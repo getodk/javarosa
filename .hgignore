@@ -1,0 +1,61 @@
+syntax: glob
+
+#compiled files and libraries
+*.class
+*.jar
+*.jad
+*.zip
+*.pyc
+
+#build process
+bin/
+build/
+deployed/
+dist/
+webdocs/
+
+#IDE and polish
+.eclipseme.tmp/
+.polishSettings/
+.settings/
+default.build
+devices/
+
+#OS and environment
+*~
+.DS_Store
+
+#mercurial
+*.rej
+*.orig
+
+#clean-up repository history
+*evgetme*
+*minixpath*
+*netbeans*
+*kxml2*
+*xmlpull*
+*java_cup*
+*entitymgr*
+*patientmgr*
+*usermgr*
+*cdctz*
+*ccptz*
+*mesh4j*
+*nextlab*
+*androidrosa*
+*tbhiv*
+*deployments*
+*chapas*
+*org.javarosa.imci*
+*dbutils*
+midp-*
+*org.javarosa.core.mvc*
+*org.javarosa.midlet.openmrs*
+epihandy
+epihandy-*
+*org.javarosa.utils.db*
+*org.javarosa.util.db*
+*org.javarosa.epihandy*
+util/db
+
