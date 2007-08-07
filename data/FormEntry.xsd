@@ -1,0 +1,1537 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:openmrs="http://tambo.cell-life.org:8180/OPENMRSDTHF//moduleServlet/formEntry/forms/schema/13-42"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+<xs:element name="form">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="header" type="_header_section" />
+      <xs:element name="patient" type="patient_section" />
+      <xs:element name="encounter" type="encounter_section" />
+      <xs:element name="obs" type="obs_section" />
+      <xs:element name="problem_list" type="problem_list_section" />
+      <xs:element name="other" type="_other_section" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:positiveInteger" fixed="13" use="required" />
+    <xs:attribute name="name" type="xs:string" fixed="Events Sheet" use="required" />
+    <xs:attribute name="version" type="xs:string" fixed="0.9" use="required" />
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="_header_section">
+  <xs:sequence>
+    <xs:element name="enterer" type="xs:string" />
+    <xs:element name="date_entered" type="xs:dateTime" />
+    <xs:element name="session" type="xs:string" />
+    <xs:element name="uid" type="xs:string" />
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="_other_section">
+  <xs:sequence>
+    <xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:simpleType name="_requiredString">
+  <xs:restriction base="xs:string">
+    <xs:minLength value="1" />
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="_infopath_boolean">
+  <xs:simpleContent>
+    <xs:extension base="xs:boolean">
+      <xs:attribute name="infopath_boolean_hack" type="xs:positiveInteger" use="required" fixed="1" />
+    </xs:extension>
+  </xs:simpleContent>
+</xs:complexType>
+
+<xs:complexType name="patient_section">
+  <xs:sequence>
+    <xs:element name="patient.birthdate" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="birthdate" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.birthdate_estimated" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="birthdate_estimated" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.family_name" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_name" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="family_name" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.given_name" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_name" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="given_name" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.medical_record_number" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_identifier" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="identifier" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.pawc_folder_no" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_identifier" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="identifier" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.preferred_id" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_identifier" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="identifier" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.cipra_patient_id" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_identifier" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="identifier" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.art_register_no" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_identifier" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="identifier" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.dthf_patient_id" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_identifier" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="identifier" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.pawc_patient_id" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_identifier" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="identifier" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.middle_name" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_name" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="middle_name" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.patient_id" nillable="0">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="_requiredString">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="patient_id" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.sex" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="gender" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient.tribe" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="tribe" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient_address.address1" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_address" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="address1" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="patient_address.address2" nillable="1">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="patient_address" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="address2" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="encounter_section">
+  <xs:sequence>
+    <xs:element name="encounter.encounter_datetime" nillable="0">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="_requiredString">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="encounter" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="encounter_datetime" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="encounter.location_id" nillable="0">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="_requiredString">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="encounter" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="location_id" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="encounter.provider_id" nillable="0">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="_requiredString">
+            <xs:attribute name="openmrs_table" type="xs:string" use="required" fixed="encounter" />
+            <xs:attribute name="openmrs_attribute" type="xs:string" use="required" fixed="provider_id" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="obs_section">
+  <xs:sequence>
+    <xs:element name="home_language" type="home_language_type" nillable="1" />
+    <xs:element name="education" type="education_type" nillable="1" />
+    <xs:element name="employed_outside_home" type="employed_outside_home_type" nillable="1" />
+    <xs:element name="last_negative_hiv_test" type="last_negative_hiv_test_type" nillable="1" />
+    <xs:element name="positive_hiv_test_date" type="positive_hiv_test_date_type" nillable="1" />
+    <xs:element name="reason_for_hiv_test" type="reason_for_hiv_test_type" nillable="1" />
+    <xs:element name="mode_of_transmission_of_hiv" type="mode_of_transmission_of_hiv_type" nillable="1" />
+    <xs:element name="hiv_disclosure_to_anyone_specific" type="hiv_disclosure_to_anyone_specific_type" nillable="1" />
+    <xs:element name="height_cm" type="height_cm_type" nillable="1" />
+    <xs:element name="weight_kg" type="weight_kg_type" nillable="1" />
+    <xs:element name="current_who_hiv_stage" type="current_who_hiv_stage_type" nillable="1" />
+    <xs:element name="adult_who_condition_query" type="adult_who_condition_query_type" nillable="1" />
+    <xs:element name="pregnancy_status" type="pregnancy_status_type" nillable="1" />
+    <xs:element name="last_menstrual_period" type="last_menstrual_period_type" nillable="1" />
+    <xs:element name="cd4_count" type="cd4_count_type" nillable="1" />
+    <xs:element name="hiv_viral_load" type="hiv_viral_load_type" nillable="1" />
+    <xs:element name="tuberculosis_drug_treatment_start_date" type="tuberculosis_drug_treatment_start_date_type" nillable="1" />
+    <xs:element name="tb_retreatment" type="tb_retreatment_type" nillable="1" />
+    <xs:element name="tb_site" type="tb_site_type" nillable="1" />
+    <xs:element name="tb_confirmed_date" type="tb_confirmed_date_type" nillable="1" />
+    <xs:element name="tb_suspected_date" type="tb_suspected_date_type" nillable="1" />
+    <xs:element name="tb_confirmation_method" type="tb_confirmation_method_type" nillable="1" />
+    <xs:element name="cotrimoxazole_start_date" type="cotrimoxazole_start_date_type" nillable="1" />
+    <xs:element name="cotrimoxazole_stop_date" type="cotrimoxazole_stop_date_type" nillable="1" />
+    <xs:element name="antiretroviral_plan" type="antiretroviral_plan_type" nillable="1" />
+    <xs:element name="dthf_arv_drug_list" type="dthf_arv_drug_list_type" nillable="1" />
+    <xs:element name="toxicity_event_type" type="toxicity_event_type_type" nillable="1" />
+    <xs:element name="probable_causative_drug" type="probable_causative_drug_type" nillable="1" />
+    <xs:element name="patient_transfer_in" type="patient_transfer_in_type" nillable="1" />
+    <xs:element name="lost_to_follow_up" type="lost_to_follow_up_type" nillable="1" />
+    <xs:element name="patient_transfer_out" type="patient_transfer_out_type" nillable="1" />
+    <xs:element name="died_while_on_antiretrovirals" type="died_while_on_antiretrovirals_type" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1238^MEDICAL RECORD OBSERVATIONS^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="ZZ" />
+</xs:complexType>
+
+<xs:complexType name="problem_list_section">
+  <xs:sequence>
+    <xs:element name="problem_added" type="problem_added_type" maxOccurs="unbounded" nillable="1" />
+    <xs:element name="problem_resolved" type="problem_resolved_type" maxOccurs="unbounded" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1284^PROBLEM LIST^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="ZZ" />
+</xs:complexType>
+
+<xs:complexType name="home_language_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:string" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1377^HOME LANGUAGE^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="ST" />
+</xs:complexType>
+
+<xs:complexType name="education_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" minOccurs="0" maxOccurs="1" nillable="1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="1383^TERTIARY EDUCATION^99DCT" /> <!-- TERTIARY EDUCATION -->
+          <xs:enumeration value="1382^GRADE 1^99DCT" /> <!-- GRADE 1 -->
+          <xs:enumeration value="1392^GRADE 7^99DCT" /> <!-- GRADE 7 -->
+          <xs:enumeration value="5622^OTHER NON-CODED^99DCT" /> <!-- OTHER NON-CODED -->
+          <xs:enumeration value="1390^GRADE 5^99DCT" /> <!-- GRADE 5 -->
+          <xs:enumeration value="1393^GRADE 8^99DCT" /> <!-- GRADE 8 -->
+          <xs:enumeration value="1397^GRADE 12^99DCT" /> <!-- GRADE 12 -->
+          <xs:enumeration value="1067^UNKNOWN^99DCT" /> <!-- UNKNOWN -->
+          <xs:enumeration value="1395^GRADE 10^99DCT" /> <!-- GRADE 10 -->
+          <xs:enumeration value="1396^GRADE 11^99DCT" /> <!-- GRADE 11 -->
+          <xs:enumeration value="1107^NONE^99DCT" /> <!-- NONE -->
+          <xs:enumeration value="1389^GRADE 4^99DCT" /> <!-- GRADE 4 -->
+          <xs:enumeration value="1391^GRADE 6^99DCT" /> <!-- GRADE 6 -->
+          <xs:enumeration value="1388^GRADE 3^99DCT" /> <!-- GRADE 3 -->
+          <xs:enumeration value="1394^GRADE 9^99DCT" /> <!-- GRADE 9 -->
+          <xs:enumeration value="1387^GRADE 2^99DCT" /> <!-- GRADE 2 -->
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1378^EDUCATION^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="0" />
+</xs:complexType>
+
+<xs:complexType name="employed_outside_home_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="_infopath_boolean" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5608^EMPLOYED OUTSIDE HOME^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="BIT" />
+</xs:complexType>
+
+<xs:complexType name="last_negative_hiv_test_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:date" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1381^LAST NEGATIVE HIV TEST^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="DT" />
+</xs:complexType>
+
+<xs:complexType name="positive_hiv_test_date_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:date" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1354^POSITIVE HIV TEST DATE^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="DT" />
+</xs:complexType>
+
+<xs:complexType name="reason_for_hiv_test_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" minOccurs="0" maxOccurs="1" nillable="1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="58^TUBERCULOSIS^99DCT" /> <!-- TUBERCULOSIS -->
+          <xs:enumeration value="1380^VOLUNTARY COUNSELING AND TESTING^99DCT" /> <!-- VOLUNTARY COUNSELING AND TESTING -->
+          <xs:enumeration value="5622^OTHER NON-CODED^99DCT" /> <!-- OTHER NON-CODED -->
+          <xs:enumeration value="1356^VERTICAL TRANSMISSION^99DCT" /> <!-- VERTICAL TRANSMISSION -->
+          <xs:enumeration value="1384^ILLNESS^99DCT" /> <!-- ILLNESS -->
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1379^REASON FOR HIV TEST^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="0" />
+</xs:complexType>
+
+<xs:complexType name="mode_of_transmission_of_hiv_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" minOccurs="0" maxOccurs="1" nillable="1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="1359^BLOOD PRODUCTS^99DCT" /> <!-- BLOOD PRODUCTS -->
+          <xs:enumeration value="105^INTRAVENOUS DRUG USE^99DCT" /> <!-- INTRAVENOUS DRUG USE -->
+          <xs:enumeration value="1356^VERTICAL TRANSMISSION^99DCT" /> <!-- VERTICAL TRANSMISSION -->
+          <xs:enumeration value="1357^HETEROSEXUAL TRANSMISSION^99DCT" /> <!-- HETEROSEXUAL TRANSMISSION -->
+          <xs:enumeration value="1067^UNKNOWN^99DCT" /> <!-- UNKNOWN -->
+          <xs:enumeration value="1358^HOMOSEXUAL TRANSMISSION^99DCT" /> <!-- HOMOSEXUAL TRANSMISSION -->
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1355^MODE OF TRANSMISSION OF HIV^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="0" />
+</xs:complexType>
+
+<xs:complexType name="hiv_disclosure_to_anyone_specific_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="commnunity" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1386^COMMNUNITY^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="other_non-coded" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5622^OTHER NON-CODED^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="partner_or_spouse" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5617^PARTNER OR SPOUSE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="other_family_member" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5620^OTHER FAMILY MEMBER^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="health_care_provider" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5619^HEALTH CARE PROVIDER^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="employer" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1385^EMPLOYER^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="other_household_member" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5621^OTHER HOUSEHOLD MEMBER^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="friend" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5618^FRIEND^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="none" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1107^NONE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5616^HIV DISCLOSURE TO ANYONE, SPECIFIC^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="1" />
+</xs:complexType>
+
+<xs:simpleType name="height_cm_type_restricted_type">
+  <xs:restriction base="xs:float">
+    <xs:minInclusive value="10.0" />
+    <xs:maxInclusive value="228.0" />
+  </xs:restriction>
+</xs:simpleType>
+<xs:complexType name="height_cm_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="height_cm_type_restricted_type" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5090^HEIGHT (CM)^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="NM" />
+</xs:complexType>
+
+<xs:simpleType name="weight_kg_type_restricted_type">
+  <xs:restriction base="xs:float">
+    <xs:minInclusive value="0.0" />
+    <xs:maxInclusive value="250.0" />
+  </xs:restriction>
+</xs:simpleType>
+<xs:complexType name="weight_kg_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="weight_kg_type_restricted_type" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5089^WEIGHT (KG)^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="NM" />
+</xs:complexType>
+
+<xs:complexType name="current_who_hiv_stage_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" minOccurs="0" maxOccurs="1" nillable="1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="1206^WHO STAGE 3 ADULT^99DCT" /> <!-- WHO STAGE 3 ADULT -->
+          <xs:enumeration value="1207^WHO STAGE 4 ADULT^99DCT" /> <!-- WHO STAGE 4 ADULT -->
+          <xs:enumeration value="1205^WHO STAGE 2 ADULT^99DCT" /> <!-- WHO STAGE 2 ADULT -->
+          <xs:enumeration value="1204^WHO STAGE 1 ADULT^99DCT" /> <!-- WHO STAGE 1 ADULT -->
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5356^CURRENT WHO HIV STAGE^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="0" />
+</xs:complexType>
+
+<xs:complexType name="adult_who_condition_query_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="encephalopathy" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5345^ENCEPHALOPATHY^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="wasting_syndrome" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="823^WASTING SYNDROME^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="cardiomyopathy" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5016^CARDIOMYOPATHY^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="progressive_multifocal_leukoencephalopathy" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5046^PROGRESSIVE MULTIFOCAL LEUKOENCEPHALOPATHY^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_persistent_generalized_lymphadenopathy" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5328^HIV STAGING - PERSISTENT GENERALIZED LYMPHADENOPATHY^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="periodontitis" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1441^PERIODONTITIS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="angular_cheilitis" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1437^ANGULAR CHEILITIS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="toxoplasmosis_central_nervous_system" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="990^TOXOPLASMOSIS, CENTRAL NERVOUS SYSTEM^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_weight_loss_greater_than_ten_percent" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5339^HIV STAGING - WEIGHT LOSS GREATER THAN TEN PERCENT^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_cryptosporidiosis" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5034^HIV STAGING - CRYPTOSPORIDIOSIS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="diarrhea_chronic" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5018^DIARRHEA, CHRONIC^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_mycobacterium_other" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5043^HIV STAGING - MYCOBACTERIUM, OTHER^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_lymphoma" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5041^HIV STAGING - LYMPHOMA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="invasive_cervical_carcinoma" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1444^INVASIVE CERVICAL CARCINOMA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="anemia" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="3^ANEMIA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_salmonella_septicemia" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5354^HIV STAGING - SALMONELLA SEPTICEMIA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="papular_pruritic_eruption" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1249^PAPULAR PRURITIC ERUPTION^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="asymptomatic_hiv_infection" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5327^ASYMPTOMATIC HIV INFECTION^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_recurrent_bacterial_pneumonia" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1215^HIV STAGING - RECURRENT BACTERIAL PNEUMONIA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_cryptococcosis_extrapulmonary" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5033^HIV STAGING - CRYPTOCOCCOSIS, EXTRAPULMONARY^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="recurrent_oral_ulceration" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1438^RECURRENT ORAL ULCERATION^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="isosporiasis_chronic" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1443^ISOSPORIASIS, CHRONIC^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_serious_bacterial_infections" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5030^HIV STAGING - SERIOUS BACTERIAL INFECTIONS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_candidiasis_ororespiratory_tract" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5340^HIV STAGING  - CANDIDIASIS, ORORESPIRATORY TRACT^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="oral_hairy_leukoplakia" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5337^ORAL HAIRY LEUKOPLAKIA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="pneumocystic_carinii_pneumonia" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="882^PNEUMOCYSTIC CARINII PNEUMONIA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_mucocutaneous_herpes_simplex" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5344^HIV STAGING - MUCOCUTANEOUS HERPES SIMPLEX^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_disseminated_endemic_mycosis" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5350^HIV STAGING - DISSEMINATED ENDEMIC MYCOSIS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="gingivitis" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="126^GINGIVITIS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_recurrent_upper_respiratory_infection" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5012^HIV STAGING - RECURRENT UPPER RESPIRATORY INFECTION^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="fungal_nail_infections" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1440^FUNGAL NAIL INFECTIONS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="kaposi_apos_s_sarcoma" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="507^KAPOSI'S SARCOMA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="seborrhoeic_dermatitis" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1439^SEBORRHOEIC DERMATITIS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="mycobacterium_tuberculosis_extrapulmonary" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5042^MYCOBACTERIUM TUBERCULOSIS, EXTRAPULMONARY^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_weight_loss_less_than_ten_percent" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5332^HIV STAGING - WEIGHT LOSS LESS THAN TEN PERCENT^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="atypical_disseminated_leishmaniasis" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1445^ATYPICAL DISSEMINATED LEISHMANIASIS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_tuberculosis_within_year" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5338^HIV STAGING - TUBERCULOSIS WITHIN YEAR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_hsv_stomatitis" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5020^HIV STAGING - HSV STOMATITIS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_cytomegalovirus_disease" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5035^HIV STAGING - CYTOMEGALOVIRUS DISEASE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="thrombocytopenia" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="839^THROMBOCYTOPENIA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_minor_mucocutaneous_manifestations" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5330^HIV STAGING - MINOR MUCOCUTANEOUS MANIFESTATIONS^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_adult_herpes_zoster" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5329^HIV STAGING - ADULT HERPES ZOSTER^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="hiv_staging_-_persistent_fever" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5027^HIV STAGING - PERSISTENT FEVER^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="neutropaenia" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1442^NEUTROPAENIA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="nephropathy" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5025^NEPHROPATHY^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="candidiasis_oral" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5334^CANDIDIASIS, ORAL^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="6048^ADULT WHO CONDITION QUERY^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="1" />
+</xs:complexType>
+
+<xs:complexType name="pregnancy_status_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="_infopath_boolean" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5272^PREGNANCY STATUS^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="BIT" />
+</xs:complexType>
+
+<xs:complexType name="last_menstrual_period_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:date" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1353^LAST MENSTRUAL PERIOD^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="DT" />
+</xs:complexType>
+
+<xs:complexType name="cd4_count_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:int" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="5497^CD4 COUNT^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="NM" />
+</xs:complexType>
+
+<xs:complexType name="hiv_viral_load_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:int" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="856^HIV VIRAL LOAD^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="NM" />
+</xs:complexType>
+
+<xs:complexType name="tuberculosis_drug_treatment_start_date_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:date" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1113^TUBERCULOSIS DRUG TREATMENT START DATE^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="DT" />
+</xs:complexType>
+
+<xs:complexType name="tb_retreatment_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="_infopath_boolean" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1368^TB RETREATMENT^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="BIT" />
+</xs:complexType>
+
+<xs:complexType name="tb_site_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:string" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1367^TB SITE ^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="ST" />
+</xs:complexType>
+
+<xs:complexType name="tb_confirmed_date_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:date" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1365^TB CONFIRMED DATE^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="DT" />
+</xs:complexType>
+
+<xs:complexType name="tb_suspected_date_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:date" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1364^TB SUSPECTED DATE ^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="DT" />
+</xs:complexType>
+
+<xs:complexType name="tb_confirmation_method_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" minOccurs="0" maxOccurs="1" nillable="1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="1417^CULTURE^99DCT" /> <!-- CULTURE -->
+          <xs:enumeration value="5622^OTHER NON-CODED^99DCT" /> <!-- OTHER NON-CODED -->
+          <xs:enumeration value="307^SPUTUM FOR ACID FAST BACILLI^99DCT" /> <!-- SPUTUM FOR ACID FAST BACILLI -->
+          <xs:enumeration value="1418^CLINICAL^99DCT" /> <!-- CLINICAL -->
+          <xs:enumeration value="12^X-RAY, CHEST^99DCT" /> <!-- X-RAY, CHEST -->
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1366^TB CONFIRMATION METHOD^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="0" />
+</xs:complexType>
+
+<xs:complexType name="cotrimoxazole_start_date_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:date" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1369^COTRIMOXAZOLE START DATE^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="DT" />
+</xs:complexType>
+
+<xs:complexType name="cotrimoxazole_stop_date_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="xs:date" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1370^COTRIMOXAZOLE STOP DATE^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="DT" />
+</xs:complexType>
+
+<xs:complexType name="antiretroviral_plan_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" minOccurs="0" maxOccurs="1" nillable="1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="1257^CONTINUE REGIMEN^99DCT" /> <!-- CONTINUE REGIMEN -->
+          <xs:enumeration value="1420^CHANGE DRUG^99DCT" /> <!-- CHANGE DRUG -->
+          <xs:enumeration value="1256^START DRUGS^99DCT" /> <!-- START DRUGS -->
+          <xs:enumeration value="1259^CHANGE REGIMEN^99DCT" /> <!-- CHANGE REGIMEN -->
+          <xs:enumeration value="1421^CONTINUE IN HIV CARE^99DCT" /> <!-- CONTINUE IN HIV CARE -->
+          <xs:enumeration value="981^DOSING CHANGE^99DCT" /> <!-- DOSING CHANGE -->
+          <xs:enumeration value="1260^STOP ALL^99DCT" /> <!-- STOP ALL -->
+          <xs:enumeration value="1415^CHANGE TO SECOND LINE REGIMEN^99DCT" /> <!-- CHANGE TO SECOND LINE REGIMEN -->
+          <xs:enumeration value="1107^NONE^99DCT" /> <!-- NONE -->
+          <xs:enumeration value="1258^CHANGE FORMULATION^99DCT" /> <!-- CHANGE FORMULATION -->
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1255^ANTIRETROVIRAL PLAN^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="0" />
+</xs:complexType>
+
+<xs:complexType name="dthf_arv_drug_list_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="hydroxyurea" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1411^HYDROXYUREA^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="delavirdine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1413^DELAVIRDINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="zidovudine_and_lamivudine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="630^ZIDOVUDINE AND LAMIVUDINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="tmc114" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1408^TMC114^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="abacavir" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="814^ABACAVIR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="nevirapine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="631^NEVIRAPINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="efavirenz" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="633^EFAVIRENZ^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="didanosine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="796^DIDANOSINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="zidovudine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="797^ZIDOVUDINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="fosamprenavir" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1406^FOSAMPRENAVIR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="emivirine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1403^EMIVIRINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="emtricitabine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="791^EMTRICITABINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="atazanavir" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1407^ATAZANAVIR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="vicriviroc" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1410^VICRIVIROC^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="saquinavir" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1431^SAQUINAVIR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="lamivudine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="628^LAMIVUDINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="maraviroc" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1409^MARAVIROC^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="ritonavir" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="795^RITONAVIR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="capravirine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1404^CAPRAVIRINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="tmc278" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1405^TMC278^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="indinavir" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="749^INDINAVIR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="lopinavir_and_ritonavir" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="794^LOPINAVIR AND RITONAVIR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="nelfinavir" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="635^NELFINAVIR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="tenofovir_and_emtricitabine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1412^TENOFOVIR AND EMTRICITABINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="amprenavir" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="810^AMPRENAVIR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="stavudine" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="625^STAVUDINE^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+    <xs:element name="tenofovir" default="false" nillable="true">
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="xs:boolean">
+            <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="802^TENOFOVIR^99DCT" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1419^DTHF ARV DRUG LIST^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="1" />
+</xs:complexType>
+
+<xs:complexType name="toxicity_event_type_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" minOccurs="0" maxOccurs="1" nillable="1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="3^ANEMIA^99DCT" /> <!-- ANEMIA -->
+          <xs:enumeration value="821^PERIPHERAL NEUROPATHY^99DCT" /> <!-- PERIPHERAL NEUROPATHY -->
+          <xs:enumeration value="29^HEPATITIS^99DCT" /> <!-- HEPATITIS -->
+          <xs:enumeration value="5622^OTHER NON-CODED^99DCT" /> <!-- OTHER NON-CODED -->
+          <xs:enumeration value="219^PSYCHOSIS^99DCT" /> <!-- PSYCHOSIS -->
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1362^TOXICITY EVENT TYPE^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="0" />
+</xs:complexType>
+
+<xs:complexType name="probable_causative_drug_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" minOccurs="0" maxOccurs="1" nillable="1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="1404^CAPRAVIRINE^99DCT" /> <!-- CAPRAVIRINE -->
+          <xs:enumeration value="635^NELFINAVIR^99DCT" /> <!-- NELFINAVIR -->
+          <xs:enumeration value="625^STAVUDINE^99DCT" /> <!-- STAVUDINE -->
+          <xs:enumeration value="1412^TENOFOVIR AND EMTRICITABINE^99DCT" /> <!-- TENOFOVIR AND EMTRICITABINE -->
+          <xs:enumeration value="1405^TMC278^99DCT" /> <!-- TMC278 -->
+          <xs:enumeration value="1410^VICRIVIROC^99DCT" /> <!-- VICRIVIROC -->
+          <xs:enumeration value="628^LAMIVUDINE^99DCT" /> <!-- LAMIVUDINE -->
+          <xs:enumeration value="1403^EMIVIRINE^99DCT" /> <!-- EMIVIRINE -->
+          <xs:enumeration value="795^RITONAVIR^99DCT" /> <!-- RITONAVIR -->
+          <xs:enumeration value="631^NEVIRAPINE^99DCT" /> <!-- NEVIRAPINE -->
+          <xs:enumeration value="1407^ATAZANAVIR^99DCT" /> <!-- ATAZANAVIR -->
+          <xs:enumeration value="794^LOPINAVIR AND RITONAVIR^99DCT" /> <!-- LOPINAVIR AND RITONAVIR -->
+          <xs:enumeration value="1413^DELAVIRDINE^99DCT" /> <!-- DELAVIRDINE -->
+          <xs:enumeration value="810^AMPRENAVIR^99DCT" /> <!-- AMPRENAVIR -->
+          <xs:enumeration value="797^ZIDOVUDINE^99DCT" /> <!-- ZIDOVUDINE -->
+          <xs:enumeration value="1411^HYDROXYUREA^99DCT" /> <!-- HYDROXYUREA -->
+          <xs:enumeration value="1406^FOSAMPRENAVIR^99DCT" /> <!-- FOSAMPRENAVIR -->
+          <xs:enumeration value="630^ZIDOVUDINE AND LAMIVUDINE^99DCT" /> <!-- ZIDOVUDINE AND LAMIVUDINE -->
+          <xs:enumeration value="791^EMTRICITABINE^99DCT" /> <!-- EMTRICITABINE -->
+          <xs:enumeration value="633^EFAVIRENZ^99DCT" /> <!-- EFAVIRENZ -->
+          <xs:enumeration value="802^TENOFOVIR^99DCT" /> <!-- TENOFOVIR -->
+          <xs:enumeration value="1409^MARAVIROC^99DCT" /> <!-- MARAVIROC -->
+          <xs:enumeration value="814^ABACAVIR^99DCT" /> <!-- ABACAVIR -->
+          <xs:enumeration value="796^DIDANOSINE^99DCT" /> <!-- DIDANOSINE -->
+          <xs:enumeration value="749^INDINAVIR^99DCT" /> <!-- INDINAVIR -->
+          <xs:enumeration value="1408^TMC114^99DCT" /> <!-- TMC114 -->
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1363^PROBABLE CAUSATIVE DRUG^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="0" />
+</xs:complexType>
+
+<xs:complexType name="patient_transfer_in_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="_infopath_boolean" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1371^PATIENT TRANSFER IN^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="BIT" />
+</xs:complexType>
+
+<xs:complexType name="lost_to_follow_up_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="_infopath_boolean" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1375^LOST TO FOLLOW UP^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="BIT" />
+</xs:complexType>
+
+<xs:complexType name="patient_transfer_out_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="_infopath_boolean" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1372^PATIENT TRANSFER OUT ^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="BIT" />
+</xs:complexType>
+
+<xs:complexType name="died_while_on_antiretrovirals_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" type="_infopath_boolean" nillable="1" />
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="1374^DIED WHILE ON ANTIRETROVIRALS^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="BIT" />
+</xs:complexType>
+
+<xs:complexType name="problem_added_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" minOccurs="0" maxOccurs="1" nillable="1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="6042^PROBLEM ADDED^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="0" />
+</xs:complexType>
+
+<xs:complexType name="problem_resolved_type">
+  <xs:sequence>
+    <xs:element name="date" type="xs:date" nillable="true" minOccurs="0" />
+    <xs:element name="time" type="xs:time" nillable="true" minOccurs="0" />
+    <xs:element name="value" minOccurs="0" maxOccurs="1" nillable="1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:element>
+  </xs:sequence>
+  <xs:attribute name="openmrs_concept" type="xs:string" use="required" fixed="6097^PROBLEM RESOLVED^99DCT" />
+  <xs:attribute name="openmrs_datatype" type="xs:string" use="required" fixed="CWE" />
+  <xs:attribute name="multiple" type="xs:integer" use="required" fixed="0" />
+</xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xd="http://schemas.microsoft.com/office/infopath/2003"
+	xmlns:openmrs="http://tambo.cell-life.org:8180/OPENMRSDTHF//moduleServlet/formEntry/forms/schema/13-42" id="13"
+	name="Events Sheet" version="0.9">
+	<header>
+		<enterer>7^Simon Kelly</enterer>
+		<date_entered>2007-04-07T11:20:29+02:00</date_entered>
+		<session>A87E6186FF98FD178692158F8FDC82AE</session>
+		<uid>jas8HJos0ksnle90jsni</uid>
+	</header>
+	<patient>
+		<patient.birthdate openmrs_attribute="birthdate" openmrs_table="patient">19811125</patient.birthdate>
+		<patient.birthdate_estimated openmrs_attribute="birthdate_estimated" openmrs_table="patient"></patient.birthdate_estimated>
+		<patient.family_name openmrs_attribute="family_name" openmrs_table="patient_name">Mongo</patient.family_name>
+		<patient.given_name openmrs_attribute="given_name" openmrs_table="patient_name">E</patient.given_name>
+		<patient.medical_record_number openmrs_attribute="identifier" openmrs_table="patient_identifier"></patient.medical_record_number>
+		<patient.pawc_folder_no openmrs_attribute="identifier" openmrs_table="patient_identifier">
+			EM1569
+		</patient.pawc_folder_no>
+		<patient.preferred_id openmrs_attribute="identifier" openmrs_table="patient_identifier">
+			EM1569
+		</patient.preferred_id>
+		<patient.cipra_patient_id openmrs_attribute="identifier" openmrs_table="patient_identifier"></patient.cipra_patient_id>
+		<patient.art_register_no openmrs_attribute="identifier" openmrs_table="patient_identifier"></patient.art_register_no>
+		<patient.dthf_patient_id openmrs_attribute="identifier" openmrs_table="patient_identifier"></patient.dthf_patient_id>
+		<patient.pawc_patient_id openmrs_attribute="identifier" openmrs_table="patient_identifier">
+			1569
+		</patient.pawc_patient_id>
+		<patient.middle_name openmrs_attribute="middle_name" openmrs_table="patient_name"></patient.middle_name>
+		<patient.patient_id openmrs_attribute="patient_id" openmrs_table="patient">12356</patient.patient_id>
+		<patient.sex openmrs_attribute="gender" openmrs_table="patient">F</patient.sex>
+		<patient.tribe openmrs_attribute="tribe" openmrs_table="patient">13^PAWC</patient.tribe>
+		<patient_address.address1 openmrs_attribute="address1" openmrs_table="patient_address"></patient_address.address1>
+		<patient_address.address2 openmrs_attribute="address2" openmrs_table="patient_address"></patient_address.address2>
+	</patient>
+	<encounter>
+		<encounter.encounter_datetime openmrs_attribute="encounter_datetime" openmrs_table="encounter" />
+		<encounter.location_id openmrs_attribute="location_id" openmrs_table="encounter" />
+		<encounter.provider_id openmrs_attribute="provider_id" openmrs_table="encounter">7</encounter.provider_id>
+	</encounter>
+	<obs openmrs_concept="1238^MEDICAL RECORD OBSERVATIONS^99DCT" openmrs_datatype="ZZ">
+		<home_language openmrs_concept="1377^HOME LANGUAGE^99DCT" openmrs_datatype="ST">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</home_language>
+		<education multiple="0" openmrs_concept="1378^EDUCATION^99DCT" openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</education>
+		<employed_outside_home openmrs_concept="5608^EMPLOYED OUTSIDE HOME^99DCT" openmrs_datatype="BIT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value infopath_boolean_hack="1" xsi:nil="true" />
+		</employed_outside_home>
+		<last_negative_hiv_test openmrs_concept="1381^LAST NEGATIVE HIV TEST^99DCT" openmrs_datatype="DT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</last_negative_hiv_test>
+		<positive_hiv_test_date openmrs_concept="1354^POSITIVE HIV TEST DATE^99DCT" openmrs_datatype="DT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</positive_hiv_test_date>
+		<reason_for_hiv_test multiple="0" openmrs_concept="1379^REASON FOR HIV TEST^99DCT" openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</reason_for_hiv_test>
+		<mode_of_transmission_of_hiv multiple="0" openmrs_concept="1355^MODE OF TRANSMISSION OF HIV^99DCT"
+			openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</mode_of_transmission_of_hiv>
+		<hiv_disclosure_to_anyone_specific multiple="1" openmrs_concept="5616^HIV DISCLOSURE TO ANYONE, SPECIFIC^99DCT"
+			openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<commnunity openmrs_concept="1386^COMMNUNITY^99DCT">false</commnunity>
+			<other_non-coded openmrs_concept="5622^OTHER NON-CODED^99DCT">false</other_non-coded>
+			<partner_or_spouse openmrs_concept="5617^PARTNER OR SPOUSE^99DCT">false</partner_or_spouse>
+			<other_family_member openmrs_concept="5620^OTHER FAMILY MEMBER^99DCT">false</other_family_member>
+			<health_care_provider openmrs_concept="5619^HEALTH CARE PROVIDER^99DCT">false</health_care_provider>
+			<employer openmrs_concept="1385^EMPLOYER^99DCT">false</employer>
+			<other_household_member openmrs_concept="5621^OTHER HOUSEHOLD MEMBER^99DCT">false</other_household_member>
+			<friend openmrs_concept="5618^FRIEND^99DCT">false</friend>
+			<none openmrs_concept="1107^NONE^99DCT">false</none>
+		</hiv_disclosure_to_anyone_specific>
+		<height_cm openmrs_concept="5090^HEIGHT (CM)^99DCT" openmrs_datatype="NM">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</height_cm>
+		<weight_kg openmrs_concept="5089^WEIGHT (KG)^99DCT" openmrs_datatype="NM">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</weight_kg>
+		<current_who_hiv_stage multiple="0" openmrs_concept="5356^CURRENT WHO HIV STAGE^99DCT" openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</current_who_hiv_stage>
+		<adult_who_condition_query multiple="1" openmrs_concept="6048^ADULT WHO CONDITION QUERY^99DCT"
+			openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<encephalopathy openmrs_concept="5345^ENCEPHALOPATHY^99DCT">false</encephalopathy>
+			<wasting_syndrome openmrs_concept="823^WASTING SYNDROME^99DCT">false</wasting_syndrome>
+			<cardiomyopathy openmrs_concept="5016^CARDIOMYOPATHY^99DCT">false</cardiomyopathy>
+			<progressive_multifocal_leukoencephalopathy
+				openmrs_concept="5046^PROGRESSIVE MULTIFOCAL LEUKOENCEPHALOPATHY^99DCT">
+				false
+			</progressive_multifocal_leukoencephalopathy>
+			<hiv_staging_-_persistent_generalized_lymphadenopathy
+				openmrs_concept="5328^HIV STAGING - PERSISTENT GENERALIZED LYMPHADENOPATHY^99DCT">
+				false
+			</hiv_staging_-_persistent_generalized_lymphadenopathy>
+			<periodontitis openmrs_concept="1441^PERIODONTITIS^99DCT">false</periodontitis>
+			<angular_cheilitis openmrs_concept="1437^ANGULAR CHEILITIS^99DCT">false</angular_cheilitis>
+			<toxoplasmosis_central_nervous_system openmrs_concept="990^TOXOPLASMOSIS, CENTRAL NERVOUS SYSTEM^99DCT">
+				false
+			</toxoplasmosis_central_nervous_system>
+			<hiv_staging_-_weight_loss_greater_than_ten_percent
+				openmrs_concept="5339^HIV STAGING - WEIGHT LOSS GREATER THAN TEN PERCENT^99DCT">
+				false
+			</hiv_staging_-_weight_loss_greater_than_ten_percent>
+			<hiv_staging_-_cryptosporidiosis openmrs_concept="5034^HIV STAGING - CRYPTOSPORIDIOSIS^99DCT">
+				false
+			</hiv_staging_-_cryptosporidiosis>
+			<diarrhea_chronic openmrs_concept="5018^DIARRHEA, CHRONIC^99DCT">false</diarrhea_chronic>
+			<hiv_staging_-_mycobacterium_other openmrs_concept="5043^HIV STAGING - MYCOBACTERIUM, OTHER^99DCT">
+				false
+			</hiv_staging_-_mycobacterium_other>
+			<hiv_staging_-_lymphoma openmrs_concept="5041^HIV STAGING - LYMPHOMA^99DCT">false</hiv_staging_-_lymphoma>
+			<invasive_cervical_carcinoma openmrs_concept="1444^INVASIVE CERVICAL CARCINOMA^99DCT">
+				false
+			</invasive_cervical_carcinoma>
+			<anemia openmrs_concept="3^ANEMIA^99DCT">false</anemia>
+			<hiv_staging_-_salmonella_septicemia openmrs_concept="5354^HIV STAGING - SALMONELLA SEPTICEMIA^99DCT">
+				false
+			</hiv_staging_-_salmonella_septicemia>
+			<papular_pruritic_eruption openmrs_concept="1249^PAPULAR PRURITIC ERUPTION^99DCT">
+				false
+			</papular_pruritic_eruption>
+			<asymptomatic_hiv_infection openmrs_concept="5327^ASYMPTOMATIC HIV INFECTION^99DCT">
+				false
+			</asymptomatic_hiv_infection>
+			<hiv_staging_-_recurrent_bacterial_pneumonia
+				openmrs_concept="1215^HIV STAGING - RECURRENT BACTERIAL PNEUMONIA^99DCT">
+				false
+			</hiv_staging_-_recurrent_bacterial_pneumonia>
+			<hiv_staging_-_cryptococcosis_extrapulmonary
+				openmrs_concept="5033^HIV STAGING - CRYPTOCOCCOSIS, EXTRAPULMONARY^99DCT">
+				false
+			</hiv_staging_-_cryptococcosis_extrapulmonary>
+			<recurrent_oral_ulceration openmrs_concept="1438^RECURRENT ORAL ULCERATION^99DCT">
+				false
+			</recurrent_oral_ulceration>
+			<isosporiasis_chronic openmrs_concept="1443^ISOSPORIASIS, CHRONIC^99DCT">false</isosporiasis_chronic>
+			<hiv_staging_-_serious_bacterial_infections
+				openmrs_concept="5030^HIV STAGING - SERIOUS BACTERIAL INFECTIONS^99DCT">
+				false
+			</hiv_staging_-_serious_bacterial_infections>
+			<hiv_staging_-_candidiasis_ororespiratory_tract
+				openmrs_concept="5340^HIV STAGING  - CANDIDIASIS, ORORESPIRATORY TRACT^99DCT">
+				false
+			</hiv_staging_-_candidiasis_ororespiratory_tract>
+			<oral_hairy_leukoplakia openmrs_concept="5337^ORAL HAIRY LEUKOPLAKIA^99DCT">false</oral_hairy_leukoplakia>
+			<pneumocystic_carinii_pneumonia openmrs_concept="882^PNEUMOCYSTIC CARINII PNEUMONIA^99DCT">
+				false
+			</pneumocystic_carinii_pneumonia>
+			<hiv_staging_-_mucocutaneous_herpes_simplex
+				openmrs_concept="5344^HIV STAGING - MUCOCUTANEOUS HERPES SIMPLEX^99DCT">
+				false
+			</hiv_staging_-_mucocutaneous_herpes_simplex>
+			<hiv_staging_-_disseminated_endemic_mycosis
+				openmrs_concept="5350^HIV STAGING - DISSEMINATED ENDEMIC MYCOSIS^99DCT">
+				false
+			</hiv_staging_-_disseminated_endemic_mycosis>
+			<gingivitis openmrs_concept="126^GINGIVITIS^99DCT">false</gingivitis>
+			<hiv_staging_-_recurrent_upper_respiratory_infection
+				openmrs_concept="5012^HIV STAGING - RECURRENT UPPER RESPIRATORY INFECTION^99DCT">
+				false
+			</hiv_staging_-_recurrent_upper_respiratory_infection>
+			<fungal_nail_infections openmrs_concept="1440^FUNGAL NAIL INFECTIONS^99DCT">false</fungal_nail_infections>
+			<kaposi_apos_s_sarcoma openmrs_concept="507^KAPOSI'S SARCOMA^99DCT">false</kaposi_apos_s_sarcoma>
+			<seborrhoeic_dermatitis openmrs_concept="1439^SEBORRHOEIC DERMATITIS^99DCT">false</seborrhoeic_dermatitis>
+			<mycobacterium_tuberculosis_extrapulmonary
+				openmrs_concept="5042^MYCOBACTERIUM TUBERCULOSIS, EXTRAPULMONARY^99DCT">
+				false
+			</mycobacterium_tuberculosis_extrapulmonary>
+			<hiv_staging_-_weight_loss_less_than_ten_percent
+				openmrs_concept="5332^HIV STAGING - WEIGHT LOSS LESS THAN TEN PERCENT^99DCT">
+				false
+			</hiv_staging_-_weight_loss_less_than_ten_percent>
+			<atypical_disseminated_leishmaniasis openmrs_concept="1445^ATYPICAL DISSEMINATED LEISHMANIASIS^99DCT">
+				false
+			</atypical_disseminated_leishmaniasis>
+			<hiv_staging_-_tuberculosis_within_year
+				openmrs_concept="5338^HIV STAGING - TUBERCULOSIS WITHIN YEAR^99DCT">
+				false
+			</hiv_staging_-_tuberculosis_within_year>
+			<hiv_staging_-_hsv_stomatitis openmrs_concept="5020^HIV STAGING - HSV STOMATITIS^99DCT">
+				false
+			</hiv_staging_-_hsv_stomatitis>
+			<hiv_staging_-_cytomegalovirus_disease openmrs_concept="5035^HIV STAGING - CYTOMEGALOVIRUS DISEASE^99DCT">
+				false
+			</hiv_staging_-_cytomegalovirus_disease>
+			<thrombocytopenia openmrs_concept="839^THROMBOCYTOPENIA^99DCT">false</thrombocytopenia>
+			<hiv_staging_-_minor_mucocutaneous_manifestations
+				openmrs_concept="5330^HIV STAGING - MINOR MUCOCUTANEOUS MANIFESTATIONS^99DCT">
+				false
+			</hiv_staging_-_minor_mucocutaneous_manifestations>
+			<hiv_staging_-_adult_herpes_zoster openmrs_concept="5329^HIV STAGING - ADULT HERPES ZOSTER^99DCT">
+				false
+			</hiv_staging_-_adult_herpes_zoster>
+			<hiv_staging_-_persistent_fever openmrs_concept="5027^HIV STAGING - PERSISTENT FEVER^99DCT">
+				false
+			</hiv_staging_-_persistent_fever>
+			<neutropaenia openmrs_concept="1442^NEUTROPAENIA^99DCT">false</neutropaenia>
+			<nephropathy openmrs_concept="5025^NEPHROPATHY^99DCT">false</nephropathy>
+			<candidiasis_oral openmrs_concept="5334^CANDIDIASIS, ORAL^99DCT">false</candidiasis_oral>
+		</adult_who_condition_query>
+		<pregnancy_status openmrs_concept="5272^PREGNANCY STATUS^99DCT" openmrs_datatype="BIT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value infopath_boolean_hack="1" xsi:nil="true" />
+		</pregnancy_status>
+		<last_menstrual_period openmrs_concept="1353^LAST MENSTRUAL PERIOD^99DCT" openmrs_datatype="DT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</last_menstrual_period>
+		<cd4_count openmrs_concept="5497^CD4 COUNT^99DCT" openmrs_datatype="NM">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</cd4_count>
+		<hiv_viral_load openmrs_concept="856^HIV VIRAL LOAD^99DCT" openmrs_datatype="NM">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</hiv_viral_load>
+		<tuberculosis_drug_treatment_start_date openmrs_concept="1113^TUBERCULOSIS DRUG TREATMENT START DATE^99DCT"
+			openmrs_datatype="DT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</tuberculosis_drug_treatment_start_date>
+		<tb_retreatment openmrs_concept="1368^TB RETREATMENT^99DCT" openmrs_datatype="BIT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value infopath_boolean_hack="1" xsi:nil="true" />
+		</tb_retreatment>
+		<tb_site openmrs_concept="1367^TB SITE ^99DCT" openmrs_datatype="ST">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</tb_site>
+		<tb_confirmed_date openmrs_concept="1365^TB CONFIRMED DATE^99DCT" openmrs_datatype="DT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</tb_confirmed_date>
+		<tb_suspected_date openmrs_concept="1364^TB SUSPECTED DATE ^99DCT" openmrs_datatype="DT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</tb_suspected_date>
+		<tb_confirmation_method multiple="0" openmrs_concept="1366^TB CONFIRMATION METHOD^99DCT"
+			openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</tb_confirmation_method>
+		<cotrimoxazole_start_date openmrs_concept="1369^COTRIMOXAZOLE START DATE^99DCT" openmrs_datatype="DT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</cotrimoxazole_start_date>
+		<cotrimoxazole_stop_date openmrs_concept="1370^COTRIMOXAZOLE STOP DATE^99DCT" openmrs_datatype="DT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</cotrimoxazole_stop_date>
+		<antiretroviral_plan multiple="0" openmrs_concept="1255^ANTIRETROVIRAL PLAN^99DCT" openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</antiretroviral_plan>
+		<dthf_arv_drug_list multiple="1" openmrs_concept="1419^DTHF ARV DRUG LIST^99DCT" openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<hydroxyurea openmrs_concept="1411^HYDROXYUREA^99DCT">false</hydroxyurea>
+			<delavirdine openmrs_concept="1413^DELAVIRDINE^99DCT">false</delavirdine>
+			<zidovudine_and_lamivudine openmrs_concept="630^ZIDOVUDINE AND LAMIVUDINE^99DCT">
+				false
+			</zidovudine_and_lamivudine>
+			<tmc114 openmrs_concept="1408^TMC114^99DCT">false</tmc114>
+			<abacavir openmrs_concept="814^ABACAVIR^99DCT">false</abacavir>
+			<nevirapine openmrs_concept="631^NEVIRAPINE^99DCT">false</nevirapine>
+			<efavirenz openmrs_concept="633^EFAVIRENZ^99DCT">false</efavirenz>
+			<didanosine openmrs_concept="796^DIDANOSINE^99DCT">false</didanosine>
+			<zidovudine openmrs_concept="797^ZIDOVUDINE^99DCT">false</zidovudine>
+			<fosamprenavir openmrs_concept="1406^FOSAMPRENAVIR^99DCT">false</fosamprenavir>
+			<emivirine openmrs_concept="1403^EMIVIRINE^99DCT">false</emivirine>
+			<emtricitabine openmrs_concept="791^EMTRICITABINE^99DCT">false</emtricitabine>
+			<atazanavir openmrs_concept="1407^ATAZANAVIR^99DCT">false</atazanavir>
+			<vicriviroc openmrs_concept="1410^VICRIVIROC^99DCT">false</vicriviroc>
+			<saquinavir openmrs_concept="1431^SAQUINAVIR^99DCT">false</saquinavir>
+			<lamivudine openmrs_concept="628^LAMIVUDINE^99DCT">false</lamivudine>
+			<maraviroc openmrs_concept="1409^MARAVIROC^99DCT">false</maraviroc>
+			<ritonavir openmrs_concept="795^RITONAVIR^99DCT">false</ritonavir>
+			<capravirine openmrs_concept="1404^CAPRAVIRINE^99DCT">false</capravirine>
+			<tmc278 openmrs_concept="1405^TMC278^99DCT">false</tmc278>
+			<indinavir openmrs_concept="749^INDINAVIR^99DCT">false</indinavir>
+			<lopinavir_and_ritonavir openmrs_concept="794^LOPINAVIR AND RITONAVIR^99DCT">false</lopinavir_and_ritonavir>
+			<nelfinavir openmrs_concept="635^NELFINAVIR^99DCT">false</nelfinavir>
+			<tenofovir_and_emtricitabine openmrs_concept="1412^TENOFOVIR AND EMTRICITABINE^99DCT">
+				false
+			</tenofovir_and_emtricitabine>
+			<amprenavir openmrs_concept="810^AMPRENAVIR^99DCT">false</amprenavir>
+			<stavudine openmrs_concept="625^STAVUDINE^99DCT">false</stavudine>
+			<tenofovir openmrs_concept="802^TENOFOVIR^99DCT">false</tenofovir>
+		</dthf_arv_drug_list>
+		<toxicity_event_type multiple="0" openmrs_concept="1362^TOXICITY EVENT TYPE^99DCT" openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</toxicity_event_type>
+		<probable_causative_drug multiple="0" openmrs_concept="1363^PROBABLE CAUSATIVE DRUG^99DCT"
+			openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</probable_causative_drug>
+		<patient_transfer_in openmrs_concept="1371^PATIENT TRANSFER IN^99DCT" openmrs_datatype="BIT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value infopath_boolean_hack="1" xsi:nil="true" />
+		</patient_transfer_in>
+		<lost_to_follow_up openmrs_concept="1375^LOST TO FOLLOW UP^99DCT" openmrs_datatype="BIT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value infopath_boolean_hack="1" xsi:nil="true" />
+		</lost_to_follow_up>
+		<patient_transfer_out openmrs_concept="1372^PATIENT TRANSFER OUT ^99DCT" openmrs_datatype="BIT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value infopath_boolean_hack="1" xsi:nil="true" />
+		</patient_transfer_out>
+		<died_while_on_antiretrovirals openmrs_concept="1374^DIED WHILE ON ANTIRETROVIRALS^99DCT"
+			openmrs_datatype="BIT">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value infopath_boolean_hack="1" xsi:nil="true" />
+		</died_while_on_antiretrovirals>
+	</obs>
+	<problem_list openmrs_concept="1284^PROBLEM LIST^99DCT" openmrs_datatype="ZZ">
+		<problem_added multiple="0" openmrs_concept="6042^PROBLEM ADDED^99DCT" openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</problem_added>
+		<problem_resolved multiple="0" openmrs_concept="6097^PROBLEM RESOLVED^99DCT" openmrs_datatype="CWE">
+			<date xsi:nil="true" />
+			<time xsi:nil="true" />
+			<value xsi:nil="true" />
+		</problem_resolved>
+	</problem_list>
+	<other />
+</form>
