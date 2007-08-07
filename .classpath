@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="lib" path="lib/xmlpull_1_1_3_1.jar"/>
+	<classpathentry kind="lib" path="lib/kxml2-2.3.0.jar" sourcepath="E:/development/workspace/kxml2-src-2.3.0/src">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/E:/development/workspace/kxml2-src-2.3.0/www/kxml2/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/j2meunit.jar"/>
+	<classpathentry kind="lib" path="C:\Program Files\J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
+	<classpathentry kind="lib" path="C:\Program Files\J2ME-Polish/import/midp-2.0.jar"/>
+	<classpathentry kind="lib" path="C:\Program Files\J2ME-Polish/import/mmapi.jar"/>
+	<classpathentry kind="lib" path="C:\Program Files\J2ME-Polish/import/nokia-ui.jar"/>
+	<classpathentry kind="lib" path="C:\Program Files\J2ME-Polish/import/wmapi.jar"/>
+	<classpathentry kind="lib" path="C:\Program Files\J2ME-Polish/import/fileconnection.jar"/>
+	<classpathentry kind="lib" path="C:\Program Files\J2ME-Polish/import/enough-j2mepolish-client.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

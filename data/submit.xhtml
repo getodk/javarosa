@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<head>
+<title>this is a test</title>
+<xf:model>
+	<xf:instance src="model.xml" xmlns="" />
+	<xf:submission id="save" method="post" action="http://tambo.cell-life.org:8180/OPENMRSDTHF/moduleServlet/formEntry/formUpload" ref="/form" />
+</xf:model>
+
+</head>
+<body>
+<xf:submit submission="save">
+	<xf:label>Submit</xf:label>
+</xf:submit>
+</body>
+</html>

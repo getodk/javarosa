@@ -1,0 +1,47 @@
+/** 
+  * The polish.css files contains all
+  * design information about a project.
+  * It can be adjusted for specific devices
+  * or device groups by putting it in the 
+  * appropriate sub-folder.
+  * If you want to adjust a design for all
+  * Nokia devices, define it in "resources/Nokia/polish.css"
+  * and so on. Only new and different settings
+  * need to be specified in such polish.css files. 
+  */
+
+/**
+  * the colors which are defined in
+  * the colors section can later be referenced.
+  * This makes changes easy, since the color
+  * just needs to be changed in one position.
+  * Even default colors (like blue, green, lime, etc)
+  * can be changed here. 
+  */
+colors {
+	
+}
+
+.modeList{
+	background: #FFC;
+	layout: center | expand;
+}
+
+focused{
+	background: none;
+	border-type: round-rect;
+	border-arc: 6;
+	border-color: yellow;
+	border-width: 2;
+	layout: left | expand;
+	font-color: black;
+}
+
+.urlForm{}
+
+.urlInput{}
+
+
+
+
+
