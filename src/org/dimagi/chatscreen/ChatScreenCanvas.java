@@ -1,39 +1,72 @@
 package org.dimagi.chatscreen;
 
 import java.util.Vector;
-import de.enough.polish.util.VectorIterator;
-import java.util.Stack;
 
 import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 import org.dimagi.entity.Question;
+import org.dimagi.utils.ViewUtils;
+import org.dimagi.view.Component;
+import org.dimagi.view.NavBar;
+
+import de.enough.polish.util.VectorIterator;
 
 public class ChatScreenCanvas extends Canvas {
 	
+	Component canvasComponent;
+	
 	Vector frameSet = new Vector();
+	NavBar theNavBar = new NavBar();
+	
+	public ChatScreenCanvas() {
+		setupComponents();
+	}
+	
+	private void setupComponents() {
+		
+		canvasComponent = new Component();
+		
+		int width = this.getWidth();
+		int height = this.getHeight();
+		
+		canvasComponent.setWidth(width);
+		canvasComponent.setHeight(height);
+		
+		int frameCanvasHeight = height - (height/11);
+		
+		theNavBar.setBackgroundColor(ViewUtils.DARK_GREY);
+		
+		theNavBar.setX(0);
+		
+		theNavBar.setY(frameCanvasHeight);
+		
+		theNavBar.setWidth(width);
+		
+		theNavBar.setHeight(height/11);
+		
+		canvasComponent.add(theNavBar);
+		canvasComponent.setBackgroundColor(ViewUtils.GREY);
+	}
 
-	static int BLACK = 0x00000000;
-	
-	static int WHITE = 0x00FFFFFF;
-	static int GREY = 0x00666666;
-	
 	public void addQuestion(Question theQuestion) {
-		frameSet.insertElementAt(new Frame(theQuestion), 0);
+		Frame newFrame = new Frame(theQuestion);
+		newFrame.setWidth(this.getWidth());
+		frameSet.insertElementAt(newFrame, 0);
+		
+		canvasComponent.add(newFrame);
+		
+		setupFrames();
 		this.repaint();
 	}
 	
-	protected void paint(Graphics g) {
-		g.setColor(GREY);
-		g.fillRect(0,0,g.getClipWidth(), g.getClipHeight());
-		
-		g.setColor(BLACK);
-		int width = g.getClipWidth();
-		int height = g.getClipHeight();
-		
+	private void setupFrames() {
 		VectorIterator iter = new VectorIterator(frameSet);
 		
-		int frameStart = height;
+		int frameCanvasHeight = canvasComponent.getHeight() - (canvasComponent.getHeight()/11);
+		
+		int frameStart = frameCanvasHeight;
 		
 		while(iter.hasNext()) {
 			Frame aFrame = (Frame)iter.next();
@@ -43,8 +76,13 @@ public class ChatScreenCanvas extends Canvas {
 			else {
 				aFrame.setDrawingModeSmall(true);
 			}
-			aFrame.setPosition(frameStart);
-			frameStart = frameStart - aFrame.drawFrameOntoGraphics(g);
-		}	
+			aFrame.setY(frameStart);
+			aFrame.sizeFrame();
+			frameStart = frameStart - aFrame.getHeight();
+		}
+	}
+	
+	protected void paint(Graphics g) {
+		canvasComponent.draw(g);
 	}
 }
