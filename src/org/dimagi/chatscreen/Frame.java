@@ -7,24 +7,65 @@ import javax.microedition.lcdui.Graphics;
 
 import org.dimagi.entity.Question;
 import org.dimagi.utils.StringUtils;
+import org.dimagi.utils.ViewUtils;
+import org.dimagi.view.Component;
+import org.dimagi.view.ISizeChangeListener;
 
-public class Frame{
+public class Frame extends Component {
 	
 	private Question _question;
 	
 	private boolean _small;
-	private int _y;
+	
+	private String _text = "";
+	
+	private int _backColor;
+	
+	private int _labelWidth;
+	
+	private int _xBufferSize;
+	
+	private int _yBufferSize;
 	
 	public Frame(Question theQuestion) {
 		_question = theQuestion;
+		setText();
 	}
 	
 	public void setDrawingModeSmall(boolean small) {
 		_small = small;
+		setText();
+		if(_small) {
+			_backColor = ViewUtils.LIGHT_GREY;
+			_labelWidth = this.getWidth() - _xBufferSize;
+		}
+		else {
+			_backColor = ViewUtils.WHITE;
+			_labelWidth = this.getWidth()/2 - _xBufferSize;
+		}
 	}
 	
-	public void setPosition(int y) {
-		_y = y;
+	private void setText() {
+		if(_small) {
+			_text = _question.getShortText();
+		}
+		else {
+			_text = _question.getLongText();
+		}
+	}
+	
+	public void sizeFrame() {
+		Font theFont = Font.getDefaultFont();
+		_xBufferSize = this.getWidth()/10;
+		_yBufferSize = _xBufferSize/2;
+		
+		int labelWidth = this.getWidth()/2 - _xBufferSize;
+		
+		Vector splitStrings = StringUtils.splitStringByWords(_text, labelWidth, theFont);
+		
+		int numLines = splitStrings.size();
+		
+		this.setHeight((theFont.getHeight() * numLines) + _yBufferSize);
 	}
 	
 	/**
@@ -34,47 +75,30 @@ public class Frame{
 	 * @param startingHeight 
 	 * @return
 	 */
-	public int drawFrameOntoGraphics(Graphics g) {
-		int xBufferSize = g.getClipWidth()/10;
-		int yBufferSize = xBufferSize/2;
+	public void draw(Graphics g) {
 		Font theFont = g.getFont();
 		
-		int labelWidth = g.getClipWidth()/2 - xBufferSize;
+		int labelWidth = g.getClipWidth()/2 - _xBufferSize;
 		
 		Vector splitStrings;
 		
-		String text = "";
-		int backColor = 0x00FFFFFF;
-		
-		if(_small) {
-			text = _question.getShortText();
-			backColor = 0x00999999;
-			labelWidth = g.getClipWidth() - xBufferSize;
-		}
-		else {
-			text = _question.getLongText();
-			backColor = 0x00FFFFFF;
-			labelWidth = g.getClipWidth()/2 - xBufferSize;
-		}
-		
-		splitStrings = StringUtils.splitStringByWords(text, labelWidth, theFont);
+		splitStrings = StringUtils.splitStringByWords(_text, labelWidth, theFont);
 		
 		int numLines = splitStrings.size();
 		
-		int totalHeight = (theFont.getHeight() * numLines) + yBufferSize;
+		int totalHeight = (theFont.getHeight() * numLines) + _yBufferSize;
 		
-		g.setColor(backColor);
+		g.setColor(_backColor);
 		g.fillRect(0, _y-totalHeight, g.getClipWidth(), totalHeight);
-		g.setColor(0x00000000);
+		
+		g.setColor(ViewUtils.BLACK);
 		g.drawRect(0, _y-totalHeight, g.getClipWidth(), totalHeight);
 		
 		for(int i = 0; i < splitStrings.size(); ++i) {
 			String stringPiece = (String)splitStrings.elementAt(i);
-			g.drawString(stringPiece,xBufferSize/2 ,
-					_y - theFont.getHeight()*(splitStrings.size()-i) - yBufferSize/2,
+			g.drawString(stringPiece,_xBufferSize/2 ,
+					_y - theFont.getHeight()*(splitStrings.size()-i) - _yBufferSize/2,
 					Graphics.TOP|Graphics.LEFT);
 		}
-		
-		return totalHeight;
 	}
 }
