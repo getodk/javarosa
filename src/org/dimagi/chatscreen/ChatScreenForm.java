@@ -18,10 +18,6 @@ public class ChatScreenForm extends MIDlet {
 		//myNewForm.insert(0, chatScreenCanvas);
 		
 		Display.getDisplay(this).setCurrent(chatScreenCanvas);
-		
-		chatScreenCanvas.addQuestion(new Question("What is the name of the child?","Child Name"));
-		chatScreenCanvas.addQuestion(new Question("Is the child having any trouble breathing?","Trouble Breathing"));
-		chatScreenCanvas.addQuestion(new Question("How is the child's hearing?","Hearing"));
 	}
 
 	protected void pauseApp() {

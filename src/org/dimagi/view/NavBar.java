@@ -2,7 +2,7 @@ package org.dimagi.view;
 
 import org.dimagi.utils.ViewUtils;
 
-public class NavBar extends Component implements ISizeChangeListener {
+public class NavBar extends Component implements ISizeChangeListener, IActionListener {
 	DProgressBar progressBar = new DProgressBar(100);
 	
 	DButton backButton = new DButton("Back");
@@ -11,6 +11,7 @@ public class NavBar extends Component implements ISizeChangeListener {
 	public NavBar() {
 		setupComponents();
 		this.addSizeChangeListener(this);
+		nextButton.addActionListener(this);
 	}
 	
 	private void setupComponents() {
@@ -38,4 +39,9 @@ public class NavBar extends Component implements ISizeChangeListener {
 		nextButton.setY(yBuffer/2);
 		nextButton.setX(6*this.getWidth()/7 - backButton.getWidth()/2);
 	}
+	
+	public void OnAction() {
+		nextButton.setText("Sweet!");
+	}
+	
 }
