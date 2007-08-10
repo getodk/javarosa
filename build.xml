@@ -81,9 +81,9 @@
 				     for getting to know the port of the debugger. In this example the 
 				     "connect-debugger" target is also required.
 				-->
-				<!--
+				<!---->
 				<debugger name="antcall" target="connect-debugger" port="6001" />
-				-->
+				<!---->
 			</emulator>
 
 			<emulator wait="true" trace="none" securityDomain="trusted" enableProfiler="false" enableMemoryMonitor="false" enableNetworkMonitor="false" if="test and not debug">
