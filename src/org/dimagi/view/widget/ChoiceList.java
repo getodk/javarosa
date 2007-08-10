@@ -8,6 +8,13 @@ import javax.microedition.lcdui.Graphics;
 import org.dimagi.utils.ViewUtils;
 import org.dimagi.view.Widget;
 
+/**
+ * A widget for accepting enumerated type choices in list of either
+ * radiobuttons or checkboxes.
+ *  
+ * @author ctsims
+ * @date Aug-09-2007
+ */
 public class ChoiceList extends Widget {
 	public static final int SINGLE = 1;
 
@@ -19,18 +26,30 @@ public class ChoiceList extends Widget {
 
 	private int _choiceType = SINGLE;
 
+	/**
+	 * Creates a new ChoiceList widget
+	 */
 	public ChoiceList() {
 	}
 
+	/**
+	 * @param choiceType The new Type of choices to be displayed.
+	 */
 	public void setChoiceType(int choiceType) {
 		_choiceType = choiceType;
 		refresh();
 	}
 
+	/**
+	 * @param choice The new choice to be added to the list.
+	 */
 	public void addChoice(String choice) {
 		_choices.addElement(choice);
 	}
 
+	/**
+	 * Sets the height of the widget to fit all choices.
+	 */
 	public void sizeWidget() {
 		int fontHeight = Font.getDefaultFont().getHeight();
 
@@ -39,9 +58,12 @@ public class ChoiceList extends Widget {
 		this.setHeight(totalHeight);
 	}
 
+	/**
+	 * Inherits a pointer event, identifies whether a choice was clicked, and deals
+	 * with the selection appropriately. 
+	 */
 	public void pointerPressed(int x, int y) {
 		int textHeight = Font.getDefaultFont().getHeight();
-		int xBuffer = Font.getDefaultFont().getHeight();
 		int yBuffer = (getHeight() - textHeight * _choices.size())
 				/ (_choices.size() + 1);
 
@@ -51,7 +73,6 @@ public class ChoiceList extends Widget {
 		// the click applies to it
 		// TODO: Make this a O(1) Operation.
 		for (int i = 0; i < _choices.size(); ++i) {
-			int xButton = xBuffer;
 			// int yButton = (yBuffer + textHeight)*(i+1);
 			int yButton = (yBuffer) * (i + 1) + textHeight * i;
 			if (ViewUtils.checkPointInRectangle(x, y, 0, yButton, this
@@ -67,6 +88,10 @@ public class ChoiceList extends Widget {
 		}
 	}
 
+	/**
+	 * Deals with a choice being selected
+	 * @param index the choice selected.
+	 */
 	private void buttonPressed(int index) {
 		switch (_choiceType) {
 		case (SINGLE):
@@ -86,7 +111,7 @@ public class ChoiceList extends Widget {
 		}
 	}
 
-	public void drawInternal(Graphics g) {
+	protected void drawInternal(Graphics g) {
 		int textHeight = Font.getDefaultFont().getHeight();
 		int xBuffer = Font.getDefaultFont().getHeight();
 		int yBuffer = (getHeight() - textHeight * _choices.size())
