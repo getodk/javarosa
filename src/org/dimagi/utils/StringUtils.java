@@ -4,10 +4,26 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
 
-import de.enough.polish.util.StringTokenizer;
-
+/**
+ * A Utility class of various static string methods
+ * 
+ * @author ctsims
+ * @date Aug-08-2007
+ */
 public class StringUtils {
 
+	//TODO: Set this up to use String[] instead of Vectors for return
+	
+	/**
+	 * Splits a string into a set of smaller strings, displaying the maximum number of letters
+	 * possible per line.
+	 * 
+	 * @param theString The string to be split up
+	 * @param totalWidth The width permitted per line
+	 * @param theFont The font that will be used to display the string
+	 * @return A Vector containing the original string split into an array of strings all of which
+	 * are less than totalWidth when displayed with theFont.
+	 */
 	public static Vector splitStringByLetters(String theString, int totalWidth, Font theFont) {
 		int numLines = 1;
 		
@@ -31,8 +47,17 @@ public class StringUtils {
 		return splitStrings;
 	}
 	
+	/**
+	 * Splits a string into a set of smaller strings, displaying the maximum number of full words
+	 * possible per line.
+	 * 
+	 * @param theString The string to be split up
+	 * @param totalWidth The width permitted per line
+	 * @param theFont The font that will be used to display the string
+	 * @return A Vector containing the original string split into an array of strings all of which
+	 * are less than totalWidth when displayed with theFont.
+	 */
 	public static Vector splitStringByWords(String theString, int totalWidth, Font theFont) {
-		int numLines = 1;
 		
 		String currentString = "";
 		

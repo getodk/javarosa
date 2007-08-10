@@ -44,7 +44,6 @@
 				
 				<!-- midlets definition -->
 				<midlet class="${app.class}" name="${app.name}" />
-				<midlet class="org.dimagi.chatscreen.ChatScreenForm" name="Hello World" />
 				
 				<sources>
 					<source dir="${dir.src}"/>

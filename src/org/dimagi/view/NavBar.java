@@ -2,18 +2,32 @@ package org.dimagi.view;
 
 import org.dimagi.utils.ViewUtils;
 
+/**
+ * The Navigation Bar component is responsible for controlling flow over a protocol,
+ * and displaying the current position in the protocol.
+ * 
+ * @author ctsims
+ * @date Aug-08-2007
+ *
+ */
 public class NavBar extends Component implements ISizeChangeListener, IActionListener {
 	DProgressBar progressBar = new DProgressBar(100);
 	
 	DButton backButton = new DButton("Back");
 	DButton nextButton = new DButton("Next");
 	
+	/**
+	 * Creates a new navication bar
+	 */
 	public NavBar() {
 		setupComponents();
 		this.addSizeChangeListener(this);
 		nextButton.addActionListener(this);
 	}
 	
+	/**
+	 * Sets up the various components
+	 */
 	private void setupComponents() {
 		backButton.setBackgroundColor(ViewUtils.LIGHT_GREY);
 		nextButton.setBackgroundColor(ViewUtils.LIGHT_GREY);
@@ -22,6 +36,9 @@ public class NavBar extends Component implements ISizeChangeListener, IActionLis
 		this.add(nextButton);
 	}
 	
+	/**
+	 * Lays out the components in the navigation bar. 
+	 */
 	public void sizeChanged() {
 		int yBuffer = this.getHeight()/5;
 		progressBar.setWidth(this.getWidth()/2);
@@ -41,7 +58,6 @@ public class NavBar extends Component implements ISizeChangeListener, IActionLis
 	}
 	
 	public void OnAction() {
-		nextButton.setText("Sweet!");
+		
 	}
-	
 }
