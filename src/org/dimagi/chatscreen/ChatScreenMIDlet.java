@@ -8,8 +8,6 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import org.dimagi.entity.Question;
-import de.esoco.ewt.UserInterfaceContext;
-import de.esoco.ewt.EWT;
 
 public class ChatScreenMIDlet extends MIDlet {
 
@@ -18,7 +16,6 @@ public class ChatScreenMIDlet extends MIDlet {
 		//myNewForm.insert(0, chatScreenCanvas);
 		
 		Display.getDisplay(this).setCurrent(chatScreenCanvas);
-		UserInterfaceContext aContext = EWT.createUserInterfaceContext(Display.getDisplay(this));
 	}
 
 	protected void pauseApp() {
