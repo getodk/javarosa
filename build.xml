@@ -8,7 +8,7 @@
 	<property file="${polish.home}/global.properties" />
 
 	<!-- Definition of the J2ME Polish task:                      -->
-	<taskdef name="j2mepolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar" />
+	<taskdef name="j2mepolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar" />
 
 	<target name="init">
 		<property name="test" value="false" />
@@ -72,6 +72,8 @@
 				<debug if="test" showLogOnError="true" verbose="true" level="error">
 					<filter pattern="org.celllife.clforms.*" level="debug" />
 				</debug>
+				<compiler classpath="${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${polish.home}/import/microewt_0.92.jar"/>
+
 			</build>
 
 			<!-- execution of emulator(s) -->
