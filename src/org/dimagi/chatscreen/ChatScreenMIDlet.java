@@ -6,7 +6,7 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
-
+import de.esoco.ewt.UserInterfaceContext;
 import org.dimagi.entity.Question;
 
 public class ChatScreenMIDlet extends MIDlet {
@@ -16,6 +16,9 @@ public class ChatScreenMIDlet extends MIDlet {
 		//myNewForm.insert(0, chatScreenCanvas);
 		
 		Display.getDisplay(this).setCurrent(chatScreenCanvas);
+		Display rDisplay = Display.getDisplay(this);
+		UserInterfaceContext aContext = new UserInterfaceContext(rDisplay);
+
 	}
 
 	protected void pauseApp() {
