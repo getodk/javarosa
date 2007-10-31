@@ -124,7 +124,7 @@ public class Frame extends Component {
 			_labelWidth = this.getWidth() - _xBufferSize;
 		}
 		else {
-			_labelWidth = this.getWidth()/3 - _xBufferSize;
+			_labelWidth = this.getWidth();
 		}
 		
 		Vector splitStrings = StringUtils.splitStringByWords(_text, _labelWidth, theFont);
@@ -133,19 +133,19 @@ public class Frame extends Component {
 		
 		int labelHeight = (theFont.getHeight() * numLines) + _yBufferSize;
 		
-		_theWidget.setWidth(this.getWidth() - _labelWidth - _xBufferSize);
+		_theWidget.setWidth(this.getWidth() - _xBufferSize);
 		
 		_theWidget.sizeWidget();
 		
-		_theWidget.setX(getWidth() - _theWidget.getWidth());
-		_theWidget.setY(0);
+		_theWidget.setX(_xBufferSize/2);
+		_theWidget.setY(labelHeight);
 		
 		if(_theWidget.getHeight() < labelHeight || _small) {
-			this.setHeight(labelHeight);	
-			_theWidget.setHeight(labelHeight);
+			this.setHeight(labelHeight + _yBufferSize);	
+			_theWidget.setHeight(labelHeight + _yBufferSize);
 		}
 		else {
-			this.setHeight(_theWidget.getHeight());
+			this.setHeight(_theWidget.getHeight() + labelHeight + _yBufferSize);
 		}
 	}
 	
