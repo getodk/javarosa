@@ -125,7 +125,7 @@ public class ChoiceList extends Widget {
 		for (int i = 0; i < _choices.size(); ++i) {
 			String choice = (String) _choices.elementAt(i);
 
-			int xButton = xBuffer;
+			int xButton = 0;
 			// int yButton = (yBuffer + textHeight)*(i+1);
 			int yButton = (yBuffer) * (i + 1) + textHeight * i;
 
