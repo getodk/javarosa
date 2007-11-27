@@ -1,5 +1,7 @@
 package org.dimagi.entity;
 
+import org.dimagi.chatscreen.Constants;
+
 /**
  * Question is a basic entity object equivilant to a single question
  * to be asked by the user. 
@@ -23,6 +25,7 @@ public class Question {
 	private String _shortText;
 	private int _widgetType;
 	private String[] _internalArray;
+	private int _labelPosition = Constants.LABEL_TOP;
 	
 	/**
 	 * Creates a new question with the given data 
@@ -36,6 +39,14 @@ public class Question {
 		_shortText = shortText;
 		_widgetType = widgetType;
 		_internalArray = internalArray;
+	}
+	
+	public Question(String longText, String shortText, int widgetType, String[] internalArray, int labelPosition) {
+		_longText = longText;
+		_shortText = shortText;
+		_widgetType = widgetType;
+		_internalArray = internalArray;
+		_labelPosition = labelPosition;
 	}
 	
 	/**
@@ -65,4 +76,9 @@ public class Question {
 	public String[] getInternalArray() {
 		return _internalArray;
 	}
+
+	public int getLabelPosition() {
+		return _labelPosition;
+	}
+
 }
