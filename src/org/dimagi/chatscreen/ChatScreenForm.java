@@ -41,6 +41,7 @@ public class ChatScreenForm extends DForm {
 	private Vector questions = new Vector();
 	
 	int counter = 0;
+	int activeQuestion = 0;
 
 	/**
 	 * Creates a new ChatScreen Form
@@ -48,10 +49,7 @@ public class ChatScreenForm extends DForm {
 	public ChatScreenForm() {
 		setupComponents();
 		defineQuestions();
-		getNextQuestion();
-//		Question first = new Question("Long Label", "Short Label", Constants.TEXTBOX, new String[] {}, Constants.LABEL_LEFT);
-//		addQuestion(first);
-//		counter++;
+		goToNextQuestion();
 	}
 
 	private void defineQuestions() {
@@ -122,18 +120,24 @@ public class ChatScreenForm extends DForm {
 		this.repaint();
 	}
 	
-	public void getNextQuestion() {
-		if ( counter < questions.size() ) {
-			addQuestion((Question)(questions.elementAt(counter)));
-		} else {	
-			addQuestion((Question)(questions.elementAt(3)));
+	public void goToNextQuestion() {
+		if (activeQuestion != 0) {
+			activeQuestion--;
+			setupFrames();
+		} else {
+			//activeQuestion = counter;
+			if ( counter < questions.size() ) {
+				addQuestion((Question)(questions.elementAt(counter)));
+			} else {	
+				addQuestion((Question)(questions.elementAt(3)));
+			}
+			counter++;
 		}
-		counter++;
 	}
 	
-	public void getPreviousQuestion() {
-		
-		
+	public void goToPreviousQuestion() {
+		activeQuestion++;
+		setupFrames();
 	}
 
 	/**
@@ -151,48 +155,34 @@ public class ChatScreenForm extends DForm {
 		//TODO: Stop displaying frames once they're off the screen
 		int i=0;
 		while (iter.hasNext()) {
+			System.out.println("i " + i + " activeQuestion " + activeQuestion);
 			Frame aFrame = (Frame) iter.next();
-			if (aFrame == frameSet.firstElement()) {
+			if ( i == activeQuestion ) {
 				aFrame.setDrawingModeSmall(false);
 			} else {
 				aFrame.setDrawingModeSmall(true);
 			}
+
+//			if (aFrame == frameSet.firstElement()) {
+//				aFrame.setDrawingModeSmall(false);
+//			} else {
+//				aFrame.setDrawingModeSmall(true);
+//			}
 			frameStart -= aFrame.getHeight();
 			aFrame.setY(frameStart);
 			i++;
 		}
+		System.out.println("========================================");
 	}
 	
 	 private class MyCommandListener implements CommandListener
 	  {
 	    public void commandAction(Command c, Displayable d)
 	    {
-	    	System.out.println("ChatScreenForm MyCommandListener()");
 			if ( c == nextCommand ) {
-				getNextQuestion();
-//				if (counter == 2) {
-//					Question second = new Question(
-//							"Is the child having any trouble breathing?",
-//							"Trouble Breathing", Constants.SINGLE_CHOICE,
-//							new String[] { "Yes", "No" });
-//					addQuestion(second);
-//					counter++;
-//				} else if (counter == 3) {
-//					Question third = new Question(
-//							"What is the name of the child?", "Child Name",
-//							Constants.SINGLE_CHOICE, new String[] { "Terry",
-//									"Michael", "Samanatha" });
-//					addQuestion(third);
-//					counter++;
-//				} else {
-//					Question fourth = new Question(
-//							"How is the child's hearing?", "Hearing",
-//							Constants.MULTIPLE_CHOICE, new String[] { "Good",
-//									"Bad", "Getting Worse", "Abysmal" },
-//							Constants.LABEL_LEFT);
-//					addQuestion(fourth);
-//					counter++;
-//				}
+				goToNextQuestion();
+			} else if ( c == backCommand ) {
+				goToPreviousQuestion();
 			}
 	    }
 	  }
