@@ -33,7 +33,6 @@ public class ChatScreenForm extends DForm {
 	//that there are frames above or below the current view.
 	
 	Vector frameSet = new Vector();
-	NavBar theNavBar = new NavBar();
 
 	private Command backCommand = new Command("Back", Command.SCREEN, 2);
 	private Command nextCommand = new Command("Next", Command.SCREEN, 1);
@@ -80,22 +79,7 @@ public class ChatScreenForm extends DForm {
 
 		int width = this.getWidth();
 		int height = this.getHeight();
-		
-		System.out.println(width + "," + height);
-
 		int frameCanvasHeight = height - (height / 11);
-
-		theNavBar.setBackgroundColor(ViewUtils.DARK_GREY);
-
-		theNavBar.setX(0);
-
-		theNavBar.setY(frameCanvasHeight);
-
-		theNavBar.setWidth(width);
-
-		theNavBar.setHeight(height / 11);
-
-		//this.getContentComponent().add(theNavBar);
 		getContentComponent().setBackgroundColor(ViewUtils.GREY);
 		this.addCommand(backCommand);
 		this.addCommand(nextCommand);
@@ -113,9 +97,7 @@ public class ChatScreenForm extends DForm {
 		Frame newFrame = new Frame(theQuestion);
 		newFrame.setWidth(this.getWidth());
 		frameSet.insertElementAt(newFrame, 0);
-
 		getContentComponent().add(newFrame);
-
 		setupFrames();
 		this.repaint();
 	}
@@ -125,7 +107,6 @@ public class ChatScreenForm extends DForm {
 			activeQuestion--;
 			setupFrames();
 		} else {
-			//activeQuestion = counter;
 			if ( counter < questions.size() ) {
 				addQuestion((Question)(questions.elementAt(counter)));
 			} else {	
@@ -162,17 +143,10 @@ public class ChatScreenForm extends DForm {
 			} else {
 				aFrame.setDrawingModeSmall(true);
 			}
-
-//			if (aFrame == frameSet.firstElement()) {
-//				aFrame.setDrawingModeSmall(false);
-//			} else {
-//				aFrame.setDrawingModeSmall(true);
-//			}
 			frameStart -= aFrame.getHeight();
 			aFrame.setY(frameStart);
 			i++;
 		}
-		System.out.println("========================================");
 	}
 	
 	 private class MyCommandListener implements CommandListener
