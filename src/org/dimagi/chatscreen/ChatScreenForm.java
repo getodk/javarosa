@@ -33,12 +33,7 @@ public class ChatScreenForm extends DForm {
 	//that there are frames above or below the current view.
 	
 	Vector frameSet = new Vector();
-
-	private Command backCommand = new Command("Back", Command.SCREEN, 2);
-	private Command nextCommand = new Command("Next", Command.SCREEN, 1);
-	private MyCommandListener commandListener = new MyCommandListener();
 	private Vector questions = new Vector();
-	
 	int counter = 0;
 	int activeQuestion = 0;
 
@@ -81,9 +76,6 @@ public class ChatScreenForm extends DForm {
 		int height = this.getHeight();
 		int frameCanvasHeight = height - (height / 11);
 		getContentComponent().setBackgroundColor(ViewUtils.GREY);
-		this.addCommand(backCommand);
-		this.addCommand(nextCommand);
-		this.setCommandListener(commandListener);
 	}
 
 	/**
@@ -148,17 +140,5 @@ public class ChatScreenForm extends DForm {
 			i++;
 		}
 	}
-	
-	 private class MyCommandListener implements CommandListener
-	  {
-	    public void commandAction(Command c, Displayable d)
-	    {
-			if ( c == nextCommand ) {
-				goToNextQuestion();
-			} else if ( c == backCommand ) {
-				goToPreviousQuestion();
-			}
-	    }
-	  }
 	
 }
