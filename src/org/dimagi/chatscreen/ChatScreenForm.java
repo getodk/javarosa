@@ -128,7 +128,6 @@ public class ChatScreenForm extends DForm {
 		//TODO: Stop displaying frames once they're off the screen
 		int i=0;
 		while (iter.hasNext()) {
-			System.out.println("i " + i + " activeQuestion " + activeQuestion);
 			Frame aFrame = (Frame) iter.next();
 			if ( i == activeQuestion ) {
 				aFrame.setDrawingModeSmall(false);
