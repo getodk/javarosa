@@ -314,4 +314,14 @@ public class Component implements IRefreshListener{
 			}
 		}
 	}
+	
+	public void keyPressed(int keyCode) {
+		System.out.println("Component keyPressed()");
+		VectorIterator iter = new VectorIterator(_components);
+		while (iter.hasNext()) {
+			Component component = (Component) iter.next();
+				component.keyPressed(0);
+			}
+		}
+	
 }
