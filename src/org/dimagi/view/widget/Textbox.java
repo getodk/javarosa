@@ -11,6 +11,7 @@ import org.dimagi.view.Widget;
 public class Textbox extends Widget {
 
 	int fontHeight;
+	String str = "";
 	
 	/**
 	 * Creates a new textbox widget
@@ -36,5 +37,14 @@ public class Textbox extends Widget {
 		int yBufferSize = this.getHeight()/10;
 		g.setColor(ViewUtils.BLACK);
 		g.drawRect(0, yBufferSize, getWidth()-xBufferSize, fontHeight);
+		g.drawString(str, 5, yBufferSize, g.TOP | g.LEFT);
 	}
+	
+	public void keyPressed(int keyCode) {
+		if (keyCode >= 0) {
+			str += (char) keyCode;
+			refresh();
+		}
+	}
+	
 }
