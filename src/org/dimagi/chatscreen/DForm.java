@@ -38,7 +38,7 @@ public class DForm extends Canvas implements IRefreshListener{
 	}
 	
 	protected void keyPressed(int keyCode) {
-		canvasComponent.keyPressed(keyCode);		
+		canvasComponent.keyPressed(keyCode);
 	}
 	
 	public void refresh() {
