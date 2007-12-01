@@ -1,5 +1,6 @@
 package org.dimagi.view.widget;
 
+
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import org.dimagi.chatscreen.Constants;
