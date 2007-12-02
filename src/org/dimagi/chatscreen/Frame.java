@@ -11,6 +11,7 @@ import org.dimagi.utils.ViewUtils;
 import org.dimagi.view.Component;
 import org.dimagi.view.Widget;
 import org.dimagi.view.widget.ChoiceList;
+import org.dimagi.view.widget.Textbox;
 
 /**
  * The Frame component is the basic element of the Chat Screen
@@ -27,7 +28,7 @@ public class Frame extends Component {
 	
 	private Question _question;
 	
-	private boolean _small;
+	private boolean _isActiveFrame = true;
 	
 	private String _text = "";
 	
@@ -38,6 +39,8 @@ public class Frame extends Component {
 	private int _yBufferSize;
 	
 	private Widget _theWidget;
+	
+	private int layout;
 	
 	/**
 	 * Creates a new Frame for the given Question.
@@ -53,16 +56,15 @@ public class Frame extends Component {
 	 * Sets the drawing mode of the frame to either large or small
 	 * @param small True if the frame should be drawn in its small form, false otherwise.
 	 */
-	public void setDrawingModeSmall(boolean small) {
-		_small = small;
+	public void setActiveFrame(boolean isActiveFrame) {
+		_isActiveFrame = isActiveFrame;
 		setText();
-		if(_small) {
-			setBackgroundColor(ViewUtils.LIGHT_GREY);
-			_theWidget.setVisible(false);
-		}
-		else {
+		if(isActiveFrame) {
 			setBackgroundColor(ViewUtils.WHITE);
-			_theWidget.setVisible(true);
+			_theWidget.setActiveWidget(true);
+		} else {
+			setBackgroundColor(ViewUtils.LIGHT_GREY);
+			_theWidget.setActiveWidget(false);
 		}
 		sizeFrame();
 	}
@@ -71,11 +73,11 @@ public class Frame extends Component {
 	 * Sets the text of the widget to the proper field of the Question
 	 */
 	private void setText() {
-		if(_small) {
-			_text = _question.getShortText();
+		if(_isActiveFrame) {
+			_text = _question.getLongText();
 		}
 		else {
-			_text = _question.getLongText();
+			_text = _question.getShortText();
 		}
 	}
 	
@@ -106,7 +108,12 @@ public class Frame extends Component {
 			
 			_theWidget = aWidget;
 			break;
+		case ( Constants.TEXTBOX):
+			_theWidget = new Textbox();
+			break;
 		}
+		_theWidget.setLabelPosition(_question.getLabelPosition());
+		layout = _theWidget.getLabelPosition(); 
 		this.add(_theWidget);
 	}
 	
@@ -120,11 +127,15 @@ public class Frame extends Component {
 		_xBufferSize = this.getWidth()/10;
 		_yBufferSize = _xBufferSize/2;
 		
-		if(_small) {
+		if(!_isActiveFrame) {
 			_labelWidth = this.getWidth() - _xBufferSize;
 		}
 		else {
-			_labelWidth = this.getWidth();
+			if ( layout == Constants.LABEL_TOP ) {
+				_labelWidth = this.getWidth();
+			} else {
+				_labelWidth = this.getWidth()/3 - _xBufferSize;
+			}
 		}
 		
 		Vector splitStrings = StringUtils.splitStringByWords(_text, _labelWidth, theFont);
@@ -132,20 +143,28 @@ public class Frame extends Component {
 		int numLines = splitStrings.size();
 		
 		int labelHeight = (theFont.getHeight() * numLines) + _yBufferSize;
-		
-		_theWidget.setWidth(this.getWidth() - _xBufferSize);
-		
+
 		_theWidget.sizeWidget();
-		
-		_theWidget.setX(_xBufferSize/2);
-		_theWidget.setY(labelHeight);
-		
-		if(_theWidget.getHeight() < labelHeight || _small) {
+			
+		if ( layout == Constants.LABEL_TOP ) {
+			_theWidget.setWidth(this.getWidth() - _xBufferSize);
+			_theWidget.setX(_xBufferSize/2);
+			_theWidget.setY(labelHeight);
+		} else {
+			_theWidget.setWidth(this.getWidth() - _labelWidth - _xBufferSize); 
+			_theWidget.setX(getWidth() - _theWidget.getWidth()); 
+	        _theWidget.setY(0); 
+	    }
+			
+		if(_theWidget.getHeight() < labelHeight || !_isActiveFrame) {
 			this.setHeight(labelHeight + _yBufferSize);	
 			_theWidget.setHeight(labelHeight + _yBufferSize);
 		}
 		else {
-			this.setHeight(_theWidget.getHeight() + labelHeight + _yBufferSize);
+			if ( layout == Constants.LABEL_TOP)
+				this.setHeight(_theWidget.getHeight() + labelHeight + _yBufferSize);
+			else
+				this.setHeight(_theWidget.getHeight()); 
 		}
 	}
 	
@@ -155,21 +174,28 @@ public class Frame extends Component {
 	 * @param g the graphic canvas
 	 */
 	public void drawInternal(Graphics g) {
-		
-		Font theFont = g.getFont();
-		
-		Vector splitStrings;
-		
-		splitStrings = StringUtils.splitStringByWords(_text, _labelWidth, theFont);
-		
+
+		// draw border
 		g.setColor(ViewUtils.BLACK);
 		g.drawRect(0, 0, this.getWidth(), this.getHeight());
 		
-		for(int i = 0; i < splitStrings.size(); ++i) {
-			String stringPiece = (String)splitStrings.elementAt(i);
-			g.drawString(stringPiece,_xBufferSize/2 ,
-					_yBufferSize/2 + theFont.getHeight()*(i),
-					Graphics.TOP|Graphics.LEFT);
+		// draw string
+		Font theFont = g.getFont();
+		if ( layout == Constants.LABEL_TOP ) {
+			g.drawString(_text,
+					     _xBufferSize/2,
+ 		                _yBufferSize/2,
+					    Graphics.TOP|Graphics.LEFT);	
+		} else {
+			Vector splitStrings;
+			splitStrings = StringUtils.splitStringByWords(_text, _labelWidth, theFont);
+			for(int i = 0; i < splitStrings.size(); ++i) {
+				String stringPiece = (String)splitStrings.elementAt(i);
+				g.drawString(stringPiece,
+						     _xBufferSize/2 ,
+							_yBufferSize/2 + theFont.getHeight()*(i),
+							Graphics.TOP|Graphics.LEFT);
+			}
 		}
 	}
 }

@@ -130,9 +130,9 @@ public class ChatScreenForm extends DForm {
 		while (iter.hasNext()) {
 			Frame aFrame = (Frame) iter.next();
 			if ( i == activeQuestion ) {
-				aFrame.setDrawingModeSmall(false);
+				aFrame.setActiveFrame(true);
 			} else {
-				aFrame.setDrawingModeSmall(true);
+				aFrame.setActiveFrame(false);
 			}
 			frameStart -= aFrame.getHeight();
 			aFrame.setY(frameStart);
