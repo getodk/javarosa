@@ -18,11 +18,44 @@ import java.util.Vector;
 public abstract class Widget extends Component {
 
 	Vector _widgetListeners;
+	int _labelPosition;
+	private boolean _activeWidget = true;
+	private String _shortAnswer;
 	
 	/**
 	 * Sets the size (height at least, width as well if applicable) of the widget
 	 */
 	public abstract void sizeWidget();
+
+	/**
+	 * Returns the label position
+	 */
+	public int getLabelPosition() {
+		return _labelPosition;
+	}
+	
+	/**
+	 * Sets the label position
+	 */
+	public void setLabelPosition(int labelPosition) {
+		_labelPosition = labelPosition;
+	}
+
+	public boolean isActiveWidget() {
+		return _activeWidget;
+	}
+	
+	public void setActiveWidget(boolean bool) {
+		_activeWidget = bool;
+	}
+	
+	public String getShortAnswer() {
+		return _shortAnswer;
+	}
+
+	public void setShortAnswer(String ans) {
+		_shortAnswer = ans;
+	}
 	
 	/**
 	 * Adds a listener to various widget events.
