@@ -1,6 +1,8 @@
 package org.dimagi.view;
 
 import java.util.Vector;
+import javax.microedition.lcdui.Graphics;
+import org.dimagi.chatscreen.Constants;
 
 /**
  * Widgets are Frame elemnts that are used to capture input to answer
@@ -27,6 +29,10 @@ public abstract class Widget extends Component {
 	 */
 	public abstract void sizeWidget();
 
+	public abstract void drawInactiveWidget(Graphics g);
+	
+	public abstract void drawActiveWidget(Graphics g); 
+	
 	/**
 	 * Returns the label position
 	 */
@@ -47,6 +53,10 @@ public abstract class Widget extends Component {
 	
 	public void setActiveWidget(boolean bool) {
 		_activeWidget = bool;
+		// if the widget is inactive, the label is always displayed on the left
+		if (!_activeWidget) {
+			setLabelPosition(Constants.LABEL_LEFT);
+		}
 	}
 	
 	public String getShortAnswer() {

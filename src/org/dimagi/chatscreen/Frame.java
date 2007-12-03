@@ -40,8 +40,6 @@ public class Frame extends Component {
 	
 	private Widget _theWidget;
 	
-	private int layout;
-	
 	/**
 	 * Creates a new Frame for the given Question.
 	 * @param theQuestion The question that this frame will represent.	
@@ -113,7 +111,6 @@ public class Frame extends Component {
 			break;
 		}
 		_theWidget.setLabelPosition(_question.getLabelPosition());
-		layout = _theWidget.getLabelPosition(); 
 		this.add(_theWidget);
 	}
 	
@@ -131,7 +128,7 @@ public class Frame extends Component {
 			_labelWidth = this.getWidth() - _xBufferSize;
 		}
 		else {
-			if ( layout == Constants.LABEL_TOP ) {
+			if ( _theWidget.getLabelPosition() == Constants.LABEL_TOP ) {
 				_labelWidth = this.getWidth();
 			} else {
 				_labelWidth = this.getWidth()/3 - _xBufferSize;
@@ -146,7 +143,7 @@ public class Frame extends Component {
 
 		_theWidget.sizeWidget();
 			
-		if ( layout == Constants.LABEL_TOP ) {
+		if ( _theWidget.getLabelPosition() == Constants.LABEL_TOP ) {
 			_theWidget.setWidth(this.getWidth() - _xBufferSize);
 			_theWidget.setX(_xBufferSize/2);
 			_theWidget.setY(labelHeight);
@@ -161,7 +158,7 @@ public class Frame extends Component {
 			_theWidget.setHeight(labelHeight + _yBufferSize);
 		}
 		else {
-			if ( layout == Constants.LABEL_TOP)
+			if ( _theWidget.getLabelPosition() == Constants.LABEL_TOP)
 				this.setHeight(_theWidget.getHeight() + labelHeight + _yBufferSize);
 			else
 				this.setHeight(_theWidget.getHeight()); 
@@ -181,7 +178,7 @@ public class Frame extends Component {
 		
 		// draw string
 		Font theFont = g.getFont();
-		if ( layout == Constants.LABEL_TOP ) {
+		if ( _theWidget.getLabelPosition() == Constants.LABEL_TOP ) {
 			g.drawString(_text,
 					     _xBufferSize/2,
  		                _yBufferSize/2,

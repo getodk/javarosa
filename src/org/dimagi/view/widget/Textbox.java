@@ -32,8 +32,7 @@ public class Textbox extends Widget {
 		this.setHeight(height);
 	}
 	
-	// make this abstract in Widget
-	private void drawInactiveWidget(Graphics g) {
+	public void drawInactiveWidget(Graphics g) {
 		int xBufferSize = this.getWidth()/10;
 		int yBufferSize = this.getHeight()/10;
 		g.setColor(ViewUtils.BLACK);
@@ -41,7 +40,7 @@ public class Textbox extends Widget {
 		g.drawString(str, getWidth()-xBufferSize-theFont.stringWidth(str), yBufferSize, g.TOP | g.RIGHT);
 	}
 	
-	private void drawActiveWidget(Graphics g) {
+	public void drawActiveWidget(Graphics g) {
 		int xBufferSize = this.getWidth()/10;
 		int yBufferSize = this.getHeight()/10;
 		g.setColor(ViewUtils.BLACK);

@@ -79,6 +79,7 @@ public class ChoiceList extends Widget {
 					.getWidth(), textHeight)) {
 				buttonPressed(i);
 				itemChanged = true;
+				this.setShortAnswer(_choices.elementAt(i).toString());
 			}
 		}
 
@@ -111,7 +112,15 @@ public class ChoiceList extends Widget {
 		}
 	}
 
-	protected void drawInternal(Graphics g) {
+	public void drawInactiveWidget(Graphics g) {
+		int xBuffer = getHeight() / 10;
+		int yBuffer = getHeight() / 10;		
+		g.setColor(ViewUtils.BLACK);
+		Font theFont = Font.getDefaultFont();
+		g.drawString(this.getShortAnswer(), getWidth()-20, yBuffer, g.TOP | g.RIGHT);
+	}
+	
+	public void drawActiveWidget(Graphics g) {
 		int textHeight = Font.getDefaultFont().getHeight();
 		int xBuffer = Font.getDefaultFont().getHeight();
 		int yBuffer = (getHeight() - textHeight * _choices.size())
@@ -160,15 +169,14 @@ public class ChoiceList extends Widget {
 				}
 				break;
 			}
-
-			/*
-			 * g.setColor(ViewUtils.WHITE); g.fillRect(0, 0, 400,
-			 * g.getFont().getHeight()*2); g.setColor(ViewUtils.BLACK);
-			 * g.drawString("Gutter - X: "+ xGutter + " Y: " + yGutter, 0, 0,
-			 * Graphics.TOP|Graphics.LEFT); g.drawString("Button - X: "+
-			 * buttonWidth + " Y: " + buttonHeight, 0, g.getFont().getHeight(),
-			 * Graphics.TOP|Graphics.LEFT);
-			 */
+		}
+	}
+	
+	protected void drawInternal(Graphics g) {
+		if ( this.isActiveWidget() ) {
+			drawActiveWidget(g);
+		} else {
+			drawInactiveWidget(g);
 		}
 	}
 }
