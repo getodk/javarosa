@@ -109,8 +109,10 @@ public class ChatScreenForm extends DForm {
 	}
 	
 	public void goToPreviousQuestion() {
-		activeQuestion++;
-		setupFrames();
+		if (activeQuestion < 0) {
+			activeQuestion++;
+			setupFrames();
+		}
 	}
 
 	/**
