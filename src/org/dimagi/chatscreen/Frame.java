@@ -171,28 +171,22 @@ public class Frame extends Component {
 	 * @param g the graphic canvas
 	 */
 	public void drawInternal(Graphics g) {
-
+		
+		Vector splitStrings;
+		
 		// draw border
 		g.setColor(ViewUtils.BLACK);
 		g.drawRect(0, 0, this.getWidth(), this.getHeight());
 		
 		// draw string
 		Font theFont = g.getFont();
-		if ( _theWidget.getLabelPosition() == Constants.LABEL_TOP ) {
-			g.drawString(_text,
-					     _xBufferSize/2,
- 		                _yBufferSize/2,
-					    Graphics.TOP|Graphics.LEFT);	
-		} else {
-			Vector splitStrings;
-			splitStrings = StringUtils.splitStringByWords(_text, _labelWidth, theFont);
-			for(int i = 0; i < splitStrings.size(); ++i) {
-				String stringPiece = (String)splitStrings.elementAt(i);
-				g.drawString(stringPiece,
-						     _xBufferSize/2 ,
-							_yBufferSize/2 + theFont.getHeight()*(i),
-							Graphics.TOP|Graphics.LEFT);
-			}
+		splitStrings = StringUtils.splitStringByWords(_text, _labelWidth, theFont);
+		for(int i = 0; i < splitStrings.size(); ++i) {
+			String stringPiece = (String)splitStrings.elementAt(i);
+			g.drawString(stringPiece,
+						_xBufferSize/2,
+ 	                	_yBufferSize/2 + theFont.getHeight()*(i),
+ 	                	Graphics.TOP|Graphics.LEFT);
 		}
 	}
 }
