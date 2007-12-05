@@ -71,6 +71,10 @@ public class Component implements IRefreshListener{
 		_components.addElement(c);
 		c.addRefreshListener(this);
 	}
+	
+	public void remove(Component c) {
+		_components.removeElement(c);
+	}
 
 	/**
 	 * @param x The x component of the new location
