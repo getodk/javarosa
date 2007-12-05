@@ -32,23 +32,23 @@ public class ChatScreenForm extends DForm {
 	//TODO: Add (...) objects to the top and bottom of the display to signal
 	//that there are frames above or below the current view.
 	
-	Vector frameSet = new Vector();
+	private Vector frameSet = new Vector();
 	private Vector questions = new Vector();
-	int counter = 0;
 	int activeQuestion = 0;
-
+	int totalQuestions = 1;
+	
 	/**
 	 * Creates a new ChatScreen Form
 	 */
 	public ChatScreenForm() {
 		setupComponents();
 		defineQuestions();
-		goToNextQuestion();
 	}
 
 	private void defineQuestions() {
 		Question first = new Question("Long Label", "Short Label", Constants.TEXTBOX, new String[] {}, Constants.LABEL_LEFT);
-		questions.addElement((Object) first);
+		questions.addElement((Object) first);		
+		addQuestion(first);
 		Question second = new Question(
 				"Is the child having any trouble breathing?",
 				"Trouble Breathing", Constants.SINGLE_CHOICE,
@@ -64,14 +64,13 @@ public class ChatScreenForm extends DForm {
 				Constants.MULTIPLE_CHOICE, new String[] { "Good",
 						"Bad", "Getting Worse", "Abysmal" },
 				Constants.LABEL_LEFT);
-		questions.addElement((Object)fourth);		
+		questions.addElement((Object)fourth);
 	}
 	
 	/**
 	 * Lays out the static components for the form
 	 */
 	private void setupComponents() {
-
 		int width = this.getWidth();
 		int height = this.getHeight();
 		int frameCanvasHeight = height - (height / 11);
@@ -88,31 +87,27 @@ public class ChatScreenForm extends DForm {
 	public void addQuestion(Question theQuestion) {
 		Frame newFrame = new Frame(theQuestion);
 		newFrame.setWidth(this.getWidth());
-		frameSet.insertElementAt(newFrame, 0);
+		frameSet.addElement(newFrame);
 		getContentComponent().add(newFrame);
 		setupFrames();
 		this.repaint();
 	}
 	
 	public void goToNextQuestion() {
-		if (activeQuestion != 0) {
-			activeQuestion--;
-			setupFrames();
+		activeQuestion++;
+		if (activeQuestion == totalQuestions) {
+			addQuestion((Question)questions.elementAt(activeQuestion));
+			totalQuestions++;
 		} else {
-			if ( counter < questions.size() ) {
-				addQuestion((Question)(questions.elementAt(counter)));
-			} else {	
-				addQuestion((Question)(questions.elementAt(3)));
-			}
-			counter++;
+			getContentComponent().add((Frame)frameSet.elementAt(activeQuestion));
+			setupFrames();
 		}
 	}
 	
 	public void goToPreviousQuestion() {
-		if (activeQuestion < 0) {
-			activeQuestion++;
-			setupFrames();
-		}
+		getContentComponent().remove((Frame)frameSet.elementAt(activeQuestion));
+		activeQuestion--;
+		setupFrames();
 	}
 
 	/**
@@ -120,17 +115,13 @@ public class ChatScreenForm extends DForm {
 	 * in a simple stack.
 	 */
 	private void setupFrames() {
-		VectorIterator iter = new VectorIterator(frameSet);
-
 		int frameCanvasHeight = getContentComponent().getHeight()
 				- (getContentComponent().getHeight() / 11);
 
 		int frameStart = frameCanvasHeight;
-
-		//TODO: Stop displaying frames once they're off the screen
-		int i=0;
-		while (iter.hasNext()) {
-			Frame aFrame = (Frame) iter.next();
+		for (int i=frameSet.size()-1; i >=0; i--) {
+			System.out.println(activeQuestion + " " + i);
+			Frame aFrame = (Frame) frameSet.elementAt(i);
 			if ( i == activeQuestion ) {
 				aFrame.setActiveFrame(true);
 			} else {
@@ -138,8 +129,7 @@ public class ChatScreenForm extends DForm {
 			}
 			frameStart -= aFrame.getHeight();
 			aFrame.setY(frameStart);
-			i++;
 		}
 	}
-	
 }
+		
