@@ -22,7 +22,7 @@ public abstract class Widget extends Component {
 	Vector _widgetListeners;
 	int _labelPosition;
 	private boolean _activeWidget = true;
-	private String _shortAnswer;
+	private String _shortAnswer="";
 	
 	/**
 	 * Sets the size (height at least, width as well if applicable) of the widget
