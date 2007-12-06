@@ -57,13 +57,16 @@ public class Textbox extends Widget {
 	}
 	
 	public void keyPressed(int keyCode) {
-		if (keyCode >= 0) {
-			str += (char)keyCode;
-		} else if (keyCode == -11) { // delete key
-			str = str.substring(0, str.length()-1); // remove last character
+		// without this if statement the keyPress event is propagated to all textbox widgets 
+		if (this.isActiveWidget() ) {
+			if (keyCode >= 0) {
+				str += (char)keyCode;
+			} else if (keyCode == -11) { // delete key
+				str = str.substring(0, str.length()-1); // remove last character
+			}
+			refresh();
+			this.setShortAnswer(str);
 		}
-		refresh();
-		this.setShortAnswer(str);
 	}
 	
 }
