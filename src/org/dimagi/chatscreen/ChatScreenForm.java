@@ -123,8 +123,7 @@ public class ChatScreenForm extends DForm {
 				- (getContentComponent().getHeight() / 11);
 
 		int frameStart = frameCanvasHeight;
-		for (int i=frameSet.size()-1; i >=0; i--) {
-			System.out.println(activeQuestion + " " + i);
+		for (int i=activeQuestion; i >=0; i--) {
 			Frame aFrame = (Frame) frameSet.elementAt(i);
 			if ( i == activeQuestion ) {
 				aFrame.setActiveFrame(true);
