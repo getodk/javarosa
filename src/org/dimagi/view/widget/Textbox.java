@@ -37,7 +37,7 @@ public class Textbox extends Widget {
 		int yBufferSize = this.getHeight()/10;
 		g.setColor(ViewUtils.BLACK);
 		Font theFont = Font.getDefaultFont();
-		g.drawString(str, getWidth()-xBufferSize-theFont.stringWidth(str), yBufferSize, g.TOP | g.RIGHT);
+		g.drawString(str, getWidth()-20, yBufferSize, g.TOP | g.RIGHT);
 	}
 	
 	public void drawActiveWidget(Graphics g) {
