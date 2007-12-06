@@ -99,16 +99,19 @@ public class ChatScreenForm extends DForm {
 			    totalQuestions++;
 				addQuestion((Question)questions.elementAt(activeQuestion % 3));
 			}
-		} else { // advnace to question that's already there
+		} else { // advance to question that's already there
 			getContentComponent().add((Frame)frameSet.elementAt(activeQuestion));
 			setupFrames();
 		}
 	}
 	
 	public void goToPreviousQuestion() {
-		getContentComponent().remove((Frame)frameSet.elementAt(activeQuestion));
-		activeQuestion--;
-		setupFrames();
+		// Don't do anything if user hits prev command for first question
+		if (activeQuestion > 0) {
+			getContentComponent().remove((Frame)frameSet.elementAt(activeQuestion));
+			activeQuestion--;
+			setupFrames();
+		}
 	}
 
 	/**
