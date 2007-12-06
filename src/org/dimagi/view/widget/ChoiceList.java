@@ -79,7 +79,12 @@ public class ChoiceList extends Widget {
 					.getWidth(), textHeight)) {
 				buttonPressed(i);
 				itemChanged = true;
-				this.setShortAnswer(_choices.elementAt(i).toString());
+				if (_selectedChoices.size() > 1) {
+					this.setShortAnswer("Multiple");
+				} else {
+					int selectedChoiceIndex = ((Integer)_selectedChoices.elementAt(0)).intValue();
+					this.setShortAnswer(_choices.elementAt(selectedChoiceIndex).toString());
+				}
 			}
 		}
 
