@@ -46,25 +46,20 @@ public class ChatScreenForm extends DForm {
 	}
 
 	private void defineQuestions() {
-		Question first = new Question("Long Label", "Short Label", Constants.TEXTBOX, new String[] {}, Constants.LABEL_LEFT);
+		Question first = new Question("Enter the patient's ID number:", "ID", Constants.TEXTBOX, new String[] {});
 		questions.addElement((Object) first);		
 		addQuestion(first);
 		Question second = new Question(
-				"Is the child having any trouble breathing?",
-				"Trouble Breathing", Constants.SINGLE_CHOICE,
-				new String[] { "Yes", "No" });
+				"What is the sex of the patient?",
+				"Sex", Constants.SINGLE_CHOICE,
+				new String[] { "Male", "Female" });
 		questions.addElement((Object) second);
 		Question third = new Question(
-				"What is the name of the child?", "Child Name",
-				Constants.SINGLE_CHOICE, new String[] { "Terry",
-						"Michael", "Samanatha" });
-		questions.addElement((Object)third);
-		Question fourth = new Question(
-				"How is the child's hearing?", "Hearing",
-				Constants.MULTIPLE_CHOICE, new String[] { "Good",
-						"Bad", "Getting Worse", "Abysmal" },
+				"Has the patient had any of the following symptoms since their last visit?", "Symptoms",
+				Constants.MULTIPLE_CHOICE, new String[] { "Fever",
+						"Night Sweats", "Weight Loss", "Vomiting" },
 				Constants.LABEL_LEFT);
-		questions.addElement((Object)fourth);
+		questions.addElement((Object)third);
 	}
 	
 	/**
@@ -95,10 +90,16 @@ public class ChatScreenForm extends DForm {
 	
 	public void goToNextQuestion() {
 		activeQuestion++;
+		// add a new question
 		if (activeQuestion == totalQuestions) {
-			addQuestion((Question)questions.elementAt(activeQuestion));
-			totalQuestions++;
-		} else {
+			if ( activeQuestion < questions.size() ) {
+				totalQuestions++;
+				addQuestion((Question)questions.elementAt(activeQuestion));
+			} else { // repeat questions in loop
+			    totalQuestions++;
+				addQuestion((Question)questions.elementAt(activeQuestion % 3));
+			}
+		} else { // advnace to question that's already there
 			getContentComponent().add((Frame)frameSet.elementAt(activeQuestion));
 			setupFrames();
 		}
