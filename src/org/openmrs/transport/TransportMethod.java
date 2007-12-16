@@ -1,0 +1,32 @@
+package org.openmrs.transport;
+
+/**
+ * Interface all transport methods have to implement.
+ * 
+ * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
+ */
+public interface TransportMethod {
+
+	public static final int HTTP_GCF = 0;
+	public static final int FILE = 1;
+	public static final int SERIAL = 2;
+	public static final int BLUETOOTH = 3;
+	public static final int HTTP_IO = 4;
+
+	/**
+	 * @param message
+	 * @param manager
+	 */
+	public void transmit(TransportMessage message, TransportManager manager);
+
+	/**
+	 * @return the name of the transport method
+	 */
+	public String getName();
+
+	/**
+	 * @return the id of the transport method
+	 */
+	public int getId();
+
+}
