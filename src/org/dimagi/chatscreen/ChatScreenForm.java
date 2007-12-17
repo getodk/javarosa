@@ -46,7 +46,8 @@ public class ChatScreenForm extends DForm {
 	}
 
 	private void defineQuestions() {
-		Question first = new Question("Enter the patient's ID number:", "ID", Constants.TEXTBOX, new String[] {});
+		Question first = new Question("Enter the patient's ID number:", "ID", Constants.DROPDOWN, 
+				new String[] {"Option1", "Option2", "Option3"}, Constants.LABEL_TOP);
 		questions.addElement((Object) first);		
 		addQuestion(first);
 		Question second = new Question(
