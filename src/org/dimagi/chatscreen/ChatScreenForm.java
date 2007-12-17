@@ -46,8 +46,7 @@ public class ChatScreenForm extends DForm {
 	}
 
 	private void defineQuestions() {
-		Question first = new Question("Enter the patient's ID number:", "ID", Constants.DROPDOWN, 
-				new String[] {"Option1", "Option2", "Option3", "Option4", "Option5"}, Constants.LABEL_TOP);
+		Question first = new Question("Enter the patient's ID number:", "ID", Constants.TEXTBOX, new String[] {});
 		questions.addElement((Object) first);		
 		addQuestion(first);
 		Question second = new Question(
@@ -61,6 +60,9 @@ public class ChatScreenForm extends DForm {
 						"Night Sweats", "Weight Loss", "Vomiting" },
 				Constants.LABEL_LEFT);
 		questions.addElement((Object)third);
+		Question fourth = new Question("Name of the city?", "City", Constants.DROPDOWN, 
+				new String[] {"Cambridge", "Boston", "Newton", "Quincy", "Brookline"}, Constants.LABEL_TOP);
+		questions.addElement((Object) fourth);	
 	}
 	
 	/**
@@ -98,7 +100,7 @@ public class ChatScreenForm extends DForm {
 				addQuestion((Question)questions.elementAt(activeQuestion));
 			} else { // repeat questions in loop
 			    totalQuestions++;
-				addQuestion((Question)questions.elementAt(activeQuestion % 3));
+				addQuestion((Question)questions.elementAt(activeQuestion % 4));
 			}
 		} else { // advance to question that's already there
 			getContentComponent().add((Frame)frameSet.elementAt(activeQuestion));
