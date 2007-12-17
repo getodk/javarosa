@@ -11,6 +11,7 @@ import org.dimagi.utils.ViewUtils;
 import org.dimagi.view.Component;
 import org.dimagi.view.Widget;
 import org.dimagi.view.widget.ChoiceList;
+import org.dimagi.view.widget.Dropdown;
 import org.dimagi.view.widget.Textbox;
 
 /**
@@ -108,6 +109,13 @@ public class Frame extends Component {
 			break;
 		case ( Constants.TEXTBOX):
 			_theWidget = new Textbox();
+			break;
+		case (Constants.DROPDOWN):
+			Dropdown dropdownWidget = new Dropdown();
+			for(int i =0 ; i < _question.getInternalArray().length ; ++i) {
+				dropdownWidget.addChoice(_question.getInternalArray()[i]);
+			}
+			_theWidget = dropdownWidget;
 			break;
 		}
 		_theWidget.setLabelPosition(_question.getLabelPosition());
