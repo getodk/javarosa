@@ -6,18 +6,20 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 import org.dimagi.utils.ViewUtils;
+import org.dimagi.utils.Rectangle;
 import org.dimagi.view.Widget;
 
 public class Dropdown extends Widget {
 
 	private Vector choices = new Vector();
-	private String selectedChoice = "Selected";
+	private String selectedChoice;
 	
 	// drawing variables	
 	private int fontHeight;
 	private int xBufferSize;
 	private int yBufferSize;
-	private boolean listExpanded = true;
+	private boolean listExpanded = false;
+	private Vector choicesSurroundingBox = new Vector();
 	
 	// drawing variable for dropdown button (db)
 	private int dbWidth;
@@ -39,10 +41,13 @@ public class Dropdown extends Widget {
 	
 	public void addChoice(String choice) {
 		choices.addElement(choice);
+		if (selectedChoice == null)	{
+			selectedChoice = (String) choices.firstElement();
+		}
 	}
 	
 	public void drawActiveWidget(Graphics g) {
-		
+			
 		// offset
 		int offset = 5;
 		
@@ -70,14 +75,14 @@ public class Dropdown extends Widget {
 
 		// lower box
 		int lowerBoxWidth = upperBoxWidth;
-		int lowerBoxHeight = fontHeight*choices.size() + yBufferSize;
+		int lowerBoxHeight = fontHeight*choices.size() + yBufferSize*4;
 		int lowerBoxX0 = upperBoxX0;
 		int lowerBoxY0 = yBufferSize + upperBoxHeight;
 		
 		// draw upper box
 		g.setColor(ViewUtils.BLACK);
 		g.drawRect(upperBoxX0, upperBoxY0, upperBoxWidth, upperBoxHeight);
-		g.drawString((String)choices.firstElement(), upperBoxX0+offset, upperBoxY0, g.TOP | g.LEFT);
+		g.drawString(selectedChoice, upperBoxX0+offset, upperBoxY0, g.TOP | g.LEFT);
 		
 		// draw dropdown button 
 		g.setColor(ViewUtils.LIGHT_GREY);
@@ -93,11 +98,13 @@ public class Dropdown extends Widget {
 			// draw lower box
 			g.drawRect(lowerBoxX0, lowerBoxY0, lowerBoxWidth, lowerBoxHeight);
 			int y = lowerBoxY0 + yBufferSize;
-			for (int i=1; i < choices.size(); i++) {
-				g.drawString((String)choices.elementAt(i), lowerBoxX0+offset, y, g.TOP | g.LEFT);
+			for (int i=0; i < choices.size(); i++) {
+				// save location of the surrounding box
+				Rectangle r = new Rectangle(lowerBoxX0, y, upperBoxWidth, upperBoxHeight);
+				choicesSurroundingBox.addElement(r);
+				g.drawString((String)choices.elementAt(i), r.getX()+offset, r.getY(), g.TOP | g.LEFT);
 				y += fontHeight + yBufferSize;
 			}
-			refresh();
 		}
 	}
 
@@ -128,14 +135,32 @@ public class Dropdown extends Widget {
 	
 	public void pointerPressed(int x, int y) {
 		if (ViewUtils.checkPointInRectangle(x, y, dbX0, dbY0, dbWidth, dbHeight)) {
-			buttonPressed();
+			dropDownButtonPressed();
+		} else {
+			for (int i=0; i < choicesSurroundingBox.size(); i++) {
+				Rectangle r = (Rectangle) choicesSurroundingBox.elementAt(i);
+				if (ViewUtils.checkPointInRectangle(x, y, r.getX(), r.getY(), r.getWidth(), r.getHeight())) {
+					itemSelected(i);
+				}
+			}
 		}
 	}
 	
-	private void buttonPressed() {
-		choices.setElementAt("Pressed", 0);
-		listExpanded = true;
+	private void dropDownButtonPressed() {
+		// expand or collapse dropdown list
+		if (listExpanded) {
+			listExpanded = false;	
+		} else { 
+			listExpanded = true;
+		}
 		refresh();
 	}
+	
+	private void itemSelected(int i) {
+		selectedChoice = (String) choices.elementAt(i);
+		listExpanded = false;
+		refresh();
+	}
+	
 	
 }
