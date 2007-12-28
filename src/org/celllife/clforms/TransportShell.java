@@ -48,9 +48,9 @@ public class TransportShell extends MIDlet implements CommandListener
 
 	private FormList formList;
 
-	//private VisualXFormServer xformServer;
+	private VisualXFormServer xformServer;
 
-	//private VisualXFormClient xformClient;
+	private VisualXFormClient xformClient;
 
 	private ModelList modelList;
 	
@@ -154,7 +154,7 @@ public class TransportShell extends MIDlet implements CommandListener
 			Display.getDisplay(this).setCurrent(this.fileBrowser);
 			break;
 		case 1:
-			//this.xformClient = new VisualXFormClient(this);
+			this.xformClient = new VisualXFormClient(this);
 			break;
 		case 2:
 			this.getMidlet = new getMidlet(this);
@@ -163,7 +163,7 @@ public class TransportShell extends MIDlet implements CommandListener
 	}
     
     public void startBToothClient() {
-		//this.xformServer = new VisualXFormServer(this);
+		this.xformServer = new VisualXFormServer(this);
 	}
 
 	protected void destroyApp(boolean unconditional)
