@@ -37,6 +37,7 @@ public class RMSUtility implements RecordListener
 
     public RMSUtility(String name, int iType)
     {
+//    	System.out.println("RMSUtility.RMSUtility()");
         this.RS_NAME = name;
         this.iType = iType;
         if (this.iType == RMSUtility.RMS_TYPE_META_DATA)
@@ -50,11 +51,13 @@ public class RMSUtility implements RecordListener
 
     public String getName()
     {
-        return this.RS_NAME;
+//    	System.out.println("RMSUtility.getName()");
+    	return this.RS_NAME;
     }
 
     public void open()
     {
+//    	System.out.println("RMSUtility.open()");
         if (this.recordStore == null)
         {
             try
@@ -71,6 +74,7 @@ public class RMSUtility implements RecordListener
 
     public void close()
     {
+//    	System.out.println("RMSUtility.close()");
         if (this.recordStore != null)
         {
             try
@@ -97,6 +101,7 @@ public class RMSUtility implements RecordListener
     public void writeToRMS(Object obj,
                            MetaDataObject metaDataObject)
     {
+//    	System.out.println("******RMSUtility.writeToRMS()");
         try
         {
             int recordId = this.recordStore.getNextRecordID();
@@ -105,7 +110,7 @@ public class RMSUtility implements RecordListener
             Externalizable externalizableObject = (Externalizable) obj;
             byte[] data = Serializer.serialize(externalizableObject);
             //LOG
-            //System.out.println("writing:"+new String(data)+"\n*** to "+recordId);
+            System.out.println("writing:"+new String(data)+"\n*** to "+recordId);
             this.recordStore.addRecord(data, 0, data.length);
             if (this.iType == RMSUtility.RMS_TYPE_META_DATA)
             {
@@ -128,6 +133,7 @@ public class RMSUtility implements RecordListener
     public void updateToRMS(int recordId, Object obj,
     		MetaDataObject metaDataObject)
     {
+//    	System.out.println("RMSUtility.updateToRMS()");
     	try
     	{
     		System.out.println("UPDATE RMS @ "+recordId);
@@ -157,6 +163,7 @@ public class RMSUtility implements RecordListener
     
     public void writeBytesToRMS(byte [] data, MetaDataObject metaDataObject)
     {
+//    	System.out.println("***************writeBytesToRMS()");
     	try
     	{
     		int recordId = this.recordStore.getNextRecordID();
@@ -177,6 +184,7 @@ public class RMSUtility implements RecordListener
 
     public void deleteRecord(int recordId)
     {
+//    	System.out.println("RMSUtility.deleteRecord()");
         try
         {
             this.recordStore.deleteRecord(recordId);
@@ -201,6 +209,7 @@ public class RMSUtility implements RecordListener
 
     public void delete()
     {
+//    	System.out.println("RMSUtility.delete()");
         try
         {   
         	System.out.println("in delete:"+this.RS_NAME);
@@ -226,6 +235,7 @@ public class RMSUtility implements RecordListener
     public void retrieveFromRMS(int recordId,
                                 Externalizable externalizableObject) throws IOException
     {
+//    	System.out.println("RMSUtility.retrieveFromRMS()");
         try
         {
             byte[] data = this.recordStore.getRecord(recordId);
@@ -246,6 +256,7 @@ public class RMSUtility implements RecordListener
     public void retrieveFromDummyForm(int recordId,
             Externalizable externalizableObject) throws IOException
     {
+//    		System.out.println("RMSUtility.retrieveFromDummyForm()");
             byte[] data = DummyForm.getData();
             Serializer.deserialize(data, externalizableObject);
     }
@@ -253,6 +264,7 @@ public class RMSUtility implements RecordListener
 
     public byte[] retrieveByteDataFromRMS(int recordId) throws IOException
     {
+//    	System.out.println("RMSUtility.retrieveByteDataFromRMS()");
         try
         {
             byte[] data = this.recordStore.getRecord(recordId);
@@ -270,6 +282,7 @@ public class RMSUtility implements RecordListener
     public void retrieveMetaDataFromRMS(int recordId,
                                         Externalizable externalizableObject)
     {
+//    	System.out.println("RMSUtility.retrieveMetaDataFromRMS()");
     	try{
     		if (this.iType == RMSUtility.RMS_TYPE_META_DATA)
     		{
@@ -281,10 +294,11 @@ public class RMSUtility implements RecordListener
     		ex.printStackTrace();
     	}
     }
-
+    
     public int getNumberOfRecords()
     {
-        int numRecords = 0;
+//    	System.out.println("RMSUtility.getNumberOfRecords()");
+    	int numRecords = 0;
         try
         {
             numRecords = this.recordStore.getNumRecords();
@@ -299,17 +313,21 @@ public class RMSUtility implements RecordListener
 
     public void recordAdded(RecordStore recordStore, int i)
     {
+//    	System.out.println("RMSUtility.recordAdded()");
     }
 
     public void recordChanged(RecordStore recordStore, int i)
     {
+//    	System.out.println("RMSUtility.recordChanged()");
     }
 
     public void recordDeleted(RecordStore recordStore, int i)
     {
+//    	System.out.println("RMSUtility.recordDeleted()");
     }
 
     public RecordEnumeration enumerateMetaData() {
+//    	System.out.println("RMSUtility.enumerateMetaData()");
     	//TODO check if need to open / close
 		if (this.iType == this.RMS_TYPE_STANDARD){
 			System.out.println("getting list from metaData RMS");
@@ -330,6 +348,7 @@ public class RMSUtility implements RecordListener
 	}
     
     public int getNextRecordID(){
+//    	System.out.println("RMSUtility.getNextRecordID()");
     	this.open();
     	
     	try {
@@ -345,7 +364,7 @@ public class RMSUtility implements RecordListener
     }
     
 	public void tempEmpty() {
-		
+//    	System.out.println("RMSUtility.tempEmpty()");
 		this.open();
 		RecordEnumeration recordEnum;
 		try {

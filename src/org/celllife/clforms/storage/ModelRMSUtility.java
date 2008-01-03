@@ -16,6 +16,7 @@ public class ModelRMSUtility extends RMSUtility
     public ModelRMSUtility(String name)
     {
         super(name, RMSUtility.RMS_TYPE_META_DATA);
+        System.out.println("ModelRMSUtility()");
     }
 
     public void writeToRMS(Model model)

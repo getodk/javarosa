@@ -380,8 +380,67 @@ public class DummyForm implements Externalizable, IDRecordable {
 			"</xf:html>" +
 			"").getBytes(); //
 	
+	private static byte[] dimagiSurvey = new String("" +
+			"<xf:html xmlns:xf=\"http://www.w3.org/2002/xforms\">\r\n" + 
+			"  <head>\r\n" + 
+			"    <title>Title</title>\r\n" + 
+			"    <xf:model id=\"DimagiSurvey\">\r\n" + 
+			"      <xf:instance>\r\n" + 
+			"        <data>\r\n" + 
+			"          <Subject>\r\n" + 
+			"            <Age />\r\n" + 
+			"            <Gender />\r\n" + 
+			"            <Homearea />\r\n" + 
+			"          </Subject>\r\n" + 
+			"          <Mobile>\r\n" + 
+			"            <Brand />\r\n" + 
+			"            <Model />\r\n" + 
+			"            <Payment />\r\n" + 
+			"	    <Services />\r\n" + 
+			"	  </Mobile>\r\n" + 
+			"          <DataCapture>\r\n" + 
+			"	    <EnteredBy />\r\n" + 
+			"          </DataCapture>\r\n" + 
+			"        </data>\r\n" + 
+			"      </xf:instance>\r\n" + 
+			"      <xf:bind id=\"Age\" nodeset=\"/data/Subject/Age\" type=\"xsd:string\" />\r\n" + 
+			"    </xf:model>\r\n" + 
+			"  </head>\r\n" + 
+			"  <body>\r\n" + 
+			"    <xf:textbox bind=\"Age\">\r\n" + 
+			"      <xf:label>How old are you?</xf:label>\r\n" + 
+			"      <xf:hint>Select your relevent age group</xf:hint>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Under 15</xf:label>\r\n" + 
+			"        <xf:value>0-15</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>15-20</xf:label>\r\n" + 
+			"        <xf:value>15-20</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>21-30</xf:label>\r\n" + 
+			"        <xf:value>21-30</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>31-45</xf:label>\r\n" + 
+			"        <xf:value>31-45</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>46-59</xf:label>\r\n" + 
+			"        <xf:value>46-59</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>60 and over</xf:label>\r\n" + 
+			"        <xf:value>60+</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"    </xf:textbox>\r\n" + 
+			"  </body>\r\n" + 
+			"</xf:html>" +
+			"").getBytes(); //
+	
 	private int recordId = 0;
-	private static byte [] currentData = mobileSurvey;//testDefaultDataXForm;//testXForm;//relevantTestXForm;
+	private static byte [] currentData = dimagiSurvey; //mobileSurvey;//testDefaultDataXForm;//testXForm;//relevantTestXForm;
 	public DummyForm()
 	{
 		recordId = 0;
@@ -419,7 +478,7 @@ public class DummyForm implements Externalizable, IDRecordable {
 	}
 
 	public void setDemo() {
-		this.currentData = this.mobileSurvey;
+		this.currentData = this.dimagiSurvey;
 		
 	}
 }

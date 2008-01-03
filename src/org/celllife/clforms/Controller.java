@@ -33,6 +33,7 @@ public class Controller
 
 	public Controller(TransportShell shell) {
 		super();
+		System.out.println("Controller()");
 		try {
 			//shell.log.write("IN CONTROLLER",MIDPLogger.DEBUG);
 			this.shell = shell;

@@ -27,6 +27,10 @@ import org.celllife.clforms.xml.XMLUtil;
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
 import org.openmrs.transport.midp.TransportLayer;
 
+import org.dimagi.view.ChatterboxView;
+import org.dimagi.view.ChatterboxPromptScreen;
+
+
 import com.ev.evgetme.getMidlet;
 
 public class TransportShell extends MIDlet implements CommandListener
@@ -44,7 +48,7 @@ public class TransportShell extends MIDlet implements CommandListener
     private List selectFunction;
     private List availableXForms;
     private FileBrowser fileBrowser;
-    private boolean writeDummy = false;
+    private boolean writeDummy = true;
 
 	private FormList formList;
 
@@ -63,6 +67,7 @@ public class TransportShell extends MIDlet implements CommandListener
 
     public TransportShell()
     {
+    	System.out.println("TransportShell()");
     	configureLogger();
     	//log.write("STARTING APP",MIDPLogger.DEBUG);
     	
@@ -121,24 +126,28 @@ public class TransportShell extends MIDlet implements CommandListener
 	}
 
 	public void displayFormList() {
+		System.out.println("TransportShell.displayFormList()");
     	this.formList = new FormList(this);		
 	}
 	
 	public FormList getFormList() {
-		
+		System.out.println("TransportShell.getFormList()");
     	this.formList = new FormList(this);
     	return this.formList;
 	}
 
 	public void displayModelList() {
+		System.out.println("TransportShell.displayModelList()");
     	this.modelList = new ModelList(this);
 	}
 
 	public void displayAvailableXFormMethods() {
+		System.out.println("TransportShell.displayAvailableXFormMethods()");
     	Display.getDisplay(this).setCurrent(availableXForms);
 	}
 
 	private void createAvailableXformsList() {
+		System.out.println("TransportShell.createAvailableXformsList()");
     	//"In file system", 
     	String[] getNewFormsMenu = {"From File system", "BlueTooth:Receive an XForm", "From URL"};
         this.availableXForms = new List("Where do you want to look for Xforms?", List.IMPLICIT,getNewFormsMenu, null);
@@ -182,6 +191,7 @@ public class TransportShell extends MIDlet implements CommandListener
 
     protected void startApp() throws MIDletStateChangeException
     {
+		System.out.println("TransportShell.startApp()");
     	//log.write("TRYING CREATEView",MIDPLogger.DEBUG);
     	initRMS();
     	createView();
@@ -189,11 +199,21 @@ public class TransportShell extends MIDlet implements CommandListener
     }
 
     private void initRMS() {
+		System.out.println("TransportShell.initRMS()");
     	//log.write("PRE-initXFormUtil",MIDPLogger.DEBUG);
 		this.xformRMS = new XFormRMSUtility(Controller.XFORM_RMS);
 		this.modelRMS = new ModelRMSUtility(Controller.MODEL_RMS);
 		//log.write("POST-initXformUtil",MIDPLogger.DEBUG);
 		//log.write("PRE-writeDummy",MIDPLogger.DEBUG);
+		
+		// get rid of all the previous records
+//		xformRMS.deleteRecord(31);
+//		xformRMS.deleteRecord(32);
+//		xformRMS.deleteRecord(33);
+//		xformRMS.deleteRecord(34);
+//		xformRMS.deleteRecord(35);
+//		xformRMS.deleteRecord(36);
+		
 		if (writeDummy)//xformRMS.getNumberOfRecords() == 0)
 		{
 		    System.out.println("***NUMBER OF RECORDS : " + xformRMS.getNumberOfRecords());
@@ -203,6 +223,7 @@ public class TransportShell extends MIDlet implements CommandListener
 	}
 
 	public void createView() {
+		System.out.println("TransportShell.createView()");
 		displayFormList();
     	//Display.getDisplay(this).setCurrent(selectFunction);
 	}
@@ -264,13 +285,15 @@ public class TransportShell extends MIDlet implements CommandListener
     }
 	
 	public void configureController(){
+		System.out.println("TransportShell.configureController()");
 		formController = new Controller(this);
-        formController.setPrompter(new PromptScreen());
+        formController.setPrompter(new ChatterboxPromptScreen());
         formController.setFormview(new FormViewScreen());
 	}
 
     public void controllerLoadForm(int formId)
     {
+		System.out.println("TransportShell.controllerLoadForm(formId)");
         display = Display.getDisplay(this);
         MVCComponent.display = display;
         formController.loadForm(formId);
@@ -279,6 +302,7 @@ public class TransportShell extends MIDlet implements CommandListener
 
     public void controllerLoadForm(Form form)
     {
+		System.out.println("TransportShell.displayFormList(Form)");
         display = Display.getDisplay(this);
         MVCComponent.display = display;
         formController.setForm(form);
@@ -286,6 +310,7 @@ public class TransportShell extends MIDlet implements CommandListener
     }
 
     public void deleteModel(int i) {
+		System.out.println("TransportShell.deleteModel()");
 		// TODO Refactor this method from controller to Shell
     	formController = new Controller(this);
     	formController.deleteModel(i);
@@ -293,6 +318,7 @@ public class TransportShell extends MIDlet implements CommandListener
     
     
     public void deleteForm(int i) {
+		System.out.println("TransportShell.deleteForm()");
 		// TODO Refactor this method from controller to Shell
     	formController = new Controller(this);
     	formController.deleteForm(i);
@@ -349,11 +375,13 @@ public class TransportShell extends MIDlet implements CommandListener
 
     public XFormRMSUtility getXFormRMSUtility()
     {
+		System.out.println("TransportShell.getXFormRMSUtility()");
         return this.xformRMS;
     }
 
     public  ModelRMSUtility getModelRMSUtility()
     {
+		System.out.println("TransportShell.getModelRMSUtility()");
         return this.modelRMS;
     }
 
@@ -366,6 +394,7 @@ public class TransportShell extends MIDlet implements CommandListener
 	}
 
 	public void writeFormToRMS(Form frm) {
+		System.out.println("TransportShell.writeFormToRMS()");
 		XFormRMSUtility rms = new XFormRMSUtility(Controller.XFORM_RMS);
         System.out.println("RMS SIZE BEFORE : " + rms.getNumberOfRecords());
         rms.writeToRMS(frm);
