@@ -249,6 +249,27 @@ public class XMLUtil {
 					// TODO possible need to handle this return
 				} else if (tagname.equalsIgnoreCase("value")) { //$NON-NLS-1$
 					value = child.getText(0).trim();
+				} else if (tagname.equalsIgnoreCase("textbox")) {
+					System.out.println("**************found textbox**********");
+					Prompt prompt = new Prompt();
+					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
+					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
+					if (ref != null) {
+						prompt.setXpathBinding(ref);
+						prompt.setId(getLastToken(ref, '/'));
+					} else if (bind != null) {
+						Binding b = (Binding) form.getBindings().get(bind);
+						if (b != null) {
+							prompt.setBindID(bind);
+							prompt.setXpathBinding(b.getNodeset());
+							prompt.setId(b.getId());
+						}
+					}
+					prompt.setFormControlType(Constants.SELECT1);
+					prompt.setReturnType(org.celllife.clforms.api.Constants.RETURN_SELECT1);
+					prompt.setSelectMap(new SimpleOrderedHashtable());
+					prompt = parseElement(form, child, prompt);
+					form.addPrompt(prompt);
 				} else{ // tagname not recognised
 					parseElement(form, child, null);
 					// TODO possible need to handle this return

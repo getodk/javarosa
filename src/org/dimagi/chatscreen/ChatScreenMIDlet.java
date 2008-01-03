@@ -10,7 +10,6 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
-import org.dimagi.entity.Question;
 
 public class ChatScreenMIDlet extends MIDlet implements CommandListener {
 

@@ -21,6 +21,9 @@ public class Constants {
 	public static final int RANGE = 5;
 	public static final int SUBMIT = 6;
 	
+	// Dimagi form control types
+	public static final int TEXTBOX = 10;
+	
 	// does the file connection API (JSR 75) exist?
 	public static boolean FILE_CONNECTION = false;
 	public static int MODE;
