@@ -250,24 +250,28 @@ public class XMLUtil {
 				} else if (tagname.equalsIgnoreCase("value")) { //$NON-NLS-1$
 					value = child.getText(0).trim();
 				} else if (tagname.equalsIgnoreCase("textbox")) {
-					System.out.println("**************found textbox**********");
+					System.out.println("found textbox");
 					Prompt prompt = new Prompt();
+					prompt.setFormControlType(Constants.TEXTBOX);
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
 					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
-					if (ref != null) {
-						prompt.setXpathBinding(ref);
-						prompt.setId(getLastToken(ref, '/'));
-					} else if (bind != null) {
+					if (bind != null) {
 						Binding b = (Binding) form.getBindings().get(bind);
 						if (b != null) {
 							prompt.setBindID(bind);
 							prompt.setXpathBinding(b.getNodeset());
+							prompt.setReturnType(getReturnTypeFromString(b.getType()));
 							prompt.setId(b.getId());
 						}
+					} else if (ref != null) {
+						prompt.setXpathBinding(ref);
+						prompt.setId(getLastToken(ref, '/'));
+						
 					}
-					prompt.setFormControlType(Constants.SELECT1);
-					prompt.setReturnType(org.celllife.clforms.api.Constants.RETURN_SELECT1);
-					prompt.setSelectMap(new SimpleOrderedHashtable());
+					String relevant = child.getAttributeValue(null, "relevant"); //$NON-NLS-1$
+					if (relevant != null){
+						prompt.setRelevantString(relevant);
+					}
 					prompt = parseElement(form, child, prompt);
 					form.addPrompt(prompt);
 				} else{ // tagname not recognised

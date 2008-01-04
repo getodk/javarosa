@@ -17,6 +17,8 @@ import org.celllife.clforms.util.J2MEUtil;
 import org.celllife.clforms.view.FormView;
 import org.celllife.clforms.view.IPrompter;
 
+import org.celllife.clforms.storage.DummyForm;
+
 public class Controller
 {
 
@@ -122,19 +124,28 @@ public class Controller
     public void loadForm(int recordId)
     {
     	// TODO put this in shell
-    	System.out.println("in load form id:"+recordId);
-        form = new Form(); //storageManager.getForm(recordId);
-        try {
-        	this.xformRMS.retrieveFromRMS(recordId, form);
-        	// TODO Sort this out so that the recordID is added in the deserialisation
-        	form.setRecordId(recordId);
-			// TODO fix this so IDs are in form objects properly
-        	form.setName(this.xformRMS.getName(recordId));
+    	System.out.println("start Controller.loadForm() id:"+recordId);
+    	DummyForm df = new DummyForm();
+    	form = df.getXFormObject();
+      	form.setRecordId(recordId);
+    	form.setName("DimagiSurvey2");
+  
+   //        form = new Form(); //storageManager.getForm(recordId);
+//        try {
+//        	this.xformRMS.retrieveFromRMS(recordId, form);
+//        	System.out.println("retrieve from rms");
+//        	// TODO Sort this out so that the recordID is added in the deserialisation
+//        	form.setRecordId(recordId);
+//        	System.out.println("set record id");
+//			// TODO fix this so IDs are in form objects properly
+//        	form.setName(this.xformRMS.getName(recordId));
+//        	System.out.println("get name");
+
         	
-        	System.out.println("form "+recordId+form.getName()+"loaded");
-        } catch (IOException e) {
-        	e.printStackTrace();
-		}
+//        	System.out.println("form "+recordId+form.getName()+"loaded");
+//        } catch (IOException e) {
+//        	e.printStackTrace();
+//		}
         if (form == null)
         {
             System.out.println("Form retuned null");
