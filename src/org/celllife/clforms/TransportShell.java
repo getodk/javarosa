@@ -30,6 +30,7 @@ import org.openmrs.transport.midp.TransportLayer;
 import org.dimagi.view.ChatterboxView;
 import org.dimagi.view.ChatterboxPromptScreen;
 import org.dimagi.view.ChatterboxPromptScreen2;
+import org.dimagi.view.ChatFormView;
 
 
 import com.ev.evgetme.getMidlet;
@@ -208,15 +209,14 @@ public class TransportShell extends MIDlet implements CommandListener
 		//log.write("PRE-writeDummy",MIDPLogger.DEBUG);
 		
 		// get rid of all the previous records
-//		xformRMS.deleteRecord(66);
-//		xformRMS.deleteRecord(67);
-//		xformRMS.deleteRecord(68);
-//		xformRMS.deleteRecord(69);
-//		xformRMS.deleteRecord(70);
-//		xformRMS.deleteRecord(71);
-//		xformRMS.deleteRecord(72);
-//		xformRMS.deleteRecord(73);
-//		xformRMS.deleteRecord(74);
+//		xformRMS.deleteRecord(75);
+//		xformRMS.deleteRecord(76);
+//		xformRMS.deleteRecord(77);
+//		xformRMS.deleteRecord(78);
+//		xformRMS.deleteRecord(79);
+//		xformRMS.deleteRecord(80);
+//		xformRMS.deleteRecord(81);
+//		xformRMS.deleteRecord(82);
 		
 		if (writeDummy)//xformRMS.getNumberOfRecords() == 0)
 		{
@@ -292,7 +292,7 @@ public class TransportShell extends MIDlet implements CommandListener
 		System.out.println("TransportShell.configureController()");
 		formController = new Controller(this);
         formController.setPrompter(new ChatterboxPromptScreen2());
-        formController.setFormview(new FormViewScreen());
+        formController.setFormview(new ChatFormView());
 	}
 
     public void controllerLoadForm(int formId)
