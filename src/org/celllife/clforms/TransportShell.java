@@ -29,6 +29,7 @@ import org.openmrs.transport.midp.TransportLayer;
 
 import org.dimagi.view.ChatterboxView;
 import org.dimagi.view.ChatterboxPromptScreen;
+import org.dimagi.view.ChatterboxPromptScreen2;
 
 
 import com.ev.evgetme.getMidlet;
@@ -207,12 +208,15 @@ public class TransportShell extends MIDlet implements CommandListener
 		//log.write("PRE-writeDummy",MIDPLogger.DEBUG);
 		
 		// get rid of all the previous records
-//		xformRMS.deleteRecord(31);
-//		xformRMS.deleteRecord(32);
-//		xformRMS.deleteRecord(33);
-//		xformRMS.deleteRecord(34);
-//		xformRMS.deleteRecord(35);
-//		xformRMS.deleteRecord(36);
+//		xformRMS.deleteRecord(66);
+//		xformRMS.deleteRecord(67);
+//		xformRMS.deleteRecord(68);
+//		xformRMS.deleteRecord(69);
+//		xformRMS.deleteRecord(70);
+//		xformRMS.deleteRecord(71);
+//		xformRMS.deleteRecord(72);
+//		xformRMS.deleteRecord(73);
+//		xformRMS.deleteRecord(74);
 		
 		if (writeDummy)//xformRMS.getNumberOfRecords() == 0)
 		{
@@ -287,7 +291,7 @@ public class TransportShell extends MIDlet implements CommandListener
 	public void configureController(){
 		System.out.println("TransportShell.configureController()");
 		formController = new Controller(this);
-        formController.setPrompter(new ChatterboxPromptScreen());
+        formController.setPrompter(new ChatterboxPromptScreen2());
         formController.setFormview(new FormViewScreen());
 	}
 
@@ -305,8 +309,8 @@ public class TransportShell extends MIDlet implements CommandListener
 		System.out.println("TransportShell.displayFormList(Form)");
         display = Display.getDisplay(this);
         MVCComponent.display = display;
-        formController.setForm(form);
-        formController.completeForm();
+        //formController.setForm(form);
+        //formController.completeForm();
     }
 
     public void deleteModel(int i) {

@@ -283,30 +283,31 @@ public class ChatterboxPromptScreen extends MVCComponent implements IPrompter, I
 		goToListCommand = new Command("Form View", Command.SCREEN, 1);
 
 		// screen by type
-		switch (p.getReturnType()) {
-		case org.celllife.clforms.api.Constants.RETURN_INTEGER:
-			intForm();
-			break;
-		case org.celllife.clforms.api.Constants.RETURN_STRING:
-			stringForm();
-			break;
-		case org.celllife.clforms.api.Constants.RETURN_DATE:
-			dateForm();
-			break;
-		case org.celllife.clforms.api.Constants.RETURN_SELECT1:
-			select1Form();
-			break;
-		case org.celllife.clforms.api.Constants.RETURN_SELECT_MULTI:
-			selectForm();
-			break;
-		case org.celllife.clforms.api.Constants.RETURN_BOOLEAN:
-			booleanForm();
-			break;
-		}
+//		switch (p.getReturnType()) {
+//		case org.celllife.clforms.api.Constants.RETURN_INTEGER:
+//			intForm();
+//			break;
+//		case org.celllife.clforms.api.Constants.RETURN_STRING:
+//			stringForm();
+//			break;
+//		case org.celllife.clforms.api.Constants.RETURN_DATE:
+//			dateForm();
+//			break;
+//		case org.celllife.clforms.api.Constants.RETURN_SELECT1:
+//			select1Form();
+//			break;
+//		case org.celllife.clforms.api.Constants.RETURN_SELECT_MULTI:
+//			selectForm();
+//			break;
+//		case org.celllife.clforms.api.Constants.RETURN_BOOLEAN:
+//			booleanForm();
+//			break;
+//		}
 
 		switch (p.getFormControlType()) {
 		case org.celllife.clforms.api.Constants.TEXTBOX:
 			System.out.println("******DRAW TEXTBOX********");
+			stringForm();
 			break;
 		}
 		
