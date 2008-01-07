@@ -27,9 +27,6 @@ import org.celllife.clforms.xml.XMLUtil;
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
 import org.openmrs.transport.midp.TransportLayer;
 
-import org.dimagi.view.ChatterboxView;
-import org.dimagi.view.ChatterboxPromptScreen;
-import org.dimagi.view.ChatterboxPromptScreen2;
 import org.dimagi.view.ChatFormView;
 
 
@@ -295,7 +292,7 @@ public class TransportShell extends MIDlet implements CommandListener
 	public void configureController(){
 		System.out.println("TransportShell.configureController()");
 		formController = new Controller(this);
-        formController.setPrompter(new ChatterboxPromptScreen2());
+        formController.setPrompter(new PromptScreen());
         formController.setFormview(new ChatFormView());
 	}
 
