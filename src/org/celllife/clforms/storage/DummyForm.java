@@ -403,13 +403,69 @@ public class DummyForm implements Externalizable, IDRecordable {
 			"          </DataCapture>\r\n" + 
 			"        </data>\r\n" + 
 			"      </xf:instance>\r\n" + 
-			"      <xf:bind id=\"Age\" nodeset=\"/data/Subject/Age\" type=\"xsd:string\" />\r\n" + 
+			"      <xf:bind id=\"ID\" nodeset=\"/data/Subject/ID\" type=\"xsd:string\" />\r\n" + 
+			"      <xf:bind id=\"Sex\" nodeset=\"/data/Subject/Sex\" type=\"xsd:string\" />\r\n" + 
+			"      <xf:bind id=\"Symptoms\" nodeset=\"/data/Subject/Symptoms\" type=\"xsd:string\" />\r\n" + 
+			"      <xf:bind id=\"City\" nodeset=\"/data/Subject/City\" type=\"xsd:string\" />\r\n" + 
 			"    </xf:model>\r\n" + 
 			"  </head>\r\n" + 
 			"  <body>\r\n" + 
-			"    <xf:textbox bind=\"Age\">\r\n" + 
-			"      <xf:label>How old are you?</xf:label>\r\n" + 
-			"    </xf:textbox>\r\n" + 
+			"    <xf:textbox bind=\"ID\">\r\n" + 
+			"      <xf:label>Enter the patient's ID number.</xf:label>\r\n" + 
+			"    </xf:textbox>\r\n" +
+			"    <xf:select1 bind=\"Sex\">\r\n" + 
+			"      <xf:label>What is the sex of the patient?</xf:label>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Female</xf:label>\r\n" + 
+			"        <xf:value>Female</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Male</xf:label>\r\n" + 
+			"        <xf:value>Male</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"    </xf:select1>\r\n" + 
+			"    <xf:select bind=\"Symptoms\">\r\n" + 
+			"      <xf:label>Has the patient had any of the following symptoms since their last visit?</xf:label>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Fever</xf:label>\r\n" + 
+			"        <xf:value>Fever</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Night Sweats</xf:label>\r\n" + 
+			"        <xf:value>Night Sweats</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Weight Loss</xf:label>\r\n" + 
+			"        <xf:value>Weight Loss</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Vomitting</xf:label>\r\n" + 
+			"        <xf:value>Vomitting</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 			
+			"    </xf:select>\r\n" + 
+			"    <xf:select1 bind=\"City\">\r\n" + 
+			"      <xf:label>Where does the patient live?</xf:label>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Cambridge</xf:label>\r\n" + 
+			"        <xf:value>Cambridge</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Boston</xf:label>\r\n" + 
+			"        <xf:value>Boston</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Newton</xf:label>\r\n" + 
+			"        <xf:value>Newton</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Quincy</xf:label>\r\n" + 
+			"        <xf:value>Quincy</xf:value>\r\n" + 
+			"      </xf:item>\r\n" +
+			"      <xf:item>\r\n" + 
+			"        <xf:label>Brookline</xf:label>\r\n" + 
+			"        <xf:value>Brookline</xf:value>\r\n" + 
+			"      </xf:item>\r\n" + 
+			"    </xf:select1>\r\n" + 
 			"  </body>\r\n" + 
 			"</xf:html>" +
 			"").getBytes(); //
