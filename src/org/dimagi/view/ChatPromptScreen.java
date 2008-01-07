@@ -10,11 +10,12 @@ import org.celllife.clforms.MVCComponent;
 import org.celllife.clforms.api.Prompt;
 import org.celllife.clforms.api.ResponseEvent;
 import org.celllife.clforms.view.FormView;
+import org.celllife.clforms.view.IPrompter;
 
 import org.dimagi.chatscreen.ChatScreenForm;
 
 
-public class ChatFormView extends MVCComponent implements FormView {
+public class ChatPromptScreen extends MVCComponent implements IPrompter {
 
 	private Controller controller;
 	private static Command prevCommand = new Command("Prev", Command.ITEM, 3);
@@ -22,8 +23,12 @@ public class ChatFormView extends MVCComponent implements FormView {
 	private static Command exitCommand = new Command("Exit", Command.EXIT, 3);
 	private static Displayable screen = null;
 	private ChatScreenForm chatScreenForm = new ChatScreenForm();
+	private int screenIndex;
+	private int totalScreens;
+	private Prompt p;
 	
-	public ChatFormView() {
+	
+	public ChatPromptScreen() {
 		screen = chatScreenForm;
 		screen.addCommand(nextCommand);
 		screen.addCommand(prevCommand);
@@ -68,7 +73,15 @@ public class ChatFormView extends MVCComponent implements FormView {
 	}
 
 	public void showPrompt(Prompt prompt) {
+		this.p = prompt;
 		showScreen();
 	}
 
+	public void showPrompt(Prompt prompt, int screenIndex, int totalScreens) {
+		this.p = prompt;
+		this.screenIndex = screenIndex;
+		this.totalScreens = totalScreens;
+		showScreen();
+	}
+	
 }

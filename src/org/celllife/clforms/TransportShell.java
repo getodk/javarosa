@@ -28,7 +28,7 @@ import org.netbeans.microedition.lcdui.pda.FileBrowser;
 import org.openmrs.transport.midp.TransportLayer;
 
 import org.dimagi.view.ChatFormView;
-
+import org.dimagi.view.ChatPromptScreen;
 
 import com.ev.evgetme.getMidlet;
 
@@ -206,18 +206,18 @@ public class TransportShell extends MIDlet implements CommandListener
 		//log.write("PRE-writeDummy",MIDPLogger.DEBUG);
 		
 		// get rid of all the previous records
-//		xformRMS.deleteRecord(83);
-//		xformRMS.deleteRecord(84);
-//		xformRMS.deleteRecord(85);
-//		xformRMS.deleteRecord(86);
-//		xformRMS.deleteRecord(87);
-//		xformRMS.deleteRecord(88);
-//		xformRMS.deleteRecord(89);
-//		xformRMS.deleteRecord(90);
-//		xformRMS.deleteRecord(91);
-//		xformRMS.deleteRecord(92);
-//		xformRMS.deleteRecord(93);
-//		xformRMS.deleteRecord(94);
+//		xformRMS.deleteRecord(106);
+//		xformRMS.deleteRecord(107);
+//		xformRMS.deleteRecord(108);
+//		xformRMS.deleteRecord(109);
+//		xformRMS.deleteRecord(110);
+//		xformRMS.deleteRecord(111);
+//		xformRMS.deleteRecord(112);
+//		xformRMS.deleteRecord(113);
+//		xformRMS.deleteRecord(114);
+//		xformRMS.deleteRecord(115);
+//		xformRMS.deleteRecord(116);
+//		xformRMS.deleteRecord(117);
 		
 		if (writeDummy)//xformRMS.getNumberOfRecords() == 0)
 		{
@@ -292,8 +292,8 @@ public class TransportShell extends MIDlet implements CommandListener
 	public void configureController(){
 		System.out.println("TransportShell.configureController()");
 		formController = new Controller(this);
-        formController.setPrompter(new PromptScreen());
-        formController.setFormview(new ChatFormView());
+        formController.setPrompter(new ChatPromptScreen());
+        formController.setFormview(new FormViewScreen());
 	}
 
     public void controllerLoadForm(int formId)
