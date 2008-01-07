@@ -95,8 +95,8 @@ public class ChatterboxPromptScreen2 extends MVCComponent implements IPrompter {
 //			
 //		}
 		
-		screen.addCommand(saveAndReloadCommand);
-		screen.addCommand(exitCommand);
+//		screen.addCommand(saveAndReloadCommand);
+//		screen.addCommand(exitCommand);
 
 	}
 
