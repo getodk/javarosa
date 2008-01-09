@@ -40,9 +40,9 @@ public class ChatScreenMIDlet extends MIDlet implements CommandListener {
 	
 	public void commandAction(Command c, Displayable d) {
 		if ( c == nextCommand ) {
-			chatScreenCanvas.goToNextQuestion();
+			chatScreenCanvas.goToNextPrompt();
 		} else if ( c == prevCommand ) {
-			chatScreenCanvas.goToPreviousQuestion();
+			chatScreenCanvas.goToPreviousPrompt();
 		} else if ( c == exitCommand ) {
 			destroyApp(false);
 			notifyDestroyed();

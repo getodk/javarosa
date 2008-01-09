@@ -45,9 +45,9 @@ public class ChatPromptScreen extends MVCComponent implements IPrompter {
 		    if (command == exitCommand){
 				controller.processEvent(new ResponseEvent(ResponseEvent.EXIT, -1));
 			} else if (command == nextCommand) {
-				chatScreenForm.goToNextQuestion();
+				chatScreenForm.goToNextPrompt();
 			} else if (command == prevCommand) {
-				chatScreenForm.goToPreviousQuestion();
+				chatScreenForm.goToPreviousPrompt();
 			}			 
 		} catch (Exception e) {
 			Alert a = new Alert("error.screen" + " 2"); //$NON-NLS-1$
