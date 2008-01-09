@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.celllife.clforms.api.Constants;
 import org.celllife.clforms.api.Form;
+import org.celllife.clforms.api.IForm;
 import org.celllife.clforms.api.Prompt;
 import org.celllife.clforms.api.ResponseEvent;
 import org.celllife.clforms.storage.Model;
@@ -26,7 +27,7 @@ public class Controller
     public static final String MODEL_RMS = "MODEL_RMS_NEW";
     public IPrompter prompter;
     public FormView formview;
-    private Form form;
+    private IForm form;
     private RMSManager rmsManager;
     private XFormRMSUtility xformRMS;
     private ModelRMSUtility modelRMS;
@@ -261,12 +262,12 @@ public class Controller
     {
     }
 
-    public Form getForm()
+    public IForm getForm()
     {
         return form;
     }
 
-    public void setForm(Form form)
+    public void setForm(IForm form)
     {
         this.form = form;
     }
