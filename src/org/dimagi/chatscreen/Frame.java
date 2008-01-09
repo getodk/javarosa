@@ -5,7 +5,8 @@ import java.util.Vector;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
-import org.dimagi.entity.Question;
+import org.celllife.clforms.api.Prompt;
+
 import org.dimagi.utils.StringUtils;
 import org.dimagi.utils.ViewUtils;
 import org.dimagi.view.Component;
@@ -27,7 +28,7 @@ import org.dimagi.view.widget.Textbox;
  */
 public class Frame extends Component {
 	
-	private Question _question;
+	private Prompt _prompt;
 	
 	private boolean _isActiveFrame = true;
 	
@@ -45,8 +46,8 @@ public class Frame extends Component {
 	 * Creates a new Frame for the given Question.
 	 * @param theQuestion The question that this frame will represent.	
 	 */
-	public Frame(Question theQuestion) {
-		_question = theQuestion;
+	public Frame(Prompt thePrompt) {
+		_prompt = thePrompt;
 		setText();
 		setupWidget();
 	}
@@ -73,10 +74,10 @@ public class Frame extends Component {
 	 */
 	private void setText() {
 		if(_isActiveFrame) {
-			_text = _question.getLongText();
+			_text = _prompt.getLongText();
 		}
 		else {
-			_text = _question.getShortText();
+			_text = _prompt.getShortText();
 		}
 	}
 	
@@ -86,39 +87,39 @@ public class Frame extends Component {
 	 *
 	 */
 	private void setupWidget() {
-		switch(_question.getWidgetType()){
-		case(Constants.SINGLE_CHOICE):
-			ChoiceList newWidget = new ChoiceList();
-			newWidget.setChoiceType(ChoiceList.SINGLE);
-			
-			for(int i =0 ; i < _question.getInternalArray().length ; ++i) {
-				newWidget.addChoice(_question.getInternalArray()[i]);
-			}
-			
-			_theWidget = newWidget;
-			break;
-		case(Constants.MULTIPLE_CHOICE):
-			ChoiceList aWidget = new ChoiceList();
-			aWidget.setChoiceType(ChoiceList.MULTI);
-			
-			for(int i =0 ; i < _question.getInternalArray().length ; ++i) {
-				aWidget.addChoice(_question.getInternalArray()[i]);
-			}
-			
-			_theWidget = aWidget;
-			break;
-		case ( Constants.TEXTBOX):
+		switch(_prompt.getFormControlType()) {
+//		case(Constants.SINGLE_CHOICE):
+//			ChoiceList newWidget = new ChoiceList();
+//			newWidget.setChoiceType(ChoiceList.SINGLE);
+//			
+//			for(int i =0 ; i < _question.getInternalArray().length ; ++i) {
+//				newWidget.addChoice(_question.getInternalArray()[i]);
+//			}
+//			
+//			_theWidget = newWidget;
+//			break;
+//		case(Constants.MULTIPLE_CHOICE):
+//			ChoiceList aWidget = new ChoiceList();
+//			aWidget.setChoiceType(ChoiceList.MULTI);
+//			
+//			for(int i =0 ; i < _question.getInternalArray().length ; ++i) {
+//				aWidget.addChoice(_question.getInternalArray()[i]);
+//			}
+//			
+//			_theWidget = aWidget;
+//			break;
+		case ( Constants.TEXTBOX ):
 			_theWidget = new Textbox();
 			break;
-		case (Constants.DROPDOWN):
-			Dropdown dropdownWidget = new Dropdown();
-			for(int i =0 ; i < _question.getInternalArray().length ; ++i) {
-				dropdownWidget.addChoice(_question.getInternalArray()[i]);
-			}
-			_theWidget = dropdownWidget;
-			break;
+//		case (Constants.DROPDOWN):
+//			Dropdown dropdownWidget = new Dropdown();
+//			for(int i =0 ; i < _question.getInternalArray().length ; ++i) {
+//				dropdownWidget.addChoice(_question.getInternalArray()[i]);
+//			}
+//			_theWidget = dropdownWidget;
+//			break;
 		}
-		_theWidget.setLabelPosition(_question.getLabelPosition());
+//		_theWidget.setLabelPosition(_prompt.getLabelPosition());
 		this.add(_theWidget);
 	}
 	
@@ -197,4 +198,5 @@ public class Frame extends Component {
  	                	Graphics.TOP|Graphics.LEFT);
 		}
 	}
+	
 }

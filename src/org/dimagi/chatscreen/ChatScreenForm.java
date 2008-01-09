@@ -8,7 +8,8 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
-import org.dimagi.entity.Question;
+import org.celllife.clforms.api.Prompt;
+
 import org.dimagi.utils.ViewUtils;
 import org.dimagi.view.Component;
 import org.dimagi.view.IRefreshListener;
@@ -33,7 +34,7 @@ public class ChatScreenForm extends DForm {
 	//that there are frames above or below the current view.
 	
 	private Vector frameSet = new Vector();
-	private Vector questions = new Vector();
+	private Vector prompts = new Vector();
 	int activeQuestion = 0;
 	int totalQuestions = 1;
 	
@@ -42,27 +43,31 @@ public class ChatScreenForm extends DForm {
 	 */
 	public ChatScreenForm() {
 		setupComponents();
-		defineQuestions();
+		definePrompts();
 	}
 
-	private void defineQuestions() {
-		Question first = new Question("Enter the patient's ID number:", "ID", Constants.TEXTBOX, new String[] {});
-		questions.addElement((Object) first);		
-		addQuestion(first);
-		Question second = new Question(
-				"What is the sex of the patient?",
-				"Sex", Constants.SINGLE_CHOICE,
-				new String[] { "Male", "Female" });
-		questions.addElement((Object) second);
-		Question third = new Question(
-				"Has the patient had any of the following symptoms since their last visit?", "Symptoms",
-				Constants.MULTIPLE_CHOICE, new String[] { "Fever",
-						"Night Sweats", "Weight Loss", "Vomiting" },
-				Constants.LABEL_LEFT);
-		questions.addElement((Object)third);
-		Question fourth = new Question("Name of the city?", "City", Constants.DROPDOWN, 
-				new String[] {"Cambridge", "Boston", "Newton", "Quincy", "Brookline"}, Constants.LABEL_TOP);
-		questions.addElement((Object) fourth);	
+	private void definePrompts() {
+		Prompt first = new Prompt();
+		first.setLongText("Enter the patient's ID number:");
+		first.setShortText("ID");
+		first.setFormControlType(Constants.TEXTBOX);
+		prompts.addElement((Object) first);		
+		addPrompt(first);
+		Prompt second = new Prompt();
+		second.setLongText("Enter the patient's ID number:");
+		second.setShortText("ID");
+		second.setFormControlType(Constants.TEXTBOX);
+		prompts.addElement((Object) second);		
+		
+//		Question third = new Question(
+//				"Has the patient had any of the following symptoms since their last visit?", "Symptoms",
+//				Constants.MULTIPLE_CHOICE, new String[] { "Fever",
+//						"Night Sweats", "Weight Loss", "Vomiting" },
+//				Constants.LABEL_LEFT);
+//		questions.addElement((Object)third);
+//		Question fourth = new Question("Name of the city?", "City", Constants.DROPDOWN, 
+//				new String[] {"Cambridge", "Boston", "Newton", "Quincy", "Brookline"}, Constants.LABEL_TOP);
+//		questions.addElement((Object) fourth);	
 	}
 	
 	/**
@@ -82,8 +87,8 @@ public class ChatScreenForm extends DForm {
 	 * 
 	 * @param theQuestion The new question to be displayed
 	 */
-	public void addQuestion(Question theQuestion) {
-		Frame newFrame = new Frame(theQuestion);
+	public void addPrompt(Prompt p) {
+		Frame newFrame = new Frame(p);
 		newFrame.setWidth(this.getWidth());
 		frameSet.addElement(newFrame);
 		getContentComponent().add(newFrame);
@@ -91,16 +96,16 @@ public class ChatScreenForm extends DForm {
 		this.repaint();
 	}
 	
-	public void goToNextQuestion() {
+	public void goToNextPrompt() {
 		activeQuestion++;
 		// add a new question
 		if (activeQuestion == totalQuestions) {
-			if ( activeQuestion < questions.size() ) {
+			if ( activeQuestion < prompts.size() ) {
 				totalQuestions++;
-				addQuestion((Question)questions.elementAt(activeQuestion));
+				addPrompt((Prompt)prompts.elementAt(activeQuestion));
 			} else { // repeat questions in loop
 			    totalQuestions++;
-				addQuestion((Question)questions.elementAt(activeQuestion % 4));
+				addPrompt((Prompt)prompts.elementAt(activeQuestion % 4));
 			}
 		} else { // advance to question that's already there
 			getContentComponent().add((Frame)frameSet.elementAt(activeQuestion));
@@ -108,7 +113,7 @@ public class ChatScreenForm extends DForm {
 		}
 	}
 	
-	public void goToPreviousQuestion() {
+	public void goToPreviousPrompt() {
 		// Don't do anything if user hits prev command for first question
 		if (activeQuestion > 0) {
 			getContentComponent().remove((Frame)frameSet.elementAt(activeQuestion));
