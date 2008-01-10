@@ -206,18 +206,18 @@ public class TransportShell extends MIDlet implements CommandListener
 		//log.write("PRE-writeDummy",MIDPLogger.DEBUG);
 		
 		// get rid of all the previous records
-//		xformRMS.deleteRecord(106);
-//		xformRMS.deleteRecord(107);
-//		xformRMS.deleteRecord(108);
-//		xformRMS.deleteRecord(109);
-//		xformRMS.deleteRecord(110);
-//		xformRMS.deleteRecord(111);
-//		xformRMS.deleteRecord(112);
-//		xformRMS.deleteRecord(113);
-//		xformRMS.deleteRecord(114);
-//		xformRMS.deleteRecord(115);
-//		xformRMS.deleteRecord(116);
-//		xformRMS.deleteRecord(117);
+//		xformRMS.deleteRecord(203);
+//		xformRMS.deleteRecord(204);
+//		xformRMS.deleteRecord(205);
+//		xformRMS.deleteRecord(206);
+//		xformRMS.deleteRecord(207);
+//		xformRMS.deleteRecord(208);
+//		xformRMS.deleteRecord(209);
+//		xformRMS.deleteRecord(210);
+//		xformRMS.deleteRecord(211);
+//		xformRMS.deleteRecord(212);
+//		xformRMS.deleteRecord(213);
+//		xformRMS.deleteRecord(202);
 		
 		if (writeDummy)//xformRMS.getNumberOfRecords() == 0)
 		{

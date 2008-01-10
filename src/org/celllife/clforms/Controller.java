@@ -88,6 +88,7 @@ public class Controller
         	form.loadPromptsDefaultValues();
         }
         formview.showPrompt(form.getPrompt(promptIndex));
+        System.out.println(((Prompt)(form.getPrompts().elementAt(0))).getLongText());
     }
 
     private void getNextPrompt()

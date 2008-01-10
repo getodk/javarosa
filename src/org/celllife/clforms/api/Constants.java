@@ -23,6 +23,7 @@ public class Constants {
 	
 	// Dimagi form control types
 	public static final int TEXTBOX = 10;
+	public static final int DROPDOWN = 11;
 	
 	// does the file connection API (JSR 75) exist?
 	public static boolean FILE_CONNECTION = false;
