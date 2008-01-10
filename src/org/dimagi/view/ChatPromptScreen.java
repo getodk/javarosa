@@ -1,5 +1,7 @@
 package org.dimagi.view;
 
+import java.util.Vector;
+
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
@@ -26,7 +28,7 @@ public class ChatPromptScreen extends MVCComponent implements IPrompter {
 	private int screenIndex;
 	private int totalScreens;
 	private Prompt p;
-	
+	private Vector prompts = new Vector();
 	
 	public ChatPromptScreen() {
 		screen = chatScreenForm;
@@ -45,7 +47,8 @@ public class ChatPromptScreen extends MVCComponent implements IPrompter {
 		    if (command == exitCommand){
 				controller.processEvent(new ResponseEvent(ResponseEvent.EXIT, -1));
 			} else if (command == nextCommand) {
-				chatScreenForm.goToNextPrompt();
+				controller.processEvent(new ResponseEvent(ResponseEvent.NEXT, -1));
+				//chatScreenForm.goToNextPrompt();
 			} else if (command == prevCommand) {
 				chatScreenForm.goToPreviousPrompt();
 			}			 
@@ -63,9 +66,19 @@ public class ChatPromptScreen extends MVCComponent implements IPrompter {
 		
 	}
 
-	protected void createView() {}
+	protected void createView() {
+//		screen = new ChatScreenForm(prompts, screenIndex, totalScreens);
+		System.out.println("length prompts " + prompts.size());
+		screen = new ChatScreenForm(prompts);
+		screen.addCommand(nextCommand);
+		screen.addCommand(prevCommand);
+		screen.addCommand(exitCommand);
+//		chatScreenForm.addPrompt(p);
+	}
 
-	protected void updateView() throws Exception {}
+	protected void updateView() throws Exception {
+		//createView();
+	}
 	
 
   	public void registerController(Controller controller) {
@@ -73,15 +86,30 @@ public class ChatPromptScreen extends MVCComponent implements IPrompter {
 	}
 
 	public void showPrompt(Prompt prompt) {
+		System.out.println("ChatPromptScreen.showPrompt(Prompt)");
 		this.p = prompt;
-		showScreen();
+		try{
+			createView();
+			showScreen();
+		}catch(Exception e){
+			System.out.println("Something wrong in ChatScreenForm.showPrompt(prompt)\n "+e.getMessage());
+			e.printStackTrace();			
+		}
 	}
 
 	public void showPrompt(Prompt prompt, int screenIndex, int totalScreens) {
+		System.out.println("ChatPromptScreen.showPrompt(prompt, screenIndex, totalScreens)");
 		this.p = prompt;
+		prompts.addElement(p);
 		this.screenIndex = screenIndex;
 		this.totalScreens = totalScreens;
-		showScreen();
+		try{
+			createView();
+			showScreen();
+		}catch(Exception e){
+			System.out.println("Something wrong in ChatScreenForm.showPrompt(prompt, screenIndex, totalScreen)\n "+e.getMessage());
+			e.printStackTrace();			
+		}
 	}
 	
 }

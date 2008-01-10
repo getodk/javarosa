@@ -1,5 +1,6 @@
 package org.dimagi.chatscreen;
 
+import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
@@ -87,39 +88,52 @@ public class Frame extends Component {
 	 *
 	 */
 	private void setupWidget() {
-		switch(_prompt.getFormControlType()) {
-//		case(Constants.SINGLE_CHOICE):
-//			ChoiceList newWidget = new ChoiceList();
-//			newWidget.setChoiceType(ChoiceList.SINGLE);
-//			
-//			for(int i =0 ; i < _question.getInternalArray().length ; ++i) {
-//				newWidget.addChoice(_question.getInternalArray()[i]);
-//			}
-//			
-//			_theWidget = newWidget;
-//			break;
-//		case(Constants.MULTIPLE_CHOICE):
-//			ChoiceList aWidget = new ChoiceList();
-//			aWidget.setChoiceType(ChoiceList.MULTI);
-//			
-//			for(int i =0 ; i < _question.getInternalArray().length ; ++i) {
-//				aWidget.addChoice(_question.getInternalArray()[i]);
-//			}
-//			
-//			_theWidget = aWidget;
-//			break;
-		case ( Constants.TEXTBOX ):
+		
+		Enumeration itr;
+		
+		switch(_prompt.getFormControlType() ) {
+		case ( org.celllife.clforms.api.Constants.SELECT1 ):
+
+			ChoiceList newWidget = new ChoiceList();
+			newWidget.setChoiceType(ChoiceList.SINGLE);
+
+			itr = _prompt.getSelectMap().keys();
+			while (itr.hasMoreElements()) {
+				String label = (String) itr.nextElement();
+				newWidget.addChoice(label);
+			}
+
+			_theWidget = newWidget;
+			break;
+			
+		case ( org.celllife.clforms.api.Constants.SELECT ):
+			ChoiceList aWidget = new ChoiceList();
+			aWidget.setChoiceType(ChoiceList.MULTI);
+			
+			itr = _prompt.getSelectMap().keys();
+			while (itr.hasMoreElements()) {
+				String label = (String) itr.nextElement();
+				aWidget.addChoice(label);
+			}
+			
+			_theWidget = aWidget;
+			break;
+		case ( org.celllife.clforms.api.Constants.TEXTBOX ):
 			_theWidget = new Textbox();
 			break;
-//		case (Constants.DROPDOWN):
-//			Dropdown dropdownWidget = new Dropdown();
-//			for(int i =0 ; i < _question.getInternalArray().length ; ++i) {
-//				dropdownWidget.addChoice(_question.getInternalArray()[i]);
-//			}
-//			_theWidget = dropdownWidget;
-//			break;
+		case ( org.celllife.clforms.api.Constants.DROPDOWN ):
+			Dropdown dropdownWidget = new Dropdown();
+		
+			itr = _prompt.getSelectMap().keys();
+			while (itr.hasMoreElements()) {
+				String label = (String) itr.nextElement();
+				dropdownWidget.addChoice(label);
+			}
+		
+			_theWidget = dropdownWidget;
+			break;
 		}
-//		_theWidget.setLabelPosition(_prompt.getLabelPosition());
+		//_theWidget.setLabelPosition(_prompt.getLabelPosition());
 		this.add(_theWidget);
 	}
 	
