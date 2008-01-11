@@ -9,6 +9,9 @@
 
 	<!-- Definition of the J2ME Polish task:                      -->
 	<taskdef name="j2mepolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar" />
+	
+	<!-- Definition of the Test Suite Name:                      -->
+	<property name="test.class.name" value="org.dimagi.ExampleTestCase" />
 
 	<target name="init">
 		<property name="test" value="false" />
@@ -47,7 +50,8 @@
 				
 				<sources>
 					<source dir="${dir.src}"/>
-					<source dir="${dir.test}"/>
+					<!--Taking this out for now...-->
+					<!--source dir="${dir.test}"/-->
 				</sources>
 				
 				<variables includeAntProperties="true">
@@ -110,9 +114,38 @@
 
 	<target name="emulator" depends="enableEmulator,j2mepolish" description="invokes the emulator">
 	</target>
-	<target name="tests" depends="j2mepolish" description="runs unit tests">
-		
-	</target>
+	
+	<property name="tst-dir" location="test/" />
+	  <property name="TALK" value="true" />
+
+	  <path id="classpath.base">
+	  </path>
+	  <path id="classpath.test">
+	    <pathelement location="${tst-dir}/lib/junit.jar" />
+	    <pathelement location="${tst-dir}" />
+	    <path refid="classpath.base" />
+	  </path>
+
+	  <target name="compile-test">
+	    <javac srcdir="${tst-dir}"
+	           verbose="${TALK}"
+	           >
+	      <classpath refid="classpath.test"/>
+	    </javac>
+	  </target>
+	  <target name="clean-compile-test">
+	    <delete verbose="${TALK}">
+	      <fileset dir="${tst-dir}" includes="**/*.class" />
+	    </delete>
+	  </target>
+
+	  <target name="tests" depends="compile-test">
+	    <junit>	
+	      <classpath refid="classpath.test" />
+	      <formatter type="brief" usefile="false" />
+	      <test name="org.dimagi.ExampleTestCase" />
+	    </junit>
+	  </target>
 
 	<target name="clean" description="allows a clean build. You should call [ant clean] whenever you made changes to devices.xml, vendors.xml or groups.xml">
 		<delete dir="build" />
