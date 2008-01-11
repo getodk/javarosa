@@ -142,7 +142,7 @@
 	  <target name="tests" depends="compile-test">
 	    <junit>	
 	      <classpath refid="classpath.test" />
-	      <formatter type="brief" usefile="false" />
+	      <formatter type="xml" usefile="false" />
 	      <test name="org.dimagi.ExampleTestCase" />
 	    </junit>
 	  </target>
