@@ -93,6 +93,7 @@ public class Controller
 
     private void getNextPrompt()
     {
+    	System.out.println("Controller.getNextPrompt()");
         promptIndex++;
         if (promptIndex >= form.getPrompts().size())
         {
@@ -100,7 +101,7 @@ public class Controller
         }
         
         form.calculateRelavant(form.getPrompt(promptIndex)); 
-		if(form.getPrompt(promptIndex).isRelevant())
+		if(form.getPrompt(promptIndex).isRelevant())	
 			showPromptAtIndex();
 		else
 			getNextPrompt();
@@ -294,7 +295,9 @@ public class Controller
     }
 
 	private void showPromptAtIndex() {
+		System.out.println("controller.showPromptAtIndex()");
 		Prompt prompt = form.getPrompt(promptIndex);
+		System.out.println(prompt.getLongText());
 		prompter.showPrompt(prompt, promptIndex+1,form.getPrompts().size());
 	}
 

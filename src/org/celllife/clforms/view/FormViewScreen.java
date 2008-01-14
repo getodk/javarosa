@@ -135,6 +135,7 @@ public class FormViewScreen extends MVCComponent implements FormView{
 				controller.processEvent(new ResponseEvent(ResponseEvent.SAVE_AND_RELOAD, -1));
 			}
 			else if (command == List.SELECT_COMMAND){
+				System.out.println("FormViewScreen.commandAction(SELECT_COMMAND) selectedIndex: " + ((List)screen).getSelectedIndex());
 				controller.processEvent(new ResponseEvent(ResponseEvent.GOTO,((List)screen).getSelectedIndex()));
 			}
 			else if (command == exitCommand){
