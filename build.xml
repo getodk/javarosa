@@ -56,6 +56,7 @@
 				
 				<variables includeAntProperties="true">
 					<variable file="configuration/configuration.properties" />
+					<variable name="polish.MenuBar.useExtendedMenuBar" value="true" />
 				</variables>
 
 				<resources
@@ -140,7 +141,7 @@
 	  </target>
 
 	  <target name="tests" depends="compile-test">
-	    <junit>	
+	    <junit failureProperty="test.failure">	
 	      <classpath refid="classpath.test" />
 	      <formatter type="xml" />
 	      <test name="org.dimagi.ExampleTestCase" outfile="junit-test-example"/>
