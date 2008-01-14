@@ -13,8 +13,12 @@ import minixpath.XPathExpression;
 
 import org.celllife.clforms.api.IForm;
 import org.celllife.clforms.api.Prompt;
+
+import org.celllife.clforms.util.SimpleOrderedHashtable;
+
 import org.celllife.clforms.storage.Model;
 import org.celllife.clforms.util.J2MEUtil;
+
 
 import org.dimagi.utils.ViewUtils;
 import org.dimagi.view.Component;
@@ -46,6 +50,8 @@ public class ChatScreenForm extends DForm implements IForm {
 	private Vector prompts;
 	int activeQuestion = 0;
 	int totalQuestions = 1;
+
+	int highestDisplayedQuestion = 0;
 	private String name;
 	private Model xmlModel;
 	private int recordId;
@@ -55,7 +61,7 @@ public class ChatScreenForm extends DForm implements IForm {
 	 */
 	public ChatScreenForm() {
 		setupComponents();
-//		definePrompts();
+		//definePrompts();
 	}
 
 	public ChatScreenForm(Vector prompts) {
@@ -82,24 +88,41 @@ public class ChatScreenForm extends DForm implements IForm {
 		Prompt first = new Prompt();
 		first.setLongText("Enter the patient's ID number:");
 		first.setShortText("ID");
-		first.setFormControlType(Constants.TEXTBOX);
+		first.setFormControlType(org.celllife.clforms.api.Constants.TEXTBOX);
 		prompts.addElement((Object) first);		
 		addPrompt(first);
 		Prompt second = new Prompt();
-		second.setLongText("Enter the patient's ID number:");
-		second.setShortText("ID");
-		second.setFormControlType(Constants.TEXTBOX);
+		second.setLongText("What is the sex of the patient?");
+		second.setShortText("Sex");
+		SimpleOrderedHashtable soht = new SimpleOrderedHashtable();
+		soht.put("Male", "Male");
+		soht.put("Female", "Female");
+		second.setSelectMap(soht);
+		second.setFormControlType(org.celllife.clforms.api.Constants.SELECT1);
 		prompts.addElement((Object) second);		
-		
-//		Question third = new Question(
-//				"Has the patient had any of the following symptoms since their last visit?", "Symptoms",
-//				Constants.MULTIPLE_CHOICE, new String[] { "Fever",
-//						"Night Sweats", "Weight Loss", "Vomiting" },
-//				Constants.LABEL_LEFT);
-//		questions.addElement((Object)third);
-//		Question fourth = new Question("Name of the city?", "City", Constants.DROPDOWN, 
-//				new String[] {"Cambridge", "Boston", "Newton", "Quincy", "Brookline"}, Constants.LABEL_TOP);
-//		questions.addElement((Object) fourth);	
+		Prompt third = new Prompt();
+		third.setLongText("Has the patient had any of the following symptoms since their last visit?");
+		third.setShortText("Symptoms");
+		SimpleOrderedHashtable soht2 = new SimpleOrderedHashtable();
+		soht2.put("Fever", "Fever");
+		soht2.put("Night Sweats", "Night Sweats");
+		soht2.put("Weight Loss", "Weight Loss");
+		soht2.put("Vomiting", "Vomiting");
+		third.setSelectMap(soht2);
+		third.setFormControlType(org.celllife.clforms.api.Constants.SELECT);
+		prompts.addElement((Object) third);		
+		Prompt fourth = new Prompt();
+		fourth.setLongText("Name of city?");
+		fourth.setShortText("City");
+		SimpleOrderedHashtable soht3 = new SimpleOrderedHashtable();
+		soht3.put("Cambridge", "Cambridge");
+		soht3.put("Boston", "Boston");
+		soht3.put("Newton", "Newton");
+		soht3.put("Quincy", "Quincy");
+		soht3.put("Brookline", "Brookline");
+		fourth.setSelectMap(soht3);
+		fourth.setFormControlType(org.celllife.clforms.api.Constants.SELECT);
+		prompts.addElement((Object) fourth);		
 	}
 	
 	/**
@@ -128,9 +151,35 @@ public class ChatScreenForm extends DForm implements IForm {
 		setupFrames();
 		this.repaint();
 	}
-	
+
 	public void goToNextPrompt() {
 		System.out.println("ChatScreenForm.goToNextPrompt()");
+		this.activeQuestion = activeQuestion;
+		
+		activeQuestion++;
+		// add a new question
+		if (activeQuestion == totalQuestions) {
+			if ( activeQuestion < prompts.size() ) {
+				totalQuestions++;
+				addPrompt((Prompt)prompts.elementAt(activeQuestion));
+			} else { // repeat questions in loop
+			    totalQuestions++;
+				addPrompt((Prompt)prompts.elementAt(activeQuestion % 4));
+			}
+		} else { // advance to question that's already there
+			getContentComponent().add((Frame)frameSet.elementAt(activeQuestion));
+			setupFrames();
+		}
+	}
+	
+	public void goToNextPrompt(int activeQuestion) {
+		System.out.println("ChatScreenForm.goToNextPrompt(activeQuestion) " + activeQuestion);
+		this.activeQuestion = activeQuestion-1;
+		Prompt p = (Prompt)prompts.elementAt(this.activeQuestion);
+		System.out.println(p.getLongText());	
+		addPrompt(p);
+		highestDisplayedQuestion++;
+		
 //		activeQuestion++;
 //		// add a new question
 //		if (activeQuestion == totalQuestions) {
@@ -156,6 +205,15 @@ public class ChatScreenForm extends DForm implements IForm {
 		}
 	}
 
+	public void draw(int activeQuestion) {
+		if (activeQuestion > highestDisplayedQuestion ) {
+			goToNextPrompt(activeQuestion);
+		} else if ( activeQuestion < highestDisplayedQuestion ) {
+			goToPreviousPrompt();
+		}
+}
+	
+	
 	/**
 	 * Queries all frames for their optimal size, and then lays them out
 	 * in a simple stack.
@@ -176,6 +234,12 @@ public class ChatScreenForm extends DForm implements IForm {
 			aFrame.setY(frameStart);
 		}
 	}
+
+	
+	public void setPrompts(Vector prompts) {
+		this.prompts = prompts;
+	}
+	
 	
 	// IForm interface
 	public Prompt getPrompt(int promptId) {
@@ -371,9 +435,7 @@ public class ChatScreenForm extends DForm implements IForm {
 		}
 	}
 
-	public void setPrompts(Vector prompts) {
-		this.prompts = prompts;
-	}
-	
+
 }
+		
 		

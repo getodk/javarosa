@@ -22,6 +22,7 @@ public class ChatPromptScreen extends MVCComponent implements IPrompter {
 	private Controller controller;
 	private static Command prevCommand = new Command("Prev", Command.ITEM, 3);
 	private static Command nextCommand = new Command("Next", Command.ITEM, 3);
+	private static Command goToFormViewCommand = new Command("FormView", Command.ITEM, 3);
 	private static Command exitCommand = new Command("Exit", Command.EXIT, 3);
 	private static Displayable screen = null;
 	private ChatScreenForm chatScreenForm = new ChatScreenForm();
@@ -30,10 +31,12 @@ public class ChatPromptScreen extends MVCComponent implements IPrompter {
 	private Prompt p;
 	private Vector prompts = new Vector();
 	
+	
 	public ChatPromptScreen() {
 		screen = chatScreenForm;
 		screen.addCommand(nextCommand);
 		screen.addCommand(prevCommand);
+		screen.addCommand(goToFormViewCommand);
 		screen.addCommand(exitCommand);
 	}
 
@@ -47,11 +50,12 @@ public class ChatPromptScreen extends MVCComponent implements IPrompter {
 		    if (command == exitCommand){
 				controller.processEvent(new ResponseEvent(ResponseEvent.EXIT, -1));
 			} else if (command == nextCommand) {
-				controller.processEvent(new ResponseEvent(ResponseEvent.NEXT, -1));
-				//chatScreenForm.goToNextPrompt();
+				controller.processEvent(new ResponseEvent(ResponseEvent.NEXT, -1));	
 			} else if (command == prevCommand) {
-				chatScreenForm.goToPreviousPrompt();
-			}			 
+				controller.processEvent(new ResponseEvent(ResponseEvent.PREVIOUS, -1));
+			} else if ( command == goToFormViewCommand ) {
+				controller.processEvent(new ResponseEvent(ResponseEvent.LIST,-1));
+			}
 		} catch (Exception e) {
 			Alert a = new Alert("error.screen" + " 2"); //$NON-NLS-1$
 			a.setString(e.getMessage());
@@ -67,18 +71,9 @@ public class ChatPromptScreen extends MVCComponent implements IPrompter {
 	}
 
 	protected void createView() {
-//		screen = new ChatScreenForm(prompts, screenIndex, totalScreens);
-		System.out.println("length prompts " + prompts.size());
-		screen = new ChatScreenForm(prompts);
-		screen.addCommand(nextCommand);
-		screen.addCommand(prevCommand);
-		screen.addCommand(exitCommand);
-//		chatScreenForm.addPrompt(p);
 	}
 
-	protected void updateView() throws Exception {
-		//createView();
-	}
+	protected void updateView() throws Exception {}
 	
 
   	public void registerController(Controller controller) {
@@ -86,30 +81,22 @@ public class ChatPromptScreen extends MVCComponent implements IPrompter {
 	}
 
 	public void showPrompt(Prompt prompt) {
-		System.out.println("ChatPromptScreen.showPrompt(Prompt)");
+		System.out.println("ChatPromptScreen.showPrompt(prompt)");
 		this.p = prompt;
-		try{
-			createView();
-			showScreen();
-		}catch(Exception e){
-			System.out.println("Something wrong in ChatScreenForm.showPrompt(prompt)\n "+e.getMessage());
-			e.printStackTrace();			
-		}
+		showScreen();
 	}
 
 	public void showPrompt(Prompt prompt, int screenIndex, int totalScreens) {
 		System.out.println("ChatPromptScreen.showPrompt(prompt, screenIndex, totalScreens)");
+		System.out.println(prompt.getLongText() + " " + screenIndex + " " + totalScreens);
 		this.p = prompt;
-		prompts.addElement(p);
+		this.prompts.addElement(p);
+		chatScreenForm.setPrompts(prompts);
 		this.screenIndex = screenIndex;
 		this.totalScreens = totalScreens;
-		try{
-			createView();
-			showScreen();
-		}catch(Exception e){
-			System.out.println("Something wrong in ChatScreenForm.showPrompt(prompt, screenIndex, totalScreen)\n "+e.getMessage());
-			e.printStackTrace();			
-		}
+		chatScreenForm.draw(screenIndex);
+		//chatScreenForm.goToNextPrompt(screenIndex);
+		showScreen();
 	}
 	
 }

@@ -88,52 +88,43 @@ public class Frame extends Component {
 	 *
 	 */
 	private void setupWidget() {
-		
 		Enumeration itr;
-		
-		switch(_prompt.getFormControlType() ) {
+		switch(_prompt.getFormControlType()) {
 		case ( org.celllife.clforms.api.Constants.SELECT1 ):
-
 			ChoiceList newWidget = new ChoiceList();
 			newWidget.setChoiceType(ChoiceList.SINGLE);
-
 			itr = _prompt.getSelectMap().keys();
-			while (itr.hasMoreElements()) {
-				String label = (String) itr.nextElement();
-				newWidget.addChoice(label);
-			}
-
+            while (itr.hasMoreElements()) {
+            	String label = (String) itr.nextElement();
+            	newWidget.addChoice(label);
+            }
 			_theWidget = newWidget;
 			break;
-			
-		case ( org.celllife.clforms.api.Constants.SELECT ):
+		case( org.celllife.clforms.api.Constants.SELECT ):
 			ChoiceList aWidget = new ChoiceList();
 			aWidget.setChoiceType(ChoiceList.MULTI);
-			
 			itr = _prompt.getSelectMap().keys();
-			while (itr.hasMoreElements()) {
-				String label = (String) itr.nextElement();
-				aWidget.addChoice(label);
-			}
-			
+            while (itr.hasMoreElements()) {
+            	String label = (String) itr.nextElement();
+            	aWidget.addChoice(label);
+            }
+						
 			_theWidget = aWidget;
 			break;
 		case ( org.celllife.clforms.api.Constants.TEXTBOX ):
 			_theWidget = new Textbox();
 			break;
-		case ( org.celllife.clforms.api.Constants.DROPDOWN ):
+		case (Constants.DROPDOWN):
 			Dropdown dropdownWidget = new Dropdown();
-		
 			itr = _prompt.getSelectMap().keys();
 			while (itr.hasMoreElements()) {
 				String label = (String) itr.nextElement();
 				dropdownWidget.addChoice(label);
 			}
-		
 			_theWidget = dropdownWidget;
 			break;
 		}
-		//_theWidget.setLabelPosition(_prompt.getLabelPosition());
+		_theWidget.setLabelPosition(_prompt.getLabelPosition());
 		this.add(_theWidget);
 	}
 	

@@ -31,7 +31,8 @@ public class Prompt {
 	private String xpathBinding;
 	private String relevantString;
 	private String bindID;
-
+	private int labelPosition;
+	
 	public Prompt() {
 		super();
 		relevantString = null;
@@ -221,4 +222,12 @@ public class Prompt {
 		return bindID;
 	}
 
+	public int getLabelPosition() {
+		return labelPosition;
+	}
+	
+	public void setLabelPosition(int labelPosition) {
+		this.labelPosition = labelPosition;
+	}
+	
 }
