@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
-import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -22,13 +21,10 @@ import org.celllife.clforms.storage.ModelRMSUtility;
 import org.celllife.clforms.storage.XFormMetaData;
 import org.celllife.clforms.storage.XFormRMSUtility;
 import org.celllife.clforms.view.FormViewScreen;
-import org.celllife.clforms.view.PromptScreen;
 import org.celllife.clforms.xml.XMLUtil;
+import org.dimagi.view.ChatPromptScreen;
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
 import org.openmrs.transport.midp.TransportLayer;
-
-import org.dimagi.view.ChatFormView;
-import org.dimagi.view.ChatPromptScreen;
 
 import com.ev.evgetme.getMidlet;
 
@@ -341,7 +337,12 @@ public class TransportShell extends MIDlet implements CommandListener
             FileConnection fc = (FileConnection) Connector.open(this.fileBrowser.getSelectedFileURL());
             System.out.println("FILE SIZE: "+fc.fileSize());
             InputStream fis = fc.openInputStream();
-            int length = new Double(fc.fileSize()+1).intValue();
+            //So this used to use Double.toInt(), which is a problem because most of these devices
+            //don't have floating point processors, and the libraries don't have the datatype. 
+            //The Double.toInt() method just cast the long to an integer anyway, so this should do
+            //the same thing
+            // - Clayton Sims Jan 15, 2008
+            int length = (int)(fc.fileSize()+1);
             byte[] b = new byte[length];
             int readLength = fis.read(b, 0, length);
             DataInputStream din = new DataInputStream(
