@@ -93,7 +93,7 @@ public class DisplayFrame {
         }
     }
     
-    public void drawLargeFormOnScreen(Screen target) {
+    public void drawLargeFormOnScreen(ChatScreen target) {
         //#style questionText
         questionText.setStyle();
         target.append(questionText);
@@ -101,7 +101,7 @@ public class DisplayFrame {
         displayedItems = new Item[] {questionText,theWidget};
         target.focus(theWidget);
     }
-    public void drawSmallFormOnScreen(Screen target) {
+    public void drawSmallFormOnScreen(ChatScreen target) {
         //#style oldPromptText
         questionText.setStyle();
         target.append(questionText);
@@ -110,7 +110,7 @@ public class DisplayFrame {
         target.append(questionResponse);
         displayedItems = new Item[] {questionText,questionResponse};
     }
-    public void removeFromScreen(Screen target) {
+    public void removeFromScreen(ChatScreen target) {
         for(int i = 0 ; i < displayedItems.length; i++) {
             target.removeItem(displayedItems[i]);
         }
