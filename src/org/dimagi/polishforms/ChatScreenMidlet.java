@@ -6,9 +6,9 @@ import javax.microedition.midlet.MIDletStateChangeException;
 
 import de.enough.polish.ui.ChoiceGroup;
 
-public class ScreenMidlet extends MIDlet {
+public class ChatScreenMidlet extends MIDlet {
 
-    Screen mainScreen;
+    ChatScreen mainScreen;
     //List itemList;
     
     protected void destroyApp(boolean arg0) throws MIDletStateChangeException {
@@ -22,7 +22,7 @@ public class ScreenMidlet extends MIDlet {
     }
 
     protected void startApp() throws MIDletStateChangeException {
-        mainScreen  = new Screen();        
+        mainScreen  = new ChatScreen();        
         Display.getDisplay(this).setCurrent(mainScreen);
     }
 

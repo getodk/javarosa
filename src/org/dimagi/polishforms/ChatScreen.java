@@ -10,7 +10,7 @@ import org.dimagi.entity.Question;
 
 import de.enough.polish.ui.Item;
 
-public class Screen extends de.enough.polish.ui.FramedForm {
+public class ChatScreen extends de.enough.polish.ui.FramedForm {
     
     Question[] sampleQuestions = new Question[]{
         new Question("What is the child's Age?","Child Age",Question.NUMBER),
@@ -26,7 +26,7 @@ public class Screen extends de.enough.polish.ui.FramedForm {
     
     Stack displayFrames = new Stack();
 
-    public Screen() {
+    public ChatScreen() {
         //#style framedForm
         super("Chatterbox");
 
