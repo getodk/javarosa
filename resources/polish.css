@@ -19,7 +19,30 @@
   * can be changed here. 
   */
 colors {
-	
+	fontColor: rgb( 30, 85, 86 );
+	focusedFontColor: #000;
+	bgColor:  #eee;
+	focusedBgColor:  #fff;
+	borderColor: fontColor;
+	focusedBorderColor: focusedFontColor;
+	menubarColor: #DDDD88;
+	oldQuestionColor: #E2E2E2;	
+}
+
+title {
+	padding: 2;
+	font-face: proportional;
+	font-size: large;
+	font-style: bold;
+	font-color: focusedFontColor;
+	background-color: bgColor;
+	border: none;
+	layout: horizontal-center | horizontal-expand;
+	//#if polish.midp2
+		text-effect: vertical-gradient;
+		text-vertical-gradient-start-color: #ddd;
+		text-vertical-gradient-end-color: #000;		
+	//#endif
 }
 
 .modeList{
@@ -33,15 +56,153 @@ focused{
 	border-arc: 6;
 	border-color: yellow;
 	border-width: 2;
-	layout: left | expand;
+	/*layout: left | expand;*/
 	font-color: black;
+}
+
+.textBox {
+	label-style: choiceGroupLabel;
+	layout: horizontal-center;
+	background-color: white;
+	border-width: 1;
+	border-color: black;
+	layout: right | expand;
+	margin-top: 3;
+	margin-bottom: 3;
+	margin-left: 1;
+	margin-right: 1;
+}
+
+choiceGroup {
+	label-style: choiceGroupLabel;
+	layout: horizontal-center;
+	background-color: white;
+	border-width: 1;
+	border-color: black;
+	layout: right | expand;
+	margin-top: 3;
+	margin-bottom: 3;
+	margin-left: 1;
+	margin-right: 1;
+}
+
+.choiceGroupLabel {
+	font-face: proportional;
+	font-size: large;
+	layout: horizontal-center | newline-after;
+}
+
+.yesNoChoiceGroup {
+	label-style: choiceGroupLabel;
+	layout: horizontal-center;
+	background-color: white;
+	border-width: 1;
+	border-color: black;
+	view-type: midp2;
+	layout: horizontal-center | expand;
+	margin-top: 3;
+	margin-bottom: 3;
+	margin-left: 1;
+	margin-right: 1;
+}
+
+.choiceItem {
+	margin: 2;
+	icon-image-align: bottom;
+	font-size: large;
+}
+
+.yesNoItem {
+	margin: 2;
+	layout: right;
+	icon-image-align: bottom
+}
+
+.framedForm {
+	padding: 2;
+	background-color: gray;
+	layout: bottom | horizontal-center;
+}
+
+.questionText {
+	font-face: proportional;
+	font-size: medium;	
+	layout: vertical-center | horizontal-center | expand; 
+	background-color: white;
+	border-width: 1;
+	border-color: black;
+	padding: 2;
+	margin-top: 3;
+	margin-bottom: 3;
+	margin-left: 1;
+	margin-right: 1;	
+}
+.oldPromptText {
+	font-face: proportional;
+	font-size: medium;
+	font-style: bold;	
+	layout: vertical-center | horizontal-center | expand; 
+	background-color: oldQuestionColor;
+	border-width: 1;
+	border-color: black;
+	padding: 2;
+	margin-top: 3;
+	margin-bottom: 1;
+	margin-left: 1;
+	margin-right: 1;	
+}
+.valueText {
+	font-face: proportional;
+	font-size: medium;
+	font-style: bold;	
+	layout: vertical-center | horizontal-center | expand; 
+	background-color: oldQuestionColor;
+	border-width: 1;
+	border-color: black;
+	padding: 2;
+	margin-top: 0;
+	margin-bottom: 3;
+	margin-left: 1;
+	margin-right: 1;	
+}
+
+leftframe {
+	layout: vertical-expand | vertical-center;
+}
+
+rightframe {
+	layout: vertical-expand | vertical-center;
+}
+
+menu {
+	border-type: top;
+	border-color: black;
+	border-width: 1;
+	padding: 5;
+	background-color: menubarColor;
+	font-style: bold; 
+	font-face: proportional; 
+	font-size: medium; 
+	font-color: red;
+	menubar-color: black;
+	margin: 0;
+}
+
+leftcommand {
+	padding-horizontal: 4;
+	padding-bottom: 0;
+	font-color: black;
+	font-style: bold;
+}
+
+rightcommand {
+	padding-horizontal: 4;
+	padding-bottom: 0;
+	font-color: black;
+	font-style: bold;
+	layout: right;
 }
 
 .urlForm{}
 
 .urlInput{}
-
-
-
-
-
