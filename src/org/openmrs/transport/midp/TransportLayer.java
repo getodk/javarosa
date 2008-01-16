@@ -24,7 +24,9 @@ import org.openmrs.transport.MessageListener;
 import org.openmrs.transport.TransportManager;
 import org.openmrs.transport.TransportMessage;
 import org.openmrs.transport.TransportMethod;
+//#if app.usefileconnections
 import org.openmrs.transport.file.FileConnectionTransportMethod;
+//#endif
 import org.openmrs.transport.http.HttpTransportMethod;
 import org.openmrs.transport.storage.RmsStorage;
 import org.openmrs.transport.util.Logger;
@@ -122,8 +124,10 @@ public class TransportLayer implements
 			transportManager = new TransportManager(new RmsStorage());
 			transportManager.setMessageListener(this);
 			transportManager.registerTransportMethod(new HttpTransportMethod());
+			//#if app.usefileconnections
 			transportManager
 			.registerTransportMethod(new FileConnectionTransportMethod());
+			//#endif
 		}
 		String[] elements = {"Select Models", "Send data via HTTP","Save to file system","Message Queue"};
 		mainMenu = new List("Transport Menu", List.IMPLICIT, elements, null);

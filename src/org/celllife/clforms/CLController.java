@@ -19,13 +19,10 @@ import org.celllife.clforms.view.FormView;
 import org.celllife.clforms.view.IPrompter;
 
 import org.celllife.clforms.storage.DummyForm;
-import org.dimagi.demo.ExampleForm;
 
-public class Controller
+public class CLController implements IController
 {
 
-    public static final String XFORM_RMS = "XFORM_RMS_NEW";
-    public static final String MODEL_RMS = "MODEL_RMS_NEW";
     public IPrompter prompter;
     public FormView formview;
     private IForm form;
@@ -35,21 +32,21 @@ public class Controller
     private int promptIndex;
     private TransportShell shell;
 
-	public Controller(TransportShell shell) {
+	public CLController(TransportShell shell) {
 		super();
 		System.out.println("Controller()");
 		try {
 			//shell.log.write("IN CONTROLLER",MIDPLogger.DEBUG);
 			this.shell = shell;
 			this.rmsManager = new RMSManager();
-			this.xformRMS = new XFormRMSUtility(Controller.XFORM_RMS);
+			this.xformRMS = new XFormRMSUtility(IController.XFORM_RMS);
 			//shell.log.write("IN CONTROLLER-post XFOrm util",MIDPLogger.DEBUG);
 			System.out.println("#REC "+xformRMS.getNumberOfRecords());
 			if (xformRMS.getNumberOfRecords() == 0)
 			{
 			    this.xformRMS.writeDummy();
 			}
-			this.modelRMS = new ModelRMSUtility(Controller.MODEL_RMS);
+			this.modelRMS = new ModelRMSUtility(IController.MODEL_RMS);
 			//shell.log.write("IN CONTROLLER-post XFOrm util",MIDPLogger.DEBUG);
 			this.rmsManager.registerRMSUtility(this.xformRMS);
 			this.rmsManager.registerRMSUtility(this.modelRMS);
@@ -60,6 +57,9 @@ public class Controller
 		}
     }
 	
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#cancelForm()
+     */
     public void cancelForm()
     {
     }
@@ -69,11 +69,17 @@ public class Controller
         this.formview.registerController(this);
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#registerPrompter()
+     */
     public void registerPrompter()
     {
         this.prompter.registerController(this);
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#completeForm()
+     */
     public void completeForm()
     {
     	System.out.println("Completing form..."+form.getName());
@@ -122,19 +128,17 @@ public class Controller
 			getPreviousPrompt();
     }
 
-    /**
-     * @param formId
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#loadForm(int)
      */
     public void loadForm(int recordId)
     {
     	// TODO put this in shell
     	System.out.println("start Controller.loadForm() id:"+recordId);
-//    	DummyForm df = new DummyForm();
-//    	form = df.getXFormObject();
-    	ExampleForm ef = new ExampleForm();
-    	form = ef.getXFormObject();
-    	form.setRecordId(recordId);
-//    	form.setName("DimagiSurvey2");
+    	DummyForm df = new DummyForm();
+    	form = df.getXFormObject();
+      	form.setRecordId(recordId);
+    	form.setName("DimagiSurvey2");
   
    //        form = new Form(); //storageManager.getForm(recordId);
 //        try {
@@ -162,12 +166,18 @@ public class Controller
         }
     }
     
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#deleteForm(int)
+     */
     public void deleteForm(int recordId) {
 		// TODO move this to Shell
     	System.out.println("deleting form id:"+recordId);
         this.xformRMS.deleteRecord(recordId);
 	}
     
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#deleteModel(int)
+     */
     public void deleteModel(int recordId) {
 		// TODO move this to Shell
     	System.out.println("deleting record id:"+recordId);
@@ -175,6 +185,9 @@ public class Controller
 	}
     
     
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#processEvent(org.celllife.clforms.api.ResponseEvent)
+     */
     public void processEvent(ResponseEvent event)
     {
         switch (event.getType())
@@ -236,6 +249,9 @@ public class Controller
         form.getXmlModel().clearData();
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#saveFormModel()
+     */
     public void saveFormModel()
     {
         try
@@ -263,35 +279,56 @@ public class Controller
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#updateModel()
+     */
     public void updateModel()
     {
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#getForm()
+     */
     public IForm getForm()
     {
         return form;
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#setForm(org.celllife.clforms.api.IForm)
+     */
     public void setForm(IForm form)
     {
         this.form = form;
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#getPrompter()
+     */
     public IPrompter getPrompter()
     {
         return prompter;
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#setPrompter(org.celllife.clforms.view.IPrompter)
+     */
     public void setPrompter(IPrompter prompter)
     {
         this.prompter = prompter;
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#getFormview()
+     */
     public FormView getFormview()
     {
         return formview;
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#setFormview(org.celllife.clforms.view.FormView)
+     */
     public void setFormview(FormView formview)
     {
         this.formview = formview;
@@ -305,6 +342,9 @@ public class Controller
 	}
 
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#getRMSManager()
+     */
     public RMSManager getRMSManager()
     {
         return this.rmsManager;

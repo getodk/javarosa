@@ -2,16 +2,25 @@ package org.dimagi.polishforms;
 
 import java.util.Stack;
 
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.List;
 
+import org.celllife.clforms.IController;
+import org.celllife.clforms.MVCComponent;
+import org.celllife.clforms.api.Prompt;
+import org.celllife.clforms.api.ResponseEvent;
+import org.celllife.clforms.view.FormView;
+import org.celllife.clforms.view.IPrompter;
 import org.dimagi.entity.Question;
 
 import de.enough.polish.ui.Item;
 
-public class ChatScreen extends de.enough.polish.ui.FramedForm {
+public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IPrompter, FormView, CommandListener{
     
+    IController controller;
     Question[] sampleQuestions = new Question[]{
         new Question("What is the child's Age?","Child Age",Question.NUMBER),
         new Question("What is the Child's Gender?","Gender",Question.SINGLE_SELECT, new String[]{"Male","Female"}),
@@ -24,6 +33,8 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm {
 
     Command selectCommand = new Command("Select", Command.BACK, 1);
     
+    Command exitCommand = new Command("Exit", Command.EXIT, 1);
+    
     Stack displayFrames = new Stack();
 
     public ChatScreen() {
@@ -33,27 +44,22 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm {
         this.addCommand(menuCommand);
         this.addCommand(selectCommand);
 
-        this.setCommandListener(new CommandListener() {
-            public void commandAction(Command c, Displayable d) {
-                if (c == selectCommand) {
-                    selectPressed();
-                }
-            }
-        }); 
+        this.setCommandListener(this); 
     }
     private void selectPressed() {
         System.out.println("selected!");
-        currentQuestion = (currentQuestion + 1) % 4;
         if(!displayFrames.empty()) {
             DisplayFrame topFrame = (DisplayFrame)(displayFrames.peek());
             topFrame.evaluateResponse();
-            topFrame.removeFromScreen(this);
-            topFrame.drawSmallFormOnScreen(this);
         }
-        addQuestion(sampleQuestions[currentQuestion]);
     }    
     private void addQuestion(Question nextQuestion) {
         DisplayFrame frame = new DisplayFrame(nextQuestion);
+        displayFrames.push(frame);
+        frame.drawLargeFormOnScreen(this);
+    }
+    private void addPrompt(Prompt nextPrompt) {
+        DisplayFrame frame = new DisplayFrame(nextPrompt);
         displayFrames.push(frame);
         frame.drawLargeFormOnScreen(this);
     }
@@ -67,4 +73,47 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm {
         }
         return -1;
     }
+    public void showPrompt(Prompt prompt) {
+        MVCComponent.display.setCurrent(this);
+        if(!displayFrames.empty()) {
+            DisplayFrame topFrame = (DisplayFrame)(displayFrames.peek());
+            topFrame.evaluateResponse();
+            topFrame.removeFromScreen(this);
+            topFrame.drawSmallFormOnScreen(this);
+        }
+        addPrompt(prompt);
+    }
+    
+    public void showPrompt(Prompt prompt, int screenIndex, int totalScreens) {
+        showPrompt(prompt);
+    }
+
+    public void registerController(IController controller) {
+        this.controller = controller;
+    }
+    public void commandAction(Command command, Displayable s) {
+        try {
+            if (command == selectCommand) {
+                selectPressed();
+                controller.processEvent(new ResponseEvent(ResponseEvent.NEXT, -1));
+            }
+            /*if (command == saveAndReloadCommand) {
+                controller.processEvent(new ResponseEvent(ResponseEvent.SAVE_AND_RELOAD, -1));
+            }
+            else if (command == List.SELECT_COMMAND){
+                System.out.println("FormViewScreen.commandAction(SELECT_COMMAND) selectedIndex: " + ((List)screen).getSelectedIndex());
+                controller.processEvent(new ResponseEvent(ResponseEvent.GOTO,((List)screen).getSelectedIndex()));
+            }*/
+            else if (command == exitCommand){
+                controller.processEvent(new ResponseEvent(ResponseEvent.EXIT, -1));
+            }
+            
+        } catch (Exception e) {
+            Alert a = new Alert("error.screen" + " 2"); //$NON-NLS-1$
+            a.setString(e.getMessage());
+            a.setTimeout(Alert.FOREVER);
+            MVCComponent.display.setCurrent(a);
+        }
+    }
+
 }

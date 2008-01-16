@@ -6,9 +6,9 @@ import org.celllife.clforms.view.IPrompter;
 
 public class Scripter implements IPrompter {
 
-	private Controller controller;
+	private IController controller;
 	
-	public void registerController(Controller controller) {
+	public void registerController(IController controller) {
 		this.controller = controller;
 	}
 
