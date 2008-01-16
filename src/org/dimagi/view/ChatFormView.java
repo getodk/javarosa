@@ -5,7 +5,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import org.celllife.clforms.Controller;
+import org.celllife.clforms.IController;
 import org.celllife.clforms.MVCComponent;
 import org.celllife.clforms.api.Prompt;
 import org.celllife.clforms.api.ResponseEvent;
@@ -16,7 +16,7 @@ import org.dimagi.chatscreen.ChatScreenForm;
 
 public class ChatFormView extends MVCComponent implements FormView {
 
-	private Controller controller;
+	private IController controller;
 	private static Command prevCommand = new Command("Prev", Command.ITEM, 3);
 	private static Command nextCommand = new Command("Next", Command.ITEM, 3);
 	private static Command exitCommand = new Command("Exit", Command.EXIT, 3);
@@ -63,7 +63,7 @@ public class ChatFormView extends MVCComponent implements FormView {
 	protected void updateView() throws Exception {}
 	
 
-  	public void registerController(Controller controller) {
+  	public void registerController(IController controller) {
   		this.controller = controller;		
 	}
 

@@ -360,6 +360,7 @@ public class XMLUtil {
 
 		InputStreamReader isr = null;
 		try {
+		  //#if app.usefileconnections
 			FileConnection fc = (FileConnection) Connector.open(file);
 
 			if (!fc.exists()) {
@@ -373,6 +374,7 @@ public class XMLUtil {
 				 */
 
 			}
+		  //#endif
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -428,6 +430,7 @@ public class XMLUtil {
 	}
 
 	public static String readTextFile(String url) throws IOException {
+	  //#if app.usefileconnections
 		FileConnection fc = (FileConnection) Connector.open(url);
 
 		if (!fc.exists()) {
@@ -447,6 +450,9 @@ public class XMLUtil {
 		fc.close();
 
 		return content.toString();
+		//#else
+		throw new IOException("No file connection API available");
+		//#endif
 	}
 
 	public static void printModel(Document doc) throws IOException {
