@@ -19,6 +19,7 @@ import org.celllife.clforms.view.FormView;
 import org.celllife.clforms.view.IPrompter;
 
 import org.celllife.clforms.storage.DummyForm;
+import org.dimagi.demo.ExampleForm;
 
 public class Controller
 {
@@ -128,10 +129,12 @@ public class Controller
     {
     	// TODO put this in shell
     	System.out.println("start Controller.loadForm() id:"+recordId);
-    	DummyForm df = new DummyForm();
-    	form = df.getXFormObject();
-      	form.setRecordId(recordId);
-    	form.setName("DimagiSurvey2");
+//    	DummyForm df = new DummyForm();
+//    	form = df.getXFormObject();
+    	ExampleForm ef = new ExampleForm();
+    	form = ef.getXFormObject();
+    	form.setRecordId(recordId);
+//    	form.setName("DimagiSurvey2");
   
    //        form = new Form(); //storageManager.getForm(recordId);
 //        try {
