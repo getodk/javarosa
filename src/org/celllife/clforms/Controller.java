@@ -1,11 +1,9 @@
 package org.celllife.clforms;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.celllife.clforms.api.Constants;
-import org.celllife.clforms.api.Form;
 import org.celllife.clforms.api.IForm;
 import org.celllife.clforms.api.Prompt;
 import org.celllife.clforms.api.ResponseEvent;
@@ -17,9 +15,8 @@ import org.celllife.clforms.storage.XFormRMSUtility;
 import org.celllife.clforms.util.J2MEUtil;
 import org.celllife.clforms.view.FormView;
 import org.celllife.clforms.view.IPrompter;
-
-import org.celllife.clforms.storage.DummyForm;
 import org.dimagi.demo.ExampleForm;
+import org.dimagi.properties.PropertyRMSUtility;
 
 public class Controller
 {
@@ -53,7 +50,7 @@ public class Controller
             //shell.log.write("IN CONTROLLER-post XFOrm util",MIDPLogger.DEBUG);
             this.rmsManager.registerRMSUtility(this.xformRMS);
             this.rmsManager.registerRMSUtility(this.modelRMS);
-            //shell.log.write("OUT CONTROLLER-post rms register",MIDPLogger.DEBUG);
+            
         } catch (Exception e) {
             //shell.log.write(e.getMessage(),MIDPLogger.DEBUG);
             e.printStackTrace();
