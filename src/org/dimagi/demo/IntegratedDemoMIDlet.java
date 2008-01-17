@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
-import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -17,30 +16,28 @@ import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
-import org.celllife.clforms.Controller;
+import org.celllife.clforms.ChatterboxController;
+import org.celllife.clforms.IController;
 import org.celllife.clforms.FormList;
 import org.celllife.clforms.ModelList;
 import org.celllife.clforms.MVCComponent;
-import org.celllife.clforms.TransportShell;
 import org.celllife.clforms.VisualXFormServer;
 import org.celllife.clforms.VisualXFormClient;
+
 import org.celllife.clforms.api.Form;
 import org.celllife.clforms.storage.ModelRMSUtility;
 import org.celllife.clforms.storage.XFormMetaData;
 import org.celllife.clforms.storage.XFormRMSUtility;
-import org.celllife.clforms.view.FormViewScreen;
-import org.celllife.clforms.view.PromptScreen;
 import org.celllife.clforms.xml.XMLUtil;
+import org.dimagi.chatscreen.ChatScreenForm;
+//#if app.usefileconnections
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
+//#endif
 import org.openmrs.transport.midp.TransportLayer;
-
-import org.dimagi.view.ChatFormView;
-import org.dimagi.view.ChatPromptScreen;
 
 import com.ev.evgetme.getMidlet;
 
-// Don't want to extend TransportShell. Create superclass for both TransportShell and IntegratedDemoMIDlet
-public class IntegratedDemoMIDlet extends TransportShell implements CommandListener
+public class IntegratedDemoMIDlet extends org.celllife.clforms.TransportShell implements CommandListener
 {
     public final static String WORKING_DIRECTORY = "C:/predefgallery/predefphotos/";
     
@@ -51,11 +48,14 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
     private ModelRMSUtility modelRMS;
     public static final int ALERT_TIMEOUT = 2000;
     private Display display;
-    private Controller formController;
+    private IController formController;
     private List selectFunction;
     private List availableXForms;
+  //#if app.usefileconnections
     private FileBrowser fileBrowser;
+    //#endif
     private boolean writeDummy = true;
+    private ChatScreenForm chatscreenform = new ChatScreenForm();
 
 	private FormList formList;
 
@@ -167,7 +167,9 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
 		{
 		case 0:
 			initServiceFileBrowser();
+			//#if app.usefileconnections
 			Display.getDisplay(this).setCurrent(this.fileBrowser);
+			//#endif
 			break;
 		case 1:
 			//this.xformClient = new VisualXFormClient(this);
@@ -208,27 +210,25 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
     private void initRMS() {
 		System.out.println("TransportShell.initRMS()");
     	//log.write("PRE-initXFormUtil",MIDPLogger.DEBUG);
-		this.xformRMS = new XFormRMSUtility(Controller.XFORM_RMS);
-		this.modelRMS = new ModelRMSUtility(Controller.MODEL_RMS);
+		this.xformRMS = new XFormRMSUtility(IController.XFORM_RMS);
+		this.modelRMS = new ModelRMSUtility(IController.MODEL_RMS);
 		//log.write("POST-initXformUtil",MIDPLogger.DEBUG);
 		//log.write("PRE-writeDummy",MIDPLogger.DEBUG);
 		
 		// get rid of all the previous records
-//		xformRMS.deleteRecord(347);
-//		xformRMS.deleteRecord(348);
-//		xformRMS.deleteRecord(349);
-//		xformRMS.deleteRecord(350);
-//		xformRMS.deleteRecord(351);
-//		xformRMS.deleteRecord(352);
-//		xformRMS.deleteRecord(353);
-//		xformRMS.deleteRecord(354);
-//		xformRMS.deleteRecord(355);
-//		xformRMS.deleteRecord(356);
-//		xformRMS.deleteRecord(357);
-//		xformRMS.deleteRecord(358);
-//		xformRMS.deleteRecord(359);
-//		xformRMS.deleteRecord(360);
-
+//		xformRMS.deleteRecord(376);
+//		xformRMS.deleteRecord(377);
+//		xformRMS.deleteRecord(378);
+//		xformRMS.deleteRecord(379);
+//		xformRMS.deleteRecord(380);
+//		xformRMS.deleteRecord(381);
+//		xformRMS.deleteRecord(382);
+//		xformRMS.deleteRecord(383);
+//		xformRMS.deleteRecord(384);
+//		xformRMS.deleteRecord(385);
+//		xformRMS.deleteRecord(386);
+//		xformRMS.deleteRecord(387);
+//		xformRMS.deleteRecord(388);
 		
 		if (writeDummy)//xformRMS.getNumberOfRecords() == 0)
 		{
@@ -265,6 +265,7 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
         		navigateAvailbleXformsList();
 			}
 		}
+      //#if app.usefileconnections
         else if (c == FileBrowser.SELECT_FILE_COMMAND)
         {
             List directory = (List) d;
@@ -275,14 +276,17 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
         {
             this.createView();
         }
+      //#endif
     }
 
 	private void initServiceFileBrowser() {
+	  //#if app.usefileconnections
     	fileBrowser = new FileBrowser(Display.getDisplay(this));
         fileBrowser.setTitle("Browse XForms");
         fileBrowser.setCommandListener(this);
         fileBrowser.addCommand(FileBrowser.SELECT_FILE_COMMAND);
         fileBrowser.addCommand(FileBrowser.EXIT_COMMAND);
+        //#endif
 	}
 
 	public void loadSpecificForm(int i)
@@ -302,9 +306,9 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
 	
 	public void configureController(){
 		System.out.println("TransportShell.configureController()");
-		formController = new Controller(this);
-        formController.setPrompter(new ChatPromptScreen());
-        formController.setFormview(new FormViewScreen());
+		formController = new ChatterboxController(this);
+        formController.setPrompter(chatscreenform);
+        formController.setFormview(chatscreenform);
 	}
 
     public void controllerLoadForm(int formId)
@@ -328,7 +332,7 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
     public void deleteModel(int i) {
 		System.out.println("TransportShell.deleteModel()");
 		// TODO Refactor this method from controller to Shell
-    	formController = new Controller(this);
+    	formController = new ChatterboxController(this);
     	formController.deleteModel(i);
 	}
     
@@ -336,7 +340,7 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
     public void deleteForm(int i) {
 		System.out.println("TransportShell.deleteForm()");
 		// TODO Refactor this method from controller to Shell
-    	formController = new Controller(this);
+    	formController = new ChatterboxController(this);
     	formController.deleteForm(i);
 	}
     
@@ -345,11 +349,17 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
     {
         try
         {
+            //#if app.usefileconnections
         	System.out.println("DIRECTORY: " + this.fileBrowser.getSelectedFileURL());
             FileConnection fc = (FileConnection) Connector.open(this.fileBrowser.getSelectedFileURL());
             System.out.println("FILE SIZE: "+fc.fileSize());
             InputStream fis = fc.openInputStream();
-            int length = new Double(fc.fileSize()+1).intValue();
+            //So this used to use Double.toInt(), which is a problem because most of these devices
+            //don't have floating point processors, and the libraries don't have the datatype. 
+            //The Double.toInt() method just cast the long to an integer anyway, so this should do
+            //the same thing
+            // - Clayton Sims Jan 15, 2008
+            int length = (int)(fc.fileSize()+1);
             byte[] b = new byte[length];
             int readLength = fis.read(b, 0, length);
             DataInputStream din = new DataInputStream(
@@ -376,6 +386,7 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
             //TextBox viewer = new TextBox("XForm Contents", null, length, TextField.ANY | TextField.UNEDITABLE);
             //viewer.setString(new String(b, 0, length));
             //Display.getDisplay(this).urrent(viewer);
+            //#endif
         }
         catch (Exception ex)
         {
@@ -411,7 +422,7 @@ public class IntegratedDemoMIDlet extends TransportShell implements CommandListe
 
 	public void writeFormToRMS(Form frm) {
 		System.out.println("TransportShell.writeFormToRMS()");
-		XFormRMSUtility rms = new XFormRMSUtility(Controller.XFORM_RMS);
+		XFormRMSUtility rms = new XFormRMSUtility(IController.XFORM_RMS);
         System.out.println("RMS SIZE BEFORE : " + rms.getNumberOfRecords());
         rms.writeToRMS(frm);
         System.out.println("RMS SIZE AFTER : " + rms.getNumberOfRecords());
