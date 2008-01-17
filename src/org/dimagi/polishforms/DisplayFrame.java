@@ -16,6 +16,14 @@ import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 
+/**
+ * DisplayFrames are a UI component used to interact with Prompts.
+ * 
+ * The frame will determine the proper UI component to use for a Prompt, and set return values appropriately.
+ * 
+ * @author ctsims
+ *
+ */
 public class DisplayFrame {
     
     private Prompt thePrompt;
@@ -27,7 +35,11 @@ public class DisplayFrame {
     private Displayable autoSelectDisplayable;
     private CommandListener autoSelectListener;
     private Command selectCommand;
-    
+   
+    /**
+     * Creates a Display frame for the given prompt
+     * @param thePrompt The prompt to be displayed
+     */
     public DisplayFrame(Prompt thePrompt) {
         this.thePrompt = thePrompt;
         
@@ -37,6 +49,9 @@ public class DisplayFrame {
         loadWidget();
     }
     
+    /**
+     * Selects the proper Control to use for the given input type of the Prompt
+     */
     private void loadWidget() {
         Enumeration itr;
         switch(thePrompt.getFormControlType()) {
@@ -81,6 +96,9 @@ public class DisplayFrame {
         }
     }
     
+    /**
+     * Evaluates a response based on the input type, and sets the Value of the Prompt
+     */
     public void evaluateResponse() {
         switch(thePrompt.getFormControlType()) {
         case Constants.INPUT:
@@ -118,6 +136,11 @@ public class DisplayFrame {
         }
     }
     
+    /**
+     * Draws the Large Version of the frame onto a Screen
+     * 
+     * @param target the Screen to which the Frame will be Added
+     */
     public void drawLargeFormOnScreen(ChatScreen target) {
         //#style questionText
         questionText.setStyle();
@@ -126,6 +149,11 @@ public class DisplayFrame {
         displayedItems = new Item[] {questionText,theWidget};
         target.focus(theWidget);
     }
+    /**
+     * Draws the Small (read only) Version of the frame onto a Screen
+     * 
+     * @param target the Screen to which the Frame will be Added
+     */
     public void drawSmallFormOnScreen(ChatScreen target) {
         //#style oldPromptText
         questionText.setStyle();
@@ -135,16 +163,16 @@ public class DisplayFrame {
         target.append(questionResponse);
         displayedItems = new Item[] {questionText,questionResponse};
     }
+    
+    /**
+     * Removes any of the Frame's Items from a given Screen
+     * 
+     * @param target The screen from which the items will be removed
+     */
     public void removeFromScreen(ChatScreen target) {
         for(int i = 0 ; i < displayedItems.length; i++) {
             target.removeItem(displayedItems[i]);
         }
-    }    
-    
-    public void wireWidgetAutoSelect(Displayable autoSelectDisplayable, CommandListener target, Command selectCommand) {
-        this.autoSelectDisplayable = autoSelectDisplayable;
-        autoSelectListener = target;
-        this.selectCommand = selectCommand;
     }    
     
     private String questionValueToString(Prompt thePrompt) {
@@ -171,6 +199,11 @@ public class DisplayFrame {
         }
     }
     
+    /**
+     * Identifies whether a given Item is auto-playable, IE "Select" need not be pressed to set the value for that question.
+     * @param item The item that will be identified for autoplayability
+     * @return True if the item can set its value without being explicitly selected. False otherwise
+     */
     public boolean autoPlayItem(Item item) {
         if(thePrompt.getFormControlType() == Constants.SELECT) {
             return false;
