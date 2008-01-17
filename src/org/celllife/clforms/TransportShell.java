@@ -16,15 +16,17 @@ import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import org.celllife.clforms.api.Constants;
 import org.celllife.clforms.api.Form;
 import org.celllife.clforms.storage.ModelRMSUtility;
 import org.celllife.clforms.storage.XFormMetaData;
 import org.celllife.clforms.storage.XFormRMSUtility;
+import org.celllife.clforms.view.FormViewScreen;
+import org.celllife.clforms.view.PromptScreen;
 import org.celllife.clforms.xml.XMLUtil;
 import org.dimagi.polishforms.ChatScreen;
-//#if app.usefileconnections
+import org.dimagi.properties.PropertyManager;
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
-//#endif
 import org.openmrs.transport.midp.TransportLayer;
 
 import com.ev.evgetme.getMidlet;
@@ -32,6 +34,7 @@ import com.ev.evgetme.getMidlet;
 public class TransportShell extends MIDlet implements CommandListener
 {
     public final static String WORKING_DIRECTORY = "C:/predefgallery/predefphotos/";
+    public final static String VIEW_TYPE_PROPERTY = "ViewStyle";
     
     private final Command EXIT_CMD = new Command("Close", Command.EXIT, 2);
     private final Command OK_CMD = new Command("Ok", Command.OK, 1);
@@ -47,7 +50,11 @@ public class TransportShell extends MIDlet implements CommandListener
     private FileBrowser fileBrowser;
     //#endif
     private boolean writeDummy = true;
+    
+    
     private ChatScreen mainScreen = new ChatScreen();
+    private PromptScreen promptScreen = new PromptScreen();
+    private FormViewScreen formViewScreen = new FormViewScreen();
 
 	private FormList formList;
 
@@ -298,11 +305,27 @@ public class TransportShell extends MIDlet implements CommandListener
         }
     }
 	
+    public void setViewType(String viewType) {
+        if(viewType == Constants.VIEW_CHATTERBOX) {
+            formController.setPrompter(mainScreen);
+            formController.setFormview(mainScreen);
+        }
+        else if(viewType == Constants.VIEW_CLFORMS) {
+            formController.setPrompter(promptScreen);
+            formController.setFormview(formViewScreen);
+        }
+    }
+	
 	public void configureController(){
 		System.out.println("TransportShell.configureController()");
 		formController = new Controller(this);
-        formController.setPrompter(mainScreen);
-        formController.setFormview(mainScreen);
+        String sviewType = PropertyManager.instance().getProperty("ViewStyle");
+        if(sviewType != null) {
+            setViewType(sviewType);
+        }
+        else {
+            setViewType(Constants.VIEW_CHATTERBOX);
+        }
 	}
 
     public void controllerLoadForm(int formId)
