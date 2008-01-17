@@ -2,32 +2,32 @@ package org.dimagi.polishforms;
 
 import java.util.Enumeration;
 
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Displayable;
+
 import org.celllife.clforms.api.Constants;
 import org.celllife.clforms.api.Prompt;
-import org.dimagi.entity.Question;
 
 import de.enough.polish.ui.ChoiceGroup;
+import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Item;
+import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 
 public class DisplayFrame {
     
-    private Question theQuestion;
     private Prompt thePrompt;
     private Item theWidget;
     private StringItem questionText;
     private StringItem questionResponse;
     private Item[] displayedItems;
     
-    public DisplayFrame(Question theQuestion) {
-        this.theQuestion = theQuestion;
-        
-        //#style questionText
-        questionText = new StringItem(null,theQuestion.longText);
-        
-        loadWidget();
-    }
+    private Displayable autoSelectDisplayable;
+    private CommandListener autoSelectListener;
+    private Command selectCommand;
+    
     public DisplayFrame(Prompt thePrompt) {
         this.thePrompt = thePrompt;
         
@@ -40,10 +40,15 @@ public class DisplayFrame {
     private void loadWidget() {
         Enumeration itr;
         switch(thePrompt.getFormControlType()) {
+        case Constants.INPUT:
+            //#style textBox
+            TextField inputBox = new TextField("","",30,TextField.ANY);
+            theWidget = inputBox;
+            break;
         case Constants.TEXTAREA:
             //#style textBox
-            TextField inputBox = new TextField("","",15,TextField.ANY);
-            theWidget = inputBox;
+            TextField textArea = new TextField("","",15,TextField.ANY);
+            theWidget = textArea;
             break;
         case Constants.TEXTBOX:
             //#style textBox
@@ -58,16 +63,10 @@ public class DisplayFrame {
                 //#style choiceItem
                 choiceGroup.append(label, null);
             }
-            
             theWidget = choiceGroup;
             break;
         case Constants.SELECT:
-            ChoiceGroup multipleGroup = new ChoiceGroup("", ChoiceGroup.MULTIPLE) {
-                protected boolean handlePointerPressed(int x, int y) {
-                    System.out.println("PointerPressReceived at "+ x+ ", " + y);
-                    return false;
-                }
-            };
+            ChoiceGroup multipleGroup = new ChoiceGroup("", ChoiceGroup.MULTIPLE);
             itr = thePrompt.getSelectMap().keys();
             while (itr.hasMoreElements()) {
                 String label = (String) itr.nextElement();
@@ -80,48 +79,13 @@ public class DisplayFrame {
             System.out.println("Unhandled Widget type: " + thePrompt.getFormControlType());
             break;
         }
-        /*
-        switch(theQuestion.inputType){
-        case Question.TEXT:
-            //#style textBox
-            TextField inputBox = new TextField("","",15,TextField.ANY);
-            theWidget = inputBox;
-            break;
-        case Question.NUMBER:
-            //#style textBox
-            TextField numberBox = new TextField("","",15,TextField.NUMERIC);
-            
-            theWidget = numberBox;
-            break;
-        case Question.SINGLE_SELECT:
-            ChoiceGroup choiceGroup = new ChoiceGroup("", ChoiceGroup.EXCLUSIVE);
-
-            for(int i = 0 ; i < theQuestion.options.length; ++i) {
-                //#style choiceItem
-                choiceGroup.append(theQuestion.options[i], null);
-            }
-            
-            theWidget = choiceGroup;
-            break;
-        case Question.MULTIPLE_SELECT:
-            ChoiceGroup multipleGroup = new ChoiceGroup("", ChoiceGroup.MULTIPLE) {
-                protected boolean handlePointerPressed(int x, int y) {
-                    System.out.println("PointerPressReceived at "+ x+ ", " + y);
-                    return false;
-                }
-            };
-
-            for(int i = 0 ; i < theQuestion.options.length; ++i) {
-                //#style choiceItem
-                multipleGroup.append(theQuestion.options[i], null);
-            }
-            theWidget = multipleGroup;
-            break;
-        }*/
     }
     
     public void evaluateResponse() {
         switch(thePrompt.getFormControlType()) {
+        case Constants.INPUT:
+            thePrompt.setValue(((StringItem)theWidget).getText());
+            break;
         case Constants.TEXTAREA:
             thePrompt.setValue(((StringItem)theWidget).getText());
             break;
@@ -152,34 +116,6 @@ public class DisplayFrame {
             thePrompt.setValue(questionValue);
             break;
         }
-        /*switch(theQuestion.inputType){
-        case Question.TEXT:
-            theQuestion.value = ((StringItem)theWidget).getText();
-            break;
-        case Question.NUMBER:
-            theQuestion.value = ((StringItem)theWidget).getText();
-            break;
-        case Question.SINGLE_SELECT:
-            ChoiceGroup singleWidget = (ChoiceGroup)theWidget;
-            theQuestion.value = new int[] { singleWidget.getSelectedIndex() };
-            break;
-        case Question.MULTIPLE_SELECT:
-            ChoiceGroup multiWidget = (ChoiceGroup)theWidget;
-            int numItems = multiWidget.getItems().length;
-            int numSelectedItems = 0;
-            int[] selectedIndicies = new int[numItems];
-            for(int i = 0 ; i < multiWidget.getItems().length ; i++) {
-                if(multiWidget.isSelected(i)) {
-                    selectedIndicies[numSelectedItems] = i;
-                    numSelectedItems++;
-                }
-            }
-            int[] questionValue = new int[numSelectedItems];
-            for(int i = 0 ; i < numSelectedItems ; i++) {
-                questionValue[i] = selectedIndicies[i];
-            }
-            theQuestion.value = questionValue;
-        }*/
     }
     
     public void drawLargeFormOnScreen(ChatScreen target) {
@@ -205,9 +141,16 @@ public class DisplayFrame {
         }
     }    
     
+    public void wireWidgetAutoSelect(Displayable autoSelectDisplayable, CommandListener target, Command selectCommand) {
+        this.autoSelectDisplayable = autoSelectDisplayable;
+        autoSelectListener = target;
+        this.selectCommand = selectCommand;
+    }    
+    
     private String questionValueToString(Prompt thePrompt) {
         if(thePrompt.getFormControlType() == Constants.TEXTAREA || 
-                thePrompt.getFormControlType() == Constants.TEXTBOX ) {
+                thePrompt.getFormControlType() == Constants.TEXTBOX ||
+                thePrompt.getFormControlType() == Constants.INPUT) {
             return thePrompt.getValue().toString();
         }
         else if(thePrompt.getFormControlType() == Constants.SELECT1) {
@@ -226,20 +169,14 @@ public class DisplayFrame {
         else {
             return thePrompt.getValue().toString();
         }
-        /*if(theQuestion.inputType == Question.TEXT || theQuestion.inputType == Question.NUMBER) {
-            return theQuestion.value.toString();
-        }
-        else if(theQuestion.inputType == Question.SINGLE_SELECT || 
-                theQuestion.inputType == Question.MULTIPLE_SELECT) {
-            String returnString = "";
-            int[] selectedIndicies = (int[])theQuestion.value;
-            for(int i = 0 ; i < selectedIndicies.length ; i++) {
-                returnString = returnString + theQuestion.options[selectedIndicies[i]] + ", ";
-            }
-            return returnString.substring(0,returnString.length() - 2);
+    }
+    
+    public boolean autoPlayItem(Item item) {
+        if(thePrompt.getFormControlType() == Constants.SELECT) {
+            return false;
         }
         else {
-            return theQuestion.value.toString();
-        }*/
+            return true;
+        }
     }
 }

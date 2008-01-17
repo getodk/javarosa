@@ -11,7 +11,7 @@ import minixpath.XPathExpression;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 
-import org.celllife.clforms.IController;
+import org.celllife.clforms.Controller;
 import org.celllife.clforms.MVCComponent;
 import org.celllife.clforms.api.Prompt;
 import org.celllife.clforms.api.ResponseEvent;
@@ -48,7 +48,7 @@ public class ChatScreenForm extends DForm implements IPrompter, FormView, Comman
 	private String name;
 	private Model xmlModel;
 	private int recordId;
-	private IController controller;
+	private Controller controller;
 	private boolean next = true;
 	private boolean prev = false;
 	
@@ -166,7 +166,7 @@ public class ChatScreenForm extends DForm implements IPrompter, FormView, Comman
 		showPrompt(prompt);
 	}
 
-	public void registerController(IController controller) {
+	public void registerController(Controller controller) {
 		System.out.println("ChatScreenForm.registerController(controller)");
 		this.controller = controller;
 	}

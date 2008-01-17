@@ -11,7 +11,7 @@ import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.Ticker;
 
-import org.celllife.clforms.IController;
+import org.celllife.clforms.Controller;
 import org.celllife.clforms.MVCComponent;
 import org.celllife.clforms.api.IForm;
 import org.celllife.clforms.api.Prompt;
@@ -25,7 +25,7 @@ public class FormViewScreen extends MVCComponent implements FormView{
 
 	private Prompt p;
 
-	private IController controller;
+	private Controller controller;
 	
 	private IForm form;
 
@@ -186,7 +186,7 @@ public class FormViewScreen extends MVCComponent implements FormView{
 		createView();
 	}
 
-	public void registerController(IController controller) {
+	public void registerController(Controller controller) {
 		this.controller = controller;		
 	}
 
