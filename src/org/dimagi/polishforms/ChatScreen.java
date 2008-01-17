@@ -9,12 +9,10 @@ import javax.microedition.lcdui.Displayable;
 
 import org.celllife.clforms.Controller;
 import org.celllife.clforms.MVCComponent;
-import org.celllife.clforms.api.Constants;
 import org.celllife.clforms.api.Prompt;
 import org.celllife.clforms.api.ResponseEvent;
 import org.celllife.clforms.view.FormView;
 import org.celllife.clforms.view.IPrompter;
-import org.dimagi.entity.Question;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
