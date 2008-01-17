@@ -20,16 +20,20 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.UiAccess;
 
+/***
+ * The ChatScreen is a view for Mobile MRS that presents an entire XForm to the user. 
+ * 
+ * It implements both the IPrompter and FormView interfaces, to be responsible for presenting forms and prompts in
+ * the same screen.
+ * 
+ * The Screen presents each Prompt as a DisplayFrame, one at a time scrolling from the bottom of the screen to the top.
+ * 
+ * @author ctsims
+ *
+ */
 public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IPrompter, FormView, CommandListener, ItemStateListener{
     
     Controller controller;
-    Question[] sampleQuestions = new Question[]{
-        new Question("What is the child's Age?","Child Age",Question.NUMBER),
-        new Question("What is the Child's Gender?","Gender",Question.SINGLE_SELECT, new String[]{"Male","Female"}),
-        new Question("What Symptoms does the child have?","Symptoms",Question.MULTIPLE_SELECT, new String[]{"Cough","Fever"}),
-        new Question("What is the child's name?","Child Name",Question.TEXT)
-    };
-    int currentQuestion = 0;
 
     Command menuCommand = new Command("Menu", Command.SCREEN, 1);
 
@@ -39,6 +43,9 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
     
     Stack displayFrames = new Stack();
 
+    /**
+     * Creates a ChatScreen, and loads the menus
+     */
     public ChatScreen() {
         //#style framedForm
         super("Chatterbox");
@@ -50,6 +57,10 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         
         this.setCommandListener(this); 
     }
+    
+    /**
+     * Handler for when the answer for the previous question has been selected 
+     */
     private void selectPressed() {
         System.out.println("selected!");
         if(!displayFrames.empty()) {
@@ -57,14 +68,26 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
             topFrame.evaluateResponse();
         }
     }    
+    
+    /**
+     * Adds a new Prompt to the screen
+     * 
+     * @param nextPrompt The prompt to be added
+     */
     private void addPrompt(Prompt nextPrompt) {
         DisplayFrame frame = new DisplayFrame(nextPrompt);
-        frame.wireWidgetAutoSelect(this,this, selectCommand);
         this.setItemStateListener(this);
         displayFrames.push(frame);
         frame.drawLargeFormOnScreen(this);
     }
     
+    /**
+     * Removes a generic MIDP Item that is contained in this screen
+     * 
+     * @param theItem The item to be removed
+     * 
+     * @return The old index of the removed item. -1 if the Item was not found.
+     */
     public int removeItem(Item theItem) {
         for(int i = 0 ; i < this.size(); i++ ) {
             if(this.get(i).equals(theItem)) {
@@ -74,6 +97,9 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         }
         return -1;
     }
+    /**
+     * Shows a prompt on the screen
+     */
     public void showPrompt(Prompt prompt) {
         MVCComponent.display.setCurrent(this);
         if(!displayFrames.empty()) {
@@ -85,13 +111,22 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         addPrompt(prompt);
     }
     
+    /**
+     * Shows a prompt on the screen at position screenIndex of totalScreens
+     */
     public void showPrompt(Prompt prompt, int screenIndex, int totalScreens) {
         showPrompt(prompt);
     }
 
+    /**
+     * Registers a controller with this FormView 
+     */
     public void registerController(Controller controller) {
         this.controller = controller;
     }
+    /**
+     * Handles command events
+     */
     public void commandAction(Command command, Displayable s) {
         try {
             if (command == selectCommand) {
@@ -117,6 +152,9 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         }
     }
     
+    /**
+     * Makes proper updates when an Item on this page is changed
+     */
     public void itemStateChanged(Item item) {
         if(!displayFrames.empty()) {
             DisplayFrame topFrame = (DisplayFrame)(displayFrames.peek());
