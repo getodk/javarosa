@@ -3,31 +3,27 @@ package org.dimagi.chatscreen;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Graphics;
 
 import minixpath.XPathExpression;
-
-import org.celllife.clforms.api.IForm;
-import org.celllife.clforms.api.Prompt;
-
-import org.celllife.clforms.util.SimpleOrderedHashtable;
-
-import org.celllife.clforms.storage.Model;
-import org.celllife.clforms.util.J2MEUtil;
-
-
-import org.dimagi.utils.ViewUtils;
-import org.dimagi.view.Component;
-import org.dimagi.view.IRefreshListener;
-import org.dimagi.view.NavBar;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 
-import de.enough.polish.util.VectorIterator;
+import org.celllife.clforms.IController;
+import org.celllife.clforms.MVCComponent;
+import org.celllife.clforms.api.Prompt;
+import org.celllife.clforms.api.ResponseEvent;
+import org.celllife.clforms.storage.Model;
+import org.celllife.clforms.view.FormView;
+import org.celllife.clforms.view.IPrompter;
+import org.celllife.clforms.util.SimpleOrderedHashtable;
+import org.celllife.clforms.util.J2MEUtil;
+import javax.microedition.lcdui.CommandListener;
+
+import org.dimagi.utils.ViewUtils;
+
 
 /**
  * The base container for the Chat Screen interface.
@@ -40,90 +36,37 @@ import de.enough.polish.util.VectorIterator;
  * @author ctsims
  *
  */
-public class ChatScreenForm extends DForm implements IForm {
+public class ChatScreenForm extends DForm implements IPrompter, FormView, CommandListener {
 
-	//TODO: Add (...) objects to the top and bottom of the display to signal
-	//that there are frames above or below the current view.
 	
 	private Vector frameSet = new Vector();
-	//private Vector prompts = new Vector();
 	private Vector prompts;
-	int activeQuestion = 0;
-	int totalQuestions = 1;
+	int activeQuestion = -1;
+	int totalQuestions = 0;
 
 	int highestDisplayedQuestion = 0;
 	private String name;
 	private Model xmlModel;
 	private int recordId;
+	private IController controller;
+	private boolean next = true;
+	private boolean prev = false;
+	
+	Command exitCommand = new Command("Exit", Command.EXIT, 1);
+	Command nextCommand = new Command("Next", Command.ITEM, 1);
+	Command prevCommand = new Command("Prev", Command.ITEM, 1);
 	
 	/**
 	 * Creates a new ChatScreen Form
 	 */
 	public ChatScreenForm() {
+		addCommand(nextCommand);
+		addCommand(prevCommand);
+		addCommand(exitCommand);
+		this.setCommandListener(this);
 		setupComponents();
-		//definePrompts();
 	}
 
-	public ChatScreenForm(Vector prompts) {
-		this.prompts = prompts;
-		setupComponents();
-//		this.activeQuestion = activeQuestion;
-		Enumeration itr = prompts.elements();
-		while ( itr.hasMoreElements() ) {
-			addPrompt((Prompt)itr.nextElement());
-		}
-	}
-	
-	public ChatScreenForm(Vector prompts, int activeQuestion, int totalQuestions) {
-		System.out.println("ChatScreenForm(activeQuestion)");
-		setupComponents();
-//		this.activeQuestion = activeQuestion;
-//		Enumeration itr = prompts.elements();
-//		while ( itr.hasMoreElements() ) {
-//			addPrompt((Prompt)itr.nextElement());
-//		}
-	}
-	
-	private void definePrompts() {
-		Prompt first = new Prompt();
-		first.setLongText("Enter the patient's ID number:");
-		first.setShortText("ID");
-		first.setFormControlType(org.celllife.clforms.api.Constants.TEXTBOX);
-		prompts.addElement((Object) first);		
-		addPrompt(first);
-		Prompt second = new Prompt();
-		second.setLongText("What is the sex of the patient?");
-		second.setShortText("Sex");
-		SimpleOrderedHashtable soht = new SimpleOrderedHashtable();
-		soht.put("Male", "Male");
-		soht.put("Female", "Female");
-		second.setSelectMap(soht);
-		second.setFormControlType(org.celllife.clforms.api.Constants.SELECT1);
-		prompts.addElement((Object) second);		
-		Prompt third = new Prompt();
-		third.setLongText("Has the patient had any of the following symptoms since their last visit?");
-		third.setShortText("Symptoms");
-		SimpleOrderedHashtable soht2 = new SimpleOrderedHashtable();
-		soht2.put("Fever", "Fever");
-		soht2.put("Night Sweats", "Night Sweats");
-		soht2.put("Weight Loss", "Weight Loss");
-		soht2.put("Vomiting", "Vomiting");
-		third.setSelectMap(soht2);
-		third.setFormControlType(org.celllife.clforms.api.Constants.SELECT);
-		prompts.addElement((Object) third);		
-		Prompt fourth = new Prompt();
-		fourth.setLongText("Name of city?");
-		fourth.setShortText("City");
-		SimpleOrderedHashtable soht3 = new SimpleOrderedHashtable();
-		soht3.put("Cambridge", "Cambridge");
-		soht3.put("Boston", "Boston");
-		soht3.put("Newton", "Newton");
-		soht3.put("Quincy", "Quincy");
-		soht3.put("Brookline", "Brookline");
-		fourth.setSelectMap(soht3);
-		fourth.setFormControlType(org.celllife.clforms.api.Constants.SELECT);
-		prompts.addElement((Object) fourth);		
-	}
 	
 	/**
 	 * Lays out the static components for the form
@@ -143,60 +86,38 @@ public class ChatScreenForm extends DForm implements IForm {
 	 * @param theQuestion The new question to be displayed
 	 */
 	public void addPrompt(Prompt p) {
-		System.out.println("ChatScreenForm.addPrompt()");
-		Frame newFrame = new Frame(p);
-		newFrame.setWidth(this.getWidth());
-		frameSet.addElement(newFrame);
-		getContentComponent().add(newFrame);
-		setupFrames();
-		this.repaint();
-	}
-
-	public void goToNextPrompt() {
-		System.out.println("ChatScreenForm.goToNextPrompt()");
-		this.activeQuestion = activeQuestion;
-		
-		activeQuestion++;
-		// add a new question
-		if (activeQuestion == totalQuestions) {
-			if ( activeQuestion < prompts.size() ) {
+		System.out.println("ChatScreenForm.addPrompt() " + activeQuestion);
+		if (next) {
+			activeQuestion++;
+			// add a new question
+			if (activeQuestion == totalQuestions) {
 				totalQuestions++;
-				addPrompt((Prompt)prompts.elementAt(activeQuestion));
-			} else { // repeat questions in loop
-			    totalQuestions++;
-				addPrompt((Prompt)prompts.elementAt(activeQuestion % 4));
+				Frame newFrame = new Frame(p);
+				newFrame.setWidth(this.getWidth());
+				frameSet.addElement(newFrame);
+				getContentComponent().add(newFrame);
+				setupFrames();
+				this.repaint();
+			} else { // advance to question that's already there
+				getContentComponent().add((Frame)frameSet.elementAt(activeQuestion));
+				setupFrames();
+			}	
+			next = false;
+		} else if (prev) {
+			System.out.println("goToPreviousPrompt()" + activeQuestion);
+			// Don't do anything if user hits prev command for first question
+			if (activeQuestion > 0) {
+				getContentComponent().remove((Frame)frameSet.elementAt(activeQuestion));
+				activeQuestion--;
+				setupFrames();
 			}
-		} else { // advance to question that's already there
-			getContentComponent().add((Frame)frameSet.elementAt(activeQuestion));
-			setupFrames();
+			prev = false;
 		}
 	}
-	
-	public void goToNextPrompt(int activeQuestion) {
-		System.out.println("ChatScreenForm.goToNextPrompt(activeQuestion) " + activeQuestion);
-		this.activeQuestion = activeQuestion-1;
-		Prompt p = (Prompt)prompts.elementAt(this.activeQuestion);
-		System.out.println(p.getLongText());	
-		addPrompt(p);
-		highestDisplayedQuestion++;
-		
-//		activeQuestion++;
-//		// add a new question
-//		if (activeQuestion == totalQuestions) {
-//			if ( activeQuestion < prompts.size() ) {
-//				totalQuestions++;
-//				addPrompt((Prompt)prompts.elementAt(activeQuestion));
-//			} else { // repeat questions in loop
-//			    totalQuestions++;
-//				addPrompt((Prompt)prompts.elementAt(activeQuestion % 4));
-//			}
-//		} else { // advance to question that's already there
-//			getContentComponent().add((Frame)frameSet.elementAt(activeQuestion));
-//			setupFrames();
-//		}
-	}
+
 	
 	public void goToPreviousPrompt() {
+		System.out.println("goToPreviousPrompt()" + activeQuestion);
 		// Don't do anything if user hits prev command for first question
 		if (activeQuestion > 0) {
 			getContentComponent().remove((Frame)frameSet.elementAt(activeQuestion));
@@ -205,13 +126,6 @@ public class ChatScreenForm extends DForm implements IForm {
 		}
 	}
 
-	public void draw(int activeQuestion) {
-		if (activeQuestion > highestDisplayedQuestion ) {
-			goToNextPrompt(activeQuestion);
-		} else if ( activeQuestion < highestDisplayedQuestion ) {
-			goToPreviousPrompt();
-		}
-}
 	
 	
 	/**
@@ -241,200 +155,44 @@ public class ChatScreenForm extends DForm implements IForm {
 	}
 	
 	
-	// IForm interface
-	public Prompt getPrompt(int promptId) {
-		return (Prompt) prompts.elementAt(promptId);
+	  public void showPrompt(Prompt prompt) {
+		System.out.println("ChatScreenForm.showPrompt(prompt)");
+		MVCComponent.display.setCurrent(this);
+		addPrompt(prompt);
 	}
 
-	public Vector getPrompts() {
-		return prompts;
+	public void showPrompt(Prompt prompt, int screenIndex, int totalScreens) {
+		System.out.println("ChatScreenForm.showPrompt(screenIndex, totalScreens)");
+		showPrompt(prompt);
+	}
+
+	public void registerController(IController controller) {
+		System.out.println("ChatScreenForm.registerController(controller)");
+		this.controller = controller;
 	}
 	
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Model getXmlModel() {
-		return xmlModel;
-	}
-
-	public void setXmlModel(Model model) {
-		this.xmlModel = model;
-	}
-
-	public void calculateRelavant(Prompt p) {
-		
-		//System.out.println("calcRel of: " + p.getLongText());
-		if (p.getRelevantString()== null)
-			p.setRelevant(true);
-		else{
-			XPathExpression xpls = new XPathExpression(xmlModel.getXmlModel().getRootElement(), p.getRelevantString());
-			Vector result = xpls.getResult();
-			for (Enumeration e = result.elements(); e.hasMoreElements();) {
-				Object obj = e.nextElement();
-				if (obj instanceof Element){
-					for (int i = 0; i < ((Element)obj).getChildCount(); i++) {
-						if (((Element)obj).getType(i)== Node.TEXT){
-							//System.out.println(" val:"+((Element)obj).getText(i));		
-							xpls.getOperation().setValue(((Element)obj).getText(i));
-						}
-					}
-				}
+	   public void commandAction(Command command, Displayable s) {
+		try {
+			if (command == nextCommand) {
+				next = true;
+				controller.processEvent(new ResponseEvent(ResponseEvent.NEXT,
+						-1));
+			} else if (command == prevCommand) {
+				goToPreviousPrompt();
+				controller.processEvent(new ResponseEvent(ResponseEvent.PREVIOUS, -1));
+				
+			} else if (command == exitCommand) {
+				controller.processEvent(new ResponseEvent(ResponseEvent.EXIT,
+						-1));
 			}
-			if (xpls.getOperation().getValue()!= null){
-				xpls.getOperation().setArgumentType(p.getReturnType());
-				boolean relevancy = xpls.getOperation().evaluateBooleanOperation();
-				p.setRelevant(relevancy);
-				if (relevancy == false){
-					p.setValue(null);
-					updateModel(p);
-				}
-			}else
-				p.setRelevant(false);
-		}
-	}
-	
-	public void calculateRelevantAll(){
-		for (int i = 0; i < prompts.size(); i++) {
-			calculateRelavant((Prompt) prompts.elementAt(i)); 
-		}
-	}
 
-	public void setRecordId(int recordId) {
-
-		this.recordId = recordId;
-	}
-
-	public int getRecordId() {
-		return recordId;
-	}
-	
-	public void setShortForms() {
-		// TODO get Short forms properly from XForm designer
-		Enumeration e = prompts.elements();
-		while (e.hasMoreElements()) {
-			Prompt elem = (Prompt) e.nextElement();
-			elem.setShortText(elem.getBindID());
-			//System.out.println(elem.getLongText()+"="+elem.getShortText()+"="+elem.getBindID());
+		} catch (Exception e) {
+			Alert a = new Alert("error.screen" + " 2"); //$NON-NLS-1$
+			a.setString(e.getMessage());
+			a.setTimeout(Alert.FOREVER);
+			MVCComponent.display.setCurrent(a);
 		}
 	}
-	
-	public void updatePromptsValues() {
-		// TODO COMBINE this with update model somehow as they are doing similar things
-		Enumeration e = prompts.elements();
-		while (e.hasMoreElements()) {
-			Prompt elem = (Prompt) e.nextElement();
-			if (elem.getValue() == null){
-				updatePrompt(elem, false);
-			}
-		}
-	}
-	
-	/**
-	 *  Populates the XFPrompts with the data contained in the xmlModel
-	 */
-	public void updatePromptsDefaults() {
-		// TODO COMBINE this with update model somehow as they are doing similar things
-		Enumeration e = prompts.elements();
-		while (e.hasMoreElements()) {
-			Prompt elem = (Prompt) e.nextElement();
-			if (elem.getValue() == null){
-				updatePrompt(elem, true);
-			}
-		}
-	}
-
-	private void updatePrompt(Prompt prompt, boolean defaultVal) {
-		String xpath = prompt.getXpathBinding();
-		String value;
-		
-		XPathExpression xpls = new XPathExpression(xmlModel.getXmlModel(), xpath);
-		Vector result = xpls.getResult();
-		
-		// log 		System.out.println("Updating prompt: " + xpath);
-		
-		for (Enumeration e = result.elements(); e.hasMoreElements();) {
-			Object obj = e.nextElement();
-			if (obj instanceof Element){
-				Element node = (Element) obj;
-				for (int i = 0; i < node.getChildCount(); i++) 
-					if (node.getType(i) == Node.TEXT) {
-						value = node.getText(i);//
-						if (defaultVal)
-							prompt.setDefaultValue(value);
-						else {
-							prompt.setValue(value);
-							//System.out.println("Updating prompt: " + value);
-						}
-					}			
-			}
-		}
-	}
-
-	/**
-	 * Populates the xmlModel with the data contained in the XFPrompts
-	 */
-	public void populateModel() {
-		Enumeration e = prompts.elements();
-		while (e.hasMoreElements()) {
-			Prompt elem = (Prompt) e.nextElement();
-			if (elem.getValue() != null){
-				updateModel(elem);
-			}
-		}
-	}
-
-	/**
-	 * Updates the xmlModel with the data in a particular prompt.
-	 * 
-	 * @param prompt
-	 */
-	public void updateModel(Prompt prompt) {
-		
-		String xpath = prompt.getXpathBinding();
-		String value = J2MEUtil.getStringValue(prompt.getValue(), prompt.getReturnType());
-		
-		//System.out.println("Updating Model"+prompt.getXpathBinding()+" - "+value);		
-		if (value != null) {
-			XPathExpression xpls = new XPathExpression(xmlModel.getXmlModel(), xpath);
-			Vector result = xpls.getResult();
-			
-			//System.out.println("XPath result.size()"+result.size());
-			for (Enumeration e = result.elements(); e.hasMoreElements();) {
-				Object obj = e.nextElement();
-				if (obj instanceof Element){
-					boolean textfound = false;
-					//System.out.println(((Element)obj).getName()+" kids: "+((Element)obj).getChildCount());
-					for (int i = 0; i < ((Element)obj).getChildCount(); i++) {
-						if (((Element)obj).getType(i) == Node.TEXT){
-							((Element) obj).removeChild(i);
-							((Element) obj).addChild(i,Node.TEXT, value);	
-							//System.out.println("added1 "+value);
-							textfound = true;
-							break;
-						}						
-					}
-					if (!textfound){
-						((Element) obj).addChild(Node.TEXT, value);	
-						//System.out.println("added2 "+value);						
-					}
-				}
-			}
-		}
-	}
-	
-	public void loadPromptsDefaultValues()
-	{
-		for (int i = 0; i < this.prompts.size(); i++)
-		{
-			this.getPrompt(i).setValue(this.getPrompt(i).getDefaultValue());
-		}
-	}
-
 
 }
 		
