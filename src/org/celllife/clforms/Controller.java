@@ -21,9 +21,12 @@ import org.celllife.clforms.view.IPrompter;
 import org.celllife.clforms.storage.DummyForm;
 import org.dimagi.demo.ExampleForm;
 
-public class ChatterboxController implements IController
+public class Controller
 {
+    public static final String XFORM_RMS = "XFORM_RMS_NEW";
 
+    public static final String MODEL_RMS = "MODEL_RMS_NEW";
+    
     public IPrompter prompter;
     public FormView formview;
     private IForm form;
@@ -33,31 +36,30 @@ public class ChatterboxController implements IController
     private int promptIndex;
     private TransportShell shell;
 
-	public ChatterboxController(TransportShell shell) {
-		super();
-		System.out.println("Chatterbox Controller()");
-		try {
-			//shell.log.write("IN CONTROLLER",MIDPLogger.DEBUG);
-			this.shell = shell;
-			this.rmsManager = new RMSManager();
-			this.xformRMS = new XFormRMSUtility(IController.XFORM_RMS);
-			//shell.log.write("IN CONTROLLER-post XFOrm util",MIDPLogger.DEBUG);
-			System.out.println("#REC "+xformRMS.getNumberOfRecords());
-			if (xformRMS.getNumberOfRecords() == 0)
-			{
-			    this.xformRMS.writeDummy();
-			}
-			this.modelRMS = new ModelRMSUtility(IController.MODEL_RMS);
-			//shell.log.write("IN CONTROLLER-post XFOrm util",MIDPLogger.DEBUG);
-			this.rmsManager.registerRMSUtility(this.xformRMS);
-			this.rmsManager.registerRMSUtility(this.modelRMS);
-			//shell.log.write("OUT CONTROLLER-post rms register",MIDPLogger.DEBUG);
-		} catch (Exception e) {
-			//shell.log.write(e.getMessage(),MIDPLogger.DEBUG);
-			e.printStackTrace();
-		}
+    public Controller(TransportShell shell) {
+        System.out.println("Controller()");
+        try {
+            //shell.log.write("IN CONTROLLER",MIDPLogger.DEBUG);
+            this.shell = shell;
+            this.rmsManager = new RMSManager();
+            this.xformRMS = new XFormRMSUtility(Controller.XFORM_RMS);
+            //shell.log.write("IN CONTROLLER-post XFOrm util",MIDPLogger.DEBUG);
+            System.out.println("#REC "+xformRMS.getNumberOfRecords());
+            if (xformRMS.getNumberOfRecords() == 0)
+            {
+                this.xformRMS.writeDummy();
+            }
+            this.modelRMS = new ModelRMSUtility(Controller.MODEL_RMS);
+            //shell.log.write("IN CONTROLLER-post XFOrm util",MIDPLogger.DEBUG);
+            this.rmsManager.registerRMSUtility(this.xformRMS);
+            this.rmsManager.registerRMSUtility(this.modelRMS);
+            //shell.log.write("OUT CONTROLLER-post rms register",MIDPLogger.DEBUG);
+        } catch (Exception e) {
+            //shell.log.write(e.getMessage(),MIDPLogger.DEBUG);
+            e.printStackTrace();
+        }
     }
-	
+    
     /* (non-Javadoc)
      * @see org.celllife.clforms.IController#cancelForm()
      */
@@ -83,17 +85,17 @@ public class ChatterboxController implements IController
      */
     public void completeForm()
     {
-    	System.out.println("Completing form..."+form.getName());
+        System.out.println("Completing form..."+form.getName());
 
         registerPrompter();
         registerFormView();
         form.setShortForms();
         promptIndex = 0;
         if(form.getXmlModel().getEditID() != -1){ // we are editing
-        	form.updatePromptsValues();
-        }else{      	
-        	form.updatePromptsDefaults();
-        	form.loadPromptsDefaultValues();
+            form.updatePromptsValues();
+        }else{          
+            form.updatePromptsDefaults();
+            form.loadPromptsDefaultValues();
         }
         formview.showPrompt(form.getPrompt(promptIndex));
         System.out.println(((Prompt)(form.getPrompts().elementAt(0))).getLongText());
@@ -101,7 +103,7 @@ public class ChatterboxController implements IController
 
     private void getNextPrompt()
     {
-    	System.out.println("Controller.getNextPrompt()");
+        System.out.println("Controller.getNextPrompt()");
         promptIndex++;
         if (promptIndex >= form.getPrompts().size())
         {
@@ -109,10 +111,10 @@ public class ChatterboxController implements IController
         }
         
         form.calculateRelavant(form.getPrompt(promptIndex)); 
-		if(form.getPrompt(promptIndex).isRelevant())	
-			showPromptAtIndex();
-		else
-			getNextPrompt();
+        if(form.getPrompt(promptIndex).isRelevant())    
+            showPromptAtIndex();
+        else
+            getNextPrompt();
     }
 
     private void getPreviousPrompt()
@@ -123,10 +125,10 @@ public class ChatterboxController implements IController
             goToFormView();
         }
         form.calculateRelavant(form.getPrompt(promptIndex)); 
-		if(form.getPrompt(promptIndex).isRelevant())
-			showPromptAtIndex();
-		else
-			getPreviousPrompt();
+        if(form.getPrompt(promptIndex).isRelevant())
+            showPromptAtIndex();
+        else
+            getPreviousPrompt();
     }
 
     /* (non-Javadoc)
@@ -134,31 +136,31 @@ public class ChatterboxController implements IController
      */
     public void loadForm(int recordId)
     {
-    	// TODO put this in shell
-    	System.out.println("start Controller.loadForm() id:"+recordId);
-//    	DummyForm df = new DummyForm();
-//   	form = df.getXFormObject();
-    	ExampleForm ef = new ExampleForm();
-    	form = ef.getXFormObject();
-    	form.setRecordId(recordId);
-//    	form.setName("DimagiSurvey2");
+        // TODO put this in shell
+        System.out.println("start Controller.loadForm() id:"+recordId);
+//      DummyForm df = new DummyForm();
+//      form = df.getXFormObject();
+        ExampleForm ef = new ExampleForm();
+        form = ef.getXFormObject();
+        form.setRecordId(recordId);
+//      form.setName("DimagiSurvey2");
   
    //        form = new Form(); //storageManager.getForm(recordId);
 //        try {
-//        	this.xformRMS.retrieveFromRMS(recordId, form);
-//        	System.out.println("retrieve from rms");
-//        	// TODO Sort this out so that the recordID is added in the deserialisation
-//        	form.setRecordId(recordId);
-//        	System.out.println("set record id");
-//			// TODO fix this so IDs are in form objects properly
-//        	form.setName(this.xformRMS.getName(recordId));
-//        	System.out.println("get name");
+//          this.xformRMS.retrieveFromRMS(recordId, form);
+//          System.out.println("retrieve from rms");
+//          // TODO Sort this out so that the recordID is added in the deserialisation
+//          form.setRecordId(recordId);
+//          System.out.println("set record id");
+//          // TODO fix this so IDs are in form objects properly
+//          form.setName(this.xformRMS.getName(recordId));
+//          System.out.println("get name");
 
-        	
-//        	System.out.println("form "+recordId+form.getName()+"loaded");
+            
+//          System.out.println("form "+recordId+form.getName()+"loaded");
 //        } catch (IOException e) {
-//        	e.printStackTrace();
-//		}
+//          e.printStackTrace();
+//      }
         if (form == null)
         {
             System.out.println("Form retuned null");
@@ -173,19 +175,19 @@ public class ChatterboxController implements IController
      * @see org.celllife.clforms.IController#deleteForm(int)
      */
     public void deleteForm(int recordId) {
-		// TODO move this to Shell
-    	System.out.println("deleting form id:"+recordId);
+        // TODO move this to Shell
+        System.out.println("deleting form id:"+recordId);
         this.xformRMS.deleteRecord(recordId);
-	}
+    }
     
     /* (non-Javadoc)
      * @see org.celllife.clforms.IController#deleteModel(int)
      */
     public void deleteModel(int recordId) {
-		// TODO move this to Shell
-    	System.out.println("deleting record id:"+recordId);
+        // TODO move this to Shell
+        System.out.println("deleting record id:"+recordId);
         this.modelRMS.deleteRecord(recordId);
-	}
+    }
     
     
     /* (non-Javadoc)
@@ -201,7 +203,7 @@ public class ChatterboxController implements IController
                 break;
             case ResponseEvent.PREVIOUS:
                 form.updateModel(form.getPrompt(promptIndex));
-				getPreviousPrompt();
+                getPreviousPrompt();
                 break;
             case ResponseEvent.SAVE_AND_RELOAD:
                 checkRMSstatus();
@@ -219,24 +221,24 @@ public class ChatterboxController implements IController
                 getNextPrompt();
                 break;
             case ResponseEvent.LIST:
-            	form.updateModel(form.getPrompt(promptIndex));
-        		form.populateModel();            	
+                form.updateModel(form.getPrompt(promptIndex));
+                form.populateModel();               
                 goToFormView();
                 break;
             case ResponseEvent.EXIT:
-            	 if(form.getXmlModel().getEditID() != -1){ // we are editing
-                 	shell.displayModelList();
+                 if(form.getXmlModel().getEditID() != -1){ // we are editing
+                    shell.displayModelList();
                  }else{   
-                	 shell.createView();
+                     shell.createView();
                  }
-				break;
+                break;
         }
     }
 
-	private void goToFormView() {
-		promptIndex = 0;
-		formview.showPrompt(form.getPrompt(promptIndex));
-	}
+    private void goToFormView() {
+        promptIndex = 0;
+        formview.showPrompt(form.getPrompt(promptIndex));
+    }
 
     private void checkRMSstatus()
     {
@@ -259,20 +261,20 @@ public class ChatterboxController implements IController
     {
         try
         {
-        	//System.out.println("SAVING MODEL- pre populate: "+form.getXmlModel().toString());            
+            //System.out.println("SAVING MODEL- pre populate: "+form.getXmlModel().toString());            
             Model model = form.getXmlModel();
-			Calendar cd = Calendar.getInstance();
-			Date d = (Date) cd.getTime();
-			String date = J2MEUtil.getStringValue(d,Constants.RETURN_DATE);
+            Calendar cd = Calendar.getInstance();
+            Date d = (Date) cd.getTime();
+            String date = J2MEUtil.getStringValue(d,Constants.RETURN_DATE);
             model.setName(form.getName()+"_"+date);
             model.setXformReference(form.getRecordId());
             System.out.println("under refID:"+form.getRecordId());
             if(model.getEditID() != -1){
-            	System.out.println("updating model- ref:"+model.getXformReference());
-            	this.modelRMS.updateToRMS(model.getEditID(),model,new ModelMetaData(model));
+                System.out.println("updating model- ref:"+model.getXformReference());
+                this.modelRMS.updateToRMS(model.getEditID(),model,new ModelMetaData(model));
             }
             else
-            	this.modelRMS.writeToRMS(model, new ModelMetaData(model));
+                this.modelRMS.writeToRMS(model, new ModelMetaData(model));
             ///storageManager.saveFormModel(form);
         }
         catch (Exception e)
@@ -337,12 +339,12 @@ public class ChatterboxController implements IController
         this.formview = formview;
     }
 
-	private void showPromptAtIndex() {
-		System.out.println("controller.showPromptAtIndex()");
-		Prompt prompt = form.getPrompt(promptIndex);
-		System.out.println(prompt.getLongText());
-		prompter.showPrompt(prompt, promptIndex+1,form.getPrompts().size());
-	}
+    private void showPromptAtIndex() {
+        System.out.println("controller.showPromptAtIndex()");
+        Prompt prompt = form.getPrompt(promptIndex);
+        System.out.println(prompt.getLongText());
+        prompter.showPrompt(prompt, promptIndex+1,form.getPrompts().size());
+    }
 
 
     /* (non-Javadoc)

@@ -17,7 +17,7 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.Ticker;
 
-import org.celllife.clforms.IController;
+import org.celllife.clforms.Controller;
 import org.celllife.clforms.MVCComponent;
 import org.celllife.clforms.api.Prompt;
 import org.celllife.clforms.api.ResponseEvent;
@@ -30,7 +30,7 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 
 	private Prompt p;
 
-	private IController controller;
+	private Controller controller;
 
 	private static Displayable screen = null;
 
@@ -521,7 +521,7 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 		createView();
 	}
 
-	public void registerController(IController controller) {
+	public void registerController(Controller controller) {
 		this.controller = controller;		
 	}
 

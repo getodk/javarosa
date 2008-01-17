@@ -183,7 +183,7 @@ public class VisualXFormClient implements CommandListener
 
     void writeDownloadedXFormToRMS(org.celllife.clforms.api.Form form)
     {
-        XFormRMSUtility rms = new XFormRMSUtility(IController.XFORM_RMS);
+        XFormRMSUtility rms = new XFormRMSUtility(Controller.XFORM_RMS);
         System.out.println("RMS SIZE BEFORE : " + rms.getNumberOfRecords());
         rms.writeToRMS(form);
         System.out.println("RMS SIZE AFTER : " + rms.getNumberOfRecords());

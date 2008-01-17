@@ -40,7 +40,7 @@ public class TransportShell extends MIDlet implements CommandListener
     private ModelRMSUtility modelRMS;
     public static final int ALERT_TIMEOUT = 2000;
     private Display display;
-    private IController formController;
+    private Controller formController;
     private List selectFunction;
     private List availableXForms;
   //#if app.usefileconnections
@@ -202,8 +202,8 @@ public class TransportShell extends MIDlet implements CommandListener
     private void initRMS() {
 		System.out.println("TransportShell.initRMS()");
     	//log.write("PRE-initXFormUtil",MIDPLogger.DEBUG);
-		this.xformRMS = new XFormRMSUtility(IController.XFORM_RMS);
-		this.modelRMS = new ModelRMSUtility(IController.MODEL_RMS);
+		this.xformRMS = new XFormRMSUtility(Controller.XFORM_RMS);
+		this.modelRMS = new ModelRMSUtility(Controller.MODEL_RMS);
 		//log.write("POST-initXformUtil",MIDPLogger.DEBUG);
 		//log.write("PRE-writeDummy",MIDPLogger.DEBUG);
 		
@@ -300,7 +300,7 @@ public class TransportShell extends MIDlet implements CommandListener
 	
 	public void configureController(){
 		System.out.println("TransportShell.configureController()");
-		formController = new ChatterboxController(this);
+		formController = new Controller(this);
         formController.setPrompter(mainScreen);
         formController.setFormview(mainScreen);
 	}
@@ -326,7 +326,7 @@ public class TransportShell extends MIDlet implements CommandListener
     public void deleteModel(int i) {
 		System.out.println("TransportShell.deleteModel()");
 		// TODO Refactor this method from controller to Shell
-    	formController = new ChatterboxController(this);
+    	formController = new Controller(this);
     	formController.deleteModel(i);
 	}
     
@@ -334,7 +334,7 @@ public class TransportShell extends MIDlet implements CommandListener
     public void deleteForm(int i) {
 		System.out.println("TransportShell.deleteForm()");
 		// TODO Refactor this method from controller to Shell
-    	formController = new ChatterboxController(this);
+    	formController = new Controller(this);
     	formController.deleteForm(i);
 	}
     
@@ -416,7 +416,7 @@ public class TransportShell extends MIDlet implements CommandListener
 
 	public void writeFormToRMS(Form frm) {
 		System.out.println("TransportShell.writeFormToRMS()");
-		XFormRMSUtility rms = new XFormRMSUtility(IController.XFORM_RMS);
+		XFormRMSUtility rms = new XFormRMSUtility(Controller.XFORM_RMS);
         System.out.println("RMS SIZE BEFORE : " + rms.getNumberOfRecords());
         rms.writeToRMS(frm);
         System.out.println("RMS SIZE AFTER : " + rms.getNumberOfRecords());

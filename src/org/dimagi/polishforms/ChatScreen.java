@@ -6,10 +6,10 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.List;
 
-import org.celllife.clforms.IController;
+import org.celllife.clforms.Controller;
 import org.celllife.clforms.MVCComponent;
+import org.celllife.clforms.api.Constants;
 import org.celllife.clforms.api.Prompt;
 import org.celllife.clforms.api.ResponseEvent;
 import org.celllife.clforms.view.FormView;
@@ -17,10 +17,12 @@ import org.celllife.clforms.view.IPrompter;
 import org.dimagi.entity.Question;
 
 import de.enough.polish.ui.Item;
+import de.enough.polish.ui.ItemStateListener;
+import de.enough.polish.ui.UiAccess;
 
-public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IPrompter, FormView, CommandListener{
+public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IPrompter, FormView, CommandListener, ItemStateListener{
     
-    IController controller;
+    Controller controller;
     Question[] sampleQuestions = new Question[]{
         new Question("What is the child's Age?","Child Age",Question.NUMBER),
         new Question("What is the Child's Gender?","Gender",Question.SINGLE_SELECT, new String[]{"Male","Female"}),
@@ -43,7 +45,9 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
 
         this.addCommand(menuCommand);
         this.addCommand(selectCommand);
-
+        
+        UiAccess.addSubCommand(exitCommand, menuCommand,this);
+        
         this.setCommandListener(this); 
     }
     private void selectPressed() {
@@ -53,13 +57,10 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
             topFrame.evaluateResponse();
         }
     }    
-    private void addQuestion(Question nextQuestion) {
-        DisplayFrame frame = new DisplayFrame(nextQuestion);
-        displayFrames.push(frame);
-        frame.drawLargeFormOnScreen(this);
-    }
     private void addPrompt(Prompt nextPrompt) {
         DisplayFrame frame = new DisplayFrame(nextPrompt);
+        frame.wireWidgetAutoSelect(this,this, selectCommand);
+        this.setItemStateListener(this);
         displayFrames.push(frame);
         frame.drawLargeFormOnScreen(this);
     }
@@ -88,7 +89,7 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         showPrompt(prompt);
     }
 
-    public void registerController(IController controller) {
+    public void registerController(Controller controller) {
         this.controller = controller;
     }
     public void commandAction(Command command, Displayable s) {
@@ -115,5 +116,13 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
             MVCComponent.display.setCurrent(a);
         }
     }
-
+    
+    public void itemStateChanged(Item item) {
+        if(!displayFrames.empty()) {
+            DisplayFrame topFrame = (DisplayFrame)(displayFrames.peek());
+            if(topFrame.autoPlayItem(item)) {
+                commandAction(selectCommand,this);
+            }
+        }
+    }
 }
