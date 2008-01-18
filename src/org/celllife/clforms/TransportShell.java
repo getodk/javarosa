@@ -25,6 +25,7 @@ import org.celllife.clforms.view.FormViewScreen;
 import org.celllife.clforms.view.PromptScreen;
 import org.celllife.clforms.xml.XMLUtil;
 import org.dimagi.polishforms.ChatScreen;
+import org.dimagi.properties.MobileMRSPropertyRules;
 import org.dimagi.properties.PropertyManager;
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
 import org.openmrs.transport.midp.TransportLayer;
@@ -34,7 +35,6 @@ import com.ev.evgetme.getMidlet;
 public class TransportShell extends MIDlet implements CommandListener
 {
     public final static String WORKING_DIRECTORY = "C:/predefgallery/predefphotos/";
-    public final static String VIEW_TYPE_PROPERTY = "ViewStyle";
     
     private final Command EXIT_CMD = new Command("Close", Command.EXIT, 2);
     private final Command OK_CMD = new Command("Ok", Command.OK, 1);
@@ -89,6 +89,7 @@ public class TransportShell extends MIDlet implements CommandListener
 			//log.write("PRE-configCntllr",MIDPLogger.DEBUG);
 			configureController();
 			//log.write("POST-configCntllr",MIDPLogger.DEBUG);
+			PropertyManager.instance().setRules(new MobileMRSPropertyRules());
 		} catch (Exception e) {
 			//log.write(e.getMessage(),MIDPLogger.DEBUG);
 			e.printStackTrace();
