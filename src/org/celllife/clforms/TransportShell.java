@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
-import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -17,6 +16,7 @@ import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import org.celllife.clforms.api.Constants;
 import org.celllife.clforms.api.Form;
 import org.celllife.clforms.storage.ModelRMSUtility;
 import org.celllife.clforms.storage.XFormMetaData;
@@ -24,6 +24,9 @@ import org.celllife.clforms.storage.XFormRMSUtility;
 import org.celllife.clforms.view.FormViewScreen;
 import org.celllife.clforms.view.PromptScreen;
 import org.celllife.clforms.xml.XMLUtil;
+import org.dimagi.polishforms.ChatScreen;
+import org.dimagi.properties.MobileMRSPropertyRules;
+import org.dimagi.properties.PropertyManager;
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
 import org.openmrs.transport.midp.TransportLayer;
 
@@ -43,8 +46,15 @@ public class TransportShell extends MIDlet implements CommandListener
     private Controller formController;
     private List selectFunction;
     private List availableXForms;
+  //#if app.usefileconnections
     private FileBrowser fileBrowser;
-    private boolean writeDummy = false;
+    //#endif
+    private boolean writeDummy = true;
+    
+    
+    private ChatScreen mainScreen = new ChatScreen();
+    private PromptScreen promptScreen = new PromptScreen();
+    private FormViewScreen formViewScreen = new FormViewScreen();
 
 	private FormList formList;
 
@@ -75,6 +85,10 @@ public class TransportShell extends MIDlet implements CommandListener
 			this.selectFunction.addCommand(OK_CMD);
 			selectFunction.setCommandListener(this);
 			this.createAvailableXformsList();
+			//log.write("PRE-configCntllr",MIDPLogger.DEBUG);
+			configureController();
+			//log.write("POST-configCntllr",MIDPLogger.DEBUG);
+			PropertyManager.instance().setRules(new MobileMRSPropertyRules());
 		} catch (Exception e) {
 			//log.write(e.getMessage(),MIDPLogger.DEBUG);
 			e.printStackTrace();
@@ -148,7 +162,9 @@ public class TransportShell extends MIDlet implements CommandListener
 		{
 		case 0:
 			initServiceFileBrowser();
+			//#if app.usefileconnections
 			Display.getDisplay(this).setCurrent(this.fileBrowser);
+			//#endif
 			break;
 		case 1:
 			this.xformClient = new VisualXFormClient(this);
@@ -225,6 +241,7 @@ public class TransportShell extends MIDlet implements CommandListener
         		navigateAvailbleXformsList();
 			}
 		}
+      //#if app.usefileconnections
         else if (c == FileBrowser.SELECT_FILE_COMMAND)
         {
             List directory = (List) d;
@@ -235,14 +252,17 @@ public class TransportShell extends MIDlet implements CommandListener
         {
             this.createView();
         }
+      //#endif
     }
 
 	private void initServiceFileBrowser() {
+	  //#if app.usefileconnections
     	fileBrowser = new FileBrowser(Display.getDisplay(this));
         fileBrowser.setTitle("Browse XForms");
         fileBrowser.setCommandListener(this);
         fileBrowser.addCommand(FileBrowser.SELECT_FILE_COMMAND);
         fileBrowser.addCommand(FileBrowser.EXIT_COMMAND);
+        //#endif
 	}
 
 	public void loadSpecificForm(int i)
@@ -260,6 +280,17 @@ public class TransportShell extends MIDlet implements CommandListener
         }
     }
 	
+    public void setViewType(String viewType) {
+        if(viewType == Constants.VIEW_CHATTERBOX) {
+            formController.setPrompter(mainScreen);
+            formController.setFormview(mainScreen);
+        }
+        else if(viewType == Constants.VIEW_CLFORMS) {
+            formController.setPrompter(promptScreen);
+            formController.setFormview(formViewScreen);
+        }
+    }
+	
 	public void configureController(){
 		formController = new Controller(this);
         formController.setPrompter(new PromptScreen());
@@ -268,7 +299,6 @@ public class TransportShell extends MIDlet implements CommandListener
 
     public void controllerLoadForm(int formId)
     {
-    	configureController();
         display = Display.getDisplay(this);
         MVCComponent.display = display;
         formController.loadForm(formId);
@@ -277,11 +307,10 @@ public class TransportShell extends MIDlet implements CommandListener
 
     public void controllerLoadForm(Form form)
     {
-    	configureController();
         display = Display.getDisplay(this);
         MVCComponent.display = display;
-        formController.setForm(form);
-        formController.completeForm();
+        //formController.setForm(form);
+        //formController.completeForm();
     }
 
     public void deleteModel(int i) {
@@ -302,11 +331,17 @@ public class TransportShell extends MIDlet implements CommandListener
     {
         try
         {
+            //#if app.usefileconnections
         	System.out.println("DIRECTORY: " + this.fileBrowser.getSelectedFileURL());
             FileConnection fc = (FileConnection) Connector.open(this.fileBrowser.getSelectedFileURL());
             System.out.println("FILE SIZE: "+fc.fileSize());
             InputStream fis = fc.openInputStream();
-            int length = new Double(fc.fileSize()+1).intValue();
+            //So this used to use Double.toInt(), which is a problem because most of these devices
+            //don't have floating point processors, and the libraries don't have the datatype. 
+            //The Double.toInt() method just cast the long to an integer anyway, so this should do
+            //the same thing
+            // - Clayton Sims Jan 15, 2008
+            int length = (int)(fc.fileSize()+1);
             byte[] b = new byte[length];
             int readLength = fis.read(b, 0, length);
             DataInputStream din = new DataInputStream(
@@ -321,20 +356,20 @@ public class TransportShell extends MIDlet implements CommandListener
             	System.out.println("Form metaD: "+new XFormMetaData(form).toString());
             	// TODO once write external fixed for Form change this to right form object
             	this.xformRMS.writeToRMS(form);
-            	Display.getDisplay(this).setCurrent(new Alert("save succes","Form Loaded successfully",null,AlertType.CONFIRMATION), this.getFormList());
+            	Display.getDisplay(this).setCurrent(new javax.microedition.lcdui.Alert("save succes","Form Loaded successfully",null,AlertType.CONFIRMATION), this.getFormList());
             	int iFormNumber = this.xformRMS.getNextRecordID()-1;
             	System.out.println("written to:"+iFormNumber+"Number of records : " + this.xformRMS.getNumberOfRecords());
             	// if immediately load form
             	//this.controllerLoadForm(iFormNumber);
 
             } catch (Exception e) {
-            	Display.getDisplay(this).setCurrent(new Alert("save error","Form failed to Load",null,AlertType.ERROR), this.getFormList());
-            	e.printStackTrace();
+            	Display.getDisplay(this).setCurrent(new javax.microedition.lcdui.Alert("save error","Form failed to Load",null,AlertType.ERROR), this.getFormList());
             }
             
             //TextBox viewer = new TextBox("XForm Contents", null, length, TextField.ANY | TextField.UNEDITABLE);
             //viewer.setString(new String(b, 0, length));
             //Display.getDisplay(this).urrent(viewer);
+            //#endif
         }
         catch (Exception ex)
         {

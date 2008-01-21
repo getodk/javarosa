@@ -1,13 +1,16 @@
 package org.celllife.clforms;
 
-import java.io.IOException;
+import java.io.IOException; 
 import java.util.Calendar;
 import java.util.Date;
 
+
 import org.celllife.clforms.api.Constants;
 import org.celllife.clforms.api.Form;
+import org.celllife.clforms.api.IForm;
 import org.celllife.clforms.api.Prompt;
 import org.celllife.clforms.api.ResponseEvent;
+import org.celllife.clforms.storage.DummyForm;
 import org.celllife.clforms.storage.Model;
 import org.celllife.clforms.storage.ModelMetaData;
 import org.celllife.clforms.storage.ModelRMSUtility;
@@ -16,7 +19,8 @@ import org.celllife.clforms.storage.XFormRMSUtility;
 import org.celllife.clforms.util.J2MEUtil;
 import org.celllife.clforms.view.FormView;
 import org.celllife.clforms.view.IPrompter;
-
+import org.dimagi.properties.PropertyRMSUtility; 
+import org.dimagi.demo.ExampleForm;
 public class Controller
 {
 
@@ -24,7 +28,7 @@ public class Controller
     public static final String MODEL_RMS = "MODEL_RMS_NEW";
     public IPrompter prompter;
     public FormView formview;
-    private Form form;
+    private IForm form;
     private RMSManager rmsManager;
     private XFormRMSUtility xformRMS;
     private ModelRMSUtility modelRMS;
@@ -54,7 +58,10 @@ public class Controller
 			e.printStackTrace();
 		}
     }
-	
+    
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#cancelForm()
+     */
     public void cancelForm()
     {
     }
@@ -64,11 +71,17 @@ public class Controller
         this.formview.registerController(this);
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#registerPrompter()
+     */
     public void registerPrompter()
     {
         this.prompter.registerController(this);
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#completeForm()
+     */
     public void completeForm()
     {
     	System.out.println("Completing form..."+form.getName()+form.getPromptCount());
@@ -118,25 +131,29 @@ public class Controller
         }
     }
 
-    /**
-     * @param formId
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#loadForm(int)
      */
     public void loadForm(int recordId)
     {
     	// TODO put this in shell
     	System.out.println("in load form id:"+recordId);
-        form = new Form(); //storageManager.getForm(recordId);
-        try {
-        	this.xformRMS.retrieveFromRMS(recordId, form);
-        	// TODO Sort this out so that the recordID is added in the deserialisation
-        	form.setRecordId(recordId);
-			// TODO fix this so IDs are in form objects properly
-        	form.setName(this.xformRMS.getName(recordId));
-        	
-        	System.out.println("form "+recordId+form.getName()+" loaded");
-        } catch (IOException e) {
-        	e.printStackTrace();
-		}
+    	ExampleForm ef = new ExampleForm();
+        form = ef.getXFormObject();
+//    	DummyForm df = new DummyForm();
+//    	form = df.getXFormObject();
+//       form = new Form(); //storageManager.getForm(recordId);
+//        try {
+//        	this.xformRMS.retrieveFromRMS(recordId, form);
+//        	// TODO Sort this out so that the recordID is added in the deserialisation
+//        	form.setRecordId(recordId);
+//			// TODO fix this so IDs are in form objects properly
+//        	form.setName(this.xformRMS.getName(recordId));
+//        	
+//        	System.out.println("form "+recordId+form.getName()+" loaded");
+//        } catch (IOException e) {
+//        	e.printStackTrace();
+//		}
         if (form == null)
         {
             System.out.println("Form retuned null");
@@ -147,12 +164,18 @@ public class Controller
         }
     }
     
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#deleteForm(int)
+     */
     public void deleteForm(int recordId) {
 		// TODO move this to Shell
     	System.out.println("deleting form id:"+recordId);
         this.xformRMS.deleteRecord(recordId);
 	}
     
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#deleteModel(int)
+     */
     public void deleteModel(int recordId) {
 		// TODO move this to Shell
     	System.out.println("deleting record id:"+recordId);
@@ -160,6 +183,9 @@ public class Controller
 	}
     
     
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#processEvent(org.celllife.clforms.api.ResponseEvent)
+     */
     public void processEvent(ResponseEvent event)
     {
         switch (event.getType())
@@ -221,6 +247,9 @@ public class Controller
         form.getXmlModel().clearData();
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#saveFormModel()
+     */
     public void saveFormModel()
     {
         try
@@ -248,35 +277,56 @@ public class Controller
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#updateModel()
+     */
     public void updateModel()
     {
     }
 
-    public Form getForm()
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#getForm()
+     */
+    public IForm getForm()
     {
         return form;
     }
 
-    public void setForm(Form form)
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#setForm(org.celllife.clforms.api.IForm)
+     */
+    public void setForm(IForm form)
     {
         this.form = form;
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#getPrompter()
+     */
     public IPrompter getPrompter()
     {
         return prompter;
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#setPrompter(org.celllife.clforms.view.IPrompter)
+     */
     public void setPrompter(IPrompter prompter)
     {
         this.prompter = prompter;
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#getFormview()
+     */
     public FormView getFormview()
     {
         return formview;
     }
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#setFormview(org.celllife.clforms.view.FormView)
+     */
     public void setFormview(FormView formview)
     {
         this.formview = formview;
@@ -295,6 +345,9 @@ public class Controller
 	}
 
 
+    /* (non-Javadoc)
+     * @see org.celllife.clforms.IController#getRMSManager()
+     */
     public RMSManager getRMSManager()
     {
         return this.rmsManager;

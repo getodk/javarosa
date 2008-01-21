@@ -9,6 +9,8 @@ import javax.microedition.lcdui.ChoiceGroup;
 import org.celllife.clforms.api.Constants;
 import org.celllife.clforms.api.Prompt;
 
+import de.enough.polish.util.TextUtil;
+
 public class J2MEUtil {
 
 	public J2MEUtil() {
@@ -66,14 +68,14 @@ public class J2MEUtil {
 			String key = null;
 			String value = (String)prompt.getValue();
 			for(int i=0; i<prompt.getSelectMap().size();i++){
-				if(value.equalsIgnoreCase((String)prompt.getSelectMap().elementAt(i))){
+				if(TextUtil.equalsIgnoreCase(value,(String)prompt.getSelectMap().elementAt(i))){
 					key = (String)prompt.getSelectMap().keyAt(i);
 				}
 			}
 			
 			System.out.println(value+"-Key-"+key);
 			for(int i=0; i<collection.size(); i++){
-				if(collection.getString(i).equalsIgnoreCase(key))
+				if(TextUtil.equalsIgnoreCase(collection.getString(i),key))
 					collection.setSelectedIndex(i,true);
 			}
 			break;
@@ -92,7 +94,7 @@ public class J2MEUtil {
 				System.out.println((String)valuesVector.elementAt(i));
 				value = (String)valuesVector.elementAt(i);
 				for(int j=0; j<prompt.getSelectMap().size();j++){
-					if(value.equalsIgnoreCase((String)prompt.getSelectMap().elementAt(j))){
+					if(TextUtil.equalsIgnoreCase(value,(String)prompt.getSelectMap().elementAt(j))){
 						keys.addElement((String)prompt.getSelectMap().keyAt(j));
 					}
 				}
