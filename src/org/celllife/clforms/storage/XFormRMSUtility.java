@@ -8,6 +8,7 @@ import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.celllife.clforms.api.Form;
+import org.dimagi.demo.ExampleForm;
 
 /**
  * 
@@ -88,10 +89,12 @@ public class XFormRMSUtility extends RMSUtility {
 	public void writeDummy() {
 
 		this.open();
-		DummyForm dummy = new DummyForm();
-		dummy.setDemo();
-		//this.writeBytesToRMS(dummy.getData(), new XFormMetaData(dummy.getXFormObject()));
-		this.writeToRMS(dummy.getXFormObject(),new XFormMetaData(dummy.getXFormObject()));
+//		DummyForm dummy = new DummyForm();
+//		dummy.setDemo();
+//		//this.writeBytesToRMS(dummy.getData(), new XFormMetaData(dummy.getXFormObject()));
+//		this.writeToRMS(dummy.getXFormObject(),new XFormMetaData(dummy.getXFormObject()));
+		ExampleForm ef = new ExampleForm();		
+		this.writeToRMS(ef.getXFormObject(),new XFormMetaData(ef.getXFormObject()));
 		System.out.println("Dummy Record ID : ");
 	}
 

@@ -22,7 +22,7 @@ import org.kxml2.kdom.Node;
 
 //import java.lang.Locale;
 
-public class Form implements IDRecordable, Externalizable {
+public class Form implements IForm, IDRecordable, Externalizable {
 
 	private String name;
 	private Vector prompts;

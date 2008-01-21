@@ -9,16 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 import javax.microedition.io.OutputConnection;
 import javax.microedition.io.file.FileConnection;
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
-import javax.microedition.lcdui.Display;
 
 import minixpath.XPathExpression;
 
@@ -37,6 +33,7 @@ import org.xmlpull.v1.XmlPullParser;
 
 import de.enough.polish.util.Locale;
 import de.enough.polish.util.StringTokenizer;
+import de.enough.polish.util.TextUtil;
 
 /**
  * 
@@ -136,13 +133,13 @@ public class XMLUtil {
 				//System.out.println("analysing " +element.getName()+" child: "+child.getName());
 				
 				String tagname = child.getName();
-				if (tagname.equalsIgnoreCase("head")) { //$NON-NLS-1$
+				if (TextUtil.equalsIgnoreCase(tagname,"head")) { //$NON-NLS-1$
 					parseElement(form, child, null);
-				} else if (tagname.equalsIgnoreCase("body")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"body")) { //$NON-NLS-1$
 					parseElement(form, child, null);
-				} else if (tagname.equalsIgnoreCase("title")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"title")) { //$NON-NLS-1$
 					form.setName(child.getText(0).trim());
-				} else if (tagname.equalsIgnoreCase("model")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"model")) { //$NON-NLS-1$
 					// LOG
 					//System.out.println("found and creating Model"+model.toString());
 					Model model = new Model();
@@ -150,7 +147,7 @@ public class XMLUtil {
 					model.setXmlModel(xmlDoc);
 					form.setXmlModel(model);
 					for(int j=0;j<child.getAttributeCount();j++){
-						if (child.getAttributeName(j).equalsIgnoreCase("id")){
+						if (TextUtil.equalsIgnoreCase(child.getAttributeName(j),"id")){
 							form.setName(child.getAttributeValue(j));
 							if (form.getXmlModel() != null)
 								form.getXmlModel().setName(form.getName());
@@ -159,11 +156,11 @@ public class XMLUtil {
 						}
 					}
 					parseElement(form, child, null);
-				} else if (tagname.equalsIgnoreCase("instance")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"instance")) { //$NON-NLS-1$
 					Document xmlDoc = form.getXmlModel().getXmlModel();
 					xmlDoc.addChild(Node.ELEMENT, child.getElement(1));
 
-				} else if (tagname.equalsIgnoreCase("bind")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"bind")) { //$NON-NLS-1$
 
 					Binding b = new Binding();
 					b.setId(child.getAttributeValue("", "id")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -179,7 +176,7 @@ public class XMLUtil {
 					//LOG
 					//System.out.println("Bind added to form = \n"+b.toString());
 
-				} else if (tagname.equalsIgnoreCase("input")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"input")) { //$NON-NLS-1$
 					
 					//LOG
 					//System.out.println("found input");
@@ -195,7 +192,7 @@ public class XMLUtil {
 					prompt = parseElement(form, child, prompt);
 					form.addPrompt(prompt);
 
-				} else if (tagname.equalsIgnoreCase("select1")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"select1")) { //$NON-NLS-1$
 
 					//LOG
 					//System.out.println("found select1");
@@ -209,7 +206,7 @@ public class XMLUtil {
 					prompt = parseElement(form, child, prompt);
 					form.addPrompt(prompt);
 
-				} else if (tagname.equalsIgnoreCase("select")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"select")) { //$NON-NLS-1$
 
 					//LOG
 					//System.out.println("found select");
@@ -223,15 +220,40 @@ public class XMLUtil {
 					prompt = parseElement(form, child, prompt);
 					form.addPrompt(prompt);
 
-				} else if (tagname.equalsIgnoreCase("label")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"label")) { //$NON-NLS-1$
 					label = child.getText(0).trim();
-				} else if (tagname.equalsIgnoreCase("hint")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"hint")) { //$NON-NLS-1$
 					existingPrompt.setHint(child.getText(0).trim());
-				} else if (tagname.equalsIgnoreCase("item")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"item")) { //$NON-NLS-1$
 					parseElement(form, child, existingPrompt);
 					// TODO possible need to handle this return
-				} else if (tagname.equalsIgnoreCase("value")) { //$NON-NLS-1$
+				} else if (TextUtil.equalsIgnoreCase(tagname,"value")) { //$NON-NLS-1$
 					value = child.getText(0).trim();
+				} else if (TextUtil.equalsIgnoreCase(tagname,"textbox")) {
+					System.out.println("found textbox");
+					Prompt prompt = new Prompt();
+					prompt.setFormControlType(Constants.TEXTBOX);
+					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
+					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
+					if (bind != null) {
+						Binding b = (Binding) form.getBindings().get(bind);
+						if (b != null) {
+							prompt.setBindID(bind);
+							prompt.setXpathBinding(b.getNodeset());
+							prompt.setReturnType(getReturnTypeFromString(b.getType()));
+							prompt.setId(b.getId());
+						}
+					} else if (ref != null) {
+						prompt.setXpathBinding(ref);
+						prompt.setId(getLastToken(ref, '/'));
+						
+					}
+					String relevant = child.getAttributeValue(null, "relevant"); //$NON-NLS-1$
+					if (relevant != null){
+						prompt.setRelevantString(relevant);
+					}
+					prompt = parseElement(form, child, prompt);
+					form.addPrompt(prompt);
 				} else{ // tagname not recognised
 					parseElement(form, child, null);
 					// TODO possible need to handle this return
@@ -318,13 +340,13 @@ public class XMLUtil {
 		if (index > 0)
 			type = type.substring(index + 1);
 
-		if (type.equalsIgnoreCase("int")) //$NON-NLS-1$
+		if (TextUtil.equalsIgnoreCase(type,"int")) //$NON-NLS-1$
 			return Constants.RETURN_INTEGER;
-		else if (type.equalsIgnoreCase("numeric")) //$NON-NLS-1$
+		else if (TextUtil.equalsIgnoreCase(type,"numeric")) //$NON-NLS-1$
 			return Constants.RETURN_INTEGER;
-		else if (type.equalsIgnoreCase("date")) //$NON-NLS-1$
+		else if (TextUtil.equalsIgnoreCase(type,"date")) //$NON-NLS-1$
 			return Constants.RETURN_DATE;
-		else if (type.equalsIgnoreCase("boolean")) //$NON-NLS-1$
+		else if (TextUtil.equalsIgnoreCase(type,"boolean")) //$NON-NLS-1$
 			return Constants.RETURN_BOOLEAN;
 		else
 			return Constants.RETURN_STRING;
@@ -340,6 +362,7 @@ public class XMLUtil {
 
 		InputStreamReader isr = null;
 		try {
+		  //#if app.usefileconnections
 			FileConnection fc = (FileConnection) Connector.open(file);
 
 			if (!fc.exists()) {
@@ -353,6 +376,7 @@ public class XMLUtil {
 				 */
 
 			}
+		  //#endif
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -408,6 +432,7 @@ public class XMLUtil {
 	}
 
 	public static String readTextFile(String url) throws IOException {
+	  //#if app.usefileconnections
 		FileConnection fc = (FileConnection) Connector.open(url);
 
 		if (!fc.exists()) {
@@ -427,6 +452,9 @@ public class XMLUtil {
 		fc.close();
 
 		return content.toString();
+		//#else
+		throw new IOException("No file connection API available");
+		//#endif
 	}
 
 	public static void printModel(Document doc) throws IOException {

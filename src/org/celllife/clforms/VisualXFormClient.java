@@ -51,13 +51,13 @@ public class VisualXFormClient implements CommandListener
        
     private TransportShell mainShell;
     
-    private XFormClientBT clientBT;
+    //private XFormClientBT clientBT;
 
     
     VisualXFormClient(TransportShell mainShell)
     {
         this.mainShell = mainShell;
-        clientBT = new XFormClientBT(this);
+        //clientBT = new XFormClientBT(this);
         clientMainScreen.addCommand(CMD_BACK);
         clientMainScreen.addCommand(CMD_FIND_SERVICES);
         clientMainScreen.setCommandListener(this);
@@ -85,14 +85,14 @@ public class VisualXFormClient implements CommandListener
             tempForm.setCommandListener(this);
             tempForm.append(new Gauge("Searching XForms...", false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING));
             Display.getDisplay(mainShell).setCurrent(tempForm);
-            clientBT.requestSearch();
+            //clientBT.requestSearch();
             return;
         }
 
         // cancels device/services search
         if (c == CMD_CANCEL_FIND)
         {
-            clientBT.cancelSearch();
+            //clientBT.cancelSearch();
             Display.getDisplay(mainShell).setCurrent(clientMainScreen);
             return;
         }
@@ -100,7 +100,7 @@ public class VisualXFormClient implements CommandListener
         // back to client main screen
         if (c == CMD_CLIENT_MAIN)
         {
-            clientBT.requestLoad(null);
+            //clientBT.requestLoad(null);
             Display.getDisplay(mainShell).setCurrent(clientMainScreen);
             return;
         }
@@ -115,7 +115,7 @@ public class VisualXFormClient implements CommandListener
             Display.getDisplay(mainShell).setCurrent(tempForm);
 
             List xformList = (List) d;
-            clientBT.requestLoad(xformList.getString(xformList.getSelectedIndex()));
+            //clientBT.requestLoad(xformList.getString(xformList.getSelectedIndex()));
 
             return;
         }
@@ -123,7 +123,7 @@ public class VisualXFormClient implements CommandListener
         // cancels loading
         if (c == CMD_CANCEL_LOAD)
         {
-            clientBT.cancelLoad();
+            //clientBT.cancelLoad();
             Display.getDisplay(mainShell).setCurrent(listScreen);
 
             return;
@@ -152,8 +152,8 @@ public class VisualXFormClient implements CommandListener
         }
 
         // error
-        Alert alert = 
-                new Alert("Error", 
+        javax.microedition.lcdui.Alert alert = 
+                new javax.microedition.lcdui.Alert("Error", 
                 "Error in initialising bluetooth device.", null, AlertType.ERROR);
         alert.setTimeout(TransportShell.ALERT_TIMEOUT);
         Display.getDisplay(mainShell).setCurrent(alert, mainShell.getDisplayable());
@@ -161,13 +161,13 @@ public class VisualXFormClient implements CommandListener
 
     void destroy()
     {
-        clientBT.destroy();
+        //clientBT.destroy();
     }
 
   
     void showSearchError(String message)
     {
-        Alert alert = new Alert("Error", message, null, AlertType.ERROR);
+        javax.microedition.lcdui.Alert alert = new javax.microedition.lcdui.Alert("Error", message, null, AlertType.ERROR);
         alert.setTimeout(TransportShell.ALERT_TIMEOUT);
         Display.getDisplay(mainShell).setCurrent(alert, clientMainScreen);
     }
@@ -175,7 +175,7 @@ public class VisualXFormClient implements CommandListener
 
     void showLoadError(String message)
     {
-        Alert alert = new Alert("Error", message, null, AlertType.ERROR);
+        javax.microedition.lcdui.Alert alert = new javax.microedition.lcdui.Alert("Error", message, null, AlertType.ERROR);
         alert.setTimeout(TransportShell.ALERT_TIMEOUT);
         Display.getDisplay(mainShell).setCurrent(alert, listScreen);
     }
