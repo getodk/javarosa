@@ -13,7 +13,6 @@ import javax.microedition.lcdui.Ticker;
 
 import org.celllife.clforms.Controller;
 import org.celllife.clforms.MVCComponent;
-import org.celllife.clforms.api.IForm;
 import org.celllife.clforms.api.Prompt;
 import org.celllife.clforms.api.ResponseEvent;
 import org.celllife.clforms.util.J2MEUtil;
@@ -27,7 +26,7 @@ public class FormViewScreen extends MVCComponent implements FormView{
 
 	private Controller controller;
 	
-	private IForm form;
+	private org.celllife.clforms.api.Form form;
 
 	private static Displayable screen = null;
 

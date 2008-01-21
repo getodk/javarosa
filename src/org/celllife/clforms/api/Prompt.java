@@ -17,7 +17,6 @@ public class Prompt {
 	private String id;
 	private int formControlType;
 	private int returnType;
-	private int widgetType;
 	private String longText;
 	private String shortText;
 	private String header;
@@ -31,7 +30,6 @@ public class Prompt {
 	private String xpathBinding;
 	private String relevantString;
 	private String bindID;
-	private int labelPosition;
 	private Binding bind;
 
 	public Binding getBind() {
@@ -72,14 +70,6 @@ public class Prompt {
 		this.returnType = returnType;
 	}
 
-	public int getWidgetType() {
-		return widgetType;
-	}
-	
-	public void setWidgetType(int widgetType) {
-		this.widgetType = widgetType;
-	}
-	
 	public String getLongText() {
 		return longText;
 	}
@@ -264,19 +254,7 @@ public class Prompt {
 			break;
 		}
 		
-		return result;	
-		
-		
-		
-		
-	}	
-	
-	public int getLabelPosition() {
-		return labelPosition;
+		return result;
 	}
-	
-	public void setLabelPosition(int labelPosition) {
-		this.labelPosition = labelPosition;
-	}
-	
+
 }
