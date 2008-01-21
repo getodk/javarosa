@@ -159,4 +159,6 @@
 
 	<target name="debug" description="debugs the project" depends="enableDebug, enableEmulator, j2mepolish" />
 
+	
+	
 </project>
