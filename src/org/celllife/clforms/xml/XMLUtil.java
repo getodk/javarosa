@@ -50,7 +50,7 @@ public class XMLUtil {
 		Form form = new Form();
 		// xform.setName(getRandomName());
 		// LOG
-		System.out.println("in parse Form1");
+		//System.out.println("in parse Form1");
 
 		try {
 			KXmlParser parser = new KXmlParser();
@@ -74,18 +74,18 @@ public class XMLUtil {
 	 * @param inputStreamReader, XForm
 	 * @return XForm
 	 */
-	public static void parseForm(InputStreamReader isr, Form form) {
+	public static void parseForm(InputStreamReader isr, Form form) throws Exception{
 
 		// LOG
-		System.out.println("in parse Form2");
-		try {
+		//System.out.println("in parse Form2");
+		// try {
 			KXmlParser parser = new KXmlParser();
 			parser.setInput(isr);
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
 			Document doc = new Document();
 			doc.parse(parser);
 			// LOG
-			System.out.println("succesfully Kxml parsing");
+			//System.out.println("succesfully Kxml parsing");
 			
 			Element html = doc.getRootElement();
 			parseElement(form, html, null);
@@ -94,9 +94,13 @@ public class XMLUtil {
 			form.getXmlModel().trimXML();
 	        form.getXmlModel().trimXML();
 			
-		} catch (Exception ex) {
+		/*} catch (Exception ex) {
+			
+			// TODO handle exception
+			
+			form = null;
 			ex.printStackTrace();
-		}
+		}*/
 	}
 
 
@@ -109,20 +113,25 @@ public class XMLUtil {
 	 * @return
 	 */
 	private static Prompt parseElement(Form form, Element element,
-			Prompt existingPrompt) {
+			Prompt existingPrompt) throws Exception{
 		String label = ""; //$NON-NLS-1$
 		String value = ""; //$NON-NLS-1$
 
 		// LOG
 		//System.out.println("parsing element: " + element.getName());
-		
+		//System.out.println("no children:"+element.getChildCount());
 		int numOfEntries = element.getChildCount();
 		for (int i = 0; i < numOfEntries; i++) {
 			if (element.isText(i)) {
 				// Text here are all insignificant white spaces.
 				// We are only interested in children elements
+				// LOG
+				//System.out.println(element.getName()+" skipping a whitespace");
 			} else {
 				Element child = element.getElement(i);
+				// LOG
+				//System.out.println("analysing " +element.getName()+" child: "+child.getName());
+				
 				String tagname = child.getName();
 				if (TextUtil.equalsIgnoreCase(tagname,"head")) { //$NON-NLS-1$
 					parseElement(form, child, null);
@@ -133,7 +142,6 @@ public class XMLUtil {
 				} else if (TextUtil.equalsIgnoreCase(tagname,"model")) { //$NON-NLS-1$
 					// LOG
 					//System.out.println("found and creating Model"+model.toString());
-					System.out.println("creating model");
 					Model model = new Model();
 					Document xmlDoc = new Document();
 					model.setXmlModel(xmlDoc);
@@ -144,7 +152,7 @@ public class XMLUtil {
 							if (form.getXmlModel() != null)
 								form.getXmlModel().setName(form.getName());
 							//LOG 
-							System.out.println("name found!!"+form.getName()+child.getAttributeValue(j));
+							//System.out.println("name found!!"+form.getName()+child.getAttributeValue(j));
 						}
 					}
 					parseElement(form, child, null);
@@ -158,33 +166,25 @@ public class XMLUtil {
 					b.setId(child.getAttributeValue("", "id")); //$NON-NLS-1$ //$NON-NLS-2$
 					b.setNodeset(child.getAttributeValue("", "nodeset")); //$NON-NLS-1$ //$NON-NLS-2$
 					b.setRelevancy(child.getAttributeValue("", "relevant")); //$NON-NLS-1$ //$NON-NLS-2$
+					if (child.getAttributeValue("", "required") != null)
+						b.setRequired(child.getAttributeValue("", "required")); //$NON-NLS-1$ //$NON-NLS-2$
 					String type = child.getAttributeValue("", "type"); //$NON-NLS-1$ //$NON-NLS-2$
 					if (type.indexOf(':') > 0)
 						type = type.substring(type.indexOf(':') + 1);
 					b.setType(type);
 					form.addBinding(b);
+					//LOG
+					//System.out.println("Bind added to form = \n"+b.toString());
 
 				} else if (TextUtil.equalsIgnoreCase(tagname,"input")) { //$NON-NLS-1$
 					
 					//LOG
-					System.out.println("found input");
+					//System.out.println("found input");
 					Prompt prompt = new Prompt();
 					prompt.setFormControlType(Constants.INPUT);
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
 					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
-					if (bind != null) {
-						Binding b = (Binding) form.getBindings().get(bind);
-						if (b != null) {
-							prompt.setBindID(bind);
-							prompt.setXpathBinding(b.getNodeset());
-							prompt.setReturnType(getReturnTypeFromString(b.getType()));
-							prompt.setId(b.getId());
-						}
-					} else if (ref != null) {
-						prompt.setXpathBinding(ref);
-						prompt.setId(getLastToken(ref, '/'));
-						
-					}
+					attachBind(form, prompt, ref, bind);
 					String relevant = child.getAttributeValue(null, "relevant"); //$NON-NLS-1$
 					if (relevant != null){
 						prompt.setRelevantString(relevant);
@@ -195,21 +195,11 @@ public class XMLUtil {
 				} else if (TextUtil.equalsIgnoreCase(tagname,"select1")) { //$NON-NLS-1$
 
 					//LOG
-					System.out.println("found select1");
+					//System.out.println("found select1");
 					Prompt prompt = new Prompt();
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
 					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
-					if (ref != null) {
-						prompt.setXpathBinding(ref);
-						prompt.setId(getLastToken(ref, '/'));
-					} else if (bind != null) {
-						Binding b = (Binding) form.getBindings().get(bind);
-						if (b != null) {
-							prompt.setBindID(bind);
-							prompt.setXpathBinding(b.getNodeset());
-							prompt.setId(b.getId());
-						}
-					}
+					attachBind(form, prompt, ref, bind);
 					prompt.setFormControlType(Constants.SELECT1);
 					prompt.setReturnType(org.celllife.clforms.api.Constants.RETURN_SELECT1);
 					prompt.setSelectMap(new SimpleOrderedHashtable());
@@ -219,21 +209,11 @@ public class XMLUtil {
 				} else if (TextUtil.equalsIgnoreCase(tagname,"select")) { //$NON-NLS-1$
 
 					//LOG
-					System.out.println("found select");
+					//System.out.println("found select");
 					Prompt prompt = new Prompt();
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
 					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
-					if (ref != null) {
-						prompt.setXpathBinding(ref);
-						prompt.setId(getLastToken(ref, '/'));
-					} else if (bind != null) {
-						Binding b = (Binding) form.getBindings().get(bind);
-						if (b != null) {
-							prompt.setBindID(bind);
-							prompt.setXpathBinding(b.getNodeset());
-							prompt.setId(b.getId());
-						}
-					}
+					attachBind(form, prompt, ref, bind);
 					prompt.setFormControlType(Constants.SELECT);
 					prompt.setReturnType(org.celllife.clforms.api.Constants.RETURN_SELECT_MULTI);
 					prompt.setSelectMap(new SimpleOrderedHashtable());
@@ -291,6 +271,28 @@ public class XMLUtil {
 		}
 		
 		return existingPrompt;
+	}
+
+	private static void attachBind(Form form, Prompt prompt, String ref,
+			String bind) {
+		if (bind != null) {
+			Binding b = (Binding) form.getBindings().get(bind);
+			if (b != null) {
+				prompt.setBindID(bind);
+				prompt.setXpathBinding(b.getNodeset());
+				prompt.setReturnType(getReturnTypeFromString(b.getType()));
+				prompt.setId(b.getId());
+				prompt.setBind(b);
+				// LOG
+				//System.out.println(prompt.getLongText()+" attached to Bind = "+prompt.getBind().toString());
+			}
+			else
+				//LOG
+				System.out.println("MATCHING BIND not found");
+		} else if (ref != null) {
+			prompt.setXpathBinding(ref);
+			prompt.setId(getLastToken(ref, '/'));
+		}
 	}
 	
 	/**

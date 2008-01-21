@@ -138,6 +138,7 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 		}
 	}
 
+	// TODO should this be in the controller?
 	/*
 	 * Method checks if element is required, i.e. cannot be empty
 	 * returns false if element is not required or is not empty
@@ -145,7 +146,10 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 	 */
 	public boolean checkRequired() {
 		boolean result = false;
+		//LOG
+		// System.out.println("Checking required for: "+p.getLongText()+" req? "+p.isRequired());
 		//only if the Prompt is required we perform the check
+		//TODO  change this case statement from returntype to widget type
 		if (p.isRequired()){
 
 			switch (p.getReturnType()) {
@@ -208,7 +212,7 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 		alert.setType(AlertType.WARNING);
 
 		alert.setTimeout(Alert.FOREVER);
-		alert.setString("error.required"); //$NON-NLS-1$
+		alert.setString("This question is required, please complete it before continuing"); //$NON-NLS-1$
 
 		display.setCurrent(alert);
 
@@ -219,8 +223,8 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
     	if(c == nextItemCommand)
       {
       	save();
-		controller.processEvent(new ResponseEvent(ResponseEvent.NEXT, -1));
 		if (!checkRequired()){
+			controller.processEvent(new ResponseEvent(ResponseEvent.NEXT, -1));
 		}
 		else
 			requiredAlert();	
@@ -508,7 +512,16 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 
 		//check if the field has already been filled in - if so display value
 		if (p.getValue() != null){
-			selectChoice.setSelectedIndex(p.getSelectedIndex(),true);
+			
+			if(p.getSelectedIndex() != -1){
+				selectChoice.setSelectedIndex(p.getSelectedIndex(),true);
+			} else{
+				for (int i=0; i<selectChoice.size();i++){
+					if(selectChoice.getString(i).equalsIgnoreCase(p.getValue().toString())){
+						selectChoice.setSelectedIndex(i, true);
+					}
+				}
+			}
 		}
 
 		((Form) screen).append(selectChoice);

@@ -61,6 +61,8 @@ public class FormViewScreen extends MVCComponent implements FormView{
 	public boolean checkRequired() {
 		boolean result = false;
 		//only if the Prompt is required we perform the check
+		
+		//TODO is this needed in formview? if so refactor to check on save
 		if (p.isRequired()){
 
 			switch (p.getReturnType()) {
@@ -135,7 +137,6 @@ public class FormViewScreen extends MVCComponent implements FormView{
 				controller.processEvent(new ResponseEvent(ResponseEvent.SAVE_AND_RELOAD, -1));
 			}
 			else if (command == List.SELECT_COMMAND){
-				System.out.println("FormViewScreen.commandAction(SELECT_COMMAND) selectedIndex: " + ((List)screen).getSelectedIndex());
 				controller.processEvent(new ResponseEvent(ResponseEvent.GOTO,((List)screen).getSelectedIndex()));
 			}
 			else if (command == exitCommand){
@@ -163,7 +164,9 @@ public class FormViewScreen extends MVCComponent implements FormView{
 		form = controller.getForm();
 		screen = new List("FORM: "+form.getName(),List.IMPLICIT);
 		form.calculateRelevantAll();
+		
 		for(int i = 0; i<form.getPrompts().size(); i++){
+			System.out.println("Appending: "+((Prompt)form.getPrompt(i)).getLongText());
 			
 			if(((Prompt)form.getPrompt(i)).isRelevant()){
 				int type = ((Prompt)form.getPrompts().elementAt(i)).getReturnType();
