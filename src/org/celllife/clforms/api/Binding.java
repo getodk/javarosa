@@ -3,6 +3,8 @@
  */
 package org.celllife.clforms.api;
 
+import org.celllife.clforms.util.J2MEUtil;
+
 /**
  * 
  */
@@ -12,6 +14,7 @@ public class Binding {
 	private String nodeset;
 	private String type;
 	private String relevancy;
+	private boolean required = false;
 
 	/**
 	 * 
@@ -47,7 +50,20 @@ public class Binding {
 	}
 
 	public String toString() {
-		return id + " " + nodeset + " " + relevancy + " " + type;
+		return "id:"+id + " nodset: " + nodeset + " rel: " + relevancy + " req: "+required+" type " + type;
+	}
+
+	public void setRequired(String attributeValue) throws Exception {
+		System.out.println("setting bind "+this.id+ " req="+attributeValue);
+		this.required = J2MEUtil.getBoolean(attributeValue);
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
+	}
+
+	public boolean isRequired() {
+		return required;
 	}
 	
 	

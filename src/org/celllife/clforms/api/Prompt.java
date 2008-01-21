@@ -22,7 +22,7 @@ public class Prompt {
 	private String shortText;
 	private String header;
 	private boolean relevant;
-	private boolean required;
+	private boolean required = false;
 	private Object defaultValue;
 	private Object value;
 	private int selectedIndex = -1;
@@ -32,7 +32,16 @@ public class Prompt {
 	private String relevantString;
 	private String bindID;
 	private int labelPosition;
-	
+	private Binding bind;
+
+	public Binding getBind() {
+		return bind;
+	}
+
+	public void setBind(Binding bind) {
+		this.bind = bind;
+	}
+
 	public Prompt() {
 		super();
 		relevantString = null;
@@ -104,7 +113,12 @@ public class Prompt {
 	}
 
 	public boolean isRequired() {
-		return required;
+		if (this.bind != null)
+			return this.bind.isRequired();
+		else{
+			System.out.println(this.getBindID()+" bind null");
+			return false;
+		}
 	}
 
 	public void setRequired(boolean required) {
@@ -222,6 +236,41 @@ public class Prompt {
 		return bindID;
 	}
 
+	public Object getValueByTypeFromString(String value) {
+		Object result = null;
+		switch (this.returnType) {
+		case Constants.RETURN_INTEGER:
+			result = (Object) new Integer(Integer.parseInt(value));
+			break;
+		case Constants.RETURN_STRING:
+			result = value;
+			break;
+		case Constants.RETURN_DATE:
+			result = new Date();
+			result = (Date) J2MEUtil.getDateFromString(value);
+			System.out.println("set string date to" +result.toString());
+			break;
+		case Constants.RETURN_SELECT1:
+			result = value;
+			break;
+		case Constants.RETURN_SELECT_MULTI:
+			result = value;
+			break;
+		case Constants.RETURN_BOOLEAN:
+			result = value;
+			break;
+
+		default:
+			break;
+		}
+		
+		return result;	
+		
+		
+		
+		
+	}	
+	
 	public int getLabelPosition() {
 		return labelPosition;
 	}

@@ -25,25 +25,34 @@ public class J2MEUtil {
 	 */
 	public static String getStringValue(Object val, int returnType) {
 		String stringValue = "";
-		if (val == null)
+		if (val == null){
+			//LOG
+			System.out.println("string value null");
 			return stringValue;
+		}
 
 		switch (returnType) {
 		case Constants.RETURN_DATE:
-			Date d = (Date) val;
-			Calendar cd = Calendar.getInstance();
-			cd.setTime(d);
-			String year = "" + cd.get(Calendar.YEAR);
-			String month = "" + (cd.get(Calendar.MONTH)+1);
-			String day = "" + cd.get(Calendar.DAY_OF_MONTH);
-
-			if (month.length() < 2)
-				month = "0" + month;
-
-			if (day.length() < 2)
-				day = "0" + day;
-
-			stringValue = day + "/" + month + "/" + year;
+			System.out.println("test1");
+			if(val instanceof Date){
+				Date d = (Date) val;
+				Calendar cd = Calendar.getInstance();
+				cd.setTime(d);
+				String year = "" + cd.get(Calendar.YEAR);
+				String month = "" + (cd.get(Calendar.MONTH)+1);
+				String day = "" + cd.get(Calendar.DAY_OF_MONTH);
+				
+				if (month.length() < 2)
+					month = "0" + month;
+				
+				if (day.length() < 2)
+					day = "0" + day;
+				
+				stringValue = day + "/" + month + "/" + year;
+			}else
+				stringValue = val.toString();				
+		
+			System.out.println("test1"+stringValue);
 			break;
 		default:
 			stringValue = val.toString();
@@ -114,5 +123,34 @@ public class J2MEUtil {
 		}
 		temp.addElement(values.substring(pos).trim());
 		return temp;
+	}
+
+	public static boolean getBoolean(String attributeValue) throws Exception {
+		if (attributeValue.equalsIgnoreCase("true()"))
+			return true;
+		else if (attributeValue.equalsIgnoreCase("false()"))
+			return false;
+		else
+			//TODO throw parse exception
+			return false;
+	}
+
+	public static Date getDateFromString(String value) {
+		Date result = new Date();
+		Vector digits = tokenize(value, '/');
+		
+		int day = Integer.valueOf((String)digits.elementAt(0)).intValue();
+		int month = Integer.valueOf((String)digits.elementAt(1)).intValue();
+		month--;
+		int year = Integer.valueOf((String)digits.elementAt(2)).intValue();
+		
+		Calendar cd = Calendar.getInstance();
+		cd.set(Calendar.DAY_OF_MONTH, day);
+		cd.set(Calendar.MONTH, month);
+		cd.set(Calendar.YEAR, year);
+		
+		result = cd.getTime();
+		
+		return result;
 	}
 }

@@ -19,9 +19,7 @@ public interface IForm {
 	public abstract Model getXmlModel();
 	
 	public abstract void updatePromptsValues();
-	
-	public abstract void updatePromptsDefaults();
-	
+		
 	public abstract void calculateRelavant(Prompt p);
 	
 	public abstract void calculateRelevantAll();
@@ -39,4 +37,8 @@ public interface IForm {
 	public abstract int getRecordId();
 	
 	public abstract void populateModel();
+	
+	public abstract int getPromptCount();
+	
+	public abstract void updatePromptsDefaultValues();
 }

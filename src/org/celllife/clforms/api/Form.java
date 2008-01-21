@@ -40,7 +40,12 @@ public class Form implements IForm, IDRecordable, Externalizable {
 	public Form(String data){
 		DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data.getBytes()));
 		InputStreamReader isr = new InputStreamReader(dis);
-		XMLUtil.parseForm(isr,this);
+		try {
+			XMLUtil.parseForm(isr,this);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public Form(String name, Vector prompts, Model model) {
@@ -254,7 +259,14 @@ public class Form implements IForm, IDRecordable, Externalizable {
 	 * @throws IOException
 	 */
 	public void readExternal(DataInputStream in) throws IOException {
-		XMLUtil.parseForm(new InputStreamReader(in), this);
+		// TODO handle xformparseexception
+		try {
+			XMLUtil.parseForm(new InputStreamReader(in), this);
+		} catch (Exception e) {
+			if (e.getClass().equals(IOException.class))
+				throw new IOException();				
+			e.printStackTrace();
+		}
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -288,20 +300,24 @@ public class Form implements IForm, IDRecordable, Externalizable {
 		}
 	}
 	
-	/**
-	 *  Populates the XFPrompts with the data contained in the xmlModel
-	 */
-	public void updatePromptsDefaults() {
-		// TODO COMBINE this with update model somehow as they are doing similar things
+	public void updatePromptsDefaultValues() {
 		Enumeration e = prompts.elements();
 		while (e.hasMoreElements()) {
 			Prompt elem = (Prompt) e.nextElement();
-			if (elem.getValue() == null){
 				updatePrompt(elem, true);
-			}
 		}
 	}
-		
+	
+	public void loadPromptsDefaultValues()
+	{
+		for (int i = 0; i < this.prompts.size(); i++)
+		{
+			this.getPrompt(i).setValue(this.getPrompt(i).getDefaultValue());
+			//LOG
+			System.out.println("Updating prompt: "+this.getPrompt(i).getBindID()+ " with default val:"+ this.getPrompt(i).getDefaultValue());
+		}
+	}
+	
 	private void updatePrompt(Prompt prompt, boolean defaultVal) {
 		String xpath = prompt.getXpathBinding();
 		String value;
@@ -318,11 +334,15 @@ public class Form implements IForm, IDRecordable, Externalizable {
 				for (int i = 0; i < node.getChildCount(); i++) 
 					if (node.getType(i) == Node.TEXT) {
 						value = node.getText(i);//
-						if (defaultVal)
-							prompt.setDefaultValue(value);
+						if (defaultVal){
+							Object obVal = prompt.getValueByTypeFromString(value);
+							prompt.setDefaultValue(obVal);
+						}
 						else {
-							prompt.setValue(value);
-							//System.out.println("Updating prompt: " + value);
+							Object obVal = prompt.getValueByTypeFromString(value);
+							prompt.setValue(obVal);
+							//LOG
+							System.out.println("Updating prompt: "+prompt.getBindID()+ " with val:"+ value);
 						}
 					}			
 			}
@@ -350,12 +370,16 @@ public class Form implements IForm, IDRecordable, Externalizable {
         }
     }
 	
-	public void loadPromptsDefaultValues()
-	{
-		for (int i = 0; i < this.prompts.size(); i++)
-		{
-			this.getPrompt(i).setValue(this.getPrompt(i).getDefaultValue());
+/*	public void updatePromptsRequired() {
+		Enumeration e = prompts.elements();
+		while (e.hasMoreElements()) {
+			Prompt elem = (Prompt) e.nextElement();
+			elem.setRequired(elem.getBind().isRequired());
+			if (elem.getValue() == null){
+				updatePrompt(elem, false);
+			}
 		}
-	}
+		
+	}*/
 
 }

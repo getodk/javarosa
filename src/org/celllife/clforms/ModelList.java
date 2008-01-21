@@ -105,6 +105,7 @@ public class ModelList extends List implements CommandListener
                 model.setEditID(data.getRecordId());
                 // TODO the setRecordID for forms needs to be done at load time
                 selectedForm.setRecordId(data.getXformReference());
+                selectedForm.updatePromptsDefaultValues();
                 selectedForm.setXmlModel(model);
                 selectedForm.updatePromptsValues();
              // TODO fix this so IDs are in form objects properly

@@ -72,12 +72,18 @@ public class ExternaliseFormMethod {
 
 	private String writeCommonFCAttributes(Prompt prompt) {
 		String result = "";
-		//required
-		if(prompt.isRequired())
-			result += "required=\"true\" ";		
-		//relevant
-		if(prompt.getRelevantString()!=null)
-			result += "relevant=\""+prompt.getRelevantString()+ "\" ";
+		
+		try {
+			//required - in bind statement
+			/*if(prompt.isRequired())
+				result += "required=\"true()\" ";	*/	
+			//relevant
+			if(prompt.getRelevantString()!=null)
+				result += "relevant=\""+prompt.getRelevantString()+ "\" ";
+		} catch (RuntimeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return result;
 	}
 
@@ -162,6 +168,9 @@ public class ExternaliseFormMethod {
 		//nodeset
 		if(bind.getNodeset()!=null)
 			result += "nodeset=\""+bind.getNodeset()+ "\" ";
+		//required
+		if(bind.isRequired())
+			result += "required=\"true()\" ";
 		//type
 		if(bind.getType()!=null)
 			result += "type=\"xsd:"+bind.getType()+ "\" ";
