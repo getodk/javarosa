@@ -25,13 +25,13 @@ public class VisualXFormServer implements CommandListener {
 	private Image selectedImage;
 	private Image unselectedImage;
 	private boolean[] publicised;
-//	private XFormServerBT xformBTServer;
+	private XFormServerBT xformBTServer;
 	private XFormRMSUtility xformRMSUtility;
 
 	VisualXFormServer(TransportShell mainShell) {
 		this.xformRMSUtility = mainShell.getXFormRMSUtility();
 		this.mainShell = mainShell;
-//		xformBTServer = new XFormServerBT(this);
+		xformBTServer = new XFormServerBT(this);
 		selectedImage = initialiseStateImage(12, 12, 0, 0, 255);
 		unselectedImage = initialiseStateImage(12, 12, 255, 0, 0);
 		this.createAvailableXFormList();
@@ -60,9 +60,8 @@ public class VisualXFormServer implements CommandListener {
 
 	private void changePublishStatus(int selectedIndex) {
 
-		boolean result = false;
-//		xformBTServer.changeXFormInfo(xformsList
-//				.getString(selectedIndex), publicised[selectedIndex]);
+		boolean result = xformBTServer.changeXFormInfo(xformsList
+				.getString(selectedIndex), publicised[selectedIndex]);
 
 		if (result) {
 			Image stateImg = (publicised[selectedIndex]) ? selectedImage
@@ -71,7 +70,7 @@ public class VisualXFormServer implements CommandListener {
 					stateImg);
 		} else {
 			// either a bad record or SDDB is busy
-			javax.microedition.lcdui.Alert al = new javax.microedition.lcdui.Alert("Error", "Error publicising", null,
+			Alert al = new Alert("Error", "Error publicising", null,
 					AlertType.ERROR);
 			al.setTimeout(TransportShell.ALERT_TIMEOUT);
 			Display.getDisplay(mainShell).setCurrent(al, xformsList);
@@ -91,7 +90,7 @@ public class VisualXFormServer implements CommandListener {
 			return;
 		}
 
-		javax.microedition.lcdui.Alert alert = new javax.microedition.lcdui.Alert("Error", "Error initialising bluetooth.", null,
+		Alert alert = new Alert("Error", "Error initialising bluetooth.", null,
 				AlertType.ERROR);
 		alert.setTimeout(TransportShell.ALERT_TIMEOUT);
 		Display.getDisplay(mainShell).setCurrent(alert,
@@ -100,7 +99,7 @@ public class VisualXFormServer implements CommandListener {
 
 	public void destroy() {
 		// finalize the image server work
-	//	xformBTServer.destroy();
+		xformBTServer.destroy();
 	}
 
 	public int getXFormReference(String xformRef) {

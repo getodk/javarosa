@@ -24,9 +24,7 @@ import org.openmrs.transport.MessageListener;
 import org.openmrs.transport.TransportManager;
 import org.openmrs.transport.TransportMessage;
 import org.openmrs.transport.TransportMethod;
-//#if app.usefileconnections
 import org.openmrs.transport.file.FileConnectionTransportMethod;
-//#endif
 import org.openmrs.transport.http.HttpTransportMethod;
 import org.openmrs.transport.storage.RmsStorage;
 import org.openmrs.transport.util.Logger;
@@ -124,10 +122,8 @@ public class TransportLayer implements
 			transportManager = new TransportManager(new RmsStorage());
 			transportManager.setMessageListener(this);
 			transportManager.registerTransportMethod(new HttpTransportMethod());
-			//#if app.usefileconnections
 			transportManager
 			.registerTransportMethod(new FileConnectionTransportMethod());
-			//#endif
 		}
 		String[] elements = {"Select Models", "Send data via HTTP","Save to file system","Message Queue"};
 		mainMenu = new List("Transport Menu", List.IMPLICIT, elements, null);
@@ -376,7 +372,7 @@ public class TransportLayer implements
 			transportManager.enqueue(this.data.getBytes("UTF-8"),
 					destinationUrl, transportMethod);
 		}else{
-			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,
+			Alert a = new Alert("noDataAlert", "No data has been selected",null,
 					AlertType.ERROR);
 			Display.getDisplay(shell).setCurrent(a,this.mainMenu);
 		}
@@ -410,7 +406,7 @@ public class TransportLayer implements
 			break;
 		}
 
-		Display.getDisplay(shell).setCurrent(new javax.microedition.lcdui.Alert(title, message, null, type), Display.getDisplay(shell).getCurrent());
+		Display.getDisplay(shell).setCurrent(new Alert(title, message, null, type), Display.getDisplay(shell).getCurrent());
 
 	}
 

@@ -350,7 +350,7 @@ public class TransportLayerDemoMIDlet extends MIDlet implements
 			break;
 		}
 
-		display.setCurrent(new javax.microedition.lcdui.Alert(title, message, null, type), display
+		display.setCurrent(new Alert(title, message, null, type), display
 				.getCurrent());
 
 	}
