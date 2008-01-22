@@ -124,7 +124,7 @@ choiceGroup {
 	layout: bottom | horizontal-center;
 }
 
-.questionText {
+.questiontext {
 	font-face: proportional;
 	font-size: medium;	
 	layout: vertical-center | horizontal-center | expand; 
@@ -137,7 +137,7 @@ choiceGroup {
 	margin-left: 1;
 	margin-right: 1;	
 }
-.oldPromptText {
+.oldprompttext {
 	font-face: proportional;
 	font-size: medium;
 	font-style: bold;	

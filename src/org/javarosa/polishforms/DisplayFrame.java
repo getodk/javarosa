@@ -23,7 +23,7 @@ public class DisplayFrame {
     
     private Prompt thePrompt;
     private Item theWidget;
-    private StringItem questionText;
+    private StringItem questiontext;
     private StringItem questionResponse;
     private Item[] displayedItems;
    
@@ -34,8 +34,8 @@ public class DisplayFrame {
     public DisplayFrame(Prompt thePrompt) {
         this.thePrompt = thePrompt;
         
-        //#style questionText
-        questionText = new StringItem(null,thePrompt.getLongText());
+        //#style questiontext
+        questiontext = new StringItem(null,thePrompt.getLongText());
         
         loadWidget();
     }
@@ -133,10 +133,11 @@ public class DisplayFrame {
      * @param target the Screen to which the Frame will be Added
      */
     public void drawLargeFormOnScreen(ChatScreen target) {
-        questionText.setStyle(StyleSheet.getStyle("questionText"));
-        target.append(questionText);
+      //#style questiontext
+        questiontext = new StringItem(null,questiontext.getText());
+        target.append(questiontext);
         target.append(theWidget);
-        displayedItems = new Item[] {questionText,theWidget};
+        displayedItems = new Item[] {questiontext,theWidget};
         target.focus(theWidget);
     }
     /**
@@ -145,12 +146,14 @@ public class DisplayFrame {
      * @param target the Screen to which the Frame will be Added
      */
     public void drawSmallFormOnScreen(ChatScreen target) {
-        questionText.setStyle(StyleSheet.getStyle("oldPromptText"));
-        target.append(questionText);
+      //#style oldprompttext
+        questiontext = new StringItem(null,questiontext.getText());
+        questiontext.setStyle(StyleSheet.getStyle("oldprompttext"));
+        target.append(questiontext);
         //#style valueText
         questionResponse = new StringItem(null,questionValueToString(thePrompt));
         target.append(questionResponse);
-        displayedItems = new Item[] {questionText,questionResponse};
+        displayedItems = new Item[] {questiontext,questionResponse};
     }
     
     /**
