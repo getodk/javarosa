@@ -2,18 +2,13 @@ package org.javarosa.polishforms;
 
 import java.util.Enumeration;
 
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
-
 import org.javarosa.clforms.api.Constants;
 import org.javarosa.clforms.api.Prompt;
 
 import de.enough.polish.ui.ChoiceGroup;
-import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Item;
-import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.StringItem;
+import de.enough.polish.ui.StyleSheet;
 import de.enough.polish.ui.TextField;
 
 /**
@@ -31,10 +26,6 @@ public class DisplayFrame {
     private StringItem questionText;
     private StringItem questionResponse;
     private Item[] displayedItems;
-    
-    private Displayable autoSelectDisplayable;
-    private CommandListener autoSelectListener;
-    private Command selectCommand;
    
     /**
      * Creates a Display frame for the given prompt
@@ -142,8 +133,7 @@ public class DisplayFrame {
      * @param target the Screen to which the Frame will be Added
      */
     public void drawLargeFormOnScreen(ChatScreen target) {
-        //#style questionText
-        questionText.setStyle();
+        questionText.setStyle(StyleSheet.getStyle("questionText"));
         target.append(questionText);
         target.append(theWidget);
         displayedItems = new Item[] {questionText,theWidget};
@@ -155,8 +145,7 @@ public class DisplayFrame {
      * @param target the Screen to which the Frame will be Added
      */
     public void drawSmallFormOnScreen(ChatScreen target) {
-        //#style oldPromptText
-        questionText.setStyle();
+        questionText.setStyle(StyleSheet.getStyle("oldPromptText"));
         target.append(questionText);
         //#style valueText
         questionResponse = new StringItem(null,questionValueToString(thePrompt));
