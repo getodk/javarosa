@@ -13,7 +13,6 @@ import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.clforms.Controller;
 import org.javarosa.clforms.MVCComponent;
-import org.javarosa.clforms.api.IForm;
 import org.javarosa.clforms.api.Prompt;
 import org.javarosa.clforms.api.ResponseEvent;
 import org.javarosa.clforms.util.J2MEUtil;
@@ -27,7 +26,7 @@ public class FormViewScreen extends MVCComponent implements FormView{
 
 	private Controller controller;
 	
-	private IForm form;
+	private org.javarosa.clforms.api.Form form;
 
 	private static Displayable screen = null;
 
