@@ -432,6 +432,7 @@ public class XMLUtil {
 	}
 
 	public static String readTextFile(String url) throws IOException {
+	    StringBuffer content = new StringBuffer();
 	  //#if app.usefileconnections
 		FileConnection fc = (FileConnection) Connector.open(url);
 
@@ -440,7 +441,6 @@ public class XMLUtil {
 		}
 
 		InputStream fis = fc.openInputStream();
-		StringBuffer content = new StringBuffer();
 		int ch;
 		while ((ch = fis.read()) != -1) {
 			
@@ -451,10 +451,18 @@ public class XMLUtil {
 		fis.close();
 		fc.close();
 
-		return content.toString();
 		//#else
-		
+		try {
+		    throw new IOException("No file connection API available");
+		}
+		catch (IOException e) {
+		    throw e;
+		}
+		finally
 		//#endif
+		{
+	    return content.toString();
+		}
 	}
 
 	public static void printModel(Document doc) throws IOException {
