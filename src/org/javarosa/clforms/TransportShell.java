@@ -293,8 +293,13 @@ public class TransportShell extends MIDlet implements CommandListener
 	
 	public void configureController(){
 		formController = new Controller(this);
-        formController.setPrompter(new PromptScreen());
-        formController.setFormview(new FormViewScreen());
+        String sviewType = PropertyManager.instance().getProperty("ViewStyle");
+        if(sviewType != null) {
+            setViewType(sviewType);
+        }
+        else {
+            setViewType(Constants.VIEW_CHATTERBOX);
+        }
 	}
 
     public void controllerLoadForm(int formId)
