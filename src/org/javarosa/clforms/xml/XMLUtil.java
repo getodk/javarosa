@@ -453,7 +453,7 @@ public class XMLUtil {
 
 		return content.toString();
 		//#else
-		throw new IOException("No file connection API available");
+		
 		//#endif
 	}
 
