@@ -357,10 +357,10 @@ public class TransportShell extends MIDlet implements CommandListener
             	// TODO once write external fixed for Form change this to right form object
             	this.xformRMS.writeToRMS(form);
             	Display.getDisplay(this).setCurrent(new javax.microedition.lcdui.Alert("save succes","Form Loaded successfully",null,AlertType.CONFIRMATION), this.getFormList());
-            	int iFormNumber = this.xformRMS.getNextRecordID()-1;
-            	System.out.println("written to:"+iFormNumber+"Number of records : " + this.xformRMS.getNumberOfRecords());
+            	int formNumber = this.xformRMS.getNextRecordID()-1;
+            	System.out.println("written to:"+formNumber+"Number of records : " + this.xformRMS.getNumberOfRecords());
             	// if immediately load form
-            	//this.controllerLoadForm(iFormNumber);
+            	//this.controllerLoadForm(formNumber);
 
             } catch (Exception e) {
             	Display.getDisplay(this).setCurrent(new javax.microedition.lcdui.Alert("save error","Form failed to Load",null,AlertType.ERROR), this.getFormList());

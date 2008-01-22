@@ -374,9 +374,9 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
             try {
                 this.xformRMS.writeToRMS(form);
                 Display.getDisplay(this).setCurrent(new javax.microedition.lcdui.Alert("save succes","Form Loaded successfully",null,AlertType.CONFIRMATION), this.getFormList());
-                int iFormNumber = this.xformRMS.getNextRecordID()-1;
-                System.out.println("written to:"+iFormNumber+"Number of records : " + this.xformRMS.getNumberOfRecords());
-                //this.controllerLoadForm(iFormNumber);
+                int formNumber = this.xformRMS.getNextRecordID()-1;
+                System.out.println("written to:"+formNumber+"Number of records : " + this.xformRMS.getNumberOfRecords());
+                //this.controllerLoadForm(formNumber);
 
             } catch (Exception e) {
                 Display.getDisplay(this).setCurrent(new javax.microedition.lcdui.Alert("save error","Form failed to Load",null,AlertType.ERROR), this.getFormList());

@@ -7,7 +7,6 @@ import java.util.Date;
 
 import org.javarosa.clforms.api.Constants;
 import org.javarosa.clforms.api.Form;
-import org.javarosa.clforms.api.IForm;
 import org.javarosa.clforms.api.Prompt;
 import org.javarosa.clforms.api.ResponseEvent;
 import org.javarosa.clforms.storage.DummyForm;
@@ -28,7 +27,7 @@ public class Controller
     public static final String MODEL_RMS = "MODEL_RMS_NEW";
     public IPrompter prompter;
     public FormView formview;
-    private IForm form;
+    private Form form;
     private RMSManager rmsManager;
     private XFormRMSUtility xformRMS;
     private ModelRMSUtility modelRMS;
@@ -287,15 +286,15 @@ public class Controller
     /* (non-Javadoc)
      * @see org.javarosa.clforms.IController#getForm()
      */
-    public IForm getForm()
+    public Form getForm()
     {
         return form;
     }
 
     /* (non-Javadoc)
-     * @see org.javarosa.clforms.IController#setForm(org.javarosa.clforms.api.IForm)
+     * @see org.javarosa.clforms.IController#setForm(org.javarosa.clforms.api.Form)
      */
-    public void setForm(IForm form)
+    public void setForm(Form form)
     {
         this.form = form;
     }
