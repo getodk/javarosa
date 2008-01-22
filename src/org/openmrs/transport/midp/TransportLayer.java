@@ -18,8 +18,8 @@ import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
 import javax.microedition.midlet.MIDletStateChangeException;
 
-import org.celllife.clforms.ModelList;
-import org.celllife.clforms.TransportShell;
+import org.javarosa.clforms.ModelList;
+import org.javarosa.clforms.TransportShell;
 import org.openmrs.transport.MessageListener;
 import org.openmrs.transport.TransportManager;
 import org.openmrs.transport.TransportMessage;
