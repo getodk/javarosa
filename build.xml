@@ -13,6 +13,7 @@
 	<!-- Definition of the Test Suite Name:                      -->
 	<property name="test.class.name" value="org.dimagi.ExampleTestCase" />
 
+	<!-- Initialization for the build targets                    -->
 	<target name="init">
 		<property name="test" value="false" />
 
@@ -24,6 +25,7 @@
 		-->
 	</target>
 
+	<!-- This is the main work target, it actually builds the code -->
 	<target name="j2mepolish" depends="init" description="This is the controller for the J2ME build process.">
 		<j2mepolish>
 			<info name="${app.name}" 
@@ -33,12 +35,15 @@
 				infoUrl="${app.infoUrl}" 
 				jarName="${app.jarName}" 
 				jarUrl="${deploy-url}${app.jarName}" copyright="" />
-			<!-- selection of supported devices -->
+			
+			<!-- selection of supported devices, set this in build.properties -->
 			<deviceRequirements>
 				<requirement name="Identifier" value="${device.identifier}" />
 			</deviceRequirements>
 
 			<!-- build settings -->
+			<!-- 'menu' here designates that we're using the fullscreen Polish UI with native menus -->
+			<!-- We should see if we can set these first two attributes as properties instead-->
 			<build fullscreen="menu" 
 				usePolishGui="true" 
 				workDir="${dir.work}" 
@@ -48,26 +53,33 @@
 				<!-- midlets definition -->
 				<midlet class="${app.class}" name="${app.name}" />
 				
+				<!-- Code source files to include in compilation -->
 				<sources>
 					<source dir="${dir.src}"/>
 					<!--Taking this out for now...-->
 					<!--source dir="${dir.test}"/-->
 				</sources>
 				
+				<!-- Build variables -->
 				<variables includeAntProperties="true">
 					<variable file="configuration/configuration.properties" />
+					<!-- Sets the extended menu bar for polish. Extra memory overhead, but might be useful on some platforms-->
 					<variable name="polish.MenuBar.useExtendedMenuBar" value="true" />
 				</variables>
 
+				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) --> 
 				<resources
 					dir="${dir.resources}"
 					defaultexcludes="yes"
 					excludes="readme.txt">
+					<!-- Set the language for the strings in the application -->
 					<localization>
 						<locale name="en" />
 					</localization>
 				</resources>
 
+				<!-- Whether to run the obfuscator, which makes reverse engineering the byte-code 
+					 more difficult, and compresses the built JAR -->
 				<!-- obfuscator settings: do not obfuscate when the test-property is true -->
 				<obfuscator name="ProGuard" unless="test">
 					<parameter name="optimize" value="true" />
@@ -77,19 +89,14 @@
 				<debug if="test" showLogOnError="true" verbose="true" level="error">
 					<filter pattern="org.celllife.clforms.*" level="debug" />
 				</debug>
+				<!-- Properties of the actual javac compiler -->
 				<compiler classpath="${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${polish.home}/import/microewt_0.92.jar:${wtk.home}/lib/jsr082.jar"/>
 
 			</build>
 
 			<!-- execution of emulator(s) -->
 			<emulator wait="true" securityDomain="trusted" enableProfiler="true" enableMemoryMonitor="true" enableNetworkMonitor="true" if="debug">
-				<!-- this is an example for connecting to a debugger - use the ${polish.debug.port} Ant property
-				     for getting to know the port of the debugger. In this example the 
-				     "connect-debugger" target is also required.
-				-->
-				<!---->
-				<debugger name="antcall" target="connect-debugger" port="6001" />
-				<!---->
+				<!--debugger name="antcall" target="connect-debugger" port="6001" /-->
 			</emulator>
 
 			<emulator wait="true" trace="none" securityDomain="trusted" enableProfiler="false" enableMemoryMonitor="false" enableNetworkMonitor="false" if="test and not debug">
@@ -99,64 +106,74 @@
 		</j2mepolish>
 	</target>
 
-	<target name="setdeploy" description="Call this target first to set the OTA download-URL, e.g. ant setdeploy j2mepolish">
-		<property name="deploy-url" value="http://www.company.com/download/" />
-	</target>
-
+	<!-- Sets the 'debug' ANT variable to true -->
 	<target name="enableDebug">
 		<property name="debug" value="true" />
 	</target>
 
-
+	<!-- Enables the emulator by setting 'test' to be true, and setting a working directory -->
 	<target name="enableEmulator">
 		<property name="test" value="true" />
 		<property name="dir.work" value="build/test" />
 	</target>
 
+	<!-- Builds the code and invokes the emulator -->
 	<target name="emulator" depends="enableEmulator,j2mepolish" description="invokes the emulator">
 	</target>
 	
+	<!-- The location of the directory containing tests -->
 	<property name="tst-dir" location="test/" />
-	  <property name="TALK" value="true" />
+	<property name="TALK" value="true" />
 
-	  <path id="classpath.base">
-	  </path>
-	  <path id="classpath.test">
-	    <pathelement location="${tst-dir}/lib/junit.jar" />
-	    <pathelement location="${tst-dir}" />
-	    <path refid="classpath.base" />
-	  </path>
+	<path id="classpath.base">
+	</path>
+	
+	<!-- Note that most of this testing code was here to test our auto-integration tester, and isn't actually
+	     usable for testing J2ME code -->
+	<!-- The classpath that should be used for tests -->
+	<path id="classpath.test">
+	  <pathelement location="${tst-dir}/lib/junit.jar" />
+	  <pathelement location="${tst-dir}" />
+	  <path refid="classpath.base" />
+	</path>
 
-	  <target name="compile-test">
-	    <javac srcdir="${tst-dir}"
-	           verbose="${TALK}"
-	           >
-	      <classpath refid="classpath.test"/>
-	    </javac>
-	  </target>
-	  <target name="clean-compile-test">
-	    <delete verbose="${TALK}">
-	      <fileset dir="${tst-dir}" includes="**/*.class" />
-	    </delete>
-	  </target>
+	<!-- Compiles the source including tests -->
+	<target name="compile-test">
+	  <javac srcdir="${tst-dir}"
+	         verbose="${TALK}"
+	         >
+	    <classpath refid="classpath.test"/>
+	  </javac>
+	</target>
+	
+	<!-- Cleans the test directory and re-compile -->
+	<target name="clean-compile-test">
+	  <delete verbose="${TALK}">
+	    <fileset dir="${tst-dir}" includes="**/*.class" />
+	  </delete>
+	</target>
 
-	  <target name="tests" depends="compile-test">
-	    <junit failureProperty="test.failure">	
-	      <classpath refid="classpath.test" />
-	      <formatter type="xml" />
-	      <test name="org.dimagi.ExampleTestCase" outfile="junit-test-example"/>
-	      <test name="org.dimagi.ExampleTestCaseTwo" outfile="junit-test-example-two"/>	
-	    </junit>
-	  	<fail message="test failed" if="test.failure" />
-	  </target>
+	<!-- Run the JUnit Tests. -->
+	<target name="tests" depends="compile-test">
+	  <junit failureProperty="test.failure">	
+	    <classpath refid="classpath.test" />
+	    <formatter type="xml" />
+	    <test name="org.dimagi.ExampleTestCase" outfile="junit-test-example"/>
+	    <test name="org.dimagi.ExampleTestCaseTwo" outfile="junit-test-example-two"/>	
+	  </junit>
+	  <fail message="test failed" if="test.failure" />
+	</target>
 
+	<!-- Cleans directories created by a build -->
 	<target name="clean" description="allows a clean build. You should call [ant clean] whenever you made changes to devices.xml, vendors.xml or groups.xml">
 		<delete dir="build" />
 		<delete dir="dist" />
 	</target>
 
+	<!-- Cleans, and then runs the build target -->
 	<target name="cleanbuild" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="clean, j2mepolish" />
 
+	<!-- Runs the build with all debug properties enabled -->
 	<target name="debug" description="debugs the project" depends="enableDebug, enableEmulator, j2mepolish" />
 	
 </project>
