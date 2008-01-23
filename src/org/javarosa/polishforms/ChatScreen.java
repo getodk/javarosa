@@ -37,8 +37,6 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
     Command menuCommand = new Command("Menu", Command.SCREEN, 1);
 
     Command selectCommand = new Command("Select", Command.BACK, 1);
-    Command specialreadCommand = new Command("read", Command.SCREEN, 1);
-    Command specialwriteCommand = new Command("write", Command.SCREEN, 1);
     
     Command exitCommand = new Command("Exit", Command.EXIT, 1);
     
@@ -51,8 +49,6 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         //#style framedForm
         super("Chatterbox");
 
-        this.addCommand(specialreadCommand);
-        this.addCommand(specialwriteCommand);
         this.addCommand(menuCommand);
         this.addCommand(selectCommand);
         
@@ -143,24 +139,6 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
                 System.out.println("FormViewScreen.commandAction(SELECT_COMMAND) selectedIndex: " + ((List)screen).getSelectedIndex());
                 controller.processEvent(new ResponseEvent(ResponseEvent.GOTO,((List)screen).getSelectedIndex()));
             }*/
-            else if (command == specialreadCommand) {
-                String propertyVal = PropertyManager.instance().getProperty("View");
-                System.out.println("retrieved!");
-                if(propertyVal == null) 
-                {
-                    System.out.println("null :(");
-                }
-                else {
-                    System.out.println("Value is: " + propertyVal);
-                    Alert a = new Alert(""); //$NON-NLS-1$
-                    a.setString(propertyVal);
-                    a.setTimeout(Alert.FOREVER);
-                    MVCComponent.display.setCurrent(a);
-                }
-            }
-            else if (command == specialwriteCommand) {
-                PropertyManager.instance().setProperty("View","Polish");
-            }
             else if (command == exitCommand){
                 controller.processEvent(new ResponseEvent(ResponseEvent.EXIT, -1));
             }
