@@ -95,7 +95,7 @@
 			</build>
 
 			<!-- execution of emulator(s) -->
-			<emulator wait="true" securityDomain="trusted" enableProfiler="true" enableMemoryMonitor="true" enableNetworkMonitor="true" if="debug">
+			<emulator wait="true" securityDomain="trusted" enableProfiler="true" enableMemoryMonitor="true" enableNetworkMonitor="false" if="debug">
 				<!--debugger name="antcall" target="connect-debugger" port="6001" /-->
 			</emulator>
 
