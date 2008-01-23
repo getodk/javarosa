@@ -148,7 +148,6 @@ public class DisplayFrame {
     public void drawSmallFormOnScreen(ChatScreen target) {
       //#style oldprompttext
         questiontext = new StringItem(null,questiontext.getText());
-        questiontext.setStyle(StyleSheet.getStyle("oldprompttext"));
         target.append(questiontext);
         //#style valueText
         questionResponse = new StringItem(null,questionValueToString(thePrompt));
