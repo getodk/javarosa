@@ -12,11 +12,11 @@ import org.javarosa.clforms.util.SimpleOrderedHashtable;
  * @author ctsims
  *
  */
-public class MobileMRSPropertyRules implements IPropertyRules {
+public class JavaRosaPropertyRules implements IPropertyRules {
     SimpleOrderedHashtable rules;
     public final static String VIEW_TYPE_PROPERTY = "ViewStyle";
     
-    public MobileMRSPropertyRules() {
+    public JavaRosaPropertyRules() {
         rules = new SimpleOrderedHashtable();
         
         Vector allowableKeys = new Vector();

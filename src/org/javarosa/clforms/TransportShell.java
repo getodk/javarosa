@@ -25,7 +25,7 @@ import org.javarosa.clforms.view.FormViewScreen;
 import org.javarosa.clforms.view.PromptScreen;
 import org.javarosa.clforms.xml.XMLUtil;
 import org.javarosa.polishforms.ChatScreen;
-import org.javarosa.properties.MobileMRSPropertyRules;
+import org.javarosa.properties.JavaRosaPropertyRules;
 import org.javarosa.properties.PropertyManager;
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
 import org.openmrs.transport.midp.TransportLayer;
@@ -88,7 +88,7 @@ public class TransportShell extends MIDlet implements CommandListener
 			//log.write("PRE-configCntllr",MIDPLogger.DEBUG);
 			configureController();
 			//log.write("POST-configCntllr",MIDPLogger.DEBUG);
-			PropertyManager.instance().setRules(new MobileMRSPropertyRules());
+			PropertyManager.instance().setRules(new JavaRosaPropertyRules());
 		} catch (Exception e) {
 			//log.write(e.getMessage(),MIDPLogger.DEBUG);
 			e.printStackTrace();
