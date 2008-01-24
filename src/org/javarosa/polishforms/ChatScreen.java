@@ -13,7 +13,6 @@ import org.javarosa.clforms.api.Prompt;
 import org.javarosa.clforms.api.ResponseEvent;
 import org.javarosa.clforms.view.FormView;
 import org.javarosa.clforms.view.IPrompter;
-import org.javarosa.properties.PropertyManager;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
@@ -38,10 +37,13 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
 
     Command selectCommand = new Command("Select", Command.BACK, 1);
     
+    Command saveAndReloadCommand = new Command("Save and Reload", Command.SCREEN, 1);
+    
     Command exitCommand = new Command("Exit", Command.EXIT, 1);
     
     Stack displayFrames = new Stack();
-
+    Stack prompts = new Stack();
+    
     /**
      * Creates a ChatScreen, and loads the menus
      */
@@ -53,8 +55,9 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         this.addCommand(selectCommand);
         
         UiAccess.addSubCommand(exitCommand, menuCommand,this);
+        UiAccess.addSubCommand(saveAndReloadCommand, menuCommand,this);
         
-        this.setCommandListener(this); 
+        this.setCommandListener(this);
     }
     
     /**
@@ -77,6 +80,7 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         DisplayFrame frame = new DisplayFrame(nextPrompt);
         this.setItemStateListener(this);
         displayFrames.push(frame);
+        prompts.push(nextPrompt);
         frame.drawLargeFormOnScreen(this);
     }
     
@@ -98,17 +102,55 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
     }
     
     /**
-     * (Inherited from FormView) Displays a prompt
+     * Exits this form
+     */
+    private void exitForm() {
+        controller.processEvent(new ResponseEvent(ResponseEvent.EXIT, -1));
+        clearForm();
+    }
+    
+    /**
+     * Clears the current form from this display
+     */
+    private void clearForm() {
+        prompts.removeAllElements();
+        while(!displayFrames.isEmpty()) {
+            DisplayFrame frame = (DisplayFrame)displayFrames.pop();
+            frame.removeFromScreen(this);
+        }
+    }
+    
+    /**
+     * Identify whether the form is finished
+     * 
+     * @param prompt The last prompt provided by the controller
+     * @return true if the form is finished, false otherwise.
+     */
+    private boolean checkFinishedWithForm(Prompt prompt) {
+        if(prompts.contains(prompt)) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * (Inherited from FormView) Displays a prompt This is generally a sign that
+     * we're either starting or finishing a form
      */
     public void displayPrompt(Prompt prompt) {
         System.out.println("Display Prompt");
-        showPrompt(prompt);
+        if (checkFinishedWithForm(prompt)) {
+            exitForm();
+        } else {
+            MVCComponent.display.setCurrent(this);
+            showPrompt(prompt);
+        }
     }
+
     /**
      * Shows a prompt on the screen
      */
     public void showPrompt(Prompt prompt) {
-        MVCComponent.display.setCurrent(this);
         if(!displayFrames.empty()) {
             DisplayFrame topFrame = (DisplayFrame)(displayFrames.peek());
             topFrame.evaluateResponse();
@@ -122,7 +164,7 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
      * Shows a prompt on the screen at position screenIndex of totalScreens
      */
     public void showPrompt(Prompt prompt, int screenIndex, int totalScreens) {
-        displayPrompt(prompt);
+        showPrompt(prompt);
     }
 
     /**
@@ -140,15 +182,12 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
                 selectPressed();
                 controller.processEvent(new ResponseEvent(ResponseEvent.NEXT, -1));
             }
-            /*if (command == saveAndReloadCommand) {
+            else if (command == saveAndReloadCommand) {
+                clearForm();
                 controller.processEvent(new ResponseEvent(ResponseEvent.SAVE_AND_RELOAD, -1));
             }
-            else if (command == List.SELECT_COMMAND){
-                System.out.println("FormViewScreen.commandAction(SELECT_COMMAND) selectedIndex: " + ((List)screen).getSelectedIndex());
-                controller.processEvent(new ResponseEvent(ResponseEvent.GOTO,((List)screen).getSelectedIndex()));
-            }*/
             else if (command == exitCommand){
-                controller.processEvent(new ResponseEvent(ResponseEvent.EXIT, -1));
+                exitForm();
             }
             
         } catch (Exception e) {
