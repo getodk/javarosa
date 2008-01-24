@@ -16,6 +16,7 @@ import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import org.javarosa.chatscreen.ChatScreenForm;
 import org.javarosa.clforms.api.Constants;
 import org.javarosa.clforms.api.Form;
 import org.javarosa.clforms.storage.ModelRMSUtility;
@@ -53,7 +54,8 @@ public class TransportShell extends MIDlet implements CommandListener
     private boolean writeDummy = true;
     
     
-    private ChatScreen mainScreen = new ChatScreen();
+    private ChatScreenForm customChatScreen = new ChatScreenForm();
+    private ChatScreen chatScreen = new ChatScreen();
     private PromptScreen promptScreen = new PromptScreen();
     private FormViewScreen formViewScreen = new FormViewScreen();
 
@@ -299,8 +301,12 @@ public class TransportShell extends MIDlet implements CommandListener
 	
     public void setViewType(String viewType) {
         if(Constants.VIEW_CHATTERBOX.equals(viewType)) {
-            formController.setPrompter(mainScreen);
-            formController.setFormview(mainScreen);
+            formController.setPrompter(chatScreen);
+            formController.setFormview(chatScreen);
+        }
+        else if(Constants.VIEW_CUSTOMCHAT.equals(viewType)) {
+            formController.setPrompter(customChatScreen);
+            formController.setFormview(customChatScreen);
         }
         else if(Constants.VIEW_CLFORMS.equals(viewType)) {
             formController.setPrompter(promptScreen);

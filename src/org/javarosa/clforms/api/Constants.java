@@ -27,6 +27,7 @@ public class Constants {
 	
 	// View Types
     public static final String VIEW_CHATTERBOX = "v_chatterbox";
+    public static final String VIEW_CUSTOMCHAT = "v_customchatter";
     public static final String VIEW_CLFORMS = "v_clforms";
 	
 	// does the file connection API (JSR 75) exist?
