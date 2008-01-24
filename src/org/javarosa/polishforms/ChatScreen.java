@@ -33,16 +33,22 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
     
     Controller controller;
 
-    Command menuCommand = new Command("Menu", Command.SCREEN, 1);
+    Command menuCommand = new Command("Menu", Command.SCREEN, 2);
 
     Command selectCommand = new Command("Select", Command.BACK, 1);
     
-    Command saveAndReloadCommand = new Command("Save and Reload", Command.SCREEN, 1);
+    Command backCommand = new Command("Back", Command.BACK, 3);
     
-    Command exitCommand = new Command("Exit", Command.EXIT, 1);
+    Command saveAndReloadCommand = new Command("Save and Reload", Command.SCREEN, 3);
+    
+    Command saveAndExitCommand = new Command("Save and Exit", Command.SCREEN, 3);
+    
+    Command exitCommand = new Command("Exit", Command.EXIT, 2);
     
     Stack displayFrames = new Stack();
     Stack prompts = new Stack();
+    
+    int currentPromptIndex = -1;
     
     /**
      * Creates a ChatScreen, and loads the menus
@@ -56,6 +62,8 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         
         UiAccess.addSubCommand(exitCommand, menuCommand,this);
         UiAccess.addSubCommand(saveAndReloadCommand, menuCommand,this);
+        UiAccess.addSubCommand(saveAndExitCommand, menuCommand, this);
+        UiAccess.addSubCommand(backCommand, menuCommand, this);
         
         this.setCommandListener(this);
     }
@@ -109,6 +117,13 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         clearForm();
     }
     
+    private void popPrompt() {
+        if (!prompts.isEmpty()) {
+            prompts.pop();
+            ((DisplayFrame)displayFrames.pop()).removeFromScreen(this);
+        }
+    }
+    
     /**
      * Clears the current form from this display
      */
@@ -140,7 +155,7 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
     public void displayPrompt(Prompt prompt) {
         System.out.println("Display Prompt");
         if (checkFinishedWithForm(prompt)) {
-            exitForm();
+            commandAction(this.saveAndExitCommand, this);
         } else {
             MVCComponent.display.setCurrent(this);
             showPrompt(prompt);
@@ -181,6 +196,16 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
             if (command == selectCommand) {
                 selectPressed();
                 controller.processEvent(new ResponseEvent(ResponseEvent.NEXT, -1));
+            }
+            else if (command == backCommand ) {
+                popPrompt();
+                popPrompt();
+                controller.processEvent(new ResponseEvent(ResponseEvent.PREVIOUS, -1));
+            }
+            else if (command == saveAndExitCommand) {
+                clearForm();
+                controller.processEvent(new ResponseEvent(ResponseEvent.SAVE_AND_EXIT, -1));
+                exitForm();
             }
             else if (command == saveAndReloadCommand) {
                 clearForm();
