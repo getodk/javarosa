@@ -27,6 +27,7 @@ import org.javarosa.clforms.xml.XMLUtil;
 import org.javarosa.polishforms.ChatScreen;
 import org.javarosa.properties.JavaRosaPropertyRules;
 import org.javarosa.properties.PropertyManager;
+import org.javarosa.properties.view.PropertiesScreen;
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
 import org.openmrs.transport.midp.TransportLayer;
 
@@ -61,6 +62,8 @@ public class TransportShell extends MIDlet implements CommandListener
 	private VisualXFormServer xformServer;
 
 	private VisualXFormClient xformClient;
+	
+	PropertiesScreen propertyScreen;
 
 	private ModelList modelList;
 	
@@ -147,6 +150,12 @@ public class TransportShell extends MIDlet implements CommandListener
 
 	public void displayAvailableXFormMethods() {
     	Display.getDisplay(this).setCurrent(availableXForms);
+	}
+	
+	public void editProperties() {
+	    propertyScreen = new PropertiesScreen();
+	    propertyScreen.setCommandListener(this);
+	    Display.getDisplay(this).setCurrent(propertyScreen);
 	}
 
 	private void createAvailableXformsList() {
@@ -253,6 +262,14 @@ public class TransportShell extends MIDlet implements CommandListener
             this.createView();
         }
       //#endif
+        else if (c == PropertiesScreen.CMD_DONE) {
+            propertyScreen.commitChanges();
+            loadAndSetViewType();
+            this.createView();
+        }
+        else if (c == PropertiesScreen.CMD_CANCEL) {
+            this.createView();
+        }
     }
 
 	private void initServiceFileBrowser() {
@@ -281,25 +298,34 @@ public class TransportShell extends MIDlet implements CommandListener
     }
 	
     public void setViewType(String viewType) {
-        if(viewType == Constants.VIEW_CHATTERBOX) {
+        if(Constants.VIEW_CHATTERBOX.equals(viewType)) {
             formController.setPrompter(mainScreen);
             formController.setFormview(mainScreen);
         }
-        else if(viewType == Constants.VIEW_CLFORMS) {
+        else if(Constants.VIEW_CLFORMS.equals(viewType)) {
             formController.setPrompter(promptScreen);
             formController.setFormview(formViewScreen);
         }
+        else {
+            System.out.println("No valid view found!");
+        }
+        System.out.println("View Type is " + viewType);
     }
-	
-	public void configureController(){
-		formController = new Controller(this);
+    
+    public void loadAndSetViewType() {
         String sviewType = PropertyManager.instance().getProperty("ViewStyle");
         if(sviewType != null) {
             setViewType(sviewType);
         }
         else {
+            System.out.println("No valid view type property, defaulting to chatterbox");
             setViewType(Constants.VIEW_CHATTERBOX);
         }
+    }
+	
+	public void configureController(){
+		formController = new Controller(this);
+		loadAndSetViewType();
 	}
 
     public void controllerLoadForm(int formId)
