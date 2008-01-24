@@ -96,6 +96,14 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         }
         return -1;
     }
+    
+    /**
+     * (Inherited from FormView) Displays a prompt
+     */
+    public void displayPrompt(Prompt prompt) {
+        System.out.println("Display Prompt");
+        showPrompt(prompt);
+    }
     /**
      * Shows a prompt on the screen
      */
@@ -114,7 +122,7 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
      * Shows a prompt on the screen at position screenIndex of totalScreens
      */
     public void showPrompt(Prompt prompt, int screenIndex, int totalScreens) {
-        showPrompt(prompt);
+        displayPrompt(prompt);
     }
 
     /**

@@ -95,7 +95,7 @@ public class Controller
         }else{      	
         	form.loadPromptsDefaultValues();
         }
-        formview.showPrompt(form.getPrompt(promptIndex));
+        formview.displayPrompt(form.getPrompt(promptIndex));
     }
 
     private void getNextPrompt()
@@ -204,7 +204,7 @@ public class Controller
                 clearModelData();
                 form.loadPromptsDefaultValues();
                 promptIndex = 0;
-                formview.showPrompt(form.getPrompt(promptIndex));
+                formview.displayPrompt(form.getPrompt(promptIndex));
                 break;
             case ResponseEvent.GOTO:
                 form.updateModel(form.getPrompt(promptIndex));
@@ -229,7 +229,7 @@ public class Controller
 
 	private void goToFormView() {
 		promptIndex = 0;
-		formview.showPrompt(form.getPrompt(promptIndex));
+		formview.displayPrompt(form.getPrompt(promptIndex));
 	}
 
     private void checkRMSstatus()

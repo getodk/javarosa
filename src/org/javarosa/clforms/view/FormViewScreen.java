@@ -192,7 +192,7 @@ public class FormViewScreen extends MVCComponent implements FormView{
 		this.controller = controller;		
 	}
 
-	public void showPrompt(Prompt prompt) {
+	public void displayPrompt(Prompt prompt) {
 		this.p = prompt;
 		try{
 			createView();
