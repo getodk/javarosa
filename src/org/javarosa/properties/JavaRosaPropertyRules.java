@@ -25,6 +25,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
         Vector allowableDisplays = new Vector();
         allowableDisplays.addElement(Constants.VIEW_CHATTERBOX);
         allowableDisplays.addElement(Constants.VIEW_CLFORMS);
+        allowableDisplays.addElement(Constants.VIEW_CUSTOMCHAT);
         rules.put(VIEW_TYPE_PROPERTY, allowableDisplays);
         
     }
