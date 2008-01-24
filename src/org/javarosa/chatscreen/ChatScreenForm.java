@@ -155,6 +155,9 @@ public class ChatScreenForm extends DForm implements IPrompter, FormView, Comman
 		this.prompts = prompts;
 	}
 	
+	public void displayPrompt(Prompt prompt) {
+        this.showPrompt(prompt);
+    }
 	
 	  public void showPrompt(Prompt prompt) {
 		System.out.println("ChatScreenForm.showPrompt(prompt)");
@@ -164,7 +167,7 @@ public class ChatScreenForm extends DForm implements IPrompter, FormView, Comman
 
 	public void showPrompt(Prompt prompt, int screenIndex, int totalScreens) {
 		System.out.println("ChatScreenForm.showPrompt(screenIndex, totalScreens)");
-		showPrompt(prompt);
+		displayPrompt(prompt);
 	}
 
 	public void registerController(Controller controller) {

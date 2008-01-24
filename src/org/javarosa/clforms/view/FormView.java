@@ -7,7 +7,7 @@ public interface FormView {
 	
 	public void registerController(Controller controller);
 	
-	public void showPrompt(Prompt prompt);
+	public void displayPrompt(Prompt prompt);
 
 	//public void showDefaultPrompt(Prompt prompt);
 
