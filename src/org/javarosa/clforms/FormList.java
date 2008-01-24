@@ -11,7 +11,6 @@ package org.javarosa.clforms;
 
 import java.util.Vector;
 
-import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
@@ -21,9 +20,9 @@ import javax.microedition.lcdui.Ticker;
 import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
 
-import org.javarosa.clforms.storage.ModelMetaData;
 import org.javarosa.clforms.storage.XFormMetaData;
 import org.javarosa.clforms.storage.XFormRMSUtility;
+import org.javarosa.properties.view.PropertiesScreen;
 
 /**
  *
@@ -37,6 +36,7 @@ public class FormList extends List implements CommandListener
     private final Command CMD_VIEWMODELS = new Command("View Saved", Command.SCREEN, 3);
     private final Command CMD_DELETE_FORM = new Command("Delete",Command.SCREEN,4);
     private final Command CMD_SHAREFORMS = new Command("Share Forms", Command.SCREEN, 2);
+    private final Command CMD_SETTINGS = new Command("Settings", Command.SCREEN, 3);
     private XFormRMSUtility xformRMSUtility;   
     private TransportShell mainShell;
     private Vector formIDs;
@@ -66,6 +66,7 @@ public class FormList extends List implements CommandListener
         this.addCommand(CMD_VIEWMODELS);
         this.addCommand(CMD_GETNEWFORMS);
         this.addCommand(CMD_SHAREFORMS);
+        this.addCommand(CMD_SETTINGS);
 	}
 
     public void commandAction(Command c, Displayable d)
@@ -109,6 +110,10 @@ public class FormList extends List implements CommandListener
         if (c == CMD_SHAREFORMS)
         {
             this.mainShell.startBToothClient();
+        }
+        if (c == CMD_SETTINGS)
+        {
+            this.mainShell.editProperties();
         }
     }
     
