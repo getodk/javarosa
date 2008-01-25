@@ -17,6 +17,9 @@ public class PropertyManager {
     private IPropertyRules rules;
     private PropertyRMSUtility propertyRMS;
     
+    /**
+     * Singleton constructor for this PropertyManager
+     */
     private PropertyManager() {
         this.propertyRMS = new PropertyRMSUtility(PROPERTY_RMS);
     }
