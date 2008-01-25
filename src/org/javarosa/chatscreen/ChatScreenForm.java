@@ -117,6 +117,9 @@ public class ChatScreenForm extends DForm implements IPrompter, FormView, Comman
 	}
 
 	
+	/**
+	 * Goes back to the previous prompt
+	 */
 	public void goToPreviousPrompt() {
 		System.out.println("goToPreviousPrompt()" + activeQuestion);
 		// Don't do anything if user hits prev command for first question
@@ -150,53 +153,69 @@ public class ChatScreenForm extends DForm implements IPrompter, FormView, Comman
 		}
 	}
 
-	
+	/**
+	 * Sets the list of prompts for this Form
+	 * @param prompts The prompts that this Form displays
+	 */
 	public void setPrompts(Vector prompts) {
 		this.prompts = prompts;
 	}
 	
+	/** (non-Javadoc)
+     *  @see org.javarosa.clforms.view.FormView#displayPrompt(Prompt)
+     */
 	public void displayPrompt(Prompt prompt) {
         this.showPrompt(prompt);
     }
 	
-	  public void showPrompt(Prompt prompt) {
+	/** (non-Javadoc)
+     *  @see org.javarosa.clforms.view.IPrompter#showPrompt(Prompt)
+     */
+	public void showPrompt(Prompt prompt) {
 		System.out.println("ChatScreenForm.showPrompt(prompt)");
 		MVCComponent.display.setCurrent(this);
 		addPrompt(prompt);
 	}
 
+	/** (non-Javadoc)
+     *  @see org.javarosa.clforms.view.IPrompter#showPrompt(Prompt,int,int)
+     */
 	public void showPrompt(Prompt prompt, int screenIndex, int totalScreens) {
 		System.out.println("ChatScreenForm.showPrompt(screenIndex, totalScreens)");
 		displayPrompt(prompt);
 	}
-
-	public void registerController(Controller controller) {
-		System.out.println("ChatScreenForm.registerController(controller)");
-		this.controller = controller;
-	}
 	
-	   public void commandAction(Command command, Displayable s) {
-		try {
-			if (command == nextCommand) {
-				next = true;
-				controller.processEvent(new ResponseEvent(ResponseEvent.NEXT,
-						-1));
-			} else if (command == prevCommand) {
-				goToPreviousPrompt();
-				controller.processEvent(new ResponseEvent(ResponseEvent.PREVIOUS, -1));
-				
-			} else if (command == exitCommand) {
-				controller.processEvent(new ResponseEvent(ResponseEvent.EXIT,
-						-1));
-			}
+	/** (non-Javadoc)
+     *  @see org.javarosa.clforms.view.FormView#registerController(Controller)
+     */
+	public void registerController(Controller controller) {
+        System.out.println("ChatScreenForm.registerController(controller)");
+        this.controller = controller;
+    }
 
-		} catch (Exception e) {
-			Alert a = new Alert("error.screen" + " 2"); //$NON-NLS-1$
-			a.setString(e.getMessage());
-			a.setTimeout(Alert.FOREVER);
-			MVCComponent.display.setCurrent(a);
-		}
-	}
+    public void commandAction(Command command, Displayable s) {
+        try {
+            if (command == nextCommand) {
+                next = true;
+                controller.processEvent(new ResponseEvent(ResponseEvent.NEXT,
+                        -1));
+            } else if (command == prevCommand) {
+                goToPreviousPrompt();
+                controller.processEvent(new ResponseEvent(
+                        ResponseEvent.PREVIOUS, -1));
+
+            } else if (command == exitCommand) {
+                controller.processEvent(new ResponseEvent(ResponseEvent.EXIT,
+                        -1));
+            }
+
+        } catch (Exception e) {
+            Alert a = new Alert("error.screen" + " 2"); //$NON-NLS-1$
+            a.setString(e.getMessage());
+            a.setTimeout(Alert.FOREVER);
+            MVCComponent.display.setCurrent(a);
+        }
+    }
 
 }
 		
