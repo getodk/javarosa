@@ -9,6 +9,12 @@ import org.javarosa.utils.Rectangle;
 import org.javarosa.utils.ViewUtils;
 import org.javarosa.view.Widget;
 
+/**
+ * A widget for accepting enumerated type choices in a dropdown list
+ *  
+ * @author cdunn
+ * @date 
+ */
 public class Dropdown extends Widget {
 
 	private Vector choices = new Vector();
@@ -39,6 +45,10 @@ public class Dropdown extends Widget {
 	public Dropdown() {
 	}
 	
+	/**
+	 * Adds a choice to this enumeration
+	 * @param choice The string to be added
+	 */
 	public void addChoice(String choice) {
 		choices.addElement(choice);
 		if (selectedChoice == null)	{
@@ -46,6 +56,9 @@ public class Dropdown extends Widget {
 		}
 	}
 	
+	/**
+	 * Draws this widget in active mode
+	 */
 	public void drawActiveWidget(Graphics g) {
 			
 		// offset
@@ -108,6 +121,9 @@ public class Dropdown extends Widget {
 		}
 	}
 
+	/**
+	 * Draws this widget in it's inactive mode
+	 */
 	public void drawInactiveWidget(Graphics g) {
 		xBufferSize = this.getWidth()/10;
 		yBufferSize = this.getHeight()/10;
@@ -123,16 +139,28 @@ public class Dropdown extends Widget {
 		}
 	}
 
+	/**
+	 * Dynamically sizes the widget based on its components
+	 */
 	public void sizeWidget() {
 		fontHeight = Font.getDefaultFont().getHeight();
 		this.setHeight(fontHeight * (choices.size()+1));
 	}
 
+	/**
+	 * Sizes the widget to a static size
+	 * 
+	 * @param width The new width of the widget
+	 * @param height The new height of the widget
+	 */
 	public void sizeWidget(int width, int height) {
 		this.setWidth(width);
 		this.setHeight(height);
 	}
 	
+	/**
+	 * Handles Pointer events
+	 */
 	public void pointerPressed(int x, int y) {
 		if (ViewUtils.checkPointInRectangle(x, y, dbX0, dbY0, dbWidth, dbHeight)) {
 			dropDownButtonPressed();
