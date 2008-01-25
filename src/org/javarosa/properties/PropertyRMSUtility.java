@@ -10,21 +10,42 @@ import org.javarosa.clforms.storage.Externalizable;
 import org.javarosa.clforms.storage.RMSUtility;
 import org.javarosa.clforms.util.SimpleOrderedHashtable;
 
+/**
+ * The PropertyRMSUtility interacts with the RMS storage on the local device to read
+ * and write Property records.
+ * 
+ * @author ctsims
+ *
+ */
 public class PropertyRMSUtility extends RMSUtility {
 
     SimpleOrderedHashtable nameToId = new SimpleOrderedHashtable();
     
+    /**
+     * Creates a propertyRMSUtility with the given name.
+     * @param name The name of this PropertyRMSUtility. This will be used to specify which
+     * utility will be returned from the RMS Utility Manager
+     */
     public PropertyRMSUtility(String name)
     {
         super(name, RMSUtility.RMS_TYPE_META_DATA);
         System.out.println("PropertyRMSUtility()");
     }
     
+    /**
+     * Writes a given property to the RMS
+     * @param property The property to be written
+     */
     public void writeToRMS(Property property)
     {
         super.writeToRMS(property, new PropertyMetaData(property));
     }
 
+    /**
+     * Gets the size of the record given by recordId
+     * @param recordId The record that will be checked
+     * @return The size of the specified record
+     */
     public int getSize(int recordId)
     {
         PropertyMetaData propertyMetaData = new PropertyMetaData();
@@ -32,6 +53,12 @@ public class PropertyRMSUtility extends RMSUtility {
         return propertyMetaData.getSize();
     }
 
+    /**
+     * Gets the name of the property in the record specified by the given ID
+     * 
+     * @param recordId The id of the record to be retrieved
+     * @return The name of the property of the record specified
+     */
     public String getName(int recordId)
     {
         PropertyMetaData propertyMetaData = new PropertyMetaData();
@@ -56,6 +83,11 @@ public class PropertyRMSUtility extends RMSUtility {
         }
     }
     
+    /**
+     * Gets the value of a given property 
+     * @param recordName The property to be retrieved
+     * @return The value of the property if it exists, null otherwise
+     */
     public String getValue(String recordName ) {
         Object recordId = nameToId.get(recordName);
         if(recordId == null) {
@@ -79,6 +111,12 @@ public class PropertyRMSUtility extends RMSUtility {
         }
     }
     
+    /**
+     * Writes a string value to a given property. Creates the property record if none exists
+     *  
+     * @param propertyName The name of the property to be written
+     * @param value The value of the property
+     */
     public void writeValue(String propertyName, String value) {
         Property theProp = new Property();
         theProp.name = propertyName;
