@@ -1,0 +1,100 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+xmlns:xf="http://www.w3.org/2002/xforms" 
+xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+   <head>
+
+      <title>Hello World in XForms</title>
+
+      <xf:model id="relevancyForm2">
+
+        <xf:instance xmlns="">
+		<data>
+			<givenName>Default Name</givenName>
+			<gender></gender>
+			<isPregnant></isPregnant>
+			<isFather></isFather>
+			<age />
+		</data>
+	</xf:instance>         
+	<xf:bind id="givenName" nodeset="/data/givenName" type="xsd:string"/>
+
+         <xf:bind id="gender" nodeset="/data/gender" type="xsd:string"/>
+
+         <xf:bind id="isPregnant" nodeset="/data/isPregnant" type="xsd:boolean" relevant="/data/gender = 'Male'" />
+	   <xf:bind id="isFather" nodeset="/data/isFather" type="xsd:boolean" relevant="/data/gender = 'Female'" />
+	   	   <xf:bind id="age" nodeset="/data/age" type="xsd:int" />
+
+      </xf:model>
+
+   </head>
+
+   <body>
+
+         <xf:input bind="givenName" >
+
+            <xf:label>Please enter your name: </xf:label>
+
+            <xf:hint>...name...</xf:hint>            
+
+         </xf:input>
+
+         <xf:select1 bind="gender" >  
+
+            <xf:label>Please choose a gender: </xf:label> 
+
+            <xf:hint>Select 1...</xf:hint>            
+
+	    	   <xf:item>
+
+                <xf:label>Female</xf:label>
+
+                <xf:value>Female</xf:value> 
+
+            </xf:item>
+
+            <xf:item>
+
+                <xf:label>Male</xf:label>
+
+                <xf:value>Male</xf:value>
+
+            </xf:item>
+
+            <xf:item>
+
+                <xf:label>Other</xf:label>
+
+                <xf:value>Other</xf:value>
+
+            </xf:item>
+
+          </xf:select1>         <br />
+
+          <xf:input bind="isPregnant" relevant="/data/gender='Female'">
+
+            <xf:label>Are you pregnant? </xf:label>
+
+            <xf:hint>... today ....</xf:hint>            
+
+         </xf:input>
+
+          <xf:input bind="isFather" relevant="/data/gender='Male'">
+
+            <xf:label>Are you a Father? </xf:label>
+
+            <xf:hint>... today ....</xf:hint>            
+
+         </xf:input>
+         
+                   <xf:input bind="age">
+
+            <xf:label>How old are you?</xf:label>
+
+            <xf:hint>years</xf:hint>            
+
+         </xf:input>
+
+   </body>
+
+</html>
