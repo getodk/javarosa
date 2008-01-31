@@ -45,7 +45,7 @@
 			<!-- 'menu' here designates that we're using the fullscreen Polish UI with native menus -->
 			<!-- We should see if we can set these first two attributes as properties instead-->
 			<build fullscreen="menu" 
-				usePolishGui="true" 
+				usePolishGui="${javarosa.usepolishui}" 
 				workDir="${dir.work}" 
 				destDir="${dir.dist}"
 				binaryLibraries="${dir.lib}">

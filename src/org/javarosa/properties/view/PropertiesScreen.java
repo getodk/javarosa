@@ -1,3 +1,4 @@
+//#if polish.usePolishGui
 package org.javarosa.properties.view;
 
 import java.util.Enumeration;
@@ -99,3 +100,5 @@ public class PropertiesScreen extends FramedForm implements ItemStateListener{
         }
     }
 }
+
+//#endif
