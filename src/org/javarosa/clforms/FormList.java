@@ -22,7 +22,6 @@ import javax.microedition.rms.RecordEnumeration;
 
 import org.javarosa.clforms.storage.XFormMetaData;
 import org.javarosa.clforms.storage.XFormRMSUtility;
-import org.javarosa.properties.view.PropertiesScreen;
 
 /**
  *
@@ -66,7 +65,9 @@ public class FormList extends List implements CommandListener
         this.addCommand(CMD_VIEWMODELS);
         this.addCommand(CMD_GETNEWFORMS);
         this.addCommand(CMD_SHAREFORMS);
+        //#if polish.usePolishGui
         this.addCommand(CMD_SETTINGS);
+        //#endif
 	}
 
     public void commandAction(Command c, Displayable d)

@@ -1,3 +1,5 @@
+//#if polish.usePolishGui
+
 package org.javarosa.polishforms;
 
 import java.util.Stack;
@@ -16,7 +18,6 @@ import org.javarosa.clforms.view.IPrompter;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
-import de.enough.polish.ui.UiAccess;
 
 /***
  * The ChatScreen is a view for Mobile MRS that presents an entire XForm to the user. 
@@ -60,10 +61,10 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         this.addCommand(menuCommand);
         this.addCommand(selectCommand);
         
-        UiAccess.addSubCommand(exitCommand, menuCommand,this);
-        UiAccess.addSubCommand(saveAndReloadCommand, menuCommand,this);
-        UiAccess.addSubCommand(saveAndExitCommand, menuCommand, this);
-        UiAccess.addSubCommand(backCommand, menuCommand, this);
+        this.addSubCommand(exitCommand, menuCommand);
+        this.addSubCommand(saveAndReloadCommand, menuCommand);
+        this.addSubCommand(saveAndExitCommand, menuCommand);
+        this.addSubCommand(backCommand, menuCommand);
         
         this.setCommandListener(this);
     }
@@ -235,3 +236,4 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         }
     }
 }
+//#endif

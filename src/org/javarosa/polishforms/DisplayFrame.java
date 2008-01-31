@@ -1,3 +1,5 @@
+//#if polish.usePolishGui
+
 package org.javarosa.polishforms;
 
 import java.util.Enumeration;
@@ -204,3 +206,5 @@ public class DisplayFrame {
         }
     }
 }
+
+//#endif

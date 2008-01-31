@@ -25,10 +25,14 @@ import org.javarosa.clforms.storage.XFormRMSUtility;
 import org.javarosa.clforms.view.FormViewScreen;
 import org.javarosa.clforms.view.PromptScreen;
 import org.javarosa.clforms.xml.XMLUtil;
+//#if polish.usePolishGui
 import org.javarosa.polishforms.ChatScreen;
+//#endif
 import org.javarosa.properties.JavaRosaPropertyRules;
 import org.javarosa.properties.PropertyManager;
+//#if polish.usePolishGui
 import org.javarosa.properties.view.PropertiesScreen;
+//#endif
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
 import org.openmrs.transport.midp.TransportLayer;
 
@@ -55,7 +59,9 @@ public class TransportShell extends MIDlet implements CommandListener
     
     
     private ChatScreenForm customChatScreen = new ChatScreenForm();
+    //#if polish.usePolishGui
     private ChatScreen chatScreen = new ChatScreen();
+    //#endif
     private PromptScreen promptScreen = new PromptScreen();
     private FormViewScreen formViewScreen = new FormViewScreen();
 
@@ -65,7 +71,9 @@ public class TransportShell extends MIDlet implements CommandListener
 
 	private VisualXFormClient xformClient;
 	
+	//#if polish.usePolishGui
 	PropertiesScreen propertyScreen;
+	//#endif
 
 	private ModelList modelList;
 	
@@ -155,9 +163,11 @@ public class TransportShell extends MIDlet implements CommandListener
 	}
 	
 	public void editProperties() {
+	    //#if polish.usePolishGui
 	    propertyScreen = new PropertiesScreen();
 	    propertyScreen.setCommandListener(this);
 	    Display.getDisplay(this).setCurrent(propertyScreen);
+	    //#endif
 	}
 
 	private void createAvailableXformsList() {
@@ -264,6 +274,7 @@ public class TransportShell extends MIDlet implements CommandListener
             this.createView();
         }
       //#endif
+        //#if polish.usePolishGui
         else if (c == PropertiesScreen.CMD_DONE) {
             propertyScreen.commitChanges();
             loadAndSetViewType();
@@ -272,6 +283,7 @@ public class TransportShell extends MIDlet implements CommandListener
         else if (c == PropertiesScreen.CMD_CANCEL) {
             this.createView();
         }
+        //#endif
     }
 
 	private void initServiceFileBrowser() {
@@ -300,14 +312,16 @@ public class TransportShell extends MIDlet implements CommandListener
     }
 	
     public void setViewType(String viewType) {
-        if(Constants.VIEW_CHATTERBOX.equals(viewType)) {
-            formController.setPrompter(chatScreen);
-            formController.setFormview(chatScreen);
-        }
-        else if(Constants.VIEW_CUSTOMCHAT.equals(viewType)) {
+        if(Constants.VIEW_CUSTOMCHAT.equals(viewType)) {
             formController.setPrompter(customChatScreen);
             formController.setFormview(customChatScreen);
         }
+        //#if polish.usePolishGui
+        else if(Constants.VIEW_CHATTERBOX.equals(viewType)) {
+            formController.setPrompter(chatScreen);
+            formController.setFormview(chatScreen);
+        }
+        //#endif
         else if(Constants.VIEW_CLFORMS.equals(viewType)) {
             formController.setPrompter(promptScreen);
             formController.setFormview(formViewScreen);
@@ -325,7 +339,11 @@ public class TransportShell extends MIDlet implements CommandListener
         }
         else {
             System.out.println("No valid view type property, defaulting to chatterbox");
+            //#if polish.usePolishGui
             setViewType(Constants.VIEW_CHATTERBOX);
+            //#else
+            setViewType(Constants.VIEW_CLFORMS);
+            //#endif
         }
     }
 	
