@@ -23,6 +23,8 @@ import org.javarosa.clforms.api.Prompt;
 import org.javarosa.clforms.api.ResponseEvent;
 import org.javarosa.clforms.util.J2MEUtil;
 
+import de.enough.polish.util.TextUtil;
+
 //import de.enough.polish.util.Locale;
 
 
@@ -517,7 +519,7 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 				selectChoice.setSelectedIndex(p.getSelectedIndex(),true);
 			} else{
 				for (int i=0; i<selectChoice.size();i++){
-					if(selectChoice.getString(i).equalsIgnoreCase(p.getValue().toString())){
+					if(TextUtil.equalsIgnoreCase(selectChoice.getString(i),p.getValue().toString())){
 						selectChoice.setSelectedIndex(i, true);
 					}
 				}

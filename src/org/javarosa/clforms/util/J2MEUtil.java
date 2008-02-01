@@ -126,9 +126,9 @@ public class J2MEUtil {
 	}
 
 	public static boolean getBoolean(String attributeValue) throws Exception {
-		if (attributeValue.equalsIgnoreCase("true()"))
+		if (TextUtil.equalsIgnoreCase(attributeValue,"true()"))
 			return true;
-		else if (attributeValue.equalsIgnoreCase("false()"))
+		else if (TextUtil.equalsIgnoreCase(attributeValue,"false()"))
 			return false;
 		else
 			//TODO throw parse exception
