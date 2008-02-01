@@ -339,10 +339,10 @@ public class TransportLayer implements
 
 		String testData = "TESTDATA007";
 		
-		InputStream in = TransportLayer.class
+		InputStream in = this.getClass()
 				.getResourceAsStream("/testdata.xml");
 		System.out.println("in=" + in);
-		if (in != null) {
+		if (in != null) { 
 			InputStreamReader isr;
 			try {
 				isr = new InputStreamReader(in, "UTF-8");
