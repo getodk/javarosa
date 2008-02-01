@@ -63,8 +63,6 @@
 				<!-- Build variables -->
 				<variables includeAntProperties="true">
 					<variable file="configuration/configuration.properties" />
-					<!-- Sets the extended menu bar for polish. Extra memory overhead, but might be useful on some platforms-->
-					<variable name="polish.MenuBar.useExtendedMenuBar" value="true" />
 				</variables>
 
 				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) --> 
