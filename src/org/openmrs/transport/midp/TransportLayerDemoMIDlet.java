@@ -298,7 +298,7 @@ public class TransportLayerDemoMIDlet extends MIDlet implements
 	private void sendData(int transportMethod) throws IOException {
 		System.out.println("Destination URL: " + destinationUrl);
 
-		InputStream in = TransportLayerDemoMIDlet.class
+		InputStream in = this.getClass()
 				.getResourceAsStream("/testdata.xml");
 		System.out.println("in=" + in);
 		if (in != null) {

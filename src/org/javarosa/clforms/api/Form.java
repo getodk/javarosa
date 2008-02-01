@@ -263,7 +263,7 @@ public class Form implements IDRecordable, Externalizable {
 		try {
 			XMLUtil.parseForm(new InputStreamReader(in), this);
 		} catch (Exception e) {
-			if (e.getClass().equals(IOException.class))
+		    if (e instanceof IOException)
 				throw new IOException();				
 			e.printStackTrace();
 		}
