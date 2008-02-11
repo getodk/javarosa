@@ -5,10 +5,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-
-import javax.microedition.io.Connector;
-import javax.microedition.io.OutputConnection;
+import java.util.Date;
 
 import org.javarosa.clforms.xml.XMLUtil;
 import org.kxml2.io.KXmlSerializer;
@@ -23,6 +20,7 @@ public class Model implements Externalizable, IDRecordable
 	private Document xmlModel;
 	private int recordId = 0;
 	private String name;
+	private Date dateSaved;
 	private int editID = -1;
 
 	public Model() {
@@ -33,14 +31,14 @@ public class Model implements Externalizable, IDRecordable
 	public void loadName() {
 
 		if(xmlModel != null	){
-			
+
 			Element e = xmlModel.getRootElement();
 			this.name = e.getAttributeValue("", "id");
 			System.out.println(e.getName()+" MODEL SET NAME: "+this.name);
 			for(int i=0; i<e.getAttributeCount();i++){
 				System.out.println(e.getAttributeName(i));
 			}
-			
+
 			Element ee = xmlModel.getElement(null, "model");
 		}else{
 			this.name = null;
@@ -79,17 +77,17 @@ public class Model implements Externalizable, IDRecordable
 	public int getRecordId() {
 		return recordId;
 	}
-	
+
 	/**
 	 * Updates the xmlModel with the data in a particular prompt.
-	 * 
+	 *
 	 * @param prompt
 	 */
 	public String toString() {
 		String value = "";
 
 		//value = traverseXML(xmlModel.getRootElement(), value, false, false, 0);
-		
+
 		KXmlSerializer serializer = new KXmlSerializer();
 
 		ByteArrayOutputStream bao = new ByteArrayOutputStream();
@@ -108,18 +106,18 @@ public class Model implements Externalizable, IDRecordable
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 		return value;
 	}
 
 	/**
 	 * @param node
 	 * @param value
-	 * @param cleanText		if true removes all TEXT children from nodes 
+	 * @param cleanText		if true removes all TEXT children from nodes
 	 * @param formatting 	if true return string is indented XML
 	 * @param indent		recursive parameter for formatting
-	 * @return 
+	 * @return
 	 */
 	private String traverseXML(Node node, String value, boolean cleanText, boolean formatting, int indent) {
 
@@ -129,7 +127,7 @@ public class Model implements Externalizable, IDRecordable
 				for (int i = 0; i<indent; i++)
 					value += "   ";
 			value += "<"+((Element )node).getName();//+((Element )node).getChildCount();
-			
+
 			for (int i = 0; i < ((Element )node).getAttributeCount();i++) {
 					value += ((Element )node).getAttributeName(i)+ "=" +((Element )node).getAttributeValue(i);
 			}
@@ -152,33 +150,33 @@ public class Model implements Externalizable, IDRecordable
 					if(formatting)
 						value += "\n";
 				}
-			}	
+			}
 		}
-		
+
 		if(formatting)
 			for (int i = 0; i<indent; i++)
 				value += "   ";
 		value += "</"+((Element )node).getName()+">";
 		if(formatting)
 			value += "\n";
-		
+
 		return value;
 	}
-	
+
 	public void trimXML(){
 		trimWSnodes(xmlModel.getRootElement());
 	}
-	
+
 	private void trimWSnodes(Node node) {
 
 		for (int i = 0; i < node.getChildCount(); i++) {
-			if ( node.getType(i) == Node.ELEMENT){	
+			if ( node.getType(i) == Node.ELEMENT){
 				trimWSnodes((Element)node.getChild(i));
 			}
 			else if (node.getType(i) == Node.TEXT) {
 				if (node.getText(i).trim().length()==0)
 					node.removeChild(i);
-			}	
+			}
 			else if (node.getType(i) == Node.IGNORABLE_WHITESPACE) {
 				node.removeChild(i);
 			}
@@ -195,6 +193,14 @@ public class Model implements Externalizable, IDRecordable
 
 	public void setXformReference(int xformReference) {
 		XformReference = xformReference;
+	}
+
+	public Date getDateSaved() {
+		return dateSaved;
+	}
+
+	public void setDateSaved(Date date) {
+		this.dateSaved = date;
 	}
 
 	public void setName(String name) {

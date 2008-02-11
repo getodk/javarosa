@@ -8,7 +8,7 @@ import org.openmrs.util.Observable;
 import org.openmrs.util.Observer;
 
 /**
- * 
+ *
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
 public class TransportManager implements Observer {
@@ -25,18 +25,18 @@ public class TransportManager implements Observer {
 	private Hashtable transportMethods = new Hashtable();
 
 	/**
-	 * 
+	 *
 	 */
 	private MessageListener messageListener;
 
 	/**
-	 * 
+	 *
 	 */
 	private Storage storage;
 
 	/**
 	 * Creates a new instance of <code>TransportManager</code>
-	 * 
+	 *
 	 * @param storage
 	 */
 	public TransportManager(Storage storage) {
@@ -53,9 +53,9 @@ public class TransportManager implements Observer {
 	 * @param transportMethod
 	 * @throws IOException
 	 */
-	public void enqueue(byte[] data, String destination, int transportMethod)
+	public void enqueue(byte[] data, String destination, int transportMethod, int modelId)
 			throws IOException {
-		TransportMessage message = new TransportMessage(data, destination, ID);
+		TransportMessage message = new TransportMessage(data, destination, ID, modelId);
 		enqueue(message, transportMethod);
 	}
 
@@ -78,7 +78,7 @@ public class TransportManager implements Observer {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public TransportMethod getTransportMethod(int transportMethod) {
 		return (TransportMethod) transportMethods.get(new Integer(
@@ -113,7 +113,7 @@ public class TransportManager implements Observer {
 		method.transmit(message, this);
 	}
 
-	/** 
+	/**
 	 * @param transportMethod
 	 */
 	public void registerTransportMethod(TransportMethod transportMethod) {
@@ -136,7 +136,7 @@ public class TransportManager implements Observer {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void cleanUp() {
 		storage.close();
@@ -144,7 +144,7 @@ public class TransportManager implements Observer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.openmrs.transport.Observer#update(org.openmrs.transport.Observable,
 	 *      java.lang.Object)
 	 */
@@ -158,7 +158,7 @@ public class TransportManager implements Observer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.openmrs.transport.Observer#update(org.openmrs.transport.Observable,
 	 *      java.lang.Object)
 	 */
@@ -169,7 +169,7 @@ public class TransportManager implements Observer {
 			System.err.println(e);
 		}
 	}
-	
+
 	/**
 	 * @return
 	 */

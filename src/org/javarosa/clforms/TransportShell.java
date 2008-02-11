@@ -22,6 +22,7 @@ import org.javarosa.clforms.api.Form;
 import org.javarosa.clforms.storage.ModelRMSUtility;
 import org.javarosa.clforms.storage.XFormMetaData;
 import org.javarosa.clforms.storage.XFormRMSUtility;
+import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.clforms.view.FormViewScreen;
 import org.javarosa.clforms.view.PromptScreen;
 import org.javarosa.clforms.xml.XMLUtil;
@@ -38,10 +39,12 @@ import org.openmrs.transport.midp.TransportLayer;
 
 import com.ev.evgetme.getMidlet;
 
+import de.enough.polish.util.TextUtil;
+
 public class TransportShell extends MIDlet implements CommandListener
 {
     public final static String WORKING_DIRECTORY = "C:/predefgallery/predefphotos/";
-    
+
     private final Command EXIT_CMD = new Command("Close", Command.EXIT, 2);
     private final Command OK_CMD = new Command("Ok", Command.OK, 1);
     private final Command BACK_CMD = new Command("Back", Command.BACK, 1);
@@ -55,9 +58,9 @@ public class TransportShell extends MIDlet implements CommandListener
   //#if app.usefileconnections
     private FileBrowser fileBrowser;
     //#endif
-    private boolean writeDummy = true;
-    
-    
+    private boolean writeDummy = false;
+
+
     private ChatScreenForm customChatScreen = new ChatScreenForm();
     //#if polish.usePolishGui
     private ChatScreen chatScreen = new ChatScreen();
@@ -70,13 +73,13 @@ public class TransportShell extends MIDlet implements CommandListener
 	private VisualXFormServer xformServer;
 
 	private VisualXFormClient xformClient;
-	
+
 	//#if polish.usePolishGui
 	PropertiesScreen propertyScreen;
 	//#endif
 
 	private ModelList modelList;
-	
+
 	//public MIDPLogger log;
 
 	private TransportLayer transportLayer;
@@ -88,9 +91,9 @@ public class TransportShell extends MIDlet implements CommandListener
     {
     	configureLogger();
     	//log.write("STARTING APP",MIDPLogger.DEBUG);
-    	
+
         try {
-        	
+
 			String[] optionsMenu = {"Select XForms", "Review Completed Forms", "Get New Forms", "Submit Completed Forms"};
 
 			this.selectFunction = new List("What do you want to do?", List.IMPLICIT, optionsMenu, null);
@@ -100,23 +103,25 @@ public class TransportShell extends MIDlet implements CommandListener
 			this.createAvailableXformsList();
 			//log.write("PRE-configCntllr",MIDPLogger.DEBUG);
 			configureController();
+			loadProperties();
 			//log.write("POST-configCntllr",MIDPLogger.DEBUG);
 			PropertyManager.instance().setRules(new JavaRosaPropertyRules());
 		} catch (Exception e) {
 			//log.write(e.getMessage(),MIDPLogger.DEBUG);
 			e.printStackTrace();
 		}
-        
+
         //log.write("END tshell.CONST()",MIDPLogger.DEBUG);
         System.out.println(System.getProperty("microedition.profiles"));
     }
-    
+
+
 	private void configureLogger() {
-		
+
 	   /* try {
 	     log = new MIDPLogger(MIDPLogger.DEBUG,true,false);
 	    }
-	    catch (Exception e) { 
+	    catch (Exception e) {
 	     System.out.println("Exception creating MIDPLogger");
 	     e.printStackTrace();
 	    }*/
@@ -141,15 +146,15 @@ public class TransportShell extends MIDlet implements CommandListener
 	}
 
     public void displayTransportLayer() {
-    	transportLayer = new TransportLayer(this);		
+    	transportLayer = new TransportLayer(this);
 	}
 
 	public void displayFormList() {
-    	this.formList = new FormList(this);		
+    	this.formList = new FormList(this);
 	}
-	
+
 	public FormList getFormList() {
-		
+
     	this.formList = new FormList(this);
     	return this.formList;
 	}
@@ -161,7 +166,7 @@ public class TransportShell extends MIDlet implements CommandListener
 	public void displayAvailableXFormMethods() {
     	Display.getDisplay(this).setCurrent(availableXForms);
 	}
-	
+
 	public void editProperties() {
 	    //#if polish.usePolishGui
 	    propertyScreen = new PropertiesScreen();
@@ -171,13 +176,13 @@ public class TransportShell extends MIDlet implements CommandListener
 	}
 
 	private void createAvailableXformsList() {
-    	//"In file system", 
+    	//"In file system",
     	String[] getNewFormsMenu = {"From File system", "BlueTooth:Receive an XForm", "From URL"};
         this.availableXForms = new List("Where do you want to look for Xforms?", List.IMPLICIT,getNewFormsMenu, null);
         this.availableXForms.setCommandListener(this);
         this.availableXForms.addCommand(BACK_CMD);
 	}
-    
+
     private void navigateAvailbleXformsList() {
     	switch (this.availableXForms.getSelectedIndex())
 		{
@@ -191,11 +196,37 @@ public class TransportShell extends MIDlet implements CommandListener
 			this.xformClient = new VisualXFormClient(this);
 			break;
 		case 2:
-			this.getMidlet = new getMidlet(this);
+			callEvGetMe();
 			break;
 		}
 	}
-    
+
+    public void getNewFormsByTransportPropertySetting() {
+    	String method = PropertyManager.instance().getProperty("GetFormsMethod");
+
+
+    	if (TextUtil.equalsIgnoreCase(method, Constants.GETFORMS_EVGETME)){
+    		callEvGetMe();
+    	} if (TextUtil.equalsIgnoreCase(method, Constants.GETFORMS_AUTOHTTP)){
+    		callEvGetMeAUTO();
+    	} else if (TextUtil.equalsIgnoreCase(method, Constants.GETFORMS_BLUETOOTH)){
+    		this.xformClient = new VisualXFormClient(this);
+    	} else if (TextUtil.equalsIgnoreCase(method, Constants.GETFORMS_FILE)){
+    		initServiceFileBrowser();
+    		//#if app.usefileconnections
+    		Display.getDisplay(this).setCurrent(this.fileBrowser);
+    		//#endif
+    	}
+	}
+
+	private void callEvGetMeAUTO() {
+		this.getMidlet = new getMidlet(this,true);
+	}
+
+	public void callEvGetMe() {
+		this.getMidlet = new getMidlet(this,false);
+	}
+
     public void startBToothClient() {
 		this.xformServer = new VisualXFormServer(this);
 	}
@@ -205,8 +236,8 @@ public class TransportShell extends MIDlet implements CommandListener
 		//log.write("IN DESTROY APP",MIDPLogger.DEBUG);
 		//log.close();
         System.out.println("Application succesfully destroyed");
-        notifyDestroyed(); 
-        
+        notifyDestroyed();
+
     }
 
     protected void pauseApp()
@@ -228,7 +259,7 @@ public class TransportShell extends MIDlet implements CommandListener
 		this.modelRMS = new ModelRMSUtility(Controller.MODEL_RMS);
 		//log.write("POST-initXformUtil",MIDPLogger.DEBUG);
 		//log.write("PRE-writeDummy",MIDPLogger.DEBUG);
-		if (writeDummy)//xformRMS.getNumberOfRecords() == 0)
+		if (writeDummy || xformRMS.getNumberOfRecords() == 0)
 		{
 		    System.out.println("***NUMBER OF RECORDS : " + xformRMS.getNumberOfRecords());
 		    this.xformRMS.writeDummy();
@@ -310,7 +341,7 @@ public class TransportShell extends MIDlet implements CommandListener
             controllerLoadForm(i);
         }
     }
-	
+
     public void setViewType(String viewType) {
         if(Constants.VIEW_CUSTOMCHAT.equals(viewType)) {
             formController.setPrompter(customChatScreen);
@@ -331,8 +362,37 @@ public class TransportShell extends MIDlet implements CommandListener
         }
         System.out.println("View Type is " + viewType);
     }
-    
-    public void loadAndSetViewType() {
+
+	private void loadProperties() {
+
+		loadAndSetViewType();
+		loadDefaultPostURL();
+		loadGetFormsMethod();
+		loadDefaultGetURL();
+
+	}
+
+    private void loadDefaultPostURL() {
+    	String postURL = PropertyManager.instance().getProperty("PostURL");
+        if(postURL == null) {
+            System.out.println("No url yet selected, select default");
+            PropertyManager.instance().setProperty("PostURL", Constants.POST_URL);
+        }
+	}
+
+    private void loadDefaultGetURL() {
+    	String prop = PropertyManager.instance().getProperty("GetURL");
+        if(prop == null)
+        	PropertyManager.instance().setProperty("GetURL", Constants.GET_URL);
+	}
+
+    private void loadGetFormsMethod() {
+    	String prop = PropertyManager.instance().getProperty("GetFormsMethod");
+        if(prop == null)
+        	PropertyManager.instance().setProperty("GetFormsMethod", Constants.GETFORMS_BLUETOOTH);
+}
+
+	public void loadAndSetViewType() {
         String sviewType = PropertyManager.instance().getProperty("ViewStyle");
         if(sviewType != null) {
             setViewType(sviewType);
@@ -346,10 +406,9 @@ public class TransportShell extends MIDlet implements CommandListener
             //#endif
         }
     }
-	
+
 	public void configureController(){
 		formController = new Controller(this);
-		loadAndSetViewType();
 	}
 
     public void controllerLoadForm(int formId)
@@ -364,8 +423,8 @@ public class TransportShell extends MIDlet implements CommandListener
     {
         display = Display.getDisplay(this);
         MVCComponent.display = display;
-        //formController.setForm(form);
-        //formController.completeForm();
+        formController.setForm(form);
+        formController.completeForm();
     }
 
     public void deleteModel(int i) {
@@ -373,14 +432,14 @@ public class TransportShell extends MIDlet implements CommandListener
     	formController = new Controller(this);
     	formController.deleteModel(i);
 	}
-    
-    
+
+
     public void deleteForm(int i) {
 		// TODO Refactor this method from controller to Shell
     	formController = new Controller(this);
     	formController.deleteForm(i);
 	}
-    
+
 
     private void openFileIntoNewForm(String fileName)
     {
@@ -392,7 +451,7 @@ public class TransportShell extends MIDlet implements CommandListener
             System.out.println("FILE SIZE: "+fc.fileSize());
             InputStream fis = fc.openInputStream();
             //So this used to use Double.toInt(), which is a problem because most of these devices
-            //don't have floating point processors, and the libraries don't have the datatype. 
+            //don't have floating point processors, and the libraries don't have the datatype.
             //The Double.toInt() method just cast the long to an integer anyway, so this should do
             //the same thing
             // - Clayton Sims Jan 15, 2008
@@ -404,7 +463,7 @@ public class TransportShell extends MIDlet implements CommandListener
             fis.close();
             fc.close();
             try {
-            	// first parse form to check correct format 
+            	// first parse form to check correct format
             	Form form = new Form();
             	XMLUtil.parseForm(new InputStreamReader(din), form);
             	System.out.println("writing form to: "+this.xformRMS.getNextRecordID()+form.getXmlModel().toString());
@@ -415,12 +474,12 @@ public class TransportShell extends MIDlet implements CommandListener
             	int formNumber = this.xformRMS.getNextRecordID()-1;
             	System.out.println("written to:"+formNumber+"Number of records : " + this.xformRMS.getNumberOfRecords());
             	// if immediately load form
-            	//this.controllerLoadForm(formNumber);
+            	this.controllerLoadForm(formNumber);
 
             } catch (Exception e) {
             	Display.getDisplay(this).setCurrent(new javax.microedition.lcdui.Alert("save error","Form failed to Load",null,AlertType.ERROR), this.getFormList());
             }
-            
+
             //TextBox viewer = new TextBox("XForm Contents", null, length, TextField.ANY | TextField.UNEDITABLE);
             //viewer.setString(new String(b, 0, length));
             //Display.getDisplay(this).urrent(viewer);
@@ -461,7 +520,7 @@ public class TransportShell extends MIDlet implements CommandListener
         System.out.println("RMS SIZE BEFORE : " + rms.getNumberOfRecords());
         rms.writeToRMS(frm);
         System.out.println("RMS SIZE AFTER : " + rms.getNumberOfRecords());
-		
+
 	}
 
 	public TransportLayer getTransportLayer() {
@@ -469,5 +528,6 @@ public class TransportShell extends MIDlet implements CommandListener
 			this.transportLayer = new TransportLayer(this);
 		return this.transportLayer;
 	}
+
 
 }

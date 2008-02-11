@@ -3,16 +3,18 @@ package org.javarosa.clforms.storage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 
 public class ModelMetaData extends MetaDataObject {
 
 	private String name = "";
 	private int xformReference = 0;
-	
-	
+	private Date dateSaved;
+
+
 	public ModelMetaData() {
-		
+
 		// TODO Auto-generated constructor stub
 	}
 
@@ -26,6 +28,7 @@ public class ModelMetaData extends MetaDataObject {
 		this.name = model.getName();
 		//System.out.println("ModelMETADATA setting xref to: "+model.getXformReference());
 		this.xformReference = model.getXformReference();
+		this.dateSaved = model.getDateSaved();
 	}
 
 	public void readExternal(DataInputStream in) throws IOException
@@ -33,6 +36,7 @@ public class ModelMetaData extends MetaDataObject {
 		System.out.println("trying to readname Model");
         this.name = in.readUTF();
         this.xformReference = in.readInt();
+        this.dateSaved = new Date(in.readLong());
         System.out.println("trying to readname Model-"+this.toString());
     }
 
@@ -40,9 +44,10 @@ public class ModelMetaData extends MetaDataObject {
     {
     	out.writeUTF(this.name);
         out.writeInt(this.xformReference);
-        
+        out.writeLong(this.dateSaved.getTime());
+
     }
-    
+
     public int getXformReference() {
 		return xformReference;
 	}
@@ -59,10 +64,18 @@ public class ModelMetaData extends MetaDataObject {
     {
     	return this.name;
     }
-    
-    public String toString(){
+
+    public Date getDateSaved() {
+		return dateSaved;
+	}
+
+	public void setDateSaved(Date dateSaved) {
+		this.dateSaved = dateSaved;
+	}
+
+	public String toString(){
     	return new String(super.toString()+"Name: "+this.getName()+"XformRef :"+this.getXformReference());
     }
-    
+
 
 }

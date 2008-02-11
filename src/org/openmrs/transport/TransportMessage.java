@@ -8,10 +8,15 @@ import java.util.Date;
 import org.openmrs.util.Observable;
 
 /**
- * 
+ *
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
 public class TransportMessage extends Observable implements Externalizable {
+
+	/**
+	 * Message has not been select for sending
+	 */
+	public static final int STATUS_NOT_SENT = 0;
 
 	/**
 	 * Message is new
@@ -36,6 +41,11 @@ public class TransportMessage extends Observable implements Externalizable {
 	public static final int STATUS_RECEIVED = 5;
 
 	/**
+	 * Message has been sent but no response was received
+	 */
+	public static final int STATUS_FAILED = 6;
+
+	/**
 	 * The actual data to be sent
 	 */
 	private byte[] payloadData;
@@ -46,7 +56,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	private String destination;
 
 	/**
-	 * 
+	 *
 	 */
 	private Date timestamp = new Date();
 
@@ -66,20 +76,26 @@ public class TransportMessage extends Observable implements Externalizable {
 	private int recordId;
 
 	/**
+	 * ID of the associated model
+	 */
+	private int modelId;
+
+	/**
 	 * @param payloadData
 	 * @param destination
 	 * @param sender
 	 */
 	public TransportMessage(byte[] payloadData, String destination,
-			String sender) {
+			String sender, int modelId) {
 		super();
 		this.payloadData = payloadData;
 		this.destination = destination;
 		this.sender = sender;
+		this.modelId = modelId;
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public TransportMessage() {
 		super();
@@ -159,6 +175,7 @@ public class TransportMessage extends Observable implements Externalizable {
 		this.timestamp = new Date(in.readLong());
 		this.recordId = in.readInt();
 		this.status = in.readInt();
+		this.modelId = in.readInt();
 	}
 
 	/**
@@ -173,6 +190,7 @@ public class TransportMessage extends Observable implements Externalizable {
 		out.writeLong(this.timestamp.getTime());
 		out.writeInt(this.recordId);
 		out.writeInt(this.status);
+		out.writeInt(this.modelId);
 	}
 
 	/**
@@ -184,7 +202,7 @@ public class TransportMessage extends Observable implements Externalizable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
 	public int hashCode() {
@@ -198,7 +216,7 @@ public class TransportMessage extends Observable implements Externalizable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
@@ -246,7 +264,7 @@ public class TransportMessage extends Observable implements Externalizable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
@@ -269,7 +287,7 @@ public class TransportMessage extends Observable implements Externalizable {
 			s = "Delivered";
 			break;
 		case STATUS_NEW:
-			s = "New";
+			s = "Delivery Not Confirmed";
 			break;
 		case STATUS_RECEIVED:
 			s = "Received";
@@ -277,10 +295,24 @@ public class TransportMessage extends Observable implements Externalizable {
 		case STATUS_SENT:
 			s = "Sent";
 			break;
+		case STATUS_NOT_SENT:
+			s = "Not Sent";
+			break;
+		case STATUS_FAILED:
+			s = "Failed";
+			break;
 		default:
 			s = "N/A";
 			break;
 		}
 		return s;
+	}
+
+	public int getModelId() {
+		return modelId;
+	}
+
+	public void setModelId(int modelId) {
+		this.modelId = modelId;
 	}
 }

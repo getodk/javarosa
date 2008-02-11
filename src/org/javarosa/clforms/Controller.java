@@ -1,6 +1,6 @@
 package org.javarosa.clforms;
 
-import java.io.IOException; 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -57,7 +57,7 @@ public class Controller
 			e.printStackTrace();
 		}
     }
-    
+
     /* (non-Javadoc)
      * @see org.javarosa.clforms.IController#cancelForm()
      */
@@ -84,7 +84,7 @@ public class Controller
     public void completeForm()
     {
     	System.out.println("Completing form..."+form.getName()+form.getPromptCount());
-    	
+
         registerPrompter();
         registerFormView();
         form.setShortForms();
@@ -92,7 +92,7 @@ public class Controller
         form.updatePromptsDefaultValues();
         if(form.getXmlModel().getEditID() != -1){ // we are editing
         	form.updatePromptsValues();
-        }else{      	
+        }else{
         	form.loadPromptsDefaultValues();
         }
         formview.displayPrompt(form.getPrompt(promptIndex));
@@ -106,7 +106,7 @@ public class Controller
             goToFormView();
         }
         else{
-        	form.calculateRelavant(form.getPrompt(promptIndex)); 
+        	form.calculateRelavant(form.getPrompt(promptIndex));
         	if(form.getPrompt(promptIndex).isRelevant())
         		showPromptAtIndex();
         	else
@@ -122,7 +122,7 @@ public class Controller
             goToFormView();
         }
         else{
-        	form.calculateRelavant(form.getPrompt(promptIndex)); 
+        	form.calculateRelavant(form.getPrompt(promptIndex));
         	if(form.getPrompt(promptIndex).isRelevant())
         		showPromptAtIndex();
         	else
@@ -137,22 +137,22 @@ public class Controller
     {
     	// TODO put this in shell
     	System.out.println("in load form id:"+recordId);
-    	ExampleForm ef = new ExampleForm();
-        form = ef.getXFormObject();
-//    	DummyForm df = new DummyForm();
-//    	form = df.getXFormObject();
-//       form = new Form(); //storageManager.getForm(recordId);
-//        try {
-//        	this.xformRMS.retrieveFromRMS(recordId, form);
-//        	// TODO Sort this out so that the recordID is added in the deserialisation
-//        	form.setRecordId(recordId);
-//			// TODO fix this so IDs are in form objects properly
-//        	form.setName(this.xformRMS.getName(recordId));
-//        	
-//        	System.out.println("form "+recordId+form.getName()+" loaded");
-//        } catch (IOException e) {
-//        	e.printStackTrace();
-//		}
+//    	ExampleForm ef = new ExampleForm();
+//        form = ef.getXFormObject();
+    	DummyForm df = new DummyForm();
+    	form = df.getXFormObject();
+    	form = new Form(); //storageManager.getForm(recordId);
+    	try {
+    		this.xformRMS.retrieveFromRMS(recordId, form);
+    		// TODO Sort this out so that the recordID is added in the deserialisation
+    		form.setRecordId(recordId);
+    		// TODO fix this so IDs are in form objects properly
+    		form.setName(this.xformRMS.getName(recordId));
+
+    		System.out.println("form "+recordId+form.getName()+" loaded");
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    	}
         if (form == null)
         {
             System.out.println("Form retuned null");
@@ -162,7 +162,7 @@ public class Controller
             System.out.println("Form loaded");
         }
     }
-    
+
     /* (non-Javadoc)
      * @see org.javarosa.clforms.IController#deleteForm(int)
      */
@@ -171,7 +171,7 @@ public class Controller
     	System.out.println("deleting form id:"+recordId);
         this.xformRMS.deleteRecord(recordId);
 	}
-    
+
     /* (non-Javadoc)
      * @see org.javarosa.clforms.IController#deleteModel(int)
      */
@@ -180,8 +180,8 @@ public class Controller
     	System.out.println("deleting record id:"+recordId);
         this.modelRMS.deleteRecord(recordId);
 	}
-    
-    
+
+
     /* (non-Javadoc)
      * @see org.javarosa.clforms.IController#processEvent(org.javarosa.clforms.api.ResponseEvent)
      */
@@ -214,13 +214,13 @@ public class Controller
                 break;
             case ResponseEvent.LIST:
             	form.updateModel(form.getPrompt(promptIndex));
-        		form.populateModel();            	
+        		form.populateModel();
                 goToFormView();
                 break;
             case ResponseEvent.EXIT:
             	 if(form.getXmlModel().getEditID() != -1){ // we are editing
                  	shell.displayModelList();
-                 }else{   
+                 }else{
                 	 shell.createView();
                  }
 				break;
@@ -240,7 +240,7 @@ public class Controller
         iModelRMSSize = this.modelRMS.getNumberOfRecords();
         System.out.println("XForm : " + iXFormRMSSize + "\n" + "Model : " + iModelRMSSize);
     }
- 
+
     private void clearModelData()
     {
         form.getXmlModel().clearData();
@@ -253,13 +253,14 @@ public class Controller
     {
         try
         {
-        	//System.out.println("SAVING MODEL- pre populate: "+form.getXmlModel().toString());            
+        	//System.out.println("SAVING MODEL- pre populate: "+form.getXmlModel().toString());
             Model model = form.getXmlModel();
 			Calendar cd = Calendar.getInstance();
 			Date d = (Date) cd.getTime();
 			String date = J2MEUtil.getStringValue(d,Constants.RETURN_DATE);
-            model.setName(form.getName()+"_"+date);
+            model.setName(form.getName());
             model.setXformReference(form.getRecordId());
+            model.setDateSaved(d);
             System.out.println("under refID:"+form.getRecordId());
             if(model.getEditID() != -1){
             	System.out.println("updating model- ref:"+model.getXformReference());
@@ -339,7 +340,7 @@ public class Controller
 		else{
 			System.out.println(prompt.getBindID()+" bind null");
 		}
-		
+
 		prompter.showPrompt(prompt, promptIndex+1,form.getPrompts().size());
 	}
 
