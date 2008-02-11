@@ -1,8 +1,8 @@
 /*
  * FormList.java
- * 
+ *
  * Created on 2007/10/25, 10:23:19
- * 
+ *
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -23,11 +23,13 @@ import javax.microedition.rms.RecordEnumeration;
 import org.javarosa.clforms.storage.XFormMetaData;
 import org.javarosa.clforms.storage.XFormRMSUtility;
 
+import com.ev.evgetme.getMidlet;
+
 /**
  *
  * @author Munier
  */
-public class FormList extends List implements CommandListener 
+public class FormList extends List implements CommandListener
 {
 	private final Command CMD_EXIT = new Command("Exit", Command.BACK, 2);
 	private final Command CMD_OPEN = new Command("Open", Command.SCREEN, 1);
@@ -36,10 +38,10 @@ public class FormList extends List implements CommandListener
     private final Command CMD_DELETE_FORM = new Command("Delete",Command.SCREEN,4);
     private final Command CMD_SHAREFORMS = new Command("Share Forms", Command.SCREEN, 2);
     private final Command CMD_SETTINGS = new Command("Settings", Command.SCREEN, 3);
-    private XFormRMSUtility xformRMSUtility;   
+    private XFormRMSUtility xformRMSUtility;
     private TransportShell mainShell;
     private Vector formIDs;
-    
+
     public FormList(TransportShell mainShell)
     {
        //super("Forms List", List.EXCLUSIVE);
@@ -48,7 +50,7 @@ public class FormList extends List implements CommandListener
        this.xformRMSUtility = mainShell.getXFormRMSUtility();
        this.createView();
     }
-    
+
     public void createView(){
     	this.deleteAll();
     	this.setTicker(new Ticker("Please select an XForm to load..."));
@@ -77,14 +79,14 @@ public class FormList extends List implements CommandListener
         	System.out.println("chosen indx: "+this.getSelectedIndex()+" recID: "+data.getRecordId());
             this.mainShell.controllerLoadForm(data.getRecordId());
 		}
-    	
+
     	/*if (c == CMD_OPEN)
         {
         	XFormMetaData data = (XFormMetaData) formIDs.elementAt(this.getSelectedIndex());
         	System.out.println("chosen indx: "+this.getSelectedIndex()+" recID: "+data.getRecordId());
             this.mainShell.controllerLoadForm(data.getRecordId());
         }*/
-       
+
         if (c == CMD_DELETE_FORM)
         {
         	XFormMetaData data = (XFormMetaData) formIDs.elementAt(this.getSelectedIndex());
@@ -92,22 +94,22 @@ public class FormList extends List implements CommandListener
             this.mainShell.deleteForm(data.getRecordId());
             createView();
         }
-        
+
         if (c == CMD_EXIT)
         {
             this.mainShell.destroyApp(true);
         }
-        
+
         if (c == CMD_GETNEWFORMS)
         {
-            this.mainShell.displayAvailableXFormMethods();
+            this.mainShell.getNewFormsByTransportPropertySetting();
         }
-        
+
         if (c == CMD_VIEWMODELS)
         {
             this.mainShell.displayModelList();
         }
-        
+
         if (c == CMD_SHAREFORMS)
         {
             this.mainShell.startBToothClient();
@@ -117,12 +119,12 @@ public class FormList extends List implements CommandListener
             this.mainShell.editProperties();
         }
     }
-    
+
     public void populateListWithXForms()
     {
     	this.xformRMSUtility.open();
     	RecordEnumeration recordEnum = this.xformRMSUtility.enumerateMetaData();
-    	formIDs = new Vector();     
+    	formIDs = new Vector();
     	int pos =0;
     	while(recordEnum.hasNextElement())
     	{

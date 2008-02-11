@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
 
-import javax.microedition.io.file.FileSystemRegistry;
-import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -20,46 +18,46 @@ import javax.microedition.midlet.MIDletStateChangeException;
 
 import org.javarosa.clforms.ModelList;
 import org.javarosa.clforms.TransportShell;
+import org.javarosa.clforms.storage.Model;
+import org.javarosa.properties.PropertyManager;
 import org.openmrs.transport.MessageListener;
 import org.openmrs.transport.TransportManager;
 import org.openmrs.transport.TransportMessage;
 import org.openmrs.transport.TransportMethod;
-//#if app.usefileconnections
 import org.openmrs.transport.file.FileConnectionTransportMethod;
-//#endif
 import org.openmrs.transport.http.HttpTransportMethod;
 import org.openmrs.transport.storage.RmsStorage;
 import org.openmrs.transport.util.Logger;
 
 /**
- * 
+ *
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
 public class TransportLayer implements
 		CommandListener, MessageListener {
 
 	/**
-	 * 
+	 *
 	 */
 	private TransportManager transportManager;
 
 	/**
-	 * 
+	 *
 	 */
 	private List mainMenu;
 
 	/**
-	 * 
+	 *
 	 */
 	private List messageList;
 
 	/**
-	 * 
+	 *
 	 */
 	private TextBox loggingTextBox;
 
 	/**
-	 * 
+	 *
 	 */
 	private TextBox messageDetailTextBox;
 
@@ -76,23 +74,23 @@ public class TransportLayer implements
 	private static final Command CMD_DELETEMSG = new Command("Delete message",Command.SCREEN,1);
 
 	/**
-	 * 
+	 *
 	 */
 	private Form urlForm;
-	
+
 	private String destinationUrl;
-	
+
 	private TextField textField;
 
 	private TransportShell shell;
 
-	private String data;
+	private Model data;
 
 	private int currentMethod;
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.microedition.midlet.MIDlet#destroyApp(boolean)
 	 */
 	protected void destroyApp(boolean unconditional)
@@ -105,7 +103,7 @@ public class TransportLayer implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.microedition.midlet.MIDlet#pauseApp()
 	 */
 	protected void pauseApp() {
@@ -114,7 +112,7 @@ public class TransportLayer implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.microedition.midlet.MIDlet#startApp()
 	 */
 	public TransportLayer(TransportShell tShell) {
@@ -150,8 +148,7 @@ public class TransportLayer implements
 		messageDetailTextBox.addCommand(CMD_BACK);
 		messageDetailTextBox.addCommand(CMD_SEND);
 		messageDetailTextBox.setCommandListener(this);
-		createView();
-		System.out.println("here1");
+		//createView();
 
 	}
 
@@ -161,7 +158,7 @@ public class TransportLayer implements
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void populateMessageList() {
 		Enumeration messages = transportManager.getMessages();
@@ -177,21 +174,21 @@ public class TransportLayer implements
 		}
 	}
 
+	public Enumeration getTransportMessages(){
+
+		return transportManager.getMessages();
+	}
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.microedition.lcdui.CommandListener#commandAction(javax.microedition.lcdui.Command,
 	 *      javax.microedition.lcdui.Displayable)
 	 */
 	public void commandAction(Command c, Displayable d) {
 		if (d == mainMenu) {
 			if (c == CMD_BACK) {
-				try {
-					destroyApp(true);
 					shell.createView();
-				} catch (MIDletStateChangeException e) {
-					System.out.println(e);
-				}
 			} else if (c == CMD_OK) {
 				int selected = ((List) mainMenu).getSelectedIndex();
 				System.out.println("Selected: " + selected);
@@ -200,16 +197,7 @@ public class TransportLayer implements
 					ModelList modelList = new ModelList(this.shell,this);
 					break;
 				case 1:
-					urlForm = new Form ("URL");
-					destinationUrl = shell.getAppProperty("destination-url");
-					textField = new TextField("Please enter destination string",
-							destinationUrl,140,TextField.URL);
-					urlForm.append(textField);
-					urlForm.addCommand(CMD_OK);
-					urlForm.addCommand(CMD_BACK);
-					urlForm.setCommandListener(this);
-					this.currentMethod = TransportMethod.HTTP_GCF;
-					Display.getDisplay(shell).setCurrent(urlForm);
+					showURLform();
 					//display.setCurrent(urlForm);
 					break;
 			/*	case 2:
@@ -247,21 +235,18 @@ public class TransportLayer implements
 					}
 					break;*/
 				case 3:
-					messageList.deleteAll();
-					populateMessageList();
-					Display.getDisplay(shell).setCurrent(messageList);
+					showMessageList();
 					//display.setCurrent(messageList);
 					break;
-				
-				
+
+
 				}
 			} else if (c == CMD_DEBUG) {
 				Logger.getInstance().show(Display.getDisplay(shell));
 			}
 		} else if (d == messageList) {
 			if (c == CMD_BACK) {
-				Display.getDisplay(shell).setCurrent(mainMenu);
-				//display.setCurrent(mainMenu);
+				this.shell.displayModelList();
 			} else if (c == CMD_DETAILS) {
 				int selected = messageList.getSelectedIndex();
 				Enumeration messages = transportManager.getMessages();
@@ -278,19 +263,13 @@ public class TransportLayer implements
 				Enumeration messages = transportManager.getMessages();
 				TransportMessage message = (TransportMessage) elementAt(
 						selected, messages);
-				
+
 				transportManager.deleteMessage(message.getRecordId());
-				messageList.deleteAll();
-				populateMessageList();
-				Display.getDisplay(shell).setCurrent(messageList);
-				//display.setCurrent(messageList);
+				showMessageList();
 			}
 		} else if (d == messageDetailTextBox) {
 			if (c == CMD_BACK) {
-				messageList.deleteAll();
-				populateMessageList();
-				Display.getDisplay(shell).setCurrent(messageList);
-				//display.setCurrent(messageList);
+				showMessageList();
 			} else if (c == CMD_SEND) {
 				int selected = messageList.getSelectedIndex();
 				TransportMessage message = (TransportMessage) elementAt(
@@ -300,8 +279,8 @@ public class TransportLayer implements
 		}
 		else if (d == urlForm) {
 			if (c == CMD_BACK) {
-				Display.getDisplay(shell).setCurrent(mainMenu);
-				//display.setCurrent(mainMenu);
+				this.shell.displayModelList();
+//				Display.getDisplay(shell).setCurrent(mainMenu);
 			} else if (c == CMD_OK) {
 				destinationUrl = textField.getString();
 				try {
@@ -312,11 +291,31 @@ public class TransportLayer implements
 				} catch (IOException e) {
 					Logger.log(e);
 				}
-				Display.getDisplay(shell).setCurrent(mainMenu);
-				//display.setCurrent(mainMenu);
+				this.shell.displayModelList();
 			}
-			
+
 		}
+	}
+
+	public void showMessageList() {
+		messageList.deleteAll();
+		populateMessageList();
+		Display.getDisplay(shell).setCurrent(messageList);
+	}
+
+	public void showURLform() {
+		urlForm = new Form ("URL");
+		//destinationUrl = shell.getAppProperty("destination-url");
+		destinationUrl = PropertyManager.instance().getProperty("PostURL");
+		System.out.println("URL PROP: " + destinationUrl);
+		textField = new TextField("Please enter destination string",
+				destinationUrl,140,TextField.URL);
+		urlForm.append(textField);
+		urlForm.addCommand(CMD_OK);
+		urlForm.addCommand(CMD_BACK);
+		urlForm.setCommandListener(this);
+		this.currentMethod = TransportMethod.HTTP_GCF;
+		Display.getDisplay(shell).setCurrent(urlForm);
 	}
 
 	private Object elementAt(int index, Enumeration en) {
@@ -334,58 +333,24 @@ public class TransportLayer implements
 	/**
 	 * @throws IOException
 	 */
-	private void sendDataOrig(int transportMethod) throws IOException {
-		System.out.println("Destination URL: " + destinationUrl);
-
-		String testData = "TESTDATA007";
-		
-		InputStream in = this.getClass()
-				.getResourceAsStream("/testdata.xml");
-		System.out.println("in=" + in);
-		if (in != null) { 
-			InputStreamReader isr;
-			try {
-				isr = new InputStreamReader(in, "UTF-8");
-				StringBuffer buffer = new StringBuffer();
-				int ch;
-				while ((ch = isr.read()) > -1) {
-					buffer.append((char) ch);
-				}
-				testData = buffer.toString();
-				System.out.println(testData);
-			} catch (Exception e) {
-				Logger.log(e);
-			}
-		} else {
-			// use this for testing if data cannot be read from file
-			testData = "TESTDATA007";
-			transportManager.enqueue(testData.getBytes("UTF-8"),
-					destinationUrl, transportMethod);
-		}
-	}
-	
-	
-	/**
-	 * @throws IOException
-	 */
 	private void sendData(int transportMethod) throws IOException {
 		System.out.println("Destination URL: " + destinationUrl);
 
 		if(this.data != null){
-			System.out.println("WANT TO SEND "+this.data);
-			transportManager.enqueue(this.data.getBytes("UTF-8"),
-					destinationUrl, transportMethod);
+			System.out.println("WANT TO SEND "+this.data+this.data.getRecordId());
+			transportManager.enqueue(this.data.toString().getBytes("UTF-8"),
+					destinationUrl, transportMethod,this.data.getRecordId());
 		}else{
 			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,
 					AlertType.ERROR);
 			Display.getDisplay(shell).setCurrent(a,this.mainMenu);
 		}
-			
+
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.openmrs.transport.MessageListener#onMessage(java.lang.String)
 	 */
 	public void onMessage(String message, int messageType) {
@@ -414,8 +379,8 @@ public class TransportLayer implements
 
 	}
 
-	public void setData(String string) {
-		this.data = string;
+	public void setData(Model model) {
+		this.data = model;
 	}
 
 }

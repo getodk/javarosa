@@ -17,10 +17,34 @@ public class J2MEUtil {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+
+	/**
+	 * turns a date into a ddd
+	 *
+	 * @return string
+	 */
+	public static String readableDateFormat(Date date) {
+
+		String stringValue = "";
+		/*if (date == null){
+			//LOG
+			System.out.println("string value null");
+			return stringValue;
+		}
+
+		Calendar cd = Calendar.getInstance();
+		cd.setTime(date);
+
+		String year = "" + cd.get(Calendar.YEAR);
+		String month = "" + (cd.get(Calendar.MONTH)+1);
+		String day = "" + cd.get(Calendar.DAY_OF_MONTH);*/
+		return stringValue;
+	}
+
+
 	/**
 	 * Converts the value object into a String based on the returnType
-	 * 
+	 *
 	 * @return
 	 */
 	public static String getStringValue(Object val, int returnType) {
@@ -41,17 +65,17 @@ public class J2MEUtil {
 				String year = "" + cd.get(Calendar.YEAR);
 				String month = "" + (cd.get(Calendar.MONTH)+1);
 				String day = "" + cd.get(Calendar.DAY_OF_MONTH);
-				
+
 				if (month.length() < 2)
 					month = "0" + month;
-				
+
 				if (day.length() < 2)
 					day = "0" + day;
-				
+
 				stringValue = day + "/" + month + "/" + year;
 			}else
-				stringValue = val.toString();				
-		
+				stringValue = val.toString();
+
 			System.out.println("test1"+stringValue);
 			break;
 		default:
@@ -59,8 +83,8 @@ public class J2MEUtil {
 		}
 		return stringValue;
 	}
-	
-	
+
+
 	public static Object setSelected(Prompt prompt, ChoiceGroup collection) {
 
 		switch (prompt.getReturnType()) {
@@ -72,7 +96,7 @@ public class J2MEUtil {
 					key = (String)prompt.getSelectMap().keyAt(i);
 				}
 			}
-			
+
 			System.out.println(value+"-Key-"+key);
 			for(int i=0; i<collection.size(); i++){
 				if(TextUtil.equalsIgnoreCase(collection.getString(i),key))
@@ -98,9 +122,9 @@ public class J2MEUtil {
 						keys.addElement((String)prompt.getSelectMap().keyAt(j));
 					}
 				}
-				
+
 			}
-			
+
 			for(int i=0; i<collection.size(); i++){
 				if(keys.contains(collection.getString(i)))
 					collection.setSelectedIndex(i,true);
@@ -138,19 +162,19 @@ public class J2MEUtil {
 	public static Date getDateFromString(String value) {
 		Date result = new Date();
 		Vector digits = tokenize(value, '/');
-		
+
 		int day = Integer.valueOf((String)digits.elementAt(0)).intValue();
 		int month = Integer.valueOf((String)digits.elementAt(1)).intValue();
 		month--;
 		int year = Integer.valueOf((String)digits.elementAt(2)).intValue();
-		
+
 		Calendar cd = Calendar.getInstance();
 		cd.set(Calendar.DAY_OF_MONTH, day);
 		cd.set(Calendar.MONTH, month);
 		cd.set(Calendar.YEAR, year);
-		
+
 		result = cd.getTime();
-		
+
 		return result;
 	}
 }

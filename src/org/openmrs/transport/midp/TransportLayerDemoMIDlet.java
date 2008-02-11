@@ -319,7 +319,7 @@ public class TransportLayerDemoMIDlet extends MIDlet implements
 			// use this for testing if data cannot be read from file
 			String testData = "TESTDATA007";
 			transportManager.enqueue(testData.getBytes("UTF-8"),
-					destinationUrl, transportMethod);
+					destinationUrl, transportMethod,0);
 		}
 	}
 

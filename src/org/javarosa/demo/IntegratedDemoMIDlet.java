@@ -39,7 +39,7 @@ import com.ev.evgetme.getMidlet;
 public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell implements CommandListener
 {
     public final static String WORKING_DIRECTORY = "C:/predefgallery/predefphotos/";
-    
+
     private final Command EXIT_CMD = new Command("Close", Command.EXIT, 2);
     private final Command OK_CMD = new Command("Ok", Command.OK, 1);
     private final Command BACK_CMD = new Command("Back", Command.BACK, 1);
@@ -63,7 +63,7 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
     private VisualXFormClient xformClient;
 
     private ModelList modelList;
-    
+
     //public MIDPLogger log;
 
     private TransportLayer transportLayer;
@@ -76,9 +76,9 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
         System.out.println("TransportShell()");
         configureLogger();
         //log.write("STARTING APP",MIDPLogger.DEBUG);
-        
+
         try {
-            
+
             String[] optionsMenu = {"Select XForms", "Review Completed Forms", "Get New Forms", "Submit Completed Forms"};
 
             this.selectFunction = new List("What do you want to do?", List.IMPLICIT, optionsMenu, null);
@@ -93,17 +93,17 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
             //log.write(e.getMessage(),MIDPLogger.DEBUG);
             e.printStackTrace();
         }
-        
+
         //log.write("END tshell.CONST()",MIDPLogger.DEBUG);
         System.out.println(System.getProperty("microedition.profiles"));
     }
-    
+
     private void configureLogger() {
-        
+
        /* try {
          log = new MIDPLogger(MIDPLogger.DEBUG,true,false);
         }
-        catch (Exception e) { 
+        catch (Exception e) {
          System.out.println("Exception creating MIDPLogger");
          e.printStackTrace();
         }*/
@@ -128,14 +128,14 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
     }
 
     public void displayTransportLayer() {
-        transportLayer = new TransportLayer(this);      
+        transportLayer = new TransportLayer(this);
     }
 
     public void displayFormList() {
         System.out.println("TransportShell.displayFormList()");
-        this.formList = new FormList(this);     
+        this.formList = new FormList(this);
     }
-    
+
     public FormList getFormList() {
         System.out.println("TransportShell.getFormList()");
         this.formList = new FormList(this);
@@ -154,13 +154,13 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
 
     private void createAvailableXformsList() {
         System.out.println("TransportShell.createAvailableXformsList()");
-        //"In file system", 
+        //"In file system",
         String[] getNewFormsMenu = {"From File system", "BlueTooth:Receive an XForm", "From URL"};
         this.availableXForms = new List("Where do you want to look for Xforms?", List.IMPLICIT,getNewFormsMenu, null);
         this.availableXForms.setCommandListener(this);
         this.availableXForms.addCommand(BACK_CMD);
     }
-    
+
     private void navigateAvailbleXformsList() {
         switch (this.availableXForms.getSelectedIndex())
         {
@@ -174,11 +174,11 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
             //this.xformClient = new VisualXFormClient(this);
             break;
         case 2:
-            this.getMidlet = new getMidlet(this);
+            this.getMidlet = new getMidlet(this, false);
             break;
         }
     }
-    
+
     public void startBToothClient() {
         //this.xformServer = new VisualXFormServer(this);
     }
@@ -188,8 +188,8 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
         //log.write("IN DESTROY APP",MIDPLogger.DEBUG);
         //log.close();
         System.out.println("Application succesfully destroyed");
-        notifyDestroyed(); 
-        
+        notifyDestroyed();
+
     }
 
     protected void pauseApp()
@@ -213,7 +213,7 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
         this.modelRMS = new ModelRMSUtility(Controller.MODEL_RMS);
         //log.write("POST-initXformUtil",MIDPLogger.DEBUG);
         //log.write("PRE-writeDummy",MIDPLogger.DEBUG);
-        
+
         // get rid of all the previous records
 //      xformRMS.deleteRecord(376);
 //      xformRMS.deleteRecord(377);
@@ -228,8 +228,8 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
 //      xformRMS.deleteRecord(386);
 //      xformRMS.deleteRecord(387);
 //      xformRMS.deleteRecord(388);
-        
-        if (writeDummy)//xformRMS.getNumberOfRecords() == 0)
+
+       if (writeDummy)//(xformRMS.getNumberOfRecords() == 0)//
         {
             System.out.println("***NUMBER OF RECORDS : " + xformRMS.getNumberOfRecords());
             this.xformRMS.writeDummy();
@@ -302,7 +302,7 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
             controllerLoadForm(i);
         }
     }
-    
+
     public void configureController(){
         System.out.println("TransportShell.configureController()");
         formController = new Controller(this);
@@ -334,15 +334,15 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
         formController = new Controller(this);
         formController.deleteModel(i);
     }
-    
-    
+
+
     public void deleteForm(int i) {
         System.out.println("TransportShell.deleteForm()");
         // TODO Refactor this method from controller to Shell
         formController = new Controller(this);
         formController.deleteForm(i);
     }
-    
+
 
     private void openFileIntoNewForm(String fileName)
     {
@@ -354,7 +354,7 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
             System.out.println("FILE SIZE: "+fc.fileSize());
             InputStream fis = fc.openInputStream();
             //So this used to use Double.toInt(), which is a problem because most of these devices
-            //don't have floating point processors, and the libraries don't have the datatype. 
+            //don't have floating point processors, and the libraries don't have the datatype.
             //The Double.toInt() method just cast the long to an integer anyway, so this should do
             //the same thing
             // - Clayton Sims Jan 15, 2008
@@ -365,7 +365,7 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
                 new ByteArrayInputStream(b));
             fis.close();
             fc.close();
-           // first parse form to check correct format 
+           // first parse form to check correct format
             Form form = new Form();
             XMLUtil.parseForm(new InputStreamReader(din), form);
             System.out.println("writing form to: "+this.xformRMS.getNextRecordID()+form.getXmlModel().toString());
@@ -381,7 +381,7 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
             } catch (Exception e) {
                 Display.getDisplay(this).setCurrent(new javax.microedition.lcdui.Alert("save error","Form failed to Load",null,AlertType.ERROR), this.getFormList());
             }
-            
+
             //TextBox viewer = new TextBox("XForm Contents", null, length, TextField.ANY | TextField.UNEDITABLE);
             //viewer.setString(new String(b, 0, length));
             //Display.getDisplay(this).urrent(viewer);
@@ -425,7 +425,7 @@ public class IntegratedDemoMIDlet extends org.javarosa.clforms.TransportShell im
         System.out.println("RMS SIZE BEFORE : " + rms.getNumberOfRecords());
         rms.writeToRMS(frm);
         System.out.println("RMS SIZE AFTER : " + rms.getNumberOfRecords());
-        
+
     }
 
     public TransportLayer getTransportLayer() {

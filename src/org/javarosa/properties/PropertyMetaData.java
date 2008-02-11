@@ -14,11 +14,11 @@ import org.javarosa.clforms.storage.Model;
  */
 public class PropertyMetaData extends MetaDataObject {
     private String name = "";
-    
+
     public PropertyMetaData()
     {
     }
-    
+
     /**
      * Creates a Property Meta Data object for a given property
      * @param property The property whose meta data will be captured
@@ -27,7 +27,7 @@ public class PropertyMetaData extends MetaDataObject {
     {
         setMetaDataParameters(property);
     }
-    
+
     /** (non-Javadoc)
      *  @see org.javarosa.clforms.storage.MetaDataTyped#setMetaDataParemeters(Object)
      */
@@ -35,7 +35,7 @@ public class PropertyMetaData extends MetaDataObject {
         Property property =(Property)originalObject;
         this.name = property.name;
     }
-    
+
     /**
      * Gets the name of the property this object represents
      * @return The name of the property that this object is the meta data for
@@ -43,7 +43,7 @@ public class PropertyMetaData extends MetaDataObject {
     public String getName() {
         return this.name;
     }
-    
+
     /**
      * Sets the name of thie property that this object represents
      * @param name The name of the property that this object is the meta data for
