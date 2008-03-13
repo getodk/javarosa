@@ -12,6 +12,7 @@ public interface TransportMethod {
 	public static final int SERIAL = 2;
 	public static final int BLUETOOTH = 3;
 	public static final int HTTP_IO = 4;
+	public static final int SMS = 5;
 
 	/**
 	 * @param message
