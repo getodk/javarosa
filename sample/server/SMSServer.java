@@ -18,7 +18,6 @@ import org.smslib.MessageTypes;
 import org.smslib.Service;
 import org.smslib.modem.SerialModemGateway;
 
-
 /**
  * For development:
  * 
