@@ -324,6 +324,10 @@ public class Controller
         return formview;
     }
 
+    public int getPromptIndex () {
+    	return promptIndex;
+    }
+    
     /* (non-Javadoc)
      * @see org.javarosa.clforms.IController#setFormview(org.javarosa.clforms.view.FormView)
      */

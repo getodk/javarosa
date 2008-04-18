@@ -8,6 +8,7 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.clforms.Controller;
 import org.javarosa.clforms.MVCComponent;
@@ -18,6 +19,7 @@ import org.javarosa.clforms.view.IPrompter;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
+import de.enough.polish.ui.Gauge;
 
 /***
  * The ChatScreen is a view for Mobile MRS that presents an entire XForm to the user. 
@@ -46,6 +48,8 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
     
     Command exitCommand = new Command("Exit", Command.EXIT, 2);
     
+    Gauge progressBar;
+    
     Stack displayFrames = new Stack();
     Stack prompts = new Stack();
     
@@ -67,6 +71,10 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         this.addSubCommand(backCommand, menuCommand);
         
         this.setCommandListener(this);
+        
+        //#style progressbar
+        progressBar = new Gauge(null, false, 1, 0);
+        append(Graphics.BOTTOM, progressBar);
     }
     
     /**
@@ -161,6 +169,10 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
             MVCComponent.display.setCurrent(this);
             showPrompt(prompt);
         }
+     
+        //droos 4/18/08: in the future we may want to be able to show a 'full' progress bar once the
+        //form has been completed, but this depends on other changes to the end-of-form workflow
+        progressBar.setValue(controller.getPromptIndex());
     }
 
     /**
@@ -174,6 +186,8 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
             topFrame.drawSmallFormOnScreen(this);
         }
         addPrompt(prompt);
+        
+        progressBar.setValue(controller.getPromptIndex());
     }
     
     /**
@@ -188,6 +202,7 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
      */
     public void registerController(Controller controller) {
         this.controller = controller;
+        progressBar.setMaxValue(controller.getForm().getPromptCount());
     }
     /**
      * Handles command events
