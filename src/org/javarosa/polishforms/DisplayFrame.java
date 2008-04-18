@@ -12,6 +12,7 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.StyleSheet;
 import de.enough.polish.ui.TextField;
+import de.enough.polish.ui.Container;
 
 /**
  * DisplayFrames are a UI component used to interact with Prompts.
@@ -148,13 +149,20 @@ public class DisplayFrame {
      * @param target the Screen to which the Frame will be Added
      */
     public void drawSmallFormOnScreen(ChatScreen target) {
-      //#style oldprompttext
-        questiontext = new StringItem(null,questiontext.getText());
-        target.append(questiontext);
-        //#style valueText
-        questionResponse = new StringItem(null,questionValueToString(thePrompt));
-        target.append(questionResponse);
-        displayedItems = new Item[] {questiontext,questionResponse};
+        //#style splitleft
+        questiontext = new StringItem(null, questiontext.getText());   	
+        //#style splitright
+        questionResponse = new StringItem(null, questionValueToString(thePrompt)); 
+    	
+    	//#style split
+    	Container c = new Container(false);
+    	//polish has a quirk where it really wants to impose the parent styling onto the first item in the
+    	//container, even if you explicitly override it with a new style. this null item takes the fall
+    	c.add(new StringItem(null, null));
+        c.add(questiontext);
+        c.add(questionResponse);
+        target.append(c);
+        displayedItems = new Item[] {c};
     }
     
     /**
