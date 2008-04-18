@@ -92,7 +92,11 @@ public class ExternaliseFormMethod {
 		String result = "";
 		//bind
 		if(prompt.getId() != null)
-			result += "bind=\""+prompt.getId()+"\" ";
+			if (prompt.getBindID() != null) {
+				result += "bind=\""+prompt.getId()+"\" ";
+			} else {
+				result += "ref=\"" + prompt.getXpathBinding() + "\"";
+			}
 		return result;
 	}
 
@@ -175,6 +179,9 @@ public class ExternaliseFormMethod {
 		//type
 		if(bind.getType()!=null)
 			result += "type=\"xsd:"+bind.getType()+ "\" ";
+		//relevant
+		if(bind.getRelevancy()!=null)
+			result += "relevant=\"" + bind.getRelevancy() + "\" ";
 		return result;
 	}
 

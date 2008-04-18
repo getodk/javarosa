@@ -203,6 +203,10 @@ public class XMLUtil {
 					prompt.setFormControlType(Constants.SELECT1);
 					prompt.setReturnType(org.javarosa.clforms.api.Constants.RETURN_SELECT1);
 					prompt.setSelectMap(new SimpleOrderedHashtable());
+					String relevant = child.getAttributeValue(null, "relevant"); //$NON-NLS-1$
+					if (relevant != null){
+						prompt.setRelevantString(relevant);
+					}
 					prompt = parseElement(form, child, prompt);
 					form.addPrompt(prompt);
 
@@ -217,6 +221,10 @@ public class XMLUtil {
 					prompt.setFormControlType(Constants.SELECT);
 					prompt.setReturnType(org.javarosa.clforms.api.Constants.RETURN_SELECT_MULTI);
 					prompt.setSelectMap(new SimpleOrderedHashtable());
+					String relevant = child.getAttributeValue(null, "relevant"); //$NON-NLS-1$
+					if (relevant != null){
+						prompt.setRelevantString(relevant);
+					}
 					prompt = parseElement(form, child, prompt);
 					form.addPrompt(prompt);
 
