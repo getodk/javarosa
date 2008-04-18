@@ -29,6 +29,9 @@ public abstract class MetaDataObject implements
         return this.size;
     }
     
+    //declare this here to work around Nokia JVM bug
+    public abstract void setMetaDataParameters(Object originalObject);
+    
     public void setRecordId(int recordId)
     {
         this.recordId = recordId;
