@@ -164,6 +164,11 @@ rightcommand {
 	layout: right;
 }
 
+.progressbar {
+	gauge-mode: continuous;
+	gauge-show-value: false;	
+}
+
 .urlForm{}
 
 .urlInput{}
