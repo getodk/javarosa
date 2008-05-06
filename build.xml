@@ -8,7 +8,7 @@
 	<property file="${polish.home}/global.properties" />
 
 	<!-- Definition of the J2ME Polish task:                      -->
-	<taskdef name="j2mepolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar" />
+	<taskdef name="j2mepolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
 	
 	<!-- Definition of the Test Suite Name:                      -->
 	<property name="test.class.name" value="org.dimagi.ExampleTestCase" />
@@ -79,16 +79,16 @@
 				<!-- Whether to run the obfuscator, which makes reverse engineering the byte-code 
 					 more difficult, and compresses the built JAR -->
 				<!-- obfuscator settings: do not obfuscate when the test-property is true -->
-				<!-- <obfuscator name="ProGuard" unless="test">
+				<obfuscator name="ProGuard" unless="test">
 					<parameter name="optimize" value="true" />
-				</obfuscator> -->
+				</obfuscator>
 
 				<!-- log settings: only use debug setting when the test-property is true -->
 				<debug if="test" showLogOnError="true" verbose="true" level="error">
 					<filter pattern="org.celllife.clforms.*" level="debug" />
 				</debug>
 				<!-- Properties of the actual javac compiler -->
-				<compiler debug="on" classpath="${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${polish.home}/import/microewt_0.92.jar:${wtk.home}/lib/jsr082.jar"/>
+				<compiler debug="on" classpath="${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${polish.home}/import/microewt_0.92.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar"/>
 
 			</build>
 
