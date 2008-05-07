@@ -96,11 +96,14 @@ public class TransportShell extends MIDlet implements CommandListener
 
 			String[] optionsMenu = {"Select XForms", "Review Completed Forms", "Get New Forms", "Submit Completed Forms"};
 
+			// dead?
 			this.selectFunction = new List("What do you want to do?", List.IMPLICIT, optionsMenu, null);
 			this.selectFunction.addCommand(EXIT_CMD);
 			this.selectFunction.addCommand(OK_CMD);
 			selectFunction.setCommandListener(this);
 			this.createAvailableXformsList();
+			//through here?
+			
 			//log.write("PRE-configCntllr",MIDPLogger.DEBUG);
 			configureController();
 			loadProperties();
@@ -175,6 +178,7 @@ public class TransportShell extends MIDlet implements CommandListener
 	    //#endif
 	}
 
+	//dead?
 	private void createAvailableXformsList() {
     	//"In file system",
     	String[] getNewFormsMenu = {"From File system", "BlueTooth:Receive an XForm", "From URL"};
@@ -342,6 +346,33 @@ public class TransportShell extends MIDlet implements CommandListener
         }
     }
 
+	private void loadProperties() {
+		loadAndSetViewType();
+		initProperty("PostURL", Constants.POST_URL);
+		initProperty("GetURL", Constants.GET_URL);
+		initProperty("GetFormsMethod", Constants.GETFORMS_BLUETOOTH);
+	}
+
+	private String initProperty (String propName, String defaultValue) {
+		String propVal = PropertyManager.instance().getProperty(propName);
+		if (propVal == null) {
+			propVal = defaultValue;
+			PropertyManager.instance().setProperty(propName, propVal);
+			System.out.println("No default value for [" + propName + "]; setting to [" + propVal + "]");  //debug
+		}
+		return propVal;
+	}
+
+	private void loadAndSetViewType () {
+		String defaultViewType;
+		//#if polish.usePolishGui
+        defaultViewType = Constants.VIEW_CHATTERBOX;
+        //#else
+        defaultViewType = Constants.VIEW_CLFORMS;
+        //#endif
+		setViewType(initProperty("ViewStyle", defaultViewType));		
+	}
+	
     public void setViewType(String viewType) {
         if(Constants.VIEW_CUSTOMCHAT.equals(viewType)) {
             formController.setPrompter(customChatScreen);
@@ -362,51 +393,7 @@ public class TransportShell extends MIDlet implements CommandListener
         }
         System.out.println("View Type is " + viewType);
     }
-
-	private void loadProperties() {
-
-		loadAndSetViewType();
-		loadDefaultPostURL();
-		loadGetFormsMethod();
-		loadDefaultGetURL();
-
-	}
-
-    private void loadDefaultPostURL() {
-    	String postURL = PropertyManager.instance().getProperty("PostURL");
-        if(postURL == null) {
-            System.out.println("No url yet selected, select default");
-            PropertyManager.instance().setProperty("PostURL", Constants.POST_URL);
-        }
-	}
-
-    private void loadDefaultGetURL() {
-    	String prop = PropertyManager.instance().getProperty("GetURL");
-        if(prop == null)
-        	PropertyManager.instance().setProperty("GetURL", Constants.GET_URL);
-	}
-
-    private void loadGetFormsMethod() {
-    	String prop = PropertyManager.instance().getProperty("GetFormsMethod");
-        if(prop == null)
-        	PropertyManager.instance().setProperty("GetFormsMethod", Constants.GETFORMS_BLUETOOTH);
-}
-
-	public void loadAndSetViewType() {
-        String sviewType = PropertyManager.instance().getProperty("ViewStyle");
-        if(sviewType != null) {
-            setViewType(sviewType);
-        }
-        else {
-            System.out.println("No valid view type property, defaulting to chatterbox");
-            //#if polish.usePolishGui
-            setViewType(Constants.VIEW_CHATTERBOX);
-            //#else
-            setViewType(Constants.VIEW_CLFORMS);
-            //#endif
-        }
-    }
-
+	
 	public void configureController(){
 		formController = new Controller(this);
 	}
