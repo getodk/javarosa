@@ -5,6 +5,7 @@ import java.util.Enumeration;
 import org.javarosa.clforms.storage.Model;
 import org.javarosa.clforms.storage.ModelMetaData;
 
+
 public class ExternaliseFormMethod {
 
 	private Form form;
@@ -80,7 +81,7 @@ public class ExternaliseFormMethod {
 				result += "required=\"true()\" ";	*/	
 			//relevant
 			if(prompt.getRelevantString()!=null)
-				result += "relevant=\""+prompt.getRelevantString()+ "\" ";
+				result += attribute("relevant", prompt.getRelevantString()) + " ";
 		} catch (RuntimeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -93,9 +94,9 @@ public class ExternaliseFormMethod {
 		//bind
 		if(prompt.getId() != null)
 			if (prompt.getBindID() != null) {
-				result += "bind=\""+prompt.getId()+"\" ";
+				result += attribute("bind", prompt.getId()) + " ";
 			} else {
-				result += "ref=\"" + prompt.getXpathBinding() + "\"";
+				result += attribute("ref", prompt.getXpathBinding());
 			}
 		return result;
 	}
@@ -130,9 +131,13 @@ public class ExternaliseFormMethod {
 	}
 
 	private String element(String label, String text) {
-		return "<"+namespace +":"+label+">"+text+"</"+namespace+":"+label+">";
+		return "<" + namespace + ":" + label + ">" + escapeStr(text, false) + "</" + namespace + ":" + label + ">";
 	}
 
+	private String attribute (String attr, String value) {
+		return attr + "=\"" + (value == null ? "" : escapeStr(value, true)) + "\"";
+	}
+	
 	private String writeModel() {
 		String result = "";
 		
@@ -149,8 +154,7 @@ public class ExternaliseFormMethod {
 
 	private String writeBinds() {
 		String result = "";
-		
-		
+			
 		Enumeration enumeration = form.getBindings().elements();
 		while (enumeration.hasMoreElements()) {
 			Binding bind = (Binding) enumeration.nextElement();
@@ -169,19 +173,19 @@ public class ExternaliseFormMethod {
 		String result = "";
 		//id
 		if(bind.getId()!=null)
-			result += "id=\""+bind.getId()+"\" ";
+			result += attribute("id", bind.getId()) + " ";
 		//nodeset
 		if(bind.getNodeset()!=null)
-			result += "nodeset=\""+bind.getNodeset()+ "\" ";
+			result += attribute("nodeset", bind.getNodeset()) + " ";
 		//required
 		if(bind.isRequired())
 			result += "required=\"true()\" ";
 		//type
 		if(bind.getType()!=null)
-			result += "type=\"xsd:"+bind.getType()+ "\" ";
+			result += attribute("type", "xsd:" + bind.getType()) + " ";
 		//relevant
 		if(bind.getRelevancy()!=null)
-			result += "relevant=\"" + bind.getRelevancy() + "\" ";
+			result += attribute("relevant", bind.getRelevancy()) + " ";
 		return result;
 	}
 
@@ -222,7 +226,7 @@ public class ExternaliseFormMethod {
 		ModelMetaData mdata = new ModelMetaData(model);
 		System.out.println("EXTERNALIZE model: "+mdata.toString());
 		
-		result += "id=\""+mdata.getName()+ "\"";
+		result += attribute("id", mdata.getName());
 				
 		return result;
 	}
@@ -234,5 +238,50 @@ public class ExternaliseFormMethod {
 
 	private String writeDocumentFooter() {
 		return "</html>";		
+	}
+	
+	public static String escapeStr (String s, boolean escapeQuotes) {
+		StringBuffer strBuff = new StringBuffer(s);
+		
+		replace(strBuff, "&", "&amp;");
+		replace(strBuff, "<", "&lt;");
+		replace(strBuff, ">", "&gt;");
+		if (escapeQuotes) {
+			replace(strBuff, "\"", "&quot;");
+			replace(strBuff, "'", "&apos;");		
+		}
+		
+		return strBuff.toString();
+	}
+	
+	/* replace all instances of a string in a stringbuffer with another string
+	 * no argument can be null; if findStr is empty string, no replacements are made
+	 * after a replacement is made, searching resumes immediately after the replaced string (no overlapping)
+	 */
+	public static void replace (StringBuffer sb, String findStr, String replStr) {
+		if (findStr.length() == 0)
+			return;
+		
+		for (int i = 0; i <= sb.length() - findStr.length(); i++) {
+			boolean match = true;
+			for (int j = 0; j < findStr.length(); j++) {
+				if (sb.charAt(i + j) != findStr.charAt(j)) {
+					match = false;
+					break;
+				}
+			}
+			
+			if (match) {
+				for (int k = 0; k < Math.min(findStr.length(), replStr.length()); k++)
+					sb.setCharAt(i + k, replStr.charAt(k));
+				if (findStr.length() < replStr.length()) {
+					sb.insert(i + findStr.length(), replStr.substring(findStr.length()));
+				} else {
+					sb.delete(i + replStr.length(), i + findStr.length());
+				}
+				
+				i += replStr.length() - 1;
+			}
+		}
 	}
 }
