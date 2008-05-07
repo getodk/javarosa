@@ -138,7 +138,7 @@ public class XMLUtil {
 				} else if (TextUtil.equalsIgnoreCase(tagname,"body")) { //$NON-NLS-1$
 					parseElement(form, child, null);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"title")) { //$NON-NLS-1$
-					form.setName(child.getText(0).trim());
+					form.setName(getXMLText(child, 0, true));
 				} else if (TextUtil.equalsIgnoreCase(tagname,"model")) { //$NON-NLS-1$
 					// LOG
 					//System.out.println("found and creating Model"+model.toString());
@@ -229,14 +229,14 @@ public class XMLUtil {
 					form.addPrompt(prompt);
 
 				} else if (TextUtil.equalsIgnoreCase(tagname,"label")) { //$NON-NLS-1$
-					label = child.getText(0).trim();
+					label = getXMLText(child, 0, true);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"hint")) { //$NON-NLS-1$
-					existingPrompt.setHint(child.getText(0).trim());
+					existingPrompt.setHint(getXMLText(child, 0, true));
 				} else if (TextUtil.equalsIgnoreCase(tagname,"item")) { //$NON-NLS-1$
 					parseElement(form, child, existingPrompt);
 					// TODO possible need to handle this return
 				} else if (TextUtil.equalsIgnoreCase(tagname,"value")) { //$NON-NLS-1$
-					value = child.getText(0).trim();
+					value = getXMLText(child, 0, true);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"textbox")) {
 					System.out.println("found textbox");
 					Prompt prompt = new Prompt();
@@ -579,4 +579,27 @@ public class XMLUtil {
 		}// end try/catch/finally
 		return responseMessage.toString();
 	}// end sendHttpPost( String )
+	
+	//reads all subsequent text nodes and returns the combined string
+	public static String getXMLText (Node node, int i, boolean trim) {
+		StringBuffer strBuff = null;
+		
+		String text = node.getText(i);
+		if (text == null)
+			return null;
+		
+		for (i++; i < node.getChildCount() && node.getType(i) == Node.TEXT; i++) {
+			if (strBuff == null)
+				strBuff = new StringBuffer(text);
+
+			strBuff.append(node.getText(i));
+		}			
+		if (strBuff != null)
+			text = strBuff.toString();
+		
+		if (trim)
+			text = text.trim();
+		
+		return text;
+	}
 }

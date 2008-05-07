@@ -204,19 +204,18 @@ public class Form implements IDRecordable, Externalizable {
 		else{
 			XPathExpression xpls = new XPathExpression(xmlModel.getXmlModel().getRootElement(), p.getRelevantString());
 			Vector result = xpls.getResult();
+
 			for (Enumeration e = result.elements(); e.hasMoreElements();) {
 				Object obj = e.nextElement();
 				if (obj instanceof Element){
-					for (int i = 0; i < ((Element)obj).getChildCount(); i++) {
-						if (((Element)obj).getType(i)== Node.TEXT){
-							//System.out.println(" val:"+((Element)obj).getText(i));		
-							xpls.getOperation().setValue(((Element)obj).getText(i));
-						}
-					}
+					Element node = (Element)obj;
+					if (node.getChildCount() == 0)
+						break;
+					xpls.getOperation().setValue(XMLUtil.getXMLText(node, 0, true));
 				}
 			}
 			if (xpls.getOperation().getValue()!= null){
-				xpls.getOperation().setArgumentType(p.getReturnType());
+				xpls.getOperation().setArgumentType(p.getReturnType()); //droos: this doesn't seem right
 				boolean relevancy = xpls.getOperation().evaluateBooleanOperation();
 				p.setRelevant(relevancy);
 				if (relevancy == false){
@@ -327,24 +326,26 @@ public class Form implements IDRecordable, Externalizable {
 		
 		// log 		System.out.println("Updating prompt: " + xpath);
 		
+		//droos: i don't think all this looping is necessary-- don't we only support binds that refer
+		//to one and only one node? and mustn't that node contain only text?
 		for (Enumeration e = result.elements(); e.hasMoreElements();) {
 			Object obj = e.nextElement();
 			if (obj instanceof Element){
-				Element node = (Element) obj;
-				for (int i = 0; i < node.getChildCount(); i++) 
-					if (node.getType(i) == Node.TEXT) {
-						value = node.getText(i);//
-						if (defaultVal){
-							Object obVal = prompt.getValueByTypeFromString(value);
-							prompt.setDefaultValue(obVal);
-						}
-						else {
-							Object obVal = prompt.getValueByTypeFromString(value);
-							prompt.setValue(obVal);
-							//LOG
-							System.out.println("Updating prompt: "+prompt.getBindID()+ " with val:"+ value);
-						}
-					}			
+				Element node = (Element)obj;
+				if (node.getChildCount() == 0)
+					break;
+				
+				value = XMLUtil.getXMLText(node, 0, true);
+				
+				if (defaultVal){
+					Object obVal = prompt.getValueByTypeFromString(value);
+					prompt.setDefaultValue(obVal);
+				} else {
+					Object obVal = prompt.getValueByTypeFromString(value);
+					prompt.setValue(obVal);
+					//LOG
+					System.out.println("Updating prompt: "+prompt.getBindID()+ " with val:"+ value);
+				}
 			}
 		}
 	}

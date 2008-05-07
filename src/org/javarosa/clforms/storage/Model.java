@@ -175,7 +175,8 @@ public class Model implements Externalizable, IDRecordable
 			}
 			else if (node.getType(i) == Node.TEXT) {
 				if (node.getText(i).trim().length()==0)
-					node.removeChild(i);
+					node.removeChild(i);  //droos: won't this skip over the next node?
+										  //also, there are circumstances where we wouldn't want to remove this node
 			}
 			else if (node.getType(i) == Node.IGNORABLE_WHITESPACE) {
 				node.removeChild(i);
