@@ -1,0 +1,287 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/2002/xforms"
+	xmlns:ev="http://www.w3.org/2001/xml-events"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<h:head>
+    <h:title>HMIS 033b [draft]: Health Unit Weekly Epidemiological Surveillance Form</h:title>
+    <model>
+	<instance>
+			<HMISFormB xmlns="">
+				<DateOfReport/>
+				<FromDate/>
+				<ToDate/>
+				<HealthUnit/>
+				<HealthUnitCode/>
+				<SubCounty/>
+				<HSD/>
+				<District/>
+				<AcuteFlaccidParalysis>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</AcuteFlaccidParalysis>
+				<AnimalBites>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</AnimalBites>
+				<Rabies>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</Rabies>
+				<Cholera>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</Cholera>
+				<Dysentery>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</Dysentery>
+				<GuineaWorm>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</GuineaWorm>
+				<Malaria>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</Malaria>
+				<Measles>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</Measles>
+				<Meningitis>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</Meningitis>
+				<NeonatalTetanus>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</NeonatalTetanus>
+				<Plague>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</Plague>
+				<YellowFever>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</YellowFever>
+				<OtherViralFevers>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</OtherViralFevers>
+				<OtherEmergingDiseases>
+					<CasesThisWeek/>
+					<DeathsThisWeek/>
+					<CasesLastWeek/>
+					<DeathsLastWeek/>
+				</OtherEmergingDiseases>
+				<ActionsTakenByHealthUnit/>
+				<Remarks/>
+				<NameOfInCharge/>
+				<DistrictUse>
+					<DateReceived/>
+					<DateOfAction/>
+					<ActionTaken/>
+				</DistrictUse> 
+
+			</HMISFormB>		
+	</instance>
+
+		<bind id="a" nodeset="/HMISFormB/DateOfReport" type="xsd:date"/>
+		<bind id="b" nodeset="/HMISFormB/FromDate" type="xsd:date"/>
+		<bind id="c" nodeset="/HMISFormB/ToDate" type="xsd:date"/>
+		<bind id="d" nodeset="/HMISFormB/AcuteFlaccidParalysis/CasesThisWeek" type="xsd:int"/>
+		<bind id="e" nodeset="/HMISFormB/AcuteFlaccidParalysis/DeathsThisWeek" type="xsd:int"/>
+		<bind id="f" nodeset="/HMISFormB/AcuteFlaccidParalysis/CasesLastWeek" type="xsd:int"/>
+		<bind id="g" nodeset="/HMISFormB/AcuteFlaccidParalysis/DeathsLastWeek" type="xsd:int"/>
+		<bind id="h" nodeset="/HMISFormB/AnimalBites/CasesThisWeek" type="xsd:int"/>
+		<bind id="i" nodeset="/HMISFormB/AnimalBites/DeathsThisWeek" type="xsd:int"/>
+		<bind id="j" nodeset="/HMISFormB/AnimalBites/CasesLastWeek" type="xsd:int"/>
+		<bind id="k" nodeset="/HMISFormB/AnimalBites/DeathsLastWeek" type="xsd:int"/>
+		<bind id="l" nodeset="/HMISFormB/Rabies/CasesThisWeek" type="xsd:int"/>
+		<bind id="m" nodeset="/HMISFormB/Rabies/DeathsThisWeek" type="xsd:int"/>
+		<bind id="n" nodeset="/HMISFormB/Rabies/CasesLastWeek" type="xsd:int"/>
+		<bind id="o" nodeset="/HMISFormB/Rabies/DeathsLastWeek" type="xsd:int"/>
+		<bind id="p" nodeset="/HMISFormB/Cholera/CasesThisWeek" type="xsd:int"/>
+		<bind id="q" nodeset="/HMISFormB/Cholera/DeathsThisWeek" type="xsd:int"/>
+		<bind id="r" nodeset="/HMISFormB/Cholera/CasesLastWeek" type="xsd:int"/>
+		<bind id="s" nodeset="/HMISFormB/Cholera/DeathsLastWeek" type="xsd:int"/>
+		<bind id="t" nodeset="/HMISFormB/Dysentery/CasesThisWeek" type="xsd:int"/>
+		<bind id="u" nodeset="/HMISFormB/Dysentery/DeathsThisWeek" type="xsd:int"/>
+		<bind id="v" nodeset="/HMISFormB/Dysentery/CasesLastWeek" type="xsd:int"/>
+		<bind id="w" nodeset="/HMISFormB/Dysentery/DeathsLastWeek" type="xsd:int"/>		
+		<bind id="x" nodeset="/HMISFormB/GuineaWorm/CasesThisWeek" type="xsd:int"/>
+		<bind id="y" nodeset="/HMISFormB/GuineaWorm/DeathsThisWeek" type="xsd:int"/>
+		<bind id="z" nodeset="/HMISFormB/GuineaWorm/CasesLastWeek" type="xsd:int"/>
+		<bind id="aa" nodeset="/HMISFormB/GuineaWorm/DeathsLastWeek" type="xsd:int"/>
+		<bind id="ab" nodeset="/HMISFormB/Malaria/CasesThisWeek" type="xsd:int"/>
+		<bind id="ac" nodeset="/HMISFormB/Malaria/DeathsThisWeek" type="xsd:int"/>
+		<bind id="ad" nodeset="/HMISFormB/Malaria/CasesLastWeek" type="xsd:int"/>
+		<bind id="ae" nodeset="/HMISFormB/Malaria/DeathsLastWeek" type="xsd:int"/>
+		<bind id="af" nodeset="/HMISFormB/Measles/CasesThisWeek" type="xsd:int"/>
+		<bind id="ag" nodeset="/HMISFormB/Measles/DeathsThisWeek" type="xsd:int"/>
+		<bind id="ah" nodeset="/HMISFormB/Measles/CasesLastWeek" type="xsd:int"/>
+		<bind id="ai" nodeset="/HMISFormB/Measles/DeathsLastWeek" type="xsd:int"/>
+		<bind id="aj" nodeset="/HMISFormB/Meningitis/CasesThisWeek" type="xsd:int"/>
+		<bind id="ak" nodeset="/HMISFormB/Meningitis/DeathsThisWeek" type="xsd:int"/>
+		<bind id="al" nodeset="/HMISFormB/Meningitis/CasesLastWeek" type="xsd:int"/>
+		<bind id="am" nodeset="/HMISFormB/Meningitis/DeathsLastWeek" type="xsd:int"/>
+		<bind id="an" nodeset="/HMISFormB/NeonatalTetanus/CasesThisWeek" type="xsd:int"/>
+		<bind id="ao" nodeset="/HMISFormB/NeonatalTetanus/DeathsThisWeek" type="xsd:int"/>
+		<bind id="ap" nodeset="/HMISFormB/NeonatalTetanus/CasesLastWeek" type="xsd:int"/>
+		<bind id="aq" nodeset="/HMISFormB/NeonatalTetanus/DeathsLastWeek" type="xsd:int"/>
+		<bind id="ar" nodeset="/HMISFormB/Plague/CasesThisWeek" type="xsd:int"/>
+		<bind id="as" nodeset="/HMISFormB/Plague/DeathsThisWeek" type="xsd:int"/>
+		<bind id="at" nodeset="/HMISFormB/Plague/CasesLastWeek" type="xsd:int"/>
+		<bind id="au" nodeset="/HMISFormB/Plague/DeathsLastWeek" type="xsd:int"/>
+		<bind id="av" nodeset="/HMISFormB/YellowFever/CasesThisWeek" type="xsd:int"/>
+		<bind id="aw" nodeset="/HMISFormB/YellowFever/DeathsThisWeek" type="xsd:int"/>
+		<bind id="ax" nodeset="/HMISFormB/YellowFever/CasesLastWeek" type="xsd:int"/>
+		<bind id="ay" nodeset="/HMISFormB/YellowFever/DeathsLastWeek" type="xsd:int"/>
+		<bind id="az" nodeset="/HMISFormB/OtherViralFevers/CasesThisWeek" type="xsd:int"/>
+		<bind id="ba" nodeset="/HMISFormB/OtherViralFevers/DeathsThisWeek" type="xsd:int"/>
+		<bind id="bb" nodeset="/HMISFormB/OtherViralFevers/CasesLastWeek" type="xsd:int"/>
+		<bind id="bc" nodeset="/HMISFormB/OtherViralFevers/DeathsLastWeek" type="xsd:int"/>
+		<bind id="bd" nodeset="/HMISFormB/OtherEmergingDiseases/CasesThisWeek" type="xsd:int"/>
+		<bind id="be" nodeset="/HMISFormB/OtherEmergingDiseases/DeathsThisWeek" type="xsd:int"/>
+		<bind id="bf" nodeset="/HMISFormB/OtherEmergingDiseases/CasesLastWeek" type="xsd:int"/>
+		<bind id="bg" nodeset="/HMISFormB/OtherEmergingDiseases/DeathsLastWeek" type="xsd:int"/>
+		<bind id="bh" nodeset="/HMISFormB/DistrictUse/DateReceived" type="xsd:date"/>
+		<bind id="bi" nodeset="/HMISFormB/DistrictUse/DateOfAction" type="xsd:date"/>
+    </model>
+</h:head>			
+<h:body>
+        <input ref="/HMISFormB/DateOfReport">
+     	    <label>Date of Report</label>
+        </input>
+       <input ref="/HMISFormB/FromDate">
+            <label>For period</label>
+        </input>
+        <input ref="/HMISFormB/ToDate">
+            <label>To...</label>
+        </input>
+
+        <input ref="/HMISFormB/HealthUnit">
+            <label>Health Unit</label>
+        </input>
+        <input ref="/HMISFormB/HealthUnitCode">
+            <label>Health Unit Code</label>
+        </input>
+        <input ref="/HMISFormB/SubCounty">
+            <label>Sub-county</label>
+        </input>
+
+        <input ref="/HMISFormB/HSD">
+            <label>HSD</label>
+        </input>
+        <input ref="/HMISFormB/District">
+            <label>District</label>
+        </input>
+
+<input ref="/HMISFormB/AcuteFlaccidParalysis/CasesThisWeek"><label>Acute Flaccid Paralysis: Cases This Week</label></input>
+<input ref="/HMISFormB/AcuteFlaccidParalysis/DeathsThisWeek"><label>Acute Flaccid Paralysis: Deaths This Week</label></input>
+<input ref="/HMISFormB/AcuteFlaccidParalysis/CasesLastWeek"><label>Acute Flaccid Paralysis: Cases Last Week</label></input>
+<input ref="/HMISFormB/AcuteFlaccidParalysis/DeathsLastWeek"><label>Acute Flaccid Paralysis: Deaths Last Week</label></input>
+<input ref="/HMISFormB/AnimalBites/CasesThisWeek"><label>Animal Bites: Cases This Week</label></input>
+<input ref="/HMISFormB/AnimalBites/DeathsThisWeek"><label>Animal Bites: Deaths This Week</label></input>
+<input ref="/HMISFormB/AnimalBites/CasesLastWeek"><label>Animal Bites: Cases Last Week</label></input>
+<input ref="/HMISFormB/AnimalBites/DeathsLastWeek"><label>Animal Bites: Deaths Last Week</label></input>
+<input ref="/HMISFormB/Rabies/CasesThisWeek"><label>Rabies: Cases This Week</label></input>
+<input ref="/HMISFormB/Rabies/DeathsThisWeek"><label>Rabies: Deaths This Week</label></input>
+<input ref="/HMISFormB/Rabies/CasesLastWeek"><label>Rabies: Cases Last Week</label></input>
+<input ref="/HMISFormB/Rabies/DeathsLastWeek"><label>Rabies: Deaths Last Week</label></input>
+<input ref="/HMISFormB/Cholera/CasesThisWeek"><label>Cholera: Cases This Week</label></input>
+<input ref="/HMISFormB/Cholera/DeathsThisWeek"><label>Cholera: Deaths This Week</label></input>
+<input ref="/HMISFormB/Cholera/CasesLastWeek"><label>Cholera: Cases Last Week</label></input>
+<input ref="/HMISFormB/Cholera/DeathsLastWeek"><label>Cholera: Deaths Last Week</label></input>
+<input ref="/HMISFormB/Dysentery/CasesThisWeek"><label>Dysentery: Cases This Week</label></input>
+<input ref="/HMISFormB/Dysentery/DeathsThisWeek"><label>Dysentery: Deaths This Week</label></input>
+<input ref="/HMISFormB/Dysentery/CasesLastWeek"><label>Dysentery: Cases Last Week</label></input>
+<input ref="/HMISFormB/Dysentery/DeathsLastWeek"><label>Dysentery: Deaths Last Week</label></input>
+<input ref="/HMISFormB/GuineaWorm/CasesThisWeek"><label>Guinea Worm: Cases This Week</label></input>
+<input ref="/HMISFormB/GuineaWorm/DeathsThisWeek"><label>Guinea Worm: Deaths This Week</label></input>
+<input ref="/HMISFormB/GuineaWorm/CasesLastWeek"><label>Guinea Worm: Cases Last Week</label></input>
+<input ref="/HMISFormB/GuineaWorm/DeathsLastWeek"><label>Guinea Worm: Deaths Last Week</label></input>
+<input ref="/HMISFormB/Malaria/CasesThisWeek"><label>Malaria: Cases This Week</label></input>
+<input ref="/HMISFormB/Malaria/DeathsThisWeek"><label>Malaria: Deaths This Week</label></input>
+<input ref="/HMISFormB/Malaria/CasesLastWeek"><label>Malaria: Cases Last Week</label></input>
+<input ref="/HMISFormB/Malaria/DeathsLastWeek"><label>Malaria: Deaths Last Week</label></input>
+<input ref="/HMISFormB/Measles/CasesThisWeek"><label>Measles: Cases This Week</label></input>
+<input ref="/HMISFormB/Measles/DeathsThisWeek"><label>Measles: Deaths This Week</label></input>
+<input ref="/HMISFormB/Measles/CasesLastWeek"><label>Measles: Cases Last Week</label></input>
+<input ref="/HMISFormB/Measles/DeathsLastWeek"><label>Measles: Deaths Last Week</label></input>
+<input ref="/HMISFormB/Meningitis/CasesThisWeek"><label>Meningitis: Cases This Week</label></input>
+<input ref="/HMISFormB/Meningitis/DeathsThisWeek"><label>Meningitis: Deaths This Week</label></input>
+<input ref="/HMISFormB/Meningitis/CasesLastWeek"><label>Meningitis: Cases Last Week</label></input>
+<input ref="/HMISFormB/Meningitis/DeathsLastWeek"><label>Meningitis: Deaths Last Week</label></input>
+<input ref="/HMISFormB/NeonatalTetanus/CasesThisWeek"><label>Neonatal tetanus: Cases This Week</label></input>
+<input ref="/HMISFormB/NeonatalTetanus/DeathsThisWeek"><label>Neonatal tetanus: Deaths This Week</label></input>
+<input ref="/HMISFormB/NeonatalTetanus/CasesLastWeek"><label>Neonatal tetanus: Cases Last Week</label></input>
+<input ref="/HMISFormB/NeonatalTetanus/DeathsLastWeek"><label>Neonatal tetanus: Deaths Last Week</label></input>
+<input ref="/HMISFormB/Plague/CasesThisWeek"><label>Plague: Cases This Week</label></input>
+<input ref="/HMISFormB/Plague/DeathsThisWeek"><label>Plague: Deaths This Week</label></input>
+<input ref="/HMISFormB/Plague/CasesLastWeek"><label>Plague: Cases Last Week</label></input>
+<input ref="/HMISFormB/Plague/DeathsLastWeek"><label>Plague: Deaths Last Week</label></input>
+<input ref="/HMISFormB/YellowFever/CasesThisWeek"><label>Yellow Fever: Cases This Week</label></input>
+<input ref="/HMISFormB/YellowFever/DeathsThisWeek"><label>Yellow Fever: Deaths This Week</label></input>
+<input ref="/HMISFormB/YellowFever/CasesLastWeek"><label>Yellow Fever: Cases Last Week</label></input>
+<input ref="/HMISFormB/YellowFever/DeathsLastWeek"><label>Yellow Fever: Deaths Last Week</label></input>
+<input ref="/HMISFormB/OtherViralFevers/CasesThisWeek"><label>Other Viral Heamorrhagic Fevers: Cases This Week</label></input>
+<input ref="/HMISFormB/OtherViralFevers/DeathsThisWeek"><label>Other Viral Heamorrhagic Fevers: Deaths This Week</label></input>
+<input ref="/HMISFormB/OtherViralFevers/CasesLastWeek"><label>Other Viral Heamorrhagic Fevers: Cases Last Week</label></input>
+<input ref="/HMISFormB/OtherViralFevers/DeathsLastWeek"><label>Other Viral Heamorrhagic Fevers: Deaths Last Week</label></input>
+<input ref="/HMISFormB/OtherEmergingDiseases/CasesThisWeek"><label>Other emerging infectious diseases: Cases This Week</label></input>
+<input ref="/HMISFormB/OtherEmergingDiseases/DeathsThisWeek"><label>Other emerging infectious diseases: Deaths This Week</label></input>
+<input ref="/HMISFormB/OtherEmergingDiseases/CasesLastWeek"><label>Other emerging infectious diseases: Cases Last Week</label></input>
+<input ref="/HMISFormB/OtherEmergingDiseases/DeathsLastWeek"><label>Other emerging infectious diseases: Deaths Last Week</label></input>
+
+
+		<input ref="/HMISFormB/ActionsTakenByHealthUnit">
+			<label>Actions taken by the health unit</label>
+		</input>
+		<input ref="/HMISFormB/Remarks">
+			<label>Remarks</label>
+		</input>
+		<input ref="/HMISFormB/NameOfInCharge">
+			<label>Name of in-charge</label>
+		</input>
+
+		<input ref="/HMISFormB/DistrictUse/DateReceived">
+			<label>District Use: Date Received</label>
+		</input>
+		<input ref="/HMISFormB/DistrictUse/DateOfAction">
+			<label>District Use: Date of Action</label>
+		</input>
+		<input ref="/HMISFormB/DistrictUse/ActionTaken">
+			<label>District Use: Action Taken</label>
+		</input>
+
+</h:body>
+</h:html>
+
+
+

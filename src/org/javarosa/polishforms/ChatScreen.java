@@ -38,11 +38,11 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
 
     Command menuCommand = new Command("Menu", Command.SCREEN, 2);
 
-    Command selectCommand = new Command("Select", Command.BACK, 1);
+    Command selectCommand = new Command("Select", Command.SCREEN, 1);
     
     Command backCommand = new Command("Back", Command.BACK, 3);
     
-    Command saveAndReloadCommand = new Command("Save and Reload", Command.SCREEN, 3);
+    Command saveAndReloadCommand = new Command("Save and Start Over", Command.SCREEN, 3);
     
     Command saveAndExitCommand = new Command("Save and Exit", Command.SCREEN, 3);
     
@@ -164,7 +164,7 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
     public void displayPrompt(Prompt prompt) {
         System.out.println("Display Prompt");
         if (checkFinishedWithForm(prompt)) {
-            commandAction(this.saveAndExitCommand, this);
+            commandAction(this.saveAndExitCommand, this);           
         } else {
             MVCComponent.display.setCurrent(this);
             showPrompt(prompt);
