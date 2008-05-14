@@ -139,8 +139,8 @@ public class Controller
     	System.out.println("in load form id:"+recordId);
 //    	ExampleForm ef = new ExampleForm();
 //        form = ef.getXFormObject();
-    	DummyForm df = new DummyForm();
-    	form = df.getXFormObject();
+    	//DummyForm df = new DummyForm();
+    	//form = df.getXFormObject();
     	form = new Form(); //storageManager.getForm(recordId);
     	try {
     		this.xformRMS.retrieveFromRMS(recordId, form);
@@ -205,6 +205,12 @@ public class Controller
                 form.loadPromptsDefaultValues();
                 promptIndex = 0;
                 formview.displayPrompt(form.getPrompt(promptIndex));
+                break;
+            case ResponseEvent.SAVE_AND_EXIT:
+                checkRMSstatus();
+                form.populateModel();
+                saveFormModel();
+                clearModelData();
                 break;
             case ResponseEvent.GOTO:
                 form.updateModel(form.getPrompt(promptIndex));

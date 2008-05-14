@@ -1,5 +1,7 @@
 package org.javarosa.clforms.storage;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Vector;
 
 import javax.microedition.rms.InvalidRecordIDException;
@@ -8,6 +10,7 @@ import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.javarosa.clforms.api.Form;
+import org.javarosa.clforms.xml.XMLUtil;
 import org.javarosa.demo.ExampleForm;
 
 /**
@@ -87,8 +90,9 @@ public class XFormRMSUtility extends RMSUtility {
 	}
 
 	public void writeDummy() {
-
 		this.open();
+		
+		/*
 		DummyForm dummy = new DummyForm();
 		dummy.setDemo();
 		//this.writeBytesToRMS(dummy.getData(), new XFormMetaData(dummy.getXFormObject()));
@@ -96,6 +100,18 @@ public class XFormRMSUtility extends RMSUtility {
 //		ExampleForm ef = new ExampleForm();
 //		this.writeToRMS(ef.getXFormObject(),new XFormMetaData(ef.getXFormObject()));
 		System.out.println("Dummy Record ID : ");
+		*/
+
+		writeFormFromResource("/hmis-a_draft.xhtml");
+		writeFormFromResource("/hmis-b_draft.xhtml");		
+		writeFormFromResource("/shortform.xhtml");	
+	}
+
+	private void writeFormFromResource (String resource) {
+		InputStream is = getClass().getResourceAsStream(resource);
+		InputStreamReader isr = new InputStreamReader(is);
+		Form xform = XMLUtil.parseForm(isr);
+		writeToRMS(xform, new XFormMetaData(xform));
 	}
 
 	public int getIDfromName(String name) {
