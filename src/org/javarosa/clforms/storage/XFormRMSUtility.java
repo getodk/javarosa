@@ -13,6 +13,9 @@ import org.javarosa.clforms.api.Form;
 import org.javarosa.clforms.xml.XMLUtil;
 import org.javarosa.demo.ExampleForm;
 
+import org.javarosa.dtree.storage.CDCXFormDemo;
+import org.javarosa.dtree.storage.CDCXForms;
+
 /**
  *
  * @author Munier
@@ -90,9 +93,8 @@ public class XFormRMSUtility extends RMSUtility {
 	}
 
 	public void writeDummy() {
+		/* ORIGINAL SCHEME
 		this.open();
-		
-		/*
 		DummyForm dummy = new DummyForm();
 		dummy.setDemo();
 		//this.writeBytesToRMS(dummy.getData(), new XFormMetaData(dummy.getXFormObject()));
@@ -102,9 +104,23 @@ public class XFormRMSUtility extends RMSUtility {
 		System.out.println("Dummy Record ID : ");
 		*/
 
+		/* NEW RESOURCE-BASED SCHEME */
 		writeFormFromResource("/hmis-a_draft.xhtml");
 		writeFormFromResource("/hmis-b_draft.xhtml");		
 		writeFormFromResource("/shortform.xhtml");	
+		
+		
+		/* LOAD CDC-TZ FORMS
+        this.open();
+//      CDCXForms cdcXForm = new CDCXForms();
+        CDCXFormDemo cdcXForm = new CDCXFormDemo();
+        cdcXForm.setDemo();		
+        System.out.println("Storing sample Xform");
+//      Form form = cdcXForm.getXFormObject();
+//      XFormMetaData metaData = new XFormMetaData(cdcXForm.getXFormObject()); 
+		this.writeToRMS(cdcXForm.getXFormObject(), new XFormMetaData(cdcXForm.getXFormObject()));
+        System.out.println("CDCXForm Stored ");
+		*/
 	}
 
 	private void writeFormFromResource (String resource) {

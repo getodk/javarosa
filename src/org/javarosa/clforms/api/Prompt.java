@@ -3,15 +3,16 @@ package org.javarosa.clforms.api;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Enumeration;
 
 import javax.microedition.lcdui.DateField;
 import javax.microedition.lcdui.List;
 
 import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.clforms.util.SimpleOrderedHashtable;
+import org.javarosa.dtree.i18n.*;
 
-
-public class Prompt {
+public class Prompt implements ILocalizable {
 
 	private String id;
 	private int formControlType;
@@ -27,12 +28,23 @@ public class Prompt {
 	private int selectedIndex = -1;
 	private String hint;
 	private SimpleOrderedHashtable selectMap;
+	private SimpleOrderedHashtable localizedSelectMap;
 	private String xpathBinding;
 	private String relevantString;
 	private String bindID;
 	private int labelPosition;
 	private Binding bind;
 
+    private String appearanceString;
+	private String typeString;
+	private SimpleOrderedHashtable selectGraphDataMap;
+    private int [] controlDataArray;
+    
+    private String longTextId = null;
+    private String shortTextId = null;
+    private String hintTextId = null;
+    private String selectMapId = null;
+	
 	public Binding getBind() {
 		return bind;
 	}
@@ -44,6 +56,8 @@ public class Prompt {
 	public Prompt() {
 		super();
 		relevantString = null;
+		appearanceString = null;
+		typeString = null;
 		// TODO Auto-generated constructor stub
 	}
 
@@ -138,6 +152,21 @@ public class Prompt {
 
 	public void setValue(Object value) {
 			this.value = value;
+            if(selectedIndex == -1 && localizedSelectMap != null && value != null) {
+                int i = 0;
+
+                Enumeration itr = localizedSelectMap.keys();
+                while(itr.hasMoreElements()) {
+                    String key = (String)itr.nextElement();
+
+                    if(value.equals((String)localizedSelectMap.get(key))) {
+                        selectedIndex = i;
+                        break;
+                    }
+
+                    i++;
+                }
+            }    
 	}
 
 	public int getSelectedIndex() {
@@ -165,6 +194,32 @@ public class Prompt {
 		// TODO set value from string (based on return type)
 	}
 
+	private void updateLocalizedSelectMap(ILocalizer localizer){
+        if(selectMap == null) 
+            return;
+        if(localizedSelectMap != null) {
+            localizedSelectMap.clear();
+        }
+        
+        Enumeration itr = selectMap.keys();
+        			
+        	while(itr.hasMoreElements()){
+        		String key = (String)itr.nextElement();
+                String localizedKey = localizer.getText(key);
+                
+                if(localizedKey == null ||localizedKey.equals("")) {
+                    ILocalizer defaultLocalizer = XFormsLocaleManager.getDefaultLocalizer();
+                    localizedKey = defaultLocalizer.getText(key);
+                }
+                String value = (String) selectMap.get(key);
+                if(localizedKey != null){
+                    	localizedSelectMap.put(localizedKey, value);
+                } else {
+                        localizedSelectMap.put(key, value);
+                }
+        	}
+	}
+	
 	/**
 	 * Converts the value object into a String based on the returnType
 	 * 
@@ -198,12 +253,27 @@ public class Prompt {
 		return stringValue;
 	}*/
 
+	public SimpleOrderedHashtable getLocalizedSelectMap() {
+		return localizedSelectMap;
+	}
+	
 	public SimpleOrderedHashtable getSelectMap() {
 		return selectMap;
 	}
 
 	public void setSelectMap(SimpleOrderedHashtable selectMap) {
 		this.selectMap = selectMap;
+        this.localizedSelectMap = new SimpleOrderedHashtable();
+	}
+
+	public void setSelectLabelValue(String label, String value){
+        this.selectMap.put(label, value);
+    }
+
+	public void setSelectLabelValue(String label, String value, 
+		ILocalizer localizer){
+		this.selectMap.put(label, value);
+		updateLocalizedSelectMap(localizer);
 	}
 
 	public String getXpathBinding() {
@@ -264,10 +334,6 @@ public class Prompt {
 		}
 		
 		return result;	
-		
-		
-		
-		
 	}	
 	
 	public int getLabelPosition() {
@@ -278,4 +344,114 @@ public class Prompt {
 		this.labelPosition = labelPosition;
 	}
 	
+    public void setAppearanceString(String appearance) {
+        this.appearanceString = appearance;
+    }
+ 
+    public String getAppearanceString() {
+        return this.appearanceString;
+    }
+
+    public void setTypeString(String type) {
+        this.typeString = type;
+    }
+
+    public String getTypeString() {
+        return this.typeString;
+    }
+   
+    public int[] getControlDataArray() {
+        return controlDataArray;
+    }
+    
+    public void setControlDataArray(int [] controlDataArray) {
+        this.controlDataArray = controlDataArray;
+    }
+
+    public String getLongTextId() {
+        return longTextId;
+    }
+    
+     public void setLongTextId(String textId, ILocalizer localizer) {
+            longTextId = textId + ";long";
+        if(localizer != null) {
+            longText =  localizer.getText(longTextId );
+        }
+    }
+     
+    public String getShortTextId() {
+        return shortTextId;
+    }
+    
+    public void setShortTextId(String textId, ILocalizer localizer) {
+        shortTextId = textId + ";short";
+        //localizer.addAvailableLocale()
+        
+        if(localizer != null) {
+            shortText = localizer.getText(shortTextId );        
+        }
+    } 
+    
+    public String getHintTextId() {
+        return hintTextId;
+    }
+    
+    public void setHintTextId(String textId, ILocalizer localizer) {
+        hintTextId = textId + ";hint";
+        if(localizer != null) {
+            hint = localizer.getText(hintTextId);
+        }
+    }
+    
+    public String getSelectMapId() {
+        return selectMapId;
+    }
+    
+    public void setSelectMapId(String textId, ILocalizer localizer) {
+        selectMapId = textId;
+        if(localizer != null) {
+            selectMap = localizer.getSelectMap(selectMapId);
+        }
+    }
+    
+    public String getLocalizedLabel(String labelId, ILocalizer localizer) {
+        String localizedLabel = null;
+        if(localizer != null)
+            localizedLabel = localizer.getText(labelId);
+        return localizedLabel;
+    }
+    
+    public void localeChanged(String locale, ILocalizer localizer) {
+       updateLocalizedSelectMap(localizer);
+        if(longTextId != null) {
+           longText = localizer.getText(longTextId);
+           if(longText != null && longText.equals("")) {
+               longText = XFormsLocaleManager.getDefaultLocalizer().getText(longTextId);
+           }
+        }
+
+        if(shortTextId != null) {
+            shortText = localizer.getText(shortTextId);
+            if(shortText != null && shortText.equals("")) {
+               shortText = XFormsLocaleManager.getDefaultLocalizer().getText(shortTextId);
+            }
+        }
+
+        if(hintTextId != null) {
+            hint = localizer.getText(hintTextId);
+            if(hint != null && hint.equals("")) {
+               hint = XFormsLocaleManager.getDefaultLocalizer().getText(hintTextId);
+            }
+        }
+        
+//        if(value != null) {
+//            if(this.formControlType == Constants.SELECT1) {
+//                if(getSelectedIndex() != -1) {
+//                    String selectValue = (String) localizedSelectMap.keyAt(selectedIndex);
+//            	setValue(selectValue); 
+//                }
+//            }
+//            
+//      }
+    }
 }

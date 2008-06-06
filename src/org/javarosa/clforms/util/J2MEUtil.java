@@ -78,6 +78,24 @@ public class J2MEUtil {
 
 			System.out.println("test1"+stringValue);
 			break;
+        case Constants.RETURN_SELECT_MULTI:
+            String returnString = "";
+            
+            if(val instanceof String){
+                stringValue = val.toString();
+            }else if(val instanceof int[]){
+                int[] intValue = (int [])val;
+                for(int j = 0; j < intValue.length; j++){
+                    returnString = returnString + String.valueOf(intValue[j]) + ",";
+                }
+                returnString = returnString.substring(0,returnString.length() - 1);
+                stringValue = returnString;
+            }
+     break;
+     // Addition ends here
+			
+			
+			
 		default:
 			stringValue = val.toString();
 		}
@@ -177,4 +195,33 @@ public class J2MEUtil {
 
 		return result;
 	}
+	
+	/**
+     * split a string similar to StringTokenizer
+     * @param originalString The String is passed to the function
+     * @return String[] it returns the splitted string into one dimensional array.
+     **/
+    public static String[] split(String original) {
+        Vector nodes = new Vector();
+        String separator = ",";
+        // Parse nodes into vector
+        int index = original.indexOf(separator);
+        while(index>=0) {
+            nodes.addElement( original.substring(0, index) );
+            original = original.substring(index+separator.length());
+            index = original.indexOf(separator);
+        }
+        // Get the last node
+        nodes.addElement( original );
+        
+        // Create splitted string array
+        String[] result = new String[ nodes.size() ];
+        if( nodes.size()>0 ) {
+            for(int loop=0; loop<nodes.size(); loop++) {
+                result[loop] = (String)nodes.elementAt(loop);
+            }
+            
+        }
+        return result;
+    }	
 }

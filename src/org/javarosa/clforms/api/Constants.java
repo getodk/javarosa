@@ -9,6 +9,9 @@ public class Constants {
 	public static final int RETURN_SELECT1 = 4;
 	public static final int RETURN_SELECT_MULTI = 5;
 	public static final int RETURN_BOOLEAN = 6;
+	public static final int RETURN_OUTPUT = 8;
+	public static final int RETURN_TRIGGER = 9;
+	public static final int RETURN_OUTPUT_GRAPH = 10;
 
 	//form control types
 	public static final int INPUT = 1;
@@ -17,14 +20,19 @@ public class Constants {
 	public static final int TEXTAREA = 4;
 	public static final int SECRET = 5;
 	public static final int OUTPUT = 6;
-	public static final int UPLOAD = 4;
-	public static final int RANGE = 5;
-	public static final int SUBMIT = 6;
+	public static final int UPLOAD = 7;
+	public static final int RANGE = 8;
+	public static final int SUBMIT = 9;
 
 	// Dimagi form control types
 	public static final int TEXTBOX = 10;
 	public static final int DROPDOWN = 11;
 
+	public static final int TRIGGER = 12;
+	public static final int SELECT1_MINIMAL_START = 13;
+	public static final int SELECT1_MINIMAL_END = 14;
+	public static final int OUTPUT_GRAPH = 15;
+	
 	// View Types
     public static final String VIEW_CHATTERBOX = "v_chatterbox";
     public static final String VIEW_CUSTOMCHAT = "v_customchatter";

@@ -61,12 +61,12 @@ public class TransportShell extends MIDlet implements CommandListener
     private boolean writeDummy = false;
 
 
-    private ChatScreenForm customChatScreen = new ChatScreenForm();
+    private ChatScreenForm customChatScreen;
     //#if polish.usePolishGui
-    private ChatScreen chatScreen = new ChatScreen();
+    private ChatScreen chatScreen;
     //#endif
-    private PromptScreen promptScreen = new PromptScreen();
-    private FormViewScreen formViewScreen = new FormViewScreen();
+    private PromptScreen promptScreen;
+    private FormViewScreen formViewScreen;
 
 	private FormList formList;
 
@@ -89,11 +89,17 @@ public class TransportShell extends MIDlet implements CommandListener
 
     public TransportShell()
     {
-    	configureLogger();
-    	//log.write("STARTING APP",MIDPLogger.DEBUG);
-
         try {
+            customChatScreen = new ChatScreenForm();
+            //#if polish.usePolishGui
+            chatScreen = new ChatScreen();
+            //#endif
+            promptScreen = new PromptScreen();
+            formViewScreen = new FormViewScreen();
 
+        	configureLogger();
+        	//log.write("STARTING APP",MIDPLogger.DEBUG);
+            
 			String[] optionsMenu = {"Select XForms", "Review Completed Forms", "Get New Forms", "Submit Completed Forms"};
 
 			// dead?

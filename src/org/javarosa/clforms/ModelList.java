@@ -32,6 +32,7 @@ import org.javarosa.clforms.storage.Model;
 import org.javarosa.clforms.storage.ModelMetaData;
 import org.javarosa.clforms.storage.ModelRMSUtility;
 import org.javarosa.clforms.storage.XFormRMSUtility;
+import org.javarosa.dtree.i18n.XFormsLocaleManager;
 import org.openmrs.transport.TransportMessage;
 import org.openmrs.transport.midp.TransportLayer;
 
@@ -111,26 +112,30 @@ public class ModelList extends List implements CommandListener
         {
             try
             {
-            	ModelMetaData data = (ModelMetaData) modelIDs.elementAt(this.getSelectedIndex());
-            	System.out.println(data.toString());
-                Form selectedForm = new Form();
-                System.out.println("Attempt retreive: "+data.getXformReference());
-                this.xformRMSUtility.retrieveFromRMS(data.getXformReference(), selectedForm);
-                System.out.println("Form retrieve OK\nAttempt retreive model: "+data.getRecordId());
-                Model model = new Model();
-                this.modelRMSUtility.retrieveFromRMS(data.getRecordId(), model);
-                model.setEditID(data.getRecordId());
-                // TODO the setRecordID for forms needs to be done at load time
-                selectedForm.setRecordId(data.getXformReference());
-                selectedForm.updatePromptsDefaultValues();
-                selectedForm.setXmlModel(model);
-                selectedForm.updatePromptsValues();
-             // TODO fix this so IDs are in form objects properly
-                selectedForm.setName(this.xformRMSUtility.getName(data.getXformReference()));
-                System.out.println("Model retrieve OK:"+model.toString()+"\nAttempt FormLoad model: ");
-                this.mainShell.controllerLoadForm(selectedForm);
-            }
-            catch (Exception ex)//IOException ex)
+            	if (this.getSelectedIndex() == -1) {
+            		//error
+            	} else {
+            		ModelMetaData data = (ModelMetaData) modelIDs.elementAt(this.getSelectedIndex());
+            		System.out.println(data.toString());
+            		Form selectedForm = new Form();
+            		XFormsLocaleManager.registerComponent(selectedForm);
+            		System.out.println("Attempt retreive: "+data.getXformReference());
+            		this.xformRMSUtility.retrieveFromRMS(data.getXformReference(), selectedForm);
+            		System.out.println("Form retrieve OK\nAttempt retreive model: "+data.getRecordId());
+            		Model model = new Model();
+            		this.modelRMSUtility.retrieveFromRMS(data.getRecordId(), model);
+            		model.setEditID(data.getRecordId());
+            		// TODO the setRecordID for forms needs to be done at load time
+            		selectedForm.setRecordId(data.getXformReference());
+            		selectedForm.updatePromptsDefaultValues();
+            		selectedForm.setXmlModel(model);
+            		selectedForm.updatePromptsValues();
+            		// TODO fix this so IDs are in form objects properly
+            		selectedForm.setName(this.xformRMSUtility.getName(data.getXformReference()));
+            		System.out.println("Model retrieve OK:"+model.toString()+"\nAttempt FormLoad model: ");
+            		this.mainShell.controllerLoadForm(selectedForm);
+            	}
+            } catch (Exception ex)//IOException ex)
             {
                 ex.printStackTrace();
             }

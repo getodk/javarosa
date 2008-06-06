@@ -3,7 +3,7 @@
 	  xmlns:ev="http://www.w3.org/2001/xml-events"
 	  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 <h:head>
-    <h:title>HMIS 033a [draft]: Health Unit Notifiable Disease Report</h:title>
+    <h:title>HMIS 033a: Health Unit Notifiable Disease Report</h:title>
     <model>
 	<instance>
 		<HMISFormA xmlns="">
@@ -106,11 +106,6 @@
 			<ActionsTakenByHealthUnit/>
 			<Remarks/>
 			<NameOfInCharge/>
-			<DistrictUse>
-				<DateReceived/>
-				<DateOfAction/>
-				<ActionTaken/>
-			</DistrictUse>
 
 			<internal>
 				<more1/><more2/><more3/><more4/><more5/>
@@ -120,7 +115,7 @@
 		
 	<bind id="a" nodeset="/HMISFormA/DateOfReport" type="xsd:date"/>
 	<bind id="b" nodeset="/HMISFormA/ReportNumberThisYear" type="xsd:int"/>
-	<bind id="c" nodeset="/HMISFormA/FinancialYear" type="xsd:gYear"/>
+	<bind id="c" nodeset="/HMISFormA/FinancialYear" type="xsd:int"/>
 	<bind id="p1a" nodeset="/HMISFormA/Patients/Patient1/PatientNumber" type="xsd:int"/>
 	<bind id="p1b" nodeset="/HMISFormA/Patients/Patient1/Age" type="xsd:int"/>
 	<bind id="p1c" nodeset="/HMISFormA/Patients/Patient1/DateOfOnset" type="xsd:date"/>
@@ -139,19 +134,17 @@
 	<bind id="p6a" nodeset="/HMISFormA/Patients/Patient6/PatientNumber" type="xsd:int"/>
 	<bind id="p6b" nodeset="/HMISFormA/Patients/Patient6/Age" type="xsd:int"/>
 	<bind id="p6c" nodeset="/HMISFormA/Patients/Patient6/DateOfOnset" type="xsd:date"/>
-	<bind id="d" nodeset="/HMISFormA/DistrictUse/DateReceived" type="xsd:date"/>
-	<bind id="e" nodeset="/HMISFormA/DistrictUse/DateOfAction" type="xsd:date"/>
     </model>
 </h:head>			
 <h:body>
 
-        <input ref="/HMISFormA/DateOfReport">
+        <input bind="a">
             <label>Date of Report</label>
         </input>
-        <input ref="/HMISFormA/ReportNumberThisYear">
+        <input bind="b">
             <label>Report number this year</label>
         </input>
-        <input ref="/HMISFormA/FinancialYear">
+        <input bind="c">
             <label>Financial Year</label>
         </input>
 	
@@ -168,24 +161,41 @@
             <label>District</label>
         </input>
 
-        <input ref="/HMISFormA/DiseaseDiagnosis">
-            <label>Disease diagnosis</label>
-        </input>
+ 	<select1 ref="/HMISFormA/DiseaseDiagnosis">
+		<label>Disease diagnosis</label>
+		<item><label>Acute Flaccid Paralysis</label><value>Acute Flaccid Paralysis</value></item>
+		<item><label>Animal Bites</label><value>Animal Bites</value></item>
+		<item><label>Dysentery</label><value>Dysentery</value></item>
+		<item><label>Malaria</label><value>Malaria</value></item>
+		<item><label>Meningitis</label><value>Meningitis</value></item>
+		<item><label>Other</label><value>Other</value></item>
+	</select1>
 
+	<select1 ref="/HMISFormA/DiseaseDiagnosis" relevant="/HMISFormA/DiseaseDiagnosis='Other'">
+		<label>Disease diagnosis (continued)</label>
+		<item><label>Rabies</label><value>Rabies</value></item>
+		<item><label>Cholera</label><value>Cholera</value></item>
+		<item><label>Guinea Worm</label><value>Guinea Worm</value></item>
+		<item><label>Measles</label><value>Measles</value></item>
+		<item><label>Neonatal Tetanus</label><value>Neonatal Tetanus</value></item>
+		<item><label>Plague</label><value>Plague</value></item>
+		<item><label>Yellow Fever</label><value>Yellow Fever</value></item>
+		<item><label>Other Viral Heamorrhagic Fevers</label><value>Other Viral Heamorrhagic Fevers</value></item>
+		<item><label>Other Emerging Infectious Diseases</label><value>Other Emerging Infectious Diseases</value></item>
+		<item><label>Other</label><value>Other</value></item>
+	</select1>
 
-
-	
-		<input ref="/HMISFormA/Patients/Patient1/PatientNumber"><label>Patient 1: Patient #</label></input>
+		<input bind="p1a"><label>Patient 1: Patient #</label></input>
 		<input ref="/HMISFormA/Patients/Patient1/Name"><label>Patient 1: Name</label></input>
 		<select1 ref="/HMISFormA/Patients/Patient1/Sex"><label>Patient 1: Sex</label>
 			<item><label>Male</label><value>m</value></item>
 			<item><label>Female</label><value>f</value></item>
 		</select1>
-		<input ref="/HMISFormA/Patients/Patient1/Age"><label>Patient 1: Age</label></input>
+		<input bind="p1b"><label>Patient 1: Age</label></input>
 		<input ref="/HMISFormA/Patients/Patient1/Village"><label>Patient 1: Village</label></input>
 		<input ref="/HMISFormA/Patients/Patient1/Parish"><label>Patient 1: Parish</label></input>
 		<input ref="/HMISFormA/Patients/Patient1/Symptoms"><label>Patient 1: Symptoms and Signs</label></input>
-		<input ref="/HMISFormA/Patients/Patient1/DateOfOnset"><label>Patient 1: Date of Onset</label></input>
+		<input bind="p1c"><label>Patient 1: Date of Onset</label></input>
 		<select1 ref="/HMISFormA/Patients/Patient1/Confirmed"><label>Patient 1: Clinically Confirmed?</label>
 			<item><label>Yes</label><value>y</value></item>
 			<item><label>No</label><value>n</value></item>
@@ -209,17 +219,17 @@
 
 
 		
-		<input relevant="/HMISFormA/internal/more1='yes'" ref="/HMISFormA/Patients/Patient2/PatientNumber"><label>Patient 2: Patient #</label></input>
+		<input relevant="/HMISFormA/internal/more1='yes'" bind="p2a"><label>Patient 2: Patient #</label></input>
 		<input relevant="/HMISFormA/internal/more1='yes'" ref="/HMISFormA/Patients/Patient2/Name"><label>Patient 2: Name</label></input>
 		<select1 relevant="/HMISFormA/internal/more1='yes'" ref="/HMISFormA/Patients/Patient2/Sex"><label>Patient 2: Sex</label>
 			<item><label>Male</label><value>m</value></item>
 			<item><label>Female</label><value>f</value></item>
 		</select1>
-		<input relevant="/HMISFormA/internal/more1='yes'" ref="/HMISFormA/Patients/Patient2/Age"><label>Patient 2: Age</label></input>
+		<input relevant="/HMISFormA/internal/more1='yes'" bind="p2b"><label>Patient 2: Age</label></input>
 		<input relevant="/HMISFormA/internal/more1='yes'" ref="/HMISFormA/Patients/Patient2/Village"><label>Patient 2: Village</label></input>
 		<input relevant="/HMISFormA/internal/more1='yes'" ref="/HMISFormA/Patients/Patient2/Parish"><label>Patient 2: Parish</label></input>
 		<input relevant="/HMISFormA/internal/more1='yes'" ref="/HMISFormA/Patients/Patient2/Symptoms"><label>Patient 2: Symptoms and Signs</label></input>
-		<input relevant="/HMISFormA/internal/more1='yes'" ref="/HMISFormA/Patients/Patient2/DateOfOnset"><label>Patient 2: Date of Onset</label></input>
+		<input relevant="/HMISFormA/internal/more1='yes'" bind="p2c"><label>Patient 2: Date of Onset</label></input>
 		<select1 relevant="/HMISFormA/internal/more1='yes'" ref="/HMISFormA/Patients/Patient2/Confirmed"><label>Patient 2: Clinically Confirmed?</label>
 			<item><label>Yes</label><value>y</value></item>
 			<item><label>No</label><value>n</value></item>
@@ -244,17 +254,17 @@
 
 
 
-		<input relevant="/HMISFormA/internal/more2='yes'" ref="/HMISFormA/Patients/Patient3/PatientNumber"><label>Patient 3: Patient #</label></input>
+		<input relevant="/HMISFormA/internal/more2='yes'" bind="p3a"><label>Patient 3: Patient #</label></input>
 		<input relevant="/HMISFormA/internal/more2='yes'" ref="/HMISFormA/Patients/Patient3/Name"><label>Patient 3: Name</label></input>
 		<select1 relevant="/HMISFormA/internal/more2='yes'" ref="/HMISFormA/Patients/Patient3/Sex"><label>Patient 3: Sex</label>
 			<item><label>Male</label><value>m</value></item>
 			<item><label>Female</label><value>f</value></item>
 		</select1>
-		<input relevant="/HMISFormA/internal/more2='yes'" ref="/HMISFormA/Patients/Patient3/Age"><label>Patient 3: Age</label></input>
+		<input relevant="/HMISFormA/internal/more2='yes'" bind="p3b"><label>Patient 3: Age</label></input>
 		<input relevant="/HMISFormA/internal/more2='yes'" ref="/HMISFormA/Patients/Patient3/Village"><label>Patient 3: Village</label></input>
 		<input relevant="/HMISFormA/internal/more2='yes'" ref="/HMISFormA/Patients/Patient3/Parish"><label>Patient 3: Parish</label></input>
 		<input relevant="/HMISFormA/internal/more2='yes'" ref="/HMISFormA/Patients/Patient3/Symptoms"><label>Patient 3: Symptoms and Signs</label></input>
-		<input relevant="/HMISFormA/internal/more2='yes'" ref="/HMISFormA/Patients/Patient3/DateOfOnset"><label>Patient 3: Date of Onset</label></input>
+		<input relevant="/HMISFormA/internal/more2='yes'" bind="p3c"><label>Patient 3: Date of Onset</label></input>
 		<select1 relevant="/HMISFormA/internal/more2='yes'" ref="/HMISFormA/Patients/Patient3/Confirmed"><label>Patient 3: Clinically Confirmed?</label>
 			<item><label>Yes</label><value>y</value></item>
 			<item><label>No</label><value>n</value></item>
@@ -279,17 +289,17 @@
 
 
 
-		<input relevant="/HMISFormA/internal/more3='yes'" ref="/HMISFormA/Patients/Patient4/PatientNumber"><label>Patient 4: Patient #</label></input>
+		<input relevant="/HMISFormA/internal/more3='yes'" bind="p4a"><label>Patient 4: Patient #</label></input>
 		<input relevant="/HMISFormA/internal/more3='yes'" ref="/HMISFormA/Patients/Patient4/Name"><label>Patient 4: Name</label></input>
 		<select1 relevant="/HMISFormA/internal/more3='yes'" ref="/HMISFormA/Patients/Patient4/Sex"><label>Patient 4: Sex</label>
 			<item><label>Male</label><value>m</value></item>
 			<item><label>Female</label><value>f</value></item>
 		</select1>
-		<input relevant="/HMISFormA/internal/more3='yes'" ref="/HMISFormA/Patients/Patient4/Age"><label>Patient 4: Age</label></input>
+		<input relevant="/HMISFormA/internal/more3='yes'" bind="p4b"><label>Patient 4: Age</label></input>
 		<input relevant="/HMISFormA/internal/more3='yes'" ref="/HMISFormA/Patients/Patient4/Village"><label>Patient 4: Village</label></input>
 		<input relevant="/HMISFormA/internal/more3='yes'" ref="/HMISFormA/Patients/Patient4/Parish"><label>Patient 4: Parish</label></input>
 		<input relevant="/HMISFormA/internal/more3='yes'" ref="/HMISFormA/Patients/Patient4/Symptoms"><label>Patient 4: Symptoms and Signs</label></input>
-		<input relevant="/HMISFormA/internal/more3='yes'" ref="/HMISFormA/Patients/Patient4/DateOfOnset"><label>Patient 4: Date of Onset</label></input>
+		<input relevant="/HMISFormA/internal/more3='yes'" bind="p4c"><label>Patient 4: Date of Onset</label></input>
 		<select1 relevant="/HMISFormA/internal/more3='yes'" ref="/HMISFormA/Patients/Patient4/Confirmed"><label>Patient 4: Clinically Confirmed?</label>
 			<item><label>Yes</label><value>y</value></item>
 			<item><label>No</label><value>n</value></item>
@@ -314,17 +324,17 @@
 
 
 
-		<input relevant="/HMISFormA/internal/more4='yes'" ref="/HMISFormA/Patients/Patient5/PatientNumber"><label>Patient 5: Patient #</label></input>
+		<input relevant="/HMISFormA/internal/more4='yes'" bind="p5a"><label>Patient 5: Patient #</label></input>
 		<input relevant="/HMISFormA/internal/more4='yes'" ref="/HMISFormA/Patients/Patient5/Name"><label>Patient 5: Name</label></input>
 		<select1 relevant="/HMISFormA/internal/more4='yes'" ref="/HMISFormA/Patients/Patient5/Sex"><label>Patient 5: Sex</label>
 			<item><label>Male</label><value>m</value></item>
 			<item><label>Female</label><value>f</value></item>
 		</select1>
-		<input relevant="/HMISFormA/internal/more4='yes'" ref="/HMISFormA/Patients/Patient5/Age"><label>Patient 5: Age</label></input>
+		<input relevant="/HMISFormA/internal/more4='yes'" bind="p5b"><label>Patient 5: Age</label></input>
 		<input relevant="/HMISFormA/internal/more4='yes'" ref="/HMISFormA/Patients/Patient5/Village"><label>Patient 5: Village</label></input>
 		<input relevant="/HMISFormA/internal/more4='yes'" ref="/HMISFormA/Patients/Patient5/Parish"><label>Patient 5: Parish</label></input>
 		<input relevant="/HMISFormA/internal/more4='yes'" ref="/HMISFormA/Patients/Patient5/Symptoms"><label>Patient 5: Symptoms and Signs</label></input>
-		<input relevant="/HMISFormA/internal/more4='yes'" ref="/HMISFormA/Patients/Patient5/DateOfOnset"><label>Patient 5: Date of Onset</label></input>
+		<input relevant="/HMISFormA/internal/more4='yes'" bind="p5c"><label>Patient 5: Date of Onset</label></input>
 		<select1 relevant="/HMISFormA/internal/more4='yes'" ref="/HMISFormA/Patients/Patient5/Confirmed"><label>Patient 5: Clinically Confirmed?</label>
 			<item><label>Yes</label><value>y</value></item>
 			<item><label>No</label><value>n</value></item>
@@ -349,17 +359,17 @@
 
 
 
-		<input relevant="/HMISFormA/internal/more5='yes'" ref="/HMISFormA/Patients/Patient6/PatientNumber"><label>Patient 6: Patient #</label></input>
+		<input relevant="/HMISFormA/internal/more5='yes'" bind="p6a"><label>Patient 6: Patient #</label></input>
 		<input relevant="/HMISFormA/internal/more5='yes'" ref="/HMISFormA/Patients/Patient6/Name"><label>Patient 6: Name</label></input>
 		<select1 relevant="/HMISFormA/internal/more5='yes'" ref="/HMISFormA/Patients/Patient6/Sex"><label>Patient 6: Sex</label>
 			<item><label>Male</label><value>m</value></item>
 			<item><label>Female</label><value>f</value></item>
 		</select1>
-		<input relevant="/HMISFormA/internal/more5='yes'" ref="/HMISFormA/Patients/Patient6/Age"><label>Patient 6: Age</label></input>
+		<input relevant="/HMISFormA/internal/more5='yes'" bind="p6b"><label>Patient 6: Age</label></input>
 		<input relevant="/HMISFormA/internal/more5='yes'" ref="/HMISFormA/Patients/Patient6/Village"><label>Patient 6: Village</label></input>
 		<input relevant="/HMISFormA/internal/more5='yes'" ref="/HMISFormA/Patients/Patient6/Parish"><label>Patient 6: Parish</label></input>
 		<input relevant="/HMISFormA/internal/more5='yes'" ref="/HMISFormA/Patients/Patient6/Symptoms"><label>Patient 6: Symptoms and Signs</label></input>
-		<input relevant="/HMISFormA/internal/more5='yes'" ref="/HMISFormA/Patients/Patient6/DateOfOnset"><label>Patient 6: Date of Onset</label></input>
+		<input relevant="/HMISFormA/internal/more5='yes'" bind="p6c"><label>Patient 6: Date of Onset</label></input>
 		<select1 relevant="/HMISFormA/internal/more5='yes'" ref="/HMISFormA/Patients/Patient6/Confirmed"><label>Patient 6: Clinically Confirmed?</label>
 			<item><label>Yes</label><value>y</value></item>
 			<item><label>No</label><value>n</value></item>
@@ -386,16 +396,6 @@
 		</input>
 		<input ref="/HMISFormA/NameOfInCharge">
 			<label>Name of in-charge</label>
-		</input>
-
-		<input ref="/HMISFormA/DistrictUse/DateReceived">
-			<label>District Use: Date Received</label>
-		</input>
-		<input ref="/HMISFormA/DistrictUse/DateOfAction">
-			<label>District Use: Date of Action</label>
-		</input>
-		<input ref="/HMISFormA/DistrictUse/ActionTaken">
-			<label>District Use: Action Taken</label>
 		</input>
 </h:body>
 </h:html>

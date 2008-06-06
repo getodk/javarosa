@@ -4,7 +4,7 @@ import java.util.Enumeration;
 
 import org.javarosa.clforms.storage.Model;
 import org.javarosa.clforms.storage.ModelMetaData;
-
+import org.javarosa.dtree.i18n.XFormsLocaleManager;
 
 public class ExternaliseFormMethod {
 
@@ -63,8 +63,19 @@ public class ExternaliseFormMethod {
 		Enumeration enumeration = prompt.getSelectMap().elements();
 		while (keys.hasMoreElements()) {
 			result += "<"+namespace+":item>"+formatting;
-			String label = (String) keys.nextElement();
-			result += element("label",label)+formatting;
+			String label = (String) keys.nextElement();			
+            String labelRefId = "";
+            if(prompt.getLocalizedLabel(label, XFormsLocaleManager.getLocalizer()) != null) {
+                String refId = label;
+                refId = "jr:itext('" + refId + "')";
+                refId = "ref =\"" + refId +"\"";
+                label = prompt.getLocalizedLabel(label, XFormsLocaleManager.getLocalizer());
+                
+                result += elementWithRefId("label", "", refId) + formatting;
+            } else {
+                result += element("label",label)+formatting;
+            }
+			
 			String value = (String) enumeration.nextElement();
 			result += element("value",value)+formatting;
 			result += "</"+namespace+":item>"+formatting;
@@ -82,6 +93,15 @@ public class ExternaliseFormMethod {
 			//relevant
 			if(prompt.getRelevantString()!=null)
 				result += attribute("relevant", prompt.getRelevantString()) + " ";
+			
+            // Set appearance attribute
+            if(prompt.getAppearanceString()!=null)
+            	result += attribute("appearance", prompt.getAppearanceString()) + " ";
+            
+            // To support type attribute
+            if(prompt.getTypeString()!=null)
+            	result += attribute("type", prompt.getTypeString()) + " ";
+			
 		} catch (RuntimeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,6 +134,13 @@ public class ExternaliseFormMethod {
 		case Constants.SELECT:
 			result += "select ";
 			break;
+        case Constants.TRIGGER:
+            result += "trigger ";
+            break;                          
+        case Constants.OUTPUT_GRAPH:
+        case Constants.OUTPUT:
+            result += "output ";
+            break;     
 		}
 		
 		return result;
@@ -121,19 +148,44 @@ public class ExternaliseFormMethod {
 
 	private String writeCommonElements(Prompt prompt) {
 		String result = "";
-		//label 
-		if(prompt.getLongText()!=null)
-			result+= element("label",prompt.getLongText())+formatting;
-		//hint
-		if(prompt.getHint()!=null)
-			result+= element("hint",prompt.getHint())+formatting;
-		return result;
+
+		String longTextId = "";
+        if(prompt.getLongText() != null) {
+            if(prompt.getLongTextId() != null) {
+                longTextId = prompt.getLongTextId().substring(0, prompt.getLongTextId().indexOf(";long"));
+                longTextId = "jr:itext('" + longTextId + "')";
+                longTextId = "ref =\"" + longTextId +"\"";
+                
+                result+= elementWithRefId("label", "", longTextId) + formatting;
+            } else {
+                result+= element("label", prompt.getLongText())+formatting;
+            }     
+        }
+        
+        String hintTextId = "";
+        if(prompt.getHint()!=null) {
+            if(prompt.getHintTextId() != null) {
+                hintTextId = prompt.getHintTextId().substring(0, prompt.getHintTextId().indexOf(";hint"));
+                hintTextId = "jr:itext('" + hintTextId + "')";
+                hintTextId = "ref =\"" + hintTextId +"\"";
+                result+= elementWithRefId("hint", "", hintTextId) + formatting;
+            } else {
+                result+= element("hint",prompt.getHint())+formatting;
+            }
+            
+        }
+	
+        return result;
 	}
 
 	private String element(String label, String text) {
 		return "<" + namespace + ":" + label + ">" + escapeStr(text, false) + "</" + namespace + ":" + label + ">";
 	}
 
+	private String elementWithRefId(String label, String text, String refId) {        
+		return "<" + namespace + ":" + label + " " + refId +" >" + escapeStr(text, false) + "</" + namespace + ":" + label + ">";
+	}
+	
 	private String attribute (String attr, String value) {
 		return attr + "=\"" + (value == null ? "" : escapeStr(value, true)) + "\"";
 	}
@@ -142,6 +194,8 @@ public class ExternaliseFormMethod {
 		String result = "";
 		
 		result += writeModelOpen()+formatting;
+		
+        result += writeItext()+formatting;
 		
 		result += writeInstance()+formatting;
 		
@@ -239,6 +293,26 @@ public class ExternaliseFormMethod {
 	private String writeDocumentFooter() {
 		return "</html>";		
 	}
+	
+    private String writeItext() {
+         String result = "";
+         
+         result += "<itext>"+formatting;
+         
+         result += writeItextData()+formatting;
+         
+         result += "</itext>";
+         
+         return result;
+     }
+
+    private String writeItextData() {
+    	String result = "";
+     
+    	result += form.getXmlModel().returnItextData();
+     
+    	return result;
+    }
 	
 	public static String escapeStr (String s, boolean escapeQuotes) {
 		StringBuffer strBuff = new StringBuffer(s);

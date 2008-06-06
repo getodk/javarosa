@@ -16,10 +16,18 @@ import org.javarosa.clforms.api.Prompt;
 import org.javarosa.clforms.api.ResponseEvent;
 import org.javarosa.clforms.view.FormView;
 import org.javarosa.clforms.view.IPrompter;
+import org.javarosa.view.widget.chart.*;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.Gauge;
+import java.util.Vector;
+import org.javarosa.dtree.i18n.*;
+import javax.microedition.lcdui.Canvas;
+
+import de.enough.polish.ui.UiAccess;
+import java.util.Enumeration;
+
 
 /***
  * The ChatScreen is a view for Mobile MRS that presents an entire XForm to the user. 
@@ -55,6 +63,13 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
     
     int currentPromptIndex = -1;
     
+    Vector langCommandLabel = new Vector();
+    
+    public static int countXForm = 0;
+
+    Command languageCommand = new Command("Select Language", Command.SCREEN, 2);
+
+    
     /**
      * Creates a ChatScreen, and loads the menus
      */
@@ -64,6 +79,7 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
 
         this.addCommand(menuCommand);
         this.addCommand(selectCommand);
+        this.addCommand(languageCommand);
         
         this.addSubCommand(exitCommand, menuCommand);
         this.addSubCommand(saveAndReloadCommand, menuCommand);
@@ -118,12 +134,25 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         return -1;
     }
     
+    public int  removeChart(LineChart chart) {
+        for(int i=0; i < this.size(); i++) {
+            if(this.get(i).equals(chart)) {
+                this.delete(i);
+                return i;
+            }
+        }
+        return -1;
+    }
+    
     /**
      * Exits this form
      */
     private void exitForm() {
         controller.processEvent(new ResponseEvent(ResponseEvent.EXIT, -1));
         clearForm();
+        
+        XFormsLocaleManager.unRegisterComponent(this.controller.getForm());
+        this.controller.setForm(null);
     }
     
     private void popPrompt() {
@@ -162,6 +191,14 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
      * we're either starting or finishing a form
      */
     public void displayPrompt(Prompt prompt) {
+        String []availableLocales = XFormsLocaleManager.getAvailableLocales();
+        for(int i=0; i < availableLocales.length; i++){
+                if(!langCommandLabel.contains(availableLocales[i])) {
+                    UiAccess.addSubCommand(new Command(availableLocales[i], Command.SCREEN, 1), languageCommand,this);
+                    langCommandLabel.addElement(availableLocales[i]);
+                }
+        }
+    	
         System.out.println("Display Prompt");
         if (checkFinishedWithForm(prompt)) {
             commandAction(this.saveAndExitCommand, this);           
@@ -208,6 +245,7 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
      * Handles command events
      */
     public void commandAction(Command command, Displayable s) {
+    	String label = command.getLabel();
         try {
             if (command == selectCommand) {
                 selectPressed();
@@ -229,7 +267,10 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
             }
             else if (command == exitCommand){
                 exitForm();
-            }
+            } else {
+                XFormsLocaleManager.setLocale(label);
+                refreshDisplay();
+            }  
             
         } catch (Exception e) {
             Alert a = new Alert("error.screen" + " 2"); //$NON-NLS-1$
@@ -250,5 +291,36 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
             }
         }
     }
+    
+    public void refreshDisplay() {
+        Enumeration displayEnum = displayFrames.elements();
+        while(displayEnum.hasMoreElements()){
+     	   DisplayFrame frame = (DisplayFrame) displayEnum.nextElement();
+     	   frame.refreshDisplayFrame(this);
+        }
+     }
+      /**
+      * This function is used to handle the keypressed Events
+      * @param keyCode integer is passed to the function
+      *
+      **/
+     public void keyPressed(int keyCode) {
+         super.keyPressed(keyCode);
+         if(keyCode == Canvas.KEY_POUND) {
+             String nextLocale = XFormsLocaleManager.getNextLocale();
+             String currentLocale = XFormsLocaleManager.getLocale();
+             if(currentLocale.equals(nextLocale)){
+                 nextLocale = XFormsLocaleManager.getNextLocale();
+                 XFormsLocaleManager.setLocale(nextLocale);
+                 refreshDisplay();
+                 // System.out.println("Current Language is :- "  + nextLocale);
+             } else { 
+                 XFormsLocaleManager.setLocale(nextLocale);
+                 refreshDisplay();
+                 // System.out.println("Current Language is :- "  + nextLocale);
+             }
+             
+         }
+     }
 }
 //#endif

@@ -3,13 +3,14 @@
 	  xmlns:ev="http://www.w3.org/2001/xml-events"
 	  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 <h:head>
-    <h:title>short form for testing</h:title>
+    <h:title>Short Test Fuzzorm</h:title>
     <model>
 	<instance>
 		<testdata xmlns="">
 			<val1/>
 			<val2/>
 			<val3/>
+			<ignore/>
 		</testdata>
 	</instance>
 		
@@ -20,12 +21,14 @@
         <input ref="/testdata/val1">
             <label>question 1</label>
         </input>
-        <input ref="/testdata/val2">
+        <input ref="/testdata/val2" relevant="/testdata/val1='a'">
             <label>question 2</label>
         </input>
-        <input ref="/testdata/val3">
+        <select1 ref="/testdata/val3" relevant="/testdata/val1='a'">
             <label>question 3</label>
-        </input>
+            <item><label>choice 1</label><value>val1</value></item>
+            <item><label>choice 2</label><value>val2</value></item>
+        </select1>
             
 </h:body>
 </h:html>
