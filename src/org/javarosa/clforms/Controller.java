@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
-
 import org.javarosa.clforms.api.Constants;
 import org.javarosa.clforms.api.Form;
 import org.javarosa.clforms.api.Prompt;
@@ -20,6 +19,8 @@ import org.javarosa.clforms.view.FormView;
 import org.javarosa.clforms.view.IPrompter;
 import org.javarosa.demo.ExampleForm;
 import org.javarosa.properties.PropertyRMSUtility;
+import org.javarosa.dtree.i18n.XFormsLocaleManager;
+
 public class Controller
 {
 
@@ -142,6 +143,7 @@ public class Controller
     	//DummyForm df = new DummyForm();
     	//form = df.getXFormObject();
     	form = new Form(); //storageManager.getForm(recordId);
+    	XFormsLocaleManager.registerComponent(form);
     	try {
     		this.xformRMS.retrieveFromRMS(recordId, form);
     		// TODO Sort this out so that the recordID is added in the deserialisation

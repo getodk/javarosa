@@ -51,6 +51,7 @@ title {
 }
 
 focused{
+	label-style: choiceGroupLabel;
 	background: none;
 	border-type: round-rect;
 	border-arc: 6;
@@ -71,6 +72,16 @@ focused{
 	margin-bottom: 3;
 	margin-left: 1;
 	margin-right: 1;
+    focused-style: textboxfocused;
+    textfield-direct-input: true;
+}
+
+.textboxfocused{
+    layout: horizontal-center | expand;
+    textfield-caret-color: red;
+	textfield-show-length: true;
+    background: default;
+    background-color: white;
 }
 
 choiceGroup extends textBox {
@@ -79,18 +90,30 @@ choiceGroup extends textBox {
 
 .choiceGroupLabel {
 	font-face: proportional;
-	font-size: large;
+	font-size: medium;
 	layout: horizontal-center | newline-after;
 }
 
 .yesNoChoiceGroup extends choicegroup{
 	view-type: midp2;
+	include-label: true;
 }
 
 .choiceItem {
 	margin: 2;
 	icon-image-align: bottom;
 	font-size: large;
+    include-label: true;
+    background-color: white;
+    focused-style: focused;
+}
+
+.stringItem extends textBox{
+    background-color: white;
+	padding: 3;
+    layout: horizontal-center | newline-after | expand;
+	font-color: black;
+	font-size: small;
 }
 
 .yesNoItem {
@@ -103,6 +126,7 @@ choiceGroup extends textBox {
 	padding: 2;
 	background-color: gray;
 	layout: bottom | horizontal-center;
+	include-label: true;
 }
 	
 .questiontext extends textBox{
@@ -203,3 +227,17 @@ rightcommand {
 .urlForm{}
 
 .urlInput{}
+
+.lineChart {
+    layout: center | expand;
+    label-style: choiceGroupLabel;
+	focused-style: graphfocused;
+	padding: 3;
+	font-color: gray;
+	font-size: small;
+}
+
+.graphfocused{
+    background: default;
+    background-color: white;
+}

@@ -16,13 +16,15 @@ import org.javarosa.clforms.storage.IDRecordable;
 import org.javarosa.clforms.storage.Model;
 import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.clforms.xml.XMLUtil;
+import org.javarosa.dtree.i18n.ILocalizable;
+import org.javarosa.dtree.i18n.ILocalizer;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 
 
 //import java.lang.Locale;
 
-public class Form implements IDRecordable, Externalizable {
+public class Form implements IDRecordable, Externalizable, ILocalizable {
 
 	private String name;
 	private Vector prompts;
@@ -148,6 +150,12 @@ public class Form implements IDRecordable, Externalizable {
 	 * @param prompt
 	 */
 	public void updateModel(Prompt prompt) {
+		//techendeavour graph stuff
+        int [] controlDataArray = null;
+        int arrCount = 0;
+        if(prompt.getFormControlType() == Constants.OUTPUT_GRAPH) {
+            controlDataArray = prompt.getControlDataArray();
+        }		
 		
 		String xpath = prompt.getXpathBinding();
 		String value = J2MEUtil.getStringValue(prompt.getValue(), prompt.getReturnType());
@@ -166,8 +174,13 @@ public class Form implements IDRecordable, Externalizable {
 					for (int i = 0; i < ((Element)obj).getChildCount(); i++) {
 						if (((Element)obj).getType(i) == Node.TEXT){
 							((Element) obj).removeChild(i);
-							((Element) obj).addChild(i,Node.TEXT, value);	
-							//System.out.println("added1 "+value);
+                            if(prompt.getFormControlType() == Constants.OUTPUT_GRAPH) {
+                                ((Element) obj).addChild(i,Node.TEXT, new String("" + controlDataArray[arrCount]) + "");
+                                arrCount++;
+                            } else {
+                                ((Element) obj).addChild(i,Node.TEXT, value);	
+    							//System.out.println("added1 "+value);
+                            }
 							textfound = true;
 							break;
 						}						
@@ -324,7 +337,8 @@ public class Form implements IDRecordable, Externalizable {
 		XPathExpression xpls = new XPathExpression(xmlModel.getXmlModel(), xpath);
 		Vector result = xpls.getResult();
 		
-		// log 		System.out.println("Updating prompt: " + xpath);
+		//droos: code for loading graph data will probably go somewhere in here; techendeavour code (not fully
+		//functional, included below (commented out)
 		
 		//droos: i don't think all this looping is necessary-- don't we only support binds that refer
 		//to one and only one node? and mustn't that node contain only text?
@@ -336,6 +350,8 @@ public class Form implements IDRecordable, Externalizable {
 					break;
 				
 				value = XMLUtil.getXMLText(node, 0, true);
+				if (value.trim().length() == 0)
+					break;
 				
 				if (defaultVal){
 					Object obVal = prompt.getValueByTypeFromString(value);
@@ -349,8 +365,46 @@ public class Form implements IDRecordable, Externalizable {
 			}
 		}
 	}
-	
 
+//	TECH-ENDEAVOUR updatePrompt -- partial implementation
+//		int [] controlDataArray =  new int[result.size()];
+//		int arrayCount = 0;
+//
+//		...
+//		// log 		
+//				for (int i = 0; i < node.getChildCount(); i++) 
+//					if (node.getType(i) == Node.TEXT) {
+//						value = node.getText(i);//
+//						if (defaultVal){
+//							if(prompt.getFormControlType() == Constants.OUTPUT_GRAPH) {
+//								String objVal = (String)prompt.getValueByTypeFromString(value);
+//								controlDataArray[arrayCount] = Integer.parseInt(objVal); 
+//								arrayCount++;
+//							} else {
+//								 Object obVal = prompt.getValueByTypeFromString(value);
+//								prompt.setDefaultValue(obVal);
+//							}
+//						} else {
+//							if(prompt.getFormControlType() == Constants.OUTPUT_GRAPH) {
+//								String objVal = (String)prompt.getValueByTypeFromString(value);
+//								controlDataArray[arrayCount] = Integer.parseInt(objVal); 
+//								arrayCount++;
+//							}  else {
+//								Object obVal = prompt.getValueByTypeFromString(value);
+//								prompt.setValue(obVal);
+//								//LOG
+//								// System.out.println("Updating prompt: "+prompt.getBindID()+ " with val:"+ value);
+//							}
+//						}
+//					}			
+//			}
+//		}
+//
+//		if(controlDataArray.length > 0) {
+//			prompt.setControlDataArray(controlDataArray);
+//		}    
+//	}
+	
 	public String getUrl() {
 		return this.url;
 	}
@@ -370,6 +424,16 @@ public class Form implements IDRecordable, Externalizable {
             this.getPrompt(i).setValue(null);
         }
     }
+	
+	public void localeChanged(String locale, ILocalizer localizer) {
+		// TODO Auto-generated method stub
+		Enumeration promptsEnum = prompts.elements();
+		while(promptsEnum.hasMoreElements()){
+			Prompt pr = (Prompt) promptsEnum.nextElement();
+			pr.localeChanged(locale, localizer);
+//                        System.out.println("In Form --> localeChanged() ==> pr == " + pr);
+		}
+	}
 	
 /*	public void updatePromptsRequired() {
 		Enumeration e = prompts.elements();

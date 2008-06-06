@@ -31,15 +31,21 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 
+import org.javarosa.dtree.i18n.*;
+
 import de.enough.polish.util.Locale;
 import de.enough.polish.util.StringTokenizer;
 import de.enough.polish.util.TextUtil;
+
+/* droos: i think this code needs to be restructured; it is too spaghettified and there is too much
+ * special-casing and code duplication */
 
 /**
  * 
  */
 public class XMLUtil {
-
+	private static String locale = "";
+	
 	/**
 	 * Method to parse an XForm from an input stream.
 	 * 
@@ -116,7 +122,8 @@ public class XMLUtil {
 			Prompt existingPrompt) throws Exception{
 		String label = ""; //$NON-NLS-1$
 		String value = ""; //$NON-NLS-1$
-
+        String labelText = "";
+        
 		// LOG
 		//System.out.println("parsing element: " + element.getName());
 		//System.out.println("no children:"+element.getChildCount());
@@ -200,6 +207,11 @@ public class XMLUtil {
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
 					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
 					attachBind(form, prompt, ref, bind);
+					String appearance = child.getAttributeValue(null, "appearance");
+					if (appearance == null) {
+						appearance = "minimal";
+					}
+					prompt.setAppearanceString(appearance);
 					prompt.setFormControlType(Constants.SELECT1);
 					prompt.setReturnType(org.javarosa.clforms.api.Constants.RETURN_SELECT1);
 					prompt.setSelectMap(new SimpleOrderedHashtable());
@@ -209,7 +221,6 @@ public class XMLUtil {
 					}
 					prompt = parseElement(form, child, prompt);
 					form.addPrompt(prompt);
-
 				} else if (TextUtil.equalsIgnoreCase(tagname,"select")) { //$NON-NLS-1$
 
 					//LOG
@@ -218,6 +229,11 @@ public class XMLUtil {
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
 					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
 					attachBind(form, prompt, ref, bind);
+					String appearance = child.getAttributeValue(null, "appearance");
+					if (appearance == null) {
+						appearance = "minimal";
+					}
+					prompt.setAppearanceString(appearance);
 					prompt.setFormControlType(Constants.SELECT);
 					prompt.setReturnType(org.javarosa.clforms.api.Constants.RETURN_SELECT_MULTI);
 					prompt.setSelectMap(new SimpleOrderedHashtable());
@@ -227,16 +243,105 @@ public class XMLUtil {
 					}
 					prompt = parseElement(form, child, prompt);
 					form.addPrompt(prompt);
-
+				} else if (TextUtil.equalsIgnoreCase(tagname, "output")) { //$NON-NLS-1$
+					// log
+					// System.out.println("found Graph");
+					Prompt prompt = new Prompt();
+					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
+					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
+					attachBind(form, prompt, ref, bind);
+					String type = child.getAttributeValue(null, "type");
+					if (type == null) {
+						type = "";
+					}
+					prompt.setTypeString(type);
+					if (TextUtil.equalsIgnoreCase(type, "graph")) {
+						prompt.setFormControlType(Constants.OUTPUT_GRAPH);
+					}
+					prompt.setReturnType(org.javarosa.clforms.api.Constants.RETURN_STRING);
+					// prompt.setGraphDataMap(new SimpleOrderedHashtable());
+					prompt = parseElement(form, child, prompt);
+					form.addPrompt(prompt);
+				} else if (TextUtil.equalsIgnoreCase(tagname, "trigger")) {
+					Prompt prompt = new Prompt();
+					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
+					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
+					attachBind(form, prompt, ref, bind);
+					prompt.setFormControlType(Constants.TRIGGER);
+					prompt.setReturnType(org.javarosa.clforms.api.Constants.RETURN_TRIGGER);
+					prompt = parseElement(form, child, prompt);
+					form.addPrompt(prompt);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"label")) { //$NON-NLS-1$
 					label = getXMLText(child, 0, true);
+					
+					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
+                    if (ref != null) {
+                            if(!label.equals("") || label == null) {
+                                label = "";
+                            }
+                            
+                            //String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
+                            if (ref.startsWith("jr:itext('")) {
+                                labelText = ref.substring("jr:itext('".length(), ref.indexOf("')"));
+                            }
+                            
+                            if(!element.getName().equalsIgnoreCase("item")) {
+                                setIText(existingPrompt, labelText);
+                            }
+                    }
 				} else if (TextUtil.equalsIgnoreCase(tagname,"hint")) { //$NON-NLS-1$
-					existingPrompt.setHint(getXMLText(child, 0, true));
+					String hint = getXMLText(child, 0, true);
+					
+					 String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
+                     if (ref != null) {
+                             if(!hint.equals("") || hint == null) {
+                                 hint = "";
+                             }
+
+                             //String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
+                             if (ref.startsWith("jr:itext('")) {
+                                 ref = ref.substring("jr:itext('".length(), ref.indexOf("')"));
+                             }
+                             if(!element.getName().equalsIgnoreCase("item")) {
+                                 setIText(existingPrompt, ref);
+                             }
+                     } else {
+                         existingPrompt.setHint(hint);
+                     }
 				} else if (TextUtil.equalsIgnoreCase(tagname,"item")) { //$NON-NLS-1$
 					parseElement(form, child, existingPrompt);
 					// TODO possible need to handle this return
 				} else if (TextUtil.equalsIgnoreCase(tagname,"value")) { //$NON-NLS-1$
 					value = getXMLText(child, 0, true);
+					String parentName = element.getName();
+                                        
+					if (TextUtil.equalsIgnoreCase(parentName, "text")) {
+						String attrValue = element.getAttributeValue("", "id");
+						String childForm = child.getAttributeValue("", "form");
+						if (TextUtil.equalsIgnoreCase(childForm, "short")) {
+							XFormsLocaleManager.setLocaleMapSetting(locale, attrValue + ";" + childForm, value);
+						}
+						
+						if (TextUtil.equalsIgnoreCase(childForm, "long")) {
+							XFormsLocaleManager.setLocaleMapSetting(locale, attrValue + ";" + childForm, value);
+						}
+						
+						if (TextUtil.equalsIgnoreCase(childForm, "hint")) {
+							XFormsLocaleManager.setLocaleMapSetting(locale, attrValue + ";" + childForm, value);
+						}
+						
+						if(childForm == null || childForm.equals("")) {
+							XFormsLocaleManager.setLocaleMapSetting(locale, attrValue , value);
+						}
+					}
+				} else if (TextUtil.equalsIgnoreCase(tagname, "translation")) {
+					locale = child.getAttributeValue("", "lang");
+					if (XFormsLocaleManager.getDefaultLocale() == null) {
+						XFormsLocaleManager.setDefaultLocale(locale);
+					}
+					XFormsLocaleManager.addAvailableLocale(locale);
+                                        XFormsLocaleManager.loadLocale(locale, new SimpleOrderedHashtable());
+					parseElement(form, child, null);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"textbox")) {
 					System.out.println("found textbox");
 					Prompt prompt = new Prompt();
@@ -271,12 +376,16 @@ public class XMLUtil {
 		}
 
 		if (!label.equals("") && !value.equals("")) { //$NON-NLS-1$ //$NON-NLS-2$
-			if (existingPrompt.getSelectMap() != null) {
-				existingPrompt.getSelectMap().put(label, value);
-			}
+            ILocalizer localizer = XFormsLocaleManager.getLocalizer();
+            existingPrompt.setSelectLabelValue(label, value, localizer);
 		} else if (!label.equals("")) { //$NON-NLS-1$
-			existingPrompt.setLongText(label);
-		}
+            if(existingPrompt.getLongText() == null) {
+            	existingPrompt.setLongText(label);
+            }
+		} else if(!labelText.equals("") && !value.equals("")) {
+            ILocalizer localizer = XFormsLocaleManager.getLocalizer();
+            existingPrompt.setSelectLabelValue(labelText, value, localizer);
+        }
 		
 		return existingPrompt;
 	}
@@ -301,6 +410,19 @@ public class XMLUtil {
 			prompt.setXpathBinding(ref);
 			prompt.setId(getLastToken(ref, '/'));
 		}
+	}
+
+	/* whaaaaat is going on here? */
+	private static void setIText (Prompt prompt, String ref) {
+		String locale = XFormsLocaleManager.getLocale();
+		if(locale == null) {
+			locale = XFormsLocaleManager.getDefaultLocale();
+		}
+		XFormsLocaleManager.setLocale(locale);
+		ILocalizer localizer = XFormsLocaleManager.getLocalizer();
+		prompt.setHintTextId(ref, localizer);
+		prompt.setShortTextId(ref, localizer);
+		prompt.setLongTextId(ref, localizer);
 	}
 	
 	/**

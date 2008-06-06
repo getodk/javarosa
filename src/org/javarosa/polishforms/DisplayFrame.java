@@ -7,12 +7,20 @@ import java.util.Enumeration;
 import org.javarosa.clforms.api.Constants;
 import org.javarosa.clforms.api.Prompt;
 
+import javax.microedition.lcdui.Font;
+
 import de.enough.polish.ui.ChoiceGroup;
+import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.StyleSheet;
 import de.enough.polish.ui.TextField;
 import de.enough.polish.ui.Container;
+
+import org.javarosa.clforms.util.*;
+
+import org.javarosa.view.widget.ButtonItem;
+import org.javarosa.view.widget.chart.LineChart;
 
 /**
  * DisplayFrames are a UI component used to interact with Prompts.
@@ -22,6 +30,9 @@ import de.enough.polish.ui.Container;
  * @author ctsims
  *
  */
+
+/* droos: there are too many switch statements in the class; this is not object-oriented */
+
 public class DisplayFrame {
     
     private Prompt thePrompt;
@@ -30,6 +41,9 @@ public class DisplayFrame {
     private StringItem questionResponse;
     private Item[] displayedItems;
    
+    private ButtonItem button;
+    private LineChart chart;
+    
     /**
      * Creates a Display frame for the given prompt
      * @param thePrompt The prompt to be displayed
@@ -50,44 +64,195 @@ public class DisplayFrame {
         Enumeration itr;
         switch(thePrompt.getFormControlType()) {
         case Constants.INPUT:
-            //#style textBox
-            TextField inputBox = new TextField("","",30,TextField.ANY);
-            theWidget = inputBox;
-            break;
+        	TextField inputBox = null;
+
+        	if(thePrompt.getValue()!= null){
+        		//#style textBox
+        		inputBox = new TextField("", thePrompt.getValue().toString(),30,TextField.ANY);
+        	} else {
+        		//#style textBox
+        		inputBox = new TextField("", "", 30, TextField.ANY);
+        	}
+
+        	if(thePrompt.getReturnType() == Constants.RETURN_INTEGER) {
+        		inputBox.setConstraints(TextField.NUMERIC);
+        	}
+
+        	theWidget = inputBox;
+        	break;
         case Constants.TEXTAREA:
-            //#style textBox
-            TextField textArea = new TextField("","",15,TextField.ANY);
-            theWidget = textArea;
-            break;
+        	TextField textArea;
+        	if(thePrompt.getValue()!= null){
+        		//#style textBox
+        		textArea = new TextField("",thePrompt.getValue().toString(),15,TextField.ANY);
+        	} else{
+        		//#style textBox
+        		textArea = new TextField("","",15,TextField.ANY);
+        	}
+
+        	theWidget = textArea;
+        	break;
         case Constants.TEXTBOX:
-            //#style textBox
-            TextField textBox = new TextField("","",50,TextField.ANY);
-            theWidget = textBox;
-            break;
+        	TextField textBox;
+        	if(thePrompt.getValue() != null){
+        		//#style textBox
+        		textBox = new TextField("",thePrompt.getValue().toString(),50,TextField.ANY);
+        	}else{
+        		//#style textBox
+        		textBox = new TextField("","",50,TextField.ANY);
+        	}
+
+        	theWidget = textBox;
+        	break;        
         case Constants.SELECT1:
-            ChoiceGroup choiceGroup = new ChoiceGroup("", ChoiceGroup.EXCLUSIVE);
-            itr = thePrompt.getSelectMap().keys();
-            while (itr.hasMoreElements()) {
-                String label = (String) itr.nextElement();
-                //#style choiceItem
-                choiceGroup.append(label, null);
-            }
-            theWidget = choiceGroup;
-            break;
+        	ChoiceGroup choiceGroup;
+        	if(thePrompt.getAppearanceString().equalsIgnoreCase("minimal")) {
+        		choiceGroup = new ChoiceGroup("", ChoiceGroup.POPUP);  //droos: watch this space
+        	} else {
+        		choiceGroup = new ChoiceGroup("", ChoiceGroup.EXCLUSIVE);
+        	}
+
+        	itr = thePrompt.getLocalizedSelectMap().keys();
+        	int i = 0;
+        	while (itr.hasMoreElements()) {
+        		String label = (String) itr.nextElement();
+        		//#style choiceItem
+        		choiceGroup.append(label, null);
+        		if(thePrompt.getValue() != null){ //droos: i'm skeptical that this works properly
+        			String  selectedOption = thePrompt.getValue().toString();
+        			if(selectedOption.equalsIgnoreCase((String)thePrompt.getLocalizedSelectMap().get(label))){
+        				choiceGroup.setSelectedIndex(i, true);
+        			}
+        		} 
+        		i++;
+        	}
+
+        	theWidget = choiceGroup;
+        	break;        
         case Constants.SELECT:
-            ChoiceGroup multipleGroup = new ChoiceGroup("", ChoiceGroup.MULTIPLE);
-            itr = thePrompt.getSelectMap().keys();
-            while (itr.hasMoreElements()) {
-                String label = (String) itr.nextElement();
-                //#style choiceItem
-                multipleGroup.append(label, null);
-            }
-            theWidget = multipleGroup;
-            break;
+        	ChoiceGroup multipleGroup = new ChoiceGroup("", ChoiceGroup.MULTIPLE);
+        	itr = thePrompt.getLocalizedSelectMap().keys();
+
+        	while (itr.hasMoreElements()) {
+        		String label = (String) itr.nextElement();
+        		//#style choiceItem
+        		multipleGroup.append(label, null);
+        	}
+        	if(thePrompt.getValue() != null){
+        		Object selectedOptions = thePrompt.getValue();
+        		if(selectedOptions instanceof String){
+        			String []selectedIndices = J2MEUtil.split((String)selectedOptions);
+        			for(int index =0; index <selectedIndices.length; index++){
+        				int selectedOption = Integer.parseInt(selectedIndices[index]);
+        				multipleGroup.setSelectedIndex(selectedOption,true);
+        			}
+        		} else if(selectedOptions instanceof int[]){
+        			int []selectedIndices = (int[])thePrompt.getValue();
+        			for(int index=0; index < selectedIndices.length; index++){
+        				multipleGroup.setSelectedIndex(selectedIndices[index],true);
+        			}
+        		}               
+        	}
+
+        	theWidget = multipleGroup;
+        	break;
+        case Constants.TRIGGER:
+        	//#style choiceItem
+        	button = new ButtonItem(thePrompt.getLongText());
+        	theWidget = button;
+        	break;
+        case Constants.OUTPUT_GRAPH:
+        	/* experimental */
+        	
+        	int [] chartXPointsArray = thePrompt.getControlDataArray();
+        	int [] chartYPointsArray = {2, 8, 16, 32, 48, 55, 64, 70, 80, 87};
+        	String [] chartXPointsLabelArray = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
+        	chart = new LineChart("Weight Graph"); 
+        	chart.setUseDefaultColor(false);
+          
+        	chart.setFont(Font.FACE_PROPORTIONAL,Font.STYLE_PLAIN,Font.SIZE_SMALL);
+        	chart.setDrawAxis(true);
+        	// chart.setPreferredSize(120, 120);
+        	chart.setMargins(5,3,30,35);
+        	chart.makeShadowVisible(true);
+        	chart.setShadowColor(20,20,20);
+        	chart.setColor(0, 0, 0);
+        	chart.resetData();
+        	
+        	for(int j = 0; j < chartXPointsArray.length; j++) {
+        		chart.insertItem(chartXPointsLabelArray[j], chartXPointsArray[j], chartYPointsArray[j], 0,  0,   255);
+        	}
+        	
+        	chart.setMaxYScaleFactor(100);
+        	
+        	break;        
         default:
             System.out.println("Unhandled Widget type: " + thePrompt.getFormControlType());
             break;
         }
+    }
+    
+    private void reloadWidget(){
+    	Enumeration itr;
+    	switch(thePrompt.getFormControlType()) {
+    	case Constants.INPUT: {
+    		questiontext.setText(thePrompt.getLongText());
+    		break;
+    	}
+
+    	case Constants.TEXTAREA: {
+    		questiontext.setText(thePrompt.getLongText());
+    		break;
+    	} 
+
+    	case Constants.TEXTBOX: {
+    		questiontext.setText(thePrompt.getLongText());
+    		break;
+    	}  
+
+    	case Constants.SELECT1: {
+    		questiontext.setText(thePrompt.getLongText());
+
+    		ChoiceGroup choice = (ChoiceGroup)theWidget;            	 
+    		itr = thePrompt.getLocalizedSelectMap().keys();
+    		int i = 0;
+    		while (itr.hasMoreElements()) {
+    			String label = (String) itr.nextElement();
+
+    			ChoiceItem selectItem = choice.getItem(i);
+    			selectItem.setText(label);
+    			i++;
+    		}
+    		break;
+    	}
+
+    	case Constants.SELECT : {
+    		questiontext.setText(thePrompt.getLongText());
+
+    		ChoiceGroup multipleGroup = (ChoiceGroup) theWidget;
+    		itr = thePrompt.getLocalizedSelectMap().keys();
+    		int i = 0;
+    		while (itr.hasMoreElements()) {
+    			String label = (String) itr.nextElement();
+    			ChoiceItem item = multipleGroup.getItem(i);
+    			item.setText(label);
+    			i++;
+    		}
+    		break;
+    	} 
+
+    	case Constants.TRIGGER:{
+    		ButtonItem item = (ButtonItem) theWidget;
+    		item.setLabel(thePrompt.getLongText());
+    	} 
+
+    	case Constants.OUTPUT_GRAPH: {
+
+    		break;
+    	}
+    	default:
+    		//theWidget.setLabel(thePrompt.getLongText());
+    	}     
     }
     
     /**
@@ -108,7 +273,10 @@ public class DisplayFrame {
             ChoiceGroup singleWidget = (ChoiceGroup)theWidget;
             int index = singleWidget.getSelectedIndex();
             thePrompt.setSelectedIndex(index);
-            thePrompt.setValue(singleWidget.getItem(index).getText());
+            
+            String label = singleWidget.getItem(index).getText();
+            String objValue = (String) thePrompt.getLocalizedSelectMap().get(label);
+            thePrompt.setValue(objValue);
             break;
         case Constants.SELECT:
             ChoiceGroup multiWidget = (ChoiceGroup)theWidget;
@@ -127,6 +295,14 @@ public class DisplayFrame {
             }
             thePrompt.setValue(questionValue);
             break;
+        case Constants.TRIGGER:
+            thePrompt.setValue("Ok");
+            break;
+       case Constants.OUTPUT_GRAPH:
+            int[] arr = (int[]) thePrompt.getControlDataArray();
+            thePrompt.setValue(thePrompt.getControlDataArray());
+            thePrompt.setValue("Done");
+            break;
         }
     }
     
@@ -136,10 +312,17 @@ public class DisplayFrame {
      * @param target the Screen to which the Frame will be Added
      */
     public void drawLargeFormOnScreen(ChatScreen target) {
-      //#style questiontext
-        questiontext = new StringItem(null,questiontext.getText());
-        target.append(questiontext);
-        target.append(theWidget);
+    	if(theWidget == null) {
+            if(chart != null) {
+                chart.setPreferredSize(target.getWidth(), target.getAvailableHeight() - 10);
+                target.append(chart); 
+            }
+        } else {
+        	//#style questiontext
+        	questiontext = new StringItem(null,questiontext.getText());    //droos: why make a new StringItem here?
+        	target.append(questiontext);
+        	target.append(theWidget);
+        }
         displayedItems = new Item[] {questiontext,theWidget};
         target.focus(theWidget);
     }
@@ -172,7 +355,12 @@ public class DisplayFrame {
      */
     public void removeFromScreen(ChatScreen target) {
         for(int i = 0 ; i < displayedItems.length; i++) {
-            target.removeItem(displayedItems[i]);
+            if((displayedItems[i] == null ) && (chart != null)) {
+                target.removeChart(chart);
+                //chart = null;
+            } else {
+            	target.removeItem(displayedItems[i]);
+            }
         }
     }    
     
@@ -194,8 +382,9 @@ public class DisplayFrame {
                 returnString = returnString + thePrompt.getSelectMap().elementAt(selectedIndicies[i]) + ", ";
             }
             return returnString.substring(0,returnString.length() - 2);
-        }
-        else {
+        } else if(thePrompt.getFormControlType() == Constants.OUTPUT_GRAPH) {
+            return "Done";
+        } else {
             return thePrompt.getValue().toString();
         }
     }
@@ -206,12 +395,23 @@ public class DisplayFrame {
      * @return True if the item can set its value without being explicitly selected. False otherwise
      */
     public boolean autoPlayItem(Item item) {
-        if(thePrompt.getFormControlType() == Constants.SELECT) {
+        if(thePrompt.getFormControlType() == Constants.SELECT ||
+           thePrompt.getFormControlType() == Constants.OUTPUT ||
+           thePrompt.getFormControlType() == Constants.INPUT) {
             return false;
         }
         else {
             return true;
         }
+    }
+    
+    public void refreshDisplayFrame(ChatScreen target) {
+    	if(questionResponse == null){
+    		reloadWidget();
+    	} else {
+    		questiontext.setText(thePrompt.getShortText());
+    		questionResponse.setText(questionValueToString(thePrompt));
+    	}
     }
 }
 
