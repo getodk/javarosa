@@ -14,6 +14,8 @@ import java.util.Vector;
 import org.javarosa.clforms.api.Form;
 import org.javarosa.clforms.util.SimpleOrderedHashtable;
 
+/* NOT USED */
+
 public class XFormsLocaleManager {
     private static Vector availableLanguages = new Vector();
     private static int localeIndex;
@@ -67,7 +69,7 @@ public class XFormsLocaleManager {
         while(localizableEnum.hasMoreElements()){
         	ILocalizable local = (ILocalizable) localizableEnum.nextElement();
                 ILocalizer localizer = XFormsLocaleManager.getLocalizer();
-        	local.localeChanged(locale, localizer);
+        	//local.localeChanged(locale, localizer);
                 // System.out.println("local == " + local + " localizer == " + localizer);
         } 
     }

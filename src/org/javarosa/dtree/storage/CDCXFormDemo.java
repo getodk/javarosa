@@ -630,7 +630,7 @@ public class CDCXFormDemo implements Externalizable,IDRecordable {
                        "            </translation>\r\n" +
                     
                     // Language1 Translation Tag 
-                    "               <translation lang=\"Chinese\" default =\"\" >\r\n" +
+                    "               <translation lang=\"Chinese\"  >\r\n" +
                     // Language4 QuestionOne
                     "                   <text id=\"question1\"> \r\n" +
                     "                       <value form=\"long\">CH: Enter ARV Regimen</value> \r\n" +

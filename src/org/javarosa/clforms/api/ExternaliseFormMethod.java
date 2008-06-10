@@ -4,7 +4,12 @@ import java.util.Enumeration;
 
 import org.javarosa.clforms.storage.Model;
 import org.javarosa.clforms.storage.ModelMetaData;
-import org.javarosa.dtree.i18n.XFormsLocaleManager;
+import org.javarosa.clforms.util.SimpleOrderedHashtable;
+import org.javarosa.dtree.i18n.*;
+
+/* droos: this method is a major PITA. why do we have to convert back to XML to store the form? can't we just serialize
+ * our form objects directly?
+ */
 
 public class ExternaliseFormMethod {
 
@@ -59,30 +64,27 @@ public class ExternaliseFormMethod {
 
 	private String writeItem(Prompt prompt) {
 		String result = "";
-		Enumeration keys = prompt.getSelectMap().keys();				
-		Enumeration enumeration = prompt.getSelectMap().elements();
-		while (keys.hasMoreElements()) {
+		
+		for (int i = 0; i < prompt.getSelectIDMap().size(); i++) {
+			String text = (String)prompt.getSelectIDMap().keyAt(i);
+			boolean type = ((Boolean)prompt.getSelectIDMapTrans().elementAt(i)).booleanValue();
+			String value = (String)prompt.getSelectIDMap().get(text);
+
 			result += "<"+namespace+":item>"+formatting;
-			String label = (String) keys.nextElement();			
-            String labelRefId = "";
-            if(prompt.getLocalizedLabel(label, XFormsLocaleManager.getLocalizer()) != null) {
-                String refId = label;
-                refId = "jr:itext('" + refId + "')";
-                refId = "ref =\"" + refId +"\"";
-                label = prompt.getLocalizedLabel(label, XFormsLocaleManager.getLocalizer());
-                
-                result += elementWithRefId("label", "", refId) + formatting;
-            } else {
-                result += element("label",label)+formatting;
-            }
-			
-			String value = (String) enumeration.nextElement();
-			result += element("value",value)+formatting;
+			result += "<label";
+			if (type) {
+				result += " ref=\"jr:itext('" + escapeStr(text, true) + "')\">";
+			} else {
+				result += ">" + escapeStr(text, false);
+			}
+			result += "</label><value>" + escapeStr(value, false) + "</value>";
 			result += "</"+namespace+":item>"+formatting;
 		}
+		
 		return result;
 	}
 
+	
 	private String writeCommonFCAttributes(Prompt prompt) {
 		String result = "";
 		
@@ -149,41 +151,24 @@ public class ExternaliseFormMethod {
 	private String writeCommonElements(Prompt prompt) {
 		String result = "";
 
-		String longTextId = "";
-        if(prompt.getLongText() != null) {
-            if(prompt.getLongTextId() != null) {
-                longTextId = prompt.getLongTextId().substring(0, prompt.getLongTextId().indexOf(";long"));
-                longTextId = "jr:itext('" + longTextId + "')";
-                longTextId = "ref =\"" + longTextId +"\"";
-                
-                result+= elementWithRefId("label", "", longTextId) + formatting;
-            } else {
-                result+= element("label", prompt.getLongText())+formatting;
-            }     
-        }
-        
-        String hintTextId = "";
-        if(prompt.getHint()!=null) {
-            if(prompt.getHintTextId() != null) {
-                hintTextId = prompt.getHintTextId().substring(0, prompt.getHintTextId().indexOf(";hint"));
-                hintTextId = "jr:itext('" + hintTextId + "')";
-                hintTextId = "ref =\"" + hintTextId +"\"";
-                result+= elementWithRefId("hint", "", hintTextId) + formatting;
-            } else {
-                result+= element("hint",prompt.getHint())+formatting;
-            }
-            
-        }
+		if(prompt.getLongTextId() != null) {
+			String longTextId = prompt.getLongTextId().substring(0, prompt.getLongTextId().indexOf(";long"));
+			result += "<label ref=\"jr:itext('" + escapeStr(longTextId, true) + "')\"></label>" + formatting;
+		} else {
+			result+= element("label", prompt.getLongText()) + formatting;
+		}     
+
+		if(prompt.getHintTextId() != null) {
+			result += "<hint ref=\"jr:itext('" + escapeStr(prompt.getHintTextId(), true) + "')\"></hint>" + formatting;
+		} else if (prompt.getHint() != null){
+			result+= element("hint",prompt.getHint())+formatting;
+		}
 	
         return result;
 	}
 
 	private String element(String label, String text) {
 		return "<" + namespace + ":" + label + ">" + escapeStr(text, false) + "</" + namespace + ":" + label + ">";
-	}
-
-	private String elementWithRefId(String label, String text, String refId) {        
-		return "<" + namespace + ":" + label + " " + refId +" >" + escapeStr(text, false) + "</" + namespace + ":" + label + ">";
 	}
 	
 	private String attribute (String attr, String value) {
@@ -195,7 +180,8 @@ public class ExternaliseFormMethod {
 		
 		result += writeModelOpen()+formatting;
 		
-        result += writeItext()+formatting;
+		if (form.getLocalizer() != null)
+			result += writeItext()+formatting;
 		
 		result += writeInstance()+formatting;
 		
@@ -296,23 +282,42 @@ public class ExternaliseFormMethod {
 	
     private String writeItext() {
          String result = "";
+         Localizer l = form.getLocalizer();
          
          result += "<itext>"+formatting;
          
-         result += writeItextData()+formatting;
-         
+         String[] locales = l.getAvailableLocales();
+         for (int i = 0; i < locales.length; i++) {
+        	 String locale = locales[i];
+        	 SimpleOrderedHashtable localeData = l.getLocaleData(locale);
+        	 
+        	 result += "<translation lang=\"" + escapeStr(locales[i], true) + "\"";
+        	 if (locale.equals(l.getDefaultLocale()))
+        		 result += " default=\"\"";
+        	 result += ">"+formatting;
+        	 
+        	 for (Enumeration e = localeData.keys(); e.hasMoreElements(); ) {
+        		 String textHandle = (String)e.nextElement();
+        		 String text = (String)localeData.get(textHandle);
+        		 String form = null;
+        		 if (textHandle.indexOf(";") != -1) {
+        			 form = textHandle.substring(textHandle.indexOf(";") + 1);
+        			 textHandle = textHandle.substring(0, textHandle.indexOf(";"));
+        		 }
+        		 
+        		 result += "<text id=\"" + escapeStr(textHandle, true) + "\"><value";
+        		 if (form != null)
+        			 result += " form=\"" + escapeStr(form, true) + "\"";
+        		 result += ">" + escapeStr(text, false) + "</value></text>" + formatting;
+        	 }
+        	 
+        	 result += "</translation>" + formatting;
+         }
+                  
          result += "</itext>";
          
          return result;
      }
-
-    private String writeItextData() {
-    	String result = "";
-     
-    	result += form.getXmlModel().returnItextData();
-     
-    	return result;
-    }
 	
 	public static String escapeStr (String s, boolean escapeQuotes) {
 		StringBuffer strBuff = new StringBuffer(s);

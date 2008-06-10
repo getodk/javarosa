@@ -79,7 +79,6 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
 
         this.addCommand(menuCommand);
         this.addCommand(selectCommand);
-        this.addCommand(languageCommand);
         
         this.addSubCommand(exitCommand, menuCommand);
         this.addSubCommand(saveAndReloadCommand, menuCommand);
@@ -151,7 +150,8 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         controller.processEvent(new ResponseEvent(ResponseEvent.EXIT, -1));
         clearForm();
         
-        XFormsLocaleManager.unRegisterComponent(this.controller.getForm());
+        if (controller.getForm().getLocalizer() != null)
+        	controller.getForm().getLocalizer().unregisterLocalizable(controller.getForm());
         this.controller.setForm(null);
     }
     
@@ -190,19 +190,15 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
      * (Inherited from FormView) Displays a prompt This is generally a sign that
      * we're either starting or finishing a form
      */
-    public void displayPrompt(Prompt prompt) {
-        String []availableLocales = XFormsLocaleManager.getAvailableLocales();
-        for(int i=0; i < availableLocales.length; i++){
-                if(!langCommandLabel.contains(availableLocales[i])) {
-                    UiAccess.addSubCommand(new Command(availableLocales[i], Command.SCREEN, 1), languageCommand,this);
-                    langCommandLabel.addElement(availableLocales[i]);
-                }
-        }
-    	
+    public void displayPrompt(Prompt prompt) {   	
         System.out.println("Display Prompt");
         if (checkFinishedWithForm(prompt)) {
             commandAction(this.saveAndExitCommand, this);           
         } else {
+        	if (controller.getForm().getLocalizer() != null) {
+               	this.addCommand(languageCommand);
+        		populateLanguageMenu();
+        	}
             MVCComponent.display.setCurrent(this);
             showPrompt(prompt);
         }
@@ -212,6 +208,16 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         progressBar.setValue(controller.getPromptIndex());
     }
 
+    public void populateLanguageMenu () {
+    	String[] availableLocales = controller.getForm().getLocalizer().getAvailableLocales();
+    	for(int i=0; i < availableLocales.length; i++){
+    		if(!langCommandLabel.contains(availableLocales[i])) {
+    			UiAccess.addSubCommand(new Command(availableLocales[i], Command.SCREEN, 3), languageCommand, this);
+    			langCommandLabel.addElement(availableLocales[i]);
+    		}
+    	}
+    }
+    
     /**
      * Shows a prompt on the screen
      */
@@ -268,9 +274,11 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
             else if (command == exitCommand){
                 exitForm();
             } else {
-                XFormsLocaleManager.setLocale(label);
-                refreshDisplay();
-            }  
+            	if (controller.getForm().getLocalizer() != null) { //don't think localizer can be null here, but to be safe...
+            		controller.getForm().getLocalizer().setLocale(label);
+            		refreshDisplay();
+            	}
+            }
             
         } catch (Exception e) {
             Alert a = new Alert("error.screen" + " 2"); //$NON-NLS-1$
@@ -306,20 +314,18 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
       **/
      public void keyPressed(int keyCode) {
          super.keyPressed(keyCode);
+    	 
+    	 Localizer l = controller.getForm().getLocalizer();
+    	 if (l == null)
+    		 return;
+    	 
          if(keyCode == Canvas.KEY_POUND) {
-             String nextLocale = XFormsLocaleManager.getNextLocale();
-             String currentLocale = XFormsLocaleManager.getLocale();
-             if(currentLocale.equals(nextLocale)){
-                 nextLocale = XFormsLocaleManager.getNextLocale();
-                 XFormsLocaleManager.setLocale(nextLocale);
+             String nextLocale = l.getNextLocale();
+             String currentLocale = l.getLocale();
+             if(!currentLocale.equals(nextLocale)){
+                 l.setLocale(nextLocale);
                  refreshDisplay();
-                 // System.out.println("Current Language is :- "  + nextLocale);
-             } else { 
-                 XFormsLocaleManager.setLocale(nextLocale);
-                 refreshDisplay();
-                 // System.out.println("Current Language is :- "  + nextLocale);
-             }
-             
+             }             
          }
      }
 }

@@ -143,7 +143,6 @@ public class Controller
     	//DummyForm df = new DummyForm();
     	//form = df.getXFormObject();
     	form = new Form(); //storageManager.getForm(recordId);
-    	XFormsLocaleManager.registerComponent(form);
     	try {
     		this.xformRMS.retrieveFromRMS(recordId, form);
     		// TODO Sort this out so that the recordID is added in the deserialisation

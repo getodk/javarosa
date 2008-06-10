@@ -50,10 +50,7 @@ public class DisplayFrame {
      */
     public DisplayFrame(Prompt thePrompt) {
         this.thePrompt = thePrompt;
-        
-        //#style questiontext
-        questiontext = new StringItem(null,thePrompt.getLongText());
-        
+                
         loadWidget();
     }
     
@@ -106,13 +103,14 @@ public class DisplayFrame {
         	break;        
         case Constants.SELECT1:
         	ChoiceGroup choiceGroup;
-        	if(thePrompt.getAppearanceString().equalsIgnoreCase("minimal")) {
+        	String appearance = thePrompt.getAppearanceString();
+        	if(appearance != null && appearance.equalsIgnoreCase("minimal")) {
         		choiceGroup = new ChoiceGroup("", ChoiceGroup.POPUP);  //droos: watch this space
         	} else {
         		choiceGroup = new ChoiceGroup("", ChoiceGroup.EXCLUSIVE);
         	}
 
-        	itr = thePrompt.getLocalizedSelectMap().keys();
+        	itr = thePrompt.getSelectMap().keys();
         	int i = 0;
         	while (itr.hasMoreElements()) {
         		String label = (String) itr.nextElement();
@@ -120,7 +118,7 @@ public class DisplayFrame {
         		choiceGroup.append(label, null);
         		if(thePrompt.getValue() != null){ //droos: i'm skeptical that this works properly
         			String  selectedOption = thePrompt.getValue().toString();
-        			if(selectedOption.equalsIgnoreCase((String)thePrompt.getLocalizedSelectMap().get(label))){
+        			if(selectedOption.equalsIgnoreCase((String)thePrompt.getSelectMap().get(label))){
         				choiceGroup.setSelectedIndex(i, true);
         			}
         		} 
@@ -131,7 +129,7 @@ public class DisplayFrame {
         	break;        
         case Constants.SELECT:
         	ChoiceGroup multipleGroup = new ChoiceGroup("", ChoiceGroup.MULTIPLE);
-        	itr = thePrompt.getLocalizedSelectMap().keys();
+        	itr = thePrompt.getSelectMap().keys();
 
         	while (itr.hasMoreElements()) {
         		String label = (String) itr.nextElement();
@@ -196,25 +194,25 @@ public class DisplayFrame {
     	Enumeration itr;
     	switch(thePrompt.getFormControlType()) {
     	case Constants.INPUT: {
-    		questiontext.setText(thePrompt.getLongText());
+            questiontext.setText(thePrompt.getLongText());
     		break;
     	}
 
     	case Constants.TEXTAREA: {
-    		questiontext.setText(thePrompt.getLongText());
+            questiontext.setText(thePrompt.getLongText());
     		break;
     	} 
 
     	case Constants.TEXTBOX: {
-    		questiontext.setText(thePrompt.getLongText());
+            questiontext.setText(thePrompt.getLongText());
     		break;
     	}  
 
     	case Constants.SELECT1: {
-    		questiontext.setText(thePrompt.getLongText());
+            questiontext.setText(thePrompt.getLongText());
 
     		ChoiceGroup choice = (ChoiceGroup)theWidget;            	 
-    		itr = thePrompt.getLocalizedSelectMap().keys();
+    		itr = thePrompt.getSelectMap().keys();
     		int i = 0;
     		while (itr.hasMoreElements()) {
     			String label = (String) itr.nextElement();
@@ -227,10 +225,10 @@ public class DisplayFrame {
     	}
 
     	case Constants.SELECT : {
-    		questiontext.setText(thePrompt.getLongText());
+            questiontext.setText(thePrompt.getLongText());
 
     		ChoiceGroup multipleGroup = (ChoiceGroup) theWidget;
-    		itr = thePrompt.getLocalizedSelectMap().keys();
+    		itr = thePrompt.getSelectMap().keys();
     		int i = 0;
     		while (itr.hasMoreElements()) {
     			String label = (String) itr.nextElement();
@@ -275,7 +273,7 @@ public class DisplayFrame {
             thePrompt.setSelectedIndex(index);
             
             String label = singleWidget.getItem(index).getText();
-            String objValue = (String) thePrompt.getLocalizedSelectMap().get(label);
+            String objValue = (String) thePrompt.getSelectMap().get(label);
             thePrompt.setValue(objValue);
             break;
         case Constants.SELECT:
@@ -319,7 +317,7 @@ public class DisplayFrame {
             }
         } else {
         	//#style questiontext
-        	questiontext = new StringItem(null,questiontext.getText());    //droos: why make a new StringItem here?
+            questiontext = new StringItem(null,thePrompt.getLongText());
         	target.append(questiontext);
         	target.append(theWidget);
         }
@@ -333,7 +331,7 @@ public class DisplayFrame {
      */
     public void drawSmallFormOnScreen(ChatScreen target) {
         //#style splitleft
-        questiontext = new StringItem(null, questiontext.getText());   	
+        questiontext = new StringItem(null,thePrompt.getShortText());
         //#style splitright
         questionResponse = new StringItem(null, questionValueToString(thePrompt)); 
     	
@@ -409,7 +407,7 @@ public class DisplayFrame {
     	if(questionResponse == null){
     		reloadWidget();
     	} else {
-    		questiontext.setText(thePrompt.getShortText());
+            questiontext.setText(thePrompt.getShortText());
     		questionResponse.setText(questionValueToString(thePrompt));
     	}
     }
