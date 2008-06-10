@@ -11,6 +11,7 @@ package org.javarosa.dtree.i18n;
 
 import org.javarosa.clforms.util.SimpleOrderedHashtable;
 
+/* NOT USED CURRENTLY */
 
 public interface ILocalizer {
   public String getText(String textId); 

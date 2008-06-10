@@ -219,29 +219,4 @@ public class Model implements Externalizable, IDRecordable
 	public int getEditID() {
 		return editID;
 	}
-
-    public String returnItextData() {
-        String value = "";
-        KXmlSerializer serializer = new KXmlSerializer();
-        ByteArrayOutputStream bao = new ByteArrayOutputStream();
-        try {
-        	serializer.setOutput(bao, null);
-                Element elem = this.xmlModel.getRootElement();
-                Node element = elem.getParent();
-                for(int i= 0; i < element.getChildCount() - 1; i++) {
-                     if(element.getChild(i) != null) {
-                         if(element.getChild(i) != null) {
-                            ((Element)element.getChild(i)).write(serializer);
-                         }
-                    }
-                       
-                }
-                serializer.flush();
-                value = bao.toString();
-        } catch (IOException e) {
-        	// TODO Auto-generated catch block
-        	e.printStackTrace();
-        }	
-        return value;
-    }
 }

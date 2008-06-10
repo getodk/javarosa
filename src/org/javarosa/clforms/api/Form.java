@@ -16,8 +16,7 @@ import org.javarosa.clforms.storage.IDRecordable;
 import org.javarosa.clforms.storage.Model;
 import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.clforms.xml.XMLUtil;
-import org.javarosa.dtree.i18n.ILocalizable;
-import org.javarosa.dtree.i18n.ILocalizer;
+import org.javarosa.dtree.i18n.*;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 
@@ -33,6 +32,8 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
 	private String url;
 	private int recordId;
 
+	private Localizer localizer;
+	
 	public Form() {
 		super();
 		this.prompts = new Vector();
@@ -109,6 +110,14 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
 		this.xmlModel = model;
 	}
 
+	public Localizer getLocalizer () {
+		return localizer;
+	}
+	
+	public void setLocalizer (Localizer localizer) {
+		this.localizer = localizer;
+	}
+	
 	public int getPromptCount() {
 		return prompts.size();
 	}
@@ -223,7 +232,7 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
 				if (obj instanceof Element){
 					Element node = (Element)obj;
 					if (node.getChildCount() == 0)
-						break;
+						break;  //should be continue?
 					xpls.getOperation().setValue(XMLUtil.getXMLText(node, 0, true));
 				}
 			}
@@ -287,18 +296,18 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
 		out.write(efm.externaliseForm(this).getBytes());
 		System.out.println("externalise form: "+ efm.externaliseForm(this));
 	}
-	
+		
 	public void setShortForms() {
 		// TODO get Short forms properly from XForm designer
 		Enumeration e = prompts.elements();
 		while (e.hasMoreElements()) {
 			Prompt elem = (Prompt) e.nextElement();
-			elem.setShortText(elem.getBindID());
-			//System.out.println(elem.getLongText()+"="+elem.getShortText()+"="+elem.getBindID());
+			if (elem.getShortText() != null && elem.getBindID() != null)
+				elem.setShortText(elem.getBindID());
 		}
 	}
 	
-		/**
+	/**
 	 * Populates the XFPrompts with the data contained in the  xmlModel
 	 */
 	public void updatePromptsValues() {
@@ -347,11 +356,11 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
 			if (obj instanceof Element){
 				Element node = (Element)obj;
 				if (node.getChildCount() == 0)
-					break;
+					break;  //should be continue?
 				
 				value = XMLUtil.getXMLText(node, 0, true);
 				if (value.trim().length() == 0)
-					break;
+					break;  //should be continue?
 				
 				if (defaultVal){
 					Object obVal = prompt.getValueByTypeFromString(value);
@@ -425,13 +434,11 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
         }
     }
 	
-	public void localeChanged(String locale, ILocalizer localizer) {
-		// TODO Auto-generated method stub
+	public void localeChanged(String locale, Localizer localizer) {
 		Enumeration promptsEnum = prompts.elements();
 		while(promptsEnum.hasMoreElements()){
 			Prompt pr = (Prompt) promptsEnum.nextElement();
 			pr.localeChanged(locale, localizer);
-//                        System.out.println("In Form --> localeChanged() ==> pr == " + pr);
 		}
 	}
 	

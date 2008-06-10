@@ -118,7 +118,6 @@ public class ModelList extends List implements CommandListener
             		ModelMetaData data = (ModelMetaData) modelIDs.elementAt(this.getSelectedIndex());
             		System.out.println(data.toString());
             		Form selectedForm = new Form();
-            		XFormsLocaleManager.registerComponent(selectedForm);
             		System.out.println("Attempt retreive: "+data.getXformReference());
             		this.xformRMSUtility.retrieveFromRMS(data.getXformReference(), selectedForm);
             		System.out.println("Form retrieve OK\nAttempt retreive model: "+data.getRecordId());

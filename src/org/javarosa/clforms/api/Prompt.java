@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Vector;
 
 import javax.microedition.lcdui.DateField;
 import javax.microedition.lcdui.List;
@@ -13,22 +14,28 @@ import org.javarosa.clforms.util.SimpleOrderedHashtable;
 import org.javarosa.dtree.i18n.*;
 
 public class Prompt implements ILocalizable {
-
 	private String id;
 	private int formControlType;
 	private int returnType;
 	private int widgetType;
+
 	private String longText;
+    private String longTextId;
 	private String shortText;
-	private String header;
+    private String shortTextId;
+	private String hintText;
+    private String hintTextId;
+	private SimpleOrderedHashtable selectMap;
+	private SimpleOrderedHashtable selectIDMap;
+	private Vector selectIDMapTrans; /* vector of booleans corresponding to selectIDMap: true = localizable text handle
+									  *		 											 false = unlocalizable fixed string */
+	private String header; //unused?
+	
 	private boolean relevant;
 	private boolean required = false;
 	private Object defaultValue;
 	private Object value;
 	private int selectedIndex = -1;
-	private String hint;
-	private SimpleOrderedHashtable selectMap;
-	private SimpleOrderedHashtable localizedSelectMap;
 	private String xpathBinding;
 	private String relevantString;
 	private String bindID;
@@ -40,11 +47,6 @@ public class Prompt implements ILocalizable {
 	private SimpleOrderedHashtable selectGraphDataMap;
     private int [] controlDataArray;
     
-    private String longTextId = null;
-    private String shortTextId = null;
-    private String hintTextId = null;
-    private String selectMapId = null;
-	
 	public Binding getBind() {
 		return bind;
 	}
@@ -58,7 +60,6 @@ public class Prompt implements ILocalizable {
 		relevantString = null;
 		appearanceString = null;
 		typeString = null;
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getId() {
@@ -92,7 +93,7 @@ public class Prompt implements ILocalizable {
 	public void setWidgetType(int widgetType) {
 		this.widgetType = widgetType;
 	}
-	
+
 	public String getLongText() {
 		return longText;
 	}
@@ -101,6 +102,17 @@ public class Prompt implements ILocalizable {
 		this.longText = longText;
 	}
 
+    public String getLongTextId() {
+        return longTextId;
+    }
+    
+    public void setLongTextId(String textId, Localizer localizer) {
+    	this.longTextId = textId;
+    	if(localizer != null) {
+    		longText = getLocalizedText(localizer, longTextId);
+    	}
+    }
+    
 	public String getShortText() {
 		return shortText;
 	}
@@ -109,6 +121,92 @@ public class Prompt implements ILocalizable {
 		this.shortText = shortText;
 	}
 
+    public String getShortTextId() {
+        return shortTextId;
+    }
+
+    public void setShortTextId(String textId, Localizer localizer) {
+    	this.shortTextId = textId;
+    	if(localizer != null) {
+    		shortText = getLocalizedText(localizer, shortTextId);        
+    	}
+    } 
+
+	public String getHint() {
+		return hintText;
+	}
+
+	public void setHint(String hintText) {
+		this.hintText = hintText;
+	}
+
+    public String getHintTextId() {
+        return hintTextId;
+    }
+    
+    public void setHintTextId(String textId, Localizer localizer) {
+        this.hintTextId = textId;
+        if(localizer != null) {
+            hintText = getLocalizedText(localizer, hintTextId);
+        }
+    }
+
+	public SimpleOrderedHashtable getSelectMap() {
+		return selectMap;
+	}
+
+	public void setSelectMap(SimpleOrderedHashtable selectMap) {
+		this.selectMap = selectMap;
+	}
+	
+	public void addSelectItem (String label, String value) {
+		if (selectMap == null)
+			selectMap = new SimpleOrderedHashtable();
+		selectMap.put(label, value);
+	}
+	
+	public SimpleOrderedHashtable getSelectIDMap () {
+		return selectIDMap;
+	}
+	
+	public Vector getSelectIDMapTrans () {
+		return selectIDMapTrans;
+	}
+	
+	public void setSelectIDMap (SimpleOrderedHashtable selectIDMap, Vector selectIDMapTrans, Localizer localizer) {
+		this.selectIDMap = selectIDMap;
+		this.selectIDMapTrans = selectIDMapTrans;
+		if (localizer != null) {
+			localizeSelectMap(localizer);
+		}
+	}
+	
+	public void addSelectItemID (String labelID, boolean type, String value) {
+		if (selectIDMap == null) {
+			selectIDMap = new SimpleOrderedHashtable();
+			selectIDMapTrans = new Vector();
+		}
+		selectIDMap.put(labelID, value);
+		selectIDMapTrans.addElement(new Boolean(type));
+	}
+	
+	//calling when localizer == null is meant for when there is no localization data and selectIDMap contains only
+	//fixed strings (trans is always false)
+	public void localizeSelectMap (Localizer localizer) {
+		selectMap = null;
+		String label;
+		for (int i = 0; i < selectIDMap.size(); i++) {
+			String key = (String)selectIDMap.keyAt(i);
+			boolean trans = ((Boolean)selectIDMapTrans.elementAt(i)).booleanValue();
+			if (trans) {
+				label = (localizer == null ? "[itext]" : getLocalizedText(localizer, key));
+			} else {
+				label = key;
+			}
+			addSelectItem(label, (String)selectIDMap.get(key));
+		}
+	}
+	
 	public String getHeader() {
 		return header;
 	}
@@ -151,22 +249,25 @@ public class Prompt implements ILocalizable {
 	}
 
 	public void setValue(Object value) {
-			this.value = value;
-            if(selectedIndex == -1 && localizedSelectMap != null && value != null) {
-                int i = 0;
+		this.value = value;
+		
+		if (selectMap != null && value != null) {
+			selectedIndex = -1;
+			
+			Enumeration e;
+			int i;
+			for (e = selectMap.keys(), i = 0;  e.hasMoreElements(); i++) {
+				String key = (String)e.nextElement();
 
-                Enumeration itr = localizedSelectMap.keys();
-                while(itr.hasMoreElements()) {
-                    String key = (String)itr.nextElement();
-
-                    if(value.equals((String)localizedSelectMap.get(key))) {
-                        selectedIndex = i;
-                        break;
-                    }
-
-                    i++;
-                }
-            }    
+				if(value.equals((String)selectMap.get(key))) {
+					selectedIndex = i;
+					break;
+				}
+			}
+			
+			if (selectedIndex == -1)
+				System.out.println("warning: value set that does not exist in select");
+		}    
 	}
 
 	public int getSelectedIndex() {
@@ -177,13 +278,6 @@ public class Prompt implements ILocalizable {
 		this.selectedIndex = selectedIndex;
 	}
 
-	public String getHint() {
-		return hint;
-	}
-
-	public void setHint(String hint) {
-		this.hint = hint;
-	}
 
 	public String toScript() {
 
@@ -194,31 +288,6 @@ public class Prompt implements ILocalizable {
 		// TODO set value from string (based on return type)
 	}
 
-	private void updateLocalizedSelectMap(ILocalizer localizer){
-        if(selectMap == null) 
-            return;
-        if(localizedSelectMap != null) {
-            localizedSelectMap.clear();
-        }
-        
-        Enumeration itr = selectMap.keys();
-        			
-        	while(itr.hasMoreElements()){
-        		String key = (String)itr.nextElement();
-                String localizedKey = localizer.getText(key);
-                
-                if(localizedKey == null ||localizedKey.equals("")) {
-                    ILocalizer defaultLocalizer = XFormsLocaleManager.getDefaultLocalizer();
-                    localizedKey = defaultLocalizer.getText(key);
-                }
-                String value = (String) selectMap.get(key);
-                if(localizedKey != null){
-                    	localizedSelectMap.put(localizedKey, value);
-                } else {
-                        localizedSelectMap.put(key, value);
-                }
-        	}
-	}
 	
 	/**
 	 * Converts the value object into a String based on the returnType
@@ -253,28 +322,6 @@ public class Prompt implements ILocalizable {
 		return stringValue;
 	}*/
 
-	public SimpleOrderedHashtable getLocalizedSelectMap() {
-		return localizedSelectMap;
-	}
-	
-	public SimpleOrderedHashtable getSelectMap() {
-		return selectMap;
-	}
-
-	public void setSelectMap(SimpleOrderedHashtable selectMap) {
-		this.selectMap = selectMap;
-        this.localizedSelectMap = new SimpleOrderedHashtable();
-	}
-
-	public void setSelectLabelValue(String label, String value){
-        this.selectMap.put(label, value);
-    }
-
-	public void setSelectLabelValue(String label, String value, 
-		ILocalizer localizer){
-		this.selectMap.put(label, value);
-		updateLocalizedSelectMap(localizer);
-	}
 
 	public String getXpathBinding() {
 		return xpathBinding;
@@ -367,91 +414,29 @@ public class Prompt implements ILocalizable {
     public void setControlDataArray(int [] controlDataArray) {
         this.controlDataArray = controlDataArray;
     }
+    
+    private String getLocalizedText (Localizer localizer, String textID) {
+    	String text = localizer.getText(textID);
+    	if (text == null)
+    		throw new RuntimeException("can't find localized text for current locale! text id: [" + textID + "]");
+    	return text;
+    }
+    
+    public void localeChanged(String locale, Localizer localizer) {
+    	if(longTextId != null) {
+    		longText = getLocalizedText(localizer, longTextId);
+    	}
 
-    public String getLongTextId() {
-        return longTextId;
-    }
-    
-     public void setLongTextId(String textId, ILocalizer localizer) {
-            longTextId = textId + ";long";
-        if(localizer != null) {
-            longText =  localizer.getText(longTextId );
-        }
-    }
-     
-    public String getShortTextId() {
-        return shortTextId;
-    }
-    
-    public void setShortTextId(String textId, ILocalizer localizer) {
-        shortTextId = textId + ";short";
-        //localizer.addAvailableLocale()
-        
-        if(localizer != null) {
-            shortText = localizer.getText(shortTextId );        
-        }
-    } 
-    
-    public String getHintTextId() {
-        return hintTextId;
-    }
-    
-    public void setHintTextId(String textId, ILocalizer localizer) {
-        hintTextId = textId + ";hint";
-        if(localizer != null) {
-            hint = localizer.getText(hintTextId);
-        }
-    }
-    
-    public String getSelectMapId() {
-        return selectMapId;
-    }
-    
-    public void setSelectMapId(String textId, ILocalizer localizer) {
-        selectMapId = textId;
-        if(localizer != null) {
-            selectMap = localizer.getSelectMap(selectMapId);
-        }
-    }
-    
-    public String getLocalizedLabel(String labelId, ILocalizer localizer) {
-        String localizedLabel = null;
-        if(localizer != null)
-            localizedLabel = localizer.getText(labelId);
-        return localizedLabel;
-    }
-    
-    public void localeChanged(String locale, ILocalizer localizer) {
-       updateLocalizedSelectMap(localizer);
-        if(longTextId != null) {
-           longText = localizer.getText(longTextId);
-           if(longText != null && longText.equals("")) {
-               longText = XFormsLocaleManager.getDefaultLocalizer().getText(longTextId);
-           }
-        }
+    	if(shortTextId != null) {
+    		shortText = getLocalizedText(localizer, shortTextId);
+    	}
 
-        if(shortTextId != null) {
-            shortText = localizer.getText(shortTextId);
-            if(shortText != null && shortText.equals("")) {
-               shortText = XFormsLocaleManager.getDefaultLocalizer().getText(shortTextId);
-            }
-        }
-
-        if(hintTextId != null) {
-            hint = localizer.getText(hintTextId);
-            if(hint != null && hint.equals("")) {
-               hint = XFormsLocaleManager.getDefaultLocalizer().getText(hintTextId);
-            }
-        }
-        
-//        if(value != null) {
-//            if(this.formControlType == Constants.SELECT1) {
-//                if(getSelectedIndex() != -1) {
-//                    String selectValue = (String) localizedSelectMap.keyAt(selectedIndex);
-//            	setValue(selectValue); 
-//                }
-//            }
-//            
-//      }
+    	if(hintTextId != null) {
+    		hintText = getLocalizedText(localizer, hintTextId);
+    	}
+    	
+    	if (selectIDMap != null) {
+    		localizeSelectMap(localizer);
+    	}
     }
 }

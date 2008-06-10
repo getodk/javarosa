@@ -37,15 +37,13 @@ import de.enough.polish.util.Locale;
 import de.enough.polish.util.StringTokenizer;
 import de.enough.polish.util.TextUtil;
 
-/* droos: i think this code needs to be restructured; it is too spaghettified and there is too much
- * special-casing and code duplication */
+/* droos: this code is getting a little out of hand; i think it needs to be restructured; it is too
+ * spaghettified and there is too much special-casing and code duplication */
 
 /**
  * 
  */
 public class XMLUtil {
-	private static String locale = "";
-	
 	/**
 	 * Method to parse an XForm from an input stream.
 	 * 
@@ -53,25 +51,9 @@ public class XMLUtil {
 	 * @return XForm
 	 */
 	public static Form parseForm(InputStreamReader isr) {
-		Form form = new Form();
-		// xform.setName(getRandomName());
-		// LOG
-		//System.out.println("in parse Form1");
-
-		try {
-			KXmlParser parser = new KXmlParser();
-			parser.setInput(isr);
-			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
-			Document doc = new Document();
-			doc.parse(parser);
-
-			Element html = doc.getRootElement();
-			parseElement(form, html, null);
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return form;
+		Form f = new Form();
+		parseForm(isr, f);
+		return f;
 	}
 	
 	/**
@@ -80,18 +62,13 @@ public class XMLUtil {
 	 * @param inputStreamReader, XForm
 	 * @return XForm
 	 */
-	public static void parseForm(InputStreamReader isr, Form form) throws Exception{
-
-		// LOG
-		//System.out.println("in parse Form2");
-		// try {
+	public static void parseForm(InputStreamReader isr, Form form) {
+		try {
 			KXmlParser parser = new KXmlParser();
 			parser.setInput(isr);
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
 			Document doc = new Document();
 			doc.parse(parser);
-			// LOG
-			//System.out.println("succesfully Kxml parsing");
 			
 			Element html = doc.getRootElement();
 			parseElement(form, html, null);
@@ -100,15 +77,15 @@ public class XMLUtil {
 			form.getXmlModel().trimXML();
 	        form.getXmlModel().trimXML();
 			
-		/*} catch (Exception ex) {
-			
-			// TODO handle exception
+	        if (form.getLocalizer() != null)
+	        	form.getLocalizer().setToDefault();
+		} catch (Exception ex) {
+			System.out.println("XML PARSING ERROR");
 			
 			form = null;
 			ex.printStackTrace();
-		}*/
+		}
 	}
-
 
 	/**
 	 * Recursive method to process XML.
@@ -122,23 +99,15 @@ public class XMLUtil {
 			Prompt existingPrompt) throws Exception{
 		String label = ""; //$NON-NLS-1$
 		String value = ""; //$NON-NLS-1$
-        String labelText = "";
+        String textRef = "";
         
-		// LOG
-		//System.out.println("parsing element: " + element.getName());
-		//System.out.println("no children:"+element.getChildCount());
 		int numOfEntries = element.getChildCount();
 		for (int i = 0; i < numOfEntries; i++) {
 			if (element.isText(i)) {
 				// Text here are all insignificant white spaces.
 				// We are only interested in children elements
-				// LOG
-				//System.out.println(element.getName()+" skipping a whitespace");
 			} else {
 				Element child = element.getElement(i);
-				// LOG
-				//System.out.println("analysing " +element.getName()+" child: "+child.getName());
-				
 				String tagname = child.getName();
 				if (TextUtil.equalsIgnoreCase(tagname,"head")) { //$NON-NLS-1$
 					parseElement(form, child, null);
@@ -147,8 +116,6 @@ public class XMLUtil {
 				} else if (TextUtil.equalsIgnoreCase(tagname,"title")) { //$NON-NLS-1$
 					form.setName(getXMLText(child, 0, true));
 				} else if (TextUtil.equalsIgnoreCase(tagname,"model")) { //$NON-NLS-1$
-					// LOG
-					//System.out.println("found and creating Model"+model.toString());
 					Model model = new Model();
 					Document xmlDoc = new Document();
 					model.setXmlModel(xmlDoc);
@@ -158,17 +125,15 @@ public class XMLUtil {
 							form.setName(child.getAttributeValue(j));
 							if (form.getXmlModel() != null)
 								form.getXmlModel().setName(form.getName());
-							//LOG 
-							//System.out.println("name found!!"+form.getName()+child.getAttributeValue(j));
 						}
 					}
 					parseElement(form, child, null);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"instance")) { //$NON-NLS-1$
 					Document xmlDoc = form.getXmlModel().getXmlModel();
 					xmlDoc.addChild(Node.ELEMENT, child.getElement(1));
-
+				} else if (TextUtil.equalsIgnoreCase(tagname, "itext")) {
+					parseIText(form, child);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"bind")) { //$NON-NLS-1$
-
 					Binding b = new Binding();
 					b.setId(child.getAttributeValue("", "id")); //$NON-NLS-1$ //$NON-NLS-2$
 					b.setNodeset(child.getAttributeValue("", "nodeset")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -180,13 +145,7 @@ public class XMLUtil {
 						type = type.substring(type.indexOf(':') + 1);
 					b.setType(type);
 					form.addBinding(b);
-					//LOG
-					//System.out.println("Bind added to form = \n"+b.toString());
-
 				} else if (TextUtil.equalsIgnoreCase(tagname,"input")) { //$NON-NLS-1$
-					
-					//LOG
-					//System.out.println("found input");
 					Prompt prompt = new Prompt();
 					prompt.setFormControlType(Constants.INPUT);
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
@@ -200,17 +159,14 @@ public class XMLUtil {
 					form.addPrompt(prompt);
 
 				} else if (TextUtil.equalsIgnoreCase(tagname,"select1")) { //$NON-NLS-1$
-
-					//LOG
-					//System.out.println("found select1");
 					Prompt prompt = new Prompt();
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
 					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
 					attachBind(form, prompt, ref, bind);
 					String appearance = child.getAttributeValue(null, "appearance");
-					if (appearance == null) {
-						appearance = "minimal";
-					}
+					//if (appearance == null) {
+					//	appearance = "minimal";
+					//}
 					prompt.setAppearanceString(appearance);
 					prompt.setFormControlType(Constants.SELECT1);
 					prompt.setReturnType(org.javarosa.clforms.api.Constants.RETURN_SELECT1);
@@ -220,19 +176,17 @@ public class XMLUtil {
 						prompt.setRelevantString(relevant);
 					}
 					prompt = parseElement(form, child, prompt);
+					prompt.localizeSelectMap(null);  //even fixed <label>s are stored in selectIDMap, and must be copied over
 					form.addPrompt(prompt);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"select")) { //$NON-NLS-1$
-
-					//LOG
-					//System.out.println("found select");
 					Prompt prompt = new Prompt();
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
 					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
 					attachBind(form, prompt, ref, bind);
 					String appearance = child.getAttributeValue(null, "appearance");
-					if (appearance == null) {
-						appearance = "minimal";
-					}
+					//if (appearance == null) {
+					//	appearance = "minimal";
+					//}
 					prompt.setAppearanceString(appearance);
 					prompt.setFormControlType(Constants.SELECT);
 					prompt.setReturnType(org.javarosa.clforms.api.Constants.RETURN_SELECT_MULTI);
@@ -242,10 +196,9 @@ public class XMLUtil {
 						prompt.setRelevantString(relevant);
 					}
 					prompt = parseElement(form, child, prompt);
+					prompt.localizeSelectMap(null);  //even fixed <label>s are stored in selectIDMap, and must be copied over
 					form.addPrompt(prompt);
 				} else if (TextUtil.equalsIgnoreCase(tagname, "output")) { //$NON-NLS-1$
-					// log
-					// System.out.println("found Graph");
 					Prompt prompt = new Prompt();
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
 					String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
@@ -273,75 +226,37 @@ public class XMLUtil {
 					form.addPrompt(prompt);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"label")) { //$NON-NLS-1$
 					label = getXMLText(child, 0, true);
-					
-					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
-                    if (ref != null) {
-                            if(!label.equals("") || label == null) {
-                                label = "";
-                            }
-                            
-                            //String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
-                            if (ref.startsWith("jr:itext('")) {
-                                labelText = ref.substring("jr:itext('".length(), ref.indexOf("')"));
-                            }
-                            
-                            if(!element.getName().equalsIgnoreCase("item")) {
-                                setIText(existingPrompt, labelText);
-                            }
-                    }
+					String ref = child.getAttributeValue("", "ref"); //$NON-NLS-1$
+					if (ref != null) {
+						if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
+							textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
+						} else {
+							throw new RuntimeException("malformed ref for <label>");
+						}
+					}
 				} else if (TextUtil.equalsIgnoreCase(tagname,"hint")) { //$NON-NLS-1$
 					String hint = getXMLText(child, 0, true);
+					String ref = child.getAttributeValue("", "ref"); //$NON-NLS-1$
+					if (ref != null) {
+						if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
+							ref = ref.substring("jr:itext('".length(), ref.indexOf("')"));
+						} else {
+							throw new RuntimeException("malformed ref for <hint>");
+						}
+					}
 					
-					 String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
-                     if (ref != null) {
-                             if(!hint.equals("") || hint == null) {
-                                 hint = "";
-                             }
-
-                             //String bind = child.getAttributeValue(null, "bind"); //$NON-NLS-1$
-                             if (ref.startsWith("jr:itext('")) {
-                                 ref = ref.substring("jr:itext('".length(), ref.indexOf("')"));
-                             }
-                             if(!element.getName().equalsIgnoreCase("item")) {
-                                 setIText(existingPrompt, ref);
-                             }
-                     } else {
-                         existingPrompt.setHint(hint);
-                     }
+					if (ref == null) {
+						existingPrompt.setHint(hint);
+					} else {
+						if (!hasITextMapping(form, ref))
+							throw new RuntimeException("<hint> text is not localizable for all locales");
+						existingPrompt.setHintTextId(ref, null);
+					}
 				} else if (TextUtil.equalsIgnoreCase(tagname,"item")) { //$NON-NLS-1$
 					parseElement(form, child, existingPrompt);
 					// TODO possible need to handle this return
 				} else if (TextUtil.equalsIgnoreCase(tagname,"value")) { //$NON-NLS-1$
 					value = getXMLText(child, 0, true);
-					String parentName = element.getName();
-                                        
-					if (TextUtil.equalsIgnoreCase(parentName, "text")) {
-						String attrValue = element.getAttributeValue("", "id");
-						String childForm = child.getAttributeValue("", "form");
-						if (TextUtil.equalsIgnoreCase(childForm, "short")) {
-							XFormsLocaleManager.setLocaleMapSetting(locale, attrValue + ";" + childForm, value);
-						}
-						
-						if (TextUtil.equalsIgnoreCase(childForm, "long")) {
-							XFormsLocaleManager.setLocaleMapSetting(locale, attrValue + ";" + childForm, value);
-						}
-						
-						if (TextUtil.equalsIgnoreCase(childForm, "hint")) {
-							XFormsLocaleManager.setLocaleMapSetting(locale, attrValue + ";" + childForm, value);
-						}
-						
-						if(childForm == null || childForm.equals("")) {
-							XFormsLocaleManager.setLocaleMapSetting(locale, attrValue , value);
-						}
-					}
-				} else if (TextUtil.equalsIgnoreCase(tagname, "translation")) {
-					locale = child.getAttributeValue("", "lang");
-					if (XFormsLocaleManager.getDefaultLocale() == null) {
-						XFormsLocaleManager.setDefaultLocale(locale);
-					}
-					XFormsLocaleManager.addAvailableLocale(locale);
-                                        XFormsLocaleManager.loadLocale(locale, new SimpleOrderedHashtable());
-					parseElement(form, child, null);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"textbox")) {
 					System.out.println("found textbox");
 					Prompt prompt = new Prompt();
@@ -373,23 +288,114 @@ public class XMLUtil {
 				}
 				// TODO - how are other elements like html:p or br handled?
 			}
-		}
-
-		if (!label.equals("") && !value.equals("")) { //$NON-NLS-1$ //$NON-NLS-2$
-            ILocalizer localizer = XFormsLocaleManager.getLocalizer();
-            existingPrompt.setSelectLabelValue(label, value, localizer);
-		} else if (!label.equals("")) { //$NON-NLS-1$
-            if(existingPrompt.getLongText() == null) {
-            	existingPrompt.setLongText(label);
-            }
-		} else if(!labelText.equals("") && !value.equals("")) {
-            ILocalizer localizer = XFormsLocaleManager.getLocalizer();
-            existingPrompt.setSelectLabelValue(labelText, value, localizer);
-        }
+		}		
 		
+		if (!value.equals("")) {
+			if (!textRef.equals("")) {
+				if (!hasITextMapping(form, textRef))
+					throw new RuntimeException("<label> text is not localizable for all locales");
+				existingPrompt.addSelectItemID(textRef, true, value);
+			} else if (!label.equals("")) {
+				existingPrompt.addSelectItemID(label, false, value);
+			}
+		} else {
+			if (!textRef.equals("")) {
+				if (!(hasITextMapping(form, textRef) ||
+					  (hasITextMapping(form, textRef + ";long") && hasITextMapping(form, textRef + ";short"))))
+					throw new RuntimeException("<label> text is not localizable for all locales");
+				existingPrompt.setLongTextId(textRef + ";long", null);
+				existingPrompt.setShortTextId(textRef + ";short", null);
+			} else if (!label.equals("")) {
+				existingPrompt.setLongText(label);
+				existingPrompt.setShortText(label);
+			}			
+		}
+				
 		return existingPrompt;
 	}
 
+	/**
+	 * KNOWN ISSUES WITH ITEXT
+	 * 
+	 * 'long' and 'short' forms of text are only supported for input control labels at this time. all other
+	 * situations (<hint> tags, <label>s within <item>s, etc.) should only reference text handles that have
+	 * only the single, default form.
+	 */
+	
+	private static void parseIText (Form f, Element itext) {
+		Localizer l = new Localizer(true, true);
+		f.setLocalizer(l);
+		l.registerLocalizable(f);
+		
+		for (int i = 0; i < itext.getChildCount(); i++) {
+			Element trans = itext.getElement(i);
+			if (trans == null || !trans.getName().equals("translation"))
+				continue;
+			
+			parseTranslation(l, trans);
+		}
+		
+		if (l.getAvailableLocales().length == 0)
+			throw new RuntimeException("no <translation>s defined");
+		
+		if (l.getDefaultLocale() == null)
+			l.setDefaultLocale(l.getAvailableLocales()[0]);
+	}
+		
+	private static void parseTranslation (Localizer l, Element trans) {
+		String lang = trans.getAttributeValue("", "lang");
+		if (lang == null || lang.length() == 0)
+			throw new RuntimeException("no language specified for <translation>");
+		String isDefault = trans.getAttributeValue("", "default");
+		
+		if (!l.addAvailableLocale(lang))
+			throw new RuntimeException("duplicate <translation> for same language");
+		
+		if (isDefault != null) {
+			if (l.getDefaultLocale() != null)
+				throw new RuntimeException("more than one <translation> set as default");
+			l.setDefaultLocale(lang);
+		}
+		
+		for (int j = 0; j < trans.getChildCount(); j++) {
+			Element text = trans.getElement(j);
+			if (text == null || !text.getName().equals("text"))
+				continue;
+			
+			parseTextHandle(l, lang, text);
+		}
+		
+	}
+		
+	private static void parseTextHandle (Localizer l, String locale, Element text) {
+		String id = text.getAttributeValue("", "id");
+		if (id == null || id.length() == 0)
+			throw new RuntimeException("no id defined for <text>");
+
+		for (int k = 0; k < text.getChildCount(); k++) {
+			Element value = text.getElement(k);
+			if (value == null || !value.getName().equals("value"))
+				continue;
+
+			String form = value.getAttributeValue("", "form");
+			if (form != null && form.length() == 0)
+				form = null;
+			String data = getXMLText(value, 0, true);
+			if (data == null)
+				data = "";
+
+			String textID = (form == null ? id : id + ";" + form);  //kind of a hack
+			if (l.hasMapping(locale, textID))
+				throw new RuntimeException("duplicate definition for text ID and form");
+			l.setLocaleMapping(locale, textID, data);
+		}
+	}
+
+	private static boolean hasITextMapping (Form form, String textID) {
+		Localizer l = form.getLocalizer();
+		return l.hasMapping(l.getDefaultLocale(), textID);
+	}
+		
 	private static void attachBind(Form form, Prompt prompt, String ref,
 			String bind) {
 		if (bind != null) {
@@ -410,19 +416,6 @@ public class XMLUtil {
 			prompt.setXpathBinding(ref);
 			prompt.setId(getLastToken(ref, '/'));
 		}
-	}
-
-	/* whaaaaat is going on here? */
-	private static void setIText (Prompt prompt, String ref) {
-		String locale = XFormsLocaleManager.getLocale();
-		if(locale == null) {
-			locale = XFormsLocaleManager.getDefaultLocale();
-		}
-		XFormsLocaleManager.setLocale(locale);
-		ILocalizer localizer = XFormsLocaleManager.getLocalizer();
-		prompt.setHintTextId(ref, localizer);
-		prompt.setShortTextId(ref, localizer);
-		prompt.setLongTextId(ref, localizer);
 	}
 	
 	/**
