@@ -46,7 +46,8 @@ public class Constants {
 
     // server URLs
     public static final String POST_URL ="http://update.cell-life.org/save_dump.php";
-    public static final String GET_URL ="http://update.cell-life.org/forms/AllDataTypes.xhtml";
+   // public static final String GET_URL ="http://update.cell-life.org/forms/AllDataTypes.xhtml";
+    public static final String GET_URL ="http://127.0.0.1/form.xhtml";
 
     // does the file connection API (JSR 75) exist?
 	public static boolean FILE_CONNECTION = false;
