@@ -2,8 +2,12 @@ package org.javarosa.clforms;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Enumeration;
+import java.util.Random;
+import java.util.Vector;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
@@ -12,6 +16,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
@@ -22,27 +27,27 @@ import org.javarosa.clforms.api.Form;
 import org.javarosa.clforms.storage.ModelRMSUtility;
 import org.javarosa.clforms.storage.XFormMetaData;
 import org.javarosa.clforms.storage.XFormRMSUtility;
-import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.clforms.view.FormViewScreen;
 import org.javarosa.clforms.view.PromptScreen;
 import org.javarosa.clforms.xml.XMLUtil;
-//#if polish.usePolishGui
 import org.javarosa.polishforms.ChatScreen;
-//#endif
 import org.javarosa.properties.JavaRosaPropertyRules;
 import org.javarosa.properties.PropertyManager;
-//#if polish.usePolishGui
 import org.javarosa.properties.view.PropertiesScreen;
-//#endif
 import org.netbeans.microedition.lcdui.pda.FileBrowser;
 import org.openmrs.transport.midp.TransportLayer;
 
 import com.ev.evgetme.getMidlet;
 
+import de.enough.polish.ui.splash.ApplicationInitializer;
+import de.enough.polish.ui.splash.InitializerSplashScreen;
 import de.enough.polish.util.TextUtil;
 
-public class TransportShell extends MIDlet implements CommandListener
-{
+// @JJ May 28, 2008: I added Application Initializer to allow for a splash screen actually worked,
+// however this now makes the project dependant on polish.  and i didn't use defs for the include
+// because then we would get compiler errors in t
+public class TransportShell extends MIDlet implements ApplicationInitializer, CommandListener {
+	
     public final static String WORKING_DIRECTORY = "C:/predefgallery/predefphotos/";
 
     private final Command EXIT_CMD = new Command("Close", Command.EXIT, 2);
@@ -55,11 +60,10 @@ public class TransportShell extends MIDlet implements CommandListener
     private Controller formController;
     private List selectFunction;
     private List availableXForms;
-  //#if app.usefileconnections
+    //#if app.usefileconnections
     private FileBrowser fileBrowser;
     //#endif
     private boolean writeDummy = false;
-
 
     private ChatScreenForm customChatScreen;
     //#if polish.usePolishGui
@@ -85,10 +89,13 @@ public class TransportShell extends MIDlet implements CommandListener
 	private TransportLayer transportLayer;
 
 	private getMidlet getMidlet;
-
+	private Displayable mainScreen;
 
     public TransportShell()
     {
+    	configureLogger();
+    	//log.write("STARTING APP",MIDPLogger.DEBUG);
+
         try {
             customChatScreen = new ChatScreenForm();
             //#if polish.usePolishGui
@@ -96,10 +103,10 @@ public class TransportShell extends MIDlet implements CommandListener
             //#endif
             promptScreen = new PromptScreen();
             formViewScreen = new FormViewScreen();
+        	
+        	PropertyManager.instance().setRules(new JavaRosaPropertyRules());
+            loadProperties();
 
-        	configureLogger();
-        	//log.write("STARTING APP",MIDPLogger.DEBUG);
-            
 			String[] optionsMenu = {"Select XForms", "Review Completed Forms", "Get New Forms", "Submit Completed Forms"};
 
 			// dead?
@@ -112,9 +119,8 @@ public class TransportShell extends MIDlet implements CommandListener
 			
 			//log.write("PRE-configCntllr",MIDPLogger.DEBUG);
 			configureController();
-			loadProperties();
 			//log.write("POST-configCntllr",MIDPLogger.DEBUG);
-			PropertyManager.instance().setRules(new JavaRosaPropertyRules());
+		     loadAndSetViewType();
 		} catch (Exception e) {
 			//log.write(e.getMessage(),MIDPLogger.DEBUG);
 			e.printStackTrace();
@@ -158,8 +164,9 @@ public class TransportShell extends MIDlet implements CommandListener
     	transportLayer = new TransportLayer(this);
 	}
 
-	public void displayFormList() {
+	public Displayable displayFormList() {
     	this.formList = new FormList(this);
+    	return this.formList;
 	}
 
 	public FormList getFormList() {
@@ -212,7 +219,7 @@ public class TransportShell extends MIDlet implements CommandListener
 	}
 
     public void getNewFormsByTransportPropertySetting() {
-    	String method = PropertyManager.instance().getProperty("GetFormsMethod");
+    	String method = PropertyManager.instance().getSingularProperty("GetFormsMethod");
 
 
     	if (TextUtil.equalsIgnoreCase(method, Constants.GETFORMS_EVGETME)){
@@ -255,14 +262,57 @@ public class TransportShell extends MIDlet implements CommandListener
         // TODO Auto-generated method stub
     }
 
-    protected void startApp() throws MIDletStateChangeException
-    {
-    	//log.write("TRYING CREATEView",MIDPLogger.DEBUG);
-    	initRMS();
-    	createView();
-    	//log.write("completed CREATEVIEW",MIDPLogger.DEBUG);
+
+
+    // @JJ May 28, 2008: added to crate splash screen, copied from here:
+    //http://www.easywms.com/easywms/?q=en/node/104
+    protected void startApp() throws MIDletStateChangeException {
+        this.display = Display.getDisplay(this);
+        if(this.mainScreen !=null){
+            //the MIDlet has been paused;
+            this.display.setCurrent(this.mainScreen);
+        }else{
+              //the MIDlet is started for this first time
+              try{
+                  Image image = Image.createImage("/splash.gif");
+                  int backgroundColor = 0xFFFFFF;
+                  String readyMessage = "Press any key to continue...";
+                  //Set readyMessage = null to forward to the next
+                  //displayabe as soon as it's available
+                  int messageColor = 0xFF0000;
+                  InitializerSplashScreen splashScreen = new InitializerSplashScreen(this.display
+                  ,image, backgroundColor, readyMessage,messageColor,this);
+                  this.display.setCurrent(splashScreen);
+                  
+              }catch(IOException e){
+                throw new MIDletStateChangeException("Unable to load splash image");
+              }
+        }
     }
 
+    public Displayable initApp(){
+        //initialize the application.e.g. read data from record store,etc
+        //.......
+        //now create the main menu screen:
+        //e.g. this.mainScreen = new Form("Main Form");
+    	try{
+  		  Thread.currentThread().sleep(2000);
+  		} catch(Exception e) {}
+  		
+    	initRMS();
+    	mainScreen = createView();
+    	return mainScreen;
+ 
+    }
+    
+//  protected void startApp() throws MIDletStateChangeException
+//  {
+//  	//log.write("TRYING CREATEView",MIDPLogger.DEBUG);
+//  	initRMS();
+//  	createView();
+//  	//log.write("completed CREATEVIEW",MIDPLogger.DEBUG);
+//  }
+    
     private void initRMS() {
     	//log.write("PRE-initXFormUtil",MIDPLogger.DEBUG);
 		this.xformRMS = new XFormRMSUtility(Controller.XFORM_RMS);
@@ -277,8 +327,8 @@ public class TransportShell extends MIDlet implements CommandListener
 		//log.write("POST-writeDummy",MIDPLogger.DEBUG);
 	}
 
-	public void createView() {
-		displayFormList();
+	public Displayable createView() {
+		return displayFormList();
     	//Display.getDisplay(this).setCurrent(selectFunction);
 	}
 
@@ -353,20 +403,43 @@ public class TransportShell extends MIDlet implements CommandListener
     }
 
 	private void loadProperties() {
-		loadAndSetViewType();
+	    initProperty(Constants.POST_URL_LIST, Constants.POST_URL);
 		initProperty("PostURL", Constants.POST_URL);
 		initProperty("GetURL", Constants.GET_URL);
 		initProperty("GetFormsMethod", Constants.GETFORMS_BLUETOOTH);
+		initProperty("DeviceID", genGUID(25));
+		Enumeration en = PropertyManager.instance().getRules().allowableProperties().elements();
+		while(en.hasMoreElements()) {
+		    String prop = (String)en.nextElement();
+		    if(PropertyManager.instance().getProperty(prop) == null) {
+		        PropertyManager.instance().setProperty(prop, " ");
+		    }
+		    else if(PropertyManager.instance().getProperty(prop).size() ==0) {
+		        PropertyManager.instance().setProperty(prop, " ");
+		    }
+		}
 	}
 
-	private String initProperty (String propName, String defaultValue) {
-		String propVal = PropertyManager.instance().getProperty(propName);
-		if (propVal == null) {
-			propVal = defaultValue;
-			PropertyManager.instance().setProperty(propName, propVal);
-			System.out.println("No default value for [" + propName + "]; setting to [" + propVal + "]");  //debug
+	public static String genGUID (int len) {
+		String guid = "";
+		Random r = new Random();
+		
+		for (int i = 0; i < 25; i++) { //25 == 128 bits of entropy
+			guid += Integer.toString(r.nextInt(36), 36);
 		}
-		return propVal;
+				
+		return guid.toUpperCase();
+	}
+	
+	private String initProperty (String propName, String defaultValue) {
+		Vector propVal = PropertyManager.instance().getProperty(propName);
+		if (propVal == null || propVal.size() == 0) {
+		    propVal = new Vector();
+			propVal.addElement(defaultValue);
+			PropertyManager.instance().setProperty(propName, propVal);
+			System.out.println("No default value for [" + propName + "]; setting to [" + defaultValue + "]");  //debug
+		}
+		return defaultValue;
 	}
 
 	private void loadAndSetViewType () {
@@ -521,6 +594,4 @@ public class TransportShell extends MIDlet implements CommandListener
 			this.transportLayer = new TransportLayer(this);
 		return this.transportLayer;
 	}
-
-
 }

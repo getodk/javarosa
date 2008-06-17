@@ -5,10 +5,13 @@ package org.javarosa.polishforms;
 import java.util.Stack;
 
 import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.clforms.Controller;
 import org.javarosa.clforms.MVCComponent;
@@ -16,16 +19,18 @@ import org.javarosa.clforms.api.Prompt;
 import org.javarosa.clforms.api.ResponseEvent;
 import org.javarosa.clforms.view.FormView;
 import org.javarosa.clforms.view.IPrompter;
-import org.javarosa.view.widget.chart.*;
+import org.javarosa.clforms.api.Constants;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.Gauge;
+import de.enough.polish.ui.UiAccess;
+
+import org.javarosa.view.widget.chart.*;
+
 import java.util.Vector;
 import org.javarosa.dtree.i18n.*;
 import javax.microedition.lcdui.Canvas;
-
-import de.enough.polish.ui.UiAccess;
 import java.util.Enumeration;
 
 
@@ -48,13 +53,13 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
 
     Command selectCommand = new Command("Select", Command.SCREEN, 1);
     
-    Command backCommand = new Command("Back", Command.BACK, 3);
+    Command backCommand = new Command("Back", Command.BACK, 2);
     
-    Command saveAndReloadCommand = new Command("Save and Start Over", Command.SCREEN, 3);
+    Command saveAndReloadCommand = new Command("Save and Start Over", Command.SCREEN, 4);
     
-    Command saveAndExitCommand = new Command("Save and Exit", Command.SCREEN, 3);
+    Command saveAndExitCommand = new Command("Save and Exit", Command.SCREEN, 4);
     
-    Command exitCommand = new Command("Exit", Command.EXIT, 2);
+    Command exitCommand = new Command("Exit", Command.EXIT, 4);
     
     Gauge progressBar;
     
@@ -69,21 +74,20 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
 
     Command languageCommand = new Command("Select Language", Command.SCREEN, 2);
 
-    
     /**
      * Creates a ChatScreen, and loads the menus
      */
     public ChatScreen() {
         //#style framedForm
-        super("Chatterbox");
+        super("GATHER");
 
-        this.addCommand(menuCommand);
+        //this.addCommand(menuCommand);
         this.addCommand(selectCommand);
         
-        this.addSubCommand(exitCommand, menuCommand);
-        this.addSubCommand(saveAndReloadCommand, menuCommand);
-        this.addSubCommand(saveAndExitCommand, menuCommand);
-        this.addSubCommand(backCommand, menuCommand);
+        this.addCommand(exitCommand);
+        this.addCommand(saveAndReloadCommand);
+        this.addCommand(saveAndExitCommand);
+        this.addCommand(backCommand);
         
         this.setCommandListener(this);
         
@@ -92,16 +96,26 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
         append(Graphics.BOTTOM, progressBar);
     }
     
-    /**
-     * Handler for when the answer for the previous question has been selected 
-     */
-    private void selectPressed() {
-        System.out.println("selected!");
-        if(!displayFrames.empty()) {
-            DisplayFrame topFrame = (DisplayFrame)(displayFrames.peek());
-            topFrame.evaluateResponse();
-        }
-    }    
+    
+    
+    public void showError(String title, String message, Display display)
+    {
+    	//#style mailAlert
+    	Alert alert = new Alert(title, message, null, AlertType.ERROR);
+    	alert.setTimeout(Alert.FOREVER);
+    	display.setCurrent(alert, this);  
+    }
+    
+//    /**
+//     * Handler for when the answer for the previous question has been selected 
+//     */
+//    private void selectPressed() {
+//        System.out.println("selected!");
+//        if(!displayFrames.empty()) {
+//            DisplayFrame topFrame = (DisplayFrame)(displayFrames.peek());
+//            topFrame.evaluateResponse();
+//        }
+//    }    
     
     /**
      * Adds a new Prompt to the screen
@@ -190,7 +204,7 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
      * (Inherited from FormView) Displays a prompt This is generally a sign that
      * we're either starting or finishing a form
      */
-    public void displayPrompt(Prompt prompt) {   	
+    public void displayPrompt(Prompt prompt) {
         System.out.println("Display Prompt");
         if (checkFinishedWithForm(prompt)) {
             commandAction(this.saveAndExitCommand, this);           
@@ -224,7 +238,11 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
     public void showPrompt(Prompt prompt) {
         if(!displayFrames.empty()) {
             DisplayFrame topFrame = (DisplayFrame)(displayFrames.peek());
-            topFrame.evaluateResponse();
+            // @JJ May 26, 2008:
+            //moving this earlier so that its actually populated when there is a call made back to the controller
+            //I'm not sure how this works in general as thsi should be populated when the controller performs its logic
+            //topFrame.evaluateResponse();
+            
             topFrame.removeFromScreen(this);
             topFrame.drawSmallFormOnScreen(this);
         }
@@ -252,9 +270,16 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
      */
     public void commandAction(Command command, Displayable s) {
     	String label = command.getLabel();
+    	
         try {
             if (command == selectCommand) {
-                selectPressed();
+                
+            	// @JJ May 26, 2008: added from SetPrompt
+            	if(!displayFrames.empty()) {
+                    DisplayFrame topFrame = (DisplayFrame)(displayFrames.peek());
+                    topFrame.evaluateResponse();
+                }
+                    
                 controller.processEvent(new ResponseEvent(ResponseEvent.NEXT, -1));
             }
             else if (command == backCommand ) {
@@ -286,6 +311,11 @@ public class ChatScreen extends de.enough.polish.ui.FramedForm  implements IProm
             a.setTimeout(Alert.FOREVER);
             MVCComponent.display.setCurrent(a);
         }
+    }
+    
+    public void destroy () {
+    	clearForm();
+    	exitForm();
     }
     
     /**

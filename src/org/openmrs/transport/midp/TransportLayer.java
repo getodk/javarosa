@@ -1,9 +1,8 @@
 package org.openmrs.transport.midp;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Enumeration;
+import java.util.Vector;
 
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
@@ -18,6 +17,7 @@ import javax.microedition.midlet.MIDletStateChangeException;
 
 import org.javarosa.clforms.ModelList;
 import org.javarosa.clforms.TransportShell;
+import org.javarosa.clforms.api.Constants;
 import org.javarosa.clforms.storage.Model;
 import org.javarosa.properties.PropertyManager;
 import org.openmrs.transport.MessageListener;
@@ -282,7 +282,7 @@ public class TransportLayer implements
 				this.shell.displayModelList();
 //				Display.getDisplay(shell).setCurrent(mainMenu);
 			} else if (c == CMD_OK) {
-				destinationUrl = textField.getString();
+				processURLform();
 				try {
 				if(currentMethod == TransportMethod.HTTP_GCF)
 					sendData(TransportMethod.HTTP_GCF);
@@ -302,18 +302,22 @@ public class TransportLayer implements
 		populateMessageList();
 		Display.getDisplay(shell).setCurrent(messageList);
 	}
-
+	
 	public void showURLform() {
+		showURLform(this); 
+	}
+
+	public void showURLform(CommandListener listener) {
 		urlForm = new Form ("URL");
 		//destinationUrl = shell.getAppProperty("destination-url");
-		destinationUrl = PropertyManager.instance().getProperty("PostURL");
+		destinationUrl = PropertyManager.instance().getSingularProperty("PostURL");
 		System.out.println("URL PROP: " + destinationUrl);
 		textField = new TextField("Please enter destination string",
 				destinationUrl,140,TextField.URL);
 		urlForm.append(textField);
 		urlForm.addCommand(CMD_OK);
 		urlForm.addCommand(CMD_BACK);
-		urlForm.setCommandListener(this);
+		urlForm.setCommandListener(listener);
 		this.currentMethod = TransportMethod.HTTP_GCF;
 		Display.getDisplay(shell).setCurrent(urlForm);
 	}
@@ -329,15 +333,31 @@ public class TransportLayer implements
 		}
 		return null;
 	}
+	
+	public void processURLform() {
+		destinationUrl = textField.getString();
+	}
 
+	public void setDestURL (String URL) {
+		destinationUrl = URL;
+	}
+	
 	/**
 	 * @throws IOException
 	 */
-	private void sendData(int transportMethod) throws IOException {
+	public void sendData(int transportMethod) throws IOException {
 		System.out.println("Destination URL: " + destinationUrl);
+		Vector existingURLs = PropertyManager.instance().getProperty(Constants.POST_URL_LIST);
+		System.out.println("Existing URLs: " + existingURLs.toString());
+		if(!existingURLs.contains(destinationUrl)) {
+		    existingURLs.addElement(destinationUrl);
+		    PropertyManager.instance().setProperty(Constants.POST_URL_LIST, existingURLs);
+		}
+		System.out.println("NEw Existing URLs: " + PropertyManager.instance().getProperty(Constants.POST_URL_LIST).toString());
 
 		if(this.data != null){
 			System.out.println("WANT TO SEND "+this.data+this.data.getRecordId());
+			String testString = this.data.toString();
 			transportManager.enqueue(this.data.toString().getBytes("UTF-8"),
 					destinationUrl, transportMethod,this.data.getRecordId());
 		}else{

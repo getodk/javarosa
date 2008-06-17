@@ -1,12 +1,12 @@
 package org.javarosa.properties;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
-import org.javarosa.clforms.storage.Externalizable;
 import org.javarosa.clforms.storage.RMSUtility;
 import org.javarosa.clforms.util.SimpleOrderedHashtable;
 
@@ -88,7 +88,7 @@ public class PropertyRMSUtility extends RMSUtility {
      * @param recordName The property to be retrieved
      * @return The value of the property if it exists, null otherwise
      */
-    public String getValue(String recordName ) {
+    public Vector getValue(String recordName ) {
         Object recordId = nameToId.get(recordName);
         if(recordId == null) {
             indexPropertyNames();
@@ -117,7 +117,7 @@ public class PropertyRMSUtility extends RMSUtility {
      * @param propertyName The name of the property to be written
      * @param value The value of the property
      */
-    public void writeValue(String propertyName, String value) {
+    public void writeValue(String propertyName, Vector value) {
         Property theProp = new Property();
         theProp.name = propertyName;
         theProp.value = value;

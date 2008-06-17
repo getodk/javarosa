@@ -1,12 +1,19 @@
 <h:html xmlns:h="http://www.w3.org/1999/xhtml"
         xmlns="http://www.w3.org/2002/xforms"
 	  xmlns:ev="http://www.w3.org/2001/xml-events"
-	  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	  xmlns:jr="http://openrosa.org/javarosa">
 <h:head>
     <h:title>HMIS 033a: Health Unit Notifiable Disease Report</h:title>
     <model>
 	<instance>
-		<HMISFormA xmlns="">
+		<HMISFormA xmlns="http://gatherdata.org/en_UG/hmis033a">
+			<Meta>
+				<DeviceID />
+				<TimeStart />
+				<TimeEnd />
+			</Meta>
+		
 			<DateOfReport/>
 			<ReportNumberThisYear/>
 			<FinancialYear/>
@@ -112,10 +119,19 @@
 			</internal>
 		</HMISFormA>
 	</instance>
+
+	<bind id="hidden1" nodeset="/HMISFormA/Meta/DeviceID" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
+	<bind id="hidden2" nodeset="/HMISFormA/Meta/TimeStart" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
+	<bind id="hidden3" nodeset="/HMISFormA/Meta/TimeEnd" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
+
+	<bind id="prop1" nodeset="/HMISFormA/HealthUnit" type="xsd:string" jr:preload="property" jr:preloadParams="health-unit" />
+	<bind id="prop2" nodeset="/HMISFormA/HealthUnitCode" type="xsd:string" jr:preload="property" jr:preloadParams="health-unit-code" />
+	<bind id="prop3" nodeset="/HMISFormA/SubCounty" type="xsd:string" jr:preload="property" jr:preloadParams="sub-county" />
+	<bind id="prop4" nodeset="/HMISFormA/District" type="xsd:string" jr:preload="property" jr:preloadParams="district" />
 		
-	<bind id="a" nodeset="/HMISFormA/DateOfReport" type="xsd:date"/>
-	<bind id="b" nodeset="/HMISFormA/ReportNumberThisYear" type="xsd:int"/>
-	<bind id="c" nodeset="/HMISFormA/FinancialYear" type="xsd:int"/>
+	<bind id="a" nodeset="/HMISFormA/DateOfReport" type="xsd:date" jr:preload="date" jr:preloadParams="today" />
+	<bind id="b" nodeset="/HMISFormA/ReportNumberThisYear" type="xsd:int" required="true()"/>
+	<bind id="c" nodeset="/HMISFormA/FinancialYear" type="xsd:int" jr:preload="property" jr:preloadParams="fin-year" />
 	<bind id="p1a" nodeset="/HMISFormA/Patients/Patient1/PatientNumber" type="xsd:int"/>
 	<bind id="p1b" nodeset="/HMISFormA/Patients/Patient1/Age" type="xsd:int"/>
 	<bind id="p1c" nodeset="/HMISFormA/Patients/Patient1/DateOfOnset" type="xsd:date"/>
@@ -148,16 +164,16 @@
             <label>Financial Year</label>
         </input>
 	
-        <input ref="/HMISFormA/HealthUnit">
+        <input bind="prop1">
             <label>Health Unit</label>
         </input>
-        <input ref="/HMISFormA/HealthUnitCode">
+        <input bind="prop2">
             <label>Health Unit Code</label>
         </input>
-        <input ref="/HMISFormA/SubCounty">
+        <input bind="prop3">
             <label>Sub county</label>
         </input>
-        <input ref="/HMISFormA/District">
+        <input bind="prop4">
             <label>District</label>
         </input>
 
@@ -168,11 +184,11 @@
 		<item><label>Dysentery</label><value>Dysentery</value></item>
 		<item><label>Malaria</label><value>Malaria</value></item>
 		<item><label>Meningitis</label><value>Meningitis</value></item>
-		<item><label>Other</label><value>Other</value></item>
+		<item><label>more...</label><value>more...</value></item>
 	</select1>
 
-	<select1 ref="/HMISFormA/DiseaseDiagnosis" relevant="/HMISFormA/DiseaseDiagnosis='Other'">
-		<label>Disease diagnosis (continued)</label>
+	<select1 ref="/HMISFormA/DiseaseDiagnosis" relevant="/HMISFormA/DiseaseDiagnosis='more...'">
+		<label>Disease diagnosis (cont'd)</label>
 		<item><label>Rabies</label><value>Rabies</value></item>
 		<item><label>Cholera</label><value>Cholera</value></item>
 		<item><label>Guinea Worm</label><value>Guinea Worm</value></item>

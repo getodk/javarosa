@@ -7,7 +7,10 @@ import java.io.OutputStream;
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 
+import org.javarosa.clforms.MVCComponent;
 import org.openmrs.transport.TransportManager;
 import org.openmrs.transport.TransportMessage;
 import org.openmrs.transport.TransportMethod;
@@ -109,7 +112,17 @@ public class HttpTransportMethod implements TransportMethod {
 						+ " is not a valid HTTP URL");
 			} catch (IOException e) {
 				System.out.println(e.getMessage());
-			} finally {
+			} catch(java.lang.SecurityException se) {
+	             /***
+                 * This exception was added to deal with the user denying access to airtime
+                 */
+			 // update status
+                message.setStatus(TransportMessage.STATUS_FAILED);
+                System.out.println("Status: " + message.getStatus());
+                // manager.updateMessage(message);
+                message.setChanged();
+                message.notifyObservers(null); 
+		    }finally {
 				cleanUp(in);
 				cleanUp(out);
 				cleanUp(con);

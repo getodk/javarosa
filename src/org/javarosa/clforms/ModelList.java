@@ -140,19 +140,20 @@ public class ModelList extends List implements CommandListener
             }
         } else if (c == CMD_SEND)
         {
-        	ModelMetaData data = (ModelMetaData) modelIDs.elementAt(this.getSelectedIndex());
-            Model model = new Model();
-            try {
-				this.modelRMSUtility.retrieveFromRMS(data.getRecordId(), model);
-				model.setRecordId(data.getRecordId());
-			} catch (IOException e) {
-				javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model",null,
-						AlertType.ERROR);
-				Display.getDisplay(this.mainShell).setCurrent(a,this);
-				e.printStackTrace();
-			}
-			this.transportLayer.setData(model);
-            this.transportLayer.showURLform();
+            if (this.getSelectedIndex() != -1) {
+                ModelMetaData data = (ModelMetaData) modelIDs.elementAt(this.getSelectedIndex());
+                Model model = new Model();
+                try {
+                    this.modelRMSUtility.retrieveFromRMS(data.getRecordId(), model);
+                    model.setRecordId(data.getRecordId());
+                } catch (IOException e) {
+                    javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
+                    Display.getDisplay(this.mainShell).setCurrent(a, this);
+                    e.printStackTrace();
+                }
+                this.transportLayer.setData(model);
+                this.transportLayer.showURLform();
+            }
         } else if (c == CMD_EMPTY)
         {
         	this.modelRMSUtility.tempEmpty();

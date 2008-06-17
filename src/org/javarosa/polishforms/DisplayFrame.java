@@ -3,6 +3,7 @@
 package org.javarosa.polishforms;
 
 import java.util.Enumeration;
+import java.util.Date;
 
 import org.javarosa.clforms.api.Constants;
 import org.javarosa.clforms.api.Prompt;
@@ -16,6 +17,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.StyleSheet;
 import de.enough.polish.ui.TextField;
 import de.enough.polish.ui.Container;
+import de.enough.polish.ui.DateField;
 
 import org.javarosa.clforms.util.*;
 
@@ -51,6 +53,9 @@ public class DisplayFrame {
     public DisplayFrame(Prompt thePrompt) {
         this.thePrompt = thePrompt;
                 
+        //#style questiontext
+        questiontext = new StringItem(null,thePrompt.getLongText());
+        
         loadWidget();
     }
     
@@ -61,22 +66,23 @@ public class DisplayFrame {
         Enumeration itr;
         switch(thePrompt.getFormControlType()) {
         case Constants.INPUT:
-        	TextField inputBox = null;
-
-        	if(thePrompt.getValue()!= null){
+        	if (thePrompt.getReturnType() != Constants.RETURN_DATE) {
         		//#style textBox
-        		inputBox = new TextField("", thePrompt.getValue().toString(),30,TextField.ANY);
+        		TextField inputBox = new TextField("", "",200,TextField.ANY);
+        		inputBox.setInputMode(TextField.MODE_UPPERCASE);
+        		inputBox.setText((String)thePrompt.getValue());
+        		
+        		if (thePrompt.getReturnType() == Constants.RETURN_INTEGER)
+        			inputBox.setConstraints(TextField.NUMERIC);
+            
+        		theWidget = inputBox;
         	} else {
         		//#style textBox
-        		inputBox = new TextField("", "", 30, TextField.ANY);
+        		DateField datefield = new DateField(null, DateField.DATE);
+        		datefield.setDate((Date)thePrompt.getValue());
+        		theWidget = datefield;
         	}
-
-        	if(thePrompt.getReturnType() == Constants.RETURN_INTEGER) {
-        		inputBox.setConstraints(TextField.NUMERIC);
-        	}
-
-        	theWidget = inputBox;
-        	break;
+            break;
         case Constants.TEXTAREA:
         	TextField textArea;
         	if(thePrompt.getValue()!= null){
@@ -139,7 +145,7 @@ public class DisplayFrame {
         	if(thePrompt.getValue() != null){
         		Object selectedOptions = thePrompt.getValue();
         		if(selectedOptions instanceof String){
-        			String []selectedIndices = J2MEUtil.split((String)selectedOptions);
+        			String []selectedIndices = J2MEUtil.split((String)selectedOptions, ",");
         			for(int index =0; index <selectedIndices.length; index++){
         				int selectedOption = Integer.parseInt(selectedIndices[index]);
         				multipleGroup.setSelectedIndex(selectedOption,true);
@@ -259,8 +265,17 @@ public class DisplayFrame {
     public void evaluateResponse() {
         switch(thePrompt.getFormControlType()) {
         case Constants.INPUT:
-            thePrompt.setValue(((StringItem)theWidget).getText());
-            break;
+        	if (thePrompt.getReturnType() != Constants.RETURN_DATE) {
+        	    String value = ((StringItem)theWidget).getText();
+        	    if(value == null) {
+        	        value = "";
+        	    }
+        		thePrompt.setValue(value);
+        	} else {
+        		Date d = ((DateField)theWidget).getDate();
+        		thePrompt.setValue(d);
+        	}
+        	break;
         case Constants.TEXTAREA:
             thePrompt.setValue(((StringItem)theWidget).getText());
             break;
@@ -323,7 +338,9 @@ public class DisplayFrame {
         }
         displayedItems = new Item[] {questiontext,theWidget};
         target.focus(theWidget);
+        target.scrollRelative((theWidget.itemHeight)/2);
     }
+
     /**
      * Draws the Small (read only) Version of the frame onto a Screen
      * 
@@ -366,7 +383,11 @@ public class DisplayFrame {
         if(thePrompt.getFormControlType() == Constants.TEXTAREA || 
                 thePrompt.getFormControlType() == Constants.TEXTBOX ||
                 thePrompt.getFormControlType() == Constants.INPUT) {
-            return thePrompt.getValue().toString();
+        	if (thePrompt.getReturnType() == Constants.RETURN_DATE) { //J2MEUtil.getStringValue probably handles everything-- not investigating now
+        		return J2MEUtil.getShortStringValue(thePrompt.getValue(), Constants.RETURN_DATE);
+        	} else {
+        		return thePrompt.getValue().toString();
+        	}
         }
         else if(thePrompt.getFormControlType() == Constants.SELECT1) {
             System.out.println(thePrompt.getValue());
@@ -395,7 +416,7 @@ public class DisplayFrame {
     public boolean autoPlayItem(Item item) {
         if(thePrompt.getFormControlType() == Constants.SELECT ||
            thePrompt.getFormControlType() == Constants.OUTPUT ||
-           thePrompt.getFormControlType() == Constants.INPUT) {
+           (thePrompt.getFormControlType() == Constants.INPUT && thePrompt.getReturnType() != Constants.RETURN_DATE)) {
             return false;
         }
         else {

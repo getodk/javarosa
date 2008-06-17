@@ -1,10 +1,10 @@
 package org.javarosa.properties;
 
-import java.lang.Character;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Vector;
 
 import org.javarosa.clforms.storage.Externalizable;
 import org.javarosa.clforms.storage.IDRecordable;
@@ -20,7 +20,7 @@ import org.javarosa.clforms.storage.IDRecordable;
  */
 public class Property implements Externalizable, IDRecordable{
     public String name;
-    public String value;
+    public Vector value;
     public int recordId;
    
     /** (non-Javadoc)
@@ -36,9 +36,26 @@ public class Property implements Externalizable, IDRecordable{
             char c = (char)inputarray[i];
             fullString = fullString + c;
         }
-        //String fullString = new String(inputarray);
-        name = fullString.substring(0, fullString.indexOf(","));
-        value = fullString.substring(fullString.indexOf(",")+1,fullString.length());
+        int nameindex = fullString.indexOf(","); 
+        if(nameindex == -1) {
+            System.out.println("WARNING: Property in RMS with no value");
+            nameindex = fullString.length();
+        }
+        name = fullString.substring(0, nameindex);
+        // The format of the properties should be each one in a list, comma delimited
+        value = new Vector();
+        String packedvalue = fullString.substring(fullString.indexOf(",")+1,fullString.length());
+        while(packedvalue.length() != 0) {
+            int index = packedvalue.indexOf(",");
+            if(index == -1) {
+                value.addElement(packedvalue);
+                packedvalue = "";
+            }
+            else {
+                value.addElement(packedvalue.substring(0,index));
+                packedvalue = packedvalue.substring(index + 1, packedvalue.length());
+            }
+        }
         in.close();
     }
 
@@ -46,11 +63,17 @@ public class Property implements Externalizable, IDRecordable{
      *  @see org.javarosa.clforms.storage.Externalizable#writeExternal(DataOutputStream)
      */
     public void writeExternal(DataOutputStream out) throws IOException {
-        String outputString = name + "," + value;
+        String outputString = name;
+        // Note that this enumeration should contain at least one element, otherwise the
+        // deserialization is invalid
+        Enumeration en = value.elements();
+        while(en.hasMoreElements()) {
+            outputString += "," + (String)en.nextElement();
+        }
+        
         for(int i = 0 ; i < outputString.length(); ++i) {
             out.writeByte((byte)outputString.charAt(i));
         }
-        //out.writeChars();
         out.close();
 
     }

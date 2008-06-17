@@ -16,6 +16,9 @@ public class Binding {
 	private String relevancy;
 	private boolean required = false;
 
+	public String preload;
+	public String preloadParams;
+	
 	/**
 	 * 
 	 */

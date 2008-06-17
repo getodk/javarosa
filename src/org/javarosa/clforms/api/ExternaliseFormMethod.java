@@ -226,6 +226,14 @@ public class ExternaliseFormMethod {
 		//relevant
 		if(bind.getRelevancy()!=null)
 			result += attribute("relevant", bind.getRelevancy()) + " ";
+
+		if (bind.preload != null) {
+			result += attribute("jr:preload", bind.preload) + " ";
+			if (bind.preloadParams != null) {
+				result += attribute("jr:preloadParams", bind.preloadParams) + " ";
+			}
+		}
+		
 		return result;
 	}
 
@@ -273,7 +281,7 @@ public class ExternaliseFormMethod {
 
 	private String writeDocumentHeader() {
 		return "" +
-				"<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:xf=\"http://www.w3.org/2002/xforms\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">";
+				"<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:xf=\"http://www.w3.org/2002/xforms\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:jr=\"http://openrosa.org/javarosa\">";
 	}
 
 	private String writeDocumentFooter() {

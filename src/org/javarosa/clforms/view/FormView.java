@@ -9,6 +9,8 @@ public interface FormView {
 	
 	public void displayPrompt(Prompt prompt);
 
+	public void destroy();
+	
 	//public void showDefaultPrompt(Prompt prompt);
 
 }

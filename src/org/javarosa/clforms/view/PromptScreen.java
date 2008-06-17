@@ -9,6 +9,7 @@ import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.DateField;
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
@@ -75,11 +76,16 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 		this.screenIndex = screenIndex;
 		this.totalScreens = totalScreens;
 	}
+	
+	public void showError(String title, String message, Display display)
+	{
+		throw new RuntimeException("Method not supported yet.");
+	}
 
 	public Displayable getScreen() {
 		return screen;
 	}
-
+	
 	public void save() {
 
 		switch (p.getReturnType()){
