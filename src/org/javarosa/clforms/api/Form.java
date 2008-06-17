@@ -159,15 +159,19 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
 	 * @param prompt
 	 */
 	public void updateModel(Prompt prompt) {
-		//techendeavour graph stuff
-        int [] controlDataArray = null;
-        int arrCount = 0;
-        if(prompt.getFormControlType() == Constants.OUTPUT_GRAPH) {
-            controlDataArray = prompt.getControlDataArray();
-        }		
-		
 		String xpath = prompt.getXpathBinding();
-		String value = J2MEUtil.getStringValue(prompt.getValue(), prompt.getReturnType());
+		String value = J2MEUtil.getXMLStringValue(prompt.getValue(), prompt.getReturnType());
+
+		updateModel(xpath, value);
+	}
+		
+	public void updateModel(String xpath, String value) {
+		//techendeavour graph stuff
+        //int [] controlDataArray = null;
+        //int arrCount = 0;
+        //if(prompt.getFormControlType() == Constants.OUTPUT_GRAPH) {
+        //    controlDataArray = prompt.getControlDataArray();
+        //}		
 		
 		//System.out.println("Updating Model"+prompt.getXpathBinding()+" - "+value);		
 		if (value != null) {
@@ -183,13 +187,14 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
 					for (int i = 0; i < ((Element)obj).getChildCount(); i++) {
 						if (((Element)obj).getType(i) == Node.TEXT){
 							((Element) obj).removeChild(i);
-                            if(prompt.getFormControlType() == Constants.OUTPUT_GRAPH) {
-                                ((Element) obj).addChild(i,Node.TEXT, new String("" + controlDataArray[arrCount]) + "");
-                                arrCount++;
-                            } else {
+							//techendeavours graph stuff
+                            //if(prompt.getFormControlType() == Constants.OUTPUT_GRAPH) {
+                            //    ((Element) obj).addChild(i,Node.TEXT, new String("" + controlDataArray[arrCount]) + "");
+                            //    arrCount++;
+                            //} else {
                                 ((Element) obj).addChild(i,Node.TEXT, value);	
     							//System.out.println("added1 "+value);
-                            }
+                            //}
 							textfound = true;
 							break;
 						}						

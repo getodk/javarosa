@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.microedition.io.Connector;
@@ -23,7 +26,9 @@ import org.javarosa.clforms.api.Constants;
 import org.javarosa.clforms.api.Form;
 import org.javarosa.clforms.api.Prompt;
 import org.javarosa.clforms.storage.Model;
+import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.clforms.util.SimpleOrderedHashtable;
+import org.javarosa.properties.PropertyManager;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
@@ -31,11 +36,11 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 
-import org.javarosa.dtree.i18n.*;
-
 import de.enough.polish.util.Locale;
 import de.enough.polish.util.StringTokenizer;
 import de.enough.polish.util.TextUtil;
+
+import org.javarosa.dtree.i18n.*;
 
 /* droos: this code is getting a little out of hand; i think it needs to be restructured; it is too
  * spaghettified and there is too much special-casing and code duplication */
@@ -44,6 +49,7 @@ import de.enough.polish.util.TextUtil;
  * 
  */
 public class XMLUtil {
+
 	/**
 	 * Method to parse an XForm from an input stream.
 	 * 
@@ -55,7 +61,7 @@ public class XMLUtil {
 		parseForm(isr, f);
 		return f;
 	}
-	
+		
 	/**
 	 * Method to parse an input stream into an existing XForm.
 	 * 
@@ -72,6 +78,7 @@ public class XMLUtil {
 			
 			Element html = doc.getRootElement();
 			parseElement(form, html, null);
+			processUnattachedBinds(form);
 			
 			//TODO FIGURE out why have to trim twice!
 			form.getXmlModel().trimXML();
@@ -99,15 +106,23 @@ public class XMLUtil {
 			Prompt existingPrompt) throws Exception{
 		String label = ""; //$NON-NLS-1$
 		String value = ""; //$NON-NLS-1$
-        String textRef = "";
-        
+		String textRef = "";
+
+		// LOG
+		//System.out.println("parsing element: " + element.getName());
+		//System.out.println("no children:"+element.getChildCount());
 		int numOfEntries = element.getChildCount();
 		for (int i = 0; i < numOfEntries; i++) {
 			if (element.isText(i)) {
 				// Text here are all insignificant white spaces.
 				// We are only interested in children elements
+				// LOG
+				//System.out.println(element.getName()+" skipping a whitespace");
 			} else {
 				Element child = element.getElement(i);
+				// LOG
+				//System.out.println("analysing " +element.getName()+" child: "+child.getName());
+				
 				String tagname = child.getName();
 				if (TextUtil.equalsIgnoreCase(tagname,"head")) { //$NON-NLS-1$
 					parseElement(form, child, null);
@@ -116,6 +131,8 @@ public class XMLUtil {
 				} else if (TextUtil.equalsIgnoreCase(tagname,"title")) { //$NON-NLS-1$
 					form.setName(getXMLText(child, 0, true));
 				} else if (TextUtil.equalsIgnoreCase(tagname,"model")) { //$NON-NLS-1$
+					// LOG
+					//System.out.println("found and creating Model"+model.toString());
 					Model model = new Model();
 					Document xmlDoc = new Document();
 					model.setXmlModel(xmlDoc);
@@ -125,6 +142,8 @@ public class XMLUtil {
 							form.setName(child.getAttributeValue(j));
 							if (form.getXmlModel() != null)
 								form.getXmlModel().setName(form.getName());
+							//LOG 
+							//System.out.println("name found!!"+form.getName()+child.getAttributeValue(j));
 						}
 					}
 					parseElement(form, child, null);
@@ -134,6 +153,7 @@ public class XMLUtil {
 				} else if (TextUtil.equalsIgnoreCase(tagname, "itext")) {
 					parseIText(form, child);
 				} else if (TextUtil.equalsIgnoreCase(tagname,"bind")) { //$NON-NLS-1$
+
 					Binding b = new Binding();
 					b.setId(child.getAttributeValue("", "id")); //$NON-NLS-1$ //$NON-NLS-2$
 					b.setNodeset(child.getAttributeValue("", "nodeset")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -144,8 +164,18 @@ public class XMLUtil {
 					if (type.indexOf(':') > 0)
 						type = type.substring(type.indexOf(':') + 1);
 					b.setType(type);
+					
+					b.preload = child.getAttributeValue("http://openrosa.org/javarosa", "preload");
+					b.preloadParams = child.getAttributeValue("http://openrosa.org/javarosa", "preloadParams");
+					
 					form.addBinding(b);
+					//LOG
+					//System.out.println("Bind added to form = \n"+b.toString());
+
 				} else if (TextUtil.equalsIgnoreCase(tagname,"input")) { //$NON-NLS-1$
+					
+					//LOG
+					//System.out.println("found input");
 					Prompt prompt = new Prompt();
 					prompt.setFormControlType(Constants.INPUT);
 					String ref = child.getAttributeValue(null, "ref"); //$NON-NLS-1$
@@ -288,8 +318,8 @@ public class XMLUtil {
 				}
 				// TODO - how are other elements like html:p or br handled?
 			}
-		}		
-		
+		}
+
 		if (!value.equals("")) {
 			if (!textRef.equals("")) {
 				if (!hasITextMapping(form, textRef))
@@ -310,7 +340,7 @@ public class XMLUtil {
 				existingPrompt.setShortText(label);
 			}			
 		}
-				
+		
 		return existingPrompt;
 	}
 
@@ -395,7 +425,7 @@ public class XMLUtil {
 		Localizer l = form.getLocalizer();
 		return l.hasMapping(l.getDefaultLocale(), textID);
 	}
-		
+	
 	private static void attachBind(Form form, Prompt prompt, String ref,
 			String bind) {
 		if (bind != null) {
@@ -404,8 +434,15 @@ public class XMLUtil {
 				prompt.setBindID(bind);
 				prompt.setXpathBinding(b.getNodeset());
 				prompt.setReturnType(getReturnTypeFromString(b.getType()));
+				if (prompt.getReturnType() == 0)
+					prompt.setReturnType(Constants.RETURN_STRING);
 				prompt.setId(b.getId());
 				prompt.setBind(b);
+				
+				if (b.preload != null) {
+					prompt.setDefaultValue(getPreloadValue(b.preload, (b.preloadParams == null ? "" : b.preloadParams)));
+				}
+
 				// LOG
 				//System.out.println(prompt.getLongText()+" attached to Bind = "+prompt.getBind().toString());
 			}
@@ -417,7 +454,146 @@ public class XMLUtil {
 			prompt.setId(getLastToken(ref, '/'));
 		}
 	}
+
+	public static Vector getUnattachedBinds (Form f) {
+		Vector leftoverBinds = new Vector();
+		
+		for (Enumeration e = f.getBindings().elements(); e.hasMoreElements(); ) {
+			Binding b = (Binding)e.nextElement();
+			leftoverBinds.addElement(b);
+		}
+		
+		for (Enumeration e = f.getPrompts().elements(); e.hasMoreElements(); ) {
+			Prompt p = (Prompt)e.nextElement();
+			if (p.getBind() != null)
+				leftoverBinds.removeElement(p.getBind());
+		}
+		
+		return leftoverBinds;
+	}
 	
+	private static void processUnattachedBinds (Form f) {
+		Vector binds = getUnattachedBinds(f);
+		
+		for (Enumeration e = binds.elements(); e.hasMoreElements(); ) {
+			Binding b = (Binding)e.nextElement();
+			String value = null;
+			
+			if (b.preload != null)
+				value = (String)getPreloadValue(b.preload, (b.preloadParams == null ? "" : b.preloadParams));
+				
+			if (b.getNodeset() != null && value != null && value.length() > 0)
+				f.updateModel(b.getNodeset(), value);				
+		}
+	}
+	
+	public static Object getPreloadValue (String loadMode, String loadParams) {
+		Object preloadVal = null;
+		
+		if (loadMode.equals("date")) {
+			Date d = null;
+			
+			if (loadParams.equals("today")) {
+				d = new Date();
+			} else if (loadParams.substring(0, 11).equals("prevperiod-")) {
+				String[] params = J2MEUtil.split(loadParams.substring(11), "-");
+				
+				try {
+					String type = params[0];
+					String start = params[1];
+					
+					boolean beginning;
+					if (params[2].equals("head")) beginning = true;
+					else if (params[2].equals("tail")) beginning = false;
+					else throw new RuntimeException();					
+					
+					boolean includeToday;
+					if (params.length >= 4) {
+						if (params[3].equals("x")) includeToday = true;
+						else if (params[3].equals("")) includeToday = false;
+						else throw new RuntimeException();											
+					} else {
+						includeToday = false;
+					}
+					
+					int nAgo;
+					if (params.length >= 5) {
+						nAgo = Integer.parseInt(params[4]);
+					} else {
+						nAgo = 1;
+					}
+
+					d = getPastPeriodDate(new Date(), type, start, beginning, includeToday, nAgo);
+				} catch (Exception e) {
+					throw new IllegalArgumentException("invalid preload params for preload mode 'date'");
+				}	
+			}
+			
+			preloadVal = d;
+		} else if (loadMode.equals("property")) {
+			String propname = loadParams;
+			String propval = PropertyManager.instance().getSingularProperty(propname);
+			if (propval != null && propval.length() > 0)
+				preloadVal = propval;
+		} else if (loadMode.equals("timestamp")) {
+			if (loadParams.equals("start"))
+				preloadVal = J2MEUtil.formatDateToTimeStamp(new Date());
+		} else {
+			throw new IllegalArgumentException();
+		}
+
+		return preloadVal;
+	}
+	
+	public static Date getPastPeriodDate (Date ref, String type, String start, boolean beginning, boolean includeToday, int nAgo) {
+		Date d = null;
+		
+		if (type.equals("week")) {
+			//1 week period
+			//start: day of week that starts period
+			//beginning: true=return first day of period, false=return last day of period
+			//includeToday: whether today's date can count as the last day of the period
+			//nAgo: how many periods ago; 1=most recent period, 0=period in progress
+			
+			int target_dow = -1, current_dow = -1, diff;
+			int offset = (includeToday ? 1 : 0);
+			
+			if (start.equals("sun")) target_dow = 0;
+			else if (start.equals("mon")) target_dow = 1;
+			else if (start.equals("tue")) target_dow = 2;
+			else if (start.equals("wed")) target_dow = 3;
+			else if (start.equals("thu")) target_dow = 4;
+			else if (start.equals("fri")) target_dow = 5;				
+			else if (start.equals("sat")) target_dow = 6;
+
+			if (target_dow == -1)
+				throw new RuntimeException();
+
+			Calendar cd = Calendar.getInstance();
+			cd.setTime(ref);
+			
+			switch(cd.get(Calendar.DAY_OF_WEEK)) {
+			case Calendar.SUNDAY: current_dow = 0; break;
+			case Calendar.MONDAY: current_dow = 1; break;
+			case Calendar.TUESDAY: current_dow = 2; break;
+			case Calendar.WEDNESDAY: current_dow = 3; break;
+			case Calendar.THURSDAY: current_dow = 4; break;
+			case Calendar.FRIDAY: current_dow = 5; break;
+			case Calendar.SATURDAY: current_dow = 6; break;
+			default: throw new RuntimeException(); //something is wrong
+			}
+
+			diff = (((current_dow - target_dow) + (7 + offset)) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah
+			d = new Date(ref.getTime() - diff * 86400000l);
+		} else if (type.equals("month")) {
+			//not supported
+		} else {
+			throw new IllegalArgumentException();
+		}
+		
+		return d;
+	}
+		
 	/**
 	 * Method to parse an input stream into an existing XForm.
 	 * 

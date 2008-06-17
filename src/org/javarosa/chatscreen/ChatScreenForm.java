@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
 import minixpath.XPathExpression;
@@ -68,6 +69,10 @@ public class ChatScreenForm extends DForm implements IPrompter, FormView, Comman
 		setupComponents();
 	}
 
+	public void showError(String title, String message, Display display)
+	{
+		throw new RuntimeException("Method not supported yet.");
+	}
 	
 	/**
 	 * Lays out the static components for the form
@@ -130,7 +135,7 @@ public class ChatScreenForm extends DForm implements IPrompter, FormView, Comman
 		}
 	}
 
-	
+	public void destroy() { }
 	
 	/**
 	 * Queries all frames for their optimal size, and then lays them out

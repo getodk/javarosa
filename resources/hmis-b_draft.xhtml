@@ -1,12 +1,19 @@
 <h:html xmlns:h="http://www.w3.org/1999/xhtml"
         xmlns="http://www.w3.org/2002/xforms"
 	xmlns:ev="http://www.w3.org/2001/xml-events"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:jr="http://openrosa.org/javarosa">
 <h:head>
     <h:title>HMIS 033b: Health Unit Weekly Epidemiological Surveillance Form</h:title>
     <model>
 	<instance>
-			<HMISFormB xmlns="">
+			<HMISFormB xmlns="http://gatherdata.org/en_UG/hmis033b">
+				<Meta>
+					<DeviceID />
+					<TimeStart />
+					<TimeEnd />
+				</Meta>
+			
 				<DateOfReport/>
 				<FromDate/>
 				<ToDate/>
@@ -105,9 +112,19 @@
 			</HMISFormB>		
 	</instance>
 
-		<bind id="a" nodeset="/HMISFormB/DateOfReport" type="xsd:date"/>
-		<bind id="b" nodeset="/HMISFormB/FromDate" type="xsd:date"/>
-		<bind id="c" nodeset="/HMISFormB/ToDate" type="xsd:date"/>
+		<bind id="hidden1" nodeset="/HMISFormB/Meta/DeviceID" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
+		<bind id="hidden2" nodeset="/HMISFormB/Meta/TimeStart" type="dateTime" jr:preload="timestamp" jr:preloadParams="start" />	
+		<bind id="hidden3" nodeset="/HMISFormB/Meta/TimeEnd" type="dateTime" jr:preload="timestamp" jr:preloadParams="end" />
+
+		<bind id="prop1" nodeset="/HMISFormB/HealthUnit" type="xsd:string" jr:preload="property" jr:preloadParams="health-unit" />
+		<bind id="prop2" nodeset="/HMISFormB/HealthUnitCode" type="xsd:string" jr:preload="property" jr:preloadParams="health-unit-code" />
+		<bind id="prop3" nodeset="/HMISFormB/SubCounty" type="xsd:string" jr:preload="property" jr:preloadParams="sub-county" />
+		<bind id="prop4" nodeset="/HMISFormB/HSD" type="xsd:string" jr:preload="property" jr:preloadParams="hsd" />
+		<bind id="prop5" nodeset="/HMISFormB/District" type="xsd:string" jr:preload="property" jr:preloadParams="district" />
+
+		<bind id="a" nodeset="/HMISFormB/DateOfReport" type="xsd:date" jr:preload="date" jr:preloadParams="today" />
+		<bind id="b" nodeset="/HMISFormB/FromDate" type="xsd:date" jr:preload="date" jr:preloadParams="prevperiod-week-mon-head" />
+		<bind id="c" nodeset="/HMISFormB/ToDate" type="xsd:date" jr:preload="date" jr:preloadParams="prevperiod-week-mon-tail" />
 		<bind id="d" nodeset="/HMISFormB/AcuteFlaccidParalysis/CasesThisWeek" type="xsd:int"/>
 		<bind id="e" nodeset="/HMISFormB/AcuteFlaccidParalysis/DeathsThisWeek" type="xsd:int"/>
 		<bind id="f" nodeset="/HMISFormB/AcuteFlaccidParalysis/CasesLastWeek" type="xsd:int"/>
@@ -177,20 +194,20 @@
             <label>To...</label>
         </input>
 
-        <input ref="/HMISFormB/HealthUnit">
+        <input bind="prop1">
             <label>Health Unit</label>
         </input>
-        <input ref="/HMISFormB/HealthUnitCode">
+        <input bind="prop2">
             <label>Health Unit Code</label>
         </input>
-        <input ref="/HMISFormB/SubCounty">
+        <input bind="prop3">
             <label>Sub-county</label>
         </input>
 
-        <input ref="/HMISFormB/HSD">
+        <input bind="prop4">
             <label>HSD</label>
         </input>
-        <input ref="/HMISFormB/District">
+        <input bind="prop5">
             <label>District</label>
         </input>
 

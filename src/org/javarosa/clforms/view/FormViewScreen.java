@@ -52,6 +52,8 @@ public class FormViewScreen extends MVCComponent implements FormView{
 		return screen;
 	}
 
+	public void destroy () { }
+	
 	/*
 	 * Method checks if element is required, i.e. cannot be empty
 	 * returns false if element is not required or is not empty
@@ -169,7 +171,7 @@ public class FormViewScreen extends MVCComponent implements FormView{
 			
 			if(((Prompt)form.getPrompt(i)).isRelevant()){
 				int type = ((Prompt)form.getPrompts().elementAt(i)).getReturnType();
-				String temp= J2MEUtil.getStringValue(((Prompt)form.getPrompts().elementAt(i)).getValue(),type);
+				String temp= J2MEUtil.getShortStringValue(((Prompt)form.getPrompts().elementAt(i)).getValue(),type);
 				//((List)screen ).append(((Prompt)form.getPrompts().elementAt(i)).getLongText()+temp,null);
 				// short text + value
 				((List)screen ).append(((Prompt)form.getPrompts().elementAt(i)).getShortText()+" => " +temp,null);

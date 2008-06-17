@@ -53,7 +53,7 @@ public class FormList extends List implements CommandListener
 
     public void createView(){
     	this.deleteAll();
-    	this.setTicker(new Ticker("Please select an XForm to load..."));
+    	this.setTicker(new Ticker("Please select a form to fill out..."));
     	addScreenCommands();
         this.setCommandListener(this);
         this.populateListWithXForms();
@@ -137,8 +137,7 @@ public class FormList extends List implements CommandListener
 				//LOG
 				System.out.println(mdata.toString());
 				//mdata.setRecordId(i);
-				this.append(mdata.getRecordId()+"-"+mdata.getName(), null);
-//				this.append(mdata.getName(), null);
+				this.append(/*mdata.getRecordId()+"-"+*/ mdata.getName(), null);
 				formIDs.insertElementAt(mdata,pos);
 				pos++;
 				System.out.println("METADATA: "+mdata.toString());

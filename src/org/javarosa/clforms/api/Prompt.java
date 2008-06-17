@@ -439,4 +439,20 @@ public class Prompt implements ILocalizable {
     		localizeSelectMap(localizer);
     	}
     }
+    
+	// @JJ May 26, 2008: added
+	/**
+	 * Determines if the value of this prompt is empty.  this method is not complete
+	 * @return
+	 */
+	public boolean isEmpty() {
+		if(this.value == null || this.value.equals(""))
+		{
+			return true;
+		}
+		else
+		{
+		    return false;
+		}
+	}
 }
