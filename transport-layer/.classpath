@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+ <classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
+ <classpathentry combineaccessrules="false" exported="true" kind="src" path="/dbutils"/>
+ <classpathentry combineaccessrules="false" exported="true" kind="src" path="/bluetooth-client"/>
+ <classpathentry combineaccessrules="false" exported="true" kind="src" path="/midp-utils"/>
+ <classpathentry kind="lib" path="C:/WTK2.5.2/lib/wma11.jar"/>
+ <classpathentry kind="con" path="J2MELIB"/>
+ <classpathentry combineaccessrules="false" exported="true" kind="src" path="/midp-mvc"/>
+ <classpathentry combineaccessrules="false" kind="src" path="/midp-dbutils"/>
+ <classpathentry exported="true" kind="lib" path="lib/tinylinegzip.jar"/>
+ <classpathentry combineaccessrules="false" kind="src" path="/epihandy"/>
+ <classpathentry kind="output" path="bin"/>
+</classpath>

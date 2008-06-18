@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/bluecove-2.0.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/dbutils"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/epihandy"/>
+	<classpathentry kind="con" path="J2MELIB"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
