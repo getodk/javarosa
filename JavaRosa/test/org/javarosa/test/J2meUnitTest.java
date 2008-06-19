@@ -27,7 +27,7 @@ public class J2meUnitTest extends TestCase {
 		aSuite.addTest((new J2meUnitTest("testTwo", new TestMethod() {
 			public void run(TestCase tc) { ((J2meUnitTest)tc).testTwo(); }
 		})));
-		
+				
 		return aSuite;
 	}
 	
@@ -36,6 +36,6 @@ public class J2meUnitTest extends TestCase {
 	}
 	
 	public void testTwo() {
-		assertTrue(true);
+		assertTrue(false);
 	}
 }
