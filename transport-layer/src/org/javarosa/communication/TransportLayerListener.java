@@ -1,6 +1,6 @@
-package org.fcitmuk.communication;
+package org.javarosa.communication;
 
-import org.fcitmuk.db.util.*;
+import org.javarosa.db.util.*;
 
 /**
  * Interface through which the transport layer communicates to the user.
