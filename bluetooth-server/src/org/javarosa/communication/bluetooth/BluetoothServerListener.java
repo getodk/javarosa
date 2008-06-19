@@ -1,4 +1,4 @@
-package org.fcitmuk.communication.bluetooth;
+package org.javarosa.communication.bluetooth;
 
 import java.io.*;
 
