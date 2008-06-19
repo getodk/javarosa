@@ -45,7 +45,7 @@
 				<sources>
 					<source dir="${dir.src}"/>
 					<!--Taking this out for now...-->
-					<!--source dir="${dir.test}"/-->
+					<source dir="${dir.test}"/>
 				</sources>
 				
 				<!-- Build variables -->
@@ -67,7 +67,7 @@
 				<!-- Whether to run the obfuscator, which makes reverse engineering the byte-code 
 					 more difficult, and compresses the built JAR -->
 				<!-- obfuscator settings: do not obfuscate when the test-property is true -->
-				<obfuscator name="ProGuard" unless="test">
+				<obfuscator name="ProGuard" unless="test or noobfuscate">
 					<parameter name="optimize" value="true" />
 				</obfuscator>
 
@@ -113,6 +113,13 @@
 	<!-- Main Target: Runs the build with all debug properties enabled -->
 	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
 	
+	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
+		<java classname="j2meunit.textui.TestRunner">
+			<classpath refid="classpath.test" />
+			<arg value="org.javarosa.test.J2meUnitTest"/>
+		</java>
+	</target>
+	
 	<!-- Main Target: Call to compile and run the JUnit test code -->
 	<target name="RunJunitTests" depends="compile-test" description="Call to compile and run the JUnit test code">
 	  <junit failureProperty="test.failure">	
@@ -153,6 +160,9 @@
 	  </delete>
 	</target>
 
+	<target name="disableObfuscator">
+		<property name="noobfuscate" value="true"/>
+	</target>
 	<!-- Sets the 'debug' ANT variable to true -->
 	<target name="enableDebug">
 		<property name="debug" value="true" />
@@ -179,16 +189,16 @@
 	
 	<!-- Definition of the J2ME Polish task:                      -->
 	<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
-
-	<path id="classpath.base">
+		<path id="classpath.base">
 	</path>
 	
 	<!-- Note that most of this testing code was here to test our auto-integration tester, and isn't actually
 	     usable for testing J2ME code -->
 	<!-- The classpath that should be used for tests -->
 	<path id="classpath.test">
-	  <pathelement location="${tst-dir}/lib/junit.jar" />
-	  <pathelement location="${tst-dir}" />
+      <pathelement location="${dir.dist}/${app.jarName}"/>
+	  <!--pathelement location="${dir.test}" /-->
+	  <pathelement location="${dir.lib}/j2meunit.jar" />
 	  <path refid="classpath.base" />
 	</path>
 </project>
