@@ -11,33 +11,7 @@
      Build target
 -->
 <project name="JavaRosa" default="LaunchEmulator">
-
-	<!-- import user specific properties                          -->
-	<property file="${basedir}/build.properties" />
-
-
-	<!-- import global properties                                 -->
-	<property file="${polish.home}/global.properties" />
-
-	<!-- Definition of the J2ME Polish task:                      -->
-	<taskdef name="BuildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
 	
-	<!-- Definition of the Test Suite Name:                      -->
-	<property name="test.class.name" value="org.dimagi.ExampleTestCase" />
-
-	<!-- Initialization for the build targets                    -->
-	<target name="init">
-		<!-- Disable the Emulator by default -->
-		<property name="test" value="false" />
-
-		<!-- increment build number 
-		<propertyfile file="${basedir}/build.properties">
-			<entry key="build.number" type="int" operation="+" value="1" pattern="00" />
-		</propertyfile>
-		<echo message="Build ${build.number}" />
-		-->
-	</target>
-
 	<!-- Main Target: Call to build the project -->
 	<!-- This is the main work target, it actually builds the code -->
 	<target name="BuildPolish" depends="init" description="This is the controller for the J2ME build process.">
@@ -150,6 +124,19 @@
 	  </junit>
 	  <fail message="test failed" if="test.failure" />
 	</target>
+	
+	<!-- Initialization for the build targets                    -->
+	<target name="init">
+		<!-- Disable the Emulator by default -->
+		<property name="test" value="false" />
+
+		<!-- increment build number 
+		<propertyfile file="${basedir}/build.properties">
+			<entry key="build.number" type="int" operation="+" value="1" pattern="00" />
+		</propertyfile>
+		<echo message="Build ${build.number}" />
+		-->
+	</target>
 
 	<!-- Sets the 'debug' ANT variable to true -->
 	<target name="enableDebug">
@@ -161,6 +148,34 @@
 		<property name="test" value="true" />
 		<property name="dir.work" value="build/test" />
 	</target>
+	
+	<!-- Compiles the source including tests -->
+	<target name="compile-test">
+	  <javac srcdir="${tst-dir}"
+	         verbose="${TALK}"
+	  	     debug="on">
+	    <classpath refid="classpath.test"/>
+	  </javac>
+	</target>
+	
+	<!-- Cleans the test directory and re-compile -->
+	<target name="clean-compile-test">
+	  <delete verbose="${TALK}">
+	    <fileset dir="${tst-dir}" includes="**/*.class" />
+	  </delete>
+	</target>
+	
+	<!-- Definition of the J2ME Polish task:                      -->
+	<taskdef name="BuildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
+	
+	<!-- import user specific properties                          -->
+	<property file="${basedir}/build.properties" />
+
+	<!-- import global properties                                 -->
+	<property file="${polish.home}/global.properties" />
+
+	<!-- Definition of the Test Suite Name:                      -->
+	<property name="test.class.name" value="org.dimagi.ExampleTestCase" />
 
 	<!-- The location of the directory containing tests -->
 	<property name="tst-dir" location="test/" />
@@ -177,20 +192,4 @@
 	  <pathelement location="${tst-dir}" />
 	  <path refid="classpath.base" />
 	</path>
-
-	<!-- Compiles the source including tests -->
-	<target name="compile-test">
-	  <javac srcdir="${tst-dir}"
-	         verbose="${TALK}"
-	  	     debug="on">
-	    <classpath refid="classpath.test"/>
-	  </javac>
-	</target>
-	
-	<!-- Cleans the test directory and re-compile -->
-	<target name="clean-compile-test">
-	  <delete verbose="${TALK}">
-	    <fileset dir="${tst-dir}" includes="**/*.class" />
-	  </delete>
-	</target>
 </project>
