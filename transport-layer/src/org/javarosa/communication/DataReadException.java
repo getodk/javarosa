@@ -1,4 +1,4 @@
-package org.fcitmuk.communication;
+package org.javarosa.communication;
 
 public class DataReadException extends Exception {
 

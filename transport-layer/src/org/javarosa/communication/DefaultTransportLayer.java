@@ -1,4 +1,4 @@
-package org.fcitmuk.communication;
+package org.javarosa.communication;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,13 +24,13 @@ import javax.wireless.messaging.Message;
 import javax.wireless.messaging.MessageConnection;
 import javax.wireless.messaging.MessageListener;
 
-import org.fcitmuk.communication.bluetooth.BluetoothClient;
-import org.fcitmuk.communication.bluetooth.BluetoothClientListener;
-import org.fcitmuk.db.util.Persistent;
-import org.fcitmuk.midp.db.util.Settings;
-import org.fcitmuk.util.AlertMessage;
-import org.fcitmuk.util.AlertMessageListener;
-import org.fcitmuk.util.SimpleOrderedHashtable;
+import org.javarosa.communication.bluetooth.BluetoothClient;
+import org.javarosa.communication.bluetooth.BluetoothClientListener;
+import org.javarosa.db.util.Persistent;
+import org.javarosa.midp.db.util.Settings;
+import org.javarosa.util.AlertMessage;
+import org.javarosa.util.AlertMessageListener;
+import org.javarosa.util.SimpleOrderedHashtable;
 
 import com.tinyline.util.GZIPInputStream;
 

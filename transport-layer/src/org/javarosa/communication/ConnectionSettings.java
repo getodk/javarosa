@@ -1,4 +1,4 @@
-package org.fcitmuk.communication;
+package org.javarosa.communication;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -12,11 +12,11 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.TextField;
 
-import org.fcitmuk.midp.mvc.AbstractView;
-import org.fcitmuk.util.AlertMessage;
-import org.fcitmuk.util.AlertMessageListener;
-import org.fcitmuk.util.DefaultCommands;
-import org.fcitmuk.util.SimpleOrderedHashtable;
+import org.javarosa.midp.mvc.AbstractView;
+import org.javarosa.util.AlertMessage;
+import org.javarosa.util.AlertMessageListener;
+import org.javarosa.util.DefaultCommands;
+import org.javarosa.util.SimpleOrderedHashtable;
 
 /**
  * This class shows existing connection parameters and lets the user modify them,

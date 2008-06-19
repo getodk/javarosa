@@ -1,10 +1,10 @@
-package org.fcitmuk.communication;
+package org.javarosa.communication;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
-import org.fcitmuk.db.util.Persistent;
+import org.javarosa.db.util.Persistent;
 
 /**
  * Abstracts the communication details.
