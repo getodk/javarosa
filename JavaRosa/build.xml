@@ -114,7 +114,7 @@
 	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
 	
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
-		<java classname="j2meunit.textui.TestRunner" fork="true">
+		<java classname="j2meunit.textui.TestRunner" fork="true" resultproperty="testresult.unittests">
 			<classpath refid="classpath.test" />
 			<arg value="org.javarosa.test.J2meUnitTest"/>
 		</java>
