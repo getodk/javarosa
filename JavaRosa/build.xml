@@ -11,11 +11,10 @@
      Build target
 -->
 <project name="JavaRosa" default="LaunchEmulator">
-	
 	<!-- Main Target: Call to build the project -->
 	<!-- This is the main work target, it actually builds the code -->
 	<target name="BuildPolish" depends="init" description="This is the controller for the J2ME build process.">
-		<BuildPolish>
+		<buildPolish>
 			<info name="${app.name}" 
 				version="${app.version}" 
 				description="${app.description}" 
@@ -91,7 +90,7 @@
 			</emulator>
 
 
-		</BuildPolish>
+		</buildPolish>
 	</target>
 
 	<!-- Main Target: Call to build the project and call up the emulator -->
@@ -137,17 +136,6 @@
 		<echo message="Build ${build.number}" />
 		-->
 	</target>
-
-	<!-- Sets the 'debug' ANT variable to true -->
-	<target name="enableDebug">
-		<property name="debug" value="true" />
-	</target>
-
-	<!-- Enables the emulator by setting 'test' to be true, and setting a working directory -->
-	<target name="enableEmulator">
-		<property name="test" value="true" />
-		<property name="dir.work" value="build/test" />
-	</target>
 	
 	<!-- Compiles the source including tests -->
 	<target name="compile-test">
@@ -164,22 +152,33 @@
 	    <fileset dir="${tst-dir}" includes="**/*.class" />
 	  </delete>
 	</target>
-	
-	<!-- Definition of the J2ME Polish task:                      -->
-	<taskdef name="BuildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
+
+	<!-- Sets the 'debug' ANT variable to true -->
+	<target name="enableDebug">
+		<property name="debug" value="true" />
+	</target>
+
+	<!-- Enables the emulator by setting 'test' to be true, and setting a working directory -->
+	<target name="enableEmulator">
+		<property name="test" value="true" />
+		<property name="dir.work" value="build/test" />
+	</target>
 	
 	<!-- import user specific properties                          -->
 	<property file="${basedir}/build.properties" />
 
 	<!-- import global properties                                 -->
 	<property file="${polish.home}/global.properties" />
-
+	
 	<!-- Definition of the Test Suite Name:                      -->
 	<property name="test.class.name" value="org.dimagi.ExampleTestCase" />
 
 	<!-- The location of the directory containing tests -->
 	<property name="tst-dir" location="test/" />
 	<property name="TALK" value="true" />
+	
+	<!-- Definition of the J2ME Polish task:                      -->
+	<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
 
 	<path id="classpath.base">
 	</path>
