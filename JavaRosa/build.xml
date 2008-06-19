@@ -1,4 +1,16 @@
-<project name="blank" default="emulator">
+<!-- The JavaRosa build script is structured as follows:
+     Modifiable properties are stored in the external build.properties file
+     The classpath for external jars is defined in the Build taskdef
+     
+     NOTE: Binary Libraries (.zip is the convention in j2me) are declared 
+     seperately in the binaryLibraries property. Not on the classpath!
+     
+     The BuildPolish target is associated with building the jar/jad files
+     
+     All other non-test targets essentially modify properties associated with the
+     Build target
+-->
+<project name="JavaRosa" default="LaunchEmulator">
 
 	<!-- import user specific properties                          -->
 	<property file="${basedir}/build.properties" />
@@ -8,16 +20,17 @@
 	<property file="${polish.home}/global.properties" />
 
 	<!-- Definition of the J2ME Polish task:                      -->
-	<taskdef name="j2mepolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
+	<taskdef name="BuildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
 	
 	<!-- Definition of the Test Suite Name:                      -->
 	<property name="test.class.name" value="org.dimagi.ExampleTestCase" />
 
 	<!-- Initialization for the build targets                    -->
 	<target name="init">
+		<!-- Disable the Emulator by default -->
 		<property name="test" value="false" />
 
-		<!-- incriment build number 
+		<!-- increment build number 
 		<propertyfile file="${basedir}/build.properties">
 			<entry key="build.number" type="int" operation="+" value="1" pattern="00" />
 		</propertyfile>
@@ -25,9 +38,10 @@
 		-->
 	</target>
 
+	<!-- Main Target: Call to build the project -->
 	<!-- This is the main work target, it actually builds the code -->
-	<target name="j2mepolish" depends="init" description="This is the controller for the J2ME build process.">
-		<j2mepolish>
+	<target name="BuildPolish" depends="init" description="This is the controller for the J2ME build process.">
+		<BuildPolish>
 			<info name="${app.name}" 
 				version="${app.version}" 
 				description="${app.description}" 
@@ -54,6 +68,7 @@
 				<midlet class="${app.class}" name="${app.name}" />
 				
 				<!-- Code source files to include in compilation -->
+				<!-- All source-level inclusions should be made here -->
 				<sources>
 					<source dir="${dir.src}"/>
 					<!--Taking this out for now...-->
@@ -93,15 +108,47 @@
 			</build>
 
 			<!-- execution of emulator(s) -->
+			<!-- Target one: Run emulator and profiling tools if debugging is enabled -->
 			<emulator wait="true" securityDomain="trusted" enableProfiler="true" enableMemoryMonitor="true" enableNetworkMonitor="false" if="debug">
-				<!--debugger name="antcall" target="connect-debugger" port="6001" /-->
 			</emulator>
 
+			<!-- Target two: Run emulator only, with no profiling tools if debugging is disabled but testing is -->
 			<emulator wait="true" trace="none" securityDomain="trusted" enableProfiler="false" enableMemoryMonitor="false" enableNetworkMonitor="false" if="test and not debug">
 			</emulator>
 
 
-		</j2mepolish>
+		</BuildPolish>
+	</target>
+
+	<!-- Main Target: Call to build the project and call up the emulator -->
+	<!-- Builds the code and invokes the emulator -->
+	<target name="LaunchEmulator" depends="enableEmulator,BuildPolish" description="invokes the emulator">
+	</target>
+	
+	<!-- Main Target: Call to clean directories created by a build -->
+	<target name="Clean" description="allows a clean build. You should call [ant clean] whenever you made changes to devices.xml, vendors.xml or groups.xml">
+		<delete dir="build" />
+		<delete dir="dist" />
+	</target>
+
+	<!-- Main Target: Cleans, and then runs the build target -->
+	<target name="BuildClean" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, BuildPolish" />
+	
+	<!-- Main Target: Cleans, and then runs the build target with the emulator -->
+	<target name="BuildCleanRunEmulator" description="allows a clean build, and then launches the emulator" depends="Clean, enableEmulator, BuildPolish" />
+
+	<!-- Main Target: Runs the build with all debug properties enabled -->
+	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
+	
+	<!-- Main Target: Call to compile and run the JUnit test code -->
+	<target name="RunJunitTests" depends="compile-test" description="Call to compile and run the JUnit test code">
+	  <junit failureProperty="test.failure">	
+	    <classpath refid="classpath.test" />
+	    <formatter type="xml" />
+	    <!--test name="org.dimagi.ExampleTestCase" outfile="junit-test-example"/>
+	    <test name="org.dimagi.ExampleTestCaseTwo" outfile="junit-test-example-two"/-->	
+	  </junit>
+	  <fail message="test failed" if="test.failure" />
 	</target>
 
 	<!-- Sets the 'debug' ANT variable to true -->
@@ -115,10 +162,6 @@
 		<property name="dir.work" value="build/test" />
 	</target>
 
-	<!-- Builds the code and invokes the emulator -->
-	<target name="emulator" depends="enableEmulator,j2mepolish" description="invokes the emulator">
-	</target>
-	
 	<!-- The location of the directory containing tests -->
 	<property name="tst-dir" location="test/" />
 	<property name="TALK" value="true" />
@@ -150,37 +193,4 @@
 	    <fileset dir="${tst-dir}" includes="**/*.class" />
 	  </delete>
 	</target>
-
-	<!-- Run the JUnit Tests. -->
-	<target name="tests" depends="compile-test">
-	  <junit failureProperty="test.failure">	
-	    <classpath refid="classpath.test" />
-	    <formatter type="xml" />
-	    <test name="org.dimagi.ExampleTestCase" outfile="junit-test-example"/>
-	    <test name="org.dimagi.ExampleTestCaseTwo" outfile="junit-test-example-two"/>	
-	  </junit>
-	  <fail message="test failed" if="test.failure" />
-	</target>
-
-	<!-- Cleans directories created by a build -->
-	<target name="clean" description="allows a clean build. You should call [ant clean] whenever you made changes to devices.xml, vendors.xml or groups.xml">
-		<delete dir="build" />
-		<delete dir="dist" />
-	</target>
-
-	<!-- Cleans, and then runs the build target -->
-	<target name="cleanbuild" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="clean, j2mepolish" />
-	
-	<target name="disableObfuscation" description="disables obfuscation (mostly for debugging)">
-		<property name="test" value="true" />
-	</target>
-	<!-- Cleans, and then runs the build target -->
-	<target name="flatbuild" description="allows a clean build with no obfuscation. This is largely useful when building the JAD for debugging" depends="disableObfuscation, j2mepolish"/>
-	
-	<!-- Cleans, and then runs the build target with the emulator -->
-	<target name="cleanbuildemulator" description="allows a clean build. whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="clean, enableEmulator, j2mepolish" />
-
-	<!-- Runs the build with all debug properties enabled -->
-	<target name="debug" description="debugs the project" depends="enableDebug, enableEmulator, j2mepolish" />
-	
 </project>
