@@ -8,7 +8,7 @@
 			<attribute name="javadoc_location" value="file:/E:/development/workspace/kxml2-src-2.3.0/www/kxml2/javadoc/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Documents and Settings/Jonathan Jackson/Desktop/javarosa-dev/JavaRosa/lib/j2meunit-javarosa.jar"/>
+	<classpathentry kind="lib" path="lib/j2meunit-javarosa.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/midp-2.0.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/mmapi.jar"/>
