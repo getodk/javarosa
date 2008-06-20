@@ -24,13 +24,13 @@ import javax.wireless.messaging.Message;
 import javax.wireless.messaging.MessageConnection;
 import javax.wireless.messaging.MessageListener;
 
-import org.javarosa.communication.bluetooth.BluetoothClient;
-import org.javarosa.communication.bluetooth.BluetoothClientListener;
-import org.javarosa.db.util.Persistent;
-import org.javarosa.midp.db.util.Settings;
+import org.javarosa.communication.bluetooth.client.BluetoothClient;
+import org.javarosa.communication.bluetooth.client.BluetoothClientListener;
+import org.javarosa.midp.util.db.Settings;
 import org.javarosa.util.AlertMessage;
 import org.javarosa.util.AlertMessageListener;
 import org.javarosa.util.SimpleOrderedHashtable;
+import org.javarosa.util.db.Persistent;
 
 import com.tinyline.util.GZIPInputStream;
 
