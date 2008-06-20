@@ -1,6 +1,6 @@
 package org.javarosa.communication;
 
-import org.javarosa.db.util.*;
+import org.javarosa.util.db.*;
 
 /**
  * Interface through which the transport layer communicates to the user.
