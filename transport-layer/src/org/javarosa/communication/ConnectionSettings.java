@@ -12,7 +12,7 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.TextField;
 
-import org.javarosa.midp.mvc.AbstractView;
+import org.javarosa.core.mvc.AbstractView;
 import org.javarosa.util.AlertMessage;
 import org.javarosa.util.AlertMessageListener;
 import org.javarosa.util.DefaultCommands;
