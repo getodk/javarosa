@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.util.db"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.mvc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

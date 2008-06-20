@@ -26,7 +26,7 @@ import javax.wireless.messaging.MessageListener;
 
 import org.javarosa.communication.bluetooth.client.BluetoothClient;
 import org.javarosa.communication.bluetooth.client.BluetoothClientListener;
-import org.javarosa.midp.util.db.Settings;
+import org.javarosa.core.util.Settings;
 import org.javarosa.util.AlertMessage;
 import org.javarosa.util.AlertMessageListener;
 import org.javarosa.util.SimpleOrderedHashtable;
