@@ -32,7 +32,7 @@ public class J2meUnitTest extends TestCase {
 	}
 	
 	public void testOne() {
-		assertEquals(1, 1);
+		assertEquals(1, 2);
 	}
 	
 	public void testTwo() {
