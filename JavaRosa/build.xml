@@ -115,11 +115,10 @@
 	
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
-		<property name="testresult.global" value="false"/>
-		<RunTestSuite suite="org.javarosa.test.JavaRosaBasicTests"/>
 		<RunTestSuite suite="org.javarosa.test.J2meUnitTest"/>
+			<RunTestSuite suite="org.javarosa.test.JavaRosaBasicTests"/>
 		<!-- add new test suites here -->
-		<fail if="testresult.global=true">Unit Tests Failed!</fail>
+		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
 		
 	<!-- Initialization for the build targets                    -->
@@ -153,16 +152,26 @@
 	<macrodef name="RunTestSuite" description="Runs a test suite, and sets testresult.global to be true on failure">
 		<attribute name="suite"/>
 		<sequential>
-		<java classname="j2meunit.textui.TestRunner" failonerror="false" fork="true" resultproperty="testresult.unittests">
+			<!-- Note: The reason that we are using @{suite} as a property is because properties in ANT
+			are immutable, and this is a unique identifier -->
+		<java classname="j2meunit.textui.TestRunner" failonerror="false" fork="true" resultproperty="@{suite}">
 							<classpath refid="classpath.test" />
 							<arg value="@{suite}"/>
 				</java>
 		<condition property="testresult.global">
 					<not>
-						<equals arg1="${testresult.unittests}" arg2="0"/>
+						<equals arg1="${@{suite}}" arg2="0"/>
 				 	</not>
 				</condition>
 		</sequential>
+	</macrodef>
+	
+	<macrodef name="propertycopy">
+	  <attribute name="name"/>
+	  <attribute name="from"/>
+	  <sequential>
+	    <property name="@{name}" value="${@{from}}"/>
+	  </sequential>
 	</macrodef>
 	
 	<!-- import user specific properties                          -->
@@ -171,11 +180,6 @@
 	<!-- import global properties                                 -->
 	<property file="${polish.home}/global.properties" />
 	
-	<!-- Definition of the Test Suite Name:                      -->
-	<property name="test.class.name" value="org.dimagi.ExampleTestCase" />
-
-	<!-- The location of the directory containing tests -->
-	<property name="tst-dir" location="test/" />
 	<property name="TALK" value="true" />
 	
 	<!-- Definition of the J2ME Polish task:                      -->
