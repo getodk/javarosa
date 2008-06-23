@@ -113,24 +113,15 @@
 	<!-- Main Target: Runs the build with all debug properties enabled -->
 	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
 	
+	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
-		<java classname="j2meunit.textui.TestRunner" failonerror="true" fork="true" resultproperty="testresult.unittests">
-			<classpath refid="classpath.test" />
-			<arg value="org.javarosa.test.J2meUnitTest"/>
-		</java>
+		<property name="testresult.global" value="false"/>
+		<RunTestSuite suite="org.javarosa.test.JavaRosaBasicTests"/>
+		<RunTestSuite suite="org.javarosa.test.J2meUnitTest"/>
+		<!-- add new test suites here -->
+		<fail if="testresult.global=true">Unit Tests Failed!</fail>
 	</target>
-	
-	<!-- Main Target: Call to compile and run the JUnit test code -->
-	<target name="RunJunitTests" depends="compile-test" description="Call to compile and run the JUnit test code">
-	  <junit failureProperty="test.failure">	
-	    <classpath refid="classpath.test" />
-	    <formatter type="xml" />
-	    <!--test name="org.dimagi.ExampleTestCase" outfile="junit-test-example"/>
-	    <test name="org.dimagi.ExampleTestCaseTwo" outfile="junit-test-example-two"/-->	
-	  </junit>
-	  <fail message="test failed" if="test.failure" />
-	</target>
-	
+		
 	<!-- Initialization for the build targets                    -->
 	<target name="init">
 		<!-- Disable the Emulator by default -->
@@ -142,22 +133,6 @@
 		</propertyfile>
 		<echo message="Build ${build.number}" />
 		-->
-	</target>
-	
-	<!-- Compiles the source including tests -->
-	<target name="compile-test">
-	  <javac srcdir="${tst-dir}"
-	         verbose="${TALK}"
-	  	     debug="on">
-	    <classpath refid="classpath.test"/>
-	  </javac>
-	</target>
-	
-	<!-- Cleans the test directory and re-compile -->
-	<target name="clean-compile-test">
-	  <delete verbose="${TALK}">
-	    <fileset dir="${tst-dir}" includes="**/*.class" />
-	  </delete>
 	</target>
 
 	<target name="disableObfuscator">
@@ -173,6 +148,22 @@
 		<property name="test" value="true" />
 		<property name="dir.work" value="build/test" />
 	</target>
+	
+	<!-- Macro: Runs a test suite, and sets testresult.global to be true on failure -->
+	<macrodef name="RunTestSuite" description="Runs a test suite, and sets testresult.global to be true on failure">
+		<attribute name="suite"/>
+		<sequential>
+		<java classname="j2meunit.textui.TestRunner" failonerror="false" fork="true" resultproperty="testresult.unittests">
+							<classpath refid="classpath.test" />
+							<arg value="@{suite}"/>
+				</java>
+		<condition property="testresult.global">
+					<not>
+						<equals arg1="${testresult.unittests}" arg2="0"/>
+				 	</not>
+				</condition>
+		</sequential>
+	</macrodef>
 	
 	<!-- import user specific properties                          -->
 	<property file="${basedir}/build.properties" />
