@@ -3,7 +3,7 @@ package org.javarosa.core.model;
 import java.util.TimeZone;
 
 /**
- * EpihandyConstants shared throught classes in the containing package.
+ * ModelConstants shared throught classes in the containing package.
  *
  * @version ,
  */

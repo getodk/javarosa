@@ -9,7 +9,7 @@ import org.javarosa.core.util.Utilities;
 /**
  * 
  */
-public class Binding {
+public class XPathBinding implements IBinding {
 
 	private String id;
 	private String nodeset;
@@ -20,10 +20,13 @@ public class Binding {
 	public String preload;
 	public String preloadParams;
 	
+	private String xpathBinding;
+	private String relevantString;
+	
 	/**
 	 * 
 	 */
-	public Binding() {
+	public XPathBinding() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
