@@ -10,15 +10,15 @@ import org.javarosa.util.db.PersistentHelper;
 
 /**
  * Definition of a form. This has some meta data about the form definition and  
- * a collection of pages together with question branching or skipping rules.
+ * a collection of groups together with question branching or skipping rules.
  * 
  * @author Daniel Kayiwa
  *
  */
 public class FormDef implements Persistent{
 	
-	/** A collection of page definitions. */
-	private Vector pages;
+	/** A collection of group definitions. */
+	private Vector groups;
 	
 	/** The string unique identifier of the form definition. */
 	private String variableName = EpihandyConstants.EMPTY_STRING;
@@ -46,25 +46,25 @@ public class FormDef implements Persistent{
 	 * @param name - the numeric unique identifier of the form definition.
 	 * @param name - the display name of the form.
 	 * @param variableName - the string unique identifier of the form definition.
-	 * @param pages - collection of page definitions.
+	 * @param groups - collection of group definitions.
 	 * @param rules - collection of branching rules.
 	 */
-	public FormDef(int id, String name, String variableName,Vector pages, Vector rules, String descTemplate) {
+	public FormDef(int id, String name, String variableName,Vector groups, Vector rules, String descTemplate) {
 		this();
 		setId(id);
 		setName(name);
 		setVariableName(variableName);
-		setPages(pages);
+		setGroups(groups);
 		setRules(rules);
 		setDescriptionTemplate((descTemplate == null) ? EpihandyConstants.EMPTY_STRING : descTemplate);
 	}
 
-	public Vector getPages() {
-		return pages;
+	public Vector getGroups() {
+		return groups;
 	}
 
-	public void setPages(Vector pages) {
-		this.pages = pages;
+	public void setGroups(Vector groups) {
+		this.groups = groups;
 	}
 	
 	public String getName() {
@@ -121,8 +121,8 @@ public class FormDef implements Persistent{
 		if(varName == null)
 			return null;
 		
-		for(byte i=0; i<getPages().size(); i++){
-			QuestionDef def = ((GroupDef)getPages().elementAt(i)).getQuestion(varName);
+		for(byte i=0; i<getGroups().size(); i++){
+			QuestionDef def = ((GroupDef)getGroups().elementAt(i)).getQuestion(varName);
 			if(def != null)
 				return def;
 		}
@@ -145,13 +145,13 @@ public class FormDef implements Persistent{
 	}
 
 	public void addQuestion(QuestionDef qtn){
-		if(pages == null){
-			pages = new Vector();
-			GroupDef page = new GroupDef(this.getVariableName(),Byte.parseByte("1"),null);
-			pages.addElement(page);
+		if(groups == null){
+			groups = new Vector();
+			GroupDef group = new GroupDef(this.getVariableName(),Byte.parseByte("1"),null);
+			groups.addElement(group);
 		}
 		
-		((GroupDef)pages.elementAt(0)).addQuestion(qtn);
+		((GroupDef)groups.elementAt(0)).addQuestion(qtn);
 	}
 	
 	/** 
@@ -168,7 +168,7 @@ public class FormDef implements Persistent{
 			setName(dis.readUTF());
 			setVariableName(dis.readUTF());
 			setDescriptionTemplate(dis.readUTF());
-			setPages(PersistentHelper.read(dis,new GroupDef().getClass()));
+			setGroups(PersistentHelper.read(dis,new GroupDef().getClass()));
 			setRules(PersistentHelper.read(dis,new EpiHandySkipRule().getClass()));
 		}
 	}
@@ -184,7 +184,7 @@ public class FormDef implements Persistent{
 		dos.writeUTF(getName());
 		dos.writeUTF(getVariableName());
 		dos.writeUTF(getDescriptionTemplate());
-		PersistentHelper.write(getPages(), dos);
+		PersistentHelper.write(getGroups(), dos);
 		PersistentHelper.write(getRules(), dos);
 	}
 }
