@@ -17,10 +17,10 @@ import org.javarosa.util.db.PersistentHelper;
  */
 public class QuestionDef implements Persistent{
 	/** The prompt text. The text the user sees. */
-	private String text = EpihandyConstants.EMPTY_STRING;
+	private String text = ModelConstants.EMPTY_STRING;
 	
 	/** The help text. */
-	private String helpText = EpihandyConstants.EMPTY_STRING;
+	private String helpText = ModelConstants.EMPTY_STRING;
 	
 	/** A flag to tell whether the question is to be answered or is optional. */
 	private boolean mandatory = false;
@@ -45,7 +45,7 @@ public class QuestionDef implements Persistent{
 	/** The text indentifier of the question. This is used by the users of the questionaire 
 	 * but in code we use the dynamically generated numeric id for speed. 
 	 */
-	private String variableName = EpihandyConstants.EMPTY_STRING;
+	private String variableName = ModelConstants.EMPTY_STRING;
 	
 	/** The allowed set of values (OptionDef) for an answer of the question. */
 	private Vector options;
@@ -54,7 +54,7 @@ public class QuestionDef implements Persistent{
 	 * given a unique (on a form) id starting from 1 up to 127. The assumption is that one will never need to have
 	 * a form with more than 127 questions for a mobile device (It would be too big).
 	 */
-	private byte id = EpihandyConstants.NULL_ID;
+	private byte id = ModelConstants.NULL_ID;
 	
 	/** Text question type. */
 	public static final byte QTN_TYPE_TEXT = 1;

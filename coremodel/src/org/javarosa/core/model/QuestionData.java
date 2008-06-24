@@ -41,7 +41,7 @@ public class QuestionData implements Persistent{
 	private QuestionDef def;
 	
 	/** The numeric unique identifier for the question that this data is collected for. */
-	private byte id = EpihandyConstants.NULL_ID;
+	private byte id = ModelConstants.NULL_ID;
 	
 	private String dataDescription;
 	
@@ -281,7 +281,7 @@ public class QuestionData implements Persistent{
 	
 	//TODO This does not belong here.
 	public static String DateToString(Date d){
-		Calendar cd = Calendar.getInstance(EpihandyConstants.DEFAULT_TIME_ZONE);
+		Calendar cd = Calendar.getInstance(ModelConstants.DEFAULT_TIME_ZONE);
 		cd.setTime(d);
 		String year = "" + cd.get(Calendar.YEAR);
 		String month = "" + (cd.get(Calendar.MONTH)+1);

@@ -21,19 +21,19 @@ public class FormDef implements Persistent{
 	private Vector groups;
 	
 	/** The string unique identifier of the form definition. */
-	private String variableName = EpihandyConstants.EMPTY_STRING;
+	private String variableName = ModelConstants.EMPTY_STRING;
 	
 	/** The display name of the form. */
-	private String name = EpihandyConstants.EMPTY_STRING;
+	private String name = ModelConstants.EMPTY_STRING;
 	
 	/** The numeric unique identifier of the form definition. */
-	private int id = EpihandyConstants.NULL_ID;
+	private int id = ModelConstants.NULL_ID;
 	
 	/** The collection of rules for this form. */
 	private Vector rules;
 	
 	/** A string constistig for form fields that describe its data. */
-	private String descriptionTemplate =  EpihandyConstants.EMPTY_STRING;
+	private String descriptionTemplate =  ModelConstants.EMPTY_STRING;
   
 	/** Constructs a form definition object. */
 	public FormDef() {
@@ -56,7 +56,7 @@ public class FormDef implements Persistent{
 		setVariableName(variableName);
 		setGroups(groups);
 		setRules(rules);
-		setDescriptionTemplate((descTemplate == null) ? EpihandyConstants.EMPTY_STRING : descTemplate);
+		setDescriptionTemplate((descTemplate == null) ? ModelConstants.EMPTY_STRING : descTemplate);
 	}
 
 	public Vector getGroups() {
@@ -141,7 +141,7 @@ public class FormDef implements Persistent{
 		if(qtn != null)
 			return qtn.getId();
 		
-		return EpihandyConstants.NULL_ID;
+		return ModelConstants.NULL_ID;
 	}
 
 	public void addQuestion(QuestionDef qtn){

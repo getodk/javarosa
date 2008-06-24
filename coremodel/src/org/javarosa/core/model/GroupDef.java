@@ -20,10 +20,10 @@ public class GroupDef implements Persistent{
 	private Vector questions;
 	
 	/** The group number. */
-	private byte groupNo = EpihandyConstants.NULL_ID;
+	private byte groupNo = ModelConstants.NULL_ID;
 	
 	/** The name of the group. */
-	private String name = EpihandyConstants.EMPTY_STRING;
+	private String name = ModelConstants.EMPTY_STRING;
 	
 	public GroupDef() {
 		 

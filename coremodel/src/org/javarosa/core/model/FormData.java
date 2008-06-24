@@ -24,7 +24,7 @@ public class FormData  extends AbstractRecord{
 	/** The numeric unique identifier of the form definition that this data represents. 
 	 * This is made int instead of byte because users may have values bigger than 256.
 	 * */
-	private int defId = EpihandyConstants.NULL_ID;
+	private int defId = ModelConstants.NULL_ID;
 	
 	/** 
 	 * Reference to the form definition. This is just for increased performance
@@ -38,7 +38,7 @@ public class FormData  extends AbstractRecord{
 	 * the form definition description template. This field is not stored
 	 * since it can be built on the fly from the form data.
 	 */
-	private String dataDescription = EpihandyConstants.EMPTY_STRING;
+	private String dataDescription = ModelConstants.EMPTY_STRING;
 	
 	/** Constructs a form data object. */
 	public FormData(){
