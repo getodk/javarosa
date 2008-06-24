@@ -8,23 +8,23 @@ import java.util.Vector;
 import org.javarosa.util.db.Persistent;
 import org.javarosa.util.db.PersistentHelper;
 
-/** This object contains the collected data of a page in a form or questionaire
- * Separating page data and definition is for optimisation. This is achieved
- * by ensuring that one definition is maintained for each page type regardles
- * of how may pages of data have been collected.
+/** This object contains the collected data of a group in a form or questionaire
+ * Separating group data and definition is for optimisation. This is achieved
+ * by ensuring that one definition is maintained for each group type regardles
+ * of how may groups of data have been collected.
  * 
  * @author Daniel Kayiwa
  *
  */
 public class GroupData  implements Persistent{
 	
-	/** The page number. */
-	private byte pageNo = EpihandyConstants.NULL_ID;
+	/** The group number. */
+	private byte groupNo = EpihandyConstants.NULL_ID;
 	
 	/** A list of question data for this object. */
 	private Vector questions;
 	
-	/** A reference to the page definition object. */
+	/** A reference to the group definition object. */
 	private GroupDef def;
 	
 	public GroupData(){
@@ -33,7 +33,7 @@ public class GroupData  implements Persistent{
 	
 	/** Copy constructor. */
 	public GroupData(GroupData data){
-		setPageNo(data.getPageNo());
+		setGroupNo(data.getGroupNo());
 		copyQuestions(data.getQuestions());
 		setDef(data.getDef());
 	}
@@ -42,7 +42,7 @@ public class GroupData  implements Persistent{
 		this();
 		setQuestions(questions);
 		setDef(def);
-		setPageNo(def.getPageNo());
+		setGroupNo(def.getGroupNo());
 	}
 	
 	public Vector getQuestions() {
@@ -53,12 +53,12 @@ public class GroupData  implements Persistent{
 		this.questions = questions;
 	}
 
-	public byte getPageNo() {
-		return pageNo;
+	public byte getGroupNo() {
+		return groupNo;
 	}
 
-	public void setPageNo(byte pageNo) {
-		this.pageNo = pageNo;
+	public void setGroupNo(byte groupNo) {
+		this.groupNo = groupNo;
 	}
 	
 	public GroupDef getDef() {
@@ -77,17 +77,17 @@ public class GroupData  implements Persistent{
 		}
 	}
 
-	/** Reads the page data object from the stream .*/
+	/** Reads the group data object from the stream .*/
 	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
 		if(!PersistentHelper.isEOF(dis)){
-			setPageNo(dis.readByte());
+			setGroupNo(dis.readByte());
 			setQuestions(PersistentHelper.read(dis,new QuestionData().getClass()));
 		}
 	}
 
-	/** Writes the page data object to the stream. */
+	/** Writes the group data object to the stream. */
 	public void write(DataOutputStream dos) throws IOException {
-		dos.writeByte(getPageNo());
+		dos.writeByte(getGroupNo());
 		PersistentHelper.write(getQuestions(), dos);
 	}
 }
