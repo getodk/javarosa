@@ -18,8 +18,8 @@ import org.javarosa.util.db.*;
  */
 public class FormData  extends AbstractRecord{
 	
-	/** The collection of pages of data. */
-	private Vector pages;
+	/** The collection of groups of data. */
+	private Vector groups;
 	
 	/** The numeric unique identifier of the form definition that this data represents. 
 	 * This is made int instead of byte because users may have values bigger than 256.
@@ -50,7 +50,7 @@ public class FormData  extends AbstractRecord{
 		setDataDescription(data.getDataDescription());
 		setDefId(data.getDefId());
 		def = data.getDef();
-		copyPages(data.getPages());
+		copyGroups(data.getGroups());
 		setRecordId(data.getRecordId());
 		buildQuestionDataDescription();
 	}
@@ -67,12 +67,12 @@ public class FormData  extends AbstractRecord{
 		setDef(def);
 	}
 	
-	public Vector getPages() {
-		return pages;
+	public Vector getGroups() {
+		return groups;
 	}
 
-	public void setPages(Vector pages) {
-		this.pages = pages;
+	public void setGroups(Vector groups) {
+		this.groups = groups;
 	}
 	
 	public FormDef getDef() {
@@ -101,19 +101,19 @@ public class FormData  extends AbstractRecord{
 		this.dataDescription = dataDescription;
 	}
 
-	private void copyPages(Vector pgs){
+	private void copyGroups(Vector pgs){
 		if(pgs != null){
-			pages  = new Vector();
+			groups  = new Vector();
 			for(int i=0; i<pgs.size(); i++)
-				pages.addElement(new GroupData((GroupData)pgs.elementAt(i)));
+				groups.addElement(new GroupData((GroupData)pgs.elementAt(i)));
 		}
 	}
 	
-	/** Creates page and question data from their corresponding definitions. */
+	/** Creates group and question data from their corresponding definitions. */
 	private void createFormData(){
-		Vector pages = new Vector();
-		for(byte i=0; i<this.getDef().getPages().size(); i++){
-			GroupDef groupDef = (GroupDef)this.getDef().getPages().elementAt(i);
+		Vector groups = new Vector();
+		for(byte i=0; i<this.getDef().getGroups().size(); i++){
+			GroupDef groupDef = (GroupDef)this.getDef().getGroups().elementAt(i);
 			Vector questions = new Vector();
 			for(byte j=0; j<groupDef.getQuestions().size(); j++){
 				QuestionDef qtnDef = (QuestionDef)groupDef.getQuestions().elementAt(j);
@@ -121,10 +121,10 @@ public class FormData  extends AbstractRecord{
 				questions.addElement(qtnData);
 			}
 			GroupData groupData = new GroupData(questions,groupDef);
-			pages.addElement(groupData);
+			groups.addElement(groupData);
 		}
 		
-		this.setPages(pages);
+		this.setGroups(groups);
 		
 		buildDataDescription();
 		buildQuestionDataDescription();
@@ -134,12 +134,12 @@ public class FormData  extends AbstractRecord{
 	 * Updates the data objects with the defs in the current formdef reference.
 	 */
 	private void updateFormDef(){
-		if(getPages() == null || getPages().size() == 0)
+		if(getGroups() == null || getGroups().size() == 0)
 			createFormData();
 
-		for(byte i=0; i<this.getPages().size(); i++){
-			GroupData groupData = (GroupData)this.getPages().elementAt(i);
-			GroupDef groupDef = (GroupDef)this.def.getPages().elementAt(i);
+		for(byte i=0; i<this.getGroups().size(); i++){
+			GroupData groupData = (GroupData)this.getGroups().elementAt(i);
+			GroupDef groupDef = (GroupDef)this.def.getGroups().elementAt(i);
 			groupData.setDef(groupDef);
 			for(byte j=0; j<groupData.getQuestions().size(); j++){
 				QuestionData qtnData = (QuestionData)groupData.getQuestions().elementAt(j);
@@ -161,20 +161,20 @@ public class FormData  extends AbstractRecord{
 	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
 		if(!PersistentHelper.isEOF(dis)){
 			setDefId(dis.readInt());
-			setPages(PersistentHelper.read(dis,new GroupData().getClass()));
+			setGroups(PersistentHelper.read(dis,new GroupData().getClass()));
 		}
 	}
 
 	public void write(DataOutputStream dos) throws IOException {
 		dos.writeInt(getDefId());
-		PersistentHelper.write(getPages(), dos);
+		PersistentHelper.write(getGroups(), dos);
 	}
 	
 	public QuestionData getQuestion(byte id){
-		for(byte i=0; i<this.getPages().size(); i++){
-			GroupData page = (GroupData)this.getPages().elementAt(i);
-			for(byte j=0; j<page.getQuestions().size(); j++){
-				QuestionData qtn = (QuestionData)page.getQuestions().elementAt(j);
+		for(byte i=0; i<this.getGroups().size(); i++){
+			GroupData group = (GroupData)this.getGroups().elementAt(i);
+			for(byte j=0; j<group.getQuestions().size(); j++){
+				QuestionData qtn = (QuestionData)group.getQuestions().elementAt(j);
 				if(qtn.getDef().getId() == id)
 					return qtn;
 			}
@@ -184,10 +184,10 @@ public class FormData  extends AbstractRecord{
 	}
 	
 	public QuestionData getQuestion(String varName){
-		for(byte i=0; i<this.getDef().getPages().size(); i++){
-			GroupDef page = (GroupDef)this.getDef().getPages().elementAt(i);
-			for(byte j=0; j<page.getQuestions().size(); j++){
-				QuestionDef qtn = (QuestionDef)page.getQuestions().elementAt(j);
+		for(byte i=0; i<this.getDef().getGroups().size(); i++){
+			GroupDef group = (GroupDef)this.getDef().getGroups().elementAt(i);
+			for(byte j=0; j<group.getQuestions().size(); j++){
+				QuestionDef qtn = (QuestionDef)group.getQuestions().elementAt(j);
 				if(qtn.getVariableName().equals(varName))
 					return getQuestion(qtn.getId());
 			}
@@ -297,10 +297,10 @@ public class FormData  extends AbstractRecord{
 	public boolean isValid(){
 		
 		//Check and return if you find just one question which is not valid.
-		for(byte i=0; i<pages.size(); i++){
-			GroupData page = (GroupData)pages.elementAt(i);
-			for(byte j=0; j<page.getQuestions().size(); j++){
-				QuestionData qtn = (QuestionData)page.getQuestions().elementAt(j);
+		for(byte i=0; i<groups.size(); i++){
+			GroupData group = (GroupData)groups.elementAt(i);
+			for(byte j=0; j<group.getQuestions().size(); j++){
+				QuestionData qtn = (QuestionData)group.getQuestions().elementAt(j);
 				if(!qtn.isValid())
 					return false;
 			}
@@ -354,10 +354,10 @@ public class FormData  extends AbstractRecord{
 	}
 	
 	public void buildQuestionDataDescription(){
-		for(byte i=0; i<pages.size(); i++){
-			GroupData page = (GroupData)pages.elementAt(i);
-			for(byte j=0; j<page.getQuestions().size(); j++)
-				buildQuestionDataDescription((QuestionData)page.getQuestions().elementAt(j));
+		for(byte i=0; i<groups.size(); i++){
+			GroupData group = (GroupData)groups.elementAt(i);
+			for(byte j=0; j<group.getQuestions().size(); j++)
+				buildQuestionDataDescription((QuestionData)group.getQuestions().elementAt(j));
 		}
 	}
 	
