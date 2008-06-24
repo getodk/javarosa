@@ -122,7 +122,7 @@ public class FormDef implements Persistent{
 			return null;
 		
 		for(byte i=0; i<getPages().size(); i++){
-			QuestionDef def = ((PageDef)getPages().elementAt(i)).getQuestion(varName);
+			QuestionDef def = ((GroupDef)getPages().elementAt(i)).getQuestion(varName);
 			if(def != null)
 				return def;
 		}
@@ -147,11 +147,11 @@ public class FormDef implements Persistent{
 	public void addQuestion(QuestionDef qtn){
 		if(pages == null){
 			pages = new Vector();
-			PageDef page = new PageDef(this.getVariableName(),Byte.parseByte("1"),null);
+			GroupDef page = new GroupDef(this.getVariableName(),Byte.parseByte("1"),null);
 			pages.addElement(page);
 		}
 		
-		((PageDef)pages.elementAt(0)).addQuestion(qtn);
+		((GroupDef)pages.elementAt(0)).addQuestion(qtn);
 	}
 	
 	/** 
@@ -168,7 +168,7 @@ public class FormDef implements Persistent{
 			setName(dis.readUTF());
 			setVariableName(dis.readUTF());
 			setDescriptionTemplate(dis.readUTF());
-			setPages(PersistentHelper.read(dis,new PageDef().getClass()));
+			setPages(PersistentHelper.read(dis,new GroupDef().getClass()));
 			setRules(PersistentHelper.read(dis,new EpiHandySkipRule().getClass()));
 		}
 	}
