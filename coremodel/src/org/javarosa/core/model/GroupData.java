@@ -16,7 +16,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel Kayiwa
  *
  */
-public class PageData  implements Persistent{
+public class GroupData  implements Persistent{
 	
 	/** The page number. */
 	private byte pageNo = EpihandyConstants.NULL_ID;
@@ -25,20 +25,20 @@ public class PageData  implements Persistent{
 	private Vector questions;
 	
 	/** A reference to the page definition object. */
-	private PageDef def;
+	private GroupDef def;
 	
-	public PageData(){
+	public GroupData(){
 
 	}
 	
 	/** Copy constructor. */
-	public PageData(PageData data){
+	public GroupData(GroupData data){
 		setPageNo(data.getPageNo());
 		copyQuestions(data.getQuestions());
 		setDef(data.getDef());
 	}
 
-	public PageData(Vector questions, PageDef def) {
+	public GroupData(Vector questions, GroupDef def) {
 		this();
 		setQuestions(questions);
 		setDef(def);
@@ -61,11 +61,11 @@ public class PageData  implements Persistent{
 		this.pageNo = pageNo;
 	}
 	
-	public PageDef getDef() {
+	public GroupDef getDef() {
 		return def;
 	}
 
-	public void setDef(PageDef def) {
+	public void setDef(GroupDef def) {
 		this.def = def;
 	}
 	

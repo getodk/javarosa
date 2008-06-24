@@ -14,7 +14,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel Kayiwa
  *
  */
-public class PageDef implements Persistent{
+public class GroupDef implements Persistent{
 	
 	/** A list of questions on a page. */
 	private Vector questions;
@@ -25,11 +25,11 @@ public class PageDef implements Persistent{
 	/** The name of the page. */
 	private String name = EpihandyConstants.EMPTY_STRING;
 	
-	public PageDef() {
+	public GroupDef() {
 		 
 	}
 	
-	public PageDef(String name, byte pageNo,Vector questions) {
+	public GroupDef(String name, byte pageNo,Vector questions) {
 		this();
 		setName(name);
 		setPageNo(pageNo);

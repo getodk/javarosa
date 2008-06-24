@@ -105,7 +105,7 @@ public class FormData  extends AbstractRecord{
 		if(pgs != null){
 			pages  = new Vector();
 			for(int i=0; i<pgs.size(); i++)
-				pages.addElement(new PageData((PageData)pgs.elementAt(i)));
+				pages.addElement(new GroupData((GroupData)pgs.elementAt(i)));
 		}
 	}
 	
@@ -113,15 +113,15 @@ public class FormData  extends AbstractRecord{
 	private void createFormData(){
 		Vector pages = new Vector();
 		for(byte i=0; i<this.getDef().getPages().size(); i++){
-			PageDef pageDef = (PageDef)this.getDef().getPages().elementAt(i);
+			GroupDef groupDef = (GroupDef)this.getDef().getPages().elementAt(i);
 			Vector questions = new Vector();
-			for(byte j=0; j<pageDef.getQuestions().size(); j++){
-				QuestionDef qtnDef = (QuestionDef)pageDef.getQuestions().elementAt(j);
+			for(byte j=0; j<groupDef.getQuestions().size(); j++){
+				QuestionDef qtnDef = (QuestionDef)groupDef.getQuestions().elementAt(j);
 				QuestionData qtnData = new QuestionData(qtnDef);
 				questions.addElement(qtnData);
 			}
-			PageData pageData = new PageData(questions,pageDef);
-			pages.addElement(pageData);
+			GroupData groupData = new GroupData(questions,groupDef);
+			pages.addElement(groupData);
 		}
 		
 		this.setPages(pages);
@@ -138,12 +138,12 @@ public class FormData  extends AbstractRecord{
 			createFormData();
 
 		for(byte i=0; i<this.getPages().size(); i++){
-			PageData pageData = (PageData)this.getPages().elementAt(i);
-			PageDef pageDef = (PageDef)this.def.getPages().elementAt(i);
-			pageData.setDef(pageDef);
-			for(byte j=0; j<pageData.getQuestions().size(); j++){
-				QuestionData qtnData = (QuestionData)pageData.getQuestions().elementAt(j);
-				QuestionDef qtnDef = pageDef.getQuestion(qtnData.getId());
+			GroupData groupData = (GroupData)this.getPages().elementAt(i);
+			GroupDef groupDef = (GroupDef)this.def.getPages().elementAt(i);
+			groupData.setDef(groupDef);
+			for(byte j=0; j<groupData.getQuestions().size(); j++){
+				QuestionData qtnData = (QuestionData)groupData.getQuestions().elementAt(j);
+				QuestionDef qtnDef = groupDef.getQuestion(qtnData.getId());
 				qtnData.setDef(qtnDef);
 				if(qtnData.getAnswer() != null && qtnDef.getType() == QuestionDef.QTN_TYPE_LIST_EXCLUSIVE)
 					((OptionData)qtnData.getAnswer()).setDef((OptionDef)qtnDef.getOptions().elementAt(Integer.parseInt(qtnData.getOptionAnswerIndices().toString())));
@@ -161,7 +161,7 @@ public class FormData  extends AbstractRecord{
 	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
 		if(!PersistentHelper.isEOF(dis)){
 			setDefId(dis.readInt());
-			setPages(PersistentHelper.read(dis,new PageData().getClass()));
+			setPages(PersistentHelper.read(dis,new GroupData().getClass()));
 		}
 	}
 
@@ -172,7 +172,7 @@ public class FormData  extends AbstractRecord{
 	
 	public QuestionData getQuestion(byte id){
 		for(byte i=0; i<this.getPages().size(); i++){
-			PageData page = (PageData)this.getPages().elementAt(i);
+			GroupData page = (GroupData)this.getPages().elementAt(i);
 			for(byte j=0; j<page.getQuestions().size(); j++){
 				QuestionData qtn = (QuestionData)page.getQuestions().elementAt(j);
 				if(qtn.getDef().getId() == id)
@@ -185,7 +185,7 @@ public class FormData  extends AbstractRecord{
 	
 	public QuestionData getQuestion(String varName){
 		for(byte i=0; i<this.getDef().getPages().size(); i++){
-			PageDef page = (PageDef)this.getDef().getPages().elementAt(i);
+			GroupDef page = (GroupDef)this.getDef().getPages().elementAt(i);
 			for(byte j=0; j<page.getQuestions().size(); j++){
 				QuestionDef qtn = (QuestionDef)page.getQuestions().elementAt(j);
 				if(qtn.getVariableName().equals(varName))
@@ -298,7 +298,7 @@ public class FormData  extends AbstractRecord{
 		
 		//Check and return if you find just one question which is not valid.
 		for(byte i=0; i<pages.size(); i++){
-			PageData page = (PageData)pages.elementAt(i);
+			GroupData page = (GroupData)pages.elementAt(i);
 			for(byte j=0; j<page.getQuestions().size(); j++){
 				QuestionData qtn = (QuestionData)page.getQuestions().elementAt(j);
 				if(!qtn.isValid())
@@ -355,7 +355,7 @@ public class FormData  extends AbstractRecord{
 	
 	public void buildQuestionDataDescription(){
 		for(byte i=0; i<pages.size(); i++){
-			PageData page = (PageData)pages.elementAt(i);
+			GroupData page = (GroupData)pages.elementAt(i);
 			for(byte j=0; j<page.getQuestions().size(); j++)
 				buildQuestionDataDescription((QuestionData)page.getQuestions().elementAt(j));
 		}
