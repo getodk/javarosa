@@ -85,4 +85,36 @@ public class Constants {
 	
 	/** The default time zone. */
 	public static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT");
+	
+	/** Question Types */
+	
+	/** Text question type. */
+	public static final byte QTN_TYPE_TEXT = 1;
+	
+	/** Numeric question type. These are numbers without decimal points*/
+	public static final byte QTN_TYPE_NUMERIC = 2;
+	
+	/** Decimal question type. These are numbers with decimals */
+	public static final byte QTN_TYPE_DECIMAL = 3;
+	
+	/** Date question type. This has only date component without time. */
+	public static final byte QTN_TYPE_DATE = 4;
+		
+	/** Time question type. This has only time element without date*/
+	public static final byte QTN_TYPE_TIME = 5;
+	
+	/** This is a question with alist of options where not more than one option can be selected at a time. */
+	public static final byte QTN_TYPE_LIST_EXCLUSIVE = 6;
+	
+	/** This is a question with alist of options where more than one option can be selected at a time. */
+	public static final byte QTN_TYPE_LIST_MULTIPLE = 7;
+	
+	/** Date and Time question type. This has both the date and time components*/
+	public static final byte QTN_TYPE_DATE_TIME = 8;
+	
+	/** Question with true and false answers. */
+	public static final byte QTN_TYPE_BOOLEAN = 9;
+	
+	/** Question with repeat sets of questions. */
+	public static final byte QTN_TYPE_REPEAT = 10;
 }

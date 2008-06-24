@@ -32,10 +32,10 @@ public class QuestionDef implements Persistent{
 	private boolean mandatory = false;
 	
 	/** The type of question. eg Numeric,Date,Text etc. */
-	private byte type = QTN_TYPE_TEXT;
+	private byte type = Constants.QTN_TYPE_TEXT;
 	
 	/** The type of widget. eg TextInput,Slider,List etc. */
-	private byte controlType = QTN_TYPE_TEXT;
+	private byte controlType = Constants.QTN_TYPE_TEXT;
 	
 	/** A flag to tell whether the question should be shown or not. */
 	private boolean visible = true;
@@ -67,37 +67,6 @@ public class QuestionDef implements Persistent{
 	
 	//TODO Add some way to link a set of visual display options
 	
-	/** Text question type. */
-	public static final byte QTN_TYPE_TEXT = 1;
-	
-	/** Numeric question type. These are numbers without decimal points*/
-	public static final byte QTN_TYPE_NUMERIC = 2;
-	
-	/** Decimal question type. These are numbers with decimals */
-	public static final byte QTN_TYPE_DECIMAL = 3;
-	
-	/** Date question type. This has only date component without time. */
-	public static final byte QTN_TYPE_DATE = 4;
-		
-	/** Time question type. This has only time element without date*/
-	public static final byte QTN_TYPE_TIME = 5;
-	
-	/** This is a question with alist of options where not more than one option can be selected at a time. */
-	public static final byte QTN_TYPE_LIST_EXCLUSIVE = 6;
-	
-	/** This is a question with alist of options where more than one option can be selected at a time. */
-	public static final byte QTN_TYPE_LIST_MULTIPLE = 7;
-	
-	/** Date and Time question type. This has both the date and time components*/
-	public static final byte QTN_TYPE_DATE_TIME = 8;
-	
-	/** Question with true and false answers. */
-	public static final byte QTN_TYPE_BOOLEAN = 9;
-	
-	/** Question with repeat sets of questions. */
-	public static final byte QTN_TYPE_REPEAT = 10;
-		
-	
 	/** This constructor is used mainly during deserialization. */
 	public QuestionDef(){
 		super();
@@ -120,10 +89,11 @@ public class QuestionDef implements Persistent{
 	 * @param variableName
 	 * @param options
 	 */
-	public QuestionDef(byte id,String text, String helpText, boolean mandatory, byte type, String defaultValue, boolean visible, boolean enabled, boolean locked, String variableName, Vector options) {
+	public QuestionDef(String id,String longText, String shortText, String helpText, boolean mandatory, byte type, String defaultValue, boolean visible, boolean enabled, boolean locked, String variableName, Vector options) {
 		this();
 		setId(id);
-		setText(text);
+		setLongText(longText);
+		setShortText(shortText);
 		setHelpText(helpText);
 		setMandatory(mandatory);
 		setType(type);
@@ -135,21 +105,20 @@ public class QuestionDef implements Persistent{
 		setOptions(options);
 	}
 	
-	public byte getId() {
+	public String getId() {
 		return id;
 	}
 	
-	public void setId(byte id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	
-	public String getDefaultValue() {
+	public Object getDefaultValue() {
 		return defaultValue;
 	}
 	
-	public void setDefaultValue(String defaultValue) {
-		if(defaultValue != null && defaultValue.trim().length() > 0)
-			this.defaultValue = defaultValue;
+	public void setDefaultValue(Object defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 	
 	public boolean isEnabled() {
@@ -192,12 +161,20 @@ public class QuestionDef implements Persistent{
 		this.options = options;
 	}
 	
-	public String getText() {
-		return text;
+	public String getLongText() {
+		return longText;
 	}
 	
-	public void setText(String text) {
-		this.text = text;
+	public void setLongText(String longText) {
+		this.longText = longText;
+	}
+	
+	public String getShortText() {
+		return shortText;
+	}
+	
+	public void setShortText(String shortText) {
+		this.shortText = shortText;
 	}
 	
 	public byte getType() {
@@ -229,15 +206,20 @@ public class QuestionDef implements Persistent{
 			options = new Vector();
 		options.addElement(optionDef);
 	}
+	
+	public String serializedDefaultValue() {
+		return this.defaultValue.toString();
+	}
 
 	/**
 	 * Reads the object from stream.
 	 */
 	public void read(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
 		if(!PersistentHelper.isEOF(dis)){
-			setId(dis.readByte());
+			setId(dis.readUTF());
 			
-			setText(dis.readUTF());
+			setLongText(dis.readUTF());
+			setShortText(dis.readUTF());
 			setHelpText(dis.readUTF());
 			setMandatory(dis.readBoolean());
 			setType(dis.readByte());
@@ -256,14 +238,15 @@ public class QuestionDef implements Persistent{
 	 * Write the object to stream.
 	 */
 	public void write(DataOutputStream dos) throws IOException {
-		dos.writeByte(getId());
+		dos.writeUTF(getId());
 
-		dos.writeUTF(getText());
+		dos.writeUTF(getLongText());
+		dos.writeUTF(getShortText());
 		dos.writeUTF(getHelpText());
 		dos.writeBoolean(isMandatory());
 		dos.writeByte(getType());
 		//dos.writeUTF(getDefaultValue());
-		PersistentHelper.writeUTF(dos, getDefaultValue());
+		PersistentHelper.writeUTF(dos, serializedDefaultValue());
 		dos.writeBoolean(isVisible());
 		dos.writeBoolean(isEnabled());
 		dos.writeBoolean(isLocked());
@@ -273,7 +256,7 @@ public class QuestionDef implements Persistent{
 	}
 	
 	public String toString() {
-		return getText();
+		return getLongText();
 	}
 }
 
