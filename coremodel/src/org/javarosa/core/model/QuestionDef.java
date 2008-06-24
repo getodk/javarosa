@@ -17,7 +17,13 @@ import org.javarosa.util.db.PersistentHelper;
  */
 public class QuestionDef implements Persistent{
 	/** The prompt text. The text the user sees. */
-	private String text = ModelConstants.EMPTY_STRING;
+	private String longText = ModelConstants.EMPTY_STRING;
+	
+	/** The prompt text. The text the user sees in short modes. */
+	private String shortText = ModelConstants.EMPTY_STRING;
+	
+	/** The locale id. Will be used to regionalize strings. */
+	private String localeId;
 	
 	/** The help text. */
 	private String helpText = ModelConstants.EMPTY_STRING;
@@ -28,8 +34,8 @@ public class QuestionDef implements Persistent{
 	/** The type of question. eg Numeric,Date,Text etc. */
 	private byte type = QTN_TYPE_TEXT;
 	
-	/** The value supplied as answer if the user has not supplied one. */
-	private String defaultValue;
+	/** The type of widget. eg TextInput,Slider,List etc. */
+	private byte controlType = QTN_TYPE_TEXT;
 	
 	/** A flag to tell whether the question should be shown or not. */
 	private boolean visible = true;
@@ -42,7 +48,7 @@ public class QuestionDef implements Persistent{
 	 */
 	private boolean locked = false;
 	
-	/** The text indentifier of the question. This is used by the users of the questionaire 
+	/** The text identifier of the question. This is used by the users of the questionnaire 
 	 * but in code we use the dynamically generated numeric id for speed. 
 	 */
 	private String variableName = ModelConstants.EMPTY_STRING;
@@ -50,11 +56,16 @@ public class QuestionDef implements Persistent{
 	/** The allowed set of values (OptionDef) for an answer of the question. */
 	private Vector options;
 	
-	/** The numeric identifier of a question. When a form definition is being built, each question is 
-	 * given a unique (on a form) id starting from 1 up to 127. The assumption is that one will never need to have
-	 * a form with more than 127 questions for a mobile device (It would be too big).
-	 */
-	private byte id = ModelConstants.NULL_ID;
+	/** The identifier of a question. */
+	private String id;
+	
+	/** The value supplied as answer if the user has not supplied one. */
+	private Object defaultValue;
+	
+	/** A Binding to an external data value */
+	private IBinding bind;
+	
+	//TODO Add some way to link a set of visual display options
 	
 	/** Text question type. */
 	public static final byte QTN_TYPE_TEXT = 1;
@@ -67,7 +78,7 @@ public class QuestionDef implements Persistent{
 	
 	/** Date question type. This has only date component without time. */
 	public static final byte QTN_TYPE_DATE = 4;
-	
+		
 	/** Time question type. This has only time element without date*/
 	public static final byte QTN_TYPE_TIME = 5;
 	
