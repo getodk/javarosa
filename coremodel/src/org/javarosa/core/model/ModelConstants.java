@@ -7,7 +7,7 @@ import java.util.TimeZone;
  *
  * @version ,
  */
-public class EpihandyConstants {
+public class ModelConstants {
 	
 	/** Empty strig representation */
 	public static final String EMPTY_STRING = "";

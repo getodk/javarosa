@@ -15,7 +15,7 @@ import org.javarosa.util.db.PersistentHelper;
  */
 public class OptionData  implements Persistent {
 	
-	private byte id = EpihandyConstants.NULL_ID;
+	private byte id = ModelConstants.NULL_ID;
 	private OptionDef def;
 	
 	public OptionData(){

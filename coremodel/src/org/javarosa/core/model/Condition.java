@@ -17,19 +17,19 @@ import org.javarosa.util.db.PersistentHelper;
 public class Condition implements Persistent{
 	
 	/** The unique identifier of the question referenced by this condition. */
-	private byte questionId = EpihandyConstants.NULL_ID;
+	private byte questionId = ModelConstants.NULL_ID;
 	
 	/** The operator of the condition. Eg Equal to, Greater than, etc. */
-	private byte operator = EpihandyConstants.OPERATOR_NULL;
+	private byte operator = ModelConstants.OPERATOR_NULL;
 	
 	/** The value checked to see if the condition is true or false.
 	 * For the above example, the value would be 4 or the id of the Male option.
 	 * For a list of options this value is the option id, not the value or text value.
 	 */
-	private String value = EpihandyConstants.EMPTY_STRING;
+	private String value = ModelConstants.EMPTY_STRING;
 	
 	/** The unique identifier of a condition. */
-	private byte id = EpihandyConstants.NULL_ID;
+	private byte id = ModelConstants.NULL_ID;
 	
 	/** Creates a new condition object. */
 	public Condition(){
@@ -144,7 +144,7 @@ public class Condition implements Persistent{
 		//while OPERATOR_EQUAL returns false.
 		//This will help make conditions false when any value is not yet filled.
 		if(data.getOptionAnswerIndices() == null || value == null)
-			return operator != EpihandyConstants.OPERATOR_EQUAL;
+			return operator != ModelConstants.OPERATOR_EQUAL;
 		
 		//For the sake of performance, we dont compare the actual value.
 		//We instead use the index.		
@@ -154,9 +154,9 @@ public class Condition implements Persistent{
 		byte val2 = Byte.parseByte(value);
 
 		switch(operator){
-			case EpihandyConstants.OPERATOR_EQUAL:
+			case ModelConstants.OPERATOR_EQUAL:
 				return val1 == val2;
-			case EpihandyConstants.OPERATOR_NOT_EQUAL:
+			case ModelConstants.OPERATOR_NOT_EQUAL:
 				return val1 != val2;
 			default:
 				return false;

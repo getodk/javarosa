@@ -50,22 +50,22 @@ public class EpiHandySkipRule extends SkipRule {
 	/** Executes the rule action on the supplied question. */
 	public void ExecuteAction(QuestionDef qtn,boolean conditionTrue){
 		switch(getAction()){
-			case EpihandyConstants.ACTION_ENABLE:
+			case ModelConstants.ACTION_ENABLE:
 				qtn.setEnabled(true);
 				break;
-			case EpihandyConstants.ACTION_DISABLE:
+			case ModelConstants.ACTION_DISABLE:
 				qtn.setEnabled(false);
 				break;
-			case EpihandyConstants.ACTION_SHOW:
+			case ModelConstants.ACTION_SHOW:
 				qtn.setVisible(true);
 				break;
-			case EpihandyConstants.ACTION_HIDE:
+			case ModelConstants.ACTION_HIDE:
 				qtn.setVisible(false);
 				break;
-			case EpihandyConstants.ACTION_MAKE_MANDATORY:
+			case ModelConstants.ACTION_MAKE_MANDATORY:
 				qtn.setMandatory(true);
 				break;
-			case EpihandyConstants.ACTION_MAKE_OPTIONAL:
+			case ModelConstants.ACTION_MAKE_OPTIONAL:
 				qtn.setMandatory(false);
 				break;
 		}

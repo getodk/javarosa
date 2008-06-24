@@ -41,8 +41,8 @@ public class RequestHeader implements Persistent{
 	/** The current status. This could be a request or return code status. */
 	public byte action = ACTION_NONE;
 		
-	private String userName = EpihandyConstants.EMPTY_STRING;
-	private String password = EpihandyConstants.EMPTY_STRING;
+	private String userName = ModelConstants.EMPTY_STRING;
+	private String password = ModelConstants.EMPTY_STRING;
 	
 	/** Constructs a new communication parameter. */
 	public RequestHeader(){

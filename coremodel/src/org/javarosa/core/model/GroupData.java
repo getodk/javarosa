@@ -19,7 +19,7 @@ import org.javarosa.util.db.PersistentHelper;
 public class GroupData  implements Persistent{
 	
 	/** The group number. */
-	private byte groupNo = EpihandyConstants.NULL_ID;
+	private byte groupNo = ModelConstants.NULL_ID;
 	
 	/** A list of question data for this object. */
 	private Vector questions;
