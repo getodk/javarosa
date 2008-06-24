@@ -17,16 +17,16 @@ import org.javarosa.util.db.PersistentHelper;
  */
 public class QuestionDef implements Persistent{
 	/** The prompt text. The text the user sees. */
-	private String longText = ModelConstants.EMPTY_STRING;
+	private String longText = Constants.EMPTY_STRING;
 	
 	/** The prompt text. The text the user sees in short modes. */
-	private String shortText = ModelConstants.EMPTY_STRING;
+	private String shortText = Constants.EMPTY_STRING;
 	
 	/** The locale id. Will be used to regionalize strings. */
 	private String localeId;
 	
 	/** The help text. */
-	private String helpText = ModelConstants.EMPTY_STRING;
+	private String helpText = Constants.EMPTY_STRING;
 	
 	/** A flag to tell whether the question is to be answered or is optional. */
 	private boolean mandatory = false;
@@ -51,7 +51,7 @@ public class QuestionDef implements Persistent{
 	/** The text identifier of the question. This is used by the users of the questionnaire 
 	 * but in code we use the dynamically generated numeric id for speed. 
 	 */
-	private String variableName = ModelConstants.EMPTY_STRING;
+	private String variableName = Constants.EMPTY_STRING;
 	
 	/** The allowed set of values (OptionDef) for an answer of the question. */
 	private Vector options;
@@ -177,12 +177,28 @@ public class QuestionDef implements Persistent{
 		this.shortText = shortText;
 	}
 	
+	public String getLocaleId() {
+		return localeId;
+	}
+	
+	public void setLocaleId(String localeId) {
+		this.localeId = localeId;
+	}
+	
 	public byte getType() {
 		return type;
 	}
 	
 	public void setType(byte type) {
 		this.type = type;
+	}
+	
+	public byte getControlType() {
+		return controlType;
+	}
+	
+	public void setControlType(byte controlType) {
+		this.controlType = controlType;
 	}
 	
 	public String getVariableName() {
@@ -220,15 +236,21 @@ public class QuestionDef implements Persistent{
 			
 			setLongText(dis.readUTF());
 			setShortText(dis.readUTF());
+			setLocaleId(dis.readUTF());
 			setHelpText(dis.readUTF());
 			setMandatory(dis.readBoolean());
 			setType(dis.readByte());
-			//setDefaultValue(dis.readUTF());
-			setDefaultValue(PersistentHelper.readUTF(dis));
+			setControlType(dis.readByte());
 			setVisible(dis.readBoolean());
 			setEnabled(dis.readBoolean());
 			setLocked(dis.readBoolean());
 			setVariableName(dis.readUTF());
+			setDefaultValue(PersistentHelper.readUTF(dis));
+			//TODO Note that this sucks, because bind has to know its type. 
+			//We need to deal with that. Should Binding be a class that
+			//has a header for its type? Should we be writing that binding
+			//here manually? We could also make bind serialize to a string.
+			bind.read(dis);
 			
 			setOptions(PersistentHelper.read(dis,new OptionDef().getClass()));
 		}
@@ -242,15 +264,18 @@ public class QuestionDef implements Persistent{
 
 		dos.writeUTF(getLongText());
 		dos.writeUTF(getShortText());
+		dos.writeUTF(getLocaleId());
 		dos.writeUTF(getHelpText());
 		dos.writeBoolean(isMandatory());
 		dos.writeByte(getType());
-		//dos.writeUTF(getDefaultValue());
-		PersistentHelper.writeUTF(dos, serializedDefaultValue());
+		dos.writeByte(getControlType());
 		dos.writeBoolean(isVisible());
 		dos.writeBoolean(isEnabled());
 		dos.writeBoolean(isLocked());
 		dos.writeUTF(getVariableName());
+		bind.write(dos);
+		
+		PersistentHelper.writeUTF(dos, serializedDefaultValue());
 		
 		PersistentHelper.write(getOptions(), dos);
 	}

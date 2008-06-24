@@ -41,8 +41,8 @@ public class RequestHeader implements Persistent{
 	/** The current status. This could be a request or return code status. */
 	public byte action = ACTION_NONE;
 		
-	private String userName = ModelConstants.EMPTY_STRING;
-	private String password = ModelConstants.EMPTY_STRING;
+	private String userName = Constants.EMPTY_STRING;
+	private String password = Constants.EMPTY_STRING;
 	
 	/** Constructs a new communication parameter. */
 	public RequestHeader(){

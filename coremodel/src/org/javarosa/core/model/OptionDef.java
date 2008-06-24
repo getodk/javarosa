@@ -15,13 +15,13 @@ import org.javarosa.util.db.PersistentHelper;
  */
 public class OptionDef implements Persistent {
 	/** The numeric unique identifier of an answer option. */
-	private byte id = ModelConstants.NULL_ID;
+	private byte id = Constants.NULL_ID;
 	
 	/** The display text of the answer option. */
-	private String text = ModelConstants.EMPTY_STRING;
+	private String text = Constants.EMPTY_STRING;
 	
 	/** The unique text ientifier of an answer option. */
-	private String variableName = ModelConstants.EMPTY_STRING;
+	private String variableName = Constants.EMPTY_STRING;
 	
 	public static final char SEPARATOR_CHAR = ',';
 

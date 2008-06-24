@@ -24,7 +24,7 @@ public class FormData  extends AbstractRecord{
 	/** The numeric unique identifier of the form definition that this data represents. 
 	 * This is made int instead of byte because users may have values bigger than 256.
 	 * */
-	private int defId = ModelConstants.NULL_ID;
+	private int defId = Constants.NULL_ID;
 	
 	/** 
 	 * Reference to the form definition. This is just for increased performance
@@ -38,7 +38,7 @@ public class FormData  extends AbstractRecord{
 	 * the form definition description template. This field is not stored
 	 * since it can be built on the fly from the form data.
 	 */
-	private String dataDescription = ModelConstants.EMPTY_STRING;
+	private String dataDescription = Constants.EMPTY_STRING;
 	
 	/** Constructs a form data object. */
 	public FormData(){
@@ -143,11 +143,11 @@ public class FormData  extends AbstractRecord{
 			groupData.setDef(groupDef);
 			for(byte j=0; j<groupData.getQuestions().size(); j++){
 				QuestionData qtnData = (QuestionData)groupData.getQuestions().elementAt(j);
-				QuestionDef qtnDef = groupDef.getQuestion(qtnData.getId());
+				QuestionDef qtnDef = groupDef.getQuestionById(qtnData.getId());
 				qtnData.setDef(qtnDef);
-				if(qtnData.getAnswer() != null && qtnDef.getType() == QuestionDef.QTN_TYPE_LIST_EXCLUSIVE)
+				if(qtnData.getAnswer() != null && qtnDef.getType() == Constants.QTN_TYPE_LIST_EXCLUSIVE)
 					((OptionData)qtnData.getAnswer()).setDef((OptionDef)qtnDef.getOptions().elementAt(Integer.parseInt(qtnData.getOptionAnswerIndices().toString())));
-				if(qtnData.getAnswer() != null && qtnDef.getType() == QuestionDef.QTN_TYPE_LIST_MULTIPLE){
+				if(qtnData.getAnswer() != null && qtnDef.getType() == Constants.QTN_TYPE_LIST_MULTIPLE){
 					Vector answers = (Vector)qtnData.getAnswer();
 					for(byte k=0; k<answers.size(); k++){
 						OptionData option = (OptionData)answers.elementAt(k);
@@ -170,7 +170,7 @@ public class FormData  extends AbstractRecord{
 		PersistentHelper.write(getGroups(), dos);
 	}
 	
-	public QuestionData getQuestion(byte id){
+	public QuestionData getQuestionById(String id){
 		for(byte i=0; i<this.getGroups().size(); i++){
 			GroupData group = (GroupData)this.getGroups().elementAt(i);
 			for(byte j=0; j<group.getQuestions().size(); j++){
@@ -364,7 +364,7 @@ public class FormData  extends AbstractRecord{
 	//TODO This needs to be refactored with buildDataDescription() above
 	private void buildQuestionDataDescription(QuestionData qtn){
 		//String s = "Where does ${name}$ come from?";
-		String f,v,text = qtn.getDef().getText();
+		String f,v,text = qtn.getDef().getLongText();
 		boolean found =  false;
 		int startIndex,j,i = 0;
 		do{
