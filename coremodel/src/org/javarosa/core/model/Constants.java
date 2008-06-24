@@ -15,8 +15,11 @@ public class Constants {
 	/** Index for no selection */
 	public static final byte NO_SELECTION = -1;
 	
-	/** ID not set numeric value */
+	/** ID not set to a value */
 	public static final byte NULL_ID = -1;
+	
+	/** ID not set numeric value */
+	public static final String NULL_STRING_ID = "-1";
 	
 	/** Operator not set numeric value */
 	public static final byte OPERATOR_NULL = 0;

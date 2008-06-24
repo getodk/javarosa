@@ -3,7 +3,12 @@
  */
 package org.javarosa.core.model;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import org.javarosa.core.util.Utilities;
+import org.javarosa.util.db.PersistentHelper;
 
 
 /**
@@ -73,6 +78,33 @@ public class XPathBinding implements IBinding {
 		return required;
 	}
 	
-	
+	/**
+	 * Reads the object from stream.
+	 */
+	public void read(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
+		if(!PersistentHelper.isEOF(dis)){
+			setId(dis.readUTF());
+			setNodeset(dis.readUTF());
+			setType(dis.readUTF());
+			setRelevancy(dis.readUTF());
+			setRequired(dis.readBoolean());
+			preload = dis.readUTF();
+			preloadParams = dis.readUTF();
+		}
+	}
+
+	/**
+	 * Write the object to stream.
+	 */
+	public void write(DataOutputStream dos) throws IOException {
+		dos.writeUTF(getId());
+		dos.writeUTF(getNodeset());
+		dos.writeUTF(getType());
+		dos.writeUTF(getRelevancy());
+		dos.writeBoolean(isRequired());
+		
+		dos.writeUTF(preload);
+		dos.writeUTF(preloadParams);
+	}
 
 }

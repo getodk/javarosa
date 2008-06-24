@@ -20,10 +20,10 @@ public class GroupDef implements Persistent{
 	private Vector questions;
 	
 	/** The group number. */
-	private byte groupNo = ModelConstants.NULL_ID;
+	private byte groupNo = Constants.NULL_ID;
 	
 	/** The name of the group. */
-	private String name = ModelConstants.EMPTY_STRING;
+	private String name = Constants.EMPTY_STRING;
 	
 	public GroupDef() {
 		 
@@ -76,7 +76,7 @@ public class GroupDef implements Persistent{
 		return null;
 	}
 	
-	public QuestionDef getQuestion(byte id){
+	public QuestionDef getQuestionById(String id){
 		for(byte i=0; i<getQuestions().size(); i++){
 			QuestionDef def = (QuestionDef)getQuestions().elementAt(i);
 			if(def.getId() == id)

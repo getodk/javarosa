@@ -44,28 +44,28 @@ public class EpiHandySkipRule extends SkipRule {
 	public void ExecuteAction(FormData data,boolean conditionTrue){
 		Vector qtns = this.getActionTargets();
 		for(byte i=0; i<qtns.size(); i++)
-			ExecuteAction(data.getQuestion(Byte.parseByte(qtns.elementAt(i).toString())).getDef(),conditionTrue);
+			ExecuteAction(data.getQuestion(qtns.elementAt(i).toString()).getDef(),conditionTrue);
 	}
 	
 	/** Executes the rule action on the supplied question. */
 	public void ExecuteAction(QuestionDef qtn,boolean conditionTrue){
 		switch(getAction()){
-			case ModelConstants.ACTION_ENABLE:
+			case Constants.ACTION_ENABLE:
 				qtn.setEnabled(true);
 				break;
-			case ModelConstants.ACTION_DISABLE:
+			case Constants.ACTION_DISABLE:
 				qtn.setEnabled(false);
 				break;
-			case ModelConstants.ACTION_SHOW:
+			case Constants.ACTION_SHOW:
 				qtn.setVisible(true);
 				break;
-			case ModelConstants.ACTION_HIDE:
+			case Constants.ACTION_HIDE:
 				qtn.setVisible(false);
 				break;
-			case ModelConstants.ACTION_MAKE_MANDATORY:
+			case Constants.ACTION_MAKE_MANDATORY:
 				qtn.setMandatory(true);
 				break;
-			case ModelConstants.ACTION_MAKE_OPTIONAL:
+			case Constants.ACTION_MAKE_OPTIONAL:
 				qtn.setMandatory(false);
 				break;
 		}

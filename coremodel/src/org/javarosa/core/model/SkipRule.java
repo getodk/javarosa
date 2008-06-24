@@ -22,7 +22,7 @@ public class SkipRule implements Persistent{
 	/** The numeric identifier of a rule. This is assigned in code and hence
 	 * is not known by the user.
 	 */
-	private byte id = ModelConstants.NULL_ID;
+	private byte id = Constants.NULL_ID;
 	
 	/** A list of conditions to be tested for a rule. 
 	 * E.g. If sex is Male. If age is greatern than 4. etc
@@ -32,7 +32,7 @@ public class SkipRule implements Persistent{
 	/** The action taken when conditions are true.
 	 * Example of actions are Disable, Hide, Show, etc
 	 */
-	private byte action = ModelConstants.ACTION_NONE;
+	private byte action = Constants.ACTION_NONE;
 	
 	/** A list of question identifiers acted upon when conditions for the rule are true. */
 	private Vector actionTargets;
@@ -117,28 +117,28 @@ public class SkipRule implements Persistent{
 	public void ExecuteAction(FormData data,boolean conditionTrue){
 		Vector qtns = this.getActionTargets();
 		for(byte i=0; i<qtns.size(); i++)
-			ExecuteAction(data.getQuestion(Byte.parseByte(qtns.elementAt(i).toString())).getDef(),conditionTrue);
+			ExecuteAction(data.getQuestion(qtns.elementAt(i).toString()).getDef(),conditionTrue);
 	}
 	
 	/** Executes the rule action on the supplied question. */
 	public void ExecuteAction(QuestionDef qtn,boolean conditionTrue){
 		switch(getAction()){
-			case ModelConstants.ACTION_ENABLE:
+			case Constants.ACTION_ENABLE:
 				qtn.setEnabled(conditionTrue);
 				break;
-			case ModelConstants.ACTION_DISABLE:
+			case Constants.ACTION_DISABLE:
 				qtn.setEnabled(!conditionTrue);
 				break;
-			case ModelConstants.ACTION_SHOW:
+			case Constants.ACTION_SHOW:
 				qtn.setVisible(conditionTrue);
 				break;
-			case ModelConstants.ACTION_HIDE:
+			case Constants.ACTION_HIDE:
 				qtn.setVisible(!conditionTrue);
 				break;
-			case ModelConstants.ACTION_MAKE_MANDATORY:
+			case Constants.ACTION_MAKE_MANDATORY:
 				qtn.setMandatory(conditionTrue);
 				break;
-			case ModelConstants.ACTION_MAKE_OPTIONAL:
+			case Constants.ACTION_MAKE_OPTIONAL:
 				qtn.setMandatory(!conditionTrue);
 				break;
 		}

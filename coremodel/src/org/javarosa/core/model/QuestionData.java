@@ -41,7 +41,7 @@ public class QuestionData implements Persistent{
 	private QuestionDef def;
 	
 	/** The numeric unique identifier for the question that this data is collected for. */
-	private byte id = ModelConstants.NULL_ID;
+	private String id = Constants.NULL_STRING_ID;
 	
 	private String dataDescription;
 	
@@ -67,11 +67,11 @@ public class QuestionData implements Persistent{
 		setDef(def);
 	}
 	
-	public byte getId() {
+	public String getId() {
 		return id;
 	}
 	
-	public void setId(byte id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	
@@ -115,7 +115,7 @@ public class QuestionData implements Persistent{
 	}
 	
 	public boolean setOptionValueIfOne(){
-		if(getDef().getType() != QuestionDef.QTN_TYPE_LIST_EXCLUSIVE)
+		if(getDef().getType() != Constants.QTN_TYPE_LIST_EXCLUSIVE)
 			return false;
 		
 		Vector options = getDef().getOptions();
@@ -128,23 +128,23 @@ public class QuestionData implements Persistent{
 	
 	public void setTextAnswer(String textAnswer){
 		switch(getDef().getType()){
-			case QuestionDef.QTN_TYPE_BOOLEAN:
+			case Constants.QTN_TYPE_BOOLEAN:
 				answer = fromString2Boolean(textAnswer);
 				break;
-			case QuestionDef.QTN_TYPE_DATE:
-			case QuestionDef.QTN_TYPE_DATE_TIME:
-			case QuestionDef.QTN_TYPE_TIME:
+			case Constants.QTN_TYPE_DATE:
+			case Constants.QTN_TYPE_DATE_TIME:
+			case Constants.QTN_TYPE_TIME:
 				answer = textAnswer;
 				break;
-			case QuestionDef.QTN_TYPE_LIST_EXCLUSIVE:
+			case Constants.QTN_TYPE_LIST_EXCLUSIVE:
 				setOptionAnswer(textAnswer);
 				break;
-			case QuestionDef.QTN_TYPE_LIST_MULTIPLE:
+			case Constants.QTN_TYPE_LIST_MULTIPLE:
 				setOptionAnswers(split(textAnswer,OptionDef.SEPARATOR_CHAR));
 				break;
-			case QuestionDef.QTN_TYPE_DECIMAL:
-			case QuestionDef.QTN_TYPE_NUMERIC:
-			case QuestionDef.QTN_TYPE_TEXT:
+			case Constants.QTN_TYPE_DECIMAL:
+			case Constants.QTN_TYPE_NUMERIC:
+			case Constants.QTN_TYPE_TEXT:
 				answer = textAnswer;
 				break;
 		}
@@ -215,16 +215,16 @@ public class QuestionData implements Persistent{
 		this.def = def;
 		setId(def.getId());
 		if(def.getDefaultValue() != null && getAnswer() == null)
-			setTextAnswer(def.getDefaultValue());
+			setAnswer(def.getDefaultValue());
 	}
 	
 	private void copyAnswersAndIndices(QuestionData data){
 		if(data.getAnswer() != null){
-			if(getDef().getType() == QuestionDef.QTN_TYPE_LIST_EXCLUSIVE){
+			if(getDef().getType() == Constants.QTN_TYPE_LIST_EXCLUSIVE){
 				setAnswer(new OptionData((OptionData)data.getAnswer()));
 				setOptionAnswerIndices(data.getOptionAnswerIndices());
 			}
-			else if(getDef().getType() == QuestionDef.QTN_TYPE_LIST_MULTIPLE){
+			else if(getDef().getType() == Constants.QTN_TYPE_LIST_MULTIPLE){
 				Vector tempAnswer = new Vector();
 				Vector ansrs  = (Vector)data.getAnswer();
 				for(int i=0; i<ansrs.size(); i++)
@@ -249,18 +249,18 @@ public class QuestionData implements Persistent{
 	 */
 	public boolean isAnswered(){
 		switch(getDef().getType()){
-			case QuestionDef.QTN_TYPE_BOOLEAN:
-			case QuestionDef.QTN_TYPE_DATE:
-			case QuestionDef.QTN_TYPE_DATE_TIME:
-			case QuestionDef.QTN_TYPE_TIME:
+			case Constants.QTN_TYPE_BOOLEAN:
+			case Constants.QTN_TYPE_DATE:
+			case Constants.QTN_TYPE_DATE_TIME:
+			case Constants.QTN_TYPE_TIME:
 				return getAnswer() != null;
-			case QuestionDef.QTN_TYPE_LIST_EXCLUSIVE:
+			case Constants.QTN_TYPE_LIST_EXCLUSIVE:
 				return getAnswer() != null;
-			case QuestionDef.QTN_TYPE_LIST_MULTIPLE:
+			case Constants.QTN_TYPE_LIST_MULTIPLE:
 				return getAnswer() != null && ((Vector)getAnswer()).size() > 0;
-			case QuestionDef.QTN_TYPE_DECIMAL:
-			case QuestionDef.QTN_TYPE_NUMERIC:
-			case QuestionDef.QTN_TYPE_TEXT:
+			case Constants.QTN_TYPE_DECIMAL:
+			case Constants.QTN_TYPE_NUMERIC:
+			case Constants.QTN_TYPE_TEXT:
 				return getAnswer() != null && this.getAnswer().toString().length() > 0;
 		}
 		//TODO need to handle other user defined types.
@@ -281,7 +281,7 @@ public class QuestionData implements Persistent{
 	
 	//TODO This does not belong here.
 	public static String DateToString(Date d){
-		Calendar cd = Calendar.getInstance(ModelConstants.DEFAULT_TIME_ZONE);
+		Calendar cd = Calendar.getInstance(Constants.DEFAULT_TIME_ZONE);
 		cd.setTime(d);
 		String year = "" + cd.get(Calendar.YEAR);
 		String month = "" + (cd.get(Calendar.MONTH)+1);
@@ -309,24 +309,24 @@ public class QuestionData implements Persistent{
 		
 		if(getAnswer() != null){
 			switch(getDef().getType()){
-				case QuestionDef.QTN_TYPE_BOOLEAN:
+				case Constants.QTN_TYPE_BOOLEAN:
 					val = fromBoolean2DisplayString(getAnswer());
 					break;
-				case QuestionDef.QTN_TYPE_DECIMAL:
-				case QuestionDef.QTN_TYPE_NUMERIC:
-				case QuestionDef.QTN_TYPE_TEXT:
+				case Constants.QTN_TYPE_DECIMAL:
+				case Constants.QTN_TYPE_NUMERIC:
+				case Constants.QTN_TYPE_TEXT:
 					val = getAnswer().toString();
 					break;
-				case QuestionDef.QTN_TYPE_DATE:
-				case QuestionDef.QTN_TYPE_DATE_TIME:
-				case QuestionDef.QTN_TYPE_TIME:{
+				case Constants.QTN_TYPE_DATE:
+				case Constants.QTN_TYPE_DATE_TIME:
+				case Constants.QTN_TYPE_TIME:{
 					val = DateToString((Date)getAnswer());
 					break;
 				}
-				case QuestionDef.QTN_TYPE_LIST_EXCLUSIVE:
+				case Constants.QTN_TYPE_LIST_EXCLUSIVE:
 					val = ((OptionData)getAnswer()).toString();
 					break;
-				case QuestionDef.QTN_TYPE_LIST_MULTIPLE:
+				case Constants.QTN_TYPE_LIST_MULTIPLE:
 					String s = ""; Vector optionAnswers = (Vector)getAnswer();
 					for(byte i=0; i<optionAnswers.size(); i++){
 						if(s.length() != 0)
@@ -374,23 +374,23 @@ public class QuestionData implements Persistent{
 		
 		if(getAnswer() != null){
 			switch(getDef().getType()){
-				case QuestionDef.QTN_TYPE_BOOLEAN:
+				case Constants.QTN_TYPE_BOOLEAN:
 					val = fromBoolean2ValueString(getAnswer());
 					break;
-				case QuestionDef.QTN_TYPE_DECIMAL:
-				case QuestionDef.QTN_TYPE_NUMERIC:
-				case QuestionDef.QTN_TYPE_TEXT:
+				case Constants.QTN_TYPE_DECIMAL:
+				case Constants.QTN_TYPE_NUMERIC:
+				case Constants.QTN_TYPE_TEXT:
 					val = getAnswer().toString();
 					break;
-				case QuestionDef.QTN_TYPE_DATE:
-				case QuestionDef.QTN_TYPE_DATE_TIME:
-				case QuestionDef.QTN_TYPE_TIME:
+				case Constants.QTN_TYPE_DATE:
+				case Constants.QTN_TYPE_DATE_TIME:
+				case Constants.QTN_TYPE_TIME:
 					val = DateToString((Date)getAnswer());
 					break;
-				case QuestionDef.QTN_TYPE_LIST_EXCLUSIVE:
+				case Constants.QTN_TYPE_LIST_EXCLUSIVE:
 					val = ((OptionData)getAnswer()).getValue();
 					break;
-				case QuestionDef.QTN_TYPE_LIST_MULTIPLE:
+				case Constants.QTN_TYPE_LIST_MULTIPLE:
 					String s = ""; Vector optionAnswers = (Vector)getAnswer();
 					for(byte i=0; i<optionAnswers.size(); i++){
 						if(s.length() != 0)
@@ -409,7 +409,7 @@ public class QuestionData implements Persistent{
 	
 	public String toString() {
 //TODO This method should be refactored with the one above.
-		String val = getDef().getText();
+		String val = getDef().getLongText();
 		
 		if(dataDescription != null && dataDescription.trim().length() > 0)
 			val = dataDescription;
@@ -421,7 +421,7 @@ public class QuestionData implements Persistent{
 	}
 	
 	public String getText(){
-		String val = getDef().getText();
+		String val = getDef().getLongText();
 		
 		if(dataDescription != null && dataDescription.trim().length() > 0)
 			val = dataDescription;
@@ -439,7 +439,7 @@ public class QuestionData implements Persistent{
 	 */
 	public void read(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
 		if(!PersistentHelper.isEOF(dis)){
-			setId(dis.readByte());	
+			setId(dis.readUTF());	
 			readAnswer(dis,dis.readByte());
 		}
 	}
@@ -455,20 +455,20 @@ public class QuestionData implements Persistent{
 	 */
 	public void readAnswer(DataInputStream dis, byte type) throws IOException, IllegalAccessException, InstantiationException{
 		switch(type){
-		case QuestionDef.QTN_TYPE_BOOLEAN:
+		case Constants.QTN_TYPE_BOOLEAN:
 			setAnswer(PersistentHelper.readBoolean(dis));
 			break;
-		case QuestionDef.QTN_TYPE_TEXT:
-		case QuestionDef.QTN_TYPE_DECIMAL:
-		case QuestionDef.QTN_TYPE_NUMERIC:
+		case Constants.QTN_TYPE_TEXT:
+		case Constants.QTN_TYPE_DECIMAL:
+		case Constants.QTN_TYPE_NUMERIC:
 			setAnswer(PersistentHelper.readUTF(dis));
 			break;
-		case QuestionDef.QTN_TYPE_DATE:
-		case QuestionDef.QTN_TYPE_DATE_TIME:
-		case QuestionDef.QTN_TYPE_TIME:
+		case Constants.QTN_TYPE_DATE:
+		case Constants.QTN_TYPE_DATE_TIME:
+		case Constants.QTN_TYPE_TIME:
 			setAnswer(PersistentHelper.readDate(dis));
 			break;
-		case QuestionDef.QTN_TYPE_LIST_EXCLUSIVE:
+		case Constants.QTN_TYPE_LIST_EXCLUSIVE:
 			if(dis.readBoolean()){
 				OptionData option = new OptionData();
 				option.read(dis);
@@ -477,7 +477,7 @@ public class QuestionData implements Persistent{
 				setOptionAnswerIndices(new Byte(dis.readByte()));
 			}
 			break;
-		case QuestionDef.QTN_TYPE_LIST_MULTIPLE:
+		case Constants.QTN_TYPE_LIST_MULTIPLE:
 			if(dis.readBoolean()){
 				setAnswer(PersistentHelper.read(dis, new OptionData().getClass()));
 				
@@ -498,7 +498,7 @@ public class QuestionData implements Persistent{
 	 * @throws IOException
 	 */
 	public void write(DataOutputStream dos) throws IOException {
-		dos.writeByte(getId());
+		dos.writeUTF(getId());
 		
 		//This type is only used when reading data back from storage.
 		//Otherwise it is not kept in memory because it can be got from the QuestionDef.
@@ -508,20 +508,20 @@ public class QuestionData implements Persistent{
 	
 	private void writeAnswer(DataOutputStream dos) throws IOException {	
 		switch(getDef().getType()){
-			case QuestionDef.QTN_TYPE_BOOLEAN:
+			case Constants.QTN_TYPE_BOOLEAN:
 				PersistentHelper.writeBoolean(dos, (Boolean)getAnswer());
 				break;
-			case QuestionDef.QTN_TYPE_TEXT:
-			case QuestionDef.QTN_TYPE_DECIMAL:
-			case QuestionDef.QTN_TYPE_NUMERIC:
+			case Constants.QTN_TYPE_TEXT:
+			case Constants.QTN_TYPE_DECIMAL:
+			case Constants.QTN_TYPE_NUMERIC:
 				PersistentHelper.writeUTF(dos, getTextAnswer());
 				break;
-			case QuestionDef.QTN_TYPE_DATE:
-			case QuestionDef.QTN_TYPE_DATE_TIME:
-			case QuestionDef.QTN_TYPE_TIME:
+			case Constants.QTN_TYPE_DATE:
+			case Constants.QTN_TYPE_DATE_TIME:
+			case Constants.QTN_TYPE_TIME:
 				PersistentHelper.writeDate(dos, (Date)getAnswer());
 				break;
-			case QuestionDef.QTN_TYPE_LIST_EXCLUSIVE:
+			case Constants.QTN_TYPE_LIST_EXCLUSIVE:
 				if(getAnswer() != null){
 					dos.writeBoolean(true);
 					((OptionData)getAnswer()).write(dos);
@@ -530,7 +530,7 @@ public class QuestionData implements Persistent{
 				else
 					dos.writeBoolean(false);
 				break;
-			case QuestionDef.QTN_TYPE_LIST_MULTIPLE:
+			case Constants.QTN_TYPE_LIST_MULTIPLE:
 				if(getAnswer() != null){
 					dos.writeBoolean(true);
 					PersistentHelper.write((Vector)getAnswer(), dos);
@@ -542,7 +542,7 @@ public class QuestionData implements Persistent{
 				else
 					dos.writeBoolean(false);
 				break;
-			case QuestionDef.QTN_TYPE_REPEAT:
+			case Constants.QTN_TYPE_REPEAT:
 				if(getAnswer() != null){
 					dos.writeBoolean(true);
 					((Persistent)getAnswer()).write(dos);

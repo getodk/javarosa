@@ -17,19 +17,19 @@ import org.javarosa.util.db.PersistentHelper;
 public class Condition implements Persistent{
 	
 	/** The unique identifier of the question referenced by this condition. */
-	private byte questionId = ModelConstants.NULL_ID;
+	private String questionId;
 	
 	/** The operator of the condition. Eg Equal to, Greater than, etc. */
-	private byte operator = ModelConstants.OPERATOR_NULL;
+	private byte operator = Constants.OPERATOR_NULL;
 	
 	/** The value checked to see if the condition is true or false.
 	 * For the above example, the value would be 4 or the id of the Male option.
 	 * For a list of options this value is the option id, not the value or text value.
 	 */
-	private String value = ModelConstants.EMPTY_STRING;
+	private String value = Constants.EMPTY_STRING;
 	
 	/** The unique identifier of a condition. */
-	private byte id = ModelConstants.NULL_ID;
+	private byte id = Constants.NULL_ID;
 	
 	/** Creates a new condition object. */
 	public Condition(){
@@ -44,7 +44,7 @@ public class Condition implements Persistent{
 	 * @param operator - the condition operator.
 	 * @param value - the value to be equated to.
 	 */
-	public Condition(byte id,byte questionId, byte operator, String value) {
+	public Condition(byte id,String questionId, byte operator, String value) {
 		this();
 		setQuestionId(questionId);
 		setOperator(operator);
@@ -58,10 +58,10 @@ public class Condition implements Persistent{
 	public void setOperator(byte operator) {
 		this.operator = operator;
 	}
-	public byte getQuestionId() {
+	public String getQuestionId() {
 		return questionId;
 	}
-	public void setQuestionId(byte questionId) {
+	public void setQuestionId(String questionId) {
 		this.questionId = questionId;
 	}
 	public String getValue() {
@@ -84,23 +84,23 @@ public class Condition implements Persistent{
 		QuestionData qn= data.getQuestion(this.questionId);
 		
 		switch(qn.getDef().getType()){
-			case QuestionDef.QTN_TYPE_TEXT:
+			case Constants.QTN_TYPE_TEXT:
 				return isTextTrue(qn);
-			case QuestionDef.QTN_TYPE_NUMERIC:
+			case Constants.QTN_TYPE_NUMERIC:
 				return isNumericTrue(qn);
-			case QuestionDef.QTN_TYPE_DATE:
+			case Constants.QTN_TYPE_DATE:
 				return isDateTrue(qn);
-			case QuestionDef.QTN_TYPE_DATE_TIME:
+			case Constants.QTN_TYPE_DATE_TIME:
 				return isDateTimeTrue(qn);
-			case QuestionDef.QTN_TYPE_DECIMAL:
+			case Constants.QTN_TYPE_DECIMAL:
 				return isDecimalTrue(qn);
-			case QuestionDef.QTN_TYPE_LIST_EXCLUSIVE:
+			case Constants.QTN_TYPE_LIST_EXCLUSIVE:
 				return isListExclusiveTrue(qn);
-			case QuestionDef.QTN_TYPE_LIST_MULTIPLE:
+			case Constants.QTN_TYPE_LIST_MULTIPLE:
 				return isListMultipleTrue(qn);
-			case QuestionDef.QTN_TYPE_TIME:
+			case Constants.QTN_TYPE_TIME:
 				return isTimeTrue(qn);
-			case QuestionDef.QTN_TYPE_BOOLEAN:
+			case Constants.QTN_TYPE_BOOLEAN:
 				return isTextTrue(qn);
 		}
 		
@@ -144,7 +144,7 @@ public class Condition implements Persistent{
 		//while OPERATOR_EQUAL returns false.
 		//This will help make conditions false when any value is not yet filled.
 		if(data.getOptionAnswerIndices() == null || value == null)
-			return operator != ModelConstants.OPERATOR_EQUAL;
+			return operator != Constants.OPERATOR_EQUAL;
 		
 		//For the sake of performance, we dont compare the actual value.
 		//We instead use the index.		
@@ -154,9 +154,9 @@ public class Condition implements Persistent{
 		byte val2 = Byte.parseByte(value);
 
 		switch(operator){
-			case ModelConstants.OPERATOR_EQUAL:
+			case Constants.OPERATOR_EQUAL:
 				return val1 == val2;
-			case ModelConstants.OPERATOR_NOT_EQUAL:
+			case Constants.OPERATOR_NOT_EQUAL:
 				return val1 != val2;
 			default:
 				return false;
@@ -178,7 +178,7 @@ public class Condition implements Persistent{
 	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
 		if(!PersistentHelper.isEOF(dis)){
 			setId(dis.readByte());
-			setQuestionId(dis.readByte());
+			setQuestionId(dis.readUTF());
 			setOperator(dis.readByte());
 			setValue(dis.readUTF());
 		}
@@ -192,7 +192,7 @@ public class Condition implements Persistent{
 	 */
 	public void write(DataOutputStream dos) throws IOException {
 		dos.writeByte(getId());
-		dos.writeByte(getQuestionId());
+		dos.writeUTF(getQuestionId());
 		dos.writeByte(getOperator());
 		dos.writeUTF(getValue());
 	}
