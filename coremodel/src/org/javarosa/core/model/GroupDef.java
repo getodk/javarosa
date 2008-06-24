@@ -9,39 +9,39 @@ import org.javarosa.util.db.Persistent;
 import org.javarosa.util.db.PersistentHelper;
 
 
-/** The definition of a page in a form or questionaire. 
+/** The definition of a group in a form or questionaire. 
  * 
  * @author Daniel Kayiwa
  *
  */
 public class GroupDef implements Persistent{
 	
-	/** A list of questions on a page. */
+	/** A list of questions on a group. */
 	private Vector questions;
 	
-	/** The page number. */
-	private byte pageNo = EpihandyConstants.NULL_ID;
+	/** The group number. */
+	private byte groupNo = EpihandyConstants.NULL_ID;
 	
-	/** The name of the page. */
+	/** The name of the group. */
 	private String name = EpihandyConstants.EMPTY_STRING;
 	
 	public GroupDef() {
 		 
 	}
 	
-	public GroupDef(String name, byte pageNo,Vector questions) {
+	public GroupDef(String name, byte groupNo,Vector questions) {
 		this();
 		setName(name);
-		setPageNo(pageNo);
+		setGroupNo(groupNo);
 		setQuestions(questions);
 	}
 	
-	public byte getPageNo() {
-		return pageNo;
+	public byte getGroupNo() {
+		return groupNo;
 	}
 
-	public void setPageNo(byte pageNo) {
-		this.pageNo = pageNo;
+	public void setGroupNo(byte groupNo) {
+		this.groupNo = groupNo;
 	}
 	
 	public String getName() {
@@ -86,18 +86,18 @@ public class GroupDef implements Persistent{
 		return null;
 	}
 
-	/** Reads a page definition object from the supplied stream. */
+	/** Reads a group definition object from the supplied stream. */
 	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
 		if(!PersistentHelper.isEOF(dis)){
-			setPageNo(dis.readByte());
+			setGroupNo(dis.readByte());
 			setName(dis.readUTF());
 			setQuestions(PersistentHelper.read(dis,new QuestionDef().getClass()));
 		}
 	}
 
-	/** Write the page definition object to the supplied stream. */
+	/** Write the group definition object to the supplied stream. */
 	public void write(DataOutputStream dos) throws IOException {
-		dos.writeByte(getPageNo());
+		dos.writeByte(getGroupNo());
 		dos.writeUTF(getName());
 		PersistentHelper.write(getQuestions(), dos);
 	}
