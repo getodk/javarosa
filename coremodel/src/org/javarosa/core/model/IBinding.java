@@ -8,5 +8,5 @@ import org.javarosa.util.db.Persistent;
  *
  */
 public interface IBinding extends Persistent {
-
+	public String getId();
 }

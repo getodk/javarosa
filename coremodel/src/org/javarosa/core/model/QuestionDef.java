@@ -223,6 +223,15 @@ public class QuestionDef implements Persistent{
 		options.addElement(optionDef);
 	}
 	
+	public IBinding getBind() {
+		return bind;
+	}
+	
+	public void setBind(IBinding bind) {
+		this.bind = bind;
+	}
+	
+	
 	public String serializedDefaultValue() {
 		return this.defaultValue.toString();
 	}
