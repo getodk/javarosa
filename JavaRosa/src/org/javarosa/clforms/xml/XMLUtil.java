@@ -58,17 +58,20 @@ public class XMLUtil {
 	 */
 	public static Form parseForm(InputStreamReader isr) {
 		Form f = new Form();
-		parseForm(isr, f);
+		f = parseForm(isr, f);
 		return f;
 	}
 		
 	/**
 	 * Method to parse an input stream into an existing XForm.
+	 * CTS June 25, 2008 - I changed this to return a form, because
+	 * although the method can mutate forms, it cannot change
+	 * the reference, which is necessary for returning null
 	 * 
 	 * @param inputStreamReader, XForm
 	 * @return XForm
 	 */
-	public static void parseForm(InputStreamReader isr, Form form) {
+	public static Form parseForm(InputStreamReader isr, Form form) {
 		try {
 			KXmlParser parser = new KXmlParser();
 			parser.setInput(isr);
@@ -92,6 +95,8 @@ public class XMLUtil {
 			form = null;
 			ex.printStackTrace();
 		}
+		
+		return form;
 	}
 
 	/**

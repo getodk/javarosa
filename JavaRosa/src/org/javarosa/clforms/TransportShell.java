@@ -531,7 +531,7 @@ public class TransportShell extends MIDlet implements ApplicationInitializer, Co
             try {
             	// first parse form to check correct format
             	Form form = new Form();
-            	XMLUtil.parseForm(new InputStreamReader(din), form);
+            	form = XMLUtil.parseForm(new InputStreamReader(din), form);
             	System.out.println("writing form to: "+this.xformRMS.getNextRecordID()+form.getXmlModel().toString());
             	System.out.println("Form metaD: "+new XFormMetaData(form).toString());
             	// TODO once write external fixed for Form change this to right form object

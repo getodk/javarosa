@@ -44,7 +44,9 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
 		DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data.getBytes()));
 		InputStreamReader isr = new InputStreamReader(dis);
 		try {
-			XMLUtil.parseForm(isr,this);
+			if (XMLUtil.parseForm(isr,this) ==null) {
+				throw new Exception("Form was unable to be parsed");
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
