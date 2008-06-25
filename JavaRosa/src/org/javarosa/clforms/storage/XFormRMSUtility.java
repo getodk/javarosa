@@ -1,5 +1,6 @@
 package org.javarosa.clforms.storage;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Vector;
@@ -11,10 +12,6 @@ import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.javarosa.clforms.api.Form;
 import org.javarosa.clforms.xml.XMLUtil;
-import org.javarosa.demo.ExampleForm;
-
-import org.javarosa.dtree.storage.CDCXFormDemo;
-import org.javarosa.dtree.storage.CDCXForms;
 
 /**
  *
@@ -106,8 +103,8 @@ public class XFormRMSUtility extends RMSUtility {
 
 		/* NEW RESOURCE-BASED SCHEME */
 		writeFormFromResource("/hmis-a_draft.xhtml");
-		writeFormFromResource("/hmis-b_draft.xhtml");		
-		writeFormFromResource("/shortform.xhtml");	
+		writeFormFromResource("/hmis-b_draft.xhtml");
+		writeFormFromResource("/shortform.xhtml");
 		
 		
 		/* LOAD CDC-TZ FORMS
@@ -126,8 +123,26 @@ public class XFormRMSUtility extends RMSUtility {
 	private void writeFormFromResource (String resource) {
 		InputStream is = getClass().getResourceAsStream(resource);
 		InputStreamReader isr = new InputStreamReader(is);
-		Form xform = XMLUtil.parseForm(isr);
-		writeToRMS(xform, new XFormMetaData(xform));
+		if(isr != null) {
+			Form xform = XMLUtil.parseForm(isr);
+			if(xform != null) {
+				writeToRMS(xform, new XFormMetaData(xform));
+			}
+			else {
+				System.out.println("Unable to parse " + resource + ". Xform could not be loaded.");
+			}
+		}
+		else {
+			System.out.println("The XFormRMSUtility was unable to obtain a stream " +
+					"for the resource " + resource);
+		}
+		try {
+			isr.close();
+		}
+		catch(IOException e) {
+			System.err.println("IO Exception while closing stream.");
+			e.printStackTrace();
+		}
 	}
 
 	public int getIDfromName(String name) {
