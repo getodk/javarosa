@@ -20,6 +20,9 @@ public class FormDef implements Persistent{
 	/** A collection of group definitions. */
 	private Vector groups;
 	
+	/** Bindings from questions to FormTypes */
+	private Hashtable bindings;
+	
 	/** The string unique identifier of the form definition. */
 	private String variableName = Constants.EMPTY_STRING;
 	
@@ -97,6 +100,18 @@ public class FormDef implements Persistent{
 
 	public void setRules(Vector rules) {
 		this.rules = rules;
+	}
+	
+	public IBinding getBinding(String id) {
+		return (IBinding)bindings.get(id);
+	}
+	public void  addBinding(IBinding bind) {
+		if(bindings != null) {
+			bindings.put(bind.getId(), bind);
+		}
+		else {
+			bindings = new Hashtable();
+		}
 	}
 
 	public String getDescriptionTemplate() {
