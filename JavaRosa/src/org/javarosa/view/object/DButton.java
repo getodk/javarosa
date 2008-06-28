@@ -1,4 +1,4 @@
-package org.javarosa.view;
+package org.javarosa.view.object;
 
 import javax.microedition.lcdui.Graphics;
 
