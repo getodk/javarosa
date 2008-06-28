@@ -1,4 +1,4 @@
-package org.javarosa.view;
+package org.javarosa.view.object;
 
 /**
  * The ActonListener interface is implemented to allow

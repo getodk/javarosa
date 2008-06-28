@@ -7,7 +7,7 @@ import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.utils.Rectangle;
 import org.javarosa.utils.ViewUtils;
-import org.javarosa.view.Widget;
+import org.javarosa.view.object.Widget;
 
 /**
  * A widget for accepting enumerated type choices in a dropdown list

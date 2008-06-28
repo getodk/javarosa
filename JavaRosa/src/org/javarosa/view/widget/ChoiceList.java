@@ -6,7 +6,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.utils.ViewUtils;
-import org.javarosa.view.Widget;
+import org.javarosa.view.object.Widget;
 
 /**
  * A widget for accepting enumerated type choices in list of either
