@@ -4,13 +4,14 @@
 package org.javarosa.demo.module;
 
 import java.io.IOException;
+import java.util.Hashtable;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.JavaRosaPlatform;
-import org.javarosa.shell.IShell;
-import org.javarosa.view.ReturnValue;
+import org.javarosa.core.api.IModule;
+import org.javarosa.core.api.IShell;
 
 import de.enough.polish.ui.splash.ApplicationInitializer;
 import de.enough.polish.ui.splash.InitializerSplashScreen;
@@ -84,9 +85,9 @@ public class SplashScreenModule implements IModule, ApplicationInitializer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.javarosa.module.IModule#viewCompleted(org.javarosa.view.ReturnValue, int)
+	 * @see org.javarosa.module.IModule#viewCompleted(Hashtable, int)
 	 */
-	public void viewCompleted(ReturnValue rv, int viewId) {
+	public void viewCompleted(Hashtable context, int viewId) {
 		// TODO Auto-generated method stub
 
 	}

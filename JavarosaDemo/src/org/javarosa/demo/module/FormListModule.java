@@ -3,6 +3,7 @@
  */
 package org.javarosa.demo.module;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -12,10 +13,10 @@ import javax.microedition.rms.RecordEnumeration;
 import org.javarosa.clforms.storage.XFormMetaData;
 import org.javarosa.clforms.storage.XFormRMSUtility;
 import org.javarosa.core.JavaRosaPlatform;
-import org.javarosa.shell.IShell;
-import org.javarosa.view.Commands;
-import org.javarosa.view.FormList;
-import org.javarosa.view.ReturnValue;
+import org.javarosa.core.api.IModule;
+import org.javarosa.core.api.IShell;
+import org.javarosa.demo.view.FormList;
+import org.javarosa.demo.view.Commands;
 import org.javarosa.view.ViewTypes;
 
 /**
@@ -42,23 +43,28 @@ public class FormListModule implements IModule {
 	}
 	
 	
-	public void viewCompleted(ReturnValue rv, int view_ID) {
+	public void viewCompleted(Hashtable returnvals, int view_ID) {
 		// Determine which view just completed and act accordingly
 		switch(view_ID) {
 		case ViewTypes.FORM_LIST:
-			processFormsList(rv);
+			processFormsList(returnvals);
 			break;
 		}
 	}
 	
-	private void processFormsList(ReturnValue rv) {
-		switch(rv.command) {
-		case Commands.CMD_SELECT_XFORM:
+	private void processFormsList(Hashtable returnvals) {
+		Enumeration en = returnvals.keys();
+		while(en.hasMoreElements()) {
+			String cmd = (String)en.nextElement();
+		
+		if( cmd == Commands.CMD_SELECT_XFORM){
 			//LOG
-			System.out.println("Selected form: " + formIDs.elementAt( ((Integer)(rv.values.get(new Integer(0)))).intValue() ));
+			System.out.println("Selected form: " + formIDs.elementAt( ((Integer)(returnvals.get(cmd))).intValue() ));
 			
 			// 
 			break;
+		
+		}
 		}
 	}
 	
