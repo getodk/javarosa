@@ -1,0 +1,56 @@
+<project name="epihandy-midlet" default="deployedSuite" basedir=".">
+
+	<!-- Build properties -->
+	<property file="build.properties" />
+
+	<!-- Import the low-level targets -->
+	<import file="build-demo.xml" />
+
+	<!-- The primary target of the build file.  The end result is   -->
+	<!-- the deployed jar and jad files.                            -->
+	<target name="deployedSuite" depends="deployable" />
+
+	<!-- Initialize the build environment as necessary -->
+	<target name="-initialize"
+		description="Initializes the build environment">
+		<echo message="Initializing build environment..." />
+
+		<!-- Create the build directories -->
+		<mkdir dir="${path.build}" />
+		<mkdir dir="${path.build.classes}" />
+		<mkdir dir="${path.build.classes}/_no_export" />
+		<mkdir dir="${path.build.output}" />
+	</target>
+
+	<!-- Build the classes that make up the midlet -->
+	<target name="build" depends="-initialize,antenna-build"
+		description="Builds the classes that make up the project">
+	</target>
+
+	<!-- Package up the compiled code without obfuscation -->
+	<target name="jar" depends="build,antenna-jar"
+		description="Packages the midlet jar without obfuscation">
+	</target>
+
+	<!-- Package up the compiled code with obfuscation -->
+	<target name="deployable" depends="build,antenna-deployable"
+		description="Packages the midlet jar, with obfuscation">
+	</target>
+
+	<!-- Run the packaged code -->
+	<target name="run" depends="deployable,antenna-run"
+		description="Runs the deployed package in the emulator">
+	</target>
+
+	<!-- Build a Palm PRC file -->
+	<target name="makeprc" depends="deployable,antenna-makeprc"
+		description="Generates a deployable Palm PRC file">
+	</target>
+
+	<!-- Clean the output of a previous execution -->
+	<target name="clean"
+		description="Cleans the output from previous builds">
+		<echo message="Cleaning project files..." />
+		<antcall target="antenna-clean" />
+	</target>
+</project>
