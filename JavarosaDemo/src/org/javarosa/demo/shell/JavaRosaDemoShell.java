@@ -1,5 +1,7 @@
 package org.javarosa.demo.shell;
 
+import java.util.Hashtable;
+
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.api.IShell;
 import org.javarosa.demo.module.FormListModule;
