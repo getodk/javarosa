@@ -3,8 +3,8 @@ package org.javarosa.chatscreen;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 
-import org.javarosa.view.Component;
-import org.javarosa.view.IRefreshListener;
+import org.javarosa.view.object.Component;
+import org.javarosa.view.object.IRefreshListener;
 
 /**
  * A DForm acts as a full screen form, and serves as the basis for
