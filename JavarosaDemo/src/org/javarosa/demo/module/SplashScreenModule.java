@@ -63,7 +63,7 @@ public class SplashScreenModule implements IModule, ApplicationInitializer {
   		} catch(Exception e) {}
   		
   		// Tell the shell that the splash screen has completed
-  		parent.moduleCompleted(this, null);
+  		parent.returnFromModule(this, null, null);
   		
   		// We're using our own architecture
 		return null;

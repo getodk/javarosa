@@ -21,7 +21,7 @@ import de.enough.polish.ui.List;
  * @author Brian DeRenzi
  *
  */
-public class FormList extends List implements IView, CommandListener {
+public class FormList extends List implements CommandListener {
 	// TODO: These should all be il8n'd
 	private final Command CMD_EXIT = new Command("Exit", Command.BACK, 2);
     private final Command CMD_GETNEWFORMS = new Command("Get New Forms", Command.SCREEN, 2);
@@ -65,10 +65,6 @@ public class FormList extends List implements IView, CommandListener {
         //#endif
 	}
 	
-	public void unloadView() {
-		// TODO Auto-generated method stub
-
-	}
 	/**
 	 * Put the list
 	 */

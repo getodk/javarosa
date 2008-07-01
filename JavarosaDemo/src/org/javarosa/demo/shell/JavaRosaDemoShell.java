@@ -2,6 +2,7 @@ package org.javarosa.demo.shell;
 
 import java.util.Hashtable;
 
+import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.util.WorkflowStack;
@@ -31,12 +32,6 @@ public class JavaRosaDemoShell implements IShell {
 
 	}
 	
-	public void pushModuleAndRunCommand(IModule module, Hashtable context, String cmd) {
-		//TODO: get context from method signature or from halt()?
-		module.halt();
-		stack.push(module,context);
-		workflow(module, cmd);
-	}
 	public void Run() {
 		this.splashScreen = new SplashScreenModule(this, "/splash.gif");
 		this.formModule = new FormListModule(this,"Forms List");
@@ -45,7 +40,8 @@ public class JavaRosaDemoShell implements IShell {
 	//	switchView(ViewTypes.FORM_LIST);
 	}
 	
-	private void workflow(IModule lastModule, String cmd) {
+	private void workflow(IModule lastModule, String cmd, Hashtable returnVals) {
+		//TODO: parse any returnvals into context
 		if(stack.size() != 0) {
 			stack.pop().resume();
 		}
@@ -59,9 +55,12 @@ public class JavaRosaDemoShell implements IShell {
 	/* (non-Javadoc)
 	 * @see org.javarosa.shell.IShell#moduleCompeleted(org.javarosa.module.IModule)
 	 */
-	public void moduleCompleted(IModule module, Hashtable returnVals) {
-		//TODO: parse any returnvals into context
-		workflow(module, null);
+	public void returnFromModule(IModule module, String returnCode, Hashtable returnVals) {
+		Hashtable moduleContext = module.halt();
+		if(returnCode != Constants.MODULE_COMPLETE) {
+			stack.push(module,moduleContext);
+		}
+		workflow(module, returnCode, returnVals);
 	}
 
 }
