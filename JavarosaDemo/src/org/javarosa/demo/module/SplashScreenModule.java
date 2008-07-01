@@ -89,7 +89,18 @@ public class SplashScreenModule implements IModule, ApplicationInitializer {
 	 */
 	public void viewCompleted(Hashtable context, int viewId) {
 		// TODO Auto-generated method stub
-
 	}
-
+	
+	public void setContext(Hashtable context) {
+		//don't bother. we don't need context
+	}
+	
+	public Hashtable halt() {
+		//no need for special halting
+		return null;
+	}
+	public void resume() {
+		//just run the screen. Should block anyway.
+		start();
+	}
 }

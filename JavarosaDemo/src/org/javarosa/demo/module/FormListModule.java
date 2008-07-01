@@ -12,6 +12,7 @@ import javax.microedition.rms.RecordEnumeration;
 
 import org.javarosa.clforms.storage.XFormMetaData;
 import org.javarosa.clforms.storage.XFormRMSUtility;
+
 import org.javarosa.core.JavaRosaPlatform;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.api.IShell;
@@ -28,6 +29,8 @@ public class FormListModule implements IModule {
 	private Hashtable listOfForms = null;
 	private Vector formIDs = null;
 	private IShell parent = null;
+	
+	Hashtable context;
 	
 	public FormListModule(IShell p, String title) {
 		this.parent = p;
@@ -97,4 +100,16 @@ public class FormListModule implements IModule {
     	//LOG
     	System.out.println("Done getting XForms");
     }
+	
+	public void setContext(Hashtable context) {
+		this.context = context; 
+	}
+	
+	public Hashtable halt() {
+		return context; 
+	}
+	public void resume() {
+		//Possibly want to check for new/updated forms
+		JavaRosaPlatform.showView(this.formsList);
+	}
 }

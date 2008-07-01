@@ -1,0 +1,34 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/2002/xforms"
+	  xmlns:ev="http://www.w3.org/2001/xml-events"
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<h:head>
+    <h:title>Short Test Fuzzorm</h:title>
+    <model>
+	<instance>
+		<testdata xmlns="">
+			<val1/>
+			<val2/>
+			<val3/>
+			<ignore/>
+		</testdata>
+	</instance>
+		
+    </model>
+</h:head>			
+<h:body>
+
+        <input ref="/testdata/val1">
+            <label>question 1</label>
+        </input>
+        <input ref="/testdata/val2" relevant="/testdata/val1='a'">
+            <label>question 2</label>
+        </input>
+        <select1 ref="/testdata/val3" relevant="/testdata/val1='a'">
+            <label>question 3</label>
+            <item><label>choice 1</label><value>val1</value></item>
+            <item><label>choice 2</label><value>val2</value></item>
+        </select1>
+            
+</h:body>
+</h:html>
