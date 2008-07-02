@@ -9,6 +9,7 @@ import java.util.Hashtable;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Image;
 
+import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaPlatform;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.api.IShell;
@@ -34,7 +35,7 @@ public class SplashScreenModule implements IModule, ApplicationInitializer {
 	/* (non-Javadoc)
 	 * @see org.javarosa.module.IModule#start()
 	 */
-	public void start() {
+	public void start(Context context) {
 		try {
 			// TODO Auto-generated method stub
 			Image image = Image.createImage(this.picture);
@@ -84,17 +85,15 @@ public class SplashScreenModule implements IModule, ApplicationInitializer {
 		this.splashDelay = splashDelay;
 	}
 	
-	public void setContext(Hashtable context) {
+	public void contextChanged(Context globalContext) {
 		//don't bother. we don't need context
 	}
 	
-	public Hashtable halt() {
-		//no need for special halting
-		return null;
+	public void halt() {
 	}
-	public void resume() {
-		//just run the screen. Should block anyway.
-		start();
+	
+	public void resume(Context context) {
+		start(context);
 	}
 	
 	public void destroy() {

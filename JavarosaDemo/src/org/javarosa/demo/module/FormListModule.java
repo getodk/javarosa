@@ -12,12 +12,13 @@ import javax.microedition.rms.RecordEnumeration;
 
 import org.javarosa.clforms.storage.XFormMetaData;
 import org.javarosa.clforms.storage.XFormRMSUtility;
-
+import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaPlatform;
+import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.api.IShell;
-import org.javarosa.demo.view.FormList;
 import org.javarosa.demo.view.Commands;
+import org.javarosa.demo.view.FormList;
 import org.javarosa.view.ViewTypes;
 
 /**
@@ -30,19 +31,21 @@ public class FormListModule implements IModule {
 	private Vector formIDs = null;
 	private IShell parent = null;
 	
-	Hashtable context;
+	Context context;
 	
 	public FormListModule(IShell p, String title) {
 		this.parent = p;
 		this.formsList = new FormList(this,title);
 	}
 	
-	public void start() {
+	public void start(Context context) {
 		this.listOfForms = new Hashtable();
 		this.formIDs = new Vector();
 		getXForms();
 		this.formsList.loadView(listOfForms);
 		parent.setDisplay(this, this.formsList);
+		
+		this.context = context;
 	}
 	
 	
@@ -101,14 +104,23 @@ public class FormListModule implements IModule {
     	System.out.println("Done getting XForms");
     }
 	
-	public void setContext(Hashtable context) {
-		this.context = context; 
+	public void contextChanged(Context context) {
+		Vector contextChanges = this.context.mergeInContext(context);
+		
+		Enumeration en = contextChanges.elements();
+		while(en.hasMoreElements()) {
+			String changedValue = (String)en.nextElement();
+			if(changedValue == Constants.USER_KEY) {
+				//update username somewhere
+			}
+		}
 	}
 	
-	public Hashtable halt() {
-		return context; 
+	public void halt() {
+		
 	}
-	public void resume() {
+	public void resume(Context context) {
+		this.contextChanged(context);
 		//Possibly want to check for new/updated forms
 		JavaRosaPlatform.instance().showView(this.formsList);
 	}
