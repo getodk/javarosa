@@ -10,8 +10,8 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.api.IView;
 import org.javarosa.core.api.IModule;
+import org.javarosa.demo.module.FormListModule;
 import org.javarosa.view.Commands;
 import org.javarosa.view.ViewTypes;
 
@@ -30,13 +30,13 @@ public class FormList extends List implements CommandListener {
     private final Command CMD_SHAREFORMS = new Command("Share Forms", Command.SCREEN, 2);
     private final Command CMD_SETTINGS = new Command("Settings", Command.SCREEN, 3);
     
-    private IModule parent = null;
+    private FormListModule parent = null;
     
-	public FormList(IModule p, String title) {
+	public FormList(FormListModule p, String title) {
 		this(p, title, List.IMPLICIT);
 	}
 
-	public FormList(IModule p, String title, int listType) {
+	public FormList(FormListModule p, String title, int listType) {
 		
 		super(title, listType);
 		this.parent = p;
