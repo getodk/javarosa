@@ -33,11 +33,11 @@ public class JavaRosaDemoShell implements IShell {
 		context = new Hashtable();
 	}
 
-	public void ExitShell() {
+	public void exitShell() {
 
 	}
 	
-	public void Run() {
+	public void run() {
 		this.splashScreen = new SplashScreenModule(this, "/splash.gif");
 		this.formModule = new FormListModule(this,"Forms List");
 		
