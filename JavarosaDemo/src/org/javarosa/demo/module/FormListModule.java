@@ -42,7 +42,7 @@ public class FormListModule implements IModule {
 		this.formIDs = new Vector();
 		getXForms();
 		this.formsList.loadView(listOfForms);
-		JavaRosaPlatform.showView(this.formsList);
+		JavaRosaPlatform.instance().showView(this.formsList);
 	}
 	
 	
@@ -72,7 +72,7 @@ public class FormListModule implements IModule {
 	}
 	
 	private void getXForms() {
-		XFormRMSUtility xformRMSUtility = JavaRosaPlatform.getXFormRMS();
+		XFormRMSUtility xformRMSUtility = JavaRosaPlatform.instance().getXFormRMS();
 		xformRMSUtility.open();
     	RecordEnumeration recordEnum = xformRMSUtility.enumerateMetaData();
     	int pos =0;
@@ -110,6 +110,9 @@ public class FormListModule implements IModule {
 	}
 	public void resume() {
 		//Possibly want to check for new/updated forms
-		JavaRosaPlatform.showView(this.formsList);
+		JavaRosaPlatform.instance().showView(this.formsList);
+	}
+	public void destroy() {
+		
 	}
 }
