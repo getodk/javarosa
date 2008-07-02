@@ -103,4 +103,8 @@ public class SplashScreenModule implements IModule, ApplicationInitializer {
 		//just run the screen. Should block anyway.
 		start();
 	}
+	
+	public void destroy() {
+		
+	}
 }
