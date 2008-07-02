@@ -83,13 +83,6 @@ public class SplashScreenModule implements IModule, ApplicationInitializer {
 	public void setSplashDelay(int splashDelay) {
 		this.splashDelay = splashDelay;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.module.IModule#viewCompleted(Hashtable, int)
-	 */
-	public void viewCompleted(Hashtable context, int viewId) {
-		// TODO Auto-generated method stub
-	}
 	
 	public void setContext(Hashtable context) {
 		//don't bother. we don't need context
