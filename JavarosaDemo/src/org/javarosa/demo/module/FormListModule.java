@@ -42,7 +42,7 @@ public class FormListModule implements IModule {
 		this.formIDs = new Vector();
 		getXForms();
 		this.formsList.loadView(listOfForms);
-		JavaRosaPlatform.instance().showView(this.formsList);
+		parent.setDisplay(this, this.formsList);
 	}
 	
 	

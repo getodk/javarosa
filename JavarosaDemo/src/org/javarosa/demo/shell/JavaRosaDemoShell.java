@@ -2,6 +2,9 @@ package org.javarosa.demo.shell;
 
 import java.util.Hashtable;
 
+import javax.microedition.lcdui.Displayable;
+
+import org.javarosa.core.JavaRosaPlatform;;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.api.IShell;
@@ -22,6 +25,8 @@ public class JavaRosaDemoShell implements IShell {
 	WorkflowStack stack;
 	
 	Hashtable context;
+	
+	IModule currentModule;
 
 	public JavaRosaDemoShell() {
 		stack = new WorkflowStack(); 
@@ -37,6 +42,7 @@ public class JavaRosaDemoShell implements IShell {
 		this.formModule = new FormListModule(this,"Forms List");
 		
 		this.splashScreen.start();
+		currentModule = splashScreen;
 	//	switchView(ViewTypes.FORM_LIST);
 	}
 	
@@ -49,6 +55,7 @@ public class JavaRosaDemoShell implements IShell {
 		if( lastModule == this.splashScreen ) {
 			this.formModule.setContext(this.context);
 			this.formModule.start();
+			currentModule = formModule;
 		}
 	}
 
@@ -63,4 +70,9 @@ public class JavaRosaDemoShell implements IShell {
 		workflow(module, returnCode, returnVals);
 	}
 
+	public void setDisplay(IModule callingModule, Displayable display) {
+		if(callingModule == currentModule) {
+		JavaRosaPlatform.instance().getDisplay().setCurrent(display);
+		}
+	}
 }

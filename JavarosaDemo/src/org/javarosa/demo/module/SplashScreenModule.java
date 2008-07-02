@@ -43,10 +43,10 @@ public class SplashScreenModule implements IModule, ApplicationInitializer {
 			//Set readyMessage = null to forward to the next
 			//displayabe as soon as it's available
 			int messageColor = 0xFF0000;
-			InitializerSplashScreen splashScreen = new InitializerSplashScreen(JavaRosaPlatform.getDisplay(),
+			InitializerSplashScreen splashScreen = new InitializerSplashScreen(JavaRosaPlatform.instance().getDisplay(),
 					image, backgroundColor, readyMessage, messageColor, this);
-			JavaRosaPlatform.showView(splashScreen);
-		} catch (IOException e) {
+			parent.setDisplay(this, splashScreen);
+			} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
