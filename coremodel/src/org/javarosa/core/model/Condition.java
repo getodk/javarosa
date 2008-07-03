@@ -4,8 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 
 /**
@@ -14,7 +14,7 @@ import org.javarosa.util.db.PersistentHelper;
  *
  *@author Daniel Kayiwa
  */
-public class Condition implements Persistent{
+public class Condition implements Externalizable{
 	
 	/** The unique identifier of the question referenced by this condition. */
 	private String questionId;
@@ -175,8 +175,8 @@ public class Condition implements Persistent{
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readByte());
 			setQuestionId(dis.readUTF());
 			setOperator(dis.readByte());
@@ -190,7 +190,7 @@ public class Condition implements Persistent{
 	 * @param dos - the stream to write to.
 	 * @throws IOException
 	 */
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeByte(getId());
 		dos.writeUTF(getQuestionId());
 		dos.writeByte(getOperator());

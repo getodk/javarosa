@@ -5,8 +5,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 
 /**
@@ -15,7 +15,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel
  *
  */
-public class User implements Persistent{
+public class User implements Externalizable{
 
 	private int userId;
 	private String name;
@@ -73,8 +73,8 @@ public class User implements Persistent{
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+		if(!ExternalizableHelper.isEOF(dis)){
 			setUserId(dis.readInt());
 			setName(dis.readUTF());
 			setPassword(dis.readUTF());
@@ -88,7 +88,7 @@ public class User implements Persistent{
 	 * @param dos - the stream to write to.
 	 * @throws IOException
 	 */
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeInt(getUserId());
 		dos.writeUTF(getName());
 		dos.writeUTF(getPassword());

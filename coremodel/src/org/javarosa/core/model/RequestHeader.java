@@ -4,8 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 
 /**
@@ -15,7 +15,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel Kayiwa
  *
  */
-public class RequestHeader implements Persistent{
+public class RequestHeader implements Externalizable{
 	
 	/** No status specified yet. */
 	public static final byte ACTION_NONE = -1;
@@ -74,19 +74,19 @@ public class RequestHeader implements Persistent{
 	}
 		
 	/**
-	 * @see org.javarosa.util.db.Persistent#write(java.io.DataOutputStream)
+	 * @see org.javarosa.util.db.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
-	public void write(DataOutputStream dos) throws IOException{
+	public void writeExternal(DataOutputStream dos) throws IOException{
 		dos.writeUTF(getUserName());
 		dos.writeUTF(getPassword());
 		dos.writeByte(getAction());
 	}
 	
 	/**
-	 * @see org.javarosa.util.db.Persistent#read(java.io.DataInputStream)
+	 * @see org.javarosa.util.db.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void read(DataInputStream dis) throws IOException,InstantiationException,IllegalAccessException{
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException,InstantiationException,IllegalAccessException{
+		if(!ExternalizableHelper.isEOF(dis)){
 			setUserName(dis.readUTF());
 			setPassword(dis.readUTF());
 			setAction(dis.readByte());

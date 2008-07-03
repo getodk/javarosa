@@ -1,9 +1,11 @@
 package org.javarosa.core.model;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 
 /** 
@@ -13,7 +15,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel Kayiwa
  *
  */
-public class OptionDef implements Persistent {
+public class OptionDef implements Externalizable {
 	/** The numeric unique identifier of an answer option. */
 	private byte id = Constants.NULL_ID;
 	
@@ -75,8 +77,8 @@ public class OptionDef implements Persistent {
 	/** Reads the answer option definition from the stream. 
 	 * 
 	 */
-	public void read(DataInputStream dis) throws IOException {
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException {
+		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readByte());
 			setText(dis.readUTF());
 			setVariableName(dis.readUTF());
@@ -86,7 +88,7 @@ public class OptionDef implements Persistent {
 	/** Writes the answer option definition to the stream. 
 	 * 
 	 */
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeByte(getId());
 		dos.writeUTF(getText());
 		dos.writeUTF(getVariableName());
