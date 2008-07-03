@@ -3,10 +3,11 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Vector;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.services.storage.utilities.IDRecordable;
 
 /**
  * Definition of a form. This has some meta data about the form definition and  
@@ -15,7 +16,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel Kayiwa
  *
  */
-public class FormDef implements Persistent{
+public class FormDef implements IDRecordable, Externalizable{
 	
 	/** A collection of group definitions. */
 	private Vector groups;
@@ -31,6 +32,8 @@ public class FormDef implements Persistent{
 	
 	/** The numeric unique identifier of the form definition. */
 	private int id = Constants.NULL_ID;
+	
+	private int recordId;
 	
 	/** The collection of rules for this form. */
 	private Vector rules;
@@ -92,6 +95,10 @@ public class FormDef implements Persistent{
 
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public void setRecordId(int recordId) {
+		this.recordId = recordId;
 	}
 
 	public Vector getRules() {
@@ -177,14 +184,14 @@ public class FormDef implements Persistent{
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readInt());
 			setName(dis.readUTF());
 			setVariableName(dis.readUTF());
 			setDescriptionTemplate(dis.readUTF());
-			setGroups(PersistentHelper.read(dis,new GroupDef().getClass()));
-			setRules(PersistentHelper.read(dis,new EpiHandySkipRule().getClass()));
+			setGroups(ExternalizableHelper.readExternal(dis,new GroupDef().getClass()));
+			setRules(ExternalizableHelper.readExternal(dis,new EpiHandySkipRule().getClass()));
 		}
 	}
 
@@ -194,12 +201,12 @@ public class FormDef implements Persistent{
 	 * @param dos - the stream to write to.
 	 * @throws IOException
 	 */
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeInt(getId());
 		dos.writeUTF(getName());
 		dos.writeUTF(getVariableName());
 		dos.writeUTF(getDescriptionTemplate());
-		PersistentHelper.write(getGroups(), dos);
-		PersistentHelper.write(getRules(), dos);
+		ExternalizableHelper.writeExternal(getGroups(), dos);
+		ExternalizableHelper.writeExternal(getRules(), dos);
 	}
 }

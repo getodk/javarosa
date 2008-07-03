@@ -3,10 +3,11 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Vector;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 
 /**
@@ -16,7 +17,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel Kayiwa
  *
  */
-public class QuestionData implements Persistent{
+public class QuestionData implements Externalizable{
 	
 	public static final String TRUE_VALUE = "true";
 	public static final String FALSE_VALUE = "false";
@@ -437,8 +438,8 @@ public class QuestionData implements Persistent{
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void read(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
+		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readUTF());	
 			readAnswer(dis,dis.readByte());
 		}
@@ -456,22 +457,22 @@ public class QuestionData implements Persistent{
 	public void readAnswer(DataInputStream dis, byte type) throws IOException, IllegalAccessException, InstantiationException{
 		switch(type){
 		case Constants.QTN_TYPE_BOOLEAN:
-			setAnswer(PersistentHelper.readBoolean(dis));
+			setAnswer(ExternalizableHelper.readBoolean(dis));
 			break;
 		case Constants.QTN_TYPE_TEXT:
 		case Constants.QTN_TYPE_DECIMAL:
 		case Constants.QTN_TYPE_NUMERIC:
-			setAnswer(PersistentHelper.readUTF(dis));
+			setAnswer(ExternalizableHelper.readUTF(dis));
 			break;
 		case Constants.QTN_TYPE_DATE:
 		case Constants.QTN_TYPE_DATE_TIME:
 		case Constants.QTN_TYPE_TIME:
-			setAnswer(PersistentHelper.readDate(dis));
+			setAnswer(ExternalizableHelper.readDate(dis));
 			break;
 		case Constants.QTN_TYPE_LIST_EXCLUSIVE:
 			if(dis.readBoolean()){
 				OptionData option = new OptionData();
-				option.read(dis);
+				option.readExternal(dis);
 				setAnswer(option);	
 				
 				setOptionAnswerIndices(new Byte(dis.readByte()));
@@ -479,7 +480,7 @@ public class QuestionData implements Persistent{
 			break;
 		case Constants.QTN_TYPE_LIST_MULTIPLE:
 			if(dis.readBoolean()){
-				setAnswer(PersistentHelper.read(dis, new OptionData().getClass()));
+				setAnswer(ExternalizableHelper.readExternal(dis, new OptionData().getClass()));
 				
 				byte count = dis.readByte(); //should always be greater than zero
 				Vector col = new Vector();
@@ -497,7 +498,7 @@ public class QuestionData implements Persistent{
 	 * @param dos - the stream to write to.
 	 * @throws IOException
 	 */
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeUTF(getId());
 		
 		//This type is only used when reading data back from storage.
@@ -509,22 +510,22 @@ public class QuestionData implements Persistent{
 	private void writeAnswer(DataOutputStream dos) throws IOException {	
 		switch(getDef().getType()){
 			case Constants.QTN_TYPE_BOOLEAN:
-				PersistentHelper.writeBoolean(dos, (Boolean)getAnswer());
+				ExternalizableHelper.writeBoolean(dos, (Boolean)getAnswer());
 				break;
 			case Constants.QTN_TYPE_TEXT:
 			case Constants.QTN_TYPE_DECIMAL:
 			case Constants.QTN_TYPE_NUMERIC:
-				PersistentHelper.writeUTF(dos, getTextAnswer());
+				ExternalizableHelper.writeUTF(dos, getTextAnswer());
 				break;
 			case Constants.QTN_TYPE_DATE:
 			case Constants.QTN_TYPE_DATE_TIME:
 			case Constants.QTN_TYPE_TIME:
-				PersistentHelper.writeDate(dos, (Date)getAnswer());
+				ExternalizableHelper.writeDate(dos, (Date)getAnswer());
 				break;
 			case Constants.QTN_TYPE_LIST_EXCLUSIVE:
 				if(getAnswer() != null){
 					dos.writeBoolean(true);
-					((OptionData)getAnswer()).write(dos);
+					((OptionData)getAnswer()).writeExternal(dos);
 					dos.writeByte(((Byte)getOptionAnswerIndices()).byteValue());
 				}
 				else
@@ -533,7 +534,7 @@ public class QuestionData implements Persistent{
 			case Constants.QTN_TYPE_LIST_MULTIPLE:
 				if(getAnswer() != null){
 					dos.writeBoolean(true);
-					PersistentHelper.write((Vector)getAnswer(), dos);
+					ExternalizableHelper.writeExternal((Vector)getAnswer(), dos);
 					Vector col = (Vector)getOptionAnswerIndices();
 					dos.writeByte(col.size());
 					for(byte i=0; i<col.size(); i++)
@@ -545,7 +546,7 @@ public class QuestionData implements Persistent{
 			case Constants.QTN_TYPE_REPEAT:
 				if(getAnswer() != null){
 					dos.writeBoolean(true);
-					((Persistent)getAnswer()).write(dos);
+					((Externalizable)getAnswer()).writeExternal(dos);
 				}
 				else
 					dos.writeBoolean(false);

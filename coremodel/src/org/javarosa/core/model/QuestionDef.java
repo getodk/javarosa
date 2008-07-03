@@ -3,10 +3,10 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Vector;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 
 /** 
@@ -15,7 +15,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel Kayiwa
  *
  */
-public class QuestionDef implements Persistent{
+public class QuestionDef implements Externalizable{
 	/** The prompt text. The text the user sees. */
 	private String longText = Constants.EMPTY_STRING;
 	
@@ -239,8 +239,8 @@ public class QuestionDef implements Persistent{
 	/**
 	 * Reads the object from stream.
 	 */
-	public void read(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
+		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readUTF());
 			
 			setLongText(dis.readUTF());
@@ -254,21 +254,21 @@ public class QuestionDef implements Persistent{
 			setEnabled(dis.readBoolean());
 			setLocked(dis.readBoolean());
 			setVariableName(dis.readUTF());
-			setDefaultValue(PersistentHelper.readUTF(dis));
+			setDefaultValue(ExternalizableHelper.readUTF(dis));
 			//TODO Note that this sucks, because bind has to know its type. 
 			//We need to deal with that. Should Binding be a class that
 			//has a header for its type? Should we be writing that binding
 			//here manually? We could also make bind serialize to a string.
-			bind.read(dis);
+			bind.readExternal(dis);
 			
-			setOptions(PersistentHelper.read(dis,new OptionDef().getClass()));
+			setOptions(ExternalizableHelper.readExternal(dis,new OptionDef().getClass()));
 		}
 	}
 
 	/**
 	 * Write the object to stream.
 	 */
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeUTF(getId());
 
 		dos.writeUTF(getLongText());
@@ -282,11 +282,11 @@ public class QuestionDef implements Persistent{
 		dos.writeBoolean(isEnabled());
 		dos.writeBoolean(isLocked());
 		dos.writeUTF(getVariableName());
-		bind.write(dos);
+		bind.writeExternal(dos);
 		
-		PersistentHelper.writeUTF(dos, serializedDefaultValue());
+		ExternalizableHelper.writeUTF(dos, serializedDefaultValue());
 		
-		PersistentHelper.write(getOptions(), dos);
+		ExternalizableHelper.writeExternal(getOptions(), dos);
 	}
 	
 	public String toString() {

@@ -3,10 +3,10 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Vector;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 
 /** The definition of a group in a form or questionaire. 
@@ -14,7 +14,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel Kayiwa
  *
  */
-public class GroupDef implements Persistent{
+public class GroupDef implements Externalizable{
 	
 	/** A list of questions on a group. */
 	private Vector questions;
@@ -87,19 +87,19 @@ public class GroupDef implements Persistent{
 	}
 
 	/** Reads a group definition object from the supplied stream. */
-	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+		if(!ExternalizableHelper.isEOF(dis)){
 			setGroupNo(dis.readByte());
 			setName(dis.readUTF());
-			setQuestions(PersistentHelper.read(dis,new QuestionDef().getClass()));
+			setQuestions(ExternalizableHelper.readExternal(dis,new QuestionDef().getClass()));
 		}
 	}
 
 	/** Write the group definition object to the supplied stream. */
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeByte(getGroupNo());
 		dos.writeUTF(getName());
-		PersistentHelper.write(getQuestions(), dos);
+		ExternalizableHelper.writeExternal(getQuestions(), dos);
 	}
 	
 	public String toString() {

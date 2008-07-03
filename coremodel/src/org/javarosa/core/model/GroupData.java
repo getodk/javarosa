@@ -5,8 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 /** This object contains the collected data of a group in a form or questionaire
  * Separating group data and definition is for optimisation. This is achieved
@@ -16,7 +16,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel Kayiwa
  *
  */
-public class GroupData  implements Persistent{
+public class GroupData  implements Externalizable{
 	
 	/** The group number. */
 	private byte groupNo = Constants.NULL_ID;
@@ -78,16 +78,16 @@ public class GroupData  implements Persistent{
 	}
 
 	/** Reads the group data object from the stream .*/
-	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+		if(!ExternalizableHelper.isEOF(dis)){
 			setGroupNo(dis.readByte());
-			setQuestions(PersistentHelper.read(dis,new QuestionData().getClass()));
+			setQuestions(ExternalizableHelper.readExternal(dis,new QuestionData().getClass()));
 		}
 	}
 
 	/** Writes the group data object to the stream. */
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeByte(getGroupNo());
-		PersistentHelper.write(getQuestions(), dos);
+		ExternalizableHelper.writeExternal(getQuestions(), dos);
 	}
 }

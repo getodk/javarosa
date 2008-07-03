@@ -4,8 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 /**
  * Contains the header of a connection response.
@@ -13,7 +13,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel
  *
  */
-public class ResponseHeader implements Persistent{
+public class ResponseHeader implements Externalizable{
 
 	/** Problems occured during execution of the request. */
 	public static final byte STATUS_ERROR = 0;
@@ -32,17 +32,17 @@ public class ResponseHeader implements Persistent{
 	}
 	
 	/**
-	 * @see org.javarosa.util.db.Persistent#read(java.io.DataInputStream)
+	 * @see org.javarosa.util.db.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void read(DataInputStream dis) throws IOException {
-		if(!PersistentHelper.isEOF(dis))
+	public void readExternal(DataInputStream dis) throws IOException {
+		if(!ExternalizableHelper.isEOF(dis))
 			setStatus(dis.readByte());
 	}
 
 	/**
-	 * @see org.javarosa.util.db.Persistent#write(java.io.DataOutputStream)
+	 * @see org.javarosa.util.db.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeByte(getStatus());
 	}
 

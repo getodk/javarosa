@@ -5,8 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 
 /**
@@ -17,7 +17,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel Kayiwa
  *
  */
-public class SkipRule implements Persistent{
+public class SkipRule implements Externalizable{
 	
 	/** The numeric identifier of a rule. This is assigned in code and hence
 	 * is not known by the user.
@@ -145,26 +145,26 @@ public class SkipRule implements Persistent{
 	}
 	
 	/**
-	 * @see org.javarosa.util.db.Persistent#read(java.io.DataInputStream)
+	 * @see org.javarosa.util.db.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readByte());
 			setAction(dis.readByte());
-			setConditions(PersistentHelper.read(dis,new Condition().getClass()));
-			setActionTargets(PersistentHelper.readBytes(dis));
+			setConditions(ExternalizableHelper.readExternal(dis,new Condition().getClass()));
+			setActionTargets(ExternalizableHelper.readBytes(dis));
 			setName(dis.readUTF());
 		}
 	}
 
 	/**
-	 * @see org.javarosa.util.db.Persistent#write(java.io.DataOutputStream)
+	 * @see org.javarosa.util.db.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeByte(getId());
 		dos.writeByte(getAction());
-		PersistentHelper.write(getConditions(), dos);
-		PersistentHelper.writeBytes(getActionTargets(), dos);
+		ExternalizableHelper.writeExternal(getConditions(), dos);
+		ExternalizableHelper.writeBytes(getActionTargets(), dos);
 		dos.writeUTF(getName());
 	}
 	

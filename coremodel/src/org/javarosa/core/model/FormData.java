@@ -3,9 +3,11 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.Vector;
+import org.javarosa.core.services.storage.utilities.IDRecordable;
 
-import org.javarosa.util.db.*;
+import org.javarosa.core.model.utils.ExternalizableHelper;
 
 /**
  * Contains data collected for a form. 
@@ -16,7 +18,7 @@ import org.javarosa.util.db.*;
  * @author Daniel Kayiwa
  *
  */
-public class FormData  extends AbstractRecord{
+public class FormData implements IDRecordable {
 	
 	/** The collection of groups of data. */
 	private Vector groups;
@@ -39,6 +41,8 @@ public class FormData  extends AbstractRecord{
 	 * since it can be built on the fly from the form data.
 	 */
 	private String dataDescription = Constants.EMPTY_STRING;
+	
+	private int recordId;
 	
 	/** Constructs a form data object. */
 	public FormData(){
@@ -91,6 +95,14 @@ public class FormData  extends AbstractRecord{
 
 	public void setDefId(int defId) {
 		this.defId = defId;
+	}
+	
+	public void setRecordId(int recordId) {
+		this.recordId = recordId;
+	}
+	
+	public int getRecordId() {
+		return this.recordId;
 	}
 	
 	public String getDataDescription() {
@@ -158,16 +170,16 @@ public class FormData  extends AbstractRecord{
 		}
 	}
 
-	public void read(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
-		if(!PersistentHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+		if(!ExternalizableHelper.isEOF(dis)){
 			setDefId(dis.readInt());
-			setGroups(PersistentHelper.read(dis,new GroupData().getClass()));
+			setGroups(ExternalizableHelper.readExternal(dis,new GroupData().getClass()));
 		}
 	}
 
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeInt(getDefId());
-		PersistentHelper.write(getGroups(), dos);
+		ExternalizableHelper.writeExternal(getGroups(), dos);
 	}
 	
 	public QuestionData getQuestionById(String id){

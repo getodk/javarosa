@@ -4,8 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.util.db.Persistent;
-import org.javarosa.util.db.PersistentHelper;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 
 /**
@@ -13,7 +13,7 @@ import org.javarosa.util.db.PersistentHelper;
  * @author Daniel
  *
  */
-public class OptionData  implements Persistent {
+public class OptionData  implements Externalizable {
 	
 	private byte id = Constants.NULL_ID;
 	private OptionDef def;
@@ -50,12 +50,12 @@ public class OptionData  implements Persistent {
 		this.def = def;
 	}
 
-	public void read(DataInputStream dis) throws IOException {
-		if(!PersistentHelper.isEOF(dis))
+	public void readExternal(DataInputStream dis) throws IOException {
+		if(!ExternalizableHelper.isEOF(dis))
 			setId(dis.readByte());
 	}
 
-	public void write(DataOutputStream dos) throws IOException {
+	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeByte(getId());
 	}
 	
