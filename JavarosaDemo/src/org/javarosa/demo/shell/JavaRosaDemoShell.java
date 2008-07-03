@@ -89,7 +89,7 @@ public class JavaRosaDemoShell implements IShell {
 	public void returnFromModule(IModule module, String returnCode, Hashtable returnVals) {
 		module.halt();
 		if(returnCode != Constants.MODULE_COMPLETE) {
-			stack.push(module,module.getContext());
+			stack.push(module);
 		}
 		workflow(module, returnCode, returnVals);
 	}
