@@ -20,5 +20,6 @@
 	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/wmapi.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/fileconnection.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/enough-j2mepolish-client.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
