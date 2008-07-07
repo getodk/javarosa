@@ -57,7 +57,7 @@ public class JavaRosaDemoShell implements IShell {
 	
 	private void init() {
 
-		FormDataRMSUtility formData = new FormDataRMSUtility("FormDataRMS");
+		FormDataRMSUtility formData = new FormDataRMSUtility(FormDataRMSUtility.getUtilityName());
 		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
 
 		System.out.println("Loading Forms");
@@ -95,7 +95,7 @@ public class JavaRosaDemoShell implements IShell {
 	 */
 	public void returnFromModule(IModule module, String returnCode, Hashtable returnVals) {
 		module.halt();
-		if(returnCode != Constants.MODULE_COMPLETE) {
+		if(returnCode == Constants.ACTIVITY_SUSPEND || returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 			stack.push(module);
 		}
 		workflow(module, returnCode, returnVals);
