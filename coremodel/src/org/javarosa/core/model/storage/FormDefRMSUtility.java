@@ -18,6 +18,10 @@ public class FormDefRMSUtility extends RMSUtility {
 	public FormDefRMSUtility(String name) {
 		super(name, RMSUtility.RMS_TYPE_META_DATA);
 	}
+	
+	public static String getUtilityName() {
+		return "FormDef RMS Utility";
+	}
 
 	public void writeToRMS(FormDef form) {
 		super.writeToRMS(form, new FormDefMetaData(form));
