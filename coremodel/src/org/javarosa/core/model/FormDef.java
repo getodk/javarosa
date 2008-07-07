@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.Externalizable;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 
