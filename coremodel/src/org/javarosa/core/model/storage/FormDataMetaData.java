@@ -12,6 +12,7 @@ package org.javarosa.core.model.storage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 import org.javarosa.core.model.FormData;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
@@ -26,6 +27,9 @@ public class FormDataMetaData extends MetaDataObject
     private String formName = ""; //the name of the FormData being referenced
     private int version = 0; //the version of the FormData
     private int type = 0; //the FormData Type
+	private Date dateSaved;
+	private int formIdReference;
+
     
     public String toString(){
     	return new String (super.toString()+" name: "+this.formName+" version: "+this.version
@@ -40,6 +44,8 @@ public class FormDataMetaData extends MetaDataObject
     public FormDataMetaData(FormData form)
     {
         this.formName = form.getDef().getName() + form.getRecordId();
+        this.dateSaved = form.getDateSaved();
+        this.formIdReference = form.getRecordId();
         
     }
     
@@ -53,6 +59,14 @@ public class FormDataMetaData extends MetaDataObject
        return this.formName; 
     }
     
+    public int getFormIdReference() {
+    	return formIdReference;
+    }
+    
+    public Date getDateSaved() {
+    	return dateSaved;
+    }
+    
     /* (non-Javadoc)
      * @see org.javarosa.clforms.storage.MetaDataObject#readExternal(java.io.DataInputStream)
      */
@@ -62,6 +76,7 @@ public class FormDataMetaData extends MetaDataObject
         this.formName = in.readUTF();
         this.version = in.readInt();
         this.type = in.readInt();
+        this.dateSaved = new Date(in.readLong());
     }
 
    
@@ -74,6 +89,7 @@ public class FormDataMetaData extends MetaDataObject
         out.writeUTF(this.formName);
         out.writeInt(this.version);
         out.writeInt(type);
+        out.writeLong(this.dateSaved.getTime());
     }
 
     public void setMetaDataParameters(Object object)

@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 
 /**
@@ -18,7 +19,7 @@ import org.javarosa.core.services.storage.utilities.IDRecordable;
  * @author Daniel Kayiwa
  *
  */
-public class FormData implements IDRecordable {
+public class FormData implements IDRecordable, Externalizable {
 	
 	/** The collection of groups of data. */
 	private Vector groups;
@@ -43,6 +44,8 @@ public class FormData implements IDRecordable {
 	private String dataDescription = Constants.EMPTY_STRING;
 	
 	private int recordId;
+	
+	private Date dateSaved;
 	
 	/** Constructs a form data object. */
 	public FormData(){
@@ -111,6 +114,14 @@ public class FormData implements IDRecordable {
 
 	public void setDataDescription(String dataDescription) {
 		this.dataDescription = dataDescription;
+	}
+	
+	public Date getDateSaved() {
+		return dateSaved;
+	}
+
+	public void setDateSaved(Date date) {
+		this.dateSaved = date;
 	}
 
 	private void copyGroups(Vector pgs){
