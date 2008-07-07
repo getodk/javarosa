@@ -4,14 +4,7 @@
 	<classpathentry exported="true" kind="lib" path="/org.javarosa.core/lib/cldc_crypto.zip"/>
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.model"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.util.db"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.mvc"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarsoa.communication"/>
 	<classpathentry kind="lib" path="/org.javarsoa.communication/lib/tinylinegzip.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/midp-2.0.jar"/>
@@ -21,5 +14,8 @@
 	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/fileconnection.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/enough-j2mepolish-client.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.formmanager"/>
+	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

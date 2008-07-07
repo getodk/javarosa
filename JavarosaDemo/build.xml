@@ -45,15 +45,13 @@
 				<sources>
 					<source dir="${dir.src}"/>
 					<!--Taking this out for now...-->
-					<source dir="${dir.test}"/>
-					<source dir="${basedir}/../minixpath/src/"/>
+					<!--source dir="${dir.test}"/-->
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
-					<source dir="${basedir}/../org.javarosa.core.model/"/>
 					<source dir="${basedir}/../org.javarosa.core.util/src/"/>
-					<source dir="${basedir}/../org.javarosa.util.db/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
+					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
-					<source dir="${basedir}/../org.javarosa.xform/test/"/>
+					<!--source dir="${basedir}/../org.javarosa.xform/test/"/-->
 				</sources>
 				
 				<!-- Build variables -->
