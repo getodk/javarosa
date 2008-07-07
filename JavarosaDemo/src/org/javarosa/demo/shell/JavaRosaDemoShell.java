@@ -12,8 +12,8 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.storage.FormDataRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.util.WorkflowStack;
-import org.javarosa.demo.module.FormListModule;
 import org.javarosa.demo.module.SplashScreenModule;
+import org.javarosa.formmanager.activity.FormListModule;
 import org.javarosa.xform.util.XFormUtils;
 
 /**
@@ -43,19 +43,24 @@ public class JavaRosaDemoShell implements IShell {
 	
 	public void run() {
 		init();
+		System.out.println("done init");
 		this.splashScreen = new SplashScreenModule(this, "/splash.gif");
+		System.out.println("done splash init");
 		this.formModule = new FormListModule(this,"Forms List");
+		System.out.println("Done formlist init");
 		
-		this.splashScreen.start(context);
 		currentModule = splashScreen;
+		this.splashScreen.start(context);
+		System.out.println("Done with splashscreen start");
 	//	switchView(ViewTypes.FORM_LIST);
 	}
 	
 	private void init() {
 
 		FormDataRMSUtility formData = new FormDataRMSUtility("FormDataRMS");
-		FormDefRMSUtility formDef = new FormDefRMSUtility("FormDefRMS");
+		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
 
+		System.out.println("Loading Forms");
 		// For now let's add the dummy form.
 		if (formDef.getNumberOfRecords() == 0) {
 			formDef.writeToRMS(XFormUtils
@@ -65,10 +70,12 @@ public class JavaRosaDemoShell implements IShell {
 			formDef.writeToRMS(XFormUtils
 					.getFormFromResource("/shortform.xhtml"));
 		}
+		System.out.println("Done Loading Forms");
 		JavaRosaPlatform.instance().getStorageManager().getRMSStorageProvider()
 				.registerRMSUtility(formData);
 		JavaRosaPlatform.instance().getStorageManager().getRMSStorageProvider()
 				.registerRMSUtility(formDef);
+		System.out.println("Done registering");
 	}
 	
 	private void workflow(IModule lastModule, String cmd, Hashtable returnVals) {
@@ -78,8 +85,8 @@ public class JavaRosaDemoShell implements IShell {
 		}
 		// TODO Auto-generated method stub
 		if( lastModule == this.splashScreen ) {
-			this.formModule.start(context);
 			currentModule = formModule;
+			this.formModule.start(context);
 		}
 	}
 
@@ -96,7 +103,10 @@ public class JavaRosaDemoShell implements IShell {
 
 	public void setDisplay(IModule callingModule, Displayable display) {
 		if(callingModule == currentModule) {
-		JavaRosaPlatform.instance().getDisplay().setCurrent(display);
+			JavaRosaPlatform.instance().getDisplay().setCurrent(display);
+		}
+		else {
+			System.out.println("Module: " + callingModule + " attempted, but failed, to set the display");
 		}
 	}
 }

@@ -36,10 +36,9 @@ public class JavaRosaDemoMidlet extends MIDlet {
 		shell = new JavaRosaDemoShell();
 
 		// Do NOT edit below
-		JavaRosaPlatform.initialize();
-		JavaRosaPlatform.setDisplay(Display.getDisplay(this));
-		JavaRosaPlatform.setShell(shell);
-		shell.Run();
+		JavaRosaPlatform.instance().initialize();
+		JavaRosaPlatform.instance().setDisplay(Display.getDisplay(this));
+		shell.run();
 	}
 
 }
