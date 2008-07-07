@@ -90,7 +90,6 @@ public class XMLUtil {
 	        if (form.getLocalizer() != null)
 	        	form.getLocalizer().setToDefault();
 		} catch (Exception ex) {
-			System.out.println("XML PARSING ERROR");
 			
 			form = null;
 			ex.printStackTrace();

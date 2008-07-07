@@ -131,10 +131,15 @@ public class HttpTransportMethod implements TransportMethod {
 
 		private void process(byte data) {
 			System.out.print(data);
+			byte[] temp = new byte[1];
+			temp[0] = data;
+
+			message.setReplyloadData(temp);
 		}
 
 		private void process(byte[] data) {
 			System.out.println(new String(data));
+			message.setReplyloadData(data);
 		}
 
 	}

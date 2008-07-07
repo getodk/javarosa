@@ -236,6 +236,17 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
 
 			for (Enumeration e = result.elements(); e.hasMoreElements();) {
 				Object obj = e.nextElement();
+			
+			//KSS: we need to double check that the child nodes are actually text
+				/*
+				if (obj instanceof Element){
+					for (int i = 0; i < ((Element)obj).getChildCount(); i++) {
+						if (((Element)obj).getType(i)== Node.TEXT){
+							xpls.getOperation().setValue(((Element)obj).getText(i));
+						}
+					}
+				}
+				*/
 				if (obj instanceof Element){
 					Element node = (Element)obj;
 					if (node.getChildCount() == 0)
@@ -368,7 +379,10 @@ public class Form implements IDRecordable, Externalizable, ILocalizable {
 				value = XMLUtil.getXMLText(node, 0, true);
 				if (value.trim().length() == 0)
 					break;  //should be continue?
-				
+				//KSS: again the if text node check
+				/*for (int i = 0; i < node.getChildCount(); i++)
+					if (node.getType(i) == Node.TEXT) {
+						value = node.getText(i);*/
 				if (defaultVal){
 					Object obVal = prompt.getValueByTypeFromString(value);
 					prompt.setDefaultValue(obVal);

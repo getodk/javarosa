@@ -26,9 +26,9 @@ import org.javarosa.view.widget.chart.LineChart;
 
 /**
  * DisplayFrames are a UI component used to interact with Prompts.
- * 
+ *
  * The frame will determine the proper UI component to use for a Prompt, and set return values appropriately.
- * 
+ *
  * @author ctsims
  *
  */
@@ -36,29 +36,29 @@ import org.javarosa.view.widget.chart.LineChart;
 /* droos: there are too many switch statements in the class; this is not object-oriented */
 
 public class DisplayFrame {
-    
+
     private Prompt thePrompt;
     private Item theWidget;
     private StringItem questiontext;
     private StringItem questionResponse;
     private Item[] displayedItems;
-   
+
     private ButtonItem button;
     private LineChart chart;
-    
+
     /**
      * Creates a Display frame for the given prompt
      * @param thePrompt The prompt to be displayed
      */
     public DisplayFrame(Prompt thePrompt) {
         this.thePrompt = thePrompt;
-                
+
         //#style questiontext
         questiontext = new StringItem(null,thePrompt.getLongText());
-        
+
         loadWidget();
     }
-    
+
     /**
      * Selects the proper Control to use for the given input type of the Prompt
      */
@@ -69,12 +69,12 @@ public class DisplayFrame {
         	if (thePrompt.getReturnType() != Constants.RETURN_DATE) {
         		//#style textBox
         		TextField inputBox = new TextField("", "",200,TextField.ANY);
-        		inputBox.setInputMode(TextField.MODE_UPPERCASE);
+	       		inputBox.setInputMode(TextField.MODE_UPPERCASE);
         		inputBox.setText((String)thePrompt.getValue());
-        		
+
         		if (thePrompt.getReturnType() == Constants.RETURN_INTEGER)
         			inputBox.setConstraints(TextField.NUMERIC);
-            
+
         		theWidget = inputBox;
         	} else {
         		//#style textBox
@@ -106,7 +106,7 @@ public class DisplayFrame {
         	}
 
         	theWidget = textBox;
-        	break;        
+        	break;
         case Constants.SELECT1:
         	ChoiceGroup choiceGroup;
         	String appearance = thePrompt.getAppearanceString();
@@ -127,12 +127,12 @@ public class DisplayFrame {
         			if(selectedOption.equalsIgnoreCase((String)thePrompt.getSelectMap().get(label))){
         				choiceGroup.setSelectedIndex(i, true);
         			}
-        		} 
+        		}
         		i++;
         	}
 
         	theWidget = choiceGroup;
-        	break;        
+        	break;
         case Constants.SELECT:
         	ChoiceGroup multipleGroup = new ChoiceGroup("", ChoiceGroup.MULTIPLE);
         	itr = thePrompt.getSelectMap().keys();
@@ -155,7 +155,7 @@ public class DisplayFrame {
         			for(int index=0; index < selectedIndices.length; index++){
         				multipleGroup.setSelectedIndex(selectedIndices[index],true);
         			}
-        		}               
+        		}
         	}
 
         	theWidget = multipleGroup;
@@ -167,13 +167,13 @@ public class DisplayFrame {
         	break;
         case Constants.OUTPUT_GRAPH:
         	/* experimental */
-        	
+
         	int [] chartXPointsArray = thePrompt.getControlDataArray();
         	int [] chartYPointsArray = {2, 8, 16, 32, 48, 55, 64, 70, 80, 87};
         	String [] chartXPointsLabelArray = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
-        	chart = new LineChart("Weight Graph"); 
+        	chart = new LineChart("Weight Graph");
         	chart.setUseDefaultColor(false);
-          
+
         	chart.setFont(Font.FACE_PROPORTIONAL,Font.STYLE_PLAIN,Font.SIZE_SMALL);
         	chart.setDrawAxis(true);
         	// chart.setPreferredSize(120, 120);
@@ -182,20 +182,20 @@ public class DisplayFrame {
         	chart.setShadowColor(20,20,20);
         	chart.setColor(0, 0, 0);
         	chart.resetData();
-        	
+
         	for(int j = 0; j < chartXPointsArray.length; j++) {
         		chart.insertItem(chartXPointsLabelArray[j], chartXPointsArray[j], chartYPointsArray[j], 0,  0,   255);
         	}
-        	
+
         	chart.setMaxYScaleFactor(100);
-        	
-        	break;        
+
+        	break;
         default:
             System.out.println("Unhandled Widget type: " + thePrompt.getFormControlType());
             break;
         }
     }
-    
+
     private void reloadWidget(){
     	Enumeration itr;
     	switch(thePrompt.getFormControlType()) {
@@ -207,17 +207,17 @@ public class DisplayFrame {
     	case Constants.TEXTAREA: {
             questiontext.setText(thePrompt.getLongText());
     		break;
-    	} 
+    	}
 
     	case Constants.TEXTBOX: {
             questiontext.setText(thePrompt.getLongText());
     		break;
-    	}  
+    	}
 
     	case Constants.SELECT1: {
             questiontext.setText(thePrompt.getLongText());
 
-    		ChoiceGroup choice = (ChoiceGroup)theWidget;            	 
+    		ChoiceGroup choice = (ChoiceGroup)theWidget;
     		itr = thePrompt.getSelectMap().keys();
     		int i = 0;
     		while (itr.hasMoreElements()) {
@@ -243,12 +243,12 @@ public class DisplayFrame {
     			i++;
     		}
     		break;
-    	} 
+    	}
 
     	case Constants.TRIGGER:{
     		ButtonItem item = (ButtonItem) theWidget;
     		item.setLabel(thePrompt.getLongText());
-    	} 
+    	}
 
     	case Constants.OUTPUT_GRAPH: {
 
@@ -256,9 +256,9 @@ public class DisplayFrame {
     	}
     	default:
     		//theWidget.setLabel(thePrompt.getLongText());
-    	}     
+    	}
     }
-    
+
     /**
      * Evaluates a response based on the input type, and sets the Value of the Prompt
      */
@@ -286,7 +286,7 @@ public class DisplayFrame {
             ChoiceGroup singleWidget = (ChoiceGroup)theWidget;
             int index = singleWidget.getSelectedIndex();
             thePrompt.setSelectedIndex(index);
-            
+
             String label = singleWidget.getItem(index).getText();
             String objValue = (String) thePrompt.getSelectMap().get(label);
             thePrompt.setValue(objValue);
@@ -318,17 +318,17 @@ public class DisplayFrame {
             break;
         }
     }
-    
+
     /**
      * Draws the Large Version of the frame onto a Screen
-     * 
+     *
      * @param target the Screen to which the Frame will be Added
      */
     public void drawLargeFormOnScreen(ChatScreen target) {
     	if(theWidget == null) {
             if(chart != null) {
                 chart.setPreferredSize(target.getWidth(), target.getAvailableHeight() - 10);
-                target.append(chart); 
+                target.append(chart);
             }
         } else {
         	//#style questiontext
@@ -343,15 +343,15 @@ public class DisplayFrame {
 
     /**
      * Draws the Small (read only) Version of the frame onto a Screen
-     * 
+     *
      * @param target the Screen to which the Frame will be Added
      */
     public void drawSmallFormOnScreen(ChatScreen target) {
         //#style splitleft
         questiontext = new StringItem(null,thePrompt.getShortText());
         //#style splitright
-        questionResponse = new StringItem(null, questionValueToString(thePrompt)); 
-    	
+        questionResponse = new StringItem(null, questionValueToString(thePrompt));
+
     	//#style split
     	Container c = new Container(false);
     	//polish has a quirk where it really wants to impose the parent styling onto the first item in the
@@ -362,10 +362,10 @@ public class DisplayFrame {
         target.append(c);
         displayedItems = new Item[] {c};
     }
-    
+
     /**
      * Removes any of the Frame's Items from a given Screen
-     * 
+     *
      * @param target The screen from which the items will be removed
      */
     public void removeFromScreen(ChatScreen target) {
@@ -377,10 +377,10 @@ public class DisplayFrame {
             	target.removeItem(displayedItems[i]);
             }
         }
-    }    
-    
+    }
+
     private String questionValueToString(Prompt thePrompt) {
-        if(thePrompt.getFormControlType() == Constants.TEXTAREA || 
+        if(thePrompt.getFormControlType() == Constants.TEXTAREA ||
                 thePrompt.getFormControlType() == Constants.TEXTBOX ||
                 thePrompt.getFormControlType() == Constants.INPUT) {
         	if (thePrompt.getReturnType() == Constants.RETURN_DATE) { //J2MEUtil.getStringValue probably handles everything-- not investigating now
@@ -407,7 +407,7 @@ public class DisplayFrame {
             return thePrompt.getValue().toString();
         }
     }
-    
+
     /**
      * Identifies whether a given Item is auto-playable, IE "Select" need not be pressed to set the value for that question.
      * @param item The item that will be identified for autoplayability
@@ -423,7 +423,7 @@ public class DisplayFrame {
             return true;
         }
     }
-    
+
     public void refreshDisplayFrame(ChatScreen target) {
     	if(questionResponse == null){
     		reloadWidget();

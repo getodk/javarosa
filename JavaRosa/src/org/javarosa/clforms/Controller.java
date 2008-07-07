@@ -201,6 +201,18 @@ public class Controller
     {
         switch (event.getType())
         {
+			case ResponseEvent.SEND_AND_RELOAD:
+        		checkRMSstatus();
+                form.populateModel();
+                saveFormModel();
+                clearModelData();
+                form.loadPromptsDefaultValues();
+                promptIndex = 0;
+                formview.displayPrompt(form.getPrompt(promptIndex));
+                System.out.println("hello " +modelRMS.getNextRecordID());
+                shell.SendLastSavedModel();
+        		break;
+
             case ResponseEvent.NEXT:
             	//check to make sure that we can actually move forward
             	Prompt prompt = form.getPrompt(promptIndex);
