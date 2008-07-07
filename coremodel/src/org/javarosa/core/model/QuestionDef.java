@@ -233,7 +233,10 @@ public class QuestionDef implements Externalizable{
 	
 	
 	public String serializedDefaultValue() {
-		return this.defaultValue.toString();
+		if(this.defaultValue != null) {
+			return this.defaultValue.toString();
+		}
+		else return null;
 	}
 
 	/**
@@ -243,23 +246,23 @@ public class QuestionDef implements Externalizable{
 		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readUTF());
 			
-			setLongText(dis.readUTF());
-			setShortText(dis.readUTF());
-			setLocaleId(dis.readUTF());
-			setHelpText(dis.readUTF());
+			setLongText(ExternalizableHelper.readUTF(dis));
+			setShortText(ExternalizableHelper.readUTF(dis));
+			setLocaleId(ExternalizableHelper.readUTF(dis));
+			setHelpText(ExternalizableHelper.readUTF(dis));
 			setMandatory(dis.readBoolean());
 			setType(dis.readByte());
 			setControlType(dis.readByte());
 			setVisible(dis.readBoolean());
 			setEnabled(dis.readBoolean());
 			setLocked(dis.readBoolean());
-			setVariableName(dis.readUTF());
-			setDefaultValue(ExternalizableHelper.readUTF(dis));
+			setVariableName(ExternalizableHelper.readUTF(dis));
 			//TODO Note that this sucks, because bind has to know its type. 
 			//We need to deal with that. Should Binding be a class that
 			//has a header for its type? Should we be writing that binding
 			//here manually? We could also make bind serialize to a string.
 			bind.readExternal(dis);
+			setDefaultValue(ExternalizableHelper.readUTF(dis));
 			
 			setOptions(ExternalizableHelper.readExternal(dis,new OptionDef().getClass()));
 		}
@@ -271,17 +274,17 @@ public class QuestionDef implements Externalizable{
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeUTF(getId());
 
-		dos.writeUTF(getLongText());
-		dos.writeUTF(getShortText());
-		dos.writeUTF(getLocaleId());
-		dos.writeUTF(getHelpText());
+		ExternalizableHelper.writeUTF(dos, getLongText());
+		ExternalizableHelper.writeUTF(dos, getShortText());
+		ExternalizableHelper.writeUTF(dos, getLocaleId());
+		ExternalizableHelper.writeUTF(dos, getHelpText());
 		dos.writeBoolean(isMandatory());
 		dos.writeByte(getType());
 		dos.writeByte(getControlType());
 		dos.writeBoolean(isVisible());
 		dos.writeBoolean(isEnabled());
 		dos.writeBoolean(isLocked());
-		dos.writeUTF(getVariableName());
+		ExternalizableHelper.writeUTF(dos, getVariableName());
 		bind.writeExternal(dos);
 		
 		ExternalizableHelper.writeUTF(dos, serializedDefaultValue());

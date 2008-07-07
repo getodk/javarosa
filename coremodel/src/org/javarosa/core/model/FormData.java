@@ -5,9 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
-import org.javarosa.core.services.storage.utilities.IDRecordable;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.IDRecordable;
 
 /**
  * Contains data collected for a form. 
