@@ -12,6 +12,8 @@
 package org.javarosa.clforms;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -141,7 +143,10 @@ public class ModelList extends List implements CommandListener
         } else if (c == CMD_SEND)
         {
             if (this.getSelectedIndex() != -1) {
-                ModelMetaData data = (ModelMetaData) modelIDs.elementAt(this.getSelectedIndex());
+        		Model model = getModel(this.getSelectedIndex());
+				sendModel(model);
+               /* Dimagi way
+				 ModelMetaData data = (ModelMetaData) modelIDs.elementAt(this.getSelectedIndex());
                 Model model = new Model();
                 try {
                     this.modelRMSUtility.retrieveFromRMS(data.getRecordId(), model);
@@ -153,6 +158,7 @@ public class ModelList extends List implements CommandListener
                 }
                 this.transportLayer.setData(model);
                 this.transportLayer.showURLform();
+*/
             }
         } else if (c == CMD_EMPTY)
         {
@@ -180,6 +186,26 @@ public class ModelList extends List implements CommandListener
         }
     }
 
+	public void sendModel(Model model) {
+		this.transportLayer.setData(model);
+		this.transportLayer.showURLform();
+	}
+
+	public Model getModel(int index) {
+		ModelMetaData data = (ModelMetaData) modelIDs.elementAt(index);
+		Model model = new Model();
+		try {
+			this.modelRMSUtility.retrieveFromRMS(data.getRecordId(), model);
+			model.setRecordId(data.getRecordId());
+		} catch (IOException e) {
+			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model",null,
+					AlertType.ERROR);
+			Display.getDisplay(this.mainShell).setCurrent(a,this);
+			e.printStackTrace();
+		}
+		return model;
+	}
+
     public void populateListWithModels()
     {
 
@@ -199,8 +225,18 @@ public class ModelList extends List implements CommandListener
 				mdata.setRecordId(i);
 
 				Image stateImg = getStateImage(getModelDeliveryStatus(i));
+				String serverKey = getModelReplyData(i);
 
-				this.append(mdata.getRecordId()+"-"+mdata.getName()+"_"+mdata.getDateSaved()+"_"+mdata.getRecordId(), stateImg);
+				///convert the date to special format with calendar
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(mdata.getDateSaved());
+				int year = calendar.get(Calendar.YEAR);
+				int month = calendar.get(Calendar.MONTH)+1;
+				int date = calendar.get(Calendar.DATE);
+
+				String dateSTR = date+"-"+month+"-"+year;
+
+				this.append(mdata.getName()+" - "+dateSTR+" ("+serverKey+")", stateImg);
 				modelIDs.insertElementAt(mdata,pos);
 				pos++;
 			} catch (InvalidRecordIDException e) {
@@ -253,4 +289,20 @@ public class ModelList extends List implements CommandListener
     	}
 		return 0;
 	}
+
+	private String getModelReplyData(int modelId) {
+
+		Enumeration qMessages = transportLayer.getTransportMessages();
+		TransportMessage message;
+		while(qMessages.hasMoreElements())
+    	{
+			message = (TransportMessage) qMessages.nextElement();
+			if(message.getModelId()==modelId)
+				return new String (message.getReplyloadData());
+
+    	}
+		return "";
+	}
+
+
 }

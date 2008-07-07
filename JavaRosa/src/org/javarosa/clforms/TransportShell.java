@@ -31,6 +31,7 @@ import org.javarosa.clforms.view.FormViewScreen;
 import org.javarosa.clforms.view.PromptScreen;
 import org.javarosa.clforms.xml.XMLUtil;
 import org.javarosa.polishforms.ChatScreen;
+import org.javarosa.polishforms.LoginForm;
 import org.javarosa.properties.JavaRosaPropertyRules;
 import org.javarosa.properties.PropertyManager;
 import org.javarosa.properties.view.PropertiesScreen;
@@ -43,14 +44,14 @@ import de.enough.polish.ui.splash.ApplicationInitializer;
 import de.enough.polish.ui.splash.InitializerSplashScreen;
 import de.enough.polish.util.TextUtil;
 
-// @JJ May 28, 2008: I added Application Initializer to allow for a splash screen actually worked,
-// however this now makes the project dependant on polish.  and i didn't use defs for the include
-// because then we would get compiler errors in t
+//@JJ May 28, 2008: I added Application Initializer to allow for a splash screen actually worked,
+//however this now makes the project dependant on polish.  and i didn't use defs for the include
+//because then we would get compiler errors in t
 public class TransportShell extends MIDlet implements ApplicationInitializer,
 		CommandListener {
 
 	public final static String WORKING_DIRECTORY = "C:/predefgallery/predefphotos/";
-
+	private LoginForm login;
 	private final Command EXIT_CMD = new Command("Close", Command.EXIT, 2);
 	private final Command OK_CMD = new Command("Ok", Command.OK, 1);
 	private final Command BACK_CMD = new Command("Back", Command.BACK, 1);
@@ -65,6 +66,7 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 	private FileBrowser fileBrowser;
 	// #endif
 	private boolean writeDummy = false;
+	public String USERTYPE = "";
 
 	private ChatScreenForm customChatScreen;
 	// #if polish.usePolishGui
@@ -107,16 +109,7 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 			PropertyManager.instance().setRules(new JavaRosaPropertyRules());
 			loadProperties();
 
-			String[] optionsMenu = { "Select XForms", "Review Completed Forms",
-					"Get New Forms", "Submit Completed Forms" };
-
 			// dead?
-			this.selectFunction = new List("What do you want to do?",
-					List.IMPLICIT, optionsMenu, null);
-			this.selectFunction.addCommand(EXIT_CMD);
-			this.selectFunction.addCommand(OK_CMD);
-			selectFunction.setCommandListener(this);
-			this.createAvailableXformsList();
 			// through here?
 
 			// log.write("PRE-configCntllr",MIDPLogger.DEBUG);
@@ -141,23 +134,6 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 		 */
 	}
 
-	private void navigateSelectFunctionList() {
-		switch (this.selectFunction.getSelectedIndex()) {
-		case 0:
-			displayFormList();
-			break;
-		case 1:
-			displayModelList();
-			break;
-		case 2:
-			displayAvailableXFormMethods();
-			break;
-		case 3:
-			displayTransportLayer();
-			break;
-		}
-	}
-
 	public void displayTransportLayer() {
 		transportLayer = new TransportLayer(this);
 	}
@@ -177,45 +153,12 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 		this.modelList = new ModelList(this);
 	}
 
-	public void displayAvailableXFormMethods() {
-		Display.getDisplay(this).setCurrent(availableXForms);
-	}
-
 	public void editProperties() {
 		// #if polish.usePolishGui
 		propertyScreen = new PropertiesScreen();
 		propertyScreen.setCommandListener(this);
 		Display.getDisplay(this).setCurrent(propertyScreen);
 		// #endif
-	}
-
-	// dead?
-	private void createAvailableXformsList() {
-		// "In file system",
-		String[] getNewFormsMenu = { "From File system",
-				"BlueTooth:Receive an XForm", "From URL" };
-		this.availableXForms = new List(
-				"Where do you want to look for Xforms?", List.IMPLICIT,
-				getNewFormsMenu, null);
-		this.availableXForms.setCommandListener(this);
-		this.availableXForms.addCommand(BACK_CMD);
-	}
-
-	private void navigateAvailbleXformsList() {
-		switch (this.availableXForms.getSelectedIndex()) {
-		case 0:
-			initServiceFileBrowser();
-			// #if app.usefileconnections
-			Display.getDisplay(this).setCurrent(this.fileBrowser);
-			// #endif
-			break;
-		case 1:
-			this.xformClient = new VisualXFormClient(this);
-			break;
-		case 2:
-			callEvGetMe();
-			break;
-		}
 	}
 
 	public void getNewFormsByTransportPropertySetting() {
@@ -282,6 +225,9 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 						this.display, image, backgroundColor, readyMessage,
 						messageColor, this);
 				this.display.setCurrent(splashScreen);
+				login = new LoginForm("log in");
+				login.setCommandListener(this);
+				Display.getDisplay(this).setCurrent(login);
 
 			} catch (IOException e) {
 				throw new MIDletStateChangeException(
@@ -338,15 +284,42 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 			destroyApp(true);
 			notifyDestroyed();
 			return;
-		} else if (c == BACK_CMD) {
-			if (d == availableXForms) {
-				createView();
-			}
-		} else if (c == List.SELECT_COMMAND) {
-			if (d == selectFunction) {
-				navigateSelectFunctionList();
-			} else if (d == availableXForms) {
-				navigateAvailbleXformsList();
+		} else if (c == login.CMD_CANCEL_LOGIN) {
+			this.destroyApp(true);
+		} else if (c == login.CMD_LOGIN_LOGIN) {
+			System.out.println("login pressed");
+			if (login.validateUser()) {
+				// this is the original code from the constructor
+				// log.write("TRYING CREATEView",MIDPLogger.DEBUG);
+				initRMS();
+				System.out.println("models answer: "
+						+ modelRMS.getNextRecordID());
+				System.out.println("models answer: "
+						+ modelRMS.getNextRecordID());
+				formList = new FormList(this);
+
+				javax.microedition.lcdui.Alert success = login
+						.successfulLogin();
+				Display.getDisplay(this).setCurrent(success, formList);
+
+				try {
+
+					configureController();
+					loadProperties();
+					PropertyManager.instance().setRules(
+							new JavaRosaPropertyRules());
+				} catch (Exception e) {
+					// log.write(e.getMessage(),MIDPLogger.DEBUG);
+					e.printStackTrace();
+					System.out.println("end of try");
+				}
+
+			} else {
+				// /display an error that login failed and return to login
+				// screen
+				javax.microedition.lcdui.Alert error = login.tryAgain();
+				Display.getDisplay(this).setCurrent(error, login);
+
 			}
 		}
 		// #if app.usefileconnections
@@ -428,8 +401,9 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 			PropertyManager.instance().setProperty(propName, propVal);
 			System.out.println("No default value for [" + propName
 					+ "]; setting to [" + defaultValue + "]"); // debug
+			return defaultValue;
 		}
-		return defaultValue;
+		return (String) propVal.elementAt(0);
 	}
 
 	private void loadAndSetViewType() {
@@ -439,6 +413,7 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 		// #else
 		defaultViewType = Constants.VIEW_CLFORMS;
 		// #endif
+		System.out.println("DEFAULT VAL: " + defaultViewType);
 		setViewType(initProperty("ViewStyle", defaultViewType));
 	}
 
@@ -451,11 +426,13 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 		else if (Constants.VIEW_CHATTERBOX.equals(viewType)) {
 			formController.setPrompter(chatScreen);
 			formController.setFormview(chatScreen);
+			System.out.println("CL VIEW_CHATTERBOX set");
 		}
 		// #endif
 		else if (Constants.VIEW_CLFORMS.equals(viewType)) {
 			formController.setPrompter(promptScreen);
 			formController.setFormview(formViewScreen);
+			System.out.println("CL VIEW_CLFORMS set");
 		} else {
 			System.out.println("No valid view found!");
 		}
@@ -573,6 +550,17 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 		return display;
 	}
 
+	public void SendLastSavedModel() {
+		this.modelList = new ModelList(this);
+		System.out.println("t shell");
+		int j = modelRMS.getNextRecordID() - 1;
+		System.out.println("next rec id from t shell " + j);
+
+		modelList.sendModel(modelList.getModel(j - 1));
+		System.out.println("asdfasd ");
+
+	}
+
 	public void setDisplay(Display display) {
 		this.display = display;
 	}
@@ -590,4 +578,13 @@ public class TransportShell extends MIDlet implements ApplicationInitializer,
 			this.transportLayer = new TransportLayer(this);
 		return this.transportLayer;
 	}
+
+	public String getUSERTYPE() {
+		return login.getLoggedInUserType();
+	}
+
+	public void setUSERTYPE(String usertype) {
+		USERTYPE = usertype;
+	}
+
 }

@@ -7,6 +7,7 @@ import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
+import org.javarosa.clforms.storage.Externalizable;
 import org.javarosa.clforms.storage.RMSUtility;
 import org.javarosa.clforms.util.SimpleOrderedHashtable;
 
@@ -29,7 +30,6 @@ public class PropertyRMSUtility extends RMSUtility {
     public PropertyRMSUtility(String name)
     {
         super(name, RMSUtility.RMS_TYPE_META_DATA);
-        System.out.println("PropertyRMSUtility()");
     }
     
     /**
@@ -71,7 +71,6 @@ public class PropertyRMSUtility extends RMSUtility {
             while(recordEnum.hasNextElement())
             {
                 int i = recordEnum.nextRecordId();
-                System.out.println("trying record:"+i);
                 nameToId.put(this.getName(i),new Integer(i));                
             }
         } catch (RecordStoreNotOpenException e) {

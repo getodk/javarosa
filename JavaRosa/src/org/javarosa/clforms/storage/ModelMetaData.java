@@ -33,11 +33,9 @@ public class ModelMetaData extends MetaDataObject {
 
 	public void readExternal(DataInputStream in) throws IOException
     {
-		System.out.println("trying to readname Model");
         this.name = in.readUTF();
         this.xformReference = in.readInt();
         this.dateSaved = new Date(in.readLong());
-        System.out.println("trying to readname Model-"+this.toString());
     }
 
     public void writeExternal(DataOutputStream out) throws IOException

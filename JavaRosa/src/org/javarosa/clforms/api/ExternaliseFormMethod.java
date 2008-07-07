@@ -136,6 +136,7 @@ public class ExternaliseFormMethod {
 		case Constants.SELECT:
 			result += "select ";
 			break;
+		//KSS: how much dow we support triggers? - can we ref the openrosa spec
         case Constants.TRIGGER:
             result += "trigger ";
             break;                          

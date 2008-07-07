@@ -57,7 +57,6 @@ public class PropertyMetaData extends MetaDataObject {
      */
     public void readExternal(DataInputStream in) throws IOException
     {
-        System.out.println("trying to readname Model");
         this.name = in.readUTF();
     }
 

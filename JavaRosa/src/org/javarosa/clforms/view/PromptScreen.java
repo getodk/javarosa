@@ -38,6 +38,7 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 	private static Displayable screen = null;
 
 	private static Command previousCommand;
+	private static Command nextCommand;
 
 	/*private static Command saveAndReloadCommand;
 
@@ -247,15 +248,15 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 
 	public void commandAction(Command command, Displayable s) {
 		try {
-			/*if (command == nextCommand) {
+			if (command == nextCommand) {
 				save();
 				controller.processEvent(new ResponseEvent(ResponseEvent.NEXT, -1));
 				if (!checkRequired()){
 				}
 				else
 					requiredAlert();							
-			}*/
-			if (command == previousCommand) {
+			}
+			else if (command == previousCommand) {
 				save();
 				controller.processEvent(new ResponseEvent(ResponseEvent.PREVIOUS, -1));
 			}
@@ -288,8 +289,8 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 
 	protected void createView() throws Exception {
 		previousCommand = new Command("back", Command.SCREEN, 2); //$NON-NLS-1$
-		/*nextCommand = new Command("next->", Command.BACK, 1); //$NON-NLS-1$
-		cancelCommand = new Command("Cancel to list", Command.ITEM, 4);
+		nextCommand = new Command("next", Command.SCREEN, 1); //$NON-NLS-1$
+		/*cancelCommand = new Command("Cancel to list", Command.ITEM, 4);
 		saveAndReloadCommand = new Command("SAVE&Reload", Command.ITEM, 5);*/
 		goToListCommand = new Command("Form View", Command.SCREEN, 1);
 
@@ -317,9 +318,10 @@ public class PromptScreen extends MVCComponent implements IPrompter, ItemCommand
 
 		setHint();
 
-		/*screen.addCommand(nextCommand);
+		/*
 		screen.addCommand(saveAndReloadCommand);
 		screen.addCommand(cancelCommand);*/
+		screen.addCommand(nextCommand);
 		screen.addCommand(previousCommand);
 		screen.addCommand(goToListCommand);
 	}

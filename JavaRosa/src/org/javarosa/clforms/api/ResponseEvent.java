@@ -8,6 +8,7 @@ public class ResponseEvent {
 	public static final int SAVE = 4;
 	public static final int SAVE_AND_RELOAD = 5;
 	public static final int EXIT = 6; // TODO is this the same as Cancel?
+	public static final int SEND_AND_RELOAD = 9; 
 	
 	// more possibles
 	

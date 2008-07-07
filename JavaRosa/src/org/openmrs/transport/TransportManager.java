@@ -151,6 +151,7 @@ public class TransportManager implements Observer {
 	public void update(Observable observable, Object arg) {
 		try {
 			storage.updateMessage((TransportMessage) observable);
+			
 		} catch (IOException e) {
 			System.err.println(e);
 		}

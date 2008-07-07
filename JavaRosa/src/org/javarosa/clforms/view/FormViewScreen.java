@@ -32,6 +32,8 @@ public class FormViewScreen extends MVCComponent implements FormView{
 
 	private static Command saveAndReloadCommand;
 
+	private static Command sendNow;
+
 	private static Command exitCommand;
 
 	private static TextField commentField;
@@ -41,7 +43,6 @@ public class FormViewScreen extends MVCComponent implements FormView{
 	private static ChoiceGroup selectChoice;
 
 	public FormViewScreen() {
-		System.out.println("FormView screen init");
 	}
 
 	public FormViewScreen(Prompt p) {
@@ -143,6 +144,12 @@ public class FormViewScreen extends MVCComponent implements FormView{
 			else if (command == exitCommand){
 				controller.processEvent(new ResponseEvent(ResponseEvent.EXIT, -1));
 			}
+			else if (command == sendNow){
+				System.out.println("right here");
+				controller.processEvent(new ResponseEvent(ResponseEvent.SEND_AND_RELOAD,9));
+				System.out.println("right here again");
+
+			}
 			
 		} catch (Exception e) {
 			Alert a = new Alert("error.screen" + " 2"); //$NON-NLS-1$
@@ -161,14 +168,13 @@ public class FormViewScreen extends MVCComponent implements FormView{
 	protected void createView() {
 		saveAndReloadCommand = new Command("SAVE&Reload", Command.ITEM, 3);
 		exitCommand = new Command("Exit", Command.EXIT, 3);
+		sendNow = new Command("Send Form Now",Command.ITEM,1);
 		
 		form = controller.getForm();
 		screen = new List("FORM: "+form.getName(),List.IMPLICIT);
 		form.calculateRelevantAll();
 		
 		for(int i = 0; i<form.getPrompts().size(); i++){
-			System.out.println("Appending: "+((Prompt)form.getPrompt(i)).getLongText());
-			
 			if(((Prompt)form.getPrompt(i)).isRelevant()){
 				int type = ((Prompt)form.getPrompts().elementAt(i)).getReturnType();
 				String temp= J2MEUtil.getShortStringValue(((Prompt)form.getPrompts().elementAt(i)).getValue(),type);
@@ -183,6 +189,7 @@ public class FormViewScreen extends MVCComponent implements FormView{
 		
 		screen.addCommand(saveAndReloadCommand);
 		screen.addCommand(exitCommand);
+		screen.addCommand(sendNow);
 
 	}
 

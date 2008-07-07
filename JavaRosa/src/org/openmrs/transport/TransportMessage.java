@@ -49,7 +49,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * The actual data to be sent
 	 */
 	private byte[] payloadData;
-
+	private byte[] replyloadData;
 	/**
 	 * ID or URL of destination
 	 */
@@ -89,9 +89,25 @@ public class TransportMessage extends Observable implements Externalizable {
 			String sender, int modelId) {
 		super();
 		this.payloadData = payloadData;
+		this.replyloadData = new byte [1];
 		this.destination = destination;
 		this.sender = sender;
 		this.modelId = modelId;
+	}
+
+	/**
+	 * @param payloadData
+	 * @param destination
+	 * @param sender
+	 */
+	public TransportMessage(byte[] payloadData, String destination,
+			String sender, int modelId, byte [] replyloadDataIn) {
+		super();
+		this.payloadData = payloadData;
+		this.destination = destination;
+		this.sender = sender;
+		this.modelId = modelId;
+		this.replyloadData = replyloadDataIn;
 	}
 
 	/**
@@ -176,6 +192,9 @@ public class TransportMessage extends Observable implements Externalizable {
 		this.recordId = in.readInt();
 		this.status = in.readInt();
 		this.modelId = in.readInt();
+		length = in.readInt();
+		this.replyloadData = new byte[length];
+		in.read(this.replyloadData);
 	}
 
 	/**
@@ -191,6 +210,8 @@ public class TransportMessage extends Observable implements Externalizable {
 		out.writeInt(this.recordId);
 		out.writeInt(this.status);
 		out.writeInt(this.modelId);
+		out.writeInt(this.replyloadData.length);
+		out.write(this.replyloadData);
 	}
 
 	/**
@@ -314,5 +335,13 @@ public class TransportMessage extends Observable implements Externalizable {
 
 	public void setModelId(int modelId) {
 		this.modelId = modelId;
+	}
+
+	public byte[] getReplyloadData() {
+		return replyloadData;
+	}
+
+	public void setReplyloadData(byte[] replyloadData) {
+		this.replyloadData = replyloadData;
 	}
 }

@@ -54,7 +54,6 @@ public class XFormRMSUtility extends RMSUtility {
 					null, false);
 			while (recordEnum.hasNextElement()) {
 				int i = recordEnum.nextRecordId();
-				System.out.println("trying record:" + i);
 				listOfNames.addElement(this.getName(i));
 
 			}
@@ -75,7 +74,6 @@ public class XFormRMSUtility extends RMSUtility {
 					null, false);
 			while (recordEnum.hasNextElement()) {
 				int i = recordEnum.nextRecordId();
-				System.out.println("trying record:" + i);
 				listOfNames.addElement(this.getName(i));
 				formIDs.addElement(new Integer(i));
 			}
@@ -102,10 +100,10 @@ public class XFormRMSUtility extends RMSUtility {
 		*/
 
 		/* NEW RESOURCE-BASED SCHEME */
-		writeFormFromResource("/hmis-a_draft.xhtml");
-		writeFormFromResource("/hmis-b_draft.xhtml");
-		writeFormFromResource("/shortform.xhtml");
 		
+		String form = "/MobieSurvey.xhtml";
+		System.out.println(form);
+		writeFormFromResource(form);
 		
 		/* LOAD CDC-TZ FORMS
         this.open();

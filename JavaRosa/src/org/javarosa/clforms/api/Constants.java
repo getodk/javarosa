@@ -39,7 +39,7 @@ public class Constants {
     public static final String VIEW_CLFORMS = "v_clforms";
 
     // Get Forms Methods
-    public static final String GETFORMS_AUTOHTTP = "From URL";
+    public static final String GETFORMS_AUTOHTTP = "Autoupdate From GetURL";
     public static final String GETFORMS_EVGETME = "Using evGetME";
     public static final String GETFORMS_BLUETOOTH= "From BlueTooth peer";
     public static final String GETFORMS_FILE = "From file system";
@@ -48,13 +48,18 @@ public class Constants {
     public static final String POST_URL_LIST = "post_url_list";
     
     // server URLs
-    //public static final String POST_URL = "http://update.cell-life.org/save_dump.php";
-    public static final String POST_URL = "http://demo.gatherdata.org:8180/gather/xforms.html";
+   public static final String POST_URL = "http://update.cell-life.org/save_dump.php";
+ //   public static final String POST_URL = "http://demo.gatherdata.org:8180/gather/xforms.html";
     //public static final String GET_URL ="http://update.cell-life.org/forms/AllDataTypes.xhtml";
     public static final String GET_URL ="http://127.0.0.1/form.xhtml";
 
     // does the file connection API (JSR 75) exist?
 	public static boolean FILE_CONNECTION = false;
 	public static int MODE;
+
+	//USERTYPEs
+	public static final String ADMINUSER = "admin";
+	public static final String USERTYPE1 = "TLP";
+	public static final String STANDARD = "standard";
 
 }
