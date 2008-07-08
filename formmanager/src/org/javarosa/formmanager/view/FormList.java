@@ -105,7 +105,7 @@ public class FormList extends List implements CommandListener {
 		}
 */
 		if (c == CMD_VIEWMODELS) {
-			this.mainShell.displayModelList();
+			
 		}
 /*
 		if (c == CMD_SHAREFORMS) {
