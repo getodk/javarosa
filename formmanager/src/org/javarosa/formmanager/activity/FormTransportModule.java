@@ -7,7 +7,6 @@ import java.util.Vector;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.List;
@@ -24,7 +23,6 @@ import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
-import org.javarosa.formmanager.view.ModelList;
 
 /**
  *
@@ -58,7 +56,6 @@ public class FormTransportModule implements
 	 */
 	private TextBox messageDetailTextBox;
 
-	private static final Command CMD_EXIT = new Command("Exit", Command.EXIT, 1);
 	private static final Command CMD_BACK = new Command("Back", Command.BACK, 1);
 	private static final Command CMD_OK = new Command("OK", Command.OK, 1);
 	private static final Command CMD_DEBUG = new Command("Debug log",
@@ -87,50 +84,47 @@ public class FormTransportModule implements
 	
 	private Context context;
 	
+	Vector transportMethods;
+	
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see javax.microedition.midlet.MIDlet#pauseApp()
-	 */
-	protected void pauseApp() {
-		System.out.println("pauseApp()");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see javax.microedition.midlet.MIDlet#startApp()
 	 */
 	public FormTransportModule(IShell parentShell) {
 		this.shell = parentShell;
 	}
 	
 	public void contextChanged(Context globalContext) {
-		// TODO Auto-generated method stub
-		
+		context.mergeInContext(globalContext);
+		//TODO: I'm _sure_ that we care about some change here
 	}
 
 	public void destroy() {
-		// TODO Auto-generated method stub
-		
+		// Nothing for this Module
 	}
 
 	public void halt() {
-		// TODO Auto-generated method stub
-		
+		// Nothing for this Module
 	}
 
 	public void resume(Context globalContext) {
-		// TODO Auto-generated method stub
-		
+		createView();		
 	}
 
 	public void start(Context context) {
+		this.context = context;
+		//TODO: Parse context arguments, we possibly do not want to create a view
+		createView();
+	}
+
+	public void createView() {
+		transportMethods = new Vector();
 		Enumeration availableMethods = JavaRosaPlatform.instance().getTransportManager().getTransportMethods();
 		Vector menuItems = new Vector();
 		while(availableMethods.hasMoreElements()) {
 			TransportMethod method = (TransportMethod)availableMethods.nextElement();
 			menuItems.addElement("Transport with " + method.getName());
+			transportMethods.addElement(new Integer(method.getId()));
 		}
 		String[] elements = new String[]{"Select Models", "Message Queue"};
 		menuItems.copyInto(elements);
@@ -154,10 +148,6 @@ public class FormTransportModule implements
 		messageDetailTextBox.addCommand(CMD_BACK);
 		messageDetailTextBox.addCommand(CMD_SEND);
 		messageDetailTextBox.setCommandListener(this);
-		//createView();
-	}
-
-	public void createView() {
 		shell.setDisplay(this, mainMenu);
 		System.out.println(this.data);
 	}
@@ -197,61 +187,47 @@ public class FormTransportModule implements
 			} else if (c == CMD_OK) {
 				int selected = ((List) mainMenu).getSelectedIndex();
 				System.out.println("Selected: " + selected);
+				
 				switch (selected) {
 				case 0:
-					ModelList modelList = new ModelList(this.shell,this);
+					//TODO: Go to model list
 					break;
 				case 1:
 					showURLform();
-					//display.setCurrent(urlForm);
-					break;
-			/*	case 2:
-					try {
-						sendData(TransportMethod.HTTP_GCF);
-					} catch (IOException e) {
-						Logger.log(e);
-					}
-					break;*/
-				case 2:
-					//getDestinationString();
-					urlForm = new Form ("FILENAME");
-					destinationUrl = shell.getAppProperty("destination-file");
-					textField = new TextField("Please enter destination path + filename",
-							destinationUrl,140,TextField.ANY);
-					/*for (Enumeration en = FileSystemRegistry.listRoots(); en
-					.hasMoreElements();) {
-						String root = (String) en.nextElement();
-						urlForm.append(root);
-						Logger.log("Root: " + root);
-					}*/
-					urlForm.append(textField);
-					urlForm.addCommand(CMD_OK);
-					urlForm.addCommand(CMD_BACK);
-					urlForm.setCommandListener(this);
-					this.currentMethod = TransportMethod.FILE;
-					Display.getDisplay(shell).setCurrent(urlForm);
-					//display.setCurrent(urlForm);
-					break;
-				/*case 4:
-					try {
-						sendData(TransportMethod.FILE);
-					} catch (IOException e) {
-						Logger.log(e);
-					}
-					break;*/
-				case 3:
 					showMessageList();
-					//display.setCurrent(messageList);
+					break;
+				default:
+					//Offset from always-present menu choices
+					int transportType = selected - 2;
+				    
+				    Integer id = (Integer)transportMethods.elementAt(transportType);
+				    TransportMethod method = JavaRosaPlatform.instance().getTransportManager().getTransportMethod(id.intValue());
+				    if (method.getId() == TransportMethod.FILE) {
+						urlForm = new Form("FILENAME");
+						// destinationUrl = shell.getAppProperty("destination-file");
+						// TODO: put this back in when the property manager is
+						// complete again
+						textField = new TextField(
+								"Please enter destination path + filename",
+								destinationUrl, 140, TextField.ANY);
+						
+						urlForm.append(textField);
+						urlForm.addCommand(CMD_OK);
+						urlForm.addCommand(CMD_BACK);
+						urlForm.setCommandListener(this);
+						this.currentMethod = TransportMethod.FILE;
+						shell.setDisplay(this, urlForm);
+					}
+					break;
+				case 3:
 					break;
 
 
 				}
-			} else if (c == CMD_DEBUG) {
-				Logger.getInstance().show(Display.getDisplay(shell));
 			}
 		} else if (d == messageList) {
 			if (c == CMD_BACK) {
-				this.shell.displayModelList();
+				shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
 			} else if (c == CMD_DETAILS) {
 				int selected = messageList.getSelectedIndex();
 				Enumeration messages = transportManager.getMessages();
@@ -259,8 +235,7 @@ public class FormTransportModule implements
 						selected, messages);
 				if (message != null) {
 					messageDetailTextBox.setString(message.toString());
-					Display.getDisplay(shell).setCurrent(messageDetailTextBox);
-					//display.setCurrent(messageDetailTextBox);
+					shell.setDisplay(this, messageDetailTextBox);
 				}
 			}
 			else if (c == CMD_DELETEMSG) {
@@ -284,8 +259,7 @@ public class FormTransportModule implements
 		}
 		else if (d == urlForm) {
 			if (c == CMD_BACK) {
-				this.shell.displayModelList();
-//				Display.getDisplay(shell).setCurrent(mainMenu);
+				shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
 			} else if (c == CMD_OK) {
 				processURLform();
 				try {
@@ -294,18 +268,17 @@ public class FormTransportModule implements
 				else if (currentMethod == TransportMethod.FILE)
 					sendData(TransportMethod.FILE);
 				} catch (IOException e) {
-					Logger.log(e);
+					e.printStackTrace();
 				}
-				this.shell.displayModelList();
+				shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
 			}
-
 		}
 	}
 
 	public void showMessageList() {
 		messageList.deleteAll();
 		populateMessageList();
-		Display.getDisplay(shell).setCurrent(messageList);
+		shell.setDisplay(this, messageList);
 	}
 	
 	public void showURLform() {
@@ -314,8 +287,8 @@ public class FormTransportModule implements
 
 	public void showURLform(CommandListener listener) {
 		urlForm = new Form ("URL");
-		//destinationUrl = shell.getAppProperty("destination-url");
-		destinationUrl = PropertyManager.instance().getSingularProperty("PostURL");
+		//destinationUrl = PropertyManager.instance().getSingularProperty("PostURL");
+		//TODO: Put this back in once we 
 		System.out.println("URL PROP: " + destinationUrl);
 		textField = new TextField("Please enter destination string",
 				destinationUrl,140,TextField.URL);
@@ -324,7 +297,7 @@ public class FormTransportModule implements
 		urlForm.addCommand(CMD_BACK);
 		urlForm.setCommandListener(listener);
 		this.currentMethod = TransportMethod.HTTP_GCF;
-		Display.getDisplay(shell).setCurrent(urlForm);
+		shell.setDisplay(this, urlForm);
 	}
 
 	private Object elementAt(int index, Enumeration en) {
@@ -352,13 +325,14 @@ public class FormTransportModule implements
 	 */
 	public void sendData(int transportMethod) throws IOException {
 		System.out.println("Destination URL: " + destinationUrl);
-		Vector existingURLs = PropertyManager.instance().getProperty(Constants.POST_URL_LIST);
+		//TODO: Fix when we have a property Manager again
+		/*Vector existingURLs = PropertyManager.instance().getProperty(Constants.POST_URL_LIST);
 		System.out.println("Existing URLs: " + existingURLs.toString());
 		if(!existingURLs.contains(destinationUrl)) {
 		    existingURLs.addElement(destinationUrl);
 		    PropertyManager.instance().setProperty(Constants.POST_URL_LIST, existingURLs);
 		}
-		System.out.println("NEw Existing URLs: " + PropertyManager.instance().getProperty(Constants.POST_URL_LIST).toString());
+		System.out.println("NEw Existing URLs: " + PropertyManager.instance().getProperty(Constants.POST_URL_LIST).toString());*/
 
 		if(this.data != null){
 			System.out.println("WANT TO SEND "+this.data+this.data.getRecordId());
@@ -368,7 +342,7 @@ public class FormTransportModule implements
 		}else{
 			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,
 					AlertType.ERROR);
-			Display.getDisplay(shell).setCurrent(a,this.mainMenu);
+			shell.setDisplay(this, this.mainMenu);
 		}
 
 	}
@@ -400,12 +374,12 @@ public class FormTransportModule implements
 			break;
 		}
 
-		Display.getDisplay(shell).setCurrent(new javax.microedition.lcdui.Alert(title, message, null, type), Display.getDisplay(shell).getCurrent());
+		shell.setDisplay(this, new javax.microedition.lcdui.Alert(title, message, null, type));
 
 	}
 
-	public void setData(Model model) {
-		this.data = model;
+	public void setData(FormData data) {
+		this.data = data;
 	}
 
 }

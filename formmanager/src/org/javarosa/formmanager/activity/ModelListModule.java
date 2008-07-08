@@ -55,30 +55,31 @@ public class ModelListModule extends List implements CommandListener, IModule
 	public final static Command CMD_MSGS = new Command("Message Status",Command.SCREEN,4);
 	public final static Command CMD_DELETE = new Command("Delete",Command.SCREEN,5);
 	public final static Command CMD_EMPTY = new Command("Empty", Command.SCREEN, 6);
+	
+	Context theContext;
 
 	public void contextChanged(Context globalContext) {
-		// TODO Auto-generated method stub
-		
+		theContext.mergeInContext(globalContext);
+		//TODO: Do we have any values that need updating depending
+		//on global context changes?
 	}
 
 	public void destroy() {
-		// TODO Auto-generated method stub
-		
+		// Stub. Nothing to do for this Module
 	}
 
 	public void halt() {
-		// TODO Auto-generated method stub
-		
+		// Stub. Nothing to do for this Module
 	}
 
 	public void resume(Context globalContext) {
-		// TODO Auto-generated method stub
-		
+		this.contextChanged(globalContext);
+		this.createView();
 	}
 
 	public void start(Context context) {
-		// TODO Auto-generated method stub
-		
+		theContext = context;
+		this.createView();
 	}
 
     private FormDataRMSUtility formDataRMSUtility;
@@ -96,9 +97,12 @@ public class ModelListModule extends List implements CommandListener, IModule
     {
         super("Saved Forms", List.EXCLUSIVE);
         this.mainShell = mainShell;
-        this.formDataRMSUtility = (FormDataRMSUtility)JavaRosaPlatform.instance().getStorageManager().getProvider(FormDataRMSUtility.getUtilityName());
-        this.formDefRMSUtility = (FormDefRMSUtility)JavaRosaPlatform.instance().getStorageManager().getProvider(FormDefRMSUtility.getUtilityName());
-        createView();
+        this.formDataRMSUtility = (FormDataRMSUtility) JavaRosaPlatform
+				.instance().getStorageManager().getRMSStorageProvider()
+				.getUtility(FormDataRMSUtility.getUtilityName());
+		this.formDefRMSUtility = (FormDefRMSUtility) JavaRosaPlatform
+				.instance().getStorageManager().getRMSStorageProvider()
+				.getUtility(FormDefRMSUtility.getUtilityName());
     }
     public void createView(){
 
