@@ -200,6 +200,8 @@ public class ModelListModule extends List implements CommandListener, IModule
         	//TODO: This is a phenomenal chance to try out the "inherited menus". Should look into that. 
         	Hashtable returnArgs = new Hashtable();
         	returnArgs.put(returnKey, CMD_MSGS);
+        	mainShell.returnFromModule(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs);
+
         } else if (c == CMD_REFRESH)
         {
         	this.createView();
