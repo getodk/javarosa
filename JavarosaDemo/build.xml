@@ -52,6 +52,7 @@
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
+					<source dir="${basedir}/../org.javarosa/src/"/> <!-- this is temporary while the refactored view still references the old model -->
 					<!--source dir="${basedir}/../org.javarosa.xform/test/"/-->
 				</sources>
 				
