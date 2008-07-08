@@ -9,6 +9,8 @@ import org.javarosa.core.JavaRosaPlatform;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.model.FormData;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.storage.FormDataRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.util.WorkflowStack;
@@ -16,6 +18,7 @@ import org.javarosa.demo.module.SplashScreenModule;
 import org.javarosa.formmanager.activity.FormListModule;
 import org.javarosa.formmanager.activity.FormTransportModule;
 import org.javarosa.formmanager.activity.ModelListModule;
+import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.xform.util.XFormUtils;
 
 /**
@@ -84,15 +87,49 @@ public class JavaRosaDemoShell implements IShell {
 		System.out.println("Done registering");
 	}
 	
-	private void workflow(IModule lastModule, String cmd, Hashtable returnVals) {
+	private void workflow(IModule lastModule, String returnCode, Hashtable returnVals) {
 		//TODO: parse any returnvals into context
 		if(stack.size() != 0) {
 			stack.pop().resume(context);
 		}
 		// TODO Auto-generated method stub
 		if( lastModule == this.splashScreen ) {
-			currentModule = formTransport;
-			this.formTransport.start(context);
+			currentModule = modelModule;
+			this.modelModule.start(context);
+		}
+		if(lastModule == this.modelModule) {
+			if(returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+				//
+				Object returnVal = returnVals.get(ModelListModule.returnKey);
+				if(returnVal == ModelListModule.CMD_MSGS) {
+					//Go to the FormTransport Module look at messages.
+					TransportContext msgContext = new TransportContext(context);
+					msgContext.setRequestedView(TransportContext.MESSAGE_VIEW);
+					currentModule = formTransport;
+					formTransport.start(msgContext);
+				}
+			}
+			if(returnCode == Constants.ACTIVITY_COMPLETE) {
+				//A Model was selected for some purpose
+				Object returnVal = returnVals.get(ModelListModule.returnKey);
+				if(returnVal == ModelListModule.CMD_EDIT) {
+					//Load the Form Entry Module, and feed it the form data
+					FormDef form = (FormDef)returnVals.get("form"); 
+					FormData data = (FormData)returnVals.get("data");
+				}
+				if(returnVal == ModelListModule.CMD_SEND) {
+					FormData data = (FormData)returnVals.get("data");
+					// Initialize the FormTransport Module, and feed it this form data.
+				}
+			}
+		}
+		if(lastModule == this.formTransport) {
+			if(returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+			
+			}
+			if(returnCode == Constants.ACTIVITY_COMPLETE) {
+
+			}
 		}
 	}
 
