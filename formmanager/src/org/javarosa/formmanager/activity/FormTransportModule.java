@@ -2,6 +2,7 @@ package org.javarosa.formmanager.activity;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.AlertType;
@@ -31,11 +32,6 @@ import org.javarosa.formmanager.utility.TransportContext;
  */
 public class FormTransportModule implements
 		CommandListener, MessageListener, IModule {
-
-	/**
-	 *
-	 */
-	private TransportManager transportManager;
 
 	/**
 	 *
@@ -89,6 +85,12 @@ public class FormTransportModule implements
 	
 	Vector transportMethods;
 	
+	public static final String RETURN_KEY = "returnval";
+	
+	public static final String VIEW_MODELS = "viewmodels";
+	
+	String task;
+	
 	/*
 	 * (non-Javadoc)
 	 *
@@ -118,10 +120,11 @@ public class FormTransportModule implements
 	public void start(Context context) {
 		this.context = new TransportContext(context);
 		//TODO: Parse context arguments, we possibly do not want to create a view
-		createView(this.context.getRequestedView());
+		createView(this.context.getRequestedTask());
 	}
 
-	public void createView(String view) {
+	public void createView(String task) {
+		this.task = task;
 		transportMethods = new Vector();
 		Enumeration availableMethods = JavaRosaPlatform.instance().getTransportManager().getTransportMethods();
 		Vector menuItems = new Vector();
@@ -153,11 +156,14 @@ public class FormTransportModule implements
 		messageDetailTextBox.addCommand(CMD_SEND);
 		messageDetailTextBox.setCommandListener(this);
 		
-		if(view.equals(TransportContext.MAIN_MENU)) {
+		if(task.equals(TransportContext.MAIN_MENU)) {
 			shell.setDisplay(this, mainMenu);
 		}
-		else if(view.equals(TransportContext.MESSAGE_VIEW)) {
+		else if(task.equals(TransportContext.MESSAGE_VIEW)) {
 			shell.setDisplay(this, messageList);
+		}
+		else if(task.equals(TransportContext.SEND_DATA)) {
+			showURLform();
 		}
 		}
 
@@ -165,7 +171,7 @@ public class FormTransportModule implements
 	 *
 	 */
 	private void populateMessageList() {
-		Enumeration messages = transportManager.getMessages();
+		Enumeration messages = JavaRosaPlatform.instance().getTransportManager().getMessages();
 		while (messages.hasMoreElements()) {
 			TransportMessage message = (TransportMessage) messages
 					.nextElement();
@@ -180,7 +186,7 @@ public class FormTransportModule implements
 
 	public Enumeration getTransportMessages(){
 
-		return transportManager.getMessages();
+		return JavaRosaPlatform.instance().getTransportManager().getMessages();
 	}
 
 	/*
@@ -199,7 +205,9 @@ public class FormTransportModule implements
 				
 				switch (selected) {
 				case 0:
-					//TODO: Go to model list
+					Hashtable returnArgs = new Hashtable();
+					returnArgs.put(RETURN_KEY, VIEW_MODELS);
+					shell.returnFromModule(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs);
 					break;
 				case 1:
 					showURLform();
@@ -236,10 +244,15 @@ public class FormTransportModule implements
 			}
 		} else if (d == messageList) {
 			if (c == CMD_BACK) {
-				shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
+				if(this.task == TransportContext.MESSAGE_VIEW) {
+					shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
+				}
+				else {
+					shell.setDisplay(this, mainMenu);
+				}
 			} else if (c == CMD_DETAILS) {
 				int selected = messageList.getSelectedIndex();
-				Enumeration messages = transportManager.getMessages();
+				Enumeration messages = JavaRosaPlatform.instance().getTransportManager().getMessages();
 				TransportMessage message = (TransportMessage) elementAt(
 						selected, messages);
 				if (message != null) {
@@ -249,11 +262,11 @@ public class FormTransportModule implements
 			}
 			else if (c == CMD_DELETEMSG) {
 				int selected = messageList.getSelectedIndex();
-				Enumeration messages = transportManager.getMessages();
+				Enumeration messages = JavaRosaPlatform.instance().getTransportManager().getMessages();
 				TransportMessage message = (TransportMessage) elementAt(
 						selected, messages);
 
-				transportManager.deleteMessage(message.getRecordId());
+				JavaRosaPlatform.instance().getTransportManager().deleteMessage(message.getRecordId());
 				showMessageList();
 			}
 		} else if (d == messageDetailTextBox) {
@@ -262,13 +275,13 @@ public class FormTransportModule implements
 			} else if (c == CMD_SEND) {
 				int selected = messageList.getSelectedIndex();
 				TransportMessage message = (TransportMessage) elementAt(
-						selected, transportManager.getMessages());
-				transportManager.send(message, TransportMethod.HTTP_GCF);
+						selected, JavaRosaPlatform.instance().getTransportManager().getMessages());
+				JavaRosaPlatform.instance().getTransportManager().send(message, TransportMethod.HTTP_GCF);
 			}
 		}
 		else if (d == urlForm) {
 			if (c == CMD_BACK) {
-				shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
+					shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
 			} else if (c == CMD_OK) {
 				processURLform();
 				try {
@@ -346,7 +359,7 @@ public class FormTransportModule implements
 		if(this.data != null){
 			System.out.println("WANT TO SEND "+this.data+this.data.getRecordId());
 			String testString = this.data.toString();
-			transportManager.enqueue(this.data.toString().getBytes("UTF-8"),
+			JavaRosaPlatform.instance().getTransportManager().enqueue(this.data.toString().getBytes("UTF-8"),
 					destinationUrl, transportMethod,this.data.getRecordId());
 		}else{
 			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,

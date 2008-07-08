@@ -195,8 +195,7 @@ public class ModelListModule extends List implements CommandListener, IModule
             formDataRMSUtility.deleteRecord(data.getRecordId());
             this.createView();
         } else if (c == CMD_MSGS)
-        {
-        	
+        {	
         	//TODO: This is a phenomenal chance to try out the "inherited menus". Should look into that. 
         	Hashtable returnArgs = new Hashtable();
         	returnArgs.put(returnKey, CMD_MSGS);
