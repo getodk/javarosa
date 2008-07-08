@@ -14,6 +14,8 @@ import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.module.SplashScreenModule;
 import org.javarosa.formmanager.activity.FormListModule;
+import org.javarosa.formmanager.activity.FormTransportModule;
+import org.javarosa.formmanager.activity.ModelListModule;
 import org.javarosa.xform.util.XFormUtils;
 
 /**
@@ -25,6 +27,8 @@ public class JavaRosaDemoShell implements IShell {
 	// List of views that are used by this shell
 	FormListModule formModule = null;
 	SplashScreenModule splashScreen = null;
+	FormTransportModule formTransport = null;
+	ModelListModule modelModule = null;
 	
 	WorkflowStack stack;
 	
@@ -48,6 +52,8 @@ public class JavaRosaDemoShell implements IShell {
 		System.out.println("done splash init");
 		this.formModule = new FormListModule(this,"Forms List");
 		System.out.println("Done formlist init");
+		this.formTransport = new FormTransportModule(this);
+		this.modelModule = new ModelListModule(this);
 		
 		currentModule = splashScreen;
 		this.splashScreen.start(context);
@@ -85,8 +91,8 @@ public class JavaRosaDemoShell implements IShell {
 		}
 		// TODO Auto-generated method stub
 		if( lastModule == this.splashScreen ) {
-			currentModule = formModule;
-			this.formModule.start(context);
+			currentModule = formTransport;
+			this.formTransport.start(context);
 		}
 	}
 
