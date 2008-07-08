@@ -4,6 +4,8 @@ import java.util.Hashtable;
 
 import javax.microedition.lcdui.Displayable;
 
+import org.javarosa.communication.http.HttpTransportMethod;
+import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaPlatform;
 import org.javarosa.core.api.Constants;
@@ -70,6 +72,9 @@ public class JavaRosaDemoShell implements IShell {
 		
 		JavaRosaPlatform.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
 		JavaRosaPlatform.instance().getPropertyManager().addRules(new DemoAppProperties());
+		JavaRosaPlatform.instance().getPropertyManager().addRules(new HttpTransportProperties());
+		
+		JavaRosaPlatform.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 		
 		FormDataRMSUtility formData = new FormDataRMSUtility(FormDataRMSUtility.getUtilityName());
 		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
