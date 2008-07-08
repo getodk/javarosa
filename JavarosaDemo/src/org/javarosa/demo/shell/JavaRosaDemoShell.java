@@ -90,46 +90,73 @@ public class JavaRosaDemoShell implements IShell {
 	private void workflow(IModule lastModule, String returnCode, Hashtable returnVals) {
 		//TODO: parse any returnvals into context
 		if(stack.size() != 0) {
-			stack.pop().resume(context);
+			IModule module = stack.pop();
+			this.currentModule = module;
+			module.resume(context);
 		}
-		// TODO Auto-generated method stub
-		if( lastModule == this.splashScreen ) {
-			currentModule = modelModule;
-			this.modelModule.start(context);
-		}
-		if(lastModule == this.modelModule) {
-			if(returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-				//
-				Object returnVal = returnVals.get(ModelListModule.returnKey);
-				if(returnVal == ModelListModule.CMD_MSGS) {
-					//Go to the FormTransport Module look at messages.
-					TransportContext msgContext = new TransportContext(context);
-					msgContext.setRequestedView(TransportContext.MESSAGE_VIEW);
-					currentModule = formTransport;
-					formTransport.start(msgContext);
+		else {
+			// TODO Auto-generated method stub
+			if (lastModule == this.splashScreen) {
+				currentModule = formTransport;
+				this.formTransport.start(context);
+			}
+			if (lastModule == this.modelModule) {
+				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+					Object returnVal = returnVals.get(ModelListModule.returnKey);
+					if (returnVal == ModelListModule.CMD_MSGS) {
+						// Go to the FormTransport Module look at messages.
+						TransportContext msgContext = new TransportContext(
+								context);
+						msgContext.setRequestedTask(TransportContext.MESSAGE_VIEW);
+						currentModule = formTransport;
+						formTransport.start(msgContext);
+					}
+				}
+				if (returnCode == Constants.ACTIVITY_COMPLETE) {
+					// A Model was selected for some purpose
+					Object returnVal = returnVals
+							.get(ModelListModule.returnKey);
+					if (returnVal == ModelListModule.CMD_EDIT) {
+						// Load the Form Entry Module, and feed it the form data
+						FormDef form = (FormDef) returnVals.get("form");
+						FormData data = (FormData) returnVals.get("data");
+					}
+					if (returnVal == ModelListModule.CMD_SEND) {
+						FormData data = (FormData) returnVals.get("data");
+						formTransport.setData(data);
+						TransportContext msgContext = new TransportContext(
+								context);
+						msgContext.setRequestedTask(TransportContext.SEND_DATA);
+						currentModule = formTransport;
+						formTransport.start(msgContext);
+					}
 				}
 			}
-			if(returnCode == Constants.ACTIVITY_COMPLETE) {
-				//A Model was selected for some purpose
-				Object returnVal = returnVals.get(ModelListModule.returnKey);
-				if(returnVal == ModelListModule.CMD_EDIT) {
-					//Load the Form Entry Module, and feed it the form data
-					FormDef form = (FormDef)returnVals.get("form"); 
-					FormData data = (FormData)returnVals.get("data");
+			if (lastModule == this.formTransport) {
+				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+					String returnVal = (String)returnVals.get(FormTransportModule.RETURN_KEY);
+					if(returnVal == FormTransportModule.VIEW_MODELS) {
+						currentModule = this.modelModule;
+						this.modelModule.start(context);
+					}
 				}
-				if(returnVal == ModelListModule.CMD_SEND) {
-					FormData data = (FormData)returnVals.get("data");
-					// Initialize the FormTransport Module, and feed it this form data.
+				if (returnCode == Constants.ACTIVITY_COMPLETE) {
+					
+				}
+			}
+			if (lastModule == this.formModule) {
+				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+					//Presumably go deal with 
+				}
+				if (returnCode == Constants.ACTIVITY_COMPLETE) {
+					
 				}
 			}
 		}
-		if(lastModule == this.formTransport) {
-			if(returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-			
-			}
-			if(returnCode == Constants.ACTIVITY_COMPLETE) {
-
-			}
+		if(currentModule == lastModule) {
+			//We didn't launch anything. Go to default
+			currentModule = formModule;
+			formModule.start(context);
 		}
 	}
 
@@ -138,10 +165,11 @@ public class JavaRosaDemoShell implements IShell {
 	 */
 	public void returnFromModule(IModule module, String returnCode, Hashtable returnVals) {
 		module.halt();
+		System.out.println("Module: " + module + " returned with code " + returnCode);
+		workflow(module, returnCode, returnVals);
 		if(returnCode == Constants.ACTIVITY_SUSPEND || returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 			stack.push(module);
 		}
-		workflow(module, returnCode, returnVals);
 	}
 
 	public void setDisplay(IModule callingModule, Displayable display) {
