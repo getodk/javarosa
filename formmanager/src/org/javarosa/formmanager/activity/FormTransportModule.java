@@ -128,12 +128,14 @@ public class FormTransportModule implements
 		transportMethods = new Vector();
 		Enumeration availableMethods = JavaRosaPlatform.instance().getTransportManager().getTransportMethods();
 		Vector menuItems = new Vector();
+		menuItems.addElement("Select Models");
+		menuItems.addElement("Message Queue");
 		while(availableMethods.hasMoreElements()) {
 			TransportMethod method = (TransportMethod)availableMethods.nextElement();
 			menuItems.addElement("Transport with " + method.getName());
 			transportMethods.addElement(new Integer(method.getId()));
 		}
-		String[] elements = new String[]{"Select Models", "Message Queue"};
+		String[] elements = new String[menuItems.size()];
 		menuItems.copyInto(elements);
 		mainMenu = new List("Transport Menu", List.IMPLICIT, elements, null);
 		mainMenu.addCommand(CMD_BACK);
