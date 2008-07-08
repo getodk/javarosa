@@ -95,26 +95,25 @@ public class FormList extends List implements CommandListener {
 			this.mainShell.deleteForm(data.getRecordId());
 			createView();
 		}
-
+*/
 		if (c == CMD_EXIT) {
-			this.mainShell.destroyApp(true);
+			
 		}
-
+/*
 		if (c == CMD_GETNEWFORMS) {
 			this.mainShell.getNewFormsByTransportPropertySetting();
 		}
-
+*/
 		if (c == CMD_VIEWMODELS) {
 			this.mainShell.displayModelList();
 		}
-
+/*
 		if (c == CMD_SHAREFORMS) {
 			this.mainShell.startBToothClient();
 		}
 		if (c == CMD_SETTINGS) {
 			this.mainShell.editProperties();
 		}
-		*/
-	}
+		*/	}
 
 }
