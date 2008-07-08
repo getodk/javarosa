@@ -23,6 +23,7 @@ import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
+import org.javarosa.formmanager.utility.TransportContext;
 
 /**
  *
@@ -82,7 +83,9 @@ public class FormTransportModule implements
 
 	private int currentMethod;
 	
-	private Context context;
+	private TransportContext context;
+	
+	private String currentView;
 	
 	Vector transportMethods;
 	
@@ -104,20 +107,21 @@ public class FormTransportModule implements
 	}
 
 	public void halt() {
-		// Nothing for this Module
+		//TODO: setup which view we're on.
+		currentView = TransportContext.MAIN_MENU;
 	}
 
 	public void resume(Context globalContext) {
-		createView();		
+		createView(currentView);		
 	}
 
 	public void start(Context context) {
-		this.context = context;
+		this.context = new TransportContext(context);
 		//TODO: Parse context arguments, we possibly do not want to create a view
-		createView();
+		createView(this.context.getRequestedView());
 	}
 
-	public void createView() {
+	public void createView(String view) {
 		transportMethods = new Vector();
 		Enumeration availableMethods = JavaRosaPlatform.instance().getTransportManager().getTransportMethods();
 		Vector menuItems = new Vector();
@@ -148,9 +152,14 @@ public class FormTransportModule implements
 		messageDetailTextBox.addCommand(CMD_BACK);
 		messageDetailTextBox.addCommand(CMD_SEND);
 		messageDetailTextBox.setCommandListener(this);
-		shell.setDisplay(this, mainMenu);
-		System.out.println(this.data);
-	}
+		
+		if(view.equals(TransportContext.MAIN_MENU)) {
+			shell.setDisplay(this, mainMenu);
+		}
+		else if(view.equals(TransportContext.MESSAGE_VIEW)) {
+			shell.setDisplay(this, messageList);
+		}
+		}
 
 	/**
 	 *
