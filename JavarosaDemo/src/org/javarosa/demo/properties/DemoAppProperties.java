@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaPlatform;
+import org.javarosa.core.services.properties.IPropertyRules;
 
 /**
  * Application-specific properties for the JavaRosa reference
@@ -13,7 +14,7 @@ import org.javarosa.core.JavaRosaPlatform;
  * @author Clayton Sims
  *
  */
-public class DemoAppProperties {
+public class DemoAppProperties implements IPropertyRules {
 	    Hashtable rules;
 	    Vector readOnlyProperties;
 

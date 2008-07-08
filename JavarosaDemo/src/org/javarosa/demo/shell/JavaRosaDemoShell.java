@@ -13,8 +13,10 @@ import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.storage.FormDataRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.module.SplashScreenModule;
+import org.javarosa.demo.properties.DemoAppProperties;
 import org.javarosa.formmanager.activity.FormListModule;
 import org.javarosa.formmanager.activity.FormTransportModule;
 import org.javarosa.formmanager.activity.ModelListModule;
@@ -65,7 +67,10 @@ public class JavaRosaDemoShell implements IShell {
 	}
 	
 	private void init() {
-
+		
+		JavaRosaPlatform.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
+		JavaRosaPlatform.instance().getPropertyManager().addRules(new DemoAppProperties());
+		
 		FormDataRMSUtility formData = new FormDataRMSUtility(FormDataRMSUtility.getUtilityName());
 		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
 
