@@ -46,6 +46,7 @@
 					<source dir="${dir.src}"/>
 					<!--Taking this out for now...-->
 					<!--source dir="${dir.test}"/-->
+					<source dir="${basedir}/../org.javarosa.communication/src/"/>
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
