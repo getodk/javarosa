@@ -17,5 +17,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.formmanager"/>
 	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.services.properties"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
