@@ -25,6 +25,7 @@ import org.javarosa.formmanager.activity.FormTransportModule;
 import org.javarosa.formmanager.activity.ModelListModule;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
+import org.javarosa.services.properties.activity.PropertyModule;
 import org.javarosa.xform.util.XFormUtils;
 
 /**
@@ -39,6 +40,7 @@ public class JavaRosaDemoShell implements IShell {
 	SplashScreenModule splashScreen = null;
 	FormTransportModule formTransport = null;
 	ModelListModule modelModule = null;
+	PropertyModule propertyModule = null;
 	
 	WorkflowStack stack;
 	
@@ -64,6 +66,8 @@ public class JavaRosaDemoShell implements IShell {
 		System.out.println("Done formlist init");
 		this.formTransport = new FormTransportModule(this);
 		this.modelModule = new ModelListModule(this);
+		
+		this.propertyModule = new PropertyModule(this);
 		
 		currentModule = splashScreen;
 		this.splashScreen.start(context);
@@ -163,6 +167,10 @@ public class JavaRosaDemoShell implements IShell {
 					if(returnVal == Commands.CMD_VIEW_DATA) {
 						currentModule = this.modelModule;
 						this.modelModule.start(context);
+					}
+					if(returnVal == Commands.CMD_SETTINGS) {
+						currentModule = this.propertyModule;
+						this.propertyModule.start(context);
 					}
 				}
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
