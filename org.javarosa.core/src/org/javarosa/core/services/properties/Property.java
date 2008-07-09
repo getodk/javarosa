@@ -37,13 +37,14 @@ public class Property implements Externalizable, IDRecordable{
             fullString = fullString + c;
         }
         int nameindex = fullString.indexOf(","); 
+        value = new Vector();
         if(nameindex == -1) {
             System.out.println("WARNING: Property in RMS with no value");
-            nameindex = fullString.length();
+            name = fullString.substring(0, fullString.length());
         }
-        name = fullString.substring(0, nameindex);
+        else {
+            name = fullString.substring(0, nameindex);
         // The format of the properties should be each one in a list, comma delimited
-        value = new Vector();
         String packedvalue = fullString.substring(fullString.indexOf(",")+1,fullString.length());
         while(packedvalue.length() != 0) {
             int index = packedvalue.indexOf(",");
@@ -55,6 +56,7 @@ public class Property implements Externalizable, IDRecordable{
                 value.addElement(packedvalue.substring(0,index));
                 packedvalue = packedvalue.substring(index + 1, packedvalue.length());
             }
+        }
         }
         in.close();
     }
