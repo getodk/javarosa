@@ -17,7 +17,6 @@ public class HttpTransportProperties implements IPropertyRules {
     Hashtable rules;
     Vector readOnlyProperties;
     
-    public final static String DEVICE_ID_PROPERTY = "DeviceID";
     public final static String POST_URL_LIST_PROPERTY = "PostURLlist";
     public final static String POST_URL_PROPERTY = "PostURL";
     public final static String GET_URL_PROPERTY = "GetURL";
@@ -33,20 +32,21 @@ public class HttpTransportProperties implements IPropertyRules {
         // PostURL List Property
         rules.put(POST_URL_LIST_PROPERTY, new Vector());
         readOnlyProperties.addElement(POST_URL_LIST_PROPERTY);
+        Vector postList = JavaRosaPlatform.instance().getPropertyManager().getProperty(POST_URL_LIST_PROPERTY);
+        if(postList == null) {
+        	JavaRosaPlatform.instance().getPropertyManager().setProperty(POST_URL_LIST_PROPERTY, new Vector());
+        }
+        
 
         // PostURL Property
         Vector postUrls = new Vector();
-        postUrls.addElement(POST_URL_PROPERTY);
+        postUrls.addElement(POST_URL_LIST_PROPERTY);
         rules.put(POST_URL_PROPERTY, postUrls);
 
         // GetURL Property
         Vector getUrls = new Vector();
-        getUrls.addElement(GET_URL_PROPERTY);
+        //getUrls.addElement(GET_URL_PROPERTY);
         rules.put(GET_URL_PROPERTY, getUrls);
-        
-        //DeviceID Property
-        rules.put(DEVICE_ID_PROPERTY, new Vector());
-        readOnlyProperties.addElement(DEVICE_ID_PROPERTY);
     }
 
     /** (non-Javadoc)
