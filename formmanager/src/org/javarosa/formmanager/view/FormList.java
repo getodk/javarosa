@@ -97,7 +97,9 @@ public class FormList extends List implements CommandListener {
 		}
 */
 		if (c == CMD_EXIT) {
-			
+			Hashtable returnvals = new Hashtable();
+			returnvals.put(Commands.CMD_EXIT, "");
+			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
 /*
 		if (c == CMD_GETNEWFORMS) {
@@ -105,7 +107,9 @@ public class FormList extends List implements CommandListener {
 		}
 */
 		if (c == CMD_VIEWMODELS) {
-			
+			Hashtable returnvals = new Hashtable();
+			returnvals.put(Commands.CMD_VIEW_DATA, "");
+			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
 /*
 		if (c == CMD_SHAREFORMS) {

@@ -70,6 +70,13 @@ public class FormListModule implements IModule {
 			// 
 			break;
 		
+		} else if (cmd == Commands.CMD_EXIT) {
+			parent.exitShell();
+			
+		} else if (cmd == Commands.CMD_VIEW_DATA) {
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put("command", Commands.CMD_VIEW_DATA);
+			parent.returnFromModule(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
 		}
 		}
 	}
