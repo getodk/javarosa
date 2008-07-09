@@ -77,6 +77,10 @@ public class FormListModule implements IModule {
 			Hashtable returnArgs = new Hashtable();
 			returnArgs.put("command", Commands.CMD_VIEW_DATA);
 			parent.returnFromModule(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
+		} else if (cmd == Commands.CMD_SETTINGS) {
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put("command", Commands.CMD_SETTINGS);
+			parent.returnFromModule(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
 		}
 		}
 	}
