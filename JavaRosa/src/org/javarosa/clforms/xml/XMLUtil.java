@@ -19,7 +19,6 @@ import javax.microedition.io.HttpConnection;
 import javax.microedition.io.OutputConnection;
 import javax.microedition.io.file.FileConnection;
 
-import minixpath.XPathExpression;
 
 import org.javarosa.clforms.api.Binding;
 import org.javarosa.clforms.api.Constants;
@@ -28,6 +27,7 @@ import org.javarosa.clforms.api.Prompt;
 import org.javarosa.clforms.storage.Model;
 import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.clforms.util.SimpleOrderedHashtable;
+import org.javarosa.minixpath.XPathExpression;
 import org.javarosa.properties.PropertyManager;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.io.KXmlSerializer;

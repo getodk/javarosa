@@ -46,6 +46,12 @@
 					<source dir="${dir.src}"/>
 					<!--Taking this out for now...-->
 					<source dir="${dir.test}"/>
+					<source dir="${basedir}/../minixpath/src/"/>
+					<source dir="${basedir}/../org.javarosa.core.util/src/"/>
+					<source dir="${basedir}/../org.javarosa.util.db/src/"/>
+					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
+					<source dir="${basedir}/../org.javarosa.xform/src/"/>
+					<source dir="${basedir}/../org.javarosa.xform/test/"/>
 				</sources>
 				
 				<!-- Build variables -->
@@ -120,7 +126,8 @@
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
 		<RunTestSuite suite="org.javarosa.test.J2meUnitTest"/>
-			<RunTestSuite suite="org.javarosa.test.JavaRosaBasicTests"/>
+		<RunTestSuite suite="org.javarosa.test.JavaRosaBasicTests"/>
+		<RunTestSuite suite="org.javarosa.xform.test.TestModelBuild"/>
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>

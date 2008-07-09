@@ -8,7 +8,6 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
-import minixpath.XPathExpression;
 
 import org.javarosa.clforms.Controller;
 import org.javarosa.clforms.MVCComponent;
@@ -19,6 +18,7 @@ import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.clforms.util.SimpleOrderedHashtable;
 import org.javarosa.clforms.view.FormView;
 import org.javarosa.clforms.view.IPrompter;
+import org.javarosa.minixpath.XPathExpression;
 import org.javarosa.utils.ViewUtils;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
