@@ -9,7 +9,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import minixpath.XPathExpression;
 
 import org.javarosa.clforms.storage.Externalizable;
 import org.javarosa.clforms.storage.IDRecordable;
@@ -17,6 +16,7 @@ import org.javarosa.clforms.storage.Model;
 import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.clforms.xml.XMLUtil;
 import org.javarosa.dtree.i18n.*;
+import org.javarosa.minixpath.XPathExpression;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 
