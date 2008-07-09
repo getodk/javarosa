@@ -3,6 +3,7 @@ package org.javarosa.demo.shell;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.http.HttpTransportProperties;
@@ -23,6 +24,7 @@ import org.javarosa.formmanager.activity.FormListModule;
 import org.javarosa.formmanager.activity.FormTransportModule;
 import org.javarosa.formmanager.activity.ModelListModule;
 import org.javarosa.formmanager.utility.TransportContext;
+import org.javarosa.formmanager.view.Commands;
 import org.javarosa.xform.util.XFormUtils;
 
 /**
@@ -32,6 +34,7 @@ import org.javarosa.xform.util.XFormUtils;
  */
 public class JavaRosaDemoShell implements IShell {
 	// List of views that are used by this shell
+	MIDlet runningAssembly;
 	FormListModule formModule = null;
 	SplashScreenModule splashScreen = null;
 	FormTransportModule formTransport = null;
@@ -49,7 +52,7 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	public void exitShell() {
-
+		runningAssembly.notifyDestroyed();
 	}
 	
 	public void run() {
@@ -107,8 +110,8 @@ public class JavaRosaDemoShell implements IShell {
 		else {
 			// TODO Auto-generated method stub
 			if (lastModule == this.splashScreen) {
-				currentModule = formTransport;
-				this.formTransport.start(context);
+				currentModule = formModule;
+				this.formModule.start(context);
 			}
 			if (lastModule == this.modelModule) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
@@ -156,7 +159,11 @@ public class JavaRosaDemoShell implements IShell {
 			}
 			if (lastModule == this.formModule) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-					//Presumably go deal with 
+					String returnVal = (String)returnVals.get("command");
+					if(returnVal == Commands.CMD_VIEW_DATA) {
+						currentModule = this.modelModule;
+						this.modelModule.start(context);
+					}
 				}
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
 					
@@ -189,5 +196,9 @@ public class JavaRosaDemoShell implements IShell {
 		else {
 			System.out.println("Module: " + callingModule + " attempted, but failed, to set the display");
 		}
+	}
+	
+	public void setRunningAssembly(MIDlet assembly) {
+		this.runningAssembly = assembly;
 	}
 }
