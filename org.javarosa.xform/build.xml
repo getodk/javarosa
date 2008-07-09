@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+
+<project name="epihandy-xform-layer" basedir="." default="package">
+	<target name="init" description="initialization">
+		<mkdir dir="bin"/>
+		<mkdir dir="dist"/>
+			
+		<path id="compile.classpath">
+			<fileset dir="lib">
+				<include name="**/*.jar"/>
+			</fileset>
+		</path>
+	</target>
+	
+	<target name="clean" description="delete the bin and the dist folder">
+		<delete>
+			<fileset dir="bin">
+				<include name="**/*.class"/>
+			</fileset>
+		</delete>
+				
+		<delete>
+			<fileset dir="dist">
+				<include  name="**/*.jar"/>
+			</fileset>
+		</delete>
+	</target>
+	
+	<target name="compile" depends="init,clean" description="compile the code">
+		<mkdir dir="bin"/>
+		
+		<javac destdir="bin" classpathref="compile.classpath" debug="true" debuglevel="lines,source">
+			<src path="src/"/>
+			<include name="**/*.java"/>
+		</javac>
+	</target>
+			
+	<target name="package" depends="init,clean,compile" description="package the code into a jar file">
+			<mkdir dir="dist"/>
+			<jar destfile="dist\epihandy-XForm-layer.jar">
+				<zipfileset dir="bin" prefix=""></zipfileset>
+			</jar>
+	</target>
+</project>
