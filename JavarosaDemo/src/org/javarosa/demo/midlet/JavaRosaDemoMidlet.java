@@ -16,6 +16,7 @@ import org.javarosa.demo.shell.JavaRosaDemoShell;
 public class JavaRosaDemoMidlet extends MIDlet {
 	IShell shell = null;
 	
+	
 	protected void destroyApp(boolean arg0) throws MIDletStateChangeException {
 		// TODO Auto-generated method stub
 
@@ -39,6 +40,7 @@ public class JavaRosaDemoMidlet extends MIDlet {
 		JavaRosaPlatform.instance().initialize();
 		JavaRosaPlatform.instance().setDisplay(Display.getDisplay(this));
 		shell.run();
+		((JavaRosaDemoShell)shell).setRunningAssembly(this);
 	}
 
 }
