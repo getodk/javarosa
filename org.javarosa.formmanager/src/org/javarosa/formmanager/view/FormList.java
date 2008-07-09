@@ -115,9 +115,11 @@ public class FormList extends List implements CommandListener {
 		if (c == CMD_SHAREFORMS) {
 			this.mainShell.startBToothClient();
 		}
-		if (c == CMD_SETTINGS) {
-			this.mainShell.editProperties();
+		*/if (c == CMD_SETTINGS) {
+			Hashtable returnvals = new Hashtable();
+			returnvals.put(Commands.CMD_SETTINGS, "");
+			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
-		*/	}
+	}
 
 }
