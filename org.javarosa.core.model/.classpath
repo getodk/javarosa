@@ -4,7 +4,5 @@
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="test"/>
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.util.db"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
