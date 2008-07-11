@@ -15,9 +15,9 @@ import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaPlatform;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IModule;
+import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormData;
 import org.javarosa.core.services.TransportManager;
@@ -31,7 +31,7 @@ import org.javarosa.formmanager.utility.TransportContext;
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
 public class FormTransportModule implements
-		CommandListener, MessageListener, IModule {
+		CommandListener, MessageListener, IActivity {
 
 	/**
 	 *
@@ -126,7 +126,7 @@ public class FormTransportModule implements
 	public void createView(String task) {
 		this.task = task;
 		transportMethods = new Vector();
-		Enumeration availableMethods = JavaRosaPlatform.instance().getTransportManager().getTransportMethods();
+		Enumeration availableMethods = JavaRosaServiceProvider.instance().getTransportManager().getTransportMethods();
 		Vector menuItems = new Vector();
 		menuItems.addElement("Select Models");
 		menuItems.addElement("Message Queue");
@@ -173,7 +173,7 @@ public class FormTransportModule implements
 	 *
 	 */
 	private void populateMessageList() {
-		Enumeration messages = JavaRosaPlatform.instance().getTransportManager().getMessages();
+		Enumeration messages = JavaRosaServiceProvider.instance().getTransportManager().getMessages();
 		while (messages.hasMoreElements()) {
 			TransportMessage message = (TransportMessage) messages
 					.nextElement();
@@ -188,7 +188,7 @@ public class FormTransportModule implements
 
 	public Enumeration getTransportMessages(){
 
-		return JavaRosaPlatform.instance().getTransportManager().getMessages();
+		return JavaRosaServiceProvider.instance().getTransportManager().getMessages();
 	}
 
 	/*
@@ -220,7 +220,7 @@ public class FormTransportModule implements
 					int transportType = selected - 2;
 				    
 				    Integer id = (Integer)transportMethods.elementAt(transportType);
-				    TransportMethod method = JavaRosaPlatform.instance().getTransportManager().getTransportMethod(id.intValue());
+				    TransportMethod method = JavaRosaServiceProvider.instance().getTransportManager().getTransportMethod(id.intValue());
 				    if (method.getId() == TransportMethod.FILE) {
 						urlForm = new Form("FILENAME");
 						// destinationUrl = shell.getAppProperty("destination-file");
@@ -254,7 +254,7 @@ public class FormTransportModule implements
 				}
 			} else if (c == CMD_DETAILS) {
 				int selected = messageList.getSelectedIndex();
-				Enumeration messages = JavaRosaPlatform.instance().getTransportManager().getMessages();
+				Enumeration messages = JavaRosaServiceProvider.instance().getTransportManager().getMessages();
 				TransportMessage message = (TransportMessage) elementAt(
 						selected, messages);
 				if (message != null) {
@@ -264,11 +264,11 @@ public class FormTransportModule implements
 			}
 			else if (c == CMD_DELETEMSG) {
 				int selected = messageList.getSelectedIndex();
-				Enumeration messages = JavaRosaPlatform.instance().getTransportManager().getMessages();
+				Enumeration messages = JavaRosaServiceProvider.instance().getTransportManager().getMessages();
 				TransportMessage message = (TransportMessage) elementAt(
 						selected, messages);
 
-				JavaRosaPlatform.instance().getTransportManager().deleteMessage(message.getRecordId());
+				JavaRosaServiceProvider.instance().getTransportManager().deleteMessage(message.getRecordId());
 				showMessageList();
 			}
 		} else if (d == messageDetailTextBox) {
@@ -277,8 +277,8 @@ public class FormTransportModule implements
 			} else if (c == CMD_SEND) {
 				int selected = messageList.getSelectedIndex();
 				TransportMessage message = (TransportMessage) elementAt(
-						selected, JavaRosaPlatform.instance().getTransportManager().getMessages());
-				JavaRosaPlatform.instance().getTransportManager().send(message, TransportMethod.HTTP_GCF);
+						selected, JavaRosaServiceProvider.instance().getTransportManager().getMessages());
+				JavaRosaServiceProvider.instance().getTransportManager().send(message, TransportMethod.HTTP_GCF);
 			}
 		}
 		else if (d == urlForm) {
@@ -361,7 +361,7 @@ public class FormTransportModule implements
 		if(this.data != null){
 			System.out.println("WANT TO SEND "+this.data+this.data.getRecordId());
 			String testString = this.data.toString();
-			JavaRosaPlatform.instance().getTransportManager().enqueue(this.data.toString().getBytes("UTF-8"),
+			JavaRosaServiceProvider.instance().getTransportManager().enqueue(this.data.toString().getBytes("UTF-8"),
 					destinationUrl, transportMethod,this.data.getRecordId());
 		}else{
 			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,

@@ -28,9 +28,9 @@ import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
 
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaPlatform;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IModule;
+import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
@@ -43,7 +43,7 @@ import org.javarosa.core.services.transport.TransportMessage;
  *
  * @author Munier
  */
-public class ModelListModule extends List implements CommandListener, IModule
+public class ModelListModule extends List implements CommandListener, IActivity
 {
 	
 	public final static String returnKey = "ModelListReturnCommand";
@@ -97,10 +97,10 @@ public class ModelListModule extends List implements CommandListener, IModule
     {
         super("Saved Forms", List.EXCLUSIVE);
         this.mainShell = mainShell;
-        this.formDataRMSUtility = (FormDataRMSUtility) JavaRosaPlatform
+        this.formDataRMSUtility = (FormDataRMSUtility) JavaRosaServiceProvider
 				.instance().getStorageManager().getRMSStorageProvider()
 				.getUtility(FormDataRMSUtility.getUtilityName());
-		this.formDefRMSUtility = (FormDefRMSUtility) JavaRosaPlatform
+		this.formDefRMSUtility = (FormDefRMSUtility) JavaRosaServiceProvider
 				.instance().getStorageManager().getRMSStorageProvider()
 				.getUtility(FormDefRMSUtility.getUtilityName());
     }
@@ -270,7 +270,7 @@ public class ModelListModule extends List implements CommandListener, IModule
 	private int getModelDeliveryStatus(int modelId) {
 
 		//TODO: Are we OK with using the transport manager here? There's coupling...
-		Enumeration qMessages = JavaRosaPlatform.instance().getTransportManager().getMessages();
+		Enumeration qMessages = JavaRosaServiceProvider.instance().getTransportManager().getMessages();
 		//TODO: The way we're doing this is fairly wasteful. We should store them
 		//locally, and update on change, instead of getting each one.
 		TransportMessage message;

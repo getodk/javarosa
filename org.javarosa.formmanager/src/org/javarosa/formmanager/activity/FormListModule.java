@@ -11,9 +11,9 @@ import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
 
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaPlatform;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IModule;
+import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.storage.FormDefMetaData;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
@@ -25,7 +25,7 @@ import org.javarosa.formmanager.view.ViewTypes;
  * @author Brian DeRenzi
  *
  */
-public class FormListModule implements IModule {
+public class FormListModule implements IActivity {
 	private FormList formsList = null;
 	private Hashtable listOfForms = null;
 	private Vector formIDs = null;
@@ -87,7 +87,7 @@ public class FormListModule implements IModule {
 	
 	private void getXForms() {
 		
-		FormDefRMSUtility formDefRMSUtility = (FormDefRMSUtility) JavaRosaPlatform
+		FormDefRMSUtility formDefRMSUtility = (FormDefRMSUtility) JavaRosaServiceProvider
 				.instance().getStorageManager().getRMSStorageProvider()
 				.getUtility(FormDefRMSUtility.getUtilityName());
 		formDefRMSUtility.open();
@@ -136,7 +136,7 @@ public class FormListModule implements IModule {
 	public void resume(Context context) {
 		this.contextChanged(context);
 		//Possibly want to check for new/updated forms
-		JavaRosaPlatform.instance().showView(this.formsList);
+		JavaRosaServiceProvider.instance().showView(this.formsList);
 	}
 	public void destroy() {
 		
