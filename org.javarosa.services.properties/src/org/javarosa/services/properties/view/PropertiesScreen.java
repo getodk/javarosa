@@ -15,7 +15,7 @@ import javax.microedition.lcdui.TextField;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
-import org.javarosa.core.JavaRosaPlatform;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.properties.IPropertyRules;
 
 public class PropertiesScreen extends Form implements ItemStateListener {
@@ -44,7 +44,7 @@ public class PropertiesScreen extends Form implements ItemStateListener {
     }
 
     private void populateProperties() {
-		Vector rulesSets = JavaRosaPlatform.instance().getPropertyManager()
+		Vector rulesSets = JavaRosaServiceProvider.instance().getPropertyManager()
 				.getRules();
 		Enumeration en = rulesSets.elements();
 		while (en.hasMoreElements()) {
@@ -59,7 +59,7 @@ public class PropertiesScreen extends Form implements ItemStateListener {
 					String option = (String) options.elementAt(0);
 					if (rules.checkPropertyAllowed(option)) {
 						// this is a Dynamic property list, replace options
-						options = JavaRosaPlatform.instance()
+						options = JavaRosaServiceProvider.instance()
 								.getPropertyManager().getProperty(option);
 					}
 				}
@@ -67,7 +67,7 @@ public class PropertiesScreen extends Form implements ItemStateListener {
 				// Don't touch
 				System.out.println("Property: " + propertyName);
 				if (options.size() != 0) {
-					Vector propValues = JavaRosaPlatform.instance()
+					Vector propValues = JavaRosaServiceProvider.instance()
 							.getPropertyManager().getProperty(propertyName);
 					// We can easily add the functionality to use multiple
 					// possible choices here but
@@ -100,7 +100,7 @@ public class PropertiesScreen extends Form implements ItemStateListener {
 						this.append(newChoiceGroup);
 					}
 				} else {
-					Vector propValues = JavaRosaPlatform.instance()
+					Vector propValues = JavaRosaServiceProvider.instance()
 							.getPropertyManager().getProperty(propertyName);
 					// We can easily add the functionality to use multiple
 					// possible choices here but
@@ -209,7 +209,7 @@ public class PropertiesScreen extends Form implements ItemStateListener {
                 // This is a weird way to do this, but essentially works as long
                 // as there is only
                 // one possible property (which is true for now).
-                if (JavaRosaPlatform.instance().getPropertyManager().getProperty(propertyName)
+                if (JavaRosaServiceProvider.instance().getPropertyManager().getProperty(propertyName)
                         .contains(selection)) {
                     changes.remove(propertyName);
                 } else {
@@ -222,7 +222,7 @@ public class PropertiesScreen extends Form implements ItemStateListener {
             // This is a weird way to do this, but essentially works as long as
             // there is only
             // one possible property (which is true for now).
-            if (JavaRosaPlatform.instance().getPropertyManager().getProperty(propertyName).contains(
+            if (JavaRosaServiceProvider.instance().getPropertyManager().getProperty(propertyName).contains(
                     tf.toString())) {
                 changes.remove(propertyName);
             } else {

@@ -8,13 +8,13 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaPlatform;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IModule;
+import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.services.properties.view.PropertiesScreen;
 
-public class PropertyModule implements IModule, CommandListener {
+public class PropertyModule implements IActivity, CommandListener {
 	
 	private PropertiesScreen screen;
 	
@@ -68,7 +68,7 @@ public class PropertyModule implements IModule, CommandListener {
         while (iter.hasMoreElements()) {
             String propertyName = iter.nextElement().toString();
             String value = changes.get(propertyName).toString();
-            JavaRosaPlatform.instance().getPropertyManager().setProperty(propertyName, value);
+            JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propertyName, value);
             System.out.println("Property " + propertyName + " is now " + value);
         }
     }
