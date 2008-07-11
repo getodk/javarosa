@@ -85,7 +85,6 @@ public class FormDefRMSUtility extends RMSUtility {
 	/**
 	 * @return a list of form names that are stored in this RMS
 	 */
-	public
 	public Vector getListOfFormNames() {
 		Vector listOfNames = new Vector();
 		try {
