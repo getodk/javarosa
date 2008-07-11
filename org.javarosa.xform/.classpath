@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/kxml2-2.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/minixpath.jar"/>
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
