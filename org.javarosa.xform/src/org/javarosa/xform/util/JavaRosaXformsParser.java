@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import minixpath.XPathExpression;
 
+import org.javarosa.core.model.Condition;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
@@ -18,6 +19,7 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.OptionDef;
 import org.javarosa.core.model.QuestionData;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SkipRule;
 import org.javarosa.model.xform.XPathBinding;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.io.KXmlSerializer;
@@ -535,7 +537,7 @@ public class JavaRosaXformsParser{
 		Element rootNode = doc.getRootElement();
 		FormDef formDef = new FormDef();
 		Hashtable id2VarNameMap = new Hashtable();
-		Vector relevants = new Vector();
+		Hashtable relevants = new Hashtable();
 		parseElement(formDef,rootNode,id2VarNameMap,null,relevants);
 		if(formDef.getName() == null || formDef.getName().length() == 0)
 			formDef.setName(formDef.getVariableName());
@@ -617,7 +619,7 @@ public class JavaRosaXformsParser{
 		return formData;
 	}
 	
-	private static QuestionDef parseElement(FormDef formDef, Element element, Hashtable map,QuestionDef questionDef,Vector relevants){
+	private static QuestionDef parseElement(FormDef formDef, Element element, Hashtable map,QuestionDef questionDef,Hashtable relevants){
 		String label = ""; //$NON-NLS-1$
 		String value = ""; //$NON-NLS-1$
 		
@@ -666,7 +668,7 @@ public class JavaRosaXformsParser{
 					if(child.getAttributeValue(null, "relevant") != null) {
 						System.out.println("Relevant!" + child.getAttributeValue(null,"relevant"));
 						String relevancy = child.getAttributeValue(null, "relevant");
-						relevants.addElement(relevancy);
+						relevants.put(relevancy, binding);
 						binding.setRelevancy(relevancy);
 					}
 					binding.preload = child.getAttributeValue("http://openrosa.org/javarosa", "preload");
@@ -689,7 +691,7 @@ public class JavaRosaXformsParser{
 						}
 						if(child.getAttributeValue(null, "relevant") != null) {
 							String relevancy = child.getAttributeValue(null, "relevant");
-							relevants.addElement(relevancy);
+							relevants.put(relevancy, qtn.getBind());
 							((XPathBinding)qtn.getBind()).setRelevancy(relevancy);
 						}
 						questionDef = qtn;
@@ -753,8 +755,50 @@ public class JavaRosaXformsParser{
 		return null;
 	}*/
 	
-	private static void addSkipRules(FormDef formDef, Hashtable map, Vector relevants){
+	private static void addSkipRules(FormDef formDef, Hashtable map, Hashtable relevants){
 		Vector rules = new Vector();
+		//Rules is vector of strings that contain the "relevant=" thing
+		Enumeration en = relevants.keys();
+		byte ruleId = 0;
+		
+		while(en.hasMoreElements()) {
+			String relevant = (String)en.nextElement();
+			XPathBinding bind = (XPathBinding)relevants.get(relevant);
+			int split = relevant.indexOf("=");
+			if(split != -1) {
+				//TODO: Consolidate these by the relevant element: Many questionss depend on the same condition
+				String relevantQuestionPath = relevant.substring(0, split);
+				String relevantAnswer = relevant.substring(split+1, relevant.length()-1);
+				QuestionDef thetarget = (QuestionDef) formDef
+						.getQuestion(relevantQuestionPath);
+
+				if (thetarget != null) {
+					Vector conditions = new Vector();
+					Vector actionTargets = new Vector();
+
+					Condition condition = new Condition(ruleId, thetarget
+							.getId(), Constants.OPERATOR_EQUAL, relevantAnswer);
+					conditions.addElement(condition);
+
+					actionTargets.addElement(formDef.getQuestion(bind
+							.getNodeset()));
+
+					SkipRule rule = new SkipRule(ruleId, conditions,
+							Constants.ACTION_ENABLE, actionTargets, relevant);
+
+					rules.addElement(rule);
+					ruleId++;
+					System.out.println("New rule added: id: " + ruleId
+							+ " Conditions: " + conditions.toString()
+							+ " actionTargets : " + actionTargets.toString());
+				}
+			}
+			else {
+				//Is there a form of relevancy that isn't an equality?
+			}
+		}
+		
+		
 		formDef.setRules(rules);
 	}
 	
@@ -767,6 +811,7 @@ public class JavaRosaXformsParser{
 				//Potential default here?
 				qtn.setId(b.getId());
 				qtn.setBind(b);
+				qtn.setVariableName(b.getNodeset());
 				
 				if (b.preload != null) {
 					qtn.setDefaultValue(getPreloadValue(b.preload, (b.preloadParams == null ? "" : b.preloadParams)));
