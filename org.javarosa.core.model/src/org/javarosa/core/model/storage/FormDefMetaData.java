@@ -1,12 +1,3 @@
-/*
- * FormDefMetaData.java
- * 
- * Created on 2007/10/31, 11:31:57
- * 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.javarosa.core.model.storage;
 
 import java.io.DataInputStream;
@@ -17,7 +8,9 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 
 /**
- *
+ * Serializable Meta Data object for form definition records that 
+ * are saved in persistent storage.
+ *  
  * @author Clayton Sims
  */
 public class FormDefMetaData extends MetaDataObject
@@ -37,17 +30,28 @@ public class FormDefMetaData extends MetaDataObject
         
     }
     
+    /**
+     * Creates a new meta data entry for a form definition
+     * @param form The form def whose metadata is to be captured
+     */
     public FormDefMetaData(FormDef form)
     {
         this.formName = form.getName();
         
     }
     
+    /**
+     * Sets the name of the form definition that this meta data represents
+     * @param name The name to be used
+     */
     public void setName(String name)
     {
         this.formName = name;
     }
     
+    /**
+     * @return the name of the form definition that this meta data represents
+     */
     public String getName()
     {
        return this.formName; 
@@ -76,6 +80,10 @@ public class FormDefMetaData extends MetaDataObject
         out.writeInt(type);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.MetaDataObject#setMetaDataParameters(java.lang.Object)
+     */
     public void setMetaDataParameters(Object object)
     {
         FormDef form = (FormDef)object;
