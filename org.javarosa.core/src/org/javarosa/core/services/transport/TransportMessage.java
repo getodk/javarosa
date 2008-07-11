@@ -9,6 +9,7 @@ import org.javarosa.core.services.storage.utilities.Externalizable;
 import org.javarosa.core.util.Observable;
 
 /**
+ * A message received from a TransportUtility
  *
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
@@ -82,6 +83,8 @@ public class TransportMessage extends Observable implements Externalizable {
 	private int modelId;
 
 	/**
+	 * Creates a new message
+	 * 
 	 * @param payloadData
 	 * @param destination
 	 * @param sender
@@ -97,6 +100,8 @@ public class TransportMessage extends Observable implements Externalizable {
 	}
 
 	/**
+	 * Creates a new message
+	 * 
 	 * @param payloadData
 	 * @param destination
 	 * @param sender
@@ -112,7 +117,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	}
 
 	/**
-	 *
+	 * Creates a new, Empty, message
 	 */
 	public TransportMessage() {
 		super();
@@ -178,9 +183,9 @@ public class TransportMessage extends Observable implements Externalizable {
 		this.sender = sender;
 	}
 
-	/**
-	 * @param in
-	 * @throws IOException
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in) throws IOException {
 		int length = in.readInt();
@@ -198,9 +203,9 @@ public class TransportMessage extends Observable implements Externalizable {
 		in.read(this.replyloadData);
 	}
 
-	/**
-	 * @param out
-	 * @throws IOException
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(this.payloadData.length);

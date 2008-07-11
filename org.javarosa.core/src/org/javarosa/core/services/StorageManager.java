@@ -1,10 +1,5 @@
 package org.javarosa.core.services;
 
-/**
- * Largely derived from Cell Life's RMSManager
- * @author Clayton Sims
- */
-
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -12,46 +7,79 @@ import java.util.Vector;
 import org.javarosa.core.services.storage.IStorageProvider;
 import org.javarosa.core.services.storage.RMSProvider;
 
+/**
+ * Manages StorageProviders for JavaRosa, which maintain persistent
+ * data on a device.
+ * 
+ * Largely derived from Cell Life's RMSManager
+ * 
+ * @author Clayton Sims
+ *
+ */
 public class StorageManager implements IService
 {
     private Hashtable StorageRegistry = new Hashtable();
 	private RMSProvider rmsProvider;
+	
     /** Creates a new instance of StorageManager */
     public StorageManager()
     {
-        
+    	StorageRegistry = new Hashtable();
     }
     
     public String getName() {
     	return "Storage Manager";
     }
     
-    public void registerIStorageProvider(IStorageProvider utility)
+    /**
+     * Registers a storage provider with this Manager. Access
+     * to this provider in the future is granted from the provider's
+     * registered name.
+     * 
+     * @param provider The storage provider to be registered
+     */
+    public void registerIStorageProvider(IStorageProvider provider)
     {
-        if (this.StorageRegistry.containsKey(utility.getName()))
+        if (this.StorageRegistry.containsKey(provider.getName()))
             return;
     
-        this.StorageRegistry.put(utility.getName(), utility);            
+        this.StorageRegistry.put(provider.getName(), provider);            
     }
     
-    
-    public IStorageProvider getProvider(String name) throws NullPointerException
+    /**
+     * Retrieves a provider from the storage manager using its name
+     * 
+     * @param name The name of the provider to be retrieved
+     * @return The StorageProvider, if it is currently registered
+     * with this manager. null otherwise.
+     */
+    public IStorageProvider getProvider(String name)
     {
         if (this.StorageRegistry.containsKey(name))
             return (IStorageProvider)this.StorageRegistry.get(name);
         else
         {
-            throw new NullPointerException();
+            return null;
         }
     }
     
     
-    public int getNumberOfRegisteredUtilities()
+    /**
+     * Gets the number of providers currently registered with this manager.
+     * 
+     * @return The number of providers currently registered
+     */
+    public int getNumberOfRegisteredProviders()
     {
         return this.StorageRegistry.size();
     }
 
-    
+    /**
+     * Gets the names of all providers currently registered with this manager.
+     * 
+     * @return A vector containing strings that are the names of all providers
+     * that are currently registered with this manager.
+     */
     public Vector getProviderNames()
     {
        Vector utilityNames = new Vector();
@@ -65,7 +93,9 @@ public class StorageManager implements IService
     }
     
     /**
-     * RMS Storage is part of core, so it gets special treatment.
+     * RMS Storage is part of core, so it gets special treatment and can be
+     * retrieved with a simple reference, rather than through the getProvider
+     * interface.
      * 
      * @return An RMSStorageProvider instance
      */

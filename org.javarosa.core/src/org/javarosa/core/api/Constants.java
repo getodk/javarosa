@@ -1,5 +1,15 @@
 package org.javarosa.core.api;
 
+/**
+ * This file is a set of constants for the JavaRosa Core platform.
+ * 
+ * It should contain constants only pertaining to core usage of JavaRosa's
+ * core classes, including Module and Shell return codes, and indexes for
+ * the core context.
+ * 
+ * @author Clayton Sims
+ *
+ */
 public class Constants {
 	/**
 	 * Activity Return Codes

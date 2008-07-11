@@ -1,7 +1,7 @@
 package org.javarosa.core.util;
 
 /**
- * 
+ * Observation interface for the observer
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
 public interface Observer {

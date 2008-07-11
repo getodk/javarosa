@@ -123,7 +123,7 @@ public class PropertyRMSUtility extends RMSUtility {
     }
     
     /**
-     * Writes a string value to a given property. Creates the property record if none exists
+     * Writes a Vector value to a given property. Creates the property record if none exists
      *  
      * @param propertyName The name of the property to be written
      * @param value The value of the property

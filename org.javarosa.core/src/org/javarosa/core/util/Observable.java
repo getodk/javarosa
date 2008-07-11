@@ -3,6 +3,7 @@ package org.javarosa.core.util;
 import java.util.Vector;
 
 /**
+ * Observable object interface
  * 
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */

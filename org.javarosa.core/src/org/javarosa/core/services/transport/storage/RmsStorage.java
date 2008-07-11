@@ -14,6 +14,7 @@ import org.javarosa.core.services.transport.Storage;
 import org.javarosa.core.services.transport.TransportMessage;
 
 /**
+ * A Storage type for Transport Messages that utilizes RMS storage
  * 
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */

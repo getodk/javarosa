@@ -11,15 +11,27 @@ import org.javarosa.core.services.properties.storage.PropertyRMSUtility;
  * from persistent storage.
  *
  * Which properties are allowed, and what they can be set to, can be specified by an implementation of
- * the IPropertyRules interface.
+ * the IPropertyRules interface, any number of which can be registered with a property manager. All 
+ * property rules are inclusive, and can only increase the number of potential properties or property
+ * values.
  *
  * @author ctsims
  *
  */
 public class PropertyManager implements IService {
-    public static final String PROPERTY_RMS = "PROPERTY_RMS_NEW";
+	/**
+	 * The name for the Persistent storage utility name
+	 */
+    public static final String PROPERTY_RMS = "PROPERTY_RMS";
 
+    /**
+     * The list of rules 
+     */
     private Vector rulesList;
+    
+    /**
+     * The persistent storage utility
+     */
     private PropertyRMSUtility propertyRMS;
     
     public String getName() {
@@ -35,11 +47,11 @@ public class PropertyManager implements IService {
     }
 
     /**
-     * Retrieves the singular property specified, as long as it exists in the current ruleset if one exists.
+     * Retrieves the singular property specified, as long as it exists in one of the current rulesets
      *
      * @param propertyName the name of the property being retrieved
-     * @return The String value of the property specified if it exists, is singluar, and is the current ruleset.
-     * null if the property is denied by the current ruleset, or is a vector.
+     * @return The String value of the property specified if it exists, is singluar, and is in one the current
+     * rulessets. null if the property is denied by the current ruleset, or is a vector.
      */
     public String getSingularProperty(String propertyName) {
         if((rulesList.size() == 0 || checkPropertyAllowed(propertyName)) && propertyRMS.getValue(propertyName).size() == 1) {
@@ -53,7 +65,7 @@ public class PropertyManager implements IService {
 
     
     /**
-     * Retrieves the property specified, as long as it exists in the current ruleset if one exists.
+     * Retrieves the property specified, as long as it exists in one of the current rulesets
      *
      * @param propertyName the name of the property being retrieved
      * @return The String value of the property specified if it exists, and is the current ruleset, if one exists.
@@ -112,14 +124,15 @@ public class PropertyManager implements IService {
     /**
      * Retrieves the set of rules being used by this property manager if any exist.
      *
-     * @return The ruleset being used by this property manager if one exists, null otherwise
+     * @return The rulesets being used by this property manager
      */
     public Vector getRules(){
         return rulesList;
     }
 
     /**
-     * Sets the rules that should be used by this PropertyManager.
+     * Sets the rules that should be used by this PropertyManager, removing any other
+     * existing rules sets.
      *
      * @param rules The rules to be used. 
      */
@@ -141,6 +154,12 @@ public class PropertyManager implements IService {
     	}
     }
     
+    /**
+     * Checks that a property is permitted to exist by any of the existing rules sets
+     * 
+     * @param propertyName The name of the property to be set
+     * @return true if the property is permitted to store values. false otherwise
+     */
     public boolean checkPropertyAllowed(String propertyName) {
     	if(rulesList.size() == 0) {
     		return true;
@@ -157,6 +176,13 @@ public class PropertyManager implements IService {
     	}
     }
     
+    /**
+     * Checks that a property is allowed to store a certain value.
+     * 
+     * @param propertyName The name of the property to be set
+     * @param propertyValue The value to be stored in the given property
+     * @return true if the property given is allowed to be stored. false otherwise.
+     */
     public boolean checkValueAllowed(String propertyName,
 			String propertyValue) {
 		if (rulesList.size() == 0) {

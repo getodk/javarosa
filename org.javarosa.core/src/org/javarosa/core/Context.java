@@ -14,7 +14,8 @@ import org.javarosa.core.api.Constants;
  * 
  * The context may be extended to provide hooks for valuable module-based
  * variables. Extended contexts can absorb root concepts using the provided
- * copy constructor
+ * copy constructor, and can absorb context values and report which have 
+ * changed using the provided merge function.
  * 
  * @author Clayton Sims
  *
@@ -47,6 +48,7 @@ public class Context {
 	
 	/**
 	 * Gets the context value for the current user
+	 * 
 	 * @return The current user 
 	 */
 	public String getCurrentUser() {
@@ -55,6 +57,7 @@ public class Context {
 	
 	/**
 	 * Sets the context value for the current user
+	 * 
 	 * @param name The current user
 	 */
 	public void setCurrentUser(String name) {
@@ -88,6 +91,7 @@ public class Context {
 	
 	/**
 	 * Removes a given element from the Context
+	 * 
 	 * @param key The name of the value
 	 */
 	public void removeElement(String key) {

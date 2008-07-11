@@ -1,16 +1,16 @@
-/**
- * 
- */
 package org.javarosa.core.api;
 
 import org.javarosa.core.Context;
 
 
 /**
+ * An activity encapsulates a discrete execution unit, with the
+ * ability to capture and release control flow from a shell.
+ * 
  * @author Brian DeRenzi
  *
  */
-public interface IModule {
+public interface IActivity {
 
 	/**
 	 * Starts the module with the current context.

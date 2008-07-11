@@ -1,22 +1,19 @@
 package org.javarosa.core.services.storage.utilities;
 
-/*
- * IDRecordable.java
- *
- * Created on September 13, 2007, 9:31 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 /**
- *
+ * IDRecordable classes represent a record with an integer
+ * ID.  
+ *   
  * @author Munier
  */
 public interface IDRecordable
 {
     
-    /** Creates a new instance of IDRecordable */
+    /**
+     * Sets the id for this record.
+     * 
+     * @param recordId The Id to be used for  current record.
+     */
     public abstract void setRecordId(int recordId);
     
 }

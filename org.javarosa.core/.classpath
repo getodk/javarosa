@@ -6,7 +6,5 @@
 	<classpathentry kind="lib" path="lib/cldc_crypto.zip"/>
 	<classpathentry kind="lib" path="lib/cldc_classes.zip"/>
 	<classpathentry kind="con" path="J2MELIB"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
