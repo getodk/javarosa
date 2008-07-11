@@ -4,7 +4,7 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
-import org.javarosa.core.JavaRosaPlatform;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IShell;
 import org.javarosa.demo.shell.JavaRosaDemoShell;
 
@@ -37,8 +37,8 @@ public class JavaRosaDemoMidlet extends MIDlet {
 		shell = new JavaRosaDemoShell();
 
 		// Do NOT edit below
-		JavaRosaPlatform.instance().initialize();
-		JavaRosaPlatform.instance().setDisplay(Display.getDisplay(this));
+		JavaRosaServiceProvider.instance().initialize();
+		JavaRosaServiceProvider.instance().setDisplay(Display.getDisplay(this));
 		shell.run();
 		((JavaRosaDemoShell)shell).setRunningAssembly(this);
 	}

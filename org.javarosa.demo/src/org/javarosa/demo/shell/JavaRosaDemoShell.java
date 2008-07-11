@@ -8,9 +8,9 @@ import javax.microedition.midlet.MIDlet;
 import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaPlatform;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IModule;
+import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
@@ -46,7 +46,7 @@ public class JavaRosaDemoShell implements IShell {
 	
 	Context context;
 	
-	IModule currentModule;
+	IActivity currentModule;
 
 	public JavaRosaDemoShell() {
 		stack = new WorkflowStack(); 
@@ -77,11 +77,11 @@ public class JavaRosaDemoShell implements IShell {
 	
 	private void init() {
 		
-		JavaRosaPlatform.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
-		JavaRosaPlatform.instance().getPropertyManager().addRules(new DemoAppProperties());
-		JavaRosaPlatform.instance().getPropertyManager().addRules(new HttpTransportProperties());
+		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
+		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new DemoAppProperties());
+		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new HttpTransportProperties());
 		
-		JavaRosaPlatform.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
+		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 		
 		FormDataRMSUtility formData = new FormDataRMSUtility(FormDataRMSUtility.getUtilityName());
 		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
@@ -97,19 +97,19 @@ public class JavaRosaDemoShell implements IShell {
 					.getFormFromResource("/shortform.xhtml"));
 		}
 		System.out.println("Done Loading Forms");
-		JavaRosaPlatform.instance().getStorageManager().getRMSStorageProvider()
+		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider()
 				.registerRMSUtility(formData);
-		JavaRosaPlatform.instance().getStorageManager().getRMSStorageProvider()
+		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider()
 				.registerRMSUtility(formDef);
 		System.out.println("Done registering");
 	}
 	
-	private void workflow(IModule lastModule, String returnCode, Hashtable returnVals) {
+	private void workflow(IActivity lastModule, String returnCode, Hashtable returnVals) {
 		//TODO: parse any returnvals into context
 		if(stack.size() != 0) {
-			IModule module = stack.pop();
-			this.currentModule = module;
-			module.resume(context);
+			IActivity activity = stack.pop();
+			this.currentModule = activity;
+			activity.resume(context);
 		}
 		else {
 			// TODO Auto-generated method stub
@@ -188,18 +188,18 @@ public class JavaRosaDemoShell implements IShell {
 	/* (non-Javadoc)
 	 * @see org.javarosa.shell.IShell#moduleCompeleted(org.javarosa.module.IModule)
 	 */
-	public void returnFromModule(IModule module, String returnCode, Hashtable returnVals) {
-		module.halt();
-		System.out.println("Module: " + module + " returned with code " + returnCode);
-		workflow(module, returnCode, returnVals);
+	public void returnFromModule(IActivity activity, String returnCode, Hashtable returnVals) {
+		activity.halt();
+		System.out.println("Module: " + activity + " returned with code " + returnCode);
+		workflow(activity, returnCode, returnVals);
 		if(returnCode == Constants.ACTIVITY_SUSPEND || returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-			stack.push(module);
+			stack.push(activity);
 		}
 	}
 
-	public void setDisplay(IModule callingModule, Displayable display) {
+	public void setDisplay(IActivity callingModule, Displayable display) {
 		if(callingModule == currentModule) {
-			JavaRosaPlatform.instance().getDisplay().setCurrent(display);
+			JavaRosaServiceProvider.instance().getDisplay().setCurrent(display);
 		}
 		else {
 			System.out.println("Module: " + callingModule + " attempted, but failed, to set the display");
