@@ -10,8 +10,8 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaPlatform;
-import org.javarosa.core.api.IModule;
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 
 import de.enough.polish.ui.splash.ApplicationInitializer;
@@ -21,7 +21,7 @@ import de.enough.polish.ui.splash.InitializerSplashScreen;
  * @author Brian DeRenzi
  *
  */
-public class SplashScreenModule implements IModule, ApplicationInitializer {
+public class SplashScreenModule implements IActivity, ApplicationInitializer {
 
 	private IShell parent = null;
 	private String picture = null;
@@ -44,7 +44,7 @@ public class SplashScreenModule implements IModule, ApplicationInitializer {
 			//Set readyMessage = null to forward to the next
 			//displayabe as soon as it's available
 			int messageColor = 0xFF0000;
-			InitializerSplashScreen splashScreen = new InitializerSplashScreen(JavaRosaPlatform.instance().getDisplay(),
+			InitializerSplashScreen splashScreen = new InitializerSplashScreen(JavaRosaServiceProvider.instance().getDisplay(),
 					image, backgroundColor, readyMessage, messageColor, this);
 			parent.setDisplay(this, splashScreen);
 			} catch (IOException e) {
