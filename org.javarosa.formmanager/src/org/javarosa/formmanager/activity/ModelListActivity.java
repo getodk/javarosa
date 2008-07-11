@@ -43,7 +43,7 @@ import org.javarosa.core.services.transport.TransportMessage;
  *
  * @author Munier
  */
-public class ModelListModule extends List implements CommandListener, IActivity
+public class ModelListActivity extends List implements CommandListener, IActivity
 {
 	
 	public final static String returnKey = "ModelListReturnCommand";
@@ -93,7 +93,7 @@ public class ModelListModule extends List implements CommandListener, IActivity
 	private Image failedImage;
 
 
-    public ModelListModule(IShell mainShell)
+    public ModelListActivity(IShell mainShell)
     {
         super("Saved Forms", List.EXCLUSIVE);
         this.mainShell = mainShell;

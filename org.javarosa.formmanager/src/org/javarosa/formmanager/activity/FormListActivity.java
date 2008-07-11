@@ -25,7 +25,7 @@ import org.javarosa.formmanager.view.ViewTypes;
  * @author Brian DeRenzi
  *
  */
-public class FormListModule implements IActivity {
+public class FormListActivity implements IActivity {
 	private FormList formsList = null;
 	private Hashtable listOfForms = null;
 	private Vector formIDs = null;
@@ -33,7 +33,7 @@ public class FormListModule implements IActivity {
 	
 	Context context;
 	
-	public FormListModule(IShell p, String title) {
+	public FormListActivity(IShell p, String title) {
 		this.parent = p;
 		this.formsList = new FormList(this,title);
 	}

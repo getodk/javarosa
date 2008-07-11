@@ -11,7 +11,7 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import org.javarosa.formmanager.activity.FormListModule;
+import org.javarosa.formmanager.activity.FormListActivity;
 
 /**
  * @author Brian DeRenzi
@@ -26,13 +26,13 @@ public class FormList extends List implements CommandListener {
     private final Command CMD_SHAREFORMS = new Command("Share Forms", Command.SCREEN, 2);
     private final Command CMD_SETTINGS = new Command("Settings", Command.SCREEN, 3);
     
-    private FormListModule parent = null;
+    private FormListActivity parent = null;
     
-	public FormList(FormListModule p, String title) {
+	public FormList(FormListActivity p, String title) {
 		this(p, title, List.IMPLICIT);
 	}
 
-	public FormList(FormListModule p, String title, int listType) {
+	public FormList(FormListActivity p, String title, int listType) {
 		
 		super(title, listType);
 		this.parent = p;

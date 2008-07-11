@@ -30,7 +30,7 @@ import org.javarosa.formmanager.utility.TransportContext;
  *
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
-public class FormTransportModule implements
+public class FormTransportActivity implements
 		CommandListener, MessageListener, IActivity {
 
 	/**
@@ -95,7 +95,7 @@ public class FormTransportModule implements
 	 * (non-Javadoc)
 	 *
 	 */
-	public FormTransportModule(IShell parentShell) {
+	public FormTransportActivity(IShell parentShell) {
 		this.shell = parentShell;
 	}
 	
