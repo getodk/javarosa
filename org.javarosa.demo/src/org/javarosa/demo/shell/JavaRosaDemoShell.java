@@ -20,9 +20,9 @@ import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.module.SplashScreenModule;
 import org.javarosa.demo.properties.DemoAppProperties;
-import org.javarosa.formmanager.activity.FormListModule;
-import org.javarosa.formmanager.activity.FormTransportModule;
-import org.javarosa.formmanager.activity.ModelListModule;
+import org.javarosa.formmanager.activity.FormListActivity;
+import org.javarosa.formmanager.activity.FormTransportActivity;
+import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.services.properties.activity.PropertyModule;
@@ -36,10 +36,10 @@ import org.javarosa.xform.util.XFormUtils;
 public class JavaRosaDemoShell implements IShell {
 	// List of views that are used by this shell
 	MIDlet runningAssembly;
-	FormListModule formModule = null;
+	FormListActivity formModule = null;
 	SplashScreenModule splashScreen = null;
-	FormTransportModule formTransport = null;
-	ModelListModule modelModule = null;
+	FormTransportActivity formTransport = null;
+	ModelListActivity modelModule = null;
 	PropertyModule propertyModule = null;
 	
 	WorkflowStack stack;
@@ -62,10 +62,10 @@ public class JavaRosaDemoShell implements IShell {
 		System.out.println("done init");
 		this.splashScreen = new SplashScreenModule(this, "/splash.gif");
 		System.out.println("done splash init");
-		this.formModule = new FormListModule(this,"Forms List");
+		this.formModule = new FormListActivity(this,"Forms List");
 		System.out.println("Done formlist init");
-		this.formTransport = new FormTransportModule(this);
-		this.modelModule = new ModelListModule(this);
+		this.formTransport = new FormTransportActivity(this);
+		this.modelModule = new ModelListActivity(this);
 		
 		this.propertyModule = new PropertyModule(this);
 		
@@ -119,8 +119,8 @@ public class JavaRosaDemoShell implements IShell {
 			}
 			if (lastModule == this.modelModule) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-					Object returnVal = returnVals.get(ModelListModule.returnKey);
-					if (returnVal == ModelListModule.CMD_MSGS) {
+					Object returnVal = returnVals.get(ModelListActivity.returnKey);
+					if (returnVal == ModelListActivity.CMD_MSGS) {
 						// Go to the FormTransport Module look at messages.
 						TransportContext msgContext = new TransportContext(
 								context);
@@ -132,13 +132,13 @@ public class JavaRosaDemoShell implements IShell {
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
 					// A Model was selected for some purpose
 					Object returnVal = returnVals
-							.get(ModelListModule.returnKey);
-					if (returnVal == ModelListModule.CMD_EDIT) {
+							.get(ModelListActivity.returnKey);
+					if (returnVal == ModelListActivity.CMD_EDIT) {
 						// Load the Form Entry Module, and feed it the form data
 						FormDef form = (FormDef) returnVals.get("form");
 						FormData data = (FormData) returnVals.get("data");
 					}
-					if (returnVal == ModelListModule.CMD_SEND) {
+					if (returnVal == ModelListActivity.CMD_SEND) {
 						FormData data = (FormData) returnVals.get("data");
 						formTransport.setData(data);
 						TransportContext msgContext = new TransportContext(
@@ -151,8 +151,8 @@ public class JavaRosaDemoShell implements IShell {
 			}
 			if (lastModule == this.formTransport) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-					String returnVal = (String)returnVals.get(FormTransportModule.RETURN_KEY);
-					if(returnVal == FormTransportModule.VIEW_MODELS) {
+					String returnVal = (String)returnVals.get(FormTransportActivity.RETURN_KEY);
+					if(returnVal == FormTransportActivity.VIEW_MODELS) {
 						currentModule = this.modelModule;
 						this.modelModule.start(context);
 					}
