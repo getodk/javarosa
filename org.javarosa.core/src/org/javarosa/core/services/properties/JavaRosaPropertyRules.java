@@ -4,16 +4,18 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaPlatform;
+import org.javarosa.core.JavaRosaServiceProvider;
 
 /**
- * A set of rules for the properties for default JavaRosa applications
- *
+ * A set of rules governing the allowable properties for JavaRosa's
+ * core funtionality. 
+ * 
  * @author ctsims
  *
  */
 public class JavaRosaPropertyRules implements IPropertyRules {
     Hashtable rules;
+    
     Vector readOnlyProperties;
     
     public final static String DEVICE_ID_PROPERTY = "DeviceID";
@@ -48,7 +50,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
             //Check whether this is a dynamic property
             if(prop.size() == 1 && checkPropertyAllowed((String)prop.elementAt(0))) {
                 // If so, get its list of available values, and see whether the potentival value is acceptable.
-                return ((Vector)JavaRosaPlatform.instance().getPropertyManager().getProperty((String)prop.elementAt(0))).contains(potentialValue);
+                return ((Vector)JavaRosaServiceProvider.instance().getPropertyManager().getProperty((String)prop.elementAt(0))).contains(potentialValue);
             }
             else {
                 return ((Vector)rules.get(propertyName)).contains(potentialValue);

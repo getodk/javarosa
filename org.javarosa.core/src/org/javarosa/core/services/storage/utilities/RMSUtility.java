@@ -1,16 +1,3 @@
-/*
- * RMSUtility.java
- *
- * Created on September 10, 2007, 5:59 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
-/**
- *
- * @author Munier
- */
 package org.javarosa.core.services.storage.utilities;
 
 import java.io.IOException;
@@ -23,10 +10,17 @@ import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 
-
+/**
+ * RMS Utilities are responsible for the persistent storage
+ * of serialized data objects. The utility opens connections
+ * to RMS storage, writes and retrieves records based on integer
+ * Id's, and closes the connection
+ * 
+ * @author Munier
+ *
+ */
 public class RMSUtility implements RecordListener
 {
-
     public static final int RMS_TYPE_STANDARD = 0;
     public static final int RMS_TYPE_META_DATA = 1;
     /** Creates a new instance of RMSUtility */
@@ -35,6 +29,12 @@ public class RMSUtility implements RecordListener
     protected RMSUtility metaDataRMS;
     protected RecordStore recordStore = null;
 
+    /**
+     * Constructs a new RMS Utility
+     * 
+     * @param name The unique name of this Utility
+     * @param iType Whether this utility is a standard or metadata utility
+     */
     public RMSUtility(String name, int iType)
     {
         this.RS_NAME = name;
@@ -48,11 +48,19 @@ public class RMSUtility implements RecordListener
         System.out.println("RMS SIZE (" + this.RS_NAME + ") : " + this.getNumberOfRecords());
     }
 
+    /**
+     * Gets the unique name of this utility
+     * 
+     * @return The unique name for this RMS utility
+     */
     public String getName()
     {
         return this.RS_NAME;
     }
 
+    /**
+     * Opens the record store on the device.
+     */
     public void open()
     {
         if (this.recordStore == null)
@@ -69,6 +77,9 @@ public class RMSUtility implements RecordListener
         }
     }
 
+    /**
+     * Closes the connection to the record store on the device
+     */
     public void close()
     {
         if (this.recordStore != null)
@@ -94,6 +105,13 @@ public class RMSUtility implements RecordListener
         }
     }
 
+    /**
+     * Writes the given object to the RMS, along with writing the 
+     * given metadata object to its respective RMS
+     * 
+     * @param obj The Externalizable object to be written
+     * @param metaDataObject The meta data descriptor for the given object
+     */
     public void writeToRMS(Object obj,
                            MetaDataObject metaDataObject)
     {
@@ -125,6 +143,14 @@ public class RMSUtility implements RecordListener
         }
     }
     
+    /**
+     * Updates the given record in the RMS, along with its metadata
+     * object.
+     * 
+     * @param recordId The record ID for the given object
+     * @param obj The Externalizable object associated wtih recordId
+     * @param metaDataObject The meta data descriptor for the object
+     */
     public void updateToRMS(int recordId, Object obj,
     		MetaDataObject metaDataObject)
     {
@@ -154,7 +180,12 @@ public class RMSUtility implements RecordListener
     	}
     }
     
-    
+    /**
+     * Writes a block of data bytes to the rms.
+     * 
+     * @param data The block of data to be written
+     * @param metaDataObject The meta data descriptor for the data block
+     */
     public void writeBytesToRMS(byte [] data, MetaDataObject metaDataObject)
     {
     	try
@@ -175,6 +206,11 @@ public class RMSUtility implements RecordListener
 
     }
 
+    /**
+     * Removes a record from persistent storage
+     * 
+     * @param recordId The Id of the record to be removed
+     */
     public void deleteRecord(int recordId)
     {
         try
@@ -199,6 +235,10 @@ public class RMSUtility implements RecordListener
         }
     }
 
+    /**
+     * Removes this RecordStore, and its associated MetaData RecordStore
+     * from persistent storage.
+     */
     public void delete()
     {
         try
@@ -223,6 +263,16 @@ public class RMSUtility implements RecordListener
         }
     }
 
+    /**
+     * Retrieves the record associated with the given record ID, and stores
+     * it in hte given object
+     * @param recordId The record Id for the record to be returned
+     * @param externalizableObject The object in which the deserialzed record
+     * will be stored
+     * @throws IOException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
     public void retrieveFromRMS(int recordId,
                                 Externalizable externalizableObject) throws IOException, IllegalAccessException, InstantiationException
     {
@@ -251,6 +301,13 @@ public class RMSUtility implements RecordListener
 
     }
 
+    /**
+     * Retrieves a block of bytes from the RecordStore associated with the
+     * given recordId 
+     * @param recordId The Id of the record to be retrieved
+     * @return The set of bytes associated with recordId
+     * @throws IOException Thrown if the RecordStore fails to retreive any data
+     */
     public byte[] retrieveByteDataFromRMS(int recordId) throws IOException
     {
         try
@@ -266,7 +323,13 @@ public class RMSUtility implements RecordListener
 
     }
 
-    
+    /**
+     * Retrieves the Meta Data associated with the given recordId from this
+     * utility's Meta Data RecordStore 
+     * 
+     * @param recordId The id of the record whose meta data will be returned
+     * @param externalizableObject The meta data associated with the given record Id
+     */
     public void retrieveMetaDataFromRMS(int recordId,
                                         Externalizable externalizableObject)
     {
@@ -290,6 +353,11 @@ public class RMSUtility implements RecordListener
         }
     }
 
+    /**
+     * Gets the total number of records stored by this RMS Utility
+     * 
+     * @return The total number of records that can be retreived
+     */
     public int getNumberOfRecords()
     {
         int numRecords = 0;
@@ -305,18 +373,36 @@ public class RMSUtility implements RecordListener
         return numRecords;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see javax.microedition.rms.RecordListener#recordAdded(javax.microedition.rms.RecordStore, int)
+     */
     public void recordAdded(RecordStore recordStore, int i)
     {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see javax.microedition.rms.RecordListener#recordChanged(javax.microedition.rms.RecordStore, int)
+     */
     public void recordChanged(RecordStore recordStore, int i)
     {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see javax.microedition.rms.RecordListener#recordDeleted(javax.microedition.rms.RecordStore, int)
+     */
     public void recordDeleted(RecordStore recordStore, int i)
     {
     }
 
+    /**
+     * Returns an enumeration of the meta data for the objects 
+     * stored in this RMS Utility.
+     * 
+     * @return a RecordEnumeration of the MetaData stored in this utility
+     */
     public RecordEnumeration enumerateMetaData() {
     	//TODO check if need to open / close
 		if (this.iType == this.RMS_TYPE_STANDARD){
@@ -337,6 +423,13 @@ public class RMSUtility implements RecordListener
 		return null;
 	}
     
+    /**
+     * Gets the ID of the next record that will be stored
+     * in this Utility
+     * 
+     * @return an integer value of the id that will be associated
+     * with the next object stored in this Utility
+     */
     public int getNextRecordID(){
     	this.open();
     	
@@ -352,6 +445,9 @@ public class RMSUtility implements RecordListener
 		return -1;
     }
     
+    /**
+     * Empty's the set of records for this Utility
+     */
 	public void tempEmpty() {
 		
 		this.open();

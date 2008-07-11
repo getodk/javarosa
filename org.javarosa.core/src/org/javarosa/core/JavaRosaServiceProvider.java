@@ -12,14 +12,15 @@ import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.transport.storage.RmsStorage;
 
 /**
- * The main JavaRosaPlatform.  This is a singleton class, ensuring that there is only one.
- * The design pattern came from:
- * http://en.wikipedia.org/wiki/Singleton_pattern
+ * JavaRosaServiceProvider is a singleton class that grants access to JavaRosa's
+ * core services, Storage, Transport, and Property Management. New services can
+ * also be registered with the Service Provider.
+ * 
  * @author Brian DeRenzi
  *
  */
-public class JavaRosaPlatform {
-	protected static JavaRosaPlatform instance;
+public class JavaRosaServiceProvider {
+	protected static JavaRosaServiceProvider instance;
 
 	private Display display;
 	
@@ -29,13 +30,13 @@ public class JavaRosaPlatform {
 	
 	Hashtable services;
 	
-	public JavaRosaPlatform() {
+	public JavaRosaServiceProvider() {
 		services = new Hashtable();
 	}
 	
-	public static JavaRosaPlatform instance() {
+	public static JavaRosaServiceProvider instance() {
 		if(instance == null) {
-			instance = new JavaRosaPlatform();
+			instance = new JavaRosaServiceProvider();
 		}
 		return instance;
 	}

@@ -45,11 +45,13 @@ public interface IPropertyRules {
     public boolean checkPropertyAllowed(String propertyName);
     
     /**
-     * Identifies whether the given property is read-only for end-users
+     * Identifies whether the property should be revealed to users. Note
+     * that this does not govern whether the value can be set, simply
+     * whether it should be set manually by users.
      * 
      * @param propertyName The name of the property that is being tested
      * 
-     * @return True if the property specified may not be modified by the user. False otherwise
+     * @return True if the property specified may not be modified by the user. false otherwise
      */
     public boolean checkPropertyUserReadOnly(String propertyName);
 }

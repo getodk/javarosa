@@ -1,6 +1,7 @@
 package org.javarosa.core.services.transport;
 
 /**
+ * Listener interface for messages
  * 
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */

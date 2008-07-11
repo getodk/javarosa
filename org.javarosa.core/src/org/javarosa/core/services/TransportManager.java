@@ -12,7 +12,10 @@ import org.javarosa.core.util.Observable;
 import org.javarosa.core.util.Observer;
 
 /**
- *
+ * The transport manager is responsible for the registration of different
+ * transport methods, which deal with receiving and transmitting data
+ * from various sources.
+ * 
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
 public class TransportManager implements Observer, IService {
@@ -29,12 +32,12 @@ public class TransportManager implements Observer, IService {
 	private Hashtable transportMethods = new Hashtable();
 
 	/**
-	 *
+	 * Listens for messages from different transport methods
 	 */
 	private MessageListener messageListener;
 
 	/**
-	 *
+	 * A storage element for placing received messages
 	 */
 	private Storage storage;
 
@@ -56,21 +59,26 @@ public class TransportManager implements Observer, IService {
 	}
 
 	/**
-	 * @param data
-	 * @param destination
-	 * @param transportMethod
-	 * @throws IOException
+	 * Enqueues a block of data to be transmitted using the given transport method.
+	 * 
+	 * @param data The block of data to be transmitted
+	 * @param destination The destination for the given data
+	 * @param transportMethod the ID of a TransportMethod registered with this manager
+	 * @param formDataId The ID of the form that should be transmitted
+	 * @throws IOException If the transport method requested is not available 
 	 */
-	public void enqueue(byte[] data, String destination, int transportMethod, int modelId)
+	public void enqueue(byte[] data, String destination, int transportMethod, int formDataId)
 			throws IOException {
-		TransportMessage message = new TransportMessage(data, destination, ID, modelId);
+		TransportMessage message = new TransportMessage(data, destination, ID, formDataId);
 		enqueue(message, transportMethod);
 	}
 
 	/**
-	 * @param message
-	 * @param transportMethod
-	 * @throws IOException
+	 * Enqueues a TransportMessage to be transmitted using the given transport method.
+	 * 
+	 * @param message The message to be sent
+	 * @param transportMethod the ID of a TransportMethod registered with this manager
+	 * @throws IOException If the transport method requested is not available 
 	 */
 	private void enqueue(TransportMessage message, int transportMethod)
 			throws IOException {
@@ -86,13 +94,25 @@ public class TransportManager implements Observer, IService {
 	}
 
 	/**
-	 *
+	 * Returns a TransportMethod registered with this Manager
+	 * 
+	 * @param transportMethod The ID of the transport method being
+	 * requested
+	 * 
+	 * @return A TransportMethod corresponding to the given 
+	 * ID, registered with this manager. null if none exists 
 	 */
 	public TransportMethod getTransportMethod(int transportMethod) {
 		return (TransportMethod) transportMethods.get(new Integer(
 				transportMethod));
 	}
 
+	/**
+	 * Fires a string to the current message listener
+	 * 
+	 * @param string The message to be shown
+	 * @param messageType The type of the given message
+	 */
 	public void showMessage(String string, int messageType) {
 		if (messageListener != null) {
 			messageListener.onMessage(string, messageType);
@@ -100,6 +120,8 @@ public class TransportManager implements Observer, IService {
 	}
 
 	/**
+	 * Sets a new message listener for this manager.
+	 * 
 	 * @param messageListener
 	 *            the messageListener to set
 	 */
@@ -107,13 +129,19 @@ public class TransportManager implements Observer, IService {
 		this.messageListener = messageListener;
 	}
 
+	/**
+	 * Starts a Bluetooth server on the current device
+	 */
 	public void startBluetoothServer() {
 		// new BluetoothTransportMethod().startServer(this);
 	}
 
 	/**
-	 * @param message
-	 * @param http
+	 * Sends a message using the given transport method
+	 * 
+	 * @param message The message to be transmitted
+	 * @param transportMethod the ID of a TransportMethod registered
+	 * with this manager to be used to transmit the given message
 	 */
 	public void send(TransportMessage message, int transportMethod) {
 		TransportMethod method = getTransportMethod(transportMethod);
@@ -122,7 +150,10 @@ public class TransportManager implements Observer, IService {
 	}
 
 	/**
-	 * @param transportMethod
+	 * Registers a new TransportMethod with this manager, able to be retrieved
+	 * by the method's Id.
+	 * 
+	 * @param transportMethod The method to be registered
 	 */
 	public void registerTransportMethod(TransportMethod transportMethod) {
 		transportMethods.put(new Integer(transportMethod.getId()),
@@ -130,13 +161,19 @@ public class TransportManager implements Observer, IService {
 	}
 
 	/**
-	 * @param transportMethod
+	 * Removes the given TransportMethod from this manager, if it is currently
+	 * registered.
+	 * 
+	 * @param transportMethod The method to be removed from the manager
 	 */
 	public void deregisterTransportMethod(TransportMethod transportMethod) {
 		transportMethods.remove(new Integer(transportMethod.getId()));
 	}
 
 	/**
+	 * Returns an enumeration of all of the TransportMethods currently
+	 * available in the manager.
+	 * 
 	 * @return an Enumeration of all available transport methods
 	 */
 	public Enumeration getTransportMethods() {
@@ -179,14 +216,18 @@ public class TransportManager implements Observer, IService {
 	}
 
 	/**
-	 * @return
+	 * Returns all of the current messages received by the TransportManager
+	 * 
+	 * @return An enumeration of all messages received by the manager
 	 */
 	public Enumeration getMessages() {
 		return storage.messageElements();
 	}
 
 	/**
-	 * @param message
+	 * Updates a given message stored in the manager
+	 * 
+	 * @param message The message to be updated
 	 * @throws IOException
 	 */
 	public void updateMessage(TransportMessage message) throws IOException {
