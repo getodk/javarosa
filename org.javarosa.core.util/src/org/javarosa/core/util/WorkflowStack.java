@@ -3,7 +3,7 @@ package org.javarosa.core.util;
 import java.util.Hashtable;
 import java.util.Stack;
 
-import org.javarosa.core.api.IModule;
+import org.javarosa.core.api.IActivity;
 
 
 /**
@@ -21,16 +21,16 @@ public class WorkflowStack {
 		internalStack = new Stack();
 	}
 	
-	public void push(IModule module) {
-		internalStack.push(module);
+	public void push(IActivity activity) {
+		internalStack.push(activity);
 	}
 	
 	public int size() {
 		return internalStack.size();
 	}
 	
-	public IModule pop() {
-		IModule module = (IModule)internalStack.pop();
-		return module;
+	public IActivity pop() {
+		IActivity activity = (IActivity)internalStack.pop();
+		return activity;
 	}
 }
