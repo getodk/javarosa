@@ -10,43 +10,82 @@ import javax.microedition.rms.RecordStoreNotOpenException;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 /**
+ * The RMS persistent storage utility for FormDef
+ * objects.
  *
  * @author Clayton Sims
  */
 public class FormDefRMSUtility extends RMSUtility {
 
+	/**
+	 * Creates a new RMS utility with the given name
+	 * @param name A unique identifier for this RMS utility
+	 */
 	public FormDefRMSUtility(String name) {
 		super(name, RMSUtility.RMS_TYPE_META_DATA);
 	}
 	
+	/**
+	 * @return The name to be used for this RMS Utility
+	 */
 	public static String getUtilityName() {
 		return "FormDef RMS Utility";
 	}
 
+	/**
+	 * Writes the given formdefinition to RMS
+	 * @param form The definition of the form to be written
+	 */
 	public void writeToRMS(FormDef form) {
 		super.writeToRMS(form, new FormDefMetaData(form));
 	}
 
+	/**
+	 * Writes the given block of bytes to RMS
+	 * @param ba The set of bytes to be written
+	 */
 	public void writeToRMS(byte[] ba) {
 		super.writeBytesToRMS(ba, new FormDefMetaData());
 	}
 
+	/**
+	 * Returns the size of the given record in the RMS
+	 * 
+	 * @param recordId The id of the record whose size is to be returned
+	 * @return The size, in bytes, of the record with the given index
+	 */
 	public int getSize(int recordId) {
 		FormDefMetaData xformMetaData = getMetaDataFromId(recordId);
 		return xformMetaData.getSize();
 	}
 
+	/**
+	 * Gets the name of given record in the RMS
+	 * 
+	 * @param recordId The id of the record whose name is to be returned
+	 * @return The name of the record with the given index
+	 */
 	public String getName(int recordId) {
 		FormDefMetaData xformMetaData = getMetaDataFromId(recordId);
 		return xformMetaData.getName();
 	}
 
+	/**
+	 * Gets the meta data object for the record with the given Id
+	 * 
+	 * @param recordId The id of the record whose meta data is to be returned
+	 * @return The meta data of the record with the given Id
+	 */
 	private FormDefMetaData getMetaDataFromId(int recordId) {
 		FormDefMetaData formMetaData = new FormDefMetaData();
 		this.retrieveMetaDataFromRMS(recordId, formMetaData);
 		return formMetaData;
 	}
 
+	/**
+	 * @return a list of form names that are stored in this RMS
+	 */
+	public
 	public Vector getListOfFormNames() {
 		Vector listOfNames = new Vector();
 		try {
@@ -68,6 +107,14 @@ public class FormDefRMSUtility extends RMSUtility {
 		return listOfNames;
 	}
 
+	/**
+	 * Gets a list of form names that correspond to the records present in this RMS
+	 * which have the ids given.
+	 * 
+	 * @param formIDs A vector of formIds
+	 * @return A vector of strings which are the names of each record in this RMS
+	 * with an id that exists in the provided vector of ids.
+	 */
 	public Vector getListOfFormNames(Vector formIDs) {
 		Vector listOfNames = new Vector();
 		try {
@@ -113,6 +160,9 @@ public class FormDefRMSUtility extends RMSUtility {
 		return id;
 	}
 
+	/**
+	 * @return a list of MetaData for the form data objects stored in this RMS
+	 */
 	public Vector getFormMetaDataList() {
 		Vector metaDataList = new Vector();
 		try {

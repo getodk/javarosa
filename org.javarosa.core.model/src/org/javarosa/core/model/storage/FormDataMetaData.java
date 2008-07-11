@@ -18,7 +18,11 @@ import org.javarosa.core.model.FormData;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 
 /**
- *
+ * FormData RMS serialization meta data object.
+ * 
+ * Contains the form's name the date it was saved, and 
+ * the Id of the form data in RMS
+ * 
  * @author Clayton Sims
  */
 public class FormDataMetaData extends MetaDataObject
@@ -36,11 +40,19 @@ public class FormDataMetaData extends MetaDataObject
     			+ " type: "+this.type);
     }
     
+    /**
+     * Creates an Empty meta data object
+     */
     public FormDataMetaData()
     {
         
     }
     
+    /**
+     * Creates a meta data object for the form data object given.
+     * 
+     * @param form The form whose meta data this object will become
+     */
     public FormDataMetaData(FormData form)
     {
         this.formName = form.getDef().getName() + form.getRecordId();
@@ -49,20 +61,32 @@ public class FormDataMetaData extends MetaDataObject
         
     }
     
+    /**
+     * @param name Sets the name for the form this meta data object represents
+     */
     public void setName(String name)
     {
         this.formName = name;
     }
     
+    /**
+     * @return the name of the form represented by this meta data
+     */
     public String getName()
     {
        return this.formName; 
     }
     
+    /**
+     * @return the RMS Storage Id for the form this meta data represents
+     */
     public int getFormIdReference() {
     	return formIdReference;
     }
     
+    /**
+     * @return The date the data represented by this object was taken 
+     */
     public Date getDateSaved() {
     	return dateSaved;
     }
@@ -92,6 +116,10 @@ public class FormDataMetaData extends MetaDataObject
         out.writeLong(this.dateSaved.getTime());
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.MetaDataObject#setMetaDataParameters(java.lang.Object)
+     */
     public void setMetaDataParameters(Object object)
     {
         FormData form = (FormData)object;
