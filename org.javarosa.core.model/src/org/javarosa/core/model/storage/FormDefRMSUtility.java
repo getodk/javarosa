@@ -92,7 +92,6 @@ public class FormDefRMSUtility extends RMSUtility {
 					null, false);
 			while (recordEnum.hasNextElement()) {
 				int i = recordEnum.nextRecordId();
-				System.out.println("trying record:" + i);
 				listOfNames.addElement(this.getName(i));
 
 			}
@@ -121,7 +120,6 @@ public class FormDefRMSUtility extends RMSUtility {
 					null, false);
 			while (recordEnum.hasNextElement()) {
 				int i = recordEnum.nextRecordId();
-				System.out.println("trying record:" + i);
 				listOfNames.addElement(this.getName(i));
 				formIDs.addElement(new Integer(i));
 			}

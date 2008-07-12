@@ -152,7 +152,7 @@ public class SkipRule implements Externalizable{
 			setId(dis.readByte());
 			setAction(dis.readByte());
 			setConditions(ExternalizableHelper.readExternal(dis,new Condition().getClass()));
-			setActionTargets(ExternalizableHelper.readBytes(dis));
+			setActionTargets(ExternalizableHelper.readUTFs(dis));
 			setName(dis.readUTF());
 		}
 	}
@@ -164,7 +164,7 @@ public class SkipRule implements Externalizable{
 		dos.writeByte(getId());
 		dos.writeByte(getAction());
 		ExternalizableHelper.writeExternal(getConditions(), dos);
-		ExternalizableHelper.writeBytes(getActionTargets(), dos);
+		ExternalizableHelper.writeUTFs(getActionTargets(), dos);
 		dos.writeUTF(getName());
 	}
 	
