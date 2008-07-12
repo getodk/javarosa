@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.javarosa.demo.module;
+package org.javarosa.demo.activity;
 
 import java.io.IOException;
 import java.util.Hashtable;
@@ -64,7 +64,7 @@ public class SplashScreenModule implements IActivity, ApplicationInitializer {
   		} catch(Exception e) {}
   		
   		// Tell the shell that the splash screen has completed
-  		parent.returnFromModule(this, null, null);
+  		parent.returnFromActivity(this, null, null);
   		
   		// We're using our own architecture
 		return null;

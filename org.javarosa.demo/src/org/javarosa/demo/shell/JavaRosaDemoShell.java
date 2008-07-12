@@ -18,14 +18,14 @@ import org.javarosa.core.model.storage.FormDataRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.WorkflowStack;
-import org.javarosa.demo.module.SplashScreenModule;
+import org.javarosa.demo.activity.SplashScreenModule;
 import org.javarosa.demo.properties.DemoAppProperties;
 import org.javarosa.formmanager.activity.FormListActivity;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
-import org.javarosa.services.properties.activity.PropertyModule;
+import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.xform.util.XFormUtils;
 
 /**
@@ -36,17 +36,17 @@ import org.javarosa.xform.util.XFormUtils;
 public class JavaRosaDemoShell implements IShell {
 	// List of views that are used by this shell
 	MIDlet runningAssembly;
-	FormListActivity formModule = null;
+	FormListActivity formActivity = null;
 	SplashScreenModule splashScreen = null;
 	FormTransportActivity formTransport = null;
-	ModelListActivity modelModule = null;
-	PropertyModule propertyModule = null;
+	ModelListActivity modelActivity = null;
+	PropertyScreenActivity propertyActivity = null;
 	
 	WorkflowStack stack;
 	
 	Context context;
 	
-	IActivity currentModule;
+	IActivity currentActivity;
 
 	public JavaRosaDemoShell() {
 		stack = new WorkflowStack(); 
@@ -59,19 +59,15 @@ public class JavaRosaDemoShell implements IShell {
 	
 	public void run() {
 		init();
-		System.out.println("done init");
 		this.splashScreen = new SplashScreenModule(this, "/splash.gif");
-		System.out.println("done splash init");
-		this.formModule = new FormListActivity(this,"Forms List");
-		System.out.println("Done formlist init");
+		this.formActivity = new FormListActivity(this,"Forms List");
 		this.formTransport = new FormTransportActivity(this);
-		this.modelModule = new ModelListActivity(this);
+		this.modelActivity = new ModelListActivity(this);
 		
-		this.propertyModule = new PropertyModule(this);
+		this.propertyActivity = new PropertyScreenActivity(this);
 		
-		currentModule = splashScreen;
+		currentActivity = splashScreen;
 		this.splashScreen.start(context);
-		System.out.println("Done with splashscreen start");
 	//	switchView(ViewTypes.FORM_LIST);
 	}
 	
@@ -86,7 +82,6 @@ public class JavaRosaDemoShell implements IShell {
 		FormDataRMSUtility formData = new FormDataRMSUtility(FormDataRMSUtility.getUtilityName());
 		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
 
-		System.out.println("Loading Forms");
 		// For now let's add the dummy form.
 		if (formDef.getNumberOfRecords() == 0) {
 			formDef.writeToRMS(XFormUtils
@@ -96,36 +91,34 @@ public class JavaRosaDemoShell implements IShell {
 			formDef.writeToRMS(XFormUtils
 					.getFormFromResource("/shortform.xhtml"));
 		}
-		System.out.println("Done Loading Forms");
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider()
 				.registerRMSUtility(formData);
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider()
 				.registerRMSUtility(formDef);
-		System.out.println("Done registering");
 	}
 	
-	private void workflow(IActivity lastModule, String returnCode, Hashtable returnVals) {
+	private void workflow(IActivity lastActivity, String returnCode, Hashtable returnVals) {
 		//TODO: parse any returnvals into context
 		if(stack.size() != 0) {
 			IActivity activity = stack.pop();
-			this.currentModule = activity;
+			this.currentActivity = activity;
 			activity.resume(context);
 		}
 		else {
 			// TODO Auto-generated method stub
-			if (lastModule == this.splashScreen) {
-				currentModule = formModule;
-				this.formModule.start(context);
+			if (lastActivity == this.splashScreen) {
+				currentActivity = formActivity;
+				this.formActivity.start(context);
 			}
-			if (lastModule == this.modelModule) {
+			if (lastActivity == this.modelActivity) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 					Object returnVal = returnVals.get(ModelListActivity.returnKey);
 					if (returnVal == ModelListActivity.CMD_MSGS) {
-						// Go to the FormTransport Module look at messages.
+						// Go to the FormTransport Activity look at messages.
 						TransportContext msgContext = new TransportContext(
 								context);
 						msgContext.setRequestedTask(TransportContext.MESSAGE_VIEW);
-						currentModule = formTransport;
+						currentActivity = formTransport;
 						formTransport.start(msgContext);
 					}
 				}
@@ -134,7 +127,7 @@ public class JavaRosaDemoShell implements IShell {
 					Object returnVal = returnVals
 							.get(ModelListActivity.returnKey);
 					if (returnVal == ModelListActivity.CMD_EDIT) {
-						// Load the Form Entry Module, and feed it the form data
+						// Load the Form Entry Activity, and feed it the form data
 						FormDef form = (FormDef) returnVals.get("form");
 						FormData data = (FormData) returnVals.get("data");
 					}
@@ -144,33 +137,33 @@ public class JavaRosaDemoShell implements IShell {
 						TransportContext msgContext = new TransportContext(
 								context);
 						msgContext.setRequestedTask(TransportContext.SEND_DATA);
-						currentModule = formTransport;
+						currentActivity = formTransport;
 						formTransport.start(msgContext);
 					}
 				}
 			}
-			if (lastModule == this.formTransport) {
+			if (lastActivity == this.formTransport) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 					String returnVal = (String)returnVals.get(FormTransportActivity.RETURN_KEY);
 					if(returnVal == FormTransportActivity.VIEW_MODELS) {
-						currentModule = this.modelModule;
-						this.modelModule.start(context);
+						currentActivity = this.modelActivity;
+						this.modelActivity.start(context);
 					}
 				}
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
 					
 				}
 			}
-			if (lastModule == this.formModule) {
+			if (lastActivity == this.formActivity) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 					String returnVal = (String)returnVals.get("command");
 					if(returnVal == Commands.CMD_VIEW_DATA) {
-						currentModule = this.modelModule;
-						this.modelModule.start(context);
+						currentActivity = this.modelActivity;
+						this.modelActivity.start(context);
 					}
 					if(returnVal == Commands.CMD_SETTINGS) {
-						currentModule = this.propertyModule;
-						this.propertyModule.start(context);
+						currentActivity = this.propertyActivity;
+						this.propertyActivity.start(context);
 					}
 				}
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
@@ -178,31 +171,32 @@ public class JavaRosaDemoShell implements IShell {
 				}
 			}
 		}
-		if(currentModule == lastModule) {
+		if(currentActivity == lastActivity) {
 			//We didn't launch anything. Go to default
-			currentModule = formModule;
-			formModule.start(context);
+			currentActivity = formActivity;
+			formActivity.start(context);
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.javarosa.shell.IShell#moduleCompeleted(org.javarosa.module.IModule)
+	 * @see org.javarosa.shell.IShell#activityCompeleted(org.javarosa.activity.IActivity)
 	 */
-	public void returnFromModule(IActivity activity, String returnCode, Hashtable returnVals) {
+	public void returnFromActivity(IActivity activity, String returnCode, Hashtable returnVals) {
 		activity.halt();
-		System.out.println("Module: " + activity + " returned with code " + returnCode);
 		workflow(activity, returnCode, returnVals);
 		if(returnCode == Constants.ACTIVITY_SUSPEND || returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 			stack.push(activity);
 		}
 	}
 
-	public void setDisplay(IActivity callingModule, Displayable display) {
-		if(callingModule == currentModule) {
+	public void setDisplay(IActivity callingActivity, Displayable display) {
+		if(callingActivity == currentActivity) {
 			JavaRosaServiceProvider.instance().getDisplay().setCurrent(display);
 		}
 		else {
-			System.out.println("Module: " + callingModule + " attempted, but failed, to set the display");
+			//#if debug.output==verbose
+			System.out.println("Activity: " + callingActivity + " attempted, but failed, to set the display");
+			//#endif
 		}
 	}
 	
