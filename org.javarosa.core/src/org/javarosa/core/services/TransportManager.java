@@ -82,8 +82,6 @@ public class TransportManager implements Observer, IService {
 	 */
 	private void enqueue(TransportMessage message, int transportMethod)
 			throws IOException {
-		System.out.println("Enqueue transport message with status "
-				+ message.statusToString());
 		message.addObserver(this);
 		TransportMethod selectedMethod = getTransportMethod(transportMethod);
 		storage.saveMessage(message);
