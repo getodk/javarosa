@@ -37,6 +37,47 @@ public class ExternalizableHelper {
 		else
 			dos.writeBoolean(false);
 	}
+	/**
+	 * Writes a small (byte size) vector of UTF objects to a stream.
+	 * 
+	 * @param utfVector - the vector of UTF objects.
+	 * @param dos - the stream to write to.
+	 * @throws IOException - thrown when a problem occurs during the writing to stream.
+	 */
+	public static void writeUTFs(Vector utfVector, DataOutputStream dos) throws IOException {	
+		if(utfVector != null){
+			dos.writeByte(utfVector.size());
+			for(int i=0; i<utfVector.size(); i++ ){
+				writeUTF(dos, ((String)utfVector.elementAt(i)));
+			}
+		}
+		else
+			dos.writeByte(0);
+	}
+	
+	/**
+	 * reads a small vector (byte size) of UTF objects from a stream.
+	 * 
+	 * @param dis - the stream to be read from
+	 * @throws IOException - thrown when a problem occurs during the writing to stream.
+	 * 
+	 * @return A vector of UTF objects
+	 */
+	public static Vector readUTFs(DataInputStream dis) throws IOException, InstantiationException,IllegalAccessException {
+		
+		byte len = dis.readByte();
+		if(len == 0)
+			return null;
+		
+		Vector utfVector = new Vector();
+		
+		for(byte i=0; i<len; i++ ) {
+			utfVector.addElement(readUTF(dis));
+		}
+		
+		return utfVector;
+	}
+	
 	
 	/**
 	 * Writes an Integer to the stream.
