@@ -1,7 +1,11 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.formmanager.model.temp.*;
-import de.enough.polish.ui.*;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.TextField;
+
+import org.javarosa.formmanager.model.temp.Prompt;
+import org.javarosa.formmanager.model.temp.QuestionData;
+import org.javarosa.formmanager.model.temp.StringData;
 
 public class TextEntryWidget extends ExpandedWidget {
 	int inputMode;

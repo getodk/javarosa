@@ -65,8 +65,9 @@ public class FormListActivity implements IActivity {
 		
 		if( cmd == Commands.CMD_SELECT_XFORM){
 			//LOG
+			//#if debug.output==verbose
 			System.out.println("Selected form: " + formIDs.elementAt( ((Integer)(returnvals.get(cmd))).intValue() ));
-			
+			//#endif
 			// 
 			break;
 		
@@ -76,11 +77,11 @@ public class FormListActivity implements IActivity {
 		} else if (cmd == Commands.CMD_VIEW_DATA) {
 			Hashtable returnArgs = new Hashtable();
 			returnArgs.put("command", Commands.CMD_VIEW_DATA);
-			parent.returnFromModule(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
+			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
 		} else if (cmd == Commands.CMD_SETTINGS) {
 			Hashtable returnArgs = new Hashtable();
 			returnArgs.put("command", Commands.CMD_SETTINGS);
-			parent.returnFromModule(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
+			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
 		}
 		}
 	}
@@ -101,21 +102,17 @@ public class FormListActivity implements IActivity {
 				FormDefMetaData mdata = new FormDefMetaData();
 				formDefRMSUtility.retrieveMetaDataFromRMS(i,mdata);
 				// TODO fix it so that record id is part of the metadata serialization
-				//LOG
-				System.out.println(mdata.toString());
-				//mdata.setRecordId(i);
+				
 				listOfForms.put(new Integer(pos), mdata.getRecordId()+"-"+mdata.getName());
 				formIDs.insertElementAt(mdata, pos);
 				pos++;
-				System.out.println("METADATA: "+mdata.toString());
 			} catch (InvalidRecordIDException e) {
 				// TODO Auto-generated catch block
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			}
 		}
-    	
-    	//LOG
-    	System.out.println("Done getting XForms");
     }
 	
 	public void contextChanged(Context context) {

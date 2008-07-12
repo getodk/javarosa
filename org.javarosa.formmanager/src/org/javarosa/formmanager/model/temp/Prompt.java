@@ -1,20 +1,16 @@
 package org.javarosa.formmanager.model.temp;
 
-import org.javarosa.clforms.api.*;
-
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.lcdui.DateField;
-import javax.microedition.lcdui.List;
-
+import org.javarosa.clforms.api.Binding;
+import org.javarosa.clforms.api.Constants;
 import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.clforms.util.SimpleOrderedHashtable;
-import org.javarosa.dtree.i18n.*;
-import org.javarosa.formmanager.utility.*;
+import org.javarosa.dtree.i18n.ILocalizable;
+import org.javarosa.dtree.i18n.Localizer;
+import org.javarosa.formmanager.utility.QuestionStateListener;
 
 public class Prompt implements ILocalizable {
 	private String id;

@@ -1,7 +1,11 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.formmanager.model.temp.*;
-import de.enough.polish.ui.*;
+import javax.microedition.lcdui.StringItem;
+
+import org.javarosa.formmanager.model.temp.Prompt;
+import org.javarosa.formmanager.model.temp.QuestionData;
+
+import de.enough.polish.ui.Container;
 
 /**
  * Default read-only view of a question: a single frame with question prompt (abbreviated) on the left/top and 

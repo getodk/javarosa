@@ -1,35 +1,5 @@
 package org.javarosa.formmanager.controller;
 
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Vector;
-
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Display;
-import javax.microedition.lcdui.Displayable;
-
-import org.javarosa.clforms.api.Binding;
-import org.javarosa.clforms.api.Constants;
-import org.javarosa.clforms.api.Form;
-import org.javarosa.clforms.api.Prompt;
-import org.javarosa.clforms.api.ResponseEvent;
-import org.javarosa.clforms.storage.Model;
-import org.javarosa.clforms.storage.ModelMetaData;
-import org.javarosa.clforms.storage.ModelRMSUtility;
-import org.javarosa.clforms.storage.RMSManager;
-import org.javarosa.clforms.storage.XFormRMSUtility;
-import org.javarosa.clforms.util.J2MEUtil;
-import org.javarosa.clforms.view.FormView;
-import org.javarosa.clforms.view.IPrompter;
-import org.javarosa.clforms.xml.XMLUtil;
-import org.javarosa.polishforms.SubmitScreen;
-import org.javarosa.polishforms.SubmitStatusScreen;
-import org.javarosa.properties.PropertyManager;
-import org.openmrs.transport.TransportMessage;
-import org.openmrs.transport.midp.TransportLayer;
 
 public class FormEntryController {
 /*

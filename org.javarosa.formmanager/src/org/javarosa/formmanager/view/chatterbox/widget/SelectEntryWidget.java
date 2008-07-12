@@ -1,7 +1,9 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.formmanager.model.temp.*;
-import de.enough.polish.ui.*;
+import javax.microedition.lcdui.ChoiceGroup;
+import javax.microedition.lcdui.Item;
+
+import org.javarosa.formmanager.model.temp.Prompt;
 
 public abstract class SelectEntryWidget extends ExpandedWidget {
 	private int style;

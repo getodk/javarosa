@@ -1,6 +1,7 @@
 package org.javarosa.formmanager.model.temp;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
 
 public class DateData implements QuestionData {
 	Date d;

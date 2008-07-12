@@ -1,7 +1,8 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.formmanager.model.temp.*;
-import de.enough.polish.ui.*;
+import javax.microedition.lcdui.ChoiceGroup;
+
+import org.javarosa.formmanager.model.temp.Prompt;
 
 public class ChatterboxWidgetFactory {
 	public ChatterboxWidget getWidget (Prompt question, int initViewState) {

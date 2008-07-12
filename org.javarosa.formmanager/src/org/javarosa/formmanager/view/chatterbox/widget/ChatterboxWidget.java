@@ -1,8 +1,11 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.formmanager.model.temp.*;
-import de.enough.polish.ui.*;
-import org.javarosa.formmanager.utility.*;
+import org.javarosa.formmanager.model.temp.Prompt;
+import org.javarosa.formmanager.model.temp.QuestionData;
+import org.javarosa.formmanager.utility.QuestionStateListener;
+
+import de.enough.polish.ui.Container;
+import de.enough.polish.ui.Style;
 
 public class ChatterboxWidget extends Container implements QuestionStateListener {
 	public static final int VIEW_NOT_SET = -1;

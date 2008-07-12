@@ -1,7 +1,12 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.formmanager.model.temp.*;
-import de.enough.polish.ui.*;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.StringItem;
+
+import org.javarosa.formmanager.model.temp.Prompt;
+import org.javarosa.formmanager.model.temp.QuestionData;
+
+import de.enough.polish.ui.Container;
 
 public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	private StringItem prompt;
