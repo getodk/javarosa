@@ -666,7 +666,9 @@ public class JavaRosaXformsParser{
 					//formDef.addQuestion(qtn);
 					map.put(binding.getId(), binding.getNodeset());
 					if(child.getAttributeValue(null, "relevant") != null) {
+						//#if debug.output==verbose
 						System.out.println("Relevant!" + child.getAttributeValue(null,"relevant"));
+						//#endif
 						String relevancy = child.getAttributeValue(null, "relevant");
 						relevants.put(relevancy, binding);
 						binding.setRelevancy(relevancy);
@@ -780,17 +782,18 @@ public class JavaRosaXformsParser{
 							.getId(), Constants.OPERATOR_EQUAL, relevantAnswer);
 					conditions.addElement(condition);
 
-					actionTargets.addElement(formDef.getQuestion(bind
-							.getNodeset()));
+					actionTargets.addElement(bind.getNodeset());
 
 					SkipRule rule = new SkipRule(ruleId, conditions,
 							Constants.ACTION_ENABLE, actionTargets, relevant);
 
 					rules.addElement(rule);
 					ruleId++;
+					//#if debug.output==verbose
 					System.out.println("New rule added: id: " + ruleId
 							+ " Conditions: " + conditions.toString()
 							+ " actionTargets : " + actionTargets.toString());
+					//#endif
 				}
 			}
 			else {
@@ -817,12 +820,13 @@ public class JavaRosaXformsParser{
 					qtn.setDefaultValue(getPreloadValue(b.preload, (b.preloadParams == null ? "" : b.preloadParams)));
 				}
 
-				// LOG
-				//System.out.println(qtn.getLongText()+" attached to Bind = "+qtn.getBind().toString());
 			}
-			else
+			else {
 				//LOG
+				//#if debug.output==verbose
 				System.out.println("MATCHING BIND not found");
+				//#endif
+			}
 		}
 		else if (ref != null) {
 			XPathBinding b = new XPathBinding();
@@ -833,6 +837,7 @@ public class JavaRosaXformsParser{
 			b.setType("xsd:string");
 			setQuestionType(qtn, b.getType());
 			qtn.setId(b.getId());
+			qtn.setVariableName(ref);
 			qtn.setBind(b);
 		}
 	}

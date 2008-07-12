@@ -68,7 +68,9 @@ public class XPathBinding implements IBinding {
 	}
 
 	public void setRequired(String attributeValue) throws Exception {
+		//#if debug.output==verbose
 		System.out.println("setting bind "+this.id+ " req="+attributeValue);
+		//#endif
 		this.required = Utilities.getBoolean(attributeValue);
 	}
 
