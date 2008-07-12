@@ -60,9 +60,7 @@ public class HttpTransportProperties implements IPropertyRules {
      *  @see org.javarosa.properties.IPropertyRules#checkValueAllowed(String, String)
      */
     public boolean checkValueAllowed(String propertyName, String potentialValue) {
-        System.out.println("Checking rules for: " + propertyName);
         Vector prop = ((Vector)rules.get(propertyName));
-        System.out.println("They are: " + prop.toString());
         if(prop.size() != 0) {
             //Check whether this is a dynamic property
             if(prop.size() == 1 && checkPropertyAllowed((String)prop.elementAt(0))) {

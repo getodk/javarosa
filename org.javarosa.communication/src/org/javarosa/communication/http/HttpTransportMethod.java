@@ -61,7 +61,9 @@ public class HttpTransportMethod implements TransportMethod {
 
 				out = con.openOutputStream();
 				out.write(message.getPayloadData());
+				//#if debug.output==verbose
 				System.out.println("PAYLOADDATA:"+new String(message.getPayloadData())+"\nENDPLDATA\n");
+				//#endif
 				out.flush();
 
 				responseCode = con.getResponseCode();
@@ -87,7 +89,9 @@ public class HttpTransportMethod implements TransportMethod {
 						bytesread += actual;
 					}
 					process(data);
+					//#if debug.output==verbose
 					System.out.println("PRCSS DATA end");
+					//#endif
 				} else {
 					int ch;
 					while ((ch = in.read()) != -1) {
@@ -97,8 +101,9 @@ public class HttpTransportMethod implements TransportMethod {
 
 				// update status
 				message.setStatus(TransportMessage.STATUS_DELIVERED);
+				//#if debug.output==verbose
 				System.out.println("Status: " + message.getStatus());
-				// manager.updateMessage(message);
+				//#endif
 				message.setChanged();
 				message.notifyObservers(null);
 
@@ -106,15 +111,18 @@ public class HttpTransportMethod implements TransportMethod {
 				throw new IllegalArgumentException(message.getDestination()
 						+ " is not a valid HTTP URL");
 			} catch (IOException e) {
+				//#if debug.output==verbose || debug.output==exception
 				System.out.println(e.getMessage());
+				//#endif
 			} catch(java.lang.SecurityException se) {
 	             /***
                  * This exception was added to deal with the user denying access to airtime
                  */
 			 // update status
                 message.setStatus(TransportMessage.STATUS_FAILED);
+        		//#if debug.output==verbose || debug.output==exception
                 System.out.println("Status: " + message.getStatus());
-                // manager.updateMessage(message);
+                //#endif
                 message.setChanged();
                 message.notifyObservers(null); 
 		    }finally {
@@ -133,7 +141,9 @@ public class HttpTransportMethod implements TransportMethod {
 		}
 
 		private void process(byte[] data) {
+			//#if debug.output==verbose
 			System.out.println(new String(data));
+			//#endif
 			message.setReplyloadData(data);
 		}
 
