@@ -1,7 +1,6 @@
 package org.javarosa.formmanager.model.temp;
 
-import java.util.*;
-import org.javarosa.formmanager.model.temp.*;
+import java.util.Vector;
 
 public class SelectMultiData implements QuestionData {
 	Vector vs; //vector of Selection

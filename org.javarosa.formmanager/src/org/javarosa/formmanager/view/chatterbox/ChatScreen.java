@@ -2,36 +2,17 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
-import java.util.Stack;
-
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.midlet.MIDlet;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.ItemStateListener;
 
 import org.javarosa.clforms.Controller;
-import org.javarosa.clforms.MVCComponent;
 import org.javarosa.clforms.api.Prompt;
-import org.javarosa.clforms.api.ResponseEvent;
 import org.javarosa.clforms.view.FormView;
 import org.javarosa.clforms.view.IPrompter;
-import org.javarosa.clforms.api.Constants;
-
-import de.enough.polish.ui.Item;
-import de.enough.polish.ui.ItemStateListener;
-import de.enough.polish.ui.Gauge;
-import de.enough.polish.ui.UiAccess;
-
-import org.javarosa.view.widget.chart.*;
-
-import java.util.Vector;
-import org.javarosa.dtree.i18n.*;
-import javax.microedition.lcdui.Canvas;
-import java.util.Enumeration;
 
 
 /***

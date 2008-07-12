@@ -14,13 +14,14 @@ import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
 
+import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormData;
-import org.javarosa.core.services.TransportManager;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
@@ -177,11 +178,12 @@ public class FormTransportActivity implements
 		while (messages.hasMoreElements()) {
 			TransportMessage message = (TransportMessage) messages
 					.nextElement();
+			//#if debug.output==verbose
 			System.out.println(message);
+			//#endif
 			StringBuffer listEntry = new StringBuffer();
 			listEntry.append("ID: ").append(message.getRecordId());
 			listEntry.append(" - ").append(message.statusToString());
-			//System.out.println(listEntry.toString());
 			messageList.append(listEntry.toString(), null);
 		}
 	}
@@ -200,16 +202,15 @@ public class FormTransportActivity implements
 	public void commandAction(Command c, Displayable d) {
 		if (d == mainMenu) {
 			if (c == CMD_BACK) {
-					shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
+					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 			} else if (c == CMD_OK) {
 				int selected = ((List) mainMenu).getSelectedIndex();
-				System.out.println("Selected: " + selected);
 				
 				switch (selected) {
 				case 0:
 					Hashtable returnArgs = new Hashtable();
 					returnArgs.put(RETURN_KEY, VIEW_MODELS);
-					shell.returnFromModule(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs);
+					shell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs);
 					break;
 				case 1:
 					showURLform();
@@ -247,7 +248,7 @@ public class FormTransportActivity implements
 		} else if (d == messageList) {
 			if (c == CMD_BACK) {
 				if(this.task == TransportContext.MESSAGE_VIEW) {
-					shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
+					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 				}
 				else {
 					shell.setDisplay(this, mainMenu);
@@ -283,7 +284,7 @@ public class FormTransportActivity implements
 		}
 		else if (d == urlForm) {
 			if (c == CMD_BACK) {
-					shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
+					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 			} else if (c == CMD_OK) {
 				processURLform();
 				try {
@@ -294,7 +295,7 @@ public class FormTransportActivity implements
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				shell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 			}
 		}
 	}
@@ -311,9 +312,8 @@ public class FormTransportActivity implements
 
 	public void showURLform(CommandListener listener) {
 		urlForm = new Form ("URL");
-		//destinationUrl = PropertyManager.instance().getSingularProperty("PostURL");
+		destinationUrl = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty("PostURL");
 		//TODO: Put this back in once we 
-		System.out.println("URL PROP: " + destinationUrl);
 		textField = new TextField("Please enter destination string",
 				destinationUrl,140,TextField.URL);
 		urlForm.append(textField);
@@ -348,19 +348,18 @@ public class FormTransportActivity implements
 	 * @throws IOException
 	 */
 	public void sendData(int transportMethod) throws IOException {
-		System.out.println("Destination URL: " + destinationUrl);
-		//TODO: Fix when we have a property Manager again
-		/*Vector existingURLs = PropertyManager.instance().getProperty(Constants.POST_URL_LIST);
-		System.out.println("Existing URLs: " + existingURLs.toString());
-		if(!existingURLs.contains(destinationUrl)) {
-		    existingURLs.addElement(destinationUrl);
-		    PropertyManager.instance().setProperty(Constants.POST_URL_LIST, existingURLs);
+		Vector existingURLs = JavaRosaServiceProvider.instance()
+				.getPropertyManager().getProperty(
+						HttpTransportProperties.POST_URL_LIST_PROPERTY);
+		if (!existingURLs.contains(destinationUrl)) {
+			existingURLs.addElement(destinationUrl);
+			JavaRosaServiceProvider.instance().getPropertyManager()
+					.setProperty(
+							HttpTransportProperties.POST_URL_LIST_PROPERTY,
+							existingURLs);
 		}
-		System.out.println("NEw Existing URLs: " + PropertyManager.instance().getProperty(Constants.POST_URL_LIST).toString());*/
 
-		if(this.data != null){
-			System.out.println("WANT TO SEND "+this.data+this.data.getRecordId());
-			String testString = this.data.toString();
+		if(this.data != null) {
 			JavaRosaServiceProvider.instance().getTransportManager().enqueue(this.data.toString().getBytes("UTF-8"),
 					destinationUrl, transportMethod,this.data.getRecordId());
 		}else{

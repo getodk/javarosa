@@ -81,7 +81,6 @@ public class FormList extends List implements CommandListener {
 		// TODO Auto-generated method stub
 		if (c == List.SELECT_COMMAND) {
 			//LOG
-			System.out.println("Selected a form");
 			
 			v.put( new Integer(0), new Integer(this.getSelectedIndex()));
 			Hashtable returnvals = new Hashtable();

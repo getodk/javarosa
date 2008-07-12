@@ -1,8 +1,12 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import java.util.*;
-import org.javarosa.formmanager.model.temp.*;
-import de.enough.polish.ui.*;
+import java.util.Vector;
+
+import javax.microedition.lcdui.ChoiceGroup;
+
+import org.javarosa.formmanager.model.temp.QuestionData;
+import org.javarosa.formmanager.model.temp.SelectMultiData;
+import org.javarosa.formmanager.model.temp.Selection;
 
 public class SelectMultiEntryWidget extends SelectEntryWidget {
 	public SelectMultiEntryWidget () {

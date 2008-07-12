@@ -127,8 +127,6 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 
     public void commandAction(Command c, Displayable d)
     {
-    	System.out.println("IN here");
-
         if (c == CMD_EDIT)
         {
             try
@@ -137,11 +135,14 @@ public class ModelListActivity extends List implements CommandListener, IActivit
             		//error
             	} else {
             		FormDataMetaData data = (FormDataMetaData) modelIDs.elementAt(this.getSelectedIndex());
-            		System.out.println(data.toString());
             		FormDef selectedForm = new FormDef();
+        			//#if debug.output==verbose
             		System.out.println("Attempt retreive: "+data.getFormIdReference());
+        			//#endif
             		this.formDefRMSUtility.retrieveFromRMS(data.getFormIdReference(), selectedForm);
+        			//#if debug.output==verbose
             		System.out.println("Form retrieve OK\nAttempt retreive model: "+data.getRecordId());
+            		//#endif
             		FormData formData = new FormData();
             		this.formDataRMSUtility.retrieveFromRMS(data.getRecordId(), formData);
             		selectedForm.setName(this.formDefRMSUtility.getName(data.getFormIdReference()));
@@ -149,11 +150,13 @@ public class ModelListActivity extends List implements CommandListener, IActivit
             		formEditArgs.put(returnKey, CMD_EDIT);
             		formEditArgs.put("form", selectedForm);
             		formEditArgs.put("data", formData);
-            		mainShell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, formEditArgs);
+            		mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, formEditArgs);
             	}
             } catch (Exception ex)//IOException ex)
             {
+    			//#if debug.output==verbose || debug.output==exception
                 ex.printStackTrace();
+                //#endif
             }
         } else if (c == CMD_SEND)
         {
@@ -180,7 +183,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
                 //TODO: We need some way to codify this Next Action stuff. Maybe a set of Constants for the ModelListModule?
                 formSendArgs.put(returnKey, CMD_SEND);
                 formSendArgs.put("data", model);
-                mainShell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, formSendArgs);
+                mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, formSendArgs);
             }
         } else if (c == CMD_EMPTY)
         {
@@ -188,7 +191,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
             createView();
         } else if (c == CMD_BACK)
         {
-        	mainShell.returnFromModule(this, Constants.ACTIVITY_COMPLETE, null);
+        	mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
         } else if (c == CMD_DELETE)
         {
         	FormDataMetaData data = (FormDataMetaData) modelIDs.elementAt(this.getSelectedIndex());
@@ -199,7 +202,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
         	//TODO: This is a phenomenal chance to try out the "inherited menus". Should look into that. 
         	Hashtable returnArgs = new Hashtable();
         	returnArgs.put(returnKey, CMD_MSGS);
-        	mainShell.returnFromModule(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs);
+        	mainShell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs);
 
         } else if (c == CMD_REFRESH)
         {

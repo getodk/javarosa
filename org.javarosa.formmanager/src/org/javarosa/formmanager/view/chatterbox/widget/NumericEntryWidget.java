@@ -1,7 +1,9 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.formmanager.model.temp.*;
-import de.enough.polish.ui.*;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.TextField;
+
+import org.javarosa.formmanager.model.temp.Prompt;
 
 public class NumericEntryWidget extends TextEntryWidget {	
 	protected Item getEntryWidget (Prompt question) {

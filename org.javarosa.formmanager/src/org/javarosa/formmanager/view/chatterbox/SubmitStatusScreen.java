@@ -1,18 +1,19 @@
 package org.javarosa.formmanager.view.chatterbox;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import java.util.Timer;
-import java.util.TimerTask;
+import javax.microedition.lcdui.Spacer;
+import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.clforms.Controller;
 import org.javarosa.clforms.storage.ModelMetaData;
 import org.openmrs.transport.TransportMessage;
 
-import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
-import de.enough.polish.ui.Spacer;
 
 public class SubmitStatusScreen extends de.enough.polish.ui.Form implements CommandListener {
 	private Controller controller;

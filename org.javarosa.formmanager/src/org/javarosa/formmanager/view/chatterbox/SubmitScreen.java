@@ -1,18 +1,18 @@
 package org.javarosa.formmanager.view.chatterbox;
 
+import javax.microedition.lcdui.Choice;
+import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import de.enough.polish.ui.ItemStateListener;
-import de.enough.polish.ui.Item;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.ItemStateListener;
+import javax.microedition.lcdui.Spacer;
 
 import org.javarosa.clforms.Controller;
 import org.javarosa.clforms.storage.ModelMetaData;
 
 import de.enough.polish.ui.Style;
-import de.enough.polish.ui.Choice;
-import de.enough.polish.ui.ChoiceGroup;
-import de.enough.polish.ui.Spacer;
 
 public class SubmitScreen extends de.enough.polish.ui.Form implements ItemStateListener, CommandListener {
 	private Controller controller;

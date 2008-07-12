@@ -1,8 +1,13 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import java.util.*;
-import org.javarosa.formmanager.model.temp.*;
-import de.enough.polish.ui.*;
+import java.util.Date;
+
+import javax.microedition.lcdui.DateField;
+import javax.microedition.lcdui.Item;
+
+import org.javarosa.formmanager.model.temp.DateData;
+import org.javarosa.formmanager.model.temp.Prompt;
+import org.javarosa.formmanager.model.temp.QuestionData;
 
 public class DateEntryWidget extends ExpandedWidget {
 	protected Item getEntryWidget (Prompt question) {
