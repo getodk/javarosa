@@ -28,8 +28,6 @@ public class JavaRosaDemoMidlet extends MIDlet {
 	}
 
 	protected void startApp() throws MIDletStateChangeException {
-		// TODO Auto-generated method stub
-		
 		/*
 		 * Duplicate this class and change the following line to 
 		 * create a custom midlet to launch from 
