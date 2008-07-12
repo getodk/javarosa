@@ -41,7 +41,9 @@ public class FileConnectionTransportMethod implements TransportMethod {
 	 *      org.openmrs.transport.TransportManager)
 	 */
 	public void transmit(TransportMessage message, TransportManager manager) {
+		//#if debug.output==verbose
 		System.out.println("File connection: transmit");
+		//#endif
 		this.message = message;
 		this.manager = manager;
 		new Thread(new WorkerThread()).start();
