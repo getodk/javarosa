@@ -36,16 +36,16 @@ public class RmsStorage implements Storage, RecordListener {
 	 * @see org.openmrs.transport.Storage#saveMessage(org.openmrs.transport.TransportMessage)
 	 */
 	public void saveMessage(TransportMessage message) throws IOException {
-		System.out.println("Storing message in RecordStore");
 		try {
 			init();
 			int recordId = this.messageRecordStore.getNextRecordID();
 			message.setRecordId(recordId);
 			byte[] data = Serializer.serialize(message);
 			this.messageRecordStore.addRecord(data, 0, data.length);
-			System.out.println("Message saved to RecordStore");
 		} catch (RecordStoreException e) {
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e);
+			//#endif
 			throw new IOException(e.getMessage());
 		} finally {
 			close();
@@ -59,16 +59,14 @@ public class RmsStorage implements Storage, RecordListener {
 	 */
 	public void updateMessage(TransportMessage message) {
 		int recordId = message.getRecordId();
-		System.out.println("updateMessage(), id=" + recordId + ", status="
-				+ message.getStatus());
 		try {
 			init();
 			byte[] data = Serializer.serialize(message);
-			System.out.println("Data length: " + data.length);
 			this.messageRecordStore.setRecord(recordId, data, 0, data.length);
-			System.out.println("Message updated");
 		} catch (Exception e) {
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e);
+			//#endif
 		} finally {
 			close();
 		}
@@ -80,13 +78,13 @@ public class RmsStorage implements Storage, RecordListener {
 	 * @see org.openmrs.transport.Storage#updateMessage(org.openmrs.transport.TransportMessage)
 	 */
 	public void deleteMessage(int msgIndex) {
-		System.out.println("deleteMessage(), id=" + msgIndex);
 		try {
 			init();
 			this.messageRecordStore.deleteRecord(msgIndex);
-			System.out.println("Message deleted");
 		} catch (Exception e) {
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e);
+			//#endif
 		} finally {
 			close();
 		}
@@ -115,7 +113,9 @@ public class RmsStorage implements Storage, RecordListener {
 				this.messageRecordStore.closeRecordStore();
 				this.messageRecordStore = null;
 			} catch (RecordStoreException e) {
+				//#if debug.output==verbose || debug.output==exception
 				System.out.println(e);
+				//#endif
 			}
 		}
 	}
@@ -127,7 +127,9 @@ public class RmsStorage implements Storage, RecordListener {
 	 * @param recordId
 	 */
 	public void recordAdded(RecordStore recordStore, int recordId) {
+		//#if debug.output==verbose
 		System.out.println("Record added with id " + recordId);
+		//#endif
 	}
 
 	/**
@@ -145,7 +147,9 @@ public class RmsStorage implements Storage, RecordListener {
 			Serializer.deserialize(data, message);
 			return message;
 		} catch (RecordStoreException e) {
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e);
+			//#endif
 			throw new IOException(e.getMessage());
 		}
         catch (IllegalAccessException iae)
@@ -235,7 +239,9 @@ public class RmsStorage implements Storage, RecordListener {
 	 *      int)
 	 */
 	public void recordChanged(RecordStore recordStore, int recordId) {
+		//#if debug.output==verbose
 		System.out.println("record changed, id=" + recordId);
+		//#endif
 	}
 
 	/*
@@ -245,7 +251,9 @@ public class RmsStorage implements Storage, RecordListener {
 	 *      int)
 	 */
 	public void recordDeleted(RecordStore recordStore, int recordId) {
+		//#if debug.output==verbose
 		System.out.println("record deleted, id=" + recordId);
+		//#endif
 	}
 
 	/*

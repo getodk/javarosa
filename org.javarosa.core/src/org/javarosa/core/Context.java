@@ -85,7 +85,9 @@ public class Context {
 			contextObject.put(key, value);
 		}
 		else {
+			//#if debug.output==verbose
 			System.out.println("Attempt to add a null context value to key " + key);
+			//#endif
 		}
 	}
 	

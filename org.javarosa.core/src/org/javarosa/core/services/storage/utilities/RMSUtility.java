@@ -45,7 +45,9 @@ public class RMSUtility implements RecordListener
         }
         
         this.open();
+		//#if debug.output==verbose
         System.out.println("RMS SIZE (" + this.RS_NAME + ") : " + this.getNumberOfRecords());
+        //#endif
     }
 
     /**
@@ -88,7 +90,6 @@ public class RMSUtility implements RecordListener
             {
                 this.recordStore.removeRecordListener(this);
                 this.recordStore.closeRecordStore();
-                System.out.println("closed:"+this.recordStore.getName());
                 if (this.iType == RMSUtility.RMS_TYPE_META_DATA)
         		{
         			this.metaDataRMS.close();
@@ -123,7 +124,6 @@ public class RMSUtility implements RecordListener
             Externalizable externalizableObject = (Externalizable) obj;
             byte[] data = Serializer.serialize(externalizableObject);
             //LOG
-            System.out.println("writing:"+new String(data)+"\n*** to "+recordId);
             this.recordStore.addRecord(data, 0, data.length);
             if (this.iType == RMSUtility.RMS_TYPE_META_DATA)
             {
@@ -156,7 +156,6 @@ public class RMSUtility implements RecordListener
     {
     	try
     	{
-    		System.out.println("UPDATE RMS @ "+recordId);
     		IDRecordable recordableObject = (IDRecordable) obj;
     		recordableObject.setRecordId(recordId);
     		Externalizable externalizableObject = (Externalizable) obj;
@@ -243,23 +242,20 @@ public class RMSUtility implements RecordListener
     {
         try
         {   
-        	System.out.println("in delete:"+this.RS_NAME);
-        	
         	if (this.iType == RMSUtility.RMS_TYPE_META_DATA)
         	{
         		this.metaDataRMS.delete();
         	}
-        	System.out.println("try delete:"+this.RS_NAME);
         	RecordStore scoresRecordStore1 = RecordStore.openRecordStore(this.RS_NAME,true);
         	scoresRecordStore1.closeRecordStore();
         	RecordStore.deleteRecordStore(this.RS_NAME);
-        	System.out.println("try delete end:"+this.RS_NAME);
-            //this.recordStore.deleteRecordStore(this.RS_NAME);
         	
         }
         catch (Exception e)
         {
+    		//#if debug.output==verbose || debug.output==exception
             e.printStackTrace();
+            //#endif
         }
     }
 
@@ -280,7 +276,6 @@ public class RMSUtility implements RecordListener
         {
             byte[] data = this.recordStore.getRecord(recordId);
             //LOG
-            System.out.println("retreived data"+new String(data));
             Serializer.deserialize(data, externalizableObject);
         }
         catch (RecordStoreException rse)
@@ -406,18 +401,20 @@ public class RMSUtility implements RecordListener
     public RecordEnumeration enumerateMetaData() {
     	//TODO check if need to open / close
 		if (this.iType == this.RMS_TYPE_STANDARD){
-			System.out.println("getting list from metaData RMS");
 			try {
 				//TODO check if this is correct return
 				return this.recordStore.enumerateRecords(null,null,false);
 			} catch (RecordStoreNotOpenException e) {
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			} catch (RecordStoreException e) {
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			}
 			
 		}else{
-			System.out.println("getting from mdRMS....");
 			return metaDataRMS.enumerateMetaData();
 		}
 		return null;
@@ -437,10 +434,14 @@ public class RMSUtility implements RecordListener
 			return this.recordStore.getNextRecordID();
 		} catch (RecordStoreNotOpenException e) {
 			// TODO Auto-generated catch block
+			//#if debug.output==verbose || debug.output==exception
 			e.printStackTrace();
+			//#endif
 		} catch (RecordStoreException e) {
+			//#if debug.output==verbose || debug.output==exception
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			//#endif
 		}
 		return -1;
     }
@@ -461,13 +462,19 @@ public class RMSUtility implements RecordListener
 			}
 		} catch (RecordStoreNotOpenException e) {
 			// TODO Auto-generated catch block
+			//#if debug.output==verbose || debug.output==exception
 			e.printStackTrace();
+			//#endif
 		} catch (InvalidRecordIDException e) {
+			//#if debug.output==verbose || debug.output==exception
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			//#endif
 		} catch (RecordStoreException e) {
 			// TODO Auto-generated catch block
+			//#if debug.output==verbose || debug.output==exception
 			e.printStackTrace();
+			//#endif
 		}
 		if (this.iType == RMSUtility.RMS_TYPE_META_DATA){
 			this.metaDataRMS.tempEmpty();

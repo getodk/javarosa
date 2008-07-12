@@ -39,7 +39,9 @@ public class Property implements Externalizable, IDRecordable{
         int nameindex = fullString.indexOf(","); 
         value = new Vector();
         if(nameindex == -1) {
+    		//#if debug.output==verbose
             System.out.println("WARNING: Property in RMS with no value");
+            //#endif
             name = fullString.substring(0, fullString.length());
         }
         else {

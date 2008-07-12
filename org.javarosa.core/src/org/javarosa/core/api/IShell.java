@@ -22,7 +22,7 @@ public interface IShell {
 	/**
 	 * Called when a module has completed running and should return control here.
 	 */
-	void returnFromModule(IActivity activity, String returnCode, Hashtable returnArgs);
+	void returnFromActivity(IActivity activity, String returnCode, Hashtable returnArgs);
 
 	/**
 	 * Called when this IShell is being exited.  This could be another application loading of this application quitting.

@@ -58,7 +58,9 @@ public class PropertyManager implements IService {
             return (String)propertyRMS.getValue(propertyName).elementAt(0);
         }
         else {
+    		//#if debug.output==verbose
             System.out.println("Warning: Singular property request failed for property " + propertyName);
+            //#endif
             return null;
         }
     }
