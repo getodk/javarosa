@@ -331,38 +331,50 @@ public class RMSStorage implements Storage{
 		catch(RecordStoreFullException e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("RecordStoreFullException: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e.getMessage());
 			e.printStackTrace();
+			//#endif
 		}
 		catch(RecordStoreNotFoundException e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("RecordStoreNotFoundException: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e.getMessage());
+			//#endif
 			e.printStackTrace();
 		}
 		catch(RecordStoreNotOpenException e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("RecordStoreNotOpenException: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e);
 			e.printStackTrace();
+			//#endif
 		}
 		catch(RecordStoreException e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("RecordStoreException: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e);
 			e.printStackTrace();
+			//#endif
 		}
 		catch(IOException e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("IOException: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.err.println(e);
 			e.printStackTrace();
+			//#endif
 		}
 		catch(Exception e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("Exception e: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.err.println("Exception e : " + e.getMessage());
 			e.printStackTrace();
+			//#endif
 		}
 		finally{
 			close();
@@ -388,38 +400,50 @@ public class RMSStorage implements Storage{
 		catch(RecordStoreFullException e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("RecordStoreFullException: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e.getMessage());
 			e.printStackTrace();
+			//#endif
 		}
 		catch(RecordStoreNotFoundException e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("RecordStoreNotFoundException: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e.getMessage());
 			e.printStackTrace();
+			//#endif
 		}
 		catch(RecordStoreNotOpenException e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("RecordStoreNotOpenException: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e);
 			e.printStackTrace();
+			//#endif
 		}
 		catch(RecordStoreException e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("RecordStoreException: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e);
 			e.printStackTrace();
+			//#endif
 		}
 		catch(IOException e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("IOException: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.err.println(e);
 			e.printStackTrace();
+			//#endif
 		}
 		catch(Exception e){
 			if(this.eventListener != null)
 				this.eventListener.errorOccured("Exception e: ", e);
+			//#if debug.output==verbose || debug.output==exception
 			System.err.println("Exception e : " + e.getMessage());
 			e.printStackTrace();
+			//#endif
 		}
 		finally{
 			close();
