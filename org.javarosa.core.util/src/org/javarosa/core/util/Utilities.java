@@ -9,7 +9,6 @@ public class Utilities {
 		int index = values.indexOf(c);
 		while(index != -1){
 			String tempp = values.substring(pos, index).trim();
-			//System.out.println(tempp+pos+index);
 			temp.addElement(tempp);
 			pos = index+1;
 			index = values.indexOf(c,pos);
