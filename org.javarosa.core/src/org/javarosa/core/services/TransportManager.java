@@ -18,7 +18,7 @@ import org.javarosa.core.util.Observer;
  * 
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
-public class TransportManager implements Observer, IService {
+public class TransportManager implements Observer, IService, ITransportManager {
 
 	/**
 	 * The unique identifier of the device. Hard coded for now.
@@ -54,18 +54,15 @@ public class TransportManager implements Observer, IService {
 		this.storage = storage;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#getName()
+	 */
 	public String getName() {
 		return "Transport Manager";
 	}
 
-	/**
-	 * Enqueues a block of data to be transmitted using the given transport method.
-	 * 
-	 * @param data The block of data to be transmitted
-	 * @param destination The destination for the given data
-	 * @param transportMethod the ID of a TransportMethod registered with this manager
-	 * @param formDataId The ID of the form that should be transmitted
-	 * @throws IOException If the transport method requested is not available 
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#enqueue(byte[], java.lang.String, int, int)
 	 */
 	public void enqueue(byte[] data, String destination, int transportMethod, int formDataId)
 			throws IOException {
@@ -91,25 +88,16 @@ public class TransportManager implements Observer, IService {
 		selectedMethod.transmit(message, this);
 	}
 
-	/**
-	 * Returns a TransportMethod registered with this Manager
-	 * 
-	 * @param transportMethod The ID of the transport method being
-	 * requested
-	 * 
-	 * @return A TransportMethod corresponding to the given 
-	 * ID, registered with this manager. null if none exists 
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#getTransportMethod(int)
 	 */
 	public TransportMethod getTransportMethod(int transportMethod) {
 		return (TransportMethod) transportMethods.get(new Integer(
 				transportMethod));
 	}
 
-	/**
-	 * Fires a string to the current message listener
-	 * 
-	 * @param string The message to be shown
-	 * @param messageType The type of the given message
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#showMessage(java.lang.String, int)
 	 */
 	public void showMessage(String string, int messageType) {
 		if (messageListener != null) {
@@ -117,11 +105,8 @@ public class TransportManager implements Observer, IService {
 		}
 	}
 
-	/**
-	 * Sets a new message listener for this manager.
-	 * 
-	 * @param messageListener
-	 *            the messageListener to set
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#setMessageListener(org.javarosa.core.services.transport.MessageListener)
 	 */
 	public void setMessageListener(MessageListener messageListener) {
 		this.messageListener = messageListener;
@@ -134,12 +119,8 @@ public class TransportManager implements Observer, IService {
 		// new BluetoothTransportMethod().startServer(this);
 	}
 
-	/**
-	 * Sends a message using the given transport method
-	 * 
-	 * @param message The message to be transmitted
-	 * @param transportMethod the ID of a TransportMethod registered
-	 * with this manager to be used to transmit the given message
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#send(org.javarosa.core.services.transport.TransportMessage, int)
 	 */
 	public void send(TransportMessage message, int transportMethod) {
 		TransportMethod method = getTransportMethod(transportMethod);
@@ -147,32 +128,23 @@ public class TransportManager implements Observer, IService {
 		method.transmit(message, this);
 	}
 
-	/**
-	 * Registers a new TransportMethod with this manager, able to be retrieved
-	 * by the method's Id.
-	 * 
-	 * @param transportMethod The method to be registered
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#registerTransportMethod(org.javarosa.core.services.transport.TransportMethod)
 	 */
 	public void registerTransportMethod(TransportMethod transportMethod) {
 		transportMethods.put(new Integer(transportMethod.getId()),
 				transportMethod);
 	}
 
-	/**
-	 * Removes the given TransportMethod from this manager, if it is currently
-	 * registered.
-	 * 
-	 * @param transportMethod The method to be removed from the manager
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#deregisterTransportMethod(org.javarosa.core.services.transport.TransportMethod)
 	 */
 	public void deregisterTransportMethod(TransportMethod transportMethod) {
 		transportMethods.remove(new Integer(transportMethod.getId()));
 	}
 
-	/**
-	 * Returns an enumeration of all of the TransportMethods currently
-	 * available in the manager.
-	 * 
-	 * @return an Enumeration of all available transport methods
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#getTransportMethods()
 	 */
 	public Enumeration getTransportMethods() {
 		return transportMethods.elements();
@@ -191,6 +163,9 @@ public class TransportManager implements Observer, IService {
 	 * @see org.openmrs.transport.Observer#update(org.openmrs.transport.Observable,
 	 *      java.lang.Object)
 	 */
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#update(org.javarosa.core.util.Observable, java.lang.Object)
+	 */
 	public void update(Observable observable, Object arg) {
 		try {
 			storage.updateMessage((TransportMessage) observable);
@@ -205,6 +180,9 @@ public class TransportManager implements Observer, IService {
 	 * @see org.openmrs.transport.Observer#update(org.openmrs.transport.Observable,
 	 *      java.lang.Object)
 	 */
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#deleteMessage(int)
+	 */
 	public void deleteMessage(int msgIndex) {
 		try {
 			storage.deleteMessage(msgIndex);
@@ -213,20 +191,15 @@ public class TransportManager implements Observer, IService {
 		}
 	}
 
-	/**
-	 * Returns all of the current messages received by the TransportManager
-	 * 
-	 * @return An enumeration of all messages received by the manager
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#getMessages()
 	 */
 	public Enumeration getMessages() {
 		return storage.messageElements();
 	}
 
-	/**
-	 * Updates a given message stored in the manager
-	 * 
-	 * @param message The message to be updated
-	 * @throws IOException
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.ITransportManager#updateMessage(org.javarosa.core.services.transport.TransportMessage)
 	 */
 	public void updateMessage(TransportMessage message) throws IOException {
 		storage.updateMessage(message);

@@ -6,6 +6,7 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.services.IService;
+import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.StorageManager;
 import org.javarosa.core.services.TransportManager;
@@ -25,7 +26,7 @@ public class JavaRosaServiceProvider {
 	private Display display;
 	
 	private StorageManager storageManager;
-    private TransportManager transportManager;
+    private ITransportManager transportManager;
     private PropertyManager propertyManager;
 	
 	Hashtable services;
@@ -79,7 +80,7 @@ public class JavaRosaServiceProvider {
 			return storageManager;
 	}
 	
-	public TransportManager getTransportManager() {
+	public ITransportManager getTransportManager() {
 		if(transportManager == null) {
 			transportManager = new TransportManager(new RmsStorage());
 			this.registerService(transportManager);
