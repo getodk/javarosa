@@ -8,7 +8,7 @@ import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
-import org.javarosa.core.services.TransportManager;
+import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 
@@ -22,14 +22,14 @@ public class HttpTransportMethod implements TransportMethod {
 
 	private TransportMessage message;
 
-	private TransportManager manager;
+	private ITransportManager manager;
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.openmrs.transport.TransportMethod#transmit(org.openmrs.transport.TransportMessage)
 	 */
-	public void transmit(TransportMessage message, TransportManager manager) {
+	public void transmit(TransportMessage message, ITransportManager manager) {
 		this.message = message;
 		this.manager = manager;
 		new Thread(new WorkerThread()).start();
