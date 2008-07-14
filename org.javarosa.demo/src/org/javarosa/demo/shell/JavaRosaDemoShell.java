@@ -189,14 +189,16 @@ public class JavaRosaDemoShell implements IShell {
 		}
 	}
 
-	public void setDisplay(IActivity callingActivity, Displayable display) {
+	public boolean setDisplay(IActivity callingActivity, Displayable display) {
 		if(callingActivity == currentActivity) {
 			JavaRosaServiceProvider.instance().getDisplay().setCurrent(display);
+			return true;
 		}
 		else {
 			//#if debug.output==verbose
 			System.out.println("Activity: " + callingActivity + " attempted, but failed, to set the display");
 			//#endif
+			return false;
 		}
 	}
 	
