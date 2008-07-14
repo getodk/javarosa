@@ -35,7 +35,7 @@ import org.javarosa.xform.util.XFormUtils;
  */
 public class JavaRosaDemoShell implements IShell {
 	// List of views that are used by this shell
-	MIDlet runningAssembly;
+	MIDlet midlet;
 	FormListActivity formActivity = null;
 	SplashScreenModule splashScreen = null;
 	FormTransportActivity formTransport = null;
@@ -54,7 +54,7 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	public void exitShell() {
-		runningAssembly.notifyDestroyed();
+		midlet.notifyDestroyed();
 	}
 	
 	public void run() {
@@ -200,7 +200,7 @@ public class JavaRosaDemoShell implements IShell {
 		}
 	}
 	
-	public void setRunningAssembly(MIDlet assembly) {
-		this.runningAssembly = assembly;
+	public void setMIDlet(MIDlet midlet) {
+		this.midlet = midlet;
 	}
 }
