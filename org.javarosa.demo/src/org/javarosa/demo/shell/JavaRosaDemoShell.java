@@ -20,9 +20,11 @@ import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.activity.SplashScreenModule;
 import org.javarosa.demo.properties.DemoAppProperties;
+import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormListActivity;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
+import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
@@ -36,11 +38,12 @@ import org.javarosa.xform.util.XFormUtils;
 public class JavaRosaDemoShell implements IShell {
 	// List of views that are used by this shell
 	MIDlet midlet;
-	FormListActivity formActivity = null;
+	FormListActivity formListActivity = null;
 	SplashScreenModule splashScreen = null;
 	FormTransportActivity formTransport = null;
 	ModelListActivity modelActivity = null;
 	PropertyScreenActivity propertyActivity = null;
+	FormEntryActivity entryActivity = null;
 	
 	WorkflowStack stack;
 	
@@ -60,9 +63,10 @@ public class JavaRosaDemoShell implements IShell {
 	public void run() {
 		init();
 		this.splashScreen = new SplashScreenModule(this, "/splash.gif");
-		this.formActivity = new FormListActivity(this,"Forms List");
+		this.formListActivity = new FormListActivity(this,"Forms List");
 		this.formTransport = new FormTransportActivity(this);
 		this.modelActivity = new ModelListActivity(this);
+		this.entryActivity  = new FormEntryActivity(this);
 		
 		this.propertyActivity = new PropertyScreenActivity(this);
 		
@@ -76,6 +80,7 @@ public class JavaRosaDemoShell implements IShell {
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new DemoAppProperties());
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new HttpTransportProperties());
+		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FormManagerProperties());
 		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 		
@@ -107,8 +112,8 @@ public class JavaRosaDemoShell implements IShell {
 		else {
 			// TODO Auto-generated method stub
 			if (lastActivity == this.splashScreen) {
-				currentActivity = formActivity;
-				this.formActivity.start(context);
+				currentActivity = formListActivity;
+				this.formListActivity.start(context);
 			}
 			if (lastActivity == this.modelActivity) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
@@ -154,7 +159,7 @@ public class JavaRosaDemoShell implements IShell {
 					
 				}
 			}
-			if (lastActivity == this.formActivity) {
+			if (lastActivity == this.formListActivity) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 					String returnVal = (String)returnVals.get("command");
 					if(returnVal == Commands.CMD_VIEW_DATA) {
@@ -165,16 +170,20 @@ public class JavaRosaDemoShell implements IShell {
 						currentActivity = this.propertyActivity;
 						this.propertyActivity.start(context);
 					}
+					if(returnVal == Commands.CMD_SELECT_XFORM) {
+						currentActivity = this.entryActivity;
+						this.entryActivity.start(context);
+					}
 				}
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
 					
 				}
 			}
-		}
-		if(currentActivity == lastActivity) {
-			//We didn't launch anything. Go to default
-			currentActivity = formActivity;
-			formActivity.start(context);
+			if(currentActivity == lastActivity) {
+				//We didn't launch anything. Go to default
+				currentActivity = formListActivity;
+				formListActivity.start(context);
+			}
 		}
 	}
 
