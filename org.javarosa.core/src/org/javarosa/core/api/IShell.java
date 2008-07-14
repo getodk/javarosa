@@ -3,6 +3,7 @@ package org.javarosa.core.api;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.midlet.MIDlet;
 
 /**
  * Shells are responsible for controlling the workflow of a 
@@ -36,4 +37,11 @@ public interface IShell {
 	 * @param display The displayable to be set
 	 */
 	void setDisplay(IActivity callingActivity, Displayable display);
+	
+	/**
+	 * Sets the currently executing MIDlet.
+	 * 
+	 * @param midlet The currently executing MIDlet
+	 */
+	public void setMIDlet(MIDlet midlet);
 }

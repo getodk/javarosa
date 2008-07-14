@@ -1,6 +1,6 @@
 package org.javarosa.core.services.transport;
 
-import org.javarosa.core.services.TransportManager;
+import org.javarosa.core.services.ITransportManager;
 
 /**
  * Interface all transport methods have to implement.
@@ -20,7 +20,7 @@ public interface TransportMethod {
 	 * @param message
 	 * @param manager
 	 */
-	public void transmit(TransportMessage message, TransportManager manager);
+	public void transmit(TransportMessage message, ITransportManager manager);
 
 	/**
 	 * @return the name of the transport method
