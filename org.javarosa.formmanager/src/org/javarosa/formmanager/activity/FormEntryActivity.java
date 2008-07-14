@@ -1,21 +1,47 @@
 package org.javarosa.formmanager.activity;
 
-import org.javarosa.core.*;
-import org.javarosa.core.api.*;
-import org.javarosa.formmanager.model.*;
-import org.javarosa.formmanager.controller.*;
-import org.javarosa.formmanager.view.*;
-import org.javarosa.formmanager.view.chatterbox.*;
+import java.util.Enumeration;
+import java.util.Vector;
+
+import org.javarosa.core.Context;
+import org.javarosa.core.api.Constants;
+import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.IShell;
+import org.javarosa.formmanager.controller.FormEntryController;
+import org.javarosa.formmanager.model.FormEntryModel;
+import org.javarosa.formmanager.view.IFormEntryView;
+import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 public class FormEntryActivity implements IActivity {
-	IShell shell;
-	FormEntryContext context;
-	FormEntryModel model;
-	FormEntryController controller;
-	IFormEntryView view;
+	/** View for entering data **/
+	private IFormEntryView view;
 	
-	public FormEntryActivity (IShell shell) {
-		this.shell = shell;
+	/** View's controller **/
+	private FormEntryController controller;
+	
+	/** The form that is to be displayed to the user, and its values **/
+	private FormEntryModel model;
+
+	/** Current running context **/
+	FormEntryContext context;
+	
+	/** The parent shell **/
+	IShell parent;
+
+	public FormEntryActivity(IShell parent) {
+		this.parent = parent;
+	}
+	
+	public void contextChanged(Context context) {
+		Vector contextChanges = this.context.mergeInContext(context);
+		
+		Enumeration en = contextChanges.elements();
+		while(en.hasMoreElements()) {
+			String changedValue = (String)en.nextElement();
+			if(changedValue == Constants.USER_KEY) {
+				//Do we need to update the username?
+			}
+		}
 	}
 	
 	public void start (Context context) {
@@ -25,16 +51,21 @@ public class FormEntryActivity implements IActivity {
 		//parse form
 		//pre-process form
 		
+		if(context.getClass() == FormEntryContext.class) {
+			context = (FormEntryContext)context;
+			//Set the form definition here
+		}
+		
 		model = new FormEntryModel(/* form data */);
 		controller = new FormEntryController(model);
 		view = new Chatterbox("Chatterbox", model, controller); //shouldn't reference this directly
+		
+		controller.setView(view);
 
-		//shell.setDisplay(this, view); //how to do this?
+		//We need to figure out how to identify the View that should be used here.
+		//Probably with the properties
 	}
 	
-	public void contextChanged (Context globalContext) {
-		
-	}
 	
 	public void halt () {
 		//save displayable
