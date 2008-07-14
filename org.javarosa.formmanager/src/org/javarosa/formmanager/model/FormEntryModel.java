@@ -6,8 +6,12 @@ import org.javarosa.clforms.api.Form;
 import org.javarosa.formmanager.utility.*;
 
 public class FormEntryModel {
-    private Form form;
+    private FormDef form;
 
+    public FormEntryModel(FormDef form) {
+    	this.form = form;
+    }
+    
     int activeQuestionIndex;
     int instanceID;
     boolean unsavedChanges;
