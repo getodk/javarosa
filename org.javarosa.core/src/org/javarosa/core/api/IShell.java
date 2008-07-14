@@ -36,12 +36,12 @@ public interface IShell {
 	 * @param callingModule The module attempting to set the displayable
 	 * @param display The displayable to be set
 	 */
-	void setDisplay(IActivity callingActivity, Displayable display);
+	boolean setDisplay(IActivity callingActivity, Displayable display);
 	
 	/**
 	 * Sets the currently executing MIDlet.
 	 * 
 	 * @param midlet The currently executing MIDlet
 	 */
-	public void setMIDlet(MIDlet midlet);
+	void setMIDlet(MIDlet midlet);
 }
