@@ -3,16 +3,20 @@ package org.javarosa.formmanager.activity;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Displayable;
+
 import org.javarosa.core.Context;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
+import org.javarosa.formmanager.model.IControllerListener;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
-public class FormEntryActivity implements IActivity {
+public class FormEntryActivity implements IActivity, IControllerListener {
+
 	/** View for entering data **/
 	private IFormEntryView view;
 	
@@ -57,7 +61,7 @@ public class FormEntryActivity implements IActivity {
 		}
 		
 		model = new FormEntryModel(/* form data */);
-		controller = new FormEntryController(model);
+		controller = new FormEntryController(model, this);
 		view = new Chatterbox("Chatterbox", model, controller); //shouldn't reference this directly
 		
 		controller.setView(view);
@@ -77,5 +81,10 @@ public class FormEntryActivity implements IActivity {
 	
 	public void destroy () {
 		//initiate destory of m v c
+	}
+	
+	public void setView(Displayable view) {
+		parent.setDisplay(this, view);
+		
 	}
 }
