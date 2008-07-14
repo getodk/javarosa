@@ -9,6 +9,7 @@ public class FormEntryModel {
     private Form form;
 
     int activeQuestionIndex;
+    int instanceID;
     boolean unsavedChanges;
     
     public int getQuestionIndex () {

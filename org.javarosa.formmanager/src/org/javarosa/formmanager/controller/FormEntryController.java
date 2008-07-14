@@ -29,8 +29,8 @@ public class FormEntryController {
 		}
 	}
 	
-	public void stepQuestion (boolean next) {
-		selectQuestion(model.getQuestionIndex() + (next ? 1 : -1)); // +/- 1 won't work; need to find next *relevant* question
+	public void stepQuestion (boolean forward) {
+		selectQuestion(model.getQuestionIndex() + (forward ? 1 : -1)); // +/- 1 won't work; need to find next *relevant* question
 	}
 	
 	public void selectQuestion (int questionIndex) {
@@ -38,7 +38,7 @@ public class FormEntryController {
 	}
 	
 	public void save () {
-		
+		//do form post-processing here
 	}
 	
 	public void exit () {
