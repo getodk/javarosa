@@ -64,11 +64,16 @@ public class FormListActivity implements IActivity {
 			String cmd = (String)en.nextElement();
 		
 		if( cmd == Commands.CMD_SELECT_XFORM){
-			//LOG
 			//#if debug.output==verbose
 			System.out.println("Selected form: " + formIDs.elementAt( ((Integer)(returnvals.get(cmd))).intValue() ));
 			//#endif
-			// 
+			FormDefMetaData meta = (FormDefMetaData)formIDs.elementAt(formsList.getSelectedIndex());
+			
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put("formId", new Integer(meta.getRecordId()));
+			returnArgs.put("command", Commands.CMD_SELECT_XFORM);
+			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
+			
 			break;
 		
 		} else if (cmd == Commands.CMD_EXIT) {

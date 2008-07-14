@@ -13,5 +13,5 @@ public interface IFormEntryView {
 	
 	public void formComplete ();
 	
-	public void show();
+	//public void show();
 }

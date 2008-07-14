@@ -6,8 +6,9 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Form;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -22,8 +23,11 @@ import org.javarosa.formmanager.model.IControllerListener;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
-public class FormEntryActivity implements IActivity, IControllerListener {
+public class FormEntryActivity implements IActivity, IControllerListener, CommandListener {
 
+	/** Alert if the form cannot load **/
+	private Alert alert;
+	
 	/** View for entering data **/
 	private IFormEntryView view;
 	
@@ -117,13 +121,19 @@ public class FormEntryActivity implements IActivity, IControllerListener {
 	
 	public void setView(Displayable view) {
 		parent.setDisplay(this, view);
-		
+	}
+	
+	public void commandAction(Command command, Displayable display) {
+		if(display == alert) {
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+		}
 	}
 	
 	private void displayError(String errorMsg) {
-		Alert alert = new Alert("Form Entry Error");
+		alert = new Alert("Form Entry Error");
 		alert.setType(AlertType.ERROR);
-		alert.setString(errorMsg);
+		alert.setString(FormEntryActivity.LOAD_ERROR);
 		setView(alert);
+		alert.setCommandListener(this);
 	}
 }
