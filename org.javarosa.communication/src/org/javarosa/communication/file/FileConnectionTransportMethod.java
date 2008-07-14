@@ -9,7 +9,7 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
 
-import org.javarosa.core.services.TransportManager;
+import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.storage.utilities.Serializer;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -25,7 +25,7 @@ public class FileConnectionTransportMethod implements TransportMethod {
 
 	private TransportMessage message;
 
-	private TransportManager manager;
+	private ITransportManager manager;
 
 	/**
 	 * Creates a new instance of <code>FileConnectionTransportMethod</code>
@@ -40,7 +40,7 @@ public class FileConnectionTransportMethod implements TransportMethod {
 	 * @see org.openmrs.transport.TransportMethod#transmit(org.openmrs.transport.TransportMessage,
 	 *      org.openmrs.transport.TransportManager)
 	 */
-	public void transmit(TransportMessage message, TransportManager manager) {
+	public void transmit(TransportMessage message, ITransportManager manager) {
 		//#if debug.output==verbose
 		System.out.println("File connection: transmit");
 		//#endif
