@@ -11,8 +11,11 @@ public class FormEntryController {
 	FormEntryModel model;
 	IFormEntryView view;
 	
-	public FormEntryController (FormEntryModel model) {
+	IControllerListener listener;
+	
+	public FormEntryController (FormEntryModel model, IControllerListener listener) {
 		this.model = model;
+		this.listener = listener;
 	}
 	
 	public void setView (IFormEntryView view) {
