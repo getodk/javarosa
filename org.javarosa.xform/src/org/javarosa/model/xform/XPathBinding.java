@@ -7,7 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.model.IBinding;
+import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.Utilities;
 import org.javarosa.core.util.db.PersistentHelper;
@@ -16,7 +16,7 @@ import org.javarosa.core.util.db.PersistentHelper;
 /**
  * 
  */
-public class XPathBinding implements IBinding {
+public class XPathBinding implements DataBinding {
 
 	private String id;
 	private String nodeset;
