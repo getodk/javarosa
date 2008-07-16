@@ -8,14 +8,14 @@ import org.javarosa.core.model.IDataReference;
 /**
  * 
  */
-public class XPathBinding implements IDataReference {
+public class XPathReference implements IDataReference {
 	private String xpath;
 	
-	public XPathBinding () {
+	public XPathReference () {
 		this(null);
 	}
 	
-	public XPathBinding (String xpath) {
+	public XPathReference (String xpath) {
 		setReference(xpath);
 	}
 	
