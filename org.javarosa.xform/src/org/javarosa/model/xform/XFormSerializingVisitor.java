@@ -17,15 +17,31 @@ import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 
+/**
+ * A visitor class which walks a DataModelTree and constructs an XML document
+ * containing its instance.
+ * 
+ * The XML node elements are constructed in a depth-first manner, consistent with
+ * standard XML document parsing.
+ * 
+ * @author Clayton Sims
+ *
+ */
 public class XFormSerializingVisitor implements IDataModelSerializingVisitor, ITreeVisitor {
 
+	/** The XML document containing the instance that is to be returned */
 	Document theXmlDoc;
 	
+	/** A hashtable linking TreeElements to the xml element that they should add themselves to */
 	Hashtable parentList;
 	
+	/** The serializer to be used in constructing XML for AnswerData elements */
 	IAnswerDataSerializer serializer;
 	
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.DataModelTree)
+	 */
 	public void visit(DataModelTree tree) {
 		theXmlDoc = new Document();
 		tree.accept(this);
@@ -33,6 +49,10 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 		parentList.put(tree.getRootElement(), theXmlDoc);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.QuestionDataElement)
+	 */
 	public void visit(QuestionDataElement element) {
 		
 		//First create the textual element for this question data
@@ -56,6 +76,10 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.QuestionDataGroup)
+	 */
 	public void visit(QuestionDataGroup element) {
 		Element thisNode = new Element();
 		thisNode.setName(element.getName());
@@ -72,11 +96,19 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.TreeElement)
+	 */
 	public void visit(TreeElement element) {
 		// TODO Auto-generated method stub
 		
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.IDataModelSerializingVisitor#serializeDataModel(org.javarosa.core.model.IFormDataModel)
+	 */
 	public DataOutputStream serializeDataModel(IFormDataModel model) {
 		model.accept(this);
 		if(theXmlDoc != null) {
@@ -88,12 +120,20 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.IDataModelVisitor#visit(org.javarosa.core.model.IFormDataModel)
+	 */
 	public void visit(IFormDataModel dataModel) {
 		if(dataModel.getClass() == DataModelTree.class) {
 			((DataModelTree)dataModel).accept(this); 
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.IDataModelSerializingVisitor#setAnswerDataSerializer(org.javarosa.core.model.IAnswerDataSerializer)
+	 */
 	public void setAnswerDataSerializer(IAnswerDataSerializer ads) {
 		this.serializer = ads;
 	}
