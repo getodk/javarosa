@@ -22,7 +22,7 @@ public class SkipRule implements Externalizable{
 	/** The numeric identifier of a rule. This is assigned in code and hence
 	 * is not known by the user.
 	 */
-	private byte id = Constants.NULL_ID;
+	private int id = Constants.NULL_ID;
 	
 	/** A list of conditions to be tested for a rule. 
 	 * E.g. If sex is Male. If age is greatern than 4. etc
@@ -32,7 +32,7 @@ public class SkipRule implements Externalizable{
 	/** The action taken when conditions are true.
 	 * Example of actions are Disable, Hide, Show, etc
 	 */
-	private byte action = Constants.ACTION_NONE;
+	private int action = Constants.ACTION_NONE;
 	
 	/** A list of question identifiers acted upon when conditions for the rule are true. */
 	private Vector actionTargets;
@@ -52,7 +52,7 @@ public class SkipRule implements Externalizable{
 	 * @param action
 	 * @param actionTargets
 	 */
-	public SkipRule(byte ruleId, Vector conditions, byte action, Vector actionTargets, String name) {
+	public SkipRule(int ruleId, Vector conditions, int action, Vector actionTargets, String name) {
 		this();
 		setId(ruleId);
 		setConditions(conditions);
@@ -61,11 +61,11 @@ public class SkipRule implements Externalizable{
 		setName(name);
 	}
 	
-	public byte getAction() {
+	public int getAction() {
 		return action;
 	}
 
-	public void setAction(byte action) {
+	public void setAction(int action) {
 		this.action = action;
 	}
 
@@ -85,11 +85,11 @@ public class SkipRule implements Externalizable{
 		this.conditions = conditions;
 	}
 
-	public byte getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(byte id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -107,7 +107,7 @@ public class SkipRule implements Externalizable{
 	 * @param data
 	 */
 	public void fire(FormData data){
-		for(byte i=0; i<this.getConditions().size(); i++){
+		for(int i=0; i<this.getConditions().size(); i++){
 			Condition condition = (Condition)this.getConditions().elementAt(i);
 			ExecuteAction(data,condition.isTrue(data));
 		}
@@ -116,7 +116,7 @@ public class SkipRule implements Externalizable{
 	/** Executes the action of a rule for its conditition's true or false value. */
 	public void ExecuteAction(FormData data,boolean conditionTrue){
 		Vector qtns = this.getActionTargets();
-		for(byte i=0; i<qtns.size(); i++)
+		for(int i=0; i<qtns.size(); i++)
 			ExecuteAction(data.getQuestion(qtns.elementAt(i).toString()).getDef(),conditionTrue);
 	}
 	
@@ -149,8 +149,8 @@ public class SkipRule implements Externalizable{
 	 */
 	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
 		if(!ExternalizableHelper.isEOF(dis)){
-			setId(dis.readByte());
-			setAction(dis.readByte());
+			setId(dis.readInt());
+			setAction(dis.readInt());
 			setConditions(ExternalizableHelper.readExternal(dis,new Condition().getClass()));
 			setActionTargets(ExternalizableHelper.readUTFs(dis));
 			setName(dis.readUTF());
@@ -161,8 +161,8 @@ public class SkipRule implements Externalizable{
 	 * @see org.javarosa.util.db.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
-		dos.writeByte(getId());
-		dos.writeByte(getAction());
+		dos.writeInt(getId());
+		dos.writeInt(getAction());
 		ExternalizableHelper.writeExternal(getConditions(), dos);
 		ExternalizableHelper.writeUTFs(getActionTargets(), dos);
 		dos.writeUTF(getName());

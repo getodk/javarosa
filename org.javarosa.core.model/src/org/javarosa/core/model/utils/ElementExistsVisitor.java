@@ -1,8 +1,5 @@
 package org.javarosa.core.model.utils;
 
-import java.util.Enumeration;
-import java.util.Vector;
-
 import org.javarosa.core.model.DataModelTree;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.QuestionDataElement;

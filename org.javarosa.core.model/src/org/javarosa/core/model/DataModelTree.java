@@ -3,6 +3,7 @@ package org.javarosa.core.model;
 import java.io.DataOutputStream;
 import java.util.Enumeration;
 
+import org.javarosa.formmanager.model.temp.QuestionData;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.model.utils.ITreeVisitor;
 
