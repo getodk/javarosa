@@ -20,7 +20,7 @@ public class Condition implements Externalizable{
 	private String questionId;
 	
 	/** The operator of the condition. Eg Equal to, Greater than, etc. */
-	private byte operator = Constants.OPERATOR_NULL;
+	private int operator = Constants.OPERATOR_NULL;
 	
 	/** The value checked to see if the condition is true or false.
 	 * For the above example, the value would be 4 or the id of the Male option.
@@ -29,7 +29,7 @@ public class Condition implements Externalizable{
 	private String value = Constants.EMPTY_STRING;
 	
 	/** The unique identifier of a condition. */
-	private byte id = Constants.NULL_ID;
+	private int id = Constants.NULL_ID;
 	
 	/** Creates a new condition object. */
 	public Condition(){
@@ -44,7 +44,7 @@ public class Condition implements Externalizable{
 	 * @param operator - the condition operator.
 	 * @param value - the value to be equated to.
 	 */
-	public Condition(byte id,String questionId, byte operator, String value) {
+	public Condition(int id,String questionId, int operator, String value) {
 		this();
 		setQuestionId(questionId);
 		setOperator(operator);
@@ -52,10 +52,10 @@ public class Condition implements Externalizable{
 		setId(id);
 	}
 	
-	public byte getOperator() {
+	public int getOperator() {
 		return operator;
 	}
-	public void setOperator(byte operator) {
+	public void setOperator(int operator) {
 		this.operator = operator;
 	}
 	public String getQuestionId() {
@@ -70,10 +70,10 @@ public class Condition implements Externalizable{
 	public void setValue(String value) {
 		this.value = value;
 	}
-	public byte getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(byte conditionId) {
+	public void setId(int conditionId) {
 		this.id = conditionId;
 	}
 	
@@ -148,10 +148,10 @@ public class Condition implements Externalizable{
 		
 		//For the sake of performance, we dont compare the actual value.
 		//We instead use the index.		
-		byte val1 = Byte.parseByte(data.getOptionAnswerIndices().toString());
+		int val1 = Integer.parseInt(data.getOptionAnswerIndices().toString());
 		val1 += 1;
 		
-		byte val2 = Byte.parseByte(value);
+		int val2 = Integer.parseInt(value);
 
 		switch(operator){
 			case Constants.OPERATOR_EQUAL:

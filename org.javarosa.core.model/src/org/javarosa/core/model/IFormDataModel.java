@@ -1,6 +1,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.utils.IDataModelVisitor;
+import org.javarosa.formmanager.model.temp.QuestionData;
 
 public interface IFormDataModel {
 	

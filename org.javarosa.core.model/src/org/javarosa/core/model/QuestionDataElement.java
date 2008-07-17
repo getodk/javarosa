@@ -1,5 +1,7 @@
 package org.javarosa.core.model;
 
+import org.javarosa.formmanager.model.temp.QuestionData;
+
 import org.javarosa.core.model.utils.ITreeVisitor;
 
 /**
