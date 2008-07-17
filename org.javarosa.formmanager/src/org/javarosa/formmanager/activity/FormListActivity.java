@@ -26,6 +26,10 @@ import org.javarosa.formmanager.view.ViewTypes;
  *
  */
 public class FormListActivity implements IActivity {
+	
+	public static final String COMMAND_KEY = "command";
+	public static final String FORM_ID_KEY = "form_id";
+	
 	private FormList formsList = null;
 	private Hashtable listOfForms = null;
 	private Vector formIDs = null;
@@ -70,8 +74,8 @@ public class FormListActivity implements IActivity {
 			FormDefMetaData meta = (FormDefMetaData)formIDs.elementAt(formsList.getSelectedIndex());
 			
 			Hashtable returnArgs = new Hashtable();
-			returnArgs.put("formId", new Integer(meta.getRecordId()));
-			returnArgs.put("command", Commands.CMD_SELECT_XFORM);
+			returnArgs.put(FORM_ID_KEY, new Integer(meta.getRecordId()));
+			returnArgs.put(COMMAND_KEY, Commands.CMD_SELECT_XFORM);
 			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
 			
 			break;
@@ -81,11 +85,11 @@ public class FormListActivity implements IActivity {
 			
 		} else if (cmd == Commands.CMD_VIEW_DATA) {
 			Hashtable returnArgs = new Hashtable();
-			returnArgs.put("command", Commands.CMD_VIEW_DATA);
+			returnArgs.put(COMMAND_KEY, Commands.CMD_VIEW_DATA);
 			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
 		} else if (cmd == Commands.CMD_SETTINGS) {
 			Hashtable returnArgs = new Hashtable();
-			returnArgs.put("command", Commands.CMD_SETTINGS);
+			returnArgs.put(COMMAND_KEY, Commands.CMD_SETTINGS);
 			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
 		}
 		}
