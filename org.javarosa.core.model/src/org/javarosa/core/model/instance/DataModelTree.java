@@ -1,9 +1,13 @@
-package org.javarosa.core.model;
+package org.javarosa.core.model.instance;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Enumeration;
 
-import org.javarosa.formmanager.model.temp.QuestionData;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.data.AnswerData;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.model.utils.ITreeVisitor;
 
@@ -62,7 +66,7 @@ public class DataModelTree implements IFormDataModel {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.IFormDataModel#updateDataValue(IDataBinding, Object)
 	 */
-	public boolean updateDataValue(IDataReference questionBinding, QuestionData value) {
+	public boolean updateDataValue(IDataReference questionBinding, AnswerData value) {
 		QuestionDataElement questionElement = resolveReference(questionBinding);
 		if(questionElement != null) {
 			questionElement.setValue(value);
@@ -77,7 +81,7 @@ public class DataModelTree implements IFormDataModel {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.IFormDataModel#getDataValue(org.javarosa.core.model.IDataReference)
 	 */
-	public QuestionData getDataValue(IDataReference questionReference) {
+	public AnswerData getDataValue(IDataReference questionReference) {
 		QuestionDataElement element = resolveReference(questionReference);
 		if(element != null) {
 			return element.getValue();
@@ -148,15 +152,39 @@ public class DataModelTree implements IFormDataModel {
 			}
 		}
 	}
+	
 
+	public void readExternal(DataInputStream in) throws IOException,
+			InstantiationException, IllegalAccessException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		out.writeInt(this.id);
+		out.writeUTF(this.name);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.IFormDataModel#getName()
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Sets the name of this datamodel instance
+	 * @param name The name to be used
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.IFormDataModel#getId()
+	 */
 	public int getId() {
 		return id;
 	}

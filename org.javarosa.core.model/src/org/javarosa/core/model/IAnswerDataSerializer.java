@@ -1,6 +1,7 @@
 package org.javarosa.core.model;
 
-import org.javarosa.formmanager.model.temp.QuestionData;
+import org.javarosa.core.model.data.AnswerData;
+
 
 /**
  * An IAnswerDataSerializer returns an object that can be serialized
@@ -23,7 +24,7 @@ public interface IAnswerDataSerializer {
 	 * @return true if this can meaningfully serialze the provided
 	 * object. false otherwise
 	 */
-	boolean canSerialize(QuestionData data);
+	boolean canSerialize(AnswerData data);
 	
 	/**
 	 * Serializes the given data object into a format that can
@@ -34,7 +35,7 @@ public interface IAnswerDataSerializer {
 	 * given object if canSerialize() would return true for that
 	 * object. False otherwise.
 	 */
-	Object serializeAnswerData(QuestionData data);
+	Object serializeAnswerData(AnswerData data);
 	
 	/**
 	 * Extends the serializing capabilities of this serializer
