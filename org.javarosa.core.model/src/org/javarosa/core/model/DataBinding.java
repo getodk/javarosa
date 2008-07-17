@@ -1,6 +1,7 @@
 package org.javarosa.core.model;
 
 public class DataBinding {
+	private String id;
 	private IDataReference ref;
 	private int dataType;
 	//private ... constraints;
@@ -56,6 +57,14 @@ public class DataBinding {
 	
 	public void setPreloadParams(String preloadParams) {
 		this.preloadParams = preloadParams;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 	
 	
