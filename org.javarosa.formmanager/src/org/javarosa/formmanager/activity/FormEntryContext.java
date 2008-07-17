@@ -6,6 +6,10 @@ public class FormEntryContext extends Context {
 	public static final String FORM_ID = "FORM_ID";
 	public static final String INSTANCE_ID = "INSTANCE_ID";
 	
+	public FormEntryContext(Context context) { 
+		super(context);
+	}
+	
 	public int getFormID () {
 		return ((Integer)getElement(FORM_ID)).intValue();
 	}

@@ -130,10 +130,10 @@ public class FormEntryActivity implements IActivity, IControllerListener, Comman
 	}
 	
 	private void displayError(String errorMsg) {
-		alert = new Alert("Form Entry Error");
-		alert.setType(AlertType.ERROR);
-		alert.setString(FormEntryActivity.LOAD_ERROR);
+		alert = new Alert("Form Entry Error",errorMsg,null,AlertType.ERROR);
+		alert.setTimeout(Alert.FOREVER);
 		setView(alert);
+		//For some reason that I really can't figure out, this alert won't display the error text
 		alert.setCommandListener(this);
 	}
 }
