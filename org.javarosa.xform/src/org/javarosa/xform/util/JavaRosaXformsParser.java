@@ -12,15 +12,21 @@ import minixpath.XPathExpression;
 
 import org.javarosa.core.model.Condition;
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.DataBinding;
+import org.javarosa.core.model.DataModelTree;
 import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupData;
 import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.OptionDef;
 import org.javarosa.core.model.QuestionData;
+import org.javarosa.core.model.QuestionDataElement;
+import org.javarosa.core.model.QuestionDataGroup;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SkipRule;
-import org.javarosa.model.xform.XPathBinding;
+import org.javarosa.core.model.TreeElement;
+import org.javarosa.model.xform.XPathReference;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
@@ -46,7 +52,7 @@ public class JavaRosaXformsParser{
 		     
 	}
 	
-	private static String getXmlType(byte type){
+	private static String getXmlType(int type){
 		switch(type){
 			case Constants.QTN_TYPE_BOOLEAN:
 				return "xsd:boolean";
@@ -111,9 +117,10 @@ public class JavaRosaXformsParser{
 			Vector questions = page.getQuestions();
 			for(int i=0; i<questions.size(); i++){
 				QuestionDef qtn = (QuestionDef)questions.elementAt(i);
-				XPathBinding bind = (XPathBinding) qtn.getBind();
+				DataBinding bind = (DataBinding) qtn.getBind();
+				XPathReference reference  = (XPathReference)bind.getReference();
 				Element dataNode =  doc.createElement("http://www.w3.org/1999/xhtml", null);
-				dataNode.setName(bind.getNodeset());
+				dataNode.setName((String)reference.getReference());
 				//dataNode.addChild(Element.TEXT,"data");
 				formNode.addChild(Element.ELEMENT,dataNode);
 				
@@ -123,8 +130,8 @@ public class JavaRosaXformsParser{
 							"http://www.w3.org/2002/xforms", null);
 					bindNode.setName("bind");
 					bindNode.setAttribute(null, "id", bind.getId());
-					bindNode.setAttribute(null, "nodeset", bind.getNodeset());
-					bindNode.setAttribute(null, "type", bind.getType());
+					bindNode.setAttribute(null, "nodeset", (String)reference.getReference());
+					bindNode.setAttribute(null, "type", getXmlType(bind.getDataType()));
 					if (qtn.isMandatory())
 						bindNode.setAttribute(null, "required", "true()");
 					if (!qtn.isEnabled())
@@ -136,10 +143,11 @@ public class JavaRosaXformsParser{
 				Element inputNode =  getXformInputElementName(doc,qtn);
 				bodyNode.addChild(Element.ELEMENT,inputNode);
 				
-				if(bind.getRelevancy() != null && bind.getRelevancy() != "") {
+				//TODO Relevancy, update with conditions
+				//if(bind.getRelevancy() != null && bind.getRelevancy() != "") {
 					// TODO should this be in the xforms namespace?
-					inputNode.setAttribute(null, "relevant", bind.getRelevancy());
-				}
+				//	inputNode.setAttribute(null, "relevant", bind.getRelevancy());
+				//}
 				
 				Element labelNode =  doc.createElement("http://www.w3.org/2002/xforms", null);
 				labelNode.setName("label");
@@ -183,12 +191,14 @@ public class JavaRosaXformsParser{
 	
 	private static Element getXformInputElementName(Document doc, QuestionDef qtnDef){
 		Element node = doc.createElement("http://www.w3.org/2002/xforms", null);
-		XPathBinding bind = (XPathBinding)qtnDef.getBind();
+		//TODO update with reference
+		DataBinding bind = null;// = qtnDef.getBinding();
 		if(bind.getId() != "") {
 			node.setAttribute(null, "bind", bind.getId());
 		}
 		else {
-			node.setAttribute(null, "ref", bind.getNodeset());
+		    XPathReference reference = (XPathReference)bind.getReference();
+			node.setAttribute(null, "ref", (String)reference.getReference());
 		}
 
 		switch(qtnDef.getType()){
@@ -360,7 +370,8 @@ public class JavaRosaXformsParser{
 				//they are considered non-relevant.
 				if(qtnData.getDef().isVisible() && qtnData.getDef().isEnabled()){
 					Element node =  doc.createElement(null, null);
-					node.setName(((XPathBinding)qtnData.getDef().getBind()).getNodeset());
+					//TODO update with reference
+					//node.setName(((XPathBinding)qtnData.getDef().getBind()).getNodeset());
 					if(qtnData.getValueAnswer() != null)
 						node.addChild(Element.TEXT,qtnData.getValueAnswer());
 					rootNode.addChild(Element.ELEMENT,node);
@@ -369,9 +380,9 @@ public class JavaRosaXformsParser{
 		}
 		
 		return fromDoc2String(doc);
-	}	
+	}
 	
-	public static String fromDoc2String(Document doc){
+	public static ByteArrayOutputStream fromDoc2Stream(Document doc) {
 		KXmlSerializer serializer = new KXmlSerializer();
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
@@ -380,11 +391,16 @@ public class JavaRosaXformsParser{
 			serializer.setOutput(dos,null);
 			doc.write(serializer);
 			serializer.flush();
+			return bos;
 		}
 		catch(Exception e){
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static String fromDoc2String(Document doc){
+		ByteArrayOutputStream bos = fromDoc2Stream(doc);		
 		
 		byte[] byteArr = bos.toByteArray();
 		char[]charArray = new char[byteArr.length];
@@ -444,15 +460,17 @@ public class JavaRosaXformsParser{
 					dataNode.addChild(Element.TEXT,qtn.getValueAnswer());
 				formNode.addChild(Element.ELEMENT,dataNode);
 				
-				XPathBinding bind = (XPathBinding) qtn.getDef().getBind();
+				//TODO: Update with reference
+				DataBinding bind = null;//qtn.getDef().getBinding();
+				XPathReference reference = (XPathReference)bind.getReference();
 				// An empty string bind ID is actually a ref
 				if(!bind.getId().equals("")) {
 				Element bindNode = doc.createElement(
 							"http://www.w3.org/2002/xforms", null);
 					bindNode.setName("bind");
 					bindNode.setAttribute(null, "id", bind.getId());
-					bindNode.setAttribute(null, "nodeset", bind.getNodeset());
-					bindNode.setAttribute(null, "type", bind.getType());
+					bindNode.setAttribute(null, "nodeset", (String)reference.getReference());
+					bindNode.setAttribute(null, "type", getXmlType(bind.getDataType()));
 					if (qtn.getDef().isMandatory())
 						bindNode.setAttribute(null, "required", "true()");
 					if (!qtn.getDef().isEnabled())
@@ -541,6 +559,7 @@ public class JavaRosaXformsParser{
 		parseElement(formDef,rootNode,id2VarNameMap,null,relevants);
 		if(formDef.getName() == null || formDef.getName().length() == 0)
 			formDef.setName(formDef.getVariableName());
+		setFormDefDataModel(getInstanceNode(doc),formDef);
 		setDefaultValues(getInstanceDataNode(doc),formDef,id2VarNameMap);
 		addSkipRules(formDef,id2VarNameMap,relevants);
 		return formDef;
@@ -652,32 +671,34 @@ public class JavaRosaXformsParser{
 					if(dataNode.getAttributeValue(null, "name") != null)
 						formDef.setName(dataNode.getAttributeValue(null, "name"));
 				} else if (tagname.equals("bind") || tagname.equals("ref")) {
-					XPathBinding binding  = new XPathBinding();
+					DataBinding binding  = new DataBinding();
+					//binding
 					binding.setId(child.getAttributeValue("", "id"));
-					binding.setNodeset(child.getAttributeValue(null, "nodeset"));
-					binding.setType(child.getAttributeValue(null, "type"));
+					String nodeset = child.getAttributeValue(null, "nodeset");
+					XPathReference reference = new XPathReference(nodeset);
+					binding.setReference(reference);
+					setDataType(binding, child.getAttributeValue(null, "type")); 
 					//setQuestionType(qtn,type);
 					if(child.getAttributeValue(null, "required") != null && child.getAttributeValue(null, "required").equals("true()")) {
 						binding.setRequired(true);
 					}
-					if(child.getAttributeValue(null, "readonly") != null && child.getAttributeValue(null, "readonly").equals("true()"))
-						//qtn.setEnabled(false);
 					
 					//formDef.addQuestion(qtn);
-					map.put(binding.getId(), binding.getNodeset());
+					map.put(binding.getId(), nodeset);
 					if(child.getAttributeValue(null, "relevant") != null) {
 						//#if debug.output==verbose
 						System.out.println("Relevant!" + child.getAttributeValue(null,"relevant"));
 						//#endif
 						String relevancy = child.getAttributeValue(null, "relevant");
 						relevants.put(relevancy, binding);
-						binding.setRelevancy(relevancy);
+						//We're 
 					}
-					binding.preload = child.getAttributeValue("http://openrosa.org/javarosa", "preload");
-					binding.preloadParams = child.getAttributeValue("http://openrosa.org/javarosa", "preloadParams");
+					binding.setPreload(child.getAttributeValue("http://openrosa.org/javarosa", "preload"));
+					binding.setPreloadParams(child.getAttributeValue("http://openrosa.org/javarosa", "preloadParams"));
 					//It's very possible that we should actually be adding these to the Map, and that the 
 					//Questions should be what are added to the form
-					formDef.addBinding(binding);
+					//TODO: update with reference
+					//formDef.addBinding(binding);
 					
 				} else if (tagname.equals("input") || tagname.equals("select1") || tagname.equals("select")) {
 					String ref = child.getAttributeValue(null, "ref");
@@ -688,13 +709,15 @@ public class JavaRosaXformsParser{
 					//If the bind existed before, it's an xforms bind. Otherwise it's just a reference.
 					if(varName != null || qtn.getBind() != null){
 						if(tagname.equals("select1") || tagname.equals("select")){
-							qtn.setType((tagname.equals("select1")) ? Constants.QTN_TYPE_LIST_EXCLUSIVE : Constants.QTN_TYPE_LIST_MULTIPLE);
+							//TODO: update with reference
+							//qtn.getBinding().setDataType((tagname.equals("select1")) ? Constants.QTN_TYPE_LIST_EXCLUSIVE : Constants.QTN_TYPE_LIST_MULTIPLE);
 							qtn.setOptions(new Vector());
 						}
 						if(child.getAttributeValue(null, "relevant") != null) {
 							String relevancy = child.getAttributeValue(null, "relevant");
 							relevants.put(relevancy, qtn.getBind());
-							((XPathBinding)qtn.getBind()).setRelevancy(relevancy);
+							//TODO: update with reference
+							//((XPathBinding)qtn.getBind()).setRelevancy(relevancy);
 						}
 						questionDef = qtn;
 						// Call parseElement to attach any of the internal elements. Then add it to the form 
@@ -729,33 +752,52 @@ public class JavaRosaXformsParser{
 		
 		return questionDef;
 	}
-	//secret,textarea, submit, trigger, upload, range
-	/*<range ref="length" start="0" end="100" step="5">
-	  <label>Length:</label>
-	</range>*/
-	private static void setQuestionType(QuestionDef def, String type){
-		if(type.equals("xsd:string") || type.indexOf("string") != -1 )
-			def.setType(Constants.QTN_TYPE_TEXT);
-		else if((type.equals("xsd:integer") || type.equals("xsd:int")) || (type.indexOf("integer") != -1 || type.indexOf("int") != -1))
-			def.setType(Constants.QTN_TYPE_NUMERIC);
-		else if(type.equals("xsd:decimal") || type.indexOf("decimal") != -1 )
-			def.setType(Constants.QTN_TYPE_DECIMAL);
-		else if(type.equals("xsd:dateTime") || type.indexOf("dateTime") != -1 )
-			def.setType(Constants.QTN_TYPE_DATE_TIME);
-		else if(type.equals("xsd:time") || type.indexOf("time") != -1 )
-			def.setType(Constants.QTN_TYPE_TIME);
-		else if(type.equals("xsd:date") || type.indexOf("date") != -1 )
-			def.setType(Constants.QTN_TYPE_DATE);
-		else if(type.equals("xsd:boolean") || type.indexOf("boolean") != -1 )
-			def.setType(Constants.QTN_TYPE_BOOLEAN);
-	}
-	/*public StudyDef fromXform2StudyDef(String xform){
-		return null;
+	
+	private static void setFormDefDataModel(Element instanceNode, FormDef form) {
+		TreeElement root = parseInstanceElement(instanceNode, "/").getRoot();
+		DataModelTree instanceModel = new DataModelTree(root);
+		//form.setDataModel(instaneModel);
 	}
 	
-	public String fromStudyDef2Xform(StudyDef def){
-		return null;
-	}*/
+	private static TreeElement parseInstanceElement(Element node, String currentPath) {
+		int childNum = node.getChildCount();
+		
+		TreeElement element;
+		if(childNum == 0) {
+			XPathReference reference = new XPathReference(currentPath + node.getName());
+			//TODO: Figure out how to make the nodeset here.
+			element = new QuestionDataElement(node.getName(), reference);
+		} else {
+			element = new QuestionDataGroup(node.getName());
+			for(int i = 0 ; i  < childNum ; ++i ) {
+				String newPath = currentPath + node.getName() + "/";
+				((QuestionDataGroup)element).addChild(parseInstanceElement((Element)node.getChild(i), newPath));
+			}
+		}
+		return element;
+	}
+	
+	private static void setQuestionType(QuestionDef def, String type){
+		//TODO: update with reference
+		//setDataType(def.getBinding(), type);
+	}
+	
+	private static void setDataType(DataBinding bind, String type) {
+		if(type.equals("xsd:string") || type.indexOf("string") != -1 )
+			bind.setDataType(Constants.QTN_TYPE_TEXT);
+		else if((type.equals("xsd:integer") || type.equals("xsd:int")) || (type.indexOf("integer") != -1 || type.indexOf("int") != -1))
+			bind.setDataType(Constants.QTN_TYPE_NUMERIC);
+		else if(type.equals("xsd:decimal") || type.indexOf("decimal") != -1 )
+			bind.setDataType(Constants.QTN_TYPE_DECIMAL);
+		else if(type.equals("xsd:dateTime") || type.indexOf("dateTime") != -1 )
+			bind.setDataType(Constants.QTN_TYPE_DATE_TIME);
+		else if(type.equals("xsd:time") || type.indexOf("time") != -1 )
+			bind.setDataType(Constants.QTN_TYPE_TIME);
+		else if(type.equals("xsd:date") || type.indexOf("date") != -1 )
+			bind.setDataType(Constants.QTN_TYPE_DATE);
+		else if(type.equals("xsd:boolean") || type.indexOf("boolean") != -1 )
+			bind.setDataType(Constants.QTN_TYPE_BOOLEAN);
+	}
 	
 	private static void addSkipRules(FormDef formDef, Hashtable map, Hashtable relevants){
 		Vector rules = new Vector();
@@ -765,7 +807,7 @@ public class JavaRosaXformsParser{
 		
 		while(en.hasMoreElements()) {
 			String relevant = (String)en.nextElement();
-			XPathBinding bind = (XPathBinding)relevants.get(relevant);
+			DataBinding bind = (DataBinding)relevants.get(relevant);
 			int split = relevant.indexOf("=");
 			if(split != -1) {
 				//TODO: Consolidate these by the relevant element: Many questionss depend on the same condition
@@ -781,8 +823,8 @@ public class JavaRosaXformsParser{
 					Condition condition = new Condition(ruleId, thetarget
 							.getId(), Constants.OPERATOR_EQUAL, relevantAnswer);
 					conditions.addElement(condition);
-
-					actionTargets.addElement(bind.getNodeset());
+					XPathReference reference = (XPathReference)bind.getReference();
+					actionTargets.addElement(reference.getReference());
 
 					SkipRule rule = new SkipRule(ruleId, conditions,
 							Constants.ACTION_ENABLE, actionTargets, relevant);
@@ -808,16 +850,18 @@ public class JavaRosaXformsParser{
 	private static void attachBind(FormDef form, QuestionDef qtn, String ref,
 			String bind) {
 		if (bind != null) {
-			XPathBinding b = (XPathBinding) form.getBinding(bind);
+			//TODO: update with reference
+			DataBinding b = null;//form.getBinding(bind);
 			if (b != null) {
-				setQuestionType(qtn, (b.getType()));
 				//Potential default here?
 				qtn.setId(b.getId());
-				qtn.setBind(b);
-				qtn.setVariableName(b.getNodeset());
+				//TODO: update with reference
+				//qtn.setBinding(b);
+				XPathReference reference = (XPathReference)b.getReference();
+				qtn.setVariableName((String)reference.getReference());
 				
-				if (b.preload != null) {
-					qtn.setDefaultValue(getPreloadValue(b.preload, (b.preloadParams == null ? "" : b.preloadParams)));
+				if (b.getPreload() != null) {
+					qtn.setDefaultValue(getPreloadValue(b.getPreload(), (b.getPreloadParams() == null ? "" : b.getPreloadParams())));
 				}
 
 			}
@@ -829,16 +873,17 @@ public class JavaRosaXformsParser{
 			}
 		}
 		else if (ref != null) {
-			XPathBinding b = new XPathBinding();
+			DataBinding b = new DataBinding();
 			//Empty ID bindings are references, not bind elements
 			b.setId("");
-			b.setNodeset(ref);
+			XPathReference reference = new XPathReference(ref);
+			b.setReference(reference);
 			//This is an assumption, is it neccesarily valid?
-			b.setType("xsd:string");
-			setQuestionType(qtn, b.getType());
+			b.setDataType(Constants.QTN_TYPE_TEXT);
 			qtn.setId(b.getId());
 			qtn.setVariableName(ref);
-			qtn.setBind(b);
+			//TODO: update with reference
+			//qtn.setBinding(b);
 		}
 	}
 	
