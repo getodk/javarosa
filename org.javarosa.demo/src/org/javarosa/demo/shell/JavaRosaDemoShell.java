@@ -21,6 +21,7 @@ import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.activity.SplashScreenModule;
 import org.javarosa.demo.properties.DemoAppProperties;
 import org.javarosa.formmanager.activity.FormEntryActivity;
+import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.activity.FormListActivity;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
@@ -135,6 +136,11 @@ public class JavaRosaDemoShell implements IShell {
 						// Load the Form Entry Activity, and feed it the form data
 						FormDef form = (FormDef) returnVals.get("form");
 						FormData data = (FormData) returnVals.get("data");
+						FormEntryContext newContext = new FormEntryContext(context);
+						newContext.setFormID(form.getId());
+						newContext.setInstanceID(data.getRecordId());
+						currentActivity = this.modelActivity;
+						this.modelActivity.start(newContext);
 					}
 					if (returnVal == ModelListActivity.CMD_SEND) {
 						FormData data = (FormData) returnVals.get("data");
@@ -161,7 +167,7 @@ public class JavaRosaDemoShell implements IShell {
 			}
 			if (lastActivity == this.formListActivity) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-					String returnVal = (String)returnVals.get("command");
+					String returnVal = (String)returnVals.get(FormListActivity.COMMAND_KEY);
 					if(returnVal == Commands.CMD_VIEW_DATA) {
 						currentActivity = this.modelActivity;
 						this.modelActivity.start(context);
@@ -171,8 +177,10 @@ public class JavaRosaDemoShell implements IShell {
 						this.propertyActivity.start(context);
 					}
 					if(returnVal == Commands.CMD_SELECT_XFORM) {
+						FormEntryContext newContext = new FormEntryContext(context);
+						newContext.setFormID(((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue());
 						currentActivity = this.entryActivity;
-						this.entryActivity.start(context);
+						this.entryActivity.start(newContext);
 					}
 				}
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
