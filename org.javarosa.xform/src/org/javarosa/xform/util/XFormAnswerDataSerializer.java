@@ -5,13 +5,13 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.IAnswerDataSerializer;
+import org.javarosa.core.model.data.AnswerData;
+import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.Selection;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.formmanager.model.temp.QuestionData;
-import org.javarosa.formmanager.model.temp.DateData;
-import org.javarosa.formmanager.model.temp.SelectMultiData;
-import org.javarosa.formmanager.model.temp.SelectOneData;
-import org.javarosa.formmanager.model.temp.Selection;
-import org.javarosa.formmanager.model.temp.StringData;
 
 /**
  * The XFormAnswerDataSerializer taks in AnswerData objects, and provides
@@ -39,9 +39,9 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.IAnswerDataSerializer#canSerialize(org.javarosa.formmanager.model.temp.QuestionData)
+	 * @see org.javarosa.core.model.IAnswerDataSerializer#canSerialize(org.javarosa.formmanager.model.temp.AnswerData)
 	 */
-	public boolean canSerialize(QuestionData data) {
+	public boolean canSerialize(AnswerData data) {
 		if (data.getClass() == StringData.class
 				|| data.getClass() == DateData.class
 				|| data.getClass() == SelectMultiData.class
@@ -99,9 +99,9 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.IAnswerDataSerializer#serializeAnswerData(org.javarosa.formmanager.model.temp.QuestionData)
+	 * @see org.javarosa.core.model.IAnswerDataSerializer#serializeAnswerData(org.javarosa.formmanager.model.temp.AnswerData)
 	 */
-	public Object serializeAnswerData(QuestionData data) {
+	public Object serializeAnswerData(AnswerData data) {
 		if(data.getClass() == StringData.class) {
 			return serializeAnswerData((StringData)data);
 		} else if(data.getClass() == DateData.class) {

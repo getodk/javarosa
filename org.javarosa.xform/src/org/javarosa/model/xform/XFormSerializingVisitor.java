@@ -4,12 +4,12 @@ import java.io.DataOutputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import org.javarosa.core.model.DataModelTree;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.core.model.QuestionDataElement;
-import org.javarosa.core.model.QuestionDataGroup;
-import org.javarosa.core.model.TreeElement;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.QuestionDataElement;
+import org.javarosa.core.model.instance.QuestionDataGroup;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
 import org.javarosa.core.model.utils.ITreeVisitor;
 import org.javarosa.xform.util.JavaRosaXformsParser;
