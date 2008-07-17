@@ -1,5 +1,8 @@
 package org.javarosa.demo.midlet;
 
+import java.util.Stack;
+import java.util.Vector;
+
 import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
