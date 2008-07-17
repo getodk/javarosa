@@ -1,9 +1,9 @@
 package org.javarosa.core.model.utils;
 
-import org.javarosa.core.model.DataModelTree;
-import org.javarosa.core.model.QuestionDataElement;
-import org.javarosa.core.model.QuestionDataGroup;
-import org.javarosa.core.model.TreeElement;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.QuestionDataElement;
+import org.javarosa.core.model.instance.QuestionDataGroup;
+import org.javarosa.core.model.instance.TreeElement;
 
 /**
  * ITreeVisitor is a visitor interface for the elements of the 

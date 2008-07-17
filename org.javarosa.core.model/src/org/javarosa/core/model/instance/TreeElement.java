@@ -1,6 +1,7 @@
-package org.javarosa.core.model;
+package org.javarosa.core.model.instance;
 
 import org.javarosa.core.model.utils.ITreeVisitor;
+import org.javarosa.core.services.storage.utilities.Externalizable;
 
 /**
  * An element of a DataModelTree. Contains a name, and a 
@@ -10,7 +11,7 @@ import org.javarosa.core.model.utils.ITreeVisitor;
  * @author Clayton Sims
  *
  */
-public abstract class TreeElement {
+public abstract class TreeElement implements Externalizable {
 	
 	/** The root of the tree containing this element */
 	protected TreeElement root;

@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.util.SimpleOrderedHashtable;
 
 
 /** 
@@ -294,6 +295,11 @@ public class QuestionDef implements Externalizable{
 	
 	public String toString() {
 		return getLongText();
+	}
+	
+	public SimpleOrderedHashtable getSelectItems() {
+		//Super stub method that Drew is going to fill in.
+		return new SimpleOrderedHashtable();
 	}
 }
 

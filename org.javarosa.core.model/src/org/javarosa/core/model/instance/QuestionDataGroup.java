@@ -1,5 +1,8 @@
-package org.javarosa.core.model;
+package org.javarosa.core.model.instance;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -125,5 +128,15 @@ public class QuestionDataGroup extends TreeElement {
 		while(en.hasMoreElements()) {
 			((TreeElement)en.nextElement()).accept(visitor);
 		}
+	}
+
+	public void readExternal(DataInputStream in) throws IOException,
+			InstantiationException, IllegalAccessException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		out.writeUTF(this.name);
 	}
 }

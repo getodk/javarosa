@@ -1,6 +1,6 @@
 package org.javarosa.core.model.data;
 
-import org.javarosa.core.model.*;
+import org.javarosa.core.model.QuestionDef;
 
 public class Selection {
 	public int index;

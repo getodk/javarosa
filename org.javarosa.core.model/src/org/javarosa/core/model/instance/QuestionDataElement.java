@@ -1,7 +1,11 @@
-package org.javarosa.core.model;
+package org.javarosa.core.model.instance;
 
-import org.javarosa.formmanager.model.temp.QuestionData;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.data.AnswerData;
 import org.javarosa.core.model.utils.ITreeVisitor;
 
 /**
@@ -16,7 +20,7 @@ import org.javarosa.core.model.utils.ITreeVisitor;
 public class QuestionDataElement extends TreeElement{
 
 	/** The actual question data value */
-	private QuestionData value;
+	private AnswerData value;
 	
 	/** A Binding for the Question Definition */
 	private IDataReference reference;
@@ -42,7 +46,7 @@ public class QuestionDataElement extends TreeElement{
 	 * @param reference The reference for Question Definitions
 	 * @param value The value for this Question Definition
 	 */
-	public QuestionDataElement(String name, IDataReference reference, QuestionData value) {
+	public QuestionDataElement(String name, IDataReference reference, AnswerData value) {
 		this(name, reference);
 		this.value = value;
 	}
@@ -58,7 +62,7 @@ public class QuestionDataElement extends TreeElement{
 	/**
 	 * @return The value for the question defined by IBinding
 	 */
-	public QuestionData getValue(){ 
+	public AnswerData getValue(){ 
 		return value;
 	}
 	
@@ -66,7 +70,7 @@ public class QuestionDataElement extends TreeElement{
 	 * Sets the value for the question defined by IBinding
 	 * @param value The question's answer value
 	 */
-	public void setValue(QuestionData value) {
+	public void setValue(AnswerData value) {
 		this.value = value;
 	}
 	
@@ -119,5 +123,23 @@ public class QuestionDataElement extends TreeElement{
 	 */
 	public void accept(ITreeVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+	 */
+	public void readExternal(DataInputStream in) throws IOException,
+			InstantiationException, IllegalAccessException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+	 */
+	public void writeExternal(DataOutputStream out) throws IOException {
+		// TODO Auto-generated method stub
+		out.writeUTF(this.name);
+		reference.writeExternal(out);
 	}
 }

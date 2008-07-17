@@ -1,10 +1,10 @@
 package org.javarosa.core.model.utils;
 
-import org.javarosa.core.model.DataModelTree;
 import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.core.model.QuestionDataElement;
-import org.javarosa.core.model.QuestionDataGroup;
-import org.javarosa.core.model.TreeElement;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.QuestionDataElement;
+import org.javarosa.core.model.instance.QuestionDataGroup;
+import org.javarosa.core.model.instance.TreeElement;
 
 /**
  * The ElementExistsVisitor is responsible for identifying whether any of the nodes 
