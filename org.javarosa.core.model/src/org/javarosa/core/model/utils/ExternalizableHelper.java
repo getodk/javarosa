@@ -217,7 +217,27 @@ public class ExternalizableHelper {
 			dos.writeByte(0);
 	}
 	
+	public static void readExternalizable(DataInputStream dis, Externalizable item)  throws IOException, InstantiationException,IllegalAccessException, UnavailableExternalizerException {
+		if(dis.readBoolean()) {
+			item.readExternal(dis);
+		}		
+	}
 	
+	/**
+	 * Writes a possibly null Externalizable item.
+	 * 
+	 * @param item
+	 * @param dos
+	 * @throws IOException
+	 */
+	public static void writeExternalizable(Externalizable item, DataOutputStream dos) throws IOException {
+		if(item == null) {
+			dos.writeBoolean(false);
+		} else {
+			dos.writeBoolean(true);
+			item.writeExternal(dos);
+		}
+	}
 	
 	/**
 	 * Writes a big vector (of int size) of externalizable objects from a stream.

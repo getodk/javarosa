@@ -86,7 +86,8 @@ public class DataBinding  implements Externalizable {
 		this.setPreload(ExternalizableHelper.readUTF(in));
 		this.setPreloadParams(ExternalizableHelper.readUTF(in));
 		this.setRequired(in.readBoolean());
-		condition.readExternal(in);
+		condition = new Condition();
+		ExternalizableHelper.readExternalizable(in, condition);
 		//TODO: Reference
 	}
 
@@ -99,7 +100,7 @@ public class DataBinding  implements Externalizable {
 		ExternalizableHelper.writeUTF(out, this.getPreload());
 		ExternalizableHelper.writeUTF(out, this.getPreloadParams());
 		out.writeBoolean(this.isRequired());
-		condition.writeExternal(out);
+		ExternalizableHelper.writeExternalizable(condition, out);
 		//TODO: Reference
 	}
 	
