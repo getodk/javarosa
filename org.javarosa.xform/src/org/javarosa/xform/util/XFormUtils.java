@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.xform.parse.XFormParser;
 
 public class XFormUtils {
 	public static FormDef getFormFromResource (String resource) {
@@ -12,7 +13,7 @@ public class XFormUtils {
 		InputStream is = System.class.getResourceAsStream(resource);
 		InputStreamReader isr = new InputStreamReader(is);
 		if(isr != null) {
-			returnForm = JavaRosaXformsParser.fromXform2FormDef(isr);
+			returnForm = XFormParser.getFormDef(isr);
 		}
 		try {
 			isr.close();

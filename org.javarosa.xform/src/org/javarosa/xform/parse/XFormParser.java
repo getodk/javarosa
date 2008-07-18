@@ -3,19 +3,17 @@ package org.javarosa.xform.parse;
 import java.io.Reader;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
-import java.util.concurrent.locks.Condition;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
-import org.javarosa.core.model.DataModelTree;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.QuestionDataElement;
-import org.javarosa.core.model.QuestionDataGroup;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.TreeElement;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.QuestionDataElement;
+import org.javarosa.core.model.instance.QuestionDataGroup;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.model.xform.XPathReference;
 import org.kxml2.io.KXmlParser;
@@ -78,8 +76,8 @@ public class XFormParser {
 		groupLevelHandlers.put("repeat", repeat);
 		
 		topLevelHandlers = new Hashtable();
-		for (Enumeration enum = groupLevelHandlers.keys(); enum.hasMoreElements(); ) {
-			String key = (String)enum.nextElement();
+		for (Enumeration en = groupLevelHandlers.keys(); en.hasMoreElements(); ) {
+			String key = (String)en.nextElement();
 			topLevelHandlers.put(key, groupLevelHandlers.get(key));
 		}
 		topLevelHandlers.put("model", model);
