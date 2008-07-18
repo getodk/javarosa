@@ -10,6 +10,7 @@ import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.javarosa.core.services.properties.Property;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 /**
  * The PropertyRMSUtility interacts with the RMS storage on the local device to read
@@ -114,6 +115,10 @@ public class PropertyRMSUtility extends RMSUtility {
                    e.printStackTrace();
                    return null;
                }
+            catch (UnavailableExternalizerException uee) {
+            	uee.printStackTrace();
+            	return null;
+            }
         }
         else {
             return null;

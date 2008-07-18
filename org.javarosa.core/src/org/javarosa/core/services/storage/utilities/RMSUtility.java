@@ -270,7 +270,7 @@ public class RMSUtility implements RecordListener
      * @throws InstantiationException
      */
     public void retrieveFromRMS(int recordId,
-                                Externalizable externalizableObject) throws IOException, IllegalAccessException, InstantiationException
+                                Externalizable externalizableObject) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException
     {
         try
         {
@@ -292,6 +292,10 @@ public class RMSUtility implements RecordListener
         {
         	ie.printStackTrace();
             throw new InstantiationException(ie.getMessage());
+        }
+        catch (UnavailableExternalizerException uee) {
+        	uee.printStackTrace();
+        	throw new UnavailableExternalizerException(uee.getMessage());
         }
 
     }
@@ -345,6 +349,9 @@ public class RMSUtility implements RecordListener
         catch (InstantiationException ie)
         {
         	ie.printStackTrace();
+        }
+        catch (UnavailableExternalizerException uee) {
+        	uee.printStackTrace();
         }
     }
 
