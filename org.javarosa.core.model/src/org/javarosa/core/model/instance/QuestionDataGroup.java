@@ -31,7 +31,7 @@ public class QuestionDataGroup extends TreeElement {
 	
 	/** List of TreeElements */
 	Vector children;
-	
+
 	public QuestionDataGroup() {
 	}
 	
@@ -43,6 +43,7 @@ public class QuestionDataGroup extends TreeElement {
 	public QuestionDataGroup(String name) {
 		this();
 		this.name = name;
+		this.children = new Vector();
 	}
 	
 	/*
