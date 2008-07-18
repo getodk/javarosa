@@ -1,7 +1,7 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.formmanager.model.temp.Prompt;
-import org.javarosa.formmanager.model.temp.QuestionData;
+import org.javarosa.clforms.api.Prompt;
+import org.javarosa.core.model.QuestionData;
 import org.javarosa.formmanager.utility.QuestionStateListener;
 
 import de.enough.polish.ui.Container;

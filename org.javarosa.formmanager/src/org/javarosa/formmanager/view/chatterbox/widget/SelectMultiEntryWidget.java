@@ -4,9 +4,9 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.ChoiceGroup;
 
-import org.javarosa.formmanager.model.temp.QuestionData;
-import org.javarosa.formmanager.model.temp.SelectMultiData;
-import org.javarosa.formmanager.model.temp.Selection;
+import org.javarosa.core.model.QuestionData;
+import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.Selection;
 
 public class SelectMultiEntryWidget extends SelectEntryWidget {
 	public SelectMultiEntryWidget () {

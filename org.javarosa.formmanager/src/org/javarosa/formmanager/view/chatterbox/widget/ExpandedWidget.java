@@ -3,8 +3,8 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.StringItem;
 
-import org.javarosa.formmanager.model.temp.Prompt;
-import org.javarosa.formmanager.model.temp.QuestionData;
+import org.javarosa.clforms.api.Prompt;
+import org.javarosa.core.model.QuestionData;
 
 import de.enough.polish.ui.Container;
 

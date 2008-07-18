@@ -1,8 +1,10 @@
 package org.javarosa.formmanager.controller;
 
-import org.javarosa.formmanager.model.*;
-import org.javarosa.formmanager.model.temp.*;
-import org.javarosa.formmanager.view.*;
+import org.javarosa.clforms.api.Prompt;
+import org.javarosa.core.model.QuestionData;
+import org.javarosa.formmanager.model.FormEntryModel;
+import org.javarosa.formmanager.model.IControllerListener;
+import org.javarosa.formmanager.view.IFormEntryView;
 
 public class FormEntryController {
 	public static final int QUESTION_OK = 0;

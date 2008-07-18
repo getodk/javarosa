@@ -1,6 +1,6 @@
 package org.javarosa.formmanager.activity;
 
-import org.javarosa.core.*;
+import org.javarosa.core.Context;
 
 public class FormEntryContext extends Context {
 	public static final String FORM_ID = "FORM_ID";

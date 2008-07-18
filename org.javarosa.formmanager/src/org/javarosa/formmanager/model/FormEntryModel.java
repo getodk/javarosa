@@ -1,9 +1,9 @@
 package org.javarosa.formmanager.model;
 
-import org.javarosa.core.model.*;
-import org.javarosa.formmanager.model.temp.*;
 import org.javarosa.clforms.api.Form;
-import org.javarosa.formmanager.utility.*;
+import org.javarosa.clforms.api.Prompt;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.formmanager.utility.FormEntryModelListener;
 
 public class FormEntryModel {
     private FormDef form;
