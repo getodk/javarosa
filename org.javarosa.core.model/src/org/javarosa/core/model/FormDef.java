@@ -39,7 +39,9 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	// /** A string constistig for form fields that describe its data. */
 	//private String descriptionTemplate =  Constants.EMPTY_STRING;
 
-	public FormDef() {	}
+	public FormDef() {
+		setChildren(null);
+	}
 	
 //	/**
 //	 * Constructs a form definition object from these parameters.
