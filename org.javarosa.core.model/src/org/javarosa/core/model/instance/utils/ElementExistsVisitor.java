@@ -1,4 +1,4 @@
-package org.javarosa.core.model.utils;
+package org.javarosa.core.model.instance.utils;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.instance.DataModelTree;

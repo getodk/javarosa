@@ -8,8 +8,9 @@ import java.util.Enumeration;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.AnswerData;
+import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.IDataModelVisitor;
-import org.javarosa.core.model.utils.ITreeVisitor;
 
 /**
  * DataModelTree is an implementation of IFormDataModel
@@ -153,16 +154,24 @@ public class DataModelTree implements IFormDataModel {
 		}
 	}
 	
-
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+	 */
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException {
-		// TODO Auto-generated method stub
-		
+		this.id = in.readInt();
+		this.name = ExternalizableHelper.readUTF(in);
+		//Visitor, or not?
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(this.id);
-		out.writeUTF(this.name);
+		ExternalizableHelper.writeUTF(out, this.name);
 	}
 
 	/*

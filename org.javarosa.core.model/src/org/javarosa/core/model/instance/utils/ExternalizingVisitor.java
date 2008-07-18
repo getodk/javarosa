@@ -1,4 +1,4 @@
-package org.javarosa.core.model.utils;
+package org.javarosa.core.model.instance.utils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

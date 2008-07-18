@@ -9,6 +9,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 
 /**
@@ -439,7 +440,7 @@ public class QuestionData implements Externalizable{
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
+	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException{
 		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readUTF());	
 			readAnswer(dis,dis.readByte());
@@ -455,7 +456,7 @@ public class QuestionData implements Externalizable{
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	public void readAnswer(DataInputStream dis, byte type) throws IOException, IllegalAccessException, InstantiationException{
+	public void readAnswer(DataInputStream dis, byte type) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException{
 		switch(type){
 		case Constants.QTN_TYPE_BOOLEAN:
 			setAnswer(ExternalizableHelper.readBoolean(dis));

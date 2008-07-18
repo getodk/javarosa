@@ -6,7 +6,9 @@ import java.io.IOException;
 
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.data.AnswerData;
-import org.javarosa.core.model.utils.ITreeVisitor;
+import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 /**
  * QuestionDataElement is a TreeElement of a DataModelTree that is a leaf
@@ -129,9 +131,9 @@ public class QuestionDataElement extends TreeElement{
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException {
-		// TODO Auto-generated method stub
-		
+			InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+		this.name = ExternalizableHelper.readUTF(in);
+		reference.readExternal(in);
 	}
 
 	/* (non-Javadoc)
@@ -139,7 +141,7 @@ public class QuestionDataElement extends TreeElement{
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		// TODO Auto-generated method stub
-		out.writeUTF(this.name);
+		ExternalizableHelper.writeUTF(out, this.name);
 		reference.writeExternal(out);
 	}
 }
