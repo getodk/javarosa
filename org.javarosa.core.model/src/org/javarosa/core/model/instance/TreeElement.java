@@ -1,5 +1,6 @@
 package org.javarosa.core.model.instance;
 
+import org.javarosa.core.model.DataReferenceFactory;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.services.storage.utilities.Externalizable;
 
@@ -12,6 +13,9 @@ import org.javarosa.core.services.storage.utilities.Externalizable;
  *
  */
 public abstract class TreeElement implements Externalizable {
+	
+	/** A set of prototype references maintained be the root node to used in deserialization. */
+	DataReferenceFactory factory;
 	
 	/** The root of the tree containing this element */
 	protected TreeElement root;
@@ -63,5 +67,29 @@ public abstract class TreeElement implements Externalizable {
 	 */
 	public void accept(ITreeVisitor visitor) {
 		visitor.visit(this);
+	}
+	
+	/**
+	 * @return the factory
+	 */
+	public DataReferenceFactory getFactory() {
+		if(this == this.getRoot()) {
+			return factory;
+		}
+		else {
+			return this.getRoot().getFactory();
+		}
+	}
+
+	/**
+	 * @param factory the factory to set
+	 */
+	public void setFactory(DataReferenceFactory factory) {
+		if(this == this.getRoot()) {
+			this.factory = factory;
+		}
+		else {
+			this.getRoot().setFactory(factory);
+		}
 	}
 }

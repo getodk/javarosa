@@ -4,10 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.DataReferenceFactory;
 import org.javarosa.core.model.instance.utils.ElementExistsVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.ExternalizableHelper;
@@ -27,11 +26,6 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
  *
  */
 public class QuestionDataGroup extends TreeElement {
-	
-	/** A set of prototype references maintained be the root node to used in deserialization. */
-	
-	Hashtable prototypes;
-	
 	/** The parent node for this Element **/
 	QuestionDataGroup parent;
 	
@@ -170,13 +164,5 @@ public class QuestionDataGroup extends TreeElement {
 		
 		out.writeInt(this.children.size());
 		
-	}
-	
-	/**
-	 * Adds a type of reference to be able to prototype 
-	 * @param reference
-	 */
-	public void addReferencePrototype(IDataReference reference) {
-		prototypes.put(reference.getClass().getName(), reference);
 	}
 }

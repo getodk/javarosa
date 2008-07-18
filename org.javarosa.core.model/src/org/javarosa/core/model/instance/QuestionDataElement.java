@@ -9,6 +9,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.Map;
 
 /**
  * QuestionDataElement is a TreeElement of a DataModelTree that is a leaf which
@@ -158,7 +159,8 @@ public class QuestionDataElement extends TreeElement {
 			InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
 		this.name = ExternalizableHelper.readUTF(in);
-		//TODO: get a template for this reference
+		String className = in.readUTF();
+		reference = this.getRoot().getFactory().getNewReference(className);
 		if (reference == null) {
 			throw new UnavailableExternalizerException(
 					"Attempt to resolve serialization for a DataModelTree failed because there was no reference " +
@@ -177,6 +179,7 @@ public class QuestionDataElement extends TreeElement {
 		//True for groups, false for DataElements
 		out.writeBoolean(false);
 		ExternalizableHelper.writeUTF(out, this.name);
+		out.writeUTF(reference.getClass().getName());
 		reference.writeExternal(out);
 	}
 }
