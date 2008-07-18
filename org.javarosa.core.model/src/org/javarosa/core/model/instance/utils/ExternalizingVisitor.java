@@ -28,7 +28,9 @@ public class ExternalizingVisitor implements ITreeVisitor {
 	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.DataModelTree)
 	 */
 	public void visit(DataModelTree tree) {
-		externalizeElement(tree);
+		//Don't actually do this. The DataModelTree is the IFormDataModel implementor, which means that it
+		//is having externalize called on it already.
+		//externalizeElement(tree);
 	}
 
 	/* (non-Javadoc)

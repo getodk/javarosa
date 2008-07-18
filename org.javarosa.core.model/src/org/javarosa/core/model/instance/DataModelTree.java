@@ -8,6 +8,7 @@ import java.util.Enumeration;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.AnswerData;
+import org.javarosa.core.model.instance.utils.ExternalizingVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.IDataModelVisitor;
@@ -149,6 +150,7 @@ public class DataModelTree implements IFormDataModel {
 	public void accept(IDataModelVisitor visitor) {
 		visitor.visit(this);
 		if(root != null) {
+			//I don't think this is going to work.
 			if(visitor.getClass() == ITreeVisitor.class) {
 				root.accept((ITreeVisitor)visitor);
 			}
@@ -181,9 +183,10 @@ public class DataModelTree implements IFormDataModel {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		//Child nodes are serialized by the visitor pattern
 		out.writeInt(this.id);
 		ExternalizableHelper.writeUTF(out, this.name);
+		ExternalizingVisitor visitor = new ExternalizingVisitor(out);
+		visitor.visit(this);
 	}
 
 	/*
