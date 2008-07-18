@@ -18,7 +18,7 @@ import org.javarosa.core.services.storage.utilities.Externalizable;
  * @author Daniel Kayiwa
  *
  */
-public class QuestionDef implements IFormElement, Localizable, Externalizable {
+public class QuestionDef implements IFormElement, Localizable {
 	private int id;
 	private String name;
 	private IDataReference binding;	/** reference to a location in the model to store data in */
@@ -311,10 +311,9 @@ public class QuestionDef implements IFormElement, Localizable, Externalizable {
 			setLongText(ExternalizableHelper.readUTF(dis));
 			setShortText(ExternalizableHelper.readUTF(dis));
 			setHelpText(ExternalizableHelper.readUTF(dis));
-			//TODO: What are we supposed to do with this?
-			//setLongTextID(ExternalizableHelper.readUTF(dis));
-			//setShortTextID(ExternalizableHelper.readUTF(dis));
-			//setHelpTextID(ExternalizableHelper.readUTF(dis));
+			setLongTextID(ExternalizableHelper.readUTF(dis), null);
+			setShortTextID(ExternalizableHelper.readUTF(dis), null);
+			setHelpTextID(ExternalizableHelper.readUTF(dis), null);
 			
 			setDataType(dis.readInt());
 			setControlType(dis.readInt());
