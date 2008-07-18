@@ -71,7 +71,7 @@ public class FormData implements IDRecordable, Externalizable {
 	 */
 	public FormData(FormDef def){
 		this();
-		setDefId(def.getId());		
+		setDefId(def.getID());		
 		setDef(def);
 	}
 	
@@ -89,7 +89,7 @@ public class FormData implements IDRecordable, Externalizable {
 
 	public void setDef(FormDef def) {
 		this.def = def;
-		this.defId = def.getId();
+		this.defId = def.getID();
 		updateFormDef();
 	}
 	
@@ -136,7 +136,7 @@ public class FormData implements IDRecordable, Externalizable {
 	/** Creates group and question data from their corresponding definitions. */
 	private void createFormData(){
 		Vector groups = new Vector();
-		for(byte i=0; i<this.getDef().getGroups().size(); i++){
+		/**for(byte i=0; i<this.getDef().getGroups().size(); i++){
 			GroupDef groupDef = (GroupDef)this.getDef().getGroups().elementAt(i);
 			Vector questions = new Vector();
 			for(byte j=0; j<groupDef.getQuestions().size(); j++){
@@ -146,7 +146,7 @@ public class FormData implements IDRecordable, Externalizable {
 			}
 			GroupData groupData = new GroupData(questions,groupDef);
 			groups.addElement(groupData);
-		}
+		}**/
 		
 		this.setGroups(groups);
 		
@@ -348,7 +348,7 @@ public class FormData implements IDRecordable, Externalizable {
 	
 	public void buildDataDescription(){
 		//String s = "Where does ${name}$ come from?";
-		String f,v,text = getDef().getDescriptionTemplate();
+		String f,v,text = getDef().getDescriptionTemplate();c
 		if(text == null || text.length() == 0)
 			this.dataDescription  = "Data: " + this.getRecordId();
 		else{

@@ -137,10 +137,10 @@ public class SkipRule implements Externalizable{
 				qtn.setVisible(!conditionTrue);
 				break;
 			case Constants.ACTION_MAKE_MANDATORY:
-				qtn.setMandatory(conditionTrue);
+				qtn.setRequired(conditionTrue);
 				break;
 			case Constants.ACTION_MAKE_OPTIONAL:
-				qtn.setMandatory(!conditionTrue);
+				qtn.setRequired(!conditionTrue);
 				break;
 		}
 	}
