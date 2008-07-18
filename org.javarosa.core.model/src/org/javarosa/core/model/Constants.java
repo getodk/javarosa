@@ -88,36 +88,25 @@ public class Constants {
 	
 	/** The default time zone. */
 	public static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT");
-	
-	/** Question Types */
-	
-	/** Text question type. */
-	public static final int QTN_TYPE_TEXT = 1;
-	
-	/** Numeric question type. These are numbers without decimal points*/
-	public static final int QTN_TYPE_NUMERIC = 2;
-	
-	/** Decimal question type. These are numbers with decimals */
-	public static final int QTN_TYPE_DECIMAL = 3;
-	
-	/** Date question type. This has only date component without time. */
-	public static final int QTN_TYPE_DATE = 4;
-		
-	/** Time question type. This has only time element without date*/
-	public static final int QTN_TYPE_TIME = 5;
-	
-	/** This is a question with alist of options where not more than one option can be selected at a time. */
-	public static final int QTN_TYPE_LIST_EXCLUSIVE = 6;
-	
-	/** This is a question with alist of options where more than one option can be selected at a time. */
-	public static final int QTN_TYPE_LIST_MULTIPLE = 7;
-	
-	/** Date and Time question type. This has both the date and time components*/
-	public static final int QTN_TYPE_DATE_TIME = 8;
-	
-	/** Question with true and false answers. */
-	public static final int QTN_TYPE_BOOLEAN = 9;
-	
+
+	public static final int DATATYPE_TEXT = 1;	/** Text question type. */
+	public static final int DATATYPE_INTEGER = 2;	/** Numeric question type. These are numbers without decimal points*/
+	public static final int DATATYPE_DECIMAL = 3;	/** Decimal question type. These are numbers with decimals */
+	public static final int DATATYPE_DATE = 4;	/** Date question type. This has only date component without time. */
+	public static final int DATATYPE_TIME = 5;	/** Time question type. This has only time element without date*/
+	public static final int DATATYPE_DATE_TIME = 6;	/** Date and Time question type. This has both the date and time components*/
+	public static final int DATATYPE_LIST_EXCLUSIVE = 7;	/** This is a question with alist of options where not more than one option can be selected at a time. */
+	public static final int DATATYPE_LIST_MULTIPLE = 8;	/** This is a question with alist of options where more than one option can be selected at a time. */
+	public static final int DATATYPE_BOOLEAN = 9;	/** Question with true and false answers. */
 	/** Question with repeat sets of questions. */
-	public static final int QTN_TYPE_REPEAT = 10;
+	public static final int DATATYPE_REPEAT = 10; //droos: not sure this is a 'question data type'
+	
+	public static final int CONTROL_INPUT = 1;
+	public static final int CONTROL_SELECT_ONE = 2;
+	public static final int CONTROL_SELECT_MULTI = 3;
+	public static final int CONTROL_TEXTAREA = 4;
+	public static final int CONTROL_SECRET = 5;
+	public static final int CONTROL_RANGE = 6;
+	public static final int CONTROL_UPLOAD = 7;
+	public static final int CONTROL_SUBMIT = 8;
 }
