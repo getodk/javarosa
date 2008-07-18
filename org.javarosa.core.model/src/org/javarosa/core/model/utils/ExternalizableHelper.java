@@ -199,6 +199,27 @@ public class ExternalizableHelper {
 	}
 	
 	/**
+	 * Writes a small vector (byte size) of Externalizable objects to a stream.
+	 * 
+	 * @param externalizableVector - the vector of externalizable objects.
+	 * @param dos - the stream to write to.
+	 * @throws IOException - thrown when a problem occurs during the writing to stream.
+	 */
+	public static void writeExternalGeneric(Vector externalizableVector, DataOutputStream dos) throws IOException {	
+		if(externalizableVector != null){
+			dos.writeByte(externalizableVector.size());
+			for(int i=0; i<externalizableVector.size(); i++ ){
+				dos.writeUTF(externalizableVector.elementAt(i).getClass().getName());
+				((Externalizable)externalizableVector.elementAt(i)).writeExternal(dos);
+			}
+		}
+		else
+			dos.writeByte(0);
+	}
+	
+	
+	
+	/**
 	 * Writes a big vector (of int size) of externalizable objects from a stream.
 	 * 
 	 * @param externalizableVector
@@ -274,6 +295,41 @@ public class ExternalizableHelper {
 		
 		for(byte i=0; i<len; i++ ){
 			Object obj = (Externalizable)cls.newInstance();
+			((Externalizable)obj).readExternal(dis);
+			externalizableVector.addElement(obj);
+		}
+		
+		return externalizableVector;
+	}
+	
+	/**
+	 * Reads a small vector (byte size) of externalizable objects of a certain class from a stream.
+	 * 
+	 * @param dis - the stream to read from.
+	 * @param cls - the class of the externalizable objects contained in the vector.
+	 * @return - the Vector of externalizable objets or null if none.
+	 * @throws IOException - thrown when a problem occurs during the reading from stream.
+	 * @throws InstantiationException - thrown when a problem occurs during the peristent object creation.
+	 * @throws IllegalAccessException - thrown when a problem occurs when setting values of the externalizable object.
+	 */
+	public static Vector readExternal(DataInputStream dis, PrototypeFactory factory) throws IOException, InstantiationException,IllegalAccessException, UnavailableExternalizerException {
+		
+		byte len = dis.readByte();
+		if(len == 0)
+			return null;
+
+		Vector externalizableVector = new Vector();
+		
+		for(byte i=0; i<len; i++ ){
+			String factoryName = dis.readUTF();
+			Object obj = null;
+			try {
+				obj = (Externalizable)factory.getNewInstance(factoryName);
+			} catch (InstantiationException e) {
+				throw new UnavailableExternalizerException("An Externalizable factory for the type " + factoryName + " could not be found");
+			} catch (IllegalAccessException e) {
+				throw new UnavailableExternalizerException("An Externalizable factory for the type " + factoryName + " could not be found");
+			}
 			((Externalizable)obj).readExternal(dis);
 			externalizableVector.addElement(obj);
 		}

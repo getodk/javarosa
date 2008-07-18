@@ -5,8 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.*;
-import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.model.utils.Localizable;
+import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 
@@ -146,10 +148,15 @@ public class GroupDef implements IFormElement, Localizable {
 	public String toString() {
 		return getName();
 	}
-	
+
 	/** Reads a group definition object from the supplied stream. */
 	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		if(!ExternalizableHelper.isEOF(dis)){
+			//TODO: Find a way to reuse the one from FormDef
+			PrototypeFactory factory = new PrototypeFactory();
+			factory.addNewPrototype(QuestionDef.class.getName(), QuestionDef.class);
+			factory.addNewPrototype(GroupDef.class.getName(), GroupDef.class);
+			
 			setID(dis.readInt());
 
 			setName(ExternalizableHelper.readUTF(dis));
@@ -160,7 +167,7 @@ public class GroupDef implements IFormElement, Localizable {
 			
 			setRepeat(dis.readBoolean());
 			
-			//get the children
+			ExternalizableHelper.readExternal(dis, factory);
 		}
 	}
 
@@ -176,6 +183,6 @@ public class GroupDef implements IFormElement, Localizable {
 		
 		dos.writeBoolean(getRepeat());
 		
-		ExternalizableHelper.writeExternal(getChildren(), dos);
+		ExternalizableHelper.writeExternalGeneric(getChildren(), dos);
 	}	
 }

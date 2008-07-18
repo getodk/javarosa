@@ -10,7 +10,6 @@ import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.SimpleOrderedHashtable;
-import org.javarosa.core.services.storage.utilities.Externalizable;
 
 /** 
  * This is the question definition properties.
@@ -354,4 +353,5 @@ public class QuestionDef implements IFormElement, Localizable {
 		dos.writeUTF(binding.getClass().toString());
 		binding.writeExternal(dos);
 	}
+
 }
