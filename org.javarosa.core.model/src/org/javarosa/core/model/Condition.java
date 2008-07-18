@@ -83,24 +83,24 @@ public class Condition implements Externalizable{
 	public boolean isTrue(FormData data){
 		QuestionData qn= data.getQuestion(this.questionId);
 		
-		switch(qn.getDef().getType()){
-			case Constants.QTN_TYPE_TEXT:
+		switch(qn.getDef().getDataType()){
+			case Constants.DATATYPE_TEXT:
 				return isTextTrue(qn);
-			case Constants.QTN_TYPE_NUMERIC:
+			case Constants.DATATYPE_INTEGER:
 				return isNumericTrue(qn);
-			case Constants.QTN_TYPE_DATE:
+			case Constants.DATATYPE_DATE:
 				return isDateTrue(qn);
-			case Constants.QTN_TYPE_DATE_TIME:
+			case Constants.DATATYPE_DATE_TIME:
 				return isDateTimeTrue(qn);
-			case Constants.QTN_TYPE_DECIMAL:
+			case Constants.DATATYPE_DECIMAL:
 				return isDecimalTrue(qn);
-			case Constants.QTN_TYPE_LIST_EXCLUSIVE:
+			case Constants.DATATYPE_LIST_EXCLUSIVE:
 				return isListExclusiveTrue(qn);
-			case Constants.QTN_TYPE_LIST_MULTIPLE:
+			case Constants.DATATYPE_LIST_MULTIPLE:
 				return isListMultipleTrue(qn);
-			case Constants.QTN_TYPE_TIME:
+			case Constants.DATATYPE_TIME:
 				return isTimeTrue(qn);
-			case Constants.QTN_TYPE_BOOLEAN:
+			case Constants.DATATYPE_BOOLEAN:
 				return isTextTrue(qn);
 		}
 		

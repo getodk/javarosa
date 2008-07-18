@@ -63,10 +63,10 @@ public class EpiHandySkipRule extends SkipRule {
 				qtn.setVisible(false);
 				break;
 			case Constants.ACTION_MAKE_MANDATORY:
-				qtn.setMandatory(true);
+				qtn.setRequired(true);
 				break;
 			case Constants.ACTION_MAKE_OPTIONAL:
-				qtn.setMandatory(false);
+				qtn.setRequired(false);
 				break;
 		}
 	}

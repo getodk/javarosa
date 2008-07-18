@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.data.AnswerData;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.SimpleOrderedHashtable;
@@ -45,7 +45,7 @@ public class QuestionDef implements IFormElement, Localizable, Externalizable {
 	private boolean enabled;	/** A flag to tell whether the question should be enabled or disabled. */
 	private boolean locked; 	/** A flag to tell whether a question is to be locked or not. A locked question is one which is visible, enabled, but cannot be edited. */
 
-	private AnswerData defaultValue;	/** this shouldn't be used for default values that are already pre-loaded in the instance */
+	private IAnswerData defaultValue;	/** this shouldn't be used for default values that are already pre-loaded in the instance */
 		
 	public QuestionDef () {
 		this(Constants.NULL_ID, null, Constants.DATATYPE_TEXT, Constants.DATATYPE_TEXT);
@@ -256,11 +256,11 @@ public class QuestionDef implements IFormElement, Localizable, Externalizable {
 		this.locked = locked;
 	}
 		
-	public AnswerData getDefaultValue() {
+	public IAnswerData getDefaultValue() {
 		return defaultValue;
 	}
 	
-	public void setDefaultValue(AnswerData defaultValue) {
+	public void setDefaultValue(IAnswerData defaultValue) {
 		this.defaultValue = defaultValue;
 	}
 	

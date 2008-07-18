@@ -44,7 +44,7 @@ public class QuestionData implements Externalizable{
 	private QuestionDef def;
 	
 	/** The numeric unique identifier for the question that this data is collected for. */
-	private String id = Constants.NULL_STRING_ID;
+	private int id = Constants.NULL_ID;
 	
 	private String dataDescription;
 	
@@ -70,11 +70,11 @@ public class QuestionData implements Externalizable{
 		setDef(def);
 	}
 	
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 	
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	
@@ -118,42 +118,45 @@ public class QuestionData implements Externalizable{
 	}
 	
 	public boolean setOptionValueIfOne(){
-		if(getDef().getType() != Constants.QTN_TYPE_LIST_EXCLUSIVE)
+		if(getDef().getDataType() != Constants.DATATYPE_LIST_EXCLUSIVE)
 			return false;
 		
-		Vector options = getDef().getOptions();
-		if(options != null && options.size() == 1){
-			setOptionAnswer(((OptionDef)options.elementAt(0)).getVariableName());
-			return true;
-		}
+		//TODO: We need to merge this code back in with the new datatypes
+//		Vector options = getDef().getOptions();
+//		if(options != null && options.size() == 1){
+//			setOptionAnswer(((OptionDef)options.elementAt(0)).getVariableName());
+//			return true;
+//		}
 		return false;
 	}
 	
 	public void setTextAnswer(String textAnswer){
-		switch(getDef().getType()){
-			case Constants.QTN_TYPE_BOOLEAN:
+		switch(getDef().getDataType()){
+			case Constants.DATATYPE_BOOLEAN:
 				answer = fromString2Boolean(textAnswer);
 				break;
-			case Constants.QTN_TYPE_DATE:
-			case Constants.QTN_TYPE_DATE_TIME:
-			case Constants.QTN_TYPE_TIME:
+			case Constants.DATATYPE_DATE:
+			case Constants.DATATYPE_DATE_TIME:
+			case Constants.DATATYPE_TIME:
 				answer = textAnswer;
 				break;
-			case Constants.QTN_TYPE_LIST_EXCLUSIVE:
+			case Constants.DATATYPE_LIST_EXCLUSIVE:
 				setOptionAnswer(textAnswer);
 				break;
-			case Constants.QTN_TYPE_LIST_MULTIPLE:
+			case Constants.DATATYPE_LIST_MULTIPLE:
 				setOptionAnswers(split(textAnswer,OptionDef.SEPARATOR_CHAR));
 				break;
-			case Constants.QTN_TYPE_DECIMAL:
-			case Constants.QTN_TYPE_NUMERIC:
-			case Constants.QTN_TYPE_TEXT:
+			case Constants.DATATYPE_DECIMAL:
+			case Constants.DATATYPE_INTEGER:
+			case Constants.DATATYPE_TEXT:
 				answer = textAnswer;
 				break;
 		}
 	}
 	
 	public void setOptionAnswer(String textAnswer){
+		//TODO: Merge back in
+		/*
 		for(byte i=0; i<getDef().getOptions().size(); i++){
 			OptionDef optionDef = (OptionDef)getDef().getOptions().elementAt(i);
 			if(optionDef.getVariableName().equals(textAnswer)){
@@ -162,9 +165,12 @@ public class QuestionData implements Externalizable{
 				break;
 			}
 		}
+		*/
 	}
 	
 	public void setOptionAnswers(Vector vals){
+		//TODO: Merge back in
+		/*
 		Vector optionAnswers = new Vector();
 		Vector optionAnswerIndices = new Vector();
 		for(byte j=0; j<vals.size(); j++){
@@ -181,6 +187,7 @@ public class QuestionData implements Externalizable{
 		
 		setAnswer(optionAnswers);
 		setOptionAnswerIndices(optionAnswerIndices);
+		*/
 	}
 	
 	public Vector split(String contents, char separator){
@@ -216,18 +223,18 @@ public class QuestionData implements Externalizable{
 
 	public void setDef(QuestionDef def) {
 		this.def = def;
-		setId(def.getId());
+		setId(def.getID());
 		if(def.getDefaultValue() != null && getAnswer() == null)
 			setAnswer(def.getDefaultValue());
 	}
 	
 	private void copyAnswersAndIndices(QuestionData data){
 		if(data.getAnswer() != null){
-			if(getDef().getType() == Constants.QTN_TYPE_LIST_EXCLUSIVE){
+			if(getDef().getDataType() == Constants.DATATYPE_LIST_EXCLUSIVE){
 				setAnswer(new OptionData((OptionData)data.getAnswer()));
 				setOptionAnswerIndices(data.getOptionAnswerIndices());
 			}
-			else if(getDef().getType() == Constants.QTN_TYPE_LIST_MULTIPLE){
+			else if(getDef().getDataType() == Constants.DATATYPE_LIST_MULTIPLE){
 				Vector tempAnswer = new Vector();
 				Vector ansrs  = (Vector)data.getAnswer();
 				for(int i=0; i<ansrs.size(); i++)
@@ -251,19 +258,19 @@ public class QuestionData implements Externalizable{
 	 * @return - true when answered, else false.
 	 */
 	public boolean isAnswered(){
-		switch(getDef().getType()){
-			case Constants.QTN_TYPE_BOOLEAN:
-			case Constants.QTN_TYPE_DATE:
-			case Constants.QTN_TYPE_DATE_TIME:
-			case Constants.QTN_TYPE_TIME:
+		switch(getDef().getDataType()){
+			case Constants.DATATYPE_BOOLEAN:
+			case Constants.DATATYPE_DATE:
+			case Constants.DATATYPE_DATE_TIME:
+			case Constants.DATATYPE_TIME:
 				return getAnswer() != null;
-			case Constants.QTN_TYPE_LIST_EXCLUSIVE:
+			case Constants.DATATYPE_LIST_EXCLUSIVE:
 				return getAnswer() != null;
-			case Constants.QTN_TYPE_LIST_MULTIPLE:
+			case Constants.DATATYPE_LIST_MULTIPLE:
 				return getAnswer() != null && ((Vector)getAnswer()).size() > 0;
-			case Constants.QTN_TYPE_DECIMAL:
-			case Constants.QTN_TYPE_NUMERIC:
-			case Constants.QTN_TYPE_TEXT:
+			case Constants.DATATYPE_DECIMAL:
+			case Constants.DATATYPE_INTEGER:
+			case Constants.DATATYPE_TEXT:
 				return getAnswer() != null && this.getAnswer().toString().length() > 0;
 		}
 		//TODO need to handle other user defined types.
@@ -277,7 +284,7 @@ public class QuestionData implements Externalizable{
 	 * @return - true if the data is correct, else false.
 	 */
 	public boolean isValid(){
-		if(this.getDef().isMandatory() && !this.isAnswered())
+		if(this.getDef().isRequired() && !this.isAnswered())
 			return false;
 		return true;
 	}
@@ -311,25 +318,25 @@ public class QuestionData implements Externalizable{
 		String val = null;
 		
 		if(getAnswer() != null){
-			switch(getDef().getType()){
-				case Constants.QTN_TYPE_BOOLEAN:
+			switch(getDef().getDataType()){
+				case Constants.DATATYPE_BOOLEAN:
 					val = fromBoolean2DisplayString(getAnswer());
 					break;
-				case Constants.QTN_TYPE_DECIMAL:
-				case Constants.QTN_TYPE_NUMERIC:
-				case Constants.QTN_TYPE_TEXT:
+				case Constants.DATATYPE_DECIMAL:
+				case Constants.DATATYPE_INTEGER:
+				case Constants.DATATYPE_TEXT:
 					val = getAnswer().toString();
 					break;
-				case Constants.QTN_TYPE_DATE:
-				case Constants.QTN_TYPE_DATE_TIME:
-				case Constants.QTN_TYPE_TIME:{
+				case Constants.DATATYPE_DATE:
+				case Constants.DATATYPE_DATE_TIME:
+				case Constants.DATATYPE_TIME:{
 					val = DateToString((Date)getAnswer());
 					break;
 				}
-				case Constants.QTN_TYPE_LIST_EXCLUSIVE:
+				case Constants.DATATYPE_LIST_EXCLUSIVE:
 					val = ((OptionData)getAnswer()).toString();
 					break;
-				case Constants.QTN_TYPE_LIST_MULTIPLE:
+				case Constants.DATATYPE_LIST_MULTIPLE:
 					String s = ""; Vector optionAnswers = (Vector)getAnswer();
 					for(byte i=0; i<optionAnswers.size(); i++){
 						if(s.length() != 0)
@@ -376,24 +383,24 @@ public class QuestionData implements Externalizable{
 		String val = null;
 		
 		if(getAnswer() != null){
-			switch(getDef().getType()){
-				case Constants.QTN_TYPE_BOOLEAN:
+			switch(getDef().getDataType()){
+				case Constants.DATATYPE_BOOLEAN:
 					val = fromBoolean2ValueString(getAnswer());
 					break;
-				case Constants.QTN_TYPE_DECIMAL:
-				case Constants.QTN_TYPE_NUMERIC:
-				case Constants.QTN_TYPE_TEXT:
+				case Constants.DATATYPE_DECIMAL:
+				case Constants.DATATYPE_INTEGER:
+				case Constants.DATATYPE_TEXT:
 					val = getAnswer().toString();
 					break;
-				case Constants.QTN_TYPE_DATE:
-				case Constants.QTN_TYPE_DATE_TIME:
-				case Constants.QTN_TYPE_TIME:
+				case Constants.DATATYPE_DATE:
+				case Constants.DATATYPE_DATE_TIME:
+				case Constants.DATATYPE_TIME:
 					val = DateToString((Date)getAnswer());
 					break;
-				case Constants.QTN_TYPE_LIST_EXCLUSIVE:
+				case Constants.DATATYPE_LIST_EXCLUSIVE:
 					val = ((OptionData)getAnswer()).getValue();
 					break;
-				case Constants.QTN_TYPE_LIST_MULTIPLE:
+				case Constants.DATATYPE_LIST_MULTIPLE:
 					String s = ""; Vector optionAnswers = (Vector)getAnswer();
 					for(byte i=0; i<optionAnswers.size(); i++){
 						if(s.length() != 0)
@@ -442,7 +449,7 @@ public class QuestionData implements Externalizable{
 	 */
 	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException{
 		if(!ExternalizableHelper.isEOF(dis)){
-			setId(dis.readUTF());	
+			setId(dis.readInt());	
 			readAnswer(dis,dis.readByte());
 		}
 	}
@@ -458,20 +465,20 @@ public class QuestionData implements Externalizable{
 	 */
 	public void readAnswer(DataInputStream dis, byte type) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException{
 		switch(type){
-		case Constants.QTN_TYPE_BOOLEAN:
+		case Constants.DATATYPE_BOOLEAN:
 			setAnswer(ExternalizableHelper.readBoolean(dis));
 			break;
-		case Constants.QTN_TYPE_TEXT:
-		case Constants.QTN_TYPE_DECIMAL:
-		case Constants.QTN_TYPE_NUMERIC:
+		case Constants.DATATYPE_TEXT:
+		case Constants.DATATYPE_DECIMAL:
+		case Constants.DATATYPE_INTEGER:
 			setAnswer(ExternalizableHelper.readUTF(dis));
 			break;
-		case Constants.QTN_TYPE_DATE:
-		case Constants.QTN_TYPE_DATE_TIME:
-		case Constants.QTN_TYPE_TIME:
+		case Constants.DATATYPE_DATE:
+		case Constants.DATATYPE_DATE_TIME:
+		case Constants.DATATYPE_TIME:
 			setAnswer(ExternalizableHelper.readDate(dis));
 			break;
-		case Constants.QTN_TYPE_LIST_EXCLUSIVE:
+		case Constants.DATATYPE_LIST_EXCLUSIVE:
 			if(dis.readBoolean()){
 				OptionData option = new OptionData();
 				option.readExternal(dis);
@@ -480,7 +487,7 @@ public class QuestionData implements Externalizable{
 				setOptionAnswerIndices(new Byte(dis.readByte()));
 			}
 			break;
-		case Constants.QTN_TYPE_LIST_MULTIPLE:
+		case Constants.DATATYPE_LIST_MULTIPLE:
 			if(dis.readBoolean()){
 				setAnswer(ExternalizableHelper.readExternal(dis, new OptionData().getClass()));
 				
@@ -501,30 +508,30 @@ public class QuestionData implements Externalizable{
 	 * @throws IOException
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
-		dos.writeUTF(getId());
+		dos.writeInt(getId());
 		
 		//This type is only used when reading data back from storage.
 		//Otherwise it is not kept in memory because it can be got from the QuestionDef.
-		dos.writeByte(getDef().getType());
+		dos.writeByte(getDef().getDataType());
 		writeAnswer(dos);
 	}
 	
 	private void writeAnswer(DataOutputStream dos) throws IOException {	
-		switch(getDef().getType()){
-			case Constants.QTN_TYPE_BOOLEAN:
+		switch(getDef().getDataType()){
+			case Constants.DATATYPE_BOOLEAN:
 				ExternalizableHelper.writeBoolean(dos, (Boolean)getAnswer());
 				break;
-			case Constants.QTN_TYPE_TEXT:
-			case Constants.QTN_TYPE_DECIMAL:
-			case Constants.QTN_TYPE_NUMERIC:
+			case Constants.DATATYPE_TEXT:
+			case Constants.DATATYPE_DECIMAL:
+			case Constants.DATATYPE_INTEGER:
 				ExternalizableHelper.writeUTF(dos, getTextAnswer());
 				break;
-			case Constants.QTN_TYPE_DATE:
-			case Constants.QTN_TYPE_DATE_TIME:
-			case Constants.QTN_TYPE_TIME:
+			case Constants.DATATYPE_DATE:
+			case Constants.DATATYPE_DATE_TIME:
+			case Constants.DATATYPE_TIME:
 				ExternalizableHelper.writeDate(dos, (Date)getAnswer());
 				break;
-			case Constants.QTN_TYPE_LIST_EXCLUSIVE:
+			case Constants.DATATYPE_LIST_EXCLUSIVE:
 				if(getAnswer() != null){
 					dos.writeBoolean(true);
 					((OptionData)getAnswer()).writeExternal(dos);
@@ -533,7 +540,7 @@ public class QuestionData implements Externalizable{
 				else
 					dos.writeBoolean(false);
 				break;
-			case Constants.QTN_TYPE_LIST_MULTIPLE:
+			case Constants.DATATYPE_LIST_MULTIPLE:
 				if(getAnswer() != null){
 					dos.writeBoolean(true);
 					ExternalizableHelper.writeExternal((Vector)getAnswer(), dos);
@@ -545,7 +552,7 @@ public class QuestionData implements Externalizable{
 				else
 					dos.writeBoolean(false);
 				break;
-			case Constants.QTN_TYPE_REPEAT:
+			case Constants.DATATYPE_REPEAT:
 				if(getAnswer() != null){
 					dos.writeBoolean(true);
 					((Externalizable)getAnswer()).writeExternal(dos);

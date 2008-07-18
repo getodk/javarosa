@@ -24,14 +24,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private int id;		/** The numeric unique identifier of the form definition. */	
 	private String name;	/** The display name of the form. */
 	private Localizer localizer;
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	private int recordId; //does this belong here?
 	
