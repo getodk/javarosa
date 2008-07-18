@@ -12,7 +12,7 @@ import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
-import org.javarosa.xform.util.JavaRosaXformsParser;
+import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
@@ -112,7 +112,9 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	public DataOutputStream serializeDataModel(IFormDataModel model) {
 		model.accept(this);
 		if(theXmlDoc != null) {
-			DataOutputStream dos = new DataOutputStream(JavaRosaXformsParser.fromDoc2Stream(theXmlDoc));
+			//TODO: Enable parsing again
+			//DataOutputStream dos = new DataOutputStream(XFormParser.fromDoc2Stream(theXmlDoc));
+			DataOutputStream dos = null;
 			return dos;
 		}
 		else {
