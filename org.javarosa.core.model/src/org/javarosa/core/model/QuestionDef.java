@@ -33,7 +33,9 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String helpText;	 /* The help text. */
 	private String helpTextID;
 
+	/** String  -> String */
 	private SimpleOrderedHashtable selectItems;
+	/** String -> String */
 	private SimpleOrderedHashtable selectItemIDs;
 	private Vector selectItemsLocalizable;
 	
@@ -328,7 +330,11 @@ public class QuestionDef implements IFormElement, Localizable {
 			setLocked(dis.readBoolean());
 			
 			String className = dis.readUTF();
-			//Get Binding prototype from factory and deserialize it
+			//TODO: Get Binding prototype from factory and deserialize it
+			
+			//TODO: Wrong kind of hashtable
+			//setSelectItems(ExternalizableHelper.readExternal(dis));
+			//setSelectItemIDs(ExternalizableHelper.readExternal(dis));	
 		}	
 	}
 
@@ -357,6 +363,10 @@ public class QuestionDef implements IFormElement, Localizable {
 		
 		dos.writeUTF(binding.getClass().toString());
 		binding.writeExternal(dos);
+		
+		//Wrong kind of hashtable
+		//ExternalizableHelper.writeExternal(getSelectItems(), dos);
+		//ExternalizableHelper.writeExternal(getSelectItemIDs(), dos);	
 	}
 
 }
