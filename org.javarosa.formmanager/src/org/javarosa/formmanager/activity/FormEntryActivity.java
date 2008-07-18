@@ -84,7 +84,7 @@ public class FormEntryActivity implements IActivity, IControllerListener, Comman
 				e.printStackTrace();
 			}
 			catch (UnavailableExternalizerException uee) {
-				e.printStackTrace();
+				uee.printStackTrace();
 			}
 		}
 		if (theForm != null) {
