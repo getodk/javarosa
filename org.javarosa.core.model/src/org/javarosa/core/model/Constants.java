@@ -89,6 +89,7 @@ public class Constants {
 	/** The default time zone. */
 	public static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT");
 
+	public static final int DATATYPE_UNSUPPORTED = -1;
 	public static final int DATATYPE_TEXT = 1;	/** Text question type. */
 	public static final int DATATYPE_INTEGER = 2;	/** Numeric question type. These are numbers without decimal points*/
 	public static final int DATATYPE_DECIMAL = 3;	/** Decimal question type. These are numbers with decimals */
