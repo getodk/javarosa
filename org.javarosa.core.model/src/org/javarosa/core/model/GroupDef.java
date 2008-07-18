@@ -15,7 +15,7 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
  * @author Daniel Kayiwa
  *
  */
-public class GroupDef implements IFormElement, Localizable, Externalizable{
+public class GroupDef implements IFormElement, Localizable {
 	private Vector children;	/** A list of questions on a group. */	
 	private boolean repeat;
 	private int id;	/** The group number. */
@@ -149,21 +149,33 @@ public class GroupDef implements IFormElement, Localizable, Externalizable{
 	
 	/** Reads a group definition object from the supplied stream. */
 	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
-		/*
 		if(!ExternalizableHelper.isEOF(dis)){
-			setGroupNo(dis.readByte());
-			setName(dis.readUTF());
-			setQuestions(ExternalizableHelper.readExternal(dis,new QuestionDef().getClass()));
+			setID(dis.readInt());
+
+			setName(ExternalizableHelper.readUTF(dis));
+			setLongText(ExternalizableHelper.readUTF(dis));
+			setShortText(ExternalizableHelper.readUTF(dis));
+			setLongTextID(ExternalizableHelper.readUTF(dis), null);
+			setShortTextID(ExternalizableHelper.readUTF(dis), null);
+			
+			setRepeat(dis.readBoolean());
+			
+			//get the children
 		}
-		*/
 	}
 
 	/** Write the group definition object to the supplied stream. */
 	public void writeExternal(DataOutputStream dos) throws IOException {
-/*
-		dos.writeByte(getGroupNo());
-		dos.writeUTF(getName());
-		ExternalizableHelper.writeExternal(getQuestions(), dos);
-*/
+		dos.writeInt(getID());
+		
+		ExternalizableHelper.writeUTF(dos, getName());
+		ExternalizableHelper.writeUTF(dos, getLongText());
+		ExternalizableHelper.writeUTF(dos, getShortText());
+		ExternalizableHelper.writeUTF(dos, getLongTextID());
+		ExternalizableHelper.writeUTF(dos, getShortTextID());
+		
+		dos.writeBoolean(getRepeat());
+		
+		ExternalizableHelper.writeExternal(getChildren(), dos);
 	}	
 }
