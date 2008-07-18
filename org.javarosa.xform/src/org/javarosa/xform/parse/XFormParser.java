@@ -22,6 +22,7 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 
+
 /**
  * Provides conversion from xform to epihandy object model and vice vasa.
  * 
@@ -41,16 +42,20 @@ public class XFormParser {
 	private static Hashtable bindingsByID;
 	private static Hashtable bindingsByRef;
 	
+	static {
+		initProcessingRules();
+		initTypeMappings();		
+	}
+	
 	/**
 	 * Default Constructor
 	 *
 	 */
 	public XFormParser(){
-		initProcessingRules();
-		initTypeMappings();
+
 	}
 	
-	private void initProcessingRules () {
+	private static void initProcessingRules () {
 		IElementHandler title = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseTitle(f, e); } };
 		IElementHandler model = new IElementHandler () {
