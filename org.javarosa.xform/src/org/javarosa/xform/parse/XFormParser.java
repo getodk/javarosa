@@ -505,17 +505,18 @@ public class XFormParser {
 	}
 
 	private static void parseInstance (FormDef f, Element e) {
-		int numChildElements = 0;
+		Element dataElement = null;
 		for (int i = 0; i < e.getChildCount(); i++) {
 			if (e.getType(i) == Node.ELEMENT) {
-				numChildElements++;
+				if (dataElement != null) {
+					throw new XFormParseException("XForm Parse: <instance> has more than one child element");
+				} else {
+					dataElement = e.getElement(i);
+				}
 			}
 		}
-		if (numChildElements > 1) {
-			throw new XFormParseException("XForm Parse: <instance> has more than one child element");
-		}
 
-		TreeElement root = parseInstanceNodes(e, "/").getRoot();
+		TreeElement root = parseInstanceNodes(dataElement, "/").getRoot();
 		DataModelTree instanceModel = new DataModelTree(root);
 		f.setDataModel(instanceModel);
 	}
@@ -531,8 +532,11 @@ public class XFormParser {
 		} else {
 			element = new QuestionDataGroup(node.getName());
 			for(int i = 0 ; i  < childNum ; ++i ) {
+				if (node.getType(i) != Node.ELEMENT)
+					continue;
+				
 				String newPath = currentPath + node.getName() + "/";
-				((QuestionDataGroup)element).addChild(parseInstanceNodes((Element)node.getChild(i), newPath));
+				((QuestionDataGroup)element).addChild(parseInstanceNodes(node.getElement(i), newPath));
 			}
 		}
 		return element;
