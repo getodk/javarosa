@@ -22,7 +22,7 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
  */
 public class FormDef implements IFormElement, Localizable, IDRecordable, Externalizable{
 	private Vector children;	/** A collection of group definitions. */
-	private Vector dataBindings;
+	private Vector dataBindings = new Vector();
 	private int id;		/** The numeric unique identifier of the form definition. */	
 	private String name;	/** The display name of the form. */
 	private Localizer localizer;
@@ -209,7 +209,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			factory.addNewPrototype(QuestionDef.class.getName(), QuestionDef.class);
 			factory.addNewPrototype(GroupDef.class.getName(), GroupDef.class);
 			setID(dis.readInt());
-			setName(dis.readUTF());
+			setName(ExternalizableHelper.readUTF(dis));
 			
 			setChildren(ExternalizableHelper.readExternal(dis,factory));
 			setBindings(ExternalizableHelper.readExternal(dis,new DataBinding().getClass()));
@@ -224,7 +224,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeInt(getID());
-		dos.writeUTF(getName());
+		ExternalizableHelper.writeUTF(dos, getName());
 		
 		ExternalizableHelper.writeExternalGeneric(getChildren(), dos);
 		ExternalizableHelper.writeExternal(getBindings(), dos);

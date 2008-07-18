@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 
 /**
@@ -63,7 +64,7 @@ public class FormDefMetaData extends MetaDataObject
     public void readExternal(DataInputStream in) throws IOException
     {
     	super.readExternal(in);
-        this.formName = in.readUTF();
+        this.formName = ExternalizableHelper.readUTF(in);
         this.version = in.readInt();
         this.type = in.readInt();
     }
@@ -75,7 +76,7 @@ public class FormDefMetaData extends MetaDataObject
     public void writeExternal(DataOutputStream out) throws IOException
     {
     	super.writeExternal(out);
-        out.writeUTF(this.formName);
+        ExternalizableHelper.writeUTF(out,this.formName);
         out.writeInt(this.version);
         out.writeInt(type);
     }
