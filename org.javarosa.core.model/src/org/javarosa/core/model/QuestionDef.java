@@ -5,11 +5,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.model.data.AnswerData;
+import org.javarosa.core.model.utils.Localizable;
+import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.model.utils.SimpleOrderedHashtable;
 import org.javarosa.core.services.storage.utilities.Externalizable;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
-import org.javarosa.core.util.SimpleOrderedHashtable;
-
 
 /** 
  * This is the question definition properties.
@@ -17,110 +17,227 @@ import org.javarosa.core.util.SimpleOrderedHashtable;
  * @author Daniel Kayiwa
  *
  */
-public class QuestionDef implements Externalizable{
-	/** The prompt text. The text the user sees. */
-	private String longText = Constants.EMPTY_STRING;
+public class QuestionDef implements IFormElement, Localizable, Externalizable {
+	private int id;
+	private String name;
+	private IDataReference binding;	/** reference to a location in the model to store data in */
 	
-	/** The prompt text. The text the user sees in short modes. */
-	private String shortText = Constants.EMPTY_STRING;
+	private int dataType;  	 /* The type of question. eg Numeric,Date,Text etc. */
+	private int controlType;  /* The type of widget. eg TextInput,Slider,List etc. */
+	private String appearanceAttr;
 	
-	/** The locale id. Will be used to regionalize strings. */
-	private String localeId;
+	private String longText;	 /* The prompt text. The text the user sees. */
+	private String longTextID;
+	private String shortText;	 /* The prompt text. The text the user sees in short modes. */
+	private String shortTextID;
+	private String helpText;	 /* The help text. */
+	private String helpTextID;
+
+	private SimpleOrderedHashtable selectItems;
+	private SimpleOrderedHashtable selectItemIDs;
+	private Vector selectItemsLocalizable;
 	
-	/** The help text. */
-	private String helpText = Constants.EMPTY_STRING;
+	private boolean required; 	/** A flag to tell whether the question is to be answered or is optional. */
+	//relevancy?
+	//constraints?
 	
-	/** A flag to tell whether the question is to be answered or is optional. */
-	private boolean mandatory = false;
-	
-	/** The type of question. eg Numeric,Date,Text etc. */
-	private byte type = Constants.QTN_TYPE_TEXT;
-	
-	/** The type of widget. eg TextInput,Slider,List etc. */
-	private byte controlType = Constants.QTN_TYPE_TEXT;
-	
-	/** A flag to tell whether the question should be shown or not. */
-	private boolean visible = true;
-	
-	/** A flag to tell whether the question should be enabled or disabled. */
-	private boolean enabled = true;
-	
-	/** A flag to tell whether a question is to be locked or not. A locked question 
-	 * is one which is visible, enabled, but cannot be edited.
-	 */
-	private boolean locked = false;
-	
-	/** The text identifier of the question. This is used by the users of the questionnaire 
-	 * but in code we use the dynamically generated numeric id for speed. 
-	 */
-	private String variableName = Constants.EMPTY_STRING;
-	
-	/** The allowed set of values (OptionDef) for an answer of the question. */
-	private Vector options;
-	
-	/** The identifier of a question. */
-	private String id;
-	
-	/** The value supplied as answer if the user has not supplied one. */
-	private Object defaultValue;
-	
-	/** A Binding to an external data value */
-	private IBinding bind;
-	
-	//TODO Add some way to link a set of visual display options
-	
-	/** This constructor is used mainly during deserialization. */
-	public QuestionDef(){
-		super();
+	private boolean visible;	/** A flag to tell whether the question should be shown or not. */
+	private boolean enabled;	/** A flag to tell whether the question should be enabled or disabled. */
+	private boolean locked; 	/** A flag to tell whether a question is to be locked or not. A locked question is one which is visible, enabled, but cannot be edited. */
+
+	private AnswerData defaultValue;	/** this shouldn't be used for default values that are already pre-loaded in the instance */
+		
+	public QuestionDef () {
+		this(Constants.NULL_ID, null, Constants.DATATYPE_TEXT, Constants.DATATYPE_TEXT);
 	}
 	
-	/**
-	 * Constructs a new question definition object from the supplied parameters.
-	 * For String type parameters, they should NOT be NULL. They should instead be empty,
-	 * for the cases of missing values.
-	 * 
-	 * @param id
-	 * @param text
-	 * @param helpText - The hint or help text. Should NOT be NULL.
-	 * @param mandatory
-	 * @param type
-	 * @param defaultValue
-	 * @param visible
-	 * @param enabled
-	 * @param locked
-	 * @param variableName
-	 * @param options
-	 */
-	public QuestionDef(String id,String longText, String shortText, String helpText, boolean mandatory, byte type, String defaultValue, boolean visible, boolean enabled, boolean locked, String variableName, Vector options) {
-		this();
-		setId(id);
-		setLongText(longText);
-		setShortText(shortText);
-		setHelpText(helpText);
-		setMandatory(mandatory);
-		setType(type);
-		setDefaultValue(defaultValue);
-		setVisible(visible);
-		setEnabled(enabled);
-		setLocked(locked);
-		setVariableName(variableName);
-		setOptions(options);
+	public QuestionDef (int id, String name, int dataType, int controlType) {
+		setID(id);
+		setName(name);
+		setDataType(dataType);
+		setControlType(controlType);
+		setRequired(false);
+		setVisible(true);
+		setEnabled(true);
+		setLocked(false);
 	}
-	
-	public String getId() {
+		
+	public int getID () {
 		return id;
 	}
 	
-	public void setId(String id) {
+	public void setID (int id) {
 		this.id = id;
 	}
 	
-	public Object getDefaultValue() {
-		return defaultValue;
+	public String getName() {
+		return name;
 	}
 	
-	public void setDefaultValue(Object defaultValue) {
-		this.defaultValue = defaultValue;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public IDataReference getBind() {
+		return binding;
+	}
+	
+	public void setBind(IDataReference binding) {
+		this.binding = binding;
+	}
+	
+	public int getDataType() {
+		return dataType;
+	}
+	
+	public void setDataType(int dataType) {
+		this.dataType = dataType;
+	}
+	
+	public int getControlType() {
+		return controlType;
+	}
+	
+	public void setControlType(int controlType) {
+		this.controlType = controlType;
+	}
+
+	public String getAppearanceAttr () {
+		return appearanceAttr;
+	}
+	
+	public void setAppearanceAttr (String appearanceAttr) {
+		this.appearanceAttr = appearanceAttr;
+	}	
+	
+	public String getLongText () {
+		return longText;
+	}
+	
+	public void setLongText (String longText) {
+		this.longText = longText;
+	}
+
+    public String getLongTextID () {
+        return longTextID;
+    }
+    
+    public void setLongTextID (String textID, Localizer localizer) {
+    	this.longTextID = textID;
+    	if (localizer != null) {
+    		longText = localizer.getLocalizedText(longTextID);
+    	}
+    }
+	
+	public String getShortText () {
+		return shortText;
+	}
+	
+	public void setShortText (String shortText) {
+		this.shortText = shortText;
+	}
+
+    public String getShortTextID () {
+        return shortTextID;
+    }
+
+    public void setShortTextID (String textID, Localizer localizer) {
+    	this.shortTextID = textID;
+    	if (localizer != null) {
+    		shortText = localizer.getLocalizedText(shortTextID);        
+    	}
+    } 
+
+	public String getHelpText () {
+		return helpText;
+	}
+	
+	public void setHelpText (String helpText) {
+		this.helpText = helpText;
+	}
+
+    public String getHelpTextID () {
+        return helpTextID;
+    }
+    
+    public void setHelpTextID (String textID, Localizer localizer) {
+        this.helpTextID = textID;
+        if (localizer != null) {
+            helpText = localizer.getLocalizedText(helpTextID);
+        }
+    }
+
+	public SimpleOrderedHashtable getSelectItems () {
+		return selectItems;
+	}
+
+	public void setSelectItems (SimpleOrderedHashtable selectItems) {
+		this.selectItems = selectItems;
+	}
+	
+	public void addSelectItem (String label, String value) {
+		if (selectItems == null)
+			selectItems = new SimpleOrderedHashtable();
+		selectItems.put(label, value);
+	}
+	
+	public SimpleOrderedHashtable getSelectItemIDs () {
+		return selectItemIDs;
+	}
+	
+	public Vector getSelectItemsLocalizable () {
+		return selectItemsLocalizable;
+	}
+	
+	public void setSelectItemIDs (SimpleOrderedHashtable selectItemIDs, Vector selectItemsLocalizable, Localizer localizer) {
+		this.selectItemIDs = selectItemIDs;
+		this.selectItemsLocalizable = selectItemsLocalizable;
+		if (localizer != null) {
+			localizeSelectMap(localizer);
+		}
+	}
+	
+	public void addSelectItemID (String labelID, boolean type, String value) {
+		if (selectItemIDs == null) {
+			selectItemIDs = new SimpleOrderedHashtable();
+			selectItemsLocalizable = new Vector();
+		}
+		selectItemIDs.put(labelID, value);
+		selectItemsLocalizable.addElement(new Boolean(type));
+	}
+	
+	//calling when localizer == null is meant for when there is no localization data and selectIDMap contains only
+	//fixed strings (trans is always false)
+	public void localizeSelectMap (Localizer localizer) {
+		selectItems = null;
+		
+		String label;
+		for (int i = 0; i < selectItemIDs.size(); i++) {
+			String key = (String)selectItemIDs.keyAt(i);
+			boolean translate = ((Boolean)selectItemsLocalizable.elementAt(i)).booleanValue();
+			if (translate) {
+				label = (localizer == null ? "[itext]" : localizer.getLocalizedText(key));
+			} else {
+				label = key;
+			}
+			addSelectItem(label, (String)selectItemIDs.get(key));
+		}
+	}
+
+	public boolean isRequired() {
+		return required;
+	}
+	
+	public void setRequired(boolean required) {
+		this.required = required;
+	}
+
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 	
 	public boolean isEnabled() {
@@ -131,14 +248,6 @@ public class QuestionDef implements Externalizable{
 		this.enabled = enabled;
 	}
 	
-	public String getHelpText() {
-		return helpText;
-	}
-	
-	public void setHelpText(String helpText) {
-		this.helpText = helpText;
-	}
-	
 	public boolean isLocked() {
 		return locked;
 	}
@@ -146,105 +255,54 @@ public class QuestionDef implements Externalizable{
 	public void setLocked(boolean locked) {
 		this.locked = locked;
 	}
-	
-	public boolean isMandatory() {
-		return mandatory;
+		
+	public AnswerData getDefaultValue() {
+		return defaultValue;
 	}
 	
-	public void setMandatory(boolean mandatory) {
-		this.mandatory = mandatory;
+	public void setDefaultValue(AnswerData defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 	
-	public Vector getOptions() {
-		return options;
-	}
-	
-	public void setOptions(Vector options) {
-		this.options = options;
-	}
-	
-	public String getLongText() {
-		return longText;
-	}
-	
-	public void setLongText(String longText) {
-		this.longText = longText;
-	}
-	
-	public String getShortText() {
-		return shortText;
-	}
-	
-	public void setShortText(String shortText) {
-		this.shortText = shortText;
-	}
-	
-	public String getLocaleId() {
-		return localeId;
-	}
-	
-	public void setLocaleId(String localeId) {
-		this.localeId = localeId;
-	}
-	
-	public byte getType() {
-		return type;
-	}
-	
-	public void setType(byte type) {
-		this.type = type;
-	}
-	
-	public byte getControlType() {
-		return controlType;
-	}
-	
-	public void setControlType(byte controlType) {
-		this.controlType = controlType;
-	}
-	
-	public String getVariableName() {
-		return variableName;
-	}
-	
-	public void setVariableName(String variableName) {
-		this.variableName = variableName;
-	}
-	
-	public boolean isVisible() {
-		return visible;
-	}
-	
-	public void setVisible(boolean visible) {
-		this.visible = visible;
-	}
-	
-	public void addOption(OptionDef optionDef){
-		if(options == null)
-			options = new Vector();
-		options.addElement(optionDef);
-	}
-	
-	public IBinding getBind() {
-		return bind;
-	}
-	
-	public void setBind(IBinding bind) {
-		this.bind = bind;
-	}
-	
-	
-	public String serializedDefaultValue() {
-		if(this.defaultValue != null) {
-			return this.defaultValue.toString();
-		}
-		else return null;
+	public String toString() {
+		return getLongText();
 	}
 
+    public void localeChanged(String locale, Localizer localizer) {
+    	if(longTextID != null) {
+    		longText = localizer.getLocalizedText(longTextID);
+    	}
+
+    	if(shortTextID != null) {
+    		shortText = localizer.getLocalizedText(shortTextID);
+    	}
+
+    	if(helpTextID != null) {
+    		helpText = localizer.getLocalizedText(helpTextID);
+    	}
+    	
+    	if (selectItemIDs != null) {
+    		localizeSelectMap(localizer);
+    	}
+    }
+	
+	public Vector getChildren () {
+		return null;
+	}
+	
+	public void setChildren (Vector v) {
+		throw new IllegalStateException();
+	}
+	
+	public void addChild (IFormElement fe) {
+		throw new IllegalStateException();
+	}
+	
 	/**
 	 * Reads the object from stream.
 	 */
-	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException{
+	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
+/*
 		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readUTF());
 			
@@ -268,12 +326,14 @@ public class QuestionDef implements Externalizable{
 			
 			setOptions(ExternalizableHelper.readExternal(dis,new OptionDef().getClass()));
 		}
+		*/
 	}
 
 	/**
 	 * Write the object to stream.
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
+/*
 		dos.writeUTF(getId());
 
 		ExternalizableHelper.writeUTF(dos, getLongText());
@@ -292,15 +352,6 @@ public class QuestionDef implements Externalizable{
 		ExternalizableHelper.writeUTF(dos, serializedDefaultValue());
 		
 		ExternalizableHelper.writeExternal(getOptions(), dos);
-	}
-	
-	public String toString() {
-		return getLongText();
-	}
-	
-	public SimpleOrderedHashtable getSelectItems() {
-		//Super stub method that Drew is going to fill in.
-		return new SimpleOrderedHashtable();
+	*/
 	}
 }
-

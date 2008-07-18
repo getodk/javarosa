@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.model.utils.*;
 import org.javarosa.core.services.storage.utilities.Externalizable;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
@@ -18,61 +18,62 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
  * @author Daniel Kayiwa
  *
  */
-public class FormDef implements IDRecordable, Externalizable{
+public class FormDef implements IFormElement, Localizable, IDRecordable, Externalizable{
+	private Vector children;	/** A collection of group definitions. */
+	private Vector dataBindings;
+	private int id;		/** The numeric unique identifier of the form definition. */	
+	private String name;	/** The display name of the form. */
+	private Localizer localizer;
 	
-	/** A collection of group definitions. */
-	private Vector groups;
 	
-	/** Bindings from questions to FormTypes */
-	private Hashtable bindings;
 	
-	/** The string unique identifier of the form definition. */
-	private String variableName = Constants.EMPTY_STRING;
 	
-	/** The display name of the form. */
-	private String name = Constants.EMPTY_STRING;
 	
-	/** The numeric unique identifier of the form definition. */
-	private int id = Constants.NULL_ID;
 	
-	private int recordId;
 	
-	/** The collection of rules for this form. */
-	private Vector rules;
 	
-	/** A string constistig for form fields that describe its data. */
-	private String descriptionTemplate =  Constants.EMPTY_STRING;
-  
-	/** Constructs a form definition object. */
-	public FormDef() {
-		super();
-	}
 	
-	/**
-	 * Constructs a form definition object from these parameters.
-	 * 
-	 * @param name - the numeric unique identifier of the form definition.
-	 * @param name - the display name of the form.
-	 * @param variableName - the string unique identifier of the form definition.
-	 * @param groups - collection of group definitions.
-	 * @param rules - collection of branching rules.
-	 */
-	public FormDef(int id, String name, String variableName,Vector groups, Vector rules, String descTemplate) {
-		this();
-		setId(id);
-		setName(name);
-		setVariableName(variableName);
-		setGroups(groups);
-		setRules(rules);
-		setDescriptionTemplate((descTemplate == null) ? Constants.EMPTY_STRING : descTemplate);
+	private int recordId; //does this belong here?
+	
+	// dunno about this...
+	///** The collection of rules for this form. */
+	//private Vector rules;
+	
+	// what is this?
+	// /** A string constistig for form fields that describe its data. */
+	//private String descriptionTemplate =  Constants.EMPTY_STRING;
+
+	public FormDef() {	}
+	
+//	/**
+//	 * Constructs a form definition object from these parameters.
+//	 * 
+//	 * @param name - the numeric unique identifier of the form definition.
+//	 * @param name - the display name of the form.
+//	 * @param variableName - the string unique identifier of the form definition.
+//	 * @param groups - collection of group definitions.
+//	 * @param rules - collection of branching rules.
+//	 */
+//	public FormDef(int id, String name, String variableName,Vector groups, Vector rules, String descTemplate) {
+//		this();
+//		setId(id);
+//		setName(name);
+//		setVariableName(variableName);
+//		setGroups(groups);
+//		setRules(rules);
+//		setDescriptionTemplate((descTemplate == null) ? Constants.EMPTY_STRING : descTemplate);
+//	}
+
+	public Vector getChildren() {
+		return children;
 	}
 
-	public Vector getGroups() {
-		return groups;
+	public void setChildren(Vector children) {
+		this.children = (children == null ? new Vector() : children);
 	}
-
-	public void setGroups(Vector groups) {
-		this.groups = groups;
+	
+	public void addChild (IFormElement fe) {
+		children.addElement(fe);
 	}
 	
 	public String getName() {
@@ -83,26 +84,28 @@ public class FormDef implements IDRecordable, Externalizable{
 		this.name = name;
 	}
 
-	public String getVariableName() {
-		return variableName;
-	}
-
-	public void setVariableName(String variableName) {
-		this.variableName = variableName;
-	}
-
-	public int getId() {
+	public int getID() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setID(int id) {
 		this.id = id;
 	}
+	
+	public Localizer getLocalizer () {
+		return localizer;
+	}
+	
+	public void setLocalizer (Localizer l) {
+		this.localizer = l;
+	}
+	
 	
 	public void setRecordId(int recordId) {
 		this.recordId = recordId;
 	}
 
+	/*
 	public Vector getRules() {
 		return rules;
 	}
@@ -110,19 +113,23 @@ public class FormDef implements IDRecordable, Externalizable{
 	public void setRules(Vector rules) {
 		this.rules = rules;
 	}
+	*/
 	
-	public IBinding getBinding(String id) {
-		return (IBinding)bindings.get(id);
+	public Vector getBindings () {
+		return dataBindings;
 	}
-	public void  addBinding(IBinding bind) {
-		if(bindings != null) {
-			bindings.put(bind.getId(), bind);
-		}
-		else {
-			bindings = new Hashtable();
-		}
+	
+	public void setBindings (Vector v) {
+		this.dataBindings = v;
 	}
-
+	
+	public void addBinding (DataBinding db) {
+		if (dataBindings == null)
+			dataBindings = new Vector();
+		dataBindings.addElement(db);
+	}
+	
+	/*
 	public String getDescriptionTemplate() {
 		return descriptionTemplate;
 	}
@@ -130,53 +137,58 @@ public class FormDef implements IDRecordable, Externalizable{
 	public void setDescriptionTemplate(String descriptionTemplate) {
 		this.descriptionTemplate = descriptionTemplate;
 	}
+	*/
+	
+	public void localeChanged (String locale, Localizer localizer) {
+		
+	}
 	
 	public String toString() {
 		return getName();
 	}
 	
-	/**
-	 * Gets a question identified by a variable name.
-	 * 
-	 * @param varName - the string identifier of the question. 
-	 * @return the question reference.
-	 */
-	public QuestionDef getQuestion(String varName){
-		if(varName == null)
-			return null;
-		
-		for(byte i=0; i<getGroups().size(); i++){
-			QuestionDef def = ((GroupDef)getGroups().elementAt(i)).getQuestion(varName);
-			if(def != null)
-				return def;
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * Gets a numeric question identifier for a given question variable name.
-	 * 
-	 * @param varName - the string identifier of the question. 
-	 * @return the numeric question identifier.
-	 */
-	public String getQuestionId(String varName){
-		QuestionDef qtn = getQuestion(varName);
-		if(qtn != null)
-			return qtn.getId();
-		
-		return Constants.NULL_STRING_ID;
-	}
-
-	public void addQuestion(QuestionDef qtn){
-		if(groups == null){
-			groups = new Vector();
-			GroupDef group = new GroupDef(this.getVariableName(),Byte.parseByte("1"),null);
-			groups.addElement(group);
-		}
-		
-		((GroupDef)groups.elementAt(0)).addQuestion(qtn);
-	}
+//	/**
+//	 * Gets a question identified by a variable name.
+//	 * 
+//	 * @param varName - the string identifier of the question. 
+//	 * @return the question reference.
+//	 */
+//	public QuestionDef getQuestion(String varName){
+//		if(varName == null)
+//			return null;
+//		
+//		for(byte i=0; i<getGroups().size(); i++){
+//			QuestionDef def = ((GroupDef)getGroups().elementAt(i)).getQuestion(varName);
+//			if(def != null)
+//				return def;
+//		}
+//		
+//		return null;
+//	}
+//	
+//	/**
+//	 * Gets a numeric question identifier for a given question variable name.
+//	 * 
+//	 * @param varName - the string identifier of the question. 
+//	 * @return the numeric question identifier.
+//	 */
+//	public String getQuestionId(String varName){
+//		QuestionDef qtn = getQuestion(varName);
+//		if(qtn != null)
+//			return qtn.getId();
+//		
+//		return Constants.NULL_STRING_ID;
+//	}
+//
+//	public void addQuestion(QuestionDef qtn){
+//		if(groups == null){
+//			groups = new Vector();
+//			GroupDef group = new GroupDef(this.getVariableName(),Byte.parseByte("1"),null);
+//			groups.addElement(group);
+//		}
+//		
+//		((GroupDef)groups.elementAt(0)).addQuestion(qtn);
+//	}
 	
 	/** 
 	 * Reads the form definition object from the supplied stream.
@@ -187,6 +199,7 @@ public class FormDef implements IDRecordable, Externalizable{
 	 * @throws IllegalAccessException
 	 */
 	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+		/*
 		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readInt());
 			setName(dis.readUTF());
@@ -195,6 +208,7 @@ public class FormDef implements IDRecordable, Externalizable{
 			setGroups(ExternalizableHelper.readExternal(dis,new GroupDef().getClass()));
 			setRules(ExternalizableHelper.readExternal(dis,new EpiHandySkipRule().getClass()));
 		}
+		*/
 	}
 
 	/** 
@@ -204,11 +218,13 @@ public class FormDef implements IDRecordable, Externalizable{
 	 * @throws IOException
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
+		/*
 		dos.writeInt(getId());
 		dos.writeUTF(getName());
 		dos.writeUTF(getVariableName());
 		dos.writeUTF(getDescriptionTemplate());
 		ExternalizableHelper.writeExternal(getGroups(), dos);
 		ExternalizableHelper.writeExternal(getRules(), dos);
+		*/
 	}
 }
