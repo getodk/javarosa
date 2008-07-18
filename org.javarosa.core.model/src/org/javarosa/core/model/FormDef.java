@@ -3,10 +3,12 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.*;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.model.utils.Localizable;
+import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.Externalizable;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
@@ -26,7 +28,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private Localizer localizer;
 
 	private IFormDataModel model;
-	
 
 	private int recordId; //does this belong here?
 	
@@ -202,10 +203,13 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 */
 	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		if(!ExternalizableHelper.isEOF(dis)){
+			PrototypeFactory factory = new PrototypeFactory();
+			factory.addNewPrototype(QuestionDef.class.getName(), QuestionDef.class);
+			factory.addNewPrototype(GroupDef.class.getName(), GroupDef.class);
 			setID(dis.readInt());
 			setName(dis.readUTF());
 			
-			//setGroups(ExternalizableHelper.readExternal(dis,new GroupDef().getClass()));
+			setChildren(ExternalizableHelper.readExternal(dis,factory));
 			setBindings(ExternalizableHelper.readExternal(dis,new DataBinding().getClass()));
 		}
 	}
@@ -220,7 +224,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		dos.writeInt(getID());
 		dos.writeUTF(getName());
 		
-		ExternalizableHelper.writeExternal(getChildren(), dos);
+		ExternalizableHelper.writeExternalGeneric(getChildren(), dos);
 		ExternalizableHelper.writeExternal(getBindings(), dos);
 	}
 }
