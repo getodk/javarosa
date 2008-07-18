@@ -3,7 +3,7 @@ package org.javarosa.core.model.data;
 import java.util.Calendar;
 import java.util.Date;
 
-public class DateData implements AnswerData {
+public class DateData implements IAnswerData {
 	Date d;
 	
 	public DateData (Date d) {

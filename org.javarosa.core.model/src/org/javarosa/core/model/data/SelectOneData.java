@@ -1,6 +1,6 @@
 package org.javarosa.core.model.data;
 
-public class SelectOneData implements AnswerData {
+public class SelectOneData implements IAnswerData {
 	Selection s;
 	
 	public SelectOneData (Selection s) {

@@ -1,6 +1,6 @@
 package org.javarosa.core.model.data;
 
-public class StringData implements AnswerData {
+public class StringData implements IAnswerData {
 	String s;
 	
 	public StringData (String s) {

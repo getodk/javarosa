@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.data.AnswerData;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
@@ -16,13 +16,16 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
  * 
  * In an XML Analogy, this represents a terminal element in the XML tree.
  * 
+ * It is important that this question's data reference be set to a template
+ * reference before attempting deserialization.
+ * 
  * @author Clayton Sims
  * 
  */
 public class QuestionDataElement extends TreeElement {
 
 	/** The actual question data value */
-	private AnswerData value;
+	private IAnswerData value;
 
 	/** A Binding for the Question Definition */
 	private IDataReference reference;
@@ -59,7 +62,7 @@ public class QuestionDataElement extends TreeElement {
 	 *            The value for this Question Definition
 	 */
 	public QuestionDataElement(String name, IDataReference reference,
-			AnswerData value) {
+			IAnswerData value) {
 		this(name, reference);
 		this.value = value;
 	}
@@ -76,7 +79,7 @@ public class QuestionDataElement extends TreeElement {
 	/**
 	 * @return The value for the question defined by IBinding
 	 */
-	public AnswerData getValue() {
+	public IAnswerData getValue() {
 		return value;
 	}
 
@@ -86,7 +89,7 @@ public class QuestionDataElement extends TreeElement {
 	 * @param value
 	 *            The question's answer value
 	 */
-	public void setValue(AnswerData value) {
+	public void setValue(IAnswerData value) {
 		this.value = value;
 	}
 
@@ -155,6 +158,7 @@ public class QuestionDataElement extends TreeElement {
 			InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
 		this.name = ExternalizableHelper.readUTF(in);
+		//TODO: get a template for this reference
 		if (reference == null) {
 			throw new UnavailableExternalizerException(
 					"Attempt to resolve serialization for a DataModelTree failed because there was no reference " +
@@ -171,7 +175,7 @@ public class QuestionDataElement extends TreeElement {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		//This flag is in place to determine whether a Data element is a Group or a Data
 		//True for groups, false for DataElements
-		ExternalizableHelper.writeBoolean(out, false);
+		out.writeBoolean(false);
 		ExternalizableHelper.writeUTF(out, this.name);
 		reference.writeExternal(out);
 	}

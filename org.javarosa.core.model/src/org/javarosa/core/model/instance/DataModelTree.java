@@ -7,7 +7,7 @@ import java.util.Enumeration;
 
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.core.model.data.AnswerData;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ExternalizingVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.ExternalizableHelper;
@@ -69,7 +69,7 @@ public class DataModelTree implements IFormDataModel {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.IFormDataModel#updateDataValue(IDataBinding, Object)
 	 */
-	public boolean updateDataValue(IDataReference questionBinding, AnswerData value) {
+	public boolean updateDataValue(IDataReference questionBinding, IAnswerData value) {
 		QuestionDataElement questionElement = resolveReference(questionBinding);
 		if(questionElement != null) {
 			questionElement.setValue(value);
@@ -84,7 +84,7 @@ public class DataModelTree implements IFormDataModel {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.IFormDataModel#getDataValue(org.javarosa.core.model.IDataReference)
 	 */
-	public AnswerData getDataValue(IDataReference questionReference) {
+	public IAnswerData getDataValue(IDataReference questionReference) {
 		QuestionDataElement element = resolveReference(questionReference);
 		if(element != null) {
 			return element.getValue();
