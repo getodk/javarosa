@@ -1,6 +1,6 @@
 package org.javarosa.core.model;
 
-import org.javarosa.core.model.data.AnswerData;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.services.storage.utilities.Externalizable;
 
@@ -24,7 +24,7 @@ public interface IFormDataModel extends Externalizable {
 	 * @param value The value that the Data Value should be set to
 	 * @return True if a value in this Model was updated, false otherwise
 	 */
-	boolean updateDataValue(IDataReference questionReference, AnswerData value);
+	boolean updateDataValue(IDataReference questionReference, IAnswerData value);
 	
 	/**
 	 * Retrieves the data value associated with the reference that is passed in.
@@ -33,7 +33,7 @@ public interface IFormDataModel extends Externalizable {
 	 * @return The QuestionData object in this data model that corresponds to
 	 * the reference passed in. Null if it is not present in this model.
 	 */
-	AnswerData getDataValue(IDataReference questionReference);
+	IAnswerData getDataValue(IDataReference questionReference);
 	
 	void accept(IDataModelVisitor visitor);
 	

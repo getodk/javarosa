@@ -2,7 +2,7 @@ package org.javarosa.core.model.data;
 
 import java.util.Vector;
 
-public class SelectMultiData implements AnswerData {
+public class SelectMultiData implements IAnswerData {
 	Vector vs; //vector of Selection
 	
 	public SelectMultiData (Vector vs) {
