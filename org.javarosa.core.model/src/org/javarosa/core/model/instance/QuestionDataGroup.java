@@ -8,6 +8,8 @@ import java.util.Vector;
 
 import org.javarosa.core.model.instance.utils.ElementExistsVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 
 /**
@@ -30,12 +32,16 @@ public class QuestionDataGroup extends TreeElement {
 	/** List of TreeElements */
 	Vector children;
 	
+	public QuestionDataGroup() {
+	}
+	
 	/**
 	 * Creates a new QuestionDataGroup.
 	 * 
 	 * @param name The name of this TreeElement
 	 */
 	public QuestionDataGroup(String name) {
+		this();
 		this.name = name;
 	}
 	
@@ -131,12 +137,32 @@ public class QuestionDataGroup extends TreeElement {
 	}
 
 	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException {
-		// TODO Auto-generated method stub
-		
+			InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+		this.name = ExternalizableHelper.readUTF(in);
+		int numChildren = in.readInt(); 
+		for(int i = 0 ; i < numChildren ; ++i ) {
+			boolean group = in.readBoolean();
+			if(group) {
+				QuestionDataGroup newGroup = new QuestionDataGroup();
+				newGroup.setRoot(this.getRoot());
+				newGroup.readExternal(in);
+			}
+			else {
+				QuestionDataElement element = new QuestionDataElement();
+				element.setRoot(this.getRoot());
+				element.readExternal(in);
+			}
+		}
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeUTF(this.name);
+		//This flag is in place to determine whether a Data element is a Group or a Data
+		//True for groups, false for DataElements
+		ExternalizableHelper.writeBoolean(out, true);
+		//This node's children are stored in a depth-first manner by the serializing visitor 
+		ExternalizableHelper.writeUTF(out,this.name);
+		
+		out.writeInt(this.children.size());
+		
 	}
 }

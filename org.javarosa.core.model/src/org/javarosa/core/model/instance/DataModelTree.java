@@ -11,6 +11,7 @@ import org.javarosa.core.model.data.AnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.IDataModelVisitor;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 /**
  * DataModelTree is an implementation of IFormDataModel
@@ -159,10 +160,20 @@ public class DataModelTree implements IFormDataModel {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException {
+			InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		this.id = in.readInt();
 		this.name = ExternalizableHelper.readUTF(in);
-		//Visitor, or not?
+		boolean group = in.readBoolean();
+		if(group) {
+			QuestionDataGroup newGroup = new QuestionDataGroup();
+			newGroup.setRoot(newGroup);
+			newGroup.readExternal(in);
+		}
+		else {
+			QuestionDataElement element = new QuestionDataElement();
+			element.setRoot(element);
+			element.readExternal(in);
+		}
 	}
 
 	/*
@@ -170,6 +181,7 @@ public class DataModelTree implements IFormDataModel {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
+		//Child nodes are serialized by the visitor pattern
 		out.writeInt(this.id);
 		ExternalizableHelper.writeUTF(out, this.name);
 	}
