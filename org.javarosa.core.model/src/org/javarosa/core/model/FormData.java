@@ -160,7 +160,8 @@ public class FormData implements IDRecordable, Externalizable {
 	private void updateFormDef(){
 		if(getGroups() == null || getGroups().size() == 0)
 			createFormData();
-
+		//TODO: merge back in
+/*
 		for(byte i=0; i<this.getGroups().size(); i++){
 			GroupData groupData = (GroupData)this.getGroups().elementAt(i);
 			GroupDef groupDef = (GroupDef)this.def.getGroups().elementAt(i);
@@ -169,9 +170,9 @@ public class FormData implements IDRecordable, Externalizable {
 				QuestionData qtnData = (QuestionData)groupData.getQuestions().elementAt(j);
 				QuestionDef qtnDef = groupDef.getQuestionById(qtnData.getId());
 				qtnData.setDef(qtnDef);
-				if(qtnData.getAnswer() != null && qtnDef.getType() == Constants.QTN_TYPE_LIST_EXCLUSIVE)
+				if(qtnData.getAnswer() != null && qtnDef.getDataType() == Constants.DATATYPE_LIST_EXCLUSIVE)
 					((OptionData)qtnData.getAnswer()).setDef((OptionDef)qtnDef.getOptions().elementAt(Integer.parseInt(qtnData.getOptionAnswerIndices().toString())));
-				if(qtnData.getAnswer() != null && qtnDef.getType() == Constants.QTN_TYPE_LIST_MULTIPLE){
+				if(qtnData.getAnswer() != null && qtnDef.getDataType() == Constants.DATATYPE_LIST_MULTIPLE){
 					Vector answers = (Vector)qtnData.getAnswer();
 					for(byte k=0; k<answers.size(); k++){
 						OptionData option = (OptionData)answers.elementAt(k);
@@ -180,6 +181,7 @@ public class FormData implements IDRecordable, Externalizable {
 				}
 			}	
 		}
+		*/
 	}
 
 	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
@@ -194,12 +196,12 @@ public class FormData implements IDRecordable, Externalizable {
 		ExternalizableHelper.writeExternal(getGroups(), dos);
 	}
 	
-	public QuestionData getQuestionById(String id){
+	public QuestionData getQuestionById(int id){
 		for(byte i=0; i<this.getGroups().size(); i++){
 			GroupData group = (GroupData)this.getGroups().elementAt(i);
 			for(byte j=0; j<group.getQuestions().size(); j++){
 				QuestionData qtn = (QuestionData)group.getQuestions().elementAt(j);
-				if(qtn.getDef().getId() == id)
+				if(qtn.getDef().getID() == id)
 					return qtn;
 			}
 		}
@@ -208,6 +210,8 @@ public class FormData implements IDRecordable, Externalizable {
 	}
 	
 	public QuestionData getQuestion(String varName){
+		//TODO: merge back in
+		/*
 		for(byte i=0; i<this.getDef().getGroups().size(); i++){
 			GroupDef group = (GroupDef)this.getDef().getGroups().elementAt(i);
 			for(byte j=0; j<group.getQuestions().size(); j++){
@@ -216,6 +220,7 @@ public class FormData implements IDRecordable, Externalizable {
 					return getQuestion(qtn.getId());
 			}
 		}
+		*/
 		
 		return null;
 	}
@@ -348,7 +353,8 @@ public class FormData implements IDRecordable, Externalizable {
 	
 	public void buildDataDescription(){
 		//String s = "Where does ${name}$ come from?";
-		String f,v,text = getDef().getDescriptionTemplate();c
+		//TODO: Merge back in
+		String f,v,text = ""; //= getDef().getDescriptionTemplate();
 		if(text == null || text.length() == 0)
 			this.dataDescription  = "Data: " + this.getRecordId();
 		else{

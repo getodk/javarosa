@@ -43,7 +43,7 @@ public class GroupData  implements Externalizable{
 		this();
 		setQuestions(questions);
 		setDef(def);
-		setGroupNo(def.getGroupNo());
+		//setGroupNo(def.getGroupNo());
 	}
 	
 	public Vector getQuestions() {
