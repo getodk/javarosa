@@ -201,16 +201,13 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * @throws IllegalAccessException
 	 */
 	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
-		/*
 		if(!ExternalizableHelper.isEOF(dis)){
-			setId(dis.readInt());
+			setID(dis.readInt());
 			setName(dis.readUTF());
-			setVariableName(dis.readUTF());
-			setDescriptionTemplate(dis.readUTF());
-			setGroups(ExternalizableHelper.readExternal(dis,new GroupDef().getClass()));
-			setRules(ExternalizableHelper.readExternal(dis,new EpiHandySkipRule().getClass()));
+			
+			//setGroups(ExternalizableHelper.readExternal(dis,new GroupDef().getClass()));
+			setBindings(ExternalizableHelper.readExternal(dis,new DataBinding().getClass()));
 		}
-		*/
 	}
 
 	/** 
@@ -220,13 +217,10 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * @throws IOException
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
-		/*
-		dos.writeInt(getId());
+		dos.writeInt(getID());
 		dos.writeUTF(getName());
-		dos.writeUTF(getVariableName());
-		dos.writeUTF(getDescriptionTemplate());
-		ExternalizableHelper.writeExternal(getGroups(), dos);
-		ExternalizableHelper.writeExternal(getRules(), dos);
-		*/
+		
+		ExternalizableHelper.writeExternal(getChildren(), dos);
+		ExternalizableHelper.writeExternal(getBindings(), dos);
 	}
 }
