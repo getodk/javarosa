@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.SimpleOrderedHashtable;
@@ -302,56 +303,56 @@ public class QuestionDef implements IFormElement, Localizable, Externalizable {
 	 * Reads the object from stream.
 	 */
 	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
-/*
 		if(!ExternalizableHelper.isEOF(dis)){
-			setId(dis.readUTF());
+			setID(dis.readInt());
 			
+			setName(ExternalizableHelper.readUTF(dis));
+			setAppearanceAttr(ExternalizableHelper.readUTF(dis));
 			setLongText(ExternalizableHelper.readUTF(dis));
 			setShortText(ExternalizableHelper.readUTF(dis));
-			setLocaleId(ExternalizableHelper.readUTF(dis));
 			setHelpText(ExternalizableHelper.readUTF(dis));
-			setMandatory(dis.readBoolean());
-			setType(dis.readByte());
-			setControlType(dis.readByte());
+			//TODO: What are we supposed to do with this?
+			//setLongTextID(ExternalizableHelper.readUTF(dis));
+			//setShortTextID(ExternalizableHelper.readUTF(dis));
+			//setHelpTextID(ExternalizableHelper.readUTF(dis));
+			
+			setDataType(dis.readInt());
+			setControlType(dis.readInt());
+			
+			setRequired(dis.readBoolean());
 			setVisible(dis.readBoolean());
 			setEnabled(dis.readBoolean());
 			setLocked(dis.readBoolean());
-			setVariableName(ExternalizableHelper.readUTF(dis));
-			//TODO Note that this sucks, because bind has to know its type. 
-			//We need to deal with that. Should Binding be a class that
-			//has a header for its type? Should we be writing that binding
-			//here manually? We could also make bind serialize to a string.
-			bind.readExternal(dis);
-			setDefaultValue(ExternalizableHelper.readUTF(dis));
 			
-			setOptions(ExternalizableHelper.readExternal(dis,new OptionDef().getClass()));
-		}
-		*/
+			String className = dis.readUTF();
+			//Get Binding prototype from factory and deserialize it
+		}	
 	}
 
 	/**
 	 * Write the object to stream.
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
-/*
-		dos.writeUTF(getId());
-
+		dos.writeInt(getID());
+		
+		ExternalizableHelper.writeUTF(dos, getName());
+		ExternalizableHelper.writeUTF(dos, getAppearanceAttr());
 		ExternalizableHelper.writeUTF(dos, getLongText());
 		ExternalizableHelper.writeUTF(dos, getShortText());
-		ExternalizableHelper.writeUTF(dos, getLocaleId());
 		ExternalizableHelper.writeUTF(dos, getHelpText());
-		dos.writeBoolean(isMandatory());
-		dos.writeByte(getType());
-		dos.writeByte(getControlType());
+		ExternalizableHelper.writeUTF(dos, getLongTextID());
+		ExternalizableHelper.writeUTF(dos, getShortTextID());
+		ExternalizableHelper.writeUTF(dos, getHelpTextID());
+		
+		dos.writeInt(getDataType());
+		dos.writeInt(getControlType());
+		
+		dos.writeBoolean(isRequired());
 		dos.writeBoolean(isVisible());
 		dos.writeBoolean(isEnabled());
 		dos.writeBoolean(isLocked());
-		ExternalizableHelper.writeUTF(dos, getVariableName());
-		bind.writeExternal(dos);
 		
-		ExternalizableHelper.writeUTF(dos, serializedDefaultValue());
-		
-		ExternalizableHelper.writeExternal(getOptions(), dos);
-	*/
+		dos.writeUTF(binding.getClass().toString());
+		binding.writeExternal(dos);
 	}
 }

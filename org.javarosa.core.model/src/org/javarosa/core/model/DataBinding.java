@@ -1,6 +1,14 @@
 package org.javarosa.core.model;
 
-public class DataBinding {
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+
+public class DataBinding  implements Externalizable {
 	private String id;
 	private IDataReference ref;
 	private int dataType;
@@ -65,6 +73,34 @@ public class DataBinding {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+	 */
+	public void readExternal(DataInputStream in) throws IOException,
+			InstantiationException, IllegalAccessException,
+			UnavailableExternalizerException {
+		this.setId(ExternalizableHelper.readUTF(in));
+		this.setDataType(in.readInt());
+		this.setPreload(ExternalizableHelper.readUTF(in));
+		this.setPreloadParams(ExternalizableHelper.readUTF(in));
+		this.setRequired(in.readBoolean());
+		condition.readExternal(in);
+		//TODO: Reference
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+	 */
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExternalizableHelper.writeUTF(out, this.getId());
+		out.writeInt(this.getDataType());
+		ExternalizableHelper.writeUTF(out, this.getPreload());
+		ExternalizableHelper.writeUTF(out, this.getPreloadParams());
+		out.writeBoolean(this.isRequired());
+		condition.writeExternal(out);
+		//TODO: Reference
 	}
 	
 	
