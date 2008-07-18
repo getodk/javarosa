@@ -59,5 +59,8 @@ public class XPathReference implements IDataReference {
 		ExternalizableHelper.writeUTF(out, xpath);
 	}
 	
+	public IDataReference clone() {
+		return new XPathReference(this.xpath);
+	}
 	
 }
