@@ -22,7 +22,6 @@ import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.model.IControllerListener;
 import org.javarosa.formmanager.view.IFormEntryView;
-import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 public class FormEntryActivity implements IActivity, IControllerListener, CommandListener {
 
@@ -95,12 +94,13 @@ public class FormEntryActivity implements IActivity, IControllerListener, Comman
 
 			model = new FormEntryModel(theForm);
 			controller = new FormEntryController(model, this);
-			view = new Chatterbox("Chatterbox", model, controller); // shouldn't
+			//TODO: Figure out what view to use
+			//view = new Chatterbox("Chatterbox", model, controller); // shouldn't
 																	// reference
 																	// this
 																	// directly
 
-			controller.setView(view);
+			//controller.setView(view);
 
 			// We need to figure out how to identify the View that should be
 			// used here.
