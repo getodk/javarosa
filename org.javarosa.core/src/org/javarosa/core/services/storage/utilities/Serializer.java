@@ -45,7 +45,8 @@ public class Serializer {
 	 *             if serialization fails
 	 */
 	public static Externalizable deserialize(byte[] data, Externalizable ext)
-			throws IOException, InstantiationException, IllegalAccessException {
+			throws IOException, InstantiationException, IllegalAccessException,
+			UnavailableExternalizerException {
 		DataInputStream din = new DataInputStream(
 				new ByteArrayInputStream(data));
 		ext.readExternal(din);

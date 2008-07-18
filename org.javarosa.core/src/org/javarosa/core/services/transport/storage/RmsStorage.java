@@ -10,6 +10,7 @@ import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
 import org.javarosa.core.services.storage.utilities.Serializer;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.core.services.transport.Storage;
 import org.javarosa.core.services.transport.TransportMessage;
 
@@ -139,7 +140,7 @@ public class RmsStorage implements Storage, RecordListener {
 	 * @throws IOException
 	 * @return
 	 */
-	private TransportMessage loadMessage(int recordId) throws IOException, InstantiationException, IllegalAccessException{
+	private TransportMessage loadMessage(int recordId) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException{
 		try {
 			init();
 			byte[] data = messageRecordStore.getRecord(recordId);
@@ -162,6 +163,10 @@ public class RmsStorage implements Storage, RecordListener {
         	ie.printStackTrace();
         	throw ie;
         }
+        catch (UnavailableExternalizerException uee) {
+        	uee.printStackTrace();
+        	throw uee;
+        }
 
 	}
 
@@ -172,7 +177,7 @@ public class RmsStorage implements Storage, RecordListener {
 	 * @throws IOException
 	 * @return
 	 */
-	public TransportMessage getMessage(int recordId) throws IOException, IllegalAccessException, InstantiationException {
+	public TransportMessage getMessage(int recordId) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
 		try {
 			init();
 			byte[] data = messageRecordStore.getRecord(recordId);
@@ -192,6 +197,10 @@ public class RmsStorage implements Storage, RecordListener {
         {
         	ie.printStackTrace();
         	throw ie;
+        }
+        catch (UnavailableExternalizerException uee) {
+        	uee.printStackTrace();
+        	throw uee;
         }
 	}
 	
@@ -223,6 +232,9 @@ public class RmsStorage implements Storage, RecordListener {
         catch (InstantiationException ie)
         {
         	ie.printStackTrace();
+        } 
+        catch (UnavailableExternalizerException uee) {
+        	uee.printStackTrace();
         } finally {
 			if (en != null) {
 				en.destroy();

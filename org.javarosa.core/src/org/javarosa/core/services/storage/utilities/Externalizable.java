@@ -17,7 +17,7 @@ public interface Externalizable {
 	 * @param in
 	 * @throws IOException
 	 */
-	public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException;
+	public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException;
 
 	/**
 	 * @param out
