@@ -2,22 +2,26 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.Item;
 
-import org.javarosa.core.*;
-import org.javarosa.formmanager.controller.*;
-import org.javarosa.formmanager.model.*;
-import org.javarosa.formmanager.utility.*;
-import org.javarosa.formmanager.view.*;
-import org.javarosa.formmanager.view.chatterbox.widget.*;
-import org.javarosa.polishforms.SubmitScreen;
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.formmanager.controller.FormEntryController;
+import org.javarosa.formmanager.model.FormEntryModel;
+import org.javarosa.formmanager.utility.FormEntryModelListener;
+import org.javarosa.formmanager.utility.SortedIntSet;
+import org.javarosa.formmanager.view.IFormEntryView;
+import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
+import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 
-import de.enough.polish.ui.*;
+import de.enough.polish.ui.FramedForm;
 
 public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryModelListener, CommandListener {
 	private static final int INDEX_NOT_SET = -1;

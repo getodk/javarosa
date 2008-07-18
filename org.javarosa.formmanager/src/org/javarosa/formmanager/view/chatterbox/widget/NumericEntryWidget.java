@@ -3,7 +3,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.TextField;
 
-import org.javarosa.formmanager.model.temp.Prompt;
+import org.javarosa.clforms.api.Prompt;
 
 public class NumericEntryWidget extends TextEntryWidget {	
 	protected Item getEntryWidget (Prompt question) {

@@ -1,6 +1,6 @@
 package org.javarosa.formmanager.utility;
 
-import java.util.*;
+import java.util.Vector;
 
 //maintain an array of integers in sorted order. no duplicates allowed.
 public class SortedIntSet {

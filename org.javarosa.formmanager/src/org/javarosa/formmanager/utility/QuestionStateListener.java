@@ -1,6 +1,6 @@
 package org.javarosa.formmanager.utility;
 
-import org.javarosa.formmanager.model.temp.Prompt;
+import org.javarosa.clforms.api.Prompt;
 
 public interface QuestionStateListener {
 	//Question: Is there a reason we're

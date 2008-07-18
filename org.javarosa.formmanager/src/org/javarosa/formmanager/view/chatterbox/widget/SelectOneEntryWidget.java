@@ -2,9 +2,9 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import javax.microedition.lcdui.ChoiceGroup;
 
-import org.javarosa.formmanager.model.temp.QuestionData;
-import org.javarosa.formmanager.model.temp.SelectOneData;
-import org.javarosa.formmanager.model.temp.Selection;
+import org.javarosa.core.model.QuestionData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.Selection;
 
 public class SelectOneEntryWidget extends SelectEntryWidget {
 	public SelectOneEntryWidget () {

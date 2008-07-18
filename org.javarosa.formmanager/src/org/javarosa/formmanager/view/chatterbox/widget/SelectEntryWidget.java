@@ -3,7 +3,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Item;
 
-import org.javarosa.formmanager.model.temp.Prompt;
+import org.javarosa.clforms.api.Prompt;
 
 public abstract class SelectEntryWidget extends ExpandedWidget {
 	private int style;

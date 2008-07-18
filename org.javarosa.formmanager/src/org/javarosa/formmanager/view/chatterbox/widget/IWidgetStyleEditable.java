@@ -1,6 +1,6 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.formmanager.model.temp.QuestionData;
+import org.javarosa.core.model.QuestionData;
 
 /**
  * Strategy object that knows how to build and maintain a widget that contains a view of a single form question. This interface

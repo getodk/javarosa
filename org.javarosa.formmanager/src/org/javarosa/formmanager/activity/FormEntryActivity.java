@@ -17,6 +17,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.model.IControllerListener;
@@ -80,6 +81,9 @@ public class FormEntryActivity implements IActivity, IControllerListener, Comman
 				e.printStackTrace();
 			}
 			catch (InstantiationException e) {
+				e.printStackTrace();
+			}
+			catch (UnavailableExternalizerException uee) {
 				e.printStackTrace();
 			}
 		}
