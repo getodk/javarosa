@@ -37,6 +37,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.storage.FormDataMetaData;
 import org.javarosa.core.model.storage.FormDataRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.core.services.transport.TransportMessage;
 
 /**
@@ -178,7 +179,11 @@ public class ModelListActivity extends List implements CommandListener, IActivit
                     javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
                     mainShell.setDisplay(this, a);
                     e.printStackTrace();
-                }
+                } catch (UnavailableExternalizerException e) {
+                    javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
+                    mainShell.setDisplay(this, a);
+                    e.printStackTrace();
+                } 
                 Hashtable formSendArgs = new Hashtable();
                 //TODO: We need some way to codify this Next Action stuff. Maybe a set of Constants for the ModelListModule?
                 formSendArgs.put(returnKey, CMD_SEND);
