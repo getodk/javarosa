@@ -25,7 +25,9 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private String name;	/** The display name of the form. */
 	private Localizer localizer;
 
+	private IFormDataModel model;
 	
+
 	private int recordId; //does this belong here?
 	
 	// dunno about this...
@@ -93,6 +95,13 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		this.localizer = l;
 	}
 	
+	public IFormDataModel getDataModel () {
+		return model;
+	}
+	
+	public void setDataModel (IFormDataModel model) {
+		this.model = model;
+	}
 	
 	public void setRecordId(int recordId) {
 		this.recordId = recordId;
