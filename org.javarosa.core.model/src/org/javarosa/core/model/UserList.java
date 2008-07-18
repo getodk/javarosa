@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 /**
  * Contains a list of users.
@@ -64,7 +65,7 @@ public class UserList implements Externalizable{
 	/**
 	 * @see org.javarosa.util.db.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		if(!ExternalizableHelper.isEOF(dis))
 			setUsers(ExternalizableHelper.readExternal(dis,new User().getClass()));
 	}

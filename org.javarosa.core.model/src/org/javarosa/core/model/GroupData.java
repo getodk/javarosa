@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 /** This object contains the collected data of a group in a form or questionaire
  * Separating group data and definition is for optimisation. This is achieved
@@ -78,7 +79,7 @@ public class GroupData  implements Externalizable{
 	}
 
 	/** Reads the group data object from the stream .*/
-	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		if(!ExternalizableHelper.isEOF(dis)){
 			setGroupNo(dis.readByte());
 			setQuestions(ExternalizableHelper.readExternal(dis,new QuestionData().getClass()));

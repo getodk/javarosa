@@ -9,6 +9,7 @@ import java.util.Vector;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.Externalizable;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 /**
  * Definition of a form. This has some meta data about the form definition and  
@@ -185,7 +186,7 @@ public class FormDef implements IDRecordable, Externalizable{
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readInt());
 			setName(dis.readUTF());

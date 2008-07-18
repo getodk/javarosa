@@ -1,6 +1,6 @@
 package org.javarosa.core.model.instance;
 
-import org.javarosa.core.model.utils.ITreeVisitor;
+import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.services.storage.utilities.Externalizable;
 
 /**

@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.ElementExistsVisitor;
-import org.javarosa.core.model.utils.ITreeVisitor;
+import org.javarosa.core.model.instance.utils.ElementExistsVisitor;
+import org.javarosa.core.model.instance.utils.ITreeVisitor;
 
 
 /**

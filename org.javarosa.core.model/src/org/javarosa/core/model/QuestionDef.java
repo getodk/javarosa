@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.core.util.SimpleOrderedHashtable;
 
 
@@ -243,7 +244,7 @@ public class QuestionDef implements Externalizable{
 	/**
 	 * Reads the object from stream.
 	 */
-	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
+	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException{
 		if(!ExternalizableHelper.isEOF(dis)){
 			setId(dis.readUTF());
 			

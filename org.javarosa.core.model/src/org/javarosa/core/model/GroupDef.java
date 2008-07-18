@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 
 /** The definition of a group in a form or questionaire. 
@@ -87,7 +88,7 @@ public class GroupDef implements Externalizable{
 	}
 
 	/** Reads a group definition object from the supplied stream. */
-	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
+	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		if(!ExternalizableHelper.isEOF(dis)){
 			setGroupNo(dis.readByte());
 			setName(dis.readUTF());

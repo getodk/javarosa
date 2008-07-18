@@ -10,6 +10,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 
 
@@ -263,7 +264,7 @@ public class ExternalizableHelper {
 	 * @throws InstantiationException - thrown when a problem occurs during the peristent object creation.
 	 * @throws IllegalAccessException - thrown when a problem occurs when setting values of the externalizable object.
 	 */
-	public static Vector readExternal(DataInputStream dis, Class cls) throws IOException, InstantiationException,IllegalAccessException {
+	public static Vector readExternal(DataInputStream dis, Class cls) throws IOException, InstantiationException,IllegalAccessException, UnavailableExternalizerException {
 		
 		byte len = dis.readByte();
 		if(len == 0)
@@ -290,7 +291,7 @@ public class ExternalizableHelper {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public static Vector readBig(DataInputStream dis, Class cls) throws IOException, InstantiationException,IllegalAccessException {
+	public static Vector readBig(DataInputStream dis, Class cls) throws IOException, InstantiationException,IllegalAccessException, UnavailableExternalizerException {
 		
 		int len = dis.readInt();
 		if(len == 0)
@@ -307,7 +308,7 @@ public class ExternalizableHelper {
 		return externalizableVector;
 	}
 	
-	public static Vector readExternal(DataInputStream dis, Class cls, int len) throws IOException, InstantiationException,IllegalAccessException {
+	public static Vector readExternal(DataInputStream dis, Class cls, int len) throws IOException, InstantiationException,IllegalAccessException, UnavailableExternalizerException {
 		
 		if(len == 0)
 			return null;
