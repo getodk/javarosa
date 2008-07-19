@@ -151,7 +151,8 @@ public class DataModelTree implements IFormDataModel {
 		visitor.visit(this);
 		if(root != null) {
 			//I don't think this is going to work.
-			if(visitor.getClass() == ITreeVisitor.class) {
+			//if(visitor.getClass() == ITreeVisitor.class) {
+			if(visitor instanceof ITreeVisitor) {
 				root.accept((ITreeVisitor)visitor);
 			}
 		}
