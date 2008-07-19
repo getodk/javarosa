@@ -137,7 +137,7 @@ public class JavaRosaDemoShell implements IShell {
 						FormDef form = (FormDef) returnVals.get("form");
 						FormData data = (FormData) returnVals.get("data");
 						FormEntryContext newContext = new FormEntryContext(context);
-						newContext.setFormID(form.getId());
+						newContext.setFormID(form.getID());
 						newContext.setInstanceID(data.getRecordId());
 						currentActivity = this.modelActivity;
 						this.modelActivity.start(newContext);
