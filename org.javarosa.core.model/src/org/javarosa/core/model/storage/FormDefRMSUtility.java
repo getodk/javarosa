@@ -1,5 +1,6 @@
 package org.javarosa.core.model.storage;
 
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.microedition.rms.InvalidRecordIDException;
@@ -9,8 +10,10 @@ import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 /**
  * The RMS persistent storage utility for FormDef
  * objects.
@@ -21,6 +24,8 @@ public class FormDefRMSUtility extends RMSUtility {
 
 	private PrototypeFactory referenceFactory;
 	
+	private PrototypeFactory modelFactory;
+	
 	/**
 	 * Creates a new RMS utility with the given name
 	 * @param name A unique identifier for this RMS utility
@@ -28,6 +33,12 @@ public class FormDefRMSUtility extends RMSUtility {
 	public FormDefRMSUtility(String name) {
 		super(name, RMSUtility.RMS_TYPE_META_DATA);
 	}
+    public void retrieveFromRMS(int recordId,
+            FormDef externalizableObject) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
+    	externalizableObject.setModelFactory(this.modelFactory);
+    	super.retrieveFromRMS(recordId, externalizableObject);
+    }
+
 	
 	/**
 	 * @return The name to be used for this RMS Utility
@@ -192,5 +203,20 @@ public class FormDefRMSUtility extends RMSUtility {
 	
 	public void clearReferenceFactory() {
 		referenceFactory = null;
+	}
+	
+	private PrototypeFactory getModelFactory() {
+		if(modelFactory == null) { 
+			modelFactory = new PrototypeFactory();
+		}
+		return modelFactory; 
+	}
+	
+	public void addModelPrototype(IFormDataModel model) {
+		this.getModelFactory().addNewPrototype(model.getClass().getName(), model.getClass());
+	}
+	
+	public void clearModelFactory() {
+		modelFactory = null;
 	}
 }

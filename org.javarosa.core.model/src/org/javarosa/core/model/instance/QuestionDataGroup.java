@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.model.DataReferenceFactory;
 import org.javarosa.core.model.instance.utils.ElementExistsVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.ExternalizableHelper;
@@ -35,6 +34,7 @@ public class QuestionDataGroup extends TreeElement {
 	public QuestionDataGroup() {
 		//Until a node group is told otherwise, it is its own root.
 		this.root = this;
+		this.children = new Vector();
 	}
 	
 	/**
@@ -45,7 +45,6 @@ public class QuestionDataGroup extends TreeElement {
 	public QuestionDataGroup(String name) {
 		this();
 		this.name = name;
-		this.children = new Vector();
 	}
 	
 	/*
@@ -147,13 +146,19 @@ public class QuestionDataGroup extends TreeElement {
 			boolean group = in.readBoolean();
 			if(group) {
 				QuestionDataGroup newGroup = new QuestionDataGroup();
+				//This root will let the node externalize
 				newGroup.setRoot(this.getRoot());
 				newGroup.readExternal(in);
+				//Treat it as a subtree to ensure that there are no graph connections
+				newGroup.setRoot(newGroup);
+				addChild(newGroup);
+				
 			}
 			else {
 				QuestionDataElement element = new QuestionDataElement();
 				element.setRoot(this.getRoot());
 				element.readExternal(in);
+				addChild(element);
 			}
 		}
 	}
