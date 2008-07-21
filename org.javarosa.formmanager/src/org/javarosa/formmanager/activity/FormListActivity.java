@@ -17,6 +17,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.storage.FormDefMetaData;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.FormList;
 import org.javarosa.formmanager.view.ViewTypes;
@@ -31,9 +32,10 @@ public class FormListActivity implements IActivity {
 	public static final String FORM_ID_KEY = "form_id";
 	
 	private FormList formsList = null;
-	private Hashtable listOfForms = null;
+	private Map listOfForms = null;
 	private Vector formIDs = null;
 	private IShell parent = null;
+	private Vector positionToId = null;
 	
 	Context context;
 	
@@ -43,10 +45,10 @@ public class FormListActivity implements IActivity {
 	}
 	
 	public void start(Context context) {
-		this.listOfForms = new Hashtable();
+		this.listOfForms = new Map();
 		this.formIDs = new Vector();
 		getXForms();
-		this.formsList.loadView(listOfForms);
+		this.positionToId = this.formsList.loadView(listOfForms);
 		parent.setDisplay(this, this.formsList);
 		
 		this.context = context;
@@ -68,10 +70,12 @@ public class FormListActivity implements IActivity {
 			String cmd = (String)en.nextElement();
 		
 		if( cmd == Commands.CMD_SELECT_XFORM){
+			int selectedForm = ((Integer)returnvals.get(Commands.CMD_SELECT_XFORM)).intValue();
+			int formId = ((Integer)positionToId.elementAt(selectedForm)).intValue();
 			//#if debug.output==verbose
-			System.out.println("Selected form: " + formIDs.elementAt( ((Integer)(returnvals.get(cmd))).intValue() ));
+			System.out.println("Selected form: " + formIDs.elementAt(formId));
 			//#endif
-			FormDefMetaData meta = (FormDefMetaData)formIDs.elementAt(formsList.getSelectedIndex());
+			FormDefMetaData meta = (FormDefMetaData)formIDs.elementAt(formId);
 			
 			Hashtable returnArgs = new Hashtable();
 			returnArgs.put(FORM_ID_KEY, new Integer(meta.getRecordId()));
