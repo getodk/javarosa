@@ -76,6 +76,15 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		children.addElement(fe);
 	}
 	
+	public IFormElement getChild (int i) {
+		return (IFormElement)children.elementAt(i);
+	}
+	
+	//collapse all groups and assume a sequential list of questions
+	public QuestionDef getQuestion (int i) {
+		return null;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -97,7 +106,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	}
 	
 	public void setLocalizer (Localizer l) {
+		if (this.localizer != null) {
+			this.localizer.unregisterLocalizable(this);
+		}
+		
 		this.localizer = l;
+		this.localizer.registerLocalizable(this);
 	}
 	
 	public IFormDataModel getDataModel () {
