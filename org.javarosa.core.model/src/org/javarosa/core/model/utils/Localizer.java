@@ -3,7 +3,7 @@ package org.javarosa.core.model.utils;
 import java.util.*;
 
 public class Localizer {
-	private SimpleOrderedHashtable localeData;
+	private SimpleOrderedHashtable localeData; /* String -> Hashtable{ String -> String } */
 	private String defaultLocale;
 	private String currentLocale;
 	private boolean fallbackDefaultLocale;
