@@ -329,12 +329,18 @@ public class QuestionDef implements IFormElement, Localizable {
 			setEnabled(dis.readBoolean());
 			setLocked(dis.readBoolean());
 			
-			String className = dis.readUTF();
-			//TODO: Get Binding prototype from factory and deserialize it
+			setSelectItemIDs(ExternalizableHelper.readExternalSOH(dis), ExternalizableHelper.readExternalVB(dis), null);
 			
-			//TODO: Wrong kind of hashtable
-			//setSelectItems(ExternalizableHelper.readExternal(dis));
-			//setSelectItemIDs(ExternalizableHelper.readExternal(dis));	
+			//default value?
+			
+			try {
+			String className = dis.readUTF();
+			IDataReference binding = (IDataReference)Class.forName(className).newInstance();
+			ExternalizableHelper.readExternalizable(dis, binding);
+			setBind(binding);
+			} catch (Exception e) {
+				System.out.println("blow me");
+			}
 		}	
 	}
 
@@ -361,12 +367,14 @@ public class QuestionDef implements IFormElement, Localizable {
 		dos.writeBoolean(isEnabled());
 		dos.writeBoolean(isLocked());
 		
+		//selectItems should not be serialized
+		ExternalizableHelper.writeExternal(getSelectItemIDs(), dos);
+		ExternalizableHelper.writeExternalVB(selectItemsLocalizable, dos);
+		
+		//default value?
+		
 		dos.writeUTF(binding.getClass().toString());
 		binding.writeExternal(dos);
-		
-		//Wrong kind of hashtable
-		//ExternalizableHelper.writeExternal(getSelectItems(), dos);
-		//ExternalizableHelper.writeExternal(getSelectItemIDs(), dos);	
 	}
 
 }

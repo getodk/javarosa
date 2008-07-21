@@ -459,6 +459,37 @@ public class ExternalizableHelper {
 			dos.writeByte(0);
 	}
 	
+	/* grrr.... why doesn't SimpleOrderedHashtable extend Hashtable? */
+	public static void writeExternal(SimpleOrderedHashtable stringHashtable, DataOutputStream dos) throws IOException {	
+		if(stringHashtable != null){
+			dos.writeByte(stringHashtable.size());
+			Enumeration keys = stringHashtable.keys();
+			String key;
+			while(keys.hasMoreElements()){
+				key  = (String)keys.nextElement();
+				dos.writeUTF(key);
+				dos.writeUTF((String)stringHashtable.get(key));
+			}
+		}
+		else
+			dos.writeByte(0);
+	}
+	
+	public static void writeExternalCompoundSOH(SimpleOrderedHashtable compoundHashtable, DataOutputStream dos) throws IOException {	
+		if(compoundHashtable != null){
+			dos.writeByte(compoundHashtable.size());
+			Enumeration keys = compoundHashtable.keys();
+			String key;
+			while(keys.hasMoreElements()){
+				key  = (String)keys.nextElement();
+				dos.writeUTF(key);
+				writeExternal((SimpleOrderedHashtable)compoundHashtable.get(key), dos);
+			}
+		}
+		else
+			dos.writeByte(0);
+	}
+	
 	/**
 	 * Reads a hashtable of string keys and values from a stream.
 	 * 
@@ -467,7 +498,6 @@ public class ExternalizableHelper {
 	 * @throws IOException - thrown when a problem occurs during the reading from stream.
 	*/
 	public static Hashtable readExternal(DataInputStream dis) throws IOException {
-		
 		byte len = dis.readByte();
 		if(len == 0)
 			return null;
@@ -478,6 +508,36 @@ public class ExternalizableHelper {
 			stringHashtable.put(dis.readUTF(), dis.readUTF());
 		
 		return stringHashtable;
+	}
+	
+	//we should be able to distinguish between null and empty vectors/hashtables
+	public static SimpleOrderedHashtable readExternalSOH(DataInputStream dis) throws IOException {
+		byte len = dis.readByte();
+		if(len == 0)
+			return null;
+		
+		SimpleOrderedHashtable stringHashtable = new SimpleOrderedHashtable();
+
+		for(byte i=0; i<len; i++ )
+			stringHashtable.put(dis.readUTF(), dis.readUTF());
+		
+		return stringHashtable;
+	}
+	
+	public static SimpleOrderedHashtable readExternalCompoundSOH(DataInputStream dis) throws IOException {
+		byte len = dis.readByte();
+		if(len == 0)
+			return null;
+		
+		SimpleOrderedHashtable compoundHashtable = new SimpleOrderedHashtable();
+
+		for(byte i=0; i<len; i++ ) {
+			String key = dis.readUTF();
+			SimpleOrderedHashtable subHashtable = readExternalSOH(dis);
+			compoundHashtable.put(key, subHashtable == null ? new SimpleOrderedHashtable() : subHashtable);
+		}
+			
+		return compoundHashtable;
 	}
 	
 	public static boolean isEOF(DataInputStream dis){
@@ -498,6 +558,32 @@ public class ExternalizableHelper {
 		
 		return false;
 	}
+	
+	//write vector of bools
+	public static void writeExternalVB(Vector externalizableVector, DataOutputStream dos) throws IOException {	
+		if(externalizableVector != null){
+			dos.writeByte(externalizableVector.size());
+			for(int i=0; i<externalizableVector.size(); i++ ){
+				writeBoolean(dos, (Boolean)externalizableVector.elementAt(i));
+			}
+		}
+		else
+			dos.writeByte(0);
+	}
+	
+	//read vector of bools
+	public static Vector readExternalVB (DataInputStream dis) throws IOException {
+		byte len = dis.readByte();
+		if(len == 0)
+			return null;
+		
+		Vector v = new Vector();
+		for(byte i=0; i<len; i++ )
+			v.addElement(readBoolean(dis));
+		
+		return v;
+	}
+	
 	
 	/**
 	 * Gets a externalizable object size in bytes.
