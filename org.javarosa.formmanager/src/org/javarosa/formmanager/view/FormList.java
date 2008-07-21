@@ -5,12 +5,14 @@ package org.javarosa.formmanager.view;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
+import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.activity.FormListActivity;
 
 /**
@@ -38,11 +40,11 @@ public class FormList extends List implements CommandListener {
 		this.parent = p;
 	}
 
-	public void loadView(Hashtable args) {
+	public Vector loadView(Map args) {
 		this.deleteAll();
 		this.createView();
 		this.setCommandListener(this);
-		this.populateWithXForms(args);
+		return this.populateWithXForms(args);
 	}
 
 	private void createView() {
@@ -64,14 +66,16 @@ public class FormList extends List implements CommandListener {
 	/**
 	 * Put the list
 	 */
-	private void populateWithXForms(Hashtable listOfForms) {
-		Integer pos = null;
+	private Vector populateWithXForms(Map listOfForms) {
+		Vector returnVals = new Vector();
 		Enumeration e = listOfForms.keys();
 		while(e.hasMoreElements()){
-			pos = (Integer)e.nextElement();
+			Integer pos = (Integer)e.nextElement();
 			String form = (String)listOfForms.get(pos);
 			this.append(form,null);
+			returnVals.addElement(pos);
 		}
+		return returnVals;
 	}
 
 
@@ -82,9 +86,8 @@ public class FormList extends List implements CommandListener {
 		if (c == List.SELECT_COMMAND) {
 			//LOG
 			
-			v.put( new Integer(0), new Integer(this.getSelectedIndex()));
 			Hashtable returnvals = new Hashtable();
-			returnvals.put(Commands.CMD_SELECT_XFORM, v);
+			returnvals.put(Commands.CMD_SELECT_XFORM, new Integer(this.getSelectedIndex()));
 			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
 /*

@@ -1,5 +1,6 @@
 package org.javarosa.core.util;
 
+import java.util.Enumeration;
 import java.util.Vector;
 
 /**
@@ -30,6 +31,10 @@ public class Map {
 		}
 		keys.addElement(key);
 		elements.addElement(value);
+	}
+	
+	public Enumeration keys(){
+		return keys.elements();
 	}
 	
 	/**
