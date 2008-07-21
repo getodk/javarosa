@@ -33,6 +33,8 @@ public class QuestionDataGroup extends TreeElement {
 	Vector children;
 
 	public QuestionDataGroup() {
+		//Until a node group is told otherwise, it is its own root.
+		this.root = this;
 	}
 	
 	/**
