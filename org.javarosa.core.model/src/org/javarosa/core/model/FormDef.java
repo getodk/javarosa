@@ -3,6 +3,7 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
@@ -161,7 +162,9 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	*/
 	
 	public void localeChanged (String locale, Localizer localizer) {
-		
+		for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
+			((IFormElement)e.nextElement()).localeChanged(locale, localizer);
+		}
 	}
 	
 	public String toString() {
