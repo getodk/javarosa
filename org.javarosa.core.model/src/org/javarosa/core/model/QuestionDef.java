@@ -3,6 +3,7 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -53,6 +54,8 @@ public class QuestionDef implements IFormElement, Localizable {
 
 	private IAnswerData defaultValue;	/** this shouldn't be used for default values that are already pre-loaded in the instance */
 		
+	Vector observers;
+	
 	public QuestionDef () {
 		this(Constants.NULL_ID, null, Constants.DATATYPE_TEXT, Constants.DATATYPE_TEXT);
 	}
@@ -66,6 +69,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		setVisible(true);
 		setEnabled(true);
 		setLocked(false);
+		observers = new Vector();
 	}
 		
 	public int getID () {
@@ -380,4 +384,25 @@ public class QuestionDef implements IFormElement, Localizable {
 		binding.writeExternal(dos);
 	}
 
+	/* === MANAGING OBSERVERS === */
+	
+	public void registerStateObserver (QuestionStateListener qsl) {
+		if (!observers.contains(qsl)) {
+			observers.addElement(qsl);
+		}
+	}
+	
+	public void unregisterStateObserver (QuestionStateListener qsl) {
+		observers.removeElement(qsl);
+	}
+	
+	public void unregisterAll () {
+		observers.removeAllElements();
+	}
+	
+	private void alertStateObservers (int changeFlags) {
+		for (Enumeration e = observers.elements(); e.hasMoreElements(); )
+			((QuestionStateListener)e.nextElement()).questionStateChanged(this, changeFlags);
+	}
+	
 }
