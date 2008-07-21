@@ -213,6 +213,10 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			
 			setChildren(ExternalizableHelper.readExternal(dis,factory));
 			setBindings(ExternalizableHelper.readExternal(dis,new DataBinding().getClass()));
+			
+			Localizer l = new Localizer();
+			l.readExternal(dis);
+			setLocalizer(l);
 		}
 	}
 
@@ -228,5 +232,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		
 		ExternalizableHelper.writeExternalGeneric(getChildren(), dos);
 		ExternalizableHelper.writeExternal(getBindings(), dos);
+		
+		ExternalizableHelper.writeExternalizable(localizer, dos);
 	}
 }

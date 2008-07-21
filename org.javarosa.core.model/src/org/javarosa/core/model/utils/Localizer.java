@@ -1,8 +1,15 @@
 package org.javarosa.core.model.utils;
 
-import java.util.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
+import java.util.Vector;
 
-public class Localizer {
+import org.javarosa.core.services.storage.utilities.Externalizable;
+
+public class Localizer implements Externalizable {
 	private SimpleOrderedHashtable localeData; /* String -> Hashtable{ String -> String } */
 	private String defaultLocale;
 	private String currentLocale;
@@ -299,14 +306,19 @@ public class Localizer {
 	/* === MANAGING LOCALIZABLE OBSERVERS === */
 	
 	/**
-	 * Register an Localizable to receive updates with the locale is changed. If the Localizable is already
-	 * registered, nothing happens.
+	 * Register a Localizable to receive updates when the locale is changed. If the Localizable is already
+	 * registered, nothing happens. If a locale is currently set, the new Localizable will receive an
+	 * immediate 'locale changed' event.
 	 * 
 	 * @param l Localizable to register.
 	 */
 	public void registerLocalizable (Localizable l) {
-		if (!observers.contains(l))
+		if (!observers.contains(l)) {
 			observers.addElement(l);
+			if (currentLocale != null) {
+				l.localeChanged(currentLocale, this);
+			}
+		}
 	}
 	
 	/**
@@ -333,4 +345,32 @@ public class Localizer {
 		for (Enumeration e = observers.elements(); e.hasMoreElements(); )
 			((Localizable)e.nextElement()).localeChanged(currentLocale, this);
 	}
+
+	/* === (DE)SERIALIZATION === */
+	
+	/**
+	 * Read the object from stream.
+	 */
+	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
+		if(!ExternalizableHelper.isEOF(dis)){
+			fallbackDefaultLocale = ExternalizableHelper.readBoolean(dis).booleanValue();
+			fallbackDefaultForm = ExternalizableHelper.readBoolean(dis).booleanValue();
+			localeData = ExternalizableHelper.readExternalSOH(dis);
+			if (localeData == null)
+				localeData = new SimpleOrderedHashtable();
+			setDefaultLocale(ExternalizableHelper.readUTF(dis));
+			setLocale(ExternalizableHelper.readUTF(dis));
+		}	
+	}
+	
+	/**
+	 * Write the object to stream.
+	 */
+	public void writeExternal(DataOutputStream dos) throws IOException {
+		ExternalizableHelper.writeBoolean(dos, new Boolean(fallbackDefaultLocale));		
+		ExternalizableHelper.writeBoolean(dos, new Boolean(fallbackDefaultForm));
+		ExternalizableHelper.writeExternalCompoundSOH(localeData, dos);
+		ExternalizableHelper.writeUTF(dos, defaultLocale);
+		ExternalizableHelper.writeUTF(dos, currentLocale);		
+	}	
 }
