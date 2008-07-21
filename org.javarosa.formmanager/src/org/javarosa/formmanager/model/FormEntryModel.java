@@ -1,8 +1,7 @@
 package org.javarosa.formmanager.model;
 
-import org.javarosa.clforms.api.Form;
-import org.javarosa.clforms.api.Prompt;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
 
 public class FormEntryModel {
@@ -20,11 +19,11 @@ public class FormEntryModel {
     	return -1;
     }
     
-    public Form getForm () {
+    public FormDef getForm () {
     	return null;
     }
     
-    public Prompt getQuestion (int questionIndex) {
+    public QuestionDef getQuestion (int questionIndex) {
     	return null;
     }
     
