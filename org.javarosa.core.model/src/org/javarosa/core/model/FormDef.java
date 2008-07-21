@@ -215,7 +215,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			setBindings(ExternalizableHelper.readExternal(dis,new DataBinding().getClass()));
 			
 			Localizer l = new Localizer();
-			l.readExternal(dis);
+			ExternalizableHelper.readExternalizable(dis, l);
 			setLocalizer(l);
 		}
 	}
