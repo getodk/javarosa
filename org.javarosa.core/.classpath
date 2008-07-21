@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="test"/>
-	<classpathentry kind="lib" path="C:/WTK2.5.2/lib/wma11.jar"/>
 	<classpathentry kind="lib" path="lib/cldc_crypto.zip"/>
 	<classpathentry kind="lib" path="lib/cldc_classes.zip"/>
 	<classpathentry kind="con" path="J2MELIB"/>

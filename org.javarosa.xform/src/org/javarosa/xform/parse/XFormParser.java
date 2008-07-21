@@ -527,7 +527,6 @@ public class XFormParser {
 		TreeElement element;
 		if(childNum == 0) {
 			XPathReference reference = new XPathReference(currentPath + node.getName());
-			//TODO: Figure out how to make the nodeset here.
 			element = new QuestionDataElement(node.getName(), reference);
 		} else {
 			element = new QuestionDataGroup(node.getName());
