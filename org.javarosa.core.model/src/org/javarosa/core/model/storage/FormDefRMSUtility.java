@@ -8,6 +8,8 @@ import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 /**
  * The RMS persistent storage utility for FormDef
@@ -17,6 +19,8 @@ import org.javarosa.core.services.storage.utilities.RMSUtility;
  */
 public class FormDefRMSUtility extends RMSUtility {
 
+	private PrototypeFactory referenceFactory;
+	
 	/**
 	 * Creates a new RMS utility with the given name
 	 * @param name A unique identifier for this RMS utility
@@ -174,5 +178,19 @@ public class FormDefRMSUtility extends RMSUtility {
 		}
 		return metaDataList;
 	}
-
+	
+	public PrototypeFactory getReferenceFactory() {
+		if(referenceFactory == null) { 
+			referenceFactory = new PrototypeFactory();
+		}
+		return referenceFactory; 
+	}
+	
+	public void addReferencePrototype(IDataReference reference) {
+		getReferenceFactory().addNewPrototype(reference.getClass().getName(), reference.getClass());
+	}
+	
+	public void clearReferenceFactory() {
+		referenceFactory = null;
+	}
 }
