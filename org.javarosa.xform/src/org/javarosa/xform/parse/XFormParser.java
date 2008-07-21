@@ -183,9 +183,9 @@ public class XFormParser {
 	}
 	
 	private static void parseTitle (FormDef f, Element e) {
-		if (f.getName() != null) {
-			f.setName(getXMLText(e, true));
-		}
+		//Removed a line here about the form title not being null. Couldn't possibly think
+		//of why that would make sense. CTS - 7/21/2008
+		f.setName(getXMLText(e, true));
 	}
 	
 	//for ease of parsing, we assume a model comes before the controls, which isn't necessarily mandated by the xforms spec
