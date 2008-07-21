@@ -3,6 +3,7 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
@@ -142,6 +143,10 @@ public class GroupDef implements IFormElement, Localizable {
 
     	if(shortTextID != null) {
     		shortText = localizer.getLocalizedText(shortTextID);
+    	}
+    	
+    	for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
+    		((IFormElement)e.nextElement()).localeChanged(locale, localizer);
     	}
     }
 	
