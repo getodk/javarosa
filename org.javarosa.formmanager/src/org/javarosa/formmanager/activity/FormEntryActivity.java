@@ -20,10 +20,10 @@ import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
-import org.javarosa.formmanager.model.IControllerListener;
+import org.javarosa.formmanager.controller.IControllerHost;
 import org.javarosa.formmanager.view.IFormEntryView;
 
-public class FormEntryActivity implements IActivity, IControllerListener, CommandListener {
+public class FormEntryActivity implements IActivity, IControllerHost, CommandListener {
 
 	/** Alert if the form cannot load **/
 	private Alert alert;
@@ -68,7 +68,7 @@ public class FormEntryActivity implements IActivity, IControllerListener, Comman
 			this.context = (FormEntryContext)context;			
 			
 			//TODO: Are we going to make this non-RMS dependant any any point?
-			FormDefRMSUtility utility = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
+			FormDefRMSUtility utility = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());  //whoa!
 			theForm = new FormDef();
 			try {
 				utility.retrieveFromRMS(this.context.getFormID(),theForm);
@@ -88,8 +88,6 @@ public class FormEntryActivity implements IActivity, IControllerListener, Comman
 		}
 		if (theForm != null) {
 
-			// load form
-			// parse form
 			// pre-process form
 
 			model = new FormEntryModel(theForm);
@@ -105,6 +103,8 @@ public class FormEntryActivity implements IActivity, IControllerListener, Comman
 			// We need to figure out how to identify the View that should be
 			// used here.
 			// Probably with the properties
+			
+			view.show();
 		} else {
 			displayError(LOAD_ERROR);
 		}
@@ -112,19 +112,22 @@ public class FormEntryActivity implements IActivity, IControllerListener, Comman
 	
 	
 	public void halt () {
-		//save displayable
+		//need to do anything?
 	}
 	
 	public void resume (Context globalContext) {
-		//restore displayable
+		view.show();
 	}
 	
 	public void destroy () {
 		//initiate destory of m v c
 	}
 	
-	public void setView(Displayable view) {
-		parent.setDisplay(this, view);
+	public void setDisplay (Displayable d) {
+		parent.setDisplay(this, d);
+	}
+	
+	public void controllerReturn (String status) {
 	}
 	
 	public void commandAction(Command command, Displayable display) {
@@ -136,7 +139,7 @@ public class FormEntryActivity implements IActivity, IControllerListener, Comman
 	private void displayError(String errorMsg) {
 		alert = new Alert("Form Entry Error",errorMsg,null,AlertType.ERROR);
 		alert.setTimeout(Alert.FOREVER);
-		setView(alert);
+		//setView(alert);
 		//For some reason that I really can't figure out, this alert won't display the error text
 		alert.setCommandListener(this);
 	}

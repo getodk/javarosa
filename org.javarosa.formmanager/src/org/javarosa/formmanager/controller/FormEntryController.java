@@ -1,9 +1,10 @@
 package org.javarosa.formmanager.controller;
 
-import org.javarosa.clforms.api.Prompt;
-import org.javarosa.core.model.QuestionData;
+import javax.microedition.lcdui.Displayable;
+
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.model.FormEntryModel;
-import org.javarosa.formmanager.model.IControllerListener;
 import org.javarosa.formmanager.view.IFormEntryView;
 
 public class FormEntryController {
@@ -12,19 +13,18 @@ public class FormEntryController {
 	
 	FormEntryModel model;
 	IFormEntryView view;
+	IControllerHost parent;
 	
-	IControllerListener listener;
-	
-	public FormEntryController (FormEntryModel model, IControllerListener listener) {
+	public FormEntryController (FormEntryModel model, IControllerHost parent) {
 		this.model = model;
-		this.listener = listener;
+		this.parent = parent;
 	}
 	
 	public void setView (IFormEntryView view) {
 		this.view = view;
 	}
 	
-	public int questionAnswered (Prompt question, QuestionData data) {
+	public int questionAnswered (QuestionDef question, IAnswerData data) {
 		if (true /* check data sufficient to answer question (specifically, required attribute) */) {
 			return QUESTION_REQUIRED_BUT_EMPTY;
 		} else {
@@ -48,6 +48,7 @@ public class FormEntryController {
 	
 	public void exit () {
 		view.destroy(); //?
+		parent.controllerReturn("all done!");
 	}
 	
 	public void startOver () {
@@ -60,5 +61,9 @@ public class FormEntryController {
 	
 	public void cycleLanguage () {
 		
+	}
+	
+	public void setDisplay (Displayable d) {
+		parent.setDisplay(d);
 	}
 }
