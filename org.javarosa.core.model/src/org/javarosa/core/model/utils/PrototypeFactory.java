@@ -9,7 +9,10 @@ public class PrototypeFactory {
 		prototypes.put(name, prototype);
 	}
 	
-	Object getNewInstance(String prototypeName) throws IllegalAccessException, InstantiationException {
+	public Object getNewInstance(String prototypeName) throws IllegalAccessException, InstantiationException {
+		if(prototypes.get(prototypeName) == null) {
+			return null;
+		}
 		return ((Class)prototypes.get(prototypeName)).newInstance();
 	}
 }

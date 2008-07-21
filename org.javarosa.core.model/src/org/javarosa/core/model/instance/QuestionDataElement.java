@@ -160,7 +160,7 @@ public class QuestionDataElement extends TreeElement {
 			UnavailableExternalizerException {
 		this.name = ExternalizableHelper.readUTF(in);
 		String className = in.readUTF();
-		reference = this.getRoot().getFactory().getNewReference(className);
+		reference = (IDataReference)this.getRoot().getFactory().getNewInstance(className);
 		if (reference == null) {
 			throw new UnavailableExternalizerException(
 					"Attempt to resolve serialization for a DataModelTree failed because there was no reference " +

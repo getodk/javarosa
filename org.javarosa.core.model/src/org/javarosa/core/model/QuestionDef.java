@@ -5,11 +5,15 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.model.utils.SimpleOrderedHashtable;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 /** 
  * This is the question definition properties.
@@ -308,7 +312,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	/**
 	 * Reads the object from stream.
 	 */
-	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
+	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException{
 		if(!ExternalizableHelper.isEOF(dis)){
 			setID(dis.readInt());
 			
@@ -331,16 +335,17 @@ public class QuestionDef implements IFormElement, Localizable {
 			
 			setSelectItemIDs(ExternalizableHelper.readExternalSOH(dis), ExternalizableHelper.readExternalVB(dis), null);
 			
-			//default value?
-			
-			try {
 			String className = dis.readUTF();
-			IDataReference binding = (IDataReference)Class.forName(className).newInstance();
-			ExternalizableHelper.readExternalizable(dis, binding);
-			setBind(binding);
-			} catch (Exception e) {
-				System.out.println("blow me");
+
+			FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
+			PrototypeFactory factory = fdrms.getReferenceFactory();
+			binding = (IDataReference)factory.getNewInstance(className);
+			if(binding == null) { 
+				throw new UnavailableExternalizerException("A reference prototype could not be found to deserialize a " +
+						"reference of the type " + className + ". Please register a Prototype of this type before deserializing " +
+						"the QuestionDef " + this.getName());
 			}
+			binding.readExternal(dis);
 		}	
 	}
 
@@ -371,9 +376,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		ExternalizableHelper.writeExternal(getSelectItemIDs(), dos);
 		ExternalizableHelper.writeExternalVB(selectItemsLocalizable, dos);
 		
-		//default value?
-		
-		dos.writeUTF(binding.getClass().toString());
+		dos.writeUTF(binding.getClass().getName());
 		binding.writeExternal(dos);
 	}
 

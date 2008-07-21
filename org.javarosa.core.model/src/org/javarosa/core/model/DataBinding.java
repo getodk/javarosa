@@ -4,7 +4,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.Externalizable;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
@@ -88,7 +91,17 @@ public class DataBinding  implements Externalizable {
 		this.setRequired(in.readBoolean());
 		condition = new Condition();
 		ExternalizableHelper.readExternalizable(in, condition);
-		//TODO: Reference
+		String factoryName = in.readUTF();
+		
+		FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
+		PrototypeFactory factory = fdrms.getReferenceFactory();
+		ref = (IDataReference)factory.getNewInstance(factoryName);
+		if(ref == null) { 
+			throw new UnavailableExternalizerException("A reference prototype could not be found to deserialize a " +
+					"reference of the type " + factoryName + ". Please register a Prototype of this type before deserializing " +
+					"the data reference " + this.getId());
+		}
+		ref.readExternal(in);
 	}
 
 	/* (non-Javadoc)
@@ -101,7 +114,8 @@ public class DataBinding  implements Externalizable {
 		ExternalizableHelper.writeUTF(out, this.getPreloadParams());
 		out.writeBoolean(this.isRequired());
 		ExternalizableHelper.writeExternalizable(condition, out);
-		//TODO: Reference
+		out.writeUTF(ref.getClass().getName());
+		ref.writeExternal(out);
 	}
 	
 	

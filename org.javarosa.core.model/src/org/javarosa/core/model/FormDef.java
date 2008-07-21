@@ -26,6 +26,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private int id;		/** The numeric unique identifier of the form definition. */	
 	private String name;	/** The display name of the form. */
 	private Localizer localizer;
+	
+	private PrototypeFactory modelFactory;
 
 	private IFormDataModel model;
 
@@ -152,6 +154,10 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		return getName();
 	}
 	
+	public void setModelFactory(PrototypeFactory modelFactory) {
+		this.modelFactory = modelFactory;
+	}
+	
 //	/**
 //	 * Gets a question identified by a variable name.
 //	 * 
@@ -198,6 +204,9 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	/** 
 	 * Reads the form definition object from the supplied stream.
 	 * 
+	 * Requires that the model has been set to a prototype of the model that should
+	 * be used for deserialization.
+	 * 
 	 * @param dis - the stream to read from.
 	 * @throws IOException
 	 * @throws InstantiationException
@@ -214,6 +223,14 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			setChildren(ExternalizableHelper.readExternal(dis,factory));
 			setBindings(ExternalizableHelper.readExternal(dis,new DataBinding().getClass()));
 			
+			String modelType = dis.readUTF();
+			model = (IFormDataModel)modelFactory.getNewInstance(modelType);
+			if(model  == null) { 
+				throw new UnavailableExternalizerException("FormDef was unable to deserialize the Model Template, " +
+						"due to a missing prototype. Please set the model to a prototype before deserialization.");
+			}
+			model.readExternal(dis);
+
 			Localizer l = new Localizer();
 			ExternalizableHelper.readExternalizable(dis, l);
 			setLocalizer(l);
@@ -232,6 +249,9 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		
 		ExternalizableHelper.writeExternalGeneric(getChildren(), dos);
 		ExternalizableHelper.writeExternal(getBindings(), dos);
+
+		dos.writeUTF(model.getClass().getName());
+		model.writeExternal(dos);
 		
 		ExternalizableHelper.writeExternalizable(localizer, dos);
 	}

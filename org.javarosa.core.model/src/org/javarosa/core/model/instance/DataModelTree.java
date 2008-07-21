@@ -5,13 +5,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ExternalizingVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.IDataModelVisitor;
+import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 /**
@@ -150,8 +153,6 @@ public class DataModelTree implements IFormDataModel {
 	public void accept(IDataModelVisitor visitor) {
 		visitor.visit(this);
 		if(root != null) {
-			//I don't think this is going to work.
-			//if(visitor.getClass() == ITreeVisitor.class) {
 			if(visitor instanceof ITreeVisitor) {
 				root.accept((ITreeVisitor)visitor);
 			}
@@ -166,16 +167,23 @@ public class DataModelTree implements IFormDataModel {
 			InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		this.id = in.readInt();
 		this.name = ExternalizableHelper.readUTF(in);
+		
+		FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
+		PrototypeFactory factory = fdrms.getReferenceFactory();
+		
 		boolean group = in.readBoolean();
 		if(group) {
 			QuestionDataGroup newGroup = new QuestionDataGroup();
 			newGroup.setRoot(newGroup);
+			newGroup.setFactory(factory);
 			newGroup.readExternal(in);
+			setRootElement(newGroup);
 		}
 		else {
 			QuestionDataElement element = new QuestionDataElement();
 			element.setRoot(element);
 			element.readExternal(in);
+			setRootElement(element);
 		}
 	}
 
@@ -187,7 +195,7 @@ public class DataModelTree implements IFormDataModel {
 		out.writeInt(this.id);
 		ExternalizableHelper.writeUTF(out, this.name);
 		ExternalizingVisitor visitor = new ExternalizingVisitor(out);
-		visitor.visit(this);
+		this.accept(visitor);
 	}
 
 	/*

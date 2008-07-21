@@ -14,6 +14,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.FormDataRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
@@ -28,6 +29,7 @@ import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
+import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.xform.util.XFormUtils;
 
@@ -87,6 +89,8 @@ public class JavaRosaDemoShell implements IShell {
 		
 		FormDataRMSUtility formData = new FormDataRMSUtility(FormDataRMSUtility.getUtilityName());
 		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
+		formDef.addModelPrototype(new DataModelTree());
+		formDef.addReferencePrototype(new XPathReference());
 
 		// For now let's add the dummy form.
 		if (formDef.getNumberOfRecords() == 0) {

@@ -518,6 +518,7 @@ public class XFormParser {
 
 		TreeElement root = parseInstanceNodes(dataElement, "/").getRoot();
 		DataModelTree instanceModel = new DataModelTree(root);
+		instanceModel.setName(f.getName());
 		f.setDataModel(instanceModel);
 	}
 	
