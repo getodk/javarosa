@@ -73,7 +73,7 @@ public class JavaRosaDemoShell implements IShell {
 		this.formListActivity = new FormListActivity(this,"Forms List");
 		this.formTransport = new FormTransportActivity(this);
 		this.modelActivity = new ModelListActivity(this);
-		this.entryActivity  = new FormEntryActivity(this);
+		this.entryActivity  = new FormEntryActivity(this, new FormEntryViewFactory());
 		
 		this.propertyActivity = new PropertyScreenActivity(this);
 		
