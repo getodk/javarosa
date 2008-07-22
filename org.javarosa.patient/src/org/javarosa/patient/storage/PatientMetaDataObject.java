@@ -10,11 +10,12 @@ import org.javarosa.patient.model.Patient;
 public class PatientMetaDataObject extends MetaDataObject {
 
     private String patientName = ""; //the name of the FormData being referenced
-	private int patientIdReference;
+	private int patientRecordId;
+	private String patientId;
 
     
     public String toString(){
-    	return new String (super.toString()+" name: "+this.patientName);
+    	return new String (super.toString()+" name: "+this.patientName + " patientId: " + patientId);
     }
     
     /**
@@ -33,7 +34,8 @@ public class PatientMetaDataObject extends MetaDataObject {
     public PatientMetaDataObject(Patient patient)
     {
         this.patientName = patient.getFullName();
-        this.patientIdReference = patient.getRecordId();
+        this.patientRecordId = patient.getRecordId();
+        this.patientId = patient.getPatientId();
         
     }
     
@@ -56,8 +58,15 @@ public class PatientMetaDataObject extends MetaDataObject {
     /**
      * @return the RMS Storage Id for the form this meta data represents
      */
-    public int getPatientIdReference() {
-    	return patientIdReference;
+    public int getPatientRecordId() {
+    	return patientRecordId;
+    }
+    
+    /** 
+     * @return The Patient ID for the patient that this meta data represents
+     */
+    public String getPatientId() {
+    	return patientId;
     }
     
     /* (non-Javadoc)
@@ -66,8 +75,11 @@ public class PatientMetaDataObject extends MetaDataObject {
     public void readExternal(DataInputStream in) throws IOException
     {
     	super.readExternal(in);
+    	
+        this.patientRecordId = in.readInt();
+        
         this.patientName = in.readUTF();
-        this.patientIdReference = in.readInt();
+        this.patientId = in.readUTF();
     }
 
    
@@ -77,8 +89,11 @@ public class PatientMetaDataObject extends MetaDataObject {
     public void writeExternal(DataOutputStream out) throws IOException
     {
     	super.writeExternal(out);
+    	
+    	out.writeInt(this.getPatientRecordId());
+    	
     	out.writeUTF(this.getName());
-    	out.writeInt(this.getPatientIdReference());
+    	out.writeUTF(this.patientId);
     }
 
     /*
