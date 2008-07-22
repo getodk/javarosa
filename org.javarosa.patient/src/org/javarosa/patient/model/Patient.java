@@ -112,6 +112,14 @@ public class Patient implements Externalizable {
 		this.patientId = patientId;
 	}
 	
+	public Object getRecord(String recordType) {
+		if(recordType == "firstName") {
+			return firstName;
+		}
+		//TODO: We need to figure out how to do these references better
+		return null;
+	}
+	
 	public Vector getRecordSet(String recordType, String selector) {
 		IPatientRecord record = (IPatientRecord)records.get(recordType);
 		if(record == null) {
