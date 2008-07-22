@@ -1,14 +1,14 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import javax.microedition.lcdui.StringItem;
+import de.enough.polish.ui.StringItem;
 
-import org.javarosa.clforms.api.Prompt;
-import org.javarosa.core.model.QuestionData;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.IAnswerData;
 
 import de.enough.polish.ui.Container;
 
 /**
- * Default read-only view of a question: a single frame with question prompt (abbreviated) on the left/top and 
+ * Default read-only view of a question: a single frame with question QuestionDef (abbreviated) on the left/top and 
  * question answer in readable-text form on the right/bottom.
  */
 public class CollapsedWidget implements IWidgetStyle {
@@ -20,11 +20,11 @@ public class CollapsedWidget implements IWidgetStyle {
 	}
 
 	/**
-	 * TODO: be smart about layout/wrapping; take into account lengths of prompt and answer for optimum
+	 * TODO: be smart about layout/wrapping; take into account lengths of QuestionDef and answer for optimum
 	 * use of vertical screen space
 	 */
 
-	public void initWidget (Prompt question, Container c) {
+	public void initWidget (QuestionDef question, Container c) {
 		//#style split
 		c.setStyle(); //polish pre-processing turns this into a valid method call
 
@@ -40,9 +40,11 @@ public class CollapsedWidget implements IWidgetStyle {
 		c.add(answer);
 	}
 
-	public void refreshWidget (Prompt question, QuestionData data, int changeFlags) {
+	public void refreshWidget (QuestionDef question, IAnswerData data, int changeFlags) {
 		prompt.setText(question.getShortText());
-		answer.setText(data.getDisplayText());
+		if (data != null) {
+			answer.setText(data.getDisplayText());
+		}
 	}
 
 	public void reset () {

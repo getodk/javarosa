@@ -1,11 +1,11 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.TextField;
-
-import org.javarosa.clforms.api.Prompt;
-import org.javarosa.core.model.QuestionData;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
+
+import de.enough.polish.ui.Item;
+import de.enough.polish.ui.TextField;
 
 public class TextEntryWidget extends ExpandedWidget {
 	int inputMode;
@@ -18,7 +18,7 @@ public class TextEntryWidget extends ExpandedWidget {
 		this.inputMode = inputMode;
 	}
 	
-	protected Item getEntryWidget (Prompt question) {
+	protected Item getEntryWidget (QuestionDef question) {
 		//#style textBox
 		TextField tf = new TextField("", "", 200, TextField.ANY);
 		tf.setInputMode(inputMode);
@@ -29,13 +29,14 @@ public class TextEntryWidget extends ExpandedWidget {
 		return (TextField)entryWidget;    
 	}
 
-	protected void updateWidget (Prompt question) { /* do nothing */ }
+	protected void updateWidget (QuestionDef question) { /* do nothing */ }
 	
 	protected void setWidgetValue (Object o) {
 		textField().setText((String)o);
 	}
 
-	protected QuestionData getWidgetValue () {
-		return new StringData(textField().getText());
+	protected IAnswerData getWidgetValue () {
+		String s = textField().getText();
+		return (s == null ? null : new StringData(s));
 	}
 }

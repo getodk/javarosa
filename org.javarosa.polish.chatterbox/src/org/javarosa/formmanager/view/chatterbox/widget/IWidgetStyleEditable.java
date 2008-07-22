@@ -1,6 +1,6 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.core.model.QuestionData;
+import org.javarosa.core.model.data.IAnswerData;
 
 /**
  * Strategy object that knows how to build and maintain a widget that contains a view of a single form question. This interface
@@ -13,5 +13,8 @@ public interface IWidgetStyleEditable extends IWidgetStyle {
 	 * 
 	 * @return currently entered question data; null if not applicable
 	 */
-	QuestionData getData ();
+	IAnswerData getData ();
+	
+	//handle custom widget focusing. return whether any focusing was performed (thus needing repaint)
+	boolean focus ();
 }

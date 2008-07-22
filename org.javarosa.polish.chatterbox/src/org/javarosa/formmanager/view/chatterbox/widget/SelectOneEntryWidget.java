@@ -1,8 +1,8 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import javax.microedition.lcdui.ChoiceGroup;
+import de.enough.polish.ui.ChoiceGroup;
 
-import org.javarosa.core.model.QuestionData;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.Selection;
 
@@ -21,10 +21,15 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 	protected void setWidgetValue (Object o) {
 		Selection s = (Selection)o;
 		choiceGroup().setSelectedIndex(s.index, true);
-		//set focus?
 	}
 
-	protected QuestionData getWidgetValue () {
-		return new SelectOneData(new Selection(choiceGroup().getSelectedIndex(), question));
+	protected IAnswerData getWidgetValue () {
+		int i = choiceGroup().getSelectedIndex();
+		return (i == -1 ? null : new SelectOneData(new Selection(i, question)));
+	}
+	
+	public boolean focus () {
+		choiceGroup().focus(choiceGroup().getSelectedIndex());
+		return true;
 	}
 }
