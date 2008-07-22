@@ -125,13 +125,14 @@ public class DataModelTree implements IFormDataModel {
 	 * provided. Null if none exists in this tree.
 	 */
 	private QuestionDataElement resolveReference(IDataReference binding, QuestionDataGroup group) {
+		//TODO: We can do this much more intelligently given that we know the format of the bindings
 		Enumeration en = group.getChildren().elements();
 		while(en.hasMoreElements()) {
 			TreeElement dme = (TreeElement)en.nextElement();
 			if(!dme.isLeaf()) {
 				return resolveReference(binding, (QuestionDataGroup)dme);
 			} else {
-				if ((root.getClass() == QuestionDataElement.class)
+				if ((dme instanceof QuestionDataElement)
 						&& ((QuestionDataElement) dme).matchesReference(binding)) {
 					return (QuestionDataElement) dme;
 				}
