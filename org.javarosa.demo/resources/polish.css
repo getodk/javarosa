@@ -166,6 +166,8 @@ rightcommand {
 	layout: right;
 }
 
+.blah { }
+
 .split {
 	columns: 3; /* really two columns, with a null item prepended */
 	layout: expand | vshrink;
