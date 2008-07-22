@@ -43,7 +43,7 @@ public class SortedIntSet {
 	//if exact = false: return the index of the highest value <= the target value, -1 if all values are greater than the target value
 	public int indexOf (int n, boolean exact) {
 		int lo = 0;
-		int hi = v.size();
+		int hi = v.size() - 1;
 
 		while (lo <= hi) {
 			int mid = (lo + hi) / 2;
