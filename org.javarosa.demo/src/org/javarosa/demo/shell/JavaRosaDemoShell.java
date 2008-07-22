@@ -1,6 +1,9 @@
 package org.javarosa.demo.shell;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Random;
+import java.util.Vector;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
@@ -30,6 +33,7 @@ import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.properties.PropertyManager;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.xform.util.XFormUtils;
 
@@ -225,5 +229,35 @@ public class JavaRosaDemoShell implements IShell {
 	
 	public void setMIDlet(MIDlet midlet) {
 		this.midlet = midlet;
+	}
+	
+	private String initProperty(String propName, String defaultValue) {
+		Vector propVal = JavaRosaServiceProvider.instance().getPropertyManager().getProperty(propName);
+		if (propVal == null || propVal.size() == 0) {
+			propVal = new Vector();
+			propVal.addElement(defaultValue);
+			JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propName, propVal);
+			System.out.println("No default value for [" + propName
+					+ "]; setting to [" + defaultValue + "]"); // debug
+			return defaultValue;
+		}
+		return (String) propVal.elementAt(0);
+	}
+	
+	private void loadProperties() {
+		initProperty("DeviceID", genGUID(25));
+
+	}
+
+	//TODO: Put this in a utility method
+	public static String genGUID(int len) {
+		String guid = "";
+		Random r = new Random();
+
+		for (int i = 0; i < 25; i++) { // 25 == 128 bits of entropy
+			guid += Integer.toString(r.nextInt(36), 36);
+		}
+
+		return guid.toUpperCase();
 	}
 }
