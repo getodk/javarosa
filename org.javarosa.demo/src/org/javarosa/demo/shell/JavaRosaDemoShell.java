@@ -83,11 +83,7 @@ public class JavaRosaDemoShell implements IShell {
 	}
 	
 	private void init() {
-		
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new DemoAppProperties());
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new HttpTransportProperties());
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FormManagerProperties());
+		loadProperties();
 		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 		
@@ -245,6 +241,11 @@ public class JavaRosaDemoShell implements IShell {
 	}
 	
 	private void loadProperties() {
+		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
+		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new DemoAppProperties());
+		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new HttpTransportProperties());
+		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FormManagerProperties());
+		
 		initProperty("DeviceID", genGUID(25));
 
 	}
