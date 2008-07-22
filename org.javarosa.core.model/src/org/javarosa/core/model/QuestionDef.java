@@ -308,11 +308,6 @@ public class QuestionDef implements IFormElement, Localizable {
 		throw new IllegalStateException();
 	}
 	
-	//need to figure this out
-	public IAnswerData getValue () {
-		return null;
-	}
-	
 	/**
 	 * Reads the object from stream.
 	 */
