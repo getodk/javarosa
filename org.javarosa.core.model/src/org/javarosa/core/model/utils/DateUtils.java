@@ -148,4 +148,52 @@ public class DateUtils {
         }
         return result;
     }	
+	public static Date getPastPeriodDate (Date ref, String type, String start, boolean beginning, boolean includeToday, int nAgo) {
+		Date d = null;
+		
+		if (type.equals("week")) {
+			//1 week period
+			//start: day of week that starts period
+			//beginning: true=return first day of period, false=return last day of period
+			//includeToday: whether today's date can count as the last day of the period
+			//nAgo: how many periods ago; 1=most recent period, 0=period in progress
+			
+			int target_dow = -1, current_dow = -1, diff;
+			int offset = (includeToday ? 1 : 0);
+			
+			if (start.equals("sun")) target_dow = 0;
+			else if (start.equals("mon")) target_dow = 1;
+			else if (start.equals("tue")) target_dow = 2;
+			else if (start.equals("wed")) target_dow = 3;
+			else if (start.equals("thu")) target_dow = 4;
+			else if (start.equals("fri")) target_dow = 5;				
+			else if (start.equals("sat")) target_dow = 6;
+
+			if (target_dow == -1)
+				throw new RuntimeException();
+
+			Calendar cd = Calendar.getInstance();
+			cd.setTime(ref);
+			
+			switch(cd.get(Calendar.DAY_OF_WEEK)) {
+			case Calendar.SUNDAY: current_dow = 0; break;
+			case Calendar.MONDAY: current_dow = 1; break;
+			case Calendar.TUESDAY: current_dow = 2; break;
+			case Calendar.WEDNESDAY: current_dow = 3; break;
+			case Calendar.THURSDAY: current_dow = 4; break;
+			case Calendar.FRIDAY: current_dow = 5; break;
+			case Calendar.SATURDAY: current_dow = 6; break;
+			default: throw new RuntimeException(); //something is wrong
+			}
+
+			diff = (((current_dow - target_dow) + (7 + offset)) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah
+			d = new Date(ref.getTime() - diff * 86400000l);
+		} else if (type.equals("month")) {
+			//not supported
+		} else {
+			throw new IllegalArgumentException();
+		}
+		
+		return d;
+	}
 }

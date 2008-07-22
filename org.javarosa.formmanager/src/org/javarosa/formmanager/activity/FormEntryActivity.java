@@ -104,7 +104,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			// used here.
 			// Probably with the properties
 			
-			view.show();
+			//view.show();
 		} else {
 			displayError(LOAD_ERROR);
 		}

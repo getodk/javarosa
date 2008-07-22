@@ -11,6 +11,7 @@ import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.PrototypeFactory;
+import org.javarosa.core.model.utils.QuestionPreloader;
 import org.javarosa.core.services.storage.utilities.Externalizable;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
@@ -28,6 +29,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private int id;		/** The numeric unique identifier of the form definition. */	
 	private String name;	/** The display name of the form. */
 	private Localizer localizer;
+	
+	private QuestionPreloader preloader = new QuestionPreloader();
 	
 	private PrototypeFactory modelFactory;
 
@@ -156,6 +159,20 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		this.dataBindings = v;
 	}
 	
+	/**
+	 * @return the preloads
+	 */
+	public QuestionPreloader getPreloader() {
+		return preloader;
+	}
+
+	/**
+	 * @param preloads the preloads to set
+	 */
+	public void setPreloader(QuestionPreloader preloads) {
+		this.preloader = preloads;
+	}
+
 	public void addBinding (DataBinding db) {
 		if (dataBindings == null)
 			dataBindings = new Vector();
@@ -235,6 +252,21 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 //		((GroupDef)groups.elementAt(0)).addQuestion(qtn);
 //	}
 	
+	/**
+	 * Preload the Data Model with the preload values that are enumerated in
+	 * the data bindings.
+	 */
+	public void preloadModel() {
+		Enumeration en = getBindings().elements();
+		while(en.hasMoreElements()) {
+			DataBinding binding = (DataBinding)en.nextElement();
+			IAnswerData preload = preloader.getQuestionPreload(binding.getPreload(), binding.getPreloadParams());
+			if(preload != null) {
+				model.updateDataValue(binding.getReference(), preload);
+			}
+		}
+	}
+	
 	/** 
 	 * Reads the form definition object from the supplied stream.
 	 * 
@@ -269,6 +301,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			ExternalizableHelper.readExternalizable(dis, l);
 			setLocalizer(l);
 		}
+		preloadModel();
 	}
 
 	/** 

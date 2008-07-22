@@ -54,15 +54,19 @@ public class PropertyManager implements IService {
      * rulessets. null if the property is denied by the current ruleset, or is a vector.
      */
     public String getSingularProperty(String propertyName) {
-        if((rulesList.size() == 0 || checkPropertyAllowed(propertyName)) && propertyRMS.getValue(propertyName).size() == 1) {
-            return (String)propertyRMS.getValue(propertyName).elementAt(0);
+    	String retVal = null;
+        if((rulesList.size() == 0 || checkPropertyAllowed(propertyName))) {
+        	Vector value = (Vector)propertyRMS.getValue(propertyName);
+        	if(value != null && value.size() == 1) {
+        		retVal = (String)value.elementAt(0);
+        	}
         }
-        else {
+        if(retVal == null) {
     		//#if debug.output==verbose
             System.out.println("Warning: Singular property request failed for property " + propertyName);
             //#endif
-            return null;
         }
+        return retVal;
     }
 
     
@@ -168,7 +172,8 @@ public class PropertyManager implements IService {
     	} else {
     		boolean allowed = false;
     		Enumeration en = rulesList.elements();
-    		while(en.hasMoreElements()) {
+    		//We're fine if we return true, inclusive rules sets
+    		while(en.hasMoreElements() && !allowed) {
     			IPropertyRules rules = (IPropertyRules)en.nextElement();
     			if(rules.checkPropertyAllowed(propertyName)) {
     				allowed = true;
