@@ -4,6 +4,7 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.IFormEntryView;
 
@@ -25,21 +26,41 @@ public class FormEntryController {
 	}
 	
 	public int questionAnswered (QuestionDef question, IAnswerData data) {
-		if (true /* check data sufficient to answer question (specifically, required attribute) */) {
+		if (question.isRequired() && data == null) {
 			return QUESTION_REQUIRED_BUT_EMPTY;
 		} else {
-			//model.updatequestion...;
+			if (data != null) {
+				model.getForm().setValue(question, data);
+			}
+			
 			stepQuestion(true);
 			return QUESTION_OK;
 		}
 	}
 	
 	public void stepQuestion (boolean forward) {
-		selectQuestion(model.getQuestionIndex() + (forward ? 1 : -1)); // +/- 1 won't work; need to find next *relevant* question
+		int inc = (forward ? 1 : -1);
+		int index = model.getQuestionIndex();
+		
+		do {
+			index += inc;
+		} while (index >= 0 && index < model.getNumQuestions() && !model.getQuestion(index).isVisible());
+		
+		if (index < 0) {
+			//already at the earliest relevant question
+			return;
+		} else if (index >= model.getNumQuestions()) {
+			model.setQuestionIndex(-1);
+			view.formComplete();
+			System.out.println("form done!");
+			return;
+		}
+		
+		selectQuestion(index);
 	}
 	
 	public void selectQuestion (int questionIndex) {
-		
+		model.setQuestionIndex(questionIndex);
 	}
 	
 	public void save () {
@@ -56,11 +77,11 @@ public class FormEntryController {
 	}
 	
 	public void setLanguage (String language) {
-		
+		model.getForm().getLocalizer().setLocale(language);
 	}
 	
 	public void cycleLanguage () {
-		
+		setLanguage(model.getForm().getLocalizer().getNextLocale());
 	}
 	
 	public void setDisplay (Displayable d) {

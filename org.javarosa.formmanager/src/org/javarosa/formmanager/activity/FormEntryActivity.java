@@ -19,9 +19,10 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.formmanager.controller.FormEntryController;
-import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.controller.IControllerHost;
+import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.IFormEntryView;
+import org.javarosa.formmanager.view.IFormEntryViewFactory;
 
 public class FormEntryActivity implements IActivity, IControllerHost, CommandListener {
 
@@ -43,11 +44,14 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	/** The parent shell **/
 	private IShell parent;
 	
+	private IFormEntryViewFactory viewFactory;
+	
 	/** Loading error string **/
 	private final static String LOAD_ERROR = "Deepest Apologies. The form could not be loaded.";
 
-	public FormEntryActivity(IShell parent) {
+	public FormEntryActivity(IShell parent, IFormEntryViewFactory viewFactory) {
 		this.parent = parent;
+		this.viewFactory = viewFactory;
 	}
 	
 	public void contextChanged(Context context) {
@@ -87,24 +91,17 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			}
 		}
 		if (theForm != null) {
-
-			// pre-process form
-
+			theForm.preloadModel();
+			if (theForm.getLocalizer() != null && theForm.getLocalizer().getLocale() == null) {
+				theForm.getLocalizer().setToDefault();
+			}
+			
 			model = new FormEntryModel(theForm);
 			controller = new FormEntryController(model, this);
-			//TODO: Figure out what view to use
-			//view = new Chatterbox("Chatterbox", model, controller); // shouldn't
-																	// reference
-																	// this
-																	// directly
-
-			//controller.setView(view);
-
-			// We need to figure out how to identify the View that should be
-			// used here.
-			// Probably with the properties
+			view = viewFactory.getFormEntryView("chatterbox", model, controller);
+			controller.setView(view);
 			
-			//view.show();
+			view.show();
 		} else {
 			displayError(LOAD_ERROR);
 		}
@@ -113,6 +110,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	
 	public void halt () {
 		//need to do anything?
+		System.out.println("whoa, nelly! we're halting!");
 	}
 	
 	public void resume (Context globalContext) {
