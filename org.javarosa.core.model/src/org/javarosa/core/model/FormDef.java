@@ -189,12 +189,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	}
 	*/
 	
-	public void preProcess () {
-	//	for (Enumeration e = dataBindings.elements(); e.hasMoreElements(); ) {
-			
-	//	}
-	}
-	
 	public void localeChanged (String locale, Localizer localizer) {
 		for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
 			((IFormElement)e.nextElement()).localeChanged(locale, localizer);
@@ -301,7 +295,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			ExternalizableHelper.readExternalizable(dis, l);
 			setLocalizer(l);
 		}
-		preloadModel();
 	}
 
 	/** 
