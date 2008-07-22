@@ -1,12 +1,12 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.TextField;
+import de.enough.polish.ui.Item;
+import de.enough.polish.ui.TextField;
 
-import org.javarosa.clforms.api.Prompt;
+import org.javarosa.core.model.QuestionDef;
 
 public class NumericEntryWidget extends TextEntryWidget {	
-	protected Item getEntryWidget (Prompt question) {
+	protected Item getEntryWidget (QuestionDef question) {
 		TextField tf = (TextField)super.getEntryWidget(question);
 	    tf.setConstraints(TextField.NUMERIC);
 		return tf;

@@ -1,10 +1,10 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.StringItem;
+import de.enough.polish.ui.Item;
+import de.enough.polish.ui.StringItem;
 
-import org.javarosa.clforms.api.Prompt;
-import org.javarosa.core.model.QuestionData;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.IAnswerData;
 
 import de.enough.polish.ui.Container;
 
@@ -16,7 +16,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		reset();
 	}
 
-	public void initWidget (Prompt question, Container c) {
+	public void initWidget (QuestionDef question, Container c) {
 		//#style questiontext
 		prompt = new StringItem(null, null);
 		entryWidget = getEntryWidget(question);
@@ -27,13 +27,15 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		c.add(entryWidget);
 	}
 
-	public void refreshWidget (Prompt question, QuestionData data, int changeFlags) {
+	public void refreshWidget (QuestionDef question, IAnswerData data, int changeFlags) {
 		prompt.setText(question.getLongText());
 		updateWidget(question);
-		setWidgetValue(data.getValue());
+		if (data != null) {
+			setWidgetValue(data.getValue());
+		}
 	}
 
-	public QuestionData getData () {
+	public IAnswerData getData () {
 		return getWidgetValue();
 	}
 
@@ -42,8 +44,13 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		entryWidget = null;
 	}
 
-	protected abstract Item getEntryWidget (Prompt question);
-	protected abstract void updateWidget (Prompt question);
+	public boolean focus () {
+		//do nothing special
+		return false;
+	}
+	
+	protected abstract Item getEntryWidget (QuestionDef question);
+	protected abstract void updateWidget (QuestionDef question);
 	protected abstract void setWidgetValue (Object o);
-	protected abstract QuestionData getWidgetValue ();
+	protected abstract IAnswerData getWidgetValue ();
 }

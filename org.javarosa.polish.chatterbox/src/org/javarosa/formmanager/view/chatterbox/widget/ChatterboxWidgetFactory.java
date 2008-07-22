@@ -1,27 +1,29 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.clforms.api.Prompt;
+import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.QuestionDef;
 
 import de.enough.polish.ui.ChoiceGroup;
 
 public class ChatterboxWidgetFactory {
-	public ChatterboxWidget getWidget (Prompt question, int initViewState) {
+	public ChatterboxWidget getWidget (QuestionDef question, FormDef form, int initViewState) {
 		IWidgetStyle collapsedStyle = null;
 		IWidgetStyleEditable expandedStyle = null;
 		
-		int controlType = question.getFormControlType();
-		int dataType = question.getReturnType();
-		String appearanceAttr = question.getAppearanceString();
+		int controlType = question.getControlType();
+		int dataType = question.getDataType();
+		String appearanceAttr = question.getAppearanceAttr();
 		
 		collapsedStyle = new CollapsedWidget();
 		
 		switch (controlType) {
-		case org.javarosa.clforms.api.Constants.INPUT:
+		case Constants.CONTROL_INPUT:
 			switch (dataType) {
-			case org.javarosa.clforms.api.Constants.RETURN_INTEGER:
+			case Constants.DATATYPE_INTEGER:
 				expandedStyle = new NumericEntryWidget();
 				break;
-			case org.javarosa.clforms.api.Constants.RETURN_DATE:
+			case Constants.DATATYPE_DATE:
 				expandedStyle = new DateEntryWidget();
 				break;
 			default:
@@ -29,7 +31,7 @@ public class ChatterboxWidgetFactory {
 				break;
 			}
 			break;
-		case org.javarosa.clforms.api.Constants.SELECT1:
+		case Constants.CONTROL_SELECT_ONE:
 			int style;
 			
 			if ("minimal".equals(appearanceAttr))
@@ -39,10 +41,10 @@ public class ChatterboxWidgetFactory {
 			
 			expandedStyle = new SelectOneEntryWidget(style);
 			break;
-		case org.javarosa.clforms.api.Constants.SELECT:
+		case Constants.CONTROL_SELECT_MULTI:
 			expandedStyle = new SelectMultiEntryWidget();
 			break;
-		case org.javarosa.clforms.api.Constants.TEXTAREA:
+		case Constants.CONTROL_TEXTAREA:
 			expandedStyle = new TextEntryWidget();
 			break;
 		}
@@ -50,6 +52,7 @@ public class ChatterboxWidgetFactory {
 		if (collapsedStyle == null || expandedStyle == null)
 			throw new IllegalStateException("No appropriate widget to render question");
 		
-		return new ChatterboxWidget(question, initViewState, collapsedStyle, expandedStyle);
+		//#style blah
+		return new ChatterboxWidget(question, form, initViewState, collapsedStyle, expandedStyle);
 	}
 }

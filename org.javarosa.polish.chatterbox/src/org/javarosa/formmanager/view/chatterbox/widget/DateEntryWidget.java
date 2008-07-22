@@ -2,15 +2,15 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.util.Date;
 
-import javax.microedition.lcdui.DateField;
-import javax.microedition.lcdui.Item;
+import de.enough.polish.ui.DateField;
+import de.enough.polish.ui.Item;
 
-import org.javarosa.clforms.api.Prompt;
-import org.javarosa.core.model.QuestionData;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.IAnswerData;
 
 public class DateEntryWidget extends ExpandedWidget {
-	protected Item getEntryWidget (Prompt question) {
+	protected Item getEntryWidget (QuestionDef question) {
 		//#style textBox
 		return new DateField(null, DateField.DATE);
 	}
@@ -19,13 +19,14 @@ public class DateEntryWidget extends ExpandedWidget {
 		return (DateField)entryWidget;    
 	}
 
-	protected void updateWidget (Prompt question) { /* do nothing */ }
+	protected void updateWidget (QuestionDef question) { /* do nothing */ }
 	
 	protected void setWidgetValue (Object o) {
 		dateField().setDate((Date)o);
 	}
 
-	protected QuestionData getWidgetValue () {
-		return new DateData(dateField().getDate());
+	protected IAnswerData getWidgetValue () {
+		Date d = dateField().getDate();
+		return (d == null ? null : new DateData(d));
 	}
 }

@@ -2,7 +2,6 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
-import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
@@ -10,7 +9,6 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Item;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.formmanager.controller.FormEntryController;
@@ -21,7 +19,9 @@ import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 
+import de.enough.polish.ui.Alert;
 import de.enough.polish.ui.FramedForm;
+import de.enough.polish.ui.Item;
 
 public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryModelListener, CommandListener {
 	private static final int INDEX_NOT_SET = -1;
@@ -69,6 +69,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	model.unregisterObservable(this);
     }
     
+    public void show () {
+    	controller.setDisplay(this);
+    }
+    
     private void initGUI () {
     	setUpCommands();
     	initProgressBar();
@@ -111,7 +115,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 
     private void initProgressBar () {
         //#style progressbar
-        progressBar = new Gauge(null, false, 10 /*model.getForm().getNumQuestions()*/, 0);
+        progressBar = new Gauge(null, false, model.getNumQuestions(), 0);
         append(Graphics.BOTTOM, progressBar);
     }
     
@@ -121,29 +125,38 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		throw new IllegalStateException();
     	    	
     	if (questionIndex > activeQuestionIndex) {
-    		if (activeQuestionIndex != INDEX_NOT_SET)
+    		if (activeQuestionIndex != INDEX_NOT_SET) {
     			((ChatterboxWidget)get(activeQuestionIndex)).setViewState(ChatterboxWidget.VIEW_COLLAPSED);
-    		
+    		}
+    			
     		for (int i = activeQuestionIndex + 1; i <= questionIndex; i++) {
     			putQuestion(i, i == questionIndex);
     		}
     	} else if (questionIndex <= activeQuestionIndex) {
-    		for (int i = activeQuestionIndex; i > questionIndex; i++) {
+    		for (int i = activeQuestionIndex; i > questionIndex; i--) {
     			removeFrame(i);
     		}
     		
-    		if (questionIndex != INDEX_NOT_SET)
-    			((ChatterboxWidget)get(questionIndex)).setViewState(ChatterboxWidget.VIEW_EXPANDED);    		
+    		if (questionIndex != INDEX_NOT_SET) {
+    			((ChatterboxWidget)get(questionIndex)).setViewState(ChatterboxWidget.VIEW_EXPANDED);    
+    		}
     	}
     	
-    	activeQuestionIndex = questionIndex;
-    	progressBar.setValue(questionIndex);
+    	if (activeQuestionIndex != questionIndex) {
+    		activeQuestionIndex = questionIndex;
+
+    		ChatterboxWidget widget = (ChatterboxWidget)get(activeQuestionIndex);
+    		focus(widget);
+    		widget.setFocus(); //argh!!! this works about 50% of the time!!!
+    		        	
+    		progressBar.setValue(questionIndex);
+    	}
     }
     
     //create a frame for a question and show it at the appropriate place in the form
     private void putQuestion (int questionIndex, boolean expanded) {
     	if (model.isRelevant(questionIndex)) {
-    		ChatterboxWidget cw = widgetFactory.getWidget(model.getQuestion(questionIndex), 
+    		ChatterboxWidget cw = widgetFactory.getWidget(model.getQuestion(questionIndex), model.getForm(),
     													  expanded ? ChatterboxWidget.VIEW_EXPANDED
     													    	   : ChatterboxWidget.VIEW_COLLAPSED);
     		putFrame(cw, questionIndex);
@@ -186,7 +199,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			showError(null, PROMPT_REQUIRED_QUESTION);
     		}
     	} else if (command == backCommand) {
-    		controller.stepQuestion(true);
+    		controller.stepQuestion(false);
     	} else if (command == exitNoSaveCommand) {
     		controller.exit();
     	} else if (command == exitSaveCommand) {
@@ -213,13 +226,14 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 
     //we might need this
     public void itemStateChanged (Item item) {
-    	if (item instanceof ChatterboxWidget && (ChatterboxWidget)item == activeFrame() /*&& autoPlayable()*/) {
-    		commandAction(selectCommand, this); //calling into another event handler is bad form
-    	}
+    //	if (item instanceof ChatterboxWidget && (ChatterboxWidget)item == activeFrame() /*&& autoPlayable()*/) {
+    //		commandAction(selectCommand, this); //calling into another event handler is bad form
+    //	}
     }
     
     public void questionIndexChanged (int questionIndex) {
-    	jumpToQuestion(questionIndex);
+    	if (questionIndex != INDEX_NOT_SET)
+    		jumpToQuestion(questionIndex);
     }    
 
     public void keyPressed(int keyCode) {

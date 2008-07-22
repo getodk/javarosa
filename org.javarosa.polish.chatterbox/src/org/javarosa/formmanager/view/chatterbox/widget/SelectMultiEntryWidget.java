@@ -2,9 +2,9 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.util.Vector;
 
-import javax.microedition.lcdui.ChoiceGroup;
+import de.enough.polish.ui.ChoiceGroup;
 
-import org.javarosa.core.model.QuestionData;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.Selection;
 
@@ -19,11 +19,9 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 			Selection s = (Selection)vs.elementAt(i);
 			choiceGroup().setSelectedIndex(s.index, true);			
 		}
-
-		//set focus?
 	}
 
-	protected QuestionData getWidgetValue () {
+	protected IAnswerData getWidgetValue () {
 		Vector vs = new Vector();
 		
 		for (int i = 0; i < choiceGroup().size(); i++) {
@@ -31,6 +29,6 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 				vs.addElement(new Selection(i, question));
 		}		
 		
-		return new SelectMultiData(vs);
+		return (vs.size() == 0 ? null : new SelectMultiData(vs));
 	}
 }

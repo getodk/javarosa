@@ -1,8 +1,9 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.clforms.api.Prompt;
-import org.javarosa.core.model.QuestionData;
-import org.javarosa.formmanager.utility.QuestionStateListener;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.QuestionStateListener;
+import org.javarosa.core.model.data.IAnswerData;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Style;
@@ -12,7 +13,8 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 	public static final int VIEW_EXPANDED = 0;
 	public static final int VIEW_COLLAPSED = 1;
 	
-	private Prompt question;
+	private QuestionDef question;
+	private FormDef form; //needed to retrieve answers
 	private int viewState = VIEW_NOT_SET;
 	private IWidgetStyle collapsedStyle;
 	private IWidgetStyleEditable expandedStyle;
@@ -20,13 +22,19 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 	private IWidgetStyle activeStyle;
 	private Style blankSlateStyle;
 
-	public ChatterboxWidget (Prompt question, int viewState,
-				 IWidgetStyle collapsedStyle,
-				 IWidgetStyleEditable expandedStyle) {
-		super(false);
+	public ChatterboxWidget (QuestionDef question, FormDef form, int viewState,
+			IWidgetStyle collapsedStyle, IWidgetStyleEditable expandedStyle) {
+		this(question, form, viewState, collapsedStyle, expandedStyle, null);
+	}
+	
+	public ChatterboxWidget (QuestionDef question, FormDef form, int viewState,
+			IWidgetStyle collapsedStyle, IWidgetStyleEditable expandedStyle,
+			Style style) {
+		super(false, style);
 		blankSlateStyle = this.getStyle();
 
 		this.question = question;
+		this.form = form;
 		this.collapsedStyle = collapsedStyle;
 		this.expandedStyle = expandedStyle;
 		
@@ -39,7 +47,7 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 		question.unregisterStateObserver(this);
 	}
 	
-	public Prompt getQuestion () {
+	public QuestionDef getQuestion () {
 		return question;
 	}
 	
@@ -56,12 +64,11 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 			activeStyle = getActiveStyle();
 			
 			activeStyle.initWidget(question, this);
-			activeStyle.refreshWidget(question, question.getValue(), QuestionStateListener.CHANGE_INIT);
+			activeStyle.refreshWidget(question, form.getValue(question), QuestionStateListener.CHANGE_INIT);
 		}
 	}
 
-
-	public QuestionData getData () {
+	public IAnswerData getData () {
 		if (viewState == VIEW_EXPANDED) {
 			return expandedStyle.getData();
 		} else {
@@ -69,6 +76,15 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 		}
 	}	
 
+	public void setFocus () {
+		if (viewState == VIEW_EXPANDED) {
+			if (expandedStyle.focus())
+				repaint();
+		} else {
+			throw new IllegalStateException("Attempt to focus widget in non-interactive mode");
+		}
+	}	
+	
 	private IWidgetStyle getActiveStyle () {
 		switch (viewState) {
 		case VIEW_EXPANDED: return expandedStyle;
@@ -80,12 +96,14 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 	private void reset () {
 		activeStyle.reset();
 		clear();
-		setStyle(blankSlateStyle);
+		if (blankSlateStyle != null) {
+			setStyle(blankSlateStyle);
+		}
 	}
 
-	public void questionStateChanged (Prompt question, int changeFlags) {
+	public void questionStateChanged (QuestionDef question, int changeFlags) {
 		if (this.question != question)
 			throw new IllegalStateException("Widget received event from foreign question");
-		activeStyle.refreshWidget(question, question.getValue(), changeFlags);
+		activeStyle.refreshWidget(question, form.getValue(question), changeFlags);
 	}
 }
