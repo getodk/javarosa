@@ -355,11 +355,14 @@ public class Localizer implements Externalizable {
 		if(!ExternalizableHelper.isEOF(dis)){
 			fallbackDefaultLocale = ExternalizableHelper.readBoolean(dis).booleanValue();
 			fallbackDefaultForm = ExternalizableHelper.readBoolean(dis).booleanValue();
-			localeData = ExternalizableHelper.readExternalSOH(dis);
+			localeData = ExternalizableHelper.readExternalCompoundSOH(dis);
 			if (localeData == null)
 				localeData = new SimpleOrderedHashtable();
 			setDefaultLocale(ExternalizableHelper.readUTF(dis));
-			setLocale(ExternalizableHelper.readUTF(dis));
+			String currentLocale = ExternalizableHelper.readUTF(dis);
+			if(currentLocale != null) {
+				setLocale(currentLocale);
+			}
 		}	
 	}
 	
