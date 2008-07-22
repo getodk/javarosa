@@ -38,10 +38,8 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String helpText;	 /* The help text. */
 	private String helpTextID;
 
-	/** String  -> String */
-	private SimpleOrderedHashtable selectItems;
-	/** String -> String */
-	private SimpleOrderedHashtable selectItemIDs;
+	private SimpleOrderedHashtable selectItems;  	/** String -> String */
+	private SimpleOrderedHashtable selectItemIDs;	/** String -> String */
 	private Vector selectItemsLocalizable;
 	
 	private boolean required; 	/** A flag to tell whether the question is to be answered or is optional. */
@@ -294,6 +292,8 @@ public class QuestionDef implements IFormElement, Localizable {
     	if (selectItemIDs != null) {
     		localizeSelectMap(localizer);
     	}
+    	
+    	alertStateObservers(QuestionStateListener.CHANGE_LOCALE);
     }
 	
 	public Vector getChildren () {
@@ -400,7 +400,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		observers.removeAllElements();
 	}
 	
-	private void alertStateObservers (int changeFlags) {
+	public void alertStateObservers (int changeFlags) {
 		for (Enumeration e = observers.elements(); e.hasMoreElements(); )
 			((QuestionStateListener)e.nextElement()).questionStateChanged(this, changeFlags);
 	}

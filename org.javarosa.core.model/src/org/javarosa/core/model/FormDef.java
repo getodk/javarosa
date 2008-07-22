@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
@@ -75,16 +76,15 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	
 	public void addChild (IFormElement fe) {
 		children.addElement(fe);
+		//if (localizer != null && localizer.getLocale() != null)
+		//	fe.localeChanged(localizer.getLocale(), localizer);
 	}
 	
 	public IFormElement getChild (int i) {
 		return (IFormElement)children.elementAt(i);
 	}
 	
-	//collapse all groups and assume a sequential list of questions
-	public QuestionDef getQuestion (int i) {
-		return null;
-	}
+	//need functions that provide means of walking the tree and intuitively accessing sub-children
 	
 	public String getName() {
 		return name;
@@ -121,6 +121,17 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	
 	public void setDataModel (IFormDataModel model) {
 		this.model = model;
+	}
+	
+	public IAnswerData getValue (QuestionDef question) {
+		return model.getDataValue(question.getBind());
+	}
+	
+	public void setValue (QuestionDef question, IAnswerData data) {
+		boolean updated = model.updateDataValue(question.getBind(), data);
+		if (updated) {
+			question.alertStateObservers(QuestionStateListener.CHANGE_DATA);
+		}
 	}
 	
 	public void setRecordId(int recordId) {
@@ -160,6 +171,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		this.descriptionTemplate = descriptionTemplate;
 	}
 	*/
+	
+	public void preProcess () {
+	//	for (Enumeration e = dataBindings.elements(); e.hasMoreElements(); ) {
+			
+	//	}
+	}
 	
 	public void localeChanged (String locale, Localizer localizer) {
 		for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
