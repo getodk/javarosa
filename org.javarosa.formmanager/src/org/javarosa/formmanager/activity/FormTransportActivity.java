@@ -20,7 +20,8 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
-import org.javarosa.core.model.FormData;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
@@ -70,12 +71,14 @@ public class FormTransportActivity implements
 	private Form urlForm;
 
 	private String destinationUrl;
+	
+	private IDataModelSerializingVisitor dataModelSerializer;
 
 	private TextField textField;
 
 	private IShell shell;
 
-	private FormData data;
+	private DataModelTree data;
 
 	private int currentMethod;
 	
@@ -190,6 +193,21 @@ public class FormTransportActivity implements
 	public Enumeration getTransportMessages(){
 
 		return JavaRosaServiceProvider.instance().getTransportManager().getMessages();
+	}
+
+	/**
+	 * @return the dataModelSerializer
+	 */
+	public IDataModelSerializingVisitor getDataModelSerializer() {
+		return dataModelSerializer;
+	}
+
+	/**
+	 * @param dataModelSerializer the dataModelSerializer to set
+	 */
+	public void setDataModelSerializer(
+			IDataModelSerializingVisitor dataModelSerializer) {
+		this.dataModelSerializer = dataModelSerializer;
 	}
 
 	/*
@@ -359,8 +377,9 @@ public class FormTransportActivity implements
 		}
 
 		if(this.data != null) {
-			JavaRosaServiceProvider.instance().getTransportManager().enqueue(this.data.toString().getBytes("UTF-8"),
-					destinationUrl, transportMethod,this.data.getRecordId());
+			byte[] dataBytes =  dataModelSerializer.serializeDataModel(data);
+			JavaRosaServiceProvider.instance().getTransportManager().enqueue(dataBytes,
+					destinationUrl, transportMethod,this.data.getFormReferenceId());
 		}else{
 			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,
 					AlertType.ERROR);
@@ -400,7 +419,7 @@ public class FormTransportActivity implements
 
 	}
 
-	public void setData(FormData data) {
+	public void setData(DataModelTree data) {
 		this.data = data;
 	}
 

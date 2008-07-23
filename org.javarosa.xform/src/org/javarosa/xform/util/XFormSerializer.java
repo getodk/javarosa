@@ -17,22 +17,32 @@ public class XFormSerializer {
 		KXmlSerializer serializer = new KXmlSerializer();
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
-		
-		try{
-			serializer.setOutput(dos,null);
+
+		try {
+			serializer.setOutput(dos, null);
 			doc.write(serializer);
 			serializer.flush();
 			return bos;
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-//	
-	///* SERIALIZATION CODE */
+
+	public static String getString(Document doc) {
+		ByteArrayOutputStream bos = getStream(doc);
+
+		byte[] byteArr = bos.toByteArray();
+		char[] charArray = new char[byteArr.length];
+		for (int i = 0; i < byteArr.length; i++)
+			charArray[i] = (char) byteArr[i];
+
+		return String.valueOf(charArray);
+	}
+
+	// /* SERIALIZATION CODE */
 	//
-	//public static String fromFormDef2Xform(FormDef formDef){
+	// public static String fromFormDef2Xform(FormDef formDef){
 //		Document doc = new Document();
 //		doc.setEncoding("UTF-8");
 //		Element htmlNode = doc.createElement("http://www.w3.org/1999/xhtml", null);
