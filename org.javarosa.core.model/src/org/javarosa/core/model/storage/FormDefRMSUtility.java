@@ -11,6 +11,12 @@ import javax.microedition.rms.RecordStoreNotOpenException;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
@@ -22,8 +28,10 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
  */
 public class FormDefRMSUtility extends RMSUtility {
 
-	private PrototypeFactory referenceFactory;
+	/** Prototypes for IDataReferences and IAnswerData */
+	private PrototypeFactory questionFactory;
 	
+	/** Prototypes for IDataModel */
 	private PrototypeFactory modelFactory;
 	
 	/**
@@ -190,19 +198,28 @@ public class FormDefRMSUtility extends RMSUtility {
 		return metaDataList;
 	}
 	
-	public PrototypeFactory getReferenceFactory() {
-		if(referenceFactory == null) { 
-			referenceFactory = new PrototypeFactory();
+	public PrototypeFactory getQuestionElementsFactory() {
+		if(questionFactory == null) { 
+			questionFactory = new PrototypeFactory();
+			addAnswerDataPrototype(new DateData());
+			addAnswerDataPrototype(new IntegerData());
+			addAnswerDataPrototype(new SelectMultiData());
+			addAnswerDataPrototype(new SelectOneData());
+			addAnswerDataPrototype(new StringData());
 		}
-		return referenceFactory; 
+		return questionFactory; 
 	}
 	
 	public void addReferencePrototype(IDataReference reference) {
-		getReferenceFactory().addNewPrototype(reference.getClass().getName(), reference.getClass());
+		getQuestionElementsFactory().addNewPrototype(reference.getClass().getName(), reference.getClass());
 	}
 	
-	public void clearReferenceFactory() {
-		referenceFactory = null;
+	public void addAnswerDataPrototype(IAnswerData answerData) {
+		getQuestionElementsFactory().addNewPrototype(answerData.getClass().getName(), answerData.getClass());
+	}
+	
+	public void clearQuestionElementsFactory() {
+		questionFactory = null;
 	}
 	
 	private PrototypeFactory getModelFactory() {

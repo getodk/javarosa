@@ -17,6 +17,14 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
 public class IntegerData implements IAnswerData {
 	Integer data;
 
+	/**
+	 * Empty Constructor, necessary for dynamic construction during deserialization.
+	 * Shouldn't be used otherwise.
+	 */
+	public IntegerData() {
+		
+	}
+	
 	public IntegerData(int i) {
 		setValue(i);
 	}

@@ -12,6 +12,14 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
 public class DateData implements IAnswerData {
 	Date d;
 	
+	/**
+	 * Empty Constructor, necessary for dynamic construction during deserialization.
+	 * Shouldn't be used otherwise.
+	 */
+	public DateData() {
+		
+	}
+	
 	public DateData (Date d) {
 		setValue(d);
 	}

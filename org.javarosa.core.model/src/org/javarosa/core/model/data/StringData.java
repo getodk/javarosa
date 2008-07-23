@@ -8,6 +8,14 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
 
 public class StringData implements IAnswerData {
 	String s;
+
+	/**
+	 * Empty Constructor, necessary for dynamic construction during deserialization.
+	 * Shouldn't be used otherwise.
+	 */
+	public StringData() {
+		
+	}
 	
 	public StringData (String s) {
 		setValue(s);

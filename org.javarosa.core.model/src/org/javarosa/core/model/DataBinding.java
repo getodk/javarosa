@@ -94,7 +94,7 @@ public class DataBinding  implements Externalizable {
 		String factoryName = in.readUTF();
 		
 		FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-		PrototypeFactory factory = fdrms.getReferenceFactory();
+		PrototypeFactory factory = fdrms.getQuestionElementsFactory();
 		ref = (IDataReference)factory.getNewInstance(factoryName);
 		if(ref == null) { 
 			throw new UnavailableExternalizerException("A reference prototype could not be found to deserialize a " +
