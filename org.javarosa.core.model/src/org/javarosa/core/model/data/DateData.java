@@ -1,7 +1,13 @@
 package org.javarosa.core.model.data;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 public class DateData implements IAnswerData {
 	Date d;
@@ -33,5 +39,22 @@ public class DateData implements IAnswerData {
 			day = "0" + day;
 
 		return day + "/" + month + "/" + year.substring(2,4);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+	 */
+	public void readExternal(DataInputStream in) throws IOException,
+			InstantiationException, IllegalAccessException,
+			UnavailableExternalizerException {
+		this.setValue(ExternalizableHelper.readDate(in));
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+	 */
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExternalizableHelper.writeDate(out, this.d);
 	}
 }

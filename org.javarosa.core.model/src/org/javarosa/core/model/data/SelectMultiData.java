@@ -1,6 +1,12 @@
 package org.javarosa.core.model.data;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Vector;
+
+import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 public class SelectMultiData implements IAnswerData {
 	Vector vs; //vector of Selection
@@ -33,5 +39,21 @@ public class SelectMultiData implements IAnswerData {
 		}		
 		
 		return str;
+	}
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+	 */
+	public void readExternal(DataInputStream in) throws IOException,
+			InstantiationException, IllegalAccessException,
+			UnavailableExternalizerException {
+		vs = ExternalizableHelper.readExternal(in, Selection.class);
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+	 */
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExternalizableHelper.writeExternal(vs, out);
 	}
 }
