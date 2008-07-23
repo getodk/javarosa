@@ -3,6 +3,7 @@ package org.javarosa.core.model.instance;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Enumeration;
 
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -36,6 +37,12 @@ public class DataModelTree implements IFormDataModel {
 	
 	/** The integer Id of the model */
 	private int id;
+	
+	/** The ID of the form that this is a model for */
+	private int formIdReference;
+	
+	/** The date that this model was taken and recorded */
+	private Date dateSaved;
 	
 	public DataModelTree() { 
 	}
@@ -160,6 +167,28 @@ public class DataModelTree implements IFormDataModel {
 		}
 	}
 	
+	public void setDateSaved(Date dateSaved) {
+		this.dateSaved = dateSaved;
+	}
+	
+	public void setFormReferenceId(int formIdReference) {
+		this.formIdReference = formIdReference;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.model.IFormDataModel#getDateSaved()
+	 */
+	public Date getDateSaved() {
+		return this.dateSaved;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.model.IFormDataModel#getFormReferenceId()
+	 */
+	public int getFormReferenceId() {
+		return this.formIdReference;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
@@ -167,7 +196,11 @@ public class DataModelTree implements IFormDataModel {
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		this.id = in.readInt();
+		this.formIdReference = in.readInt();
+		
 		this.name = ExternalizableHelper.readUTF(in);
+		
+		this.dateSaved = ExternalizableHelper.readDate(in);
 		
 		FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 		PrototypeFactory factory = fdrms.getQuestionElementsFactory();
@@ -194,7 +227,12 @@ public class DataModelTree implements IFormDataModel {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(this.id);
+		out.writeInt(this.formIdReference);
+		
 		ExternalizableHelper.writeUTF(out, this.name);
+		
+		ExternalizableHelper.writeDate(out, this.dateSaved);
+		
 		ExternalizingVisitor visitor = new ExternalizingVisitor(out);
 		this.accept(visitor);
 	}

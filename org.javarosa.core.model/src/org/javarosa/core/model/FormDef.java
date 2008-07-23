@@ -289,6 +289,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 				throw new UnavailableExternalizerException("FormDef was unable to deserialize the Model Template, " +
 						"due to a missing prototype. Please set the model to a prototype before deserialization.");
 			}
+			model.setFormReferenceId(this.getID());
 			model.readExternal(dis);
 
 			Localizer l = new Localizer();

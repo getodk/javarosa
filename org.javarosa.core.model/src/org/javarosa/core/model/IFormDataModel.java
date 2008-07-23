@@ -1,5 +1,7 @@
 package org.javarosa.core.model;
 
+import java.util.Date;
+
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.services.storage.utilities.Externalizable;
@@ -15,6 +17,22 @@ public interface IFormDataModel extends Externalizable {
 	 * @return The Id of this particular Model
 	 */
 	int getId();	
+	
+	/**
+	 * @return The id of the form that this is a model for.
+	 */
+	int getFormReferenceId();
+	
+	/**
+	 * @return The date that this data model was filled out and saved
+	 */
+	Date getDateSaved();
+	
+	/**
+	 * @param formIdReference The id of the form that this is a model for.
+	 */
+	public void setFormReferenceId(int formIdReference);
+
 	
 	/**
 	 * Updates the data value associated with the reference that is passed in.
