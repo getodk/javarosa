@@ -33,7 +33,7 @@ public class DataModelTreeRMSUtility extends RMSUtility {
 	 * @return The unique name to be used to register this utility
 	 */
 	public static String getUtilityName() {
-		return "Data Model Tree RMS Utility";
+		return "Data Tree RMS Utility";
 	}
 	
 	/**

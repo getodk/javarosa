@@ -1,6 +1,7 @@
 package org.javarosa.model.xform;
 
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -109,12 +110,10 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.IDataModelSerializingVisitor#serializeDataModel(org.javarosa.core.model.IFormDataModel)
 	 */
-	public DataOutputStream serializeDataModel(IFormDataModel model) {
+	public byte[] serializeDataModel(IFormDataModel model) throws IOException {
 		model.accept(this);
 		if(theXmlDoc != null) {
-			//TODO: Enable parsing again
-			DataOutputStream dos = new DataOutputStream(XFormSerializer.getStream(theXmlDoc));
-			return dos;
+			return XFormSerializer.getString(theXmlDoc).getBytes("UTF-8");
 		}
 		else {
 			return null;

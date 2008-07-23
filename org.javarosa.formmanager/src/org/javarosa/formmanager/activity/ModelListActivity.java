@@ -34,8 +34,9 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.storage.FormDataMetaData;
-import org.javarosa.core.model.storage.FormDataRMSUtility;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.storage.DataModelTreeMetaData;
+import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -83,7 +84,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 		this.createView();
 	}
 
-    private FormDataRMSUtility formDataRMSUtility;
+    private DataModelTreeRMSUtility dataModelRMSUtility;
     private FormDefRMSUtility formDefRMSUtility;
     private IShell mainShell;
     private Vector modelIDs;
@@ -98,9 +99,9 @@ public class ModelListActivity extends List implements CommandListener, IActivit
     {
         super("Saved Forms", List.EXCLUSIVE);
         this.mainShell = mainShell;
-        this.formDataRMSUtility = (FormDataRMSUtility) JavaRosaServiceProvider
+        this.dataModelRMSUtility = (DataModelTreeRMSUtility) JavaRosaServiceProvider
 				.instance().getStorageManager().getRMSStorageProvider()
-				.getUtility(FormDataRMSUtility.getUtilityName());
+				.getUtility(DataModelTreeRMSUtility.getUtilityName());
 		this.formDefRMSUtility = (FormDefRMSUtility) JavaRosaServiceProvider
 				.instance().getStorageManager().getRMSStorageProvider()
 				.getUtility(FormDefRMSUtility.getUtilityName());
@@ -135,7 +136,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
             	if (this.getSelectedIndex() == -1) {
             		//error
             	} else {
-            		FormDataMetaData data = (FormDataMetaData) modelIDs.elementAt(this.getSelectedIndex());
+            		DataModelTreeMetaData data = (DataModelTreeMetaData) modelIDs.elementAt(this.getSelectedIndex());
             		FormDef selectedForm = new FormDef();
         			//#if debug.output==verbose
             		System.out.println("Attempt retreive: "+data.getFormIdReference());
@@ -144,8 +145,8 @@ public class ModelListActivity extends List implements CommandListener, IActivit
         			//#if debug.output==verbose
             		System.out.println("Form retrieve OK\nAttempt retreive model: "+data.getRecordId());
             		//#endif
-            		FormData formData = new FormData();
-            		this.formDataRMSUtility.retrieveFromRMS(data.getRecordId(), formData);
+            		DataModelTree formData = new DataModelTree();
+            		this.dataModelRMSUtility.retrieveFromRMS(data.getRecordId(), formData);
             		selectedForm.setName(this.formDefRMSUtility.getName(data.getFormIdReference()));
             		Hashtable formEditArgs = new Hashtable();
             		formEditArgs.put(returnKey, CMD_EDIT);
@@ -162,10 +163,10 @@ public class ModelListActivity extends List implements CommandListener, IActivit
         } else if (c == CMD_SEND)
         {
             if (this.getSelectedIndex() != -1) {
-            	FormDataMetaData data = (FormDataMetaData) modelIDs.elementAt(this.getSelectedIndex());
+            	DataModelTreeMetaData data = (DataModelTreeMetaData) modelIDs.elementAt(this.getSelectedIndex());
             	FormData model = new FormData();
                 try {
-                    this.formDataRMSUtility.retrieveFromRMS(data.getRecordId(), model);
+                    this.dataModelRMSUtility.retrieveFromRMS(data.getRecordId(), model);
                     model.setRecordId(data.getRecordId());
                 } catch (IOException e) {
                     javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
@@ -192,15 +193,15 @@ public class ModelListActivity extends List implements CommandListener, IActivit
             }
         } else if (c == CMD_EMPTY)
         {
-        	this.formDataRMSUtility.tempEmpty();
+        	this.dataModelRMSUtility.tempEmpty();
             createView();
         } else if (c == CMD_BACK)
         {
         	mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
         } else if (c == CMD_DELETE)
         {
-        	FormDataMetaData data = (FormDataMetaData) modelIDs.elementAt(this.getSelectedIndex());
-            formDataRMSUtility.deleteRecord(data.getRecordId());
+        	DataModelTreeMetaData data = (DataModelTreeMetaData) modelIDs.elementAt(this.getSelectedIndex());
+            dataModelRMSUtility.deleteRecord(data.getRecordId());
             this.createView();
         } else if (c == CMD_MSGS)
         {	
@@ -218,8 +219,8 @@ public class ModelListActivity extends List implements CommandListener, IActivit
     public void populateListWithModels()
     {
 
-    	this.formDataRMSUtility.open();
-    	RecordEnumeration recordEnum = this.formDataRMSUtility.enumerateMetaData();
+    	this.dataModelRMSUtility.open();
+    	RecordEnumeration recordEnum = this.dataModelRMSUtility.enumerateMetaData();
     	modelIDs = new Vector();
     	int pos =0;
     	while(recordEnum.hasNextElement())
@@ -228,8 +229,8 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 			try {
 
 				i = recordEnum.nextRecordId();
-				FormDataMetaData mdata = new FormDataMetaData();
-				this.formDataRMSUtility.retrieveMetaDataFromRMS(i,mdata);
+				DataModelTreeMetaData mdata = new DataModelTreeMetaData();
+				this.dataModelRMSUtility.retrieveMetaDataFromRMS(i,mdata);
 				// TODO fix it so that record id is part of the metadata serialization
 				mdata.setRecordId(i);
 

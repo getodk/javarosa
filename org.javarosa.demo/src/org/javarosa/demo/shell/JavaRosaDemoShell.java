@@ -1,6 +1,5 @@
 package org.javarosa.demo.shell;
 
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
 import java.util.Vector;
@@ -15,10 +14,9 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
-import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.storage.FormDataRMSUtility;
+import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.WorkflowStack;
@@ -32,8 +30,8 @@ import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
+import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
-import org.javarosa.properties.PropertyManager;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.xform.util.XFormUtils;
 
@@ -72,6 +70,7 @@ public class JavaRosaDemoShell implements IShell {
 		this.splashScreen = new SplashScreenModule(this, "/splash.gif");
 		this.formListActivity = new FormListActivity(this,"Forms List");
 		this.formTransport = new FormTransportActivity(this);
+		formTransport.setDataModelSerializer(new XFormSerializingVisitor());
 		this.modelActivity = new ModelListActivity(this);
 		this.entryActivity  = new FormEntryActivity(this, new FormEntryViewFactory());
 		
@@ -87,7 +86,7 @@ public class JavaRosaDemoShell implements IShell {
 		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 		
-		FormDataRMSUtility formData = new FormDataRMSUtility(FormDataRMSUtility.getUtilityName());
+		DataModelTreeRMSUtility formData = new DataModelTreeRMSUtility(DataModelTreeRMSUtility.getUtilityName());
 		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
 		formDef.addModelPrototype(new DataModelTree());
 		formDef.addReferencePrototype(new XPathReference());
@@ -139,15 +138,15 @@ public class JavaRosaDemoShell implements IShell {
 					if (returnVal == ModelListActivity.CMD_EDIT) {
 						// Load the Form Entry Activity, and feed it the form data
 						FormDef form = (FormDef) returnVals.get("form");
-						FormData data = (FormData) returnVals.get("data");
+						DataModelTree data = (DataModelTree) returnVals.get("data");
 						FormEntryContext newContext = new FormEntryContext(context);
 						newContext.setFormID(form.getID());
-						newContext.setInstanceID(data.getRecordId());
+						newContext.setInstanceID(data.getFormReferenceId());
 						currentActivity = this.modelActivity;
 						this.modelActivity.start(newContext);
 					}
 					if (returnVal == ModelListActivity.CMD_SEND) {
-						FormData data = (FormData) returnVals.get("data");
+						DataModelTree data = (DataModelTree) returnVals.get("data");
 						formTransport.setData(data);
 						TransportContext msgContext = new TransportContext(
 								context);
