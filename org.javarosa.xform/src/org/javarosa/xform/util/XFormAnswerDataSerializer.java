@@ -14,7 +14,7 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.utils.DateUtils;
 
 /**
- * The XFormAnswerDataSerializer taks in AnswerData objects, and provides
+ * The XFormAnswerDataSerializer takes in AnswerData objects, and provides
  * an XForms compliant (String or Element) representation of that AnswerData.
  * 
  * By default, this serializer can properly operate on StringData, DateData
