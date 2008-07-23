@@ -68,6 +68,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
 
     public void destroy () {
+    	for (int i = 0; i < size(); i++) {
+    		((ChatterboxWidget)get(i)).destroy();
+    	}
+    	
     	model.unregisterObservable(this);
     }
     
@@ -258,8 +262,6 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }    
     
     public void keyPressed(int keyCode) {
-    	super.keyPressed(keyCode);
-
     	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
     		controller.cycleLanguage();
     	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
@@ -267,6 +269,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		if (widget != null)
     			/* widget.UIHack(UIHACK_SELECT_PRESS) */;
     	}
+    	
+    	super.keyPressed(keyCode);
     }
 
     //good utility function
