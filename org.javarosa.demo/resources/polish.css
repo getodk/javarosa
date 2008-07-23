@@ -75,7 +75,7 @@ focused{
 	margin-right: 1;
 }
 
-choiceGroup extends textBox {
+.choiceGroup extends textBox {
 	
 }
 
@@ -166,7 +166,10 @@ rightcommand {
 	layout: right;
 }
 
-.blah { }
+.container {
+	columns: 1;
+	layout: expand | vshrink;
+}
 
 .split {
 	columns: 3; /* really two columns, with a null item prepended */
