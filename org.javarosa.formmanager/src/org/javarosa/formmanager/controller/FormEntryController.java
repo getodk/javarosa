@@ -4,7 +4,6 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.IFormEntryView;
 
