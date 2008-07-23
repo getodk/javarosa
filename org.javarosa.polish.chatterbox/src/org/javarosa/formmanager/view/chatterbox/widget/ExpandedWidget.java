@@ -1,12 +1,12 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import de.enough.polish.ui.Item;
-import de.enough.polish.ui.StringItem;
-
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 
 import de.enough.polish.ui.Container;
+import de.enough.polish.ui.Item;
+import de.enough.polish.ui.StringItem;
+import de.enough.polish.ui.UiAccess;
 
 public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	private StringItem prompt;
@@ -17,11 +17,14 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	}
 
 	public void initWidget (QuestionDef question, Container c) {
+		//#style container
+		UiAccess.setStyle(c); //it is dubious whether this works properly; Chatterbox.babysitStyles() takes care of this for now
+		
 		//#style questiontext
 		prompt = new StringItem(null, null);
 		entryWidget = getEntryWidget(question);
 		//#style textBox
-		entryWidget.setStyle(); //polish pre-processing turns this into a valid method call
+		UiAccess.setStyle(entryWidget);
 		
 		c.add(prompt);
 		c.add(entryWidget);
@@ -47,6 +50,14 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	public boolean focus () {
 		//do nothing special
 		return false;
+	}
+	
+	public int getNextMode () {
+		return ChatterboxWidget.NEXT_ON_MANUAL;
+	}
+	
+	public Item getInteractiveWidget () {
+		return entryWidget;
 	}
 	
 	protected abstract Item getEntryWidget (QuestionDef question);

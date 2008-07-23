@@ -3,10 +3,17 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.ui.ChoiceGroup;
 
 public class ChatterboxWidgetFactory {
+	Chatterbox cbox;
+	
+	public ChatterboxWidgetFactory (Chatterbox cbox) {
+		this.cbox = cbox;
+	}
+	
 	public ChatterboxWidget getWidget (QuestionDef question, FormDef form, int initViewState) {
 		IWidgetStyle collapsedStyle = null;
 		IWidgetStyleEditable expandedStyle = null;
@@ -52,7 +59,6 @@ public class ChatterboxWidgetFactory {
 		if (collapsedStyle == null || expandedStyle == null)
 			throw new IllegalStateException("No appropriate widget to render question");
 		
-		//#style blah
-		return new ChatterboxWidget(question, form, initViewState, collapsedStyle, expandedStyle);
+		return new ChatterboxWidget(cbox, question, form, initViewState, collapsedStyle, expandedStyle);
 	}
 }

@@ -2,11 +2,11 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.util.Vector;
 
-import de.enough.polish.ui.ChoiceGroup;
-
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.Selection;
+
+import de.enough.polish.ui.ChoiceGroup;
 
 public class SelectMultiEntryWidget extends SelectEntryWidget {
 	public SelectMultiEntryWidget () {

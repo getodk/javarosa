@@ -18,6 +18,10 @@ public class TextEntryWidget extends ExpandedWidget {
 		this.inputMode = inputMode;
 	}
 	
+	public int getNextMode () {
+		return ChatterboxWidget.NEXT_ON_SELECT;
+	}
+	
 	protected Item getEntryWidget (QuestionDef question) {
 		//#style textBox
 		TextField tf = new TextField("", "", 200, TextField.ANY);
