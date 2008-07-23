@@ -76,6 +76,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			theForm = new FormDef();
 			try {
 				utility.retrieveFromRMS(this.context.getFormID(),theForm);
+				//what about preloading with a saved instance?
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -118,7 +119,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	}
 	
 	public void destroy () {
-		//initiate destory of m v c
+		
 	}
 	
 	public void setDisplay (Displayable d) {
@@ -126,6 +127,9 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	}
 	
 	public void controllerReturn (String status) {
+		if ("exit".equals(status)) {
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+		}
 	}
 	
 	public void commandAction(Command command, Displayable display) {

@@ -2,8 +2,12 @@ package org.javarosa.formmanager.controller;
 
 import javax.microedition.lcdui.Displayable;
 
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
+import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.IFormEntryView;
 
@@ -65,11 +69,19 @@ public class FormEntryController {
 	
 	public void save () {
 		//do form post-processing here
+		
+		//DataModelTreeRMSUtility utility = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
+
+		
+		//theForm = new FormDef();
+		//try {
+		//	utility.retrieveFromRMS(this.context.getFormID(),theForm);
+
 	}
 	
 	public void exit () {
-		view.destroy(); //?
-		parent.controllerReturn("all done!");
+		view.destroy();
+		parent.controllerReturn("exit");
 	}
 	
 	public void startOver () {
