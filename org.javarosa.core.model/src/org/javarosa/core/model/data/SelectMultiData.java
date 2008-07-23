@@ -11,6 +11,14 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
 public class SelectMultiData implements IAnswerData {
 	Vector vs; //vector of Selection
 	
+	/**
+	 * Empty Constructor, necessary for dynamic construction during deserialization.
+	 * Shouldn't be used otherwise.
+	 */
+	public SelectMultiData() {
+		
+	}
+	
 	public SelectMultiData (Vector vs) {
 		setValue(vs);
 	}

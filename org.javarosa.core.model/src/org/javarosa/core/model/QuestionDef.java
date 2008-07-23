@@ -337,7 +337,7 @@ public class QuestionDef implements IFormElement, Localizable {
 			String className = dis.readUTF();
 
 			FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-			PrototypeFactory factory = fdrms.getReferenceFactory();
+			PrototypeFactory factory = fdrms.getQuestionElementsFactory();
 			binding = (IDataReference)factory.getNewInstance(className);
 			if(binding == null) { 
 				throw new UnavailableExternalizerException("A reference prototype could not be found to deserialize a " +

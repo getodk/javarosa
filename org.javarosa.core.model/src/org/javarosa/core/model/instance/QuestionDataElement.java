@@ -9,7 +9,6 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
-import org.javarosa.core.util.Map;
 
 /**
  * QuestionDataElement is a TreeElement of a DataModelTree that is a leaf which
@@ -167,6 +166,18 @@ public class QuestionDataElement extends TreeElement {
 					"template available to deserialize the stored reference");
 		}
 		reference.readExternal(in);
+		if(in.readBoolean() == false) {
+			value = null;
+		} else {
+			String valueName = in.readUTF();
+			value = (IAnswerData)this.getRoot().getFactory().getNewInstance(valueName);
+			if(value == null) {
+				throw new UnavailableExternalizerException(
+						"Attempt to resolve serialization for a DataModelTree failed because there was no answerdata " +
+						"template available to deserialize the stored answer data of type " + valueName);
+			}
+			value.readExternal(in);
+		}
 	}
 
 	/*
@@ -181,5 +192,13 @@ public class QuestionDataElement extends TreeElement {
 		ExternalizableHelper.writeUTF(out, this.name);
 		out.writeUTF(reference.getClass().getName());
 		reference.writeExternal(out);
+		if(value == null) {
+			out.writeBoolean(false);
+		}
+		else {
+			out.writeBoolean(true);
+			out.writeUTF(value.getClass().getName());
+			value.writeExternal(out);
+		}
 	}
 }

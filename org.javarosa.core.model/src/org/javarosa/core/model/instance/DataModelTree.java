@@ -170,7 +170,7 @@ public class DataModelTree implements IFormDataModel {
 		this.name = ExternalizableHelper.readUTF(in);
 		
 		FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-		PrototypeFactory factory = fdrms.getReferenceFactory();
+		PrototypeFactory factory = fdrms.getQuestionElementsFactory();
 		
 		boolean group = in.readBoolean();
 		if(group) {
