@@ -1,5 +1,6 @@
 package org.javarosa.xform.parse;
 
+import java.io.OutputStream;
 import java.io.Reader;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -637,7 +638,6 @@ public class XFormParser {
 		
 		return text;
 	}
-	
 //	private static void addSkipRules(FormDef formDef, Hashtable map, Hashtable relevants){
 //		Vector rules = new Vector();
 //		//Rules is vector of strings that contain the "relevant=" thing
