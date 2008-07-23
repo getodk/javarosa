@@ -21,13 +21,16 @@ import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 
 import de.enough.polish.ui.Alert;
 import de.enough.polish.ui.FramedForm;
-import de.enough.polish.ui.Item;
+import de.enough.polish.ui.UiAccess;
 
 public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryModelListener, CommandListener {
 	private static final int INDEX_NOT_SET = -1;
 	private static final int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
 	private static final String PROMPT_REQUIRED_QUESTION = "Required question; you must answer";
+	
+    public static final int KEY_CENTER_LETS_HOPE = -5;
+    public static final int UIHACK_SELECT_PRESS = 1;
 	
 	private FormEntryController controller;
     private FormEntryModel model;
@@ -38,7 +41,6 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     private int activeQuestionIndex;
     
     //GUI elements
-    private Command selectCommand;
     private Command backCommand;
     private Command exitNoSaveCommand;
     private Command exitSaveCommand;
@@ -55,7 +57,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	this.controller = controller;
     	controller.setView(this);
 
-    	widgetFactory = new ChatterboxWidgetFactory();
+    	widgetFactory = new ChatterboxWidgetFactory(this);
     	multiLingual = (model.getForm().getLocalizer() != null);
     	questionIndexes = new SortedIntSet();
     	activeQuestionIndex = INDEX_NOT_SET;
@@ -80,7 +82,6 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
     
     private void setUpCommands () {
-        selectCommand = new Command("Select", Command.SCREEN, 1);
         backCommand = new Command("Back", Command.BACK, 2);
         exitNoSaveCommand = new Command("Exit", Command.EXIT, 4);
         exitSaveCommand = new Command("Save and Exit", Command.SCREEN, 4);
@@ -91,7 +92,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
         	populateLanguages();
         }
         
-        addCommand(selectCommand);
+        //next command is added on a per-widget basis
         addCommand(backCommand);
         addCommand(exitNoSaveCommand);        
         addCommand(exitSaveCommand);
@@ -151,6 +152,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		        	
     		progressBar.setValue(questionIndex);
     	}
+    	
+    	babysitStyles();
     }
     
     //create a frame for a question and show it at the appropriate place in the form
@@ -180,6 +183,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     
     public void formComplete () {
     	activeFrame().setViewState(ChatterboxWidget.VIEW_COLLAPSED);
+    	babysitStyles();
+		progressBar.setValue(model.getNumQuestions());
     	//notify controller about being done
     }
     
@@ -191,14 +196,29 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		return (ChatterboxWidget)get(frameIndex);
     }
     
-    public void commandAction(Command command, Displayable s) {
-    	if (command == selectCommand) {
-    		ChatterboxWidget frame = activeFrame();
+    //probably not the most efficient way of doing this...
+    private void babysitStyles () {
+    	for (int i = 0; i < size(); i++) {
+    		ChatterboxWidget cw = (ChatterboxWidget)get(i);
     		
-    		if (controller.questionAnswered(frame.getQuestion(), frame.getData()) == FormEntryController.QUESTION_REQUIRED_BUT_EMPTY) {
-    			showError(null, PROMPT_REQUIRED_QUESTION);
+    		switch (cw.getViewState()) {
+    		case ChatterboxWidget.VIEW_COLLAPSED:
+    			//#style split
+    			UiAccess.setStyle(cw);
+    			break;
+    		case ChatterboxWidget.VIEW_EXPANDED:
+    			//#style container
+    			UiAccess.setStyle(cw);
+    			break;
     		}
-    	} else if (command == backCommand) {
+    	}
+    }
+    
+    public void commandAction(Command command, Displayable s) {
+    	System.out.println("cbox: command action");
+    	
+    	if (command == backCommand) {
+    		System.out.println("back");
     		controller.stepQuestion(false);
     	} else if (command == exitNoSaveCommand) {
     		controller.exit();
@@ -222,25 +242,31 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			System.err.println("Chatterbox: Unknown command event received [" + command.getLabel() + "]");
     		}
     	}
-    }    	
+    }
 
-    //we might need this
-    public void itemStateChanged (Item item) {
-    //	if (item instanceof ChatterboxWidget && (ChatterboxWidget)item == activeFrame() /*&& autoPlayable()*/) {
-    //		commandAction(selectCommand, this); //calling into another event handler is bad form
-    //	}
+    public void questionAnswered () {
+    	ChatterboxWidget frame = activeFrame();
+	
+    	if (controller.questionAnswered(frame.getQuestion(), frame.getData()) == FormEntryController.QUESTION_REQUIRED_BUT_EMPTY) {
+    		showError(null, PROMPT_REQUIRED_QUESTION);
+    	}
     }
     
     public void questionIndexChanged (int questionIndex) {
     	if (questionIndex != INDEX_NOT_SET)
     		jumpToQuestion(questionIndex);
     }    
-
+    
     public void keyPressed(int keyCode) {
     	super.keyPressed(keyCode);
 
-    	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE)
+    	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
     		controller.cycleLanguage();
+    	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
+    		ChatterboxWidget widget = activeFrame();
+    		if (widget != null)
+    			/* widget.UIHack(UIHACK_SELECT_PRESS) */;
+    	}
     }
 
     //good utility function
@@ -254,4 +280,3 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 }
     
 //display send now? screens -- these belong outside chatterbox, activity's responsibility to overlay on finished chatterbox displayable
-//itemstatelistener? autoplayability

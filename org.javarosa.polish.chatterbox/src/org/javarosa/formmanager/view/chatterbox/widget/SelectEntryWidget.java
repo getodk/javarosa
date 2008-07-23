@@ -1,9 +1,9 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import org.javarosa.core.model.QuestionDef;
+
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.Item;
-
-import org.javarosa.core.model.QuestionDef;
 
 public abstract class SelectEntryWidget extends ExpandedWidget {
 	private int style;

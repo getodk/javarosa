@@ -2,14 +2,18 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.util.Date;
 
-import de.enough.polish.ui.DateField;
-import de.enough.polish.ui.Item;
-
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 
+import de.enough.polish.ui.DateField;
+import de.enough.polish.ui.Item;
+
 public class DateEntryWidget extends ExpandedWidget {
+	public int getNextMode () {
+		return ChatterboxWidget.NEXT_ON_ENTRY;
+	}
+	
 	protected Item getEntryWidget (QuestionDef question) {
 		//#style textBox
 		return new DateField(null, DateField.DATE);

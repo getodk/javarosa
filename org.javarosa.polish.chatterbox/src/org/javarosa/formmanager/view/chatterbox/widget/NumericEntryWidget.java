@@ -1,9 +1,9 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import org.javarosa.core.model.QuestionDef;
+
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.TextField;
-
-import org.javarosa.core.model.QuestionDef;
 
 public class NumericEntryWidget extends TextEntryWidget {	
 	protected Item getEntryWidget (QuestionDef question) {

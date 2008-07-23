@@ -1,11 +1,11 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import de.enough.polish.ui.StringItem;
-
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 
 import de.enough.polish.ui.Container;
+import de.enough.polish.ui.StringItem;
+import de.enough.polish.ui.UiAccess;
 
 /**
  * Default read-only view of a question: a single frame with question QuestionDef (abbreviated) on the left/top and 
@@ -26,7 +26,7 @@ public class CollapsedWidget implements IWidgetStyle {
 
 	public void initWidget (QuestionDef question, Container c) {
 		//#style split
-		c.setStyle(); //polish pre-processing turns this into a valid method call
+		UiAccess.setStyle(c); //it is dubious whether this works properly; Chatterbox.babysitStyles() takes care of this for now
 
 		//#style splitleft
 		prompt = new StringItem(null, null);
