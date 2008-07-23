@@ -41,6 +41,7 @@ public class XFormParser {
 	private static boolean modelFound;
 	private static Hashtable bindingsByID;
 	private static Hashtable bindingsByRef;
+	private static Element instanceNode;
 	
 	static {
 		initProcessingRules();
@@ -117,6 +118,7 @@ public class XFormParser {
 		modelFound = false;
 		bindingsByID = new Hashtable();
 		bindingsByRef = new Hashtable();
+		instanceNode = null;
 	}
 		
 	public static FormDef getFormDef (Reader reader) {
@@ -156,6 +158,10 @@ public class XFormParser {
 		parseElement(formDef, doc.getRootElement(), formDef, topLevelHandlers);
 		
 //		addSkipRules(formDef,id2VarNameMap,relevants);
+		
+		if(instanceNode != null) {
+			parseInstance(formDef, instanceNode);
+		}
 		
 		initStateVars();
 		
@@ -204,7 +210,10 @@ public class XFormParser {
 			if ("itext".equals(childName)) {
 				parseIText(f, child);
 			} else if ("instance".equals(childName)) {
-				parseInstance(f, child);
+				//Remove the parsing of instance nodes here in favor of parsing them
+				//at the end of the process. That will allow us to properly deal with
+				//bind types. ctsims@dimagi.com - Jul 23, 2008
+				instanceNode = child;
 			} else if ("bind".equals(childName)) {
 				parseBind(f, child);
 			} else {
