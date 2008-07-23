@@ -10,12 +10,14 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
@@ -535,17 +537,45 @@ public class XFormParser {
 		int childNum = node.getChildCount();
 
 		TreeElement element;
-		if(childNum == 0) {
-			XPathReference reference = new XPathReference(currentPath + node.getName());
+		XPathReference reference = new XPathReference(currentPath+ node.getName());
+
+		if (bindingsByRef.containsKey(reference)) {
+			DataBinding binding = (DataBinding)bindingsByRef.get(reference);
+			// This node, and its children represent some sort of Question
 			element = new QuestionDataElement(node.getName(), reference);
+			((QuestionDataElement)element).setValue(XFormAnswerDataParser.getAnswerData(binding, node));
 		} else {
-			element = new QuestionDataGroup(node.getName());
-			for(int i = 0 ; i  < childNum ; ++i ) {
-				if (node.getType(i) != Node.ELEMENT)
-					continue;
+			if (childNum == 0) {
+				// There's no binding, but this is also a Question Data
+				element = new QuestionDataElement(node.getName(), reference);
+			} else if(childNum ==1 ) {
+				//This is potentially a data element, depending on the child's type
+				if(node.getType(0) == Node.TEXT) {
+					//Data Element
+					element = new QuestionDataElement(node.getName(), reference);
+					((QuestionDataElement)element).setValue(new StringData((String)node.getChild(0)));
+				}
+				else {
+					element = new QuestionDataGroup(node.getName());
+					String newPath = currentPath + node.getName() + "/";
+					((QuestionDataGroup)element).addChild(parseInstanceNodes(
+							node.getElement(0), newPath));
+				}
 				
-				String newPath = currentPath + node.getName() + "/";
-				((QuestionDataGroup)element).addChild(parseInstanceNodes(node.getElement(i), newPath));
+			} else {
+				//This is a Group of elements, and has no bindings, so its
+				//children are responsible for the rest.
+				element = new QuestionDataGroup(node.getName());
+				
+				for (int i = 0; i < childNum; ++i) {
+					if (node.getType(i) != Node.ELEMENT) {
+						continue;
+					} else {
+						String newPath = currentPath + node.getName() + "/";
+						((QuestionDataGroup)element).addChild(parseInstanceNodes(
+										node.getElement(i), newPath));
+					}
+				}
 			}
 		}
 		return element;
