@@ -1,6 +1,5 @@
 package org.javarosa.model.xform;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -13,6 +12,7 @@ import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
+import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xform.util.XFormSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
@@ -45,7 +45,6 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	 */
 	public void visit(DataModelTree tree) {
 		theXmlDoc = new Document();
-		tree.accept(this);
 		parentList = new Hashtable();
 		parentList.put(tree.getRootElement(), theXmlDoc);
 	}
@@ -61,6 +60,9 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 		text.setName(element.getName()); 
 		//(I think that the below is right. I could be very wrong, and it could
 		//require us to create a new element, instead of throwing the string in)
+		if(serializer == null) {
+			throw new NullPointerException("No Answer Data Serializer Could be Found to Serialize Answers");
+		}
 		Object serializedAnswerData = serializer.serializeAnswerData(element.getValue());
 		if(serializedAnswerData.getClass() == String.class) {
 			text.addChild(Element.TEXT, serializedAnswerData);
@@ -111,6 +113,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	 * @see org.javarosa.core.model.utils.IDataModelSerializingVisitor#serializeDataModel(org.javarosa.core.model.IFormDataModel)
 	 */
 	public byte[] serializeDataModel(IFormDataModel model) throws IOException {
+		this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
 		model.accept(this);
 		if(theXmlDoc != null) {
 			return XFormSerializer.getString(theXmlDoc).getBytes("UTF-8");
@@ -126,7 +129,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	 */
 	public void visit(IFormDataModel dataModel) {
 		if(dataModel.getClass() == DataModelTree.class) {
-			((DataModelTree)dataModel).accept(this); 
+			this.visit((DataModelTree)dataModel); 
 		}
 	}
 	

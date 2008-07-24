@@ -3,6 +3,8 @@ package org.javarosa.formmanager.activity;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.microedition.lcdui.AlertType;
@@ -26,8 +28,12 @@ import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.formmanager.utility.TransportContext;
+import org.javarosa.formmanager.view.SubmitScreen;
+import org.javarosa.formmanager.view.SubmitStatusScreen;
 
 /**
+ *
+ * TODO: This Activity needs to have most of its functionality delegated out to a controller. Badly.
  *
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
@@ -53,6 +59,12 @@ public class FormTransportActivity implements
 	 *
 	 */
 	private TextBox messageDetailTextBox;
+	
+	private SubmitScreen submitScreen;
+	
+	private SubmitStatusScreen submitStatusScreen;
+	
+	int counter;
 
 	private static final Command CMD_BACK = new Command("Back", Command.BACK, 1);
 	private static final Command CMD_OK = new Command("OK", Command.OK, 1);
@@ -64,7 +76,7 @@ public class FormTransportActivity implements
 			Command.SCREEN, 1);
 
 	private static final Command CMD_DELETEMSG = new Command("Delete message",Command.SCREEN,1);
-
+	
 	/**
 	 *
 	 */
@@ -93,6 +105,8 @@ public class FormTransportActivity implements
 	public static final String VIEW_MODELS = "viewmodels";
 	
 	String task;
+	
+	Timer timer;
 	
 	/*
 	 * (non-Javadoc)
@@ -168,7 +182,9 @@ public class FormTransportActivity implements
 			shell.setDisplay(this, messageList);
 		}
 		else if(task.equals(TransportContext.SEND_DATA)) {
-			showURLform();
+			submitScreen = new SubmitScreen();
+			submitScreen.setCommandListener(this);
+			shell.setDisplay(this,submitScreen);
 		}
 		}
 
@@ -298,6 +314,24 @@ public class FormTransportActivity implements
 						selected, JavaRosaServiceProvider.instance().getTransportManager().getMessages());
 				JavaRosaServiceProvider.instance().getTransportManager().send(message, TransportMethod.HTTP_GCF);
 			}
+		} else if (d == submitScreen) {
+			switch(submitScreen.getCommandChoice()) {
+			case SubmitScreen.SEND_NOW_DEFAULT:
+				try {
+					sendData(currentMethod);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+				break;
+			case SubmitScreen.SEND_NOW_SPEC:
+				this.showURLform();
+				break;
+			case SubmitScreen.SEND_LATER:
+				//If we're going to send later, no reason to be in the transport activity
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+				break;
+			}
 		}
 		else if (d == urlForm) {
 			if (c == CMD_BACK) {
@@ -305,15 +339,14 @@ public class FormTransportActivity implements
 			} else if (c == CMD_OK) {
 				processURLform();
 				try {
-				if(currentMethod == TransportMethod.HTTP_GCF)
-					sendData(TransportMethod.HTTP_GCF);
-				else if (currentMethod == TransportMethod.FILE)
-					sendData(TransportMethod.FILE);
+					sendData(currentMethod);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 			}
+		} else if(d == submitStatusScreen) {
+			shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 		}
 	}
 
@@ -330,7 +363,6 @@ public class FormTransportActivity implements
 	public void showURLform(CommandListener listener) {
 		urlForm = new Form ("URL");
 		destinationUrl = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty("PostURL");
-		//TODO: Put this back in once we 
 		textField = new TextField("Please enter destination string",
 				destinationUrl,140,TextField.URL);
 		urlForm.append(textField);
@@ -385,7 +417,16 @@ public class FormTransportActivity implements
 					AlertType.ERROR);
 			shell.setDisplay(this, this.mainMenu);
 		}
-
+		submitStatusScreen = new SubmitStatusScreen();
+		submitStatusScreen.setCommandListener(this);
+		timer = new Timer();
+		timer.schedule(new TimerTask () {
+			public void run () {
+				counter += SubmitStatusScreen.REFRESH_INTERVAL;
+				submitStatusScreen.updateStatus(data.getId());
+			}
+		}, SubmitStatusScreen.REFRESH_INTERVAL, SubmitStatusScreen.REFRESH_INTERVAL);
+		shell.setDisplay(this, submitStatusScreen);
 	}
 
 	/*
@@ -421,6 +462,18 @@ public class FormTransportActivity implements
 
 	public void setData(DataModelTree data) {
 		this.data = data;
+	}
+	
+	public int getSubmitStatus(int recordId) {
+    	
+    	Enumeration qMessages = JavaRosaServiceProvider.instance().getTransportManager().getMessages();
+    	TransportMessage message;
+    	while(qMessages.hasMoreElements()) {
+    		message = (TransportMessage) qMessages.nextElement();
+    		if(message.getModelId() == recordId)
+    			return message.getStatus();
+    	}
+    	return -1;
 	}
 
 }

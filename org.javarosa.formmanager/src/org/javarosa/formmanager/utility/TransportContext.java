@@ -24,5 +24,4 @@ public class TransportContext extends Context{
 	public void setRequestedTask(String view) {
 		contextObject.put("form-transport-view", view);
 	}
-
 }
