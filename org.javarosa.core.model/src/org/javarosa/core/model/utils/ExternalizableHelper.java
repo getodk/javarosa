@@ -217,10 +217,13 @@ public class ExternalizableHelper {
 			dos.writeByte(0);
 	}
 	
-	public static void readExternalizable(DataInputStream dis, Externalizable item)  throws IOException, InstantiationException,IllegalAccessException, UnavailableExternalizerException {
+	public static Externalizable readExternalizable(DataInputStream dis, Externalizable item)  throws IOException, InstantiationException,IllegalAccessException, UnavailableExternalizerException {
 		if(dis.readBoolean()) {
 			item.readExternal(dis);
-		}		
+		} else {
+			item = null;
+		}
+		return item;
 	}
 	
 	/**

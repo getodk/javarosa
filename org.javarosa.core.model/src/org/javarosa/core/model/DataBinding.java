@@ -89,8 +89,7 @@ public class DataBinding  implements Externalizable {
 		this.setPreload(ExternalizableHelper.readUTF(in));
 		this.setPreloadParams(ExternalizableHelper.readUTF(in));
 		this.setRequired(in.readBoolean());
-		condition = new Condition();
-		ExternalizableHelper.readExternalizable(in, condition);
+		condition = (Condition)ExternalizableHelper.readExternalizable(in, new Condition());
 		String factoryName = in.readUTF();
 		
 		FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
