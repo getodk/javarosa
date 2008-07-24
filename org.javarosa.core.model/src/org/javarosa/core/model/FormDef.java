@@ -115,7 +115,9 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		}
 		
 		this.localizer = l;
-		this.localizer.registerLocalizable(this);
+		if (this.localizer != null) {
+			this.localizer.registerLocalizable(this);
+		}
 	}
 	
 	public IFormDataModel getDataModel () {
@@ -292,9 +294,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			model.setFormReferenceId(this.getID());
 			model.readExternal(dis);
 
-			Localizer l = new Localizer();
-			ExternalizableHelper.readExternalizable(dis, l);
-			setLocalizer(l);
+			setLocalizer((Localizer)ExternalizableHelper.readExternalizable(dis, new Localizer()));
 		}
 	}
 
