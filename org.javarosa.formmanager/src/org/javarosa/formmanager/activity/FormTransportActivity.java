@@ -246,9 +246,6 @@ public class FormTransportActivity implements
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-
-					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-							null);
 				} else {
 					this.showURLform();
 				}
