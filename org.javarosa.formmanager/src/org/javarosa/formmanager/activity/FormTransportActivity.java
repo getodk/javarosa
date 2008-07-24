@@ -12,6 +12,8 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
@@ -38,7 +40,7 @@ import org.javarosa.formmanager.view.SubmitStatusScreen;
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
 public class FormTransportActivity implements
-		CommandListener, MessageListener, IActivity {
+		CommandListener, MessageListener, IActivity, ItemStateListener {
 
 	/**
 	 *
@@ -184,6 +186,7 @@ public class FormTransportActivity implements
 		else if(task.equals(TransportContext.SEND_DATA)) {
 			submitScreen = new SubmitScreen();
 			submitScreen.setCommandListener(this);
+			submitScreen.setItemStateListener(this);
 			shell.setDisplay(this,submitScreen);
 		}
 		}
@@ -224,6 +227,42 @@ public class FormTransportActivity implements
 	public void setDataModelSerializer(
 			IDataModelSerializingVisitor dataModelSerializer) {
 		this.dataModelSerializer = dataModelSerializer;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.microedition.lcdui.ItemStateListener#itemStateChanged(javax.microedition.lcdui.Item)
+	 */
+	public void itemStateChanged(Item arg0) {
+		//This is for the submit Screen
+			switch (submitScreen.getCommandChoice()) {
+			case SubmitScreen.SEND_NOW_DEFAULT:
+				String postURL = JavaRosaServiceProvider.instance()
+						.getPropertyManager().getSingularProperty(
+								HttpTransportProperties.POST_URL_PROPERTY);
+				if (postURL != null) {
+					this.setDestURL(postURL);
+					try {
+						sendData(currentMethod);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+							null);
+				} else {
+					this.showURLform();
+				}
+				break;
+			case SubmitScreen.SEND_NOW_SPEC:
+				this.showURLform();
+				break;
+			case SubmitScreen.SEND_LATER:
+				// If we're going to send later, no reason to be in the
+				// transport activity
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+						null);
+				break;
+			}
 	}
 
 	/*
@@ -315,36 +354,6 @@ public class FormTransportActivity implements
 								.getTransportManager().getMessages());
 				JavaRosaServiceProvider.instance().getTransportManager().send(
 						message, TransportMethod.HTTP_GCF);
-			}
-		} else if (d == submitScreen) {
-			switch (submitScreen.getCommandChoice()) {
-			case SubmitScreen.SEND_NOW_DEFAULT:
-				String postURL = JavaRosaServiceProvider.instance()
-						.getPropertyManager().getSingularProperty(
-								HttpTransportProperties.POST_URL_PROPERTY);
-				if (postURL != null) {
-					this.setDestURL(postURL);
-					try {
-						sendData(currentMethod);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-
-					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-							null);
-				} else {
-					this.showURLform();
-				}
-				break;
-			case SubmitScreen.SEND_NOW_SPEC:
-				this.showURLform();
-				break;
-			case SubmitScreen.SEND_LATER:
-				// If we're going to send later, no reason to be in the
-				// transport activity
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-						null);
-				break;
 			}
 		} else if (d == urlForm) {
 			if (c == CMD_BACK) {

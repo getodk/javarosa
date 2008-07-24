@@ -1,8 +1,6 @@
 package org.javarosa.formmanager.view;
 
-import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.ChoiceGroup;
-import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Spacer;
 
@@ -18,13 +16,14 @@ public class SubmitScreen extends Form {
 	
     //private Command selectCommand;
     
+	//#style submitPopup
 	public SubmitScreen () {
 		super("Submit Form");
 		
-		Command selectCommand = new Command("OK", Command.OK, 1);
+		//Command selectCommand = new Command("OK", Command.OK, 1);
 		
 		//#style submitYesNo
-		cg = new ChoiceGroup("Send data now?", Choice.EXCLUSIVE);
+		cg = new ChoiceGroup("Send data now?", ChoiceGroup.EXCLUSIVE);
 		
 		//NOTE! These Indexes are optimized to be added in a certain
 		//order. _DO NOT_ change it without updating the static values
@@ -33,9 +32,7 @@ public class SubmitScreen extends Form {
 		cg.append(SEND_LATER_STRING, null);
 		cg.append(SEND_NOW_SPEC_STRING, null);
 		cg.setSelectedIndex(0, true);
-		
-		addCommand(selectCommand);
-		
+				
 		append(cg);
 		append(new Spacer(80, 0));
 	}

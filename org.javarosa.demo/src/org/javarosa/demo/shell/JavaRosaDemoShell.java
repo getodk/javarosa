@@ -180,10 +180,27 @@ public class JavaRosaDemoShell implements IShell {
 						this.propertyActivity.start(context);
 					}
 					if(returnVal == Commands.CMD_SELECT_XFORM) {
-						FormEntryContext newContext = new FormEntryContext(context);
-						newContext.setFormID(((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue());
-						currentActivity = this.entryActivity;
-						this.entryActivity.start(newContext);										
+						FormDefRMSUtility def = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
+						FormDef formDef = new FormDef();
+						int formId = ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue();
+						try {
+						def.retrieveFromRMS(formId, formDef);
+						}
+						catch (Exception e) {
+							e.printStackTrace();
+						}
+						DataModelTree data = (DataModelTree)formDef.getDataModel();
+						formTransport.setData(data);
+						TransportContext msgContext = new TransportContext(
+								context);
+						msgContext.setRequestedTask(TransportContext.SEND_DATA);
+						currentActivity = formTransport;
+						formTransport.start(msgContext);
+						
+						//FormEntryContext newContext = new FormEntryContext(context);
+						//newContext.setFormID(((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue());
+						//currentActivity = this.entryActivity;
+						//this.entryActivity.start(newContext);										
 					}
 				}
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
