@@ -1,6 +1,7 @@
 package org.javarosa.user.storage;
 
 import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.user.model.User;
 
 
 public class UserRMSUtility  extends RMSUtility {
