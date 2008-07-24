@@ -103,9 +103,10 @@ public class DataModelTreeMetaData extends MetaDataObject{
 	 * setMetaDataParameters(java.lang.Object)
 	 */
 	public void setMetaDataParameters(Object object) {
-		FormData form = (FormData) object;
-		this.setName(form.getDef().getName() + form.getRecordId());
-
+		DataModelTree data = (DataModelTree) object;
+		this.formName = data.getName() + data.getId();
+		this.dateSaved = data.getDateSaved();
+		this.formIdReference = data.getFormReferenceId();
 	}
 
 }
