@@ -258,7 +258,8 @@ public class JavaRosaDemoShell implements IShell {
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FormManagerProperties());
 		
 		initProperty("DeviceID", genGUID(25));
-
+		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://openrosa.org/testsubmit.html");
+		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://openrosa.org/testsubmit.html");
 	}
 
 	//TODO: Put this in a utility method
