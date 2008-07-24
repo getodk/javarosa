@@ -102,13 +102,16 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	 * @see org.javarosa.core.model.IAnswerDataSerializer#serializeAnswerData(org.javarosa.formmanager.model.temp.AnswerData)
 	 */
 	public Object serializeAnswerData(IAnswerData data) {
-		if(data.getClass() == StringData.class) {
+		if(data == null) { 
+			return "";
+		}
+		if(data instanceof StringData) {
 			return serializeAnswerData((StringData)data);
-		} else if(data.getClass() == DateData.class) {
+		} else if(data instanceof DateData) {
 			return serializeAnswerData((DateData)data);
-		} else if(data.getClass() == SelectMultiData.class) {
+		} else if(data instanceof SelectMultiData) {
 			return serializeAnswerData((SelectMultiData)data);
-		} else if(data.getClass() == SelectOneData.class) {
+		} else if(data instanceof SelectOneData) {
 			return serializeAnswerData((SelectOneData)data);
 		} else {
 			Enumeration en = additionalSerializers.elements();

@@ -55,7 +55,6 @@
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
-					<!--source dir="${basedir}/../org.javarosa.xform/test/"/-->
 				</sources>
 				
 				<!-- Build variables -->
