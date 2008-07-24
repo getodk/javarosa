@@ -93,6 +93,8 @@
 			<dob />
 			<sex />
 			<addr />
+			<blah />
+			<fizz />
 		</demog>
 	</instance>
 		
@@ -102,22 +104,25 @@
 </h:head>			
 <h:body>
 
-<select1 ref="/demog/feeling">
+<select ref="/demog/feeling">
 <label>How do you feel about Polish?</label>
 <item><label>Like It</label><value>1</value></item>
 <item><label>Love It</label><value>2</value></item>
 <item><label>Love to Hate It</label><value>3</value></item>
-</select1>
+</select>
 
 <input ref="/demog/lname"><label ref="jr:itext('q1')"></label></input>
 <input ref="/demog/fname"><label ref="jr:itext('q2')"></label></input>
 <input bind="DOB"><label ref="jr:itext('q3')"></label></input>
+
 <select1 ref="/demog/sex">
 <label ref="jr:itext('q4')"></label>
 <item><label ref="jr:itext('q4a')"></label><value>m</value></item>
 <item><label ref="jr:itext('q4b')"></label><value>f</value></item>
 </select1>
 <input ref="/demog/addr"><label ref="jr:itext('q5')"></label></input>
+   
+
    
 </h:body>
 </h:html>
