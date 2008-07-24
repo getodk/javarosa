@@ -261,6 +261,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		jumpToQuestion(questionIndex);
     }    
     
+	public void saveStateChanged (int instanceID, boolean dirty) {
+		//do nothing
+	}
+    
     public void keyPressed(int keyCode) {
     	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
     		controller.cycleLanguage();
