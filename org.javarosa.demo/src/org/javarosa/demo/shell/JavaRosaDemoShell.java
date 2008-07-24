@@ -261,8 +261,10 @@ public class JavaRosaDemoShell implements IShell {
 			propVal = new Vector();
 			propVal.addElement(defaultValue);
 			JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propName, propVal);
+			//#if debug.output==verbose
 			System.out.println("No default value for [" + propName
 					+ "]; setting to [" + defaultValue + "]"); // debug
+			//#endif
 			return defaultValue;
 		}
 		return (String) propVal.elementAt(0);

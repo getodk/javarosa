@@ -182,7 +182,9 @@ public class XFormParser {
 		if (eh != null) {
 			eh.handle(f, e, parent);
 		} else {
+			//#if debug.output==verbose
 			System.err.println("XForm Parse: Unrecognized element [" + name + "]. Ignoring and processing children...");
+			//#endif
 			for (int i = 0; i < e.getChildCount(); i++) {
 				if (e.getType(i) == Element.ELEMENT) {
 					parseElement(f, e.getElement(i), parent, handlers);
@@ -602,7 +604,9 @@ public class XFormParser {
 		
 		if (dataType <= 0) {
 			if (type != null) {
+				//#if debug.output==verbose
 				System.err.println("XForm Parse: unrecognized data type; default to string");
+				//#endif
 			}
 			dataType = Constants.DATATYPE_TEXT;
 		}
