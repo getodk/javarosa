@@ -81,6 +81,7 @@ public class DataModelTreeMetaData extends MetaDataObject{
 		this.formName = in.readUTF();
 		this.version = in.readInt();
 		this.dateSaved = new Date(in.readLong());
+		this.formIdReference = in.readInt();
 	}
 
 	/*
@@ -94,6 +95,7 @@ public class DataModelTreeMetaData extends MetaDataObject{
 		out.writeUTF(this.formName);
 		out.writeInt(this.version);
 		out.writeLong(this.dateSaved.getTime());
+		out.writeInt(this.formIdReference);
 	}
 
 	/*

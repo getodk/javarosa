@@ -36,7 +36,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 
 	private IFormDataModel model;
 
-	private int recordId; //does this belong here?
+	//private int recordId;
 	
 	// dunno about this...
 	///** The collection of rules for this form. */
@@ -105,6 +105,17 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		this.id = id;
 	}
 	
+	//treating id and record id as the same until we resolve the need for both of them
+	public int getRecordId () {
+		return getID();
+		//return recordId;
+	}
+	
+	public void setRecordId(int recordId) {
+		setID(recordId);
+		//this.recordId = recordId;
+	}
+	
 	public Localizer getLocalizer () {
 		return localizer;
 	}
@@ -137,14 +148,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		if (updated) {
 			question.alertStateObservers(QuestionStateListener.CHANGE_DATA);
 		}
-	}
-	
-	public int getRecordId () {
-		return recordId;
-	}
-	
-	public void setRecordId(int recordId) {
-		this.recordId = recordId;
 	}
 	
 	/*
