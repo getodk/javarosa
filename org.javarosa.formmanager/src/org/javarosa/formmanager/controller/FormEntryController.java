@@ -58,10 +58,7 @@ public class FormEntryController {
 			//already at the earliest relevant question
 			return;
 		} else if (index >= model.getNumQuestions()) {
-			model.setQuestionIndex(-1);
-			view.formComplete();
-
-			System.out.println("form done!");
+			model.setFormComplete();
 			return;
 		}
 		

@@ -2,6 +2,7 @@ package org.javarosa.formmanager.activity;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Alert;
@@ -128,7 +129,14 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	
 	public void controllerReturn (String status) {
 		if ("exit".equals(status)) {
-			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+			Hashtable returnArgs = new Hashtable();
+			
+			returnArgs.put("INSTANCE_ID", new Integer(model.getInstanceID()));
+			returnArgs.put("DATA_MODEL", model.getForm().getDataModel());
+			returnArgs.put("FORM_COMPLETE", new Boolean(model.isFormComplete()));
+			returnArgs.put("QUIT_WITHOUT_SAVING", new Boolean(!model.isSaved()));
+			
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
 		}
 	}
 	

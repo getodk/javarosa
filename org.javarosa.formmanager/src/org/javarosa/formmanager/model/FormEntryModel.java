@@ -13,7 +13,8 @@ public class FormEntryModel {
     private int activeQuestionIndex;
     private int instanceID;
     private boolean unsavedChanges;
-
+    private boolean formCompleted;
+    
     private Vector observers;
     
     public FormEntryModel(FormDef form) {
@@ -26,7 +27,8 @@ public class FormEntryModel {
     	this.observers = new Vector();
     	
     	this.activeQuestionIndex = (getNumQuestions() > 0 ? 0 : -1);
-    	this.unsavedChanges = false;
+    	this.unsavedChanges = true; //we want them to be able to save the form initially, even with nothing in it
+    	this.formCompleted = false;
     }
     
     public int getQuestionIndex () {
@@ -78,6 +80,22 @@ public class FormEntryModel {
 		}	  	
     }
         
+    public boolean isFormComplete () {
+    	return formCompleted; 
+    }
+    
+    public void setFormComplete () {
+    	if (!formCompleted) {
+    		formCompleted = true;
+    	
+			setQuestionIndex(-1);
+    		
+    		for (Enumeration e = observers.elements(); e.hasMoreElements(); ) {
+    			((FormEntryModelListener)e.nextElement()).formComplete();   			
+    		}	 
+    	}
+    }
+    
     //doesn't support groups yet
     public QuestionDef getQuestion (int questionIndex) {
     	return (QuestionDef)form.getChild(questionIndex);

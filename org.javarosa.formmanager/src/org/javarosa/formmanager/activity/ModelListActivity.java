@@ -51,7 +51,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 	public final static String returnKey = "ModelListReturnCommand";
 
 	public final static Command CMD_BACK = new Command("Back", Command.BACK, 2);
-	public final static Command CMD_SEND = new Command("SEND Data",Command.SCREEN,1);
+	public final static Command CMD_SEND = new Command("Send Data",Command.SCREEN,1);
 	public final static Command CMD_EDIT = new Command("Edit", Command.SCREEN, 2);
 	public final static Command CMD_REFRESH = new Command("Refresh", Command.SCREEN, 3);
 	public final static Command CMD_MSGS = new Command("Message Status",Command.SCREEN,4);
@@ -164,10 +164,10 @@ public class ModelListActivity extends List implements CommandListener, IActivit
         {
             if (this.getSelectedIndex() != -1) {
             	DataModelTreeMetaData data = (DataModelTreeMetaData) modelIDs.elementAt(this.getSelectedIndex());
-            	FormData model = new FormData();
+            	DataModelTree model = new DataModelTree();
                 try {
                     this.dataModelRMSUtility.retrieveFromRMS(data.getRecordId(), model);
-                    model.setRecordId(data.getRecordId());
+                    //model.setRecordId(data.getRecordId());
                 } catch (IOException e) {
                     javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
                     mainShell.setDisplay(this, a);
