@@ -311,31 +311,45 @@ public class FormTransportActivity implements
 			} else if (c == CMD_SEND) {
 				int selected = messageList.getSelectedIndex();
 				TransportMessage message = (TransportMessage) elementAt(
-						selected, JavaRosaServiceProvider.instance().getTransportManager().getMessages());
-				JavaRosaServiceProvider.instance().getTransportManager().send(message, TransportMethod.HTTP_GCF);
+						selected, JavaRosaServiceProvider.instance()
+								.getTransportManager().getMessages());
+				JavaRosaServiceProvider.instance().getTransportManager().send(
+						message, TransportMethod.HTTP_GCF);
 			}
 		} else if (d == submitScreen) {
-			switch(submitScreen.getCommandChoice()) {
+			switch (submitScreen.getCommandChoice()) {
 			case SubmitScreen.SEND_NOW_DEFAULT:
-				try {
-					sendData(currentMethod);
-				} catch (IOException e) {
-					e.printStackTrace();
+				String postURL = JavaRosaServiceProvider.instance()
+						.getPropertyManager().getSingularProperty(
+								HttpTransportProperties.POST_URL_PROPERTY);
+				if (postURL != null) {
+					this.setDestURL(postURL);
+					try {
+						sendData(currentMethod);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+							null);
+				} else {
+					this.showURLform();
 				}
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 				break;
 			case SubmitScreen.SEND_NOW_SPEC:
 				this.showURLform();
 				break;
 			case SubmitScreen.SEND_LATER:
-				//If we're going to send later, no reason to be in the transport activity
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+				// If we're going to send later, no reason to be in the
+				// transport activity
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+						null);
 				break;
 			}
-		}
-		else if (d == urlForm) {
+		} else if (d == urlForm) {
 			if (c == CMD_BACK) {
-					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+						null);
 			} else if (c == CMD_OK) {
 				processURLform();
 				try {
@@ -343,9 +357,10 @@ public class FormTransportActivity implements
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+						null);
 			}
-		} else if(d == submitStatusScreen) {
+		} else if (d == submitStatusScreen) {
 			shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 		}
 	}
