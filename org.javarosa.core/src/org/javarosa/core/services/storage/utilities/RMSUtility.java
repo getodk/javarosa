@@ -112,15 +112,17 @@ public class RMSUtility implements RecordListener
      * 
      * @param obj The Externalizable object to be written
      * @param metaDataObject The meta data descriptor for the given object
+     * @return record ID of new record
      */
-    public void writeToRMS(Object obj,
+    public int writeToRMS(Object obj,
                            MetaDataObject metaDataObject)
     {
+    	int recordId = -1;
         try
         {
-            int recordId = this.recordStore.getNextRecordID();
-            IDRecordable recordableObject = (IDRecordable) obj;
-            recordableObject.setRecordId(recordId);
+            recordId = this.recordStore.getNextRecordID();
+    		if (obj instanceof IDRecordable)
+    			((IDRecordable)obj).setRecordId(recordId);
             Externalizable externalizableObject = (Externalizable) obj;
             byte[] data = Serializer.serialize(externalizableObject);
             //LOG
@@ -141,6 +143,7 @@ public class RMSUtility implements RecordListener
         {
             ioe.printStackTrace();
         }
+        return recordId;
     }
     
     /**
@@ -156,8 +159,8 @@ public class RMSUtility implements RecordListener
     {
     	try
     	{
-    		IDRecordable recordableObject = (IDRecordable) obj;
-    		recordableObject.setRecordId(recordId);
+    		if (obj instanceof IDRecordable)
+    			((IDRecordable)obj).setRecordId(recordId);
     		Externalizable externalizableObject = (Externalizable) obj;
     		byte[] data = Serializer.serialize(externalizableObject);
     		this.recordStore.setRecord(recordId, data, 0, data.length);
