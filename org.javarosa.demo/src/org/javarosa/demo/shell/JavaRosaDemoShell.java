@@ -86,7 +86,7 @@ public class JavaRosaDemoShell implements IShell {
 		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 		
-		DataModelTreeRMSUtility formData = new DataModelTreeRMSUtility(DataModelTreeRMSUtility.getUtilityName());
+		DataModelTreeRMSUtility dataModel = new DataModelTreeRMSUtility(DataModelTreeRMSUtility.getUtilityName());
 		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
 		formDef.addModelPrototype(new DataModelTree());
 		formDef.addReferencePrototype(new XPathReference());
@@ -101,7 +101,7 @@ public class JavaRosaDemoShell implements IShell {
 					.getFormFromResource("/shortform.xhtml"));
 		}
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider()
-				.registerRMSUtility(formData);
+				.registerRMSUtility(dataModel);
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider()
 				.registerRMSUtility(formDef);
 	}
