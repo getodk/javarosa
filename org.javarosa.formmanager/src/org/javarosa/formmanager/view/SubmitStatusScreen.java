@@ -16,6 +16,7 @@ public class SubmitStatusScreen extends Form  {
     public static final int TIMEOUT = 60000;
     
 	public SubmitStatusScreen () {
+    	// #style submitPopup
 		super("Send Status");
 		
 		okCommand = new Command("OK", Command.OK, 1);
