@@ -1,33 +1,25 @@
 
 
-package org.javarosa.demo.login;
+package org.javarosa.user.view;
 
 import java.io.IOException;
 
 import javax.microedition.lcdui.AlertType;
-import javax.microedition.lcdui.Choice;
-import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
-
-import de.enough.polish.ui.Form;
-import de.enough.polish.ui.ItemCommandListener;
-import de.enough.polish.ui.backgrounds.ImageBackground;
-
-/*import de.enough.polish.ui.Choice;
-import de.enough.polish.ui.ChoiceGroup;
-import de.enough.polish.ui.TextField;*/
+import org.javarosa.user.model.User;
+import org.javarosa.user.storage.UserRMSUtility;
 
 public class LoginForm extends Form
 {
 	   public final Command CMD_CANCEL_LOGIN = new Command("Cancel",Command.CANCEL, 1);
-	   public final Command CMD_LOGIN_LOGIN = new Command("Login", Command.OK, 1);
-	   public Command nextItemCommand = new Command("next Item Command", Command.ITEM, 1);
+	   public Command loginButtonCommand = new Command("Login", Command.ITEM, 1);
 
 	   private TextField userName;
 	   private TextField password;
@@ -39,9 +31,7 @@ public class LoginForm extends Form
 	   private String rememberMe;
 	   private static final String DO_REMEMBER_ME = "DoRememberMe";
        private static final String DONT_REMEMBER_ME = "DontRememberMe";
-	   ImageBackground background;
 	   IActivity parent;
-
 
 	  public LoginForm(IActivity loginActivity, String title) {
 		   super(title);
@@ -51,14 +41,13 @@ public class LoginForm extends Form
 	      password = new TextField("Password:", "", 10, TextField.PASSWORD);
 
 	      this.addCommand(CMD_CANCEL_LOGIN);
-	      this.addCommand(CMD_LOGIN_LOGIN);
 
 	      this.append(userName);
 	      append(password);
 
 	      loginButton = new StringItem(null,"LOGIN",Item.BUTTON);
 	      this.append(loginButton);
-	      loginButton.setDefaultCommand(nextItemCommand);     // add Command to Item.
+	      loginButton.setDefaultCommand(loginButtonCommand);     // add Command to Item.
 
 	      userRMS = new UserRMSUtility("LoginMem");
 	      loggedInUser = new User ("admin","password",User.ADMINUSER);

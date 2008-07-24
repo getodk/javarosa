@@ -46,14 +46,14 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 	}
 
 	public void commandAction(Command c, Item item) {
-		if (c == this.loginScreen.nextItemCommand) {
+		if (c == this.loginScreen.loginButtonCommand) {
 			System.out.println("login pressed");
 			if (loginScreen.validateUser()) {
 				javax.microedition.lcdui.Alert success = loginScreen
 						.successfulLogin();
 				parent.setDisplay(this, success);
 				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, Commands.CMD_LOGIN_SUCCESS);
+				returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
 				returnArgs.put(USER, loginScreen.getLoggedInUser());
 				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
 						returnArgs);
@@ -99,15 +99,17 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 
 	public void commandAction(Command c, Displayable d) {
 		if (c == loginScreen.CMD_CANCEL_LOGIN) {
-			parent.exitShell();
-		} else if (c == loginScreen.CMD_LOGIN_LOGIN) {
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put(COMMAND_KEY, "USER_CANCELLED");
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,returnArgs);
+		} else if (c == loginScreen.loginButtonCommand) {
 			System.out.println("login pressed");
 			if (loginScreen.validateUser()) {
 				javax.microedition.lcdui.Alert success = loginScreen
 						.successfulLogin();
 				parent.setDisplay(this, success);
 				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, Commands.CMD_LOGIN_SUCCESS);
+				returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
 				returnArgs.put(USER, loginScreen.getLoggedInUser());
 				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
 						returnArgs);
