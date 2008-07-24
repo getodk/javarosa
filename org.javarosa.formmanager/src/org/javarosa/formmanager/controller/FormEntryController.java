@@ -5,8 +5,6 @@ import java.util.Date;
 
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.clforms.api.Constants;
-import org.javarosa.clforms.util.J2MEUtil;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
