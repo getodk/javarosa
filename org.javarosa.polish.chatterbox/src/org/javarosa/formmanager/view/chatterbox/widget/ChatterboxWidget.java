@@ -172,8 +172,13 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 	public void commandAction (Command c, Item i) {
     	System.out.println("cw: command action");
 		
-		if (i == expandedStyle.getInteractiveWidget() && c == nextCommand)
+		if (i == expandedStyle.getInteractiveWidget() && c == nextCommand) {
 			cbox.questionAnswered();
+		} else {
+			//unrecognized commandAction, propagate to parent.
+			cbox.commandAction(c, cbox);
+		}
+		
 	}
 	
 	public void itemStateChanged (Item i) {
