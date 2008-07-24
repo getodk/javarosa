@@ -17,11 +17,15 @@ public class FormEntryModel {
     private Vector observers;
     
     public FormEntryModel(FormDef form) {
+    	this(form, -1);
+    }
+    
+    public FormEntryModel(FormDef form, int instanceID) {
     	this.form = form;
+    	this.instanceID = instanceID;
     	this.observers = new Vector();
     	
     	this.activeQuestionIndex = (getNumQuestions() > 0 ? 0 : -1);
-    	this.instanceID = -1;
     	this.unsavedChanges = false;
     }
     
@@ -47,6 +51,33 @@ public class FormEntryModel {
     	return form;
     }
     
+    public int getInstanceID () {
+    	return instanceID;
+    }
+    
+    public boolean isSaved () {
+    	return !unsavedChanges;
+    }
+    
+    public void modelChanged () {
+    	if (!unsavedChanges) {
+    		unsavedChanges = true;
+    		
+    		for (Enumeration e = observers.elements(); e.hasMoreElements(); ) {
+    			((FormEntryModelListener)e.nextElement()).saveStateChanged(instanceID, unsavedChanges);   			
+    		}		
+    	}
+    }
+    
+    public void modelSaved (int instanceID) {
+    	this.instanceID = instanceID;
+    	unsavedChanges = false;
+    	
+		for (Enumeration e = observers.elements(); e.hasMoreElements(); ) {
+			((FormEntryModelListener)e.nextElement()).saveStateChanged(instanceID, unsavedChanges);   			
+		}	  	
+    }
+        
     //doesn't support groups yet
     public QuestionDef getQuestion (int questionIndex) {
     	return (QuestionDef)form.getChild(questionIndex);
