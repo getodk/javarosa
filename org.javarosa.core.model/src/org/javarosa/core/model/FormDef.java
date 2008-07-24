@@ -139,10 +139,14 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		}
 	}
 	
+	public int getRecordId () {
+		return recordId;
+	}
+	
 	public void setRecordId(int recordId) {
 		this.recordId = recordId;
 	}
-
+	
 	/*
 	public Vector getRules() {
 		return rules;

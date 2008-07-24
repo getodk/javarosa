@@ -17,6 +17,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
@@ -52,17 +53,22 @@ public class FormDefRMSUtility extends RMSUtility {
 	 * @return The name to be used for this RMS Utility
 	 */
 	public static String getUtilityName() {
-		return "FormDef RMS Utility";
+		return "FORM_DEF_RMS";
 	}
 
 	/**
 	 * Writes the given formdefinition to RMS
 	 * @param form The definition of the form to be written
+	 * @return new record ID
 	 */
-	public void writeToRMS(FormDef form) {
-		super.writeToRMS(form, new FormDefMetaData(form));
+	public int writeToRMS(FormDef form) {
+		return super.writeToRMS(form, new FormDefMetaData(form));
 	}
 
+	public void updateToRMS(int recordId, FormDef form) {
+		updateToRMS(recordId, form, getMetaDataFromId(recordId));
+	}
+	
 	/**
 	 * Writes the given block of bytes to RMS
 	 * @param ba The set of bytes to be written

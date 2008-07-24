@@ -33,17 +33,22 @@ public class DataModelTreeRMSUtility extends RMSUtility {
 	 * @return The unique name to be used to register this utility
 	 */
 	public static String getUtilityName() {
-		return "Data Tree RMS Utility";
+		return "DATA_MODEL_TREE_RMS";
 	}
 	
 	/**
 	 * Writes the given model data to persistent storage
 	 * @param model The model to be written
+	 * @return new record ID
 	 */
-	public void writeToRMS(DataModelTree model) {
-		super.writeToRMS(model, new DataModelTreeMetaData(model));
+	public int writeToRMS(DataModelTree model) {
+		return super.writeToRMS(model, new DataModelTreeMetaData(model));
 	}
 
+	public void updateToRMS(int recordId, DataModelTree model) {
+		updateToRMS(recordId, model, getMetaDataFromId(recordId));
+	}
+	
 	/**
 	 * Writes the block of bytes to this RMS with Meta DAta
 	 * @param ba The block of bytes
