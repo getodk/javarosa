@@ -152,7 +152,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 
     		ChatterboxWidget widget = (ChatterboxWidget)get(activeQuestionIndex);
     		focus(widget);
-    		widget.setFocus(); //argh!!! this works about 50% of the time!!!
+    		//widget.setFocus(); //argh!!! this works about 50% of the time!!!
     		        	
     		progressBar.setValue(questionIndex);
     	}
@@ -189,7 +189,14 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	activeFrame().setViewState(ChatterboxWidget.VIEW_COLLAPSED);
     	babysitStyles();
 		progressBar.setValue(model.getNumQuestions());
-    	//notify controller about being done
+		
+		repaint();
+		try {
+			Thread.sleep(1000); //let them bask in their completeness
+		} catch (InterruptedException ie) { }
+			
+		controller.save();
+		controller.exit();
     }
     
     private ChatterboxWidget activeFrame () {
@@ -233,10 +240,12 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		controller.save();
     	} else {
     		String language = null;
-    		for (int i = 0; i < languageCommands.length; i++) {
-    			if (command == languageCommands[i]) {
-    				language = command.getLabel();
-    				break;
+    		if (multiLingual) {
+    			for (int i = 0; i < languageCommands.length; i++) {
+    				if (command == languageCommands[i]) {
+    					language = command.getLabel();
+    					break;
+    				}
     			}
     		}
     		
