@@ -183,11 +183,23 @@ public class JavaRosaDemoShell implements IShell {
 						FormEntryContext newContext = new FormEntryContext(context);
 						newContext.setFormID(((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue());
 						currentActivity = this.entryActivity;
-						this.entryActivity.start(newContext);
+						this.entryActivity.start(newContext);										
 					}
 				}
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
 					
+				}
+			}
+			if (lastActivity == this.entryActivity) {
+				if(returnCode == Constants.ACTIVITY_COMPLETE) {
+				//Set the data model properly here.
+					DataModelTree data = null;
+					formTransport.setData(data);
+					TransportContext msgContext = new TransportContext(
+							context);
+					msgContext.setRequestedTask(TransportContext.SEND_DATA);
+					currentActivity = formTransport;
+					formTransport.start(msgContext);
 				}
 			}
 			if(currentActivity == lastActivity) {
