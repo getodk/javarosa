@@ -209,14 +209,14 @@ public class JavaRosaDemoShell implements IShell {
 			}
 			if (lastActivity == this.entryActivity) {
 				if(returnCode == Constants.ACTIVITY_COMPLETE) {
-				//Set the data model properly here.
-					DataModelTree data = null;
-					formTransport.setData(data);
-					TransportContext msgContext = new TransportContext(
-							context);
-					msgContext.setRequestedTask(TransportContext.SEND_DATA);
-					currentActivity = formTransport;
-					formTransport.start(msgContext);
+					if (((Boolean)returnVals.get("FORM_COMPLETE")).booleanValue()) {
+						DataModelTree data = (DataModelTree)returnVals.get("DATA_MODEL");
+						formTransport.setData(data);
+						TransportContext msgContext = new TransportContext(context);
+						msgContext.setRequestedTask(TransportContext.SEND_DATA);
+						currentActivity = formTransport;
+						formTransport.start(msgContext);
+					}
 				}
 			}
 			if(currentActivity == lastActivity) {
