@@ -11,7 +11,9 @@ public class TextEntryWidget extends ExpandedWidget {
 	int inputMode;
 	
 	public TextEntryWidget () {
+		//#if polish.TextField.useDirectInput == true
 		this(TextField.MODE_UPPERCASE);
+		//#endif
 	}
 	
 	public TextEntryWidget (int inputMode) {

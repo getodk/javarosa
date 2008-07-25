@@ -44,6 +44,9 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     private SortedIntSet questionIndexes;
     private int activeQuestionIndex;
     
+    /** The active question's index when a key is pressed */
+    private int indexWhenKeyPressed = -1;
+    
     //GUI elements
     private Command backCommand;
     private Command exitNoSaveCommand;
@@ -293,17 +296,25 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 	public void saveStateChanged (int instanceID, boolean dirty) {
 		//do nothing
 	}
-    
+	
     public void keyPressed(int keyCode) {
+    	int keyDownSelectedWidget = this.activeQuestionIndex;
+    	super.keyPressed(keyCode);
     	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
     		controller.cycleLanguage();
     	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
     		ChatterboxWidget widget = activeFrame();
-    		if (widget != null)
-    			/* widget.UIHack(UIHACK_SELECT_PRESS) */;
+    		if (widget != null)  {
+    			//widget.UIHack(UIHACK_SELECT_PRESS);
+    			 }
+        	indexWhenKeyPressed = keyDownSelectedWidget;
     	}
-    	
-    	super.keyPressed(keyCode);
+    }
+    
+    public void keyReleased(int keyCode) {
+    	if(indexWhenKeyPressed == this.activeQuestionIndex) {
+    		super.keyReleased(keyCode);
+    	}
     }
 
     //good utility function
