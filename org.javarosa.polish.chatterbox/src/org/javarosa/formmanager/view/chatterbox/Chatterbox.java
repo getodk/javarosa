@@ -2,6 +2,9 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
@@ -16,6 +19,7 @@ import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.utility.SortedIntSet;
 import org.javarosa.formmanager.view.IFormEntryView;
+import org.javarosa.formmanager.view.SubmitStatusScreen;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 
@@ -151,13 +155,29 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		activeQuestionIndex = questionIndex;
 
     		ChatterboxWidget widget = (ChatterboxWidget)get(activeQuestionIndex);
-    		focus(widget);
+    		//this.focus(widget);
+    		this.focus(widget, true);
     		//widget.setFocus(); //argh!!! this works about 50% of the time!!!
-    		        	
+    		//this.container.focus(questionIndex);
+
     		progressBar.setValue(questionIndex);
+    		
     	}
-    	
     	babysitStyles();
+		Timer t = new Timer();
+		t.schedule(new TimerTask () {
+			public void run () {
+				//These key codes might be phone dependent.
+				//If they aren't working on your device, you might
+				//need to add it.
+				
+				//Emulator
+				UiAccess.emitKeyPress(-2);
+				//Not sure if this works anywhere.
+				UiAccess.emitKeyPress(DOWN);
+				UiAccess.emitKeyRelease(DOWN);
+			}
+		}, 50);
     }
     
     //create a frame for a question and show it at the appropriate place in the form

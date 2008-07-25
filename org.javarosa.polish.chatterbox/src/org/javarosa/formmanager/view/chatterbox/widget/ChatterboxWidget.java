@@ -101,8 +101,9 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 
 	public void setFocus () {
 		if (viewState == VIEW_EXPANDED) {
-			if (expandedStyle.focus())
+			if (expandedStyle.focus()) {
 				repaint();
+			}
 		} else {
 			throw new IllegalStateException("Attempt to focus widget in non-interactive mode");
 		}
