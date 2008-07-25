@@ -166,6 +166,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		progressBar.setValue(questionIndex);
     		
     	}
+    	
+    	//UI hacks ho!
     	babysitStyles();
 		Timer t = new Timer();
 		t.schedule(new TimerTask () {
@@ -305,8 +307,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
     		ChatterboxWidget widget = activeFrame();
     		if (widget != null)  {
-    			//widget.UIHack(UIHACK_SELECT_PRESS);
-    			 }
+    			widget.UIHack(UIHACK_SELECT_PRESS);
+    		}
         	indexWhenKeyPressed = keyDownSelectedWidget;
     	}
     }
