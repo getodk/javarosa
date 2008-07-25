@@ -16,8 +16,8 @@ public class SubmitScreen extends Form {
 	
     //private Command selectCommand;
     
-	//#style submitPopup
 	public SubmitScreen () {
+		//#style submitPopup
 		super("Submit Form");
 		
 		//Command selectCommand = new Command("OK", Command.OK, 1);
