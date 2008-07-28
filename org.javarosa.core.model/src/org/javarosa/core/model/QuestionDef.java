@@ -200,10 +200,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	public void setSelectItemIDs (SimpleOrderedHashtable selectItemIDs, Vector selectItemsLocalizable, Localizer localizer) {
 		this.selectItemIDs = selectItemIDs;
 		this.selectItemsLocalizable = selectItemsLocalizable;
-		// 27/7/2008
-		// BWD Fixed bug where we didn't have items for select1 unless is`
-		//if (localizer != null) {
-		if(selectItemIDs != null) {
+		if(localizer != null) {
 			localizeSelectMap(localizer);
 		}
 	}
@@ -336,9 +333,11 @@ public class QuestionDef implements IFormElement, Localizable {
 			setLocked(dis.readBoolean());
 			
 			setSelectItemIDs(ExternalizableHelper.readExternalSOH(dis), ExternalizableHelper.readExternalVB(dis), null);
+			if (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_SELECT_ONE) {
+				localizeSelectMap(null); //even for non-multilingual forms, text must be initially 'localized'
+			}
 			
 			String className = dis.readUTF();
-
 			FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 			PrototypeFactory factory = fdrms.getQuestionElementsFactory();
 			binding = (IDataReference)factory.getNewInstance(className);
