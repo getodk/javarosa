@@ -1,12 +1,12 @@
 <!-- The JavaRosa build script is structured as follows:
      Modifiable properties are stored in the external build.properties file
      The classpath for external jars is defined in the Build taskdef
-     
-     NOTE: Binary Libraries (.zip is the convention in j2me) are declared 
+
+     NOTE: Binary Libraries (.zip is the convention in j2me) are declared
      seperately in the binaryLibraries property. Not on the classpath!
-     
+
      The BuildPolish target is associated with building the jar/jad files
-     
+
      All other non-test targets essentially modify properties associated with the
      Build target
 -->
@@ -15,14 +15,14 @@
 	<!-- This is the main work target, it actually builds the code -->
 	<target name="BuildPolish" depends="init" description="This is the controller for the J2ME build process.">
 		<buildPolish>
-			<info name="${app.name}" 
-				version="${app.version}" 
-				description="${app.description}" 
-				vendorName="${app.vendor}" 
-				infoUrl="${app.infoUrl}" 
-				jarName="${app.jarName}" 
+			<info name="${app.name}"
+				version="${app.version}"
+				description="${app.description}"
+				vendorName="${app.vendor}"
+				infoUrl="${app.infoUrl}"
+				jarName="${app.jarName}"
 				jarUrl="${deploy-url}${app.jarName}" copyright="" />
-			
+
 			<!-- selection of supported devices, set this in build.properties -->
 			<deviceRequirements>
 				<requirement name="Identifier" value="${device.identifier}" />
@@ -31,15 +31,15 @@
 			<!-- build settings -->
 			<!-- 'menu' here designates that we're using the fullscreen Polish UI with native menus -->
 			<!-- We should see if we can set these first two attributes as properties instead-->
-			<build fullscreen="menu" 
-				usePolishGui="${javarosa.usepolishui}" 
-				workDir="${dir.work}" 
+			<build fullscreen="menu"
+				usePolishGui="${javarosa.usepolishui}"
+				workDir="${dir.work}"
 				destDir="${dir.dist}"
 				binaryLibraries="${dir.lib}">
-				
+
 				<!-- midlets definition -->
 				<midlet class="${app.class}" name="${app.name}" />
-				
+
 				<!-- Code source files to include in compilation -->
 				<!-- All source-level inclusions should be made here -->
 				<sources>
@@ -54,15 +54,15 @@
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>					
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
-					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
+					<source dir="${basedir}/../org.javarosa.user/src/"/>
 				</sources>
-				
+
 				<!-- Build variables -->
 				<variables includeAntProperties="true">
 					<variable file="configuration/configuration.properties" />
 				</variables>
 
-				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) --> 
+				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) -->
 				<resources
 					dir="${dir.resources}"
 					defaultexcludes="yes"
@@ -73,7 +73,7 @@
 					</localization>
 				</resources>
 
-				<!-- Whether to run the obfuscator, which makes reverse engineering the byte-code 
+				<!-- Whether to run the obfuscator, which makes reverse engineering the byte-code
 					 more difficult, and compresses the built JAR -->
 				<!-- obfuscator settings: do not obfuscate when the test-property is true -->
 				<obfuscator name="ProGuard" unless="test or noobfuscate">
@@ -102,7 +102,6 @@
 				<!--parameter name="-Xheapsize" value="850000"/-->
 			</emulator>
 
-
 		</buildPolish>
 	</target>
 
@@ -110,7 +109,7 @@
 	<!-- Builds the code and invokes the emulator -->
 	<target name="LaunchEmulator" depends="enableEmulator,BuildPolish" description="invokes the emulator">
 	</target>
-	
+
 	<!-- Main Target: Call to clean directories created by a build -->
 	<target name="Clean" description="allows a clean build. You should call [ant clean] whenever you made changes to devices.xml, vendors.xml or groups.xml">
 		<delete dir="build" />
@@ -119,13 +118,13 @@
 
 	<!-- Main Target: Cleans, and then runs the build target -->
 	<target name="BuildClean" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, BuildPolish" />
-	
+
 	<!-- Main Target: Cleans, and then runs the build target with the emulator -->
 	<target name="BuildCleanRunEmulator" description="allows a clean build, and then launches the emulator" depends="Clean, enableEmulator, BuildPolish" />
 
 	<!-- Main Target: Runs the build with all debug properties enabled -->
 	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
-	
+
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
 		<RunTestSuite suite="org.javarosa.test.J2meUnitTest"/>
@@ -134,13 +133,13 @@
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
-		
+
 	<!-- Initialization for the build targets                    -->
 	<target name="init">
 		<!-- Disable the Emulator by default -->
 		<property name="test" value="false" />
 
-		<!-- increment build number 
+		<!-- increment build number
 		<propertyfile file="${basedir}/build.properties">
 			<entry key="build.number" type="int" operation="+" value="1" pattern="00" />
 		</propertyfile>
@@ -161,7 +160,7 @@
 		<property name="test" value="true" />
 		<property name="dir.work" value="build/test" />
 	</target>
-	
+
 	<!-- Macro: Runs a test suite, and sets testresult.global to be true on failure -->
 	<macrodef name="RunTestSuite" description="Runs a test suite, and sets testresult.global to be true on failure">
 		<attribute name="suite"/>
@@ -179,7 +178,7 @@
 				</condition>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="propertycopy">
 	  <attribute name="name"/>
 	  <attribute name="from"/>
@@ -187,20 +186,20 @@
 	    <property name="@{name}" value="${@{from}}"/>
 	  </sequential>
 	</macrodef>
-	
+
 	<!-- import user specific properties                          -->
 	<property file="${basedir}/build.properties" />
 
 	<!-- import global properties                                 -->
 	<property file="${polish.home}/global.properties" />
-	
+
 	<property name="TALK" value="true" />
-	
+
 	<!-- Definition of the J2ME Polish task:                      -->
 	<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
 		<path id="classpath.base">
 	</path>
-	
+
 	<!-- Note that most of this testing code was here to test our auto-integration tester, and isn't actually
 	     usable for testing J2ME code -->
 	<!-- The classpath that should be used for tests -->
