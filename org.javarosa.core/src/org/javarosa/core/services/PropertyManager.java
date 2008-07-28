@@ -123,6 +123,11 @@ public class PropertyManager implements IService {
             if(valid) {
                 propertyRMS.writeValue(propertyName, propertyValue);
             }
+            //#if debug.output==verbose
+            else {
+            	System.out.println("Property Manager: Unable to write value (" + propertyValue + ") to " + propertyName);
+            }
+            //#endif
         }
 
     }
