@@ -200,7 +200,10 @@ public class QuestionDef implements IFormElement, Localizable {
 	public void setSelectItemIDs (SimpleOrderedHashtable selectItemIDs, Vector selectItemsLocalizable, Localizer localizer) {
 		this.selectItemIDs = selectItemIDs;
 		this.selectItemsLocalizable = selectItemsLocalizable;
-		if (localizer != null) {
+		// 27/7/2008
+		// BWD Fixed bug where we didn't have items for select1 unless is`
+		//if (localizer != null) {
+		if(selectItemIDs != null) {
 			localizeSelectMap(localizer);
 		}
 	}
