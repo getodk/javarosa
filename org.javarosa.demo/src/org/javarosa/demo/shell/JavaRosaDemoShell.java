@@ -14,6 +14,7 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
@@ -21,6 +22,7 @@ import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.activity.SplashScreenModule;
+import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.demo.properties.DemoAppProperties;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
@@ -49,7 +51,8 @@ public class JavaRosaDemoShell implements IShell {
 	ModelListActivity modelActivity = null;
 	PropertyScreenActivity propertyActivity = null;
 	FormEntryActivity entryActivity = null;
-	
+	LoginActivity loginActivity = null;
+
 	WorkflowStack stack;
 	
 	Context context;
@@ -64,10 +67,11 @@ public class JavaRosaDemoShell implements IShell {
 	public void exitShell() {
 		midlet.notifyDestroyed();
 	}
-	
+
 	public void run() {
 		init();
 		this.splashScreen = new SplashScreenModule(this, "/splash.gif");
+		this.loginActivity = new LoginActivity(this,"Login");
 		this.formListActivity = new FormListActivity(this,"Forms List");
 		this.formTransport = new FormTransportActivity(this);
 		formTransport.setDataModelSerializer(new XFormSerializingVisitor());
@@ -75,15 +79,15 @@ public class JavaRosaDemoShell implements IShell {
 		this.entryActivity  = new FormEntryActivity(this, new FormEntryViewFactory());
 		
 		this.propertyActivity = new PropertyScreenActivity(this);
-		
+
 		currentActivity = splashScreen;
 		this.splashScreen.start(context);
 	//	switchView(ViewTypes.FORM_LIST);
 	}
-	
+
 	private void init() {
 		loadProperties();
-		
+
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 		
 		DataModelTreeRMSUtility dataModel = new DataModelTreeRMSUtility(DataModelTreeRMSUtility.getUtilityName());
@@ -105,7 +109,7 @@ public class JavaRosaDemoShell implements IShell {
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider()
 				.registerRMSUtility(formDef);
 	}
-	
+
 	private void workflow(IActivity lastActivity, String returnCode, Hashtable returnVals) {
 		//TODO: parse any returnvals into context
 		if(stack.size() != 0) {
@@ -116,8 +120,18 @@ public class JavaRosaDemoShell implements IShell {
 		else {
 			// TODO Auto-generated method stub
 			if (lastActivity == this.splashScreen) {
-				currentActivity = formListActivity;
-				this.formListActivity.start(context);
+				currentActivity = loginActivity;
+				this.loginActivity.start(context);
+			}
+			if (lastActivity == this.loginActivity) {
+				Object returnVal = returnVals.get(LoginActivity.COMMAND_KEY);
+				if (returnVal == "USER_VALIDATED") {
+					currentActivity = formListActivity;
+					this.formListActivity.start(context);
+				}
+				else if (returnVal == "USER_CANCELLED") {
+					this.exitShell();
+				}
 			}
 			if (lastActivity == this.modelActivity) {
 				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
@@ -165,7 +179,7 @@ public class JavaRosaDemoShell implements IShell {
 					}
 				}
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
-					
+
 				}
 			}
 			if (lastActivity == this.formListActivity) {
@@ -180,31 +194,14 @@ public class JavaRosaDemoShell implements IShell {
 						this.propertyActivity.start(context);
 					}
 					if(returnVal == Commands.CMD_SELECT_XFORM) {
-//						FormDefRMSUtility def = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-//						FormDef formDef = new FormDef();
-//						int formId = ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue();
-//						try {
-//						def.retrieveFromRMS(formId, formDef);
-//						}
-//						catch (Exception e) {
-//							e.printStackTrace();
-//						}
-//						DataModelTree data = (DataModelTree)formDef.getDataModel();
-//						formTransport.setData(data);
-//						TransportContext msgContext = new TransportContext(
-//								context);
-//						msgContext.setRequestedTask(TransportContext.SEND_DATA);
-//						currentActivity = formTransport;
-//						formTransport.start(msgContext);
-						
 						FormEntryContext newContext = new FormEntryContext(context);
 						newContext.setFormID(((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue());
 						currentActivity = this.entryActivity;
-						this.entryActivity.start(newContext);										
+						this.entryActivity.start(newContext);
 					}
 				}
 				if (returnCode == Constants.ACTIVITY_COMPLETE) {
-					
+
 				}
 			}
 			if (lastActivity == this.entryActivity) {
@@ -250,11 +247,11 @@ public class JavaRosaDemoShell implements IShell {
 			return false;
 		}
 	}
-	
+
 	public void setMIDlet(MIDlet midlet) {
 		this.midlet = midlet;
 	}
-	
+
 	private String initProperty(String propName, String defaultValue) {
 		Vector propVal = JavaRosaServiceProvider.instance().getPropertyManager().getProperty(propName);
 		if (propVal == null || propVal.size() == 0) {
@@ -269,13 +266,13 @@ public class JavaRosaDemoShell implements IShell {
 		}
 		return (String) propVal.elementAt(0);
 	}
-	
+
 	private void loadProperties() {
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new DemoAppProperties());
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new HttpTransportProperties());
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FormManagerProperties());
-		
+
 		initProperty("DeviceID", genGUID(25));
 		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://openrosa.org/testsubmit.html");
 		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://openrosa.org/testsubmit.html");
