@@ -361,7 +361,7 @@ public class XFormParser {
 						if (!hasITextMapping(f, textRef))
 							throw new XFormParseException("<label> text is not localizable for all locales");
 					} else {
-						throw new XFormParseException("malformed ref for <hint>");
+						throw new XFormParseException("malformed ref for <item>");
 					}
 				}
 			} else if ("value".equals(childName)) {
