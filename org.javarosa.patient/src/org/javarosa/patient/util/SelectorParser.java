@@ -63,31 +63,37 @@ public class SelectorParser {
 		//[a:b:c]
 		else {
 			String a = selector.substring(0, firstColon);
-			String c = selector.substring(secondColon, selector.length()-1);
+			String c = selector.substring(secondColon+1, selector.length());
 			//[a:c]
 			if(secondColon == firstColon) {
+				int cindex;
+				if(c.equals("N")) {
+					cindex = lastIndex;
+				} else {
+					cindex = Integer.parseInt(c); 
+				}
 				firstIndex = boundIndex(Integer.parseInt(a), lastIndex);
-				lastIndex = boundIndex(Integer.parseInt(c), lastIndex);
+				lastIndex = boundIndex(cindex, lastIndex);
 			}
 			//[a:b:] or [:b:c]
 			else {
-				String b = selector.substring(firstColon, secondColon+1);
+				String b = selector.substring(firstColon+1, secondColon);
 				//[:b:c]
-				if(a == "") {
+				if(a.equals("")) {
 					int cIndex;
-					if(c == "N") {
+					if("N".equals(c)) {
 						cIndex = lastIndex;
 					}
 					else {
 						cIndex = Integer.parseInt(c);
 					}
 					lastIndex = boundIndex(cIndex, lastIndex);
-					firstIndex = boundIndex(lastIndex - Integer.parseInt(b), lastIndex); 
+					firstIndex = boundIndex(lastIndex - Integer.parseInt(b) + 1, lastIndex); 
 				}
-				//[a:b]
-				else if(c == "") {
+				//[a:b:]
+				else if("".equals(c)) {
 					firstIndex = boundIndex(Integer.parseInt(a), lastIndex);
-					lastIndex = boundIndex(firstIndex + Integer.parseInt(b), lastIndex);
+					lastIndex = boundIndex(firstIndex + Integer.parseInt(b) - 1, lastIndex);
 				}
 			}
 		}
