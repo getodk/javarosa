@@ -103,6 +103,6 @@ public class PatientMetaDataObject extends MetaDataObject {
     public void setMetaDataParameters(Object object)
     {
         Patient patient = (Patient)object;
-        this.setName(patient.getFullName());
+        this.setName(patient.getName());
     }
 }
