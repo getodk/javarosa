@@ -6,5 +6,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry kind="lib" path="/org.javarosa.demo/lib/j2meunit-javarosa.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entitymgr"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.util"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
