@@ -533,7 +533,7 @@ public class ExternalizableHelper {
 	/* grrr.... why doesn't SimpleOrderedHashtable extend Hashtable? */
 	public static void writeExternal(SimpleOrderedHashtable stringHashtable, DataOutputStream dos) throws IOException {	
 		if(stringHashtable != null){
-			dos.writeByte(stringHashtable.size());
+			writeNumeric(dos, stringHashtable.size());
 			Enumeration keys = stringHashtable.keys();
 			String key;
 			while(keys.hasMoreElements()){
@@ -548,7 +548,7 @@ public class ExternalizableHelper {
 	
 	public static void writeExternalCompoundSOH(SimpleOrderedHashtable compoundHashtable, DataOutputStream dos) throws IOException {	
 		if(compoundHashtable != null){
-			dos.writeByte(compoundHashtable.size());
+			writeNumeric(dos, compoundHashtable.size());
 			Enumeration keys = compoundHashtable.keys();
 			String key;
 			while(keys.hasMoreElements()){
@@ -583,26 +583,26 @@ public class ExternalizableHelper {
 	
 	//we should be able to distinguish between null and empty vectors/hashtables
 	public static SimpleOrderedHashtable readExternalSOH(DataInputStream dis) throws IOException {
-		byte len = dis.readByte();
+		long len = readNumeric(dis);
 		if(len == 0)
 			return null;
 		
 		SimpleOrderedHashtable stringHashtable = new SimpleOrderedHashtable();
 
-		for(byte i=0; i<len; i++ )
+		for(long i=0; i<len; i++ )
 			stringHashtable.put(dis.readUTF(), dis.readUTF());
 		
 		return stringHashtable;
 	}
 	
 	public static SimpleOrderedHashtable readExternalCompoundSOH(DataInputStream dis) throws IOException {
-		byte len = dis.readByte();
+		long len = readNumeric(dis);
 		if(len == 0)
 			return null;
 		
 		SimpleOrderedHashtable compoundHashtable = new SimpleOrderedHashtable();
 
-		for(byte i=0; i<len; i++ ) {
+		for(long i=0; i<len; i++ ) {
 			String key = dis.readUTF();
 			SimpleOrderedHashtable subHashtable = readExternalSOH(dis);
 			compoundHashtable.put(key, subHashtable == null ? new SimpleOrderedHashtable() : subHashtable);
