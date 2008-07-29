@@ -3,12 +3,16 @@ package org.javarosa.patient.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.services.storage.utilities.Externalizable;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.core.util.Map;
+import org.javarosa.entitymgr.model.EntityFieldList;
+import org.javarosa.entitymgr.model.EntityFieldValueList;
+import org.javarosa.entitymgr.model.IEntity;
+import org.javarosa.util.Utilities;
 
 /**
  * The Patient data object contains information and records
@@ -19,20 +23,33 @@ import org.javarosa.core.util.Map;
  * @author Clayton Sims
  *
  */
-public class Patient implements Externalizable {
+public class Patient implements IEntity {
+	
+
+	private static final int INVALID_RECORD_ID = -1;
+	private static final String NULL_DISPLAY_VALUE = "";
 
 	/** RMS Record Id */
-	private int recordId;
+	private int recordId = INVALID_RECORD_ID;
 	
-	/** Patient's given name */
-	private String firstName;
+	/** Patient's medical record ID. Is made Integer instead of int because new patients dont have it. */
+	Integer patientId; //patientid 
+	String prefix;
+	
+	/** Patient's Family name */
+	String familyName;
+	/** Optional Middle Name */
+	String middleName;
 	
 	/** Patient's surname */
-	private String surname;
+	String givenName;
+	String gender;
+	Date birthDate;
+	String patientIdentifier;
+	Vector attributes; //Not serialized since we can generate it on the fly.
+	boolean isNewPatient;
 	
-	/** Patient's medical record ID */
-	private String patientId;
-	
+
 	/* String->IPatientRecord */
 	private Map records;
 	
@@ -50,10 +67,24 @@ public class Patient implements Externalizable {
 	}
 	
 	/**
-	 * @return a human readable version of the patient's full name
+	 * Gets the patient whole name which is a concatenation of the
+	 * given, middle and family names.
+	 * 
+	 * @return
 	 */
-	public String getFullName() {
-		return surname + ", " + firstName;
+	public String getName(){
+		String s="";
+
+		if(getGivenName() != null && getGivenName().length() != 0)
+			s += " " + getGivenName();
+		
+		if(getMiddleName() != null && getMiddleName().length() != 0)
+			s += " " + getMiddleName();
+
+		if(getFamilyName() != null && getFamilyName().length() != 0)
+			s += " " + getFamilyName();
+
+		return s;
 	}
 	
 	/**
@@ -71,50 +102,116 @@ public class Patient implements Externalizable {
 	}
 
 	/**
-	 * @return the firstName
+	 * @return the familyName
 	 */
-	public String getFirstName() {
-		return firstName;
+	public String getFamilyName() {
+		return familyName;
 	}
 
 	/**
-	 * @param firstName the firstName to set
+	 * @param familyName the familyName to set
 	 */
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setFamilyName(String familyName) {
+		this.familyName = familyName;
 	}
 
 	/**
-	 * @return the surname
+	 * @return the givenName
 	 */
-	public String getSurname() {
-		return surname;
+	public String getGivenName() {
+		return givenName;
+	}
+	/**
+	 * @param givenName the givenName to set
+	 */
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
+	}
+	
+	/**
+	 * @return the middleName
+	 */
+	public String getMiddleName() {
+		return middleName;
 	}
 
 	/**
-	 * @param surname the surname to set
+	 * @param middleName the middleName to set
 	 */
-	public void setSurname(String surname) {
-		this.surname = surname;
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
 	}
 
 	/**
-	 * @return the patientId
+	 * @return the gender
 	 */
-	public String getPatientId() {
+	public String getGender() {
+		return gender;
+	}
+
+	/**
+	 * @param gender the gender to set
+	 */
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	/**
+	 * @return the birthDate
+	 */
+	public Date getBirthDate() {
+		return birthDate;
+	}
+
+	/**
+	 * @param birthDate the birthDate to set
+	 */
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
+	
+	/**
+	 * Determines if this is a new record.
+	 * @return true if the record is new.
+	 */
+	public boolean isNew(){
+		return getRecordId() == INVALID_RECORD_ID;
+	}
+	
+
+	public boolean isNewPatient() {
+		return isNewPatient;
+	}
+
+	public void setNewPatient(boolean isNewPatient) {
+		this.isNewPatient = isNewPatient;
+	}
+
+	/**
+	 * Gets the current patient's Id
+	 * @return An Id number representing this patient. Negative ID's are 
+	 * assigned to new patients that have not been synchronized with a server.
+	 */
+	public Integer getPatientId() {
+		//For now, new patients have negative ids. assuming server does not assign negatives
+		//We use recordid value because is takes care of generating new ids for us.
+		if(isNewPatient())
+			return new Integer(-getRecordId());
+		
 		return patientId;
 	}
 
 	/**
 	 * @param patientId the patientId to set
 	 */
-	public void setPatientId(String patientId) {
+	public void setPatientId(Integer patientId) {
 		this.patientId = patientId;
 	}
 	
+
 	public Object getRecord(String recordType) {
-		if(recordType == "firstName") {
-			return firstName;
+		if(recordType == "givenName") {
+			return givenName;
 		}
 		//TODO: We need to figure out how to do these references better
 		return null;
@@ -130,14 +227,74 @@ public class Patient implements Externalizable {
 	
 	//public Vector getMeasurements(String type, String delimeted )
 
+	/**
+	 * @return the prefix
+	 */
+	public String getPrefix() {
+		return prefix;
+	}
+
+	/**
+	 * @param prefix the prefix to set
+	 */
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
+
+	/**
+	 * @return the patientIdentifier
+	 */
+	public String getPatientIdentifier() {
+		return patientIdentifier;
+	}
+
+	/**
+	 * @param patientIdentifier the patientIdentifier to set
+	 */
+	public void setPatientIdentifier(String patientIdentifier) {
+		this.patientIdentifier = patientIdentifier;
+	}
+	
+	public String toString() {
+		String s;
+
+		if(getPrefix() != null && getPrefix().length() != 0)
+			s = getPatientIdentifier() + " " + getPrefix();
+		else
+			s = getPatientIdentifier();
+
+		if(getGivenName() != null && getGivenName().length() != 0)
+			s += " " + getGivenName();
+		
+		if(getMiddleName() != null && getMiddleName().length() != 0)
+			s += " " + getMiddleName();
+
+		if(getFamilyName() != null && getFamilyName().length() != 0)
+			s += " " + getFamilyName();
+
+		if(isNewPatient())
+			s += " (NEW)";
+
+		if(s == null)
+			s = "NAMELESS PatientId="+getPatientId();
+		return s;
+	}
+
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
 		recordId = in.readInt();
 	
-		firstName = ExternalizableHelper.readUTF(in);
-		surname = ExternalizableHelper.readUTF(in);
-		patientId = in.readUTF();
+		setPatientId(ExternalizableHelper.readInteger(in));
+		setPrefix(ExternalizableHelper.readUTF(in));
+		setFamilyName(ExternalizableHelper.readUTF(in));
+		setMiddleName(ExternalizableHelper.readUTF(in));
+		setGivenName(ExternalizableHelper.readUTF(in));
+		setGender(ExternalizableHelper.readUTF(in));
+		setBirthDate(ExternalizableHelper.readDate(in));
+		setPatientIdentifier(ExternalizableHelper.readUTF(in));
+		setNewPatient(in.readBoolean());
+
 		
 		weightRecord = new NumericalRecord();
 		heightRecord = new NumericalRecord();
@@ -150,14 +307,72 @@ public class Patient implements Externalizable {
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(recordId);
-		
-		ExternalizableHelper.writeUTF(out, firstName);
-		ExternalizableHelper.writeUTF(out, surname);
-		out.writeUTF(patientId);
+			
+		ExternalizableHelper.writeInteger(out,getPatientId());
+		ExternalizableHelper.writeUTF(out, getPrefix());
+		ExternalizableHelper.writeUTF(out, getFamilyName());
+		ExternalizableHelper.writeUTF(out, getMiddleName());
+		ExternalizableHelper.writeUTF(out, getGivenName());
+		ExternalizableHelper.writeUTF(out, getGender());
+		ExternalizableHelper.writeDate(out, getBirthDate());
+		ExternalizableHelper.writeUTF(out, getPatientIdentifier());
+		out.writeBoolean(isNewPatient());
 		
 		weightRecord.writeExternal(out);
 		heightRecord.writeExternal(out);
 		cd4CountRecord.writeExternal(out);
 	}
-
+	/** 
+	 * Gets a list of patient attributes.
+	 */
+	public Vector getAttributes(){
+		if(attributes == null)
+			setDefaultAttributes();
+		return attributes;
+	}
+	
+	public void setIdentifier(String identifier){
+		setPatientIdentifier(identifier);
+	}
+	
+	public String getIdentifier(){
+		return getPatientIdentifier();
+	}
+	
+	
+	/**
+	 * Adds a patient attribute. This is the value appended to the atttribute name.
+	 * eg. "WHO Stage: II", "Last Visit Date: 01/01/2009", etc.
+	 * 
+	 * @param attribute
+	 */
+	public void addAttribute(String attribute){
+		if(attributes == null)
+			setDefaultAttributes();
+		attributes.addElement(attribute);
+	}
+	
+	public void addAttributes(EntityFieldList fields, EntityFieldValueList fieldVals){
+		if(attributes == null)
+			setDefaultAttributes();
+		
+		/*for(int i=0; i<fields.size(); i++){
+			EntityField field = fields.getField(i);
+			if(data.containsQuestion(field.getName()))
+				data.setValue(field.getName(), fieldVals.getPatintFiledValue(field.getId(), getPatientId()));
+		}
+		
+		attributes.addElement(attribute);*/
+	}
+	
+	private void setDefaultAttributes(){
+		attributes = new Vector();
+		attributes.addElement("Identifier: " + (getPatientIdentifier() != null ? getPatientIdentifier() : NULL_DISPLAY_VALUE));
+		attributes.addElement("Prefix: " + (getPrefix() != null ? getPrefix() : NULL_DISPLAY_VALUE));
+		attributes.addElement("FamilyName: " + (getFamilyName() != null ? getFamilyName() : NULL_DISPLAY_VALUE));
+		attributes.addElement("MiddleName: " + (getMiddleName() != null ? getMiddleName() : NULL_DISPLAY_VALUE));
+		attributes.addElement("GivenName: " + (getGivenName() != null ? getGivenName() : NULL_DISPLAY_VALUE));
+		attributes.addElement("Gender: " + (getGender() != null ? getGender() : NULL_DISPLAY_VALUE));
+		attributes.addElement("BirthDate: " + (getBirthDate() != null ? Utilities.dateToString(getBirthDate()) : NULL_DISPLAY_VALUE));
+	}
 }
