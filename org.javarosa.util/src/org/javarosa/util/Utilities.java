@@ -18,7 +18,7 @@ public class Utilities {
 		return String.valueOf(new java.util.Date().getTime()); //this needs to be replaced with a realistic implementation
 	}
 	
-	public static String DateToString(Date d){
+	public static String dateToString(Date d){
 		Calendar cd = Calendar.getInstance(java.util.TimeZone.getTimeZone("GMT+830"));
 		cd.setTime(d);
 		String year = "" + cd.get(Calendar.YEAR);
