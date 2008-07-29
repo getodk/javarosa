@@ -55,6 +55,8 @@
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
+					<source dir="${basedir}/../org.javarosa.patient/src/"/>
+					<source dir="${basedir}/../org.javarosa.patient/test/"/>
 				</sources>
 
 				<!-- Build variables -->
@@ -127,9 +129,7 @@
 
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
-		<RunTestSuite suite="org.javarosa.test.J2meUnitTest"/>
-		<RunTestSuite suite="org.javarosa.test.JavaRosaBasicTests"/>
-		<RunTestSuite suite="org.javarosa.xform.test.TestModelBuild"/>
+		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>

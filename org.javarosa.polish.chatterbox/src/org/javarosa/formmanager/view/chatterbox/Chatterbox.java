@@ -169,6 +169,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	
     	//UI hacks ho!
     	babysitStyles();
+    	
 		Timer t = new Timer();
 		t.schedule(new TimerTask () {
 			public void run () {
@@ -176,7 +177,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 				//If they aren't working on your device, you might
 				//need to add it.
 				
-				//Emulator
+				//Emulator and standard 'down' key'
 				UiAccess.emitKeyPress(-2);
 				//Not sure if this works anywhere.
 				UiAccess.emitKeyPress(DOWN);
@@ -328,5 +329,3 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	Alert.setCurrent(JavaRosaServiceProvider.instance().getDisplay(), alert, null);
     }
 }
-    
-//display send now? screens -- these belong outside chatterbox, activity's responsibility to overlay on finished chatterbox displayable
