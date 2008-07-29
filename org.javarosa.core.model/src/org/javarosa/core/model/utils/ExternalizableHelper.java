@@ -1,5 +1,6 @@
 package org.javarosa.core.model.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,6 +23,73 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
  *
  */
 public class ExternalizableHelper {
+	
+	/*
+	 * serialize a numeric value, only using as many bytes as needed. splits up the value into
+	 * chunks of 7 bits, using as many chunks as needed to unambiguously represent the value. each
+	 * chunk is serialized as a single byte, where the most-significant bit is set to 1 to indicate
+	 * there are more bytes to follow, or 0 to indicate the last byte
+	 */
+	public static void writeNumeric (DataOutputStream dos, long l) throws IOException {		
+		int sig = -1;
+		long k;
+		do {
+			sig++;
+			k = l >> (sig * 7);
+		} while (k < -64 || k > 63);
+			
+		for (int i = sig; i >= 0; i--) {
+			byte chunk = (byte)((l >> (i * 7)) & 0x7f);
+			dos.writeByte((i > 0 ? 0x80 : 0x00) | chunk);
+		}
+	}
+
+	/*
+	 * deserialize a numeric value stored in a variable number of bytes. see writeNumeric
+	 */
+	public static long readNumeric (DataInputStream dis) throws IOException {
+		long l = 0;
+		byte b;
+		boolean firstByte = true;
+		
+		do {
+			b = dis.readByte();
+			
+			if (firstByte) {
+				firstByte = false;
+				l = (((b >> 6) & 0x01) == 0 ? 0 : -1); //set initial sign
+			}
+			
+			l = (l << 7) | (b & 0x7f);
+		} while (((b >> 7) & 0x01) == 1);
+		
+		return l;
+	}
+	
+	public static int readNumInt (DataInputStream dis) throws IOException {
+		long l = readNumeric(dis);
+		if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE)
+			throw new ArithmeticException("Deserialized value (" + l + ") cannot fit into int");
+		return (int)l;
+	}
+
+	public static short readNumShort (DataInputStream dis) throws IOException {
+		long l = readNumeric(dis);
+		if (l < Short.MIN_VALUE || l > Short.MAX_VALUE)
+			throw new ArithmeticException("Deserialized value (" + l + ") cannot fit into short");
+		return (short)l;
+	}
+
+	public static byte readNumByte (DataInputStream dis) throws IOException {
+		long l = readNumeric(dis);
+		if (l < Byte.MIN_VALUE || l > Byte.MAX_VALUE)
+			throw new ArithmeticException("Deserialized value (" + l + ") cannot fit into byte");
+		return (byte)l;
+	}	
+	
+
+	
+	
 	
 	/**
 	 * Writes a string to the stream.
@@ -606,4 +674,64 @@ public class ExternalizableHelper {
 		}
 		return 0;
 	}
+	
+	public static boolean numericEncodingUnitTest (long valIn) {
+		byte[] bytesOut; 
+		long valOut;
+		
+		System.out.println("Testing: " + valIn);
+		
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream(100);
+			ExternalizableHelper.writeNumeric(new DataOutputStream(baos), valIn);
+			bytesOut = baos.toByteArray();
+
+			ByteArrayInputStream bais = new ByteArrayInputStream(bytesOut);
+			valOut = ExternalizableHelper.readNumeric(new DataInputStream(bais));
+		} catch (IOException ioe) {
+			System.out.println("  IOException!");
+			return false;
+		}
+		
+		System.out.print("; serialized as: ");
+		for (int i = 0; i < bytesOut.length; i++) {
+			String hex = Integer.toHexString(bytesOut[i]);
+			if (hex.length() == 1)
+				hex = "0" + hex;
+			else
+				hex = hex.substring(hex.length() - 2);
+			System.out.print(hex + " ");
+			i++;
+		}
+		System.out.print("deserialized: ");
+		if (valIn == valOut) {
+			System.out.println("OK");
+			return true;
+		} else {
+			System.out.println("ERROR!! [" + valOut + "]");
+			return false;
+		}
+	}
+	
+	public static void numericEncodingUnitTestSuite () {
+		numericEncodingUnitTest(0);
+		numericEncodingUnitTest(-1);
+		numericEncodingUnitTest(1);			
+		numericEncodingUnitTest(-2);
+	
+		for (int i = 3; i <= 64; i++) {
+			long min = (i < 64 ? -((long)0x01 << (i - 1)) : -9223372036854775808l);
+			long max = (i < 64 ? ((long)0x01 << (i - 1)) - 1 : 9223372036854775807l);
+			
+			numericEncodingUnitTest(max - 1);
+			numericEncodingUnitTest(max);
+			if (i < 64)
+				numericEncodingUnitTest(max + 1);
+			numericEncodingUnitTest(min + 1);
+			numericEncodingUnitTest(min);
+			if (i < 64)
+				numericEncodingUnitTest(min - 1);					
+		}
+	}
+		
 }
