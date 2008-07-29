@@ -679,7 +679,7 @@ public class ExternalizableHelper {
 		byte[] bytesOut; 
 		long valOut;
 		
-		System.out.println("Testing: " + valIn);
+		System.out.print("Testing: " + valIn);
 		
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream(100);
@@ -693,17 +693,18 @@ public class ExternalizableHelper {
 			return false;
 		}
 		
-		System.out.print("; serialized as: ");
+		System.out.print("; serialized as: [");
 		for (int i = 0; i < bytesOut.length; i++) {
 			String hex = Integer.toHexString(bytesOut[i]);
 			if (hex.length() == 1)
 				hex = "0" + hex;
 			else
 				hex = hex.substring(hex.length() - 2);
-			System.out.print(hex + " ");
-			i++;
+			System.out.print(hex);
+			if (i < bytesOut.length - 1)
+				System.out.print(" ");
 		}
-		System.out.print("deserialized: ");
+		System.out.print("]; deserialized: ");
 		if (valIn == valOut) {
 			System.out.println("OK");
 			return true;
@@ -720,8 +721,8 @@ public class ExternalizableHelper {
 		numericEncodingUnitTest(-2);
 	
 		for (int i = 3; i <= 64; i++) {
-			long min = (i < 64 ? -((long)0x01 << (i - 1)) : -9223372036854775808l);
-			long max = (i < 64 ? ((long)0x01 << (i - 1)) - 1 : 9223372036854775807l);
+			long min = (i < 64 ? -((long)0x01 << (i - 1)) : Long.MIN_VALUE);
+			long max = (i < 64 ? ((long)0x01 << (i - 1)) - 1 : Long.MAX_VALUE);
 			
 			numericEncodingUnitTest(max - 1);
 			numericEncodingUnitTest(max);
