@@ -622,6 +622,10 @@ public class XFormParser {
 		
 		return dataType;
 	}
+	
+	public static void addDataType (String type, int dataType) {
+		typeMappings.put(type, new Integer(dataType));
+	}
 
 	public static String getXMLText (Node n, boolean trim) {
 		return (n.getChildCount() == 0 ? null : getXMLText(n, 0, trim));
