@@ -43,6 +43,6 @@ public class TextEntryWidget extends ExpandedWidget {
 
 	protected IAnswerData getWidgetValue () {
 		String s = textField().getText();
-		return (s == null ? null : new StringData(s));
+		return (s == null || s.equals("") ? null : new StringData(s));
 	}
 }
