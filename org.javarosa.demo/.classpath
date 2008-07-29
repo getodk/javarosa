@@ -19,5 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.services.properties"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.chatterbox"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.user"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

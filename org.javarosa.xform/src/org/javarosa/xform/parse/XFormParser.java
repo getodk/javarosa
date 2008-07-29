@@ -333,7 +333,7 @@ public class XFormParser {
 				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 				
 				if (!hasITextMapping(f, textRef))
-					throw new XFormParseException("<hint> text is not localizable for all locales");
+					throw new XFormParseException("<hint> text is not localizable for all locales for reference " + textRef);
 				q.setHelpTextID(textRef, null);
 			} else {
 				throw new RuntimeException("malformed ref for <hint>");
