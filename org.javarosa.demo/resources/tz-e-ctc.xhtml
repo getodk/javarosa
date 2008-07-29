@@ -696,26 +696,20 @@
 	<instance>
 		<data>
 			<ARVRegimen>
-				<RegimenName>
-				</RegimenName>
+				<RegimenName/>
 			</ARVRegimen>
 			<Entry>
-				<RegimenChanged>
-				</RegimenChanged>
+				<RegimenChanged/>
 			</Entry>
 			<Patient>
-				<OnTreatment>
-				</OnTreatment>
+				<OnTreatment/>
 			</Patient>
 			<Reminder>
-				<ToOrder>
-				</ToOrder>
+				<ToOrder/>
 			</Reminder>
 			<Weight>
-				<Value>
-				</Value>
-				<Units>
-				</Units>
+				<Value/>
+				<Units/>
 			</Weight>
 			<History>
 				<data>5</data>
@@ -730,20 +724,16 @@
 				<data>99</data>
 			</History>
 			<Desease>
-				<Status>
-				</Status>
+				<Status/>
 			</Desease>
 			<Ask>
-				<Message>
-				</Message>
+				<Message/>
 			</Ask>
 			<HospitalAdmission>
-				<Status>
-				</Status>
+				<Status/>
 			</HospitalAdmission>
 			<Rash>
-				<Status>
-				</Status>
+				<Status/>
 			</Rash>
 			<Condition>
 				<IsImproved>Yes</IsImproved>
@@ -752,7 +742,7 @@
 	</instance>
 	<bind id="isImproved" nodeset="/data/Condition/IsImproved" type="xsd:string" />
 	<bind id="status" nodeset="/data/Desease/Status" type="xsd:string" />
-	<bind id="weightValue" nodeset="/data/Weight/Value" type="xsd:numeric" />
+	<bind id="weightValue" nodeset="/data/Weight/Value" type="xsd:integer" />
 	<bind id="regimenChanged" nodeset="/data/Entry/RegimenChanged" type="xsd:string" />
 	<bind id="history" nodeset="/data/History/data" type="xsd:string" />
 	<bind id="admissionStatus" nodeset="/data/HospitalAdmission/Status" type="xsd:string" />
