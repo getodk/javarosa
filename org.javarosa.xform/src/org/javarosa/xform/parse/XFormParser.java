@@ -43,7 +43,7 @@ public class XFormParser {
 	//state variables -- not a good idea since this class is static, but that's not really a good idea either, now is it
 	private static boolean modelFound;
 	private static Hashtable bindingsByID;
-	private static Hashtable bindingsByRef;
+	private static Hashtable bindingsByRef; //key is the xpath ref string, not the IDataReference object
 	private static Element instanceNode;
 	
 	static {
@@ -144,6 +144,8 @@ public class XFormParser {
 
 			doc.parse(parser);
 		} catch(Exception e){
+			System.err.println("XML Syntax Error!");
+			
 			e.printStackTrace();
 		}
 
@@ -165,6 +167,8 @@ public class XFormParser {
 		if(instanceNode != null) {
 			parseInstance(formDef, instanceNode);
 		}
+		
+		verifyBindings(formDef);
 		
 		initStateVars();
 		
@@ -215,9 +219,8 @@ public class XFormParser {
 			if ("itext".equals(childName)) {
 				parseIText(f, child);
 			} else if ("instance".equals(childName)) {
-				//Remove the parsing of instance nodes here in favor of parsing them
-				//at the end of the process. That will allow us to properly deal with
-				//bind types. ctsims@dimagi.com - Jul 23, 2008
+				//we save parsing the instance node until the end, giving us the information we need about
+				//binds and data types and such
 				instanceNode = child;
 			} else if ("bind".equals(childName)) {
 				parseBind(f, child);
@@ -272,7 +275,7 @@ public class XFormParser {
 					    controlType == Constants.CONTROL_SELECT_ONE) && "item".equals(childName)) {
 				parseItem(f, question, child);
 			}
-		}		
+		}	
 		
 		parent.addChild(question);
 	}
@@ -515,9 +518,24 @@ public class XFormParser {
 				throw new XFormParseException("XForm Parse: <bind>s with duplicate ID");
 			}
 		}
-		bindingsByRef.put(binding.getId(), binding);
+		bindingsByRef.put((String)binding.getReference().getReference(), binding);
 	}
 
+	private static void attachBind(FormDef f, QuestionDef q, DataBinding binding) {
+		if (q.getBind() == null) {
+			q.setBind(binding.getReference());
+		}
+
+		q.setDataType(binding.getDataType());	
+		//constraints?
+		//conditions?
+		q.setRequired(binding.isRequired());
+	}
+	
+	private static void verifyBindings (FormDef f) {
+		
+	}
+	
 	private static void parseInstance (FormDef f, Element e) {
 		Element dataElement = null;
 		for (int i = 0; i < e.getChildCount(); i++) {
@@ -540,12 +558,14 @@ public class XFormParser {
 		int childNum = node.getChildCount();
 
 		TreeElement element;
-		XPathReference reference = new XPathReference(currentPath+ node.getName());
-
-		if (bindingsByRef.containsKey(reference)) {
-			DataBinding binding = (DataBinding)bindingsByRef.get(reference);
+		String refStr = currentPath + node.getName();
+		XPathReference reference = new XPathReference(refStr);
+		
+		if (bindingsByRef.containsKey(refStr)) {
+			DataBinding binding = (DataBinding)bindingsByRef.get(refStr);
 			// This node, and its children represent some sort of Question
 			element = new QuestionDataElement(node.getName(), reference);
+			
 			((QuestionDataElement)element).setValue(XFormAnswerDataParser.getAnswerData(binding, node));
 		} else {
 			if (childNum == 0) {
@@ -582,17 +602,6 @@ public class XFormParser {
 			}
 		}
 		return element;
-	}
-				
-	private static void attachBind(FormDef f, QuestionDef q, DataBinding binding) {
-		if (q.getBind() == null) {
-			q.setBind(binding.getReference());
-		}
-
-		q.setDataType(binding.getDataType());	
-		//constraints?
-		//conditions?
-		q.setRequired(binding.isRequired());
 	}
 	
 	private static int getDataType (String type) {
