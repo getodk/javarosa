@@ -447,6 +447,7 @@
 						<RegimenChanged />
 					</ARVRegimen>
 					<Patient>
+						<MonthsOnTreatment />
 						<OnTreatment />
 					</Patient>
 					<Reminder>
@@ -512,11 +513,12 @@
 			<bind id="regimenName" nodeset="/data/ARVRegimen/RegimenName" type="xsd:string" />
 			<bind id="regimenChanged" nodeset="/data/ARVRegimen/RegimenChanged" type="xsd:string" />
 
+			<bind id="monthsOnTreatment" nodeset="/data/Patient/MonthsOnTreatment" type="xsd:integer" jr:preload="patient" jr:preloadParams="monthsOnTreatment" />
 			<bind id="onTreatment" nodeset="/data/Patient/OnTreatment" type="xsd:string" />
 
 			<bind id="toOrder" nodeset="/data/Reminder/ToOrder" type="xsd:string" />
 
-			<bind id="history" nodeset="/data/History/data" type="xsd:string" />
+			<bind id="history" nodeset="/data/History/data" type="jr:numtable" jr:preload="patient" jr:preloadParams="weight[:10:N]"/>
 
 			<bind id="status" nodeset="/data/Disease/Status" type="xsd:string" />
 
@@ -605,7 +607,7 @@
 				<value>Not on Arvs Yet</value>
 			</item>
 		</select1 >
-		<select1 bind="regimenChanged" appearance="full">
+		<select1 relevant="/HMISFormA/internal/more1!='1c:ZDV-3TC-EFV'" bind="regimenChanged" appearance="full">
 			<label ref="jr:itext('question2')"/>
 			<hint ref="jr:itext('question2hint')"/>
 			<item>
@@ -617,7 +619,7 @@
 				<value>Keep my current Entry</value>
 			</item>
 		</select1 >
-		<select1 bind="onTreatment" appearance="full">
+		<select1 relevant="/data/Patient/MonthsOnTreatment>=12" bind="onTreatment" appearance="full">
 			<label ref="jr:itext('question3')"/>
 			<hint ref="jr:itext('question3hint')"/>
 			<item>
@@ -689,7 +691,7 @@
 				<value>Yes</value>
 			</item>
 		</select1 >
-		<select1 bind="isImproved" appearance="full">
+		<select1 relevant="/data/Rash/Status='Yes'" bind="isImproved" appearance="full">
 			<label ref="jr:itext('question11')"/>
 			<hint ref="jr:itext('question11hint')"/>
 			<item>
@@ -766,7 +768,7 @@
 				<value>Yes</value>
 			</item>
 		</select1 >
-		<select1 bind="botheredByLoss" appearance="full">
+		<select1 relevant="/data/Weight/LossLocation='Yes'" bind="botheredByLoss" appearance="full">
 			<label ref="jr:itext('botheredByLossText')"/>
 			<hint ref="jr:itext('botheredByLossHint')"/>
 			<item>
@@ -792,7 +794,7 @@
 			</item>
 		</select1 >
 
-		<select1 bind="gainProportional" appearance="full">
+		<select1 relevant="/data/Weight/GainLocation='Yes'" bind="gainProportional" appearance="full">
 			<label ref="jr:itext('gainProportionalText')"/>
 			<hint ref="jr:itext('gainProportionalHint')"/>
 			<item>
@@ -804,7 +806,7 @@
 				<value>Yes</value>
 			</item>
 		</select1 >
-		<select1 bind="botheredByGain" appearance="full">
+		<select1 relevant="/data/Weight/GainProportional='Yes'" bind="botheredByGain" appearance="full">
 			<label ref="jr:itext('botheredByGainText')"/>
 			<hint ref="jr:itext('botheredByGainHint')"/>
 			<item>
@@ -830,7 +832,7 @@
 			</item>
 		</select1 >
 
-		<select1 bind="tbTreatmentFeelingBetter" appearance="full">
+		<select1 relevant="/data/TbAndCoughing/OnTbTreatment='Yes'" bind="tbTreatmentFeelingBetter" appearance="full">
 			<label ref="jr:itext('tbTreatmentFeelingBetterText')"/>
 			<hint ref="jr:itext('tbTreatmentFeelingBetterHint')"/>
 			<item>
@@ -843,7 +845,7 @@
 			</item>
 		</select1 >
 
-		<select1 bind="coughing" appearance="full">
+		<select1 relevant="/data/TbAndCoughing/OnTbTreatment='NO'" bind="coughing" appearance="full">
 			<label ref="jr:itext('coughingText')"/>
 			<hint ref="jr:itext('coughingHint')"/>
 			<item>
@@ -856,7 +858,7 @@
 			</item>
 		</select1 >
 
-		<select1 bind="housemateWithCoughTb" appearance="full">
+		<select1 relevant="/data/TbAndCoughing/Cough/Coughing='Yes'" bind="housemateWithCoughTb" appearance="full">
 			<label ref="jr:itext('housemateWithCoughTbText')"/>
 			<hint ref="jr:itext('housemateWithCoughTbHint')"/>
 			<item>
@@ -869,7 +871,7 @@
 			</item>
 		</select1 >
 
-		<select1 bind="lengthCoughing" appearance="full">
+		<select1 relevant="/data/TbAndCoughing/Cough/Coughing='Yes'" bind="lengthCoughing" appearance="full">
 			<label ref="jr:itext('lengthCoughingText')"/>
 			<hint ref="jr:itext('lengthCoughingHint')"/>
 			<item>
@@ -882,7 +884,7 @@
 			</item>
 		</select1 >
 
-		<select1 bind="bloodySputum" appearance="full">
+		<select1 relevant="/data/TbAndCoughing/Cough/Coughing='Yes'" bind="bloodySputum" appearance="full">
 			<label ref="jr:itext('bloodySputumText')"/>
 			<hint ref="jr:itext('bloodySputumHint')"/>
 			<item>
@@ -908,7 +910,7 @@
 			</item>
 		</select1 >
 
-		<select1 bind="sweatSoaks" appearance="full">
+		<select1 relevant="/data/TbAndCoughing/Sweats/SweatSoaks='Yes'" bind="sweatSoaks" appearance="full">
 			<label ref="jr:itext('sweatSoaksText')"/>
 			<hint ref="jr:itext('sweatSoaksHint')"/>
 			<item>
@@ -921,7 +923,7 @@
 			</item>
 		</select1 >
 
-		<select1 bind="nightlySoak" appearance="full">
+		<select1 relevant="/data/TbAndCoughing/Sweats/NightlySoak='Yes'" bind="nightlySoak" appearance="full">
 			<label ref="jr:itext('nightlySoakText')"/>
 			<hint ref="jr:itext('nightlySoakHint')"/>
 			<item>
@@ -947,7 +949,7 @@
 			</item>
 		</select1 >
 
-		<select1 bind="shortBreathStatus" appearance="full" >
+		<select1 relevant="/data/TbAndCoughing/ShortBreath='Yes'" bind="shortBreathStatus" appearance="full" >
 			<label ref ="jr:itext('shortBreathStatusText')" />
 			<hint ref ="jr:itext('shortBreathStatusHint')" />
 			<item>
