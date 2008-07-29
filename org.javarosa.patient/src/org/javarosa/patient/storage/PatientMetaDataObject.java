@@ -33,9 +33,9 @@ public class PatientMetaDataObject extends MetaDataObject {
      */
     public PatientMetaDataObject(Patient patient)
     {
-        this.patientName = patient.getFullName();
+        this.patientName = patient.getName();
         this.patientRecordId = patient.getRecordId();
-        this.patientId = patient.getPatientId();
+        this.patientId = patient.getPatientIdentifier();
         
     }
     
