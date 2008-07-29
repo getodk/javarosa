@@ -54,9 +54,11 @@
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>					
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
+					<source dir="${basedir}/../org.javarosa.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
-					<source dir="${basedir}/../org.javarosa.patient/src/"/>
-					<source dir="${basedir}/../org.javarosa.patient/test/"/>
+					<!--source dir="${basedir}/../org.javarosa.entitymgr/src/"/-->
+					<!--source dir="${basedir}/../org.javarosa.patient/src/"/-->
+					<!--source dir="${basedir}/../org.javarosa.patient/test/"/-->
 				</sources>
 
 				<!-- Build variables -->
