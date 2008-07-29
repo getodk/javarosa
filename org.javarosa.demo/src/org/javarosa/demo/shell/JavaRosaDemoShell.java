@@ -14,7 +14,6 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
-import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
@@ -22,7 +21,6 @@ import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.activity.SplashScreenModule;
-import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.demo.properties.DemoAppProperties;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
@@ -35,6 +33,7 @@ import org.javarosa.formmanager.view.Commands;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
+import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.xform.util.XFormUtils;
 
 /**
@@ -81,6 +80,7 @@ public class JavaRosaDemoShell implements IShell {
 		this.propertyActivity = new PropertyScreenActivity(this);
 
 		currentActivity = splashScreen;
+		
 		this.splashScreen.start(context);
 	//	switchView(ViewTypes.FORM_LIST);
 	}
@@ -103,6 +103,8 @@ public class JavaRosaDemoShell implements IShell {
 					.getFormFromResource("/hmis-b_draft.xhtml"));
 			formDef.writeToRMS(XFormUtils
 					.getFormFromResource("/shortform.xhtml"));
+			formDef.writeToRMS(XFormUtils
+					.getFormFromResource("/tz-e-ctc.xhtml"));
 		}
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider()
 				.registerRMSUtility(dataModel);
@@ -120,8 +122,12 @@ public class JavaRosaDemoShell implements IShell {
 		else {
 			// TODO Auto-generated method stub
 			if (lastActivity == this.splashScreen) {
+				//#if javarosa.dev.shortcuts
+				currentActivity = this.formListActivity;
+				//#else 
 				currentActivity = loginActivity;
-				this.loginActivity.start(context);
+				//#endif
+				this.currentActivity.start(context);
 			}
 			if (lastActivity == this.loginActivity) {
 				Object returnVal = returnVals.get(LoginActivity.COMMAND_KEY);
