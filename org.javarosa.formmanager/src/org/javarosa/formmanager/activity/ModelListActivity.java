@@ -12,7 +12,6 @@
 package org.javarosa.formmanager.activity;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -32,12 +31,12 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
-import org.javarosa.core.model.FormData;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeMetaData;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
@@ -220,7 +219,8 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 
     public void populateListWithModels()
     {
-
+    	ITransportManager tm = JavaRosaServiceProvider.instance().getTransportManager();
+    	
     	this.dataModelRMSUtility.open();
     	RecordEnumeration recordEnum = this.dataModelRMSUtility.enumerateMetaData();
     	modelIDs = new Vector();
@@ -236,7 +236,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 				// TODO fix it so that record id is part of the metadata serialization
 				mdata.setRecordId(i);
 
-				Image stateImg = getStateImage(getModelDeliveryStatus(i));
+				Image stateImg = getStateImage(tm.getModelDeliveryStatus(i, true));
 
 				this.append(mdata.getRecordId()+"-"+mdata.getName()+"_"+mdata.getDateSaved()+"_"+mdata.getRecordId(), stateImg);
 				modelIDs.insertElementAt(mdata,pos);
@@ -276,22 +276,5 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 		gc.setColor(r, g, b);
 		gc.fillRect(0, 0, w, h);
 		return res;
-	}
-
-	private int getModelDeliveryStatus(int modelId) {
-
-		//TODO: Are we OK with using the transport manager here? There's coupling...
-		Enumeration qMessages = JavaRosaServiceProvider.instance().getTransportManager().getMessages();
-		//TODO: The way we're doing this is fairly wasteful. We should store them
-		//locally, and update on change, instead of getting each one.
-		TransportMessage message;
-		while(qMessages.hasMoreElements())
-    	{
-			message = (TransportMessage) qMessages.nextElement();
-			if(message.getModelId()==modelId)
-				return message.getStatus();
-
-    	}
-		return 0;
 	}
 }

@@ -34,8 +34,7 @@ public class SubmitStatusScreen extends Form  {
 		switch (status) {
 		case TransportMessage.STATUS_NEW:       message = (counter < TIMEOUT ? "Sending..."
 				: "Sending is taking a long time; you may check on the status and/or resend later in 'View Saved'"); break;
-		case TransportMessage.STATUS_DELIVERED: message = "Form has been submitted successfully! " +
-				"The Ministry of Health thanks you for your participation in the GATHER field test!"; break;
+		case TransportMessage.STATUS_DELIVERED: message = "Form has been submitted successfully!"; break;
 		case TransportMessage.STATUS_FAILED:    message = "Submission failed! Please try to submit the form again later in 'View Saved'."; break;
 		default:                                message = "Unknown sending error; form not sent!"; break;
 		}

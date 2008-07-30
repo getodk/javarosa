@@ -26,6 +26,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
+import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
@@ -432,7 +433,7 @@ public class FormTransportActivity implements
 		if(this.data != null) {
 			byte[] dataBytes =  dataModelSerializer.serializeDataModel(data);
 			JavaRosaServiceProvider.instance().getTransportManager().enqueue(dataBytes,
-					destinationUrl, transportMethod,this.data.getFormReferenceId());
+					destinationUrl, transportMethod, this.data.getId());
 		}else{
 			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,
 					AlertType.ERROR);
@@ -444,7 +445,7 @@ public class FormTransportActivity implements
 		timer.schedule(new TimerTask () {
 			public void run () {
 				counter += SubmitStatusScreen.REFRESH_INTERVAL;
-				submitStatusScreen.updateStatus(data.getId());
+				submitStatusScreen.updateStatus(JavaRosaServiceProvider.instance().getTransportManager().getModelDeliveryStatus(data.getId(), false));
 			}
 		}, SubmitStatusScreen.REFRESH_INTERVAL, SubmitStatusScreen.REFRESH_INTERVAL);
 		shell.setDisplay(this, submitStatusScreen);
@@ -485,6 +486,7 @@ public class FormTransportActivity implements
 		this.data = data;
 	}
 	
+	//this method is unused and almost identical to ModelListActivity.getModelDeliveryStatus
 	public int getSubmitStatus(int recordId) {
     	
     	Enumeration qMessages = JavaRosaServiceProvider.instance().getTransportManager().getMessages();
