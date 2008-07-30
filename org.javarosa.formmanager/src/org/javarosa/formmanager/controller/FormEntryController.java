@@ -70,7 +70,7 @@ public class FormEntryController {
 	}
 	
 	public void save () {
-		boolean postProcessModified = false; //do form post-processing here
+		boolean postProcessModified = model.getForm().postProcessModel();
 		
 		if (!model.isSaved() || postProcessModified) {
 			FormDef form = model.getForm();
@@ -91,43 +91,6 @@ public class FormEntryController {
 			model.modelSaved(instanceID);
 		}
 	}
-
-	
-	
-//
-//	    public void postProcessForm () {
-//	    	//binds bound to prompts
-//	    	for (Enumeration e = form.getPrompts().elements(); e.hasMoreElements(); ) {
-//	    		Prompt p = (Prompt)e.nextElement();
-//	    		
-//	    		if (p.getBind() != null && "property".equals(p.getBind().preload)) {
-//	    			String propname = p.getBind().preloadParams;
-//	    			String value = J2MEUtil.getXMLStringValue(p.getValue(), p.getReturnType());
-//	    			
-//	    			if (propname != null && propname.length() > 0 && value != null && value.length() > 0)
-//	    				PropertyManager.instance().setProperty(propname, value);
-//	    		}
-//	    	}
-//	    	
-//	    	//binds not bound (hidden fields)
-//	    	Vector unboundBinds = XMLUtil.getUnattachedBinds(form);
-//			for (Enumeration e = unboundBinds.elements(); e.hasMoreElements(); ) {
-//				String value = null;
-//				Binding b = (Binding)e.nextElement();
-//				if (b.preload == null)
-//					continue;			
-//				
-//				if (b.preload.equals("timestamp") && "end".equals(b.preloadParams)) {
-//					value = J2MEUtil.formatDateToTimeStamp(new Date());
-//				}
-//				
-//				if (b.getNodeset() != null && value != null && value.length() > 0)
-//					form.updateModel(b.getNodeset(), value);				
-//			}
-//	    }
-
-	
-	
 	
 	public void exit () {
 		view.destroy();
