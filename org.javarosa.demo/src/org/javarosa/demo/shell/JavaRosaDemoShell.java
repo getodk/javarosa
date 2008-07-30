@@ -18,6 +18,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.activity.SplashScreenModule;
@@ -152,7 +153,7 @@ public class JavaRosaDemoShell implements IShell {
 				launchFormTransportActivity(context, TransportContext.MESSAGE_VIEW, null);
 			} else if (returnVal == ModelListActivity.CMD_EDIT) {
 				launchFormEntryActivity(context, ((FormDef)returnVals.get("form")).getID(),
-						((DataModelTree)returnVals.get("data")).getFormReferenceId());
+						((DataModelTree)returnVals.get("data")).getId());
 			} else if (returnVal == ModelListActivity.CMD_SEND) {
 				launchFormTransportActivity(context, TransportContext.SEND_DATA, (DataModelTree)returnVals.get("data"));
 			} else if (returnVal == ModelListActivity.CMD_BACK) {
@@ -172,7 +173,7 @@ public class JavaRosaDemoShell implements IShell {
 			relaunchListActivity();			
 			
 			//what is this for?
-/*			if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+			/*if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 				String returnVal = (String)returnVals.get(FormTransportActivity.RETURN_KEY);
 				if(returnVal == FormTransportActivity.VIEW_MODELS) {
 					currentActivity = this.modelActivity;
