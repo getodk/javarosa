@@ -157,7 +157,7 @@ public class QuestionPreloader {
 	 */
 	private IAnswerData preloadTimestamp(String preloadParams) {
 		String value = null;
-		if (preloadParams.equals("start") || preloadParams.equals("end")) {
+		if ("start".equals(preloadParams)) { //timestamp 'end' should not be preloaded
 			value = DateUtils.formatDateToTimeStamp(new Date());
 		} else {
 			throw new IllegalArgumentException("Preload 'timestamp' requires a valid parameter ('start' or 'end'), in order to be properly parsed");
