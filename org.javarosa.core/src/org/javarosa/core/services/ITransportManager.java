@@ -117,4 +117,6 @@ public interface ITransportManager extends IService {
 	public abstract void updateMessage(TransportMessage message)
 			throws IOException;
 
+	
+	public int getModelDeliveryStatus (int modelID, boolean notFoundOK);
 }

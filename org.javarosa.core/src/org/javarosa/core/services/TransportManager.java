@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.Storage;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -205,4 +206,20 @@ public class TransportManager implements Observer, IService, ITransportManager {
 		storage.updateMessage(message);
 	}
 
+	public int getModelDeliveryStatus(int modelId, boolean notFoundOK) {
+
+		//TODO: Are we OK with using the transport manager here? There's coupling...
+		Enumeration qMessages = getMessages();
+		//TODO: The way we're doing this is fairly wasteful. We should store them
+		//locally, and update on change, instead of getting each one.
+		TransportMessage message;
+		while(qMessages.hasMoreElements())
+    	{
+			message = (TransportMessage) qMessages.nextElement();
+			if(message.getModelId()==modelId)
+				return message.getStatus();
+
+    	}
+		return (notFoundOK ? TransportMessage.STATUS_NOT_SENT : -1);
+	}
 }
