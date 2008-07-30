@@ -182,7 +182,7 @@ public class FormTransportActivity implements
 			shell.setDisplay(this, mainMenu);
 		}
 		else if(task.equals(TransportContext.MESSAGE_VIEW)) {
-			shell.setDisplay(this, messageList);
+			showMessageList();
 		}
 		else if(task.equals(TransportContext.SEND_DATA)) {
 			submitScreen = new SubmitScreen();
