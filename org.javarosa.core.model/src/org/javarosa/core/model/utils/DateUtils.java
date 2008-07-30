@@ -24,15 +24,17 @@ public class DateUtils {
 	 */
 	public static String formatDateToTimeStamp(Date date) {
 		String dateElement = getXMLStringValue(date);
-		
 		Calendar cd = Calendar.getInstance();
 		cd.setTime(date);
-		String hour = String.valueOf(cd.get(Calendar.HOUR));
+		
+		String hour = String.valueOf(cd.get(Calendar.HOUR_OF_DAY));
 		hour = hour.length() < 2 ? "0" + hour : hour;
 		String minute = String.valueOf(cd.get(Calendar.MINUTE));
 		minute = minute.length() < 2 ? "0" + minute : minute;
-		String time = hour + ":"+ minute + ":" + String.valueOf(cd.get(Calendar.MILLISECOND)).substring(0,2);
+		String second = String.valueOf(cd.get(Calendar.SECOND));
+		second = second.length() < 2 ? "0" + second : second;		
 		
+		String time = hour + ":"+ minute + ":" + second;
 		return dateElement + "T" + time;
 	}
 
