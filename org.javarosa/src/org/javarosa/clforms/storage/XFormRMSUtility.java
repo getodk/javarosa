@@ -100,19 +100,19 @@ public class XFormRMSUtility extends RMSUtility {
 		*/
 
 		/* NEW RESOURCE-BASED SCHEME */
-		
-		String form = "/MobieSurvey.xhtml";
+
+		String form = "/MobileSurvey.xhtml";
 		System.out.println(form);
 		writeFormFromResource(form);
-		
+
 		/* LOAD CDC-TZ FORMS
         this.open();
 //      CDCXForms cdcXForm = new CDCXForms();
         CDCXFormDemo cdcXForm = new CDCXFormDemo();
-        cdcXForm.setDemo();		
+        cdcXForm.setDemo();
         System.out.println("Storing sample Xform");
 //      Form form = cdcXForm.getXFormObject();
-//      XFormMetaData metaData = new XFormMetaData(cdcXForm.getXFormObject()); 
+//      XFormMetaData metaData = new XFormMetaData(cdcXForm.getXFormObject());
 		this.writeToRMS(cdcXForm.getXFormObject(), new XFormMetaData(cdcXForm.getXFormObject()));
         System.out.println("CDCXForm Stored ");
 		*/
