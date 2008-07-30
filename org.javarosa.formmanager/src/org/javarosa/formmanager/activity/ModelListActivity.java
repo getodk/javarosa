@@ -189,7 +189,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
                 //TODO: We need some way to codify this Next Action stuff. Maybe a set of Constants for the ModelListModule?
                 formSendArgs.put(returnKey, CMD_SEND);
                 formSendArgs.put("data", model);
-                mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, formSendArgs);
+                mainShell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, formSendArgs);
             }
         } else if (c == CMD_EMPTY)
         {
@@ -197,7 +197,9 @@ public class ModelListActivity extends List implements CommandListener, IActivit
             createView();
         } else if (c == CMD_BACK)
         {
-        	mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+        	Hashtable returnArgs = new Hashtable();
+        	returnArgs.put(returnKey, CMD_BACK);
+        	mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
         } else if (c == CMD_DELETE)
         {
         	DataModelTreeMetaData data = (DataModelTreeMetaData) modelIDs.elementAt(this.getSelectedIndex());
@@ -208,7 +210,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
         	//TODO: This is a phenomenal chance to try out the "inherited menus". Should look into that. 
         	Hashtable returnArgs = new Hashtable();
         	returnArgs.put(returnKey, CMD_MSGS);
-        	mainShell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs);
+        	mainShell.returnFromActivity(this, Constants.ACTIVITY_SUSPEND, returnArgs);
 
         } else if (c == CMD_REFRESH)
         {
