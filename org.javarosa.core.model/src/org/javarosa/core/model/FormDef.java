@@ -3,15 +3,20 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.model.utils.QuestionPreloader;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
@@ -268,6 +273,30 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 				model.updateDataValue(binding.getReference(), preload);
 			}
 		}
+	}
+	
+	//TODO: make this all generic like preloadModel
+	public boolean postProcessModel () {
+		boolean modelModified = false;
+		
+		for (Enumeration e = dataBindings.elements(); e.hasMoreElements(); ) {
+			DataBinding b = (DataBinding)e.nextElement();
+			IDataReference ref = b.getReference();
+
+			//model-modifying operations should come first
+			if ("timestamp".equals(b.getPreload()) && "end".equals(b.getPreloadParams())) {
+				model.updateDataValue(ref, new StringData(DateUtils.formatDateToTimeStamp(new Date())));
+				modelModified = true;
+			} else if ("property".equals(b.getPreload())) {
+				String propName = b.getPreloadParams();
+				IAnswerData answer = model.getDataValue(ref);
+				String value = (answer == null ? null : answer.getDisplayText());
+				if (propName != null && propName.length() > 0 && value != null && value.length() > 0)
+					JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propName, value);
+			}
+		}
+			
+		return modelModified;
 	}
 	
 	/** 
