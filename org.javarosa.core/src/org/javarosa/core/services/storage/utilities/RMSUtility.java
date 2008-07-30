@@ -120,9 +120,12 @@ public class RMSUtility implements RecordListener
     	int recordId = -1;
         try
         {
-            recordId = this.recordStore.getNextRecordID();
+        	//if this is a metadata object, we just wipe out the data object's record id that
+        	//was already written in here. let's hope they're the same...
+        	recordId = this.recordStore.getNextRecordID();
     		if (obj instanceof IDRecordable)
     			((IDRecordable)obj).setRecordId(recordId);
+    		
             Externalizable externalizableObject = (Externalizable) obj;
             byte[] data = Serializer.serialize(externalizableObject);
             //LOG
