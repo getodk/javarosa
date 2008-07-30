@@ -95,6 +95,7 @@ public class PropertyScreenActivity implements IActivity, CommandListener, ItemS
 		 screen.addCommand(CMD_DONE);
 		 screen.addCommand(CMD_CANCEL);
 		 screen.setCommandListener(this);
+		 screen.setItemStateListener(this);
 		 shell.setDisplay(this,screen);
 	}
 	
@@ -111,7 +112,7 @@ public class PropertyScreenActivity implements IActivity, CommandListener, ItemS
 	
 
     public void itemStateChanged(Item item) {
-        if (item.getClass() == ChoiceGroup.class) {
+        if (item instanceof ChoiceGroup) {
             ChoiceGroup cg = (ChoiceGroup) item;
             Vector choices = (Vector) screen.getItemChoices().get(cg);
             String propertyName = cg.getLabel();
@@ -128,17 +129,20 @@ public class PropertyScreenActivity implements IActivity, CommandListener, ItemS
                     changes.put(propertyName, selection);
                 }
             }
-        } else if (item.getClass() == TextField.class) {
+        } else if (item instanceof TextField) {
             TextField tf = (TextField) item;
             String propertyName = tf.getLabel();
             // This is a weird way to do this, but essentially works as long as
             // there is only
             // one possible property (which is true for now).
-            if (JavaRosaServiceProvider.instance().getPropertyManager().getProperty(propertyName).contains(
-                    tf.toString())) {
+            Vector prop = JavaRosaServiceProvider.instance().getPropertyManager().getProperty(propertyName);
+            if(prop == null) {
+            	prop = new Vector();
+            }
+            if (prop.contains(tf.toString())) {
                 changes.remove(propertyName);
             } else {
-                changes.put(propertyName, tf.toString());
+                changes.put(propertyName, tf.getString());
             }
         }
     }
