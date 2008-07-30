@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.util.Externalizable;
 
 
 /**
@@ -74,7 +74,7 @@ public class RequestHeader implements Externalizable{
 	}
 		
 	/**
-	 * @see org.javarosa.util.db.Externalizable#writeExternal(java.io.DataOutputStream)
+	 * @see org.javarosa.core.util.util.db.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException{
 		dos.writeUTF(getUserName());
@@ -83,7 +83,7 @@ public class RequestHeader implements Externalizable{
 	}
 	
 	/**
-	 * @see org.javarosa.util.db.Externalizable#readExternal(java.io.DataInputStream)
+	 * @see org.javarosa.core.util.util.db.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream dis) throws IOException,InstantiationException,IllegalAccessException{
 		if(!ExternalizableHelper.isEOF(dis)){

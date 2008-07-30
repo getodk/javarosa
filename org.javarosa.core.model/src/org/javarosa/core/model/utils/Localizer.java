@@ -7,7 +7,7 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
-import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.util.Externalizable;
 
 public class Localizer implements Externalizable {
 	private SimpleOrderedHashtable localeData; /* String -> Hashtable{ String -> String } */

@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.IDataModelVisitor;
-import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.util.Externalizable;
 
 public interface IFormDataModel extends Externalizable {
 	

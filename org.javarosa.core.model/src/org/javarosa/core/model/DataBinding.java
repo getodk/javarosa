@@ -8,8 +8,8 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.PrototypeFactory;
-import org.javarosa.core.services.storage.utilities.Externalizable;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class DataBinding  implements Externalizable {
 	private String id;

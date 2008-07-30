@@ -1,4 +1,4 @@
-package org.javarosa.core.services.storage.utilities;
+package org.javarosa.core.util;
 
 /**
  * Unavailable Externalizer Exceptions are thrown when an Externalizing object

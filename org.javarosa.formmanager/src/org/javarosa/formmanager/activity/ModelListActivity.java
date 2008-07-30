@@ -38,8 +38,8 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeMetaData;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.core.services.transport.TransportMessage;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 /**
  *

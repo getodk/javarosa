@@ -12,7 +12,7 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.api.IActivity;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 

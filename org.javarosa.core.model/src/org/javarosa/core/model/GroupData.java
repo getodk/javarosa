@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.services.storage.utilities.Externalizable;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 /** This object contains the collected data of a group in a form or questionaire
  * Separating group data and definition is for optimisation. This is achieved

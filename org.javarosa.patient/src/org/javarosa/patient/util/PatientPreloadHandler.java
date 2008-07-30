@@ -29,6 +29,15 @@ public class PatientPreloadHandler implements IPreloadHandler {
 		if(preloadParams == "monthsOnTreatment") {
 			//TODO: Get actual data from patient
 			returnVal = new IntegerData(12);
+		} else {
+			int selectorStart = preloadParams.indexOf("[");
+			if(selectorStart == -1) {
+				patient.getRecord(preloadParams);
+			} else {
+				String type = preloadParams.substring(0, selectorStart -1);
+				String selector = preloadParams.substring(selectorStart, preloadParams.length());
+				patient.getRecordSet(type, selector);
+			}
 		}
 		return returnVal;
 	}

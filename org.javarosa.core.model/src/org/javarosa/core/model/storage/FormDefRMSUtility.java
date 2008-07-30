@@ -20,7 +20,7 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.UnavailableExternalizerException;
 /**
  * The RMS persistent storage utility for FormDef
  * objects.

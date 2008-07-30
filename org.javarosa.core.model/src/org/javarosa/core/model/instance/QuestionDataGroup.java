@@ -9,7 +9,7 @@ import java.util.Vector;
 import org.javarosa.core.model.instance.utils.ElementExistsVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 
 /**

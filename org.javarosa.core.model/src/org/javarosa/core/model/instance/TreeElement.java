@@ -2,7 +2,7 @@ package org.javarosa.core.model.instance;
 
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.PrototypeFactory;
-import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.util.Externalizable;
 
 /**
  * An element of a DataModelTree. Contains a name, and a 

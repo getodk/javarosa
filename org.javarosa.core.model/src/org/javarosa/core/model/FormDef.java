@@ -12,9 +12,9 @@ import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.model.utils.QuestionPreloader;
-import org.javarosa.core.services.storage.utilities.Externalizable;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 /**
  * Definition of a form. This has some meta data about the form definition and  
