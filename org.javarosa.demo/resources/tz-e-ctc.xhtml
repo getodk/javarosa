@@ -438,6 +438,105 @@
 					<text id="shortBreathStatusLabel2">
 						<value form="">Yes</value>
 					</text>
+					
+					<text id="mouthPainText">
+						<value form="long">Do you have pain or sores in your mouth or trouble swallowing?</value>
+						<value form="short">Mouth Pain</value>
+					</text>
+					<text id="mouthPainHint">
+						<value form="">Select Correct answer</value>
+					</text>
+					<text id="mouthPainLabel1">
+						<value form="">No</value>
+					</text>
+					<text id="mouthPainLabel2">
+						<value form="">Yes</value>
+					</text>
+					
+					<text id="stomachPainText">
+						<value form="long">Do you have stomach pain or discomfort?</value>
+						<value form="short">Stomach Pain</value>
+					</text>
+					<text id="stomachPainHint">
+						<value form="">Select Correct answer</value>
+					</text>
+					<text id="stomachPainLabel1">
+						<value form="">No</value>
+					</text>
+					<text id="stomachPainLabel2">
+						<value form="">Yes</value>
+					</text>
+					
+					<text id="stomachWorseText">
+						<value form="long">Is it new or getting worse since your last visit? </value>
+						<value form="short">Worse Stomach Pain</value>
+					</text>
+					<text id="stomachWorseHint">
+						<value form="">Select Correct answer</value>
+					</text>
+					<text id="stomachWorseLabel1">
+						<value form="">No</value>
+					</text>
+					<text id="stomachWorseLabel2">
+						<value form="">Yes</value>
+					</text>
+					
+					<text id="diarrheaText">
+						<value form="long">Do you have any diarrhea?</value>
+						<value form="short">Diarrhea</value>
+					</text>
+					<text id="diarrheaHint">
+						<value form="">Select Correct answer</value>
+					</text>
+					<text id="diarrheaLabel1">
+						<value form="">No</value>
+					</text>
+					<text id="diarrheaLabel2">
+						<value form="">Yes</value>
+					</text>
+					
+					<text id="diarrheaWorseText">
+						<value form="long">Is it new or getting worse since your last visit?</value>
+						<value form="short">Worse Diarrhea</value>
+					</text>
+					<text id="diarrheaWorseHint">
+						<value form="">Select Correct answer</value>
+					</text>
+					<text id="diarrheaWorseLabel1">
+						<value form="">No</value>
+					</text>
+					<text id="diarrheaWorseLabel2">
+						<value form="">Yes</value>
+					</text>
+					
+					<text id="genitalProblemsText">
+						<value form="long">Do you have any genital discharge, sores or problems? </value>
+						<value form="short">Genital Pain</value>
+					</text>
+					<text id="genitalProblemsHint">
+						<value form="">Select Correct answer</value>
+					</text>
+					<text id="genitalProblemsLabel1">
+						<value form="">No</value>
+					</text>
+					<text id="genitalProblemsLabel2">
+						<value form="">Yes</value>
+					</text>
+					
+					<text id="vomitingText">
+						<value form="long">Have you been vomiting?</value>
+						<value form="short">Vomiting</value>
+					</text>
+					<text id="vomitingHint">
+						<value form="">Select Correct answer</value>
+					</text>
+					<text id="vomitingLabel1">
+						<value form="">No</value>
+					</text>
+					<text id="vomitingLabel2">
+						<value form="">Yes</value>
+					</text>
+					
 				</translation>
 			</itext>
 			<instance>
@@ -508,6 +607,15 @@
 						<ShortBreath />
 						<ShortBreathStatus />
 					</TbAndCoughing>
+					<GeneralOIs>
+						<MouthPain/>
+						<StomachPain/>
+						<StomachWorse/>
+						<Diarrhea/>
+						<DiarrheaWorse/>
+						<GenitalProblems/>
+						<Vomiting/>
+					</GeneralOIs>
 				</data>
 			</instance>
 			<bind id="regimenName" nodeset="/data/ARVRegimen/RegimenName" type="xsd:string" />
@@ -552,6 +660,14 @@
 			<bind id="shortBreath" nodeset="/data/TbAndCoughing/ShortBreath" type="xsd:string" />
 			<bind id="shortBreathStatus" nodeset="/data/TbAndCoughing/ShortBreathStatus" type="xsd:string" />
 
+			<bind id="mouthPain" nodeset="/data/GeneralOis/MouthPain" type="xsd:string" />
+			<bind id="stomachPain" nodeset="/data/GeneralOis/StomachPain" type="xsd:string" />
+			<bind id="stomachWorse" nodeset="/data/GeneralOis/StomachWorse" type="xsd:string" />
+			<bind id="diarrhea" nodeset="/data/GeneralOis/Diarrhea" type="xsd:string" />
+			<bind id="diarrheaWorse" nodeset="/data/GeneralOis/DiarrheaWorse" type="xsd:string" />
+			<bind id="genitalProblems" nodeset="/data/GeneralOis/GenitalProblems" type="xsd:string" />
+			<bind id="vomiting" nodeset="/data/GeneralOis/Vomiting" type="xsd:string" />
+			
 		</model>
 	</h:head>
 	<h:body>
@@ -958,6 +1074,97 @@
 			</item>
 			<item>
 				<label ref ="jr:itext('shortBreathStatusLabel2')" />
+				<value>Yes</value>
+			</item>
+		</select1 >
+		
+		<select1 bind="mouthPain" appearance="full" >
+			<label ref ="jr:itext('mouthPainText')" />
+			<hint ref ="jr:itext('mouthPainHint')" />
+			<item>
+				<label ref ="jr:itext('mouthPainLabel1')" />
+				<value>NO</value>
+			</item>
+			<item>
+				<label ref ="jr:itext('mouthPainLabel2')" />
+				<value>Yes</value>
+			</item>
+		</select1 >
+		
+		<select1 bind="stomachPain" appearance="full" >
+			<label ref ="jr:itext('stomachPainText')" />
+			<hint ref ="jr:itext('stomachPainHint')" />
+			<item>
+				<label ref ="jr:itext('stomachPainLabel1')" />
+				<value>NO</value>
+			</item>
+			<item>
+				<label ref ="jr:itext('stomachPainLabel2')" />
+				<value>Yes</value>
+			</item>
+		</select1 >
+		
+		<select1 bind="stomachWorse" appearance="full" >
+			<label ref ="jr:itext('stomachWorseText')" />
+			<hint ref ="jr:itext('stomachWorseHint')" />
+			<item>
+				<label ref ="jr:itext('stomachWorseLabel1')" />
+				<value>NO</value>
+			</item>
+			<item>
+				<label ref ="jr:itext('stomachWorseLabel2')" />
+				<value>Yes</value>
+			</item>
+		</select1 >
+		
+		<select1 bind="diarrhea" appearance="full" >
+			<label ref ="jr:itext('diarrheaText')" />
+			<hint ref ="jr:itext('diarrheaHint')" />
+			<item>
+				<label ref ="jr:itext('diarrheaLabel1')" />
+				<value>NO</value>
+			</item>
+			<item>
+				<label ref ="jr:itext('diarrheaLabel2')" />
+				<value>Yes</value>
+			</item>
+		</select1 >
+		
+		<select1 bind="diarrheaWorse" appearance="full" >
+			<label ref ="jr:itext('diarrheaWorseText')" />
+			<hint ref ="jr:itext('diarrheaWorseHint')" />
+			<item>
+				<label ref ="jr:itext('diarrheaWorseLabel1')" />
+				<value>NO</value>
+			</item>
+			<item>
+				<label ref ="jr:itext('diarrheaWorseLabel2')" />
+				<value>Yes</value>
+			</item>
+		</select1 >
+		
+		<select1 bind="genitalProblems" appearance="full" >
+			<label ref ="jr:itext('genitalProblemsText')" />
+			<hint ref ="jr:itext('genitalProblemsHint')" />
+			<item>
+				<label ref ="jr:itext('genitalProblemsLabel1')" />
+				<value>NO</value>
+			</item>
+			<item>
+				<label ref ="jr:itext('genitalProblemsLabel2')" />
+				<value>Yes</value>
+			</item>
+		</select1 >
+		
+		<select1 bind="vomiting" appearance="full" >
+			<label ref ="jr:itext('vomitingText')" />
+			<hint ref ="jr:itext('vomitingHint')" />
+			<item>
+				<label ref ="jr:itext('vomitingLabel1')" />
+				<value>NO</value>
+			</item>
+			<item>
+				<label ref ="jr:itext('vomitingLabel2')" />
 				<value>Yes</value>
 			</item>
 		</select1 >
