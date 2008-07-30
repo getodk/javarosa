@@ -23,6 +23,53 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
  *
  */
 public class ExternalizableHelper {
+	public static final int ENCODING_NUM_DEFAULT = 1; //equal performance for entire range of longs
+	public static final int ENCODING_NUM_STINGY = 2;  //highly optimized for [0,254], ints only
+	
+	/* max magnitude of negative number encodable in one byte; allowed range [0,254]
+	 * increasing this steals from the max positive range
+	 * ex.: BIAS = 0   -> [0,254] will fit in one byte; all other values will overflow
+	 *      BIAS = 30  -> [-30,224]
+	 *      BIAS = 254 -> [-254,0]
+	 */
+	private static final int STINGY_NEGATIVE_BIAS = 0;
+	
+	public static void writeNumeric (DataOutputStream dos, long l, int encoding) throws IOException {
+		switch (encoding) {
+		case ENCODING_NUM_DEFAULT: writeNumDefault(dos, l); break;
+		case ENCODING_NUM_STINGY: writeNumStingy(dos, l); break;
+		default: throw new IllegalStateException("Unrecognized numeric encoding");
+		}
+	}
+	
+	public static long readNumeric (DataInputStream dis, int encoding) throws IOException {
+		switch (encoding) {
+		case ENCODING_NUM_DEFAULT: return readNumDefault(dis);
+		case ENCODING_NUM_STINGY: return readNumStingy(dis);
+		default: throw new IllegalStateException("Unrecognized numeric encoding");
+		}
+	}
+	
+	public static int readNumInt (DataInputStream dis, int encoding) throws IOException {
+		long l = readNumeric(dis, encoding);
+		if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE)
+			throw new ArithmeticException("Deserialized value (" + l + ") cannot fit into int");
+		return (int)l;
+	}
+
+	public static short readNumShort (DataInputStream dis, int encoding) throws IOException {
+		long l = readNumeric(dis, encoding);
+		if (l < Short.MIN_VALUE || l > Short.MAX_VALUE)
+			throw new ArithmeticException("Deserialized value (" + l + ") cannot fit into short");
+		return (short)l;
+	}
+
+	public static byte readNumByte (DataInputStream dis, int encoding) throws IOException {
+		long l = readNumeric(dis, encoding);
+		if (l < Byte.MIN_VALUE || l > Byte.MAX_VALUE)
+			throw new ArithmeticException("Deserialized value (" + l + ") cannot fit into byte");
+		return (byte)l;
+	}	
 	
 	/*
 	 * serialize a numeric value, only using as many bytes as needed. splits up the value into
@@ -30,13 +77,13 @@ public class ExternalizableHelper {
 	 * chunk is serialized as a single byte, where the most-significant bit is set to 1 to indicate
 	 * there are more bytes to follow, or 0 to indicate the last byte
 	 */
-	public static void writeNumeric (DataOutputStream dos, long l) throws IOException {		
+	public static void writeNumDefault (DataOutputStream dos, long l) throws IOException {		
 		int sig = -1;
 		long k;
 		do {
 			sig++;
 			k = l >> (sig * 7);
-		} while (k < -64 || k > 63);
+		} while (k < (-1 << 6) || k > (1 << 6) - 1); //[-64,63] -- the range we can fit into one byte
 			
 		for (int i = sig; i >= 0; i--) {
 			byte chunk = (byte)((l >> (i * 7)) & 0x7f);
@@ -47,7 +94,7 @@ public class ExternalizableHelper {
 	/*
 	 * deserialize a numeric value stored in a variable number of bytes. see writeNumeric
 	 */
-	public static long readNumeric (DataInputStream dis) throws IOException {
+	public static long readNumDefault (DataInputStream dis) throws IOException {
 		long l = 0;
 		byte b;
 		boolean firstByte = true;
@@ -66,30 +113,32 @@ public class ExternalizableHelper {
 		return l;
 	}
 	
-	public static int readNumInt (DataInputStream dis) throws IOException {
-		long l = readNumeric(dis);
+	public static void writeNumStingy (DataOutputStream dos, long l) throws IOException {		
 		if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE)
-			throw new ArithmeticException("Deserialized value (" + l + ") cannot fit into int");
-		return (int)l;
+			throw new ArithmeticException("Value (" + l + ") too large for chosen encoding");
+		
+		if (l >= -STINGY_NEGATIVE_BIAS && l < 255 - STINGY_NEGATIVE_BIAS) {
+			l += STINGY_NEGATIVE_BIAS;
+			dos.writeByte((byte)(l >= 128 ? l - 256 : l));
+		} else {
+			dos.writeByte(0xff);
+			dos.writeInt((int)l);
+		}
 	}
 
-	public static short readNumShort (DataInputStream dis) throws IOException {
-		long l = readNumeric(dis);
-		if (l < Short.MIN_VALUE || l > Short.MAX_VALUE)
-			throw new ArithmeticException("Deserialized value (" + l + ") cannot fit into short");
-		return (short)l;
+	public static long readNumStingy (DataInputStream dis) throws IOException {
+		byte b = dis.readByte();
+		long l;
+		
+		if (b == (byte)0xff) {
+			l = dis.readInt();
+		} else {
+			l = (b < 0 ? b + 256 : b);
+			l -= STINGY_NEGATIVE_BIAS;
+		}
+		
+		return l;
 	}
-
-	public static byte readNumByte (DataInputStream dis) throws IOException {
-		long l = readNumeric(dis);
-		if (l < Byte.MIN_VALUE || l > Byte.MAX_VALUE)
-			throw new ArithmeticException("Deserialized value (" + l + ") cannot fit into byte");
-		return (byte)l;
-	}	
-	
-
-	
-	
 	
 	/**
 	 * Writes a string to the stream.
@@ -533,7 +582,7 @@ public class ExternalizableHelper {
 	/* grrr.... why doesn't SimpleOrderedHashtable extend Hashtable? */
 	public static void writeExternal(SimpleOrderedHashtable stringHashtable, DataOutputStream dos) throws IOException {	
 		if(stringHashtable != null){
-			writeNumeric(dos, stringHashtable.size());
+			writeNumeric(dos, stringHashtable.size(), ENCODING_NUM_DEFAULT);
 			Enumeration keys = stringHashtable.keys();
 			String key;
 			while(keys.hasMoreElements()){
@@ -548,7 +597,7 @@ public class ExternalizableHelper {
 	
 	public static void writeExternalCompoundSOH(SimpleOrderedHashtable compoundHashtable, DataOutputStream dos) throws IOException {	
 		if(compoundHashtable != null){
-			writeNumeric(dos, compoundHashtable.size());
+			writeNumeric(dos, compoundHashtable.size(), ENCODING_NUM_DEFAULT);
 			Enumeration keys = compoundHashtable.keys();
 			String key;
 			while(keys.hasMoreElements()){
@@ -583,7 +632,7 @@ public class ExternalizableHelper {
 	
 	//we should be able to distinguish between null and empty vectors/hashtables
 	public static SimpleOrderedHashtable readExternalSOH(DataInputStream dis) throws IOException {
-		long len = readNumeric(dis);
+		long len = readNumeric(dis, ENCODING_NUM_DEFAULT);
 		if(len == 0)
 			return null;
 		
@@ -596,7 +645,7 @@ public class ExternalizableHelper {
 	}
 	
 	public static SimpleOrderedHashtable readExternalCompoundSOH(DataInputStream dis) throws IOException {
-		long len = readNumeric(dis);
+		long len = readNumeric(dis, ENCODING_NUM_DEFAULT);
 		if(len == 0)
 			return null;
 		
@@ -675,19 +724,24 @@ public class ExternalizableHelper {
 		return 0;
 	}
 	
-	public static boolean numericEncodingUnitTest (long valIn) {
+	public static boolean numericEncodingUnitTest (long valIn, int encoding) {
 		byte[] bytesOut; 
 		long valOut;
 		
-		System.out.print("Testing: " + valIn);
+		System.out.print("Testing: " + valIn + " [");
+		switch (encoding) {
+		case ENCODING_NUM_DEFAULT: System.out.print("default"); break;
+		case ENCODING_NUM_STINGY: System.out.print("stingy"); break;
+		}
+		System.out.print("]");
 		
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream(100);
-			ExternalizableHelper.writeNumeric(new DataOutputStream(baos), valIn);
+			ExternalizableHelper.writeNumeric(new DataOutputStream(baos), valIn, encoding);
 			bytesOut = baos.toByteArray();
 
 			ByteArrayInputStream bais = new ByteArrayInputStream(bytesOut);
-			valOut = ExternalizableHelper.readNumeric(new DataInputStream(bais));
+			valOut = ExternalizableHelper.readNumeric(new DataInputStream(bais), encoding);
 		} catch (IOException ioe) {
 			System.out.println("  IOException!");
 			return false;
@@ -715,24 +769,60 @@ public class ExternalizableHelper {
 	}
 	
 	public static void numericEncodingUnitTestSuite () {
-		numericEncodingUnitTest(0);
-		numericEncodingUnitTest(-1);
-		numericEncodingUnitTest(1);			
-		numericEncodingUnitTest(-2);
+		int enc;
+		
+		enc = ENCODING_NUM_DEFAULT;
+		
+		numericEncodingUnitTest(0, enc);
+		numericEncodingUnitTest(-1, enc);
+		numericEncodingUnitTest(1, enc);			
+		numericEncodingUnitTest(-2, enc);
 	
 		for (int i = 3; i <= 64; i++) {
 			long min = (i < 64 ? -((long)0x01 << (i - 1)) : Long.MIN_VALUE);
 			long max = (i < 64 ? ((long)0x01 << (i - 1)) - 1 : Long.MAX_VALUE);
 			
-			numericEncodingUnitTest(max - 1);
-			numericEncodingUnitTest(max);
+			numericEncodingUnitTest(max - 1, enc);
+			numericEncodingUnitTest(max, enc);
 			if (i < 64)
-				numericEncodingUnitTest(max + 1);
-			numericEncodingUnitTest(min + 1);
-			numericEncodingUnitTest(min);
+				numericEncodingUnitTest(max + 1, enc);
+			numericEncodingUnitTest(min + 1, enc);
+			numericEncodingUnitTest(min, enc);
 			if (i < 64)
-				numericEncodingUnitTest(min - 1);					
+				numericEncodingUnitTest(min - 1, enc);					
 		}
+		
+		enc = ENCODING_NUM_STINGY;
+		
+		for (int i = 0; i <= 1; i++) {
+			int offset = (i == 0 ? 0 : STINGY_NEGATIVE_BIAS);
+			if (offset == 0 && i == 1)
+				break;
+			
+			numericEncodingUnitTest(0 - offset, enc);
+			numericEncodingUnitTest(1 - offset, enc);
+			numericEncodingUnitTest(126 - offset, enc);
+			numericEncodingUnitTest(127 - offset, enc);
+			numericEncodingUnitTest(128 - offset, enc);
+			numericEncodingUnitTest(129 - offset, enc);
+			numericEncodingUnitTest(253 - offset, enc);
+			numericEncodingUnitTest(254 - offset, enc);
+			numericEncodingUnitTest(255 - offset, enc);
+			numericEncodingUnitTest(256 - offset, enc);
+			numericEncodingUnitTest(-1 - offset, enc);
+			numericEncodingUnitTest(-2 - offset, enc);
+			numericEncodingUnitTest(-127 - offset, enc);
+			numericEncodingUnitTest(-128 - offset, enc);
+			numericEncodingUnitTest(-129 - offset, enc);
+		}
+		numericEncodingUnitTest(3750, enc);
+		numericEncodingUnitTest(-3750, enc);
+		numericEncodingUnitTest(33947015, enc);
+		numericEncodingUnitTest(-33947015, enc);		
+		numericEncodingUnitTest(Integer.MAX_VALUE, enc);
+		numericEncodingUnitTest(Integer.MAX_VALUE - 1, enc);
+		numericEncodingUnitTest(Integer.MIN_VALUE, enc);
+		numericEncodingUnitTest(Integer.MIN_VALUE + 1, enc);
 	}
 		
 }
