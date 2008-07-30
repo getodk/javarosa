@@ -53,7 +53,7 @@ public class PropertyMetaData extends MetaDataObject {
     }
 
     /** (non-Javadoc)
-     *  @see org.javarosa.clforms.storage.Externalizable#readExternal(DataInputStream)
+     *  @see org.javarosa.core.util.clforms.storage.Externalizable#readExternal(DataInputStream)
      */
     public void readExternal(DataInputStream in) throws IOException
     {
@@ -61,7 +61,7 @@ public class PropertyMetaData extends MetaDataObject {
     }
 
     /** (non-Javadoc)
-     *  @see org.javarosa.clforms.storage.Externalizable#writeExternal(DataOutputStream)
+     *  @see org.javarosa.core.util.clforms.storage.Externalizable#writeExternal(DataOutputStream)
      */
     public void writeExternal(DataOutputStream out) throws IOException
     {

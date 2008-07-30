@@ -3,7 +3,7 @@ package org.javarosa.core.model;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.Localizable;
-import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.util.Externalizable;
 
 public interface IFormElement extends Localizable, Externalizable {
 	int getID ();

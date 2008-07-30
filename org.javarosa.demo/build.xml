@@ -97,7 +97,8 @@
 			<!-- Target one: Run emulator and profiling tools if debugging is enabled -->
 			<emulator wait="true" securityDomain="trusted" enableProfiler="true" enableMemoryMonitor="true" enableNetworkMonitor="false" if="debug">
 				<!-- Enable the following line to test memory constraints on the device -->
-				<!--parameter name="-Xheapsize" value="850000"/-->
+				<!--parameter name="-Xheapsize" value="630000"/-->
+				<!--parameter name="-Xheapsize" value="1750000"/-->
 			</emulator>
 
 			<!-- Target two: Run emulator only, with no profiling tools if debugging is disabled but testing is -->

@@ -1,4 +1,4 @@
-package org.javarosa.core.services.storage.utilities;
+package org.javarosa.core.util;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

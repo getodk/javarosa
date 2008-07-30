@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class SelectOneData implements IAnswerData {
 	Selection s;

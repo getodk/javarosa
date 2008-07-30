@@ -1,6 +1,6 @@
 package org.javarosa.core.model;
 
-import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.util.Externalizable;
 
 public interface IDataReference extends Externalizable { 
 	Object getReference ();

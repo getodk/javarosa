@@ -8,8 +8,8 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.services.storage.utilities.Externalizable;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 
 /**

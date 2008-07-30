@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class StringData implements IAnswerData {
 	String s;

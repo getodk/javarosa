@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.javarosa.action</name>
+	<name>org.javarosa.polish.chatterbox.extensions</name>
 	<comment></comment>
 	<projects>
 	</projects>
-	<buildSpec><buildCommand>
+	<buildSpec>
+		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
 			<arguments>
 			</arguments>
-		</buildCommand></buildSpec>
-	<natures><nature>org.eclipse.jdt.core.javanature</nature><nature>eclipseme.core.nature</nature></natures>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
 </projectDescription>

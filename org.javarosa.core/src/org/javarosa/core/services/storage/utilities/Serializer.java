@@ -6,6 +6,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.UnavailableExternalizerException;
+
 /**
  * Utility class that provides methods for serialization and deserialization.
  * 

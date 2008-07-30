@@ -14,7 +14,7 @@ import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.model.utils.SimpleOrderedHashtable;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 /** 
  * This is the question definition properties.

@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class DateData implements IAnswerData {
 	Date d;

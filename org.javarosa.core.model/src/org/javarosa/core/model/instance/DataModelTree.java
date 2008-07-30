@@ -16,8 +16,8 @@ import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.model.utils.PrototypeFactory;
+import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 /**
  * DataModelTree is an implementation of IFormDataModel

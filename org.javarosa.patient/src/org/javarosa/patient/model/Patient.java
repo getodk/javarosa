@@ -7,20 +7,21 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.core.util.Map;
+import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.entitymgr.model.EntityFieldList;
 import org.javarosa.entitymgr.model.EntityFieldValueList;
 import org.javarosa.entitymgr.model.IEntity;
 import org.javarosa.util.Utilities;
 
 /**
- * The Patient data object contains information and records
- * for a single patient. These include static data types such as
- * a patient's id and name, and also historical data records for
- * patients, such as a list of weight measurements .
+ * Encapsulates demographic data about a patient and contains 
+ * information and records for a single patient. These include 
+ * static data types such as a patient's id and name, and also 
+ * historical data records for patients, such as a list of weight
+ * measurements . 
  * 
- * @author Clayton Sims
+ * @author daniel
  *
  */
 public class Patient implements IEntity {
@@ -339,6 +340,13 @@ public class Patient implements IEntity {
 		return getPatientIdentifier();
 	}
 	
+	public Integer getId(){
+		return getPatientId();
+	}
+	
+	public void setId(Integer id){
+		setPatientId(id);
+	}
 	
 	/**
 	 * Adds a patient attribute. This is the value appended to the atttribute name.

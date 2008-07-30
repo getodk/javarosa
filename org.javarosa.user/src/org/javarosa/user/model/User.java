@@ -6,7 +6,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.services.storage.utilities.IDRecordable;
-import org.javarosa.core.services.storage.utilities.Externalizable;
+import org.javarosa.core.util.Externalizable;
 
 //import javax.microedition.rms.RecordStoreException;
 

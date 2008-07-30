@@ -10,9 +10,9 @@ import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
 import org.javarosa.core.services.storage.utilities.Serializer;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.core.services.transport.Storage;
 import org.javarosa.core.services.transport.TransportMessage;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 /**
  * A Storage type for Transport Messages that utilizes RMS storage

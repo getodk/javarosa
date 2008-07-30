@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
+import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.patient.util.SelectorParser;
 
 /**
