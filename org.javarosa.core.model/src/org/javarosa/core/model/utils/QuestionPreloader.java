@@ -155,12 +155,11 @@ public class QuestionPreloader {
 	 * @return A preload string value if the parameters can be parsed,
 	 * null otherwise
 	 */
+	//TODO: we should really have a native DateTimeData type
 	private IAnswerData preloadTimestamp(String preloadParams) {
 		String value = null;
 		if ("start".equals(preloadParams)) { //timestamp 'end' should not be preloaded
 			value = DateUtils.formatDateToTimeStamp(new Date());
-		} else {
-			throw new IllegalArgumentException("Preload 'timestamp' requires a valid parameter ('start' or 'end'), in order to be properly parsed");
 		}
 		return new StringData(value);
 	}
