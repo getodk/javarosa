@@ -68,34 +68,35 @@ public class FormListActivity implements IActivity {
 		Enumeration en = returnvals.keys();
 		while(en.hasMoreElements()) {
 			String cmd = (String)en.nextElement();
-		
-		if( cmd == Commands.CMD_SELECT_XFORM){
-			int selectedForm = ((Integer)returnvals.get(Commands.CMD_SELECT_XFORM)).intValue();
-			int formId = ((Integer)positionToId.elementAt(selectedForm)).intValue();
-			//#if debug.output==verbose
-			System.out.println("Selected form: " + formIDs.elementAt(formId));
-			//#endif
-			FormDefMetaData meta = (FormDefMetaData)formIDs.elementAt(formId);
-			
-			Hashtable returnArgs = new Hashtable();
-			returnArgs.put(FORM_ID_KEY, new Integer(meta.getRecordId()));
-			returnArgs.put(COMMAND_KEY, Commands.CMD_SELECT_XFORM);
-			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
-			
-			break;
-		
-		} else if (cmd == Commands.CMD_EXIT) {
-			parent.exitShell();
-			
-		} else if (cmd == Commands.CMD_VIEW_DATA) {
-			Hashtable returnArgs = new Hashtable();
-			returnArgs.put(COMMAND_KEY, Commands.CMD_VIEW_DATA);
-			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
-		} else if (cmd == Commands.CMD_SETTINGS) {
-			Hashtable returnArgs = new Hashtable();
-			returnArgs.put(COMMAND_KEY, Commands.CMD_SETTINGS);
-			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs );
-		}
+
+			if( cmd == Commands.CMD_SELECT_XFORM){
+				int selectedForm = ((Integer)returnvals.get(Commands.CMD_SELECT_XFORM)).intValue();
+				int formId = ((Integer)positionToId.elementAt(selectedForm)).intValue();
+				//#if debug.output==verbose
+				System.out.println("Selected form: " + formIDs.elementAt(formId));
+				//#endif
+				FormDefMetaData meta = (FormDefMetaData)formIDs.elementAt(formId);
+
+				Hashtable returnArgs = new Hashtable();
+				returnArgs.put(FORM_ID_KEY, new Integer(meta.getRecordId()));
+				returnArgs.put(COMMAND_KEY, Commands.CMD_SELECT_XFORM);
+				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
+
+				break;
+
+			} else if (cmd == Commands.CMD_EXIT) {
+				Hashtable returnArgs = new Hashtable();
+				returnArgs.put(COMMAND_KEY, Commands.CMD_EXIT);
+				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
+			} else if (cmd == Commands.CMD_VIEW_DATA) {
+				Hashtable returnArgs = new Hashtable();
+				returnArgs.put(COMMAND_KEY, Commands.CMD_VIEW_DATA);
+				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
+			} else if (cmd == Commands.CMD_SETTINGS) {
+				Hashtable returnArgs = new Hashtable();
+				returnArgs.put(COMMAND_KEY, Commands.CMD_SETTINGS);
+				parent.returnFromActivity(this, Constants.ACTIVITY_SUSPEND, returnArgs );
+			}
 		}
 	}
 	
