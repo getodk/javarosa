@@ -98,8 +98,13 @@
 		</demog>
 	</instance>
 		
-	<bind id="DOB" nodeset="/demog/dob" type="xsd:date" />
-		
+	<bind id="DOB" nodeset="/demog/dob" type="xsd:date" required="true()" />
+	<bind id="lname" nodeset="/demog/lname" required="true()" />
+	<bind id="fname" nodeset="/demog/fname" required="true()" />
+	<bind id="feeling" nodeset="/demog/feeling" required="true()" />
+	<bind id="sex" nodeset="/demog/sex" required="true()" />
+	<bind id="addr" nodeset="/demog/addr" required="true()" />
+						
     </model>
 </h:head>			
 <h:body>
