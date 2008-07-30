@@ -16,6 +16,7 @@ import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.model.utils.PrototypeFactory;
+import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 
 /**
@@ -27,7 +28,7 @@ import org.javarosa.core.services.storage.utilities.UnavailableExternalizerExcep
  * @author Clayton Sims
  *
  */
-public class DataModelTree implements IFormDataModel {
+public class DataModelTree implements IFormDataModel, IDRecordable {
 
 	/** The root of this tree */
 	private TreeElement root;
@@ -267,5 +268,14 @@ public class DataModelTree implements IFormDataModel {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	//treating id and record id as the same until we resolve the need for both of them
+	public int getRecordId () {
+		return getId();
+	}
+	
+	public void setRecordId(int recordId) {
+		setId(recordId);
 	}
 }
