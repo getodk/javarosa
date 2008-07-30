@@ -42,10 +42,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	 * @see org.javarosa.core.model.IAnswerDataSerializer#canSerialize(org.javarosa.formmanager.model.temp.AnswerData)
 	 */
 	public boolean canSerialize(IAnswerData data) {
-		if (data.getClass() == StringData.class
-				|| data.getClass() == DateData.class
-				|| data.getClass() == SelectMultiData.class
-				|| data.getClass() == SelectOneData.class) {
+		if (data instanceof StringData || data instanceof DateData ||
+			data instanceof SelectMultiData || data instanceof SelectOneData) {
 			return true;
 		} else {
 			return false;
@@ -78,15 +76,17 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(SelectMultiData data) {
 		Vector selections = (Vector)data.getValue();
 		Enumeration en = selections.elements();
-		String selectString = "";
+		StringBuffer selectString = new StringBuffer();
 		
 		while(en.hasMoreElements()) {
 			Selection selection = (Selection)en.nextElement();
-			selectString = selectString + " " + selection.getText();
+			if (selectString.length() > 0)
+				selectString.append(" ");
+			selectString.append(selection.getValue());
 		}
 		//As Crazy, and stupid, as it sounds, this is the XForms specification
 		//for storing multiple selections.	
-		return selectString;
+		return selectString.toString();
 	}
 	
 	/**
@@ -94,7 +94,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	 * @return A String which contains the value of a selection
 	 */
 	public Object serializeAnswerData(SelectOneData data) {
-		return ((Selection)data.getValue()).getText();
+		return ((Selection)data.getValue()).getValue();
 	}
 	
 	/*
