@@ -44,20 +44,13 @@ import org.javarosa.xform.util.XFormUtils;
 public class JavaRosaDemoShell implements IShell {
 	// List of views that are used by this shell
 	MIDlet midlet;
-	FormListActivity formListActivity = null;
-	SplashScreenModule splashScreen = null;
-	FormTransportActivity formTransport = null;
-	ModelListActivity modelActivity = null;
-	PropertyScreenActivity propertyActivity = null;
-	FormEntryActivity entryActivity = null;
-	LoginActivity loginActivity = null;
 
 	WorkflowStack stack;
-	
 	Context context;
 	
 	IActivity currentActivity;
-
+	IActivity mostRecentListActivity; //should never be accessed, only checked for type
+	
 	public JavaRosaDemoShell() {
 		stack = new WorkflowStack(); 
 		context = new Context();
@@ -69,20 +62,7 @@ public class JavaRosaDemoShell implements IShell {
 
 	public void run() {
 		init();
-		this.splashScreen = new SplashScreenModule(this, "/splash.gif");
-		this.loginActivity = new LoginActivity(this,"Login");
-		this.formListActivity = new FormListActivity(this,"Forms List");
-		this.formTransport = new FormTransportActivity(this);
-		formTransport.setDataModelSerializer(new XFormSerializingVisitor());
-		this.modelActivity = new ModelListActivity(this);
-		this.entryActivity  = new FormEntryActivity(this, new FormEntryViewFactory());
-		
-		this.propertyActivity = new PropertyScreenActivity(this);
-
-		currentActivity = splashScreen;
-		
-		this.splashScreen.start(context);
-	//	switchView(ViewTypes.FORM_LIST);
+		workflow(null, null, null);
 	}
 
 	private void init() {
@@ -97,148 +77,168 @@ public class JavaRosaDemoShell implements IShell {
 
 		// For now let's add the dummy form.
 		if (formDef.getNumberOfRecords() == 0) {
-			formDef.writeToRMS(XFormUtils
-					.getFormFromResource("/hmis-a_draft.xhtml"));
-			formDef.writeToRMS(XFormUtils
-					.getFormFromResource("/hmis-b_draft.xhtml"));
-			formDef.writeToRMS(XFormUtils
-					.getFormFromResource("/shortform.xhtml"));
-			formDef.writeToRMS(XFormUtils
-					.getFormFromResource("/tz-e-ctc.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-a_draft.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-b_draft.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/shortform.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/tz-e-ctc.xhtml"));
 		}
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider()
-				.registerRMSUtility(dataModel);
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider()
-				.registerRMSUtility(formDef);
+		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(dataModel);
+		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(formDef);
 	}
 
 	private void workflow(IActivity lastActivity, String returnCode, Hashtable returnVals) {
-		//TODO: parse any returnvals into context
-		if(stack.size() != 0) {
-			IActivity activity = stack.pop();
-			this.currentActivity = activity;
-			activity.resume(context);
+		if (returnVals == null)
+			returnVals = new Hashtable(); //for easier processing
+		
+		if (lastActivity != currentActivity) {
+			System.out.println("Received 'return' event from activity other than the current activity" +
+					" (such as a background process). Can't handle this yet");
+			return;
 		}
-		else {
-			// TODO Auto-generated method stub
-			if (lastActivity == this.splashScreen) {
-				//#if javarosa.dev.shortcuts
-				currentActivity = this.formListActivity;
-				//#else 
-				currentActivity = loginActivity;
-				//#endif
-				this.currentActivity.start(context);
-			}
-			if (lastActivity == this.loginActivity) {
-				Object returnVal = returnVals.get(LoginActivity.COMMAND_KEY);
-				if (returnVal == "USER_VALIDATED") {
-					currentActivity = formListActivity;
-					this.formListActivity.start(context);
-				}
-				else if (returnVal == "USER_CANCELLED") {
-					this.exitShell();
-				}
-			}
-			if (lastActivity == this.modelActivity) {
-				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-					Object returnVal = returnVals.get(ModelListActivity.returnKey);
-					if (returnVal == ModelListActivity.CMD_MSGS) {
-						// Go to the FormTransport Activity look at messages.
-						TransportContext msgContext = new TransportContext(
-								context);
-						msgContext.setRequestedTask(TransportContext.MESSAGE_VIEW);
-						currentActivity = formTransport;
-						formTransport.start(msgContext);
-					}
-				}
-				if (returnCode == Constants.ACTIVITY_COMPLETE) {
-					// A Model was selected for some purpose
-					Object returnVal = returnVals
-							.get(ModelListActivity.returnKey);
-					if (returnVal == ModelListActivity.CMD_EDIT) {
-						// Load the Form Entry Activity, and feed it the form data
-						FormDef form = (FormDef) returnVals.get("form");
-						DataModelTree data = (DataModelTree) returnVals.get("data");
-						FormEntryContext newContext = new FormEntryContext(context);
-						newContext.setFormID(form.getID());
-						newContext.setInstanceID(data.getFormReferenceId());
-						currentActivity = this.modelActivity;
-						this.modelActivity.start(newContext);
-					}
-					if (returnVal == ModelListActivity.CMD_SEND) {
-						DataModelTree data = (DataModelTree) returnVals.get("data");
-						formTransport.setData(data);
-						TransportContext msgContext = new TransportContext(
-								context);
-						msgContext.setRequestedTask(TransportContext.SEND_DATA);
-						currentActivity = formTransport;
-						formTransport.start(msgContext);
-					}
-				}
-			}
-			if (lastActivity == this.formTransport) {
-				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-					String returnVal = (String)returnVals.get(FormTransportActivity.RETURN_KEY);
-					if(returnVal == FormTransportActivity.VIEW_MODELS) {
-						currentActivity = this.modelActivity;
-						this.modelActivity.start(context);
-					}
-				}
-				if (returnCode == Constants.ACTIVITY_COMPLETE) {
-
-				}
-			}
-			if (lastActivity == this.formListActivity) {
-				if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-					String returnVal = (String)returnVals.get(FormListActivity.COMMAND_KEY);
-					if(returnVal == Commands.CMD_VIEW_DATA) {
-						currentActivity = this.modelActivity;
-						this.modelActivity.start(context);
-					}
-					if(returnVal == Commands.CMD_SETTINGS) {
-						currentActivity = this.propertyActivity;
-						this.propertyActivity.start(context);
-					}
-					if(returnVal == Commands.CMD_SELECT_XFORM) {
-						FormEntryContext newContext = new FormEntryContext(context);
-						newContext.setFormID(((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue());
-						currentActivity = this.entryActivity;
-						this.entryActivity.start(newContext);
-					}
-				}
-				if (returnCode == Constants.ACTIVITY_COMPLETE) {
-
-				}
-			}
-			if (lastActivity == this.entryActivity) {
-				if(returnCode == Constants.ACTIVITY_COMPLETE) {
-					if (((Boolean)returnVals.get("FORM_COMPLETE")).booleanValue()) {
-						DataModelTree data = (DataModelTree)returnVals.get("DATA_MODEL");
-						formTransport.setData(data);
-						TransportContext msgContext = new TransportContext(context);
-						msgContext.setRequestedTask(TransportContext.SEND_DATA);
-						currentActivity = formTransport;
-						formTransport.start(msgContext);
-					}
-				}
-			}
-			if(currentActivity == lastActivity) {
-				//We didn't launch anything. Go to default
-				currentActivity = formListActivity;
-				formListActivity.start(context);
+		
+		if (returnCode == Constants.ACTIVITY_SUSPEND || returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+			stack.push(lastActivity);
+			workflowLaunch(lastActivity, returnCode, returnVals);
+		} else {
+			if (stack.size() > 0) {
+				workflowResume(stack.pop(), lastActivity, returnCode, returnVals);
+			} else {
+				workflowLaunch(lastActivity, returnCode, returnVals);
+				if (lastActivity != null)
+					lastActivity.destroy();
 			}
 		}
 	}
+	
+	private void workflowLaunch (IActivity returningActivity, String returnCode, Hashtable returnVals) {
+		if (returningActivity == null) {
+			
+			launchActivity(new SplashScreenModule(this, "/splash.gif"), context);
+			
+		} else if (returningActivity instanceof SplashScreenModule) {
+			
+			//#if javarosa.dev.shortcuts
+			launchActivity(new FormListActivity(this, "Forms List"), context);
+			//#else 
+			launchActivity(new LoginActivity(this, "Login"), context);
+			//#endif
+			
+		} else if (returningActivity instanceof LoginActivity) {
+			
+			Object returnVal = returnVals.get(LoginActivity.COMMAND_KEY);
+			if (returnVal == "USER_VALIDATED") {
+				launchActivity(new FormListActivity(this, "Forms List"), context);
+			} else if (returnVal == "USER_CANCELLED") {
+				exitShell();
+			}
+			
+		} else if (returningActivity instanceof FormListActivity) {
+			
+			String returnVal = (String)returnVals.get(FormListActivity.COMMAND_KEY);
+			if (returnVal == Commands.CMD_SETTINGS) {
+				launchActivity(new PropertyScreenActivity(this), context);
+			} else if (returnVal == Commands.CMD_VIEW_DATA) {
+				launchActivity(new ModelListActivity(this), context);
+			} else if (returnVal == Commands.CMD_SELECT_XFORM) {
+				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1);
+			} else if (returnVal == Commands.CMD_EXIT) {
+				exitShell();
+			}
+			
+		} else if (returningActivity instanceof ModelListActivity) {
+			
+			Object returnVal = returnVals.get(ModelListActivity.returnKey);
+			if (returnVal == ModelListActivity.CMD_MSGS) {
+				launchFormTransportActivity(context, TransportContext.MESSAGE_VIEW, null);
+			} else if (returnVal == ModelListActivity.CMD_EDIT) {
+				launchFormEntryActivity(context, ((FormDef)returnVals.get("form")).getID(),
+						((DataModelTree)returnVals.get("data")).getFormReferenceId());
+			} else if (returnVal == ModelListActivity.CMD_SEND) {
+				launchFormTransportActivity(context, TransportContext.SEND_DATA, (DataModelTree)returnVals.get("data"));
+			} else if (returnVal == ModelListActivity.CMD_BACK) {
+				launchActivity(new FormListActivity(this, "Forms List"), context);
+			}
+			
+		} else if (returningActivity instanceof FormEntryActivity) {
+			
+			if (((Boolean)returnVals.get("FORM_COMPLETE")).booleanValue()) {
+				launchFormTransportActivity(context, TransportContext.SEND_DATA, (DataModelTree)returnVals.get("DATA_MODEL"));
+			} else {
+				relaunchListActivity();
+			}
+			
+		} else if (returningActivity instanceof FormTransportActivity) {
+			
+			relaunchListActivity();			
+			
+			//what is this for?
+/*			if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+				String returnVal = (String)returnVals.get(FormTransportActivity.RETURN_KEY);
+				if(returnVal == FormTransportActivity.VIEW_MODELS) {
+					currentActivity = this.modelActivity;
+					this.modelActivity.start(context);
+				}
+			}*/
+		}
+	}
+	
+	private void workflowResume (IActivity suspendedActivity, IActivity completingActivity,
+								 String returnCode, Hashtable returnVals) {
+		
+		//default action
+		resumeActivity(suspendedActivity, context);
+	}
+		
+	private void launchActivity (IActivity activity, Context context) {
+		if (activity instanceof FormListActivity || activity instanceof ModelListActivity)
+			mostRecentListActivity = activity;
+		
+		currentActivity = activity;
+		activity.start(context);
+	}
+	
+	private void resumeActivity (IActivity activity, Context context) {
+		currentActivity = activity;
+		activity.resume(context);
+	}	
+	
+	private void launchFormEntryActivity (Context context, int formID, int instanceID) {
+		FormEntryActivity entryActivity = new FormEntryActivity(this, new FormEntryViewFactory());
+		FormEntryContext formEntryContext = new FormEntryContext(context);
+		formEntryContext.setFormID(formID);
+		if (instanceID != -1)
+			formEntryContext.setInstanceID(instanceID);
 
+		launchActivity(entryActivity, formEntryContext);
+	}
+	
+	private void launchFormTransportActivity (Context context, String task, DataModelTree data) {
+		FormTransportActivity formTransport = new FormTransportActivity(this);
+		formTransport.setDataModelSerializer(new XFormSerializingVisitor());
+		formTransport.setData(data); //why isn't this going in the context?
+		TransportContext msgContext = new TransportContext(context);		
+		msgContext.setRequestedTask(task);
+
+		launchActivity(formTransport, msgContext);
+	}
+	
+	private void relaunchListActivity () {
+		if (mostRecentListActivity instanceof FormListActivity) {
+			launchActivity(new FormListActivity(this, "Forms List"), context);
+		} else if (mostRecentListActivity instanceof ModelListActivity) {
+			launchActivity(new ModelListActivity(this), context);
+		} else {
+			throw new IllegalStateException("Trying to resume list activity when no most recent set");
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.shell.IShell#activityCompeleted(org.javarosa.activity.IActivity)
 	 */
 	public void returnFromActivity(IActivity activity, String returnCode, Hashtable returnVals) {
-		activity.halt();
+		//activity.halt(); //i don't think this belongs here? the contract reserves halt for unexpected halts;
+						   //an activity calling returnFromActivity isn't halting unexpectedly
 		workflow(activity, returnCode, returnVals);
-		if(returnCode == Constants.ACTIVITY_SUSPEND || returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
-			stack.push(activity);
-		}
 	}
 
 	public boolean setDisplay(IActivity callingActivity, Displayable display) {
@@ -280,8 +280,10 @@ public class JavaRosaDemoShell implements IShell {
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FormManagerProperties());
 
 		initProperty("DeviceID", genGUID(25));
-		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://openrosa.org/testsubmit.html");
-		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://openrosa.org/testsubmit.html");
+		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://update.cell-life.org/save_dump_org.php");
+		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://update.cell-life.org/save_dump_org.php");				
+//		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://openrosa.org/testsubmit.html");
+//		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://openrosa.org/testsubmit.html");
 	}
 
 	//TODO: Put this in a utility method
