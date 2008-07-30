@@ -17,6 +17,9 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.storage.utilities.UnavailableExternalizerException;
 import org.javarosa.formmanager.controller.FormEntryController;
@@ -69,15 +72,24 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	
 	public void start (Context context) {
 		FormDef theForm = null;
-		if(context.getClass() == FormEntryContext.class) {
+		int instanceID = -1;
+		
+		if(context instanceof FormEntryContext) {
 			this.context = (FormEntryContext)context;			
+			instanceID = this.context.getInstanceID();			
 			
 			//TODO: Are we going to make this non-RMS dependant any any point?
-			FormDefRMSUtility utility = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());  //whoa!
+			FormDefRMSUtility formUtil = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());  //whoa!
 			theForm = new FormDef();
 			try {
-				utility.retrieveFromRMS(this.context.getFormID(),theForm);
-				//what about preloading with a saved instance?
+				formUtil.retrieveFromRMS(this.context.getFormID(), theForm);
+				
+				if (instanceID != -1) {
+					DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
+					IFormDataModel theModel = new DataModelTree();
+					modelUtil.retrieveFromRMS(this.context.getInstanceID(), theModel);
+					theForm.setDataModel(theModel);
+				}
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -93,12 +105,13 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			}
 		}
 		if (theForm != null) {
-			theForm.preloadModel();
+			if (instanceID == -1) //only preload new forms (we may have to revisit this)
+				theForm.preloadModel();
 			if (theForm.getLocalizer() != null && theForm.getLocalizer().getLocale() == null) {
 				theForm.getLocalizer().setToDefault();
 			}
 			
-			model = new FormEntryModel(theForm);
+			model = new FormEntryModel(theForm, instanceID);
 			controller = new FormEntryController(model, this);
 			view = viewFactory.getFormEntryView("chatterbox", model, controller);
 			controller.setView(view);

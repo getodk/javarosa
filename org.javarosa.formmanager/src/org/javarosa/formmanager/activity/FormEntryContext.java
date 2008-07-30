@@ -19,7 +19,8 @@ public class FormEntryContext extends Context {
 	}
 
 	public int getInstanceID () {
-		return ((Integer)getElement(INSTANCE_ID)).intValue();
+		Integer i = (Integer)getElement(INSTANCE_ID);
+		return (i == null ? -1 : i.intValue());
 	}
 	
 	public void setInstanceID (int instanceID) {
