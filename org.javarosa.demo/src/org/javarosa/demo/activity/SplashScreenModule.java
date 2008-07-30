@@ -4,13 +4,13 @@
 package org.javarosa.demo.activity;
 
 import java.io.IOException;
-import java.util.Hashtable;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 
@@ -64,7 +64,7 @@ public class SplashScreenModule implements IActivity, ApplicationInitializer {
   		} catch(Exception e) {}
   		
   		// Tell the shell that the splash screen has completed
-  		parent.returnFromActivity(this, null, null);
+  		parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
   		
   		// We're using our own architecture
 		return null;
