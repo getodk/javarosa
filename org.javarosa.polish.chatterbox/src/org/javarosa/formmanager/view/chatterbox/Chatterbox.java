@@ -306,10 +306,12 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
     		controller.cycleLanguage();
     	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
-    		ChatterboxWidget widget = activeFrame();
-    		if (widget != null)  {
-    			widget.UIHack(UIHACK_SELECT_PRESS);
-    		}
+    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
+				ChatterboxWidget widget = activeFrame();
+				if (widget != null) {
+					widget.UIHack(UIHACK_SELECT_PRESS);
+				}
+			}
         	indexWhenKeyPressed = keyDownSelectedWidget;
     	}
     }
