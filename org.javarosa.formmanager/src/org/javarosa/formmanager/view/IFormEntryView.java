@@ -8,6 +8,8 @@ package org.javarosa.formmanager.view;
  * @author Drew Roos
  *
  */
+
+//this is generic enough to be renamed 'IActivityView'
 public interface IFormEntryView {
 	public void destroy ();
 	

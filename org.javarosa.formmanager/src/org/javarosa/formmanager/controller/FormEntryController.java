@@ -1,6 +1,5 @@
 package org.javarosa.formmanager.controller;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.microedition.lcdui.Displayable;
@@ -35,14 +34,20 @@ public class FormEntryController {
 		if (question.isRequired() && data == null) {
 			return QUESTION_REQUIRED_BUT_EMPTY;
 		} else {
-			if (data != null || model.getForm().getValue(question) != null) {
-				//we should check if the data to be saved is already the same as the data in the model, but we can't
-				model.getForm().setValue(question, data);
-				model.modelChanged();
-			}
-			
+			commitAnswer(question, data);
 			stepQuestion(true);
 			return QUESTION_OK;
+		}
+	}
+	
+	public boolean commitAnswer (QuestionDef question, IAnswerData data) {
+		if (data != null || model.getForm().getValue(question) != null) {
+			//we should check if the data to be saved is already the same as the data in the model, but we can't
+			model.getForm().setValue(question, data);
+			model.modelChanged();
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
@@ -69,6 +74,7 @@ public class FormEntryController {
 		model.setQuestionIndex(questionIndex);
 	}
 	
+	//saves model as is; view is responsible for committing any pending data in the current question
 	public void save () {
 		boolean postProcessModified = model.getForm().postProcessModel();
 		
