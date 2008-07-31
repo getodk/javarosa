@@ -133,8 +133,7 @@ public class ExternalizableHelper {
 		if (b == (byte)0xff) {
 			l = dis.readInt();
 		} else {
-			l = (b < 0 ? b + 256 : b);
-			l -= STINGY_NEGATIVE_BIAS;
+			l = (b < 0 ? b + 256 : b) - STINGY_NEGATIVE_BIAS;
 		}
 		
 		return l;
