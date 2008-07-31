@@ -86,8 +86,9 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 			
 			activeStyle.initWidget(question, this);
 			activeStyle.refreshWidget(question, form.getValue(question), QuestionStateListener.CHANGE_INIT);
-			if (viewState == VIEW_EXPANDED)
+			if (viewState == VIEW_EXPANDED) {
 				attachWidget();
+			}
 		}
 	}
 
@@ -150,6 +151,7 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 			widget.setDefaultCommand(nextCommand);
 			break;
 		}
+		this.focus(this.itemsList.size()-1);
 	}
 	
 	private void detachWidget () {
