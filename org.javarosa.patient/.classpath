@@ -8,5 +8,8 @@
 	<classpathentry kind="lib" path="/org.javarosa.demo/lib/j2meunit-javarosa.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entitymgr"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.action"/>
+	<classpathentry kind="src" path="/org.javarosa.patientmgr"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
