@@ -1,14 +1,15 @@
 package org.javarosa.xform.parse;
 
-import java.io.OutputStream;
 import java.io.Reader;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.StringData;
@@ -532,8 +533,18 @@ public class XFormParser {
 		q.setRequired(binding.isRequired());
 	}
 	
+	//will check that all <bind>s and refs refer to nodes that actually exist in the instance
+	//not complete
 	private static void verifyBindings (FormDef f) {
-		
+//		Vector bindings = f.getBindings();
+//		for (Enumeration e = bindings.elements(); e.hasMoreElements(); ) {
+//			IDataReference ref = ((DataBinding)e.nextElement()).getReference();
+//			f.getDataModel().
+//			
+//		}
+//		
+//		f.getBindings();
+//		
 	}
 	
 	private static void parseInstance (FormDef f, Element e) {
