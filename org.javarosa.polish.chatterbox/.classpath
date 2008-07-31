@@ -5,12 +5,12 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.formmanager"/>
-	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/midp-2.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/mmapi.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/nokia-ui.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/wmapi.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/fileconnection.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Clayton Sims/J2ME-Polish/import/enough-j2mepolish-client.jar" sourcepath="C:/Users/Clayton Sims/J2ME-Polish/j2mepolish-src/j2me"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/midp-2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/mmapi.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/nokia-ui.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/wmapi.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/fileconnection.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/enough-j2mepolish-client.jar" sourcepath="C:/Program Files/J2ME-Polish/j2mepolish-src/j2me"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
