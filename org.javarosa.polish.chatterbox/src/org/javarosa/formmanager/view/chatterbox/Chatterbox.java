@@ -260,10 +260,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	} else if (command == exitNoSaveCommand) {
     		controller.exit();
     	} else if (command == exitSaveCommand) {
-    		controller.save();
+    		commitAndSave();
     		controller.exit();
     	} else if (command == saveCommand) {
-    		controller.save();
+    		commitAndSave();
     	} else {
     		String language = null;
     		if (multiLingual) {
@@ -283,6 +283,14 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	}
     }
 
+    private void commitAndSave () {
+       	ChatterboxWidget frame = activeFrame();
+    	if (frame != null) {
+    		controller.commitAnswer(frame.getQuestion(), frame.getData());
+    	}
+    	controller.save();
+    }
+    
     public void questionAnswered () {
     	ChatterboxWidget frame = activeFrame();
 	
