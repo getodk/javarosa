@@ -335,7 +335,9 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
     
     public void keyReleased(int keyCode) {
-    	if(indexWhenKeyPressed == this.activeQuestionIndex) {
+    	if(keyCode == KEY_CENTER_LETS_HOPE && !(indexWhenKeyPressed == this.activeQuestionIndex)) {
+    		//The previous select keypress was for a different item.
+    	} else {
     		super.keyReleased(keyCode);
     	}
     }
