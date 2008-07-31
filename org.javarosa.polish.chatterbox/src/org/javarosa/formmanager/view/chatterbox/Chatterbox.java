@@ -157,10 +157,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		activeQuestionIndex = questionIndex;
 
     		ChatterboxWidget widget = (ChatterboxWidget)get(activeQuestionIndex);
-    		//this.focus(widget);
+    		
     		this.focus(widget, true);
-    		//widget.setFocus(); //argh!!! this works about 50% of the time!!!
-    		//this.container.focus(questionIndex);
 
     		progressBar.setValue(questionIndex);
     		
@@ -168,32 +166,6 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	
     	//UI hacks ho!
     	babysitStyles();
-    	ChatterboxWidget widget = (ChatterboxWidget)get(activeQuestionIndex);
-		container.scroll(8, widget);
-		//widget.relativeY = container.getScrollHeight() - widget.itemHeight;
-    	
-		Timer t = new Timer();
-		t.schedule(new TimerTask () {
-			public void run () {
-				//These key codes might be phone dependent.
-				//If they aren't working on your device, you might
-				//need to add it.
-				
-				//Found a much cleaner way to do this
-	    		//ChatterboxWidget widget = (ChatterboxWidget)get(activeQuestionIndex);
-	    		//container.scroll(8, widget);
-	    		//widget.relativeY = container.getScrollHeight() - widget.get
-				
-				//UiAccess.scrollTo(widget, Graphics.VCENTER);
-				
-				//Emulator and standard 'down' key'
-				//UiAccess.emitKeyPress(-2);
-				//System.out.println("Fake press");
-				//Not sure if this works anywhere.
-				//UiAccess.emitKeyPress(DOWN);
-				//UiAccess.emitKeyRelease(DOWN);
-			}
-		}, 5);
     }
     
     //create a frame for a question and show it at the appropriate place in the form
