@@ -129,6 +129,7 @@ public class JavaRosaDemoShell implements IShell {
 			
 			Object returnVal = returnVals.get(LoginActivity.COMMAND_KEY);
 			if (returnVal == "USER_VALIDATED") {
+				//shouldn't we add user info to context here?
 				launchActivity(new FormListActivity(this, "Forms List"), context);
 			} else if (returnVal == "USER_CANCELLED") {
 				exitShell();
