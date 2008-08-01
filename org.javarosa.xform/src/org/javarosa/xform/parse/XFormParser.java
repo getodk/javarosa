@@ -625,7 +625,7 @@ public class XFormParser {
 		if (dataType <= 0) {
 			if (type != null) {
 				//#if debug.output==verbose
-				System.err.println("XForm Parse: unrecognized data type; default to string");
+				System.err.println("XForm Parse: unrecognized data type [" + type + "]; default to string");
 				//#endif
 			}
 			dataType = Constants.DATATYPE_TEXT;

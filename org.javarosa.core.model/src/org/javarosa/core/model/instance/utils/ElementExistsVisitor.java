@@ -71,10 +71,16 @@ public class ElementExistsVisitor implements ITreeVisitor {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.TreeElement)
 	 */
+	//TODO: this seems extremely hacky
+	//TODO: make this visitor actually work (even with hack); when commented out, form entry seems to work fine
 	public void visit(TreeElement element) {
-		//#if debug.output==verbose
-		System.out.println("Visited an abstract element, this shouldn't have occured.");
-		//#endif
+//		if (element instanceof QuestionDataElement) {
+//			visit((QuestionDataElement)element);
+//		} else if (element instanceof QuestionDataGroup) {
+//			visit((QuestionDataGroup)element);
+//		} else {
+//			throw new RuntimeException("ElementExistsVisitor: unrecognized sub-class of TreeElement. Our hack has come back to haunt us...");
+//		}
 	}
 	
 	/**
