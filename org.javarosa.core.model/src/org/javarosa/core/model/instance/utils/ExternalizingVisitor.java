@@ -38,6 +38,7 @@ public class ExternalizingVisitor implements ITreeVisitor {
 	 */
 	public void visit(TreeElement element) {
 		//Shouldn't happen
+		System.out.println("bad news bears");
 	}
 
 	/* (non-Javadoc)
