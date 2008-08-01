@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<project name="epihandy-xform-layer" basedir="." default="package">
+<project name="epihandy-xform-layer" basedir="." default="build-xpath-parser">
 	<target name="init" description="initialization">
 		<mkdir dir="bin"/>
 		<mkdir dir="dist"/>
@@ -13,17 +13,8 @@
 	</target>
 	
 	<target name="clean" description="delete the bin and the dist folder">
-		<delete>
-			<fileset dir="bin">
-				<include name="**/*.class"/>
-			</fileset>
-		</delete>
-				
-		<delete>
-			<fileset dir="dist">
-				<include  name="**/*.jar"/>
-			</fileset>
-		</delete>
+		<delete dir="bin" />
+		<delete dir="dist" />
 	</target>
 	
 	<target name="compile" depends="init,clean" description="compile the code">
@@ -40,5 +31,32 @@
 			<jar destfile="dist\epihandy-XForm-layer.jar">
 				<zipfileset dir="bin" prefix=""></zipfileset>
 			</jar>
+	</target>
+
+	<target name="build-xpath-parser" description="build xpath parser">
+		<property name="source" location="src/org/javarosa/xpath/parser" />
+		
+		<delete>
+			<fileset dir="${source}" includes="*.java" />
+		</delete>
+		
+		<taskdef classname="JFlex.anttask.JFlexTask" name="jflex">
+			<classpath>
+				<pathelement location="lib/JFlex.jar" />
+			</classpath>
+		</taskdef>		
+		
+		<jflex file="${source}/xpath.flex" verbose="on" />
+		
+		<!-- our version of cup.jar doesn't include ant task -->		
+		<java classname="java_cup.Main" dir="${source}" fork="yes">
+			<arg line="-package org.javarosa.xpath.parser" />
+			<arg line="-parser XPathParser" />
+			<arg file="${source}/xpath.grammar" />
+
+			<classpath>
+				<pathelement location="lib/cup.jar" />
+			</classpath>
+		</java>
 	</target>
 </project>
