@@ -7,6 +7,7 @@ import java.util.Vector;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
+import org.javarosa.activity.splashscreen.SplashScreenActivity;
 import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
@@ -18,10 +19,8 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
-import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.WorkflowStack;
-import org.javarosa.demo.activity.SplashScreenModule;
 import org.javarosa.demo.properties.DemoAppProperties;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
@@ -35,7 +34,6 @@ import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.LoginActivity;
-import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormUtils;
 
 /**
@@ -115,9 +113,9 @@ public class JavaRosaDemoShell implements IShell {
 	private void workflowLaunch (IActivity returningActivity, String returnCode, Hashtable returnVals) {
 		if (returningActivity == null) {
 			
-			launchActivity(new SplashScreenModule(this, "/splash.gif"), context);
+			launchActivity(new SplashScreenActivity(this, "/splash.gif"), context);
 			
-		} else if (returningActivity instanceof SplashScreenModule) {
+		} else if (returningActivity instanceof SplashScreenActivity) {
 			
 			//#if javarosa.dev.shortcuts
 			launchActivity(new FormListActivity(this, "Forms List"), context);
