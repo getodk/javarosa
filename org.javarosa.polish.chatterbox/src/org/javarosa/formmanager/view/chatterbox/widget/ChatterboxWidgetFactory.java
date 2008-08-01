@@ -18,7 +18,7 @@ public class ChatterboxWidgetFactory {
 		this.cbox = cbox;
 	}
 	
-	public void registerExtendedWidget(int controlType, IWidgetStyleEditable prototype) {
+	public void registerExtendedWidget(int controlType, IWidgetStyle prototype) {
 		widgetFactory.addNewPrototype(String.valueOf(controlType), prototype.getClass());
 	}
 	
@@ -41,33 +41,16 @@ public class ChatterboxWidgetFactory {
 			case Constants.DATATYPE_DATE:
 				expandedStyle = new DateEntryWidget();
 				break;
-			default:
-				expandedStyle = new TextEntryWidget();
-				String name = String.valueOf(controlType);
-				try {
-					Object widget;
-					widget = widgetFactory.getNewInstance(name);
-
-					if (widget == null) {
-					} else {
-						expandedStyle = (IWidgetStyleEditable) widget;
-					}
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					e.printStackTrace();
-				}
-				break;
 			}
 			break;
 		case Constants.CONTROL_SELECT_ONE:
 			int style;
-			
+
 			if ("minimal".equals(appearanceAttr))
 				style = ChoiceGroup.POPUP;
 			else
 				style = ChoiceGroup.EXCLUSIVE;
-			
+
 			expandedStyle = new SelectOneEntryWidget(style);
 			break;
 		case Constants.CONTROL_SELECT_MULTI:
@@ -76,6 +59,24 @@ public class ChatterboxWidgetFactory {
 		case Constants.CONTROL_TEXTAREA:
 			expandedStyle = new TextEntryWidget();
 			break;
+		}
+
+		if (expandedStyle == null) {
+			expandedStyle = new TextEntryWidget();
+			String name = String.valueOf(controlType);
+			try {
+				Object widget;
+				widget = widgetFactory.getNewInstance(name);
+
+				if (widget == null) {
+				} else {
+					expandedStyle = (IWidgetStyleEditable) widget;
+				}
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		if (collapsedStyle == null || expandedStyle == null)

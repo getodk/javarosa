@@ -637,6 +637,12 @@ public class XFormParser {
 	public static void addDataType (String type, int dataType) {
 		typeMappings.put(type, new Integer(dataType));
 	}
+	public static void registerControlType(String type, final int typeId) {
+		IElementHandler newHandler = new IElementHandler () {
+			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, typeId); } };
+		topLevelHandlers.put(type, newHandler);
+		groupLevelHandlers.put(type, newHandler);
+	}
 
 	public static String getXMLText (Node n, boolean trim) {
 		return (n.getChildCount() == 0 ? null : getXMLText(n, 0, trim));

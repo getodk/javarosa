@@ -2,6 +2,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.util.Vector;
 
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.Selection;
@@ -30,5 +31,12 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 		}		
 		
 		return (vs.size() == 0 ? null : new SelectMultiData(vs));
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle#widgetType()
+	 */
+	public int widgetType() {
+		return Constants.CONTROL_SELECT_MULTI;
 	}
 }

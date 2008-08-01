@@ -1,5 +1,6 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
@@ -44,5 +45,13 @@ public class TextEntryWidget extends ExpandedWidget {
 	protected IAnswerData getWidgetValue () {
 		String s = textField().getText();
 		return (s == null || s.equals("") ? null : new StringData(s));
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle#widgetType()
+	 */
+	public int widgetType() {
+		return Constants.CONTROL_INPUT;
 	}
 }

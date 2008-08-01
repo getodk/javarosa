@@ -26,7 +26,6 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
-import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;

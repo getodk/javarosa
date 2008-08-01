@@ -102,6 +102,7 @@ public class Constants {
 	/** Question with repeat sets of questions. */
 	public static final int DATATYPE_REPEAT = 10; //droos: not sure this is a 'question data type'
 	
+	public static final int CONTROL_UNTYPED = -1;
 	public static final int CONTROL_INPUT = 1;
 	public static final int CONTROL_SELECT_ONE = 2;
 	public static final int CONTROL_SELECT_MULTI = 3;

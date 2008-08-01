@@ -2,6 +2,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.util.Date;
 
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -32,5 +33,13 @@ public class DateEntryWidget extends ExpandedWidget {
 	protected IAnswerData getWidgetValue () {
 		Date d = dateField().getDate();
 		return (d == null ? null : new DateData(d));
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle#widgetType()
+	 */
+	public int widgetType() {
+		return Constants.CONTROL_INPUT;
 	}
 }
