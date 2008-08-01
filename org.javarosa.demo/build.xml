@@ -51,6 +51,7 @@
 					<source dir="${basedir}/../org.javarosa.core.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
+					<source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>					
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
@@ -104,7 +105,7 @@
 			<!-- Target two: Run emulator only, with no profiling tools if debugging is disabled but testing is -->
 			<emulator wait="true" trace="none" securityDomain="trusted" enableProfiler="false" enableMemoryMonitor="false" enableNetworkMonitor="false" if="test and not debug">
 				<!-- Enable the following line to test memory constraints on the device -->
-				<!--parameter name="-Xheapsize" value="850000"/-->
+				<parameter name="-Xheapsize" value="2850000"/>
 			</emulator>
 
 		</buildPolish>
