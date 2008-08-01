@@ -35,6 +35,7 @@ import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.xform.util.XFormUtils;
+import org.javarosa.xpath.XPathTest;
 
 /**
  * This is the shell for the JavaRosa demo that handles switching all of the views
@@ -66,6 +67,8 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void init() {
+		XPathTest.test();
+		
 		loadProperties();
 
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
