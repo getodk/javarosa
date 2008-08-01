@@ -42,4 +42,12 @@ public class PatientPreloadHandler implements IPreloadHandler {
 		return returnVal;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.IPreloadHandler#preloadHandled()
+	 */
+	public String preloadHandled() {
+		return "patient";
+	}
+
 }

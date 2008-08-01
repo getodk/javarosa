@@ -1,5 +1,7 @@
 package org.javarosa.core.model.utils;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.data.IAnswerData;
 
 /**
@@ -11,6 +13,11 @@ import org.javarosa.core.model.data.IAnswerData;
  *
  */
 public interface IPreloadHandler {
+	
+	/**
+	 * @return A String representing the preload handled by this handler
+	 */
+	String preloadHandled(); 
 	
 	/**
 	 * Takes in a set of preload parameters, and determines the 

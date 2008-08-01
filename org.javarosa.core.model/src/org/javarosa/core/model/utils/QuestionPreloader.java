@@ -1,6 +1,7 @@
 package org.javarosa.core.model.utils;
 
 import java.util.Date;
+import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.data.DateData;
@@ -32,35 +33,42 @@ public class QuestionPreloader {
 	 */
 	private void initPreloadHandlers() {
 		IPreloadHandler date = new IPreloadHandler() {
+			public String preloadHandled() {
+				return "date";
+			}
 			public IAnswerData handle(String preloadParams) {
 				return preloadDate(preloadParams);
 			}
 		};
 		IPreloadHandler property = new IPreloadHandler() {
+			public String preloadHandled() {
+				return "property";
+			}
 			public IAnswerData handle(String preloadParams) {
 				return preloadProperty(preloadParams);
 			}
 		};
 		IPreloadHandler timestamp = new IPreloadHandler() {
+			public String preloadHandled() {
+				return "timestamp";
+			}
 			public IAnswerData handle(String preloadParams) {
 				return preloadTimestamp(preloadParams);
 			}
 		};
 
-		addPreloadHandler("date", date);
-		addPreloadHandler("property", property);
-		addPreloadHandler("timestamp", timestamp);
+		addPreloadHandler(date);
+		addPreloadHandler(property);
+		addPreloadHandler(timestamp);
 	}
 	
 	/**
 	 * Adds a new preload handler to this preloader. 
 	 * 
-	 * @param preloadType The type of the preload to register a handler for. If
-	 * one already exists, it will be overwritten.
 	 * @param handler an IPreloadHandler that can handle a preload type
 	 */
-	public void addPreloadHandler(String preloadType, IPreloadHandler handler) {
-		preloadHandlers.put(preloadType, handler);
+	public void addPreloadHandler(IPreloadHandler handler) {
+		preloadHandlers.put(handler.preloadHandled(), handler);
 	}
 	
 	/**
