@@ -21,6 +21,7 @@ import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.controller.IControllerHost;
@@ -105,8 +106,17 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			}
 		}
 		if (theForm != null) {
-			if (instanceID == -1) //only preload new forms (we may have to revisit this)
+			if (instanceID == -1) {//only preload new forms (we may have to revisit this)
+				Vector handlers = this.context.getPreloadHandlers();
+				if(handlers != null) {
+					Enumeration en = handlers.elements();
+					while(en.hasMoreElements()) {
+						theForm.getPreloader().addPreloadHandler((IPreloadHandler)en.nextElement());
+					}
+					
+				}
 				theForm.preloadModel();
+			}
 			if (theForm.getLocalizer() != null && theForm.getLocalizer().getLocale() == null) {
 				theForm.getLocalizer().setToDefault();
 			}
