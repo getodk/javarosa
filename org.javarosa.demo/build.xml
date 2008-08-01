@@ -13,7 +13,7 @@
 <project name="JavaRosa" default="LaunchEmulator">
 	<!-- Main Target: Call to build the project -->
 	<!-- This is the main work target, it actually builds the code -->
-	<target name="BuildPolish" depends="init" description="This is the controller for the J2ME build process.">
+	<target name="BuildPolish" depends="init,build-xpath-parser" description="This is the controller for the J2ME build process.">
 		<buildPolish>
 			<info name="${app.name}"
 				version="${app.version}"
@@ -165,6 +165,10 @@
 		<property name="dir.work" value="build/test" />
 	</target>
 
+	<target name="build-xpath-parser">
+		<ant antfile="../org.javarosa.xform/build.xml" target="build-xpath-parser" dir="../org.javarosa.xform" />
+	</target>
+	
 	<!-- Macro: Runs a test suite, and sets testresult.global to be true on failure -->
 	<macrodef name="RunTestSuite" description="Runs a test suite, and sets testresult.global to be true on failure">
 		<attribute name="suite"/>
