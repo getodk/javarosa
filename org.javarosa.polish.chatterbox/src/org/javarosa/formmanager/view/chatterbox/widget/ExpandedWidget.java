@@ -1,6 +1,7 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.QuestionStateListener;
 import org.javarosa.core.model.data.IAnswerData;
 
 import de.enough.polish.ui.Container;
@@ -33,7 +34,9 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	public void refreshWidget (QuestionDef question, IAnswerData data, int changeFlags) {
 		prompt.setText(question.getLongText());
 		updateWidget(question);
-		if (data != null) {
+		
+		//don't wipe out user-entered data, even on data-changed event
+		if (data != null && changeFlags == QuestionStateListener.CHANGE_INIT) {
 			setWidgetValue(data.getValue());
 		}
 	}
