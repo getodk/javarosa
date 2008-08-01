@@ -85,7 +85,7 @@ public class QuestionDataGroup extends TreeElement {
 					return true;
 				}
 		}
-		return true;
+		return false;
 	}
 	
 	/**

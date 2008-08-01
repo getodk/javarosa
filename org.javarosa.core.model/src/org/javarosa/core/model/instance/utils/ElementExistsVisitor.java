@@ -74,13 +74,13 @@ public class ElementExistsVisitor implements ITreeVisitor {
 	//TODO: this seems extremely hacky
 	//TODO: make this visitor actually work (even with hack); when commented out, form entry seems to work fine
 	public void visit(TreeElement element) {
-//		if (element instanceof QuestionDataElement) {
-//			visit((QuestionDataElement)element);
-//		} else if (element instanceof QuestionDataGroup) {
-//			visit((QuestionDataGroup)element);
-//		} else {
-//			throw new RuntimeException("ElementExistsVisitor: unrecognized sub-class of TreeElement. Our hack has come back to haunt us...");
-//		}
+		if (element instanceof QuestionDataElement) {
+			visit((QuestionDataElement)element);
+		} else if (element instanceof QuestionDataGroup) {
+			visit((QuestionDataGroup)element);
+		} else {
+			throw new RuntimeException("ElementExistsVisitor: unrecognized sub-class of TreeElement. Our hack has come back to haunt us...");
+		}
 	}
 	
 	/**
