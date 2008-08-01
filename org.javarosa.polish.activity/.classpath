@@ -2,6 +2,13 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="J2MELIB"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/midp-2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/mmapi.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/nokia-ui.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/wmapi.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/fileconnection.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/enough-j2mepolish-client.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
