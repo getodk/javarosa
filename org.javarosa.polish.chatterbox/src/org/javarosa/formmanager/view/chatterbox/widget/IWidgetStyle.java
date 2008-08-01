@@ -36,4 +36,9 @@ public interface IWidgetStyle {
 	 * first.
 	 */
 	void reset ();
+	
+	/**
+	 * @return A unique integer ID that will be used to represent this widget type
+	 */
+	int widgetType();
 }

@@ -1,5 +1,6 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 
@@ -50,5 +51,13 @@ public class CollapsedWidget implements IWidgetStyle {
 	public void reset () {
 		prompt = null;
 		answer = null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle#widgetType()
+	 */
+	public int widgetType() {
+		return Constants.CONTROL_UNTYPED;
 	}
 }

@@ -1,5 +1,6 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.Selection;
@@ -43,5 +44,13 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 	public boolean focus () {
 		choiceGroup().focus(choiceGroup().getSelectedIndex());
 		return true;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle#widgetType()
+	 */
+	public int widgetType() {
+		return Constants.CONTROL_SELECT_ONE;
 	}
 }

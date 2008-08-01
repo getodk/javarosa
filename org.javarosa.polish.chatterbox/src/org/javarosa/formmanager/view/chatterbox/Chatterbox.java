@@ -2,8 +2,7 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Enumeration;
 
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
@@ -14,13 +13,16 @@ import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.utility.SortedIntSet;
 import org.javarosa.formmanager.view.IFormEntryView;
+import org.javarosa.formmanager.view.chatterbox.util.ChatterboxContext;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
+import org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle;
 
 import de.enough.polish.ui.Alert;
 import de.enough.polish.ui.FramedForm;
@@ -322,4 +324,15 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	//alert.setCommandListener?
     	Alert.setCurrent(JavaRosaServiceProvider.instance().getDisplay(), alert, null);
     }
+
+	public void setContext(FormEntryContext context) {
+		if(context instanceof ChatterboxContext && context != null) {
+			ChatterboxContext cbcontext = (ChatterboxContext)context;
+			Enumeration en = cbcontext.getCustomWidgets().elements();
+			while(en.hasMoreElements()) {
+				IWidgetStyle widget = (IWidgetStyle)en.nextElement();
+				this.widgetFactory.registerExtendedWidget(widget.widgetType(), widget);
+			}
+		}
+	}
 }
