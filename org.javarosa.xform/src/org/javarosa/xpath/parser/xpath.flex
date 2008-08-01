@@ -7,6 +7,11 @@ import org.javarosa.xpath.expr.*;
   
 /* DON'T EDIT THIS FILE UNLESS YOU KNOW WHAT YOU'RE DOING */ 
 
+/* TODO:
+ * need to catch syntax errors
+ * need to explore directives that make compiled code smaller
+ */
+
 %public
 %class XPathLexer
 %unicode
