@@ -16,6 +16,8 @@ import org.javarosa.xpath.expr.*;
 %class XPathLexer
 %unicode
 %cup
+%buffer 128
+%pack
 
 %{   
 	private Symbol symbol(int type) {
