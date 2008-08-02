@@ -36,9 +36,9 @@
 	<target name="build-xpath-parser" description="build xpath parser">
 		<property name="source" location="src/org/javarosa/xpath/parser" />
 		
-		<delete file="XPathParser.java" />
-		<delete file="XPathLexer.java" />
-		<delete file="sym.java" />
+		<delete file="${source}/XPathParser.java" />
+		<delete file="${source}/XPathLexer.java" />
+		<delete file="${source}/sym.java" />
 		
 		<taskdef classname="JFlex.anttask.JFlexTask" name="jflex">
 			<classpath>
@@ -52,6 +52,7 @@
 		<java classname="java_cup.Main" dir="${source}" fork="yes">
 			<arg line="-package org.javarosa.xpath.parser" />
 			<arg line="-parser XPathParser" />
+			<arg line="-compact_red" />
 			<arg file="${source}/xpath.grammar" />
 
 			<classpath>
