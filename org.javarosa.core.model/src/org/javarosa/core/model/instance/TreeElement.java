@@ -1,5 +1,7 @@
 package org.javarosa.core.model.instance;
 
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.util.Externalizable;
@@ -92,4 +94,11 @@ public abstract class TreeElement implements Externalizable {
 			this.getRoot().setFactory(factory);
 		}
 	}
+	public abstract boolean matchesReference(IDataReference reference);
+	
+	public abstract IAnswerData getValue();
+	
+	public abstract void setReference(IDataReference reference);
+	
+	public abstract void setValue(IAnswerData data);
 }

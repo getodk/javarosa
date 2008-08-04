@@ -3,13 +3,11 @@ package org.javarosa.xform.parse;
 import java.io.Reader;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
-import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.StringData;
@@ -18,6 +16,7 @@ import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.kxml2.io.KXmlParser;
@@ -39,6 +38,8 @@ public class XFormParser {
 	private static Hashtable topLevelHandlers;
 	private static Hashtable groupLevelHandlers;
 	private static Hashtable typeMappings;
+	private static PrototypeFactory modelPrototypes;
+	
 	
 	/* THIS CLASS IS NOT THREAD-SAFE */
 	//state variables -- not a good idea since this class is static, but that's not really a good idea either, now is it
@@ -49,7 +50,8 @@ public class XFormParser {
 	
 	static {
 		initProcessingRules();
-		initTypeMappings();		
+		initTypeMappings();
+		modelPrototypes = new PrototypeFactory();
 	}
 	
 	/**
@@ -569,54 +571,71 @@ public class XFormParser {
 	private static TreeElement parseInstanceNodes (Element node, String currentPath) {
 		int childNum = node.getChildCount();
 
-		TreeElement element;
+		TreeElement element = null;
 		String refStr = currentPath + node.getName();
 		XPathReference reference = new XPathReference(refStr);
 		
 		if (bindingsByRef.containsKey(refStr)) {
-			DataBinding binding = (DataBinding)bindingsByRef.get(refStr);
+			DataBinding binding = (DataBinding) bindingsByRef.get(refStr);
 			// This node, and its children represent some sort of Question
-			element = new QuestionDataElement(node.getName(), reference);
+			try {
+				element = (TreeElement)modelPrototypes.getNewInstance(String.valueOf(binding.getDataType()));
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			}
 			
-			((QuestionDataElement)element).setValue(XFormAnswerDataParser.getAnswerData(binding, node));
-		} else {
-			if (childNum == 0) {
-				// There's no binding, but this is also a Question Data
+			if(element == null) {
+				//Nothing special happened when we tried to instantiate. This is just a normal question
 				element = new QuestionDataElement(node.getName(), reference);
-			} else if(childNum ==1 ) {
-				//This is potentially a data element, depending on the child's type
-				if(node.getType(0) == Node.TEXT) {
-					//Data Element
+				((QuestionDataElement) element).setValue(XFormAnswerDataParser
+						.getAnswerData(binding, node));
+			}
+		}
+		if (childNum == 0 && element == null) {
+			// This is a Question Data
+			element = new QuestionDataElement(node.getName(), reference);
+		} else if (childNum == 1) {
+			// This is potentially a data element, depending on the child's type
+			if (node.getType(0) == Node.TEXT) {
+				if (element == null) {
+					// Data Element
 					element = new QuestionDataElement(node.getName(), reference);
-					((QuestionDataElement)element).setValue(new StringData((String)node.getChild(0)));
+					((QuestionDataElement) element).setValue(new StringData(
+							(String) node.getChild(0)));
 				}
-				else {
-					element = new QuestionDataGroup(node.getName());
-					String newPath = currentPath + node.getName() + "/";
-					((QuestionDataGroup)element).addChild(parseInstanceNodes(
-							node.getElement(0), newPath));
-				}
-				
 			} else {
-				//This is a Group of elements, and has no bindings, so its
-				//children are responsible for the rest.
+				if(element == null ) {
+					element = new QuestionDataGroup(node.getName());
+				}
+				String newPath = currentPath + node.getName() + "/";
+				((QuestionDataGroup) element).addChild(parseInstanceNodes(node
+						.getElement(0), newPath));
+			}
+
+		} else {
+			// This is a Group of elements, and has no bindings, so its
+			// children are responsible for the rest.
+			
+			if(element == null) {
 				element = new QuestionDataGroup(node.getName());
-				
-				for (int i = 0; i < childNum; ++i) {
-					if (node.getType(i) != Node.ELEMENT) {
-						continue;
-					} else {
-						String newPath = currentPath + node.getName() + "/";
-						((QuestionDataGroup)element).addChild(parseInstanceNodes(
-										node.getElement(i), newPath));
-					}
+			}
+
+			for (int i = 0; i < childNum; ++i) {
+				if (node.getType(i) != Node.ELEMENT) {
+					continue;
+				} else {
+					String newPath = currentPath + node.getName() + "/";
+					((QuestionDataGroup) element).addChild(parseInstanceNodes(
+							node.getElement(i), newPath));
 				}
 			}
 		}
 		return element;
 	}
-	
-	private static int getDataType (String type) {
+
+	private static int getDataType(String type) {
 		int dataType = -1;
 		
 		if (type != null && typeMappings.containsKey(type)) {
@@ -633,6 +652,10 @@ public class XFormParser {
 		}
 		
 		return dataType;
+	}
+	
+	public static void addModelPrototype(int type, TreeElement element) {
+		modelPrototypes.addNewPrototype(String.valueOf(type), element.getClass());
 	}
 	
 	public static void addDataType (String type, int dataType) {
