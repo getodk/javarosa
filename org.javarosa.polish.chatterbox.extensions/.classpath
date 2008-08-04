@@ -13,5 +13,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.formmanager"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.chatterbox"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

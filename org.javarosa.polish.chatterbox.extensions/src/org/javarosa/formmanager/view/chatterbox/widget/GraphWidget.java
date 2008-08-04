@@ -10,16 +10,17 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.Style;
 
 public class GraphWidget extends ExpandedWidget {
-	public final static int CONTROL_GRAPH = 9; 
+	public final static int CONTROL_GRAPH = 9;
 	
-	protected Item getEntryWidget(QuestionDef question) {
-		
+	LineChart chart;
+	
+	public GraphWidget() {
 		int [] chartXPointsArray = {5, 10, 20, 25, 35, 45, 58, 69, 80, 99};
         int [] chartYPointsArray = {2, 8, 16, 32, 48, 55, 64, 70, 80, 87};
         String [] chartXPointsLabelArray = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
         
         //#style lineChart
-        LineChart chart = new LineChart(""); 
+        chart = new LineChart(""); 
         chart.setUseDefaultColor(false);
         
         chart.setFont(Font.FACE_PROPORTIONAL,Font.STYLE_PLAIN,Font.SIZE_SMALL);
@@ -37,7 +38,9 @@ public class GraphWidget extends ExpandedWidget {
         
         chart.setMaxYScaleFactor(100);
         chart.setMaxXScaleFactor(18);
-
+	}
+	
+	protected Item getEntryWidget(QuestionDef question) {		
 		return chart;
 	}
 

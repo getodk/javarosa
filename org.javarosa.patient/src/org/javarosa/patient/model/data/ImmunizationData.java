@@ -3,8 +3,10 @@ package org.javarosa.patient.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 /**
@@ -13,28 +15,25 @@ import org.javarosa.core.util.UnavailableExternalizerException;
  */
 public class ImmunizationData implements IAnswerData {
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
-	 */
+	/** ImmunizationRow */
+	Vector rows;
+	
 	public String getDisplayText() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Data Table";
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
 	 */
 	public Object getValue() {
-		// TODO Auto-generated method stub
-		return null;
+		return rows;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
 	 */
 	public void setValue(Object o) {
-		// TODO Auto-generated method stub
-
+		rows = (Vector)o;
 	}
 
 	/* (non-Javadoc)
@@ -43,16 +42,14 @@ public class ImmunizationData implements IAnswerData {
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
-		// TODO Auto-generated method stub
-		
+		rows = ExternalizableHelper.readExternal(in,ImmunizationRow.class);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		// TODO Auto-generated method stub
-		
+		ExternalizableHelper.writeExternal(rows, out);
 	}
 
 }
