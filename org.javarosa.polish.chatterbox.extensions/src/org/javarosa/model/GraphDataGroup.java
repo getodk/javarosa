@@ -1,5 +1,7 @@
 package org.javarosa.model;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.QuestionDataGroup;
@@ -8,6 +10,10 @@ public class GraphDataGroup extends QuestionDataGroup {
 	public static final int GRAPH_DATA_ID = 11;
 	
 	IDataReference reference;
+	
+	public GraphDataGroup() {
+		super();
+	}
 	
 	public void setReference(IDataReference reference) {
 		this.reference = reference;

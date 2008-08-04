@@ -165,11 +165,18 @@ public class QuestionDataGroup extends TreeElement {
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		this.name = ExternalizableHelper.readUTF(in);
-		int numChildren = in.readInt(); 
+		int numChildren = in.readInt();
 		for(int i = 0 ; i < numChildren ; ++i ) {
 			boolean group = in.readBoolean();
 			if(group) {
-				QuestionDataGroup newGroup = new QuestionDataGroup();
+				String className = in.readUTF();
+				QuestionDataGroup newGroup = (QuestionDataGroup) this.getRoot().factory.getNewInstance(className);
+				if(newGroup == null) {
+					throw new UnavailableExternalizerException("Attempted to deserialize a Question Data Group object" +
+							"of type " + className + ". Please ensure that this class is available in the prototype factory" +
+							" in the root of the data model tree"); 
+				}
+
 				//This root will let the node externalize
 				newGroup.setRoot(this.getRoot());
 				newGroup.readExternal(in);
@@ -191,10 +198,13 @@ public class QuestionDataGroup extends TreeElement {
 		//This flag is in place to determine whether a Data element is a Group or a Data
 		//True for groups, false for DataElements
 		out.writeBoolean(true);
-		//This node's children are stored in a depth-first manner by the serializing visitor 
+		
+		out.writeUTF(this.getClass().getName());
+				 
 		ExternalizableHelper.writeUTF(out,this.name);
 		
 		out.writeInt(this.children.size());
 		
+		//This node's children are stored in a depth-first manner by the serializing visitor
 	}
 }
