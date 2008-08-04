@@ -11,7 +11,9 @@ import de.enough.polish.ui.CustomItem;
 import de.enough.polish.ui.Style;
 
 public class LineChart extends CustomItem {
-    public Vector pointVector;
+    public Vector currentPointVector;
+    /** Vector<LinePointsItem> */
+    public Vector pointsVector;
     public int yScaleFactor;
     public int xScaleFactor;
     public boolean isDrawAxis;
@@ -52,7 +54,9 @@ public class LineChart extends CustomItem {
     	super(label,style);
             ticker = 1;
             equalCoordTicker = 1;
-            pointVector = new Vector();
+            currentPointVector = new Vector();
+            pointsVector = new Vector();
+            pointsVector.addElement(currentPointVector);
             yScaleFactor = 100;
             xScaleFactor = 25;
             isDrawAxis = true;
@@ -95,7 +99,9 @@ public class LineChart extends CustomItem {
      * Return : 
      */
     public void resetData() {
-        pointVector = new Vector();
+    	pointsVector = new Vector();
+        currentPointVector = new Vector();
+        pointsVector.addElement(currentPointVector);
     }
     
     /**
@@ -109,7 +115,7 @@ public class LineChart extends CustomItem {
      */
    
     public void insertItem(String pointLabel, int yCordValue, int xCordValue,  int colorOne, int colorTwo, int colorThree) {
-        pointVector.addElement(new LinePointsItem(this, pointLabel, yCordValue, xCordValue, colorOne, colorTwo, colorThree));
+        currentPointVector.addElement(new LinePointsItem(this, pointLabel, yCordValue, xCordValue, colorOne, colorTwo, colorThree));
         if(yCordValue > yScaleFactor) {
             yScaleFactor = yCordValue;
         }
@@ -285,58 +291,72 @@ public class LineChart extends CustomItem {
                 isDrawPoint = !isDrawPoint;
             }
         }
-
-        pointVector.size();
-        int count = -1;
-        int pointX1 = marginOne;
-        int pointY1 = this.height - marginFour;
-        Enumeration enumeration = pointVector.elements();
-        int size = pointVector.size();
-        int scaleFactor = 0;
-        if(size <= 4 ) {
-            scaleFactor = size;
-        } else if (size <= 10) {
-            scaleFactor = 6;
+        Enumeration en = pointsVector.elements();
+        while(en.hasMoreElements()) {
+        	Vector pointVector = (Vector)en.nextElement();
+        	drawLine(g, pointVector);
         }
-        
-        do {
-            if(size > 10) {
-                break;
-            }
-            if(!enumeration.hasMoreElements()) {
-                break;
-            }
-            count++;
-            LinePointsItem b1 = (LinePointsItem)enumeration.nextElement();
-            
-            if(isDefaultColor) {
-                g.setColor(colorFieldOne, colorFieldTwo, colorFieldThree);
-            } else {
-                g.setColor(b1.getColorOne(), b1.getColorTwo(), b1.getColorThree());
-            }
-            
-            int pointY2 = this.height - fontSpaceHeight - (height * b1.yCordPt) / (yScaleFactor);
-            int pointX2 = marginOne + (width * b1.xCordPt) / (xScaleFactor * scaleFactor);
-            // System.out.println("pointX1 ==  " + pointX1 + " pointY1 == " + pointY1 + " pointX2 == " + pointX2 + " pointY2 == " + pointY2);
-            
-            if(count > -1) {
-                g.drawLine(pointX1, pointY1, pointX2, pointY2);
-            }
-            pointX1 = pointX2;
-            pointY1 = pointY2;
-            if(isMarginTwoTrue) {
-                g.setColor(0, 0, 0);
-                if((count + 1) % ticker == 0) {
-                    //g.drawLine(pointX2, this.height - fontSpaceHeight, pointX2, (this.height - fontSpaceHeight) + 2);
-                }
-                pointLabelWidth = font.stringWidth(b1.labelX);
-                
-                if(isLabelXTrue && (count + 1) % (equalCoordTicker * ticker) == 0) {
-                    g.drawString(b1.labelX, pointX2 - pointLabelWidth / 2, (this.height - fontSpaceHeight) + 1, 20);
-                }
-            }
-        } while(true);
     }
+   
+   public void drawLine(Graphics g, Vector pointVector) {
+
+       pointVector.size();
+       int count = -1;
+       int pointX1 = marginOne;
+       int pointY1 = this.height - marginFour;
+       Enumeration enumeration = pointVector.elements();
+       int size = pointVector.size();
+       int scaleFactor = 0;
+       if(size <= 4 ) {
+           scaleFactor = size;
+       } else if (size <= 10) {
+           scaleFactor = 6;
+       }
+       
+	   do {
+           if(size > 10) {
+               break;
+           }
+           if(!enumeration.hasMoreElements()) {
+               break;
+           }
+           count++;
+           LinePointsItem b1 = (LinePointsItem)enumeration.nextElement();
+           
+           if(isDefaultColor) {
+               g.setColor(colorFieldOne, colorFieldTwo, colorFieldThree);
+           } else {
+               g.setColor(b1.getColorOne(), b1.getColorTwo(), b1.getColorThree());
+           }
+           
+           int pointY2 = this.height - fontSpaceHeight - (height * b1.yCordPt) / (yScaleFactor);
+           int pointX2 = marginOne + (width * b1.xCordPt) / (xScaleFactor * scaleFactor);
+           // System.out.println("pointX1 ==  " + pointX1 + " pointY1 == " + pointY1 + " pointX2 == " + pointX2 + " pointY2 == " + pointY2);
+           
+           if(count > -1) {
+               g.drawLine(pointX1, pointY1, pointX2, pointY2);
+           }
+           pointX1 = pointX2;
+           pointY1 = pointY2;
+           if(isMarginTwoTrue) {
+               g.setColor(0, 0, 0);
+               if((count + 1) % ticker == 0) {
+                   //g.drawLine(pointX2, this.height - fontSpaceHeight, pointX2, (this.height - fontSpaceHeight) + 2);
+               }
+               pointLabelWidth = font.stringWidth(b1.labelX);
+               
+               if(isLabelXTrue && (count + 1) % (equalCoordTicker * ticker) == 0) {
+                   g.drawString(b1.labelX, pointX2 - pointLabelWidth / 2, (this.height - fontSpaceHeight) + 1, 20);
+               }
+           }
+       } while(true);
+   }
+   
+   public void startNewLine() {
+	   Vector newVector = new Vector();
+	   pointsVector.addElement(newVector);
+	   currentPointVector = newVector;
+   }
      
     /**
      * Set Fonts

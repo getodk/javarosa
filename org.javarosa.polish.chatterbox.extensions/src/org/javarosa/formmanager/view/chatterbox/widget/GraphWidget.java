@@ -19,6 +19,10 @@ public class GraphWidget extends ExpandedWidget {
         int [] chartYPointsArray = {2, 8, 16, 32, 48, 55, 64, 70, 80, 87};
         String [] chartXPointsLabelArray = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
         
+        int [] chartX2PointsArray = {15, 20, 30, 35, 45, 55, 68, 79, 90};
+        int [] chartY2PointsArray = {2, 8, 16, 32, 48, 55, 64, 70, 80};
+        //String [] chartX2PointsLabelArray = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
+        
         //#style lineChart
         chart = new LineChart(""); 
         chart.setUseDefaultColor(false);
@@ -34,6 +38,12 @@ public class GraphWidget extends ExpandedWidget {
         
         for(int i = 0; i < chartXPointsArray.length; i++) {
             chart.insertItem(chartXPointsLabelArray[i], chartXPointsArray[i], chartYPointsArray[i], 0,  0,   255);
+        }
+        
+        chart.startNewLine();
+        
+        for(int i = 0; i < chartX2PointsArray.length; i++) {
+            chart.insertItem("", chartX2PointsArray[i], chartY2PointsArray[i], 0,  255,   255);
         }
         
         chart.setMaxYScaleFactor(100);
