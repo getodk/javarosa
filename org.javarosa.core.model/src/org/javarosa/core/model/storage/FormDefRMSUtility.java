@@ -17,7 +17,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.util.UnavailableExternalizerException;
@@ -222,6 +222,10 @@ public class FormDefRMSUtility extends RMSUtility {
 	
 	public void addAnswerDataPrototype(IAnswerData answerData) {
 		getQuestionElementsFactory().addNewPrototype(answerData.getClass().getName(), answerData.getClass());
+	}
+	
+	public void addQuestionGroupPrototype(QuestionDataGroup group) {
+		getQuestionElementsFactory().addNewPrototype(group.getClass().getName(), group.getClass());
 	}
 	
 	public void clearQuestionElementsFactory() {

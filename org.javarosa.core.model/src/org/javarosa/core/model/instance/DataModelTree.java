@@ -214,10 +214,17 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		
 		FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 		PrototypeFactory factory = fdrms.getQuestionElementsFactory();
+		factory.addNewPrototype(QuestionDataGroup.class.getName(), QuestionDataGroup.class);
 		
 		boolean group = in.readBoolean();
 		if(group) {
-			QuestionDataGroup newGroup = new QuestionDataGroup();
+			String className = in.readUTF();
+			QuestionDataGroup newGroup = (QuestionDataGroup)factory.getNewInstance(className);
+			if(newGroup == null) {
+				throw new UnavailableExternalizerException("Attempted to deserialize a Question Data Group object" +
+						"of type " + className + ". Please ensure that this class is available in the prototype factory" +
+						" in the root of the data model tree"); 
+			}
 			newGroup.setRoot(newGroup);
 			newGroup.setFactory(factory);
 			newGroup.readExternal(in);
