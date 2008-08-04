@@ -281,9 +281,9 @@ public class Patient implements IEntity {
 		return s;
 	}
 
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
+	public void read(DataInputStream in) throws IOException,
+			InstantiationException, IllegalAccessException/*,
+			UnavailableExternalizerException*/ {
 		recordId = in.readInt();
 	
 		setPatientId(ExternalizableHelper.readInteger(in));
@@ -301,12 +301,12 @@ public class Patient implements IEntity {
 		heightRecord = new NumericalRecord();
 		cd4CountRecord = new NumericalRecord();
 		
-		weightRecord.readExternal(in);
-		heightRecord.readExternal(in);
-		cd4CountRecord.readExternal(in);
+		//weightRecord.readExternal(in);
+		//heightRecord.readExternal(in);
+		//cd4CountRecord.readExternal(in);
 	}
 	
-	public void writeExternal(DataOutputStream out) throws IOException {
+	public void write(DataOutputStream out) throws IOException {
 		out.writeInt(recordId);
 			
 		ExternalizableHelper.writeInteger(out,getPatientId());
@@ -319,9 +319,9 @@ public class Patient implements IEntity {
 		ExternalizableHelper.writeUTF(out, getPatientIdentifier());
 		out.writeBoolean(isNewPatient());
 		
-		weightRecord.writeExternal(out);
-		heightRecord.writeExternal(out);
-		cd4CountRecord.writeExternal(out);
+		//weightRecord.writeExternal(out);
+		//heightRecord.writeExternal(out);
+		//cd4CountRecord.writeExternal(out);
 	}
 	/** 
 	 * Gets a list of patient attributes.
