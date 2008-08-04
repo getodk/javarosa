@@ -161,6 +161,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		ChatterboxWidget widget = (ChatterboxWidget)get(activeQuestionIndex);
     		
     		this.focus(widget, true);
+    		widget.showCommands();
 
     		progressBar.setValue(questionIndex);
     		
