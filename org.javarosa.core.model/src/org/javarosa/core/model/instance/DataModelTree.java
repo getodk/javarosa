@@ -76,19 +76,26 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.IFormDataModel#updateDataValue(IDataBinding, Object)
+	 * 
+	 * @see org.javarosa.core.model.IFormDataModel#updateDataValue(IDataBinding,
+	 * Object)
 	 */
-	public boolean updateDataValue(IDataReference questionBinding, IAnswerData value) {
-		QuestionDataElement questionElement = resolveReference(questionBinding);
-		if(questionElement != null) {
-			questionElement.setValue(value);
-			return true;
+	public boolean updateDataValue(IDataReference questionBinding,
+			IAnswerData value) {
+		TreeElement treeElement = resolveReference(questionBinding);
+		if (treeElement instanceof QuestionDataElement) {
+			QuestionDataElement questionElement = (QuestionDataElement) treeElement;
+			if (questionElement != null) {
+				questionElement.setValue(value);
+				return true;
+			} else {
+				return false;
+			}
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 	
 	/*
@@ -96,7 +103,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	 * @see org.javarosa.core.model.IFormDataModel#getDataValue(org.javarosa.core.model.IDataReference)
 	 */
 	public IAnswerData getDataValue(IDataReference questionReference) {
-		QuestionDataElement element = resolveReference(questionReference);
+		TreeElement element = resolveReference(questionReference);
 		if(element != null) {
 			return element.getValue();
 		}
@@ -112,11 +119,10 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	 * @return A QuestionDataElement corresponding to the binding
 	 * provided. Null if none exists in this tree.
 	 */
-	public QuestionDataElement resolveReference(IDataReference binding) {
+	public TreeElement resolveReference(IDataReference binding) {
 		if (root.isLeaf()) {
-			if ((root.getClass() == QuestionDataElement.class)
-					&& ((QuestionDataElement) root).matchesReference(binding)) {
-				return (QuestionDataElement) root;
+			if (root.matchesReference(binding)) {
+				return root;
 			} else {
 				return null;
 			}
@@ -132,9 +138,9 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	 * @return A QuestionDataElement corresponding to the binding
 	 * provided. Null if none exists in this tree.
 	 */
-	private QuestionDataElement resolveReference(IDataReference binding, QuestionDataGroup group) {
+	private TreeElement resolveReference(IDataReference binding, QuestionDataGroup group) {
 		//TODO: We can do this much more intelligently given that we know the format of the bindings
-		QuestionDataElement target = null;
+		TreeElement target = null;
 		
 		Enumeration en = group.getChildren().elements();		
 		while(target == null && en.hasMoreElements()) {
@@ -143,9 +149,8 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 			if(!dme.isLeaf()) {
 				target = resolveReference(binding, (QuestionDataGroup)dme);
 			} else {
-				if ((dme instanceof QuestionDataElement)
-						&& ((QuestionDataElement) dme).matchesReference(binding)) {
-					target = (QuestionDataElement) dme;
+				if (dme.matchesReference(binding)) {
+					return dme;
 				}
 			}
 		}

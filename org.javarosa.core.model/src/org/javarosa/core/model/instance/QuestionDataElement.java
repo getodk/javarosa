@@ -124,6 +124,10 @@ public class QuestionDataElement extends TreeElement {
 		}
 	}
 
+	public void setReference(IDataReference reference) {
+		this.reference = reference;
+	}
+	
 	public boolean matchesReference(IDataReference reference) {
 		if (this.reference == null) {
 			return false;

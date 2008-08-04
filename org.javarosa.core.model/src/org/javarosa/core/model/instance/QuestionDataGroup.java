@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ElementExistsVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.utils.ExternalizableHelper;
@@ -68,6 +70,28 @@ public class QuestionDataGroup extends TreeElement {
 	 */
 	public Vector getChildren() {
 		return children;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.instance.TreeElement#matchesReference(org.javarosa.core.model.IDataReference)
+	 */
+	public boolean matchesReference(IDataReference reference) {
+		//This class should be subclassed in order to return values from reference
+		return false;
+	}
+	
+	public IAnswerData getValue() {
+		//This class needs to be subclassed in order to return values
+		return null;
+	}
+	
+	public void setReference(IDataReference reference) {
+		//This class cannot hold references
+	}
+	
+	public void setValue(IAnswerData data) {
+		//This class does not hold data
 	}
 	
 	/*
