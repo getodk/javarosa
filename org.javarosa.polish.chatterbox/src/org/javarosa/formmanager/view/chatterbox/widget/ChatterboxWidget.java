@@ -208,4 +208,10 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 			}
 		}
 	}
+	
+	public void showCommands() {
+		super.showCommands();
+		Item widget = expandedStyle.getInteractiveWidget();
+		widget.showCommands();
+	}
 }
