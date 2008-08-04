@@ -233,7 +233,7 @@ public class XFormParser {
 		}
 	}
 	
-	private static void parseControl (IFormElement parent, Element e, FormDef f, int controlType) {
+	protected static QuestionDef parseControl (IFormElement parent, Element e, FormDef f, int controlType) {
 		QuestionDef question = new QuestionDef();
 		DataBinding binding;
 		
@@ -279,6 +279,7 @@ public class XFormParser {
 		}	
 		
 		parent.addChild(question);
+		return question;
 	}
 	
 	private static void parseQuestionLabel (FormDef f, QuestionDef q, Element e) {
@@ -642,6 +643,11 @@ public class XFormParser {
 			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, typeId); } };
 		topLevelHandlers.put(type, newHandler);
 		groupLevelHandlers.put(type, newHandler);
+	}
+	
+	public static void registerHandler(String type, IElementHandler handler) {
+		topLevelHandlers.put(type, handler);
+		groupLevelHandlers.put(type, handler);
 	}
 
 	public static String getXMLText (Node n, boolean trim) {

@@ -11,10 +11,8 @@ public final class LinePointsItem
     private int colorThree;
     public String labelX;
     private boolean colorField;
-    private final LineChart chartItem;
 
-    public LinePointsItem(LineChart chartItem, String labelX, int yCordPt, int xCordPt, int colorOne, int colorTwo, int colorThree) {
-        this.chartItem = chartItem;
+    public LinePointsItem(String labelX, int yCordPt, int xCordPt, int colorOne, int colorTwo, int colorThree) {
         this.xCordPt = xCordPt;
         this.yCordPt = yCordPt; 
         this.colorOne = colorOne;
@@ -24,29 +22,21 @@ public final class LinePointsItem
         colorField = false;
         // System.out.println("LinePointsItem() --> xCordPt == > " + xCordPt + " yCordPt == " + yCordPt + " colorOne " + colorOne + " colorTwo " + colorTwo + " colorThree " + colorThree ) ;
     }
+    
+    public boolean isColorField() {
+    	return colorField;
+    }
 
     
     public final int getColorOne() {
-        if(colorField) {
-            return this.chartItem.colorOne;
-        } else {
-            return colorOne;
-        }
+        return colorOne;
     }
 
     public final int getColorTwo() {
-        if(colorField) {
-            return this.chartItem.colorTwo;
-        } else {
-            return colorTwo;
-        }
+        return colorTwo;
     }
 
     public final int getColorThree() {
-        if(colorField) {
-            return this.chartItem.colorThree;
-        } else {
-            return colorThree;
-        }
+        return colorThree;
     }
 }
