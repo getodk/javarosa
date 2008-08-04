@@ -114,15 +114,29 @@ public class LineChart extends CustomItem {
      * Return : 
      */
    
-    public void insertItem(String pointLabel, int yCordValue, int xCordValue,  int colorOne, int colorTwo, int colorThree) {
-        currentPointVector.addElement(new LinePointsItem(this, pointLabel, yCordValue, xCordValue, colorOne, colorTwo, colorThree));
-        if(yCordValue > yScaleFactor) {
-            yScaleFactor = yCordValue;
+    public void insertItem(LinePointsItem item) {
+        currentPointVector.addElement(item);
+        if(item.yCordPt > yScaleFactor) {
+            yScaleFactor = item.yCordPt;
         }
         if(scaleCount > xScaleFactor) {
             xScaleFactor = scaleCount;
         }
         scaleCount++;
+    }
+    
+    /**
+     * Inserts the Point object into point vector
+     * Param : 
+     *          String pointLabel :- labelForPoint
+     *          int xCordValue : x cordinate Value for the Point to be drawn
+     *          int yCordValue : y cordinate Value for the Point to be drawn
+     *          int colorOne, int colorTwo, int colorThree, : RGB Values Of color for the line
+     * Return : 
+     */
+   
+    public void insertItem(String pointLabel, int yCordValue, int xCordValue,  int colorOne, int colorTwo, int colorThree) {
+    	insertItem(new LinePointsItem(pointLabel, yCordValue, xCordValue, colorOne, colorTwo, colorThree));
     }
 
     /**
