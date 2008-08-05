@@ -23,6 +23,7 @@ public class DateUtils {
 	 * @param date The date to be converted
 	 * @return The date represented by 'date' in the XML dateTime format.
 	 */
+	//yyyy-mm-ddThh:mm:ss.sssZ or yyyy-mm-ddThh:mm:ss.sss(+-)hh:mm
 	public static String formatDateToTimeStamp(Date date) {
 		String dateElement = getXMLStringValue(date);
 		Calendar cd = Calendar.getInstance();
