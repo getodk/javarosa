@@ -41,6 +41,10 @@ public class SelectorParser {
 		int firstIndex = 0;
 		int lastIndex = elements.size()-1;
 		
+		if(elements.size() ==0 ) { 
+			return new Vector();
+		}
+		
 		selector = selector.substring(1, selector.length()-1);
 		int firstColon = selector.indexOf(':');
 		int secondColon = selector.indexOf(':', firstColon + 1);
