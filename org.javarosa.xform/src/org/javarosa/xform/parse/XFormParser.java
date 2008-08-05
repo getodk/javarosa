@@ -587,6 +587,9 @@ public class XFormParser {
 			// This node, and its children represent some sort of Question
 			try {
 				element = (TreeElement)modelPrototypes.getNewInstance(String.valueOf(binding.getDataType()));
+				if(element != null) {
+					element.setReference(reference);
+				}
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			} catch (InstantiationException e) {

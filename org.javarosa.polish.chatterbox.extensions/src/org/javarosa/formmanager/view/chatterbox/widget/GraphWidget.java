@@ -12,6 +12,7 @@ import org.javarosa.formmanager.view.chatterbox.widget.chart.IGraphTemplate;
 import org.javarosa.formmanager.view.chatterbox.widget.chart.LineChart;
 import org.javarosa.formmanager.view.chatterbox.widget.chart.LinePointsItem;
 import org.javarosa.formmanager.view.chatterbox.widget.chart.WHOWeightTemplate;
+import org.javarosa.patient.model.data.NumericListData;
 
 import de.enough.polish.ui.Item;
 
@@ -93,6 +94,9 @@ public class GraphWidget extends ExpandedWidget {
 
 	
 	protected void setWidgetValue(Object o) {
+		if(o instanceof Vector) {
+			Vector data = (Vector)o;
+		}
 	}
 
 	

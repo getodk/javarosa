@@ -11,6 +11,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.Map;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 
@@ -340,6 +341,32 @@ public class ExternalizableHelper {
 			item = null;
 		}
 		return item;
+	}
+	
+
+	public static Map readExternalStringValueMap(DataInputStream in, Class classname) throws IOException,
+			InstantiationException, IllegalAccessException,
+			UnavailableExternalizerException {
+		Map theMap = new Map();
+		int sizes = in.readInt();
+		for(int i = 0 ; i < sizes ; i++) {
+			String key = in.readUTF();
+			Externalizable value = (Externalizable)classname.newInstance();
+			value.readExternal(in);
+			theMap.put(key, value);
+		}
+		return theMap;
+	}
+
+	public static void writeExternalStringValueMap(DataOutputStream out, Map map) throws IOException {
+		out.writeInt(map.size());
+		
+		Enumeration en = map.keys();
+		while(en.hasMoreElements()) {
+			String key = (String)en.nextElement();
+			out.writeUTF(key);
+			((Externalizable)map.get(key)).writeExternal(out);
+		}
 	}
 	
 	/**
