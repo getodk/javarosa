@@ -43,8 +43,8 @@ public class PatientRMSUtility extends RMSUtility {
 		return super.writeToRMS(patient, new PatientMetaDataObject(patient));
 	}
 
-	public void updateToRMS(int recordId, Patient model) {
-		updateToRMS(recordId, model, getMetaDataFromId(recordId));
+	public void updateToRMS(int recordId, Patient patient) {
+		updateToRMS(recordId, patient, getMetaDataFromId(recordId));
 	}
 	
 	/**
