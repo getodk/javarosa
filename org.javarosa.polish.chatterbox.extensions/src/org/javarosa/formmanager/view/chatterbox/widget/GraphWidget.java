@@ -16,7 +16,7 @@ import org.javarosa.formmanager.view.chatterbox.widget.chart.WHOWeightTemplate;
 import de.enough.polish.ui.Item;
 
 public class GraphWidget extends ExpandedWidget {
-	public final static int CONTROL_GRAPH = 9;
+	public final static int CONTROL_GRAPH = 101; 
 	
 	LineChart chart;
 	
