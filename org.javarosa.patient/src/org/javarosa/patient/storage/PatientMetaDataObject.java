@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.patient.model.Patient;
 
@@ -79,7 +80,7 @@ public class PatientMetaDataObject extends MetaDataObject {
         this.patientRecordId = in.readInt();
         
         this.patientName = in.readUTF();
-        this.patientId = in.readUTF();
+        this.patientId = ExternalizableHelper.readUTF(in);
     }
 
    
@@ -93,7 +94,7 @@ public class PatientMetaDataObject extends MetaDataObject {
     	out.writeInt(this.getPatientRecordId());
     	
     	out.writeUTF(this.getName());
-    	out.writeUTF(this.patientId);
+    	ExternalizableHelper.writeUTF(out, this.patientId);
     }
 
     /*

@@ -7,11 +7,14 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.Map;
 import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.entitymgr.model.EntityFieldList;
 import org.javarosa.entitymgr.model.EntityFieldValueList;
-import org.javarosa.entitymgr.model.IEntity;
+import org.javarosa.patient.model.data.ImmunizationData;
+import org.javarosa.patient.model.data.ImmunizationRow;
+import org.javarosa.patient.model.data.NumericListData;
 import org.javarosa.util.Utilities;
 
 /**
@@ -21,10 +24,10 @@ import org.javarosa.util.Utilities;
  * historical data records for patients, such as a list of weight
  * measurements . 
  * 
- * @author daniel
+ * @author daniel/ctsims(temp)
  *
  */
-public class Patient implements IEntity {
+public class Patient implements Externalizable {
 	
 
 	private static final int INVALID_RECORD_ID = -1;
@@ -52,19 +55,31 @@ public class Patient implements IEntity {
 	
 
 	/* String->IPatientRecord */
-	private Map records;
+	private Map records = new Map();
 	
 	//For now we're statically encoding record types.
-	private NumericalRecord weightRecord = new NumericalRecord();
+	private NumericListData weightRecord = new NumericListData();
 	
-	private NumericalRecord heightRecord = new NumericalRecord();
+	private NumericListData heightRecord = new NumericListData();
 	
-	private NumericalRecord cd4CountRecord = new NumericalRecord();
+	private NumericListData cd4CountRecord = new NumericListData();
+	
+	ImmunizationData vaccinationData = new ImmunizationData();
 	
 	public Patient() { 
 		records.put("weight", weightRecord);
 		records.put("height", heightRecord);
 		records.put("cd4count", cd4CountRecord);
+		
+		Vector rows = new Vector();
+		rows.addElement(new ImmunizationRow("BCG"));
+		rows.addElement(new ImmunizationRow("OPV"));
+		rows.addElement(new ImmunizationRow("DPT"));
+		rows.addElement(new ImmunizationRow("Hep B"));
+		rows.addElement(new ImmunizationRow("Measles"));
+		vaccinationData.setValue(rows);
+		
+		records.put("vaccinations", vaccinationData);
 	}
 	
 	/**
@@ -281,9 +296,9 @@ public class Patient implements IEntity {
 		return s;
 	}
 
-	public void read(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException/*,
-			UnavailableExternalizerException*/ {
+	public void readExternal(DataInputStream in) throws IOException,
+			InstantiationException, IllegalAccessException,
+			UnavailableExternalizerException {
 		recordId = in.readInt();
 	
 		setPatientId(ExternalizableHelper.readInteger(in));
@@ -297,16 +312,16 @@ public class Patient implements IEntity {
 		setNewPatient(in.readBoolean());
 
 		
-		weightRecord = new NumericalRecord();
-		heightRecord = new NumericalRecord();
-		cd4CountRecord = new NumericalRecord();
+		weightRecord = new NumericListData();
+		heightRecord = new NumericListData();
+		cd4CountRecord = new NumericListData();
 		
-		//weightRecord.readExternal(in);
-		//heightRecord.readExternal(in);
-		//cd4CountRecord.readExternal(in);
+		weightRecord.readExternal(in);
+		heightRecord.readExternal(in);
+		cd4CountRecord.readExternal(in);
 	}
 	
-	public void write(DataOutputStream out) throws IOException {
+	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(recordId);
 			
 		ExternalizableHelper.writeInteger(out,getPatientId());
@@ -319,9 +334,9 @@ public class Patient implements IEntity {
 		ExternalizableHelper.writeUTF(out, getPatientIdentifier());
 		out.writeBoolean(isNewPatient());
 		
-		//weightRecord.writeExternal(out);
-		//heightRecord.writeExternal(out);
-		//cd4CountRecord.writeExternal(out);
+		weightRecord.writeExternal(out);
+		heightRecord.writeExternal(out);
+		cd4CountRecord.writeExternal(out);
 	}
 	/** 
 	 * Gets a list of patient attributes.
