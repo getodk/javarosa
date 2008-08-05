@@ -2,6 +2,8 @@ package org.javarosa.patient.util;
 
 import java.util.Vector;
 
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.utils.IPreloadHandler;
@@ -27,7 +29,7 @@ public class PatientPreloadHandler implements IPreloadHandler {
 	/**
 	 * 
 	 */
-	public IAnswerData handle(String preloadParams) {
+	public IAnswerData handlePreload(String preloadParams) {
 		IAnswerData returnVal = null;
 		if(preloadParams == "monthsOnTreatment") {
 			//TODO: Get actual data from patient
@@ -48,6 +50,10 @@ public class PatientPreloadHandler implements IPreloadHandler {
 		return returnVal;
 	}
 
+	public boolean handlePostProcess(IFormDataModel model, IDataReference ref, String params) {
+		return false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.IPreloadHandler#preloadHandled()
