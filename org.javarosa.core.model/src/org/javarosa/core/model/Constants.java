@@ -90,6 +90,7 @@ public class Constants {
 	public static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT");
 
 	public static final int DATATYPE_UNSUPPORTED = -1;
+	public static final int DATATYPE_NULL = 0;  /* for controls that return no value */
 	public static final int DATATYPE_TEXT = 1;	/** Text question type. */
 	public static final int DATATYPE_INTEGER = 2;	/** Numeric question type. These are numbers without decimal points*/
 	public static final int DATATYPE_DECIMAL = 3;	/** Decimal question type. These are numbers with decimals */
@@ -111,4 +112,5 @@ public class Constants {
 	public static final int CONTROL_RANGE = 6;
 	public static final int CONTROL_UPLOAD = 7;
 	public static final int CONTROL_SUBMIT = 8;
+	public static final int CONTROL_TRIGGER = 9;
 }

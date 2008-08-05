@@ -79,6 +79,8 @@ public class XFormParser {
 			public void handle (FormDef f, Element e, Object parent) { parseGroup((IFormElement)parent, e, f, CONTAINER_REPEAT); } };		
 		IElementHandler groupLabel = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseGroupLabel(f, (GroupDef)parent, e); } };					
+		IElementHandler trigger = new IElementHandler () {
+			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, Constants.CONTROL_TRIGGER); } };
 			
 		groupLevelHandlers = new Hashtable();
 		groupLevelHandlers.put("input", input);
@@ -86,6 +88,7 @@ public class XFormParser {
 		groupLevelHandlers.put("select1", select1);
 		groupLevelHandlers.put("group", group);
 		groupLevelHandlers.put("repeat", repeat);
+		groupLevelHandlers.put("trigger", trigger);
 		
 		topLevelHandlers = new Hashtable();
 		for (Enumeration en = groupLevelHandlers.keys(); en.hasMoreElements(); ) {
@@ -237,7 +240,7 @@ public class XFormParser {
 	
 	protected static QuestionDef parseControl (IFormElement parent, Element e, FormDef f, int controlType) {
 		QuestionDef question = new QuestionDef();
-		DataBinding binding;
+		DataBinding binding = null;
 		
 		String ref = e.getAttributeValue(null, "ref");
 		String bind = e.getAttributeValue(null, "bind");
@@ -254,7 +257,11 @@ public class XFormParser {
 			binding = (DataBinding)bindingsByRef.get(ref);
 			//in the future, we may have multiple <bind>s that must be applied in succession
 		} else {
-			throw new XFormParseException("XForm Parse: input control with neither 'ref' nor 'bind'");
+			if (controlType != Constants.CONTROL_TRIGGER) {
+				throw new XFormParseException("XForm Parse: input control with neither 'ref' nor 'bind'");
+			} else {
+				question.setDataType(Constants.DATATYPE_NULL);
+			}
 		}
 		
 		if (binding != null) {

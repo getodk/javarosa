@@ -59,6 +59,9 @@ public class ChatterboxWidgetFactory {
 		case Constants.CONTROL_TEXTAREA:
 			expandedStyle = new TextEntryWidget();
 			break;
+		case Constants.CONTROL_TRIGGER:
+			expandedStyle = new MessageWidget();
+			break;
 		}
 
 		if (expandedStyle == null) {
