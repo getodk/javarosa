@@ -28,6 +28,7 @@ colors {
 	menubarColor: #DDDD88;
 	oldQuestionColor: #E2E2E2;	
 	overlay: argb( 150, 255, 255, 255 );
+	buttonBgColor: #ffeecc;
 }
 
 title {
@@ -169,6 +170,22 @@ rightcommand {
 .container {
 	columns: 1;
 	layout: expand | vshrink;
+}
+
+.buttonfocused {
+	font-color: black;
+	font-style: bold;
+	border-color: black;
+	border-width: 1;
+	background-color: buttonBgColor;
+	padding-vertical: 2;
+	padding-horizontal: 5;
+	layout: horizontal-center;
+	min-width: 80;
+}
+
+.button extends buttonfocused {
+	focused-style: buttonfocused;
 }
 
 .split {

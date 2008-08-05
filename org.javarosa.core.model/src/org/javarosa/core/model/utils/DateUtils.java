@@ -2,6 +2,7 @@ package org.javarosa.core.model.utils;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.Vector;
 
 /**
@@ -27,17 +28,23 @@ public class DateUtils {
 		Calendar cd = Calendar.getInstance();
 		cd.setTime(date);
 		
-		String hour = String.valueOf(cd.get(Calendar.HOUR_OF_DAY));
-		hour = hour.length() < 2 ? "0" + hour : hour;
-		String minute = String.valueOf(cd.get(Calendar.MINUTE));
-		minute = minute.length() < 2 ? "0" + minute : minute;
-		String second = String.valueOf(cd.get(Calendar.SECOND));
-		second = second.length() < 2 ? "0" + second : second;		
+		String hour = intPad(cd.get(Calendar.HOUR_OF_DAY), 2);
+		String minute = intPad(cd.get(Calendar.MINUTE), 2);
+		String second = intPad(cd.get(Calendar.SECOND), 2);
+		String secfrac = intPad(cd.get(Calendar.MILLISECOND), 3);
 		
-		String time = hour + ":"+ minute + ":" + second;
+		//want to add time zone info to be fully ISO-8601 compliant, but API is totally on crack!
+		String time = hour + ":"+ minute + ":" + second + "." + secfrac; 
 		return dateElement + "T" + time;
 	}
 
+	public static String intPad (int n, int pad) {
+		String s = String.valueOf(n);
+		while (s.length() < pad)
+			s = "0" + s;
+		return s;
+	}
+	
 	/**
 	 * Converts the value object into a String based on the returnType
 	 * Note: This is for a short

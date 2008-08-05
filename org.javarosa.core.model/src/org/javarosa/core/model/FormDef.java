@@ -265,40 +265,37 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * the data bindings.
 	 */
 	public void preloadModel() {
+		IAnswerData preload = null;
+		
 		Enumeration en = getBindings().elements();
 		while(en.hasMoreElements()) {
 			DataBinding binding = (DataBinding)en.nextElement();
-			IAnswerData preload = preloader.getQuestionPreload(binding.getPreload(), binding.getPreloadParams());
-			if(preload != null) {
+			if (binding.getPreload() != null)
+				preload = preloader.getQuestionPreload(binding.getPreload(), binding.getPreloadParams());
+			if(preload != null) { //what if we want to wipe out a value in the instance?
 				model.updateDataValue(binding.getReference(), preload);
 			}
 		}
 	}
 	
-	//TODO: make this all generic like preloadModel
 	public boolean postProcessModel () {
 		boolean modelModified = false;
 		
-		for (Enumeration e = dataBindings.elements(); e.hasMoreElements(); ) {
-			DataBinding b = (DataBinding)e.nextElement();
-			IDataReference ref = b.getReference();
-
-			//model-modifying operations should come first
-			if ("timestamp".equals(b.getPreload()) && "end".equals(b.getPreloadParams())) {
-				model.updateDataValue(ref, new StringData(DateUtils.formatDateToTimeStamp(new Date())));
-				modelModified = true;
-			} else if ("property".equals(b.getPreload())) {
-				String propName = b.getPreloadParams();
-				IAnswerData answer = model.getDataValue(ref);
-				String value = (answer == null ? null : answer.getDisplayText());
-				if (propName != null && propName.length() > 0 && value != null && value.length() > 0)
-					JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propName, value);
+		Enumeration en = getBindings().elements();
+		//we might have issues with ordering, for example, a handler that writes a value to a node,
+		//and a handler that does something external with the node. if both handlers are bound to the
+		//same node, we need to make sure the one that alters the node executes first. deal with that later.
+		while(en.hasMoreElements()) {
+			DataBinding binding = (DataBinding)en.nextElement();
+			if (binding.getPreload() != null) {
+				modelModified = preloader.questionPostProcess(binding.getReference(), binding.getPreload(), binding.getPreloadParams(), model)
+					|| modelModified;
 			}
 		}
-			
+		
 		return modelModified;
 	}
-	
+			
 	/** 
 	 * Reads the form definition object from the supplied stream.
 	 * 

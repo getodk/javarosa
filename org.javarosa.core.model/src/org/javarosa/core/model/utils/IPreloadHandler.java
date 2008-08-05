@@ -1,7 +1,7 @@
 package org.javarosa.core.model.utils;
 
-import java.util.Vector;
-
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 
 /**
@@ -27,5 +27,7 @@ public interface IPreloadHandler {
 	 * @return An IAnswerData to be used as the default, preloaded value
 	 * for a Question.
 	 */
-	IAnswerData handle(String preloadParams);
+	IAnswerData handlePreload(String preloadParams);
+	
+	boolean handlePostProcess(IFormDataModel model, IDataReference ref, String params);
 }
