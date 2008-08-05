@@ -1,5 +1,8 @@
 package org.javarosa.core.util;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -35,6 +38,10 @@ public class Map {
 	
 	public Enumeration keys(){
 		return keys.elements();
+	}
+	
+	public int size() {
+		return keys.size();
 	}
 	
 	/**

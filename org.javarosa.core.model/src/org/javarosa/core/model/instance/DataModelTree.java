@@ -86,16 +86,12 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	public boolean updateDataValue(IDataReference questionBinding,
 			IAnswerData value) {
 		TreeElement treeElement = resolveReference(questionBinding);
-		if (treeElement instanceof QuestionDataElement) {
-			QuestionDataElement questionElement = (QuestionDataElement) treeElement;
-			if (questionElement != null) {
-				questionElement.setValue(value);
-				return true;
-			} else {
-				return false;
-			}
+		if (treeElement != null) {
+			treeElement.setValue(value);
+			return true;
+		} else {
+			return false;
 		}
-		return false;
 	}
 	
 	/*
@@ -144,14 +140,12 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		
 		Enumeration en = group.getChildren().elements();		
 		while(target == null && en.hasMoreElements()) {
-			TreeElement dme = (TreeElement)en.nextElement();
-			
-			if(!dme.isLeaf()) {
+			TreeElement dme = (TreeElement)en.nextElement();			
+			if (dme.matchesReference(binding)) {
+				return dme;
+			}
+			else if(!dme.isLeaf()) {
 				target = resolveReference(binding, (QuestionDataGroup)dme);
-			} else {
-				if (dme.matchesReference(binding)) {
-					return dme;
-				}
 			}
 		}
 

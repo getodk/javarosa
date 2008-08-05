@@ -28,10 +28,10 @@ import org.javarosa.core.util.UnavailableExternalizerException;
  */
 public class QuestionDataGroup extends TreeElement {
 	/** The parent node for this Element **/
-	QuestionDataGroup parent;
+	protected QuestionDataGroup parent;
 	
 	/** List of TreeElements */
-	Vector children;
+	protected Vector children;
 
 	public QuestionDataGroup() {
 		//Until a node group is told otherwise, it is its own root.
@@ -135,6 +135,10 @@ public class QuestionDataGroup extends TreeElement {
 		}
 	}
 	
+	protected void removeChild(TreeElement child) {
+		children.removeElement(child);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.TreeElement#setRoot(org.javarosa.core.model.TreeElement)
@@ -161,10 +165,15 @@ public class QuestionDataGroup extends TreeElement {
 			((TreeElement)en.nextElement()).accept(visitor);
 		}
 	}
+	
+	protected void readNodeAttributes(DataInputStream in) throws IOException,
+				InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+		this.name = ExternalizableHelper.readUTF(in);
+	}
 
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException, UnavailableExternalizerException {
-		this.name = ExternalizableHelper.readUTF(in);
+		readNodeAttributes(in);
 		int numChildren = in.readInt();
 		for(int i = 0 ; i < numChildren ; ++i ) {
 			boolean group = in.readBoolean();
@@ -194,14 +203,18 @@ public class QuestionDataGroup extends TreeElement {
 		}
 	}
 
+	protected void writeNodeAttributes(DataOutputStream out) throws IOException {		 
+		ExternalizableHelper.writeUTF(out,this.name);
+	}
+	
 	public void writeExternal(DataOutputStream out) throws IOException {
 		//This flag is in place to determine whether a Data element is a Group or a Data
 		//True for groups, false for DataElements
 		out.writeBoolean(true);
 		
 		out.writeUTF(this.getClass().getName());
-				 
-		ExternalizableHelper.writeUTF(out,this.name);
+		
+		writeNodeAttributes(out);
 		
 		out.writeInt(this.children.size());
 		

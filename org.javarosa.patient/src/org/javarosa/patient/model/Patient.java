@@ -79,7 +79,7 @@ public class Patient implements Externalizable {
 		rows.addElement(new ImmunizationRow("Measles"));
 		vaccinationData.setValue(rows);
 		
-		records.put("vaccinations", vaccinationData);
+		//records.put("vaccinations", vaccinationData);
 	}
 	
 	/**
@@ -241,6 +241,10 @@ public class Patient implements Externalizable {
 		return record.getHistoricalRecords(selector);
 	}
 	
+	public void setRecord(String recordType, IPatientRecord record) {
+		records.put(recordType, record);
+	}
+	
 	//public Vector getMeasurements(String type, String delimeted )
 
 	/**
@@ -311,14 +315,7 @@ public class Patient implements Externalizable {
 		setPatientIdentifier(ExternalizableHelper.readUTF(in));
 		setNewPatient(in.readBoolean());
 
-		
-		weightRecord = new NumericListData();
-		heightRecord = new NumericListData();
-		cd4CountRecord = new NumericListData();
-		
-		weightRecord.readExternal(in);
-		heightRecord.readExternal(in);
-		cd4CountRecord.readExternal(in);
+		records = ExternalizableHelper.readExternalStringValueMap(in, NumericListData.class);
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -334,9 +331,7 @@ public class Patient implements Externalizable {
 		ExternalizableHelper.writeUTF(out, getPatientIdentifier());
 		out.writeBoolean(isNewPatient());
 		
-		weightRecord.writeExternal(out);
-		heightRecord.writeExternal(out);
-		cd4CountRecord.writeExternal(out);
+		ExternalizableHelper.writeExternalStringValueMap(out, records);
 	}
 	/** 
 	 * Gets a list of patient attributes.

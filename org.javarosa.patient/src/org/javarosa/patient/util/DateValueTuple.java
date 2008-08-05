@@ -13,6 +13,10 @@ public class DateValueTuple implements Externalizable {
 	public Date date;
 	public int value;
 	
+	public DateValueTuple(){
+		
+	}
+	
 	public DateValueTuple(Date date, int value) {
 		this.date = date;
 		this.value = value;
