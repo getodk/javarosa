@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.Map;
@@ -234,13 +236,17 @@ public class Patient implements Externalizable {
 		return this.vaccinationData;
 	}
 
-	public Object getRecord(String recordType) {
+	public IAnswerData getRecord(String recordType) {
 		if(recordType == "givenName") {
-			return givenName;
+			return new StringData(givenName);
 		} else if (recordType == "sex") {
-			return new Integer(gender);
+			switch (gender) {
+			case SEX_MALE: return new StringData("m");
+			case SEX_FEMALE: return new StringData("f");
+			default: return null;
+			}
 		} else if (recordType == "age") {
-			return new Integer((int)(((new Date()).getTime() - birthDate.getTime()) / 31556952000l));
+			return new IntegerData((int)(((new Date()).getTime() - birthDate.getTime()) / 31556952000l));
 		} else {
 			//TODO: We need to figure out how to do these references better
 			return null;
