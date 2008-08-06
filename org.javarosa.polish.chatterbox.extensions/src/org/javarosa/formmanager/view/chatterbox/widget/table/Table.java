@@ -36,7 +36,7 @@ public class Table extends CustomItem implements ItemCommandListener {
     private static final int LOWER = 2;
     private int rows = 6;
     private int cols = 6;
-    private int dx = 40;
+    private int dx = 36;
     private int dy = 20;
     private int location = IN;
     private int currentX = 0;
@@ -144,6 +144,7 @@ public class Table extends CustomItem implements ItemCommandListener {
     }
 
     protected void paint(Graphics g, int w, int h) {
+    	this.border = null;
         for (int i = 0; i <= rows; i++) {
             g.drawLine(0, i * dy, cols * dx, i * dy);
         }
