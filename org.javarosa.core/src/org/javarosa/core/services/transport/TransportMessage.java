@@ -51,6 +51,9 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * The actual data to be sent
 	 */
 	private byte[] payloadData;
+	/**
+	 * The actual data returned
+	 */
 	private byte[] replyloadData;
 	/**
 	 * ID or URL of destination
@@ -84,7 +87,7 @@ public class TransportMessage extends Observable implements Externalizable {
 
 	/**
 	 * Creates a new message
-	 * 
+	 *
 	 * @param payloadData
 	 * @param destination
 	 * @param sender
@@ -101,7 +104,7 @@ public class TransportMessage extends Observable implements Externalizable {
 
 	/**
 	 * Creates a new message
-	 * 
+	 *
 	 * @param payloadData
 	 * @param destination
 	 * @param sender
