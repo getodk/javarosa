@@ -29,7 +29,9 @@ import org.javarosa.util.Utilities;
  *
  */
 public class Patient implements Externalizable {
-	
+	public static final int SEX_MALE = 1;
+	public static final int SEX_FEMALE = 2;
+	public static final int SEX_UNKNOWN = 3;
 
 	private static final int INVALID_RECORD_ID = -1;
 	private static final String NULL_DISPLAY_VALUE = "";
@@ -41,15 +43,14 @@ public class Patient implements Externalizable {
 	Integer patientId; //patientid 
 	String prefix;
 	
-	/** Patient's Family name */
-	String familyName;
-	/** Optional Middle Name */
-	String middleName;
-	
-	/** Patient's surname */
-	String givenName;
-	String gender;
+	String familyName;  	/** Patient's Family name */
+	String middleName;	    /** Optional Middle Name */
+	String givenName;       /** Patient's surname */
+	int gender;
 	Date birthDate;
+	boolean birthDateEstimated;
+	int age;
+	
 	String patientIdentifier;
 	Vector attributes; //Not serialized since we can generate it on the fly.
 	boolean isNewPatient;
@@ -89,7 +90,7 @@ public class Patient implements Externalizable {
 	 * 
 	 * @return
 	 */
-	public String getName(){
+	public String getName (){
 		String s="";
 
 		if(getGivenName() != null && getGivenName().length() != 0)
@@ -162,14 +163,14 @@ public class Patient implements Externalizable {
 	/**
 	 * @return the gender
 	 */
-	public String getGender() {
+	public int getGender() {
 		return gender;
 	}
 
 	/**
 	 * @param gender the gender to set
 	 */
-	public void setGender(String gender) {
+	public void setGender(int gender) {
 		this.gender = gender;
 	}
 
@@ -236,9 +237,20 @@ public class Patient implements Externalizable {
 	public Object getRecord(String recordType) {
 		if(recordType == "givenName") {
 			return givenName;
+		} else if (recordType == "sex") {
+			return new Integer(gender);
+		} else if (recordType == "age") {
+			return new Integer((int)(((new Date()).getTime() - birthDate.getTime()) / 31556952000l));
+		} else {
+			//TODO: We need to figure out how to do these references better
+			return null;
 		}
-		//TODO: We need to figure out how to do these references better
-		return null;
+	}
+	
+	public void setRecord (String recordType, Object o) {
+		//not needed right now
+		
+		
 	}
 	
 	public Vector getRecordSet(String recordType, String selector) {
@@ -318,7 +330,7 @@ public class Patient implements Externalizable {
 		setFamilyName(ExternalizableHelper.readUTF(in));
 		setMiddleName(ExternalizableHelper.readUTF(in));
 		setGivenName(ExternalizableHelper.readUTF(in));
-		setGender(ExternalizableHelper.readUTF(in));
+		setGender(ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT));
 		setBirthDate(ExternalizableHelper.readDate(in));
 		setPatientIdentifier(ExternalizableHelper.readUTF(in));
 		setNewPatient(in.readBoolean());
@@ -337,7 +349,7 @@ public class Patient implements Externalizable {
 		ExternalizableHelper.writeUTF(out, getFamilyName());
 		ExternalizableHelper.writeUTF(out, getMiddleName());
 		ExternalizableHelper.writeUTF(out, getGivenName());
-		ExternalizableHelper.writeUTF(out, getGender());
+		ExternalizableHelper.writeNumeric(out, getGender(), ExternalizableHelper.ENCODING_NUM_DEFAULT);
 		ExternalizableHelper.writeDate(out, getBirthDate());
 		ExternalizableHelper.writeUTF(out, getPatientIdentifier());
 		out.writeBoolean(isNewPatient());
@@ -403,7 +415,7 @@ public class Patient implements Externalizable {
 		attributes.addElement("FamilyName: " + (getFamilyName() != null ? getFamilyName() : NULL_DISPLAY_VALUE));
 		attributes.addElement("MiddleName: " + (getMiddleName() != null ? getMiddleName() : NULL_DISPLAY_VALUE));
 		attributes.addElement("GivenName: " + (getGivenName() != null ? getGivenName() : NULL_DISPLAY_VALUE));
-		attributes.addElement("Gender: " + (getGender() != null ? getGender() : NULL_DISPLAY_VALUE));
+		attributes.addElement("Gender: " + (getGender() == SEX_MALE ? "Male" : getGender() == SEX_FEMALE ? "Female" : NULL_DISPLAY_VALUE));
 		attributes.addElement("BirthDate: " + (getBirthDate() != null ? Utilities.dateToString(getBirthDate()) : NULL_DISPLAY_VALUE));
 	}
 }
