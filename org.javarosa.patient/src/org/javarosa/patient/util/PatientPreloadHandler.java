@@ -59,7 +59,7 @@ public class PatientPreloadHandler implements IPreloadHandler {
 		IAnswerData data = model.getDataValue(ref);
 
 		if ("vaccination_table".equals(params)) {
-			patient.setVaccinations((ImmunizationData)data);
+			patient.setVaccinations((ImmunizationData)((ImmunizationAnswerData)data).getValue());
 			return true;
 		} else {
 			
