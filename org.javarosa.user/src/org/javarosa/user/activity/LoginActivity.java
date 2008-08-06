@@ -55,6 +55,9 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 				Hashtable returnArgs = new Hashtable();
 				returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
 				returnArgs.put(USER, loginScreen.getLoggedInUser());
+				//store logged in user here? must check if necessary to return context in return args
+				context.setCurrentUser(loginScreen.getLoggedInUser().getUsername());
+
 				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
 						returnArgs);
 			} else {
