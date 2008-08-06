@@ -9,6 +9,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.model.data.ImmunizationAnswerData;
+import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.NumericListData;
 
 public class PatientPreloadHandler implements IPreloadHandler {
@@ -32,10 +33,11 @@ public class PatientPreloadHandler implements IPreloadHandler {
 	 */
 	public IAnswerData handlePreload(String preloadParams) {
 		IAnswerData returnVal = null;
-		if(preloadParams == "monthsOnTreatment") {
+		/*if(preloadParams == "monthsOnTreatment") {
 			//TODO: Get actual data from patient
 			returnVal = new IntegerData(12);
-		} else if("vaccination_table".equals(preloadParams)) {
+		} else*/
+		if("vaccination_table".equals(preloadParams)) {
 			returnVal = new ImmunizationAnswerData(patient.getVaccinations());
 		}
 		else {
@@ -54,6 +56,15 @@ public class PatientPreloadHandler implements IPreloadHandler {
 	}
 
 	public boolean handlePostProcess(IFormDataModel model, IDataReference ref, String params) {
+		IAnswerData data = model.getDataValue(ref);
+
+		if ("vaccination_table".equals(params)) {
+			patient.setVaccinations((ImmunizationData)data);
+			return true;
+		} else {
+			
+		}
+		
 		return false;
 	}
 	

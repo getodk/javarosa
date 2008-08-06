@@ -4,13 +4,19 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 
 import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.parser.XPathLexer;
+import org.javarosa.xpath.parser.XPathParser;
+
+/* if you get build errors about missing XPathParser and XPathLexer, run the ant target 'build-xpath-parser'
+ * in the build.xml file for this project
+ */
 
 public class XPathTest {
 	private static void testXPath (String expr) {
 		System.out.println("Parsing [" + expr + "]");
 		ByteArrayInputStream bais = new ByteArrayInputStream(expr.getBytes());
 
-		/*//need to figure out how to catch syntax errors
+		//need to figure out how to catch syntax errors
 		try {
 			XPathParser p = new XPathParser(new XPathLexer(new InputStreamReader(bais)));
 			XPathExpression root = (XPathExpression)p.parse().value;
@@ -19,7 +25,7 @@ public class XPathTest {
 			System.err.println("   ...XPath Syntax Error");
 		} catch (Error e) {
 			System.err.println("   ...XPath Syntax Error");
-		}*/
+		}
 	}
 
 	public static void test () {
