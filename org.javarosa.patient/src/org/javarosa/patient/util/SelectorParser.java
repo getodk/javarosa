@@ -38,12 +38,12 @@ public class SelectorParser {
 	 * described in this class's overview.
 	 */
 	public static Vector selectValues(String selector, Vector elements) {
-		int firstIndex = 0;
-		int lastIndex = elements.size()-1;
-		
 		if(elements.size() ==0 ) { 
 			return new Vector();
 		}
+		
+		int firstIndex = 0;
+		int lastIndex = elements.size()-1;
 		
 		selector = selector.substring(1, selector.length()-1);
 		int firstColon = selector.indexOf(':');

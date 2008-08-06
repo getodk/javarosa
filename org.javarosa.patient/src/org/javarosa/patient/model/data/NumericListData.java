@@ -40,7 +40,9 @@ public class NumericListData implements IAnswerData, IPatientRecord {
 	 * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
 	 */
 	public void setValue(Object o) { 
-		valueList = (Vector)o;
+		if(o != null) {
+			valueList = (Vector)o;
+		}
 	}
 	
 	/**
@@ -123,6 +125,9 @@ public class NumericListData implements IAnswerData, IPatientRecord {
 			InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
 		valueList = ExternalizableHelper.readExternal(in, DateValueTuple.class);
+		if(valueList == null) {
+			valueList = new Vector();
+		}
 	}
 
 	/* (non-Javadoc)
