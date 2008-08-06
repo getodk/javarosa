@@ -8,11 +8,16 @@ package org.javarosa.formmanager.view.chatterbox.widget.table;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+
+import org.javarosa.formmanager.view.chatterbox.widget.util.ExtensionConstants;
+import org.javarosa.patient.model.data.ImmunizationData;
+import org.javarosa.patient.model.data.ImmunizationRow;
 
 import de.enough.polish.ui.CustomItem;
 import de.enough.polish.ui.DateField;
@@ -62,6 +67,10 @@ public class Table extends CustomItem implements ItemCommandListener {
     public int length=25;
     
     public Table(String title) {
+    	this(title, null);
+    }
+    
+    public Table(String title, ImmunizationData data) {
         super(title);
         datefield.addCommand(CMD_EDIT);
         //setDefaultCommand(CMD_EDIT);
@@ -71,48 +80,49 @@ public class Table extends CustomItem implements ItemCommandListener {
         vert = ((interactionMode & CustomItem.TRAVERSE_VERTICAL) != 0);
        // getRecord();
         datefield.setDate(new Date());
+        if(data != null) {
+        	setData(data);
+        }
     }
     
-    public void getRecord()
+    public void setData(ImmunizationData data) 
     {
+    	Enumeration en = data.getImmunizationRows().elements();
+    	int currentRow = 0;
     	
-        /*RecordStore recordStore=null;
-        int recordID =1;
-        int count=0;
-        //String Name;
-        //System.out.println("Recordid =>"+controller.recordId);
-        try {
-            recordStore = RecordStore.openRecordStore("Child"+controller.recordId, true);
-            count=recordStore.getNumRecords();
-            for(;count>0;count--)
-            {
-            	ByteArrayInputStream bais = new ByteArrayInputStream(recordStore.getRecord(count));
-        		DataInputStream inputStream = new DataInputStream(bais);
-        		try {
-        		    int choiceindex = inputStream.readInt();
-        		    int selectedrow =inputStream.readInt();
-        		    int selectedcol=inputStream.readInt();
-        		    //Name = inputStream.readUTF();
-        		    if(choiceindex==3)
-        		    	recorddate[selectedrow][selectedcol]=inputStream.readLong();
-        	
-        		    selectedindex[selectedrow][selectedcol]=choiceindex;
-        		    setText(" X",selectedcol,selectedrow);
-        		}
-        		catch (EOFException eofe) {
-        		    System.out.println(eofe);
-        		    eofe.printStackTrace();
-        		}
-            }
-        }
-        catch (RecordStoreException rse) {
-        	System.out.println(rse);
-        	rse.printStackTrace();
-        }
-        catch (IOException ioe) {
-        	System.out.println(ioe);
-        	ioe.printStackTrace();
-        }*/
+    	while(en.hasMoreElements()) {
+    		ImmunizationRow row = (ImmunizationRow)en.nextElement();
+    		for(int i = 0; i < 5 ; ++i ) {
+    			if(row.getStatus(i) != -1) {
+    			selectedindex[currentRow+1][i+1] = row.getStatus(i);
+    			if(row.getStatus(i) == ExtensionConstants.VACCINATION_GIVEN_ON_DATE) {
+    				recorddate[currentRow+1][i+1] = row.getDate(i).getTime();
+    			}
+    			//This may seem backwards, but it's because the function goes X,Y, not row,column
+    			setText(" X",i+1,currentRow+1);
+    			}
+    		}
+    		currentRow++;
+    	}
+    }
+    
+    public ImmunizationData getData() {
+    	ImmunizationData data = new ImmunizationData();
+    	
+    	//First row is for labels
+    	for(int i = 1 ; i < rows ; ++i ) {
+    		ImmunizationRow row = new ImmunizationRow(this.data[i][0]);
+    		for(int j = 1 ; j < cols ; j++) {
+    			if(selectedindex[i][j] == ExtensionConstants.VACCINATION_GIVEN_ON_DATE) {
+    				row.setDose(j, selectedindex[i][j], new Date(recorddate[i][j]));
+    			} else {
+        			row.setVaccinationDose(j, selectedindex[i][j]);	
+    			}
+    		}
+    		data.addRow(row);
+    	}
+    	
+    	return data;
     }
     
     
@@ -347,6 +357,7 @@ public class Table extends CustomItem implements ItemCommandListener {
     				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				setText("X",currentX,currentY);
+    				selectedindex[currentX][currentY] = 1;
     				checkdatefield();
     				break;
             
@@ -358,6 +369,7 @@ public class Table extends CustomItem implements ItemCommandListener {
     				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				setText("X",currentX,currentY);
+    				selectedindex[currentX][currentY] = 2;
     				checkdatefield();
     				break;
     			case Canvas.KEY_NUM3:
@@ -368,6 +380,7 @@ public class Table extends CustomItem implements ItemCommandListener {
     				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				setText("X",currentX,currentY);
+    				selectedindex[currentX][currentY] = 3;
     				checkdatefield();
     				break;
     			case Canvas.KEY_NUM4:
@@ -386,6 +399,8 @@ public class Table extends CustomItem implements ItemCommandListener {
   	    	  		datefield.setDate(calendar.getTime());
   	    	  		//chatScreen.insert(chatScreen.getCurrentIndex()+1,datefield);
   	    	  		setText("X",currentX,currentY);
+  	    	  		selectedindex[currentX][currentY] = 4;
+  	    	  		recorddate[currentX][currentY] = calendar.getTime().getTime();
   	    	  		//chatScreen.append(datefield);
   	    	  		//chatScreen.focus(datefield);
   	    	  		break;
