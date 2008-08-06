@@ -21,12 +21,8 @@ import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
-<<<<<<< .mine
 import org.javarosa.core.model.utils.ContextPreloadHandler;
 import org.javarosa.core.model.utils.IPreloadHandler;
-=======
-import org.javarosa.core.model.utils.IPreloadHandler;
->>>>>>> .r850
 import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.controller.IControllerHost;
@@ -56,11 +52,11 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 
 	private IFormEntryViewFactory viewFactory;
 
+	private ContextPreloadHandler contextHandler;
+
+
 	/** Loading error string **/
 	private final static String LOAD_ERROR = "Deepest Apologies. The form could not be loaded.";
-
-	//the context preload handler
-	private ContextPreloadHandler contextHandler;
 
 	public FormEntryActivity(IShell parent, IFormEntryViewFactory viewFactory) {
 		this.parent = parent;
@@ -121,11 +117,13 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 					while(en.hasMoreElements()) {
 						theForm.getPreloader().addPreloadHandler((IPreloadHandler)en.nextElement());
 					}
-					
+
 				}
+
 				//set handler for preload context
-				contextHandler = new ContextPreloadHandler(context);
-				theForm.getPreloader().addPreloadHandler("context",contextHandler);
+				 contextHandler = new ContextPreloadHandler(context);
+				theForm.getPreloader().addPreloadHandler(contextHandler);
+
 				theForm.preloadModel();
 			}
 			if (theForm.getLocalizer() != null && theForm.getLocalizer().getLocale() == null) {
