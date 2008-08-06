@@ -26,13 +26,14 @@ public class ImmunizationWidget extends ExpandedWidget {
 	}
 
 	protected IAnswerData getWidgetValue() {
+		d = table.getData();
 		return new ImmunizationAnswerData(d);
 	}
 
 	protected void setWidgetValue(Object o) {
 		if(o instanceof ImmunizationData ) {
 			d = (ImmunizationData)o;
-			//TODO: Update table values
+			table.setData(d);
 		}
 	}
 

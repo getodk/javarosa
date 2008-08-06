@@ -30,6 +30,10 @@ public class ImmunizationData {
 		 return rows;
 	}
 	
+	public void addRow(ImmunizationRow row) {
+		rows.addElement(row);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
