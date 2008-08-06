@@ -84,6 +84,38 @@ public class NumericListData implements IAnswerData, IPatientRecord {
 		valueList.insertElementAt(entry, i);
 	}
 
+	//combine with the values from another NumericListData. result will be the union of both sets
+	//if both lists contain a reading for the same date, the value in the list being merged in takes precedence
+	public void mergeList (NumericListData nld) {
+		if (nld == null || nld.getValue() == null || ((Vector)nld.getValue()).size() == 0)
+			return;
+		
+		Vector newList = (Vector)nld.getValue();
+		Vector merged = new Vector();
+		int i = 0, j = 0;
+		while (i < valueList.size() || j < newList.size()) {
+			DateValueTuple a = (i < valueList.size() ? ((DateValueTuple)valueList.elementAt(i)) : null);
+			DateValueTuple b = (j < newList.size() ? ((DateValueTuple)newList.elementAt(j)) : null);
+			long dateA = (a == null ? Long.MAX_VALUE : a.date.getTime());
+			long dateB = (b == null ? Long.MAX_VALUE : b.date.getTime());
+			
+			if (dateA < dateB) {
+				merged.addElement(a);
+				i++;
+			} else if (dateA > dateB) {
+				merged.addElement(b);
+				j++;
+			} else { //if both lists contain reading for same date, use the newer value
+				merged.addElement(b);
+				i++;
+				j++;
+			}
+		}
+
+		if (merged.size() > 0)
+			setValue(merged);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
