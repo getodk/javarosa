@@ -3,13 +3,13 @@ package org.javarosa.patient.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.patient.model.IPatientRecord;
-import org.javarosa.patient.model.NumericalRecordEntry;
 import org.javarosa.patient.util.DateValueTuple;
 import org.javarosa.patient.util.SelectorParser;
 
@@ -77,7 +77,7 @@ public class NumericListData implements IAnswerData, IPatientRecord {
 		int i;
 		for(i = 0 ; i < valueList.size() ; ++i ) {
 			DateValueTuple curEntry = (DateValueTuple) valueList.elementAt(i);
-			if(curEntry.date.getTime() < entry.date.getTime() ) {
+			if(curEntry.date.getTime() > entry.date.getTime() ) {
 				break;
 			}
 		}

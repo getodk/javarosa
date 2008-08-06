@@ -101,7 +101,8 @@ public class GraphWidget extends ExpandedWidget {
 	
 	protected void setWidgetValue(Object o) {
 		if(o instanceof Vector) {
-			Vector data = reverseVector((Vector)o);
+			//Vector data = reverseVector((Vector)o);
+			Vector data = (Vector)o;
 			
 			int numPoints = data.size();
 			
