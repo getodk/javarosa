@@ -92,6 +92,10 @@ public class QuestionDataElement extends TreeElement {
 	public void setValue(IAnswerData value) {
 		this.value = value;
 	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	/*
 	 * (non-Javadoc)

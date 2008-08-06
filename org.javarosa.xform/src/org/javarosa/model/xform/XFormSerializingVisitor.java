@@ -113,7 +113,9 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	 * @see org.javarosa.core.model.utils.IDataModelSerializingVisitor#serializeDataModel(org.javarosa.core.model.IFormDataModel)
 	 */
 	public byte[] serializeDataModel(IFormDataModel model) throws IOException {
-		this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
+		if(this.serializer == null) {
+			this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
+		}
 		model.accept(this);
 		if(theXmlDoc != null) {
 			return XFormSerializer.getString(theXmlDoc).getBytes("UTF-8");

@@ -5,8 +5,9 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.IAnswerDataSerializer;
-import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.Selection;
@@ -56,6 +57,14 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	 */
 	public Object serializeAnswerData(StringData data) {
 		return (String)data.getValue();
+	}
+	
+	/**
+	 * @param data The AnswerDataObject to be serialized
+	 * @return A String which contains the given answer
+	 */
+	public Object serializeAnswerData(IntegerData data) {
+		return String.valueOf(((Integer)data.getValue()).intValue());
 	}
 	
 	/**
@@ -113,6 +122,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			return serializeAnswerData((SelectMultiData)data);
 		} else if(data instanceof SelectOneData) {
 			return serializeAnswerData((SelectOneData)data);
+		} else if(data instanceof IntegerData) {
+			return serializeAnswerData((IntegerData)data);
 		} else {
 			Enumeration en = additionalSerializers.elements();
 			while(en.hasMoreElements()) {
