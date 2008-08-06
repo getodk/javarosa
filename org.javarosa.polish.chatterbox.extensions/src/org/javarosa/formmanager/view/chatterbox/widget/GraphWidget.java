@@ -44,7 +44,7 @@ public class GraphWidget extends ExpandedWidget {
         
         chart.setFont(Font.FACE_PROPORTIONAL,Font.STYLE_PLAIN,Font.SIZE_SMALL);
         chart.setDrawAxis(true);
-        chart.setPreferredSize(240, 120);
+        chart.setPreferredSize(240, 200);
         chart.setMargins(5,3,30,35);
         chart.makeShadowVisible(true);
         chart.setShadowColor(20,20,20);
