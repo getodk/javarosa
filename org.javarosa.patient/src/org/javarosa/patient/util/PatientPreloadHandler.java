@@ -62,7 +62,16 @@ public class PatientPreloadHandler implements IPreloadHandler {
 			patient.setVaccinations((ImmunizationData)((ImmunizationAnswerData)data).getValue());
 			return true;
 		} else {
-			
+			int selectorStart = params.indexOf("[");
+			if(selectorStart == -1) {
+				//modifying such values not supported right now
+			} else {
+				String type = params.substring(0, selectorStart);
+				NumericListData combinedList = new NumericListData();
+				combinedList.setValue(patient.getRecordSet(type, "[0:N]"));
+				combinedList.mergeList((NumericListData)data);
+				patient.setRecord(type, combinedList);
+			}
 		}
 		
 		return false;
