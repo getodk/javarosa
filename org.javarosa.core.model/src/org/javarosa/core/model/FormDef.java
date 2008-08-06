@@ -270,6 +270,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		Enumeration en = getBindings().elements();
 		while(en.hasMoreElements()) {
 			DataBinding binding = (DataBinding)en.nextElement();
+			preload = null;
 			if (binding.getPreload() != null)
 				preload = preloader.getQuestionPreload(binding.getPreload(), binding.getPreloadParams());
 			if(preload != null) { //what if we want to wipe out a value in the instance?
