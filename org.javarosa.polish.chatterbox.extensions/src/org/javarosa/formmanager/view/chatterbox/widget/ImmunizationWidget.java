@@ -3,26 +3,33 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.view.chatterbox.widget.table.Table;
+import org.javarosa.formmanager.view.chatterbox.widget.table.VaccinationTable;
 import org.javarosa.patient.model.data.ImmunizationAnswerData;
 import org.javarosa.patient.model.data.ImmunizationData;
 
+import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
 
 public class ImmunizationWidget extends ExpandedWidget {
 	
 	public final static int CONTROL_IMMUNIZATION = 10;
 	
-	Table table;
+	VaccinationTable table;
+	
+	Container container;
 	
 	ImmunizationData d;
 	
 	public ImmunizationWidget() {
-		table = new Table("");
-		//TODO: Set table values
+		//#style focusedNoBorder
+		container = new Container(false);
+		//#style focusedNoBorder
+		table = new VaccinationTable(false);
+		container.add(table);
 	}
 
 	protected Item getEntryWidget(QuestionDef question) {
-		return table;
+		return container;
 	}
 
 	protected IAnswerData getWidgetValue() {

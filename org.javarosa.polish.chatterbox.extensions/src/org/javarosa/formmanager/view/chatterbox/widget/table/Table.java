@@ -19,6 +19,7 @@ import org.javarosa.formmanager.view.chatterbox.widget.util.ExtensionConstants;
 import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.ImmunizationRow;
 
+import de.enough.polish.ui.Container;
 import de.enough.polish.ui.CustomItem;
 import de.enough.polish.ui.DateField;
 import de.enough.polish.ui.Item;
@@ -58,6 +59,8 @@ public class Table extends CustomItem implements ItemCommandListener {
     private StringItem question4 = new StringItem("", "4:Specify Date Given: ");
     public DateField datefield = new DateField("", DateField.DATE);
     
+    private Container container;
+    
     private boolean isStringitem=false;
     private boolean isDatefield=false;
     
@@ -70,8 +73,9 @@ public class Table extends CustomItem implements ItemCommandListener {
     	this(title, null);
     }
     
-    public Table(String title, ImmunizationData data) {
+    public Table(String title, Container container) {
         super(title);
+        this.container = container;
         datefield.addCommand(CMD_EDIT);
         //setDefaultCommand(CMD_EDIT);
         //setItemCommandListener(this);
@@ -80,9 +84,6 @@ public class Table extends CustomItem implements ItemCommandListener {
         vert = ((interactionMode & CustomItem.TRAVERSE_VERTICAL) != 0);
        // getRecord();
         datefield.setDate(new Date());
-        if(data != null) {
-        	setData(data);
-        }
     }
     
     public void setData(ImmunizationData data) 
@@ -304,7 +305,7 @@ public class Table extends CustomItem implements ItemCommandListener {
          data[0][2]="4 wk";
          data[0][3]="8 wk";
          data[0][4]="12 wk";
-         data[0][5]="9 mon";
+         data[0][5]="9 mo";
          data[1][0]="BCG";
          data[2][0]="OPV";
          data[3][0]="DPT";
@@ -318,11 +319,11 @@ public class Table extends CustomItem implements ItemCommandListener {
     
     public void removeStringItem()
     {
-    	/*chatScreen.removeItem(option);
-       	chatScreen.removeItem(question1);
-       	chatScreen.removeItem(question2);
-       	chatScreen.removeItem(question3);
-       	chatScreen.removeItem(question4);*/	
+    	container.remove(option);
+    	container.remove(question1);
+    	container.remove(question2);
+    	container.remove(question3);
+    	container.remove(question4);
     }
     public void getdate()
     {
@@ -344,9 +345,6 @@ public class Table extends CustomItem implements ItemCommandListener {
         //repaint(currentY * dx, currentX * dy, dx, dy);
     }
     public void keyPressed(int code) {
-    	
-    	
-    	
     		switch(code)
     		{
     			case Canvas.KEY_NUM1:
@@ -408,20 +406,36 @@ public class Table extends CustomItem implements ItemCommandListener {
     }
     public void addOptions()
     {
-    	/*chatScreen.append(option);
-		chatScreen.append(question1);
-    	chatScreen.append(question2);
-    	chatScreen.append(question3);
-    	chatScreen.append(question4);*/
+    	if (container != null) {
+			container.add(option);
+			container.add(question1);
+			container.add(question2);
+			container.add(question3);
+			container.add(question4);
+		}
     	//set default
     	question1.setLabel("");
 		question1.setText("1:Given. ");
-		question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+		question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
 		question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
 		question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
 		question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
 		
-
+		switch(selectedindex[currentY][currentX]) {
+		case 1:
+			question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+			break;
+		case 2:
+			question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+			break;
+		case 3:
+			question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+			break;
+		case 4:
+			question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+			break;
+			
+		}
     }
     public void setOptions()
     {
