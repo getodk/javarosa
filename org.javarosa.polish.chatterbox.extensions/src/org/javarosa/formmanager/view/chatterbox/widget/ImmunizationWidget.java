@@ -21,9 +21,7 @@ public class ImmunizationWidget extends ExpandedWidget {
 	ImmunizationData d;
 	
 	public ImmunizationWidget() {
-		//#style focusedNoBorder
 		container = new Container(false);
-		//#style focusedNoBorder
 		table = new VaccinationTable(false);
 		container.add(table);
 	}
