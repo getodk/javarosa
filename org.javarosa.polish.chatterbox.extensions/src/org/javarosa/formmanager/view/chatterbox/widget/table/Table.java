@@ -114,9 +114,9 @@ public class Table extends CustomItem implements ItemCommandListener {
     		ImmunizationRow row = new ImmunizationRow(this.data[i][0]);
     		for(int j = 1 ; j < cols ; j++) {
     			if(selectedindex[i][j] == ExtensionConstants.VACCINATION_GIVEN_ON_DATE) {
-    				row.setDose(j, selectedindex[i][j], new Date(recorddate[i][j]));
+    				row.setDose(j-1, selectedindex[i][j], new Date(recorddate[i][j]));
     			} else {
-        			row.setVaccinationDose(j, selectedindex[i][j]);	
+        			row.setVaccinationDose(j-1, selectedindex[i][j]);	
     			}
     		}
     		data.addRow(row);
@@ -357,7 +357,7 @@ public class Table extends CustomItem implements ItemCommandListener {
     				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				setText("X",currentX,currentY);
-    				selectedindex[currentX][currentY] = 1;
+    				selectedindex[currentY][currentX] = 1;
     				checkdatefield();
     				break;
             
@@ -369,7 +369,7 @@ public class Table extends CustomItem implements ItemCommandListener {
     				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				setText("X",currentX,currentY);
-    				selectedindex[currentX][currentY] = 2;
+    				selectedindex[currentY][currentX] = 2;
     				checkdatefield();
     				break;
     			case Canvas.KEY_NUM3:
@@ -380,7 +380,7 @@ public class Table extends CustomItem implements ItemCommandListener {
     				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
     				setText("X",currentX,currentY);
-    				selectedindex[currentX][currentY] = 3;
+    				selectedindex[currentY][currentX] = 3;
     				checkdatefield();
     				break;
     			case Canvas.KEY_NUM4:
@@ -399,8 +399,8 @@ public class Table extends CustomItem implements ItemCommandListener {
   	    	  		datefield.setDate(calendar.getTime());
   	    	  		//chatScreen.insert(chatScreen.getCurrentIndex()+1,datefield);
   	    	  		setText("X",currentX,currentY);
-  	    	  		selectedindex[currentX][currentY] = 4;
-  	    	  		recorddate[currentX][currentY] = calendar.getTime().getTime();
+  	    	  		selectedindex[currentY][currentX] = 4;
+  	    	  		recorddate[currentY][currentX] = calendar.getTime().getTime();
   	    	  		//chatScreen.append(datefield);
   	    	  		//chatScreen.focus(datefield);
   	    	  		break;
