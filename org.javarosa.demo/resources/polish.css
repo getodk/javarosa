@@ -63,6 +63,10 @@ focused{
 	font-style: bold;
 }
 
+.focusedNoBorder extends focused {
+	border-type: none;
+}
+
 .textBox {
 	label-style: choiceGroupLabel;
 	layout: horizontal-center;
