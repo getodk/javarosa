@@ -139,6 +139,9 @@ public class GraphWidget extends ExpandedWidget {
 			}
 			
 			long dateSpan = maxDate.longValue() - minDate.longValue();
+			if(dateSpan == 0) {
+				dateSpan = 1;
+			}
 			int valSpan = maxVal.intValue() - minVal.intValue();
 			
 			long dateRes = dateSpan / numPoints;
