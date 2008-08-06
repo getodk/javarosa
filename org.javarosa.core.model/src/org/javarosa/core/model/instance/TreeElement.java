@@ -94,6 +94,8 @@ public abstract class TreeElement implements Externalizable {
 			this.getRoot().setFactory(factory);
 		}
 	}
+	
+	public abstract void setName(String name);
 	public abstract boolean matchesReference(IDataReference reference);
 	
 	public abstract IAnswerData getValue();

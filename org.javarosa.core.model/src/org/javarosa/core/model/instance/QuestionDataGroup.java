@@ -86,6 +86,10 @@ public class QuestionDataGroup extends TreeElement {
 		return null;
 	}
 	
+	public void setName(String name) {
+		this.name =name;
+	}
+	
 	public void setReference(IDataReference reference) {
 		//This class cannot hold references
 	}

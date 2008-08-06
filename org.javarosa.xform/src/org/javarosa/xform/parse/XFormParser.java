@@ -589,6 +589,7 @@ public class XFormParser {
 				element = (TreeElement)modelPrototypes.getNewInstance(String.valueOf(binding.getDataType()));
 				if(element != null) {
 					element.setReference(reference);
+					element.setName(node.getName());
 				}
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
