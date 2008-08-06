@@ -3,11 +3,14 @@ package org.javarosa.core.model.utils;
 import java.util.Date;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.util.Map;
 import org.javarosa.core.Context;
+import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.model.utils.ContextPreloadHandler;
 /**
  * The Question Preloader is responsible for maintaining a set of handlers which are capable
@@ -33,18 +36,49 @@ public class QuestionPreloader {
 	 */
 	private void initPreloadHandlers() {
 		IPreloadHandler date = new IPreloadHandler() {
-			public IAnswerData handle(String preloadParams) {
+			public boolean handlePostProcess(IFormDataModel model,
+					IDataReference ref, String params) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			public IAnswerData handlePreload(String preloadParams) {
 				return preloadDate(preloadParams);
+			}
+
+			public String preloadHandled() {
+				String preload = "date";
+				return preload;
 			}
 		};
 		IPreloadHandler property = new IPreloadHandler() {
-			public IAnswerData handle(String preloadParams) {
+			public IAnswerData handlePreload(String preloadParams) {
 				return preloadProperty(preloadParams);
 			}
+			public boolean handlePostProcess(IFormDataModel model,
+					IDataReference ref, String params) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			public String preloadHandled() {
+				String preload = "property";
+				return preload;
+			}
+
 		};
 		IPreloadHandler timestamp = new IPreloadHandler() {
-			public IAnswerData handle(String preloadParams) {
+			public boolean handlePostProcess(IFormDataModel model,
+					IDataReference ref, String params) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			public IAnswerData handlePreload(String preloadParams) {
 				return preloadTimestamp(preloadParams);
+			}
+
+			public String preloadHandled() {
+				String preload = "timestamp";
+				return preload;
 			}
 		};
 		//attempt at adding 'context' as a preload parameter
@@ -54,21 +88,19 @@ public class QuestionPreloader {
 			}
 		};*/
 
-		addPreloadHandler("date", date);
-		addPreloadHandler("property", property);
-		addPreloadHandler("timestamp", timestamp);
+		addPreloadHandler(date);
+		addPreloadHandler(property);
+		addPreloadHandler(timestamp);
 		//addPreloadHandler("context",context);
 	}
 
 	/**
 	 * Adds a new preload handler to this preloader.
 	 *
-	 * @param preloadType The type of the preload to register a handler for. If
-	 * one already exists, it will be overwritten.
 	 * @param handler an IPreloadHandler that can handle a preload type
 	 */
-	public void addPreloadHandler(String preloadType, IPreloadHandler handler) {
-		preloadHandlers.put(preloadType, handler);
+	public void addPreloadHandler(IPreloadHandler handler) {
+		preloadHandlers.put(handler.preloadHandled(), handler);
 	}
 
 
@@ -84,7 +116,7 @@ public class QuestionPreloader {
 	public IAnswerData getQuestionPreload(String preloadType, String preloadParams) {
 		IPreloadHandler handler = (IPreloadHandler)preloadHandlers.get(preloadType);
 		if(handler != null) {
-			return handler.handle(preloadParams);
+			return handler.handlePreload(preloadParams);
 		}
 		else {
 			return null;
@@ -171,6 +203,16 @@ public class QuestionPreloader {
 			value = DateUtils.formatDateToTimeStamp(new Date());
 		}
 		return new StringData(value);
+	}
+
+	public boolean questionPostProcess (IDataReference ref, String preloadType, String params, IFormDataModel model) {
+		IPreloadHandler handler = (IPreloadHandler)preloadHandlers.get(preloadType);
+		if(handler != null) {
+			return handler.handlePostProcess(model, ref, params);
+		} else {
+			System.err.println("Do not know how to handle preloader [" + preloadType + "]");
+			return false;
+		}
 	}
 
 
