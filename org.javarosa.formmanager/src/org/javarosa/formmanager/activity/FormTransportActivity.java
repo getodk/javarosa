@@ -61,11 +61,11 @@ public class FormTransportActivity implements
 	 *
 	 */
 	private TextBox messageDetailTextBox;
-	
+
 	private SubmitScreen submitScreen;
-	
+
 	private SubmitStatusScreen submitStatusScreen;
-	
+
 	int counter;
 
 	private static final Command CMD_BACK = new Command("Back", Command.BACK, 1);
@@ -78,14 +78,14 @@ public class FormTransportActivity implements
 			Command.SCREEN, 1);
 
 	private static final Command CMD_DELETEMSG = new Command("Delete message",Command.SCREEN,1);
-	
+
 	/**
 	 *
 	 */
 	private Form urlForm;
 
 	private String destinationUrl;
-	
+
 	private IDataModelSerializingVisitor dataModelSerializer;
 
 	private TextField textField;
@@ -95,21 +95,21 @@ public class FormTransportActivity implements
 	private DataModelTree data;
 
 	private int currentMethod;
-	
+
 	private TransportContext context;
-	
+
 	private String currentView;
-	
+
 	Vector transportMethods;
-	
+
 	public static final String RETURN_KEY = "returnval";
-	
+
 	public static final String VIEW_MODELS = "viewmodels";
-	
+
 	String task;
-	
+
 	Timer timer;
-	
+
 	/*
 	 * (non-Javadoc)
 	 *
@@ -117,7 +117,7 @@ public class FormTransportActivity implements
 	public FormTransportActivity(IShell parentShell) {
 		this.shell = parentShell;
 	}
-	
+
 	public void contextChanged(Context globalContext) {
 		context.mergeInContext(globalContext);
 		//TODO: I'm _sure_ that we care about some change here
@@ -133,7 +133,7 @@ public class FormTransportActivity implements
 	}
 
 	public void resume(Context globalContext) {
-		createView(currentView);		
+		createView(currentView);
 	}
 
 	public void start(Context context) {
@@ -176,7 +176,7 @@ public class FormTransportActivity implements
 		messageDetailTextBox.addCommand(CMD_BACK);
 		messageDetailTextBox.addCommand(CMD_SEND);
 		messageDetailTextBox.setCommandListener(this);
-		
+
 		if(task.equals(TransportContext.MAIN_MENU)) {
 			shell.setDisplay(this, mainMenu);
 		}
@@ -274,7 +274,7 @@ public class FormTransportActivity implements
 					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 			} else if (c == CMD_OK) {
 				int selected = ((List) mainMenu).getSelectedIndex();
-				
+
 				switch (selected) {
 				case 0:
 					Hashtable returnArgs = new Hashtable();
@@ -288,7 +288,7 @@ public class FormTransportActivity implements
 				default:
 					//Offset from always-present menu choices
 					int transportType = selected - 2;
-				    
+
 				    Integer id = (Integer)transportMethods.elementAt(transportType);
 				    TransportMethod method = JavaRosaServiceProvider.instance().getTransportManager().getTransportMethod(id.intValue());
 				    if (method.getId() == TransportMethod.FILE) {
@@ -299,7 +299,7 @@ public class FormTransportActivity implements
 						textField = new TextField(
 								"Please enter destination path + filename",
 								destinationUrl, 140, TextField.ANY);
-						
+
 						urlForm.append(textField);
 						urlForm.addCommand(CMD_OK);
 						urlForm.addCommand(CMD_BACK);
@@ -376,9 +376,9 @@ public class FormTransportActivity implements
 		populateMessageList();
 		shell.setDisplay(this, messageList);
 	}
-	
+
 	public void showURLform() {
-		showURLform(this); 
+		showURLform(this);
 	}
 
 	public void showURLform(CommandListener listener) {
@@ -405,7 +405,7 @@ public class FormTransportActivity implements
 		}
 		return null;
 	}
-	
+
 	public void processURLform() {
 		destinationUrl = textField.getString();
 	}
@@ -413,7 +413,7 @@ public class FormTransportActivity implements
 	public void setDestURL (String URL) {
 		destinationUrl = URL;
 	}
-	
+
 	/**
 	 * @throws IOException
 	 */
@@ -484,10 +484,10 @@ public class FormTransportActivity implements
 	public void setData(DataModelTree data) {
 		this.data = data;
 	}
-	
+
 	//this method is unused and almost identical to ModelListActivity.getModelDeliveryStatus
 	public int getSubmitStatus(int recordId) {
-    	
+
     	Enumeration qMessages = JavaRosaServiceProvider.instance().getTransportManager().getMessages();
     	TransportMessage message;
     	while(qMessages.hasMoreElements()) {
