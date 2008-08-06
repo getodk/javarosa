@@ -9,40 +9,57 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
-/**
- * @author Clayton Sims
- *
- */
-public class ImmunizationData {
+public class ImmunizationAnswerData  implements IAnswerData {
+	
+	ImmunizationData data;
+	
+	public ImmunizationAnswerData() {
+		
+	}
+	
+	public ImmunizationAnswerData(ImmunizationData data ) {
+		this.data = data;
+	}
+	
+	public String getDisplayText() {
+		return "Data Table";
+	}
 
-	/** ImmunizationRow */
-	Vector rows;
-	
-	public ImmunizationData() {
-		rows = new Vector();
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
+	 */
+	public Object getValue() {
+		return data;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
+	 */
+	public void setValue(Object o) {
+		data = (ImmunizationData)o;
 	}
 	
-	public ImmunizationData(Vector rows) {
-		this.rows = rows;
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
+	 */
+	public void setValue(ImmunizationData o) {
+		data = o;
 	}
-	
-	public Vector getImmunizationRows() {
-		 return rows;
-	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
-		rows = ExternalizableHelper.readExternal(in,ImmunizationRow.class);
+		data = new ImmunizationData();
+		data.readExternal(in);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelper.writeExternal(rows, out);
+		data.writeExternal(out);
 	}
 }

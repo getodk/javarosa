@@ -3,6 +3,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.view.chatterbox.widget.table.Table;
+import org.javarosa.patient.model.data.ImmunizationAnswerData;
 import org.javarosa.patient.model.data.ImmunizationData;
 
 import de.enough.polish.ui.Item;
@@ -25,7 +26,7 @@ public class ImmunizationWidget extends ExpandedWidget {
 	}
 
 	protected IAnswerData getWidgetValue() {
-		return d;
+		return new ImmunizationAnswerData(d);
 	}
 
 	protected void setWidgetValue(Object o) {

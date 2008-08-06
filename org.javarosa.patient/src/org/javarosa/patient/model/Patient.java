@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.Map;
@@ -64,7 +65,7 @@ public class Patient implements Externalizable {
 	
 	private NumericListData cd4CountRecord = new NumericListData();
 	
-	ImmunizationData vaccinationData = new ImmunizationData();
+	ImmunizationData vaccinationData;
 	
 	public Patient() { 
 		records.put("weight", weightRecord);
@@ -77,7 +78,7 @@ public class Patient implements Externalizable {
 		rows.addElement(new ImmunizationRow("DPT"));
 		rows.addElement(new ImmunizationRow("Hep B"));
 		rows.addElement(new ImmunizationRow("Measles"));
-		vaccinationData.setValue(rows);
+		vaccinationData = new ImmunizationData(rows);
 		
 		//records.put("vaccinations", vaccinationData);
 	}
@@ -224,6 +225,13 @@ public class Patient implements Externalizable {
 		this.patientId = patientId;
 	}
 	
+	public void setVaccinations(ImmunizationData data ){
+		this.vaccinationData = data;
+	}
+	
+	public ImmunizationData getVaccinations() {
+		return this.vaccinationData;
+	}
 
 	public Object getRecord(String recordType) {
 		if(recordType == "givenName") {
@@ -315,7 +323,10 @@ public class Patient implements Externalizable {
 		setPatientIdentifier(ExternalizableHelper.readUTF(in));
 		setNewPatient(in.readBoolean());
 
-		records = ExternalizableHelper.readExternalStringValueMap(in, NumericListData.class);
+		vaccinationData = new ImmunizationData();
+		vaccinationData.readExternal(in);
+		
+		records = ExternalizableHelper.readExternalStringValueMap(in, NumericListData.class);		
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -330,6 +341,8 @@ public class Patient implements Externalizable {
 		ExternalizableHelper.writeDate(out, getBirthDate());
 		ExternalizableHelper.writeUTF(out, getPatientIdentifier());
 		out.writeBoolean(isNewPatient());
+		
+		vaccinationData.writeExternal(out);
 		
 		ExternalizableHelper.writeExternalStringValueMap(out, records);
 	}

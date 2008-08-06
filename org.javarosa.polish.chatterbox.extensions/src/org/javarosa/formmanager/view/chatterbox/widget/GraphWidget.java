@@ -151,16 +151,16 @@ public class GraphWidget extends ExpandedWidget {
 			while(en.hasMoreElements()) {
 				DateValueTuple tuple = (DateValueTuple)en.nextElement();
 				long time = tuple.date.getTime();
-				System.out.println("Pure " + time);
+				//System.out.println("Pure " + time);
 				long timeUnit = (time - minDate.longValue())*scaledRes;
-				System.out.println("Time " + timeUnit);
-				System.out.println("Scaler " + dateRes);
+				//System.out.println("Time " + timeUnit);
+				//System.out.println("Scaler " + dateRes);
 				long scaledTime = (timeUnit/dateRes);
-				System.out.println("Scaled " + scaledTime);
+				//System.out.println("Scaled " + scaledTime);
 				int intScaled = (int)scaledTime;
-				System.out.println("Int scaled " + intScaled);
+				//System.out.println("Int scaled " + intScaled);
 				int finalTime = intScaled;
-				System.out.println("Final " + finalTime);
+				//System.out.println("Final " + finalTime);
 				Integer xPoint = new Integer(finalTime);
 				Integer val = new Integer(tuple.value);
 				//Integer yPoint = new Integer(((val - minVal.intValue())/valRes)*scaledRes);

@@ -21,6 +21,10 @@ public class ImmunizationRow implements Externalizable {
 	int[] vaccinationDoses = new int[] {-1, -1, -1, -1, -1};
 	Date[] vaccinationDates = new Date[5];
 	
+	public ImmunizationRow() {
+		
+	}
+	
 	public ImmunizationRow(String name) {
 		this.vaccinationName = name;
 	}
