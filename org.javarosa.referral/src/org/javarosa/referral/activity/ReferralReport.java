@@ -18,6 +18,7 @@ import org.javarosa.referral.model.Referrals;
 import org.javarosa.referral.storage.ReferralRMSUtility;
 import org.javarosa.referral.util.ReportContext;
 import org.javarosa.referral.view.ReportView;
+import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 public class ReferralReport implements IActivity, CommandListener {
 
@@ -86,7 +87,7 @@ public class ReferralReport implements IActivity, CommandListener {
 		}
 		
 		view = new ReportView("Referral Report");
-		view.setReferrals(referrals.getPositiveReferrals(model));
+		view.setReferrals(referrals.getPositiveReferrals(model, new XFormAnswerDataSerializer()));
 		view.setCommandListener(this);
 		
 		parent.setDisplay(this, view);
