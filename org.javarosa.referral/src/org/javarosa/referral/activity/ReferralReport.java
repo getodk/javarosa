@@ -1,22 +1,25 @@
 package org.javarosa.referral.activity;
 
 import java.io.IOException;
-import java.util.Vector;
+
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.util.UnavailableExternalizerException;
-import org.javarosa.patient.model.Patient;
 import org.javarosa.referral.model.Referrals;
 import org.javarosa.referral.storage.ReferralRMSUtility;
 import org.javarosa.referral.util.ReportContext;
 import org.javarosa.referral.view.ReportView;
 
-public class ReferralReport implements IActivity {
+public class ReferralReport implements IActivity, CommandListener {
 
 	private IShell parent;
 	private Referrals referrals;
@@ -57,32 +60,42 @@ public class ReferralReport implements IActivity {
 			
 			ReferralRMSUtility referralRms = (ReferralRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(ReferralRMSUtility.getUtilityName());
 			DataModelTreeRMSUtility modelUtility = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
-			try {
-				this.referrals = referralRms.retrieveFromRMS(formId);
-				
-				this.model = new DataModelTree();
-				modelUtility.retrieveFromRMS(modelId, this.model);
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (UnavailableExternalizerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if(!referralRms.containsFormReferrals(formId)) {
+				this.referrals = new Referrals();
+			} else {
+				try {
+					this.referrals = referralRms.retrieveFromRMS(formId);
+
+					this.model = new DataModelTree();
+					modelUtility.retrieveFromRMS(modelId, this.model);
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UnavailableExternalizerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
+		
 		view = new ReportView("Referral Report");
 		view.setReferrals(referrals.getPositiveReferrals(model));
+		view.setCommandListener(this);
 		
 		parent.setDisplay(this, view);
 	}
 	public Context getActivityContext() {
 		return context;
+	}
+
+	public void commandAction(Command arg0, Displayable arg1) {
+		parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 	}
 }

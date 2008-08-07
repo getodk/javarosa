@@ -6,7 +6,7 @@ public class ReportContext extends Context {
 	private final static String FORM_ID_KEY = "FORM_ID";
 	private final static String MODEL_ID_KEY = "MODEL_ID";
 	
-	public void getFormId(int formId) {
+	public void setFormId(int formId) {
 		this.contextObject.put(FORM_ID_KEY, new Integer(formId));
 	}
 	
