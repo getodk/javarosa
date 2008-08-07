@@ -3,6 +3,7 @@ package org.javarosa.xform.parse;
 import java.io.Reader;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
@@ -40,6 +41,8 @@ public class XFormParser {
 	private static Hashtable typeMappings;
 	private static PrototypeFactory modelPrototypes;
 	
+	/** IXFormBindHaandler */
+	private static Vector bindHandlers;
 	
 	/* THIS CLASS IS NOT THREAD-SAFE */
 	//state variables -- not a good idea since this class is static, but that's not really a good idea either, now is it
