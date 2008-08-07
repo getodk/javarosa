@@ -16,13 +16,18 @@ public class ReportView extends Form {
 	}
 	public void setReferrals(Vector strings) {
 		this.deleteAll();
-		//#style title
-		label = new StringItem("Reasons for Referral", "");
-		this.append(label);
-		Enumeration en = strings.elements();
-		while(en.hasMoreElements()){
-			String s = (String)en.nextElement();
-			this.append(new StringItem(s,""));
+		if (strings.size() > 0) {
+			// #style title
+			label = new StringItem("Reasons for Referral", "");
+			this.append(label);
+			Enumeration en = strings.elements();
+			while (en.hasMoreElements()) {
+				String s = (String) en.nextElement();
+				this.append(new StringItem(s, ""));
+			}
+		} else {
+			label = new StringItem("No Referral Necessary", "");
+			this.append(label);
 		}
 	}
 	

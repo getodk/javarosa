@@ -27,6 +27,8 @@ public class SplashScreenActivity implements IActivity, ApplicationInitializer {
 	private String picture = null;
 	private int splashDelay = 2000;
 	
+	Context context;
+	
 	public SplashScreenActivity(IShell p, String pic) {
 		this.parent = p;
 		this.picture = pic;
@@ -47,6 +49,7 @@ public class SplashScreenActivity implements IActivity, ApplicationInitializer {
 			InitializerSplashScreen splashScreen = new InitializerSplashScreen(JavaRosaServiceProvider.instance().getDisplay(),
 					image, backgroundColor, readyMessage, messageColor, this);
 			parent.setDisplay(this, splashScreen);
+			this.context = context;
 			} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -98,5 +101,9 @@ public class SplashScreenActivity implements IActivity, ApplicationInitializer {
 	
 	public void destroy() {
 		
+	}
+	
+	public Context getActivityContext() {
+		return context;
 	}
 }

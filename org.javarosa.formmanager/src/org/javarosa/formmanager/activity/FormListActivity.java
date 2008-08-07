@@ -152,4 +152,7 @@ public class FormListActivity implements IActivity {
 	public void destroy() {
 		
 	}
+	public Context getActivityContext() {
+		return context;
+	}
 }
