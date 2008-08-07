@@ -20,7 +20,7 @@ public class Referrals implements Externalizable {
 	Vector referralConditions;
 	
 	public Referrals() {
-		
+		referralConditions = new Vector();
 	}
 	
 	public Referrals(int formId , Vector referralConditions) {

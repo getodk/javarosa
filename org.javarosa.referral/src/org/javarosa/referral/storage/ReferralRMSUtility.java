@@ -40,6 +40,13 @@ public class ReferralRMSUtility extends RMSUtility {
 		return referrals;
 	}
 	
+	public boolean containsFormReferrals(int formId) {
+		if(getReferralsId(formId) == -1) {
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * Gets the meta data object for the record with the given Id
 	 * 
