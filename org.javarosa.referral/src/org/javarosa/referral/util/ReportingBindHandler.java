@@ -1,0 +1,25 @@
+package org.javarosa.referral.util;
+
+import org.javarosa.core.model.DataBinding;
+import org.javarosa.xform.util.IXFormBindHandler;
+import org.kxml2.kdom.Element;
+
+public class ReportingBindHandler implements IXFormBindHandler {
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.xform.util.IXFormBindHandler#handle(org.kxml2.kdom.Element, org.javarosa.core.model.DataBinding)
+	 */
+	public void handle(Element bindElement, DataBinding bind) {
+		String referralValue = bindElement.getAttributeValue(null, "referralvalue");
+		String referralText = bindElement.getAttributeValue(null, "referraltext");
+		
+		if(referralValue != null) {
+			if(referralText != null) {
+				if (referralText.startsWith("jr:itext('") && referralText.endsWith("')")) {
+					String textRef = referralText.substring("jr:itext('".length(), referralText.indexOf("')"));
+					
+				}
+			}
+		}
+	}
+}
