@@ -67,59 +67,59 @@
     <xf:bind id="6" nodeset="/root/Prov" type="xsd:string"/>
     <xf:bind id="7" nodeset="/root/Where" type="xsd:string"/>
     <xf:bind id="8" nodeset="/root/Whereother" type="xsd:string" />
-    <xf:bind id="9" nodeset="/root/LocWCHC" type="xsd:string" relevant="/root/Prov=='9',/root/Where=='1'"/>
-    <xf:bind id="10" nodeset="/root/LocWCHCother" type="xsd:string" relevant="/root/LocWCHC=='999'"/>
-    <xf:bind id="11" nodeset="/root/LocWCSC" type="xsd:string" relevant="/root/Where!='99', /root/Where!='',/root/Where=='8',/root/Where=='7',/root/Where=='6',/root/Where=='5',/root/Where=='2',/root/Where=='3',/root/Where=='4',/root/Prov=='9'"/>
-    <xf:bind id="12" nodeset="/root/LocWCSCother" type="xsd:string" relevant="/root/Prov=='9',/root/LocWCSC=='999'"/>
-    <xf:bind id="13" nodeset="/root/LocECHC" type="xsd:string" relevant="/root/Where=='1',/root/Prov=='1'"/>
-    <xf:bind id="14" nodeset="/root/LocECHCother" type="xsd:string" relevant="/root/LocECHC=='999'"/>
-    <xf:bind id="15" nodeset="/root/LocECSC" type="xsd:string" relevant="/root/Where=='99',/root/Where=='8',/root/Where=='7',/root/Where=='6',/root/Where=='5',/root/Where=='3',/root/Where=='4',Prov=='1',/root/Where=='2'"/>
-    <xf:bind id="16" nodeset="/root/LocECSCother" type="xsd:string" relevant="Prov=='1',LocECSC=='999'"/>
-    <xf:bind id="17" nodeset="/root/LocGPHC" type="xsd:string" relevant="Prov=='2',/root/Where=='1'"/>
-    <xf:bind id="18" nodeset="/root/LocGPHCother" type="xsd:string" relevant="LocGPHC=='999'"/>
-    <xf:bind id="19" nodeset="/root/LocGPSC" type="xsd:string" relevant="Where=='99',/root/Where=='2',/root/Where=='5',/root/Where=='6',/root/Where=='7',/root/Where=='8',/root/Where=='4',/root/Where=='3',Prov=='2'"/>
-    <xf:bind id="20" nodeset="/root/LocGPSCother" type="xsd:string" relevant="LocGPSC=='999',Prov=='2'"/>
-    <xf:bind id="21" nodeset="/root/LocKZNHC" type="xsd:string" relevant="Where=='1',Prov=='4'"/>
-    <xf:bind id="22" nodeset="/root/LocKZNHCother" type="xsd:string" relevant="LocKZNHC=='63'"/>
-    <xf:bind id="23" nodeset="/root/LocKZNSC" type="xsd:string" relevant="Where=='4',/root/Where=='5',/root/Where=='6',/root/Where=='7',/root/Where=='8',/root/Where=='99',Prov=='4',/root/Where=='3',/root/Where=='2'"/>
-    <xf:bind id="24" nodeset="/root/LocKZNSCother" type="xsd:string" relevant="LocKZNSC=='999'"/>
-    <xf:bind id="25" nodeset="/root/LocFSHC" type="xsd:string" relevant="Where=='1',Prov=='3'"/>
-    <xf:bind id="26" nodeset="/root/LocFSHCother" type="xsd:string" relevant="LocFSHC=='999'"/>
-    <xf:bind id="27" nodeset="/root/LocFSSCother" type="xsd:string" relevant="Where=='2',/root/Where=='3',/root/Where=='4',/root/Where=='5',/root/Where=='6',/root/Where=='99',Prov=='3',/root/Where=='7',/root/Where=='8'"/>
-    <xf:bind id="28" nodeset="/root/LocLPSCother" type="xsd:string" relevant="Prov=='5'"/>
-    <xf:bind id="29" nodeset="/root/LocMPSCother" type="xsd:string" relevant="Prov=='6'"/>
-    <xf:bind id="30" nodeset="/root/LocNCSCother" type="xsd:string" relevant="Prov=='8'"/>
-    <xf:bind id="31" nodeset="/root/LocNWSCother" type="xsd:string" relevant="Prov=='7'"/>
+    <xf:bind id="9" nodeset="/root/LocWCHC" type="xsd:string" relevant="/root/Prov='9' and /root/Where='1'"/>
+    <xf:bind id="10" nodeset="/root/LocWCHCother" type="xsd:string" relevant="/root/LocWCHC='999'"/>
+    <xf:bind id="11" nodeset="/root/LocWCSC" type="xsd:string" relevant="/root/Prov='9' and /root/Where!='1'"/>
+    <xf:bind id="12" nodeset="/root/LocWCSCother" type="xsd:string" relevant="/root/LocWCSC='999'"/>
+    <xf:bind id="13" nodeset="/root/LocECHC" type="xsd:string" relevant="/root/Where='1' and /root/Prov='1'"/>
+    <xf:bind id="14" nodeset="/root/LocECHCother" type="xsd:string" relevant="/root/LocECHC='999'"/>
+    <xf:bind id="15" nodeset="/root/LocECSC" type="xsd:string" relevant="/root/Where!='1' and /root/Prov='1'"/>
+    <xf:bind id="16" nodeset="/root/LocECSCother" type="xsd:string" relevant="/root/Prov='1' and /root/LocECSC='999'"/>
+    <xf:bind id="17" nodeset="/root/LocGPHC" type="xsd:string" relevant="/root/Prov='2' and /root/Where='1'"/>
+    <xf:bind id="18" nodeset="/root/LocGPHCother" type="xsd:string" relevant="/root/LocGPHC='999'"/>
+    <xf:bind id="19" nodeset="/root/LocGPSC" type="xsd:string" relevant="/root/Prov='2' and /root/Where!='1'"/>
+    <xf:bind id="20" nodeset="/root/LocGPSCother" type="xsd:string" relevant="/root/LocGPSC='999'"/>
+    <xf:bind id="21" nodeset="/root/LocKZNHC" type="xsd:string" relevant="/root/Where='1' and /root/Prov='4'"/>
+    <xf:bind id="22" nodeset="/root/LocKZNHCother" type="xsd:string" relevant="/root/LocKZNHC='63'"/>
+    <xf:bind id="23" nodeset="/root/LocKZNSC" type="xsd:string" relevant="/root/Where!='1' and /root/Prov='4'"/>
+    <xf:bind id="24" nodeset="/root/LocKZNSCother" type="xsd:string" relevant="/root/LocKZNSC='999'"/>
+    <xf:bind id="25" nodeset="/root/LocFSHC" type="xsd:string" relevant="/root/Where='1' and /root/Prov='3'"/>
+    <xf:bind id="26" nodeset="/root/LocFSHCother" type="xsd:string" relevant="/root/LocFSHC='999'"/>
+    <xf:bind id="27" nodeset="/root/LocFSSCother" type="xsd:string" relevant="/root/Where!='1' and /root/Prov='3'"/>
+    <xf:bind id="28" nodeset="/root/LocLPSCother" type="xsd:string" relevant="/root/Prov='5'"/>
+    <xf:bind id="29" nodeset="/root/LocMPSCother" type="xsd:string" relevant="/root/Prov='6'"/>
+    <xf:bind id="30" nodeset="/root/LocNCSCother" type="xsd:string" relevant="/root/Prov='8'"/>
+    <xf:bind id="31" nodeset="/root/LocNWSCother" type="xsd:string" relevant="/root/Prov='7'"/>
     <xf:bind id="32" nodeset="/root/Male" type="xsd:decimal"/>
     <xf:bind id="33" nodeset="/root/Female" type="xsd:decimal"/>
     <xf:bind id="34" nodeset="/root/TimeStart" type="xsd:time"/>
     <xf:bind id="35" nodeset="/root/TimeEnd" type="xsd:time"/>
     <xf:bind id="49" nodeset="/root/Topics1" type="xsd:string"/>
-    <xf:bind id="50" nodeset="/root/Topicother1" type="xsd:string" relevant="Topics1=='20'"/>
+    <xf:bind id="50" nodeset="/root/Topicother1" type="xsd:string" relevant="/root/Topics1='20'"/>
     <xf:bind id="51" nodeset="/root/Topics2" type="xsd:string"/>
-    <xf:bind id="52" nodeset="/root/Topicother2" type="xsd:string" relevant="Topics2=='20'"/>
+    <xf:bind id="52" nodeset="/root/Topicother2" type="xsd:string" relevant="/root/Topics2='20'"/>
     <xf:bind id="53" nodeset="/root/Topics3" type="xsd:string"/>
-    <xf:bind id="54" nodeset="/root/Topicother3" type="xsd:string" relevant="Topics3=='20'"/>
+    <xf:bind id="54" nodeset="/root/Topicother3" type="xsd:string" relevant="/root/Topics3='20'"/>
     <xf:bind id="55" nodeset="/root/Topics4" type="xsd:string"/>
-    <xf:bind id="56" nodeset="/root/Topicother4" type="xsd:string" relevant="Topics4=='20'"/>
+    <xf:bind id="56" nodeset="/root/Topicother4" type="xsd:string" relevant="/root/Topics4='20'"/>
     <xf:bind id="57" nodeset="/root/Topics5" type="xsd:string"/>
-    <xf:bind id="58" nodeset="/root/Topicother5" type="xsd:string" relevant="Topics5=='20'"/>
+    <xf:bind id="58" nodeset="/root/Topicother5" type="xsd:string" relevant="/root/Topics5='20'"/>
     <xf:bind id="44" nodeset="/root/Support" type="xsd:select1"/>
     <xf:bind id="45" nodeset="/root/Individual" type="xsd:select1"/>
-    <xf:bind id="36" nodeset="/root/Mon" type="xsd:select1" relevant="MindsetTV=='Y'"/>
+    <xf:bind id="36" nodeset="/root/Mon" type="xsd:select1" relevant="/root/MindsetTV='Y'"/>
     <xf:bind id="37" nodeset="/root/AVKit" type="xsd:select1"/>
     <xf:bind id="38" nodeset="/root/CHMTDVD" type="xsd:select1"/>
     <xf:bind id="39" nodeset="/root/Chmtscrutinize" type="xsd:select1"/>
     <xf:bind id="40" nodeset="/root/ChmtSparesBesties" type="xsd:select1"/>
     <xf:bind id="41" nodeset="/root/ChmtPSA" type="xsd:select1"/>
     <xf:bind id="42" nodeset="/root/CofacilitateCHMT" type="xsd:select1"/>
-    <xf:bind id="43" nodeset="/root/CofacilitatorCHMT" type="xsd:string" relevant="CofacilitateCHMT=='Y'"/>
-    <xf:bind id="1" nodeset="/root/Clinic" type="xsd:string" relevant="Where=='1'"/>
-    <xf:bind id="2" nodeset="/root/Clinicother" type="xsd:string" relevant="Clinic=='99'"/>
-    <xf:bind id="3" nodeset="/root/Mindsetuse" type="xsd:select1" relevant="Where=='1'"/>
-    <xf:bind id="4" nodeset="/root/MindsetTV" type="xsd:select1" relevant="Where=='1'"/>
-    <xf:bind id="46" nodeset="/root/Grade" type="xsd:string" relevant="Where=='2',/root/Where=='3'"/>
-    <xf:bind id="47" nodeset="/root/Print" type="xsd:select1" relevant="Where=='2',/root/Where=='3'"/>
+    <xf:bind id="43" nodeset="/root/CofacilitatorCHMT" type="xsd:string" relevant="/root/CofacilitateCHMT='Y'"/>
+    <xf:bind id="1" nodeset="/root/Clinic" type="xsd:string" relevant="/root/Where='1'"/>
+    <xf:bind id="2" nodeset="/root/Clinicother" type="xsd:string" relevant="/root/Clinic='99'"/>
+    <xf:bind id="3" nodeset="/root/Mindsetuse" type="xsd:select1" relevant="/root/Where='1'"/>
+    <xf:bind id="4" nodeset="/root/MindsetTV" type="xsd:select1" relevant="/root/Where='1'"/>
+    <xf:bind id="46" nodeset="/root/Grade" type="xsd:string" relevant="/root/Where='2' and /root/Where='3'"/>
+    <xf:bind id="47" nodeset="/root/Print" type="xsd:select1" relevant="/root/Where='2' and /root/Where='3'"/>
     <xf:bind id="48" nodeset="/root/Confirmed" type="xsd:select1"/>
   </xf:model>
 
@@ -204,10 +204,10 @@
       <xf:value>99</xf:value>
     </xf:item>
   </xf:select1>
-  <xf:input bind="8" relevant="/root/Where=='99'">
+  <xf:input bind="8" relevant="/root/Where='99'">
     <xf:label>Other (specify)</xf:label>
   </xf:input>
-  <xf:select1 bind="9"  relevant="/root/Prov=='9',/root/Where=='1'">
+  <xf:select1 bind="9"  relevant="/root/Prov='9' and /root/Where='1'">
     <xf:label>What is the name of the hospital or clinic in the Western Cape where you had the session?</xf:label>
     <xf:item>
       <xf:label>2lungile Commnity Health Centre </xf:label>
@@ -254,7 +254,7 @@
       <xf:value>999</xf:value>
     </xf:item>
   </xf:select1>
-  <xf:input bind="10" relevant="/root/LocWCHC=='999'" >
+  <xf:input bind="10" relevant="/root/LocWCHC='999'" >
     <xf:label>Other Hospital / Clinic (WC):</xf:label>
   </xf:input>
   <xf:select1 bind="11" >
