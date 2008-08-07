@@ -186,4 +186,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		//For some reason that I really can't figure out, this alert won't display the error text
 		alert.setCommandListener(this);
 	}
+	public Context getActivityContext() {
+		return context;
+	}
 }

@@ -277,4 +277,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 		gc.fillRect(0, 0, w, h);
 		return res;
 	}
+	public Context getActivityContext() {
+		return theContext;
+	}
 }

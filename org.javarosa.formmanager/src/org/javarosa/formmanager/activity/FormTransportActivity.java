@@ -497,5 +497,7 @@ public class FormTransportActivity implements
     	}
     	return -1;
 	}
-
+	public Context getActivityContext() {
+		return context;
+	}
 }

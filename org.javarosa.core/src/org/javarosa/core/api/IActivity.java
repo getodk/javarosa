@@ -45,4 +45,9 @@ public interface IActivity {
 	 * Cleans up anything that needs to be manually destroyed in a module
 	 */
 	public void destroy();
+	
+	/**
+	 * @return The context under which the activity is operating
+	 */
+	public Context getActivityContext();
 }

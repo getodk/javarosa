@@ -127,4 +127,7 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 		}
 		// #endif
 	}
+	public Context getActivityContext() {
+		return context;
+	}
 }

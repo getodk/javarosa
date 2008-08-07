@@ -40,6 +40,8 @@ public class PropertyScreenActivity implements IActivity, CommandListener, ItemS
     
     private Hashtable changes;
     
+    private Context context;
+    
     /**
      * Creates a new PropertyScreenActivity for the given shell
      * 
@@ -90,6 +92,7 @@ public class PropertyScreenActivity implements IActivity, CommandListener, ItemS
 	 * @see org.javarosa.core.api.IActivity#start(org.javarosa.core.Context)
 	 */
 	public void start(Context context) {
+		this.context = context;
     	changes = new Hashtable();
 		 screen = new PropertiesScreen(JavaRosaServiceProvider.instance().getPropertyManager());
 		 screen.addCommand(CMD_DONE);
@@ -165,4 +168,7 @@ public class PropertyScreenActivity implements IActivity, CommandListener, ItemS
             //#endif
         }
     }
+	public Context getActivityContext() {
+		return context;
+	}
 }

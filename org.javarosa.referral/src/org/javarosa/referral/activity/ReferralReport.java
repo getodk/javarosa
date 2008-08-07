@@ -23,6 +23,8 @@ public class ReferralReport implements IActivity {
 	private DataModelTree model;
 	private ReportView view;
 	
+	private Context context;
+	
 	public ReferralReport(IShell parent) {
 		this.parent = parent;
 	}
@@ -49,6 +51,7 @@ public class ReferralReport implements IActivity {
 
 	public void start(Context context) {
 		if(context instanceof ReportContext) {
+			this.context = context;
 			int formId = ((ReportContext)context).getFormId();
 			int modelId = ((ReportContext)context).getModelId();
 			
@@ -78,5 +81,8 @@ public class ReferralReport implements IActivity {
 		view.setReferrals(referrals.getPositiveReferrals(model));
 		
 		parent.setDisplay(this, view);
+	}
+	public Context getActivityContext() {
+		return context;
 	}
 }
