@@ -19,6 +19,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.xform.util.IXFormBindHandler;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Document;
@@ -55,6 +56,7 @@ public class XFormParser {
 		initProcessingRules();
 		initTypeMappings();
 		modelPrototypes = new PrototypeFactory();
+		bindHandlers = new Vector();
 	}
 	
 	/**
@@ -521,6 +523,12 @@ public class XFormParser {
 
 		binding.setPreload(e.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
 		binding.setPreloadParams(e.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
+		
+		Enumeration en = bindHandlers.elements();
+		while(en.hasMoreElements()) {
+			IXFormBindHandler handler = (IXFormBindHandler)en.nextElement();
+			handler.handle(e, binding);
+		}
 	
 		addBinding(f, binding);
 	}
@@ -685,6 +693,10 @@ public class XFormParser {
 	public static void registerHandler(String type, IElementHandler handler) {
 		topLevelHandlers.put(type, handler);
 		groupLevelHandlers.put(type, handler);
+	}
+	
+	public static void registerBindHandler(IXFormBindHandler handler) {
+		bindHandlers.addElement(handler);
 	}
 
 	public static String getXMLText (Node n, boolean trim) {
