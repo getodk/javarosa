@@ -11,6 +11,7 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 public class Referrals implements Externalizable {
 	//The id of the form that these referrals are for
@@ -42,7 +43,7 @@ public class Referrals implements Externalizable {
 		this.formId = formId;
 	}
 
-	public Vector getPositiveReferrals(DataModelTree model) {
+	public Vector getPositiveReferrals(DataModelTree model, XFormAnswerDataSerializer serializer) {
 		Vector referralStrings = new Vector();
 		
 		Enumeration en = referralConditions.elements();
@@ -51,12 +52,18 @@ public class Referrals implements Externalizable {
 			
 			IAnswerData data = model.getDataValue(condition.getQuestionReference());
 			
-			//TODO: We should be parsing this better. Probably using the XFormAnswerSerializer.
-			if(data.getDisplayText().equals(condition.getReferralValue())) {
-				referralStrings.addElement(condition.getReferralText());
+			// TODO: We should be parsing this better. Probably using the
+			// XFormAnswerSerializer.
+			Object serData = serializer.serializeAnswerData(data);
+			if (serData != null) {
+				if (serData instanceof String) {
+					if (serData.equals(condition.getReferralValue())) {
+						referralStrings.addElement(condition.getReferralText());
+					}
+				}
 			}
 		}
-		
+
 		return referralStrings;
 	}
 
@@ -75,8 +82,7 @@ public class Referrals implements Externalizable {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(this.formId);
-		ExternalizableHelper.writeExternal(referralConditions, out);
-		
+		ExternalizableHelper.writeExternal(referralConditions, out);	
 	}
 	
 	

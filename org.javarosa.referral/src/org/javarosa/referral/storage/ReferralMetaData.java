@@ -3,6 +3,10 @@
  */
 package org.javarosa.referral.storage;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.referral.model.Referrals;
 
@@ -38,5 +42,24 @@ public class ReferralMetaData extends MetaDataObject {
 		Referrals ref = (Referrals)originalObject;
 		this.formId = ref.getFormId();
 	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+	 */
+    public void readExternal(DataInputStream in) throws IOException
+    {
+    	super.readExternal(in);
+    	this.formId = in.readInt();
+    }
+	
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+     */
+	public void writeExternal(DataOutputStream out) throws IOException
+    {
+        super.writeExternal(out);
+        out.writeInt(this.formId);
+    }
 
 }

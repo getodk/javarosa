@@ -11,14 +11,15 @@ import org.kxml2.kdom.Element;
 public class ReportingBindHandler implements IXFormBindHandler {
 
 	/** ReferralCondition */
-	Vector referrals;
+	Vector referrals = new Vector();
 	
 	/* (non-Javadoc)
 	 * @see org.javarosa.xform.util.IXFormBindHandler#handle(org.kxml2.kdom.Element, org.javarosa.core.model.DataBinding)
 	 */
 	public void handle(Element bindElement, DataBinding bind) {
-		String referralValue = bindElement.getAttributeValue(null, "referralvalue");
-		String referralText = bindElement.getAttributeValue(null, "referraltext");
+		String referralValue = bindElement.getAttributeValue("", "referralvalue");
+		String referralText = bindElement.getAttributeValue("", "referraltext");
+	
 		
 		if(referralValue != null) {
 			if(referralText != null) {
@@ -27,7 +28,7 @@ public class ReportingBindHandler implements IXFormBindHandler {
 					
 				}
 			}
-			ReferralCondition newCondition = new ReferralCondition(referralValue, (XPathReference)bind.getReference());
+			ReferralCondition newCondition = new ReferralCondition(referralValue, referralText, (XPathReference)bind.getReference());
 			referrals.addElement(newCondition);
 		}
 	}

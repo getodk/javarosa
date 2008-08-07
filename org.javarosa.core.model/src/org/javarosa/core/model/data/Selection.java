@@ -30,7 +30,10 @@ public class Selection implements Externalizable {
 	}
 	
 	public String getValue () {
-		return (String)question.getSelectItems().elementAt(index);
+		//NOTE:  Not sure whether this is actually correct, we definitely
+		//should be returning what is in ItemIDs....
+		//return (String)question.getSelectItems().elementAt(index);
+		return (String)question.getSelectItemIDs().elementAt(index);
 	}
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)

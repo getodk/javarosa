@@ -19,8 +19,9 @@ public class ReferralCondition implements Externalizable {
 		
 	}
 	
-	public ReferralCondition(String referralValue, XPathReference questionReference) {
+	public ReferralCondition(String referralValue, String referralText, XPathReference questionReference) {
 		this.referralValue = referralValue;
+		this.referralText = referralText;
 		this.questionReference = questionReference;
 	}
 
