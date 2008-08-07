@@ -1,11 +1,18 @@
 package org.javarosa.referral.util;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.DataBinding;
+import org.javarosa.model.xform.XPathReference;
+import org.javarosa.referral.model.ReferralCondition;
 import org.javarosa.xform.util.IXFormBindHandler;
 import org.kxml2.kdom.Element;
 
 public class ReportingBindHandler implements IXFormBindHandler {
 
+	/** ReferralCondition */
+	Vector referrals;
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.xform.util.IXFormBindHandler#handle(org.kxml2.kdom.Element, org.javarosa.core.model.DataBinding)
 	 */
@@ -20,6 +27,16 @@ public class ReportingBindHandler implements IXFormBindHandler {
 					
 				}
 			}
+			ReferralCondition newCondition = new ReferralCondition(referralValue, (XPathReference)bind.getReference());
+			referrals.addElement(newCondition);
 		}
+	}
+	
+	public Vector getReferralConditions() {
+		return referrals;
+	}
+	
+	public void clearConditions() {
+		referrals = new Vector();
 	}
 }

@@ -11,16 +11,17 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.patient.model.Patient;
-import org.javarosa.patient.storage.PatientRMSUtility;
+import org.javarosa.referral.model.Referrals;
+import org.javarosa.referral.storage.ReferralRMSUtility;
 import org.javarosa.referral.util.ReportContext;
 import org.javarosa.referral.view.ReportView;
 
 public class ReferralReport implements IActivity {
 
-	IShell parent;
-	Patient patient;
-	DataModelTree model;
-	ReportView view;
+	private IShell parent;
+	private Referrals referrals;
+	private DataModelTree model;
+	private ReportView view;
 	
 	public ReferralReport(IShell parent) {
 		this.parent = parent;
@@ -48,14 +49,13 @@ public class ReferralReport implements IActivity {
 
 	public void start(Context context) {
 		if(context instanceof ReportContext) {
-			int patientId = ((ReportContext)context).getPatientId();
+			int formId = ((ReportContext)context).getFormId();
 			int modelId = ((ReportContext)context).getModelId();
 			
-			PatientRMSUtility patientUtility = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
+			ReferralRMSUtility referralRms = (ReferralRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(ReferralRMSUtility.getUtilityName());
 			DataModelTreeRMSUtility modelUtility = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
 			try {
-				this.patient = new Patient();
-				patientUtility.retrieveFromRMS(patientId, this.patient);
+				this.referrals = referralRms.retrieveFromRMS(formId);
 				
 				this.model = new DataModelTree();
 				modelUtility.retrieveFromRMS(modelId, this.model);
@@ -75,12 +75,8 @@ public class ReferralReport implements IActivity {
 			}
 		}
 		view = new ReportView("Referral Report");
+		view.setReferrals(referrals.getPositiveReferrals(model));
 		
 		parent.setDisplay(this, view);
-	}
-	
-	public Vector determineReferrals() {
-		Vector referrals = new Vector();
-		return referrals;
 	}
 }
