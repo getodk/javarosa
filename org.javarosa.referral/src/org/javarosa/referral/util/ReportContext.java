@@ -3,19 +3,19 @@ package org.javarosa.referral.util;
 import org.javarosa.core.Context;
 
 public class ReportContext extends Context {
-	private final static String PATIENT_ID_KEY = "PATIENT_ID";
+	private final static String FORM_ID_KEY = "FORM_ID";
 	private final static String MODEL_ID_KEY = "MODEL_ID";
 	
-	public void setPatientId(int patientId) {
-		this.contextObject.put(PATIENT_ID_KEY, new Integer(patientId));
+	public void getFormId(int formId) {
+		this.contextObject.put(FORM_ID_KEY, new Integer(formId));
 	}
 	
 	/**
 	 * @return the patient Id for the current patient. -1 if no
 	 * patient is currently selected
 	 */
-	public int getPatientId() {
-		Integer id = (Integer)this.contextObject.get(PATIENT_ID_KEY);
+	public int getFormId() {
+		Integer id = (Integer)this.contextObject.get(FORM_ID_KEY);
 		if(id == null ) {
 			return -1;
 		}
