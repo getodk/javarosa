@@ -121,11 +121,21 @@ public class DateUtils {
 		Date result = new Date();
 		Vector digits = tokenize(value, '-');
 
-		int day = Integer.valueOf((String)digits.elementAt(2)).intValue();
-		int month = Integer.valueOf((String)digits.elementAt(1)).intValue();
-		month--;
-		int year = Integer.valueOf((String)digits.elementAt(0)).intValue();
-
+		if (digits.size() != 3)
+			return null;
+		
+		int day, month, year;
+		try {
+			day = Integer.parseInt((String)digits.elementAt(2));
+			month = Integer.parseInt((String)digits.elementAt(1)) - 1;
+			year = Integer.parseInt((String)digits.elementAt(0));
+		} catch (NumberFormatException nfe) {
+			return null;
+		}
+		
+		if (month < Calendar.JANUARY || month > Calendar.DECEMBER || day < 1 || day > daysInMonth(month, year))
+			return null;
+		
 		Calendar cd = Calendar.getInstance();
 		cd.set(Calendar.DAY_OF_MONTH, day);
 		cd.set(Calendar.MONTH, month);
@@ -134,6 +144,20 @@ public class DateUtils {
 		result = cd.getTime();
 
 		return result;
+	}
+	
+	public static int daysInMonth (int month, int year) {
+		if (month == Calendar.APRIL || month == Calendar.JUNE || month == Calendar.SEPTEMBER || month == Calendar.NOVEMBER) {
+			return 30;
+		} else if (month == Calendar.FEBRUARY) {
+			return 28 + (isLeap(year) ? 1 : 0);
+		} else {
+			return 31;
+		}
+	}
+	
+	public static boolean isLeap (int year) {
+		return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
 	}
 	
     public static String[] split(String original, String delimiter) {
