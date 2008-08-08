@@ -66,7 +66,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 		Object serializedAnswerData = serializer.serializeAnswerData(element.getValue());
 		if(serializedAnswerData.getClass() == String.class) {
 			text.addChild(Element.TEXT, serializedAnswerData);
-		} else if(serializedAnswerData.getClass() == Element.class) {
+		} else if(serializedAnswerData instanceof Element) {
 			text.addChild(Element.ELEMENT, serializedAnswerData);
 			
 		}
