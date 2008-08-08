@@ -5,6 +5,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.javarosa.core.model.Condition;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -21,6 +22,9 @@ import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.IXFormBindHandler;
 import org.javarosa.xform.util.XFormAnswerDataParser;
+import org.javarosa.xpath.XPathTest;
+import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
@@ -243,9 +247,12 @@ public class XFormParser {
 		}
 	}
 	
+	private static int serialQuestionID = 1;
+	
 	protected static QuestionDef parseControl (IFormElement parent, Element e, FormDef f, int controlType) {
 		QuestionDef question = new QuestionDef();
 		DataBinding binding = null;
+		question.setID(serialQuestionID++); //until we come up with a better scheme
 		
 		String ref = e.getAttributeValue(null, "ref");
 		String bind = e.getAttributeValue(null, "bind");
@@ -510,17 +517,45 @@ public class XFormParser {
 		
 		//constraints
 		
-		//conditions
-//		if(child.getAttributeValue(null, "relevant") != null) {
-//			//#if debug.output==verbose
-//			System.out.println("Relevant!" + child.getAttributeValue(null,"relevant"));
-//			//#endif
-//			String relevancy = child.getAttributeValue(null, "relevant");
-//			relevants.put(relevancy, binding);
-//		}
+		String xpathRel = e.getAttributeValue(null, "relevant");
+		if (xpathRel != null) {
+			if ("true()".equals(xpathRel)) {
+				//do nothing
+			} else if ("false()".equals(xpathRel)) {
+				System.err.println("Warning: <bind> never relevant. Ignoring relevancy...");
+			} else {
+				Condition c = buildCondition(xpathRel, "relevant");
+				c = f.addCondition(c);
+				binding.relevancyCondition = c;
+			}
+		}
 		
-		binding.setRequired("true()".equals(e.getAttributeValue(null, "required")));
-
+		String xpathReq = e.getAttributeValue(null, "required");
+		if (xpathReq != null) {
+			if ("true()".equals(xpathReq)) {
+				binding.requiredAbsolute = true;
+			} else if ("false()".equals(xpathReq)) {
+				binding.requiredAbsolute = false;
+			} else {
+				Condition c = buildCondition(xpathReq, "required");
+				c = f.addCondition(c);
+				binding.requiredCondition = c;
+			}
+		}	
+	
+		String xpathRO = e.getAttributeValue(null, "readonly");
+		if (xpathRO != null) {
+			if ("true()".equals(xpathRO)) {
+				binding.readonlyAbsolute = true;
+			} else if ("false()".equals(xpathRO)) {
+				binding.readonlyAbsolute = false;
+			} else {
+				Condition c = buildCondition(xpathRO, "readonly");
+				c = f.addCondition(c);
+				binding.readonlyCondition = c;
+			}
+		}	
+		
 		binding.setPreload(e.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
 		binding.setPreloadParams(e.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
 		
@@ -531,6 +566,33 @@ public class XFormParser {
 		}
 	
 		addBinding(f, binding);
+	}
+	
+	private static Condition buildCondition (String xpath, String type) {
+		XPathExpression expr;
+		int trueAction = -1, falseAction = -1;
+		
+		if ("relevant".equals(type)) {
+			trueAction = Condition.ACTION_SHOW;
+			falseAction = Condition.ACTION_HIDE;
+		} else if ("required".equals(type)) {
+			trueAction = Condition.ACTION_REQUIRE;
+			falseAction = Condition.ACTION_DONT_REQUIRE;
+		} else if ("readonly".equals(type)) {
+			trueAction = Condition.ACTION_DISABLE;
+			falseAction = Condition.ACTION_ENABLE;
+		}
+		
+		try {
+			expr = XPathTest.parseXPath(xpath);
+		} catch (XPathSyntaxException xse) {
+			System.err.println("Invalid XPath expression [" + xpath + "]!");
+			return null;
+		}
+		
+		Condition c = new Condition(expr, trueAction, falseAction);
+		c.xpath = xpath;
+		return c;
 	}
 	
 	private static void addBinding (FormDef f, DataBinding binding) {
@@ -550,8 +612,22 @@ public class XFormParser {
 
 		q.setDataType(binding.getDataType());	
 		//constraints?
-		//conditions?
-		q.setRequired(binding.isRequired());
+		
+		if (binding.relevancyCondition != null) {
+			binding.relevancyCondition.addAffectedQuestion(q);
+		}
+		
+		if (binding.requiredCondition != null) {
+			binding.requiredCondition.addAffectedQuestion(q);
+		} else {
+			q.setRequired(binding.requiredAbsolute);
+		}
+		
+		if (binding.readonlyCondition != null) {
+			binding.readonlyCondition.addAffectedQuestion(q);
+		} else {
+			q.setEnabled(!binding.readonlyAbsolute);
+		}		
 	}
 	
 	//will check that all <bind>s and refs refer to nodes that actually exist in the instance

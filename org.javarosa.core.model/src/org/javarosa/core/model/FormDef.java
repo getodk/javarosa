@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -34,12 +35,13 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private int id;		/** The numeric unique identifier of the form definition. */	
 	private String name;	/** The display name of the form. */
 	private Localizer localizer;
+	private Vector conditions;
+	private IFormDataModel model;
+
+	private Hashtable conditionTriggerIndex; /* String (xpath reference) -> Vector of Condition */
 	
 	private QuestionPreloader preloader = new QuestionPreloader();
-	
 	private PrototypeFactory modelFactory;
-
-	private IFormDataModel model;
 
 	//private int recordId;
 	
@@ -53,6 +55,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 
 	public FormDef() {
 		setChildren(null);
+		conditions = new Vector();
+		conditionTriggerIndex = new Hashtable();
 	}
 	
 //	/**
@@ -151,8 +155,61 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	public void setValue (QuestionDef question, IAnswerData data) {
 		boolean updated = model.updateDataValue(question.getBind(), data);
 		if (updated) {
+			evaluateConditions(question.getBind());
 			question.alertStateObservers(QuestionStateListener.CHANGE_DATA);
 		}
+	}
+	
+	/**
+	 * Add a Condition to the form's Collection.
+	 * @param condition
+	 */
+	public Condition addCondition (Condition condition) {
+		for (int i = 0; i < conditions.size(); i++) {
+			Condition c = (Condition)conditions.elementAt(i);
+			if (c.equals(condition))
+				return c;
+		}
+		conditions.addElement(condition);
+		condition.attachForm(this);
+		
+		Vector triggers = condition.getTriggers();
+		for (int i = 0; i < triggers.size(); i++) {
+			String trigger = (String)triggers.elementAt(i);
+			if (!conditionTriggerIndex.containsKey(trigger)) {
+				conditionTriggerIndex.put(trigger, new Vector());
+			}
+			Vector triggeredConditions = (Vector)conditionTriggerIndex.get(trigger);
+			if (!triggeredConditions.contains(condition)) {
+				triggeredConditions.addElement(condition);
+			}
+		}
+		
+		return condition;
+	}
+
+	public void evaluateConditions (IDataReference ref) {
+		String xpathRef = (String)ref.getReference();
+		Vector conditions = (Vector)conditionTriggerIndex.get(xpathRef);
+		if (conditions == null)
+			return;
+		
+		for (int i = 0; i < conditions.size(); i++) {
+			Condition condition = (Condition)conditions.elementAt(i);
+			condition.eval(model);
+		}
+	}
+	
+	//doesn't know about groups right now
+	public QuestionDef getQuesitonByID (int questionID) {
+		for (int i = 0; i < children.size(); i++) {
+			QuestionDef q = (QuestionDef)children.elementAt(i);
+			if (questionID == q.getID()) {
+				return q;
+			}
+		}
+		
+		return null;
 	}
 	
 	/*
@@ -329,6 +386,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			model.readExternal(dis);
 
 			setLocalizer((Localizer)ExternalizableHelper.readExternalizable(dis, new Localizer()));
+			
+			Vector conditionList = ExternalizableHelper.readExternal(dis, Condition.class);
+			if (conditionList != null) {
+				for (int i = 0; i < conditionList.size(); i++)
+					this.addCondition((Condition)conditionList.elementAt(i));
+			}
 		}
 	}
 
@@ -349,5 +412,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		model.writeExternal(dos);
 		
 		ExternalizableHelper.writeExternalizable(localizer, dos);
+		
+		ExternalizableHelper.writeExternal(conditions, dos);
 	}
 }

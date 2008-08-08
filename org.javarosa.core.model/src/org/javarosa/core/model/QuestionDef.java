@@ -43,7 +43,6 @@ public class QuestionDef implements IFormElement, Localizable {
 	private Vector selectItemsLocalizable;
 	
 	private boolean required; 	/** A flag to tell whether the question is to be answered or is optional. */
-	//relevancy?
 	//constraints?
 	
 	private boolean visible;	/** A flag to tell whether the question should be shown or not. */
@@ -63,10 +62,10 @@ public class QuestionDef implements IFormElement, Localizable {
 		setName(name);
 		setDataType(dataType);
 		setControlType(controlType);
-		setRequired(false);
-		setVisible(true);
-		setEnabled(true);
-		setLocked(false);
+		required = false;
+		visible = true;
+		enabled = true;
+		locked = false;
 		observers = new Vector();
 	}
 		
@@ -237,7 +236,10 @@ public class QuestionDef implements IFormElement, Localizable {
 	}
 	
 	public void setRequired(boolean required) {
-		this.required = required;
+		if (this.required != required) {		
+			this.required = required;
+	    	alertStateObservers(QuestionStateListener.CHANGE_REQUIRED);
+		}
 	}
 
 	public boolean isVisible() {
@@ -245,7 +247,10 @@ public class QuestionDef implements IFormElement, Localizable {
 	}
 	
 	public void setVisible(boolean visible) {
-		this.visible = visible;
+		if (this.visible != visible) {		
+			this.visible = visible;
+	    	alertStateObservers(QuestionStateListener.CHANGE_VISIBLE);
+		}
 	}
 	
 	public boolean isEnabled() {
@@ -253,7 +258,10 @@ public class QuestionDef implements IFormElement, Localizable {
 	}
 	
 	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+		if (this.enabled != enabled) {		
+			this.enabled = enabled;
+	    	alertStateObservers(QuestionStateListener.CHANGE_ENABLED);
+		}
 	}
 	
 	public boolean isLocked() {
@@ -261,7 +269,10 @@ public class QuestionDef implements IFormElement, Localizable {
 	}
 	
 	public void setLocked(boolean locked) {
-		this.locked = locked;
+		if (this.locked != locked) {		
+			this.locked = locked;
+	    	alertStateObservers(QuestionStateListener.CHANGE_LOCKED);
+		}
 	}
 		
 	public IAnswerData getDefaultValue() {

@@ -139,7 +139,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	    	
     	if (questionIndex > activeQuestionIndex) {
     		if (activeQuestionIndex != INDEX_NOT_SET) {
-    			((ChatterboxWidget)get(activeQuestionIndex)).setViewState(ChatterboxWidget.VIEW_COLLAPSED);
+    			((ChatterboxWidget)get(questionIndexes.indexOf(activeQuestionIndex, true))).setViewState(ChatterboxWidget.VIEW_COLLAPSED);
     		}
     			
     		for (int i = activeQuestionIndex + 1; i <= questionIndex; i++) {
@@ -158,7 +158,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	if (activeQuestionIndex != questionIndex) {
     		activeQuestionIndex = questionIndex;
 
-    		ChatterboxWidget widget = (ChatterboxWidget)get(activeQuestionIndex);
+    		ChatterboxWidget widget = (ChatterboxWidget)get(questionIndexes.indexOf(activeQuestionIndex, true));
     		
     		this.focus(widget, true);
     		widget.showCommands();
@@ -190,7 +190,9 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     //remove the frame corresponding to a particular question from display
     private void removeFrame (int questionIndex) {
     	int frameIndex = questionIndexes.remove(questionIndex);
-    	    	
+    	if (frameIndex == -1)
+    		return; //question not present in chatterbox (hidden/non-relevant)
+    	
     	ChatterboxWidget cw = (ChatterboxWidget)get(frameIndex);
     	cw.destroy();
     	delete(frameIndex);

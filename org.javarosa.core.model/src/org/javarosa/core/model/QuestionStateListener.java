@@ -10,7 +10,9 @@ public interface QuestionStateListener {
 	static final int CHANGE_LOCALE = 0x02;
 	static final int CHANGE_ENABLED = 0x04;
 	static final int CHANGE_VISIBLE = 0x08;
-	static final int CHANGE_OTHER = 0x10;
+	static final int CHANGE_REQUIRED = 0x10;
+	static final int CHANGE_LOCKED = 0x20;
+	static final int CHANGE_OTHER = 0x40;
 
 	void questionStateChanged (QuestionDef question, int changeFlags);
 }

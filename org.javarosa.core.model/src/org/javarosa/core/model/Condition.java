@@ -3,197 +3,149 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.xpath.XPathTest;
+import org.javarosa.xpath.expr.XPathBinaryOpExpr;
+import org.javarosa.xpath.expr.XPathExpression;
+import org.javarosa.xpath.expr.XPathFuncExpr;
+import org.javarosa.xpath.expr.XPathPathExpr;
+import org.javarosa.xpath.expr.XPathUnaryOpExpr;
+import org.javarosa.xpath.parser.XPathSyntaxException;
 
-
-/**
- * A condition which is part of a rule. For definition of a rule, go to the Rule class.
- * E.g. If sex is Male. If age is greater than than 4. etc
- *
- *@author Daniel Kayiwa
- */
-public class Condition implements Externalizable{
+public class Condition implements Externalizable {
+	public static final int ACTION_NULL = 0;
+	public static final int ACTION_SHOW = 1;
+	public static final int ACTION_HIDE = 2;
+	public static final int ACTION_ENABLE = 3;
+	public static final int ACTION_DISABLE = 4;
+	public static final int ACTION_LOCK = 5;
+	public static final int ACTION_UNLOCK = 6;
+	public static final int ACTION_REQUIRE = 7;
+	public static final int ACTION_DONT_REQUIRE = 8;
 	
-	/** The unique identifier of the question referenced by this condition. */
-	private String questionId;
+	private XPathExpression expr;
+	private int trueAction;
+	private int falseAction;
+	private Vector affectedQuestions;
 	
-	/** The operator of the condition. Eg Equal to, Greater than, etc. */
-	private int operator = Constants.OPERATOR_NULL;
+	//hackiness for now to ease comparison and serialization
+	public String xpath; 
+	private Vector qIDs;
 	
-	/** The value checked to see if the condition is true or false.
-	 * For the above example, the value would be 4 or the id of the Male option.
-	 * For a list of options this value is the option id, not the value or text value.
-	 */
-	private String value = Constants.EMPTY_STRING;
-	
-	/** The unique identifier of a condition. */
-	private int id = Constants.NULL_ID;
-	
-	/** Creates a new condition object. */
-	public Condition(){
-		super();
+	public Condition () {
+		this(null, ACTION_NULL, ACTION_NULL);
 	}
 	
-	/**
-	 * Creates a new condition object from its parameters. 
-	 * 
-	 * @param id - the numeric identifier of the condition.
-	 * @param questionId - the numeric identifier of the question.
-	 * @param operator - the condition operator.
-	 * @param value - the value to be equated to.
-	 */
-	public Condition(int id,String questionId, int operator, String value) {
-		this();
-		setQuestionId(questionId);
-		setOperator(operator);
-		setValue(value);
-		setId(id);
+	public Condition (XPathExpression expr, int trueAction, int falseAction) {
+		this(expr, trueAction, falseAction, new Vector());
 	}
 	
-	public int getOperator() {
-		return operator;
-	}
-	public void setOperator(int operator) {
-		this.operator = operator;
-	}
-	public String getQuestionId() {
-		return questionId;
-	}
-	public void setQuestionId(String questionId) {
-		this.questionId = questionId;
-	}
-	public String getValue() {
-		return value;
-	}
-	public void setValue(String value) {
-		this.value = value;
-	}
-	public int getId() {
-		return id;
-	}
-	public void setId(int conditionId) {
-		this.id = conditionId;
+	public Condition (XPathExpression expr, int trueAction, int falseAction, Vector affectedQuestions) {
+		this.expr = expr;
+		this.trueAction = trueAction;
+		this.falseAction = falseAction;
+		this.affectedQuestions = affectedQuestions;
 	}
 	
-	/**
-     * Test if a condition is true or false.
-     */
-	public boolean isTrue(FormData data){
-		QuestionData qn= data.getQuestion(this.questionId);
+	public void eval (IFormDataModel model) {
+		Object result = expr.eval(model);
 		
-		switch(qn.getDef().getDataType()){
-			case Constants.DATATYPE_TEXT:
-				return isTextTrue(qn);
-			case Constants.DATATYPE_INTEGER:
-				return isNumericTrue(qn);
-			case Constants.DATATYPE_DATE:
-				return isDateTrue(qn);
-			case Constants.DATATYPE_DATE_TIME:
-				return isDateTimeTrue(qn);
-			case Constants.DATATYPE_DECIMAL:
-				return isDecimalTrue(qn);
-			case Constants.DATATYPE_LIST_EXCLUSIVE:
-				return isListExclusiveTrue(qn);
-			case Constants.DATATYPE_LIST_MULTIPLE:
-				return isListMultipleTrue(qn);
-			case Constants.DATATYPE_TIME:
-				return isTimeTrue(qn);
-			case Constants.DATATYPE_BOOLEAN:
-				return isTextTrue(qn);
+		if (!(result instanceof Boolean)) {
+			throw new RuntimeException("XPath evaluation: expression does not evaluate to boolean");			
 		}
 		
-		return true;
-	}
-	
-	private boolean isNumericTrue(QuestionData data){
-		return data.getTextAnswer().equals(this.value);
-	}
-	
-	private boolean isTextTrue(QuestionData data){
-		return data.getTextAnswer().equals(this.value);
-	}
-	
-	/**
-	 * Tests if the passed parameter date value is equal to the value of the condition.
-	 * 
-	 * @param data - passed parameter date value.
-	 * @return - true when the two values are the same, else false.
-	 */
-	private boolean isDateTrue(QuestionData data){
-		return data.getTextAnswer().equals(this.value);
-	}
-	
-	private boolean isDateTimeTrue(QuestionData data){
-		return data.getTextAnswer().equals(this.value);
-	}
-	
-	private boolean isTimeTrue(QuestionData data){
-		return data.getTextAnswer().equals(this.value);
-	}
-	
-	private boolean isListMultipleTrue(QuestionData data){
-		return data.getTextAnswer().equals(this.value);
-	}
-	
-	private boolean isListExclusiveTrue(QuestionData data){
-		
-		//If any value is null, we assume false.
-		//Therefore OPERATOR_NOT_EQUAL will always return true
-		//while OPERATOR_EQUAL returns false.
-		//This will help make conditions false when any value is not yet filled.
-		if(data.getOptionAnswerIndices() == null || value == null)
-			return operator != Constants.OPERATOR_EQUAL;
-		
-		//For the sake of performance, we dont compare the actual value.
-		//We instead use the index.		
-		int val1 = Integer.parseInt(data.getOptionAnswerIndices().toString());
-		val1 += 1;
-		
-		int val2 = Integer.parseInt(value);
-
-		switch(operator){
-			case Constants.OPERATOR_EQUAL:
-				return val1 == val2;
-			case Constants.OPERATOR_NOT_EQUAL:
-				return val1 != val2;
-			default:
-				return false;
-		}
-	}
-	
-	private boolean isDecimalTrue(QuestionData data){
-		return data.getTextAnswer().equals(this.value);
-	}
-	
-	/** 
-	 * Reads the condition object from the supplied stream.
-	 * 
-	 * @param dis - the stream to read from.
-	 * @throws IOException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 */
-	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException {
-		if(!ExternalizableHelper.isEOF(dis)){
-			setId(dis.readByte());
-			setQuestionId(dis.readUTF());
-			setOperator(dis.readByte());
-			setValue(dis.readUTF());
+		boolean b = ((Boolean)result).booleanValue();
+		for (int i = 0; i < affectedQuestions.size(); i++) {
+			performAction((QuestionDef)affectedQuestions.elementAt(i), b ? trueAction : falseAction);
 		}
 	}
 
-	/** 
-	 * Writes the Condition object to the supplied stream.
-	 * 
-	 * @param dos - the stream to write to.
-	 * @throws IOException
-	 */
-	public void writeExternal(DataOutputStream dos) throws IOException {
-		dos.writeByte(getId());
-		dos.writeUTF(getQuestionId());
-		dos.writeByte(getOperator());
-		dos.writeUTF(getValue());
+	private void performAction (QuestionDef q, int action) {
+		switch (action) {
+		case ACTION_NULL: break;
+		case ACTION_SHOW:         q.setVisible(true); break;
+		case ACTION_HIDE:         q.setVisible(false); break;
+		case ACTION_ENABLE:       q.setEnabled(true); break;
+		case ACTION_DISABLE:      q.setEnabled(false); break;
+		case ACTION_LOCK:         q.setLocked(true); break;
+		case ACTION_UNLOCK:       q.setLocked(false); break;
+		case ACTION_REQUIRE:      q.setRequired(true); break;
+		case ACTION_DONT_REQUIRE: q.setRequired(false); break;
+		}
 	}
+	
+	public void addAffectedQuestion (QuestionDef question) {
+		affectedQuestions.addElement(question);
+	}
+	
+	public Vector getAffectedQuestions () {
+		return affectedQuestions;
+	}
+	
+	public Vector getTriggers () {
+		Vector v = new Vector();
+		getTriggers(expr, v);
+		return v;
+	}
+
+	private void getTriggers (XPathExpression x, Vector v) {
+		if (x instanceof XPathPathExpr) {
+			v.addElement(((XPathPathExpr)x).getXPath());
+		} else if (x instanceof XPathBinaryOpExpr) {
+			getTriggers(((XPathBinaryOpExpr)x).a, v);
+			getTriggers(((XPathBinaryOpExpr)x).b, v);			
+		} else if (x instanceof XPathUnaryOpExpr) {
+			getTriggers(((XPathUnaryOpExpr)x).a, v);
+		} else if (x instanceof XPathFuncExpr) {
+			XPathFuncExpr fx = (XPathFuncExpr)x;
+			for (int i = 0; i < fx.args.length; i++)
+				getTriggers(fx.args[i], v);
+		}
+	}
+	
+	public boolean equals (Condition c) {
+		return (this.trueAction == c.trueAction && this.falseAction == c.falseAction && this.xpath.equals(c.xpath));
+	}
+	
+	public void readExternal(DataInputStream in) throws IOException,
+			InstantiationException, IllegalAccessException,
+			UnavailableExternalizerException {
+		trueAction = ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT);
+		falseAction = ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT);
+		xpath = ExternalizableHelper.readUTF(in);
+		try {
+			expr = XPathTest.parseXPath(xpath);
+		} catch (XPathSyntaxException xse) { }
+		
+		//affected q's
+		qIDs = ExternalizableHelper.readIntegers(in);
+		//can't convert qIDs to QuestionDefs until 'form' is set by FormDef; thus attachForm, below
+	}
+
+	public void attachForm (FormDef form) {
+		if (qIDs != null) {
+			for (int i = 0; i < qIDs.size(); i++)
+				affectedQuestions.addElement(form.getQuesitonByID(((Integer)qIDs.elementAt(i)).intValue()));
+		}
+	}
+	
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExternalizableHelper.writeNumeric(out, trueAction, ExternalizableHelper.ENCODING_NUM_DEFAULT);
+		ExternalizableHelper.writeNumeric(out, falseAction, ExternalizableHelper.ENCODING_NUM_DEFAULT);
+		ExternalizableHelper.writeUTF(out, xpath);
+		//don't write expr; will rebuild from xpath
+		
+		//affected q's
+		qIDs = new Vector();
+		for (int i = 0; i < affectedQuestions.size(); i++)
+			qIDs.addElement(new Integer(((QuestionDef)affectedQuestions.elementAt(i)).getID()));
+		ExternalizableHelper.writeIntegers(qIDs, out);
+	}
+
+	
+	
 }

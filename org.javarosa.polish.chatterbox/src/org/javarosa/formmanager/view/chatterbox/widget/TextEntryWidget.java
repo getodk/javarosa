@@ -32,7 +32,7 @@ public class TextEntryWidget extends ExpandedWidget {
 		return tf;
 	}
 
-	private TextField textField () {
+	protected TextField textField () {
 		return (TextField)entryWidget;    
 	}
 
