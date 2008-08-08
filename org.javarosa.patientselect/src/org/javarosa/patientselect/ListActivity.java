@@ -3,6 +3,7 @@ package org.javarosa.patientselect;
 import java.util.Vector;
 import java.io.IOException;
 import javax.microedition.lcdui.*;
+
 import org.javarosa.core.Context;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IActivity;
@@ -254,7 +255,7 @@ private static String pName, pCode, pLocation, pSickness, pDiagnosis, pPeriod, p
 
 	private void showList() {
 		
-		list = new List("Select an option to continue", ChoiceGroup.IMPLICIT);
+		list = new List("Select an option to continue", Choice.IMPLICIT);
 		
 		list.append("Search Patient", null);
 		list.append("Enter New Patient", null);
