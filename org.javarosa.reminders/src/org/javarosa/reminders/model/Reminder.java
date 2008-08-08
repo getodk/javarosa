@@ -140,6 +140,8 @@ public class Reminder implements Externalizable, IDRecordable {
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
+		reminderId = in.readInt();
+		
 		followUpDate = ExternalizableHelper.readDate(in);
 		patientId = in.readInt();
 		patientName = ExternalizableHelper.readUTF(in);
@@ -149,6 +151,8 @@ public class Reminder implements Externalizable, IDRecordable {
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
+		out.writeInt(reminderId);
+		
 		ExternalizableHelper.writeDate(out, followUpDate);
 		out.writeInt(patientId);
 		ExternalizableHelper.writeUTF(out, patientName);

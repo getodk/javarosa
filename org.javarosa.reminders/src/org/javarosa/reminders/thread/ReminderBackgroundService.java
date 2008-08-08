@@ -23,7 +23,7 @@ public class ReminderBackgroundService extends TimerTask {
 		while(en.hasMoreElements()) {
 			Reminder reminder = (Reminder)en.nextElement();
 			Date followUpDate = reminder.getFollowUpDate();
-			if(followUpDate.getTime() > current.getTime()) {
+			if(followUpDate.getTime() <= current.getTime()) {
 				if(!reminder.isNotified()) {
 					newExpiredReminders.addElement(reminder);
 				}

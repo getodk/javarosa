@@ -24,6 +24,7 @@ public class ReminderRMSUtility extends RMSUtility {
 	 * @param form The form to be written
 	 */
 	public void writeToRMS(Reminder reminder) {
+		reminder.setRecordId(this.getNextRecordID());
 		super.writeToRMS(reminder, null);
 	}
 	

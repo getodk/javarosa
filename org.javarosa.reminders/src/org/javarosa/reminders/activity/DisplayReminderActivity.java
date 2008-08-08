@@ -44,6 +44,7 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 	public DisplayReminderActivity(IShell parent) {
 		this.parent = parent;
 		remindersDisplay = new DisplayReminders();
+		remindersDisplay.setCommandListener(this);
 	}
 	
 	public void setReminders(Vector reminders) {
@@ -115,6 +116,7 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 			}
 			if(command == DisplayReminders.HANDLE) { 
 				handleReminder = new HandleReminder(selectedReminder);
+				handleReminder.setCommandListener(this);
 				parent.setDisplay(this, handleReminder);
 			}
 		}
@@ -145,6 +147,7 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 	private void returnToList() {
 		if(reminders.size() > 0) {
 			remindersDisplay.setReminders(reminders);
+			parent.setDisplay(this, remindersDisplay);
 		}
 		else {
 			commitChanges();

@@ -30,7 +30,7 @@ public class DisplayReminders extends Form {
 		this.deleteAll();
 		this.append(head);
 		
-		this.reminders = new ChoiceGroup("", Choice.IMPLICIT);
+		this.reminders = new ChoiceGroup("", Choice.EXCLUSIVE);
 		Enumeration en = reminders.elements();
 		while(en.hasMoreElements()) {
 			Reminder reminder = (Reminder)en.nextElement();

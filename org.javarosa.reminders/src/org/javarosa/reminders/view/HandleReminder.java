@@ -33,6 +33,10 @@ public class HandleReminder extends Form {
 		this.append(dateItem);
 		this.append(patientText);
 		this.append(reminderMessage);
+		
+		this.addCommand(UPDATE);
+		this.addCommand(REMOVE);
+		this.addCommand(DONE);
 	}
 	
 	public Reminder getReminder() {
