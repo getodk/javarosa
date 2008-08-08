@@ -2,6 +2,7 @@ package org.javarosa.core.model.utils;
 
 import java.util.Date;
 
+import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
@@ -82,24 +83,9 @@ public class QuestionPreloader {
 			}
 		};
 		
-		IPreloadHandler context = new IPreloadHandler () {
-			public String preloadHandled() {
-				return "context";
-			}
-			
-			public IAnswerData handlePreload(String preloadParams) {
-				return null; //fixme
-			}
-			
-			public boolean handlePostProcess(IFormDataModel model, IDataReference ref, String params) {
-				return false; //fixme
-			}
-		};
-		
 		addPreloadHandler(date);
 		addPreloadHandler(property);
 		addPreloadHandler(timestamp);
-		addPreloadHandler(context);
 	}
 	
 	/**

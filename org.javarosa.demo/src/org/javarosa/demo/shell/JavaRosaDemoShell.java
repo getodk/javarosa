@@ -34,6 +34,7 @@ import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.LoginActivity;
+import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xpath.XPathTest;
 
@@ -132,7 +133,10 @@ public class JavaRosaDemoShell implements IShell {
 			
 			Object returnVal = returnVals.get(LoginActivity.COMMAND_KEY);
 			if (returnVal == "USER_VALIDATED") {
-				//shouldn't we add user info to context here?
+				User user = (User)returnVals.get(LoginActivity.USER);
+				if (user != null)
+					context.setCurrentUser(user.getUsername());
+				
 				launchActivity(new FormListActivity(this, "Forms List"), context);
 			} else if (returnVal == "USER_CANCELLED") {
 				exitShell();
