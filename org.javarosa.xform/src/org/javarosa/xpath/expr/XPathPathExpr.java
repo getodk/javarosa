@@ -5,10 +5,12 @@ import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.model.xform.XPathReference;
+import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 public class XPathPathExpr extends XPathExpression {
 	public static final int INIT_CONTEXT_ROOT = 0;
@@ -67,6 +69,8 @@ public class XPathPathExpr extends XPathExpression {
 			return val.getValue();
 		} else if (val instanceof SelectOneData) {
 			return ((Selection)val.getValue()).getValue();
+		} else if (val instanceof SelectMultiData) {
+			return (new XFormAnswerDataSerializer()).serializeAnswerData(val);
 		} else if (val instanceof DateData) {
 			return val.getValue();
 		} else {

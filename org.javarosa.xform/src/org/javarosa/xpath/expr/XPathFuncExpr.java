@@ -27,14 +27,19 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("false") && args.length == 0) {
 			return Boolean.FALSE;
 		} else if (name.equals("boolean") && args.length == 1) {
-			return XPathFuncExpr.toBoolean(argVals[0]);
+			return toBoolean(argVals[0]);
 		} else if (name.equals("number") && args.length == 1) {
-			return XPathFuncExpr.toNumeric(argVals[0]);
+			return toNumeric(argVals[0]);
 		} else if (name.equals("string") && args.length == 1) {
-			return XPathFuncExpr.toString(argVals[0]);			
+			return toString(argVals[0]);			
 		} else if (name.equals("date") && args.length == 1) { //non-standard
-			return XPathFuncExpr.toDate(argVals[0]);				
-			
+			return toDate(argVals[0]);				
+		} else if (name.equals("not") && args.length == 1) {
+			return boolNot(argVals[0]);
+		} else if (name.equals("boolean-from-string") && args.length == 1) {
+			return boolStr(argVals[0]);
+		} else if (name.equals("selected") && args.length == 2) { //non-standard
+			return multiSelected(argVals[0], argVals[1]);
 		} else {
 			throw new RuntimeException("XPath evaluation: unsupported construct [function call]");
 		}
@@ -119,5 +124,26 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 
+	public static Boolean boolNot (Object o) {
+		boolean b = toBoolean(o).booleanValue();
+		return new Boolean(!b);
+	}
 	
+	public static Boolean boolStr (Object o) {
+		String s = toString(o);
+		if (s.equalsIgnoreCase("true") || s.equals("1"))
+			return Boolean.TRUE;
+		else
+			return Boolean.FALSE;
+	}
+
+	//return whether a particular choice of a multi-select is selected
+	//arg1: XML-serialized answer to multi-select question (space-delimited choice values)
+	//arg2: choice to look for
+	public static Boolean multiSelected (Object o1, Object o2) {
+		String s1 = (String)o1;
+		String s2 = (String)o2;
+		
+		return new Boolean((" " + s1 + " ").indexOf(" " + s2 + " ") != -1);
+	}
 }
