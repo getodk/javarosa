@@ -84,6 +84,8 @@ public class JavaRosaDemoShell implements IShell {
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-b_draft.xhtml"));
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/shortform.xhtml"));
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/tz-e-ctc.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/condtest.xhtml"));
 		}
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(dataModel);
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(formDef);
