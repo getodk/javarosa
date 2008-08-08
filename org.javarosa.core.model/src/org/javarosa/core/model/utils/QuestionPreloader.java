@@ -181,12 +181,11 @@ public class QuestionPreloader {
 	private IAnswerData preloadProperty(String preloadParams) {
 		String propname = preloadParams;
 		String propval = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(propname);
-		String preloadVal = null;
+		StringData preloadVal = null;
 		if (propval != null && propval.length() > 0) {
-			preloadVal = propval;
+			preloadVal = new StringData(propval);
 		}
-		StringData data = new StringData(preloadVal);
-		return data;
+		return preloadVal;
 	}
 
 	/**
@@ -198,11 +197,11 @@ public class QuestionPreloader {
 	 */
 	//TODO: we should really have a native DateTimeData type
 	private IAnswerData preloadTimestamp(String preloadParams) {
-		String value = null;
+		StringData value = null;
 		if ("start".equals(preloadParams)) { //timestamp 'end' should not be preloaded
-			value = DateUtils.formatDateToTimeStamp(new Date());
+			value = new StringData(DateUtils.formatDateToTimeStamp(new Date()));
 		}
-		return new StringData(value);
+		return value;
 	}
 
 	public boolean questionPostProcess (IDataReference ref, String preloadType, String params, IFormDataModel model) {
