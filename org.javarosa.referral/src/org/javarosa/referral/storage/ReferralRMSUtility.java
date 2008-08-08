@@ -5,8 +5,6 @@ import java.util.Vector;
 
 import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
-
-import org.javarosa.core.model.storage.FormDataMetaData;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.referral.model.Referrals;
