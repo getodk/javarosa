@@ -10,7 +10,7 @@ import org.javarosa.reminders.storage.ReminderRMSUtility;
 import org.javarosa.reminders.thread.ReminderBackgroundService;
 
 public class ReminderNotifier {
-	public static final int period = 1000;// * 60 * 5;
+	public static final int period = 1000 * 60 * 5;
 
 	INotificationReceiver notificationReceiver;
 
