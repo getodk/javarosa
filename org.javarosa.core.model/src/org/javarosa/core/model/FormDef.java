@@ -152,12 +152,18 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		return model.getDataValue(question.getBind());
 	}
 	
-	public void setValue (QuestionDef question, IAnswerData data) {
-		boolean updated = model.updateDataValue(question.getBind(), data);
-		if (updated) {
-			evaluateConditions(question.getBind());
-			question.alertStateObservers(QuestionStateListener.CHANGE_DATA);
+	public void setQuestionValue (QuestionDef question, IAnswerData data) {
+		if (setValue(question.getBind(), data)) {
+			question.alertStateObservers(QuestionStateListener.CHANGE_DATA);			
 		}
+	}
+	
+	public boolean setValue (IDataReference ref, IAnswerData data) {
+		boolean updated = model.updateDataValue(ref, data);
+		if (updated) {
+			evaluateConditions(ref);
+		}
+		return updated;
 	}
 	
 	/**
@@ -188,6 +194,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		return condition;
 	}
 
+	public void initializeConditions () {
+		for (int i = 0; i < conditions.size(); i++) {
+			((Condition)conditions.elementAt(i)).eval(model);
+		}
+	}
+	
 	public void evaluateConditions (IDataReference ref) {
 		String xpathRef = (String)ref.getReference();
 		Vector conditions = (Vector)conditionTriggerIndex.get(xpathRef);
@@ -331,7 +343,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			if (binding.getPreload() != null)
 				preload = preloader.getQuestionPreload(binding.getPreload(), binding.getPreloadParams());
 			if(preload != null) { //what if we want to wipe out a value in the instance?
-				model.updateDataValue(binding.getReference(), preload);
+				setValue(binding.getReference(), preload);
 			}
 		}
 	}
@@ -343,6 +355,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		//we might have issues with ordering, for example, a handler that writes a value to a node,
 		//and a handler that does something external with the node. if both handlers are bound to the
 		//same node, we need to make sure the one that alters the node executes first. deal with that later.
+		
+		//also have issues with conditions. it is hard to detect what conditions are affected by the actions
+		//of the post-processor. normally, it wouldn't matter because we only post-process when we are exiting
+		//the form, so the result of any triggered conditions is irrelevant. however, if we save a form in the
+		//interim, post-processing occurs, and then we continue to edit the form. it seems like having conditions
+		//dependent on data written during post-processing is a bad practice anyway, and maybe we shouldn't support it.
 		while(en.hasMoreElements()) {
 			DataBinding binding = (DataBinding)en.nextElement();
 			if (binding.getPreload() != null) {
@@ -392,6 +410,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 				for (int i = 0; i < conditionList.size(); i++)
 					this.addCondition((Condition)conditionList.elementAt(i));
 			}
+			initializeConditions();
 		}
 	}
 

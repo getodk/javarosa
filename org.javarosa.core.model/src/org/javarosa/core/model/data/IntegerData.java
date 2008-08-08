@@ -15,7 +15,7 @@ import org.javarosa.core.util.UnavailableExternalizerException;
  *
  */
 public class IntegerData implements IAnswerData {
-	Integer data;
+	int n;
 
 	/**
 	 * Empty Constructor, necessary for dynamic construction during deserialization.
@@ -25,52 +25,41 @@ public class IntegerData implements IAnswerData {
 		
 	}
 	
-	public IntegerData(int i) {
-		setValue(i);
-	}
-	
-	public IntegerData(Integer o) { 
-		setValue(o);
+	public IntegerData(int n) {
+		this.n = n;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
 	 */
 	public String getDisplayText() {
-		return String.valueOf(data);
+		return String.valueOf(n);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
 	 */
 	public Object getValue() {
-		return data; 
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
-	 */
-	public void setValue(Object o) {
-		data = (Integer)o;
+		return new Integer(n); 
 	}
 	
-	public void setValue(int i) {
-		data = new Integer(i);
+	public void setValue(Object o) {
+		n = ((Integer)o).intValue();
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
-		this.setValue(in.readInt());
-		
+		n = ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeInt(this.data.intValue());
+		ExternalizableHelper.writeNumeric(out, n, ExternalizableHelper.ENCODING_NUM_DEFAULT);
 	}
 }
