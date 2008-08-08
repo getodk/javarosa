@@ -8,13 +8,8 @@ public class XPathNumNegExpr extends XPathUnaryOpExpr {
 	}
 	
 	public Object eval (IFormDataModel model) {
-		Object aval = a.eval(model);
-		
-		if (aval instanceof Double) {
-			return new Double(-((Double)aval).doubleValue());
-		} else {
-			throw new RuntimeException("XPath evaluation: type mismatch");
-		}
+		double aval = XPathFuncExpr.toNumeric(a.eval(model)).doubleValue();
+		return new Double(-aval);
 	}
 
 }

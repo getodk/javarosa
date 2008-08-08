@@ -20,43 +20,32 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 		Object bval = b.eval(model);
 		boolean result = false;
 
-		if (aval == null || bval == null) {
-			if (aval instanceof String || bval instanceof String) {
-				if (aval == null)
-					aval = "";
-				if (bval == null)
-					bval = "";				
-			} else {
-				return Boolean.FALSE; //non-string comparison always false if one arg is null
-			}
-		}
-			
-		if (aval instanceof Double && bval instanceof Double) {
-			double fa = ((Double)aval).doubleValue();
-			double fb = ((Double)bval).doubleValue();
-			
-			switch (op) {
-			case LT: result = fa < fb; break;
-			case GT: result = fa > fb; break;
-			case LTE: result = fa <= fb; break;
-			case GTE: result = fa >= fb; break;
-			}
-		} else if (aval instanceof String && bval instanceof String) {
-			String sa = (String)aval;
-			String sb = (String)bval;
-			int cmp = sa.compareTo(sb);
-			
-			switch (op) {
-			case LT: result = (cmp < 0); break;
-			case GT: result = (cmp > 0); break;
-			case LTE: result = (cmp <= 0); break;
-			case GTE: result = (cmp >= 0); break;
-			}
-		} else {
-			throw new RuntimeException("XPath evaluation: type mismatch");
+		//xpath spec says comparisons only defined for numbers (not defined for strings)
+		aval = XPathFuncExpr.toNumeric(aval);
+		bval = XPathFuncExpr.toNumeric(bval);
+					
+		double fa = ((Double)aval).doubleValue();
+		double fb = ((Double)bval).doubleValue();
+
+		switch (op) {
+		case LT: result = fa < fb; break;
+		case GT: result = fa > fb; break;
+		case LTE: result = fa <= fb; break;
+		case GTE: result = fa >= fb; break;
 		}
 		
-		return new Boolean(result);
+		return new Boolean(result);		
+		
+//		String sa = (String)aval;
+//		String sb = (String)bval;
+//		int cmp = sa.compareTo(sb);
+//		
+//		switch (op) {
+//		case LT: result = (cmp < 0); break;
+//		case GT: result = (cmp > 0); break;
+//		case LTE: result = (cmp <= 0); break;
+//		case GTE: result = (cmp >= 0); break;
+//		}
 	}
 
 }
