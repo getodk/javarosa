@@ -19,16 +19,18 @@ public class ReminderBackgroundService extends TimerTask {
 		Vector reminders = notifier.getReminders();
 		Enumeration en = reminders.elements();
 		Date current = new Date();
-		Vector expiredReminders = new Vector();
+		Vector newExpiredReminders = new Vector();
 		while(en.hasMoreElements()) {
 			Reminder reminder = (Reminder)en.nextElement();
 			Date followUpDate = reminder.getFollowUpDate();
 			if(followUpDate.getTime() > current.getTime()) {
-				expiredReminders.addElement(reminder);
+				if(!reminder.isNotified()) {
+					newExpiredReminders.addElement(reminder);
+				}
 			}
 		}
-		if(expiredReminders.size() > 0 ) {
-			notifier.remindersExpired(expiredReminders);
+		if(newExpiredReminders.size() > 0 ) {
+			notifier.remindersExpired(newExpiredReminders);
 		}
 	}
 	
