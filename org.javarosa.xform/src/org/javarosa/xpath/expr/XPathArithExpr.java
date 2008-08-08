@@ -17,24 +17,17 @@ public class XPathArithExpr extends XPathBinaryOpExpr {
 	}
 	
 	public Object eval (IFormDataModel model) {
-		Object aval = a.eval(model);
-		Object bval = b.eval(model);
+		double aval = XPathFuncExpr.toNumeric(a.eval(model)).doubleValue();
+		double bval = XPathFuncExpr.toNumeric(b.eval(model)).doubleValue();
 		
-		if (!(aval instanceof Double && bval instanceof Double)) {
-			throw new RuntimeException("XPath evaluation: type mismatch");
-		}
-		
-		double fa = ((Double)aval).doubleValue();
-		double fb = ((Double)bval).doubleValue();
-		
-		double fc = 0;
+		double result = 0;
 		switch (op) {
-		case ADD: fc = fa + fb; break;
-		case SUBTRACT: fc = fa - fb; break;
-		case MULTIPLY: fc = fa * fb; break;
-		case DIVIDE: fc = fa / fb; break;
-		case MODULO: fc = fa % fb; break;
+		case ADD: result = aval + bval; break;
+		case SUBTRACT: result = aval - bval; break;
+		case MULTIPLY: result = aval * bval; break;
+		case DIVIDE: result = aval / bval; break;
+		case MODULO: result = aval % bval; break;
 		}
-		return new Double(fc);
+		return new Double(result);
 	}
 }

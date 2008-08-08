@@ -10,7 +10,7 @@ public class XPathVariableReference extends XPathExpression {
     }
     
 	public Object eval (IFormDataModel model) {
-		throw new RuntimeException("XPath evaluation: unsupported construct");
+		throw new RuntimeException("XPath evaluation: unsupported construct [variable reference]");
 	}
 
 }

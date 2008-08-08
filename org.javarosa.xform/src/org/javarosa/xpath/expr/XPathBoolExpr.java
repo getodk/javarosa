@@ -14,24 +14,21 @@ public class XPathBoolExpr extends XPathBinaryOpExpr {
 	}
 	
 	public Object eval (IFormDataModel model) {
-		Object aval = a.eval(model);
-		Object bval = b.eval(model);
+		boolean aval = XPathFuncExpr.toBoolean(a.eval(model)).booleanValue();
 		
-		//no short-circuiting support right now
-		
-		if (!(aval instanceof Boolean && bval instanceof Boolean)) {
-			throw new RuntimeException("XPath evaluation: type mismatch");
+		//short-circuiting
+		if ((!aval && op == AND) || (aval && op == OR)) {
+			return new Boolean(aval);
 		}
+
+		boolean bval = XPathFuncExpr.toBoolean(b.eval(model)).booleanValue();
 		
-		boolean ba = ((Boolean)aval).booleanValue();
-		boolean bb = ((Boolean)bval).booleanValue();
-		
-		boolean bc = false;
+		boolean result = false;
 		switch (op) {
-		case AND: bc = ba && bb; break;
-		case OR: bc = ba || bb; break;
+		case AND: result = aval && bval; break;
+		case OR: result = aval || bval; break;
 		}
-		return new Boolean(bc);
+		return new Boolean(result);
 	}
 
 }

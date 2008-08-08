@@ -15,18 +15,24 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
 		Object bval = b.eval(model);
 		boolean eq = false;
 
-		if (aval == null || bval == null) {
-			if (aval instanceof String || bval instanceof String) {
-				if (aval == null)
-					aval = "";
-				if (bval == null)
-					bval = "";				
-			} else {
-				return Boolean.FALSE; //non-string comparison always false if one arg is null
-			}
+		if (aval instanceof Boolean && !(bval instanceof Boolean)) {
+			bval = XPathFuncExpr.toBoolean(bval);
+		} else if (bval instanceof Boolean && !(aval instanceof Boolean)) {
+			aval = XPathFuncExpr.toBoolean(aval);
+		} else if (aval instanceof Double && !(bval instanceof Double)) {
+			bval = XPathFuncExpr.toNumeric(bval);
+		} else if (bval instanceof Double && !(aval instanceof Double)) {
+			aval = XPathFuncExpr.toNumeric(aval); 
+		} else {
+			aval = XPathFuncExpr.toString(aval);
+			bval = XPathFuncExpr.toString(bval);			
 		}
-		
-		if (aval instanceof Double && bval instanceof Double) {
+				
+		if (aval instanceof Boolean && bval instanceof Boolean) {
+			boolean ba = ((Boolean)aval).booleanValue();
+			boolean bb = ((Boolean)bval).booleanValue();
+			eq = (ba == bb);
+		} else if (aval instanceof Double && bval instanceof Double) {
 			double fa = ((Double)aval).doubleValue();
 			double fb = ((Double)bval).doubleValue();
 			eq = (fa == fb);
@@ -34,12 +40,6 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
 			String sa = (String)aval;
 			String sb = (String)bval;
 			eq = (sa.equals(sb));
-		} else if (aval instanceof Boolean && bval instanceof Boolean) {
-			boolean ba = ((Boolean)aval).booleanValue();
-			boolean bb = ((Boolean)bval).booleanValue();
-			eq = (ba == bb);
-		} else {
-			throw new RuntimeException("XPath evaluation: type mismatch");
 		}
 		
 		return new Boolean(equal ? eq : !eq);

@@ -52,15 +52,10 @@ public class Condition implements Externalizable {
 	}
 	
 	public void eval (IFormDataModel model) {
-		Object result = expr.eval(model);
+		boolean result = XPathFuncExpr.toBoolean(expr.eval(model)).booleanValue();
 		
-		if (!(result instanceof Boolean)) {
-			throw new RuntimeException("XPath evaluation: expression does not evaluate to boolean");			
-		}
-		
-		boolean b = ((Boolean)result).booleanValue();
 		for (int i = 0; i < affectedQuestions.size(); i++) {
-			performAction((QuestionDef)affectedQuestions.elementAt(i), b ? trueAction : falseAction);
+			performAction((QuestionDef)affectedQuestions.elementAt(i), result ? trueAction : falseAction);
 		}
 	}
 
