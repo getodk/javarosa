@@ -25,7 +25,7 @@ public class StringData implements IAnswerData {
 	//string should not be null or empty; the entire StringData reference should be null in this case
 	public void setValue (Object o) {
 		//#if debug.output == verbose
-		if(o == null) {
+		if(o == null || ((String)o).length() == 0) {
 			System.out.println("StringData is being set to a null value. Should not be allowed.");
 		}
 		//#endif

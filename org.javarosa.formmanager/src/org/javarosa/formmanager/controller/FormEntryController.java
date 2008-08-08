@@ -43,7 +43,7 @@ public class FormEntryController {
 	public boolean commitAnswer (QuestionDef question, IAnswerData data) {
 		if (data != null || model.getForm().getValue(question) != null) {
 			//we should check if the data to be saved is already the same as the data in the model, but we can't
-			model.getForm().setValue(question, data);
+			model.getForm().setQuestionValue(question, data);
 			model.modelChanged();
 			return true;
 		} else {

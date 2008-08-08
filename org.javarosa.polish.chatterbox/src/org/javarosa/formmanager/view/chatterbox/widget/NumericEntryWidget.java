@@ -15,6 +15,10 @@ public class NumericEntryWidget extends TextEntryWidget {
 		return tf;
 	}
 
+	protected void setWidgetValue (Object o) {
+		super.setWidgetValue(((Integer)o).toString());
+	}
+	
 	protected IAnswerData getWidgetValue () {
 		String s = textField().getText();
 		
