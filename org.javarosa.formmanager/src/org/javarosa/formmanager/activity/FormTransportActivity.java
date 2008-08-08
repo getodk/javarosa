@@ -7,9 +7,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
@@ -65,6 +67,10 @@ public class FormTransportActivity implements
 	private SubmitScreen submitScreen;
 
 	private SubmitStatusScreen submitStatusScreen;
+
+	private Display display;
+
+	public Alert alert;
 
 	int counter;
 
@@ -254,12 +260,17 @@ public class FormTransportActivity implements
 				this.showURLform();
 				break;
 			case SubmitScreen.SEND_LATER:
+				String userNotify = "Form has been saved. Check saved form list";
+				 alert = new Alert("Saving...",userNotify,null,AlertType.INFO);
+				 alert.setCommandListener(this);
+				shell.setDisplay(this,alert);
 				// If we're going to send later, no reason to be in the
 				// transport activity
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-						null);
+				//shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+					//null);
 				break;
 			}
+
 	}
 
 	/*
@@ -368,6 +379,12 @@ public class FormTransportActivity implements
 			}
 		} else if (d == submitStatusScreen) {
 			shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+		}
+		else if(d == alert)
+		{
+			if(c == alert.DISMISS_COMMAND) {
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,null);
+			}
 		}
 	}
 
