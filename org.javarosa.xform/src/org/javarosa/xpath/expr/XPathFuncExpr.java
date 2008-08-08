@@ -1,6 +1,9 @@
 package org.javarosa.xpath.expr;
 
+import java.util.Date;
+
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.utils.DateUtils;
 
 public class XPathFuncExpr extends XPathExpression {
 	public XPathQName id;
@@ -29,7 +32,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return XPathFuncExpr.toNumeric(argVals[0]);
 		} else if (name.equals("string") && args.length == 1) {
 			return XPathFuncExpr.toString(argVals[0]);			
-			
+		} else if (name.equals("date") && args.length == 1) { //non-standard
+			return XPathFuncExpr.toDate(argVals[0]);				
 			
 		} else {
 			throw new RuntimeException("XPath evaluation: unsupported construct [function call]");
@@ -64,6 +68,8 @@ public class XPathFuncExpr extends XPathExpression {
 				return new Double(Double.NaN);
 			}
 			return new Double(d);
+		} else if (o instanceof Date) {
+			return new Double((((Date)o).getTime() - DateUtils.getDateFromString("1970-01-01").getTime()) / 86400000l);
 		} else {
 			throw new RuntimeException("XPath evaluation: type mismatch [cannot convert to numeric]");
 		}
@@ -87,9 +93,31 @@ public class XPathFuncExpr extends XPathExpression {
 			}
 		} else if (o instanceof String) {
 			return (String)o;
+		} else if (o instanceof Date) {
+			return DateUtils.getXMLStringValue((Date)o);
 		} else {
 			throw new RuntimeException("XPath evaluation: type mismatch [cannot convert to string]");
 		}
 	}
+
+	public static Date toDate (Object o) {
+		if (o instanceof Double) {
+			Date d = DateUtils.getDateFromString("1970-01-01");
+			d.setTime(d.getTime() + (long)((Double)o).doubleValue() * 86400000l);
+			return d;
+		} else if (o instanceof String) {
+			Date d = DateUtils.getDateFromString((String)o);
+			if (d == null) {
+				throw new RuntimeException("XPath evaluation: type mismatch [cannot convert to date]");
+			} else {
+				return d;
+			}
+		} else if (o instanceof Date) {
+			return (Date)o;
+		} else {
+			throw new RuntimeException("XPath evaluation: type mismatch [cannot convert to date]");
+		}
+	}
+
 	
 }
