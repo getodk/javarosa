@@ -1,0 +1,35 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/2002/xforms"
+	  xmlns:ev="http://www.w3.org/2001/xml-events"
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<h:head>
+    <h:title>Conditions Test</h:title>
+    <model>
+
+	<instance>
+		<data xmlns="">
+		
+		<a />
+		<b />
+		<c />
+		<d />
+		
+		</data>
+	</instance>
+		
+	<bind id="a" nodeset="/data/a" type="xsd:int" />
+	<bind id="b" nodeset="/data/b" type="xsd:int" />
+	<bind id="c" nodeset="/data/c" relevant="/data/a &lt; 15 and /data/b = 6" />
+	<bind id="d" nodeset="/data/d" />
+						
+    </model>
+</h:head>			
+<h:body>
+
+<input bind="a"><label>question a</label></input>
+<input bind="b"><label>question b</label></input>
+<input bind="c"><label>question c</label></input>
+<input bind="d"><label>question d</label></input>
+
+</h:body>
+</h:html>
