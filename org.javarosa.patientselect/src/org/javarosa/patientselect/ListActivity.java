@@ -399,4 +399,9 @@ private static String pName, pCode, pLocation, pSickness, pDiagnosis, pPeriod, p
 		return null;
 	}
 
+	public Context getActivityContext() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
