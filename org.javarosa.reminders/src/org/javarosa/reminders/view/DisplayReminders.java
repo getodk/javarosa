@@ -17,13 +17,13 @@ public class DisplayReminders extends Form {
 	public ChoiceGroup reminders;
 	
 	public static final Command DISMISS = new Command("Dismiss", Command.SCREEN, 1);
-	public static final Command HANDLE = new Command("Handle", Command.SCREEN, 1);
+	public static final Command VIEW = new Command("View", Command.SCREEN, 1);
 	
 	public DisplayReminders() {
 		super("Reminder");
 		head = new StringItem("","The following reminders are ready");
 		this.addCommand(DISMISS);
-		this.addCommand(HANDLE);
+		this.addCommand(VIEW);
 	}
 	
 	public void setReminders(Vector reminders) {

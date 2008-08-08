@@ -114,8 +114,8 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 				reminders.removeElement(selectedReminder);
 				returnToList();
 			}
-			if(command == DisplayReminders.HANDLE) { 
-				handleReminder = new HandleReminder(selectedReminder);
+			if(command == DisplayReminders.VIEW) { 
+				handleReminder = new HandleReminder(selectedReminder, true);
 				handleReminder.setCommandListener(this);
 				parent.setDisplay(this, handleReminder);
 			}
@@ -135,11 +135,9 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 				returnToList();
 			}
 			if(command == HandleReminder.UPDATE) {
-				Reminder selectedReminder = handleReminder.getUpdatedReminder();
-				selectedReminder.setNotified(true);
-				changedReminders.addElement(selectedReminder);
-				reminders.removeElement(selectedReminder);
-				returnToList();	
+				//#if debug.output == verbose
+				System.out.println("Read only Reminder Viewer is firing updates...");
+				//#endif
 			}
 		}
 	}
