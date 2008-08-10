@@ -1,9 +1,13 @@
 package org.javarosa.xpath.expr;
 
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.xpath.IFunctionHandler;
 
 public class XPathFuncExpr extends XPathExpression {
 	public XPathQName id;
@@ -17,6 +21,8 @@ public class XPathFuncExpr extends XPathExpression {
 	public Object eval (IFormDataModel model) {
 		String name = id.toString();
 		Object[] argVals = new Object[args.length];
+		
+		Hashtable funcHandlers = null; //how does this get here?
 		
 		for (int i = 0; i < args.length; i++) {
 			argVals[i] = args[i].eval(model);
@@ -41,10 +47,67 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("selected") && args.length == 2) { //non-standard
 			return multiSelected(argVals[0], argVals[1]);
 		} else {
-			throw new RuntimeException("XPath evaluation: unsupported construct [function call]");
+			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
+			if (handler != null) {
+				return evalCustomFunction(handler, argVals);
+			} else {
+				throw new RuntimeException("XPath evaluation: no handler for function [" + name + "]");
+			}
 		}
 	}
 
+	private Object evalCustomFunction (IFunctionHandler handler, Object[] args) {
+		Vector prototypes = handler.getPrototypes();
+		Enumeration e = prototypes.elements();
+		Object[] typedArgs = null;
+
+		while (typedArgs == null && e.hasMoreElements()) {
+			typedArgs = matchPrototype(args, (Class[])e.nextElement());
+		}
+
+		if (typedArgs != null) {
+			return handler.eval(typedArgs);
+		} else if (handler.rawArgs()) {
+			return handler.eval(args);
+		} else {
+			throw new RuntimeException("XPath evaluation: type mismatch for function [" + handler.getName() + "]");
+		}
+	}
+	
+	Object[] matchPrototype (Object[] args, Class[] prototype) {
+		Object[] typed = null;
+
+		if (prototype.length == args.length) {
+			typed = new Object[args.length];
+
+			for (int i = 0; i < prototype.length; i++) {
+				typed[i] = null;
+
+				//how to handle type conversions of custom types?
+				if (prototype[i].isAssignableFrom(args[i].getClass())) {
+					typed[i] = args[i];
+				} else {
+					try {
+						if (prototype[i] == Boolean.class) {
+							typed[i] = toBoolean(args[i]);
+						} else if (prototype[i] == Double.class) {
+							typed[i] = toNumeric(args[i]);
+						} else if (prototype[i] == String.class) {
+							typed[i] = toString(args[i]);
+						} else if (prototype[i] == Date.class) {
+							typed[i] = toDate(args[i]);
+						}
+					} catch (RuntimeException re) { /* swallow type mismatch exception */ }
+				}
+
+				if (typed[i] == null)
+					return null;
+			}
+		}
+
+		return typed;
+	}
+	
 	public static Boolean toBoolean (Object o) {
 		if (o instanceof Boolean) {
 			return (Boolean)o;
