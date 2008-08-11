@@ -1,6 +1,7 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.xpath.EvaluationContext;
 
 public class XPathArithExpr extends XPathBinaryOpExpr {
 	public static final int ADD = 0;
@@ -16,9 +17,9 @@ public class XPathArithExpr extends XPathBinaryOpExpr {
 		this.op = op;
 	}
 	
-	public Object eval (IFormDataModel model) {
-		double aval = XPathFuncExpr.toNumeric(a.eval(model)).doubleValue();
-		double bval = XPathFuncExpr.toNumeric(b.eval(model)).doubleValue();
+	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
+		double aval = XPathFuncExpr.toNumeric(a.eval(model, evalContext)).doubleValue();
+		double bval = XPathFuncExpr.toNumeric(b.eval(model, evalContext)).doubleValue();
 		
 		double result = 0;
 		switch (op) {

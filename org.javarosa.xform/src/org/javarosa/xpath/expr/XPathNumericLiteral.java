@@ -1,6 +1,7 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.xpath.EvaluationContext;
 
 public class XPathNumericLiteral extends XPathExpression {
 	public double d;
@@ -9,7 +10,7 @@ public class XPathNumericLiteral extends XPathExpression {
 		this.d = d.doubleValue();
 	}
 	
-	public Object eval (IFormDataModel model) {
+	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
 		return new Double(d);
 	}
 

@@ -8,6 +8,7 @@ import java.util.Vector;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.xpath.EvaluationContext;
 import org.javarosa.xpath.XPathTest;
 import org.javarosa.xpath.expr.XPathBinaryOpExpr;
 import org.javarosa.xpath.expr.XPathExpression;
@@ -51,8 +52,8 @@ public class Condition implements Externalizable {
 		this.affectedQuestions = affectedQuestions;
 	}
 	
-	public void eval (IFormDataModel model) {
-		boolean result = XPathFuncExpr.toBoolean(expr.eval(model)).booleanValue();
+	public void eval (IFormDataModel model, EvaluationContext evalContext) {
+		boolean result = XPathFuncExpr.toBoolean(expr.eval(model, evalContext)).booleanValue();
 		
 		for (int i = 0; i < affectedQuestions.size(); i++) {
 			performAction((QuestionDef)affectedQuestions.elementAt(i), result ? trueAction : falseAction);

@@ -1,6 +1,7 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.xpath.EvaluationContext;
 
 public class XPathBoolExpr extends XPathBinaryOpExpr {
 	public static final int AND = 0;
@@ -13,15 +14,15 @@ public class XPathBoolExpr extends XPathBinaryOpExpr {
 		this.op = op;
 	}
 	
-	public Object eval (IFormDataModel model) {
-		boolean aval = XPathFuncExpr.toBoolean(a.eval(model)).booleanValue();
+	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
+		boolean aval = XPathFuncExpr.toBoolean(a.eval(model, evalContext)).booleanValue();
 		
 		//short-circuiting
 		if ((!aval && op == AND) || (aval && op == OR)) {
 			return new Boolean(aval);
 		}
 
-		boolean bval = XPathFuncExpr.toBoolean(b.eval(model)).booleanValue();
+		boolean bval = XPathFuncExpr.toBoolean(b.eval(model, evalContext)).booleanValue();
 		
 		boolean result = false;
 		switch (op) {

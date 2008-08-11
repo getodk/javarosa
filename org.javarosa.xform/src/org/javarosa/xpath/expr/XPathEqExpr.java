@@ -1,6 +1,7 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.xpath.EvaluationContext;
 
 public class XPathEqExpr extends XPathBinaryOpExpr {
 	public boolean equal;
@@ -10,9 +11,9 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
 		this.equal = equal;
 	}
 	
-	public Object eval (IFormDataModel model) {
-		Object aval = a.eval(model);
-		Object bval = b.eval(model);
+	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
+		Object aval = a.eval(model, evalContext);
+		Object bval = b.eval(model, evalContext);
 		boolean eq = false;
 
 		if (aval instanceof Boolean && !(bval instanceof Boolean)) {

@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.xpath.EvaluationContext;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.IFunctionHandler;
 import org.javarosa.xpath.XPathTypeMismatchException;
@@ -21,14 +22,14 @@ public class XPathFuncExpr extends XPathExpression {
 		this.args = args;
 	}
 	
-	public Object eval (IFormDataModel model) {
+	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
 		String name = id.toString();
 		Object[] argVals = new Object[args.length];
 		
-		Hashtable funcHandlers = null; //how does this get here?
+		Hashtable funcHandlers = evalContext.getFunctionHandlers();
 		
 		for (int i = 0; i < args.length; i++) {
-			argVals[i] = args[i].eval(model);
+			argVals[i] = args[i].eval(model, evalContext);
 		}
 		
 		if (name.equals("true") && args.length == 0) {
@@ -77,7 +78,7 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 	
-	Object[] matchPrototype (Object[] args, Class[] prototype) {
+	private Object[] matchPrototype (Object[] args, Class[] prototype) {
 		Object[] typed = null;
 
 		if (prototype.length == args.length) {
