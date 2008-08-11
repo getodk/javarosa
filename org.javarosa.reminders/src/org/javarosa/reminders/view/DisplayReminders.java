@@ -26,7 +26,7 @@ public class DisplayReminders extends Form {
 		this.addCommand(VIEW);
 	}
 	
-	public void setReminders(Vector reminders) {
+	public void setReminders(Vector reminders, int viewMode) {
 		this.deleteAll();
 		this.append(head);
 		

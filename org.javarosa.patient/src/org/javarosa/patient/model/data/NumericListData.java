@@ -18,6 +18,7 @@ import org.javarosa.patient.util.SelectorParser;
  */
 public class NumericListData implements IAnswerData, IPatientRecord {
 
+	/** DateValueTuple */
 	Vector valueList = new Vector();
 	
 	/* (non-Javadoc)
