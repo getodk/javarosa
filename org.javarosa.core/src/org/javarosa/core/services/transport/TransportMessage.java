@@ -304,6 +304,8 @@ public class TransportMessage extends Observable implements Externalizable {
 		sb.append("\r\nDestination: ").append(destination);
 		sb.append("\r\nTime: ").append(timestamp);
 		sb.append("\r\nStatus: ").append(statusToString());
+		if (this.replyloadData != null)
+			sb.append("\r\nReply Data: ").append(new String(this.replyloadData));
 		return sb.toString();
 	}
 
