@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.Vector;
 
+import org.javarosa.core.model.data.IntegerData;
+
 /**
  * Static utility methods for Dates in j2me 
  * 
@@ -229,5 +231,20 @@ public class DateUtils {
 		}
 		
 		return d;
+	}
+	
+	public static int getMonthsDifference(Date earlierDate, Date laterDate) {
+		Date span = new Date(laterDate.getTime() - earlierDate.getTime());
+		Date firstDate = new Date(0);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(firstDate);
+		int firstYear = calendar.get(Calendar.YEAR);
+		int firstMonth = calendar.get(Calendar.MONTH);				
+		
+		calendar.setTime(span);
+		int spanYear = calendar.get(Calendar.YEAR);
+		int spanMonth = calendar.get(Calendar.MONTH);
+		int months = (spanYear - firstYear)*12 + (spanMonth - firstMonth);
+		return months;
 	}
 }

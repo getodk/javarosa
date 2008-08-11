@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
+import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
@@ -53,12 +54,14 @@ public class Patient implements Externalizable {
 	boolean birthDateEstimated;
 	int age;
 	
+	Date treatmentStartDate;
+	
 	String patientIdentifier;
 	Vector attributes; //Not serialized since we can generate it on the fly.
 	boolean isNewPatient;
 	
 
-	/* String->IPatientRecord */
+	/* String->NumericListData */
 	private Map records = new Map();
 	
 	//For now we're statically encoding record types.
@@ -247,6 +250,13 @@ public class Patient implements Externalizable {
 			}
 		} else if (recordType == "age") {
 			return new IntegerData((int)(((new Date()).getTime() - birthDate.getTime()) / 31556952000l));
+		} else if (recordType == "treatmentStart") {
+			if(this.treatmentStartDate != null) {
+				return new DateData(this.treatmentStartDate);
+			}
+			else {
+				return null;
+			}
 		} else {
 			//TODO: We need to figure out how to do these references better
 			return null;
@@ -301,6 +311,20 @@ public class Patient implements Externalizable {
 		this.patientIdentifier = patientIdentifier;
 	}
 	
+	/**
+	 * @return the treatmentStartDate
+	 */
+	public Date getTreatmentStartDate() {
+		return treatmentStartDate;
+	}
+
+	/**
+	 * @param treatmentStartDate the treatmentStartDate to set
+	 */
+	public void setTreatmentStartDate(Date treatmentStartDate) {
+		this.treatmentStartDate = treatmentStartDate;
+	}
+
 	public String toString() {
 		String s;
 
@@ -338,6 +362,7 @@ public class Patient implements Externalizable {
 		setGivenName(ExternalizableHelper.readUTF(in));
 		setGender(ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT));
 		setBirthDate(ExternalizableHelper.readDate(in));
+		setTreatmentStartDate(ExternalizableHelper.readDate(in));
 		setPatientIdentifier(ExternalizableHelper.readUTF(in));
 		setNewPatient(in.readBoolean());
 
@@ -357,6 +382,7 @@ public class Patient implements Externalizable {
 		ExternalizableHelper.writeUTF(out, getGivenName());
 		ExternalizableHelper.writeNumeric(out, getGender(), ExternalizableHelper.ENCODING_NUM_DEFAULT);
 		ExternalizableHelper.writeDate(out, getBirthDate());
+		ExternalizableHelper.writeDate(out, getTreatmentStartDate());
 		ExternalizableHelper.writeUTF(out, getPatientIdentifier());
 		out.writeBoolean(isNewPatient());
 		

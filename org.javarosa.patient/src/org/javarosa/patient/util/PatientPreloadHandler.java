@@ -1,11 +1,15 @@
 package org.javarosa.patient.util;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.model.data.ImmunizationAnswerData;
@@ -33,12 +37,14 @@ public class PatientPreloadHandler implements IPreloadHandler {
 	 */
 	public IAnswerData handlePreload(String preloadParams) {
 		IAnswerData returnVal = null;
-		/*if(preloadParams == "monthsOnTreatment") {
-			//TODO: Get actual data from patient
-			returnVal = new IntegerData(12);
-		} else*/
 		if("vaccination_table".equals(preloadParams)) {
 			returnVal = new ImmunizationAnswerData(patient.getVaccinations());
+		} else if(preloadParams.equals("monthsOnTreatment")) {
+			DateData dateData = (DateData)patient.getRecord("treatmentStart");
+			if(dateData != null) {
+				int months = DateUtils.getMonthsDifference((Date)dateData.getValue(), new Date()); 
+				returnVal = new IntegerData(months);
+			}
 		}
 		else {
 			int selectorStart = preloadParams.indexOf("[");

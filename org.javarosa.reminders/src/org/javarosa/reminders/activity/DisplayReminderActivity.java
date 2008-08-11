@@ -17,6 +17,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.reminders.model.Reminder;
 import org.javarosa.reminders.storage.ReminderRMSUtility;
+import org.javarosa.reminders.util.ReminderListContext;
 import org.javarosa.reminders.view.DisplayReminders;
 import org.javarosa.reminders.view.HandleReminder;
 
@@ -39,7 +40,9 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 	
 	HandleReminder handleReminder;
 	
-	Context context;
+	ReminderListContext context;
+	
+	int viewMode;
 	
 	public DisplayReminderActivity(IShell parent) {
 		this.parent = parent;
@@ -94,7 +97,10 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 	 * @see org.javarosa.core.api.IActivity#start(org.javarosa.core.Context)
 	 */
 	public void start(Context context) {
-		this.context = context;
+		if(context instanceof ReminderListContext) {
+			this.context = (ReminderListContext)context;
+			viewMode = this.context.getViewMode();
+		}
 		changedReminders = new Vector();
 		removedReminders = new Vector();
 		
@@ -115,7 +121,7 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 				returnToList();
 			}
 			if(command == DisplayReminders.VIEW) { 
-				handleReminder = new HandleReminder(selectedReminder, true);
+				handleReminder = new HandleReminder(selectedReminder,(viewMode == ReminderListContext.VIEW_TRIGGERED));
 				handleReminder.setCommandListener(this);
 				parent.setDisplay(this, handleReminder);
 			}
@@ -135,16 +141,18 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 				returnToList();
 			}
 			if(command == HandleReminder.UPDATE) {
-				//#if debug.output == verbose
-				System.out.println("Read only Reminder Viewer is firing updates...");
-				//#endif
+				Reminder selectedReminder = handleReminder.getUpdatedReminder();
+				selectedReminder.setNotified(true);
+				changedReminders.addElement(selectedReminder);
+				reminders.removeElement(selectedReminder);
+				returnToList();
 			}
 		}
 	}
 	
 	private void returnToList() {
 		if(reminders.size() > 0) {
-			remindersDisplay.setReminders(reminders);
+			remindersDisplay.setReminders(reminders, viewMode);
 			parent.setDisplay(this, remindersDisplay);
 		}
 		else {
