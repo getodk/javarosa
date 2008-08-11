@@ -1,6 +1,7 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathUnionExpr extends XPathBinaryOpExpr {
 	public XPathUnionExpr (XPathExpression a, XPathExpression b) {
@@ -8,7 +9,7 @@ public class XPathUnionExpr extends XPathBinaryOpExpr {
 	}
 	
 	public Object eval (IFormDataModel model) {
-		throw new RuntimeException("XPath evaluation: unsupported construct [nodeset union operation]");
+		throw new XPathUnsupportedException("nodeset union operation");
 	}
 
 }

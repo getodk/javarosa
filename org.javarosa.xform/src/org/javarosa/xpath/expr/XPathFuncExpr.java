@@ -7,7 +7,10 @@ import java.util.Vector;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.IFunctionHandler;
+import org.javarosa.xpath.XPathTypeMismatchException;
+import org.javarosa.xpath.XPathUnhandledException;
 
 public class XPathFuncExpr extends XPathExpression {
 	public XPathQName id;
@@ -51,7 +54,7 @@ public class XPathFuncExpr extends XPathExpression {
 			if (handler != null) {
 				return evalCustomFunction(handler, argVals);
 			} else {
-				throw new RuntimeException("XPath evaluation: no handler for function [" + name + "]");
+				throw new XPathUnhandledException("function \'" + name + "\'");
 			}
 		}
 	}
@@ -70,7 +73,7 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (handler.rawArgs()) {
 			return handler.eval(args);
 		} else {
-			throw new RuntimeException("XPath evaluation: type mismatch for function [" + handler.getName() + "]");
+			throw new XPathTypeMismatchException("for function \'" + handler.getName() + "\'");
 		}
 	}
 	
@@ -97,7 +100,7 @@ public class XPathFuncExpr extends XPathExpression {
 						} else if (prototype[i] == Date.class) {
 							typed[i] = toDate(args[i]);
 						}
-					} catch (RuntimeException re) { /* swallow type mismatch exception */ }
+					} catch (XPathTypeMismatchException xptme) { /* swallow type mismatch exception */ }
 				}
 
 				if (typed[i] == null)
@@ -109,62 +112,86 @@ public class XPathFuncExpr extends XPathExpression {
 	}
 	
 	public static Boolean toBoolean (Object o) {
+		Boolean val = null;
+		
 		if (o instanceof Boolean) {
-			return (Boolean)o;
+			val = (Boolean)o;
 		} else if (o instanceof Double) {
 			double d = ((Double)o).doubleValue();
-			return new Boolean(Math.abs(d) > 1.0e-12 && !Double.isNaN(d));
+			val = new Boolean(Math.abs(d) > 1.0e-12 && !Double.isNaN(d));
 		} else if (o instanceof String) {
 			String s = (String)o;
-			return new Boolean(s.length() > 0);
+			val = new Boolean(s.length() > 0);
+		} else if (o instanceof IExprDataType) {
+			val = ((IExprDataType)o).toBoolean();
+		}
+		
+		if (val != null) {
+			return val;
 		} else {
-			throw new RuntimeException("XPath evaluation: type mismatch [cannot convert to boolean]");
+			throw new XPathTypeMismatchException("converting to boolean");
 		}
 	}
 	
 	public static Double toNumeric (Object o) {
+		Double val = null;
+		
 		if (o instanceof Boolean) {
-			return new Double(((Boolean)o).booleanValue() ? 1 : 0);
+			val = new Double(((Boolean)o).booleanValue() ? 1 : 0);
 		} else if (o instanceof Double) {
-			return (Double)o;
+			val = (Double)o;
 		} else if (o instanceof String) {
 			String s = (String)o;
 			double d;
 			try {
 				d = Double.parseDouble(s.trim());
+				val = new Double(d);
 			} catch (NumberFormatException nfe) {
-				return new Double(Double.NaN);
+				val = new Double(Double.NaN);
 			}
-			return new Double(d);
 		} else if (o instanceof Date) {
-			return new Double((((Date)o).getTime() - DateUtils.getDateFromString("1970-01-01").getTime()) / 86400000l);
+			val = new Double((((Date)o).getTime() - DateUtils.getDateFromString("1970-01-01").getTime()) / 86400000l);
+		} else if (o instanceof IExprDataType) {
+			val = ((IExprDataType)o).toNumeric();
+		}
+		
+		if (val != null) {
+			return val;
 		} else {
-			throw new RuntimeException("XPath evaluation: type mismatch [cannot convert to numeric]");
+			throw new XPathTypeMismatchException("converting to numeric");
 		}
 	}
 
 	public static String toString (Object o) {
+		String val = null;
+		
 		if (o instanceof Boolean) {
-			return (((Boolean)o).booleanValue() ? "true" : "false");
+			val = (((Boolean)o).booleanValue() ? "true" : "false");
 		} else if (o instanceof Double) {
 			double d = ((Double)o).doubleValue();
 			if (Double.isNaN(d)) {
-				return "NaN";
+				val = "NaN";
 			} else if (Math.abs(d) < 1.0e-12) {
-				return "0";
+				val = "0";
 			} else if (Double.isInfinite(d)) {
-				return (d < 0 ? "-" : "") + "Infinity";
+				val = (d < 0 ? "-" : "") + "Infinity";
 			} else if (Math.abs(d - (int)d) < 1.0e-12) {
-				return String.valueOf((int)d);
+				val = String.valueOf((int)d);
 			} else {
-				return String.valueOf(d);
+				val = String.valueOf(d);
 			}
 		} else if (o instanceof String) {
-			return (String)o;
+			val = (String)o;
 		} else if (o instanceof Date) {
-			return DateUtils.getXMLStringValue((Date)o);
+			val = DateUtils.getXMLStringValue((Date)o);
+		} else if (o instanceof IExprDataType) {
+			val = ((IExprDataType)o).toString();
+		}
+			
+		if (val != null) {
+			return val;
 		} else {
-			throw new RuntimeException("XPath evaluation: type mismatch [cannot convert to string]");
+			throw new XPathTypeMismatchException("converting to string");
 		}
 	}
 
@@ -176,14 +203,14 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (o instanceof String) {
 			Date d = DateUtils.getDateFromString((String)o);
 			if (d == null) {
-				throw new RuntimeException("XPath evaluation: type mismatch [cannot convert to date]");
+				throw new XPathTypeMismatchException("converting to date");
 			} else {
 				return d;
 			}
 		} else if (o instanceof Date) {
 			return (Date)o;
 		} else {
-			throw new RuntimeException("XPath evaluation: type mismatch [cannot convert to date]");
+			throw new XPathTypeMismatchException("converting to date");
 		}
 	}
 

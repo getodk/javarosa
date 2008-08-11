@@ -11,6 +11,7 @@ import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
+import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathPathExpr extends XPathExpression {
 	public static final int INIT_CONTEXT_ROOT = 0;
@@ -39,14 +40,18 @@ public class XPathPathExpr extends XPathExpression {
 		StringBuffer sb = new StringBuffer();
 		
 		if (init_context == INIT_CONTEXT_EXPR)
-			throw new RuntimeException("XPath evaluation: unsupported construct [path expression with expression as root]");
+			throw new XPathUnsupportedException("path expression with expression as root");
 		
 		if (init_context == INIT_CONTEXT_ROOT)
 			sb.append("/");
 		
 		for (int i = 0; i < steps.length; i++) {
-			if (steps[i].axis != XPathStep.AXIS_CHILD || steps[i].test != XPathStep.TEST_NAME || steps[i].predicates.length > 0)
-				throw new RuntimeException("XPath evaluation: unsupported construct [predicates in path expression]");
+			if (steps[i].axis != XPathStep.AXIS_CHILD)
+				throw new XPathUnsupportedException("non-child axis");		
+			if (steps[i].test != XPathStep.TEST_NAME)
+				throw new XPathUnsupportedException("node test other than name");				
+			if (steps[i].predicates.length > 0)
+				throw new XPathUnsupportedException("predicates in path expression");
 			
 			sb.append(steps[i].name.toString());
 			if (i < steps.length - 1)
@@ -74,7 +79,7 @@ public class XPathPathExpr extends XPathExpression {
 		} else if (val instanceof DateData) {
 			return val.getValue();
 		} else {
-			throw new RuntimeException("XPath evaluation: cannot handle datatype");
+			return val.getValue();
 		}
 	}
 

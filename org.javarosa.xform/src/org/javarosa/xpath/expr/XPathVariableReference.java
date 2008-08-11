@@ -1,6 +1,7 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathVariableReference extends XPathExpression {
     public XPathQName id;
@@ -10,7 +11,7 @@ public class XPathVariableReference extends XPathExpression {
     }
     
 	public Object eval (IFormDataModel model) {
-		throw new RuntimeException("XPath evaluation: unsupported construct [variable reference]");
+		throw new XPathUnsupportedException("variable reference");
 	}
 
 }
