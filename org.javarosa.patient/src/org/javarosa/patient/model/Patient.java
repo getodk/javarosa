@@ -11,6 +11,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.Map;
 import org.javarosa.core.util.UnavailableExternalizerException;
@@ -31,7 +32,7 @@ import org.javarosa.util.Utilities;
  * @author daniel/ctsims(temp)
  *
  */
-public class Patient implements Externalizable {
+public class Patient implements Externalizable, IDRecordable {
 	public static final int SEX_MALE = 1;
 	public static final int SEX_FEMALE = 2;
 	public static final int SEX_UNKNOWN = 3;
