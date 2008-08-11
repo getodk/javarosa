@@ -411,7 +411,19 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 				for (int i = 0; i < conditionList.size(); i++)
 					this.addCondition((Condition)conditionList.elementAt(i));
 			}
-			initializeConditions();
+		}
+	}
+
+	//meant to be called after deserialization and initialization of handlers
+	public void initialize (boolean newInstance) {
+		if (newInstance) {//only preload new forms (we may have to revisit this)
+			preloadModel();
+		}
+		
+		initializeConditions();
+		
+		if (getLocalizer() != null && getLocalizer().getLocale() == null) {
+			getLocalizer().setToDefault();
 		}
 	}
 
