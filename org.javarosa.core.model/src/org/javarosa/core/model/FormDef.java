@@ -3,24 +3,20 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.model.utils.QuestionPreloader;
-import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.xpath.EvaluationContext;
 
 /**
  * Definition of a form. This has some meta data about the form definition and  
@@ -39,6 +35,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private IFormDataModel model;
 
 	private Hashtable conditionTriggerIndex; /* String (xpath reference) -> Vector of Condition */
+	private EvaluationContext conditionEvalContext;
 	
 	private QuestionPreloader preloader = new QuestionPreloader();
 	private PrototypeFactory modelFactory;
@@ -196,7 +193,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 
 	public void initializeConditions () {
 		for (int i = 0; i < conditions.size(); i++) {
-			((Condition)conditions.elementAt(i)).eval(model);
+			((Condition)conditions.elementAt(i)).eval(model, conditionEvalContext);
 		}
 	}
 	
@@ -208,8 +205,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		
 		for (int i = 0; i < conditions.size(); i++) {
 			Condition condition = (Condition)conditions.elementAt(i);
-			condition.eval(model);
+			condition.eval(model, conditionEvalContext);
 		}
+	}
+	
+	public void setEvaluationContext (EvaluationContext ec) {
+		this.conditionEvalContext = ec;
 	}
 	
 	//doesn't know about groups right now

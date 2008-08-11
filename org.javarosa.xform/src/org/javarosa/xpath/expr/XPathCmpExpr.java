@@ -1,6 +1,7 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.xpath.EvaluationContext;
 
 public class XPathCmpExpr extends XPathBinaryOpExpr {
 	public static final int LT = 0;
@@ -15,9 +16,9 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 		this.op = op;
 	}
 	
-	public Object eval (IFormDataModel model) {
-		Object aval = a.eval(model);
-		Object bval = b.eval(model);
+	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
+		Object aval = a.eval(model, evalContext);
+		Object bval = b.eval(model, evalContext);
 		boolean result = false;
 
 		//xpath spec says comparisons only defined for numbers (not defined for strings)

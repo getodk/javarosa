@@ -1,10 +1,11 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.xpath.EvaluationContext;
 
 public abstract class XPathExpression {
 
-	public abstract Object eval (IFormDataModel model);
+	public abstract Object eval (IFormDataModel model, EvaluationContext evalContext);
 	
 	/*======= DEBUGGING ========*/
 	// do not compile onto phone
