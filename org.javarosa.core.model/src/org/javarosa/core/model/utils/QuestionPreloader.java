@@ -184,11 +184,10 @@ public class QuestionPreloader {
 	private IAnswerData preloadProperty(String preloadParams) {
 		String propname = preloadParams;
 		String propval = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(propname);
-		String preloadVal = null;
+		StringData data = null;
 		if (propval != null && propval.length() > 0) {
-			preloadVal = propval;
+			data = new StringData(propval);
 		}
-		StringData data = new StringData(preloadVal);
 		return data;
 	}
 	
