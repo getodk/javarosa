@@ -21,10 +21,10 @@ import org.kxml2.kdom.Node;
 /**
  * A visitor class which walks a DataModelTree and constructs an XML document
  * containing its instance.
- * 
+ *
  * The XML node elements are constructed in a depth-first manner, consistent with
  * standard XML document parsing.
- * 
+ *
  * @author Clayton Sims
  *
  */
@@ -32,13 +32,13 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 
 	/** The XML document containing the instance that is to be returned */
 	Document theXmlDoc;
-	
+
 	/** A hashtable linking TreeElements to the xml element that they should add themselves to */
 	Hashtable parentList;
-	
+
 	/** The serializer to be used in constructing XML for AnswerData elements */
 	IAnswerDataSerializer serializer;
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.DataModelTree)
@@ -54,10 +54,18 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.QuestionDataElement)
 	 */
 	public void visit(QuestionDataElement element) {
-		
+
 		//First create the textual element for this question data
 		Element text = new Element();
-		text.setName(element.getName()); 
+		text.setName(element.getName());
+		// add attributes
+		for(int i = 0; i<element.getAttributeCount();i++){
+			String namespace= element.getAttributeNamespace(i);
+			String name		= element.getAttributeName(i);
+			String val		= element.getAttributeValue(i);
+			text.setAttribute(namespace, name, val);
+		}
+
 		//(I think that the below is right. I could be very wrong, and it could
 		//require us to create a new element, instead of throwing the string in)
 		if(serializer == null) {
@@ -68,12 +76,12 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 			text.addChild(Element.TEXT, serializedAnswerData);
 		} else if(serializedAnswerData instanceof Element) {
 			text.addChild(Element.ELEMENT, serializedAnswerData);
-			
+
 		}
 
 		//Attach to parent
 		Node parentNode = (Node)parentList.get(element);
-		
+
 		if(parentNode != null) {
 			parentNode.addChild(Element.ELEMENT, text);
 		}
@@ -86,15 +94,15 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	public void visit(QuestionDataGroup element) {
 		Element thisNode = new Element();
 		thisNode.setName(element.getName());
-		
+
 		Node parentNode = (Node)parentList.get(element);
-		
+
 		if(parentNode != null) {
 			parentNode.addChild(Element.ELEMENT, thisNode);
 		}
-		
+
 		Enumeration en = element.getChildren().elements();
-		while (en.hasMoreElements()){ 
+		while (en.hasMoreElements()){
 			parentList.put(en.nextElement(), thisNode);
 		}
 	}
@@ -105,7 +113,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	 */
 	public void visit(TreeElement element) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/*
@@ -131,10 +139,10 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	 */
 	public void visit(IFormDataModel dataModel) {
 		if(dataModel.getClass() == DataModelTree.class) {
-			this.visit((DataModelTree)dataModel); 
+			this.visit((DataModelTree)dataModel);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.IDataModelSerializingVisitor#setAnswerDataSerializer(org.javarosa.core.model.IAnswerDataSerializer)

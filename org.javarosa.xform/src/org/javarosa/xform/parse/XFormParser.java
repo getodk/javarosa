@@ -34,35 +34,35 @@ import org.xmlpull.v1.XmlPullParser;
 
 /**
  * Provides conversion from xform to epihandy object model and vice vasa.
- * 
+ *
  * @author Daniel Kayiwa
  *
  */
 public class XFormParser {
 	public static final String NAMESPACE_JAVAROSA = "http://openrosa.org/javarosa";
-	
+
 	private static Hashtable topLevelHandlers;
 	private static Hashtable groupLevelHandlers;
 	private static Hashtable typeMappings;
 	private static PrototypeFactory modelPrototypes;
-	
+
 	/** IXFormBindHaandler */
 	private static Vector bindHandlers;
-	
+
 	/* THIS CLASS IS NOT THREAD-SAFE */
 	//state variables -- not a good idea since this class is static, but that's not really a good idea either, now is it
 	private static boolean modelFound;
 	private static Hashtable bindingsByID;
 	private static Hashtable bindingsByRef; //key is the xpath ref string, not the IDataReference object
 	private static Element instanceNode;
-	
+
 	static {
 		initProcessingRules();
 		initTypeMappings();
 		modelPrototypes = new PrototypeFactory();
 		bindHandlers = new Vector();
 	}
-	
+
 	/**
 	 * Default Constructor
 	 *
@@ -70,7 +70,7 @@ public class XFormParser {
 	public XFormParser(){
 
 	}
-	
+
 	private static void initProcessingRules () {
 		IElementHandler title = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseTitle(f, e); } };
@@ -85,12 +85,12 @@ public class XFormParser {
 		IElementHandler group = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseGroup((IFormElement)parent, e, f, CONTAINER_GROUP); } };
 		IElementHandler repeat = new IElementHandler () {
-			public void handle (FormDef f, Element e, Object parent) { parseGroup((IFormElement)parent, e, f, CONTAINER_REPEAT); } };		
+			public void handle (FormDef f, Element e, Object parent) { parseGroup((IFormElement)parent, e, f, CONTAINER_REPEAT); } };
 		IElementHandler groupLabel = new IElementHandler () {
-			public void handle (FormDef f, Element e, Object parent) { parseGroupLabel(f, (GroupDef)parent, e); } };					
+			public void handle (FormDef f, Element e, Object parent) { parseGroupLabel(f, (GroupDef)parent, e); } };
 		IElementHandler trigger = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, Constants.CONTROL_TRIGGER); } };
-			
+
 		groupLevelHandlers = new Hashtable();
 		groupLevelHandlers.put("input", input);
 		groupLevelHandlers.put("select", select);
@@ -98,7 +98,7 @@ public class XFormParser {
 		groupLevelHandlers.put("group", group);
 		groupLevelHandlers.put("repeat", repeat);
 		groupLevelHandlers.put("trigger", trigger);
-		
+
 		topLevelHandlers = new Hashtable();
 		for (Enumeration en = groupLevelHandlers.keys(); en.hasMoreElements(); ) {
 			String key = (String)en.nextElement();
@@ -106,10 +106,10 @@ public class XFormParser {
 		}
 		topLevelHandlers.put("model", model);
 		topLevelHandlers.put("title", title);
-		
+
 		groupLevelHandlers.put("label", groupLabel);
 	}
-	
+
 	private static void initTypeMappings () {
 		typeMappings = new Hashtable();
 		typeMappings.put("xsd:string", new Integer(Constants.DATATYPE_TEXT));
@@ -131,14 +131,14 @@ public class XFormParser {
 		typeMappings.put("xsd:hexBinary", new Integer(Constants.DATATYPE_UNSUPPORTED));
 		typeMappings.put("xsd:anyURI", new Integer(Constants.DATATYPE_UNSUPPORTED));
 	}
-	
+
 	private static void initStateVars () {
 		modelFound = false;
 		bindingsByID = new Hashtable();
 		bindingsByRef = new Hashtable();
 		instanceNode = null;
 	}
-		
+
 	public static FormDef getFormDef (Reader reader) {
 		Document doc = getXMLDocument(reader);
 		try {
@@ -146,7 +146,7 @@ public class XFormParser {
 		} catch(Exception e) {
 			e.printStackTrace();
 			return null;
-		}		
+		}
 	}
 
 	public static Document getXMLDocument(Reader reader){
@@ -160,7 +160,7 @@ public class XFormParser {
 			doc.parse(parser);
 		} catch(Exception e){
 			System.err.println("XML Syntax Error!");
-			
+
 			e.printStackTrace();
 		}
 
@@ -171,32 +171,32 @@ public class XFormParser {
 		FormDef formDef = new FormDef();
 
 		initStateVars();
-		
+
 //		Hashtable id2VarNameMap = new Hashtable();
 //		Hashtable relevants = new Hashtable();
-		
+
 		parseElement(formDef, doc.getRootElement(), formDef, topLevelHandlers);
-		
+
 //		addSkipRules(formDef,id2VarNameMap,relevants);
-		
+
 		if(instanceNode != null) {
 			parseInstance(formDef, instanceNode);
 		}
-		
+
 		verifyBindings(formDef);
-		
+
 		initStateVars();
-		
+
 		return formDef;
 	}
 
 	private static final int CONTAINER_GROUP = 1;
 	private static final int CONTAINER_REPEAT = 2;
-	
+
 	private static void parseElement (FormDef f, Element e, Object parent, Hashtable handlers) { //,
 //			boolean allowUnknownElements, boolean allowText, boolean recurseUnknown) {
 		String name = e.getName();
-		
+
 		IElementHandler eh = (IElementHandler)handlers.get(name);
 		if (eh != null) {
 			eh.handle(f, e, parent);
@@ -208,16 +208,16 @@ public class XFormParser {
 				if (e.getType(i) == Element.ELEMENT) {
 					parseElement(f, e.getElement(i), parent, handlers);
 				}
-			}			
+			}
 		}
 	}
-	
+
 	private static void parseTitle (FormDef f, Element e) {
 		//Removed a line here about the form title not being null. Couldn't possibly think
 		//of why that would make sense. CTS - 7/21/2008
 		f.setName(getXMLText(e, true));
 	}
-	
+
 	//for ease of parsing, we assume a model comes before the controls, which isn't necessarily mandated by the xforms spec
 	private static void parseModel (FormDef f, Element e) {
 		if (modelFound) {
@@ -225,12 +225,12 @@ public class XFormParser {
 			return;
 		}
 		modelFound = true;
-		
+
 		for (int i = 0; i < e.getChildCount(); i++) {
 			int type = e.getType(i);
 			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
 			String childName = (child != null ? child.getName() : null);
-			
+
 			if ("itext".equals(childName)) {
 				parseIText(f, child);
 			} else if ("instance".equals(childName)) {
@@ -246,14 +246,14 @@ public class XFormParser {
 			}
 		}
 	}
-	
+
 	private static int serialQuestionID = 1;
-	
+
 	protected static QuestionDef parseControl (IFormElement parent, Element e, FormDef f, int controlType) {
 		QuestionDef question = new QuestionDef();
 		DataBinding binding = null;
 		question.setID(serialQuestionID++); //until we come up with a better scheme
-		
+
 		String ref = e.getAttributeValue(null, "ref");
 		String bind = e.getAttributeValue(null, "bind");
 
@@ -275,20 +275,20 @@ public class XFormParser {
 				question.setDataType(Constants.DATATYPE_NULL);
 			}
 		}
-		
+
 		if (binding != null) {
 			attachBind(f, question, binding);
 		}
-		
+
 		question.setControlType(controlType);
-		
+
 		question.setAppearanceAttr(e.getAttributeValue(null, "appearance"));
-		
+
 		for (int i = 0; i < e.getChildCount(); i++) {
 			int type = e.getType(i);
 			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
 			String childName = (child != null ? child.getName() : null);
-			
+
 			if ("label".equals(childName)) {
 				parseQuestionLabel(f, question, child);
 			} else if ("hint".equals(childName)) {
@@ -297,12 +297,12 @@ public class XFormParser {
 					    controlType == Constants.CONTROL_SELECT_ONE) && "item".equals(childName)) {
 				parseItem(f, question, child);
 			}
-		}	
-		
+		}
+
 		parent.addChild(question);
 		return question;
 	}
-	
+
 	private static void parseQuestionLabel (FormDef f, QuestionDef q, Element e) {
 		String label = getXMLText(e, true);
 		String ref = e.getAttributeValue("", "ref");
@@ -321,7 +321,7 @@ public class XFormParser {
 			}
 		} else {
 			q.setLongText(label);
-			q.setShortText(label);			
+			q.setShortText(label);
 		}
 	}
 
@@ -343,18 +343,18 @@ public class XFormParser {
 			}
 		} else {
 			g.setLongText(label);
-			g.setShortText(label);			
+			g.setShortText(label);
 		}
 	}
-	
+
 	private static void parseHint (FormDef f, QuestionDef q, Element e) {
 		String hint = getXMLText(e, true);
 		String ref = e.getAttributeValue("", "ref");
-		
+
 		if (ref != null) {
 			if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
 				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
-				
+
 				if (!hasITextMapping(f, textRef))
 					throw new XFormParseException("<hint> text is not localizable for all locales for reference " + textRef);
 				q.setHelpTextID(textRef, null);
@@ -362,28 +362,28 @@ public class XFormParser {
 				throw new RuntimeException("malformed ref for <hint>");
 			}
 		} else {
-			q.setHelpText(hint);			
+			q.setHelpText(hint);
 		}
 	}
-	
+
 	private static void parseItem (FormDef f, QuestionDef q, Element e) {
 		String label = null;
 		String textRef = null;
 		String value = null;
-		
+
 		for (int i = 0; i < e.getChildCount(); i++) {
 			int type = e.getType(i);
 			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
 			String childName = (child != null ? child.getName() : null);
-			
+
 			if ("label".equals(childName)) {
 				label = getXMLText(child, true);
 				String ref = child.getAttributeValue("", "ref");
-				
+
 				if (ref != null) {
 					if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
 						textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
-						
+
 						if (!hasITextMapping(f, textRef))
 							throw new XFormParseException("<label> text is not localizable for all locales");
 					} else {
@@ -398,81 +398,81 @@ public class XFormParser {
 		if ((textRef == null && label == null) || value == null) {
 			throw new XFormParseException("<item> without proper <label> or <value>");
 		}
-		
+
 		if (textRef != null) {
 			q.addSelectItemID(textRef, true, value);
 		} else {
 			q.addSelectItemID(label, false, value);
 		}
 	}
-	
+
 	private static void parseGroup (IFormElement parent, Element e, FormDef f, int groupType) {
 		GroupDef group = new GroupDef();
 
 		if (groupType == CONTAINER_REPEAT) {
 			group.setRepeat(true);
 		}
-		
+
 		//binding
-		
+
 		parseElement(f, e, group, groupLevelHandlers);
-		
+
 		parent.addChild(group);
 	}
-	
+
 	/**
 	 * KNOWN ISSUES WITH ITEXT
-	 * 
+	 *
 	 * 'long' and 'short' forms of text are only supported for input control labels at this time. all other
 	 * situations (<hint> tags, <label>s within <item>s, etc.) should only reference text handles that have
 	 * only the single, default form.
 	 */
-	
+
 	private static void parseIText (FormDef f, Element itext) {
 		Localizer l = new Localizer(true, true);
 		f.setLocalizer(l);
 		l.registerLocalizable(f);
-		
+
 		for (int i = 0; i < itext.getChildCount(); i++) {
 			Element trans = itext.getElement(i);
 			if (trans == null || !trans.getName().equals("translation"))
 				continue;
-			
+
 			parseTranslation(l, trans);
 		}
-		
+
 		if (l.getAvailableLocales().length == 0)
 			throw new XFormParseException("no <translation>s defined");
-		
+
 		if (l.getDefaultLocale() == null)
 			l.setDefaultLocale(l.getAvailableLocales()[0]);
 	}
-		
+
 	private static void parseTranslation (Localizer l, Element trans) {
 		String lang = trans.getAttributeValue("", "lang");
 		if (lang == null || lang.length() == 0)
 			throw new XFormParseException("no language specified for <translation>");
 		String isDefault = trans.getAttributeValue("", "default");
-		
+
 		if (!l.addAvailableLocale(lang))
 			throw new XFormParseException("duplicate <translation> for same language");
-		
+
 		if (isDefault != null) {
 			if (l.getDefaultLocale() != null)
 				throw new XFormParseException("more than one <translation> set as default");
 			l.setDefaultLocale(lang);
 		}
-		
+
 		for (int j = 0; j < trans.getChildCount(); j++) {
 			Element text = trans.getElement(j);
 			if (text == null || !text.getName().equals("text"))
 				continue;
-			
+
 			parseTextHandle(l, lang, text);
 		}
-		
+
 	}
-		
+
 	private static void parseTextHandle (Localizer l, String locale, Element text) {
 		String id = text.getAttributeValue("", "id");
 		if (id == null || id.length() == 0)
@@ -501,22 +501,22 @@ public class XFormParser {
 		Localizer l = form.getLocalizer();
 		return l.hasMapping(l.getDefaultLocale(), textID);
 	}
-	
+
 	private static void parseBind (FormDef f, Element e) {
 		DataBinding binding  = new DataBinding();
 
 		binding.setId(e.getAttributeValue("", "id"));
-		
+
 		String nodeset = e.getAttributeValue(null, "nodeset");
 		if (nodeset == null) {
 			throw new XFormParseException("XForm Parse: <bind> without nodeset");
 		}
 		binding.setReference(new XPathReference(nodeset));
-		
+
 		binding.setDataType(getDataType(e.getAttributeValue(null, "type")));
-		
+
 		//constraints
-		
+
 		String xpathRel = e.getAttributeValue(null, "relevant");
 		if (xpathRel != null) {
 			if ("true()".equals(xpathRel)) {
@@ -529,7 +529,7 @@ public class XFormParser {
 				binding.relevancyCondition = c;
 			}
 		}
-		
+
 		String xpathReq = e.getAttributeValue(null, "required");
 		if (xpathReq != null) {
 			if ("true()".equals(xpathReq)) {
@@ -541,8 +541,8 @@ public class XFormParser {
 				c = f.addCondition(c);
 				binding.requiredCondition = c;
 			}
-		}	
-	
+		}
+
 		String xpathRO = e.getAttributeValue(null, "readonly");
 		if (xpathRO != null) {
 			if ("true()".equals(xpathRO)) {
@@ -554,24 +554,24 @@ public class XFormParser {
 				c = f.addCondition(c);
 				binding.readonlyCondition = c;
 			}
-		}	
-		
+		}
+
 		binding.setPreload(e.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
 		binding.setPreloadParams(e.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
-		
+
 		Enumeration en = bindHandlers.elements();
 		while(en.hasMoreElements()) {
 			IXFormBindHandler handler = (IXFormBindHandler)en.nextElement();
 			handler.handle(e, binding);
 		}
-	
+
 		addBinding(f, binding);
 	}
-	
+
 	private static Condition buildCondition (String xpath, String type) {
 		XPathExpression expr;
 		int trueAction = -1, falseAction = -1;
-		
+
 		if ("relevant".equals(type)) {
 			trueAction = Condition.ACTION_SHOW;
 			falseAction = Condition.ACTION_HIDE;
@@ -582,19 +582,19 @@ public class XFormParser {
 			trueAction = Condition.ACTION_DISABLE;
 			falseAction = Condition.ACTION_ENABLE;
 		}
-		
+
 		try {
 			expr = XPathTest.parseXPath(xpath);
 		} catch (XPathSyntaxException xse) {
 			System.err.println("Invalid XPath expression [" + xpath + "]!");
 			return null;
 		}
-		
+
 		Condition c = new Condition(expr, trueAction, falseAction);
 		c.xpath = xpath;
 		return c;
 	}
-	
+
 	private static void addBinding (FormDef f, DataBinding binding) {
 		f.addBinding(binding);
 		if (binding.getId() != null) {
@@ -610,26 +610,26 @@ public class XFormParser {
 			q.setBind(binding.getReference());
 		}
 
-		q.setDataType(binding.getDataType());	
+		q.setDataType(binding.getDataType());
 		//constraints?
-		
+
 		if (binding.relevancyCondition != null) {
 			binding.relevancyCondition.addAffectedQuestion(q);
 		}
-		
+
 		if (binding.requiredCondition != null) {
 			binding.requiredCondition.addAffectedQuestion(q);
 		} else {
 			q.setRequired(binding.requiredAbsolute);
 		}
-		
+
 		if (binding.readonlyCondition != null) {
 			binding.readonlyCondition.addAffectedQuestion(q);
 		} else {
 			q.setEnabled(!binding.readonlyAbsolute);
-		}		
+		}
 	}
-	
+
 	//will check that all <bind>s and refs refer to nodes that actually exist in the instance
 	//not complete
 	private static void verifyBindings (FormDef f) {
@@ -637,13 +637,13 @@ public class XFormParser {
 //		for (Enumeration e = bindings.elements(); e.hasMoreElements(); ) {
 //			IDataReference ref = ((DataBinding)e.nextElement()).getReference();
 //			f.getDataModel().
-//			
+//
 //		}
-//		
+//
 //		f.getBindings();
-//		
+//
 	}
-	
+
 	private static void parseInstance (FormDef f, Element e) {
 		Element dataElement = null;
 		for (int i = 0; i < e.getChildCount(); i++) {
@@ -661,14 +661,14 @@ public class XFormParser {
 		instanceModel.setName(f.getName());
 		f.setDataModel(instanceModel);
 	}
-	
+
 	private static TreeElement parseInstanceNodes (Element node, String currentPath) {
 		int childNum = node.getChildCount();
 
 		TreeElement element = null;
 		String refStr = currentPath + node.getName();
 		XPathReference reference = new XPathReference(refStr);
-		
+
 		if (bindingsByRef.containsKey(refStr)) {
 			DataBinding binding = (DataBinding) bindingsByRef.get(refStr);
 			// This node, and its children represent some sort of Question
@@ -683,7 +683,7 @@ public class XFormParser {
 			} catch (InstantiationException e) {
 				e.printStackTrace();
 			}
-			
+
 			if(element == null) {
 				//Nothing special happened when we tried to instantiate. This is just a normal question
 				element = new QuestionDataElement(node.getName(), reference);
@@ -715,7 +715,7 @@ public class XFormParser {
 		} else {
 			// This is a Group of elements, and has no bindings, so its
 			// children are responsible for the rest.
-			
+
 			if(element == null) {
 				element = new QuestionDataGroup(node.getName());
 			}
@@ -730,16 +730,26 @@ public class XFormParser {
 				}
 			}
 		}
+
+		// Does it have any attributes??
+		if(node.getAttributeCount()>0){
+			for(int i=0; i<node.getAttributeCount();i++){
+				element.setAttribute(node.getAttributeNamespace(i), node.getAttributeName(i), node.getAttributeValue(i));
+				//#if debug.output==verbose
+				System.out.println(element.getName()+ " has added ATT: "+element.getAttributeName(i)+"="+element.getAttributeValue(i));
+				//#endif
+			}
+		}
 		return element;
 	}
 
 	private static int getDataType(String type) {
 		int dataType = -1;
-		
+
 		if (type != null && typeMappings.containsKey(type)) {
 			dataType = ((Integer)typeMappings.get(type)).intValue();
 		}
-		
+
 		if (dataType <= 0) {
 			if (type != null) {
 				//#if debug.output==verbose
@@ -748,14 +758,14 @@ public class XFormParser {
 			}
 			dataType = Constants.DATATYPE_TEXT;
 		}
-		
+
 		return dataType;
 	}
-	
+
 	public static void addModelPrototype(int type, TreeElement element) {
 		modelPrototypes.addNewPrototype(String.valueOf(type), element.getClass());
 	}
-	
+
 	public static void addDataType (String type, int dataType) {
 		typeMappings.put(type, new Integer(dataType));
 	}
@@ -765,12 +775,12 @@ public class XFormParser {
 		topLevelHandlers.put(type, newHandler);
 		groupLevelHandlers.put(type, newHandler);
 	}
-	
+
 	public static void registerHandler(String type, IElementHandler handler) {
 		topLevelHandlers.put(type, handler);
 		groupLevelHandlers.put(type, handler);
 	}
-	
+
 	public static void registerBindHandler(IXFormBindHandler handler) {
 		bindHandlers.addElement(handler);
 	}
@@ -778,29 +788,29 @@ public class XFormParser {
 	public static String getXMLText (Node n, boolean trim) {
 		return (n.getChildCount() == 0 ? null : getXMLText(n, 0, trim));
 	}
-	
+
 	//reads all subsequent text nodes and returns the combined string
 	//needed because escape sequences are parsed into consecutive text nodes
 	//e.g. "abc&amp;123" --> (abc)(&)(123)
 	public static String getXMLText (Node node, int i, boolean trim) {
 		StringBuffer strBuff = null;
-		
+
 		String text = node.getText(i);
 		if (text == null)
 			return null;
-		
+
 		for (i++; i < node.getChildCount() && node.getType(i) == Node.TEXT; i++) {
 			if (strBuff == null)
 				strBuff = new StringBuffer(text);
 
 			strBuff.append(node.getText(i));
-		}			
+		}
 		if (strBuff != null)
 			text = strBuff.toString();
-		
+
 		if (trim)
 			text = text.trim();
-		
+
 		return text;
 	}
 //	private static void addSkipRules(FormDef formDef, Hashtable map, Hashtable relevants){
@@ -848,7 +858,7 @@ public class XFormParser {
 //
 //		formDef.setRules(rules);
 //	}
-	
+
 //	private static void setDefaultValues(Element dataNode,FormDef formDef,Hashtable id2VarNameMap){
 //		String id, val;
 //		Enumeration keys = id2VarNameMap.keys();
@@ -862,7 +872,7 @@ public class XFormParser {
 //				def.setDefaultValue(val);
 //		}
 //	}
-	
+
 //	private static String getNodeTextValue(Element dataNode,String name){
 //		Element node = getNode(dataNode,name);
 //		return getTextValue(node);
@@ -883,10 +893,10 @@ public class XFormParser {
 //
 //		return null;
 //	}
-	
+
 //	/**
 //	 * Gets a child element of a parent node with a given name.
-//	 * 
+//	 *
 //	 * @param parent - the parent element
 //	 * @param name - the name of the child.
 //	 * @return - the child element.
