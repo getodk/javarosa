@@ -218,6 +218,7 @@ public class JavaRosaDemoShell implements IShell {
 		formEntryContext.setFormID(formID);
 		if (instanceID != -1)
 			formEntryContext.setInstanceID(instanceID);
+		formEntryContext.addFunctionHandler(new TestFunctionHandler()); //testing out custom function handlers in conditions
 
 		launchActivity(entryActivity, formEntryContext);
 	}

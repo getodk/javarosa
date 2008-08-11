@@ -53,6 +53,10 @@ public class Condition implements Externalizable {
 	}
 	
 	public void eval (IFormDataModel model, EvaluationContext evalContext) {
+		if (evalContext == null) {
+			evalContext = new EvaluationContext();
+		}	
+			
 		boolean result = XPathFuncExpr.toBoolean(expr.eval(model, evalContext)).booleanValue();
 		
 		for (int i = 0; i < affectedQuestions.size(); i++) {

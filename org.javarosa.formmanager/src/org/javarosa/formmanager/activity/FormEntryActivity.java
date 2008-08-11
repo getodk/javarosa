@@ -29,6 +29,8 @@ import org.javarosa.formmanager.controller.IControllerHost;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
+import org.javarosa.xpath.EvaluationContext;
+import org.javarosa.xpath.IFunctionHandler;
 
 public class FormEntryActivity implements IActivity, IControllerHost, CommandListener {
 
@@ -95,40 +97,21 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 					modelUtil.retrieveFromRMS(this.context.getInstanceID(), theModel);
 					theForm.setDataModel(theModel);
 				}
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
-			}
-			catch (IllegalAccessException e) {
+			} catch (IllegalAccessException e) {
 				e.printStackTrace();
-			}
-			catch (InstantiationException e) {
+			} catch (InstantiationException e) {
 				e.printStackTrace();
-			}
-			catch (UnavailableExternalizerException uee) {
+			} catch (UnavailableExternalizerException uee) {
 				uee.printStackTrace();
 			}
 		}
 		if (theForm != null) {
-			if (instanceID == -1) {//only preload new forms (we may have to revisit this)
-				Vector handlers = this.context.getPreloadHandlers();
-				if(handlers != null) {
-					Enumeration en = handlers.elements();
-					while(en.hasMoreElements()) {
-						theForm.getPreloader().addPreloadHandler((IPreloadHandler)en.nextElement());
-					}
-
-				}
-
-				//set handler for preload context
-				 contextHandler = new ContextPreloadHandler(context);
-				theForm.getPreloader().addPreloadHandler(contextHandler);
-
-				theForm.preloadModel();
-			}
-			if (theForm.getLocalizer() != null && theForm.getLocalizer().getLocale() == null) {
-				theForm.getLocalizer().setToDefault();
-			}
+			theForm.setEvaluationContext(initEvaluationContext());
+			initPreloadHandlers(theForm); //must always load; even if we won't preload, we may still post-process!
+			
+			theForm.initialize(instanceID == -1);			
 
 			model = new FormEntryModel(theForm, instanceID);
 			controller = new FormEntryController(model, this);
@@ -142,6 +125,33 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		}
 	}
 
+	private void initPreloadHandlers (FormDef f) {
+		Vector preloadHandlers = this.context.getPreloadHandlers();
+		if(preloadHandlers != null) {
+			Enumeration en = preloadHandlers.elements();
+			while(en.hasMoreElements()) {
+				f.getPreloader().addPreloadHandler((IPreloadHandler)en.nextElement());
+			}
+		}
+
+		//set handler for preload context
+		contextHandler = new ContextPreloadHandler(context);
+		f.getPreloader().addPreloadHandler(contextHandler);
+	}
+	
+	private EvaluationContext initEvaluationContext () {
+		EvaluationContext ec = new EvaluationContext();
+		
+		Vector functionHandlers = this.context.getFunctionHandlers();
+		if(functionHandlers != null) {
+			Enumeration en = functionHandlers.elements();
+			while(en.hasMoreElements()) {
+				ec.addFunctionHandler((IFunctionHandler)en.nextElement());
+			}
+		}
+		
+		return ec;
+	}
 
 	public void halt () {
 		//need to do anything?

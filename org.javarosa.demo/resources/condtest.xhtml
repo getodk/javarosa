@@ -13,14 +13,18 @@
 		<b>6</b>
 		<c />
 		<d />
+		<e />
+		<f />
 		
 		</data>
 	</instance>
 		
 	<bind id="a" nodeset="/data/a" type="xsd:int" />
 	<bind id="b" nodeset="/data/b" type="xsd:int" />
-	<bind id="c" nodeset="/data/c" relevant="/data/a &lt; 15 and /data/b = 6" />
+	<bind id="c" nodeset="/data/c" relevant="testfunc(/data/a, /data/b) &lt; 35" />
 	<bind id="d" nodeset="/data/d" />
+	<bind id="e" nodeset="/data/e" relevant="testfunc(/data/d) = 'bambam'"  />
+	<bind id="f" nodeset="/data/f" />
 						
     </model>
 </h:head>			
@@ -30,6 +34,8 @@
 <input bind="b"><label>question b</label></input>
 <input bind="c"><label>question c</label></input>
 <input bind="d"><label>question d</label></input>
+<input bind="e"><label>question e</label></input>
+<input bind="f"><label>question f</label></input>
 
 </h:body>
 </h:html>
