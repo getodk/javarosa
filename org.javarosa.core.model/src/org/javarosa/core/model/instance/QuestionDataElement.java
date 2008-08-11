@@ -3,6 +3,7 @@ package org.javarosa.core.model.instance;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.data.IAnswerData;
@@ -13,14 +14,14 @@ import org.javarosa.core.util.UnavailableExternalizerException;
 /**
  * QuestionDataElement is a TreeElement of a DataModelTree that is a leaf which
  * contains the answer to a QuestionDef.
- * 
+ *
  * In an XML Analogy, this represents a terminal element in the XML tree.
- * 
+ *
  * It is important that this question's data reference be set to a template
  * reference before attempting deserialization.
- * 
+ *
  * @author Clayton Sims
- * 
+ *
  */
 public class QuestionDataElement extends TreeElement {
 
@@ -35,11 +36,11 @@ public class QuestionDataElement extends TreeElement {
 	 */
 	public QuestionDataElement() {
 	}
-	
+
 	/**
 	 * Creates a new QuestionDataElement for the question defined by the name
 	 * and reference provided
-	 * 
+	 *
 	 * @param name
 	 *            The name of this TreeElement
 	 * @param reference
@@ -53,7 +54,7 @@ public class QuestionDataElement extends TreeElement {
 	/**
 	 * Creates a new QuestionDataElement for the question defined by the name
 	 * and reference provided, and sets its value to that provided.
-	 * 
+	 *
 	 * @param name
 	 *            The name of this TreeElement
 	 * @param reference
@@ -69,7 +70,7 @@ public class QuestionDataElement extends TreeElement {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.javarosa.core.model.TreeElement#getName()
 	 */
 	public String getName() {
@@ -85,21 +86,21 @@ public class QuestionDataElement extends TreeElement {
 
 	/**
 	 * Sets the value for the question defined by IBinding
-	 * 
+	 *
 	 * @param value
 	 *            The question's answer value
 	 */
 	public void setValue(IAnswerData value) {
 		this.value = value;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.javarosa.core.model.TreeElement#isLeaf()
 	 */
 	public boolean isLeaf() {
@@ -108,7 +109,7 @@ public class QuestionDataElement extends TreeElement {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.javarosa.core.model.TreeElement#setRoot(org.javarosa.core.model.TreeElement)
 	 */
 	protected void setRoot(TreeElement root) {
@@ -117,7 +118,7 @@ public class QuestionDataElement extends TreeElement {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.javarosa.core.model.TreeElement#contains(org.javarosa.core.model.TreeElement)
 	 */
 	public boolean contains(TreeElement element) {
@@ -131,7 +132,7 @@ public class QuestionDataElement extends TreeElement {
 	public void setReference(IDataReference reference) {
 		this.reference = reference;
 	}
-	
+
 	public boolean matchesReference(IDataReference reference) {
 		if (this.reference == null) {
 			return false;
@@ -149,7 +150,7 @@ public class QuestionDataElement extends TreeElement {
 
 	/**
 	 * Visitor pattern acceptance method.
-	 * 
+	 *
 	 * @param visitor
 	 *            The visitor traveling this tree
 	 */
@@ -159,7 +160,7 @@ public class QuestionDataElement extends TreeElement {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in) throws IOException,
@@ -174,6 +175,10 @@ public class QuestionDataElement extends TreeElement {
 					"template available to deserialize the stored reference");
 		}
 		reference.readExternal(in);
+		// read attributes
+		Vector attStrings = ExternalizableHelper.readUTFs(in);
+		setAttributesFromSingleStringVector(attStrings);
+		// read value
 		if(in.readBoolean() == false) {
 			value = null;
 		} else {
@@ -190,7 +195,7 @@ public class QuestionDataElement extends TreeElement {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -200,6 +205,13 @@ public class QuestionDataElement extends TreeElement {
 		ExternalizableHelper.writeUTF(out, this.name);
 		out.writeUTF(reference.getClass().getName());
 		reference.writeExternal(out);
+		// write attributes.
+		// 1. Add attributes to vector as full strings  'qid="82"'
+		Vector attStrings = getSingleStringAttributeVector();
+		// 2. @ writeExternal - call ExternalizableHelper.writeUTFs to write the vector
+		ExternalizableHelper.writeUTFs(attStrings, out);
+		// 3. @ readExternal read from vector
+		// 4. Don't forget you'll need to externalize them in XMLserializer too. :-(
 		if(value == null) {
 			out.writeBoolean(false);
 		}
