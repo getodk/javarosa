@@ -3,10 +3,8 @@ package org.javarosa.patient.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class ImmunizationAnswerData  implements IAnswerData {
