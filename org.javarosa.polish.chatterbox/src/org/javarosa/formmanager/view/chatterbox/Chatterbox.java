@@ -151,7 +151,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		}
     		
     		if (questionIndex != INDEX_NOT_SET) {
-    			((ChatterboxWidget)get(questionIndex)).setViewState(ChatterboxWidget.VIEW_EXPANDED);    
+    			((ChatterboxWidget)get(questionIndexes.indexOf(questionIndex, true))).setViewState(ChatterboxWidget.VIEW_EXPANDED);    
     		}
     	}
     	
