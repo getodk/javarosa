@@ -66,11 +66,11 @@
 	<xf:bind id="5" nodeset="/root/Date" required="true()" type="xsd:date"/>
     <xf:bind id="6" nodeset="/root/Prov" type="xsd:string"/>
     <xf:bind id="7" nodeset="/root/Where" type="xsd:string"/>
-    <xf:bind id="8" nodeset="/root/Whereother" type="xsd:string" />
+    <xf:bind id="8" nodeset="/root/Whereother" type="xsd:string" relevant="/root/Where='99'" />
     <xf:bind id="9" nodeset="/root/LocWCHC" type="xsd:string" relevant="/root/Prov='9' and /root/Where='1'"/>
     <xf:bind id="10" nodeset="/root/LocWCHCother" type="xsd:string" relevant="/root/LocWCHC='999'"/>
     <xf:bind id="11" nodeset="/root/LocWCSC" type="xsd:string" relevant="/root/Prov='9' and /root/Where!='1'"/>
-    <xf:bind id="12" nodeset="/root/LocWCSCother" type="xsd:string" relevant="/root/LocWCSC='999'"/>
+    <xf:bind id="12" nodeset="/root/LocWCSCother" type="xsd:string" relevant="/root/Prov='9' and /root/LocWCSC='999'"/>
     <xf:bind id="13" nodeset="/root/LocECHC" type="xsd:string" relevant="/root/Where='1' and /root/Prov='1'"/>
     <xf:bind id="14" nodeset="/root/LocECHCother" type="xsd:string" relevant="/root/LocECHC='999'"/>
     <xf:bind id="15" nodeset="/root/LocECSC" type="xsd:string" relevant="/root/Where!='1' and /root/Prov='1'"/>
@@ -204,7 +204,7 @@
       <xf:value>99</xf:value>
     </xf:item>
   </xf:select1>
-  <xf:input bind="8" relevant="/root/Where='99'">
+  <xf:input bind="8">
     <xf:label>Other (specify)</xf:label>
   </xf:input>
   <xf:select1 bind="9"  relevant="/root/Prov='9' and /root/Where='1'">
@@ -254,7 +254,7 @@
       <xf:value>999</xf:value>
     </xf:item>
   </xf:select1>
-  <xf:input bind="10" relevant="/root/LocWCHC='999'" >
+  <xf:input bind="10">
     <xf:label>Other Hospital / Clinic (WC):</xf:label>
   </xf:input>
   <xf:select1 bind="11" >
