@@ -20,6 +20,7 @@ public class ImmunizationRow implements Externalizable {
 	private String vaccinationName;
 	int[] vaccinationDoses = new int[] {-1, -1, -1, -1, -1};
 	Date[] vaccinationDates = new Date[5];
+	boolean[] cellEnabled = new boolean[] {true,true,true,true,true};
 	
 	public ImmunizationRow() {
 		
@@ -50,7 +51,20 @@ public class ImmunizationRow implements Externalizable {
 		return vaccinationDoses[doseType];
 	}
 	
-	
+	/**
+	 * @return the cellEnabled
+	 */
+	public boolean getCellEnabled(int column) {
+		return cellEnabled[column];
+	}
+
+	/**
+	 * @param cellEnabled the cellEnabled to set
+	 */
+	public void setCellEnabled(int column, boolean cellEnabled) {
+		this.cellEnabled[column] = cellEnabled;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream)
 	 */
@@ -64,6 +78,9 @@ public class ImmunizationRow implements Externalizable {
 		}
 		for(int i = 0 ; i < 5 ; i++) {
 			vaccinationDates[i] = ExternalizableHelper.readDate(in);
+		}
+		for(int i = 0 ; i < 5 ; i++) {
+			cellEnabled[i] = in.readBoolean();
 		}
 		
 	}
@@ -79,6 +96,9 @@ public class ImmunizationRow implements Externalizable {
 		}
 		for(int i = 0 ; i < 5 ; i++) {
 			ExternalizableHelper.writeDate(out, vaccinationDates[i]);
+		}
+		for(int i = 0 ; i < 5 ; i++) {
+			out.writeBoolean(cellEnabled[i]);
 		}
 	}
 

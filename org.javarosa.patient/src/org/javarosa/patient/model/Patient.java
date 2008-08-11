@@ -55,6 +55,7 @@ public class Patient implements Externalizable {
 	int age;
 	
 	Date treatmentStartDate;
+	String treatmentRegimen;
 	
 	String patientIdentifier;
 	Vector attributes; //Not serialized since we can generate it on the fly.
@@ -79,11 +80,29 @@ public class Patient implements Externalizable {
 		records.put("cd4count", cd4CountRecord);
 		
 		Vector rows = new Vector();
-		rows.addElement(new ImmunizationRow("BCG"));
-		rows.addElement(new ImmunizationRow("OPV"));
-		rows.addElement(new ImmunizationRow("DPT"));
-		rows.addElement(new ImmunizationRow("Hep B"));
-		rows.addElement(new ImmunizationRow("Measles"));
+		ImmunizationRow bcg = new ImmunizationRow("BCG");
+		bcg.setCellEnabled(1, false);
+		bcg.setCellEnabled(2, false);
+		bcg.setCellEnabled(3, false);
+		bcg.setCellEnabled(4, false);
+		rows.addElement(bcg);
+		ImmunizationRow opv = new ImmunizationRow("OPV");
+		opv.setCellEnabled(4, false);
+		rows.addElement(opv);
+		ImmunizationRow dpt = new ImmunizationRow("DPT");
+		dpt.setCellEnabled(0, false);
+		dpt.setCellEnabled(4, false);
+		rows.addElement(dpt);
+		ImmunizationRow hepb = new ImmunizationRow("Hep B");
+		hepb.setCellEnabled(0, false);
+		hepb.setCellEnabled(4, false);
+		rows.addElement(hepb);
+		ImmunizationRow measles = new ImmunizationRow("Measles");
+		measles.setCellEnabled(0,false);
+		measles.setCellEnabled(1,false);
+		measles.setCellEnabled(2,false);
+		measles.setCellEnabled(3,false);
+		rows.addElement(measles);
 		vaccinationData = new ImmunizationData(rows);
 		
 		//records.put("vaccinations", vaccinationData);
@@ -257,7 +276,13 @@ public class Patient implements Externalizable {
 			else {
 				return null;
 			}
-		} else {
+		} else if (recordType == "treatmentregimen") {
+			if(getTreatmentRegimen() != null) {
+				return new StringData(getTreatmentRegimen());
+			} else {
+				return null;
+			}
+		}else {
 			//TODO: We need to figure out how to do these references better
 			return null;
 		}
@@ -323,6 +348,20 @@ public class Patient implements Externalizable {
 	 */
 	public void setTreatmentStartDate(Date treatmentStartDate) {
 		this.treatmentStartDate = treatmentStartDate;
+	}
+
+	/**
+	 * @return the treatmentRegimen
+	 */
+	public String getTreatmentRegimen() {
+		return treatmentRegimen;
+	}
+
+	/**
+	 * @param treatmentRegimen the treatmentRegimen to set
+	 */
+	public void setTreatmentRegimen(String treatmentRegimen) {
+		this.treatmentRegimen = treatmentRegimen;
 	}
 
 	public String toString() {
