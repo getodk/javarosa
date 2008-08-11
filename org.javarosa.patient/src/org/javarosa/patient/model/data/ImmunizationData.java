@@ -17,6 +17,9 @@ public class ImmunizationData {
 	/** ImmunizationRow */
 	Vector rows;
 	
+	/** The largest column we'll display due to age */
+	int largestAgeColumn; /* Note that we don't persist this value */
+	
 	public ImmunizationData() {
 		rows = new Vector();
 	}
@@ -33,6 +36,20 @@ public class ImmunizationData {
 		rows.addElement(row);
 	}
 	
+	/**
+	 * @return the largestAgeColumn
+	 */
+	public int getLargestAgeColumn() {
+		return largestAgeColumn;
+	}
+
+	/**
+	 * @param largestAgeColumn the largestAgeColumn to set
+	 */
+	public void setLargestAgeColumn(int largestAgeColumn) {
+		this.largestAgeColumn = largestAgeColumn;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */

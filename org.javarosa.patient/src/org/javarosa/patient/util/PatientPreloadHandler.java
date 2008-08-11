@@ -1,5 +1,6 @@
 package org.javarosa.patient.util;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
@@ -38,6 +39,19 @@ public class PatientPreloadHandler implements IPreloadHandler {
 		IAnswerData returnVal = null;
 		if("vaccination_table".equals(preloadParams)) {
 			ImmunizationData table = patient.getVaccinations();
+			int largestAge = 0;
+			Date birthDate = patient.getBirthDate();
+			int months = DateUtils.getMonthsDifference(birthDate, new Date());
+			if(months >= 9) {
+				largestAge = 4;
+			} else if(months >= 3) {
+				largestAge = 3;
+			} else if(months >= 2) {
+				largestAge = 2;
+			} else if(months >= 1){
+				largestAge = 1;
+			}
+			table.setLargestAgeColumn(largestAge);
 			returnVal = new ImmunizationAnswerData(table);
 		} else if(preloadParams.equals("monthsOnTreatment")) {
 			DateData dateData = (DateData)patient.getRecord("treatmentStart");
