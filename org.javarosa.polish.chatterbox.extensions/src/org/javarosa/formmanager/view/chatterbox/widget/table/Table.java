@@ -44,6 +44,7 @@ public class Table extends CustomItem implements ItemCommandListener {
     public String[][] data = new String[rows][cols];
     public static long[][] recorddate = new long[6][6];
     public static int[][] selectedindex= new int [6][6];
+    public static boolean[][] availablecells = new boolean [6][6];
     // Traversal stuff     
     // indicating support of horizontal traversal internal to the CustomItem
     boolean horz;
@@ -102,6 +103,12 @@ public class Table extends CustomItem implements ItemCommandListener {
     			//This may seem backwards, but it's because the function goes X,Y, not row,column
     			setText(" X",i+1,currentRow+1);
     			}
+    			if(i <= data.getLargestAgeColumn() ) {
+    				availablecells[currentRow+1][i+1] = row.getCellEnabled(i);
+    			}
+    			else {
+    				availablecells[currentRow+1][i+1] = false;
+    			}
     		}
     		currentRow++;
     	}
@@ -159,7 +166,17 @@ public class Table extends CustomItem implements ItemCommandListener {
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                if (data[i][j] != null) {
+            	if(!availablecells[i][j] && (i != 0 && j != 0)) {
+            		oldColor = g.getColor();
+            		if(i == currentY && j == currentX) {
+            			g.setColor(0x00545454);
+            		} else {
+            			g.setColor(0x00040404);
+            		}
+            		g.fillRect((j * dx) + 1, i * dy+1, dx - 2, dy - 2);
+            		g.setColor(oldColor);
+            	}
+            	else if (data[i][j] != null) {
                     // store clipping properties
                     int oldClipX = g.getClipX();
                     int oldClipY = g.getClipY();
@@ -346,6 +363,7 @@ public class Table extends CustomItem implements ItemCommandListener {
         //repaint(currentY * dx, currentX * dy, dx, dy);
     }
     public void keyPressed(int code) {
+    	if(availablecells[currentY][currentX]) {
     		switch(code)
     		{
     			case Canvas.KEY_NUM1:
@@ -404,6 +422,7 @@ public class Table extends CustomItem implements ItemCommandListener {
   	    	  		//chatScreen.focus(datefield);
   	    	  		break;
     		}
+    	}
     }
     public void addOptions()
     {
