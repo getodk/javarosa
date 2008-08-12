@@ -3,8 +3,6 @@ package org.javarosa.formmanager.activity;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Alert;
@@ -113,8 +111,6 @@ public class FormTransportActivity implements
 	public static final String VIEW_MODELS = "viewmodels";
 
 	String task;
-
-	Timer timer;
 
 	/*
 	 * (non-Javadoc)
@@ -378,6 +374,8 @@ public class FormTransportActivity implements
 						null);
 			}
 		} else if (d == submitStatusScreen) {
+			submitStatusScreen.destroy();
+			submitStatusScreen = null;
 			shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 		}
 		else if(d == alert)
@@ -455,15 +453,8 @@ public class FormTransportActivity implements
 					AlertType.ERROR);
 			shell.setDisplay(this, this.mainMenu);
 		}
-		submitStatusScreen = new SubmitStatusScreen();
-		submitStatusScreen.setCommandListener(this);
-		timer = new Timer();
-		timer.schedule(new TimerTask () {
-			public void run () {
-				counter += SubmitStatusScreen.REFRESH_INTERVAL;
-				submitStatusScreen.updateStatus(JavaRosaServiceProvider.instance().getTransportManager().getModelDeliveryStatus(data.getId(), false));
-			}
-		}, SubmitStatusScreen.REFRESH_INTERVAL, SubmitStatusScreen.REFRESH_INTERVAL);
+		
+		submitStatusScreen = new SubmitStatusScreen(this, data.getId());
 		shell.setDisplay(this, submitStatusScreen);
 	}
 
