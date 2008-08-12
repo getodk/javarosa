@@ -260,7 +260,7 @@ public class FormTransportActivity implements
 				this.showURLform();
 				break;
 			case SubmitScreen.SEND_LATER:
-				String userNotify = "Form has been saved. Check saved form list";
+				String userNotify = "Form has been saved. Check 'Saved Forms' list";
 				 alert = new Alert("Saving...",userNotify,null,AlertType.INFO);
 				 alert.setCommandListener(this);
 				shell.setDisplay(this,alert);
