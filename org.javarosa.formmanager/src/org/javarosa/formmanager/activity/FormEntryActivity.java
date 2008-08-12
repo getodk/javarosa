@@ -90,13 +90,6 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			theForm = new FormDef();
 			try {
 				formUtil.retrieveFromRMS(this.context.getFormID(), theForm);
-
-				if (instanceID != -1) {
-					DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
-					IFormDataModel theModel = new DataModelTree();
-					modelUtil.retrieveFromRMS(this.context.getInstanceID(), theModel);
-					theForm.setDataModel(theModel);
-				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
