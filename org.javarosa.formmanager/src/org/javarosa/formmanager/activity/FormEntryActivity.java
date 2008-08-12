@@ -20,13 +20,15 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
-import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.ContextPreloadHandler;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.controller.IControllerHost;
 import org.javarosa.formmanager.model.FormEntryModel;
+import org.javarosa.formmanager.utility.FormDefFetcher;
+import org.javarosa.formmanager.utility.IFormDefRetrievalMethod;
+import org.javarosa.formmanager.utility.RMSRetreivalMethod;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
 import org.javarosa.xpath.EvaluationContext;
@@ -55,6 +57,8 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	private IFormEntryViewFactory viewFactory;
 
 	private ContextPreloadHandler contextHandler;
+	
+	FormDefFetcher fetcher;
 
 
 	/** Loading error string **/
@@ -63,6 +67,8 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	public FormEntryActivity(IShell parent, IFormEntryViewFactory viewFactory) {
 		this.parent = parent;
 		this.viewFactory = viewFactory;
+		this.fetcher = new FormDefFetcher();
+		this.fetcher.setFetcher(new RMSRetreivalMethod());
 	}
 
 	public void contextChanged(Context context) {
@@ -81,15 +87,28 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		FormDef theForm = null;
 		int instanceID = -1;
 
-		if(context instanceof FormEntryContext) {
-			this.context = (FormEntryContext)context;
-			instanceID = this.context.getInstanceID();
+		if (context instanceof FormEntryContext) {
+			this.context = (FormEntryContext) context;
+		}
+		theForm = fetcher.getFormDef(context);
+		if (theForm != null) {
+			theForm.setEvaluationContext(initEvaluationContext());
+			initPreloadHandlers(theForm); // must always load; even if we won't
+											// preload, we may still
+											// post-process!
 
-			//TODO: Are we going to make this non-RMS dependant any any point?
-			FormDefRMSUtility formUtil = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());  //whoa!
-			theForm = new FormDef();
+			theForm.initialize(instanceID == -1);
 			try {
-				formUtil.retrieveFromRMS(this.context.getFormID(), theForm);
+				if (instanceID != -1) {
+					DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility) JavaRosaServiceProvider
+							.instance().getStorageManager()
+							.getRMSStorageProvider().getUtility(
+									DataModelTreeRMSUtility.getUtilityName());
+					IFormDataModel theModel = new DataModelTree();
+					modelUtil.retrieveFromRMS(this.context.getInstanceID(),
+							theModel);
+					theForm.setDataModel(theModel);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
@@ -99,12 +118,6 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			} catch (UnavailableExternalizerException uee) {
 				uee.printStackTrace();
 			}
-		}
-		if (theForm != null) {
-			theForm.setEvaluationContext(initEvaluationContext());
-			initPreloadHandlers(theForm); //must always load; even if we won't preload, we may still post-process!
-			
-			theForm.initialize(instanceID == -1);			
 
 			model = new FormEntryModel(theForm, instanceID);
 			controller = new FormEntryController(model, this);
@@ -191,5 +204,9 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	}
 	public Context getActivityContext() {
 		return context;
+	}
+	
+	public void setRetrievalMethod(IFormDefRetrievalMethod method) {
+		fetcher.setFetcher(method);
 	}
 }
