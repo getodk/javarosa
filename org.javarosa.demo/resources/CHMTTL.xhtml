@@ -1,8 +1,14 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
   <title>CHMT TLP Report</title>
   <xf:model id="final CHMT">
     <xf:instance xmlns="">
     <root>
+	  <Meta>
+		<UserID/>
+		<DeviceID/>
+		<TimeStart />
+		<TimeEnd />
+	  </Meta>
       <Date qid="81" gid="11"/>
       <Prov qid="82" gid="11"/>
       <Where qid="83" gid="11"/>
@@ -63,6 +69,10 @@
       <Mon qid="138" gid="18"/>
       </root>
     </xf:instance>
+	<xf:bind id="hidden1" nodeset="/root/Meta/UserID" type="xsd:string" jr:preload="context" jr:preloadParams="UserID" />
+	<xf:bind id="hidden2" nodeset="/root/Meta/DeviceID" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
+	<xf:bind id="hidden3" nodeset="/root/Meta/TimeStart" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
+	<xf:bind id="hidden4" nodeset="/root/Meta/TimeEnd" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />	
 	<xf:bind id="5" nodeset="/root/Date" required="true()" type="xsd:date"/>
     <xf:bind id="6" nodeset="/root/Prov" type="xsd:string"/>
     <xf:bind id="7" nodeset="/root/Where" type="xsd:string"/>
