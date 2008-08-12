@@ -126,7 +126,7 @@ public class Context {
 	 */
 	public Vector mergeInContext(Context context) {
 		Vector differentValues = new Vector();
-		Enumeration en = context.contextObject.elements();
+		Enumeration en = context.contextObject.keys();
 		
 		while(en.hasMoreElements()) {
 			String key = (String)en.nextElement();
