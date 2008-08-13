@@ -37,4 +37,7 @@ public class TestFunctionHandler implements IFunctionHandler {
 		return false;
 	}
 
+	public boolean realTime () {
+		return false;
+	}
 }

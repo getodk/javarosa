@@ -15,6 +15,12 @@ public interface IFunctionHandler {
 	/* Return true if this handler should be fed the raw argument list if no prototype matches it */
 	boolean rawArgs ();
 	
+	/* Return true if the result of this handler depends on some dynamic data source, and the expression
+	 * cannot be pre-computed before the question is reached
+	 * (un-supported)
+	 */
+	boolean realTime ();
+	
 	/* Evaluate the function */
 	Object eval (Object[] args);
 }
