@@ -25,6 +25,7 @@ import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle;
 
 import de.enough.polish.ui.Alert;
+import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.UiAccess;
 
@@ -34,7 +35,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 	
 	private static final String PROMPT_REQUIRED_QUESTION = "Required question; you must answer";
 	
-    public static final int KEY_CENTER_LETS_HOPE = -5;
+    public static int KEY_CENTER_LETS_HOPE = -5;
+    
     public static final int UIHACK_SELECT_PRESS = 1;
 	
 	private FormEntryController controller;
@@ -73,6 +75,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	model.registerObservable(this);
     	
     	initGUI();
+    	
+    	//#if device.identifier == Sony-Ericsson/P1i
+    	KEY_CENTER_LETS_HOPE = 13;
+    	//#endif
     }
 
     public void destroy () {

@@ -203,8 +203,14 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 		if (hackType == Chatterbox.UIHACK_SELECT_PRESS) {
 			if (expandedStyle.getNextMode() == NEXT_ON_SELECT && expandedStyle.getInteractiveWidget() instanceof TextField) {
 				String text = ((TextField)expandedStyle.getInteractiveWidget()).getText();
-				if (text == null || text.length() == 0)
+				if (text == null || text.length() == 0) {
 					commandAction(nextCommand, expandedStyle.getInteractiveWidget());
+				}
+				else {
+					//#if device.identifier == Sony-Ericsson/P1i
+					commandAction(nextCommand, expandedStyle.getInteractiveWidget());
+					//#endif
+				}
 			}
 		}
 	}
