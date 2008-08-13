@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.Context;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
@@ -19,6 +20,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.patient.entry.util.PatientEntryFormDefFactory;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.model.data.NumericListData;
+import org.javarosa.patient.storage.PatientRMSUtility;
 import org.javarosa.patient.util.DateValueTuple;
 
 public class PatientEntryActivity implements IActivity {
@@ -77,27 +79,27 @@ public class PatientEntryActivity implements IActivity {
 			TreeElement element = (TreeElement)en.nextElement();
 			if(element instanceof QuestionDataElement) {
 				QuestionDataElement data  = (QuestionDataElement)element;
-				if(data.getName().equals("GivenName")) {
+				if("GivenName".equals(data.getName())) {
 					StringData name = (StringData)data.getValue();
 					if(name != null) {
 						newPatient.setGivenName((String)name.getValue());
 					}
-				} else if(data.getName().equals("FamilyName")) {
+				} else if("FamilyName".equals(data.getName())) {
 					StringData name = (StringData)data.getValue();
 					if(name != null) {
 						newPatient.setFamilyName((String)name.getValue());
 					}
-				} else if(data.getName().equals("MiddleName")) {
+				} else if("MiddleName".equals(data.getName())) {
 					StringData name = (StringData)data.getValue();
 					if(name != null) {
 						newPatient.setMiddleName((String)name.getValue());
 					}
-				} else if(data.getName().equals("DOB")) {
+				} else if("DOB".equals(data.getName())) {
 					DateData date = (DateData)data.getValue();
 					if(date != null) {
 						newPatient.setBirthDate((Date)date.getValue());
 					}
-				} else if(data.getName().equals("TreatmentStartDate")) {
+				} else if("TreatmentStartDate".equals(data.getName())) {
 					DateData date = (DateData)data.getValue();
 					if(date != null) {
 						newPatient.setTreatmentStartDate((Date)date.getValue());
@@ -129,7 +131,12 @@ public class PatientEntryActivity implements IActivity {
 			}
 		}
 		newPatient.setRecord("weight", weightRecords);
-		patient.getRoot();
+		writePatient(newPatient);
+	}
+	
+	private void writePatient(Patient newPatient) {
+		PatientRMSUtility utility = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
+		utility.writeToRMS(newPatient);
 	}
 	
 	public void parsePatientsFromModel(DataModelTree tree) {
@@ -145,6 +152,7 @@ public class PatientEntryActivity implements IActivity {
 	 */
 	public void resume(Context globalContext) {
 		parsePatientsFromModel((DataModelTree)patientEntryForm.getDataModel());
+		parent.returnFromActivity(this,Constants.ACTIVITY_COMPLETE, null);
 	}
 
 	/* (non-Javadoc)

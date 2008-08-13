@@ -28,7 +28,7 @@ public class AddDataPointTrigger implements ITriggerHandler {
 		QuestionDataElement date = new QuestionDataElement("Date", dateRef);
 		TriggerQuestionDataElement moreValues = new TriggerQuestionDataElement();
 		
-		moreValues.setName("MoreValues");
+		moreValues.setName("MoreVals");
 		moreValues.setReference(moreRef);
 
 		AddDataPointTrigger newTrigger = new AddDataPointTrigger();

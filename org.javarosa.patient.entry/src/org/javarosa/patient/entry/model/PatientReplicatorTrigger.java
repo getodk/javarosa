@@ -31,7 +31,7 @@ public class PatientReplicatorTrigger implements ITriggerHandler {
 		lastName.setLongText("Patient's Last Name");
 		lastName.setShortText("Last Name");
 		lastName.setDataType(Constants.DATATYPE_TEXT);
-		lastName.setBind(new XPathReference(rootRef + "LastName"));
+		lastName.setBind(new XPathReference(rootRef + "FamilyName"));
 		
 		QuestionDef middleName = new QuestionDef();
 		middleName.setLongText("Patient's Middle Name");
@@ -126,6 +126,7 @@ public class PatientReplicatorTrigger implements ITriggerHandler {
 		patientNode.addChild(weightValues);
 		
 		TriggerQuestionDataElement morePatients = new TriggerQuestionDataElement();
+		morePatients.setName("MorePatients");
 		
 		PatientReplicatorTrigger patTrigger = new PatientReplicatorTrigger();
 		patTrigger.setTargetForm(targetForm);
