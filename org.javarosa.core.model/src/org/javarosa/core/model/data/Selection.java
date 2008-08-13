@@ -39,21 +39,36 @@ public class Selection implements Externalizable {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	//TODO: this sucks!
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
 		index = in.readInt();
+		
+		//setting QuestionDef in this way isn't correct; see note below
 		question = new QuestionDef();
-		question.readExternal(in); //i don't think this even works right: it has to reference the SAME QuestionDef that's in the FormDef
+		question.readExternal(in);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
-	//TODO: this sucks!
+	/* TODO: serializing the referenced QuestionDef directly isn't correct, and we're lucky it's not causing us
+	 * problems right now. The point of keeping a reference to the QuestionDef is so that we have easy access
+	 * to the localized text in the current locale. However, for this to work, the referenced QuestionDef must be
+	 * the SAME QuestionDef that the FormDef uses. Serializing/deserializing the QuestionDef like we are now results
+	 * in this object pointing to a DIFFERENT QuestionDef -- one that does not receive localization updates. (In fact,
+	 * a QuestionDef that is never properly localized in the first place). We need to change this so that this object
+	 * will point to the proper QuestionDef object.
+	 * 
+	 * The only reason this isn't biting us is because this Selection object will be discarded and rebuilt properly
+	 * by the time we ever need to access the QuestionDef. We only call getText after the question has been
+	 * skipped/answered, and when we answer/skip the select question, we create a new IAnswerData that overwrites this
+	 * one. This invariance seems fragile, however.
+	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(index);
-		question.writeExternal(out);
+		
+		//TODO: fix this
+		question.writeExternal(out); 
 	}
 }
