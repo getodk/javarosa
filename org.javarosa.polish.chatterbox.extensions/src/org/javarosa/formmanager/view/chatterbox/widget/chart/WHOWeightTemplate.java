@@ -45,9 +45,8 @@ public class WHOWeightTemplate implements IGraphTemplate {
 	 * @see org.javarosa.formmanager.view.chatterbox.widget.chart.IGraphTemplate#getDataPoints()
 	 */
 	public Vector getLines(Vector data) {
-		
-		//This function will give a number of months. We can use it 
-		//DateUtils.getMonthsDifference(earlierDate, laterDate)
+		//This function will give a number of days. We can use it to scale record dates 
+		//DateUtils.getApproxDaysDifference(earlierDate, laterDate)
 		
 		//TODO: Scale X axis from 0 to 5 years. Display the data from the website
 		Vector lines = new Vector();

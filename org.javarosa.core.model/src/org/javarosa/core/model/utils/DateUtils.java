@@ -247,4 +247,29 @@ public class DateUtils {
 		int months = (spanYear - firstYear)*12 + (spanMonth - firstMonth);
 		return months;
 	}
+	
+	/**
+	 * @param earlierDate The earlier of the two dates to Diff
+	 * @param laterDate The later of the two dates to Diff
+	 * @return The approximate difference, in days, between the two dates given.
+	 * The estimate is most likely to be a small underestimate.
+	 */
+	public static int getApproxDaysDifference(Date earlierDate, Date laterDate) {
+		Date span = new Date(laterDate.getTime() - earlierDate.getTime());
+		Date firstDate = new Date(0);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(firstDate);
+		int firstYear = calendar.get(Calendar.YEAR);
+		int firstMonth = calendar.get(Calendar.MONTH);
+		int firstDay = calendar.get(Calendar.DAY_OF_MONTH);
+		
+		calendar.setTime(span);
+		int spanYear = calendar.get(Calendar.YEAR);
+		int spanMonth = calendar.get(Calendar.MONTH);
+		int spanDay = calendar.get(Calendar.DAY_OF_MONTH);
+		
+		int days = (spanYear - firstYear)*365 + (spanMonth - firstMonth)*30 + (spanDay - firstDay);
+		
+		return days;
+	}
 }
