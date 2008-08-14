@@ -121,11 +121,13 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 
 			model = new FormEntryModel(theForm, instanceID);
 			controller = new FormEntryController(model, this);
+
 			view = viewFactory.getFormEntryView("chatterbox", model, controller);
 			view.setContext(this.context);
 			controller.setView(view);
 
 			view.show();
+			
 		} else {
 			displayError(LOAD_ERROR);
 		}
