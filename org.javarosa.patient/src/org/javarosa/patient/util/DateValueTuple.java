@@ -9,8 +9,18 @@ import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
+/**
+ * DateValueTuple is an externalizable data object that represents
+ * an integer measurement that is associated with the date that the
+ * measurement was taken.
+ * 
+ * @author Clayton Sims
+ *
+ */
 public class DateValueTuple implements Externalizable {
+	/** The date of the measurement */
 	public Date date;
+	/** The measurement's value */
 	public int value;
 	
 	public DateValueTuple(){
