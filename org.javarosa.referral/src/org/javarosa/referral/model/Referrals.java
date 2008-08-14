@@ -7,6 +7,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.Externalizable;
@@ -52,13 +53,20 @@ public class Referrals implements Externalizable {
 			
 			IAnswerData data = model.getDataValue(condition.getQuestionReference());
 			
-			// TODO: We should be parsing this better. Probably using the
-			// XFormAnswerSerializer.
-			Object serData = serializer.serializeAnswerData(data);
-			if (serData != null) {
-				if (serData instanceof String) {
-					if (serData.equals(condition.getReferralValue())) {
-						referralStrings.addElement(condition.getReferralText());
+			if (data instanceof SelectMultiData) {
+				SelectMultiData mulData = (SelectMultiData) data;
+				if (mulData != null && ((Vector) mulData.getValue()).size() > 0) {
+					referralStrings.addElement(condition.getReferralText());
+				}
+				condition.getReferralText();
+			} else {
+				Object serData = serializer.serializeAnswerData(data);
+				if (serData != null && data != null) {
+					if (serData instanceof String) {
+						if (serData.equals(condition.getReferralValue())) {
+							referralStrings.addElement(condition
+									.getReferralText());
+						}
 					}
 				}
 			}
@@ -67,8 +75,12 @@ public class Referrals implements Externalizable {
 		return referralStrings;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream
+	 * )
 	 */
 	public void readExternal(DataInputStream in) throws IOException,
 			InstantiationException, IllegalAccessException,
