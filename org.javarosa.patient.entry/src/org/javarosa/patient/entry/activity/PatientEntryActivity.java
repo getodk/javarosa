@@ -75,6 +75,8 @@ public class PatientEntryActivity implements IActivity {
 		
 		Vector children = patient.getChildren();
 		Enumeration en = children.elements();
+		
+		boolean formComplete = false;
 		while(en.hasMoreElements()) {
 			TreeElement element = (TreeElement)en.nextElement();
 			if(element instanceof QuestionDataElement) {
@@ -104,6 +106,10 @@ public class PatientEntryActivity implements IActivity {
 					if(date != null) {
 						newPatient.setTreatmentStartDate((Date)date.getValue());
 					}
+				} else if("MorePatients".equals(data.getName())) {
+					if(data.getValue() != null) {
+						formComplete = true;
+					}
 				}
 			} else if(element instanceof QuestionDataGroup) {
 				QuestionDataGroup group = (QuestionDataGroup)element;
@@ -131,7 +137,9 @@ public class PatientEntryActivity implements IActivity {
 			}
 		}
 		newPatient.setRecord("weight", weightRecords);
-		writePatient(newPatient);
+		if(formComplete) {
+			writePatient(newPatient);
+		}
 	}
 	
 	private void writePatient(Patient newPatient) {
