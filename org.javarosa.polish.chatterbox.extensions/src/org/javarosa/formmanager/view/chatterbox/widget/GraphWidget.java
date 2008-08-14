@@ -16,11 +16,20 @@ import org.javarosa.patient.util.DateValueTuple;
 
 import de.enough.polish.ui.Item;
 
+/**
+ * GraphWidget is an extended chatterbox widget that draws sets
+ * of DateValueTuples onto the screen with dates scaled on the X
+ * axis, and values scaled on the Y axis of a colored graph.
+ * 
+ * @author Clayton Sims
+ *
+ */
 public class GraphWidget extends ExpandedWidget {
 	public final static int CONTROL_GRAPH = 11; 
 	
 	private int resolution = 100;
 	
+	//The actual chart widget
 	LineChart chart;
 	
 	Integer[] chartXPointsArray = {};
@@ -32,11 +41,16 @@ public class GraphWidget extends ExpandedWidget {
 	
 	IGraphTemplate currentTemplate = null;
 	
+	Vector data;
+	
 	public GraphWidget() {
 		init();
 		this.registerTemplate(new WHOWeightTemplate());
 	}
 	
+	/**
+	 * Do the initial setup for the Chart
+	 */
 	private void init() {
         //#style lineChart
         chart = new LineChart(""); 
@@ -55,20 +69,24 @@ public class GraphWidget extends ExpandedWidget {
         //chart.setMaxXScaleFactor(18);
 	}
 	
+	/**
+	 * Commits the data line (not the template lines), onto the actual chart widget
+	 */
 	private void applyData() {
-		//int [] chartXPointsArray = {5, 10, 20, 25, 35, 45, 58, 69, 80, 99};
-        //int [] chartYPointsArray = {2, 8, 16, 32, 48, 55, 64, 70, 80, 87};
-        //String [] chartXPointsLabelArray = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
-        
-        for(int i = 0; i < chartXPointsArray.length; i++) {
+		for(int i = 0; i < chartXPointsArray.length; i++) {
             chart.insertItem("", chartYPointsArray[i].intValue(), chartXPointsArray[i].intValue(), 0,  0,   255);
         }
         
 	}
 	
-	private void applyTemplate() {
+	/**
+	 * Applies the data from the graph's template to this chart
+	 * @param data a Vector<DateValueTuple> of measurements that
+	 * should be used to scale the lines returned by the template
+	 */
+	private void applyTemplate(Vector data) {
 		if(currentTemplate != null) {
-			Vector lines = currentTemplate.getLines();
+			Vector lines = currentTemplate.getLines(data);
 			if(lines != null) {
 				Enumeration en = lines.elements();
 				while(en.hasMoreElements()) {
@@ -82,27 +100,47 @@ public class GraphWidget extends ExpandedWidget {
 		}
 	}
 	
+	/**
+	 * Registers a new template for displaying records on the line chart
+	 * @param template An IGraphTemplate object that this widget will register
+	 * to use in displaying graph data.
+	 */
 	public void registerTemplate(IGraphTemplate template) {
 		templates.put(new Integer(template.getTemplateId()), template);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#getEntryWidget(org.javarosa.core.model.QuestionDef)
+	 */
 	protected Item getEntryWidget(QuestionDef question) {		
 		return chart;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#getNextMode()
+	 */
 	public int getNextMode () {
 		return ChatterboxWidget.NEXT_ON_SELECT;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#getWidgetValue()
+	 */
 	protected IAnswerData getWidgetValue() {
 		return null;
 	}
 
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#setWidgetValue(java.lang.Object)
+	 */
 	protected void setWidgetValue(Object o) {
 		if(o instanceof Vector) {
-			//Vector data = reverseVector((Vector)o);
-			Vector data = (Vector)o;
+			data = (Vector)o;
+			
 			
 			int numPoints = data.size();
 			
@@ -155,19 +193,12 @@ public class GraphWidget extends ExpandedWidget {
 			while(en.hasMoreElements()) {
 				DateValueTuple tuple = (DateValueTuple)en.nextElement();
 				long time = tuple.date.getTime();
-				//System.out.println("Pure " + time);
 				long timeUnit = (time - minDate.longValue())*scaledRes;
-				//System.out.println("Time " + timeUnit);
-				//System.out.println("Scaler " + dateRes);
 				long scaledTime = (timeUnit/dateRes);
-				//System.out.println("Scaled " + scaledTime);
 				int intScaled = (int)scaledTime;
-				//System.out.println("Int scaled " + intScaled);
 				int finalTime = intScaled;
-				//System.out.println("Final " + finalTime);
 				Integer xPoint = new Integer(finalTime);
 				Integer val = new Integer(tuple.value);
-				//Integer yPoint = new Integer(((val - minVal.intValue())/valRes)*scaledRes);
 				
 				xpoints.addElement(xPoint);
 				ypoints.addElement(val);
@@ -179,27 +210,26 @@ public class GraphWidget extends ExpandedWidget {
 	        //chart.setMinYScaleFactor(minVal.intValue());
 			
 			chart.resetData();
-			applyTemplate();
+			applyTemplate(data);
 			applyData();
 		}        
 	}
-	
-	private Vector reverseVector(Vector vector) {
-		Vector v = new Vector();
-		for(int i = vector.size() -1 ; i >= 0 ; --i ){
-			v.addElement(vector.elementAt(i));
-		}
-		return v;
-	}
 
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#updateWidget(org.javarosa.core.model.QuestionDef)
+	 */
 	protected void updateWidget(QuestionDef question) {
 		currentTemplate = (IGraphTemplate)templates.get(new Integer(question.getDataType()));
         chart.resetData();
-		applyTemplate();
+		applyTemplate(data);
 		applyData();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle#widgetType()
+	 */
 	public int widgetType() {
 		return CONTROL_GRAPH;
 	}
