@@ -45,7 +45,6 @@ public class GraphWidget extends ExpandedWidget {
 	
 	public GraphWidget() {
 		init();
-		this.registerTemplate(new WHOWeightTemplate());
 	}
 	
 	/**
