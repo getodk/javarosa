@@ -12,6 +12,8 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 
 import org.javarosa.patientselect.object.*;
+import org.javarosa.patientselect.store.PatientListMetaData;
+import org.javarosa.patientselect.store.PatientStore;
 
 public class PatientListActivity extends MIDlet implements IActivity, CommandListener {
 	
@@ -28,6 +30,8 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 	private int formId;
 	
 	private ExternalizableObject externObject = null;
+	private PatientListMetaData metaDataObject = null;
+	private PatientStore store;
 	
 	private String title = null;
 	
@@ -36,8 +40,14 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		this.title = midTitle;
 		externObject = new ExternalizableObject(title);
 		
+		store = new PatientStore("PatientStore");
+		metaDataObject = new PatientListMetaData();
 	}
 	
+	public PatientListActivity() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public void contextChanged(Context globalContext) {
 		
 		Vector contextChanges = this.context.mergeInContext(context);
@@ -109,7 +119,7 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 	}
 
 	public String selectPatient(String patientId) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -132,13 +142,13 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 			if(choiceId == 0){
 				
 				System.out.println(choiceId);
-				
+				ExternalizableObject.initPatientSearchForm();
 			}
 			
 			else if(choiceId == 1){
 				
 				System.out.println(choiceId);
-				
+				ExternalizableObject.initPatientRegistrationForm();
 			}
 		}
 		
@@ -151,12 +161,23 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		else if(command == search){
 			
 			
+			
 		}
 		else if(command.getCommandType() == Command.ITEM){
 			
 			System.out.println("Entering save mode");
 			
-			System.out.println("Entering save mode in [LaunchActivity]");
+			if(ExternalizableObject.validateData()){
+				
+				store.writeToRMS(externObject, metaDataObject);				
+			}
+			else{
+				
+				String fError = "Null Values";
+				String sError = "Some required patient data is missing on the Patient Form.";
+				
+				showAlert(fError, sError);
+			}
 			
 			System.out.println("Exiting save mode [Data saved]");
 		}
