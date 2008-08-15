@@ -6,15 +6,21 @@ import org.javarosa.core.util.*;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.patientselect.object.ExternalizableObject;
+import org.javarosa.patientselect.store.PatientStore;
 
 public class BasicSearch implements Externalizable {
 	
 	private int formId;
 	Vector searchConditions;
 	
+	private PatientStore store = null;
+	private ExternalizableObject externObject = null;
+	
 	public BasicSearch(){
 		
 		searchConditions = new Vector();	
+		store = new PatientStore("PatientStore");
+		externObject = new ExternalizableObject();
 	}
 
 	public BasicSearch(int formid, Vector searchCondition){
@@ -22,7 +28,6 @@ public class BasicSearch implements Externalizable {
 		this.formId = formid;
 		this.searchConditions = searchCondition;
 	}
-	
 	
 	public int getFormId(){
 		
@@ -42,9 +47,7 @@ public class BasicSearch implements Externalizable {
 		while(en.hasMoreElements()) {
 			
 		}
-		
 		return searchAlg;
-		
 	}
 	
 	public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException,UnavailableExternalizerException 
@@ -59,23 +62,22 @@ public class BasicSearch implements Externalizable {
 		ExternalizableHelper.writeExternal(searchConditions, out );
 	}
 
-	public void searchByBoth(String patientName, String patientCode) {
+	public void searchByBoth(String patientName, String patientCode) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
 		if(patientName != null && patientCode != null){
-			
-		}
-		
+			store.retrieveFromRMS(formId, externObject);
+		}	
 	}
 
-	public String searchByCode(String code) {
+	public String searchByCode(String code) throws IOException {
 		if(code != null){
-			
+			store.retrieveByteDataFromRMS(formId);
 		}
 		return null;
 	}
 
-	public String searchByName(String patientName) {
+	public String searchByName(String patientName) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
 		if(patientName != null){
-			
+			store.retrieveFromRMS(formId);
 		}
 		return null;
 	}
@@ -86,6 +88,4 @@ public class BasicSearch implements Externalizable {
 		}
 		return null;
 	}
-
-
 }
