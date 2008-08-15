@@ -34,10 +34,14 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 	
 	public ExternalizableObject(String title) {
 		
-		store = new PatientStore(storeName, 0);
+		store = new PatientStore(storeName);
 		mForm = new Form(title);
 	}
 	
+	public ExternalizableObject() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public static void initPatientRegistrationForm() {
 		
 		mForm = new Form("Enter New Patient Details");
