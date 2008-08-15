@@ -7,6 +7,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Command;
 import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
 
@@ -96,6 +97,10 @@ public class FormListActivity implements IActivity {
 				Hashtable returnArgs = new Hashtable();
 				returnArgs.put(COMMAND_KEY, Commands.CMD_SETTINGS);
 				parent.returnFromActivity(this, Constants.ACTIVITY_SUSPEND, returnArgs );
+			} else {
+				Hashtable returnArgs = new Hashtable();
+				returnArgs.put(COMMAND_KEY, cmd);
+				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
 			}
 		}
 	}
@@ -154,5 +159,9 @@ public class FormListActivity implements IActivity {
 	}
 	public Context getActivityContext() {
 		return context;
+	}
+	
+	public void addNewMenuCommand(Command c) {
+		this.formsList.addCommand(c);
 	}
 }

@@ -24,7 +24,7 @@ public class HandleReminder extends Form {
 		
 		
 		this.reminder = reminder;
-		title = new TextField("", reminder.getTitle(), 50, TextField.ANY);
+		title = new TextField("Title: ", reminder.getTitle(), 50, TextField.ANY);
 		StringItem readOnlyTitle = new StringItem("", reminder.getTitle());
 		StringItem patientText = new StringItem("Patient: ", reminder.getPatientName());
 		StringItem dateItem = new StringItem("Date: ", reminder.getFollowUpDate().toString());
