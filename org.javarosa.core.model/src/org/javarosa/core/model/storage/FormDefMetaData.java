@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 /**
  * Serializable Meta Data object for form definition records that 
@@ -61,7 +62,7 @@ public class FormDefMetaData extends MetaDataObject
     /* (non-Javadoc)
      * @see org.javarosa.clforms.storage.MetaDataObject#readExternal(java.io.DataInputStream)
      */
-    public void readExternal(DataInputStream in) throws IOException
+    public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException
     {
     	super.readExternal(in);
         this.formName = ExternalizableHelper.readUTF(in);

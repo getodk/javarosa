@@ -7,6 +7,7 @@ import java.util.Date;
 
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class DataModelTreeMetaData extends MetaDataObject{
 
@@ -75,7 +76,7 @@ public class DataModelTreeMetaData extends MetaDataObject{
 	 * @seeorg.javarosa.clforms.storage.MetaDataObject#readExternal(java.io.
 	 * DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException {
+	public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		super.readExternal(in);
 		this.formName = in.readUTF();
 		this.version = in.readInt();

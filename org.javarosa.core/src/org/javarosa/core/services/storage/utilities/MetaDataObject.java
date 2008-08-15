@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
 /**
  * A MetaDataObject is a serialized meta data description of
@@ -71,7 +72,7 @@ public abstract class MetaDataObject implements
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-    public void readExternal(DataInputStream in) throws IOException
+    public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException
     {
         this.recordId = in.readInt();
         this.size = in.readInt();

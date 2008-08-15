@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
+import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.patient.model.Patient;
 
 public class PatientMetaDataObject extends MetaDataObject {
@@ -73,7 +74,7 @@ public class PatientMetaDataObject extends MetaDataObject {
     /* (non-Javadoc)
      * @see org.javarosa.clforms.storage.MetaDataObject#readExternal(java.io.DataInputStream)
      */
-    public void readExternal(DataInputStream in) throws IOException
+    public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException
     {
     	super.readExternal(in);
     	
