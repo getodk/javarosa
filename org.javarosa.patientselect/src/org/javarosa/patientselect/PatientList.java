@@ -3,6 +3,7 @@ package org.javarosa.patientselect;
 import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.patientselect.shell.PatientListShell;
 
 public class PatientList extends MIDlet  {
 	
@@ -37,3 +38,4 @@ public class PatientList extends MIDlet  {
 		
 	}
 }
+
