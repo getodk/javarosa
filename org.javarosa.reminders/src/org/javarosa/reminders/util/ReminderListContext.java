@@ -8,6 +8,10 @@ public class ReminderListContext extends Context {
 	
 	public static final String VIEW_MODE_KEY = "Reminder View Mode";
 	
+	public ReminderListContext(Context context) {
+		super(context);
+	}
+	
 	public void setViewMode(int viewMode) {
 		this.setElement(VIEW_MODE_KEY, new Integer(viewMode));
 	}

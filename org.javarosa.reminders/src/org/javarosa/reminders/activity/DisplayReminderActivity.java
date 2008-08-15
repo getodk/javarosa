@@ -9,6 +9,8 @@ import java.util.Vector;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.ItemStateListener;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -26,12 +28,18 @@ import org.javarosa.reminders.view.HandleReminder;
  *
  */
 public class DisplayReminderActivity implements IActivity, CommandListener {
+	
+	public static final Command VIEW_REMINDERS = new Command("View Reminders", Command.SCREEN, 3);
+	
+	private static final Command DONE_VIEWING = new Command("Done", Command.SCREEN, 1);
 
 	/** Reminder */
 	Vector reminders;
 	
+	/** Reminder */
 	Vector changedReminders;
 	
+	/** Reminder */
 	Vector removedReminders;
 	
 	IShell parent;
@@ -103,7 +111,9 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 		}
 		changedReminders = new Vector();
 		removedReminders = new Vector();
-		
+		if(viewMode == ReminderListContext.VIEW_ALL) {
+			remindersDisplay.addCommand(DONE_VIEWING);
+		}
 		returnToList();
 	}
 
@@ -112,26 +122,31 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 	 */
 	public void commandAction(Command command, Displayable display) {
 		if(display == remindersDisplay) {
-			int index = remindersDisplay.getIndex();
-			Reminder selectedReminder = (Reminder)reminders.elementAt(index);
-			if(command == DisplayReminders.DISMISS) {
+			Reminder selectedReminder = remindersDisplay.getReminder(command);
+			if(command.getLabel().equals(DisplayReminders.DISMISS_STRING)) {
 				selectedReminder.setNotified(true);
 				changedReminders.addElement(selectedReminder);
 				reminders.removeElement(selectedReminder);
 				returnToList();
 			}
-			if(command == DisplayReminders.VIEW) { 
+			if(command.getLabel().equals(DisplayReminders.VIEW_STRING)) { 
 				handleReminder = new HandleReminder(selectedReminder,(viewMode == ReminderListContext.VIEW_TRIGGERED));
 				handleReminder.setCommandListener(this);
 				parent.setDisplay(this, handleReminder);
+			}
+			if(command == DONE_VIEWING) {
+				commitChanges();
+				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 			}
 		}
 		if(display == handleReminder) {
 			if(command == HandleReminder.DONE) {
 				Reminder selectedReminder = handleReminder.getReminder();
-				selectedReminder.setNotified(true);
+				if(viewMode == ReminderListContext.VIEW_TRIGGERED) {
+					reminders.removeElement(selectedReminder);
+					selectedReminder.setNotified(true);
+				}
 				changedReminders.addElement(selectedReminder);
-				reminders.removeElement(selectedReminder);
 				returnToList();
 			}
 			if(command == HandleReminder.REMOVE) {
@@ -142,9 +157,11 @@ public class DisplayReminderActivity implements IActivity, CommandListener {
 			}
 			if(command == HandleReminder.UPDATE) {
 				Reminder selectedReminder = handleReminder.getUpdatedReminder();
-				selectedReminder.setNotified(true);
+				if(viewMode == ReminderListContext.VIEW_TRIGGERED) {
+					reminders.removeElement(selectedReminder);
+					selectedReminder.setNotified(true);
+				}
 				changedReminders.addElement(selectedReminder);
-				reminders.removeElement(selectedReminder);
 				returnToList();
 			}
 		}
