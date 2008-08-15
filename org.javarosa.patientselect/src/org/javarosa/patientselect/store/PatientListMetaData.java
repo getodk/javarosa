@@ -3,11 +3,9 @@ package org.javarosa.patientselect.store;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import org.javarosa.patientselect.*;
-import org.javarosa.patientselect.object.ExternalizableObject;
-
-import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.patientselect.object.ExternalizableObject;
+import org.javarosa.core.services.storage.utilities.MetaDataObject;
 
 public class PatientListMetaData extends MetaDataObject {
 	
