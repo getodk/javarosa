@@ -97,6 +97,13 @@ public class FormListActivity implements IActivity {
 				Hashtable returnArgs = new Hashtable();
 				returnArgs.put(COMMAND_KEY, Commands.CMD_SETTINGS);
 				parent.returnFromActivity(this, Constants.ACTIVITY_SUSPEND, returnArgs );
+			} else if (cmd == Commands.CMD_GET_NEW_FORM) {
+				Hashtable returnArgs = new Hashtable();
+				returnArgs.put(COMMAND_KEY, Commands.CMD_GET_NEW_FORM);
+				// Using activity complete means that the shell must actively recreate the
+				// forms list.  I think this is best to ensure that the list is updated
+				// - Brian DeRenzi 18 Aug 2008
+				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
 			} else {
 				Hashtable returnArgs = new Hashtable();
 				returnArgs.put(COMMAND_KEY, cmd);
@@ -122,7 +129,10 @@ public class FormListActivity implements IActivity {
 				formDefRMSUtility.retrieveMetaDataFromRMS(i,mdata);
 				// TODO fix it so that record id is part of the metadata serialization
 				
-				listOfForms.put(new Integer(pos), mdata.getRecordId()+"-"+mdata.getName());
+				// BWD 27/7/2008
+				// Getting rid of annoying numbers thing
+				//listOfForms.put(new Integer(pos), mdata.getRecordId()+"-"+mdata.getName());
+				listOfForms.put(new Integer(pos), mdata.getName());
 				formIDs.insertElementAt(mdata, pos);
 				pos++;
 			} catch (InvalidRecordIDException e) {
