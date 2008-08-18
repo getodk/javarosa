@@ -6,6 +6,13 @@ import java.io.IOException;
 
 import org.javarosa.core.util.UnavailableExternalizerException;
 
+/**
+ * A response to a question requesting a selection
+ * of one and only one item from a list
+ * 
+ * @author Drew Roos
+ *
+ */
 public class SelectOneData implements IAnswerData {
 	Selection s;
 	

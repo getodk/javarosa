@@ -40,41 +40,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private QuestionPreloader preloader = new QuestionPreloader();
 	private PrototypeFactory modelFactory;
 
-	//private int recordId;
-	
-	// dunno about this...
-	///** The collection of rules for this form. */
-	//private Vector rules;
-	
-	// what is this?
-	// /** A string constistig for form fields that describe its data. */
-	//private String descriptionTemplate =  Constants.EMPTY_STRING;
-
 	public FormDef() {
 		setChildren(null);
 		conditions = new Vector();
 		conditionTriggerIndex = new Hashtable();
 	}
 	
-//	/**
-//	 * Constructs a form definition object from these parameters.
-//	 * 
-//	 * @param name - the numeric unique identifier of the form definition.
-//	 * @param name - the display name of the form.
-//	 * @param variableName - the string unique identifier of the form definition.
-//	 * @param groups - collection of group definitions.
-//	 * @param rules - collection of branching rules.
-//	 */
-//	public FormDef(int id, String name, String variableName,Vector groups, Vector rules, String descTemplate) {
-//		this();
-//		setId(id);
-//		setName(name);
-//		setVariableName(variableName);
-//		setGroups(groups);
-//		setRules(rules);
-//		setDescriptionTemplate((descTemplate == null) ? Constants.EMPTY_STRING : descTemplate);
-//	}
-
 	public Vector getChildren() {
 		return children;
 	}
@@ -85,15 +56,13 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	
 	public void addChild (IFormElement fe) {
 		children.addElement(fe);
-		//if (localizer != null && localizer.getLocale() != null)
-		//	fe.localeChanged(localizer.getLocale(), localizer);
 	}
 	
 	public IFormElement getChild (int i) {
 		return (IFormElement)children.elementAt(i);
 	}
 	
-	//need functions that provide means of walking the tree and intuitively accessing sub-children
+	//TODO: need functions that provide means of walking the tree and intuitively accessing sub-children
 	
 	public String getName() {
 		return name;
@@ -114,12 +83,10 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	//treating id and record id as the same until we resolve the need for both of them
 	public int getRecordId () {
 		return getID();
-		//return recordId;
 	}
 	
 	public void setRecordId(int recordId) {
 		setID(recordId);
-		//this.recordId = recordId;
 	}
 	
 	public Localizer getLocalizer () {
@@ -145,16 +112,36 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		this.model = model;
 	}
 	
+	/**
+	 * @param question The question whose data should be retrieved
+	 * @return The value, if any, associated with this question in the
+	 * form's underlying data model.
+	 */
 	public IAnswerData getValue (QuestionDef question) {
 		return model.getDataValue(question.getBind());
 	}
 	
+	/**
+	 * Sets the value associated with the given question in the form's
+	 * underlying data model.
+	 * 
+	 * @param question the question whose data should be set
+	 * @param data The new data value
+	 */
 	public void setQuestionValue (QuestionDef question, IAnswerData data) {
 		if (setValue(question.getBind(), data)) {
 			question.alertStateObservers(QuestionStateListener.CHANGE_DATA);			
 		}
 	}
 	
+	/**
+	 * Sets the value associated with the given data reference in the
+	 * form's underlying data model
+	 * 
+	 * @param ref The reference to the value which should be set
+	 * @param data the new data value.
+	 * @return Whether or not a value was updated in the model.
+	 */
 	public boolean setValue (IDataReference ref, IAnswerData data) {
 		boolean updated = model.updateDataValue(ref, data);
 		if (updated) {
@@ -165,7 +152,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	
 	/**
 	 * Add a Condition to the form's Collection.
-	 * @param condition
+	 * @param condition the condition to be set
 	 */
 	public Condition addCondition (Condition condition) {
 		for (int i = 0; i < conditions.size(); i++) {
@@ -191,12 +178,24 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		return condition;
 	}
 
+	/**
+	 * Walks the current set of conditions, and evaluates each of them with the 
+	 * current context.
+	 */
 	public void initializeConditions () {
 		for (int i = 0; i < conditions.size(); i++) {
 			((Condition)conditions.elementAt(i)).eval(model, conditionEvalContext);
 		}
 	}
 	
+	/**
+	 * Evaluates any conditions that are associated with the value determined
+	 * by the given reference.
+	 * 
+	 * @param ref The reference. NOTE: Currently this reference's getReference()
+	 * value must be a String datatype. This should be dealt with in a more
+	 * general way in the future.
+	 */
 	public void evaluateConditions (IDataReference ref) {
 		String xpathRef = (String)ref.getReference();
 		Vector conditions = (Vector)conditionTriggerIndex.get(xpathRef);
@@ -209,11 +208,20 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		}
 	}
 	
+	/**
+	 * @param ec The new Evaluation Context
+	 */
 	public void setEvaluationContext (EvaluationContext ec) {
 		this.conditionEvalContext = ec;
 	}
 	
-	//doesn't know about groups right now
+	/**
+	 * Note that this method doesn't yet deal with groups in any
+	 * way, and will fail if this form contains any groups.
+	 * 
+	 * @param questionID the unique integer ID of the question.
+	 * @return A quesiton associated with the given ID. 
+	 */
 	public QuestionDef getQuesitonByID (int questionID) {
 		for (int i = 0; i < children.size(); i++) {
 			QuestionDef q = (QuestionDef)children.elementAt(i);
@@ -224,16 +232,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		
 		return null;
 	}
-	
-	/*
-	public Vector getRules() {
-		return rules;
-	}
-
-	public void setRules(Vector rules) {
-		this.rules = rules;
-	}
-	*/
 	
 	public Vector getBindings () {
 		return dataBindings;
@@ -257,22 +255,19 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		this.preloader = preloads;
 	}
 
+	/**
+	 * @param db A new DataBinding to be added to the form's list.
+	 */
 	public void addBinding (DataBinding db) {
 		if (dataBindings == null)
 			dataBindings = new Vector();
 		dataBindings.addElement(db);
 	}
-	
-	/*
-	public String getDescriptionTemplate() {
-		return descriptionTemplate;
-	}
 
-	public void setDescriptionTemplate(String descriptionTemplate) {
-		this.descriptionTemplate = descriptionTemplate;
-	}
-	*/
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.Localizable#localeChanged(java.lang.String, org.javarosa.core.model.utils.Localizer)
+	 */
 	public void localeChanged (String locale, Localizer localizer) {
 		for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
 			((IFormElement)e.nextElement()).localeChanged(locale, localizer);
@@ -283,52 +278,13 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		return getName();
 	}
 	
+	/**
+	 * @param modelFactory the PrototypeFactory that should be used to deserialize IDataModel
+	 * objects.
+	 */
 	public void setModelFactory(PrototypeFactory modelFactory) {
 		this.modelFactory = modelFactory;
 	}
-	
-//	/**
-//	 * Gets a question identified by a variable name.
-//	 * 
-//	 * @param varName - the string identifier of the question. 
-//	 * @return the question reference.
-//	 */
-//	public QuestionDef getQuestion(String varName){
-//		if(varName == null)
-//			return null;
-//		
-//		for(byte i=0; i<getGroups().size(); i++){
-//			QuestionDef def = ((GroupDef)getGroups().elementAt(i)).getQuestion(varName);
-//			if(def != null)
-//				return def;
-//		}
-//		
-//		return null;
-//	}
-//	
-//	/**
-//	 * Gets a numeric question identifier for a given question variable name.
-//	 * 
-//	 * @param varName - the string identifier of the question. 
-//	 * @return the numeric question identifier.
-//	 */
-//	public String getQuestionId(String varName){
-//		QuestionDef qtn = getQuestion(varName);
-//		if(qtn != null)
-//			return qtn.getId();
-//		
-//		return Constants.NULL_STRING_ID;
-//	}
-//
-//	public void addQuestion(QuestionDef qtn){
-//		if(groups == null){
-//			groups = new Vector();
-//			GroupDef group = new GroupDef(this.getVariableName(),Byte.parseByte("1"),null);
-//			groups.addElement(group);
-//		}
-//		
-//		((GroupDef)groups.elementAt(0)).addQuestion(qtn);
-//	}
 	
 	/**
 	 * Preload the Data Model with the preload values that are enumerated in
@@ -349,6 +305,11 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		}
 	}
 	
+	/**
+	 * Iterate over the form's data bindings, and evaluate all post procesing calls.
+	 * 
+	 * @return true if the model was modified in any way. false otherwise.
+	 */
 	public boolean postProcessModel () {
 		boolean modelModified = false;
 		
@@ -414,7 +375,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		}
 	}
 
-	//meant to be called after deserialization and initialization of handlers
+	/**
+	 * meant to be called after deserialization and initialization of handlers
+	 * 
+	 * @param newInstance true if the form is to be used for a new entry interaction,
+	 * false if it is using an existing IDataModel
+	 */
 	public void initialize (boolean newInstance) {
 		if (newInstance) {//only preload new forms (we may have to revisit this)
 			preloadModel();

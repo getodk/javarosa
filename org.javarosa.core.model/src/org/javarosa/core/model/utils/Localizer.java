@@ -9,6 +9,14 @@ import java.util.Vector;
 
 import org.javarosa.core.util.Externalizable;
 
+/**
+ * The Localizer object maintains mappings for locale ID's and Object
+ * ID's to the String values associated with them in different 
+ * locales.
+ * 
+ * @author Drew Roos
+ *
+ */
 public class Localizer implements Externalizable {
 	private SimpleOrderedHashtable localeData; /* String -> Hashtable{ String -> String } */
 	private String defaultLocale;

@@ -23,6 +23,10 @@ import org.javarosa.core.util.UnavailableExternalizerException;
  * In an XML Analogy, this represents a non-terminal element with
  * other nested elements.
  * 
+ * QuestionDataGroups cannot resolve bindings, or have values set or
+ * retrieved from them by default, but can be subclassed in order to
+ * implement those methods.
+ * 
  * @author Clayton Sims
  *
  */

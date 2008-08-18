@@ -7,6 +7,11 @@ import java.io.IOException;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
+/**
+ * A response to a question requesting a String Value
+ * @author Drew Roos
+ *
+ */
 public class StringData implements IAnswerData {
 	String s;
 
@@ -32,10 +37,18 @@ public class StringData implements IAnswerData {
 		s = (String)o;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
+	 */
 	public Object getValue () {
 		return s;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
+	 */
 	public String getDisplayText () {
 		return s;
 	}

@@ -29,5 +29,14 @@ public interface IPreloadHandler {
 	 */
 	IAnswerData handlePreload(String preloadParams);
 	
+	/**
+	 * Handles any post processing tasks that should be completed after the form entry
+	 * interaction is completed.
+	 * 
+	 * @param model The completed data model.
+	 * @param ref The reference to be processed
+	 * @param params Processing paramaters.
+	 * @return true if any post-processing occurs, false otherwise.
+	 */
 	boolean handlePostProcess(IFormDataModel model, IDataReference ref, String params);
 }

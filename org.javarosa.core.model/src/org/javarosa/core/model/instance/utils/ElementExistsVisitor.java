@@ -71,8 +71,7 @@ public class ElementExistsVisitor implements ITreeVisitor {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.TreeElement)
 	 */
-	//TODO: this seems extremely hacky
-	//TODO: make this visitor actually work (even with hack); when commented out, form entry seems to work fine
+	//TODO: This is hacky, and should be improved
 	public void visit(TreeElement element) {
 		if (element instanceof QuestionDataElement) {
 			visit((QuestionDataElement)element);

@@ -8,6 +8,17 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
+/**
+ * A response to a question requesting a selection
+ * from a list. 
+ * 
+ * Note that this class currently maintains a reference
+ * to a QuestionDef object in order to determine values
+ * and strings. This is fairly hacky and should be refactored.
+ * 
+ * @author Drew Roos
+ *
+ */
 public class Selection implements Externalizable {
 	public int index;
 	public QuestionDef question; //cannot hold reference directly to selectItems, as it is wiped out and rebuilt after every locale change
