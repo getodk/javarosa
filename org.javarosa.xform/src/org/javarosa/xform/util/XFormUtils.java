@@ -7,6 +7,12 @@ import java.io.InputStreamReader;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.xform.parse.XFormParser;
 
+/**
+ * Static Utility methods pertaining to XForms.
+ *  
+ * @author Clayton Sims
+ *
+ */
 public class XFormUtils {
 	public static FormDef getFormFromResource (String resource) {
 		FormDef returnForm = null;
