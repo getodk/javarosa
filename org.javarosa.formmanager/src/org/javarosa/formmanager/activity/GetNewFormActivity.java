@@ -3,15 +3,46 @@
  */
 package org.javarosa.formmanager.activity;
 
+import java.io.IOException;
+
+import javax.microedition.io.file.FileConnection;
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Displayable;
+
 import org.javarosa.core.Context;
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.IShell;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.xform.util.XFormUtils;
+import org.netbeans.microedition.lcdui.pda.FileBrowser;
 
 /**
  * @author Brian DeRenzi
  *
  */
-public class GetNewFormActivity implements IActivity {
+public class GetNewFormActivity implements IActivity, CommandListener {
 
+	public static final String FILENAME_KEY = "filename";
+	
+	// #if app.usefileconnections
+	private FileBrowser fileBrowser = null;
+	public String fileBrowserTitle = "Browse XForms";
+	// #endif
+	
+	private IShell parent = null;
+	
+	/** Alert if the form cannot load **/
+	private Alert alert;
+	
+	public GetNewFormActivity(IShell p) {
+		parent = p;
+	}
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IActivity#contextChanged(org.javarosa.core.Context)
 	 */
@@ -56,14 +87,67 @@ public class GetNewFormActivity implements IActivity {
 		// TODO Auto-generated method stub
 
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IActivity#start(org.javarosa.core.Context)
 	 */
 	//@Override
 	public void start(Context context) {
-		// TODO Auto-generated method stub
+		// #if app.usefileconnections
+		fileBrowser = new FileBrowser(JavaRosaServiceProvider.instance().getDisplay());
+		fileBrowser.setTitle(this.fileBrowserTitle);
+		fileBrowser.setCommandListener(this);
+		fileBrowser.addCommand(FileBrowser.SELECT_FILE_COMMAND);
+		fileBrowser.addCommand(FileBrowser.EXIT_COMMAND);
+		JavaRosaServiceProvider.instance().showView(fileBrowser);
+		// #endif
+	}
 
+	/* (non-Javadoc)
+	 * @see javax.microedition.lcdui.CommandListener#commandAction(javax.microedition.lcdui.Command, javax.microedition.lcdui.Displayable)
+	 */
+	//@Override
+	public void commandAction(Command c, Displayable d) {
+		if( d == alert ) {
+			parent.returnFromActivity(this, Constants.ACTIVITY_ERROR, null);
+		}
+		else if( c == FileBrowser.EXIT_COMMAND ) {
+			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+		}
+		else if( c == FileBrowser.SELECT_FILE_COMMAND) {
+			// Get ready to dump in the new file
+			FormDefRMSUtility rms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
+			
+			// Figure out which file was selected
+			try {
+				FileConnection fc = fileBrowser.getSelectedFile();
+				FormDef form = XFormUtils.getFormFromFile(fc);
+				
+				// Display a positive or negative alert
+				if(form == null) {
+					// TODO: internationlize this text
+					displayError("Cannot load form");
+					return;
+				}
+				
+				rms.writeToRMS(form);
+
+				// Exit back
+				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	
+	private void displayError(String errorMsg) {
+		alert = new Alert("Form Entry Error",errorMsg,null,AlertType.ERROR);
+		alert.setTimeout(Alert.FOREVER);
+		//setView(alert);
+		//For some reason that I really can't figure out, this alert won't display the error text
+		alert.setCommandListener(this);
 	}
 
 }
