@@ -103,11 +103,13 @@ public class FormList extends List implements CommandListener {
 			returnvals.put(Commands.CMD_EXIT, "");
 			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
-/*
-		if (c == CMD_GETNEWFORMS) {
-			this.mainShell.getNewFormsByTransportPropertySetting();
+
+		else if (c == CMD_GETNEWFORMS) {
+			Hashtable returnvals = new Hashtable();
+			returnvals.put(Commands.CMD_GET_NEW_FORM, "");
+			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
-*/
+
 		else if (c == CMD_VIEWMODELS) {
 			Hashtable returnvals = new Hashtable();
 			returnvals.put(Commands.CMD_VIEW_DATA, "");
