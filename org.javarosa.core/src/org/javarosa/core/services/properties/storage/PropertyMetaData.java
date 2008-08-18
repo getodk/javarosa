@@ -10,7 +10,7 @@ import org.javarosa.core.util.UnavailableExternalizerException;
 
 /**
  * PropertyMetaData is the Meta Data object used for Property records in the RMS
- * @author ctsims
+ * @author Clayton Sims
  *
  */
 public class PropertyMetaData extends MetaDataObject {

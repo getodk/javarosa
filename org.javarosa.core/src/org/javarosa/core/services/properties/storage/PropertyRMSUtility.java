@@ -16,7 +16,7 @@ import org.javarosa.core.util.UnavailableExternalizerException;
  * The PropertyRMSUtility interacts with the RMS storage on the local device to read
  * and write Property records.
  * 
- * @author ctsims
+ * @author Clayton Sims
  *
  */
 public class PropertyRMSUtility extends RMSUtility {

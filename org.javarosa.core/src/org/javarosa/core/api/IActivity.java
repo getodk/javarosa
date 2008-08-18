@@ -8,6 +8,8 @@ import org.javarosa.core.Context;
  * ability to capture and release control flow from a shell.
  * 
  * @author Brian DeRenzi
+ * @author Clayton Sims
+ * @author Drew Roos
  *
  */
 public interface IActivity {
