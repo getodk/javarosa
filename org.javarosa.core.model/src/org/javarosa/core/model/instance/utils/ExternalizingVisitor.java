@@ -11,6 +11,10 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.util.Externalizable;
 
 /**
+ * The Externalizing Visitor walks a Data Model Tree and 
+ * writes its elements serially to the output stream 
+ * provided.
+ * 
  * @author Clayton Sims
  *
  */

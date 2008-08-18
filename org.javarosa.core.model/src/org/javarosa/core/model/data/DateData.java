@@ -9,6 +9,11 @@ import java.util.Date;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
+/**
+ * A response to a question requesting a Date Value
+ * @author Drew Roos
+ *
+ */
 public class DateData implements IAnswerData {
 	Date d;
 	

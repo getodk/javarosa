@@ -24,6 +24,11 @@ import org.javarosa.core.util.UnavailableExternalizerException;
 /**
  * The RMS persistent storage utility for FormDef
  * objects.
+ * 
+ * This class contains prototype factories for 
+ * serializing and deserializing various elements of
+ * the core JavaRosa model infrastructure, such as
+ * IDataReferences, IAnswerData's, and IDataModelTrees.
  *
  * @author Clayton Sims
  */
@@ -204,6 +209,12 @@ public class FormDefRMSUtility extends RMSUtility {
 		return metaDataList;
 	}
 	
+	/**
+	 * @return a PrototypeFactory containing prototypes for IAnswerData's,
+	 * IDataReferences, and QuestionDataGroups. If a factory doesn't yet
+	 * exist, one is created, and default IAnswerData implementing classes
+	 * are pre-populated. 
+	 */
 	public PrototypeFactory getQuestionElementsFactory() {
 		if(questionFactory == null) { 
 			questionFactory = new PrototypeFactory();

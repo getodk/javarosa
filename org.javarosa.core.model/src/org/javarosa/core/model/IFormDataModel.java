@@ -6,6 +6,18 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.util.Externalizable;
 
+/**
+ * An IFormDataModel stores the values underlying a form.
+ * 
+ * Answer data values are set, updated, and retrieved based
+ * on implementation specific IDataReferences.
+ * 
+ * Elements in implementation specific data models should
+ * be walked using IDataModelVisitors if necessary.
+ * 
+ * @author Clayton Sims
+ *
+ */
 public interface IFormDataModel extends Externalizable {
 	
 	/**
@@ -53,6 +65,11 @@ public interface IFormDataModel extends Externalizable {
 	 */
 	IAnswerData getDataValue(IDataReference questionReference);
 	
+	/**
+	 * Dispatches the visitor to any child elements that exist in this model.
+	 * 
+	 * @param visitor
+	 */
 	void accept(IDataModelVisitor visitor);
 	
 }

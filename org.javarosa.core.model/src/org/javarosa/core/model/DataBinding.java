@@ -11,6 +11,21 @@ import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
+/**
+ * A data binding is an object that represents how a
+ * data element is to be used in a form entry interaction.
+ * 
+ * It contains a reference to where the data should be retreived
+ * and stored, as well as the preload parameters, and the
+ * conditional logic for the question.
+ * 
+ * The class relies on any Data References that are used
+ * in a form to be registered with the FormDefRMSUtility's
+ * prototype factory in order to properly deserialize.
+ * 
+ * @author Drew Roos
+ *
+ */
 public class DataBinding  implements Externalizable {
 	private String id;
 	private IDataReference ref;
@@ -32,44 +47,74 @@ public class DataBinding  implements Externalizable {
 		readonlyAbsolute = false;
 	}
 	
+	/**
+	 * @return The data reference
+	 */
 	public IDataReference getReference() {
 		return ref;
 	}
 	
+	/**
+	 * @param ref the reference to set
+	 */
 	public void setReference(IDataReference ref) {
 		this.ref = ref;
 	}
-	
-	public int getDataType() {
-		return dataType;
-	}
-	
-	public void setDataType(int dataType) {
-		this.dataType = dataType;
-	}
-	
-	public String getPreload() {
-		return preload;
-	}
-	
-	public void setPreload(String preload) {
-		this.preload = preload;
-	}
-	
-	public String getPreloadParams() {
-		return preloadParams;
-	}
-	
-	public void setPreloadParams(String preloadParams) {
-		this.preloadParams = preloadParams;
-	}
 
+	/**
+	 * @return the id
+	 */
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * @param id the id to set
+	 */
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	/**
+	 * @return the dataType
+	 */
+	public int getDataType() {
+		return dataType;
+	}
+
+	/**
+	 * @param dataType the dataType to set
+	 */
+	public void setDataType(int dataType) {
+		this.dataType = dataType;
+	}
+
+	/**
+	 * @return the preload
+	 */
+	public String getPreload() {
+		return preload;
+	}
+
+	/**
+	 * @param preload the preload to set
+	 */
+	public void setPreload(String preload) {
+		this.preload = preload;
+	}
+
+	/**
+	 * @return the preloadParams
+	 */
+	public String getPreloadParams() {
+		return preloadParams;
+	}
+
+	/**
+	 * @param preloadParams the preloadParams to set
+	 */
+	public void setPreloadParams(String preloadParams) {
+		this.preloadParams = preloadParams;
 	}
 
 	/* (non-Javadoc)

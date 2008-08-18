@@ -1,5 +1,9 @@
 package org.javarosa.core.model;
 
+/**
+ * @author Drew Roos?
+ *
+ */
 public interface QuestionStateListener {
 	//Question: Is there a reason we're
 	//using individual bytes here? Do we

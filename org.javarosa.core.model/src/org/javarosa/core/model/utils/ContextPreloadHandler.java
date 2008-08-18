@@ -7,6 +7,13 @@ import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 
+/**
+ * The Context Preload Handler retrieves values from a context
+ * object for preloading questions.
+ *  
+ * @author Alfred Mukudu
+ *
+ */
 public class ContextPreloadHandler implements IPreloadHandler
 {
 	public Context context;
@@ -21,14 +28,28 @@ public class ContextPreloadHandler implements IPreloadHandler
 		//initHandler();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.IPreloadHandler#handlePostProcess(org.javarosa.core.model.IFormDataModel, org.javarosa.core.model.IDataReference, java.lang.String)
+	 */
 	public boolean handlePostProcess(IFormDataModel model, IDataReference ref,
 			String params) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.IPreloadHandler#handlePreload(java.lang.String)
+	 */
 	public IAnswerData handlePreload(String preloadParams) {
 		return preloadContext(preloadParams);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.IPreloadHandler#preloadHandled()
+	 */
 	public String preloadHandled() {
 		return "context";
 	}

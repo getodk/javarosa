@@ -111,6 +111,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	
 	/**
 	 * Resolves a binding to a particular question data element
+	 * 
 	 * @param binding The binding representing a particular question
 	 * @return A QuestionDataElement corresponding to the binding
 	 * provided. Null if none exists in this tree.

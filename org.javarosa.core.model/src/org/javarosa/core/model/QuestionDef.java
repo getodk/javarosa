@@ -17,9 +17,15 @@ import org.javarosa.core.model.utils.SimpleOrderedHashtable;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 /** 
- * This is the question definition properties.
+ * The definition of a Question to be presented to users when
+ * filling out a form.
  * 
- * @author Daniel Kayiwa
+ * QuestionDef requires that any IDataReferences that are used
+ * are contained in the FormDefRMS's PrototypeFactory in order
+ * to be properly deserialized. If they aren't, an exception
+ * will be thrown at the time of deserialization. 
+ * 
+ * @author Daniel Kayiwa/Drew Roos
  *
  */
 public class QuestionDef implements IFormElement, Localizable {
@@ -319,8 +325,9 @@ public class QuestionDef implements IFormElement, Localizable {
 		throw new IllegalStateException();
 	}
 	
-	/**
-	 * Reads the object from stream.
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException{
 		if(!ExternalizableHelper.isEOF(dis)){
@@ -361,8 +368,9 @@ public class QuestionDef implements IFormElement, Localizable {
 		}	
 	}
 
-	/**
-	 * Write the object to stream.
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.util.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeInt(getID());

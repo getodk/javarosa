@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.javarosa.core.model.data;
 
 import java.io.DataInputStream;
@@ -10,7 +7,9 @@ import java.io.IOException;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
+
 /**
+ * A response to a question requesting an Integer Value
  * @author Clayton Sims
  *
  */

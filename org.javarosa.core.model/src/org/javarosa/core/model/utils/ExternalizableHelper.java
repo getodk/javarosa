@@ -72,12 +72,12 @@ public class ExternalizableHelper {
 		return (byte)l;
 	}	
 	
-	/*
+	/**
 	 * serialize a numeric value, only using as many bytes as needed. splits up the value into
 	 * chunks of 7 bits, using as many chunks as needed to unambiguously represent the value. each
 	 * chunk is serialized as a single byte, where the most-significant bit is set to 1 to indicate
 	 * there are more bytes to follow, or 0 to indicate the last byte
-	 */
+	 **/
 	public static void writeNumDefault (DataOutputStream dos, long l) throws IOException {		
 		int sig = -1;
 		long k;
@@ -92,9 +92,9 @@ public class ExternalizableHelper {
 		}
 	}
 
-	/*
+	/**
 	 * deserialize a numeric value stored in a variable number of bytes. see writeNumeric
-	 */
+	 **/
 	public static long readNumDefault (DataInputStream dis) throws IOException {
 		long l = 0;
 		byte b;
