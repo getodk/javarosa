@@ -8,6 +8,13 @@ import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.core.util.Observable;
 
+/**
+ * An ITransportManager is responsible for transmitting byte
+ * data using various Transport Methods.
+ * 
+ * @author 
+ *
+ */
 public interface ITransportManager extends IService {
 
 	public abstract String getName();

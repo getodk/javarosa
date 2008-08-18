@@ -18,6 +18,7 @@ import org.javarosa.core.services.transport.storage.RmsStorage;
  * also be registered with the Service Provider.
  * 
  * @author Brian DeRenzi
+ * @author Clayton Sims
  *
  */
 public class JavaRosaServiceProvider {

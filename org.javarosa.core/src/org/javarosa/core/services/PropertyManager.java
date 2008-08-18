@@ -7,7 +7,7 @@ import org.javarosa.core.services.properties.IPropertyRules;
 import org.javarosa.core.services.properties.storage.PropertyRMSUtility;
 
 /**
- * PropertyManager is a singleton class that is used to set and retrieve name/value pairs
+ * PropertyManager is a class that is used to set and retrieve name/value pairs
  * from persistent storage.
  *
  * Which properties are allowed, and what they can be set to, can be specified by an implementation of
@@ -15,7 +15,7 @@ import org.javarosa.core.services.properties.storage.PropertyRMSUtility;
  * property rules are inclusive, and can only increase the number of potential properties or property
  * values.
  *
- * @author ctsims
+ * @author Clayton Sims
  *
  */
 public class PropertyManager implements IService {
