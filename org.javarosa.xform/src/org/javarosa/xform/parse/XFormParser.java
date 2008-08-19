@@ -164,7 +164,9 @@ public class XFormParser {
 
 			doc.parse(parser);
 		} catch(Exception e){
+			//#if debug.output==verbose || debug.output==exception
 			System.err.println("XML Syntax Error!");
+			//#endif
 
 			e.printStackTrace();
 			return null;
@@ -227,7 +229,9 @@ public class XFormParser {
 	//for ease of parsing, we assume a model comes before the controls, which isn't necessarily mandated by the xforms spec
 	private static void parseModel (FormDef f, Element e) {
 		if (modelFound) {
+			//#if debug.output==verbose
 			System.err.println("Multiple models not supported. Ignoring subsequent models.");
+			//#endif
 			return;
 		}
 		modelFound = true;
@@ -528,7 +532,9 @@ public class XFormParser {
 			if ("true()".equals(xpathRel)) {
 				//do nothing
 			} else if ("false()".equals(xpathRel)) {
+				//#if debug.output==verbose
 				System.err.println("Warning: <bind> never relevant. Ignoring relevancy...");
+				//#endif
 			} else {
 				Condition c = buildCondition(xpathRel, "relevant");
 				c = f.addCondition(c);
@@ -592,7 +598,9 @@ public class XFormParser {
 		try {
 			expr = XPathParseTool.parseXPath(xpath);
 		} catch (XPathSyntaxException xse) {
+			//#if debug.output==verbose
 			System.err.println("Invalid XPath expression [" + xpath + "]!");
+			//#endif
 			return null;
 		}
 
