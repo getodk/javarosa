@@ -51,6 +51,7 @@
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
+					<source dir="${basedir}/../org.javarosa.core.model/test/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>					
@@ -138,6 +139,7 @@
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathTest"/>
+		<RunTestSuite suite="org.javarosa.core.model.utils.NumericEncodingTest"/>
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
