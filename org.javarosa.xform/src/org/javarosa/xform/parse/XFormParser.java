@@ -140,12 +140,16 @@ public class XFormParser {
 		instanceNode = null;
 	}
 
-	public static FormDef getFormDef (Reader reader) {
+	public static FormDef getFormDef(Reader reader) {
 		Document doc = getXMLDocument(reader);
-		try {
-			return getFormDef(doc);
-		} catch(Exception e) {
-			e.printStackTrace();
+		if (doc != null) {
+			try {
+				return getFormDef(doc);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else {
 			return null;
 		}
 	}
@@ -163,6 +167,7 @@ public class XFormParser {
 			System.err.println("XML Syntax Error!");
 
 			e.printStackTrace();
+			return null;
 		}
 
 		return doc;
