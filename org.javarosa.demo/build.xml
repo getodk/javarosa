@@ -46,6 +46,7 @@
 					<source dir="${dir.src}"/>
 					<!--Taking this out for now...-->
 					<!--source dir="${dir.test}"/-->
+					<source dir="${basedir}/../org.javarosa.action/src/"/>
 					<source dir="${basedir}/../org.javarosa.communication/src/"/>
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.util/src/"/>
@@ -57,9 +58,10 @@
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
-					<!--source dir="${basedir}/../org.javarosa.entitymgr/src/"/-->
-					<!--source dir="${basedir}/../org.javarosa.patient/src/"/-->
-					<!--source dir="${basedir}/../org.javarosa.patient/test/"/-->
+					<source dir="${basedir}/../org.javarosa.entitymgr/src/"/>
+					<source dir="${basedir}/../org.javarosa.patient/src/"/>
+					<source dir="${basedir}/../org.javarosa.patient/test/"/>
+					<source dir="${basedir}/../org.javarosa.patientmgr/src/"/>
 				</sources>
 
 				<!-- Build variables -->
@@ -133,7 +135,7 @@
 
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
-		<!--RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/-->
+		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
