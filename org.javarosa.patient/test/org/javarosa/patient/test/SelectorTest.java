@@ -39,7 +39,6 @@ public class SelectorTest extends TestCase  {
 		}
 		
 		public void testBasicParsing() {
-			assertEquals("This should fail and email should be sent",1,2);
 			Vector testVector = new Vector();
 			testVector.addElement("1");
 			testVector.addElement("2");
