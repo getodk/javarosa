@@ -33,7 +33,7 @@ public class ExternalizableHelper {
 	 *      BIAS = 30  -> [-30,224]
 	 *      BIAS = 254 -> [-254,0]
 	 */
-	private static final int STINGY_NEGATIVE_BIAS = 0;
+	protected static final int STINGY_NEGATIVE_BIAS = 0;
 	
 	public static void writeNumeric (DataOutputStream dos, long l, int encoding) throws IOException {
 		switch (encoding) {
@@ -748,107 +748,5 @@ public class ExternalizableHelper {
 			e.printStackTrace();
 		}
 		return 0;
-	}
-	
-	public static boolean numericEncodingUnitTest (long valIn, int encoding) {
-		byte[] bytesOut; 
-		long valOut;
-		
-		System.out.print("Testing: " + valIn + " [");
-		switch (encoding) {
-		case ENCODING_NUM_DEFAULT: System.out.print("default"); break;
-		case ENCODING_NUM_STINGY: System.out.print("stingy"); break;
-		}
-		System.out.print("]");
-		
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream(100);
-			ExternalizableHelper.writeNumeric(new DataOutputStream(baos), valIn, encoding);
-			bytesOut = baos.toByteArray();
-
-			ByteArrayInputStream bais = new ByteArrayInputStream(bytesOut);
-			valOut = ExternalizableHelper.readNumeric(new DataInputStream(bais), encoding);
-		} catch (IOException ioe) {
-			System.out.println("  IOException!");
-			return false;
-		}
-		
-		System.out.print("; serialized as: [");
-		for (int i = 0; i < bytesOut.length; i++) {
-			String hex = Integer.toHexString(bytesOut[i]);
-			if (hex.length() == 1)
-				hex = "0" + hex;
-			else
-				hex = hex.substring(hex.length() - 2);
-			System.out.print(hex);
-			if (i < bytesOut.length - 1)
-				System.out.print(" ");
-		}
-		System.out.print("]; deserialized: ");
-		if (valIn == valOut) {
-			System.out.println("OK");
-			return true;
-		} else {
-			System.out.println("ERROR!! [" + valOut + "]");
-			return false;
-		}
-	}
-	
-	public static void numericEncodingUnitTestSuite () {
-		int enc;
-		
-		enc = ENCODING_NUM_DEFAULT;
-		
-		numericEncodingUnitTest(0, enc);
-		numericEncodingUnitTest(-1, enc);
-		numericEncodingUnitTest(1, enc);			
-		numericEncodingUnitTest(-2, enc);
-	
-		for (int i = 3; i <= 64; i++) {
-			long min = (i < 64 ? -((long)0x01 << (i - 1)) : Long.MIN_VALUE);
-			long max = (i < 64 ? ((long)0x01 << (i - 1)) - 1 : Long.MAX_VALUE);
-			
-			numericEncodingUnitTest(max - 1, enc);
-			numericEncodingUnitTest(max, enc);
-			if (i < 64)
-				numericEncodingUnitTest(max + 1, enc);
-			numericEncodingUnitTest(min + 1, enc);
-			numericEncodingUnitTest(min, enc);
-			if (i < 64)
-				numericEncodingUnitTest(min - 1, enc);					
-		}
-		
-		enc = ENCODING_NUM_STINGY;
-		
-		for (int i = 0; i <= 1; i++) {
-			int offset = (i == 0 ? 0 : STINGY_NEGATIVE_BIAS);
-			if (offset == 0 && i == 1)
-				break;
-			
-			numericEncodingUnitTest(0 - offset, enc);
-			numericEncodingUnitTest(1 - offset, enc);
-			numericEncodingUnitTest(126 - offset, enc);
-			numericEncodingUnitTest(127 - offset, enc);
-			numericEncodingUnitTest(128 - offset, enc);
-			numericEncodingUnitTest(129 - offset, enc);
-			numericEncodingUnitTest(253 - offset, enc);
-			numericEncodingUnitTest(254 - offset, enc);
-			numericEncodingUnitTest(255 - offset, enc);
-			numericEncodingUnitTest(256 - offset, enc);
-			numericEncodingUnitTest(-1 - offset, enc);
-			numericEncodingUnitTest(-2 - offset, enc);
-			numericEncodingUnitTest(-127 - offset, enc);
-			numericEncodingUnitTest(-128 - offset, enc);
-			numericEncodingUnitTest(-129 - offset, enc);
-		}
-		numericEncodingUnitTest(3750, enc);
-		numericEncodingUnitTest(-3750, enc);
-		numericEncodingUnitTest(33947015, enc);
-		numericEncodingUnitTest(-33947015, enc);		
-		numericEncodingUnitTest(Integer.MAX_VALUE, enc);
-		numericEncodingUnitTest(Integer.MAX_VALUE - 1, enc);
-		numericEncodingUnitTest(Integer.MIN_VALUE, enc);
-		numericEncodingUnitTest(Integer.MIN_VALUE + 1, enc);
-	}
-		
+	}	
 }

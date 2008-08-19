@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
+	<classpathentry kind="lib" path="/org.javarosa.demo/lib/j2meunit-javarosa.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
