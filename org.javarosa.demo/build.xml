@@ -137,7 +137,7 @@
 	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
 
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
-	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
+	<target name="RunJ2MEUnitTests" depends="supressOutput, disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.NumericEncodingTest"/>
@@ -157,6 +157,10 @@
 		</propertyfile>
 		<echo message="Build ${build.number}" />
 		-->
+	</target>
+	
+	<target name="supressOutput">
+		<property name="${debug.output}" value="none"/>
 	</target>
 
 	<target name="disableObfuscator">
