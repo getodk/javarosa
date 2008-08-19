@@ -51,6 +51,5 @@ public class DemoFormsTest extends TestCase  {
 			testForm("/tz-e-ctc.xhtml");
 			testForm("/CHMTTL.xhtml");
 			testForm("/condtest.xhtml");
-			fail("Intentional failure. Want to see output trace");
 		}
 }
