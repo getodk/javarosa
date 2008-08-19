@@ -9,7 +9,7 @@ import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.xpath.EvaluationContext;
-import org.javarosa.xpath.XPathTest;
+import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathBinaryOpExpr;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
@@ -118,7 +118,7 @@ public class Condition implements Externalizable {
 		falseAction = ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT);
 		xpath = ExternalizableHelper.readUTF(in);
 		try {
-			expr = XPathTest.parseXPath(xpath);
+			expr = XPathParseTool.parseXPath(xpath);
 		} catch (XPathSyntaxException xse) { }
 		
 		//affected q's

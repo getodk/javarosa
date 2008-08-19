@@ -55,13 +55,14 @@
 					<source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>					
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
-					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
 					<source dir="${basedir}/../org.javarosa.entitymgr/src/"/>
 					<source dir="${basedir}/../org.javarosa.patient/src/"/>
 					<source dir="${basedir}/../org.javarosa.patient/test/"/>
 					<source dir="${basedir}/../org.javarosa.patientmgr/src/"/>
+					<source dir="${basedir}/../org.javarosa.xform/src/"/>
+					<source dir="${basedir}/../org.javarosa.xform/test/"/>
 				</sources>
 
 				<!-- Build variables -->
@@ -136,6 +137,7 @@
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
+		<RunTestSuite suite="org.javarosa.xpath.test.XPathTest"/>
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>

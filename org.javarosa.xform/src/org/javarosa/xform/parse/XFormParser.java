@@ -22,7 +22,7 @@ import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.IXFormBindHandler;
 import org.javarosa.xform.util.XFormAnswerDataParser;
-import org.javarosa.xpath.XPathTest;
+import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
@@ -585,7 +585,7 @@ public class XFormParser {
 		}
 
 		try {
-			expr = XPathTest.parseXPath(xpath);
+			expr = XPathParseTool.parseXPath(xpath);
 		} catch (XPathSyntaxException xse) {
 			System.err.println("Invalid XPath expression [" + xpath + "]!");
 			return null;

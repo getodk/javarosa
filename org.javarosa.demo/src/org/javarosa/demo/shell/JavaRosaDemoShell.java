@@ -68,7 +68,6 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void init() {
-		XPathTest.test();
 		
 		loadProperties();
 
