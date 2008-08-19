@@ -150,13 +150,6 @@
 	<target name="init">
 		<!-- Disable the Emulator by default -->
 		<property name="test" value="false" />
-
-		<!-- increment build number
-		<propertyfile file="${basedir}/build.properties">
-			<entry key="build.number" type="int" operation="+" value="1" pattern="00" />
-		</propertyfile>
-		<echo message="Build ${build.number}" />
-		-->
 	</target>
 	
 	<target name="supressOutput">
