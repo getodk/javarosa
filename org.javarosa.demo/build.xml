@@ -133,7 +133,7 @@
 
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
-		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
+		<!--RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/-->
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
