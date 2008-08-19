@@ -52,6 +52,7 @@
 					<source dir="${basedir}/../org.javarosa.core.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/test/"/>
+					<source dir="${basedir}/../org.javarosa.demo/test/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>					
@@ -140,6 +141,7 @@
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.NumericEncodingTest"/>
+		<RunTestSuite suite="org.javarosa.demo.xform.test.DemoFormsTest"/>
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
