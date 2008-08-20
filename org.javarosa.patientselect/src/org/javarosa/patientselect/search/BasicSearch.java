@@ -8,7 +8,7 @@ import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.patientselect.object.ExternalizableObject;
 import org.javarosa.patientselect.store.PatientStore;
 
-public class BasicSearch implements Externalizable {
+public class BasicSearch implements ISearch, Externalizable {
 	
 	private int formId;
 	Vector searchConditions;
@@ -62,22 +62,58 @@ public class BasicSearch implements Externalizable {
 		ExternalizableHelper.writeExternal(searchConditions, out );
 	}
 
-	public void searchByBoth(String patientName, String patientCode) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
+	public void searchByBoth(String patientName, String patientCode) {
+		
 		if(patientName != null && patientCode != null){
-			store.retrieveFromRMS(formId, externObject);
+			try {
+				store.retrieveFromRMS(formId, externObject);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (UnavailableExternalizerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}	
 	}
 
-	public String searchByCode(String code) throws IOException {
+	public String searchByCode(String code) {
+		
 		if(code != null){
-			store.retrieveByteDataFromRMS(formId);
+			try{
+				store.retrieveDataIndex(code);
+			}
+			catch(Exception excep){
+				excep.printStackTrace();
+			}
 		}
 		return null;
 	}
 
-	public String searchByName(String patientName) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
+	public String searchByName(String patientName) {
+		
 		if(patientName != null){
-			store.retrieveFromRMS(formId);
+			try {
+				store.retrieveFromRMS(formId);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (UnavailableExternalizerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
