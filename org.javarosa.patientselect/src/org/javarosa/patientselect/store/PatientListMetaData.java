@@ -7,9 +7,18 @@ import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.patientselect.object.ExternalizableObject;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 
+/**
+* This encapsulates the data to be passed with the patient Data
+* 
+* 
+* @author Mark Gerard
+*
+*/
 public class PatientListMetaData extends MetaDataObject {
 	
 	private int formId;
+	private int patientId;
+	private String patientName;
 	
 	public PatientListMetaData(){
 		
@@ -18,6 +27,17 @@ public class PatientListMetaData extends MetaDataObject {
 	public int getFormId(){
 		
 		return formId;
+	}
+	
+	public int getPatientId(){
+		
+		return patientId;
+		
+	}
+	
+	private String getPatientName(){
+		
+		return patientName;
 	}
 	
 	public void setFormId(int formid)
