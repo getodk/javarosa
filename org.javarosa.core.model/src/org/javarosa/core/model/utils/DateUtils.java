@@ -148,6 +148,25 @@ public class DateUtils {
 		return result;
 	}
 	
+	
+	public static String get24HourTimeFromDate(Date d)
+	{
+		//set as the xml transport standard for time Questions
+		Calendar cd = Calendar.getInstance();
+		cd.setTime(d);
+	
+		String hour = "" + cd.get(Calendar.HOUR_OF_DAY);
+		String minutes = "" + cd.get(Calendar.MINUTE);
+		
+			if (hour.length() <2)
+				hour = "0" + hour;
+			
+			if (minutes.length() < 2)
+				minutes = "0" + minutes;
+			
+			return hour+":"+minutes;	
+	}
+	
 	public static int daysInMonth (int month, int year) {
 		if (month == Calendar.APRIL || month == Calendar.JUNE || month == Calendar.SEPTEMBER || month == Calendar.NOVEMBER) {
 			return 30;
