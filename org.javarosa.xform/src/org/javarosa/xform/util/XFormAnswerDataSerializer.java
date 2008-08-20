@@ -12,6 +12,7 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.utils.DateUtils;
 
 /**
@@ -78,6 +79,15 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	
 	/**
 	 * @param data The AnswerDataObject to be serialized
+	 * @return A String which contains a date in xsd:time
+	 * formatting
+	 */
+	public Object serializeAnswerData(TimeData data) {
+		return DateUtils.get24HourTimeFromDate((Date)data.getValue());
+	}
+	
+	/**
+	 * @param data The AnswerDataObject to be serialized
 	 * @return A string containing the xforms compliant format
 	 * for a <select> tag, a string containing a list of answers
 	 * separated by space characters.
@@ -118,7 +128,11 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			return serializeAnswerData((StringData)data);
 		} else if(data instanceof DateData) {
 			return serializeAnswerData((DateData)data);
-		} else if(data instanceof SelectMultiData) {
+		}
+		else if(data instanceof TimeData) {
+			return serializeAnswerData((TimeData)data);
+		}
+		else if(data instanceof SelectMultiData) {
 			return serializeAnswerData((SelectMultiData)data);
 		} else if(data instanceof SelectOneData) {
 			return serializeAnswerData((SelectOneData)data);
