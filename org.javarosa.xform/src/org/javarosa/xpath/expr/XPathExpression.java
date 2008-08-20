@@ -98,7 +98,7 @@ public abstract class XPathExpression {
 			printStr("}");
 		} else if (o instanceof XPathFuncExpr) {
 			XPathFuncExpr x = (XPathFuncExpr)o;
-			if (x.args == null) {
+			if (x.args.length == 0) {
 				printStr("func {" + x.id.toString() + ", args {none}}");
 			} else {
 				printStr("func {" + x.id.toString() + ", args {{");
@@ -122,20 +122,9 @@ public abstract class XPathExpression {
 			printStr("path {init-context:" + init + ",");
 
 			if (x.init_context == XPathPathExpr.INIT_CONTEXT_EXPR) {
-				printStr(" init-expr:{{");
-				print(x.expr);
-
-				if (x.predicates.length == 0) {
-					printStr(" } predicates {none}}");
-				} else {
-					printStr(" } predicates {{");
-					for (int i = 0; i < x.predicates.length; i++) {
-						print(x.predicates[i]);
-						if (i < x.predicates.length - 1)
-							printStr(" } {");
-					}
-					printStr(" }}}");
-				}
+				printStr(" init-expr:{");
+				print(x.filtExpr);
+				printStr(" }");
 			}
 
 			if (x.steps.length == 0) {
@@ -150,7 +139,23 @@ public abstract class XPathExpression {
 				}
 				printStr("}}}");
 			}
+		} else if (o instanceof XPathFilterExpr) {
+			XPathFilterExpr x = (XPathFilterExpr)o;
+			
+			printStr("filter-expr:{{");
+			print(x.x);
 
+			if (x.predicates.length == 0) {
+				printStr(" } predicates {none}}");
+			} else {
+				printStr(" } predicates {{");
+				for (int i = 0; i < x.predicates.length; i++) {
+					print(x.predicates[i]);
+					if (i < x.predicates.length - 1)
+						printStr(" } {");
+				}
+				printStr(" }}}");
+			}
 		} else if (o instanceof XPathStep) {
 			XPathStep x = (XPathStep)o;
 			String axis = null;

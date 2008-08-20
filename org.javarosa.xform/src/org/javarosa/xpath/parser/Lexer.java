@@ -45,7 +45,7 @@ public class Lexer {
 			} else if (c == '+') {
 				token = new Token(Token.PLUS);
 			} else if (c == '-') {
-				token = new Token(Token.MINUS);
+				token = new Token(context == LEX_CONTEXT_VAL ? Token.UMINUS : Token.MINUS); //not sure this is entirely correct
 			} else if (c == '*') {
 				token = new Token(context == LEX_CONTEXT_VAL ? Token.WILDCARD : Token.MULT);
 			} else if (c == '|') {
