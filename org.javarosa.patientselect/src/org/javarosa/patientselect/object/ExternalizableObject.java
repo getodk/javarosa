@@ -1,48 +1,45 @@
 package org.javarosa.patientselect.object;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import javax.microedition.lcdui.*;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.patientselect.store.PatientListMetaData;
 import org.javarosa.patientselect.store.PatientStore;
 
 /**
-* This IActivity encapsulates a discrete execution unit, with the
-* ability to List patients and allow to select a particular patient.
+* This encapsulates the Externalizable object to be passed to the RMS
 * 
-* The IActivity also release control flow from the IShell
 * 
 * @author Mark Gerard
 *
 */
-public class ExternalizableObject extends PatientListMetaData implements Externalizable {
+public class ExternalizableObject extends PatientListMetaData implements CommandListener {
 
 	static PatientStore store;
-	static Form mForm, sForm;
-	
-	static TextField mPatientField, mPatientCode, mPatientLocation, mPatientSickness, mPatientTreatment, mPeriod, mPatientSex;
-	static DateField mReportDate,mNextDateVisit;
-	
 	static String storeName = "patientRecordStore";
-
+	private Form mForm, sForm;
+	private Command search, save;
+	private StringBuffer patientData;
+	private DateField mReportDate,mNextDateVisit;
+	private TextField mPatientField, mPatientCode, mPatientLocation, mPatientSickness, mPatientTreatment, mPeriod, mPatientSex;
 	
 	public ExternalizableObject(String title) {
 		
 		store = new PatientStore(storeName);
 		mForm = new Form(title);
+		
+		patientData = new StringBuffer();
+		
+		search = new Command("Search", Command.ITEM, 0);
+		save = new Command("Save", Command.ITEM, 1);
 	}
 	
 	public ExternalizableObject() {
 		// TODO Auto-generated constructor stub
 	}
-
-	public static void initPatientRegistrationForm() {
+	
+	
+	public  void initPatientRegistrationForm() {
 		
 		mForm = new Form("Enter New Patient Details");
 		
@@ -70,15 +67,32 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 		mForm.append(mPeriod);
 		
 		mForm.addCommand(new Command("Back", Command.BACK, 0));
-		mForm.addCommand(new Command("Save Patient", Command.ITEM, 1));
+		mForm.addCommand(save);
 		
-		//mForm.setCommandListener(this);
+		mForm.setCommandListener(this);
 		
 		//parent.setDisplay(this, mForm);
 		JavaRosaServiceProvider.instance().getDisplay().setCurrent(mForm);
 	}
 	
-	public static void initPatientSearchForm() {
+	public Object getPatientData(){
+		
+		if(validateData()){
+			
+			patientData.append(mPatientField.getString().trim());
+			patientData.append(mPatientCode.getString().trim());
+			patientData.append(mPatientSickness.getString().trim());
+			patientData.append(mPatientTreatment.getString().trim());
+			patientData.append(mPatientSex.getString().trim());
+			patientData.append(mPatientLocation.getString().trim());
+			patientData.append(mPeriod.getString().trim());
+			
+			patientData.append(mReportDate.getDate().toString().trim());
+			patientData.append(mNextDateVisit.getDate().toString().trim());
+		}
+		return patientData;
+	}
+	public  void initPatientSearchForm() {
 
 		sForm = new Form("Enter patient details to search");
 		
@@ -98,7 +112,7 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 		
 	}
 
-	public static boolean validateData() {
+	public  boolean validateData() {
 		
 		boolean validated = false;
 		
@@ -108,8 +122,6 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 			validated = true;
 		}
 		else{
-			
-			//showAlert("Patient Data","You did not enter all the required patient Data! Save cannot proceed");
 			validated = false;
 		}
 		
@@ -120,7 +132,7 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 		}
 		
 		else{
-			//showAlert("Patient Data","You did not enter all the required patient Data! Save cannot proceed");
+			
 			validated = false;
 		}
 		
@@ -130,8 +142,6 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 			validated = true;
 		}
 		else{
-			
-			//showAlert("Patient Data","You did not enter all the required patient Data! Save cannot proceed");
 			validated = false;
 		}
 		
@@ -141,7 +151,6 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 			validated = true;
 		}
 		else{
-			//showAlert("Patient Data","You did not enter all the required patient Data! Save cannot proceed");
 			validated = false;
 		}
 		
@@ -151,7 +160,6 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 			validated = true;
 		}
 		else{
-			//showAlert("Patient Data","You did not enter all the required patient Data! Save cannot proceed");
 			validated = false;
 		}
 		
@@ -161,7 +169,6 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 			validated = true;
 		}
 		else{
-			//showAlert("Patient Data","You did not enter all the required patient Data! Save cannot proceed");
 			validated = false;
 		}
 		
@@ -171,7 +178,6 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 			validated = true;
 		}
 		else{
-			//showAlert("Patient Data","You did not enter all the required patient Data! Save cannot proceed");
 			validated = false;
 		}
 		
@@ -181,7 +187,6 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 			validated = true;
 		}
 		else{
-			//showAlert("Patient Data","You did not enter all the required patient Data! Save cannot proceed");
 			validated = false;
 		}
 		
@@ -192,11 +197,36 @@ public class ExternalizableObject extends PatientListMetaData implements Externa
 		}
 		else{
 			
-			//showAlert("Patient Data","You did not enter all the required patient Data! Save cannot proceed");
 			validated = false;
 		}
 		
 		return validated;
+	}
+	
+	public Command getCommandType(){
+		
+		return save;
+	}
+
+	public void commandAction(Command c, Displayable d) {
+		
+		if(c == save){
+			System.out.println("In");
+			
+			PatientListMetaData metaDataObject = new PatientListMetaData();
+			System.out.println("In");
+			
+			Object patData = getPatientData();
+			
+			System.out.println("In");
+			store.writeToRMS(patData, metaDataObject);
+			
+			System.out.println("out");
+		}
+		else if (c == search){
+			
+		}
+		
 	}
 
 }
