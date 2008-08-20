@@ -13,5 +13,6 @@ public class Commands {
 	public static final String CMD_EXIT = "exit";
 	public static final String CMD_VIEW_DATA = "view_data";
 	public static final String CMD_GET_NEW_FORM = "get_new_form";
+	public static final String CMD_DELETE_FORM = "delete_form";
 	public static final String CMD_SETTINGS = "view_settings";
 }
