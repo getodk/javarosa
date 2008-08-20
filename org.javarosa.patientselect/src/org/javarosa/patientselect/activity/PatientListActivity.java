@@ -12,6 +12,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 
 import org.javarosa.patientselect.object.*;
+import org.javarosa.patientselect.search.BasicSearch;
 import org.javarosa.patientselect.store.PatientListMetaData;
 import org.javarosa.patientselect.store.PatientStore;
 
@@ -20,14 +21,13 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 	private Context context;
 	private List list;
 	
-	private Command search;
+	private Command search, save;
 	private Alert alert;
 	private Gauge patientIndicator;
 	
 	private IShell parent = null;
 	
 	private int choiceId = -1;
-	private int formId;
 	
 	private ExternalizableObject externObject = null;
 	private PatientListMetaData metaDataObject = null;
@@ -42,6 +42,9 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		
 		store = new PatientStore("PatientStore");
 		metaDataObject = new PatientListMetaData();
+		
+		search = new Command("Search", Command.ITEM, 0);
+		save = new Command("Save", Command.ITEM, 1);
 	}
 	
 	public PatientListActivity() {
@@ -94,7 +97,6 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		list.addCommand(new Command("Proceed", Command.SCREEN, 0));
 		list.addCommand(new Command("Exit", Command.EXIT, 1));
 		
-		//parent.setDisplay(this, list);
 		JavaRosaServiceProvider.instance().getDisplay().setCurrent(list);
 		
 		list.setCommandListener(this);
@@ -123,11 +125,6 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		return null;
 	}
 
-	public int getFormId() {
-		
-		return formId;
-	}
-
 	public void commandAction(Command command, Displayable display) {
 		
 		if (command.getCommandType() == Command.EXIT) {
@@ -142,13 +139,13 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 			if(choiceId == 0){
 				
 				System.out.println(choiceId);
-				ExternalizableObject.initPatientSearchForm();
+				externObject.initPatientSearchForm();
 			}
 			
 			else if(choiceId == 1){
 				
 				System.out.println(choiceId);
-				ExternalizableObject.initPatientRegistrationForm();
+				externObject.initPatientRegistrationForm();
 			}
 		}
 		
@@ -159,18 +156,21 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		}
 		
 		else if(command == search){
+			BasicSearch search = new BasicSearch();
 			
+			search.searchByCode(code);
 			
 			
 		}
-		else if(command.getCommandType() == Command.ITEM){
+		else if(command == externObject.getCommandType()){
 			
 			System.out.println("Entering save mode");
 			
-			if(ExternalizableObject.validateData()){
-				
-				store.writeToRMS(externObject, metaDataObject);				
-			}
+			Object patData = externObject.getPatientData();
+			store.writeToRMS(patData, metaDataObject);	
+			
+			System.out.println("Exiting save mode [Data saved]");
+		}
 			else{
 				
 				String fError = "Null Values";
@@ -178,9 +178,6 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 				
 				showAlert(fError, sError);
 			}
-			
-			System.out.println("Exiting save mode [Data saved]");
-		}
 	}
 	
 	public void destroyApp(boolean arg0) throws MIDletStateChangeException {
@@ -194,14 +191,12 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 	}
 	
 	public void startApp() throws MIDletStateChangeException {
-		
-		this.context = context;
+
+		context.setCurrentUser("Mark");
 		parent.setDisplay(this, list);
 		JavaRosaServiceProvider.instance().getDisplay().setCurrent(list);
 		
 		showList();
 		
 	}
-
-
 }
