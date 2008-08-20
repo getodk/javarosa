@@ -1,18 +1,20 @@
 package org.javarosa.patientselect.store;
 
 import java.io.IOException;
+import java.util.Vector;
 
-import javax.microedition.rms.InvalidRecordIDException;
-import javax.microedition.rms.RecordEnumeration;
-import javax.microedition.rms.RecordListener;
-import javax.microedition.rms.RecordStore;
-import org.javarosa.core.services.storage.utilities.*;
+import javax.microedition.rms.*;
+import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.util.UnavailableExternalizerException;
-import org.javarosa.patientselect.activity.PatientListActivity;
 import org.javarosa.patientselect.object.ExternalizableObject;
-import org.javarosa.referral.model.Referrals;
-import org.javarosa.referral.storage.ReferralMetaData;
 
+/**
+* RMSUtility class for this project
+* 
+* 
+* @author Mark Gerard
+*
+*/
 public class PatientStore extends RMSUtility  implements RecordListener {
 
 	private String recordStoreName = "";
@@ -20,6 +22,9 @@ public class PatientStore extends RMSUtility  implements RecordListener {
 	
 	protected RMSUtility metaDataRMS;
     protected RecordStore recordStore = null;
+    
+	private Vector patientList;
+	int patIndex;
 	
 	public PatientStore(String name) {
 		
@@ -35,6 +40,51 @@ public class PatientStore extends RMSUtility  implements RecordListener {
         this.open();
         
         System.out.println("RMS SIZE (" + this.recordStoreName + ") : " + this.getNumberOfRecords());
+        
+        patientList = new Vector();
+	}
+	
+	public void putData(String[] patData){
+		try{
+			if(patData != null){
+				patientList.addElement(patData);
+			}
+		}
+		catch(Exception excep){
+			excep.printStackTrace();
+		}
+		
+	}
+	
+	public int retrieveDataIndex(String data){
+		
+		patIndex = -1;
+		
+		try{
+			if(data != null){
+				if(patientList.contains(data)){
+					patIndex =  patientList.indexOf(data);
+					searchPatient(patIndex);
+				}
+			}
+		}
+		catch(Exception excep){
+			excep.printStackTrace();
+		}
+		return patIndex;
+	}
+	
+	public String searchPatient(int searchIndex){
+		
+		searchIndex = patIndex;
+		try{
+			return patientList.elementAt(searchIndex).toString();
+		}
+		catch(Exception excep){
+			
+			excep.printStackTrace();
+			return null;
+		}
 	}
 	
 	/*
