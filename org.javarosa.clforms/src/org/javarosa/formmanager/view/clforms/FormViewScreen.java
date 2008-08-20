@@ -76,11 +76,17 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 			int i = ((List) screen).getSelectedIndex();
 			controller.selectQuestion(i);
 			backCommand = new Command("Back", Command.BACK, 2);
-
-			questionScreen = new PromptScreen(model.getQuestion(i));
+System.out.println("question selected proceeding to widget");
+			//this method will call the single question screen form to create single view form
+			SingleQuestionScreen newScreen = new SingleQuestionScreen(model.getQuestion(i));
+			newScreen.setParent(this);
+			newScreen.setController(controller);
+			newScreen.show();
+			
+/*			questionScreen = new PromptScreen(model.getQuestion(i));
 			questionScreen.setParent(this);
 			questionScreen.setController(controller);
-			questionScreen.show();
+			questionScreen.show();*/
 			/*tempForm = new Form(model.getQuestion(i).getLongText());
 			tempForm.addCommand(backCommand);
 			tempForm.setCommandListener(this);
@@ -144,7 +150,6 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 
 	protected void createView() {
 
-		//NeedModel
 
 		//Check who's relevant and display
 //		form.calculateRelevantAll();
@@ -170,6 +175,7 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 	public void show() {
 		createView();
 		controller.setDisplay(screen);
+		
 	}
 
 	public void destroy() {
