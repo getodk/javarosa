@@ -90,14 +90,14 @@ public class FormList extends List implements CommandListener {
 			returnvals.put(Commands.CMD_SELECT_XFORM, new Integer(this.getSelectedIndex()));
 			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
-/*
+
         if (c == CMD_DELETE_FORM) {
-			XFormMetaData data = (XFormMetaData) formIDs.elementAt(this.getSelectedIndex());
+			Hashtable returnvals = new Hashtable();
+			returnvals.put(Commands.CMD_DELETE_FORM, new Integer(this.getSelectedIndex()));
 			// TODO check for any form dependancies
-			this.mainShell.deleteForm(data.getRecordId());
-			createView();
+			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
-*/
+
 		else if (c == CMD_EXIT) {
 			Hashtable returnvals = new Hashtable();
 			returnvals.put(Commands.CMD_EXIT, "");
