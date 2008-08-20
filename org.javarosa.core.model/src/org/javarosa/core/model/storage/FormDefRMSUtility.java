@@ -17,6 +17,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
@@ -222,7 +223,8 @@ public class FormDefRMSUtility extends RMSUtility {
 			addAnswerDataPrototype(new IntegerData());
 			addAnswerDataPrototype(new SelectMultiData());
 			addAnswerDataPrototype(new SelectOneData());
-			addAnswerDataPrototype(new StringData());
+			addAnswerDataPrototype(new StringData());			
+			addAnswerDataPrototype(new TimeData());
 		}
 		return questionFactory; 
 	}
