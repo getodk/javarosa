@@ -41,6 +41,9 @@ public class ChatterboxWidgetFactory {
 			case Constants.DATATYPE_DATE:
 				expandedStyle = new DateEntryWidget();
 				break;
+			case Constants.DATATYPE_TIME:
+				expandedStyle = new TimeEntryWidget();
+				break;
 			}
 			break;
 		case Constants.CONTROL_SELECT_ONE:
