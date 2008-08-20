@@ -104,6 +104,20 @@ public class FormListActivity implements IActivity {
 				// forms list.  I think this is best to ensure that the list is updated
 				// - Brian DeRenzi 18 Aug 2008
 				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+			} else if (cmd == Commands.CMD_DELETE_FORM) {
+				int selectedForm = ((Integer)returnvals.get(Commands.CMD_DELETE_FORM)).intValue();
+				int formId = ((Integer)positionToId.elementAt(selectedForm)).intValue();
+				//#if debug.output==verbose
+				System.out.println("Deleting form: " + formIDs.elementAt(formId));
+				//#endif
+				FormDefMetaData meta = (FormDefMetaData)formIDs.elementAt(formId);
+				FormDefRMSUtility rms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
+				
+				// Delete!
+				rms.deleteRecord(meta.getRecordId());
+				
+				// refresh
+				this.start(this.context);
 			} else {
 				Hashtable returnArgs = new Hashtable();
 				returnArgs.put(COMMAND_KEY, cmd);
