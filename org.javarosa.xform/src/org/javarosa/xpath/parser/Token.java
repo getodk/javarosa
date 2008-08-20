@@ -31,9 +31,10 @@ public class Token {
 	public static final int RPAREN = 26;
 	public static final int SLASH = 27;
 	public static final int STR = 28;
-	public static final int UNION = 29;
-	public static final int VAR = 30;
-	public static final int WILDCARD = 31;
+	public static final int UMINUS = 29;
+	public static final int UNION = 30;
+	public static final int VAR = 31;
+	public static final int WILDCARD = 32;
 	
 	public int type;
 	public Object val;
@@ -79,6 +80,7 @@ public class Token {
 		case RPAREN: s = "RPAREN"; break;
 		case SLASH: s = "SLASH"; break;
 		case STR: s = "STR(" + (String)val + ")"; break;
+		case UMINUS: s = "UMINUS"; break;
 		case UNION: s = "UNION"; break;
 		case VAR: s = "VAR(" + ((XPathQName)val).toString() + ")"; break;
 		case WILDCARD: s = "WILDCARD"; break;		

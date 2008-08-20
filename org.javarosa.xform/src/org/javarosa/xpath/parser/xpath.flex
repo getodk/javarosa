@@ -7,6 +7,11 @@ import org.javarosa.xpath.expr.*;
   
 /* DON'T EDIT THIS FILE UNLESS YOU KNOW WHAT YOU'RE DOING */ 
 
+/* this file isn't actually used, as the generated parser used too much memory,
+ * however, our custom light-weight parser is based off it, and it is left here
+ * for reference
+ */
+
 /* TODO:
  * need to catch syntax errors
  * need to explore directives that make compiled code smaller
