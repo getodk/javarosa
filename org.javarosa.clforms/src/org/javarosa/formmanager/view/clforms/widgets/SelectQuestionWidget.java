@@ -1,5 +1,7 @@
 package org.javarosa.formmanager.view.clforms.widgets;
 
+import java.util.Enumeration;
+
 import javax.microedition.lcdui.Command;
 
 import org.javarosa.core.model.QuestionDef;
@@ -45,38 +47,18 @@ public class SelectQuestionWidget extends SingleQuestionScreen
 	{
 		this.question = question;
 
-		ChoiceGroup cg = new ChoiceGroup("",choiceType ); //{
-			/*public int getRelativeScrollYOffset() {
-				if (!this.enableScrolling && this.parent instanceof Container) {
-					//This line here (The + this.parent.relativeY part) is the fix.
-					return ((Container)this.parent).getScrollYOffset() + this.relativeY + this.parent.relativeY;
-				}
-				int offset = this.targetYOffset;
-				//#ifdef polish.css.scroll-mode
-					if (!this.scrollSmooth) {
-						offset = this.yOffset;
-					}
-				//#endif
-				return offset;
-			}*/
-		//};
-		
-		for (int i = 0; i < question.getSelectItems().size(); i++)
-			cg.append(question.getLongText(), null);
+		ChoiceGroup cg = new ChoiceGroup(question.getLongText(),ChoiceGroup.MULTIPLE ); //{
+		Enumeration itr = question.getSelectItems().keys();//access choices directly
+		int i = 0;
+		while (itr.hasMoreElements()) {
+			String label = (String) itr.nextElement();
+			cg.append(label, null);//add options to choice group
+			i++;
+		}	
 		
 		return cg;
 	}
 
-/*	protected ChoiceGroup choiceGroup () {
-		return (ChoiceGroup)entryWidget;    
-	}*/
-
-/*	protected void updateWidget (QuestionDef question) {
-		for (int i = 0; i < choiceGroup().size(); i++) {
-			choiceGroup().getItem(i).setText((String)question.getSelectItems().keyAt(i));
-		}
-	}*/	
-	
 	
 	public void reset () {
 		prompt = null;
@@ -88,4 +70,5 @@ public class SelectQuestionWidget extends SingleQuestionScreen
 	{
 		//should be abstract and handled by question-type child classes.
 	}
+	
 }
