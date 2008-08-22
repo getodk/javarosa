@@ -7,6 +7,7 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.List;
 
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
@@ -53,11 +54,13 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 
     	multiLingual = (model.getForm().getLocalizer() != null);
     	model.registerObservable(this);
+    	
+		setUpCommands();
 
 	}
 
 	public void commandAction(Command command, Displayable s) {
-		if(s instanceof PromptScreen){
+		if(s instanceof FormViewManager){
 //			if (command == P)
 
 			controller.stepQuestion(true);
@@ -76,21 +79,10 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 			int i = ((List) screen).getSelectedIndex();
 			controller.selectQuestion(i);
 			backCommand = new Command("Back", Command.BACK, 2);
-System.out.println("question selected proceeding to widget");
-			//this method will call the single question screen form to create single view form
-			SingleQuestionScreen newScreen = new SingleQuestionScreen(model.getQuestion(i));
-			newScreen.setParent(this);
-			newScreen.setController(controller);
-			newScreen.show();
-			
-/*			questionScreen = new PromptScreen(model.getQuestion(i));
-			questionScreen.setParent(this);
-			questionScreen.setController(controller);
-			questionScreen.show();*/
-			/*tempForm = new Form(model.getQuestion(i).getLongText());
-			tempForm.addCommand(backCommand);
-			tempForm.setCommandListener(this);
-			controller.setDisplay(tempForm);*/
+//form view manager starts here...
+			FormViewManager manager = new FormViewManager("Questions",model,controller,i,this);
+			manager.show();
+
 		} else {
 			String language = null;
 			if (multiLingual) {
@@ -150,20 +142,31 @@ System.out.println("question selected proceeding to widget");
 
 	protected void createView() {
 
-
 		//Check who's relevant and display
 //		form.calculateRelevantAll();
 
-		setUpCommands();
+		//first ensure clean gui
+		((List) screen).deleteAll();
+		
 		for (int i = 0; i < model.getNumQuestions(); i++) {
 			// Check if relevant
-
+			String stringVal;
 			// Get current value as STring
-//			IAnswerData val = model.getForm().getValue(model.getQuestion(i));
-			String stringVal = null;//val.toString();
-			if (stringVal == null){
-				stringVal = new String("123test");
+			IAnswerData  val = model.getForm().getValue(model.getQuestion(i));
+			//check for null answers
+			if(val == null)
+			{System.out.println("no answer stored for question");
+				stringVal = null;
 			}
+			else
+			{
+			stringVal = val.getDisplayText();
+			}
+
+			if (stringVal == null){
+				stringVal = new String("Unanswered");
+			}
+
 			// Append to list
 			((List) screen).append(model.getQuestion(i).getShortText()+"   =>   "+stringVal,null);
 
