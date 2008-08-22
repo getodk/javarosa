@@ -40,7 +40,7 @@ public class NumericQuestionWidget extends SingleQuestionScreen
 		return tf;
 	}
 
-	protected IAnswerData getWidgetValue () {
+	public IAnswerData getWidgetValue () {
 		String s = tf.getString();
 		//if empty
 		if (s == null || s.equals(""))
@@ -62,7 +62,7 @@ public class NumericQuestionWidget extends SingleQuestionScreen
 		entryWidget = null;
 	}
 	
-	protected void setHint(String helpText)
+	public void setHint(String helpText)
 	{
 		//should be abstract and handled by question-type child classes.
 	}
