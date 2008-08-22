@@ -6,6 +6,7 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Item;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class Select1QuestionWidget extends SingleQuestionScreen
@@ -13,7 +14,7 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 	private QuestionDef prompt;
 	protected Item entryWidget;
 	protected QuestionDef question;
-	private int choiceType;
+	protected ChoiceGroup cg;
 	
 	public Select1QuestionWidget(String formTitle) {
 		super(formTitle);
@@ -39,7 +40,7 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 	{
 		this.question = question;
 
-		ChoiceGroup cg = new ChoiceGroup(question.getLongText(),ChoiceGroup.EXCLUSIVE ); //{
+		cg = new ChoiceGroup(question.getLongText(),ChoiceGroup.EXCLUSIVE ); //{
 		Enumeration itr = question.getSelectItems().keys();//access choices directly
 		int i = 0;
 		while (itr.hasMoreElements()) {
@@ -58,9 +59,14 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 	}
 	
 	//Utility methods
-	protected void setHint(String helpText)
+	public void setHint(String helpText)
 	{
 		//should be abstract and handled by question-type child classes.
+	}
+
+	public IAnswerData getWidgetValue() {
+		
+		return null;
 	}
 	
 }

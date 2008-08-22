@@ -39,7 +39,6 @@ public class TextQuestionWidget extends SingleQuestionScreen
 		System.out.println("Now performing text options");
 		prompt = question;
 		entryWidget = getEntryWidget(prompt);
-
 		//set hint associated with
 		setHint("Type in answer");
 		
@@ -54,7 +53,7 @@ public class TextQuestionWidget extends SingleQuestionScreen
 		return tf;
 	}
 
-	protected IAnswerData getWidgetValue () {
+	public IAnswerData getWidgetValue () {
 		String s = tf.getString();
 		return (s == null || s.equals("") ? null : new StringData(s));
 	}
@@ -65,9 +64,10 @@ public class TextQuestionWidget extends SingleQuestionScreen
 		entryWidget = null;
 	}
 	
-	protected void setHint(String helpText)
+	public void setHint(String helpText)
 	{
 		//should be abstract and handled by question-type child classes.
 	}
+
 
 }

@@ -6,12 +6,15 @@ import javax.microedition.lcdui.DateField;
 import javax.microedition.lcdui.Item;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class DateQuestionWidget extends SingleQuestionScreen
 {
 	protected Item entryWidget;
 	protected QuestionDef qdef;
+	protected DateField datePicker;
 	
 	public DateQuestionWidget(String formTitle) {
 		super(formTitle);
@@ -27,7 +30,7 @@ public class DateQuestionWidget extends SingleQuestionScreen
 	
 	protected Item getEntryWidget(QuestionDef prompt)
 	{
-		DateField datePicker = new DateField(prompt.getShortText(), DateField.DATE);
+		datePicker = new DateField(prompt.getShortText(), DateField.DATE);
 		//set question 
 		datePicker.setLabel(prompt.getLongText());
 		//check if the field has already been filled in by default value- if so display value
@@ -45,6 +48,18 @@ public class DateQuestionWidget extends SingleQuestionScreen
 	{
 		qdef = null;
 		entryWidget = null;
+	}
+
+
+	public IAnswerData getWidgetValue() {
+		
+		return new DateData(datePicker.getDate());
+	}
+
+
+	public void setHint(String helpText) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
