@@ -150,27 +150,33 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 		
 		for (int i = 0; i < model.getNumQuestions(); i++) {
 			// Check if relevant
-			String stringVal;
-			// Get current value as STring
-			IAnswerData  val = model.getForm().getValue(model.getQuestion(i));
-			//check for null answers
-			if(val == null)
-			{System.out.println("no answer stored for question");
-				stringVal = null;
-			}
-			else
+			if(model.isRelevant(i))
 			{
-			stringVal = val.getDisplayText();
+					
+				String stringVal;
+				// Get current value as STring
+				IAnswerData  val = model.getForm().getValue(model.getQuestion(i));
+				//check for null answers
+				if(val == null)
+				{System.out.println("no answer stored for question");
+					stringVal = null;
+				}
+				else
+				{
+				stringVal = val.getDisplayText();
+				}
+	
+				if (stringVal == null){
+					stringVal = new String("Unanswered");
+				}
+	
+				// Append to list
+				((List) screen).append(model.getQuestion(i).getShortText()+"   =>   "+stringVal,null);
+	
 			}
-
-			if (stringVal == null){
-				stringVal = new String("Unanswered");
-			}
-
-			// Append to list
-			((List) screen).append(model.getQuestion(i).getShortText()+"   =>   "+stringVal,null);
-
-			}
+			
+		}
+		
 
 
 	}
