@@ -176,7 +176,10 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
     	System.out.println("cw: command action");
 		
 		if (i == expandedStyle.getInteractiveWidget() && c == nextCommand) {
-			cbox.questionAnswered();
+			// BWD 23/8/2008 Ticket #69.  Added check for menu open
+	    	// before passing on the hack.
+			if(!cbox.isMenuOpened())
+				cbox.questionAnswered();
 		} else {
 			//unrecognized commandAction, propagate to parent.
 			cbox.commandAction(c, cbox);
