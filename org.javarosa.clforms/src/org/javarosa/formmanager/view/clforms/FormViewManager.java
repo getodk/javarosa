@@ -3,11 +3,8 @@ package org.javarosa.formmanager.view.clforms;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
-import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
@@ -24,200 +21,185 @@ import org.javarosa.formmanager.view.clforms.widgets.SelectQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TextQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TimeQuestionWidget;
 
-public class FormViewManager extends Form implements IFormEntryView, FormEntryModelListener, CommandListener, ItemCommandListener
+public class FormViewManager implements IFormEntryView, FormEntryModelListener, CommandListener, ItemCommandListener
 {
 	private FormEntryController controller;
 	private FormEntryModel model;
 	private FormViewScreen parent;
-	
-	private boolean multiLingual;
+
 	private int index;
 	private QuestionDef prompt;
 	private IAnswerData answer;
 	private SingleQuestionScreen widget;
 	// GUI elements
 
-	private static Command previousCommand;
-	private static Command nextCommand;
-	private static Command goToListCommand;
-
-	//widget commands
-	private Command backItemCommand = new Command("back Item Command", Command.ITEM, 1);
-	private Command nextItemCommand = new Command("next", Command.ITEM, 1);
-
-/*	public FormViewManager()
-	{
-		//constructor
-	}*/
-	
 	public FormViewManager(String formTitle, FormEntryModel model, FormEntryController controller, int questionIndex, FormViewScreen node)
 	{
-		super(formTitle);
-
     	this.parent = node;
 		this.model = model;
     	this.controller = controller;
-		//setup commands only once
-		setUpCommands();
 		//immediately setup question, need to decide if this is the best place to do it
     	this.getView(questionIndex);
     	//controller.setView(this);
 
-    	multiLingual = (model.getForm().getLocalizer() != null);
     	model.registerObservable(this);
 	}
+
 	public int getIndex()
 	{
 		index = model.getQuestionIndex();//return index of active question
 		return index;
 	}
+
 	public void getView(int qIndex)
-	{	
-		
+	{
+
 		prompt = model.getQuestion(qIndex);
 		//checks question type
 		int qType = prompt.getDataType();
-	
+
 		//obtains correct view
 		switch (qType)
 		{
 		case Constants.DATATYPE_DATE:
 			//go to DateQuestion Widget
-			widget = new DateQuestionWidget(prompt.getName());
-			this.append(widget.initWidget(prompt));
+			widget = new DateQuestionWidget(prompt);
+			controller.setDisplay(widget);
+
 			break;
 		case Constants.DATATYPE_LIST_MULTIPLE:
 			//go to SelectQuestion Widget
-			widget = new SelectQuestionWidget(prompt.getName());
-			this.append(widget.initWidget(prompt));
+			widget = new SelectQuestionWidget(prompt);
+			widget.setCommandListener(this);
+			widget.setItemCommandListner(this);
+			controller.setDisplay(widget);
 			break;
 		case Constants.DATATYPE_LIST_EXCLUSIVE:
 			//go to Select1Question Widget
-			widget = new Select1QuestionWidget(prompt.getName());
-			this.append(widget.initWidget(prompt));
+			widget = new Select1QuestionWidget(prompt);
+			widget.setCommandListener(this);
+			widget.setItemCommandListner(this);
+			controller.setDisplay(widget);
 			break;
 		case Constants.DATATYPE_TEXT:
 			//go to TextQuestion Widget
-			widget = new TextQuestionWidget(prompt.getName());
-			this.append(widget.initWidget(prompt));
+			widget = new TextQuestionWidget(prompt);
+			widget.setCommandListener(this);
+			widget.setItemCommandListner(this);
+			controller.setDisplay(widget);
 			break;
 		case Constants.DATATYPE_TIME:
 			//go to TimeQuestion Widget
-			widget = new TimeQuestionWidget(prompt.getName());
-			this.append(widget.initWidget(prompt));
+			widget = new TimeQuestionWidget(prompt);
+			widget.setCommandListener(this);
+			widget.setItemCommandListner(this);
+			controller.setDisplay(widget);
 			break;
 		case Constants.DATATYPE_INTEGER:
-			widget = new NumericQuestionWidget(prompt.getName());
-			this.append(widget.initWidget(prompt));
+			widget = new NumericQuestionWidget(prompt);
+			widget.setCommandListener(this);
+			widget.setItemCommandListner(this);
+			controller.setDisplay(widget);
 			break;
 		default:
 			System.out.println("Unsupported type!");
 			break;
 		}
 		//add widget item commands...
-		addNavigationButtons();
 	}
-	
+
 
 	public void destroy() {
 		model.unregisterObservable(this);
-		
+
 	}
 
 
 	public void setContext(FormEntryContext context) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
 	public void show() {
-		// TODO Auto-generated method stub
-		controller.setDisplay(this);
+		getView(getIndex());//refresh view
 	}
 
 	public void refreshView()
 	{
-		this.deleteAll();
-		int nextQIndex = getIndex();
-		getView(nextQIndex);//refresh view
+		getView(getIndex());//refresh view
 	}
 
 	public void formComplete() {
 		try {
-			Thread.sleep(1000); 
+			Thread.sleep(1000);
 		} catch (InterruptedException ie) { }
 
 		controller.save();//always save form
 		controller.exit();
-		
+
 	}
 
 
 	public void questionIndexChanged(int questionIndex) {
-		// TODO Auto-generated method stub
-		
+		getView(getIndex());//refresh view
 	}
 
 
 	public void saveStateChanged(int instanceID, boolean dirty) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	private void setUpCommands() 
+	/*private void setUpCommands()
 	{	System.out.println("setting up comands");
-		previousCommand = new Command("back", Command.SCREEN, 2); 
-		nextCommand = new Command("next", Command.SCREEN, 1); 
-		goToListCommand = new Command("View Answers", Command.SCREEN, 1);
-	
+		previousCommand = new Command("back", Command.SCREEN, 2);
+		nextCommand = new Command("next", Command.SCREEN, 1);
+		viewAnswersCommand = new Command("View Answers", Command.SCREEN, 1);
+
 		this.addCommand(previousCommand);
 		//this.addCommand(nextCommand);//disable command, handled by item command
-		this.addCommand(goToListCommand);
-	
+		this.addCommand(viewAnswersCommand);
+
 		this.setCommandListener(this);
 		System.out.println("command listener set");
 
-	}
+	}*/
 
-	public void commandAction(Command command, Displayable arg1) 
+	public void commandAction(Command command, Displayable arg1)
 	{
-		if (command == nextCommand) {
+		if (command == SingleQuestionScreen.nextCommand) {
 				answer=widget.getWidgetValue();
 				//System.out.println("you answered "+ answer.getDisplayText()+" for "+prompt.getLongText()+" moving on");
 				controller.questionAnswered(this.prompt, answer);//store answers
-				refreshView();
+//				refreshView();
 				}
-			
-		else if (command == previousCommand) {
+
+		else if (command == SingleQuestionScreen.previousCommand) {
 			controller.stepQuestion(false);
 			refreshView();
 			//parent.show();
 		}
-		else if (command == goToListCommand){
+		else if (command == SingleQuestionScreen.viewAnswersCommand){
 			controller.save();//always save
 			//controller.exit();
 			 parent.show();
 		}
 	}
-	
+
     public void commandAction(Command c, Item item)
     {
-    	if(c == nextItemCommand)
+    	if(c == SingleQuestionScreen.nextItemCommand)
       {
 			answer=widget.getWidgetValue();
 			//System.out.println("you answered "+ answer.getDisplayText()+" for "+prompt.getLongText()+" moving on");
 			controller.questionAnswered(this.prompt, answer);//store answers
 			refreshView();
 
-      }else if (c == backItemCommand) {
-			controller.stepQuestion(false);
-		}
-
-
+      }
     }
 
-	public void addNavigationButtons() 
+/*	public void addNavigationButtons()
 	{
 		StringItem backItem = new StringItem(null,"BACK",Item.BUTTON);
 		StringItem nextItem = new StringItem(null,"NEXT",Item.BUTTON);
@@ -230,5 +212,5 @@ public class FormViewManager extends Form implements IFormEntryView, FormEntryMo
 	    nextItem.setDefaultCommand(nextItemCommand);     // add Command to Item.
 	    nextItem.setItemCommandListener(this);       // set item command listener
 
-	}
+	}*/
 }

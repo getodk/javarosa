@@ -21,8 +21,6 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 	private FormEntryController controller;
 	private FormEntryModel model;
 
-	private boolean multiLingual;
-
 	private List screen;
 
 	// GUI elements
@@ -52,19 +50,18 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
     	this.controller = controller;
     	controller.setView(this);
 
-    	multiLingual = (model.getForm().getLocalizer() != null);
     	model.registerObservable(this);
-    	
+
 		setUpCommands();
 
 	}
 
 	public void commandAction(Command command, Displayable s) {
-		if(s instanceof FormViewManager){
+		/*if(s instanceof FormViewManager){
 //			if (command == P)
 
 			controller.stepQuestion(true);
-		}
+		}*/
 
 		if (command == backCommand) {
 			this.show();
@@ -83,24 +80,6 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 			FormViewManager manager = new FormViewManager("Questions",model,controller,i,this);
 			manager.show();
 
-		} else {
-			String language = null;
-			if (multiLingual) {
-				for (int i = 0; i < languageCommands.length; i++) {
-					if (command == languageCommands[i]) {
-						language = command.getLabel();
-						break;
-					}
-				}
-			}
-
-			if (language != null) {
-				controller.setLanguage(language);
-			} else {
-				System.err
-						.println("Chatterbox: Unknown command event received ["
-								+ command.getLabel() + "]");
-			}
 		}
 	}
 
@@ -110,34 +89,12 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 		saveCommand = new Command("Save", Command.SCREEN, 4);
 		saveAndReloadCommand = new Command("SAVE&Reload", Command.ITEM, 3);
 
-		if (multiLingual) {
-			languageSubMenu = new Command("Language", Command.SCREEN, 2);
-			populateLanguages();
-		}
-
 		// next command is added on a per-widget basis
 		screen.addCommand(exitNoSaveCommand);
 		screen.addCommand(exitSaveCommand);
 		screen.addCommand(saveCommand);
 		screen.addCommand(saveAndReloadCommand);
-
-		if (languageSubMenu != null) {
-			screen.addCommand(languageSubMenu);
-			// for (int i = 0; i < languageCommands.length; i++)
-			// screen.addSubCommand(languageCommands[i], languageSubMenu);
-			// Whats a subCommand??
-		}
-
 		screen.setCommandListener(this);
-	}
-
-	private void populateLanguages() {
-		String[] availableLocales = model.getForm().getLocalizer()
-				.getAvailableLocales();
-		languageCommands = new Command[availableLocales.length];
-		for (int i = 0; i < languageCommands.length; i++)
-			languageCommands[i] = new Command(availableLocales[i],
-					Command.SCREEN, 3);
 	}
 
 	protected void createView() {
@@ -147,12 +104,12 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 
 		//first ensure clean gui
 		((List) screen).deleteAll();
-		
+
 		for (int i = 0; i < model.getNumQuestions(); i++) {
 			// Check if relevant
 			if(model.isRelevant(i))
 			{
-					
+
 				String stringVal;
 				// Get current value as STring
 				IAnswerData  val = model.getForm().getValue(model.getQuestion(i));
@@ -165,18 +122,18 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 				{
 				stringVal = val.getDisplayText();
 				}
-	
+
 				if (stringVal == null){
 					stringVal = new String("Unanswered");
 				}
-	
+
 				// Append to list
-				((List) screen).append(model.getQuestion(i).getShortText()+"   =>   "+stringVal,null);
-	
+				((List) screen).append(model.getQuestion(i).getShortText()+"  => "+stringVal,null);
+
 			}
-			
+
 		}
-		
+
 
 
 	}
@@ -184,7 +141,7 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 	public void show() {
 		createView();
 		controller.setDisplay(screen);
-		
+
 	}
 
 	public void destroy() {
