@@ -293,6 +293,11 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	public void preloadModel() {
 		IAnswerData preload = null;
 		
+		// 25/08/2008 BWD 
+		// Fixed bug where it expected bindings.  Not all forms have bindings!
+		if(getBindings() == null)
+			return;
+		
 		Enumeration en = getBindings().elements();
 		while(en.hasMoreElements()) {
 			DataBinding binding = (DataBinding)en.nextElement();
