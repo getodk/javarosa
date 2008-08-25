@@ -39,7 +39,11 @@ public class ChatterboxWidgetFactory {
 				expandedStyle = new NumericEntryWidget();
 				break;
 			case Constants.DATATYPE_DATE:
+				//#if javarosa.useNewDatePicker 
+				expandedStyle = new InlineDateEntryWidget();
+				//#else
 				expandedStyle = new DateEntryWidget();
+				//#endif
 				break;
 			case Constants.DATATYPE_TIME:
 				expandedStyle = new TimeEntryWidget();
