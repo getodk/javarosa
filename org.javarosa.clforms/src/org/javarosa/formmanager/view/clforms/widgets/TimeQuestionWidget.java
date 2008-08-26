@@ -31,7 +31,9 @@ public class TimeQuestionWidget extends SingleQuestionScreen
 
 	public IAnswerData getWidgetValue() {
 
-		return new DateData(timePicker.getDate());
+		if(timePicker.getDate() != null){
+			return new DateData(timePicker.getDate());}
+			else{return null;}
 	}
 
 	public void setHint(String helpText) {

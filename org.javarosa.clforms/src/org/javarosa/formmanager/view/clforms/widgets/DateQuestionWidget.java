@@ -30,8 +30,9 @@ public class DateQuestionWidget extends SingleQuestionScreen
 	}
 
 	public IAnswerData getWidgetValue() {
-
-		return new DateData(datePicker.getDate());
+		if(datePicker.getDate() != null){
+		return new DateData(datePicker.getDate());}
+		else{return null;}
 	}
 
 
