@@ -70,6 +70,8 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 			case Constants.DATATYPE_DATE:
 				//go to DateQuestion Widget
 				widget = new DateQuestionWidget(prompt);
+				widget.setCommandListener(this);
+				widget.setItemCommandListner(this);
 				controller.setDisplay(widget);
 				break;
 			case Constants.DATATYPE_TIME:
@@ -162,7 +164,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
 	public void commandAction(Command command, Displayable arg1)
 	{
-		if (command == SingleQuestionScreen.nextCommand) {
+		if (command == SingleQuestionScreen.nextItemCommand) {
 				answer=widget.getWidgetValue();
 				//System.out.println("you answered "+ answer.getDisplayText()+" for "+prompt.getLongText()+" moving on");
 				controller.questionAnswered(this.prompt, answer);//store answers
