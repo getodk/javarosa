@@ -1,5 +1,7 @@
 package org.javarosa.formmanager.view.clforms;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -167,8 +169,13 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 		if (command == SingleQuestionScreen.nextItemCommand) {
 				answer=widget.getWidgetValue();
 				//System.out.println("you answered "+ answer.getDisplayText()+" for "+prompt.getLongText()+" moving on");
-				controller.questionAnswered(this.prompt, answer);//store answers
-//				refreshView();
+				int code = controller.questionAnswered(this.prompt, answer);//store answers
+				if(code == controller.QUESTION_REQUIRED_BUT_EMPTY)
+				{
+					Alert alert = new Alert("Question Required", "Question Required!!!", null, AlertType.ERROR);
+					controller.setDisplay(alert);
+				}
+				//				refreshView();
 				}
 
 		else if (command == SingleQuestionScreen.previousCommand) {
@@ -194,19 +201,4 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
       }
     }
-
-/*	public void addNavigationButtons()
-	{
-		StringItem backItem = new StringItem(null,"BACK",Item.BUTTON);
-		StringItem nextItem = new StringItem(null,"NEXT",Item.BUTTON);
-
-		this.append(nextItem);
-	    //this.append(backItem);//disable, handled by previousCommand
-
-	    backItem.setDefaultCommand(backItemCommand);     // add Command to Item.
-	    backItem.setItemCommandListener(this);       // set item command listener
-	    nextItem.setDefaultCommand(nextItemCommand);     // add Command to Item.
-	    nextItem.setItemCommandListener(this);       // set item command listener
-
-	}*/
 }
