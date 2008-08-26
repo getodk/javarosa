@@ -1,5 +1,8 @@
 package org.javarosa.formmanager.view.clforms;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -7,6 +10,7 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.List;
 
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.controller.FormEntryController;
@@ -22,6 +26,7 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 	private FormEntryModel model;
 
 	private List screen;
+	private Vector indexHash;
 
 	// GUI elements
 	private Command exitNoSaveCommand;
@@ -73,11 +78,16 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 		} else if (command == saveCommand) {
 			controller.save();
 		} else if (command == List.SELECT_COMMAND) {
-			int i = ((List) screen).getSelectedIndex();
-			controller.selectQuestion(i);
+			int i = ((List) screen).getSelectedIndex();	
+			System.out.println("list chosen"+ i);
+			QuestionDef a = (QuestionDef)indexHash.elementAt(i);//get question corresponding to list index
+			controller.selectQuestion(a.getID()-1);
+			System.out.println("controller sets"+a.getID());
+			int b = model.getQuestionIndex();
+			System.out.println("viewmanager sets"+b);
 			backCommand = new Command("Back", Command.BACK, 2);
 //form view manager starts here...
-			FormViewManager manager = new FormViewManager("Questions",model,controller,i,this);
+			FormViewManager manager = new FormViewManager("Questions",model,controller,b,this);
 			manager.show();
 
 		}
@@ -104,8 +114,10 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 
 		//first ensure clean gui
 		((List) screen).deleteAll();
+		indexHash = new Vector();
 
 		for (int i = 0; i < model.getNumQuestions(); i++) {
+			
 			// Check if relevant
 			if(model.isRelevant(i))
 			{
@@ -128,8 +140,10 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 				}
 
 				// Append to list
-				((List) screen).append(model.getQuestion(i).getShortText()+"  => "+stringVal,null);
-
+				((List) screen).append(model.getQuestion(i).getShortText()+"   =>   "+stringVal,null);
+				
+				indexHash.addElement(model.getQuestion(i));//map list index to question index.
+	
 			}
 
 		}

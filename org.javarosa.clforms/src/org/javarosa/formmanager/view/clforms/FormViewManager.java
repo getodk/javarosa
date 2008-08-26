@@ -32,16 +32,15 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	private IAnswerData answer;
 	private SingleQuestionScreen widget;
 	// GUI elements
-
 	public FormViewManager(String formTitle, FormEntryModel model, FormEntryController controller, int questionIndex, FormViewScreen node)
 	{
-    	this.parent = node;
+
+	   	this.parent = node;
 		this.model = model;
     	this.controller = controller;
 		//immediately setup question, need to decide if this is the best place to do it
     	this.getView(questionIndex);
     	//controller.setView(this);
-
     	model.registerObservable(this);
 	}
 
@@ -57,46 +56,57 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 		prompt = model.getQuestion(qIndex);
 		//checks question type
 		int qType = prompt.getDataType();
+		int contType = prompt.getControlType();
+		
+	System.out.println("Receiving :"+qType+" and "+contType);
+	System.out.println("Match Type :"+Constants.DATATYPE_LIST_EXCLUSIVE);
 
 		//obtains correct view
-		switch (qType)
-		{
-		case Constants.DATATYPE_DATE:
-			//go to DateQuestion Widget
-			widget = new DateQuestionWidget(prompt);
-			controller.setDisplay(widget);
 
+		switch(contType){
+		case Constants.CONTROL_INPUT:
+			switch (qType)
+			{
+			case Constants.DATATYPE_DATE:
+				//go to DateQuestion Widget
+				widget = new DateQuestionWidget(prompt);
+				controller.setDisplay(widget);
+				break;
+			case Constants.DATATYPE_TIME:
+				//go to TimeQuestion Widget
+				widget = new TimeQuestionWidget(prompt);
+				widget.setCommandListener(this);
+				widget.setItemCommandListner(this);
+				controller.setDisplay(widget);
+				break;
+			case Constants.DATATYPE_INTEGER:
+				widget = new NumericQuestionWidget(prompt);
+				widget.setCommandListener(this);
+				widget.setItemCommandListner(this);
+				controller.setDisplay(widget);
+				break;
+/*			default:
+				System.out.println("Unsupported type!");
+				break;*/
+			}
 			break;
-		case Constants.DATATYPE_LIST_MULTIPLE:
+		case Constants.CONTROL_SELECT_ONE:
+			//go to SelectQuestion widget
+			widget = new Select1QuestionWidget(prompt);
+			widget.setCommandListener(this);
+			widget.setItemCommandListner(this);
+			controller.setDisplay(widget);
+			break;
+		case Constants.CONTROL_SELECT_MULTI:
 			//go to SelectQuestion Widget
 			widget = new SelectQuestionWidget(prompt);
 			widget.setCommandListener(this);
 			widget.setItemCommandListner(this);
 			controller.setDisplay(widget);
 			break;
-		case Constants.DATATYPE_LIST_EXCLUSIVE:
-			//go to Select1Question Widget
-			widget = new Select1QuestionWidget(prompt);
-			widget.setCommandListener(this);
-			widget.setItemCommandListner(this);
-			controller.setDisplay(widget);
-			break;
-		case Constants.DATATYPE_TEXT:
+		case Constants.CONTROL_TEXTAREA:
 			//go to TextQuestion Widget
 			widget = new TextQuestionWidget(prompt);
-			widget.setCommandListener(this);
-			widget.setItemCommandListner(this);
-			controller.setDisplay(widget);
-			break;
-		case Constants.DATATYPE_TIME:
-			//go to TimeQuestion Widget
-			widget = new TimeQuestionWidget(prompt);
-			widget.setCommandListener(this);
-			widget.setItemCommandListner(this);
-			controller.setDisplay(widget);
-			break;
-		case Constants.DATATYPE_INTEGER:
-			widget = new NumericQuestionWidget(prompt);
 			widget.setCommandListener(this);
 			widget.setItemCommandListner(this);
 			controller.setDisplay(widget);
@@ -105,7 +115,6 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 			System.out.println("Unsupported type!");
 			break;
 		}
-		//add widget item commands...
 	}
 
 
@@ -150,21 +159,6 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 		// TODO Auto-generated method stub
 
 	}
-
-	/*private void setUpCommands()
-	{	System.out.println("setting up comands");
-		previousCommand = new Command("back", Command.SCREEN, 2);
-		nextCommand = new Command("next", Command.SCREEN, 1);
-		viewAnswersCommand = new Command("View Answers", Command.SCREEN, 1);
-
-		this.addCommand(previousCommand);
-		//this.addCommand(nextCommand);//disable command, handled by item command
-		this.addCommand(viewAnswersCommand);
-
-		this.setCommandListener(this);
-		System.out.println("command listener set");
-
-	}*/
 
 	public void commandAction(Command command, Displayable arg1)
 	{
