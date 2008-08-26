@@ -7,14 +7,18 @@ import javax.microedition.lcdui.Item;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.Selection;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class Select1QuestionWidget extends SingleQuestionScreen
 {
 	protected ChoiceGroup cg;
+	QuestionDef q;
 
 	public Select1QuestionWidget(QuestionDef question) {
 		super(question);
+		this.q=question;
 	}
 
 	public void creatView() {
@@ -41,7 +45,16 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 
 	public IAnswerData getWidgetValue() {
 
-		return null;
+		int selectedIndex = -1;
+		
+		for (int i = 0; i < cg.size(); i++) {
+			if (cg.isSelected(i)) {
+				selectedIndex = i;
+				break;
+			}
+		}
+		
+		return (selectedIndex == -1 ? null : new SelectOneData(new Selection(selectedIndex, q)));
 	}
 
 
