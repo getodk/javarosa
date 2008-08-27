@@ -35,14 +35,16 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 
 	public LoginActivity(IShell p, String title) {
 		this.parent = p;
-		this.loginScreen = new LoginForm(this, title);
-		this.loginScreen.setCommandListener(this);
-		this.loginScreen.loginButton.setItemCommandListener(this);       // set item command listener
+		
 	}
 
 	public void start(Context context) {
-		parent.setDisplay(this, this.loginScreen);
+		
 		this.context = context;
+		this.loginScreen = new LoginForm(this, "formTitle");
+		this.loginScreen.setCommandListener(this);
+		this.loginScreen.loginButton.setItemCommandListener(this);       // set item command listener
+		parent.setDisplay(this, this.loginScreen);
 	}
 
 	public void commandAction(Command c, Item item) {
