@@ -290,7 +290,7 @@ public class JavaRosaDemoShell implements IShell {
 		initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CLFORMS);
 		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
 //		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://update.cell-life.org/save_dump_org.php");
-//		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://update.cell-life.org/save_dump_org.php");
+		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
 	//	initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CLFORMS);
 //		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://openrosa.org/testsubmit.html");
 //		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://openrosa.org/testsubmit.html");
