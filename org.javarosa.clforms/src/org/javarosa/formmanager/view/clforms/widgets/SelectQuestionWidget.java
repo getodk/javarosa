@@ -33,21 +33,19 @@ public class SelectQuestionWidget extends SingleQuestionScreen
 		}
 		this.append(cg);
 		this.addNavigationButtons();
-	}
-	//Utility methods
-	public void setHint(String helpText)
-	{
-		//should be abstract and handled by question-type child classes.
+		if (qDef.getHelpText()!=null){
+			setHint(qDef.getHelpText());
+		}
 	}
 
 	public IAnswerData getWidgetValue() {
 		Vector vs = new Vector();
-		
+
 		for (int i = 0; i < cg.size(); i++) {
 			if (cg.isSelected(i))
 				vs.addElement(new Selection(i, q));
-		}		
-		
+		}
+
 		return (vs.size() == 0 ? null : new SelectMultiData(vs));
 	}
 }

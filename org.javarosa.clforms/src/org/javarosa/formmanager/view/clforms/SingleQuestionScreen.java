@@ -6,8 +6,8 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
-import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.StringItem;
+import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
@@ -43,7 +43,12 @@ public abstract class SingleQuestionScreen extends Form {
 
 	public abstract void creatView();
     public abstract IAnswerData getWidgetValue ();
-    public abstract void setHint(String helpText);
+
+	public void setHint(String helpText) {
+		Ticker tick = new Ticker("HELP: "+helpText);
+		this.setTicker(tick);
+	}
+
 
 	private void setUpCommands(){
 		previousCommand = new Command("back", Command.SCREEN, 2);
@@ -53,8 +58,7 @@ public abstract class SingleQuestionScreen extends Form {
 		this.addCommand(viewAnswersCommand);
 	}
 
-	public void addNavigationButtons()
-	{
+	public void addNavigationButtons()	{
 		this.append(nextItem);
 	    nextItem.setDefaultCommand(nextItemCommand);     // add Command to Item.
 	}

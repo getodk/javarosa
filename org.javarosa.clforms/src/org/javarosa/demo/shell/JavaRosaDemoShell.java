@@ -2,6 +2,8 @@ package org.javarosa.demo.shell;
 
 import java.util.Hashtable;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Displayable;
@@ -27,6 +29,7 @@ import org.javarosa.formmanager.activity.FormListActivity;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.properties.FormManagerProperties;
+import org.javarosa.formmanager.utility.FormDefSerializer;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.model.xform.XFormSerializingVisitor;
@@ -65,28 +68,79 @@ public class JavaRosaDemoShell implements IShell {
 		workflow(null, null, null);
 	}
 
+	private void startGCThread () {
+        final int GC_INTERVAL = 1000;
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask () {
+            public void run () {
+                System.gc();
+//                System.out.print("gc attempted:: ");
+//                System.out.println(Runtime.getRuntime().freeMemory());
+            }
+        }, GC_INTERVAL, GC_INTERVAL);
+    }
+
 	private void init() {
 		loadProperties();
-
+		startGCThread();
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 
 		DataModelTreeRMSUtility dataModel = new DataModelTreeRMSUtility(DataModelTreeRMSUtility.getUtilityName());
 		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
 		formDef.addModelPrototype(new DataModelTree());
 		formDef.addReferencePrototype(new XPathReference());
+		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(dataModel);
+		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(formDef);
+
+		boolean readSerialized = false;
+		boolean genSerialized = false;
+		if (genSerialized) {
+			generateSerializedForms("/CHMTTL.xhtml");
+			generateSerializedForms("/MobileSurvey.xhtml");
+		}
 
 		System.out.println("TOTAL MEM AVAIL: "+java.lang.Runtime.getRuntime().totalMemory());
 		System.out.println("PRE LOAD FORM MEM: "+java.lang.Runtime.getRuntime().freeMemory());
 		// For now let's add the dummy form.
 		if (formDef.getNumberOfRecords() == 0) {
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
+			if (readSerialized ) {
+				//load from serialized form.
+				FormDef form = new FormDef();
+				form = XFormUtils
+				.getFormFromSerializedResource("/CHMTTL.xhtml.serialized");
+				//#if debug.output==verbose
+				System.out.println("SERIALIZE TEST:");
+				System.out.println(form.getName());
+				//#endif
+				formDef.writeToRMS(form);
+				//load from serialized form.
+				/*form = new FormDef();
+				form = XFormUtils
+				.getFormFromSerializedResource("/MobileSurvey.xhtml.serialized");
+				//#if debug.output==verbose
+				System.out.println("SERIALIZE TEST:");
+				System.out.println(form.getName());
+				//#endif
+				formDef.writeToRMS(form);*/
+			}else{
+				formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL_Help.xhtml"));
 //			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-a_draft.xhtml"));
-//			formDef.writeToRMS(XFormUtils.getFormFromResource("/shortform.xhtml"));
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/MobileSurvey.xhtml"));
+			}
 		}
+
 		System.out.println("POST LOAD FORM MEM: "+java.lang.Runtime.getRuntime().freeMemory());
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(dataModel);
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(formDef);
+
+
+	}
+
+	private void generateSerializedForms(String originalResource) {
+		FormDef a = XFormUtils.getFormFromResource(originalResource);
+		FormDefSerializer fds = new FormDefSerializer();
+		fds.setForm(a);
+		fds.setFname(originalResource+".serialized");
+		new Thread(fds).start();
 	}
 
 	private void workflow(IActivity lastActivity, String returnCode, Hashtable returnVals) {
@@ -120,6 +174,7 @@ public class JavaRosaDemoShell implements IShell {
 
 		} else if (returningActivity instanceof SplashScreenActivity) {
 
+			returningActivity = null;
 			//#if javarosa.dev.shortcuts
 			launchActivity(new FormListActivity(this, "Forms List"), context);
 			//#else
@@ -289,8 +344,9 @@ public class JavaRosaDemoShell implements IShell {
 		initProperty("DeviceID", genGUID(25));
 		initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CLFORMS);
 		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
-//		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://update.cell-life.org/save_dump_org.php");
 		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
+		//		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://update.cell-life.org/save_dump_org.php");
+//		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://update.cell-life.org/save_dump_org.php");
 	//	initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CLFORMS);
 //		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://openrosa.org/testsubmit.html");
 //		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://openrosa.org/testsubmit.html");

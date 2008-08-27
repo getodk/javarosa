@@ -4,6 +4,7 @@ import java.util.Enumeration;
 
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
@@ -34,26 +35,23 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 		}
 		this.append(cg);
 		this.addNavigationButtons();
+		if (qDef.getHelpText()!=null){
+			setHint(qDef.getHelpText());
+		}
 
-	}
-
-	//Utility methods
-	public void setHint(String helpText)
-	{
-		//should be abstract and handled by question-type child classes.
 	}
 
 	public IAnswerData getWidgetValue() {
 
 		int selectedIndex = -1;
-		
+
 		for (int i = 0; i < cg.size(); i++) {
 			if (cg.isSelected(i)) {
 				selectedIndex = i;
 				break;
 			}
 		}
-		
+
 		return (selectedIndex == -1 ? null : new SelectOneData(new Selection(selectedIndex, q)));
 	}
 

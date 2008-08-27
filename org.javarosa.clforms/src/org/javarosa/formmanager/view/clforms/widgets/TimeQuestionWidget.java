@@ -27,6 +27,9 @@ public class TimeQuestionWidget extends SingleQuestionScreen
 		}
 		this.append(timePicker);
 		this.addNavigationButtons();
+		if (qDef.getHelpText()!=null){
+			setHint(qDef.getHelpText());
+		}
 	}
 
 	public IAnswerData getWidgetValue() {
@@ -34,11 +37,6 @@ public class TimeQuestionWidget extends SingleQuestionScreen
 		if(timePicker.getDate() != null){
 			return new DateData(timePicker.getDate());}
 			else{return null;}
-	}
-
-	public void setHint(String helpText) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

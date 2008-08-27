@@ -3,6 +3,7 @@ package org.javarosa.formmanager.view.clforms.widgets;
 import java.util.Date;
 
 import javax.microedition.lcdui.DateField;
+import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
@@ -27,18 +28,15 @@ public class DateQuestionWidget extends SingleQuestionScreen
 		}
 		this.append(datePicker);
 		this.addNavigationButtons();
+		if (qDef.getHelpText()!=null){
+			setHint(qDef.getHelpText());
+		}
 	}
 
 	public IAnswerData getWidgetValue() {
 		if(datePicker.getDate() != null){
 		return new DateData(datePicker.getDate());}
 		else{return null;}
-	}
-
-
-	public void setHint(String helpText) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
