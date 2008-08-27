@@ -59,7 +59,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 		//checks question type
 		int qType = prompt.getDataType();
 		int contType = prompt.getControlType();
-		
+
 	System.out.println("Receiving :"+qType+" and "+contType);
 	System.out.println("Match Type :"+Constants.DATATYPE_LIST_EXCLUSIVE);
 
@@ -69,6 +69,13 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 		case Constants.CONTROL_INPUT:
 			switch (qType)
 			{
+			case Constants.DATATYPE_TEXT:
+				//go to TextQuestion Widget
+				widget = new TextQuestionWidget(prompt);
+				widget.setCommandListener(this);
+				widget.setItemCommandListner(this);
+				controller.setDisplay(widget);
+				break;
 			case Constants.DATATYPE_DATE:
 				//go to DateQuestion Widget
 				widget = new DateQuestionWidget(prompt);
@@ -89,9 +96,6 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 				widget.setItemCommandListner(this);
 				controller.setDisplay(widget);
 				break;
-/*			default:
-				System.out.println("Unsupported type!");
-				break;*/
 			}
 			break;
 		case Constants.CONTROL_SELECT_ONE:
@@ -166,26 +170,23 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
 	public void commandAction(Command command, Displayable arg1)
 	{
-		if (command == SingleQuestionScreen.nextItemCommand) {
-				answer=widget.getWidgetValue();
-				//System.out.println("you answered "+ answer.getDisplayText()+" for "+prompt.getLongText()+" moving on");
-				int code = controller.questionAnswered(this.prompt, answer);//store answers
-				if(code == controller.QUESTION_REQUIRED_BUT_EMPTY)
-				{
-					Alert alert = new Alert("Question Required", "Question Required!!!", null, AlertType.ERROR);
-					controller.setDisplay(alert);
-				}
-				//				refreshView();
-				}
+		if (command == SingleQuestionScreen.nextItemCommand || command == SingleQuestionScreen.nextCommand) {
+			answer = widget.getWidgetValue();
+			int code = controller.questionAnswered(this.prompt, answer);// store
+																		// answers
+			if (code == controller.QUESTION_REQUIRED_BUT_EMPTY) {
+				Alert alert = new Alert("Question Required",
+						"Question Required!!!", null, AlertType.ERROR);
+				controller.setDisplay(alert);
+			}
+		}
 
 		else if (command == SingleQuestionScreen.previousCommand) {
 			controller.stepQuestion(false);
 			refreshView();
-			//parent.show();
 		}
 		else if (command == SingleQuestionScreen.viewAnswersCommand){
 			controller.save();//always save
-			//controller.exit();
 			 parent.show();
 		}
 	}
