@@ -34,12 +34,11 @@ public class LoginForm extends Form
 	   IActivity parent;
 
 	  public LoginForm(IActivity loginActivity, String title) {
-		   super(title);
-		   parent = loginActivity;
+		  super(title);
+     	   parent = loginActivity;
 
 		  userName = new TextField("Username:", "", 10, TextField.ANY);
 	      password = new TextField("Password:", "", 10, TextField.PASSWORD);
-
 	      this.addCommand(CMD_CANCEL_LOGIN);
 
 	      this.append(userName);
@@ -50,8 +49,13 @@ public class LoginForm extends Form
 	      loginButton.setDefaultCommand(loginButtonCommand);     // add Command to Item.
 
 	      userRMS = new UserRMSUtility("LoginMem");
-	      loggedInUser = new User ("admin","password",User.ADMINUSER);
+	      
 	      if (userRMS.getNumberOfRecords() == 0){
+	    	  
+	    	  String usernameVAR= (String)loginActivity.getActivityContext().getElement("username"); 
+	    	  String passwordVAR= (String)loginActivity.getActivityContext().getElement("password");	    	  
+	    	  
+	    	  loggedInUser = new User (usernameVAR,passwordVAR,User.ADMINUSER);
 	    	  userRMS.writeToRMS(loggedInUser);
 	      }
 	   }
