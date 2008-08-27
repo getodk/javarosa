@@ -1,6 +1,7 @@
 package org.javarosa.formmanager.view.clforms.widgets;
 
 import javax.microedition.lcdui.TextField;
+import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
@@ -9,7 +10,6 @@ import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class NumericQuestionWidget extends SingleQuestionScreen
 {
-
 	protected TextField tf;
 
 	public NumericQuestionWidget(QuestionDef question){
@@ -22,6 +22,9 @@ public class NumericQuestionWidget extends SingleQuestionScreen
 		tf.setLabel(qDef.getLongText());
 		this.append(tf);
 		this.addNavigationButtons();
+		if (qDef.getHelpText()!=null){
+			setHint(qDef.getHelpText());
+		}
 	}
 
 	public IAnswerData getWidgetValue () {
@@ -39,12 +42,5 @@ public class NumericQuestionWidget extends SingleQuestionScreen
 		}
 		return new IntegerData(i);
 	}
-
-	public void setHint(String helpText)
-	{
-		//should be abstract and handled by question-type child classes.
-	}
-
-
 
 }

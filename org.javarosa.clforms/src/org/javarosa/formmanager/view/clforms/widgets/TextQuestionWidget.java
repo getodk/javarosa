@@ -22,6 +22,9 @@ public class TextQuestionWidget extends SingleQuestionScreen {
 		tf.setLabel(qDef.getLongText());
 		this.append(tf);
 		this.addNavigationButtons();
+		if (qDef.getHelpText()!=null){
+			setHint(qDef.getHelpText());
+		}
 	}
 
 	public IAnswerData getWidgetValue () {
@@ -29,8 +32,4 @@ public class TextQuestionWidget extends SingleQuestionScreen {
 		return (s == null || s.equals("") ? null : new StringData(s));
 	}
 
-	public void setHint(String helpText)
-	{
-		//should be abstract and handled by question-type child classes.
-	}
 }
