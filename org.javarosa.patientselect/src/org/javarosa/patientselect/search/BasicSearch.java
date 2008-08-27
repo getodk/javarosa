@@ -16,6 +16,9 @@ public class BasicSearch implements ISearch, Externalizable {
 	private PatientStore store = null;
 	private ExternalizableObject externObject = null;
 	
+	/*
+	 * Utility constructor to initialize objects
+	 */
 	public BasicSearch(){
 		
 		searchConditions = new Vector();	
@@ -23,22 +26,34 @@ public class BasicSearch implements ISearch, Externalizable {
 		externObject = new ExternalizableObject();
 	}
 
+	/*
+	 * Utility Constructor to set formId
+	 */
 	public BasicSearch(int formid, Vector searchCondition){
 		
 		this.formId = formid;
 		this.searchConditions = searchCondition;
 	}
 	
+	/*
+	 * Property to get the formId
+	 */
 	public int getFormId(){
 		
 		return this.formId;
 	}
 	
+	/*
+	 * Property to return the formId
+	 */
 	public void setFormId(int formid){
 		
 		this.formId = formid;
 	}
 	
+	/*
+	 * Method to set the search Procedure algorithm
+	 */
 	public Vector getSearchProc(){
 		
 		Vector searchAlg = new Vector();
@@ -49,6 +64,7 @@ public class BasicSearch implements ISearch, Externalizable {
 		}
 		return searchAlg;
 	}
+	
 	
 	public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException,UnavailableExternalizerException 
 	{
@@ -68,17 +84,21 @@ public class BasicSearch implements ISearch, Externalizable {
 			try {
 				store.retrieveFromRMS(formId, externObject);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			} catch (UnavailableExternalizerException e) {
-				// TODO Auto-generated catch block
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			}
 		}	
 	}
@@ -102,17 +122,21 @@ public class BasicSearch implements ISearch, Externalizable {
 			try {
 				store.retrieveFromRMS(formId);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			} catch (UnavailableExternalizerException e) {
-				// TODO Auto-generated catch block
+				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
+				//#endif
 			}
 		}
 		return null;

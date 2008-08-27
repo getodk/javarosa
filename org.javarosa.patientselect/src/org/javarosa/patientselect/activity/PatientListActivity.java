@@ -94,7 +94,6 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		list.append("Search Patient", null);
 		list.append("Enter New Patient", null);
 		
-		list.addCommand(new Command("Proceed", Command.SCREEN, 0));
 		list.addCommand(new Command("Exit", Command.EXIT, 1));
 		
 		JavaRosaServiceProvider.instance().getDisplay().setCurrent(list);
@@ -132,10 +131,9 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 			parent.exitShell();
 		
 		}
-		else if(command.getCommandType() == Command.SCREEN){
+		else if(command == List.SELECT_COMMAND){
 			
 			choiceId = list.getSelectedIndex();
-			
 			if(choiceId == 0){
 				
 				System.out.println(choiceId);
@@ -156,13 +154,22 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		}
 		
 		else if(command == search){
+			
+			//#if debug.output == verbose || debug.output == exception
+			
+			System.out.println("Entering search");
+			
+			//#endif
+			
 			BasicSearch search = new BasicSearch();
 			
-			search.searchByCode(code);
+			ExternalizableObject externSearch = new ExternalizableObject();
+			
+			search.searchByCode(externSearch.getPatientCode());
 			
 			
 		}
-		else if(command == externObject.getCommandType()){
+		else if(command == externObject.getSaveCommand()){
 			
 			System.out.println("Entering save mode");
 			

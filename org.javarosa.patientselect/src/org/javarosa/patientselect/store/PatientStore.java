@@ -1,12 +1,15 @@
 package org.javarosa.patientselect.store;
 
 import java.io.IOException;
-import java.util.Vector;
-
-import javax.microedition.rms.*;
+import javax.microedition.rms.InvalidRecordIDException;
+import javax.microedition.rms.RecordEnumeration;
+import javax.microedition.rms.RecordListener;
+import javax.microedition.rms.RecordStore;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.patientselect.object.ExternalizableObject;
+
+import de.enough.polish.util.ArrayList;
 
 /**
 * RMSUtility class for this project
@@ -23,7 +26,7 @@ public class PatientStore extends RMSUtility  implements RecordListener {
 	protected RMSUtility metaDataRMS;
     protected RecordStore recordStore = null;
     
-	private Vector patientList;
+	private ArrayList patientList;
 	int patIndex;
 	
 	public PatientStore(String name) {
@@ -39,50 +42,65 @@ public class PatientStore extends RMSUtility  implements RecordListener {
         
         this.open();
         
+      //#if debug.output==verbose || debug.output==exception
         System.out.println("RMS SIZE (" + this.recordStoreName + ") : " + this.getNumberOfRecords());
+        //#endif
         
-        patientList = new Vector();
+        patientList = new ArrayList();
+        
+        patientList.add("Mark");
 	}
 	
-	public void putData(String[] patData){
+	public void saveData(Object patData){
+		
 		try{
 			if(patData != null){
-				patientList.addElement(patData);
+				patientList.add(patData);
 			}
 		}
 		catch(Exception excep){
+			
+			//#if debug.output==verbose || debug.output==exception
 			excep.printStackTrace();
+			//#endif
 		}
 		
 	}
 	
-	public int retrieveDataIndex(String data){
+	public int retrieveDataIndex(Object searchData){
 		
 		patIndex = -1;
 		
 		try{
-			if(data != null){
-				if(patientList.contains(data)){
-					patIndex =  patientList.indexOf(data);
+			if(searchData != null){
+				
+				if(patientList.contains(searchData)){
+					patIndex =  patientList.indexOf(searchData);
 					searchPatient(patIndex);
 				}
 			}
 		}
 		catch(Exception excep){
+			//#if debug.output==verbose || debug.output==exception
 			excep.printStackTrace();
+			//#endif
 		}
 		return patIndex;
 	}
 	
 	public String searchPatient(int searchIndex){
 		
-		searchIndex = patIndex;
+		patIndex = searchIndex;
+		
 		try{
-			return patientList.elementAt(searchIndex).toString();
+			return patientList.get(patIndex).toString();
 		}
 		catch(Exception excep){
 			
+			//#if debug.output==verbose || debug.output==exception
 			excep.printStackTrace();
+			//#endif
+			
 			return null;
 		}
 	}
@@ -93,13 +111,15 @@ public class PatientStore extends RMSUtility  implements RecordListener {
 	 * @param form The form to be written
 	 */
 	public void writeToRMS(ExternalizableObject patientData) {
-		PatientListMetaData md = new PatientListMetaData();
 		
-		md.setFormId(patientData.getFormId());
-		super.writeToRMS(patientData, md);
+		PatientListMetaData patMetaDataObject = new PatientListMetaData();
+		
+		patMetaDataObject.setFormId(patientData.getFormId());
+		super.writeToRMS(patientData, patMetaDataObject);
 	}
 	
 	public ExternalizableObject retrieveFromRMS(int formId) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
+		
 		ExternalizableObject patData = new ExternalizableObject();
 		
 		int patId = getPatientDataId(formId);
@@ -117,9 +137,13 @@ public class PatientStore extends RMSUtility  implements RecordListener {
 	}
 	
 	private int getPatientDataId(int formId) {
+		
 		try {
+			
 			RecordEnumeration metaEnum = metaDataRMS.enumerateMetaData();
+			
 			while (metaEnum.hasNextElement()) {
+				
 				int i = metaEnum.nextRecordId();
 				PatientListMetaData md = (PatientListMetaData)getMetaDataFromId(i);
 				
@@ -127,10 +151,12 @@ public class PatientStore extends RMSUtility  implements RecordListener {
 					return md.getRecordId();
 				}
 			}
+			
 		} catch (InvalidRecordIDException e) {
-			// TODO Auto-generated catch block
+			//#if debug.output==verbose || debug.output==exception
 			e.printStackTrace();
+			//#endif
 		}
-		return -1;
+		return formId;
 	}
 }
