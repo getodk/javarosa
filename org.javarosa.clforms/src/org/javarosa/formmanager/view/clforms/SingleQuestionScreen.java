@@ -51,9 +51,11 @@ public abstract class SingleQuestionScreen extends Form {
 
 
 	private void setUpCommands(){
+		nextCommand = new Command("next", Command.SCREEN, 1);
 		previousCommand = new Command("back", Command.SCREEN, 2);
-		viewAnswersCommand = new Command("View Answers", Command.SCREEN, 1);
+		viewAnswersCommand = new Command("View Answers", Command.SCREEN, 3);
 
+		this.addCommand(nextCommand);
 		this.addCommand(previousCommand);
 		this.addCommand(viewAnswersCommand);
 	}
