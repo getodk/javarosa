@@ -7,6 +7,7 @@ import javax.microedition.lcdui.DateField;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.TimeData;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class TimeQuestionWidget extends SingleQuestionScreen
@@ -35,7 +36,7 @@ public class TimeQuestionWidget extends SingleQuestionScreen
 	public IAnswerData getWidgetValue() {
 
 		if(timePicker.getDate() != null){
-			return new DateData(timePicker.getDate());}
+			return new TimeData(timePicker.getDate());}
 			else{return null;}
 	}
 
