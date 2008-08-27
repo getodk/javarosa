@@ -12,6 +12,8 @@
 package org.javarosa.formmanager.activity;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -237,8 +239,19 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 				mdata.setRecordId(i);
 
 				Image stateImg = getStateImage(tm.getModelDeliveryStatus(i, true));
+				String serverKey = this.getModelReplyData(mdata.getRecordId());
+				
+				
+				///convert the date to special format with calendar
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(mdata.getDateSaved());
+				int year = calendar.get(Calendar.YEAR);
+				int month = calendar.get(Calendar.MONTH)+1;
+				int date = calendar.get(Calendar.DATE);
 
-				this.append(mdata.getRecordId()+"-"+mdata.getName()+"_"+mdata.getDateSaved()+"_"+mdata.getRecordId(), stateImg);
+				String dateSTR = date+"-"+month+"-"+year;
+				
+				this.append(mdata.getName()+" - "+dateSTR+" - "+serverKey, stateImg);
 				modelIDs.insertElementAt(mdata,pos);
 				pos++;
 			} catch (InvalidRecordIDException e) {
@@ -248,6 +261,20 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 		}
     }
 
+    private String getModelReplyData(int modelId) {
+
+    	
+		Enumeration qMessages = JavaRosaServiceProvider.instance().getTransportManager().getMessages(); 
+		
+		TransportMessage message;
+		while(qMessages.hasMoreElements())
+    	{
+			message = (TransportMessage) qMessages.nextElement();
+			if(message.getModelId()==modelId)
+				return new String (message.getReplyloadData());
+    	}
+		return "";
+	}
     private Image getStateImage(int modelDeliveryStatus) {
     	Image result;
     	switch (modelDeliveryStatus) {
