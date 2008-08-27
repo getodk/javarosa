@@ -23,19 +23,19 @@ public class PatientListShell {
 			patientListContext = new Context();
 			
 			patientListActivity = new PatientListActivity(shellName);
-			
-
 		}
 		
 		public void exitShell(){
 			
 			patientListMidlet.notifyDestroyed();
-			System.out.println("exitCommand");
 		}
 		
 		public void run(){
 			
+			//#if debug.output==verbose || debug.output==exception
 			System.out.println("Running midlet in Init<>");
+			
+			//#endif
 			patientListActivity.start(patientListContext);
 		}
 		
@@ -64,7 +64,9 @@ public class PatientListShell {
 			}
 			else 
 			{
+				//#if debug.output==verbose || debug.output==exception
 				System.out.println("Activity: " + callingActivity + " attempted, but failed, to set the display");
+				//#endif
 				
 				return false;
 			}
