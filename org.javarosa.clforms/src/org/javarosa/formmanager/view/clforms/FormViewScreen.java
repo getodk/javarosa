@@ -79,12 +79,12 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 			controller.save();
 		} else if (command == List.SELECT_COMMAND) {
 			int i = ((List) screen).getSelectedIndex();	
-			System.out.println("list chosen"+ i);
+			//System.out.println("list chosen"+ i);
 			QuestionDef a = (QuestionDef)indexHash.elementAt(i);//get question corresponding to list index
-			controller.selectQuestion(a.getID()-1);
-			System.out.println("controller sets"+a.getID());
+			controller.selectQuestion(a.getID()-1);	
+			//System.out.println("controller sets"+a.getID());
 			int b = model.getQuestionIndex();
-			System.out.println("viewmanager sets"+b);
+			//System.out.println("viewmanager sets"+b);
 			backCommand = new Command("Back", Command.BACK, 2);
 //form view manager starts here...
 			FormViewManager manager = new FormViewManager("Questions",model,controller,b,this);
