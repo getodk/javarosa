@@ -88,6 +88,7 @@
 				<!-- obfuscator settings: do not obfuscate when the test-property is true -->
 				<obfuscator name="ProGuard" unless="test or noobfuscate">
 					<parameter name="optimize" value="true" />
+					<parameter name="printmapping" value="dist\obfuscation_mapping.txt" />
 				</obfuscator>
 
 				<!-- log settings: only use debug setting when the test-property is true -->
