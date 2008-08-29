@@ -78,10 +78,10 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 		} else if (command == saveCommand) {
 			controller.save();
 		} else if (command == List.SELECT_COMMAND) {
-			int i = ((List) screen).getSelectedIndex();	
+			int i = ((List) screen).getSelectedIndex();
 			//System.out.println("list chosen"+ i);
 			QuestionDef a = (QuestionDef)indexHash.elementAt(i);//get question corresponding to list index
-			controller.selectQuestion(a.getID()-1);	
+			controller.selectQuestion(a.getID()-1);
 			//System.out.println("controller sets"+a.getID());
 			int b = model.getQuestionIndex();
 			//System.out.println("viewmanager sets"+b);
@@ -117,7 +117,7 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 		indexHash = new Vector();
 
 		for (int i = 0; i < model.getNumQuestions(); i++) {
-			
+
 			// Check if relevant
 			if(model.isRelevant(i))
 			{
@@ -126,24 +126,18 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 				// Get current value as STring
 				IAnswerData  val = model.getForm().getValue(model.getQuestion(i));
 				//check for null answers
-				if(val == null)
-				{System.out.println("no answer stored for question");
-					stringVal = null;
+				if(val == null){
+					stringVal = "";
 				}
-				else
-				{
+				else {
 				stringVal = val.getDisplayText();
 				}
 
-				if (stringVal == null){
-					stringVal = new String("Unanswered");
-				}
-
 				// Append to list
-				((List) screen).append(model.getQuestion(i).getShortText()+"   =>   "+stringVal,null);
-				
+				((List) screen).append(model.getQuestion(i).getShortText()+" => "+stringVal,null);
+
 				indexHash.addElement(model.getQuestion(i));//map list index to question index.
-	
+
 			}
 
 		}

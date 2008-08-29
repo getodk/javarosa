@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
@@ -96,8 +97,8 @@ public class JavaRosaDemoShell implements IShell {
 		boolean readSerialized = false;
 		boolean genSerialized = false;
 		if (genSerialized) {
-			generateSerializedForms("/CHMTTL.xhtml");
-			generateSerializedForms("/MobileSurvey.xhtml");
+			generateSerializedForms("/CHMTTL_Help.xhtml");
+//			generateSerializedForms("/MobileSurvey.xhtml");
 		}
 
 		System.out.println("TOTAL MEM AVAIL: "+java.lang.Runtime.getRuntime().totalMemory());
@@ -108,7 +109,7 @@ public class JavaRosaDemoShell implements IShell {
 				//load from serialized form.
 				FormDef form = new FormDef();
 				form = XFormUtils
-				.getFormFromSerializedResource("/CHMTTL.xhtml.serialized");
+				.getFormFromSerializedResource("/CHMTTL_Help.xhtml.serialized");
 				//#if debug.output==verbose
 				System.out.println("SERIALIZE TEST:");
 				System.out.println(form.getName());
@@ -126,7 +127,7 @@ public class JavaRosaDemoShell implements IShell {
 			}else{
 				formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL_Help.xhtml"));
 //			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-a_draft.xhtml"));
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/MobileSurvey.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/MobileSurvey.xhtml"));
 			}
 		}
 
@@ -170,14 +171,26 @@ public class JavaRosaDemoShell implements IShell {
 	private void workflowLaunch (IActivity returningActivity, String returnCode, Hashtable returnVals) {
 		if (returningActivity == null) {
 
-			launchActivity(new SplashScreenActivity(this, "/splash.gif"), context);
+		/*	launchActivity(new SplashScreenActivity(this, "/splash.gif"), context);
 
 		} else if (returningActivity instanceof SplashScreenActivity) {
-
+*/
 			returningActivity = null;
 			//#if javarosa.dev.shortcuts
 			launchActivity(new FormListActivity(this, "Forms List"), context);
 			//#else
+	    	String passwordVAR = midlet.getAppProperty("username");
+            String usernameVAR = midlet.getAppProperty("password");
+            if ((usernameVAR == null) || (passwordVAR == null))
+            {
+            context.setElement("username","u");
+            context.setElement("password","p");
+            }
+            else{
+                    context.setElement("username",usernameVAR);
+                    context.setElement("password",passwordVAR);
+            }
+            context.setElement("authorization", "admin");
 			launchActivity(new LoginActivity(this, "Login"), context);
 			//#endif
 
@@ -186,10 +199,13 @@ public class JavaRosaDemoShell implements IShell {
 			Object returnVal = returnVals.get(LoginActivity.COMMAND_KEY);
 			if (returnVal == "USER_VALIDATED") {
 				User user = (User)returnVals.get(LoginActivity.USER);
-				if (user != null)
-					context.setCurrentUser(user.getUsername());
 
-				launchActivity(new FormListActivity(this, "Forms List"), context);
+				FormListActivity formList = new FormListActivity(this, "Forms List");
+				if (user != null){
+					context.setCurrentUser(user.getUsername());
+				}
+
+				launchActivity(formList, context);
 			} else if (returnVal == "USER_CANCELLED") {
 				exitShell();
 			}
@@ -342,7 +358,7 @@ public class JavaRosaDemoShell implements IShell {
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FormManagerProperties());
 
 		initProperty("DeviceID", genGUID(25));
-		initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CLFORMS);
+		initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CHATTERBOX);
 		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
 		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
 		//		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://update.cell-life.org/save_dump_org.php");

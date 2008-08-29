@@ -11,7 +11,7 @@ import org.javarosa.formmanager.view.clforms.FormViewScreen;
 public class FormEntryViewFactory implements IFormEntryViewFactory {
 	public IFormEntryView getFormEntryView (String viewType, FormEntryModel model, FormEntryController controller) {
 		if (FormManagerProperties.VIEW_CHATTERBOX.equals(viewType)) {
-			return new Chatterbox("Chatterbox STRING", model, controller);
+			return new Chatterbox("CHMT TLP Report", model, controller);
 		} else if (FormManagerProperties.VIEW_CLFORMS.equals(viewType)) {
 			return new FormViewScreen("CHMT_FORMS STRING", model, controller);
 		}
