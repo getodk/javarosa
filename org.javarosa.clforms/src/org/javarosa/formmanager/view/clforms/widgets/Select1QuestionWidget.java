@@ -23,8 +23,6 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 	}
 
 	public void creatView() {
-		setHint("You must select only one option");
-
 		cg = new ChoiceGroup(qDef.getLongText(),ChoiceGroup.EXCLUSIVE ); //{
 		Enumeration itr = qDef.getSelectItems().keys();//access choices directly
 		int i = 0;
@@ -38,7 +36,6 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 		if (qDef.getHelpText()!=null){
 			setHint(qDef.getHelpText());
 		}
-
 	}
 
 	public IAnswerData getWidgetValue() {

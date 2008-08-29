@@ -60,15 +60,17 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 		int qType = prompt.getDataType();
 		int contType = prompt.getControlType();
 
-	System.out.println("Receiving :"+qType+" and "+contType);
-	System.out.println("Match Type :"+Constants.DATATYPE_LIST_EXCLUSIVE);
-
-		//obtains correct view
-
 		switch(contType){
 		case Constants.CONTROL_INPUT:
 			switch (qType)
 			{
+			case Constants.DATATYPE_TEXT:
+				//go to TextQuestion Widget
+				widget = new TextQuestionWidget(prompt);
+				widget.setCommandListener(this);
+				widget.setItemCommandListner(this);
+				controller.setDisplay(widget);
+				break;
 			case Constants.DATATYPE_DATE:
 				//go to DateQuestion Widget
 				widget = new DateQuestionWidget(prompt);
@@ -141,9 +143,10 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	}
 
 	public void formComplete() {
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException ie) { }
+
+	  try {
+		   Thread.sleep(1000);
+		  } catch (InterruptedException ie) { }
 
 		controller.save();//always save form
 		controller.exit();
@@ -152,7 +155,8 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
 
 	public void questionIndexChanged(int questionIndex) {
-		getView(getIndex());//refresh view
+		if (questionIndex != -1)
+			getView(getIndex());//refresh view
 	}
 
 
@@ -163,9 +167,9 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
 	public void commandAction(Command command, Displayable arg1)
 	{
-		if (command == SingleQuestionScreen.nextItemCommand) {
-				answer=widget.getWidgetValue();
-				
+		if (command == SingleQuestionScreen.nextItemCommand || command == SingleQuestionScreen.nextCommand) {
+			answer=widget.getWidgetValue();
+
 				//System.out.println("you answered "+ answer.getDisplayText()+" for "+prompt.getLongText()+" moving on");
 
 				if(prompt.isRequired() && answer == null)
@@ -174,19 +178,20 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 					controller.setDisplay(alert);
 				}
 				else{
-					//save and proceed to next question
+				//save and proceed to next question
 					controller.commitAnswer(this.prompt, answer);
 					if(model.getQuestionIndex()+1 < model.getNumQuestions() )
 					{
-					controller.stepQuestion(true);	
+						controller.stepQuestion(true);
 					}
 					else{
-						controller.save();//always save
-						 parent.show();
-					//formComplete();//go to form view list instead
-					
+					   controller.save();//always save
+				       parent.show();
+					//parent.show();
+//					formComplete();//go to form view list instead
+//						model.setFormComplete();
 					}
-				}		
+				}
 		}
 		else if (command == SingleQuestionScreen.previousCommand) {
 			controller.stepQuestion(false);
