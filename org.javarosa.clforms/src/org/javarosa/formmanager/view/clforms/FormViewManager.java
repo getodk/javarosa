@@ -173,16 +173,17 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 					Alert alert = new Alert("Question Required", "Question Required!!!", null, AlertType.ERROR);
 					controller.setDisplay(alert);
 				}
-				else{				
-				//save and proceed to next question
+				else{
+					//save and proceed to next question
 					controller.commitAnswer(this.prompt, answer);
 					if(model.getQuestionIndex()+1 < model.getNumQuestions() )
 					{
 					controller.stepQuestion(true);	
 					}
 					else{
-					//parent.show();
-					formComplete();//go to form view list instead
+						controller.save();//always save
+						 parent.show();
+					//formComplete();//go to form view list instead
 					
 					}
 				}		
