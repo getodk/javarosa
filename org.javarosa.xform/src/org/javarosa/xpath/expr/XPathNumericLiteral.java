@@ -15,6 +15,6 @@ public class XPathNumericLiteral extends XPathExpression {
 	}
 
 	public String toString () {
-		return "{num:" + XPathFuncExpr.toNumeric(new Double(d)) + "}";
+		return "{num:" + Double.toString(d) + "}";
 	}
 }
