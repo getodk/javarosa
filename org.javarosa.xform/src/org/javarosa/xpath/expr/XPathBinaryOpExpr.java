@@ -7,4 +7,8 @@ public abstract class XPathBinaryOpExpr extends XPathOpExpr {
 		this.a = a;
 		this.b = b;
 	}
+	
+	public String toString (String op) {
+		return "{binop-expr:" + op + "," + a.toString() + "," + b.toString() + "}";
+	}
 }

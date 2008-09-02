@@ -22,6 +22,22 @@ public class XPathFuncExpr extends XPathExpression {
 		this.args = args;
 	}
 	
+	public String toString () {
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("{func-expr:");	
+		sb.append(id.toString());
+		sb.append(",{");
+		for (int i = 0; i < args.length; i++) {
+			sb.append(args[i].toString());
+			if (i < args.length - 1)
+				sb.append(",");
+		}
+		sb.append("}}");
+		
+		return sb.toString();
+	}
+	
 	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
 		String name = id.toString();
 		Object[] argVals = new Object[args.length];
@@ -59,7 +75,7 @@ public class XPathFuncExpr extends XPathExpression {
 			}
 		}
 	}
-
+	
 	private Object evalCustomFunction (IFunctionHandler handler, Object[] args) {
 		Vector prototypes = handler.getPrototypes();
 		Enumeration e = prototypes.elements();

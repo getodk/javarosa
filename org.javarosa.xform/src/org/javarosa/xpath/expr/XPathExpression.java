@@ -7,9 +7,19 @@ public abstract class XPathExpression {
 
 	public abstract Object eval (IFormDataModel model, EvaluationContext evalContext);
 	
+	
+	
+	
+	
+	
+	
+	
+	
 	/*======= DEBUGGING ========*/
-	// do not compile onto phone
+	// should not compile onto phone
 
+	/* print out formatted expression tree */
+	
 	int indent;
 
 	private void printStr (String s) {
@@ -161,32 +171,9 @@ public abstract class XPathExpression {
 			String axis = null;
 			String test = null;
 
-			switch (x.axis) {
-			case XPathStep.AXIS_CHILD: axis = "child"; break;
-			case XPathStep.AXIS_DESCENDANT: axis = "descendant"; break;
-			case XPathStep.AXIS_PARENT: axis = "parent"; break;
-			case XPathStep.AXIS_ANCESTOR: axis = "ancestor"; break;
-			case XPathStep.AXIS_FOLLOWING_SIBLING: axis = "following-sibling"; break;
-			case XPathStep.AXIS_PRECEDING_SIBLING: axis = "preceding-sibling"; break;
-			case XPathStep.AXIS_FOLLOWING: axis = "following"; break;
-			case XPathStep.AXIS_PRECEDING: axis = "preceding"; break;
-			case XPathStep.AXIS_ATTRIBUTE: axis = "attribute"; break;
-			case XPathStep.AXIS_NAMESPACE: axis = "namespace"; break;
-			case XPathStep.AXIS_SELF: axis = "self"; break;
-			case XPathStep.AXIS_DESCENDANT_OR_SELF: axis = "descendant-or-self"; break;
-			case XPathStep.AXIS_ANCESTOR_OR_SELF: axis = "ancestor-or-self"; break;
-			}
-
-			switch(x.test) {
-			case XPathStep.TEST_NAME: test = x.name.toString(); break;
-			case XPathStep.TEST_NAME_WILDCARD: test = "*"; break;
-			case XPathStep.TEST_NAMESPACE_WILDCARD: test = x.namespace + ":*"; break;
-			case XPathStep.TEST_TYPE_NODE: test = "node()"; break;
-			case XPathStep.TEST_TYPE_TEXT: test = "text()"; break;
-			case XPathStep.TEST_TYPE_COMMENT: test = "comment()"; break;
-			case XPathStep.TEST_TYPE_PROCESSING_INSTRUCTION: test = "proc-instr(" + x.literal + ")"; break;
-			}
-
+			axis = XPathStep.axisStr(x.axis);
+			test = x.testStr();
+			
 			if (x.predicates.length == 0) {
 				printStr("step {axis:" + axis + " test:" + test + " predicates {none}}");
 			} else {

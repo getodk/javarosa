@@ -1,6 +1,12 @@
 package org.javarosa.xpath.expr;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.xpath.EvaluationContext;
 
 public class XPathArithExpr extends XPathBinaryOpExpr {
@@ -30,5 +36,19 @@ public class XPathArithExpr extends XPathBinaryOpExpr {
 		case MODULO: result = aval % bval; break;
 		}
 		return new Double(result);
+	}
+	
+	public String toString () {
+		String sOp = null;
+		
+		switch (op) {
+		case ADD: sOp = "+"; break;
+		case SUBTRACT: sOp = "-"; break;
+		case MULTIPLY: sOp = "*"; break;
+		case DIVIDE: sOp = "/"; break;
+		case MODULO: sOp = "%"; break;
+		}
+		
+		return super.toString(sOp);
 	}
 }

@@ -13,4 +13,7 @@ public class XPathUnionExpr extends XPathBinaryOpExpr {
 		throw new XPathUnsupportedException("nodeset union operation");
 	}
 
+	public String toString () {
+		return super.toString("union");
+	}
 }

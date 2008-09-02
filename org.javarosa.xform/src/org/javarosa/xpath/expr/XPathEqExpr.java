@@ -46,4 +46,7 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
 		return new Boolean(equal ? eq : !eq);
 	}
 
+	public String toString () {
+		return super.toString(equal ? "==" : "!=");
+	}
 }

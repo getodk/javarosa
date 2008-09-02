@@ -13,4 +13,7 @@ public class XPathNumNegExpr extends XPathUnaryOpExpr {
 		return new Double(-aval);
 	}
 
+	public String toString () {
+		return "{unop-expr:num-neg," + a.toString() + "}";
+	}
 }

@@ -14,4 +14,7 @@ public class XPathStringLiteral extends XPathExpression {
 		return s;
 	}
 
+	public String toString () {
+		return "{str:\'" + s + "\'}"; //TODO: s needs to be escaped (' -> \'; \ -> \\)
+	}
 }
