@@ -28,6 +28,7 @@ import org.javarosa.formmanager.activity.FormListActivity;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.properties.FormManagerProperties;
+import org.javarosa.formmanager.utility.FormDefSerializer;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.model.xform.XFormSerializingVisitor;
@@ -48,12 +49,12 @@ public class JavaRosaDemoShell implements IShell {
 
 	WorkflowStack stack;
 	Context context;
-	
+
 	IActivity currentActivity;
 	IActivity mostRecentListActivity; //should never be accessed, only checked for type
-	
+
 	public JavaRosaDemoShell() {
-		stack = new WorkflowStack(); 
+		stack = new WorkflowStack();
 		context = new Context();
 	}
 
@@ -67,11 +68,10 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void init() {
-		
 		loadProperties();
 
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
-		
+
 		DataModelTreeRMSUtility dataModel = new DataModelTreeRMSUtility(DataModelTreeRMSUtility.getUtilityName());
 		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
 		formDef.addModelPrototype(new DataModelTree());
@@ -90,16 +90,24 @@ public class JavaRosaDemoShell implements IShell {
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(formDef);
 	}
 
+	private void generateSerializedForms(String originalResource) {
+		FormDef a = XFormUtils.getFormFromResource(originalResource);
+		FormDefSerializer fds = new FormDefSerializer();
+		fds.setForm(a);
+		fds.setFname(originalResource+".serialized");
+		new Thread(fds).start();
+	}
+
 	private void workflow(IActivity lastActivity, String returnCode, Hashtable returnVals) {
 		if (returnVals == null)
 			returnVals = new Hashtable(); //for easier processing
-		
+
 		if (lastActivity != currentActivity) {
 			System.out.println("Received 'return' event from activity other than the current activity" +
 					" (such as a background process). Can't handle this yet");
 			return;
 		}
-		
+
 		if (returnCode == Constants.ACTIVITY_SUSPEND || returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 			stack.push(lastActivity);
 			workflowLaunch(lastActivity, returnCode, returnVals);
@@ -113,35 +121,49 @@ public class JavaRosaDemoShell implements IShell {
 			}
 		}
 	}
-	
+
+
+
 	private void workflowLaunch (IActivity returningActivity, String returnCode, Hashtable returnVals) {
 		if (returningActivity == null) {
-			
+
 			launchActivity(new SplashScreenActivity(this, "/splash.gif"), context);
-			
+
 		} else if (returningActivity instanceof SplashScreenActivity) {
-			
+
 			//#if javarosa.dev.shortcuts
 			launchActivity(new FormListActivity(this, "Forms List"), context);
-			//#else 
+			//#else
+			String passwordVAR = midlet.getAppProperty("username");
+            String usernameVAR = midlet.getAppProperty("password");
+            if ((usernameVAR == null) || (passwordVAR == null))
+            {
+            context.setElement("username","admin");
+            context.setElement("password","p");
+            }
+            else{
+                    context.setElement("username",usernameVAR);
+                    context.setElement("password",passwordVAR);
+            }
+            context.setElement("authorization", "admin");
 			launchActivity(new LoginActivity(this, "Login"), context);
 			//#endif
-			
+
 		} else if (returningActivity instanceof LoginActivity) {
-			
+
 			Object returnVal = returnVals.get(LoginActivity.COMMAND_KEY);
 			if (returnVal == "USER_VALIDATED") {
 				User user = (User)returnVals.get(LoginActivity.USER);
 				if (user != null)
 					context.setCurrentUser(user.getUsername());
-				
+
 				launchActivity(new FormListActivity(this, "Forms List"), context);
 			} else if (returnVal == "USER_CANCELLED") {
 				exitShell();
 			}
-			
+
 		} else if (returningActivity instanceof FormListActivity) {
-			
+
 			String returnVal = (String)returnVals.get(FormListActivity.COMMAND_KEY);
 			if (returnVal == Commands.CMD_SETTINGS) {
 				launchActivity(new PropertyScreenActivity(this), context);
@@ -152,9 +174,9 @@ public class JavaRosaDemoShell implements IShell {
 			} else if (returnVal == Commands.CMD_EXIT) {
 				exitShell();
 			}
-			
+
 		} else if (returningActivity instanceof ModelListActivity) {
-			
+
 			Object returnVal = returnVals.get(ModelListActivity.returnKey);
 			if (returnVal == ModelListActivity.CMD_MSGS) {
 				launchFormTransportActivity(context, TransportContext.MESSAGE_VIEW, null);
@@ -166,19 +188,19 @@ public class JavaRosaDemoShell implements IShell {
 			} else if (returnVal == ModelListActivity.CMD_BACK) {
 				launchActivity(new FormListActivity(this, "Forms List"), context);
 			}
-			
+
 		} else if (returningActivity instanceof FormEntryActivity) {
-			
+
 			if (((Boolean)returnVals.get("FORM_COMPLETE")).booleanValue()) {
 				launchFormTransportActivity(context, TransportContext.SEND_DATA, (DataModelTree)returnVals.get("DATA_MODEL"));
 			} else {
 				relaunchListActivity();
 			}
-			
+
 		} else if (returningActivity instanceof FormTransportActivity) {
-			
-			relaunchListActivity();			
-			
+
+			relaunchListActivity();
+
 			//what is this for?
 			/*if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 				String returnVal = (String)returnVals.get(FormTransportActivity.RETURN_KEY);
@@ -189,48 +211,47 @@ public class JavaRosaDemoShell implements IShell {
 			}*/
 		}
 	}
-	
+
 	private void workflowResume (IActivity suspendedActivity, IActivity completingActivity,
 								 String returnCode, Hashtable returnVals) {
-		
+
 		//default action
 		resumeActivity(suspendedActivity, context);
 	}
-		
+
 	private void launchActivity (IActivity activity, Context context) {
 		if (activity instanceof FormListActivity || activity instanceof ModelListActivity)
 			mostRecentListActivity = activity;
-		
+
 		currentActivity = activity;
 		activity.start(context);
 	}
-	
+
 	private void resumeActivity (IActivity activity, Context context) {
 		currentActivity = activity;
 		activity.resume(context);
-	}	
-	
+	}
+
 	private void launchFormEntryActivity (Context context, int formID, int instanceID) {
 		FormEntryActivity entryActivity = new FormEntryActivity(this, new FormEntryViewFactory());
 		FormEntryContext formEntryContext = new FormEntryContext(context);
 		formEntryContext.setFormID(formID);
 		if (instanceID != -1)
 			formEntryContext.setInstanceID(instanceID);
-		formEntryContext.addFunctionHandler(new TestFunctionHandler()); //testing out custom function handlers in conditions
 
 		launchActivity(entryActivity, formEntryContext);
 	}
-	
+
 	private void launchFormTransportActivity (Context context, String task, DataModelTree data) {
 		FormTransportActivity formTransport = new FormTransportActivity(this);
 		formTransport.setDataModelSerializer(new XFormSerializingVisitor());
 		formTransport.setData(data); //why isn't this going in the context?
-		TransportContext msgContext = new TransportContext(context);		
+		TransportContext msgContext = new TransportContext(context);
 		msgContext.setRequestedTask(task);
 
 		launchActivity(formTransport, msgContext);
 	}
-	
+
 	private void relaunchListActivity () {
 		if (mostRecentListActivity instanceof FormListActivity) {
 			launchActivity(new FormListActivity(this, "Forms List"), context);
@@ -240,7 +261,7 @@ public class JavaRosaDemoShell implements IShell {
 			throw new IllegalStateException("Trying to resume list activity when no most recent set");
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.shell.IShell#activityCompeleted(org.javarosa.activity.IActivity)
 	 */
@@ -267,6 +288,7 @@ public class JavaRosaDemoShell implements IShell {
 		this.midlet = midlet;
 	}
 
+	//need 'addpropery' too.
 	private String initProperty(String propName, String defaultValue) {
 		Vector propVal = JavaRosaServiceProvider.instance().getPropertyManager().getProperty(propName);
 		if (propVal == null || propVal.size() == 0) {
