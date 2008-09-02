@@ -48,6 +48,7 @@
 					<!--source dir="${dir.test}"/-->
 					<source dir="${basedir}/../org.javarosa.action/src/"/>
 					<source dir="${basedir}/../org.javarosa.communication/src/"/>
+					<source dir="${basedir}/../org.javarosa.clforms/src/"/>
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
@@ -152,7 +153,7 @@
 		<!-- Disable the Emulator by default -->
 		<property name="test" value="false" />
 	</target>
-	
+
 	<target name="supressOutput">
 		<property name="${debug.output}" value="none"/>
 	</target>
@@ -174,7 +175,7 @@
 	<target name="build-xpath-parser">
 		<ant antfile="../org.javarosa.xform/build.xml" target="build-xpath-parser" dir="../org.javarosa.xform" />
 	</target>
-	
+
 	<!-- Macro: Runs a test suite, and sets testresult.global to be true on failure -->
 	<macrodef name="RunTestSuite" description="Runs a test suite, and sets testresult.global to be true on failure">
 		<attribute name="suite"/>
