@@ -8,9 +8,6 @@ import j2meunit.framework.TestSuite;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
-/* if you get build errors about missing XPathParser and XPathLexer, run the ant target 'build-xpath-parser'
- * in the build.xml file for this project
- */
 
 public class XPathTest extends TestCase{
 	

@@ -15,4 +15,7 @@ public class XPathVariableReference extends XPathExpression {
 		throw new XPathUnsupportedException("variable reference");
 	}
 
+	public String toString () {
+		return "{var:" + id.toString() + "}";
+	}
 }

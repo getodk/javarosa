@@ -82,4 +82,23 @@ public class XPathPathExpr extends XPathExpression {
 		}
 	}
 
+	public String toString () {
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("{path-expr:");
+		switch (init_context) {
+		case INIT_CONTEXT_ROOT: sb.append("abs"); break;
+		case INIT_CONTEXT_RELATIVE: sb.append("rel"); break;
+		case INIT_CONTEXT_EXPR: sb.append(filtExpr.toString()); break;
+		}
+		sb.append(",{");
+		for (int i = 0; i < steps.length; i++) {
+			sb.append(steps[i].toString());
+			if (i < steps.length - 1)
+				sb.append(",");
+		}
+		sb.append("}}");
+		
+		return sb.toString();
+	}
 }

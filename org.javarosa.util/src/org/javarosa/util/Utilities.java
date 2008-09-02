@@ -9,15 +9,6 @@ public class Utilities {
 		
 	}
 	
-	/** 
-	 * Creates a new Globally Unique Identifier.
-	 * 
-	 * @return - the new guid.
-	 */
-	public static String getNewGuid(){
-		return String.valueOf(new java.util.Date().getTime()); //this needs to be replaced with a realistic implementation
-	}
-	
 	public static String dateToString(Date d){
 		Calendar cd = Calendar.getInstance(java.util.TimeZone.getTimeZone("GMT+830"));
 		cd.setTime(d);
