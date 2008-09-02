@@ -26,6 +26,7 @@ import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.controller.IControllerHost;
 import org.javarosa.formmanager.model.FormEntryModel;
+import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.IFormDefRetrievalMethod;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
@@ -57,7 +58,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	private IFormEntryViewFactory viewFactory;
 
 	private ContextPreloadHandler contextHandler;
-	
+
 	FormDefFetcher fetcher;
 
 
@@ -84,6 +85,9 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	}
 
 	public void start (Context context) {
+		//#if debug.output==verbose
+		System.out.println("Finally in FormEntryActivity - pre form fetch");
+		//#endif
 		FormDef theForm = null;
 		int instanceID = -1;
 
@@ -91,6 +95,9 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			this.context = (FormEntryContext) context;
 		}
 		theForm = fetcher.getFormDef(context);
+		//#if debug.output==verbose
+		System.out.println("FormEntryActivity - post form fetch");
+		//#endif
 		if (theForm != null) {
 			theForm.setEvaluationContext(initEvaluationContext());
 			initPreloadHandlers(theForm); // must always load; even if we won't
@@ -121,13 +128,12 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 
 			model = new FormEntryModel(theForm, instanceID);
 			controller = new FormEntryController(model, this);
-
-			view = viewFactory.getFormEntryView("chatterbox", model, controller);
+			String viewString = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(FormManagerProperties.VIEW_TYPE_PROPERTY);
+			view = viewFactory.getFormEntryView(viewString, model, controller);
 			view.setContext(this.context);
 			controller.setView(view);
-
 			view.show();
-			
+
 		} else {
 			displayError(LOAD_ERROR);
 		}
@@ -146,10 +152,10 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		contextHandler = new ContextPreloadHandler(context);
 		f.getPreloader().addPreloadHandler(contextHandler);
 	}
-	
+
 	private EvaluationContext initEvaluationContext () {
 		EvaluationContext ec = new EvaluationContext();
-		
+
 		Vector functionHandlers = this.context.getFunctionHandlers();
 		if(functionHandlers != null) {
 			Enumeration en = functionHandlers.elements();
@@ -157,7 +163,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 				ec.addFunctionHandler((IFunctionHandler)en.nextElement());
 			}
 		}
-		
+
 		return ec;
 	}
 
@@ -207,7 +213,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	public Context getActivityContext() {
 		return context;
 	}
-	
+
 	public void setRetrievalMethod(IFormDefRetrievalMethod method) {
 		fetcher.setFetcher(method);
 	}
