@@ -33,20 +33,28 @@ public class ExternalizableHelper {
 	 *      BIAS = 30  -> [-30,224]
 	 *      BIAS = 254 -> [-254,0]
 	 */
-	protected static final int STINGY_NEGATIVE_BIAS = 0;
+	protected static final int STINGY_NEGATIVE_BIAS = 1;
+	
+	public static void writeNumeric (DataOutputStream dos, long l) throws IOException {
+		writeNumeric(dos, l, ENCODING_NUM_DEFAULT);
+	}
 	
 	public static void writeNumeric (DataOutputStream dos, long l, int encoding) throws IOException {
 		switch (encoding) {
 		case ENCODING_NUM_DEFAULT: writeNumDefault(dos, l); break;
-		case ENCODING_NUM_STINGY: writeNumStingy(dos, l); break;
+		case ENCODING_NUM_STINGY: writeNumStingy(dos, l, STINGY_NEGATIVE_BIAS); break;
 		default: throw new IllegalStateException("Unrecognized numeric encoding");
 		}
+	}
+	
+	public static long readNumeric (DataInputStream dis) throws IOException {
+		return readNumeric(dis, ENCODING_NUM_DEFAULT);
 	}
 	
 	public static long readNumeric (DataInputStream dis, int encoding) throws IOException {
 		switch (encoding) {
 		case ENCODING_NUM_DEFAULT: return readNumDefault(dis);
-		case ENCODING_NUM_STINGY: return readNumStingy(dis);
+		case ENCODING_NUM_STINGY: return readNumStingy(dis, STINGY_NEGATIVE_BIAS);
 		default: throw new IllegalStateException("Unrecognized numeric encoding");
 		}
 	}
@@ -114,12 +122,12 @@ public class ExternalizableHelper {
 		return l;
 	}
 	
-	public static void writeNumStingy (DataOutputStream dos, long l) throws IOException {		
+	public static void writeNumStingy (DataOutputStream dos, long l, int bias) throws IOException {		
 		if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE)
 			throw new ArithmeticException("Value (" + l + ") too large for chosen encoding");
 		
-		if (l >= -STINGY_NEGATIVE_BIAS && l < 255 - STINGY_NEGATIVE_BIAS) {
-			l += STINGY_NEGATIVE_BIAS;
+		if (l >= -bias && l < 255 - bias) {
+			l += bias;
 			dos.writeByte((byte)(l >= 128 ? l - 256 : l));
 		} else {
 			dos.writeByte(0xff);
@@ -127,14 +135,14 @@ public class ExternalizableHelper {
 		}
 	}
 
-	public static long readNumStingy (DataInputStream dis) throws IOException {
+	public static long readNumStingy (DataInputStream dis, int bias) throws IOException {
 		byte b = dis.readByte();
 		long l;
 		
 		if (b == (byte)0xff) {
 			l = dis.readInt();
 		} else {
-			l = (b < 0 ? b + 256 : b) - STINGY_NEGATIVE_BIAS;
+			l = (b < 0 ? b + 256 : b) - bias;
 		}
 		
 		return l;
