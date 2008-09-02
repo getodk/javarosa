@@ -1,6 +1,5 @@
 package org.javarosa.formmanager.view.clforms;
 
-import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
@@ -78,10 +77,10 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 		} else if (command == saveCommand) {
 			controller.save();
 		} else if (command == List.SELECT_COMMAND) {
-			int i = ((List) screen).getSelectedIndex();
+			int i = ((List) screen).getSelectedIndex();	
 			//System.out.println("list chosen"+ i);
 			QuestionDef a = (QuestionDef)indexHash.elementAt(i);//get question corresponding to list index
-			controller.selectQuestion(a.getID()-1);
+			controller.selectQuestion(a.getID()-1);	
 			//System.out.println("controller sets"+a.getID());
 			int b = model.getQuestionIndex();
 			//System.out.println("viewmanager sets"+b);
@@ -91,6 +90,11 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 			manager.show();
 
 		}
+/*		else if (command == saveAndReloadCommand)
+		{
+			//future implementation. The idea is it should allow the user to save the current form
+			//and reload allow them to start on a new one.
+		}*/
 	}
 
 	private void setUpCommands() {
@@ -103,7 +107,7 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 		screen.addCommand(exitNoSaveCommand);
 		screen.addCommand(exitSaveCommand);
 		screen.addCommand(saveCommand);
-		screen.addCommand(saveAndReloadCommand);
+		//screen.addCommand(saveAndReloadCommand);
 		screen.setCommandListener(this);
 	}
 
@@ -126,18 +130,20 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 				// Get current value as STring
 				IAnswerData  val = model.getForm().getValue(model.getQuestion(i));
 				//check for null answers
-				if(val == null){
+				if(val == null)
+				{
 					stringVal = "";
 				}
-				else {
+				else
+				{
 				stringVal = val.getDisplayText();
 				}
 
 				// Append to list
-				((List) screen).append(model.getQuestion(i).getShortText()+" => "+stringVal,null);
-
+				((List) screen).append(model.getQuestion(i).getShortText()+"   =>   "+stringVal,null);
+				
 				indexHash.addElement(model.getQuestion(i));//map list index to question index.
-
+	
 			}
 
 		}
