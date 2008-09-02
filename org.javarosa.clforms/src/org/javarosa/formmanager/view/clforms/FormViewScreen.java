@@ -1,20 +1,16 @@
 package org.javarosa.formmanager.view.clforms;
 
-import java.util.Vector;
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.List;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
+import org.javarosa.formmanager.utility.SortedIntSet;
 import org.javarosa.formmanager.view.IFormEntryView;
 
 //import de.enough.polish.util.Locale;
@@ -25,20 +21,14 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 	private FormEntryModel model;
 
 	private List screen;
-	private Vector indexHash;
+	private SortedIntSet indexHash;
 
 	// GUI elements
 	private Command exitNoSaveCommand;
 	private Command exitSaveCommand;
 	private Command saveCommand;
-	private Command languageSubMenu;
-	private Command[] languageCommands;
-	private Gauge progressBar;
 	private Command saveAndReloadCommand;
 	private Command backCommand;
-
-	private Form tempForm;
-	private PromptScreen questionScreen;
 
 	public FormViewScreen() {
 
@@ -77,24 +67,13 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 		} else if (command == saveCommand) {
 			controller.save();
 		} else if (command == List.SELECT_COMMAND) {
-			int i = ((List) screen).getSelectedIndex();	
-			//System.out.println("list chosen"+ i);
-			QuestionDef a = (QuestionDef)indexHash.elementAt(i);//get question corresponding to list index
-			controller.selectQuestion(a.getID()-1);	
-			//System.out.println("controller sets"+a.getID());
-			int b = model.getQuestionIndex();
-			//System.out.println("viewmanager sets"+b);
-			backCommand = new Command("Back", Command.BACK, 2);
-//form view manager starts here...
+			int i = ((List) screen).getSelectedIndex();
+			int b = indexHash.get(i);
 			FormViewManager manager = new FormViewManager("Questions",model,controller,b,this);
-			manager.show();
+			controller.selectQuestion(indexHash.get(i));
+			//manager.show();
 
 		}
-/*		else if (command == saveAndReloadCommand)
-		{
-			//future implementation. The idea is it should allow the user to save the current form
-			//and reload allow them to start on a new one.
-		}*/
 	}
 
 	private void setUpCommands() {
@@ -118,7 +97,7 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 
 		//first ensure clean gui
 		((List) screen).deleteAll();
-		indexHash = new Vector();
+		indexHash = new SortedIntSet();
 
 		for (int i = 0; i < model.getNumQuestions(); i++) {
 
@@ -130,20 +109,18 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 				// Get current value as STring
 				IAnswerData  val = model.getForm().getValue(model.getQuestion(i));
 				//check for null answers
-				if(val == null)
-				{
+				if(val == null){
 					stringVal = "";
 				}
-				else
-				{
+				else {
 				stringVal = val.getDisplayText();
 				}
 
 				// Append to list
-				((List) screen).append(model.getQuestion(i).getShortText()+"   =>   "+stringVal,null);
-				
-				indexHash.addElement(model.getQuestion(i));//map list index to question index.
-	
+				((List) screen).append(model.getQuestion(i).getShortText()+" => "+stringVal,null);
+
+				indexHash.add(i);//map list index to question index.
+
 			}
 
 		}
