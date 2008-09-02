@@ -109,7 +109,7 @@ public class XPathStep {
 		case TEST_TYPE_NODE: return "node()";
 		case TEST_TYPE_TEXT: return "text()";
 		case TEST_TYPE_COMMENT: return "comment()";
-		case TEST_TYPE_PROCESSING_INSTRUCTION: return "proc-instr(" + (literal == null ? "" : literal) + ")";
+		case TEST_TYPE_PROCESSING_INSTRUCTION: return "proc-instr(" + (literal == null ? "" : "\'" + literal + "\'") + ")";
 		default: return null;
 		}
 	}
