@@ -18,7 +18,7 @@ import org.javarosa.user.storage.UserRMSUtility;
 
 public class LoginForm extends Form
 {
-	   public final Command CMD_CANCEL_LOGIN = new Command("Cancel",Command.CANCEL, 1);
+	   public final Command CMD_CANCEL_LOGIN = new Command("EXIT",Command.SCREEN, 1);
 	   public Command loginButtonCommand = new Command("Login", Command.ITEM, 1);
 
 	   private TextField userName;
@@ -34,10 +34,42 @@ public class LoginForm extends Form
 	   IActivity parent;
 
 	  public LoginForm(IActivity loginActivity, String title) {
-		  super(title);
-     	   parent = loginActivity;
+		   super(title);
+		   parent = loginActivity;
 
-		  userName = new TextField("Username:", "", 10, TextField.ANY);
+		   userRMS = new UserRMSUtility("LoginMem");
+
+	      if (userRMS.getNumberOfRecords() == 0){
+
+	    	  String usernameVAR= (String)loginActivity.getActivityContext().getElement("username");
+	    	  String passwordVAR= (String)loginActivity.getActivityContext().getElement("password");
+
+	    	  loggedInUser = new User (usernameVAR,passwordVAR,User.ADMINUSER);
+	    	  userRMS.writeToRMS(loggedInUser);
+	      }
+
+		   //get first username from RMS
+		   User tempuser = new User();
+		   tempuser.setUsername("");
+
+		   if (userRMS.getNumberOfRecords() != 0){
+			   	try {
+					userRMS.retrieveFromRMS(userRMS.getNextRecordID()-1, tempuser);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UnavailableExternalizerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		      }
+		  userName = new TextField("Username:", tempuser.getUsername(), 10, TextField.ANY);
 	      password = new TextField("Password:", "", 10, TextField.PASSWORD);
 	      this.addCommand(CMD_CANCEL_LOGIN);
 
@@ -47,17 +79,6 @@ public class LoginForm extends Form
 	      loginButton = new StringItem(null,"LOGIN",Item.BUTTON);
 	      this.append(loginButton);
 	      loginButton.setDefaultCommand(loginButtonCommand);     // add Command to Item.
-
-	      userRMS = new UserRMSUtility("LoginMem");
-	      
-	      if (userRMS.getNumberOfRecords() == 0){
-	    	  
-	    	  String usernameVAR= (String)loginActivity.getActivityContext().getElement("username"); 
-	    	  String passwordVAR= (String)loginActivity.getActivityContext().getElement("password");	    	  
-	    	  
-	    	  loggedInUser = new User (usernameVAR,passwordVAR,User.ADMINUSER);
-	    	  userRMS.writeToRMS(loggedInUser);
-	      }
 	   }
 
 
