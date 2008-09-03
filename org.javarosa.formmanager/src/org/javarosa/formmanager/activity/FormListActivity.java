@@ -25,7 +25,9 @@ import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.FormList;
 import org.javarosa.formmanager.view.ViewTypes;
+import org.javarosa.user.model.User;
 import org.javarosa.user.view.NewUserForm;
+
 
 /**
  * @author Brian DeRenzi
@@ -58,7 +60,9 @@ public class FormListActivity implements IActivity, CommandListener {
 		this.listOfForms = new Map();
 		this.formIDs = new Vector();
 		getXForms();
-		this.formsList.addCommand(CMD_ADD_USER);
+		User loggedInUser = (User)context.getElement("user");
+		if (loggedInUser.isAdminUser())
+			this.formsList.addCommand(CMD_ADD_USER);
 		this.positionToId = this.formsList.loadView(listOfForms);
 		parent.setDisplay(this, this.formsList);
 
@@ -155,7 +159,7 @@ public class FormListActivity implements IActivity, CommandListener {
 
     		if (answer.equals(""))	{///success
 
-    			javax.microedition.lcdui.Alert successfulNewUser  = new javax.microedition.lcdui.Alert("User added successfully - The new user can only be logged in when the current user logs out.");
+    			javax.microedition.lcdui.Alert successfulNewUser  = new javax.microedition.lcdui.Alert("User added successfully ");
     			parent.setDisplay(this, successfulNewUser);
     		}
     		else if (answer.substring(0,10 ).equals("Username ("))///name already taken..
