@@ -15,6 +15,7 @@ import javax.microedition.lcdui.TextField;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
 
@@ -151,6 +152,8 @@ public class PropertiesScreen extends Form{
 
         this.append(new StringItem(null, "Available Space: "
                 + formatBytes(availableSpace)));
+        String devID = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty("DeviceID");
+        this.append(new StringItem(null, "Device ID: "+devID));
         for (int i = 0; i < recordStores.length; i++) {
             this.append(new StringItem(null, recordStores[i] + ": "
                     + formatBytes(consumedSpace[i])));
