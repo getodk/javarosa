@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.javarosa.formmanager.view;
 
@@ -15,4 +15,5 @@ public class Commands {
 	public static final String CMD_GET_NEW_FORM = "get_new_form";
 	public static final String CMD_DELETE_FORM = "delete_form";
 	public static final String CMD_SETTINGS = "view_settings";
+	public static final String CMD_ADD_USER = "add_user";
 }

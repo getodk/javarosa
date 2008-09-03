@@ -27,15 +27,15 @@ public class FormList extends List implements CommandListener {
     private final Command CMD_DELETE_FORM = new Command("Delete",Command.SCREEN,4);
     private final Command CMD_SHAREFORMS = new Command("Share Forms", Command.SCREEN, 2);
     private final Command CMD_SETTINGS = new Command("Settings", Command.SCREEN, 3);
-    
+
     private FormListActivity parent = null;
-    
+
 	public FormList(FormListActivity p, String title) {
 		this(p, title, List.IMPLICIT);
 	}
 
 	public FormList(FormListActivity p, String title, int listType) {
-		
+
 		super(title, listType);
 		this.parent = p;
 	}
@@ -50,19 +50,20 @@ public class FormList extends List implements CommandListener {
 	private void createView() {
 		addScreenCommands();
 	}
-	
+
 	private void addScreenCommands() {
 		this.addCommand(CMD_EXIT);
         //this.addCommand(CMD_OPEN);
         this.addCommand(CMD_DELETE_FORM);
         this.addCommand(CMD_VIEWMODELS);
         this.addCommand(CMD_GETNEWFORMS);
-        this.addCommand(CMD_SHAREFORMS);
+//        this.addCommand(CMD_SHAREFORMS);
+
         //#if polish.usePolishGui
         this.addCommand(CMD_SETTINGS);
         //#endif
 	}
-	
+
 	/**
 	 * Put the list
 	 */
@@ -81,11 +82,11 @@ public class FormList extends List implements CommandListener {
 
 	public void commandAction(Command c, Displayable arg1) {
 		Hashtable v = new Hashtable();
-		
+
 		// TODO Auto-generated method stub
 		if (c == List.SELECT_COMMAND) {
 			//LOG
-			
+
 			Hashtable returnvals = new Hashtable();
 			returnvals.put(Commands.CMD_SELECT_XFORM, new Integer(this.getSelectedIndex()));
 			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
@@ -113,6 +114,12 @@ public class FormList extends List implements CommandListener {
 		else if (c == CMD_VIEWMODELS) {
 			Hashtable returnvals = new Hashtable();
 			returnvals.put(Commands.CMD_VIEW_DATA, "");
+			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
+		}
+
+		else if (c == parent.CMD_ADD_USER) {
+			Hashtable returnvals = new Hashtable();
+			returnvals.put(Commands.CMD_ADD_USER, "");
 			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
 /*
