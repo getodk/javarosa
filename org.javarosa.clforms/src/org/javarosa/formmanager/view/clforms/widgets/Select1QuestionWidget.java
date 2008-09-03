@@ -4,12 +4,15 @@ import java.util.Enumeration;
 
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.Spacer;
+import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.Selection;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class Select1QuestionWidget extends SingleQuestionScreen
@@ -23,6 +26,7 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 	}
 
 	public void creatView() {
+		//#style choiceGroup
 		cg = new ChoiceGroup(qDef.getLongText(),ChoiceGroup.EXCLUSIVE ); //{
 		Enumeration itr = qDef.getSelectItems().keys();//access choices directly
 		int i = 0;
@@ -36,6 +40,7 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 		if (qDef.getHelpText()!=null){
 			setHint(qDef.getHelpText());
 		}
+
 	}
 
 	public IAnswerData getWidgetValue() {
@@ -48,7 +53,6 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 				break;
 			}
 		}
-
 		return (selectedIndex == -1 ? null : new SelectOneData(new Selection(selectedIndex, q)));
 	}
 

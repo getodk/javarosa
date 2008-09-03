@@ -19,6 +19,7 @@ public class TimeQuestionWidget extends SingleQuestionScreen
 	}
 
 	public void creatView() {
+		//#style textBox
 		timePicker = new DateField(qDef.getShortText(), DateField.TIME);
 		//set question
 		timePicker.setLabel(qDef.getLongText());
