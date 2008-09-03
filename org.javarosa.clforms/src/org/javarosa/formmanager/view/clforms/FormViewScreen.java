@@ -26,8 +26,8 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 	// GUI elements
 	private Command exitNoSaveCommand;
 	private Command exitSaveCommand;
-	private Command saveCommand;
-	private Command saveAndReloadCommand;
+	private Command sendCommand;
+	//private Command saveAndReloadCommand;
 	private Command backCommand;
 
 	public FormViewScreen() {
@@ -64,8 +64,9 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 		} else if (command == exitSaveCommand) {
 			controller.save();
 			controller.exit();
-		} else if (command == saveCommand) {
-			controller.save();
+		} else if (command == sendCommand) {
+			model.setFormComplete();
+			//controller.exit();
 		} else if (command == List.SELECT_COMMAND) {
 			int i = ((List) screen).getSelectedIndex();
 			int b = indexHash.get(i);
@@ -79,13 +80,13 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 	private void setUpCommands() {
 		exitNoSaveCommand = new Command("Exit", Command.EXIT, 4);
 		exitSaveCommand = new Command("Save and Exit", Command.SCREEN, 4);
-		saveCommand = new Command("Save", Command.SCREEN, 4);
-		saveAndReloadCommand = new Command("SAVE&Reload", Command.ITEM, 3);
+		sendCommand = new Command("Send Form", Command.SCREEN, 4);
+		//saveAndReloadCommand = new Command("SAVE&Reload", Command.ITEM, 3);
 
 		// next command is added on a per-widget basis
 		screen.addCommand(exitNoSaveCommand);
 		screen.addCommand(exitSaveCommand);
-		screen.addCommand(saveCommand);
+		screen.addCommand(sendCommand);
 		//screen.addCommand(saveAndReloadCommand);
 		screen.setCommandListener(this);
 	}

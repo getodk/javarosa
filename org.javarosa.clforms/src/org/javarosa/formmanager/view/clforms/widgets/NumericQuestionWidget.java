@@ -1,7 +1,7 @@
 package org.javarosa.formmanager.view.clforms.widgets;
 
+import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.TextField;
-import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
@@ -14,6 +14,7 @@ public class NumericQuestionWidget extends SingleQuestionScreen
 
 	public NumericQuestionWidget(QuestionDef question){
 		super(question);
+
 	}
 
 	public void creatView() {

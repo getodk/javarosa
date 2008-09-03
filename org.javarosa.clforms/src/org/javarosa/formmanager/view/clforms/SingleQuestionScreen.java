@@ -2,10 +2,12 @@ package org.javarosa.formmanager.view.clforms;
 
 //import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
+import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.Ticker;
 
@@ -24,13 +26,14 @@ public abstract class SingleQuestionScreen extends Form {
 	protected IAnswerData answer;
 
 	// GUI elements
-	protected Gauge progressBar;
+	public Gauge progressBar;
 
 	public static Command previousCommand;
 	public static Command nextCommand;
 	public static Command viewAnswersCommand;
 
 	public static Command nextItemCommand = new Command("next", Command.ITEM, 1);
+	//#style button
 	public static StringItem nextItem = new StringItem(null,"NEXT",Item.BUTTON);
 	public ItemCommandListener itemListner;
 
@@ -43,24 +46,24 @@ public abstract class SingleQuestionScreen extends Form {
 
 	public abstract void creatView();
     public abstract IAnswerData getWidgetValue ();
-
+    
 	public void setHint(String helpText) {
 		Ticker tick = new Ticker("HELP: "+helpText);
 		this.setTicker(tick);
 	}
-
 
 	private void setUpCommands(){
 		nextCommand = new Command("next", Command.SCREEN, 1);
 		previousCommand = new Command("back", Command.SCREEN, 2);
 		viewAnswersCommand = new Command("View Answers", Command.SCREEN, 3);
 
-		this.addCommand(nextCommand);
 		this.addCommand(previousCommand);
 		this.addCommand(viewAnswersCommand);
+		this.addCommand(nextCommand);
 	}
 
-	public void addNavigationButtons()	{
+	public void addNavigationButtons()
+	{
 		this.append(nextItem);
 	    nextItem.setDefaultCommand(nextItemCommand);     // add Command to Item.
 	}
@@ -79,6 +82,5 @@ public abstract class SingleQuestionScreen extends Form {
 	public void setItemCommandListner(ItemCommandListener itemListner) {
 		this.itemListner = itemListner;
 	}
-
 
 }

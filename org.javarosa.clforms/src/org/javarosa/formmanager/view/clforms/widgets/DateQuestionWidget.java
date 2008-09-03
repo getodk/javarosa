@@ -19,6 +19,7 @@ public class DateQuestionWidget extends SingleQuestionScreen
 	}
 
 	public void creatView() {
+		//#style textBox
 		datePicker = new DateField(qDef.getShortText(), DateField.DATE);
 		//set question
 		datePicker.setLabel(qDef.getLongText());

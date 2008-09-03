@@ -5,6 +5,8 @@ import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Gauge;
+import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
 
@@ -30,9 +32,11 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	private FormViewScreen parent;
 
 	private int index;
+	public int tempIndex;
 	private QuestionDef prompt;
 	private IAnswerData answer;
 	private SingleQuestionScreen widget;
+	Gauge progressBar;
 	// GUI elements
 	public FormViewManager(String formTitle, FormEntryModel model, FormEntryController controller, int questionIndex, FormViewScreen node)
 	{
@@ -40,10 +44,11 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	   	this.parent = node;
 		this.model = model;
     	this.controller = controller;
-		//immediately setup question, need to decide if this is the best place to do it
+//immediately setup question, need to decide if this is the best place to do it
     	this.getView(questionIndex);
     	//controller.setView(this);
     	model.registerObservable(this);
+    	
 	}
 
 	public int getIndex()
@@ -165,6 +170,8 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
 	}
 
+
+    
 	public void commandAction(Command command, Displayable arg1)
 	{
 		if (command == SingleQuestionScreen.nextItemCommand || command == SingleQuestionScreen.nextCommand) {
@@ -174,7 +181,8 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
 				if(prompt.isRequired() && answer == null)
 				{
-					Alert alert = new Alert("Question Required", "Question Required!!!", null, AlertType.ERROR);
+					String txt = "This is a compulsory question and must be completed first to proceed";
+					Alert alert = new Alert("Question Required!", txt, null, AlertType.ERROR);
 					controller.setDisplay(alert);
 				}
 				else{
@@ -186,7 +194,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 					}
 					else{
 					   controller.save();//always save
-				       parent.show();
+					   parent.show();
 					//parent.show();
 //					formComplete();//go to form view list instead
 //						model.setFormComplete();
