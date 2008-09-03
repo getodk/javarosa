@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.javarosa.formmanager.activity;
 
@@ -7,7 +7,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Displayable;
 import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
 
@@ -22,40 +25,48 @@ import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.FormList;
 import org.javarosa.formmanager.view.ViewTypes;
+import org.javarosa.user.view.NewUserForm;
 
 /**
  * @author Brian DeRenzi
  *
  */
-public class FormListActivity implements IActivity {
-	
+public class FormListActivity implements IActivity, CommandListener {
+
 	public static final String COMMAND_KEY = "command";
 	public static final String FORM_ID_KEY = "form_id";
-	
+	//refactor these out.
+	public final Command CMD_ADD_USER = new Command("Add User", Command.SCREEN, 5);
+	public final Command CMD_SAVE = new Command("Save", Command.OK, 1);
+	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
+	private NewUserForm addUser = null;
+
 	private FormList formsList = null;
 	private Map listOfForms = null;
 	private Vector formIDs = null;
 	private IShell parent = null;
 	private Vector positionToId = null;
-	
+
 	Context context;
-	
+
 	public FormListActivity(IShell p, String title) {
 		this.parent = p;
 		this.formsList = new FormList(this,title);
 	}
-	
+
 	public void start(Context context) {
 		this.listOfForms = new Map();
 		this.formIDs = new Vector();
 		getXForms();
+		this.formsList.addCommand(CMD_ADD_USER);
 		this.positionToId = this.formsList.loadView(listOfForms);
 		parent.setDisplay(this, this.formsList);
-		
+
 		this.context = context;
+
 	}
-	
-	
+
+
 	public void viewCompleted(Hashtable returnvals, int view_ID) {
 		// Determine which view just completed and act accordingly
 		switch(view_ID) {
@@ -64,7 +75,7 @@ public class FormListActivity implements IActivity {
 			break;
 		}
 	}
-	
+
 	private void processFormsList(Hashtable returnvals) {
 		Enumeration en = returnvals.keys();
 		while(en.hasMoreElements()) {
@@ -85,6 +96,13 @@ public class FormListActivity implements IActivity {
 
 				break;
 
+			} else if (cmd == Commands.CMD_ADD_USER) {
+				//take this out into an activity
+				addUser = new NewUserForm("Add User");
+				addUser.addCommand(CMD_SAVE);
+	    		addUser.addCommand(CMD_CANCEL);
+	    		addUser.setCommandListener(this);
+	    		parent.setDisplay(this, addUser);
 			} else if (cmd == Commands.CMD_EXIT) {
 				Hashtable returnArgs = new Hashtable();
 				returnArgs.put(COMMAND_KEY, Commands.CMD_EXIT);
@@ -112,10 +130,10 @@ public class FormListActivity implements IActivity {
 				//#endif
 				FormDefMetaData meta = (FormDefMetaData)formIDs.elementAt(formId);
 				FormDefRMSUtility rms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-				
+
 				// Delete!
 				rms.deleteRecord(meta.getRecordId());
-				
+
 				// refresh
 				this.start(this.context);
 			} else {
@@ -125,9 +143,50 @@ public class FormListActivity implements IActivity {
 			}
 		}
 	}
-	
+
+	public void commandAction(Command c, Displayable d)
+    {
+    	if (c == CMD_CANCEL) {
+    		parent.setDisplay(this, this.formsList);
+		}
+		if (c == CMD_SAVE)
+    	{
+    		String answer = addUser.readyToSave();
+
+    		if (answer.equals(""))	{///success
+
+    			javax.microedition.lcdui.Alert successfulNewUser  = new javax.microedition.lcdui.Alert("User added successfully - The new user can only be logged in when the current user logs out.");
+    			parent.setDisplay(this, successfulNewUser);
+    		}
+    		else if (answer.substring(0,10 ).equals("Username ("))///name already taken..
+    		{
+
+    			javax.microedition.lcdui.Alert nameTakenError  = new javax.microedition.lcdui.Alert("Problem adding User - name taken",
+						answer, null,AlertType.ERROR);
+    			parent.setDisplay(this, nameTakenError);
+    		}
+    		else if (answer.substring(0,9).equals("Please fi") )
+    		{
+    			System.out.println(answer.substring(9));
+    			javax.microedition.lcdui.Alert noInputError  = new javax.microedition.lcdui.Alert("Problem adding User - no input",
+						answer, null,AlertType.ERROR);
+    			parent.setDisplay(this, noInputError);
+    		}
+    		else if (answer.substring(0,9).equals("Please re"))///password error
+    		{
+    			System.out.println(answer.substring(9));
+    			javax.microedition.lcdui.Alert passwordMismatchError  = new javax.microedition.lcdui.Alert("Problem adding User - passwords don't match",
+						answer, null,AlertType.ERROR);
+    			passwordMismatchError.setTimeout(javax.microedition.lcdui.Alert.FOREVER);
+    			parent.setDisplay(this, passwordMismatchError);
+
+    		}
+
+    	}
+    }
+
 	private void getXForms() {
-		
+
 		FormDefRMSUtility formDefRMSUtility = (FormDefRMSUtility) JavaRosaServiceProvider
 				.instance().getStorageManager().getRMSStorageProvider()
 				.getUtility(FormDefRMSUtility.getUtilityName());
@@ -142,7 +201,7 @@ public class FormListActivity implements IActivity {
 				FormDefMetaData mdata = new FormDefMetaData();
 				formDefRMSUtility.retrieveMetaDataFromRMS(i,mdata);
 				// TODO fix it so that record id is part of the metadata serialization
-				
+
 				// BWD 27/7/2008
 				// Getting rid of annoying numbers thing
 				//listOfForms.put(new Integer(pos), mdata.getRecordId()+"-"+mdata.getName());
@@ -157,10 +216,10 @@ public class FormListActivity implements IActivity {
 			}
 		}
     }
-	
+
 	public void contextChanged(Context context) {
 		Vector contextChanges = this.context.mergeInContext(context);
-		
+
 		Enumeration en = contextChanges.elements();
 		while(en.hasMoreElements()) {
 			String changedValue = (String)en.nextElement();
@@ -169,9 +228,9 @@ public class FormListActivity implements IActivity {
 			}
 		}
 	}
-	
+
 	public void halt() {
-		
+
 	}
 	public void resume(Context context) {
 		this.contextChanged(context);
@@ -179,12 +238,12 @@ public class FormListActivity implements IActivity {
 		JavaRosaServiceProvider.instance().showView(this.formsList);
 	}
 	public void destroy() {
-		
+
 	}
 	public Context getActivityContext() {
 		return context;
 	}
-	
+
 	public void addNewMenuCommand(Command c) {
 		this.formsList.addCommand(c);
 	}
