@@ -116,9 +116,9 @@ public class ModelListActivity extends List implements CommandListener, IActivit
     	this.deleteAll();
     	this.setTicker(new Ticker("Please select a Model to send..."));
         this.addCommand(CMD_BACK);
-        this.addCommand(CMD_EDIT);
+        //this.addCommand(CMD_EDIT); //obscure from users until implemented.
         this.addCommand(CMD_SEND);
-        this.addCommand(CMD_MSGS);
+        //this.addCommand(CMD_MSGS);//now redundant as we have color boxes for this TODO: clean up related code!
         this.addCommand(CMD_DELETE);
         this.addCommand(CMD_EMPTY);
         this.addCommand(CMD_REFRESH);
