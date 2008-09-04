@@ -206,7 +206,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 			refreshView();
 		}
 		else if (command == SingleQuestionScreen.viewAnswersCommand){
-			controller.save();//always save
+			//controller.save();//always save
 			 parent.show();
 		}
 	}
