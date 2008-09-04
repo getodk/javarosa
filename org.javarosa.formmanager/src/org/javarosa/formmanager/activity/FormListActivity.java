@@ -60,9 +60,12 @@ public class FormListActivity implements IActivity, CommandListener {
 		this.listOfForms = new Map();
 		this.formIDs = new Vector();
 		getXForms();
-		User loggedInUser = (User)context.getElement("user");
-		if (loggedInUser.isAdminUser())
-			this.formsList.addCommand(CMD_ADD_USER);
+
+		if(context.getElement("USER")!=null){
+			User loggedInUser = (User)context.getElement("USER");
+			if (loggedInUser.isAdminUser())
+				this.formsList.addCommand(CMD_ADD_USER);
+		}
 		this.positionToId = this.formsList.loadView(listOfForms);
 		parent.setDisplay(this, this.formsList);
 
