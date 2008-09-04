@@ -183,8 +183,8 @@ public class JavaRosaDemoShell implements IShell {
             String usernameVAR = midlet.getAppProperty("password");
             if ((usernameVAR == null) || (passwordVAR == null))
             {
-            context.setElement("username","u");
-            context.setElement("password","p");
+            context.setElement("username","admin");
+            context.setElement("password","adat");
             }
             else{
                     context.setElement("username",usernameVAR);
@@ -203,6 +203,7 @@ public class JavaRosaDemoShell implements IShell {
 				FormListActivity formList = new FormListActivity(this, "Forms List");
 				if (user != null){
 					context.setCurrentUser(user.getUsername());
+					context.setElement("USER", user);
 				}
 
 				launchActivity(formList, context);
