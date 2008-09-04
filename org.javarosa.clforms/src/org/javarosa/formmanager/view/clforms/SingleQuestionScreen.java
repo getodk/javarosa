@@ -33,8 +33,9 @@ public abstract class SingleQuestionScreen extends Form {
 	public static Command viewAnswersCommand;
 
 	public static Command nextItemCommand = new Command("next", Command.ITEM, 1);
+	
 	//#style button
-	public static StringItem nextItem = new StringItem(null,"NEXT",Item.BUTTON);
+	public StringItem nextItem = new StringItem(null,"NEXT",Item.BUTTON);
 	public ItemCommandListener itemListner;
 
 	public SingleQuestionScreen(QuestionDef prompt) {
@@ -63,7 +64,7 @@ public abstract class SingleQuestionScreen extends Form {
 	}
 
 	public void addNavigationButtons()
-	{
+	{	
 		this.append(nextItem);
 	    nextItem.setDefaultCommand(nextItemCommand);     // add Command to Item.
 	}

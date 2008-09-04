@@ -85,7 +85,7 @@ public class FormViewScreen implements IFormEntryView, FormEntryModelListener, C
 
 		// next command is added on a per-widget basis
 		screen.addCommand(exitNoSaveCommand);
-		screen.addCommand(exitSaveCommand);
+		//screen.addCommand(exitSaveCommand);
 		screen.addCommand(sendCommand);
 		//screen.addCommand(saveAndReloadCommand);
 		screen.setCommandListener(this);
