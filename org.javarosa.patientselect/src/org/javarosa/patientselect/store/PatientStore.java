@@ -1,10 +1,12 @@
 package org.javarosa.patientselect.store;
 
 import java.io.IOException;
+
 import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordListener;
 import javax.microedition.rms.RecordStore;
+
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.patientselect.object.ExternalizableObject;
@@ -12,7 +14,7 @@ import org.javarosa.patientselect.object.ExternalizableObject;
 import de.enough.polish.util.ArrayList;
 
 /**
-* RMSUtility class for this project
+* Temporary patient store to simulate the storing of patients
 * 
 * 
 * @author Mark Gerard
@@ -27,7 +29,7 @@ public class PatientStore extends RMSUtility  implements RecordListener {
     protected RecordStore recordStore = null;
     
 	private ArrayList patientList;
-	int patIndex;
+	
 	
 	public PatientStore(String name) {
 		
@@ -41,22 +43,40 @@ public class PatientStore extends RMSUtility  implements RecordListener {
         }
         
         this.open();
+
+        //Simulated Patient Data
         
-      //#if debug.output==verbose || debug.output==exception
-        System.out.println("RMS SIZE (" + this.recordStoreName + ") : " + this.getNumberOfRecords());
-        //#endif
+        String pat0 = "Gerard Mark, M/23, Genius, Reading, Elgon, 23/08/2008, 05/09/2008";
+        String pat1 = "Clayton Sims, C/20, Code, Programming, MIT, 25/08/2008, 10/09/2008";
+        String pat2 = "Jonathan Jackson, J/40, Manager, Company, Massechussets, 02/06/2008, 04/07/2008";
+        
+        //Simulated Patient Store
         
         patientList = new ArrayList();
+        patientList.add(pat0);
+        patientList.add(pat1);
+        patientList.add(pat2);
         
-        patientList.add("Mark");
+        //#if debug.output==verbose || debug.output==exception
+        
+        	System.out.println("RMS SIZE (" + this.recordStoreName + ") : " + this.getNumberOfRecords());
+        	System.out.println("ARRAY LIST SIZE ("+ this.patientList + "): " + this.patientList.size());
+        	
+        //#endif
+        
 	}
 	
 	public void saveData(Object patData){
 		
 		try{
 			if(patData != null){
+				
 				patientList.add(patData);
 			}
+			
+			//#if debug.output==verbose || debug.output==exception
+				System.out.println("ARRAY LIST SIZE ("+ this.patientList + "): " + this.patientList.size());
+			//#endif
 		}
 		catch(Exception excep){
 			
@@ -67,16 +87,23 @@ public class PatientStore extends RMSUtility  implements RecordListener {
 		
 	}
 	
-	public int retrieveDataIndex(Object searchData){
+	public Object retrieveDataIndex(Object searchData){
 		
-		patIndex = -1;
+		Object returnedData = null;
 		
 		try{
+			
 			if(searchData != null){
 				
+				System.out.println("Entering search mode in [store]");
+				
 				if(patientList.contains(searchData)){
-					patIndex =  patientList.indexOf(searchData);
-					searchPatient(patIndex);
+					
+					int patientIndex = patientList.indexOf(searchData);
+					
+					System.out.println("The index of the Patient Is:" + patientIndex);
+					
+					returnedData = patientList.get(patientIndex);
 				}
 			}
 		}
@@ -85,24 +112,23 @@ public class PatientStore extends RMSUtility  implements RecordListener {
 			excep.printStackTrace();
 			//#endif
 		}
-		return patIndex;
+		
+		System.out.println("Exiting search mode in [store]");
+		
+		return returnedData;
 	}
-	
-	public String searchPatient(int searchIndex){
+
+	private ArrayList searchPatient(String searchData) {
 		
-		patIndex = searchIndex;
-		
-		try{
-			return patientList.get(patIndex).toString();
-		}
-		catch(Exception excep){
+		ArrayList matchingPatients = new ArrayList();
+		for(int i = this.patientList.size();--i >= 0;){
+			String result = (String) this.patientList.get(i);
 			
-			//#if debug.output==verbose || debug.output==exception
-			excep.printStackTrace();
-			//#endif
-			
-			return null;
+			if(result.indexOf(searchData)!= -1){
+				matchingPatients.add(result);
+			}
 		}
+		return matchingPatients;
 	}
 	
 	/*
