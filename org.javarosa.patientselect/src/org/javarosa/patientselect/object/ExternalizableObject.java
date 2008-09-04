@@ -112,123 +112,29 @@ public class ExternalizableObject extends PatientListMetaData implements Command
 		resForm.addCommand(new Command("Back", Command.BACK,0));
 		
 		resForm.setCommandListener(this);
-		resForm.append(resObject.toString());
+		//resForm.append(resObject);
 		
 		JavaRosaServiceProvider.instance().getDisplay().setCurrent(resForm);
 	}
+	
 	/*
 	 * Method to return the string on the data fields on the form
 	 */
 	public Object getPatientData(){
-		
-		if(validateData()){
 			
-			patientData.append(mPatientField.getString().trim());
-			patientData.append(mPatientCode.getString().trim());
-			patientData.append(mPatientSickness.getString().trim());
-			patientData.append(mPatientTreatment.getString().trim());
-			patientData.append(mPatientSex.getString().trim());
-			patientData.append(mPatientLocation.getString().trim());
-			patientData.append(mPeriod.getString().trim());
+			patientData.append(mPatientField == null  ? "" : mPatientField.getString().trim());
+			patientData.append(mPatientCode == null ? "" : mPatientCode.getString().trim() );
+			patientData.append(mPatientSickness == null ? "" : mPatientSickness.getString().trim());
+			patientData.append(mPatientTreatment == null ? "" : mPatientTreatment.getString().trim());
+			patientData.append(mPatientSex == null ? "" : mPatientSex.getString().trim());
+			patientData.append(mPatientLocation == null ? "" : mPatientLocation.getString().trim());
+			patientData.append(mPeriod == null ? "" : mPeriod.getString().trim());
 			
-			patientData.append(mReportDate.getDate().toString().trim());
-			patientData.append(mNextDateVisit.getDate().toString().trim());
-		}
-		return patientData;
-	}
-	
-	/*
-	 * Method to validate data field for null values
-	 */
-	public  boolean validateData() {
+			//Date values... Report Date and Next visit Date
+			patientData.append(mReportDate == null ? "" : mReportDate.getDate().toString().trim());
+			patientData.append(mNextDateVisit == null ? "" : mNextDateVisit.getDate().toString().trim());
 		
-		boolean validated = false;
-		
-		if(mPatientField.getString().trim().length() != 0){
-			
-			mPatientField.getString();
-			validated = true;
-		}
-		else{
-			validated = false;
-		}
-		
-		if(mPatientCode.getString().trim().length() != 0){
-			
-			mPatientCode.getString();
-			validated = true;
-		}
-		
-		else{
-			
-			validated = false;
-		}
-		
-		if(mPatientLocation.getString().trim().length() != 0){
-			
-			mPatientLocation.getString();
-			validated = true;
-		}
-		else{
-			validated = false;
-		}
-		
-		if(mPatientSickness.getString().trim().length() != 0){
-			
-			mPatientSickness.getString();
-			validated = true;
-		}
-		else{
-			validated = false;
-		}
-		
-		if(mPatientTreatment.getString().trim().length() != 0){
-			
-			mPatientTreatment.getString();
-			validated = true;
-		}
-		else{
-			validated = false;
-		}
-		
-		if(mPeriod.getString().trim().length() != 0){
-			
-			mPeriod.getString();
-			validated = true;
-		}
-		else{
-			validated = false;
-		}
-		
-		if(mPatientSex.getString().trim().length() != 0){
-			
-			mPatientSex.getString();
-			validated = true;
-		}
-		else{
-			validated = false;
-		}
-		
-		if(mNextDateVisit.getDate().toString().trim().length() != 0){
-			
-			mNextDateVisit.getDate().toString();
-			validated = true;
-		}
-		else{
-			validated = false;
-		}
-		
-		if(mReportDate.getDate().toString().trim().length() != 0){
-			
-			mReportDate.getDate().toString();
-			validated = true;
-		}
-		else{
-			
-			validated = false;
-		}
-		
-		return validated;
+			return patientData;
 	}
 	
 	/*
@@ -279,10 +185,16 @@ public class ExternalizableObject extends PatientListMetaData implements Command
 			
 			Object searchData = getPatientCode();
 			
-			store.retrieveDataIndex(searchData);
-			InitSearchResultsForm(searchData);
+			Object returnedData = store.retrieveDataIndex(searchData);
+			
+			InitSearchResultsForm(returnedData);
 			
 			System.out.println("Exiting Search Mode in [Externalizable]");
+		}
+		else if(c.getCommandType() == Command.BACK){
+			
+			System.out.println("Back to list huh");
+
 		}
 		
 	}
