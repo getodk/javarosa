@@ -176,11 +176,12 @@ rightcommand {
 	layout: expand | vshrink;
 }
 
-.buttonfocused {
+.plainbutton {
 	font-color: black;
 	font-style: bold;
 	border-color: black;
 	border-width: 1;
+	border-type: round-rect;
 	background-color: buttonBgColor;
 	padding-vertical: 2;
 	padding-horizontal: 5;
@@ -188,7 +189,19 @@ rightcommand {
 	min-width: 80;
 }
 
-.button extends buttonfocused {
+.buttonfocused {
+	font-color: black;
+	font-style: bold;
+	border-type: round-rect;
+	border-color: #FF6347;
+	border-width: 2;
+	background-color: buttonBgColor;
+	padding-vertical: 2;
+	padding-horizontal: 5;
+	layout: horizontal-center;
+	min-width: 80;
+}
+.button extends plainbutton {
 	focused-style: buttonfocused;
 }
 
