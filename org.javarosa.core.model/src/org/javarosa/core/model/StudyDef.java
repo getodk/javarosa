@@ -121,7 +121,7 @@ public class StudyDef implements Externalizable {
 	public FormDef getForm(String varName){
 		for(byte i=0; i<forms.size(); i++){
 			FormDef def = (FormDef)forms.elementAt(i);
-			if(def.getVariableName().equals(varName))
+			if(def.getName().equals(varName))
 				return def;
 		}
 		
@@ -150,8 +150,10 @@ public class StudyDef implements Externalizable {
 	
 	private void copyForms(Vector forms){
 		this.forms = new Vector();
-		for(byte i=0; i<forms.size(); i++)
-			this.forms.addElement(new FormDef((FormDef)forms.elementAt(i)));
+		for(byte i=0; i<forms.size(); i++) {
+			//this.forms.addElement(new FormDef((FormDef)forms.elementAt(i)));
+			//TODO: Write a copy constructor for this code
+		}
 	}
 	
 	/** 
