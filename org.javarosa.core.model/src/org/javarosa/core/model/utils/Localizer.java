@@ -329,14 +329,27 @@ public class Localizer implements Externalizable {
 	 * @throws NullPointerException if textID is null
 	 */
 	public String getText (String textID, String locale) {
-		String text = (String)getLocaleMap(locale).get(textID);
+		String text = getRawText(locale, textID);
 		if (text == null && fallbackDefaultForm && textID.indexOf(";") != -1)
-			text = (String)getLocaleMap(locale).get(textID.substring(0, textID.indexOf(";")));
+			text = getRawText(locale, textID.substring(0, textID.indexOf(";")));
 		if (text == null && fallbackDefaultLocale && !locale.equals(defaultLocale) && defaultLocale != null)
 			text = getText(textID, defaultLocale);
 		return text;
 	}
 		
+	/**
+	 * Get text for locale and exact text ID only, not using any fallbacks
+	 * 
+	 * @param locale Locale. Must be defined and not null.
+	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
+	 * @return Localized text. Return null if none found.
+	 * @throws NoSuchElementException If the locale is not defined or null.
+	 * @throws NullPointerException if textID is null
+	 */
+	public String getRawText (String locale, String textID) {
+		return (String)getLocaleMap(locale).get(textID);
+	}
+	
 	/* === MANAGING LOCALIZABLE OBSERVERS === */
 	
 	/**
