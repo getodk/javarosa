@@ -257,7 +257,7 @@ public class FormTransportActivity implements
 				break;
 			case SubmitScreen.SEND_LATER:
 				String userNotify = "Form has been saved. Check 'Saved Forms' list";
-				 alert = new Alert("Saving...",userNotify,null,AlertType.INFO);
+				 alert = new Alert("Saved!!!",userNotify,null,AlertType.INFO);
 				 alert.setCommandListener(this);
 				shell.setDisplay(this,alert);
 				// If we're going to send later, no reason to be in the
