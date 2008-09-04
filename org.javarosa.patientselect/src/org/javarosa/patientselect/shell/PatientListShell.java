@@ -11,7 +11,7 @@ import org.javarosa.patientselect.activity.PatientListActivity;
 public class PatientListShell {
 	
 	 	private MIDlet patientListMidlet;
-		// private ListActivity patientListActivity = null;
+	 	
 		 private PatientListActivity patientListActivity = null;
 		 private Context patientListContext;
 		 private IActivity currentActivity = null;
@@ -41,7 +41,9 @@ public class PatientListShell {
 		
 	    public void init(){
 	    	
+	    	//#if debug.output==verbose || debug.output==exception
 	    	System.out.println("Init Error!");
+	    	//#endif
 		}
 		
 		public void setMIDlet(MIDlet midlet){
@@ -49,9 +51,9 @@ public class PatientListShell {
 			this.patientListMidlet = midlet;
 		}
 		
-		public void returnFromActivity(IActivity i, String s, Hashtable h){
+		public void returnFromActivity(IActivity activity, String s, Hashtable h){
 			
-			i.resume(patientListContext);
+			activity.resume(patientListContext);
 		}
 		
 		public boolean setDisplay(IActivity callingActivity, Displayable display)
