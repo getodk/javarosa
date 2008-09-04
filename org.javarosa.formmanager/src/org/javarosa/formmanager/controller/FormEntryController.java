@@ -90,11 +90,11 @@ public class FormEntryController {
 	        instance.setDateSaved(new Date());
 
 	        //notify of save details
-	        String info = "Form saved to 'Saved Forms' at "+ instance.getDateSaved().toString();
+	        //String info = "Form saved to 'Saved Forms' at "+ instance.getDateSaved().toString();
 	       //System.out.println(info);
-			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("Save Successful!", info,null,AlertType.INFO);
-			a.setTimeout(2000);
-			setDisplay(a);
+			//javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("Save Successful!", info,null,AlertType.INFO);
+			//a.setTimeout(2000);
+			//setDisplay(a);
 
 			if(instanceID == -1) {
 				instanceID = utility.writeToRMS(instance);
