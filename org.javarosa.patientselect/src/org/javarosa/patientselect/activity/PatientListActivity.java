@@ -156,9 +156,7 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		else if(command == search){
 			
 			//#if debug.output == verbose || debug.output == exception
-			
 			System.out.println("Entering search");
-			
 			//#endif
 			
 			BasicSearch search = new BasicSearch();
@@ -180,10 +178,10 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		}
 			else{
 				
-				String fError = "Null Values";
-				String sError = "Some required patient data is missing on the Patient Form.";
+				String fErrorMessage = "Null Values";
+				String sErrorMessage = "Some required patient data is missing on the Patient Form.";
 				
-				showAlert(fError, sError);
+				showAlert(fErrorMessage, sErrorMessage);
 			}
 	}
 	
