@@ -22,6 +22,10 @@ import org.javarosa.core.services.storage.utilities.Serializer;
 	fds.setFname("Name.txt");
  *  new Thread(FormDefSerializer).start();
  */
+
+// Clayton Sims - Sep 4, 2008 : This class should be separated out in such a way that FormManager isn't dependent
+// on the FileConnection API. Even surrounding the appropriate code sections with preprocessor directives would be
+// fine.
 public class FormDefSerializer implements Runnable{
 
 	private FormDef form;
