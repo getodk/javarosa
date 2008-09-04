@@ -568,18 +568,14 @@ public class LocalizerTest extends TestCase  {
 				continue;
 			
 			switch (i + 1) {
-			case 1: text = getRawText(l, l.getLocale(), textID); break;
-			case 2: text = getRawText(l, l.getLocale(), baseTextID); break;
-			case 3: text = getRawText(l, l.getDefaultLocale(), textID); break;
-			case 4: text = getRawText(l, l.getDefaultLocale(), baseTextID); break;
+			case 1: text = l.getRawText(l.getLocale(), textID); break;
+			case 2: text = l.getRawText(l.getLocale(), baseTextID); break;
+			case 3: text = l.getRawText(l.getDefaultLocale(), textID); break;
+			case 4: text = l.getRawText(l.getDefaultLocale(), baseTextID); break;
 			}
 		}
 		
 		return text;
-	}
-	
-	private String getRawText (Localizer l, String locale, String textID) {
-		return (String)l.getLocaleMap(locale).get(textID);
 	}
 	
 	public void testGetTextNoCurrentLocale () {
