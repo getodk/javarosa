@@ -27,6 +27,11 @@ public class IntegerData implements IAnswerData {
 	public IntegerData(int n) {
 		this.n = n;
 	}
+	public IntegerData(Integer n) {
+		if(n != null) {
+			this.n = n.intValue();
+		}
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
