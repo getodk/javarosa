@@ -188,11 +188,8 @@ public class XPathFuncExpr extends XPathExpression {
 				val = new Double(Double.NaN);
 			}
 		} else if (o instanceof Date) {
-			System.out.println("date: "+((Date)o).getTime());
-			System.out.println("date: "+DateUtils.getDateFromString("1970-01-01").getTime());
-			
 			val = new Double(divLongNotSuck(
-					((Date)o).getTime() - DateUtils.getDateFromString("1970-01-01").getTime() +	43200000l,
+					DateUtils.roundDate((Date)o).getTime() - DateUtils.getDateFromString("1970-01-01").getTime() +	43200000l,
 					86400000l)); //43200000 factor (12 hours in ms) handles differing DST offsets
 		} else if (o instanceof IExprDataType) {
 			val = ((IExprDataType)o).toNumeric();
@@ -247,11 +244,7 @@ public class XPathFuncExpr extends XPathExpression {
 			
 			Date dt = DateUtils.getDate(1970, 1, 1);
 			dt.setTime(dt.getTime() + (long)d * 86400000l + 43200000l);
-			
-			Calendar cd = Calendar.getInstance();
-			cd.setTime(dt);
-			
-			return DateUtils.getDate(cd.get(Calendar.YEAR), cd.get(Calendar.MONTH) + 1, cd.get(Calendar.DAY_OF_MONTH));
+			return DateUtils.roundDate(dt);
 		} else if (o instanceof String) {
 			Date d = DateUtils.getDateFromString((String)o);
 			if (d == null) {

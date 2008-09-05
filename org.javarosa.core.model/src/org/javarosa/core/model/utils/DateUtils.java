@@ -88,20 +88,21 @@ public class DateUtils {
 		if (val == null){
 			return stringValue;
 		}
-				Date d = (Date) val;
-				Calendar cd = Calendar.getInstance();
-				cd.setTime(d);
-				String year = "" + cd.get(Calendar.YEAR);
-				String month = "" + (cd.get(Calendar.MONTH)+1);
-				String day = "" + cd.get(Calendar.DAY_OF_MONTH);
+		
+		Date d = (Date) val;
+		Calendar cd = Calendar.getInstance();
+		cd.setTime(d);
+		String year = "" + cd.get(Calendar.YEAR);
+		String month = "" + (cd.get(Calendar.MONTH)+1);
+		String day = "" + cd.get(Calendar.DAY_OF_MONTH);
 
-				if (month.length() < 2)
-					month = "0" + month;
+		if (month.length() < 2)
+			month = "0" + month;
 
-				if (day.length() < 2)
-					day = "0" + day;
+		if (day.length() < 2)
+			day = "0" + day;
 
-				stringValue =  year + "-" + month + "-" + day;
+		stringValue =  year + "-" + month + "-" + day;
 		return stringValue;
 	}
 
@@ -155,6 +156,13 @@ public class DateUtils {
 		cd.set(Calendar.MILLISECOND, 0);
 		
 		return cd.getTime();
+	}
+	
+	//return new Date object with same date but time set to midnight (in current timezone)
+	public static Date roundDate (Date d) {
+		Calendar cd = Calendar.getInstance();
+		cd.setTime(d);
+		return DateUtils.getDate(cd.get(Calendar.YEAR), cd.get(Calendar.MONTH) + 1, cd.get(Calendar.DAY_OF_MONTH));
 	}
 	
 	public static String get24HourTimeFromDate(Date d)
