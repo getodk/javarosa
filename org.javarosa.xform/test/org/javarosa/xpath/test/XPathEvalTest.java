@@ -67,6 +67,10 @@ public class XPathEvalTest extends TestCase {
 			
 			if (exceptionExpected) {
 				fail("Expected exception");
+			} else if ((result instanceof Double && expected instanceof Double)) {
+				if (Math.abs(((Double)result).doubleValue() - ((Double)expected).doubleValue()) > 1.0e-12) {
+					fail("Doubles outside of tolerance");
+				}
 			} else if (!expected.equals(result)) {
 				fail("Did not get expected result");
 			}
@@ -119,7 +123,8 @@ public class XPathEvalTest extends TestCase {
 		testEval("boolean(0)", null, Boolean.FALSE);
 		testEval("boolean(-0)", null, Boolean.FALSE);
 		testEval("boolean(number('NaN'))", null, Boolean.FALSE);
-		// +/-infinity -> bool
+		testEval("boolean(1 div 0)", null, Boolean.TRUE);
+		testEval("boolean(-1 div 0)", null, Boolean.TRUE);
 		testEval("boolean('')", null, Boolean.FALSE);
 		testEval("boolean('asdf')", null, Boolean.TRUE);
 		testEval("boolean('  ')", null, Boolean.TRUE);
@@ -148,7 +153,8 @@ public class XPathEvalTest extends TestCase {
 		testEval("number(-0)", null, new Double(-0.0));
 		testEval("number(-123.5)", null, new Double(-123.5));
 		testEval("number(number('NaN'))", null, new Double(Double.NaN));
-		// +/-infinity -> num
+		testEval("number(1 div 0)", null, new Double(Double.POSITIVE_INFINITY));
+		testEval("number(-1 div 0)", null, new Double(Double.NEGATIVE_INFINITY));
 		testEval("number(date('1970-01-01'))", null, new Double(0.0));
 		testEval("number(date('1970-01-02'))", null, new Double(1.0));
 		testEval("number(date('1969-12-31'))", null, new Double(-1.0));
@@ -157,7 +163,8 @@ public class XPathEvalTest extends TestCase {
 		testEval("string(true())", null, "true");
 		testEval("string(false())", null, "false");
 		testEval("string(number('NaN'))", null, "NaN");
-		// +/-infinity -> string
+		testEval("string(1 div 0)", null, "Infinity");
+		testEval("string(-1 div 0)", null, "-Infinity");
 		testEval("string(0)", null, "0");
 		testEval("string(-0)", null, "0");
 		testEval("string(123456.0000)", null, "123456");
@@ -184,9 +191,95 @@ public class XPathEvalTest extends TestCase {
 		testEval("date(-10252)", null, DateUtils.getDate(1941, 12, 7));
 		testEval("date(date('1989-11-09'))", null, DateUtils.getDate(1989, 11, 9));
 		testEval("date(true())", null, new XPathTypeMismatchException());
-//		testEval("string(true())", null, "true");
-//		testEval("string(true())", null, "true");
-//		testEval("string(true())", null, "true");
+		/* other built-in functions */
+		testEval("not(true())", null, Boolean.FALSE);
+		testEval("not(false())", null, Boolean.TRUE);
+		testEval("not('')", null, Boolean.TRUE);
+		testEval("boolean-from-string('true')", null, Boolean.TRUE);
+		testEval("boolean-from-string('false')", null, Boolean.FALSE);
+		testEval("boolean-from-string('whatever')", null, Boolean.FALSE);
+		testEval("boolean-from-string('1')", null, Boolean.TRUE);
+		testEval("boolean-from-string('0')", null, Boolean.FALSE);
+		testEval("boolean-from-string(1)", null, Boolean.TRUE);
+		testEval("boolean-from-string(1.0)", null, Boolean.TRUE);
+		testEval("boolean-from-string(1.0001)", null, Boolean.FALSE);
+		testEval("boolean-from-string(true())", null, Boolean.TRUE);
+		testEval("selected('apple baby crimson', 'apple')", null, Boolean.TRUE);
+		testEval("selected('apple baby crimson', 'baby')", null, Boolean.TRUE);
+		testEval("selected('apple baby crimson', 'crimson')", null, Boolean.TRUE);
+		testEval("selected('apple baby crimson', '  baby  ')", null, Boolean.TRUE);
+		testEval("selected('apple baby crimson', 'babby')", null, Boolean.FALSE);
+		testEval("selected('apple baby crimson', 'bab')", null, Boolean.FALSE);
+		testEval("selected('apple', 'apple')", null, Boolean.TRUE);
+		testEval("selected('apple', 'ovoid')", null, Boolean.FALSE);
+		testEval("selected('', 'apple')", null, Boolean.FALSE);
+		/* operators */
+		testEval("5.5 + 5.5" , null, new Double(11.0));
+		testEval("0 + 0" , null, new Double(0.0));
+		testEval("6.1 - 7.8" , null, new Double(-1.7));
+		testEval("-3 + 4" , null, new Double(1.0));
+		testEval("3 + -4" , null, new Double(-1.0));
+		testEval("1 - 2 - 3" , null, new Double(-4.0));
+		testEval("1 - (2 - 3)" , null, new Double(2.0));
+		testEval("1.1 * -1.1" , null, new Double(-1.21));
+		testEval("-10 div -4" , null, new Double(2.5));
+		testEval("2 * 3 div 8 * 2" , null, new Double(1.5));
+		testEval("3 + 3 * 3" , null, new Double(12.0));
+		testEval("1 div 0" , null, new Double(Double.POSITIVE_INFINITY));
+		testEval("-1 div 0" , null, new Double(Double.NEGATIVE_INFINITY));
+		testEval("0 div 0" , null, new Double(Double.NaN));
+		testEval("3.1 mod 3.1" , null, new Double(0.0));
+		testEval("5 mod 3.1" , null, new Double(1.9));
+		testEval("2 mod 3.1" , null, new Double(2.0));
+		testEval("0 mod 3.1" , null, new Double(0.0));
+		testEval("5 mod -3" , null, new Double(2.0));
+		testEval("-5 mod 3" , null, new Double(-2.0));
+		testEval("-5 mod -3" , null, new Double(-2.0));
+		testEval("5 mod 0" , null, new Double(Double.NaN));
+		testEval("5 * (6 + 7)" , null, new Double(65.0));
+		testEval("'123' * '456'" , null, new Double(56088.0));
+		testEval("true() + 8" , null, new Double(9.0));
+		testEval("5 + 5" , null, new Double(10.0));
+		testEval("true() and true()" , null, Boolean.TRUE);
+		testEval("true() and false()" , null, Boolean.FALSE);
+		testEval("false() and false()" , null, Boolean.FALSE);		
+		testEval("true() or true()" , null, Boolean.TRUE);
+		testEval("true() or false()" , null, Boolean.TRUE);
+		testEval("false() or false()" , null, Boolean.FALSE);
+		testEval("true() or true() and false()" , null, Boolean.TRUE);
+		testEval("(true() or true()) and false()" , null, Boolean.FALSE);
+		testEval("true() or date('')" , null, Boolean.TRUE); //short-circuiting
+		testEval("false() and date('')" , null, Boolean.FALSE); //short-circuiting
+		testEval("'' or 17" , null, Boolean.TRUE);
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+
+		
+		testEval("6.1 - 7.8 = -1.7" , null, Boolean.TRUE); //handle floating point rounding
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+//		testEval("5 + 5" , null, new Double(10.0));
+		
+		
+		//testEval("", null, );
 		
 	}
 }
