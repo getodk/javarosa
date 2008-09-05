@@ -34,7 +34,7 @@ public class DateData implements IAnswerData {
 	}
 	
 	public Object getValue () {
-		return d;
+		return new Date(d.getTime());
 	}
 	
 	public String getDisplayText () {
