@@ -23,6 +23,8 @@ public class XPathParseTest extends TestCase {
 		{"0.12345", "{num:0.12345}"},
 		{".666", "{num:0.666}"},
 		{"00000333.3330000", "{num:333.333}"},
+		{"1230000000000000000000", "{num:1.23E21}"},
+		{"0.00000000000000000123", "{num:1.23E-18}"},
 		{"0", "{num:0.0}"},
 		{"0.", "{num:0.0}"},
 		{".0", "{num:0.0}"},
@@ -115,6 +117,8 @@ public class XPathParseTest extends TestCase {
 		/* filter expressions */
 		{"bunch-o-nodes()[3]", "{filt-expr:{func-expr:bunch-o-nodes,{}},{{num:3.0}}}"},
 		{"bunch-o-nodes()[3]['predicates'!='galore']", "{filt-expr:{func-expr:bunch-o-nodes,{}},{{num:3.0},{binop-expr:!=,{str:'predicates'},{str:'galore'}}}}"},
+		{"(bunch-o-nodes)[3]", "{filt-expr:{path-expr:rel,{{step:child,bunch-o-nodes}}},{{num:3.0}}}"},
+		{"bunch-o-nodes[3]", "{path-expr:rel,{{step:child,bunch-o-nodes,{{num:3.0}}}}}"},
 		/* path steps */
 		{".", "{path-expr:rel,{{step:self,node()}}}"},
 		{"..", "{path-expr:rel,{{step:parent,node()}}}"},
@@ -160,6 +164,9 @@ public class XPathParseTest extends TestCase {
 		{"rel/ative/path/", null},
 		{"/abs/olute/path['etc']", "{path-expr:abs,{{step:child,abs},{step:child,olute},{step:child,path,{{str:'etc'}}}}}"},
 		{"filter()/expr/path", "{path-expr:{filt-expr:{func-expr:filter,{}},{}},{{step:child,expr},{step:child,path}}}"},
+		{"fil()['ter']/expr/path", "{path-expr:{filt-expr:{func-expr:fil,{}},{{str:'ter'}}},{{step:child,expr},{step:child,path}}}"},
+		{"(another-filter)/expr/path", "{path-expr:{filt-expr:{path-expr:rel,{{step:child,another-filter}}},{}},{{step:child,expr},{step:child,path}}}"},
+		{"filter-expr/(must-come)['first']", null},
 		{"/", "{path-expr:abs,{}}"},
 		{"//", null},
 		{"//all", "{path-expr:abs,{{step:descendant-or-self,node()},{step:child,all}}}"},

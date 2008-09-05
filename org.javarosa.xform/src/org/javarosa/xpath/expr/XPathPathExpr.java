@@ -40,6 +40,8 @@ public class XPathPathExpr extends XPathExpression {
 		
 		if (init_context == INIT_CONTEXT_EXPR)
 			throw new XPathUnsupportedException("path expression with expression as root");
+		if (init_context == INIT_CONTEXT_RELATIVE)
+			throw new XPathUnsupportedException("relative path expression");		
 		
 		if (init_context == INIT_CONTEXT_ROOT)
 			sb.append("/");
