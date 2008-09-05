@@ -67,6 +67,10 @@ public class XPathFuncExpr extends XPathExpression {
 			return boolStr(argVals[0]);
 		} else if (name.equals("selected") && args.length == 2) { //non-standard
 			return multiSelected(argVals[0], argVals[1]);
+		} else if (name.equals("today") && args.length == 0) {
+			return DateUtils.roundDate(new Date());
+		} else if (name.equals("now") && args.length == 0) {
+			return new Date();
 		} else {
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
 			if (handler != null) {
@@ -190,7 +194,7 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (o instanceof Date) {
 			val = new Double(divLongNotSuck(
 					DateUtils.roundDate((Date)o).getTime() - DateUtils.getDateFromString("1970-01-01").getTime() +	43200000l,
-					86400000l)); //43200000 factor (12 hours in ms) handles differing DST offsets
+					86400000l)); //43200000 offset (0.5 day in ms) is needed to handle differing DST offsets!
 		} else if (o instanceof IExprDataType) {
 			val = ((IExprDataType)o).toNumeric();
 		}
@@ -243,7 +247,7 @@ public class XPathFuncExpr extends XPathExpression {
 			}
 			
 			Date dt = DateUtils.getDate(1970, 1, 1);
-			dt.setTime(dt.getTime() + (long)d * 86400000l + 43200000l);
+			dt.setTime(dt.getTime() + (long)d * 86400000l + 43200000l); //43200000 offset (0.5 day in ms) is needed to handle differing DST offsets!
 			return DateUtils.roundDate(dt);
 		} else if (o instanceof String) {
 			Date d = DateUtils.getDateFromString((String)o);
@@ -277,7 +281,7 @@ public class XPathFuncExpr extends XPathExpression {
 	//arg2: choice to look for
 	public static Boolean multiSelected (Object o1, Object o2) {
 		String s1 = (String)o1;
-		String s2 = (String)o2;
+		String s2 = ((String)o2).trim();
 		
 		return new Boolean((" " + s1 + " ").indexOf(" " + s2 + " ") != -1);
 	}
