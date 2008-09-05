@@ -10,7 +10,7 @@ import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
 
-public class XPathTest extends TestCase {
+public class XPathParseTest extends TestCase {
 	public static String[][] parseTestCases = {
 		/* no null expressions */
 		{"", null},
@@ -173,15 +173,15 @@ public class XPathTest extends TestCase {
 			"{func-expr:function_call,{{binop-expr:*,{num:26.0},{binop-expr:+,{num:7.0},{num:3.0}}},{path-expr:abs,{{step:descendant-or-self,node()},{step:child,*}}},{path-expr:abs,{{step:child,im},{step:child,an},{step:ancestor,x,{{num:3.0},{func-expr:true,{}}}},{step:child,path}}}}}"}			
 	};
 	
-	public XPathTest(String name, TestMethod rTestMethod) {
+	public XPathParseTest(String name, TestMethod rTestMethod) {
 		super(name, rTestMethod);
 	}
 	
-	public XPathTest(String name) {
+	public XPathParseTest(String name) {
 		super(name);
 	}
 	
-	public XPathTest() {
+	public XPathParseTest() {
 		super();
 	}	
 	
@@ -192,9 +192,9 @@ public class XPathTest extends TestCase {
 			final String expr = parseTestCases[i][0];
 			final String expected = parseTestCases[i][1];
 			
-			aSuite.addTest(new XPathTest("XPath Parsing Test [" + expr + "]", new TestMethod() {
+			aSuite.addTest(new XPathParseTest("XPath Parsing Test [" + expr + "]", new TestMethod() {
 				public void run (TestCase tc) {
-					((XPathTest)tc).testParse(expr, expected);
+					((XPathParseTest)tc).testParse(expr, expected);
 				}
 			}));
 		}
