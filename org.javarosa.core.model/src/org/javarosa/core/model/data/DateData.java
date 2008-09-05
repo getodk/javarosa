@@ -30,7 +30,7 @@ public class DateData implements IAnswerData {
 	}
 	
 	public void setValue (Object o) {
-		d = (Date)o;
+		d = new Date(((Date)o).getTime());
 	}
 	
 	public Object getValue () {
