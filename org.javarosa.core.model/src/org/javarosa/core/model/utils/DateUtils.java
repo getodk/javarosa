@@ -119,8 +119,9 @@ public class DateUtils {
 		temp.addElement(values.substring(pos).trim());
 		return temp;
 	}
+	
+	//returns a date object set to midnight on the given date in the current timezone *including DST!!*
 	public static Date getDateFromString(String value) {
-		Date result = new Date();
 		Vector digits = tokenize(value, '-');
 
 		if (digits.size() != 3)
@@ -129,11 +130,17 @@ public class DateUtils {
 		int day, month, year;
 		try {
 			day = Integer.parseInt((String)digits.elementAt(2));
-			month = Integer.parseInt((String)digits.elementAt(1)) - 1;
+			month = Integer.parseInt((String)digits.elementAt(1));
 			year = Integer.parseInt((String)digits.elementAt(0));
 		} catch (NumberFormatException nfe) {
 			return null;
 		}
+		
+		return getDate(year, month, day);
+	}
+	
+	public static Date getDate (int year, int month, int day) {
+		month -= 1;
 		
 		if (month < Calendar.JANUARY || month > Calendar.DECEMBER || day < 1 || day > daysInMonth(month, year))
 			return null;
@@ -142,12 +149,13 @@ public class DateUtils {
 		cd.set(Calendar.DAY_OF_MONTH, day);
 		cd.set(Calendar.MONTH, month);
 		cd.set(Calendar.YEAR, year);
-
-		result = cd.getTime();
-
-		return result;
+		cd.set(Calendar.HOUR_OF_DAY, 0);
+		cd.set(Calendar.MINUTE, 0);
+		cd.set(Calendar.SECOND, 0);
+		cd.set(Calendar.MILLISECOND, 0);
+		
+		return cd.getTime();
 	}
-	
 	
 	public static String get24HourTimeFromDate(Date d)
 	{

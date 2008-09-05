@@ -1,5 +1,6 @@
 package org.javarosa.xpath.expr;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -149,6 +150,15 @@ public class XPathFuncExpr extends XPathExpression {
 			throw new XPathTypeMismatchException("converting to boolean");
 		}
 	}
+			
+	//a - b * floor(a / b)
+	private static long modLongNotSuck (long a, long b) {
+		return ((a % b) + b) % b;
+	}
+
+	private static long divLongNotSuck (long a, long b) {
+		return (a - modLongNotSuck(a, b)) / b;
+	}
 	
 	public static Double toNumeric (Object o) {
 		Double val = null;
@@ -158,16 +168,32 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (o instanceof Double) {
 			val = (Double)o;
 		} else if (o instanceof String) {
+			/* annoying, but the xpath spec doesn't recognize scientific notation, or +/-Infinity
+			 * when converting a string to a number
+			 */
+			
 			String s = (String)o;
 			double d;
 			try {
-				d = Double.parseDouble(s.trim());
+				s = s.trim();
+				for (int i = 0; i < s.length(); i++) {
+					char c = s.charAt(i);
+					if (c != '-' && c != '.' && (c < '0' || c > '9'))
+						throw new NumberFormatException();
+				}
+				
+				d = Double.parseDouble(s);
 				val = new Double(d);
 			} catch (NumberFormatException nfe) {
 				val = new Double(Double.NaN);
 			}
 		} else if (o instanceof Date) {
-			val = new Double((((Date)o).getTime() - DateUtils.getDateFromString("1970-01-01").getTime()) / 86400000l);
+			System.out.println("date: "+((Date)o).getTime());
+			System.out.println("date: "+DateUtils.getDateFromString("1970-01-01").getTime());
+			
+			val = new Double(divLongNotSuck(
+					((Date)o).getTime() - DateUtils.getDateFromString("1970-01-01").getTime() +	43200000l,
+					86400000l)); //43200000 factor (12 hours in ms) handles differing DST offsets
 		} else if (o instanceof IExprDataType) {
 			val = ((IExprDataType)o).toNumeric();
 		}
@@ -214,9 +240,18 @@ public class XPathFuncExpr extends XPathExpression {
 
 	public static Date toDate (Object o) {
 		if (o instanceof Double) {
-			Date d = DateUtils.getDateFromString("1970-01-01");
-			d.setTime(d.getTime() + (long)((Double)o).doubleValue() * 86400000l);
-			return d;
+			double d = ((Double)o).doubleValue();
+			if (Math.abs(d - (int)d) > 1.0e-12) {
+				throw new XPathTypeMismatchException("converting non-integer to date");
+			}
+			
+			Date dt = DateUtils.getDate(1970, 1, 1);
+			dt.setTime(dt.getTime() + (long)d * 86400000l + 43200000l);
+			
+			Calendar cd = Calendar.getInstance();
+			cd.setTime(dt);
+			
+			return DateUtils.getDate(cd.get(Calendar.YEAR), cd.get(Calendar.MONTH) + 1, cd.get(Calendar.DAY_OF_MONTH));
 		} else if (o instanceof String) {
 			Date d = DateUtils.getDateFromString((String)o);
 			if (d == null) {
