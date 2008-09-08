@@ -48,7 +48,7 @@ public class XPathEvalTest extends TestCase {
 	}
 		
 	private void testEval (String expr, IFormDataModel model, Object expected) {
-		//System.out.println("[" + expr + "]");
+		System.out.println("[" + expr + "]");
 		
 		XPathExpression xpe = null;
 		boolean exceptionExpected = (expected instanceof XPathException);
@@ -63,7 +63,7 @@ public class XPathEvalTest extends TestCase {
 		
 		try {
 			Object result = xpe.eval(model, new EvaluationContext());
-			//System.out.println("out: " + result);
+			System.out.println("out: " + result);
 			
 			if (exceptionExpected) {
 				fail("Expected exception");
@@ -221,6 +221,8 @@ public class XPathEvalTest extends TestCase {
 		testEval("3 + -4" , null, new Double(-1.0));
 		testEval("1 - 2 - 3" , null, new Double(-4.0));
 		testEval("1 - (2 - 3)" , null, new Double(2.0));
+		testEval("-(8*5)" , null, new Double(-40.0));
+		testEval("-'19'" , null, new Double(-19.0));
 		testEval("1.1 * -1.1" , null, new Double(-1.21));
 		testEval("-10 div -4" , null, new Double(2.5));
 		testEval("2 * 3 div 8 * 2" , null, new Double(1.5));
@@ -239,7 +241,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("5 * (6 + 7)" , null, new Double(65.0));
 		testEval("'123' * '456'" , null, new Double(56088.0));
 		testEval("true() + 8" , null, new Double(9.0));
-		testEval("5 + 5" , null, new Double(10.0));
+		testEval("date('2008-09-08') - date('1983-10-06')" , null, new Double(9104.0));
 		testEval("true() and true()" , null, Boolean.TRUE);
 		testEval("true() and false()" , null, Boolean.FALSE);
 		testEval("false() and false()" , null, Boolean.FALSE);		
@@ -251,7 +253,58 @@ public class XPathEvalTest extends TestCase {
 		testEval("true() or date('')" , null, Boolean.TRUE); //short-circuiting
 		testEval("false() and date('')" , null, Boolean.FALSE); //short-circuiting
 		testEval("'' or 17" , null, Boolean.TRUE);
-//		testEval("5 + 5" , null, new Double(10.0));
+		testEval("4 < 5" , null, Boolean.TRUE);
+		testEval("5 < 5" , null, Boolean.FALSE);
+		testEval("6 < 5" , null, Boolean.FALSE);
+		testEval("4 <= 5" , null, Boolean.TRUE);
+		testEval("5 <= 5" , null, Boolean.TRUE);
+		testEval("6 <= 5" , null, Boolean.FALSE);
+		testEval("4 > 5" , null, Boolean.FALSE);
+		testEval("5 > 5" , null, Boolean.FALSE);
+		testEval("6 > 5" , null, Boolean.TRUE);
+		testEval("4 >= 5" , null, Boolean.FALSE);
+		testEval("5 >= 5" , null, Boolean.TRUE);
+		testEval("6 >= 5" , null, Boolean.TRUE);
+		testEval("-3 > -6" , null, Boolean.TRUE);
+		testEval("true() > 0.9999" , null, Boolean.TRUE);
+		testEval("'-17' > '-172'" , null, Boolean.TRUE); //no string comparison: converted to number
+		testEval("'abc' < 'abcd'" , null, Boolean.FALSE); //no string comparison: converted to NaN
+		testEval("date('2001-12-26') > date('2001-12-25')" , null, Boolean.TRUE);
+		testEval("date('1969-07-20') < date('1969-07-21')" , null, Boolean.TRUE);
+		testEval("true() = true()" , null, Boolean.TRUE);
+		testEval("true() = false()" , null, Boolean.FALSE);
+		testEval("true() != true()" , null, Boolean.FALSE);
+		testEval("true() != false()" , null, Boolean.TRUE);
+		testEval("3 = 3" , null, Boolean.TRUE);
+		testEval("3 = 4" , null, Boolean.FALSE);
+		testEval("3 != 3" , null, Boolean.FALSE);
+		testEval("3 != 4" , null, Boolean.TRUE);
+		testEval("6.1 - 7.8 = -1.7" , null, Boolean.TRUE); //handle floating point rounding
+		testEval("'abc' = 'abc'" , null, Boolean.TRUE);
+		testEval("'abc' = 'def'" , null, Boolean.FALSE);
+		testEval("'abc' != 'abc'" , null, Boolean.FALSE);
+		testEval("'abc' != 'def'" , null, Boolean.TRUE);
+		testEval("'' = ''" , null, Boolean.TRUE);		
+		testEval("true() = 17" , null, Boolean.TRUE);
+		testEval("0 = false()" , null, Boolean.TRUE);
+		testEval("true() = 'true'" , null, Boolean.TRUE);
+		testEval("17 = '17.0000000'" , null, Boolean.TRUE);
+		testEval("'0017.' = 17" , null, Boolean.TRUE);
+		testEval("'017.' = '17.000'", null, Boolean.FALSE);
+		testEval("date('2004-05-01') = date('2004-05-01')" , null, Boolean.TRUE);
+		testEval("true() != date('1999-09-09')" , null, new XPathTypeMismatchException());
+//		testEval("" , null, Boolean.);
+//		testEval("" , null, Boolean.);
+//		testEval("" , null, Boolean.);
+//		testEval("" , null, Boolean.);
+//		testEval("" , null, Boolean.);
+//		testEval("" , null, Boolean.);
+//		testEval("" , null, Boolean.);
+//		testEval("" , null, Boolean.);
+//		testEval("" , null, Boolean.);
+//		testEval("" , null, Boolean.);
+//		testEval("" , null, Boolean.);
+		//		testEval("5 + 5" , null, new Double(10.0));
 //		testEval("5 + 5" , null, new Double(10.0));
 //		testEval("5 + 5" , null, new Double(10.0));
 //		testEval("5 + 5" , null, new Double(10.0));
@@ -265,7 +318,6 @@ public class XPathEvalTest extends TestCase {
 //		testEval("5 + 5" , null, new Double(10.0));
 
 		
-		testEval("6.1 - 7.8 = -1.7" , null, Boolean.TRUE); //handle floating point rounding
 //		testEval("5 + 5" , null, new Double(10.0));
 //		testEval("5 + 5" , null, new Double(10.0));
 //		testEval("5 + 5" , null, new Double(10.0));

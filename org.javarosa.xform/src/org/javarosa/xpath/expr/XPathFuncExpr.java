@@ -193,7 +193,7 @@ public class XPathFuncExpr extends XPathExpression {
 			}
 		} else if (o instanceof Date) {
 			val = new Double(divLongNotSuck(
-					DateUtils.roundDate((Date)o).getTime() - DateUtils.getDateFromString("1970-01-01").getTime() +	43200000l,
+					DateUtils.roundDate((Date)o).getTime() - DateUtils.getDate(1970, 1, 1).getTime() +	43200000l,
 					86400000l)); //43200000 offset (0.5 day in ms) is needed to handle differing DST offsets!
 		} else if (o instanceof IExprDataType) {
 			val = ((IExprDataType)o).toNumeric();
