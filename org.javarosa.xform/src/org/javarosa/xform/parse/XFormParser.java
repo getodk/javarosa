@@ -166,9 +166,9 @@ public class XFormParser {
 		} catch(Exception e){
 			//#if debug.output==verbose || debug.output==exception
 			System.err.println("XML Syntax Error!");
+			e.printStackTrace();
 			//#endif
 
-			e.printStackTrace();
 			return null;
 		}
 
