@@ -1,6 +1,5 @@
 package org.javarosa.core.util;
 
-import java.util.Hashtable;
 import java.util.Stack;
 
 import org.javarosa.core.api.IActivity;
