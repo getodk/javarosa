@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.OrderedHashtable;
 
 /**
  * The Localizer object maintains mappings for locale ID's and Object
@@ -18,7 +19,7 @@ import org.javarosa.core.util.Externalizable;
  *
  */
 public class Localizer implements Externalizable {
-	private SimpleOrderedHashtable localeData; /* String -> Hashtable{ String -> String } */
+	private OrderedHashtable localeData; /* String -> Hashtable{ String -> String } */
 	private String defaultLocale;
 	private String currentLocale;
 	private boolean fallbackDefaultLocale;
@@ -41,7 +42,7 @@ public class Localizer implements Externalizable {
 	 * specified text form ('long', 'short', etc.). Note: form is specified by appending ';[form]' onto the text ID. 
 	 */
 	public Localizer (boolean fallbackDefaultLocale, boolean fallbackDefaultForm) {
-		localeData = new SimpleOrderedHashtable();
+		localeData = new OrderedHashtable();
 		defaultLocale = null;
 		currentLocale = null;
 		observers = new Vector();
@@ -80,7 +81,7 @@ public class Localizer implements Externalizable {
 		if (hasLocale(locale)) {
 			return false;
 		} else {
-			localeData.put(locale, new SimpleOrderedHashtable());
+			localeData.put(locale, new OrderedHashtable());
 			return true;
 		}
 	}
@@ -191,8 +192,8 @@ public class Localizer implements Externalizable {
 	 * @return Whether an existing set of mappings (excluding the empty set) for this locale was overwritten.
 	 * @throws NullPointerException if locale or mappings is null
 	 */
-	public boolean setLocaleData (String locale, SimpleOrderedHashtable mappings) {
-		SimpleOrderedHashtable origMapping = (SimpleOrderedHashtable)localeData.get(locale);
+	public boolean setLocaleData (String locale, OrderedHashtable mappings) {
+		OrderedHashtable origMapping = (OrderedHashtable)localeData.get(locale);
 		boolean overwritten = (origMapping == null ? false : origMapping.size() > 0);
 		
 		localeData.put(locale, mappings);
@@ -205,8 +206,8 @@ public class Localizer implements Externalizable {
 	 * @param locale Locale
 	 * @returns Hashtable representing text mappings for this locale. Returns null if locale not defined or null.
 	 */
-	public SimpleOrderedHashtable getLocaleData (String locale) {
-		return (locale == null ? null : (SimpleOrderedHashtable)localeData.get(locale));
+	public OrderedHashtable getLocaleData (String locale) {
+		return (locale == null ? null : (OrderedHashtable)localeData.get(locale));
 	}
 
 	/**
@@ -216,8 +217,8 @@ public class Localizer implements Externalizable {
 	 * @return Text mappings for locale.
 	 * @throws NoSuchElementException If locale is not defined or null.
 	 */
-	public SimpleOrderedHashtable getLocaleMap (String locale) {
-		SimpleOrderedHashtable mapping = getLocaleData(locale);
+	public OrderedHashtable getLocaleMap (String locale) {
+		OrderedHashtable mapping = getLocaleData(locale);
 		if (mapping == null)
 			throw new NoSuchElementException("Attempted to access an undefined locale.");
 		return mapping;
@@ -251,7 +252,7 @@ public class Localizer implements Externalizable {
 	 * @throws NoSuchElementException If locale is not defined.
 	 */
 	public boolean hasMapping (String locale, String textID) {
-		SimpleOrderedHashtable localeData = getLocaleMap(locale);
+		OrderedHashtable localeData = getLocaleMap(locale);
 		return (textID == null ? false : localeData.get(textID) != null);
 	}
 	
@@ -404,7 +405,7 @@ public class Localizer implements Externalizable {
 			fallbackDefaultForm = ExternalizableHelper.readBoolean(dis).booleanValue();
 			localeData = ExternalizableHelper.readExternalCompoundSOH(dis);
 			if (localeData == null)
-				localeData = new SimpleOrderedHashtable();
+				localeData = new OrderedHashtable();
 			setDefaultLocale(ExternalizableHelper.readUTF(dis));
 			String currentLocale = ExternalizableHelper.readUTF(dis);
 			if(currentLocale != null) {

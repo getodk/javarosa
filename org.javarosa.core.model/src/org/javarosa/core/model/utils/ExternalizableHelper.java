@@ -1,6 +1,5 @@
 package org.javarosa.core.model.utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -12,6 +11,7 @@ import java.util.Vector;
 
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.Map;
+import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 
@@ -613,8 +613,8 @@ public class ExternalizableHelper {
 			dos.writeByte(0);
 	}
 	
-	/* grrr.... why doesn't SimpleOrderedHashtable extend Hashtable? */
-	public static void writeExternal(SimpleOrderedHashtable stringHashtable, DataOutputStream dos) throws IOException {	
+	/* grrr.... why doesn't OrderedHashtable extend Hashtable? */
+	public static void writeExternal(OrderedHashtable stringHashtable, DataOutputStream dos) throws IOException {	
 		if(stringHashtable != null){
 			writeNumeric(dos, stringHashtable.size(), ENCODING_NUM_DEFAULT);
 			Enumeration keys = stringHashtable.keys();
@@ -629,7 +629,7 @@ public class ExternalizableHelper {
 			dos.writeByte(0);
 	}
 	
-	public static void writeExternalCompoundSOH(SimpleOrderedHashtable compoundHashtable, DataOutputStream dos) throws IOException {	
+	public static void writeExternalCompoundSOH(OrderedHashtable compoundHashtable, DataOutputStream dos) throws IOException {	
 		if(compoundHashtable != null){
 			writeNumeric(dos, compoundHashtable.size(), ENCODING_NUM_DEFAULT);
 			Enumeration keys = compoundHashtable.keys();
@@ -637,7 +637,7 @@ public class ExternalizableHelper {
 			while(keys.hasMoreElements()){
 				key  = (String)keys.nextElement();
 				dos.writeUTF(key);
-				writeExternal((SimpleOrderedHashtable)compoundHashtable.get(key), dos);
+				writeExternal((OrderedHashtable)compoundHashtable.get(key), dos);
 			}
 		}
 		else
@@ -665,12 +665,12 @@ public class ExternalizableHelper {
 	}
 	
 	//we should be able to distinguish between null and empty vectors/hashtables
-	public static SimpleOrderedHashtable readExternalSOH(DataInputStream dis) throws IOException {
+	public static OrderedHashtable readExternalSOH(DataInputStream dis) throws IOException {
 		long len = readNumeric(dis, ENCODING_NUM_DEFAULT);
 		if(len == 0)
 			return null;
 		
-		SimpleOrderedHashtable stringHashtable = new SimpleOrderedHashtable();
+		OrderedHashtable stringHashtable = new OrderedHashtable();
 
 		for(long i=0; i<len; i++ )
 			stringHashtable.put(dis.readUTF(), dis.readUTF());
@@ -678,17 +678,17 @@ public class ExternalizableHelper {
 		return stringHashtable;
 	}
 	
-	public static SimpleOrderedHashtable readExternalCompoundSOH(DataInputStream dis) throws IOException {
+	public static OrderedHashtable readExternalCompoundSOH(DataInputStream dis) throws IOException {
 		long len = readNumeric(dis, ENCODING_NUM_DEFAULT);
 		if(len == 0)
 			return null;
 		
-		SimpleOrderedHashtable compoundHashtable = new SimpleOrderedHashtable();
+		OrderedHashtable compoundHashtable = new OrderedHashtable();
 
 		for(long i=0; i<len; i++ ) {
 			String key = dis.readUTF();
-			SimpleOrderedHashtable subHashtable = readExternalSOH(dis);
-			compoundHashtable.put(key, subHashtable == null ? new SimpleOrderedHashtable() : subHashtable);
+			OrderedHashtable subHashtable = readExternalSOH(dis);
+			compoundHashtable.put(key, subHashtable == null ? new OrderedHashtable() : subHashtable);
 		}
 			
 		return compoundHashtable;

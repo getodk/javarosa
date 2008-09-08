@@ -23,5 +23,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.user"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.activity"/>
 	<classpathentry kind="lib" path="lib/j2meunit-javarosa.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.chatterbox.extensions"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

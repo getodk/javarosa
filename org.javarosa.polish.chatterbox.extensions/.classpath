@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/midp-2.0.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/mmapi.jar"/>
@@ -16,5 +17,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
 	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
+	<classpathentry kind="lib" path="/org.javarosa.demo/lib/j2meunit-javarosa.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

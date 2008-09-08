@@ -33,7 +33,7 @@ import java.util.Hashtable;
  *  Implements an Ordered Hashtable, with elements in
  *    chronological order (i.e. insertion order)
  */
-public class SimpleOrderedHashtable {
+public class OrderedHashtable {
 
     private Vector    orderedKeys;
     private Hashtable hashTable;
@@ -41,7 +41,7 @@ public class SimpleOrderedHashtable {
     /**
      *  Constructor, creates an SimpleOrderedHashtable.
      */
-    public SimpleOrderedHashtable() {
+    public OrderedHashtable() {
         orderedKeys = new Vector();
         hashTable = new Hashtable();
     }
@@ -50,7 +50,7 @@ public class SimpleOrderedHashtable {
      *  Constructor, creates an SimpleOrderedHashtable.
      *  @param initialCapacity is the initial size for the container.
      */
-    public SimpleOrderedHashtable(int initialCapacity) {
+    public OrderedHashtable(int initialCapacity) {
         orderedKeys = new Vector(initialCapacity);
         hashTable = new Hashtable(initialCapacity);
     }
