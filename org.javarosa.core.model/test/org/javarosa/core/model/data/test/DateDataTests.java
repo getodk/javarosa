@@ -14,7 +14,7 @@ public class DateDataTests extends TestCase{
 	Date today;
 	Date notToday;
 	
-	private static int NUM_TESTS = 3;
+	private static int NUM_TESTS = 4;
 	
 	/* (non-Javadoc)
 	 * @see j2meunit.framework.TestCase#setUp()
@@ -60,6 +60,7 @@ public class DateDataTests extends TestCase{
 		case 1: testGetData(); break;
 		case 2: testSetData(); break;
 		case 3: testDisplay(); break;
+		case 4: testNullData(); break;
 		}
 	}
 	
@@ -94,5 +95,18 @@ public class DateDataTests extends TestCase{
 	
 	public void testDisplay() {
 		// We don't actually want this, because the Date's getDisplayText code should be moved to a library
+	}
+	
+	public void testNullData() {
+		boolean exceptionThrown = false;
+		DateData data = new DateData();
+		data.setValue(today);
+		try { 
+			data.setValue(null);
+		} catch (NullPointerException e) {
+			exceptionThrown = true;
+		}
+		assertTrue("DateData failed to throw an exception when setting null data", exceptionThrown);
+		assertTrue("DateData overwrote existing value on incorrect input", data.getValue().equals(today));
 	}
 }
