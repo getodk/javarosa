@@ -15,8 +15,6 @@ import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.Map;
 import org.javarosa.core.util.UnavailableExternalizerException;
-import org.javarosa.entitymgr.model.EntityFieldList;
-import org.javarosa.entitymgr.model.EntityFieldValueList;
 import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.ImmunizationRow;
 import org.javarosa.patient.model.data.NumericListData;
@@ -467,18 +465,19 @@ public class Patient implements Externalizable, IDRecordable {
 		attributes.addElement(attribute);
 	}
 	
-	public void addAttributes(EntityFieldList fields, EntityFieldValueList fieldVals){
-		if(attributes == null)
-			setDefaultAttributes();
-		
-		/*for(int i=0; i<fields.size(); i++){
-			EntityField field = fields.getField(i);
-			if(data.containsQuestion(field.getName()))
-				data.setValue(field.getName(), fieldVals.getPatintFiledValue(field.getId(), getPatientId()));
-		}
-		
-		attributes.addElement(attribute);*/
-	}
+//	commented out until entitymgr compiles	
+//	public void addAttributes(EntityFieldList fields, EntityFieldValueList fieldVals){
+//		if(attributes == null)
+//			setDefaultAttributes();
+//		
+//		/*for(int i=0; i<fields.size(); i++){
+//			EntityField field = fields.getField(i);
+//			if(data.containsQuestion(field.getName()))
+//				data.setValue(field.getName(), fieldVals.getPatintFiledValue(field.getId(), getPatientId()));
+//		}
+//		
+//		attributes.addElement(attribute);*/
+//	}
 	
 	private void setDefaultAttributes(){
 		attributes = new Vector();

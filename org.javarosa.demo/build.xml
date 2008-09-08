@@ -50,7 +50,6 @@
 					<source dir="${basedir}/../org.javarosa.communication/src/"/>
 					<source dir="${basedir}/../org.javarosa.clforms/src/"/>
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
-					<source dir="${basedir}/../org.javarosa.core.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/test/"/>
 					<source dir="${basedir}/../org.javarosa.demo/test/"/>
@@ -60,10 +59,10 @@
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
-					<source dir="${basedir}/../org.javarosa.entitymgr/src/"/>
+				<!--	<source dir="${basedir}/../org.javarosa.entitymgr/src/"/> -->
 					<source dir="${basedir}/../org.javarosa.patient/src/"/>
 					<source dir="${basedir}/../org.javarosa.patient/test/"/>
-					<source dir="${basedir}/../org.javarosa.patientmgr/src/"/>
+				<!--	<source dir="${basedir}/../org.javarosa.patientmgr/src/"/> -->
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/test/"/>
 				</sources>
