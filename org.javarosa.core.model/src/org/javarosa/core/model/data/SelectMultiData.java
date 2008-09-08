@@ -35,6 +35,9 @@ public class SelectMultiData implements IAnswerData {
 	 * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
 	 */
 	public void setValue (Object o) {
+		if(o == null) {
+			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
+		}
 		vs = (Vector)o;
 		
 		//validate type

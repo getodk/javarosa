@@ -29,6 +29,9 @@ public class SelectOneData implements IAnswerData {
 	}
 	
 	public void setValue (Object o) {
+		if(o == null) {
+			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
+		}
 		s = (Selection)o;
 	}
 	

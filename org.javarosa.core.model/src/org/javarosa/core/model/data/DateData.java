@@ -30,6 +30,10 @@ public class DateData implements IAnswerData {
 	}
 	
 	public void setValue (Object o) {
+		//Should not ever be possible to set this to a null value
+		if(o == null) {
+			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
+		}
 		d = new Date(((Date)o).getTime());
 	}
 	
