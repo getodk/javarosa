@@ -13,7 +13,7 @@ import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.PrototypeFactory;
-import org.javarosa.core.model.utils.SimpleOrderedHashtable;
+import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 /** 
@@ -44,8 +44,8 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String helpText;	 /* The help text. */
 	private String helpTextID;
 
-	private SimpleOrderedHashtable selectItems;  	/** String -> String */
-	private SimpleOrderedHashtable selectItemIDs;	/** String -> String */
+	private OrderedHashtable selectItems;  	/** String -> String */
+	private OrderedHashtable selectItemIDs;	/** String -> String */
 	private Vector selectItemsLocalizable;
 	
 	private boolean required; 	/** A flag to tell whether the question is to be answered or is optional. */
@@ -180,21 +180,21 @@ public class QuestionDef implements IFormElement, Localizable {
         }
     }
 
-	public SimpleOrderedHashtable getSelectItems () {
+	public OrderedHashtable getSelectItems () {
 		return selectItems;
 	}
 
-	public void setSelectItems (SimpleOrderedHashtable selectItems) {
+	public void setSelectItems (OrderedHashtable selectItems) {
 		this.selectItems = selectItems;
 	}
 	
 	public void addSelectItem (String label, String value) {
 		if (selectItems == null)
-			selectItems = new SimpleOrderedHashtable();
+			selectItems = new OrderedHashtable();
 		selectItems.put(label, value);
 	}
 	
-	public SimpleOrderedHashtable getSelectItemIDs () {
+	public OrderedHashtable getSelectItemIDs () {
 		return selectItemIDs;
 	}
 	
@@ -202,7 +202,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		return selectItemsLocalizable;
 	}
 	
-	public void setSelectItemIDs (SimpleOrderedHashtable selectItemIDs, Vector selectItemsLocalizable, Localizer localizer) {
+	public void setSelectItemIDs (OrderedHashtable selectItemIDs, Vector selectItemsLocalizable, Localizer localizer) {
 		this.selectItemIDs = selectItemIDs;
 		this.selectItemsLocalizable = selectItemsLocalizable;
 		if(localizer != null) {
@@ -212,7 +212,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	
 	public void addSelectItemID (String labelID, boolean type, String value) {
 		if (selectItemIDs == null) {
-			selectItemIDs = new SimpleOrderedHashtable();
+			selectItemIDs = new OrderedHashtable();
 			selectItemsLocalizable = new Vector();
 		}
 		selectItemIDs.put(labelID, value);

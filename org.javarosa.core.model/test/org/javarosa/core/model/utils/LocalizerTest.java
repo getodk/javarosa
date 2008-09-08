@@ -7,6 +7,8 @@ import j2meunit.framework.TestSuite;
 
 import java.util.NoSuchElementException;
 
+import org.javarosa.core.util.OrderedHashtable;
+
 public class LocalizerTest extends TestCase  {
 	public final int NUM_TESTS = 29;
 	
@@ -105,7 +107,7 @@ public class LocalizerTest extends TestCase  {
 		if (!l.hasLocale(TEST_LOCALE)) {
 			fail("Localizer reports it does not contain newly added locale");
 		}
-		SimpleOrderedHashtable localeData = l.getLocaleData(TEST_LOCALE);
+		OrderedHashtable localeData = l.getLocaleData(TEST_LOCALE);
 		if (localeData == null || localeData.size() != 0) {
 			fail("Newly created locale not empty (or undefined)");
 		}
@@ -114,7 +116,7 @@ public class LocalizerTest extends TestCase  {
 	public void testAddLocaleWithData () {
 		Localizer l = new Localizer();	
 		final String TEST_LOCALE = "test";
-		SimpleOrderedHashtable localeData = new SimpleOrderedHashtable();
+		OrderedHashtable localeData = new OrderedHashtable();
 		localeData.put("textID", "text");
 		
 		if (l.hasLocale(TEST_LOCALE)) {
@@ -138,7 +140,7 @@ public class LocalizerTest extends TestCase  {
 
 		l.addAvailableLocale(TEST_LOCALE);
 		l.setLocaleMapping(TEST_LOCALE, "textID", "text");
-		SimpleOrderedHashtable localeData = l.getLocaleData(TEST_LOCALE);
+		OrderedHashtable localeData = l.getLocaleData(TEST_LOCALE);
 		
 		boolean result = l.addAvailableLocale(TEST_LOCALE);
 		if (result) {
@@ -156,7 +158,7 @@ public class LocalizerTest extends TestCase  {
 		l.addAvailableLocale(TEST_LOCALE);
 		l.setLocaleMapping(TEST_LOCALE, "oldTextID", "oldText");
 		
-		SimpleOrderedHashtable localeData = new SimpleOrderedHashtable();
+		OrderedHashtable localeData = new OrderedHashtable();
 		localeData.put("newTextID", "newText");
 		
 		boolean result = l.setLocaleData(TEST_LOCALE, localeData);
@@ -670,7 +672,7 @@ public class LocalizerTest extends TestCase  {
 		}
 		
 		try {
-			l.setLocaleData(null, new SimpleOrderedHashtable());
+			l.setLocaleData(null, new OrderedHashtable());
 			
 			fail("setLocaleData: Did not get expected null pointer exception");
 		} catch (NullPointerException npe) {
