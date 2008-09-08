@@ -1,5 +1,0 @@
-* a screen can only have one ticker - meaning you can't have a list
-  of scrolling questions
-* A list can only take a string and not show other widgets (which 
-  would display the Qs&As in a better method). However a form of 
-  widgets cannot be used as it will not return a selected index.
