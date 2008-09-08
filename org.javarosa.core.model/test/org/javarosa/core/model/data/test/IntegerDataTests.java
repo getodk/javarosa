@@ -7,13 +7,14 @@ import j2meunit.framework.TestSuite;
 
 import java.util.Date;
 
+import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IntegerData;
 
 public class IntegerDataTests extends TestCase {
 	Integer one;
 	Integer two;
 	
-	private static int NUM_TESTS = 2;
+	private static int NUM_TESTS = 3;
 	
 	/* (non-Javadoc)
 	 * @see j2meunit.framework.TestCase#setUp()
@@ -58,6 +59,7 @@ public class IntegerDataTests extends TestCase {
 		switch (testID) {
 		case 1: testGetData(); break;
 		case 2: testSetData(); break;
+		case 3: testNullData(); break;
 		}
 	}
 	
@@ -77,5 +79,17 @@ public class IntegerDataTests extends TestCase {
 		assertTrue("IntegerData did not set value properly. Maintained old value.", !(data.getValue().equals(two)));
 		assertEquals("IntegerData did not properly reset value ", data.getValue(), one);
 		
+	}
+	public void testNullData() {
+		boolean exceptionThrown = false;
+		IntegerData data = new IntegerData();
+		data.setValue(one);
+		try { 
+			data.setValue(null);
+		} catch (NullPointerException e) {
+			exceptionThrown = true;
+		}
+		assertTrue("IntegerData failed to throw an exception when setting null data", exceptionThrown);
+		assertTrue("IntegerData overwrote existing value on incorrect input", data.getValue().equals(one));
 	}
 }
