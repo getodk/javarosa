@@ -55,7 +55,8 @@
 					<source dir="${basedir}/../org.javarosa.demo/test/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
-					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>					
+					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
+					<source dir="${basedir}/../org.javarosa.polish.chatterbox.extensions/src/"/>
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
@@ -112,6 +113,7 @@
 			<emulator wait="true" trace="none" securityDomain="trusted" enableProfiler="false" enableMemoryMonitor="false" enableNetworkMonitor="false" if="test and not debug">
 				<!-- Enable the following line to test memory constraints on the device -->
 				<parameter name="-Xheapsize" value="2850000"/>
+				<!--debugger port="6001" /-->
 			</emulator>
 
 		</buildPolish>
@@ -141,10 +143,13 @@
 	<target name="RunJ2MEUnitTests" depends="supressOutput, disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathParseTest"/>
-		<RunTestSuite suite="org.javarosa.xpath.test.XPathEvalTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.NumericEncodingTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.LocalizerTest"/>
 		<RunTestSuite suite="org.javarosa.demo.xform.test.DemoFormsTest"/>
+		<RunTestSuite suite="org.javarosa.core.model.data.test.DateDataTests"/>
+		<RunTestSuite suite="org.javarosa.core.model.data.test.IntegerDataTests"/>
+		<!--RunTestSuite suite="org.javarosa.formmanager.test.ExtensionIntegrationTests"/-->
+		
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
@@ -223,6 +228,8 @@
       <pathelement location="${dir.dist}/${app.jarName}"/>
 	  <!--pathelement location="${dir.test}" /-->
 	  <pathelement location="${dir.lib}/j2meunit-javarosa.jar" />
+	  <pathelement location="${wtk.hom}/lib/wma11.jar"/>
+	  <pathelement location="${wtk.home}/lib/midpapi21.jar"/>
 	  <path refid="classpath.base" />
 	</path>
 </project>
