@@ -40,7 +40,7 @@ public class XFormUtils {
 	}
 	// #endif
 
-	private static FormDef getFormFromInputStream(InputStream is) {
+	public static FormDef getFormFromInputStream(InputStream is) {
 		FormDef returnForm = null;
 		InputStreamReader isr = new InputStreamReader(is);
 		if(isr != null) {
