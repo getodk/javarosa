@@ -150,6 +150,7 @@
 		<RunTestSuite suite="org.javarosa.core.model.data.test.IntegerDataTests"/>
 		<RunTestSuite suite="org.javarosa.core.model.data.test.StringDataTests"/>
 		<RunTestSuite suite="org.javarosa.core.model.data.test.TimeDataTests"/>
+		<RunTestSuite suite="org.javarosa.core.model.data.test.SelectOneDataTests"/>
 		<!--RunTestSuite suite="org.javarosa.formmanager.test.ExtensionIntegrationTests"/-->
 		
 		<!-- add new test suites here -->
