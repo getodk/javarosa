@@ -1,4 +1,4 @@
-package org.javarosa.core.model.data;
+package org.javarosa.core.model.instance;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
