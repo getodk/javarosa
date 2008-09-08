@@ -28,9 +28,7 @@ public class IntegerData implements IAnswerData {
 		this.n = n;
 	}
 	public IntegerData(Integer n) {
-		if(n != null) {
-			this.n = n.intValue();
-		}
+		setValue(n);
 	}
 	
 	/* (non-Javadoc)
@@ -48,6 +46,9 @@ public class IntegerData implements IAnswerData {
 	}
 	
 	public void setValue(Object o) {
+		if(o == null) {
+			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
+		}
 		n = ((Integer)o).intValue();
 	}
 	

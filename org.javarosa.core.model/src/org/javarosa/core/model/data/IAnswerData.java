@@ -16,7 +16,7 @@ import org.javarosa.core.util.Externalizable;
 public interface IAnswerData extends Externalizable {
 	/**
 	 * @param o the value of this answerdata object.
-	 * o should not in any circumstances be null.
+	 * @throws NullPointerException if o is null
 	 */
 	void setValue (Object o); //can't be null
 	/**
