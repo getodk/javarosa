@@ -29,12 +29,12 @@ public class TimeData implements IAnswerData {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
-		d = (Date)o;
+		d = new Date(((Date)o).getTime());
 		
 	}
 	
 	public Object getValue () {
-		return d;
+		return new Date(d.getTime());
 	}
 	
 	public String getDisplayText () {
