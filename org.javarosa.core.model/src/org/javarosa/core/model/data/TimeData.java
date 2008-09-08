@@ -18,7 +18,6 @@ public class TimeData implements IAnswerData {
 	 * Shouldn't be used otherwise.
 	 */
 	public TimeData() {
-		
 	}
 	
 	public TimeData (Date d) {
