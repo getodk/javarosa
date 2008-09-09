@@ -14,6 +14,8 @@
 	<!-- Main Target: Call to build the project -->
 	<!-- This is the main work target, it actually builds the code -->
 	<target name="BuildPolish" depends="init" description="This is the controller for the J2ME build process.">
+		<!-- A property containing the path to the preprocessed source files -->
+		<property name="builtsource" value="${dir.build}/real/${device.identifier}/en/source/" />
 		<buildPolish>
 			<info name="${app.name}"
 				version="${app.version}"
@@ -157,6 +159,29 @@
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
+	
+	<target name="CreateJavadoc" depends="BuildClean" description="generates javadoc and also UML Diagram">
+		<mkdir dir="${dir.javadoc}"/>
+	        <javadoc sourcepath="${builtsource}" packagenames="org.javarosa.*" destdir="${dir.javadoc}"
+	        	classpathref="classpath.test" private="true">
+	        	   <doclet name="org.umlgraph.doclet.UmlGraphDoc"
+	        		  path="${dir.tools}/UMLGraph.jar">
+	        	        <param name="-attributes" />
+	        	        <param name="-operations" />
+	        	        <param name="-qualify" />
+	        	        <param name="-types" />
+	        	        <param name="-visibility" />
+	        	    </doclet>
+	        	  </javadoc>
+		  <apply executable="dot" dest="${dir.documentation}" parallel="false">
+		    <arg value="-Tpng"/>
+		    <arg value="-o"/>
+		     <targetfile/>
+		     <srcfile/>
+		     <fileset dir="${dir.documentation}" includes="*.dot"/>
+		     <mapper type="glob" from="*.dot" to="*.png"/>
+		  </apply>
+	</target>
 
 	<!-- Initialization for the build targets                    -->
 	<target name="init">
@@ -232,7 +257,7 @@
       <pathelement location="${dir.dist}/${app.jarName}"/>
 	  <!--pathelement location="${dir.test}" /-->
 	  <pathelement location="${dir.lib}/j2meunit-javarosa.jar" />
-	  <pathelement location="${wtk.hom}/lib/wma11.jar"/>
+	  <pathelement location="${wtk.home}/lib/wma11.jar"/>
 	  <pathelement location="${wtk.home}/lib/midpapi21.jar"/>
 	  <path refid="classpath.base" />
 	</path>
