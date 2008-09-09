@@ -25,7 +25,7 @@ public class Selection implements Externalizable {
 	
 	/**
 	 * Note that this constructor should only be used for serialization/deserialization as 
-	 * selection is immutable
+	 * the index and questiondef for a Selection shouldn't be changed after construction.
 	 */
 	public Selection() {
 		
