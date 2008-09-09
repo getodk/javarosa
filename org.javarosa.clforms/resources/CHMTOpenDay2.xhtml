@@ -3,6 +3,12 @@
 	<model id="new 48657">
     <instance xmlns="">
 	<root>
+	<Meta>
+		<UserID/>
+		<DeviceID/>
+		<TimeStartRecorded />
+		<TimeEndRecorded />
+	  </Meta>
 		<Condoms qid="139" gid="19"/>
       <Femidoms qid="140" gid="19"/>
       <Pamphlets qid="141" gid="19"/>
@@ -36,6 +42,10 @@
       <TimeEnd qid="165" gid="21"/>
 	</root>
     </instance>
+    <bind id="hidden1" nodeset="/root/Meta/UserID" type="xsd:string" jr:preload="context" jr:preloadParams="UserID" />
+	<bind id="hidden2" nodeset="/root/Meta/DeviceID" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
+	<bind id="hidden3" nodeset="/root/Meta/TimeStartRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
+	<bind id="hidden4" nodeset="/root/Meta/TimeEndRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
 	<bind id="15" nodeset="/root/Date" required="true()" type="xsd:date"/>
     <bind id="16" nodeset="/root/Prov" type="xsd:string"/>
     <bind id="17" nodeset="/root/Wheretrain" type="xsd:string"/>
