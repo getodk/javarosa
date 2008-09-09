@@ -1,8 +1,14 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <title>CHMT TL TRAINING</title>
-  <xf:model id="TLT">
-    <xf:instance xmlns="">
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+  <h:title>CHMT TL TRAINING</h:title>
+  <model id="TLT">
+    <instance xmlns="">
     <root>
+	  <Meta>
+		<UserID/>
+		<DeviceID/>
+		<TimeStartRecorded />
+		<TimeEndRecorded />
+	  </Meta>
       <Date qid="1" gid="1"/>
       <Prov qid="2" gid="1"/>
       <Wheretrain qid="9" gid="1"/>
@@ -44,706 +50,710 @@
       <Ocontactnumber qid="38" gid="5"/>
       <Oposition qid="37" gid="5"/>
      </root>
-    </xf:instance>
-    <xf:bind id="1" nodeset="/root/Date" required="true()" type="xsd:date"/>
-    <xf:bind id="2" nodeset="/root/Prov" type="xsd:string"/>
-    <xf:bind id="3" nodeset="/root/Wheretrain" type="xsd:string"/>
-    <xf:bind id="4" nodeset="/root/Wheretrainother" type="xsd:string" relevant="Wheretrain='99'"/>
-    <xf:bind id="5" nodeset="/root/LocEC" type="xsd:string" relevant="/root/Prov=='1'"/>
-    <xf:bind id="6" nodeset="/root/LocWC" type="xsd:string" relevant="/root/Prov=='9'"/>
-    <xf:bind id="7" nodeset="/root/LocGP" type="xsd:string" relevant="/root/Prov=='2'"/>
-    <xf:bind id="8" nodeset="/root/LocKZN" type="xsd:string" relevant="/root/Prov=='4'"/>
-    <xf:bind id="9" nodeset="/root/LocFS" type="xsd:string" relevant="/root/Prov=='3'"/>
-    <xf:bind id="10" nodeset="/root/LocLP" type="xsd:string" relevant="/root/Prov=='5'"/>
-    <xf:bind id="11" nodeset="/root/LocMP" type="xsd:string" relevant="/root/Prov=='6'"/>
-    <xf:bind id="12" nodeset="/root/LocNW" type="xsd:string" relevant="/root/Prov=='7'"/>
-    <xf:bind id="13" nodeset="/root/LocNC" type="xsd:string" relevant="/root/Prov=='8'"/>
-    <xf:bind id="14" nodeset="/root/Male" type="xsd:decimal"/>
-    <xf:bind id="15" nodeset="/root/Female" type="xsd:decimal"/>
-    <xf:bind id="16" nodeset="/root/TimeStart" type="xsd:time"/>
-    <xf:bind id="17" nodeset="/root/TimeEnd" type="xsd:time"/>
-    <xf:bind id="18" nodeset="/root/AVKit" type="xsd:string"/>
-    <xf:bind id="19" nodeset="/root/CHMTDVD" type="xsd:string"/>
-    <xf:bind id="20" nodeset="/root/Chmtscrutinize" type="xsd:string"/>
-    <xf:bind id="21" nodeset="/root/ChmtSparesBesties" type="xsd:string"/>
-    <xf:bind id="22" nodeset="/root/ChmtPSA" type="xsd:string"/>
-    <xf:bind id="23" nodeset="/root/CofacilitateCHMT" type="xsd:string"/>
-    <xf:bind id="24" nodeset="/root/CofacilitatorCHMT" type="xsd:string" relevant="/root/CofacilitateCHMT!=1"/>
-    <xf:bind id="25" nodeset="/root/Confirmed" type="xsd:string"/>
-    <xf:bind id="26" nodeset="/root/Topics1" type="xsd:string"/>
-    <xf:bind id="27" nodeset="/root/Topicother1" type="xsd:string" relevant="/root/Topics1=='20'"/>
-    <xf:bind id="28" nodeset="/root/Topics2" type="xsd:string"/>
-    <xf:bind id="29" nodeset="/root/Topicother2" type="xsd:string" relevant="/root/Topics2=='20'"/>
-    <xf:bind id="30" nodeset="/root/Topics3" type="xsd:string"/>
-    <xf:bind id="31" nodeset="/root/Topicother3" type="xsd:string" relevant="/root/Topics3=='20'"/>
-    <xf:bind id="32" nodeset="/root/Topics4" type="xsd:string"/>
-    <xf:bind id="33" nodeset="/root/Topicother4" type="xsd:string" relevant="/root/Topics4=='20'"/>
-    <xf:bind id="34" nodeset="/root/Topics5" type="xsd:string"/>
-    <xf:bind id="35" nodeset="/root/Topicother5" type="xsd:string" relevant="/root/Topics5=='20'"/>
-    <xf:bind id="36" nodeset="/root/Oname" type="xsd:string"/>
-    <xf:bind id="37" nodeset="/root/Ophone" type="xsd:decimal"/>
-    <xf:bind id="38" nodeset="/root/Ocontact" type="xsd:string"/>
-    <xf:bind id="39" nodeset="/root/Ocontactnumber" type="xsd:decimal"/>
-    <xf:bind id="40" nodeset="/root/Oposition" type="xsd:string"/>
-  </xf:model>
-  <xf:input bind="1">
-    <xf:label>On what date was the session held?</xf:label>
-  </xf:input>
-  <xf:select1 bind="2">
-    <xf:label>Which Province?</xf:label>
-    <xf:item>
-      <xf:label>Eastern Cape</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Gauteng</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Free State</xf:label>
-      <xf:value>3</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Kwazulu Natal</xf:label>
-      <xf:value>4</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Limpopo</xf:label>
-      <xf:value>5</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Mpumalanga</xf:label>
-      <xf:value>6</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>North West Province</xf:label>
-      <xf:value>7</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Northern Cape</xf:label>
-      <xf:value>8</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Western Cape</xf:label>
-      <xf:value>9</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:select1 bind="3">
-    <xf:label>Where was the training session held?</xf:label>
-    <xf:item>
-      <xf:label>At the organisation being trained</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>At the CHMT offices</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Conference Centre</xf:label>
-      <xf:value>4</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Community Centre</xf:label>
-      <xf:value>5</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Youth Centre</xf:label>
-      <xf:value>6</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Church</xf:label>
-      <xf:value>7</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Primary School</xf:label>
-      <xf:value>8</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Secondary School</xf:label>
-      <xf:value>9</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Other</xf:label>
-      <xf:value>99</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:input bind="4" relevant="/root/Wheretrain='99'">
-    <xf:label>Other (specify)</xf:label>
-  </xf:input>
-  <xf:input bind="5" relevant="Prov='1'">
-    <xf:label>What was the name of this Location (EC):</xf:label>
-  </xf:input>
-  <xf:input bind="6" relevant="Prov='9'">
-    <xf:label>What was the name of this Location (WC):</xf:label>
-  </xf:input>
-  <xf:input bind="7" relevant="Prov='2'">
-    <xf:label>What was the name of this Location (Gauteng):</xf:label>
-  </xf:input>
-  <xf:input bind="8" relevant="Prov='4'">
-    <xf:label>What was the name of this Location (KZN):</xf:label>
-  </xf:input>
-  <xf:input bind="9" relevant="Prov='3'">
-    <xf:label>What was the name of this Location (FS):</xf:label>
-  </xf:input>
-  <xf:input bind="10" relevant="Prov=5">
-    <xf:label>What was the name of this Location (LP):</xf:label>
-  </xf:input>
-  <xf:input bind="11" relevant="Prov='6'">
-    <xf:label>What was the name of this Location (MP):</xf:label>
-  </xf:input>
-  <xf:input bind="12" relevant="Prov='7'">
-    <xf:label>What was the name of this Location (NW):</xf:label>
-  </xf:input>
-  <xf:input bind="13" relevant="Prov='8'">
-    <xf:label>What was the name of this Location (NC):</xf:label>
-  </xf:input>
-  <xf:input bind="14">
-    <xf:label>Number of session participants (male)</xf:label>
-  </xf:input>
-  <xf:input bind="15">
-    <xf:label>Number of session participants (female)</xf:label>
-  </xf:input>
-  <xf:input bind="16">
-    <xf:label>What time did the session start?</xf:label>
-  </xf:input>
-  <xf:input bind="17">
-    <xf:label>What time did the session end?</xf:label>
-  </xf:input>
-    <xf:select1 bind="26">
-    <xf:label>What was the #1 topic discussed?</xf:label>
-    <xf:item>
-      <xf:label>ARVs and Adherence</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>ARV Readiness</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Children and HIV </xf:label>
-      <xf:value>3</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>HIV and the Immune System </xf:label>
-      <xf:value>4</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Human Rights</xf:label>
-      <xf:value>5</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Nutrition</xf:label>
-      <xf:value>6</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Opportunistic infections  </xf:label>
-      <xf:value>7</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Palliative and Home based care</xf:label>
-      <xf:value>8</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>PEP and Rape</xf:label>
-      <xf:value>9</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>PMTCT and Maternal Health</xf:label>
-      <xf:value>10</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Positive Living </xf:label>
-      <xf:value>11</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Prevention </xf:label>
-      <xf:value>12</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Safer sex</xf:label>
-      <xf:value>13</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Sexuality</xf:label>
-      <xf:value>14</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>STIs</xf:label>
-      <xf:value>15</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Teenage Pregnancy</xf:label>
-      <xf:value>16</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>TB</xf:label>
-      <xf:value>17</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>VCT </xf:label>
-      <xf:value>18</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Woman’s Health  </xf:label>
-      <xf:value>19</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Other topic</xf:label>
-      <xf:value>20</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:input bind="27" relevant="/root/Topics1=20">
-    <xf:label>Other topic:</xf:label>
-  </xf:input>
-  <xf:select1 bind="28">
-    <xf:label>What was the #2 topic discussed?</xf:label>
-    <xf:item>
-      <xf:label>ARVs and Adherence</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>ARV Readiness</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Children and HIV </xf:label>
-      <xf:value>3</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>HIV and the Immune System </xf:label>
-      <xf:value>4</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Human Rights</xf:label>
-      <xf:value>5</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Nutrition</xf:label>
-      <xf:value>6</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Opportunistic infections  </xf:label>
-      <xf:value>7</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Palliative and Home based care</xf:label>
-      <xf:value>8</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>PEP and Rape</xf:label>
-      <xf:value>9</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>PMTCT and Maternal Health</xf:label>
-      <xf:value>10</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Positive Living </xf:label>
-      <xf:value>11</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Prevention </xf:label>
-      <xf:value>12</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Safer sex </xf:label>
-      <xf:value>13</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Sexuality</xf:label>
-      <xf:value>14</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>STIs</xf:label>
-      <xf:value>15</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Teenage Pregnancy</xf:label>
-      <xf:value>16</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>TB</xf:label>
-      <xf:value>17</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>VCT </xf:label>
-      <xf:value>18</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Woman’s Health  </xf:label>
-      <xf:value>19</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Other topic</xf:label>
-      <xf:value>20</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:input bind="29" relevant="/root/Topics2=20">
-    <xf:label>Other topic:</xf:label>
-  </xf:input>
-  <xf:select1 bind="30">
-    <xf:label>What was the #3 topic discussed?</xf:label>
-    <xf:item>
-      <xf:label>ARVs and Adherence</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>ARV Readiness</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Children and HIV </xf:label>
-      <xf:value>3</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>HIV and the Immune System </xf:label>
-      <xf:value>4</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Human Rights</xf:label>
-      <xf:value>5</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Nutrition</xf:label>
-      <xf:value>6</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Opportunistic infections  </xf:label>
-      <xf:value>7</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Palliative and Home based care</xf:label>
-      <xf:value>8</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>PEP and Rape</xf:label>
-      <xf:value>9</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>PMTCT and Maternal Health</xf:label>
-      <xf:value>10</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Positive Living </xf:label>
-      <xf:value>11</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Prevention </xf:label>
-      <xf:value>12</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Safer sex</xf:label>
-      <xf:value>13</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Sexuality</xf:label>
-      <xf:value>14</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>STIs</xf:label>
-      <xf:value>15</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Teenage Pregnancy</xf:label>
-      <xf:value>16</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>TB</xf:label>
-      <xf:value>17</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>VCT </xf:label>
-      <xf:value>18</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Woman’s Health  </xf:label>
-      <xf:value>19</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Other topic</xf:label>
-      <xf:value>20</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:input bind="31" relevant="/root/Topics3=20">
-    <xf:label>Other topic:</xf:label>
-  </xf:input>
-  <xf:select1 bind="32">
-    <xf:label>What was the #4 topic discussed?</xf:label>
-    <xf:item>
-      <xf:label>ARVs and Adherence</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>ARV Readiness</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Children and HIV </xf:label>
-      <xf:value>3</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>HIV and the Immune System </xf:label>
-      <xf:value>4</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Human Rights</xf:label>
-      <xf:value>5</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Nutrition</xf:label>
-      <xf:value>6</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Opportunistic infections  </xf:label>
-      <xf:value>7</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Palliative and Home based care</xf:label>
-      <xf:value>8</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>PEP and Rape </xf:label>
-      <xf:value>9</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>PMTCT and Maternal Health</xf:label>
-      <xf:value>10</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Positive Living </xf:label>
-      <xf:value>11</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Prevention </xf:label>
-      <xf:value>12</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Safer sex</xf:label>
-      <xf:value>13</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Sexuality</xf:label>
-      <xf:value>14</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>STIs</xf:label>
-      <xf:value>15</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Teenage Pregnancy</xf:label>
-      <xf:value>16</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>TB</xf:label>
-      <xf:value>17</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>VCT </xf:label>
-      <xf:value>18</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Woman’s Health  </xf:label>
-      <xf:value>19</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Other topic</xf:label>
-      <xf:value>20</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:input bind="33" relevant="/root/Topics4=20">
-    <xf:label>Other topic:</xf:label>
-  </xf:input>
-  <xf:select1 bind="34">
-    <xf:label>What was the #5 topic discussed?</xf:label>
-    <xf:item>
-      <xf:label>ARVs and Adherence</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>ARV Readiness</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Children and HIV </xf:label>
-      <xf:value>3</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>HIV and the Immune System </xf:label>
-      <xf:value>4</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Human Rights </xf:label>
-      <xf:value>5</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Nutrition</xf:label>
-      <xf:value>6</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Opportunistic infections  </xf:label>
-      <xf:value>7</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Palliative and Home based care</xf:label>
-      <xf:value>8</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>PEP and Rape</xf:label>
-      <xf:value>9</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>PMTCT and Maternal Health</xf:label>
-      <xf:value>10</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Positive Living </xf:label>
-      <xf:value>11</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Prevention </xf:label>
-      <xf:value>12</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Safer sex</xf:label>
-      <xf:value>13</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Sexuality</xf:label>
-      <xf:value>14</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>STIs</xf:label>
-      <xf:value>15</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Teenage Pregnancy</xf:label>
-      <xf:value>16</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>TB</xf:label>
-      <xf:value>17</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>VCT </xf:label>
-      <xf:value>18</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Woman’s Health  </xf:label>
-      <xf:value>19</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Other topic</xf:label>
-      <xf:value>20</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:input bind="35" relevant="/root/Topics5=20">
-    <xf:label>Other topic:</xf:label>
-  </xf:input>
-  <xf:select1 bind="18">
-    <xf:label>Did you use a CHMT AV Kit?</xf:label>
-    <xf:item>
-      <xf:label>Yes</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>No</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:select1 bind="19">
-    <xf:label>Did you show a CHMT DVD?</xf:label>
-    <xf:item>
-      <xf:label>Yes</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>No</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:select1 bind="20">
-    <xf:label>Did you use Scrutinize material?</xf:label>
-    <xf:item>
-      <xf:label>Yes</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>No</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:select1 bind="21">
-    <xf:label>Did you show a Spares and Besties DVD?</xf:label>
-    <xf:item>
-      <xf:label>Yes</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>No</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:select1 bind="22">
-    <xf:label>Did you show a CHMT PSA?</xf:label>
-    <xf:item>
-      <xf:label>Yes</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>No</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:select1 bind="23">
-    <xf:label>Did someone from CHMT co-facilitate the session with you?</xf:label>
-    <xf:item>
-      <xf:label>No</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Yes - a TLT</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Yes - a TLP</xf:label>
-      <xf:value>3</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Yes - a Peer Educator</xf:label>
-      <xf:value>4</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>Yes - TL Coordinator</xf:label>
-      <xf:value>5</xf:value>
-    </xf:item>
-  </xf:select1>
-  <xf:input bind="36">
-    <xf:label>What is the name of the organization that received training</xf:label>
-  </xf:input>
-  <xf:input bind="37">
-    <xf:label>Phone number for the organization</xf:label>
-  </xf:input>
-  <xf:input bind="38">
-    <xf:label>The contact persons name at the organization</xf:label>
-  </xf:input>
-  <xf:input bind="39">
-    <xf:label>Contact persons number</xf:label>
-  </xf:input>
-  <xf:input bind="40">
-    <xf:label>Contact persons position</xf:label>
-  </xf:input>
-  <xf:input bind="24" relevant="/root/CofacilitateCHMT!=1">
-    <xf:label>What was the name of the co-facilitator(s)?</xf:label>
-  </xf:input>
-    <xf:select1 bind="25">
-    <xf:label>Has this session been confirmed with a signature or a stamp?</xf:label>
-    <xf:item>
-      <xf:label>Yes</xf:label>
-      <xf:value>1</xf:value>
-    </xf:item>
-    <xf:item>
-      <xf:label>No</xf:label>
-      <xf:value>2</xf:value>
-    </xf:item>
-  </xf:select1>
-</html>
+    </instance>
+	<bind id="hidden1" nodeset="/root/Meta/UserID" type="xsd:string" jr:preload="context" jr:preloadParams="UserID" />
+	<bind id="hidden2" nodeset="/root/Meta/DeviceID" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
+	<bind id="hidden3" nodeset="/root/Meta/TimeStartRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
+	<bind id="hidden4" nodeset="/root/Meta/TimeEndRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
+    <bind id="1" nodeset="/root/Date" required="true()" type="xsd:date"/>
+    <bind id="2" nodeset="/root/Prov" type="xsd:string"/>
+    <bind id="3" nodeset="/root/Wheretrain" type="xsd:string"/>
+    <bind id="4" nodeset="/root/Wheretrainother" type="xsd:string" relevant="Wheretrain='99'"/>
+    <bind id="5" nodeset="/root/LocEC" type="xsd:string" relevant="/root/Prov='1'"/>
+    <bind id="6" nodeset="/root/LocWC" type="xsd:string" relevant="/root/Prov='9'"/>
+    <bind id="7" nodeset="/root/LocGP" type="xsd:string" relevant="/root/Prov='2'"/>
+    <bind id="8" nodeset="/root/LocKZN" type="xsd:string" relevant="/root/Prov='4'"/>
+    <bind id="9" nodeset="/root/LocFS" type="xsd:string" relevant="/root/Prov='3'"/>
+    <bind id="10" nodeset="/root/LocLP" type="xsd:string" relevant="/root/Prov='5'"/>
+    <bind id="11" nodeset="/root/LocMP" type="xsd:string" relevant="/root/Prov='6'"/>
+    <bind id="12" nodeset="/root/LocNW" type="xsd:string" relevant="/root/Prov='7'"/>
+    <bind id="13" nodeset="/root/LocNC" type="xsd:string" relevant="/root/Prov='8'"/>
+    <bind id="14" nodeset="/root/Male" type="xsd:int"/>
+    <bind id="15" nodeset="/root/Female" type="xsd:int"/>
+    <bind id="16" nodeset="/root/TimeStart" type="xsd:time"/>
+    <bind id="17" nodeset="/root/TimeEnd" type="xsd:time"/>
+    <bind id="18" nodeset="/root/AVKit" type="xsd:string"/>
+    <bind id="19" nodeset="/root/CHMTDVD" type="xsd:string"/>
+    <bind id="20" nodeset="/root/Chmtscrutinize" type="xsd:string"/>
+    <bind id="21" nodeset="/root/ChmtSparesBesties" type="xsd:string"/>
+    <bind id="22" nodeset="/root/ChmtPSA" type="xsd:string"/>
+    <bind id="23" nodeset="/root/CofacilitateCHMT" type="xsd:string"/>
+    <bind id="24" nodeset="/root/CofacilitatorCHMT" type="xsd:string" relevant="/root/CofacilitateCHMT!=1"/>
+    <bind id="25" nodeset="/root/Confirmed" type="xsd:string"/>
+    <bind id="26" nodeset="/root/Topics1" type="xsd:string"/>
+    <bind id="27" nodeset="/root/Topicother1" type="xsd:string" relevant="/root/Topics1='20'"/>
+    <bind id="28" nodeset="/root/Topics2" type="xsd:string"/>
+    <bind id="29" nodeset="/root/Topicother2" type="xsd:string" relevant="/root/Topics2='20'"/>
+    <bind id="30" nodeset="/root/Topics3" type="xsd:string"/>
+    <bind id="31" nodeset="/root/Topicother3" type="xsd:string" relevant="/root/Topics3='20'"/>
+    <bind id="32" nodeset="/root/Topics4" type="xsd:string"/>
+    <bind id="33" nodeset="/root/Topicother4" type="xsd:string" relevant="/root/Topics4='20'"/>
+    <bind id="34" nodeset="/root/Topics5" type="xsd:string"/>
+    <bind id="35" nodeset="/root/Topicother5" type="xsd:string" relevant="/root/Topics5='20'"/>
+    <bind id="36" nodeset="/root/Oname" type="xsd:string"/>
+    <bind id="37" nodeset="/root/Ophone" type="xsd:int"/>
+    <bind id="38" nodeset="/root/Ocontact" type="xsd:string"/>
+    <bind id="39" nodeset="/root/Ocontactnumber" type="xsd:int"/>
+    <bind id="40" nodeset="/root/Oposition" type="xsd:string"/>
+  </model>
+  <input bind="1">
+    <label>On what date was the session held?</label>
+  </input>
+  <select1 bind="2">
+    <label>Which Province?</label>
+    <item>
+      <label>Eastern Cape</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>Gauteng</label>
+      <value>2</value>
+    </item>
+    <item>
+      <label>Free State</label>
+      <value>3</value>
+    </item>
+    <item>
+      <label>Kwazulu Natal</label>
+      <value>4</value>
+    </item>
+    <item>
+      <label>Limpopo</label>
+      <value>5</value>
+    </item>
+    <item>
+      <label>Mpumalanga</label>
+      <value>6</value>
+    </item>
+    <item>
+      <label>North West Province</label>
+      <value>7</value>
+    </item>
+    <item>
+      <label>Northern Cape</label>
+      <value>8</value>
+    </item>
+    <item>
+      <label>Western Cape</label>
+      <value>9</value>
+    </item>
+  </select1>
+  <select1 bind="3">
+    <label>Where was the training session held?</label>
+    <item>
+      <label>At the organisation being trained</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>At the CHMT offices</label>
+      <value>2</value>
+    </item>
+    <item>
+      <label>Conference Centre</label>
+      <value>4</value>
+    </item>
+    <item>
+      <label>Community Centre</label>
+      <value>5</value>
+    </item>
+    <item>
+      <label>Youth Centre</label>
+      <value>6</value>
+    </item>
+    <item>
+      <label>Church</label>
+      <value>7</value>
+    </item>
+    <item>
+      <label>Primary School</label>
+      <value>8</value>
+    </item>
+    <item>
+      <label>Secondary School</label>
+      <value>9</value>
+    </item>
+    <item>
+      <label>Other</label>
+      <value>99</value>
+    </item>
+  </select1>
+  <input bind="4">
+    <label>Other (specify)</label>
+  </input>
+  <input bind="5">
+    <label>What was the name of this Location (EC):</label>
+  </input>
+  <input bind="6">
+    <label>What was the name of this Location (WC):</label>
+  </input>
+  <input bind="7">
+    <label>What was the name of this Location (Gauteng):</label>
+  </input>
+  <input bind="8">
+    <label>What was the name of this Location (KZN):</label>
+  </input>
+  <input bind="9">
+    <label>What was the name of this Location (FS):</label>
+  </input>
+  <input bind="10">
+    <label>What was the name of this Location (LP):</label>
+  </input>
+  <input bind="11">
+    <label>What was the name of this Location (MP):</label>
+  </input>
+  <input bind="12">
+    <label>What was the name of this Location (NW):</label>
+  </input>
+  <input bind="13">
+    <label>What was the name of this Location (NC):</label>
+  </input>
+  <input bind="14">
+    <label>Number of session participants (male)</label>
+  </input>
+  <input bind="15">
+    <label>Number of session participants (female)</label>
+  </input>
+  <input bind="16">
+    <label>What time did the session start?</label>
+  </input>
+  <input bind="17">
+    <label>What time did the session end?</label>
+  </input>
+    <select1 bind="26">
+    <label>What was the #1 topic discussed?</label>
+    <item>
+      <label>ARVs and Adherence</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>ARV Readiness</label>
+      <value>2</value>
+    </item>
+    <item>
+      <label>Children and HIV </label>
+      <value>3</value>
+    </item>
+    <item>
+      <label>HIV and the Immune System </label>
+      <value>4</value>
+    </item>
+    <item>
+      <label>Human Rights</label>
+      <value>5</value>
+    </item>
+    <item>
+      <label>Nutrition</label>
+      <value>6</value>
+    </item>
+    <item>
+      <label>Opportunistic infections  </label>
+      <value>7</value>
+    </item>
+    <item>
+      <label>Palliative and Home based care</label>
+      <value>8</value>
+    </item>
+    <item>
+      <label>PEP and Rape</label>
+      <value>9</value>
+    </item>
+    <item>
+      <label>PMTCT and Maternal Health</label>
+      <value>10</value>
+    </item>
+    <item>
+      <label>Positive Living </label>
+      <value>11</value>
+    </item>
+    <item>
+      <label>Prevention </label>
+      <value>12</value>
+    </item>
+    <item>
+      <label>Safer sex</label>
+      <value>13</value>
+    </item>
+    <item>
+      <label>Sexuality</label>
+      <value>14</value>
+    </item>
+    <item>
+      <label>STIs</label>
+      <value>15</value>
+    </item>
+    <item>
+      <label>Teenage Pregnancy</label>
+      <value>16</value>
+    </item>
+    <item>
+      <label>TB</label>
+      <value>17</value>
+    </item>
+    <item>
+      <label>VCT </label>
+      <value>18</value>
+    </item>
+    <item>
+      <label>Woman&apos;s Health  </label>
+      <value>19</value>
+    </item>
+    <item>
+      <label>Other topic</label>
+      <value>20</value>
+    </item>
+  </select1>
+  <input bind="27">
+    <label>Other topic:</label>
+  </input>
+  <select1 bind="28">
+    <label>What was the #2 topic discussed?</label>
+    <item>
+      <label>ARVs and Adherence</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>ARV Readiness</label>
+      <value>2</value>
+    </item>
+    <item>
+      <label>Children and HIV </label>
+      <value>3</value>
+    </item>
+    <item>
+      <label>HIV and the Immune System </label>
+      <value>4</value>
+    </item>
+    <item>
+      <label>Human Rights</label>
+      <value>5</value>
+    </item>
+    <item>
+      <label>Nutrition</label>
+      <value>6</value>
+    </item>
+    <item>
+      <label>Opportunistic infections  </label>
+      <value>7</value>
+    </item>
+    <item>
+      <label>Palliative and Home based care</label>
+      <value>8</value>
+    </item>
+    <item>
+      <label>PEP and Rape</label>
+      <value>9</value>
+    </item>
+    <item>
+      <label>PMTCT and Maternal Health</label>
+      <value>10</value>
+    </item>
+    <item>
+      <label>Positive Living </label>
+      <value>11</value>
+    </item>
+    <item>
+      <label>Prevention </label>
+      <value>12</value>
+    </item>
+    <item>
+      <label>Safer sex </label>
+      <value>13</value>
+    </item>
+    <item>
+      <label>Sexuality</label>
+      <value>14</value>
+    </item>
+    <item>
+      <label>STIs</label>
+      <value>15</value>
+    </item>
+    <item>
+      <label>Teenage Pregnancy</label>
+      <value>16</value>
+    </item>
+    <item>
+      <label>TB</label>
+      <value>17</value>
+    </item>
+    <item>
+      <label>VCT </label>
+      <value>18</value>
+    </item>
+    <item>
+      <label>Woman&apos;s Health  </label>
+      <value>19</value>
+    </item>
+    <item>
+      <label>Other topic</label>
+      <value>20</value>
+    </item>
+  </select1>
+  <input bind="29">
+    <label>Other topic:</label>
+  </input>
+  <select1 bind="30">
+    <label>What was the #3 topic discussed?</label>
+    <item>
+      <label>ARVs and Adherence</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>ARV Readiness</label>
+      <value>2</value>
+    </item>
+    <item>
+      <label>Children and HIV </label>
+      <value>3</value>
+    </item>
+    <item>
+      <label>HIV and the Immune System </label>
+      <value>4</value>
+    </item>
+    <item>
+      <label>Human Rights</label>
+      <value>5</value>
+    </item>
+    <item>
+      <label>Nutrition</label>
+      <value>6</value>
+    </item>
+    <item>
+      <label>Opportunistic infections  </label>
+      <value>7</value>
+    </item>
+    <item>
+      <label>Palliative and Home based care</label>
+      <value>8</value>
+    </item>
+    <item>
+      <label>PEP and Rape</label>
+      <value>9</value>
+    </item>
+    <item>
+      <label>PMTCT and Maternal Health</label>
+      <value>10</value>
+    </item>
+    <item>
+      <label>Positive Living </label>
+      <value>11</value>
+    </item>
+    <item>
+      <label>Prevention </label>
+      <value>12</value>
+    </item>
+    <item>
+      <label>Safer sex</label>
+      <value>13</value>
+    </item>
+    <item>
+      <label>Sexuality</label>
+      <value>14</value>
+    </item>
+    <item>
+      <label>STIs</label>
+      <value>15</value>
+    </item>
+    <item>
+      <label>Teenage Pregnancy</label>
+      <value>16</value>
+    </item>
+    <item>
+      <label>TB</label>
+      <value>17</value>
+    </item>
+    <item>
+      <label>VCT </label>
+      <value>18</value>
+    </item>
+    <item>
+      <label>Woman&apos;s Health  </label>
+      <value>19</value>
+    </item>
+    <item>
+      <label>Other topic</label>
+      <value>20</value>
+    </item>
+  </select1>
+  <input bind="31">
+    <label>Other topic:</label>
+  </input>
+  <select1 bind="32">
+    <label>What was the #4 topic discussed?</label>
+    <item>
+      <label>ARVs and Adherence</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>ARV Readiness</label>
+      <value>2</value>
+    </item>
+    <item>
+      <label>Children and HIV </label>
+      <value>3</value>
+    </item>
+    <item>
+      <label>HIV and the Immune System </label>
+      <value>4</value>
+    </item>
+    <item>
+      <label>Human Rights</label>
+      <value>5</value>
+    </item>
+    <item>
+      <label>Nutrition</label>
+      <value>6</value>
+    </item>
+    <item>
+      <label>Opportunistic infections  </label>
+      <value>7</value>
+    </item>
+    <item>
+      <label>Palliative and Home based care</label>
+      <value>8</value>
+    </item>
+    <item>
+      <label>PEP and Rape </label>
+      <value>9</value>
+    </item>
+    <item>
+      <label>PMTCT and Maternal Health</label>
+      <value>10</value>
+    </item>
+    <item>
+      <label>Positive Living </label>
+      <value>11</value>
+    </item>
+    <item>
+      <label>Prevention </label>
+      <value>12</value>
+    </item>
+    <item>
+      <label>Safer sex</label>
+      <value>13</value>
+    </item>
+    <item>
+      <label>Sexuality</label>
+      <value>14</value>
+    </item>
+    <item>
+      <label>STIs</label>
+      <value>15</value>
+    </item>
+    <item>
+      <label>Teenage Pregnancy</label>
+      <value>16</value>
+    </item>
+    <item>
+      <label>TB</label>
+      <value>17</value>
+    </item>
+    <item>
+      <label>VCT </label>
+      <value>18</value>
+    </item>
+    <item>
+      <label>Woman&apos;s Health  </label>
+      <value>19</value>
+    </item>
+    <item>
+      <label>Other topic</label>
+      <value>20</value>
+    </item>
+  </select1>
+  <input bind="33">
+    <label>Other topic:</label>
+  </input>
+  <select1 bind="34">
+    <label>What was the #5 topic discussed?</label>
+    <item>
+      <label>ARVs and Adherence</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>ARV Readiness</label>
+      <value>2</value>
+    </item>
+    <item>
+      <label>Children and HIV </label>
+      <value>3</value>
+    </item>
+    <item>
+      <label>HIV and the Immune System </label>
+      <value>4</value>
+    </item>
+    <item>
+      <label>Human Rights </label>
+      <value>5</value>
+    </item>
+    <item>
+      <label>Nutrition</label>
+      <value>6</value>
+    </item>
+    <item>
+      <label>Opportunistic infections  </label>
+      <value>7</value>
+    </item>
+    <item>
+      <label>Palliative and Home based care</label>
+      <value>8</value>
+    </item>
+    <item>
+      <label>PEP and Rape</label>
+      <value>9</value>
+    </item>
+    <item>
+      <label>PMTCT and Maternal Health</label>
+      <value>10</value>
+    </item>
+    <item>
+      <label>Positive Living </label>
+      <value>11</value>
+    </item>
+    <item>
+      <label>Prevention </label>
+      <value>12</value>
+    </item>
+    <item>
+      <label>Safer sex</label>
+      <value>13</value>
+    </item>
+    <item>
+      <label>Sexuality</label>
+      <value>14</value>
+    </item>
+    <item>
+      <label>STIs</label>
+      <value>15</value>
+    </item>
+    <item>
+      <label>Teenage Pregnancy</label>
+      <value>16</value>
+    </item>
+    <item>
+      <label>TB</label>
+      <value>17</value>
+    </item>
+    <item>
+      <label>VCT </label>
+      <value>18</value>
+    </item>
+    <item>
+      <label>Woman&apos;s Health  </label>
+      <value>19</value>
+    </item>
+    <item>
+      <label>Other topic</label>
+      <value>20</value>
+    </item>
+  </select1>
+  <input bind="35">
+    <label>Other topic:</label>
+  </input>
+  <select1 bind="18">
+    <label>Did you use a CHMT AV Kit?</label>
+    <item>
+      <label>Yes</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>2</value>
+    </item>
+  </select1>
+  <select1 bind="19">
+    <label>Did you show a CHMT DVD?</label>
+    <item>
+      <label>Yes</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>2</value>
+    </item>
+  </select1>
+  <select1 bind="20">
+    <label>Did you use Scrutinize material?</label>
+    <item>
+      <label>Yes</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>2</value>
+    </item>
+  </select1>
+  <select1 bind="21">
+    <label>Did you show a Spares &amp; Besties DVD?</label>
+    <item>
+      <label>Yes</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>2</value>
+    </item>
+  </select1>
+  <select1 bind="22">
+    <label>Did you show a CHMT PSA?</label>
+    <item>
+      <label>Yes</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>2</value>
+    </item>
+  </select1>
+  <select1 bind="23">
+    <label>Did someone from CHMT co-facilitate the session with you?</label>
+    <item>
+      <label>No</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>Yes - a TLT</label>
+      <value>2</value>
+    </item>
+    <item>
+      <label>Yes - a TLP</label>
+      <value>3</value>
+    </item>
+    <item>
+      <label>Yes - a Peer Educator</label>
+      <value>4</value>
+    </item>
+    <item>
+      <label>Yes - TL Coordinator</label>
+      <value>5</value>
+    </item>
+  </select1>
+  <input bind="36">
+    <label>What is the name of the organization that received training</label>
+  </input>
+  <input bind="37">
+    <label>Phone number for the organization</label>
+  </input>
+  <input bind="38">
+    <label>The contact persons name at the organization</label>
+  </input>
+  <input bind="39">
+    <label>Contact persons number</label>
+  </input>
+  <input bind="40">
+    <label>Contact persons position</label>
+  </input>
+  <input bind="24">
+    <label>What was the name of the co-facilitator(s)?</label>
+  </input>
+    <select1 bind="25">
+    <label>Has this session been confirmed with a signature or a stamp?</label>
+    <item>
+      <label>Yes</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>2</value>
+    </item>
+  </select1>
+</h:html>
