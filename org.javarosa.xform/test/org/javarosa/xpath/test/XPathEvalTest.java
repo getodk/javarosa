@@ -5,14 +5,13 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
-import java.util.Date;
-
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.xpath.EvaluationContext;
 import org.javarosa.xpath.XPathException;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.XPathTypeMismatchException;
+import org.javarosa.xpath.XPathUnhandledException;
 import org.javarosa.xpath.XPathUnsupportedException;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -253,6 +252,8 @@ public class XPathEvalTest extends TestCase {
 		testEval("true() or date('')" , null, Boolean.TRUE); //short-circuiting
 		testEval("false() and date('')" , null, Boolean.FALSE); //short-circuiting
 		testEval("'' or 17" , null, Boolean.TRUE);
+		testEval("false() or 0 + 2" , null, Boolean.TRUE);
+		testEval("(false() or 0) + 2" , null, new Double(2.0));
 		testEval("4 < 5" , null, Boolean.TRUE);
 		testEval("5 < 5" , null, Boolean.FALSE);
 		testEval("6 < 5" , null, Boolean.FALSE);
@@ -271,6 +272,12 @@ public class XPathEvalTest extends TestCase {
 		testEval("'abc' < 'abcd'" , null, Boolean.FALSE); //no string comparison: converted to NaN
 		testEval("date('2001-12-26') > date('2001-12-25')" , null, Boolean.TRUE);
 		testEval("date('1969-07-20') < date('1969-07-21')" , null, Boolean.TRUE);
+		testEval("false() and false() < true()" , null, Boolean.FALSE);
+		testEval("(false() and false()) < true()" , null, Boolean.TRUE);
+		testEval("6 < 7 - 4" , null, Boolean.FALSE);
+		testEval("(6 < 7) - 4" , null, new Double(-3.0));	
+		testEval("3 < 4 < 5" , null, Boolean.TRUE);
+		testEval("3 < (4 < 5)" , null, Boolean.FALSE);
 		testEval("true() = true()" , null, Boolean.TRUE);
 		testEval("true() = false()" , null, Boolean.FALSE);
 		testEval("true() != true()" , null, Boolean.FALSE);
@@ -293,6 +300,10 @@ public class XPathEvalTest extends TestCase {
 		testEval("'017.' = '17.000'", null, Boolean.FALSE);
 		testEval("date('2004-05-01') = date('2004-05-01')" , null, Boolean.TRUE);
 		testEval("true() != date('1999-09-09')" , null, new XPathTypeMismatchException());
+		testEval("false() and true() != true()" , null, Boolean.FALSE);
+		testEval("(false() and true()) != true()" , null, Boolean.TRUE);
+		testEval("-3 < 3 = 6 >= 6" , null, Boolean.TRUE);
+
 //		testEval("" , null, Boolean.);
 //		testEval("" , null, Boolean.);
 //		testEval("" , null, Boolean.);
@@ -304,6 +315,15 @@ public class XPathEvalTest extends TestCase {
 //		testEval("" , null, Boolean.);
 //		testEval("" , null, Boolean.);
 //		testEval("" , null, Boolean.);
+		testEval("true(5)", null, new XPathUnhandledException());
+		testEval("number()", null, new XPathUnhandledException());
+		testEval("string('too', 'many', 'args')", null, new XPathUnhandledException());
+//		testEval("true(5)", null, new XPathUnhandledException());
+//		testEval("true(5)", null, new XPathUnhandledException());
+//		testEval("true(5)", null, new XPathUnhandledException());
+//		testEval("true(5)", null, new XPathUnhandledException());
+//		testEval("true(5)", null, new XPathUnhandledException());
+		
 		//		testEval("5 + 5" , null, new Double(10.0));
 //		testEval("5 + 5" , null, new Double(10.0));
 //		testEval("5 + 5" , null, new Double(10.0));
