@@ -172,6 +172,9 @@
 	        	        <param name="-types" />
 	        	        <param name="-visibility" />
 	        	    </doclet>
+	        	    <link href="http://java.sun.com/javame/reference/apis/jsr030/"/>
+	        	    <link href="http://java.sun.com/javame/reference/apis/jsr118/"/>
+	        	    <link href="http://www.j2mepolish.org/javadoc/j2me/"/>
 	        	  </javadoc>
 		  <apply executable="dot" dest="${dir.documentation}" parallel="false">
 		    <arg value="-Tpng"/>
