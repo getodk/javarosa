@@ -41,14 +41,16 @@ public class Selection implements Externalizable {
 	}
 	
 	public String getValue () {
+		return (String)question.getSelectItems().elementAt(index);
+
 		//NOTE:  Not sure whether this is actually correct, we definitely
 		//should be returning what is in ItemIDs....
 		//droos: it doesn't matter; the 'element' portions of both these hashtables should be identical
 		// Clayton Sims - Sep 8, 2008 : At one point I was getting null pointers with that assumption.
 		// It was when I was using something that had an [itext] value. 
-		//return (String)question.getSelectItems().elementAt(index);
-		return (String)question.getSelectItemIDs().elementAt(index);
+		//return (String)question.getSelectItemsIDs().elementAt(index);
 	}
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */

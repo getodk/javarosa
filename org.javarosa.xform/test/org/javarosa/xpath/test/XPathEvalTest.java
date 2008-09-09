@@ -5,11 +5,27 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.Date;
 import java.util.Vector;
 
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.Selection;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.QuestionDataElement;
+import org.javarosa.core.model.instance.QuestionDataGroup;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.EvaluationContext;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.IFunctionHandler;
@@ -38,22 +54,17 @@ public class XPathEvalTest extends TestCase {
 	public Test suite() {
 		TestSuite aSuite = new TestSuite();
 		
-		//for (int i = 0; i < parseTestCases.length; i++) {
-		//	final String expr = parseTestCases[i][0];
-		//	final String expected = parseTestCases[i][1];
-			
-			aSuite.addTest(new XPathEvalTest("XPath Evaluation Test", new TestMethod() {
-				public void run (TestCase tc) {
-					((XPathEvalTest)tc).doTests();
-				}
-			}));
-		//}
+		aSuite.addTest(new XPathEvalTest("XPath Evaluation Test", new TestMethod() {
+			public void run (TestCase tc) {
+				((XPathEvalTest)tc).doTests();
+			}
+		}));
 		
 		return aSuite;
 	}
 		
 	private void testEval (String expr, IFormDataModel model, EvaluationContext ec, Object expected) {
-		System.out.println("[" + expr + "]");
+		//System.out.println("[" + expr + "]");
 		
 		XPathExpression xpe = null;
 		boolean exceptionExpected = (expected instanceof XPathException);
@@ -71,7 +82,7 @@ public class XPathEvalTest extends TestCase {
 		
 		try {
 			Object result = xpe.eval(model, ec);
-			System.out.println("out: " + result);
+			//System.out.println("out: " + result);
 			
 			if (exceptionExpected) {
 				fail("Expected exception");
@@ -102,6 +113,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("/@blah", null, null, new XPathUnsupportedException());
 		testEval("/.", null, null, new XPathUnsupportedException());
 		testEval("/..", null, null, new XPathUnsupportedException());
+		testEval("/cant//support", null, null, new XPathUnsupportedException());
 		testEval("/text()", null, null, new XPathUnsupportedException());
 		testEval("/*", null, null, new XPathUnsupportedException());
 		testEval("/namespace:*", null, null, new XPathUnsupportedException());
@@ -208,6 +220,11 @@ public class XPathEvalTest extends TestCase {
 		testEval("date(date('1989-11-09'))", null, null, DateUtils.getDate(1989, 11, 9));
 		testEval("date(true())", null, null, new XPathTypeMismatchException());
 		testEval("date(convertible())", null, ec, new XPathTypeMismatchException());
+		//note: there are lots of time and timezone-like issues with dates that should be tested (particularly DST changes),
+		//	but it's just too hard and client-dependent, so not doing it now
+		//  basically:
+		//		dates cannot reliably be compared/used across time zones (an issue with the code)
+		//		any time-of-day or DST should be ignored when comparing/using a date (an issue with testing)
 		/* other built-in functions */
 		testEval("not(true())", null, null, Boolean.FALSE);
 		testEval("not(false())", null, null, Boolean.TRUE);
@@ -370,6 +387,109 @@ public class XPathEvalTest extends TestCase {
 			fail("Custom function handler did not successfully send data to external source");
 		
 		/* fetching from model */
+		DataModelTree dm1 = newDataModel();
+		testEval("/", dm1, null, "");
+		testEval("/non-existent", dm1, null, "");
+		
+		addDataRef(dm1, "/data/test", null);
+		addNodeRef(dm1, "/empty-group", false);
+		testEval("/", dm1, null, "");
+		testEval("/data", dm1, null, "");
+		testEval("/empty-group", dm1, null, "");
+		testEval("/empty-group/undefined", dm1, null, "");
+		testEval("/data/test", dm1, null, "");
+		testEval("/data/test/too-deep", dm1, null, "");
+		
+		addDataRef(dm1, "/data/string", new StringData("string"));
+		addDataRef(dm1, "/data/int", new IntegerData(17));
+		addDataRef(dm1, "/data/date", new DateData(DateUtils.getDate(2006, 6, 13)));
+
+		SelectOneData sod = new SelectOneData(new Selection(1, getSelectQuestion(false)));
+		QuestionDef smq = getSelectQuestion(true);
+		Vector sv = new Vector();
+		sv.addElement(new Selection(0, smq));
+		sv.addElement(new Selection(3, smq));
+		addDataRef(dm1, "/data/select-one", sod);
+		addDataRef(dm1, "/data/select-multi", new SelectMultiData(sv));
+		addDataRef(dm1, "/data/custom", new CustomAnswerData());
+		
+		testEval("/data/string", dm1, null, "string");
+		testEval("/data/int", dm1, null, new Double(17.0));
+		testEval("/data/date", dm1, null, DateUtils.getDate(2006, 6, 13));
+		testEval("/data/select-one", dm1, null, "val2");
+		testEval("/data/select-multi", dm1, null, "val1 val4");
+		testEval("/data/custom", dm1, null, new CustomType());
+		testEval("selected(/data/select-multi, 'val4')", dm1, null, Boolean.TRUE);
+		testEval("selected(/data/select-multi, 'val3')", dm1, null, Boolean.FALSE);
+		testEval("/data/child::int + /child::data/int", dm1, null, new Double(34.0));
+		testEval("concat(/data/string, /data/date, add(/data/int, /data/int))", dm1, ec, "string2006-06-1334");
+	}
+	
+	private DataModelTree newDataModel () {
+		return new DataModelTree(new QuestionDataGroup());
+	}
+	
+	private void addDataRef (DataModelTree dm, String ref, IAnswerData data) {
+		addNodeRef(dm, ref, true);
+		
+		if (data != null) {
+			dm.updateDataValue(new XPathReference(ref), data);
+		}
+	}
+	
+	private void addNodeRef (DataModelTree dm, String ref, boolean terminal) {
+		Vector pieces = new Vector();
+		
+		//split ref by '/', assume first char is '/'
+		int i = 1;
+		while (i > 0) {
+			int j = ref.indexOf("/", i);
+			pieces.addElement(ref.substring(i, j == -1 ? ref.length() : j));
+			i = j + 1;
+		}
+		
+		QuestionDataGroup node = (QuestionDataGroup)dm.getRootElement();
+		for (int k = 0; k < pieces.size(); k++) {
+			//find if child exists
+			Vector children = node.getChildren();
+			TreeElement child = null;
+			for (int l = 0; l < children.size(); l++) {
+				if (((TreeElement)children.elementAt(l)).getName().equals((String)pieces.elementAt(k))) {
+					child = (TreeElement)children.elementAt(l);
+					break;
+				}
+			}
+
+			if (child == null) {
+				if (k == pieces.size() - 1 && terminal) {
+					child = new QuestionDataElement((String)pieces.elementAt(k), new XPathReference(ref));
+				} else {
+					child = new QuestionDataGroup((String)pieces.elementAt(k));
+				}
+				
+				node.addChild(child);
+			}
+			
+			if (k < pieces.size() - 1) {
+				if (child instanceof QuestionDataElement) {
+					throw new IllegalArgumentException();
+				}	
+				
+				node = (QuestionDataGroup)child;
+			}
+		}
+	}
+	
+	private QuestionDef getSelectQuestion (boolean multi) {
+		QuestionDef q = new QuestionDef(1, "blah", Constants.DATATYPE_TEXT,
+				multi ? Constants.CONTROL_SELECT_MULTI : Constants.CONTROL_SELECT_ONE);
+		
+		q.addSelectItem("choice 1", "val1");
+		q.addSelectItem("choice 2", "val2");
+		q.addSelectItem("choice 3", "val3");
+		q.addSelectItem("choice 4", "val4");
+		
+		return q;
 	}
 	
 	private EvaluationContext getFunctionHandlers () {
@@ -528,10 +648,19 @@ public class XPathEvalTest extends TestCase {
 	private class CustomType {
 		public String val () { return "custom"; }
 		public String toString() { return ""; }
+		public boolean equals (Object o) { return o instanceof CustomType; }
 	}
 	
 	private class CustomSubType extends CustomType {
 		public String val () { return "custom-sub"; }		
+	}
+	
+	private class CustomAnswerData implements IAnswerData {
+		public String getDisplayText() { return "custom"; }
+		public Object getValue() { return new CustomType(); }
+		public void setValue(Object o) { }
+		public void readExternal(DataInputStream in) { }
+		public void writeExternal(DataOutputStream out) { }
 	}
 	
 	private abstract class StatefulFunc implements IFunctionHandler {

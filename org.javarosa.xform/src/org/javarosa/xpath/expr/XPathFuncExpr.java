@@ -257,7 +257,7 @@ public class XPathFuncExpr extends XPathExpression {
 				return d;
 			}
 		} else if (o instanceof Date) {
-			return (Date)o;
+			return DateUtils.roundDate((Date)o);
 		} else {
 			throw new XPathTypeMismatchException("converting to date");
 		}
