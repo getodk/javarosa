@@ -38,12 +38,8 @@ public class SelectMultiData implements IAnswerData {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
-		vs = (Vector)o;
 		
-		//validate type
-		for (int i = 0; i < vs.size(); i++) {
-			Selection s = (Selection)vs.elementAt(i);
-		}
+		vs = vectorCopy((Vector)o);
 	}
 	
 	/*
@@ -51,7 +47,21 @@ public class SelectMultiData implements IAnswerData {
 	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
 	 */
 	public Object getValue () {
-		return vs;
+		return vectorCopy(vs);
+	}
+	
+	/**
+	 * @return A type checked vector containing all of the elements
+	 * contained in the vector input 
+	 */
+	private Vector vectorCopy(Vector input) {
+		Vector output = new Vector();
+		//validate type
+		for (int i = 0; i < input.size(); i++) {
+			Selection s = (Selection)input.elementAt(i);
+			output.addElement(s);
+		}
+		return output;
 	}
 	
 	/*
