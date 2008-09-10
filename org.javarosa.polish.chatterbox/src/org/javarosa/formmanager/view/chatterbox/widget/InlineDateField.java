@@ -13,6 +13,9 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.CustomItem;
 import de.enough.polish.ui.Style;
 
+/**
+ * Date field that fits into the chatterbox display.
+ */
 public class InlineDateField extends CustomItem {
 
 	// value is the current value of the field, and defaults to no selection (null).
@@ -23,9 +26,11 @@ public class InlineDateField extends CustomItem {
 	
 	// Indicates if the month control is currently selected.
 	private int selectionMode;
+	private int repeatCount;
 	private final int DAYS = 1;
 	private final int NO_DATE = 2;
 	private final int MONTH = 3;
+	private final int YEAR = 4;
 	
 	private Command clearCmd;
 	
@@ -44,11 +49,12 @@ public class InlineDateField extends CustomItem {
 		// Initialize selection to current date.
 		sel = Calendar.getInstance();
 		selectionMode = DAYS;
+		repeatCount = 0;
 	}
 	
 	public int getMinContentHeight() { return 10; }
 	public int getMinContentWidth() { return 10; }
-	public int getPrefContentHeight(int h) { Font f = Font.getDefaultFont(); return 7 * f.getHeight() + 6; }
+	public int getPrefContentHeight(int h) { Font f = Font.getDefaultFont(); return 8 * f.getHeight() + 6; }
 	public int getPrefContentWidth(int w) { return 99999; /* force the max */ }
 
   // Handle key presses.
@@ -59,7 +65,10 @@ public class InlineDateField extends CustomItem {
 		
 		// Handle four arrows.
 		if (gameAction == Canvas.RIGHT) {
-			if (selectionMode == MONTH) {
+			if (selectionMode == YEAR) {
+				changeMonth(sel, 12);
+				changed = true;
+			} else if (selectionMode == MONTH) {
 				changeMonth(sel, 1);
 				changed = true;
 			} else if (selectionMode == DAYS) {
@@ -72,7 +81,10 @@ public class InlineDateField extends CustomItem {
 				}
 			} 
 		} else if (gameAction == Canvas.LEFT) {
-			if (selectionMode == MONTH) {
+			if (selectionMode == YEAR) {
+				changeMonth(sel, -12);
+				changed = true;
+			} else if (selectionMode == MONTH) {
 				changeMonth(sel, -1);
 				changed = true;
 			} else if (selectionMode == DAYS && curDay > 1) {
@@ -84,7 +96,10 @@ public class InlineDateField extends CustomItem {
 				changed = true;
 			}
 		} else if (gameAction == Canvas.UP) {
-			if (selectionMode == DAYS) {
+			if (selectionMode == MONTH) {
+				selectionMode = YEAR;
+				changed = true;
+			} else if (selectionMode == DAYS) {
 				if (curDay > 7)
 					curDay -= 7;
 				else 
@@ -96,7 +111,10 @@ public class InlineDateField extends CustomItem {
 				changed = true;
 			}
 		} else if (gameAction == Canvas.DOWN) {
-			if (selectionMode == MONTH) {
+			if (selectionMode == YEAR) {
+				selectionMode = MONTH;
+				changed = true;
+			} else if (selectionMode == MONTH) {
 				selectionMode = DAYS;
 				changed = true;
 			} else if (selectionMode == DAYS) {
@@ -131,6 +149,40 @@ public class InlineDateField extends CustomItem {
 			return false;
 	}
 	
+	public boolean handleKeyRepeated(int keyCode, int gameAction) {
+		
+		if ((selectionMode == YEAR || selectionMode == MONTH)
+			&& (gameAction == Canvas.LEFT || gameAction == Canvas.RIGHT)) {
+
+			int repeatIncrement;
+			int diff;
+
+			// Increment repeat count.
+			repeatCount++;
+		
+			// Determine number of years/months to increment/decrement by.
+			if (repeatCount % 2 == 0) repeatIncrement = 0;
+			else if (repeatCount <= 10) repeatIncrement = 1;
+			else repeatIncrement = 5;
+		
+			diff = (gameAction == Canvas.LEFT ? -1 : 1) * (selectionMode == YEAR ? 12 : 1) * repeatIncrement;
+				
+			changeMonth(sel, diff);
+		
+			return true;
+		} else
+			return false;
+	}
+
+	public boolean handleKeyReleased(int keyCode, int gameAction) {
+		if (gameAction == Canvas.LEFT || gameAction == Canvas.RIGHT) {
+			repeatCount = 0;
+			return true;
+		} else
+			return false;
+	}
+	
+	
 	// Changes the month/year of the given Calendar by diff months.
 	private void changeMonth(Calendar cal, int diff) {
 		int n = cal.get(Calendar.YEAR) * 12 + cal.get(Calendar.MONTH) + diff;
@@ -162,23 +214,36 @@ public class InlineDateField extends CustomItem {
 		int vSpacing = 13;
 		int boxWidth = font.stringWidth("22") + 4;
 		int boxHeight = font.getHeight() - 2;
-        
-		// Set the month.
-		String m = monthNames[sel.get(Calendar.MONTH)];
-		String y = "" + sel.get(Calendar.YEAR);
-		String my = m + " " + y;
 
-		// If month is selected, draw outline around it.
-		if (selectionMode == MONTH) {
-			int strWidth = font.stringWidth(my);
+		// Set the year.
+		String y = String.valueOf(sel.get(Calendar.YEAR));
+
+		// If year is selected, draw outline around it.
+		if (selectionMode == YEAR) {
+			int strWidth = font.stringWidth(y);
 			g.drawRect(width / 2 - strWidth / 2 - 4, 1, strWidth + 6, boxHeight + 2);
 		}
 		
+		// Draw the year.
+		g.drawString("<  " + y + "  >", width / 2, 1, anchor);
+        
+		// Set the ypos for the month.
+		int monthY = vSpacing + 2;
+		
+		// Set the month.
+		String m = monthNames[sel.get(Calendar.MONTH)];
+
+		// If month is selected, draw outline around it.
+		if (selectionMode == MONTH) {
+			int strWidth = font.stringWidth(m);
+			g.drawRect(width / 2 - strWidth / 2 - 4, monthY, strWidth + 6, boxHeight + 2);
+		}
+		
 		// Draw the month.
-		g.drawString("<  " + my + "  >", width / 2, 1, anchor);
+		g.drawString("<  " + m + "  >", width / 2, monthY, anchor);
 		
 		// Draw the day name abbreviations.
-		int dayAbbrY = vSpacing + 2;
+		int dayAbbrY = monthY + vSpacing + 1;
 		for (int c = 0; c < 7; c++)
 			g.drawString(dayNames[c].substring(0, 1), (int)((0.5 + c) * hSpacing), dayAbbrY, anchor);
 			

@@ -11,6 +11,10 @@ import org.javarosa.core.model.data.IAnswerData;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.TextField;
 
+/**
+ * Widget class for InlineDateField.
+ * By Thomas Smyth (tom@tomsmyth.ca)
+ */
 public class InlineDateEntryWidget extends ExpandedWidget {
 	public final static int CONTROL_INLINE_DATE = 111; 
 
