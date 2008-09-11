@@ -35,6 +35,7 @@ public class QuestionDataElement extends TreeElement {
 	 * Creates a new, blank, QuestionDataElement;
 	 */
 	public QuestionDataElement() {
+		this.root = this;
 	}
 
 	/**
@@ -47,6 +48,7 @@ public class QuestionDataElement extends TreeElement {
 	 *            The reference for Question Definitions
 	 */
 	public QuestionDataElement(String name, IDataReference reference) {
+		this();
 		this.name = name;
 		this.reference = reference;
 	}
@@ -145,7 +147,7 @@ public class QuestionDataElement extends TreeElement {
 	 * @return a string representing the value of this question's answer
 	 */
 	public String createStringValue() {
-		return value.toString();
+		return value.getDisplayText();
 	}
 
 	/**
