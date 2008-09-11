@@ -18,6 +18,7 @@ import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class QuestionDataElementTests extends TestCase{
@@ -155,10 +156,11 @@ public class QuestionDataElementTests extends TestCase{
 			case 3: testSetName(); break;
 			case 4: testReferenceMatch(); break;
 			case 5: testAcceptsVisitor(); break;
+			case 6: testSuperclassMethods(); break;
 			
 		}
 	}
-	
+
 	public void testIsLeaf() {
 		assertTrue("Question Data Element returned negative for being a leaf",stringElement.isLeaf());
 	}
@@ -220,5 +222,14 @@ public class QuestionDataElementTests extends TestCase{
 		assertTrue("The visitor's visit method was not called correctly by the QuestionDataElement",visitorAccepted.getValue());
 		
 		assertTrue("The visitor was dispatched incorrectly by the QuestionDataElement",!dispatchedWrong.getValue());
+	}
+	
+	private void testSuperclassMethods() {
+		//stringElement should not have a root at this point.
+		PrototypeFactory factory = new PrototypeFactory();
+		stringElement.setFactory(factory);
+		assertEquals("The QuestionDataElement 'stringElement' is not properly registering or returning factories",stringElement.getFactory(), factory);
+		
+		//TODO: Implement tests for the 'attribute' system.
 	}
 }
