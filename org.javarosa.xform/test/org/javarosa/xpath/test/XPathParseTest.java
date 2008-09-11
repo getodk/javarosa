@@ -171,6 +171,7 @@ public class XPathParseTest extends TestCase {
 		{"//", null},
 		{"//all", "{path-expr:abs,{{step:descendant-or-self,node()},{step:child,all}}}"},
 		{"a/.//../z", "{path-expr:rel,{{step:child,a},{step:self,node()},{step:descendant-or-self,node()},{step:parent,node()},{step:child,z}}}"},
+		{"6andpath", "{binop-expr:and,{num:6.0},{path-expr:rel,{{step:child,path}}}}"},
 		/* real-world examples */
 		{"/patient/sex = 'male' and /patient/age > 15",
 			"{binop-expr:and,{binop-expr:==,{path-expr:abs,{{step:child,patient},{step:child,sex}}},{str:'male'}},{binop-expr:>,{path-expr:abs,{{step:child,patient},{step:child,age}}},{num:15.0}}}"},
