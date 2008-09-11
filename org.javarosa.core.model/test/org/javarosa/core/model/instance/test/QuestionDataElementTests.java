@@ -34,7 +34,7 @@ public class QuestionDataElementTests extends TestCase{
 	QuestionDataElement stringElement;
 	QuestionDataElement intElement;
 	
-	private static int NUM_TESTS = 5;
+	private static int NUM_TESTS = 6;
 	
 	/* (non-Javadoc)
 	 * @see j2meunit.framework.TestCase#setUp()
