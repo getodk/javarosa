@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.DataModelTree;
@@ -34,7 +35,7 @@ public class QuestionDataElementTests extends TestCase{
 	QuestionDataElement stringElement;
 	QuestionDataElement intElement;
 	
-	private static int NUM_TESTS = 6;
+	private static int NUM_TESTS = 8;
 	
 	/* (non-Javadoc)
 	 * @see j2meunit.framework.TestCase#setUp()
@@ -154,9 +155,11 @@ public class QuestionDataElementTests extends TestCase{
 			case 1: testIsLeaf(); break;
 			case 2: testGetName(); break;
 			case 3: testSetName(); break;
-			case 4: testReferenceMatch(); break;
-			case 5: testAcceptsVisitor(); break;
-			case 6: testSuperclassMethods(); break;
+			case 4: testGetValue(); break;
+			case 5: testSetValue(); break;
+			case 6: testReferenceMatch(); break;
+			case 7: testAcceptsVisitor(); break;
+			case 8: testSuperclassMethods(); break;
 			
 		}
 	}
@@ -174,6 +177,25 @@ public class QuestionDataElementTests extends TestCase{
 		stringElement.setName(newName);
 		
 		assertEquals("Question Data Element 'string' did not properly set its name", stringElement.getName(), newName);
+	}
+	
+	public void testGetValue() {
+		IAnswerData data = stringElement.getValue();
+		assertEquals("Question Data Element did not return the correct value",data,stringData);
+	}
+	
+	public void testSetValue() {
+		stringElement.setValue(integerData);
+		assertEquals("Question Data Element did not set value correctly",stringElement.getValue(),integerData);
+		
+		try {
+			stringElement.setValue(null);
+		} catch(Exception e) {
+			fail("Question Data Element did not allow for its value to be set as null");
+		}
+		
+		assertEquals("Question Data Element did not return a null value correctly", stringElement.getValue(),null);
+		
 	}
 	
 	public void testReferenceMatch() {
