@@ -183,4 +183,19 @@ public class OrderedHashtable {
     synchronized public void ensureCapacity(int capacity) {
         orderedKeys.ensureCapacity(capacity);
     }
+    
+    public String toString () {
+    	StringBuffer sb = new StringBuffer();
+    	sb.append("[");
+    	for (Enumeration e = keys(); e.hasMoreElements(); ) {
+    		Object key = e.nextElement();
+    		sb.append(key.toString());
+    		sb.append(" => ");
+    		sb.append(get(key).toString());
+    		if (e.hasMoreElements())
+    			sb.append(", ");
+    	}
+    	sb.append("]");    	
+    	return sb.toString();
+    }
 }

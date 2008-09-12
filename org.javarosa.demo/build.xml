@@ -145,6 +145,8 @@
 	<target name="RunJ2MEUnitTests" depends="supressOutput, disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathParseTest"/>
+		<RunTestSuite suite="org.javarosa.xpath.test.XPathEvalTest"/>
+		<RunTestSuite suite="org.javarosa.core.model.test.QuestionDefTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.NumericEncodingTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.LocalizerTest"/>
 		<RunTestSuite suite="org.javarosa.demo.xform.test.DemoFormsTest"/>
