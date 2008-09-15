@@ -1,6 +1,6 @@
 <h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
-  <h:title>CHMT TL TRAINING</h:title>
-  <model id="TLT">
+ <h:title>TL Training Report</h:title>
+  <model id="14895">
     <instance xmlns="">
     <root>
 	  <Meta>
@@ -9,56 +9,56 @@
 		<TimeStartRecorded />
 		<TimeEndRecorded />
 	  </Meta>
-      <Date qid="1" gid="1"/>
-      <Prov qid="2" gid="1"/>
-      <Wheretrain qid="9" gid="1"/>
-      <Wheretrainother qid="10" gid="1"/>
-      <LocEC qid="5" gid="1"/>
-      <LocWC qid="3" gid="1"/>
-      <LocGP qid="4" gid="1"/>
-      <LocKZN qid="6" gid="1"/>
-      <LocFS qid="14" gid="1"/>
-      <LocLP qid="13" gid="1"/>
-      <LocMP qid="15" gid="1"/>
-      <LocNW qid="16" gid="1"/>
-      <LocNC qid="17" gid="1"/>
-      <Male qid="7" gid="1"/>
-      <Female qid="8" gid="1"/>
-      <TimeStart qid="12" gid="1"/>
-      <TimeEnd qid="11" gid="1"/>
-      <AVKit qid="18" gid="2"/>
-      <CHMTDVD qid="19" gid="2"/>
-      <Chmtscrutinize qid="22" gid="2"/>
-      <ChmtSparesBesties qid="23" gid="2"/>
-      <ChmtPSA qid="24" gid="2"/>
-      <CofacilitateCHMT qid="20" gid="2"/>
-      <CofacilitatorCHMT qid="21" gid="2"/>
-      <Confirmed qid="25" gid="3"/>
-      <Topics1 qid="26" gid="4"/>
-      <Topicother1 qid="27" gid="4"/>
-      <Topics2 qid="28" gid="4"/>
-      <Topicother2 qid="32" gid="4"/>
-      <Topics3 qid="29" gid="4"/>
-      <Topicother3 qid="33" gid="4"/>
-      <Topics4 qid="30" gid="4"/>
-      <Topicother4 qid="34" gid="4"/>
-      <Topics5 qid="31" gid="4"/>
-      <Topicother5 qid="35" gid="4"/>
-      <Oname qid="39" gid="5"/>
-      <Ophone qid="40" gid="5"/>
-      <Ocontact qid="36" gid="5"/>
-      <Ocontactnumber qid="38" gid="5"/>
-      <Oposition qid="37" gid="5"/>
-     </root>
+      <Date qid="422" gid="69"/>
+      <Prov qid="423" gid="69"/>
+      <Wheretrain qid="430" gid="69"/>
+      <Wheretrainother qid="431" gid="69"/>
+      <LocEC qid="426" gid="69"/>
+      <LocWC qid="424" gid="69"/>
+      <LocGP qid="425" gid="69"/>
+      <LocKZN qid="427" gid="69"/>
+      <LocFS qid="435" gid="69"/>
+      <LocLP qid="434" gid="69"/>
+      <LocMP qid="436" gid="69"/>
+      <LocNW qid="437" gid="69"/>
+      <LocNC qid="438" gid="69"/>
+      <Male qid="428" gid="69"/>
+      <Female qid="429" gid="69"/>
+      <TimeStart qid="433" gid="69"/>
+      <TimeEnd qid="432" gid="69"/>
+      <Topics1 qid="447" gid="72"/>
+      <Topicother1 qid="448" gid="72"/>
+      <Topics2 qid="449" gid="72"/>
+      <Topicother2 qid="453" gid="72"/>
+      <Topics3 qid="450" gid="72"/>
+      <Topicother3 qid="454" gid="72"/>
+      <Topics4 qid="451" gid="72"/>
+      <Topicother4 qid="455" gid="72"/>
+      <Topics5 qid="452" gid="72"/>
+      <Topicother5 qid="456" gid="72"/>
+      <AVKit qid="439" gid="70"/>
+      <CHMTDVD qid="440" gid="70"/>
+      <Chmtscrutinize qid="443" gid="70"/>
+      <ChmtSparesBesties qid="444" gid="70"/>
+      <ChmtPSA qid="445" gid="70"/>
+      <CofacilitateCHMT qid="441" gid="70"/>
+      <CofacilitatorCHMT qid="442" gid="70"/>
+      <Oname qid="460" gid="73"/>
+      <Ophone qid="461" gid="73"/>
+      <Ocontact qid="457" gid="73"/>
+      <Ocontactnumber qid="459" gid="73"/>
+      <Oposition qid="458" gid="73"/>
+      <Confirmed qid="446" gid="71"/>
+    </root>
     </instance>
-	<bind id="hidden1" nodeset="/root/Meta/UserID" type="xsd:string" jr:preload="context" jr:preloadParams="UserID" />
+    <bind id="hidden1" nodeset="/root/Meta/UserID" type="xsd:string" jr:preload="context" jr:preloadParams="UserID" />
 	<bind id="hidden2" nodeset="/root/Meta/DeviceID" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
 	<bind id="hidden3" nodeset="/root/Meta/TimeStartRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
 	<bind id="hidden4" nodeset="/root/Meta/TimeEndRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
     <bind id="1" nodeset="/root/Date" required="true()" type="xsd:date"/>
     <bind id="2" nodeset="/root/Prov" type="xsd:string"/>
     <bind id="3" nodeset="/root/Wheretrain" type="xsd:string"/>
-    <bind id="4" nodeset="/root/Wheretrainother" type="xsd:string" relevant="Wheretrain='99'"/>
+    <bind id="4" nodeset="/root/Wheretrainother" type="xsd:string" relevant="/root/Wheretrain='99'"/>
     <bind id="5" nodeset="/root/LocEC" type="xsd:string" relevant="/root/Prov='1'"/>
     <bind id="6" nodeset="/root/LocWC" type="xsd:string" relevant="/root/Prov='9'"/>
     <bind id="7" nodeset="/root/LocGP" type="xsd:string" relevant="/root/Prov='2'"/>
@@ -72,14 +72,6 @@
     <bind id="15" nodeset="/root/Female" type="xsd:int"/>
     <bind id="16" nodeset="/root/TimeStart" type="xsd:time"/>
     <bind id="17" nodeset="/root/TimeEnd" type="xsd:time"/>
-    <bind id="18" nodeset="/root/AVKit" type="xsd:string"/>
-    <bind id="19" nodeset="/root/CHMTDVD" type="xsd:string"/>
-    <bind id="20" nodeset="/root/Chmtscrutinize" type="xsd:string"/>
-    <bind id="21" nodeset="/root/ChmtSparesBesties" type="xsd:string"/>
-    <bind id="22" nodeset="/root/ChmtPSA" type="xsd:string"/>
-    <bind id="23" nodeset="/root/CofacilitateCHMT" type="xsd:string"/>
-    <bind id="24" nodeset="/root/CofacilitatorCHMT" type="xsd:string" relevant="/root/CofacilitateCHMT!=1"/>
-    <bind id="25" nodeset="/root/Confirmed" type="xsd:string"/>
     <bind id="26" nodeset="/root/Topics1" type="xsd:string"/>
     <bind id="27" nodeset="/root/Topicother1" type="xsd:string" relevant="/root/Topics1='20'"/>
     <bind id="28" nodeset="/root/Topics2" type="xsd:string"/>
@@ -90,11 +82,19 @@
     <bind id="33" nodeset="/root/Topicother4" type="xsd:string" relevant="/root/Topics4='20'"/>
     <bind id="34" nodeset="/root/Topics5" type="xsd:string"/>
     <bind id="35" nodeset="/root/Topicother5" type="xsd:string" relevant="/root/Topics5='20'"/>
+    <bind id="18" nodeset="/root/AVKit" type="xsd:select1"/>
+    <bind id="19" nodeset="/root/CHMTDVD" type="xsd:select1"/>
+    <bind id="20" nodeset="/root/Chmtscrutinize" type="xsd:select1"/>
+    <bind id="21" nodeset="/root/ChmtSparesBesties" type="xsd:select1"/>
+    <bind id="22" nodeset="/root/ChmtPSA" type="xsd:select1"/>
+    <bind id="23" nodeset="/root/CofacilitateCHMT" type="xsd:string"/>
+    <bind id="24" nodeset="/root/CofacilitatorCHMT" type="xsd:string" relevant="/root/CofacilitateCHMT!='1'"/>
     <bind id="36" nodeset="/root/Oname" type="xsd:string"/>
     <bind id="37" nodeset="/root/Ophone" type="xsd:int"/>
     <bind id="38" nodeset="/root/Ocontact" type="xsd:string"/>
     <bind id="39" nodeset="/root/Ocontactnumber" type="xsd:int"/>
     <bind id="40" nodeset="/root/Oposition" type="xsd:string"/>
+    <bind id="25" nodeset="/root/Confirmed" type="xsd:select1"/>
   </model>
   <input bind="1">
     <label>On what date was the session held?</label>
@@ -219,10 +219,102 @@
   <input bind="17">
     <label>What time did the session end?</label>
   </input>
-    <select1 bind="26">
+  <select1 bind="18">
+    <label>Did you use a CHMT AV Kit?</label>
+    <item>
+      <label>Yes</label>
+      <value>Y</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>N</value>
+    </item>
+  </select1>
+  <select1 bind="19">
+    <label>Did you show a CHMT DVD?</label>
+    <item>
+      <label>Yes</label>
+      <value>Y</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>N</value>
+    </item>
+  </select1>
+  <select1 bind="20">
+    <label>Did you use 'Scrutinize' material?</label>
+    <item>
+      <label>Yes</label>
+      <value>Y</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>N</value>
+    </item>
+  </select1>
+  <select1 bind="21">
+    <label>Did you show a 'Spares and Besties' DVD?</label>
+    <item>
+      <label>Yes</label>
+      <value>Y</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>N</value>
+    </item>
+  </select1>
+  <select1 bind="22">
+    <label>Did you show a CHMT PSA?</label>
+    <item>
+      <label>Yes</label>
+      <value>Y</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>N</value>
+    </item>
+  </select1>
+  <select1 bind="23">
+    <label>Did someone from CHMT co-facilitate the session with you?</label>
+    <item>
+      <label>No</label>
+      <value>1</value>
+    </item>
+    <item>
+      <label>Yes - a TLT</label>
+      <value>2</value>
+    </item>
+    <item>
+      <label>Yes - a TLP</label>
+      <value>3</value>
+    </item>
+    <item>
+      <label>Yes - a Peer Educator</label>
+      <value>4</value>
+    </item>
+    <item>
+      <label>Yes - TL Coordinator</label>
+      <value>5</value>
+    </item>
+  </select1>
+  <input bind="24">
+    <label>What was the name of the co-facilitator(s)?</label>
+  </input>
+  <select1 bind="25">
+    <label>Has this session been confirmed with a signature or a stamp?</label>
+    <item>
+      <label>Yes</label>
+      <value>Y</value>
+    </item>
+    <item>
+      <label>No</label>
+      <value>N</value>
+    </item>
+  </select1>
+  <select1 bind="26">
     <label>What was the #1 topic discussed?</label>
     <item>
-      <label>ARVs and Adherence</label>
+      <label>ARVs &amp; Adherence</label>
       <value>1</value>
     </item>
     <item>
@@ -234,7 +326,7 @@
       <value>3</value>
     </item>
     <item>
-      <label>HIV and the Immune System </label>
+      <label>HIV &amp; the Immune System </label>
       <value>4</value>
     </item>
     <item>
@@ -250,15 +342,15 @@
       <value>7</value>
     </item>
     <item>
-      <label>Palliative and Home based care</label>
+      <label>Palliative &amp; Home based care</label>
       <value>8</value>
     </item>
     <item>
-      <label>PEP and Rape</label>
+      <label>PEP &amp; Rape</label>
       <value>9</value>
     </item>
     <item>
-      <label>PMTCT and Maternal Health</label>
+      <label>PMTCT &amp; Maternal Health</label>
       <value>10</value>
     </item>
     <item>
@@ -278,7 +370,7 @@
       <value>14</value>
     </item>
     <item>
-      <label>STIs</label>
+      <label>STI&apos;s</label>
       <value>15</value>
     </item>
     <item>
@@ -308,7 +400,7 @@
   <select1 bind="28">
     <label>What was the #2 topic discussed?</label>
     <item>
-      <label>ARVs and Adherence</label>
+      <label>ARVs &amp; Adherence</label>
       <value>1</value>
     </item>
     <item>
@@ -320,7 +412,7 @@
       <value>3</value>
     </item>
     <item>
-      <label>HIV and the Immune System </label>
+      <label>HIV &amp; the Immune System </label>
       <value>4</value>
     </item>
     <item>
@@ -336,15 +428,15 @@
       <value>7</value>
     </item>
     <item>
-      <label>Palliative and Home based care</label>
+      <label>Palliative &amp; Home based care</label>
       <value>8</value>
     </item>
     <item>
-      <label>PEP and Rape</label>
+      <label>PEP &amp; Rape</label>
       <value>9</value>
     </item>
     <item>
-      <label>PMTCT and Maternal Health</label>
+      <label>PMTCT &amp; Maternal Health</label>
       <value>10</value>
     </item>
     <item>
@@ -364,7 +456,7 @@
       <value>14</value>
     </item>
     <item>
-      <label>STIs</label>
+      <label>STI's</label>
       <value>15</value>
     </item>
     <item>
@@ -394,7 +486,7 @@
   <select1 bind="30">
     <label>What was the #3 topic discussed?</label>
     <item>
-      <label>ARVs and Adherence</label>
+      <label>ARVs &amp; Adherence</label>
       <value>1</value>
     </item>
     <item>
@@ -406,7 +498,7 @@
       <value>3</value>
     </item>
     <item>
-      <label>HIV and the Immune System </label>
+      <label>HIV &amp; the Immune System </label>
       <value>4</value>
     </item>
     <item>
@@ -422,15 +514,15 @@
       <value>7</value>
     </item>
     <item>
-      <label>Palliative and Home based care</label>
+      <label>Palliative &amp; Home based care</label>
       <value>8</value>
     </item>
     <item>
-      <label>PEP and Rape</label>
+      <label>PEP &amp; Rape</label>
       <value>9</value>
     </item>
     <item>
-      <label>PMTCT and Maternal Health</label>
+      <label>PMTCT &amp; Maternal Health</label>
       <value>10</value>
     </item>
     <item>
@@ -450,7 +542,7 @@
       <value>14</value>
     </item>
     <item>
-      <label>STIs</label>
+      <label>STI&apos;s</label>
       <value>15</value>
     </item>
     <item>
@@ -480,7 +572,7 @@
   <select1 bind="32">
     <label>What was the #4 topic discussed?</label>
     <item>
-      <label>ARVs and Adherence</label>
+      <label>ARVs &amp; Adherence</label>
       <value>1</value>
     </item>
     <item>
@@ -492,7 +584,7 @@
       <value>3</value>
     </item>
     <item>
-      <label>HIV and the Immune System </label>
+      <label>HIV &amp; the Immune System </label>
       <value>4</value>
     </item>
     <item>
@@ -508,15 +600,15 @@
       <value>7</value>
     </item>
     <item>
-      <label>Palliative and Home based care</label>
+      <label>Palliative &amp; Home based care</label>
       <value>8</value>
     </item>
     <item>
-      <label>PEP and Rape </label>
+      <label>PEP &amp; Rape </label>
       <value>9</value>
     </item>
     <item>
-      <label>PMTCT and Maternal Health</label>
+      <label>PMTCT &amp; Maternal Health</label>
       <value>10</value>
     </item>
     <item>
@@ -536,7 +628,7 @@
       <value>14</value>
     </item>
     <item>
-      <label>STIs</label>
+      <label>STI&apos;s</label>
       <value>15</value>
     </item>
     <item>
@@ -566,7 +658,7 @@
   <select1 bind="34">
     <label>What was the #5 topic discussed?</label>
     <item>
-      <label>ARVs and Adherence</label>
+      <label>ARVs &amp; Adherence</label>
       <value>1</value>
     </item>
     <item>
@@ -578,7 +670,7 @@
       <value>3</value>
     </item>
     <item>
-      <label>HIV and the Immune System </label>
+      <label>HIV &amp; the Immune System </label>
       <value>4</value>
     </item>
     <item>
@@ -594,15 +686,15 @@
       <value>7</value>
     </item>
     <item>
-      <label>Palliative and Home based care</label>
+      <label>Palliative &amp; Home based care</label>
       <value>8</value>
     </item>
     <item>
-      <label>PEP and Rape</label>
+      <label>PEP &amp; Rape</label>
       <value>9</value>
     </item>
     <item>
-      <label>PMTCT and Maternal Health</label>
+      <label>PMTCT &amp; Maternal Health</label>
       <value>10</value>
     </item>
     <item>
@@ -622,7 +714,7 @@
       <value>14</value>
     </item>
     <item>
-      <label>STIs</label>
+      <label>STI&apos;s</label>
       <value>15</value>
     </item>
     <item>
@@ -649,84 +741,6 @@
   <input bind="35">
     <label>Other topic:</label>
   </input>
-  <select1 bind="18">
-    <label>Did you use a CHMT AV Kit?</label>
-    <item>
-      <label>Yes</label>
-      <value>1</value>
-    </item>
-    <item>
-      <label>No</label>
-      <value>2</value>
-    </item>
-  </select1>
-  <select1 bind="19">
-    <label>Did you show a CHMT DVD?</label>
-    <item>
-      <label>Yes</label>
-      <value>1</value>
-    </item>
-    <item>
-      <label>No</label>
-      <value>2</value>
-    </item>
-  </select1>
-  <select1 bind="20">
-    <label>Did you use Scrutinize material?</label>
-    <item>
-      <label>Yes</label>
-      <value>1</value>
-    </item>
-    <item>
-      <label>No</label>
-      <value>2</value>
-    </item>
-  </select1>
-  <select1 bind="21">
-    <label>Did you show a Spares &amp; Besties DVD?</label>
-    <item>
-      <label>Yes</label>
-      <value>1</value>
-    </item>
-    <item>
-      <label>No</label>
-      <value>2</value>
-    </item>
-  </select1>
-  <select1 bind="22">
-    <label>Did you show a CHMT PSA?</label>
-    <item>
-      <label>Yes</label>
-      <value>1</value>
-    </item>
-    <item>
-      <label>No</label>
-      <value>2</value>
-    </item>
-  </select1>
-  <select1 bind="23">
-    <label>Did someone from CHMT co-facilitate the session with you?</label>
-    <item>
-      <label>No</label>
-      <value>1</value>
-    </item>
-    <item>
-      <label>Yes - a TLT</label>
-      <value>2</value>
-    </item>
-    <item>
-      <label>Yes - a TLP</label>
-      <value>3</value>
-    </item>
-    <item>
-      <label>Yes - a Peer Educator</label>
-      <value>4</value>
-    </item>
-    <item>
-      <label>Yes - TL Coordinator</label>
-      <value>5</value>
-    </item>
-  </select1>
   <input bind="36">
     <label>What is the name of the organization that received training</label>
   </input>
@@ -734,26 +748,12 @@
     <label>Phone number for the organization</label>
   </input>
   <input bind="38">
-    <label>The contact persons name at the organization</label>
+    <label>The contact person&apos;s name at the organization</label>
   </input>
   <input bind="39">
-    <label>Contact persons number</label>
+    <label>Contact person&apos;s number</label>
   </input>
   <input bind="40">
-    <label>Contact persons position</label>
+    <label>Contact person&apos;s position</label>
   </input>
-  <input bind="24">
-    <label>What was the name of the co-facilitator(s)?</label>
-  </input>
-    <select1 bind="25">
-    <label>Has this session been confirmed with a signature or a stamp?</label>
-    <item>
-      <label>Yes</label>
-      <value>1</value>
-    </item>
-    <item>
-      <label>No</label>
-      <value>2</value>
-    </item>
-  </select1>
 </h:html>
