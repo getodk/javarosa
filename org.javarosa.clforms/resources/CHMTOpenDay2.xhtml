@@ -9,37 +9,37 @@
 		<TimeStartRecorded />
 		<TimeEndRecorded />
 	  </Meta>
-		<Condoms qid="139" gid="19"/>
-      <Femidoms qid="140" gid="19"/>
-      <Pamphlets qid="141" gid="19"/>
-      <Chmtpamphlets qid="142" gid="19"/>
-      <Topics1 qid="143" gid="20"/>
-      <Topicother1 qid="144" gid="20"/>
-      <Topics2 qid="145" gid="20"/>
-      <Topicother2 qid="149" gid="20"/>
-      <Topics3 qid="146" gid="20"/>
-      <Topicother3 qid="150" gid="20"/>
-      <Topics4 qid="147" gid="20"/>
-      <Topicother4 qid="151" gid="20"/>
-      <Topics5 qid="148" gid="20"/>
-      <Topicother5 qid="152" gid="20"/>
-      <Date qid="155" gid="21"/>
-      <Prov qid="156" gid="21"/>
-      <Wheretrain qid="163" gid="21"/>
-      <Wheretrainother qid="164" gid="21"/>
-      <LocEC qid="159" gid="21"/>
-      <LocWC qid="157" gid="21"/>
-      <LocGP qid="158" gid="21"/>
-      <LocKZN qid="160" gid="21"/>
-      <LocFS qid="169" gid="21"/>
-      <LocLP qid="167" gid="21"/>
-      <LocMP qid="168" gid="21"/>
-      <LocNW qid="154" gid="21"/>
-      <LocNC qid="153" gid="21"/>
-      <Male qid="161" gid="21"/>
-      <Female qid="162" gid="21"/>
-      <TimeStart qid="166" gid="21"/>
-      <TimeEnd qid="165" gid="21"/>
+      <Condoms qid="333" gid="58"/>
+      <Femidoms qid="334" gid="58"/>
+      <Pamphlets qid="335" gid="58"/>
+      <Chmtpamphlets qid="336" gid="58"/>
+      <Topics1 qid="337" gid="59"/>
+      <Topicother1 qid="338" gid="59"/>
+      <Topics2 qid="339" gid="59"/>
+      <Topicother2 qid="343" gid="59"/>
+      <Topics3 qid="340" gid="59"/>
+      <Topicother3 qid="344" gid="59"/>
+      <Topics4 qid="341" gid="59"/>
+      <Topicother4 qid="345" gid="59"/>
+      <Topics5 qid="342" gid="59"/>
+      <Topicother5 qid="346" gid="59"/>
+      <Date qid="349" gid="60"/>
+      <Prov qid="350" gid="60"/>
+      <Whereopen qid="357" gid="60"/>
+      <Wheretrainother qid="358" gid="60"/>
+      <LocEC qid="353" gid="60"/>
+      <LocWC qid="351" gid="60"/>
+      <LocGP qid="352" gid="60"/>
+      <LocKZN qid="354" gid="60"/>
+      <LocFS qid="363" gid="60"/>
+      <LocLP qid="361" gid="60"/>
+      <LocMP qid="362" gid="60"/>
+      <LocNW qid="348" gid="60"/>
+      <LocNC qid="347" gid="60"/>
+      <Male qid="355" gid="60"/>
+      <Female qid="356" gid="60"/>
+      <TimeStart qid="360" gid="60"/>
+      <TimeEnd qid="359" gid="60"/>
 	</root>
     </instance>
     <bind id="hidden1" nodeset="/root/Meta/UserID" type="xsd:string" jr:preload="context" jr:preloadParams="UserID" />
@@ -64,15 +64,15 @@
     <bind id="30" nodeset="/root/TimeStart" type="xsd:time"/>
     <bind id="31" nodeset="/root/TimeEnd" type="xsd:time"/>
     <bind id="1" nodeset="/root/Topics1" type="xsd:string"/>
-    <bind id="2" nodeset="/root/Topicother1" type="xsd:string" relevant="/root/Topics1='20'"/>
+    <bind id="2" nodeset="/root/Topicother1" type="xsd:string" relevant="/root/Topics1='59'"/>
     <bind id="3" nodeset="/root/Topics2" type="xsd:string"/>
-    <bind id="4" nodeset="/root/Topicother2" type="xsd:string" relevant="/root/Topics2='20'"/>
+    <bind id="4" nodeset="/root/Topicother2" type="xsd:string" relevant="/root/Topics2='59'"/>
     <bind id="5" nodeset="/root/Topics3" type="xsd:string"/>
-    <bind id="6" nodeset="/root/Topicother3" type="xsd:string" relevant="/root/Topics3='20'"/>
+    <bind id="6" nodeset="/root/Topicother3" type="xsd:string" relevant="/root/Topics3='59'"/>
     <bind id="7" nodeset="/root/Topics4" type="xsd:string"/>
-    <bind id="8" nodeset="/root/Topicother4" type="xsd:string" relevant="/root/Topics4='20'"/>
+    <bind id="8" nodeset="/root/Topicother4" type="xsd:string" relevant="/root/Topics4='59'"/>
     <bind id="9" nodeset="/root/Topics5" type="xsd:string"/>
-    <bind id="10" nodeset="/root/Topicother5" type="xsd:string" relevant="/root/Topics5='20'"/>
+    <bind id="10" nodeset="/root/Topicother5" type="xsd:string" relevant="/root/Topics5='59'"/>
     <bind id="11" nodeset="/root/Condoms" type="xsd:int"/>
     <bind id="12" nodeset="/root/Femidoms" type="xsd:int"/>
     <bind id="13" nodeset="/root/Pamphlets" type="xsd:int"/>
@@ -277,14 +277,14 @@
     </item>
     <item>
       <label>Woman&apos;s Health  </label>
-      <value>19</value>
+      <value>58</value>
     </item>
     <item>
       <label>Other topic</label>
-      <value>20</value>
+      <value>59</value>
     </item>
   </select1>
-  <input bind="2" relevant="/root/Topics1='20'">
+  <input bind="2" relevant="/root/Topics1='59'">
     <label>Other topic:</label>
   </input>
   <select1 bind="3">
@@ -363,14 +363,14 @@
     </item>
     <item>
       <label>Woman&apos;s Health  </label>
-      <value>19</value>
+      <value>58</value>
     </item>
     <item>
       <label>Other topic</label>
-      <value>20</value>
+      <value>59</value>
     </item>
   </select1>
-  <input bind="4" relevant="/root/Topics2='20'">
+  <input bind="4" relevant="/root/Topics2='59'">
     <label>Other topic:</label>
   </input>
   <select1 bind="5">
@@ -449,14 +449,14 @@
     </item>
     <item>
       <label>Woman&apos;s Health  </label>
-      <value>19</value>
+      <value>58</value>
     </item>
     <item>
       <label>Other topic</label>
-      <value>20</value>
+      <value>59</value>
     </item>
   </select1>
-  <input bind="6" relevant="/root/Topics3='20'">
+  <input bind="6" relevant="/root/Topics3='59'">
     <label>Other topic:</label>
   </input>
   <select1 bind="7">
@@ -535,14 +535,14 @@
     </item>
     <item>
       <label>Woman&apos;s Health  </label>
-      <value>19</value>
+      <value>58</value>
     </item>
     <item>
       <label>Other topic</label>
-      <value>20</value>
+      <value>59</value>
     </item>
   </select1>
-  <input bind="8" relevant="/root/Topics4='20'">
+  <input bind="8" relevant="/root/Topics4='59'">
     <label>Other topic:</label>
   </input>
   <select1 bind="9">
@@ -621,14 +621,14 @@
     </item>
     <item>
       <label>Woman&apos;s Health  </label>
-      <value>19</value>
+      <value>58</value>
     </item>
     <item>
       <label>Other topic</label>
-      <value>20</value>
+      <value>59</value>
     </item>
   </select1>
-  <input bind="10" relevant="/root/Topics5='20'">
+  <input bind="10" relevant="/root/Topics5='59'">
     <label>Other topic:</label>
   </input>
   <input bind="11">
