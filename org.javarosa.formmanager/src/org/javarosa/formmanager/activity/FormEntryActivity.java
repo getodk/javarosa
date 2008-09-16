@@ -90,24 +90,17 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 
 		if (context instanceof FormEntryContext) {
 			this.context = (FormEntryContext) context;
+			instanceID = this.context.getInstanceID();
 		}
+		
 		theForm = fetcher.getFormDef(context);
 		if (theForm != null) {
-			theForm.setEvaluationContext(initEvaluationContext());
-			initPreloadHandlers(theForm); // must always load; even if we won't
-											// preload, we may still
-											// post-process!
 
-			theForm.initialize(instanceID == -1);
 			try {
 				if (instanceID != -1) {
-					DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility) JavaRosaServiceProvider
-							.instance().getStorageManager()
-							.getRMSStorageProvider().getUtility(
-									DataModelTreeRMSUtility.getUtilityName());
+					DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
 					IFormDataModel theModel = new DataModelTree();
-					modelUtil.retrieveFromRMS(this.context.getInstanceID(),
-							theModel);
+					modelUtil.retrieveFromRMS(this.context.getInstanceID(), theModel);
 					theForm.setDataModel(theModel);
 				}
 			} catch (IOException e) {
@@ -119,6 +112,11 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			} catch (UnavailableExternalizerException uee) {
 				uee.printStackTrace();
 			}
+			
+			theForm.setEvaluationContext(initEvaluationContext());
+			initPreloadHandlers(theForm); // must always load; even if we won't preload, we may still post-process!
+
+			theForm.initialize(instanceID == -1);
 
 			model = new FormEntryModel(theForm, instanceID);
 			controller = new FormEntryController(model, this);

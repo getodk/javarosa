@@ -10,8 +10,6 @@ import java.util.NoSuchElementException;
 import org.javarosa.core.util.OrderedHashtable;
 
 public class LocalizerTest extends TestCase  {
-	public final int NUM_TESTS = 29;
-	
 	public LocalizerTest(String name, TestMethod rTestMethod) {
 		super(name, rTestMethod);
 	}
@@ -39,7 +37,8 @@ public class LocalizerTest extends TestCase  {
 
 		return aSuite;
 	}
-	
+
+	public final int NUM_TESTS = 29;
 	public void testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
