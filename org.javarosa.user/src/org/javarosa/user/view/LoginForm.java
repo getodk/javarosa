@@ -160,8 +160,8 @@ public class LoginForm extends Form
 
 		   if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))
 			   {
-			   System.out.println("found a user: "+discoveredUser.getUsername()+" with type: "+discoveredUser.getType());
-			   return discoveredUser.getType();
+			   System.out.println("found a user: "+discoveredUser.getUsername()+" with type: "+discoveredUser.getUserType());
+			   return discoveredUser.getUserType();
 			   }
 
 	     return "userNotFound";
