@@ -91,8 +91,7 @@ public class FormEntryController {
 
 	        //notify of save details
 	        //String info = "Form saved to 'Saved Forms' at "+ instance.getDateSaved().toString();
-	       //System.out.println(info);
-			//javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("Save Successful!", info,null,AlertType.INFO);
+			//Alert a = new Alert("Save Successful!", info, null, AlertType.INFO);
 			//a.setTimeout(2000);
 			//setDisplay(a);
 
