@@ -62,7 +62,8 @@
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
-				<!--	<source dir="${basedir}/../org.javarosa.entitymgr/src/"/> -->
+					<source dir="${basedir}/../org.javarosa.user/test/"/>
+					<!-- <source dir="${basedir}/../org.javarosa.entitymgr/src/"/> -->
 					<source dir="${basedir}/../org.javarosa.patient/src/"/>
 					<source dir="${basedir}/../org.javarosa.patient/test/"/>
 				<!--	<source dir="${basedir}/../org.javarosa.patientmgr/src/"/> -->
@@ -157,8 +158,9 @@
 		<RunTestSuite suite="org.javarosa.core.model.data.test.SelectOneDataTests"/>
 		<RunTestSuite suite="org.javarosa.core.model.data.test.SelectMultiDataTests"/>
 		<RunTestSuite suite="org.javarosa.core.model.instance.test.QuestionDataElementTests"/>
+		<RunTestSuite suite="org.javarosa.user.model.test.UserTests"/>
 		<!--RunTestSuite suite="org.javarosa.formmanager.test.ExtensionIntegrationTests"/-->
-		
+
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
