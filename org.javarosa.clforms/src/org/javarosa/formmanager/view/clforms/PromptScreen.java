@@ -1,4 +1,4 @@
-package org.javarosa.formmanager.view.clforms;
+/*package org.javarosa.formmanager.view.clforms;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
@@ -49,7 +49,7 @@ public class PromptScreen extends Form implements ItemCommandListener, CommandLi
 
 
 	public boolean checkRequired() {
-	/*	boolean result = false;
+		boolean result = false;
 		//LOG
 		// System.out.println("Checking required for: "+p.getLongText()+" req? "+p.isRequired());
 		//only if the Prompt is required we perform the check
@@ -106,7 +106,7 @@ public class PromptScreen extends Form implements ItemCommandListener, CommandLi
 			}
 		}
 
-		return result;*/
+		return result;
 		return false;
 	}
 
@@ -166,7 +166,7 @@ public class PromptScreen extends Form implements ItemCommandListener, CommandLi
 		setHint();
 		stringForm();
 		// screen by type
-		/*switch (p.getReturnType()) {
+		switch (p.getReturnType()) {
 		case org.javarosa.clforms.api.Constants.RETURN_INTEGER:
 			intForm();
 			break;
@@ -185,14 +185,14 @@ public class PromptScreen extends Form implements ItemCommandListener, CommandLi
 		case org.javarosa.clforms.api.Constants.RETURN_BOOLEAN:
 			booleanForm();
 			break;
-		}*/
+		}
 
 
-		/*
+
 		screen.addCommand(saveAndReloadCommand);
 		screen.addCommand(cancelCommand);
 		screen.addCommand(nextCommand);
-		screen.addCommand(goToListCommand);*/
+		screen.addCommand(goToListCommand);
 	}
 
 	private void addCommands() {
@@ -226,7 +226,7 @@ public class PromptScreen extends Form implements ItemCommandListener, CommandLi
 	}
 
 
-	/*private void intForm() {
+	private void intForm() {
 
 		commentField = new TextField(p.getLongText(), "", 40, TextField.NUMERIC); //$NON-NLS-1$
 		String[] parameters = new String[2];
@@ -247,7 +247,7 @@ public class PromptScreen extends Form implements ItemCommandListener, CommandLi
 		((Form) screen).append(commentField);
 
 		addNavigaitonButtons();
-	}*/
+	}
 
 	private void addNavigaitonButtons() {
 		StringItem backItem = new StringItem(null,"BACK",Item.BUTTON);
@@ -256,8 +256,8 @@ public class PromptScreen extends Form implements ItemCommandListener, CommandLi
 
 		//nextItem.setPreferredSize(40,25);
 		//backItem.setPreferredSize(40,25);
-		/*nextItem.setLayout(Item.LAYOUT_LEFT);
-		backItem.setLayout(Item.LAYOUT_RIGHT);*/
+		nextItem.setLayout(Item.LAYOUT_LEFT);
+		backItem.setLayout(Item.LAYOUT_RIGHT);
 
 		this.append(nextItem);
 	    //((Form) screen).append(backItem);
@@ -276,18 +276,18 @@ public class PromptScreen extends Form implements ItemCommandListener, CommandLi
 		this.append(commentField);
 
 		//check if the field has already been filled in - if so display value
-		/*if (p.getValue() != null){
+		if (p.getValue() != null){
 			commentField.setString((String)p.getValue());
 		}
 		else if (p.getDefaultValue() != null){
 			commentField.setString(((String)p.getDefaultValue()));
-		}*/
+		}
 
 
 		addNavigaitonButtons();
 	}
 
-	/*private void dateForm() {
+	private void dateForm() {
 
 		DateField datePicker = new DateField(p.getLongText(), DateField.DATE);
 
@@ -422,7 +422,7 @@ public class PromptScreen extends Form implements ItemCommandListener, CommandLi
 
 		addNavigaitonButtons();
 
-	}*/
+	}
 
 	public void show() {
 		createView();
@@ -436,3 +436,4 @@ public class PromptScreen extends Form implements ItemCommandListener, CommandLi
 	}
 
 }
+*/
