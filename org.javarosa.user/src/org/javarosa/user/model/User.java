@@ -32,15 +32,6 @@ public class User implements Externalizable, IDRecordable
 		userType = STANDARD;
 	}
 
-	public void setType (String typeIn)
-	{
-		userType = typeIn;
-	}
-
-	public String getType()
-	{
-		return userType;
-	}
 	public User(String name, String passw)
 	{
 		username = name;
@@ -51,16 +42,16 @@ public class User implements Externalizable, IDRecordable
 	{
 		username = name;
 		password = passw;
-		if (isAAdmin.equals( ADMINUSER))
+		if (isAAdmin.equals(ADMINUSER))
 		{
-			this.setType( ADMINUSER);
+			this.setUserType(ADMINUSER);
 		}
 		else if (isAAdmin.equals( STANDARD))
 		{
-			this.setType( STANDARD);
+			this.setUserType(STANDARD);
 		}
-		else if (isAAdmin.equals( USERTYPE1))
-			this.setType( USERTYPE1);
+		else if (isAAdmin.equals(USERTYPE1))
+			this.setUserType( USERTYPE1);
 		else
 			System.out.println("while creating user, an invalid isAAdmin variable was passed in: options are \"STANDARD\" or \"ADMINSUER\" or \"USERTYPE1\"");
 	}
