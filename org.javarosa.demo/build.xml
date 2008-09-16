@@ -52,6 +52,7 @@
 					<source dir="${basedir}/../org.javarosa.communication/src/"/>
 					<source dir="${basedir}/../org.javarosa.clforms/src/"/>
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
+					<source dir="${basedir}/../org.javarosa.core/test/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/test/"/>
 					<source dir="${basedir}/../org.javarosa.demo/test/"/>
@@ -150,6 +151,7 @@
 		<RunTestSuite suite="org.javarosa.core.model.test.QuestionDefTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.NumericEncodingTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.LocalizerTest"/>
+		<!-- <RunTestSuite suite="org.javarosa.core.model.test.ExternalizableTest"/> -->
 		<RunTestSuite suite="org.javarosa.demo.xform.test.DemoFormsTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.data.test.DateDataTests"/>
 		<RunTestSuite suite="org.javarosa.core.model.data.test.IntegerDataTests"/>
