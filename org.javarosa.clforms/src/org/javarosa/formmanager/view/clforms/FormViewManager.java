@@ -6,9 +6,9 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Gauge;
-import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
+import javax.microedition.lcdui.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
@@ -37,18 +37,19 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	private IAnswerData answer;
 	private SingleQuestionScreen widget;
 	Gauge progressBar;
+	private boolean showFormView;
+	private FormViewScreen formView;
 	// GUI elements
-	public FormViewManager(String formTitle, FormEntryModel model, FormEntryController controller, int questionIndex, FormViewScreen node)
+	public FormViewManager(String formTitle, FormEntryModel model, FormEntryController controller)
 	{
-
-	   	this.parent = node;
 		this.model = model;
     	this.controller = controller;
-//immediately setup question, need to decide if this is the best place to do it
-    	this.getView(questionIndex);
-    	//controller.setView(this);
+    	this.showFormView = true;
     	model.registerObservable(this);
-    	
+//immediately setup question, need to decide if this is the best place to do it
+//    	this.getView(questionIndex);
+    	//controller.setView(this);
+
 	}
 
 	public int getIndex()
@@ -59,7 +60,6 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
 	public void getView(int qIndex)
 	{
-
 		prompt = model.getQuestion(qIndex);
 		//checks question type
 		int qType = prompt.getDataType();
@@ -72,57 +72,39 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 			case Constants.DATATYPE_TEXT:
 				//go to TextQuestion Widget
 				widget = new TextQuestionWidget(prompt);
-				widget.setCommandListener(this);
-				widget.setItemCommandListner(this);
-				controller.setDisplay(widget);
 				break;
 			case Constants.DATATYPE_DATE:
 				//go to DateQuestion Widget
 				widget = new DateQuestionWidget(prompt);
-				widget.setCommandListener(this);
-				widget.setItemCommandListner(this);
-				controller.setDisplay(widget);
 				break;
 			case Constants.DATATYPE_TIME:
 				//go to TimeQuestion Widget
 				widget = new TimeQuestionWidget(prompt);
-				widget.setCommandListener(this);
-				widget.setItemCommandListner(this);
-				controller.setDisplay(widget);
 				break;
 			case Constants.DATATYPE_INTEGER:
 				widget = new NumericQuestionWidget(prompt);
-				widget.setCommandListener(this);
-				widget.setItemCommandListner(this);
-				controller.setDisplay(widget);
 				break;
 			}
 			break;
 		case Constants.CONTROL_SELECT_ONE:
 			//go to SelectQuestion widget
 			widget = new Select1QuestionWidget(prompt);
-			widget.setCommandListener(this);
-			widget.setItemCommandListner(this);
-			controller.setDisplay(widget);
 			break;
 		case Constants.CONTROL_SELECT_MULTI:
 			//go to SelectQuestion Widget
 			widget = new SelectQuestionWidget(prompt);
-			widget.setCommandListener(this);
-			widget.setItemCommandListner(this);
-			controller.setDisplay(widget);
 			break;
 		case Constants.CONTROL_TEXTAREA:
 			//go to TextQuestion Widget
 			widget = new TextQuestionWidget(prompt);
-			widget.setCommandListener(this);
-			widget.setItemCommandListner(this);
-			controller.setDisplay(widget);
 			break;
 		default:
 			System.out.println("Unsupported type!");
 			break;
 		}
+		widget.setCommandListener(this);
+		widget.setItemCommandListner(this);
+		controller.setDisplay(widget);
 	}
 
 
@@ -139,7 +121,16 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
 
 	public void show() {
-		getView(getIndex());//refresh view
+		if (this.showFormView)
+			showFormViewScreen();
+		else
+			getView(getIndex());//refresh view
+	}
+
+	private void showFormViewScreen() {
+		formView = new FormViewScreen(this.model);
+		formView.setCommandListener(this);
+		controller.setDisplay(formView);
 	}
 
 	public void refreshView()
@@ -171,43 +162,62 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	}
 
 
-    
+
 	public void commandAction(Command command, Displayable arg1)
 	{
-		if (command == SingleQuestionScreen.nextItemCommand || command == SingleQuestionScreen.nextCommand) {
-			answer=widget.getWidgetValue();
+		if(arg1 == formView){
+			if (command == formView.backCommand) {
+				this.show();
+			} else if (command == formView.exitNoSaveCommand) {
+				controller.exit();
+			} else if (command == formView.exitSaveCommand) {
+				controller.save();
+				controller.exit();
+			} else if (command == formView.sendCommand) {
+				model.setFormComplete();
+				//controller.exit();
+			} else if (command == List.SELECT_COMMAND) {
+				this.showFormView = false;
+				int i = formView.getSelectedIndex();
+				int b = formView.indexHash.get(i);
+				getView(b);
+				controller.selectQuestion(b);
+			}
 
-				//System.out.println("you answered "+ answer.getDisplayText()+" for "+prompt.getLongText()+" moving on");
+		}else{
+			if (command == SingleQuestionScreen.nextItemCommand || command == SingleQuestionScreen.nextCommand) {
+				answer=widget.getWidgetValue();
 
-				if(prompt.isRequired() && answer == null)
-				{
-					String txt = "This is a compulsory question and must be completed first to proceed";
-					Alert alert = new Alert("Question Required!", txt, null, AlertType.ERROR);
-					controller.setDisplay(alert);
-				}
-				else{
-				//save and proceed to next question
-					controller.commitAnswer(this.prompt, answer);
-					if(model.getQuestionIndex()+1 < model.getNumQuestions() )
+					//System.out.println("you answered "+ answer.getDisplayText()+" for "+prompt.getLongText()+" moving on");
+
+					if(prompt.isRequired() && answer == null)
 					{
-						controller.stepQuestion(true);
+						String txt = "This is a compulsory question and must be completed first to proceed";
+						Alert alert = new Alert("Question Required!", txt, null, AlertType.ERROR);
+						controller.setDisplay(alert);
 					}
 					else{
-					   controller.save();//always save
-					   parent.show();
-					//parent.show();
-//					formComplete();//go to form view list instead
-//						model.setFormComplete();
+					//save and proceed to next question
+						controller.commitAnswer(this.prompt, answer);
+						if(model.getQuestionIndex()+1 < model.getNumQuestions() )
+						{
+							controller.stepQuestion(true);
+						}
+						else{
+						   controller.save();//always save
+						   this.showFormView = true;
+						   showFormViewScreen();
+						}
 					}
-				}
-		}
-		else if (command == SingleQuestionScreen.previousCommand) {
-			controller.stepQuestion(false);
-			refreshView();
-		}
-		else if (command == SingleQuestionScreen.viewAnswersCommand){
-			//controller.save();//always save
-			 parent.show();
+			}
+			else if (command == SingleQuestionScreen.previousCommand) {
+				controller.stepQuestion(false);
+				refreshView();
+			}
+			else if (command == SingleQuestionScreen.viewAnswersCommand){
+				this.showFormView = true;
+				showFormViewScreen();
+			}
 		}
 	}
 
@@ -222,4 +232,12 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
       }
     }
+
+	public boolean isShowOverView() {
+		return showFormView;
+	}
+
+	public void setShowOverView(boolean showOverView) {
+		this.showFormView = showOverView;
+	}
 }

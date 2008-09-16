@@ -6,11 +6,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
-import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
-import org.javarosa.activity.splashscreen.SplashScreenActivity;
 import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
@@ -349,7 +347,15 @@ public class JavaRosaDemoShell implements IShell {
 					+ "]; setting to [" + defaultValue + "]"); // debug
 			//#endif
 			return defaultValue;
-		}
+		}/*else {
+			propVal.addElement(defaultValue);
+			JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propName, propVal);
+			//#if debug.output==verbose
+			System.out.println("added value for [" + propName
+					+ "]; setting to [" + defaultValue + "]"); // debug
+			//#endif
+			return defaultValue;
+		}*/
 		return (String) propVal.elementAt(0);
 	}
 
@@ -359,9 +365,14 @@ public class JavaRosaDemoShell implements IShell {
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FormManagerProperties());
 
 		initProperty("DeviceID", genGUID(25));
-		initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CHATTERBOX);
-		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
-		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
+		initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CLFORMS);
+		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://survey.cell-life.org/admin/post2limeNew.php");
+		Vector v = JavaRosaServiceProvider.instance().getPropertyManager().getProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY);
+		v.addElement("http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
+		JavaRosaServiceProvider.instance().getPropertyManager().setProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, v);
+//		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
+//		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
+		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://survey.cell-life.org/admin/post2limeNew.php");
 		//		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://update.cell-life.org/save_dump_org.php");
 //		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://update.cell-life.org/save_dump_org.php");
 	//	initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CLFORMS);
