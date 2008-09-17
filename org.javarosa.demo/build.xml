@@ -151,7 +151,7 @@
 		<RunTestSuite suite="org.javarosa.core.model.test.QuestionDefTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.NumericEncodingTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.LocalizerTest"/>
-		<!-- <RunTestSuite suite="org.javarosa.core.model.test.ExternalizableTest"/> -->
+		<RunTestSuite suite="org.javarosa.core.util.test.ExtUtilTest"/>
 		<RunTestSuite suite="org.javarosa.demo.xform.test.DemoFormsTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.data.test.DateDataTests"/>
 		<RunTestSuite suite="org.javarosa.core.model.data.test.IntegerDataTests"/>
