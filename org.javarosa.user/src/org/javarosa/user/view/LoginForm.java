@@ -69,7 +69,7 @@ public class LoginForm extends Form
 					e.printStackTrace();
 				}
 		      }
-		  userName = new TextField("Username:", tempuser.getUsername(), 10, TextField.ANY);
+		  userName = new TextField("Username:", tempuser.getUsername(), 50, TextField.ANY);
 	      password = new TextField("Password:", "", 10, TextField.PASSWORD);
 	      this.addCommand(CMD_CANCEL_LOGIN);
 
