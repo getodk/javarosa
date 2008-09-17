@@ -117,7 +117,7 @@ public class Localizer implements Externalizable {
 	 */
 	public String getNextLocale () {
 		return currentLocale == null ? defaultLocale
-									 : (String)localeData.keyAt((localeData.getIndex(currentLocale) + 1) % localeData.size());
+									 : (String)localeData.keyAt((localeData.indexOfKey(currentLocale) + 1) % localeData.size());
 	}
 	
 	/* === MANAGING CURRENT AND DEFAULT LOCALES === */
