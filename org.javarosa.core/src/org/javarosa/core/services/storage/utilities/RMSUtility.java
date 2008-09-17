@@ -497,6 +497,28 @@ public class RMSUtility implements RecordListener
         }
 	}
 
+    public float computeSpace()
+    {
+    	float currentSize = 0;
+    	float remainingSize = 0;
+    	float totalSize = 0;
+    	float space = 0;
+    	//get total size of record store
+    	try {
+			currentSize = recordStore.getSize();
+			remainingSize = recordStore.getSizeAvailable();
+			totalSize = currentSize + remainingSize;
+			}
+    	catch (RecordStoreNotOpenException e) {
+			// TODO Auto-generated catch block
+			//#if debug.output==verbose || debug.output==exception
+			e.printStackTrace();
+			//#endif
+		}
+    	
+    	space = remainingSize/totalSize;
     
+    	return space;
+    }
     
 }
