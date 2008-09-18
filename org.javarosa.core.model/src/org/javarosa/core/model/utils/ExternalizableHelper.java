@@ -757,4 +757,38 @@ public class ExternalizableHelper {
 		}
 		return 0;
 	}	
+	
+	public static boolean equals (Vector a, Vector b) {
+		if (a.size() != b.size()) {
+			return false;
+		} else {
+			for (int i = 0; i < a.size(); i++) {
+				if (!a.elementAt(i).equals(b.elementAt(i))) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+	}
+	
+	//assumes that (for plain hashtables) if contents are equals, keys will be returned in the same order
+	public static boolean equals (Hashtable a, Hashtable b) {
+		if (a.size() != b.size()) {
+			return false;
+		} else {
+			for (Enumeration ea = a.keys(), eb = b.keys(); ea.hasMoreElements(); ) {
+				Object keyA = ea.nextElement();
+				Object keyB = eb.nextElement();
+				
+				if (!keyA.equals(keyB)) {
+					return false;
+				} else if (!a.get(keyA).equals(b.get(keyB))) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+	}
 }
