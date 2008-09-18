@@ -46,6 +46,10 @@ public class ExtUtilTest extends TestCase {
 	}
 	
 	public void testExternalizable (Object orig, Object template) {
+		testExternalizable(orig, template, null);
+	}
+	
+	public void testExternalizable (Object orig, Object template, Vector prototypes) {
 		byte[] bytesOut;
 		Object deser;
 		Object base = orig;
@@ -69,7 +73,7 @@ public class ExtUtilTest extends TestCase {
 			if (template instanceof Class) {
 				deser = ExtUtil.read(new DataInputStream(bais), (Class)template);
 			} else if (template instanceof ExternalizableWrapper) {
-				deser = ExtUtil.read(new DataInputStream(bais), (ExternalizableWrapper)template);				
+				deser = ExtUtil.read(new DataInputStream(bais), (ExternalizableWrapper)template, prototypes);				
 			} else {
 				throw new ClassCastException();
 			}
@@ -170,22 +174,22 @@ public class ExtUtilTest extends TestCase {
 		testExternalizable(new ExtWrapList(y, new ExtWrapList(Integer.class)), new ExtWrapList(new ExtWrapList(Integer.class)));
 		testExternalizable(new ExtWrapList(new Vector(), new ExtWrapList(Integer.class)), new ExtWrapList(new ExtWrapList(Integer.class)));
 		
-		testExternalizable(new ExtWrapTagged("string"), new ExtWrapTagged(null, null));
-		testExternalizable(new ExtWrapTagged(new Integer(5000)), new ExtWrapTagged(null, null));
+		testExternalizable(new ExtWrapTagged("string"), new ExtWrapTagged());
+		testExternalizable(new ExtWrapTagged(new Integer(5000)), new ExtWrapTagged());
 		Vector proto = new Vector();
 		proto.addElement(SampleExtz.class);
-		testExternalizable(new ExtWrapTagged(new SampleExtz("bon", "jovi")), new ExtWrapTagged(null, proto));
-		testExternalizable(new ExtWrapTagged(new ExtWrapList(v)), new ExtWrapTagged(null, null));
+		testExternalizable(new ExtWrapTagged(new SampleExtz("bon", "jovi")), new ExtWrapTagged(), proto);
+		testExternalizable(new ExtWrapTagged(new ExtWrapList(v)), new ExtWrapTagged());
 		
-		testExternalizable(new ExtWrapTagged(new ExtWrapNullable("string")), new ExtWrapTagged(null, null));
-		testExternalizable(new ExtWrapTagged(new ExtWrapNullable((String)null)), new ExtWrapTagged(null, null));
-		testExternalizable(new ExtWrapTagged(new ExtWrapList(y, new ExtWrapList(Integer.class))), new ExtWrapTagged(null, null));
+		testExternalizable(new ExtWrapTagged(new ExtWrapNullable("string")), new ExtWrapTagged());
+		testExternalizable(new ExtWrapTagged(new ExtWrapNullable((String)null)), new ExtWrapTagged());
+		testExternalizable(new ExtWrapTagged(new ExtWrapList(y, new ExtWrapList(Integer.class))), new ExtWrapTagged());
 		
 		Vector a = new Vector();
 		a.addElement(new Integer(47));
 		a.addElement("string");
 		a.addElement(Boolean.FALSE);
 		testExternalizable(new ExtWrapListPoly(a), new ExtWrapListPoly());
-		testExternalizable(new ExtWrapTagged(new ExtWrapListPoly(a)), new ExtWrapTagged(null, null));
+		testExternalizable(new ExtWrapTagged(new ExtWrapListPoly(a)), new ExtWrapTagged());
 	}
 }

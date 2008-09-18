@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Vector;
 
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
@@ -96,7 +97,12 @@ public class ExtUtil {
 	
 	public static Object read (DataInputStream in, ExternalizableWrapper ew) throws
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		ew.readExternal(in);
+		return read(in, ew, null);
+	}
+	
+	public static Object read (DataInputStream in, ExternalizableWrapper ew, Vector prototypes) throws
+		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+		ew.readExternal(in, ExtWrapTagged.initPrototypes(prototypes));
 		return ew.val;
 	}
 	

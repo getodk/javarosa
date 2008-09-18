@@ -40,7 +40,7 @@ public class ExtWrapIntEncodingUniform extends ExternalizableWrapper {
 		return new ExtWrapIntEncodingUniform(l);
 	}
 	
-	public void readExternal(DataInputStream in) throws 
+	public void readExternal(DataInputStream in, Vector prototypes) throws 
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		long l = 0;
 		byte b;
