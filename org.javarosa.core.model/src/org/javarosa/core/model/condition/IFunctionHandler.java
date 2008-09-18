@@ -1,4 +1,4 @@
-package org.javarosa.xpath;
+package org.javarosa.core.model.condition;
 
 import java.util.Vector;
 

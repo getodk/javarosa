@@ -2,7 +2,7 @@ package org.javarosa.demo.shell;
 
 import java.util.Vector;
 
-import org.javarosa.xpath.IFunctionHandler;
+import org.javarosa.core.model.condition.IFunctionHandler;
 
 public class TestFunctionHandler implements IFunctionHandler {
 

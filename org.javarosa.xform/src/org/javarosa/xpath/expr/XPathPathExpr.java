@@ -2,6 +2,7 @@ package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
@@ -11,7 +12,6 @@ import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
-import org.javarosa.xpath.EvaluationContext;
 import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathPathExpr extends XPathExpression {
@@ -35,7 +35,7 @@ public class XPathPathExpr extends XPathExpression {
 		this.filtExpr = filtExpr;
 	}
 	
-	public String getXPath () {
+	public XPathReference getXPath () {
 		StringBuffer sb = new StringBuffer();
 		
 		if (init_context == INIT_CONTEXT_EXPR)
@@ -59,12 +59,11 @@ public class XPathPathExpr extends XPathExpression {
 				sb.append("/");
 		}
 			
-		return sb.toString();
+		return new XPathReference(sb.toString());
 	}
 	
 	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
-		String xpathRef = getXPath();
-		IDataReference ref = new XPathReference(xpathRef);
+		IDataReference ref = getXPath();
 		IAnswerData val = model.getDataValue(ref);
 		
 		if (val == null) {

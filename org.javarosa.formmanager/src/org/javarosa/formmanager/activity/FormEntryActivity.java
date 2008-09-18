@@ -18,6 +18,8 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.utils.ContextPreloadHandler;
@@ -32,8 +34,6 @@ import org.javarosa.formmanager.utility.IFormDefRetrievalMethod;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
-import org.javarosa.xpath.EvaluationContext;
-import org.javarosa.xpath.IFunctionHandler;
 
 public class FormEntryActivity implements IActivity, IControllerHost, CommandListener {
 

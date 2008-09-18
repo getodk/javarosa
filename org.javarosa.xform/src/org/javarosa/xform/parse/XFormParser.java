@@ -5,13 +5,13 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.model.Condition;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.QuestionDataElement;
@@ -22,6 +22,7 @@ import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.IXFormBindHandler;
 import org.javarosa.xform.util.XFormAnswerDataParser;
+import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -582,6 +583,7 @@ public class XFormParser {
 
 	private static Condition buildCondition (String xpath, String type) {
 		XPathExpression expr;
+		XPathConditional cond;
 		int trueAction = -1, falseAction = -1;
 
 		if ("relevant".equals(type)) {
@@ -596,16 +598,15 @@ public class XFormParser {
 		}
 
 		try {
-			expr = XPathParseTool.parseXPath(xpath);
-		} catch (XPathSyntaxException xse) {
+			cond = new XPathConditional(xpath);
+		} catch (RuntimeException re) {
 			//#if debug.output==verbose
 			System.err.println("Invalid XPath expression [" + xpath + "]!");
 			//#endif
 			return null;
 		}
 
-		Condition c = new Condition(expr, trueAction, falseAction);
-		c.xpath = xpath;
+		Condition c = new Condition(cond, trueAction, falseAction);
 		return c;
 	}
 

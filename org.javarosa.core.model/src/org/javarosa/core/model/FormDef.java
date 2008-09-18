@@ -7,6 +7,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.javarosa.core.model.condition.Condition;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
@@ -16,7 +18,6 @@ import org.javarosa.core.model.utils.QuestionPreloader;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
-import org.javarosa.xpath.EvaluationContext;
 
 /**
  * Definition of a form. This has some meta data about the form definition and  
@@ -34,7 +35,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private Vector conditions;
 	private IFormDataModel model;
 
-	private Hashtable conditionTriggerIndex; /* String (xpath reference) -> Vector of Condition */
+	private Hashtable conditionTriggerIndex; /* String IDataReference -> Vector of Condition */
 	private EvaluationContext conditionEvalContext;
 	
 	private QuestionPreloader preloader = new QuestionPreloader();
@@ -165,7 +166,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		
 		Vector triggers = condition.getTriggers();
 		for (int i = 0; i < triggers.size(); i++) {
-			String trigger = (String)triggers.elementAt(i);
+			IDataReference trigger = (IDataReference)triggers.elementAt(i);
 			if (!conditionTriggerIndex.containsKey(trigger)) {
 				conditionTriggerIndex.put(trigger, new Vector());
 			}
@@ -197,8 +198,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * general way in the future.
 	 */
 	public void evaluateConditions (IDataReference ref) {
-		String xpathRef = (String)ref.getReference();
-		Vector conditions = (Vector)conditionTriggerIndex.get(xpathRef);
+		Vector conditions = (Vector)conditionTriggerIndex.get(ref);
 		if (conditions == null)
 			return;
 		

@@ -5,7 +5,6 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry kind="var" path="J2MELIB"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/midp-2.0.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/enough-j2mepolish-client.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

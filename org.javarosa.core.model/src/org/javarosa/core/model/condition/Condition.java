@@ -1,21 +1,16 @@
-package org.javarosa.core.model;
+package org.javarosa.core.model.condition;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
-import org.javarosa.xpath.EvaluationContext;
-import org.javarosa.xpath.XPathParseTool;
-import org.javarosa.xpath.expr.XPathBinaryOpExpr;
-import org.javarosa.xpath.expr.XPathExpression;
-import org.javarosa.xpath.expr.XPathFuncExpr;
-import org.javarosa.xpath.expr.XPathPathExpr;
-import org.javarosa.xpath.expr.XPathUnaryOpExpr;
-import org.javarosa.xpath.parser.XPathSyntaxException;
 
 public class Condition implements Externalizable {
 	public static final int ACTION_NULL = 0;
@@ -28,24 +23,22 @@ public class Condition implements Externalizable {
 	public static final int ACTION_REQUIRE = 7;
 	public static final int ACTION_DONT_REQUIRE = 8;
 	
-	private XPathExpression expr;
+	private IConditionExpr expr;
 	private int trueAction;
 	private int falseAction;
 	private Vector affectedQuestions;
 	
-	//hackiness for now to ease comparison and serialization
-	public String xpath; 
 	private Vector qIDs;
 	
 	public Condition () {
 		this(null, ACTION_NULL, ACTION_NULL);
 	}
 	
-	public Condition (XPathExpression expr, int trueAction, int falseAction) {
+	public Condition (IConditionExpr expr, int trueAction, int falseAction) {
 		this(expr, trueAction, falseAction, new Vector());
 	}
 	
-	public Condition (XPathExpression expr, int trueAction, int falseAction, Vector affectedQuestions) {
+	public Condition (IConditionExpr expr, int trueAction, int falseAction, Vector affectedQuestions) {
 		this.expr = expr;
 		this.trueAction = trueAction;
 		this.falseAction = falseAction;
@@ -56,8 +49,8 @@ public class Condition implements Externalizable {
 		if (evalContext == null) {
 			evalContext = new EvaluationContext();
 		}	
-			
-		boolean result = XPathFuncExpr.toBoolean(expr.eval(model, evalContext)).booleanValue();
+		
+		boolean result = expr.eval(model, evalContext);
 		
 		for (int i = 0; i < affectedQuestions.size(); i++) {
 			performAction((QuestionDef)affectedQuestions.elementAt(i), result ? trueAction : falseAction);
@@ -87,28 +80,11 @@ public class Condition implements Externalizable {
 	}
 	
 	public Vector getTriggers () {
-		Vector v = new Vector();
-		getTriggers(expr, v);
-		return v;
-	}
-
-	private void getTriggers (XPathExpression x, Vector v) {
-		if (x instanceof XPathPathExpr) {
-			v.addElement(((XPathPathExpr)x).getXPath());
-		} else if (x instanceof XPathBinaryOpExpr) {
-			getTriggers(((XPathBinaryOpExpr)x).a, v);
-			getTriggers(((XPathBinaryOpExpr)x).b, v);			
-		} else if (x instanceof XPathUnaryOpExpr) {
-			getTriggers(((XPathUnaryOpExpr)x).a, v);
-		} else if (x instanceof XPathFuncExpr) {
-			XPathFuncExpr fx = (XPathFuncExpr)x;
-			for (int i = 0; i < fx.args.length; i++)
-				getTriggers(fx.args[i], v);
-		}
+		return expr.getTriggers();
 	}
 	
 	public boolean equals (Condition c) {
-		return (this.trueAction == c.trueAction && this.falseAction == c.falseAction && this.xpath.equals(c.xpath));
+		return (this.trueAction == c.trueAction && this.falseAction == c.falseAction && this.expr.equals(c.expr));
 	}
 	
 	public void readExternal(DataInputStream in) throws IOException,
@@ -116,10 +92,14 @@ public class Condition implements Externalizable {
 			UnavailableExternalizerException {
 		trueAction = ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT);
 		falseAction = ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT);
-		xpath = ExternalizableHelper.readUTF(in);
+		
+		//TOTAL HACK!!!
 		try {
-			expr = XPathParseTool.parseXPath(xpath);
-		} catch (XPathSyntaxException xse) { }
+			expr = (IConditionExpr)Class.forName("org.javarosa.xpath.XPathConditional").newInstance();
+		} catch (ClassNotFoundException cnfe) {
+			throw new RuntimeException("can't find org.javarosa.xpath.XPathConditional... moved?");
+		}
+		expr.readExternal(in);
 		
 		//affected q's
 		qIDs = ExternalizableHelper.readIntegers(in);
@@ -136,8 +116,7 @@ public class Condition implements Externalizable {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExternalizableHelper.writeNumeric(out, trueAction, ExternalizableHelper.ENCODING_NUM_DEFAULT);
 		ExternalizableHelper.writeNumeric(out, falseAction, ExternalizableHelper.ENCODING_NUM_DEFAULT);
-		ExternalizableHelper.writeUTF(out, xpath);
-		//don't write expr; will rebuild from xpath
+		expr.writeExternal(out);
 		
 		//affected q's
 		qIDs = new Vector();

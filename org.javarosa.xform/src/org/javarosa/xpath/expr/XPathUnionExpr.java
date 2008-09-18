@@ -1,7 +1,7 @@
 package org.javarosa.xpath.expr;
 
 import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.xpath.EvaluationContext;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathUnionExpr extends XPathBinaryOpExpr {

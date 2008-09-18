@@ -7,10 +7,10 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.xpath.EvaluationContext;
 import org.javarosa.xpath.IExprDataType;
-import org.javarosa.xpath.IFunctionHandler;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 

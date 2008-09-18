@@ -5,9 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
-import org.javarosa.xpath.EvaluationContext;
 
 public class XPathArithExpr extends XPathBinaryOpExpr {
 	public static final int ADD = 0;

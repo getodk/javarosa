@@ -3,8 +3,8 @@ package org.javarosa.formmanager.activity;
 import java.util.Vector;
 
 import org.javarosa.core.Context;
+import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.utils.IPreloadHandler;
-import org.javarosa.xpath.IFunctionHandler;
 
 public class FormEntryContext extends Context {
 	public static final String FORM_ID = "FORM_ID";
