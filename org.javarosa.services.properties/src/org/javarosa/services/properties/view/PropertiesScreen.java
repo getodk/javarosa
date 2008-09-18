@@ -28,7 +28,7 @@ public class PropertiesScreen extends Form{
     Display currentDisplay;
 
     Displayable currentScreen;
-    
+
     PropertyManager propertyManager;
 
     public PropertiesScreen(PropertyManager propertyManager) {
@@ -36,7 +36,7 @@ public class PropertiesScreen extends Form{
         itemChoices = new Hashtable();
         changes = new Hashtable();
         this.propertyManager = propertyManager;
-        
+
         populateProperties();
         addRMSInfo();
     }
@@ -134,15 +134,14 @@ public class PropertiesScreen extends Form{
 
         String[] recordStores = RecordStore.listRecordStores();
         int consumedSpace[] = new int[recordStores.length];
-        int availableSpace = -1;
+        int availableSpace[] = new int[recordStores.length];
 
         for (int i = 0; i < recordStores.length; i++) {
             try {
                 RecordStore r = RecordStore.openRecordStore(recordStores[i],
                         false);
                 consumedSpace[i] = r.getSize();
-                if (availableSpace == -1)
-                    availableSpace = r.getSizeAvailable();
+                availableSpace[i] = r.getSizeAvailable();
                 // really should close the recordstore here, but we don't do it
                 // anywhere else and it might introduce bugs
             } catch (RecordStoreException e) {
@@ -150,13 +149,12 @@ public class PropertiesScreen extends Form{
             }
         }
 
-        this.append(new StringItem(null, "Available Space: "
-                + formatBytes(availableSpace)));
         String devID = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty("DeviceID");
         this.append(new StringItem(null, "Device ID: "+devID));
         for (int i = 0; i < recordStores.length; i++) {
-            this.append(new StringItem(null, recordStores[i] + ": "
-                    + formatBytes(consumedSpace[i])));
+        	this.append(new StringItem(null, recordStores[i]));
+        	this.append(new StringItem(null,"Available: "+ formatBytes(availableSpace[i])));
+            this.append(new StringItem(null,"Used: " + formatBytes(consumedSpace[i])));
         }
 
     }
