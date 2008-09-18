@@ -21,9 +21,9 @@
 		
 	<bind id="a" nodeset="/data/a" type="xsd:int" />
 	<bind id="b" nodeset="/data/b" type="xsd:int" />
-	<bind id="c" nodeset="/data/c" relevant="testfunc(/data/a, /data/b) &lt; 35" />
+	<bind id="c" nodeset="/data/c" relevant="/data/a * /data/b &lt; 35" />
 	<bind id="d" nodeset="/data/d" />
-	<bind id="e" nodeset="/data/e" relevant="testfunc(/data/d) = 'bambam'"  />
+	<bind id="e" nodeset="/data/e" relevant="/data/d = 'bam'"  />
 	<bind id="f" nodeset="/data/f" />
 						
     </model>

@@ -3,9 +3,7 @@
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="test"/>
 	<classpathentry kind="con" path="J2MELIB"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry kind="lib" path="/org.javarosa.demo/lib/j2meunit-javarosa.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

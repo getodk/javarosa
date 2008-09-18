@@ -45,6 +45,18 @@ public class XPathReference implements IDataReference {
 		}
 	}
 	
+	public boolean equals (Object o) {
+		if (o instanceof XPathReference) {
+			return nodeset.equals(((XPathReference)o).nodeset);
+		} else {
+			return false;
+		}
+	}
+	
+	public int hashCode () {
+		return nodeset.hashCode();
+	}
+	
 	public IDataReference clone () {
 		return new XPathReference(nodeset);
 	}
