@@ -65,6 +65,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return boolNot(argVals[0]);
 		} else if (name.equals("boolean-from-string") && args.length == 1) {
 			return boolStr(argVals[0]);
+		} else if (name.equals("if") && args.length == 3) { //non-standard
+			return ifThenElse(argVals[0], argVals[1], argVals[2]);	
 		} else if (name.equals("selected") && args.length == 2) { //non-standard
 			return multiSelected(argVals[0], argVals[1]);
 		} else if (name.equals("today") && args.length == 0) {
@@ -276,6 +278,11 @@ public class XPathFuncExpr extends XPathExpression {
 			return Boolean.FALSE;
 	}
 
+	public static Object ifThenElse (Object o1, Object o2, Object o3) {
+		boolean b = toBoolean(o1).booleanValue();
+		return (b ? o2 : o3);
+	}
+	
 	//return whether a particular choice of a multi-select is selected
 	//arg1: XML-serialized answer to multi-select question (space-delimited choice values)
 	//arg2: choice to look for
