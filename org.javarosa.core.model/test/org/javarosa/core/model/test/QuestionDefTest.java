@@ -8,12 +8,12 @@ import j2meunit.framework.TestSuite;
 import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.QuestionStateListener;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.model.xform.XPathReference;
 
 public class QuestionDefTest extends TestCase {
 	public QuestionDefTest(String name, TestMethod rTestMethod) {
@@ -80,6 +80,16 @@ public class QuestionDefTest extends TestCase {
 		}
 	}
 	
+	public static IDataReference newXPathRef (String xpath) {
+		try {
+			IDataReference ref = (IDataReference)Class.forName("org.javarosa.model.xform.XPathReference").newInstance();
+			ref.setReference(xpath);
+			return ref;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
 	public void testAccessorsModifiers () {
 		QuestionDef q = new QuestionDef();
 		
@@ -93,7 +103,7 @@ public class QuestionDefTest extends TestCase {
 			fail("Name getter/setter broken");
 		}
 
-		XPathReference ref = new XPathReference("/data");
+		IDataReference ref = newXPathRef("/data");
 		q.setBind(ref);
 		if (q.getBind() != ref) {
 			fail("Ref getter/setter broken");
