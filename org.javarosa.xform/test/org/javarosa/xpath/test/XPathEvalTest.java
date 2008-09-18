@@ -238,6 +238,10 @@ public class XPathEvalTest extends TestCase {
 		testEval("boolean-from-string(1.0)", null, null, Boolean.TRUE);
 		testEval("boolean-from-string(1.0001)", null, null, Boolean.FALSE);
 		testEval("boolean-from-string(true())", null, null, Boolean.TRUE);
+		testEval("if(true(), 5, 'abc')", null, null, new Double(5.0));
+		testEval("if(false(), 5, 'abc')", null, null, "abc");
+		testEval("if(6 > 7, 5, 'abc')", null, null, "abc");
+		testEval("if('', 5, 'abc')", null, null, "abc");
 		testEval("selected('apple baby crimson', 'apple')", null, null, Boolean.TRUE);
 		testEval("selected('apple baby crimson', 'baby')", null, null, Boolean.TRUE);
 		testEval("selected('apple baby crimson', 'crimson')", null, null, Boolean.TRUE);
