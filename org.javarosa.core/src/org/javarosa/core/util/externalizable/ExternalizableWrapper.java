@@ -22,6 +22,14 @@ public abstract class ExternalizableWrapper implements Externalizable {
 	/* create a copy of a wrapper, but with new val (but all the same type annotations */
 	public abstract ExternalizableWrapper clone (Object val);
 	
+	public void readExternal(DataInputStream in) throws
+		IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+		readExternal(in, ExtWrapTagged.initPrototypes(null));
+	}
+	
+	public abstract void readExternal(DataInputStream in, Vector prototypes) throws
+		IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException;
+	
 	/* serialize the state of the externalizable wrapper (type information only, not value) */
 	public abstract void metaWriteExternal (DataOutputStream out) throws IOException;
 

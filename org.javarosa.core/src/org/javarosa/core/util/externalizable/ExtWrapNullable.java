@@ -42,10 +42,10 @@ public class ExtWrapNullable extends ExternalizableWrapper {
 		return new ExtWrapNullable(val);
 	}
 	
-	public void readExternal(DataInputStream in) throws 
+	public void readExternal(DataInputStream in, Vector prototypes) throws 
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		if (in.readBoolean()) {
-			val = ExtUtil.read(in, type);
+			val = ExtUtil.read(in, type, prototypes);
 		} else {
 			val = null;
 		}

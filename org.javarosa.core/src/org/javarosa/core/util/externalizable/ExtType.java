@@ -38,7 +38,7 @@ public class ExtType extends ExternalizableWrapper {
 		return new ExtType(val);
 	}
 	
-	public void readExternal(DataInputStream in) throws
+	public void readExternal(DataInputStream in, Vector prototypes) throws
 		IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		val = ExtUtil.read(in, type);
 	}

@@ -12,8 +12,6 @@ import org.javarosa.core.util.MD5;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class ExtWrapTagged extends ExternalizableWrapper {
-	public Vector prototypes;
-	
 	public final static int CLASS_HASH_SIZE = 4;
 	public final static byte[] WRAPPER_TAG = {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff};
 	
@@ -44,44 +42,18 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 	
 	/* deserialization */
 	
-	public ExtWrapTagged (Object ignore, Vector prototypes) {
-		initPrototypes(prototypes);
-	}
-	
-	private void initPrototypes (Vector prototypes) {
-		this.prototypes = prototypes == null ? new Vector() : prototypes;
-		fillDefaultClasses();
-		checkCollisions();
-	}
-	
-	private void fillDefaultClasses () {
-		addNoDup(prototypes, Object.class);
-		addNoDup(prototypes, Integer.class);
-		addNoDup(prototypes, Long.class);
-		addNoDup(prototypes, Short.class);
-		addNoDup(prototypes, Byte.class);
-		addNoDup(prototypes, Character.class);
-		addNoDup(prototypes, Boolean.class);
-		addNoDup(prototypes, Float.class);
-		addNoDup(prototypes, Double.class);
-		addNoDup(prototypes, String.class);
-		addNoDup(prototypes, Date.class);
-	}
-	
-	private void addNoDup (Vector v, Object o) {
-		if (!v.contains(o)) {
-			v.addElement(o);
-		}
+	public ExtWrapTagged () {
+
 	}
 	
 	public ExternalizableWrapper clone (Object val) {
-		return new ExtWrapTagged(val, prototypes);
+		return new ExtWrapTagged(val);
 	}
 	
-	public void readExternal(DataInputStream in) throws 
+	public void readExternal(DataInputStream in, Vector prototypes) throws 
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		ExternalizableWrapper type = readTag(in, prototypes);
-		val = ExtUtil.read(in, type);
+		val = ExtUtil.read(in, type, prototypes);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -185,7 +157,32 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 		throw new RuntimeException("Tagged wrapper should never be tagged"); //writeTag(out, val);
 	}
 	
-	private void checkCollisions () {
+	public static Vector initPrototypes (Vector prototypes) {
+		if (prototypes == null) {
+			prototypes = new Vector();
+		}
+		
+		fillDefaultClasses(prototypes);
+		checkCollisions(prototypes);
+		
+		return prototypes;
+	}
+	
+	private static void fillDefaultClasses (Vector prototypes) {
+		addNoDup(prototypes, Object.class);
+		addNoDup(prototypes, Integer.class);
+		addNoDup(prototypes, Long.class);
+		addNoDup(prototypes, Short.class);
+		addNoDup(prototypes, Byte.class);
+		addNoDup(prototypes, Character.class);
+		addNoDup(prototypes, Boolean.class);
+		addNoDup(prototypes, Float.class);
+		addNoDup(prototypes, Double.class);
+		addNoDup(prototypes, String.class);
+		addNoDup(prototypes, Date.class);
+	}
+	
+	private static void checkCollisions (Vector prototypes) {
 		Hashtable hashes = new Hashtable();
 		for (Enumeration e = prototypes.elements(); e.hasMoreElements(); ) {
 			Class t = (Class)e.nextElement();
@@ -204,6 +201,12 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 			}
 			
 			hashes.put(t, hash);
+		}
+	}
+	
+	private static void addNoDup (Vector v, Object o) {
+		if (!v.contains(o)) {
+			v.addElement(o);
 		}
 	}
 }

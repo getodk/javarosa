@@ -60,7 +60,7 @@ public class ExtWrapIntEncodingSmall extends ExternalizableWrapper {
 		return new ExtWrapIntEncodingSmall(l, bias);
 	}
 	
-	public void readExternal(DataInputStream in) throws 
+	public void readExternal(DataInputStream in, Vector prototypes) throws 
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		byte b = in.readByte();
 		long l;
@@ -81,17 +81,14 @@ public class ExtWrapIntEncodingSmall extends ExternalizableWrapper {
 	 * there are more bytes to follow, or 0 to indicate the last byte
 	 **/
 	public void writeExternal(DataOutputStream out) throws IOException {
-		long l = ((Long)val).longValue();
-		
-		if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE)
-			throw new ArithmeticException("Value (" + l + ") too large for chosen encoding");
-		
-		if (l >= -bias && l < 255 - bias) {
-			l += bias;
-			out.writeByte((byte)(l >= 128 ? l - 256 : l));
+		int n = ExtUtil.toInt(((Long)val).longValue());
+				
+		if (n >= -bias && n < 255 - bias) {
+			n += bias;
+			out.writeByte((byte)(n >= 128 ? n - 256 : n));
 		} else {
 			out.writeByte(0xff);
-			out.writeInt((int)l);
+			out.writeInt(n);
 		}
 	}
 
