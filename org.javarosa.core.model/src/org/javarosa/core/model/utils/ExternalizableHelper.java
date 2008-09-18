@@ -758,12 +758,24 @@ public class ExternalizableHelper {
 		return 0;
 	}	
 	
-	public static boolean equals (Vector a, Vector b) {
+	public static boolean equals (Object a, Object b) {
+		if (a == null) {
+			return b == null;
+		} else if (a instanceof Vector) {
+			return (b instanceof Vector && vectorEquals((Vector)a, (Vector)b));
+		} else if (a instanceof Hashtable) {
+			return (b instanceof Hashtable && hashtableEquals((Hashtable)a, (Hashtable)b));
+		} else {
+			return a.equals(b);
+		}		
+	}
+	
+	public static boolean vectorEquals (Vector a, Vector b) {
 		if (a.size() != b.size()) {
 			return false;
 		} else {
 			for (int i = 0; i < a.size(); i++) {
-				if (!a.elementAt(i).equals(b.elementAt(i))) {
+				if (!equals(a.elementAt(i), b.elementAt(i))) {
 					return false;
 				}
 			}
@@ -773,7 +785,7 @@ public class ExternalizableHelper {
 	}
 	
 	//assumes that (for plain hashtables) if contents are equals, keys will be returned in the same order
-	public static boolean equals (Hashtable a, Hashtable b) {
+	public static boolean hashtableEquals (Hashtable a, Hashtable b) {
 		if (a.size() != b.size()) {
 			return false;
 		} else {
@@ -781,9 +793,9 @@ public class ExternalizableHelper {
 				Object keyA = ea.nextElement();
 				Object keyB = eb.nextElement();
 				
-				if (!keyA.equals(keyB)) {
+				if (keyA.hashCode() != keyB.hashCode() || !equals(keyA, keyB)) {
 					return false;
-				} else if (!a.get(keyA).equals(b.get(keyB))) {
+				} else if (!equals(a.get(keyA), b.get(keyB))) {
 					return false;
 				}
 			}

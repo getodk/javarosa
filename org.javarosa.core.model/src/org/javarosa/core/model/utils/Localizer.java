@@ -50,6 +50,19 @@ public class Localizer implements Externalizable {
 		this.fallbackDefaultForm = fallbackDefaultForm;
 	}
 	
+	public boolean equals (Object o) {
+		if (o instanceof Localizer) {
+			Localizer l = (Localizer)o;
+			return (ExternalizableHelper.equals(localeData, l.localeData) &&
+					ExternalizableHelper.equals(defaultLocale, l.defaultLocale) &&
+					ExternalizableHelper.equals(currentLocale, l.currentLocale) &&
+					fallbackDefaultLocale == l.fallbackDefaultLocale &&
+					fallbackDefaultForm == l.fallbackDefaultForm);
+		} else {
+			return false;
+		}
+	}
+	
 	/**
 	 * Get default locale fallback mode
 	 * 
