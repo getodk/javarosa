@@ -5,9 +5,11 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
+import java.util.Hashtable;
 import java.util.NoSuchElementException;
 
 import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.test.ExternalizableTest;
 
 public class LocalizerTest extends TestCase  {
 	public LocalizerTest(String name, TestMethod rTestMethod) {
@@ -38,7 +40,7 @@ public class LocalizerTest extends TestCase  {
 		return aSuite;
 	}
 
-	public final int NUM_TESTS = 29;
+	public final int NUM_TESTS = 30;
 	public void testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
@@ -72,7 +74,12 @@ public class LocalizerTest extends TestCase  {
 		case 27: testLocalizationObservers(); break;
 		case 28: testLocalizationObserverUpdateOnRegister(); break;
 		case 29: testNullArgs(); break;
+		case 30: testSerialization(); break;
 		}
+	}
+	
+	private void testSerialize (Localizer l, String msg) {
+		ExternalizableTest.testSerialization(l, this, "Localizer [" + msg + "]");
 	}
 	
 	public void testEmpty () {
@@ -338,23 +345,25 @@ public class LocalizerTest extends TestCase  {
 		if (locales.length != 2 || !locales[0].equals("test1") || !locales[1].equals("test2")) {
 			fail("Available locales not as expected");
 		}
-
+		
 		l.addAvailableLocale("test3");
 		locales = l.getAvailableLocales();
 		if (locales.length != 3 || !locales[0].equals("test1") || !locales[1].equals("test2") || !locales[2].equals("test3")) {
 			fail("Available locales not as expected");
 		}
-
+		
 		l.destroyLocale("test2");
 		locales = l.getAvailableLocales();
 		if (locales.length != 2 || !locales[0].equals("test1") || !locales[1].equals("test3")) {
 			fail("Available locales not as expected");
 		}
+		
 		l.destroyLocale("test1");
 		locales = l.getAvailableLocales();
 		if (locales.length != 1 || !locales[0].equals("test3")) {
 			fail("Available locales not as expected");
 		}
+		
 		l.destroyLocale("test3");
 		locales = l.getAvailableLocales();
 		if (locales == null || locales.length != 0) {
@@ -759,5 +768,52 @@ public class LocalizerTest extends TestCase  {
 		}
 	}
 	
-	//test serialization
+	public void testSerialization () {
+		Localizer l = new Localizer(true, true);
+
+		testSerialize(l, "empty 1");
+		testSerialize(new Localizer(false, false), "empty 2");
+		testSerialize(new Localizer(true, false), "empty 3");
+		testSerialize(new Localizer(false, true), "empty 4");
+		
+		l.addAvailableLocale("locale1");
+		testSerialize(l, "one empty locale");
+		
+		l.addAvailableLocale("locale2");
+		testSerialize(l, "two empty locales");
+		
+		l.setDefaultLocale("locale2");
+		testSerialize(l, "two empty locales + default");
+		
+		l.setToDefault();
+		testSerialize(l, "two empty locales + default/current");
+		
+		l.setLocale("locale1");
+		testSerialize(l, "two empty locales + default/current 2");
+		
+		l.setDefaultLocale(null);
+		testSerialize(l, "two empty locales + current");
+		
+		l.setLocaleMapping("locale1", "id1", "text1");
+		testSerialize(l, "locales with data 1");
+		l.setLocaleMapping("locale1", "id2", "text2");
+		testSerialize(l, "locales with data 2");
+		
+		l.setLocaleMapping("locale2", "id1", "text1");
+		l.setLocaleMapping("locale2", "id2", "text2");
+		l.setLocaleMapping("locale2", "id3", "text3");
+		testSerialize(l, "locales with data 3");
+		
+		l.setLocaleMapping("locale2", "id2", null);
+		testSerialize(l, "locales with data 4");
+		
+		OrderedHashtable loc3 = new OrderedHashtable();
+		loc3.put("id1", "text1");
+		loc3.put("id4", "text4");
+		l.setLocaleData("locale3", loc3);
+		testSerialize(l, "locales with data 5");
+		
+		l.destroyLocale("locale2");
+		testSerialize(l, "locales with data 6");
+	}
 }

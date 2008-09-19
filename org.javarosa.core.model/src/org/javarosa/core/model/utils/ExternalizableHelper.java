@@ -784,19 +784,29 @@ public class ExternalizableHelper {
 		}
 	}
 	
-	//assumes that (for plain hashtables) if contents are equals, keys will be returned in the same order
 	public static boolean hashtableEquals (Hashtable a, Hashtable b) {
 		if (a.size() != b.size()) {
 			return false;
 		} else {
-			for (Enumeration ea = a.keys(), eb = b.keys(); ea.hasMoreElements(); ) {
+			for (Enumeration ea = a.keys(); ea.hasMoreElements(); ) {
 				Object keyA = ea.nextElement();
-				Object keyB = eb.nextElement();
+
+				if (!a.get(keyA).equals(b.get(keyA))) {
+					return false;
+				}
+			}
+			
+			if (a instanceof OrderedHashtable && b instanceof OrderedHashtable) {
+				Enumeration ea = a.keys();
+				Enumeration eb = b.keys();
 				
-				if (keyA.hashCode() != keyB.hashCode() || !equals(keyA, keyB)) {
-					return false;
-				} else if (!equals(a.get(keyA), b.get(keyB))) {
-					return false;
+				while (ea.hasMoreElements()) {
+					Object keyA = ea.nextElement();
+					Object keyB = eb.nextElement();
+					
+					if (!keyA.equals(keyB)) {
+						return false;
+					}
 				}
 			}
 			
