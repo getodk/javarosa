@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.javarosa.core.model.storage;
 
 import java.util.Vector;
@@ -14,8 +11,10 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 
 /**
- * @author Clayton Sims
+ * The RMS persistent storage utility for DataModelTree
+ * objects.
  *
+ * @author Clayton Sims
  */
 public class DataModelTreeRMSUtility extends RMSUtility {
 

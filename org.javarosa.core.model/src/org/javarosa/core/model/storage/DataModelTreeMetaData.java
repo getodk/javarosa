@@ -9,6 +9,14 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
+/**
+ * Serializable Meta Data object for Model Tree definition records that 
+ * are saved in persistent storage.
+ *  
+
+ * @author Clayton Sims
+ *
+ */
 public class DataModelTreeMetaData extends MetaDataObject{
 
 	private String formName = ""; // the name of the FormData being referenced

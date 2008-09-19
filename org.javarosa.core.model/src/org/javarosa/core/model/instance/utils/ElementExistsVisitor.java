@@ -49,6 +49,7 @@ public class ElementExistsVisitor implements ITreeVisitor {
 	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.QuestionDataGroup)
 	 */
 	public void visit(QuestionDataGroup element) {
+		System.out.println("Depth: " + element.getName());
 		//We can skip the recursive check if the list of children contains the element
 		if(rootNode.contains(element)) {
 			contains = true;
