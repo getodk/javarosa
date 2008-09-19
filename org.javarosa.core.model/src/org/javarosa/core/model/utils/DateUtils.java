@@ -41,6 +41,14 @@ public class DateUtils {
 		return dateElement + "T" + time;
 	}
 
+	/**
+	 * Converts an integer to a string, ensuring that the string
+	 * contains a certain number of digits
+	 * @param n The integer to be converted
+	 * @param pad The length of the string to be returned
+	 * @return A string representing n, which has pad - #digits(n)
+	 * 0's preceding the number.
+	 */
 	public static String intPad (int n, int pad) {
 		String s = String.valueOf(n);
 		while (s.length() < pad)
@@ -106,6 +114,14 @@ public class DateUtils {
 		return stringValue;
 	}
 
+	/**
+	 * Tokenizes the input string into a vector of 
+	 * output strings based on the separate c
+	 * @param values The string to be tokenized
+	 * @param c the separator character to be used
+	 * @return A Vector of Strings which were split from the 
+	 * input string based on the separator c
+	 */
 	private static Vector tokenize(String values, char c) {
 		Vector temp = new Vector();
 		int pos = 0;
@@ -121,7 +137,12 @@ public class DateUtils {
 		return temp;
 	}
 	
-	//returns a date object set to midnight on the given date in the current timezone *including DST!!*
+	/**
+	 * Creates a Date object identifying the date that is passed in in the format
+	 * YYYY-MM-DD
+	 * @param value A date string to be parsed
+	 * @returns a date object set to midnight on the given date in the current timezone *including DST!!*
+	 */
 	public static Date getDateFromString(String value) {
 		Vector digits = tokenize(value, '-');
 
@@ -140,6 +161,15 @@ public class DateUtils {
 		return getDate(year, month, day);
 	}
 	
+	/**
+	 * Generates a date object for the date represented by the 
+	 * parameters.
+	 * @param year The year of the returned date object 
+	 * @param month The month of the returned date object (0 for January, 11 for December)
+	 * @param day The day of the returned date object (Between 1 and the 
+	 * number of days in the month given)
+	 * @return A date object which represents the the day of passed in.
+	 */
 	public static Date getDate (int year, int month, int day) {
 		month -= 1;
 		
@@ -158,13 +188,23 @@ public class DateUtils {
 		return cd.getTime();
 	}
 	
-	//return new Date object with same date but time set to midnight (in current timezone)
+	/**
+	 * 
+	 * @return new Date object with same date but time set to midnight (in current timezone)
+	 */
 	public static Date roundDate (Date d) {
 		Calendar cd = Calendar.getInstance();
 		cd.setTime(d);
 		return DateUtils.getDate(cd.get(Calendar.YEAR), cd.get(Calendar.MONTH) + 1, cd.get(Calendar.DAY_OF_MONTH));
 	}
 	
+	/**
+	 * Creates a string representing the date given in the format
+	 * HH:MM
+	 * @param d The date to be turned into a string
+	 * @return a string representing the date given in the format
+	 * HH:MM
+	 */
 	public static String get24HourTimeFromDate(Date d)
 	{
 		//set as the xml transport standard for time Questions
@@ -183,6 +223,14 @@ public class DateUtils {
 			return hour+":"+minutes;	
 	}
 	
+	/**
+	 * Returns the number of days in the month given for
+	 * a given year.
+	 * @param month The month to be tested
+	 * @param year The year in which the month is to be tested
+	 * @return the number of days in the given month on the given
+	 * year.
+	 */
 	public static int daysInMonth (int month, int year) {
 		if (month == Calendar.APRIL || month == Calendar.JUNE || month == Calendar.SEPTEMBER || month == Calendar.NOVEMBER) {
 			return 30;
@@ -193,10 +241,25 @@ public class DateUtils {
 		}
 	}
 	
+	/**
+	 * Determines whether a year is a leap year in the
+	 * proleptic Gregorian calendar.
+	 * 
+	 * @param year The year to be tested
+	 * @return True, if the year given is a leap year, 
+	 * false otherwise.
+	 */
 	public static boolean isLeap (int year) {
 		return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
 	}
 	
+	/**
+	 * Tokenizes a string based on the given delimeter string
+	 * @param original The string to be split
+	 * @param delimiter The delimeter to be used
+	 * @return An array of strings contained in original which were
+	 * seperated by the delimeter
+	 */
     public static String[] split(String original, String delimiter) {
         Vector nodes = new Vector();
         // Parse nodes into vector
@@ -219,6 +282,18 @@ public class DateUtils {
         }
         return result;
     }	
+    /**
+     * Creates a Date object representing the amount of time between the
+     * reference date, and the given parameters.
+     * @param ref The starting reference date 
+     * @param type "week", or "month", representing the time period which is to be returned. 
+     * @param start "sun", "mon", ... etc. representing the start of the time period.
+     * @param beginning true=return first day of period, false=return last day of period
+     * @param includeToday Whether to include the current date in the returned calculation
+     * @param nAgo How many periods ago. 1=most recent period, 0=period in progress 
+     * @return a Date object representing the amount of time between the
+     * reference date, and the given parameters.
+     */
 	public static Date getPastPeriodDate (Date ref, String type, String start, boolean beginning, boolean includeToday, int nAgo) {
 		Date d = null;
 		
@@ -268,6 +343,12 @@ public class DateUtils {
 		return d;
 	}
 	
+	/**
+	 * Gets the number of months separating the two dates.
+	 * @param earlierDate The earlier date, chronologically
+	 * @param laterDate The later date, chronologically
+	 * @return the number of months separating the two dates.
+	 */
 	public static int getMonthsDifference(Date earlierDate, Date laterDate) {
 		Date span = new Date(laterDate.getTime() - earlierDate.getTime());
 		Date firstDate = new Date(0);
