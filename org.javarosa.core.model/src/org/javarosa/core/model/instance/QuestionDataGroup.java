@@ -107,12 +107,14 @@ public class QuestionDataGroup extends TreeElement {
 	 * @see org.javarosa.core.model.TreeElement#contains(org.javarosa.core.model.TreeElement)
 	 */
 	public boolean contains(TreeElement child) {
+		
 		if(children.contains(child)) {
 			return true;
 		}
 		Enumeration en = children.elements();
 		while(en.hasMoreElements()) {
 			TreeElement element = (TreeElement)en.nextElement();
+			System.out.println("Contains on " + element.getName());
 				if(element.contains((child))) {
 					return true;
 				}

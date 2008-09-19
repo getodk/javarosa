@@ -13,7 +13,7 @@ import org.javarosa.core.util.UnavailableExternalizerException;
  *
  */
 public class StringData implements IAnswerData {
-	String s;
+	private String s;
 
 	/**
 	 * Empty Constructor, necessary for dynamic construction during deserialization.
