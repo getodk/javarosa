@@ -163,23 +163,27 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 		}
 		
 		fillDefaultClasses(prototypes);
-		checkCollisions(prototypes);
+		checkCollisions(prototypes); // probably want to run this less frequently
 		
 		return prototypes;
 	}
 	
 	private static void fillDefaultClasses (Vector prototypes) {
-		addNoDup(prototypes, Object.class);
-		addNoDup(prototypes, Integer.class);
-		addNoDup(prototypes, Long.class);
-		addNoDup(prototypes, Short.class);
-		addNoDup(prototypes, Byte.class);
-		addNoDup(prototypes, Character.class);
-		addNoDup(prototypes, Boolean.class);
-		addNoDup(prototypes, Float.class);
-		addNoDup(prototypes, Double.class);
-		addNoDup(prototypes, String.class);
-		addNoDup(prototypes, Date.class);
+		Class[] baseTypes = {Object.class,
+				Integer.class,
+				Long.class,
+				Short.class,
+				Byte.class,
+				Character.class,
+				Boolean.class,
+				Float.class,
+				Double.class,
+				String.class,
+				Date.class};
+		
+		for (int i = 0; i < baseTypes.length; i++) {
+			addNoDup(prototypes, baseTypes[i]);
+		}
 	}
 	
 	private static void checkCollisions (Vector prototypes) {
@@ -204,9 +208,12 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 		}
 	}
 	
-	private static void addNoDup (Vector v, Object o) {
+	private static boolean addNoDup (Vector v, Object o) {
 		if (!v.contains(o)) {
 			v.addElement(o);
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.ExternalizableDynamic;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class ExtUtil {
@@ -64,9 +65,18 @@ public class ExtUtil {
 		//time zone?
 	}
 	
-	public static Object read (DataInputStream in, Class type)
+	public static Object read (DataInputStream in, Class type) throws
+		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+		return read(in, type, null);
+	}
+	
+	public static Object read (DataInputStream in, Class type, Vector prototypes)
 		throws IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		if (Externalizable.class.isAssignableFrom(type)) {
+		if (ExternalizableDynamic.class.isAssignableFrom(type)) {
+			ExternalizableDynamic extd = (ExternalizableDynamic)type.newInstance();
+			extd.readExternal(in, ExtWrapTagged.initPrototypes(prototypes));
+			return extd;
+		} else if (Externalizable.class.isAssignableFrom(type)) {
 			Externalizable ext = (Externalizable)type.newInstance();
 			ext.readExternal(in);
 			return ext;
