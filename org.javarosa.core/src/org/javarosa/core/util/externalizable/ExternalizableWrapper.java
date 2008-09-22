@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.ExternalizableDynamic;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 /**
@@ -15,7 +15,7 @@ import org.javarosa.core.util.UnavailableExternalizerException;
  * * conflicting constructors... null(listwrapper())... confuses listwrapper as type, even though it contains val
  */
 
-public abstract class ExternalizableWrapper implements Externalizable {
+public abstract class ExternalizableWrapper implements ExternalizableDynamic {
 	/* core data that is being wrapped; will be null when shell wrapper is created for deserialization */
 	public Object val;
 	
@@ -26,9 +26,6 @@ public abstract class ExternalizableWrapper implements Externalizable {
 		IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
 		readExternal(in, ExtWrapTagged.initPrototypes(null));
 	}
-	
-	public abstract void readExternal(DataInputStream in, Vector prototypes) throws
-		IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException;
 	
 	/* serialize the state of the externalizable wrapper (type information only, not value) */
 	public abstract void metaWriteExternal (DataOutputStream out) throws IOException;
