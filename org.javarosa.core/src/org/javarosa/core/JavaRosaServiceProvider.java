@@ -10,6 +10,7 @@ import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.StorageManager;
 import org.javarosa.core.services.TransportManager;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.transport.storage.RmsStorage;
 
 /**
@@ -101,7 +102,12 @@ public class JavaRosaServiceProvider {
 		services.put(service, service.getName());
 	}
 	
-	public IService getService(String serviceName) {
-		return (IService)services.get(serviceName);
+	public IService getService(String serviceName) throws UnavailableServiceException {
+		IService service = (IService)services.get(serviceName);
+		if( service == null) {
+			throw new UnavailableServiceException("The JavaRosaServiceProvider received a request for the service " + serviceName + ", which was not registered");
+		} else {
+			return service; 
+		}
 	}
 }
