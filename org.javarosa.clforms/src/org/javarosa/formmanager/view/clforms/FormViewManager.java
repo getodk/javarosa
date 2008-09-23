@@ -1,5 +1,7 @@
 package org.javarosa.formmanager.view.clforms;
 
+import java.util.Enumeration;
+
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
@@ -11,6 +13,7 @@ import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.List;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.activity.FormEntryContext;
@@ -174,6 +177,26 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 				controller.save();
 				controller.exit();
 			} else if (command == formView.sendCommand) {
+				//check if all required questions are complete
+				int counter = 0,a = 0;
+				FormDef form = model.getForm();
+				for(a=0;a<model.getNumQuestions();a++)
+				{
+					if(model.getQuestion(a).isRequired() && (form.getValue(model.getQuestion(a)) == null))
+					{
+						//set counter for incomplete questions
+						counter++;
+					}
+					
+				}
+				if(counter >0)
+				{
+					//show alert
+					String txt = "There are "+counter+" unanswered compulsory questions and must be completed first to proceed";
+					Alert alert = new Alert("Question Required!", txt, null, AlertType.ERROR);
+					controller.setDisplay(alert);
+				}
+				else
 				model.setFormComplete();
 				//controller.exit();
 			} else if (command == List.SELECT_COMMAND) {
