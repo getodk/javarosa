@@ -6,9 +6,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
+import org.javarosa.activity.splashscreen.SplashScreenActivity;
 import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
@@ -26,6 +28,7 @@ import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.activity.FormListActivity;
 import org.javarosa.formmanager.activity.FormTransportActivity;
+import org.javarosa.formmanager.activity.MemoryCheckActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.FormDefSerializer;
@@ -101,13 +104,13 @@ public class JavaRosaDemoShell implements IShell {
 
 		System.out.println("TOTAL MEM AVAIL: "+java.lang.Runtime.getRuntime().totalMemory());
 		System.out.println("PRE LOAD FORM MEM: "+java.lang.Runtime.getRuntime().freeMemory());
+		
 		// For now let's add the dummy form.
 		if (formDef.getNumberOfRecords() == 0) {
 			if (readSerialized ) {
 				//load from serialized form.
 				FormDef form = new FormDef();
-				form = XFormUtils
-				.getFormFromSerializedResource("/CHMTTL_Help.xhtml.serialized");
+				form = XFormUtils.getFormFromSerializedResource("/CHMTTL.xhtml.serialized");
 				//#if debug.output==verbose
 				System.out.println("SERIALIZE TEST:");
 				System.out.println(form.getName());
@@ -124,6 +127,8 @@ public class JavaRosaDemoShell implements IShell {
 				formDef.writeToRMS(form);*/
 			}else{
 				formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL_Help.xhtml"));
+//				formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTOpenDay2.xhtml"));
+//				formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTLT2.xhtml"));
 //			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-a_draft.xhtml"));
 //			formDef.writeToRMS(XFormUtils.getFormFromResource("/MobileSurvey.xhtml"));
 			}
@@ -177,7 +182,7 @@ public class JavaRosaDemoShell implements IShell {
 			//#if javarosa.dev.shortcuts
 			launchActivity(new FormListActivity(this, "Forms List"), context);
 			//#else
-	    	String passwordVAR = midlet.getAppProperty("username");
+				    	String passwordVAR = midlet.getAppProperty("username");
             String usernameVAR = midlet.getAppProperty("password");
             if ((usernameVAR == null) || (passwordVAR == null))
             {
@@ -198,18 +203,22 @@ public class JavaRosaDemoShell implements IShell {
 			if (returnVal == "USER_VALIDATED") {
 				User user = (User)returnVals.get(LoginActivity.USER);
 
-				FormListActivity formList = new FormListActivity(this, "Forms List");
+				MemoryCheckActivity memCheck = new MemoryCheckActivity(this);
 				if (user != null){
 					context.setCurrentUser(user.getUsername());
 					context.setElement("USER", user);
 				}
 
-				launchActivity(formList, context);
+				launchActivity(memCheck, context);
 			} else if (returnVal == "USER_CANCELLED") {
 				exitShell();
 			}
 
-		} else if (returningActivity instanceof FormListActivity) {
+		}else if (returningActivity instanceof MemoryCheckActivity) 
+		{
+			launchActivity(new FormListActivity(this, "Forms List"), context);
+		}
+		else if (returningActivity instanceof FormListActivity) {
 
 			String returnVal = (String)returnVals.get(FormListActivity.COMMAND_KEY);
 			if (returnVal == Commands.CMD_SETTINGS) {
@@ -285,7 +294,6 @@ public class JavaRosaDemoShell implements IShell {
 		formEntryContext.setFormID(formID);
 		if (instanceID != -1)
 			formEntryContext.setInstanceID(instanceID);
-
 		launchActivity(entryActivity, formEntryContext);
 	}
 
