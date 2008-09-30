@@ -107,18 +107,9 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 		this.formDefRMSUtility = (FormDefRMSUtility) JavaRosaServiceProvider
 				.instance().getStorageManager().getRMSStorageProvider()
 				.getUtility(FormDefRMSUtility.getUtilityName());
-		System.out.println("CURRENT SPACE: " + dataModelRMSUtility.computeSpace());
 
     }
     public void createView(){
-    	//check memory status alert user
-		if(dataModelRMSUtility.computeSpace() <= 0.05) //less than 5% of memory left
-		{
-			String info = "Your phone memory is low and you may not be able to save more forms";
-			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("Memory low!", info, null, AlertType.ERROR);
-			a.setTimeout(2000);//calm down and read the alert first
-			mainShell.setDisplay(this, a);
-		}
     	unSentImage = initialiseStateImage(12, 12, 255, 255, 255);
     	deliveredImage = initialiseStateImage(12, 12, 0, 255, 0);
     	unConfirmedImage = initialiseStateImage(12, 12, 255, 140, 0);
