@@ -26,10 +26,15 @@ public class XPathVariableReference extends XPathExpression {
 		return "{var:" + id.toString() + "}";
 	}
 
+	public void readExternal(DataInputStream in)
+	throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+		id = (XPathQName)ExtUtil.read(in, XPathQName.class);
+	}
+	
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
-		id = (XPathQName)ExtUtil.read(in, XPathQName.class);
+		readExternal(in);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

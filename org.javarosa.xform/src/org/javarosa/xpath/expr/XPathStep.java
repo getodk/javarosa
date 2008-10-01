@@ -1,6 +1,19 @@
 package org.javarosa.xpath.expr;
 
-public class XPathStep {
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Vector;
+
+import org.javarosa.core.util.ExternalizableDynamic;
+import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapListPoly;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+
+public class XPathStep implements ExternalizableDynamic {
 	public static final int AXIS_CHILD = 0;
 	public static final int AXIS_DESCENDANT = 1;
 	public static final int AXIS_PARENT = 2;
@@ -112,5 +125,45 @@ public class XPathStep {
 		case TEST_TYPE_PROCESSING_INSTRUCTION: return "proc-instr(" + (literal == null ? "" : "\'" + literal + "\'") + ")";
 		default: return null;
 		}
+	}
+
+	public void readExternal(DataInputStream in) throws IOException,
+	InstantiationException, IllegalAccessException,
+	UnavailableExternalizerException {
+		readExternal(in, new PrototypeFactory()); //this method will fail if the step has any predicates
+	}
+	
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+			throws IOException, InstantiationException, IllegalAccessException,
+			UnavailableExternalizerException {
+		axis = ExtUtil.readInt(in);
+		test = ExtUtil.readInt(in);
+		
+		switch (test) {
+		case TEST_NAME: name = (XPathQName)ExtUtil.read(in, XPathQName.class); break;
+		case TEST_NAMESPACE_WILDCARD: namespace = ExtUtil.readString(in); break;
+		case TEST_TYPE_PROCESSING_INSTRUCTION: literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf); break;
+		}	
+		
+		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+		predicates = new XPathExpression[v.size()];
+		for (int i = 0; i < predicates.length; i++)
+			predicates[i] = (XPathExpression)v.elementAt(i);	
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExtUtil.writeNumeric(out, axis);
+		ExtUtil.writeNumeric(out, test);
+		
+		switch (test) {
+		case TEST_NAME: ExtUtil.write(out, name); break;
+		case TEST_NAMESPACE_WILDCARD: ExtUtil.writeString(out, namespace); break;
+		case TEST_TYPE_PROCESSING_INSTRUCTION: ExtUtil.write(out, new ExtWrapNullable(literal)); break;
+		}
+		
+		Vector v = new Vector();
+		for (int i = 0; i < predicates.length; i++)
+			v.addElement(predicates[i]);
+		ExtUtil.write(out, new ExtWrapListPoly(v));
 	}
 }

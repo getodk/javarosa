@@ -6,12 +6,17 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.ExternalizableDynamic;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class ExtUtil {
 
+	private static PrototypeFactory defaultPrototypes () {
+		return new PrototypeFactory(JavaRosaServiceProvider.instance().getPrototypes());
+	}
+	
 	public static void write (DataOutputStream out, Object data) throws IOException {
 		if (data instanceof Externalizable) {
 			((Externalizable)data).writeExternal(out);
@@ -74,7 +79,7 @@ public class ExtUtil {
 		throws IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		if (ExternalizableDynamic.class.isAssignableFrom(type)) {
 			ExternalizableDynamic extd = (ExternalizableDynamic)type.newInstance();
-			extd.readExternal(in, pf == null ? new PrototypeFactory() : pf);
+			extd.readExternal(in, pf == null ? defaultPrototypes() : pf);
 			return extd;
 		} else if (Externalizable.class.isAssignableFrom(type)) {
 			Externalizable ext = (Externalizable)type.newInstance();
@@ -112,7 +117,7 @@ public class ExtUtil {
 	
 	public static Object read (DataInputStream in, ExternalizableWrapper ew, PrototypeFactory pf) throws
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		ew.readExternal(in, pf == null ? new PrototypeFactory() : pf);
+		ew.readExternal(in, pf == null ? defaultPrototypes() : pf);
 		return ew.val;
 	}
 	
