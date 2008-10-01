@@ -11,27 +11,40 @@ public class PrototypeFactory {
 	private Vector classes;
 	private Vector hashes;
 	
-	private boolean initialized; //use lazy evalutaion to avoid needless pre-computing of hashes
+	//lazy evaluation
+	private Vector classNames;
+	private boolean initialized;
 	
 	public PrototypeFactory () {
-		classes = new Vector();
-		hashes = new Vector();
-		initialized = false;
+		this(null);
 	}
 	
 	public PrototypeFactory (Vector classNames) {
-		this();
+		this.classNames = classNames;
+		initialized = false;
+	}		
 		
-		for (int i = 0; i < classNames.size(); i++) {
-			try {
-				addClass(Class.forName((String)classNames.elementAt(i)));
-			} catch (ClassNotFoundException cnfe) {
-				throw new RuntimeException(); //TODO: throw an appropriate (runtime) exception
+	private void lazyInit () {
+		initialized = true;
+		
+		classes = new Vector();
+		hashes = new Vector();
+
+		addDefaultClasses();
+		
+		if (classNames != null) {
+			for (int i = 0; i < classNames.size(); i++) {
+				try {
+					addClass(Class.forName((String)classNames.elementAt(i)));
+				} catch (ClassNotFoundException cnfe) {
+					throw new RuntimeException(); //TODO: throw an appropriate (runtime) exception
+				}
 			}
+			classNames = null;
 		}
 	}
 
-	private void initDefaultClasses () {
+	private void addDefaultClasses () {
 		Class[] baseTypes = {
 				Object.class,
 				Integer.class,
@@ -45,8 +58,6 @@ public class PrototypeFactory {
 				String.class,
 				Date.class
 		};
-
-		initialized = true;
 		
 		for (int i = 0; i < baseTypes.length; i++) {
 			addClass(baseTypes[i]);
@@ -55,7 +66,7 @@ public class PrototypeFactory {
 
 	public void addClass (Class c) {
 		if (!initialized) {
-			initDefaultClasses();
+			lazyInit();
 		}
 		
 		byte[] hash = getClassHash(c);
@@ -75,7 +86,7 @@ public class PrototypeFactory {
 	
 	public Class getClass (byte[] hash) {
 		if (!initialized) {
-			initDefaultClasses();
+			lazyInit();
 		}
 		
 		for (int i = 0; i < classes.size(); i++) {

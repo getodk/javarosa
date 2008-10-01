@@ -1,6 +1,7 @@
 package org.javarosa.core;
 
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
@@ -109,5 +110,10 @@ public class JavaRosaServiceProvider {
 		} else {
 			return service; 
 		}
+	}
+	
+	//stub
+	public Vector getPrototypes () {
+		return new Vector();
 	}
 }

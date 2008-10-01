@@ -25,7 +25,7 @@ public class XPathNumericLiteral extends XPathExpression {
 		return "{num:" + Double.toString(d) + "}";
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
+	public void readExternal(DataInputStream in)
 	throws IOException, InstantiationException, IllegalAccessException,
 	UnavailableExternalizerException {
 		if (in.readByte() == 0x00) {
@@ -33,6 +33,12 @@ public class XPathNumericLiteral extends XPathExpression {
 		} else {
 			d = ExtUtil.readDecimal(in);
 		}
+	}
+	
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+	throws IOException, InstantiationException, IllegalAccessException,
+	UnavailableExternalizerException {
+		readExternal(in);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

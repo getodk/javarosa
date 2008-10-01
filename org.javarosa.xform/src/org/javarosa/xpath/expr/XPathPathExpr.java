@@ -3,6 +3,7 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
@@ -15,6 +16,9 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
@@ -112,12 +116,26 @@ public class XPathPathExpr extends XPathExpression {
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, InstantiationException, IllegalAccessException,
 			UnavailableExternalizerException {
-		// TODO Auto-generated method stub
+		init_context = ExtUtil.readInt(in);
+		if (init_context == INIT_CONTEXT_EXPR) {
+			filtExpr = (XPathFilterExpr)ExtUtil.read(in, XPathFilterExpr.class, pf);
+		}
 		
+		Vector v = (Vector)ExtUtil.read(in, new ExtWrapList(XPathStep.class), pf);
+		steps = new XPathStep[v.size()];
+		for (int i = 0; i < steps.length; i++)
+			steps[i] = (XPathStep)v.elementAt(i);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		// TODO Auto-generated method stub
+		ExtUtil.writeNumeric(out, init_context);
+		if (init_context == INIT_CONTEXT_EXPR) {
+			ExtUtil.write(out, filtExpr);
+		}
 		
+		Vector v = new Vector();
+		for (int i = 0; i < steps.length; i++)
+			v.addElement(steps[i]);
+		ExtUtil.write(out, new ExtWrapList(v));
 	}
 }

@@ -43,8 +43,8 @@ public class ExtWrapIntEncodingSmall extends ExternalizableWrapper {
 	public ExternalizableWrapper clone(Object val) {
 		return new ExtWrapIntEncodingSmall(ExtUtil.toLong(val), bias);
 	}
-	
-	public void readExternal(DataInputStream in) throws 
+
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		byte b = in.readByte();
 		long l;
@@ -56,11 +56,6 @@ public class ExtWrapIntEncodingSmall extends ExternalizableWrapper {
 		}
 		
 		val = new Long(l);
-	}
-
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		readExternal(in);
 	}
 		
 	/**

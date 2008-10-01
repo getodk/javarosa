@@ -25,10 +25,16 @@ public class XPathStringLiteral extends XPathExpression {
 		return "{str:\'" + s + "\'}"; //TODO: s needs to be escaped (' -> \'; \ -> \\)
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
+	public void readExternal(DataInputStream in)
 	throws IOException, InstantiationException, IllegalAccessException,
 	UnavailableExternalizerException {
 		ExtUtil.readString(in);
+	}
+	
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+	throws IOException, InstantiationException, IllegalAccessException,
+	UnavailableExternalizerException {
+		readExternal(in);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
