@@ -21,26 +21,10 @@ public class ExtWrapIntEncodingUniform extends ExternalizableWrapper {
 	}
 	
 	public ExternalizableWrapper clone(Object val) {
-		long l;
-		
-		if (val instanceof Byte) {
-			l = ((Byte)val).byteValue();
-		} else if (val instanceof Short) {
-			l = ((Short)val).shortValue();
-		} else if (val instanceof Integer) {
-			l = ((Integer)val).intValue();
-		} else if (val instanceof Long) {
-			l = ((Long)val).longValue();
-		} else if (val instanceof Character) {
-			l = ((Character)val).charValue();
-		} else {
-			throw new ClassCastException();
-		}
-		
-		return new ExtWrapIntEncodingUniform(l);
+		return new ExtWrapIntEncodingUniform(ExtUtil.toLong(val));
 	}
 	
-	public void readExternal(DataInputStream in, Vector prototypes) throws 
+	public void readExternal(DataInputStream in) throws 
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		long l = 0;
 		byte b;
@@ -60,6 +44,11 @@ public class ExtWrapIntEncodingUniform extends ExternalizableWrapper {
 		val = new Long(l);
 	}
 
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
+		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+		readExternal(in);
+	}
+	
 	/**
 	 * serialize a numeric value, only using as many bytes as needed. splits up the value into
 	 * chunks of 7 bits, using as many chunks as needed to unambiguously represent the value. each
@@ -82,7 +71,7 @@ public class ExtWrapIntEncodingUniform extends ExternalizableWrapper {
 		}
 	}
 
-	public void metaReadExternal(DataInputStream in, Vector prototypes) {
+	public void metaReadExternal(DataInputStream in, PrototypeFactory pf) {
 		//do nothing
 	}
 

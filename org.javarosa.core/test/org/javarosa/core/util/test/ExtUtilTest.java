@@ -19,6 +19,7 @@ import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.ExternalizableWrapper;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class ExtUtilTest extends TestCase {
 	public ExtUtilTest(String name, TestMethod rTestMethod) {
@@ -49,7 +50,7 @@ public class ExtUtilTest extends TestCase {
 		testExternalizable(orig, template, null);
 	}
 	
-	public void testExternalizable (Object orig, Object template, Vector prototypes) {
+	public void testExternalizable (Object orig, Object template, PrototypeFactory pf) {
 		byte[] bytesOut;
 		Object deser;
 		Object base = orig;
@@ -73,7 +74,7 @@ public class ExtUtilTest extends TestCase {
 			if (template instanceof Class) {
 				deser = ExtUtil.read(new DataInputStream(bais), (Class)template);
 			} else if (template instanceof ExternalizableWrapper) {
-				deser = ExtUtil.read(new DataInputStream(bais), (ExternalizableWrapper)template, prototypes);				
+				deser = ExtUtil.read(new DataInputStream(bais), (ExternalizableWrapper)template, pf);				
 			} else {
 				throw new ClassCastException();
 			}
@@ -176,9 +177,9 @@ public class ExtUtilTest extends TestCase {
 		
 		testExternalizable(new ExtWrapTagged("string"), new ExtWrapTagged());
 		testExternalizable(new ExtWrapTagged(new Integer(5000)), new ExtWrapTagged());
-		Vector proto = new Vector();
-		proto.addElement(SampleExtz.class);
-		testExternalizable(new ExtWrapTagged(new SampleExtz("bon", "jovi")), new ExtWrapTagged(), proto);
+		PrototypeFactory pf = new PrototypeFactory();
+		pf.addClass(SampleExtz.class);
+		testExternalizable(new ExtWrapTagged(new SampleExtz("bon", "jovi")), new ExtWrapTagged(), pf);
 		testExternalizable(new ExtWrapTagged(new ExtWrapList(v)), new ExtWrapTagged());
 		
 		testExternalizable(new ExtWrapTagged(new ExtWrapNullable("string")), new ExtWrapTagged());

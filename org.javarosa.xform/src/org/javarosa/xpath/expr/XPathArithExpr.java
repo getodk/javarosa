@@ -6,8 +6,9 @@ import java.io.IOException;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class XPathArithExpr extends XPathBinaryOpExpr {
 	public static final int ADD = 0;
@@ -50,5 +51,17 @@ public class XPathArithExpr extends XPathBinaryOpExpr {
 		}
 		
 		return super.toString(sOp);
+	}
+
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+			throws IOException, InstantiationException, IllegalAccessException,
+			UnavailableExternalizerException {
+		op = ExtUtil.readInt(in);
+		super.readExternal(in, pf);
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExtUtil.writeNumeric(out, op);
+		super.writeExternal(out);
 	}
 }

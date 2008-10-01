@@ -12,8 +12,7 @@ import org.javarosa.core.util.MD5;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class ExtWrapTagged extends ExternalizableWrapper {
-	public final static int CLASS_HASH_SIZE = 4;
-	public final static byte[] WRAPPER_TAG = {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff};
+	public final static byte[] WRAPPER_TAG = {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff}; //must be same length as PrototypeFactory.CLASS_HASH_SIZE
 	
 	public static Hashtable WRAPPER_CODES;
 	
@@ -50,10 +49,10 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 		return new ExtWrapTagged(val);
 	}
 	
-	public void readExternal(DataInputStream in, Vector prototypes) throws 
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		ExternalizableWrapper type = readTag(in, prototypes);
-		val = ExtUtil.read(in, type, prototypes);
+		ExternalizableWrapper type = readTag(in, pf);
+		val = ExtUtil.read(in, type, pf);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -61,32 +60,40 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 		ExtUtil.write(out, val);
 	}
 
-	public static byte[] getClassHash (Class type) {
-		byte[] hash = new byte[CLASS_HASH_SIZE];
-		byte[] md5 = MD5.hash(type.getName().getBytes()); //add support for a salt, in case of collision?
+	public static ExternalizableWrapper readTag (DataInputStream in, PrototypeFactory pf) throws IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+		byte[] tag = new byte[PrototypeFactory.CLASS_HASH_SIZE];
+		in.read(tag, 0, tag.length);
 		
-		for (int i = 0; i < hash.length; i++)
-			hash[i] = md5[i];
-		
-		return hash;
-	}
-	
-	private static boolean compareHash (byte[] a, byte[] b) {
-		if (a.length != b.length) {
-			return false;
-		}
-		
-		for (int i = 0; i < a.length; i++) {
-			if (a[i] != b[i])
-				return false;
-		}
-		
-		return true;
+		if (PrototypeFactory.compareHash(tag, WRAPPER_TAG)) {
+			int wrapperCode = (int)ExtUtil.readInt(in);
+			
+			//find wrapper indicated by code
+			ExternalizableWrapper type = null;
+			for (Enumeration e = WRAPPER_CODES.keys(); e.hasMoreElements(); ) {
+				Class t = (Class)e.nextElement();
+				if (((Integer)WRAPPER_CODES.get(t)).intValue() == wrapperCode) {
+					type = (ExternalizableWrapper)t.newInstance();
+				}
+			}
+			if (type == null) {
+				throw new UnavailableExternalizerException("");
+			}
+			
+			type.metaReadExternal(in, pf);
+			return type;
+		} else {
+			Class type = pf.getClass(tag);
+			if (type == null) {
+				throw new UnavailableExternalizerException("");
+			}
+			
+			return new ExtType(type);
+		}		
 	}
 	
 	public static void writeTag (DataOutputStream out, Object o) throws IOException {
 		if (o instanceof ExternalizableWrapper && !(o instanceof ExtType)) {
-			out.write(WRAPPER_TAG, 0, CLASS_HASH_SIZE);
+			out.write(WRAPPER_TAG, 0, PrototypeFactory.CLASS_HASH_SIZE);
 			ExtUtil.writeNumeric(out, ((Integer)WRAPPER_CODES.get(o.getClass())).intValue());
 			((ExternalizableWrapper)o).metaWriteExternal(out);
 		} else {
@@ -104,116 +111,17 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 				type = o.getClass();
 			}
 				
-			byte[] tag = getClassHash(type);
+			byte[] tag = PrototypeFactory.getClassHash(type);
 			out.write(tag, 0, tag.length);
 		}
 	}
 
-	public static ExternalizableWrapper readTag (DataInputStream in, Vector prototypes) throws IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		byte[] tag = new byte[CLASS_HASH_SIZE];
-		in.read(tag, 0, tag.length);
-		
-		if (compareHash(tag, WRAPPER_TAG)) {
-			int wrapperCode = (int)ExtUtil.readInt(in);
-			
-			//find wrapper indicated by code
-			ExternalizableWrapper type = null;
-			for (Enumeration e = WRAPPER_CODES.keys(); e.hasMoreElements(); ) {
-				Class t = (Class)e.nextElement();
-				if (((Integer)WRAPPER_CODES.get(t)).intValue() == wrapperCode) {
-					type = (ExternalizableWrapper)t.newInstance();
-				}
-			}
-			if (type == null) {
-				throw new UnavailableExternalizerException("");
-			}
-			
-			type.metaReadExternal(in, prototypes);
-			return type;
-		} else {
-			//find class corresponding to hash
-			Class type = null;
-			for (int i = 0; i < prototypes.size(); i++) {
-				Class t = (Class)prototypes.elementAt(i);
-				if (compareHash(tag, getClassHash(t))) {
-					type = t;
-					break;
-				}
-			}
-			if (type == null) {
-				throw new UnavailableExternalizerException("");
-			}
-			
-			return new ExtType(type);
-		}		
-	}
-
-	public void metaReadExternal(DataInputStream in, Vector prototypes) throws
+	public void metaReadExternal(DataInputStream in, PrototypeFactory pf) throws
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		throw new RuntimeException("Tagged wrapper should never be tagged");
 	}
 
 	public void metaWriteExternal(DataOutputStream out) throws IOException {
-		throw new RuntimeException("Tagged wrapper should never be tagged"); //writeTag(out, val);
-	}
-	
-	public static Vector initPrototypes (Vector prototypes) {
-		if (prototypes == null) {
-			prototypes = new Vector();
-		}
-		
-		fillDefaultClasses(prototypes);
-		checkCollisions(prototypes); // probably want to run this less frequently
-		
-		return prototypes;
-	}
-	
-	private static void fillDefaultClasses (Vector prototypes) {
-		Class[] baseTypes = {Object.class,
-				Integer.class,
-				Long.class,
-				Short.class,
-				Byte.class,
-				Character.class,
-				Boolean.class,
-				Float.class,
-				Double.class,
-				String.class,
-				Date.class};
-		
-		for (int i = 0; i < baseTypes.length; i++) {
-			addNoDup(prototypes, baseTypes[i]);
-		}
-	}
-	
-	private static void checkCollisions (Vector prototypes) {
-		Hashtable hashes = new Hashtable();
-		for (Enumeration e = prototypes.elements(); e.hasMoreElements(); ) {
-			Class t = (Class)e.nextElement();
-			byte[] hash = getClassHash(t);
-			
-			if (compareHash(hash, WRAPPER_TAG)) {
-				throw new Error("Hash collision! " + t.getName() + " and reserved wrapper tag");
-			}
-			
-			for (Enumeration f = hashes.keys(); f.hasMoreElements(); ) {
-				Class u = (Class)f.nextElement();
-				
-				if (compareHash(hash, (byte[])hashes.get(u))) {
-					throw new Error("Hash collision! " + t.getName() + " and " + u.getName());					
-				}
-			}
-			
-			hashes.put(t, hash);
-		}
-	}
-	
-	private static boolean addNoDup (Vector v, Object o) {
-		if (!v.contains(o)) {
-			v.addElement(o);
-			return true;
-		} else {
-			return false;
-		}
+		throw new RuntimeException("Tagged wrapper should never be tagged");
 	}
 }

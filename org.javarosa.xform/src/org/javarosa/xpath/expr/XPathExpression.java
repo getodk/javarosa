@@ -1,19 +1,20 @@
 package org.javarosa.xpath.expr;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.util.ExternalizableDynamic;
+import org.javarosa.core.util.UnavailableExternalizerException;
 
-public abstract class XPathExpression {
+public abstract class XPathExpression implements ExternalizableDynamic {
 
 	public abstract Object eval (IFormDataModel model, EvaluationContext evalContext);
 	
-	
-	
-	
-	
-	
-	
-	
+	public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+		throw new UnavailableExternalizerException("");
+	}
 	
 	/*======= DEBUGGING ========*/
 	// should not compile onto phone

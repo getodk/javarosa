@@ -70,11 +70,11 @@ public class ExtUtil {
 		return read(in, type, null);
 	}
 	
-	public static Object read (DataInputStream in, Class type, Vector prototypes)
+	public static Object read (DataInputStream in, Class type, PrototypeFactory pf)
 		throws IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		if (ExternalizableDynamic.class.isAssignableFrom(type)) {
 			ExternalizableDynamic extd = (ExternalizableDynamic)type.newInstance();
-			extd.readExternal(in, ExtWrapTagged.initPrototypes(prototypes));
+			extd.readExternal(in, pf == null ? new PrototypeFactory() : pf);
 			return extd;
 		} else if (Externalizable.class.isAssignableFrom(type)) {
 			Externalizable ext = (Externalizable)type.newInstance();
@@ -110,9 +110,9 @@ public class ExtUtil {
 		return read(in, ew, null);
 	}
 	
-	public static Object read (DataInputStream in, ExternalizableWrapper ew, Vector prototypes) throws
+	public static Object read (DataInputStream in, ExternalizableWrapper ew, PrototypeFactory pf) throws
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		ew.readExternal(in, ExtWrapTagged.initPrototypes(prototypes));
+		ew.readExternal(in, pf == null ? new PrototypeFactory() : pf);
 		return ew.val;
 	}
 	
@@ -174,5 +174,21 @@ public class ExtUtil {
 		if (l < Byte.MIN_VALUE || l > Byte.MAX_VALUE)
 			throw new ArithmeticException("Value (" + l + ") cannot fit into byte");
 		return (byte)l;
+	}
+	
+	public static long toLong (Object o) {
+		if (o instanceof Byte) {
+			return ((Byte)o).byteValue();
+		} else if (o instanceof Short) {
+			return ((Short)o).shortValue();
+		} else if (o instanceof Integer) {
+			return ((Integer)o).intValue();
+		} else if (o instanceof Long) {
+			return ((Long)o).longValue();
+		} else if (o instanceof Character) {
+			return ((Character)o).charValue();
+		} else {
+			throw new ClassCastException();
+		}
 	}
 }

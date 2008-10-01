@@ -48,13 +48,13 @@ public class ExtWrapList extends ExternalizableWrapper {
 		return new ExtWrapList((Vector)val, type);
 	}
 	
-	public void readExternal(DataInputStream in, Vector prototypes) throws 
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		Vector v = new Vector();
 
 		long size = ExtUtil.readNumeric(in);
 		for (int i = 0; i < size; i++) {
-			v.addElement(ExtUtil.read(in, type, prototypes));
+			v.addElement(ExtUtil.read(in, type, pf));
 		}
 		
 		val = v;
@@ -69,9 +69,9 @@ public class ExtWrapList extends ExternalizableWrapper {
 		}
 	}
 
-	public void metaReadExternal (DataInputStream in, Vector prototypes) throws
+	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		type = ExtWrapTagged.readTag(in, prototypes);
+		type = ExtWrapTagged.readTag(in, pf);
 	}
 
 	public void metaWriteExternal (DataOutputStream out) throws IOException {

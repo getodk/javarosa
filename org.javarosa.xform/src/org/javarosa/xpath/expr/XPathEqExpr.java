@@ -1,7 +1,14 @@
 package org.javarosa.xpath.expr;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class XPathEqExpr extends XPathBinaryOpExpr {
 	public boolean equal;
@@ -47,5 +54,17 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
 
 	public String toString () {
 		return super.toString(equal ? "==" : "!=");
+	}
+	
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+	throws IOException, InstantiationException, IllegalAccessException,
+	UnavailableExternalizerException {
+		equal = ExtUtil.readBool(in);
+		super.readExternal(in, pf);
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExtUtil.writeBool(out, equal);
+		super.writeExternal(out);
 	}
 }
