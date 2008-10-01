@@ -142,7 +142,7 @@ public class XPathStep implements ExternalizableDynamic {
 		switch (test) {
 		case TEST_NAME: name = (XPathQName)ExtUtil.read(in, XPathQName.class); break;
 		case TEST_NAMESPACE_WILDCARD: namespace = ExtUtil.readString(in); break;
-		case TEST_TYPE_PROCESSING_INSTRUCTION: literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf); break;
+		case TEST_TYPE_PROCESSING_INSTRUCTION: literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class)); break; //TODO: this will call JRSP.getPrototypes, even though we don't need them... how to avoid?
 		}	
 		
 		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
