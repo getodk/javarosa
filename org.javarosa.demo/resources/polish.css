@@ -67,6 +67,42 @@ focused{
 	border-type: none;
 }
 
+.nextQuestion{
+	screen-change-animation: right;
+	background-color: gray;
+	right-screen-change-animation-speed: 8; 
+    right-screen-change-animation-move-previous: true; 
+	
+}
+
+.prevQuestion{
+	screen-change-animation: left;
+	background-color: gray;
+	left-screen-change-animation-speed: 8;  
+    left-screen-change-animation-move-previous: true; 
+	
+}
+
+fromViewAnswers
+{
+	screen-change-animation: particle;
+	background-color: gray;
+	
+}
+
+.framedForm {
+	padding: 2;
+	background-color: gray;
+	layout: bottom | horizontal-center;	
+}
+
+.CL_Forms_Form{
+	padding: 2;
+	background-color: gray;
+	screen-change-animation: particle;
+	layout: bottom | horizontal-center;	
+}
+
 .textBox {
 	label-style: choiceGroupLabel;
 	layout: horizontal-center;
