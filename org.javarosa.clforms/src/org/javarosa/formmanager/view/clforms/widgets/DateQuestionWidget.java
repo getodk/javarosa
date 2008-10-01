@@ -17,7 +17,17 @@ public class DateQuestionWidget extends SingleQuestionScreen
 	public DateQuestionWidget(QuestionDef qDef) {
 		super(qDef);
 	}
-
+	
+	public DateQuestionWidget(QuestionDef prompt, int num) {
+		super (prompt,num);
+	}
+	public DateQuestionWidget(QuestionDef prompt, String str) {
+		super (prompt,str);
+	}
+	public DateQuestionWidget(QuestionDef prompt, char c) {
+		super (prompt,c);
+	}
+	
 	public void creatView() {
 		//#style textBox
 		datePicker = new DateField(qDef.getShortText(), DateField.DATE);

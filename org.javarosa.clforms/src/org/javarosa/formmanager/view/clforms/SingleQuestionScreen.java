@@ -39,11 +39,67 @@ public abstract class SingleQuestionScreen extends Form {
 	public ItemCommandListener itemListner;
 
 	public SingleQuestionScreen(QuestionDef prompt) {
+		super(prompt.getName());		
+		this.qDef = prompt;
+		this.creatView();
+		this.setUpCommands();
+	}
+	
+	//hack: this is for moving to NEXT question
+	public SingleQuestionScreen(QuestionDef prompt, int temp) {
+	//#style nextQuestion
+		super(prompt.getName());
+		
+		this.qDef = prompt;
+		this.creatView();
+		this.setUpCommands();
+	}
+
+	//hack: this is for moving to PREV question
+	public SingleQuestionScreen(QuestionDef prompt, String str) {
+	//#style prevQuestion
 		super(prompt.getName());
 		this.qDef = prompt;
 		this.creatView();
 		this.setUpCommands();
 	}
+
+	//hack: this is for moving to question fromViewAnswers
+	public SingleQuestionScreen(QuestionDef prompt, char str) {
+	//#style fromViewAnswers
+		super(prompt.getName());
+		this.qDef = prompt;
+		this.creatView();
+		this.setUpCommands();
+	}
+	
+
+/*
+ * This constructor would have been the non-hacked version, but it doesn't work:
+ * The first line of a constructor must be super(), not even an if statement may 
+ * come before it
+*/
+/*public SingleQuestionScreen(QuestionDef prompt, boolean direction) {
+	
+		if (direction == true)
+		{
+			//#style nextQuestion
+			super(prompt.getName());
+	//		SingleQuestionScreen(prompt,1);
+		}
+		else
+		{
+
+			//#style prevQuestion
+			super(prompt.getName());
+	//		SingleQuestionScreen(prompt,"s");
+		}
+		this.qDef = prompt;
+		this.creatView();
+		this.setUpCommands();
+	}*/
+
+
 
 	public abstract void creatView();
     public abstract IAnswerData getWidgetValue ();
@@ -54,7 +110,7 @@ public abstract class SingleQuestionScreen extends Form {
 	}
 
 	private void setUpCommands(){
-		nextCommand = new Command("next", Command.SCREEN, 1);
+		nextCommand = new Command("next", Command.SCREEN, 0);
 		previousCommand = new Command("back", Command.SCREEN, 2);
 		viewAnswersCommand = new Command("View Answers", Command.SCREEN, 3);
 
@@ -70,7 +126,7 @@ public abstract class SingleQuestionScreen extends Form {
 	}
 
 	public SingleQuestionScreen (String formTitle) {
-        //#style framedForm
+        //#style CL_Forms_Form
     	super(formTitle);
 	}
 

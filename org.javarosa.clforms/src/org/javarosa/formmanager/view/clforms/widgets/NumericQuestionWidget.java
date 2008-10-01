@@ -17,6 +17,17 @@ public class NumericQuestionWidget extends SingleQuestionScreen
 
 	}
 
+	
+	public NumericQuestionWidget(QuestionDef prompt, int num) {
+		super (prompt,num);
+	}
+	public NumericQuestionWidget(QuestionDef prompt, String str) {
+		super (prompt,str);
+	}
+	public NumericQuestionWidget(QuestionDef prompt, char c) {
+		super (prompt,c);
+	}
+	
 	public void creatView() {
 		//#style textBox
 		 tf = new TextField("", "", 200, TextField.NUMERIC);

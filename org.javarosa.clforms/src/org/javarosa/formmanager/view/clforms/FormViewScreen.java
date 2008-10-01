@@ -27,7 +27,7 @@ public class FormViewScreen extends List {
 	public static Command backCommand;
 
 	public FormViewScreen (FormEntryModel model) {
-        //#style framedForm
+        //#style CL_Forms_Form
     	super(model.getForm().getName(),List.IMPLICIT);
     	this.model = model;
     	createView();
