@@ -1,5 +1,9 @@
 package org.javarosa.xpath.expr;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -10,6 +14,8 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathUnsupportedException;
@@ -101,5 +107,17 @@ public class XPathPathExpr extends XPathExpression {
 		sb.append("}}");
 		
 		return sb.toString();
+	}
+
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+			throws IOException, InstantiationException, IllegalAccessException,
+			UnavailableExternalizerException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 }

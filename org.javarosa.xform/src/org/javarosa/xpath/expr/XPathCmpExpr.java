@@ -1,7 +1,14 @@
 package org.javarosa.xpath.expr;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class XPathCmpExpr extends XPathBinaryOpExpr {
 	public static final int LT = 0;
@@ -60,5 +67,17 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 		}
 		
 		return super.toString(sOp);
+	}
+	
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+	throws IOException, InstantiationException, IllegalAccessException,
+	UnavailableExternalizerException {
+		op = ExtUtil.readInt(in);
+		super.readExternal(in, pf);
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExtUtil.writeNumeric(out, op);
+		super.writeExternal(out);
 	}
 }

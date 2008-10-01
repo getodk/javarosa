@@ -76,14 +76,14 @@ public class ExtWrapMap extends ExternalizableWrapper {
 		return new ExtWrapMap((Hashtable)val, keyType, dataType);
 	}
 	
-	public void readExternal(DataInputStream in, Vector prototypes) throws 
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		Hashtable h = ordered ? new OrderedHashtable() : new Hashtable();
 
 		long size = ExtUtil.readNumeric(in);
 		for (int i = 0; i < size; i++) {
-			Object key = ExtUtil.read(in, keyType, prototypes);
-			Object elem = ExtUtil.read(in, dataType, prototypes);
+			Object key = ExtUtil.read(in, keyType, pf);
+			Object elem = ExtUtil.read(in, dataType, pf);
 			h.put(key, elem);
 		}
 		
@@ -103,10 +103,10 @@ public class ExtWrapMap extends ExternalizableWrapper {
 		}		
 	}
 
-	public void metaReadExternal (DataInputStream in, Vector prototypes) throws
+	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		keyType = ExtWrapTagged.readTag(in, prototypes);
-		dataType = ExtWrapTagged.readTag(in, prototypes);
+		keyType = ExtWrapTagged.readTag(in, pf);
+		dataType = ExtWrapTagged.readTag(in, pf);
 	}
 
 	public void metaWriteExternal (DataOutputStream out) throws IOException {

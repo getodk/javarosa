@@ -38,16 +38,16 @@ public class ExtType extends ExternalizableWrapper {
 		return new ExtType(val);
 	}
 	
-	public void readExternal(DataInputStream in, Vector prototypes) throws
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws
 		IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
-		val = ExtUtil.read(in, type);
+		val = ExtUtil.read(in, type, pf);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, val);
 	}
 
-	public void metaReadExternal (DataInputStream in, Vector prototypes) {
+	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) {
 		throw new RuntimeException("Identity wrapper should never be tagged");
 	}
 

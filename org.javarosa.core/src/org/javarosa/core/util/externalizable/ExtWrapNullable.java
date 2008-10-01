@@ -42,10 +42,10 @@ public class ExtWrapNullable extends ExternalizableWrapper {
 		return new ExtWrapNullable(val);
 	}
 	
-	public void readExternal(DataInputStream in, Vector prototypes) throws 
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
 		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
 		if (in.readBoolean()) {
-			val = ExtUtil.read(in, type, prototypes);
+			val = ExtUtil.read(in, type, pf);
 		} else {
 			val = null;
 		}
@@ -60,9 +60,9 @@ public class ExtWrapNullable extends ExternalizableWrapper {
 		}
 	}
 
-	public void metaReadExternal(DataInputStream in, Vector prototypes)
+	public void metaReadExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		type = ExtWrapTagged.readTag(in, prototypes);
+		type = ExtWrapTagged.readTag(in, pf);
 	}
 
 	public void metaWriteExternal(DataOutputStream out) throws IOException {

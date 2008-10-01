@@ -1,0 +1,126 @@
+package org.javarosa.core.util.externalizable;
+
+import java.util.Date;
+import java.util.Vector;
+
+import org.javarosa.core.util.MD5;
+
+public class PrototypeFactory {
+	public final static int CLASS_HASH_SIZE = 4;
+	
+	private Vector classes;
+	private Vector hashes;
+	
+	private boolean initialized; //use lazy evalutaion to avoid needless pre-computing of hashes
+	
+	public PrototypeFactory () {
+		classes = new Vector();
+		hashes = new Vector();
+		initialized = false;
+	}
+	
+	public PrototypeFactory (Vector classNames) {
+		this();
+		
+		for (int i = 0; i < classNames.size(); i++) {
+			try {
+				addClass(Class.forName((String)classNames.elementAt(i)));
+			} catch (ClassNotFoundException cnfe) {
+				throw new RuntimeException(); //TODO: throw an appropriate (runtime) exception
+			}
+		}
+	}
+
+	private void initDefaultClasses () {
+		Class[] baseTypes = {
+				Object.class,
+				Integer.class,
+				Long.class,
+				Short.class,
+				Byte.class,
+				Character.class,
+				Boolean.class,
+				Float.class,
+				Double.class,
+				String.class,
+				Date.class
+		};
+
+		initialized = true;
+		
+		for (int i = 0; i < baseTypes.length; i++) {
+			addClass(baseTypes[i]);
+		}
+	}
+
+	public void addClass (Class c) {
+		if (!initialized) {
+			initDefaultClasses();
+		}
+		
+		byte[] hash = getClassHash(c);
+		
+		if (compareHash(hash, ExtWrapTagged.WRAPPER_TAG)) {
+			throw new Error("Hash collision! " + c.getName() + " and reserved wrapper tag");
+		}
+		
+		Class d = getClass(hash);
+		if (d != null && d != c) {
+			throw new Error("Hash collision! " + c.getName() + " and " + d.getName());					
+		}
+		
+		classes.addElement(c);
+		hashes.addElement(hash);
+	}
+	
+	public Class getClass (byte[] hash) {
+		if (!initialized) {
+			initDefaultClasses();
+		}
+		
+		for (int i = 0; i < classes.size(); i++) {
+			if (compareHash(hash, (byte[])hashes.elementAt(i))) {
+				return (Class)classes.elementAt(i);
+			}
+		}
+		
+		return null;
+	}
+	
+	public Object getInstance (byte[] hash) {
+		return getInstance(getClass(hash));
+	}
+	
+	public static Object getInstance (Class c) {
+		try {
+			return c.newInstance();
+		} catch (InstantiationException ie) {
+			throw new RuntimeException(); //TODO: throw an appropriate (runtime) exception
+		} catch (IllegalAccessException iae) {
+			throw new RuntimeException(); //TODO: throw an appropriate (runtime) exception
+		}
+	}
+	
+	public static byte[] getClassHash (Class type) {
+		byte[] hash = new byte[CLASS_HASH_SIZE];
+		byte[] md5 = MD5.hash(type.getName().getBytes()); //add support for a salt, in case of collision?
+		
+		for (int i = 0; i < hash.length; i++)
+			hash[i] = md5[i];
+		
+		return hash;
+	}
+	
+	public static boolean compareHash (byte[] a, byte[] b) {
+		if (a.length != b.length) {
+			return false;
+		}
+		
+		for (int i = 0; i < a.length; i++) {
+			if (a[i] != b[i])
+				return false;
+		}
+		
+		return true;
+	}
+}

@@ -1,6 +1,8 @@
 package org.javarosa.xpath.expr;
 
-import java.util.Calendar;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -10,6 +12,10 @@ import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapListPoly;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
@@ -37,6 +43,26 @@ public class XPathFuncExpr extends XPathExpression {
 		sb.append("}}");
 		
 		return sb.toString();
+	}
+	
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+	throws IOException, InstantiationException, IllegalAccessException,
+	UnavailableExternalizerException {
+		id = (XPathQName)ExtUtil.read(in, XPathQName.class);
+		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
+		
+		args = new XPathExpression[v.size()];
+		for (int i = 0; i < args.length; i++)
+			args[i] = (XPathExpression)v.elementAt(i);		
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		Vector v = new Vector();
+		for (int i = 0; i < args.length; i++)
+			v.addElement(args[i]);
+
+		ExtUtil.write(out, id);
+		ExtUtil.write(out, new ExtWrapListPoly(v));
 	}
 	
 	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
