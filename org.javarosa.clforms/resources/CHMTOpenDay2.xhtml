@@ -1,5 +1,5 @@
 <h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
-<h:title>Open Day Report</h:title>  
+<h:title>Open Day Report</h:title>
 	<model id="new 48657">
     <instance xmlns="">
 	<root>
@@ -47,8 +47,8 @@
 	<bind id="hidden3" nodeset="/root/Meta/TimeStartRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
 	<bind id="hidden4" nodeset="/root/Meta/TimeEndRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
 	<bind id="15" nodeset="/root/Date" required="true()" type="xsd:date"/>
-    <bind id="16" nodeset="/root/Prov" type="xsd:string"/>
-    <bind id="17" nodeset="/root/Wheretrain" type="xsd:string"/>
+    <bind id="16" nodeset="/root/Prov" required="true()" type="xsd:string"/>
+    <bind id="17" nodeset="/root/Wheretrain" required="true()" type="xsd:string"/>
     <bind id="18" nodeset="/root/Wheretrainother" type="xsd:string" relevant="/root/Wheretrain='99'"/>
     <bind id="19" nodeset="/root/LocEC" type="xsd:string" relevant="/root/Prov='1'"/>
     <bind id="20" nodeset="/root/LocWC" type="xsd:string" relevant="/root/Prov='9'"/>
@@ -59,11 +59,11 @@
     <bind id="25" nodeset="/root/LocMP" type="xsd:string" relevant="/root/Prov='6'"/>
     <bind id="26" nodeset="/root/LocNW" type="xsd:string" relevant="/root/Prov='7'"/>
     <bind id="27" nodeset="/root/LocNC" type="xsd:string" relevant="/root/Prov='8'"/>
-    <bind id="28" nodeset="/root/Male" type="xsd:int"/>
-    <bind id="29" nodeset="/root/Female" type="xsd:int"/>
-    <bind id="30" nodeset="/root/TimeStart" type="xsd:time"/>
-    <bind id="31" nodeset="/root/TimeEnd" type="xsd:time"/>
-    <bind id="1" nodeset="/root/Topics1" type="xsd:string"/>
+    <bind id="28" nodeset="/root/Male" required="true()" type="xsd:int"/>
+    <bind id="29" nodeset="/root/Female" required="true()" type="xsd:int"/>
+    <bind id="30" nodeset="/root/TimeStart" required="true()" type="xsd:time"/>
+    <bind id="31" nodeset="/root/TimeEnd" required="true()" type="xsd:time"/>
+    <bind id="1" nodeset="/root/Topics1" required="true()" type="xsd:string"/>
     <bind id="2" nodeset="/root/Topicother1" type="xsd:string" relevant="/root/Topics1='59'"/>
     <bind id="3" nodeset="/root/Topics2" type="xsd:string"/>
     <bind id="4" nodeset="/root/Topicother2" type="xsd:string" relevant="/root/Topics2='59'"/>

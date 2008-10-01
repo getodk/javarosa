@@ -75,8 +75,8 @@
 	<bind id="hidden3" nodeset="/root/Meta/TimeStartRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
 	<bind id="hidden4" nodeset="/root/Meta/TimeEndRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
 	<bind id="5" nodeset="/root/Date" required="true()" type="xsd:date"/>
-    <bind id="6" nodeset="/root/Prov" type="xsd:string"/>
-    <bind id="7" nodeset="/root/Where" type="xsd:string"/>
+    <bind id="6" nodeset="/root/Prov" required="true()" type="xsd:string"/>
+    <bind id="7" nodeset="/root/Where" required="true()" type="xsd:string"/>
     <bind id="8" nodeset="/root/Whereother" type="xsd:string" relevant="/root/Where='99'" />
     <bind id="9" nodeset="/root/LocWCHC" type="xsd:string" relevant="/root/Prov='9' and /root/Where='1'"/>
     <bind id="10" nodeset="/root/LocWCHCother" type="xsd:string" relevant="/root/LocWCHC='999'"/>
@@ -101,11 +101,11 @@
     <bind id="29" nodeset="/root/LocMPSCother" type="xsd:string" relevant="/root/Prov='6'"/>
     <bind id="30" nodeset="/root/LocNCSCother" type="xsd:string" relevant="/root/Prov='8'"/>
     <bind id="31" nodeset="/root/LocNWSCother" type="xsd:string" relevant="/root/Prov='7'"/>
-    <bind id="32" nodeset="/root/Male" type="xsd:int"/>
-    <bind id="33" nodeset="/root/Female" type="xsd:int"/>
-    <bind id="34" nodeset="/root/TimeStart" type="xsd:time"/>
-    <bind id="35" nodeset="/root/TimeEnd" type="xsd:time"/>
-    <bind id="49" nodeset="/root/Topics1" type="xsd:string"/>
+    <bind id="32" nodeset="/root/Male" required="true()" type="xsd:int"/>
+    <bind id="33" nodeset="/root/Female" required="true()" type="xsd:int"/>
+    <bind id="34" nodeset="/root/TimeStart" required="true()" type="xsd:time"/>
+    <bind id="35" nodeset="/root/TimeEnd" required="true()" type="xsd:time"/>
+    <bind id="49" nodeset="/root/Topics1" required="true()" type="xsd:string"/>
     <bind id="50" nodeset="/root/Topicother1" type="xsd:string" relevant="/root/Topics1='20'"/>
     <bind id="51" nodeset="/root/Topics2" type="xsd:string"/>
     <bind id="52" nodeset="/root/Topicother2" type="xsd:string" relevant="/root/Topics2='20'"/>
@@ -116,7 +116,7 @@
     <bind id="57" nodeset="/root/Topics5" type="xsd:string"/>
     <bind id="58" nodeset="/root/Topicother5" type="xsd:string" relevant="/root/Topics5='20'"/>
     <bind id="44" nodeset="/root/Support" type="xsd:select1"/>
-    <bind id="45" nodeset="/root/Individual" type="xsd:select1"/>
+    <bind id="45" nodeset="/root/Individual" required="true()" type="xsd:select1"/>
     <bind id="36" nodeset="/root/Mon" type="xsd:select1" relevant="/root/MindsetTV='Y'"/>
     <bind id="37" nodeset="/root/AVKit" type="xsd:select1"/>
     <bind id="38" nodeset="/root/CHMTDVD" type="xsd:select1"/>
@@ -131,7 +131,7 @@
     <bind id="4" nodeset="/root/MindsetTV" type="xsd:select1" relevant="/root/Where='1'"/>
     <bind id="46" nodeset="/root/Grade" type="xsd:string" relevant="/root/Where='2' or /root/Where='3'"/>
     <bind id="47" nodeset="/root/Print" type="xsd:select1" relevant="/root/Where='2' or /root/Where='3'"/>
-    <bind id="48" nodeset="/root/Confirmed" type="xsd:select1"/>
+    <bind id="48" nodeset="/root/Confirmed" required="true()" type="xsd:select1"/>
   </model>
 
   <input bind="5">

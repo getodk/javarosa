@@ -56,8 +56,8 @@
 	<bind id="hidden3" nodeset="/root/Meta/TimeStartRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
 	<bind id="hidden4" nodeset="/root/Meta/TimeEndRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
     <bind id="1" nodeset="/root/Date" required="true()" type="xsd:date"/>
-    <bind id="2" nodeset="/root/Prov" type="xsd:string"/>
-    <bind id="3" nodeset="/root/Wheretrain" type="xsd:string"/>
+    <bind id="2" nodeset="/root/Prov" required="true()" type="xsd:string"/>
+    <bind id="3" nodeset="/root/Wheretrain" required="true()" type="xsd:string"/>
     <bind id="4" nodeset="/root/Wheretrainother" type="xsd:string" relevant="/root/Wheretrain='99'"/>
     <bind id="5" nodeset="/root/LocEC" type="xsd:string" relevant="/root/Prov='1'"/>
     <bind id="6" nodeset="/root/LocWC" type="xsd:string" relevant="/root/Prov='9'"/>
@@ -68,11 +68,11 @@
     <bind id="11" nodeset="/root/LocMP" type="xsd:string" relevant="/root/Prov='6'"/>
     <bind id="12" nodeset="/root/LocNW" type="xsd:string" relevant="/root/Prov='7'"/>
     <bind id="13" nodeset="/root/LocNC" type="xsd:string" relevant="/root/Prov='8'"/>
-    <bind id="14" nodeset="/root/Male" type="xsd:int"/>
-    <bind id="15" nodeset="/root/Female" type="xsd:int"/>
-    <bind id="16" nodeset="/root/TimeStart" type="xsd:time"/>
-    <bind id="17" nodeset="/root/TimeEnd" type="xsd:time"/>
-    <bind id="26" nodeset="/root/Topics1" type="xsd:string"/>
+    <bind id="14" nodeset="/root/Male" required="true()" type="xsd:int"/>
+    <bind id="15" nodeset="/root/Female" required="true()" type="xsd:int"/>
+    <bind id="16" nodeset="/root/TimeStart" required="true()" type="xsd:time"/>
+    <bind id="17" nodeset="/root/TimeEnd" required="true()" type="xsd:time"/>
+    <bind id="26" nodeset="/root/Topics1" required="true()" type="xsd:string"/>
     <bind id="27" nodeset="/root/Topicother1" type="xsd:string" relevant="/root/Topics1='20'"/>
     <bind id="28" nodeset="/root/Topics2" type="xsd:string"/>
     <bind id="29" nodeset="/root/Topicother2" type="xsd:string" relevant="/root/Topics2='20'"/>
@@ -88,13 +88,13 @@
     <bind id="21" nodeset="/root/ChmtSparesBesties" type="xsd:select1"/>
     <bind id="22" nodeset="/root/ChmtPSA" type="xsd:select1"/>
     <bind id="23" nodeset="/root/CofacilitateCHMT" type="xsd:string"/>
-    <bind id="24" nodeset="/root/CofacilitatorCHMT" type="xsd:string" relevant="/root/CofacilitateCHMT!='1'"/>
+    <bind id="24" nodeset="/root/CofacilitatorCHMT" type="xsd:string" relevant="/root/CofacilitateCHMT='2' or /root/CofacilitateCHMT='3' or /root/CofacilitateCHMT='4' or /root/CofacilitateCHMT='5'"/>
     <bind id="36" nodeset="/root/Oname" type="xsd:string"/>
     <bind id="37" nodeset="/root/Ophone" type="xsd:int"/>
     <bind id="38" nodeset="/root/Ocontact" type="xsd:string"/>
     <bind id="39" nodeset="/root/Ocontactnumber" type="xsd:int"/>
     <bind id="40" nodeset="/root/Oposition" type="xsd:string"/>
-    <bind id="25" nodeset="/root/Confirmed" type="xsd:select1"/>
+    <bind id="25" nodeset="/root/Confirmed" required="true()" type="xsd:select1"/>
   </model>
   <input bind="1">
     <label>On what date was the session held?</label>
