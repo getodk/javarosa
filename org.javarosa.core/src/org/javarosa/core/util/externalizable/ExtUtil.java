@@ -4,11 +4,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.ExternalizableDynamic;
+import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class ExtUtil {
@@ -194,6 +197,62 @@ public class ExtUtil {
 			return ((Character)o).charValue();
 		} else {
 			throw new ClassCastException();
+		}
+	}
+	
+	public static boolean equals (Object a, Object b) {
+		if (a == null) {
+			return b == null;
+		} else if (a instanceof Vector) {
+			return (b instanceof Vector && vectorEquals((Vector)a, (Vector)b));
+		} else if (a instanceof Hashtable) {
+			return (b instanceof Hashtable && hashtableEquals((Hashtable)a, (Hashtable)b));
+		} else {
+			return a.equals(b);
+		}		
+	}
+	
+	public static boolean vectorEquals (Vector a, Vector b) {
+		if (a.size() != b.size()) {
+			return false;
+		} else {
+			for (int i = 0; i < a.size(); i++) {
+				if (!equals(a.elementAt(i), b.elementAt(i))) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+	}
+	
+	public static boolean hashtableEquals (Hashtable a, Hashtable b) {
+		if (a.size() != b.size()) {
+			return false;
+		} else {
+			for (Enumeration ea = a.keys(); ea.hasMoreElements(); ) {
+				Object keyA = ea.nextElement();
+
+				if (!a.get(keyA).equals(b.get(keyA))) {
+					return false;
+				}
+			}
+			
+			if (a instanceof OrderedHashtable && b instanceof OrderedHashtable) {
+				Enumeration ea = a.keys();
+				Enumeration eb = b.keys();
+				
+				while (ea.hasMoreElements()) {
+					Object keyA = ea.nextElement();
+					Object keyB = eb.nextElement();
+					
+					if (!keyA.equals(keyB)) {
+						return false;
+					}
+				}
+			}
+			
+			return true;
 		}
 	}
 }
