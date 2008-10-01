@@ -17,7 +17,18 @@ public class TimeQuestionWidget extends SingleQuestionScreen
 	public TimeQuestionWidget(QuestionDef question) {
 		super(question);
 	}
-
+	
+	
+	public TimeQuestionWidget(QuestionDef prompt, int num) {
+		super (prompt,num);
+	}
+	public TimeQuestionWidget(QuestionDef prompt, String str) {
+		super (prompt,str);
+	}
+	public TimeQuestionWidget(QuestionDef prompt, char c) {
+		super (prompt,c);
+	}
+	
 	public void creatView() {
 		//#style textBox
 		timePicker = new DateField(qDef.getShortText(), DateField.TIME);

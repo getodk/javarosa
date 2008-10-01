@@ -15,10 +15,21 @@ public class TextQuestionWidget extends SingleQuestionScreen {
 		super(question);
 	}
 
+	
+	public TextQuestionWidget(QuestionDef prompt, int num) {
+		super (prompt,num);
+	}
+	public TextQuestionWidget(QuestionDef prompt, String str) {
+		super (prompt,str);
+	}
+	public TextQuestionWidget(QuestionDef prompt, char c) {
+		super (prompt,c);
+	}
+	
 	public void creatView() {
 		setHint("Type in your answer");
 		//#style textBox
-		 tf = new TextField("", "", 200, TextField.ANY);
+		tf = new TextField("", "", 200, TextField.ANY);
 		tf.setLabel(qDef.getLongText());
 		this.append(tf);
 		this.addNavigationButtons();

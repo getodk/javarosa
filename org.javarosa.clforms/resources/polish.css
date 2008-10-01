@@ -106,10 +106,42 @@ focused{
 	icon-image-align: bottom
 }
 
+
+
+.nextQuestion{
+	screen-change-animation: right;
+	background-color: gray;
+	right-screen-change-animation-speed: 8; 
+    right-screen-change-animation-move-previous: true; 
+	
+}
+
+.prevQuestion{
+	screen-change-animation: left;
+	background-color: gray;
+	left-screen-change-animation-speed: 8;  
+    left-screen-change-animation-move-previous: true; 
+	
+}
+
+fromViewAnswers
+{
+	screen-change-animation: particle;
+	background-color: gray;
+	
+}
+
 .framedForm {
 	padding: 2;
 	background-color: gray;
-	layout: bottom | horizontal-center;
+	layout: bottom | horizontal-center;	
+}
+
+.CL_Forms_Form{
+	padding: 2;
+	background-color: gray;
+	screen-change-animation: particle;
+	layout: bottom | horizontal-center;	
 }
 	
 .questiontext extends textBox{
@@ -154,6 +186,8 @@ menu {
 	font-color: red;
 	menubar-color: black;
 	margin: 0;
+	view-type: slide-up;
+	
 }
 
 leftcommand {
@@ -174,6 +208,7 @@ rightcommand {
 .container {
 	columns: 1;
 	layout: expand | vshrink;
+	screen-change-animation: right;
 }
 
 .plainbutton {
@@ -216,6 +251,8 @@ rightcommand {
 	margin-right: 1;
 	border-width: 1;
 	border-color: black;
+	screen-change-animation: right;
+	
 }
 
 /* 'expand' is currently set in both splitleft and splitright because without it the text doesn't always align correctly.
@@ -280,7 +317,7 @@ rightcommand {
     background-color: black;
     layout: horizontal-expand | horizontal-center | top;
     //#if polish.midp2
-        screen-change-animation: fade;
+        screen-change-animation: right;
     //#endif
 }
 
@@ -293,7 +330,7 @@ rightcommand {
     layout: horizontal-center | bottom | horizontal-shrink | vertical-shrink;
     repaint-previous-screen: true;
     //#if polish.midp2
-        screen-change-animation: fade;
+        screen-change-animation: left;
     //#endif
     background-color: green;
 }

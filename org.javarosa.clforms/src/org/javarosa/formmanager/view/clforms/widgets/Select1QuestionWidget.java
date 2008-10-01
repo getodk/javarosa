@@ -24,7 +24,21 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 		super(question);
 		this.q=question;
 	}
-
+	
+	public Select1QuestionWidget(QuestionDef prompt, int num) {
+		super (prompt,num);
+		this.q=prompt;
+	}
+	public Select1QuestionWidget(QuestionDef prompt, String str) {
+		super (prompt,str);
+		this.q=prompt;
+	}
+	
+	public Select1QuestionWidget(QuestionDef prompt, char c) {
+		super (prompt,c);
+		this.q=prompt;
+	}
+	
 	public void creatView() {
 		//#style choiceGroup
 		cg = new ChoiceGroup(qDef.getLongText(),ChoiceGroup.EXCLUSIVE ); //{

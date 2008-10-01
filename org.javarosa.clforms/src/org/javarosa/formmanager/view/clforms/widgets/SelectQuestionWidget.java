@@ -20,6 +20,21 @@ public class SelectQuestionWidget extends SingleQuestionScreen
 		super(question);
 		this.q = question;
 	}
+	
+
+	public SelectQuestionWidget(QuestionDef prompt, int num) {
+		super (prompt,num);
+		this.q = prompt;
+	}
+	public SelectQuestionWidget(QuestionDef prompt, String str) {
+		super (prompt,str);
+		this.q = prompt;
+	}
+	
+	public SelectQuestionWidget(QuestionDef prompt, char c) {
+		super (prompt,c);
+		this.q = prompt;
+	}
 
 	public void creatView()
 	{
