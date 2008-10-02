@@ -38,8 +38,14 @@ public class SelectQuestionWidget extends SingleQuestionScreen
 
 	public void creatView()
 	{
-		//#style choiceGroup
-		cg = new ChoiceGroup(qDef.getLongText(),ChoiceGroup.MULTIPLE ); //{
+		if(qDef.isRequired())
+		{
+			//#style choiceGroup
+			cg = new ChoiceGroup("*"+qDef.getLongText(),ChoiceGroup.MULTIPLE );
+		}
+		else{
+			//#style choiceGroup
+			cg = new ChoiceGroup(qDef.getLongText(),ChoiceGroup.MULTIPLE );}
 		Enumeration itr = qDef.getSelectItems().keys();//access choices directly
 		int i = 0;
 		while (itr.hasMoreElements()) {

@@ -39,9 +39,17 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 		this.q=prompt;
 	}
 	
+
 	public void creatView() {
-		//#style choiceGroup
-		cg = new ChoiceGroup(qDef.getLongText(),ChoiceGroup.EXCLUSIVE ); //{
+		if(qDef.isRequired())
+		{
+			//#style choiceGroup
+			cg = new ChoiceGroup("*"+qDef.getLongText(),ChoiceGroup.EXCLUSIVE );
+		}
+		else{
+			//#style choiceGroup
+			cg = new ChoiceGroup(qDef.getLongText(),ChoiceGroup.EXCLUSIVE );}
+
 		Enumeration itr = qDef.getSelectItems().keys();//access choices directly
 		int i = 0;
 		while (itr.hasMoreElements()) {

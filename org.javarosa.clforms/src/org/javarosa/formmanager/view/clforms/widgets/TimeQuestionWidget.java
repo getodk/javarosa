@@ -18,7 +18,6 @@ public class TimeQuestionWidget extends SingleQuestionScreen
 		super(question);
 	}
 	
-	
 	public TimeQuestionWidget(QuestionDef prompt, int num) {
 		super (prompt,num);
 	}
@@ -33,7 +32,10 @@ public class TimeQuestionWidget extends SingleQuestionScreen
 		//#style textBox
 		timePicker = new DateField(qDef.getShortText(), DateField.TIME);
 		//set question
-		timePicker.setLabel(qDef.getLongText());
+		 if(qDef.isRequired())
+				timePicker.setLabel("*"+qDef.getLongText()); //visual symbol for required
+				else
+					timePicker.setLabel(qDef.getLongText());
 		//check if the field has already been filled in by default value- if so display value
 		if (qDef.getDefaultValue() != null){
 			timePicker.setDate((Date)qDef.getDefaultValue());

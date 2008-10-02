@@ -14,7 +14,6 @@ public class TextQuestionWidget extends SingleQuestionScreen {
 	public TextQuestionWidget(QuestionDef question){
 		super(question);
 	}
-
 	
 	public TextQuestionWidget(QuestionDef prompt, int num) {
 		super (prompt,num);
@@ -25,12 +24,15 @@ public class TextQuestionWidget extends SingleQuestionScreen {
 	public TextQuestionWidget(QuestionDef prompt, char c) {
 		super (prompt,c);
 	}
-	
+
 	public void creatView() {
 		setHint("Type in your answer");
 		//#style textBox
-		tf = new TextField("", "", 200, TextField.ANY);
-		tf.setLabel(qDef.getLongText());
+		 tf = new TextField("", "", 200, TextField.ANY);
+		 if(qDef.isRequired())
+				tf.setLabel("*"+qDef.getLongText()); //visual symbol for required
+				else
+					tf.setLabel(qDef.getLongText());
 		this.append(tf);
 		this.addNavigationButtons();
 		if (qDef.getHelpText()!=null){
