@@ -16,7 +16,6 @@ public class NumericQuestionWidget extends SingleQuestionScreen
 		super(question);
 
 	}
-
 	
 	public NumericQuestionWidget(QuestionDef prompt, int num) {
 		super (prompt,num);
@@ -28,10 +27,14 @@ public class NumericQuestionWidget extends SingleQuestionScreen
 		super (prompt,c);
 	}
 	
+
 	public void creatView() {
 		//#style textBox
-		 tf = new TextField("", "", 200, TextField.NUMERIC);
-		tf.setLabel(qDef.getLongText());
+		 tf = new TextField("", "", 200, TextField.NUMERIC);	
+		 if(qDef.isRequired())
+				tf.setLabel("*"+qDef.getLongText()); //visual symbol for required
+				else
+					tf.setLabel(qDef.getLongText());
 		this.append(tf);
 		this.addNavigationButtons();
 		if (qDef.getHelpText()!=null){

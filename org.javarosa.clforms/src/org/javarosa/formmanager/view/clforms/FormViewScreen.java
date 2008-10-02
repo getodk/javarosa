@@ -71,9 +71,14 @@ public class FormViewScreen extends List {
 				stringVal = val.getDisplayText();
 				}
 
+				if(model.getQuestion(i).isRequired()){
 				// Append to list
-				((List) this).append(model.getQuestion(i).getShortText()+" => "+stringVal,null);
-
+				((List) this).append("*"+model.getQuestion(i).getShortText()+" => "+stringVal,null);
+				}
+				else
+				{
+					((List) this).append(model.getQuestion(i).getShortText()+" => "+stringVal,null);
+				}
 				indexHash.add(i);//map list index to question index.
 			}
 		}

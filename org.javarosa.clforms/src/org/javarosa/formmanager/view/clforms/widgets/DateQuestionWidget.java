@@ -27,12 +27,15 @@ public class DateQuestionWidget extends SingleQuestionScreen
 	public DateQuestionWidget(QuestionDef prompt, char c) {
 		super (prompt,c);
 	}
-	
+
 	public void creatView() {
 		//#style textBox
 		datePicker = new DateField(qDef.getShortText(), DateField.DATE);
 		//set question
-		datePicker.setLabel(qDef.getLongText());
+		if(qDef.isRequired())
+		datePicker.setLabel("*"+qDef.getLongText());
+		else
+			datePicker.setLabel(qDef.getLongText());
 		//check if the field has already been filled in by default value- if so display value
 		if (qDef.getDefaultValue() != null){
 			datePicker.setDate((Date)qDef.getDefaultValue());
