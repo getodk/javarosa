@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathUnionExpr extends XPathBinaryOpExpr {
@@ -23,9 +23,7 @@ public class XPathUnionExpr extends XPathBinaryOpExpr {
 		return super.toString("union");
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-	throws IOException, InstantiationException, IllegalAccessException,
-	UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		super.readExternal(in, pf);
 	}
 

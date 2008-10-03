@@ -5,8 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.Observable;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * A message received from a TransportUtility
@@ -190,7 +191,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
 		int length = in.readInt();
 		this.payloadData = new byte[length];
 		// int noOfBytesRead = in.read(this.payloadData);

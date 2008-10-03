@@ -4,9 +4,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class SampleExtz implements Externalizable {
 	String a, b;
@@ -20,9 +21,7 @@ public class SampleExtz implements Externalizable {
 		this("", "");
 	}
 
-	public void readExternal(DataInputStream in) throws IOException,
-	InstantiationException, IllegalAccessException,
-	UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
 		a = ExtUtil.readString(in);
 		b = ExtUtil.readString(in);
 	}
@@ -32,6 +31,15 @@ public class SampleExtz implements Externalizable {
 		ExtUtil.writeString(out, b);			
 	}
 
+	public boolean equals (Object o) {
+		if (o instanceof SampleExtz) {
+			SampleExtz se = (SampleExtz)o;
+			return a.equals(se.a) && b.equals(se.b);
+		} else {
+			return false;
+		}
+	}
+	
 	public String toString () {
 		return a + "," + b;
 	}

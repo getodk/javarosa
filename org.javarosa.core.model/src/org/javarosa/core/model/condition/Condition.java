@@ -8,9 +8,10 @@ import java.util.Vector;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class Condition implements Externalizable {
 	public static final int ACTION_NULL = 0;
@@ -87,22 +88,20 @@ public class Condition implements Externalizable {
 		return (this.trueAction == c.trueAction && this.falseAction == c.falseAction && this.expr.equals(c.expr));
 	}
 	
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
-		trueAction = ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT);
-		falseAction = ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT);
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		trueAction = ExternalizableHelperDeprecated.readNumInt(in, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
+		falseAction = ExternalizableHelperDeprecated.readNumInt(in, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
 		
 		//TOTAL HACK!!!
 		try {
-			expr = (IConditionExpr)Class.forName("org.javarosa.xpath.XPathConditional").newInstance();
+			expr = (IConditionExpr)PrototypeFactory.getInstance(Class.forName("org.javarosa.xpath.XPathConditional"));
 		} catch (ClassNotFoundException cnfe) {
 			throw new RuntimeException("can't find org.javarosa.xpath.XPathConditional... moved?");
 		}
-		expr.readExternal(in);
+		expr.readExternal(in, pf);
 		
 		//affected q's
-		qIDs = ExternalizableHelper.readIntegers(in);
+		qIDs = ExternalizableHelperDeprecated.readIntegers(in);
 		//can't convert qIDs to QuestionDefs until 'form' is set by FormDef; thus attachForm, below
 	}
 
@@ -114,15 +113,15 @@ public class Condition implements Externalizable {
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelper.writeNumeric(out, trueAction, ExternalizableHelper.ENCODING_NUM_DEFAULT);
-		ExternalizableHelper.writeNumeric(out, falseAction, ExternalizableHelper.ENCODING_NUM_DEFAULT);
+		ExternalizableHelperDeprecated.writeNumeric(out, trueAction, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
+		ExternalizableHelperDeprecated.writeNumeric(out, falseAction, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
 		expr.writeExternal(out);
 		
 		//affected q's
 		qIDs = new Vector();
 		for (int i = 0; i < affectedQuestions.size(); i++)
 			qIDs.addElement(new Integer(((QuestionDef)affectedQuestions.elementAt(i)).getID()));
-		ExternalizableHelper.writeIntegers(qIDs, out);
+		ExternalizableHelperDeprecated.writeIntegers(qIDs, out);
 	}
 
 	

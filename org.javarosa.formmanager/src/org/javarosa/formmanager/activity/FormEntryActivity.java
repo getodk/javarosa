@@ -24,7 +24,7 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.utils.ContextPreloadHandler;
 import org.javarosa.core.model.utils.IPreloadHandler;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.controller.IControllerHost;
 import org.javarosa.formmanager.model.FormEntryModel;
@@ -105,11 +105,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (UnavailableExternalizerException uee) {
+			} catch (DeserializationException uee) {
 				uee.printStackTrace();
 			}
 			

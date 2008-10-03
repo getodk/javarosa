@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class ExtWrapNullable extends ExternalizableWrapper {
 	public ExternalizableWrapper type;
@@ -23,7 +22,7 @@ public class ExtWrapNullable extends ExternalizableWrapper {
 	}
 	
 	public ExtWrapNullable (Class type) {
-		this.type = new ExtType(type);
+		this.type = new ExtWrapBase(type);
 	}
 
 	/* serialization or deserialization, depending on context */
@@ -42,8 +41,7 @@ public class ExtWrapNullable extends ExternalizableWrapper {
 		return new ExtWrapNullable(val);
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		if (in.readBoolean()) {
 			val = ExtUtil.read(in, type, pf);
 		} else {
@@ -60,8 +58,7 @@ public class ExtWrapNullable extends ExternalizableWrapper {
 		}
 	}
 
-	public void metaReadExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void metaReadExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		type = ExtWrapTagged.readTag(in, pf);
 	}
 

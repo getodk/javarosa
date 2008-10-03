@@ -8,7 +8,7 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * The Externalizing Visitor walks a Data Model Tree and 

@@ -8,7 +8,7 @@ import javax.microedition.rms.RecordListener;
 import javax.microedition.rms.RecordStore;
 
 import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.patientselect.object.ExternalizableObject;
 
 import de.enough.polish.util.ArrayList;
@@ -144,7 +144,7 @@ public class PatientStore extends RMSUtility  implements RecordListener {
 		super.writeToRMS(patientData, patMetaDataObject);
 	}
 	
-	public ExternalizableObject retrieveFromRMS(int formId) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
+	public ExternalizableObject retrieveFromRMS(int formId) throws IOException, IllegalAccessException, InstantiationException, DeserializationException {
 		
 		ExternalizableObject patData = new ExternalizableObject();
 		

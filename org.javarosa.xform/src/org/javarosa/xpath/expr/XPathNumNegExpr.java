@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class XPathNumNegExpr extends XPathUnaryOpExpr {
 	public XPathNumNegExpr (XPathExpression a) {
@@ -23,9 +23,7 @@ public class XPathNumNegExpr extends XPathUnaryOpExpr {
 		return "{unop-expr:num-neg," + a.toString() + "}";
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-	throws IOException, InstantiationException, IllegalAccessException,
-	UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		super.readExternal(in, pf);
 	}
 

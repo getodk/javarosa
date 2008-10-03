@@ -5,7 +5,7 @@ import java.util.Timer;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.reminders.storage.ReminderRMSUtility;
 import org.javarosa.reminders.thread.ReminderBackgroundService;
 
@@ -50,7 +50,7 @@ public class ReminderNotifier {
 		} catch (InstantiationException e) {
 			this.stopService();
 			e.printStackTrace();
-		} catch (UnavailableExternalizerException e) {
+		} catch (DeserializationException e) {
 			this.stopService();
 			e.printStackTrace();
 		}

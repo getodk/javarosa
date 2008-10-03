@@ -4,8 +4,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * Contains the header of a connection response.
@@ -32,15 +34,15 @@ public class ResponseHeader implements Externalizable{
 	}
 	
 	/**
-	 * @see org.javarosa.core.util.util.db.Externalizable#readExternal(java.io.DataInputStream)
+	 * @see org.javarosa.core.util.externalizable.util.db.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream dis) throws IOException {
-		if(!ExternalizableHelper.isEOF(dis))
+	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+		if(!ExternalizableHelperDeprecated.isEOF(dis))
 			setStatus(dis.readByte());
 	}
 
 	/**
-	 * @see org.javarosa.core.util.util.db.Externalizable#writeExternal(java.io.DataOutputStream)
+	 * @see org.javarosa.core.util.externalizable.util.db.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeByte(getStatus());

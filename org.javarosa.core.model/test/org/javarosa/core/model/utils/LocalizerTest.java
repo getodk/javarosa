@@ -5,10 +5,11 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
-import java.util.Hashtable;
 import java.util.NoSuchElementException;
 
 import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
 
 public class LocalizerTest extends TestCase  {
@@ -79,7 +80,7 @@ public class LocalizerTest extends TestCase  {
 	}
 	
 	private void testSerialize (Localizer l, String msg) {
-		ExternalizableTest.testSerialization(l, this, "Localizer [" + msg + "]");
+		ExternalizableTest.testExternalizable(l, this, null, "Localizer [" + msg + "]");
 	}
 	
 	public void testEmpty () {

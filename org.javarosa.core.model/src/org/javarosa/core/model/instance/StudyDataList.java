@@ -5,9 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * This class holds a collection of study data.
@@ -63,11 +64,9 @@ public class StudyDataList implements Externalizable {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
-		if(!ExternalizableHelper.isEOF(in))
-			setStudies(ExternalizableHelper.readBig(in,new StudyData().getClass()));
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		if(!ExternalizableHelperDeprecated.isEOF(in))
+			setStudies(ExternalizableHelperDeprecated.readBig(in,new StudyData().getClass()));
 		
 	}
 
@@ -78,7 +77,7 @@ public class StudyDataList implements Externalizable {
 	 * @throws IOException
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelper.writeBig(getStudies(), out);
+		ExternalizableHelperDeprecated.writeBig(getStudies(), out);
 		
 	}
 

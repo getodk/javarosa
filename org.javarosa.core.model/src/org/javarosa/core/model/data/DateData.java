@@ -6,8 +6,9 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * A response to a question requesting a Date Value
@@ -61,10 +62,8 @@ public class DateData implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
-		this.setValue(ExternalizableHelper.readDate(in));
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		this.setValue(ExternalizableHelperDeprecated.readDate(in));
 		
 	}
 
@@ -72,6 +71,6 @@ public class DateData implements IAnswerData {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelper.writeDate(out, this.d);
+		ExternalizableHelperDeprecated.writeDate(out, this.d);
 	}
 }

@@ -3,7 +3,7 @@ package org.javarosa.core.model;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.Localizable;
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * An IFormDataElement is an element of the physical interaction for

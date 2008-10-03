@@ -27,6 +27,7 @@ import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathException;
@@ -663,7 +664,7 @@ public class XPathEvalTest extends TestCase {
 		public String getDisplayText() { return "custom"; }
 		public Object getValue() { return new CustomType(); }
 		public void setValue(Object o) { }
-		public void readExternal(DataInputStream in) { }
+		public void readExternal(DataInputStream in, PrototypeFactory pf) { }
 		public void writeExternal(DataOutputStream out) { }
 	}
 	

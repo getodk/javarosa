@@ -19,9 +19,9 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.instance.QuestionDataGroup;
-import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
 /**
  * The RMS persistent storage utility for FormDef
  * objects.
@@ -36,10 +36,10 @@ import org.javarosa.core.util.UnavailableExternalizerException;
 public class FormDefRMSUtility extends RMSUtility {
 
 	/** Prototypes for IDataReferences and IAnswerData */
-	private PrototypeFactory questionFactory;
+	private PrototypeFactoryDeprecated questionFactory;
 	
 	/** Prototypes for IDataModel */
-	private PrototypeFactory modelFactory;
+	private PrototypeFactoryDeprecated modelFactory;
 	
 	/**
 	 * Creates a new RMS utility with the given name
@@ -49,7 +49,7 @@ public class FormDefRMSUtility extends RMSUtility {
 		super(name, RMSUtility.RMS_TYPE_META_DATA);
 	}
     public void retrieveFromRMS(int recordId,
-            FormDef externalizableObject) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
+            FormDef externalizableObject) throws IOException, DeserializationException {
     	externalizableObject.setModelFactory(this.modelFactory);
     	super.retrieveFromRMS(recordId, externalizableObject);
     }
@@ -211,14 +211,14 @@ public class FormDefRMSUtility extends RMSUtility {
 	}
 	
 	/**
-	 * @return a PrototypeFactory containing prototypes for IAnswerData's,
+	 * @return a PrototypeFactoryDeprecated containing prototypes for IAnswerData's,
 	 * IDataReferences, and QuestionDataGroups. If a factory doesn't yet
 	 * exist, one is created, and default IAnswerData implementing classes
 	 * are pre-populated. 
 	 */
-	public PrototypeFactory getQuestionElementsFactory() {
+	public PrototypeFactoryDeprecated getQuestionElementsFactory() {
 		if(questionFactory == null) { 
-			questionFactory = new PrototypeFactory();
+			questionFactory = new PrototypeFactoryDeprecated();
 			addAnswerDataPrototype(new DateData());
 			addAnswerDataPrototype(new IntegerData());
 			addAnswerDataPrototype(new SelectMultiData());
@@ -245,9 +245,9 @@ public class FormDefRMSUtility extends RMSUtility {
 		questionFactory = null;
 	}
 	
-	private PrototypeFactory getModelFactory() {
+	private PrototypeFactoryDeprecated getModelFactory() {
 		if(modelFactory == null) { 
-			modelFactory = new PrototypeFactory();
+			modelFactory = new PrototypeFactoryDeprecated();
 		}
 		return modelFactory; 
 	}

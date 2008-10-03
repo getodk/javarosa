@@ -7,10 +7,11 @@ import java.io.IOException;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.model.utils.PrototypeFactory;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
 
 /**
  * A data binding is an object that represents how a
@@ -121,45 +122,43 @@ public class DataBinding  implements Externalizable {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
-		this.setId(ExternalizableHelper.readUTF(in));
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		this.setId(ExternalizableHelperDeprecated.readUTF(in));
 		this.setDataType(in.readInt());
-		this.setPreload(ExternalizableHelper.readUTF(in));
-		this.setPreloadParams(ExternalizableHelper.readUTF(in));
+		this.setPreload(ExternalizableHelperDeprecated.readUTF(in));
+		this.setPreloadParams(ExternalizableHelperDeprecated.readUTF(in));
 
 		String factoryName = in.readUTF();
 		FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-		PrototypeFactory factory = fdrms.getQuestionElementsFactory();
+		PrototypeFactoryDeprecated factory = fdrms.getQuestionElementsFactory();
 		ref = (IDataReference)factory.getNewInstance(factoryName);
 		if(ref == null) { 
-			throw new UnavailableExternalizerException("A reference prototype could not be found to deserialize a " +
+			throw new DeserializationException("A reference prototype could not be found to deserialize a " +
 					"reference of the type " + factoryName + ". Please register a Prototype of this type before deserializing " +
 					"the data reference " + this.getId());
 		}
-		ref.readExternal(in);
+		ref.readExternal(in, pf);
 		
 		//don't bother reading relevancy/required/readonly right now; they're only used during parse anyway		
 		//this.setRequired(in.readBoolean());
-		//condition = (Condition)ExternalizableHelper.readExternalizable(in, new Condition());
+		//condition = (Condition)ExternalizableHelperDeprecated.readExternalizable(in, new Condition());
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelper.writeUTF(out, this.getId());
+		ExternalizableHelperDeprecated.writeUTF(out, this.getId());
 		out.writeInt(this.getDataType());
-		ExternalizableHelper.writeUTF(out, this.getPreload());
-		ExternalizableHelper.writeUTF(out, this.getPreloadParams());
+		ExternalizableHelperDeprecated.writeUTF(out, this.getPreload());
+		ExternalizableHelperDeprecated.writeUTF(out, this.getPreloadParams());
 
 		out.writeUTF(ref.getClass().getName());
 		ref.writeExternal(out);
 
 		//don't bother writing relevancy/required/readonly right now; they're only used during parse anyway
 		//out.writeBoolean(this.isRequired());
-		//ExternalizableHelper.writeExternalizable(condition, out);
+		//ExternalizableHelperDeprecated.writeExternalizable(condition, out);
 	}
 	
 	

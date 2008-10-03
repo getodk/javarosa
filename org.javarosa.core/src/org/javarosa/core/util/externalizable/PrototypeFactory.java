@@ -105,10 +105,10 @@ public class PrototypeFactory {
 	public static Object getInstance (Class c) {
 		try {
 			return c.newInstance();
-		} catch (InstantiationException ie) {
-			throw new RuntimeException(); //TODO: throw an appropriate (runtime) exception
 		} catch (IllegalAccessException iae) {
-			throw new RuntimeException(); //TODO: throw an appropriate (runtime) exception
+			throw new CannotCreateObjectException(c.getName() + ": not accessible or no empty constructor");
+		} catch (InstantiationException e) {
+			throw new CannotCreateObjectException(c.getName() + ": not instantiable");
 		}
 	}
 	

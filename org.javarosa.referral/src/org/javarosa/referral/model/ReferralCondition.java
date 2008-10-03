@@ -4,9 +4,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.model.xform.XPathReference;
 
 public class ReferralCondition implements Externalizable {
@@ -70,22 +71,20 @@ public class ReferralCondition implements Externalizable {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
-		referralValue = ExternalizableHelper.readUTF(in);
-		referralText = ExternalizableHelper.readUTF(in);
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		referralValue = ExternalizableHelperDeprecated.readUTF(in);
+		referralText = ExternalizableHelperDeprecated.readUTF(in);
 		
 		questionReference = new XPathReference();
-		questionReference.readExternal(in);
+		questionReference.readExternal(in, pf);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.util.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelper.writeUTF(out,referralValue);
-		ExternalizableHelper.writeUTF(out,referralText);
+		ExternalizableHelperDeprecated.writeUTF(out,referralValue);
+		ExternalizableHelperDeprecated.writeUTF(out,referralText);
 		
 		questionReference.writeExternal(out);
 	}

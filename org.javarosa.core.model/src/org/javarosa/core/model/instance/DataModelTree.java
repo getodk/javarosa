@@ -13,10 +13,11 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ExternalizingVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
-import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.IDataModelVisitor;
-import org.javarosa.core.model.utils.PrototypeFactory;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 
 /**
@@ -198,17 +199,16 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		this.id = in.readInt();
 		this.formIdReference = in.readInt();
 		
-		this.name = ExternalizableHelper.readUTF(in);
+		this.name = ExternalizableHelperDeprecated.readUTF(in);
 		
-		this.dateSaved = ExternalizableHelper.readDate(in);
+		this.dateSaved = ExternalizableHelperDeprecated.readDate(in);
 		
 		FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-		PrototypeFactory factory = fdrms.getQuestionElementsFactory();
+		PrototypeFactoryDeprecated factory = fdrms.getQuestionElementsFactory();
 		factory.addNewPrototype(QuestionDataGroup.class.getName(), QuestionDataGroup.class);
 		
 		boolean group = in.readBoolean();
@@ -216,19 +216,19 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 			String className = in.readUTF();
 			QuestionDataGroup newGroup = (QuestionDataGroup)factory.getNewInstance(className);
 			if(newGroup == null) {
-				throw new UnavailableExternalizerException("Attempted to deserialize a Question Data Group object" +
+				throw new DeserializationException("Attempted to deserialize a Question Data Group object" +
 						"of type " + className + ". Please ensure that this class is available in the prototype factory" +
 						" in the root of the data model tree"); 
 			}
 			newGroup.setRoot(newGroup);
 			newGroup.setFactory(factory);
-			newGroup.readExternal(in);
+			newGroup.readExternal(in, pf);
 			setRootElement(newGroup);
 		}
 		else {
 			QuestionDataElement element = new QuestionDataElement();
 			element.setRoot(element);
-			element.readExternal(in);
+			element.readExternal(in, pf);
 			setRootElement(element);
 		}
 	}
@@ -241,9 +241,9 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		out.writeInt(this.id);
 		out.writeInt(this.formIdReference);
 		
-		ExternalizableHelper.writeUTF(out, this.name);
+		ExternalizableHelperDeprecated.writeUTF(out, this.name);
 		
-		ExternalizableHelper.writeDate(out, this.dateSaved);
+		ExternalizableHelperDeprecated.writeDate(out, this.dateSaved);
 		
 		ExternalizingVisitor visitor = new ExternalizingVisitor(out);
 		this.accept(visitor);

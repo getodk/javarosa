@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.util.UnavailableExternalizerException;
 
 //list of objects of multiple types
 //if elements are compound types (i.e., need wrappers), they must be pre-wrapped before invoking this wrapper, because... come on now.
@@ -30,8 +29,7 @@ public class ExtWrapListPoly extends ExternalizableWrapper {
 		return new ExtWrapListPoly((Vector)val);
 	}	
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		Vector v = new Vector();
 		
 		long size = ExtUtil.readNumeric(in);
@@ -51,12 +49,11 @@ public class ExtWrapListPoly extends ExternalizableWrapper {
 		}
 	}
 	
-	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) {
 		//do nothing
 	}
 
-	public void metaWriteExternal (DataOutputStream out) throws IOException {
+	public void metaWriteExternal (DataOutputStream out) {
 		//do nothing
 	}
 }

@@ -10,8 +10,8 @@ import javax.microedition.io.file.FileConnection;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.utils.PrototypeFactory;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xform.parse.XFormParser;
 
 /**
@@ -58,15 +58,14 @@ public class XFormUtils {
 
 	public static FormDef getFormFromSerializedResource(String resource) {
 		FormDef returnForm = new FormDef();
-		QuestionDef handy = new QuestionDef();
-		PrototypeFactory modelFactory = new PrototypeFactory();
+		PrototypeFactoryDeprecated modelFactory = new PrototypeFactoryDeprecated();
 		modelFactory.addNewPrototype(new DataModelTree().getClass().getName(), new DataModelTree().getClass());
 		returnForm.setModelFactory(modelFactory);
 		InputStream is = System.class.getResourceAsStream(resource);
 		try {
 			if(is != null) {
 				DataInputStream dis = new DataInputStream(is);
-				returnForm.readExternal(dis);
+				returnForm.readExternal(dis, null); //TODO: don't leave this like this
 				dis.close();
 				is.close();
 			}else{
@@ -78,13 +77,7 @@ public class XFormUtils {
 		catch(IOException e) {
 			System.err.println("IO Exception while closing stream.");
 			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnavailableExternalizerException e) {
+		} catch (DeserializationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

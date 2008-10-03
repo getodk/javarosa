@@ -10,11 +10,12 @@ import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
-import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.Map;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.ImmunizationRow;
 import org.javarosa.patient.model.data.NumericListData;
@@ -388,45 +389,43 @@ public class Patient implements Externalizable, IDRecordable {
 		return s;
 	}
 
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		recordId = in.readInt();
 	
-		setPatientId(ExternalizableHelper.readInteger(in));
-		setPrefix(ExternalizableHelper.readUTF(in));
-		setFamilyName(ExternalizableHelper.readUTF(in));
-		setMiddleName(ExternalizableHelper.readUTF(in));
-		setGivenName(ExternalizableHelper.readUTF(in));
-		setGender(ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT));
-		setBirthDate(ExternalizableHelper.readDate(in));
-		setTreatmentStartDate(ExternalizableHelper.readDate(in));
-		setPatientIdentifier(ExternalizableHelper.readUTF(in));
+		setPatientId(ExternalizableHelperDeprecated.readInteger(in));
+		setPrefix(ExternalizableHelperDeprecated.readUTF(in));
+		setFamilyName(ExternalizableHelperDeprecated.readUTF(in));
+		setMiddleName(ExternalizableHelperDeprecated.readUTF(in));
+		setGivenName(ExternalizableHelperDeprecated.readUTF(in));
+		setGender(ExternalizableHelperDeprecated.readNumInt(in, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT));
+		setBirthDate(ExternalizableHelperDeprecated.readDate(in));
+		setTreatmentStartDate(ExternalizableHelperDeprecated.readDate(in));
+		setPatientIdentifier(ExternalizableHelperDeprecated.readUTF(in));
 		setNewPatient(in.readBoolean());
 
 		vaccinationData = new ImmunizationData();
-		vaccinationData.readExternal(in);
+		vaccinationData.readExternal(in, pf);
 		
-		records = ExternalizableHelper.readExternalStringValueMap(in, NumericListData.class);		
+		records = ExternalizableHelperDeprecated.readExternalStringValueMap(in, NumericListData.class);		
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(recordId);
 			
-		ExternalizableHelper.writeInteger(out,getPatientId());
-		ExternalizableHelper.writeUTF(out, getPrefix());
-		ExternalizableHelper.writeUTF(out, getFamilyName());
-		ExternalizableHelper.writeUTF(out, getMiddleName());
-		ExternalizableHelper.writeUTF(out, getGivenName());
-		ExternalizableHelper.writeNumeric(out, getGender(), ExternalizableHelper.ENCODING_NUM_DEFAULT);
-		ExternalizableHelper.writeDate(out, getBirthDate());
-		ExternalizableHelper.writeDate(out, getTreatmentStartDate());
-		ExternalizableHelper.writeUTF(out, getPatientIdentifier());
+		ExternalizableHelperDeprecated.writeInteger(out,getPatientId());
+		ExternalizableHelperDeprecated.writeUTF(out, getPrefix());
+		ExternalizableHelperDeprecated.writeUTF(out, getFamilyName());
+		ExternalizableHelperDeprecated.writeUTF(out, getMiddleName());
+		ExternalizableHelperDeprecated.writeUTF(out, getGivenName());
+		ExternalizableHelperDeprecated.writeNumeric(out, getGender(), ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
+		ExternalizableHelperDeprecated.writeDate(out, getBirthDate());
+		ExternalizableHelperDeprecated.writeDate(out, getTreatmentStartDate());
+		ExternalizableHelperDeprecated.writeUTF(out, getPatientIdentifier());
 		out.writeBoolean(isNewPatient());
 		
 		vaccinationData.writeExternal(out);
 		
-		ExternalizableHelper.writeExternalStringValueMap(out, records);
+		ExternalizableHelperDeprecated.writeExternalStringValueMap(out, records);
 	}
 	/** 
 	 * Gets a list of patient attributes.

@@ -6,7 +6,7 @@ import java.util.Vector;
 import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.referral.model.Referrals;
 
 public class ReferralRMSUtility extends RMSUtility {
@@ -29,7 +29,7 @@ public class ReferralRMSUtility extends RMSUtility {
 		super.writeToRMS(referrals, md);
 	}
 	
-	public Referrals retrieveFromRMS(int formId) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
+	public Referrals retrieveFromRMS(int formId) throws IOException, IllegalAccessException, InstantiationException, DeserializationException {
 		Referrals referrals = new Referrals();
 		
 		int refId = getReferralsId(formId);

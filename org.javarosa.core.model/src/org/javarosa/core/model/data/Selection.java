@@ -5,8 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * A response to a question requesting a selection
@@ -54,14 +55,12 @@ public class Selection implements Externalizable {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		index = in.readInt();
 		
 		//setting QuestionDef in this way isn't correct; see note below
 		question = new QuestionDef();
-		question.readExternal(in);
+		question.readExternal(in, pf);
 	}
 
 	/* (non-Javadoc)

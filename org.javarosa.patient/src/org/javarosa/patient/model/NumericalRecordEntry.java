@@ -5,8 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class NumericalRecordEntry implements IRecordEntry, Externalizable {
 	Date recordDate;
@@ -27,9 +28,7 @@ public class NumericalRecordEntry implements IRecordEntry, Externalizable {
 		return recordValue;
 	}
 
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		recordValue = in.readInt();
 		
 		recordDate = new Date(in.readLong());

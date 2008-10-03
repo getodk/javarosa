@@ -1,6 +1,6 @@
 package org.javarosa.core.model;
 
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * An IDataReference is a reference to a value in a data

@@ -5,9 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * This class encapsulates all form definitions of a particular study.
@@ -164,16 +165,14 @@ public class StudyDef implements Externalizable {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		
-		if(!ExternalizableHelper.isEOF(in)){
+		if(!ExternalizableHelperDeprecated.isEOF(in)){
 			setId(in.readByte());
 			setName(in.readUTF());
 			setVariableName(in.readUTF());
 			
-			setForms(ExternalizableHelper.readBig(in,new FormDef().getClass()));
+			setForms(ExternalizableHelperDeprecated.readBig(in,new FormDef().getClass()));
 		}
 		
 	}
@@ -190,7 +189,7 @@ public class StudyDef implements Externalizable {
 		out.writeUTF(getName());
 		out.writeUTF(getVariableName());
 		
-		ExternalizableHelper.writeBig(getForms(), out);
+		ExternalizableHelperDeprecated.writeBig(getForms(), out);
 		
 	}
 

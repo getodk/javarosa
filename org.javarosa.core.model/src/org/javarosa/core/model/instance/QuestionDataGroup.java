@@ -10,8 +10,9 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ElementExistsVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
 /**
@@ -114,7 +115,7 @@ public class QuestionDataGroup extends TreeElement {
 		Enumeration en = children.elements();
 		while(en.hasMoreElements()) {
 			TreeElement element = (TreeElement)en.nextElement();
-			System.out.println("Contains on " + element.getName());
+			//System.out.println("Contains on " + element.getName());
 				if(element.contains((child))) {
 					return true;
 				}
@@ -176,13 +177,11 @@ public class QuestionDataGroup extends TreeElement {
 		}
 	}
 	
-	protected void readNodeAttributes(DataInputStream in) throws IOException,
-				InstantiationException, IllegalAccessException, UnavailableExternalizerException {
-		this.name = ExternalizableHelper.readUTF(in);
+	protected void readNodeAttributes(DataInputStream in) throws IOException {
+		this.name = ExternalizableHelperDeprecated.readUTF(in);
 	}
 
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		readNodeAttributes(in);
 		int numChildren = in.readInt();
 		for(int i = 0 ; i < numChildren ; ++i ) {
@@ -191,14 +190,14 @@ public class QuestionDataGroup extends TreeElement {
 				String className = in.readUTF();
 				QuestionDataGroup newGroup = (QuestionDataGroup) this.getRoot().factory.getNewInstance(className);
 				if(newGroup == null) {
-					throw new UnavailableExternalizerException("Attempted to deserialize a Question Data Group object" +
+					throw new DeserializationException("Attempted to deserialize a Question Data Group object" +
 							"of type " + className + ". Please ensure that this class is available in the prototype factory" +
 							" in the root of the data model tree"); 
 				}
 
 				//This root will let the node externalize
 				newGroup.setRoot(this.getRoot());
-				newGroup.readExternal(in);
+				newGroup.readExternal(in, pf);
 				//Treat it as a subtree to ensure that there are no graph connections
 				newGroup.setRoot(newGroup);
 				addChild(newGroup);
@@ -207,14 +206,14 @@ public class QuestionDataGroup extends TreeElement {
 			else {
 				QuestionDataElement element = new QuestionDataElement();
 				element.setRoot(this.getRoot());
-				element.readExternal(in);
+				element.readExternal(in, pf);
 				addChild(element);
 			}
 		}
 	}
 
 	protected void writeNodeAttributes(DataOutputStream out) throws IOException {		 
-		ExternalizableHelper.writeUTF(out,this.name);
+		ExternalizableHelperDeprecated.writeUTF(out,this.name);
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {

@@ -3,7 +3,9 @@ package org.javarosa.patientselect.store;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import org.javarosa.core.util.UnavailableExternalizerException;
+
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patientselect.object.ExternalizableObject;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 
@@ -53,9 +55,8 @@ public class PatientListMetaData extends MetaDataObject {
 		
 	}
 	
-    public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException
-    {
-    	super.readExternal(in);
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+    	super.readExternal(in, pf);
     	this.formId = in.readInt();
     }
     

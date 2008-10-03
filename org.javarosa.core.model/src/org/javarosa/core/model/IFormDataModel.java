@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.utils.IDataModelVisitor;
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * An IFormDataModel stores the values underlying a form.

@@ -5,15 +5,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.util.ExternalizableDynamic;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.ExtWrapTagged;
+import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
-public class XPathStep implements ExternalizableDynamic {
+public class XPathStep implements Externalizable {
 	public static final int AXIS_CHILD = 0;
 	public static final int AXIS_DESCENDANT = 1;
 	public static final int AXIS_PARENT = 2;
@@ -126,16 +125,8 @@ public class XPathStep implements ExternalizableDynamic {
 		default: return null;
 		}
 	}
-
-	public void readExternal(DataInputStream in) throws IOException,
-	InstantiationException, IllegalAccessException,
-	UnavailableExternalizerException {
-		readExternal(in, new PrototypeFactory()); //this method will fail if the step has any predicates
-	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		axis = ExtUtil.readInt(in);
 		test = ExtUtil.readInt(in);
 		

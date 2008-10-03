@@ -8,7 +8,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.core.util.UnavailableExternalizerException;
 
 //map of objects where elements are multiple types, keys are still assumed to be of a single (non-polymorphic) type
 //if elements are compound types (i.e., need wrappers), they must be pre-wrapped before invoking this wrapper, because... come on now.
@@ -29,6 +28,7 @@ public class ExtWrapMapPoly extends ExternalizableWrapper {
 		
 		this.val = val;
 		this.keyType = keyType;
+		this.ordered = (val instanceof OrderedHashtable);
 	}
 
 	/* deserialization */
@@ -46,7 +46,7 @@ public class ExtWrapMapPoly extends ExternalizableWrapper {
 	}
 	
 	public ExtWrapMapPoly (Class keyType, boolean ordered) {
-		this(new ExtType(keyType), ordered);
+		this(new ExtWrapBase(keyType), ordered);
 	}
 	
 	public ExtWrapMapPoly (ExternalizableWrapper keyType, boolean ordered) {
@@ -62,8 +62,7 @@ public class ExtWrapMapPoly extends ExternalizableWrapper {
 		return new ExtWrapMapPoly((Hashtable)val, keyType);
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		Hashtable h = ordered ? new OrderedHashtable() : new Hashtable();
 
 		long size = ExtUtil.readNumeric(in);
@@ -89,14 +88,16 @@ public class ExtWrapMapPoly extends ExternalizableWrapper {
 		}		
 	}
 
-	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		ordered = ExtUtil.readBool(in);
 		keyType = ExtWrapTagged.readTag(in, pf);
 	}
 
 	public void metaWriteExternal (DataOutputStream out) throws IOException {
 		Hashtable h = (Hashtable)val;
 		Object keyTagObj;
+		
+		ExtUtil.writeBool(out, ordered);
 		
 		keyTagObj = (keyType == null ? (h.size() == 0 ? new Object() : h.keys().nextElement()) : keyType);		
 		ExtWrapTagged.writeTag(out, keyTagObj);
