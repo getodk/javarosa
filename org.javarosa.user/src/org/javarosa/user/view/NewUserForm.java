@@ -15,7 +15,7 @@ import org.javarosa.user.storage.UserRMSUtility;
 
 
 /**
- * @author Julian Hulme
+ * @author Julian
  *
  */
 public class NewUserForm extends Form  {
@@ -44,33 +44,37 @@ public class NewUserForm extends Form  {
 
 	public String readyToSave()
 	{
+
+		System.out.println("reached this far");
 		boolean nameAlreadyTaken = checkNameExistsAlready();
 		if (nameAlreadyTaken == true)
 		{
-			
+			System.out.println("username taken love");
 			return "Username ("+userName.getString()+") already taken. Please choose another username.";
 		}
 		else if ((userName.getString().equalsIgnoreCase("")) || (password.getString().equals("")))
 		{
-			
+			System.out.println("fail");
 			return "Please fill in both username and password.";
 		}
 		else if (!(password.getString().equals(confirmPassword.getString())))
 		{
-			
+			System.out.println("passwords don't match...");
 			return "Please re-enter your password, the password and password confirmation box did not match.";
 		}
 		else
 		{
-
+			System.out.println("ready returned as true");
 			if (choice.isSelected(0) == false)
-				userRMS.writeToRMS(new User (userName.getString() ,password.getString()));
-			else 
-				userRMS.writeToRMS(new User (userName.getString() ,password.getString(), Constants.ADMINUSER));
-			
+			userRMS.writeToRMS(new User (userName.getString() ,password.getString()));
+			else userRMS.writeToRMS(new User (userName.getString() ,password.getString(), Constants.ADMINUSER));
+			System.out.println("added user "+ userName.getString() + " passw: "+password.getString()+" = "+confirmPassword.getString() );
 			return "";
 		}
 	}
+
+
+
 
 	private boolean checkNameExistsAlready()
 	{
@@ -106,7 +110,11 @@ public class NewUserForm extends Form  {
 		   }
 
 		   if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))
-		   	   return true;
+		   {
+			   System.out.println("name already taken valid");
+			   return true;
+		   }
+
 		   else return false;
 
 
