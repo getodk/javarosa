@@ -12,10 +12,11 @@ import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
-import org.javarosa.core.util.externalizable.DeserializationException;
 
 /** 
  * The definition of a Question to be presented to users when
@@ -76,6 +77,33 @@ public class QuestionDef implements IFormElement, Localizable {
 		observers = new Vector();
 	}
 		
+	public boolean equals (Object o) {
+		if (o instanceof QuestionDef) {
+			QuestionDef q = (QuestionDef)o;
+			return (id == q.id &&
+					ExtUtil.equals(name, q.name) &&
+					ExtUtil.equals(binding, q.binding) &&
+					dataType == q.dataType &&
+					controlType == q.controlType &&
+					ExtUtil.equals(appearanceAttr, q.appearanceAttr) &&
+					ExtUtil.equals(longText, q.longText) &&
+					ExtUtil.equals(longTextID, q.longTextID) &&
+					ExtUtil.equals(shortText, q.shortText) &&
+					ExtUtil.equals(shortTextID, q.shortTextID) &&
+					ExtUtil.equals(helpText, q.helpText) &&
+					ExtUtil.equals(helpTextID, q.helpTextID) &&
+					ExtUtil.equals(selectItemIDs, q.selectItemIDs) &&
+					ExtUtil.equals(selectItemsLocalizable, q.selectItemsLocalizable) &&
+					required == q.required &&
+					visible == q.visible &&
+					enabled == q.enabled &&
+					locked == q.locked);
+				//no defaultValue, selectItems
+		} else {
+			return false;
+		}
+	}
+	
 	public int getID () {
 		return id;
 	}
@@ -185,10 +213,12 @@ public class QuestionDef implements IFormElement, Localizable {
 		return selectItems;
 	}
 
+	//this function is dangerous: QuestionDef will not serialize properly unless selectItemIDs is set as well
 	public void setSelectItems (OrderedHashtable selectItems) {
 		this.selectItems = selectItems;
 	}
 	
+	//this function is dangerous: QuestionDef will not serialize properly unless selectItemIDs is set as well
 	public void addSelectItem (String label, String value) {
 		if (selectItems == null)
 			selectItems = new OrderedHashtable();
@@ -289,10 +319,6 @@ public class QuestionDef implements IFormElement, Localizable {
 	public void setDefaultValue(IAnswerData defaultValue) {
 		this.defaultValue = defaultValue;
 	}
-	
-	public String toString() {
-		return getLongText();
-	}
 
     public void localeChanged(String locale, Localizer localizer) {
     	if(longTextID != null) {
@@ -357,15 +383,17 @@ public class QuestionDef implements IFormElement, Localizable {
 			}
 			
 			String className = dis.readUTF();
-			FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-			PrototypeFactoryDeprecated factory = fdrms.getQuestionElementsFactory();
-			binding = (IDataReference)factory.getNewInstance(className);
-			if(binding == null) { 
-				throw new DeserializationException("A reference prototype could not be found to deserialize a " +
-						"reference of the type " + className + ". Please register a Prototype of this type before deserializing " +
-						"the QuestionDef " + this.getName());
+			if (!className.equals("")) {
+				FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
+				PrototypeFactoryDeprecated factory = fdrms.getQuestionElementsFactory();
+				binding = (IDataReference)factory.getNewInstance(className);
+				if(binding == null) { 
+					throw new DeserializationException("A reference prototype could not be found to deserialize a " +
+							"reference of the type " + className + ". Please register a Prototype of this type before deserializing " +
+							"the QuestionDef " + this.getName());
+				}
+				binding.readExternal(dis, pf);
 			}
-			binding.readExternal(dis, pf);
 		}	
 	}
 
@@ -397,8 +425,12 @@ public class QuestionDef implements IFormElement, Localizable {
 		ExternalizableHelperDeprecated.writeExternal(getSelectItemIDs(), dos);
 		ExternalizableHelperDeprecated.writeExternalVB(selectItemsLocalizable, dos);
 		
-		dos.writeUTF(binding.getClass().getName());
-		binding.writeExternal(dos);
+		if (binding != null) {
+			dos.writeUTF(binding.getClass().getName());
+			binding.writeExternal(dos);
+		} else {
+			dos.writeUTF("");			
+		}
 	}
 
 	/* === MANAGING OBSERVERS === */

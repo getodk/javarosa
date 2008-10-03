@@ -7,13 +7,17 @@ import j2meunit.framework.TestSuite;
 
 import java.util.Vector;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.QuestionStateListener;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.test.ExternalizableTest;
 
 public class QuestionDefTest extends TestCase {
 	public QuestionDefTest(String name, TestMethod rTestMethod) {
@@ -28,6 +32,12 @@ public class QuestionDefTest extends TestCase {
 		super();
 	}	
 	
+	public void init () {
+		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
+		formDef.addReferencePrototype(newXPathRef(""));
+		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(formDef);
+	}
+	
 	public Test suite() {
 		TestSuite aSuite = new TestSuite();
 		
@@ -35,12 +45,17 @@ public class QuestionDefTest extends TestCase {
 			final int testID = i;
 			aSuite.addTest(new QuestionDefTest("QuestionDef Test " + i, new TestMethod() {
 				public void run (TestCase tc) {
+					init();
 					((QuestionDefTest)tc).doTest(testID);
 				}
 			}));
 		}
 			
 		return aSuite;
+	}
+	
+	private void testSerialize (QuestionDef q, String msg) {
+		ExternalizableTest.testExternalizable(q, this, null, "QuestionDef [" + msg + "]");
 	}
 	
 	public final static int NUM_TESTS = 15;
@@ -72,12 +87,14 @@ public class QuestionDefTest extends TestCase {
 				q.isRequired() || !q.isVisible() || !q.isEnabled() || q.isLocked()) {
 			fail("QuestionDef not initialized properly (default constructor)");
 		}
+		testSerialize(q, "");
 		
 		q = new QuestionDef(17, "test question", Constants.DATATYPE_DATE, Constants.CONTROL_RANGE);
 		if (q.getID() != 17 || !"test question".equals(q.getName()) || q.getDataType() != Constants.DATATYPE_DATE || q.getControlType() != Constants.CONTROL_RANGE ||
 				q.isRequired() || !q.isVisible() || !q.isEnabled() || q.isLocked()) {
 			fail("QuestionDef not initialized properly");
 		}
+		testSerialize(q, "");
 	}
 	
 	public static IDataReference newXPathRef (String xpath) {
@@ -97,58 +114,69 @@ public class QuestionDefTest extends TestCase {
 		if (q.getID() != 45) {
 			fail("ID getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setName("rosebud");
 		if (!"rosebud".equals(q.getName())) {
 			fail("Name getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		IDataReference ref = newXPathRef("/data");
 		q.setBind(ref);
 		if (q.getBind() != ref) {
 			fail("Ref getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setDataType(Constants.DATATYPE_BOOLEAN);
 		if (q.getDataType() != Constants.DATATYPE_BOOLEAN) {
 			fail("Datatype getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setControlType(Constants.CONTROL_SELECT_ONE);
 		if (q.getControlType() != Constants.CONTROL_SELECT_ONE) {
 			fail("Control type getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setAppearanceAttr("minimal");
 		if (!"minimal".equals(q.getAppearanceAttr())) {
 			fail("Appearance getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setRequired(true);
 		if (!q.isRequired()) {
 			fail("Required getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setVisible(false);
 		if (q.isVisible()) {
 			fail("Visible getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setEnabled(false);
 		if (q.isEnabled()) {
 			fail("Enabled getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setLocked(true);
 		if (!q.isLocked()) {
 			fail("Locked getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		StringData sd = new StringData("asdf");
 		q.setDefaultValue(sd);
 		if (q.getDefaultValue() != sd) {
 			fail("Default value getter/setter broken");
 		}
+		testSerialize(q, "");
 	}
 		
 	public void testChild () {
@@ -249,16 +277,19 @@ public class QuestionDefTest extends TestCase {
 		if (!"long text".equals(q.getLongText())) {
 			fail("Long text getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setShortText("short text");
 		if (!"short text".equals(q.getShortText())) {
 			fail("Short text getter/setter broken");
 		}
+		testSerialize(q, "");
 		
 		q.setHelpText("help text");
 		if (!"help text".equals(q.getHelpText())) {
 			fail("Help text getter/setter broken");
 		}
+		testSerialize(q, "");
 	}
 	
 	public void testPromptIDsNoLocalizer () {
@@ -268,16 +299,19 @@ public class QuestionDefTest extends TestCase {
 		if (!"long text id".equals(q.getLongTextID()) || q.getLongText() != null) {
 			fail("Long text ID getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setShortTextID("short text id", null);
 		if (!"short text id".equals(q.getShortTextID()) || q.getShortText() != null) {
 			fail("Short text ID getter/setter broken");
 		}
+		testSerialize(q, "");
 
 		q.setHelpTextID("help text id", null);
 		if (!"help text id".equals(q.getHelpTextID()) || q.getHelpText() != null) {
 			fail("Help text ID getter/setter broken");
 		}
+		testSerialize(q, "");
 	}
 	
 	public void testPromptsWithLocalizer () {
@@ -294,16 +328,19 @@ public class QuestionDefTest extends TestCase {
 		if (!"loc: long text".equals(q.getLongText())) {
 			fail("Long text did not localize when setting ID");
 		}
-		
+		testSerialize(q, "");
+	
 		q.setShortTextID("prompt;short", l);
 		if (!"loc: short text".equals(q.getShortText())) {
 			fail("Short text did not localize when setting ID");
 		}
-		
+		testSerialize(q, "");
+	
 		q.setHelpTextID("help", l);
 		if (!"loc: help text".equals(q.getHelpText())) {
 			fail("Help text did not localize when setting ID");
 		}
+		testSerialize(q, "");
 	}
 
 	public void testSelectChoicesNoLocalizer () {
@@ -317,13 +354,15 @@ public class QuestionDefTest extends TestCase {
 		if (!q.getSelectItems().toString().equals("[choice => val, stacey's => mom]")) {
 			fail("Could not add individual select choice");
 		}
-
+		//won't work: testSerialize(q, "");
+		
 		OrderedHashtable newChoices = new OrderedHashtable();
 		newChoices.put("alpha", "beta");
 		q.setSelectItems(newChoices);
 		if (q.getSelectItems() != newChoices) {
 			fail("Could not set select choices en masse");
 		}
+		//won't work: testSerialize(q, "");
 	}
 	
 	public void testSelectChoiceIDsNoLocalizer () {
@@ -336,6 +375,7 @@ public class QuestionDefTest extends TestCase {
 			q.getSelectItems() != null) {
 			fail("Could not add individual select choice ID");
 		}
+		testSerialize(q, "");
 
 		OrderedHashtable newChoiceIDs = new OrderedHashtable();
 		Vector newChoiceLocs = new Vector();
@@ -345,6 +385,7 @@ public class QuestionDefTest extends TestCase {
 		if (q.getSelectItemIDs() != newChoiceIDs || q.getSelectItemsLocalizable() != newChoiceLocs || q.getSelectItems() != null) {
 			fail("Could not set select choices en masse");
 		}
+		testSerialize(q, "");
 	}
 	
 	public void testLocalizeSelectMap () {
@@ -367,6 +408,7 @@ public class QuestionDefTest extends TestCase {
 		if (!q.getSelectItems().toString().equals("[loc: choice1 => val1, loc: choice2 => val2, non-loc: choice3 => val3]")) {
 			fail("Did not localize select choices properly");
 		}
+		testSerialize(q, "");
 	}
 		
 	public void testLocalizeSelectMapNoLocalizer () {
@@ -379,6 +421,7 @@ public class QuestionDefTest extends TestCase {
 		if (!q.getSelectItems().toString().equals("[[itext] => val1, non-loc: choice2 => val2]")) {
 			fail("Did not localize select choices properly (w/o localizer)");
 		}
+		testSerialize(q, "");
 	}
 
 	public void testLocalizeSelectMapEmpty () {
@@ -397,6 +440,7 @@ public class QuestionDefTest extends TestCase {
 		if (q.getSelectItems() != null) {
 			fail("Localized select choices out of nowhere");
 		}
+		testSerialize(q, "");
 	}
 
 	public void testSelectChoiceIDsWithLocalizer () {
@@ -421,6 +465,7 @@ public class QuestionDefTest extends TestCase {
 				!q.getSelectItems().toString().equals("[loc: choice1 => val1, loc: choice2 => val2, non-loc: choice3 => val3]")) {
 			fail("Could not set and localize select choices en masse");
 		}
+		testSerialize(q, "");
 	}		
 	
 	public void testLocaleChanged () {
@@ -474,8 +519,6 @@ public class QuestionDefTest extends TestCase {
 			fail("Improper locale change update (no localizable fields)");
 		}
 	}	
-	
-	//serialization
 	
 	private class QuestionObserver implements QuestionStateListener {
 		public boolean flag = false;
