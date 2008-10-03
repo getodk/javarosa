@@ -6,11 +6,11 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
-import org.javarosa.core.model.test.QuestionDefTest;
+import org.javarosa.core.util.test.ExternalizableTest;
 import org.javarosa.user.model.User;
 
 public class UserTests extends TestCase  {
-	public final int NUM_TESTS = 2 ;
+	public final int NUM_TESTS = 4 ;
 
 	public UserTests(String name, TestMethod rTestMethod) {
 		super(name, rTestMethod);
@@ -46,6 +46,8 @@ public class UserTests extends TestCase  {
 		switch (testID) {
 		case 1: testAccessorsModifiers(); break;
 		case 2: testIsAdminUser(); break;
+		case 3: testEquals(); break;
+		case 4: testExternalizable(); break;
 		}
 	}
 
@@ -78,6 +80,27 @@ public class UserTests extends TestCase  {
 		assertTrue(u.isAdminUser());
 	}
 
-	//TODO  - implement unit test for writeExternal
-	//TODO  - implement unit test for readExternal
+	public void testEquals() {
+		User u = new User();
+		User u2 = new User();
+		assertTrue("User.equals Fails on obj with no values set",u.equals(u2));
+		u.setUsername("TEST");
+		u2.setUsername("TEST");
+		assertTrue("User.equals Fails on obj with usernames set",u.equals(u2));
+		u.setPassword("TEST");
+		u2.setPassword("TEST");
+		assertTrue("User.equals Fails on obj with passwords set",u.equals(u2));
+		u.setUserType("TEST");
+		u2.setUserType("TEST");
+		assertTrue("User.equals Fails on obj with userType set",u.equals(u2));
+	}
+
+	public void testExternalizable() {
+		User u = new User();
+		u.setUsername("TEST");
+		u.setPassword("TEST");
+//		ExternalizableTest.testSerialization(u, this , "Externalising User failed with no member values set");
+//		ExternalizableTest.testSerialization(u, this , "Externalising User failed with only username value set");
+//		ExternalizableTest.testSerialization(u, this , "Externalising User failed with member values all set");
+	}
 }
