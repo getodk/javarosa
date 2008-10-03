@@ -34,6 +34,7 @@ import org.javarosa.formmanager.view.Commands;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
+import org.javarosa.user.activity.AddUserActivity;
 import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
@@ -174,7 +175,8 @@ public class JavaRosaDemoShell implements IShell {
 				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1);
 			} else if (returnVal == Commands.CMD_EXIT) {
 				exitShell();
-			}
+			} else if (returnVal == Commands.CMD_ADD_USER) 
+				launchActivity( new AddUserActivity(this),context);
 
 		} else if (returningActivity instanceof ModelListActivity) {
 
@@ -210,7 +212,8 @@ public class JavaRosaDemoShell implements IShell {
 					this.modelActivity.start(context);
 				}
 			}*/
-		}
+		} else if (returningActivity instanceof AddUserActivity)
+			launchActivity(new FormListActivity(this, "Forms List"), context);
 	}
 
 	private void workflowResume (IActivity suspendedActivity, IActivity completingActivity,
