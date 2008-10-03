@@ -3,11 +3,9 @@ package org.javarosa.core.util.externalizable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
 
-import org.javarosa.core.util.UnavailableExternalizerException;
 
-public class ExtWrapIntEncodingSmall extends ExternalizableWrapper {
+public class ExtWrapIntEncodingSmall extends ExtWrapIntEncoding {
 	public static final int DEFAULT_BIAS = 1;
 	
 	/* max magnitude of negative number encodable in one byte; allowed range [0,254]
@@ -44,8 +42,7 @@ public class ExtWrapIntEncodingSmall extends ExternalizableWrapper {
 		return new ExtWrapIntEncodingSmall(ExtUtil.toLong(val), bias);
 	}
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
 		byte b = in.readByte();
 		long l;
 		

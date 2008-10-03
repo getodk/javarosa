@@ -9,10 +9,10 @@ import javax.microedition.rms.RecordListener;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
-import org.javarosa.core.services.storage.utilities.Serializer;
 import org.javarosa.core.services.transport.Storage;
 import org.javarosa.core.services.transport.TransportMessage;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
 
 /**
  * A Storage type for Transport Messages that utilizes RMS storage
@@ -41,7 +41,7 @@ public class RmsStorage implements Storage, RecordListener {
 			init();
 			int recordId = this.messageRecordStore.getNextRecordID();
 			message.setRecordId(recordId);
-			byte[] data = Serializer.serialize(message);
+			byte[] data = ExtUtil.serialize(message);
 			this.messageRecordStore.addRecord(data, 0, data.length);
 		} catch (RecordStoreException e) {
 			//#if debug.output==verbose || debug.output==exception
@@ -62,7 +62,7 @@ public class RmsStorage implements Storage, RecordListener {
 		int recordId = message.getRecordId();
 		try {
 			init();
-			byte[] data = Serializer.serialize(message);
+			byte[] data = ExtUtil.serialize(message);
 			this.messageRecordStore.setRecord(recordId, data, 0, data.length);
 		} catch (Exception e) {
 			//#if debug.output==verbose || debug.output==exception
@@ -140,12 +140,12 @@ public class RmsStorage implements Storage, RecordListener {
 	 * @throws IOException
 	 * @return
 	 */
-	private TransportMessage loadMessage(int recordId) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException{
+	private TransportMessage loadMessage(int recordId) throws IOException, DeserializationException{
 		try {
 			init();
 			byte[] data = messageRecordStore.getRecord(recordId);
 			TransportMessage message = new TransportMessage();
-			Serializer.deserialize(data, message);
+			ExtUtil.deserialize(data, message);
 			return message;
 		} catch (RecordStoreException e) {
 			//#if debug.output==verbose || debug.output==exception
@@ -153,17 +153,7 @@ public class RmsStorage implements Storage, RecordListener {
 			//#endif
 			throw new IOException(e.getMessage());
 		}
-        catch (IllegalAccessException iae)
-        {
-            iae.printStackTrace();
-            throw iae;
-        }
-        catch (InstantiationException ie)
-        {
-        	ie.printStackTrace();
-        	throw ie;
-        }
-        catch (UnavailableExternalizerException uee) {
+        catch (DeserializationException uee) {
         	uee.printStackTrace();
         	throw uee;
         }
@@ -177,28 +167,18 @@ public class RmsStorage implements Storage, RecordListener {
 	 * @throws IOException
 	 * @return
 	 */
-	public TransportMessage getMessage(int recordId) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
+	public TransportMessage getMessage(int recordId) throws IOException, DeserializationException {
 		try {
 			init();
 			byte[] data = messageRecordStore.getRecord(recordId);
 			TransportMessage message = new TransportMessage();
-			Serializer.deserialize(data, message);
+			ExtUtil.deserialize(data, message);
 			return message;
 		} catch (RecordStoreException e) {
 			System.out.println(e);
 			throw new IOException(e.getMessage());
 		}
-        catch (IllegalAccessException iae)
-        {
-            iae.printStackTrace();
-            throw iae;
-        }
-        catch (InstantiationException ie)
-        {
-        	ie.printStackTrace();
-        	throw ie;
-        }
-        catch (UnavailableExternalizerException uee) {
+        catch (DeserializationException uee) {
         	uee.printStackTrace();
         	throw uee;
         }
@@ -225,15 +205,7 @@ public class RmsStorage implements Storage, RecordListener {
 			System.out.println(e);
 			e.printStackTrace();
 		} 
-        catch (IllegalAccessException iae)
-        {
-            iae.printStackTrace();
-        }
-        catch (InstantiationException ie)
-        {
-        	ie.printStackTrace();
-        } 
-        catch (UnavailableExternalizerException uee) {
+        catch (DeserializationException uee) {
         	uee.printStackTrace();
         } finally {
 			if (en != null) {

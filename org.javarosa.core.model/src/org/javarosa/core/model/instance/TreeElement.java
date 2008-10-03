@@ -5,8 +5,8 @@ import java.util.Vector;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.model.utils.PrototypeFactory;
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 
 /**
  * An element of a DataModelTree. Contains a name, and a
@@ -20,7 +20,7 @@ import org.javarosa.core.util.Externalizable;
 public abstract class TreeElement implements Externalizable {
 
 	/** A set of prototype references maintained be the root node to used in deserialization. */
-	PrototypeFactory factory;
+	PrototypeFactoryDeprecated factory;
 
 	/** The root of the tree containing this element */
 	protected TreeElement root;
@@ -80,7 +80,7 @@ public abstract class TreeElement implements Externalizable {
 	/**
 	 * @return the factory
 	 */
-	public PrototypeFactory getFactory() {
+	public PrototypeFactoryDeprecated getFactory() {
 		if(this == this.getRoot()) {
 			return factory;
 		}
@@ -92,7 +92,7 @@ public abstract class TreeElement implements Externalizable {
 	/**
 	 * @param factory the factory to set
 	 */
-	public void setFactory(PrototypeFactory factory) {
+	public void setFactory(PrototypeFactoryDeprecated factory) {
 		if(this == this.getRoot()) {
 			this.factory = factory;
 		}

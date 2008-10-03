@@ -8,7 +8,8 @@ import java.util.Vector;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.expr.XPathBinaryOpExpr;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
@@ -78,7 +79,7 @@ public class XPathConditional implements IConditionExpr {
 		}
 	}
 
-	public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		init(in.readUTF());
 	}
 

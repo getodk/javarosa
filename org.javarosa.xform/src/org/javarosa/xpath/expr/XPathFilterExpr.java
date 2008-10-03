@@ -7,11 +7,11 @@ import java.util.Vector;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathFilterExpr extends XPathExpression {
@@ -43,9 +43,7 @@ public class XPathFilterExpr extends XPathExpression {
 		return sb.toString();
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-	throws IOException, InstantiationException, IllegalAccessException,
-	UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		x = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 		

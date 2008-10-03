@@ -15,11 +15,11 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathUnsupportedException;
@@ -113,9 +113,7 @@ public class XPathPathExpr extends XPathExpression {
 		return sb.toString();
 	}
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		init_context = ExtUtil.readInt(in);
 		if (init_context == INIT_CONTEXT_EXPR) {
 			filtExpr = (XPathFilterExpr)ExtUtil.read(in, XPathFilterExpr.class, pf);

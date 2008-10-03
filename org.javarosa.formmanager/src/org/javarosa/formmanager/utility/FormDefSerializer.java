@@ -7,7 +7,7 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.services.storage.utilities.Serializer;
+import org.javarosa.core.util.externalizable.ExtUtil;
 
 /**
  * @author Kieran
@@ -58,7 +58,7 @@ public class FormDefSerializer implements Runnable{
 	public void saveForm(FormDef theForm, String filename){
 		byte[] data;
 		try {
-			data = Serializer.serialize(theForm);
+			data = ExtUtil.serialize(theForm);
 	        //LOG
 	        System.out.println("SERIALIZED FORM:"+data+" \nS_FORM END");
 	        String root = "root1/";

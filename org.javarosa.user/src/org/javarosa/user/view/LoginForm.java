@@ -12,7 +12,7 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.api.IActivity;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 
@@ -58,13 +58,7 @@ public class LoginForm extends Form
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (UnavailableExternalizerException e) {
+				} catch (DeserializationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -99,13 +93,7 @@ public class LoginForm extends Form
 			   catch (IOException ioe) {
 				   System.out.println(ioe);
 			   }
-			   catch (InstantiationException ie) {
-				   System.out.println(ie);
-			   }
-			   catch (IllegalAccessException ia) {
-				   System.out.println(ia);
-			   }
-			   catch (UnavailableExternalizerException uee) {
+			   catch (DeserializationException uee) {
 				   System.out.println(uee);
 			   }
 			   if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))
@@ -143,13 +131,7 @@ public class LoginForm extends Form
 			   catch (IOException ioe) {
 				   System.out.println(ioe);
 			   }
-			   catch (InstantiationException ie) {
-				   System.out.println(ie);
-			   }
-			   catch (IllegalAccessException ia) {
-				   System.out.println(ia);
-			   }
-			   catch (UnavailableExternalizerException uee) {
+			   catch (DeserializationException uee) {
 				   System.out.println(uee);
 			   }
 			   if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))

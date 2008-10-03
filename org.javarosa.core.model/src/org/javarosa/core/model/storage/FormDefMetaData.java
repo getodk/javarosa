@@ -5,9 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * Serializable Meta Data object for form definition records that 
@@ -62,10 +63,9 @@ public class FormDefMetaData extends MetaDataObject
     /* (non-Javadoc)
      * @see org.javarosa.clforms.storage.MetaDataObject#readExternal(java.io.DataInputStream)
      */
-    public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException
-    {
-    	super.readExternal(in);
-        this.formName = ExternalizableHelper.readUTF(in);
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+    	super.readExternal(in, pf);
+        this.formName = ExternalizableHelperDeprecated.readUTF(in);
         this.version = in.readInt();
         this.type = in.readInt();
     }
@@ -77,7 +77,7 @@ public class FormDefMetaData extends MetaDataObject
     public void writeExternal(DataOutputStream out) throws IOException
     {
     	super.writeExternal(out);
-        ExternalizableHelper.writeUTF(out,this.formName);
+        ExternalizableHelperDeprecated.writeUTF(out,this.formName);
         out.writeInt(this.version);
         out.writeInt(type);
     }

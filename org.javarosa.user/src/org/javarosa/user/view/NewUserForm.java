@@ -7,7 +7,7 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.Constants;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
@@ -89,13 +89,7 @@ public class NewUserForm extends Form  {
 			   {
 				   try {
 					userRMS.retrieveFromRMS(index, discoveredUser);
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (UnavailableExternalizerException e) {
+				} catch (DeserializationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}

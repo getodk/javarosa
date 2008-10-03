@@ -9,7 +9,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.util.MD5;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.test.ExternalizableTest;
 
 public class ExtWrapTagged extends ExternalizableWrapper {
 	public final static byte[] WRAPPER_TAG = {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff}; //must be same length as PrototypeFactory.CLASS_HASH_SIZE
@@ -49,8 +49,7 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 		return new ExtWrapTagged(val);
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		ExternalizableWrapper type = readTag(in, pf);
 		val = ExtUtil.read(in, type, pf);
 	}
@@ -60,23 +59,27 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 		ExtUtil.write(out, val);
 	}
 
-	public static ExternalizableWrapper readTag (DataInputStream in, PrototypeFactory pf) throws IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public static ExternalizableWrapper readTag (DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		byte[] tag = new byte[PrototypeFactory.CLASS_HASH_SIZE];
 		in.read(tag, 0, tag.length);
 		
 		if (PrototypeFactory.compareHash(tag, WRAPPER_TAG)) {
-			int wrapperCode = (int)ExtUtil.readInt(in);
+			int wrapperCode = ExtUtil.readInt(in);
 			
 			//find wrapper indicated by code
 			ExternalizableWrapper type = null;
 			for (Enumeration e = WRAPPER_CODES.keys(); e.hasMoreElements(); ) {
 				Class t = (Class)e.nextElement();
 				if (((Integer)WRAPPER_CODES.get(t)).intValue() == wrapperCode) {
-					type = (ExternalizableWrapper)t.newInstance();
+					try {
+						type = (ExternalizableWrapper)PrototypeFactory.getInstance(t);
+					} catch (CannotCreateObjectException ccoe) {
+						throw new CannotCreateObjectException("Serious problem: cannot create built-in ExternalizableWrapper [" + t.getName() + "]");
+					}
 				}
 			}
 			if (type == null) {
-				throw new UnavailableExternalizerException("");
+				throw new DeserializationException("Unrecognized ExternalizableWrapper type [" + wrapperCode + "]");
 			}
 			
 			type.metaReadExternal(in, pf);
@@ -84,23 +87,23 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 		} else {
 			Class type = pf.getClass(tag);
 			if (type == null) {
-				throw new UnavailableExternalizerException("");
+				throw new DeserializationException("No datatype registered to serialization code " + ExternalizableTest.printBytes(tag));
 			}
 			
-			return new ExtType(type);
+			return new ExtWrapBase(type);
 		}		
 	}
 	
 	public static void writeTag (DataOutputStream out, Object o) throws IOException {
-		if (o instanceof ExternalizableWrapper && !(o instanceof ExtType)) {
+		if (o instanceof ExternalizableWrapper && !(o instanceof ExtWrapBase)) {
 			out.write(WRAPPER_TAG, 0, PrototypeFactory.CLASS_HASH_SIZE);
 			ExtUtil.writeNumeric(out, ((Integer)WRAPPER_CODES.get(o.getClass())).intValue());
 			((ExternalizableWrapper)o).metaWriteExternal(out);
 		} else {
 			Class type = null;
 			
-			if (o instanceof ExtType) { //ExtWrapTagged?
-				ExtType extType = (ExtType)o;
+			if (o instanceof ExtWrapBase) {
+				ExtWrapBase extType = (ExtWrapBase)o;
 				if (extType.val != null) {
 					o = extType.val;
 				} else {
@@ -116,12 +119,11 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 		}
 	}
 
-	public void metaReadExternal(DataInputStream in, PrototypeFactory pf) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void metaReadExternal(DataInputStream in, PrototypeFactory pf) {
 		throw new RuntimeException("Tagged wrapper should never be tagged");
 	}
 
-	public void metaWriteExternal(DataOutputStream out) throws IOException {
+	public void metaWriteExternal(DataOutputStream out) {
 		throw new RuntimeException("Tagged wrapper should never be tagged");
 	}
 }

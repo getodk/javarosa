@@ -13,7 +13,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.referral.model.Referrals;
 import org.javarosa.referral.storage.ReferralRMSUtility;
 import org.javarosa.referral.util.ReportContext;
@@ -79,7 +79,7 @@ public class ReferralReport implements IActivity, CommandListener {
 				} catch (InstantiationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} catch (UnavailableExternalizerException e) {
+				} catch (DeserializationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}

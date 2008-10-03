@@ -9,19 +9,20 @@ import java.util.Vector;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
-import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
-import org.javarosa.core.model.utils.PrototypeFactory;
 import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
 
 /** 
  * The definition of a Question to be presented to users when
  * filling out a form.
  * 
  * QuestionDef requires that any IDataReferences that are used
- * are contained in the FormDefRMS's PrototypeFactory in order
+ * are contained in the FormDefRMS's PrototypeFactoryDeprecated in order
  * to be properly deserialized. If they aren't, an exception
  * will be thrown at the time of deserialization. 
  * 
@@ -329,18 +330,18 @@ public class QuestionDef implements IFormElement, Localizable {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException{
-		if(!ExternalizableHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+		if(!ExternalizableHelperDeprecated.isEOF(dis)){
 			setID(dis.readInt());
 			
-			setName(ExternalizableHelper.readUTF(dis));
-			setAppearanceAttr(ExternalizableHelper.readUTF(dis));
-			setLongText(ExternalizableHelper.readUTF(dis));
-			setShortText(ExternalizableHelper.readUTF(dis));
-			setHelpText(ExternalizableHelper.readUTF(dis));
-			setLongTextID(ExternalizableHelper.readUTF(dis), null);
-			setShortTextID(ExternalizableHelper.readUTF(dis), null);
-			setHelpTextID(ExternalizableHelper.readUTF(dis), null);
+			setName(ExternalizableHelperDeprecated.readUTF(dis));
+			setAppearanceAttr(ExternalizableHelperDeprecated.readUTF(dis));
+			setLongText(ExternalizableHelperDeprecated.readUTF(dis));
+			setShortText(ExternalizableHelperDeprecated.readUTF(dis));
+			setHelpText(ExternalizableHelperDeprecated.readUTF(dis));
+			setLongTextID(ExternalizableHelperDeprecated.readUTF(dis), null);
+			setShortTextID(ExternalizableHelperDeprecated.readUTF(dis), null);
+			setHelpTextID(ExternalizableHelperDeprecated.readUTF(dis), null);
 			
 			setDataType(dis.readInt());
 			setControlType(dis.readInt());
@@ -350,21 +351,21 @@ public class QuestionDef implements IFormElement, Localizable {
 			setEnabled(dis.readBoolean());
 			setLocked(dis.readBoolean());
 			
-			setSelectItemIDs(ExternalizableHelper.readExternalSOH(dis), ExternalizableHelper.readExternalVB(dis), null);
+			setSelectItemIDs(ExternalizableHelperDeprecated.readExternalSOH(dis), ExternalizableHelperDeprecated.readExternalVB(dis), null);
 			if (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_SELECT_ONE) {
 				localizeSelectMap(null); //even for non-multilingual forms, text must be initially 'localized'
 			}
 			
 			String className = dis.readUTF();
 			FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-			PrototypeFactory factory = fdrms.getQuestionElementsFactory();
+			PrototypeFactoryDeprecated factory = fdrms.getQuestionElementsFactory();
 			binding = (IDataReference)factory.getNewInstance(className);
 			if(binding == null) { 
-				throw new UnavailableExternalizerException("A reference prototype could not be found to deserialize a " +
+				throw new DeserializationException("A reference prototype could not be found to deserialize a " +
 						"reference of the type " + className + ". Please register a Prototype of this type before deserializing " +
 						"the QuestionDef " + this.getName());
 			}
-			binding.readExternal(dis);
+			binding.readExternal(dis, pf);
 		}	
 	}
 
@@ -375,14 +376,14 @@ public class QuestionDef implements IFormElement, Localizable {
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeInt(getID());
 		
-		ExternalizableHelper.writeUTF(dos, getName());
-		ExternalizableHelper.writeUTF(dos, getAppearanceAttr());
-		ExternalizableHelper.writeUTF(dos, getLongText());
-		ExternalizableHelper.writeUTF(dos, getShortText());
-		ExternalizableHelper.writeUTF(dos, getHelpText());
-		ExternalizableHelper.writeUTF(dos, getLongTextID());
-		ExternalizableHelper.writeUTF(dos, getShortTextID());
-		ExternalizableHelper.writeUTF(dos, getHelpTextID());
+		ExternalizableHelperDeprecated.writeUTF(dos, getName());
+		ExternalizableHelperDeprecated.writeUTF(dos, getAppearanceAttr());
+		ExternalizableHelperDeprecated.writeUTF(dos, getLongText());
+		ExternalizableHelperDeprecated.writeUTF(dos, getShortText());
+		ExternalizableHelperDeprecated.writeUTF(dos, getHelpText());
+		ExternalizableHelperDeprecated.writeUTF(dos, getLongTextID());
+		ExternalizableHelperDeprecated.writeUTF(dos, getShortTextID());
+		ExternalizableHelperDeprecated.writeUTF(dos, getHelpTextID());
 		
 		dos.writeInt(getDataType());
 		dos.writeInt(getControlType());
@@ -393,8 +394,8 @@ public class QuestionDef implements IFormElement, Localizable {
 		dos.writeBoolean(isLocked());
 		
 		//selectItems should not be serialized
-		ExternalizableHelper.writeExternal(getSelectItemIDs(), dos);
-		ExternalizableHelper.writeExternalVB(selectItemsLocalizable, dos);
+		ExternalizableHelperDeprecated.writeExternal(getSelectItemIDs(), dos);
+		ExternalizableHelperDeprecated.writeExternalVB(selectItemsLocalizable, dos);
 		
 		dos.writeUTF(binding.getClass().getName());
 		binding.writeExternal(dos);

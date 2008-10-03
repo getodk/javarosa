@@ -5,7 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class ImmunizationAnswerData  implements IAnswerData {
 	
@@ -47,11 +48,9 @@ public class ImmunizationAnswerData  implements IAnswerData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		data = new ImmunizationData();
-		data.readExternal(in);
+		data.readExternal(in, pf);
 	}
 
 	/* (non-Javadoc)

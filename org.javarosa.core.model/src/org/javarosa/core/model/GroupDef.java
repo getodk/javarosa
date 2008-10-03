@@ -6,11 +6,12 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
-import org.javarosa.core.model.utils.PrototypeFactory;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
 
 
 /** The definition of a group in a form or questionaire. 
@@ -155,24 +156,24 @@ public class GroupDef implements IFormElement, Localizable {
 	}
 
 	/** Reads a group definition object from the supplied stream. */
-	public void readExternal(DataInputStream dis) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
-		if(!ExternalizableHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+		if(!ExternalizableHelperDeprecated.isEOF(dis)){
 			//TODO: Find a way to reuse the one from FormDef
-			PrototypeFactory factory = new PrototypeFactory();
+			PrototypeFactoryDeprecated factory = new PrototypeFactoryDeprecated();
 			factory.addNewPrototype(QuestionDef.class.getName(), QuestionDef.class);
 			factory.addNewPrototype(GroupDef.class.getName(), GroupDef.class);
 			
 			setID(dis.readInt());
 
-			setName(ExternalizableHelper.readUTF(dis));
-			setLongText(ExternalizableHelper.readUTF(dis));
-			setShortText(ExternalizableHelper.readUTF(dis));
-			setLongTextID(ExternalizableHelper.readUTF(dis), null);
-			setShortTextID(ExternalizableHelper.readUTF(dis), null);
+			setName(ExternalizableHelperDeprecated.readUTF(dis));
+			setLongText(ExternalizableHelperDeprecated.readUTF(dis));
+			setShortText(ExternalizableHelperDeprecated.readUTF(dis));
+			setLongTextID(ExternalizableHelperDeprecated.readUTF(dis), null);
+			setShortTextID(ExternalizableHelperDeprecated.readUTF(dis), null);
 			
 			setRepeat(dis.readBoolean());
 			
-			ExternalizableHelper.readExternal(dis, factory);
+			ExternalizableHelperDeprecated.readExternal(dis, factory);
 		}
 	}
 
@@ -180,14 +181,14 @@ public class GroupDef implements IFormElement, Localizable {
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		dos.writeInt(getID());
 		
-		ExternalizableHelper.writeUTF(dos, getName());
-		ExternalizableHelper.writeUTF(dos, getLongText());
-		ExternalizableHelper.writeUTF(dos, getShortText());
-		ExternalizableHelper.writeUTF(dos, getLongTextID());
-		ExternalizableHelper.writeUTF(dos, getShortTextID());
+		ExternalizableHelperDeprecated.writeUTF(dos, getName());
+		ExternalizableHelperDeprecated.writeUTF(dos, getLongText());
+		ExternalizableHelperDeprecated.writeUTF(dos, getShortText());
+		ExternalizableHelperDeprecated.writeUTF(dos, getLongTextID());
+		ExternalizableHelperDeprecated.writeUTF(dos, getShortTextID());
 		
 		dos.writeBoolean(getRepeat());
 		
-		ExternalizableHelper.writeExternalGeneric(getChildren(), dos);
+		ExternalizableHelperDeprecated.writeExternalGeneric(getChildren(), dos);
 	}	
 }

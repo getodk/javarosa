@@ -8,8 +8,9 @@ import java.util.Vector;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * QuestionDataElement is a TreeElement of a DataModelTree that is a leaf which
@@ -165,20 +166,18 @@ public class QuestionDataElement extends TreeElement {
 	 *
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
-		this.name = ExternalizableHelper.readUTF(in);
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		this.name = ExternalizableHelperDeprecated.readUTF(in);
 		String className = in.readUTF();
 		reference = (IDataReference)this.getRoot().getFactory().getNewInstance(className);
 		if (reference == null) {
-			throw new UnavailableExternalizerException(
+			throw new DeserializationException(
 					"Attempt to resolve serialization for a DataModelTree failed because there was no reference " +
 					"template available to deserialize the stored reference");
 		}
-		reference.readExternal(in);
+		reference.readExternal(in, pf);
 		// read attributes
-		Vector attStrings = ExternalizableHelper.readUTFs(in);
+		Vector attStrings = ExternalizableHelperDeprecated.readUTFs(in);
 		setAttributesFromSingleStringVector(attStrings);
 		// read value
 		if(in.readBoolean() == false) {
@@ -187,11 +186,11 @@ public class QuestionDataElement extends TreeElement {
 			String valueName = in.readUTF();
 			value = (IAnswerData)this.getRoot().getFactory().getNewInstance(valueName);
 			if(value == null) {
-				throw new UnavailableExternalizerException(
+				throw new DeserializationException(
 						"Attempt to resolve serialization for a DataModelTree failed because there was no answerdata " +
 						"template available to deserialize the stored answer data of type " + valueName);
 			}
-			value.readExternal(in);
+			value.readExternal(in, pf);
 		}
 	}
 
@@ -204,14 +203,14 @@ public class QuestionDataElement extends TreeElement {
 		//This flag is in place to determine whether a Data element is a Group or a Data
 		//True for groups, false for DataElements
 		out.writeBoolean(false);
-		ExternalizableHelper.writeUTF(out, this.name);
+		ExternalizableHelperDeprecated.writeUTF(out, this.name);
 		out.writeUTF(reference.getClass().getName());
 		reference.writeExternal(out);
 		// write attributes.
 		// 1. Add attributes to vector as full strings  'qid="82"'
 		Vector attStrings = getSingleStringAttributeVector();
-		// 2. @ writeExternal - call ExternalizableHelper.writeUTFs to write the vector
-		ExternalizableHelper.writeUTFs(attStrings, out);
+		// 2. @ writeExternal - call ExternalizableHelperDeprecated.writeUTFs to write the vector
+		ExternalizableHelperDeprecated.writeUTFs(attStrings, out);
 		// 3. @ readExternal read from vector
 		// 4. Don't forget you'll need to externalize them in XMLserializer too. :-(
 		if(value == null) {

@@ -41,7 +41,7 @@ import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.TransportMessage;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 
 /**
  *
@@ -175,15 +175,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
                     javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
                     mainShell.setDisplay(this, a);
                     e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
-                    mainShell.setDisplay(this, a);
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
-                    mainShell.setDisplay(this, a);
-                    e.printStackTrace();
-                } catch (UnavailableExternalizerException e) {
+                } catch (DeserializationException e) {
                     javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
                     mainShell.setDisplay(this, a);
                     e.printStackTrace();

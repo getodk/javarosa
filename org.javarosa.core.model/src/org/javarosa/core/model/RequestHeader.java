@@ -4,8 +4,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
 /**
@@ -74,7 +76,7 @@ public class RequestHeader implements Externalizable{
 	}
 		
 	/**
-	 * @see org.javarosa.core.util.util.db.Externalizable#writeExternal(java.io.DataOutputStream)
+	 * @see org.javarosa.core.util.externalizable.util.db.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException{
 		dos.writeUTF(getUserName());
@@ -83,10 +85,10 @@ public class RequestHeader implements Externalizable{
 	}
 	
 	/**
-	 * @see org.javarosa.core.util.util.db.Externalizable#readExternal(java.io.DataInputStream)
+	 * @see org.javarosa.core.util.externalizable.util.db.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream dis) throws IOException,InstantiationException,IllegalAccessException{
-		if(!ExternalizableHelper.isEOF(dis)){
+	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+		if(!ExternalizableHelperDeprecated.isEOF(dis)){
 			setUserName(dis.readUTF());
 			setPassword(dis.readUTF());
 			setAction(dis.readByte());

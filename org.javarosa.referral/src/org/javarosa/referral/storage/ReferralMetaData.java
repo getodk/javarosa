@@ -8,7 +8,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.referral.model.Referrals;
 
 /**
@@ -47,9 +48,9 @@ public class ReferralMetaData extends MetaDataObject {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-    public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException
     {
-    	super.readExternal(in);
+    	super.readExternal(in, pf);
     	this.formId = in.readInt();
     }
 	

@@ -4,10 +4,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.DeserializationException;
 
 public abstract class XPathBinaryOpExpr extends XPathOpExpr {
 	public XPathExpression a, b;
@@ -21,9 +21,7 @@ public abstract class XPathBinaryOpExpr extends XPathOpExpr {
 		return "{binop-expr:" + op + "," + a.toString() + "," + b.toString() + "}";
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-	throws IOException, InstantiationException, IllegalAccessException,
-	UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		a = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		b = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
 	}

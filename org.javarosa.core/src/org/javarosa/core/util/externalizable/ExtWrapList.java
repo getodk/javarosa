@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.util.UnavailableExternalizerException;
 
 //list of objects of single (non-polymorphic) type
 public class ExtWrapList extends ExternalizableWrapper {
@@ -33,7 +32,7 @@ public class ExtWrapList extends ExternalizableWrapper {
 	}
 	
 	public ExtWrapList (Class type) {
-		this.type = new ExtType(type);
+		this.type = new ExtWrapBase(type);
 	}
 
 	public ExtWrapList (ExternalizableWrapper type) {
@@ -48,8 +47,7 @@ public class ExtWrapList extends ExternalizableWrapper {
 		return new ExtWrapList((Vector)val, type);
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		Vector v = new Vector();
 
 		long size = ExtUtil.readNumeric(in);
@@ -69,8 +67,7 @@ public class ExtWrapList extends ExternalizableWrapper {
 		}
 	}
 
-	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		type = ExtWrapTagged.readTag(in, pf);
 	}
 

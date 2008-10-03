@@ -2,7 +2,7 @@ package org.javarosa.patient.model;
 
 import java.util.Vector;
 
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * IPatientRecord is a storage location for historical

@@ -7,7 +7,7 @@ import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
 
 import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.reminders.model.Reminder;
 
 public class ReminderRMSUtility extends RMSUtility {
@@ -28,7 +28,7 @@ public class ReminderRMSUtility extends RMSUtility {
 		super.writeToRMS(reminder, null);
 	}
 	
-	public Reminder retrieveFromRMS(int reminderId) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException {
+	public Reminder retrieveFromRMS(int reminderId) throws IOException, IllegalAccessException, InstantiationException, DeserializationException {
 		Reminder reminder = new Reminder();
 		
 		this.retrieveFromRMS(reminderId, reminder);
@@ -37,7 +37,7 @@ public class ReminderRMSUtility extends RMSUtility {
 	}
 	
 	public Vector getReminders() throws IOException, IllegalAccessException,
-			InstantiationException, UnavailableExternalizerException {
+			InstantiationException, DeserializationException {
 		RecordEnumeration en = this.enumerateMetaData();
 		Vector reminders = new Vector();
 		try {

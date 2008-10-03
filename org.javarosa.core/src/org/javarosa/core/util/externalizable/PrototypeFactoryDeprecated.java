@@ -38,10 +38,16 @@ public class PrototypeFactoryDeprecated {
 	 * allowed to be accessed.
 	 * @throws InstantiationException
 	 */
-	public Object getNewInstance(String prototypeName) throws IllegalAccessException, InstantiationException {
+	public Object getNewInstance(String prototypeName) {
 		if(prototypes.get(prototypeName) == null) {
 			return null;
 		}
-		return ((Class)prototypes.get(prototypeName)).newInstance();
+		try {
+			return ((Class)prototypes.get(prototypeName)).newInstance();
+		} catch (InstantiationException e) {
+			throw new CannotCreateObjectException(prototypeName);
+		} catch (IllegalAccessException e) {
+			throw new CannotCreateObjectException(prototypeName);
+		}
 	}
 }

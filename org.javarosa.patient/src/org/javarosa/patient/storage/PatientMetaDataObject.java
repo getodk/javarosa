@@ -4,9 +4,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.model.Patient;
 
 public class PatientMetaDataObject extends MetaDataObject {
@@ -74,14 +75,13 @@ public class PatientMetaDataObject extends MetaDataObject {
     /* (non-Javadoc)
      * @see org.javarosa.clforms.storage.MetaDataObject#readExternal(java.io.DataInputStream)
      */
-    public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException
-    {
-    	super.readExternal(in);
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+    	super.readExternal(in, pf);
     	
         this.patientRecordId = in.readInt();
         
         this.patientName = in.readUTF();
-        this.patientId = ExternalizableHelper.readUTF(in);
+        this.patientId = ExternalizableHelperDeprecated.readUTF(in);
     }
 
    
@@ -95,7 +95,7 @@ public class PatientMetaDataObject extends MetaDataObject {
     	out.writeInt(this.getPatientRecordId());
     	
     	out.writeUTF(this.getName());
-    	ExternalizableHelper.writeUTF(out, this.patientId);
+    	ExternalizableHelperDeprecated.writeUTF(out, this.patientId);
     }
 
     /*

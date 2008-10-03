@@ -6,7 +6,7 @@ import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.formmanager.activity.FormEntryContext;
 
 public class RMSRetreivalMethod implements IFormDefRetrievalMethod {
@@ -23,11 +23,7 @@ public class RMSRetreivalMethod implements IFormDefRetrievalMethod {
 				return theForm;
 			} catch (IOException e) {
 				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (UnavailableExternalizerException uee) {
+			} catch (DeserializationException uee) {
 				uee.printStackTrace();
 			}
 		}

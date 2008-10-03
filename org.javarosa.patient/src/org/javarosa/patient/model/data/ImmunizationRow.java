@@ -8,9 +8,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * @author Clayton Sims
@@ -68,16 +69,14 @@ public class ImmunizationRow implements Externalizable {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
-		vaccinationName = ExternalizableHelper.readUTF(in);
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		vaccinationName = ExternalizableHelperDeprecated.readUTF(in);
 		
 		for(int i = 0 ; i < 5 ; i++) {
 			vaccinationDoses[i] = in.readInt();
 		}
 		for(int i = 0 ; i < 5 ; i++) {
-			vaccinationDates[i] = ExternalizableHelper.readDate(in);
+			vaccinationDates[i] = ExternalizableHelperDeprecated.readDate(in);
 		}
 		for(int i = 0 ; i < 5 ; i++) {
 			cellEnabled[i] = in.readBoolean();
@@ -89,13 +88,13 @@ public class ImmunizationRow implements Externalizable {
 	 * @see org.javarosa.core.util.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelper.writeUTF(out, vaccinationName);
+		ExternalizableHelperDeprecated.writeUTF(out, vaccinationName);
 		
 		for(int i = 0 ; i < 5 ; i++) {
 			out.writeInt(vaccinationDoses[i]);
 		}
 		for(int i = 0 ; i < 5 ; i++) {
-			ExternalizableHelper.writeDate(out, vaccinationDates[i]);
+			ExternalizableHelperDeprecated.writeDate(out, vaccinationDates[i]);
 		}
 		for(int i = 0 ; i < 5 ; i++) {
 			out.writeBoolean(cellEnabled[i]);

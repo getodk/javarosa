@@ -18,7 +18,7 @@ import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.Localizer;
-import org.javarosa.core.model.utils.PrototypeFactory;
+import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.IXFormBindHandler;
 import org.javarosa.xform.util.XFormAnswerDataParser;
@@ -46,7 +46,7 @@ public class XFormParser {
 	private static Hashtable topLevelHandlers;
 	private static Hashtable groupLevelHandlers;
 	private static Hashtable typeMappings;
-	private static PrototypeFactory modelPrototypes;
+	private static PrototypeFactoryDeprecated modelPrototypes;
 
 	/** IXFormBindHaandler */
 	private static Vector bindHandlers;
@@ -61,7 +61,7 @@ public class XFormParser {
 	static {
 		initProcessingRules();
 		initTypeMappings();
-		modelPrototypes = new PrototypeFactory();
+		modelPrototypes = new PrototypeFactoryDeprecated();
 		bindHandlers = new Vector();
 	}
 
@@ -687,18 +687,12 @@ public class XFormParser {
 		if (bindingsByRef.containsKey(refStr)) {
 			DataBinding binding = (DataBinding) bindingsByRef.get(refStr);
 			// This node, and its children represent some sort of Question
-			try {
-				element = (TreeElement)modelPrototypes.getNewInstance(String.valueOf(binding.getDataType()));
-				if(element != null) {
-					element.setReference(reference);
-					element.setName(node.getName());
-				}
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			}
 
+			element = (TreeElement)modelPrototypes.getNewInstance(String.valueOf(binding.getDataType()));
+			if(element != null) {
+				element.setReference(reference);
+				element.setName(node.getName());
+			}
 			if(element == null) {
 				//Nothing special happened when we tried to instantiate. This is just a normal question
 				element = new QuestionDataElement(node.getName(), reference);

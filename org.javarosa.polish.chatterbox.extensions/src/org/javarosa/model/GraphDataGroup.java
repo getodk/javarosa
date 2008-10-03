@@ -14,7 +14,8 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.model.data.NumericListData;
 import org.javarosa.patient.util.DateValueTuple;
 
@@ -115,18 +116,17 @@ public class GraphDataGroup extends QuestionDataGroup {
 	}
 	
 	
-	public void readNodeAttributes(DataInputStream in) throws IOException,
-	InstantiationException, IllegalAccessException, UnavailableExternalizerException {
+	public void readNodeAttributes(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		super.readNodeAttributes(in);
 		
 		String className = in.readUTF();
 		reference = (IDataReference)this.getRoot().getFactory().getNewInstance(className);
 		if (reference == null) {
-			throw new UnavailableExternalizerException(
+			throw new DeserializationException(
 					"Attempt to resolve serialization for a DataModelTree failed because there was no reference " +
 					"template available to deserialize the stored reference");
 		}
-		reference.readExternal(in);
+		reference.readExternal(in, pf);
 	}
 	public void writeNodeAttributes(DataOutputStream out) throws IOException {
 		super.writeNodeAttributes(out);

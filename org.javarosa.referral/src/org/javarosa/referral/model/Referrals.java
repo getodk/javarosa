@@ -9,9 +9,10 @@ import java.util.Vector;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 public class Referrals implements Externalizable {
@@ -82,11 +83,9 @@ public class Referrals implements Externalizable {
 	 * org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream
 	 * )
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		this.formId = in.readInt();
-		referralConditions = ExternalizableHelper.readExternal(in, ReferralCondition.class);
+		referralConditions = ExternalizableHelperDeprecated.readExternal(in, ReferralCondition.class);
 	}
 
 	/* (non-Javadoc)
@@ -94,7 +93,7 @@ public class Referrals implements Externalizable {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(this.formId);
-		ExternalizableHelper.writeExternal(referralConditions, out);	
+		ExternalizableHelperDeprecated.writeExternal(referralConditions, out);	
 	}
 	
 	

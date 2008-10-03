@@ -1,6 +1,6 @@
 package org.javarosa.core.model.data;
 
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * An IAnswerData object represents an answer to a question

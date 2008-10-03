@@ -10,10 +10,10 @@ import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
 
 import org.javarosa.core.services.ITransportManager;
-import org.javarosa.core.services.storage.utilities.Serializer;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
+import org.javarosa.core.util.externalizable.ExtUtil;
 
 /**
  * 
@@ -78,7 +78,7 @@ public class FileConnectionTransportMethod implements TransportMethod {
 					fcon.create();
 				}
 				OutputStream out = fcon.openOutputStream();
-				out.write(Serializer.serialize(message));
+				out.write(ExtUtil.serialize(message));
 				//update status
 				message.setStatus(TransportMessage.STATUS_DELIVERED);
 				message.setChanged();

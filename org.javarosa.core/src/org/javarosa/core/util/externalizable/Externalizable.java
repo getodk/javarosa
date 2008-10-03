@@ -1,8 +1,9 @@
-package org.javarosa.core.util;
+package org.javarosa.core.util.externalizable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
 
 /**
  * Gives objects control over serialization. A replacement for the interfaces
@@ -17,7 +18,7 @@ public interface Externalizable {
 	 * @param in
 	 * @throws IOException
 	 */
-	public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException;
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException;
 
 	/**
 	 * @param out

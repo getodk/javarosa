@@ -7,7 +7,8 @@ import java.util.Date;
 
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * Serializable Meta Data object for Model Tree definition records that 
@@ -84,8 +85,8 @@ public class DataModelTreeMetaData extends MetaDataObject{
 	 * @seeorg.javarosa.clforms.storage.MetaDataObject#readExternal(java.io.
 	 * DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {
-		super.readExternal(in);
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		super.readExternal(in, pf);
 		this.formName = in.readUTF();
 		this.version = in.readInt();
 		this.dateSaved = new Date(in.readLong());

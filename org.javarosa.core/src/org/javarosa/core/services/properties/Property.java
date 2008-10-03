@@ -7,7 +7,8 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.services.storage.utilities.IDRecordable;
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * Property is an encapsulation of a record containing a property in the J2ME
@@ -24,9 +25,9 @@ public class Property implements Externalizable, IDRecordable{
     public int recordId;
    
     /** (non-Javadoc)
-     *  @see org.javarosa.core.util.clforms.storage.Externalizable#readExternal(DataInputStream)
+     *  @see org.javarosa.core.util.externalizable.clforms.storage.Externalizable#readExternal(DataInputStream)
      */
-    public void readExternal(DataInputStream in) throws IOException {
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
         String fullString = "";
         
         byte[] inputarray = new byte[in.available()];
@@ -64,7 +65,7 @@ public class Property implements Externalizable, IDRecordable{
     }
 
     /** (non-Javadoc)
-     *  @see org.javarosa.core.util.clforms.storage.Externalizable#writeExternal(DataOutputStream)
+     *  @see org.javarosa.core.util.externalizable.clforms.storage.Externalizable#writeExternal(DataOutputStream)
      */
     public void writeExternal(DataOutputStream out) throws IOException {
         String outputString = name;

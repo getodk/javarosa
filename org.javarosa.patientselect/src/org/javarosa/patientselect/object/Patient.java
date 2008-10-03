@@ -5,9 +5,10 @@ import java.util.Vector;
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
 * This encapsulates the Externalizable object to be passed to the RMS
@@ -187,17 +188,17 @@ public class Patient implements Externalizable{
 		return nextVisitDate;
 	}
 	
-	public void readExternal(DataInputStream in) throws IOException,InstantiationException, IllegalAccessException,UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		
-		patientId = ExternalizableHelper.readNumInt(in, ExternalizableHelper.ENCODING_NUM_DEFAULT);
-		patientName = ExternalizableHelper.readUTF(in);
+		patientId = ExternalizableHelperDeprecated.readNumInt(in, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
+		patientName = ExternalizableHelperDeprecated.readUTF(in);
 		
-		patientData = ExternalizableHelper.readUTFs(in);		
+		patientData = ExternalizableHelperDeprecated.readUTFs(in);		
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		
-		ExternalizableHelper.writeBytes(patientData, out);		
+		ExternalizableHelperDeprecated.writeBytes(patientData, out);		
 	}
 
 }

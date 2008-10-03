@@ -6,8 +6,9 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.model.IPatientRecord;
 import org.javarosa.patient.util.DateValueTuple;
 import org.javarosa.patient.util.SelectorParser;
@@ -121,10 +122,8 @@ public class NumericListData implements IAnswerData, IPatientRecord {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
-		valueList = ExternalizableHelper.readExternal(in, DateValueTuple.class);
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		valueList = ExternalizableHelperDeprecated.readExternal(in, DateValueTuple.class);
 		if(valueList == null) {
 			valueList = new Vector();
 		}
@@ -134,7 +133,7 @@ public class NumericListData implements IAnswerData, IPatientRecord {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	 public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelper.writeExternal(valueList, out);
+		ExternalizableHelperDeprecated.writeExternal(valueList, out);
 	}
 
 }

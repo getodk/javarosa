@@ -3,7 +3,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.utils.PrototypeFactory;
+import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.ui.ChoiceGroup;
@@ -11,10 +11,10 @@ import de.enough.polish.ui.ChoiceGroup;
 public class ChatterboxWidgetFactory {
 	Chatterbox cbox;
 	
-	PrototypeFactory widgetFactory;
+	PrototypeFactoryDeprecated widgetFactory;
 	
 	public ChatterboxWidgetFactory (Chatterbox cbox) {
-		widgetFactory = new PrototypeFactory();
+		widgetFactory = new PrototypeFactoryDeprecated();
 		this.cbox = cbox;
 	}
 	
@@ -74,18 +74,13 @@ public class ChatterboxWidgetFactory {
 		if (expandedStyle == null) {
 			expandedStyle = new TextEntryWidget();
 			String name = String.valueOf(controlType);
-			try {
-				Object widget;
-				widget = widgetFactory.getNewInstance(name);
 
-				if (widget == null) {
-				} else {
-					expandedStyle = (IWidgetStyleEditable) widget;
-				}
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
+			Object widget;
+			widget = widgetFactory.getNewInstance(name);
+
+			if (widget == null) {
+			} else {
+				expandedStyle = (IWidgetStyleEditable) widget;
 			}
 		}
 		

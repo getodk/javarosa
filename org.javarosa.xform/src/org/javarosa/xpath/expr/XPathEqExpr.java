@@ -6,9 +6,9 @@ import java.io.IOException;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class XPathEqExpr extends XPathBinaryOpExpr {
 	public boolean equal;
@@ -56,9 +56,7 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
 		return super.toString(equal ? "==" : "!=");
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-	throws IOException, InstantiationException, IllegalAccessException,
-	UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		equal = ExtUtil.readBool(in);
 		super.readExternal(in, pf);
 	}

@@ -1,5 +1,7 @@
 package org.javarosa.core.util.externalizable;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -9,14 +11,37 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.ExternalizableDynamic;
 import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.core.util.UnavailableExternalizerException;
 
 public class ExtUtil {
+	public static byte[] serialize (Object o) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		write(new DataOutputStream(baos), o);
+		return baos.toByteArray();
+	}
 
-	private static PrototypeFactory defaultPrototypes () {
+	//original deserialization API (whose limits made us make this whole new framework!); here for backwards compatibility
+	public static void deserialize (byte[] data, Externalizable ext) throws IOException, DeserializationException {
+		ext.readExternal(new DataInputStream(new ByteArrayInputStream(data)), defaultPrototypes());
+	}
+		
+	public static Object deserialize (byte[] data, Class type) throws IOException, DeserializationException {
+		return deserialize(data, type, null);
+	}
+	
+	public static Object deserialize (byte[] data, Class type, PrototypeFactory pf) throws IOException, DeserializationException {
+		return read(new DataInputStream(new ByteArrayInputStream(data)), type, pf);
+	}
+	
+	public static int getSize (Object o) {
+		try {
+			return serialize(o).length;
+		} catch (Exception e) {
+			return -1;
+		}
+	}
+	
+	public static PrototypeFactory defaultPrototypes () {
 		return new PrototypeFactory(JavaRosaServiceProvider.instance().getPrototypes());
 	}
 	
@@ -44,12 +69,16 @@ public class ExtUtil {
 		} else if (data instanceof Date) {
 			writeDate(out, (Date)data);
 		} else {
-			throw new RuntimeException("can't serialize");
+			throw new ClassCastException("Not a serializable datatype: " + data.getClass().getName());
 		}
 	}
 	
 	public static void writeNumeric (DataOutputStream out, long val) throws IOException {
-		write(out, new ExtWrapIntEncodingUniform(val));
+		writeNumeric(out, val, new ExtWrapIntEncodingUniform());
+	}
+	
+	public static void writeNumeric (DataOutputStream out, long val, ExtWrapIntEncoding encoding) throws IOException {
+		write(out, encoding.clone(new Long(val)));
 	}
 	
 	public static void writeChar (DataOutputStream out, char val) throws IOException {
@@ -73,20 +102,14 @@ public class ExtUtil {
 		//time zone?
 	}
 	
-	public static Object read (DataInputStream in, Class type) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public static Object read (DataInputStream in, Class type) throws IOException, DeserializationException {
 		return read(in, type, null);
 	}
 	
-	public static Object read (DataInputStream in, Class type, PrototypeFactory pf)
-		throws IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		if (ExternalizableDynamic.class.isAssignableFrom(type)) {
-			ExternalizableDynamic extd = (ExternalizableDynamic)type.newInstance();
-			extd.readExternal(in, pf == null ? defaultPrototypes() : pf);
-			return extd;
-		} else if (Externalizable.class.isAssignableFrom(type)) {
-			Externalizable ext = (Externalizable)type.newInstance();
-			ext.readExternal(in);
+	public static Object read (DataInputStream in, Class type, PrototypeFactory pf) throws IOException, DeserializationException {
+		if (Externalizable.class.isAssignableFrom(type)) {
+			Externalizable ext = (Externalizable)PrototypeFactory.getInstance(type);
+			ext.readExternal(in, pf == null ? defaultPrototypes() : pf);
 			return ext;
 		} else if (type == Byte.class) {
 			return new Byte(readByte(in));
@@ -109,38 +132,40 @@ public class ExtUtil {
 		} else if (type == Date.class) {
 			return readDate(in);
 		} else {
-			throw new RuntimeException("can't deserialize");
+			throw new ClassCastException("Not a deserializable datatype: " + type.getName());
 		}
 	}
 	
-	public static Object read (DataInputStream in, ExternalizableWrapper ew) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public static Object read (DataInputStream in, ExternalizableWrapper ew) throws	IOException, DeserializationException {
 		return read(in, ew, null);
 	}
 	
-	public static Object read (DataInputStream in, ExternalizableWrapper ew, PrototypeFactory pf) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public static Object read (DataInputStream in, ExternalizableWrapper ew, PrototypeFactory pf) throws IOException, DeserializationException {
 		ew.readExternal(in, pf == null ? defaultPrototypes() : pf);
 		return ew.val;
 	}
 	
-	public static long readNumeric (DataInputStream in) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
-		return ((Long)read(in, new ExtWrapIntEncodingUniform())).longValue();
+	public static long readNumeric (DataInputStream in) throws IOException {
+		return readNumeric(in, new ExtWrapIntEncodingUniform());
 	}
+
+	public static long readNumeric (DataInputStream in, ExtWrapIntEncoding encoding) throws IOException {
+		try {
+			return ((Long)read(in, encoding)).longValue();
+		} catch (DeserializationException de) {
+			throw new RuntimeException("Shouldn't happen: Base-type encoding wrappers should never touch prototypes");
+		}
+	}	
 	
-	public static int readInt (DataInputStream in) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public static int readInt (DataInputStream in) throws IOException {
 		return toInt(readNumeric(in));
 	}
 
-	public static short readShort (DataInputStream in) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public static short readShort (DataInputStream in) throws IOException {
 		return toShort(readNumeric(in));
 	}
 
-	public static byte readByte (DataInputStream in) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public static byte readByte (DataInputStream in) throws	IOException {
 		return toByte(readNumeric(in));
 	}
 	
@@ -160,8 +185,7 @@ public class ExtUtil {
 		return in.readUTF();
 	}
 	
-	public static Date readDate (DataInputStream in) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public static Date readDate (DataInputStream in) throws	IOException {
 		return new Date(readNumeric(in));
 		//time zone?
 	}
@@ -200,7 +224,14 @@ public class ExtUtil {
 		}
 	}
 	
+	public static Object unwrap (Object o) {
+		return (o instanceof ExternalizableWrapper ? ((ExternalizableWrapper)o).baseValue() : o);
+	}
+	
 	public static boolean equals (Object a, Object b) {
+		a = unwrap(a);
+		b = unwrap(b);
+		
 		if (a == null) {
 			return b == null;
 		} else if (a instanceof Vector) {
@@ -229,11 +260,13 @@ public class ExtUtil {
 	public static boolean hashtableEquals (Hashtable a, Hashtable b) {
 		if (a.size() != b.size()) {
 			return false;
+		} else if (a instanceof OrderedHashtable != b instanceof OrderedHashtable) {
+			return false;
 		} else {
 			for (Enumeration ea = a.keys(); ea.hasMoreElements(); ) {
 				Object keyA = ea.nextElement();
 
-				if (!a.get(keyA).equals(b.get(keyA))) {
+				if (!equals(a.get(keyA), b.get(keyA))) {
 					return false;
 				}
 			}
@@ -246,7 +279,7 @@ public class ExtUtil {
 					Object keyA = ea.nextElement();
 					Object keyB = eb.nextElement();
 					
-					if (!keyA.equals(keyB)) {
+					if (!keyA.equals(keyB)) { //must use built-in equals for keys, as that's what hashtable uses
 						return false;
 					}
 				}

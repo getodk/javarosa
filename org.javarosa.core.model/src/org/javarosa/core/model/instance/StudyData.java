@@ -8,9 +8,10 @@ import java.util.Vector;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.StudyDef;
 import org.javarosa.core.model.storage.FormDefMetaData;
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * This calls encapsulates data collected in all forms of a particular study.
@@ -99,12 +100,10 @@ public class StudyData implements Externalizable{
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
-		if(!ExternalizableHelper.isEOF(in)){
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		if(!ExternalizableHelperDeprecated.isEOF(in)){
 			setId(in.readByte());
-			setForms(ExternalizableHelper.readBig(in,new FormDefMetaData().getClass()));
+			setForms(ExternalizableHelperDeprecated.readBig(in,new FormDefMetaData().getClass()));
 		}
 		
 	}
@@ -117,7 +116,7 @@ public class StudyData implements Externalizable{
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeByte(getId());
-		ExternalizableHelper.writeBig(getForms(), out);
+		ExternalizableHelperDeprecated.writeBig(getForms(), out);
 		
 	}
 }

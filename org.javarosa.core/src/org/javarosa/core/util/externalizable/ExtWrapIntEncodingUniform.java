@@ -3,11 +3,9 @@ package org.javarosa.core.util.externalizable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
 
-import org.javarosa.core.util.UnavailableExternalizerException;
 
-public class ExtWrapIntEncodingUniform extends ExternalizableWrapper {
+public class ExtWrapIntEncodingUniform extends ExtWrapIntEncoding {
 	/* serialization */
 	
 	public ExtWrapIntEncodingUniform (long l) {
@@ -24,8 +22,7 @@ public class ExtWrapIntEncodingUniform extends ExternalizableWrapper {
 		return new ExtWrapIntEncodingUniform(ExtUtil.toLong(val));
 	}
 
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
 		long l = 0;
 		byte b;
 		boolean firstByte = true;

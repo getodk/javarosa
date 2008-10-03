@@ -7,8 +7,12 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
-import org.javarosa.core.util.Externalizable;
 import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * The Localizer object maintains mappings for locale ID's and Object
@@ -53,9 +57,9 @@ public class Localizer implements Externalizable {
 	public boolean equals (Object o) {
 		if (o instanceof Localizer) {
 			Localizer l = (Localizer)o;
-			return (ExternalizableHelper.equals(localeData, l.localeData) &&
-					ExternalizableHelper.equals(defaultLocale, l.defaultLocale) &&
-					ExternalizableHelper.equals(currentLocale, l.currentLocale) &&
+			return (ExtUtil.equals(localeData, l.localeData) &&
+					ExtUtil.equals(defaultLocale, l.defaultLocale) &&
+					ExtUtil.equals(currentLocale, l.currentLocale) &&
 					fallbackDefaultLocale == l.fallbackDefaultLocale &&
 					fallbackDefaultForm == l.fallbackDefaultForm);
 		} else {
@@ -412,15 +416,15 @@ public class Localizer implements Externalizable {
 	/**
 	 * Read the object from stream.
 	 */
-	public void readExternal(DataInputStream dis) throws IOException, IllegalAccessException, InstantiationException{
-		if(!ExternalizableHelper.isEOF(dis)){
-			fallbackDefaultLocale = ExternalizableHelper.readBoolean(dis).booleanValue();
-			fallbackDefaultForm = ExternalizableHelper.readBoolean(dis).booleanValue();
-			localeData = ExternalizableHelper.readExternalCompoundSOH(dis);
+	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+		if(!ExternalizableHelperDeprecated.isEOF(dis)){
+			fallbackDefaultLocale = ExternalizableHelperDeprecated.readBoolean(dis).booleanValue();
+			fallbackDefaultForm = ExternalizableHelperDeprecated.readBoolean(dis).booleanValue();
+			localeData = ExternalizableHelperDeprecated.readExternalCompoundSOH(dis);
 			if (localeData == null)
 				localeData = new OrderedHashtable();
-			setDefaultLocale(ExternalizableHelper.readUTF(dis));
-			String currentLocale = ExternalizableHelper.readUTF(dis);
+			setDefaultLocale(ExternalizableHelperDeprecated.readUTF(dis));
+			String currentLocale = ExternalizableHelperDeprecated.readUTF(dis);
 			if(currentLocale != null) {
 				setLocale(currentLocale);
 			}
@@ -431,10 +435,10 @@ public class Localizer implements Externalizable {
 	 * Write the object to stream.
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
-		ExternalizableHelper.writeBoolean(dos, new Boolean(fallbackDefaultLocale));		
-		ExternalizableHelper.writeBoolean(dos, new Boolean(fallbackDefaultForm));
-		ExternalizableHelper.writeExternalCompoundSOH(localeData, dos);
-		ExternalizableHelper.writeUTF(dos, defaultLocale);
-		ExternalizableHelper.writeUTF(dos, currentLocale);		
+		ExternalizableHelperDeprecated.writeBoolean(dos, new Boolean(fallbackDefaultLocale));		
+		ExternalizableHelperDeprecated.writeBoolean(dos, new Boolean(fallbackDefaultForm));
+		ExternalizableHelperDeprecated.writeExternalCompoundSOH(localeData, dos);
+		ExternalizableHelperDeprecated.writeUTF(dos, defaultLocale);
+		ExternalizableHelperDeprecated.writeUTF(dos, currentLocale);		
 	}	
 }

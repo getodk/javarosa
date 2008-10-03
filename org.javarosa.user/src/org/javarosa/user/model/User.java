@@ -6,7 +6,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.services.storage.utilities.IDRecordable;
-import org.javarosa.core.util.Externalizable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 //import javax.microedition.rms.RecordStoreException;
 
@@ -57,7 +59,7 @@ public class User implements Externalizable, IDRecordable
 	}
 
 	///fetch the value for the default user and password from the RMS
-	public void readExternal(DataInputStream in) throws IOException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		try {
 			this.username = in.readUTF();
 			this.password = in.readUTF();

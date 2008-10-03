@@ -9,8 +9,9 @@ import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 
 /**
@@ -129,8 +130,7 @@ public class RMSUtility implements RecordListener
     		if (obj instanceof IDRecordable)
     			((IDRecordable)obj).setRecordId(recordId);
     		
-            Externalizable externalizableObject = (Externalizable) obj;
-            byte[] data = Serializer.serialize(externalizableObject);
+            byte[] data = ExtUtil.serialize(obj);
             //LOG
             this.recordStore.addRecord(data, 0, data.length);
             if (this.iType == RMSUtility.RMS_TYPE_META_DATA)
@@ -167,8 +167,7 @@ public class RMSUtility implements RecordListener
     	{
     		if (obj instanceof IDRecordable)
     			((IDRecordable)obj).setRecordId(recordId);
-    		Externalizable externalizableObject = (Externalizable) obj;
-    		byte[] data = Serializer.serialize(externalizableObject);
+    		byte[] data = ExtUtil.serialize(obj);
     		this.recordStore.setRecord(recordId, data, 0, data.length);
     		if (this.iType == RMSUtility.RMS_TYPE_META_DATA)
     		{
@@ -279,32 +278,22 @@ public class RMSUtility implements RecordListener
      * @throws InstantiationException
      */
     public void retrieveFromRMS(int recordId,
-                                Externalizable externalizableObject) throws IOException, IllegalAccessException, InstantiationException, UnavailableExternalizerException
+                                Externalizable externalizableObject) throws IOException, DeserializationException
     {
         try
         {
             byte[] data = this.recordStore.getRecord(recordId);
             //LOG
-            Serializer.deserialize(data, externalizableObject);
+            ExtUtil.deserialize(data, externalizableObject);
         }
         catch (RecordStoreException rse)
         {
             rse.printStackTrace();
             throw new IOException(rse.getMessage());
         }
-        catch (IllegalAccessException iae)
-        {
-            iae.printStackTrace();
-            throw new IllegalAccessException(iae.getMessage());
-        }
-        catch (InstantiationException ie)
-        {
-        	ie.printStackTrace();
-            throw new InstantiationException(ie.getMessage());
-        }
-        catch (UnavailableExternalizerException uee) {
+        catch (DeserializationException uee) {
         	uee.printStackTrace();
-        	throw new UnavailableExternalizerException(uee.getMessage());
+        	throw new DeserializationException(uee.getMessage());
         }
 
     }
@@ -351,15 +340,7 @@ public class RMSUtility implements RecordListener
     	{
     		ex.printStackTrace();
     	}
-        catch (IllegalAccessException iae)
-        {
-            iae.printStackTrace();
-        }
-        catch (InstantiationException ie)
-        {
-        	ie.printStackTrace();
-        }
-        catch (UnavailableExternalizerException uee) {
+        catch (DeserializationException uee) {
         	uee.printStackTrace();
         }
     }

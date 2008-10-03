@@ -3,8 +3,10 @@ package org.javarosa.patientselect.search;
 import java.io.*;
 import java.util.*;
 import org.javarosa.core.util.*;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.model.utils.ExternalizableHelper;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patientselect.object.ExternalizableObject;
 import org.javarosa.patientselect.store.PatientStore;
 
@@ -66,16 +68,15 @@ public class BasicSearch implements ISearch, Externalizable {
 	}
 	
 	
-	public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException,UnavailableExternalizerException 
-	{
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		this.formId = in.readInt();
-		searchConditions = ExternalizableHelper.readExternal(in, ExternalizableObject.class);
+		searchConditions = ExternalizableHelperDeprecated.readExternal(in, ExternalizableObject.class);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException 
 	{
 		out.writeInt(this.formId);
-		ExternalizableHelper.writeExternal(searchConditions, out );
+		ExternalizableHelperDeprecated.writeExternal(searchConditions, out );
 	}
 
 	public void searchByBoth(String patientName, String patientCode) {
@@ -95,7 +96,7 @@ public class BasicSearch implements ISearch, Externalizable {
 				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
 				//#endif
-			} catch (UnavailableExternalizerException e) {
+			} catch (DeserializationException e) {
 				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
 				//#endif
@@ -133,7 +134,7 @@ public class BasicSearch implements ISearch, Externalizable {
 				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
 				//#endif
-			} catch (UnavailableExternalizerException e) {
+			} catch (DeserializationException e) {
 				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
 				//#endif

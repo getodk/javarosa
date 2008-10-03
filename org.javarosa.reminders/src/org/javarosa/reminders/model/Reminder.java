@@ -5,10 +5,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.model.utils.ExternalizableHelper;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class Reminder implements Externalizable, IDRecordable {
 	Date followUpDate;
@@ -137,27 +138,25 @@ public class Reminder implements Externalizable, IDRecordable {
 		this.patientName = patientName;
 	}
 
-	public void readExternal(DataInputStream in) throws IOException,
-			InstantiationException, IllegalAccessException,
-			UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		reminderId = in.readInt();
 		
-		followUpDate = ExternalizableHelper.readDate(in);
+		followUpDate = ExternalizableHelperDeprecated.readDate(in);
 		patientId = in.readInt();
-		patientName = ExternalizableHelper.readUTF(in);
-		title = ExternalizableHelper.readUTF(in);
-		text = ExternalizableHelper.readUTF(in);
+		patientName = ExternalizableHelperDeprecated.readUTF(in);
+		title = ExternalizableHelperDeprecated.readUTF(in);
+		text = ExternalizableHelperDeprecated.readUTF(in);
 		notified = in.readBoolean();
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(reminderId);
 		
-		ExternalizableHelper.writeDate(out, followUpDate);
+		ExternalizableHelperDeprecated.writeDate(out, followUpDate);
 		out.writeInt(patientId);
-		ExternalizableHelper.writeUTF(out, patientName);
-		ExternalizableHelper.writeUTF(out, title);
-		ExternalizableHelper.writeUTF(out, text);
+		ExternalizableHelperDeprecated.writeUTF(out, patientName);
+		ExternalizableHelperDeprecated.writeUTF(out, title);
+		ExternalizableHelperDeprecated.writeUTF(out, text);
 		out.writeBoolean(notified);
 	}	
 }

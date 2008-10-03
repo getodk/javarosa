@@ -8,7 +8,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.core.util.UnavailableExternalizerException;
 
 //map of objects where key and data are all of single (non-polymorphic) type (key and value can be of separate types)
 public class ExtWrapMap extends ExternalizableWrapper {
@@ -34,6 +33,7 @@ public class ExtWrapMap extends ExternalizableWrapper {
 		this.val = val;
 		this.keyType = keyType;
 		this.dataType = dataType;
+		this.ordered = (val instanceof OrderedHashtable);
 	}
 
 	/* deserialization */
@@ -55,11 +55,11 @@ public class ExtWrapMap extends ExternalizableWrapper {
 	}
 	
 	public ExtWrapMap (Class keyType, Class dataType, boolean ordered) {
-		this(new ExtType(keyType), new ExtType(dataType), ordered);
+		this(new ExtWrapBase(keyType), new ExtWrapBase(dataType), ordered);
 	}
 
 	public ExtWrapMap (Class keyType, ExternalizableWrapper dataType, boolean ordered) {
-		this(new ExtType(keyType), dataType, ordered);
+		this(new ExtWrapBase(keyType), dataType, ordered);
 	}
 	
 	public ExtWrapMap (ExternalizableWrapper keyType, ExternalizableWrapper dataType, boolean ordered) {
@@ -76,8 +76,7 @@ public class ExtWrapMap extends ExternalizableWrapper {
 		return new ExtWrapMap((Hashtable)val, keyType, dataType);
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws 
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		Hashtable h = ordered ? new OrderedHashtable() : new Hashtable();
 
 		long size = ExtUtil.readNumeric(in);
@@ -100,11 +99,11 @@ public class ExtWrapMap extends ExternalizableWrapper {
 			
 			ExtUtil.write(out, keyType == null ? key : keyType.clone(key));
 			ExtUtil.write(out, dataType == null ? elem : dataType.clone(elem));			
-		}		
+		}
 	}
 
-	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws
-		IOException, UnavailableExternalizerException, IllegalAccessException, InstantiationException {
+	public void metaReadExternal (DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		ordered = ExtUtil.readBool(in);
 		keyType = ExtWrapTagged.readTag(in, pf);
 		dataType = ExtWrapTagged.readTag(in, pf);
 	}
@@ -116,6 +115,7 @@ public class ExtWrapMap extends ExternalizableWrapper {
 		keyTagObj = (keyType == null ? (h.size() == 0 ? new Object() : h.keys().nextElement()) : keyType);
 		elemTagObj = (dataType == null ? (h.size() == 0 ? new Object() : h.elements().nextElement()) : dataType);
 		
+		ExtUtil.writeBool(out, ordered);
 		ExtWrapTagged.writeTag(out, keyTagObj);
 		ExtWrapTagged.writeTag(out, elemTagObj);
 	}

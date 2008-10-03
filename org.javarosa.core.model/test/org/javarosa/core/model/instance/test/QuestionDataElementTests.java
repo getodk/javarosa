@@ -19,8 +19,9 @@ import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.model.utils.PrototypeFactory;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
+import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class QuestionDataElementTests extends TestCase{
 	private final String stringElementName = "String Data Element";
@@ -73,9 +74,9 @@ public class QuestionDataElementTests extends TestCase{
 				newReference.setReference(reference);
 				return newReference;
 			}
-			public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {}
+			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
 
-			public void writeExternal(DataOutputStream out) throws IOException {};
+			public void writeExternal(DataOutputStream out) throws IOException {}
 
 		};
 		
@@ -107,9 +108,9 @@ public class QuestionDataElementTests extends TestCase{
 				newReference.setReference(intReference);
 				return newReference;
 			}
-			public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException {}
+			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
 
-			public void writeExternal(DataOutputStream out) throws IOException {};
+			public void writeExternal(DataOutputStream out) throws IOException {}
 
 		};
 		
@@ -248,7 +249,7 @@ public class QuestionDataElementTests extends TestCase{
 	
 	private void testSuperclassMethods() {
 		//stringElement should not have a root at this point.
-		PrototypeFactory factory = new PrototypeFactory();
+		PrototypeFactoryDeprecated factory = new PrototypeFactoryDeprecated();
 		stringElement.setFactory(factory);
 		assertEquals("The QuestionDataElement 'stringElement' is not properly registering or returning factories",stringElement.getFactory(), factory);
 		

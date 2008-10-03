@@ -6,7 +6,8 @@ import java.io.IOException;
 
 import org.javarosa.core.services.properties.Property;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * PropertyMetaData is the Meta Data object used for Property records in the RMS
@@ -54,15 +55,14 @@ public class PropertyMetaData extends MetaDataObject {
     }
 
     /** (non-Javadoc)
-     *  @see org.javarosa.core.util.clforms.storage.Externalizable#readExternal(DataInputStream)
+     *  @see org.javarosa.core.util.externalizable.clforms.storage.Externalizable#readExternal(DataInputStream)
      */
-    public void readExternal(DataInputStream in) throws IOException, InstantiationException, IllegalAccessException, UnavailableExternalizerException
-    {
+    public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         this.name = in.readUTF();
     }
 
     /** (non-Javadoc)
-     *  @see org.javarosa.core.util.clforms.storage.Externalizable#writeExternal(DataOutputStream)
+     *  @see org.javarosa.core.util.externalizable.clforms.storage.Externalizable#writeExternal(DataOutputStream)
      */
     public void writeExternal(DataOutputStream out) throws IOException
     {

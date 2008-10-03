@@ -4,10 +4,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.util.Externalizable;
-import org.javarosa.core.util.UnavailableExternalizerException;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class XPathQName implements Externalizable {
 	public String namespace;
@@ -40,8 +41,7 @@ public class XPathQName implements Externalizable {
 		return (namespace == null ? name : namespace + ":" + name);
 	}
 	
-	public void readExternal(DataInputStream in)
-	throws IOException, InstantiationException, IllegalAccessException,	UnavailableExternalizerException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		namespace = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
 		name = ExtUtil.readString(in);
 	}
