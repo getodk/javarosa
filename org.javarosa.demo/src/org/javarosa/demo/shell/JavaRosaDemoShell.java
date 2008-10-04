@@ -37,6 +37,7 @@ import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
+import org.javarosa.xpath.XPathParseTool;
 
 /**
  * This is the shell for the JavaRosa demo that handles switching all of the views
@@ -92,24 +93,7 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void registerPrototypes () {
-		String[] classes = {
-				"org.javarosa.xpath.expr.XPathArithExpr",
-				"org.javarosa.xpath.expr.XPathBoolExpr",
-				"org.javarosa.xpath.expr.XPathCmpExpr",
-				"org.javarosa.xpath.expr.XPathEqExpr",
-				"org.javarosa.xpath.expr.XPathFilterExpr",
-				"org.javarosa.xpath.expr.XPathFuncExpr",
-				"org.javarosa.xpath.expr.XPathNumericLiteral",
-				"org.javarosa.xpath.expr.XPathNumNegExpr",
-				"org.javarosa.xpath.expr.XPathPathExpr",
-				"org.javarosa.xpath.expr.XPathStringLiteral",
-				"org.javarosa.xpath.expr.XPathUnionExpr",
-				"org.javarosa.xpath.expr.XPathVariableReference"
-		};
-		
-		for (int i = 0; i < classes.length; i++) {
-			JavaRosaServiceProvider.instance().registerPrototype(classes[i]);
-		}
+		JavaRosaServiceProvider.instance().registerPrototypes(XPathParseTool.xpathClasses);
 	}
 	
 	private void generateSerializedForms(String originalResource) {
