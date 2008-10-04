@@ -14,6 +14,8 @@ import org.javarosa.xpath.XPathUnsupportedException;
 public class XPathVariableReference extends XPathExpression {
     public XPathQName id;
 
+	public XPathVariableReference () { } //for deserialization
+
     public XPathVariableReference (XPathQName id) {
     	this.id = id;
     }
@@ -24,6 +26,15 @@ public class XPathVariableReference extends XPathExpression {
 
 	public String toString () {
 		return "{var:" + id.toString() + "}";
+	}
+	
+	public boolean equals (Object o) {
+		if (o instanceof XPathVariableReference) {
+			XPathVariableReference x = (XPathVariableReference)o;
+			return id.equals(x.id);
+		} else {
+			return false;
+		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

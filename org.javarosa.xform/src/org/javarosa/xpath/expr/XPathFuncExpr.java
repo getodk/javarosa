@@ -24,6 +24,8 @@ public class XPathFuncExpr extends XPathExpression {
 	public XPathQName id;
 	public XPathExpression[] args;
 
+	public XPathFuncExpr () { } //for deserialization
+	
 	public XPathFuncExpr (XPathQName id, XPathExpression[] args) {
 		this.id = id;
 		this.args = args;
@@ -43,6 +45,23 @@ public class XPathFuncExpr extends XPathExpression {
 		sb.append("}}");
 		
 		return sb.toString();
+	}
+	
+	public boolean equals (Object o) {
+		if (o instanceof XPathFuncExpr) {
+			XPathFuncExpr x = (XPathFuncExpr)o;
+
+			Vector a = new Vector();
+			for (int i = 0; i < args.length; i++)
+				a.addElement(args[i]);
+			Vector b = new Vector();
+			for (int i = 0; i < x.args.length; i++)
+				b.addElement(x.args[i]);
+			
+			return id.equals(x.id) && ExtUtil.vectorEquals(a, b);
+		} else {
+			return false;
+		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

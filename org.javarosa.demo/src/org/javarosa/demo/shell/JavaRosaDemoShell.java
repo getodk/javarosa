@@ -68,8 +68,9 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void init() {
+		registerPrototypes();
 		loadProperties();
-
+		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 
 		DataModelTreeRMSUtility dataModel = new DataModelTreeRMSUtility(DataModelTreeRMSUtility.getUtilityName());
@@ -90,6 +91,27 @@ public class JavaRosaDemoShell implements IShell {
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(formDef);
 	}
 
+	private void registerPrototypes () {
+		String[] classes = {
+				"org.javarosa.xpath.expr.XPathArithExpr",
+				"org.javarosa.xpath.expr.XPathBoolExpr",
+				"org.javarosa.xpath.expr.XPathCmpExpr",
+				"org.javarosa.xpath.expr.XPathEqExpr",
+				"org.javarosa.xpath.expr.XPathFilterExpr",
+				"org.javarosa.xpath.expr.XPathFuncExpr",
+				"org.javarosa.xpath.expr.XPathNumericLiteral",
+				"org.javarosa.xpath.expr.XPathNumNegExpr",
+				"org.javarosa.xpath.expr.XPathPathExpr",
+				"org.javarosa.xpath.expr.XPathStringLiteral",
+				"org.javarosa.xpath.expr.XPathUnionExpr",
+				"org.javarosa.xpath.expr.XPathVariableReference"
+		};
+		
+		for (int i = 0; i < classes.length; i++) {
+			JavaRosaServiceProvider.instance().registerPrototype(classes[i]);
+		}
+	}
+	
 	private void generateSerializedForms(String originalResource) {
 		FormDef a = XFormUtils.getFormFromResource(originalResource);
 		FormDefSerializer fds = new FormDefSerializer();

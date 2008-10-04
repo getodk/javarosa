@@ -18,6 +18,8 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 
 	public int op;
 
+	public XPathCmpExpr () { } //for deserialization
+
 	public XPathCmpExpr (int op, XPathExpression a, XPathExpression b) {
 		super(a, b);
 		this.op = op;
@@ -67,6 +69,15 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 		}
 		
 		return super.toString(sOp);
+	}
+	
+	public boolean equals (Object o) {
+		if (o instanceof XPathCmpExpr) {
+			XPathCmpExpr x = (XPathCmpExpr)o;
+			return super.equals(o) && op == x.op;
+		} else {
+			return false;
+		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

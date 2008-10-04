@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.util.MD5;
+import org.javarosa.core.util.PrefixTree;
 
 public class PrototypeFactory {
 	public final static int CLASS_HASH_SIZE = 4;
@@ -12,14 +13,14 @@ public class PrototypeFactory {
 	private Vector hashes;
 	
 	//lazy evaluation
-	private Vector classNames;
+	private PrefixTree classNames;
 	private boolean initialized;
 	
 	public PrototypeFactory () {
 		this(null);
 	}
 	
-	public PrototypeFactory (Vector classNames) {
+	public PrototypeFactory (PrefixTree classNames) {
 		this.classNames = classNames;
 		initialized = false;
 	}		
@@ -33,11 +34,14 @@ public class PrototypeFactory {
 		addDefaultClasses();
 		
 		if (classNames != null) {
-			for (int i = 0; i < classNames.size(); i++) {
+			Vector vClasses = classNames.getStrings();
+			
+			for (int i = 0; i < vClasses.size(); i++) {
+				String name = (String)vClasses.elementAt(i); 
 				try {
-					addClass(Class.forName((String)classNames.elementAt(i)));
+					addClass(Class.forName(name));
 				} catch (ClassNotFoundException cnfe) {
-					throw new RuntimeException(); //TODO: throw an appropriate (runtime) exception
+					throw new CannotCreateObjectException(name + ": not found");
 				}
 			}
 			classNames = null;

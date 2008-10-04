@@ -94,6 +94,8 @@
 				<obfuscator name="ProGuard" unless="test or noobfuscate">
 					<parameter name="optimize" value="true" />
 					<parameter name="printmapping" value="dist\obfuscation_mapping.txt" />
+					
+					<parameter name="keepnames" value="!abstract class org.javarosa.xpath.expr.* extends org.javarosa.xpath.expr.XPathExpression" />
 				</obfuscator>
 
 				<!-- log settings: only use debug setting when the test-property is true -->
@@ -150,6 +152,7 @@
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathEvalTest"/>
 	<!--	<RunTestSuite suite="org.javarosa.core.model.test.QuestionDefTest"/> -->
 		<RunTestSuite suite="org.javarosa.core.util.test.NumericEncodingTest"/>
+		<RunTestSuite suite="org.javarosa.core.util.test.PrefixTreeTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.LocalizerTest"/>
 		<RunTestSuite suite="org.javarosa.core.util.test.ExternalizableTest"/>
 		<RunTestSuite suite="org.javarosa.demo.xform.test.DemoFormsTest"/>

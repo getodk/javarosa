@@ -3,6 +3,7 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -12,6 +13,8 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class XPathNumericLiteral extends XPathExpression {
 	public double d;
+
+	public XPathNumericLiteral () { } //for deserialization
 
 	public XPathNumericLiteral (Double d) {
 		this.d = d.doubleValue();
@@ -25,6 +28,15 @@ public class XPathNumericLiteral extends XPathExpression {
 		return "{num:" + Double.toString(d) + "}";
 	}
 		
+	public boolean equals (Object o) {
+		if (o instanceof XPathNumericLiteral) {
+			XPathNumericLiteral x = (XPathNumericLiteral)o;
+			return (Double.isNaN(d) ? Double.isNaN(x.d) : d == x.d);
+		} else {
+			return false;
+		}
+	}
+	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		if (in.readByte() == (byte)0x00) {
 			d = ExtUtil.readNumeric(in);

@@ -14,6 +14,8 @@ public class XPathQName implements Externalizable {
 	public String namespace;
 	public String name;
 
+	public XPathQName () { } //for deserialization
+	
 	public XPathQName (String qname) {
 		int sep = (qname == null ? -1 : qname.indexOf(":"));
 		if (sep == -1) {
@@ -39,6 +41,15 @@ public class XPathQName implements Externalizable {
 
 	public String toString () {
 		return (namespace == null ? name : namespace + ":" + name);
+	}
+	
+	public boolean equals (Object o) {
+		if (o instanceof XPathQName) {
+			XPathQName x = (XPathQName)o;
+			return ExtUtil.equals(namespace, x.namespace) && name.equals(x.name);
+		} else {
+			return false;
+		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

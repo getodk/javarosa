@@ -3,13 +3,17 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class XPathNumNegExpr extends XPathUnaryOpExpr {
+	public XPathNumNegExpr () { } //for deserialization
+
 	public XPathNumNegExpr (XPathExpression a) {
 		super(a);
 	}
@@ -21,6 +25,14 @@ public class XPathNumNegExpr extends XPathUnaryOpExpr {
 
 	public String toString () {
 		return "{unop-expr:num-neg," + a.toString() + "}";
+	}
+	
+	public boolean equals (Object o) {
+		if (o instanceof XPathNumNegExpr) {
+			return super.equals(o);
+		} else {
+			return false;
+		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

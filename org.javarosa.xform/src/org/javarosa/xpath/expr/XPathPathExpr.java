@@ -18,6 +18,7 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.model.xform.XPathReference;
@@ -34,6 +35,8 @@ public class XPathPathExpr extends XPathExpression {
 
 	//for INIT_CONTEXT_EXPR only
 	public XPathFilterExpr filtExpr;
+
+	public XPathPathExpr () { } //for deserialization
 
 	public XPathPathExpr (int init_context, XPathStep[] steps) {
 		this.init_context = init_context;
@@ -113,6 +116,24 @@ public class XPathPathExpr extends XPathExpression {
 		return sb.toString();
 	}
 
+	public boolean equals (Object o) {
+		if (o instanceof XPathPathExpr) {
+			XPathPathExpr x = (XPathPathExpr)o;
+
+			Vector a = new Vector();
+			for (int i = 0; i < steps.length; i++)
+				a.addElement(steps[i]);
+			Vector b = new Vector();
+			for (int i = 0; i < x.steps.length; i++)
+				b.addElement(x.steps[i]);
+			
+			return init_context == x.init_context && ExtUtil.vectorEquals(a, b) &&
+				(init_context == INIT_CONTEXT_EXPR ? filtExpr.equals(x.filtExpr) : true);
+		} else {
+			return false;
+		}
+	}
+	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		init_context = ExtUtil.readInt(in);
 		if (init_context == INIT_CONTEXT_EXPR) {
