@@ -229,7 +229,7 @@ public class ExternalizableTest extends TestCase {
 
 		//empty vectors (base types)
 		testExternalizable(new ExtWrapList(new Vector()), new ExtWrapList(String.class));
-		testExternalizable(new ExtWrapList(new Vector(), new ExtWrapBase(Integer.class)), new ExtWrapList(String.class));
+		testExternalizable(new ExtWrapList(new Vector(), new ExtWrapBase(Integer.class)), new ExtWrapList(String.class)); //sub-types don't matter for empties
 		
 		//vectors of vectors (including empties)
 		Vector x = new Vector();
@@ -239,8 +239,8 @@ public class ExternalizableTest extends TestCase {
 		y.addElement(v);
 		y.addElement(x);
 		y.addElement(new Vector());
-		testExternalizable(new ExtWrapList(y, new ExtWrapList(Integer.class)), new ExtWrapList(new ExtWrapList(Integer.class)));
-		testExternalizable(new ExtWrapList(new Vector(), new ExtWrapList(Integer.class)), new ExtWrapList(new ExtWrapList(Integer.class)));
+		testExternalizable(new ExtWrapList(y, new ExtWrapList()), new ExtWrapList(new ExtWrapList(Integer.class))); //risky to not specify 'leaf' type (Integer), but works in limited situations
+		testExternalizable(new ExtWrapList(new Vector(), new ExtWrapList()), new ExtWrapList(new ExtWrapList(Integer.class))); //same as above
 
 		//tagged base types
 		testExternalizable(new ExtWrapTagged("string"), new ExtWrapTagged());
@@ -256,7 +256,8 @@ public class ExternalizableTest extends TestCase {
 		testExternalizable(new ExtWrapTagged(new ExtWrapNullable("string")), new ExtWrapTagged());
 		testExternalizable(new ExtWrapTagged(new ExtWrapNullable((String)null)), new ExtWrapTagged());
 		testExternalizable(new ExtWrapTagged(new ExtWrapList(y, new ExtWrapList(Integer.class))), new ExtWrapTagged());
-
+		testExternalizable(new ExtWrapTagged(new ExtWrapList(new Vector(), new ExtWrapList(Integer.class))), new ExtWrapTagged());
+		
 		//polymorphic vectors
 		Vector a = new Vector();
 		a.addElement(new Integer(47));
