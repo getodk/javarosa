@@ -18,6 +18,8 @@ public class XPathFilterExpr extends XPathExpression {
 	public XPathExpression x;
 	public XPathExpression[] predicates;
 	
+	public XPathFilterExpr () { } //for deserialization
+	
 	public XPathFilterExpr (XPathExpression x, XPathExpression[] predicates) {
 		this.x = x;
 		this.predicates = predicates;
@@ -41,6 +43,23 @@ public class XPathFilterExpr extends XPathExpression {
 		sb.append("}}");
 		
 		return sb.toString();
+	}
+	
+	public boolean equals (Object o) {
+		if (o instanceof XPathFilterExpr) {
+			XPathFilterExpr fe = (XPathFilterExpr)o;
+
+			Vector a = new Vector();
+			for (int i = 0; i < predicates.length; i++)
+				a.addElement(predicates[i]);
+			Vector b = new Vector();
+			for (int i = 0; i < fe.predicates.length; i++)
+				b.addElement(fe.predicates[i]);
+			
+			return x.equals(fe.x) && ExtUtil.vectorEquals(a, b);
+		} else {
+			return false;
+		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

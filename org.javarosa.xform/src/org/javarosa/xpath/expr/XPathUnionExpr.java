@@ -11,6 +11,8 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathUnionExpr extends XPathBinaryOpExpr {
+	public XPathUnionExpr () { } //for deserialization
+
 	public XPathUnionExpr (XPathExpression a, XPathExpression b) {
 		super(a, b);
 	}
@@ -21,6 +23,14 @@ public class XPathUnionExpr extends XPathBinaryOpExpr {
 
 	public String toString () {
 		return super.toString("union");
+	}
+	
+	public boolean equals (Object o) {
+		if (o instanceof XPathUnionExpr) {
+			return super.equals(o);
+		} else {
+			return false;
+		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

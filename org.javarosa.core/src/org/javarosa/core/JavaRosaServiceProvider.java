@@ -13,6 +13,9 @@ import org.javarosa.core.services.StorageManager;
 import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.transport.storage.RmsStorage;
+import org.javarosa.core.util.PrefixTree;
+import org.javarosa.core.util.externalizable.CannotCreateObjectException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * JavaRosaServiceProvider is a singleton class that grants access to JavaRosa's
@@ -33,9 +36,11 @@ public class JavaRosaServiceProvider {
     private PropertyManager propertyManager;
 	
 	Hashtable services;
+	private PrefixTree prototypes;
 	
 	public JavaRosaServiceProvider() {
 		services = new Hashtable();
+		prototypes = new PrefixTree();
 	}
 	
 	public static JavaRosaServiceProvider instance() {
@@ -112,8 +117,17 @@ public class JavaRosaServiceProvider {
 		}
 	}
 	
-	//stub
-	public Vector getPrototypes () {
-		return new Vector();
+	public void registerPrototype (String className) {
+		prototypes.addString(className);
+		
+		try {
+			PrototypeFactory.getInstance(Class.forName(className));
+		} catch (ClassNotFoundException e) {
+			throw new CannotCreateObjectException(className + ": not found");
+		}
+	}
+	
+	public PrefixTree getPrototypes () {
+		return prototypes;
 	}
 }

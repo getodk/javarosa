@@ -56,6 +56,8 @@ public class XPathStep implements Externalizable {
 	public String namespace; //TEST_NAMESPACE_WILDCARD only
 	public String literal; //TEST_TYPE_PROCESSING_INSTRUCTION only
 
+	public XPathStep () { } //for deserialization
+	
 	public XPathStep (int axis, int test) {
 		this.axis = axis;
 		this.test = test;
@@ -126,6 +128,32 @@ public class XPathStep implements Externalizable {
 		}
 	}
 	
+	public boolean equals (Object o) {
+		if (o instanceof XPathStep) {
+			XPathStep x = (XPathStep)o;
+			
+			Vector a = new Vector();
+			for (int i = 0; i < predicates.length; i++)
+				a.addElement(predicates[i]);
+			Vector b = new Vector();
+			for (int i = 0; i < x.predicates.length; i++)
+				b.addElement(x.predicates[i]);			
+			
+			if (axis == x.axis && test == x.test && ExtUtil.vectorEquals(a, b)) {
+				switch (test) {
+				case TEST_NAME: return name.equals(x.name);
+				case TEST_NAMESPACE_WILDCARD: return namespace.equals(x.namespace);
+				case TEST_TYPE_PROCESSING_INSTRUCTION: return ExtUtil.equals(literal, x.literal);
+				default: return true;
+				}					
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		axis = ExtUtil.readInt(in);
 		test = ExtUtil.readInt(in);
@@ -133,7 +161,7 @@ public class XPathStep implements Externalizable {
 		switch (test) {
 		case TEST_NAME: name = (XPathQName)ExtUtil.read(in, XPathQName.class); break;
 		case TEST_NAMESPACE_WILDCARD: namespace = ExtUtil.readString(in); break;
-		case TEST_TYPE_PROCESSING_INSTRUCTION: literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class)); break; //TODO: this will call JRSP.getPrototypes, even though we don't need them... how to avoid?
+		case TEST_TYPE_PROCESSING_INSTRUCTION: literal = (String)ExtUtil.read(in, new ExtWrapNullable(String.class)); break;
 		}	
 		
 		Vector v = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);

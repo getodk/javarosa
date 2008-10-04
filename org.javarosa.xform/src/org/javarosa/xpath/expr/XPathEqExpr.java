@@ -13,6 +13,8 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 public class XPathEqExpr extends XPathBinaryOpExpr {
 	public boolean equal;
 
+	public XPathEqExpr () { } //for deserialization
+	
 	public XPathEqExpr (boolean equal, XPathExpression a, XPathExpression b) {
 		super(a, b);
 		this.equal = equal;
@@ -54,6 +56,15 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
 
 	public String toString () {
 		return super.toString(equal ? "==" : "!=");
+	}
+	
+	public boolean equals (Object o) {
+		if (o instanceof XPathEqExpr) {
+			XPathEqExpr x = (XPathEqExpr)o;
+			return super.equals(o) && equal == x.equal;
+		} else {
+			return false;
+		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
