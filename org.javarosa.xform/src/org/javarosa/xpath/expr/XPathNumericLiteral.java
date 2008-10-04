@@ -46,7 +46,7 @@ public class XPathNumericLiteral extends XPathExpression {
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		if (Math.abs(d - (int)d) < 1.0e-12) {
+		if (d == (int)d) {
 			out.writeByte(0x00);
 			ExtUtil.writeNumeric(out, (int)d);
 		} else {

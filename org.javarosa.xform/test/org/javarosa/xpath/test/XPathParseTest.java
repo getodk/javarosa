@@ -5,6 +5,11 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.core.util.test.ExternalizableTest;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -181,6 +186,13 @@ public class XPathParseTest extends TestCase {
 			"{func-expr:function_call,{{binop-expr:*,{num:26.0},{binop-expr:+,{num:7.0},{num:3.0}}},{path-expr:abs,{{step:descendant-or-self,node()},{step:child,*}}},{path-expr:abs,{{step:child,im},{step:child,an},{step:ancestor,x,{{num:3.0},{func-expr:true,{}}}},{step:child,path}}}}}"}			
 	};
 	
+	static PrototypeFactory pf;
+	
+	static {
+		JavaRosaServiceProvider.instance().registerPrototypes(XPathParseTool.xpathClasses);
+		pf = ExtUtil.defaultPrototypes();
+	}
+	
 	public XPathParseTest(String name, TestMethod rTestMethod) {
 		super(name, rTestMethod);
 	}
@@ -227,6 +239,9 @@ public class XPathParseTest extends TestCase {
 							"\n    expected:[" + expected + "]" +
 							"\n    result:[" + result + "]");
 			}
+			
+			//test serialization of parse tree
+			ExternalizableTest.testExternalizable(new ExtWrapTagged(xpe), new ExtWrapTagged(), pf, this, "XPath");
 		} catch (XPathSyntaxException xse) {
 			this.fail("XPath Parse Failed! Unexpected syntax error." + 
 						"\n    expression:[" + expr + "]");

@@ -37,7 +37,7 @@ public class XPathStringLiteral extends XPathExpression {
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		ExtUtil.readString(in);
+		s = ExtUtil.readString(in);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

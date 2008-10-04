@@ -127,6 +127,11 @@ public class JavaRosaServiceProvider {
 		}
 	}
 	
+	public void registerPrototypes (String[] classNames) {
+		for (int i = 0; i < classNames.length; i++)
+			registerPrototype(classNames[i]);
+	}
+	
 	public PrefixTree getPrototypes () {
 		return prototypes;
 	}

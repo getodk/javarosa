@@ -76,7 +76,7 @@ public class XPathFilterExpr extends XPathExpression {
 		for (int i = 0; i < predicates.length; i++)
 			v.addElement(predicates[i]);
 
-		ExtUtil.write(out, x);
+		ExtUtil.write(out, new ExtWrapTagged(x));
 		ExtUtil.write(out, new ExtWrapListPoly(v));
 	}
 }
