@@ -57,10 +57,36 @@ public class DateUtilsTests extends TestCase {
 		
 	
 		switch (testID) {
-		case 1: testGetData(); break;
+		case 1: testGetXMLStringValueFormat(); break;
 		case 2: testSetDates(); break;
 		case 3: testNullDates(); break;
 		
+		}
+	}
+	
+	/**
+	 * This test ensures that the Strings returned
+	 * by the getXMLStringValue function are in
+	 * the proper XML compliant format.
+	 */
+	private void testGetXMLStringValueFormat() {
+		String currentDate = DateUtils.getXMLStringValue(currentTime);
+		assertEquals("The date string was not of the proper length", currentDate.length(),"YYYY-MM-DD".length());
+		assertEquals("The date string does not have proper year formatting", currentDate.indexOf("-"),"YYYY-".indexOf("-"));
+		try {
+			Integer.parseInt(currentDate.substring(0, 4));
+		} catch (NumberFormatException e) {
+			fail("The Year value was not a valid integer");
+		}
+		try {
+			Integer.parseInt(currentDate.substring(5, 7));
+		} catch (NumberFormatException e) {
+			fail("The Month value was not a valid integer");
+		}
+		try {
+			Integer.parseInt(currentDate.substring(8, 10));
+		} catch (NumberFormatException e) {
+			fail("The Day value was not a valid integer");
 		}
 	}
 
