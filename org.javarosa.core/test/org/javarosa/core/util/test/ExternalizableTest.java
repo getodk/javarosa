@@ -64,7 +64,7 @@ public class ExternalizableTest extends TestCase {
 			bytes = ExtUtil.serialize(orig);
 			
 			print("Serialized as:");
-			print(printBytes(bytes));
+			print(ExtUtil.printBytes(bytes));
 			
 			if (template instanceof Class) {
 				deser = ExtUtil.deserialize(bytes, (Class)template, pf);
@@ -104,29 +104,6 @@ public class ExternalizableTest extends TestCase {
 	
 	public void testExternalizable (Object orig, Object template, PrototypeFactory pf) {
 		testExternalizable(orig, template, pf, this, null);
-	}
-	
-	public static String printBytes (byte[] data) {
-		StringBuffer sb = new StringBuffer();
-		sb.append("[");
-		for (int i = 0; i < data.length; i++) {
-			String hex = Integer.toHexString(data[i]);
-			if (hex.length() == 1)
-				hex = "0" + hex;
-			else
-				hex = hex.substring(hex.length() - 2);
-			sb.append(hex);
-			if (i < data.length - 1) {
-				if ((i + 1) % 30 == 0)
-					sb.append("\n ");
-				else if ((i + 1) % 10 == 0)
-					sb.append("  ");
-				else
-					sb.append(" ");
-			}
-		}
-		sb.append("]");
-		return sb.toString();
 	}
 
 	public static String printObj (Object o) {

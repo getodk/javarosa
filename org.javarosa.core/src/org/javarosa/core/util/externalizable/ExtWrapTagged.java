@@ -3,13 +3,8 @@ package org.javarosa.core.util.externalizable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
-
-import org.javarosa.core.util.MD5;
-import org.javarosa.core.util.test.ExternalizableTest;
 
 public class ExtWrapTagged extends ExternalizableWrapper {
 	public final static byte[] WRAPPER_TAG = {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff}; //must be same length as PrototypeFactory.CLASS_HASH_SIZE
@@ -87,7 +82,7 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 		} else {
 			Class type = pf.getClass(tag);
 			if (type == null) {
-				throw new DeserializationException("No datatype registered to serialization code " + ExternalizableTest.printBytes(tag));
+				throw new DeserializationException("No datatype registered to serialization code " + ExtUtil.printBytes(tag));
 			}
 			
 			return new ExtWrapBase(type);
