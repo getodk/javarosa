@@ -8,10 +8,17 @@ import java.util.Vector;
 
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExtWrapListPoly;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
-import org.javarosa.core.util.externalizable.DeserializationException;
 
 
 /** The definition of a group in a form or questionaire. 
@@ -157,38 +164,25 @@ public class GroupDef implements IFormElement, Localizable {
 
 	/** Reads a group definition object from the supplied stream. */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
-		if(!ExternalizableHelperDeprecated.isEOF(dis)){
-			//TODO: Find a way to reuse the one from FormDef
-			PrototypeFactoryDeprecated factory = new PrototypeFactoryDeprecated();
-			factory.addNewPrototype(QuestionDef.class.getName(), QuestionDef.class);
-			factory.addNewPrototype(GroupDef.class.getName(), GroupDef.class);
-			
-			setID(dis.readInt());
-
-			setName(ExternalizableHelperDeprecated.readUTF(dis));
-			setLongText(ExternalizableHelperDeprecated.readUTF(dis));
-			setShortText(ExternalizableHelperDeprecated.readUTF(dis));
-			setLongTextID(ExternalizableHelperDeprecated.readUTF(dis), null);
-			setShortTextID(ExternalizableHelperDeprecated.readUTF(dis), null);
-			
-			setRepeat(dis.readBoolean());
-			
-			ExternalizableHelperDeprecated.readExternal(dis, factory);
-		}
+		setID(ExtUtil.readInt(dis));
+		setName((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setLongTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
+		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
+		setRepeat(ExtUtil.readBool(dis));
+		setChildren((Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 	}
 
 	/** Write the group definition object to the supplied stream. */
 	public void writeExternal(DataOutputStream dos) throws IOException {
-		dos.writeInt(getID());
-		
-		ExternalizableHelperDeprecated.writeUTF(dos, getName());
-		ExternalizableHelperDeprecated.writeUTF(dos, getLongText());
-		ExternalizableHelperDeprecated.writeUTF(dos, getShortText());
-		ExternalizableHelperDeprecated.writeUTF(dos, getLongTextID());
-		ExternalizableHelperDeprecated.writeUTF(dos, getShortTextID());
-		
-		dos.writeBoolean(getRepeat());
-		
-		ExternalizableHelperDeprecated.writeExternalGeneric(getChildren(), dos);
-	}	
+		ExtUtil.writeNumeric(dos, getID());
+		ExtUtil.write(dos, new ExtWrapNullable(getName()));
+		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
+		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
+		ExtUtil.write(dos, new ExtWrapNullable(getLongTextID()));
+		ExtUtil.write(dos, new ExtWrapNullable(getShortTextID()));				
+		ExtUtil.writeBool(dos, getRepeat());
+		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
+	}
 }

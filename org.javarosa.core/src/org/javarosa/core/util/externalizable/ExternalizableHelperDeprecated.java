@@ -550,7 +550,7 @@ public class ExternalizableHelperDeprecated {
 	}
 	
 	public static PrototypeFactory convertPrototypeFactory (PrototypeFactoryDeprecated pfd) {
-		PrototypeFactory pf = new PrototypeFactory();
+		PrototypeFactory pf = ExtUtil.defaultPrototypes();
 		for (Enumeration e = pfd.prototypes.keys(); e.hasMoreElements(); ) {
 			pf.addClass((Class)pfd.prototypes.get(e.nextElement()));
 		}

@@ -146,6 +146,8 @@ public class JavaRosaDemoShell implements IShell {
 
 	private void registerPrototypes () {
 		String[] classes = {
+				"org.javarosa.core.model.QuestionDef",
+				"org.javarosa.core.model.GroupDef",		
 				"org.javarosa.model.xform.XPathReference",
 				"org.javarosa.xpath.XPathConditional"
 		};

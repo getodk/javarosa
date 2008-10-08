@@ -362,14 +362,14 @@ public class QuestionDef implements IFormElement, Localizable {
 	 */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
-		setName((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)));
-		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)));
-		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)));
-		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)));
-		setHelpText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)));
-		setLongTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)), null);
-		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)), null);
-		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)), null);
+		setName((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setHelpText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setLongTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
+		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
+		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 
 		setDataType(ExtUtil.readInt(dis));
 		setControlType(ExtUtil.readInt(dis));
@@ -380,14 +380,14 @@ public class QuestionDef implements IFormElement, Localizable {
 		setLocked(ExtUtil.readBool(dis));
 
 		setSelectItemIDs(
-				(OrderedHashtable)ExtUtil.nullIfEmpty((OrderedHashtable)ExtUtil.read(dis, new ExtWrapMap(String.class, String.class, true))),
-				ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(Boolean.class))),
+				(OrderedHashtable)ExtUtil.nullIfEmpty((OrderedHashtable)ExtUtil.read(dis, new ExtWrapMap(String.class, String.class, true), pf)),
+				ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(Boolean.class), pf)),
 				null);
 		if (getSelectItemIDs() != null && (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_SELECT_ONE)) {
 			localizeSelectMap(null); //even for non-multilingual forms, text must be initially 'localized'
 		}
 
-		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()));
+		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 	}
 
 	/*

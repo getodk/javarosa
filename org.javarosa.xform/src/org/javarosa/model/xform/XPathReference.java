@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -67,13 +68,13 @@ public class XPathReference implements IDataReference {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		nodeset = ExternalizableHelperDeprecated.readUTF(in);
+		nodeset = ExtUtil.readString(in);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelperDeprecated.writeUTF(out, nodeset);
+		ExtUtil.writeString(out, nodeset);
 	}
 }
