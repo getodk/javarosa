@@ -51,6 +51,7 @@
 					<source dir="${basedir}/../org.javarosa.action/src/"/>
 					<source dir="${basedir}/../org.javarosa.communication/src/"/>
 					<source dir="${basedir}/../org.javarosa.clforms/src/"/>
+					<source dir="${basedir}/../org.javarosa.clforms/test/"/>
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
 					<source dir="${basedir}/../org.javarosa.core/test/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
@@ -94,7 +95,6 @@
 				<obfuscator name="ProGuard" unless="test or noobfuscate">
 					<parameter name="optimize" value="true" />
 					<parameter name="printmapping" value="dist\obfuscation_mapping.txt" />
-					
 					<parameter name="keepnames" value="!abstract class org.javarosa.xpath.expr.* extends org.javarosa.xpath.expr.XPathExpression" />
 				</obfuscator>
 
@@ -147,6 +147,8 @@
 
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="supressOutput, disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
+		<RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.FormViewManagerTest"/>
+		<!--RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.CLFormsWidgetsTest"/-->
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathParseTest"/>
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathEvalTest"/>
