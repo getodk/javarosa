@@ -23,7 +23,6 @@ import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.IXFormBindHandler;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xpath.XPathConditional;
-import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
@@ -599,7 +598,7 @@ public class XFormParser {
 
 		try {
 			cond = new XPathConditional(xpath);
-		} catch (RuntimeException re) {
+		} catch (XPathSyntaxException xse) {
 			//#if debug.output==verbose
 			System.err.println("Invalid XPath expression [" + xpath + "]!");
 			//#endif
