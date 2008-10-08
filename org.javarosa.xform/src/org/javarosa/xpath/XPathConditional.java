@@ -9,6 +9,8 @@ import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.expr.XPathBinaryOpExpr;
 import org.javarosa.xpath.expr.XPathExpression;
@@ -18,28 +20,14 @@ import org.javarosa.xpath.expr.XPathUnaryOpExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 
 public class XPathConditional implements IConditionExpr {
-	private String xpath;
 	private XPathExpression expr;
 	
-	public XPathConditional (String xpath) {
-		init(xpath);
+	public XPathConditional (String xpath) throws XPathSyntaxException {
+		expr = XPathParseTool.parseXPath(xpath);
 	}
 	
 	public XPathConditional () {
 		
-	}
-	
-	private void init (String xpath) {
-		this.xpath = xpath;
-		try {
-			expr = XPathParseTool.parseXPath(xpath);
-		} catch (XPathSyntaxException e) {
-			throw new RuntimeException("condition with invalid xpath: " + xpath);
-		}
-	}
-	
-	public String getXPath () {
-		return xpath;
 	}
 	
 	public XPathExpression getExpr () {
@@ -73,17 +61,17 @@ public class XPathConditional implements IConditionExpr {
 	
 	public boolean equals (Object o) {
 		if (o instanceof XPathConditional) {
-			return xpath.equals(((XPathConditional)o).getXPath());
+			return expr.equals(((XPathConditional)o).expr);
 		} else {
 			return false;
 		}
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		init(in.readUTF());
+		expr = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged());
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeUTF(xpath);
+		ExtUtil.write(out, new ExtWrapTagged(expr));
 	}
 }
