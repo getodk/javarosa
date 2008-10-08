@@ -33,7 +33,7 @@ import org.javarosa.user.view.NewUserForm;
  * @author Brian DeRenzi
  *
  */
-public class FormListActivity implements IActivity, CommandListener {
+public class FormListActivity implements IActivity {
 
 	public static final String COMMAND_KEY = "command";
 	public static final String FORM_ID_KEY = "form_id";
@@ -104,12 +104,9 @@ public class FormListActivity implements IActivity, CommandListener {
 				break;
 
 			} else if (cmd == Commands.CMD_ADD_USER) {
-				//take this out into an activity
-				addUser = new NewUserForm("Add User");
-				addUser.addCommand(CMD_SAVE);
-	    		addUser.addCommand(CMD_CANCEL);
-	    		addUser.setCommandListener(this);
-	    		parent.setDisplay(this, addUser);
+			   Hashtable returnArgs = new Hashtable(); 
+               returnArgs.put(COMMAND_KEY, Commands.CMD_ADD_USER); 
+               parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs ); 
 			} else if (cmd == Commands.CMD_EXIT) {
 				Hashtable returnArgs = new Hashtable();
 				returnArgs.put(COMMAND_KEY, Commands.CMD_EXIT);
@@ -150,47 +147,6 @@ public class FormListActivity implements IActivity, CommandListener {
 			}
 		}
 	}
-
-	public void commandAction(Command c, Displayable d)
-    {
-    	if (c == CMD_CANCEL) {
-    		parent.setDisplay(this, this.formsList);
-		}
-		if (c == CMD_SAVE)
-    	{
-    		String answer = addUser.readyToSave();
-
-    		if (answer.equals(""))	{///success
-
-    			javax.microedition.lcdui.Alert successfulNewUser  = new javax.microedition.lcdui.Alert("User added successfully ");
-    			parent.setDisplay(this, successfulNewUser);
-    		}
-    		else if (answer.substring(0,10 ).equals("Username ("))///name already taken..
-    		{
-
-    			javax.microedition.lcdui.Alert nameTakenError  = new javax.microedition.lcdui.Alert("Problem adding User - name taken",
-						answer, null,AlertType.ERROR);
-    			parent.setDisplay(this, nameTakenError);
-    		}
-    		else if (answer.substring(0,9).equals("Please fi") )
-    		{
-    			System.out.println(answer.substring(9));
-    			javax.microedition.lcdui.Alert noInputError  = new javax.microedition.lcdui.Alert("Problem adding User - no input",
-						answer, null,AlertType.ERROR);
-    			parent.setDisplay(this, noInputError);
-    		}
-    		else if (answer.substring(0,9).equals("Please re"))///password error
-    		{
-    			System.out.println(answer.substring(9));
-    			javax.microedition.lcdui.Alert passwordMismatchError  = new javax.microedition.lcdui.Alert("Problem adding User - passwords don't match",
-						answer, null,AlertType.ERROR);
-    			passwordMismatchError.setTimeout(javax.microedition.lcdui.Alert.FOREVER);
-    			parent.setDisplay(this, passwordMismatchError);
-
-    		}
-
-    	}
-    }
 
 	private void getXForms() {
 
