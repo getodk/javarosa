@@ -74,7 +74,6 @@ public class JavaRosaDemoShell implements IShell {
 
 	private void init() {
 		loadModules();
-		registerPrototypes();
 		loadProperties();
 		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
