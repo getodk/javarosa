@@ -132,6 +132,23 @@ public class XFormParser {
 		typeMappings.put("xsd:hexBinary", new Integer(Constants.DATATYPE_UNSUPPORTED));
 		typeMappings.put("xsd:anyURI", new Integer(Constants.DATATYPE_UNSUPPORTED));
 	}
+	
+	private static void initBindHandlers() {
+		Enumeration en = bindHandlers.elements();
+		while(en.hasMoreElements()) {
+			IXFormBindHandler handler = (IXFormBindHandler)en.nextElement();
+			handler.init();
+			
+		}
+	}
+	private static void processBindHandlers(FormDef formDef) {
+		Enumeration en = bindHandlers.elements();
+		while(en.hasMoreElements()) {
+			IXFormBindHandler handler = (IXFormBindHandler)en.nextElement();
+			handler.postProcess(formDef);
+			
+		}
+	}
 
 	private static void initStateVars () {
 		modelFound = false;
@@ -178,6 +195,7 @@ public class XFormParser {
 	public static FormDef getFormDef(Document doc){
 		FormDef formDef = new FormDef();
 
+		initBindHandlers();
 		initStateVars();
 
 //		Hashtable id2VarNameMap = new Hashtable();
@@ -195,6 +213,7 @@ public class XFormParser {
 
 		initStateVars();
 
+		processBindHandlers(formDef);
 		return formDef;
 	}
 
