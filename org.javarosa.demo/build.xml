@@ -168,6 +168,7 @@
 		<RunTestSuite suite="org.javarosa.core.model.instance.test.QuestionDataGroupTests"/>
 		<RunTestSuite suite="org.javarosa.user.model.test.UserTests"/>
 		<!--RunTestSuite suite="org.javarosa.formmanager.test.ExtensionIntegrationTests"/-->
+		<RunTestSuite suite="org.javarosa.core.model.utils.DateUtilsTests"/>
 
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>

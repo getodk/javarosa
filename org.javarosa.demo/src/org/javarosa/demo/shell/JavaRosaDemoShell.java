@@ -2,37 +2,40 @@ package org.javarosa.demo.shell;
 
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.Vector;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.activity.splashscreen.SplashScreenActivity;
 import org.javarosa.communication.http.HttpTransportMethod;
+import org.javarosa.communication.http.HttpTransportModule;
 import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.test.QuestionDefTest;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.properties.DemoAppProperties;
+import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.activity.FormListActivity;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
-import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.FormDefSerializer;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
+import org.javarosa.formmanager.view.chatterbox.widget.ExtendedWidgetsModule;
 import org.javarosa.model.xform.XFormSerializingVisitor;
+import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.AddUserActivity;
@@ -70,14 +73,12 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void init() {
+		loadModules();
 		registerPrototypes();
 		loadProperties();
 		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
-
-		DataModelTreeRMSUtility dataModel = new DataModelTreeRMSUtility(DataModelTreeRMSUtility.getUtilityName());
-		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
-		formDef.addModelPrototype(new DataModelTree());
+		FormDefRMSUtility formDef = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 		formDef.addReferencePrototype(new XPathReference());
 
 		// For now let's add the dummy form.
@@ -89,18 +90,14 @@ public class JavaRosaDemoShell implements IShell {
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/condtest.xhtml"));
 		}
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(dataModel);
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(formDef);
 	}
-
-	private void registerPrototypes () {
-		String[] classes = {
-				"org.javarosa.model.xform.XPathReference",
-				"org.javarosa.xpath.XPathConditional"
-		};
-		
-		JavaRosaServiceProvider.instance().registerPrototypes(classes);
-		JavaRosaServiceProvider.instance().registerPrototypes(XPathParseTool.xpathClasses);
+	
+	private void loadModules() {
+		new XFormsModule().registerModule(context);
+		new CoreModelModule().registerModule(context);
+		new HttpTransportModule().registerModule(context);
+		new FormManagerModule().registerModule(context);
+		new ExtendedWidgetsModule().registerModule(context);
 	}
 	
 	private void generateSerializedForms(String originalResource) {
@@ -306,34 +303,13 @@ public class JavaRosaDemoShell implements IShell {
 		this.midlet = midlet;
 	}
 
-	//need 'addpropery' too.
-	private String initProperty(String propName, String defaultValue) {
-		Vector propVal = JavaRosaServiceProvider.instance().getPropertyManager().getProperty(propName);
-		if (propVal == null || propVal.size() == 0) {
-			propVal = new Vector();
-			propVal.addElement(defaultValue);
-			JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propName, propVal);
-			//#if debug.output==verbose
-			System.out.println("No default value for [" + propName
-					+ "]; setting to [" + defaultValue + "]"); // debug
-			//#endif
-			return defaultValue;
-		}
-		return (String) propVal.elementAt(0);
-	}
-
 	private void loadProperties() {
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new DemoAppProperties());
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new HttpTransportProperties());
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FormManagerProperties());
 
-		initProperty("DeviceID", genGUID(25));
-		initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CHATTERBOX);
-		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
-		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
-//		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://update.cell-life.org/save_dump_org.php");
-//		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://update.cell-life.org/save_dump_org.php");
+		PropertyUtils.initializeProperty("DeviceID", genGUID(25));
+		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
+		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
 	}
 
 	//TODO: Put this in a utility method

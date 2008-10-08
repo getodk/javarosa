@@ -1,6 +1,7 @@
 package org.javarosa.xform.util;
 
 import org.javarosa.core.model.DataBinding;
+import org.javarosa.core.model.FormDef;
 import org.kxml2.kdom.Element;
 
 /**
@@ -12,4 +13,6 @@ import org.kxml2.kdom.Element;
  */
 public interface IXFormBindHandler {
 	void handle(Element bindElement, DataBinding bind);
+	void init();
+	void postProcess(FormDef formDef);
 }
