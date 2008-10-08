@@ -177,12 +177,12 @@ public class QuestionDataGroup extends TreeElement {
 		}
 	}
 	
-	protected void readNodeAttributes(DataInputStream in) throws IOException {
+	protected void readNodeAttributes(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		this.name = ExternalizableHelperDeprecated.readUTF(in);
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		readNodeAttributes(in);
+		readNodeAttributes(in, pf);
 		int numChildren = in.readInt();
 		for(int i = 0 ; i < numChildren ; ++i ) {
 			boolean group = in.readBoolean();

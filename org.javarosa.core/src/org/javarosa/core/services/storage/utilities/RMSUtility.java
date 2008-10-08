@@ -283,6 +283,7 @@ public class RMSUtility implements RecordListener
         try
         {
             byte[] data = this.recordStore.getRecord(recordId);
+            
             //LOG
             ExtUtil.deserialize(data, externalizableObject);
         }

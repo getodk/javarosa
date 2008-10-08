@@ -117,7 +117,7 @@ public class GraphDataGroup extends QuestionDataGroup {
 	
 	
 	public void readNodeAttributes(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		super.readNodeAttributes(in);
+		super.readNodeAttributes(in, pf);
 		
 		String className = in.readUTF();
 		reference = (IDataReference)this.getRoot().getFactory().getNewInstance(className);

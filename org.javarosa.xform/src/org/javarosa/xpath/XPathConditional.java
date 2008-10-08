@@ -68,7 +68,7 @@ public class XPathConditional implements IConditionExpr {
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		expr = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged());
+		expr = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
