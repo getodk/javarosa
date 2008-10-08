@@ -41,6 +41,9 @@ import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
 
+import org.javarosa.user.activity.LoginActivity;
+import org.javarosa.user.activity.AddUserActivity;
+
 /**
  * This is the shell for the JavaRosa demo that handles switching all of the views
  * @author Brian DeRenzi
@@ -229,7 +232,8 @@ public class JavaRosaDemoShell implements IShell {
 				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1);
 			} else if (returnVal == Commands.CMD_EXIT) {
 				exitShell();
-			}
+			}else if (returnVal == Commands.CMD_ADD_USER) 
+				launchActivity( new AddUserActivity(this),context);
 
 		} else if (returningActivity instanceof ModelListActivity) {
 
@@ -265,7 +269,9 @@ public class JavaRosaDemoShell implements IShell {
 					this.modelActivity.start(context);
 				}
 			}*/
-		}
+		}else if (returningActivity instanceof AddUserActivity) 
+		 	launchActivity(new FormListActivity(this, "Forms List"), context); 
+		
 	}
 
 	private void workflowResume (IActivity suspendedActivity, IActivity completingActivity,
