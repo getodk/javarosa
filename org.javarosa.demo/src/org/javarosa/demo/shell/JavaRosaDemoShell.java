@@ -6,7 +6,9 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
-
+import org.javarosa.user.activity.LoginActivity;
+import org.javarosa.user.model.User;
+import org.javarosa.user.activity.AddUserActivity;
 import org.javarosa.activity.splashscreen.SplashScreenActivity;
 import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.http.HttpTransportProperties;
@@ -16,6 +18,7 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormDef;
+//import org.javarosa.core.model.User;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
@@ -34,11 +37,8 @@ import org.javarosa.formmanager.view.Commands;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
-import org.javarosa.user.activity.LoginActivity;
-import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xpath.XPathParseTool;
-
 /**
  * This is the shell for the JavaRosa demo that handles switching all of the views
  * @author Brian DeRenzi
@@ -168,6 +168,7 @@ public class JavaRosaDemoShell implements IShell {
 			} else if (returnVal == "USER_CANCELLED") {
 				exitShell();
 			}
+			
 
 		} else if (returningActivity instanceof FormListActivity) {
 
@@ -178,9 +179,11 @@ public class JavaRosaDemoShell implements IShell {
 				launchActivity(new ModelListActivity(this), context);
 			} else if (returnVal == Commands.CMD_SELECT_XFORM) {
 				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1);
-			} else if (returnVal == Commands.CMD_EXIT) {
+			} else if (returnVal == Commands.CMD_EXIT) 
 				exitShell();
-			}
+			  else if (returnVal == Commands.CMD_ADD_USER) 
+				launchActivity( new AddUserActivity(this),context);
+			
 
 		} else if (returningActivity instanceof ModelListActivity) {
 
@@ -205,7 +208,6 @@ public class JavaRosaDemoShell implements IShell {
 			}
 
 		} else if (returningActivity instanceof FormTransportActivity) {
-
 			relaunchListActivity();
 
 			//what is this for?
@@ -217,6 +219,8 @@ public class JavaRosaDemoShell implements IShell {
 				}
 			}*/
 		}
+		else if (returningActivity instanceof AddUserActivity) 
+		 	launchActivity(new FormListActivity(this, "Forms List"), context); 
 	}
 
 	private void workflowResume (IActivity suspendedActivity, IActivity completingActivity,
