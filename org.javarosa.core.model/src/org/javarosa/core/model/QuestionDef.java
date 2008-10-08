@@ -14,6 +14,10 @@ import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
@@ -92,8 +96,8 @@ public class QuestionDef implements IFormElement, Localizable {
 					ExtUtil.equals(shortTextID, q.shortTextID) &&
 					ExtUtil.equals(helpText, q.helpText) &&
 					ExtUtil.equals(helpTextID, q.helpTextID) &&
-					ExtUtil.equals(selectItemIDs, q.selectItemIDs) &&
-					ExtUtil.equals(selectItemsLocalizable, q.selectItemsLocalizable) &&
+					ExtUtil.equals(ExtUtil.nullIfEmpty(selectItemIDs), ExtUtil.nullIfEmpty(q.selectItemIDs)) &&
+					ExtUtil.equals(ExtUtil.nullIfEmpty(selectItemsLocalizable), ExtUtil.nullIfEmpty(q.selectItemsLocalizable)) &&
 					required == q.required &&
 					visible == q.visible &&
 					enabled == q.enabled &&
@@ -357,44 +361,33 @@ public class QuestionDef implements IFormElement, Localizable {
 	 * @see org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
-		if(!ExternalizableHelperDeprecated.isEOF(dis)){
-			setID(dis.readInt());
-			
-			setName(ExternalizableHelperDeprecated.readUTF(dis));
-			setAppearanceAttr(ExternalizableHelperDeprecated.readUTF(dis));
-			setLongText(ExternalizableHelperDeprecated.readUTF(dis));
-			setShortText(ExternalizableHelperDeprecated.readUTF(dis));
-			setHelpText(ExternalizableHelperDeprecated.readUTF(dis));
-			setLongTextID(ExternalizableHelperDeprecated.readUTF(dis), null);
-			setShortTextID(ExternalizableHelperDeprecated.readUTF(dis), null);
-			setHelpTextID(ExternalizableHelperDeprecated.readUTF(dis), null);
-			
-			setDataType(dis.readInt());
-			setControlType(dis.readInt());
-			
-			setRequired(dis.readBoolean());
-			setVisible(dis.readBoolean());
-			setEnabled(dis.readBoolean());
-			setLocked(dis.readBoolean());
-			
-			setSelectItemIDs(ExternalizableHelperDeprecated.readExternalSOH(dis), ExternalizableHelperDeprecated.readExternalVB(dis), null);
-			if (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_SELECT_ONE) {
-				localizeSelectMap(null); //even for non-multilingual forms, text must be initially 'localized'
-			}
-			
-			String className = dis.readUTF();
-			if (!className.equals("")) {
-				FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-				PrototypeFactoryDeprecated factory = fdrms.getQuestionElementsFactory();
-				binding = (IDataReference)factory.getNewInstance(className);
-				if(binding == null) { 
-					throw new DeserializationException("A reference prototype could not be found to deserialize a " +
-							"reference of the type " + className + ". Please register a Prototype of this type before deserializing " +
-							"the QuestionDef " + this.getName());
-				}
-				binding.readExternal(dis, pf);
-			}
-		}	
+		setID(ExtUtil.readInt(dis));
+		setName((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)));
+		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)));
+		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)));
+		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)));
+		setHelpText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)));
+		setLongTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)), null);
+		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)), null);
+		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class)), null);
+
+		setDataType(ExtUtil.readInt(dis));
+		setControlType(ExtUtil.readInt(dis));
+
+		setRequired(ExtUtil.readBool(dis));
+		setVisible(ExtUtil.readBool(dis));
+		setEnabled(ExtUtil.readBool(dis));
+		setLocked(ExtUtil.readBool(dis));
+
+		setSelectItemIDs(
+				(OrderedHashtable)ExtUtil.nullIfEmpty((OrderedHashtable)ExtUtil.read(dis, new ExtWrapMap(String.class, String.class, true))),
+				ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(Boolean.class))),
+				null);
+		if (getSelectItemIDs() != null && (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_SELECT_ONE)) {
+			localizeSelectMap(null); //even for non-multilingual forms, text must be initially 'localized'
+		}
+
+		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()));
 	}
 
 	/*
@@ -402,35 +395,29 @@ public class QuestionDef implements IFormElement, Localizable {
 	 * @see org.javarosa.core.util.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
-		dos.writeInt(getID());
+		ExtUtil.writeNumeric(dos, getID());
+		ExtUtil.write(dos, new ExtWrapNullable(getName()));
+		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
+		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
+		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
+		ExtUtil.write(dos, new ExtWrapNullable(getHelpText()));
+		ExtUtil.write(dos, new ExtWrapNullable(getLongTextID()));
+		ExtUtil.write(dos, new ExtWrapNullable(getShortTextID()));
+		ExtUtil.write(dos, new ExtWrapNullable(getHelpTextID()));
+				
+		ExtUtil.writeNumeric(dos, getDataType());
+		ExtUtil.writeNumeric(dos, getControlType());
 		
-		ExternalizableHelperDeprecated.writeUTF(dos, getName());
-		ExternalizableHelperDeprecated.writeUTF(dos, getAppearanceAttr());
-		ExternalizableHelperDeprecated.writeUTF(dos, getLongText());
-		ExternalizableHelperDeprecated.writeUTF(dos, getShortText());
-		ExternalizableHelperDeprecated.writeUTF(dos, getHelpText());
-		ExternalizableHelperDeprecated.writeUTF(dos, getLongTextID());
-		ExternalizableHelperDeprecated.writeUTF(dos, getShortTextID());
-		ExternalizableHelperDeprecated.writeUTF(dos, getHelpTextID());
-		
-		dos.writeInt(getDataType());
-		dos.writeInt(getControlType());
-		
-		dos.writeBoolean(isRequired());
-		dos.writeBoolean(isVisible());
-		dos.writeBoolean(isEnabled());
-		dos.writeBoolean(isLocked());
+		ExtUtil.writeBool(dos, isRequired());
+		ExtUtil.writeBool(dos, isVisible());
+		ExtUtil.writeBool(dos, isEnabled());
+		ExtUtil.writeBool(dos, isLocked());
 		
 		//selectItems should not be serialized
-		ExternalizableHelperDeprecated.writeExternal(getSelectItemIDs(), dos);
-		ExternalizableHelperDeprecated.writeExternalVB(selectItemsLocalizable, dos);
-		
-		if (binding != null) {
-			dos.writeUTF(binding.getClass().getName());
-			binding.writeExternal(dos);
-		} else {
-			dos.writeUTF("");			
-		}
+		ExtUtil.write(dos, new ExtWrapMap(ExtUtil.emptyIfNull(getSelectItemIDs())));
+		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(selectItemsLocalizable)));
+
+		ExtUtil.write(dos, new ExtWrapNullable(binding == null ? null : new ExtWrapTagged(binding)));
 	}
 
 	/* === MANAGING OBSERVERS === */

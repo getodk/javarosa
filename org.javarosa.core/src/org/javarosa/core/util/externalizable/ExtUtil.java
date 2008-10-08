@@ -95,6 +95,7 @@ public class ExtUtil {
 	
 	public static void writeString (DataOutputStream out, String val) throws IOException {
 		out.writeUTF(val);
+		//we could easily come up with more efficient default encoding for string
 	}
 	
 	public static void writeDate (DataOutputStream out, Date val) throws IOException {
@@ -222,6 +223,22 @@ public class ExtUtil {
 		} else {
 			throw new ClassCastException();
 		}
+	}
+	
+	public static Vector nullIfEmpty (Vector v) {
+		return (v == null ? null : (v.size() == 0 ? null : v));
+	}
+	
+	public static Hashtable nullIfEmpty (Hashtable h) {
+		return (h == null ? null : (h.size() == 0 ? null : h));
+	}
+	
+	public static Vector emptyIfNull (Vector v) {
+		return v == null ? new Vector() : v;
+	}
+
+	public static Hashtable emptyIfNull (Hashtable h) {
+		return h == null ? new Hashtable() : h;
 	}
 	
 	public static Object unwrap (Object o) {
