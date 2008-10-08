@@ -9,6 +9,9 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -89,19 +92,12 @@ public class Condition implements Externalizable {
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		trueAction = ExternalizableHelperDeprecated.readNumInt(in, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
-		falseAction = ExternalizableHelperDeprecated.readNumInt(in, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
-		
-		//TOTAL HACK!!!
-		try {
-			expr = (IConditionExpr)PrototypeFactory.getInstance(Class.forName("org.javarosa.xpath.XPathConditional"));
-		} catch (ClassNotFoundException cnfe) {
-			throw new RuntimeException("can't find org.javarosa.xpath.XPathConditional... moved?");
-		}
-		expr.readExternal(in, pf);
+		trueAction = ExtUtil.readInt(in);
+		falseAction = ExtUtil.readInt(in);
+		expr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		
 		//affected q's
-		qIDs = ExternalizableHelperDeprecated.readIntegers(in);
+		qIDs = (Vector)ExtUtil.read(in, new ExtWrapList(Integer.class), pf);
 		//can't convert qIDs to QuestionDefs until 'form' is set by FormDef; thus attachForm, below
 	}
 
@@ -109,19 +105,20 @@ public class Condition implements Externalizable {
 		if (qIDs != null) {
 			for (int i = 0; i < qIDs.size(); i++)
 				affectedQuestions.addElement(form.getQuesitonByID(((Integer)qIDs.elementAt(i)).intValue()));
+			qIDs = null;
 		}
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelperDeprecated.writeNumeric(out, trueAction, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
-		ExternalizableHelperDeprecated.writeNumeric(out, falseAction, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
-		expr.writeExternal(out);
-		
+		ExtUtil.writeNumeric(out, trueAction);
+		ExtUtil.writeNumeric(out, falseAction);
+		ExtUtil.write(out, new ExtWrapTagged(expr));
+				
 		//affected q's
 		qIDs = new Vector();
 		for (int i = 0; i < affectedQuestions.size(); i++)
 			qIDs.addElement(new Integer(((QuestionDef)affectedQuestions.elementAt(i)).getID()));
-		ExternalizableHelperDeprecated.writeIntegers(qIDs, out);
+		ExtUtil.write(out, new ExtWrapList(qIDs));
 	}
 
 	

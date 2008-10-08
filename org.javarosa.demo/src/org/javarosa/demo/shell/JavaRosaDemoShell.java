@@ -6,9 +6,7 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
-import org.javarosa.user.activity.LoginActivity;
-import org.javarosa.user.model.User;
-import org.javarosa.user.activity.AddUserActivity;
+
 import org.javarosa.activity.splashscreen.SplashScreenActivity;
 import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.http.HttpTransportProperties;
@@ -18,10 +16,10 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormDef;
-//import org.javarosa.core.model.User;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.model.test.QuestionDefTest;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.properties.DemoAppProperties;
@@ -37,6 +35,9 @@ import org.javarosa.formmanager.view.Commands;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
+import org.javarosa.user.activity.AddUserActivity;
+import org.javarosa.user.activity.LoginActivity;
+import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xpath.XPathParseTool;
 /**
@@ -93,6 +94,12 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void registerPrototypes () {
+		String[] classes = {
+				"org.javarosa.model.xform.XPathReference",
+				"org.javarosa.xpath.XPathConditional"
+		};
+		
+		JavaRosaServiceProvider.instance().registerPrototypes(classes);
 		JavaRosaServiceProvider.instance().registerPrototypes(XPathParseTool.xpathClasses);
 	}
 	

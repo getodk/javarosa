@@ -10,6 +10,8 @@ import java.util.Vector;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -417,28 +419,24 @@ public class Localizer implements Externalizable {
 	 * Read the object from stream.
 	 */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
-		if(!ExternalizableHelperDeprecated.isEOF(dis)){
-			fallbackDefaultLocale = ExternalizableHelperDeprecated.readBoolean(dis).booleanValue();
-			fallbackDefaultForm = ExternalizableHelperDeprecated.readBoolean(dis).booleanValue();
-			localeData = ExternalizableHelperDeprecated.readExternalCompoundSOH(dis);
-			if (localeData == null)
-				localeData = new OrderedHashtable();
-			setDefaultLocale(ExternalizableHelperDeprecated.readUTF(dis));
-			String currentLocale = ExternalizableHelperDeprecated.readUTF(dis);
-			if(currentLocale != null) {
-				setLocale(currentLocale);
-			}
-		}	
+		fallbackDefaultLocale = ExtUtil.readBool(dis);
+		fallbackDefaultForm = ExtUtil.readBool(dis);
+		localeData = (OrderedHashtable)ExtUtil.read(dis, new ExtWrapMap(String.class, new ExtWrapMap(String.class, String.class, true), true), pf);
+		setDefaultLocale((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		String currentLocale = (String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf);
+		if (currentLocale != null) {
+			setLocale(currentLocale);
+		}
 	}
 	
 	/**
 	 * Write the object to stream.
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
-		ExternalizableHelperDeprecated.writeBoolean(dos, new Boolean(fallbackDefaultLocale));		
-		ExternalizableHelperDeprecated.writeBoolean(dos, new Boolean(fallbackDefaultForm));
-		ExternalizableHelperDeprecated.writeExternalCompoundSOH(localeData, dos);
-		ExternalizableHelperDeprecated.writeUTF(dos, defaultLocale);
-		ExternalizableHelperDeprecated.writeUTF(dos, currentLocale);		
+		ExtUtil.writeBool(dos, fallbackDefaultLocale);
+		ExtUtil.writeBool(dos, fallbackDefaultForm);
+		ExtUtil.write(dos, new ExtWrapMap(localeData, new ExtWrapMap(String.class, String.class, true)));
+		ExtUtil.write(dos, new ExtWrapNullable(defaultLocale));
+		ExtUtil.write(dos, new ExtWrapNullable(currentLocale));
 	}	
 }
