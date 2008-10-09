@@ -249,9 +249,6 @@ public class QuestionDataElementTests extends TestCase{
 	
 	private void testSuperclassMethods() {
 		//stringElement should not have a root at this point.
-		PrototypeFactoryDeprecated factory = new PrototypeFactoryDeprecated();
-		stringElement.setFactory(factory);
-		assertEquals("The QuestionDataElement 'stringElement' is not properly registering or returning factories",stringElement.getFactory(), factory);
 		
 		//TODO: Implement tests for the 'attribute' system.
 	}

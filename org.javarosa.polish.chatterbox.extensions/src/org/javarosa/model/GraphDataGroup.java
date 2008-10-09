@@ -120,7 +120,18 @@ public class GraphDataGroup extends QuestionDataGroup {
 		super.readNodeAttributes(in, pf);
 		
 		String className = in.readUTF();
-		reference = (IDataReference)this.getRoot().getFactory().getNewInstance(className);
+		try {
+			reference = (IDataReference)Class.forName(className).newInstance();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (reference == null) {
 			throw new DeserializationException(
 					"Attempt to resolve serialization for a DataModelTree failed because there was no reference " +

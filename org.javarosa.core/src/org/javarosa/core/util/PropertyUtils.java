@@ -1,5 +1,6 @@
 package org.javarosa.core.util;
 
+import java.util.Random;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -20,5 +21,16 @@ public class PropertyUtils {
 			return defaultValue;
 		}
 		return (String) propVal.elementAt(0);
+	}
+	
+	public static String genGUID(int len) {
+		String guid = "";
+		Random r = new Random();
+
+		for (int i = 0; i < 25; i++) { // 25 == 128 bits of entropy
+			guid += Integer.toString(r.nextInt(36), 36);
+		}
+
+		return guid.toUpperCase();
 	}
 }

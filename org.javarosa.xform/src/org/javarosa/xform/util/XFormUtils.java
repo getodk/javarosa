@@ -10,6 +10,7 @@ import javax.microedition.io.file.FileConnection;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xform.parse.XFormParser;
@@ -57,15 +58,12 @@ public class XFormUtils {
 	}
 
 	public static FormDef getFormFromSerializedResource(String resource) {
-		FormDef returnForm = new FormDef();
-		PrototypeFactoryDeprecated modelFactory = new PrototypeFactoryDeprecated();
-		modelFactory.addNewPrototype(new DataModelTree().getClass().getName(), new DataModelTree().getClass());
-		returnForm.setModelFactory(modelFactory);
+		FormDef returnForm = null;
 		InputStream is = System.class.getResourceAsStream(resource);
 		try {
 			if(is != null) {
 				DataInputStream dis = new DataInputStream(is);
-				returnForm.readExternal(dis, null); //TODO: don't leave this like this
+				returnForm = (FormDef)ExtUtil.read(dis, FormDef.class);
 				dis.close();
 				is.close();
 			}else{
@@ -75,13 +73,10 @@ public class XFormUtils {
 			}
 		}
 		catch(IOException e) {
-			System.err.println("IO Exception while closing stream.");
 			e.printStackTrace();
 		} catch (DeserializationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return returnForm;
-
 	}
 }

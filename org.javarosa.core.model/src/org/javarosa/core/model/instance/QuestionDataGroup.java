@@ -188,7 +188,19 @@ public class QuestionDataGroup extends TreeElement {
 			boolean group = in.readBoolean();
 			if(group) {
 				String className = in.readUTF();
-				QuestionDataGroup newGroup = (QuestionDataGroup) this.getRoot().factory.getNewInstance(className);
+				QuestionDataGroup newGroup = null;
+				try {
+					newGroup = (QuestionDataGroup)Class.forName(className).newInstance();
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				if(newGroup == null) {
 					throw new DeserializationException("Attempted to deserialize a Question Data Group object" +
 							"of type " + className + ". Please ensure that this class is available in the prototype factory" +

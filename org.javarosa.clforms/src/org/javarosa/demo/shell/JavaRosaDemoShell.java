@@ -1,29 +1,30 @@
 package org.javarosa.demo.shell;
 
 import java.util.Hashtable;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
-import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
-import org.javarosa.activity.splashscreen.SplashScreenActivity;
 import org.javarosa.communication.http.HttpTransportMethod;
+import org.javarosa.communication.http.HttpTransportModule;
 import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.WorkflowStack;
+import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.activity.FormListActivity;
@@ -34,16 +35,16 @@ import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.FormDefSerializer;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
+import org.javarosa.formmanager.view.chatterbox.widget.ExtendedWidgetsModule;
 import org.javarosa.model.xform.XFormSerializingVisitor;
+import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
+import org.javarosa.user.activity.AddUserActivity;
 import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xpath.XPathParseTool;
-
-import org.javarosa.user.activity.LoginActivity;
-import org.javarosa.user.activity.AddUserActivity;
 
 /**
  * This is the shell for the JavaRosa demo that handles switching all of the views
@@ -88,17 +89,10 @@ public class JavaRosaDemoShell implements IShell {
     }
 
 	private void init() {
-		registerPrototypes();
+		loadModules();
 		loadProperties();
 		startGCThread();
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
-
-		DataModelTreeRMSUtility dataModel = new DataModelTreeRMSUtility(DataModelTreeRMSUtility.getUtilityName());
-		FormDefRMSUtility formDef = new FormDefRMSUtility(FormDefRMSUtility.getUtilityName());
-		formDef.addModelPrototype(new DataModelTree());
-		formDef.addReferencePrototype(new XPathReference());
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(dataModel);
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(formDef);
 
 		boolean readSerialized = false;
 		boolean genSerialized = false;
@@ -110,7 +104,7 @@ public class JavaRosaDemoShell implements IShell {
 		System.out.println("TOTAL MEM AVAIL: "+java.lang.Runtime.getRuntime().totalMemory());
 		System.out.println("PRE LOAD FORM MEM: "+java.lang.Runtime.getRuntime().freeMemory());
 		
-		// For now let's add the dummy form.
+		FormDefRMSUtility formDef = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 		if (formDef.getNumberOfRecords() == 0) {
 			if (readSerialized ) {
 				//load from serialized form.
@@ -144,18 +138,13 @@ public class JavaRosaDemoShell implements IShell {
 
 	}
 
-	private void registerPrototypes () {
-		String[] classes = {
-				"org.javarosa.core.model.QuestionDef",
-				"org.javarosa.core.model.GroupDef",		
-				"org.javarosa.model.xform.XPathReference",
-				"org.javarosa.xpath.XPathConditional"
-		};
-		
-		JavaRosaServiceProvider.instance().registerPrototypes(classes);
-		JavaRosaServiceProvider.instance().registerPrototypes(XPathParseTool.xpathClasses);
+	private void loadModules() {
+		new XFormsModule().registerModule(context);
+		new CoreModelModule().registerModule(context);
+		//new HttpTransportModule().registerModule(context);
+		//new FormManagerModule().registerModule(context);
 	}
-	
+		
 	private void generateSerializedForms(String originalResource) {
 		FormDef a = XFormUtils.getFormFromResource(originalResource);
 		FormDefSerializer fds = new FormDefSerializer();
@@ -392,7 +381,7 @@ public class JavaRosaDemoShell implements IShell {
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new HttpTransportProperties());
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FormManagerProperties());
 
-		initProperty("DeviceID", genGUID(25));
+		initProperty("DeviceID", PropertyUtils.genGUID(25));
 		initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CLFORMS);
 		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://survey.cell-life.org/admin/post2limeNew.php");
 		Vector v = JavaRosaServiceProvider.instance().getPropertyManager().getProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY);
@@ -406,17 +395,5 @@ public class JavaRosaDemoShell implements IShell {
 	//	initProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CLFORMS);
 //		initProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://openrosa.org/testsubmit.html");
 //		initProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://openrosa.org/testsubmit.html");
-	}
-
-	//TODO: Put this in a utility method
-	public static String genGUID(int len) {
-		String guid = "";
-		Random r = new Random();
-
-		for (int i = 0; i < 25; i++) { // 25 == 128 bits of entropy
-			guid += Integer.toString(r.nextInt(36), 36);
-		}
-
-		return guid.toUpperCase();
 	}
 }
