@@ -95,6 +95,13 @@
 				<obfuscator name="ProGuard" unless="test or noobfuscate">
 					<parameter name="optimize" value="true" />
 					<parameter name="printmapping" value="dist\obfuscation_mapping.txt" />
+					
+					<parameter name="keepnames" value="!abstract class org.javarosa.core.model.* implements org.javarosa.core.model.IFormElement" />
+					<parameter name="keepnames" value="!abstract class org.javarosa.core.model.instance.* implements org.javarosa.core.model.IFormDataModel" />
+					<parameter name="keepnames" value="!abstract class org.javarosa.core.model.instance.* extends org.javarosa.core.model.instance.TreeElement" />
+					<parameter name="keepnames" value="!abstract class org.javarosa.core.model.data.* implements org.javarosa.core.model.data.IAnswerData" />
+					<parameter name="keepnames" value="!abstract class org.javarosa.model.xform.* implements org.javarosa.core.model.IDataReference" />
+					<parameter name="keepnames" value="!abstract class org.javarosa.xpath.* implements org.javarosa.core.model.condition.IConditionExpr" />
 					<parameter name="keepnames" value="!abstract class org.javarosa.xpath.expr.* extends org.javarosa.xpath.expr.XPathExpression" />
 				</obfuscator>
 

@@ -14,11 +14,16 @@ import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.model.utils.QuestionPreloader;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExtWrapListPoly;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
-import org.javarosa.core.util.externalizable.DeserializationException;
 
 /**
  * Definition of a form. This has some meta data about the form definition and  
@@ -40,7 +45,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private EvaluationContext conditionEvalContext;
 	
 	private QuestionPreloader preloader = new QuestionPreloader();
-	private PrototypeFactoryDeprecated modelFactory;
 
 	public FormDef() {
 		setChildren(null);
@@ -280,14 +284,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	}
 	
 	/**
-	 * @param modelFactory the PrototypeFactoryDeprecated that should be used to deserialize IDataModel
-	 * objects.
-	 */
-	public void setModelFactory(PrototypeFactoryDeprecated modelFactory) {
-		this.modelFactory = modelFactory;
-	}
-	
-	/**
 	 * Preload the Data Model with the preload values that are enumerated in
 	 * the data bindings.
 	 */
@@ -352,33 +348,19 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * @throws IllegalAccessException
 	 */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
-		if(!ExternalizableHelperDeprecated.isEOF(dis)){
-			PrototypeFactoryDeprecated factory = new PrototypeFactoryDeprecated();
-			factory.addNewPrototype(QuestionDef.class.getName(), QuestionDef.class);
-			factory.addNewPrototype(GroupDef.class.getName(), GroupDef.class);
-			setID(dis.readInt());
-			setName(ExternalizableHelperDeprecated.readUTF(dis));
-			
-			setChildren(ExternalizableHelperDeprecated.readExternal(dis,factory));
-			setBindings(ExternalizableHelperDeprecated.readExternal(dis,new DataBinding().getClass()));
-			
-			String modelType = dis.readUTF();
-			model = (IFormDataModel)modelFactory.getNewInstance(modelType);
-			if(model  == null) { 
-				throw new DeserializationException("FormDef was unable to deserialize the Model Template, " +
-						"due to a missing prototype. Please set the model to a prototype before deserialization.");
-			}
-			model.setFormReferenceId(this.getID());
-			model.readExternal(dis, pf);
+		setID(ExtUtil.readInt(dis));
+		setName((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setChildren((Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+		setBindings((Vector)ExtUtil.read(dis, new ExtWrapList(DataBinding.class), pf));
+		
+		model = (IFormDataModel)ExtUtil.read(dis, new ExtWrapTagged(), pf);
+		model.setFormReferenceId(getID());
 
-			setLocalizer((Localizer)ExternalizableHelperDeprecated.readExternalizable(dis, new Localizer()));
-			
-			Vector conditionList = ExternalizableHelperDeprecated.readExternal(dis, Condition.class);
-			if (conditionList != null) {
-				for (int i = 0; i < conditionList.size(); i++)
-					this.addCondition((Condition)conditionList.elementAt(i));
-			}
-		}
+		setLocalizer((Localizer)ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
+		
+		Vector vcond = (Vector)ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
+		for (Enumeration e = vcond.elements(); e.hasMoreElements(); )
+			addCondition((Condition)e.nextElement());		
 	}
 
 	/**
@@ -398,7 +380,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			getLocalizer().setToDefault();
 		}
 	}
-
+	
 	/** 
 	 * Writes the form definition object to the supplied stream.
 	 * 
@@ -406,17 +388,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * @throws IOException
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
-		dos.writeInt(getID());
-		ExternalizableHelperDeprecated.writeUTF(dos, getName());
-		
-		ExternalizableHelperDeprecated.writeExternalGeneric(getChildren(), dos);
-		ExternalizableHelperDeprecated.writeExternal(getBindings(), dos);
-
-		dos.writeUTF(model.getClass().getName());
-		model.writeExternal(dos);
-		
-		ExternalizableHelperDeprecated.writeExternalizable(localizer, dos);
-		
-		ExternalizableHelperDeprecated.writeExternal(conditions, dos);
+		ExtUtil.writeNumeric(dos, getID());
+		ExtUtil.write(dos, new ExtWrapNullable(getName()));
+		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
+		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(getBindings())));
+		ExtUtil.write(dos, new ExtWrapTagged(model));
+		ExtUtil.write(dos, new ExtWrapNullable(localizer));
+		ExtUtil.write(dos, new ExtWrapList(conditions));
 	}
 }

@@ -74,9 +74,6 @@ public class JavaRosaDemoShell implements IShell {
 		loadProperties();
 		
 		FormDefRMSUtility formDef = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-		formDef.addReferencePrototype(new XPathReference());
-
-		// For now let's add the dummy form.
 		if (formDef.getNumberOfRecords() == 0) {
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-a_draft.xhtml"));
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-b_draft.xhtml"));
@@ -302,20 +299,10 @@ public class JavaRosaDemoShell implements IShell {
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new DemoAppProperties());
 
-		PropertyUtils.initializeProperty("DeviceID", genGUID(25));
+		PropertyUtils.initializeProperty("DeviceID", PropertyUtils.genGUID(25));
 		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
 		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
 	}
 
-	//TODO: Put this in a utility method
-	public static String genGUID(int len) {
-		String guid = "";
-		Random r = new Random();
 
-		for (int i = 0; i < 25; i++) { // 25 == 128 bits of entropy
-			guid += Integer.toString(r.nextInt(36), 36);
-		}
-
-		return guid.toUpperCase();
-	}
 }

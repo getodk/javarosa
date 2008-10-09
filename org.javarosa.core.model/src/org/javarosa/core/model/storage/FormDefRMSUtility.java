@@ -33,14 +33,7 @@ import org.javarosa.core.util.externalizable.DeserializationException;
  *
  * @author Clayton Sims
  */
-public class FormDefRMSUtility extends RMSUtility {
-
-	/** Prototypes for IDataReferences and IAnswerData */
-	private PrototypeFactoryDeprecated questionFactory;
-	
-	/** Prototypes for IDataModel */
-	private PrototypeFactoryDeprecated modelFactory;
-	
+public class FormDefRMSUtility extends RMSUtility {	
 	/**
 	 * Creates a new RMS utility with the given name
 	 * @param name A unique identifier for this RMS utility
@@ -48,9 +41,8 @@ public class FormDefRMSUtility extends RMSUtility {
 	public FormDefRMSUtility(String name) {
 		super(name, RMSUtility.RMS_TYPE_META_DATA);
 	}
-    public void retrieveFromRMS(int recordId,
-            FormDef externalizableObject) throws IOException, DeserializationException {
-    	externalizableObject.setModelFactory(this.modelFactory);
+	
+    public void retrieveFromRMS(int recordId, FormDef externalizableObject) throws IOException, DeserializationException {
     	super.retrieveFromRMS(recordId, externalizableObject);
     }
 
@@ -208,55 +200,5 @@ public class FormDefRMSUtility extends RMSUtility {
 			e.printStackTrace();
 		}
 		return metaDataList;
-	}
-	
-	/**
-	 * @return a PrototypeFactoryDeprecated containing prototypes for IAnswerData's,
-	 * IDataReferences, and QuestionDataGroups. If a factory doesn't yet
-	 * exist, one is created, and default IAnswerData implementing classes
-	 * are pre-populated. 
-	 */
-	public PrototypeFactoryDeprecated getQuestionElementsFactory() {
-		if(questionFactory == null) { 
-			questionFactory = new PrototypeFactoryDeprecated();
-			addAnswerDataPrototype(new DateData());
-			addAnswerDataPrototype(new IntegerData());
-			addAnswerDataPrototype(new SelectMultiData());
-			addAnswerDataPrototype(new SelectOneData());
-			addAnswerDataPrototype(new StringData());			
-			addAnswerDataPrototype(new TimeData());
-		}
-		return questionFactory; 
-	}
-	
-	public void addReferencePrototype(IDataReference reference) {
-		getQuestionElementsFactory().addNewPrototype(reference.getClass().getName(), reference.getClass());
-	}
-	
-	public void addAnswerDataPrototype(IAnswerData answerData) {
-		getQuestionElementsFactory().addNewPrototype(answerData.getClass().getName(), answerData.getClass());
-	}
-	
-	public void addQuestionGroupPrototype(QuestionDataGroup group) {
-		getQuestionElementsFactory().addNewPrototype(group.getClass().getName(), group.getClass());
-	}
-	
-	public void clearQuestionElementsFactory() {
-		questionFactory = null;
-	}
-	
-	private PrototypeFactoryDeprecated getModelFactory() {
-		if(modelFactory == null) { 
-			modelFactory = new PrototypeFactoryDeprecated();
-		}
-		return modelFactory; 
-	}
-	
-	public void addModelPrototype(IFormDataModel model) {
-		this.getModelFactory().addNewPrototype(model.getClass().getName(), model.getClass());
-	}
-	
-	public void clearModelFactory() {
-		modelFactory = null;
 	}
 }

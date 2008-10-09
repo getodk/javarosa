@@ -202,26 +202,31 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		this.id = in.readInt();
 		this.formIdReference = in.readInt();
-		
 		this.name = ExternalizableHelperDeprecated.readUTF(in);
-		
 		this.dateSaved = ExternalizableHelperDeprecated.readDate(in);
-		
-		FormDefRMSUtility fdrms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-		PrototypeFactoryDeprecated factory = fdrms.getQuestionElementsFactory();
-		factory.addNewPrototype(QuestionDataGroup.class.getName(), QuestionDataGroup.class);
-		
+			
 		boolean group = in.readBoolean();
 		if(group) {
 			String className = in.readUTF();
-			QuestionDataGroup newGroup = (QuestionDataGroup)factory.getNewInstance(className);
+			QuestionDataGroup newGroup = null;
+			try {
+				newGroup = (QuestionDataGroup)Class.forName(className).newInstance();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			if(newGroup == null) {
 				throw new DeserializationException("Attempted to deserialize a Question Data Group object" +
 						"of type " + className + ". Please ensure that this class is available in the prototype factory" +
 						" in the root of the data model tree"); 
 			}
 			newGroup.setRoot(newGroup);
-			newGroup.setFactory(factory);
 			newGroup.readExternal(in, pf);
 			setRootElement(newGroup);
 		}

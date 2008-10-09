@@ -169,7 +169,18 @@ public class QuestionDataElement extends TreeElement {
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		this.name = ExternalizableHelperDeprecated.readUTF(in);
 		String className = in.readUTF();
-		reference = (IDataReference)this.getRoot().getFactory().getNewInstance(className);
+		try {
+			reference = (IDataReference)Class.forName(className).newInstance();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (reference == null) {
 			throw new DeserializationException(
 					"Attempt to resolve serialization for a DataModelTree failed because there was no reference " +
@@ -184,7 +195,18 @@ public class QuestionDataElement extends TreeElement {
 			value = null;
 		} else {
 			String valueName = in.readUTF();
-			value = (IAnswerData)this.getRoot().getFactory().getNewInstance(valueName);
+			try {
+				value = (IAnswerData)Class.forName(valueName).newInstance();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			if(value == null) {
 				throw new DeserializationException(
 						"Attempt to resolve serialization for a DataModelTree failed because there was no answerdata " +

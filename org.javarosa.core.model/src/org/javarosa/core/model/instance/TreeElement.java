@@ -19,9 +19,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 
 public abstract class TreeElement implements Externalizable {
 
-	/** A set of prototype references maintained be the root node to used in deserialization. */
-	PrototypeFactoryDeprecated factory;
-
 	/** The root of the tree containing this element */
 	protected TreeElement root;
 
@@ -75,30 +72,6 @@ public abstract class TreeElement implements Externalizable {
 	 */
 	public void accept(ITreeVisitor visitor) {
 		visitor.visit(this);
-	}
-
-	/**
-	 * @return the factory
-	 */
-	public PrototypeFactoryDeprecated getFactory() {
-		if(this == this.getRoot()) {
-			return factory;
-		}
-		else {
-			return this.getRoot().getFactory();
-		}
-	}
-
-	/**
-	 * @param factory the factory to set
-	 */
-	public void setFactory(PrototypeFactoryDeprecated factory) {
-		if(this == this.getRoot()) {
-			this.factory = factory;
-		}
-		else {
-			this.getRoot().setFactory(factory);
-		}
 	}
 
     /**
