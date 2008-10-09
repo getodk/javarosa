@@ -8,8 +8,12 @@ import java.util.Vector;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -167,53 +171,14 @@ public class QuestionDataElement extends TreeElement {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		this.name = ExternalizableHelperDeprecated.readUTF(in);
-		String className = in.readUTF();
-		try {
-			reference = (IDataReference)Class.forName(className).newInstance();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (reference == null) {
-			throw new DeserializationException(
-					"Attempt to resolve serialization for a DataModelTree failed because there was no reference " +
-					"template available to deserialize the stored reference");
-		}
-		reference.readExternal(in, pf);
+		name = ExtUtil.readString(in);
+		reference = (IDataReference)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		
 		// read attributes
-		Vector attStrings = ExternalizableHelperDeprecated.readUTFs(in);
+		Vector attStrings = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(), pf));
 		setAttributesFromSingleStringVector(attStrings);
-		// read value
-		if(in.readBoolean() == false) {
-			value = null;
-		} else {
-			String valueName = in.readUTF();
-			try {
-				value = (IAnswerData)Class.forName(valueName).newInstance();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if(value == null) {
-				throw new DeserializationException(
-						"Attempt to resolve serialization for a DataModelTree failed because there was no answerdata " +
-						"template available to deserialize the stored answer data of type " + valueName);
-			}
-			value.readExternal(in, pf);
-		}
+
+		value = (IAnswerData)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);	
 	}
 
 	/*
@@ -222,26 +187,18 @@ public class QuestionDataElement extends TreeElement {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		//This flag is in place to determine whether a Data element is a Group or a Data
-		//True for groups, false for DataElements
-		out.writeBoolean(false);
-		ExternalizableHelperDeprecated.writeUTF(out, this.name);
-		out.writeUTF(reference.getClass().getName());
-		reference.writeExternal(out);
+		ExtUtil.writeBool(out, false); 		//True for groups, false for DataElements
+		ExtUtil.writeString(out, name);
+		ExtUtil.write(out, new ExtWrapTagged(reference));
+
 		// write attributes.
 		// 1. Add attributes to vector as full strings  'qid="82"'
-		Vector attStrings = getSingleStringAttributeVector();
 		// 2. @ writeExternal - call ExternalizableHelperDeprecated.writeUTFs to write the vector
-		ExternalizableHelperDeprecated.writeUTFs(attStrings, out);
 		// 3. @ readExternal read from vector
 		// 4. Don't forget you'll need to externalize them in XMLserializer too. :-(
-		if(value == null) {
-			out.writeBoolean(false);
-		}
-		else {
-			out.writeBoolean(true);
-			out.writeUTF(value.getClass().getName());
-			value.writeExternal(out);
-		}
+		Vector attStrings = getSingleStringAttributeVector();
+		ExtUtil.write(out, new ExtWrapList(ExtUtil.emptyIfNull(attStrings)));
+
+		ExtUtil.write(out, new ExtWrapNullable(value == null ? null : new ExtWrapTagged(value)));
 	}
 }

@@ -63,13 +63,11 @@ public class DateUtils {
 	 * @return
 	 */
 	public static String getShortStringValue(Date val) {
-		String stringValue = "";
-		if (val == null) {
-			return stringValue;
-		}
-		Date d = (Date) val;
+		if (val == null)
+			return "";
+
 		Calendar cd = Calendar.getInstance();
-		cd.setTime(d);
+		cd.setTime(val);
 		String year = "" + cd.get(Calendar.YEAR);
 		String month = "" + (cd.get(Calendar.MONTH) + 1);
 		String day = "" + cd.get(Calendar.DAY_OF_MONTH);
@@ -80,8 +78,7 @@ public class DateUtils {
 		if (day.length() < 2)
 			day = "0" + day;
 
-		stringValue = day + "/" + month + "/" + year.substring(2, 4);
-		return stringValue;
+		return day + "/" + month + "/" + year.substring(2, 4);		
 	}
 	
 	/**

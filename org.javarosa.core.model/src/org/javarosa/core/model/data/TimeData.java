@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class TimeData implements IAnswerData {
@@ -46,15 +47,13 @@ public class TimeData implements IAnswerData {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		this.setValue(ExternalizableHelperDeprecated.readDate(in));
-		
+		setValue(ExtUtil.readDate(in));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		System.out.println("written out timedata");
-		ExternalizableHelperDeprecated.writeDate(out, this.d);
+		ExtUtil.writeDate(out, d);
 	}
 }

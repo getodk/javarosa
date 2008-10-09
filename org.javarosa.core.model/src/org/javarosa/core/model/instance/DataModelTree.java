@@ -6,19 +6,18 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ExternalizingVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.IDataModelVisitor;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * DataModelTree is an implementation of IFormDataModel
@@ -200,40 +199,18 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		this.id = in.readInt();
-		this.formIdReference = in.readInt();
-		this.name = ExternalizableHelperDeprecated.readUTF(in);
-		this.dateSaved = ExternalizableHelperDeprecated.readDate(in);
-			
-		boolean group = in.readBoolean();
+		id = ExtUtil.readInt(in);
+		formIdReference = ExtUtil.readInt(in);
+		name = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
+		dateSaved = (Date)ExtUtil.read(in, new ExtWrapNullable(Date.class));
+					
+		boolean group = ExtUtil.readBool(in);
 		if(group) {
-			String className = in.readUTF();
-			QuestionDataGroup newGroup = null;
-			try {
-				newGroup = (QuestionDataGroup)Class.forName(className).newInstance();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if(newGroup == null) {
-				throw new DeserializationException("Attempted to deserialize a Question Data Group object" +
-						"of type " + className + ". Please ensure that this class is available in the prototype factory" +
-						" in the root of the data model tree"); 
-			}
-			newGroup.setRoot(newGroup);
-			newGroup.readExternal(in, pf);
+			QuestionDataGroup newGroup = (QuestionDataGroup)ExtUtil.read(in, new ExtWrapTagged(), pf);
 			setRootElement(newGroup);
 		}
 		else {
-			QuestionDataElement element = new QuestionDataElement();
-			element.setRoot(element);
-			element.readExternal(in, pf);
+			QuestionDataElement element = (QuestionDataElement)ExtUtil.read(in, QuestionDataElement.class, pf);
 			setRootElement(element);
 		}
 	}
@@ -243,12 +220,10 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeInt(this.id);
-		out.writeInt(this.formIdReference);
-		
-		ExternalizableHelperDeprecated.writeUTF(out, this.name);
-		
-		ExternalizableHelperDeprecated.writeDate(out, this.dateSaved);
+		ExtUtil.writeNumeric(out, id);
+		ExtUtil.writeNumeric(out, formIdReference);
+		ExtUtil.write(out, new ExtWrapNullable(name));
+		ExtUtil.write(out, new ExtWrapNullable(dateSaved));		
 		
 		ExternalizingVisitor visitor = new ExternalizingVisitor(out);
 		this.accept(visitor);

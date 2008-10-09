@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -57,13 +58,13 @@ public class IntegerData implements IAnswerData {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		n = ExternalizableHelperDeprecated.readNumInt(in, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
+		n = ExtUtil.readInt(in);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelperDeprecated.writeNumeric(out, n, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
+		ExtUtil.writeNumeric(out, n);
 	}
 }
