@@ -203,16 +203,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		formIdReference = ExtUtil.readInt(in);
 		name = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
 		dateSaved = (Date)ExtUtil.read(in, new ExtWrapNullable(Date.class));
-					
-		boolean group = ExtUtil.readBool(in);
-		if(group) {
-			QuestionDataGroup newGroup = (QuestionDataGroup)ExtUtil.read(in, new ExtWrapTagged(), pf);
-			setRootElement(newGroup);
-		}
-		else {
-			QuestionDataElement element = (QuestionDataElement)ExtUtil.read(in, QuestionDataElement.class, pf);
-			setRootElement(element);
-		}
+		setRootElement((TreeElement)ExtUtil.read(in, new ExtWrapTagged(), pf));
 	}
 
 	/*

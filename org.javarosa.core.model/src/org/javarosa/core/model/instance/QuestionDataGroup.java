@@ -186,15 +186,7 @@ public class QuestionDataGroup extends TreeElement {
 		readNodeAttributes(in, pf);
 		int numChildren = ExtUtil.readInt(in);
 		for(int i = 0 ; i < numChildren ; ++i ) {
-			boolean group = ExtUtil.readBool(in);
-			if(group) {
-				QuestionDataGroup newGroup = (QuestionDataGroup)ExtUtil.read(in, new ExtWrapTagged(), pf);
-				addChild(newGroup);				
-			}
-			else {
-				QuestionDataElement element = (QuestionDataElement)ExtUtil.read(in, QuestionDataElement.class, pf);
-				addChild(element);
-			}
+			addChild((TreeElement)ExtUtil.read(in, new ExtWrapTagged(), pf));
 		}
 	}
 
@@ -203,13 +195,7 @@ public class QuestionDataGroup extends TreeElement {
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeBool(out, true); //True for groups, false for DataElements
-		
-		ExtWrapTagged.writeTag(out, this); //ugh!
-		//  out.writeUTF(this.getClass().getName());
-		
-		writeNodeAttributes(out);
-		
+		writeNodeAttributes(out);		
 		ExtUtil.writeNumeric(out, children.size());		
 		//This node's children are stored in a depth-first manner by the serializing visitor
 	}
