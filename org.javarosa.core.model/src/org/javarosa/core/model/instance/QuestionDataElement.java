@@ -187,7 +187,6 @@ public class QuestionDataElement extends TreeElement {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeBool(out, false); 		//True for groups, false for DataElements
 		ExtUtil.writeString(out, name);
 		ExtUtil.write(out, new ExtWrapTagged(reference));
 

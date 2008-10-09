@@ -9,6 +9,7 @@ import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
@@ -70,7 +71,7 @@ public class ExternalizingVisitor implements ITreeVisitor {
 	private void externalizeElement(Externalizable ext) {
 		if (!failure) {
 			try {
-				ExtUtil.write(outStream, ext);
+				ExtUtil.write(outStream, new ExtWrapTagged(ext));
 			} catch (IOException e) {
 				// #if debug.output == exception || debug.output == verbose
 				e.printStackTrace();
