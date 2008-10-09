@@ -7,7 +7,6 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.activity.splashscreen.SplashScreenActivity;
-import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.http.HttpTransportModule;
 import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
@@ -19,7 +18,6 @@ import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
-import org.javarosa.core.model.test.QuestionDefTest;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.WorkflowStack;
@@ -42,7 +40,6 @@ import org.javarosa.user.activity.AddUserActivity;
 import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
-import org.javarosa.xpath.XPathParseTool;
 /**
  * This is the shell for the JavaRosa demo that handles switching all of the views
  * @author Brian DeRenzi
@@ -76,7 +73,6 @@ public class JavaRosaDemoShell implements IShell {
 		loadModules();
 		loadProperties();
 		
-		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 		FormDefRMSUtility formDef = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 		formDef.addReferencePrototype(new XPathReference());
 
