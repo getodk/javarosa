@@ -15,6 +15,8 @@ import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.model.data.NumericListData;
 import org.javarosa.patient.util.DateValueTuple;
@@ -118,31 +120,11 @@ public class GraphDataGroup extends QuestionDataGroup {
 	
 	public void readNodeAttributes(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		super.readNodeAttributes(in, pf);
-		
-		String className = in.readUTF();
-		try {
-			reference = (IDataReference)Class.forName(className).newInstance();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (reference == null) {
-			throw new DeserializationException(
-					"Attempt to resolve serialization for a DataModelTree failed because there was no reference " +
-					"template available to deserialize the stored reference");
-		}
-		reference.readExternal(in, pf);
+		reference = (IDataReference)ExtUtil.read(in, new ExtWrapTagged(), pf);
 	}
 	public void writeNodeAttributes(DataOutputStream out) throws IOException {
 		super.writeNodeAttributes(out);
-		out.writeUTF(reference.getClass().getName());
-		reference.writeExternal(out);
+		ExtUtil.write(out, new ExtWrapTagged(reference));
 	}
 	
 }

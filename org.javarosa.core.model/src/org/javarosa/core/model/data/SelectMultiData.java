@@ -5,8 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -53,7 +55,8 @@ public class SelectMultiData implements IAnswerData {
 	
 	/**
 	 * @return A type checked vector containing all of the elements
-	 * contained in the vector input 
+	 * contained in the vector input
+	 * TODO: move to utility class
 	 */
 	private Vector vectorCopy(Vector input) {
 		Vector output = new Vector();
@@ -77,7 +80,7 @@ public class SelectMultiData implements IAnswerData {
 			str += s.getText();
 			if (i < vs.size() - 1)
 				str += ", ";
-		}		
+		}
 		
 		return str;
 	}
@@ -85,14 +88,13 @@ public class SelectMultiData implements IAnswerData {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		vs = ExternalizableHelperDeprecated.readExternal(in, Selection.class);
-		
+		vs = (Vector)ExtUtil.read(in, new ExtWrapList(Selection.class), pf);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelperDeprecated.writeExternal(vs, out);
+		ExtUtil.write(out, new ExtWrapList(vs));
 	}
 }

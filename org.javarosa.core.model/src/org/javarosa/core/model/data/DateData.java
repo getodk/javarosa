@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -43,34 +45,20 @@ public class DateData implements IAnswerData {
 	}
 	
 	public String getDisplayText () {
-		//move to util library
-		Calendar cd = Calendar.getInstance();
-		cd.setTime(d);
-		String year = "" + cd.get(Calendar.YEAR);
-		String month = "" + (cd.get(Calendar.MONTH)+1);
-		String day = "" + cd.get(Calendar.DAY_OF_MONTH);
-
-		if (month.length() < 2)
-			month = "0" + month;
-
-		if (day.length() < 2)
-			day = "0" + day;
-
-		return day + "/" + month + "/" + year.substring(2,4);
+		return DateUtils.getShortStringValue(d);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		this.setValue(ExternalizableHelperDeprecated.readDate(in));
-		
+		setValue(ExtUtil.readDate(in));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelperDeprecated.writeDate(out, this.d);
+		ExtUtil.writeDate(out, d);
 	}
 }

@@ -10,8 +10,9 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ElementExistsVisitor;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
@@ -178,67 +179,38 @@ public class QuestionDataGroup extends TreeElement {
 	}
 	
 	protected void readNodeAttributes(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		this.name = ExternalizableHelperDeprecated.readUTF(in);
+		name = ExtUtil.readString(in);
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		readNodeAttributes(in, pf);
-		int numChildren = in.readInt();
+		int numChildren = ExtUtil.readInt(in);
 		for(int i = 0 ; i < numChildren ; ++i ) {
-			boolean group = in.readBoolean();
+			boolean group = ExtUtil.readBool(in);
 			if(group) {
-				String className = in.readUTF();
-				QuestionDataGroup newGroup = null;
-				try {
-					newGroup = (QuestionDataGroup)Class.forName(className).newInstance();
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				if(newGroup == null) {
-					throw new DeserializationException("Attempted to deserialize a Question Data Group object" +
-							"of type " + className + ". Please ensure that this class is available in the prototype factory" +
-							" in the root of the data model tree"); 
-				}
-
-				//This root will let the node externalize
-				newGroup.setRoot(this.getRoot());
-				newGroup.readExternal(in, pf);
-				//Treat it as a subtree to ensure that there are no graph connections
-				newGroup.setRoot(newGroup);
-				addChild(newGroup);
-				
+				QuestionDataGroup newGroup = (QuestionDataGroup)ExtUtil.read(in, new ExtWrapTagged(), pf);
+				addChild(newGroup);				
 			}
 			else {
-				QuestionDataElement element = new QuestionDataElement();
-				element.setRoot(this.getRoot());
-				element.readExternal(in, pf);
+				QuestionDataElement element = (QuestionDataElement)ExtUtil.read(in, QuestionDataElement.class, pf);
 				addChild(element);
 			}
 		}
 	}
 
-	protected void writeNodeAttributes(DataOutputStream out) throws IOException {		 
-		ExternalizableHelperDeprecated.writeUTF(out,this.name);
+	protected void writeNodeAttributes(DataOutputStream out) throws IOException {
+		ExtUtil.writeString(out, name);
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
-		//This flag is in place to determine whether a Data element is a Group or a Data
-		//True for groups, false for DataElements
-		out.writeBoolean(true);
+		ExtUtil.writeBool(out, true); //True for groups, false for DataElements
 		
-		out.writeUTF(this.getClass().getName());
+		ExtWrapTagged.writeTag(out, this); //ugh!
+		//  out.writeUTF(this.getClass().getName());
 		
 		writeNodeAttributes(out);
 		
-		out.writeInt(this.children.size());
-		
+		ExtUtil.writeNumeric(out, children.size());		
 		//This node's children are stored in a depth-first manner by the serializing visitor
 	}
 }

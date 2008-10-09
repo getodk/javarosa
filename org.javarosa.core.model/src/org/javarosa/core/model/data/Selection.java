@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -56,11 +57,10 @@ public class Selection implements Externalizable {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		index = in.readInt();
-		
+		index = ExtUtil.readInt(in);
+
 		//setting QuestionDef in this way isn't correct; see note below
-		question = new QuestionDef();
-		question.readExternal(in, pf);
+		question = (QuestionDef)ExtUtil.read(in, QuestionDef.class, pf);
 	}
 
 	/* (non-Javadoc)
@@ -80,9 +80,9 @@ public class Selection implements Externalizable {
 	 * one. This invariance seems fragile, however.
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeInt(index);
+		ExtUtil.writeNumeric(out, index);
 		
 		//TODO: fix this
-		question.writeExternal(out); 
+		ExtUtil.write(out, question);
 	}
 }
