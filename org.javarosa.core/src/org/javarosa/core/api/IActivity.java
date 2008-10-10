@@ -52,4 +52,9 @@ public interface IActivity {
 	 * @return The context under which the activity is operating
 	 */
 	public Context getActivityContext();
+	
+	/**
+	 * @param shell the shell that this activity is running under.
+	 */
+	public void setShell(IShell shell);
 }

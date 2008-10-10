@@ -1,7 +1,6 @@
 package org.javarosa.demo.shell;
 
 import java.util.Hashtable;
-import java.util.Random;
 
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
@@ -9,6 +8,7 @@ import javax.microedition.midlet.MIDlet;
 import org.javarosa.activity.splashscreen.SplashScreenActivity;
 import org.javarosa.communication.http.HttpTransportModule;
 import org.javarosa.communication.http.HttpTransportProperties;
+import org.javarosa.communication.ui.CommunicationUIModule;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
@@ -19,6 +19,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
+import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.properties.DemoAppProperties;
@@ -34,7 +35,6 @@ import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.chatterbox.widget.ExtendedWidgetsModule;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
-import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.AddUserActivity;
 import org.javarosa.user.activity.LoginActivity;
@@ -90,6 +90,7 @@ public class JavaRosaDemoShell implements IShell {
 		new HttpTransportModule().registerModule(context);
 		new FormManagerModule().registerModule(context);
 		new ExtendedWidgetsModule().registerModule(context);
+		new CommunicationUIModule().registerModule(context);
 	}
 	
 	private void generateSerializedForms(String originalResource) {
@@ -204,7 +205,14 @@ public class JavaRosaDemoShell implements IShell {
 			}
 
 		} else if (returningActivity instanceof FormTransportActivity) {
-			relaunchListActivity();
+			if(returnVals.get(FormTransportActivity.RETURN_KEY ) == FormTransportActivity.NEW_DESTINATION) {
+				TransportMethod transport = JavaRosaServiceProvider.instance().getTransportManager().getTransportMethod(JavaRosaServiceProvider.instance().getTransportManager().getCurrentTransportMethod());
+				IActivity activity = transport.getDestinationRetrievalActivity();
+				activity.setShell(this);
+				this.launchActivity(activity, context);
+			} else {
+				relaunchListActivity();
+			}
 
 			//what is this for?
 			/*if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
@@ -223,7 +231,9 @@ public class JavaRosaDemoShell implements IShell {
 								 String returnCode, Hashtable returnVals) {
 
 		//default action
-		resumeActivity(suspendedActivity, context);
+		Context newContext = new Context(context);
+		newContext.addAllValues(returnVals);
+		resumeActivity(suspendedActivity, newContext);
 	}
 
 	private void launchActivity (IActivity activity, Context context) {

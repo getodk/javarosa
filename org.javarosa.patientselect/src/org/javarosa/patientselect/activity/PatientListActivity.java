@@ -1,8 +1,12 @@
 package org.javarosa.patientselect.activity;
 
-import java.util.Vector;
-
-import javax.microedition.lcdui.*;
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.Choice;
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Gauge;
+import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
@@ -10,8 +14,7 @@ import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
-
-import org.javarosa.patientselect.object.*;
+import org.javarosa.patientselect.object.ExternalizableObject;
 import org.javarosa.patientselect.search.BasicSearch;
 import org.javarosa.patientselect.store.PatientListMetaData;
 import org.javarosa.patientselect.store.PatientStore;
@@ -203,5 +206,13 @@ public class PatientListActivity extends MIDlet implements IActivity, CommandLis
 		
 		showList();
 		
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.parent = shell;
 	}
 }

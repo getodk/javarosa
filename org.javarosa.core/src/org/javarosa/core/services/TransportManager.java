@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.Storage;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -41,7 +41,12 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	 * A storage element for placing received messages
 	 */
 	private Storage storage;
-
+	
+	/**
+	 * The current transport method that has been set for use
+	 */
+	private int currentTransportMethod = -1;
+	
 	/**
 	 * Creates a new instance of <code>TransportManager</code>
 	 *
@@ -61,11 +66,30 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	public String getName() {
 		return "Transport Manager";
 	}
+	
+	/**
+	 * Sets the current transport method.
+	 * @param transportMethodId The Id of a registered transport method.
+	 * The current transport method will only be set if this Id is registered.
+	 */
+	public void setCurrentTransportMethod(int transportMethodId) {
+		Integer method = new Integer(transportMethodId);
+		Enumeration en = transportMethods.keys();
+		while(en.hasMoreElements()) {
+			if(method.equals(en.nextElement())){
+				this.currentTransportMethod = transportMethodId;
+			}
+		}
+	}
+	
+	public int getCurrentTransportMethod() {
+		return this.currentTransportMethod;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.ITransportManager#enqueue(byte[], java.lang.String, int, int)
 	 */
-	public void enqueue(byte[] data, String destination, int transportMethod, int formDataId)
+	public void enqueue(byte[] data, ITransportDestination destination, int transportMethod, int formDataId)
 			throws IOException {
 		TransportMessage message = new TransportMessage(data, destination, ID, formDataId);
 		enqueue(message, transportMethod);
@@ -221,5 +245,16 @@ public class TransportManager implements Observer, IService, ITransportManager {
 
     	}
 		return (notFoundOK ? TransportMessage.STATUS_NOT_SENT : -1);
+	}
+	
+	/**
+	 * 
+	 * @param i The index of the transport method whose current default destination
+	 * should be returned.
+	 * @return The default Transport Destination current used by the transport
+	 * method requested.
+	 */
+	public ITransportDestination getDefaultTransportDestination(int i) {
+		return ((TransportMethod)transportMethods.get(new Integer(i))).getDefaultDestination();
 	}
 }

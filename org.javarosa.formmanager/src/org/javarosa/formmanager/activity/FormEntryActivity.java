@@ -206,4 +206,12 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	public void setRetrievalMethod(IFormDefRetrievalMethod method) {
 		fetcher.setFetcher(method);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.parent = shell;
+	}
 }

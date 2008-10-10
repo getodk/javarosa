@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.javarosa.core.util.Observable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -59,7 +62,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	/**
 	 * ID or URL of destination
 	 */
-	private String destination;
+	private ITransportDestination destination;
 
 	/**
 	 *
@@ -93,7 +96,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @param destination
 	 * @param sender
 	 */
-	public TransportMessage(byte[] payloadData, String destination,
+	public TransportMessage(byte[] payloadData, ITransportDestination destination,
 			String sender, int modelId) {
 		super();
 		this.payloadData = payloadData;
@@ -110,7 +113,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @param destination
 	 * @param sender
 	 */
-	public TransportMessage(byte[] payloadData, String destination,
+	public TransportMessage(byte[] payloadData, ITransportDestination destination,
 			String sender, int modelId, byte [] replyloadDataIn) {
 		super();
 		this.payloadData = payloadData;
@@ -145,7 +148,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	/**
 	 * @return the destination
 	 */
-	public String getDestination() {
+	public ITransportDestination getDestination() {
 		return destination;
 	}
 
@@ -153,7 +156,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @param destination
 	 *            the destination to set
 	 */
-	public void setDestination(String destination) {
+	public void setDestination(ITransportDestination destination) {
 		this.destination = destination;
 	}
 
@@ -191,12 +194,14 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		int length = in.readInt();
 		this.payloadData = new byte[length];
 		// int noOfBytesRead = in.read(this.payloadData);
 		in.read(this.payloadData);
-		this.destination = in.readUTF();
+		
+		this.destination = (ITransportDestination) ExtUtil.read(in,new ExtWrapTagged(),pf);
+		
 		this.sender = in.readUTF();
 		this.timestamp = new Date(in.readLong());
 		this.recordId = in.readInt();
@@ -214,7 +219,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(this.payloadData.length);
 		out.write(this.payloadData);
-		out.writeUTF(this.destination);
+		ExtUtil.write(out, new ExtWrapTagged(this.destination));
 		out.writeUTF(this.sender);
 		out.writeLong(this.timestamp.getTime());
 		out.writeInt(this.recordId);

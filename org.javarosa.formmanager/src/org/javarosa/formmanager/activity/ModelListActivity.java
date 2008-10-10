@@ -301,4 +301,11 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 	public Context getActivityContext() {
 		return theContext;
 	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.mainShell = shell;
+	}
 }

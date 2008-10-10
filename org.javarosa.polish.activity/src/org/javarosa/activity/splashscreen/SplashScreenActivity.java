@@ -106,4 +106,11 @@ public class SplashScreenActivity implements IActivity, ApplicationInitializer {
 	public Context getActivityContext() {
 		return context;
 	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.parent = shell;
+	}
 }

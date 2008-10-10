@@ -149,5 +149,13 @@ public class GetNewFormActivity implements IActivity, CommandListener {
 		//For some reason that I really can't figure out, this alert won't display the error text
 		alert.setCommandListener(this);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.parent = shell;
+	}
 
 }

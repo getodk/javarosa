@@ -8,8 +8,15 @@ import org.javarosa.core.util.PropertyUtils;
 public class HttpTransportModule implements IModule {
 
 	public void registerModule(Context context) {
+		
+		String[] classes = {
+				"org.javarosa.communication.http.HttpTransportDestination",				
+		};		
+		JavaRosaServiceProvider.instance().registerPrototypes(classes);
+		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new HttpTransportProperties());
+		JavaRosaServiceProvider.instance().getTransportManager().setCurrentTransportMethod(new HttpTransportMethod().getId());
 	}
 
 }

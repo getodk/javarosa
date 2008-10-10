@@ -26,6 +26,8 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
+import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
@@ -82,17 +84,10 @@ public class FormTransportActivity implements
 			Command.SCREEN, 1);
 
 	private static final Command CMD_DELETEMSG = new Command("Delete message",Command.SCREEN,1);
-
-	/**
-	 *
-	 */
-	private Form urlForm;
-
-	private String destinationUrl;
+	
+	private ITransportDestination destination;
 
 	private IDataModelSerializingVisitor dataModelSerializer;
-
-	private TextField textField;
 
 	private IShell shell;
 
@@ -109,6 +104,8 @@ public class FormTransportActivity implements
 	public static final String RETURN_KEY = "returnval";
 
 	public static final String VIEW_MODELS = "viewmodels";
+	
+	public static final String NEW_DESTINATION = "dest";
 
 	String task;
 
@@ -135,7 +132,12 @@ public class FormTransportActivity implements
 	}
 
 	public void resume(Context globalContext) {
-		createView(currentView);
+		this.context.mergeInContext(globalContext);
+		ITransportDestination destination = this.context.getDestination();
+		if(destination != null) {
+			setDestination(destination);
+		}
+		createView(context.getRequestedTask());
 	}
 
 	public void start(Context context) {
@@ -186,10 +188,19 @@ public class FormTransportActivity implements
 			showMessageList();
 		}
 		else if(task.equals(TransportContext.SEND_DATA)) {
-			submitScreen = new SubmitScreen();
-			submitScreen.setCommandListener(this);
-			submitScreen.setItemStateListener(this);
-			shell.setDisplay(this,submitScreen);
+			if(destination == null) {
+				submitScreen = new SubmitScreen();
+				submitScreen.setCommandListener(this);
+				submitScreen.setItemStateListener(this);
+				shell.setDisplay(this,submitScreen);
+			} else {
+				try {
+					sendData(JavaRosaServiceProvider.instance().getTransportManager().getCurrentTransportMethod());
+				} catch (IOException e) {
+					//TODO: Handle this exception reasonably!!!!!
+					e.printStackTrace();
+				}
+			}
 		}
 		}
 
@@ -212,7 +223,6 @@ public class FormTransportActivity implements
 	}
 
 	public Enumeration getTransportMessages(){
-
 		return JavaRosaServiceProvider.instance().getTransportManager().getMessages();
 	}
 
@@ -238,22 +248,21 @@ public class FormTransportActivity implements
 		//This is for the submit Screen
 			switch (submitScreen.getCommandChoice()) {
 			case SubmitScreen.SEND_NOW_DEFAULT:
-				String postURL = JavaRosaServiceProvider.instance()
-						.getPropertyManager().getSingularProperty(
-								HttpTransportProperties.POST_URL_PROPERTY);
-				if (postURL != null) {
-					this.setDestURL(postURL);
+				ITransportManager tmanager = JavaRosaServiceProvider.instance().getTransportManager();
+				ITransportDestination destination = tmanager.getDefaultTransportDestination(tmanager.getCurrentTransportMethod());
+				if (destination != null) {
+					this.setDestination(destination);
 					try {
 						sendData(currentMethod);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 				} else {
-					this.showURLform();
+					returnForDestination();
 				}
 				break;
 			case SubmitScreen.SEND_NOW_SPEC:
-				this.showURLform();
+				returnForDestination();
 				break;
 			case SubmitScreen.SEND_LATER:
 				String userNotify = "Form has been saved. Check 'Saved Forms' list";
@@ -268,6 +277,16 @@ public class FormTransportActivity implements
 			}
 
 	}
+	
+	/**
+	 * This method returns to the shell requesting a new Transport Destination
+	 */
+	private void returnForDestination() {
+		Hashtable returnArgs = new Hashtable();
+		returnArgs.put(RETURN_KEY, NEW_DESTINATION);
+		shell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs);
+	}
+	
 
 	/*
 	 * (non-Javadoc)
@@ -289,7 +308,7 @@ public class FormTransportActivity implements
 					shell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs);
 					break;
 				case 1:
-					showURLform();
+					returnForDestination();
 					showMessageList();
 					break;
 				default:
@@ -299,26 +318,11 @@ public class FormTransportActivity implements
 				    Integer id = (Integer)transportMethods.elementAt(transportType);
 				    TransportMethod method = JavaRosaServiceProvider.instance().getTransportManager().getTransportMethod(id.intValue());
 				    if (method.getId() == TransportMethod.FILE) {
-						urlForm = new Form("FILENAME");
-						// destinationUrl = shell.getAppProperty("destination-file");
-						// TODO: put this back in when the property manager is
-						// complete again
-						textField = new TextField(
-								"Please enter destination path + filename",
-								destinationUrl, 140, TextField.ANY);
-
-						urlForm.append(textField);
-						urlForm.addCommand(CMD_OK);
-						urlForm.addCommand(CMD_BACK);
-						urlForm.setCommandListener(this);
-						this.currentMethod = TransportMethod.FILE;
-						shell.setDisplay(this, urlForm);
+				    	this.returnForDestination();
 					}
 					break;
 				case 3:
 					break;
-
-
 				}
 			}
 		} else if (d == messageList) {
@@ -359,21 +363,7 @@ public class FormTransportActivity implements
 				JavaRosaServiceProvider.instance().getTransportManager().send(
 						message, TransportMethod.HTTP_GCF);
 			}
-		} else if (d == urlForm) {
-			if (c == CMD_BACK) {
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-						null);
-			} else if (c == CMD_OK) {
-				processURLform();
-				try {
-					sendData(currentMethod);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-						null);
-			}
-		} else if (d == submitStatusScreen) {
+		}  else if (d == submitStatusScreen) {
 			submitStatusScreen.destroy();
 			submitStatusScreen = null;
 			shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
@@ -392,23 +382,6 @@ public class FormTransportActivity implements
 		shell.setDisplay(this, messageList);
 	}
 
-	public void showURLform() {
-		showURLform(this);
-	}
-
-	public void showURLform(CommandListener listener) {
-		urlForm = new Form ("URL");
-		destinationUrl = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty("PostURL");
-		textField = new TextField("Please enter destination string",
-				destinationUrl,140,TextField.URL);
-		urlForm.append(textField);
-		urlForm.addCommand(CMD_OK);
-		urlForm.addCommand(CMD_BACK);
-		urlForm.setCommandListener(listener);
-		this.currentMethod = TransportMethod.HTTP_GCF;
-		shell.setDisplay(this, urlForm);
-	}
-
 	private Object elementAt(int index, Enumeration en) {
 		int i = 0;
 		while (en.hasMoreElements()) {
@@ -421,33 +394,18 @@ public class FormTransportActivity implements
 		return null;
 	}
 
-	public void processURLform() {
-		destinationUrl = textField.getString();
-	}
-
-	public void setDestURL (String URL) {
-		destinationUrl = URL;
+	public void setDestination(ITransportDestination destination) {
+		this.destination = destination;
 	}
 
 	/**
 	 * @throws IOException
 	 */
 	public void sendData(int transportMethod) throws IOException {
-		Vector existingURLs = JavaRosaServiceProvider.instance()
-				.getPropertyManager().getProperty(
-						HttpTransportProperties.POST_URL_LIST_PROPERTY);
-		if (!existingURLs.contains(destinationUrl)) {
-			existingURLs.addElement(destinationUrl);
-			JavaRosaServiceProvider.instance().getPropertyManager()
-					.setProperty(
-							HttpTransportProperties.POST_URL_LIST_PROPERTY,
-							existingURLs);
-		}
-
 		if(this.data != null) {
 			byte[] dataBytes =  dataModelSerializer.serializeDataModel(data);
 			JavaRosaServiceProvider.instance().getTransportManager().enqueue(dataBytes,
-					destinationUrl, transportMethod, this.data.getId());
+					destination, transportMethod, this.data.getId());
 		}else{
 			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,
 					AlertType.ERROR);
@@ -507,5 +465,13 @@ public class FormTransportActivity implements
 	}
 	public Context getActivityContext() {
 		return context;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.shell = shell;
 	}
 }

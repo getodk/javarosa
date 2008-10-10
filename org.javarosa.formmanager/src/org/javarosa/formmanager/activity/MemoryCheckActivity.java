@@ -83,4 +83,11 @@ public class MemoryCheckActivity implements IActivity
 		mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
 		//can add commands to give user option to take action here...
     }
+    /*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.mainShell = shell;
+	}
 }

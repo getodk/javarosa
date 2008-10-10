@@ -50,6 +50,7 @@
 					<!--source dir="${dir.test}"/-->
 					<source dir="${basedir}/../org.javarosa.action/src/"/>
 					<source dir="${basedir}/../org.javarosa.communication/src/"/>
+					<source dir="${basedir}/../org.javarosa.communication.ui/src/"/>
 					<source dir="${basedir}/../org.javarosa.clforms/src/"/>
 					<source dir="${basedir}/../org.javarosa.clforms/test/"/>
 					<source dir="${basedir}/../org.javarosa.core/src/"/>

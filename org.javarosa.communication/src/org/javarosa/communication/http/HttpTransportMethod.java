@@ -3,12 +3,16 @@ package org.javarosa.communication.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Vector;
 
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 
@@ -23,6 +27,8 @@ public class HttpTransportMethod implements TransportMethod {
 	private TransportMessage message;
 
 	private ITransportManager manager;
+	
+	private IActivity destinationRetrievalActivity;
 
 	/*
 	 * (non-Javadoc)
@@ -30,9 +36,24 @@ public class HttpTransportMethod implements TransportMethod {
 	 * @see org.openmrs.transport.TransportMethod#transmit(org.openmrs.transport.TransportMessage)
 	 */
 	public void transmit(TransportMessage message, ITransportManager manager) {
+		cacheURL(message);
 		this.message = message;
 		this.manager = manager;
 		new Thread(new WorkerThread()).start();
+	}
+	
+	private void cacheURL(TransportMessage message) {
+		String destinationUrl = ((HttpTransportDestination)message.getDestination()).getURL();
+		Vector existingURLs = JavaRosaServiceProvider.instance()
+		.getPropertyManager().getProperty(
+				HttpTransportProperties.POST_URL_LIST_PROPERTY);
+		if (!existingURLs.contains(destinationUrl)) {
+			existingURLs.addElement(destinationUrl);
+			JavaRosaServiceProvider.instance().getPropertyManager()
+			.setProperty(
+					HttpTransportProperties.POST_URL_LIST_PROPERTY,
+					existingURLs);
+		}
 	}
 
 	/**
@@ -52,7 +73,8 @@ public class HttpTransportMethod implements TransportMethod {
 			OutputStream out = null;
 			int responseCode;
 			try {
-				con = (HttpConnection) Connector.open(message.getDestination());
+				HttpTransportDestination destination = (HttpTransportDestination)message.getDestination();
+				con = (HttpConnection) Connector.open(destination.getURL());
 
 				con.setRequestMethod(HttpConnection.POST);
 				con.setRequestProperty("User-Agent",
@@ -202,4 +224,23 @@ public class HttpTransportMethod implements TransportMethod {
 		return TransportMethod.HTTP_GCF;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.services.transport.TransportMethod#getDefaultDestination()
+	 */
+	public ITransportDestination getDefaultDestination() {
+		String url = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(HttpTransportProperties.POST_URL_PROPERTY);
+		if(url == null) {
+			return null;
+		} else {
+			return new HttpTransportDestination(url);
+		}
+	}
+	public void setDestinationRetrievalActivity(IActivity activity) {
+		destinationRetrievalActivity = activity;
+	}
+	
+	public IActivity getDestinationRetrievalActivity() {
+		return destinationRetrievalActivity;
+	}
 }
