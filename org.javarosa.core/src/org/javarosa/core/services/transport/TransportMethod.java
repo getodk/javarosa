@@ -1,5 +1,6 @@
 package org.javarosa.core.services.transport;
 
+import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
 
 /**
@@ -15,6 +16,8 @@ public interface TransportMethod {
 	public static final int BLUETOOTH = 3;
 	public static final int HTTP_IO = 4;
 	public static final int SMS = 5;
+	
+	public static final String DESTINATION_KEY = "destination";
 
 	/**
 	 * @param message
@@ -32,4 +35,13 @@ public interface TransportMethod {
 	 */
 	public int getId();
 
+	/**
+	 * @return Gets the default destination for Messages of this specific
+	 * Method.
+	 */
+	public ITransportDestination getDefaultDestination();
+	
+	public void setDestinationRetrievalActivity(IActivity activity);
+	
+	public IActivity getDestinationRetrievalActivity();
 }

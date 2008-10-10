@@ -9,7 +9,12 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
 
+import org.javarosa.communication.http.HttpTransportDestination;
+import org.javarosa.communication.http.HttpTransportProperties;
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
@@ -26,6 +31,8 @@ public class FileConnectionTransportMethod implements TransportMethod {
 	private TransportMessage message;
 
 	private ITransportManager manager;
+	
+	private IActivity destinationRetrievalActivity;
 
 	/**
 	 * Creates a new instance of <code>FileConnectionTransportMethod</code>
@@ -65,15 +72,10 @@ public class FileConnectionTransportMethod implements TransportMethod {
 					.hasMoreElements();) {
 				String root = (String) en.nextElement();
 			}
-			// String root = (String)
-			// FileSystemRegistry.listRoots().nextElement();
-			String root = "myModels/";
-			String filename = "test.txt";
-			String uri = "file:///" + root + filename;
-			uri = message.getDestination();
+			FileTransportDestination destination = (FileTransportDestination)message.getDestination();
 			FileConnection fcon = null;
 			try {
-				fcon = (FileConnection) Connector.open(uri);
+				fcon = (FileConnection) Connector.open(destination.getURI());
 				if (!fcon.exists()) {
 					fcon.create();
 				}
@@ -121,4 +123,24 @@ public class FileConnectionTransportMethod implements TransportMethod {
 		return TransportMethod.FILE;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.services.transport.TransportMethod#getDefaultDestination()
+	 */
+	public ITransportDestination getDefaultDestination() {
+		String uri = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(FileTransportProperties.SAVE_URI_PROPERTY);
+		if(uri == null) {
+			return null;
+		} else {
+			return new FileTransportDestination(uri);
+		}
+	}
+	
+	public void setDestinationRetrievalActivity(IActivity activity) {
+		destinationRetrievalActivity = activity;
+	}
+	
+	public IActivity getDestinationRetrievalActivity() {
+		return destinationRetrievalActivity;
+	}
 }

@@ -127,5 +127,13 @@ public class AddUserActivity implements IActivity, CommandListener {
 		//	parent.setDisplay(this, this.formsList);			
 		}
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.parent = shell;
+	}
 
 }

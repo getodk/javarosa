@@ -3,6 +3,7 @@ package org.javarosa.core.services;
 import java.io.IOException;
 import java.util.Enumeration;
 
+import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
@@ -28,7 +29,7 @@ public interface ITransportManager extends IService {
 	 * @param formDataId The ID of the form that should be transmitted
 	 * @throws IOException If the transport method requested is not available 
 	 */
-	public abstract void enqueue(byte[] data, String destination,
+	public abstract void enqueue(byte[] data, ITransportDestination destination,
 			int transportMethod, int formDataId) throws IOException;
 
 	/**
@@ -41,7 +42,16 @@ public interface ITransportManager extends IService {
 	 * ID, registered with this manager. null if none exists 
 	 */
 	public abstract TransportMethod getTransportMethod(int transportMethod);
-
+	
+	/**
+	 * Sets the current transport method.
+	 * @param transportMethodId The Id of a registered transport method.
+	 * The current transport method will only be set if this Id is registered.
+	 */
+	public abstract void setCurrentTransportMethod(int transportMethodId);
+	
+	public abstract int getCurrentTransportMethod();
+	
 	/**
 	 * Fires a string to the current message listener
 	 * 
@@ -126,4 +136,13 @@ public interface ITransportManager extends IService {
 
 	
 	public int getModelDeliveryStatus (int modelID, boolean notFoundOK);
+	
+	/**
+	 * 
+	 * @param i The index of the transport method whose current default destination
+	 * should be returned.
+	 * @return The default Transport Destination current used by the transport
+	 * method requested.
+	 */
+	public ITransportDestination getDefaultTransportDestination(int transportMethod);
 }

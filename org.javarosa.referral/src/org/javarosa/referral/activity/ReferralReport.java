@@ -99,4 +99,12 @@ public class ReferralReport implements IActivity, CommandListener {
 	public void commandAction(Command arg0, Displayable arg1) {
 		parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.parent = shell;
+	}
 }

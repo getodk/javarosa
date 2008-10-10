@@ -140,4 +140,22 @@ public class Context {
 		
 		return differentValues;
 	}
+	
+	/**
+	 * Places all values in the given hashtable into the Context
+	 *      
+	 * @param context the context whose values will be written to this context
+	 */
+	public void addAllValues(Hashtable values) {
+		Enumeration en = values.keys();
+		
+		while(en.hasMoreElements()) {
+			String key = (String)en.nextElement();
+			Object value = values.get(key);
+			
+			if(getElement(key) != value) {
+				setElement(key,value);
+			}
+		}
+	}
 }

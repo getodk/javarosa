@@ -24,5 +24,6 @@
 	<classpathentry kind="lib" path="lib/j2meunit-javarosa.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.chatterbox.extensions"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.clforms"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication.ui"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

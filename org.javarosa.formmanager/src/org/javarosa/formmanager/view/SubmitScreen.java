@@ -30,7 +30,7 @@ public class SubmitScreen extends Form {
 		//for their numerical order.
 		cg.append(SEND_NOW_DEFAULT_STRING, null);
 		cg.append(SEND_LATER_STRING, null);
-		//cg.append(SEND_NOW_SPEC_STRING, null);//clients wont need to see this
+		cg.append(SEND_NOW_SPEC_STRING, null);//clients wont need to see this
 		cg.setSelectedIndex(0, true);
 				
 		append(cg);

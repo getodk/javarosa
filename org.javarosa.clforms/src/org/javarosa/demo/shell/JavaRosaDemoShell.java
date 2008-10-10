@@ -92,7 +92,6 @@ public class JavaRosaDemoShell implements IShell {
 		loadModules();
 		loadProperties();
 		startGCThread();
-		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
 
 		boolean readSerialized = false;
 		boolean genSerialized = false;

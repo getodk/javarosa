@@ -210,4 +210,12 @@ public class FormListActivity implements IActivity {
 	public void addNewMenuCommand(Command c) {
 		this.formsList.addCommand(c);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.parent = shell;
+	}
 }

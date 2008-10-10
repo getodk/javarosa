@@ -404,5 +404,13 @@ private static String pName, pCode, pLocation, pSickness, pDiagnosis, pPeriod, p
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.parent = shell;
+	}
 
 }
