@@ -62,6 +62,7 @@
 					<source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox.extensions/src/"/>
+					<source dir="${basedir}/../org.javarosa.referral/src/"/>
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>

@@ -35,6 +35,7 @@ import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.chatterbox.widget.ExtendedWidgetsModule;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.referral.ReferralModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.AddUserActivity;
 import org.javarosa.user.activity.LoginActivity;
@@ -91,6 +92,7 @@ public class JavaRosaDemoShell implements IShell {
 		new FormManagerModule().registerModule(context);
 		new ExtendedWidgetsModule().registerModule(context);
 		new CommunicationUIModule().registerModule(context);
+		new ReferralModule().registerModule(context);
 	}
 	
 	private void generateSerializedForms(String originalResource) {

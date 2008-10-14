@@ -25,5 +25,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.chatterbox.extensions"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.clforms"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication.ui"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.referral"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
