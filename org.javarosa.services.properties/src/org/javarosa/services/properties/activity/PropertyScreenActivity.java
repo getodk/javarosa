@@ -118,7 +118,7 @@ public class PropertyScreenActivity implements IActivity, CommandListener, ItemS
         if (item instanceof ChoiceGroup) {
             ChoiceGroup cg = (ChoiceGroup) item;
             Vector choices = (Vector) screen.getItemChoices().get(cg);
-            String propertyName = cg.getLabel();
+            String propertyName = screen.nameFromItem(cg);
             if (cg.getSelectedIndex() >= 0) {
                 String selection = (String) choices.elementAt(cg
                         .getSelectedIndex());
@@ -134,7 +134,7 @@ public class PropertyScreenActivity implements IActivity, CommandListener, ItemS
             }
         } else if (item instanceof TextField) {
             TextField tf = (TextField) item;
-            String propertyName = tf.getLabel();
+            String propertyName = screen.nameFromItem(tf);
             // This is a weird way to do this, but essentially works as long as
             // there is only
             // one possible property (which is true for now).
