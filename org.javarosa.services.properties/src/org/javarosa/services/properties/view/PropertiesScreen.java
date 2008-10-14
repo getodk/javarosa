@@ -24,6 +24,9 @@ public class PropertiesScreen extends Form{
     Hashtable itemChoices;
 
     Hashtable changes;
+    
+    /** item -> String **/
+    Hashtable itemForPropertyName;
 
     Display currentDisplay;
 
@@ -35,6 +38,7 @@ public class PropertiesScreen extends Form{
         super("Properties");
         itemChoices = new Hashtable();
         changes = new Hashtable();
+        itemForPropertyName = new Hashtable();
         this.propertyManager = propertyManager;
 
         populateProperties();
@@ -83,8 +87,9 @@ public class PropertiesScreen extends Form{
 
 						// Create the UI Elements
 						ChoiceGroup newChoiceGroup = new ChoiceGroup(
-								propertyName, ChoiceGroup.EXCLUSIVE);
+								rules.getHumanReadableDescription(propertyName), ChoiceGroup.EXCLUSIVE);
 						itemChoices.put(newChoiceGroup, options);
+						itemForPropertyName.put(newChoiceGroup, propertyName);
 
 						// Seek through to find the property in the list of
 						// potentials
@@ -94,7 +99,7 @@ public class PropertiesScreen extends Form{
 							if (option.equals(currentSelection)) {
 								selindex = j;
 							}
-							newChoiceGroup.append(option, null);
+							newChoiceGroup.append(rules.getHumanReadableValue(propertyName, option), null);
 						}
 
 						// Finish it all up
@@ -108,21 +113,22 @@ public class PropertiesScreen extends Form{
 					// for now, we'll stick with single-selection properties
 					if (propValues != null) {
 						if (propValues.size() <= 1
-								&& !rules
-										.checkPropertyUserReadOnly(propertyName)) {
-							TextField input = new TextField(propertyName,
+								&& !rules.checkPropertyUserReadOnly(propertyName)) {
+							TextField input = new TextField(rules.getHumanReadableDescription(propertyName),
 									(String) propValues.elementAt(0), 50,
 									TextField.ANY);
 							this.append(input);
+							itemForPropertyName.put(input, propertyName);
 
 						}
 					}
 					else {
 						if(!rules.checkPropertyUserReadOnly(propertyName)) {
-							TextField input = new TextField(propertyName,
+							TextField input = new TextField(rules.getHumanReadableDescription(propertyName),
 									"", 50,
 									TextField.ANY);
 							this.append(input);
+							itemForPropertyName.put(input, propertyName);
 						}
 					}
 				}
@@ -199,5 +205,9 @@ public class PropertiesScreen extends Form{
 
     public Hashtable getItemChoices() {
     	return itemChoices;
+    }
+    
+    public String nameFromItem(Item item) {
+    	return (String)itemForPropertyName.get(item);
     }
 }
