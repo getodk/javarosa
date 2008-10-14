@@ -106,4 +106,27 @@ public class HttpTransportProperties implements IPropertyRules {
     public boolean checkPropertyUserReadOnly(String propertyName){
         return readOnlyProperties.contains(propertyName);
     }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableDescription(java.lang.String)
+     */
+    public String getHumanReadableDescription(String propertyName) {
+    	if(POST_URL_LIST_PROPERTY.equals(propertyName)) {
+    		return "List of possible POST URL's";
+    	} else if(POST_URL_PROPERTY.equals(propertyName)) {
+    		return "Current URL for POST's";
+    	} else if(GET_URL_PROPERTY.equals(propertyName)) {
+    		return "Current URL for GET's";
+     	}
+    	return propertyName;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableValue(java.lang.String, java.lang.String)
+     */
+    public String getHumanReadableValue(String propertyName, String value) {
+    	return value;
+    }
 }

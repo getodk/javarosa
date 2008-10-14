@@ -99,4 +99,33 @@ public class DemoAppProperties implements IPropertyRules {
 	    public boolean checkPropertyUserReadOnly(String propertyName){
 	        return readOnlyProperties.contains(propertyName);
 	    }
+	    /*
+	     * (non-Javadoc)
+	     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableDescription(java.lang.String)
+	     */
+	    public String getHumanReadableDescription(String propertyName) {
+	    	if(HEALTH_UNIT_PROPERTY.equals(propertyName)) {
+	    		return "Health Unit";
+	    	} else if(HEALTH_UNIT_CODE_PROPERTY.equals(propertyName)) {
+	    		return "Health Unit Code";
+	    	} else if(SUBCOUNTY_PROPERTY.equals(propertyName)) {
+	    		return "Sub County";
+	     	} else if(DISTRICT_PROPERTY.equals(propertyName)) {
+	    		return "District";
+	     	} else if(HSD_PROPERTY.equals(propertyName)) {
+	    		return "HSD";
+	     	} else if(FIN_YEAR_PROPERTY.equals(propertyName)) {
+	    		return "Financial Year";
+	     	}
+	    	
+	    	return propertyName;
+	    }
+
+	    /*
+	     * (non-Javadoc)
+	     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableValue(java.lang.String, java.lang.String)
+	     */
+	    public String getHumanReadableValue(String propertyName, String value) {
+	    	return value;
+	    }
 }

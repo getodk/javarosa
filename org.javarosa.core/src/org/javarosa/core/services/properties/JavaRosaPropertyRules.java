@@ -89,4 +89,23 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     public boolean checkPropertyUserReadOnly(String propertyName){
         return readOnlyProperties.contains(propertyName);
     }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableDescription(java.lang.String)
+     */
+    public String getHumanReadableDescription(String propertyName) {
+    	if(DEVICE_ID_PROPERTY.equals(propertyName)) {
+    		return "Unique Device ID";
+    	}
+    	return propertyName;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableValue(java.lang.String, java.lang.String)
+     */
+    public String getHumanReadableValue(String propertyName, String value) {
+    	return value;
+    }
 }
