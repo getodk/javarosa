@@ -95,4 +95,29 @@ public class FormManagerProperties implements IPropertyRules {
 	    public boolean checkPropertyUserReadOnly(String propertyName){
 	        return readOnlyProperties.contains(propertyName);
 	    }
+	    /*
+	     * (non-Javadoc)
+	     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableDescription(java.lang.String)
+	     */
+	    public String getHumanReadableDescription(String propertyName) {
+	    	if(VIEW_TYPE_PROPERTY.equals(propertyName)) {
+	    		return "Form Entry View";
+	    	}
+	    	return propertyName;
+	    }
+	    
+	    /*
+	     * (non-Javadoc)
+	     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableValue(java.lang.String, java.lang.String)
+	     */
+	    public String getHumanReadableValue(String propertyName, String value) {
+	    	if(VIEW_TYPE_PROPERTY.equals(propertyName)) {
+	    		if(VIEW_CHATTERBOX.equals(value)) {
+	    			return "Chatterbox";
+	    		} else if(VIEW_CLFORMS.equals(value)) {
+	    			return "One Question Per Screen"; 
+	    		}
+	     	}
+	    	return value;
+	    }
 }

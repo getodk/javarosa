@@ -5,6 +5,10 @@ import java.util.Vector;
 /**
  * The IPropertyRules interface is used to describe a set of rules for what properties are allowed for a given
  * property manager, and what values are are acceptable for a given property.
+ * 
+ * Essentially, individual properties should be considered to be actual persistent storage
+ * for a device's specific configuration, and a set of property rules should be considered
+ * to be the non-persistent meta-data surrounding what those configurations mean.
  *  
  * @author ctsims
  *
@@ -54,4 +58,27 @@ public interface IPropertyRules {
      * @return True if the property specified may not be modified by the user. false otherwise
      */
     public boolean checkPropertyUserReadOnly(String propertyName);
+    
+    /**
+     * Returns a human readable string representing the description of a
+     * property.
+     *  
+     * @param propertyName The name of the property to be described
+     * @return A string that describes the meaning of the property name
+     */
+    public String getHumanReadableDescription(String propertyName);
+    
+    /**
+     * Returns a human readable string representing the value of a specific
+     * property. This allows multiple choice answers to be stored in a concise
+     * format, while offering a standardized way to present those options to
+     * a user.
+     *  
+     * @param propertyName The name of the property whose value is to be 
+     * interpreted.
+     * @param value The value to be interpreted as a String
+     * @return A string representing the passed in value that can be parsed by 
+     * a user to determine what its significance is.
+     */
+    public String getHumanReadableValue(String propertyName, String value);
 }

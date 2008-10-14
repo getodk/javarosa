@@ -106,4 +106,28 @@ public class FileTransportProperties implements IPropertyRules {
     public boolean checkPropertyUserReadOnly(String propertyName){
         return readOnlyProperties.contains(propertyName);
     }
+
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableDescription(java.lang.String)
+     */
+    public String getHumanReadableDescription(String propertyName) {
+    	if(SAVE_URI_LIST_PROPERTY.equals(propertyName)) {
+    		return "List of possible file save locations";
+    	} else if(SAVE_URI_PROPERTY.equals(propertyName)) {
+    		return "Current file system save location";
+    	} else if(LOAD_URI_PROPERTY.equals(propertyName)) {
+    		return "Current file system load location";
+     	}
+    	return propertyName;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableValue(java.lang.String, java.lang.String)
+     */
+    public String getHumanReadableValue(String propertyName, String value) {
+    	return value;
+    }
+    
 }
