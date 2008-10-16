@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.reminders.properties.ReminderPropertyRules;
 import org.javarosa.reminders.storage.ReminderRMSUtility;
 import org.javarosa.reminders.thread.ReminderBackgroundService;
 
@@ -18,12 +19,17 @@ public class ReminderNotifier {
 	boolean running = false;
 
 	public void startService() {
-		if (!running) {
-			timer = new Timer();
-			ReminderBackgroundService service = new ReminderBackgroundService();
-			service.setReminderNotifier(this);
-			timer.schedule(service, 0, period);
-			running = true;
+		String enabledProperty = JavaRosaServiceProvider.instance()
+				.getPropertyManager().getSingularProperty(
+						ReminderPropertyRules.REMINDERS_ENABLED_PROPERTY);
+		if (ReminderPropertyRules.REMINDERS_ENABLED.equals(enabledProperty)) {
+			if (!running) {
+				timer = new Timer();
+				ReminderBackgroundService service = new ReminderBackgroundService();
+				service.setReminderNotifier(this);
+				timer.schedule(service, 0, period);
+				running = true;
+			}
 		}
 	}
 
@@ -38,7 +44,9 @@ public class ReminderNotifier {
 	 * @return the reminders
 	 */
 	public Vector getReminders() {
-		ReminderRMSUtility reminderRms = (ReminderRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(ReminderRMSUtility.getUtilityName());
+		ReminderRMSUtility reminderRms = (ReminderRMSUtility) JavaRosaServiceProvider
+				.instance().getStorageManager().getRMSStorageProvider()
+				.getUtility(ReminderRMSUtility.getUtilityName());
 		try {
 			return reminderRms.getReminders();
 		} catch (IOException e) {
