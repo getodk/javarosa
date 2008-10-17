@@ -129,5 +129,11 @@ public class FileTransportProperties implements IPropertyRules {
     public String getHumanReadableValue(String propertyName, String value) {
     	return value;
     }
-    
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.properties.IPropertyRules#handlePropertyChanges(java.lang.String)
+     */
+    public void handlePropertyChanges(String propertyName) {
+    	//Nothing
+    }
 }

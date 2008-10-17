@@ -81,4 +81,12 @@ public interface IPropertyRules {
      * a user to determine what its significance is.
      */
     public String getHumanReadableValue(String propertyName, String value);
+    
+    /**
+     * Handles any state changes that would be required upon a specific value
+     * being changed.
+     * 
+     * @param propertyName The name of the property that has changed
+     */
+    public void handlePropertyChanges(String propertyName);
 }

@@ -61,4 +61,11 @@ public class ReferralPropertyRules implements IPropertyRules {
 		}
 		return null;
 	}
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.properties.IPropertyRules#handlePropertyChanges(java.lang.String)
+     */
+    public void handlePropertyChanges(String propertyName) {
+    	//Is there anything to be done here? 
+    }
 }

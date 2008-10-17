@@ -1,11 +1,11 @@
 package org.javarosa.core;
 
 import java.util.Hashtable;
-import java.util.Vector;
 
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
+import org.javarosa.core.api.IDaemon;
 import org.javarosa.core.services.IService;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.PropertyManager;
@@ -28,6 +28,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class JavaRosaServiceProvider {
 	protected static JavaRosaServiceProvider instance;
+	
+	private Hashtable daemons;
 
 	private Display display;
 	
@@ -41,6 +43,7 @@ public class JavaRosaServiceProvider {
 	public JavaRosaServiceProvider() {
 		services = new Hashtable();
 		prototypes = new PrefixTree();
+		daemons = new Hashtable();
 	}
 	
 	public static JavaRosaServiceProvider instance() {
@@ -102,6 +105,17 @@ public class JavaRosaServiceProvider {
 			this.registerService(propertyManager);
 		}
 		return propertyManager;
+	}
+	
+
+	public void registerDaemon(IDaemon daemon, String name) {
+		daemons.put(name, daemon);
+	}
+	
+	public IDaemon getDaemon(String name) {
+		IDaemon daemon = (IDaemon)daemons.get(name);
+		//Do we want to handle the null case with an exception, like with services?
+		return daemon;
 	}
 	
 	public void registerService(IService service) {
