@@ -10,16 +10,16 @@ import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.Map;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.ImmunizationRow;
 import org.javarosa.patient.model.data.NumericListData;
-import org.javarosa.util.Utilities;
 
 /**
  * Encapsulates demographic data about a patient and contains 
@@ -486,6 +486,6 @@ public class Patient implements Externalizable, IDRecordable {
 		attributes.addElement("MiddleName: " + (getMiddleName() != null ? getMiddleName() : NULL_DISPLAY_VALUE));
 		attributes.addElement("GivenName: " + (getGivenName() != null ? getGivenName() : NULL_DISPLAY_VALUE));
 		attributes.addElement("Gender: " + (getGender() == SEX_MALE ? "Male" : getGender() == SEX_FEMALE ? "Female" : NULL_DISPLAY_VALUE));
-		attributes.addElement("BirthDate: " + (getBirthDate() != null ? Utilities.dateToString(getBirthDate()) : NULL_DISPLAY_VALUE));
+		attributes.addElement("BirthDate: " + (getBirthDate() != null ? DateUtils.getXMLStringValue(getBirthDate()) : NULL_DISPLAY_VALUE));
 	}
 }
