@@ -48,7 +48,6 @@
 					<source dir="${dir.src}"/>
 					<!--Taking this out for now...-->
 					<!--source dir="${dir.test}"/-->
-					<source dir="${basedir}/../org.javarosa.action/src/"/>
 					<source dir="${basedir}/../org.javarosa.communication/src/"/>
 					<source dir="${basedir}/../org.javarosa.communication.ui/src/"/>
 					<source dir="${basedir}/../org.javarosa.clforms/src/"/>
@@ -64,15 +63,19 @@
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox.extensions/src/"/>
 					<source dir="${basedir}/../org.javarosa.referral/src/"/>
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
-					<source dir="${basedir}/../org.javarosa.util/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/test/"/>
-					<!-- <source dir="${basedir}/../org.javarosa.entitymgr/src/"/> -->
 					<source dir="${basedir}/../org.javarosa.patient/src/"/>
 					<source dir="${basedir}/../org.javarosa.patient/test/"/>
-				<!--	<source dir="${basedir}/../org.javarosa.patientmgr/src/"/> -->
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/test/"/>
+					
+					<!-- defunct
+					<source dir="${basedir}/../org.javarosa.action/src/"/>
+					<source dir="${basedir}/../org.javarosa.util/src/"/>
+					<source dir="${basedir}/../org.javarosa.entitymgr/src/"/>
+					<source dir="${basedir}/../org.javarosa.patientmgr/src/"/>
+					-->
 				</sources>
 
 				<!-- Build variables -->
