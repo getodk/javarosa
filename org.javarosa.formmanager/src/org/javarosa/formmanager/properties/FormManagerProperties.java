@@ -120,4 +120,11 @@ public class FormManagerProperties implements IPropertyRules {
 	     	}
 	    	return value;
 	    }
+	    /*
+	     * (non-Javadoc)
+	     * @see org.javarosa.core.services.properties.IPropertyRules#handlePropertyChanges(java.lang.String)
+	     */
+	    public void handlePropertyChanges(String propertyName) {
+	    	//Is there anything we can do here?
+	    }
 }

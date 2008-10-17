@@ -5,20 +5,35 @@ import java.util.Timer;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.IDaemon;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.reminders.properties.ReminderPropertyRules;
 import org.javarosa.reminders.storage.ReminderRMSUtility;
 import org.javarosa.reminders.thread.ReminderBackgroundService;
 
-public class ReminderNotifier {
+public class ReminderNotifierDaemon implements IDaemon {
 	public static final int period = 1000 * 60 * 5;
+	
+	public static final String DEFAULT_NAME = "Reminder Notifier Daemon";
 
 	INotificationReceiver notificationReceiver;
 
 	Timer timer;
 	boolean running = false;
 
-	public void startService() {
+	public String getName() {
+		return "Reminders Daemon";
+	}
+
+	public void restart() {
+		if(isRunning()) {
+			stop();
+		} else {
+			start();
+		}
+		
+	}
+	public void start() {
 		String enabledProperty = JavaRosaServiceProvider.instance()
 				.getPropertyManager().getSingularProperty(
 						ReminderPropertyRules.REMINDERS_ENABLED_PROPERTY);
@@ -33,7 +48,7 @@ public class ReminderNotifier {
 		}
 	}
 
-	public void stopService() {
+	public void stop() {
 		if (running) {
 			timer.cancel();
 			running = false;
@@ -50,16 +65,16 @@ public class ReminderNotifier {
 		try {
 			return reminderRms.getReminders();
 		} catch (IOException e) {
-			this.stopService();
+			this.stop();
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			this.stopService();
+			this.stop();
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			this.stopService();
+			this.stop();
 			e.printStackTrace();
 		} catch (DeserializationException e) {
-			this.stopService();
+			this.stop();
 			e.printStackTrace();
 		}
 		return new Vector();
@@ -90,5 +105,4 @@ public class ReminderNotifier {
 			notificationReceiver.receiveReminders(expiredReminders);
 		}
 	}
-
 }

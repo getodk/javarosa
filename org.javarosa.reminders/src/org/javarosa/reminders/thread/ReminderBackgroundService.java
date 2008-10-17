@@ -6,10 +6,10 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import org.javarosa.reminders.model.Reminder;
-import org.javarosa.reminders.util.ReminderNotifier;
+import org.javarosa.reminders.util.ReminderNotifierDaemon;
 
 public class ReminderBackgroundService extends TimerTask {
-	private ReminderNotifier notifier;
+	private ReminderNotifierDaemon notifier;
 	
 	/*
 	 * (non-Javadoc)
@@ -35,7 +35,7 @@ public class ReminderBackgroundService extends TimerTask {
 	}
 	
 	
-	public void setReminderNotifier(ReminderNotifier notifier) {
+	public void setReminderNotifier(ReminderNotifierDaemon notifier) {
 		this.notifier = notifier;
 	}
 }

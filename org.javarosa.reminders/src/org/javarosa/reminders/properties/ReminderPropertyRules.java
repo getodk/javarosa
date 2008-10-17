@@ -2,7 +2,10 @@ package org.javarosa.reminders.properties;
 
 import java.util.Vector;
 
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.IDaemon;
 import org.javarosa.core.services.properties.IPropertyRules;
+import org.javarosa.reminders.util.ReminderNotifierDaemon;
 
 public class ReminderPropertyRules implements IPropertyRules {
 	public final static String REMINDERS_ENABLED_PROPERTY = "rem_enabled";
@@ -61,4 +64,28 @@ public class ReminderPropertyRules implements IPropertyRules {
 		}
 		return null;
 	}
+    /*
+     * (non-Javadoc)
+     * @see org.javarosa.core.services.properties.IPropertyRules#handlePropertyChanges(java.lang.String)
+     */
+    public void handlePropertyChanges(String propertyName) {
+    	String value = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(REMINDERS_ENABLED_PROPERTY);
+    	IDaemon daemon = JavaRosaServiceProvider.instance().getDaemon(ReminderNotifierDaemon.DEFAULT_NAME);
+    	if(REMINDERS_ENABLED.equals(value)) {
+    		if(daemon.isRunning()) {
+    			//#if debug.output==verbose
+    			System.out.println("The Reminder Notifier Daemon appears to have been running while disabled.");
+    			//#endif
+    			daemon.restart();
+    		} else {
+    			daemon.start();
+    		}
+    	}
+    	else if(REMINDERS_DISABLED.equals(value)) {
+    		if(daemon.isRunning()) {
+    			daemon.stop();
+    		}
+    	}
+    	
+    }
 }

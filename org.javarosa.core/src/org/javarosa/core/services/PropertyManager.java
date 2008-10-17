@@ -109,6 +109,11 @@ public class PropertyManager implements IService {
      * @param propertyValue The value that the property will be set to
      */
     public void setProperty(String propertyName, Vector propertyValue) {
+    	Vector oldValue = getProperty(propertyName);
+    	if(oldValue != null && vectorEquals(oldValue, propertyValue)) {
+    		//No point in redundantly setting values!
+    		return;
+    	}
         if(rulesList.size() == 0) {
            propertyRMS.writeValue(propertyName, propertyValue);
         }
@@ -122,6 +127,7 @@ public class PropertyManager implements IService {
             }
             if(valid) {
                 propertyRMS.writeValue(propertyName, propertyValue);
+                notifyChanges(propertyName);
             }
             //#if debug.output==verbose
             else {
@@ -130,6 +136,19 @@ public class PropertyManager implements IService {
             //#endif
         }
 
+    }
+    
+    private boolean vectorEquals(Vector v1, Vector v2) {
+    	if(v1.size() != v2.size()) {
+    		return false;
+    	} else {
+    		for(int i = 0; i < v1.size() ; ++i ) {
+    			if(!v1.elementAt(i).equals(v2.elementAt(i))) {
+    				return false;
+    			}
+    		}
+    	}
+    	return true;
     }
 
     /**
@@ -214,4 +233,25 @@ public class PropertyManager implements IService {
 		}
 	}
     
+    /**
+     * Identifies the property rules set that the property belongs to, and notifies
+     * it about the property change.
+     * 
+     * @param property The property that has been changed 
+     */
+    private void notifyChanges(String property) {
+    	if(rulesList.size() ==0 ) { 
+    		return;
+    	} 
+    	
+    	boolean notified = false;
+    	Enumeration rules = rulesList.elements();
+    	while(rules.hasMoreElements() && !notified) {
+    		IPropertyRules therules = (IPropertyRules)rules.nextElement();
+    		if(therules.checkPropertyAllowed(property)) {
+    			therules.handlePropertyChanges(property);
+    		}
+    	}
+    	
+    }
 }
