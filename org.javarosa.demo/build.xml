@@ -221,8 +221,8 @@
 			<arg value="obfuscation_mapping.txt" />
 		</exec-->
 	    <py-run script="${dir.tools}/jar_usage.py" optimize="0" python="${pythonexec}">
-	      <arg value="${deploy-url}${app.jarName}"/>
-	      <arg value="${deploy-url}/obfuscation_mapping.txt"/>
+	      <arg value="${dir.dist}/${app.jarName}"/>
+	      <arg value="${dir.dist}/obfuscation_mapping.txt"/>
 	    </py-run>
 	</target>
 	
