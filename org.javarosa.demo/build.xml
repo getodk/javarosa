@@ -151,13 +151,7 @@
 	</target>
 
 	<!-- Main Target: Cleans, and then runs the build target -->
-	<target name="BuildClean" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, BuildPolish">
-		<exec executable="python" failifexecutionfails="false" dir="dist">
-			<arg value="../tools/jar_usage.py" />
-			<arg value="JavaRosaDemoP.jar" />
-			<arg value="obfuscation_mapping.txt" />
-		</exec>
-	</target>
+	<target name="BuildClean" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, BuildPolish"/>
 
 	<!-- Main Target: Cleans, and then runs the build target with the emulator -->
 	<target name="BuildCleanRunEmulator" description="allows a clean build, and then launches the emulator" depends="Clean, enableEmulator, BuildPolish" />
@@ -219,6 +213,19 @@
 		     <mapper type="glob" from="*.dot" to="*.png"/>
 		  </apply>
 	</target>
+	
+	<target name="DecomposeJar" depends="BuildClean">
+		<!--exec executable="python" failifexecutionfails="false" dir="dist">
+			<arg value="../tools/jar_usage.py" />
+			<arg value="JavaRosaDemoP.jar" />
+			<arg value="obfuscation_mapping.txt" />
+		</exec-->
+	    <py-run script="${dir.tools}/jar_usage.py" optimize="0" python="${pythonexec}">
+	      <arg value="${app.jarName}"/>
+	      <arg value="obfuscation_mapping.txt"/>
+	    </py-run>
+	</target>
+	      	
 
 	<!-- Initialization for the build targets                    -->
 	<target name="init">
@@ -284,8 +291,12 @@
 
 	<!-- Definition of the J2ME Polish task:                      -->
 	<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
-		<path id="classpath.base">
+	<path id="classpath.base">
 	</path>
+	
+
+	<!-- Defines the py-run task                                  -->
+	<taskdef name="py-run" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.2.jar"/>
 
 	<!-- Note that most of this testing code was here to test our auto-integration tester, and isn't actually
 	     usable for testing J2ME code -->
