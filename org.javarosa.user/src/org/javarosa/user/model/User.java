@@ -10,8 +10,6 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
-//import javax.microedition.rms.RecordStoreException;
-
 
 
 public class User implements Externalizable, IDRecordable

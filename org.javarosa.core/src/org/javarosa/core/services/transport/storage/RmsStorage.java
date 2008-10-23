@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.rms.RecordStore;
-import javax.microedition.rms.RecordStoreException;
-
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.storage.utilities.IRecordStorage;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
@@ -122,18 +119,6 @@ public class RmsStorage implements Storage {
 	}
 
 	/**
-	 * Called when a record has been updated
-	 * 
-	 * @param recordStore
-	 * @param recordId
-	 */
-	public void recordAdded(RecordStore recordStore, int recordId) {
-		//#if debug.output==verbose
-		System.out.println("Record added with id " + recordId);
-		//#endif
-	}
-
-	/**
 	 * Loads transport message with given record id from RMS
 	 * 
 	 * @param recordId
@@ -215,31 +200,6 @@ public class RmsStorage implements Storage {
 		}
 		return messages;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.microedition.rms.RecordListener#recordChanged(javax.microedition.rms.RecordStore,
-	 *      int)
-	 */
-	public void recordChanged(RecordStore recordStore, int recordId) {
-		//#if debug.output==verbose
-		System.out.println("record changed, id=" + recordId);
-		//#endif
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.microedition.rms.RecordListener#recordDeleted(javax.microedition.rms.RecordStore,
-	 *      int)
-	 */
-	public void recordDeleted(RecordStore recordStore, int recordId) {
-		//#if debug.output==verbose
-		System.out.println("record deleted, id=" + recordId);
-		//#endif
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

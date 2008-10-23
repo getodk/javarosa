@@ -9,15 +9,14 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
-import javax.microedition.rms.RecordStore;
-import javax.microedition.rms.RecordStoreException;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
+import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.core.services.storage.utilities.RecordStorageException;
 
 public class PropertiesScreen extends Form{
 
@@ -137,35 +136,39 @@ public class PropertiesScreen extends Form{
 	}
 
     private void addRMSInfo() {
+    	Vector stores = JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtilityNames();
+        int consumedSpace[] = new int[stores.size()];
+        int availableSpace[] = new int[stores.size()];
+        
+        Enumeration names = stores.elements();
+		int i = 0;
 
-        String[] recordStores = RecordStore.listRecordStores();
-        int consumedSpace[] = new int[recordStores.length];
-        int availableSpace[] = new int[recordStores.length];
+		while (names.hasMoreElements()) {
+			String name = (String) names.nextElement();
+			RMSUtility utility = JavaRosaServiceProvider.instance()
+					.getStorageManager().getRMSStorageProvider().getUtility(
+							name);
 
-        for (int i = 0; i < recordStores.length; i++) {
-            try {
-                RecordStore r = RecordStore.openRecordStore(recordStores[i],
-                        false);
-                consumedSpace[i] = r.getSize();
-                availableSpace[i] = r.getSizeAvailable();
-                // really should close the recordstore here, but we don't do it
-                // anywhere else and it might introduce bugs
-            } catch (RecordStoreException e) {
-                consumedSpace[i] = -1;
-            }
-        }
+			consumedSpace[i] = (int) utility.getConsumedSpace();
+			availableSpace[i] = (int) utility.getAvailableSpace();
+			++i;
+		}
 
-        String devID = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty("DeviceID");
-        this.append(new StringItem(null, "Device ID: "+devID));
-        for (int i = 0; i < recordStores.length; i++) {
-        	this.append(new StringItem(null, recordStores[i]));
-        	this.append(new StringItem(null,"Available: "+ formatBytes(availableSpace[i])));
-            this.append(new StringItem(null,"Used: " + formatBytes(consumedSpace[i])));
-        }
+		String devID = JavaRosaServiceProvider.instance().getPropertyManager()
+				.getSingularProperty("DeviceID");
+		this.append(new StringItem(null, "Device ID: " + devID));
+		for (i = 0; i < stores.size(); i++) {
+			this.append(new StringItem(null, (String) stores.elementAt(i)
+					.toString()));
+			this.append(new StringItem(null, "Available: "
+					+ formatBytes(availableSpace[i])));
+			this.append(new StringItem(null, "Used: "
+					+ formatBytes(consumedSpace[i])));
+		}
 
-    }
+	}
 
-    private String formatBytes(int bytes) {
+	private String formatBytes(int bytes) {
         if (bytes == -1)
             return "error";
 

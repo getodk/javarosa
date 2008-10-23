@@ -422,6 +422,44 @@ public class RMSUtility
 			this.metaDataRMS.tempEmpty();
         }
 	}
+	
+	public float getConsumedSpace() {
+		float currentSize = 0;
+    	//get total size of record store
+    	try {
+			currentSize = recordStore.getSize();
+			if(this.metaDataRMS != null) {
+				currentSize += this.metaDataRMS.getConsumedSpace();
+			}
+			}
+    	catch (RecordStorageException e) {
+			// TODO Auto-generated catch block
+			//#if debug.output==verbose || debug.output==exception
+			e.printStackTrace();
+			//#endif
+		}
+    
+    	return currentSize;
+	}
+	
+	public float getAvailableSpace() {
+		float currentSize = 0;
+    	//get total size of record store
+    	try {
+			currentSize = recordStore.getSizeAvailable();
+			if(this.metaDataRMS != null) {
+				currentSize += this.metaDataRMS.getAvailableSpace();
+			}
+			}
+    	catch (RecordStorageException e) {
+			// TODO Auto-generated catch block
+			//#if debug.output==verbose || debug.output==exception
+			e.printStackTrace();
+			//#endif
+		}
+    
+    	return currentSize;
+	}
 
     public float computeSpace()
     {

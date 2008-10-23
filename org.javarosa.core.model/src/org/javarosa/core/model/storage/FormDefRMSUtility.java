@@ -3,9 +3,6 @@ package org.javarosa.core.model.storage;
 import java.io.IOException;
 import java.util.Vector;
 
-import javax.microedition.rms.InvalidRecordIDException;
-import javax.microedition.rms.RecordEnumeration;
-
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
