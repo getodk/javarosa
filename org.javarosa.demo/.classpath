@@ -26,5 +26,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.clforms"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication.ui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.referral"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.storage.rms"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

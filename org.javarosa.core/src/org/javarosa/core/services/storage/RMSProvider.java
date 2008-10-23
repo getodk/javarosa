@@ -5,6 +5,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.javarosa.core.services.storage.utilities.IRecordStoreFactory;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 
 
@@ -17,6 +18,8 @@ import org.javarosa.core.services.storage.utilities.RMSUtility;
 public class RMSProvider implements IStorageProvider
 {
     private Hashtable RMSRegistry = new Hashtable();
+    
+    IRecordStoreFactory storeFactory;
     
     /** Creates a new instance of RMSProvider */
     public RMSProvider()
@@ -76,4 +79,21 @@ public class RMSProvider implements IStorageProvider
     	return "RMS Provider";
     }
     
+    /**
+     * Sets the factory that can be used to produce new interfaces to
+     * on-device record storage.
+     * 
+     * @param factory The factory that should be used. 
+     */
+    public void setRecordStoreFactory(IRecordStoreFactory factory) {
+    	this.storeFactory = factory;
+    }
+    
+    /**
+     * @return The factory to be used to produce new interfaces to 
+     * on device storage.
+     */
+    public IRecordStoreFactory getRecordStoreFactory() {
+    	return this.storeFactory;
+    }
 }

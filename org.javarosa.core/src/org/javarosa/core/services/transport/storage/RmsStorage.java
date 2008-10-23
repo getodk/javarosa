@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.rms.RecordEnumeration;
-import javax.microedition.rms.RecordListener;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.storage.utilities.IRecordStorage;
+import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.services.transport.Storage;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -19,12 +21,12 @@ import org.javarosa.core.util.externalizable.ExtUtil;
  * 
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
-public class RmsStorage implements Storage, RecordListener {
+public class RmsStorage implements Storage {
 
 	/**
 	 * 
 	 */
-	private RecordStore messageRecordStore;
+	private IRecordStorage messageRecordStore;
 
 	/**
 	 * Name of the record store containing the messages
@@ -43,7 +45,7 @@ public class RmsStorage implements Storage, RecordListener {
 			message.setRecordId(recordId);
 			byte[] data = ExtUtil.serialize(message);
 			this.messageRecordStore.addRecord(data, 0, data.length);
-		} catch (RecordStoreException e) {
+		} catch (RecordStorageException e) {
 			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e);
 			//#endif
@@ -94,11 +96,10 @@ public class RmsStorage implements Storage, RecordListener {
 	/**
 	 * @throws RecordStoreException
 	 */
-	private void init() throws RecordStoreException {
+	private void init() throws RecordStorageException {
 		if (this.messageRecordStore == null) {
-			this.messageRecordStore = RecordStore.openRecordStore(RS_MSG_NAME,
-					true);
-			this.messageRecordStore.addRecordListener(this);
+			messageRecordStore = JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getRecordStoreFactory().produceNewStore();
+			messageRecordStore.openAsRecordStorage(RS_MSG_NAME, true);
 		}
 	}
 
@@ -110,10 +111,9 @@ public class RmsStorage implements Storage, RecordListener {
 	public void close() {
 		if (this.messageRecordStore != null) {
 			try {
-				this.messageRecordStore.removeRecordListener(this);
 				this.messageRecordStore.closeRecordStore();
 				this.messageRecordStore = null;
-			} catch (RecordStoreException e) {
+			} catch (RecordStorageException e) {
 				//#if debug.output==verbose || debug.output==exception
 				System.out.println(e);
 				//#endif
@@ -147,7 +147,7 @@ public class RmsStorage implements Storage, RecordListener {
 			TransportMessage message = new TransportMessage();
 			ExtUtil.deserialize(data, message);
 			return message;
-		} catch (RecordStoreException e) {
+		} catch (RecordStorageException e) {
 			//#if debug.output==verbose || debug.output==exception
 			System.out.println(e);
 			//#endif
@@ -174,7 +174,7 @@ public class RmsStorage implements Storage, RecordListener {
 			TransportMessage message = new TransportMessage();
 			ExtUtil.deserialize(data, message);
 			return message;
-		} catch (RecordStoreException e) {
+		} catch (RecordStorageException e) {
 			System.out.println(e);
 			throw new IOException(e.getMessage());
 		}
@@ -189,16 +189,16 @@ public class RmsStorage implements Storage, RecordListener {
 	 */
 	public Vector getMessages() {
 		Vector messages = new Vector();
-		RecordEnumeration en = null;
+		IRecordStoreEnumeration en = null;
 		try {
 			init();
-			en = messageRecordStore.enumerateRecords(null, null, true);
+			en = messageRecordStore.enumerateRecords();
 			while (en.hasNextElement()) {
 				int recordId = en.nextRecordId();
 				TransportMessage message = loadMessage(recordId);
 				messages.addElement(message);
 			}
-		} catch (RecordStoreException e) {
+		} catch (RecordStorageException e) {
 			System.out.println(e);
 			e.printStackTrace();
 		} catch (IOException e) {

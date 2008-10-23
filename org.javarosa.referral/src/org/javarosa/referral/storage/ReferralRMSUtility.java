@@ -1,11 +1,10 @@
 package org.javarosa.referral.storage;
 
 import java.io.IOException;
-import java.util.Vector;
 
-import javax.microedition.rms.InvalidRecordIDException;
-import javax.microedition.rms.RecordEnumeration;
+import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.referral.model.Referrals;
 
@@ -59,7 +58,7 @@ public class ReferralRMSUtility extends RMSUtility {
 	
 	private int getReferralsId(int formId) {
 		try {
-			RecordEnumeration metaEnum = metaDataRMS.enumerateMetaData();
+			IRecordStoreEnumeration metaEnum = metaDataRMS.enumerateMetaData();
 			while (metaEnum.hasNextElement()) {
 				int i = metaEnum.nextRecordId();
 				ReferralMetaData md = (ReferralMetaData)getMetaDataFromId(i);
@@ -67,7 +66,7 @@ public class ReferralRMSUtility extends RMSUtility {
 					return md.getRecordId();
 				}
 			}
-		} catch (InvalidRecordIDException e) {
+		} catch (RecordStorageException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

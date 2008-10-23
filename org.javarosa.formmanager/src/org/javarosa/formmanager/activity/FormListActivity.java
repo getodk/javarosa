@@ -7,12 +7,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.rms.InvalidRecordIDException;
-import javax.microedition.rms.RecordEnumeration;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -21,6 +16,8 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.storage.FormDefMetaData;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.FormList;
@@ -154,7 +151,7 @@ public class FormListActivity implements IActivity {
 				.instance().getStorageManager().getRMSStorageProvider()
 				.getUtility(FormDefRMSUtility.getUtilityName());
 		formDefRMSUtility.open();
-    	RecordEnumeration recordEnum = formDefRMSUtility.enumerateMetaData();
+    	IRecordStoreEnumeration recordEnum = formDefRMSUtility.enumerateMetaData();
     	int pos =0;
     	while(recordEnum.hasNextElement())
     	{
@@ -171,7 +168,7 @@ public class FormListActivity implements IActivity {
 				listOfForms.put(new Integer(pos), mdata.getName());
 				formIDs.insertElementAt(mdata, pos);
 				pos++;
-			} catch (InvalidRecordIDException e) {
+			} catch (RecordStorageException e) {
 				// TODO Auto-generated catch block
 				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();

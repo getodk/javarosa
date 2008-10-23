@@ -2,13 +2,7 @@ package org.javarosa.core.services.storage.utilities;
 
 import java.io.IOException;
 
-import javax.microedition.rms.InvalidRecordIDException;
-import javax.microedition.rms.RecordEnumeration;
-import javax.microedition.rms.RecordListener;
-import javax.microedition.rms.RecordStore;
-import javax.microedition.rms.RecordStoreException;
-import javax.microedition.rms.RecordStoreNotOpenException;
-
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
@@ -23,7 +17,7 @@ import org.javarosa.core.util.externalizable.Externalizable;
  * @author Munier
  *
  */
-public class RMSUtility implements RecordListener
+public class RMSUtility
 {
     public static final int RMS_TYPE_STANDARD = 0;
     public static final int RMS_TYPE_META_DATA = 1;
@@ -31,7 +25,7 @@ public class RMSUtility implements RecordListener
     private String RS_NAME = "";
     private int iType = RMSUtility.RMS_TYPE_STANDARD;
     protected RMSUtility metaDataRMS;
-    protected RecordStore recordStore = null;
+    private IRecordStorage recordStore = null;
 
     /**
      * Constructs a new RMS Utility
@@ -63,6 +57,10 @@ public class RMSUtility implements RecordListener
     {
         return this.RS_NAME;
     }
+    
+    protected IRecordStorage getRecordStore() {
+    	return recordStore;
+    }
 
     /**
      * Opens the record store on the device.
@@ -73,10 +71,10 @@ public class RMSUtility implements RecordListener
         {
             try
             {
-                this.recordStore = RecordStore.openRecordStore(RS_NAME, true);
-                this.recordStore.addRecordListener(this);
+            	this.recordStore = JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getRecordStoreFactory().produceNewStore();
+            	this.recordStore.openAsRecordStorage(RS_NAME, true);
             }
-            catch (RecordStoreException rse)
+            catch (RecordStorageException rse)
             {
                 rse.printStackTrace();
             }
@@ -92,14 +90,13 @@ public class RMSUtility implements RecordListener
         {
             try
             {
-                this.recordStore.removeRecordListener(this);
                 this.recordStore.closeRecordStore();
                 if (this.iType == RMSUtility.RMS_TYPE_META_DATA)
         		{
         			this.metaDataRMS.close();
         		}
             }
-            catch (RecordStoreException rse)
+            catch (RecordStorageException rse)
             {
                 rse.printStackTrace();
             }
@@ -141,7 +138,7 @@ public class RMSUtility implements RecordListener
                 this.metaDataRMS.writeToRMS(metaDataObject, null);
             }
         }
-        catch (RecordStoreException rse)
+        catch (RecordStorageException rse)
         {
             rse.printStackTrace();
         }
@@ -177,7 +174,7 @@ public class RMSUtility implements RecordListener
     			this.metaDataRMS.updateToRMS(recordId, metaDataObject, null);
     		}
     	}
-    	catch (RecordStoreException rse)
+    	catch (RecordStorageException rse)
     	{
     		rse.printStackTrace();
     	}
@@ -206,7 +203,7 @@ public class RMSUtility implements RecordListener
     		}
     		this.recordStore.addRecord(data, 0, data.length);
     	}
-    	catch (RecordStoreException rse)
+    	catch (RecordStorageException rse)
     	{
     		rse.printStackTrace();
     	}
@@ -228,15 +225,7 @@ public class RMSUtility implements RecordListener
                 this.metaDataRMS.deleteRecord(recordId);
             }
         }
-        catch (InvalidRecordIDException ex)
-        {
-            ex.printStackTrace();
-        }
-        catch (RecordStoreNotOpenException ex)
-        {
-            ex.printStackTrace();
-        }
-        catch (RecordStoreException ex)
+        catch (RecordStorageException ex)
         {
             ex.printStackTrace();
         }
@@ -254,12 +243,10 @@ public class RMSUtility implements RecordListener
         	{
         		this.metaDataRMS.delete();
         	}
-        	RecordStore scoresRecordStore1 = RecordStore.openRecordStore(this.RS_NAME,true);
-        	scoresRecordStore1.closeRecordStore();
-        	RecordStore.deleteRecordStore(this.RS_NAME);
+        	recordStore.deleteRecordStore();
         	
         }
-        catch (Exception e)
+        catch (RecordStorageException e)
         {
     		//#if debug.output==verbose || debug.output==exception
             e.printStackTrace();
@@ -287,7 +274,7 @@ public class RMSUtility implements RecordListener
             //LOG
             ExtUtil.deserialize(data, externalizableObject);
         }
-        catch (RecordStoreException rse)
+        catch (RecordStorageException rse)
         {
             rse.printStackTrace();
             throw new IOException(rse.getMessage());
@@ -313,7 +300,7 @@ public class RMSUtility implements RecordListener
             byte[] data = this.recordStore.getRecord(recordId);
             return data;
         }
-        catch (RecordStoreException rse)
+        catch (RecordStorageException rse)
         {
             rse.printStackTrace();
             throw new IOException(rse.getMessage());
@@ -358,36 +345,12 @@ public class RMSUtility implements RecordListener
         {
             numRecords = this.recordStore.getNumRecords();
         }
-        catch (RecordStoreNotOpenException e)
+        catch (RecordStorageException e)
         {
             e.printStackTrace();
         }
 
         return numRecords;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see javax.microedition.rms.RecordListener#recordAdded(javax.microedition.rms.RecordStore, int)
-     */
-    public void recordAdded(RecordStore recordStore, int i)
-    {
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see javax.microedition.rms.RecordListener#recordChanged(javax.microedition.rms.RecordStore, int)
-     */
-    public void recordChanged(RecordStore recordStore, int i)
-    {
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see javax.microedition.rms.RecordListener#recordDeleted(javax.microedition.rms.RecordStore, int)
-     */
-    public void recordDeleted(RecordStore recordStore, int i)
-    {
     }
 
     /**
@@ -396,17 +359,13 @@ public class RMSUtility implements RecordListener
      * 
      * @return a RecordEnumeration of the MetaData stored in this utility
      */
-    public RecordEnumeration enumerateMetaData() {
+    public IRecordStoreEnumeration enumerateMetaData() {
     	//TODO check if need to open / close
-		if (this.iType == this.RMS_TYPE_STANDARD){
+		if (this.iType == RMSUtility.RMS_TYPE_STANDARD){
 			try {
 				//TODO check if this is correct return
-				return this.recordStore.enumerateRecords(null,null,false);
-			} catch (RecordStoreNotOpenException e) {
-				//#if debug.output==verbose || debug.output==exception
-				e.printStackTrace();
-				//#endif
-			} catch (RecordStoreException e) {
+				return this.recordStore.enumerateRecords();
+			} catch (RecordStorageException e) {
 				//#if debug.output==verbose || debug.output==exception
 				e.printStackTrace();
 				//#endif
@@ -430,12 +389,7 @@ public class RMSUtility implements RecordListener
     	
     	try {
 			return this.recordStore.getNextRecordID();
-		} catch (RecordStoreNotOpenException e) {
-			// TODO Auto-generated catch block
-			//#if debug.output==verbose || debug.output==exception
-			e.printStackTrace();
-			//#endif
-		} catch (RecordStoreException e) {
+		} catch (RecordStorageException e) {
 			//#if debug.output==verbose || debug.output==exception
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -450,25 +404,15 @@ public class RMSUtility implements RecordListener
 	public void tempEmpty() {
 		
 		this.open();
-		RecordEnumeration recordEnum;
+		IRecordStoreEnumeration recordEnum;
 		try {
-			recordEnum = recordStore.enumerateRecords(null,null,false);
+			recordEnum = recordStore.enumerateRecords();
 			while(recordEnum.hasNextElement())
 			{
 				int i = recordEnum.nextRecordId();
 				this.recordStore.deleteRecord(i);		
 			}
-		} catch (RecordStoreNotOpenException e) {
-			// TODO Auto-generated catch block
-			//#if debug.output==verbose || debug.output==exception
-			e.printStackTrace();
-			//#endif
-		} catch (InvalidRecordIDException e) {
-			//#if debug.output==verbose || debug.output==exception
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			//#endif
-		} catch (RecordStoreException e) {
+		} catch (RecordStorageException e) {
 			// TODO Auto-generated catch block
 			//#if debug.output==verbose || debug.output==exception
 			e.printStackTrace();
@@ -491,7 +435,7 @@ public class RMSUtility implements RecordListener
 			remainingSize = recordStore.getSizeAvailable();
 			totalSize = currentSize + remainingSize;
 			}
-    	catch (RecordStoreNotOpenException e) {
+    	catch (RecordStorageException e) {
 			// TODO Auto-generated catch block
 			//#if debug.output==verbose || debug.output==exception
 			e.printStackTrace();

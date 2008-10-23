@@ -3,10 +3,9 @@ package org.javarosa.reminders.storage;
 import java.io.IOException;
 import java.util.Vector;
 
-import javax.microedition.rms.InvalidRecordIDException;
-import javax.microedition.rms.RecordEnumeration;
-
+import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.reminders.model.Reminder;
 
@@ -38,7 +37,7 @@ public class ReminderRMSUtility extends RMSUtility {
 	
 	public Vector getReminders() throws IOException, IllegalAccessException,
 			InstantiationException, DeserializationException {
-		RecordEnumeration en = this.enumerateMetaData();
+		IRecordStoreEnumeration en = this.enumerateMetaData();
 		Vector reminders = new Vector();
 		try {
 			while (en.hasNextElement()) {
@@ -48,7 +47,7 @@ public class ReminderRMSUtility extends RMSUtility {
 				super.retrieveFromRMS(id, reminder);
 				reminders.addElement(reminder);
 			}
-		} catch (InvalidRecordIDException e) {
+		} catch (RecordStorageException e) {
 			throw new IOException("There was a problem with the Reminder RMS trying to enumerate all of its members. This really shouldn't happen.");
 		}
 		return reminders;

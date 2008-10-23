@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import javax.microedition.rms.RecordEnumeration;
-import javax.microedition.rms.RecordStoreException;
-import javax.microedition.rms.RecordStoreNotOpenException;
-
 import org.javarosa.core.services.properties.Property;
+import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.util.externalizable.DeserializationException;
 
 /**
@@ -68,16 +66,13 @@ public class PropertyRMSUtility extends RMSUtility {
     }
     private void indexPropertyNames() {
         try {
-            RecordEnumeration recordEnum = recordStore.enumerateRecords(null,null,false);
+            IRecordStoreEnumeration recordEnum = this.getRecordStore().enumerateRecords();
             while(recordEnum.hasNextElement())
             {
                 int i = recordEnum.nextRecordId();
                 nameToId.put(this.getName(i),new Integer(i));                
             }
-        } catch (RecordStoreNotOpenException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (RecordStoreException e) {
+        } catch (RecordStorageException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
