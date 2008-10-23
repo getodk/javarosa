@@ -17,7 +17,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -25,9 +24,6 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
-import javax.microedition.lcdui.Ticker;
-import javax.microedition.rms.InvalidRecordIDException;
-import javax.microedition.rms.RecordEnumeration;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -40,6 +36,8 @@ import org.javarosa.core.model.storage.DataModelTreeMetaData;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
 
@@ -218,7 +216,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
     	ITransportManager tm = JavaRosaServiceProvider.instance().getTransportManager();
     	
     	this.dataModelRMSUtility.open();
-    	RecordEnumeration recordEnum = this.dataModelRMSUtility.enumerateMetaData();
+    	IRecordStoreEnumeration recordEnum = this.dataModelRMSUtility.enumerateMetaData();
     	modelIDs = new Vector();
     	int pos =0;
     	while(recordEnum.hasNextElement())
@@ -248,7 +246,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 				this.append(mdata.getName()+" - "+dateSTR+" - "+serverKey, stateImg);
 				modelIDs.insertElementAt(mdata,pos);
 				pos++;
-			} catch (InvalidRecordIDException e) {
+			} catch (RecordStorageException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

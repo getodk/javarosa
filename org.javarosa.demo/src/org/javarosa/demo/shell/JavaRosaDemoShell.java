@@ -37,6 +37,7 @@ import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.referral.ReferralModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
+import org.javarosa.storage.rms.RMSStorageModule;
 import org.javarosa.user.activity.AddUserActivity;
 import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.user.model.User;
@@ -86,6 +87,7 @@ public class JavaRosaDemoShell implements IShell {
 	}
 	
 	private void loadModules() {
+		new RMSStorageModule().registerModule(context);
 		new XFormsModule().registerModule(context);
 		new CoreModelModule().registerModule(context);
 		new HttpTransportModule().registerModule(context);
