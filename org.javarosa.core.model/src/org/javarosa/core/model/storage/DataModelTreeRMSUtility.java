@@ -2,11 +2,6 @@ package org.javarosa.core.model.storage;
 
 import java.util.Vector;
 
-import javax.microedition.rms.InvalidRecordIDException;
-import javax.microedition.rms.RecordEnumeration;
-import javax.microedition.rms.RecordStoreException;
-import javax.microedition.rms.RecordStoreNotOpenException;
-
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
