@@ -47,13 +47,19 @@ public class HttpTransportMethod implements TransportMethod {
 		Vector existingURLs = JavaRosaServiceProvider.instance()
 		.getPropertyManager().getProperty(
 				HttpTransportProperties.POST_URL_LIST_PROPERTY);
-		if (!existingURLs.contains(destinationUrl)) {
-			existingURLs.addElement(destinationUrl);
-			JavaRosaServiceProvider.instance().getPropertyManager()
-			.setProperty(
-					HttpTransportProperties.POST_URL_LIST_PROPERTY,
-					existingURLs);
+		
+		if(existingURLs!=null){
+			if (!existingURLs.contains(destinationUrl)) {
+				existingURLs.addElement(destinationUrl);
+				JavaRosaServiceProvider.instance().getPropertyManager()
+				.setProperty(
+						HttpTransportProperties.POST_URL_LIST_PROPERTY,
+						existingURLs);
+			}	
+		}else{
+			//add code to add urls outside the HttpTransportProperties 
 		}
+		
 	}
 
 	/**
@@ -127,7 +133,7 @@ public class HttpTransportMethod implements TransportMethod {
 				System.out.println("Status: " + message.getStatus());
 				//#endif
 				message.setChanged();
-				message.notifyObservers(null);
+				message.notifyObservers(message.getReplyloadData());
 
 			} catch (ClassCastException e) {
 				throw new IllegalArgumentException(message.getDestination()
