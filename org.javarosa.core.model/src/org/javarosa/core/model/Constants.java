@@ -113,4 +113,10 @@ public class Constants {
 	public static final int CONTROL_UPLOAD = 7;
 	public static final int CONTROL_SUBMIT = 8;
 	public static final int CONTROL_TRIGGER = 9;
+	public static final int CONTROL_IMAGE_CHOOSE = 10;
+	
+	/** constants for xform tags */ 
+	public static final String XFTAG_UPLOAD = "upload";
+
+	
 }
