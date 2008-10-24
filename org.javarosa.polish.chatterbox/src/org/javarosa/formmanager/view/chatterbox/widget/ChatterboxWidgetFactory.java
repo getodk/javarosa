@@ -69,6 +69,9 @@ public class ChatterboxWidgetFactory {
 		case Constants.CONTROL_TRIGGER:
 			expandedStyle = new MessageWidget();
 			break;
+		case Constants.CONTROL_IMAGE_CHOOSE:
+			expandedStyle = new ImageChooserWidget();
+			break;
 		}
 
 		if (expandedStyle == null) {
