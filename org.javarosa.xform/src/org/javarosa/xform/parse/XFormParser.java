@@ -91,6 +91,8 @@ public class XFormParser {
 			public void handle (FormDef f, Element e, Object parent) { parseGroupLabel(f, (GroupDef)parent, e); } };
 		IElementHandler trigger = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, Constants.CONTROL_TRIGGER); } };
+		IElementHandler upload = new IElementHandler () {
+			public void handle (FormDef f, Element e, Object parent) { parseUpload((IFormElement)parent, e, f, Constants.CONTROL_UPLOAD); } };
 
 		groupLevelHandlers = new Hashtable();
 		groupLevelHandlers.put("input", input);
@@ -99,6 +101,7 @@ public class XFormParser {
 		groupLevelHandlers.put("group", group);
 		groupLevelHandlers.put("repeat", repeat);
 		groupLevelHandlers.put("trigger", trigger);
+		groupLevelHandlers.put(Constants.XFTAG_UPLOAD, upload);
 
 		topLevelHandlers = new Hashtable();
 		for (Enumeration en = groupLevelHandlers.keys(); en.hasMoreElements(); ) {
@@ -278,6 +281,18 @@ public class XFormParser {
 
 	private static int serialQuestionID = 1;
 
+	
+	protected static QuestionDef parseUpload(IFormElement parent, Element e, FormDef f,
+			int controlUpload) {
+		QuestionDef question = parseControl(parent, e, f, controlUpload);
+		String mediaType = e.getAttributeValue(null, "mediatype");
+		if ("image/*".equals(mediaType)) {
+			// NOTE: this could be further expanded. 
+			question.setControlType(Constants.CONTROL_IMAGE_CHOOSE);
+		}
+		return question;
+	}
+	
 	protected static QuestionDef parseControl (IFormElement parent, Element e, FormDef f, int controlType) {
 		QuestionDef question = new QuestionDef();
 		DataBinding binding = null;
@@ -285,7 +300,7 @@ public class XFormParser {
 
 		String ref = e.getAttributeValue(null, "ref");
 		String bind = e.getAttributeValue(null, "bind");
-
+		
 		//for now we assume that all <bind>s and <ref>s specify one and only one node in their nodeset,
 		//and that a given data node is referenced by at most one <bind>
 		if (bind != null) {
@@ -326,6 +341,7 @@ public class XFormParser {
 					    controlType == Constants.CONTROL_SELECT_ONE) && "item".equals(childName)) {
 				parseItem(f, question, child);
 			}
+			// @czue - do we need to add parsers for filename and mediatype here for upload?
 		}
 
 		parent.addChild(question);
