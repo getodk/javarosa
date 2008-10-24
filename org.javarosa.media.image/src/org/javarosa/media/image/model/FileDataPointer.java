@@ -1,5 +1,7 @@
 package org.javarosa.media.image.model;
 
+import org.javarosa.core.model.data.IDataPointer;
+
 /**
  * Implementation of the data pointer that represents an underlying file on the file system.
  * 
