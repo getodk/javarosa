@@ -4,15 +4,9 @@ import j2meunit.framework.Test;
 import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.storage.FormDefMetaData;
-import org.javarosa.core.model.utils.ExternalizableHelper;
-import org.javarosa.core.services.storage.utilities.MetaDataObject;
-//import org.javarosa.core.util.UnavailableExternalizerException;
 
 
 public class FormDefMetaDataTests extends TestCase{
