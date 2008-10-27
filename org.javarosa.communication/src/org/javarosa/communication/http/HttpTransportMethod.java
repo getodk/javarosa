@@ -29,6 +29,7 @@ public class HttpTransportMethod implements TransportMethod {
 	private ITransportManager manager;
 	
 	private IActivity destinationRetrievalActivity;
+	private WorkerThread primaryWorker;
 
 	/*
 	 * (non-Javadoc)
@@ -39,7 +40,8 @@ public class HttpTransportMethod implements TransportMethod {
 		cacheURL(message);
 		this.message = message;
 		this.manager = manager;
-		new Thread(new WorkerThread()).start();
+		primaryWorker = new WorkerThread();
+		new Thread(primaryWorker).start();
 	}
 	
 	private void cacheURL(TransportMessage message) {
@@ -67,6 +69,35 @@ public class HttpTransportMethod implements TransportMethod {
 	 * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
 	 */
 	private class WorkerThread implements Runnable {
+		private HttpConnection con = null;
+		private InputStream in = null;
+		private OutputStream out = null;
+		
+		
+		public void cleanStreams(){
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+			if (con != null) {
+				try {
+					con.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+			
+		}
 
 		/*
 		 * (non-Javadoc)
@@ -74,9 +105,7 @@ public class HttpTransportMethod implements TransportMethod {
 		 * @see java.lang.Thread#run()
 		 */
 		public void run() {
-			HttpConnection con = null;
-			InputStream in = null;
-			OutputStream out = null;
+			
 			int responseCode;
 			try {
 				HttpTransportDestination destination = (HttpTransportDestination)message.getDestination();
@@ -248,5 +277,14 @@ public class HttpTransportMethod implements TransportMethod {
 	
 	public IActivity getDestinationRetrievalActivity() {
 		return destinationRetrievalActivity;
+	}
+
+	
+	public void closeConnections() {
+		if(primaryWorker!=null){
+			primaryWorker.cleanStreams();
+		}
+		
+		
 	}
 }

@@ -143,4 +143,10 @@ public class FileConnectionTransportMethod implements TransportMethod {
 	public IActivity getDestinationRetrievalActivity() {
 		return destinationRetrievalActivity;
 	}
+
+	
+	public void closeConnections() {
+		// TODO release all open connections and resources
+		
+	}
 }
