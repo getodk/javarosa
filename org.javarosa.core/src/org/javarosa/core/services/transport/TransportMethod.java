@@ -44,4 +44,7 @@ public interface TransportMethod {
 	public void setDestinationRetrievalActivity(IActivity activity);
 	
 	public IActivity getDestinationRetrievalActivity();
+	
+	public void closeConnections();
+	
 }
