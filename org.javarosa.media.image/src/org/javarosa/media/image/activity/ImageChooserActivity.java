@@ -2,10 +2,14 @@ package org.javarosa.media.image.activity;
 
 import java.util.Hashtable;
 
+import javax.microedition.lcdui.Display;
+
 import org.javarosa.core.Context;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.media.image.model.FileDataPointer;
+import org.javarosa.media.image.storage.ImageRMSUtility;
 
 /**
  * An Activity that represents the selection of zero or more images.
@@ -21,9 +25,17 @@ public class ImageChooserActivity implements IActivity
 	private Hashtable allImages;
 	private Context context;
 	private IShell shell;
+	private Display display;
+	private ImageRMSUtility dataModel;
+
+	public ImageChooserActivity(IShell shell) {
+		this.shell = shell;
+		display = JavaRosaServiceProvider.instance().getDisplay();
+		dataModel = new ImageRMSUtility("image_store");
+	}
 
 	public void contextChanged(Context globalContext) {
-		// TODO Auto-generated method stub
+
 		
 	}
 
