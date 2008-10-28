@@ -11,6 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.services.properties"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.user"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.storage.rms"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.j2me"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -2,10 +2,8 @@ package org.javarosa.formmanager.controller;
 
 import java.util.Date;
 
-import javax.microedition.lcdui.AlertType;
-import javax.microedition.lcdui.Displayable;
-
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
@@ -27,7 +25,7 @@ public class FormEntryController {
 		this.parent = parent;
 	}
 
-	public void setView (IFormEntryView view) {
+	public void setFormEntryView (IFormEntryView view) {
 		this.view = view;
 	}
 
@@ -122,7 +120,7 @@ public class FormEntryController {
 		setLanguage(model.getForm().getLocalizer().getNextLocale());
 	}
 
-	public void setDisplay (Displayable d) {
-		parent.setDisplay(d);
+	public void setView (IView d) {
+		parent.setView(d);
 	}
 }

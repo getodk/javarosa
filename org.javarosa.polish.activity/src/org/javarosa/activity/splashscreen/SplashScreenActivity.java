@@ -13,6 +13,8 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.IView;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.splash.ApplicationInitializer;
 import de.enough.polish.ui.splash.InitializerSplashScreen;
@@ -46,9 +48,12 @@ public class SplashScreenActivity implements IActivity, ApplicationInitializer {
 			//Set readyMessage = null to forward to the next
 			//displayabe as soon as it's available
 			int messageColor = 0xFF0000;
-			InitializerSplashScreen splashScreen = new InitializerSplashScreen(JavaRosaServiceProvider.instance().getDisplay(),
-					image, backgroundColor, readyMessage, messageColor, this);
-			parent.setDisplay(this, splashScreen);
+			final InitializerSplashScreen splashScreen = new InitializerSplashScreen(((J2MEDisplay)JavaRosaServiceProvider.instance().getDisplay()).getDisplay(),
+					image, backgroundColor, readyMessage, messageColor, this){};
+			parent.setDisplay(this, new IView() {
+				public Object getScreenObject() {
+					return splashScreen;
+				}} );
 			this.context = context;
 			} catch (IOException e) {
 			// TODO Auto-generated catch block

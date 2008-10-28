@@ -8,6 +8,7 @@ import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
@@ -25,11 +26,10 @@ import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle;
 
 import de.enough.polish.ui.Alert;
-import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.UiAccess;
 
-public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryModelListener, CommandListener {
+public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryModelListener, CommandListener{
 	private static final int INDEX_NOT_SET = -1;
 	private static final int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
@@ -90,7 +90,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
     
     public void show () {
-    	controller.setDisplay(this);
+    	controller.setView(this);
     }
     
     private void initGUI () {
@@ -331,7 +331,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	Alert alert = new Alert(title, message, null, AlertType.ERROR);
     	alert.setTimeout(Alert.FOREVER);
     	//alert.setCommandListener?
-    	Alert.setCurrent(JavaRosaServiceProvider.instance().getDisplay(), alert, null);
+    	Alert.setCurrent((Display)JavaRosaServiceProvider.instance().getDisplay().getDisplayObject(), alert, null);
     }
 
 	public void setContext(FormEntryContext context) {
@@ -343,5 +343,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 				this.widgetFactory.registerExtendedWidget(widget.widgetType(), widget);
 			}
 		}
+	}
+	public Object getScreenObject() {
+		return this;
 	}
 }

@@ -13,12 +13,12 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.services.storage.utilities.RecordStorageException;
 
-public class PropertiesScreen extends Form{
+public class PropertiesScreen extends Form implements IView{
 
     Hashtable itemChoices;
 
@@ -213,4 +213,7 @@ public class PropertiesScreen extends Form{
     public String nameFromItem(Item item) {
     	return (String)itemForPropertyName.get(item);
     }
+	public Object getScreenObject() {
+		return this;
+	}
 }

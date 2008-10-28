@@ -1,9 +1,9 @@
 package org.javarosa.formmanager.controller;
 
-import javax.microedition.lcdui.Displayable;
+import org.javarosa.core.api.IView;
 
 public interface IControllerHost {
-	void setDisplay (Displayable view);
+	void setView (IView view);
 	
 	void controllerReturn (String status);
 }

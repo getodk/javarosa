@@ -11,19 +11,18 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
 
-import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
 import org.javarosa.core.services.ITransportManager;
@@ -182,7 +181,7 @@ public class FormTransportActivity implements
 		messageDetailTextBox.setCommandListener(this);
 
 		if(task.equals(TransportContext.MAIN_MENU)) {
-			shell.setDisplay(this, mainMenu);
+			shell.setDisplay(this, new IView() {public Object getScreenObject() {return mainMenu;}});
 		}
 		else if(task.equals(TransportContext.MESSAGE_VIEW)) {
 			showMessageList();
@@ -268,7 +267,7 @@ public class FormTransportActivity implements
 				String userNotify = "Form has been saved. Check 'Saved Forms' list";
 				 alert = new Alert("Saved!!!",userNotify,null,AlertType.INFO);
 				 alert.setCommandListener(this);
-				shell.setDisplay(this,alert);
+				shell.setDisplay(this,new IView() {public Object getScreenObject() {return alert;}});
 				// If we're going to send later, no reason to be in the
 				// transport activity
 				//shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
@@ -331,7 +330,7 @@ public class FormTransportActivity implements
 					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 				}
 				else {
-					shell.setDisplay(this, mainMenu);
+					shell.setDisplay(this, new IView() {public Object getScreenObject() {return mainMenu;}});
 				}
 			} else if (c == CMD_DETAILS) {
 				int selected = messageList.getSelectedIndex();
@@ -340,7 +339,7 @@ public class FormTransportActivity implements
 						selected, messages);
 				if (message != null) {
 					messageDetailTextBox.setString(message.toString());
-					shell.setDisplay(this, messageDetailTextBox);
+					shell.setDisplay(this, new IView() {public Object getScreenObject() {return messageDetailTextBox;}});
 				}
 			}
 			else if (c == CMD_DELETEMSG) {
@@ -379,7 +378,7 @@ public class FormTransportActivity implements
 	public void showMessageList() {
 		messageList.deleteAll();
 		populateMessageList();
-		shell.setDisplay(this, messageList);
+		shell.setDisplay(this, new IView() {public Object getScreenObject() {return messageList;}});
 	}
 
 	private Object elementAt(int index, Enumeration en) {
@@ -409,7 +408,7 @@ public class FormTransportActivity implements
 		}else{
 			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,
 					AlertType.ERROR);
-			shell.setDisplay(this, this.mainMenu);
+			shell.setDisplay(this, new IView() {public Object getScreenObject() {return mainMenu;}});
 		}
 		
 		submitStatusScreen = new SubmitStatusScreen(this, data.getId());
@@ -442,8 +441,8 @@ public class FormTransportActivity implements
 			title = "Info";
 			break;
 		}
-
-		shell.setDisplay(this, new javax.microedition.lcdui.Alert(title, message, null, type));
+		final Alert alert =  new Alert(title, message, null, type);
+		shell.setDisplay(this,new IView() {public Object getScreenObject() {return alert;}});
 
 	}
 

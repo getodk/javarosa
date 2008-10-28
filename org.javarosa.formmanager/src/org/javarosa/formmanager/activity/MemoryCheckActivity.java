@@ -9,6 +9,7 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 
@@ -73,9 +74,9 @@ public class MemoryCheckActivity implements IActivity
 		if(dataModelRMSUtility.computeSpace() <= 0.05 || formDefRMSUtility.computeSpace() <= 0.05) //less than 5% of memory left
 		{
 			String info = "Your phone memory is low and you may not be able to save more forms";
-			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("Memory low!", info, null, AlertType.ERROR);
+			final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("Memory low!", info, null, AlertType.ERROR);
 			a.setTimeout(2000);//calm down and read the alert first
-			mainShell.setDisplay(this, a);
+			mainShell.setDisplay(this, new IView() {public Object getScreenObject() { return a;}} );
 		}
 
 		Hashtable returnArgs = new Hashtable();

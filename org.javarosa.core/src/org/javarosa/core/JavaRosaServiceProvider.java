@@ -2,10 +2,9 @@ package org.javarosa.core;
 
 import java.util.Hashtable;
 
-import javax.microedition.lcdui.Display;
-import javax.microedition.lcdui.Displayable;
-
 import org.javarosa.core.api.IDaemon;
+import org.javarosa.core.api.IDisplay;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.services.IService;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.PropertyManager;
@@ -31,7 +30,7 @@ public class JavaRosaServiceProvider {
 	
 	private Hashtable daemons;
 
-	private Display display;
+	private IDisplay display;
 	
 	private StorageManager storageManager;
     private ITransportManager transportManager;
@@ -64,14 +63,14 @@ public class JavaRosaServiceProvider {
 	 * Should be called by the midlet to set the display
 	 * @param d - the j2me disply
 	 */
-	public void setDisplay(Display d) {
+	public void setDisplay(IDisplay d) {
 		instance.display = d;
 	}
 
 	/**
 	 * @return the display
 	 */
-	public Display getDisplay() {
+	public IDisplay getDisplay() {
 		return instance.display;
 	}
 
@@ -79,8 +78,8 @@ public class JavaRosaServiceProvider {
 	 * Display the view that is passed in.
 	 * @param view
 	 */
-	public void showView(Displayable view) {
-		instance.display.setCurrent(view);
+	public void showView(IView view) {
+		instance.display.setView(view);
 	}
 	
 	public StorageManager getStorageManager() {

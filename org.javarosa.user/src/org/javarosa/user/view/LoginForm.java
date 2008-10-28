@@ -12,11 +12,12 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 
-public class LoginForm extends Form
+public class LoginForm extends Form implements IView
 {
 	   public final Command CMD_CANCEL_LOGIN = new Command("EXIT",Command.SCREEN, 1);
 	   public Command loginButtonCommand = new Command("Login", Command.ITEM, 1);
@@ -169,5 +170,7 @@ public class LoginForm extends Form
 	private void setLoggedInUser(User loggedInUser) {
 		this.loggedInUser = loggedInUser;
 	}
-
+	public Object getScreenObject() {
+		return this;
+	}
 }

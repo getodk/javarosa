@@ -50,10 +50,10 @@
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
+					<source dir="${basedir}/../org.javarosa.j2me/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>					
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
-					<source dir="${basedir}/../org.javarosa.storage.rms/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
 					

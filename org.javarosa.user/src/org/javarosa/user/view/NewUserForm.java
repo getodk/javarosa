@@ -7,6 +7,7 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
+import org.javarosa.core.api.IView;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.Constants;
 import org.javarosa.user.model.User;
@@ -18,7 +19,7 @@ import org.javarosa.user.storage.UserRMSUtility;
  * @author Julian
  *
  */
-public class NewUserForm extends Form  {
+public class NewUserForm extends Form implements IView{
 
 	private TextField userName;
 	private TextField password;
@@ -110,10 +111,8 @@ public class NewUserForm extends Form  {
 		   }
 
 		   else return false;
-
-
 	}
-
-
-
+	public Object getScreenObject() {
+		return this;
+	}
 }

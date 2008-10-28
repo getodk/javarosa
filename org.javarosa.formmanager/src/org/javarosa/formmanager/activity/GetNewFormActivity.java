@@ -10,6 +10,7 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.Context;
@@ -17,6 +18,7 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.xform.util.XFormUtils;
@@ -26,6 +28,9 @@ import org.netbeans.microedition.lcdui.pda.FileBrowser;
  * @author Brian DeRenzi
  *
  */
+
+//TODO: This class needs to be pulled out of this project (Or at least the part that is dependent
+//      on the io.file library that isn't available on a large number of phones)
 public class GetNewFormActivity implements IActivity, CommandListener {
 
 	public static final String FILENAME_KEY = "filename";
@@ -94,12 +99,12 @@ public class GetNewFormActivity implements IActivity, CommandListener {
 	//@Override
 	public void start(Context context) {
 		// #if app.usefileconnections
-		fileBrowser = new FileBrowser(JavaRosaServiceProvider.instance().getDisplay());
+		fileBrowser = new FileBrowser((Display)JavaRosaServiceProvider.instance().getDisplay().getDisplayObject());
 		fileBrowser.setTitle(this.fileBrowserTitle);
 		fileBrowser.setCommandListener(this);
 		fileBrowser.addCommand(FileBrowser.SELECT_FILE_COMMAND);
 		fileBrowser.addCommand(FileBrowser.EXIT_COMMAND);
-		JavaRosaServiceProvider.instance().showView(fileBrowser);
+		JavaRosaServiceProvider.instance().showView(new IView() {public Object getScreenObject() {return fileBrowser;}});
 		// #endif
 	}
 

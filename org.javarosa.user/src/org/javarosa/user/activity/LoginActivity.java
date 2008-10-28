@@ -18,6 +18,7 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.IView;
 import org.javarosa.user.view.LoginForm;
 
 /**
@@ -51,9 +52,9 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 		if (c == this.loginScreen.loginButtonCommand) {
 			System.out.println("login pressed");
 			if (loginScreen.validateUser()) {
-				javax.microedition.lcdui.Alert success = loginScreen
+				final javax.microedition.lcdui.Alert success = loginScreen
 						.successfulLogin();
-				parent.setDisplay(this, success);
+				parent.setDisplay(this, new IView() {public Object getScreenObject() { return success;}});
 				Hashtable returnArgs = new Hashtable();
 				returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
 				returnArgs.put(USER, loginScreen.getLoggedInUser());
@@ -62,8 +63,8 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 			} else {
 				// /display an error that login failed and return to login
 				// screen
-				javax.microedition.lcdui.Alert error = loginScreen.tryAgain();
-				parent.setDisplay(this, error);
+				final javax.microedition.lcdui.Alert error = loginScreen.tryAgain();
+				parent.setDisplay(this, new IView() {public Object getScreenObject() { return error;}});
 				parent.setDisplay(this, this.loginScreen);
 
 			}
@@ -107,9 +108,9 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 		} else if (c == loginScreen.loginButtonCommand) {
 			System.out.println("login pressed");
 			if (loginScreen.validateUser()) {
-				javax.microedition.lcdui.Alert success = loginScreen
+				final javax.microedition.lcdui.Alert success = loginScreen
 						.successfulLogin();
-				parent.setDisplay(this, success);
+				parent.setDisplay(this, new IView() {public Object getScreenObject() { return success;}});
 				Hashtable returnArgs = new Hashtable();
 				returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
 				returnArgs.put(USER, loginScreen.getLoggedInUser());
@@ -118,8 +119,8 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 			} else {
 				// /display an error that login failed and return to login
 				// screen
-				javax.microedition.lcdui.Alert error = loginScreen.tryAgain();
-				parent.setDisplay(this, error);
+				final javax.microedition.lcdui.Alert error = loginScreen.tryAgain();
+				parent.setDisplay(this, new IView() {public Object getScreenObject() { return error;}});
 				parent.setDisplay(this, this.loginScreen);
 
 			}
