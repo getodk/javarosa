@@ -8,11 +8,8 @@ import java.io.InputStreamReader;
 import javax.microedition.io.file.FileConnection;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.XFormParser;
 
 /**
@@ -27,6 +24,8 @@ public class XFormUtils {
 		return getFormFromInputStream(is);
 	}
 
+	// 28 Oct 2008 This code needs to be abstracted to not use any
+	// javax.microedition libraries.
 	// 18 Aug 2008 added by Brian DeRenzi
 	// #if app.usefileconnections
 	public static FormDef getFormFromFile(FileConnection fc) {
