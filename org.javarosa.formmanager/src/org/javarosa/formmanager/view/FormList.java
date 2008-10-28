@@ -12,6 +12,7 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
+import org.javarosa.core.api.IView;
 import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.activity.FormListActivity;
 
@@ -19,7 +20,7 @@ import org.javarosa.formmanager.activity.FormListActivity;
  * @author Brian DeRenzi
  *
  */
-public class FormList extends List implements CommandListener {
+public class FormList extends List implements CommandListener, IView {
 	// TODO: These should all be il8n'd
 	private final Command CMD_EXIT = new Command("Exit", Command.BACK, 2);
     private final Command CMD_GETNEWFORMS = new Command("Get New Forms", Command.SCREEN, 2);
@@ -137,6 +138,9 @@ public class FormList extends List implements CommandListener {
 			returnvals.put(c.getLabel(), "");
 			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
+	}
+	public Object getScreenObject() {
+		return this;
 	}
 
 }

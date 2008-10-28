@@ -2,9 +2,6 @@ package org.javarosa.core.api;
 
 import java.util.Hashtable;
 
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.midlet.MIDlet;
-
 /**
  * Shells are responsible for controlling the workflow of a 
  * JavaRosa application. It is responsibly for spawning activities,
@@ -34,14 +31,8 @@ public interface IShell {
 	 * Sets the current display, taking into account what module is currently executing 
 	 * 
 	 * @param callingModule The module attempting to set the displayable
-	 * @param display The displayable to be set
+	 * @param display The display to be set
 	 */
-	boolean setDisplay(IActivity callingActivity, Displayable display);
+	boolean setDisplay(IActivity callingActivity, IView display);
 	
-	/**
-	 * Sets the currently executing MIDlet.
-	 * 
-	 * @param midlet The currently executing MIDlet
-	 */
-	void setMIDlet(MIDlet midlet);
 }

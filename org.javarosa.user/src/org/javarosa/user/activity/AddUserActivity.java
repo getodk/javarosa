@@ -1,6 +1,7 @@
 package org.javarosa.user.activity;
 
 import java.util.Hashtable;
+
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -10,6 +11,7 @@ import org.javarosa.core.Context;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.IView;
 import org.javarosa.user.view.NewUserForm;
 
 /*
@@ -86,34 +88,34 @@ public class AddUserActivity implements IActivity, CommandListener {
 
     		if (answer.equals(""))	{///success
 
-    			javax.microedition.lcdui.Alert successfulNewUser  = new javax.microedition.lcdui.Alert("User added","User added successfully",null,javax.microedition.lcdui.AlertType.CONFIRMATION);
+    			final javax.microedition.lcdui.Alert successfulNewUser  = new javax.microedition.lcdui.Alert("User added","User added successfully",null,javax.microedition.lcdui.AlertType.CONFIRMATION);
     			
-    			parent.setDisplay(this, successfulNewUser);
+    			parent.setDisplay(this, new IView() {public Object getScreenObject() { return successfulNewUser;}});
     			parent.setDisplay(this, this.addUser);
     		}
     		else if (answer.substring(0,10 ).equals("Username ("))///name already taken..
     		{
 
-    			javax.microedition.lcdui.Alert nameTakenError  = new javax.microedition.lcdui.Alert("Problem adding User - name taken",
+    			final javax.microedition.lcdui.Alert nameTakenError  = new javax.microedition.lcdui.Alert("Problem adding User - name taken",
 						answer, null,AlertType.ERROR);
-    			parent.setDisplay(this, nameTakenError);
+    			parent.setDisplay(this, new IView() {public Object getScreenObject() { return nameTakenError;}});
     			parent.setDisplay(this, this.addUser);
     		}
     		else if (answer.substring(0,9).equals("Please fi") )
     		{
     			System.out.println(answer.substring(9));
-    			javax.microedition.lcdui.Alert noInputError  = new javax.microedition.lcdui.Alert("Problem adding User - no input",
+    			final javax.microedition.lcdui.Alert noInputError  = new javax.microedition.lcdui.Alert("Problem adding User - no input",
 						answer, null,AlertType.ERROR);
-    			parent.setDisplay(this, noInputError);
+    			parent.setDisplay(this, new IView() {public Object getScreenObject() { return noInputError;}});
     			parent.setDisplay(this, this.addUser);
     		}
     		else if (answer.substring(0,9).equals("Please re"))///password error
     		{
     			System.out.println(answer.substring(9));
-    			javax.microedition.lcdui.Alert passwordMismatchError  = new javax.microedition.lcdui.Alert("Problem adding User - passwords don't match",
+    			final javax.microedition.lcdui.Alert passwordMismatchError  = new javax.microedition.lcdui.Alert("Problem adding User - passwords don't match",
 						answer, null,AlertType.ERROR);
     			passwordMismatchError.setTimeout(javax.microedition.lcdui.Alert.FOREVER);
-    			parent.setDisplay(this, passwordMismatchError);
+    			parent.setDisplay(this, new IView() {public Object getScreenObject() { return passwordMismatchError;}});
     			parent.setDisplay(this, this.addUser);
 
     		}

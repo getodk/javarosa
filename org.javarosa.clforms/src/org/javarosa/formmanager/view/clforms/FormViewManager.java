@@ -1,7 +1,5 @@
 package org.javarosa.formmanager.view.clforms;
 
-import java.util.Enumeration;
-
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
@@ -12,6 +10,7 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.List;
 
+import org.javarosa.core.api.IView;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
@@ -150,7 +149,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 		}
 		widget.setCommandListener(this);
 		widget.setItemCommandListner(this);
-		controller.setDisplay(widget);
+		controller.setView(widget);
 	}
 
 
@@ -176,7 +175,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 		model.setQuestionIndex(-1);
 		formView = new FormViewScreen(this.model);
 		formView.setCommandListener(this);
-		controller.setDisplay(formView);
+		controller.setView(formView);
 	}
 
 	public void refreshView()
@@ -236,8 +235,8 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 				{
 					//show alert
 					String txt = "There are "+counter+" unanswered compulsory questions and must be completed first to proceed";
-					Alert alert = new Alert("Question Required!", txt, null, AlertType.ERROR);
-					controller.setDisplay(alert);
+					final Alert alert = new Alert("Question Required!", txt, null, AlertType.ERROR);
+					controller.setView(new IView() {public Object getScreenObject() { return alert;}});
 				}
 				else
 				model.setFormComplete();
@@ -258,8 +257,8 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 				{
 					String txt = "This is a compulsory question and must be completed first to proceed";
 					//#style CL_Forms_Form
-					Alert alert = new Alert("Question Required!", txt, null, AlertType.ERROR);
-					controller.setDisplay(alert);
+					final Alert alert = new Alert("Question Required!", txt, null, AlertType.ERROR);
+					controller.setView(new IView() {public Object getScreenObject() {return alert;}});
 				}
 				else{
 				//save and proceed to next question
@@ -306,5 +305,9 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
 	public void setShowOverView(boolean showOverView) {
 		this.showFormView = showOverView;
+	}
+	
+	public Object getScreenObject() {
+		return parent.getScreenObject();
 	}
 }

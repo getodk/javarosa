@@ -5,9 +5,10 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
+import org.javarosa.core.api.IView;
 import org.javarosa.reminders.model.Reminder;
 
-public class HandleReminder extends Form {
+public class HandleReminder extends Form implements IView{
 
 	Reminder reminder;
 	
@@ -60,5 +61,8 @@ public class HandleReminder extends Form {
 		reminder.setText(reminderMessage.getString());
 		reminder.setTitle(title.getString());
 		return reminder;
+	}
+	public Object getScreenObject() {
+		return this;
 	}
 }

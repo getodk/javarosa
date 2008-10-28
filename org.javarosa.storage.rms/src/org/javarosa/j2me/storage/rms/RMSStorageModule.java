@@ -1,4 +1,4 @@
-package org.javarosa.storage.rms;
+package org.javarosa.j2me.storage.rms;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;

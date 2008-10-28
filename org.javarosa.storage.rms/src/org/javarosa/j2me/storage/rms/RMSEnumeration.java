@@ -1,4 +1,4 @@
-package org.javarosa.storage.rms;
+package org.javarosa.j2me.storage.rms;
 
 import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;

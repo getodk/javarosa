@@ -4,17 +4,16 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
+import org.javarosa.core.api.IView;
 import org.javarosa.core.util.Map;
 import org.javarosa.reminders.model.Reminder;
 import org.javarosa.reminders.util.ReminderListContext;
 
-public class DisplayReminders extends Form {
+public class DisplayReminders extends Form implements IView{
 	
 	public StringItem head;
 	
@@ -90,5 +89,9 @@ public class DisplayReminders extends Form {
 	
 	public Reminder getReminder(Command command) {
 		return (Reminder)reminderMapping.get(command); 
+	}
+	
+	public Object getScreenObject() {
+		return this;
 	}
 }

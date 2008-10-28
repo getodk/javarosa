@@ -2,7 +2,6 @@ package org.javarosa.demo.shell;
 
 import java.util.Hashtable;
 
-import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.activity.splashscreen.SplashScreenActivity;
@@ -14,6 +13,7 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
@@ -33,11 +33,11 @@ import org.javarosa.formmanager.utility.FormDefSerializer;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.chatterbox.widget.ExtendedWidgetsModule;
+import org.javarosa.j2me.storage.rms.RMSStorageModule;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.referral.ReferralModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
-import org.javarosa.storage.rms.RMSStorageModule;
 import org.javarosa.user.activity.AddUserActivity;
 import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.user.model.User;
@@ -292,9 +292,9 @@ public class JavaRosaDemoShell implements IShell {
 		workflow(activity, returnCode, returnVals);
 	}
 
-	public boolean setDisplay(IActivity callingActivity, Displayable display) {
+	public boolean setDisplay(IActivity callingActivity, IView display) {
 		if(callingActivity == currentActivity) {
-			JavaRosaServiceProvider.instance().getDisplay().setCurrent(display);
+			JavaRosaServiceProvider.instance().getDisplay().setView(display);
 			return true;
 		}
 		else {

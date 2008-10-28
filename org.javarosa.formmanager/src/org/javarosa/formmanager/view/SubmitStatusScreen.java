@@ -10,10 +10,11 @@ import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 
-public class SubmitStatusScreen extends Form  {
+public class SubmitStatusScreen extends Form implements IView {
 	private int modelID;
     private StringItem msg;
     private Command okCommand;
@@ -81,6 +82,9 @@ public class SubmitStatusScreen extends Form  {
 		receipt = new String(response.getReplyloadData()); //this does not seem terribly robust
 		//}
 		return receipt;
+	}
+	public Object getScreenObject() {
+		return this;
 	}
 }
 

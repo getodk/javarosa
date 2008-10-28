@@ -1,19 +1,14 @@
 package org.javarosa.formmanager.view.clforms;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
+import org.javarosa.core.api.IView;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.activity.FormEntryContext;
-import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
-import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.utility.SortedIntSet;
-import org.javarosa.formmanager.view.IFormEntryView;
 
-public class FormViewScreen extends List {
+public class FormViewScreen extends List implements IView {
 
 	private FormEntryModel model;
 	private FormViewManager parent;
@@ -83,5 +78,7 @@ public class FormViewScreen extends List {
 			}
 		}
 	}
-
+	public Object getScreenObject() {
+		return this;
+	}
 }

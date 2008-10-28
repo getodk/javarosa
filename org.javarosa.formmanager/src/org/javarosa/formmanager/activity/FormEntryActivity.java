@@ -16,6 +16,7 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -169,8 +170,8 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 
 	}
 
-	public void setDisplay (Displayable d) {
-		parent.setDisplay(this, d);
+	public void setView(IView v) {
+		parent.setDisplay(this, v);
 	}
 
 	public void controllerReturn (String status) {

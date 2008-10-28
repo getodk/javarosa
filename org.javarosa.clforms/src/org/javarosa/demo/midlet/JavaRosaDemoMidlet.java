@@ -1,8 +1,5 @@
 package org.javarosa.demo.midlet;
 
-import java.util.Stack;
-import java.util.Vector;
-
 import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
@@ -10,6 +7,7 @@ import javax.microedition.midlet.MIDletStateChangeException;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IShell;
 import org.javarosa.demo.shell.JavaRosaDemoShell;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
  * This is the starting point for the JavarosaDemo application
@@ -39,7 +37,7 @@ public class JavaRosaDemoMidlet extends MIDlet {
 
 		// Do NOT edit below
 		JavaRosaServiceProvider.instance().initialize();
-		JavaRosaServiceProvider.instance().setDisplay(Display.getDisplay(this));
+		JavaRosaServiceProvider.instance().setDisplay(new J2MEDisplay(Display.getDisplay(this)));
 		((JavaRosaDemoShell)shell).setMIDlet(this);
 		shell.run();
 	}

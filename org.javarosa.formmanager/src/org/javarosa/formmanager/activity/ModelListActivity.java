@@ -30,6 +30,7 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.IView;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeMetaData;
@@ -45,7 +46,7 @@ import org.javarosa.core.util.externalizable.DeserializationException;
  *
  * @author Munier
  */
-public class ModelListActivity extends List implements CommandListener, IActivity
+public class ModelListActivity extends List implements CommandListener, IActivity, IView
 {
 	
 	public final static String returnKey = "ModelListReturnCommand";
@@ -170,12 +171,12 @@ public class ModelListActivity extends List implements CommandListener, IActivit
                     this.dataModelRMSUtility.retrieveFromRMS(data.getRecordId(), model);
                     //model.setRecordId(data.getRecordId());
                 } catch (IOException e) {
-                    javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
-                    mainShell.setDisplay(this, a);
+                    final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
+                    mainShell.setDisplay(this, new IView() {public Object getScreenObject() { return a;}});
                     e.printStackTrace();
                 } catch (DeserializationException e) {
-                    javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
-                    mainShell.setDisplay(this, a);
+                    final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
+                    mainShell.setDisplay(this, new IView() {public Object getScreenObject() { return a;}});
                     e.printStackTrace();
                 } 
                 Hashtable formSendArgs = new Hashtable();
@@ -305,5 +306,10 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 	 */
 	public void setShell(IShell shell) {
 		this.mainShell = shell;
+	}
+
+	public Object getScreenObject() {
+		// TODO Auto-generated method stub
+		return this;
 	}
 }

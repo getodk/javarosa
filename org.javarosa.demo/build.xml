@@ -58,12 +58,12 @@
 					<source dir="${basedir}/../org.javarosa.core.model/test/"/>
 					<source dir="${basedir}/../org.javarosa.demo/test/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
+					<source dir="${basedir}/../org.javarosa.j2me/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox.extensions/src/"/>
 					<source dir="${basedir}/../org.javarosa.referral/src/"/>
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
-					<source dir="${basedir}/../org.javarosa.storage.rms/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/test/"/>
 					<source dir="${basedir}/../org.javarosa.patient/src/"/>

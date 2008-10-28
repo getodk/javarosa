@@ -4,7 +4,9 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Spacer;
 
-public class SubmitScreen extends Form {
+import org.javarosa.core.api.IView;
+
+public class SubmitScreen extends Form implements IView {
 	private ChoiceGroup cg;	
 	public static final int SEND_NOW_DEFAULT = 0;
 	public static final int SEND_LATER = 1;
@@ -39,5 +41,8 @@ public class SubmitScreen extends Form {
 	
 	public int getCommandChoice() {
 		return cg.getSelectedIndex();
+	}
+	public Object getScreenObject() {
+		return this;
 	}
 }

@@ -7,7 +7,9 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 
-public class ReportView extends Form {
+import org.javarosa.core.api.IView;
+
+public class ReportView extends Form implements IView {
 
 	private StringItem label;
 	public ReportView(String title) {
@@ -30,6 +32,7 @@ public class ReportView extends Form {
 			this.append(label);
 		}
 	}
-	
-	
+	public Object getScreenObject() {
+		return this;
+	}
 }
