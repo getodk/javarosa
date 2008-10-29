@@ -65,7 +65,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	
     	this.model = model;
     	this.controller = controller;
-    	controller.setView(this);
+    	controller.setFormEntryView(this);
 
     	widgetFactory = new ChatterboxWidgetFactory(this);
     	multiLingual = (model.getForm().getLocalizer() != null);
