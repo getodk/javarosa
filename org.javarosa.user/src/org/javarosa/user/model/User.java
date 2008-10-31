@@ -23,6 +23,7 @@ public class User implements Externalizable, IDRecordable
 	private String username;
 	private String password;
 	private String userType;
+	private boolean rememberMe= false;
 
 	private int [] formsApplied;
 
@@ -37,7 +38,10 @@ public class User implements Externalizable, IDRecordable
 		username = name;
 		password = passw;
 		userType =  STANDARD;
+		rememberMe = false;
 	}
+	
+	
 	public User(String name, String passw, String isAAdmin)
 	{
 		username = name;
@@ -62,6 +66,7 @@ public class User implements Externalizable, IDRecordable
 			this.username = in.readUTF();
 			this.password = in.readUTF();
 			this.userType = in.readUTF();
+			this.rememberMe = in.readBoolean();
 		}
 		catch (IOException ioe)
 		{
@@ -82,6 +87,7 @@ public class User implements Externalizable, IDRecordable
 			out.writeUTF(this.username);
 	        out.writeUTF(this.password);
 	        out.writeUTF(this.userType);
+	        out.writeBoolean(this.rememberMe);
 
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage()); //$NON-NLS-1$
@@ -124,5 +130,15 @@ public class User implements Externalizable, IDRecordable
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public boolean isRememberMe() {
+		return rememberMe;
+	}
+
+	public void setRememberMe(boolean rememberMe) {
+		this.rememberMe = rememberMe;
+	}
+	
+	
 
 }
