@@ -25,7 +25,9 @@ import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
+import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.media.image.storage.ImageRMSUtility;
 import org.javarosa.media.image.view.CameraCanvas;
@@ -50,7 +52,7 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	private VideoControl mVideoControl;
 	private Command mBackCommand;
 	private Command mCaptureCommand;
-	private Display display;
+	private IDisplay display;
 	private ImageRMSUtility dataModel;
 
 	public ImageCaptureActivity(IShell shell) {
@@ -151,7 +153,7 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 			canvas.addCommand(mCaptureCommand);
 			canvas.setCommandListener(this);
 			
-			display.setCurrent(canvas);
+			display.setView(DisplayViewFactory.createView(canvas));
 			
 
 			/*
@@ -324,7 +326,7 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		Alert alert = new Alert(error);
 		alert.setTimeout(Alert.FOREVER);
 		alert.setType(AlertType.ERROR);
-		display.setCurrent(alert);
+		//display.setView(alert);
 	}
 	
 }
