@@ -7,6 +7,7 @@ import javax.microedition.lcdui.Display;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
 import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.media.image.storage.ImageRMSUtility;
@@ -25,7 +26,7 @@ public class ImageChooserActivity implements IActivity
 	private Hashtable allImages;
 	private Context context;
 	private IShell shell;
-	private Display display;
+	private IDisplay display;
 	private ImageRMSUtility dataModel;
 
 	public ImageChooserActivity(IShell shell) {
