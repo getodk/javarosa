@@ -66,7 +66,22 @@ public class ImageChooserActivity implements IActivity
 	}
 
 	public void start(Context context) {
-		// TODO Auto-generated method stub
+//		The start method should complete all initialization that was not performed in the 
+//		constructor, including all GUI initialization. The context object parameter is 
+//		likely a subclass of the global context object. The context should contain required 
+//		and optional parameters for running the Activity. It is preferred to pass all this 
+//		information through the context rather than call separate initialize(...) methods, 
+//		because this way the activity's current 'configuration' can be accessed and passed 
+//		around generically.
+
+//		When start() is called, the Activity should initialize itself and then take control 
+//		of the application, for instance by setting the Display. Activities shouldn't touch 
+//		the device's Display object directly, but rather call the shell's setDisplay() method. 
+//		This allows the Shell to mediate requests for the Display, thus preventing confused 
+//		Activities from breaking the Application's workflow.
+
+//		In this method you should generally save off a reference to the activity's parent Shell. 
+
 		
 	}
 	

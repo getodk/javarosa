@@ -30,6 +30,7 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.media.image.storage.ImageRMSUtility;
+import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.view.CameraCanvas;
 
 /**
@@ -67,8 +68,7 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	}
 
 	public void destroy() {
-		// TODO Auto-generated method stub
-		
+		shell.returnFromActivity(this, "Success!", null);
 	}
 
 	public Context getActivityContext() {
@@ -96,21 +96,6 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		this.context = context;
 		showCamera();
 		
-//		The start method should complete all initialization that was not performed in the 
-//		constructor, including all GUI initialization. The context object parameter is 
-//		likely a subclass of the global context object. The context should contain required 
-//		and optional parameters for running the Activity. It is preferred to pass all this 
-//		information through the context rather than call separate initialize(...) methods, 
-//		because this way the activity's current 'configuration' can be accessed and passed 
-//		around generically.
-
-//		When start() is called, the Activity should initialize itself and then take control 
-//		of the application, for instance by setting the Display. Activities shouldn't touch 
-//		the device's Display object directly, but rather call the shell's setDisplay() method. 
-//		This allows the Shell to mediate requests for the Display, thus preventing confused 
-//		Activities from breaking the Application's workflow.
-
-//		In this method you should generally save off a reference to the activity's parent Shell. 
 	}
 	
 	/**
@@ -154,19 +139,6 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 			canvas.setCommandListener(this);
 			
 			display.setView(DisplayViewFactory.createView(canvas));
-			
-
-			/*
-			 Form form = new Form("Camera form");
-			 Item item = (Item)mVideoControl.initDisplayMode(
-			 GUIControl.USE_GUI_PRIMITIVE, null);
-			 form.append(item);
-			 form.addCommand(mBackCommand);
-			 form.addCommand(mCaptureCommand);
-			 form.setCommandListener(this);
-			 mDisplay.setCurrent(form);
-			 */
-
 			mPlayer.start();
 		} catch (IOException ioe) {
 			handleException(ioe);
@@ -206,6 +178,22 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 
 	private void doCapture() {
 		byte[] jpg;
+		int width = 1360;
+		int height = 1020;
+		try {
+			// Get the image.
+			jpg = mVideoControl.getSnapshot("encoding=jpeg&quality=100&width=" + width + "&height=" + height);
+			// Save to file
+			String fileName = "test" + System.currentTimeMillis();
+			boolean saved = saveFile(fileName + ".jpg", jpg);
+		} catch (MediaException me) {
+			handleException(me);
+		}
+	}
+	
+	
+	private void doCaptureLoop() {
+		byte[] jpg;
 		// add a loop to do this a lot and write them to individual files so we know when we fail
 		int width = 640;
 		int height = 480;
@@ -236,13 +224,8 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 			height += 60;
 		}
 		saveFile("photo_log" + System.currentTimeMillis() + ".txt", text.getBytes());
-//		if (null != jpg) {
-//			String fileName = "test" + System.currentTimeMillis();
-//			boolean saved = saveFile(fileName + ".jpg", jpg);
-//			//boolean saved = saveImageToRMS(fileName + ".jpg", jpg);
-//		}
-		
 	}
+	
 	private boolean saveImageToRMS(String filename, byte[] image) {
 		Image imageObj = Image.createImage(image, 0, image.length);
 		dataModel.saveImage(filename, image);
@@ -251,76 +234,17 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	
 	private boolean saveFile(String filename, byte[] image) {
 		// TODO 
-		String rootName = getRootName();
+		String rootName = FileUtility.getDefaultRoot();
 		String restorepath = "file:///" + rootName + "JRImages";				
-		createDirectory(restorepath);
+		FileUtility.createDirectory(restorepath);
 		String fullName = restorepath + "/" + filename;
 		System.out.println("Image saved.");
-		return createFile(fullName, image);
+		return FileUtility.createFile(fullName, image);
 		// not sure why this was being done twice
 	}
 
-	private boolean createFile(String fullName, byte[] image) {
-		OutputStream fos = null;
-		FileConnection file = null;
-		boolean isSaved = false;
-		try {
-			file = (FileConnection) Connector.open(fullName);
-			if (!file.exists()) {
-				file.create();
-			}				
-			fos = file.openOutputStream();
-			fos.write(image);
-			isSaved = true;
-		} catch (Exception ex) {				
-			showAlert("Error - File is not writable - 1 " + ex.getMessage());
-			ex.printStackTrace();
-		} 
-		finally {
-			try {					
-				if (fos != null) {
-					fos.flush();
-					fos.close();
-				}
-				if (file != null)
-					file.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return isSaved;
-		
-	}
-	private void createDirectory(String restorepath) {
-		
-		FileConnection directory = null;
-		try {
-			directory = (FileConnection) Connector.open(restorepath);
-			if (!directory.exists())
-				directory.mkdir();
-			directory.close();
-		}
-		catch (Exception ex) {
-			showAlert("Error - Folder not created - 1 : " + ex.getMessage());
-		}
-		finally {
-			try {
-				if (directory != null)
-					directory.close();
-			}
-			catch(Exception e) {}
-		}
-	}
-
-	private String getRootName() {
-		Enumeration root = FileSystemRegistry.listRoots();
-		String rootName = null;
-		while (root.hasMoreElements()) {
-			rootName = (String) root.nextElement();
-		}
-		return rootName;
-	}
-
+	
+	
 	public void showAlert(String error) {
 		// TODO: should these be polished?
 		Alert alert = new Alert(error);
