@@ -1,5 +1,5 @@
 <project default="default">
-	<property name="rootdir" value="..\..\" />
+	<property name="rootdir" value="C:\src\svn\JavaRosa\" />
 	<target name="clean" description="Remove old merge">
 		<delete dir="${rootdir}\merged" />
 	</target>
