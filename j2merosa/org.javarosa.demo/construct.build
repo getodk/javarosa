@@ -1,0 +1,23 @@
+<project default="default">
+
+	<target name="clean" description="Remove old merge">
+		<delete dir="merged" />
+	</target>
+
+	<target name="merge" description="Merge together the javarosa and j2merosa code">
+		<mkdir dir="merged" />
+		<copy todir="merged">
+			<fileset basedir="javarosa">
+				<include name="*" />
+			</fileset>
+		</copy>
+		<copy todir="merged">
+			<fileset basedir="j2merosa">
+				<include name="*" />
+			</fileset>
+		</copy>
+
+	</target>
+	<target name="default" depends="clean, merge" />
+
+</project>
