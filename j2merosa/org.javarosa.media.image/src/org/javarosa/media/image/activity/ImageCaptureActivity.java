@@ -43,6 +43,7 @@ import org.javarosa.media.image.view.CameraCanvas;
 public class ImageCaptureActivity implements IActivity, CommandListener
 {
 
+	public static final String IMAGE_KEY = "IMAGE_KEY";
 	private Context context;
 	private IShell shell;
 	
@@ -55,7 +56,8 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	private Command mCaptureCommand;
 	private IDisplay display;
 	private ImageRMSUtility dataModel;
-
+	private Image image;
+	
 	public ImageCaptureActivity(IShell shell) {
 		this.shell = shell;
 		display = JavaRosaServiceProvider.instance().getDisplay();
@@ -68,12 +70,13 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	}
 
 	public void destroy() {
-		shell.returnFromActivity(this, "Success!", null);
+		mPlayer.close();
+		mPlayer = null;
+		mVideoControl = null;
 	}
 
 	public Context getActivityContext() {
-		// TODO Auto-generated method stub
-		return null;
+		return context;
 	}
 
 	public void halt() {
@@ -95,7 +98,6 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		// take a pointer to the context and shell
 		this.context = context;
 		showCamera();
-		
 	}
 	
 	/**
@@ -111,15 +113,20 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	 * takes the selected image return it (and control) to the shell
 	 * Other images are deleted?
 	 */
-	private void finish() {
+	private void doFinish() {
 		Hashtable args = buildReturnArgs();
-		shell.returnFromActivity(this, "Success!", args);
+		shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, args);
+	}
 
+	private void doError() {
+		shell.returnFromActivity(this, Constants.ACTIVITY_ERROR, null);
 	}
 
 	private Hashtable buildReturnArgs() {
 		// stick the picture in here. 
-		return null;
+		Hashtable table = new Hashtable();
+		table.put(IMAGE_KEY, image);
+		return table;
 	}
 	private void showCamera() {
 		try {
@@ -128,8 +135,8 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 
 			mVideoControl = (VideoControl) mPlayer.getControl("VideoControl");
 
-//			Command mExitCommand = new Command("Exit", Command.EXIT, 0);
-//			Command mCameraCommand = new Command("Camera", Command.SCREEN, 0);
+			//	Command mExitCommand = new Command("Exit", Command.EXIT, 0);
+			//	Command mCameraCommand = new Command("Camera", Command.SCREEN, 0);
 			mBackCommand = new Command("Back", Command.BACK, 0);
 			mCaptureCommand = new Command("Capture", Command.SCREEN, 0);
 
@@ -152,41 +159,44 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 //		a.setTimeout(Alert.FOREVER);
 //		JavaRosaServiceProvider.instance().getDisplay().setCurrent(a);
 //		throw new RuntimeException(e.getMessage());
+		System.out.println(e.getMessage());
+		e.printStackTrace();
 		String toLog = e.getMessage();
 		toLog += e.toString();
 		saveFile("log" + System.currentTimeMillis() + ".txt", toLog.getBytes());
 		
+		doError();
 	}
 
+	
 	public void commandAction(Command cmd, Displayable display) {
-		// TODO Auto-generated method stub
 		if (cmd.equals(this.mBackCommand)) {
 			goBack();
 		}
 		else if (cmd.equals(this.mCaptureCommand)) {
 			doCapture();
-			System.out.println("Click!");
+			//doCaptureLoop();
 		}
 	}
 
 	private void goBack() {
-		// TODO
-		System.out.println("Back Again!");
 		this.shell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
 		
 	}
 
 	private void doCapture() {
-		byte[] jpg;
-		int width = 1360;
-		int height = 1020;
+		byte[] jpg;	
+		int width = 640;
+		int height = 480;
 		try {
 			// Get the image.
 			jpg = mVideoControl.getSnapshot("encoding=jpeg&quality=100&width=" + width + "&height=" + height);
-			// Save to file
-			String fileName = "test" + System.currentTimeMillis();
-			boolean saved = saveFile(fileName + ".jpg", jpg);
-		} catch (MediaException me) {
+			image = Image.createImage(jpg, 0, jpg.length);
+			doFinish();
+			// Save to file no longer
+			//String fileName = "test" + System.currentTimeMillis();
+			//boolean saved = saveFile(fileName + ".jpg", jpg);
+		} catch (Exception me) {
 			handleException(me);
 		}
 	}

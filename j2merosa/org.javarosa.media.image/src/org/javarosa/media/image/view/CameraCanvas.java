@@ -1,6 +1,6 @@
 /* License
  * 
-  * Modifications by Andres Monroy-Hernandez, 2008
+ * Modifications by Cory Zue, Oct-Nov 2008
  * Copyright 1994-2004 Sun Microsystems, Inc. All Rights Reserved.
  * 
  * Redistribution and use in source and binary forms, with or without

@@ -31,22 +31,18 @@ public class FileUtility {
 			directory = (FileConnection) Connector.open(path);
 			if (!directory.exists())
 				directory.mkdir();
-			directory.close();
 		}
 		catch (IOException ex) {
 			handleException(ex);
 			return false;
 		}
 		finally {
-			try {
-				if (directory != null)
-					directory.close();
-			}
-			catch(Exception e) {}
+			close(directory);
 		}
 		return true;
 	}
 	
+
 	/**
 	 * Get a list of root directories on the device
 	 * @return
@@ -67,6 +63,28 @@ public class FileUtility {
 		}
 		return rootName;
 	}
+	
+	
+	public static Enumeration listDirectory(String directoryPath) {
+		FileConnection dir = null;
+		try {
+			dir = (FileConnection) Connector.open(directoryPath);
+			return dir.list();
+		} catch (Exception ex) {
+			handleException(ex);
+			return new Enumeration() {
+				public boolean hasMoreElements() {
+					return false;
+				}
+				public Object nextElement() {
+					return null;
+				}};
+		} finally {
+			close(dir);
+			
+		}
+	}
+
 	
 	
 	/**
@@ -90,21 +108,31 @@ public class FileUtility {
 			handleException(ex);
 			return false;
 		} 
-		finally {
-			try {					
-				if (fos != null) {
-					fos.flush();
-					fos.close();
-				}
-				if (file != null)
-					file.close();
-			} catch (Exception e) {
-				
-			}
+		finally {		
+			close(fos);
+			close(file);
 		}
 		return true;
 	}
 
+	private static void close(OutputStream stream) {
+		try {					
+			if (stream != null) {
+				stream.flush();
+				stream.close();
+			}
+		} catch (Exception e) {
+		}	
+	}
+
+	private static void close(FileConnection connection) {
+		try {
+			if (connection != null)
+				connection.close();
+		}
+		catch(Exception e) {}
+	}
+	
 	private static void handleException(Exception ex) {
 		// TODO Auto-generated method stub
 		
