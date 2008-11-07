@@ -2,15 +2,23 @@ package org.javarosa.media.image.activity;
 
 import java.util.Hashtable;
 
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
+import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
+import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.media.image.storage.ImageRMSUtility;
+import org.javarosa.media.image.utilities.ImageUtility;
 
 /**
  * An Activity that represents the selection of zero or more images.
@@ -20,19 +28,36 @@ import org.javarosa.media.image.storage.ImageRMSUtility;
  * @author Cory Zue
  *
  */
-public class ImageChooserActivity implements IActivity
+public class ImageChooserActivity implements IActivity, CommandListener
 {
+	public static final String ACTIVITY_KEY = "ACTIVITY_KEY";
 	// this should map images (IDataPointers) to bool true/false whether selected or not
 	private Hashtable allImages;
 	private Context context;
 	private IShell shell;
 	private IDisplay display;
 	private ImageRMSUtility dataModel;
+	private Form mainForm;
+	private Command cancelCommand;
+	private Command cameraCommand;
+	private Command browseCommand;
+	private Command returnCommand;
+	private Command viewCommand;
+	private Command markCommand;
+	private String currentKey;
+	  
 
 	public ImageChooserActivity(IShell shell) {
 		this.shell = shell;
 		display = JavaRosaServiceProvider.instance().getDisplay();
 		dataModel = new ImageRMSUtility("image_store");
+		
+		cancelCommand = new Command("Cancel", Command.CANCEL, 0);
+		returnCommand = new Command("Return", Command.OK, 0);
+	    cameraCommand = new Command("Camera", Command.SCREEN, 0);
+	    browseCommand = new Command("Browse", Command.SCREEN, 0);
+	    viewCommand = new Command("View", Command.SCREEN, 0);
+	    markCommand = new Command("Mark/Unmark", Command.SCREEN, 0);
 	}
 
 	public void contextChanged(Context globalContext) {
@@ -46,8 +71,7 @@ public class ImageChooserActivity implements IActivity
 	}
 
 	public Context getActivityContext() {
-		// TODO Auto-generated method stub
-		return null;
+		return context;
 	}
 
 	public void halt() {
@@ -56,32 +80,32 @@ public class ImageChooserActivity implements IActivity
 	}
 
 	public void resume(Context globalContext) {
-		// TODO Auto-generated method stub
+		Image img = (Image) globalContext.getElement(currentKey);
+		if (img != null) {
+			Image thumbnail = ImageUtility.createThumbnail(img);
+			mainForm.append(thumbnail);
+		}
+		display.setView(DisplayViewFactory.createView(mainForm));
 		
 	}
 
 	public void setShell(IShell shell) {
-		// TODO Auto-generated method stub
+		this.shell = shell;
 		
 	}
 
 	public void start(Context context) {
-//		The start method should complete all initialization that was not performed in the 
-//		constructor, including all GUI initialization. The context object parameter is 
-//		likely a subclass of the global context object. The context should contain required 
-//		and optional parameters for running the Activity. It is preferred to pass all this 
-//		information through the context rather than call separate initialize(...) methods, 
-//		because this way the activity's current 'configuration' can be accessed and passed 
-//		around generically.
-
-//		When start() is called, the Activity should initialize itself and then take control 
-//		of the application, for instance by setting the Display. Activities shouldn't touch 
-//		the device's Display object directly, but rather call the shell's setDisplay() method. 
-//		This allows the Shell to mediate requests for the Display, thus preventing confused 
-//		Activities from breaking the Application's workflow.
-
-//		In this method you should generally save off a reference to the activity's parent Shell. 
-
+		this.context = context;
+		mainForm = new Form("Image Chooser");
+        mainForm.addCommand(cancelCommand);
+		mainForm.addCommand(cameraCommand);
+		mainForm.addCommand(browseCommand);
+		mainForm.addCommand(returnCommand);
+		mainForm.addCommand(viewCommand);
+		mainForm.addCommand(markCommand);
+	    mainForm.setCommandListener(this);
+	    
+	    display.setView(DisplayViewFactory.createView(mainForm));
 		
 	}
 	
@@ -115,6 +139,61 @@ public class ImageChooserActivity implements IActivity
 		Hashtable args = null; //buildReturnArgs();
 		shell.returnFromActivity(this, "Success!", args);
 
+	}
+
+	public void commandAction(Command command, Displayable display) {
+		if (command.equals(cameraCommand)) {
+			processCamera();
+		} else if (command.equals(browseCommand)) {
+			processBrowser();
+		} else if (command.equals(viewCommand)) {
+			processView();
+		} else if (command.equals(cancelCommand)) {
+			processCancel();
+		} else if (command.equals(returnCommand)) {
+			processReturn();
+		} else if (command.equals(markCommand)) {
+			processMark();
+		}  
+	}
+
+	private void processReturn() {
+		shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+	}
+
+	private void processMark() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void processCancel() {
+		shell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);				
+	}
+
+	private void processView() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void processBrowser() {
+		returnFromActivity(new FileBrowseActivity(shell));
+	}
+
+	private void processCamera() 
+	{
+		currentKey = ImageCaptureActivity.IMAGE_KEY;
+		returnFromActivity(new ImageCaptureActivity(shell));
+	}
+
+	private void returnFromActivity(IActivity activity) {
+		Hashtable returnArgs = buildReturnArgsFromActivity(activity);
+		shell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, returnArgs);
+	}
+
+	private Hashtable buildReturnArgsFromActivity(IActivity activity) {
+		Hashtable table = new Hashtable();
+		table.put(ACTIVITY_KEY, activity);
+		return table;
 	}
 
 	
