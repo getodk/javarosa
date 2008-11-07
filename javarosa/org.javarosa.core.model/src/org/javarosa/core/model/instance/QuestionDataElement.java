@@ -175,7 +175,7 @@ public class QuestionDataElement extends TreeElement {
 		reference = (IDataReference)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		
 		// read attributes
-		Vector attStrings = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(), pf));
+		Vector attStrings = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(String.class), pf));
 		setAttributesFromSingleStringVector(attStrings);
 
 		value = (IAnswerData)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);	

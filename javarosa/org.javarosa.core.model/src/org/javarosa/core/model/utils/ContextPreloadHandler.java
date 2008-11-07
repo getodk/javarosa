@@ -56,11 +56,12 @@ public class ContextPreloadHandler implements IPreloadHandler
 	//The context preload parameter
 	private IAnswerData preloadContext(String preloadParams) {
 		String value = "";
-		String userVal = this.context.getCurrentUser();
-		System.out.println("LOGIN NAME IS "+userVal);
-		if ("UserID".equals(preloadParams) && userVal != "")
-		{ //retrieve
-			value = userVal;
+		if ("UserID".equals(preloadParams)) {
+			String userVal = this.context.getCurrentUser();
+			System.out.println("LOGIN NAME IS "+userVal);
+			
+			if (userVal != null && userVal.length() > 0)
+				value = userVal;
 		}
 		System.out.println(value);
 		return new StringData(value);
