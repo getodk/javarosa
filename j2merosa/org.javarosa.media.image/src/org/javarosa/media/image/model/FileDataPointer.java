@@ -1,6 +1,7 @@
 package org.javarosa.media.image.model;
 
 import org.javarosa.core.model.data.IDataPointer;
+import org.javarosa.media.image.utilities.FileUtility;
 
 /**
  * Implementation of the data pointer that represents an underlying file on the file system.
@@ -17,8 +18,7 @@ public class FileDataPointer implements IDataPointer {
 	}
 	
 	public byte[] getData() {
-		// TODO read the file from memory
-		return null;
+		return FileUtility.getFileData(fileName);
 	}
 
 	public String getDisplayText() {

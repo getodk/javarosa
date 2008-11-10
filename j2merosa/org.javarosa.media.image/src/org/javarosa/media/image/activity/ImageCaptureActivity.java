@@ -1,19 +1,13 @@
 package org.javarosa.media.image.activity;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
-import javax.microedition.io.Connector;
-import javax.microedition.io.file.FileConnection;
-import javax.microedition.io.file.FileSystemRegistry;
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Image;
 import javax.microedition.media.Manager;
@@ -27,9 +21,10 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.model.data.BasicDataPointer;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
-import org.javarosa.media.image.storage.ImageRMSUtility;
+import org.javarosa.media.image.storage.FileRMSUtility;
 import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.view.CameraCanvas;
 
@@ -55,15 +50,20 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	private Command mBackCommand;
 	private Command mCaptureCommand;
 	private IDisplay display;
-	private ImageRMSUtility dataModel;
-	private Image image;
+	private FileRMSUtility dataModel;
+	private byte[] imageData;
+	private int width;
+	private int height;
 	
 	public ImageCaptureActivity(IShell shell) {
 		this.shell = shell;
 		display = JavaRosaServiceProvider.instance().getDisplay();
-		dataModel = new ImageRMSUtility("image_store");
+		dataModel = new FileRMSUtility("image_store");
+		width = 640;
+		height = 480;
 	}
 
+	
 	public void contextChanged(Context globalContext) {
 		// TODO Auto-generated method stub
 		
@@ -100,6 +100,11 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		showCamera();
 	}
 	
+	public void setResolition(int width, int height) {
+		this.width = width;
+		this.height = height;
+		
+	}
 	/**
 	 * Actually capture an image
 	 * 
@@ -125,9 +130,11 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	private Hashtable buildReturnArgs() {
 		// stick the picture in here. 
 		Hashtable table = new Hashtable();
-		table.put(IMAGE_KEY, image);
+		BasicDataPointer p = new BasicDataPointer("Image", imageData);
+		table.put(IMAGE_KEY, p);
 		return table;
 	}
+	
 	private void showCamera() {
 		try {
 			mPlayer = Manager.createPlayer("capture://video");
@@ -185,13 +192,10 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	}
 
 	private void doCapture() {
-		byte[] jpg;	
-		int width = 640;
-		int height = 480;
 		try {
 			// Get the image.
-			jpg = mVideoControl.getSnapshot("encoding=jpeg&quality=100&width=" + width + "&height=" + height);
-			image = Image.createImage(jpg, 0, jpg.length);
+			imageData = mVideoControl.getSnapshot("encoding=jpeg&quality=100&width=" + width + "&height=" + height);
+			//image = Image.createImage(jpg, 0, jpg.length);
 			doFinish();
 			// Save to file no longer
 			//String fileName = "test" + System.currentTimeMillis();

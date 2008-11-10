@@ -1,6 +1,7 @@
 package org.javarosa.media.image.utilities;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
@@ -115,6 +116,51 @@ public class FileUtility {
 		return true;
 	}
 
+	
+	/**
+	 * Gets file data from the OS
+	 * @param fileName
+	 * @return
+	 */
+	public static byte[] getFileData(String fileName) {
+		InputStream fis = null;
+		FileConnection file = null;
+		boolean isSaved = false;
+		try {
+			file = (FileConnection) Connector.open(fileName);
+			int bytesToRead = (int) file.fileSize();
+			byte[] toReturn = new byte[bytesToRead];
+			fis = file.openInputStream();
+			int bytesRead = 0;
+			int blockSize = 1024;
+			while (bytesToRead > bytesRead) {
+				int thisBlock = blockSize;
+				if (bytesToRead - bytesRead < blockSize) {
+					thisBlock = bytesToRead-bytesRead;
+				}
+				fis.read(toReturn, bytesRead, thisBlock);
+				bytesRead += blockSize;
+			}
+			return toReturn;
+		} catch (Exception ex) {				
+			handleException(ex);
+		} 
+		finally {		
+			close(fis);
+			close(file);
+		}
+		return null;
+	}
+	private static void close(InputStream stream) {
+		try {					
+			if (stream != null) {
+				stream.close();
+			}
+		} catch (Exception e) {
+		}
+	}
+
+
 	private static void close(OutputStream stream) {
 		try {					
 			if (stream != null) {
@@ -137,6 +183,8 @@ public class FileUtility {
 		// TODO Auto-generated method stub
 		
 	}
+
+	
 
 	
 }
