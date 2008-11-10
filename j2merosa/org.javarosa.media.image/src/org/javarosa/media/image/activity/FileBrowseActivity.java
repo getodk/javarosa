@@ -3,6 +3,7 @@ package org.javarosa.media.image.activity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 import javax.microedition.io.Connector;
 import javax.microedition.lcdui.Alert;
@@ -22,6 +23,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
 import org.javarosa.j2me.view.DisplayViewFactory;
+import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.media.image.utilities.FileUtility;
 
 public class FileBrowseActivity implements IActivity, CommandListener {
@@ -40,6 +42,8 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	private final static String MEGA_ROOT = "/";
 	private final static String SEP_STR = "/";
 	private final static char SEP = '/';
+
+	public static final String FILE_POINTER = "FILE_POINTER";
 
 	public FileBrowseActivity(IShell shell) {
 		this.shell = shell;
@@ -102,7 +106,6 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		if (c == selectCommand ) {
 			List curr = (List) d;
 			final String currFile = curr.getString(curr.getSelectedIndex());
-			
 			new Thread(new Runnable() {
 				public void run() {
 					if (currFile.endsWith(SEP_STR)
@@ -183,10 +186,11 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	}
 
 	void returnFile(String fileName) {
-		try {
-			// todo
-		} catch (Exception e) {
-		}
+		String fullName = "file:///" + currDirName + fileName;
+		FileDataPointer fdp = new FileDataPointer(fullName);
+		Hashtable returnArgs = new Hashtable();
+		returnArgs.put(FILE_POINTER, fdp);
+		shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
 	}
 	
 }

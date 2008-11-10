@@ -7,7 +7,7 @@ import org.javarosa.core.services.storage.utilities.MetaDataObject;
  * @author Cory Zue
  *
  */
-public class ImageMetaData  extends MetaDataObject {
+public class FileMetaData  extends MetaDataObject {
 
 	
 	private String fileName;

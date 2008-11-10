@@ -6,17 +6,17 @@ import java.util.Hashtable;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 
 /**
- * A (potentially temporary) class for writing an image to RMS
+ * A (potentially temporary) class for writing a basic byte[] to RMS
  * @author Cory Zue
  *
  */
-public class ImageRMSUtility extends RMSUtility {
+public class FileRMSUtility extends RMSUtility {
 
 	private Hashtable images;
 	
-	public ImageRMSUtility(String name) {
+	public FileRMSUtility(String name) {
 		super(name, RMSUtility.RMS_TYPE_STANDARD);
-		images = new Hashtable();
+		images = new Hashtable();	
 	}
 	
 	public String[] getList() {
@@ -32,7 +32,7 @@ public class ImageRMSUtility extends RMSUtility {
 	
 	public void saveImage(String fileName, byte[] data) {
 		
-		ImageMetaData md = new ImageMetaData();
+		FileMetaData md = new FileMetaData();
 		md.setFileName(fileName);
 		this.writeBytesToRMS(data, md);
 		images.put(fileName, md);
