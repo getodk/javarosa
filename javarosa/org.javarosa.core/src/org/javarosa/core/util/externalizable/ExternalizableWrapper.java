@@ -35,6 +35,10 @@ public abstract class ExternalizableWrapper implements Externalizable {
 	/* serialize the state of the externalizable wrapper (type information only, not value) */
 	public abstract void metaWriteExternal (DataOutputStream out) throws IOException;
 
+	public abstract void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException;
+	
+	public abstract void writeExternal(DataOutputStream out) throws IOException;
+			
 	public Object baseValue () {
 		Object baseVal = val;
 		while (baseVal instanceof ExternalizableWrapper) {
