@@ -167,6 +167,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
             if (this.getSelectedIndex() != -1) {
             	DataModelTreeMetaData data = (DataModelTreeMetaData) modelIDs.elementAt(this.getSelectedIndex());
             	DataModelTree model = new DataModelTree();
+            	ITransportManager tm = JavaRosaServiceProvider.instance().getTransportManager();
                 try {
                     this.dataModelRMSUtility.retrieveFromRMS(data.getRecordId(), model);
                     //model.setRecordId(data.getRecordId());
@@ -178,12 +179,24 @@ public class ModelListActivity extends List implements CommandListener, IActivit
                     final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("modelLoadError", "Error Loading Model", null, AlertType.ERROR);
                     mainShell.setDisplay(this, new IView() {public Object getScreenObject() { return a;}});
                     e.printStackTrace();
-                } 
+                }
+                //restrict resending of sent forms here
+                
+                if(TransportMessage.STATUS_DELIVERED == tm.getModelDeliveryStatus(data.getRecordId(), true))
+                {
+                	final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("Resend restriction", "Form already submitted!", null, AlertType.INFO);
+                    mainShell.setDisplay(this, new IView() {public Object getScreenObject() { return a;}});
+                	//Hashtable returnArgs = new Hashtable();
+                	//returnArgs.put(returnKey, CMD_BACK);
+                	//mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+                }	
+                
                 Hashtable formSendArgs = new Hashtable();
                 //TODO: We need some way to codify this Next Action stuff. Maybe a set of Constants for the ModelListModule?
                 formSendArgs.put(returnKey, CMD_SEND);
                 formSendArgs.put("data", model);
                 mainShell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, formSendArgs);
+                
             }
         } else if (c == CMD_EMPTY)
         {
