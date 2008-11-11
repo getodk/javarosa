@@ -47,11 +47,12 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	{
 		this.model = model;
     	this.controller = controller;
+    	this.parent = new FormViewScreen(model);
     	this.showFormView = true;
     	model.registerObservable(this);
 //immediately setup question, need to decide if this is the best place to do it
 //    	this.getView(questionIndex);
-    	//controller.setView(this);
+    	controller.setFormEntryView(this);
 
 	}
 
