@@ -163,7 +163,7 @@
 
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="supressOutput, disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
-		<RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.FormViewManagerTest"/>
+		<!--RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.FormViewManagerTest"/-->
 		<!--RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.CLFormsWidgetsTest"/-->
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathParseTest"/>
