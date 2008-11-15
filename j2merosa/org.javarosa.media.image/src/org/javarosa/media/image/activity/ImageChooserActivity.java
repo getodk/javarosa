@@ -19,6 +19,7 @@ import org.javarosa.core.model.data.IDataPointer;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.media.image.storage.FileRMSUtility;
+import org.javarosa.media.image.utilities.ImageSniffer;
 import org.javarosa.media.image.utilities.ImageUtility;
 
 /**
@@ -47,6 +48,8 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	private Command viewCommand;
 	private Command markCommand;
 	private String currentKey;
+	private Thread snifferThread;
+	private ImageSniffer sniffer;
 
 	public ImageChooserActivity(IShell shell) {
 		this.shell = shell;
@@ -66,8 +69,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	}
 
 	public void destroy() {
-		// TODO Auto-generated method stub
-
+		sniffer.quit();
 	}
 
 	public Context getActivityContext() {
@@ -82,18 +84,12 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	public void resume(Context globalContext) {
 		Object o = globalContext.getElement(currentKey);
 		IDataPointer pointer = (IDataPointer) o;
-		try {
-			if (pointer != null) { 
-				byte[] data = pointer.getData();
-				Image img = Image.createImage(data, 0, data.length);
-				Image thumbNail = ImageUtility.createThumbnail(img);
-				mainForm.append(thumbNail);
-			}
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
-			System.out.println(ex);
-			
-		}
+		addImageToUI(pointer);
+		updateView();
+	}
+
+	
+	private void updateView() {
 		display.setView(DisplayViewFactory.createView(mainForm));
 	}
 
@@ -113,9 +109,30 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		mainForm.addCommand(markCommand);
 		mainForm.setCommandListener(this);
 
-		display.setView(DisplayViewFactory.createView(mainForm));
-
+		mainForm.append("Use the menu options to take pictures or browse.");
+	      
+		// also create the sniffer
+		sniffer = new ImageSniffer("file://localhost/root1/photos/", this);
+		snifferThread = new Thread(sniffer);
+		snifferThread.start();
+		updateView();
 	}
+	
+	public synchronized void addImageToUI(IDataPointer pointer) {
+		try {
+			if (pointer != null) { 
+				byte[] data = pointer.getData();
+				Image img = Image.createImage(data, 0, data.length);
+				Image thumbNail = ImageUtility.createThumbnail(img);
+				mainForm.append(thumbNail);
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			System.out.println(ex);
+			
+		}
+	}
+
 
 	private FileDataPointer captureNewImage() {
 		// TODO: I have a feeling this is going to actually be some sort of back
