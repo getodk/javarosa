@@ -54,13 +54,14 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	private byte[] imageData;
 	private int width;
 	private int height;
+	private String fullName;
 	
 	public ImageCaptureActivity(IShell shell) {
 		this.shell = shell;
 		display = JavaRosaServiceProvider.instance().getDisplay();
 		dataModel = new FileRMSUtility("image_store");
-		width = 640;
-		height = 480;
+		width = 960;
+		height = 720;
 	}
 
 	
@@ -130,7 +131,8 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	private Hashtable buildReturnArgs() {
 		// stick the picture in here. 
 		Hashtable table = new Hashtable();
-		BasicDataPointer p = new BasicDataPointer("Image", imageData);
+		FileDataPointer p = new FileDataPointer(fullName);
+		//BasicDataPointer p = new BasicDataPointer("Image", imageData);
 		table.put(IMAGE_KEY, p);
 		return table;
 	}
@@ -196,10 +198,11 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 			// Get the image.
 			imageData = mVideoControl.getSnapshot("encoding=jpeg&quality=100&width=" + width + "&height=" + height);
 			//image = Image.createImage(jpg, 0, jpg.length);
-			doFinish();
 			// Save to file no longer
-			//String fileName = "test" + System.currentTimeMillis();
-			//boolean saved = saveFile(fileName + ".jpg", jpg);
+			String fileName = "test" + System.currentTimeMillis();
+			fullName = saveFile(fileName + ".jpg", imageData);
+			doFinish();
+			
 		} catch (Exception me) {
 			handleException(me);
 		}
@@ -220,7 +223,7 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 			//jpg = mVideoControl.getSnapshot("encoding=jpeg&quality="+ quality);
 			jpg = mVideoControl.getSnapshot("encoding=jpeg&quality=100&width=" + width + "&height=" + height);
 			String fileName = "test" + System.currentTimeMillis();
-			boolean saved = saveFile(fileName + ".jpg", jpg);
+			boolean saved = saveFile(fileName + ".jpg", jpg) == "";
 			if (saved) {
 				text += "Success!";
 				
@@ -246,15 +249,19 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		return true;
 	}
 	
-	private boolean saveFile(String filename, byte[] image) {
+	private String saveFile(String filename, byte[] image) {
 		// TODO 
 		String rootName = FileUtility.getDefaultRoot();
 		String restorepath = "file:///" + rootName + "JRImages";				
 		FileUtility.createDirectory(restorepath);
 		String fullName = restorepath + "/" + filename;
-		System.out.println("Image saved.");
-		return FileUtility.createFile(fullName, image);
-		// not sure why this was being done twice
+		if (FileUtility.createFile(fullName, image)) {
+			System.out.println("Image saved.");	
+			return fullName;	
+		} else {
+			return "";
+		}
+		
 	}
 
 	
