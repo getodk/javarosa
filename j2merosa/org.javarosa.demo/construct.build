@@ -16,8 +16,7 @@
 				<include name="**/*" />
 			</fileset>
 		</copy>
-
 	</target>
+	
 	<target name="default" depends="clean, merge" />
-
 </project>
