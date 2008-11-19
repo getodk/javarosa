@@ -185,18 +185,18 @@ public class ModelListActivity extends List implements CommandListener, IActivit
                 if(TransportMessage.STATUS_DELIVERED == tm.getModelDeliveryStatus(data.getRecordId(), true))
                 {
                 	final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("Resend restriction", "Form already submitted!", null, AlertType.INFO);
-                    mainShell.setDisplay(this, new IView() {public Object getScreenObject() { return a;}});
-                	//Hashtable returnArgs = new Hashtable();
-                	//returnArgs.put(returnKey, CMD_BACK);
-                	//mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+                	mainShell.setDisplay(this, new IView() {public Object getScreenObject() { return a;}});
+                	Hashtable returnArgs = new Hashtable();
+                	returnArgs.put(returnKey, CMD_MSGS);
+                	mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
                 }	
-                
+                else{
                 Hashtable formSendArgs = new Hashtable();
                 //TODO: We need some way to codify this Next Action stuff. Maybe a set of Constants for the ModelListModule?
                 formSendArgs.put(returnKey, CMD_SEND);
                 formSendArgs.put("data", model);
                 mainShell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, formSendArgs);
-                
+                }
             }
         } else if (c == CMD_EMPTY)
         {
