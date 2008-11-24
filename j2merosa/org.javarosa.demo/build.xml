@@ -59,6 +59,7 @@
 					<source dir="${basedir}/../org.javarosa.demo/test/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
 					<source dir="${basedir}/../org.javarosa.j2me/src/"/>
+					<!--source dir="${basedir}/../org.javarosa.mesh4j.sync.extensions/src/"/-->
                     <source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox.extensions/src/"/>
@@ -70,6 +71,9 @@
 					<source dir="${basedir}/../org.javarosa.patient/test/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/test/"/>
+					<!--source dir="${basedir}/../org.mesh4j.sync/src/"/-->
+					<!--source dir="${basedir}/../org.mesh4j.sync.message/src/"/-->
+					<!-- Add back in Mesh4X code once we're satisfied with using Java5's in Polish -->
 					
 					<!-- defunct
 					<source dir="${basedir}/../org.javarosa.action/src/"/>
@@ -119,7 +123,10 @@
 					<filter pattern="org.celllife.clforms.*" level="debug" />
 				</debug>
 				<!-- Properties of the actual javac compiler -->
-				<compiler debug="on" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar"/>
+				<compiler debug="on" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar${polish.home}/import/wmapi.jar"/>
+				
+				<!--postcompiler name="java5" /-->
+				<!-- Add back when we're satisfied with everyone using it -->
 
 			</build>
 
