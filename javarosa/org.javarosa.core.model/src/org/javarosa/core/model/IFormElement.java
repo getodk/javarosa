@@ -48,4 +48,10 @@ public interface IFormElement extends Localizable, Externalizable {
 	 * having children.
 	 */
 	void addChild (IFormElement fe);
+	
+	/**
+	 * @param binding The binding to direct which children should be returned
+	 * @param result The vector to be filled with this element's children
+	 */
+	void getChild(IDataReference binding, Vector result);
 }

@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
@@ -12,7 +13,6 @@ import javax.microedition.lcdui.StringItem;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.services.transport.TransportMessage;
-import org.javarosa.formmanager.activity.FormTransportActivity;
 
 public class SubmitStatusScreen extends Form implements IView {
 	private int modelID;
@@ -30,11 +30,15 @@ public class SubmitStatusScreen extends Form implements IView {
     public static String MSG_TOO_LONG = "Sending is taking a long time; you may check on the status and/or resend later in 'View Saved'";
     public static String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
     
-	public SubmitStatusScreen (FormTransportActivity fta, int modelID) {
+    public SubmitStatusScreen (CommandListener listener) {
+    	this(listener, -1);
+	}
+    
+	public SubmitStatusScreen (CommandListener listener, int modelID) {
     	//#style submitPopup
 		super("Send Status");
 		this.modelID = modelID;
-		setCommandListener(fta);
+		setCommandListener(listener);
 		
 		okCommand = new Command("OK", Command.OK, 1);
 		msg = new StringItem(null, MSG_SENDING);
@@ -52,21 +56,25 @@ public class SubmitStatusScreen extends Form implements IView {
 	}
 	
 	public void updateStatus () {
-		counter += REFRESH_INTERVAL;
-
 		int status = JavaRosaServiceProvider.instance().getTransportManager().getModelDeliveryStatus(modelID, false);
-		if (status != TransportMessage.STATUS_NEW)
-			timer.cancel();
+		updateStatus(status);
+	}
+	
+	public void updateStatus(int status) {
+			counter += REFRESH_INTERVAL;
 
-		String message;
-		switch (status) {
-		case TransportMessage.STATUS_NEW:       message = (counter < TIMEOUT ? MSG_SENDING : MSG_TOO_LONG); break;
-		case TransportMessage.STATUS_DELIVERED: message = MSG_SUCCESS + getServerResponse(); break;
-		case TransportMessage.STATUS_FAILED:    message = MSG_FAILED; break;
-		default:                                message = MSG_UNKNOWN_ERROR; break;
-		}
+			if (status != TransportMessage.STATUS_NEW)
+				timer.cancel();
 
-		msg.setText(message);
+			String message;
+			switch (status) {
+			case TransportMessage.STATUS_NEW:       message = (counter < TIMEOUT ? MSG_SENDING : MSG_TOO_LONG); break;
+			case TransportMessage.STATUS_DELIVERED: message = MSG_SUCCESS + getServerResponse(); break;
+			case TransportMessage.STATUS_FAILED:    message = MSG_FAILED; break;
+			default:                                message = MSG_UNKNOWN_ERROR; break;
+			}
+
+			msg.setText(message);
 	}
 	
 	public void destroy () {
