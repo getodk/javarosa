@@ -32,7 +32,7 @@ import org.javarosa.core.model.utils.DateUtils;
  */
 public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	
-	public final static String DELIMITER = "|";
+	public final static String DELIMITER = " ";
 	
 	Vector additionalSerializers = new Vector();
 	
