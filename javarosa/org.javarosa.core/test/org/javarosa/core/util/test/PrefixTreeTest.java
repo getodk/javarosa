@@ -43,7 +43,6 @@ public class PrefixTreeTest extends TestCase  {
 	}
 	
 	public void doTests() {
-		System.out.println("here i am motherfucker");
 		
 		PrefixTree t = new PrefixTree();	
 		System.out.println(t.toString());
