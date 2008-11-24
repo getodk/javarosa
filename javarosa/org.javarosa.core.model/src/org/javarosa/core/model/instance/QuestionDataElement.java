@@ -200,4 +200,8 @@ public class QuestionDataElement extends TreeElement {
 
 		ExtUtil.write(out, new ExtWrapNullable(value == null ? null : new ExtWrapTagged(value)));
 	}
+
+	public IDataReference getReference(){
+		return this.reference;
+	}
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.instance.DataModelTree;
@@ -38,7 +39,12 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 
 	/** The serializer to be used in constructing XML for AnswerData elements */
 	IAnswerDataSerializer serializer;
+	
+	/** The schema to be used to serialize answer data */
+	FormDef schema;
 
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.DataModelTree)
@@ -71,7 +77,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 		if(serializer == null) {
 			throw new NullPointerException("No Answer Data Serializer Could be Found to Serialize Answers");
 		}
-		Object serializedAnswerData = serializer.serializeAnswerData(element.getValue());
+		Object serializedAnswerData = serializer.serializeAnswerData(element, schema);
 		if(serializedAnswerData.getClass() == String.class) {
 			text.addChild(Element.TEXT, serializedAnswerData);
 		} else if(serializedAnswerData instanceof Element) {
@@ -149,5 +155,11 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 	 */
 	public void setAnswerDataSerializer(IAnswerDataSerializer ads) {
 		this.serializer = ads;
+	}
+
+	public byte[] serializeDataModel(IFormDataModel model, FormDef formDef)
+			throws IOException {
+		this.schema = formDef;
+		return serializeDataModel(model);
 	}
 }

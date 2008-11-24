@@ -1,6 +1,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.QuestionDataElement;
 
 
 /**
@@ -16,21 +17,35 @@ import org.javarosa.core.model.data.IAnswerData;
  *
  */
 public interface IAnswerDataSerializer {
+	
 	/**
-	 * Identifies whether this serializer can turn the provided
-	 * AnswerData object into an external format.
+	 * Identifies whether this serializer can turn the AnswerData 
+	 * object inside of the given element into an external format.
 	 *  
-	 * @param data The object to be serialized
+	 * @param element The element whose data is to be serialzed
 	 * @return true if this can meaningfully serialze the provided
 	 * object. false otherwise
 	 */
-	boolean canSerialize(IAnswerData data);
+	boolean canSerialize(QuestionDataElement element);
+	
+	/**
+	 * Serializes the given data object into a format that can
+	 * be stored externally using the defined schemas
+	 * 
+	 * @param element The element whose data is to be serialzed
+	 * @param schema the schema containing the necessary bindings to determine
+	 * the elements data type
+	 * @return An implementation-specific representation of the
+	 * given object if canSerialize() would return true for that
+	 * object. False otherwise.
+	 */
+	Object serializeAnswerData(QuestionDataElement element, FormDef schema);
 	
 	/**
 	 * Serializes the given data object into a format that can
 	 * be stored externally.
 	 * 
-	 * @param data The object to be serialzed
+	 * @param data The element whose data is to be serialzed
 	 * @return An implementation-specific representation of the
 	 * given object if canSerialize() would return true for that
 	 * object. False otherwise.

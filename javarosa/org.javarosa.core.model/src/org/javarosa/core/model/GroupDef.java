@@ -185,4 +185,12 @@ public class GroupDef implements IFormElement, Localizable {
 		ExtUtil.writeBool(dos, getRepeat());
 		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
 	}
+	
+	public void getChild(IDataReference binding, Vector result) {
+		IFormElement ele;
+		for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
+			ele = (IFormElement)e.nextElement();
+			ele.getChild(binding, result);
+		}
+	}
 }

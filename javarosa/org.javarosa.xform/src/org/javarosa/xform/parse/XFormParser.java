@@ -1,5 +1,7 @@
 package org.javarosa.xform.parse;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -646,6 +648,10 @@ public class XFormParser {
 
 	private static void addBinding (FormDef f, DataBinding binding) {
 		f.addBinding(binding);
+		addBinding(binding);
+	}
+	
+	private static void addBinding (DataBinding binding) {
 		if (binding.getId() != null) {
 			if (bindingsByID.put(binding.getId(), binding) != null) {
 				throw new XFormParseException("XForm Parse: <bind>s with duplicate ID");
@@ -705,13 +711,13 @@ public class XFormParser {
 			}
 		}
 
-		TreeElement root = parseInstanceNodes(dataElement, "/").getRoot();
+		TreeElement root = parseInstanceNodes(f, dataElement, "/").getRoot();
 		DataModelTree instanceModel = new DataModelTree(root);
 		instanceModel.setName(f.getName());
 		f.setDataModel(instanceModel);
 	}
 
-	private static TreeElement parseInstanceNodes (Element node, String currentPath) {
+	private static TreeElement parseInstanceNodes (FormDef formDef, Element node, String currentPath) {
 		int childNum = node.getChildCount();
 
 		TreeElement element = null;
@@ -727,11 +733,17 @@ public class XFormParser {
 				element.setReference(reference);
 				element.setName(node.getName());
 			}
-			if(element == null) {
-				//Nothing special happened when we tried to instantiate. This is just a normal question
+			if (element == null) {
+				
+				// Nothing special happened when we tried to instantiate. This
+				// is just a normal question
+				
 				element = new QuestionDataElement(node.getName(), reference);
+				
+				Vector formElements = new Vector();
+				formDef.getChild(reference, formElements);
 				((QuestionDataElement) element).setValue(XFormAnswerDataParser
-						.getAnswerData(binding, node));
+						.getAnswerData(formElements, binding, node));	
 			}
 		}
 		if (childNum == 0 && element == null) {
@@ -743,15 +755,21 @@ public class XFormParser {
 				if (element == null) {
 					// Data Element
 					element = new QuestionDataElement(node.getName(), reference);
-					((QuestionDataElement) element).setValue(new StringData(
-							(String) node.getChild(0)));
+					
+					Vector formElements = new Vector();
+					formDef.getChild(reference, formElements);
+					if(!formElements.isEmpty()){
+						((QuestionDataElement)element).setValue(XFormAnswerDataParser.getAnswerData(formElements, null, node));
+					} else {
+						((QuestionDataElement)element).setValue(new StringData((String)node.getChild(0)));
+					}
 				}
 			} else {
 				if(element == null ) {
 					element = new QuestionDataGroup(node.getName());
 				}
 				String newPath = currentPath + node.getName() + "/";
-				((QuestionDataGroup) element).addChild(parseInstanceNodes(node
+				((QuestionDataGroup) element).addChild(parseInstanceNodes(formDef, node
 						.getElement(0), newPath));
 			}
 
@@ -768,7 +786,7 @@ public class XFormParser {
 					continue;
 				} else {
 					String newPath = currentPath + node.getName() + "/";
-					((QuestionDataGroup) element).addChild(parseInstanceNodes(
+					((QuestionDataGroup) element).addChild(parseInstanceNodes(formDef, 
 							node.getElement(i), newPath));
 				}
 			}
@@ -784,6 +802,45 @@ public class XFormParser {
 			}
 		}
 		return element;
+	}
+	
+	public static DataModelTree parseDataModelTree(String xml, FormDef formDef) throws Exception {
+		// init variables
+		initStateVars();
+		
+//		// add form def bindings
+		DataBinding binding;
+		for (int i = 0; i < formDef.getBindings().size(); i++) {
+			binding = (DataBinding)formDef.getBindings().elementAt(i);
+			addBinding(binding);
+		}
+		
+		// parse xml to DOM
+		Reader reader = new InputStreamReader(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+		XmlPullParser xmlPullParser = new KXmlParser();
+		xmlPullParser.setInput(reader);
+				
+		Document doc = new Document();
+		doc.parse(xmlPullParser);
+		
+		// parse DOM to model
+		Element dataElement = null;
+		for (int i = 0; i < doc.getChildCount(); i++) {
+			if (doc.getType(i) == Node.ELEMENT) {
+				if (dataElement != null) {
+					throw new XFormParseException("XForm Parse: <instance> has more than one child element");
+				} else {
+					dataElement = doc.getElement(i);
+				}
+			}
+		}
+
+		TreeElement root = parseInstanceNodes(formDef, dataElement, "/").getRoot();
+		DataModelTree instanceModel = new DataModelTree(root);
+
+		instanceModel.setName(formDef.getName());
+		instanceModel.setFormReferenceId(formDef.getRecordId());
+		return instanceModel;
 	}
 
 	private static int getDataType(String type) {

@@ -441,4 +441,24 @@ public class QuestionDef implements IFormElement, Localizable {
 			((QuestionStateListener)e.nextElement()).questionStateChanged(this, changeFlags);
 	}
 	
+	public void getChild(IDataReference binding, Vector result) {
+		if (this.binding != null && this.binding.referenceMatches(binding)) {
+			result.addElement(this);
+		} 
+	}
+
+	public int getSelectedItemIndex(String value) {
+		if (selectItems == null || selectItems.size() == 0) {
+			return -1;
+		} else {
+			String selectedValue;
+			for (int i = 0; i < this.selectItems.size(); i++) {
+				selectedValue = (String) this.selectItems.elementAt(i);
+				if (selectedValue.equals(value)) {
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
 }

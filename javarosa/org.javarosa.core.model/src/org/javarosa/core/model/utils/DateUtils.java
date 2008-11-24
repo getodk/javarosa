@@ -17,7 +17,6 @@ public class DateUtils {
 
 	public DateUtils() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -141,6 +140,9 @@ public class DateUtils {
 	 * @returns a date object set to midnight on the given date in the current timezone *including DST!!*
 	 */
 	public static Date getDateFromString(String value) {
+		if(value == null || value.trim().length() == 0){   // if value is null or empty
+			return null;
+		}
 		Vector digits = tokenize(value, '-');
 
 		if (digits.size() != 3)
@@ -156,6 +158,44 @@ public class DateUtils {
 		}
 		
 		return getDate(year, month, day);
+	}
+	
+	/**
+	 * Creates a Date object identifying the datetime that is passed in
+	 * @param value A date string to be parsed
+	 * @returns a date object set to the given time on the given date in the current timezone *including DST!!*
+	 */
+	public static Date getDateTimeFromString(String value) {
+		if(value == null || value.trim().length() == 0){   // if value is null or empty
+			return null;
+		}
+		
+		Date result = new Date();
+		Vector digits = tokenize(value, '-');
+
+		String dayAndHs = (String)digits.elementAt(2);
+		String dayString = dayAndHs.substring(0, 2);
+		int day = Integer.valueOf(dayString).intValue();
+		int month = Integer.valueOf((String)digits.elementAt(1)).intValue();
+		month--;
+		int year = Integer.valueOf((String)digits.elementAt(0)).intValue();
+		int hour = Integer.valueOf(dayAndHs.substring(3, 5)).intValue();
+		int minute = Integer.valueOf(dayAndHs.substring(6, 8)).intValue();
+		int second = Integer.valueOf(dayAndHs.substring(9, 11)).intValue();
+		
+		//24T19:46:39
+		//01234567890
+		
+		Calendar cd = Calendar.getInstance();
+		cd.set(Calendar.DAY_OF_MONTH, day);
+		cd.set(Calendar.MONTH, month);
+		cd.set(Calendar.YEAR, year);
+		cd.set(Calendar.HOUR_OF_DAY, hour);
+		cd.set(Calendar.MINUTE, minute);
+		cd.set(Calendar.SECOND, second);
+		result = cd.getTime();
+
+		return result;
 	}
 	
 	/**

@@ -396,4 +396,29 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		ExtUtil.write(dos, new ExtWrapNullable(localizer));
 		ExtUtil.write(dos, new ExtWrapList(conditions));
 	}
+	
+	/**
+	 * Gets the data binding for a particular reference
+	 * @param reference
+	 * @return
+	 */
+	public DataBinding getBinding(IDataReference reference) {
+		for (Enumeration e = dataBindings.elements(); e.hasMoreElements(); ) {
+			DataBinding b = (DataBinding)e.nextElement();
+			IDataReference ref = b.getReference();
+			if(ref.referenceMatches(reference)){
+				return b;
+			}
+
+		}
+		return null;
+	}
+	
+	public void getChild(IDataReference binding, Vector result) {
+		IFormElement ele;
+		for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
+			ele = (IFormElement)e.nextElement();
+			ele.getChild(binding, result);
+		}
+	}
 }
