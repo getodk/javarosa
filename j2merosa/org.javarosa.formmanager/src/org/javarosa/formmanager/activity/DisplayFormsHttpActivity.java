@@ -3,6 +3,7 @@ package org.javarosa.formmanager.activity;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -48,7 +49,7 @@ public class DisplayFormsHttpActivity implements IActivity,CommandListener,Obser
 
 	public void init(Hashtable args){
 
-		byte[] data = (byte[])args.get(GetFormListHttpActivity.RETURN_KEY);
+		byte[] data = (byte[])args.get("returnval");
 
 		try{
 			bin = new ByteArrayInputStream(data);
@@ -59,10 +60,16 @@ public class DisplayFormsHttpActivity implements IActivity,CommandListener,Obser
 			items = new Vector();
 			formInfo = new Hashtable();
 
-			processSurveyList(parser, formInfo,items);
-
-			String[] formlist = new String[ items.size() ];
-			items.copyInto( formlist );
+			processSurveyList(parser, formInfo);
+			
+			String[] formlist = new String[ formInfo.size() ];
+			Enumeration e = formInfo.keys();//read available form names from hasttable
+	
+			for(int i=0;i<formInfo.size(); i++)
+		{
+			items.addElement(e.nextElement());
+		}
+		items.copyInto( formlist );
 
 			formList = new AvailableFormsScreen("Available Forms",formlist,this);
 
@@ -74,7 +81,7 @@ public class DisplayFormsHttpActivity implements IActivity,CommandListener,Obser
 
 	}
 
-public void processSurveyList(KXmlParser parser, Hashtable formInfo, Vector items) throws XmlPullParserException{
+public void processSurveyList(KXmlParser parser, Hashtable formInfo) throws XmlPullParserException{
 		
 		try {
 			boolean inItem = false;
@@ -91,7 +98,7 @@ System.out.println("<"+name+">"+text+" "+url);
 				if(name.equals("form"))
 					{
 					inItem = true;
-					items.addElement(text);
+					//items.addElement(text);
 					formInfo.put(text, url);
 					}
 				else
