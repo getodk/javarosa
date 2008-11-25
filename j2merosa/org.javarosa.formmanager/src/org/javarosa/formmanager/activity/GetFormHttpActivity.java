@@ -34,22 +34,26 @@ public class GetFormHttpActivity implements IActivity,CommandListener,Observer {
 	private String getFormUrl;
 	private String formName = "";
 	private IShell parent;
-	
+
 	private ByteArrayInputStream bin;
-	
-	
+
+
 
 	public GetFormHttpActivity(IShell parent,Hashtable args) {
 		this.parent = parent;
 		init(args);
-		
+
 	}
-	
+
 	public void init(Hashtable args){
-		getFormUrl = (String)args.get(DisplayFormsHttpActivity.FORM_URL);
+		//getFormUrl = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(HttpTransportProperties.GET_URL_PROPERTY);
+		//getFormUrl = "http://dev.cell-life.org/javarosa/web/limesurvey/admin/getXform.php";
+		getFormUrl = (String)args.get("selected_form_url");
+		//getFormUrl = "http://172.16.23.220/limesurvey/xforms/CHMT%20TREATMENT%20LITERACY%20SESSION%20REPORT.xhtml";
+		//formName = "?name="+(String)args.get(DisplayFormsHttpActivity.SELECTED_FORM);//send GET request
 		System.out.println("URL SHALL BE: "+ getFormUrl);
 	}
-	
+
 	public void fetchForm(){
 		ITransportDestination requestDest= new HttpTransportDestination(getFormUrl);
 		message = new TransportMessage();
@@ -59,7 +63,7 @@ public class GetFormHttpActivity implements IActivity,CommandListener,Observer {
 
 		transportManager = (TransportManager)JavaRosaServiceProvider.instance().getTransportManager();
 		transportManager.send(message, TransportMethod.HTTP_GCF);
-		
+
 	}
 
 	public void contextChanged(Context globalContext) {
@@ -75,7 +79,7 @@ public class GetFormHttpActivity implements IActivity,CommandListener,Observer {
 		if(transportManager!=null){
 			//transportManager.closeSend();
 			transportManager = null;
-			
+
 		}
 
 	}
@@ -97,14 +101,14 @@ public class GetFormHttpActivity implements IActivity,CommandListener,Observer {
 	public void start(Context context) {
 		this.context=context;
 		fetchForm();
-		parent.setDisplay(this, new IView() {public Object getScreenObject() {return progressScreen;}});
-		
+		//parent.setDisplay(this, new IView() {public Object getScreenObject() {return progressScreen;}});
+
 
 	}
 
 	public void setShell(IShell shell) {
 		this.parent = shell;
-		
+
 	}
 
 	public void commandAction(Command command, Displayable display) {
@@ -112,27 +116,27 @@ public class GetFormHttpActivity implements IActivity,CommandListener,Observer {
 			if(command==progressScreen.CMD_CANCEL){
 				parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
 			}
-			
+
 		}
-		
+
 	}
 
 	public void update(Observable observable, Object arg) {
 		byte[] data = (byte[])arg;
 		process(data);
-		
+
 	}
-	
+
 	public void process(byte[] data) {
 		String response;
 		response = new String(data).trim();
-		System.out.println("MYFORM:"+response);
+		//System.out.println("MYFORM:"+response);
 		FormDefRMSUtility formDef = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-		
-		bin = new ByteArrayInputStream(data);		
+
+		bin = new ByteArrayInputStream(data);
 		formDef.writeToRMS(XFormUtils.getFormFromInputStream(bin));
 		parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
-		
+
 	}
 
 }
