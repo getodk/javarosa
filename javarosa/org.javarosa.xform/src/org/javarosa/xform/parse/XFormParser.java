@@ -308,7 +308,7 @@ public class XFormParser {
 		if (bind != null) {
 			binding = (DataBinding)bindingsByID.get(bind);
 			if (binding == null) {
-				throw new XFormParseException("XForm Parse: invalid binding ID");
+				throw new XFormParseException("XForm Parse: invalid binding ID '" + bind + "'");
 			}
 		} else if (ref != null) {
 			question.setBind(new XPathReference(ref));
@@ -360,7 +360,7 @@ public class XFormParser {
 
 				if (!(hasITextMapping(f, textRef) ||
 						(hasITextMapping(f, textRef + ";long") && hasITextMapping(f, textRef + ";short"))))
-					throw new XFormParseException("<label> text is not localizable for all locales");
+					throw new XFormParseException("<label> '" + textRef + "': text is not localizable for all locales");
 				q.setLongTextID(textRef + ";long", null);
 				q.setShortTextID(textRef + ";short", null);
 			} else {
@@ -382,7 +382,7 @@ public class XFormParser {
 
 				if (!(hasITextMapping(f, textRef) ||
 						(hasITextMapping(f, textRef + ";long") && hasITextMapping(f, textRef + ";short"))))
-					throw new XFormParseException("<label> text is not localizable for all locales");
+					throw new XFormParseException("<label> '" + textRef + "': text is not localizable for all locales");
 				g.setLongTextID(textRef + ";long", null);
 				g.setShortTextID(textRef + ";short", null);
 			} else {
@@ -432,7 +432,7 @@ public class XFormParser {
 						textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
 						if (!hasITextMapping(f, textRef))
-							throw new XFormParseException("<label> text is not localizable for all locales");
+							throw new XFormParseException("<label> '" + textRef + "': text is not localizable for all locales");
 					} else {
 						throw new XFormParseException("malformed ref for <item>");
 					}
