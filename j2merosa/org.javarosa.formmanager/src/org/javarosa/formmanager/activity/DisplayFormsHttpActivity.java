@@ -124,7 +124,7 @@ System.out.println("<"+name+">"+text+" "+url);
 	}
 
 	public void destroy() {
-		parent.exitShell();
+		//parent.exitShell();
 
 	}
 
