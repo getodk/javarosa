@@ -546,7 +546,15 @@ public class XFormParser {
 
 	private static boolean hasITextMapping (FormDef form, String textID) {
 		Localizer l = form.getLocalizer();
-		return l.hasMapping(l.getDefaultLocale(), textID);
+		
+		// 30.Nov BWD - Fixing bug.  Previously it only checked for the default locale
+		// that's not good enough since everything that calls this method expects it to
+		// ensure there is a translation for all locales.
+		String locales[] = l.getAvailableLocales();
+		boolean answer = true;
+		for( int i=0; i<locales.length; i++ )
+			answer = l.hasMapping(locales[i], textID) && answer;
+		return answer;
 	}
 
 	private static void parseBind (FormDef f, Element e) {
