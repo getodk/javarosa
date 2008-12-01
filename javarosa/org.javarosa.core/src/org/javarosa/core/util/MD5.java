@@ -329,7 +329,11 @@ public class MD5 {
 		state.state[1] += b;
 		state.state[2] += c;
 		state.state[3] += d;
-		System.gc();
+		
+		//ctsims - Dec 1. 2008
+		//This call doesn't play well with others, and doesn't have a reason to be here.
+		//It makes serialization super slow, so I took it out.
+		//System.gc();
 	}
 
 	/**
