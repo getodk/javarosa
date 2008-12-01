@@ -1,4 +1,4 @@
-package org.javarosa.formmanager.view.clforms;
+package org.javarosa.formmanager.view;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.List;

@@ -18,7 +18,7 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.util.Observable;
 import org.javarosa.core.util.Observer;
-import org.javarosa.formmanager.view.clforms.AvailableFormsScreen;
+import org.javarosa.formmanager.view.AvailableFormsScreen;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
