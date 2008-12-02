@@ -360,7 +360,7 @@ public class XFormParser {
 
 				if (!(hasITextMapping(f, textRef) ||
 						(hasITextMapping(f, textRef + ";long") && hasITextMapping(f, textRef + ";short"))))
-					throw new XFormParseException("<label> '" + textRef + "': text is not localizable for all locales");
+					throw new XFormParseException("<label> '" + textRef + "': text is not localizable for the default locale (" + getDefaultLocaleName(f) + ")!");
 				q.setLongTextID(textRef + ";long", null);
 				q.setShortTextID(textRef + ";short", null);
 			} else {
@@ -382,7 +382,7 @@ public class XFormParser {
 
 				if (!(hasITextMapping(f, textRef) ||
 						(hasITextMapping(f, textRef + ";long") && hasITextMapping(f, textRef + ";short"))))
-					throw new XFormParseException("<label> '" + textRef + "': text is not localizable for all locales");
+					throw new XFormParseException("<label> '" + textRef + "': text is not localizable for the default locale (" + getDefaultLocaleName(f) + ")!");
 				g.setLongTextID(textRef + ";long", null);
 				g.setShortTextID(textRef + ";short", null);
 			} else {
@@ -403,7 +403,7 @@ public class XFormParser {
 				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
 				if (!hasITextMapping(f, textRef))
-					throw new XFormParseException("<hint> text is not localizable for all locales for reference " + textRef);
+					throw new XFormParseException("<hint> '" + textRef + "': text is not localizable for the default locale (" + getDefaultLocaleName(f) + ")!");
 				q.setHelpTextID(textRef, null);
 			} else {
 				throw new RuntimeException("malformed ref for <hint>");
@@ -432,7 +432,7 @@ public class XFormParser {
 						textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
 						if (!hasITextMapping(f, textRef))
-							throw new XFormParseException("<label> '" + textRef + "': text is not localizable for all locales");
+							throw new XFormParseException("<label> '" + textRef + "': text is not localizable for the default locale (" + getDefaultLocaleName(f) + ")!");
 					} else {
 						throw new XFormParseException("malformed ref for <item>");
 					}
@@ -550,11 +550,18 @@ public class XFormParser {
 		// 30.Nov BWD - Fixing bug.  Previously it only checked for the default locale
 		// that's not good enough since everything that calls this method expects it to
 		// ensure there is a translation for all locales.
+		// 2.Dec BWD - Changed back to checking only default locale and now give an error if
+		// it is missing for any other locales.
 		String locales[] = l.getAvailableLocales();
-		boolean answer = true;
-		for( int i=0; i<locales.length; i++ )
-			answer = l.hasMapping(locales[i], textID) && answer;
-		return answer;
+		for( int i=0; i<locales.length; i++ ) {
+			if( !l.hasMapping(locales[i], textID) )
+				System.err.println("***WARNING: Missing translation for '" + textID + "' for the '" + locales[i] + "' locale.");
+		}
+		return l.hasMapping(l.getDefaultLocale(), textID);
+	}
+	
+	private static String getDefaultLocaleName(FormDef form) {
+		return form.getLocalizer().getDefaultLocale();
 	}
 
 	private static void parseBind (FormDef f, Element e) {
