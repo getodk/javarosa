@@ -92,6 +92,7 @@
 			<fname />
 			<dob />
 			<sex />
+			<preg />
 			<addr />
 			<blah />
 			<fizz />
@@ -104,17 +105,11 @@
 	<bind id="feeling" nodeset="/demog/feeling" required="true()" />
 	<bind id="sex" nodeset="/demog/sex" required="true()" />
 	<bind id="addr" nodeset="/demog/addr" required="true()" />
-						
+	<bind id="preg" nodeset="/demog/preg" relevant="/demog/sex='f'" />	
     </model>
 </h:head>			
 <h:body>
 
-<select ref="/demog/feeling">
-<label>How do you feel about Polish?</label>
-<item><label>Like It</label><value>1</value></item>
-<item><label>Love It</label><value>2</value></item>
-<item><label>Love to Hate It</label><value>3</value></item>
-</select>
 
 <input ref="/demog/lname"><label ref="jr:itext('q1')"></label></input>
 <input bind="fname"><label ref="jr:itext('q2')"></label></input>
@@ -124,6 +119,7 @@
 <item><label ref="jr:itext('q4a')"></label><value>m</value></item>
 <item><label ref="jr:itext('q4b')"></label><value>f</value></item>
 </select1>
+<input bind="preg"><label>Pregnant?</label></input>
 <input ref="/demog/addr"><label ref="jr:itext('q5')"></label></input>
    
 
