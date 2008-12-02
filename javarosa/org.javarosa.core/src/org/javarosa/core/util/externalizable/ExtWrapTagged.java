@@ -109,7 +109,7 @@ public class ExtWrapTagged extends ExternalizableWrapper {
 				type = o.getClass();
 			}
 				
-			byte[] tag = PrototypeFactory.getClassHash(type);
+			byte[] tag = PrototypeFactory.getClassHash(type); //cache this?
 			out.write(tag, 0, tag.length);
 		}
 	}
