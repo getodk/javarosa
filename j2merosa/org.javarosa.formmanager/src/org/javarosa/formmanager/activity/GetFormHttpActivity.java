@@ -23,7 +23,7 @@ import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.core.util.Observable;
 import org.javarosa.core.util.Observer;
 //import org.javarosa.datadyne.properties.EpisurveyorPropertyRules;
-import org.javarosa.formmanager.view.clforms.ProgressScreen;
+import org.javarosa.formmanager.view.ProgressScreen;
 import org.javarosa.xform.util.XFormUtils;
 
 public class GetFormHttpActivity implements IActivity,CommandListener,Observer {
