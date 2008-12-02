@@ -36,8 +36,12 @@
 			<build fullscreen="menu"
 				usePolishGui="${javarosa.usepolishui}"
 				workDir="${dir.work}"
-				destDir="${dir.dist}"
-				binaryLibraries="${dir.lib}">
+				destDir="${dir.dist}">
+				
+				<libraries>
+					<library dir="${dir.lib}"/>
+					<library file="${dir.tools}/j2meunit-javarosa.jar" if="unittests" />
+				</libraries>
 
 				<!-- midlets definition -->
 				<midlet class="${app.class}" name="${app.name}" />
@@ -51,12 +55,8 @@
 					<source dir="${basedir}/../org.javarosa.communication/src/"/>
 					<source dir="${basedir}/../org.javarosa.communication.ui/src/"/>
 					<source dir="${basedir}/../org.javarosa.clforms/src/"/>
-					<source dir="${basedir}/../org.javarosa.clforms/test/"/>
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
-					<source dir="${basedir}/../org.javarosa.core/test/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
-					<source dir="${basedir}/../org.javarosa.core.model/test/"/>
-					<source dir="${basedir}/../org.javarosa.demo/test/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
 					<source dir="${basedir}/../org.javarosa.j2me/src/"/>
 					<!--source dir="${basedir}/../org.javarosa.mesh4j.sync.extensions/src/"/-->
@@ -66,14 +66,21 @@
 					<source dir="${basedir}/../org.javarosa.referral/src/"/>
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
-					<source dir="${basedir}/../org.javarosa.user/test/"/>
 					<source dir="${basedir}/../org.javarosa.patient/src/"/>
-					<source dir="${basedir}/../org.javarosa.patient/test/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
-					<source dir="${basedir}/../org.javarosa.xform/test/"/>
+					
 					<!--source dir="${basedir}/../org.mesh4j.sync/src/"/-->
 					<!--source dir="${basedir}/../org.mesh4j.sync.message/src/"/-->
 					<!-- Add back in Mesh4X code once we're satisfied with using Java5's in Polish -->
+					
+					
+					<source dir="${basedir}/../org.javarosa.clforms/test/" if="unittests"/>
+					<source dir="${basedir}/../org.javarosa.core/test/" if="unittests"/>
+					<source dir="${basedir}/../org.javarosa.core.model/test/" if="unittests"/>
+					<source dir="${basedir}/../org.javarosa.demo/test/" if="unittests"/>
+					<source dir="${basedir}/../org.javarosa.user/test/" if="unittests"/>
+					<source dir="${basedir}/../org.javarosa.patient/test/" if="unittests"/>
+					<source dir="${basedir}/../org.javarosa.xform/test/" if="unittests"/>
 					
 					<!-- defunct
 					<source dir="${basedir}/../org.javarosa.action/src/"/>
@@ -169,7 +176,7 @@
 	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
 
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
-	<target name="RunJ2MEUnitTests" depends="supressOutput, disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
+	<target name="RunJ2MEUnitTests" depends="supressOutput, disableObfuscator, enableTesting, BuildClean" description="Runs j2mepolish Unit Tests on constructed jars">
 		<!--RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.FormViewManagerTest"/-->
 		<!--RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.CLFormsWidgetsTest"/-->
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
@@ -261,6 +268,10 @@
 	<target name="enableEmulator">
 		<property name="test" value="true" />
 		<property name="dir.work" value="build/test" />
+	</target>
+	
+	<target name="enableTesting">
+		<property name="unittests" value="true"/>
 	</target>
 
 	<target name="build-xpath-parser">
