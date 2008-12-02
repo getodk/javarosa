@@ -128,6 +128,9 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 					}
 				}
 			}
+			else {
+				return data;
+			}
 		}
 		return null;
 	}

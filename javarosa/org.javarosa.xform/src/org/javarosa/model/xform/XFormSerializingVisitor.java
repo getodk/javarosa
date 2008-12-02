@@ -78,7 +78,14 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor, IT
 			throw new NullPointerException("No Answer Data Serializer Could be Found to Serialize Answers");
 		}
 		Object serializedAnswerData = serializer.serializeAnswerData(element, schema);
-		if(serializedAnswerData.getClass() == String.class) {
+		if(serializedAnswerData == null) {
+			//#if debug.output==verbose || debug.output==exception 
+				if(element != null) {
+					System.out.println("Warning: Wasn't able to Serialize element: " + element.getName());
+				}
+			//#endif
+		}
+		if(serializedAnswerData instanceof String) {
 			text.addChild(Element.TEXT, serializedAnswerData);
 		} else if(serializedAnswerData instanceof Element) {
 			text.addChild(Element.ELEMENT, serializedAnswerData);
