@@ -26,7 +26,7 @@ import org.javarosa.core.util.Observable;
 import org.javarosa.core.util.Observer;
 import org.javarosa.clforms.server.WebServerResponses;
 //import org.javarosa.datadyne.properties.EpisurveyorPropertyRules;
-import org.javarosa.formmanager.view.clforms.ProgressScreen;
+import org.javarosa.formmanager.view.ProgressScreen;
 
 public class GetFormListHttpActivity implements IActivity,CommandListener,Observer{
 	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
