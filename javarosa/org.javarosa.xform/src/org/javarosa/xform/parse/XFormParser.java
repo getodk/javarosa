@@ -669,7 +669,7 @@ public class XFormParser {
 	private static void addBinding (DataBinding binding) {
 		if (binding.getId() != null) {
 			if (bindingsByID.put(binding.getId(), binding) != null) {
-				throw new XFormParseException("XForm Parse: <bind>s with duplicate ID");
+				throw new XFormParseException("XForm Parse: <bind>s with duplicate ID: '" + binding.getId() + "'");
 			}
 		}
 		bindingsByRef.put((String)binding.getReference().getReference(), binding);
