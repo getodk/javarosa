@@ -53,6 +53,9 @@ public class XFormAnswerDataParser {
 			// return value.trim().length() == 0 ? null : new
 			// IntegerData(Integer.parseInt(value));
 			return new StringData(value);
+		case Constants.DATATYPE_DECIMAL:
+			// BWD 6.Dec.2008. copying this one from the integer example 
+			return new StringData(value);
 		case Constants.DATATYPE_TEXT:
 			if (formElements.isEmpty()) {
 				return new StringData(value);
