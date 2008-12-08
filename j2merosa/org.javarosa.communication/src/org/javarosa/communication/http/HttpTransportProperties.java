@@ -20,6 +20,7 @@ public class HttpTransportProperties implements IPropertyRules {
     public final static String POST_URL_LIST_PROPERTY = "PostURLlist";
     public final static String POST_URL_PROPERTY = "PostURL";
     public final static String GET_URL_PROPERTY = "GetURL";
+    public final static String AUTH_URL_PROPERTY = "AuthenticateURL";//for remote server user authentication
 
     /**
      * Creates the JavaRosa set of property rules
@@ -47,6 +48,11 @@ public class HttpTransportProperties implements IPropertyRules {
         Vector getUrls = new Vector();
         //getUrls.addElement(GET_URL_PROPERTY);
         rules.put(GET_URL_PROPERTY, getUrls);
+        
+        // AuthURL Property
+        Vector authUrls = new Vector();
+        //getUrls.addElement(GET_URL_PROPERTY);
+        rules.put(AUTH_URL_PROPERTY, authUrls);
     }
 
     /** (non-Javadoc)
