@@ -1,5 +1,7 @@
 package org.javarosa.media.image.model;
 
+import java.io.InputStream;
+
 import org.javarosa.core.model.data.IDataPointer;
 import org.javarosa.media.image.utilities.FileUtility;
 
@@ -21,12 +23,16 @@ public class FileDataPointer implements IDataPointer {
 		return FileUtility.getFileData(fileName);
 	}
 
+	public InputStream getDataStream() {
+		return FileUtility.getFileDataStream(fileName);
+	}
+
 	public String getDisplayText() {
 		return fileName;
 	}
 
-	public void deleteData() {
-		// TODO delete the file
+	public boolean deleteData() {
+		return FileUtility.deleteFile(fileName);
 	}
 
 }

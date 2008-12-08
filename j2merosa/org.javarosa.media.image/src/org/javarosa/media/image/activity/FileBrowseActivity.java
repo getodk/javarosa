@@ -186,7 +186,7 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	}
 
 	void returnFile(String fileName) {
-		String fullName = "file:///" + currDirName + fileName;
+		String fullName = "file://" + currDirName + fileName;
 		FileDataPointer fdp = new FileDataPointer(fullName);
 		Hashtable returnArgs = new Hashtable();
 		returnArgs.put(FILE_POINTER, fdp);
