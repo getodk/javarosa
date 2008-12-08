@@ -1,5 +1,7 @@
 package org.javarosa.core.model.data;
 
+import java.io.InputStream;
+
 
 /**
  * A data pointer representing a pointer to a (usually) larger object in memory.  
@@ -23,7 +25,13 @@ public interface IDataPointer {
 	public byte[] getData();
 
 	/**
+	 * Get the data from the underlying storage.  
+	 * @return
+	 */
+	public InputStream getDataStream();
+
+	/**
 	 * Deletes the underlying data from storage.
 	 */
-	public void deleteData();
+	public boolean deleteData();
 }
