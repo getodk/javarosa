@@ -2,12 +2,12 @@ package org.javarosa.media.image.activity;
 
 import java.util.Hashtable;
 
+import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Display;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.Displayable; //import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.List;
+import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -18,9 +18,12 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.data.IDataPointer;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
-import org.javarosa.media.image.storage.FileRMSUtility;
+import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.utilities.ImageSniffer;
-import org.javarosa.media.image.utilities.ImageUtility;
+
+import de.enough.polish.ui.ChoiceGroup;
+import de.enough.polish.ui.Container;
+import de.enough.polish.ui.Form;
 
 /**
  * An Activity that represents the selection of zero or more images. This will
@@ -39,29 +42,36 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	private Context context;
 	private IShell shell;
 	private IDisplay display;
-	private FileRMSUtility dataModel;
+	// private FileRMSUtility dataModel;
+	private Form mainFormOld;
 	private Form mainForm;
+	private ChoiceGroup mainList;
+	private Container mainContainer;
+
 	private Command cancelCommand;
 	private Command cameraCommand;
 	private Command browseCommand;
 	private Command returnCommand;
 	private Command viewCommand;
-	private Command markCommand;
+	private Command deleteCommand;
 	private String currentKey;
 	private Thread snifferThread;
 	private ImageSniffer sniffer;
+	private MIDlet midlet;
 
-	public ImageChooserActivity(IShell shell) {
+	public ImageChooserActivity(IShell shell, MIDlet midlet) {
 		this.shell = shell;
+		this.midlet = midlet;
+		allImages = new Hashtable();
 		display = JavaRosaServiceProvider.instance().getDisplay();
-		dataModel = new FileRMSUtility("image_store");
+		// dataModel = new FileRMSUtility("image_store");
 
 		cancelCommand = new Command("Cancel", Command.CANCEL, 0);
 		returnCommand = new Command("Return", Command.OK, 0);
 		cameraCommand = new Command("Camera", Command.SCREEN, 0);
 		browseCommand = new Command("Browse", Command.SCREEN, 0);
 		viewCommand = new Command("View", Command.SCREEN, 0);
-		markCommand = new Command("Mark/Unmark", Command.SCREEN, 0);
+		deleteCommand = new Command("Delete", Command.SCREEN, 0);
 	}
 
 	public void contextChanged(Context globalContext) {
@@ -69,7 +79,9 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	}
 
 	public void destroy() {
-		sniffer.quit();
+		if (sniffer != null) {
+			sniffer.quit();
+		}
 	}
 
 	public Context getActivityContext() {
@@ -88,7 +100,6 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		updateView();
 	}
 
-	
 	private void updateView() {
 		display.setView(DisplayViewFactory.createView(mainForm));
 	}
@@ -100,39 +111,104 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 
 	public void start(Context context) {
 		this.context = context;
+
+		// mainList = new List("Available Images", List.IMPLICIT);
+		mainList = new ChoiceGroup("Available Images", ChoiceGroup.MULTIPLE);
 		mainForm = new Form("Image Chooser");
+		mainFormOld = new Form("Old Image Chooser");
 		mainForm.addCommand(cancelCommand);
 		mainForm.addCommand(cameraCommand);
 		mainForm.addCommand(browseCommand);
 		mainForm.addCommand(returnCommand);
 		mainForm.addCommand(viewCommand);
-		mainForm.addCommand(markCommand);
+		mainForm.addCommand(deleteCommand);
+		// mainList.setCommandListener(this);
 		mainForm.setCommandListener(this);
+		mainContainer = new Container(false);
+		mainForm.append(mainList);
+		// mainForm.append("Use the menu options to take pictures or browse.");
 
-		mainForm.append("Use the menu options to take pictures or browse.");
-	      
 		// also create the sniffer
-		sniffer = new ImageSniffer("file://localhost/root1/photos/", this);
+		sniffer = new ImageSniffer(getImageRootPath(), this);
 		snifferThread = new Thread(sniffer);
 		snifferThread.start();
 		updateView();
 	}
-	
+
+	private String getImageRootPath() {
+		// file system testing
+		//return "file://localhost/root1/photos/";
+		// phone testing
+		String rootName = FileUtility.getDefaultRoot();
+		return "file://localhost/" + rootName + "Images/200812";
+	}
+
 	public synchronized void addImageToUI(IDataPointer pointer) {
 		try {
-			if (pointer != null) { 
-				byte[] data = pointer.getData();
-				Image img = Image.createImage(data, 0, data.length);
-				Image thumbNail = ImageUtility.createThumbnail(img);
-				mainForm.append(thumbNail);
+			if (pointer != null) {
+				// printMemories("BEFORE load");
+				// byte[] data = pointer.getData();
+				// printMemories("AFTER load");
+
+				String name = pointer.getDisplayText();
+				System.out.println("Reading file: " + name);
+
+				// mainForm.append(pointer.getDisplayText());
+				mainList.append(name, null);
+				allImages.put(name, pointer);
+
+				/*
+				 * testing streams // check hack - stream through and make sure
+				 * at least that works
+				 * 
+				 * InputStream s = pointer.getDataStream();
+				 * 
+				 * byte[] bytes = new byte[1024]; int i = 0; int totalBytesRead =
+				 * 0; int bytesRead = s.read(bytes);
+				 * 
+				 * System.out.println("Reading file: " +
+				 * pointer.getDisplayText()); System.out.println("Initial bytes
+				 * read: " + bytesRead + " first byte is: " + bytes[0]); while
+				 * (bytesRead >= 0) { totalBytesRead += bytesRead; if (i % 10 ==
+				 * 0) { System.out.println("Iteration " + i + " total bytes
+				 * read: " + totalBytesRead + " first byte is: " + bytes[0]); }
+				 * i++; if (bytesRead != 1024) { break; } bytesRead =
+				 * s.read(bytes); }
+				 * 
+				 */
+
+				// Image img = ImageUtility.resizeImage(pointer.getDataStream(),
+				// 64, 48);
+				// Image img = Image.createImage(data, 0, data.length);
+				// printMemories("AFTER image creation");
+				// mainForm.append("Image is " + img.getWidth() + " by " +
+				// img.getHeight());
+				// Image thumbNail = ImageUtility.createThumbnail(img);
+				// printMemories("AFTER thumbnail creation");
+				// mainForm.append(img);
 			}
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 			System.out.println(ex);
-			
+			ex.printStackTrace();
+			mainFormOld.append("Exception" + ex.getMessage());
+
 		}
 	}
 
+	private void printMemories(String tag) {
+		String memory = System.getProperty("com.nokia.memoryramfree");
+		long jvmMemory = Runtime.getRuntime().freeMemory();
+		System.out.println("Available Memory " + tag + ": " + memory);
+		System.out.println("Available JVM Memory " + tag + ": " + jvmMemory);
+		System.out.flush();
+		mainFormOld.append("Available Memory " + tag + ": " + memory);
+		mainFormOld.append("Available JVM Memory " + tag + ": " + jvmMemory);
+	}
+
+	public synchronized void addTextToUI(String message) {
+		mainFormOld.append(message);
+	}
 
 	private FileDataPointer captureNewImage() {
 		// TODO: I have a feeling this is going to actually be some sort of back
@@ -174,14 +250,24 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 			processCamera();
 		} else if (command.equals(browseCommand)) {
 			processBrowser();
-		} else if (command.equals(viewCommand)) {
-			processView();
+
 		} else if (command.equals(cancelCommand)) {
 			processCancel();
 		} else if (command.equals(returnCommand)) {
 			processReturn();
-		} else if (command.equals(markCommand)) {
-			processMark();
+		} else {
+			ChoiceGroup curr = mainList;
+			//int index = curr.getSelectedIndex();
+			int index = curr.getFocusedIndex();
+			if (index != -1) {
+				final String currFile = curr.getString(index);
+				if (command.equals(viewCommand)) {
+					processView(currFile);
+
+				} else if (command.equals(deleteCommand)) {
+					processDelete(currFile);
+				}
+			}
 		}
 	}
 
@@ -189,8 +275,11 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 	}
 
-	private void processMark() {
-		// TODO Auto-generated method stub
+	private void processDelete(String file) {
+		IDataPointer pointer = (IDataPointer) allImages.get(file);
+		if (pointer.deleteData()) {
+			mainList.delete(mainList.getFocusedIndex());
+		}
 
 	}
 
@@ -198,14 +287,26 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		shell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
 	}
 
-	private void processView() {
-		// TODO Auto-generated method stub
-
+	private void processView(String file) {
+		try {
+			System.out.println("Opening: " + file);
+			midlet.platformRequest(file);
+		} catch (ConnectionNotFoundException e) {
+			System.out.println("Error displaying image: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	private void processBrowser() {
-		currentKey = FileBrowseActivity.FILE_POINTER;
-		returnFromActivity(new FileBrowseActivity(shell));
+		try {
+			System.out.println("Browser...");
+			currentKey = FileBrowseActivity.FILE_POINTER;
+			returnFromActivity(new FileBrowseActivity(shell));
+
+		} catch (Exception e) {
+			mainFormOld.append("Exception: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	private void processCamera() {
