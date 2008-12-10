@@ -2,6 +2,8 @@ package org.javarosa.formmanager.controller;
 
 import java.util.Date;
 
+import javax.microedition.lcdui.Command;
+
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.FormDef;
@@ -122,5 +124,10 @@ public class FormEntryController {
 
 	public void setView (IView d) {
 		parent.setView(d);
+	}
+
+	public void suspendActivity(Command command) {
+		// added for image choosing
+		parent.controllerReturn(command.getLabel());
 	}
 }
