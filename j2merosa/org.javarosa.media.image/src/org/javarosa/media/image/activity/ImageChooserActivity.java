@@ -22,8 +22,10 @@ import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.utilities.ImageSniffer;
 
 import de.enough.polish.ui.ChoiceGroup;
+import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Form;
+import de.enough.polish.util.ArrayList;
 
 /**
  * An Activity that represents the selection of zero or more images. This will
@@ -36,6 +38,7 @@ import de.enough.polish.ui.Form;
  */
 public class ImageChooserActivity implements IActivity, CommandListener {
 	public static final String ACTIVITY_KEY = "ACTIVITY_KEY";
+	
 	// this should map images (IDataPointers) to bool true/false whether
 	// selected or not
 	private Hashtable allImages;
@@ -137,10 +140,10 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 
 	private String getImageRootPath() {
 		// file system testing
-		//return "file://localhost/root1/photos/";
+		return "file://localhost/root1/photos/";
 		// phone testing
-		String rootName = FileUtility.getDefaultRoot();
-		return "file://localhost/" + rootName + "Images/200812";
+		//String rootName = FileUtility.getDefaultRoot();
+		//return "file://localhost/" + rootName + "Images/200812";
 	}
 
 	public synchronized void addImageToUI(IDataPointer pointer) {
@@ -272,7 +275,25 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	}
 
 	private void processReturn() {
-		shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+		// null indicates we're done done
+		returnFromActivity(null);
+	}
+
+	private IDataPointer[] getSelectedImages() {
+		ArrayList tempList = new ArrayList();
+		for (int i = 0; i < mainList.size(); i++) {
+			ChoiceItem item = mainList.getItem(i);
+			if (item.isSelected) {
+				tempList.add(item);
+			}
+		}
+		IDataPointer[] toReturn = new IDataPointer[tempList.size()];
+		for (int i = 0; i <tempList.size(); i++) {
+			ChoiceItem item = (ChoiceItem) tempList.get(i);
+			IDataPointer thisOne = new FileDataPointer(item.getText());
+			toReturn[i] = thisOne;
+		}
+		return toReturn;
 	}
 
 	private void processDelete(String file) {
@@ -316,13 +337,24 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 
 	private void returnFromActivity(IActivity activity) {
 		Hashtable returnArgs = buildReturnArgsFromActivity(activity);
-		shell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION,
-				returnArgs);
+		String returnCode =Constants.ACTIVITY_NEEDS_RESOLUTION; 
+		if (activity == null) {
+			returnCode = Constants.ACTIVITY_COMPLETE;
+		}
+		shell.returnFromActivity(this, returnCode,returnArgs);
 	}
 
 	private Hashtable buildReturnArgsFromActivity(IActivity activity) {
 		Hashtable table = new Hashtable();
-		table.put(ACTIVITY_KEY, activity);
+		if (activity == null) {
+			// if we're going back to the original caller then add the images 
+			IDataPointer[] imageList = getSelectedImages();
+			table.put(Constants.RETURN_ARG_KEY, imageList);
+			table.put(Constants.RETURN_ARG_TYPE_KEY, Constants.RETURN_ARG_TYPE_DATA_POINTER_LIST);
+		} else {
+			// otherwise add the callback
+			table.put(ACTIVITY_KEY, activity);
+		}
 		return table;
 	}
 
