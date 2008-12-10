@@ -2,6 +2,7 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
+import java.io.IOException;
 import java.util.Enumeration;
 
 import javax.microedition.lcdui.AlertType;
@@ -12,8 +13,14 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.media.Manager;
+import javax.microedition.media.MediaException;
+import javax.microedition.media.Player;
+import javax.microedition.media.control.VideoControl;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.Constants;
+import org.javarosa.core.api.IView;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
@@ -24,6 +31,7 @@ import org.javarosa.formmanager.view.chatterbox.util.ChatterboxContext;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle;
+import org.javarosa.media.image.view.CameraCanvas;
 
 import de.enough.polish.ui.Alert;
 import de.enough.polish.ui.FramedForm;
@@ -257,6 +265,13 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		controller.exit();
     	} else if (command == saveCommand) {
     		commitAndSave();
+    		
+    	} else if (command.getLabel()== Constants.ACTIVITY_TYPE_GET_IMAGES) {
+    		suspendActivity(command);
+    	} else if (command.getLabel()== "Capture") {
+    		doCapture();
+    	} else if (command.getLabel()== "Back") {
+    		backFromCamera();
     	} else {
     		String language = null;
     		if (multiLingual) {
@@ -276,7 +291,13 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	}
     }
 
-    private void commitAndSave () {
+    
+	private void suspendActivity(Command command) {
+		controller.suspendActivity(command);
+		
+	}
+
+	private void commitAndSave () {
        	ChatterboxWidget frame = activeFrame();
     	if (frame != null) {
     		controller.commitAnswer(frame.getQuestion(), frame.getData());
@@ -344,7 +365,28 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 			}
 		}
 	}
+
+	
+	private void backFromCamera() {
+		// TODO Auto-generated method stub
+		System.out.println("And we're back...");	
+	}
+
+	private void doCapture() {
+		// TODO Auto-generated method stub
+		System.out.println("Click!");
+	}
+
+	private void handleException(Exception e) {
+		Alert a = new Alert("Exception", e.toString(), null, null);
+		a.setTimeout(Alert.FOREVER);
+		//JavaRosaServiceProvider.instance().getDisplay().setCurrent(a, mMainForm);
+	}
+	
+
+
 	public Object getScreenObject() {
 		return this;
 	}
+
 }
