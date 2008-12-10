@@ -21,6 +21,9 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.IDataPointer;
+import org.javarosa.core.model.data.MultiPointerAnswerData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.utils.ContextPreloadHandler;
@@ -38,6 +41,7 @@ import org.javarosa.formmanager.view.IFormEntryViewFactory;
 
 public class FormEntryActivity implements IActivity, IControllerHost, CommandListener {
 
+	
 	/** Alert if the form cannot load **/
 	private Alert alert;
 
@@ -129,6 +133,18 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		}
 	}
 
+	
+	private IAnswerData getAnswerData(String type, Object value) {
+		if (Constants.RETURN_ARG_TYPE_DATA_POINTER_LIST.equals(type)) {
+			IDataPointer[] answers = (IDataPointer[]) value;
+			IAnswerData toReturn = new MultiPointerAnswerData(answers);
+			return toReturn;
+		} else {
+			throw new RuntimeException("Unable to build answer data for return type: " + type);
+		}
+	}
+
+	
 	private void initPreloadHandlers (FormDef f) {
 		Vector preloadHandlers = this.context.getPreloadHandlers();
 		if(preloadHandlers != null) {
@@ -163,7 +179,15 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	}
 
 	public void resume (Context globalContext) {
+		// this is a hacky non-generic solution to the "pass data back to the form" problem,
+		// but can be readily modified
 		view.show();
+		Object returnArg =  globalContext.getElement(Constants.RETURN_ARG_KEY);
+		if (globalContext.getElement(Constants.RETURN_ARG_KEY) != null) {
+			String returnArgType = (String) globalContext.getElement(Constants.RETURN_ARG_TYPE_KEY);
+			IAnswerData dataBack = getAnswerData(returnArgType, returnArg);
+			controller.questionAnswered(model.getQuestion(model.getQuestionIndex()), dataBack);
+		}
 	}
 
 	public void destroy () {
@@ -184,6 +208,15 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			returnArgs.put("QUIT_WITHOUT_SAVING", new Boolean(!model.isSaved()));
 
 			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+		} else if (Constants.ACTIVITY_TYPE_GET_IMAGES.equals(status)) {
+			Hashtable returnArgs = new Hashtable();
+
+			returnArgs.put("FORM_COMPLETE", new Boolean(false));
+			returnArgs.put(Constants.ACTIVITY_LAUNCH_KEY, Constants.ACTIVITY_TYPE_GET_IMAGES);
+			
+			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION,
+					returnArgs);
+			//parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
 		}
 	}
 

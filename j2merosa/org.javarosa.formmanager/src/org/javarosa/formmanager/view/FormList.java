@@ -24,6 +24,10 @@ public class FormList extends List implements CommandListener, IView {
 	// TODO: These should all be il8n'd
 	private final Command CMD_EXIT = new Command("Exit", Command.BACK, 2);
     private final Command CMD_GETNEWFORMS = new Command("Get New Forms", Command.SCREEN, 2);
+    // CZUE added for testing 
+    private final Command CMD_CAMERA = new Command("Camera", Command.SCREEN, 2);
+    private final Command CMD_IMAGE_BROWSE = new Command("Image Management", Command.SCREEN, 2);
+	// others
     private final Command CMD_VIEWMODELS = new Command("View Saved", Command.SCREEN, 3);
     private final Command CMD_DELETE_FORM = new Command("Delete",Command.SCREEN,4);
     private final Command CMD_SHAREFORMS = new Command("Share Forms", Command.SCREEN, 2);
@@ -58,6 +62,8 @@ public class FormList extends List implements CommandListener, IView {
         this.addCommand(CMD_DELETE_FORM);
         this.addCommand(CMD_VIEWMODELS);
         this.addCommand(CMD_GETNEWFORMS);
+        this.addCommand(CMD_CAMERA);
+        this.addCommand(CMD_IMAGE_BROWSE);
 //        this.addCommand(CMD_SHAREFORMS);
 
         //#if polish.usePolishGui
@@ -115,6 +121,17 @@ public class FormList extends List implements CommandListener, IView {
 		else if (c == CMD_VIEWMODELS) {
 			Hashtable returnvals = new Hashtable();
 			returnvals.put(Commands.CMD_VIEW_DATA, "");
+			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
+		}
+        // CZUE: camera test
+		else if (c == CMD_CAMERA) {
+			Hashtable returnvals = new Hashtable();
+			returnvals.put(Commands.CMD_CAMERA, "");
+			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
+		}
+		else if (c == CMD_IMAGE_BROWSE) {
+			Hashtable returnvals = new Hashtable();
+			returnvals.put(Commands.CMD_IMAGE_BROWSE, "");
 			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
 
