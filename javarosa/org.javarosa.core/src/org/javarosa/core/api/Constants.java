@@ -20,5 +20,19 @@ public class Constants {
 	final public static String ACTIVITY_SUSPEND  = "activity_suspend";
 	final public static String ACTIVITY_NEEDS_RESOLUTION  = "activity_needs_resolution";
 	
+	
 	final public static String USER_KEY = "username";
+	
+	/**
+	 * Return arg codes
+	 */
+	final public static String ACTIVITY_LAUNCH_KEY = "activity_to_launch";
+	final public static String RETURN_ARG_KEY = "return_arg";
+	final public static String RETURN_ARG_TYPE_KEY = "return_arg_type";
+	final public static String RETURN_ARG_TYPE_DATA_POINTER_LIST = "data_pointer_list";
+	
+	/**
+	 * Activity codes
+	 */
+	final public static String ACTIVITY_TYPE_GET_IMAGES = "get_images";
 }
