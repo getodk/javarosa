@@ -46,22 +46,34 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	private IShell shell;
 	private IDisplay display;
 	// private FileRMSUtility dataModel;
-	private Form mainFormOld;
+	//private Form mainFormOld;
 	private Form mainForm;
 	private ChoiceGroup mainList;
-	private Container mainContainer;
-
+	
 	private Command cancelCommand;
 	private Command cameraCommand;
 	private Command browseCommand;
 	private Command returnCommand;
 	private Command viewCommand;
 	private Command deleteCommand;
+	private Command changeSniffDirectoryCommand;
+	
 	private String currentKey;
 	private Thread snifferThread;
 	private ImageSniffer sniffer;
 	private MIDlet midlet;
 
+	private String sniffingPath;
+	
+	private int callBackActivity = ACTIVITY_NONE;
+	private static final int ACTIVITY_NONE = 0;
+	private static final int ACTIVITY_DIRECTORY_CHANGE = 1;
+	
+	private boolean isSniffingImages = true;
+
+	private boolean isActivelySniffing = false;
+
+	
 	public ImageChooserActivity(IShell shell, MIDlet midlet) {
 		this.shell = shell;
 		this.midlet = midlet;
@@ -75,6 +87,8 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		browseCommand = new Command("Browse", Command.SCREEN, 0);
 		viewCommand = new Command("View", Command.SCREEN, 0);
 		deleteCommand = new Command("Delete", Command.SCREEN, 0);
+		changeSniffDirectoryCommand = new Command("Change Search Directory", Command.SCREEN, 0);
+		
 	}
 
 	public void contextChanged(Context globalContext) {
@@ -99,10 +113,16 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	public void resume(Context globalContext) {
 		Object o = globalContext.getElement(currentKey);
 		IDataPointer pointer = (IDataPointer) o;
-		addImageToUI(pointer);
+		if (callBackActivity == ACTIVITY_DIRECTORY_CHANGE) {
+			changeSniffingDirectory(pointer.getDisplayText());
+		} else {
+			addImageToUI(pointer);
+		}
 		updateView();
+		callBackActivity = ACTIVITY_NONE;
 	}
 
+	
 	private void updateView() {
 		display.setView(DisplayViewFactory.createView(mainForm));
 	}
@@ -116,9 +136,8 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		this.context = context;
 
 		// mainList = new List("Available Images", List.IMPLICIT);
-		mainList = new ChoiceGroup("Available Images", ChoiceGroup.MULTIPLE);
 		mainForm = new Form("Image Chooser");
-		mainFormOld = new Form("Old Image Chooser");
+		//mainFormOld = new Form("Old Image Chooser");
 		mainForm.addCommand(cancelCommand);
 		mainForm.addCommand(cameraCommand);
 		mainForm.addCommand(browseCommand);
@@ -127,25 +146,82 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		mainForm.addCommand(deleteCommand);
 		// mainList.setCommandListener(this);
 		mainForm.setCommandListener(this);
-		mainContainer = new Container(false);
-		mainForm.append(mainList);
 		// mainForm.append("Use the menu options to take pictures or browse.");
 
 		// also create the sniffer
-		sniffer = new ImageSniffer(getImageRootPath(), this);
-		snifferThread = new Thread(sniffer);
-		snifferThread.start();
+		if (isSniffingImages) {
+			mainList = new ChoiceGroup("Available Images (searching in " + getImageSniffingPath() + ")", ChoiceGroup.MULTIPLE);
+			sniffer = new ImageSniffer(getImageSniffingPath(), this);
+			snifferThread = new Thread(sniffer);
+			snifferThread.start();
+			isActivelySniffing = true;
+			mainForm.addCommand(changeSniffDirectoryCommand);
+		} else {
+			mainList = new ChoiceGroup("Available Images (not searching file system)", ChoiceGroup.MULTIPLE);
+		}
+		mainForm.append(mainList);
 		updateView();
 	}
 
-	private String getImageRootPath() {
-		// file system testing
-//		return "file://localhost/root1/photos/";
-		// phone testing
-		String rootName = FileUtility.getDefaultRoot();
-		return "file://localhost/" + rootName + "Images/200812";
+	/**
+	 * The path to sniff images
+	 * @return
+	 */
+	public String getImageSniffingPath() {
+
+		if (sniffingPath == null) {
+			// default
+			// file system testing
+			//sniffingPath = "file://localhost/root1/photos/"; 
+			// phone testing
+			String rootName = FileUtility.getDefaultRoot();
+			sniffingPath = "file://localhost/" + rootName + "Images/";
+		}
+		return sniffingPath;
 	}
 
+	/**
+	 * Set or change the path to sniff images.  
+	 * @return
+	 */
+	public void changeSniffingDirectory(String path) {
+		sniffingPath = path;
+		
+		if (isActivelySniffing ) { 
+			if (sniffer != null) {
+				sniffer.quit();
+			}
+			System.out.println("Setting directory to: " + path);
+			sniffer.setSniffDirectory(sniffingPath); 
+			//sniffer = new ImageSniffer(sniffingPath, this);
+			//snifferThread = new Thread(sniffer);
+			//snifferThread.start();
+			mainList.setLabel("Available Images (searching in " + sniffingPath + ")");
+		}
+	}
+
+
+	/**
+	 * Set whether to sniff a directory for images.  This will have no effect after
+	 * the activity has been started.
+	 * @param toSniff
+	 */
+	public void setSniffingImages(boolean toSniff) {
+		isSniffingImages = toSniff;
+	}
+	
+	/**
+	 * Whether a directory is/will be sniffed for images
+	 * @return
+	 */
+	public boolean isSniffingImages() {
+		return isSniffingImages;
+	}
+	
+	/**
+	 * Add an image to this object in the form of a data pointer
+	 * @param pointer
+	 */
 	public synchronized void addImageToUI(IDataPointer pointer) {
 		try {
 			if (pointer != null) {
@@ -194,25 +270,25 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 			System.out.println(ex.getMessage());
 			System.out.println(ex);
 			ex.printStackTrace();
-			mainFormOld.append("Exception" + ex.getMessage());
-
 		}
 	}
 
+	public synchronized void updateImageSniffingDisplay(String newPath) {
+		mainList.setLabel("Available Images (searching in " + newPath + ")");
+	}
+
+	// utility method for memory debugging
 	private void printMemories(String tag) {
 		String memory = System.getProperty("com.nokia.memoryramfree");
 		long jvmMemory = Runtime.getRuntime().freeMemory();
 		System.out.println("Available Memory " + tag + ": " + memory);
 		System.out.println("Available JVM Memory " + tag + ": " + jvmMemory);
 		System.out.flush();
-		mainFormOld.append("Available Memory " + tag + ": " + memory);
-		mainFormOld.append("Available JVM Memory " + tag + ": " + jvmMemory);
+//		mainFormOld.append("Available Memory " + tag + ": " + memory);
+//		mainFormOld.append("Available JVM Memory " + tag + ": " + jvmMemory);
 	}
 
-	public synchronized void addTextToUI(String message) {
-		mainFormOld.append(message);
-	}
-
+	
 	private FileDataPointer captureNewImage() {
 		// TODO: I have a feeling this is going to actually be some sort of back
 		// and forth chicannery
@@ -253,9 +329,10 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 			processCamera();
 		} else if (command.equals(browseCommand)) {
 			processBrowser();
-
 		} else if (command.equals(cancelCommand)) {
 			processCancel();
+		} else if (command.equals(changeSniffDirectoryCommand)) {
+			processChangeDirectory();
 		} else if (command.equals(returnCommand)) {
 			processReturn();
 		} else {
@@ -320,15 +397,22 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 
 	private void processBrowser() {
 		try {
-			System.out.println("Browser...");
 			currentKey = FileBrowseActivity.FILE_POINTER;
 			returnFromActivity(new FileBrowseActivity(shell));
-
 		} catch (Exception e) {
-			mainFormOld.append("Exception: " + e.getMessage());
+			System.out.println("Exception: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
+
+	private void processChangeDirectory() {
+		currentKey = FileBrowseActivity.FILE_POINTER;
+		callBackActivity = ACTIVITY_DIRECTORY_CHANGE;
+		FileBrowseActivity activity = new FileBrowseActivity(shell);
+		activity.setMode(FileBrowseActivity.MODE_DIRECTORY);
+		returnFromActivity(activity);
+	}
+
 
 	private void processCamera() {
 		currentKey = ImageCaptureActivity.IMAGE_KEY;

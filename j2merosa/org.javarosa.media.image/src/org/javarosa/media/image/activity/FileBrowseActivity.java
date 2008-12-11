@@ -31,9 +31,11 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	private String currDirName;
 
 	private Command selectCommand = new Command("Select", Command.OK, 1);
+	private Command returnCommand = new Command("Return Directory", Command.OK, 2);
 	private Command back = new Command("Back", Command.BACK, 2);
-	private Command cancel = new Command("Cancel", Command.CANCEL, 3);
+	private Command cancel = new Command("Cancel", Command.CANCEL, 4);
 
+	
 	private IShell shell;
 	private IDisplay display;
 
@@ -43,8 +45,15 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	private final static String SEP_STR = "/";
 	private final static char SEP = '/';
 
+	private int mode = MODE_FILE;
+
+	
 	public static final String FILE_POINTER = "FILE_POINTER";
 
+	public static final int MODE_FILE = 0;
+	public static final int MODE_DIRECTORY = 1;
+	
+	
 	public FileBrowseActivity(IShell shell) {
 		this.shell = shell;
 		this.display = JavaRosaServiceProvider.instance().getDisplay();
@@ -116,6 +125,9 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 					}
 				}
 			}).start();
+		} else if (c == returnCommand) {
+			List curr = (List)d;
+			returnDirectory(curr.getString(curr.getSelectedIndex()));
 		} else if (c == back) {
 			showCurrDir();
 		} else if (c == cancel) {
@@ -123,7 +135,11 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		}
 	}
 
-	void showCurrDir() {
+	public void setMode(int mode) {
+		this.mode = mode;
+	}
+	
+	private void showCurrDir() {
 		Enumeration e;
 		List browser;
 		System.out.println("In showCurrDir");
@@ -142,25 +158,33 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		while (e.hasMoreElements()) {
 			String fileName = (String) e.nextElement();
 			if (fileName.charAt(fileName.length() - 1) == SEP) {
+				// this is a directory
 				browser.append(fileName, null);
 			}
 			// if((fileName.charAt(fileName.length()-1))).equals("g"))){}
 			else {
 				System.out.println("h4");
 				// Image image = Image.createImage(fileName);
-				browser.append(fileName, null);
+				// this is a file
+				if (mode == MODE_FILE) {
+					browser.append(fileName, null);
+				}
 				// Form form = new Form("Image here");
 
 				// form.append(image);
 			}
 		}
 		browser.setSelectCommand(selectCommand );
+		if (mode == MODE_DIRECTORY) {
+			browser.addCommand(returnCommand);
+		}
+		
 		browser.addCommand(cancel);
 		browser.setCommandListener(this);
 		display.setView(DisplayViewFactory.createView(browser));
 	}
 
-	void traverseDirectory(String fileName) {
+	private void traverseDirectory(String fileName) {
 		System.out.println("fileName:" + fileName + "cur_dir:" + currDirName
 				+ "mega_root:" + MEGA_ROOT);
 		if (currDirName.equals(MEGA_ROOT)) {
@@ -185,12 +209,22 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		showCurrDir();
 	}
 
-	void returnFile(String fileName) {
-		String fullName = "file://" + currDirName + fileName;
+	private void returnFile(String fileName) {
+		if (fileName == "/") {
+			fileName = "";
+		}
+		String fullName = "file://localhost/" + currDirName + fileName;
 		FileDataPointer fdp = new FileDataPointer(fullName);
 		Hashtable returnArgs = new Hashtable();
 		returnArgs.put(FILE_POINTER, fdp);
 		shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
 	}
+	
+	private void returnDirectory(String name) {
+		returnFile(name);
+	}
+	
+	
+
 	
 }
