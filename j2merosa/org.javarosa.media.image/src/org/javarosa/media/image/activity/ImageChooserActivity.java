@@ -140,10 +140,10 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 
 	private String getImageRootPath() {
 		// file system testing
-		return "file://localhost/root1/photos/";
+//		return "file://localhost/root1/photos/";
 		// phone testing
-		//String rootName = FileUtility.getDefaultRoot();
-		//return "file://localhost/" + rootName + "Images/200812";
+		String rootName = FileUtility.getDefaultRoot();
+		return "file://localhost/" + rootName + "Images/200812";
 	}
 
 	public synchronized void addImageToUI(IDataPointer pointer) {

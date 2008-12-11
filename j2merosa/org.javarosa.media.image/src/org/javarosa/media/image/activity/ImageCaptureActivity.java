@@ -60,8 +60,8 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		this.shell = shell;
 		display = JavaRosaServiceProvider.instance().getDisplay();
 		dataModel = new FileRMSUtility("image_store");
-		width = 960;
-		height = 720;
+		width = 640;
+		height = 480;
 	}
 
 	
@@ -250,7 +250,6 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	}
 	
 	private String saveFile(String filename, byte[] image) {
-		// TODO 
 		String rootName = FileUtility.getDefaultRoot();
 		String restorepath = "file:///" + rootName + "JRImages";				
 		FileUtility.createDirectory(restorepath);
