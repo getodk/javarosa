@@ -21,6 +21,7 @@ public class ImageSniffer implements Runnable {
 	private String directory;
 	private Vector foundFiles;
 	private ImageChooserActivity chooser;
+	private String directoryToUse;
 	
 	public ImageSniffer(String directory, ImageChooserActivity chooser) {
 		this.directory = directory;
@@ -37,11 +38,12 @@ public class ImageSniffer implements Runnable {
 		// with the most recent file and assume that's correct
 		try {
 			//if (true) throw new RuntimeException("Is this message Showing up?");
-			chooser.addTextToUI("Searching directory: " + directory);
+			System.out.println("Searching directory: " + directory);
 			
-			String directoryToUse = getDirectoryToSniff();
+			directoryToUse = getDirectoryToSniff();
 			
-			chooser.addTextToUI("Searching sub directory: " + directoryToUse);
+			System.out.println("Searching sub directory: " + directoryToUse);
+			chooser.updateImageSniffingDisplay(directoryToUse);
 			System.out.println("Most recently modified directory below: " + directory + " is: " + directoryToUse);
 		
 		
@@ -69,17 +71,21 @@ public class ImageSniffer implements Runnable {
 			}
 			
 			}
-			System.out.println("Bye bye!");
 		} catch (Exception e) {
-			chooser.addTextToUI(e.getMessage());
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 			
 		} finally {
-			// TODO cleanup
-			System.out.println("Really really leaving from here.");
+			 // TODO cleanup
 		}
 
 	}
+	
+	public synchronized void setSniffDirectory(String path) {
+		directoryToUse = path;
+		
+	}
+
 
 	private String getDirectoryToSniff() {
 		String mostRecentMod =FileUtility.getMostRecentlyModifiedDirectoryBelow(directory);
@@ -97,4 +103,5 @@ public class ImageSniffer implements Runnable {
 		quit = true;
 	}
 
+	
 }
