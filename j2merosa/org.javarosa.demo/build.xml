@@ -68,7 +68,8 @@
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
 					<source dir="${basedir}/../org.javarosa.j2me/src/"/>
-					<!--source dir="${basedir}/../org.javarosa.mesh4j.sync.extensions/src/"/-->
+					<source dir="${basedir}/../org.javarosa.media.image/src/"/>
+				    <!--source dir="${basedir}/../org.javarosa.mesh4j.sync.extensions/src/"/-->
                     <source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox.extensions/src/"/>
