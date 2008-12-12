@@ -54,7 +54,7 @@ public class GetFormListHttpActivity implements IActivity,CommandListener,Observ
 		//System.out.println("NOW STARTING RETRIEVE");
 		getListUrl = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(HttpTransportProperties.GET_URL_PROPERTY);
 		credentials = "?user="+context.getCurrentUser();
-		requestPayload = credentials;
+		//requestPayload = credentials;
 	}
 
 	public void contextChanged(Context globalContext) {
@@ -116,7 +116,6 @@ public class GetFormListHttpActivity implements IActivity,CommandListener,Observ
 		if(display== progressScreen){
 			if(command == CMD_CANCEL){
 				parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-				
 			}
 			
 		}
@@ -135,7 +134,6 @@ public class GetFormListHttpActivity implements IActivity,CommandListener,Observ
 	public void process(byte[] data) {
 		String response;
 		response = new String(data).trim();
-		
 		if(response ==null){
 			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
 			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
