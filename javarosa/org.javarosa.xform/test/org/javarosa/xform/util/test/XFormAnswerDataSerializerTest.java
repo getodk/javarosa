@@ -13,7 +13,6 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.instance.QuestionDataElement;
-import org.javarosa.core.model.instance.test.QuestionDataElementTests;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 /**
@@ -23,7 +22,7 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
  * @author Clayton Sims
  *
  */
-public class XFormAnswerDataSerializerTest extends TestCase{
+public class XFormAnswerDataSerializerTest extends TestCase {
 	final String stringDataValue = "String Data Value";
 	final Integer integerDataValue = new Integer(5);
 	final Date dateDataValue = new Date();
@@ -35,11 +34,11 @@ public class XFormAnswerDataSerializerTest extends TestCase{
 	SelectOneData selectData;
 	TimeData timeData;
 	
-	QuestionDataElement stringElement;
-	QuestionDataElement intElement;
-	QuestionDataElement dateElement;
-	QuestionDataElement selectElement;
-	QuestionDataElement timeElement;
+	QuestionDataElement stringElement = new QuestionDataElement();
+	QuestionDataElement intElement = new QuestionDataElement();
+	QuestionDataElement dateElement = new QuestionDataElement();
+	QuestionDataElement selectElement = new QuestionDataElement();
+	QuestionDataElement timeElement = new QuestionDataElement();
 	
 	XFormAnswerDataSerializer serializer;
 	
@@ -49,6 +48,7 @@ public class XFormAnswerDataSerializerTest extends TestCase{
 	 * @see j2meunit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
+		super.setUp();
 		stringData = new StringData(stringDataValue);
 		stringElement.setValue(stringData);
 		
@@ -62,8 +62,6 @@ public class XFormAnswerDataSerializerTest extends TestCase{
 		timeElement.setValue(timeData);
 		
 		serializer = new XFormAnswerDataSerializer();
-		
-	
 	}
 	public XFormAnswerDataSerializerTest(String name, TestMethod rTestMethod) {
 		super(name, rTestMethod);
@@ -83,9 +81,9 @@ public class XFormAnswerDataSerializerTest extends TestCase{
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
 
-			aSuite.addTest(new QuestionDataElementTests("QuestionDataElement Test " + i, new TestMethod() {
+			aSuite.addTest(new XFormAnswerDataSerializerTest("XFormAnswerDataSerializer Test " + i, new TestMethod() {
 				public void run (TestCase tc) {
-					((QuestionDataElementTests)tc).testMaster(testID);
+					((XFormAnswerDataSerializerTest)tc).testMaster(testID);
 				}
 			}));
 		}
@@ -93,8 +91,6 @@ public class XFormAnswerDataSerializerTest extends TestCase{
 		return aSuite;
 	}
 	public void testMaster (int testID) {
-		//System.out.println("running " + testID);
-		
 		switch (testID) {
 			case 1: testString(); break;
 			case 2: testInteger(); break;

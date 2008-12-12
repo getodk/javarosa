@@ -15,6 +15,7 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.instance.QuestionDataElement;
 import org.javarosa.core.model.utils.DateUtils;
 
@@ -42,7 +43,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	
 	public boolean canSerialize(QuestionDataElement element) {
 		if (element.getValue() instanceof StringData || element.getValue() instanceof DateData ||
-				element.getValue() instanceof SelectMultiData || element.getValue() instanceof SelectOneData) {
+				element.getValue() instanceof SelectMultiData || element.getValue() instanceof SelectOneData
+				|| element.getValue() instanceof IntegerData || element.getValue() instanceof TimeData) {
 			return true;
 		} else {
 			return false;
@@ -64,6 +66,15 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	 */
 	public Object serializeAnswerData(DateData data) {
 		return DateUtils.getXMLStringValue((Date)data.getValue());
+	}
+	
+	/**
+	 * @param data The AnswerDataObject to be serialized
+	 * @return A String which contains a date in xsd:time
+	 * formatting
+	 */
+	public Object serializeAnswerData(TimeData data) {
+		return DateUtils.get24HourTimeFromDate((Date)data.getValue());
 	}
 	
 	/**
