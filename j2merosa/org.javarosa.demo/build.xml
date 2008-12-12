@@ -193,6 +193,7 @@
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathParseTest"/>
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathEvalTest"/>
+		<RunTestSuite suite="org.javarosa.xform.util.test.XFormAnswerDataSerializerTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.test.QuestionDefTest"/>
 		<RunTestSuite suite="org.javarosa.core.util.test.NumericEncodingTest"/>
 		<RunTestSuite suite="org.javarosa.core.util.test.PrefixTreeTest"/>

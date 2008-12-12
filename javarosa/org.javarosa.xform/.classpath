@@ -9,6 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry kind="lib" path="lib/cup.jar"/>
 	<classpathentry kind="lib" path="lib/JFlex.jar"/>
-	<classpathentry kind="lib" path="/org.javarosa.demo/lib/j2meunit-javarosa.jar"/>
+	<classpathentry kind="lib" path="/org.javarosa.demo/tools/j2meunit-javarosa.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
