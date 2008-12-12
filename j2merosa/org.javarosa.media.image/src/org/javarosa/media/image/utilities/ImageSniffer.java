@@ -76,14 +76,13 @@ public class ImageSniffer implements Runnable {
 			e.printStackTrace();
 			
 		} finally {
-			 // TODO cleanup
+			System.out.println("Exiting Sniffer Thread");
 		}
 
 	}
 	
 	public synchronized void setSniffDirectory(String path) {
 		directoryToUse = path;
-		
 	}
 
 

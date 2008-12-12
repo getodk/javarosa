@@ -69,7 +69,7 @@ public class FileUtility {
 	
 	public static Enumeration listDirectory(String directoryPath) {
 		FileConnection dir = null;
-		//System.out.println("Listing the contents of: " + directoryPath);
+		System.out.println("Listing the contents of: " + directoryPath);
 		try {
 			dir = (FileConnection) Connector.open(directoryPath);
 			return dir.list();

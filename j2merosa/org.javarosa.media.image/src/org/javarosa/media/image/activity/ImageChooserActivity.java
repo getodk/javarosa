@@ -189,7 +189,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		
 		if (isActivelySniffing ) { 
 			if (sniffer != null) {
-				sniffer.quit();
+				// sniffer.quit();
 			}
 			System.out.println("Setting directory to: " + path);
 			sniffer.setSniffDirectory(sniffingPath); 
