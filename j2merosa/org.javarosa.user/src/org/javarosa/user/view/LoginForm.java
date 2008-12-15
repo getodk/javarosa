@@ -4,6 +4,7 @@ package org.javarosa.user.view;
 
 import java.io.IOException;
 
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Form;
@@ -11,22 +12,39 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
+import org.javarosa.communication.http.HttpTransportDestination;
+import org.javarosa.communication.http.HttpTransportProperties;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IView;
+import org.javarosa.core.services.TransportManager;
+import org.javarosa.core.services.transport.ITransportDestination;
+import org.javarosa.core.services.transport.TransportMessage;
+import org.javarosa.core.services.transport.TransportMethod;
+import org.javarosa.core.util.Observable;
+import org.javarosa.core.util.Observer;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
+
+import de.enough.polish.util.StringTokenizer;
 
 public class LoginForm extends Form implements IView
 {
 	   public final Command CMD_CANCEL_LOGIN = new Command("EXIT",Command.SCREEN, 1);
 	   public Command loginButtonCommand = new Command("Login", Command.ITEM, 1);
+	   private Alert alertdialog = new Alert("Web Service Error", "No response from server", null, AlertType.ERROR);
 
 	   private TextField userName;
 	   private TextField password;
-	   private UserRMSUtility userRMS;
+	   public UserRMSUtility userRMS;
 	   private User loggedInUser;
 	   public StringItem loginButton;
+	   public boolean validator;
+	   
+	   private TransportMessage message;
+	   private TransportManager transportManager;
+	   private String requestPayload = "#";
 
 	   ///these 4 variable is for a rememberMe option that could join the login menu
 	   private String rememberMe;
@@ -103,18 +121,19 @@ public class LoginForm extends Form implements IView
 			   index++;
 		   }
 
-		   if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))
+		   if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr)){
 			   if (discoveredUser.getPassword().equals(password.getString()))
 			   {
 				   System.out.println("login valid");
 				   validLogin = true;
 				   setLoggedInUser(discoveredUser);
 			   }
-
+			   }
+   
 	     return validLogin;
 
 	   }
-
+	   
 	   public String getLoggedInUserType() {
 
 
@@ -162,12 +181,24 @@ public class LoginForm extends Form implements IView
 		     javax.microedition.lcdui.Alert success = new javax.microedition.lcdui.Alert("Login Successful", "Loading your profile", null, AlertType.CONFIRMATION);
 		     return success;
 		   }
-
+		public UserRMSUtility getUserRMS() {
+				return this.userRMS;
+		}
+		
+		public String getPassWord() {
+			String pass = password.getString();
+			return pass;
+		}
+		
+		public String getUserName() {
+			String usr = userName.getString();
+			return usr;
+		}
 	public User getLoggedInUser() {
 		return loggedInUser;
 	}
 
-	private void setLoggedInUser(User loggedInUser) {
+	public void setLoggedInUser(User loggedInUser) {
 		this.loggedInUser = loggedInUser;
 	}
 	public Object getScreenObject() {

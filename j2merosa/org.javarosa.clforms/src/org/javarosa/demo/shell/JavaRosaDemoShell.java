@@ -40,6 +40,8 @@ import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.AddUserActivity;
 import org.javarosa.user.activity.LoginActivity;
+import org.javarosa.user.activity.RemoteLoginActivity;
+import org.javarosa.user.activity.UpdateProfileActivity;
 import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
 /**
@@ -74,17 +76,18 @@ public class JavaRosaDemoShell implements IShell {
 	private void init() {
 		loadModules();
 		loadProperties();
-		
+
 		FormDefRMSUtility formDef = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 		if (formDef.getNumberOfRecords() == 0) {
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL_Help.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/onlineTest.xhtml"));
 //			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTOpenDay2.xhtml"));
 //			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTLT2.xhtml"));
 //		formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-a_draft.xhtml"));
 //		formDef.writeToRMS(XFormUtils.getFormFromResource("/MobileSurvey.xhtml"));
 		}
 	}
-	
+
 	private void loadModules() {
 		new RMSStorageModule().registerModule(context);
 		new XFormsModule().registerModule(context);
@@ -93,7 +96,7 @@ public class JavaRosaDemoShell implements IShell {
 		new FormManagerModule().registerModule(context);
 		//new CommunicationUIModule().registerModule(context);
 	}
-	
+
 	private void generateSerializedForms(String originalResource) {
 		FormDef a = XFormUtils.getFormFromResource(originalResource);
 		FormDefSerializer fds = new FormDefSerializer();
@@ -150,29 +153,45 @@ public class JavaRosaDemoShell implements IShell {
                     context.setElement("password",passwordVAR);
             }
             context.setElement("authorization", "admin");
-			launchActivity(new LoginActivity(this, "Login"), context);
+			//launchActivity(new LoginActivity(this, "Login"), context);
+			launchActivity(new RemoteLoginActivity(this, "Login"), context);
 			//#endif
 
-		} else if (returningActivity instanceof LoginActivity) {
+		} else if (returningActivity instanceof RemoteLoginActivity) {
 
-			Object returnVal = returnVals.get(LoginActivity.COMMAND_KEY);
+			Object returnVal = returnVals.get(RemoteLoginActivity.COMMAND_KEY);
 			if (returnVal == "USER_VALIDATED") {
-				User user = (User)returnVals.get(LoginActivity.USER);
-				MemoryCheckActivity memCheck = new MemoryCheckActivity(this);
+				User user = (User)returnVals.get(RemoteLoginActivity.USER);
+				Object loginType =returnVals.get(RemoteLoginActivity.TYPE);
+				Hashtable profile = (Hashtable)returnVals.get(RemoteLoginActivity.PROFILE);
+				UpdateProfileActivity addProp = new UpdateProfileActivity(this);
+				MemoryCheckActivity memcheck = new MemoryCheckActivity(this);
 				if (user != null){
 					context.setCurrentUser(user.getUsername());
 					context.setElement("USER", user);
 				}
-				launchActivity(memCheck, context);
+				if(loginType == "REMOTE_AUTH"){
+					context.addAllValues(profile);
+					launchActivity(addProp, context);//only launch profile update if remotely authenticated
+				}
+				else
+				{//loginType == "LOCAL_AUTH"
+					launchActivity(memcheck, context);
+				}
 			} else if (returnVal == "USER_CANCELLED") {
 				exitShell();
 			}
-			
 
-		}else if (returningActivity instanceof MemoryCheckActivity) 
+		}
+		else if (returningActivity instanceof UpdateProfileActivity)
+		{
+			launchActivity(new MemoryCheckActivity(this), context);
+		}
+		else if (returningActivity instanceof MemoryCheckActivity)
 		{
 			launchActivity(new FormListActivity(this, "Forms List"), context);
-		} else if (returningActivity instanceof FormListActivity) {
+		} 
+		else if (returningActivity instanceof FormListActivity) {
 
 			String returnVal = (String)returnVals.get(FormListActivity.COMMAND_KEY);
 			if (returnVal == Commands.CMD_SETTINGS) {
@@ -181,14 +200,14 @@ public class JavaRosaDemoShell implements IShell {
 				launchActivity(new ModelListActivity(this), context);
 			} else if (returnVal == Commands.CMD_SELECT_XFORM) {
 				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1);
-			} else if (returnVal == Commands.CMD_EXIT) 
+			} else if (returnVal == Commands.CMD_EXIT)
 				exitShell();
-			  else if (returnVal == Commands.CMD_ADD_USER) 
+			  else if (returnVal == Commands.CMD_ADD_USER)
 				{launchActivity( new AddUserActivity(this),context);}
 			  else if (returnVal == Commands.CMD_GET_NEW_FORM) {
 					launchActivity(new GetFormListHttpActivity(this), context);
-				}  
-			
+				}
+
 
 		} else if (returningActivity instanceof ModelListActivity) {
 
@@ -231,7 +250,7 @@ public class JavaRosaDemoShell implements IShell {
 				}
 			}*/
 		}
-		else if (returningActivity instanceof AddUserActivity) 
+		else if (returningActivity instanceof AddUserActivity)
 		 	{
 			launchActivity(new FormListActivity(this, "Forms List"), context);
 			}
@@ -257,7 +276,7 @@ public class JavaRosaDemoShell implements IShell {
 			}else if(returnCode.equals(Constants.ACTIVITY_COMPLETE)){
 				launchActivity(new FormListActivity(this, "Forms List"), context);
 			}
-			
+
 
 		}
 	}
@@ -345,11 +364,13 @@ public class JavaRosaDemoShell implements IShell {
 		//JavaRosaServiceProvider.instance().getPropertyManager().addRules(new DemoAppProperties());
 
 		PropertyUtils.initializeProperty("DeviceID", PropertyUtils.genGUID(25));
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
+		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://localhost/limesurvey/admin/post2lime.php");
+		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://localhost/limesurvey/admin/post2lime.php");
 		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://survey.cell-life.org/admin/post2limeNew.php");
 		PropertyUtils.initializeProperty(HttpTransportProperties.GET_URL_PROPERTY, "http://update.cell-life.org/save_dump.php");
-		
+		//PropertyUtils.initializeProperty(HttpTransportProperties.GET_URL_PROPERTY, "http://localhost/limesurvey/listsurveys.php");
+		PropertyUtils.initializeProperty(HttpTransportProperties.AUTH_URL_PROPERTY, "http://localhost/limesurvey/verifyremote.php");
+
 	}
 
 
