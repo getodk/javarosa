@@ -10,6 +10,8 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 	private int style;
 	protected QuestionDef question;
 	
+	private ChoiceGroup choicegroup;
+	
 	public SelectEntryWidget (int style) {
 		this.style = style;
 	}
@@ -40,11 +42,14 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 		for (int i = 0; i < question.getSelectItems().size(); i++)
 			cg.append("", null);
 		
+		this.choicegroup = cg;
+		
 		return cg;
 	}
 
 	protected ChoiceGroup choiceGroup () {
-		return (ChoiceGroup)entryWidget;    
+		//return (ChoiceGroup)entryWidget;
+		return this.choicegroup;
 	}
 
 	protected void updateWidget (QuestionDef question) {
