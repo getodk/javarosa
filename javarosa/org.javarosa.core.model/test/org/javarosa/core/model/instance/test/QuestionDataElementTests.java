@@ -15,13 +15,10 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.instance.QuestionDataElement;
-import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class QuestionDataElementTests extends TestCase{
 	private final String stringElementName = "String Data Element";
@@ -33,10 +30,10 @@ public class QuestionDataElementTests extends TestCase{
 	
 	IDataReference integerReference;
 	
-	QuestionDataElement stringElement;
-	QuestionDataElement intElement;
+	TreeElement stringElement;
+	TreeElement intElement;
 	
-	private static int NUM_TESTS = 8;
+	private static int NUM_TESTS = 7;
 	
 	/* (non-Javadoc)
 	 * @see j2meunit.framework.TestCase#setUp()
@@ -114,10 +111,10 @@ public class QuestionDataElementTests extends TestCase{
 
 		};
 		
-		intElement  = new QuestionDataElement("intElement", integerReference);
+		intElement  = new TreeElement("intElement");
 		intElement.setValue(integerData);
 		
-		stringElement = new QuestionDataElement(stringElementName, stringReference);
+		stringElement = new TreeElement(stringElementName);
 		stringElement.setValue(stringData);
 		
 	}
@@ -158,9 +155,8 @@ public class QuestionDataElementTests extends TestCase{
 			case 3: testSetName(); break;
 			case 4: testGetValue(); break;
 			case 5: testSetValue(); break;
-			case 6: testReferenceMatch(); break;
-			case 7: testAcceptsVisitor(); break;
-			case 8: testSuperclassMethods(); break;
+			case 6: testAcceptsVisitor(); break;
+			case 7: testSuperclassMethods(); break;
 			
 		}
 	}
@@ -199,9 +195,6 @@ public class QuestionDataElementTests extends TestCase{
 		
 	}
 	
-	public void testReferenceMatch() {
-		assertTrue("String Element's reference did not match the correct reference", stringElement.matchesReference(stringReference));
-	}
 	
 	private class MutableBoolean {
 		private boolean bool;
@@ -225,19 +218,13 @@ public class QuestionDataElementTests extends TestCase{
 		ITreeVisitor sampleVisitor = new ITreeVisitor() {
 			
 			public void visit(DataModelTree tree) {
-				
+				dispatchedWrong.bool = true;
 			}
 			public void visit(TreeElement element) {
-				dispatchedWrong.setValue(true);
-			}
-			public void visit(QuestionDataElement element) {
-				visitorAccepted.setValue(true);
-			}
-			public void visit(QuestionDataGroup element) {
-				
+				visitorAccepted.bool = true;
 			}
 			public void visit(IFormDataModel dataModel) {
-				
+				dispatchedWrong.bool = true;
 			}
 		};
 		

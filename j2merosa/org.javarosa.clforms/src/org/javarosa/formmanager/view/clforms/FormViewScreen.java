@@ -4,16 +4,19 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.List;
 
 import org.javarosa.core.api.IView;
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.model.FormEntryModel;
-import org.javarosa.formmanager.utility.SortedIntSet;
+import org.javarosa.formmanager.utility.SortedIndexSet;
+import org.javarosa.formmanager.view.FormElementBinding;
 
 public class FormViewScreen extends List implements IView {
 
 	private FormEntryModel model;
 	private FormViewManager parent;
 
-	public SortedIntSet indexHash;
+	public SortedIndexSet indexHash;
 
 	// GUI elements
 	public static Command exitNoSaveCommand;
@@ -49,15 +52,19 @@ public class FormViewScreen extends List implements IView {
 
 		//first ensure clean gui
 		((List) this).deleteAll();
-		indexHash = new SortedIntSet();
+		indexHash = new SortedIndexSet();
 
-		for (int i = 0; i < model.getNumQuestions(); i++) {
+		for (FormIndex i = model.getForm().incrementIndex(FormIndex.createBeginningOfFormIndex());
+			 i.compareTo(FormIndex.createEndOfFormIndex()) < 0;
+			 i = model.getForm().incrementIndex(i)) {
 			// Check if relevant
 			if(model.isRelevant(i))
 			{
+				FormElementBinding bind = new FormElementBinding(null, i, model.getForm());
+				
 				String stringVal;
 				// Get current value as STring
-				IAnswerData  val = model.getForm().getValue(model.getQuestion(i));
+				IAnswerData  val = bind.getValue();
 				//check for null answers
 				if(val == null){
 					stringVal = "";
@@ -66,13 +73,13 @@ public class FormViewScreen extends List implements IView {
 				stringVal = val.getDisplayText();
 				}
 
-				if(model.getQuestion(i).isRequired()){
+				if(bind.instanceNode.required){
 				// Append to list
-				((List) this).append("*"+model.getQuestion(i).getShortText()+" => "+stringVal,null);
+				((List) this).append("*"+((QuestionDef)bind.element).getShortText()+" => "+stringVal,null);
 				}
 				else
 				{
-					((List) this).append(model.getQuestion(i).getShortText()+" => "+stringVal,null);
+					((List) this).append(((QuestionDef)bind.element).getShortText()+" => "+stringVal,null);
 				}
 				indexHash.add(i);//map list index to question index.
 			}

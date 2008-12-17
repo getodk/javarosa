@@ -1,6 +1,6 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.IAnswerData;
 
 import de.enough.polish.ui.Container;
@@ -19,7 +19,7 @@ public interface IWidgetStyle {
 	 * @param question question object this widget represents
 	 * @param c top-level container item of the widget, to which GUI items are added. 'c' may also be styled.
 	 */
-	void initWidget (QuestionDef question, Container c);
+	void initWidget (IFormElement question, Container c);
 	
 	/**
 	 * Refresh the widget in response to a change in the question, such as locale, data value, etc. Will be called
@@ -29,7 +29,7 @@ public interface IWidgetStyle {
 	 * @param data representation of the question's current data value
 	 * @param changeFlags bitmap represent what specifically has changed in the question (see QuestionStateListener)
 	 */
-	void refreshWidget (QuestionDef question, IAnswerData data, int changeFlags);
+	void refreshWidget (IFormElement question, IAnswerData data, int changeFlags);
 	
 	/**
 	 * Erase all state associated with this widget. If this widget is to be used again, initWidget() will be called again

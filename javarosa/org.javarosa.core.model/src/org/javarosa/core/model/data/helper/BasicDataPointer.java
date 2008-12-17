@@ -1,4 +1,4 @@
-package org.javarosa.core.model.data;
+package org.javarosa.core.model.data.helper;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -12,10 +12,12 @@ public class BasicDataPointer implements IDataPointer {
 
 	private byte[] data;
 	private String name;
+	
 	public BasicDataPointer(String name, byte[] data) {
 		this.name = name;
 		this.data = data;
-	}
+	}	
+	
 	public boolean deleteData() {
 		
 		this.data = null;
@@ -28,7 +30,7 @@ public class BasicDataPointer implements IDataPointer {
 
 	public String getDisplayText() {
 		return name;
-	}
+	} 
 	public InputStream getDataStream() {
 		// TODO Auto-generated method stub
 		ByteArrayInputStream bis = new ByteArrayInputStream(data);

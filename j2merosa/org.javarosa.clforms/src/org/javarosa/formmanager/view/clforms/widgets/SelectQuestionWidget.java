@@ -8,45 +8,41 @@ import javax.microedition.lcdui.ChoiceGroup;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
-import org.javarosa.core.model.data.Selection;
+import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class SelectQuestionWidget extends SingleQuestionScreen
 {
 	ChoiceGroup cg;
-	QuestionDef q;
 
-	public SelectQuestionWidget(QuestionDef question){
+	public SelectQuestionWidget(FormElementBinding question){
 		super(question);
-		this.q = question;
 	}
 	
 
-	public SelectQuestionWidget(QuestionDef prompt, int num) {
+	public SelectQuestionWidget(FormElementBinding prompt, int num) {
 		super (prompt,num);
-		this.q = prompt;
 	}
-	public SelectQuestionWidget(QuestionDef prompt, String str) {
+	public SelectQuestionWidget(FormElementBinding prompt, String str) {
 		super (prompt,str);
-		this.q = prompt;
 	}
 	
-	public SelectQuestionWidget(QuestionDef prompt, char c) {
+	public SelectQuestionWidget(FormElementBinding prompt, char c) {
 		super (prompt,c);
-		this.q = prompt;
 	}
 
 	public void creatView()
 	{
-		if(qDef.isRequired())
+		if(qDef.instanceNode.required)
 		{
 			//#style choiceGroup
-			cg = new ChoiceGroup("*"+qDef.getLongText(),ChoiceGroup.MULTIPLE );
+			cg = new ChoiceGroup("*"+((QuestionDef)qDef.element).getLongText(),ChoiceGroup.MULTIPLE );
 		}
 		else{
 			//#style choiceGroup
-			cg = new ChoiceGroup(qDef.getLongText(),ChoiceGroup.MULTIPLE );}
-		Enumeration itr = qDef.getSelectItems().keys();//access choices directly
+			cg = new ChoiceGroup(((QuestionDef)qDef.element).getLongText(),ChoiceGroup.MULTIPLE );}
+		Enumeration itr = ((QuestionDef)qDef.element).getSelectItems().keys();//access choices directly
 		int i = 0;
 		while (itr.hasMoreElements()) {
 			String label = (String) itr.nextElement();
@@ -55,8 +51,8 @@ public class SelectQuestionWidget extends SingleQuestionScreen
 		}
 		this.append(cg);
 		this.addNavigationButtons();
-		if (qDef.getHelpText()!=null){
-			setHint(qDef.getHelpText());
+		if (((QuestionDef)qDef.element).getHelpText()!=null){
+			setHint(((QuestionDef)qDef.element).getHelpText());
 		}
 	}
 
@@ -65,7 +61,7 @@ public class SelectQuestionWidget extends SingleQuestionScreen
 
 		for (int i = 0; i < cg.size(); i++) {
 			if (cg.isSelected(i))
-				vs.addElement(new Selection(i, q));
+				vs.addElement(new Selection(i, ((QuestionDef)qDef.element)));
 		}
 
 		return (vs.size() == 0 ? null : new SelectMultiData(vs));

@@ -3,21 +3,22 @@ package org.javarosa.formmanager.controller;
 import java.util.Date;
 
 import javax.microedition.lcdui.Command;
-
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.IFormEntryView;
+import org.javarosa.formmanager.view.FormElementBinding;
 
 public class FormEntryController {
 	public static final int QUESTION_OK = 0;
 	public static final int QUESTION_REQUIRED_BUT_EMPTY = 1;
-
+	public static final int QUESTION_CONSTRAINT_VIOLATED = 2;
+	
 	FormEntryModel model;
 	IFormEntryView view;
 	IControllerHost parent;
@@ -31,20 +32,24 @@ public class FormEntryController {
 		this.view = view;
 	}
 
-	public int questionAnswered (QuestionDef question, IAnswerData data) {
-		if (question.isRequired() && data == null) {
+	public int questionAnswered (FormElementBinding binding, IAnswerData data) {
+		if (binding.instanceNode.required && data == null) {
 			return QUESTION_REQUIRED_BUT_EMPTY;
+		} else if (false /*!evalConstraint()*/) { //FIXME
+			return QUESTION_CONSTRAINT_VIOLATED;
 		} else {
-			commitAnswer(question, data);
+			commitAnswer(binding, data);
 			stepQuestion(true);
 			return QUESTION_OK;
 		}
 	}
 
-	public boolean commitAnswer (QuestionDef question, IAnswerData data) {
-		if (data != null || model.getForm().getValue(question) != null) {
-			//we should check if the data to be saved is already the same as the data in the model, but we can't
-			model.getForm().setQuestionValue(question, data);
+	//TODO: constraint isn't checked here, meaning if you 'save' on a question with invalid data entered in, that data will save
+	//without complaint... seems wrong
+	public boolean commitAnswer (FormElementBinding binding, IAnswerData data) {
+		if (data != null || binding.getValue() != null) {
+			//we should check if the data to be saved is already the same as the data in the model, but we can't (no IAnswerData.equals())
+			model.getForm().setValue(data, binding.instanceRef, binding.instanceNode);
 			model.modelChanged();
 			return true;
 		} else {
@@ -53,17 +58,20 @@ public class FormEntryController {
 	}
 
 	public void stepQuestion (boolean forward) {
-		int inc = (forward ? 1 : -1);
-		int index = model.getQuestionIndex();
+		FormIndex index = model.getQuestionIndex();
 
 		do {
-			index += inc;
-		} while (index >= 0 && index < model.getNumQuestions() && !model.getQuestion(index).isVisible());
+			if (forward) {
+				index = model.getForm().incrementIndex(index);
+			} else {
+				index = model.getForm().decrementIndex(index);
+			}
+		} while (index.isInForm() && !model.isRelevant(index));
 
-		if (index < 0) {
+		if (index.isBeginningOfFormIndex()) {
 			//already at the earliest relevant question
 			return;
-		} else if (index >= model.getNumQuestions()) {
+		} else if (index.isEndOfFormIndex()) {
 			model.setFormComplete();
 			return;
 		}
@@ -71,10 +79,14 @@ public class FormEntryController {
 		selectQuestion(index);
 	}
 
-	public void selectQuestion (int questionIndex) {
+	public void selectQuestion (FormIndex questionIndex) {
 		model.setQuestionIndex(questionIndex);
 	}
 
+	public void newRepeat (FormIndex questionIndex) {
+		model.getForm().createNewRepeat(questionIndex);
+	}
+	
 	//saves model as is; view is responsible for committing any pending data in the current question
 	public void save () {
 		boolean postProcessModified = model.getForm().postProcessModel();
@@ -86,7 +98,7 @@ public class FormEntryController {
 			int instanceID = model.getInstanceID();
 
 			instance.setName(form.getName());
-	        instance.setFormReferenceId(form.getRecordId());
+	        instance.setFormId(form.getRecordId());
 	        instance.setDateSaved(new Date());
 
 	        //notify of save details
@@ -125,7 +137,6 @@ public class FormEntryController {
 	public void setView (IView d) {
 		parent.setView(d);
 	}
-
 	public void suspendActivity(Command command) {
 		// added for image choosing
 		parent.controllerReturn(command.getLabel());

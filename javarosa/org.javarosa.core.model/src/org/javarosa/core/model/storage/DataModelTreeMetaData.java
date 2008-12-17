@@ -46,7 +46,7 @@ public class DataModelTreeMetaData extends MetaDataObject{
 	public DataModelTreeMetaData(DataModelTree data) {
 		this.formName = data.getName() + data.getId();
 		this.dateSaved = data.getDateSaved();
-		this.formIdReference = data.getFormReferenceId();
+		this.formIdReference = data.getFormId();
 
 	}
 
@@ -117,7 +117,7 @@ public class DataModelTreeMetaData extends MetaDataObject{
 		DataModelTree data = (DataModelTree) object;
 		this.formName = data.getName() + data.getId();
 		this.dateSaved = data.getDateSaved();
-		this.formIdReference = data.getFormReferenceId();
+		this.formIdReference = data.getFormId();
 	}
 
 }

@@ -3,6 +3,7 @@ package org.javarosa.patient.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
@@ -134,6 +135,16 @@ public class NumericListData implements IAnswerData, IPatientRecord {
 	 */
 	 public void writeExternal(DataOutputStream out) throws IOException {
 		ExternalizableHelperDeprecated.writeExternal(valueList, out);
+	}
+
+	public IAnswerData clone() {
+		NumericListData data = new NumericListData();
+		Enumeration en = valueList.elements();
+		while(en.hasMoreElements()) {
+			DateValueTuple entry = (DateValueTuple)en.nextElement();
+			data.valueList.addElement(entry.clone());
+		}
+		return data;
 	}
 
 }

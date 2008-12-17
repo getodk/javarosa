@@ -9,13 +9,13 @@ import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.QuestionStateListener;
-import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.core.util.externalizable.CannotCreateObjectException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
@@ -84,28 +84,23 @@ public class QuestionDefTest extends TestCase {
 		QuestionDef q;
 		
 		q = new QuestionDef();
-		if (q.getID() != -1 || q.getName() != null || q.getDataType() != Constants.DATATYPE_TEXT || q.getDataType() != Constants.CONTROL_INPUT ||
-				q.isRequired() || !q.isVisible() || !q.isEnabled() || q.isLocked()) {
+		if (q.getID() != -1 || q.getName() != null) {
 			fail("QuestionDef not initialized properly (default constructor)");
 		}
 		testSerialize(q, "a");
 		
-		q = new QuestionDef(17, "test question", Constants.DATATYPE_DATE, Constants.CONTROL_RANGE);
-		if (q.getID() != 17 || !"test question".equals(q.getName()) || q.getDataType() != Constants.DATATYPE_DATE || q.getControlType() != Constants.CONTROL_RANGE ||
-				q.isRequired() || !q.isVisible() || !q.isEnabled() || q.isLocked()) {
+		q = new QuestionDef(17, "test question", Constants.CONTROL_RANGE);
+		if (q.getID() != 17 || !"test question".equals(q.getName())) {
 			fail("QuestionDef not initialized properly");
 		}
 		testSerialize(q, "b");
 	}
-	
-	public static IDataReference newXPathRef (String xpath) {
-		try {
-			IDataReference ref = (IDataReference)PrototypeFactory.getInstance(Class.forName("org.javarosa.model.xform.XPathReference"));
+
+	public IDataReference newRef (String xpath) {
+			IDataReference ref = new DummyReference();
 			ref.setReference(xpath);
+			pf.addClass(DummyReference.class);
 			return ref;
-		} catch (ClassNotFoundException cnfe) {
-			throw new CannotCreateObjectException("Cannot create XPathReference for testing QuestionDef");
-		}
 	}
 	
 	public void testAccessorsModifiers () {
@@ -123,18 +118,12 @@ public class QuestionDefTest extends TestCase {
 		}
 		testSerialize(q, "d");
 
-		IDataReference ref = newXPathRef("/data");
+		IDataReference ref = newRef("/data");
 		q.setBind(ref);
 		if (q.getBind() != ref) {
 			fail("Ref getter/setter broken");
 		}
 		testSerialize(q, "e");
-
-		q.setDataType(Constants.DATATYPE_BOOLEAN);
-		if (q.getDataType() != Constants.DATATYPE_BOOLEAN) {
-			fail("Datatype getter/setter broken");
-		}
-		testSerialize(q, "f");
 
 		q.setControlType(Constants.CONTROL_SELECT_ONE);
 		if (q.getControlType() != Constants.CONTROL_SELECT_ONE) {
@@ -147,37 +136,6 @@ public class QuestionDefTest extends TestCase {
 			fail("Appearance getter/setter broken");
 		}
 		testSerialize(q, "h");
-
-		q.setRequired(true);
-		if (!q.isRequired()) {
-			fail("Required getter/setter broken");
-		}
-		testSerialize(q, "i");
-
-		q.setVisible(false);
-		if (q.isVisible()) {
-			fail("Visible getter/setter broken");
-		}
-		testSerialize(q, "j");
-
-		q.setEnabled(false);
-		if (q.isEnabled()) {
-			fail("Enabled getter/setter broken");
-		}
-		testSerialize(q, "k");
-
-		q.setLocked(true);
-		if (!q.isLocked()) {
-			fail("Locked getter/setter broken");
-		}
-		testSerialize(q, "l");
-
-		StringData sd = new StringData("asdf");
-		q.setDefaultValue(sd);
-		if (q.getDefaultValue() != sd) {
-			fail("Default value getter/setter broken");
-		}
-		testSerialize(q, "m");
 	}
 		
 	public void testChild () {
@@ -204,10 +162,6 @@ public class QuestionDefTest extends TestCase {
 	
 	public void testFlagObservers () {
 		QuestionDef q = new QuestionDef();
-		q.setRequired(false);
-		q.setVisible(false);
-		q.setEnabled(false);
-		q.setLocked(false);
 
 		QuestionObserver qo = new QuestionObserver();
 		q.registerStateObserver(qo);
@@ -216,56 +170,8 @@ public class QuestionDefTest extends TestCase {
 			fail("Improper state in question observer");
 		}
 
-		q.setRequired(true);
-		if (!qo.flag || qo.flags != QuestionStateListener.CHANGE_REQUIRED || q != qo.q) {
-			fail("Improper state in question observer, or not updated properly");
-		}
-		qo.flag = false;
-
-		q.setRequired(true);
-		if (qo.flag) {
-			fail("Question observer improperly updated");
-		}
-
-		q.setVisible(true);
-		if (!qo.flag || qo.flags != QuestionStateListener.CHANGE_VISIBLE || q != qo.q) {
-			fail("Improper state in question observer, or not updated properly");
-		}
-		qo.flag = false;
-
-		q.setVisible(true);
-		if (qo.flag) {
-			fail("Question observer improperly updated");
-		}
-
-		q.setEnabled(true);
-		if (!qo.flag || qo.flags != QuestionStateListener.CHANGE_ENABLED || q != qo.q) {
-			fail("Improper state in question observer, or not updated properly");
-		}
-		qo.flag = false;
-
-		q.setEnabled(true);
-		if (qo.flag) {
-			fail("Question observer improperly updated");
-		}
-
-		q.setLocked(true);
-		if (!qo.flag || qo.flags != QuestionStateListener.CHANGE_LOCKED || q != qo.q) {
-			fail("Improper state in question observer, or not updated properly");
-		}
-		qo.flag = false;
-
-		q.setLocked(true);
-		if (qo.flag) {
-			fail("Question observer improperly updated");
-		}
-
 		q.unregisterStateObserver(qo);
-		q.setRequired(false);
-		q.setVisible(false);
-		q.setEnabled(false);
-		q.setLocked(false);
-			
+		
 		if (qo.flag) {
 			fail("Localization observer updated after unregistered");
 		}
@@ -494,7 +400,7 @@ public class QuestionDefTest extends TestCase {
 		q.localeChanged("locale", l);
 		if (!"en: long text".equals(q.getLongText()) || !"en: short text".equals(q.getShortText()) || !"en: help text".equals(q.getHelpText()) ||
 				!"[en: choice => val]".equals(q.getSelectItems().toString()) ||
-				!qo.flag || qo.flags != QuestionStateListener.CHANGE_LOCALE) {
+				!qo.flag || qo.flags != FormElementStateListener.CHANGE_LOCALE) {
 			fail("Improper locale change update");
 		}
 	}	
@@ -516,20 +422,27 @@ public class QuestionDefTest extends TestCase {
 		q.localeChanged("locale", l);
 		if (!"long text".equals(q.getLongText()) || !"short text".equals(q.getShortText()) || !"help text".equals(q.getHelpText()) ||
 				!"[choice => val]".equals(q.getSelectItems().toString()) ||
-				!qo.flag || qo.flags != QuestionStateListener.CHANGE_LOCALE) {
+				!qo.flag || qo.flags != FormElementStateListener.CHANGE_LOCALE) {
 			fail("Improper locale change update (no localizable fields)");
 		}
 	}	
 	
-	private class QuestionObserver implements QuestionStateListener {
+	private class QuestionObserver implements FormElementStateListener {
 		public boolean flag = false;
+		public TreeElement e;
 		public QuestionDef q;
 		public int flags;
 		
-		public void questionStateChanged (QuestionDef q, int flags) {
+		public void formElementStateChanged (IFormElement q, int flags) {
 			flag = true;
-			this.q = q;
+			this.q = (QuestionDef)q;
 			this.flags = flags;
+		}
+
+		public void formElementStateChanged(TreeElement question, int changeFlags) {
+			flag = true;
+			this.e = question;
+			this.flags = changeFlags;
 		}
 	}
 }

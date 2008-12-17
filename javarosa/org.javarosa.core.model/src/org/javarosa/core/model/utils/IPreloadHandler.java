@@ -1,8 +1,7 @@
 package org.javarosa.core.model.utils;
 
-import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.TreeElement;
 
 /**
  * An IPreloadHandler is capable of taking in a set of parameters
@@ -38,5 +37,5 @@ public interface IPreloadHandler {
 	 * @param params Processing paramaters.
 	 * @return true if any post-processing occurs, false otherwise.
 	 */
-	boolean handlePostProcess(IFormDataModel model, IDataReference ref, String params);
+	boolean handlePostProcess(TreeElement node, String params);
 }

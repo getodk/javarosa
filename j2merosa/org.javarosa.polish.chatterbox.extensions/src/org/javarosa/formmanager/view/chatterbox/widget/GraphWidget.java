@@ -105,7 +105,7 @@ public class GraphWidget extends ExpandedWidget {
 	 * to use in displaying graph data.
 	 */
 	public void registerTemplate(IGraphTemplate template) {
-		templates.put(new Integer(template.getTemplateId()), template);
+		templates.put(template.getTemplateName(), template);
 	}
 	
 	/*
@@ -219,7 +219,7 @@ public class GraphWidget extends ExpandedWidget {
 	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#updateWidget(org.javarosa.core.model.QuestionDef)
 	 */
 	protected void updateWidget(QuestionDef question) {
-		currentTemplate = (IGraphTemplate)templates.get(new Integer(question.getDataType()));
+		currentTemplate = (IGraphTemplate)templates.get(question.getAppearanceAttr());
         chart.resetData();
 		applyTemplate(data);
 		applyData();

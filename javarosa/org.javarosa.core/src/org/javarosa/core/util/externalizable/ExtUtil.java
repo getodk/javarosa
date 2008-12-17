@@ -224,6 +224,10 @@ public class ExtUtil {
 			throw new ClassCastException();
 		}
 	}
+
+	public static String nullIfEmpty (String s) {
+		return (s == null ? null : (s.length() == 0 ? null : s));
+	}
 	
 	public static Vector nullIfEmpty (Vector v) {
 		return (v == null ? null : (v.size() == 0 ? null : v));
@@ -233,13 +237,17 @@ public class ExtUtil {
 		return (h == null ? null : (h.size() == 0 ? null : h));
 	}
 	
+	public static String emptyIfNull (String s) {
+		return s == null ? "" : s;
+	}
+	
 	public static Vector emptyIfNull (Vector v) {
 		return v == null ? new Vector() : v;
 	}
 
 	public static Hashtable emptyIfNull (Hashtable h) {
 		return h == null ? new Hashtable() : h;
-	}
+	}	
 	
 	public static Object unwrap (Object o) {
 		return (o instanceof ExternalizableWrapper ? ((ExternalizableWrapper)o).baseValue() : o);

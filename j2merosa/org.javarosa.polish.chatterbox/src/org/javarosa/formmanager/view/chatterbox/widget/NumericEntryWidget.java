@@ -9,11 +9,10 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.TextField;
 
 public class NumericEntryWidget extends TextEntryWidget {
-	// BWD 6.Dec - don't need a whole new widget for floating point
-	private boolean isDecimal = false;
+	private boolean isDecimal;
 	
 	public NumericEntryWidget() {
-		super();
+		this(false);
 	}
 	
 	public NumericEntryWidget(boolean dec) {
@@ -23,10 +22,7 @@ public class NumericEntryWidget extends TextEntryWidget {
 	
 	protected Item getEntryWidget (QuestionDef question) {
 		TextField tf = (TextField)super.getEntryWidget(question);
-		if(this.isDecimal)
-			tf.setConstraints(TextField.DECIMAL);
-		else
-			tf.setConstraints(TextField.NUMERIC);
+		tf.setConstraints(isDecimal ? TextField.DECIMAL : TextField.NUMERIC);
 		return tf;
 	}
 

@@ -26,6 +26,10 @@ public class TimeData implements IAnswerData {
 		setValue(d);
 	}
 	
+	public IAnswerData clone () {
+		return new TimeData(new Date(d.getTime()));
+	}
+	
 	public void setValue (Object o) {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
@@ -39,8 +43,7 @@ public class TimeData implements IAnswerData {
 	}
 	
 	public String getDisplayText () {
-		
-		return DateUtils.get24HourTimeFromDate(d);
+		return DateUtils.formatTime(d, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 	}
 
 	/* (non-Javadoc)

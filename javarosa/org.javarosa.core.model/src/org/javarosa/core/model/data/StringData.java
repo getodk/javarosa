@@ -3,6 +3,7 @@ package org.javarosa.core.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
@@ -29,6 +30,10 @@ public class StringData implements IAnswerData {
 		setValue(s);
 	}
 
+	public IAnswerData clone () {
+		return new StringData(s);
+	}
+	
 	//string should not be null or empty; the entire StringData reference should be null in this case
 	public void setValue (Object o) {
 		if(o == null) {

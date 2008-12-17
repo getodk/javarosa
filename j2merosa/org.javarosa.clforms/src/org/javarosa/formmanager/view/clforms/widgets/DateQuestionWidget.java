@@ -1,49 +1,49 @@
 package org.javarosa.formmanager.view.clforms.widgets;
 
-import java.util.Date;
-
 import javax.microedition.lcdui.DateField;
-import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class DateQuestionWidget extends SingleQuestionScreen
 {
 	protected DateField datePicker;
 
-	public DateQuestionWidget(QuestionDef qDef) {
+	public DateQuestionWidget(FormElementBinding qDef) {
 		super(qDef);
 	}
 	
-	public DateQuestionWidget(QuestionDef prompt, int num) {
+	public DateQuestionWidget(FormElementBinding prompt, int num) {
 		super (prompt,num);
 	}
-	public DateQuestionWidget(QuestionDef prompt, String str) {
+	public DateQuestionWidget(FormElementBinding prompt, String str) {
 		super (prompt,str);
 	}
-	public DateQuestionWidget(QuestionDef prompt, char c) {
+	public DateQuestionWidget(FormElementBinding prompt, char c) {
 		super (prompt,c);
 	}
 
 	public void creatView() {
 		//#style textBox
-		datePicker = new DateField(qDef.getShortText(), DateField.DATE);
+		datePicker = new DateField(((QuestionDef)qDef.element).getShortText(), DateField.DATE);
 		//set question
-		if(qDef.isRequired())
-		datePicker.setLabel("*"+qDef.getLongText());
+		if(qDef.instanceNode.required)
+		datePicker.setLabel("*"+((QuestionDef)qDef.element).getLongText());
 		else
-			datePicker.setLabel(qDef.getLongText());
-		//check if the field has already been filled in by default value- if so display value
-		if (qDef.getDefaultValue() != null){
-			datePicker.setDate((Date)qDef.getDefaultValue());
-		}
+			datePicker.setLabel(((QuestionDef)qDef.element).getLongText());
+		
+		//droos: shouldn't be getting default values this way
+//		//check if the field has already been filled in by default value- if so display value
+//		if (qDef.getDefaultValue() != null){
+//			datePicker.setDate((Date)qDef.getDefaultValue());
+//		}
 		this.append(datePicker);
 		this.addNavigationButtons();
-		if (qDef.getHelpText()!=null){
-			setHint(qDef.getHelpText());
+		if (((QuestionDef)qDef.element).getHelpText()!=null){
+			setHint(((QuestionDef)qDef.element).getHelpText());
 		}
 	}
 

@@ -1,11 +1,9 @@
 package org.javarosa.core.model.utils;
 
 import org.javarosa.core.Context;
-import org.javarosa.core.api.Constants;
-import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.TreeElement;
 
 /**
  * The Context Preload Handler retrieves values from a context
@@ -32,8 +30,7 @@ public class ContextPreloadHandler implements IPreloadHandler
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.IPreloadHandler#handlePostProcess(org.javarosa.core.model.IFormDataModel, org.javarosa.core.model.IDataReference, java.lang.String)
 	 */
-	public boolean handlePostProcess(IFormDataModel model, IDataReference ref,
-			String params) {
+	public boolean handlePostProcess(TreeElement node, String params) {
 		// TODO Auto-generated method stub
 		return false;
 	}

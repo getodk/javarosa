@@ -1,14 +1,15 @@
 package org.javarosa.core.model.utils;
 
 import java.util.Date;
+import java.util.Vector;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.util.Map;
 
 /**
@@ -43,7 +44,7 @@ public class QuestionPreloader {
 				return preloadDate(preloadParams);
 			}
 			
-			public boolean handlePostProcess(IFormDataModel model, IDataReference ref, String params) {
+			public boolean handlePostProcess(TreeElement node, String params) {
 				//do nothing
 				return false;
 			}
@@ -58,8 +59,8 @@ public class QuestionPreloader {
 				return preloadProperty(preloadParams);
 			}
 			
-			public boolean handlePostProcess(IFormDataModel model, IDataReference ref, String params) {
-				saveProperty(params, ref, model);
+			public boolean handlePostProcess(TreeElement node, String params) {
+				saveProperty(params, node);
 				return false;
 			}
 		};
@@ -73,9 +74,9 @@ public class QuestionPreloader {
 				return ("start".equals(preloadParams) ? getTimestamp() : null);
 			}
 			
-			public boolean handlePostProcess(IFormDataModel model, IDataReference ref, String params) {
+			public boolean handlePostProcess(TreeElement node, String params) {
 				if ("end".equals(params)) {
-					model.updateDataValue(ref, getTimestamp());
+					node.setAnswer(getTimestamp());
 					return true;
 				} else {
 					return false;
@@ -116,10 +117,10 @@ public class QuestionPreloader {
 		}
 	}
 	
-	public boolean questionPostProcess (IDataReference ref, String preloadType, String params, IFormDataModel model) {
+	public boolean questionPostProcess (TreeElement node, String preloadType, String params) {
 		IPreloadHandler handler = (IPreloadHandler)preloadHandlers.get(preloadType);
 		if(handler != null) {
-			return handler.handlePostProcess(model, ref, params);
+			return handler.handlePostProcess(node, params);
 		} else {
 			System.err.println("Do not know how to handle preloader [" + preloadType + "]");
 			return false;
@@ -138,7 +139,10 @@ public class QuestionPreloader {
 		if (preloadParams.equals("today")) {
 			d = new Date();
 		} else if (preloadParams.substring(0, 11).equals("prevperiod-")) {
-			String[] params = DateUtils.split(preloadParams.substring(11), "-");
+			Vector v = DateUtils.split(preloadParams.substring(11), "-", false);
+			String[] params = new String[v.size()];
+			for (int i = 0; i < params.length; i++)
+				params[i] = (String)v.elementAt(i);
 			
 			try {
 				String type = params[0];
@@ -165,7 +169,7 @@ public class QuestionPreloader {
 					nAgo = 1;
 				}
 	
-					d = DateUtils.getPastPeriodDate(new Date(), type, start, beginning, includeToday, nAgo);
+				d = DateUtils.getPastPeriodDate(new Date(), type, start, beginning, includeToday, nAgo);
 			} catch (Exception e) {
 				throw new IllegalArgumentException("invalid preload params for preload mode 'date'");
 			}	
@@ -191,14 +195,14 @@ public class QuestionPreloader {
 		return data;
 	}
 	
-	private void saveProperty (String propName, IDataReference ref, IFormDataModel model) {
-		IAnswerData answer = model.getDataValue(ref);
+	private void saveProperty (String propName, TreeElement node) {
+		IAnswerData answer = node.getValue();
 		String value = (answer == null ? null : answer.getDisplayText());
 		if (propName != null && propName.length() > 0 && value != null && value.length() > 0)
 			JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propName, value);
 	}
 	
 	private StringData getTimestamp() {
-		return new StringData(DateUtils.formatDateToTimeStamp(new Date()));
+		return new StringData(DateUtils.formatDateTime(new Date(), DateUtils.FORMAT_ISO8601));
 	}
 }

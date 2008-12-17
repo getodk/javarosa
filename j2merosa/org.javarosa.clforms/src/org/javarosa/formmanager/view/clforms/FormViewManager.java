@@ -12,13 +12,14 @@ import javax.microedition.lcdui.List;
 
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
+import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.clforms.widgets.DateQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.NumericQuestionWidget;
@@ -33,9 +34,8 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	private FormEntryModel model;
 	private FormViewScreen parent;
 
-	private int index;
-	public int tempIndex;
-	private QuestionDef prompt;
+	private FormIndex index;
+	private FormElementBinding prompt;
 	private IAnswerData answer;
 	private SingleQuestionScreen widget;
 	Gauge progressBar;
@@ -56,24 +56,26 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 
 	}
 
-	public int getIndex()
+	public FormIndex getIndex()
 	{
 		index = model.getQuestionIndex();//return index of active question
 		return index;
 	}
 
-	public void getView(int qIndex, boolean fromFormView )
+	public void getView(FormIndex qIndex, boolean fromFormView )
 	{
-		prompt = model.getQuestion(qIndex);
+		prompt = new FormElementBinding(null, qIndex, model.getForm());
 		//checks question type
-		int qType = prompt.getDataType();
-		int contType = prompt.getControlType();
+		int qType = prompt.instanceNode.dataType;
+		int contType = ((QuestionDef)prompt.element).getControlType();
 
 		switch(contType){
 		case Constants.CONTROL_INPUT:
 			switch (qType)
 			{
-			case Constants.DATATYPE_TEXT:			 
+			case Constants.DATATYPE_TEXT:
+			case Constants.DATATYPE_NULL:
+			case Constants.DATATYPE_UNSUPPORTED:
 				//go to TextQuestion Widget
 				if (fromFormView == true)					
 					widget = new TextQuestionWidget(prompt,'c');
@@ -173,7 +175,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	}
 
 	private void showFormViewScreen() {
-		model.setQuestionIndex(-1);
+		model.setQuestionIndex(FormIndex.createBeginningOfFormIndex());
 		formView = new FormViewScreen(this.model);
 		formView.setCommandListener(this);
 		controller.setView(formView);
@@ -196,8 +198,8 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	}
 
 
-	public void questionIndexChanged(int questionIndex) {
-		if (questionIndex != -1)
+	public void questionIndexChanged(FormIndex questionIndex) {
+		if (questionIndex.isInForm())
 			getView(getIndex(),this.showFormView);//refresh view
 	}
 
@@ -221,11 +223,14 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 				controller.exit();
 			} else if (command == formView.sendCommand) {
 				//check if all required questions are complete
-				int counter = 0,a = 0;
-				FormDef form = model.getForm();
-				for(a=0;a<model.getNumQuestions();a++)
-				{
-					if(model.getQuestion(a).isRequired() && (form.getValue(model.getQuestion(a)) == null))
+				int counter = 0;
+				
+				for (FormIndex a = model.getForm().incrementIndex(FormIndex.createBeginningOfFormIndex());
+					 a.compareTo(FormIndex.createEndOfFormIndex()) < 0;
+					 a = model.getForm().incrementIndex(a)) {
+					FormElementBinding bind = new FormElementBinding(null, a, model.getForm());
+					
+					if (bind.instanceNode.required && bind.getValue() == null)
 					{
 						//set counter for incomplete questions
 						counter++;
@@ -244,7 +249,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 				//controller.exit();
 			} else if (command == List.SELECT_COMMAND) {
 				int i = formView.getSelectedIndex();
-				int b = formView.indexHash.get(i);
+				FormIndex b = formView.indexHash.get(i);
 				controller.selectQuestion(b);
 				
 				this.showFormView = false;
@@ -254,7 +259,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 			if (command == SingleQuestionScreen.nextItemCommand || command == SingleQuestionScreen.nextCommand) {
 				answer=widget.getWidgetValue();
 
-				if	(prompt.isRequired() && answer == null)
+				if	(prompt.instanceNode.required && answer == null)
 				{
 					String txt = "This is a compulsory question and must be completed first to proceed";
 					//#style CL_Forms_Form
@@ -264,7 +269,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 				else{
 				//save and proceed to next question
 					controller.commitAnswer(this.prompt, answer);
-					if(model.getQuestionIndex()+1 < model.getNumQuestions() )
+					if(model.getForm().incrementIndex(model.getQuestionIndex()).isInForm())
 					{						
 						direction = true;
 						controller.stepQuestion(direction);
@@ -282,7 +287,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 				
 			}
 			else if (command == SingleQuestionScreen.viewAnswersCommand){
-				controller.selectQuestion(-1);
+				controller.selectQuestion(FormIndex.createBeginningOfFormIndex());
 				this.showFormView = true;				
 				showFormViewScreen();
 			}

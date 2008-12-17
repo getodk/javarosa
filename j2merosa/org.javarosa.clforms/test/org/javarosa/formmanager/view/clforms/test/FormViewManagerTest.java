@@ -78,7 +78,7 @@ public class FormViewManagerTest extends TestCase{
 		FormViewManager fvm = new FormViewManager("Test123",model,controller);
 
 
-	if(fvm.getIndex() != -1)
+	if(fvm.getIndex().isInForm())
 		fail("FormViewManager returns incorrect index");
 
 	}

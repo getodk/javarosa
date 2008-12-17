@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.javarosa.core.model.data.helper.IDataPointer;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -42,6 +43,10 @@ public class MultiPointerAnswerData implements IAnswerData {
 		data = (IDataPointer[]) o;
 	}
 
+	public IAnswerData clone () {
+		return null; //not cloneable
+	}
+	
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
 		// TODO Auto-generated method stub

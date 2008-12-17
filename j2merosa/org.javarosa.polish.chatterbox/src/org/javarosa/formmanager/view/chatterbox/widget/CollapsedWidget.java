@@ -1,6 +1,7 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 
@@ -25,7 +26,7 @@ public class CollapsedWidget implements IWidgetStyle {
 	 * use of vertical screen space
 	 */
 
-	public void initWidget (QuestionDef question, Container c) {
+	public void initWidget (IFormElement question, Container c) {
 		//#style split
 		UiAccess.setStyle(c); //it is dubious whether this works properly; Chatterbox.babysitStyles() takes care of this for now
 
@@ -41,7 +42,11 @@ public class CollapsedWidget implements IWidgetStyle {
 		c.add(answer);
 	}
 
-	public void refreshWidget (QuestionDef question, IAnswerData data, int changeFlags) {
+	public void refreshWidget (IFormElement element, IAnswerData data, int changeFlags) {
+		if(!(element instanceof QuestionDef)) {
+			throw new IllegalArgumentException("element passed to refreshWidget that is not a QuestionDef");
+		}
+		QuestionDef question = (QuestionDef)element;
 		prompt.setText(question.getShortText());
 		if (data != null) {
 			answer.setText(data.getDisplayText());

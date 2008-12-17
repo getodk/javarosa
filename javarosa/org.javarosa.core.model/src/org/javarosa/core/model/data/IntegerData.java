@@ -3,6 +3,7 @@ package org.javarosa.core.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
@@ -31,6 +32,10 @@ public class IntegerData implements IAnswerData {
 	}
 	public IntegerData(Integer n) {
 		setValue(n);
+	}
+	
+	public IAnswerData clone () {
+		return new IntegerData(n);
 	}
 	
 	/* (non-Javadoc)

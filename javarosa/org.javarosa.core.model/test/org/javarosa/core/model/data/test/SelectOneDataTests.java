@@ -7,7 +7,7 @@ import j2meunit.framework.TestSuite;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.Selection;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.util.OrderedHashtable;
 
 public class SelectOneDataTests extends TestCase {

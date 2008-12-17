@@ -5,15 +5,15 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class Condition implements Externalizable {
@@ -30,97 +30,118 @@ public class Condition implements Externalizable {
 	private IConditionExpr expr;
 	private int trueAction;
 	private int falseAction;
-	private Vector affectedQuestions;
-	
-	private Vector qIDs;
-	
+	private Vector targets;
+	public TreeReference contextRef;  //generic ref used to turn triggers into absolute references
+		
 	public Condition () {
-		this(null, ACTION_NULL, ACTION_NULL);
+		this(null, ACTION_NULL, ACTION_NULL, null);
 	}
 	
-	public Condition (IConditionExpr expr, int trueAction, int falseAction) {
-		this(expr, trueAction, falseAction, new Vector());
+	public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef) {
+		this(expr, trueAction, falseAction, contextRef, new Vector());
 	}
 	
-	public Condition (IConditionExpr expr, int trueAction, int falseAction, Vector affectedQuestions) {
+	public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef, Vector targets) {
 		this.expr = expr;
 		this.trueAction = trueAction;
 		this.falseAction = falseAction;
-		this.affectedQuestions = affectedQuestions;
+		this.contextRef = contextRef;
+		this.targets = targets;
 	}
 	
-	public void eval (IFormDataModel model, EvaluationContext evalContext) {
-		if (evalContext == null) {
-			evalContext = new EvaluationContext();
-		}	
-		
-		boolean result = expr.eval(model, evalContext);
-		
-		for (int i = 0; i < affectedQuestions.size(); i++) {
-			performAction((QuestionDef)affectedQuestions.elementAt(i), result ? trueAction : falseAction);
-		}
+	public boolean eval (IFormDataModel model, EvaluationContext evalContext) {
+		return expr.eval(model, evalContext);
+	}
+	
+	public void apply (IFormDataModel model, EvaluationContext evalContext) {
+		boolean result = eval(model, evalContext);
+
+		for (int i = 0; i < targets.size(); i++) {
+			TreeReference targetRef = ((TreeReference)targets.elementAt(i)).contextualize(evalContext.getContextRef());
+			Vector v = ((DataModelTree)model).expandReference(targetRef);		
+			for (int j = 0; j < v.size(); j++) {
+				performAction(((DataModelTree)model).resolveReference((TreeReference)v.elementAt(j)), result ? trueAction : falseAction);
+			}
+		}		
 	}
 
-	private void performAction (QuestionDef q, int action) {
+	private void performAction (TreeElement node, int action) {
 		switch (action) {
 		case ACTION_NULL: break;
-		case ACTION_SHOW:         q.setVisible(true); break;
-		case ACTION_HIDE:         q.setVisible(false); break;
-		case ACTION_ENABLE:       q.setEnabled(true); break;
-		case ACTION_DISABLE:      q.setEnabled(false); break;
-		case ACTION_LOCK:         q.setLocked(true); break;
-		case ACTION_UNLOCK:       q.setLocked(false); break;
-		case ACTION_REQUIRE:      q.setRequired(true); break;
-		case ACTION_DONT_REQUIRE: q.setRequired(false); break;
+		case ACTION_SHOW:         node.setRelevant(true); break;
+		case ACTION_HIDE:         node.setRelevant(false); break;
+		case ACTION_ENABLE:       node.setEnabled(true); break;
+		case ACTION_DISABLE:      node.setEnabled(false); break;
+		case ACTION_LOCK:         /* not supported */; break;
+		case ACTION_UNLOCK:       /* not supported */; break;
+		case ACTION_REQUIRE:      node.setRequired(true); break;
+		case ACTION_DONT_REQUIRE: node.setRequired(false); break;
 		}
 	}
 	
-	public void addAffectedQuestion (QuestionDef question) {
-		affectedQuestions.addElement(question);
+	public void addTarget (TreeReference target) {
+		if (targets.indexOf(target) == -1)
+			targets.addElement(target);
 	}
 	
-	public Vector getAffectedQuestions () {
-		return affectedQuestions;
+	public Vector getTargets () {
+		return targets;
 	}
 	
 	public Vector getTriggers () {
-		return expr.getTriggers();
+		Vector relTriggers = expr.getTriggers();
+		Vector absTriggers = new Vector();
+		for (int i = 0; i < relTriggers.size(); i++) {
+			absTriggers.addElement(((TreeReference)relTriggers.elementAt(i)).anchor(contextRef));
+		}
+		return absTriggers;		
 	}
 	
-	public boolean equals (Condition c) {
-		return (this.trueAction == c.trueAction && this.falseAction == c.falseAction && this.expr.equals(c.expr));
+	//conditions are equal if they have the same actions, expression, and triggers, but NOT targets or context ref
+	public boolean equals (Object o) {
+		if (o instanceof Condition) {
+			Condition c = (Condition)o;
+			if (this == c)
+				return true;
+			
+			if (this.trueAction == c.trueAction && this.falseAction == c.falseAction && this.expr.equals(c.expr)) {
+				//check triggers
+				Vector Atriggers = this.getTriggers();
+				Vector Btriggers = c.getTriggers();
+				
+				//order and quantity don't matter; all that matters is every trigger in A exists in B and vice versa
+				for (int k = 0; k < 2; k++) {
+					Vector v1 = (k == 0 ? Atriggers : Btriggers);
+					Vector v2 = (k == 0 ? Btriggers : Atriggers);
+				
+					for (int i = 0; i < v1.size(); i++) {
+						if (v2.indexOf(v1.elementAt(i)) == -1) {
+							return false;
+						}
+					}
+				}
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}			
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		trueAction = ExtUtil.readInt(in);
 		falseAction = ExtUtil.readInt(in);
 		expr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
-		
-		//affected q's
-		qIDs = (Vector)ExtUtil.read(in, new ExtWrapList(Integer.class), pf);
-		//can't convert qIDs to QuestionDefs until 'form' is set by FormDef; thus attachForm, below
-	}
-
-	public void attachForm (FormDef form) {
-		if (qIDs != null) {
-			for (int i = 0; i < qIDs.size(); i++)
-				affectedQuestions.addElement(form.getQuesitonByID(((Integer)qIDs.elementAt(i)).intValue()));
-			qIDs = null;
-		}
+		contextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
+		targets = (Vector)ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, trueAction);
 		ExtUtil.writeNumeric(out, falseAction);
 		ExtUtil.write(out, new ExtWrapTagged(expr));
-				
-		//affected q's
-		qIDs = new Vector();
-		for (int i = 0; i < affectedQuestions.size(); i++)
-			qIDs.addElement(new Integer(((QuestionDef)affectedQuestions.elementAt(i)).getID()));
-		ExtUtil.write(out, new ExtWrapList(qIDs));
-	}
-
-	
-	
+		ExtUtil.write(out, contextRef);
+		ExtUtil.write(out, new ExtWrapList(targets));
+	}	
 }

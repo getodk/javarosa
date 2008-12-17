@@ -11,11 +11,12 @@ import java.util.Vector;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
@@ -112,6 +113,10 @@ public class XPathFuncExpr extends XPathExpression {
 			return ifThenElse(argVals[0], argVals[1], argVals[2]);	
 		} else if (name.equals("selected") && args.length == 2) { //non-standard
 			return multiSelected(argVals[0], argVals[1]);
+		} else if (name.equals("count") && args.length == 1) {
+			return count(argVals[0]);
+		} else if (name.equals("sum") && args.length == 1) {
+			return sum(model, argVals[0]);
 		} else if (name.equals("today") && args.length == 0) {
 			return DateUtils.roundDate(new Date());
 		} else if (name.equals("now") && args.length == 0) {
@@ -189,6 +194,8 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (o instanceof String) {
 			String s = (String)o;
 			val = new Boolean(s.length() > 0);
+		} else if (o instanceof Vector) {
+			return new Boolean(count(o).doubleValue() > 0);
 		} else if (o instanceof IExprDataType) {
 			val = ((IExprDataType)o).toBoolean();
 		}
@@ -335,4 +342,27 @@ public class XPathFuncExpr extends XPathExpression {
 		
 		return new Boolean((" " + s1 + " ").indexOf(" " + s2 + " ") != -1);
 	}
+	
+	public static Double count (Object o) {
+		if (o instanceof Vector) {
+			return new Double(((Vector)o).size());
+		} else {
+			throw new XPathTypeMismatchException("not a nodeset");
+		}	
+	}
+	
+	public static Double sum (IFormDataModel model, Object o) {
+		if (o instanceof Vector) {
+			Vector v = (Vector)o;
+			double sum = 0.0;
+			for (int i = 0; i < v.size(); i++) {
+				TreeReference ref = (TreeReference)v.elementAt(i);
+				sum += toNumeric(XPathPathExpr.getRefValue(model, ref)).doubleValue();
+			}
+			return new Double(sum);
+		} else {
+			throw new XPathTypeMismatchException("not a nodeset");
+		}	
+	}
+
 }

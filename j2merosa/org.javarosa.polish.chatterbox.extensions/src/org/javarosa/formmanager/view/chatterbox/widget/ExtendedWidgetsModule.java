@@ -12,7 +12,7 @@ public class ExtendedWidgetsModule implements IModule {
 	public void registerModule(Context context) {
 		
 		GraphElementHandler graphHandler = new GraphElementHandler();
-		graphHandler.registerGraphType(WHOWeightTemplate.WHO_WEIGHT_TEMPLATE_NAME, WHOWeightTemplate.WHO_WEIGHT_TEMPLATE_ID);
+		graphHandler.registerGraphType(WHOWeightTemplate.WHO_WEIGHT_TEMPLATE_NAME);
 
 		XFormParser.registerHandler("graph", graphHandler);
 		XFormParser.registerControlType("table", ImmunizationWidget.CONTROL_IMMUNIZATION);

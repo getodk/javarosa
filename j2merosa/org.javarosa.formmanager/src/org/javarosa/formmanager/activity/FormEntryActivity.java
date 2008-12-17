@@ -22,8 +22,8 @@ import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.IDataPointer;
 import org.javarosa.core.model.data.MultiPointerAnswerData;
+import org.javarosa.core.model.data.helper.IDataPointer;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.utils.ContextPreloadHandler;
@@ -36,6 +36,7 @@ import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.IFormDefRetrievalMethod;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
+import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
 
@@ -186,7 +187,8 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		if (globalContext.getElement(Constants.RETURN_ARG_KEY) != null) {
 			String returnArgType = (String) globalContext.getElement(Constants.RETURN_ARG_TYPE_KEY);
 			IAnswerData dataBack = getAnswerData(returnArgType, returnArg);
-			controller.questionAnswered(model.getQuestion(model.getQuestionIndex()), dataBack);
+			
+			controller.questionAnswered(new FormElementBinding(null, model.getQuestionIndex(), model.getForm()), dataBack);
 		}
 	}
 

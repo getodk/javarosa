@@ -5,11 +5,6 @@ import java.util.Vector;
 public interface IGraphTemplate {
 	
 	/**
-	 * @return The internal ID used to identify the template
-	 */
-	int getTemplateId();
-	
-	/**
 	 * @return the name that is used in XFroms, etc, to distinguish this 
 	 * template. 
 	 */

@@ -8,17 +8,12 @@ import java.util.Vector;
 
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
-import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
-import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 
 
 /** The definition of a group in a form or questionaire. 
@@ -31,11 +26,18 @@ public class GroupDef implements IFormElement, Localizable {
 	private boolean repeat;
 	private int id;	/** The group number. */
 	private String name;	/** The name of the group. */
+	private IDataReference binding;	/** reference to a location in the model to store data in */
 	
 	private String longText;
 	private String longTextID;
 	private String shortText;
 	private String shortTextID;
+	
+	Vector observers;
+	
+	public boolean noAddRemove = false;
+	//public boolean startEmpty = false;
+	public IDataReference count = null;
 	
 	public GroupDef () {
 		this(Constants.NULL_ID, null, null, false);
@@ -46,6 +48,7 @@ public class GroupDef implements IFormElement, Localizable {
 		setID(id);
 		setChildren(children);
 		setRepeat(repeat);
+		observers = new Vector();
 	}
 	
 	public int getID () {
@@ -64,6 +67,14 @@ public class GroupDef implements IFormElement, Localizable {
 		this.name = name;
 	}
 
+	public IDataReference getBind() {
+		return binding;
+	}
+	
+	public void setBind(IDataReference binding) {
+		this.binding = binding;
+	}
+	
 	public Vector getChildren() {
 		return children;
 	}
@@ -74,6 +85,14 @@ public class GroupDef implements IFormElement, Localizable {
 	
 	public void addChild (IFormElement fe) {
 		children.addElement(fe);
+	}
+	
+	public IFormElement getChild (int i) {
+		if (children == null || i >= children.size()) {
+			return null;
+		} else {
+			return (IFormElement)children.elementAt(i);
+		}
 	}
 	
 	public boolean getRepeat () {
@@ -161,36 +180,56 @@ public class GroupDef implements IFormElement, Localizable {
 	public String toString() {
 		return getName();
 	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.IFormElement#getDeepChildCount()
+	 */
+	public int getDeepChildCount() {
+		int total = 0;
+		Enumeration e = children.elements();
+		while(e.hasMoreElements()) {
+			total += ((IFormElement)e.nextElement()).getDeepChildCount();
+		}
+		return total;
+	}
 
 	/** Reads a group definition object from the supplied stream. */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
 		setName((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setBind((IDataReference)ExtUtil.read(dis, new ExtWrapTagged(), pf));
 		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLongTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 		setRepeat(ExtUtil.readBool(dis));
 		setChildren((Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
+		
+		//TODO: custom group parameters
 	}
 
 	/** Write the group definition object to the supplied stream. */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		ExtUtil.writeNumeric(dos, getID());
 		ExtUtil.write(dos, new ExtWrapNullable(getName()));
+		ExtUtil.write(dos, new ExtWrapTagged(getBind()));
 		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getLongTextID()));
 		ExtUtil.write(dos, new ExtWrapNullable(getShortTextID()));				
 		ExtUtil.writeBool(dos, getRepeat());
 		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
+
+		//TODO: custom group parameters
 	}
 	
-	public void getChild(IDataReference binding, Vector result) {
-		IFormElement ele;
-		for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
-			ele = (IFormElement)e.nextElement();
-			ele.getChild(binding, result);
+	public void registerStateObserver (FormElementStateListener qsl) {
+		if (!observers.contains(qsl)) {
+			observers.addElement(qsl);
 		}
+	}
+	
+	public void unregisterStateObserver (FormElementStateListener qsl) {
+		observers.removeElement(qsl);
 	}
 }

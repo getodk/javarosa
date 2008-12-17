@@ -3,8 +3,10 @@ package org.javarosa.core.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Vector;
 
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
@@ -31,6 +33,14 @@ public class SelectMultiData implements IAnswerData {
 	
 	public SelectMultiData (Vector vs) {
 		setValue(vs);
+	}
+	
+	public IAnswerData clone () {
+		Vector v = new Vector();
+		for (int i = 0; i < vs.size(); i++) {
+			v.addElement(((Selection)vs.elementAt(i)).clone());
+		}
+		return new SelectMultiData(v);
 	}
 	
 	/*

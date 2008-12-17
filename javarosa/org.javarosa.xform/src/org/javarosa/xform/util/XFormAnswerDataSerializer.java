@@ -5,18 +5,16 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.DataBinding;
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
-import org.javarosa.core.model.instance.QuestionDataElement;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.utils.DateUtils;
 
 /**
@@ -41,10 +39,10 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		additionalSerializers.addElement(ads);
 	}
 	
-	public boolean canSerialize(QuestionDataElement element) {
-		if (element.getValue() instanceof StringData || element.getValue() instanceof DateData ||
-				element.getValue() instanceof SelectMultiData || element.getValue() instanceof SelectOneData
-				|| element.getValue() instanceof IntegerData || element.getValue() instanceof TimeData) {
+	public boolean canSerialize(IAnswerData data) {
+		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData ||
+		    data instanceof SelectMultiData || data instanceof SelectOneData ||
+		    data instanceof IntegerData || data instanceof DecimalData) {
 			return true;
 		} else {
 			return false;
@@ -65,7 +63,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	 * formatting
 	 */
 	public Object serializeAnswerData(DateData data) {
-		return DateUtils.getXMLStringValue((Date)data.getValue());
+		return DateUtils.formatDate((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
 	}
 	
 	/**
@@ -74,7 +72,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	 * formatting
 	 */
 	public Object serializeAnswerData(TimeData data) {
-		return DateUtils.get24HourTimeFromDate((Date)data.getValue());
+		return DateUtils.formatTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
 	}
 	
 	/**
@@ -110,55 +108,46 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(IntegerData data) {
 		return ((Integer)data.getValue()).toString();
 	}
-	
 
-	public Object serializeAnswerData(QuestionDataElement element, FormDef formDef) {
-		if(element == null || element.getValue() == null) { 
-			return "";
-		}
-		if(element.getValue() instanceof DateData) {
-			DataBinding binding = getBinding(element, formDef);
-			if(binding == null){
-				return serializeAnswerData((DateData) element.getValue());
-			} else {
-				if(Constants.DATATYPE_DATE_TIME == binding.getDataType()){
-					return DateUtils.formatDateToTimeStamp((Date)element.getValue().getValue());
-				} else {
-					return serializeAnswerData((DateData) element.getValue());
-				}
+	public Object serializeAnswerData(DecimalData data) {
+		return ((Double)data.getValue()).toString();
+	}
+	
+	public Object serializeAnswerData(IAnswerData data, int dataType) {
+		if (data instanceof DateData) {
+			if (dataType == Constants.DATATYPE_DATE) {
+				return serializeAnswerData((DateData)data);
+			} else { //date+time
+				return DateUtils.formatDateTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
 			}
-		}
-		else {
-			Object data = serializeAnswerData(element.getValue());
-			if(data == null) {
+		} else {
+			Object result = serializeAnswerData(data);
+			if (result == null) {
 				Enumeration en = additionalSerializers.elements();
 				while(en.hasMoreElements()) {
 					IAnswerDataSerializer serializer = (IAnswerDataSerializer)en.nextElement();
-					if(serializer.canSerialize(element)) {
-						return serializer.serializeAnswerData(element, formDef);
+					if(serializer.canSerialize(data)) {
+						return serializer.serializeAnswerData(data, dataType);
 					}
 				}
 			}
-			else {
-				return data;
-			}
+			return result;
 		}
-		return null;
-	}
-
-	private DataBinding getBinding(QuestionDataElement element, FormDef formDef) {
-		return formDef == null ? null : formDef.getBinding(element.getReference());
 	}
 
 	public Object serializeAnswerData(IAnswerData data) {
-		if(data instanceof StringData) {
+		if (data instanceof StringData) {
 			return serializeAnswerData((StringData)data);
-		} else if(data instanceof SelectMultiData) {
+		} else if (data instanceof SelectMultiData) {
 			return serializeAnswerData((SelectMultiData)data);
-		} else if(data instanceof SelectOneData) {
+		} else if (data instanceof SelectOneData) {
 			return serializeAnswerData((SelectOneData)data);
-		} else if(data instanceof IntegerData){
+		} else if (data instanceof IntegerData){
 			return serializeAnswerData((IntegerData)data);
+		} else if (data instanceof DecimalData) {
+			return serializeAnswerData((DecimalData)data);
+		} else if (data instanceof TimeData) {
+			return serializeAnswerData((TimeData)data);			
 		}
 		
 		return null;

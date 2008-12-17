@@ -12,6 +12,8 @@ import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.formmanager.view.chatterbox.util.ChatterboxContext;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
@@ -57,17 +59,20 @@ public class ExtensionIntegrationTests extends TestCase {
 			ChatterboxWidgetFactory factory = new ChatterboxWidgetFactory(null);
 			factory.registerExtendedWidget(widget.widgetType(), widget);
 
-			Vector children = def.getChildren();
-			for (int i = 0; i < children.size(); ++i) {
-				if (children.elementAt(i) instanceof QuestionDef) {
-					QuestionDef question = new QuestionDef();
-					ChatterboxWidget cboxWidget = factory.getWidget(question,
+			FormIndex index = FormIndex.createBeginningOfFormIndex();
+			index = def.incrementIndex(index);
+
+			while (!index.isEndOfFormIndex()) {
+				IFormElement element = def.getChild(index);
+				if (element instanceof QuestionDef) {
+					ChatterboxWidget cboxWidget = factory.getWidget(index,
 							def, ChatterboxWidget.VIEW_NOT_SET);
 					if (cboxWidget == null) {
 						fail("There was no chatterbox widget available for the name "
 								+ widget.getClass().getName());
 					}
 				}
+				index = def.incrementIndex(index);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

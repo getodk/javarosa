@@ -14,6 +14,7 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
+import org.javarosa.formmanager.view.FormElementBinding;
 
 
 public abstract class SingleQuestionScreen extends Form implements IView {
@@ -21,7 +22,7 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	protected FormEntryController controller;
 	protected FormEntryModel model;
 
-	protected QuestionDef qDef;
+	protected FormElementBinding qDef;
 	protected IAnswerData answer;
 
 	// GUI elements
@@ -37,17 +38,17 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	public StringItem nextItem = new StringItem(null,"NEXT",Item.BUTTON);
 	public ItemCommandListener itemListner;
 
-	public SingleQuestionScreen(QuestionDef prompt) {
-		super(prompt.getName());		
+	public SingleQuestionScreen(FormElementBinding prompt) {
+		super(prompt.element.getName());		
 		this.qDef = prompt;
 		this.creatView();
 		this.setUpCommands();
 	}
 	
 	//hack: this is for moving to NEXT question
-	public SingleQuestionScreen(QuestionDef prompt, int temp) {
+	public SingleQuestionScreen(FormElementBinding prompt, int temp) {
 	//#style nextQuestion
-		super(prompt.getName());
+		super(prompt.element.getName());
 		
 		this.qDef = prompt;
 		this.creatView();
@@ -55,18 +56,18 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	}
 
 	//hack: this is for moving to PREV question
-	public SingleQuestionScreen(QuestionDef prompt, String str) {
+	public SingleQuestionScreen(FormElementBinding prompt, String str) {
 	//#style prevQuestion
-		super(prompt.getName());
+		super(prompt.element.getName());
 		this.qDef = prompt;
 		this.creatView();
 		this.setUpCommands();
 	}
 
 	//hack: this is for moving to question fromViewAnswers
-	public SingleQuestionScreen(QuestionDef prompt, char str) {
+	public SingleQuestionScreen(FormElementBinding prompt, char str) {
 	//#style fromViewAnswers
-		super(prompt.getName());
+		super(prompt.element.getName());
 		this.qDef = prompt;
 		this.creatView();
 		this.setUpCommands();

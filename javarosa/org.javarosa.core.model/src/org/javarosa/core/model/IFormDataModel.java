@@ -33,7 +33,7 @@ public interface IFormDataModel extends Externalizable {
 	/**
 	 * @return The id of the form that this is a model for.
 	 */
-	int getFormReferenceId();
+	int getFormId();
 	
 	/**
 	 * @return The date that this data model was filled out and saved
@@ -43,7 +43,7 @@ public interface IFormDataModel extends Externalizable {
 	/**
 	 * @param formIdReference The id of the form that this is a model for.
 	 */
-	public void setFormReferenceId(int formIdReference);
+	public void setFormId(int formId);
 
 	
 	/**

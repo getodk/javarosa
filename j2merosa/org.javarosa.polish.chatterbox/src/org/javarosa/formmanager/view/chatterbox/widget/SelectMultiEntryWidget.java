@@ -6,7 +6,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
-import org.javarosa.core.model.data.Selection;
+import org.javarosa.core.model.data.helper.Selection;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.Container;

@@ -3,54 +3,45 @@ package org.javarosa.formmanager.view.clforms.widgets;
 import java.util.Enumeration;
 
 import javax.microedition.lcdui.ChoiceGroup;
-import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.Spacer;
-import javax.microedition.lcdui.TextField;
-import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.Selection;
-import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class Select1QuestionWidget extends SingleQuestionScreen
 {
 	protected ChoiceGroup cg;
-	QuestionDef q;
 
-	public Select1QuestionWidget(QuestionDef question) {
+	public Select1QuestionWidget(FormElementBinding question) {
 		super(question);
-		this.q=question;
 	}
 	
-	public Select1QuestionWidget(QuestionDef prompt, int num) {
+	public Select1QuestionWidget(FormElementBinding prompt, int num) {
 		super (prompt,num);
-		this.q=prompt;
 	}
-	public Select1QuestionWidget(QuestionDef prompt, String str) {
+	public Select1QuestionWidget(FormElementBinding prompt, String str) {
 		super (prompt,str);
-		this.q=prompt;
 	}
 	
-	public Select1QuestionWidget(QuestionDef prompt, char c) {
+	public Select1QuestionWidget(FormElementBinding prompt, char c) {
 		super (prompt,c);
-		this.q=prompt;
 	}
 	
 
 	public void creatView() {
-		if(qDef.isRequired())
+		if(qDef.instanceNode.required)
 		{
 			//#style choiceGroup
-			cg = new ChoiceGroup("*"+qDef.getLongText(),ChoiceGroup.EXCLUSIVE );
+			cg = new ChoiceGroup("*"+((QuestionDef)qDef.element).getLongText(),ChoiceGroup.EXCLUSIVE );
 		}
 		else{
 			//#style choiceGroup
-			cg = new ChoiceGroup(qDef.getLongText(),ChoiceGroup.EXCLUSIVE );}
+			cg = new ChoiceGroup(((QuestionDef)qDef.element).getLongText(),ChoiceGroup.EXCLUSIVE );}
 
-		Enumeration itr = qDef.getSelectItems().keys();//access choices directly
+		Enumeration itr = ((QuestionDef)qDef.element).getSelectItems().keys();//access choices directly
 		int i = 0;
 		while (itr.hasMoreElements()) {
 			String label = (String) itr.nextElement();
@@ -59,8 +50,8 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 		}
 		this.append(cg);
 		this.addNavigationButtons();
-		if (qDef.getHelpText()!=null){
-			setHint(qDef.getHelpText());
+		if (((QuestionDef)qDef.element).getHelpText()!=null){
+			setHint(((QuestionDef)qDef.element).getHelpText());
 		}
 
 	}
@@ -75,7 +66,7 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 				break;
 			}
 		}
-		return (selectedIndex == -1 ? null : new SelectOneData(new Selection(selectedIndex, q)));
+		return (selectedIndex == -1 ? null : new SelectOneData(new Selection(selectedIndex, ((QuestionDef)qDef.element))));
 	}
 
 
