@@ -49,6 +49,11 @@ public class DateUtils {
 		
 //		public String tzStr;
 //		public int tzOffset; //s ahead of UTC
+		
+		public boolean check () {
+			return (inRange(month, 1, 12) && inRange(day, 1, daysInMonth(month - MONTH_OFFSET, year)) &&
+					inRange(hour, 0, 23) && inRange(minute, 0, 59) && inRange(second, 0, 59) && inRange(secTicks, 0, 999));
+		}
 	}
 	
 	private static DateFields getFields (Date d) {
@@ -178,7 +183,7 @@ public class DateUtils {
 			return false;
 		}
 		
-		return true;
+		return f.check();
 	}
 	
 	private static boolean parseTime (String timeStr, DateFields f) {
@@ -208,22 +213,17 @@ public class DateUtils {
 			return false;
 		}
 		
-		return true;	
+		return f.check();	
 	}
 	
 	/* ==== DATE UTILITY FUNCTIONS ==== */
 	
 	public static Date getDate (int year, int month, int day) {
-		int jMonth = month - MONTH_OFFSET;;
-		
-		if (jMonth < Calendar.JANUARY || jMonth > Calendar.DECEMBER || day < 1 || day > daysInMonth(jMonth , year))
-			return null;
-		
 		DateFields f = new DateFields();
 		f.year = year;
 		f.month = month;
 		f.day = day;
-		return getDate(f);
+		return (f.check() ? getDate(f) : null);
 	}
 	
 	/**
@@ -417,11 +417,15 @@ public class DateUtils {
 	 * @return A string representing n, which has pad - #digits(n)
 	 * 0's preceding the number.
 	 */
-	public static String intPad (int n, int pad) {
+	private static String intPad (int n, int pad) {
 		String s = String.valueOf(n);
 		while (s.length() < pad)
 			s = "0" + s;
 		return s;
+	}
+	
+	private static boolean inRange(int x, int min, int max) {
+		return (x >= min && x <= max);
 	}
 	
 	/* ==== GARBAGE (backward compatibility; too lazy to remove them now) ==== */
