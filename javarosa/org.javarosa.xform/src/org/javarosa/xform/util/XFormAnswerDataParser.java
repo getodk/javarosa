@@ -1,21 +1,20 @@
 package org.javarosa.xform.util;
 
+import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.DataBinding;
-import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.TimeData;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.util.Map;
-import org.javarosa.xform.parse.XFormParser;
-import org.kxml2.kdom.Element;
 
 /**
  * The XFormAnswerDataParser is responsible for taking XForms elements and
@@ -24,110 +23,94 @@ import org.kxml2.kdom.Element;
  * @author Clayton Sims
  * 
  */
+
+/*
+int
+text
+float
+datetime
+date
+time
+choice
+choice list
+*/
+
 public class XFormAnswerDataParser {
-	Map parsers;
-
-	public static IAnswerData getAnswerData(Vector formElements,
-			DataBinding binding, Element node) {
-		// TODO: This should be a set of Handlers, not a switch
-		String value = XFormParser.getXMLText(node, false);
-		if (value == null)
-			return null;
-
-		int dataType = 0;
-		if (binding == null) {
-			dataType = ((QuestionDef) formElements.elementAt(0)).getDataType();
-		} else {
-			dataType = binding.getDataType();
-		}
-
+	//FIXME: the QuestionDef parameter is a hack until we find a better way to represent AnswerDatas for select questions
+	public static IAnswerData getAnswerData (String text, int dataType, QuestionDef q) {
+		String trimmedText = text.trim();
+		if (trimmedText.length() == 0)
+			trimmedText = null;
+		
 		switch (dataType) {
-		case Constants.DATATYPE_DATE:
-			return value.trim().length() == 0 ? null : new DateData(DateUtils
-					.getDateFromString(value));
-		case Constants.DATATYPE_DATE_TIME:
-			// We need to get datetime here, not date
-			return value.trim().length() == 0 ? null : new DateData(DateUtils
-					.getDateTimeFromString(value));
-		case Constants.DATATYPE_INTEGER:
-			// return value.trim().length() == 0 ? null : new
-			// IntegerData(Integer.parseInt(value));
-			return new StringData(value);
-		case Constants.DATATYPE_DECIMAL:
-			// BWD 6.Dec.2008. copying this one from the integer example 
-			return new StringData(value);
+		case Constants.DATATYPE_NULL:
+		case Constants.DATATYPE_UNSUPPORTED:
 		case Constants.DATATYPE_TEXT:
-			if (formElements.isEmpty()) {
-				return new StringData(value);
-			} else {
-				QuestionDef questionDef = (QuestionDef) formElements.elementAt(0); // TODO (JMT) this cast is not good
-				if (questionDef.getSelectItemIDs() == null) {
-					return new StringData(value);
-				} else {
-					int controlType = questionDef.getControlType();
-					switch (controlType) {
-					case Constants.CONTROL_SELECT_ONE:
-						Selection selection = getSelection(value, formElements);
-						return new SelectOneData(selection);
-					case Constants.CONTROL_SELECT_MULTI:
-						String[] splitValues = split(value, XFormAnswerDataSerializer.DELIMITER);
-						Vector selections = new Vector();
-						for (int i = 0; i < splitValues.length; i++) {
-							selection = getSelection(splitValues[i], formElements);
-							if(selection != null){
-								selections.addElement(selection);
-							}
-						}
-						return new SelectMultiData(selections);
-					}
-				}
+
+			return new StringData(text);
+
+		case Constants.DATATYPE_INTEGER:
+
+			try {
+				return (trimmedText == null ? null : new IntegerData(Integer.parseInt(trimmedText)));
+			} catch (NumberFormatException nfe) {
+				return null;
 			}
+			
+		case Constants.DATATYPE_DECIMAL:
+
+			try {
+				return (trimmedText == null ? null : new DecimalData(Double.parseDouble(trimmedText)));
+			} catch (NumberFormatException nfe) {
+				return null;
+			}
+			
+		case Constants.DATATYPE_CHOICE:
+
+			Vector selections = getSelections(text, q);
+			return (selections.size() == 0 ? null : new SelectOneData((Selection)selections.elementAt(0)));
+						
+		case Constants.DATATYPE_CHOICE_LIST:
+
+			return new SelectMultiData(getSelections(text, q));
+			
+		case Constants.DATATYPE_DATE_TIME:
+
+			Date dt = (trimmedText == null ? null : DateUtils.parseDateTime(trimmedText));
+			return (dt == null ? null : new DateData(dt));
+
+		case Constants.DATATYPE_DATE:
+
+			Date d = (trimmedText == null ? null : DateUtils.parseDate(trimmedText));
+			return (d == null ? null : new DateData(d));
+
 		case Constants.DATATYPE_TIME:
-			// Come up with a parser for this.
+
+			Date t = (trimmedText == null ? null : DateUtils.parseTime(trimmedText));
+			return (t == null ? null : new TimeData(t));
+
+		default:
+
 			return null;
-
 		}
-		return null;
+	}	
+
+	private static Vector getSelections (String text, QuestionDef q) {
+		Vector v = new Vector();
+		
+		Vector choices = DateUtils.split(text, XFormAnswerDataSerializer.DELIMITER, true);
+		for (int i = 0; i < choices.size(); i++) {
+			Selection s = getSelection((String)choices.elementAt(i), q);
+			if (s != null)
+				v.addElement(s);
+		}
+		
+		return v;
 	}
-
-	private static Selection getSelection(String value, Vector formElements) {
-		IFormElement element;
-		QuestionDef questionDef;
-		for (int i = 0; i < formElements.size(); i++) {
-			element = (IFormElement) formElements.elementAt(i);
-			if(element instanceof QuestionDef){
-				questionDef = (QuestionDef) element;
-				questionDef.localizeSelectMap(null);
-				int index = questionDef.getSelectedItemIndex(value); 
-				if(index != -1){
-					return new Selection(index, questionDef);
-				}
-			}
-		}
-		return null;
-	}
-
-	// TODO (JMT) this methods is an util method, put it in a util class
-	public static String[] split(String original, String delimiter) {
-		Vector nodes = new Vector();
-		// Parse nodes into vector
-		int index = original.indexOf(delimiter);
-		while (index >= 0) {
-			nodes.addElement(original.substring(0, index));
-			original = original.substring(index + delimiter.length());
-			index = original.indexOf(delimiter);
-		}
-		// Get the last node
-		nodes.addElement(original);
-
-		// Create splitted string array
-		String[] result = new String[nodes.size()];
-		if (nodes.size() > 0) {
-			for (int loop = 0; loop < nodes.size(); loop++) {
-				result[loop] = (String) nodes.elementAt(loop);
-			}
-
-		}
-		return result;
+	
+	private static Selection getSelection(String choice, QuestionDef q) {
+		q.localizeSelectMap(null);
+		int index = q.getSelectedItemIndex(choice); 
+		return (index != -1 ? new Selection(index, q) : null);
 	}
 }

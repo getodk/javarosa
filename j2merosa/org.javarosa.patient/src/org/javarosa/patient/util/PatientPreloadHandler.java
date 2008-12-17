@@ -9,6 +9,7 @@ import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.patient.model.Patient;
@@ -75,8 +76,8 @@ public class PatientPreloadHandler implements IPreloadHandler {
 		return returnVal;
 	}
 
-	public boolean handlePostProcess(IFormDataModel model, IDataReference ref, String params) {
-		IAnswerData data = model.getDataValue(ref);
+	public boolean handlePostProcess(TreeElement node, String params) {
+		IAnswerData data = node.getValue();
 
 		if ("vaccination_table".equals(params)) {
 			patient.setVaccinations((ImmunizationData)((ImmunizationAnswerData)data).getValue());

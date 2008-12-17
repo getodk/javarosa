@@ -1,7 +1,5 @@
 package org.javarosa.formmanager.activity;
 
-import java.util.Hashtable;
-
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
@@ -16,16 +14,12 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
-import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.transport.ITransportDestination;
-import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.core.util.Observable;
 import org.javarosa.core.util.Observer;
-import org.javarosa.clforms.server.WebServerResponses;
-//import org.javarosa.datadyne.properties.EpisurveyorPropertyRules;
 import org.javarosa.formmanager.view.ProgressScreen;
 
 public class GetFormListHttpActivity implements IActivity,CommandListener,Observer{
@@ -54,7 +48,7 @@ public class GetFormListHttpActivity implements IActivity,CommandListener,Observ
 		//System.out.println("NOW STARTING RETRIEVE");
 		getListUrl = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(HttpTransportProperties.GET_URL_PROPERTY);
 		credentials = "?user="+context.getCurrentUser();
-		//requestPayload = credentials;
+		requestPayload = credentials;
 	}
 
 	public void contextChanged(Context globalContext) {
@@ -116,6 +110,7 @@ public class GetFormListHttpActivity implements IActivity,CommandListener,Observ
 		if(display== progressScreen){
 			if(command == CMD_CANCEL){
 				parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+				
 			}
 			
 		}
@@ -134,20 +129,22 @@ public class GetFormListHttpActivity implements IActivity,CommandListener,Observ
 	public void process(byte[] data) {
 		String response;
 		response = new String(data).trim();
-		if(response ==null){
-			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
-			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-		}else if(response.equals(WebServerResponses.GET_LIST_ERROR)){
-			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
-			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-		}else if(response.equals(WebServerResponses.GET_LIST_NO_SURVEY)){
-			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
-			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-		}else{
-			Hashtable returnArgs = new Hashtable();
-			returnArgs.put(RETURN_KEY, data);
-			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
-		}
+		
+		//FIXME
+//		if(response ==null){
+//			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
+//			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+//		}else if(response.equals(WebServerResponses.GET_LIST_ERROR)){
+//			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
+//			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+//		}else if(response.equals(WebServerResponses.GET_LIST_NO_SURVEY)){
+//			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
+//			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+//		}else{
+//			Hashtable returnArgs = new Hashtable();
+//			returnArgs.put(RETURN_KEY, data);
+//			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+//		}
 		
 	}
 

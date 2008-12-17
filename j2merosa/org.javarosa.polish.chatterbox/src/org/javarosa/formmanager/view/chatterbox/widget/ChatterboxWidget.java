@@ -2,10 +2,13 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import javax.microedition.lcdui.Command;
 
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.QuestionStateListener;
+import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.formmanager.view.IQuestionWidget;
+import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.ui.ChoiceGroup;
@@ -16,20 +19,27 @@ import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
 
-public class ChatterboxWidget extends Container implements QuestionStateListener, ItemStateListener, ItemCommandListener {
+public class ChatterboxWidget extends Container implements IQuestionWidget, ItemStateListener, ItemCommandListener {
 	public static final int VIEW_NOT_SET = -1;
+	/** A Widget currently interacting with the user **/
 	public static final int VIEW_EXPANDED = 0;
+	/** A Widget that has been used and finished **/
 	public static final int VIEW_COLLAPSED = 1;
+	/** A Label that will never be interacted with **/
+	public static final int VIEW_LABEL = 2;
 	
 	public static final int NEXT_ON_MANUAL = 1;
 	public static final int NEXT_ON_ENTRY = 2;
 	public static final int NEXT_ON_SELECT = 3;
 	
+	/** Only valid for Labels **/
+	private boolean pinned = false;
+	
 	private Chatterbox cbox;
 	private Command nextCommand;
 	
-	private QuestionDef question;
-	private FormDef form; //needed to retrieve answers
+	private FormElementBinding binding;
+	
 	private int viewState = VIEW_NOT_SET;
 	private IWidgetStyle collapsedStyle;
 	private IWidgetStyleEditable expandedStyle;
@@ -37,12 +47,12 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 	private IWidgetStyle activeStyle;
 	//private Style blankSlateStyle;
 	
-	public ChatterboxWidget (Chatterbox cbox, QuestionDef question, FormDef form, int viewState,
+	public ChatterboxWidget (Chatterbox cbox, FormElementBinding binding, int viewState,
 			IWidgetStyle collapsedStyle, IWidgetStyleEditable expandedStyle) {
-		this(cbox, question, form, viewState, collapsedStyle, expandedStyle, null);
+		this(cbox, binding, viewState, collapsedStyle, expandedStyle, null);
 	}
-	
-	public ChatterboxWidget (Chatterbox cbox, QuestionDef question, FormDef form, int viewState,
+			
+	public ChatterboxWidget (Chatterbox cbox, FormElementBinding binding, int viewState,
 			IWidgetStyle collapsedStyle, IWidgetStyleEditable expandedStyle, 
 			Style style) {
 		super(false, style);
@@ -51,27 +61,26 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 		this.cbox = cbox;
         this.nextCommand = new Command("Next", Command.ITEM, 1);
         
-		this.question = question;
-		this.form = form;
+        this.binding = binding;
+        binding.widget = this;
+        
 		this.collapsedStyle = collapsedStyle;
 		this.expandedStyle = expandedStyle;
 				
 		setViewState(viewState);
-
-		question.registerStateObserver(this);
 	}
 	
 	public void destroy () {
 		if (viewState == VIEW_EXPANDED)
 			detachWidget();
 		
-		question.unregisterStateObserver(this);
+		binding.unregister();
 	}
 	
-	public QuestionDef getQuestion () {
-		return question;
+	public FormElementBinding getBinding () {
+		return binding;
 	}
-	
+		
 	public int getViewState () {
 		return viewState;
 	}
@@ -84,8 +93,8 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 			this.viewState = viewState;
 			activeStyle = getActiveStyle();
 			
-			activeStyle.initWidget(question, this);
-			activeStyle.refreshWidget(question, form.getValue(question), QuestionStateListener.CHANGE_INIT);
+			activeStyle.initWidget(binding.element, this);
+			activeStyle.refreshWidget(binding.element, binding.getValue(), FormElementStateListener.CHANGE_INIT);
 			if (viewState == VIEW_EXPANDED) {
 				attachWidget();
 			}
@@ -114,6 +123,7 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 		switch (viewState) {
 		case VIEW_EXPANDED: return expandedStyle;
 		case VIEW_COLLAPSED: return collapsedStyle;
+		case VIEW_LABEL: return collapsedStyle;
 		default: throw new IllegalArgumentException("Attempt to set invalid view style");
 		}
 	}
@@ -129,12 +139,11 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 		//}
 	}
 
-	public void questionStateChanged (QuestionDef question, int changeFlags) {
-		if (this.question != question)
-			throw new IllegalStateException("Widget received event from foreign question");
-		activeStyle.refreshWidget(question, form.getValue(question), changeFlags);
+	//call-back from QuestionBinding
+	public void refreshWidget (int changeFlags) {
+		activeStyle.refreshWidget(binding.element, binding.getValue(), changeFlags);		
 	}
-	
+		
 	private void attachWidget () {
 		Item widget = expandedStyle.getInteractiveWidget();
 		
@@ -175,7 +184,7 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 	public void commandAction (Command c, Item i) {
     	System.out.println("cw: command action");
 		
-    	if (i == expandedStyle.getInteractiveWidget() && c == nextCommand) {
+		if (i == expandedStyle.getInteractiveWidget() && c == nextCommand) {
 			// BWD 23/8/2008 Ticket #69.  Added check for menu open
 	    	// before passing on the hack.
 			if(!cbox.isMenuOpened())
@@ -184,7 +193,6 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 			//unrecognized commandAction, propagate to parent.
 			cbox.commandAction(c, cbox);
 		}
-		
 	}
 	
 	public void itemStateChanged (Item i) {
@@ -222,5 +230,43 @@ public class ChatterboxWidget extends Container implements QuestionStateListener
 		super.showCommands();
 		Item widget = expandedStyle.getInteractiveWidget();
 		widget.showCommands();
+	}
+	
+	public void setPinned(boolean pinned) {
+		this.pinned = pinned;
+	}
+	
+	public boolean isPinned() {
+		return pinned;
+	}
+	
+	public String toString() {
+		if(this.activeStyle instanceof LabelWidget) {
+			LabelWidget label = (LabelWidget)activeStyle;
+			return label.toString();
+		}
+		return super.toString();
+	}
+	
+	
+	public boolean equals(Object o) {
+		if(!(o instanceof ChatterboxWidget)) {
+			return false;
+		}
+		ChatterboxWidget w = (ChatterboxWidget)o;
+		if(w.getViewState() == this.getViewState() && w.getViewState() == VIEW_LABEL) {
+			return this.toString().equals(o.toString());
+		}
+		
+		return this == o;
+	}
+	
+	public Object clone() {
+		if(this.getViewState() == ChatterboxWidget.VIEW_LABEL) {
+			LabelWidget label = (LabelWidget)this.activeStyle;
+			ChatterboxWidget widget = new ChatterboxWidget(cbox, binding, this.getViewState(), (LabelWidget)label.clone(), null);
+			return widget;
+		}
+		return null;
 	}
 }

@@ -2,8 +2,13 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
+import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.ui.ChoiceGroup;
@@ -22,12 +27,28 @@ public class ChatterboxWidgetFactory {
 		widgetFactory.addNewPrototype(String.valueOf(controlType), prototype.getClass());
 	}
 	
-	public ChatterboxWidget getWidget (QuestionDef question, FormDef form, int initViewState) {
+	/**
+	 * NOTE: Only applicable for Questions right now, not any other kind of IFormElement
+	 * @param questionIndex
+	 * @param form
+	 * @param initViewState
+	 * @return
+	 */
+	public ChatterboxWidget getWidget (FormIndex questionIndex, FormDef form, int initViewState) {
 		IWidgetStyle collapsedStyle = null;
 		IWidgetStyleEditable expandedStyle = null;
 		
+		FormElementBinding binding = new FormElementBinding(null, questionIndex, form);
+		
+		if(!(binding.element instanceof QuestionDef)) {
+			throw new IllegalArgumentException("Only QuestionDefs can be currently resolved from getWidget()");
+		}
+		
+		QuestionDef question = (QuestionDef)binding.element;
+		
 		int controlType = question.getControlType();
-		int dataType = question.getDataType();
+		int dataType = binding.instanceNode.dataType;
+		
 		String appearanceAttr = question.getAppearanceAttr();
 		
 		collapsedStyle = new CollapsedWidget();
@@ -77,15 +98,12 @@ public class ChatterboxWidgetFactory {
 			break;
 		}
 
-		if (expandedStyle == null) {
+		if (expandedStyle == null) { //catch types text, null, unsupported
 			expandedStyle = new TextEntryWidget();
-			String name = String.valueOf(controlType);
-
-			Object widget;
-			widget = widgetFactory.getNewInstance(name);
-
-			if (widget == null) {
-			} else {
+			
+			String name = String.valueOf(controlType); //huh? controlType is an int
+			Object widget = widgetFactory.getNewInstance(name);
+			if (widget != null) {
 				expandedStyle = (IWidgetStyleEditable) widget;
 			}
 		}
@@ -93,6 +111,50 @@ public class ChatterboxWidgetFactory {
 		if (collapsedStyle == null || expandedStyle == null)
 			throw new IllegalStateException("No appropriate widget to render question");
 		
-		return new ChatterboxWidget(cbox, question, form, initViewState, collapsedStyle, expandedStyle);
+		return new ChatterboxWidget(cbox, binding, initViewState, collapsedStyle, expandedStyle);
 	}
+	
+    public ChatterboxWidget getNewRepeatWidget (FormIndex index, FormDef f, Chatterbox cbox) {
+    	GroupDef repeat = (GroupDef)f.explodeIndex(index).lastElement();
+
+    	//damn linked lists...
+    	FormIndex end = index;
+    	while (!end.isTerminal()) {
+    		end = end.getNextLevel();
+    	}
+    	int multiplicity = end.getInstanceIndex();
+    	
+    	QuestionDef q = new QuestionDef(-1, "New Repeat?", Constants.CONTROL_SELECT_ONE);
+    	
+    	String label = repeat.getLongText();
+    	
+    	q.setLongText("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?"); //this caption will not localize, even though repeat label is taken from the current locale
+    	q.addSelectItem("Yes", "y");
+    	q.addSelectItem("No", "n");
+    	
+    	FormElementBinding binding = new FormElementBinding(null, q, new TreeElement(null, 0));
+		
+		return new ChatterboxWidget(cbox, binding, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
+    }
+    
+    public ChatterboxWidget getNewLabelWidget(FormIndex index, FormDef f, Chatterbox cbox){
+    	IFormElement element = f.getChild(index);
+    	if(!(element instanceof GroupDef)) {
+    		throw new IllegalArgumentException("Attempted to create a Label for something that was not a Group");
+    	}
+    	GroupDef group = (GroupDef)element;
+    	
+    	String labelText = group.getLongText();
+    	if(labelText != null && labelText != "") {
+    		FormElementBinding binding = new FormElementBinding(null, index, f);
+    		int mult = -1;
+    		if(group.getRepeat()) {
+    			mult = binding.instanceNode.getMult() + 1;
+    		}
+    		ChatterboxWidget newLabel = new ChatterboxWidget(cbox, binding,ChatterboxWidget.VIEW_LABEL, new LabelWidget(mult), null);
+    		return newLabel;
+    	} else {
+    		return null;
+    	}
+    }
 }

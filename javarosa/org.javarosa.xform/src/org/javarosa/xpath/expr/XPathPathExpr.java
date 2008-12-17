@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.DateData;
@@ -13,16 +12,17 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.Selection;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapListPoly;
-import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
+import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnsupportedException;
 
 public class XPathPathExpr extends XPathExpression {
@@ -48,37 +48,93 @@ public class XPathPathExpr extends XPathExpression {
 		this.filtExpr = filtExpr;
 	}
 	
-	public XPathReference getXPath () {
-		StringBuffer sb = new StringBuffer();
+	/**
+	 * translate an xpath path reference into a TreeReference
+	 * TreeReferences only support a subset of true xpath paths; restrictions are:
+	 *   simple child name tests 'child::name', '.', and '..' allowed only
+	 *   no predicates
+	 *   all '..' steps must come before anything else
+	 */
+	public TreeReference getReference () throws XPathUnsupportedException {
+		TreeReference ref = new TreeReference();
+		boolean parentsAllowed;
 		
-		if (init_context == INIT_CONTEXT_EXPR)
-			throw new XPathUnsupportedException("path expression with expression as root");
-		if (init_context == INIT_CONTEXT_RELATIVE)
-			throw new XPathUnsupportedException("relative path expression");		
-		
-		if (init_context == INIT_CONTEXT_ROOT)
-			sb.append("/");
+		switch (init_context) {
+		case XPathPathExpr.INIT_CONTEXT_ROOT:
+			ref.refLevel = TreeReference.REF_ABSOLUTE;
+			parentsAllowed = false;
+			break;
+		case XPathPathExpr.INIT_CONTEXT_RELATIVE:
+			ref.refLevel = 0;
+			parentsAllowed = true;
+			break;
+		default: throw new XPathUnsupportedException();
+		}
 		
 		for (int i = 0; i < steps.length; i++) {
-			if (steps[i].axis != XPathStep.AXIS_CHILD)
-				throw new XPathUnsupportedException("non-child axis");		
-			if (steps[i].test != XPathStep.TEST_NAME)
-				throw new XPathUnsupportedException("node test other than name");				
-			if (steps[i].predicates.length > 0)
-				throw new XPathUnsupportedException("predicates in path expression");
+			XPathStep step = steps[i];
 			
-			sb.append(steps[i].name.toString());
-			if (i < steps.length - 1)
-				sb.append("/");
-		}
+			if (step.predicates.length > 0) {
+				throw new XPathUnsupportedException();
+			}
 			
-		return new XPathReference(sb.toString());
+			if (step.axis == XPathStep.AXIS_SELF) {
+				if (step.test != XPathStep.TEST_TYPE_NODE) {
+					throw new XPathUnsupportedException();
+				}
+			} else if (step.axis == XPathStep.AXIS_PARENT) {
+				if (!parentsAllowed || step.test != XPathStep.TEST_TYPE_NODE) {
+					throw new XPathUnsupportedException();
+				} else {
+					ref.refLevel++;
+				}
+			} else if (step.axis == XPathStep.AXIS_CHILD) {
+				if (step.test == XPathStep.TEST_NAME) {
+					ref.add(step.name.toString(), TreeReference.INDEX_UNBOUND);
+					parentsAllowed = false;
+				} else {
+					throw new XPathUnsupportedException();
+				}
+			} else {
+				throw new XPathUnsupportedException();
+			}
+		}		
+		
+		return ref;
 	}
 	
 	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
-		IDataReference ref = getXPath();
-		IAnswerData val = model.getDataValue(ref);
+		DataModelTree m = (DataModelTree)model;
+		TreeReference ref = getReference().contextualize(evalContext.getContextRef());
 		
+		//is this a nodeset? it is if the ref contains any unbound multiplicities AND the unbound nodes are repeatable
+		//the way i'm calculating this sucks; there has got to be an easier way to find out if a node is repeatable
+		boolean nodeset = false;
+		TreeReference repeatTestRef = TreeReference.rootRef();
+		for (int i = 0; i < ref.size(); i++) {
+			repeatTestRef.add((String)ref.names.elementAt(i), ((Integer)ref.multiplicity.elementAt(i)).intValue());
+			if (((Integer)ref.multiplicity.elementAt(i)).intValue() == TreeReference.INDEX_UNBOUND) {
+				if (m.getTemplate(repeatTestRef) != null) {
+					nodeset = true;
+					break;
+				}
+			}
+		}
+
+		if (nodeset) {
+			return m.expandReference(ref);
+		} else {
+			return getRefValue(model, ref);
+		}
+	}
+	
+	public static Object getRefValue (IFormDataModel model, TreeReference ref) {
+		TreeElement node = ((DataModelTree)model).resolveReference(ref);
+		if (node == null) {
+			throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
+		}
+		
+		IAnswerData val = node.getValue();
 		if (val == null) {
 			return "";
 		} else if (val instanceof IntegerData) {
@@ -95,7 +151,7 @@ public class XPathPathExpr extends XPathExpression {
 			return val.getValue();
 		}
 	}
-
+	
 	public String toString () {
 		StringBuffer sb = new StringBuffer();
 		

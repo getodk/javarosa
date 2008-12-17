@@ -15,7 +15,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class DecimalData implements IAnswerData {
-	double n;
+	double d;
 
 	/**
 	 * Empty Constructor, necessary for dynamic construction during deserialization.
@@ -25,45 +25,49 @@ public class DecimalData implements IAnswerData {
 		
 	}
 	
-	public DecimalData(double n) {
-		this.n = n;
+	public DecimalData(double d) {
+		this.d = d;
 	}
-	public DecimalData(Double n) {
-		setValue(n);
+	public DecimalData(Double d) {
+		setValue(d);
+	}
+	
+	public IAnswerData clone () {
+		return new DecimalData(d);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
 	 */
 	public String getDisplayText() {
-		return String.valueOf(n);
+		return String.valueOf(d);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
 	 */
 	public Object getValue() {
-		return new Double(n); 
+		return new Double(d); 
 	}
 	
 	public void setValue(Object o) {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
-		n = ((Double)o).doubleValue();
+		d = ((Double)o).doubleValue();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		n = ExtUtil.readDecimal(in);
+		d = ExtUtil.readDecimal(in);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeDecimal(out, n);
+		ExtUtil.writeDecimal(out, d);
 	}
 }

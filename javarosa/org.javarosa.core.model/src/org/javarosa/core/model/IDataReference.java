@@ -19,15 +19,15 @@ public interface IDataReference extends Externalizable {
 	 */
 	void setReference (Object reference); 
 	
-	/**
-	 * @param reference A reference to be evaluated against this reference
-	 * @return true if the given data reference is associated with the same
-	 * data value as this reference.
-	 */
-	boolean referenceMatches(IDataReference reference);
-	
-	/** 
-	 * @return a new object that is a copy of this data reference
-	 */
-	IDataReference clone();
+//	/**
+//	 * @param reference A reference to be evaluated against this reference
+//	 * @return true if the given data reference is associated with the same
+//	 * data value as this reference.
+//	 */
+//	boolean referenceMatches(IDataReference reference);
+//	
+//	/** 
+//	 * @return a new object that is a copy of this data reference
+//	 */
+//	IDataReference clone();
 }

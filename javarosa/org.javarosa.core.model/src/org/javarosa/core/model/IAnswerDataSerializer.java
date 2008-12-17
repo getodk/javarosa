@@ -1,7 +1,6 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.instance.QuestionDataElement;
 
 
 /**
@@ -26,7 +25,7 @@ public interface IAnswerDataSerializer {
 	 * @return true if this can meaningfully serialze the provided
 	 * object. false otherwise
 	 */
-	boolean canSerialize(QuestionDataElement element);
+	boolean canSerialize(IAnswerData element);
 	
 	/**
 	 * Serializes the given data object into a format that can
@@ -39,7 +38,7 @@ public interface IAnswerDataSerializer {
 	 * given object if canSerialize() would return true for that
 	 * object. False otherwise.
 	 */
-	Object serializeAnswerData(QuestionDataElement element, FormDef schema);
+	Object serializeAnswerData(IAnswerData data, int dataType);
 	
 	/**
 	 * Serializes the given data object into a format that can

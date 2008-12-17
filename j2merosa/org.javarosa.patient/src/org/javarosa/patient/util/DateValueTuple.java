@@ -48,5 +48,9 @@ public class DateValueTuple implements Externalizable {
 	 public void writeExternal(DataOutputStream out) throws IOException {
 		 ExternalizableHelperDeprecated.writeDate(out, date);
 		 out.writeInt(value);
-	}
+	 }
+	
+	 public DateValueTuple clone() {
+		 return new DateValueTuple(date,value);
+	 }
 }

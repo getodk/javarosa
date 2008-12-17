@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.Localizable;
 import org.javarosa.core.model.utils.Localizer;
 import org.javarosa.core.util.OrderedHashtable;
@@ -18,9 +15,7 @@ import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 
 /** 
  * The definition of a Question to be presented to users when
@@ -39,7 +34,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String name;
 	private IDataReference binding;	/** reference to a location in the model to store data in */
 	
-	private int dataType;  	 /* The type of question. eg Numeric,Date,Text etc. */
+	//int dataType -- can we get away with storing this only in the instance node?
 	private int controlType;  /* The type of widget. eg TextInput,Slider,List etc. */
 	private String appearanceAttr;
 	
@@ -54,30 +49,21 @@ public class QuestionDef implements IFormElement, Localizable {
 	private OrderedHashtable selectItemIDs;	/** String -> String */
 	private Vector selectItemsLocalizable;
 	
-	private boolean required; 	/** A flag to tell whether the question is to be answered or is optional. */
-	//constraints?
-	
-	private boolean visible;	/** A flag to tell whether the question should be shown or not. */
-	private boolean enabled;	/** A flag to tell whether the question should be enabled or disabled. */
-	private boolean locked; 	/** A flag to tell whether a question is to be locked or not. A locked question is one which is visible, enabled, but cannot be edited. */
-
-	private IAnswerData defaultValue;	/** this shouldn't be used for default values that are already pre-loaded in the instance */
+	//this may be used in the future, but it is not the default value you're probably thinking about
+	//"these are not the default values you are looking for..."
+	//"not your mothers's default value anymore!"
+	//private IAnswerData defaultValue;
 		
 	Vector observers;
 	
 	public QuestionDef () {
-		this(Constants.NULL_ID, null, Constants.DATATYPE_TEXT, Constants.DATATYPE_TEXT);
+		this(Constants.NULL_ID, null, Constants.DATATYPE_TEXT);
 	}
 	
-	public QuestionDef (int id, String name, int dataType, int controlType) {
+	public QuestionDef (int id, String name, int controlType) {
 		setID(id);
 		setName(name);
-		setDataType(dataType);
 		setControlType(controlType);
-		required = false;
-		visible = true;
-		enabled = true;
-		locked = false;
 		observers = new Vector();
 	}
 		
@@ -87,7 +73,6 @@ public class QuestionDef implements IFormElement, Localizable {
 			return (id == q.id &&
 					ExtUtil.equals(name, q.name) &&
 					ExtUtil.equals(binding, q.binding) &&
-					dataType == q.dataType &&
 					controlType == q.controlType &&
 					ExtUtil.equals(appearanceAttr, q.appearanceAttr) &&
 					ExtUtil.equals(longText, q.longText) &&
@@ -97,11 +82,8 @@ public class QuestionDef implements IFormElement, Localizable {
 					ExtUtil.equals(helpText, q.helpText) &&
 					ExtUtil.equals(helpTextID, q.helpTextID) &&
 					ExtUtil.equals(ExtUtil.nullIfEmpty(selectItemIDs), ExtUtil.nullIfEmpty(q.selectItemIDs)) &&
-					ExtUtil.equals(ExtUtil.nullIfEmpty(selectItemsLocalizable), ExtUtil.nullIfEmpty(q.selectItemsLocalizable)) &&
-					required == q.required &&
-					visible == q.visible &&
-					enabled == q.enabled &&
-					locked == q.locked);
+					ExtUtil.equals(ExtUtil.nullIfEmpty(selectItemsLocalizable), ExtUtil.nullIfEmpty(q.selectItemsLocalizable))
+					);
 				//no defaultValue, selectItems
 		} else {
 			return false;
@@ -130,14 +112,6 @@ public class QuestionDef implements IFormElement, Localizable {
 	
 	public void setBind(IDataReference binding) {
 		this.binding = binding;
-	}
-	
-	public int getDataType() {
-		return dataType;
-	}
-	
-	public void setDataType(int dataType) {
-		this.dataType = dataType;
 	}
 	
 	public int getControlType() {
@@ -272,50 +246,18 @@ public class QuestionDef implements IFormElement, Localizable {
 		}
 	}
 
-	public boolean isRequired() {
-		return required;
-	}
-	
-	public void setRequired(boolean required) {
-		if (this.required != required) {		
-			this.required = required;
-	    	alertStateObservers(QuestionStateListener.CHANGE_REQUIRED);
+	public int getSelectedItemIndex(String value) {
+		if (selectItems != null) {
+			for (int i = 0; i < selectItems.size(); i++) {
+				if (((String)selectItems.elementAt(i)).equals(value)) {
+					return i;
+				}
+			}
 		}
-	}
-
-	public boolean isVisible() {
-		return visible;
-	}
-	
-	public void setVisible(boolean visible) {
-		if (this.visible != visible) {		
-			this.visible = visible;
-	    	alertStateObservers(QuestionStateListener.CHANGE_VISIBLE);
-		}
-	}
-	
-	public boolean isEnabled() {
-		return enabled;
-	}
-	
-	public void setEnabled(boolean enabled) {
-		if (this.enabled != enabled) {		
-			this.enabled = enabled;
-	    	alertStateObservers(QuestionStateListener.CHANGE_ENABLED);
-		}
-	}
-	
-	public boolean isLocked() {
-		return locked;
-	}
-	
-	public void setLocked(boolean locked) {
-		if (this.locked != locked) {		
-			this.locked = locked;
-	    	alertStateObservers(QuestionStateListener.CHANGE_LOCKED);
-		}
+		return -1;
 	}
 		
+	/*
 	public IAnswerData getDefaultValue() {
 		return defaultValue;
 	}
@@ -323,6 +265,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	public void setDefaultValue(IAnswerData defaultValue) {
 		this.defaultValue = defaultValue;
 	}
+    */
 
     public void localeChanged(String locale, Localizer localizer) {
     	if(longTextID != null) {
@@ -341,7 +284,7 @@ public class QuestionDef implements IFormElement, Localizable {
     		localizeSelectMap(localizer);
     	}
     	
-    	alertStateObservers(QuestionStateListener.CHANGE_LOCALE);
+    	alertStateObservers(FormElementStateListener.CHANGE_LOCALE);
     }
 	
 	public Vector getChildren () {
@@ -354,6 +297,10 @@ public class QuestionDef implements IFormElement, Localizable {
 	
 	public void addChild (IFormElement fe) {
 		throw new IllegalStateException();
+	}
+	
+	public IFormElement getChild (int i) {
+		return null;
 	}
 	
 	/*
@@ -371,13 +318,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 
-		setDataType(ExtUtil.readInt(dis));
 		setControlType(ExtUtil.readInt(dis));
-
-		setRequired(ExtUtil.readBool(dis));
-		setVisible(ExtUtil.readBool(dis));
-		setEnabled(ExtUtil.readBool(dis));
-		setLocked(ExtUtil.readBool(dis));
 
 		setSelectItemIDs(
 				(OrderedHashtable)ExtUtil.nullIfEmpty((OrderedHashtable)ExtUtil.read(dis, new ExtWrapMap(String.class, String.class, true), pf)),
@@ -405,13 +346,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		ExtUtil.write(dos, new ExtWrapNullable(getShortTextID()));
 		ExtUtil.write(dos, new ExtWrapNullable(getHelpTextID()));
 				
-		ExtUtil.writeNumeric(dos, getDataType());
 		ExtUtil.writeNumeric(dos, getControlType());
-		
-		ExtUtil.writeBool(dos, isRequired());
-		ExtUtil.writeBool(dos, isVisible());
-		ExtUtil.writeBool(dos, isEnabled());
-		ExtUtil.writeBool(dos, isLocked());
 		
 		//selectItems should not be serialized
 		ExtUtil.write(dos, new ExtWrapMap(ExtUtil.emptyIfNull(getSelectItemIDs())));
@@ -422,13 +357,13 @@ public class QuestionDef implements IFormElement, Localizable {
 
 	/* === MANAGING OBSERVERS === */
 	
-	public void registerStateObserver (QuestionStateListener qsl) {
+	public void registerStateObserver (FormElementStateListener qsl) {
 		if (!observers.contains(qsl)) {
 			observers.addElement(qsl);
 		}
 	}
 	
-	public void unregisterStateObserver (QuestionStateListener qsl) {
+	public void unregisterStateObserver (FormElementStateListener qsl) {
 		observers.removeElement(qsl);
 	}
 	
@@ -438,27 +373,14 @@ public class QuestionDef implements IFormElement, Localizable {
 	
 	public void alertStateObservers (int changeFlags) {
 		for (Enumeration e = observers.elements(); e.hasMoreElements(); )
-			((QuestionStateListener)e.nextElement()).questionStateChanged(this, changeFlags);
-	}
-	
-	public void getChild(IDataReference binding, Vector result) {
-		if (this.binding != null && this.binding.referenceMatches(binding)) {
-			result.addElement(this);
-		} 
+			((FormElementStateListener)e.nextElement()).formElementStateChanged(this, changeFlags);
 	}
 
-	public int getSelectedItemIndex(String value) {
-		if (selectItems == null || selectItems.size() == 0) {
-			return -1;
-		} else {
-			String selectedValue;
-			for (int i = 0; i < this.selectItems.size(); i++) {
-				selectedValue = (String) this.selectItems.elementAt(i);
-				if (selectedValue.equals(value)) {
-					return i;
-				}
-			}
-		}
-		return -1;
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.IFormElement#getDeepChildCount()
+	 */
+	public int getDeepChildCount() {
+		return 1;
 	}
 }

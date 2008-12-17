@@ -1,7 +1,6 @@
-package org.javarosa.core.model.data;
+package org.javarosa.core.model.data.helper;
 
 import java.io.InputStream;
-
 
 /**
  * A data pointer representing a pointer to a (usually) larger object in memory.  

@@ -1,8 +1,6 @@
 package org.javarosa.core.model.instance.utils;
 
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.instance.QuestionDataElement;
-import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 
@@ -18,6 +16,4 @@ import org.javarosa.core.model.utils.IDataModelVisitor;
 public interface ITreeVisitor extends IDataModelVisitor {
 	public void visit(DataModelTree tree);
 	public void visit(TreeElement element);
-	public void visit(QuestionDataElement element);
-	public void visit(QuestionDataGroup element);
 }

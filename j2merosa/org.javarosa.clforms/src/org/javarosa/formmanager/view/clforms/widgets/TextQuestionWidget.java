@@ -5,23 +5,24 @@ import javax.microedition.lcdui.TextField;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class TextQuestionWidget extends SingleQuestionScreen {
 
 	protected TextField tf;
 
-	public TextQuestionWidget(QuestionDef question){
+	public TextQuestionWidget(FormElementBinding question){
 		super(question);
 	}
 	
-	public TextQuestionWidget(QuestionDef prompt, int num) {
+	public TextQuestionWidget(FormElementBinding prompt, int num) {
 		super (prompt,num);
 	}
-	public TextQuestionWidget(QuestionDef prompt, String str) {
+	public TextQuestionWidget(FormElementBinding prompt, String str) {
 		super (prompt,str);
 	}
-	public TextQuestionWidget(QuestionDef prompt, char c) {
+	public TextQuestionWidget(FormElementBinding prompt, char c) {
 		super (prompt,c);
 	}
 
@@ -29,14 +30,14 @@ public class TextQuestionWidget extends SingleQuestionScreen {
 		setHint("Type in your answer");
 		//#style textBox
 		 tf = new TextField("", "", 200, TextField.ANY);
-		 if(qDef.isRequired())
-				tf.setLabel("*"+qDef.getLongText()); //visual symbol for required
+		 if(qDef.instanceNode.required)
+				tf.setLabel("*"+((QuestionDef)qDef.element).getLongText()); //visual symbol for required
 				else
-					tf.setLabel(qDef.getLongText());
+					tf.setLabel(((QuestionDef)qDef.element).getLongText());
 		this.append(tf);
 		this.addNavigationButtons();
-		if (qDef.getHelpText()!=null){
-			setHint(qDef.getHelpText());
+		if (((QuestionDef)qDef.element).getHelpText()!=null){
+			setHint(((QuestionDef)qDef.element).getHelpText());
 		}
 	}
 

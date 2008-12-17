@@ -4,6 +4,6 @@
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="test"/>
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
-	<classpathentry kind="lib" path="/org.javarosa.demo/lib/j2meunit-javarosa.jar"/>
+	<classpathentry kind="lib" path="/org.javarosa.cdctz/lib/j2meunit-javarosa.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

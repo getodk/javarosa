@@ -13,216 +13,217 @@ import org.javarosa.core.model.data.IntegerData;
  * @author Clayton Sims
  *
  */
-public class DateUtils {
 
+public class DateUtils {
+	private static final int MONTH_OFFSET = (1 - Calendar.JANUARY);
+		
+	public static final int FORMAT_ISO8601 = 1;
+	public static final int FORMAT_HUMAN_READABLE_SHORT = 2;
+	//public static final int FORMAT_HUMAN_READABLE_LONG = 3;
+	
 	public DateUtils() {
 		super();
 	}
 
-	/**
-	 * Converts the date into a string formatted according to the xsd:dateTime specifications
-	 * @param date The date to be converted
-	 * @return The date represented by 'date' in the XML dateTime format.
-	 */
-	//yyyy-mm-ddThh:mm:ss.sssZ or yyyy-mm-ddThh:mm:ss.sss(+-)hh:mm
-	public static String formatDateToTimeStamp(Date date) {
-		String dateElement = getXMLStringValue(date);
-		Calendar cd = Calendar.getInstance();
-		cd.setTime(date);
-		
-		String hour = intPad(cd.get(Calendar.HOUR_OF_DAY), 2);
-		String minute = intPad(cd.get(Calendar.MINUTE), 2);
-		String second = intPad(cd.get(Calendar.SECOND), 2);
-		String secfrac = intPad(cd.get(Calendar.MILLISECOND), 3);
-		
-		//want to add time zone info to be fully ISO-8601 compliant, but API is totally on crack!
-		String time = hour + ":"+ minute + ":" + second + "." + secfrac; 
-		return dateElement + "T" + time;
-	}
-
-	/**
-	 * Converts an integer to a string, ensuring that the string
-	 * contains a certain number of digits
-	 * @param n The integer to be converted
-	 * @param pad The length of the string to be returned
-	 * @return A string representing n, which has pad - #digits(n)
-	 * 0's preceding the number.
-	 */
-	public static String intPad (int n, int pad) {
-		String s = String.valueOf(n);
-		while (s.length() < pad)
-			s = "0" + s;
-		return s;
-	}
-	
-	/**
-	 * Converts the value object into a String based on the returnType
-	 * Note: This is for a short
-	 *
-	 * @return
-	 */
-	public static String getShortStringValue(Date val) {
-		if (val == null)
-			return "";
-
-		Calendar cd = Calendar.getInstance();
-		cd.setTime(val);
-		String year = "" + cd.get(Calendar.YEAR);
-		String month = "" + (cd.get(Calendar.MONTH) + 1);
-		String day = "" + cd.get(Calendar.DAY_OF_MONTH);
-
-		if (month.length() < 2)
-			month = "0" + month;
-
-		if (day.length() < 2)
-			day = "0" + day;
-
-		return day + "/" + month + "/" + year.substring(2, 4);		
-	}
-	
-	/**
-	 * Converts the value object into a String based on the returnType Note:
-	 * This is for an xml formatted xsd:date datatype, the formatting must be
-	 * YYYY-MM-DD
-	 * 
-	 * @return
-	 */
-	public static String getXMLStringValue(Date val) {
-		String stringValue = "";
-		if (val == null){
-			return stringValue;
+	private static class DateFields {
+		public DateFields () {
+			year = 1970;
+			month = 1;
+			day = 1;
+			hour = 0;
+			minute = 0;
+			second = 0;
+			secTicks = 0;
+			
+//			tzStr = "Z";
+//			tzOffset = 0;
 		}
 		
-		Date d = (Date) val;
+		public int year;
+		public int month; //1-12
+		public int day; //1-31
+		public int hour; //0-23
+		public int minute; //0-59
+		public int second; //0-59
+		public int secTicks; //0-999 (ms)
+		
+//		public String tzStr;
+//		public int tzOffset; //s ahead of UTC
+	}
+	
+	private static DateFields getFields (Date d) {
 		Calendar cd = Calendar.getInstance();
 		cd.setTime(d);
-		String year = "" + cd.get(Calendar.YEAR);
-		String month = "" + (cd.get(Calendar.MONTH)+1);
-		String day = "" + cd.get(Calendar.DAY_OF_MONTH);
-
-		if (month.length() < 2)
-			month = "0" + month;
-
-		if (day.length() < 2)
-			day = "0" + day;
-
-		stringValue =  year + "-" + month + "-" + day;
-		return stringValue;
-	}
-
-	/**
-	 * Tokenizes the input string into a vector of 
-	 * output strings based on the separate c
-	 * @param values The string to be tokenized
-	 * @param c the separator character to be used
-	 * @return A Vector of Strings which were split from the 
-	 * input string based on the separator c
-	 */
-	private static Vector tokenize(String values, char c) {
-		Vector temp = new Vector();
-		int pos = 0;
-		int index = values.indexOf(c);
-		while(index != -1){
-			String tempp = values.substring(pos, index).trim();
-			//System.out.println(tempp+pos+index);
-			temp.addElement(tempp);
-			pos = index+1;
-			index = values.indexOf(c,pos);
-		}
-		temp.addElement(values.substring(pos).trim());
-		return temp;
+		
+		DateFields fields = new DateFields();
+		fields.year = cd.get(Calendar.YEAR);
+		fields.month = cd.get(Calendar.MONTH) + MONTH_OFFSET;
+		fields.day = cd.get(Calendar.DAY_OF_MONTH);
+		fields.hour = cd.get(Calendar.HOUR_OF_DAY);
+		fields.minute = cd.get(Calendar.MINUTE);
+		fields.second = cd.get(Calendar.SECOND);
+		fields.secTicks = cd.get(Calendar.MILLISECOND);
+		
+		return fields;
 	}
 	
-	/**
-	 * Creates a Date object identifying the date that is passed in in the format
-	 * YYYY-MM-DD
-	 * @param value A date string to be parsed
-	 * @returns a date object set to midnight on the given date in the current timezone *including DST!!*
-	 */
-	public static Date getDateFromString(String value) {
-		if(value == null || value.trim().length() == 0){   // if value is null or empty
+	private static Date getDate (DateFields f) {
+		Calendar cd = Calendar.getInstance();
+		cd.set(Calendar.YEAR, f.year);
+		cd.set(Calendar.MONTH, f.month - MONTH_OFFSET);
+		cd.set(Calendar.DAY_OF_MONTH, f.day);
+		cd.set(Calendar.HOUR_OF_DAY, f.hour);
+		cd.set(Calendar.MINUTE, f.minute);
+		cd.set(Calendar.SECOND, f.second);
+		cd.set(Calendar.MILLISECOND, f.secTicks);
+		
+		return cd.getTime();		
+	}
+	
+	/* ==== FORMATTING DATES/TIMES ==== */
+	
+	public static String formatDateTime (Date d, int format) {
+		if (d == null)
+			return "";
+		
+		DateFields fields = getFields(d);
+
+		String delim;
+		switch (format) {
+		case FORMAT_ISO8601: delim = "T"; break;
+		default: delim = " "; break;
+		}
+		
+		return formatDate(fields, format) + delim + formatTime(fields, format);
+	}
+	
+	public static String formatDate (Date d, int format) {
+		return (d == null ? "" :formatDate(getFields(d), format));
+	}
+	
+	public static String formatTime (Date d, int format) {
+		return (d == null ? "" : formatTime(getFields(d), format));
+	}
+	
+	private static String formatDate (DateFields f, int format) {
+		switch (format) {
+		case FORMAT_ISO8601: return formatDateISO8601(f);
+		case FORMAT_HUMAN_READABLE_SHORT: return formatDateColloquial(f);
+		default: return null;
+		}	
+	}
+	
+	private static String formatTime (DateFields f, int format) {
+		switch (format) {
+		case FORMAT_ISO8601: return formatTimeISO8601(f);
+		case FORMAT_HUMAN_READABLE_SHORT: return formatTimeColloquial(f);
+		default: return null;
+		}	
+	}
+	
+	private static String formatDateISO8601 (DateFields f) {
+		return f.year + "-" + intPad(f.month, 2) + "-" + intPad(f.day, 2);
+	}
+
+	private static String formatDateColloquial (DateFields f) {
+		return intPad(f.day, 2) + "/" + intPad(f.month, 2) + "/" + (new Integer(f.year)).toString().substring(2, 4);
+	}
+
+	private static String formatTimeISO8601 (DateFields f) {
+		return intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":" + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
+		//want to add time zone info to be fully ISO-8601 compliant, but API is totally on crack!
+	}
+	
+	private static String formatTimeColloquial (DateFields f) {
+		return intPad(f.hour, 2) + ":" + intPad(f.minute, 2);
+	}
+		
+	/* ==== PARSING DATES/TIMES ==== */
+	
+	public static Date parseDateTime (String str) {
+		DateFields fields = new DateFields();
+		int i = str.indexOf("T");
+		if (!parseDate(str.substring(0, i), fields) || !parseTime(str.substring(i + 1), fields)) {
 			return null;
 		}
-		Vector digits = tokenize(value, '-');
-
-		if (digits.size() != 3)
+		return getDate(fields);
+	}
+	
+	public static Date parseDate (String str) {
+		DateFields fields = new DateFields();
+		if (!parseDate(str, fields)) {
 			return null;
-		
-		int day, month, year;
+		}
+		return getDate(fields);
+	}
+	
+	public static Date parseTime (String str) {
+		DateFields fields = new DateFields();
+		if (!parseTime(str, fields)) {
+			return null;
+		}
+		return getDate(fields);
+	}
+	
+	private static boolean parseDate (String dateStr, DateFields f) {
+		Vector pieces = split(dateStr, "-", false);
+		if (pieces.size() != 3)
+			return false;
+
 		try {
-			day = Integer.parseInt((String)digits.elementAt(2));
-			month = Integer.parseInt((String)digits.elementAt(1));
-			year = Integer.parseInt((String)digits.elementAt(0));
+			f.year = Integer.parseInt((String)pieces.elementAt(0));
+			f.month = Integer.parseInt((String)pieces.elementAt(1));
+			f.day = Integer.parseInt((String)pieces.elementAt(2));
 		} catch (NumberFormatException nfe) {
-			return null;
+			return false;
 		}
 		
-		return getDate(year, month, day);
+		return true;
 	}
 	
-	/**
-	 * Creates a Date object identifying the datetime that is passed in
-	 * @param value A date string to be parsed
-	 * @returns a date object set to the given time on the given date in the current timezone *including DST!!*
-	 */
-	public static Date getDateTimeFromString(String value) {
-		if(value == null || value.trim().length() == 0){   // if value is null or empty
-			return null;
+	private static boolean parseTime (String timeStr, DateFields f) {
+		Vector pieces = split(timeStr, ":", false);
+		if (pieces.size() != 2 && pieces.size() != 3)
+			return false;
+		
+		try {
+			f.hour = Integer.parseInt((String)pieces.elementAt(0));
+			f.minute = Integer.parseInt((String)pieces.elementAt(1));
+	
+			if (pieces.size() == 3) {
+				String secStr = (String)pieces.elementAt(2);
+				int i;
+				for (i = 0; i < secStr.length(); i++) {
+					char c = secStr.charAt(i);
+					if (!Character.isDigit(c) && c != '.')
+						break;
+				}
+				secStr = secStr.substring(0, i);
+				
+				double fsec = Double.parseDouble(secStr);
+				f.second = (int)fsec;
+				f.secTicks = (int)(1000.0 * (fsec - f.second));
+			}
+		} catch (NumberFormatException nfe) {
+			return false;
 		}
 		
-		Date result = new Date();
-		Vector digits = tokenize(value, '-');
-
-		String dayAndHs = (String)digits.elementAt(2);
-		String dayString = dayAndHs.substring(0, 2);
-		int day = Integer.valueOf(dayString).intValue();
-		int month = Integer.valueOf((String)digits.elementAt(1)).intValue();
-		month--;
-		int year = Integer.valueOf((String)digits.elementAt(0)).intValue();
-		int hour = Integer.valueOf(dayAndHs.substring(3, 5)).intValue();
-		int minute = Integer.valueOf(dayAndHs.substring(6, 8)).intValue();
-		int second = Integer.valueOf(dayAndHs.substring(9, 11)).intValue();
-		
-		//24T19:46:39
-		//01234567890
-		
-		Calendar cd = Calendar.getInstance();
-		cd.set(Calendar.DAY_OF_MONTH, day);
-		cd.set(Calendar.MONTH, month);
-		cd.set(Calendar.YEAR, year);
-		cd.set(Calendar.HOUR_OF_DAY, hour);
-		cd.set(Calendar.MINUTE, minute);
-		cd.set(Calendar.SECOND, second);
-		result = cd.getTime();
-
-		return result;
+		return true;	
 	}
 	
-	/**
-	 * Generates a date object for the date represented by the 
-	 * parameters.
-	 * @param year The year of the returned date object 
-	 * @param month The month of the returned date object (0 for January, 11 for December)
-	 * @param day The day of the returned date object (Between 1 and the 
-	 * number of days in the month given)
-	 * @return A date object which represents the the day of passed in.
-	 */
+	/* ==== DATE UTILITY FUNCTIONS ==== */
+	
 	public static Date getDate (int year, int month, int day) {
-		month -= 1;
+		int jMonth = month - MONTH_OFFSET;;
 		
-		if (month < Calendar.JANUARY || month > Calendar.DECEMBER || day < 1 || day > daysInMonth(month, year))
+		if (jMonth < Calendar.JANUARY || jMonth > Calendar.DECEMBER || day < 1 || day > daysInMonth(jMonth , year))
 			return null;
 		
-		Calendar cd = Calendar.getInstance();
-		cd.set(Calendar.DAY_OF_MONTH, day);
-		cd.set(Calendar.MONTH, month);
-		cd.set(Calendar.YEAR, year);
-		cd.set(Calendar.HOUR_OF_DAY, 0);
-		cd.set(Calendar.MINUTE, 0);
-		cd.set(Calendar.SECOND, 0);
-		cd.set(Calendar.MILLISECOND, 0);
-		
-		return cd.getTime();
+		DateFields f = new DateFields();
+		f.year = year;
+		f.month = month;
+		f.day = day;
+		return getDate(f);
 	}
 	
 	/**
@@ -230,35 +231,11 @@ public class DateUtils {
 	 * @return new Date object with same date but time set to midnight (in current timezone)
 	 */
 	public static Date roundDate (Date d) {
-		Calendar cd = Calendar.getInstance();
-		cd.setTime(d);
-		return DateUtils.getDate(cd.get(Calendar.YEAR), cd.get(Calendar.MONTH) + 1, cd.get(Calendar.DAY_OF_MONTH));
+		DateFields f = getFields(d);
+		return getDate(f.year, f.month, f.day);
 	}
 	
-	/**
-	 * Creates a string representing the date given in the format
-	 * HH:MM
-	 * @param d The date to be turned into a string
-	 * @return a string representing the date given in the format
-	 * HH:MM
-	 */
-	public static String get24HourTimeFromDate(Date d)
-	{
-		//set as the xml transport standard for time Questions
-		Calendar cd = Calendar.getInstance();
-		cd.setTime(d);
-	
-		String hour = "" + cd.get(Calendar.HOUR_OF_DAY);
-		String minutes = "" + cd.get(Calendar.MINUTE);
-		
-			if (hour.length() <2)
-				hour = "0" + hour;
-			
-			if (minutes.length() < 2)
-				minutes = "0" + minutes;
-			
-			return hour+":"+minutes;	
-	}
+	/* ==== CALENDAR FUNCTIONS ==== */
 	
 	/**
 	 * Returns the number of days in the month given for
@@ -290,35 +267,8 @@ public class DateUtils {
 		return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
 	}
 	
-	/**
-	 * Tokenizes a string based on the given delimeter string
-	 * @param original The string to be split
-	 * @param delimiter The delimeter to be used
-	 * @return An array of strings contained in original which were
-	 * seperated by the delimeter
-	 */
-    public static String[] split(String original, String delimiter) {
-        Vector nodes = new Vector();
-        // Parse nodes into vector
-        int index = original.indexOf(delimiter);
-        while(index>=0) {
-            nodes.addElement( original.substring(0, index) );
-            original = original.substring(index+delimiter.length());
-            index = original.indexOf(delimiter);
-        }
-        // Get the last node
-        nodes.addElement( original );
-        
-        // Create splitted string array
-        String[] result = new String[ nodes.size() ];
-        if( nodes.size()>0 ) {
-            for(int loop=0; loop<nodes.size(); loop++) {
-                result[loop] = (String)nodes.elementAt(loop);
-            }
-            
-        }
-        return result;
-    }	
+	/* ==== DATE OPERATIONS ==== */
+	
     /**
      * Creates a Date object representing the amount of time between the
      * reference date, and the given parameters.
@@ -407,6 +357,7 @@ public class DateUtils {
 	 * @return The approximate difference, in days, between the two dates given.
 	 * The estimate is most likely to be a small underestimate.
 	 */
+	//who added this shit!?!
 	public static int getApproxDaysDifference(Date earlierDate, Date laterDate) {
 		Date span = new Date(laterDate.getTime() - earlierDate.getTime());
 		Date firstDate = new Date(0);
@@ -425,4 +376,77 @@ public class DateUtils {
 		
 		return days;
 	}
+	
+	/* ==== UTILITY ==== */
+	
+	/**
+	 * Tokenizes a string based on the given delimeter string
+	 * @param original The string to be split
+	 * @param delimiter The delimeter to be used
+	 * @return An array of strings contained in original which were
+	 * seperated by the delimeter
+	 */
+    public static Vector split (String str, String delimiter, boolean combineMultipleDelimiters) {
+    	Vector pieces = new Vector();
+    	
+    	int index = str.indexOf(delimiter);
+        while (index >= 0) {
+            pieces.addElement(str.substring(0, index));
+            str = str.substring(index + delimiter.length());
+            index = str.indexOf(delimiter);
+        }
+        pieces.addElement(str);
+
+        if (combineMultipleDelimiters) {
+        	for (int i = 0; i < pieces.size(); i++) {
+        		if (((String)pieces.elementAt(i)).length() == 0) {
+        			pieces.removeElementAt(i);
+        			i--;
+        		}
+        	}
+        }
+
+        return pieces;
+    }	
+	
+	/**
+	 * Converts an integer to a string, ensuring that the string
+	 * contains a certain number of digits
+	 * @param n The integer to be converted
+	 * @param pad The length of the string to be returned
+	 * @return A string representing n, which has pad - #digits(n)
+	 * 0's preceding the number.
+	 */
+	public static String intPad (int n, int pad) {
+		String s = String.valueOf(n);
+		while (s.length() < pad)
+			s = "0" + s;
+		return s;
+	}
+	
+	/* ==== GARBAGE (backward compatibility; too lazy to remove them now) ==== */
+	
+	public static String formatDateToTimeStamp(Date date) {
+		return formatDateTime(date, FORMAT_ISO8601);
+	}
+
+	public static String getShortStringValue(Date val) {
+		return formatDate(val, FORMAT_HUMAN_READABLE_SHORT);
+	}
+
+	public static String getXMLStringValue(Date val) {
+		return formatDate(val, FORMAT_ISO8601);
+	}
+
+	public static String get24HourTimeFromDate(Date d) {
+		return formatTime(d, FORMAT_HUMAN_READABLE_SHORT);
+	}
+
+	public static Date getDateFromString(String value) {
+		return parseDate(value);
+	}
+	
+	public static Date getDateTimeFromString(String value) {
+		return parseDateTime(value);
+	}	
 }

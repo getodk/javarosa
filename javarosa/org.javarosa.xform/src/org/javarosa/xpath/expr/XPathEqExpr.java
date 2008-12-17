@@ -3,12 +3,14 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.xpath.XPathTypeMismatchException;
 
 public class XPathEqExpr extends XPathBinaryOpExpr {
 	public boolean equal;
@@ -25,7 +27,9 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
 		Object bval = b.eval(model, evalContext);
 		boolean eq = false;
 
-		if (aval instanceof Boolean || bval instanceof Boolean) {
+		if (aval instanceof Vector || bval instanceof Vector) {
+			throw new XPathTypeMismatchException();
+		} else if (aval instanceof Boolean || bval instanceof Boolean) {
 			if (!(aval instanceof Boolean)) {
 				aval = XPathFuncExpr.toBoolean(aval);
 			} else if (!(bval instanceof Boolean)) {

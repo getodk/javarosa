@@ -5,7 +5,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
-	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
-	<classpathentry kind="lib" path="/org.javarosa.xform/lib/minixpath.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

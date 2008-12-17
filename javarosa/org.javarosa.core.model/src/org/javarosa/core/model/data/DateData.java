@@ -32,6 +32,10 @@ public class DateData implements IAnswerData {
 		setValue(d);
 	}
 	
+	public IAnswerData clone () {
+		return new DateData(new Date(d.getTime()));
+	}
+	
 	public void setValue (Object o) {
 		//Should not ever be possible to set this to a null value
 		if(o == null) {

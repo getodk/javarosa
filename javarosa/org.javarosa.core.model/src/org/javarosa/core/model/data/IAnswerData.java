@@ -30,4 +30,6 @@ public interface IAnswerData extends Externalizable {
 	 * answer
 	 */
 	String getDisplayText ();
+	
+	IAnswerData clone ();
 }

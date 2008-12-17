@@ -1,83 +1,383 @@
 package org.javarosa.core.model.instance;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.condition.Constraint;
+import org.javarosa.core.model.Constants;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
- * An element of a DataModelTree. Contains a name, and a
- * reference to the TreeElement that is the root of the
- * tree that contains this element.
+ * An element of a DataModelTree.
  *
  * @author Clayton Sims
  *
  */
 
-public abstract class TreeElement implements Externalizable {
-
-	/** The root of the tree containing this element */
-	protected TreeElement root;
-
-	/** The name of this element */
-	protected String name;
-
-	/** The vector of attributes */
+public class TreeElement implements Externalizable {
+	protected String name; //can be null only for hidden root node
+	protected int multiplicity;
     protected Vector attributes;
+    
+    public boolean repeatable;
+  //  public boolean isAttribute;  for when we support xml attributes as data nodes
+    
+    private IAnswerData value;
+    private Vector children;
 
-	/**
-	 * @return True if the element can contain subelements. False otherwise
-	 */
-	public abstract boolean isLeaf();
+    /* model properties */
+	public int dataType = Constants.DATATYPE_NULL;
+	private boolean relevant = true;
+	public boolean required = false;
+	private boolean enabled = true;
+	public Constraint constraint = null;
+	public String preloadHandler = null;
+	public String preloadParams = null;
+   
+	public boolean relevantInherited = true;
+	public boolean enabledInherited = true;
+	
+	Vector observers;
+	
+    public TreeElement () {
+    	this(null, 0);
+    }
 
-	/**
-	 * @return The name of this element
-	 */
-	public String getName() {
+    public TreeElement (String name) {
+		this(name, 0);
+	}
+    
+	public TreeElement (String name, int multiplicity) {
+		this.name = name;
+		this.multiplicity = multiplicity;
+		
+		attributes = null;
+		repeatable = false;
+		value = null;
+		children = null;
+	}
+	
+	public boolean isLeaf () {
+		return (children == null);
+	}
+
+	public boolean isChildable () {
+		return (value == null);
+	}
+	
+	public String getName () {
 		return name;
 	}
-
-	/**
-	 * @return The root of the tree containing this element
-	 */
-	public TreeElement getRoot() {
-		return root;
+	
+	public void setName (String name) {
+		this.name = name;
 	}
 
-	/**
-	 * Sets the root of this element. Implementing classes
-	 * are responsible for identifying that the given root
-	 * contains this element
-	 *
-	 * @param root The new root of the tree containing
-	 * this element
-	 */
-	protected abstract void setRoot(TreeElement root);
+	public int getMult() {
+		return multiplicity;
+	}
+	
+	public void setMult (int multiplicity) {
+		this.multiplicity = multiplicity;
+	}
+	
+	public IAnswerData getValue() {
+		return value;
+	}
 
-	/**
-	 * @param element The element to be checked for
-	 * @return true if this element is, or any subtree defined
-	 * by this element contains, the element provided. false
-	 * otherwise.
-	 *
-	 */
-	public abstract boolean contains(TreeElement element);
+	public void setValue(IAnswerData value) {
+		if (isLeaf()) {
+			this.value = value;
+		} else {
+			throw new RuntimeException("Can't set data value for node that has children!");
+		}
+	}
+
+	//may return null! this vector should not be manipulated outside of this class! (namely, don't delete stuff)
+	public Vector getChildren () {
+		return children;
+	}
+
+	public int getNumChildren () {
+		return (children == null ? 0 : children.size());
+	}
+	
+	public TreeElement getChild (String name, int multiplicity) {
+		if (children == null) {
+			return null;
+		} else {		
+			for (int i = 0; i < children.size(); i++) {
+				TreeElement child = (TreeElement)children.elementAt(i);
+				if (name.equals(child.getName()) && child.getMult() == multiplicity)
+					return child;
+			}
+			return null;
+		}
+	}
+
+	public Vector getChild (String name) {
+		return getChild(name, false);
+	}
+	
+	public Vector getChild (String name, boolean includeTemplate) {
+		Vector v = new Vector();
+		
+		if (children != null) {
+			for (int i = 0; i < children.size(); i++) {
+				TreeElement child = (TreeElement)children.elementAt(i);
+				if (child.getName().equals(name) && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
+					v.addElement(child);
+			}
+		}
+		
+		return v;
+	}
+	
+	public void addChild (TreeElement child) {
+		addChild(child, false);
+	}
+	
+	public void addChild(TreeElement child, boolean checkDuplicate) {
+		if (children == null) {
+			if (isChildable()) {
+				children = new Vector();
+			} else {
+				throw new RuntimeException("Can't add children to node that has data value!");
+			}
+		}
+		
+		if (child.multiplicity == TreeReference.INDEX_UNBOUND) {
+			throw new RuntimeException("Cannot add child with an unbound index!");
+		}
+		
+		if (checkDuplicate) {
+			TreeElement existingChild = getChild(child.name, child.multiplicity);
+			if (existingChild != null) {
+				throw new RuntimeException("Attempted to add duplicate child!");
+			}
+		}
+
+		//try to keep things in order
+		int i = children.size();
+		if (child.getMult() == TreeReference.INDEX_TEMPLATE) {
+			TreeElement anchor = getChild(child.getName(), 0);
+			if (anchor != null)
+				i = children.indexOf(anchor);
+		} else {
+			TreeElement anchor = getChild(child.getName(), (child.getMult() == 0 ? TreeReference.INDEX_TEMPLATE : child.getMult() - 1));
+			if (anchor != null)
+				i = children.indexOf(anchor) + 1;
+		}
+		children.insertElementAt(child, i);
+		
+		child.setRelevant(isRelevant(), true);
+		child.setEnabled(isEnabled(), true);
+	}
+	
+	public void removeChild(TreeElement child) {
+		children.removeElement(child);
+		nullChildren();
+	}
+	
+	public void removeChild (String name, int multiplicity) {
+		TreeElement child = getChild(name, multiplicity);
+		if (child != null) {
+			removeChild(child);
+		}
+	}
+
+	public void removeChildren (String name) {
+		removeChildren(name, false);
+	}
+		
+	public void removeChildren (String name, boolean includeTemplate) {
+		Vector v = getChild(name, includeTemplate);
+		for (int i = 0; i < v.size(); i++) {
+			removeChild((TreeElement)v.elementAt(i));
+		}
+	}
+	
+	public void removeChildAt (int i) {
+		children.removeElementAt(i);
+		nullChildren();
+	}
+	
+	private void nullChildren () {
+		if (children.size() == 0)
+			children = null;
+	}
+	
+	public int getChildMultiplicity (String name) {
+		return getChild(name, false).size();
+	}
+	
+	public TreeElement deepCopy (boolean includeTemplates) {
+		TreeElement newNode = new TreeElement(name, multiplicity);
+		newNode.repeatable = repeatable;
+		newNode.dataType = dataType;
+		newNode.relevant = relevant;
+		newNode.required = required;
+		newNode.enabled = enabled;
+		newNode.constraint = constraint;
+		newNode.preloadHandler = preloadHandler;
+		newNode.preloadParams = preloadParams;
+		
+		newNode.setAttributesFromSingleStringVector(getSingleStringAttributeVector());	
+		if(value != null) {
+			newNode.value = value.clone();
+		}
+		
+		for (int i = 0; i < getNumChildren(); i++) {
+			TreeElement child = (TreeElement)children.elementAt(i);
+			if (includeTemplates || child.getMult() != TreeReference.INDEX_TEMPLATE) {
+				newNode.addChild(child.deepCopy(includeTemplates));
+			}
+		}
+		
+		return newNode;
+	}
+	
+	/* ==== MODEL PROPERTIES ==== */
+	
+	//factoring inheritance rules
+	public boolean isRelevant () {
+		return relevantInherited && relevant;
+	}
+	
+	//factoring in inheritance rules
+	public boolean isEnabled () {
+		return enabledInherited && enabled;
+	}
+	
+	/* ==== SPECIAL SETTERS (SETTERS WITH SIDE-EFFECTS) ==== */
+
+	public boolean setAnswer (IAnswerData answer) {
+		if (value != null || answer != null) {
+			setValue(answer);
+			alertStateObservers(FormElementStateListener.CHANGE_DATA);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public void setRequired (boolean required) {
+		if (this.required != required) {		
+			this.required = required;
+	    	alertStateObservers(FormElementStateListener.CHANGE_REQUIRED);
+		}
+	}
+
+	public void setRelevant (boolean relevant) {
+		setRelevant(relevant, false);
+	}
+	
+	public void setRelevant (boolean relevant, boolean inherited) {
+		boolean oldRelevancy = isRelevant();
+		if (inherited) {
+			this.relevantInherited = relevant;
+		} else {
+			this.relevant = relevant; 
+		}
+			
+		if (isRelevant() != oldRelevancy) {		
+			for (int i = 0; i < getNumChildren(); i++) {
+				((TreeElement)children.elementAt(i)).setRelevant(isRelevant(), true);
+			}
+	    	alertStateObservers(FormElementStateListener.CHANGE_RELEVANT);
+		}
+	}
+	
+	public void setEnabled (boolean enabled) {
+		setEnabled(enabled, false);
+	}
+	
+	public void setEnabled (boolean enabled, boolean inherited) {
+		boolean oldEnabled = isEnabled();
+		if (inherited) {
+			this.enabledInherited = enabled;
+		} else {
+			this.enabled = enabled; 
+		}
+			
+		if (isEnabled() != oldEnabled) {		
+			for (int i = 0; i < getNumChildren(); i++) {
+				((TreeElement)children.elementAt(i)).setEnabled(isEnabled(), true);
+			}
+	    	alertStateObservers(FormElementStateListener.CHANGE_ENABLED);
+		}
+	}
+	
+	/* ==== OBSERVER PATTERN ==== */
+	
+	public void registerStateObserver (FormElementStateListener qsl) {
+		if (observers == null)
+			observers = new Vector();
+		
+		if (!observers.contains(qsl)) {
+			observers.addElement(qsl);
+		}
+	}
+	
+	public void unregisterStateObserver (FormElementStateListener qsl) {
+		if (observers != null) {
+			observers.removeElement(qsl);
+			if (observers.isEmpty())
+				observers = null;
+		}
+	}
+	
+	public void unregisterAll () {
+		observers = null;
+	}
+	
+	public void alertStateObservers (int changeFlags) {
+		if (observers != null) {
+			for (Enumeration e = observers.elements(); e.hasMoreElements(); )
+				((FormElementStateListener)e.nextElement()).formElementStateChanged(this, changeFlags);
+		}
+	}
+	
+	/* ==== VISITOR PATTERN ==== */
 
 	/**
 	 * Visitor pattern acceptance method.
-	 * @param visitor The visitor traveling this tree
+	 * 
+	 * @param visitor
+	 *            The visitor traveling this tree
 	 */
 	public void accept(ITreeVisitor visitor) {
 		visitor.visit(this);
+		if (children != null) {
+			Enumeration en = children.elements();
+			while (en.hasMoreElements()) {
+				((TreeElement) en.nextElement()).accept(visitor);
+			}
+		}
 	}
 
-    /**
-     * Returns the number of attributes of this element. */
-    public int getAttributeCount() {
-        return attributes == null ? 0 : attributes.size ();
+	/*
+	 * ==== HARD-CODED ATTRIBUTES (delete once we support writable attributes)
+	 * ====
+	 */
+
+	/**
+	 * Returns the number of attributes of this element.
+	 */
+	public int getAttributeCount() {
+		return attributes == null ? 0 : attributes.size ();
     }
 
 	/**
@@ -97,7 +397,6 @@ public abstract class TreeElement implements Externalizable {
 	public String getAttributeName (int index) {
 		return ((String []) attributes.elementAt (index)) [1];
 	}
-
 
 	/**
 	 * get value of attribute at 'index' in the vector
@@ -154,17 +453,7 @@ public abstract class TreeElement implements Externalizable {
 		attributes.addElement
 			(new String [] {namespace, name, value});
 	}
-
-	public abstract void setName(String name);
-
-	public abstract boolean matchesReference(IDataReference reference);
-
-	public abstract IAnswerData getValue();
-
-	public abstract void setReference(IDataReference reference);
-
-	public abstract void setValue(IAnswerData data);
-
+	
 	/**
 	 * A method for producing a vector of single strings - from the current
 	 * attribute vector of string [] arrays.
@@ -218,7 +507,59 @@ public abstract class TreeElement implements Externalizable {
 				this.setAttribute(array[0], array[1], array[2]);
 			}
 		}
+	}
+	
+	/* ==== SERIALIZATION ==== */
+	
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
+	 */
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		name = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		multiplicity = ExtUtil.readInt(in);
+		repeatable = ExtUtil.readBool(in);
+		value = (IAnswerData)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);	
+		children = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(TreeElement.class), pf));
 
+		dataType = ExtUtil.readInt(in);
+		relevant = ExtUtil.readBool(in);
+		required = ExtUtil.readBool(in);
+		enabled = ExtUtil.readBool(in);
+		relevantInherited = ExtUtil.readBool(in);
+		enabledInherited = ExtUtil.readBool(in);
+		constraint = (Constraint)ExtUtil.read(in, new ExtWrapNullable(Constraint.class), pf);
+		preloadHandler = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		preloadParams = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		
+		Vector attStrings = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(String.class), pf));
+		setAttributesFromSingleStringVector(attStrings);	
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
+	 */
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(name));
+		ExtUtil.writeNumeric(out, multiplicity);
+		ExtUtil.writeBool(out, repeatable);
+		ExtUtil.write(out, new ExtWrapNullable(value == null ? null : new ExtWrapTagged(value)));	
+		ExtUtil.write(out, new ExtWrapList(ExtUtil.emptyIfNull(children)));
+
+		ExtUtil.writeNumeric(out, dataType);
+		ExtUtil.writeBool(out, relevant);
+		ExtUtil.writeBool(out, required);
+		ExtUtil.writeBool(out, enabled);
+		ExtUtil.writeBool(out, relevantInherited);
+		ExtUtil.writeBool(out, enabledInherited);
+		ExtUtil.write(out, new ExtWrapNullable(constraint)); //TODO: inefficient for repeats
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(preloadHandler));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(preloadParams));
+		
+		Vector attStrings = getSingleStringAttributeVector();
+		ExtUtil.write(out, new ExtWrapList(ExtUtil.emptyIfNull(attStrings)));
+	}
 }

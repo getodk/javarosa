@@ -7,5 +7,5 @@ import org.javarosa.core.util.externalizable.Externalizable;
 
 public interface IConditionExpr extends Externalizable {
 	boolean eval (IFormDataModel model, EvaluationContext evalContext);
-	Vector getTriggers (); /* vector of IDataReference */
+	Vector getTriggers (); /* vector of TreeReference */
 }

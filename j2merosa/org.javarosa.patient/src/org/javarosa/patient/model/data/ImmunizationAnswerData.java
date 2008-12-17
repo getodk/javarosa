@@ -59,4 +59,8 @@ public class ImmunizationAnswerData  implements IAnswerData {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		data.writeExternal(out);
 	}
+
+	public IAnswerData clone() {
+		return new ImmunizationAnswerData(data.clone());
+	}
 }

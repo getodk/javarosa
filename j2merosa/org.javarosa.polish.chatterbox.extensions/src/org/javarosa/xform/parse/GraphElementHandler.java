@@ -1,17 +1,18 @@
 package org.javarosa.xform.parse;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.view.chatterbox.widget.GraphWidget;
 import org.kxml2.kdom.Element;
 
 public class GraphElementHandler implements IElementHandler{
-	private Map graphTypes = new Map();
+	private Vector graphTypes = new Vector();
 	
-	public void registerGraphType(String type, int typeVal) {
-		graphTypes.put(type, new Integer(typeVal));
+	public void registerGraphType(String type) {
+		graphTypes.addElement(type);
 	}
 	
 	/* (non-Javadoc)
@@ -26,13 +27,12 @@ public class GraphElementHandler implements IElementHandler{
 		QuestionDef question = XFormParser.parseControl(parent, e, f, controlType);
 		String type = e.getAttributeValue(null,"type");
 		if (type != null) {
-			Integer typeVal = (Integer) graphTypes.get(type);
-			if (typeVal != null) {
-				question.setDataType(typeVal.intValue());
+			if (graphTypes.contains(type)) {
+				question.setAppearanceAttr(type);
 				return;
 			}
 		}
 		//We didn't set the datatype. don't want to get one on accident.
-		question.setDataType(-1);
+		question.setAppearanceAttr(null);
 	}
 }

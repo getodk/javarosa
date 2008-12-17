@@ -7,7 +7,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
 
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -100,5 +102,23 @@ public class ImmunizationRow implements Externalizable {
 			out.writeBoolean(cellEnabled[i]);
 		}
 	}
-
+	public ImmunizationRow clone() {
+		ImmunizationRow clone = new ImmunizationRow();
+		int size = vaccinationDoses.length;
+		clone.vaccinationDoses = new int[size];
+		for(int i = 0; i < size ; ++i) {
+			clone.vaccinationDoses[i] = this.vaccinationDoses[i];
+		}
+		size = vaccinationDates.length;
+		clone.vaccinationDates = new Date[size];
+		for(int i = 0; i < size ; ++i) {
+			clone.vaccinationDates[i] = this.vaccinationDates[i];
+		}
+		size = cellEnabled.length;
+		clone.cellEnabled = new boolean[size];
+		for(int i = 0; i < size ; ++i) {
+			clone.cellEnabled[i] = this.cellEnabled[i];
+		}
+		return clone;
+	}
 }

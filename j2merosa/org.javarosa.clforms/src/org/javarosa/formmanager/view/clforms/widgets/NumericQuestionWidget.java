@@ -1,29 +1,29 @@
 package org.javarosa.formmanager.view.clforms.widgets;
 
-import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class NumericQuestionWidget extends SingleQuestionScreen
 {
 	protected TextField tf;
 
-	public NumericQuestionWidget(QuestionDef question){
+	public NumericQuestionWidget(FormElementBinding question){
 		super(question);
 
 	}
 	
-	public NumericQuestionWidget(QuestionDef prompt, int num) {
+	public NumericQuestionWidget(FormElementBinding prompt, int num) {
 		super (prompt,num);
 	}
-	public NumericQuestionWidget(QuestionDef prompt, String str) {
+	public NumericQuestionWidget(FormElementBinding prompt, String str) {
 		super (prompt,str);
 	}
-	public NumericQuestionWidget(QuestionDef prompt, char c) {
+	public NumericQuestionWidget(FormElementBinding prompt, char c) {
 		super (prompt,c);
 	}
 	
@@ -31,14 +31,14 @@ public class NumericQuestionWidget extends SingleQuestionScreen
 	public void creatView() {
 		//#style textBox
 		 tf = new TextField("", "", 200, TextField.NUMERIC);	
-		 if(qDef.isRequired())
-				tf.setLabel("*"+qDef.getLongText()); //visual symbol for required
+		 if(qDef.instanceNode.required)
+				tf.setLabel("*"+((QuestionDef)qDef.element).getLongText()); //visual symbol for required
 				else
-					tf.setLabel(qDef.getLongText());
+					tf.setLabel(((QuestionDef)qDef.element).getLongText());
 		this.append(tf);
 		this.addNavigationButtons();
-		if (qDef.getHelpText()!=null){
-			setHint(qDef.getHelpText());
+		if (((QuestionDef)qDef.element).getHelpText()!=null){
+			setHint(((QuestionDef)qDef.element).getHelpText());
 		}
 	}
 

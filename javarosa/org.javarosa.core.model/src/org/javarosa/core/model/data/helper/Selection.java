@@ -1,8 +1,9 @@
-package org.javarosa.core.model.data;
+package org.javarosa.core.model.data.helper;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -36,6 +37,10 @@ public class Selection implements Externalizable {
 	public Selection (int index, QuestionDef question) {
 		this.index = index;
 		this.question = question;
+	}
+	
+	public Selection clone () {
+		return new Selection(index, question);
 	}
 	
 	public String getText () {

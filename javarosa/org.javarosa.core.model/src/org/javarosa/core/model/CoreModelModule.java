@@ -25,8 +25,6 @@ public class CoreModelModule implements IModule {
 				"org.javarosa.core.model.QuestionDef",
 				"org.javarosa.core.model.GroupDef",
 				"org.javarosa.core.model.instance.DataModelTree",
-				"org.javarosa.core.model.instance.QuestionDataGroup",
-				"org.javarosa.core.model.instance.QuestionDataElement",
 				"org.javarosa.core.model.data.StringData",
 				"org.javarosa.core.model.data.IntegerData",
 				"org.javarosa.core.model.data.SelectOneData",

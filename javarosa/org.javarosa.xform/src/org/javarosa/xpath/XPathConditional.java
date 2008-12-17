@@ -23,7 +23,7 @@ public class XPathConditional implements IConditionExpr {
 	private XPathExpression expr;
 	
 	public XPathConditional (String xpath) throws XPathSyntaxException {
-		expr = XPathParseTool.parseXPath(xpath);
+		this.expr = XPathParseTool.parseXPath(xpath);
 	}
 	
 	public XPathConditional () {
@@ -39,14 +39,14 @@ public class XPathConditional implements IConditionExpr {
 	}
 	
 	public Vector getTriggers () {
-		Vector v = new Vector();
-		getTriggers(expr, v);
-		return v;
+		Vector triggers = new Vector();
+		getTriggers(expr, triggers);
+		return triggers;
 	}
 	
 	private void getTriggers (XPathExpression x, Vector v) {
 		if (x instanceof XPathPathExpr) {
-			v.addElement(((XPathPathExpr)x).getXPath());
+			v.addElement(((XPathPathExpr)x).getReference());
 		} else if (x instanceof XPathBinaryOpExpr) {
 			getTriggers(((XPathBinaryOpExpr)x).a, v);
 			getTriggers(((XPathBinaryOpExpr)x).b, v);			
@@ -61,7 +61,8 @@ public class XPathConditional implements IConditionExpr {
 	
 	public boolean equals (Object o) {
 		if (o instanceof XPathConditional) {
-			return expr.equals(((XPathConditional)o).expr);
+			XPathConditional cond = (XPathConditional)o;
+			return expr.equals(cond.expr);
 		} else {
 			return false;
 		}

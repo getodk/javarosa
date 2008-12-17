@@ -2,7 +2,7 @@ package org.javarosa.media.image.model;
 
 import java.io.InputStream;
 
-import org.javarosa.core.model.data.IDataPointer;
+import org.javarosa.core.model.data.helper.IDataPointer;
 import org.javarosa.media.image.utilities.FileUtility;
 
 /**

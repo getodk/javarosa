@@ -92,7 +92,8 @@ public class DataModelTreeMetaDataTests extends TestCase{
 			fail("The constructor \"DataModelTreeMetaData(data)\" for DataModelTreeMetaData not properly initialized");
 		}
 		
-		if(d.getFormIdReference()!= data.getFormReferenceId() ){
+		
+		if(d.getFormIdReference()!= data.getFormId() ){
 			fail("The form reference ID in constructor \"DataModelTreeMetaData(data)\" for DataModelTreeMetaData not properly initialized ");
 		}
 	}

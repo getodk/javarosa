@@ -4,17 +4,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.condition.Condition;
-import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 
 /**
  * A data binding is an object that represents how a
@@ -35,19 +32,21 @@ public class DataBinding  implements Externalizable {
 	private String id;
 	private IDataReference ref;
 	private int dataType;
-	//private ... constraints;
-
-	//do getters/setters later
+	
 	public Condition relevancyCondition;
+	public boolean relevantAbsolute;
 	public Condition requiredCondition;
 	public boolean requiredAbsolute;
 	public Condition readonlyCondition;
 	public boolean readonlyAbsolute;
+	public IConditionExpr constraint;
 	
 	private String preload;
 	private String preloadParams;
+	public String constraintMessage;
 	
 	public DataBinding () {
+		relevantAbsolute = true;
 		requiredAbsolute = false;
 		readonlyAbsolute = false;
 	}

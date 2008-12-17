@@ -1,7 +1,9 @@
 package org.javarosa.formmanager.utility;
 
+import org.javarosa.core.model.FormIndex;
+
 public interface FormEntryModelListener {
-	void questionIndexChanged (int questionIndex);
+	void questionIndexChanged (FormIndex questionIndex);
 	void saveStateChanged (int instanceID, boolean dirty);
 	void formComplete ();
 }

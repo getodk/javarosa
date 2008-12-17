@@ -21,7 +21,7 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
-import org.javarosa.core.model.data.BasicDataPointer;
+import org.javarosa.core.model.data.helper.BasicDataPointer;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.media.image.storage.FileRMSUtility;

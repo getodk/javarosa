@@ -49,9 +49,29 @@ public interface IFormElement extends Localizable, Externalizable {
 	 */
 	void addChild (IFormElement fe);
 	
+	IFormElement getChild (int i);
+	
 	/**
-	 * @param binding The binding to direct which children should be returned
-	 * @param result The vector to be filled with this element's children
+	 * @return A recursive count of how many elements are ancestors of this element.
 	 */
-	void getChild(IDataReference binding, Vector result);
+	int getDeepChildCount();
+	
+	/**
+	 * @return The data reference for this element
+	 */
+	IDataReference getBind();
+	
+	/**
+	 * Registers a state observer for this element.
+	 * 
+	 * @param qsl
+	 */
+	public void registerStateObserver (FormElementStateListener qsl);
+	
+	/**
+	 * Unregisters a state observer for this element.
+	 * 
+	 * @param qsl
+	 */
+	public void unregisterStateObserver (FormElementStateListener qsl);
 }

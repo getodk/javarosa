@@ -3,10 +3,12 @@ package org.javarosa.patient.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -63,5 +65,15 @@ public class ImmunizationData {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExternalizableHelperDeprecated.writeExternal(rows, out);
+	}
+	public ImmunizationData clone() {
+		ImmunizationData clone = new ImmunizationData();
+		clone.largestAgeColumn = this.largestAgeColumn;
+		Enumeration en = rows.elements();
+		while(en.hasMoreElements()) {
+			ImmunizationRow row = (ImmunizationRow)en.nextElement();
+			clone.rows.addElement(row.clone());
+		}
+		return clone;
 	}
 }
