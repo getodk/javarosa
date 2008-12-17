@@ -194,7 +194,6 @@
 		<RunTestSuite suite="org.javarosa.xpath.test.XPathEvalTest"/>
 		<RunTestSuite suite="org.javarosa.xform.util.test.XFormAnswerDataSerializerTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.test.QuestionDefTest"/>
-		<RunTestSuite suite="org.javarosa.core.model.FormDefTravelTest"/>
 		<RunTestSuite suite="org.javarosa.core.util.test.NumericEncodingTest"/>
 		<RunTestSuite suite="org.javarosa.core.util.test.PrefixTreeTest"/>
 		<RunTestSuite suite="org.javarosa.core.model.utils.LocalizerTest"/>

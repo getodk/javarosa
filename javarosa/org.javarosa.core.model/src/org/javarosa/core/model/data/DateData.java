@@ -49,7 +49,7 @@ public class DateData implements IAnswerData {
 	}
 	
 	public String getDisplayText () {
-		return DateUtils.getShortStringValue(d);
+		return DateUtils.formatDate(d, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 	}
 
 	/* (non-Javadoc)

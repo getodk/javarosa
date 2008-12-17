@@ -279,7 +279,7 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (o instanceof String) {
 			val = (String)o;
 		} else if (o instanceof Date) {
-			val = DateUtils.getXMLStringValue((Date)o);
+			val = DateUtils.formatDate((Date)o, DateUtils.FORMAT_ISO8601);
 		} else if (o instanceof IExprDataType) {
 			val = ((IExprDataType)o).toString();
 		}
@@ -302,7 +302,7 @@ public class XPathFuncExpr extends XPathExpression {
 			dt.setTime(dt.getTime() + (long)d * 86400000l + 43200000l); //43200000 offset (0.5 day in ms) is needed to handle differing DST offsets!
 			return DateUtils.roundDate(dt);
 		} else if (o instanceof String) {
-			Date d = DateUtils.getDateFromString((String)o);
+			Date d = DateUtils.parseDate((String)o);
 			if (d == null) {
 				throw new XPathTypeMismatchException("converting to date");
 			} else {
