@@ -35,7 +35,7 @@ public class FormEntryController {
 	public int questionAnswered (FormElementBinding binding, IAnswerData data) {
 		if (binding.instanceNode.required && data == null) {
 			return QUESTION_REQUIRED_BUT_EMPTY;
-		} else if (false /*!evalConstraint()*/) { //FIXME
+		} else if (!model.getForm().evaluateConstraint(binding.instanceRef, data)) {
 			return QUESTION_CONSTRAINT_VIOLATED;
 		} else {
 			commitAnswer(binding, data);
@@ -45,7 +45,7 @@ public class FormEntryController {
 	}
 
 	//TODO: constraint isn't checked here, meaning if you 'save' on a question with invalid data entered in, that data will save
-	//without complaint... seems wrong
+	//without complaint... seems wrong (but oh-so right?)
 	public boolean commitAnswer (FormElementBinding binding, IAnswerData data) {
 		if (data != null || binding.getValue() != null) {
 			//we should check if the data to be saved is already the same as the data in the model, but we can't (no IAnswerData.equals())

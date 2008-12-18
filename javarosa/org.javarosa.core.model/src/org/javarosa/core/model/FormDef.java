@@ -8,6 +8,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.model.condition.Condition;
+import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.DataModelTree;
@@ -313,6 +314,19 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			EvaluationContext ec = new EvaluationContext(conditionEvalContext, (TreeReference)v.elementAt(j));
 			c.apply(model, ec);
 		}
+	}
+	
+	public boolean evaluateConstraint (TreeReference ref, IAnswerData data) {
+		TreeElement node = model.resolveReference(ref);
+		Constraint c = node.constraint;
+		if (c == null)
+			return true;
+		
+		EvaluationContext ec = new EvaluationContext(conditionEvalContext, ref);
+		ec.isConstraint = true;
+		ec.candidateValue = data;
+		
+		return c.constraint.eval(model, ec);
 	}
 	
 	/**

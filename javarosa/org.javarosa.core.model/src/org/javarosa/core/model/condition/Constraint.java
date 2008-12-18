@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -19,15 +21,13 @@ public class Constraint implements Externalizable {
 		this.constraintMsg = constraintMsg;
 	}
 	
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
-		// TODO Auto-generated method stub
-		
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		constraint = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		constraintMsg = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		// TODO Auto-generated method stub
-		
+		ExtUtil.write(out, new ExtWrapTagged(constraint));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(constraintMsg));
 	}
-
 }

@@ -764,7 +764,7 @@ public class XFormParser {
 				System.err.println("Invalid XPath expression [" + xpathConstr + "]!");
 				//#endif
 			}
-			binding.constraintMessage = e.getAttributeValue(NAMESPACE_JAVAROSA, "outOfRangeMsg");
+			binding.constraintMessage = e.getAttributeValue(NAMESPACE_JAVAROSA, "constraintMsg");
 		}
 		
 		binding.setPreload(e.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));

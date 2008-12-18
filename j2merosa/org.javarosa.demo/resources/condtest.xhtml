@@ -1,7 +1,8 @@
 <h:html xmlns:h="http://www.w3.org/1999/xhtml"
         xmlns="http://www.w3.org/2002/xforms"
 	  xmlns:ev="http://www.w3.org/2001/xml-events"
-	  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  	  xmlns:jr="http://openrosa.org/javarosa">
 <h:head>
     <h:title>Conditions Test</h:title>
     <model>
@@ -29,8 +30,8 @@
 	</instance>
 	
 	<bind nodeset="a" type="xsd:int" />
-	<bind nodeset="b" type="xsd:int" relevant="../a > 3" />
-	<bind nodeset="c" type="xsd:int" relevant="../a > 3" />
+	<bind nodeset="b" type="xsd:int" relevant="../a > 3" constraint=". > 10" />
+	<bind nodeset="c" type="xsd:int" relevant="../a > 3" constraint=". > ../b + 5" jr:constraintMsg="you suck" />
 	<bind nodeset="d/a" type="xsd:int" />
 	<bind nodeset="d/b" type="xsd:int" relevant="../a > 3" />
 	<bind nodeset="d/c" type="xsd:int" relevant="../a > 3" />
