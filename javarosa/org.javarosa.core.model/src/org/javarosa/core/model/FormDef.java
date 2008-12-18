@@ -317,6 +317,9 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	}
 	
 	public boolean evaluateConstraint (TreeReference ref, IAnswerData data) {
+		if (data == null)
+			return true;
+		
 		TreeElement node = model.resolveReference(ref);
 		Constraint c = node.constraint;
 		if (c == null)
