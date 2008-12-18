@@ -108,6 +108,10 @@ public class XPathPathExpr extends XPathExpression {
 		DataModelTree m = (DataModelTree)model;
 		TreeReference ref = getReference().contextualize(evalContext.getContextRef());
 		
+		if (evalContext.isConstraint && ref.equals(evalContext.getContextRef())) {
+			return unpackValue(evalContext.candidateValue);
+		}
+		
 		//is this a nodeset? it is if the ref contains any unbound multiplicities AND the unbound nodes are repeatable
 		//the way i'm calculating this sucks; there has got to be an easier way to find out if a node is repeatable
 		boolean nodeset = false;
@@ -135,7 +139,10 @@ public class XPathPathExpr extends XPathExpression {
 			throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
 		}
 		
-		IAnswerData val = node.getValue();
+		return unpackValue(node.getValue());
+	}
+	
+	private static Object unpackValue (IAnswerData val) {
 		if (val == null) {
 			return "";
 		} else if (val instanceof IntegerData) {
@@ -151,7 +158,7 @@ public class XPathPathExpr extends XPathExpression {
 		} else if (val instanceof DateData) {
 			return val.getValue();
 		} else {
-			return val.getValue();
+			return val.getValue(); //is this a good idea?
 		}
 	}
 	
