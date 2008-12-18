@@ -21,6 +21,11 @@ import org.javarosa.xform.parse.XFormParser;
 public class XFormUtils {
 	public static FormDef getFormFromResource (String resource) {
 		InputStream is = System.class.getResourceAsStream(resource);
+		if (is == null) {
+			System.err.println("Can't find form resource \"" + resource + "\". Is it in the JAR?");
+			return null;
+		}
+		
 		return getFormFromInputStream(is);
 	}
 

@@ -156,7 +156,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     private void jumpToQuestion (FormIndex questionIndex) {
     	boolean newRepeat = false;
     	
-    	if (questionIndex.isInForm() && !model.isRelevant(questionIndex)) //FIXME relevancy
+    	if (questionIndex.isInForm() && !model.isRelevant(questionIndex))
 			throw new IllegalStateException();
 
 		// Determine what should and shouldn't be pinned.
