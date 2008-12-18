@@ -39,6 +39,7 @@ import org.javarosa.formmanager.utility.RMSRetreivalMethod;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
+import org.javarosa.polish.activity.loadingscreen.LoadingScreenActivity;
 
 public class FormEntryActivity implements IActivity, IControllerHost, CommandListener {
 
@@ -63,10 +64,11 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 
 	private IFormEntryViewFactory viewFactory;
 
-	private ContextPreloadHandler contextHandler;
+	private FormLoadActivity formLoader = null;
 	
-	FormDefFetcher fetcher;
-
+	private LoadingScreenActivity loadingScreen = null;
+	
+	private int instanceID = -1;
 
 	/** Loading error string **/
 	private final static String LOAD_ERROR = "Deepest Apologies. The form could not be loaded.";
@@ -74,8 +76,9 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	public FormEntryActivity(IShell parent, IFormEntryViewFactory viewFactory) {
 		this.parent = parent;
 		this.viewFactory = viewFactory;
-		this.fetcher = new FormDefFetcher();
-		this.fetcher.setFetcher(new RMSRetreivalMethod());
+		
+		this.formLoader = new FormLoadActivity(this);
+		this.loadingScreen = new LoadingScreenActivity(this.parent);
 	}
 
 	public void contextChanged(Context context) {
@@ -90,50 +93,31 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		}
 	}
 
-	public void start (Context context) {
-		FormDef theForm = null;
-		int instanceID = -1;
-
-		if (context instanceof FormEntryContext) {
-			this.context = (FormEntryContext) context;
-			instanceID = this.context.getInstanceID();
-		}
+	public void returnFromLoading(FormEntryContext context) {
+		// Kill the thread for the loading screen
+		this.loadingScreen.halt();
+		this.loadingScreen = null;
 		
-		theForm = fetcher.getFormDef(context);
-		if (theForm != null) {
-
-			try {
-				if (instanceID != -1) {
-					DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
-					IFormDataModel theModel = new DataModelTree();
-					modelUtil.retrieveFromRMS(this.context.getInstanceID(), theModel);
-					theForm.setDataModel(theModel);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (DeserializationException uee) {
-				uee.printStackTrace();
-			}
-			
-			theForm.setEvaluationContext(initEvaluationContext());
-			initPreloadHandlers(theForm); // must always load; even if we won't preload, we may still post-process!
-
-			theForm.initialize(instanceID == -1);
-
-			model = new FormEntryModel(theForm, instanceID);
+		// get the form
+		FormDef theForm = (FormDef)context.getElement("theForm");
+		context = null;
+	
+		if( theForm != null){
+			model = new FormEntryModel(theForm, this.instanceID);
 			controller = new FormEntryController(model, this);
 			String viewString = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(FormManagerProperties.VIEW_TYPE_PROPERTY);
+			System.out.println("making view! " + viewString + model + controller);
 			view = viewFactory.getFormEntryView(viewString, model, controller);
+			System.out.println("setting context");
 			view.setContext(this.context);
 			controller.setView(view);
-
+	
+			System.out.println("showing view!");
 			view.show();
-			
 		} else {
 			displayError(LOAD_ERROR);
 		}
 	}
-
 	
 	private IAnswerData getAnswerData(String type, Object value) {
 		if (Constants.RETURN_ARG_TYPE_DATA_POINTER_LIST.equals(type)) {
@@ -144,34 +128,22 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			throw new RuntimeException("Unable to build answer data for return type: " + type);
 		}
 	}
-
 	
-	private void initPreloadHandlers (FormDef f) {
-		Vector preloadHandlers = this.context.getPreloadHandlers();
-		if(preloadHandlers != null) {
-			Enumeration en = preloadHandlers.elements();
-			while(en.hasMoreElements()) {
-				f.getPreloader().addPreloadHandler((IPreloadHandler)en.nextElement());
-			}
-		}
-
-		//set handler for preload context
-		contextHandler = new ContextPreloadHandler(context);
-		f.getPreloader().addPreloadHandler(contextHandler);
-	}
-	
-	private EvaluationContext initEvaluationContext () {
-		EvaluationContext ec = new EvaluationContext();
+	public void start (Context context) {
+		this.instanceID = -1;
 		
-		Vector functionHandlers = this.context.getFunctionHandlers();
-		if(functionHandlers != null) {
-			Enumeration en = functionHandlers.elements();
-			while(en.hasMoreElements()) {
-				ec.addFunctionHandler((IFunctionHandler)en.nextElement());
-			}
+		if (context instanceof FormEntryContext) {
+			this.context = (FormEntryContext) context;
+			this.instanceID = this.context.getInstanceID();
 		}
 		
-		return ec;
+		// Start the loading screen
+		//#if javarosa.useloadingscreen
+		this.loadingScreen.start(context);
+		//#endif
+		
+		// Start loading the form
+		this.formLoader.start(context);
 	}
 
 	public void halt () {
@@ -240,7 +212,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	}
 	
 	public void setRetrievalMethod(IFormDefRetrievalMethod method) {
-		fetcher.setFetcher(method);
+		this.formLoader.setRetrievalMethod(method);
 	}
 	
 	/*
