@@ -8,6 +8,7 @@ import java.util.Vector;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
@@ -139,6 +140,8 @@ public class XPathPathExpr extends XPathExpression {
 			return "";
 		} else if (val instanceof IntegerData) {
 			return new Double(((Integer)val.getValue()).doubleValue());
+		} else if (val instanceof DecimalData) {
+			return val.getValue();			
 		} else if (val instanceof StringData) {
 			return val.getValue();
 		} else if (val instanceof SelectOneData) {
