@@ -111,8 +111,9 @@ public class JavaRosaDemoShell implements IShell {
 
 		if (lastActivity != currentActivity) {
 			System.out.println("Received 'return' event from activity other than the current activity" +
-					" (such as a background process). Can't handle this yet");
-			return;
+					" (such as a background process). Can't handle this yet.  Saw: " +
+					lastActivity + " but expecting: " + currentActivity);
+			return; 
 		}
 
 		if (returnCode == Constants.ACTIVITY_SUSPEND || returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
