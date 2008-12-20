@@ -54,7 +54,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	/**
 	 * The actual data to be sent
 	 */
-	private byte[] payloadData;
+	private IDataPayload payloadData;
 	/**
 	 * The actual data returned
 	 */
@@ -96,7 +96,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @param destination
 	 * @param sender
 	 */
-	public TransportMessage(byte[] payloadData, ITransportDestination destination,
+	public TransportMessage(IDataPayload payloadData, ITransportDestination destination,
 			String sender, int modelId) {
 		super();
 		this.payloadData = payloadData;
@@ -113,7 +113,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @param destination
 	 * @param sender
 	 */
-	public TransportMessage(byte[] payloadData, ITransportDestination destination,
+	public TransportMessage(IDataPayload payloadData, ITransportDestination destination,
 			String sender, int modelId, byte [] replyloadDataIn) {
 		super();
 		this.payloadData = payloadData;
@@ -133,7 +133,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	/**
 	 * @return the payloadData
 	 */
-	public byte[] getPayloadData() {
+	public IDataPayload getPayloadData() {
 		return payloadData;
 	}
 
@@ -141,7 +141,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @param payloadData
 	 *            the payloadData to set
 	 */
-	public void setPayloadData(byte[] payloadData) {
+	public void setPayloadData(IDataPayload payloadData) {
 		this.payloadData = payloadData;
 	}
 
@@ -195,10 +195,10 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		int length = in.readInt();
-		this.payloadData = new byte[length];
+		payloadData = (IDataPayload)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		//this.payloadData = new byte[length];
 		// int noOfBytesRead = in.read(this.payloadData);
-		in.read(this.payloadData);
+		//in.read(this.payloadData);
 		
 		this.destination = (ITransportDestination) ExtUtil.read(in,new ExtWrapTagged(),pf);
 		
@@ -207,7 +207,7 @@ public class TransportMessage extends Observable implements Externalizable {
 		this.recordId = in.readInt();
 		this.status = in.readInt();
 		this.modelId = in.readInt();
-		length = in.readInt();
+		int length = in.readInt();
 		this.replyloadData = new byte[length];
 		in.read(this.replyloadData);
 	}
@@ -217,8 +217,11 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeInt(this.payloadData.length);
-		out.write(this.payloadData);
+		
+		//TODO: Restore the ability to deserialize Stream.
+		//out.writeInt(this.payloadData.length);
+		//out.write(this.payloadData);
+		ExtUtil.write(out, new ExtWrapTagged(this.payloadData));
 		ExtUtil.write(out, new ExtWrapTagged(this.destination));
 		out.writeUTF(this.sender);
 		out.writeLong(this.timestamp.getTime());

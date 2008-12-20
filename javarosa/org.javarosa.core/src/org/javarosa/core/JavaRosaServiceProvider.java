@@ -92,6 +92,11 @@ public class JavaRosaServiceProvider {
 	
 	public ITransportManager getTransportManager() {
 		if(transportManager == null) {
+			String[] classes = {
+					"org.javarosa.core.services.transport.ByteArrayPayload",
+					"org.javarosa.core.services.transport.MultiMessagePayload"
+			};		
+			registerPrototypes(classes);
 			transportManager = new TransportManager(new RmsStorage());
 			this.registerService(transportManager);
 		}

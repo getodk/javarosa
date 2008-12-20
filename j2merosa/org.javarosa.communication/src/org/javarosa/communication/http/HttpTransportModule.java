@@ -10,7 +10,8 @@ public class HttpTransportModule implements IModule {
 	public void registerModule(Context context) {
 		
 		String[] classes = {
-				"org.javarosa.communication.http.HttpTransportDestination",				
+				"org.javarosa.communication.http.HttpTransportDestination",
+				"org.javarosa.communication.http.HttpTransportHeader"
 		};		
 		JavaRosaServiceProvider.instance().registerPrototypes(classes);
 		

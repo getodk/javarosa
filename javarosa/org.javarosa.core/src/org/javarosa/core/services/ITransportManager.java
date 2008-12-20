@@ -3,6 +3,7 @@ package org.javarosa.core.services;
 import java.io.IOException;
 import java.util.Enumeration;
 
+import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -29,7 +30,7 @@ public interface ITransportManager extends IService {
 	 * @param formDataId The ID of the form that should be transmitted
 	 * @throws IOException If the transport method requested is not available 
 	 */
-	public abstract void enqueue(byte[] data, ITransportDestination destination,
+	public abstract void enqueue(IDataPayload data, ITransportDestination destination,
 			int transportMethod, int formDataId) throws IOException;
 
 	/**

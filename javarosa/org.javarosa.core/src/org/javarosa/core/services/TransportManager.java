@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.Storage;
@@ -89,7 +90,7 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.ITransportManager#enqueue(byte[], java.lang.String, int, int)
 	 */
-	public void enqueue(byte[] data, ITransportDestination destination, int transportMethod, int formDataId)
+	public void enqueue(IDataPayload data, ITransportDestination destination, int transportMethod, int formDataId)
 			throws IOException {
 		TransportMessage message = new TransportMessage(data, destination, ID, formDataId);
 		enqueue(message, transportMethod);
