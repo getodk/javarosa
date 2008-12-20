@@ -26,6 +26,7 @@ import org.javarosa.core.api.IView;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -403,7 +404,7 @@ public class FormTransportActivity implements
 	public void sendData(int transportMethod) throws IOException {
 		if(this.data != null) {
 			byte[] dataBytes =  dataModelSerializer.serializeDataModel(data);
-			JavaRosaServiceProvider.instance().getTransportManager().enqueue(dataBytes,
+			JavaRosaServiceProvider.instance().getTransportManager().enqueue(new ByteArrayPayload(dataBytes, null, Constants.PAYLOAD_TYPE_TEXT),
 					destination, transportMethod, this.data.getId());
 		}else{
 			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,

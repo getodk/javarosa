@@ -8,21 +8,19 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.communication.http.HttpTransportDestination;
-import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.TransportManager;
+import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.core.util.Observable;
 import org.javarosa.core.util.Observer;
-//import org.javarosa.datadyne.properties.EpisurveyorPropertyRules;
 import org.javarosa.formmanager.view.ProgressScreen;
 import org.javarosa.xform.util.XFormUtils;
 
@@ -57,7 +55,7 @@ public class GetFormHttpActivity implements IActivity,CommandListener,Observer {
 	public void fetchForm(){
 		ITransportDestination requestDest= new HttpTransportDestination(getFormUrl);
 		message = new TransportMessage();
-		message.setPayloadData("".getBytes()); // TODO change this to send xml msg with search options /uname, form type
+		message.setPayloadData(new ByteArrayPayload("".getBytes(),null,Constants.PAYLOAD_TYPE_TEXT)); // TODO change this to send xml msg with search options /uname, form type
 		message.setDestination(requestDest);
 		message.addObserver(this);
 

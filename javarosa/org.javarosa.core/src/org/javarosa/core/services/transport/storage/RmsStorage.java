@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import javax.microedition.rms.RecordStoreException;
+
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.storage.utilities.IRecordStorage;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
@@ -12,6 +14,7 @@ import org.javarosa.core.services.transport.Storage;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * A Storage type for Transport Messages that utilizes RMS storage
@@ -130,7 +133,8 @@ public class RmsStorage implements Storage {
 			init();
 			byte[] data = messageRecordStore.getRecord(recordId);
 			TransportMessage message = new TransportMessage();
-			ExtUtil.deserialize(data, message);
+			PrototypeFactory factory = new PrototypeFactory(JavaRosaServiceProvider.instance().getPrototypes());
+			message = (TransportMessage)ExtUtil.deserialize(data, message.getClass(), factory);
 			return message;
 		} catch (RecordStorageException e) {
 			//#if debug.output==verbose || debug.output==exception

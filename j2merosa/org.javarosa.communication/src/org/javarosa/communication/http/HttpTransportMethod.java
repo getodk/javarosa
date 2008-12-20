@@ -12,6 +12,7 @@ import javax.microedition.io.HttpConnection;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
@@ -117,10 +118,21 @@ public class HttpTransportMethod implements TransportMethod {
 				con.setRequestProperty("Content-Language", "en-US");
 
 				out = con.openOutputStream();
-				out.write(message.getPayloadData());
+				
+				IDataPayload payload = message.getPayloadData();
+				HttpHeaderAppendingVisitor visitor = new HttpHeaderAppendingVisitor();
+				IDataPayload httpload = (IDataPayload)payload.accept(visitor);
+				
+				InputStream valueStream = httpload.getPayloadStream();
+				int val = valueStream.read();
+				while(val != -1) {
+					out.write(val);
+					val = valueStream.read();
+				}
 				//#if debug.output==verbose
-				System.out.println("PAYLOADDATA:"+new String(message.getPayloadData())+"\nENDPLDATA\n");
+				//System.out.println("PAYLOADDATA:"+new String(message.getPayloadData())+"\nENDPLDATA\n");
 				//#endif
+				valueStream.close();
 				out.flush();
 
 				responseCode = con.getResponseCode();
