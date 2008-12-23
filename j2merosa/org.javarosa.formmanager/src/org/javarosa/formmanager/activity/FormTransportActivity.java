@@ -29,6 +29,7 @@ import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
+import org.javarosa.core.services.transport.MultiMessagePayload;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.formmanager.utility.TransportContext;

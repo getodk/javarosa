@@ -69,7 +69,7 @@ public class MultiInputStream extends InputStream {
 		
 		//Loop through the available streams until we read something that isn't 
 		//an end of stream
-		while(next != -1 && currentStream + 1 < streams.size()) {
+		while(next == -1 && currentStream + 1 < streams.size()) {
 			currentStream++;
 			cur = ((InputStream)streams.elementAt(currentStream));
 			next = cur.read();

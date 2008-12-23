@@ -29,7 +29,6 @@ public class HttpTransportHeader implements IDataPayload {
 	Hashtable headers = new Hashtable();
 	
 	public HttpTransportHeader() {
-		headers.put("Content-type","text/plain");
 	}
 	
 	public void addHeader(String key, String value) {

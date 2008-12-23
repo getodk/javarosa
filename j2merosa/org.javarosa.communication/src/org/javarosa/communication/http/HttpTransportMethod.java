@@ -1,5 +1,6 @@
 package org.javarosa.communication.http;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -119,6 +120,8 @@ public class HttpTransportMethod implements TransportMethod {
 
 				out = con.openOutputStream();
 				
+				//ByteArrayOutputStream bis = new ByteArrayOutputStream();  For Testing!
+				
 				IDataPayload payload = message.getPayloadData();
 				HttpHeaderAppendingVisitor visitor = new HttpHeaderAppendingVisitor();
 				IDataPayload httpload = (IDataPayload)payload.accept(visitor);
@@ -126,9 +129,14 @@ public class HttpTransportMethod implements TransportMethod {
 				InputStream valueStream = httpload.getPayloadStream();
 				int val = valueStream.read();
 				while(val != -1) {
+					//bis.write(val);  For Testing!
 					out.write(val);
 					val = valueStream.read();
 				}
+				//byte[] newArr = bis.toByteArray(); For Testing!
+				//String theVal = new String(newArr); For Testing!
+				//System.out.println(theVal); For Testing!
+				
 				//#if debug.output==verbose
 				//System.out.println("PAYLOADDATA:"+new String(message.getPayloadData())+"\nENDPLDATA\n");
 				//#endif
