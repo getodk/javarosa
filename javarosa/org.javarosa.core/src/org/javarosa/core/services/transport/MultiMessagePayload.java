@@ -15,7 +15,7 @@ import org.javarosa.core.util.MultiInputStream;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapTagged;
+import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -25,7 +25,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class MultiMessagePayload implements IDataPayload {
 	/** IDataPayload **/
-	Vector payloads;
+	Vector payloads = new Vector();
 	
 	/**
 	 * Note: Only useful for serialization.
@@ -72,7 +72,8 @@ public class MultiMessagePayload implements IDataPayload {
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
-		payloads = (Vector)ExtUtil.read(in, new ExtWrapList(new ExtWrapTagged()), pf);
+		//payloads = (Vector)ExtUtil.read(in, new ExtWrapList(new ExtWrapTagged()), pf);
+		payloads = (Vector)ExtUtil.read(in, new ExtWrapListPoly(), pf);
 	}
 
 	/*
@@ -80,7 +81,8 @@ public class MultiMessagePayload implements IDataPayload {
 	 * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, new ExtWrapList(payloads));
+		//ExtUtil.write(out, new ExtWrapList(payloads));
+		ExtUtil.write(out, new ExtWrapListPoly(payloads));
 	}
 	
 	public Object accept(IDataPayloadVisitor visitor) {

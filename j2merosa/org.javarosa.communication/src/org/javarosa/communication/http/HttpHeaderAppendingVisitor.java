@@ -27,6 +27,7 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 	
 	private HttpHeaderAppendingVisitor(String divider) {
 		this.divider = divider;
+		this.top = false;
 	}
 	
 	/* (non-Javadoc)
