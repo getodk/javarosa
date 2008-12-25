@@ -10,13 +10,14 @@ package org.javarosa.communication.sms;
 
 import java.util.Vector;
 
+import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.TransportMessage;
 
 public class SMSSplitTransportMessage implements SplitTransportMessage {
 
 	private Vector messageParts;
 	private int formID;
-	private byte[] payload;
+	private IDataPayload payload;
 	
 	
 	public SMSSplitTransportMessage(TransportMessage tm) {
@@ -24,7 +25,7 @@ public class SMSSplitTransportMessage implements SplitTransportMessage {
 		this.payload = tm.getPayloadData();
 	}
 	
-	public void setPayloadData(byte[] payload) {
+	public void setPayloadData(IDataPayload payload) {
 		this.payload = payload;
 	}
 	
@@ -45,7 +46,7 @@ public class SMSSplitTransportMessage implements SplitTransportMessage {
 		// Define the number of message parts we will need based on the size of
 		// the message payload and the metadata
 		int maxPayload = SmsTransportProperties.MAX_SMS_SIZE - metaData(0,0).length();
-		int numParts = payload.length / maxPayload;
+		/** int numParts = payload.length / maxPayload;
 		if(payload.length % maxPayload == 0)
 			numParts ++;
 		
@@ -59,7 +60,7 @@ public class SMSSplitTransportMessage implements SplitTransportMessage {
 		
 			// Add the message part to the vector
 			messageParts.addElement(part);
-		}
+		} **/
 	}
 	
 	/**

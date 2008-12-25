@@ -29,7 +29,6 @@ import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
-import org.javarosa.core.services.transport.MultiMessagePayload;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.formmanager.utility.TransportContext;
@@ -250,7 +249,8 @@ public class FormTransportActivity implements
 			switch (submitScreen.getCommandChoice()) {
 			case SubmitScreen.SEND_NOW_DEFAULT:
 				ITransportManager tmanager = JavaRosaServiceProvider.instance().getTransportManager();
-				ITransportDestination destination = tmanager.getDefaultTransportDestination(tmanager.getCurrentTransportMethod());
+				currentMethod = tmanager.getCurrentTransportMethod();
+				ITransportDestination destination = tmanager.getDefaultTransportDestination(currentMethod);
 				if (destination != null) {
 					this.setDestination(destination);
 					try {
@@ -361,8 +361,9 @@ public class FormTransportActivity implements
 				TransportMessage message = (TransportMessage) elementAt(
 						selected, JavaRosaServiceProvider.instance()
 								.getTransportManager().getMessages());
+				ITransportManager manager = JavaRosaServiceProvider.instance().getTransportManager();
 				JavaRosaServiceProvider.instance().getTransportManager().send(
-						message, TransportMethod.HTTP_GCF);
+						message, manager.getCurrentTransportMethod());
 			}
 		}  else if (d == submitStatusScreen) {
 			submitStatusScreen.destroy();

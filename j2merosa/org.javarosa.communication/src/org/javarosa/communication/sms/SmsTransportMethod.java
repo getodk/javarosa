@@ -1,6 +1,8 @@
 package org.javarosa.communication.sms;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.microedition.io.Connector;
 import javax.wireless.messaging.MessageConnection;
@@ -80,7 +82,14 @@ public class SmsTransportMethod implements TransportMethod {
 				tmsg.setAddress(destinationUrl);
 				
 				// Load payload and send text message
-				String payload = new String(message.getPayloadData());
+				InputStream istream = message.getPayloadData().getPayloadStream();
+				ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+				int val = istream.read();
+				while(val != -1) {
+					ostream.write(val);
+					val = istream.read();
+				}
+				String payload = new String(ostream.toByteArray());
 				tmsg.setPayloadText(payload);
 				System.out.println("SMS Payload: " + payload);
 				mconn.send(tmsg);
