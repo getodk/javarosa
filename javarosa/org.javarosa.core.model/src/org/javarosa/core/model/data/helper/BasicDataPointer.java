@@ -1,4 +1,4 @@
-package org.javarosa.core.model.data;
+package org.javarosa.core.model.data.helper;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
