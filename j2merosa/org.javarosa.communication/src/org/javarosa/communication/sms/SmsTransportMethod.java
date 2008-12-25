@@ -1,8 +1,21 @@
+/**
+ * Class:	SmsTransportMethod
+ * @author 	vijayu
+ * Desc:	This class represents a transport method using SMS and the procedures for
+ * 			transmitting a TransportMessage using the SMS protocol.  The defining feature
+ * 			of SMS is the character limit imposed for a given SMS message.  To account for
+ * 			this, we use a SMSSplitTransportMessage to automatically split the message into
+ * 			parts that we know will each fit into SMS messages with easy to parse metadata
+ * 			for each message part.
+ */
+
+//TODO: Handle Incoming SMS Messages - right now, our thread only transmits
+
 package org.javarosa.communication.sms;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Enumeration;
 
 import javax.microedition.io.Connector;
 import javax.wireless.messaging.MessageConnection;
@@ -76,24 +89,26 @@ public class SmsTransportMethod implements TransportMethod {
 			// Open an SMS Message connection to send the messages
 			String destinationUrl = ((SmsTransportDestination)message.getDestination()).getSmsAddress();
 			try {
+				SMSSplitTransportMessage sp = new SMSSplitTransportMessage(message);
+				sp.splitMessage();
+				
 				// Set destination URL from TransportMessage data
 				mconn = (MessageConnection)Connector.open(destinationUrl);
-				TextMessage tmsg = (TextMessage)mconn.newMessage(MessageConnection.TEXT_MESSAGE);
-				tmsg.setAddress(destinationUrl);
 				
-				// Load payload and send text message
-				InputStream istream = message.getPayloadData().getPayloadStream();
-				ByteArrayOutputStream ostream = new ByteArrayOutputStream();
-				int val = istream.read();
-				while(val != -1) {
-					ostream.write(val);
-					val = istream.read();
+				Enumeration e = sp.getMessageParts().elements();
+				TextMessage tmsg;	
+				
+				while(e.hasMoreElements()) {
+					tmsg = (TextMessage)mconn.newMessage(MessageConnection.TEXT_MESSAGE);
+					tmsg.setAddress(destinationUrl);
+					String payload = new String(((ByteArrayOutputStream)e.nextElement()).toByteArray());
+					System.out.println("SMS Payload: " + payload);
+					
+					mconn.send(tmsg);
+					tmsg = null;
 				}
-				String payload = new String(ostream.toByteArray());
-				tmsg.setPayloadText(payload);
-				System.out.println("SMS Payload: " + payload);
-				mconn.send(tmsg);
 				
+
 			} catch (IOException e) {
 				System.err.println("Error sending SMS message");
 				e.printStackTrace();

@@ -8,6 +8,9 @@
 
 package org.javarosa.communication.sms;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Vector;
 
 import org.javarosa.core.services.transport.IDataPayload;
@@ -38,29 +41,47 @@ public class SMSSplitTransportMessage implements SplitTransportMessage {
 	}
 	
 	public void splitMessage() {
-		
+		System.out.println("SPLITTING MESSAGE");
 		// Create a new vector to store the message strings
 		if(messageParts == null)
 			messageParts = new Vector();
 		
 		// Define the number of message parts we will need based on the size of
 		// the message payload and the metadata
+		//FIXME: This only handles messages of <10 parts!
 		int maxPayload = SmsTransportProperties.MAX_SMS_SIZE - metaData(0,0).length();
-		/** int numParts = payload.length / maxPayload;
-		if(payload.length % maxPayload == 0)
-			numParts ++;
-		
-		for(int i = 0; i < numParts; i++) {
-			byte[] part = new byte[SmsTransportProperties.MAX_SMS_SIZE];
-			byte[] meta = metaData(i+1,numParts).getBytes();
+		System.out.println("Max Payload: "+maxPayload);
+		int numParts = payload.getLength() / maxPayload;
+		System.out.println("Num Parts: "+numParts+1);
+		if(payload.getLength() % maxPayload > 0)
+			numParts++;
+		try {
+			InputStream istream = payload.getPayloadStream();
+			int currentPart = 0;
 			
-			// Create a byte[] with metadata and partial payload data for each message part
-			System.arraycopy(meta, 0, part, 0, meta.length);
-			System.arraycopy(payload, i*maxPayload, part, meta.length, maxPayload);
-		
-			// Add the message part to the vector
-			messageParts.addElement(part);
-		} **/
+			while(currentPart < numParts) {
+				ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+				byte[] meta = metaData(currentPart+1,numParts).getBytes();
+				int byteCounter = 0;
+				ostream.write(meta);
+				
+				byte nextByte = (byte) istream.read();
+				
+				while(nextByte != -1 && byteCounter < maxPayload) {
+					ostream.write(nextByte);
+					byteCounter++;
+					nextByte = (byte) istream.read();
+				}
+				
+				messageParts.addElement(ostream);
+				currentPart++;
+			}
+			
+		}
+		catch(IOException e) {
+			System.err.println("IO Exception while splitting payload");
+		}
+			
 	}
 	
 	/**
