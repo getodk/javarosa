@@ -93,4 +93,8 @@ public class ByteArrayPayload implements IDataPayload {
 	public int getPayloadType() {
 		return type;
 	}
+
+	public int getLength() {
+		return payload.length;
+	}
 }

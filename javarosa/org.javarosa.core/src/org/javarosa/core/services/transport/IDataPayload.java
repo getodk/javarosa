@@ -36,4 +36,6 @@ public interface IDataPayload extends Externalizable {
 	 * @param visitor The visitor to visit this payload.
 	 */
 	public Object accept(IDataPayloadVisitor visitor);
+	
+	public int getLength();
 }

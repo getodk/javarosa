@@ -72,4 +72,13 @@ public class HttpTransportHeader implements IDataPayload {
 	public int getPayloadType() {
 		return 0;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.services.transport.IDataPayload#getLength()
+	 */
+	public int getLength() {
+		//Unimplemented for now
+		return -1;
+	}
 }
