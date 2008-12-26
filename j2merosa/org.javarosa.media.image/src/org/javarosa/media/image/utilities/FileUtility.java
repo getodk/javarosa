@@ -107,7 +107,7 @@ public class FileUtility {
 			}				
 			fos = file.openOutputStream();
 			fos.write(data);
-		} catch (Exception ex) {				
+		} catch (IOException ex) {				
 			handleException(ex);
 			return false;
 		} 
@@ -309,7 +309,9 @@ public class FileUtility {
 			if (connection != null)
 				connection.close();
 		}
-		catch(Exception e) {}
+		catch(IOException e) {
+			
+		}
 	}
 	
 	private static void handleException(Exception ex) {

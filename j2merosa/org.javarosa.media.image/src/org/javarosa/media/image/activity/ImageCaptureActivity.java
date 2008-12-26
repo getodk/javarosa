@@ -3,13 +3,10 @@ package org.javarosa.media.image.activity;
 import java.io.IOException;
 import java.util.Hashtable;
 
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Image;
 import javax.microedition.media.Manager;
 import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
@@ -21,10 +18,8 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
-import org.javarosa.core.model.data.helper.BasicDataPointer;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
-import org.javarosa.media.image.storage.FileRMSUtility;
 import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.view.CameraCanvas;
 
@@ -50,7 +45,6 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	private Command mBackCommand;
 	private Command mCaptureCommand;
 	private IDisplay display;
-	private FileRMSUtility dataModel;
 	private byte[] imageData;
 	private int width;
 	private int height;
@@ -59,7 +53,6 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	public ImageCaptureActivity(IShell shell) {
 		this.shell = shell;
 		display = JavaRosaServiceProvider.instance().getDisplay();
-		dataModel = new FileRMSUtility("image_store");
 		width = 640;
 		height = 480;
 	}
@@ -81,13 +74,11 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	}
 
 	public void halt() {
-		// TODO Auto-generated method stub
-		
+		// no need to modify the default behavior
 	}
 
 	public void resume(Context globalContext) {
-		// TODO Auto-generated method stub
-		
+		// no need to modify the default behavior
 	}
 
 	public void setShell(IShell shell) {
@@ -101,19 +92,12 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		showCamera();
 	}
 	
-	public void setResolition(int width, int height) {
+	public void setResolution(int width, int height) {
 		this.width = width;
 		this.height = height;
 		
 	}
-	/**
-	 * Actually capture an image
-	 * 
-	 */
-	private FileDataPointer captureImage() {
-		return null;
-	}
-
+	
 	
 	/**
 	 * takes the selected image return it (and control) to the shell
@@ -209,6 +193,9 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	}
 	
 	
+	/**
+	 * This method was used in memory profiling to loop take images at different resolutions until it fails
+	 */
 	private void doCaptureLoop() {
 		byte[] jpg;
 		// add a loop to do this a lot and write them to individual files so we know when we fail
@@ -243,11 +230,6 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		saveFile("photo_log" + System.currentTimeMillis() + ".txt", text.getBytes());
 	}
 	
-	private boolean saveImageToRMS(String filename, byte[] image) {
-		Image imageObj = Image.createImage(image, 0, image.length);
-		dataModel.saveImage(filename, image);
-		return true;
-	}
 	
 	private String saveFile(String filename, byte[] image) {
 		String rootName = FileUtility.getDefaultRoot();
@@ -262,15 +244,6 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		}
 		
 	}
-
 	
-	
-	public void showAlert(String error) {
-		// TODO: should these be polished?
-		Alert alert = new Alert(error);
-		alert.setTimeout(Alert.FOREVER);
-		alert.setType(AlertType.ERROR);
-		//display.setView(alert);
-	}
 	
 }

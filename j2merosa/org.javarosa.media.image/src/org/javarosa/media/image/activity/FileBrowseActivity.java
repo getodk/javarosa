@@ -1,20 +1,33 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development
+ * and Distribution License (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at http://www.netbeans.org/cddl.html
+ * or http://www.netbeans.org/cddl.txt.
+ *
+ * When distributing Covered Code, include this CDDL Header Notice in each file
+ * and include the License file at http://www.netbeans.org/cddl.txt.
+ * If applicable, add the following below the CDDL Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ */
+
 package org.javarosa.media.image.activity;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import javax.microedition.io.Connector;
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
-import javax.microedition.lcdui.TextBox;
-import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -25,6 +38,16 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.media.image.utilities.FileUtility;
+
+/**
+ * The <code>FileBrowser</code> custom component lets the user list files and
+ * directories. It's uses FileConnection Optional Package (JSR 75). The FileConnection
+ * Optional Package APIs give J2ME devices access to file systems residing on mobile devices,
+ * primarily access to removable storage media such as external memory cards.  
+ * This code has been wrapped in an activity by Cory Zue to work in the JavaRosa framework
+ * @author breh
+ * @author Cory Zue
+ */
 
 public class FileBrowseActivity implements IActivity, CommandListener {
 
@@ -135,6 +158,10 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		}
 	}
 
+	/**
+	 * Sets the mode of this, currently DIRECTORY or FILE
+	 * @param mode
+	 */
 	public void setMode(int mode) {
 		this.mode = mode;
 	}
