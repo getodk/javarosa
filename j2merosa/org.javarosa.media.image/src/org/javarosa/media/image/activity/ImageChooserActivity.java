@@ -5,8 +5,7 @@ import java.util.Hashtable;
 import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable; //import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.List;
+import javax.microedition.lcdui.Displayable; 
 import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.Context;
@@ -23,7 +22,6 @@ import org.javarosa.media.image.utilities.ImageSniffer;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
-import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Form;
 import de.enough.polish.util.ArrayList;
 
@@ -39,8 +37,9 @@ import de.enough.polish.util.ArrayList;
 public class ImageChooserActivity implements IActivity, CommandListener {
 	public static final String ACTIVITY_KEY = "ACTIVITY_KEY";
 	
-	// this should map images (IDataPointers) to bool true/false whether
-	// selected or not
+	/**
+	 * String -> IDataPointer map of image names to references
+	 **/
 	private Hashtable allImages;
 	private Context context;
 	private IShell shell;
@@ -58,7 +57,11 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	private Command deleteCommand;
 	private Command changeSniffDirectoryCommand;
 	
-	private String currentKey;
+	/**
+	 * This holds the key to lookup the return value from a capture or browse activity
+	 * when it gets control back.
+	 */
+	private String currentReturnValueKey;
 	private Thread snifferThread;
 	private ImageSniffer sniffer;
 	private MIDlet midlet;
@@ -106,12 +109,11 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	}
 
 	public void halt() {
-		// TODO Auto-generated method stub
-
+		// No need to override the default behavior.
 	}
 
 	public void resume(Context globalContext) {
-		Object o = globalContext.getElement(currentKey);
+		Object o = globalContext.getElement(currentReturnValueKey);
 		IDataPointer pointer = (IDataPointer) o;
 		if (callBackActivity == ACTIVITY_DIRECTORY_CHANGE) {
 			changeSniffingDirectory(pointer.getDisplayText());
@@ -188,15 +190,11 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		sniffingPath = path;
 		
 		if (isActivelySniffing ) { 
-			if (sniffer != null) {
-				// sniffer.quit();
-			}
 			System.out.println("Setting directory to: " + path);
 			sniffer.setSniffDirectory(sniffingPath); 
-			//sniffer = new ImageSniffer(sniffingPath, this);
-			//snifferThread = new Thread(sniffer);
-			//snifferThread.start();
 			mainList.setLabel("Available Images (searching in " + sniffingPath + ")");
+		} else {
+			throw new RuntimeException("Tried to change the sniffing directory but wasn't sniffing!");
 		}
 	}
 
@@ -270,6 +268,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 			System.out.println(ex.getMessage());
 			System.out.println(ex);
 			ex.printStackTrace();
+			throw new RuntimeException(ex.getMessage());
 		}
 	}
 
@@ -288,41 +287,8 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 //		mainFormOld.append("Available JVM Memory " + tag + ": " + jvmMemory);
 	}
 
+
 	
-	private FileDataPointer captureNewImage() {
-		// TODO: I have a feeling this is going to actually be some sort of back
-		// and forth chicannery
-		// with the shell
-		return null;
-	}
-
-	/**
-	 * Selects an image
-	 * 
-	 * @param image
-	 */
-	private void selectImage(FileDataPointer image) {
-		// TODO: impl;
-	}
-
-	/**
-	 * Deselects an image
-	 * 
-	 * @param image
-	 */
-	private void deselectImage(FileDataPointer image) {
-		// TODO: impl;
-	}
-
-	/**
-	 * Picks the selected images and returns them (and control) to the shell
-	 * Other images are deleted?
-	 */
-	private void finish() {
-		Hashtable args = null; // buildReturnArgs();
-		shell.returnFromActivity(this, "Success!", args);
-
-	}
 
 	public void commandAction(Command command, Displayable display) {
 		if (command.equals(cameraCommand)) {
@@ -397,7 +363,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 
 	private void processBrowser() {
 		try {
-			currentKey = FileBrowseActivity.FILE_POINTER;
+			currentReturnValueKey = FileBrowseActivity.FILE_POINTER;
 			returnFromActivity(new FileBrowseActivity(shell));
 		} catch (Exception e) {
 			System.out.println("Exception: " + e.getMessage());
@@ -406,7 +372,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	}
 
 	private void processChangeDirectory() {
-		currentKey = FileBrowseActivity.FILE_POINTER;
+		currentReturnValueKey = FileBrowseActivity.FILE_POINTER;
 		callBackActivity = ACTIVITY_DIRECTORY_CHANGE;
 		FileBrowseActivity activity = new FileBrowseActivity(shell);
 		activity.setMode(FileBrowseActivity.MODE_DIRECTORY);
@@ -415,7 +381,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 
 
 	private void processCamera() {
-		currentKey = ImageCaptureActivity.IMAGE_KEY;
+		currentReturnValueKey = ImageCaptureActivity.IMAGE_KEY;
 		returnFromActivity(new ImageCaptureActivity(shell));
 	}
 
