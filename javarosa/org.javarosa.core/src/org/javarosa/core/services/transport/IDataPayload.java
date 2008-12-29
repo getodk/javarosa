@@ -21,7 +21,7 @@ public interface IDataPayload extends Externalizable {
 	public InputStream getPayloadStream();
 	
 	/**
-	 * @return The Id of this payload
+	 * @return A string identifying the contents of the payload
 	 */
 	public String getPayloadId();
 	

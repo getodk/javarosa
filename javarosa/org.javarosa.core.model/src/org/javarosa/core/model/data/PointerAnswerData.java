@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.model.data.helper.IDataPointer;
+import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 

@@ -11,4 +11,5 @@ package org.javarosa.core.services.transport;
 public interface IDataPayloadVisitor {
 	public Object visit(ByteArrayPayload payload);
 	public Object visit(MultiMessagePayload payload);
+	public Object visit(DataPointerPayload payload);
 }

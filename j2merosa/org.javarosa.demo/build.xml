@@ -132,6 +132,7 @@
 					<parameter name="keep  ,allowshrinking" value="!abstract class org.javarosa.xpath.expr.* extends org.javarosa.xpath.expr.XPathExpression" />
 					<parameter name="keep,   allowshrinking" value="!abstract class org.javarosa.communication.http.* implements org.javarosa.core.services.transport.ITransportDestination"/>
 					<parameter name="keep,     allowshrinking" value="!abstract class org.javarosa.* implements org.javarosa.core.services.transport.IDataPayload"/>
+					<parameter name="keep,      allowshrinking" value="!abstract class org.javarosa.* implements org.javarosa.core.data.IDataPointer"/>
 				</obfuscator>
 
 				<!-- log settings: only use debug setting when the test-property is true -->

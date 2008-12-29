@@ -1,6 +1,8 @@
-package org.javarosa.core.model.data.helper;
+package org.javarosa.core.data;
 
 import java.io.InputStream;
+
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * A data pointer representing a pointer to a (usually) larger object in memory.  
@@ -8,7 +10,7 @@ import java.io.InputStream;
  * @author Cory Zue
  *
  */
-public interface IDataPointer {
+public interface IDataPointer extends Externalizable {
 	
 	/**
 	 * Get a display string that represents this data.
