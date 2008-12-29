@@ -7,6 +7,7 @@ import java.util.Enumeration;
 
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.services.transport.ByteArrayPayload;
+import org.javarosa.core.services.transport.DataPointerPayload;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.IDataPayloadVisitor;
 import org.javarosa.core.services.transport.MultiMessagePayload;
@@ -34,6 +35,36 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 	 * @see org.javarosa.core.services.transport.IDataPayloadVisitor#visit(org.javarosa.core.services.transport.ByteArrayPayload)
 	 */
 	public Object visit(ByteArrayPayload payload) {
+		return visitIndividual(payload);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.transport.IDataPayloadVisitor#visit(org.javarosa.core.services.transport.MultiMessagePayload)
+	 */
+	public Object visit(MultiMessagePayload payload) {
+		MultiMessagePayload ret = new MultiMessagePayload();
+		if(top) {
+			//TODO: Create a reasonable divider, and 
+			divider = "newdivider";
+			HttpTransportHeader header = new HttpTransportHeader();
+			header.addHeader("MIME-version: ", "1.0");
+			header.addHeader("Content-type: ", "multipart/mixed; boundary='" + divider + "'");
+			ret.addPayload(header);
+		}
+		HttpHeaderAppendingVisitor newVis = new HttpHeaderAppendingVisitor(divider);
+		Enumeration en = payload.getPayloads().elements();
+		while(en.hasMoreElements()) {
+			IDataPayload child = (IDataPayload)en.nextElement();
+			ret.addPayload((IDataPayload)child.accept(newVis));
+		}
+		return ret;
+	}
+
+	public Object visit(DataPointerPayload payload) {
+		return visitIndividual(payload);
+	}
+	
+	private Object visitIndividual(IDataPayload payload) {
 		if(divider != null) {
 			MultiMessagePayload message = new MultiMessagePayload();
 			HttpTransportHeader header = new HttpTransportHeader();
@@ -58,28 +89,6 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 		else {
 			return payload;
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.transport.IDataPayloadVisitor#visit(org.javarosa.core.services.transport.MultiMessagePayload)
-	 */
-	public Object visit(MultiMessagePayload payload) {
-		MultiMessagePayload ret = new MultiMessagePayload();
-		if(top) {
-			//TODO: Create a reasonable divider, and 
-			divider = "newdivider";
-			HttpTransportHeader header = new HttpTransportHeader();
-			header.addHeader("MIME-version: ", "1.0");
-			header.addHeader("Content-type: ", "multipart/mixed; boundary='" + divider + "'");
-			ret.addPayload(header);
-		}
-		HttpHeaderAppendingVisitor newVis = new HttpHeaderAppendingVisitor(divider);
-		Enumeration en = payload.getPayloads().elements();
-		while(en.hasMoreElements()) {
-			IDataPayload child = (IDataPayload)en.nextElement();
-			ret.addPayload((IDataPayload)child.accept(newVis));
-		}
-		return ret;
 	}
 
 }

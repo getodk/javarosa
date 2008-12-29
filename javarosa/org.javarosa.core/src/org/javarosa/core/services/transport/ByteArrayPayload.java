@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -31,7 +32,6 @@ public class ByteArrayPayload implements IDataPayload {
 	 * Note: Only useful for serialization.
 	 */
 	public ByteArrayPayload() {
-		//ONLY FOR SERIALIZATION
 	}
 	
 	public ByteArrayPayload(byte[] payload, String id, int type) {
@@ -58,6 +58,7 @@ public class ByteArrayPayload implements IDataPayload {
 			this.payload = new byte[length];
 			in.read(this.payload);
 		}
+		id = ExtUtil.readString(in);
 	}
 
 	/* (non-Javadoc)
@@ -68,6 +69,7 @@ public class ByteArrayPayload implements IDataPayload {
 		if(payload.length > 0) {
 			out.write(payload);
 		}
+		ExtUtil.writeString(out, id);
 	}
 	
 	/*
