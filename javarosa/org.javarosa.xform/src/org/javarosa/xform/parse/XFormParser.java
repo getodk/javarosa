@@ -46,7 +46,7 @@ public class XFormParser {
 	private static Hashtable typeMappings;
 	private static PrototypeFactoryDeprecated modelPrototypes;
 
-	/** IXFormBindHaandler */
+	/** IXFormBindHandler */
 	private static Vector bindHandlers;
 
 	/* THIS CLASS IS NOT THREAD-SAFE */
@@ -770,11 +770,10 @@ public class XFormParser {
 		binding.setPreload(e.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
 		binding.setPreloadParams(e.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
 
-		//TODO hmmmm...
+		//custom bind handlers
 		Enumeration en = bindHandlers.elements();
 		while(en.hasMoreElements()) {
-			IXFormBindHandler handler = (IXFormBindHandler)en.nextElement();
-			handler.handle(e, binding);
+			((IXFormBindHandler)en.nextElement()).handle(e, binding);
 		}
 
 		addBinding(binding);

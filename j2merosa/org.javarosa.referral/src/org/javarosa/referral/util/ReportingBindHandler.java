@@ -24,12 +24,11 @@ public class ReportingBindHandler implements IXFormBindHandler {
 		String referralValue = bindElement.getAttributeValue("", "referralvalue");
 		String referralText = bindElement.getAttributeValue("", "referraltext");
 	
-		
 		if(referralValue != null) {
 			if(referralText != null) {
 				if (referralText.startsWith("jr:itext('") && referralText.endsWith("')")) {
-					String textRef = referralText.substring("jr:itext('".length(), referralText.indexOf("')"));
-					
+					String textRef = referralText.substring("jr:itext('".length(), referralText.indexOf("')"));				
+					//is this incomplete?
 				}
 			}
 			ReferralCondition newCondition = new ReferralCondition(referralValue, referralText, (XPathReference)bind.getReference());
