@@ -71,6 +71,7 @@ public class HttpTransportHeader implements IDataPayload {
 			String value = (String)headers.get(key);
 			header += key + value + "\n";
 		}
+		header +="\n";
 		return header.getBytes();
 	}
 	
