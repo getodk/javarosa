@@ -122,6 +122,8 @@ public class HttpTransportMethod implements TransportMethod {
 				con.setRequestProperty("User-Agent",
 						"Profile/MIDP-2.0 Configuration/CLDC-1.1");
 				con.setRequestProperty("Content-Language", "en-US");
+				con.setRequestProperty("MIME-version", "1.0");
+				con.setRequestProperty("Content-Type",visitor.getOverallContentType());
 				//con.setRequestProperty("Content-length", String.valueOf(httpload.getLength()));
 				//System.out.println("Content-Length: " + String.valueOf(httpload.getLength()) + " bytes");
 				//You don't use content length with chunked encoding

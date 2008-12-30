@@ -22,6 +22,8 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 	private boolean top = false;
 	private String divider;
 	
+	private String contentType;
+	
 	public HttpHeaderAppendingVisitor() {
 		top = true;
 	}
@@ -47,8 +49,7 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 			//TODO: Create a reasonable divider, and 
 			divider = "newdivider";
 			HttpTransportHeader header = new HttpTransportHeader();
-			header.addHeader("MIME-version: ", "1.0");
-			header.addHeader("Content-type: ", "multipart/mixed; boundary='" + divider + "'");
+			contentType = "multipart/mixed; boundary='" + divider + "'";
 			ret.addPayload(header);
 		}
 		HttpHeaderAppendingVisitor newVis = new HttpHeaderAppendingVisitor(divider);
@@ -77,21 +78,40 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 			}
 			switch(payload.getPayloadType()) {
 			case IDataPayload.PAYLOAD_TYPE_TEXT:
-				header.addHeader("Content-type: ", "text/plain");
+				header.addHeader("Content-type: ", getContentTypeFromId(payload.getPayloadType()));
 				break;
 			case IDataPayload.PAYLOAD_TYPE_JPG:
-				header.addHeader("Content-type: ", "image/jpg");
+				header.addHeader("Content-type: ", getContentTypeFromId(payload.getPayloadType()));
 				header.addHeader("Content-transfer-encoding: ", "binary");
 				break;
 			}
+			
+
 			
 			message.addPayload(header);
 			message.addPayload(payload);
 			return message;
 		}
 		else {
+			contentType = getContentTypeFromId(payload.getPayloadType());
 			return payload;
 		}
+	}
+	
+	public String getOverallContentType() {
+		return contentType;
+	}
+	
+	private String getContentTypeFromId(int id) {
+		switch(id) {
+		case IDataPayload.PAYLOAD_TYPE_TEXT:
+			return "text/plain";
+		case IDataPayload.PAYLOAD_TYPE_JPG:
+			return "image/jpg";
+			//TODO: Handle this
+			//header.addHeader("Content-transfer-encoding: ", "binary");
+		}
+		return "text/plain";
 	}
 
 }
