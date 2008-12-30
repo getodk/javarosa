@@ -3,13 +3,16 @@ package org.javarosa.server.util;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Enumeration;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -52,13 +55,11 @@ public class JavaRosaTestServlet extends HttpServlet {
 		try {
 			Enumeration headers = req.getHeaderNames();
 			
-			// String postData = "Headers:<br>";
 			String postData = "Headers:\n";
 
 			while (headers.hasMoreElements()) {
 				String nextName = (String) headers.nextElement();
 				String nextValue = req.getHeader(nextName);
-				// postData += nextName + ":" + nextValue + "<br>";
 				postData += nextName + ":" + nextValue + "\n";
 			}
 			int bufSize = 100;
@@ -67,11 +68,11 @@ public class JavaRosaTestServlet extends HttpServlet {
 			int bytesRead = stream.read(temp);
 			int totalBytesRead = 0;
 			ByteArrayOutputStream body = new ByteArrayOutputStream();
-			//String bodyString = "";
 			String fileName = this.getNewFileName("jrpost-in-progress");
 			File f = new File(fileName);
 			f.createNewFile();
 			Writer output = new BufferedWriter(new FileWriter(f));
+			output.write(postData);
 			try {
 				// FileWriter always assumes default encoding is OK!
 				while (bytesRead != -1) {
@@ -99,10 +100,12 @@ public class JavaRosaTestServlet extends HttpServlet {
 				output.close();
 			}
 
-			// postData += "<br>Body: (" + totalBytesRead + " bytes total)<br>"
-			// ;
 			postData += "\nBody: (" + totalBytesRead + " bytes total)\n";
 			postData += new String(body.toByteArray());
+			
+			parseAndSaveHtml(req, body.toByteArray());
+			
+			postData += 
 			_lastPostParsable = trim(postData);
 			_lastFileName = saveFile(postData);
 		} catch (Exception e) {
@@ -154,6 +157,135 @@ public class JavaRosaTestServlet extends HttpServlet {
 	exception.printStackTrace(pw);
 	return sw.toString();
 	}
+	
+	private void parseAndSaveHtml(HttpServletRequest req, byte[] body) throws IOException {
+		Enumeration headers = req.getHeaderNames();
+		
+		String htmlPostData = "Headers:<br>";
+		
+		String type = "text/plain";
+		
+		String boundary ="";
+
+		while (headers.hasMoreElements()) {
+			String nextName = (String) headers.nextElement();
+			String nextValue = req.getHeader(nextName);
+			htmlPostData += nextName + ":" + nextValue + "<br>";
+			if(nextName.equalsIgnoreCase("content-type")) {
+				String[] typeData = nextValue.split(";");
+				type = typeData[0];
+				if(type.equals("multipart/mixed")) {
+					String boundData = typeData[1].trim();
+					boundary = (boundData.split("=")[1]).replaceAll("'", "");
+				}
+			}
+		}
+		htmlPostData += "\n BODY :\n";
+		
+		if(type.equals("multipart/mixed")) {
+			Vector<String> partNames = parseAndHandle(body, boundary);
+			for(int i = 0; i < partNames.size() ; ++i) {
+				htmlPostData += "<a href=" + partNames.elementAt(i) + ">Part " + i + "</a><br/>";
+			}
+		} else {
+			htmlPostData += "<a href=" + handlePart(body, type) + ">Single Part</a><br/>";
+		}
+		
+		String fileName = getNewFileName("jrpost", "html");
+
+		File f = new File(fileName);
+		f.createNewFile();
+		// use buffering
+		Writer output = new BufferedWriter(new FileWriter(f));
+		try {
+			// FileWriter always assumes default encoding is OK!
+			output.write(htmlPostData);
+		} finally {
+			output.close();
+		}
+	}
+	
+	private Vector<String> parseAndHandle(byte[] body, String boundary) throws IOException{
+		Vector<String> partNames = new Vector<String>();
+		byte[] boundaryData = ("\n--" + boundary + "\n").getBytes();
+		byte[] finalBoundary = ("\n--" + boundary + "--\n").getBytes();
+		Vector<Integer> boundaries = locate(body, boundaryData);
+		boundaries.addAll(locate(body, finalBoundary));
+		
+		partNames.add("Number of Boundaries: " + boundaries.size() + " which are at: " + boundaries.toString());
+		
+		//There should always be two of these surrounding a body
+		for(int i = 0 ; i < boundaries.size() -1; ++i) {
+			int start = boundaries.elementAt(i).intValue() + boundaryData.length;
+			int end = boundaries.elementAt(i + 1);
+			byte[] part = getPart(body, start, end);
+			byte[] headerDivBytes = "\n\n".getBytes();
+			Vector<Integer>  headerEnd = locate(part, headerDivBytes); 
+			byte[] headers = getPart(part, 0, headerEnd.elementAt(0).intValue());
+			byte[] partBody = getPart(part, headerEnd.elementAt(0).intValue() + headerDivBytes.length, part.length);
+			
+			String type = "text/plain";
+			String[] headerLines = new String(headers).split("\n");
+			for(String header : headerLines) {
+				String[] pieces = header.split(":");
+				if(pieces[0].equalsIgnoreCase("content-type")) {
+					type = pieces[1];
+				}
+			}
+			partNames.add(handlePart(partBody, type));
+		}
+		return partNames;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param body
+	 * @param start
+	 * @param end
+	 * @return body[start, end -1]
+	 */
+	private byte[] getPart(byte[] body, int start, int end) {
+		int length = (end-start) -1;
+		byte[] part = new byte[length];
+		for(int i = 0; i < length ; ++ i) {
+			part[i] = body[start + i];
+		}
+		return part;
+	}
+	
+	
+	
+	private String handlePart(byte[] body, String encoding) throws IOException {
+		if(encoding == "text/plain") {
+			String fileBody = new String(body);
+			String fileName = getNewFileName("jr-submit-xml", "xml");
+			File f = new File(fileName);
+			Writer output = new BufferedWriter(new FileWriter(f));
+			try {
+				// FileWriter always assumes default encoding is OK!
+				output.write(fileBody);
+			} finally {
+				output.close();
+				return fileName;
+			}
+		} else if(encoding == "image/jpg") {
+			String fileName = getNewFileName("jr-submit-jpg", "jpg");
+			File f = new File(fileName);
+			OutputStream output = new FileOutputStream(f);
+			try {
+				// FileWriter always assumes default encoding is OK!
+				output.write(body);
+				
+			} finally {
+				output.close();
+				return fileName;
+			}
+		} else {
+			return null;
+		}
+	}
+	
 	private String saveFile(String postData) throws IOException {
 		String fileName = getNewFileName("jrpost");
 
@@ -170,11 +302,57 @@ public class JavaRosaTestServlet extends HttpServlet {
 		return fileName;
 	}
 
+	private String getNewFileName(String base, String ext) {
+		return _storageRoot + base + "-" + System.currentTimeMillis() + "." + ext;
+	}
+	
 	private String getNewFileName(String base) {
-		return _storageRoot + base + "-" + System.currentTimeMillis() + ".txt";
+		return getNewFileName(base, "txt");
 	}
 
 	public void init() throws ServletException {
 
 	}
+	
+	//stackoverflow
+	static Vector<Integer> Empty = new Vector<Integer>();
+
+    public static Vector<Integer> locate (byte [] self, byte [] candidate)
+    {
+        if (isEmptyLocate (self, candidate))
+                return Empty;
+
+        Vector<Integer> list = new Vector<Integer> ();
+
+        for (int i = 0; i < self.length; i++) {
+                if (!isMatch (self, i, candidate))
+                        continue;
+
+                list.add (i);
+        }
+        return list.size() == 0 ? Empty : list;
+    }
+
+    static boolean isMatch (byte [] array, int position, byte [] candidate)
+    {
+        if (candidate.length > (array.length - position))
+                return false;
+
+        for (int i = 0; i < candidate.length; i++)
+                if (array [position + i] != candidate [i])
+                        return false;
+
+        return true;
+    }
+
+    static boolean isEmptyLocate (byte [] array, byte [] candidate)
+    {
+        return array == null
+                || candidate == null
+                || array.length == 0
+                || candidate.length == 0
+                || candidate.length > array.length;
+    }
+
+    //</stackoverflow>
 }
