@@ -31,6 +31,8 @@ public class CoreModelModule implements IModule {
 				"org.javarosa.core.model.data.SelectMultiData",
 				"org.javarosa.core.model.data.DateData",
 				"org.javarosa.core.model.data.TimeData",
+				"org.javarosa.core.model.data.PointerAnswerData",
+				"org.javarosa.core.model.data.MultiPointerAnswerData",
 				"org.javarosa.core.model.data.helper.BasicDataPointer"
 		};		
 		JavaRosaServiceProvider.instance().registerPrototypes(classes);

@@ -57,6 +57,9 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 			IDataPayload child = (IDataPayload)en.nextElement();
 			ret.addPayload((IDataPayload)child.accept(newVis));
 		}
+		HttpTransportHeader footer = new HttpTransportHeader();
+		footer.addHeader("\n--", divider + "--");
+		ret.addPayload(footer);
 		return ret;
 	}
 
@@ -68,15 +71,15 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 		if(divider != null) {
 			MultiMessagePayload message = new MultiMessagePayload();
 			HttpTransportHeader header = new HttpTransportHeader();
-			header.addHeader("--", divider);
+			header.addHeader("\n--", divider);
 			if(payload.getPayloadId() != null) {
 				header.addHeader("Content-ID: ", payload.getPayloadId());
 			}
 			switch(payload.getPayloadType()) {
-			case Constants.PAYLOAD_TYPE_TEXT:
+			case IDataPayload.PAYLOAD_TYPE_TEXT:
 				header.addHeader("Content-type: ", "text/plain");
 				break;
-			case Constants.PAYLOAD_TYPE_JPG:
+			case IDataPayload.PAYLOAD_TYPE_JPG:
 				header.addHeader("Content-type: ", "image/jpg");
 				header.addHeader("Content-transfer-encoding: ", "binary");
 				break;

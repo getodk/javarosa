@@ -35,4 +35,9 @@ public interface IDataPointer extends Externalizable {
 	 * Deletes the underlying data from storage.
 	 */
 	public boolean deleteData();
+	
+	/**
+	 * @return Gets the length of the data payload
+	 */
+	public long getLength();
 }

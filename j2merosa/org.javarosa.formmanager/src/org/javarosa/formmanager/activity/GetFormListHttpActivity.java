@@ -16,6 +16,7 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.transport.ByteArrayPayload;
+import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
@@ -95,7 +96,7 @@ public class GetFormListHttpActivity implements IActivity,CommandListener,Observ
 	public void fetchList() {
 		ITransportDestination requestDest= new HttpTransportDestination(getListUrl+credentials);//send username and url
 		message = new TransportMessage();
-		message.setPayloadData(new ByteArrayPayload(requestPayload.getBytes(),null,Constants.PAYLOAD_TYPE_TEXT)); // TODO change this to send xml msg with search options /uname, form type
+		message.setPayloadData(new ByteArrayPayload(requestPayload.getBytes(),null,IDataPayload.PAYLOAD_TYPE_TEXT)); // TODO change this to send xml msg with search options /uname, form type
 		// TODO add url stuff here below
 		message.setDestination(requestDest);
 		message.addObserver(this);

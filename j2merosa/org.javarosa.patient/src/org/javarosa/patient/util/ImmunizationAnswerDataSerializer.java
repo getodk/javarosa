@@ -3,6 +3,7 @@
  */
 package org.javarosa.patient.util;
 
+import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.data.IAnswerData;
@@ -50,5 +51,21 @@ public class ImmunizationAnswerDataSerializer implements IAnswerDataSerializer {
 
 	public Object serializeAnswerData(IAnswerData data, int dataType) {
 		return "Immunization Data Serializer is not done yet";
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.IAnswerDataSerializer#containsExternalData(org.javarosa.core.model.data.IAnswerData)
+	 */
+	public Boolean containsExternalData(IAnswerData data) {
+		return null;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.IAnswerDataSerializer#retrieveExternalDataPointer(org.javarosa.core.model.data.IAnswerData)
+	 */
+	public IDataPointer[] retrieveExternalDataPointer(IAnswerData data) {
+		return null;
 	}
 }

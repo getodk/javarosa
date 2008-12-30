@@ -21,6 +21,12 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class DataPointerPayload implements IDataPayload {
 	IDataPointer pointer;
 	
+	/**
+	 * Note: Only useful for serialization.
+	 */
+	public DataPointerPayload() {
+	}
+	
 	public DataPointerPayload(IDataPointer pointer) {
 		this.pointer = pointer;
 	}
@@ -37,9 +43,9 @@ public class DataPointerPayload implements IDataPayload {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.transport.IDataPayload#getLength()
 	 */
-	public int getLength() {
+	public long getLength() {
 		//Unimplemented. This method will eventually leave the contract
-		return -1;
+		return pointer.getLength();
 	}
 	
 	/*
@@ -63,8 +69,8 @@ public class DataPointerPayload implements IDataPayload {
 	 * @see org.javarosa.core.services.transport.IDataPayload#getPayloadType()
 	 */
 	public int getPayloadType() {
-		// TODO Auto-generated method stub
-		return 0;
+		//TODO: FIX so this isn't always the case
+		return IDataPayload.PAYLOAD_TYPE_JPG;
 	}
 
 	/*

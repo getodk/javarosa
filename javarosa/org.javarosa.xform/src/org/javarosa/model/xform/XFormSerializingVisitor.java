@@ -2,7 +2,9 @@ package org.javarosa.model.xform;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Vector;
 
+import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.IFormDataModel;
@@ -10,6 +12,10 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
+import org.javarosa.core.services.transport.ByteArrayPayload;
+import org.javarosa.core.services.transport.DataPointerPayload;
+import org.javarosa.core.services.transport.IDataPayload;
+import org.javarosa.core.services.transport.MultiMessagePayload;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xform.util.XFormSerializer;
 import org.kxml2.kdom.Document;
@@ -17,7 +23,7 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 
 /**
- * A visitor class which walks a DataModelTree and constructs an XML document
+ * A visitor-esque class which walks a DataModelTree and constructs an XML document
  * containing its instance.
  *
  * The XML node elements are constructed in a depth-first manner, consistent with
@@ -36,6 +42,8 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 	
 	/** The schema to be used to serialize answer data */
 	FormDef schema;	//not used
+	
+	Vector dataPointers;
 
 	public byte[] serializeDataModel(IFormDataModel model, FormDef formDef) throws IOException {
 		this.schema = formDef;
@@ -53,6 +61,31 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 		model.accept(this);
 		if(theXmlDoc != null) {
 			return XFormSerializer.getString(theXmlDoc).getBytes("UTF-8");
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public IDataPayload createSerializedPayload	(IFormDataModel model) throws IOException {
+		dataPointers = new Vector();
+		if(this.serializer == null) {
+			this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
+		}
+		model.accept(this);
+		if(theXmlDoc != null) {
+			byte[] form = XFormSerializer.getString(theXmlDoc).getBytes("UTF-8");
+			if(dataPointers.size() == 0) {
+				return new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_TEXT);
+			}
+			MultiMessagePayload payload = new MultiMessagePayload();
+			payload.addPayload(new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_TEXT));
+			Enumeration en = dataPointers.elements();
+			while(en.hasMoreElements()) {
+				IDataPointer pointer = (IDataPointer)en.nextElement();
+				payload.addPayload(new DataPointerPayload(pointer));
+			}
+			return payload; 
 		}
 		else {
 			return null;
@@ -96,7 +129,14 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 				e = new Element();
 				e.addChild(Node.TEXT, (String)serializedAnswer);				
 			} else {
-				throw new RuntimeException("Can't handle serialized output");
+				throw new RuntimeException("Can't handle serialized output for" + instanceNode.getValue().toString() + ", " + serializedAnswer);
+			}
+			
+			if(serializer.containsExternalData(instanceNode.getValue()).booleanValue()) {
+				IDataPointer[] pointer = serializer.retrieveExternalDataPointer(instanceNode.getValue());
+				for(int i = 0 ; i < pointer.length ; ++i) {
+					dataPointers.addElement(pointer[i]);
+				}
 			}
 
 		} else {

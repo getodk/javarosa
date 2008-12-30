@@ -11,6 +11,7 @@ import java.io.InputStream;
 
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -34,6 +35,12 @@ public class ByteArrayPayload implements IDataPayload {
 	public ByteArrayPayload() {
 	}
 	
+	/**
+	 * 
+	 * @param payload The byte array for this payload.
+	 * @param id An optional id identifying the payload
+	 * @param type The type of data for this byte array
+	 */
 	public ByteArrayPayload(byte[] payload, String id, int type) {
 		this.payload = payload;
 		this.id = id;
@@ -58,7 +65,7 @@ public class ByteArrayPayload implements IDataPayload {
 			this.payload = new byte[length];
 			in.read(this.payload);
 		}
-		id = ExtUtil.readString(in);
+		id = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 	}
 
 	/* (non-Javadoc)
@@ -69,7 +76,7 @@ public class ByteArrayPayload implements IDataPayload {
 		if(payload.length > 0) {
 			out.write(payload);
 		}
-		ExtUtil.writeString(out, id);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(id));
 	}
 	
 	/*
@@ -96,7 +103,7 @@ public class ByteArrayPayload implements IDataPayload {
 		return type;
 	}
 
-	public int getLength() {
+	public long getLength() {
 		return payload.length;
 	}
 }

@@ -1,5 +1,6 @@
 package org.javarosa.communication.http;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -109,6 +110,11 @@ public class HttpTransportMethod implements TransportMethod {
 			
 			int responseCode;
 			try {
+				
+				IDataPayload payload = message.getPayloadData();
+				HttpHeaderAppendingVisitor visitor = new HttpHeaderAppendingVisitor();
+				IDataPayload httpload = (IDataPayload)payload.accept(visitor);
+				
 				HttpTransportDestination destination = (HttpTransportDestination)message.getDestination();
 				con = (HttpConnection) Connector.open(destination.getURL());
 
@@ -116,25 +122,24 @@ public class HttpTransportMethod implements TransportMethod {
 				con.setRequestProperty("User-Agent",
 						"Profile/MIDP-2.0 Configuration/CLDC-1.1");
 				con.setRequestProperty("Content-Language", "en-US");
-
+				//con.setRequestProperty("Content-length", String.valueOf(httpload.getLength()));
+				//System.out.println("Content-Length: " + String.valueOf(httpload.getLength()) + " bytes");
+				//You don't use content length with chunked encoding
 				out = con.openOutputStream();
 				
-				//ByteArrayOutputStream bis = new ByteArrayOutputStream();  For Testing!
+				//ByteArrayOutputStream bis = new ByteArrayOutputStream();  //For Testing!
 				
-				IDataPayload payload = message.getPayloadData();
-				HttpHeaderAppendingVisitor visitor = new HttpHeaderAppendingVisitor();
-				IDataPayload httpload = (IDataPayload)payload.accept(visitor);
 				
 				InputStream valueStream = httpload.getPayloadStream();
 				int val = valueStream.read();
 				while(val != -1) {
-					//bis.write(val);  For Testing!
+					//bis.write(val); // For Testing!
 					out.write(val);
 					val = valueStream.read();
 				}
-				//byte[] newArr = bis.toByteArray(); For Testing!
-				//String theVal = new String(newArr); For Testing!
-				//System.out.println(theVal); For Testing!
+				//byte[] newArr = bis.toByteArray();// For Testing!
+				//String theVal = new String(newArr); //For Testing!
+				//System.out.println(theVal);// For Testing!
 				
 				//#if debug.output==verbose
 				//System.out.println("PAYLOADDATA:"+new String(message.getPayloadData())+"\nENDPLDATA\n");

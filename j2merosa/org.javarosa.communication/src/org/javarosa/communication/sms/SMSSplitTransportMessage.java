@@ -49,15 +49,15 @@ public class SMSSplitTransportMessage implements SplitTransportMessage {
 		// Define the number of message parts we will need based on the size of
 		// the message payload and the metadata
 		//FIXME: This only handles messages of <10 parts!
-		int maxPayload = SmsTransportProperties.MAX_SMS_SIZE - metaData(0,0).length();
+		long maxPayload = SmsTransportProperties.MAX_SMS_SIZE - metaData(0,0).length();
 		System.out.println("Max Payload: "+maxPayload);
-		int numParts = payload.getLength() / maxPayload;
+		long numParts = payload.getLength() / maxPayload;
 		System.out.println("Num Parts: "+numParts+1);
 		if(payload.getLength() % maxPayload > 0)
 			numParts++;
 		try {
 			InputStream istream = payload.getPayloadStream();
-			int currentPart = 0;
+			long currentPart = 0;
 			
 			while(currentPart < numParts) {
 				ByteArrayOutputStream ostream = new ByteArrayOutputStream();
@@ -91,7 +91,7 @@ public class SMSSplitTransportMessage implements SplitTransportMessage {
 	 * @param totalMsg
 	 * @return
 	 */
-	private String metaData(int currentMsg, int totalMsg) {
+	private String metaData(long currentMsg, long totalMsg) {
 		//TODO: Change the formID to something alphanumeric to save space
 		return "f="+formID+"&p="+currentMsg+","+totalMsg+"$";
 	}
