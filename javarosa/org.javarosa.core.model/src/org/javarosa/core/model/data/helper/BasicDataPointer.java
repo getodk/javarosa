@@ -86,6 +86,11 @@ public class BasicDataPointer implements IDataPointer {
 			out.write(data);
 		}
 		ExtUtil.writeString(out, name);
+	}
+
+	public long getLength() {
+		// TODO Auto-generated method stub
+		return data.length;
 	} 
 
 

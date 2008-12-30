@@ -7,6 +7,8 @@ import java.util.Date;
 
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -19,6 +21,14 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class PointerAnswerData implements IAnswerData {
 
 	private IDataPointer data;
+	
+
+	/**
+	 * NOTE: Only for serialization/deserialization
+	 */
+	public PointerAnswerData() {
+		//Only for serialization/deserialization
+	}
 	
 	public PointerAnswerData(IDataPointer data) {
 		this.data = data;
@@ -45,11 +55,11 @@ public class PointerAnswerData implements IAnswerData {
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
-		// TODO Auto-generated method stub
+		data = (IDataPointer)ExtUtil.read(in, new ExtWrapTagged());
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		// TODO Auto-generated method stub
+		ExtUtil.write(out, new ExtWrapTagged(data));
 	}
 
 }

@@ -83,4 +83,12 @@ public class FileDataPointer implements IDataPointer {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeUTF(fileName);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.data.IDataPointer#getLength()
+	 */
+	public long getLength() {
+		return FileUtility.getFileLength(fileName);
+	}
 }

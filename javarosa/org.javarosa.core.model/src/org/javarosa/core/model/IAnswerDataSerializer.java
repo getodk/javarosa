@@ -1,5 +1,6 @@
 package org.javarosa.core.model;
 
+import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.data.IAnswerData;
 
 
@@ -60,4 +61,28 @@ public interface IAnswerDataSerializer {
 	 * @param ads An IAnswerDataSerializer
 	 */
 	void registerAnswerSerializer(IAnswerDataSerializer ads);
+	
+	/**
+	 * Identifies whether an answer data object contains data
+	 * that needs to be extracted to be handled differently
+	 * than the serialized answer data.
+	 * 
+	 * @param data The answer data that should be checked.
+	 * @return True if this data contains information that can
+	 * be extracted. False if it does not. Null if this serializer
+	 * cannot process the data type.
+	 */
+	Boolean containsExternalData(IAnswerData data);
+	
+	/**
+	 * Retrieves a pointer to external data contained in the
+	 * provided answer data, if one exists.
+	 * @param data The answer data that contains the pointer.
+	 * containsExternalData should return true for this data.
+	 * @return An IDataPointer to an external piece of data
+	 * that couldn't (or shouldn't) be serialized directly. Null
+	 * if containsExternalData() does not return true for this
+	 * answer data.
+	 */
+	IDataPointer[] retrieveExternalDataPointer(IAnswerData data);
 }

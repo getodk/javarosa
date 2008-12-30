@@ -4,18 +4,22 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.MultiPointerAnswerData;
+import org.javarosa.core.model.data.PointerAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.utils.DateUtils;
+import org.kxml2.kdom.Element;
 
 /**
  * The XFormAnswerDataSerializer takes in AnswerData objects, and provides
@@ -42,7 +46,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public boolean canSerialize(IAnswerData data) {
 		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData ||
 		    data instanceof SelectMultiData || data instanceof SelectOneData ||
-		    data instanceof IntegerData || data instanceof DecimalData) {
+		    data instanceof IntegerData || data instanceof DecimalData || data instanceof PointerAnswerData	||
+		    data instanceof MultiPointerAnswerData ) {
 			return true;
 		} else {
 			return false;
@@ -73,6 +78,43 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	 */
 	public Object serializeAnswerData(TimeData data) {
 		return DateUtils.formatTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
+	}
+	
+	/**
+	 * @param data The AnswerDataObject to be serialized
+	 * @return A String which contains a reference to the 
+	 * data
+	 */
+	public Object serializeAnswerData(PointerAnswerData data) {
+		//Note: In order to override this default behavior, a
+		//new serializer should be used, and then registered
+		//with this serializer
+		IDataPointer pointer = (IDataPointer)data.getValue();
+		return pointer.getDisplayText();
+	}
+	
+	/**
+	 * @param data The AnswerDataObject to be serialized
+	 * @return A String which contains a reference to the 
+	 * data
+	 */
+	public Object serializeAnswerData(MultiPointerAnswerData data) {
+		//Note: In order to override this default behavior, a
+		//new serializer should be used, and then registered
+		//with this serializer
+		IDataPointer[] pointers = (IDataPointer[])data.getValue();
+		if(pointers.length == 1) {
+			return pointers[0].getDisplayText();
+		}
+		Element parent = new Element();
+		for(int i = 0; i < pointers.length; ++i) {
+			Element datael = new Element();
+			datael.setName("data");
+			
+			datael.addChild(Element.TEXT, pointers[i].getDisplayText());
+			parent.addChild(Element.ELEMENT, datael);
+		}
+		return parent;
 	}
 	
 	/**
@@ -114,25 +156,28 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	}
 	
 	public Object serializeAnswerData(IAnswerData data, int dataType) {
+		// First, we want to go through the additional serializers, as they should
+		// take priority to the default serializations
+		Enumeration en = additionalSerializers.elements();
+		while(en.hasMoreElements()) {
+			IAnswerDataSerializer serializer = (IAnswerDataSerializer)en.nextElement();
+			if(serializer.canSerialize(data)) {
+				return serializer.serializeAnswerData(data, dataType);
+			}
+		}
+		/**
+		 * Complications for date/datetime
+		 */
 		if (data instanceof DateData) {
 			if (dataType == Constants.DATATYPE_DATE) {
 				return serializeAnswerData((DateData)data);
 			} else { //date+time
 				return DateUtils.formatDateTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
 			}
-		} else {
-			Object result = serializeAnswerData(data);
-			if (result == null) {
-				Enumeration en = additionalSerializers.elements();
-				while(en.hasMoreElements()) {
-					IAnswerDataSerializer serializer = (IAnswerDataSerializer)en.nextElement();
-					if(serializer.canSerialize(data)) {
-						return serializer.serializeAnswerData(data, dataType);
-					}
-				}
-			}
-			return result;
-		}
+		} 
+		//Defaults
+		Object result = serializeAnswerData(data);
+		return result;
 	}
 
 	public Object serializeAnswerData(IAnswerData data) {
@@ -148,8 +193,55 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			return serializeAnswerData((DecimalData)data);
 		} else if (data instanceof TimeData) {
 			return serializeAnswerData((TimeData)data);			
+		} else if (data instanceof PointerAnswerData) {
+			return serializeAnswerData((PointerAnswerData)data);
+		} else if (data instanceof MultiPointerAnswerData) {
+			return serializeAnswerData((MultiPointerAnswerData)data);			
 		}
 		
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.IAnswerDataSerializer#containsExternalData(org.javarosa.core.model.data.IAnswerData)
+	 */
+	public Boolean containsExternalData(IAnswerData data) {
+		//First check for registered serializers to identify whether
+		//they override this one.
+		Enumeration en = additionalSerializers.elements();
+		while(en.hasMoreElements()) {
+			IAnswerDataSerializer serializer = (IAnswerDataSerializer)en.nextElement();
+			Boolean contains = serializer.containsExternalData(data);
+			if(contains != null) {
+				return contains;
+			}
+		}
+		if( data instanceof PointerAnswerData	||
+	    data instanceof MultiPointerAnswerData ) {
+			return Boolean.TRUE;
+		}
+		return Boolean.FALSE;
+	}
+
+	public IDataPointer[] retrieveExternalDataPointer(IAnswerData data) {
+		Enumeration en = additionalSerializers.elements();
+		while(en.hasMoreElements()) {
+			IAnswerDataSerializer serializer = (IAnswerDataSerializer)en.nextElement();
+			Boolean contains = serializer.containsExternalData(data);
+			if(contains != null) {
+				return serializer.retrieveExternalDataPointer(data);
+			}
+		}
+		if( data instanceof PointerAnswerData) {
+			IDataPointer[] pointer = new IDataPointer[1];
+			pointer[1] = (IDataPointer)((PointerAnswerData)data).getValue();
+			return pointer;
+		}
+		else if (data instanceof MultiPointerAnswerData ) {
+			return (IDataPointer[])((MultiPointerAnswerData)data).getValue();
+		}
+		//This shouldn't have been called.
 		return null;
 	}
 }

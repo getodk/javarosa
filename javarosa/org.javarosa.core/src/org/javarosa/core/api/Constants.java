@@ -35,12 +35,4 @@ public class Constants {
 	 * Activity codes
 	 */
 	final public static String ACTIVITY_TYPE_GET_IMAGES = "get_images";
-	
-	/**
-	 * Data payload codes
-	 */
-	final public static int PAYLOAD_TYPE_TEXT = 0;
-	final public static int PAYLOAD_TYPE_JPG = 1;
-	final public static int PAYLOAD_TYPE_HEADER = 2;
-	final public static int PAYLOAD_TYPE_MULTI = 3;
 }

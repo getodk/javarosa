@@ -59,6 +59,11 @@ public class HttpTransportHeader implements IDataPayload {
 		return null;
 	}
 	public InputStream getPayloadStream() {
+
+		return new ByteArrayInputStream(getBytes());
+	}
+	
+	private byte[] getBytes() {
 		String header = "";
 		Enumeration en = headers.keys();
 		while(en.hasMoreElements()) {
@@ -66,7 +71,7 @@ public class HttpTransportHeader implements IDataPayload {
 			String value = (String)headers.get(key);
 			header += key + value + "\n";
 		}
-		return new ByteArrayInputStream(header.getBytes());
+		return header.getBytes();
 	}
 	
 	public int getPayloadType() {
@@ -77,8 +82,7 @@ public class HttpTransportHeader implements IDataPayload {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.services.transport.IDataPayload#getLength()
 	 */
-	public int getLength() {
-		//Unimplemented for now
-		return -1;
+	public long getLength() {
+		return getBytes().length;
 	}
 }

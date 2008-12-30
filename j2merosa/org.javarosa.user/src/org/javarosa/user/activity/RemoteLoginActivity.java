@@ -22,6 +22,7 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.transport.ByteArrayPayload;
+import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
@@ -151,7 +152,7 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 					   System.out.println(loginUrl); 
 					ITransportDestination requestDest= new HttpTransportDestination(loginUrl);
 					message = new TransportMessage();
-					message.setPayloadData(new ByteArrayPayload("".getBytes(),null,Constants.PAYLOAD_TYPE_TEXT)); //might have to change
+					message.setPayloadData(new ByteArrayPayload("".getBytes(),null,IDataPayload.PAYLOAD_TYPE_TEXT)); //might have to change
 					message.setDestination(requestDest);
 					message.addObserver(this);
 					transportManager = (TransportManager)JavaRosaServiceProvider.instance().getTransportManager();

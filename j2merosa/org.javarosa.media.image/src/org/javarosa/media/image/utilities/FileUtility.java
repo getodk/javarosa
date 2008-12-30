@@ -321,6 +321,22 @@ public class FileUtility {
 	}
 
 
+	public static long getFileLength(String fileName) {
+		InputStream fis = null;
+		FileConnection file = null;
+		try {
+			file = (FileConnection) Connector.open(fileName);
+			return file.availableSize();
+		} catch (Exception ex) {				
+			handleException(ex);
+		} 
+		finally {		
+			close(file);
+		}
+		return -1;
+	}
+
+
 
 
 	

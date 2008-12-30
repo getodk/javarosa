@@ -13,6 +13,15 @@ import org.javarosa.core.util.externalizable.Externalizable;
  *
  */
 public interface IDataPayload extends Externalizable {
+	
+	/**
+	 * Data payload codes
+	 */
+	final public static int PAYLOAD_TYPE_TEXT = 0;
+	final public static int PAYLOAD_TYPE_JPG = 1;
+	final public static int PAYLOAD_TYPE_HEADER = 2;
+	final public static int PAYLOAD_TYPE_MULTI = 3;
+	
 	/**
 	 * Gets the stream for this payload.
 	 * 
@@ -37,5 +46,5 @@ public interface IDataPayload extends Externalizable {
 	 */
 	public Object accept(IDataPayloadVisitor visitor);
 	
-	public int getLength();
+	public long getLength();
 }
