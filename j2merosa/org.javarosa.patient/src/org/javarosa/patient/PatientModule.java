@@ -11,5 +11,5 @@ public class PatientModule implements IModule {
 		PatientRMSUtility patientRms = new PatientRMSUtility(PatientRMSUtility.getUtilityName());
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(patientRms);
 	}
-
+   
 }
