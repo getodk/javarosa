@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -60,32 +61,38 @@ public class JavaRosaTestServlet extends HttpServlet {
 				// postData += nextName + ":" + nextValue + "<br>";
 				postData += nextName + ":" + nextValue + "\n";
 			}
-			postData += "Content-Length:" + req.getContentLength() + "\n";
-			byte[] temp = new byte[100];
-			int bytesRead = req.getInputStream().read(temp);
+			int bufSize = 100;
+			byte[] temp = new byte[bufSize];
+			InputStream stream = req.getInputStream();
+			int bytesRead = stream.read(temp);
 			int totalBytesRead = 0;
-			String bodyString = "";
+			ByteArrayOutputStream body = new ByteArrayOutputStream();
+			//String bodyString = "";
 			String fileName = this.getNewFileName("jrpost-in-progress");
 			File f = new File(fileName);
 			f.createNewFile();
 			Writer output = new BufferedWriter(new FileWriter(f));
 			try {
 				// FileWriter always assumes default encoding is OK!
-				while (bytesRead > 0) {
+				while (bytesRead != -1) {
 					totalBytesRead += bytesRead;
 					String thisChunk;
-					if (bytesRead == temp.length) {
-						thisChunk = new String(temp);
-						bytesRead = req.getInputStream().read(temp);
-					} else {
+					//If we didn't read in a full buffer.
+					if(bytesRead < bufSize) {
 						byte[] newTemp = new byte[bytesRead];
 						for (int i = 0; i < bytesRead; i++) {
 							newTemp[i] = temp[i];
 						}
 						thisChunk = new String(newTemp);
-						bytesRead = 0;
+						bytesRead = req.getInputStream().read(newTemp);
 					}
-					bodyString += thisChunk;
+					//We did read in a full buffer.
+					else {
+						//If we read in a full compliment
+						thisChunk = new String(temp);
+						bytesRead = req.getInputStream().read(temp);
+					}
+					body.write(temp);
 					output.write(thisChunk);
 				}
 			} finally {
@@ -95,7 +102,7 @@ public class JavaRosaTestServlet extends HttpServlet {
 			// postData += "<br>Body: (" + totalBytesRead + " bytes total)<br>"
 			// ;
 			postData += "\nBody: (" + totalBytesRead + " bytes total)\n";
-			postData += bodyString;
+			postData += new String(body.toByteArray());
 			_lastPostParsable = trim(postData);
 			_lastFileName = saveFile(postData);
 		} catch (Exception e) {
