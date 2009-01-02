@@ -76,10 +76,10 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 		if(theXmlDoc != null) {
 			byte[] form = XFormSerializer.getString(theXmlDoc).getBytes("UTF-8");
 			if(dataPointers.size() == 0) {
-				return new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_TEXT);
+				return new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_XML);
 			}
 			MultiMessagePayload payload = new MultiMessagePayload();
-			payload.addPayload(new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_TEXT));
+			payload.addPayload(new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_XML));
 			Enumeration en = dataPointers.elements();
 			while(en.hasMoreElements()) {
 				IDataPointer pointer = (IDataPointer)en.nextElement();

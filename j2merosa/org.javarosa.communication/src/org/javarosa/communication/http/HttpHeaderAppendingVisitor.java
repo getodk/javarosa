@@ -77,13 +77,12 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 				header.addHeader("Content-ID: ", payload.getPayloadId());
 			}
 			switch(payload.getPayloadType()) {
-			case IDataPayload.PAYLOAD_TYPE_TEXT:
-				header.addHeader("Content-type: ", getContentTypeFromId(payload.getPayloadType()));
-				break;
 			case IDataPayload.PAYLOAD_TYPE_JPG:
 				header.addHeader("Content-type: ", getContentTypeFromId(payload.getPayloadType()));
 				header.addHeader("Content-transfer-encoding: ", "binary");
 				break;
+			default: 
+				header.addHeader("Content-type: ", getContentTypeFromId(payload.getPayloadType()));
 			}
 			
 
@@ -106,8 +105,10 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 		switch(id) {
 		case IDataPayload.PAYLOAD_TYPE_TEXT:
 			return "text/plain";
+		case IDataPayload.PAYLOAD_TYPE_XML:
+			return "text/xml";
 		case IDataPayload.PAYLOAD_TYPE_JPG:
-			return "image/jpg";
+			return "image/jpeg";
 			//TODO: Handle this
 			//header.addHeader("Content-transfer-encoding: ", "binary");
 		}
