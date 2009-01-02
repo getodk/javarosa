@@ -18,9 +18,10 @@ public interface IDataPayload extends Externalizable {
 	 * Data payload codes
 	 */
 	final public static int PAYLOAD_TYPE_TEXT = 0;
-	final public static int PAYLOAD_TYPE_JPG = 1;
-	final public static int PAYLOAD_TYPE_HEADER = 2;
-	final public static int PAYLOAD_TYPE_MULTI = 3;
+	final public static int PAYLOAD_TYPE_XML = 1;
+	final public static int PAYLOAD_TYPE_JPG = 2;
+	final public static int PAYLOAD_TYPE_HEADER = 3;
+	final public static int PAYLOAD_TYPE_MULTI = 4;
 	
 	/**
 	 * Gets the stream for this payload.
