@@ -256,7 +256,10 @@ public class TreeReference implements Externalizable {
 			switch (mult) {
 			case INDEX_UNBOUND: break;
 			case INDEX_TEMPLATE: sb.append("[@template]"); break;
-			default: sb.append("[" + (mult + 1) + "]"); break;
+			default:
+				if (i > 0 || mult != 0)
+					sb.append("[" + (mult + 1) + "]");
+				break;
 			}
 			
 			if (i < size() - 1)

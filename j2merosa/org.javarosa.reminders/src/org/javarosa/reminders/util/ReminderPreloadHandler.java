@@ -7,6 +7,7 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.reminders.model.Reminder;
@@ -24,10 +25,9 @@ public class ReminderPreloadHandler implements IPreloadHandler {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.IPreloadHandler#handlePostProcess(org.javarosa.core.model.IFormDataModel, org.javarosa.core.model.IDataReference, java.lang.String)
 	 */
-	public boolean handlePostProcess(IFormDataModel model, IDataReference ref,
-			String params) {
+	public boolean handlePostProcess(TreeElement node, String params) {
 		ReminderRMSUtility reminderRms = (ReminderRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(ReminderRMSUtility.getUtilityName());
-		DateData dateData = (DateData)model.getDataValue(ref);
+		DateData dateData = (DateData)node.getValue();
 		if(dateData != null) {
 			Date date = (Date)dateData.getValue();
 			String patientName = patient.getName();

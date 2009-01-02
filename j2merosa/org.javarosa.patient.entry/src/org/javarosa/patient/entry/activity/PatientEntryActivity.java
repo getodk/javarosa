@@ -1,7 +1,6 @@
 package org.javarosa.patient.entry.activity;
 
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -11,17 +10,17 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.instance.QuestionDataElement;
-import org.javarosa.core.model.instance.QuestionDataGroup;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.patient.entry.util.PatientEntryFormDefFactory;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.model.xform.XPathReference;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.model.data.NumericListData;
 import org.javarosa.patient.storage.PatientRMSUtility;
 import org.javarosa.patient.util.DateValueTuple;
+import org.javarosa.xform.util.XFormUtils;
 
 /**
  * NOTICE:
@@ -86,78 +85,38 @@ public class PatientEntryActivity implements IActivity {
 		
 	}
 	
-	public void parsePatientFromModel(QuestionDataGroup patient) {
+	public void parsePatientFromModel(DataModelTree tree, TreeReference patRef) {
 		Patient newPatient = new Patient();
 		
+		String id = (String)getValue("/patients/patient/id", patRef, tree);
+		String familyName = (String)getValue("/patients/patient/name/family", patRef, tree);
+		String givenName = (String)getValue("/patients/patient/name/given", patRef, tree);
+		String middleName = (String)getValue("/patients/patient/name/middle", patRef, tree);
+		String sexStr = ((Selection)getValue("/patients/patient/sex", patRef, tree)).getValue();
+		int sex = ("m".equals(sexStr) ? Patient.SEX_MALE : "f".equals(sexStr) ? Patient.SEX_FEMALE : Patient.SEX_UNKNOWN);
+		Date birth = (Date)getValue("/patients/patient/dob", patRef, tree);
+		Date treatmentStart = (Date)getValue("/patients/patient/treatment-start", patRef, tree);
+
+		newPatient.setPatientIdentifier(id);
+		newPatient.setGivenName(givenName);
+		newPatient.setFamilyName(familyName);
+		newPatient.setMiddleName(middleName);
+		newPatient.setGender(sex);
+		newPatient.setBirthDate(birth);
+		newPatient.setTreatmentStartDate(treatmentStart);
+		
 		NumericListData weightRecords = new NumericListData();
-		
-		Vector children = patient.getChildren();
-		Enumeration en = children.elements();
-		
-		boolean formComplete = false;
-		while(en.hasMoreElements()) {
-			TreeElement element = (TreeElement)en.nextElement();
-			if(element instanceof QuestionDataElement) {
-				QuestionDataElement data  = (QuestionDataElement)element;
-				if("GivenName".equals(data.getName())) {
-					StringData name = (StringData)data.getValue();
-					if(name != null) {
-						newPatient.setGivenName((String)name.getValue());
-					}
-				} else if("FamilyName".equals(data.getName())) {
-					StringData name = (StringData)data.getValue();
-					if(name != null) {
-						newPatient.setFamilyName((String)name.getValue());
-					}
-				} else if("MiddleName".equals(data.getName())) {
-					StringData name = (StringData)data.getValue();
-					if(name != null) {
-						newPatient.setMiddleName((String)name.getValue());
-					}
-				} else if("DOB".equals(data.getName())) {
-					DateData date = (DateData)data.getValue();
-					if(date != null) {
-						newPatient.setBirthDate((Date)date.getValue());
-					}
-				} else if("TreatmentStartDate".equals(data.getName())) {
-					DateData date = (DateData)data.getValue();
-					if(date != null) {
-						newPatient.setTreatmentStartDate((Date)date.getValue());
-					}
-				} else if("MorePatients".equals(data.getName())) {
-					if(data.getValue() != null) {
-						formComplete = true;
-					}
-				}
-			} else if(element instanceof QuestionDataGroup) {
-				QuestionDataGroup group = (QuestionDataGroup)element;
-				if(group.getName().equals("Weight")) {
-					Enumeration weights = group.getChildren().elements();
-					DateValueTuple tuple = null;
-					while(weights.hasMoreElements()) {
-						QuestionDataElement weightData = (QuestionDataElement)weights.nextElement();
-						if(weightData.getName().indexOf("Value") != -1 ) {
-							tuple = new DateValueTuple();
-							Integer answer = (Integer)weightData.getValue().getValue();
-							if(answer != null) {
-								tuple.value = answer.intValue();
-							}
-						}
-						if(weightData.getName().indexOf("Date") != -1 ) {
-							Date answer = (Date)weightData.getValue().getValue();
-							if(answer != null && tuple != null) {
-								tuple.date = answer;
-								weightRecords.addMeasurement(tuple);
-							}
-						}
-					}
-				}
-			}
+		Vector weights = tree.expandReference(newRef("/patients/patient/weight-history/reading").contextualize(patRef));
+		for (int i = 0; i < weights.size(); i++) {
+			TreeReference readingRef = (TreeReference)weights.elementAt(i);
+			DateValueTuple reading = new DateValueTuple();
+			reading.value = ((Integer)getValue("/patients/patient/weight-history/reading/weight", readingRef, tree)).intValue();
+			reading.date = (Date)getValue("/patients/patient/weight-history/reading/taken-on", readingRef, tree);
+			weightRecords.addMeasurement(reading);
 		}
 		newPatient.setRecord("weight", weightRecords);
-		if(formComplete) {
-			writePatient(newPatient);
-		}
+		
+		writePatient(newPatient);
 	}
 	
 	private void writePatient(Patient newPatient) {
@@ -165,11 +124,19 @@ public class PatientEntryActivity implements IActivity {
 		utility.writeToRMS(newPatient);
 	}
 	
+	private Object getValue (String xpath, TreeReference context, DataModelTree tree) {
+		IAnswerData val = tree.resolveReference(newRef(xpath).contextualize(context)).getValue();
+		return (val == null ? null : val.getValue());
+	}
+	
+	private TreeReference newRef (String xpath) {
+		return DataModelTree.unpackReference(new XPathReference(xpath));
+	}
+	
 	public void parsePatientsFromModel(DataModelTree tree) {
-		QuestionDataGroup group = (QuestionDataGroup)tree.getRootElement();
-		Enumeration en = group.getChildren().elements();
-		while(en.hasMoreElements()) {
-			parsePatientFromModel((QuestionDataGroup)en.nextElement());
+		Vector patientRefs = tree.expandReference(newRef("/patients/patient"));
+		for (int i = 0; i < patientRefs.size(); i++) {
+			parsePatientFromModel(tree, (TreeReference)patientRefs.elementAt(i));
 		}
 	}
 
@@ -177,7 +144,7 @@ public class PatientEntryActivity implements IActivity {
 	 * @see org.javarosa.core.api.IActivity#resume(org.javarosa.core.Context)
 	 */
 	public void resume(Context globalContext) {
-		parsePatientsFromModel((DataModelTree)patientEntryForm.getDataModel());
+		parsePatientsFromModel((DataModelTree)patientEntryForm.getDataModel());		
 		parent.returnFromActivity(this,Constants.ACTIVITY_COMPLETE, null);
 	}
 
@@ -186,7 +153,7 @@ public class PatientEntryActivity implements IActivity {
 	 */
 	public void start(Context context) {
 		this.context = context;
-		patientEntryForm = PatientEntryFormDefFactory.createPatientEntryFormDef();
+		patientEntryForm = XFormUtils.getFormFromResource("/patient-entry.xhtml");
 		Hashtable table = new Hashtable();
 		table.put(PATIENT_ENTRY_FORM_KEY, patientEntryForm);
 		parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, table);
@@ -199,5 +166,4 @@ public class PatientEntryActivity implements IActivity {
 	public void setShell(IShell shell) {
 		this.parent = shell;
 	}
-	
 }
