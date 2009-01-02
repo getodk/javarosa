@@ -270,8 +270,9 @@ public class JavaRosaTestServlet extends HttpServlet {
 				output.close();
 				return fileName;
 			}
-		} else if(encoding.equals("image/jpg")) {
-			String fileName = getNewFileName("jr-submit-jpg", "jpg");
+		} else if(encoding.contains("image/")) {
+			String extension = encoding.split("/")[1];
+			String fileName = getNewFileName("jr-submit-" + extension, extension);
 			File f = new File(fileName);
 			OutputStream output = new FileOutputStream(f);
 			try {
