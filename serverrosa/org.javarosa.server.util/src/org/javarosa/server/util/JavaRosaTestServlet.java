@@ -258,7 +258,11 @@ public class JavaRosaTestServlet extends HttpServlet {
 	
 	
 	private String handlePart(byte[] body, String encoding) throws IOException {
-		if(encoding.equals("text/plain")) {
+		if(encoding.contains("text/")) {
+			String extension = encoding.split("/")[1];
+			if(extension == "plain") {
+				extension = "txt";
+			}
 			String fileBody = new String(body);
 			String fileName = getNewFileName("jr-submit-xml", "xml");
 			File f = new File(fileName);
@@ -272,6 +276,9 @@ public class JavaRosaTestServlet extends HttpServlet {
 			}
 		} else if(encoding.contains("image/")) {
 			String extension = encoding.split("/")[1];
+			if(extension.equals("jpeg")) {
+				extension = "jpg";
+			}
 			String fileName = getNewFileName("jr-submit-" + extension, extension);
 			File f = new File(fileName);
 			OutputStream output = new FileOutputStream(f);
