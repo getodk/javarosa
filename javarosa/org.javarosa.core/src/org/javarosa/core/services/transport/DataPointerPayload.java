@@ -79,7 +79,7 @@ public class DataPointerPayload implements IDataPayload {
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
-		ExtUtil.read(in, new ExtWrapTagged());
+		pointer = (IDataPointer)ExtUtil.read(in, new ExtWrapTagged());
 	}
 
 	/*
