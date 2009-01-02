@@ -85,16 +85,17 @@ public class JavaRosaTestServlet extends HttpServlet {
 							newTemp[i] = temp[i];
 						}
 						thisChunk = new String(newTemp);
-						bytesRead = req.getInputStream().read(newTemp);
+						output.write(thisChunk);
+						body.write(newTemp);
+						bytesRead = req.getInputStream().read(temp);
 					}
 					//We did read in a full buffer.
 					else {
-						//If we read in a full compliment
 						thisChunk = new String(temp);
+						output.write(thisChunk);
+						body.write(temp);
 						bytesRead = req.getInputStream().read(temp);
 					}
-					body.write(temp);
-					output.write(thisChunk);
 				}
 			} finally {
 				output.close();
@@ -185,7 +186,9 @@ public class JavaRosaTestServlet extends HttpServlet {
 		if(type.equals("multipart/mixed")) {
 			Vector<String> partNames = parseAndHandle(body, boundary);
 			for(int i = 0; i < partNames.size() ; ++i) {
-				htmlPostData += "<a href=" + partNames.elementAt(i) + ">Part " + i + "</a><br/>";
+				String fullname = partNames.elementAt(i);
+				String[] parts =  fullname.split(File.separator);
+				htmlPostData += "<a href=" + parts[parts.length - 1] + ">Part " + i + "</a><br/>";
 			}
 		} else {
 			htmlPostData += "<a href=" + handlePart(body, type) + ">Single Part</a><br/>";
@@ -212,8 +215,6 @@ public class JavaRosaTestServlet extends HttpServlet {
 		Vector<Integer> boundaries = locate(body, boundaryData);
 		boundaries.addAll(locate(body, finalBoundary));
 		
-		partNames.add("Number of Boundaries: " + boundaries.size() + " which are at: " + boundaries.toString());
-		
 		//There should always be two of these surrounding a body
 		for(int i = 0 ; i < boundaries.size() -1; ++i) {
 			int start = boundaries.elementAt(i).intValue() + boundaryData.length;
@@ -228,8 +229,8 @@ public class JavaRosaTestServlet extends HttpServlet {
 			String[] headerLines = new String(headers).split("\n");
 			for(String header : headerLines) {
 				String[] pieces = header.split(":");
-				if(pieces[0].equalsIgnoreCase("content-type")) {
-					type = pieces[1];
+				if(pieces[0].trim().equalsIgnoreCase("content-type")) {
+					type = pieces[1].trim();
 				}
 			}
 			partNames.add(handlePart(partBody, type));
@@ -243,10 +244,10 @@ public class JavaRosaTestServlet extends HttpServlet {
 	 * @param body
 	 * @param start
 	 * @param end
-	 * @return body[start, end -1]
+	 * @return body[start, end)
 	 */
 	private byte[] getPart(byte[] body, int start, int end) {
-		int length = (end-start) -1;
+		int length = (end-start);
 		byte[] part = new byte[length];
 		for(int i = 0; i < length ; ++ i) {
 			part[i] = body[start + i];
@@ -257,7 +258,7 @@ public class JavaRosaTestServlet extends HttpServlet {
 	
 	
 	private String handlePart(byte[] body, String encoding) throws IOException {
-		if(encoding == "text/plain") {
+		if(encoding.equals("text/plain")) {
 			String fileBody = new String(body);
 			String fileName = getNewFileName("jr-submit-xml", "xml");
 			File f = new File(fileName);
@@ -269,7 +270,7 @@ public class JavaRosaTestServlet extends HttpServlet {
 				output.close();
 				return fileName;
 			}
-		} else if(encoding == "image/jpg") {
+		} else if(encoding.equals("image/jpg")) {
 			String fileName = getNewFileName("jr-submit-jpg", "jpg");
 			File f = new File(fileName);
 			OutputStream output = new FileOutputStream(f);
