@@ -48,7 +48,6 @@ public class DemoFormsTest extends TestCase  {
 			testForm("/hmis-a_draft.xhtml");
 			testForm("/hmis-b_draft.xhtml");
 			testForm("/shortform.xhtml");
-			testForm("/tz-e-ctc.xhtml");
 			testForm("/CHMTTL.xhtml");
 			testForm("/condtest.xhtml");
 		}
