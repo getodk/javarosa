@@ -4,13 +4,16 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-import javax.microedition.io.file.FileConnection;
+//import javax.microedition.io.file.FileConnection;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.util.XFormUtils;
 
 /**
  * Static Utility methods pertaining to XForms.
@@ -28,22 +31,6 @@ public class XFormUtils {
 		
 		return getFormFromInputStream(is);
 	}
-
-	// 28 Oct 2008 This code needs to be abstracted to not use any
-	// javax.microedition libraries.
-	// 18 Aug 2008 added by Brian DeRenzi
-	// #if app.usefileconnections
-	public static FormDef getFormFromFile(FileConnection fc) {
-		InputStream fis = null;
-		try {
-			fis = fc.openInputStream();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return XFormUtils.getFormFromInputStream(fis);
-	}
-	// #endif
 
 	public static FormDef getFormFromInputStream(InputStream is) {
 		FormDef returnForm = null;
