@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.rms.RecordStoreException;
-
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.storage.utilities.IRecordStorage;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
