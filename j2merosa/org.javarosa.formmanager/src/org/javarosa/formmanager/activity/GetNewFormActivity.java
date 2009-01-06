@@ -126,7 +126,8 @@ public class GetNewFormActivity implements IActivity, CommandListener {
 			// Figure out which file was selected
 			try {
 				FileConnection fc = fileBrowser.getSelectedFile();
-				FormDef form = XFormUtils.getFormFromFile(fc);
+				InputStream fis = fc.openInputStream();
+				FormDef form = XFormUtils.getFormFromInputStream(fis);
 				
 				// Display a positive or negative alert
 				if(form == null) {
