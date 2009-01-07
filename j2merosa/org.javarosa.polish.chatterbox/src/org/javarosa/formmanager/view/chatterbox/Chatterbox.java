@@ -165,12 +165,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 			ChatterboxWidget cw = this.getWidgetAtIndex(i);
 			if (cw.getViewState() == ChatterboxWidget.VIEW_LABEL) {
 				if (FormIndex.isSubElement(index, questionIndex)) {
-					System.out.println(index.toString() + " is a parent of " + questionIndex.toString());
 					cw.setPinned(true);
 				} else {
-					if(cw.isPinned()) {
-						System.out.println(index.toString() + " is not a parent of " + questionIndex.toString());
-					}
 					cw.setPinned(false);
 				}
 			}
@@ -500,7 +496,6 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	    	StringItem item2 = new StringItem("","");
     	    	headers.addElement(cw.clone());
     		} else {
-    			System.out.println("Didn't pin a header because it was still on the screen");
     		}
     		}
     	}
@@ -509,11 +504,9 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	headers.copyInto(newHeaders);
     	if((this.topFrame == null && headers.size() > 0) || (this.topFrame != null && !itemArraysEqual(newHeaders, this.topFrame.getItems()))) {
         	if(topFrame != null) {
-        		System.out.println("Clearing headers!");
         		this.topFrame.clear();
         	}
         	for(int i = 0 ; i < newHeaders.length ; ++i ) {
-        		System.out.println("Adding a new header: " + i); 
         		append(Graphics.TOP, newHeaders[i]);
         	}
         	if(newHeaders.length == 0) {
