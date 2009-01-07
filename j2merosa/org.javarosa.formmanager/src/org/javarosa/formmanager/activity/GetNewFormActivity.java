@@ -4,6 +4,7 @@
 package org.javarosa.formmanager.activity;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.lcdui.Alert;
