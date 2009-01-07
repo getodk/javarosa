@@ -179,7 +179,12 @@
 		<delete dir="build" />
 		<delete dir="dist" />
 	</target>
-
+	
+	<!-- Main Target: Call to clean the emulator's RMS -->
+	<target name="CleanRMS" description="cleans the emulator's database">
+		<delete dir="${j2mewtk.home}/appdb/DefaultColorPhone"/>
+	</target>
+	
 	<!-- Main Target: Cleans, and then runs the build target -->
 	<target name="BuildClean" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, BuildPolish"/>
 
