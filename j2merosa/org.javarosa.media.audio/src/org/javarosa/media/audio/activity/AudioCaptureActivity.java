@@ -25,6 +25,8 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
+import org.javarosa.j2me.view.DisplayViewFactory;
+//import org.javarosa.media.audio.midlet.RecordForm;
 //import org.javarosa.j2me.view.DisplayViewFactory;
 
 //import org.javarosa.media.audio.model.FileDataPointer;
@@ -48,9 +50,11 @@ public class AudioCaptureActivity implements IActivity, CommandListener
 	private RecordControl recordControl;
 	private Command backCommand;
 	private Command captureCommand;
+	private Command playCommand;
 	private IDisplay display;
-	private byte[] audioData;
+	private ByteArrayOutputStream audioDataStream;
 	private String fullName;
+	private RecordForm form;
 	
 	public AudioCaptureActivity(IShell shell)
 	{
@@ -62,9 +66,12 @@ public class AudioCaptureActivity implements IActivity, CommandListener
 	public void start(Context context)
 	{		
 		currentContext = context;
-		RecordForm form = new RecordForm();
-		recorderPlayer = form.getPlayer();
+		form = new RecordForm();
+		recorderPlayer = form.getRecordPlayer();
 		captureCommand = form.getRecordCommand();
+		playCommand = form.getPlayCommand();
+		//Display.getDisplay(this).setCurrent(new RecordForm());
+		display.setView(DisplayViewFactory.createView(form));
 	}
 
 	//@Override
@@ -78,8 +85,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener
 	public void destroy() 
 	{
 		// TODO Auto-generated method stub
-		player.close();
-		player = null;
+		recorderPlayer.close();
+		recorderPlayer = null;
 		
 	}
 
@@ -115,12 +122,12 @@ public class AudioCaptureActivity implements IActivity, CommandListener
 	//Start the recording
 	public void capture()
 	{
-		form.commandAction(captureCommand, this);
+		//form.commandAction(captureCommand, this);
 	}
 	
 	public void commandAction(Command c, Displayable disp)
 	{
-		form.commandAction(c, disp);
+		form.commandAction(c, form);		
 	}
 	
 }
@@ -130,10 +137,13 @@ class RecordForm extends Form implements CommandListener
     private StringItem messageItem;
     private StringItem errorItem;
     private final Command recordCommand, playCommand;
-    private Player p;
-    private byte[] recordedSoundArray = null;
+    private Player recordP;
+    private Player playP;
+    //private byte[] recordedSoundArray = null;
+    private ByteArrayOutputStream output;
 
-public RecordForm(){
+public RecordForm()
+{
     super("Record Audio");        
     messageItem = new StringItem("Record", "Click record to start recording.");
     this.append(messageItem);
@@ -150,20 +160,9 @@ public RecordForm(){
 public void commandAction(Command comm, Displayable disp){
     //Record to file
 	if(comm==recordCommand){
-        try{                
-            p = Manager.createPlayer("capture://audio?encoding=pcm");
-            p.realize();                
-            RecordControl rc = (RecordControl)p.getControl("RecordControl");                
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            rc.setRecordStream(output);                
-            rc.startRecord();
-            p.start();
-            messageItem.setText("recording...");
-            Thread.currentThread().sleep(5000);
-            messageItem.setText("done!");
-            rc.commit();               
-            recordedSoundArray = output.toByteArray();                
-            p.close();
+        try
+        {                
+        	recordAudio();
         } catch (IOException ioe) {
             errorItem.setLabel("Error");
             errorItem.setText(ioe.toString());
@@ -177,11 +176,9 @@ public void commandAction(Command comm, Displayable disp){
     } 
     //User should be able to replay recording
     else if(comm == playCommand) {
-        try {
-            ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(recordedSoundArray);
-            Player p2 = Manager.createPlayer(recordedInputStream,"audio/basic");
-            p2.prefetch();
-            p2.start();
+        try 
+        {
+        	playAudio();
         }  catch (IOException ioe) {
             errorItem.setLabel("Error");
             errorItem.setText(ioe.toString());
@@ -196,8 +193,48 @@ public void commandAction(Command comm, Displayable disp){
 	  return recordCommand;
   }
   
-  public Player getPlayer()
-  {	  
-	  return p;
+  public Command getPlayCommand()
+  {
+	  return playCommand;
   }
+  
+  public Player getRecordPlayer()
+  {	  
+	  return recordP;
+  }
+  
+  public Player getPlayer()
+  {
+	  return playP;
+  }
+  
+  public ByteArrayOutputStream getRecordedAudio()
+  {
+	  return output;
+  }
+  
+  public void recordAudio() throws MediaException, IOException, InterruptedException
+  {	  
+	  recordP = Manager.createPlayer("capture://audio");
+	  recordP.realize();                
+      RecordControl rc = (RecordControl)recordP.getControl("RecordControl");                
+      output = new ByteArrayOutputStream();
+      rc.setRecordStream(output);                
+      rc.startRecord();
+      recordP.start();
+      messageItem.setText("recording...");
+      Thread.currentThread().sleep(5000);
+      messageItem.setText("done!");
+      rc.commit();               
+      //recordedSoundArray = output.toByteArray();                
+      recordP.close();
+  }
+  
+  public void playAudio() throws MediaException, IOException
+  {
+	  ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(output.toByteArray()/*recordedSoundArray*/);
+      playP = Manager.createPlayer(recordedInputStream,"audio/basic");
+      playP.prefetch();
+      playP.start();
+  }  
 }
