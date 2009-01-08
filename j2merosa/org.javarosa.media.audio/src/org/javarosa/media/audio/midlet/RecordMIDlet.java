@@ -40,7 +40,8 @@ class RecordForm extends Form implements CommandListener{
     }
     
     public void commandAction(Command comm, Displayable disp){
-        if(comm==recordCommand){
+        //Record to file
+    	if(comm==recordCommand){
             try{                
                 p = Manager.createPlayer("capture://audio?encoding=pcm");
                 p.realize();                
@@ -65,7 +66,9 @@ class RecordForm extends Form implements CommandListener{
                 errorItem.setLabel("Error");
                 errorItem.setText(ie.toString());
             }
-        } else if(comm == playCommand) {
+        } 
+        //User should be able to replay recording
+        else if(comm == playCommand) {
             try {
                 ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(recordedSoundArray);
                 Player p2 = Manager.createPlayer(recordedInputStream,"audio/basic");
