@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -18,13 +19,14 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class FormDefMetaData extends MetaDataObject
 {
+	private String formTitle = ""; //the title of the FormDef being referenced
 
-    private String formName = ""; //the name of the FormDef being referenced
+	private String formName = ""; //the name of the FormDef being referenced
     private int version = 0; //the version of the FormDef
     private int type = 0; //the FormDef Type
     
     public String toString(){
-    	return new String (super.toString()+" name: "+this.formName+" version: "+this.version
+    	return new String (super.toString()+" name: "+this.formName+" title: " + this.formTitle + " version: "+this.version
     			+ " type: "+this.type);
     }
     
@@ -39,7 +41,7 @@ public class FormDefMetaData extends MetaDataObject
      */
     public FormDefMetaData(FormDef form)
     {
-        this.formName = form.getName();
+        this.formName = form.getTitle();
         
     }
     
@@ -60,12 +62,27 @@ public class FormDefMetaData extends MetaDataObject
        return this.formName; 
     }
     
+    /**
+	 * @return the formTitle
+	 */
+	public String getTitle() {
+		return formTitle;
+	}
+
+	/**
+	 * @param formTitle the formTitle to set
+	 */
+	public void setTitle(String formTitle) {
+		this.formTitle = formTitle;
+	}
+    
     /* (non-Javadoc)
      * @see org.javarosa.clforms.storage.MetaDataObject#readExternal(java.io.DataInputStream)
      */
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
     	super.readExternal(in, pf);
         this.formName = ExternalizableHelperDeprecated.readUTF(in);
+        this.formTitle = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
         this.version = in.readInt();
         this.type = in.readInt();
     }
@@ -78,6 +95,7 @@ public class FormDefMetaData extends MetaDataObject
     {
     	super.writeExternal(out);
         ExternalizableHelperDeprecated.writeUTF(out,this.formName);
+        ExtUtil.writeString(out,ExtUtil.emptyIfNull(this.formTitle));
         out.writeInt(this.version);
         out.writeInt(type);
     }
@@ -90,7 +108,7 @@ public class FormDefMetaData extends MetaDataObject
     {
         FormDef form = (FormDef)object;
         this.setName(form.getName());
-        
+        this.setTitle(form.getTitle());
     }
 
 

@@ -97,7 +97,7 @@ public class FormEntryController {
 			DataModelTree instance = (DataModelTree)form.getDataModel(); //worry about supporting other data model types later
 			int instanceID = model.getInstanceID();
 
-			instance.setName(form.getName());
+			instance.setName(form.getTitle());
 	        instance.setFormId(form.getRecordId());
 	        instance.setDateSaved(new Date());
 

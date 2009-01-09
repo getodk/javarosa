@@ -17,7 +17,7 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 public class Referrals implements Externalizable {
 	//The id of the form that these referrals are for
-	private int formId;
+	private String formName;
 	
 	/** ReferralCondition */
 	Vector referralConditions;
@@ -26,23 +26,20 @@ public class Referrals implements Externalizable {
 		referralConditions = new Vector();
 	}
 	
-	public Referrals(int formId , Vector referralConditions) {
-		this.formId = formId;
+	public Referrals(String formName , Vector referralConditions) {
+		if(formName == null) {
+			throw new IllegalArgumentException("Cannot create a set of Referrals for a form with a null name");
+		}
+		this.formName = formName;
 		this.referralConditions = referralConditions;
 	}
 	
-	/**
-	 * @return the formId
-	 */
-	public int getFormId() {
-		return formId;
+	public String getFormName() {
+		return formName;
 	}
 
-	/**
-	 * @param formId the formId to set
-	 */
-	public void setFormId(int formId) {
-		this.formId = formId;
+	public void setFormName(String formName) {
+		this.formName = formName;
 	}
 
 	public Vector getPositiveReferrals(DataModelTree model, XFormAnswerDataSerializer serializer) {
@@ -58,6 +55,7 @@ public class Referrals implements Externalizable {
 				SelectMultiData mulData = (SelectMultiData) data;
 				if (mulData != null && ((Vector) mulData.getValue()).size() > 0) {
 					referralStrings.addElement(condition.getReferralText());
+					
 				}
 				condition.getReferralText();
 			} else {
@@ -84,7 +82,7 @@ public class Referrals implements Externalizable {
 	 * )
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		this.formId = in.readInt();
+		this.formName = in.readUTF();
 		referralConditions = ExternalizableHelperDeprecated.readExternal(in, ReferralCondition.class);
 	}
 
@@ -92,7 +90,7 @@ public class Referrals implements Externalizable {
 	 * @see org.javarosa.core.util.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeInt(this.formId);
+		out.writeUTF(this.formName);
 		ExternalizableHelperDeprecated.writeExternal(referralConditions, out);	
 	}
 	

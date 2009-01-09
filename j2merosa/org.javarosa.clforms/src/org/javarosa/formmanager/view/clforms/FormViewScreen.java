@@ -26,7 +26,7 @@ public class FormViewScreen extends List implements IView {
 
 	public FormViewScreen (FormEntryModel model) {
         //#style CL_Forms_Form
-    	super(model.getForm().getName(),List.IMPLICIT);
+    	super(model.getForm().getTitle(),List.IMPLICIT);
     	this.model = model;
     	createView();
 		setUpCommands();

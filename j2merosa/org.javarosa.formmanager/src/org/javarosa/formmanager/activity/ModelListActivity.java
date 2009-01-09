@@ -148,7 +148,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
             		//#endif
             		DataModelTree formData = new DataModelTree();
             		this.dataModelRMSUtility.retrieveFromRMS(data.getRecordId(), formData);
-            		selectedForm.setName(this.formDefRMSUtility.getName(data.getFormIdReference()));
+            		selectedForm.setTitle(this.formDefRMSUtility.getName(data.getFormIdReference()));
             		System.out.println("data model: "+formData.getName());
             		Hashtable formEditArgs = new Hashtable();
             		formEditArgs.put(returnKey, CMD_EDIT);

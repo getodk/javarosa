@@ -84,13 +84,13 @@ public class QuestionDefTest extends TestCase {
 		QuestionDef q;
 		
 		q = new QuestionDef();
-		if (q.getID() != -1 || q.getName() != null) {
+		if (q.getID() != -1 || q.getTitle() != null) {
 			fail("QuestionDef not initialized properly (default constructor)");
 		}
 		testSerialize(q, "a");
 		
 		q = new QuestionDef(17, "test question", Constants.CONTROL_RANGE);
-		if (q.getID() != 17 || !"test question".equals(q.getName())) {
+		if (q.getID() != 17 || !"test question".equals(q.getTitle())) {
 			fail("QuestionDef not initialized properly");
 		}
 		testSerialize(q, "b");
@@ -112,8 +112,8 @@ public class QuestionDefTest extends TestCase {
 		}
 		testSerialize(q, "c");
 
-		q.setName("rosebud");
-		if (!"rosebud".equals(q.getName())) {
+		q.setTitle("rosebud");
+		if (!"rosebud".equals(q.getTitle())) {
 			fail("Name getter/setter broken");
 		}
 		testSerialize(q, "d");

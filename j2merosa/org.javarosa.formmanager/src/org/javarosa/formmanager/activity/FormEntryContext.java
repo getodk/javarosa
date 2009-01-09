@@ -8,6 +8,7 @@ import org.javarosa.core.model.utils.IPreloadHandler;
 
 public class FormEntryContext extends Context {
 	public static final String FORM_ID = "FORM_ID";
+	public static final String FORM_NAME = "FORM_NAME";
 	public static final String INSTANCE_ID = "INSTANCE_ID";
 	public static final String PRELOAD_HANDLERS = "PRELOAD_HANDLERS";
 	public static final String FUNCTION_HANDLERS = "FUNCTION_HANDLERS";
@@ -22,6 +23,14 @@ public class FormEntryContext extends Context {
 	
 	public void setFormID (int formID) {
 		setElement(FORM_ID, new Integer(formID));
+	}
+	
+	public String getFormName () {
+		return (String)getElement(FORM_NAME);
+	}
+	
+	public void setFormName (String formName) {
+		setElement(FORM_NAME, formName);
 	}
 
 	public int getInstanceID () {

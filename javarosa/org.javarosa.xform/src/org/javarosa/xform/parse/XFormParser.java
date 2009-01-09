@@ -80,6 +80,8 @@ public class XFormParser {
 	private static void initProcessingRules () {
 		IElementHandler title = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseTitle(f, e); } };
+		IElementHandler meta = new IElementHandler () {
+			public void handle (FormDef f, Element e, Object parent) { parseMeta(f, e); } };
 		IElementHandler model = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseModel(f, e); } };
 		IElementHandler input = new IElementHandler () {
@@ -115,6 +117,7 @@ public class XFormParser {
 		}
 		topLevelHandlers.put("model", model);
 		topLevelHandlers.put("title", title);
+		topLevelHandlers.put("meta", meta);
 
 		groupLevelHandlers.put("label", groupLabel);
 	}
@@ -253,7 +256,25 @@ public class XFormParser {
 	private static void parseTitle (FormDef f, Element e) {
 		String title = getXMLText(e, true);
 		System.out.println("Title: \"" + title + "\"");
-		f.setName(title);
+		f.setTitle(title);
+		if(f.getName() == null) {
+			//Jan 9, 2009 - ctsims
+			//We don't really want to allow for forms without
+			//some unique ID, so if a title is available, use
+			//that.
+			f.setName(title);
+		}
+	}
+	
+	private static void parseMeta (FormDef f, Element e) {
+		int attributes = e.getAttributeCount();
+		for(int i = 0 ; i < attributes ; ++i) {
+			String name = e.getAttributeName(i);
+			String value = e.getAttributeValue(i);
+			if("name".equals(name)) {
+				f.setName(value);
+			}
+		}
 	}
 
 	//for ease of parsing, we assume a model comes before the controls, which isn't necessarily mandated by the xforms spec
@@ -821,7 +842,7 @@ public class XFormParser {
 	private static void parseInstance (FormDef f, Element e) {
 		TreeElement root = buildInstanceStructure(e, null);
 		DataModelTree instanceModel = new DataModelTree(root);
-		instanceModel.setName(f.getName());
+		instanceModel.setName(f.getTitle());
 		
 		processRepeats(instanceModel);
 		verifyBindings(f, instanceModel);

@@ -24,8 +24,8 @@ public interface IFormElement extends Localizable, Externalizable {
 	 */
 	void setID (int id);
 	
-	String getName ();
-	void setName (String name);
+	String getTitle ();
+	void setTitle (String name);
 	
 	/**
 	 * @return A vector containing any children that this element
