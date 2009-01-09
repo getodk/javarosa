@@ -56,16 +56,16 @@ public class ReferralReport implements IActivity, CommandListener {
 	public void start(Context context) {
 		if(context instanceof ReportContext) {
 			this.context = context;
-			int formId = ((ReportContext)context).getFormId();
+			String formName = ((ReportContext)context).getFormName();
 			int modelId = ((ReportContext)context).getModelId();
 			
 			ReferralRMSUtility referralRms = (ReferralRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(ReferralRMSUtility.getUtilityName());
 			DataModelTreeRMSUtility modelUtility = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
-			if(!referralRms.containsFormReferrals(formId)) {
+			if(!referralRms.containsFormReferrals(formName)) {
 				this.referrals = new Referrals();
 			} else {
 				try {
-					this.referrals = referralRms.retrieveFromRMS(formId);
+					this.referrals = referralRms.retrieveFromRMS(formName);
 
 					this.model = new DataModelTree();
 					modelUtility.retrieveFromRMS(modelId, this.model);

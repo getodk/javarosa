@@ -122,7 +122,7 @@ public class StudyDef implements Externalizable {
 	public FormDef getForm(String varName){
 		for(byte i=0; i<forms.size(); i++){
 			FormDef def = (FormDef)forms.elementAt(i);
-			if(def.getName().equals(varName))
+			if(def.getTitle().equals(varName))
 				return def;
 		}
 		

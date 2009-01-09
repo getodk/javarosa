@@ -39,7 +39,7 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	public ItemCommandListener itemListner;
 
 	public SingleQuestionScreen(FormElementBinding prompt) {
-		super(prompt.element.getName());		
+		super(prompt.element.getTitle());		
 		this.qDef = prompt;
 		this.creatView();
 		this.setUpCommands();
@@ -48,7 +48,7 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	//hack: this is for moving to NEXT question
 	public SingleQuestionScreen(FormElementBinding prompt, int temp) {
 	//#style nextQuestion
-		super(prompt.element.getName());
+		super(prompt.element.getTitle());
 		
 		this.qDef = prompt;
 		this.creatView();
@@ -58,7 +58,7 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	//hack: this is for moving to PREV question
 	public SingleQuestionScreen(FormElementBinding prompt, String str) {
 	//#style prevQuestion
-		super(prompt.element.getName());
+		super(prompt.element.getTitle());
 		this.qDef = prompt;
 		this.creatView();
 		this.setUpCommands();
@@ -67,7 +67,7 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	//hack: this is for moving to question fromViewAnswers
 	public SingleQuestionScreen(FormElementBinding prompt, char str) {
 	//#style fromViewAnswers
-		super(prompt.element.getName());
+		super(prompt.element.getTitle());
 		this.qDef = prompt;
 		this.creatView();
 		this.setUpCommands();

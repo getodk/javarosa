@@ -35,8 +35,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class FormDef implements IFormElement, Localizable, IDRecordable, Externalizable{
 	private Vector children;	/** A collection of group definitions. */
-	private int id;		/** The numeric unique identifier of the form definition. */	
-	private String name;	/** The display name of the form. */
+	private int id;		/** The numeric unique identifier of the form definition on the local device */	
+	private String title;	/** The display title of the form. */
+	private String name;  /** A unique external name that is used to identify the form between machines */
 	private Localizer localizer;
 	private Vector conditions; //<Condition>
 	private DataModelTree model;
@@ -137,12 +138,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		return ref;
 	}
 	
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public int getID() {
@@ -151,6 +152,14 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 
 	public void setID(int id) {
 		this.id = id;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	//treating id and record id as the same until we resolve the need for both of them
@@ -382,7 +391,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	}
 	
 	public String toString() {
-		return getName();
+		return getTitle();
 	}
 	
 	/**
@@ -458,7 +467,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
-		setName((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setName(ExtUtil.nullIfEmpty(ExtUtil.readString(dis)));
+		setTitle((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setChildren((Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 		
 		model = (DataModelTree)ExtUtil.read(dis, DataModelTree.class, pf);
@@ -497,7 +507,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		ExtUtil.writeNumeric(dos, getID());
-		ExtUtil.write(dos, new ExtWrapNullable(getName()));
+		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(getName()));
+		ExtUtil.write(dos, new ExtWrapNullable(getTitle()));
 		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
 		ExtUtil.write(dos, model);
 		ExtUtil.write(dos, new ExtWrapNullable(localizer));

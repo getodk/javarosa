@@ -24,21 +24,21 @@ public class ReferralRMSUtility extends RMSUtility {
 	 */
 	public void writeToRMS(Referrals referrals) {
 		ReferralMetaData md = new ReferralMetaData();
-		md.setFormId(referrals.getFormId());
+		md.setFormName(referrals.getFormName());
 		super.writeToRMS(referrals, md);
 	}
 	
-	public Referrals retrieveFromRMS(int formId) throws IOException, IllegalAccessException, InstantiationException, DeserializationException {
+	public Referrals retrieveFromRMS(String formName) throws IOException, IllegalAccessException, InstantiationException, DeserializationException {
 		Referrals referrals = new Referrals();
 		
-		int refId = getReferralsId(formId);
+		int refId = getReferralsId(formName);
 		this.retrieveFromRMS(refId, referrals);
 		
 		return referrals;
 	}
 	
-	public boolean containsFormReferrals(int formId) {
-		if(getReferralsId(formId) == -1) {
+	public boolean containsFormReferrals(String formName) {
+		if(getReferralsId(formName) == -1) {
 			return false;
 		}
 		return true;
@@ -56,13 +56,13 @@ public class ReferralRMSUtility extends RMSUtility {
 		return referralMetaData;
 	}
 	
-	private int getReferralsId(int formId) {
+	private int getReferralsId(String formName) {
 		try {
 			IRecordStoreEnumeration metaEnum = metaDataRMS.enumerateMetaData();
 			while (metaEnum.hasNextElement()) {
 				int i = metaEnum.nextRecordId();
 				ReferralMetaData md = (ReferralMetaData)getMetaDataFromId(i);
-				if(md.getFormId() == formId) {
+				if(md.getFormName().equals(formName)) {
 					return md.getRecordId();
 				}
 			}

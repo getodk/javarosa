@@ -50,7 +50,7 @@ public class ReportingBindHandler implements IXFormBindHandler {
 	
 	public void postProcess(FormDef formDef) {
 		ReferralRMSUtility referralRms =(ReferralRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(ReferralRMSUtility.getUtilityName());
-		Referrals referrals = new Referrals(formDef.getID(), this.getReferralConditions());
+		Referrals referrals = new Referrals(formDef.getName(), this.getReferralConditions());
 		referralRms.writeToRMS(referrals);
 	}
 }

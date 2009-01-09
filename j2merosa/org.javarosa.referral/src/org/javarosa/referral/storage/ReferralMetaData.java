@@ -18,23 +18,24 @@ import org.javarosa.referral.model.Referrals;
  */
 public class ReferralMetaData extends MetaDataObject {
 
-	int formId;
+	/** The external name of the form these referrals are for **/
+	String formName;
 	
 	public ReferralMetaData() {
 	}
 	
 	/**
-	 * @return the formId
+	 * @return the formName
 	 */
-	public int getFormId() {
-		return formId;
+	public String getFormName() {
+		return formName;
 	}
 
 	/**
-	 * @param formId the formId to set
+	 * @param formName the formName to set
 	 */
-	public void setFormId(int formId) {
-		this.formId = formId;
+	public void setFormName(String formName) {
+		this.formName = formName;
 	}
 
 	/* (non-Javadoc)
@@ -42,7 +43,7 @@ public class ReferralMetaData extends MetaDataObject {
 	 */
 	public void setMetaDataParameters(Object originalObject) {
 		Referrals ref = (Referrals)originalObject;
-		this.formId = ref.getFormId();
+		this.formName = ref.getFormName();
 	}
 	/*
 	 * (non-Javadoc)
@@ -51,7 +52,7 @@ public class ReferralMetaData extends MetaDataObject {
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException
     {
     	super.readExternal(in, pf);
-    	this.formId = in.readInt();
+    	this.formName = in.readUTF();
     }
 	
     /*
@@ -61,7 +62,7 @@ public class ReferralMetaData extends MetaDataObject {
 	public void writeExternal(DataOutputStream out) throws IOException
     {
         super.writeExternal(out);
-        out.writeInt(this.formId);
+        out.writeUTF(this.formName);
     }
 
 }

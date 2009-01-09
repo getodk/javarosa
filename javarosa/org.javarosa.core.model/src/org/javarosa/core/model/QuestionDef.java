@@ -62,7 +62,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	
 	public QuestionDef (int id, String name, int controlType) {
 		setID(id);
-		setName(name);
+		setTitle(name);
 		setControlType(controlType);
 		observers = new Vector();
 	}
@@ -98,11 +98,11 @@ public class QuestionDef implements IFormElement, Localizable {
 		this.id = id;
 	}
 	
-	public String getName() {
+	public String getTitle() {
 		return name;
 	}
 	
-	public void setName(String name) {
+	public void setTitle(String name) {
 		this.name = name;
 	}
 
@@ -309,7 +309,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	 */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
-		setName((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setTitle((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
@@ -337,7 +337,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		ExtUtil.writeNumeric(dos, getID());
-		ExtUtil.write(dos, new ExtWrapNullable(getName()));
+		ExtUtil.write(dos, new ExtWrapNullable(getTitle()));
 		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
 		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
