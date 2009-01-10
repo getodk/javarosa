@@ -26,6 +26,8 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
 import org.javarosa.j2me.view.DisplayViewFactory;
+//import org.javarosa.media.image.activity.String;
+import org.javarosa.media.image.utilities.FileUtility;
 //import org.javarosa.media.audio.midlet.RecordForm;
 //import org.javarosa.j2me.view.DisplayViewFactory;
 
@@ -41,20 +43,28 @@ import javax.microedition.lcdui.*;
 import javax.microedition.media.*;
 import javax.microedition.media.control.*;
 
-public class AudioCaptureActivity implements IActivity, CommandListener 
+public class AudioCaptureActivity implements IActivity, CommandListener, Runnable 
 {
+	private final long FOREVER = 1000000;
 	private IShell parentShell;
 	private Context currentContext;
 	
-	private Player recorderPlayer;
+	private Player recordP;
+    private Player playP;
 	private RecordControl recordControl;
-	private Command backCommand;
-	private Command captureCommand;
-	private Command playCommand;
+	//Obviously, we also want to implement a Stop command
+	private Command recordCommand, playCommand, stopCommand, backCommand;
 	private IDisplay display;
 	private ByteArrayOutputStream audioDataStream;
 	private String fullName;
-	private RecordForm form;
+	private RecorderForm form;
+	
+	private StringItem messageItem;
+    private StringItem errorItem;
+    
+    Thread captureThread;
+    
+    boolean captureThreadInterrupted = false;
 	
 	public AudioCaptureActivity(IShell shell)
 	{
@@ -66,12 +76,24 @@ public class AudioCaptureActivity implements IActivity, CommandListener
 	public void start(Context context)
 	{		
 		currentContext = context;
-		form = new RecordForm();
-		recorderPlayer = form.getRecordPlayer();
-		captureCommand = form.getRecordCommand();
-		playCommand = form.getPlayCommand();
+		form = new RecorderForm();
+		
+		messageItem = form.getMessageItem();
+		errorItem = form.getErrorItem();
+		
+		recordCommand = new Command("Record", Command.SCREEN, 0);
+    	form.addCommand(recordCommand);
+    	playCommand = new Command("Play", Command.SCREEN, 1);
+    	form.addCommand(playCommand);
+    	stopCommand = new Command("Stop", Command.SCREEN, 0); //Do not add immediately    	
+    	backCommand = new Command("Back", Command.BACK, 0);
+    	form.addCommand(backCommand);
+		
+    	captureThread = new Thread(this);
+    	
 		//Display.getDisplay(this).setCurrent(new RecordForm());
 		display.setView(DisplayViewFactory.createView(form));
+		form.setCommandListener(this);
 	}
 
 	//@Override
@@ -84,9 +106,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener
 	//@Override
 	public void destroy() 
 	{
-		// TODO Auto-generated method stub
-		recorderPlayer.close();
-		recorderPlayer = null;
+		// TODO Auto-generated method stub		
+		recordP = null;
 		
 	}
 
@@ -117,124 +138,199 @@ public class AudioCaptureActivity implements IActivity, CommandListener
 	public void setShell(IShell shell) 
 	{
 		parentShell = shell;		
-	}
-	
-	//Start the recording
-	public void capture()
+	}	
+
+	//This method does not run, because the commandlistener is from the RecordForm
+	public void commandAction(Command comm, Displayable disp)
 	{
-		//form.commandAction(captureCommand, this);
+		//Record to file
+		if(comm==recordCommand)
+		{	           
+	        captureThread.setPriority(Thread.currentThread().getPriority() +1 );
+	        if(!captureThreadInterrupted)
+	        	captureThread.start();	        
+	        //recordAudio();	        
+	    } 
+	    //User should be able to replay recording
+	    else if(comm == playCommand)
+	    {
+	        try 
+	        {
+	        	playAudio();
+	        }  catch (IOException ioe) {
+	            errorItem.setLabel("Error");
+	            errorItem.setText(ioe.toString());
+	        } catch (MediaException me) {
+	            errorItem.setLabel("Error");
+	            errorItem.setText(me.toString());
+	        }
+	    }
+	    //Stop recording audio
+	    else if(comm == stopCommand)
+	    {
+	    	try
+	    	{
+	    		stopCapturing();
+	    	}
+	    	catch(InterruptedException ie)
+	    	{
+	    		errorItem.setLabel("Error");
+	            errorItem.setText(ie.toString());
+	    	}	    	
+	    	catch(IOException ioe) 
+	    	{
+	            errorItem.setLabel("Error");
+	            errorItem.setText(ioe.toString());
+	        } 
+	    	catch(MediaException me) 
+	    	{
+	            errorItem.setLabel("Error");
+	            errorItem.setText(me.toString());
+	        }
+	    }
+		
+	    else if(comm == backCommand)
+	    {
+	    	moveBack();
+	    }	
+	    
 	}
 	
-	public void commandAction(Command c, Displayable disp)
+	public synchronized void recordAudio() throws MediaException, IOException, InterruptedException
 	{
-		form.commandAction(c, form);		
-	}
-	
+		  if(recordP == null)
+			  recordP = Manager.createPlayer(/*"capture://audio"*/"capture://audio?rate=8000&bits=8&Channels=1");
+		  recordP.realize();                
+		  recordControl = (RecordControl)recordP.getControl("RecordControl");                
+	      audioDataStream = new ByteArrayOutputStream();
+	      recordControl.setRecordStream(audioDataStream);                
+	      recordControl.startRecord();
+	      //errorItem.setText("Started recording");
+	      recordP.start();
+	      messageItem.setText("recording...");
+	      
+	      form.removeCommand(recordCommand); //"Hide" recordCommand when recording has stopped
+		  form.addCommand(stopCommand);		  
+		  
+	      //Thread.currentThread().sleep(FOREVER);
+		  /*
+		  captureThread.start();
+		  Thread.yield();
+		  captureThread.join();
+		  */
+		  Thread.sleep(FOREVER);		  
+		  
+		  /*
+	      messageItem.setText("done!");
+	      recordControl.commit();               
+	      //recordedSoundArray = audioDataStream.toByteArray();
+	      errorItem.setText("Sound size=" + audioDataStream.toByteArray().length);
+	      saveFile("Test_Rec.wav", audioDataStream.toByteArray());
+	      */	      
+	  }
+	  
+	  public synchronized void playAudio() throws MediaException, IOException
+	  {
+		  System.err.println("Attempting to play audio...");
+		  ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(audioDataStream.toByteArray()/*recordedSoundArray*/);
+	      playP = Manager.createPlayer(recordedInputStream,"audio/basic");
+          playP.prefetch();
+	      //playP.realize();
+	      playP.start();
+	      playP.close();
+	  }  
+	  
+	  public void stopCapturing() throws InterruptedException, MediaException, IOException
+	  {
+		  System.err.println("Stop recording");
+		  recordControl.stopRecord();
+		  //Thread.currentThread().interrupt();
+		  captureThread.interrupt();
+		  captureThreadInterrupted = true;
+		  captureThread.setPriority(Thread.currentThread().getPriority() -1 );		  
+		  form.removeCommand(stopCommand); //"Hide" stopCommand when recording desires to resume
+		  form.addCommand(recordCommand);
+		  
+		  messageItem.setText("done!");
+	      recordControl.commit();               
+	      //recordedSoundArray = audioDataStream.toByteArray();
+	      errorItem.setText("Sound size=" + audioDataStream.toByteArray().length);
+	      saveFile("Test_Rec.wav", audioDataStream.toByteArray());
+	      
+	      recordP.deallocate();
+		  recordP.close();
+	  }
+	  
+	  private String saveFile(String filename, byte[] sound) 
+	  {
+		  String rootName = FileUtility.getDefaultRoot();
+		  String restorepath = "file:///" + rootName + "JRSounds";				
+		  FileUtility.createDirectory(restorepath);
+		  String fullName = restorepath + "/" + filename;
+		  if(FileUtility.createFile(fullName, sound)) 
+		  {
+			System.out.println("Sound saved.");	
+			return fullName;	
+		  } 
+		  else 
+		  {
+			return "";
+		  }		
+	  }
+	  
+	  //Go back one screen
+	  public void moveBack()
+	  {
+		System.err.println("Moving back");
+		parentShell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+		/*TODO
+		 * Fix NullPointerException.
+		 */
+		
+	  }
+	  
+	  //Record audio in a separate thread to keep the command listener alert for stopping
+	  public void run()
+	  {		  
+		    try
+	        {   
+			  recordAudio();
+	        } catch (IOException ioe) {
+	            errorItem.setLabel("Error");
+	            errorItem.setText(ioe.toString());
+	        } catch (MediaException me) {
+	            errorItem.setLabel("Error");
+	            errorItem.setText(me.toString());
+	        } catch (InterruptedException ie) {
+	            errorItem.setLabel("Error");
+	            errorItem.setText(ie.toString());
+	        }
+	  }
 }
 
-class RecordForm extends Form implements CommandListener
+class RecorderForm extends Form
 {
     private StringItem messageItem;
-    private StringItem errorItem;
-    private final Command recordCommand, playCommand;
-    private Player recordP;
-    private Player playP;
-    //private byte[] recordedSoundArray = null;
-    private ByteArrayOutputStream output;
+    private StringItem errorItem;    
 
-public RecordForm()
-{
-    super("Record Audio");        
-    messageItem = new StringItem("Record", "Click record to start recording.");
-    this.append(messageItem);
-    errorItem = new StringItem("", "");
-    this.append(errorItem);        
-    recordCommand = new Command("Record", Command.SCREEN, 1);
-    this.addCommand(recordCommand);
-    playCommand = new Command("Play", Command.SCREEN, 2);
-    this.addCommand(playCommand);        
-    StringBuffer inhalt = new StringBuffer();        
-    this.setCommandListener(this);
-}
-
-public void commandAction(Command comm, Displayable disp){
-    //Record to file
-	if(comm==recordCommand){
-        try
-        {                
-        	recordAudio();
-        } catch (IOException ioe) {
-            errorItem.setLabel("Error");
-            errorItem.setText(ioe.toString());
-        } catch (MediaException me) {
-            errorItem.setLabel("Error");
-            errorItem.setText(me.toString());
-        } catch (InterruptedException ie) {
-            errorItem.setLabel("Error");
-            errorItem.setText(ie.toString());
-        }
-    } 
-    //User should be able to replay recording
-    else if(comm == playCommand) {
-        try 
-        {
-        	playAudio();
-        }  catch (IOException ioe) {
-            errorItem.setLabel("Error");
-            errorItem.setText(ioe.toString());
-        } catch (MediaException me) {
-            errorItem.setLabel("Error");
-            errorItem.setText(me.toString());
-        }
+    public RecorderForm()
+    {    	
+    	super("Record Audio");        
+    	messageItem = new StringItem("", "Press Record to start recording.");
+    	append(messageItem);
+    	errorItem = new StringItem("", "");
+    	append(errorItem);    	
+    	StringBuffer inhalt = new StringBuffer();    	
     }
-  }
-  public Command getRecordCommand()
-  {	  
-	  return recordCommand;
-  }
-  
-  public Command getPlayCommand()
-  {
-	  return playCommand;
-  }
-  
-  public Player getRecordPlayer()
-  {	  
-	  return recordP;
-  }
-  
-  public Player getPlayer()
-  {
-	  return playP;
-  }
-  
-  public ByteArrayOutputStream getRecordedAudio()
-  {
-	  return output;
-  }
-  
-  public void recordAudio() throws MediaException, IOException, InterruptedException
-  {	  
-	  recordP = Manager.createPlayer("capture://audio");
-	  recordP.realize();                
-      RecordControl rc = (RecordControl)recordP.getControl("RecordControl");                
-      output = new ByteArrayOutputStream();
-      rc.setRecordStream(output);                
-      rc.startRecord();
-      recordP.start();
-      messageItem.setText("recording...");
-      Thread.currentThread().sleep(5000);
-      messageItem.setText("done!");
-      rc.commit();               
-      //recordedSoundArray = output.toByteArray();                
-      recordP.close();
-  }
-  
-  public void playAudio() throws MediaException, IOException
-  {
-	  ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(output.toByteArray()/*recordedSoundArray*/);
-      playP = Manager.createPlayer(recordedInputStream,"audio/basic");
-      playP.prefetch();
-      playP.start();
-  }  
+    
+    public StringItem getMessageItem()
+    {
+    	return messageItem;
+    }
+    
+    public StringItem getErrorItem()
+    {
+    	return errorItem;
+    }
+    
 }
