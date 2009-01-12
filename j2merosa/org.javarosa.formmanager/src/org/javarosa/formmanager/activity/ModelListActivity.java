@@ -53,6 +53,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 
 	public final static Command CMD_BACK = new Command("Back", Command.BACK, 2);
 	public final static Command CMD_SEND = new Command("Send Data",Command.SCREEN,1);
+	public static final Command CMD_SEND_ALL_UNSENT = new Command("Send all unsent", Command.SCREEN, 2);
 	public final static Command CMD_EDIT = new Command("Edit", Command.SCREEN, 2);
 	public final static Command CMD_REFRESH = new Command("Refresh", Command.SCREEN, 3);
 	public final static Command CMD_MSGS = new Command("Message Status",Command.SCREEN,4);
@@ -119,9 +120,10 @@ public class ModelListActivity extends List implements CommandListener, IActivit
         this.addCommand(CMD_EDIT);
         this.addCommand(CMD_SEND);
         //this.addCommand(CMD_MSGS);//now redundant as we have color boxes for this TODO: clean up related code!
+        this.addCommand(CMD_SEND_ALL_UNSENT);
         this.addCommand(CMD_DELETE);
         this.addCommand(CMD_EMPTY);
-        this.addCommand(CMD_REFRESH);
+        this.addCommand(CMD_REFRESH);        
         this.setCommandListener(this);
         this.populateListWithModels();
 		mainShell.setDisplay(this,this);
@@ -198,7 +200,62 @@ public class ModelListActivity extends List implements CommandListener, IActivit
                 mainShell.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, formSendArgs);
                 }
             }
-        } else if (c == CMD_EMPTY)
+        } else if (c == CMD_SEND_ALL_UNSENT) {
+        	Enumeration en = modelIDs.elements();
+        	Vector unsent = new Vector();
+			while (en.hasMoreElements()) {
+				DataModelTreeMetaData data = (DataModelTreeMetaData)en.nextElement();
+				DataModelTree model = new DataModelTree();
+				ITransportManager tm = JavaRosaServiceProvider.instance()
+						.getTransportManager();
+				try {
+					this.dataModelRMSUtility.retrieveFromRMS(
+							data.getRecordId(), model);
+					// model.setRecordId(data.getRecordId());
+				} catch (IOException e) {
+					final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert(
+							"modelLoadError", "Error Loading Model", null,
+							AlertType.ERROR);
+					mainShell.setDisplay(this, new IView() {
+						public Object getScreenObject() {
+							return a;
+						}
+					});
+					e.printStackTrace();
+				} catch (DeserializationException e) {
+					final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert(
+							"modelLoadError", "Error Loading Model", null,
+							AlertType.ERROR);
+					mainShell.setDisplay(this, new IView() {
+						public Object getScreenObject() {
+							return a;
+						}
+					});
+					e.printStackTrace();
+				}
+				// restrict resending of sent forms here
+
+				if (TransportMessage.STATUS_DELIVERED == tm
+						.getModelDeliveryStatus(data.getRecordId(), true)) {
+					//Do Nothing
+				} else {
+					unsent.addElement(model);
+				}
+			}
+			if(unsent.size() != 0) {
+				Hashtable formSendArgs = new Hashtable();
+				// TODO: We need some way to codify this Next Action stuff.
+				// Maybe a set of Constants for the ModelListModule?
+				formSendArgs.put(returnKey, CMD_SEND_ALL_UNSENT);
+				formSendArgs.put("data_vec", unsent);
+				mainShell.returnFromActivity(this,
+						Constants.ACTIVITY_NEEDS_RESOLUTION, formSendArgs);
+				
+			} else {
+				createView();
+			}
+        }
+        else if (c == CMD_EMPTY)
         {
         	this.dataModelRMSUtility.tempEmpty();
             createView();

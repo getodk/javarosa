@@ -1,6 +1,7 @@
 package org.javarosa.demo.shell;
 
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.microedition.midlet.MIDlet;
 
@@ -190,12 +191,14 @@ public class JavaRosaDemoShell implements IShell {
 
 			Object returnVal = returnVals.get(ModelListActivity.returnKey);
 			if (returnVal == ModelListActivity.CMD_MSGS) {
-				launchFormTransportActivity(context, TransportContext.MESSAGE_VIEW, null);
+				launchFormTransportActivity(context, TransportContext.MESSAGE_VIEW);
 			} else if (returnVal == ModelListActivity.CMD_EDIT) {
 				launchFormEntryActivity(context, ((FormDef)returnVals.get("form")).getID(),
 						((DataModelTree)returnVals.get("data")).getId());
 			} else if (returnVal == ModelListActivity.CMD_SEND) {
 				launchFormTransportActivity(context, TransportContext.SEND_DATA, (DataModelTree)returnVals.get("data"));
+			} else if (returnVal == ModelListActivity.CMD_SEND_ALL_UNSENT) {
+				launchFormTransportActivity(context, TransportContext.SEND_MULTIPLE_DATA, (Vector)returnVals.get("data_vec"));
 			} else if (returnVal == ModelListActivity.CMD_BACK) {
 				launchActivity(new FormListActivity(this, "Forms List"), context);
 			}
@@ -265,12 +268,31 @@ public class JavaRosaDemoShell implements IShell {
 
 	private void launchFormTransportActivity (Context context, String task, DataModelTree data) {
 		FormTransportActivity formTransport = new FormTransportActivity(this);
-		formTransport.setDataModelSerializer(new XFormSerializingVisitor());
 		formTransport.setData(data); //why isn't this going in the context?
 		TransportContext msgContext = new TransportContext(context);
-		msgContext.setRequestedTask(task);
 
-		launchActivity(formTransport, msgContext);
+		launchFormTransportActivity(formTransport, task, msgContext);
+	}
+	private void launchFormTransportActivity (Context context, String task, Vector multidata) {
+		FormTransportActivity formTransport = new FormTransportActivity(this);
+		TransportContext msgContext = new TransportContext(context);
+		msgContext.setMultipleData(multidata);
+
+		launchFormTransportActivity(formTransport, task, msgContext);
+	}
+	
+	private void launchFormTransportActivity (Context context, String task) {
+		FormTransportActivity formTransport = new FormTransportActivity(this);
+		TransportContext msgContext = new TransportContext(context);
+
+		launchFormTransportActivity(formTransport, task, msgContext);
+	}
+	
+	private void launchFormTransportActivity(FormTransportActivity activity, String task, TransportContext context) {
+		context.setRequestedTask(task);
+		activity.setDataModelSerializer(new XFormSerializingVisitor());
+
+		launchActivity(activity, context);
 	}
 
 	private void relaunchListActivity () {

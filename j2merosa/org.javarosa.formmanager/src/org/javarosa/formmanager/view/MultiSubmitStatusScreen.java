@@ -1,8 +1,12 @@
+/**
+ * 
+ */
 package org.javarosa.formmanager.view;
 
 import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -14,34 +18,44 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.services.transport.TransportMessage;
 
-public class SubmitStatusScreen extends Form implements ISubmitStatusScreen {
-	private int modelID;
+/**
+ * Note: This screen assumes that the model IDs provided will be sent in a more or
+ * less sequential fashion.
+ * 
+ * @author Clayton Sims
+ * @date Jan 11, 2009 
+ *
+ */
+public class MultiSubmitStatusScreen extends Form implements ISubmitStatusScreen {
+	
+	private int currentid;
+	private int[] modelIDs;
     private StringItem msg;
     private Command okCommand;
     private Timer timer;
     int counter = 0;
+    
+    private String response;
 
     public static final int REFRESH_INTERVAL = 1000;
-    public static final int TIMEOUT = 60000;
+    public static final int TIMEOUT = 180000;
 
-    public static String MSG_SENDING = "Sending...";
-    public static String MSG_SUCCESS = "Form has been submitted successfully! Your reference is: ";
+    public static final String MSG_N_COMP = "Succesfully Transmitted Form ";
+    public static final String MSG_SENDING_N = "\nCurrently Sending Form ";
+    public static String MSG_SUCCESS = "Forms have been submitted successfully! Your reference is: ";
     public static String MSG_FAILED = "Submission failed! Please try to submit the form again later in 'View Saved'.";
     public static String MSG_TOO_LONG = "Sending is taking a long time; you may check on the status and/or resend later in 'View Saved'";
     public static String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
     
-    public SubmitStatusScreen (CommandListener listener) {
-    	this(listener, -1);
-	}
-    
-	public SubmitStatusScreen (CommandListener listener, int modelID) {
+	public MultiSubmitStatusScreen (CommandListener listener, int[] modelIDs) {
     	//#style submitPopup
 		super("Send Status");
-		this.modelID = modelID;
+		this.modelIDs = modelIDs;
+		response = "";
 		setCommandListener(listener);
 		
 		okCommand = new Command("OK", Command.OK, 1);
-		msg = new StringItem(null, MSG_SENDING);
+		msg = new StringItem(null, getCurrentDisplay());
 
 		addCommand(okCommand);
 		append(new Spacer(80, 0));
@@ -56,25 +70,43 @@ public class SubmitStatusScreen extends Form implements ISubmitStatusScreen {
 	}
 	
 	public void updateStatus () {
-		int status = JavaRosaServiceProvider.instance().getTransportManager().getModelDeliveryStatus(modelID, false);
+		int status = JavaRosaServiceProvider.instance().getTransportManager().getModelDeliveryStatus(modelIDs[currentid], false);
 		updateStatus(status);
 	}
 	
 	public void updateStatus(int status) {
 			counter += REFRESH_INTERVAL;
 
-			if (status != TransportMessage.STATUS_NEW)
+			if (!(status == TransportMessage.STATUS_NEW || status == TransportMessage.STATUS_DELIVERED || status == -1)) {
 				timer.cancel();
+			}
 
 			String message;
 			switch (status) {
-			case TransportMessage.STATUS_NEW:       message = (counter < TIMEOUT ? MSG_SENDING : MSG_TOO_LONG); break;
-			case TransportMessage.STATUS_DELIVERED: message = MSG_SUCCESS + getServerResponse(); break;
-			case TransportMessage.STATUS_FAILED:    message = MSG_FAILED; break;
-			default:                                message = MSG_UNKNOWN_ERROR; break;
+			case TransportMessage.STATUS_NEW:
+			case -1:
+				message = (counter < TIMEOUT ? getCurrentDisplay() : MSG_TOO_LONG); break;
+			case TransportMessage.STATUS_DELIVERED:
+				response += getServerResponse() + "\n";
+				currentid++;
+				if(currentid == modelIDs.length) {
+					message = MSG_SUCCESS  + response;
+					timer.cancel();
+				} else {
+					message = getCurrentDisplay();
+				}
+				break;
+			case TransportMessage.STATUS_FAILED:    
+				message = MSG_FAILED; break;
+			default:                                
+				message = MSG_UNKNOWN_ERROR; break;
 			}
 
 			msg.setText(message);
+	}
+	
+	private String getCurrentDisplay() {
+		return MSG_N_COMP + currentid + " of " + modelIDs.length + MSG_SENDING_N + (currentid+1) + " of " + modelIDs.length; 
 	}
 	
 	public void destroy () {
@@ -91,10 +123,13 @@ public class SubmitStatusScreen extends Form implements ISubmitStatusScreen {
 		//}
 		return receipt;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IView#getScreenObject()
+	 */
 	public Object getScreenObject() {
+		// TODO Auto-generated method stub
 		return this;
 	}
+
 }
-
-
-

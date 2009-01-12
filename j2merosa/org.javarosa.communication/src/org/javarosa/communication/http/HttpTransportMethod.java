@@ -1,6 +1,5 @@
 package org.javarosa.communication.http;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,10 +8,13 @@ import java.util.Vector;
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -26,8 +28,6 @@ public class HttpTransportMethod implements TransportMethod {
 
 	private static final String name = "HTTP";
 
-	private TransportMessage message;
-
 	private ITransportManager manager;
 	
 	private IActivity destinationRetrievalActivity;
@@ -39,10 +39,10 @@ public class HttpTransportMethod implements TransportMethod {
 	 * @see org.openmrs.transport.TransportMethod#transmit(org.openmrs.transport.TransportMessage)
 	 */
 	public void transmit(TransportMessage message, ITransportManager manager) {
-		cacheURL(message);
-		this.message = message;
+		cacheURL(message);		
 		this.manager = manager;
 		primaryWorker = new WorkerThread();
+		primaryWorker.setMessage(message);	
 		new Thread(primaryWorker).start();
 	}
 	
@@ -74,6 +74,12 @@ public class HttpTransportMethod implements TransportMethod {
 		private HttpConnection con = null;
 		private InputStream in = null;
 		private OutputStream out = null;
+		
+		private TransportMessage message;
+		
+		public void setMessage(TransportMessage message) {
+			this.message  = message;
+		}
 		
 		
 		public void cleanStreams(){
@@ -117,7 +123,7 @@ public class HttpTransportMethod implements TransportMethod {
 				
 				HttpTransportDestination destination = (HttpTransportDestination)message.getDestination();
 				con = (HttpConnection) Connector.open(destination.getURL());
-
+				
 				con.setRequestMethod(HttpConnection.POST);
 				con.setRequestProperty("User-Agent",
 						"Profile/MIDP-2.0 Configuration/CLDC-1.1");
@@ -127,10 +133,10 @@ public class HttpTransportMethod implements TransportMethod {
 				//con.setRequestProperty("Content-length", String.valueOf(httpload.getLength()));
 				//System.out.println("Content-Length: " + String.valueOf(httpload.getLength()) + " bytes");
 				//You don't use content length with chunked encoding
-				out = con.openOutputStream();
 				
+				out = con.openOutputStream(); // Problem exists here on 3110c CommCare Application: open hangs
+					
 				//ByteArrayOutputStream bis = new ByteArrayOutputStream();  //For Testing!
-				
 				
 				InputStream valueStream = httpload.getPayloadStream();
 				int val = valueStream.read();
@@ -191,13 +197,16 @@ public class HttpTransportMethod implements TransportMethod {
 				message.notifyObservers(message.getReplyloadData());
 
 			} catch (ClassCastException e) {
+				Alert alert = new Alert("ERROR! cce", e.getMessage(), null, AlertType.ERROR);
 				throw new IllegalArgumentException(message.getDestination()
 						+ " is not a valid HTTP URL");
 			} catch (IOException e) {
+				Alert alert = new Alert("ERROR! ioe", e.getMessage(), null, AlertType.ERROR);
 				//#if debug.output==verbose || debug.output==exception
 				System.out.println(e.getMessage());
 				//#endif
 			} catch(java.lang.SecurityException se) {
+				Alert alert = new Alert("ERROR! se", se.getMessage(), null, AlertType.ERROR);
 	             /***
                  * This exception was added to deal with the user denying access to airtime
                  */
