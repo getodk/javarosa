@@ -14,6 +14,17 @@
 	<!-- Main Target: Call to build the project -->
 	<!-- This is the main work target, it actually builds the code -->
 	<target name="BuildPolish" depends="init" description="This is the controller for the J2ME build process.">
+
+		<!-- Since the <libraries> call won't filter, we have to do so ahead of time. -->
+		<mkdir dir="${dir.lib.working}"/>
+		<copy todir="${dir.lib.working}">
+			<fileset dir="${dir.lib}">
+				<exclude name=".svn"/>
+			</fileset>
+		</copy>
+		
+		<!-- A property containing the path to the preprocessed source files -->
+		<property name="builtsource" value="${dir.build}/real/${device.identifier}/en/source/" />
 		<buildPolish>
 			<info name="${app.name}"
 				version="${app.version}"
@@ -47,6 +58,8 @@
 					<!--Taking this out for now...-->
 					<!--source dir="${dir.test}"/-->
 					<source dir="${basedir}/../org.javarosa.communication/src/"/>
+					<source dir="${basedir}/../org.javarosa.communication.ui/src/"/>
+					<source dir="${basedir}/../org.javarosa.clforms/src/"/>
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
@@ -56,7 +69,7 @@
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
-					
+					<source dir="${basedir}/../org.javarosa.clforms/test/"/>
 					<!-- defunct
 					<source dir="${basedir}/../org.javarosa.entitymgr/src/"/>
 					<source dir="${basedir}/../org.javarosa.patient/src/"/>
@@ -86,14 +99,20 @@
 				<!-- obfuscator settings: do not obfuscate when the test-property is true -->
 				<obfuscator name="ProGuard" unless="test or noobfuscate">
 					<parameter name="optimize" value="true" />
+					<parameter name="printmapping" value="dist\obfuscation_mapping.txt" />
 					
 					<!-- none of the parameter names below can be the same, or else they will clobber previous parameters; hence the varied spacing -->
 					<parameter name="keep,allowshrinking" value="!abstract class org.javarosa.core.model.* implements org.javarosa.core.model.IFormElement" />
 					<parameter name="keep, allowshrinking" value="!abstract class org.javarosa.core.model.instance.* implements org.javarosa.core.model.IFormDataModel" />
-					<parameter name="keep , allowshrinking" value="!abstract class org.javarosa.core.model.data.* implements org.javarosa.core.model.data.IAnswerData" />
-					<parameter name="keep  ,allowshrinking" value="!abstract class org.javarosa.model.xform.* implements org.javarosa.core.model.IDataReference" />
-					<parameter name="keep,   allowshrinking" value="!abstract class org.javarosa.xpath.* implements org.javarosa.core.model.condition.IConditionExpr" />
-					<parameter name="keep ,  allowshrinking" value="!abstract class org.javarosa.xpath.expr.* extends org.javarosa.xpath.expr.XPathExpression" />
+					<parameter name="keep ,allowshrinking" value="!abstract class org.javarosa.core.model.data.* implements org.javarosa.core.model.data.IAnswerData" />
+					<parameter name="keep,  allowshrinking" value="!abstract class org.javarosa.model.xform.* implements org.javarosa.core.model.IDataReference" />
+					<parameter name="keep , allowshrinking" value="!abstract class org.javarosa.xpath.* implements org.javarosa.core.model.condition.IConditionExpr" />
+					<parameter name="keep  ,allowshrinking" value="!abstract class org.javarosa.xpath.expr.* extends org.javarosa.xpath.expr.XPathExpression" />
+					<parameter name="keep,   allowshrinking" value="!abstract class org.javarosa.communication.http.* implements org.javarosa.core.services.transport.ITransportDestination"/>
+					<parameter name="keep " value="!abstract class org.javarosa.** implements org.javarosa.core.services.transport.IDataPayload"/>
+					<parameter name="keep,    allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.transport.IDataPayload"/>
+					<parameter name="keep  " value="!abstract class org.javarosa.** implements org.javarosa.core.data.IDataPointer"/>
+					<parameter name="keep,     allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.data.IDataPointer"/>
 				</obfuscator>
 
 				<!-- log settings: only use debug setting when the test-property is true -->
@@ -101,7 +120,10 @@
 					<filter pattern="org.celllife.clforms.*" level="debug" />
 				</debug>
 				<!-- Properties of the actual javac compiler -->
-				<compiler debug="on" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar"/>
+			<compiler debug="on" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/wmapi.jar"/>
+				
+				<!--postcompiler name="java5" /-->
+				<!-- Add back when we're satisfied with everyone using it -->
 
 			</build>
 
@@ -145,6 +167,7 @@
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="disableObfuscator, BuildPolish" description="Runs j2mepolish Unit Tests on constructed jars">
 		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
+		<RunTestSuite suite="org.javarosa.clforms.test.FormViewManagerTest"/>
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
 	</target>
