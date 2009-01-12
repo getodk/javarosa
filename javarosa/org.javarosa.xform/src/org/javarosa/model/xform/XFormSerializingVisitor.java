@@ -44,8 +44,15 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 	FormDef schema;	//not used
 	
 	Vector dataPointers;
+	
+	private void init() {
+		theXmlDoc = null;
+		schema = null;
+		dataPointers = new Vector();
+	}
 
 	public byte[] serializeDataModel(IFormDataModel model, FormDef formDef) throws IOException {
+		init();
 		this.schema = formDef;
 		return serializeDataModel(model);
 	}
@@ -55,6 +62,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 	 * @see org.javarosa.core.model.utils.IDataModelSerializingVisitor#serializeDataModel(org.javarosa.core.model.IFormDataModel)
 	 */
 	public byte[] serializeDataModel(IFormDataModel model) throws IOException {
+		init();
 		if(this.serializer == null) {
 			this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
 		}
@@ -68,7 +76,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 	}
 	
 	public IDataPayload createSerializedPayload	(IFormDataModel model) throws IOException {
-		dataPointers = new Vector();
+		init();
 		if(this.serializer == null) {
 			this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
 		}

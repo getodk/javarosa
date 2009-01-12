@@ -26,13 +26,14 @@ import org.javarosa.core.api.IView;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
 import org.javarosa.core.services.ITransportManager;
-import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.formmanager.utility.TransportContext;
+import org.javarosa.formmanager.view.ISubmitStatusScreen;
+import org.javarosa.formmanager.view.MultiSubmitStatusScreen;
 import org.javarosa.formmanager.view.SubmitScreen;
 import org.javarosa.formmanager.view.SubmitStatusScreen;
 
@@ -67,7 +68,7 @@ public class FormTransportActivity implements
 
 	private SubmitScreen submitScreen;
 
-	private SubmitStatusScreen submitStatusScreen;
+	private ISubmitStatusScreen submitStatusScreen;
 
 	private Display display;
 
@@ -83,6 +84,8 @@ public class FormTransportActivity implements
 			Command.OK, 1);
 	private static final Command CMD_DETAILS = new Command("Show details",
 			Command.SCREEN, 1);
+	private static final Command CMD_SEND_ALL_UNSENT = new Command("Send all unsent",
+			Command.OK, 2);
 
 	private static final Command CMD_DELETEMSG = new Command("Delete message",Command.SCREEN,1);
 	
@@ -93,6 +96,8 @@ public class FormTransportActivity implements
 	private IShell shell;
 
 	private DataModelTree data;
+	
+	private Vector multiData;
 
 	private int currentMethod;
 
@@ -170,6 +175,7 @@ public class FormTransportActivity implements
 		messageList.addCommand(CMD_BACK);
 		messageList.addCommand(CMD_DETAILS);
 		messageList.addCommand(CMD_DELETEMSG);
+		messageList.addCommand(CMD_SEND_ALL_UNSENT);
 		messageList.setSelectCommand(CMD_DETAILS);
 		messageList.setCommandListener(this);
 		loggingTextBox = new TextBox("Log messages", null, 1000,
@@ -189,6 +195,22 @@ public class FormTransportActivity implements
 			showMessageList();
 		}
 		else if(task.equals(TransportContext.SEND_DATA)) {
+			multiData = null;
+			if(destination == null) {
+				submitScreen = new SubmitScreen();
+				submitScreen.setCommandListener(this);
+				submitScreen.setItemStateListener(this);
+				shell.setDisplay(this,submitScreen);
+			} else {
+				try {
+					sendData(JavaRosaServiceProvider.instance().getTransportManager().getCurrentTransportMethod());
+				} catch (IOException e) {
+					//TODO: Handle this exception reasonably!!!!!
+					e.printStackTrace();
+				}
+			}
+		} else if(task.equals(TransportContext.SEND_MULTIPLE_DATA)) {
+			multiData = context.getMultipleData();
 			if(destination == null) {
 				submitScreen = new SubmitScreen();
 				submitScreen.setCommandListener(this);
@@ -314,6 +336,10 @@ public class FormTransportActivity implements
 					showMessageList();
 					break;
 				default:
+					//1-10-2009 - ctsims
+					//The comment below sketches me out. That doesn't seem like an acceptable way to 
+					//index menu items.
+					
 					//Offset from always-present menu choices
 					int transportType = selected - 2;
 
@@ -405,18 +431,41 @@ public class FormTransportActivity implements
 	 * @throws IOException
 	 */
 	public void sendData(int transportMethod) throws IOException {
-		if(this.data != null) {
-			IDataPayload payload = dataModelSerializer.createSerializedPayload(data);
-			JavaRosaServiceProvider.instance().getTransportManager().enqueue(payload,
-					destination, transportMethod, this.data.getId());
-		}else{
-			javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("noDataAlert", "No data has been selected",null,
-					AlertType.ERROR);
-			shell.setDisplay(this, new IView() {public Object getScreenObject() {return mainMenu;}});
+		if (this.multiData != null) {
+			int[] ids = new int[multiData.size()];
+			int i = 0;
+			Enumeration en = multiData.elements();
+			while(en.hasMoreElements()) {
+				DataModelTree ndata = (DataModelTree)en.nextElement();
+				IDataPayload payload = dataModelSerializer.createSerializedPayload(ndata);
+				JavaRosaServiceProvider.instance().getTransportManager().enqueue(payload,
+						destination, transportMethod, ndata.getId());
+				ids[i] = ndata.getId();
+				i++;
+			}
+			submitStatusScreen = new MultiSubmitStatusScreen(this, ids);
+			shell.setDisplay(this, submitStatusScreen);
+			
+		} else {
+			if (this.data != null) {
+				IDataPayload payload = dataModelSerializer.createSerializedPayload(data);
+				JavaRosaServiceProvider.instance().getTransportManager()
+						.enqueue(payload, destination, transportMethod,
+								this.data.getId());
+			} else {
+				javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert(
+						"noDataAlert", "No data has been selected", null,
+						AlertType.ERROR);
+				shell.setDisplay(this, new IView() {
+					public Object getScreenObject() {
+						return mainMenu;
+					}
+				});
+			}
+
+			submitStatusScreen = new SubmitStatusScreen(this, data.getId());
+			shell.setDisplay(this, submitStatusScreen);
 		}
-		
-		submitStatusScreen = new SubmitStatusScreen(this, data.getId());
-		shell.setDisplay(this, submitStatusScreen);
 	}
 
 	/*
