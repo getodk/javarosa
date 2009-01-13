@@ -1,18 +1,15 @@
 package org.javarosa.formmanager.controller;
 
-import java.util.Date;
-
-//import javax.microedition.lcdui.Command;
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.formmanager.model.FormEntryModel;
-import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.FormElementBinding;
+
+import java.util.Date;
 
 public class FormEntryController {
 	public static final int QUESTION_OK = 0;
@@ -20,16 +17,9 @@ public class FormEntryController {
 	public static final int QUESTION_CONSTRAINT_VIOLATED = 2;
 	
 	FormEntryModel model;
-	IFormEntryView view;
-	IControllerHost parent;
 
-	public FormEntryController (FormEntryModel model, IControllerHost parent) {
+	public FormEntryController (FormEntryModel model) {
 		this.model = model;
-		this.parent = parent;
-	}
-
-	public void setFormEntryView (IFormEntryView view) {
-		this.view = view;
 	}
 
 	public int questionAnswered (FormElementBinding binding, IAnswerData data) {
@@ -59,7 +49,6 @@ public class FormEntryController {
 
 	public void stepQuestion (boolean forward) {
 		FormIndex index = model.getQuestionIndex();
-
 		do {
 			if (forward) {
 				index = model.getForm().incrementIndex(index);
@@ -75,7 +64,6 @@ public class FormEntryController {
 			model.setFormComplete();
 			return;
 		}
-
 		selectQuestion(index);
 	}
 
@@ -117,14 +105,6 @@ public class FormEntryController {
 		}
 	}
 
-	public void exit () {
-		view.destroy();
-		parent.controllerReturn("exit");
-	}
-
-	public void startOver () {
-
-	}
 
 	public void setLanguage (String language) {
 		model.getForm().getLocalizer().setLocale(language);
@@ -133,13 +113,4 @@ public class FormEntryController {
 	public void cycleLanguage () {
 		setLanguage(model.getForm().getLocalizer().getNextLocale());
 	}
-
-	public void setView (IView d) {
-		parent.setView(d);
-	}
-	/*
-	public void suspendActivity(Command command) {
-		// added for image choosing
-		parent.controllerReturn(command.getLabel());
-	}*/
 }
