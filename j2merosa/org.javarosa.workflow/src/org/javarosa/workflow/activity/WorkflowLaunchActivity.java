@@ -81,6 +81,7 @@ public class WorkflowLaunchActivity implements IActivity {
 		if(context instanceof WorkflowLaunchContext) {
 			this.context = (WorkflowLaunchContext)context;
 			this.workflow = this.context.getWorkflow();
+			this.workflow.setDataModel(this.context.getDataModel());
 		}
 		
 	}

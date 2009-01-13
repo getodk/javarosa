@@ -4,6 +4,7 @@
 package org.javarosa.workflow;
 
 import org.javarosa.core.Context;
+import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.workflow.model.Workflow;
 
 /**
@@ -13,6 +14,7 @@ import org.javarosa.workflow.model.Workflow;
  */
 public class WorkflowLaunchContext extends Context {
 	private static String WORKFLOW_KEY = "w";
+	private static String DATA_MODEL_KEY = "dm";
 	
 	public void setWorkflow(Workflow w) {
 		this.setElement(WORKFLOW_KEY, w);
@@ -21,4 +23,14 @@ public class WorkflowLaunchContext extends Context {
 	public Workflow getWorkflow() {
 		return (Workflow)this.getElement(WORKFLOW_KEY);
 	}
+	
+	public void setDataModel(IFormDataModel dm) {
+		this.setElement(DATA_MODEL_KEY, dm);
+	}
+	
+	public IFormDataModel getDataModel() {
+		return (IFormDataModel)this.getElement(DATA_MODEL_KEY);
+	}
+	
+	
 }
