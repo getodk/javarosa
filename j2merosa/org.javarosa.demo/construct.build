@@ -7,12 +7,12 @@
 	<target name="merge" description="Merge together the javarosa and j2merosa code">
 		<mkdir dir="${rootdir}\merged" />
 		<copy todir="${rootdir}\merged">
+            <fileset basedir="${rootdir}\j2merosa">
+                <include name="**/*" />
+            </fileset>
+        </copy>
+        <copy todir="${rootdir}\merged">
 			<fileset basedir="${rootdir}\javarosa">
-				<include name="**/*" />
-			</fileset>
-		</copy>
-		<copy todir="${rootdir}\merged">
-			<fileset basedir="${rootdir}\j2merosa">
 				<include name="**/*" />
 			</fileset>
 		</copy>
