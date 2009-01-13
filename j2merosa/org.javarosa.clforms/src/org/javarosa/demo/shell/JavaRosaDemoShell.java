@@ -7,6 +7,7 @@ import javax.microedition.midlet.MIDlet;
 import org.javarosa.activity.splashscreen.SplashScreenActivity;
 import org.javarosa.communication.http.HttpTransportModule;
 import org.javarosa.communication.http.HttpTransportProperties;
+import org.javarosa.communication.ui.CommunicationUIModule;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
@@ -21,16 +22,16 @@ import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.WorkflowStack;
-import org.javarosa.formmanager.activity.DisplayFormsHttpActivity;
-import org.javarosa.formmanager.activity.GetFormHttpActivity;
-import org.javarosa.formmanager.activity.GetFormListHttpActivity;
 import org.javarosa.formmanager.FormManagerModule;
+import org.javarosa.formmanager.activity.DisplayFormsHttpActivity;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.activity.FormListActivity;
 import org.javarosa.formmanager.activity.FormTransportActivity;
-import org.javarosa.formmanager.activity.ModelListActivity;
+import org.javarosa.formmanager.activity.GetFormHttpActivity;
+import org.javarosa.formmanager.activity.GetFormListHttpActivity;
 import org.javarosa.formmanager.activity.MemoryCheckActivity;
+import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.utility.FormDefSerializer;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
@@ -39,7 +40,6 @@ import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.AddUserActivity;
-import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.user.activity.RemoteLoginActivity;
 import org.javarosa.user.activity.UpdateProfileActivity;
 import org.javarosa.user.model.User;
@@ -94,7 +94,7 @@ public class JavaRosaDemoShell implements IShell {
 		new CoreModelModule().registerModule(context);
 		new HttpTransportModule().registerModule(context);
 		new FormManagerModule().registerModule(context);
-		//new CommunicationUIModule().registerModule(context);
+		new CommunicationUIModule().registerModule(context);
 	}
 
 	private void generateSerializedForms(String originalResource) {
@@ -360,16 +360,22 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void loadProperties() {
+		//read default urls from jad file
+		String authURL,getURL,postURL; 
+		authURL = midlet.getAppProperty("authURL");
+		getURL = midlet.getAppProperty("getURL");
+		postURL = midlet.getAppProperty("postURL");
+		
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
 		//JavaRosaServiceProvider.instance().getPropertyManager().addRules(new DemoAppProperties());
-
 		PropertyUtils.initializeProperty("DeviceID", PropertyUtils.genGUID(25));
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://localhost/limesurvey/admin/post2lime.php");
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://localhost/limesurvey/admin/post2lime.php");
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://survey.cell-life.org/admin/post2limeNew.php");
-		PropertyUtils.initializeProperty(HttpTransportProperties.GET_URL_PROPERTY, "http://update.cell-life.org/save_dump.php");
-		//PropertyUtils.initializeProperty(HttpTransportProperties.GET_URL_PROPERTY, "http://localhost/limesurvey/listsurveys.php");
-		PropertyUtils.initializeProperty(HttpTransportProperties.AUTH_URL_PROPERTY, "http://localhost/limesurvey/verifyremote.php");
+		//PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://localhost/limesurvey/admin/post2lime.php");
+		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, postURL);
+		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, postURL);
+		//PropertyUtils.initializeProperty(HttpTransportProperties.GET_URL_PROPERTY, "http://update.cell-life.org/save_dump.php");
+		PropertyUtils.initializeProperty(HttpTransportProperties.GET_URL_PROPERTY, getURL);
+		//PropertyUtils.initializeProperty(HttpTransportProperties.AUTH_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/verifyremote.php");
+		PropertyUtils.initializeProperty(HttpTransportProperties.AUTH_URL_PROPERTY, authURL);
 
 	}
 
