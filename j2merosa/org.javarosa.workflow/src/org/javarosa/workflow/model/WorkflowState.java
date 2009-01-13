@@ -27,6 +27,11 @@ public class WorkflowState {
 	String name;
 	
 	/**
+	 * A human-readable description of this state.
+	 */
+	String description;
+	
+	/**
 	 * A boolean XPathExpression which defines whether or not this is
 	 * the state that the workflow should currently reside in.
 	 */
@@ -51,4 +56,26 @@ public class WorkflowState {
 	public boolean isCurrentState(IFormDataModel model) {
 		return XPathFuncExpr.toBoolean(definition.eval(model, new EvaluationContext())).booleanValue();
 	}
+	
+	/**
+	 * @return A human-readable description of this state.
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * @return the actions
+	 */
+	public Vector getActions() {
+		return actions;
+	}
+	
 }
