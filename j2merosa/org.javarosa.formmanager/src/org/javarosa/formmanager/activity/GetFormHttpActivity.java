@@ -12,6 +12,7 @@ import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.TransportManager;
@@ -137,5 +138,10 @@ public class GetFormHttpActivity implements IActivity,CommandListener,Observer {
 		parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 
 	}
-
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
+	 */
+	public void annotateCommand(ICommand command) {
+		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
+	}
 }

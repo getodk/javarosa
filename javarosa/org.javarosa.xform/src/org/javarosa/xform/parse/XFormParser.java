@@ -302,7 +302,7 @@ public class XFormParser {
 				parseBind(f, child);
 			} else {
 				if (type == Node.ELEMENT || type == Node.TEXT && getXMLText(e, i, true).length() != 0) {
-					throw new XFormParseException("Unrecognized context found within <model>");
+					throw new XFormParseException("Unrecognized top-level tag found within <model>");
 				}
 			}
 		}

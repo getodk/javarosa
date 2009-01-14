@@ -57,4 +57,12 @@ public interface IActivity {
 	 * @param shell the shell that this activity is running under.
 	 */
 	public void setShell(IShell shell);
+	
+	/**
+	 * Annotates the activity with the provided general command.
+	 * 
+	 * @param command A wrapper for a platform specific command
+	 * action.
+	 */
+	public void annotateCommand(ICommand command);
 }
