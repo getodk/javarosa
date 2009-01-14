@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication"/>
 	<classpathentry kind="src" path="/org.javarosa.xform"/>
 	<classpathentry kind="src" path="/org.javarosa.user"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.activity"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

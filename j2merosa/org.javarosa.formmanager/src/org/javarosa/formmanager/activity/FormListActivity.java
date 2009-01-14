@@ -46,7 +46,7 @@ public class FormListActivity implements IActivity {
 	private IShell parent = null;
 	private Vector positionToId = null;
 
-	Context context;
+	private Context context;
 
 	public FormListActivity(IShell p, String title) {
 		this.parent = p;
@@ -54,6 +54,9 @@ public class FormListActivity implements IActivity {
 	}
 
 	public void start(Context context) {
+		this.context = context;
+		
+		
 		this.listOfForms = new Map();
 		this.formIDs = new Vector();
 		getXForms();
@@ -65,9 +68,10 @@ public class FormListActivity implements IActivity {
 		}
 		this.positionToId = this.formsList.loadView(listOfForms);
 		parent.setDisplay(this, this.formsList);
-
-		this.context = context;
-
+	}
+	
+	public Context getContext()	{
+		return this.context;
 	}
 
 

@@ -12,9 +12,11 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
+import org.javarosa.core.Context;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.activity.FormListActivity;
+import org.javarosa.user.model.User;
 
 /**
  * @author Brian DeRenzi
@@ -57,18 +59,27 @@ public class FormList extends List implements CommandListener, IView {
 	}
 
 	private void addScreenCommands() {
+		Context c = this.parent.getContext();
+		boolean demo = false;
+		if(c.getElement("USER")!=null){
+			User loggedInUser = (User)c.getElement("USER");
+			if (loggedInUser.getUserType().equals(User.DEMO_USER))
+				demo = true;
+		}
 		this.addCommand(CMD_EXIT);
         //this.addCommand(CMD_OPEN);
-        this.addCommand(CMD_DELETE_FORM);
-        this.addCommand(CMD_VIEWMODELS);
-        this.addCommand(CMD_GETNEWFORMS);
-        this.addCommand(CMD_CAMERA);
-        this.addCommand(CMD_IMAGE_BROWSE);
-//        this.addCommand(CMD_SHAREFORMS);
-
-        //#if polish.usePolishGui
-        this.addCommand(CMD_SETTINGS);
-        //#endif
+		if(!demo) {
+	        this.addCommand(CMD_DELETE_FORM);
+	        this.addCommand(CMD_VIEWMODELS);
+	        this.addCommand(CMD_GETNEWFORMS);
+	        this.addCommand(CMD_CAMERA);
+	        this.addCommand(CMD_IMAGE_BROWSE);
+	//        this.addCommand(CMD_SHAREFORMS);
+	
+	        //#if polish.usePolishGui
+	        this.addCommand(CMD_SETTINGS);
+	        //#endif
+		}
 	}
 
 	/**
