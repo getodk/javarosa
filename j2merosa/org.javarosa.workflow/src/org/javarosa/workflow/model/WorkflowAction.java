@@ -25,7 +25,15 @@ public class WorkflowAction {
 	/**
 	 * 
 	 */
-	private String action; 
+	private String action;
+	
+	private IActionProcessor processor;
+	
+	public WorkflowAction(String action, String description, IActionProcessor processor) {
+		this.action = action;
+		this.description = description;
+		this.processor = processor;
+	}
 	
 	/**
 	 * @return A human-interpretable description of what this action
@@ -45,5 +53,7 @@ public class WorkflowAction {
 		return action;
 	}
 	
-	
+	public IActionProcessor getProcessor() {
+		return processor;
+	}
 }

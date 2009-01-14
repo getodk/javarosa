@@ -26,12 +26,22 @@ public class Workflow {
 	 */
 	IFormDataModel model;
 	
+	/** Vector<WorkflowActionListener> **/
+	Vector listeners;
+	
 	public Workflow(Vector states) {
 		this.states = states;
 	}
 	
 	public void setDataModel(IFormDataModel model) {
 		this.model = model;
+	}
+	
+	protected void processAction(WorkflowAction action) {
+		Enumeration en = listeners.elements();
+		while(en.hasMoreElements()) {
+			((IWorkflowActionListener)en.nextElement()).actionFired(action);
+		}
 	}
 	
 	/**
@@ -58,5 +68,9 @@ public class Workflow {
 	 */
 	public void terminate() {
 		
+	}
+	
+	public void addListener(IWorkflowActionListener listener) {
+		listeners.addElement(listener);
 	}
 }

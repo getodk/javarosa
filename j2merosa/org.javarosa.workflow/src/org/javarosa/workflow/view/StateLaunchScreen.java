@@ -70,7 +70,11 @@ public class StateLaunchScreen extends Form implements IView, CommandListener {
 			workflow.terminate();
 		}
 		
-		
+		if(SELECT.equals(command)) {
+			//Get Action.
+			//Figure out which action to fire.
+			
+		}
 	}
 
 }
