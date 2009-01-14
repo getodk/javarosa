@@ -18,6 +18,7 @@ public class User implements Externalizable, IDRecordable
 	public static final String ADMINUSER = "admin";
 	public static final String USERTYPE1 = "TLP";
 	public static final String STANDARD = "standard";
+	public static final String DEMO_USER = "demo_user";
 
 	private int recordId = 0; //this objects ID in the RMS
 	private String username;
