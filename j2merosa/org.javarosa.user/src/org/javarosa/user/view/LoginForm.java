@@ -40,6 +40,10 @@ public class LoginForm extends Form implements IView
 	   public UserRMSUtility userRMS;
 	   private User loggedInUser;
 	   public StringItem loginButton;
+	   //#if javarosa.login.demobutton
+	   public StringItem demoButton;
+	   public Command demoButtonCommand = new Command("Demo", Command.ITEM, 1);
+	   //#endif
 	   public boolean validator;
 	   
 	   private TransportMessage message;
@@ -92,6 +96,12 @@ public class LoginForm extends Form implements IView
 	      loginButton = new StringItem(null,"LOGIN",Item.BUTTON);
 	      this.append(loginButton);
 	      loginButton.setDefaultCommand(loginButtonCommand);     // add Command to Item.
+	      
+	      //#if javarosa.login.demobutton
+	      demoButton = new StringItem(null,"DEMO",Item.BUTTON);
+	      this.append(demoButton);
+	      demoButton.setDefaultCommand(demoButtonCommand);     // add Command to Item.
+	      //#endif
 	   }
 
 

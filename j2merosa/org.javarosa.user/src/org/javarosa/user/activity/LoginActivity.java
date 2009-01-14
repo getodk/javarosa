@@ -19,6 +19,7 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
+import org.javarosa.user.model.User;
 import org.javarosa.user.view.LoginForm;
 
 /**
@@ -69,8 +70,24 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 
 			}
 		}
+		//#if javarosa.login.demobutton
+		else if (c == this.loginScreen.demoButtonCommand) {
+			//#if debug.output==verbose
+			System.out.println("demo button on login screen 1!");
+			//#endif
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
+			User u = new User();
+			u.setUsername(User.DEMO_USER);	// NOTE: Using a user type as a username also!
+			u.setUserType(User.DEMO_USER);
+			returnArgs.put(USER, u);
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+					returnArgs);
+		}
+		//#endif
+		System.out.println("");
 	}
-
+	
 	public void viewCompleted(Hashtable returnvals, int view_ID) {
 	}
 
@@ -116,7 +133,8 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 				returnArgs.put(USER, loginScreen.getLoggedInUser());
 				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
 						returnArgs);
-			} else {
+			} 
+			else {
 				// /display an error that login failed and return to login
 				// screen
 				final javax.microedition.lcdui.Alert error = loginScreen.tryAgain();
@@ -125,7 +143,21 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 
 			}
 		}
-		// #endif
+		//#if javarosa.login.demobutton
+		else if (c == this.loginScreen.demoButtonCommand) {
+			//#if debug.output==verbose
+			System.out.println("demo button on login screen 2!");
+			//#endif
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
+			User u = new User();
+			u.setUsername(User.DEMO_USER);	// NOTE: Using a user type as a username also!
+			u.setUserType(User.DEMO_USER);
+			returnArgs.put(USER, u);
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+					returnArgs);
+		}
+		//#endif
 	}
 	public Context getActivityContext() {
 		return context;
