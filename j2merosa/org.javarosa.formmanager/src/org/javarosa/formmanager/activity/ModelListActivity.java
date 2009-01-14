@@ -29,6 +29,7 @@ import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.FormDef;
@@ -381,5 +382,11 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 	public Object getScreenObject() {
 		// TODO Auto-generated method stub
 		return this;
+	}
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
+	 */
+	public void annotateCommand(ICommand command) {
+		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
 	}
 }

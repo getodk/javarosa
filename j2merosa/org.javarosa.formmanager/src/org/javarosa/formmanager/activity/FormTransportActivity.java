@@ -21,6 +21,7 @@ import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.instance.DataModelTree;
@@ -525,5 +526,11 @@ public class FormTransportActivity implements
 	 */
 	public void setShell(IShell shell) {
 		this.shell = shell;
+	}
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
+	 */
+	public void annotateCommand(ICommand command) {
+		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
 	}
 }
