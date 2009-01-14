@@ -46,7 +46,7 @@ public class HttpTransportMethod implements TransportMethod {
 		new Thread(primaryWorker).start();
 	}
 	
-	private void cacheURL(TransportMessage message) {
+	protected void cacheURL(TransportMessage message) {
 		String destinationUrl = ((HttpTransportDestination)message.getDestination()).getURL();
 		Vector existingURLs = JavaRosaServiceProvider.instance()
 		.getPropertyManager().getProperty(
