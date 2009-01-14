@@ -14,6 +14,7 @@
         <copy todir="${rootdir}\merged">
 			<fileset basedir="${rootdir}\javarosa">
 				<include name="**/*" />
+				<exclude name="**org.javarosa.formmanger*/*"/>
 			</fileset>
 		</copy>
 	</target>
