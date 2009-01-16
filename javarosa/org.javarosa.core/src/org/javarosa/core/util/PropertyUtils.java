@@ -27,7 +27,7 @@ public class PropertyUtils {
 		String guid = "";
 		Random r = new Random();
 
-		for (int i = 0; i < 25; i++) { // 25 == 128 bits of entropy
+		for (int i = 0; i < len; i++) { // 25 == 128 bits of entropy
 			guid += Integer.toString(r.nextInt(36), 36);
 		}
 

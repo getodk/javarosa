@@ -352,3 +352,45 @@ alertcontent {
     background: default;
     background-color: white;
 }
+
+.patselRow {
+    font-size: small;
+	columns: 3;
+	columns-width: 110,95,25;
+}
+
+.patselDetailRow {
+    font-size: small;
+	columns: 2;
+	columns-width: 80,150;
+}
+
+.patselEvenRow extends patselRow {
+	background-color: white;
+}
+
+.patselOddRow extends patselRow {
+	background-color:  #EEEEFF;
+}
+
+.patselSelectedRow extends patselRow {
+	background-color:  #FFCCCC;
+}
+
+.patselCell {
+    text-wrap: false
+}
+
+.patselSortPopup {
+    margin-right: 15;
+	margin-left: 15;
+    margin-top: 5;
+    margin-bottom: 5;
+    border-color: black;
+    border-width: 1;
+
+    font-size: large;
+    font-style: bold;
+    layout: vertical-center | horizontal-shrink | vertical-shrink;
+    repaint-previous-screen: true;
+}

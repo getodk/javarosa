@@ -15,6 +15,7 @@ import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.data.IDataPointer;
@@ -221,5 +222,10 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	 */
 	public void setShell(IShell shell) {
 		this.parent = shell;
+	}
+
+	public void annotateCommand(ICommand command) {
+		// TODO Auto-generated method stub
+		
 	}
 }

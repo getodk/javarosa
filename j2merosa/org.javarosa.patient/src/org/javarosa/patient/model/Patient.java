@@ -205,6 +205,10 @@ public class Patient implements Externalizable, IDRecordable {
 		return birthDate;
 	}
 
+	public int getAge () {
+		return (int)(birthDate == null ? -1 : ((new Date()).getTime() - birthDate.getTime()) / 31556952000l);
+	}
+	
 	/**
 	 * @param birthDate the birthDate to set
 	 */
