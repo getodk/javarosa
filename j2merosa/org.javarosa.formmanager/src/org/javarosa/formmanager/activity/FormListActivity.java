@@ -170,7 +170,7 @@ public class FormListActivity implements IActivity {
 				// BWD 27/7/2008
 				// Getting rid of annoying numbers thing
 				//listOfForms.put(new Integer(pos), mdata.getRecordId()+"-"+mdata.getName());
-				listOfForms.put(new Integer(pos), mdata.getName());
+				listOfForms.put(new Integer(pos), mdata.getTitle());
 				formIDs.insertElementAt(mdata, pos);
 				pos++;
 			} catch (RecordStorageException e) {
