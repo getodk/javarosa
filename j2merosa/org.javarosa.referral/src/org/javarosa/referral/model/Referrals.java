@@ -55,7 +55,6 @@ public class Referrals implements Externalizable {
 				SelectMultiData mulData = (SelectMultiData) data;
 				if (mulData != null && ((Vector) mulData.getValue()).size() > 0) {
 					referralStrings.addElement(condition.getReferralText());
-					
 				}
 				condition.getReferralText();
 			} else {

@@ -55,6 +55,8 @@ public class Selection implements Externalizable {
 		//droos: it doesn't matter; the 'element' portions of both these hashtables should be identical
 		// Clayton Sims - Sep 8, 2008 : At one point I was getting null pointers with that assumption.
 		// It was when I was using something that had an [itext] value. 
+		// Clayton Sims - Jan 15, 2009 : Getting that problem again. Don't remember what the resolution 
+		// was. I think it had to do with making sure the form got deserialized?
 		//return (String)question.getSelectItemsIDs().elementAt(index);
 	}
 

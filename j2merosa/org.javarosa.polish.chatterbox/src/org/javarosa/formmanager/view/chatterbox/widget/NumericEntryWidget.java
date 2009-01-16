@@ -21,9 +21,9 @@ public class NumericEntryWidget extends TextEntryWidget {
 	}
 	
 	protected Item getEntryWidget (QuestionDef question) {
-		TextField tf = (TextField)super.getEntryWidget(question);
+		TextField tf = textField();
 		tf.setConstraints(isDecimal ? TextField.DECIMAL : TextField.NUMERIC);
-		return tf;
+		return super.getEntryWidget(question);
 	}
 
 	protected void setWidgetValue (Object o) {

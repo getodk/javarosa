@@ -12,8 +12,10 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
+import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.referral.model.Referrals;
 import org.javarosa.referral.storage.ReferralRMSUtility;
@@ -55,6 +57,7 @@ public class ReferralReport implements IActivity, CommandListener {
 	}
 
 	public void start(Context context) {
+		FormDef temp = new FormDef();
 		if(context instanceof ReportContext) {
 			this.context = context;
 			String formName = ((ReportContext)context).getFormName();
@@ -62,12 +65,14 @@ public class ReferralReport implements IActivity, CommandListener {
 			
 			ReferralRMSUtility referralRms = (ReferralRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(ReferralRMSUtility.getUtilityName());
 			DataModelTreeRMSUtility modelUtility = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
+			FormDefRMSUtility rmsUtility = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 			if(!referralRms.containsFormReferrals(formName)) {
 				this.referrals = new Referrals();
 			} else {
 				try {
 					this.referrals = referralRms.retrieveFromRMS(formName);
-
+					rmsUtility.retrieveFromRMS(modelId,temp);
+					
 					this.model = new DataModelTree();
 					modelUtility.retrieveFromRMS(modelId, this.model);
 

@@ -1,5 +1,7 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import javax.microedition.lcdui.Command;
+
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
@@ -32,6 +34,8 @@ public class CollapsedWidget implements IWidgetStyle {
 
 		//#style splitleft
 		prompt = new StringItem(null, null);
+		prompt.setDefaultCommand(new Command("Update", Command.ITEM, 1));
+		
 		//#style splitright
 		answer = new StringItem(null, null); 
 
