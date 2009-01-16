@@ -235,7 +235,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		}
 		if( data instanceof PointerAnswerData) {
 			IDataPointer[] pointer = new IDataPointer[1];
-			pointer[1] = (IDataPointer)((PointerAnswerData)data).getValue();
+			pointer[0] = (IDataPointer)((PointerAnswerData)data).getValue();
 			return pointer;
 		}
 		else if (data instanceof MultiPointerAnswerData ) {
