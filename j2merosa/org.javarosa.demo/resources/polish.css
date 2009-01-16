@@ -355,14 +355,23 @@ alertcontent {
 
 .patselRow {
     font-size: small;
+    //#if polish.ScreenWidth > 128 || device.identifier == 'Generic/DefaultColorPhone'
 	columns: 3;
 	columns-width: 110,95,25;
+	//#else
+	columns: 2;
+	columns-width: 67,58;
+	//#endif
 }
 
 .patselDetailRow {
     font-size: small;
 	columns: 2;
+    //#if polish.ScreenWidth > 128 || device.identifier == 'Generic/DefaultColorPhone'
 	columns-width: 80,150;
+	//#else
+	columns-width: 40,85;
+	//#endif
 }
 
 .patselEvenRow extends patselRow {

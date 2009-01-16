@@ -18,8 +18,13 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 
 public class PatientSelectView extends FramedForm implements IView, ItemStateListener, CommandListener {
+	//#if polish.ScreenWidth > 128 || device.identifier == 'Generic/DefaultColorPhone'
 	private static final int MAX_ROWS_ON_SCREEN = 11;
-	private static final int SCROLL_INCREMENT = 5;
+	private static final int SCROLL_INCREMENT = 5;	
+	//#else
+	private static final int MAX_ROWS_ON_SCREEN = 5;
+	private static final int SCROLL_INCREMENT = 3;	
+	//#endif
 	
 	private static final boolean ALLOW_NEW = true;
 	private static final int INDEX_NEW = -1;
@@ -207,7 +212,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 			stepIndex(true);
 			refreshList();
 			return true;
-		} else if (gameAction == Canvas.FIRE) {
+		} else if (gameAction == Canvas.FIRE && keyCode != Canvas.KEY_NUM5) {
 			int rowID = rowID(selectedIndex);
 			if (rowID == INDEX_NEW) {
 				controller.newEntity();
