@@ -26,12 +26,11 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
 import org.javarosa.j2me.view.DisplayViewFactory;
-//import org.javarosa.media.image.activity.String;
 import org.javarosa.media.image.utilities.FileUtility;
 //import org.javarosa.media.audio.midlet.RecordForm;
 //import org.javarosa.j2me.view.DisplayViewFactory;
 
-//import org.javarosa.media.audio.model.FileDataPointer;
+import org.javarosa.media.audio.model.FileDataPointer;
 //import org.javarosa.media.audio.utilities.FileUtility;
 //import org.javarosa.media.image.view.CameraCanvas;
 
@@ -53,22 +52,27 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
     private Player playP;
 	private RecordControl recordControl;
 	//Obviously, we also want to implement a Stop command
-	private Command recordCommand, playCommand, stopCommand, backCommand;
+	private Command recordCommand, playCommand, stopCommand, backCommand, 
+	                saveCommand, finishCommand;
 	private IDisplay display;
 	private ByteArrayOutputStream audioDataStream;
 	private String fullName;
 	private RecorderForm form;
+	private FileDataPointer recordFile;
 	
 	private StringItem messageItem;
     private StringItem errorItem;
     
     Thread captureThread;    
     boolean captureThreadStarted = false;
+    
+    private static int counter = 0; //Used for saving files
     	
 	public AudioCaptureActivity(IShell shell)
 	{
 		parentShell = shell;
 		display = JavaRosaServiceProvider.instance().getDisplay();
+		++counter;
 	}
 	
 	//Finish off construction of Activity
@@ -80,14 +84,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		messageItem = form.getMessageItem();
 		errorItem = form.getErrorItem();
 		
-		recordCommand = new Command("Record", Command.SCREEN, 0);
-    	form.addCommand(recordCommand);
-    	playCommand = new Command("Play", Command.SCREEN, 1);
-    	form.addCommand(playCommand);
-    	stopCommand = new Command("Stop", Command.SCREEN, 0); //Do not add immediately    	
-    	backCommand = new Command("Back", Command.BACK, 0);
-    	form.addCommand(backCommand);
-		
+		initCommands();		
     	captureThread = new Thread(this, "CaptureThread");
     	    	
 		//Display.getDisplay(this).setCurrent(new RecordForm());
@@ -106,12 +103,16 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	public void destroy() 
 	{
 		// TODO Auto-generated method stub
-		recordP.close();
-		recordP = null;
-		playP.close();
-		playP = null;
-		
-		
+		if(recordP != null)
+		{
+			recordP.close();
+			recordP = null;
+		}
+		else if(playP != null)
+		{
+			playP.close();
+			playP = null;
+		}
 	}
 
 	//@Override
@@ -143,11 +144,26 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		parentShell = shell;		
 	}
 	
+	private void initCommands()
+	{
+		recordCommand = new Command("Record", Command.SCREEN, 0);
+    	form.addCommand(recordCommand);
+    	playCommand = new Command("Play", Command.SCREEN, 1);
+    	form.addCommand(playCommand);
+    	stopCommand = new Command("Stop", Command.SCREEN, 0); //Do not add immediately    	
+    	backCommand = new Command("Back", Command.BACK, 0);    	
+    	form.addCommand(backCommand);
+    	finishCommand = new Command("Finish", Command.OK, 0);
+    	saveCommand = new Command("Save", Command.SCREEN, 0);
+	}
+	
 	public void commandAction(Command comm, Displayable disp)
 	{
 		//Record to file
-		if(comm==recordCommand)
-		{	           
+		if(comm == recordCommand)
+		{	
+			readFile("Test.wav");
+			/*
 	        captureThread.setPriority(Thread.currentThread().getPriority() +1 );
 	        if(!captureThreadStarted)
 	        {
@@ -156,7 +172,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	        }
 	        else
 	        	captureThread.run();
-	        //recordAudio();	        
+	        //recordAudio(); 
+	        */
 	    } 
 	    //User should be able to replay recording
 	    else if(comm == playCommand)
@@ -207,13 +224,21 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	    else if(comm == backCommand)
 	    {
 	    	moveBack();
-	    }	    
+	    }
+	    else if(comm == finishCommand)
+	    {
+	    	finalizeTask();
+	    }
+	    else if(comm == saveCommand)
+	    {
+	    	String fileName = "Audio" + counter + ".wav";
+	    	saveFile(fileName, audioDataStream.toByteArray());
+	    }
 	}
 	
 	public void recordAudio() throws MediaException, IOException, InterruptedException
 	{
-		  //if(recordP == null)
-			  recordP = Manager.createPlayer("capture://audio");
+		  recordP = Manager.createPlayer("capture://audio");
 		  recordP.realize();                
 		  recordControl = (RecordControl)recordP.getControl("RecordControl");                
 	      audioDataStream = new ByteArrayOutputStream();
@@ -221,12 +246,12 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	      recordControl.startRecord();
 	      //errorItem.setText("Started recording");
 	      recordP.start();
-	      messageItem.setText("recording...");
+	      messageItem.setText("Recording...");
 	      
 	      form.removeCommand(recordCommand); //"Hide" recordCommand when recording has stopped
 		  form.addCommand(stopCommand);		  
 		  
-	      //Thread.currentThread().sleep(FOREVER);
+		  //Thread.currentThread().sleep(FOREVER);
 		  /*
 		  captureThread.start();
 		  Thread.yield();
@@ -248,16 +273,20 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  {
 		  System.err.println("Attempting to play audio...");
 		  ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(audioDataStream.toByteArray()/*recordedSoundArray*/);
-	      playP = Manager.createPlayer(recordedInputStream,"audio/x-wav");
+	      
+		  checkStreamSize(audioDataStream);
+		  
+		  playP = Manager.createPlayer(recordedInputStream,"audio/x-wav");
           playP.prefetch();
 	      //playP.realize();
 	      playP.start();
 	      System.err.println("Player has started.");
 	      
+	      form.removeCommand(saveCommand);
 	      form.removeCommand(playCommand); //"Hide" playCommand when playing has started
 	      form.removeCommand(recordCommand); //"Hide" recordCommand when playing has started
 	      form.addCommand(stopCommand); //Show recordCommand when playing has started
-	  }  
+	  }
 	  
 	  //General method to stop recording or playback
 	  public void stop() throws MediaException, IOException
@@ -287,6 +316,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  
 		  form.removeCommand(stopCommand); //"Hide" stopCommand when recording desires to resume
 		  form.addCommand(recordCommand);
+		  form.addCommand(finishCommand);
+		  form.addCommand(saveCommand);
 		  
 		  messageItem.setText("done!");	                     
 	      //recordedSoundArray = audioDataStream.toByteArray();
@@ -296,6 +327,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	      //recordP.deallocate();
 	      recordP.stop();
 		  //recordP.close();
+	      
 	  }
 	  
 	  //Stops the playback of the Recorder
@@ -311,6 +343,26 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  
 	  }
 	  
+	  public FileDataPointer getRecordedAudio()
+	  {
+		  recordFile = new FileDataPointer(fullName);
+		  return recordFile;
+	  }
+	  
+	  private void readFile(String fileName)
+	  {
+		  String rootName = FileUtility.getDefaultRoot();
+		  String restorepath = "file:///" + rootName + "JRSounds";				
+		  String fullName = restorepath + "/" + fileName;
+		  
+		  recordFile = new FileDataPointer(fullName);
+		  System.err.println("Successfully read Music file");
+		  
+		  System.out.println("Sound Size =" + recordFile.getData().length);		  
+		  
+		  finalizeTask();
+	  }
+	  
 	  private String saveFile(String filename, byte[] sound) 
 	  {
 		  String rootName = FileUtility.getDefaultRoot();
@@ -319,7 +371,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  String fullName = restorepath + "/" + filename;
 		  if(FileUtility.createFile(fullName, sound)) 
 		  {
-			System.out.println("Sound saved.");	
+			System.out.println("Sound saved to:" + fullName);	
 			return fullName;	
 		  } 
 		  else 
@@ -331,12 +383,29 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  //Go back one screen
 	  public void moveBack()
 	  {
-		System.err.println("Moving back");
-		parentShell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-		/*TODO
-		 * Fix NullPointerException.
-		 */
-		
+		  System.err.println("Moving back");
+		  parentShell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+		  /* TODO
+		   * Fix NullPointerException.
+		   */		
+	  }	  
+	  
+	  //Finish capturing audio, inform shell, and return data as well
+	  public void finalizeTask()
+	  {
+		  System.err.println("Finalizing audio capture");
+		  Hashtable returnArgs = new Hashtable();
+		  
+		  returnArgs.put(Constants.RETURN_ARG_KEY, recordFile);
+		  returnArgs.put(Constants.RETURN_ARG_TYPE_KEY, Constants.RETURN_ARG_TYPE_DATA_POINTER);
+		  
+		  parentShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+	  }	  
+	  
+	  public void checkStreamSize(ByteArrayOutputStream ba) throws MediaException
+	  {
+		  if(ba.toByteArray().length <= 0)
+			  throw new MediaException("Cannot create Player with no bytes in stream");
 	  }
 	  
 	  //Record audio in a separate thread to keep the command listener alert for stopping
