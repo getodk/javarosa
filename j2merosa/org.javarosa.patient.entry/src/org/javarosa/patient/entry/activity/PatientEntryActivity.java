@@ -44,6 +44,7 @@ import org.javarosa.xform.util.XFormUtils;
 public class PatientEntryActivity implements IActivity {
 
 	public static final String PATIENT_ENTRY_FORM_KEY = "Patient Entry Form";
+	public static final String NEW_PATIENT_ID = "patient-id";
 	
 	Context context;
 	IShell parent;
@@ -86,7 +87,7 @@ public class PatientEntryActivity implements IActivity {
 		
 	}
 	
-	public void parsePatientFromModel(DataModelTree tree, TreeReference patRef) {
+	public int parsePatientFromModel(DataModelTree tree, TreeReference patRef) {
 		Patient newPatient = new Patient();
 		
 		String id = (String)getValue("/patients/patient/id", patRef, tree);
@@ -117,12 +118,12 @@ public class PatientEntryActivity implements IActivity {
 		}
 		newPatient.setRecord("weight", weightRecords);
 		
-		writePatient(newPatient);
+		return writePatient(newPatient);
 	}
 	
-	private void writePatient(Patient newPatient) {
+	private int writePatient(Patient newPatient) {
 		PatientRMSUtility utility = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
-		utility.writeToRMS(newPatient);
+		return utility.writeToRMS(newPatient);
 	}
 	
 	private Object getValue (String xpath, TreeReference context, DataModelTree tree) {
@@ -134,19 +135,27 @@ public class PatientEntryActivity implements IActivity {
 		return DataModelTree.unpackReference(new XPathReference(xpath));
 	}
 	
-	public void parsePatientsFromModel(DataModelTree tree) {
+	public int parsePatientsFromModel(DataModelTree tree) {
+		int patID = -1;
+		
 		Vector patientRefs = tree.expandReference(newRef("/patients/patient"));
 		for (int i = 0; i < patientRefs.size(); i++) {
-			parsePatientFromModel(tree, (TreeReference)patientRefs.elementAt(i));
+			int newPatID = parsePatientFromModel(tree, (TreeReference)patientRefs.elementAt(i));
+			if (patID == -1)
+				patID = newPatID;
 		}
+		
+		return patID;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IActivity#resume(org.javarosa.core.Context)
 	 */
 	public void resume(Context globalContext) {
-		parsePatientsFromModel((DataModelTree)patientEntryForm.getDataModel());		
-		parent.returnFromActivity(this,Constants.ACTIVITY_COMPLETE, null);
+		int patID = parsePatientsFromModel((DataModelTree)patientEntryForm.getDataModel());
+		Hashtable returnVals = new Hashtable();
+		returnVals.put(NEW_PATIENT_ID, new Integer(patID));
+		parent.returnFromActivity(this,Constants.ACTIVITY_COMPLETE, returnVals);
 	}
 
 	/* (non-Javadoc)

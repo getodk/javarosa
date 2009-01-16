@@ -1,5 +1,8 @@
 package org.javarosa.demo.shell;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -19,6 +22,7 @@ import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.core.util.PropertyUtils;
@@ -30,13 +34,21 @@ import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.activity.FormListActivity;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
-import org.javarosa.formmanager.utility.FormDefSerializer;
+import org.javarosa.formmanager.utility.IFormDefRetrievalMethod;
+import org.javarosa.formmanager.utility.RMSRetreivalMethod;
+import org.javarosa.formmanager.utility.ReferenceRetrievalMethod;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.chatterbox.widget.ExtendedWidgetsModule;
 import org.javarosa.j2me.storage.rms.RMSStorageModule;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.patient.PatientModule;
+import org.javarosa.patient.entry.activity.PatientEntryActivity;
+import org.javarosa.patient.model.Patient;
+import org.javarosa.patient.select.activity.PatientEntity;
+import org.javarosa.patient.select.activity.PatientSelectActivity;
+import org.javarosa.patient.storage.PatientRMSUtility;
 import org.javarosa.referral.ReferralModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.AddUserActivity;
@@ -84,6 +96,7 @@ public class JavaRosaDemoShell implements IShell {
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/condtest.xhtml"));
 		}
+		initTestPatients((PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName()));
 	}
 	
 	private void loadModules() {
@@ -95,16 +108,9 @@ public class JavaRosaDemoShell implements IShell {
 		new ExtendedWidgetsModule().registerModule(context);
 		new CommunicationUIModule().registerModule(context);
 		new ReferralModule().registerModule(context);
+		new PatientModule().registerModule(context);
 	}
 	
-	private void generateSerializedForms(String originalResource) {
-		FormDef a = XFormUtils.getFormFromResource(originalResource);
-		FormDefSerializer fds = new FormDefSerializer();
-		fds.setForm(a);
-		fds.setFname(originalResource+".serialized");
-		new Thread(fds).start();
-	}
-
 	private void workflow(IActivity lastActivity, String returnCode, Hashtable returnVals) {
 		if (returnVals == null)
 			returnVals = new Hashtable(); //for easier processing
@@ -128,9 +134,7 @@ public class JavaRosaDemoShell implements IShell {
 					lastActivity.destroy();
 			}
 		}
-	}
-
-
+	}	
 
 	private void workflowLaunch (IActivity returningActivity, String returnCode, Hashtable returnVals) {
 		if (returningActivity == null) {
@@ -138,23 +142,25 @@ public class JavaRosaDemoShell implements IShell {
 			launchActivity(new SplashScreenActivity(this, "/splash.gif"), context);
 
 		} else if (returningActivity instanceof SplashScreenActivity) {
-
+			
 			//#if javarosa.dev.shortcuts
-			launchActivity(new FormListActivity(this, "Forms List"), context);
+			
+			launchPatientSelectActivity(context);
+			
 			//#else
+			
 			String passwordVAR = midlet.getAppProperty("username");
             String usernameVAR = midlet.getAppProperty("password");
-            if ((usernameVAR == null) || (passwordVAR == null))
-            {
-            context.setElement("username","admin");
-            context.setElement("password","p");
-            }
-            else{
-                    context.setElement("username",usernameVAR);
-                    context.setElement("password",passwordVAR);
+            if ((usernameVAR == null) || (passwordVAR == null)) {
+            	context.setElement("username","admin");
+            	context.setElement("password","p");
+            } else {
+            	context.setElement("username",usernameVAR);
+            	context.setElement("password",passwordVAR);
             }
             context.setElement("authorization", "admin");
 			launchActivity(new LoginActivity(this, "Login"), context);
+
 			//#endif
 
 		} else if (returningActivity instanceof LoginActivity) {
@@ -166,12 +172,29 @@ public class JavaRosaDemoShell implements IShell {
 					context.setCurrentUser(user.getUsername());
 					context.setElement("USER", user);
 				}
-				launchActivity(new FormListActivity(this, "Forms List"), context);
+
+				launchPatientSelectActivity(context);
 			} else if (returnVal == "USER_CANCELLED") {
 				exitShell();
 			}
+						
+		} else if (returningActivity instanceof PatientSelectActivity) {
 			
-
+			if (returnCode == Constants.ACTIVITY_COMPLETE) {
+				int patID = ((Integer)returnVals.get(PatientSelectActivity.ENTITY_ID_KEY)).intValue();
+				context.setElement("PATIENT_ID", new Integer(patID));
+				System.out.println("Patient " + patID + " selected");
+				
+				launchActivity(new FormListActivity(this, "Forms List"), context);				
+			} else if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+				String action = (String)returnVals.get("action");
+				if (PatientSelectActivity.ACTION_NEW_ENTITY.equals(action)) {
+					launchActivity(new PatientEntryActivity(this), context);					
+				}
+			} else if (returnCode == Constants.ACTIVITY_CANCEL) {
+				exitShell();
+			}
+			
 		} else if (returningActivity instanceof FormListActivity) {
 
 			String returnVal = (String)returnVals.get(FormListActivity.COMMAND_KEY);
@@ -182,11 +205,10 @@ public class JavaRosaDemoShell implements IShell {
 			} else if (returnVal == Commands.CMD_SELECT_XFORM) {
 				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1);
 			} else if (returnVal == Commands.CMD_EXIT) 
-				exitShell();
+				launchPatientSelectActivity(context);
 			  else if (returnVal == Commands.CMD_ADD_USER) 
 				launchActivity( new AddUserActivity(this),context);
 			
-
 		} else if (returningActivity instanceof ModelListActivity) {
 
 			Object returnVal = returnVals.get(ModelListActivity.returnKey);
@@ -229,9 +251,16 @@ public class JavaRosaDemoShell implements IShell {
 					this.modelActivity.start(context);
 				}
 			}*/
+		} else if (returningActivity instanceof PatientEntryActivity) {
+			if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+				FormDef def = (FormDef)returnVals.get(PatientEntryActivity.PATIENT_ENTRY_FORM_KEY);
+				ReferenceRetrievalMethod method = new ReferenceRetrievalMethod();
+				method.setFormDef(def);
+				launchFormEntryActivity(context, -1, -1, method);
+			}
+		} else if (returningActivity instanceof AddUserActivity) { 
+		 	launchActivity(new FormListActivity(this, "Forms List"), context);
 		}
-		else if (returningActivity instanceof AddUserActivity) 
-		 	launchActivity(new FormListActivity(this, "Forms List"), context); 
 	}
 
 	private void workflowResume (IActivity suspendedActivity, IActivity completingActivity,
@@ -257,15 +286,25 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void launchFormEntryActivity (Context context, int formID, int instanceID) {
+		launchFormEntryActivity(context, formID, instanceID, null);
+	}
+	
+	private void launchFormEntryActivity (Context context, int formID, int instanceID, IFormDefRetrievalMethod method) {
 		FormEntryActivity entryActivity = new FormEntryActivity(this, new FormEntryViewFactory());
 		FormEntryContext formEntryContext = new FormEntryContext(context);
 		formEntryContext.setFormID(formID);
 		if (instanceID != -1)
 			formEntryContext.setInstanceID(instanceID);
 
+		if(method != null) {
+			entryActivity.setRetrievalMethod(method);
+		} else {
+			entryActivity.setRetrievalMethod(new RMSRetreivalMethod());
+		}
+		
 		launchActivity(entryActivity, formEntryContext);
 	}
-
+	
 	private void launchFormTransportActivity (Context context, String task, DataModelTree data) {
 		FormTransportActivity formTransport = new FormTransportActivity(this);
 		formTransport.setData(data); //why isn't this going in the context?
@@ -280,7 +319,7 @@ public class JavaRosaDemoShell implements IShell {
 
 		launchFormTransportActivity(formTransport, task, msgContext);
 	}
-	
+
 	private void launchFormTransportActivity (Context context, String task) {
 		FormTransportActivity formTransport = new FormTransportActivity(this);
 		TransportContext msgContext = new TransportContext(context);
@@ -294,7 +333,17 @@ public class JavaRosaDemoShell implements IShell {
 
 		launchActivity(activity, context);
 	}
-
+	
+	private void launchPatientSelectActivity (Context context) {
+		PatientSelectActivity psa = new PatientSelectActivity(this, "Choose a Patient");
+		PatientRMSUtility prms = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
+		context.setElement(PatientSelectActivity.ENTITY_PROTO_KEY, new PatientEntity());
+		context.setElement(PatientSelectActivity.ENTITY_RMS_KEY, prms);
+		context.setElement(PatientSelectActivity.NEW_ENTITY_ID_KEY_KEY, PatientEntryActivity.NEW_PATIENT_ID);
+		
+		launchActivity(psa, context);
+	}
+	
 	private void relaunchListActivity () {
 		if (mostRecentListActivity instanceof FormListActivity) {
 			launchActivity(new FormListActivity(this, "Forms List"), context);
@@ -340,5 +389,50 @@ public class JavaRosaDemoShell implements IShell {
 		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
 	}
 
-
+	private void initTestPatients (PatientRMSUtility prms) {
+		if (prms.getNumberOfRecords() == 0) {
+			//read test patient data into byte buffer
+			byte[] buffer = new byte[4000]; //make sure buffer is big enough for entire file; it will not grow to file size (budget 40 bytes per patient)
+			InputStream is = System.class.getResourceAsStream("/testpatients");
+			if (is == null) {
+				System.out.println("Test patient data not found.");
+				return;
+			}
+			
+			int len = 0;
+			try {
+				len = is.read(buffer);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			//copy byte buffer into character string
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < len; i++)
+				sb.append((char)buffer[i]);
+			buffer = null;
+			String data = sb.toString();
+			
+			//split lines
+			Vector lines = DateUtils.split(data, "\n", false);
+			data = null;
+			
+			//parse patients
+			for (int i = 0; i < lines.size(); i++) {
+				Vector pat = DateUtils.split((String)lines.elementAt(i), "|", false);
+				if (pat.size() != 6)
+					continue;
+				
+				Patient p = new Patient();
+				p.setFamilyName((String)pat.elementAt(0));
+				p.setGivenName((String)pat.elementAt(1));
+				p.setMiddleName((String)pat.elementAt(2));
+				p.setPatientIdentifier((String)pat.elementAt(3));
+				p.setGender("m".equals((String)pat.elementAt(4)) ? Patient.SEX_MALE : Patient.SEX_FEMALE);
+				p.setBirthDate(new Date((new Date()).getTime() - 86400000l * Integer.parseInt((String)pat.elementAt(5))));
+			
+				prms.writeToRMS(p);				
+			}
+		}
+	}
 }
