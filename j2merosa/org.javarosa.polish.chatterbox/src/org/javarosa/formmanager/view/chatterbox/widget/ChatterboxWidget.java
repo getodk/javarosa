@@ -1,14 +1,13 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import java.io.InputStream;
+
 import javax.microedition.lcdui.Command;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.formmanager.view.IQuestionWidget;
 import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.formmanager.view.IQuestionWidget;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.ui.ChoiceGroup;
@@ -97,6 +96,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 			activeStyle.refreshWidget(binding.element, binding.getValue(), FormElementStateListener.CHANGE_INIT);
 			if (viewState == VIEW_EXPANDED) {
 				attachWidget();
+			} if(viewState == VIEW_COLLAPSED) {
 			}
 		}
 	}
@@ -212,14 +212,17 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 	
 	public void UIHack (int hackType) {
 		if (hackType == Chatterbox.UIHACK_SELECT_PRESS) {
-			if (expandedStyle.getNextMode() == NEXT_ON_SELECT && expandedStyle.getInteractiveWidget() instanceof TextField) {
-				String text = ((TextField)expandedStyle.getInteractiveWidget()).getText();
+			if (expandedStyle.getNextMode() == NEXT_ON_SELECT && expandedStyle instanceof TextEntryWidget) {
+				String text = (((TextEntryWidget)expandedStyle).textField()).getText();
+				System.out.println("Text equals: " + text);
 				if (text == null || text.length() == 0) {
 					commandAction(nextCommand, expandedStyle.getInteractiveWidget());
 				}
 				else {
-					//#if device.identifier == Sony-Ericsson/P1i
+					//Jan 14, 2009 - I don't know why only the P1i was setup to do this. Seems weird to me...
+					
 					commandAction(nextCommand, expandedStyle.getInteractiveWidget());
+					//#if device.identifier == Sony-Ericsson/P1i
 					//#endif
 				}
 			}

@@ -14,9 +14,7 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 
 public class SelectMultiEntryWidget extends SelectEntryWidget {
-	//#style button
-	private StringItem nextItem = new StringItem(null,"Endelea",Item.BUTTON);
-
+	private WidgetEscapeComponent wec = new WidgetEscapeComponent();
 	
 	public SelectMultiEntryWidget () {
 		super(ChoiceGroup.MULTIPLE);
@@ -31,35 +29,15 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 	}
 	
 	protected Item getEntryWidget(QuestionDef question) {
-		// TODO Auto-generated method stub
-		ChoiceGroup cg = (ChoiceGroup)super.getEntryWidget(question);
-		Item i = (Item)cg;
-		
-		//#if chatterbox.selectmulti.nextbutton
-		Container c = new Container(false);
-			
-		c.add(cg);
-		c.add(this.nextItem);
-		i = (Item)c;
-		//#endif
-		
-		return i;
+		return wec.wrapEntryWidget(super.getEntryWidget(question));
 	}
 	
 	public Item getInteractiveWidget() {
-		Item i = super.getInteractiveWidget();
-		//#if chatterbox.selectmulti.nextbutton
-		i = this.nextItem;
-		//#endif
-		return i;
+		return wec.wrapInteractiveWidget(super.getInteractiveWidget());
 	}
 
 	public int getNextMode() {
-		int i = super.getNextMode();
-		//#if chatterbox.selectmulti.nextbutton
-		i = ChatterboxWidget.NEXT_ON_SELECT;
-		//#endif
-		return i;
+		return wec.wrapNextMode(super.getNextMode());
 	}
 
 	protected IAnswerData getWidgetValue () {

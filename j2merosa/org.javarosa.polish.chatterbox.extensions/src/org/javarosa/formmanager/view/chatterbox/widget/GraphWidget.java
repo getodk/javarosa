@@ -25,6 +25,8 @@ import de.enough.polish.ui.Item;
  *
  */
 public class GraphWidget extends ExpandedWidget {
+	private WidgetEscapeComponent wec = new WidgetEscapeComponent();
+
 	public final static int CONTROL_GRAPH = 11; 
 	
 	private int resolution = 100;
@@ -66,6 +68,7 @@ public class GraphWidget extends ExpandedWidget {
 
         //chart.setMaxYScaleFactor(100);
         //chart.setMaxXScaleFactor(18);
+        wec.init();
 	}
 	
 	/**
@@ -113,7 +116,15 @@ public class GraphWidget extends ExpandedWidget {
 	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#getEntryWidget(org.javarosa.core.model.QuestionDef)
 	 */
 	protected Item getEntryWidget(QuestionDef question) {		
-		return chart;
+		return wec.wrapEntryWidget(chart);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#getEntryWidget(org.javarosa.core.model.QuestionDef)
+	 */
+	public Item getInteractiveWidget() {		
+		return wec.wrapInteractiveWidget(super.getInteractiveWidget());
 	}
 
 	/*
@@ -121,7 +132,7 @@ public class GraphWidget extends ExpandedWidget {
 	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#getNextMode()
 	 */
 	public int getNextMode () {
-		return ChatterboxWidget.NEXT_ON_SELECT;
+		return wec.wrapNextMode(ChatterboxWidget.NEXT_ON_SELECT);
 	}
 	
 	/*

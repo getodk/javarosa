@@ -11,6 +11,10 @@ import de.enough.polish.ui.TextField;
 public class TextEntryWidget extends ExpandedWidget {
 	int inputMode;
 	
+	IWidgetComponentWrapper wec;
+	
+	private TextField textField;
+	
 	public TextEntryWidget () {
 		//#if polish.TextField.useDirectInput == true
 		this(TextField.MODE_UPPERCASE);
@@ -19,21 +23,32 @@ public class TextEntryWidget extends ExpandedWidget {
 	
 	public TextEntryWidget (int inputMode) {
 		this.inputMode = inputMode;
+		
+		//#style textBox
+		textField = new TextField("", "", 200, TextField.ANY);
+		
+		textField.setInputMode(inputMode);
+    	//#if device.identifier == Sony-Ericsson/P1i
+		wec = new WidgetEscapeComponent();
+		//#else
+		wec = new EmptyWrapperComponent();
+		//#endif
 	}
 	
 	public int getNextMode () {
-		return ChatterboxWidget.NEXT_ON_SELECT;
+		return wec.wrapNextMode(ChatterboxWidget.NEXT_ON_SELECT);
 	}
 	
 	protected Item getEntryWidget (QuestionDef question) {
-		//#style textBox
-		TextField tf = new TextField("", "", 200, TextField.ANY);
-		tf.setInputMode(inputMode);
-		return tf;
+		return wec.wrapEntryWidget(textField);
+	}
+	
+	public Item getInteractiveWidget() {
+		return wec.wrapInteractiveWidget(super.getInteractiveWidget());
 	}
 
 	protected TextField textField () {
-		return (TextField)entryWidget;    
+		return textField;    
 	}
 
 	protected void updateWidget (QuestionDef question) { /* do nothing */ }
