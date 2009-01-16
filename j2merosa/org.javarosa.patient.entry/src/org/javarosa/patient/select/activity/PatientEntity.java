@@ -174,15 +174,24 @@ public class PatientEntity implements IEntity {
 	}
 
 	public String[] getHeaders(boolean detailed) {
+		//#if polish.ScreenWidth > 128 || device.identifier == 'Generic/DefaultColorPhone'
 		String[] shortHeaders = {"Name", "ID", "Age/Sex"};
+		//#else
+		String[] shortHeaders = {"Name", "ID"};
+		//#endif
+
 		String[] longHeaders = {"Name", "ID", "Sex", "DOB", "Age"};
 		
 		return detailed ? longHeaders : shortHeaders;
 	}
 
 	public String[] getShortFields() {
-		String[] fields = new String[3];
+		String[] fields = new String[getHeaders(false).length];
+		fields[0] = getName();
+		fields[1] = getID();
 		
+		//#if polish.ScreenWidth > 128 || device.identifier == 'Generic/DefaultColorPhone'
+
 		String sexStr;
 		switch (gender) {
 		case Patient.SEX_MALE: sexStr = "M"; break;
@@ -190,9 +199,9 @@ public class PatientEntity implements IEntity {
 		default: sexStr = "?"; break;
 		}
 		
-		fields[0] = getName();
-		fields[1] = getID();
 		fields[2] = (age == -1 ? "?" : age + "") + "/" + sexStr;
+
+		//#endif
 		
 		return fields;
 	}
