@@ -204,11 +204,11 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	protected boolean handleKeyReleased(int keyCode, int gameAction) {
 		boolean ret = super.handleKeyReleased(keyCode, gameAction);
 		
-		if (gameAction == Canvas.UP) {
+		if (gameAction == Canvas.UP && keyCode != Canvas.KEY_NUM2) {
 			stepIndex(false);
 			refreshList();
 			return true;
-		} else if (gameAction == Canvas.DOWN) {
+		} else if (gameAction == Canvas.DOWN && keyCode != Canvas.KEY_NUM8) {
 			stepIndex(true);
 			refreshList();
 			return true;

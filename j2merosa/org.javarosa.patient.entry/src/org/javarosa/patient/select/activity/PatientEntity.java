@@ -1,7 +1,7 @@
 package org.javarosa.patient.select.activity;
 
 import java.io.IOException;
-import java.util.Date;
+import java.util.Random;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.DateUtils;
@@ -19,6 +19,9 @@ public class PatientEntity implements IEntity {
 	int age;	
 	int gender;
 		
+	String[] normalizedName;
+	String normalizedID;
+	
 	public IEntity factory (int recordID) {
 		PatientEntity pe = new PatientEntity();
 		pe.recordID = recordID;
@@ -38,6 +41,9 @@ public class PatientEntity implements IEntity {
 		middleName = ExtUtil.emptyIfNull(p.getMiddleName());
 		age = p.getAge();
 		gender = p.getGender();
+		
+		normalizedName = normalizeNames();
+		normalizedID = normalizeID(getID());
 	}
 
 	public Object fetchRMS (RMSUtility rmsu) {
@@ -133,12 +139,9 @@ public class PatientEntity implements IEntity {
 	}
 	
 	public boolean matchID(String key) {
-		String IDn = normalizeID(getID());
-		String keyn = normalizeID(key);
+		String normalizedKey = normalizeID(key);
 		
-		System.out.println(IDn + " " + keyn);
-
-		return findKey(IDn, keyn, false);
+		return findKey(normalizedID, normalizedKey, false);
 	}
 
 	private void concatVector (Vector base, Vector append) {
@@ -146,21 +149,26 @@ public class PatientEntity implements IEntity {
 			base.addElement(append.elementAt(i));
 	}
 	
-	public boolean matchName(String key) {
+	private String[] normalizeNames () {
 		Vector nameFrags = new Vector();
 		concatVector(nameFrags, normalizeName(familyName));
 		concatVector(nameFrags, normalizeName(givenName));
 		concatVector(nameFrags, normalizeName(middleName));
-
-		Vector keyFrags = normalizeName(key);
 		
-		System.out.println(nameFrags + " " + keyFrags);
+		String[] nameNorm = new String[nameFrags.size()];
+		for (int i = 0; i < nameNorm.length; i++)
+			nameNorm[i] = (String)nameFrags.elementAt(i);
+		return nameNorm;
+	}
+	
+	public boolean matchName(String key) {
+		Vector keyFrags = normalizeName(key);
 		
 		for (int i = 0; i < keyFrags.size(); i++) {
 			String keyFrag = (String)keyFrags.elementAt(i);
 			boolean fragMatched = false;
-			for (int j = 0; j < nameFrags.size(); j++) {
-				String nameFrag = (String)nameFrags.elementAt(j);
+			for (int j = 0; j < normalizedName.length; j++) {
+				String nameFrag = normalizedName[j];
 				if (findKey(nameFrag, keyFrag, false)) {
 					fragMatched = true;
 					break;
@@ -180,7 +188,7 @@ public class PatientEntity implements IEntity {
 		String[] shortHeaders = {"Name", "ID"};
 		//#endif
 
-		String[] longHeaders = {"Name", "ID", "Sex", "DOB", "Age"};
+		String[] longHeaders = {"Name", "ID", "Sex", "DOB", "Age", "Phone", "Village"};
 		
 		return detailed ? longHeaders : shortHeaders;
 	}
@@ -209,7 +217,7 @@ public class PatientEntity implements IEntity {
 	public String[] getLongFields(Object o) {
 		Patient p = (Patient)o;
 
-		String[] fields = new String[5];
+		String[] fields = new String[getHeaders(true).length];
 	
 		String sexStr;
 		switch (gender) {
@@ -218,11 +226,33 @@ public class PatientEntity implements IEntity {
 		default: sexStr = "Unknown"; break;
 		}
 		
+		Random r = new Random();
+		
+		String village = null;
+		switch(r.nextInt(10)) {
+		case 0: village = "Mikocheni"; break;
+		case 1: village = "Bagamoyo"; break;
+		case 2: village = "Mbezi"; break;
+		case 3: village = "Kariakoo"; break;
+		case 4: village = "Msasani"; break;
+		case 5: village = "Kinondoni"; break;
+		case 6: village = "Tabora"; break;
+		case 7: village = "Kigoma"; break;
+		case 8: village = "Ifakara"; break;
+		case 9: village = "Kigomboni"; break;
+		}
+		
+		String phone = "07";
+		for (int i = 0; i < 8; i++)
+			phone += (r.nextInt(10));
+		
 		fields[0] = getName();
 		fields[1] = getID();
 		fields[2] = sexStr;
 		fields[3] = DateUtils.formatDate(p.getBirthDate(), DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 		fields[4] = (age == -1 ? "" : age + "");
+		fields[5] = phone;
+		fields[6] = village;
 		
 		return fields;
 	}
