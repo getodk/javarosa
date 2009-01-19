@@ -32,7 +32,7 @@ import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
 import org.javarosa.polish.activity.loadingscreen.LoadingScreenActivity;
 
-public class FormEntryActivity implements IActivity, IControllerHost, CommandListener, ILoadHost {
+public class FormReviewActivity implements IActivity, CommandListener, IControllerHost, ILoadHost {
 
 	
 	/** Alert if the form cannot load **/
@@ -64,7 +64,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	/** Loading error string **/
 	private final static String LOAD_ERROR = "Deepest Apologies. The form could not be loaded.";
 
-	public FormEntryActivity(IShell parent, IFormEntryViewFactory viewFactory) {
+	public FormReviewActivity(IShell parent, IFormEntryViewFactory viewFactory) {
 		this.parent = parent;
 		this.viewFactory = viewFactory;
 		

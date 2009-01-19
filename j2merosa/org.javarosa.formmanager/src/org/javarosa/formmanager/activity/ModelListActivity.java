@@ -56,6 +56,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 	public final static Command CMD_SEND = new Command("Send Data",Command.SCREEN,1);
 	public static final Command CMD_SEND_ALL_UNSENT = new Command("Send all unsent", Command.SCREEN, 2);
 	public final static Command CMD_EDIT = new Command("Edit", Command.SCREEN, 2);
+	public final static Command CMD_REVIEW = new Command("Review", Command.SCREEN, 2);
 	public final static Command CMD_REFRESH = new Command("Refresh", Command.SCREEN, 3);
 	public final static Command CMD_MSGS = new Command("Message Status",Command.SCREEN,4);
 	public final static Command CMD_DELETE = new Command("Delete",Command.SCREEN,5);
@@ -119,6 +120,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
     	//this.setTicker(new Ticker("Please select a Model to send..."));
         this.addCommand(CMD_BACK);
         this.addCommand(CMD_EDIT);
+        this.addCommand(CMD_REVIEW);
         this.addCommand(CMD_SEND);
         //this.addCommand(CMD_MSGS);//now redundant as we have color boxes for this TODO: clean up related code!
         this.addCommand(CMD_SEND_ALL_UNSENT);
@@ -158,6 +160,38 @@ public class ModelListActivity extends List implements CommandListener, IActivit
             		formEditArgs.put("form", selectedForm);
             		formEditArgs.put("data", formData);
             		mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, formEditArgs);
+            	}
+            } catch (Exception ex)//IOException ex)
+            {
+    			//#if debug.output==verbose || debug.output==exception
+                ex.printStackTrace();
+                //#endif
+            }
+        }  if (c == CMD_REVIEW)
+        {
+            try
+            {
+            	if (this.getSelectedIndex() == -1) {
+            		//error
+            	} else {
+            		DataModelTreeMetaData data = (DataModelTreeMetaData) modelIDs.elementAt(this.getSelectedIndex());
+            		FormDef selectedForm = new FormDef();
+        			//#if debug.output==verbose
+            		System.out.println("Attempt retreive: "+data.getFormIdReference());
+        			//#endif
+            		this.formDefRMSUtility.retrieveFromRMS(data.getFormIdReference(), selectedForm);
+        			//#if debug.output==verbose
+            		System.out.println("Form retrieve OK\nAttempt retreive model: "+data.getRecordId());
+            		//#endif
+            		DataModelTree formData = new DataModelTree();
+            		this.dataModelRMSUtility.retrieveFromRMS(data.getRecordId(), formData);
+            		selectedForm.setTitle(this.formDefRMSUtility.getName(data.getFormIdReference()));
+            		System.out.println("data model: "+formData.getName());
+            		Hashtable formReviewArgs = new Hashtable();
+            		formReviewArgs.put(returnKey, CMD_REVIEW);
+            		formReviewArgs.put("form", selectedForm);
+            		formReviewArgs.put("data", formData);
+            		mainShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, formReviewArgs);
             	}
             } catch (Exception ex)//IOException ex)
             {
