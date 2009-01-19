@@ -212,7 +212,6 @@ public class JavaRosaDemoShell implements IShell {
 				launchActivity( new AddUserActivity(this),context);
 			
 		} else if (returningActivity instanceof ModelListActivity) {
-//http://www.thenation.com/doc/20061127/joyce
 			Object returnVal = returnVals.get(ModelListActivity.returnKey);
 			if (returnVal == ModelListActivity.CMD_MSGS) {
 				launchFormTransportActivity(context, TransportContext.MESSAGE_VIEW);

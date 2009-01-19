@@ -56,6 +56,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		conditions = new Vector();
 		conditionTriggerIndex = new Hashtable();
 		conditionRepeatTargetIndex = new Hashtable();
+		conditionEvalContext = new EvaluationContext();
 	}
 	
 	public Vector getChildren() {
@@ -500,6 +501,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		initializeConditions();
 		
 		if (getLocalizer() != null && getLocalizer().getLocale() == null) {
+			System.out.println("Set to Default!");
 			getLocalizer().setToDefault();
 		}
 	}
@@ -529,6 +531,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 				int qID = s.question.getID();
 				QuestionDef properQ = (QuestionDef)questionMapping.get(new Integer(qID));
 				if (properQ == null) {
+					System.out.println(" QID: " + qID);
 					throw new RuntimeException("Error: cannot find referenced question def for select answer data");
 				}
 				s.question = properQ;
