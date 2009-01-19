@@ -24,6 +24,11 @@ public class NewUserForm extends Form implements IView{
 	private TextField userName;
 	private TextField password;
 	private TextField confirmPassword;
+	
+	//#if javarosa.adduser.extended
+	private TextField userID;
+	//#endif
+	
 	private UserRMSUtility userRMS;
 	private ChoiceGroup choice = new ChoiceGroup("",Choice.MULTIPLE);
 
@@ -33,11 +38,17 @@ public class NewUserForm extends Form implements IView{
 		userName = new TextField("Name (ie: loginID):", "", 10, TextField.ANY);
 	    password = new TextField("User Password:", "", 10, TextField.PASSWORD);
 	    confirmPassword = new TextField("Confirm Password:", "", 10, TextField.PASSWORD);
+	    //#if javarosa.adduser.extended
+	    userID = new TextField("User ID:", "", 10, TextField.NUMERIC);
+	    //#endif
 	    choice.append("Give this user admin rights?", null);
 
 	    this.append(userName);
 	    this.append(password);
 	    this.append(confirmPassword);
+	    //#if javarosa.adduser.extended
+	    this.append(userID);
+	    //#endif
 	    this.append(choice);
 
 	    userRMS = new UserRMSUtility("LoginMem");
@@ -66,9 +77,14 @@ public class NewUserForm extends Form implements IView{
 		else
 		{
 			System.out.println("ready returned as true");
+			int userid = -1;
+			//#if javarosa.adduser.extended
+			userid = Integer.parseInt(userID.getString());
+			//#endif
 			if (choice.isSelected(0) == false)
-			userRMS.writeToRMS(new User (userName.getString() ,password.getString()));
-			else userRMS.writeToRMS(new User (userName.getString() ,password.getString(), Constants.ADMINUSER));
+				userRMS.writeToRMS(new User (userName.getString() ,password.getString(), userid));
+			else 
+				userRMS.writeToRMS(new User (userName.getString() ,password.getString(), userid, Constants.ADMINUSER));
 			System.out.println("added user "+ userName.getString() + " passw: "+password.getString()+" = "+confirmPassword.getString() );
 			return "";
 		}
