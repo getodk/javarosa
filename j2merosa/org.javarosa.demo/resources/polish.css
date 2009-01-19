@@ -392,22 +392,22 @@ alertcontent {
 
 .patselRow {
     font-size: small;
-    //#if polish.ScreenWidth > 128 || device.identifier == 'Generic/DefaultColorPhone'
-	columns: 3;
-	columns-width: 110,95,25;
-	//#else
+	//#if javarosa.patientselect.formfactor == nokia-s40
 	columns: 2;
 	columns-width: 67,58;
+	//#else
+	columns: 3;
+	columns-width: 110,95,25;
 	//#endif
 }
 
 .patselDetailRow {
     font-size: small;
 	columns: 2;
-    //#if polish.ScreenWidth > 128 || device.identifier == 'Generic/DefaultColorPhone'
-	columns-width: 80,150;
-	//#else
+	//#if javarosa.patientselect.formfactor == nokia-s40
 	columns-width: 40,85;
+	//#else
+	columns-width: 80,150;
 	//#endif
 }
 

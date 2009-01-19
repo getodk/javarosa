@@ -182,10 +182,10 @@ public class PatientEntity implements IEntity {
 	}
 
 	public String[] getHeaders(boolean detailed) {
-		//#if polish.ScreenWidth > 128 || device.identifier == 'Generic/DefaultColorPhone'
-		String[] shortHeaders = {"Name", "ID", "Age/Sex"};
-		//#else
+		//#if javarosa.patientselect.formfactor == nokia-s40
 		String[] shortHeaders = {"Name", "ID"};
+		//#else
+		String[] shortHeaders = {"Name", "ID", "Age/Sex"};
 		//#endif
 
 		String[] longHeaders = {"Name", "ID", "Sex", "DOB", "Age", "Phone", "Village"};
@@ -198,8 +198,8 @@ public class PatientEntity implements IEntity {
 		fields[0] = getName();
 		fields[1] = getID();
 		
-		//#if polish.ScreenWidth > 128 || device.identifier == 'Generic/DefaultColorPhone'
-
+		//#if javarosa.patientselect.formfactor != nokia-s40
+		
 		String sexStr;
 		switch (gender) {
 		case Patient.SEX_MALE: sexStr = "M"; break;
