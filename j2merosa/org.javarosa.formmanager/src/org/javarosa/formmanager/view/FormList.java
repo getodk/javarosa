@@ -28,6 +28,8 @@ public class FormList extends List implements CommandListener, IView {
     private final Command CMD_GETNEWFORMS = new Command("Get New Forms", Command.SCREEN, 2);
     // CZUE added for testing 
     private final Command CMD_CAMERA = new Command("Camera", Command.SCREEN, 2);
+    //Added for debugging(Ndubisi)
+    private final Command CMD_RECORDER = new Command("Recorder", Command.SCREEN, 2);
     private final Command CMD_IMAGE_BROWSE = new Command("Image Management", Command.SCREEN, 2);
 	// others
     private final Command CMD_VIEWMODELS = new Command("View Saved", Command.SCREEN, 3);
@@ -68,6 +70,19 @@ public class FormList extends List implements CommandListener, IView {
 		}
 		this.addCommand(CMD_EXIT);
         //this.addCommand(CMD_OPEN);
+<<<<<<< .mine
+        this.addCommand(CMD_DELETE_FORM);
+        this.addCommand(CMD_VIEWMODELS);
+        this.addCommand(CMD_GETNEWFORMS);
+        this.addCommand(CMD_CAMERA);
+        this.addCommand(CMD_RECORDER);
+        this.addCommand(CMD_IMAGE_BROWSE);
+//        this.addCommand(CMD_SHAREFORMS);
+
+        //#if polish.usePolishGui
+        this.addCommand(CMD_SETTINGS);
+        //#endif
+=======
 		if(!demo) {
 	        this.addCommand(CMD_DELETE_FORM);
 	        this.addCommand(CMD_VIEWMODELS);
@@ -80,6 +95,7 @@ public class FormList extends List implements CommandListener, IView {
 	        this.addCommand(CMD_SETTINGS);
 	        //#endif
 		}
+>>>>>>> .r1813
 	}
 
 	/**
@@ -151,7 +167,15 @@ public class FormList extends List implements CommandListener, IView {
 			returnvals.put(Commands.CMD_ADD_USER, "");
 			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
 		}
-/*
+        //Recorder debugging(Ndubisi)
+		else if(c == CMD_RECORDER)
+		{
+			Hashtable returnvals = new Hashtable();
+			returnvals.put(Commands.CMD_RECORDER, "");
+			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
+		}
+        
+        /*
 		if (c == CMD_SHAREFORMS) {
 			this.mainShell.startBToothClient();
 		}
