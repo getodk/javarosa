@@ -22,6 +22,7 @@ public class Constants {
 	
 	
 	final public static String USER_KEY = "username";
+	final public static String USER_ID_KEY = "userid";
 	
 	/**
 	 * Return arg codes
