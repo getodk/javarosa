@@ -21,6 +21,15 @@ import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultiPointerAnswerData;
+<<<<<<< .mine
+import org.javarosa.core.model.data.PointerAnswerData;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
+import org.javarosa.core.model.utils.ContextPreloadHandler;
+import org.javarosa.core.model.utils.IPreloadHandler;
+import org.javarosa.core.util.externalizable.DeserializationException;
+=======
+>>>>>>> .r1811
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.controller.IControllerHost;
 import org.javarosa.formmanager.model.FormEntryModel;
@@ -111,12 +120,22 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		}
 	}
 	
-	private IAnswerData getAnswerData(String type, Object value) {
-		if (Constants.RETURN_ARG_TYPE_DATA_POINTER_LIST.equals(type)) {
+	private IAnswerData getAnswerData(String type, Object value) 
+	{
+		if(Constants.RETURN_ARG_TYPE_DATA_POINTER_LIST.equals(type)) 
+		{
 			IDataPointer[] answers = (IDataPointer[]) value;
 			IAnswerData toReturn = new MultiPointerAnswerData(answers);
 			return toReturn;
-		} else {
+		} 
+		else if(Constants.RETURN_ARG_TYPE_DATA_POINTER.equals(type))
+		{
+			IDataPointer answer = (IDataPointer)value;
+			IAnswerData toReturn = new PointerAnswerData(answer);
+			return toReturn;
+		}
+		else 
+		{
 			throw new RuntimeException("Unable to build answer data for return type: " + type);
 		}
 	}
@@ -183,6 +202,16 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION,
 					returnArgs);
 			//parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+		}
+		else if (Constants.ACTIVITY_TYPE_GET_AUDIO.equals(status))
+		{
+			Hashtable returnArgs = new Hashtable();
+
+			returnArgs.put("FORM_COMPLETE", new Boolean(false));
+			returnArgs.put(Constants.ACTIVITY_LAUNCH_KEY, Constants.ACTIVITY_TYPE_GET_AUDIO);
+			
+			parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION,
+					returnArgs);
 		}
 	}
 
