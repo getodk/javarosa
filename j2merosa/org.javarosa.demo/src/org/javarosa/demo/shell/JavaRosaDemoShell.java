@@ -203,7 +203,7 @@ public class JavaRosaDemoShell implements IShell {
 			} else if (returnVal == Commands.CMD_VIEW_DATA) {
 				launchActivity(new ModelListActivity(this), context);
 			} else if (returnVal == Commands.CMD_SELECT_XFORM) {
-				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1);
+				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1, false);
 			} else if (returnVal == Commands.CMD_EXIT) 
 				launchPatientSelectActivity(context);
 			  else if (returnVal == Commands.CMD_ADD_USER) 
@@ -216,7 +216,7 @@ public class JavaRosaDemoShell implements IShell {
 				launchFormTransportActivity(context, TransportContext.MESSAGE_VIEW);
 			} else if (returnVal == ModelListActivity.CMD_EDIT) {
 				launchFormEntryActivity(context, ((FormDef)returnVals.get("form")).getID(),
-						((DataModelTree)returnVals.get("data")).getId());
+						((DataModelTree)returnVals.get("data")).getId(), false);
 			} else if (returnVal == ModelListActivity.CMD_SEND) {
 				launchFormTransportActivity(context, TransportContext.SEND_DATA, (DataModelTree)returnVals.get("data"));
 			} else if (returnVal == ModelListActivity.CMD_SEND_ALL_UNSENT) {
@@ -256,7 +256,7 @@ public class JavaRosaDemoShell implements IShell {
 				FormDef def = (FormDef)returnVals.get(PatientEntryActivity.PATIENT_ENTRY_FORM_KEY);
 				ReferenceRetrievalMethod method = new ReferenceRetrievalMethod();
 				method.setFormDef(def);
-				launchFormEntryActivity(context, -1, -1, method);
+				launchFormEntryActivity(context, -1, -1, method, false);
 			}
 		} else if (returningActivity instanceof AddUserActivity) { 
 		 	launchActivity(new FormListActivity(this, "Forms List"), context);
@@ -285,14 +285,15 @@ public class JavaRosaDemoShell implements IShell {
 		activity.resume(context);
 	}
 
-	private void launchFormEntryActivity (Context context, int formID, int instanceID) {
-		launchFormEntryActivity(context, formID, instanceID, null);
+	private void launchFormEntryActivity (Context context, int formID, int instanceID, boolean readOnly) {
+		launchFormEntryActivity(context, formID, instanceID, null, false);
 	}
 	
-	private void launchFormEntryActivity (Context context, int formID, int instanceID, IFormDefRetrievalMethod method) {
+	private void launchFormEntryActivity (Context context, int formID, int instanceID, IFormDefRetrievalMethod method,boolean readOnly) {
 		FormEntryActivity entryActivity = new FormEntryActivity(this, new FormEntryViewFactory());
 		FormEntryContext formEntryContext = new FormEntryContext(context);
 		formEntryContext.setFormID(formID);
+		formEntryContext.setReadOnly(readOnly);
 		if (instanceID != -1)
 			formEntryContext.setInstanceID(instanceID);
 

@@ -43,7 +43,7 @@ import org.javarosa.xform.util.XFormUtils;
  */
 public class PatientEntryActivity implements IActivity {
 
-	public static final String PATIENT_ENTRY_FORM_KEY = "Patient Entry Form";
+	public static final String PATIENT_ENTRY_FORM_KEY = "jr-patient-reg";
 	public static final String NEW_PATIENT_ID = "patient-id";
 	
 	Context context;
@@ -118,6 +118,10 @@ public class PatientEntryActivity implements IActivity {
 		}
 		newPatient.setRecord("weight", weightRecords);
 		
+		if("SINGLE".equals(context.getElement("ENTRY_MODE"))){
+			this.context.setElement("PATIENT_ID", new Integer(newPatient.getRecordId()));
+		}
+		
 		return writePatient(newPatient);
 	}
 	
@@ -163,7 +167,14 @@ public class PatientEntryActivity implements IActivity {
 	 */
 	public void start(Context context) {
 		this.context = context;
-		patientEntryForm = XFormUtils.getFormFromResource("/patient-entry.xhtml");
+		String mode = (String)context.getElement("ENTRY_MODE");
+		if(mode.equals("BATCH")) {
+			patientEntryForm = XFormUtils.getFormFromResource("/batch-patient-entry.xhtml");
+				
+		} else {
+			patientEntryForm = XFormUtils.getFormFromResource("/patient-entry.xhtml");
+		}
+		
 		Hashtable table = new Hashtable();
 		table.put(PATIENT_ENTRY_FORM_KEY, patientEntryForm);
 		parent.returnFromActivity(this, Constants.ACTIVITY_NEEDS_RESOLUTION, table);

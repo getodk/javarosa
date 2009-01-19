@@ -106,6 +106,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		if( theForm != null){
 			model = new FormEntryModel(theForm, this.instanceID);
 			controller = new FormEntryController(model, this);
+			model.setReadOnly(this.context.getReadOnly());
 			String viewString = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(FormManagerProperties.VIEW_TYPE_PROPERTY);
 			System.out.println("making view! " + viewString + model + controller);
 			view = viewFactory.getFormEntryView(viewString, model, controller);

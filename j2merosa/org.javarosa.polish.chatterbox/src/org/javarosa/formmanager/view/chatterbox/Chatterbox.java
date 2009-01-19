@@ -29,6 +29,7 @@ import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.util.ChatterboxContext;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
+import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle;
 
 import de.enough.polish.ui.Alert;
@@ -77,11 +78,17 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
         //#style framedForm
     	super(formTitle);
     	
+    	if(model.isReadOnly()) {
+    		//#style ReviewFramedForm
+    		UiAccess.setStyle(this);
+    	}
+    	
     	this.model = model;
     	this.controller = controller;
     	controller.setFormEntryView(this);
 
     	widgetFactory = new ChatterboxWidgetFactory(this);
+    	widgetFactory.setReadOnly(this.model.isReadOnly());
     	multiLingual = (model.getForm().getLocalizer() != null);
     	questionIndexes = new SortedIndexSet();
     	activeQuestionIndex = FormIndex.createBeginningOfFormIndex(); //null is not allowed
@@ -93,6 +100,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	//#if device.identifier == Sony-Ericsson/P1i
     	KEY_CENTER_LETS_HOPE = 13;
     	//#endif
+
     }
 
     public void destroy () {
@@ -110,7 +118,14 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     private void initGUI () {
     	setUpCommands();
     	initProgressBar();
-    	controller.stepQuestion(true);
+    	if(!model.isReadOnly()) {
+    		controller.stepQuestion(true);
+    	} else {
+    		while(!model.getQuestionIndex().isEndOfFormIndex()) {
+    			controller.stepQuestion(true);
+    		}
+    	}
+    	
     }
     
     private void setUpCommands () {
@@ -125,10 +140,15 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
         }
         
         //next command is added on a per-widget basis
-        addCommand(backCommand);
+        
+        if(!model.isReadOnly()) {
+            addCommand(backCommand);
+            addCommand(exitSaveCommand);
+            addCommand(saveCommand);
+    	}
+
         addCommand(exitNoSaveCommand);        
-        addCommand(exitSaveCommand);
-        addCommand(saveCommand);
+
         
         if (languageSubMenu != null) {
         	addCommand(languageSubMenu);
@@ -301,6 +321,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
     
     public void formComplete () {
+    	if(!model.isReadOnly()) {
     	jumpToQuestion(FormIndex.createEndOfFormIndex());
     	babysitStyles();
 		progressBar.setValue(progressBar.getMaxValue());
@@ -312,6 +333,9 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 			
 		controller.save();
 		controller.exit();
+    	} else { 
+    		
+    	}
     }
     
     private ChatterboxWidget activeFrame () {
@@ -326,11 +350,15 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     private void babysitStyles () {
     	for (int i = 0; i < size(); i++) {
     		ChatterboxWidget cw = (ChatterboxWidget)get(i);
-    		
     		switch (cw.getViewState()) {
     		case ChatterboxWidget.VIEW_COLLAPSED:
-    			//#style split
-    			UiAccess.setStyle(cw);
+    			if(model.isReadOnly()) {
+    				//#style ReviewSplit
+    				UiAccess.setStyle(cw);
+    			} else {
+    				//#style split
+    				UiAccess.setStyle(cw);
+    			}
     			break;
     		case ChatterboxWidget.VIEW_EXPANDED:
     			//#style container
@@ -359,6 +387,9 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		doCapture();
     	} else if (command.getLabel()== "Back") {
     		backFromCamera();
+    	} else if (command.getLabel().equals(CollapsedWidget.UPDATE_TEXT)) { //TODO: Put this static string in a better place.
+    		//Return to shell providing the question index.
+    		controller.exit();
     	} else {
     		String language = null;
     		if (multiLingual) {
