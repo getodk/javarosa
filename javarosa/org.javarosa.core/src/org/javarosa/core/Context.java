@@ -49,7 +49,7 @@ public class Context {
 	/**
 	 * Gets the context value for the current user
 	 * 
-	 * @return The current user 
+	 * @return The current user name
 	 */
 	public String getCurrentUser() {
 		return (String)getElement(Constants.USER_KEY);
@@ -58,10 +58,28 @@ public class Context {
 	/**
 	 * Sets the context value for the current user
 	 * 
-	 * @param name The current user
+	 * @param name The current user name
 	 */
 	public void setCurrentUser(String name) {
 		setElement(Constants.USER_KEY, name);
+	}
+	
+	/**
+	 * Gets the context value for the current user
+	 * 
+	 * @return The current user id
+	 */
+	public Integer getCurrentUserID() {
+		return (Integer)getElement(Constants.USER_ID_KEY);
+	}
+	
+	/**
+	 * Sets the context value for the current user
+	 * 
+	 * @param id The current user id
+	 */
+	public void setCurrentUserID(Integer id) {
+		setElement(Constants.USER_ID_KEY, id);
 	}
 	
 	/**
