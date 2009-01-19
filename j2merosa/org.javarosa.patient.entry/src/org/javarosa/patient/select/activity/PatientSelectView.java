@@ -26,8 +26,16 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	private static final int SCROLL_INCREMENT = 5;	
 	//#endif
 	
-	private static final boolean ALLOW_NEW = true;
+	public static final int NEW_DISALLOWED = 0;
+	public static final int NEW_IN_LIST = 1;
+	public static final int NEW_IN_MENU = 2;
+	
 	private static final int INDEX_NEW = -1;
+	
+	//behavior configuration options
+	public boolean sortByName = true; //if false, sort by ID
+	public boolean wrapAround = false; //TODO: support this
+	public int newType = NEW_IN_LIST;
 	
 	private PatientSelectActivity controller;
 	public String entityType;
@@ -36,13 +44,11 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	private Container list;
 	private Command exitCmd;
 	private Command sortCmd;
+    private Command newCmd;
 	
 	private int firstIndex;
 	private int selectedIndex;
-	
-	public boolean sortByName = true; //if false, sort by ID
-	public boolean wrapAround = false; //TODO: support this
-	
+		
 	private Vector rowIDs; //index into data corresponding to current matches
 		
 	public PatientSelectView(PatientSelectActivity controller, String title) {
@@ -62,6 +68,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
         sortCmd = new Command("Sort", Command.SCREEN, 3);
         addCommand(exitCmd);
         addCommand(sortCmd);
+        
         this.setCommandListener(this);
         
         rowIDs = new Vector();
@@ -71,6 +78,12 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
         selectedIndex = 0;
         firstIndex = 0;
 
+        //can't go in constructor, as entityType is not set there yet
+        if (newType == NEW_IN_MENU) {
+        	newCmd = new Command("New " + entityType, Command.SCREEN, 4);
+        	addCommand(newCmd);
+        }
+        
         refresh();
 	}
 	
@@ -98,7 +111,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	private void getMatches (String key) {
 		rowIDs = controller.search(key);
 		sortRows();
-		if (ALLOW_NEW) {
+		if (newType == NEW_IN_LIST) {
 			rowIDs.addElement(new Integer(INDEX_NEW));
 		}
 	}
@@ -136,7 +149,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	}
 	
 	private boolean listIsEmpty () {
-		return rowIDs.size() == 0 || (rowIDs.size() == 1 && ALLOW_NEW);
+		return rowIDs.size() == 0 || (rowIDs.size() == 1 && newType == NEW_IN_LIST);
 	}
 	
 	private int rowID (int i) {
@@ -265,6 +278,8 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 			} else if (cmd == sortCmd) {
 				PatientSelectSortPopup pssw = new PatientSelectSortPopup(this, controller);
 				pssw.show();
+			} else if (cmd == newCmd) {
+				controller.newEntity();
 			}
 		}
 	}	
