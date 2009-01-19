@@ -4,15 +4,19 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.Hashtable;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,19 +27,19 @@ public class JavaRosaTestServlet extends HttpServlet {
 
 	private static final String HEADER = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\">";
 	private static final String _storageRoot = "/usr/share/tomcat5.5/webapps/jrtest/store/";
-
-	/**
-	 * 
-	 */
+	private static final int maxNumTransmissions = 128;
+	
 	private static final long serialVersionUID = 1L;
 	private String _lastPostParsable = null;
-	private Object _lastFileName;
-	private String _lastError;
+	private Object _lastFileName;			
 
+	private String _lastError;
+    private Hashtable<Integer,Integer> md5toLastByteRead;
+    private int numTransmissions = 0;
+    
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		resp.getOutputStream().write(HEADER.getBytes());
-		// resp.getOutputStream().write("Yee haw!".getBytes());
 		resp.getOutputStream().write(
 				new String("<br>Your Last Post was:<br>" + _lastPostParsable
 						+ "<br>").getBytes());
@@ -51,56 +55,100 @@ public class JavaRosaTestServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
+        int MD5 = 0;
+	    
 		// do something smart here
 		try {
 			Enumeration headers = req.getHeaderNames();
 			
 			String postData = "Headers:\n";
 
+			int totalBytesRead = 0;
 			while (headers.hasMoreElements()) {
 				String nextName = (String) headers.nextElement();
 				String nextValue = req.getHeader(nextName);
+				if(nextName.equalsIgnoreCase("If-Match")){
+                    resp.addHeader("ETag", nextValue);
+				    MD5 = new Integer(nextValue).intValue();
+	                if (md5toLastByteRead.containsKey(new Integer(MD5))){
+	                	totalBytesRead = md5toLastByteRead.get(new Integer(MD5)).intValue();
+	                } else {
+		                md5toLastByteRead.put(new Integer(MD5),new Integer(0));	                		                	
+	                }
+				}
 				postData += nextName + ":" + nextValue + "\n";
 			}
-			int bufSize = 100;
+			int bufSize = 1400;
 			byte[] temp = new byte[bufSize];
 			InputStream stream = req.getInputStream();
 			int bytesRead = stream.read(temp);
-			int totalBytesRead = 0;
 			ByteArrayOutputStream body = new ByteArrayOutputStream();
-			String fileName = this.getNewFileName("jrpost-in-progress");
-			File f = new File(fileName);
-			f.createNewFile();
-			Writer output = new BufferedWriter(new FileWriter(f));
-			output.write(postData);
+			File f;
+			if(MD5!=0) f = new File(_storageRoot + String.valueOf(MD5)+"-in-progress.txt");
+			else f = new File( this.getNewFileName("jrpost-in-progress" ));
+			boolean isNewDownload = f.createNewFile();
+			OutputStream output = new BufferedOutputStream(new FileOutputStream(f,true));
+            if (isNewDownload) output.write(postData.getBytes());
 			try {
 				// FileWriter always assumes default encoding is OK!
 				while (bytesRead != -1) {
 					totalBytesRead += bytesRead;
-					String thisChunk;
+					if( MD5 != 0) md5toLastByteRead.put(new Integer(MD5),new Integer(totalBytesRead));
 					//If we didn't read in a full buffer.
 					if(bytesRead < bufSize) {
 						byte[] newTemp = new byte[bytesRead];
 						for (int i = 0; i < bytesRead; i++) {
 							newTemp[i] = temp[i];
 						}
-						thisChunk = new String(newTemp);
-						output.write(thisChunk);
+						output.write(newTemp);
 						body.write(newTemp);
-						bytesRead = req.getInputStream().read(temp);
 					}
 					//We did read in a full buffer.
 					else {
-						thisChunk = new String(temp);
-						output.write(thisChunk);
+						output.write(temp);
 						body.write(temp);
-						bytesRead = req.getInputStream().read(temp);
 					}
+					bytesRead = req.getInputStream().read(temp);
 				}
 			} finally {
 				output.close();
 			}
 
+			if( MD5 != 0 ){
+    			if( MD5 != hashcode( String.valueOf(MD5) ) ){
+                    //File transmission was interrupted
+                    return;
+    			}
+    			else {
+    				//File transmission is complete
+                    File g = new File(_storageRoot + String.valueOf(MD5)+"-in-progress.txt");
+                    g.renameTo(new File(_storageRoot + String.valueOf(MD5)+"-complete.txt"));
+                    md5toLastByteRead.remove(new Integer(MD5));
+                    body.close();
+
+        			body = new ByteArrayOutputStream();
+        			InputStream in = new BufferedInputStream(new FileInputStream(new File(_storageRoot + String.valueOf(MD5)+"-complete.txt")));
+					bufSize = 8192;
+					temp = new byte[bufSize];
+					bytesRead = in.read(temp);
+    				while (bytesRead != -1) {
+    					if(bytesRead < bufSize) { //We read a partial buffer
+    						byte[] newTemp = new byte[bytesRead];
+    						for (int i = 0; i < bytesRead; i++) {
+    							newTemp[i] = temp[i];
+    						}
+    						body.write(newTemp);
+    					}
+    					else { //We read a full buffer
+    						body.write(temp);
+    					}
+						bytesRead = in.read(temp);    						
+                        output.flush();
+    				}
+    			}
+			}
+
+			
 			postData += "\nBody: (" + totalBytesRead + " bytes total)\n";
 			postData += new String(body.toByteArray());
 			
@@ -118,6 +166,50 @@ public class JavaRosaTestServlet extends HttpServlet {
 
 	}
 
+	/*
+	 * If we receive a post with a valid ETag, we check to see whether this contains a valid md5.
+	 * Then we return the last good byte read
+	 * Example response is: * HTTP/1.1 308 Resume Incomplete / ETag: "vEpr6barcD" / Content-Length: 0 / Range: 0-42
+	 */
+    public void doHead(HttpServletRequest req, HttpServletResponse resp){
+        int MD5 = 0;
+        
+        Enumeration headers = req.getHeaderNames();
+        String md5Value = null;
+
+        while (headers.hasMoreElements()) {
+            String nextName = (String) headers.nextElement();
+            if(nextName.equalsIgnoreCase("If-Match")){
+                md5Value = req.getHeader(nextName);
+                resp.addHeader("ETag", md5Value);
+                break;
+            }
+        }
+        if ( md5Value != null ){
+            MD5 = new Integer(md5Value).intValue();
+        	Integer lbr = md5toLastByteRead.get( new Integer(MD5) );
+        	if(lbr==null) return;
+            int lastByteRead = lbr.intValue();
+            if (lastByteRead>0) resp.setHeader("Range", "0-" + String.valueOf(lastByteRead) + "/*" );
+            else resp.setHeader("Range", "0-0/*" );
+            resp.setIntHeader("Content-Length", 0); 
+            resp.setStatus(308); //Status : resume incomplete
+        }            
+    }
+	
+    static int counter=0;
+	public int hashcode(String fileName){
+		counter++;
+	    if(counter%2==1)return 999;
+	    else return 888;
+	    /* File f = new File(fileName);
+        f.createNewFile();
+        BufferedInputStream in = new BufferedInputStream(new FileWriter(f));
+        return hashcode(in);	  
+        */
+	}
+	
+	
 	private String trim(String postData) {
 		// TODO Auto-generated method stub
 		if (postData != null && postData.length() > 2000) {
@@ -172,6 +264,7 @@ public class JavaRosaTestServlet extends HttpServlet {
 			String nextName = (String) headers.nextElement();
 			String nextValue = req.getHeader(nextName);
 			htmlPostData += nextName + ":" + nextValue + "<br>";
+			// Identifies the boundary marker between the different parts of the file
 			if(nextName.equalsIgnoreCase("content-type")) {
 				String[] typeData = nextValue.split(";");
 				type = typeData[0];
@@ -207,7 +300,10 @@ public class JavaRosaTestServlet extends HttpServlet {
 			output.close();
 		}
 	}
-	
+
+	/* 
+	 * This function breaks up the received bytestream by boundary markers
+	 */
 	private Vector<String> parseAndHandle(byte[] body, String boundary) throws IOException{
 		Vector<String> partNames = new Vector<String>();
 		byte[] boundaryData = ("\n--" + boundary + "\n").getBytes();
@@ -320,7 +416,7 @@ public class JavaRosaTestServlet extends HttpServlet {
 	}
 
 	public void init() throws ServletException {
-
+        md5toLastByteRead = new Hashtable<Integer,Integer>();
 	}
 	
 	//stackoverflow
