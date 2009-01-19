@@ -161,9 +161,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	{
 		//Record to file
 		if(comm == recordCommand)
-		{	
-			readFile("Test.wav");
-			/*
+		{			
 	        captureThread.setPriority(Thread.currentThread().getPriority() +1 );
 	        if(!captureThreadStarted)
 	        {
@@ -171,9 +169,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	        	captureThreadStarted = true;	        	
 	        }
 	        else
-	        	captureThread.run();
-	        //recordAudio(); 
-	        */
+	        	captureThread.run();	        	        
 	    } 
 	    //User should be able to replay recording
 	    else if(comm == playCommand)
@@ -188,13 +184,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	            errorItem.setLabel("Error");
 	            errorItem.setText(me.toString());
 	        }
-	        /*
-	        catch(InterruptedException ie)
-	        {
-	        	errorItem.setLabel("Error");
-	            errorItem.setText(ie.toString());
-	        }
-	        */
+	        
 	    }
 	    //Stop recording audio
 	    else if(comm == stopCommand)
@@ -202,14 +192,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	    	try
 	    	{
 	    		stop();
-	    	}
-	    	/*
-	    	catch(InterruptedException ie)
-	    	{
-	    		errorItem.setLabel("Error");
-	            errorItem.setText(ie.toString());
-	    	}
-	    	*/	    	
+	    	}	    		    	
 	    	catch(IOException ioe) 
 	    	{
 	            errorItem.setLabel("Error");
@@ -249,16 +232,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	      messageItem.setText("Recording...");
 	      
 	      form.removeCommand(recordCommand); //"Hide" recordCommand when recording has stopped
-		  form.addCommand(stopCommand);		  
-		  
-		  //Thread.currentThread().sleep(FOREVER);
-		  /*
-		  captureThread.start();
-		  Thread.yield();
-		  captureThread.join();
-		  */
-		  
-		  //Thread.sleep(FOREVER);		  
+		  form.addCommand(stopCommand);	    
 		  
 		  /*
 	      messageItem.setText("done!");
@@ -321,13 +295,9 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  
 		  messageItem.setText("done!");	                     
 	      //recordedSoundArray = audioDataStream.toByteArray();
-	      errorItem.setText("Sound size=" + audioDataStream.toByteArray().length);
-	      //saveFile("Test_Rec.wav", audioDataStream.toByteArray());
-	      
-	      //recordP.deallocate();
-	      recordP.stop();
-		  //recordP.close();
-	      
+	      //errorItem.setText("Sound size=" + audioDataStream.toByteArray().length);
+	      	      
+	      recordP.stop();	      
 	  }
 	  
 	  //Stops the playback of the Recorder
@@ -384,10 +354,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  public void moveBack()
 	  {
 		  System.err.println("Moving back");
-		  parentShell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-		  /* TODO
-		   * Fix NullPointerException.
-		   */		
+		  parentShell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);		  		
 	  }	  
 	  
 	  //Finish capturing audio, inform shell, and return data as well
@@ -405,7 +372,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  public void checkStreamSize(ByteArrayOutputStream ba) throws MediaException
 	  {
 		  if(ba.toByteArray().length <= 0)
-			  throw new MediaException("Cannot create Player with no bytes in stream");
+			  throw new MediaException("Cannot create Player with 0 or less bytes in stream");
 	  }
 	  
 	  //Record audio in a separate thread to keep the command listener alert for stopping
