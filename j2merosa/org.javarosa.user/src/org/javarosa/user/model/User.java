@@ -24,6 +24,7 @@ public class User implements Externalizable, IDRecordable
 	private String username;
 	private String password;
 	private String userType;
+	private int id;
 	private boolean rememberMe= false;
 
 	private int [] formsApplied;
@@ -34,16 +35,17 @@ public class User implements Externalizable, IDRecordable
 		userType = STANDARD;
 	}
 
-	public User(String name, String passw)
+	public User(String name, String passw, int id)
 	{
 		username = name;
 		password = passw;
 		userType =  STANDARD;
 		rememberMe = false;
+		this.id = id;
 	}
 	
 	
-	public User(String name, String passw, String isAAdmin)
+	public User(String name, String passw, int id, String isAAdmin)
 	{
 		username = name;
 		password = passw;
@@ -59,6 +61,7 @@ public class User implements Externalizable, IDRecordable
 			this.setUserType( USERTYPE1);
 		else
 			System.out.println("while creating user, an invalid isAAdmin variable was passed in: options are \"STANDARD\" or \"ADMINSUER\" or \"USERTYPE1\"");
+		this.id = id;
 	}
 
 	///fetch the value for the default user and password from the RMS
@@ -67,6 +70,7 @@ public class User implements Externalizable, IDRecordable
 			this.username = in.readUTF();
 			this.password = in.readUTF();
 			this.userType = in.readUTF();
+			this.id = in.readInt();
 			this.rememberMe = in.readBoolean();
 		}
 		catch (IOException ioe)
@@ -88,6 +92,7 @@ public class User implements Externalizable, IDRecordable
 			out.writeUTF(this.username);
 	        out.writeUTF(this.password);
 	        out.writeUTF(this.userType);
+	        out.writeInt(this.id);
 	        out.writeBoolean(this.rememberMe);
 
 		} catch (IOException e) {
@@ -118,6 +123,10 @@ public class User implements Externalizable, IDRecordable
 
 	public String getUserType() {
 		return userType;
+	}
+	
+	public int getUserID() {
+		return this.id;
 	}
 
 	public void setUserType(String userType) {
