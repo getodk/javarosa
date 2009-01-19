@@ -99,6 +99,9 @@ public class ChatterboxWidgetFactory {
 		case Constants.CONTROL_IMAGE_CHOOSE:
 			expandedStyle = new ImageChooserWidget();
 			break;
+		case Constants.CONTROL_AUDIO_CAPTURE:
+			expandedStyle = new AudioCaptureWidget();
+			break;	
 		}
 
 		if (expandedStyle == null) { //catch types text, null, unsupported
