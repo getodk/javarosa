@@ -118,8 +118,11 @@ public class FormEntryController {
 	}
 
 	public void exit () {
+		this.exit("exit");
+	}
+	public void exit (String code) {
 		view.destroy();
-		parent.controllerReturn("exit");
+		parent.controllerReturn(code);
 	}
 
 	public void startOver () {

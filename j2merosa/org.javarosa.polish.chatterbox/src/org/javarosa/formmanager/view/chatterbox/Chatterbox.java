@@ -118,12 +118,21 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     private void initGUI () {
     	setUpCommands();
     	initProgressBar();
-    	if(!model.isReadOnly()) {
-    		controller.stepQuestion(true);
-    	} else {
+    	
+    	//Mode 1: Read only review screen.
+    	if(model.isReadOnly()) {
     		while(!model.getQuestionIndex().isEndOfFormIndex()) {
     			controller.stepQuestion(true);
     		}
+    	} else if(model.getStartIndex() != null) {
+    		
+    		//Mode 2: Seek to current question
+    		while(!model.getQuestionIndex().equals(model.getStartIndex())) {
+    			controller.stepQuestion(true);
+    		}
+    	} else {
+    		//Default Mode: Start at first question
+    		controller.stepQuestion(true);
     	}
     	
     }
@@ -389,7 +398,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		backFromCamera();
     	} else if (command.getLabel().equals(CollapsedWidget.UPDATE_TEXT)) { //TODO: Put this static string in a better place.
     		//Return to shell providing the question index.
-    		controller.exit();
+    		model.setQuestionIndex(this.questionIndexes.get(this.getCurrentIndex()));
+    		controller.exit("update");
     	} else {
     		String language = null;
     		if (multiLingual) {
