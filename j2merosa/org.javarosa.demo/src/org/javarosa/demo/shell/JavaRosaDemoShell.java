@@ -20,6 +20,7 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.DateUtils;
@@ -211,7 +212,7 @@ public class JavaRosaDemoShell implements IShell {
 				launchActivity( new AddUserActivity(this),context);
 			
 		} else if (returningActivity instanceof ModelListActivity) {
-
+//http://www.thenation.com/doc/20061127/joyce
 			Object returnVal = returnVals.get(ModelListActivity.returnKey);
 			if (returnVal == ModelListActivity.CMD_MSGS) {
 				launchFormTransportActivity(context, TransportContext.MESSAGE_VIEW);
@@ -237,7 +238,15 @@ public class JavaRosaDemoShell implements IShell {
 				relaunchListActivity();
 			}
 
-		} else if (returningActivity instanceof FormTransportActivity) {
+		} else if (returningActivity instanceof FormReviewActivity) {
+			if ("update".equals(returnVals.get(Commands.COMMAND_KEY))) {
+				launchFormEntryActivity(context, ((Integer)returnVals.get("FORM_ID")).intValue(),
+						((Integer)returnVals.get("INSTANCE_ID")).intValue(),(FormIndex)returnVals.get("SELECTED_QUESTION"),new RMSRetreivalMethod());
+			} else {
+				relaunchListActivity();
+			}
+
+		}  else if (returningActivity instanceof FormTransportActivity) {
 			if(returnVals.get(FormTransportActivity.RETURN_KEY ) == FormTransportActivity.NEW_DESTINATION) {
 				TransportMethod transport = JavaRosaServiceProvider.instance().getTransportManager().getTransportMethod(JavaRosaServiceProvider.instance().getTransportManager().getCurrentTransportMethod());
 				IActivity activity = transport.getDestinationRetrievalActivity();
@@ -260,7 +269,7 @@ public class JavaRosaDemoShell implements IShell {
 				FormDef def = (FormDef)returnVals.get(PatientEntryActivity.PATIENT_ENTRY_FORM_KEY);
 				ReferenceRetrievalMethod method = new ReferenceRetrievalMethod();
 				method.setFormDef(def);
-				launchFormEntryActivity(context, -1, -1, method);
+				launchFormEntryActivity(context, -1, -1, null, method);
 			}
 		} else if (returningActivity instanceof AddUserActivity) { 
 		 	launchActivity(new FormListActivity(this, "Forms List"), context);
@@ -290,13 +299,14 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void launchFormEntryActivity (Context context, int formID, int instanceID) {
-		launchFormEntryActivity(context, formID, instanceID, null);
+		launchFormEntryActivity(context, formID, instanceID, null, null);
 	}
 	
-	private void launchFormEntryActivity (Context context, int formID, int instanceID, IFormDefRetrievalMethod method) {
+	private void launchFormEntryActivity (Context context, int formID, int instanceID, FormIndex selected, IFormDefRetrievalMethod method) {
 		FormEntryActivity entryActivity = new FormEntryActivity(this, new FormEntryViewFactory());
 		FormEntryContext formEntryContext = new FormEntryContext(context);
 		formEntryContext.setFormID(formID);
+		formEntryContext.setFirstQuestionIndex(selected);
 		if (instanceID != -1)
 			formEntryContext.setInstanceID(instanceID);
 

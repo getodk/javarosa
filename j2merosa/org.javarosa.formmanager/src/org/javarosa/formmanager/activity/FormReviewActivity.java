@@ -27,6 +27,7 @@ import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.IFormDefRetrievalMethod;
 import org.javarosa.formmanager.utility.ILoadHost;
+import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
@@ -167,11 +168,19 @@ public class FormReviewActivity implements IActivity, CommandListener, IControll
 	public void controllerReturn (String status) {
 		if ("exit".equals(status)) {
 			Hashtable returnArgs = new Hashtable();
-
+			returnArgs.put("FORM_ID", new Integer(model.getForm().getID()));
 			returnArgs.put("INSTANCE_ID", new Integer(model.getInstanceID()));
 			returnArgs.put("DATA_MODEL", model.getForm().getDataModel());
-			returnArgs.put("FORM_COMPLETE", new Boolean(model.isFormComplete()));
-			returnArgs.put("QUIT_WITHOUT_SAVING", new Boolean(!model.isSaved()));
+			returnArgs.put(Commands.COMMAND_KEY, "exit");
+
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+		} else if ("update".equals(status)) {
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put("SELECTED_QUESTION", model.getQuestionIndex());
+			returnArgs.put("FORM_ID", new Integer(model.getForm().getID()));
+			returnArgs.put("INSTANCE_ID", new Integer(model.getInstanceID()));
+			returnArgs.put("DATA_MODEL", model.getForm().getDataModel());
+			returnArgs.put(Commands.COMMAND_KEY, "update");
 
 			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
 		} else if (Constants.ACTIVITY_TYPE_GET_IMAGES.equals(status)) {

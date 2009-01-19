@@ -3,6 +3,7 @@ package org.javarosa.formmanager.activity;
 import java.util.Vector;
 
 import org.javarosa.core.Context;
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.utils.IPreloadHandler;
 
@@ -13,6 +14,7 @@ public class FormEntryContext extends Context {
 	public static final String PRELOAD_HANDLERS = "PRELOAD_HANDLERS";
 	public static final String FUNCTION_HANDLERS = "FUNCTION_HANDLERS";
 	public static final String READ_ONLY = "fec_ro";
+	public static final String FIRST_QUESTION_INDEX = "fec_fqi";
 	
 	public FormEntryContext(Context context) { 
 		super(context);
@@ -78,5 +80,14 @@ public class FormEntryContext extends Context {
 		} else {
 			return false;
 		}
+	}
+	
+	public void setFirstQuestionIndex(FormIndex index) {
+		setElement(FIRST_QUESTION_INDEX, index);
+	}
+	
+	public FormIndex getFirstQuestionIndex() {
+		return (FormIndex)getElement(FIRST_QUESTION_INDEX);
+		
 	}
 }

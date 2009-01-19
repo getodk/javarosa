@@ -77,7 +77,7 @@ public class FormLoadActivity extends TimerTask implements IActivity {
 			} catch (DeserializationException uee) {
 				uee.printStackTrace();
 			}
-			
+			try {
 			theForm.setEvaluationContext(initEvaluationContext());
 			initPreloadHandlers(theForm); // must always load; even if we won't preload, we may still post-process!
 			theForm.initialize(instanceID == -1);
@@ -86,6 +86,9 @@ public class FormLoadActivity extends TimerTask implements IActivity {
 			System.out.println("Loaded the form successfuly");
 			//#endif
 			finish(theForm);
+			}				catch(Exception e) {
+				e.printStackTrace();
+			}
 		} else {
 			// error!
 			System.out.println("there's an error loading...");

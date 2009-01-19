@@ -16,6 +16,7 @@ public class FormEntryModel {
     private FormDef form;
 
     private FormIndex activeQuestionIndex;
+    private FormIndex startIndex;
     private int instanceID;
     private boolean unsavedChanges;
     private boolean formCompleted;
@@ -31,6 +32,10 @@ public class FormEntryModel {
     }
     
     public FormEntryModel(FormDef form, int instanceID) {
+    	this(form, instanceID, null);
+    }
+    
+    public FormEntryModel(FormDef form, int instanceID, FormIndex firstIndex) {
     	this.form = form;
     	this.instanceID = instanceID;
     	this.observers = new Vector();
@@ -38,6 +43,7 @@ public class FormEntryModel {
     	this.activeQuestionIndex = FormIndex.createBeginningOfFormIndex();
     	this.unsavedChanges = true; //we want them to be able to save the form initially, even with nothing in it
     	this.formCompleted = false;
+    	this.startIndex = firstIndex;
     }
     
     public FormIndex getQuestionIndex () {
@@ -180,5 +186,12 @@ public class FormEntryModel {
 	 */
 	public void setReadOnly(boolean readOnly) {
 		this.readOnly = readOnly;
+	}
+
+	/**
+	 * @return the startIndex
+	 */
+	public FormIndex getStartIndex() {
+		return startIndex;
 	}
 }
