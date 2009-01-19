@@ -30,7 +30,7 @@ public class ReferralReport implements IActivity, CommandListener {
 	private DataModelTree model;
 	private ReportView view;
 	
-	private Context context;
+	private ReportContext context;
 	
 	public ReferralReport(IShell parent) {
 		this.parent = parent;
@@ -59,7 +59,7 @@ public class ReferralReport implements IActivity, CommandListener {
 	public void start(Context context) {
 		FormDef temp = new FormDef();
 		if(context instanceof ReportContext) {
-			this.context = context;
+			this.context = (ReportContext)context;
 			String formName = ((ReportContext)context).getFormName();
 			int modelId = ((ReportContext)context).getModelId();
 			
@@ -71,10 +71,12 @@ public class ReferralReport implements IActivity, CommandListener {
 			} else {
 				try {
 					this.referrals = referralRms.retrieveFromRMS(formName);
-					rmsUtility.retrieveFromRMS(modelId,temp);
+					rmsUtility.retrieveFromRMS(this.context.getFormId(),temp);
 					
 					this.model = new DataModelTree();
 					modelUtility.retrieveFromRMS(modelId, this.model);
+					temp.setDataModel(model);
+					temp.initialize(false);
 
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

@@ -101,6 +101,7 @@ public class FormLoadActivity extends TimerTask implements IActivity {
 		System.out.println("finishing formloadactivity!");
 		//#endif
 		this.context.setElement("theForm", theForm);
+		this.context.setFormName(theForm.getName());
 		
 		this.parent.returnFromLoading(this.context);
 	}
