@@ -18,6 +18,8 @@ public class ChatterboxWidgetFactory {
 	
 	PrototypeFactoryDeprecated widgetFactory;
 	
+	boolean readOnly = false;
+	
 	public ChatterboxWidgetFactory (Chatterbox cbox) {
 		widgetFactory = new PrototypeFactoryDeprecated();
 		this.cbox = cbox;
@@ -52,6 +54,7 @@ public class ChatterboxWidgetFactory {
 		String appearanceAttr = question.getAppearanceAttr();
 		
 		collapsedStyle = new CollapsedWidget();
+		((CollapsedWidget)collapsedStyle).setSeekable(this.readOnly);
 		
 		switch (controlType) {
 		case Constants.CONTROL_INPUT:
@@ -156,5 +159,9 @@ public class ChatterboxWidgetFactory {
     	} else {
     		return null;
     	}
+    }
+    
+    public void setReadOnly(boolean readOnly) {
+    	this.readOnly = readOnly;
     }
 }

@@ -23,6 +23,8 @@ public class FormEntryModel {
     private Vector observers;
     
     public int totalQuestions; //total number of questions in the form; used for progress bar
+
+	private boolean readOnly;
     
     public FormEntryModel(FormDef form) {
     	this(form, -1);
@@ -163,5 +165,20 @@ public class FormEntryModel {
     
 	public void unregisterAll () {
 		observers.removeAllElements();
-	}	
+	}
+	
+    /**
+	 * @return Whether or not the form model should be written to.
+	 */
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	/**
+	 * @param readOnly Whether or not the form model should be changed by the
+	 * form entry interaction.
+	 */
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
+	}
 }

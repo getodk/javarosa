@@ -12,6 +12,7 @@ public class FormEntryContext extends Context {
 	public static final String INSTANCE_ID = "INSTANCE_ID";
 	public static final String PRELOAD_HANDLERS = "PRELOAD_HANDLERS";
 	public static final String FUNCTION_HANDLERS = "FUNCTION_HANDLERS";
+	public static final String READ_ONLY = "fec_ro";
 	
 	public FormEntryContext(Context context) { 
 		super(context);
@@ -65,5 +66,17 @@ public class FormEntryContext extends Context {
 	
 	public Vector getFunctionHandlers() {
 		return (Vector)getElement(FUNCTION_HANDLERS);
+	}
+	
+	public void setReadOnly(boolean readonly) {
+		setElement(READ_ONLY, new Boolean(readonly));
+	}
+	public boolean getReadOnly() {
+		Boolean readOnly = (Boolean) getElement(READ_ONLY);
+		if(readOnly != null) {
+			return readOnly.booleanValue();
+		} else {
+			return false;
+		}
 	}
 }
