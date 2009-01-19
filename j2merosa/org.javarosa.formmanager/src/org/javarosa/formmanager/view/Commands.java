@@ -20,4 +20,5 @@ public class Commands {
 	public static final String CMD_CAPTURE_IMAGE = "capture_image";
 	public static final String CMD_CAMERA = "camera";
 	public static final String CMD_IMAGE_BROWSE = "browse_images";
+	public static final String CMD_RECORDER = "audio_capture";
 }
