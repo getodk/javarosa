@@ -330,6 +330,10 @@ public class XFormParser {
 			// NOTE: this could be further expanded. 
 			question.setControlType(Constants.CONTROL_IMAGE_CHOOSE);
 		}
+		else if("audio/*".equals(mediaType))
+		{			 
+			question.setControlType(Constants.CONTROL_AUDIO_CAPTURE);
+		}
 		return question;
 	}
 	
