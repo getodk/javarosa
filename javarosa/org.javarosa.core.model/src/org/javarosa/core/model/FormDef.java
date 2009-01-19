@@ -540,7 +540,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		if (fe instanceof QuestionDef) {
 			QuestionDef q = (QuestionDef)fe;
 			if (q.getControlType() == Constants.CONTROL_SELECT_ONE || q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
-				mapping.put(new Integer(q.getID()), fe);
+				mapping.put(new Integer(q.getID()), q);
 			}
 		} else {
 			for (int i = 0; i < fe.getChildren().size(); i++) {

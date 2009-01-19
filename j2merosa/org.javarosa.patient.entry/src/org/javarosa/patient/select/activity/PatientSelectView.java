@@ -68,7 +68,6 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
         sortCmd = new Command("Sort", Command.SCREEN, 3);
         addCommand(exitCmd);
         addCommand(sortCmd);
-        
         this.setCommandListener(this);
         
         rowIDs = new Vector();
