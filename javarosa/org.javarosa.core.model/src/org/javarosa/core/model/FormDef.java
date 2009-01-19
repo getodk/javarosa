@@ -11,6 +11,9 @@ import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -488,6 +491,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * false if it is using an existing IDataModel
 	 */
 	public void initialize (boolean newInstance) {
+		hackFixSelectQuestionDeserialization();
+		
 		if (newInstance) {//only preload new forms (we may have to revisit this)
 			preloadModel(model.getRoot());
 		}
@@ -496,6 +501,48 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		
 		if (getLocalizer() != null && getLocalizer().getLocale() == null) {
 			getLocalizer().setToDefault();
+		}
+	}
+	
+	private void hackFixSelectQuestionDeserialization () {
+		Hashtable questionMapping = new Hashtable();
+		hackGenQuestionMapping(this, questionMapping);
+		hackFixSelectQuestionDeserialization(model.getRoot(), questionMapping);
+	}
+
+	private void hackFixSelectQuestionDeserialization (TreeElement node, Hashtable questionMapping) {
+		IAnswerData data = node.getValue();
+		if (data == null) {
+			for (int i = 0; i < node.getNumChildren(); i++)
+				hackFixSelectQuestionDeserialization((TreeElement)node.getChildren().elementAt(i), questionMapping);
+		} else if (data instanceof SelectOneData || data instanceof SelectMultiData) {
+			Vector selections;
+			if (data instanceof SelectOneData) {
+				selections = new Vector();
+				selections.addElement((Selection)data.getValue());
+			} else {
+				selections = (Vector)data.getValue();
+			}
+			
+			for (int i = 0; i < selections.size(); i++) {
+				Selection s = (Selection)selections.elementAt(i);
+				int qID = s.question.getID();
+				QuestionDef properQ = (QuestionDef)questionMapping.get(new Integer(qID));
+				if (properQ == null) {
+					throw new RuntimeException("Error: cannot find referenced question def for select answer data");
+				}
+				s.question = properQ;
+			}
+		}
+	}
+
+	private void hackGenQuestionMapping (IFormElement fe, Hashtable mapping) {
+		if (fe instanceof QuestionDef) {
+			mapping.put(new Integer(((QuestionDef)fe).getID()), fe);
+		} else {
+			for (int i = 0; i < fe.getChildren().size(); i++) {
+				hackGenQuestionMapping(fe.getChild(i), mapping);
+			}
 		}
 	}
 	
