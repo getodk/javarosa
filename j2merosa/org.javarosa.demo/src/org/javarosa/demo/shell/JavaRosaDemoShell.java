@@ -32,6 +32,7 @@ import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.activity.FormListActivity;
+import org.javarosa.formmanager.activity.FormReviewActivity;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.utility.IFormDefRetrievalMethod;
@@ -203,7 +204,7 @@ public class JavaRosaDemoShell implements IShell {
 			} else if (returnVal == Commands.CMD_VIEW_DATA) {
 				launchActivity(new ModelListActivity(this), context);
 			} else if (returnVal == Commands.CMD_SELECT_XFORM) {
-				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1, false);
+				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1);
 			} else if (returnVal == Commands.CMD_EXIT) 
 				launchPatientSelectActivity(context);
 			  else if (returnVal == Commands.CMD_ADD_USER) 
@@ -216,7 +217,10 @@ public class JavaRosaDemoShell implements IShell {
 				launchFormTransportActivity(context, TransportContext.MESSAGE_VIEW);
 			} else if (returnVal == ModelListActivity.CMD_EDIT) {
 				launchFormEntryActivity(context, ((FormDef)returnVals.get("form")).getID(),
-						((DataModelTree)returnVals.get("data")).getId(), false);
+						((DataModelTree)returnVals.get("data")).getId());
+			} else if (returnVal == ModelListActivity.CMD_REVIEW) {
+				launchFormReviewActivity(context, ((FormDef)returnVals.get("form")).getID(),
+						((DataModelTree)returnVals.get("data")).getId());
 			} else if (returnVal == ModelListActivity.CMD_SEND) {
 				launchFormTransportActivity(context, TransportContext.SEND_DATA, (DataModelTree)returnVals.get("data"));
 			} else if (returnVal == ModelListActivity.CMD_SEND_ALL_UNSENT) {
@@ -256,7 +260,7 @@ public class JavaRosaDemoShell implements IShell {
 				FormDef def = (FormDef)returnVals.get(PatientEntryActivity.PATIENT_ENTRY_FORM_KEY);
 				ReferenceRetrievalMethod method = new ReferenceRetrievalMethod();
 				method.setFormDef(def);
-				launchFormEntryActivity(context, -1, -1, method, false);
+				launchFormEntryActivity(context, -1, -1, method);
 			}
 		} else if (returningActivity instanceof AddUserActivity) { 
 		 	launchActivity(new FormListActivity(this, "Forms List"), context);
@@ -285,15 +289,14 @@ public class JavaRosaDemoShell implements IShell {
 		activity.resume(context);
 	}
 
-	private void launchFormEntryActivity (Context context, int formID, int instanceID, boolean readOnly) {
-		launchFormEntryActivity(context, formID, instanceID, null, false);
+	private void launchFormEntryActivity (Context context, int formID, int instanceID) {
+		launchFormEntryActivity(context, formID, instanceID, null);
 	}
 	
-	private void launchFormEntryActivity (Context context, int formID, int instanceID, IFormDefRetrievalMethod method,boolean readOnly) {
+	private void launchFormEntryActivity (Context context, int formID, int instanceID, IFormDefRetrievalMethod method) {
 		FormEntryActivity entryActivity = new FormEntryActivity(this, new FormEntryViewFactory());
 		FormEntryContext formEntryContext = new FormEntryContext(context);
 		formEntryContext.setFormID(formID);
-		formEntryContext.setReadOnly(readOnly);
 		if (instanceID != -1)
 			formEntryContext.setInstanceID(instanceID);
 
@@ -304,6 +307,21 @@ public class JavaRosaDemoShell implements IShell {
 		}
 		
 		launchActivity(entryActivity, formEntryContext);
+	}
+	
+	private void launchFormReviewActivity (Context context, int formID, int instanceID) {
+		FormReviewActivity reviewActivity = new FormReviewActivity(this, new FormEntryViewFactory());
+		FormEntryContext formEntryContext = new FormEntryContext(context);
+		formEntryContext.setFormID(formID);
+		formEntryContext.setReadOnly(true);
+		if (instanceID != -1)
+			formEntryContext.setInstanceID(instanceID);
+		else {
+			reviewActivity.setRetrievalMethod(new RMSRetreivalMethod());
+		}
+		
+		launchActivity(reviewActivity, formEntryContext);
+
 	}
 	
 	private void launchFormTransportActivity (Context context, String task, DataModelTree data) {

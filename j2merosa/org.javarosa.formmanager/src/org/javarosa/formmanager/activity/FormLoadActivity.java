@@ -24,6 +24,7 @@ import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.IFormDefRetrievalMethod;
+import org.javarosa.formmanager.utility.ILoadHost;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
 
 /**
@@ -41,12 +42,12 @@ public class FormLoadActivity extends TimerTask implements IActivity {
 	
 	private int instanceID = -1;
 	
-	// This is bad.  Not generic.  No interface
-	private FormEntryActivity parent;
+	// This will go away once this activity is removed.
+	private ILoadHost parent;
 	
 	private Thread loadThread;
 	
-	public FormLoadActivity(FormEntryActivity parent) {
+	public FormLoadActivity(ILoadHost parent) {
 		this.parent = parent;
 		
 		this.fetcher = new FormDefFetcher();
