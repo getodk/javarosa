@@ -392,6 +392,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		commitAndSave();
     	} else if (command.getLabel()== Constants.ACTIVITY_TYPE_GET_IMAGES) {
     		suspendActivity(command);
+    	} else if (command.getLabel()== Constants.ACTIVITY_TYPE_GET_AUDIO) {
+        	suspendActivity(command);
     	} else if (command.getLabel()== "Capture") {
     		doCapture();
     	} else if (command.getLabel()== "Back") {
