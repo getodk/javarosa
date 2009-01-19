@@ -67,7 +67,8 @@ public class LoginForm extends Form implements IView
 	    	  String usernameVAR= (String)loginActivity.getActivityContext().getElement("username");
 	    	  String passwordVAR= (String)loginActivity.getActivityContext().getElement("password");
 
-	    	  loggedInUser = new User (usernameVAR,passwordVAR,User.ADMINUSER);
+	    	  // BWD - giving the default admin user an ID of -1...
+	    	  loggedInUser = new User (usernameVAR,passwordVAR, -1, User.ADMINUSER);
 	    	  userRMS.writeToRMS(loggedInUser);
 	      }
 
