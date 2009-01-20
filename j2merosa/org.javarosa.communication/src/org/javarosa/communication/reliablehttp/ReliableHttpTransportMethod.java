@@ -108,7 +108,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
     			HttpTransportDestination destination = (HttpTransportDestination)message.getDestination();
 			
     			reliableHttpPost(destination.getURL(),MD5,
-		            visitor.getOverallContentType(),httpload.getPayloadStream());		
+		            visitor.getOverallContentType(),httpload);		
 
 				// update status
 				message.setStatus(TransportMessage.STATUS_DELIVERED);
@@ -127,7 +127,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 				//#if debug.output==verbose || debug.output==exception
 				System.out.println(e.getMessage());
 				//#endif
-			} catch (inIOException e){
+			} catch (OtherIOException e){
                 Alert alert = new Alert("ERROR! ioe", e.getMessage(), null, AlertType.ERROR);
                 //#if debug.output==verbose || debug.output==exception
                 System.out.println(e.getMessage());
@@ -166,23 +166,30 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 			message.setReplyloadData(data);
 		}
 		
-		private void reliableHttpPost(String url, int MD5, String contentType, InputStream in)
-		    throws IOException, inIOException {
+		/*
+		 * Sends a header of the form
+		 * POST /upload HTTP/1.1 / Host: example.com / If-Match: "vEpr6barcD" / Content-Length: 100 / Content-Range: 0-99/100
+		 */
+		private void reliableHttpPost(String url, int MD5, String contentType, IDataPayload pl)
+		    throws IOException, OtherIOException {
 		    boolean sendFailed;
+            InputStream in = pl.getPayloadStream();
 		    
 		    //Eventually we will use timeouts instead of maximum number of retries
 		    int numTries = 0;
             while (numTries<MAX_NUM_RETRIES){
                 numTries++;
                 sendFailed = false;
-                try{
-                    con = (HttpConnection) Connector.open(url);
-                    con.setRequestMethod(HttpConnection.POST);
-                    setDefaultRequestProperties(con);
-                    con.setRequestProperty("Content-Type",contentType);
-                    con.setRequestProperty("ETag",String.valueOf(MD5));
-                    out = con.openOutputStream(); // Problem exists here on 3110c CommCare Application: open hangs
+                //Posting to a non-existent machine should generate an exception in the following code
+                con = (HttpConnection) Connector.open(url);
+                con.setRequestMethod(HttpConnection.POST);
+                setDefaultRequestProperties(con);
+                con.setRequestProperty("Content-Type",contentType);
+                con.setRequestProperty("If-Match",String.valueOf(MD5));
+                out = con.openOutputStream(); // Problem exists here on 3110c CommCare Application: open hangs
 
+                //We only want to deal with errors in streaming files
+                try{
                     //RL: This should be optimized to read in packets of 1450 bytes at a time
                     int c = inputStreamReadCastExceptions(in);
                     while(c != -1) {
@@ -203,7 +210,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                         }
                         else{
                             //The server has generated some unknown response code
-                            throw new IOException("Response code: " + responseCode);                        
+                            throw new OtherIOException("IOEXCEPTION: Server response code: " + responseCode);       //CHANGE THIS BACK                 
                         }
                     }
                 } catch (IOException e){ 
@@ -217,12 +224,14 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                     int lastByte = reliableRequestLastByte(url, MD5);
                     if (lastByte != -1 ){ 
                         //server supports reliable http and has returns a valid lastByte
-                        in.reset();
+                        cleanUp(in);
+                        in = pl.getPayloadStream();
                         in.skip(lastByte);
                         continue;
                     } 
                     // server does not support reliable http so we resend from the first byte
-                    in.reset(); 
+                    cleanUp(in);
+                    in = pl.getPayloadStream();
                     continue;
                 }
                 //At this point, we have successfully transmitted the whole file and gotten a final ACK
@@ -270,14 +279,12 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		    while(numTries < MAX_NUM_RETRIES){
 		        numTries++;
                 try{
-    	            con = (HttpConnection) Connector.open(url);
+    	            HttpConnection con = (HttpConnection) Connector.open(url);
     	            con.setRequestMethod(HttpConnection.HEAD);
     	            setDefaultRequestProperties(con);
     	            //RL: todo - We probably need to request the correct Content-Type
-    	            //con.setRequestProperty("Content-Type",visitor.getOverallContentType());            
-    	            con.setRequestProperty("Content-Length", "0");
-    	            con.setRequestProperty("Content-Range", "*/100");
-                    con.setRequestProperty("ETag", String.valueOf(MD5));
+    	            //con.setRequestProperty("Content-Type",visitor.getOverallContentType());           
+                    con.setRequestProperty("If-Match", String.valueOf(MD5));
                     
                     //Is this how we send the HEAD message?
     	            OutputStream out = con.openOutputStream(); 
@@ -302,10 +309,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		}
 		
 		/* Server response expected is of the form:
-		* HTTP/1.1 308 Resume Incomplete
-		* ETag: "md5sum_of_posted_file"
-		* Content-Length: 0
-		* Range: range_of_bytes_the_server_has_received
+		* HTTP/1.1 308 Resume Incomplete / ETag: "md5sum_of_posted_file" / Content-Length: 0 / Range: range_of_bytes_the_server_has_received
         * @returns "-1" if cannot determine last byte received by server
 		*/
 		private int readLastByteReceived(HttpConnection con) throws IOException
@@ -316,9 +320,10 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
               String bytesReceivedByServer = con.getHeaderField("Range");
               if (bytesReceivedByServer==null) return -1;
               int i = bytesReceivedByServer.indexOf('-');
-              if ( i==-1 || i==bytesReceivedByServer.length()-1) return -1;
+              int j = bytesReceivedByServer.indexOf('/');
+              if ( i==-1 || i>j || j==-1 || j>(bytesReceivedByServer.length()-1) ) return -1;
               try {
-                  return Integer.parseInt(bytesReceivedByServer.substring(i+1));
+                  return Integer.parseInt(bytesReceivedByServer.substring(i+1,j));
               } catch (NumberFormatException e){
                   return -1;
               }
@@ -334,20 +339,24 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		 * The only reason this function exists is so that IOExceptions from the
 		 * inputstream do not cause reliablehttp to attempt to retransmit
 		 */
-		private int inputStreamReadCastExceptions (InputStream in) throws inIOException{
+		private int inputStreamReadCastExceptions (InputStream in) throws OtherIOException{
 		    try{
 		        return in.read();
 		    } catch (IOException e) {
-		        throw new inIOException();
+		        throw new OtherIOException(": inputstream");
 		    }
 		}
 		
-		/*
-		 * I really hate creating custom exceptions... 
-		 * But this is the only way to differentiate inputstream errors and httpconnection/outputstream errors
-		 */
-
-	    private class inIOException extends java.lang.Exception{};        		
+	    /*
+	     * I really hate creating custom exceptions... 
+	     * But this is the only way to differentiate inputstream errors and httpconnection/outputstream errors
+	     */
+	    private class OtherIOException extends java.lang.Exception
+	    {
+	        OtherIOException(String msg){
+	            super(msg);
+	        }
+	    }
 	}
 
 	private void cleanUp(InputStream in) {
