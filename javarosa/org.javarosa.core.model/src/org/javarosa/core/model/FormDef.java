@@ -498,17 +498,18 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			preloadModel(model.getRoot());
 		}
 		
-		initializeConditions();
-		
 		if (getLocalizer() != null && getLocalizer().getLocale() == null) {
 			System.out.println("Set to Default!");
 			getLocalizer().setToDefault();
 		}
+		
+		initializeConditions();
 	}
 	
 	private void hackFixSelectQuestionDeserialization () {
 		Hashtable questionMapping = new Hashtable();
 		hackGenQuestionMapping(this, questionMapping);
+		System.out.println(questionMapping);
 		hackFixSelectQuestionDeserialization(model.getRoot(), questionMapping);
 	}
 
@@ -531,7 +532,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 				int qID = s.question.getID();
 				QuestionDef properQ = (QuestionDef)questionMapping.get(new Integer(qID));
 				if (properQ == null) {
-					System.out.println(" QID: " + qID);
 					throw new RuntimeException("Error: cannot find referenced question def for select answer data");
 				}
 				s.question = properQ;
@@ -541,10 +541,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 
 	private void hackGenQuestionMapping (IFormElement fe, Hashtable mapping) {
 		if (fe instanceof QuestionDef) {
-			QuestionDef q = (QuestionDef)fe;
-			if (q.getControlType() == Constants.CONTROL_SELECT_ONE || q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
-				mapping.put(new Integer(q.getID()), q);
-			}
+			mapping.put(new Integer(((QuestionDef)fe).getID()), fe);
 		} else {
 			for (int i = 0; i < fe.getChildren().size(); i++) {
 				hackGenQuestionMapping(fe.getChild(i), mapping);
