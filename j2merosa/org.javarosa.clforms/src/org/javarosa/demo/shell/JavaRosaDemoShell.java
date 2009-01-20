@@ -178,7 +178,12 @@ public class JavaRosaDemoShell implements IShell {
 				{//loginType == "LOCAL_AUTH"
 					launchActivity(memcheck, context);
 				}
-			} else if (returnVal == "USER_CANCELLED") {
+			}
+			else if (returnVal == "USER_NOT_VALIDATED")
+			{
+				launchActivity(new RemoteLoginActivity(this, "Login"), context);
+			}
+			else if (returnVal == "USER_CANCELLED") {
 				exitShell();
 			}
 
