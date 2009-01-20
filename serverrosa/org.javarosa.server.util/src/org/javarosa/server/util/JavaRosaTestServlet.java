@@ -143,8 +143,8 @@ public class JavaRosaTestServlet extends HttpServlet {
     						body.write(temp);
     					}
 						bytesRead = in.read(temp);    						
-                        output.flush();
     				}
+    				body.flush();
     			}
 			}
 
