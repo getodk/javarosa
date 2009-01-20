@@ -3,7 +3,7 @@ package org.javarosa.communication.reliablehttp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Vector;
+import java.lang.Thread;
 
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
@@ -36,7 +36,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 	private ReliableWorkerThread primaryWorker;
 
     //RL: Temporary values until we start using timeouts
-    private static final int MAX_NUM_RETRIES = 3; 
+    private static final int MAX_NUM_RETRIES = 7; 
     private static final int MD5 = 999; 
 
     /*
@@ -125,12 +125,14 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 			} catch (IOException e) {
 				Alert alert = new Alert("ERROR! ioe", e.getMessage(), null, AlertType.ERROR);
 				//#if debug.output==verbose || debug.output==exception
-				System.out.println(e.getMessage());
+				System.out.println("Error! ioe: " + e.getMessage());
+                e.printStackTrace();
 				//#endif
 			} catch (OtherIOException e){
-                Alert alert = new Alert("ERROR! ioe", e.getMessage(), null, AlertType.ERROR);
+                Alert alert = new Alert("ERROR! oioe", e.getMessage(), null, AlertType.ERROR);
                 //#if debug.output==verbose || debug.output==exception
-                System.out.println(e.getMessage());
+                System.out.println("Error! oioe: " + e.getMessage() );
+                e.printStackTrace();
                 //#endif			  
 			} catch(java.lang.SecurityException se) {
 				Alert alert = new Alert("ERROR! se", se.getMessage(), null, AlertType.ERROR);
@@ -181,13 +183,22 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 numTries++;
                 sendFailed = false;
                 //Posting to a non-existent machine should generate an exception in the following code
-                con = (HttpConnection) Connector.open(url);
-                con.setRequestMethod(HttpConnection.POST);
-                setDefaultRequestProperties(con);
-                con.setRequestProperty("Content-Type",contentType);
-                con.setRequestProperty("If-Match",String.valueOf(MD5));
-                out = con.openOutputStream(); // Problem exists here on 3110c CommCare Application: open hangs
 
+                //#if debug.output==verbose || debug.output==exception
+                try{
+                //#endif
+                    con = (HttpConnection) Connector.open(url);
+                    con.setRequestMethod(HttpConnection.POST);
+                    setDefaultRequestProperties(con);
+                    con.setRequestProperty("Content-Type",contentType);
+                    con.setRequestProperty("If-Match",String.valueOf(MD5));
+                    out = con.openOutputStream(); // Problem exists here on 3110c CommCare Application: open hangs
+                //#if debug.output==verbose || debug.output==exception
+                } catch (IOException e){
+                    throw new IOException("reliableHttpPost: error in initialization");
+                }
+                //#endif
+                
                 //We only want to deal with errors in streaming files
                 try{
                     //RL: This should be optimized to read in packets of 1450 bytes at a time
@@ -222,19 +233,24 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                     cleanUp(con);
                     //Ask the server to transmit the last byte it has received
                     int lastByte = reliableRequestLastByte(url, MD5);
-                    if (lastByte != -1 ){ 
-                        //server supports reliable http and has returns a valid lastByte
-                        cleanUp(in);
-                        in = pl.getPayloadStream();
-                        in.skip(lastByte);
-                        continue;
-                    } 
-                    // server does not support reliable http so we resend from the first byte
                     cleanUp(in);
                     in = pl.getPayloadStream();
+                    if (lastByte != -1 ){ 
+                        //server supports reliable http and has returns a valid lastByte
+                        in.skip(lastByte);
+                    } 
+                    // server does not support reliable http so we resend from the first byte
+                    // many network errors are transient, so it's good to give a little buffer between re-tries
+                    try{
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e){}
                     continue;
                 }
                 //At this point, we have successfully transmitted the whole file and gotten a final ACK
+                if( numTries == MAX_NUM_RETRIES ){
+                    //The connection is truly foo-bar'd. Give up. 
+                    throw new IOException("Max num retransmits exceeded");
+                }                   
                 
                 in.close();
                 in = con.openInputStream();              
@@ -258,12 +274,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 }
                 break;
             }
-            
-            if( numTries == MAX_NUM_RETRIES ){
-                //The connection is truly foo-bar'd. Give up. 
-                throw new IOException();
-            }                   
-		}
+   		}
 		
 		/*
 		* HEAD /upload/eCn14NjNAy HTTP/1.1
@@ -291,10 +302,14 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
     	            out.flush();
     	            out.close();
     	            r = readLastByteReceived(con);
-		        } catch (IOException e){ //RL: todo -what if this is a problem with something else?
+		        } catch (IOException e){ 
 		            //keep on trying until maximum retransmission timeout
 		            cleanUp(out);
 		            cleanUp(con);
+                    // many network errors are transient, so it's good to give a little buffer between re-tries
+                    try{
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e2){}
 		            continue;
 		        }
 	            break;
@@ -302,7 +317,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		    
 		    if (numTries >= MAX_NUM_RETRIES ){
     		    //The connection is truly messed up. Give up.
-    		    throw new IOException();
+    		    throw new IOException("Max num retransmits exceeded");
 		    }
             cleanUp(con);
             return r; 
