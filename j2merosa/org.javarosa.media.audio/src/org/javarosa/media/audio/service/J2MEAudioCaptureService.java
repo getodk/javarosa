@@ -5,6 +5,8 @@ import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
 import javax.microedition.media.control.RecordControl;
 
+import org.javarosa.media.audio.AudioException;
+
 /**
  * An audio capture service that utilizes J2ME's beautiful Media API
  * 
@@ -14,7 +16,7 @@ import javax.microedition.media.control.RecordControl;
 public class J2MEAudioCaptureService implements IAudioCaptureService 
 {
 	private final String serviceName = "J2MEAudioCaptureService";
-	private STATE serviceState;
+	private int serviceState;
 	
 	private Player recordP;
 	private RecordControl recordControl;
@@ -25,7 +27,7 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	
 	public J2MEAudioCaptureService()
 	{
-		serviceState = IDLE;
+		serviceState = IAudioCaptureService.IDLE;
 	}
 
 	public String getName()
@@ -39,57 +41,85 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 		return audioDataStream;
 	}
 
-	public STATE getState()
+	public int getState()
 	{
 		return serviceState;
 	}	
 	
 	//@Override
-	public void startRecord()
+	public void startRecord() throws AudioException
 	{
-		recordP = Manager.createPlayer("capture://audio");
-		recordP.realize();                
-		recordControl = (RecordControl)recordP.getControl("RecordControl");                
-	    audioDataStream = new ByteArrayOutputStream();
-	    recordControl.setRecordStream(audioDataStream);                
-	    recordControl.startRecord();
+		try
+		{
+			recordP = Manager.createPlayer("capture://audio");
+			recordP.realize();                
+			recordControl = (RecordControl)recordP.getControl("RecordControl");                
+			audioDataStream = new ByteArrayOutputStream();
+			recordControl.setRecordStream(audioDataStream);                
+			recordControl.startRecord();
 	      
-	    recordP.start();	    
+			recordP.start();	    
 	  
 	   /*
 	    * If the method does not die before here, 
 	    * then the capture has officially started.	    
 	    */	   
-	    serviceState = CAPTURE_STARTED; 
+			serviceState = IAudioCaptureService.CAPTURE_STARTED;
+		}
+		catch(MediaException me)
+		{
+			throw new AudioException();
+		}
 	}
 
 	//@Override
-	public void stopRecord() 
+	public void stopRecord() throws AudioException
 	{
-		recordControl.commit();
-		recordP.stop();
+		try
+		{
+			recordControl.commit();
+			recordP.stop();
 		
-		serviceState = CAPTURE_STOPPED;
+			serviceState = IAudioCaptureService.CAPTURE_STOPPED;
+		}
+		catch(MediaException me)
+		{
+			throw new AudioException();
+		}
 	}
 	
 	//@Override
-	public void startPlayback() 
+	public void startPlayback() throws AudioException 
 	{
-		ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(audioDataStream.toByteArray());	      
-		checkStreamSize(audioDataStream);
-		playP = Manager.createPlayer(recordedInputStream,"audio/x-wav");
+		try
+		{
+			ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(audioDataStream.toByteArray());	      
+			checkStreamSize(audioDataStream);
+			playP = Manager.createPlayer(recordedInputStream,"audio/x-wav");
 		
-		playP.prefetch();
-	    playP.start();
+			playP.prefetch();
+			playP.start();		
 	    
-	    serviceState = PLAYBACK_STARTED;
+			serviceState = IAudioCaptureService.PLAYBACK_STARTED;
+		}
+		catch(MediaException me)
+		{
+			throw new AudioException();
+		}
 	}
 	
 	//@Override
-	public void stopPlayback() 
+	public void stopPlayback() throws AudioException 
 	{
-		playP.stop();
-		serviceState = PLAYBACK_STOPPED;
+		try
+		{
+			playP.stop();
+			serviceState = IAudioCaptureService.PLAYBACK_STOPPED;
+		}
+		catch(MediaException me)
+		{
+			throw new AudioException();
+		}
 	}
 	
 	//Closes all types of streams that are used
@@ -97,7 +127,7 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	{		
 		recordP.close();
 		playP.close();
-		serviceState = CLOSED;
+		serviceState = IAudioCaptureService.CLOSED;
 	}
 
 }

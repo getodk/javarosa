@@ -7,22 +7,22 @@
 package org.javarosa.media.audio.service;
 
 import org.javarosa.core.services.IService;
+import java.io.OutputStream;
 
 public interface IAudioCaptureService extends IService 
 {
-	public static enum STATE{
-		IDLE,
-		CAPTURE_STARTED, 
-		CAPTURE_STOPPED, 
-		PLAYBACK_STARTED,
-		PLAYBACK_STOPPED,
-		CLOSED};
+	public static final int	IDLE = 0;
+	public static final int CAPTURE_STARTED = 1; 
+	public static final int CAPTURE_STOPPED = 2; 
+	public static final int PLAYBACK_STARTED = 3;
+	public static final int PLAYBACK_STOPPED = 4;
+	public static final int CLOSED = 5;
 	
 	//Get the name of the service
-	public String getName();	
+	public String getName();
 	
 	//Returns the state of this service
-	public STATE getState();
+	public int getState();
 	
 	//Start recording audio
 	public void startRecord();	
@@ -37,7 +37,7 @@ public interface IAudioCaptureService extends IService
 	public void stopPlayback();
 	
 	//Return the captured audio
-	public ByteArrayOutputStream getAudio();
+	public OutputStream getAudio();
 	
 	//Closes all types of streams that are used
 	public void closeStreams();
