@@ -28,7 +28,7 @@ import org.javarosa.communication.http.HttpHeaderAppendingVisitor;
  */
 public class ReliableHttpTransportMethod extends HttpTransportMethod {
 
-	private static final String name = "HTTP";
+	private static final String name = "RELIABLE_HTTP";
 
 	private ITransportManager manager;
 	
@@ -176,7 +176,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		    throws IOException, OtherIOException {
 		    boolean sendFailed;
             InputStream in = pl.getPayloadStream();
-		    
+
 		    //Eventually we will use timeouts instead of maximum number of retries
 		    int numTries = 0;
             while (numTries<MAX_NUM_RETRIES){
@@ -184,6 +184,12 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 sendFailed = false;
                 //Posting to a non-existent machine should generate an exception in the following code
 
+                int lastByte = reliableRequestLastByte(url, MD5);
+                if (lastByte != -1 ){
+                    //server supports reliable http and has returned a valid lastByte
+                    in.skip(lastByte);
+                }
+                
                 //#if debug.output==verbose || debug.output==exception
                 try{
                 //#endif
@@ -232,16 +238,10 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                     cleanUp(out);
                     cleanUp(con);
                     //Ask the server to transmit the last byte it has received
-                    int lastByte = reliableRequestLastByte(url, MD5);
                     cleanUp(in);
                     in = pl.getPayloadStream();
-                    if (lastByte != -1 ){ 
-                        //server supports reliable http and has returns a valid lastByte
-                        in.skip(lastByte);
-                    } 
-                    // server does not support reliable http so we resend from the first byte
-                    // many network errors are transient, so it's good to give a little buffer between re-tries
                     try{
+                        // many network errors are transient, so it's good to give a little buffer between re-tries
                         Thread.sleep(1000);
                     } catch (InterruptedException e){}
                     continue;
@@ -297,7 +297,6 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
     	            //con.setRequestProperty("Content-Type",visitor.getOverallContentType());           
                     con.setRequestProperty("If-Match", String.valueOf(MD5));
                     
-                    //Is this how we send the HEAD message?
     	            OutputStream out = con.openOutputStream(); 
     	            out.flush();
     	            out.close();
