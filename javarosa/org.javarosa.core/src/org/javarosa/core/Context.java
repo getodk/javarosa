@@ -65,6 +65,30 @@ public class Context {
 	}
 	
 	/**
+	 * Sets the context value for the return code of the last
+	 * running activity, if this context is being used for
+	 * an activity resume.
+	 * 
+	 * @param key The return code of the last running activity.
+	 */
+	public void setReturnKey(String key) { 
+		setElement(Constants.RETURN_ARG_KEY, key);
+	}
+	
+	/**
+	 * Gets the context value for the return code of the last
+	 * running activity, if this context is being used for
+	 * an activity resume.
+	 * 
+	 * @return The return code of the last running activity.
+	 */
+	public String getReturnKey() { 
+		return (String)getElement(Constants.RETURN_ARG_KEY);
+	}
+	
+	
+	
+	/**
 	 * Gets the context value for the current user
 	 * 
 	 * @return The current user id

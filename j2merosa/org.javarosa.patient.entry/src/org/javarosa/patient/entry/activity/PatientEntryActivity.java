@@ -155,10 +155,16 @@ public class PatientEntryActivity implements IActivity {
 	 * @see org.javarosa.core.api.IActivity#resume(org.javarosa.core.Context)
 	 */
 	public void resume(Context globalContext) {
-		int patID = parsePatientsFromModel((DataModelTree)patientEntryForm.getDataModel());
 		Hashtable returnVals = new Hashtable();
-		returnVals.put(NEW_PATIENT_ID, new Integer(patID));
-		parent.returnFromActivity(this,Constants.ACTIVITY_COMPLETE, returnVals);
+		if(((Boolean)globalContext.getElement("QUIT_WITHOUT_SAVING")).booleanValue()) {
+			parent.returnFromActivity(this,Constants.ACTIVITY_ERROR, returnVals);
+		} else {
+			int patID = parsePatientsFromModel((DataModelTree) patientEntryForm
+					.getDataModel());
+			returnVals.put(NEW_PATIENT_ID, new Integer(patID));
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+					returnVals);
+		}
 	}
 
 	/* (non-Javadoc)
