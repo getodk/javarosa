@@ -9,15 +9,20 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.api.IView;
+import org.javarosa.patient.entry.activity.util.ClickableContainer;
+import org.javarosa.patient.entry.activity.util.IClickEventListener;
 
-import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
+import de.enough.polish.ui.ItemCommandListener;
 import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 
-public class PatientSelectView extends FramedForm implements IView, ItemStateListener, CommandListener {
+public class PatientSelectView extends FramedForm implements IView, ItemStateListener, CommandListener, IClickEventListener, ItemCommandListener {
+	//TODO: NO. WRONG. Polish Pre-processors should not be a neccesity for the code to not have
+	//errors in it.
+	
 	//#if javarosa.patientselect.formfactor == nokia-s40
 	private static final int MAX_ROWS_ON_SCREEN = 5;
 	private static final int SCROLL_INCREMENT = 3;	
@@ -41,7 +46,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	public String entityType;
 	
 	private TextField tf;
-	private Container list;
+	//private Container list;
 	private Command exitCmd;
 	private Command sortCmd;
     private Command newCmd;
@@ -53,17 +58,22 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 		
 	public PatientSelectView(PatientSelectActivity controller, String title) {
 		super(title);
+		
 		this.controller = controller;
 
 		tf = new TextField("Find:  ", "", 20, TextField.ANY);
 		tf.setInputMode(TextField.MODE_UPPERCASE);
 		tf.setItemStateListener(this);
 		
-		list = new Container(false);
+		//list = new Container(false);
+		//list.setAppearanceMode(Item.INTERACTIVE);
 		
         append(Graphics.BOTTOM, tf);
-        append(Graphics.VCENTER, list);
-                
+        //Jan 21, 2009 - csims@dimagi.com
+        //Changed from Graphics.VCENTER because that isn't actually a valid
+        //choice. Only top, bottom, left, and right are.
+        //append(Graphics.TOP, list);
+        
         exitCmd = new Command("Cancel", Command.CANCEL, 4);
         sortCmd = new Command("Sort", Command.SCREEN, 3);
         addCommand(exitCmd);
@@ -100,6 +110,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	}
 	
 	public void show () {
+		this.setActiveFrame(Graphics.BOTTOM);
 		controller.setView(this);
 	}
 	
@@ -175,25 +186,27 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	}
 	
 	private void refreshList () {
-		list.clear();
+		if(this.container != null){
+			this.container.clear();
+		}
 		
 		if (listIsEmpty()) {
-			list.add(new StringItem("", "(No matches)"));
+			this.append( new StringItem("", "(No matches)"));
 		}
 		
 		for (int i = firstIndex; i < rowIDs.size() && i < firstIndex + MAX_ROWS_ON_SCREEN; i++) {
-			Container row;
+			ClickableContainer row;
 			int rowID = rowID(i);
 			
 			if (i == selectedIndex) {
 				//#style patselSelectedRow
-				row = new Container(false);			
+				row = new ClickableContainer(false);			
 			} else if (i % 2 == 0) {
 				//#style patselEvenRow
-				row = new Container(false);
+				row = new ClickableContainer(false);
 			} else {
 				//#style patselOddRow
-				row = new Container(false);
+				row = new ClickableContainer(false);
 			}
 			
 			if (rowID == INDEX_NEW) {
@@ -207,15 +220,15 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 					row.add(str);
 				}
 			}
-			list.add(row);
+			//row.setClickEventListener(this);
+			//row.setItemCommandListener(this);
+			this.append(row);
+			row.setId(rowID);
 		}
-		
 		setActiveFrame(Graphics.BOTTOM);
 	}
-	
+
 	protected boolean handleKeyReleased(int keyCode, int gameAction) {
-		boolean ret = super.handleKeyReleased(keyCode, gameAction);
-		
 		if (gameAction == Canvas.UP && keyCode != Canvas.KEY_NUM2) {
 			stepIndex(false);
 			refreshList();
@@ -234,7 +247,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 			return true;
 		}
 		
-		return ret;
+		return super.handleKeyReleased(keyCode, gameAction);
 	}
 	
 	public void itemStateChanged (Item item) {
@@ -281,5 +294,54 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 				controller.newEntity();
 			}
 		}
+	}
+
+	public void clicked(ClickableContainer container) {
+		int rowID = container.getId();
+		if (rowID == INDEX_NEW) {
+			controller.newEntity();
+		} else {
+			controller.itemSelected(rowID);
+		}
 	}	
+	
+	//#if polish.hasPointerEvents
+	
+	/* (non-Javadoc)
+	 * @see de.enough.polish.ui.Container#handlePointerPressed(int, int)
+	 */
+	protected boolean handlePointerPressed(int x, int y) {
+		boolean handled = false;
+		//Item item = this.container.getItemAt(this.container.getAbsoluteX() + x, this.container.getAbsoluteY() + y);
+		for(int i = 0 ; i < this.container.size(); ++i) {
+			//if(this.container.isInItemArea(this.container.getAbsoluteX() + x, this.container.getAbsoluteY() + y, this.container.getItems()[i] )) {
+			if(this.container.isInItemArea(x - this.container.getAbsoluteX(), y - this.container.getAbsoluteY(), this.container.getItems()[i] )) {
+				if(this.container.getItems()[i] instanceof ClickableContainer) {
+					clicked(((ClickableContainer)this.container.getItems()[i]));
+					handled = true;
+				}
+			}
+		}
+		if (handled){
+			return true;
+		} else {
+			return super.handlePointerPressed(x, y);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.enough.polish.ui.Container#handlePointerReleased(int, int)
+	 */
+	protected boolean handlePointerReleased(int arg0, int arg1) {
+		Item[] items = this.container.getItems();
+		for(int i = 0; i < items.length ; ++i ) {
+			((ClickableContainer)items[i]).disarm();
+		}
+		return super.handlePointerReleased(arg0, arg1);
+	}
+	//#endif
+
+	public void commandAction(Command c, Item item) {
+		System.out.println("This sucks");
+	}
 }	

@@ -6,5 +6,17 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-app-designer.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-build.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-build-common.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-build-src.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-client.jar" sourcepath="C:/Program Files/J2ME-Polish/j2mepolish-src"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-client-java5.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-designer.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-extensions.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-rmi.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-runtime.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-license.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-webprocessor.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
