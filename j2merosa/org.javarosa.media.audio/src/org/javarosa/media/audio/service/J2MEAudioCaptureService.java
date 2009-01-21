@@ -51,8 +51,9 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	{
 		try
 		{
-			recordP = Manager.createPlayer("capture://audio");
-			recordP.realize();                
+			//recordP = Manager.createPlayer("capture://audio");
+			recordP = Manager.createPlayer("capture://audio?encoding=audio/mpeg");
+			recordP.realize();
 			recordControl = (RecordControl)recordP.getControl("RecordControl");                
 			audioDataStream = new ByteArrayOutputStream();
 			recordControl.setRecordStream(audioDataStream);                
@@ -94,8 +95,9 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 		try
 		{
 			ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(audioDataStream.toByteArray());	      
-			checkStreamSize(audioDataStream);
-			playP = Manager.createPlayer(recordedInputStream,"audio/x-wav");
+			//checkStreamSize(audioDataStream);
+			//playP = Manager.createPlayer(recordedInputStream,"audio/x-wav");
+			playP = Manager.createPlayer(recordedInputStream,"audio/mpeg");
 		
 			playP.prefetch();
 			playP.start();		
