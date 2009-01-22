@@ -7,7 +7,6 @@
 
 package org.javarosa.media.audio.activity;
 
-import java.io.IOException;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.Canvas;
@@ -19,13 +18,16 @@ import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.audio.model.FileDataPointer;
 
 import org.javarosa.media.audio.service.IAudioCaptureService;
+import org.javarosa.media.audio.service.J2MEAudioCaptureService;
 import org.javarosa.media.audio.AudioException;
 
 
@@ -39,12 +41,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	private final long FOREVER = 1000000;
 	private IShell parentShell;
 	private Context currentContext;
-	
-	/*
-	private Player recordP;
-    private Player playP;
-	private RecordControl recordControl;
-	*/
+		
 	private IAudioCaptureService recordService;
 	
 	private Command recordCommand, playCommand, stopCommand, backCommand, 
@@ -66,7 +63,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	public AudioCaptureActivity(IShell shell)
 	{
 		parentShell = shell;
-		display = JavaRosaServiceProvider.instance().getDisplay();		
+		display = JavaRosaServiceProvider.instance().getDisplay();	
+		JavaRosaServiceProvider.instance().registerService(new J2MEAudioCaptureService());
 	}
 	
 	//Finish off construction of Activity
@@ -86,18 +84,17 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		
 		try
 		{
-			recordService = JavaRosaServiceProvider.instance().getService("J2MEAudioCaptureService");
+			recordService = new J2MEAudioCaptureService();
+			//recordService = (J2MEAudioCaptureService)JavaRosaServiceProvider.instance().getService("J2MEAudioCaptureService");
 		}
-		catch(UnavailableServiceException ue)
+		catch(ClassCastException ce)
 		{
-			errorItem.setText("The Audio Recorder Service is unavailable.\n QUITTING!");
-			
-			//The only thing the user can do is retreat
-			form.removeCommand(recordCommmand);
-			form.removeCommand(playCommand);
-			
-			System.err.println(ue.getStackTrace());
-		}		
+			serviceUnavailable(ce);
+		}
+		/*catch(UnavailableServiceException ue)
+		{
+			serviceUnavailable(ue);
+		}*/
 		captureThread = new Thread(this, "CaptureThread");
 	}
 
@@ -111,7 +108,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	//@Override
 	public void destroy() 
 	{
-		recordService.closeStreams();
+		if(recordService != null)
+			recordService.closeStreams();
 	}
 
 	//@Override
@@ -143,7 +141,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		parentShell = shell;		
 	}
 	
-	public void annotateCommand(Command c)
+	public void annotateCommand(ICommand c)
 	{
 		
 	}
@@ -181,12 +179,12 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	        try 
 	        {
 	        	playAudio();
-	        }  catch (IOException ioe) {
-	            errorItem.setLabel("Error");
-	            errorItem.setText(ioe.toString());
-	        } catch (AudioException me) {
-	            errorItem.setLabel("Error");
-	            errorItem.setText(me.toString());
+	        }  
+	        catch (AudioException ae) 
+	        {
+	            errorItem.setLabel("Error playing audio");
+	            //errorItem.setText(me.toString());
+	            System.err.println(ae.toString());
 	        }	        
 	    }
 	    //Stop recording or playing audio
@@ -195,16 +193,12 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	    	try
 	    	{
 	    		stop();
-	    	}	    		    	
-	    	catch(IOException ioe) 
+	    	}	    	 
+	    	catch(AudioException ae) 
 	    	{
-	            errorItem.setLabel("Error");
-	            errorItem.setText(ioe.toString());
-	        } 
-	    	catch(AudioException me) 
-	    	{
-	            errorItem.setLabel("Error");
-	            errorItem.setText(me.toString());
+	            errorItem.setLabel("Error stopping action");
+	            //errorItem.setText(ae.toString());
+	            System.err.println(ae.toString());
 	        }
 	    }		
 	    else if(comm == backCommand)
@@ -218,70 +212,47 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	    else if(comm == saveCommand)
 	    {
 	    	String fileName = "Audio" + counter + ".wav";
+	    	if(audioDataStream == null)
+	    		audioDataStream = (ByteArrayOutputStream)recordService.getAudio();
 	    	saveFile(fileName, audioDataStream.toByteArray());
 	    }
 	}
 	
-	public void recordAudio() throws AudioException, IOException, InterruptedException
-	{		  
-		  //Throw away when Service works
-		  /*
-		  recordP = Manager.createPlayer("capture://audio");
-		  recordP.realize();                
-		  recordControl = (RecordControl)recordP.getControl("RecordControl");                
-	      audioDataStream = new ByteArrayOutputStream();
-	      recordControl.setRecordStream(audioDataStream);                
-	      recordControl.startRecord();
-	      
-	      recordP.start();
-	      */
-		
+	public void recordAudio() throws AudioException, InterruptedException
+	{
+		  errorItem.setLabel("");
+		  errorItem.setText("");
 		  recordService.startRecord();
 		
 	      messageItem.setText("Recording...");
 	      
 	      form.removeCommand(recordCommand); //"Hide" recordCommand when recording has stopped
-		  form.addCommand(stopCommand);	    
-		  
-		  /*
-	      messageItem.setText("done!");
-	      recordControl.commit();               
-	      //recordedSoundArray = audioDataStream.toByteArray();
-	      errorItem.setText("Sound size=" + audioDataStream.toByteArray().length);
-	      saveFile("Test_Rec.wav", audioDataStream.toByteArray());
-	      */	      
-	  }
+		  form.addCommand(stopCommand);
+		  form.addCommand(saveCommand);		  
+	}
 	  
-	  public void playAudio() throws AudioException, IOException
+	  public void playAudio() throws AudioException
 	  {
-		  System.err.println("Attempting to play audio...");
+		  errorItem.setLabel("");
+		  errorItem.setText("");
+		  System.err.println("Attempting to play audio...");		  
+		  messageItem.setText("Starting the Player...");		  
 		  
-		  //ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(audioDataStream.toByteArray()/*recordedSoundArray*/);
-	      
-		  //checkStreamSize(audioDataStream);
+		  recordService.startPlayback();
 		  
-		  //playP = Manager.createPlayer(recordedInputStream,"audio/x-wav");		  
-		  
-		  messageItem.setText("Starting the Player...");
-		  
-		  /*
-          playP.prefetch();
-	      //playP.realize();
-	      playP.start();
-	      */		  
 	      System.err.println("Player has started.");
-	      messageItem.setText("Player has started!");
-	      
-	      recordService.startPlayback();
+	      messageItem.setText("Player has started!");	      
 	      
 	      form.removeCommand(saveCommand);
 	      form.removeCommand(playCommand); //"Hide" playCommand when playing has started
 	      form.removeCommand(recordCommand); //"Hide" recordCommand when playing has started
 	      form.addCommand(stopCommand); //Show recordCommand when playing has started
+	      
+	      //Thread.currentThread().sleep(FOREVER);
 	  }
 	  
 	  //General method to stop recording or playback
-	  public void stop() throws AudioException, IOException
+	  public void stop() throws AudioException
 	  {
 		  //If currently recording
 		  if(recordService.getState() == IAudioCaptureService.CAPTURE_STARTED)
@@ -294,41 +265,37 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  }
 	  }
 	  
-	  public void stopCapturing() throws AudioException, IOException
+	  public void stopCapturing() throws AudioException
 	  {
-		  System.err.println("Attempting to stop recording");
+		  errorItem.setLabel("");
+		  errorItem.setText("");
+		  System.err.println("Attempting to stop recording");		  
 		  
-		  //Thread.currentThread().interrupt();
 		  /*
-		  captureThread.interrupt();		  
+		  captureThread.interrupt();
 		  captureThread.setPriority(Thread.currentThread().getPriority() -1 );
-		  */		  
-		  
-		  //Destroy after service
-		  //recordControl.commit();
+		  */		  		  
 		  
 		  recordService.stopRecord();
 		  
 		  form.removeCommand(stopCommand); //"Hide" stopCommand when recording desires to resume
 		  form.addCommand(recordCommand);
-		  form.addCommand(finishCommand);
-		  form.addCommand(saveCommand);
+		  form.addCommand(finishCommand);		  
 		  
 		  messageItem.setText("Stopping the Recorder...");
-		  	                     
-	      //recordedSoundArray = audioDataStream.toByteArray();
-	      //errorItem.setText("Sound size=" + audioDataStream.toByteArray().length);
+		  audioDataStream = (ByteArrayOutputStream)recordService.getAudio();		  	                     
 	      
-		  //Destroy after service creation
-	      //recordP.stop();
+	      System.err.println("Sound size=" + audioDataStream.toByteArray().length);	      
+		  
 	      messageItem.setText("Stopped Recording!");
 	  }
 	  
 	  //Stops the playback of the Recorder
 	  public void stopPlaying() throws AudioException
 	  {
-		  //Application must wait for Player to finish playing
-		  //playP.stop();
+		  errorItem.setLabel("");
+		  errorItem.setText("");
+		  //Application must wait for Player to finish playing		  
 		  recordService.stopPlayback();
 		  System.err.println("Player has been stopped.");
 		  messageItem.setText("Stopped Playing!");
@@ -363,6 +330,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  
 	  private String saveFile(String filename, byte[] sound) 
 	  {
+		  errorItem.setLabel("");
+		  errorItem.setText("");
 		  try 
 		  {
 			  /*
@@ -370,7 +339,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 			   * stop command. Recorder player must be started but not closed. 
 			   */
 			  
-			  if(recordP.getState() == Player.STARTED && recordService.getState() != IAudioCaptureService.CLOSED)
+			  if(recordService.getState() == IAudioCaptureService.CAPTURE_STARTED && recordService.getState() != IAudioCaptureService.CLOSED)
 			  {
 				  stopCapturing();
 				  //recordControl.reset();
@@ -379,10 +348,6 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  catch(AudioException me)
 		  {
 			  System.err.println("An error occured when attempting to stop audio capture!");
-		  }
-		  catch(IOException ioe)
-		  {
-			  System.err.println("An I/O error occured!");
 		  }
 		  
 		  String rootName = FileUtility.getDefaultRoot();
@@ -400,6 +365,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  } 
 		  else 
 		  {
+			System.err.println("Error saving audio.");
+			errorItem.setText("Error saving audio.");
 			return "";
 		  }		
 	  }
@@ -423,14 +390,17 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  parentShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
 	  }	  
 	  
-	  /*
-	   * Delete after service creation
-	  public void checkStreamSize(ByteArrayOutputStream ba) throws MediaException
+	  //Actions to perform when service is unavailable
+	  private void serviceUnavailable(Exception e)
 	  {
-		  if(ba.toByteArray().length <= 0)
-			  throw new MediaException("Cannot create Player with 0 or less bytes in stream");
-	  }
-	  */
+		  errorItem.setText("The Audio Recorder Service is unavailable.\n QUITTING!");
+			
+		  //The only thing the user can do is retreat
+		  form.removeCommand(recordCommand);
+		  form.removeCommand(playCommand);
+			
+		  System.err.println(e.getMessage());
+	  }	  
 	  
 	  //Record audio in a separate thread to keep the command listener alert for stopping
 	  public void run()
@@ -439,20 +409,17 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	        {   
 			  recordAudio();
 	        } 
-	        catch (AudioException ie) 
+	        catch (AudioException ae) 
 	        {
-	        	errorItem.setLabel("Error");
-	        	errorItem.setText(ie.toString());
-	        }		    
-		    catch (IOException ioe) 
-		    {
-	            errorItem.setLabel("Error");
-	            errorItem.setText(ioe.toString());	        
-	        } 
+	        	errorItem.setLabel("Error recording audio");
+	        	//errorItem.setText(ae.toString());
+	        	System.err.println(ae.toString());
+	        }		     
 		    catch (InterruptedException ie) 
 		    {
-	            errorItem.setLabel("Error");
-	            errorItem.setText(ie.toString());
+	            errorItem.setLabel("Error occurred while recording");
+	            //errorItem.setText(ie.toString());
+	            System.err.println(ie.toString());
 	        }
 	  }
 }
