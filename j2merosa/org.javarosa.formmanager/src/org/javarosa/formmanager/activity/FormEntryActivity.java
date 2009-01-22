@@ -21,15 +21,7 @@ import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultiPointerAnswerData;
-<<<<<<< .mine
 import org.javarosa.core.model.data.PointerAnswerData;
-import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
-import org.javarosa.core.model.utils.ContextPreloadHandler;
-import org.javarosa.core.model.utils.IPreloadHandler;
-import org.javarosa.core.util.externalizable.DeserializationException;
-=======
->>>>>>> .r1811
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.controller.IControllerHost;
 import org.javarosa.formmanager.model.FormEntryModel;
@@ -40,7 +32,7 @@ import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
 import org.javarosa.polish.activity.loadingscreen.LoadingScreenActivity;
-
+ 
 public class FormEntryActivity implements IActivity, IControllerHost, CommandListener, ILoadHost {
 
 	

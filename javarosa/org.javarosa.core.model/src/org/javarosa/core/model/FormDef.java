@@ -497,13 +497,12 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		if (newInstance) {//only preload new forms (we may have to revisit this)
 			preloadModel(model.getRoot());
 		}
-		
+		 
+		initializeConditions();
+
 		if (getLocalizer() != null && getLocalizer().getLocale() == null) {
-			System.out.println("Set to Default!");
 			getLocalizer().setToDefault();
 		}
-		
-		initializeConditions();
 	}
 	
 	private void hackFixSelectQuestionDeserialization () {
