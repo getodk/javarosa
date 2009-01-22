@@ -298,6 +298,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 
 	public void clicked(ClickableContainer container) {
 		int rowID = container.getId();
+		
 		if (rowID == INDEX_NEW) {
 			controller.newEntity();
 		} else {
