@@ -124,7 +124,7 @@ public class JavaRosaServiceProvider {
 	}
 	
 	public void registerService(IService service) {
-		services.put(service, service.getName());
+		services.put(service.getName(), service);
 	}
 	
 	public IService getService(String serviceName) throws UnavailableServiceException {
