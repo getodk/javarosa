@@ -31,7 +31,7 @@ public class Constants {
 	final public static String RETURN_ARG_KEY = "return_arg";
 	final public static String RETURN_ARG_TYPE_KEY = "return_arg_type";
 	final public static String RETURN_ARG_TYPE_DATA_POINTER = "data_pointer";
-	final public static String RETURN_ARG_TYPE_DATA_POINTER_LIST = "data_pointer_list";
+	final public static String RETURN_ARG_TYPE_DATA_POINTER_LIST = "data_pointer_list";	
 	
 	/**
 	 * Activity codes
