@@ -6,9 +6,13 @@ import javax.microedition.media.Player;
 import javax.microedition.media.control.RecordControl;
 
 import org.javarosa.media.audio.AudioException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.IOException;
 
 /**
- * An audio capture service that utilizes J2ME's beautiful Media API
+ * An audio capture service that utilizes J2ME's robust Media API
  * 
  * @author Ndubisi Onuora
  */
@@ -36,7 +40,7 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	}
 	
 	//@Override
-	public ByteArrayOutputStream getAudio() 
+	public OutputStream getAudio() 
 	{		
 		return audioDataStream;
 	}
@@ -51,8 +55,8 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	{
 		try
 		{
-			//recordP = Manager.createPlayer("capture://audio");
-			recordP = Manager.createPlayer("capture://audio?encoding=audio/mpeg");
+			recordP = Manager.createPlayer("capture://audio");
+			//recordP = Manager.createPlayer("capture://audio?encoding=mp3");
 			recordP.realize();
 			recordControl = (RecordControl)recordP.getControl("RecordControl");                
 			audioDataStream = new ByteArrayOutputStream();
@@ -69,7 +73,11 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 		}
 		catch(MediaException me)
 		{
-			throw new AudioException();
+			throw new AudioException(me.getMessage());
+		}
+		catch(IOException ioe)
+		{
+			System.err.println(ioe.getMessage());
 		}
 	}
 
@@ -85,8 +93,13 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 		}
 		catch(MediaException me)
 		{
-			throw new AudioException();
+			throw new AudioException(me.getMessage());
 		}
+		catch(IOException ioe)
+		{
+			System.err.println(ioe.getMessage());
+		}
+		
 	}
 	
 	//@Override
@@ -94,10 +107,14 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	{
 		try
 		{
+			if( audioDataStream == null || (audioDataStream != null) && (audioDataStream.toByteArray().length <= 0) )
+			{
+				throw new AudioException("No audio data recorded!");
+			}
 			ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(audioDataStream.toByteArray());	      
 			//checkStreamSize(audioDataStream);
-			//playP = Manager.createPlayer(recordedInputStream,"audio/x-wav");
-			playP = Manager.createPlayer(recordedInputStream,"audio/mpeg");
+			playP = Manager.createPlayer(recordedInputStream,"audio/x-wav");
+			//playP = Manager.createPlayer(recordedInputStream,"audio/mpeg");
 		
 			playP.prefetch();
 			playP.start();		
@@ -106,8 +123,13 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 		}
 		catch(MediaException me)
 		{
-			throw new AudioException();
+			throw new AudioException(me.getMessage());
 		}
+		catch(IOException ioe)
+		{
+			System.err.println(ioe.getMessage());
+		}
+		
 	}
 	
 	//@Override
@@ -120,15 +142,17 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 		}
 		catch(MediaException me)
 		{
-			throw new AudioException();
+			throw new AudioException(me.getMessage());
 		}
 	}
 	
 	//Closes all types of streams that are used
 	public void closeStreams()
-	{		
-		recordP.close();
-		playP.close();
+	{
+		if(recordP != null)
+			recordP.close();
+		if(playP != null)
+			playP.close();
 		serviceState = IAudioCaptureService.CLOSED;
 	}
 
