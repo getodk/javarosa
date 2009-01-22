@@ -174,25 +174,28 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		 */
 		private void reliableHttpPost(String url, int MD5, String contentType, IDataPayload pl)
 		    throws IOException, OtherIOException {
-		    boolean sendFailed;
             InputStream in = pl.getPayloadStream();
 
 		    //Eventually we will use timeouts instead of maximum number of retries
 		    int numTries = 0;
+            boolean sendFailed, isNotReliableServer = false;
             while (numTries<MAX_NUM_RETRIES){
                 numTries++;
                 sendFailed = false;
-                //Posting to a non-existent machine should generate an exception in the following code
 
-                int lastByte = reliableRequestLastByte(url, MD5);
-                if (lastByte != -1 ){
-                    //server supports reliable http and has returned a valid lastByte
-                    in.skip(lastByte);
+                if(!isNotReliableServer){
+                    int lastByte = reliableRequestLastByte(url, MD5);
+                    if (lastByte == -1 ){
+                        isNotReliableServer = true;
+                    } else {
+                        in.skip(lastByte);
+                    }
                 }
                 
                 //#if debug.output==verbose || debug.output==exception
                 try{
                 //#endif
+                    //Posting to a non-existent machine should generate an exception in the following code
                     con = (HttpConnection) Connector.open(url);
                     con.setRequestMethod(HttpConnection.POST);
                     setDefaultRequestProperties(con);
