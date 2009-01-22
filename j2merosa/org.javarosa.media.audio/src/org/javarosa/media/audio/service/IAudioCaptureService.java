@@ -7,6 +7,7 @@
 package org.javarosa.media.audio.service;
 
 import org.javarosa.core.services.IService;
+import org.javarosa.media.audio.AudioException;
 import java.io.OutputStream;
 
 public interface IAudioCaptureService extends IService 
@@ -25,16 +26,16 @@ public interface IAudioCaptureService extends IService
 	public int getState();
 	
 	//Start recording audio
-	public void startRecord();	
+	public void startRecord() throws AudioException;	
 	
 	//Stop recording audio
-	public void stopRecord();	
+	public void stopRecord() throws AudioException;	
 	
 	//Start playing the recorded audio
-	public void startPlayback();
+	public void startPlayback() throws AudioException;
 	
 	//Stop playback of the recorded audio
-	public void stopPlayback();
+	public void stopPlayback() throws AudioException;
 	
 	//Return the captured audio
 	public OutputStream getAudio();
