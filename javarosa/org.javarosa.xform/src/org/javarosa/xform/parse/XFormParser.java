@@ -791,7 +791,7 @@ public class XFormParser {
 			}
 			binding.constraintMessage = e.getAttributeValue(NAMESPACE_JAVAROSA, "constraintMsg");
 		}
-		
+
 		binding.setPreload(e.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
 		binding.setPreloadParams(e.getAttributeValue(NAMESPACE_JAVAROSA, "preloadParams"));
 
@@ -890,8 +890,22 @@ public class XFormParser {
 			multiplicity = (parent == null ? 0 : parent.getChildMultiplicity(name));
 		}
 			
+		
+		String modelType = node.getAttributeValue(NAMESPACE_JAVAROSA, "modeltype");
 		//create node; handle children
-		element = new TreeElement(name, multiplicity);
+		if(modelType == null) {
+			element = new TreeElement(name, multiplicity);
+		} else {
+			element = (TreeElement)modelPrototypes.getNewInstance(((Integer)typeMappings.get(modelType)).toString());
+			
+			if(element == null) {
+				element = new TreeElement(name, multiplicity);
+				System.out.println("No model type prototype available for " + modelType);
+			} else {
+				element.setName(name);
+				element.setMult(multiplicity);
+			}
+		}
 
 		if (hasElements) {
 			for (int i = 0; i < numChildren; i++) {
@@ -907,6 +921,8 @@ public class XFormParser {
 				String attrNamespace = node.getAttributeNamespace(i);
 				String attrName = node.getAttributeName(i);
 				if (attrNamespace.equals(NAMESPACE_JAVAROSA) && attrName.equals("template"))
+					continue;
+				if (attrNamespace.equals(NAMESPACE_JAVAROSA) && attrName.equals("recordset"))
 					continue;
 				
 				element.setAttribute(attrNamespace, attrName, node.getAttributeValue(i));
@@ -1255,7 +1271,7 @@ public class XFormParser {
 			DataBinding bind = (DataBinding)bindings.elementAt(i);
 			TreeReference ref = DataModelTree.unpackReference(bind.getReference());
 			Vector nodes = instance.expandReference(ref, true);
-
+			
 			if (nodes.size() > 0) {
 				attachBindGeneral(bind);
 			}
