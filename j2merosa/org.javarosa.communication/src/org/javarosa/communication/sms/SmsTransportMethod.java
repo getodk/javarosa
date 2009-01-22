@@ -51,7 +51,7 @@ public class SmsTransportMethod implements TransportMethod {
 
 	public ITransportDestination getDefaultDestination() {
 		//FIXME: Figure out the SMS application of this...
-		return new SmsTransportDestination("sms://+919955999910");
+		return new SmsTransportDestination("sms://+5566511");
 	}
 
 
