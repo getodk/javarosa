@@ -238,14 +238,14 @@ public class QuestionDef implements IFormElement, Localizable {
 			String key = (String)selectItemIDs.keyAt(i);
 			boolean translate = ((Boolean)selectItemsLocalizable.elementAt(i)).booleanValue();
 			if (translate) {
-				label = (localizer == null ? "[itext]" : localizer.getLocalizedText(key));
+				label = (localizer == null ? "[itext:" + i + "]" : localizer.getLocalizedText(key));
 			} else {
 				label = key;
 			}
 			addSelectItem(label, (String)selectItemIDs.get(key));
 		}
 	}
-
+  
 	public int getSelectedItemIndex(String value) {
 		if (selectItems != null) {
 			for (int i = 0; i < selectItems.size(); i++) {

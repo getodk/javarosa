@@ -49,15 +49,6 @@ public class Selection implements Externalizable {
 	
 	public String getValue () {
 		return (String)question.getSelectItems().elementAt(index);
-
-		//NOTE:  Not sure whether this is actually correct, we definitely
-		//should be returning what is in ItemIDs....
-		//droos: it doesn't matter; the 'element' portions of both these hashtables should be identical
-		// Clayton Sims - Sep 8, 2008 : At one point I was getting null pointers with that assumption.
-		// It was when I was using something that had an [itext] value. 
-		// Clayton Sims - Jan 15, 2009 : Getting that problem again. Don't remember what the resolution 
-		// was. I think it had to do with making sure the form got deserialized?
-		//return (String)question.getSelectItemsIDs().elementAt(index);
 	}
 
 	/* (non-Javadoc)
@@ -69,7 +60,7 @@ public class Selection implements Externalizable {
 		//setting QuestionDef in this way isn't correct; see note below
 		question = (QuestionDef)ExtUtil.read(in, QuestionDef.class, pf);
 	}
-
+ 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */

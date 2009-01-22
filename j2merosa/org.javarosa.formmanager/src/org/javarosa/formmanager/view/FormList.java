@@ -70,7 +70,6 @@ public class FormList extends List implements CommandListener, IView {
 		}
 		this.addCommand(CMD_EXIT);
         //this.addCommand(CMD_OPEN);
-<<<<<<< .mine
         this.addCommand(CMD_DELETE_FORM);
         this.addCommand(CMD_VIEWMODELS);
         this.addCommand(CMD_GETNEWFORMS);
@@ -82,20 +81,6 @@ public class FormList extends List implements CommandListener, IView {
         //#if polish.usePolishGui
         this.addCommand(CMD_SETTINGS);
         //#endif
-=======
-		if(!demo) {
-	        this.addCommand(CMD_DELETE_FORM);
-	        this.addCommand(CMD_VIEWMODELS);
-	        this.addCommand(CMD_GETNEWFORMS);
-	        this.addCommand(CMD_CAMERA);
-	        this.addCommand(CMD_IMAGE_BROWSE);
-	//        this.addCommand(CMD_SHAREFORMS);
-	
-	        //#if polish.usePolishGui
-	        this.addCommand(CMD_SETTINGS);
-	        //#endif
-		}
->>>>>>> .r1813
 	}
 
 	/**
@@ -116,7 +101,7 @@ public class FormList extends List implements CommandListener, IView {
 
 	public void commandAction(Command c, Displayable arg1) {
 		Hashtable v = new Hashtable();
-
+ 
 		// TODO Auto-generated method stub
 		if (c == List.SELECT_COMMAND) {
 			//LOG
