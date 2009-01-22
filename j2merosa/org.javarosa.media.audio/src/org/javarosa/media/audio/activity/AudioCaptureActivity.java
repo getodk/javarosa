@@ -84,17 +84,17 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		
 		try
 		{
-			recordService = new J2MEAudioCaptureService();
-			//recordService = (J2MEAudioCaptureService)JavaRosaServiceProvider.instance().getService("J2MEAudioCaptureService");
+			//recordService = new J2MEAudioCaptureService();
+			recordService = (J2MEAudioCaptureService)JavaRosaServiceProvider.instance().getService("J2MEAudioCaptureService");
 		}
 		catch(ClassCastException ce)
 		{
 			serviceUnavailable(ce);
 		}
-		/*catch(UnavailableServiceException ue)
+		catch(UnavailableServiceException ue)
 		{
 			serviceUnavailable(ue);
-		}*/
+		}
 		captureThread = new Thread(this, "CaptureThread");
 	}
 
