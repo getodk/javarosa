@@ -51,7 +51,7 @@ public class SmsTransportMethod implements TransportMethod {
 
 	public ITransportDestination getDefaultDestination() {
 		//FIXME: Figure out the SMS application of this...
-		return new SmsTransportDestination("sms://+40404");
+		return new SmsTransportDestination("sms://+919955999910");
 	}
 
 
@@ -108,6 +108,10 @@ public class SmsTransportMethod implements TransportMethod {
 				}
 				//FIXME: Risk of memory leak with tmsg here??
 				
+				message.setStatus(TransportMessage.STATUS_DELIVERED);
+				System.out.println("Status: " + message.getStatus());
+				message.setChanged();
+				message.notifyObservers(message.getReplyloadData());
 
 			} catch (IOException e) {
 				System.err.println("Error sending SMS message");
