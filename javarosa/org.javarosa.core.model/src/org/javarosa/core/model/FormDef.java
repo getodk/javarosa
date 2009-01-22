@@ -509,7 +509,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private void hackFixSelectQuestionDeserialization () {
 		Hashtable questionMapping = new Hashtable();
 		hackGenQuestionMapping(this, questionMapping);
-		System.out.println(questionMapping);
 		hackFixSelectQuestionDeserialization(model.getRoot(), questionMapping);
 	}
 
@@ -541,7 +540,10 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 
 	private void hackGenQuestionMapping (IFormElement fe, Hashtable mapping) {
 		if (fe instanceof QuestionDef) {
-			mapping.put(new Integer(((QuestionDef)fe).getID()), fe);
+			QuestionDef q = (QuestionDef)fe;
+			if (q.getControlType() == Constants.CONTROL_SELECT_ONE || q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
+				mapping.put(new Integer(q.getID()), q);
+			}
 		} else {
 			for (int i = 0; i < fe.getChildren().size(); i++) {
 				hackGenQuestionMapping(fe.getChild(i), mapping);
