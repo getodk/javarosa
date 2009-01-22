@@ -33,6 +33,7 @@ import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle;
 
 import de.enough.polish.ui.Alert;
+import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
@@ -82,6 +83,16 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		//#style ReviewFramedForm
     		UiAccess.setStyle(this);
     	}
+    	
+    	//22 Jan, 2009 - csims@dimagi.com
+    	//This constructor code supresses the ability to scroll the chatterbox by dragging the mouse
+    	//pointer. This "Feature" was causing tons of problems for our nurses. Let me know if anyone else
+    	//wants to make this a customizable inclusion.
+    	this.container = new Container(false) {
+    		protected boolean handlePointerScrollReleased(int relX, int relY) {
+    			return false;
+    		}
+    	};
     	
     	this.model = model;
     	this.controller = controller;
