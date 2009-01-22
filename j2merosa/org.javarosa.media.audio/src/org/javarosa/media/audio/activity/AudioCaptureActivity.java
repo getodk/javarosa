@@ -30,6 +30,7 @@ import org.javarosa.media.audio.service.IAudioCaptureService;
 import org.javarosa.media.audio.service.J2MEAudioCaptureService;
 import org.javarosa.media.audio.AudioException;
 
+import javax.microedition.io.ConnectionNotFoundException;
 
 /*Specify imports later on*/
 import java.io.*;
@@ -59,12 +60,22 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
     boolean captureThreadStarted = false;
     
     private static int counter = 0; //Used for saving files
+    
+    MIDlet recMid;
     	
 	public AudioCaptureActivity(IShell shell)
 	{
 		parentShell = shell;
 		display = JavaRosaServiceProvider.instance().getDisplay();	
+		JavaRosaServiceProvider.instance().registerService(new J2MEAudioCaptureService());		
+	}
+	
+	public AudioCaptureActivity(IShell shell, MIDlet m)
+	{
+		parentShell = shell;
+		display = JavaRosaServiceProvider.instance().getDisplay();	
 		JavaRosaServiceProvider.instance().registerService(new J2MEAudioCaptureService());
+		recMid = m;
 	}
 	
 	//Finish off construction of Activity
@@ -83,8 +94,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		form.setCommandListener(this);
 		
 		try
-		{
-			//recordService = new J2MEAudioCaptureService();
+		{			
 			recordService = (J2MEAudioCaptureService)JavaRosaServiceProvider.instance().getService("J2MEAudioCaptureService");
 		}
 		catch(ClassCastException ce)
@@ -150,8 +160,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	{
 		recordCommand = new Command("Record", Command.SCREEN, 0);
     	form.addCommand(recordCommand);
-    	playCommand = new Command("Play", Command.SCREEN, 1);
-    	form.addCommand(playCommand);
+    	playCommand = new Command("Play", Command.SCREEN, 1);    	
     	stopCommand = new Command("Stop", Command.SCREEN, 0); //Do not add immediately    	
     	backCommand = new Command("Back", Command.BACK, 0);    	
     	form.addCommand(backCommand);
@@ -180,12 +189,12 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	        {
 	        	playAudio();
 	        }  
-	        catch (AudioException ae) 
+	        catch(AudioException ae) 
 	        {
 	            errorItem.setLabel("Error playing audio");
 	            //errorItem.setText(me.toString());
 	            System.err.println(ae.toString());
-	        }	        
+	        }
 	    }
 	    //Stop recording or playing audio
 	    else if(comm == stopCommand)
@@ -240,6 +249,18 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  
 		  recordService.startPlayback();
 		  
+		  try
+		  {
+			  recMid.platformRequest(fullName);
+		  }
+		  catch(ConnectionNotFoundException cnfe)
+		  {
+			  cnfe.printStackTrace(); 
+			  /*If the platform request fails, which it shouldn't attempt to start playback
+			   * through the service.*/			  
+		  	  recordService.startPlayback();
+		  }
+		  
 	      System.err.println("Player has started.");
 	      messageItem.setText("Player has started!");	      
 	      
@@ -280,7 +301,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  
 		  form.removeCommand(stopCommand); //"Hide" stopCommand when recording desires to resume
 		  form.addCommand(recordCommand);
-		  form.addCommand(finishCommand);		  
+		  form.addCommand(playCommand);
+		  form.addCommand(finishCommand);
 		  
 		  messageItem.setText("Stopping the Recorder...");
 		  audioDataStream = (ByteArrayOutputStream)recordService.getAudio();		  	                     
@@ -354,6 +376,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  String restorepath = "file:///" + rootName + "JRSounds";				
 		  FileUtility.createDirectory(restorepath);
 		  String fullName = restorepath + "/" + filename;
+		  this.fullName = fullName;
 		  if(FileUtility.createFile(fullName, sound)) 
 		  {
 			System.out.println("Sound saved to:" + fullName);
@@ -384,7 +407,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  System.err.println("Finalizing audio capture");
 		  Hashtable returnArgs = new Hashtable();
 		  
-		  returnArgs.put(Constants.RETURN_ARG_KEY, recordFile);
+		  if(recordFile != null)
+			  returnArgs.put(Constants.RETURN_ARG_KEY, recordFile);
 		  returnArgs.put(Constants.RETURN_ARG_TYPE_KEY, Constants.RETURN_ARG_TYPE_DATA_POINTER);
 		  
 		  parentShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
