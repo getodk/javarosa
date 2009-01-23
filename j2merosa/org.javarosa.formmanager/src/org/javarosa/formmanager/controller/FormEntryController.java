@@ -71,6 +71,7 @@ public class FormEntryController {
 
 		if (index.isBeginningOfFormIndex()) {
 			//already at the earliest relevant question
+			model.notifyStartOfForm();
 			return;
 		} else if (index.isEndOfFormIndex()) {
 			model.setFormComplete();

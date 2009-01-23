@@ -109,22 +109,43 @@ public class FormEntryModel {
     	}
     }
     
+    public void notifyStartOfForm () {
+		for (Enumeration e = observers.elements(); e.hasMoreElements(); ) {
+			((FormEntryModelListener)e.nextElement()).startOfForm();   			
+		}	     	
+    }
+    
     public int getNumQuestions () {
     	return form.getDeepChildCount();
     }
     
-    public boolean isRelevant (FormIndex questionIndex) {
-    	TreeReference ref = form.getChildInstanceRef(questionIndex);
-    	boolean isAskNewRepeat = false;
-    	
+    protected boolean isAskNewRepeat (FormIndex questionIndex) {
     	Vector defs = form.explodeIndex(questionIndex);
     	IFormElement last = (defs.size() == 0 ? null : (IFormElement)defs.lastElement());
     	if (last instanceof GroupDef &&
     		((GroupDef)last).getRepeat() &&
     		form.getDataModel().resolveReference(form.getChildInstanceRef(questionIndex)) == null) {
-    			isAskNewRepeat = true;
+    			return true;
     	}
-    	
+    	return false;
+    }
+    
+    public boolean isReadonly (FormIndex questionIndex) {
+    	TreeReference ref = form.getChildInstanceRef(questionIndex);
+    	boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
+    	    	
+    	if (isAskNewRepeat) {
+    		 return false;
+    	} else {
+        	TreeElement node = form.getDataModel().resolveReference(ref);
+        	return !node.isEnabled();
+    	}
+    }
+    
+    public boolean isRelevant (FormIndex questionIndex) {
+    	TreeReference ref = form.getChildInstanceRef(questionIndex);
+    	boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
+    	    	
     	boolean relevant;
     	if (isAskNewRepeat) {
     		relevant = form.canCreateRepeat(ref);
@@ -132,8 +153,10 @@ public class FormEntryModel {
         	TreeElement node = form.getDataModel().resolveReference(ref);
         	relevant = node.isRelevant();  //check instance flag first
     	}
-        	
+
     	if (relevant) { //if instance flag/condition says relevant, we still have to check the <group>/<repeat> hierarchy
+        	Vector defs = form.explodeIndex(questionIndex);
+    		
     		FormIndex ancestorIndex = null;
     		FormIndex cur = null;
     		FormIndex qcur = questionIndex;

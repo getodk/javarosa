@@ -198,7 +198,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	
     	if (questionIndex.isInForm() && !model.isRelevant(questionIndex))
 			throw new IllegalStateException();
-
+    	
 		// Determine what should and shouldn't be pinned.
 		for (int i = 0; i < this.size(); ++i) {
 			FormIndex index = this.questionIndexes.get(i);
@@ -229,6 +229,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			controller.stepQuestion(forwards);
     			return;
     		}
+    	} else if (model.isReadonly(questionIndex)) {
+			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
+			controller.stepQuestion(forwards);
+			return;    		
     	}
     	    	
     	if (questionIndex.compareTo(activeQuestionIndex) > 0) {
@@ -342,20 +346,24 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     
     public void formComplete () {
     	if(!model.isReadOnly()) {
-    	jumpToQuestion(FormIndex.createEndOfFormIndex());
-    	babysitStyles();
-		progressBar.setValue(progressBar.getMaxValue());
-		
-		repaint();
-		try {
-			Thread.sleep(1000); //let them bask in their completeness
-		} catch (InterruptedException ie) { }
+	    	jumpToQuestion(FormIndex.createEndOfFormIndex());
+	    	babysitStyles();
+			progressBar.setValue(progressBar.getMaxValue());
 			
-		controller.save();
-		controller.exit();
+			repaint();
+			try {
+				Thread.sleep(1000); //let them bask in their completeness
+			} catch (InterruptedException ie) { }
+				
+			controller.save();
+			controller.exit();
     	} else { 
     		
     	}
+    }
+    
+    public void startOfForm () {
+    	controller.selectQuestion(activeQuestionIndex);
     }
     
     private ChatterboxWidget activeFrame () {
@@ -545,12 +553,11 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		// Test for whether this is a header, and should be pinned to the top of the screen because it is above
     		// the visible area
     		if(cw.isPinned()) {
-    		if(cw.getAbsoluteY() + cw.getContentHeight() < threshold ) {
-    			//#style questiontext
-    	    	StringItem item2 = new StringItem("","");
-    	    	headers.addElement(cw.clone());
-    		} else {
-    		}
+	    		if(cw.getAbsoluteY() + cw.getContentHeight() < threshold ) {
+	    			//#style questiontext
+	    	    	StringItem item2 = new StringItem("","");
+	    	    	headers.addElement(cw.clone());
+	    		}
     		}
     	}
 

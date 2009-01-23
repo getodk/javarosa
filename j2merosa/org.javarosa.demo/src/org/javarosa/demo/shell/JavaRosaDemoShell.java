@@ -366,7 +366,7 @@ public class JavaRosaDemoShell implements IShell {
 	private void launchPatientSelectActivity (Context context) {
 		PatientSelectActivity psa = new PatientSelectActivity(this, "Choose a Patient");
 		PatientRMSUtility prms = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
-		context.setElement(PatientSelectActivity.ENTITY_PROTO_KEY, new CommCarePatientEntity());
+		context.setElement(PatientSelectActivity.ENTITY_PROTO_KEY, new /*CommCare*/PatientEntity());
 		context.setElement(PatientSelectActivity.ENTITY_RMS_KEY, prms);
 		context.setElement(PatientSelectActivity.NEW_ENTITY_ID_KEY_KEY, PatientEntryActivity.NEW_PATIENT_ID);
 		
