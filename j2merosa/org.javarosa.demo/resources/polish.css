@@ -393,8 +393,16 @@ alertcontent {
 .patselRow {
     font-size: small;
 	//#if javarosa.patientselect.formfactor == nokia-s40
-	columns: 2;
-	columns-width: 67,58;
+	
+	/*
+		columns: 2;
+		columns-width: 67,58;
+	*/
+
+	/* commcare */
+	columns: 3;
+	columns-width: 42,51,29;
+
 	//#else
 	columns: 3;
 	columns-width: 110,95,25;

@@ -49,6 +49,7 @@ import org.javarosa.patient.PatientModule;
 import org.javarosa.patient.entry.activity.PatientEntryActivity;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.select.activity.PatientEntity;
+import org.javarosa.patient.select.activity.CommCarePatientEntity;
 import org.javarosa.patient.select.activity.PatientSelectActivity;
 import org.javarosa.patient.storage.PatientRMSUtility;
 import org.javarosa.referral.ReferralModule;
@@ -365,7 +366,7 @@ public class JavaRosaDemoShell implements IShell {
 	private void launchPatientSelectActivity (Context context) {
 		PatientSelectActivity psa = new PatientSelectActivity(this, "Choose a Patient");
 		PatientRMSUtility prms = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
-		context.setElement(PatientSelectActivity.ENTITY_PROTO_KEY, new PatientEntity());
+		context.setElement(PatientSelectActivity.ENTITY_PROTO_KEY, new CommCarePatientEntity());
 		context.setElement(PatientSelectActivity.ENTITY_RMS_KEY, prms);
 		context.setElement(PatientSelectActivity.NEW_ENTITY_ID_KEY_KEY, PatientEntryActivity.NEW_PATIENT_ID);
 		

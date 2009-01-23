@@ -65,18 +65,18 @@ public class PatientEntity implements IEntity {
 	public String getName() {
 		String name = "";
 		
-		if (familyName != null) {
+		if (familyName.length() > 0) {
 			name += familyName;
 		}
 		
-		if (givenName != null) {
+		if (givenName.length() > 0) {
 			if (name.length() > 0) {
 				name += ", ";
 			}
 			name += givenName;
 		}
 		
-		if (middleName != null) {
+		if (middleName.length() > 0) {
 			if (name.length() > 0) {
 				name += " ";
 			}
@@ -90,7 +90,7 @@ public class PatientEntity implements IEntity {
 		return recordID;
 	}
 	
-	private static String normalizeID (String ID) {
+	protected static String normalizeID (String ID) {
 		StringBuffer sb = new StringBuffer();
 		char[] carr = ID.toCharArray();
 		
@@ -106,7 +106,7 @@ public class PatientEntity implements IEntity {
 		return sb.toString();
 	}
 	
-	private static Vector normalizeName (String name) {
+	protected static Vector normalizeName (String name) {
 		StringBuffer sb = new StringBuffer();
 		char[] carr = name.toCharArray();
 		
@@ -126,7 +126,7 @@ public class PatientEntity implements IEntity {
 		return DateUtils.split(sb.toString(), " ", true);
 	}
 	
-	private static boolean findKey (String str, String key, boolean anywhere) {
+	protected static boolean findKey (String str, String key, boolean anywhere) {
 		if (str.length() == 0 || key.length() == 0) {
 			return false;
 		} else {
@@ -144,12 +144,12 @@ public class PatientEntity implements IEntity {
 		return findKey(normalizedID, normalizedKey, false);
 	}
 
-	private void concatVector (Vector base, Vector append) {
+	protected void concatVector (Vector base, Vector append) {
 		for (int i = 0; i < append.size(); i++)
 			base.addElement(append.elementAt(i));
 	}
 	
-	private String[] normalizeNames () {
+	protected String[] normalizeNames () {
 		Vector nameFrags = new Vector();
 		concatVector(nameFrags, normalizeName(familyName));
 		concatVector(nameFrags, normalizeName(givenName));
