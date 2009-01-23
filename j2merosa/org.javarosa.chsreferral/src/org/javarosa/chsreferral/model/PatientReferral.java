@@ -36,6 +36,13 @@ public class PatientReferral implements Externalizable, IDRecordable {
 	}
 
 	/**
+	 * @return the patientId
+	 */
+	public int getPatientId() {
+		return patientId;
+	}
+
+	/**
 	 * @return the type
 	 */
 	public String getType() {
