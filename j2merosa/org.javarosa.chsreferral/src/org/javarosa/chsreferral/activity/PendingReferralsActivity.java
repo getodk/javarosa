@@ -1,0 +1,164 @@
+/**
+ * 
+ */
+package org.javarosa.chsreferral.activity;
+
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Displayable;
+
+import org.javarosa.chsreferral.model.PatientReferral;
+import org.javarosa.chsreferral.storage.PatientReferralRMSUtility;
+import org.javarosa.chsreferral.view.PendingReferralsView;
+import org.javarosa.chsreferral.view.ReferralsDetailView;
+import org.javarosa.core.Context;
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.Constants;
+import org.javarosa.core.api.IActivity;
+import org.javarosa.core.api.ICommand;
+import org.javarosa.core.api.IShell;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.patient.model.Patient;
+import org.javarosa.patient.storage.PatientRMSUtility;
+
+/**
+ * @author Clayton Sims
+ * @date Jan 23, 2009 
+ *
+ */
+public class PendingReferralsActivity implements IActivity, CommandListener {
+	
+	IShell shell;
+	
+	Context context;
+	
+	Vector pendingRefs;
+	
+	PendingReferralsView pending;
+	ReferralsDetailView details;
+	
+	private static final Command EXIT = new Command("Exit", Command.EXIT, 1);
+	private static final Command SELECT = new Command("Select", Command.ITEM, 1);
+	
+	public static final Command RESOLVE = new Command("Resolve", Command.ITEM, 1);
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
+	 */
+	public void annotateCommand(ICommand command) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#contextChanged(org.javarosa.core.Context)
+	 */
+	public void contextChanged(Context globalContext) {
+		this.context.mergeInContext(globalContext);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#destroy()
+	 */
+	public void destroy() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#getActivityContext()
+	 */
+	public Context getActivityContext() {
+		return context;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#halt()
+	 */
+	public void halt() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#resume(org.javarosa.core.Context)
+	 */
+	public void resume(Context globalContext) {
+		shell.setDisplay(this, pending);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.shell = shell;
+	}
+
+	public void commandAction(Command com, Displayable view) {
+		Hashtable returnArgs = new Hashtable();
+		if(view.equals(pending)) {
+			if(com.equals(EXIT)) {
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+			} else if(com.equals(SELECT)) {
+				PatientReferral ref = ((PatientReferral)pendingRefs.elementAt(pending.getSelectedIndex()));
+				//TODO: Get patient here.
+				details = new ReferralsDetailView("Referral for ");
+				details.setReferral(ref);
+				shell.setDisplay(this, details);
+			}
+		} else if(view.equals(details)) {
+			if(com.equals(EXIT)) {
+				shell.setDisplay(this, pending);
+			} else if(com.equals(RESOLVE)) {
+				returnArgs.put(RESOLVE, details.getReferral().getReferralId());
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IActivity#start(org.javarosa.core.Context)
+	 */
+	public void start(Context context) {
+		PatientReferralRMSUtility ref = (PatientReferralRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientReferralRMSUtility.getUtilityName());
+		PatientRMSUtility pat = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
+		
+		//TODO: Replace - Maybe with Entity Select Stuff? Seems super-appropriate.
+		pending = new PendingReferralsView("Pending Referrals");
+		try {
+			Vector pendingReferrals = ref.getPendingReferrals();
+			
+			int elementNum = 0;
+			
+			Enumeration en = pendingReferrals.elements();
+			while(en.hasMoreElements()) {
+				PatientReferral referral = (PatientReferral)en.nextElement();
+				Patient patient = new Patient();
+				pat.retrieveFromRMS(referral.getPatientId(), patient);
+				
+				pending.set(elementNum, patient.getInitials() + " - " + referral.getType() + " - " + referral.getDateReferred(), null);
+				this.pendingRefs.addElement(referral);
+			}
+			pending.setCommandListener(this);
+			pending.addCommand(EXIT);
+			pending.addCommand(SELECT);
+			pending.setSelectCommand(SELECT);
+			
+			shell.setDisplay(this, pending);
+			
+		} catch (DeserializationException e) {
+			e.printStackTrace();
+			//Jan 23, 2009 - csims@dimagi.com
+			//This should be treated as an assertion, and not caught or handled. If this error
+			//is to be handled, it should be done so here, and by rewriting this.
+			throw new RuntimeException("Problem deserializing referrals or patients while trying to list pending referrals. Fix this");
+		} catch (IOException e) {
+			//Jan 23, 2009 - csims@dimagi.com
+			//This should be treated as an assertion, and not caught or handled. If this error
+			//is to be handled, it should be done so here, and by rewriting this.
+			e.printStackTrace();
+			throw new RuntimeException("Problem deserializing referrals or patients while trying to list pending referrals. Fix this");
+		}
+	}
+}
