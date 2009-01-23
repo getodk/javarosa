@@ -112,10 +112,8 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 				throw new AudioException("No audio data recorded!");
 			}
 			ByteArrayInputStream recordedInputStream = new ByteArrayInputStream(audioDataStream.toByteArray());	      
-			//checkStreamSize(audioDataStream);
 			playP = Manager.createPlayer(recordedInputStream,"audio/x-wav");
-			//playP = Manager.createPlayer(recordedInputStream,"audio/mpeg");
-		
+			
 			playP.prefetch();
 			playP.start();		
 	    
@@ -155,5 +153,4 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 			playP.close();
 		serviceState = IAudioCaptureService.CLOSED;
 	}
-
 }
