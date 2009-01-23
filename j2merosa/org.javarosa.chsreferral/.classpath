@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
+	<classpathentry kind="lib" path="/org.javarosa.demo/lib/kxml2-2.3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
