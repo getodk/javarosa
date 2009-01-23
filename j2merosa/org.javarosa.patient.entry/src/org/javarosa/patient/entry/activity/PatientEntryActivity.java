@@ -173,7 +173,7 @@ public class PatientEntryActivity implements IActivity {
 	public void start(Context context) {
 		this.context = context;
 		String mode = (String)context.getElement("ENTRY_MODE");
-		if(mode.equals("BATCH")) {
+		if("BATCH".equals(mode)) {
 			patientEntryForm = XFormUtils.getFormFromResource("/batch-patient-entry.xhtml");
 				
 		} else {

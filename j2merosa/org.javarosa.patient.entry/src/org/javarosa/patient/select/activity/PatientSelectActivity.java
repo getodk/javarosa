@@ -85,14 +85,15 @@ public class PatientSelectActivity implements IActivity {
 	}
 
 	public void resume(Context context) {
-		if (context.getElement(newEntityIDKey) != null) {
+		int newEntityID = (context.getElement(newEntityIDKey) != null ? ((Integer)context.getElement(newEntityIDKey)).intValue() : -1);
+		
+		if (newEntityID != -1) {
 			//returning from 'create new entity' activity
-			int entityID = ((Integer)context.getElement(newEntityIDKey)).intValue();
 			if (immediatelySelectNewlyCreated) {
-				entityChosen(entityID);
+				entityChosen(newEntityID);
 			} else {
-				loadEntity(entityID);
-				selView.refresh(entityID);
+				loadEntity(newEntityID);
+				selView.refresh(newEntityID);
 				showList();
 			}
 		} else {
