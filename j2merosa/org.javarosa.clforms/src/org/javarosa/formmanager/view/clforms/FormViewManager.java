@@ -316,4 +316,9 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 	public Object getScreenObject() {
 		return parent.getScreenObject();
 	}
+
+	public void startOfForm() {
+		// TODO Auto-generated method stub
+		
+	}
 }

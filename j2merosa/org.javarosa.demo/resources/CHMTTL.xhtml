@@ -10,9 +10,9 @@
 		<TimeStartRecorded />
 		<TimeEndRecorded />
 	  </Meta>
-        <Date qid="817" gid="131"/>
-      <Prov qid="818" gid="131"/>
-      <Where qid="819" gid="131"/>
+        <Date qid="817" gid="131">2008-07-20</Date>
+      <Prov qid="818" gid="131">2</Prov>
+      <Where qid="819" gid="131">8</Where>
       <Whereother qid="820" gid="131"/>
       <LocWCHC qid="835" gid="131"/>
       <LocWCHCother qid="833" gid="131"/>
@@ -76,9 +76,9 @@
 	<xf:bind id="hidden2" nodeset="/root/Meta/DeviceID" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
 	<xf:bind id="hidden3" nodeset="/root/Meta/TimeStartRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
 	<xf:bind id="hidden4" nodeset="/root/Meta/TimeEndRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
-	<xf:bind id="5" nodeset="/root/Date" required="true()" type="xsd:date"/>
-    <xf:bind id="6" nodeset="/root/Prov" type="xsd:string"/>
-    <xf:bind id="7" nodeset="/root/Where" type="xsd:string"/>
+	<xf:bind id="5" nodeset="/root/Date" required="true()" readonly="true()" type="xsd:date" />
+    <xf:bind id="6" nodeset="/root/Prov" type="xsd:string" readonly="true()"/>
+    <xf:bind id="7" nodeset="/root/Where" type="xsd:string" readonly="true()"/>
     <xf:bind id="8" nodeset="/root/Whereother" type="xsd:string" relevant="/root/Where='99'" />
     <xf:bind id="9" nodeset="/root/LocWCHC" type="xsd:string" relevant="/root/Prov='9' and /root/Where='1'"/>
     <xf:bind id="10" nodeset="/root/LocWCHCother" type="xsd:string" relevant="/root/LocWCHC='999'"/>
@@ -104,7 +104,7 @@
     <xf:bind id="30" nodeset="/root/LocNCSCother" type="xsd:string" relevant="/root/Prov='8'"/>
     <xf:bind id="31" nodeset="/root/LocNWSCother" type="xsd:string" relevant="/root/Prov='7'"/>
     <xf:bind id="32" nodeset="/root/Male" type="xsd:int"/>
-    <xf:bind id="33" nodeset="/root/Female" type="xsd:int"/>
+    <xf:bind id="33" nodeset="/root/Female" type="xsd:int" required="true()" readonly="../Male >= 10" />
     <xf:bind id="34" nodeset="/root/TimeStart" type="xsd:time"/>
     <xf:bind id="35" nodeset="/root/TimeEnd" type="xsd:time"/>
     <xf:bind id="49" nodeset="/root/Topics1" type="xsd:string"/>
