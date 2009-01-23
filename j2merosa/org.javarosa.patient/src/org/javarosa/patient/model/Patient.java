@@ -232,6 +232,22 @@ public class Patient implements Externalizable, IDRecordable {
 	public void setNewPatient(boolean isNewPatient) {
 		this.isNewPatient = isNewPatient;
 	}
+	
+	public String getInitials() {
+		String s="";
+
+		if(getFamilyName() != null && getFamilyName().length() > 0)
+			s += getFamilyName().toLowerCase().charAt(0);
+		
+		if(getMiddleName() != null && getMiddleName().length() > 0)
+			s += getMiddleName().toLowerCase().charAt(0);
+		
+		if(getGivenName() != null && getGivenName().length() > 0)
+			s += getGivenName().toLowerCase().charAt(0);
+
+
+		return s;
+	}
 
 	/**
 	 * Gets the current patient's Id
