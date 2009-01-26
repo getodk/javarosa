@@ -37,8 +37,8 @@ import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-public class RemoteLoginActivity implements IActivity, CommandListener,
-		ItemCommandListener, Observer {
+
+public class RemoteLoginActivity implements IActivity,CommandListener,ItemCommandListener,Observer{
 	private LoginForm logScr;
 	private TransportMessage message;
 	private TransportManager transportManager;
@@ -46,7 +46,7 @@ public class RemoteLoginActivity implements IActivity, CommandListener,
 	private Context context;
 	private ByteArrayInputStream bin;
 	private KXmlParser parser = new KXmlParser();
-	// private ProgressScreen progressScreen;
+	//private ProgressScreen progressScreen;
 	public static final String COMMAND_KEY = "command";
 	public static final String USER = "user";
 	public static final String PROFILE = "profile";
@@ -56,137 +56,131 @@ public class RemoteLoginActivity implements IActivity, CommandListener,
 	private javax.microedition.lcdui.Alert fail;
 	private javax.microedition.lcdui.Alert alertdialog;
 
+
 	public RemoteLoginActivity(IShell parent, String title) {
-		this.parent = parent;
-		// progressScreen = new
-		// ProgressScreen("Login In","Please Wait. Contacting Server...",this);
+		this.parent =parent;
+		//progressScreen = new ProgressScreen("Login In","Please Wait. Contacting Server...",this);
 	}
 
+	
 	public void contextChanged(Context globalContext) {
 		context.mergeInContext(globalContext);
 
 	}
 
+	
 	public void destroy() {
-		if (transportManager != null) {
-			// transportManager.closeSend();
+		if(transportManager!=null){
+			//transportManager.closeSend();
 			transportManager = null;
 
 		}
 
 	}
 
+	
 	public Context getActivityContext() {
 		return context;
 	}
 
+	
 	public void halt() {
 		// TODO Auto-generated method stub
 
 	}
 
+	
 	public void resume(Context globalContext) {
 		// TODO Auto-generated method stub
 
 	}
 
+	
 	public void setShell(IShell shell) {
 		this.parent = shell;
 
 	}
 
+	
 	public void start(Context context) {
-		this.context = context;
-		logScr = new LoginForm(this, "Login");
+		this.context=context;
+		logScr = new LoginForm(this,"Login");
 		logScr.setCommandListener(this);
 		logScr.loginButton.setItemCommandListener(this);
 		parent.setDisplay(this, logScr);
 
+
 	}
 
+	
 	public void commandAction(Command command, Displayable display) {
-
-		if (command == logScr.CMD_CANCEL_LOGIN) {
+		
+		if(command==logScr.CMD_CANCEL_LOGIN){
 			System.out.println("Clicks on the hem Exit");
 			Hashtable returnArgs = new Hashtable();
 			returnArgs.put(COMMAND_KEY, "USER_CANCELLED");
-			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-					returnArgs);
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,returnArgs);
 		}
-
+		
 	}
+
 
 	public void commandAction(Command command, Item item) {
-		if (command == logScr.loginButtonCommand) {
-			if (validateUser()) {
-				final javax.microedition.lcdui.Alert success = logScr
-						.successfulLogin();
-				parent.setDisplay(this, new IView() {
-					public Object getScreenObject() {
-						return success;
-					}
-				});
+		if(command==logScr.loginButtonCommand){
+				if(validateUser()){
+					final javax.microedition.lcdui.Alert success = logScr.successfulLogin();
+					parent.setDisplay(this, new IView() {public Object getScreenObject() {return success;}});
+					
+					Hashtable returnArgs = new Hashtable();
+					returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
+					returnArgs.put(USER, logScr.getLoggedInUser());
+					returnArgs.put(TYPE, "LOCAL_AUTH");
+					parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+							returnArgs);
 
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
-				returnArgs.put(USER, logScr.getLoggedInUser());
-				returnArgs.put(TYPE, "LOCAL_AUTH");
-				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-						returnArgs);
-
-			} else if (logScr.getUserName() == null
-					|| logScr.getPassWord() == null) {
-				final javax.microedition.lcdui.Alert fail = new javax.microedition.lcdui.Alert(
-						"Error", "Enter Username and Password", null,
-						AlertType.ERROR);
-				parent.setDisplay(this, new IView() {
-					public Object getScreenObject() {
-						return fail;
-					}
-				});
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, "USER_NOT_VALIDATED");
-				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-						returnArgs);
-
-			} else {
-				// parent.setDisplay(this, progressScreen);
-				String loginUrl = JavaRosaServiceProvider.instance()
-						.getPropertyManager().getSingularProperty(
-								HttpTransportProperties.AUTH_URL_PROPERTY);
-				loginUrl += "?user=" + logScr.getUserName() + "&pass="
-						+ logScr.getPassWord();
-				System.out.println(loginUrl);
-				ITransportDestination requestDest = new HttpTransportDestination(
-						loginUrl);
-				message = new TransportMessage();
-				message.setPayloadData(new ByteArrayPayload("".getBytes(),
-						null, IDataPayload.PAYLOAD_TYPE_TEXT)); // might have to
-																// change
-				message.setDestination(requestDest);
-				message.addObserver(this);
-				transportManager = (TransportManager) JavaRosaServiceProvider
-						.instance().getTransportManager();
-				transportManager.send(message, TransportMethod.HTTP_GCF);
-
-			}
+				}
+				else if(logScr.getUserName()==""||logScr.getPassWord()==""){
+					final javax.microedition.lcdui.Alert fail = new javax.microedition.lcdui.Alert("Error", "Enter Username and Password", null, AlertType.ERROR);
+					parent.setDisplay(this, new IView() {public Object getScreenObject() {return fail;}});
+					Hashtable returnArgs = new Hashtable();
+					returnArgs.put(COMMAND_KEY, "USER_NOT_VALIDATED");
+					parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,returnArgs);
+					
+				}else{
+					//parent.setDisplay(this, progressScreen);
+					String loginUrl = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(HttpTransportProperties.AUTH_URL_PROPERTY);
+					   loginUrl+="?user="+logScr.getUserName()+"&pass="+logScr.getPassWord();
+					   System.out.println(loginUrl); 
+					ITransportDestination requestDest= new HttpTransportDestination(loginUrl);
+					message = new TransportMessage();
+					message.setPayloadData(new ByteArrayPayload("".getBytes(),null,IDataPayload.PAYLOAD_TYPE_TEXT)); //might have to change
+					message.setDestination(requestDest);
+					message.addObserver(this);
+					transportManager = (TransportManager)JavaRosaServiceProvider.instance().getTransportManager();
+					transportManager.send(message, TransportMethod.HTTP_GCF);
+					
+				}
 		}
 
 	}
 
-	public boolean validateUser() {
+	public boolean validateUser(){
 		boolean validLogin = false;
 		UserRMSUtility userRMS = logScr.getUserRMS();
 		User discoveredUser = new User();
 		String usernameStr = logScr.getUserName();
 		int index = 1;
 
-		while (index <= userRMS.getNumberOfRecords()) {
-			try {
+		while (index <= userRMS.getNumberOfRecords() )
+		{
+			try
+			{
 				userRMS.retrieveFromRMS(index, discoveredUser);
-			} catch (IOException ioe) {
+			}
+			catch (IOException ioe) {
 				System.out.println(ioe);
-			} catch (DeserializationException uee) {
+			}
+			catch (DeserializationException uee) {
 				System.out.println(uee);
 			}
 			if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))
@@ -195,8 +189,9 @@ public class RemoteLoginActivity implements IActivity, CommandListener,
 			index++;
 		}
 
-		if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr)) {
-			if (discoveredUser.getPassword().equals(logScr.getPassWord())) {
+		if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr)){
+			if (discoveredUser.getPassword().equals(logScr.getPassWord()))
+			{
 				System.out.println("login valid");
 				validLogin = true;
 				logScr.setLoggedInUser(discoveredUser);
@@ -206,17 +201,18 @@ public class RemoteLoginActivity implements IActivity, CommandListener,
 
 	}
 
+	
 	public void update(Observable observable, Object arg) {
-		byte[] data = (byte[]) arg;
-		// String response;
+		byte[] data = (byte[])arg;
+		//String response;
 		String printme = new String(data).trim();
-		System.out.println("SERVER SAYS: " + printme);
-
+		System.out.println("SERVER SAYS: "+printme);
+		
 		bin = new ByteArrayInputStream(data);
-
-		// parse info
+		
+		//parse info
 		Hashtable temp = new Hashtable();
-
+		
 		try {
 			parser.setInput(new InputStreamReader(bin));
 			parseProfile(parser, temp);
@@ -225,111 +221,84 @@ public class RemoteLoginActivity implements IActivity, CommandListener,
 			e.printStackTrace();
 		}
 
-		// extract server response only for now
+		//extract server response only for now
 		String response = (String) temp.get("response");
 
-		if (response == null) {
-			final javax.microedition.lcdui.Alert alertdialog = new javax.microedition.lcdui.Alert(
-					"Web Service Error", "No response from server", null,
-					AlertType.ERROR);
+		if(response ==null){
+			final javax.microedition.lcdui.Alert alertdialog = new javax.microedition.lcdui.Alert("Web Service Error", "No response from server", null, AlertType.ERROR);
 			alertdialog.setTimeout(1000);
-			parent.setDisplay(this, new IView() {
-				public Object getScreenObject() {
-					return alertdialog;
-				}
-			});
+			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
 			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-		} else if (response.equalsIgnoreCase("OK")) {
-			final javax.microedition.lcdui.Alert success = logScr
-					.successfulLogin();
-			parent.setDisplay(this, new IView() {
-				public Object getScreenObject() {
-					return success;
-				}
-			});
+		}else if(response.equalsIgnoreCase("OK")){
+			final javax.microedition.lcdui.Alert success = logScr.successfulLogin();
+			parent.setDisplay(this, new IView() {public Object getScreenObject() {return success;}});
 			saveUser();
 			Hashtable returnArgs = new Hashtable();
 			returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
 			returnArgs.put(USER, logScr.getLoggedInUser());
-			returnArgs.put(PROFILE, temp); // return the whole hashtable profile
-											// for now?
+			returnArgs.put(PROFILE, temp); //return the whole hashtable profile for now?
 			returnArgs.put(TYPE, "REMOTE_AUTH");
 			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
 					returnArgs);
 
-		} else if (response.equals("authenticationerror")) {
-			final javax.microedition.lcdui.Alert fail = new javax.microedition.lcdui.Alert(
-					"Error", "Invalid uID or Password: " + response, null,
-					AlertType.ERROR);
-			fail.setTimeout(1000);
-			parent.setDisplay(this, new IView() {
-				public Object getScreenObject() {
-					return fail;
-				}
-			});
+		}else if(response.equals("authenticationerror")){
+			final javax.microedition.lcdui.Alert fail = new javax.microedition.lcdui.Alert("Error", "Invalid uID or Password: "+ response, null, AlertType.ERROR);
+			//fail.setTimeout(1000);
+			parent.setDisplay(this, new IView() {public Object getScreenObject() {return fail;}});
 			Hashtable returnArgs = new Hashtable();
 			returnArgs.put(COMMAND_KEY, "USER_NOT_VALIDATED");
-			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-					returnArgs);
-
-		} else if (response.equals("notfound")) {
-			final javax.microedition.lcdui.Alert fail = new javax.microedition.lcdui.Alert(
-					"Error", "Server error: " + response, null, AlertType.ERROR);
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,returnArgs);
+			
+		}else if(response.equals("notfound")){
+			final javax.microedition.lcdui.Alert fail = new javax.microedition.lcdui.Alert("Error", "Server error: " +response, null, AlertType.ERROR);
 			fail.setTimeout(1000);
-			parent.setDisplay(this, new IView() {
-				public Object getScreenObject() {
-					return fail;
-				}
-			});
+			parent.setDisplay(this, new IView() {public Object getScreenObject() {return fail;}});
 			Hashtable returnArgs = new Hashtable();
 			returnArgs.put(COMMAND_KEY, "USER_NOT_VALIDATED");
-			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-					returnArgs);
-
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,returnArgs);
+			
 		}
 
 	}
-
-	public void saveUser() {
+	
+	public void saveUser(){
 		UserRMSUtility userRMS = logScr.getUserRMS();
 		User discoveredUser = new User();
 		discoveredUser.setUsername(logScr.getUserName());
 		discoveredUser.setPassword(logScr.getPassWord());
-		discoveredUser.setUserType(User.STANDARD);// make all users standard
-													// users? what if they are
-													// admin on the server?
+		discoveredUser.setUserType(User.STANDARD);//make all users standard users? what if they are admin on the server?
 		logScr.setLoggedInUser(discoveredUser);
 		userRMS.writeToRMS(discoveredUser);
-
+		
 	}
-
-	public void parseProfile(KXmlParser parser, Hashtable formInfo)
-			throws XmlPullParserException {
-
+	
+public void parseProfile(KXmlParser parser, Hashtable formInfo) throws XmlPullParserException{
+		
 		try {
 			boolean inItem = false;
 			parser.nextTag();
 			parser.require(XmlPullParser.START_TAG, null, "profile");
-			while (parser.nextTag() != XmlPullParser.END_TAG) {
-				// parser file names
+			while( parser.nextTag() != XmlPullParser.END_TAG ){
+				//parser file names
 				parser.require(XmlPullParser.START_TAG, null, null);
-
+				
 				String name = parser.getName();
-				// String url = parser.getAttributeValue(null, "url");
+				//String url = parser.getAttributeValue(null, "url");
 				String text = parser.nextText();
-				System.out.println("<" + name + ">" + text);
-				if (name.equals("response") || name.equals("posturl")
-						|| name.equals("geturl") || name.equals("viewtype")) {
+System.out.println("<"+name+">"+text);				
+				if(name.equals("response") || name.equals("posturl") || name.equals("geturl") || name.equals("viewtype") )
+					{
 					inItem = true;
-					// items.addElement(text);
-					formInfo.put(name, text);
-				} else
+					//items.addElement(text);
+					formInfo.put(name,text);
+					}
+				else
 					inItem = false;
 
-				// parser.require(XmlPullParser.END_TAG, null, "form");
+				//parser.require(XmlPullParser.END_TAG, null, "form");
 			}
 			parser.require(XmlPullParser.END_TAG, null, "profile");
-
+			
 			parser.next();
 			parser.require(XmlPullParser.END_DOCUMENT, null, null);
 
@@ -340,10 +309,12 @@ public class RemoteLoginActivity implements IActivity, CommandListener,
 
 		}
 	}
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
-	 */
-	public void annotateCommand(ICommand command) {
-		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
-	}
+
+
+public void annotateCommand(ICommand command) {//to check what effect this has if left unimplemented
+	// TODO Auto-generated method stub
+	
+}
+
+
 }
