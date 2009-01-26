@@ -233,12 +233,16 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 		return super.handleKeyReleased(keyCode, gameAction);
 	}
 
-	private void processSelect () {
-		int rowID = rowID(selectedIndex);
-		if (rowID == INDEX_NEW) {
-			controller.newEntity();
-		} else {
-			controller.itemSelected(rowID);
+	private void processSelect() {
+		//Jan 26, 2009 - csims@dimagi.com
+		//Don't want to try to access rows if the list doesn't have any.
+		if (!(listIsEmpty() && newType != PatientSelectView.NEW_IN_LIST)) {
+			int rowID = rowID(selectedIndex);
+			if (rowID == INDEX_NEW) {
+				controller.newEntity();
+			} else {
+				controller.itemSelected(rowID);
+			}
 		}
 	}
 	
@@ -314,6 +318,8 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 		}
 		
 		if (handled){
+			//Jan 26, 2009 - csims@dimagi.com
+			//what the hell is this?
 			addCommand(new Command("hey", Command.ITEM, 3));
 			return true;
 		} else {
