@@ -18,7 +18,7 @@ public class PatientSelectActivity implements IActivity {
 	public static final String ENTITY_RMS_KEY = "entity-rms";
 	public static final String ENTITY_PROTO_KEY = "entity-type";
 	public static final String NEW_ENTITY_ID_KEY_KEY = "new-entity-key";
-	//public static final String NEW_ENTITY_ID_KEY = "new-entity-id";
+	public static final String NEW_TYPE_KEY = "new-type-key";
 	public static final String ACTION_NEW_ENTITY = "new-entity";
 	
 	private IShell parent;
@@ -46,6 +46,11 @@ public class PatientSelectActivity implements IActivity {
 		entityPrototype = (IEntity)context.getElement(ENTITY_PROTO_KEY);
 		newEntityIDKey = (String)context.getElement(NEW_ENTITY_ID_KEY_KEY);
 		selView.entityType = entityPrototype.entityType();
+		
+		Integer newtype = (Integer)context.getElement(NEW_TYPE_KEY);
+		if(newtype != null) {
+			selView.newType = newtype.intValue();
+		}
 		
 		loadEntities();
 		selView.init();
