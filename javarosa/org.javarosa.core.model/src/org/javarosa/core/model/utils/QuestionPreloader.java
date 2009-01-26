@@ -1,16 +1,16 @@
 package org.javarosa.core.model.utils;
 
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.util.Map;
+import org.javarosa.core.util.PropertyUtils;
 
 /**
  * The Question Preloader is responsible for maintaining a set of handlers which are capable 
@@ -84,9 +84,49 @@ public class QuestionPreloader {
 			}
 		};
 		
+		IPreloadHandler uid = new IPreloadHandler() {
+			public String preloadHandled() {
+				return "uid";
+			}
+			public IAnswerData handlePreload(String preloadParams) {
+				return new StringData(PropertyUtils.genGUID(25));
+			}
+			
+			public boolean handlePostProcess(TreeElement node, String params) {
+				return false;
+			}
+		};
+		
+		
+		//TODO: Finish this up.
+		IPreloadHandler meta = new IPreloadHandler() {
+			public String preloadHandled() {
+				return "meta";
+			}
+			public IAnswerData handlePreload(String preloadParams) {
+				//TODO: Ideally, we want to handle this preloader by taking in the
+				//existing structure. Resultantly, we don't want to mess with this.
+				//We should be enforcing that we don't.
+				return null;
+			}
+			
+			public boolean handlePostProcess(TreeElement node, String params) {
+				Vector kids = node.getChildren();
+				Enumeration en = kids.elements();
+				while(en.hasMoreElements()) {
+					TreeElement kid = (TreeElement)en.nextElement();
+					if(kid.getName().equals("uid")) {
+						kid.setValue(new StringData(PropertyUtils.genGUID(25)));
+					}
+				}
+				return true;
+			}
+		};
+		
 		addPreloadHandler(date);
 		addPreloadHandler(property);
 		addPreloadHandler(timestamp);
+		addPreloadHandler(uid);
 	}
 	
 	/**
