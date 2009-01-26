@@ -378,6 +378,23 @@ public class RMSUtility
 	}
     
     /**
+     * Returns an enumeration of the objects stored in this RMS Utility.
+     * 
+     * @return a RecordEnumeration of the Data stored in this utility
+     */
+    public IRecordStoreEnumeration enumerateRecords() {
+		try {
+			// TODO check if this is correct return
+			return this.recordStore.enumerateRecords();
+		} catch (RecordStorageException e) {
+			// #if debug.output==verbose || debug.output==exception
+			e.printStackTrace();
+			// #endif
+		}
+		return null;
+	}
+    
+    /**
      * Gets the ID of the next record that will be stored
      * in this Utility
      * 

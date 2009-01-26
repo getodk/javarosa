@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormElementStateListener;
+import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.model.condition.Constraint;
-import org.javarosa.core.model.Constants;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
@@ -520,8 +520,42 @@ public class TreeElement implements Externalizable {
 		name = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		multiplicity = ExtUtil.readInt(in);
 		repeatable = ExtUtil.readBool(in);
-		value = (IAnswerData)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);	
-		children = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(TreeElement.class), pf));
+		value = (IAnswerData)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
+		
+		//children = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(TreeElement.class), pf));
+		
+		//Jan 22, 2009 - csims@dimagi.com
+		//old line: children = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(TreeElement.class), pf));
+		//New Child deserialization
+		//1. read null status as boolean
+		//2. read number of children
+		//3. for i < number of children
+		//3.1 if read boolean true , then create TreeElement and deserialize directly.
+		//3.2 if read boolean false then create tagged element and deserialize child
+		if(!ExtUtil.readBool(in)) {
+			//1.
+			children = null;
+		} else {
+			children = new Vector();
+			//2.
+			int numChildren = (int) ExtUtil.readNumeric(in);
+			//3.
+			for(int i = 0 ; i < numChildren ; ++i) {
+				boolean normal = ExtUtil.readBool(in);
+				if(normal) {
+					//3.1
+					TreeElement child = new TreeElement();
+					child.readExternal(in, pf);
+					children.addElement(child);
+				} else {
+					//3.2
+					TreeElement child = (TreeElement)ExtUtil.read(in, new ExtWrapTagged(), pf);
+					children.addElement(child);
+				}
+			}
+		}
+		
+		//end Jan 22, 2009
 
 		dataType = ExtUtil.readInt(in);
 		relevant = ExtUtil.readBool(in);
@@ -534,7 +568,7 @@ public class TreeElement implements Externalizable {
 		preloadParams = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		
 		Vector attStrings = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(String.class), pf));
-		setAttributesFromSingleStringVector(attStrings);	
+		setAttributesFromSingleStringVector(attStrings);
 	}
 
 	/*
@@ -546,8 +580,42 @@ public class TreeElement implements Externalizable {
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(name));
 		ExtUtil.writeNumeric(out, multiplicity);
 		ExtUtil.writeBool(out, repeatable);
-		ExtUtil.write(out, new ExtWrapNullable(value == null ? null : new ExtWrapTagged(value)));	
-		ExtUtil.write(out, new ExtWrapList(ExtUtil.emptyIfNull(children)));
+		ExtUtil.write(out, new ExtWrapNullable(value == null ? null : new ExtWrapTagged(value)));
+		
+		//Jan 22, 2009 - csims@dimagi.com
+		//old line: ExtUtil.write(out, new ExtWrapList(ExtUtil.emptyIfNull(children)));
+		//New Child serialization
+		//1. write null status as boolean
+		//2. write number of children
+		//3. for all child in children
+		//3.1 if child type == TreeElement write boolean true , then serialize directly.
+		//3.2 if child type != TreeElement, write boolean false, then tagged child
+		if(children == null) {
+			//1.
+			ExtUtil.writeBool(out, false);
+		} else {
+			//1.
+			ExtUtil.writeBool(out, true);
+			//2.
+			ExtUtil.writeNumeric(out, children.size());
+			//3.
+			Enumeration en = children.elements();
+			while(en.hasMoreElements()) {
+				TreeElement child  = (TreeElement)en.nextElement();
+				if(child.getClass() == TreeElement.class) {
+					//3.1
+					ExtUtil.writeBool(out, true);
+					child.writeExternal(out);
+				} else {
+					//3.2
+					ExtUtil.writeBool(out, false);
+					ExtUtil.write(out, new ExtWrapTagged(child));
+				}
+			}
+		}
+		
+		//end Jan 22, 2009
+
 
 		ExtUtil.writeNumeric(out, dataType);
 		ExtUtil.writeBool(out, relevant);

@@ -27,4 +27,10 @@ public interface ICommand {
 	 * @return A Platform Specific Command object 
 	 */
 	public Object getCommand();
+	
+	/**
+	 * @return A unique command id that can be used to 
+	 * distinguish this command at the shell level.
+	 */
+	public String getCommandId();
 }

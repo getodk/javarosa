@@ -403,7 +403,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * the data bindings.
 	 */
 	public void preloadModel(TreeElement node) {
-		if (node.isLeaf()) {
+		//if (node.isLeaf()) {
 			IAnswerData preload = null;
 			if (node.preloadHandler != null) {
 				preload = preloader.getQuestionPreload(node.preloadHandler, node.preloadParams);
@@ -411,13 +411,15 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			if (preload != null) { //what if we want to wipe out a value in the instance?
 				node.setAnswer(preload);
 			}			
-		} else {
+		//} else {
+			if(!node.isLeaf()) {
 			for (int i = 0; i < node.getNumChildren(); i++) {
 				TreeElement child = (TreeElement)node.getChildren().elementAt(i);
 				if (child.getMult() != TreeReference.INDEX_TEMPLATE) //don't preload templates; new repeats are preloaded as they're created
 					preloadModel(child);
 			}
-		}
+			}
+		//}
 	}
 	
 	public boolean postProcessModel () {

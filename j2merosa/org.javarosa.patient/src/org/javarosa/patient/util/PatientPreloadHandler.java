@@ -37,6 +37,7 @@ public class PatientPreloadHandler implements IPreloadHandler {
 	 * 
 	 */
 	public IAnswerData handlePreload(String preloadParams) {
+		System.out.println("Patient preloader! Params: " + preloadParams);
 		IAnswerData returnVal = null;
 		if("vaccination_table".equals(preloadParams)) {
 			ImmunizationData table = patient.getVaccinations();
@@ -67,7 +68,7 @@ public class PatientPreloadHandler implements IPreloadHandler {
 				returnVal = (IAnswerData)patient.getRecord(preloadParams);
 			} else {
 				String type = preloadParams.substring(0, selectorStart);
-				String selector = preloadParams.substring(selectorStart, preloadParams.length());
+				String selector = preloadParams.substring(selectorStart, preloadParams.length()); 
 				Vector data = patient.getRecordSet(type, selector);
 				returnVal = new NumericListData();
 				returnVal.setValue(data);
