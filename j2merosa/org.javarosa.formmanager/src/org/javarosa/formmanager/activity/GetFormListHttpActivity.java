@@ -1,5 +1,7 @@
 package org.javarosa.formmanager.activity;
 
+import java.util.Hashtable;
+
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
@@ -133,21 +135,21 @@ public class GetFormListHttpActivity implements IActivity,CommandListener,Observ
 		String response;
 		response = new String(data).trim();
 		
-		//FIXME
-//		if(response ==null){
-//			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
-//			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-//		}else if(response.equals(WebServerResponses.GET_LIST_ERROR)){
-//			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
-//			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-//		}else if(response.equals(WebServerResponses.GET_LIST_NO_SURVEY)){
-//			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
-//			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-//		}else{
-//			Hashtable returnArgs = new Hashtable();
-//			returnArgs.put(RETURN_KEY, data);
-//			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
-//		}
+		//FIXME - resolve the responses to be received from the webserver
+		if(response ==null){
+			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
+			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+		}else if(response.equals("WebServerResponses.GET_LIST_ERROR")){
+			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
+			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+		}else if(response.equals("WebServerResponses.GET_LIST_NO_SURVEY")){
+			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
+			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+		}else{
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put(RETURN_KEY, data);
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+		}
 		
 	}
 
