@@ -37,7 +37,7 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 	
 	Context context;
 	
-	Vector pendingRefs;
+	Vector pendingRefs = new Vector();
 	
 	PendingReferralsView pending;
 	ReferralsDetailView details;
@@ -127,11 +127,11 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 		//TODO: Replace - Maybe with Entity Select Stuff? Seems super-appropriate.
 		pending = new PendingReferralsView("Pending Referrals");
 		try {
-			Vector pendingReferrals = ref.getPendingReferrals();
+			Vector pendingVector = ref.getPendingReferrals();
 			
 			int elementNum = 0;
 			
-			Enumeration en = pendingReferrals.elements();
+			Enumeration en = pendingVector.elements();
 			while(en.hasMoreElements()) {
 				PatientReferral referral = (PatientReferral)en.nextElement();
 				Patient patient = new Patient();
@@ -140,10 +140,16 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 				pending.set(elementNum, patient.getInitials() + " - " + referral.getType() + " - " + referral.getDateReferred(), null);
 				this.pendingRefs.addElement(referral);
 			}
-			pending.setCommandListener(this);
+			
 			pending.addCommand(EXIT);
-			pending.addCommand(SELECT);
-			pending.setSelectCommand(SELECT);
+			if(this.pendingRefs.size() == 0) {
+				pending.append("No Pending Referrals!", null);
+				pending.setSelectCommand(EXIT);
+			} else {
+				pending.addCommand(SELECT);
+				pending.setSelectCommand(SELECT);
+			}
+			pending.setCommandListener(this);
 			
 			shell.setDisplay(this, pending);
 			
