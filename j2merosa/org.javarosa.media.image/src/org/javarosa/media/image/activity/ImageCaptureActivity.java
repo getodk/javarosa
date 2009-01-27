@@ -19,10 +19,16 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.view.DisplayViewFactory;
+import org.javarosa.media.audio.service.J2MEAudioCaptureService;
 import org.javarosa.media.image.model.FileDataPointer;
-import org.javarosa.media.image.utilities.FileUtility;
+//import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.view.CameraCanvas;
+import org.javarosa.utilities.file.*;
+import org.javarosa.utilities.file.services.*;
+
+
 
 /**
  * An Activity that represents the capture of a single Image.  This will talk to the
@@ -51,11 +57,22 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	private int height;
 	private String fullName;
 	
-	public ImageCaptureActivity(IShell shell) {
+	private IFileService fileService;
+	
+	public ImageCaptureActivity(IShell shell)
+	{
 		this.shell = shell;
 		display = JavaRosaServiceProvider.instance().getDisplay();
 		width = 640;
 		height = 480;
+		try
+		{
+			fileService = getFileService();
+		}
+		catch(UnavailableServiceException ue)
+		{
+			serviceUnavailable(ue);
+		}
 	}
 
 	
@@ -91,6 +108,14 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		// take a pointer to the context and shell
 		this.context = context;
 		showCamera();
+		try
+		{
+			fileService = getFileService();
+		}
+		catch(UnavailableServiceException ue)
+		{
+			serviceUnavailable(ue);
+		}
 	}
 	
 	public void setResolution(int width, int height) {
@@ -157,7 +182,15 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		e.printStackTrace();
 		String toLog = e.getMessage();
 		toLog += e.toString();
-		saveFile("log" + System.currentTimeMillis() + ".txt", toLog.getBytes());
+		try
+		{
+			saveFile("log" + System.currentTimeMillis() + ".txt", toLog.getBytes());
+		}
+		catch(FileException fe)
+		{
+			System.err.println("The was an error saving the file.");
+			fe.printStackTrace();
+		}
 		
 		doError();
 	}
@@ -188,7 +221,14 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 			fullName = saveFile(fileName + ".jpg", imageData);
 			doFinish();
 			
-		} catch (Exception me) {
+		}
+		catch(FileException fe)
+		{
+			System.err.println("The was an error saving the file.");
+			fe.printStackTrace();
+		}
+		catch(Exception me) 
+		{
 			handleException(me);
 		}
 	}
@@ -218,7 +258,14 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 			}
 			//jpg = mVideoControl.getSnapshot("encoding=jpeg&quality=100&width=2048&height=1536");
 			//jpg = mVideoControl.getSnapshot("encoding=jpeg&quality=100&width=1280&height=960");
-		} catch (MediaException me) {
+		} 
+		catch(FileException fe)
+		{
+			System.err.println("The was an error saving the file.");
+			fe.printStackTrace();
+		}
+		catch (MediaException me) 
+		{
 			handleException(me);
 			failures++;
 			jpg = null;
@@ -228,16 +275,25 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 			width += 80;
 			height += 60;
 		}
-		saveFile("photo_log" + System.currentTimeMillis() + ".txt", text.getBytes());
+		try
+		{
+			saveFile("photo_log" + System.currentTimeMillis() + ".txt", text.getBytes());
+		}
+		catch(FileException fe)
+		{
+			System.err.println("The was an error saving the file.");
+			fe.printStackTrace();
+		}
 	}
 	
 	
-	private String saveFile(String filename, byte[] image) {
-		String rootName = FileUtility.getDefaultRoot();
+	private String saveFile(String filename, byte[] image) throws FileException 
+	{
+		String rootName = fileService.getDefaultRoot();
 		String restorepath = "file:///" + rootName + "JRImages";				
-		FileUtility.createDirectory(restorepath);
+		fileService.createDirectory(restorepath);
 		String fullName = restorepath + "/" + filename;
-		if (FileUtility.createFile(fullName, image)) {
+		if (fileService.createFile(fullName, image)) {
 			System.out.println("Image saved.");	
 			return fullName;	
 		} else {
@@ -248,7 +304,21 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
 	 */
-	public void annotateCommand(ICommand command) {
+	public void annotateCommand(ICommand command) 
+	{
 		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
-	}		
+	}
+	
+	private IFileService getFileService() throws UnavailableServiceException
+	{
+		JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
+		IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		return service;
+	}
+	
+	private void serviceUnavailable(Exception e)
+	{
+		System.err.println("The File Service is unavailable.\n QUITTING!");			
+		System.err.println(e.getMessage());
+	}
 }
