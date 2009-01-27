@@ -23,12 +23,14 @@ import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.view.DisplayViewFactory;
-import org.javarosa.media.image.utilities.FileUtility;
+import org.javarosa.utilities.file.services.*;
+import org.javarosa.utilities.file.FileException;
 import org.javarosa.media.audio.model.FileDataPointer;
 
 import org.javarosa.media.audio.service.IAudioCaptureService;
 import org.javarosa.media.audio.service.J2MEAudioCaptureService;
 import org.javarosa.media.audio.AudioException;
+
 
 import javax.microedition.io.ConnectionNotFoundException;
 
@@ -44,6 +46,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	private Context currentContext;
 		
 	private IAudioCaptureService recordService;
+	private IFileService fileService;
 	
 	private Command recordCommand, playCommand, stopCommand, backCommand, 
 	                saveCommand, finishCommand;
@@ -66,15 +69,13 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	public AudioCaptureActivity(IShell shell)
 	{
 		parentShell = shell;
-		display = JavaRosaServiceProvider.instance().getDisplay();	
-		JavaRosaServiceProvider.instance().registerService(new J2MEAudioCaptureService());		
+		display = JavaRosaServiceProvider.instance().getDisplay();		
 	}
 	
 	public AudioCaptureActivity(IShell shell, MIDlet m)
 	{
 		parentShell = shell;
-		display = JavaRosaServiceProvider.instance().getDisplay();	
-		JavaRosaServiceProvider.instance().registerService(new J2MEAudioCaptureService());
+		display = JavaRosaServiceProvider.instance().getDisplay();		
 		recMid = m;
 	}
 	
@@ -95,7 +96,8 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		
 		try
 		{			
-			recordService = (J2MEAudioCaptureService)JavaRosaServiceProvider.instance().getService("J2MEAudioCaptureService");
+			recordService = getAudioCaptureService();			 
+			fileService = getFileService();
 		}
 		catch(ClassCastException ce)
 		{
@@ -118,8 +120,16 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	//@Override
 	public void destroy() 
 	{
-		if(recordService != null)
-			recordService.closeStreams();
+		try
+		{
+			if(recordService != null)
+				recordService.closeStreams();
+		}
+		catch(IOException ioe)
+		{
+			System.err.println("An error occurred while closing the streams of the AudioCaptureService.");
+			ioe.printStackTrace();
+		}
 	}
 
 	//@Override
@@ -251,12 +261,15 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  
 		  try
 		  {
-			  recMid.platformRequest(fullName);
+			  if(recMid!= null)
+				  recMid.platformRequest(fullName);
+			  else
+				  throw new ConnectionNotFoundException("Since midlet is null, try 2nd method of playback");
 		  }
 		  catch(ConnectionNotFoundException cnfe)
 		  {
 			  cnfe.printStackTrace(); 
-			  /*If the platform request fails, which it shouldn't attempt to start playback
+			  /*If the platform request fails, which it shouldn't, attempt to start playback
 			   * through the service.*/			  
 		  	  recordService.startPlayback();
 		  }
@@ -338,16 +351,24 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  
 	  private void readFile(String fileName)
 	  {
-		  String rootName = FileUtility.getDefaultRoot();
-		  String restorepath = "file:///" + rootName + "JRSounds";				
-		  String fullName = restorepath + "/" + fileName;
+		  try
+		  {
+			  String rootName = fileService.getDefaultRoot();
+			  String restorepath = "file:///" + rootName + "JRSounds";				
+			  String fullName = restorepath + "/" + fileName;
 		  
-		  recordFile = new FileDataPointer(fullName);
-		  System.err.println("Successfully read Music file");
+			  recordFile = new FileDataPointer(fullName);
+			  System.err.println("Successfully read Music file");
 		  
-		  System.out.println("Sound Size =" + recordFile.getData().length);		  
+			  System.out.println("Sound Size =" + recordFile.getData().length);		  
 		  
-		  finalizeTask();
+			  finalizeTask();
+		  }
+		  catch(FileException fe)
+		  {
+			  System.err.println(fe);
+			  fe.printStackTrace();
+		  }
 	  }
 	  
 	  private String saveFile(String filename, byte[] sound) 
@@ -367,31 +388,41 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 				  //recordControl.reset();
 			  }
 		  }
-		  catch(AudioException me)
+		  catch(AudioException ae)
 		  {
 			  System.err.println("An error occured when attempting to stop audio capture!");
+		  }		  
+		  
+		  try
+		  {
+			  String rootName = fileService.getDefaultRoot();
+			  String restorepath = "file:///" + rootName + "JRSounds";				
+			  fileService.createDirectory(restorepath);
+			  String fullName = restorepath + "/" + filename;
+			  this.fullName = fullName;
+			  if(fileService.createFile(fullName, sound)) 
+			  {
+				  System.out.println("Sound saved to:" + fullName);
+				  messageItem.setText("Saved to:" + fullName);
+				  recordFile = new FileDataPointer(fullName);
+				  ++counter;			
+			
+				  return fullName;
+			  } 
+			  else 
+			  {
+				  System.err.println("Error saving audio.");
+				  errorItem.setText("Error saving audio.");
+				  return "";
+			  }
+		  }
+		  catch(FileException fe)
+		  {
+			  System.err.println(fe);
+			  fe.printStackTrace();
 		  }
 		  
-		  String rootName = FileUtility.getDefaultRoot();
-		  String restorepath = "file:///" + rootName + "JRSounds";				
-		  FileUtility.createDirectory(restorepath);
-		  String fullName = restorepath + "/" + filename;
-		  this.fullName = fullName;
-		  if(FileUtility.createFile(fullName, sound)) 
-		  {
-			System.out.println("Sound saved to:" + fullName);
-			messageItem.setText("Saved to:" + fullName);
-			recordFile = new FileDataPointer(fullName);
-			++counter;			
-			
-			return fullName;
-		  } 
-		  else 
-		  {
-			System.err.println("Error saving audio.");
-			errorItem.setText("Error saving audio.");
-			return "";
-		  }		
+		  return fullName;
 	  }
 	  
 	  //Go back one screen
@@ -417,7 +448,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  //Actions to perform when service is unavailable
 	  private void serviceUnavailable(Exception e)
 	  {
-		  errorItem.setText("The Audio Recorder Service is unavailable.\n QUITTING!");
+		  errorItem.setText("The Audio Capture or File Service is unavailable.\n QUITTING!");
 			
 		  //The only thing the user can do is retreat
 		  form.removeCommand(recordCommand);
@@ -426,6 +457,22 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  System.err.println(e.getMessage());
 	  }	  
 	  
+	  //Retrieve a reference to the appropriate available service
+	  private IAudioCaptureService getAudioCaptureService() throws UnavailableServiceException
+	  {
+		  JavaRosaServiceProvider.instance().registerService(new J2MEAudioCaptureService());  
+		  IAudioCaptureService audioCaptureService = (J2MEAudioCaptureService)JavaRosaServiceProvider.instance().getService(J2MEAudioCaptureService.serviceName);
+		  return audioCaptureService;
+	  }	  
+	  
+	  //Retrieve a reference to the first available service
+	  private IFileService getFileService() throws UnavailableServiceException
+	  {
+		  JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
+		  IFileService fileService = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		  return fileService;
+	  }
+	  
 	  //Record audio in a separate thread to keep the command listener alert for stopping
 	  public void run()
 	  {		  
@@ -433,13 +480,13 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	        {   
 			  recordAudio();
 	        } 
-	        catch (AudioException ae) 
+	        catch(AudioException ae) 
 	        {
 	        	errorItem.setLabel("Error recording audio");
 	        	//errorItem.setText(ae.toString());
 	        	System.err.println(ae.toString());
 	        }		     
-		    catch (InterruptedException ie) 
+		    catch(InterruptedException ie) 
 		    {
 	            errorItem.setLabel("Error occurred while recording");
 	            //errorItem.setText(ie.toString());
