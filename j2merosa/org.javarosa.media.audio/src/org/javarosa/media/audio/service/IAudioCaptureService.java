@@ -9,6 +9,7 @@ package org.javarosa.media.audio.service;
 import org.javarosa.core.services.IService;
 import org.javarosa.media.audio.AudioException;
 import java.io.OutputStream;
+import java.io.IOException;
 
 public interface IAudioCaptureService extends IService 
 {
@@ -41,5 +42,5 @@ public interface IAudioCaptureService extends IService
 	public OutputStream getAudio();
 	
 	//Closes all types of streams that are used
-	public void closeStreams();
+	public void closeStreams() throws IOException;
 }
