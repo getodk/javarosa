@@ -18,8 +18,14 @@ import javax.microedition.io.file.FileSystemRegistry;
  * @author Cory Zue
  *
  */
-public class FileUtility {
-
+public class FileUtility
+{
+	private static final String serviceName = "J2MEFileService";
+	
+	public String getName()
+	{
+		return serviceName;
+	}
 	
 	/**
 	 * Create a directory from the path
@@ -54,7 +60,7 @@ public class FileUtility {
 	}
 	
 	/**
-	 * Get the defaut root directory
+	 * Get the default root directory
 	 * @return
 	 */
 	public static String getDefaultRoot() {
@@ -176,6 +182,43 @@ public class FileUtility {
 		return null;
 	}
 	
+	/**
+	 * Gets file data from the OS
+	 * @param fileName
+	 * @return
+	 */
+	/*
+	public static byte[] getFileData(String fileName) {
+		InputStream fis = null;
+		FileConnection file = null;
+		try {
+			file = (FileConnection) Connector.open(fileName);
+			int bytesToRead = (int) file.fileSize();
+			byte[] toReturn = new byte[bytesToRead];
+			fis = file.openInputStream();
+			int bytesRead = 0;
+			int blockSize = 1024;
+			while (bytesToRead > bytesRead) {
+				int thisBlock = blockSize;
+				if (bytesToRead - bytesRead < blockSize) {
+					thisBlock = bytesToRead-bytesRead;
+				}
+				fis.read(toReturn, bytesRead, thisBlock);
+				bytesRead += blockSize;
+			}
+			return toReturn;
+		} catch (Exception ex) {				
+			handleException(ex);
+		} 
+		finally {		
+			close(fis);
+			close(file);
+		}
+		return null;
+	}
+	*/
+
+
 	public static InputStream getFileDataStream(String fileName) {
 		InputStream fis = null;
 		FileConnection file = null;

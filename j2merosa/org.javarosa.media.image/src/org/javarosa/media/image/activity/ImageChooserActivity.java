@@ -16,10 +16,14 @@ import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.data.IDataPointer;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
-import org.javarosa.media.image.utilities.FileUtility;
+//import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.utilities.ImageSniffer;
+import org.javarosa.utilities.file.FileException;
+import org.javarosa.utilities.file.services.IFileService;
+import org.javarosa.utilities.file.services.J2MEFileService;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
@@ -68,6 +72,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	private MIDlet midlet;
 
 	private String sniffingPath;
+	private IFileService fileService;
 	
 	private int callBackActivity = ACTIVITY_NONE;
 	private static final int ACTIVITY_NONE = 0;
@@ -78,7 +83,8 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	private boolean isActivelySniffing = false;
 
 	
-	public ImageChooserActivity(IShell shell, MIDlet midlet) {
+	public ImageChooserActivity(IShell shell, MIDlet midlet) 
+	{
 		this.shell = shell;
 		this.midlet = midlet;
 		allImages = new Hashtable();
@@ -92,6 +98,15 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		viewCommand = new Command("View", Command.SCREEN, 0);
 		deleteCommand = new Command("Delete", Command.SCREEN, 0);
 		changeSniffDirectoryCommand = new Command("Change Search Directory", Command.SCREEN, 0);
+		
+		try 
+		{
+			fileService = getFileService();
+		}
+		catch(UnavailableServiceException ue)
+		{
+			serviceUnavailable(ue);
+		}
 		
 	}
 
@@ -152,9 +167,20 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		// mainForm.append("Use the menu options to take pictures or browse.");
 
 		// also create the sniffer
-		if (isSniffingImages) {
-			mainList = new ChoiceGroup("Available Images (searching in " + getImageSniffingPath() + ")", ChoiceGroup.MULTIPLE);
-			sniffer = new ImageSniffer(getImageSniffingPath(), this);
+		if(isSniffingImages) 
+		{			
+			try
+			{
+				mainList = new ChoiceGroup("Available Images (searching in " + getImageSniffingPath() + ")", ChoiceGroup.MULTIPLE);
+				sniffer = new ImageSniffer(getImageSniffingPath(), this);
+			}
+			catch(FileException fe)
+			{				
+				System.err.println("An error occurred while getting image sniffing path.");
+				System.err.println("Sniffer could not be created. QUITTING!!!");
+				fe.printStackTrace();
+				returnFromActivity(this);
+			}
 			snifferThread = new Thread(sniffer);
 			snifferThread.start();
 			isActivelySniffing = true;
@@ -170,14 +196,15 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	 * The path to sniff images
 	 * @return
 	 */
-	public String getImageSniffingPath() {
+	public String getImageSniffingPath() throws FileException 
+	{
 
 		if (sniffingPath == null) {
 			// default
 			// file system testing
 			//sniffingPath = "file://localhost/root1/photos/"; 
 			// phone testing
-			String rootName = FileUtility.getDefaultRoot();
+			String rootName = fileService.getDefaultRoot();
 			sniffingPath = "file://localhost/" + rootName + "Images/";
 		}
 		return sniffingPath;
@@ -413,5 +440,18 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	 */
 	public void annotateCommand(ICommand command) {
 		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
+	}
+	
+	private IFileService getFileService() throws UnavailableServiceException
+	{
+		JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
+		IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		return service;
+	}
+	
+	private void serviceUnavailable(Exception e)
+	{
+		System.err.println("The File Service is unavailable.\n QUITTING!");			
+		System.err.println(e.getMessage());
 	}
 }

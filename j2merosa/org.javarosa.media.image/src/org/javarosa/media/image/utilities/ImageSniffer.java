@@ -6,8 +6,12 @@ import java.util.Vector;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.List;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.media.image.activity.ImageChooserActivity;
 import org.javarosa.media.image.model.FileDataPointer;
+import org.javarosa.utilities.file.FileException;
+import org.javarosa.utilities.file.services.*;
+import org.javarosa.core.services.UnavailableServiceException;
 
 /**
  * Image Sniffer that polls the contents of a directory and notifies someone when they change
@@ -15,23 +19,36 @@ import org.javarosa.media.image.model.FileDataPointer;
  * @author Cory Zue
  *
  */
-public class ImageSniffer implements Runnable {
-
+public class ImageSniffer implements Runnable
+{
 	private boolean quit = false;
 	private String directory;
 	private Vector foundFiles;
 	private ImageChooserActivity chooser;
 	private String directoryToUse;
 	
-	public ImageSniffer(String directory, ImageChooserActivity chooser) {
+	private IFileService fileService;
+	
+	public ImageSniffer(String directory, ImageChooserActivity chooser) 
+	{
 		this.directory = directory;
 		this.chooser = chooser;
 		foundFiles = new Vector();
 		
+		try
+		{
+			fileService = getFileService();			
+		}
+		catch(UnavailableServiceException ue)
+		{
+			System.err.println(ue.getMessage());
+			ue.printStackTrace();
+		}		
 		System.out.println("Created Sniffer.");
 	}
 		
-	public void run() {
+	public void run()
+	{
 		// first pass - run in the background and find new images, just printing out their names
 		System.out.println("Starting to sniff: " + directory);
 		// CZUE - I'm not sure the most appropriate thing to do here.  For now find the folder
@@ -56,13 +73,16 @@ public class ImageSniffer implements Runnable {
 				System.out.println("Thread interrupted!" + e.getMessage());
 				e.printStackTrace();
 			}
-			Enumeration directoryContents = FileUtility.listDirectory(directoryToUse);
-			while (directoryContents.hasMoreElements()) {
-				String fileName = (String) directoryContents.nextElement();
-				if (!foundFiles.contains(fileName)) {
+			String[] directoryContents = fileService.listDirectory(directoryToUse);
+			for(int i = 0; i < directoryContents.length; ++i) 
+			{
+				String fileName = directoryContents[i];
+				if (!foundFiles.contains(fileName)) 
+				{
 					foundFiles.addElement(fileName);
 					// hard code this for now
-					if (fileName.endsWith(".jpg")) {
+					if (fileName.endsWith(".jpg")) 
+					{
 						FileDataPointer fdp = new FileDataPointer(directoryToUse + fileName);
 						chooser.addImageToUI(fdp);
 					}
@@ -71,23 +91,34 @@ public class ImageSniffer implements Runnable {
 			}
 			
 			}
-		} catch (Exception e) {
+		} 
+		catch(FileException fe)
+		{
+			System.err.println(fe.getMessage());
+			fe.printStackTrace();
+		}
+		catch(Exception e) 
+		{
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 			
-		} finally {
+		}		
+		finally 
+		{
 			System.out.println("Exiting Sniffer Thread");
 		}
 
 	}
 	
-	public synchronized void setSniffDirectory(String path) {
+	public synchronized void setSniffDirectory(String path)
+	{
 		directoryToUse = path;
 	}
 
 
-	private String getDirectoryToSniff() {
-		String mostRecentMod =FileUtility.getMostRecentlyModifiedDirectoryBelow(directory);
+	private String getDirectoryToSniff() throws FileException 
+	{
+		String mostRecentMod = ( (J2MEFileService)fileService ).getMostRecentlyModifiedDirectoryBelow(directory);
 		/*
 		if (!directory.endsWith("/"))
 		{
@@ -98,9 +129,22 @@ public class ImageSniffer implements Runnable {
 		return mostRecentMod; 
 	}
 
-	public void quit() {
+	public void quit()
+	{
 		quit = true;
 	}
-
+	
+	private IFileService getFileService() throws UnavailableServiceException
+	{
+		JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
+		IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		return service;
+	}
+	
+	private void serviceUnavailable(Exception e)
+	{
+		System.err.println("The File Service is unavailable.\n QUITTING!");			
+		System.err.println(e.getMessage());
+	}
 	
 }

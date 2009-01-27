@@ -36,9 +36,14 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
-import org.javarosa.media.image.utilities.FileUtility;
+//import org.javarosa.media.image.utilities.FileUtility;
+
+import org.javarosa.utilities.file.*;
+import org.javarosa.utilities.file.services.IFileService;
+import org.javarosa.utilities.file.services.J2MEFileService;
 
 /**
  * The <code>FileBrowser</code> custom component lets the user list files and
@@ -62,6 +67,7 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	
 	private IShell shell;
 	private IDisplay display;
+	private IFileService fileService;
 
 
 	private final static String UP_DIRECTORY = "/";
@@ -78,10 +84,24 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	public static final int MODE_DIRECTORY = 1;
 	
 	
-	public FileBrowseActivity(IShell shell) {
+	public FileBrowseActivity(IShell shell) 
+	{
 		this.shell = shell;
 		this.display = JavaRosaServiceProvider.instance().getDisplay();
-		this.currDirName = FileUtility.getDefaultRoot();
+		//this.currDirName = FileUtility.getDefaultRoot();
+		try
+		{
+			fileService = getFileService();
+			this.currDirName = fileService.getDefaultRoot();
+		}
+		catch(UnavailableServiceException ue)
+		{
+			serviceUnavailable(ue);
+		}
+		catch(FileException fe)
+		{
+			fe.printStackTrace();
+		}
 			
 	}
 	public void contextChanged(Context globalContext) {
@@ -117,12 +137,17 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		boolean isAPIAvailable = false;
 		if (System.getProperty("microedition.io.file.FileConnection.version") != null) {
 			isAPIAvailable = true;
-			try {
+			try 
+			{
 				showCurrDir();
 				System.out.println("h5");
-			} catch (SecurityException e) {
+			} 
+			catch (SecurityException e) 
+			{
 				System.out.println(e);
-			} catch (Exception e) {
+			} 
+			catch (Exception e) 
+			{
 				System.out.println(e);
 			}
 		} else {
@@ -152,9 +177,19 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		} else if (c == returnCommand) {
 			List curr = (List)d;
 			returnDirectory(curr.getString(curr.getSelectedIndex()));
-		} else if (c == back) {
-			showCurrDir();
-		} else if (c == cancel) {
+		} else if (c == back) 
+		{
+			try
+			{
+				showCurrDir();
+			}
+			catch(FileException fe)
+			{
+				System.err.println("An FileException occurred while showing the current directory.");
+				fe.printStackTrace();
+			}
+		} 
+		else if (c == cancel) {
 			shell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null); 
 		}
 	}
@@ -167,24 +202,26 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		this.mode = mode;
 	}
 	
-	private void showCurrDir() {
-		Enumeration e;
+	private void showCurrDir() throws FileException 
+	{
+		String[] strArr;
 		List browser;
 		System.out.println("In showCurrDir");
 		System.out.println("mega_root:" + MEGA_ROOT + "cur_dir:"
 				+ currDirName);
 		if (MEGA_ROOT.equals(currDirName)) {
-			e = FileUtility.getRootNames();
+			strArr = fileService.getRootNames();
 			browser = new List(currDirName, List.IMPLICIT);
 			System.out.println("here");
 		} else {
 			String fullPath =  "file://localhost/" + currDirName;
-			e = FileUtility.listDirectory(fullPath);
+			strArr = fileService.listDirectory(fullPath);
 			browser = new List(currDirName, List.IMPLICIT);
 			browser.append(UP_DIRECTORY, null);
 		}
-		while (e.hasMoreElements()) {
-			String fileName = (String) e.nextElement();
+		for(int i = 0; i < strArr.length; ++i) 
+		{
+			String fileName = strArr[i];
 			if (fileName.charAt(fileName.length() - 1) == SEP) {
 				// this is a directory
 				browser.append(fileName, null);
@@ -234,7 +271,15 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		} else {
 			currDirName = currDirName + fileName;
 		}
-		showCurrDir();
+		try
+		{
+			showCurrDir();
+		}
+		catch(FileException fe)
+		{
+			System.err.println("An FileException occurred while showing the current directory.");
+			fe.printStackTrace();
+		}
 	}
 
 	private void returnFile(String fileName) {
@@ -256,5 +301,18 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	 */
 	public void annotateCommand(ICommand command) {
 		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
+	}
+	
+	private void serviceUnavailable(Exception e)
+	{
+		System.err.println("The File Service is unavailable.\n QUITTING!");			
+		System.err.println(e.getMessage());
+	}
+	
+	private IFileService getFileService() throws UnavailableServiceException
+	{
+		JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
+		IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		return service;
 	}
 }
