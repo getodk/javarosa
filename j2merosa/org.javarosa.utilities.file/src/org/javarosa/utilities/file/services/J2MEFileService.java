@@ -2,10 +2,17 @@ package org.javarosa.utilities.file.services;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Vector;
 import java.util.Enumeration;
+import java.util.Date;
+
+import javax.microedition.io.Connector;
+import javax.microedition.io.file.FileConnection;
+import javax.microedition.io.file.FileSystemRegistry;
 
 import org.javarosa.utilities.file.FileException;
+
 
 /**
  * 
@@ -16,7 +23,7 @@ import org.javarosa.utilities.file.FileException;
 
 public class J2MEFileService implements IFileService 
 {
-	private static final String serviceName = "J2MEFileService";
+	public static final String serviceName = "J2MEFileService";
 	
 	public String getName()
 	{
@@ -31,43 +38,53 @@ public class J2MEFileService implements IFileService
 	public boolean createDirectory(String path) throws FileException 
 	{		
 		FileConnection directory = null;
-		try {
-			directory = (FileConnection) Connector.open(path);
-			if (!directory.exists())
-				directory.mkdir();
-		}
-		catch(IOException ex) 
-		{
-			//handleException(ex);
-			throw new FileException("An error occurred with creating a directory.");
-			return false;
-		}
-		finally {
-			close(directory);
-		}
-		return true;
-	}
-	
-	public boolean deleteDirectory(String path) throws FileException
-	{
-		FileConnection directory = null;
+		boolean dirCreated = false;
 		try 
 		{
-			directory = (FileConnection)Connector.open(path);
-			if(!directory.exists())
-				directory.rmdir();
+			directory = (FileConnection) Connector.open(path);
+			if (!directory.exists())
+			{
+				directory.mkdir();
+				dirCreated = true;
+			}
 		}
 		catch(IOException ex) 
 		{
 			//handleException(ex);
-			throw new FileException("An error occurred with deleting a directory.");
-			return false;
+			dirCreated = false;
+			throw new FileException("An error occurred with creating a directory.");			
 		}
 		finally 
 		{
 			close(directory);
 		}
-		return true;
+		return dirCreated = false;
+	}
+	
+	public boolean deleteDirectory(String path) throws FileException
+	{
+		FileConnection directory = null;
+		boolean dirDeleted = false;
+		try 
+		{
+			directory = (FileConnection)Connector.open(path);
+			if(directory.exists() && directory.isDirectory())
+			{
+				directory.delete();
+				dirDeleted = true;
+			}
+		}
+		catch(IOException ex) 
+		{
+			//handleException(ex);
+			dirDeleted = false;
+			throw new FileException("An error occurred when deleting a directory.");			
+		}
+		finally 
+		{
+			close(directory);
+		}
+		return dirDeleted;
 	}	
 	
 	/**
@@ -75,8 +92,7 @@ public class J2MEFileService implements IFileService
 	 * @return
 	 */
 	public String[] getRootNames() throws FileException
-	{
-		
+	{		
 		return enumtoStringArr( FileSystemRegistry.listRoots() );
 	}
 	
@@ -86,7 +102,9 @@ public class J2MEFileService implements IFileService
 	 */
 	public String getDefaultRoot() throws FileException 
 	{
-		Enumeration root = getRootNames();
+		Vector v = new Vector();		
+		addArrtoVec(v, getRootNames());
+		Enumeration root = v.elements();
 		String rootName = "";
 		while (root.hasMoreElements()) {
 			rootName = (String) root.nextElement();
@@ -96,12 +114,38 @@ public class J2MEFileService implements IFileService
 	
 	private static String[] enumtoStringArr(Enumeration enumer)
 	{
-		ArrayList enumerationList = new ArrayList();
+		Vector enumerationList = new Vector();
 		Enumeration e = enumer;
 		while(e.hasMoreElements())
-			(String)e.nextElement();
+			enumerationList.addElement( (String)e.nextElement() );
 		
-		return (String[])enumerationList.toArray();
+		return vectorToStringArr(enumerationList);
+	}
+	
+	private static Object[] vectorToArr(Vector vec)
+	{
+		int vecSize = vec.size();
+		Object[] arr = new Object[vecSize];
+		for(int i = 0; i < vecSize; ++i)		
+			arr[i] = vec.elementAt(i);
+		
+		return arr;
+	}
+	
+	private static String[] vectorToStringArr(Vector vec)
+	{
+		int vecSize = vec.size();
+		String[] arr = new String[vecSize];
+		for(int i = 0; i < vecSize; ++i)		
+			arr[i] = (String)vec.elementAt(i);
+		
+		return arr;
+	}
+	
+	private static void addArrtoVec(Vector vec, Object[] arr)
+	{
+		for(int i = 0; i < arr.length; ++i)
+			vec.addElement(arr[i]);
 	}
 	
 	public String[]/*Enumeration*/ listDirectory(String directoryPath) throws FileException 
@@ -110,8 +154,7 @@ public class J2MEFileService implements IFileService
 		System.out.println("Listing the contents of: " + directoryPath);
 		try
 		{
-			dir = (FileConnection)Connector.open(directoryPath);
-			return enumtoStringArr(dir.list());
+			dir = (FileConnection)Connector.open(directoryPath);			
 		} 
 		catch(IOException ioe)
 		{
@@ -138,6 +181,18 @@ public class J2MEFileService implements IFileService
 		{
 			close(dir);			
 		}
+		if(dir != null)
+		{
+			try
+			{
+				return enumtoStringArr(dir.list());
+			}
+			catch(IOException ioe)
+			{
+				throw new FileException("Error listing directory components.");
+			}
+		}
+		return null; //THIS SHOULD NEVER HAPPEN!!!
 	}	
 	
 	/**
@@ -151,26 +206,29 @@ public class J2MEFileService implements IFileService
 		OutputStream fos = null;
 		FileConnection file = null;
 		boolean isSaved = false;
-		try {
+		try 
+		{
 			file = (FileConnection) Connector.open(fullName);
-			if (!file.exists()) {
-				file.create();
+			if (!file.exists()) 
+			{
+				file.create();				
 			}				
 			fos = file.openOutputStream();
 			fos.write(data);
+			isSaved = true;
 		} 
 		catch(IOException ex) 
 		{				
 			//handleException(ex);
-			throw new FileException("Error creating file.");
-			return false;
+			isSaved = false;
+			throw new FileException("Error creating file.");			
 		} 
 		finally 
 		{		
 			close(fos);
 			close(file);
 		}
-		return true;
+		return isSaved;
 	}
 	
 	/**
@@ -181,9 +239,11 @@ public class J2MEFileService implements IFileService
 	{		
 		FileConnection file = null;
 		boolean isSaved = false;
-		try {
+		try 
+		{
 			file = (FileConnection) Connector.open(fileName);
-			if (file.exists()) {
+			if (file.exists()) 
+			{
 				file.delete();
 				return true;
 			}				
@@ -279,7 +339,7 @@ public class J2MEFileService implements IFileService
 		{
 			file = (FileConnection)Connector.open(fileName);
 			fis = file.openInputStream();
-			return fis;
+			//return fis;
 		} 
 		catch(Exception ex) 
 		{				
@@ -290,7 +350,8 @@ public class J2MEFileService implements IFileService
 		{		
 			close(file);
 		}
-		return null;
+		//return null;
+		return fis;
 	}	
 
 	/**
@@ -305,10 +366,12 @@ public class J2MEFileService implements IFileService
 			directory = directory + "/";
 		}
 		String toReturn = directory;
-		try {
-			
+		try 
+		{			
 			Date latestFoundDate = getModifiedDate(directory);
-			Enumeration filesBelow = listDirectory(directory);
+			Vector v = new Vector();
+			addArrtoVec(v, listDirectory(directory) );
+			Enumeration filesBelow = v.elements();
 			// this is not very efficient and could be significantly tweaked if
 			// desired. Does way too many trips up and down the tree.
 			while (filesBelow.hasMoreElements()) {
@@ -332,10 +395,15 @@ public class J2MEFileService implements IFileService
 			if (toReturn != directory) {
 				return getMostRecentlyModifiedDirectoryBelow(toReturn);
 			}
-		} catch(IOException e) 
+		} 
+		catch(IOException e) 
 		{
 			handleException(e);
 			toReturn = null;
+		}
+		catch(FileException fe)
+		{
+			
 		}
 		return toReturn;
 	}	
@@ -368,8 +436,11 @@ public class J2MEFileService implements IFileService
 		try {
 			file = (FileConnection) Connector.open(fileName);
 			Date toReturn = new Date(file.lastModified());
-			if (file.isDirectory()) {
-				Enumeration filesBelow = listDirectory(fileName);
+			if (file.isDirectory()) 
+			{
+				Vector v = new Vector();
+				addArrtoVec(v, listDirectory(fileName) );
+				Enumeration filesBelow = v.elements();
 				while (filesBelow.hasMoreElements()) {
 					String subFileName = (String) filesBelow.nextElement();
 					String fullPathConstructed = fileName + subFileName;
