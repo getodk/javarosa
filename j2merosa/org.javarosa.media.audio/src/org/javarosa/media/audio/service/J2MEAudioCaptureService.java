@@ -19,7 +19,7 @@ import java.io.IOException;
 
 public class J2MEAudioCaptureService implements IAudioCaptureService 
 {
-	private final String serviceName = "J2MEAudioCaptureService";
+	public static final String serviceName = "J2MEAudioCaptureService";
 	private int serviceState;
 	
 	private Player recordP;
@@ -145,12 +145,16 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	}
 	
 	//Closes all types of streams that are used
-	public void closeStreams()
+	public void closeStreams() throws IOException
 	{
 		if(recordP != null)
 			recordP.close();
 		if(playP != null)
 			playP.close();
+		if(recordedInputStream != null)
+			recordedInputStream.close();
+		if(audioDataStream != null)
+			audioDataStream.close();
 		serviceState = IAudioCaptureService.CLOSED;
 	}
 }
