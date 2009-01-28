@@ -1,6 +1,7 @@
 package org.javarosa.utilities.file.services;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.javarosa.core.services.IService;
 import org.javarosa.utilities.file.FileException;
@@ -95,4 +96,12 @@ public interface IFileService extends IService
 	 * @throws FileException
 	 */
 	public InputStream getFileDataStream(String fileName) throws FileException;
+	
+	/**
+	 * 
+	 * @param fileName to retrieve opened OutputStream
+	 * @return access to the output stream created by the file
+	 * @throws FileException
+	 */
+	public OutputStream getFileOutputStream(String fileName) throws FileException;
 }

@@ -154,7 +154,8 @@ public class J2MEFileService implements IFileService
 		System.out.println("Listing the contents of: " + directoryPath);
 		try
 		{
-			dir = (FileConnection)Connector.open(directoryPath);			
+			dir = (FileConnection)Connector.open(directoryPath);
+			return enumtoStringArr(dir.list());
 		} 
 		catch(IOException ioe)
 		{
@@ -180,18 +181,7 @@ public class J2MEFileService implements IFileService
 		finally 
 		{
 			close(dir);			
-		}
-		if(dir != null)
-		{
-			try
-			{
-				return enumtoStringArr(dir.list());
-			}
-			catch(IOException ioe)
-			{
-				throw new FileException("Error listing directory components.");
-			}
-		}
+		}		
 		return null; //THIS SHOULD NEVER HAPPEN!!!
 	}	
 	
@@ -236,25 +226,30 @@ public class J2MEFileService implements IFileService
 	 * @param fileName
 	 */
 	public boolean deleteFile(String fileName) throws FileException 
-	{		
-		FileConnection file = null;
-		boolean isSaved = false;
+	{
+		FileConnection file = null;		
 		try 
 		{
-			file = (FileConnection) Connector.open(fileName);
-			if (file.exists()) 
+			file = (FileConnection)Connector.open(fileName);
+			if(file.exists()) 
 			{
+				System.err.println(fileName + " exists");
 				file.delete();
 				return true;
-			}				
-		} 
+			}
+			else
+			{
+				System.err.println(fileName + " does not exist");
+			}
+		}
 		catch(IOException ioe)
 		{
-			throw new FileException("Error deleing file.");
+			handleException(ioe);
+			throw new FileException("Error deleting file.");
 		}
 		catch(Exception ex)
-		{				
-			handleException(ex);
+		{		
+			//handleException(ex);
 		} 
 		finally {		
 			close(file);
@@ -352,7 +347,28 @@ public class J2MEFileService implements IFileService
 		}
 		//return null;
 		return fis;
-	}	
+	}
+	
+	public OutputStream getFileOutputStream(String fileName) throws FileException
+	{
+		OutputStream fos = null;
+		FileConnection file = null;		
+		try 
+		{
+			file = (FileConnection)Connector.open(fileName);
+			if (!file.exists())
+			{
+				file.create();				
+			}				
+			fos = file.openOutputStream();			
+		} 
+		catch(IOException ex) 
+		{
+			handleException(ex);
+			throw new FileException("Error creating file.");			
+		}
+		return fos;
+	}
 
 	/**
 	 * Gets the directory with the most recent changes below the one passed in.
@@ -374,25 +390,32 @@ public class J2MEFileService implements IFileService
 			Enumeration filesBelow = v.elements();
 			// this is not very efficient and could be significantly tweaked if
 			// desired. Does way too many trips up and down the tree.
-			while (filesBelow.hasMoreElements()) {
+			while (filesBelow.hasMoreElements()) 
+			{
 				FileConnection subFile = null;
 				String subFileName = (String) filesBelow.nextElement();
-				try {
+				try 
+				{
 					String fullPathConstructed = directory + subFileName;
 					subFile = (FileConnection) Connector.open(fullPathConstructed);
-					if (subFile.isDirectory()) {
+					if (subFile.isDirectory()) 
+					{
 						// continue otherwise
 						Date subFileDate = getModifiedDateRecursive(fullPathConstructed);
-						if (subFileDate.getTime() > latestFoundDate.getTime()) {
+						if (subFileDate.getTime() > latestFoundDate.getTime()) 
+						{
 							latestFoundDate = subFileDate;
 							toReturn = fullPathConstructed;
 						}
 					}
-				} finally {
+				} 
+				finally
+				{
 					close(subFile);
 				}
 			}
-			if (toReturn != directory) {
+			if (toReturn != directory) 
+			{
 				return getMostRecentlyModifiedDirectoryBelow(toReturn);
 			}
 		} 
@@ -403,7 +426,8 @@ public class J2MEFileService implements IFileService
 		}
 		catch(FileException fe)
 		{
-			
+			System.err.println("An error occurred while attempting to get most recently modified directory below.");
+			fe.printStackTrace();			
 		}
 		return toReturn;
 	}	
@@ -498,7 +522,7 @@ public class J2MEFileService implements IFileService
 	private static void handleException(Exception ex) 
 	{
 		// TODO Auto-generated method stub
-		System.out.println("Exception caught in J2MEFileService" + ex.getMessage());
+		System.out.println("Exception caught in " + serviceName + ex.getMessage());
 		ex.printStackTrace();
 	}
 
