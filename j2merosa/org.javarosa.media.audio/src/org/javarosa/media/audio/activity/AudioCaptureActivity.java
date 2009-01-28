@@ -324,6 +324,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  form.removeCommand(stopCommand); //"Hide" stopCommand when recording desires to resume
 		  form.addCommand(recordCommand);
 		  form.addCommand(playCommand);
+		  form.addCommand(eraseCommand);
 		  form.addCommand(finishCommand);
 		  
 		  messageItem.setText("Stopping the Recorder...");
@@ -348,7 +349,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  form.addCommand(playCommand);
 		  form.addCommand(recordCommand);
 		  form.addCommand(saveCommand);
-		  
+		  form.addCommand(eraseCommand);		  
 	  }
 	  
 	  public FileDataPointer getRecordedAudio()
