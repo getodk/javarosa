@@ -163,6 +163,7 @@ public class FileUtility
 			fis = file.openInputStream();
 			int bytesRead = 0;
 			int blockSize = 1024;
+			/* RL - Should this be "while (bytesToRead >= bytesRead)"? */
 			while (bytesToRead > bytesRead) {
 				int thisBlock = blockSize;
 				if (bytesToRead - bytesRead < blockSize) {
@@ -224,7 +225,10 @@ public class FileUtility
 		FileConnection file = null;
 		try {
 			file = (FileConnection) Connector.open(fileName);
-			fis = file.openInputStream();
+			//RL - Ideally we would test for whether this is a text or a binary file
+			//However, it's hard to be certain. We default to binary, since at the least
+			//this will not mess up our MD5sums.
+			fis = file.openDataInputStream();
 			return fis;
 		} catch (Exception ex) {				
 			handleException(ex);
@@ -369,7 +373,7 @@ public class FileUtility
 		FileConnection file = null;
 		try {
 			file = (FileConnection) Connector.open(fileName);
-			return file.availableSize();
+			return file.fileSize();
 		} catch (Exception ex) {				
 			handleException(ex);
 		} 
