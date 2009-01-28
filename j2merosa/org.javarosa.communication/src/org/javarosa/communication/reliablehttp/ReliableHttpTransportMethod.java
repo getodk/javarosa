@@ -18,6 +18,7 @@ import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
+import org.javarosa.core.util.MD5InputStream;
 import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.http.HttpTransportDestination;
 import org.javarosa.communication.http.HttpHeaderAppendingVisitor;
@@ -37,7 +38,6 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 
     //RL: Temporary values until we start using timeouts
     private static final int MAX_NUM_RETRIES = 7; 
-    private static final int MD5 = 999; 
 
     /*
 	 * (non-Javadoc)
@@ -60,6 +60,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		private HttpConnection con = null;
 		private InputStream in = null;
 		private OutputStream out = null;
+		private String md5;
 		
 		private TransportMessage message;
 		
@@ -107,7 +108,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
     
     			HttpTransportDestination destination = (HttpTransportDestination)message.getDestination();
 			
-    			reliableHttpPost(destination.getURL(),MD5,
+    			reliableHttpPost(destination.getURL(),
 		            visitor.getOverallContentType(),httpload);		
 
 				// update status
@@ -153,6 +154,26 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 			}
 		}
 
+		private void process(InputStream in) throws IOException {
+            int len = (int) con.getLength();
+            if (len > 0) {
+                int actual = 0;
+                int bytesread = 0;
+                byte[] data = new byte[len];
+                while ((bytesread != len) && (actual != -1)) {
+                    actual = in.read(data, bytesread, len - bytesread);
+                    bytesread += actual;
+                }
+                process(data);
+            } else {
+                int ch;
+                while ((ch = in.read()) != -1) {
+                    process((byte) ch);
+                }
+            }
+        }
+
+		
 		private void process(byte data) {
 			System.out.print(data);
 			byte[] temp = new byte[1];
@@ -172,9 +193,14 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		 * Sends a header of the form
 		 * POST /upload HTTP/1.1 / Host: example.com / If-Match: "vEpr6barcD" / Content-Length: 100 / Content-Range: 0-99/100
 		 */
-		private void reliableHttpPost(String url, int MD5, String contentType, IDataPayload pl)
+		private void reliableHttpPost(String url, String contentType, IDataPayload pl)
 		    throws IOException, OtherIOException {
-            InputStream in = pl.getPayloadStream();
+
+		    InputStream in = pl.getPayloadStream();
+		    md5 = (new MD5InputStream(in)).getHashCode();
+		    in.close();
+		    
+            in = pl.getPayloadStream();
 
 		    //Eventually we will use timeouts instead of maximum number of retries
 		    int numTries = 0;
@@ -184,10 +210,12 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 sendFailed = false;
 
                 if(!isNotReliableServer){
-                    int lastByte = reliableRequestLastByte(url, MD5);
+                    int lastByte = reliableRequestLastByte(url, md5);
                     if (lastByte == -1 ){
                         isNotReliableServer = true;
-                    } else {
+                    } else if( lastByte>0 ){
+                        //If the file has already been sent, then we do not send it again
+                        if(lastByte >= pl.getLength()) return;
                         in.skip(lastByte);
                     }
                 }
@@ -200,7 +228,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                     con.setRequestMethod(HttpConnection.POST);
                     setDefaultRequestProperties(con);
                     con.setRequestProperty("Content-Type",contentType);
-                    con.setRequestProperty("If-Match",String.valueOf(MD5));
+                    con.setRequestProperty("If-Match",md5);
                     out = con.openOutputStream(); // Problem exists here on 3110c CommCare Application: open hangs
                 //#if debug.output==verbose || debug.output==exception
                 } catch (IOException e){
@@ -222,15 +250,14 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                     int responseCode = con.getResponseCode();
                     String ETag = con.getHeaderField("ETag");
                     if (responseCode != HttpConnection.HTTP_OK){
-                        //RL: todo - verify that this is the *correct* MD5
-                        if (ETag != null){ 
+                        if (ETag == null || !md5.equalsIgnoreCase(ETag) ){ //Java supports short-circuit evaluations
+                            //The server has generated some unknown response code
+                            throw new OtherIOException("IOEXCEPTION: Server response code: " + responseCode);    //feel free to change this back 
+                        }
+                        else { 
                             //If the ETag is valid, this indicates the server knows the reliablehttp protocol
                             //So we should try to resend
                             sendFailed = true;
-                        }
-                        else{
-                            //The server has generated some unknown response code
-                            throw new OtherIOException("IOEXCEPTION: Server response code: " + responseCode);       //CHANGE THIS BACK                 
                         }
                     }
                 } catch (IOException e){ 
@@ -256,25 +283,10 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 }                   
                 
                 in.close();
-                in = con.openInputStream();              
-                
-                // Get the length and process the data
-                int len = (int) con.getLength();
-                if (len > 0) {
-                    int actual = 0;
-                    int bytesread = 0;
-                    byte[] data = new byte[len];
-                    while ((bytesread != len) && (actual != -1)) {
-                        actual = in.read(data, bytesread, len - bytesread);
-                        bytesread += actual;
-                    }
-                    process(data);
-                } else {
-                    int ch;
-                    while ((ch = in.read()) != -1) {
-                        process((byte) ch);
-                    }
-                }
+                in = con.openInputStream();   
+
+                // Process the HTTP response
+                process(in);
                 break;
             }
    		}
@@ -286,7 +298,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		* Content-Range: bytes *\/100
 		* @returns "-1" if not byte received
 		*/
-		private int reliableRequestLastByte (String url, int MD5) throws IOException{
+		private int reliableRequestLastByte (String url, String md5) throws IOException{
 		    //send out request
 		    int numTries = 0;
 		    int r = -1;
@@ -298,7 +310,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
     	            setDefaultRequestProperties(con);
     	            //RL: todo - We probably need to request the correct Content-Type
     	            //con.setRequestProperty("Content-Type",visitor.getOverallContentType());           
-                    con.setRequestProperty("If-Match", String.valueOf(MD5));
+                    con.setRequestProperty("If-Match", md5 );
                     
     	            OutputStream out = con.openOutputStream(); 
     	            out.flush();
@@ -333,7 +345,8 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		{
 	          String ETag = con.getHeaderField("ETag");
 	          // RL: This should check that ETag == MD5 of file. For now, just checks for non-null.
-	          if (ETag == null) return -1; 
+	          if (ETag == null) return -1;
+	          if (!md5.equalsIgnoreCase(ETag)) return -1; 
               String bytesReceivedByServer = con.getHeaderField("Range");
               if (bytesReceivedByServer==null) return -1;
               int i = bytesReceivedByServer.indexOf('-');

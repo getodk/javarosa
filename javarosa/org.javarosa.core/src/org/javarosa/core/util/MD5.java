@@ -417,10 +417,15 @@ public class MD5 {
 	public final void update( final byte buffer[]) {
 		if( buffer == null )
 			return;
-		this.state = new MD5State();
-		update( state, buffer,0, buffer.length );
+	    update(buffer,0,buffer.length);
 	}
 
+    public final void update( final byte buffer[], int offset, int length) {
+        if( buffer == null )
+            return;
+        update( state, buffer, offset, length );
+    }
+	
 	/**
 	 * Returns array of bytes (16 bytes) representing hash as of the current
 	 * state of this object. Note: getting a hash does not invalidate the hash
