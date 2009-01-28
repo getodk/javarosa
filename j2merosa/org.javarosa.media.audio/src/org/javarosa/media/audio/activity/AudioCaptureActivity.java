@@ -46,13 +46,12 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	private Context currentContext;
 		
 	private IAudioCaptureService recordService;
-	private IFileService fileService;
-	
+		
 	private Command recordCommand, playCommand, stopCommand, backCommand, 
-	                saveCommand, finishCommand;
+	                saveCommand, eraseCommand, finishCommand;
 	private IDisplay display;
-	private ByteArrayOutputStream audioDataStream;
-	private String fullName;
+	private OutputStream audioDataStream;
+	private String fullName, audioFileName;
 	private RecorderForm form;
 	private FileDataPointer recordFile;
 	
@@ -88,16 +87,15 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		messageItem = form.getMessageItem();
 		errorItem = form.getErrorItem();		
 			
-		initCommands();   	
-    	    	
+		initCommands();
+		audioFileName = null;
 		//Display.getDisplay(this).setCurrent(new RecordForm());
 		display.setView(DisplayViewFactory.createView(form));
 		form.setCommandListener(this);
 		
 		try
 		{			
-			recordService = getAudioCaptureService();			 
-			fileService = getFileService();
+			recordService = getAudioCaptureService();			
 		}
 		catch(ClassCastException ce)
 		{
@@ -176,6 +174,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
     	form.addCommand(backCommand);
     	finishCommand = new Command("Finish", Command.OK, 0);
     	saveCommand = new Command("Save", Command.SCREEN, 0);
+    	eraseCommand = new Command("Erase", Command.SCREEN, 0);
 	}
 	
 	public void commandAction(Command comm, Displayable disp)
@@ -201,9 +200,13 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	        }  
 	        catch(AudioException ae) 
 	        {
-	            errorItem.setLabel("Error playing audio");
-	            //errorItem.setText(me.toString());
+	            errorItem.setLabel("Error playing audio");	            
 	            System.err.println(ae.toString());
+	        }
+	        catch(FileException fe)
+	        {
+	        	errorItem.setLabel("Error playing audio");	            
+	            System.err.println(fe.toString());
 	        }
 	    }
 	    //Stop recording or playing audio
@@ -230,33 +233,38 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	    }
 	    else if(comm == saveCommand)
 	    {
-	    	String fileName = "Audio" + counter + ".wav";
+	    	//String fileName = "Audio" + counter + ".wav";
 	    	if(audioDataStream == null)
-	    		audioDataStream = (ByteArrayOutputStream)recordService.getAudio();
-	    	saveFile(fileName, audioDataStream.toByteArray());
+	    		audioDataStream = recordService.getAudio();
+	    	saveFile(audioFileName);
+	    }
+	    else if(comm == eraseCommand)
+	    {
+	    	removeFile();
 	    }
 	}
 	
-	public void recordAudio() throws AudioException, InterruptedException
+	public void recordAudio() throws AudioException, FileException, InterruptedException
 	{
 		  errorItem.setLabel("");
-		  errorItem.setText("");
+		  errorItem.setText("");	  
+		  
 		  recordService.startRecord();
 		
 	      messageItem.setText("Recording...");
 	      
 	      form.removeCommand(recordCommand); //"Hide" recordCommand when recording has stopped
 		  form.addCommand(stopCommand);
-		  form.addCommand(saveCommand);		  
+		  form.addCommand(saveCommand);  
 	}
 	  
-	  public void playAudio() throws AudioException
+	  public void playAudio() throws AudioException, FileException
 	  {
 		  errorItem.setLabel("");
 		  errorItem.setText("");
 		  System.err.println("Attempting to play audio...");		  
 		  messageItem.setText("Starting the Player...");		  
-		  
+		  		  
 		  recordService.startPlayback();
 		  
 		  try
@@ -318,9 +326,9 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  form.addCommand(finishCommand);
 		  
 		  messageItem.setText("Stopping the Recorder...");
-		  audioDataStream = (ByteArrayOutputStream)recordService.getAudio();		  	                     
+		  audioDataStream = recordService.getAudio();		  	                     
 	      
-	      System.err.println("Sound size=" + audioDataStream.toByteArray().length);	      
+	      //System.err.println("Sound size=" + audioDataStream.toByteArray().length);	      
 		  
 	      messageItem.setText("Stopped Recording!");
 	  }
@@ -349,6 +357,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  return recordFile;
 	  }
 	  
+	  /*
 	  private void readFile(String fileName)
 	  {
 		  try
@@ -360,7 +369,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 			  recordFile = new FileDataPointer(fullName);
 			  System.err.println("Successfully read Music file");
 		  
-			  System.out.println("Sound Size =" + recordFile.getData().length);		  
+			  //System.out.println("Sound Size =" + recordFile.getData().length);		  
 		  
 			  finalizeTask();
 		  }
@@ -370,8 +379,9 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 			  fe.printStackTrace();
 		  }
 	  }
+	  */
 	  
-	  private String saveFile(String filename, byte[] sound) 
+	  private String saveFile(String filename) 
 	  {
 		  errorItem.setLabel("");
 		  errorItem.setText("");
@@ -384,8 +394,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 			  
 			  if(recordService.getState() == IAudioCaptureService.CAPTURE_STARTED && recordService.getState() != IAudioCaptureService.CLOSED)
 			  {
-				  stopCapturing();
-				  //recordControl.reset();
+				  stopCapturing();				  
 			  }
 		  }
 		  catch(AudioException ae)
@@ -395,34 +404,55 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		  
 		  try
 		  {
-			  String rootName = fileService.getDefaultRoot();
-			  String restorepath = "file:///" + rootName + "JRSounds";				
-			  fileService.createDirectory(restorepath);
-			  String fullName = restorepath + "/" + filename;
-			  this.fullName = fullName;
-			  if(fileService.createFile(fullName, sound)) 
-			  {
-				  System.out.println("Sound saved to:" + fullName);
-				  messageItem.setText("Saved to:" + fullName);
-				  recordFile = new FileDataPointer(fullName);
-				  ++counter;			
-			
-				  return fullName;
-			  } 
-			  else 
-			  {
-				  System.err.println("Error saving audio.");
-				  errorItem.setText("Error saving audio.");
-				  return "";
-			  }
+			  recordService.saveRecording(audioFileName);
+			  fullName = recordService.getAudioPath();			  	  
 		  }
 		  catch(FileException fe)
 		  {
+			  errorItem.setText("Error saving audio.");
 			  System.err.println(fe);
-			  fe.printStackTrace();
+			  fe.printStackTrace();		  
+			  
+			  return "";
 		  }
 		  
+		  System.out.println("Sound saved to:" + fullName);
+		  messageItem.setText("Saved to:" + fullName);
+		  recordFile = new FileDataPointer(fullName);
+		  form.addCommand(eraseCommand);
+		  
 		  return fullName;
+	  }
+	  
+	  //Removes the captured audio
+	  public void removeFile()
+	  {
+		  errorItem.setLabel("");
+		  errorItem.setText("");
+		  
+		  boolean eraseSucceeded = false;
+		  
+		  try
+		  {
+			  recordService.removeRecording();
+			  eraseSucceeded = true;
+		  }
+		  catch(FileException fe)
+		  {
+			  eraseSucceeded = false;
+			  messageItem.setText("");
+			  errorItem.setText("Error erasing audio");
+			  fe.printStackTrace();
+			  System.err.println("Error erasing captured audio!");
+		  }
+		  if(eraseSucceeded)
+		  {
+			  messageItem.setText("Erased audio at " + fullName);
+			  recordFile = null;
+			  form.removeCommand(eraseCommand);
+			  form.removeCommand(saveCommand);
+			  form.removeCommand(playCommand);
+		  }		  		  
 	  }
 	  
 	  //Go back one screen
@@ -460,18 +490,13 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  //Retrieve a reference to the appropriate available service
 	  private IAudioCaptureService getAudioCaptureService() throws UnavailableServiceException
 	  {
+		  //#if app.useJ2MEAudioLib
 		  JavaRosaServiceProvider.instance().registerService(new J2MEAudioCaptureService());  
 		  IAudioCaptureService audioCaptureService = (J2MEAudioCaptureService)JavaRosaServiceProvider.instance().getService(J2MEAudioCaptureService.serviceName);
+		  //#endif
+		  		  
 		  return audioCaptureService;
-	  }	  
-	  
-	  //Retrieve a reference to the first available service
-	  private IFileService getFileService() throws UnavailableServiceException
-	  {
-		  JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
-		  IFileService fileService = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
-		  return fileService;
-	  }
+	  }	  	  
 	  
 	  //Record audio in a separate thread to keep the command listener alert for stopping
 	  public void run()
@@ -485,14 +510,20 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	        	errorItem.setLabel("Error recording audio");
 	        	//errorItem.setText(ae.toString());
 	        	System.err.println(ae.toString());
-	        }		     
+	        }
+	        catch(FileException fe)
+	        {
+	        	errorItem.setLabel("Error recording audio");
+	        	//errorItem.setText(ae.toString());
+	        	System.err.println(fe.toString());
+	        }
 		    catch(InterruptedException ie) 
 		    {
 	            errorItem.setLabel("Error occurred while recording");
 	            //errorItem.setText(ie.toString());
 	            System.err.println(ie.toString());
 	        }
-	  }
+	  }  
 }
 
 class RecorderForm extends Form
