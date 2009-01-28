@@ -285,6 +285,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	      System.err.println("Player has started.");
 	      messageItem.setText("Player has started!");	      
 	      
+	      form.removeCommand(eraseCommand);
 	      form.removeCommand(saveCommand);
 	      form.removeCommand(playCommand); //"Hide" playCommand when playing has started
 	      form.removeCommand(recordCommand); //"Hide" recordCommand when playing has started
