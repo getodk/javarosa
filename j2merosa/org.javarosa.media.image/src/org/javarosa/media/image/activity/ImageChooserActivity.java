@@ -444,8 +444,10 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	
 	private IFileService getFileService() throws UnavailableServiceException
 	{
+		//#if app.usefileconnections
 		JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
 		IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		//#endif
 		return service;
 	}
 	

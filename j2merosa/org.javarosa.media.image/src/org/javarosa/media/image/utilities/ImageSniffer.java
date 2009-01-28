@@ -94,7 +94,7 @@ public class ImageSniffer implements Runnable
 		} 
 		catch(FileException fe)
 		{
-			System.err.println(fe.getMessage());
+			System.err.println(fe.getMessage());			
 			fe.printStackTrace();
 		}
 		catch(Exception e) 
@@ -136,8 +136,10 @@ public class ImageSniffer implements Runnable
 	
 	private IFileService getFileService() throws UnavailableServiceException
 	{
+		//#if app.usefileconnections
 		JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
 		IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		//#endif
 		return service;
 	}
 	
