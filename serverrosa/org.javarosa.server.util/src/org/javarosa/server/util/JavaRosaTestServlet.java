@@ -14,6 +14,7 @@ import java.io.BufferedInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.security.MessageDigest;
 import java.util.Enumeration;
 import java.util.Vector;
 import java.util.Hashtable;
@@ -23,19 +24,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/*
+ * This function requires the existence of the directory
+ * _storageRoot="/usr/share/tomcat5.5/webapps/jrtest/store/" to store temporary files.
+ * It also creates proprietary data chunks labelled *.data
+ * Do not put other files labelled *.data in _storageRoot
+ */
 public class JavaRosaTestServlet extends HttpServlet {
 
 	private static final String HEADER = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\">";
 	private static final String _storageRoot = "/usr/share/tomcat5.5/webapps/jrtest/store/";
-	private static final int maxNumTransmissions = 128;
 	
 	private static final long serialVersionUID = 1L;
 	private String _lastPostParsable = null;
 	private Object _lastFileName;			
 
 	private String _lastError;
-    private Hashtable<Integer,Integer> md5toLastByteRead;
-    private int numTransmissions = 0;
+    private Hashtable<String,Long> md5toLastByteRead;
     
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
@@ -55,7 +60,7 @@ public class JavaRosaTestServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-        int MD5 = 0;
+        String MD5 = null;
 	    
 		// do something smart here
 		try {
@@ -63,17 +68,17 @@ public class JavaRosaTestServlet extends HttpServlet {
 			
 			String postData = "Headers:\n";
 
-			int totalBytesRead = 0;
+			long totalBytesRead = 0;
 			while (headers.hasMoreElements()) {
 				String nextName = (String) headers.nextElement();
 				String nextValue = req.getHeader(nextName);
 				if(nextName.equalsIgnoreCase("If-Match")){
                     resp.addHeader("ETag", nextValue);
-				    MD5 = new Integer(nextValue).intValue();
-	                if (md5toLastByteRead.containsKey(new Integer(MD5))){
-	                	totalBytesRead = md5toLastByteRead.get(new Integer(MD5)).intValue();
+				    MD5 = nextValue;
+	                if (md5toLastByteRead.containsKey(MD5)){
+	                	totalBytesRead = md5toLastByteRead.get(MD5).longValue();
 	                } else {
-		                md5toLastByteRead.put(new Integer(MD5),new Integer(0));	                		                	
+		                md5toLastByteRead.put(MD5,new Long(0));	                		                	
 	                }
 				}
 				postData += nextName + ":" + nextValue + "\n";
@@ -84,16 +89,20 @@ public class JavaRosaTestServlet extends HttpServlet {
 			int bytesRead = stream.read(temp);
 			ByteArrayOutputStream body = new ByteArrayOutputStream();
 			File f;
-			if(MD5!=0) f = new File(_storageRoot + String.valueOf(MD5)+"-in-progress.txt");
+			if(MD5!=null){
+				f = new File(_storageRoot + MD5 +"-complete.data");
+				if (f.exists()) return; //file has already been received correctly
+				f = new File(_storageRoot + MD5 +"-in-progress.data");
+			}
 			else f = new File( this.getNewFileName("jrpost-in-progress" ));
-			boolean isNewDownload = f.createNewFile();
+			if ( !f.exists() ) f.createNewFile();
 			OutputStream output = new BufferedOutputStream(new FileOutputStream(f,true));
-            if (isNewDownload) output.write(postData.getBytes());
+            //if (isNewDownload) output.write(postData.getBytes());
 			try {
 				// FileWriter always assumes default encoding is OK!
 				while (bytesRead != -1) {
 					totalBytesRead += bytesRead;
-					if( MD5 != 0) md5toLastByteRead.put(new Integer(MD5),new Integer(totalBytesRead));
+					if( MD5 != null) md5toLastByteRead.put(MD5,new Long(totalBytesRead));
 					//If we didn't read in a full buffer.
 					if(bytesRead < bufSize) {
 						byte[] newTemp = new byte[bytesRead];
@@ -114,20 +123,21 @@ public class JavaRosaTestServlet extends HttpServlet {
 				output.close();
 			}
 
-			if( MD5 != 0 ){
-    			if( MD5 != hashcode( String.valueOf(MD5) ) ){
+			if( MD5 != null ){
+				String h = hashcode( _storageRoot + String.valueOf(MD5)+"-in-progress.data" );
+    			if( h != null && !MD5.equalsIgnoreCase(h) ){
                     //File transmission was interrupted
                     return;
     			}
     			else {
     				//File transmission is complete
-                    File g = new File(_storageRoot + String.valueOf(MD5)+"-in-progress.txt");
-                    g.renameTo(new File(_storageRoot + String.valueOf(MD5)+"-complete.txt"));
-                    md5toLastByteRead.remove(new Integer(MD5));
+                    File g = new File(_storageRoot + String.valueOf(MD5)+"-in-progress.data");
+                    g.renameTo(new File(_storageRoot + String.valueOf(MD5)+"-complete.data"));
+                    md5toLastByteRead.remove(MD5);
                     body.close();
 
         			body = new ByteArrayOutputStream();
-        			InputStream in = new BufferedInputStream(new FileInputStream(new File(_storageRoot + String.valueOf(MD5)+"-complete.txt")));
+        			InputStream in = new BufferedInputStream(new FileInputStream(new File(_storageRoot + String.valueOf(MD5)+"-complete.data")));
 					bufSize = 8192;
 					temp = new byte[bufSize];
 					bytesRead = in.read(temp);
@@ -172,41 +182,50 @@ public class JavaRosaTestServlet extends HttpServlet {
 	 * Example response is: * HTTP/1.1 308 Resume Incomplete / ETag: "vEpr6barcD" / Content-Length: 0 / Range: 0-42
 	 */
     public void doHead(HttpServletRequest req, HttpServletResponse resp){
-        int MD5 = 0;
+        String storedMD5 = null;
         
         Enumeration headers = req.getHeaderNames();
-        String md5Value = null;
+        String postedMD5 = null;
 
         while (headers.hasMoreElements()) {
             String nextName = (String) headers.nextElement();
             if(nextName.equalsIgnoreCase("If-Match")){
-                md5Value = req.getHeader(nextName);
-                resp.addHeader("ETag", md5Value);
+            	postedMD5 = req.getHeader(nextName);
+                resp.addHeader("ETag", postedMD5);
                 break;
             }
         }
-        if ( md5Value != null ){
-            MD5 = new Integer(md5Value).intValue();
-        	Integer lbr = md5toLastByteRead.get( new Integer(MD5) );
-        	if(lbr==null) return;
-            int lastByteRead = lbr.intValue();
-            if (lastByteRead>0) resp.setHeader("Range", "0-" + String.valueOf(lastByteRead) + "/*" );
+        if ( postedMD5 != null ){
+        	Long lastByteRead = md5toLastByteRead.get( postedMD5 );
+            if (lastByteRead != null) resp.setHeader("Range", "0-" + String.valueOf(lastByteRead) + "/*" );
             else resp.setHeader("Range", "0-0/*" );
             resp.setIntHeader("Content-Length", 0); 
             resp.setStatus(308); //Status : resume incomplete
         }            
     }
 	
-    static int counter=0;
-	public int hashcode(String fileName){
-		counter++;
-	    if(counter%2==1)return 999;
-	    else return 888;
-	    /* File f = new File(fileName);
-        f.createNewFile();
-        BufferedInputStream in = new BufferedInputStream(new FileWriter(f));
-        return hashcode(in);	  
-        */
+	public String hashcode(String fileName){
+		InputStream is = null;
+		try{
+	        MessageDigest digest = MessageDigest.getInstance("MD5");
+	        File f = new File(fileName);
+	        is = new FileInputStream(f);
+
+	        int read;
+	        byte[] buffer=new byte[8192];
+	    	while((read=is.read(buffer))>0){
+	    		digest.update(buffer,0,read);
+	    	}
+	    	return getHexString(digest.digest());
+		} catch (Exception e){
+			return null;
+		} finally {
+			if(is!=null){
+				try{
+					is.close();
+				}catch(IOException e){}
+			}
+		}
 	}
 	
 	
@@ -416,9 +435,25 @@ public class JavaRosaTestServlet extends HttpServlet {
 	}
 
 	public void init() throws ServletException {
-        md5toLastByteRead = new Hashtable<Integer,Integer>();
+        md5toLastByteRead = new Hashtable<String,Long>();
+		//File transmission is complete
+        File dir = new File(_storageRoot);
+        File[] files = dir.listFiles();
+        for (int i=0; i<files.length ; i++){
+        	if (files[i].getName().endsWith(".data")){
+        		md5toLastByteRead.put(files[i].getName().substring(0,32), files[i].length());
+        	}
+        }
 	}
-	
+
+	public static String getHexString(byte[] b) throws Exception {
+		  String result = "";
+		  for (int i=0; i < b.length; i++) {
+		    result +=
+		          Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+		  }
+		  return result;
+		}	
 	//stackoverflow
 	static Vector<Integer> Empty = new Vector<Integer>();
 
