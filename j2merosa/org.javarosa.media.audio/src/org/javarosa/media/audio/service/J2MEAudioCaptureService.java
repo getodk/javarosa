@@ -229,7 +229,9 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 		if(recordingCreated)
 		{
 			try
-			{								
+			{
+				audioDataStream.flush();
+				audioDataStream.close();
 				System.err.println("Recorded Filename=" + recordFileName);
 				fileService.deleteFile(recordFileName);
 				recordFileName = null;
@@ -241,10 +243,13 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 			catch(IOException ie)
 			{
 				System.err.println("Error resetting record control!");
+				System.err.println(ie.getMessage());
 				ie.printStackTrace();			
 			}
 			catch(FileException fe)
-			{			
+			{
+				System.err.println(fe.getMessage());
+				fe.printStackTrace();				
 				throw new FileException("Error removing recorded audio!");
 			}
 		}		
