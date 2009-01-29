@@ -229,7 +229,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			controller.stepQuestion(forwards);
     			return;
     		}
-    	} else if (model.isReadonly(questionIndex)) {
+    	} else if (questionIndex.isInForm() && model.isReadonly(questionIndex)) {
 			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
 			controller.stepQuestion(forwards);
 			return;    		

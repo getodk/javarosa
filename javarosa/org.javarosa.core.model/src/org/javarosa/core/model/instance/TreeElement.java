@@ -511,6 +511,15 @@ public class TreeElement implements Externalizable {
 	
 	/* ==== SERIALIZATION ==== */
 	
+	/* TODO:
+	 * 
+	 * this new serialization scheme is kind of lame. ideally, we shouldn't have to sub-class TreeElement at all; we
+	 * should have an API that can seamlessly represent complex data model objects (like weight history or immunizations) as
+	 * if they were explicity XML subtrees underneath the parent TreeElement
+	 * 
+	 * failing that, we should wrap this scheme in an ExternalizableWrapper
+	 */
+	
 	/*
 	 * (non-Javadoc)
 	 *
