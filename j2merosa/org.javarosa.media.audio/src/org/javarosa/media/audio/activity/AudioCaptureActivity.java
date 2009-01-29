@@ -159,9 +159,9 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		parentShell = shell;		
 	}
 	
-	public void annotateCommand(ICommand c) throws UnsupportedMethodException
+	public void annotateCommand(ICommand c)
 	{
-		throw new UnsupportedMethodException("This method has not been implemented!");
+		throw new RuntimeException("This method has not been implemented in " + getClass()+ "!");
 	}
 	
 	private void initCommands()
