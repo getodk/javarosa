@@ -11,16 +11,16 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.patient.model.Patient;
 
 public class PatientEntity implements IEntity {
-	int recordID;
-	String ID;	
-	String familyName;
-	String givenName;
-	String middleName;
-	int age;	
-	int gender;
+	protected int recordID;
+	protected String ID;	
+	protected String familyName;
+	protected String givenName;
+	protected String middleName;
+	protected int age;	
+	protected int gender;
 		
-	String[] normalizedName;
-	String normalizedID;
+	protected String[] normalizedName;
+	protected String normalizedID;
 	
 	public IEntity factory (int recordID) {
 		PatientEntity pe = new PatientEntity();
