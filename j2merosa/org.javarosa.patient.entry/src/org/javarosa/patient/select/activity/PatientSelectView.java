@@ -35,7 +35,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	//behavior configuration options
 	public boolean sortByName = true; //if false, sort by ID
 	public boolean wrapAround = false; //TODO: support this
-	public int newType = NEW_IN_LIST;
+	public int newMode = NEW_IN_LIST;
 	
 	private PatientSelectActivity controller;
 	public String entityType;
@@ -75,7 +75,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
         firstIndex = 0;
 
         //can't go in constructor, as entityType is not set there yet
-        if (newType == NEW_IN_MENU) {
+        if (newMode == NEW_IN_MENU) {
         	newCmd = new Command("New " + entityType, Command.SCREEN, 4);
         	addCommand(newCmd);
         }
@@ -108,7 +108,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	private void getMatches (String key) {
 		rowIDs = controller.search(key);
 		sortRows();
-		if (newType == NEW_IN_LIST) {
+		if (newMode == NEW_IN_LIST) {
 			rowIDs.addElement(new Integer(INDEX_NEW));
 		}
 	}
@@ -146,7 +146,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	}
 	
 	private boolean listIsEmpty () {
-		return rowIDs.size() == 0 || (rowIDs.size() == 1 && newType == NEW_IN_LIST);
+		return rowIDs.size() == 0 || (rowIDs.size() == 1 && newMode == NEW_IN_LIST);
 	}
 	
 	private int rowID (int i) {
@@ -234,9 +234,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	}
 
 	private void processSelect() {
-		//Jan 26, 2009 - csims@dimagi.com
-		//Don't want to try to access rows if the list doesn't have any.
-		if (!(listIsEmpty() && newType != PatientSelectView.NEW_IN_LIST)) {
+		if (rowIDs.size() > 0) {
 			int rowID = rowID(selectedIndex);
 			if (rowID == INDEX_NEW) {
 				controller.newEntity();
@@ -318,9 +316,6 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 		}
 		
 		if (handled){
-			//Jan 26, 2009 - csims@dimagi.com
-			//what the hell is this?
-			addCommand(new Command("hey", Command.ITEM, 3));
 			return true;
 		} else {
 			return super.handlePointerPressed(x, y);

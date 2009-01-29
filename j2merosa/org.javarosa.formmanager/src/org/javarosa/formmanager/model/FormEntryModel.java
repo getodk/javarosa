@@ -131,7 +131,6 @@ public class FormEntryModel {
     }
     
     public boolean isReadonly (FormIndex questionIndex) {
-    	if(questionIndex.isInForm()) {
     	TreeReference ref = form.getChildInstanceRef(questionIndex);
     	boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
     	    	
@@ -140,11 +139,6 @@ public class FormEntryModel {
     	} else {
         	TreeElement node = form.getDataModel().resolveReference(ref);
         	return !node.isEnabled();
-    	}
-    	} else {
-    		//TODO: Is this the right return value? I'm just assuming so
-    		//since we don't want to screw with these at all.
-    		return false;
     	}
     }
     
