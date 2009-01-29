@@ -231,7 +231,8 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 			try
 			{
 				audioDataStream.flush();
-				audioDataStream.close();
+				closeRecordingStream();
+				//closePlaybackStream();
 				System.err.println("Recorded Filename=" + recordFileName);
 				fileService.deleteFile(recordFileName);
 				recordFileName = null;
@@ -295,6 +296,22 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 		recordFileName = fullName;
 	}	
 	
+	private void closeRecordingStream() throws IOException
+	{
+		if(audioDataStream != null && serviceState == CAPTURE_STOPPED)
+		{			
+			audioDataStream.close();
+		}
+	}
+	
+	private void closePlaybackStream() throws IOException
+	{		
+		if(recordedInputStream != null && serviceState == PLAYBACK_STOPPED)
+		{			
+			recordedInputStream.close();
+		}
+	}
+	
 	//Closes all types of streams that are used
 	public void closeStreams() throws IOException
 	{
@@ -302,14 +319,9 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 			recordP.close();
 		if(playP != null)
 			playP.close();
-		if(recordedInputStream != null)
-			recordedInputStream.close();
+		closeRecordingStream();
+		closePlaybackStream();
 		
-		if(audioDataStream != null)
-		{
-			//audioDataStream.flush();
-			audioDataStream.close();
-		}
 		serviceState = IAudioCaptureService.CLOSED;		
 	}
 }
