@@ -227,7 +227,8 @@ public class J2MEFileService implements IFileService
 	 */
 	public boolean deleteFile(String fileName) throws FileException 
 	{
-		FileConnection file = null;		
+		FileConnection file = null;
+		boolean fileDeleted = false;
 		try 
 		{
 			file = (FileConnection)Connector.open(fileName);
@@ -235,7 +236,7 @@ public class J2MEFileService implements IFileService
 			{
 				System.err.println(fileName + " exists");
 				file.delete();
-				return true;
+				fileDeleted = true;
 			}
 			else
 			{
@@ -243,18 +244,19 @@ public class J2MEFileService implements IFileService
 			}
 		}
 		catch(IOException ioe)
-		{
+		{			
 			handleException(ioe);
 			throw new FileException("Error deleting file.");
 		}
 		catch(Exception ex)
 		{		
-			//handleException(ex);
+			handleException(ex);
 		} 
-		finally {		
+		finally 
+		{		
 			close(file);
 		}
-		return false;
+		return fileDeleted;
 	}
 
 	/**
@@ -366,6 +368,10 @@ public class J2MEFileService implements IFileService
 		{
 			handleException(ex);
 			throw new FileException("Error creating file.");			
+		}
+		finally
+		{
+			close(file);
 		}
 		return fos;
 	}
