@@ -238,7 +238,8 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 				//fileService.deleteDirectory(recordDirectory);
 				recordControl.reset();
 				recordingCreated = false;
-				recordingDeleted = true;				
+				recordingDeleted = true;
+				--counter;
 			}		
 			catch(IOException ie)
 			{
