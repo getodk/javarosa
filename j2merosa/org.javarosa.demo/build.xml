@@ -68,7 +68,7 @@
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
 					<source dir="${basedir}/../org.javarosa.j2me/src/"/>
-					<source dir="${basedir}/../org.javarosa.media.image/src/"/>
+					
 					<!--source dir="${basedir}/../org.javarosa.mesh4j.sync.extensions/src/"/-->
                     <source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
@@ -76,6 +76,7 @@
 					<source dir="${basedir}/../org.javarosa.referral/src/"/>
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
+					<source dir="${basedir}/../org.javarosa.utilities.file/src/"/>
 					<source dir="${basedir}/../org.javarosa.patient/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.patient.entry/src/"/>
