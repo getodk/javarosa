@@ -1,4 +1,4 @@
-package org.javarosa.demo.midlet;
+package org.javarosa.clforms.midlet;
 
 import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
@@ -14,7 +14,7 @@ import org.javarosa.j2me.view.J2MEDisplay;
  * @author Brian DeRenzi
  *
  */
-public class JavaRosaDemoMidlet extends MIDlet {
+public class JavaRosaCLFormsMidlet extends MIDlet {
 	IShell shell = null;
 
 
