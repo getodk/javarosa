@@ -26,26 +26,25 @@ public class RMSRetreivalMethod implements IFormDefRetrievalMethod {
 				if(formContext.getFormID() != -1) {
 					formUtil.retrieveFromRMS(formContext.getFormID(), theForm);
 				} else if(formContext.getFormName() != null) {
-					IRecordStoreEnumeration en = formUtil.enumerateMetaData();
-					FormDefMetaData mdata;
-					while(en.hasNextElement()) {
-						mdata = new FormDefMetaData();
-						byte[] record = en.nextRecord();
-						ExtUtil.deserialize(record, mdata);
-						if(mdata.getName().equals(formContext.getFormName())) {
-							formUtil.retrieveFromRMS(mdata.getRecordId(), theForm);
-						}
-					}
-					
+					formUtil.retrieveFromRMS(formUtil.getIDfromName(formContext.getFormName()), theForm);
 				}
-				return theForm;
+				//TODO: Better heuristic for whether retrieval worked!
+				if(theForm.getID() != -1) {
+					return theForm;
+				} else {
+					String error = "Form loader couldn't retrieve form for ";
+					if(formContext.getFormID() != -1) {
+						error += " ID = " + formContext.getFormID();
+					} else if(formContext.getFormName() != null) {
+						error += " Name = " + formContext.getFormName();
+					}
+					throw new RuntimeException(error);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (DeserializationException uee) {
 				uee.printStackTrace();
-			} catch (RecordStorageException e) {
-				e.printStackTrace();
-			}
+			} 
 		}
 		return null;
 	}
