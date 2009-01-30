@@ -129,15 +129,14 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 		try {
 			Vector pendingVector = ref.getPendingReferrals();
 			
-			int elementNum = 0;
-			
 			Enumeration en = pendingVector.elements();
 			while(en.hasMoreElements()) {
 				PatientReferral referral = (PatientReferral)en.nextElement();
 				Patient patient = new Patient();
 				pat.retrieveFromRMS(referral.getPatientId(), patient);
 				
-				pending.set(elementNum, patient.getInitials() + " - " + referral.getType() + " - " + referral.getDateReferred(), null);
+				pending.append(patient.getInitials() + " - " + referral.getType() + " - " + referral.getDateReferred(), null);
+				//TODO: Enforce that these two numbers are the same.
 				this.pendingRefs.addElement(referral);
 			}
 			
