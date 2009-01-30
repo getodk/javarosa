@@ -22,6 +22,10 @@ public class ReferralsDetailView extends Form implements IView {
 	
 	public void setReferral(PatientReferral ref) {
 		this.ref = ref;
+		//TODO: Get patient info here somehow.
+		this.append("Name: " + ref.getPatientId());
+		this.append("Date of Referral: " + ref.getDateReferred());
+		this.append("Referral Type: " + ref.getType());
 	}
 	
 	public PatientReferral getReferral() {
