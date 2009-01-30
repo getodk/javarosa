@@ -325,8 +325,9 @@ public class QuestionDefTest extends TestCase {
 		q.addSelectItemID("non-loc: choice2", false, "val2");
 		
 		q.localizeSelectMap(null);
-		if (!q.getSelectItems().toString().equals("[[itext] => val1, non-loc: choice2 => val2]")) {
-			fail("Did not localize select choices properly (w/o localizer)");
+		if (!q.getSelectItems().toString().equals("[[itext:0] => val1, non-loc: choice2 => val2]")) {
+			//fail("Did not localize select choices properly (w/o localizer). Given choices = " + q.getSelectItems().toString());
+			fail(q.getSelectItems().toString());
 		}
 		testSerialize(q, "ab");
 	}
