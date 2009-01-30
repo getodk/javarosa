@@ -42,7 +42,7 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 	PendingReferralsView pending;
 	ReferralsDetailView details;
 	
-	private static final Command EXIT = new Command("Exit", Command.EXIT, 1);
+	private static final Command EXIT = new Command("Back", Command.EXIT, 1);
 	private static final Command SELECT = new Command("Select", Command.ITEM, 1);
 	
 	public static final Command RESOLVE = new Command("Resolve", Command.ITEM, 1);
@@ -105,13 +105,19 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 				//TODO: Get patient here.
 				details = new ReferralsDetailView("Referral for ");
 				details.setReferral(ref);
+				
+				details.addCommand(EXIT);
+				details.addCommand(RESOLVE);
+				
+				details.setCommandListener(this);
+				
 				shell.setDisplay(this, details);
 			}
 		} else if(view.equals(details)) {
 			if(com.equals(EXIT)) {
 				shell.setDisplay(this, pending);
 			} else if(com.equals(RESOLVE)) {
-				returnArgs.put(RESOLVE, details.getReferral().getReferralId());
+				returnArgs.put(RESOLVE, details.getReferral());
 				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
 			}
 		}
