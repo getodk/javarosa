@@ -1,4 +1,4 @@
-package org.javarosa.demo.shell;
+package org.javarosa.clforms.shell;
 
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;

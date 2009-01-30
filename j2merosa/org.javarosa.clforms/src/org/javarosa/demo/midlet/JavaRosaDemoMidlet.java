@@ -4,9 +4,9 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import org.javarosa.clforms.shell.JavaRosaCLFormsShell;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IShell;
-import org.javarosa.demo.shell.JavaRosaCLFormsShell;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 /**

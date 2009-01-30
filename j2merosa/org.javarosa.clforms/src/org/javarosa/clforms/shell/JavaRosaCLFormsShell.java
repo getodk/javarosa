@@ -1,4 +1,4 @@
-package org.javarosa.demo.shell;
+package org.javarosa.clforms.shell;
 
 import java.util.Hashtable;
 
