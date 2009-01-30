@@ -13,7 +13,7 @@ import org.javarosa.core.model.utils.IModelProcessor;
  */
 public class PatientEntryContext extends Context {
 	public static final String TITLE_KEY = "pec_tk";
-	public static final String PROCESSOR_KEY = "pec_tk";
+	public static final String PROCESSOR_KEY = "pec_pk";
 
 	public PatientEntryContext(Context context) {
 		super(context);
