@@ -97,6 +97,7 @@ public class JavaRosaDemoShell implements IShell {
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/shortform.xhtml"));
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
 			formDef.writeToRMS(XFormUtils.getFormFromResource("/condtest.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
 		}
 		initTestPatients((PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName()));
 	}

@@ -4,8 +4,8 @@
        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
        xmlns:jr="http://openrosa.org/javarosa">
 
-<h:title>New Patient Registration</h:title>
-<meta jr:name="jr-patient-single-reg"/>
+<h:title>Batch Patient Registration</h:title>
+<meta jr:name="jr-patient-batch-reg"/>
 
 <model>
     
@@ -31,13 +31,13 @@
 	</patients>
 </instance>
 
-<bind nodeset="patient/name/family" required="true()" />		
-<bind nodeset="patient/name/given" required="true()" />	
-<bind nodeset="patient/sex" required="true()" />	
-<bind nodeset="patient/dob" type="xsd:date" required="true()" />
-<bind nodeset="patient/treatment-start" type="xsd:date" />
-<bind nodeset="patient/weight-history/reading/weight" type="xsd:int" required="true()" />
-<bind nodeset="patient/weight-history/reading/taken-on" type="xsd:date" required="true()" />
+<bind nodeset="patients/patient/name/family" required="true()" />		
+<bind nodeset="patients/patient/name/given" required="true()" />	
+<bind nodeset="patients/patient/sex" required="true()" />	
+<bind nodeset="patients/patient/dob" type="xsd:date" required="true()" />
+<bind nodeset="patients/patient/treatment-start" type="xsd:date" />
+<bind nodeset="patients/patient/weight-history/reading/weight" type="xsd:int" required="true()" />
+<bind nodeset="patients/patient/weight-history/reading/taken-on" type="xsd:date" required="true()" />
 
 <itext>
   <translation lang="English">
