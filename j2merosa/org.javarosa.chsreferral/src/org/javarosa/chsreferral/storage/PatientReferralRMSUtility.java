@@ -62,4 +62,33 @@ public class PatientReferralRMSUtility extends RMSUtility {
 		
 		return pending;
 	}
+	
+	public PatientReferral getRecordFromUid(String uid) throws DeserializationException {
+		PatientReferral ref;
+		IRecordStoreEnumeration en = this.enumerateRecords();
+		while(en.hasNextElement()) {
+			try {
+				ref = this.retrieveFromRMS(en.nextRecordId());
+				
+				if(ref.getReferralId().equals(uid)) {
+					return ref;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new DeserializationException("Could not deserialize a referral from the RMS");
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+				throw new DeserializationException("Could not deserialize a referral from the RMS");
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+				throw new DeserializationException("Could not deserialize a referral from the RMS");
+			} catch (RecordStorageException e) {
+				e.printStackTrace();
+				throw new DeserializationException("Could not deserialize a referral from the RMS");
+			}
+			
+		}
+		
+		return null;
+	}
 }
