@@ -12,6 +12,7 @@ import org.javarosa.core.services.StorageManager;
 import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.transport.storage.RmsStorage;
+import org.javarosa.core.util.InactivityMonitor;
 import org.javarosa.core.util.PrefixTree;
 import org.javarosa.core.util.externalizable.CannotCreateObjectException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -38,6 +39,8 @@ public class JavaRosaServiceProvider {
 	
 	Hashtable services;
 	private PrefixTree prototypes;
+	
+	private InactivityMonitor imon;
 	
 	public JavaRosaServiceProvider() {
 		services = new Hashtable();
@@ -154,4 +157,26 @@ public class JavaRosaServiceProvider {
 	public PrefixTree getPrototypes () {
 		return prototypes;
 	}
+	
+//	public void enableInactivityTimeout (int seconds) {
+//		imon = new InactivityMonitor(this, seconds);
+//	}
+//	
+//	public void activateInactivityTimeout () {
+//		if (imon != null) {
+//			imon.activate();
+//		}
+//	}
+//
+//	public void deactivateInactivityTimeout () {
+//		if (imon != null) {
+//			imon.deactivate();
+//		}
+//	}
+//
+//	public void notifyActivity () {
+//		if (imon != null) {
+//			imon.notifyActivity();
+//		}
+//	}
 }
