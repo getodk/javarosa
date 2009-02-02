@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.model.data.DateData;
@@ -14,6 +15,8 @@ import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.Map;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -64,6 +67,9 @@ public class Patient implements Externalizable, IDRecordable {
 
 	/* String->NumericListData */
 	private Map records = new Map();
+	
+	/* String->String */
+	private Hashtable singles = new Hashtable();
 	
 	//For now we're statically encoding record types.
 	private NumericListData weightRecord = new NumericListData();
@@ -430,7 +436,9 @@ public class Patient implements Externalizable, IDRecordable {
 		vaccinationData = new ImmunizationData();
 		vaccinationData.readExternal(in, pf);
 		
-		records = ExternalizableHelperDeprecated.readExternalStringValueMap(in, NumericListData.class);		
+		records = ExternalizableHelperDeprecated.readExternalStringValueMap(in, NumericListData.class);
+		//singles = ExternalizableHelperDeprecated.readExternalStringValueMap(in, String.class);
+		singles = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -450,6 +458,7 @@ public class Patient implements Externalizable, IDRecordable {
 		vaccinationData.writeExternal(out);
 		
 		ExternalizableHelperDeprecated.writeExternalStringValueMap(out, records);
+		ExtUtil.write(out, new ExtWrapMap(singles));
 	}
 	/** 
 	 * Gets a list of patient attributes.
@@ -474,6 +483,17 @@ public class Patient implements Externalizable, IDRecordable {
 	
 	public void setId(Integer id){
 		setPatientId(id);
+	}
+	
+	//NOTE: This class is still super-shoddy. The things below aren't really well written.
+	//The system of attributes and individual values should be written, well, _better_.
+	
+	public void setValue(String type, String value) {
+		singles.put(type, value);
+	}
+	
+	public String getValue(String type) {
+		return (String)singles.get(type);
 	}
 	
 	/**
