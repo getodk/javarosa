@@ -302,7 +302,11 @@ public class Patient implements Externalizable, IDRecordable {
 			} else {
 				return null;
 			}
-		}else {
+		} else if ("fullName".equals(recordType)) {
+			return new StringData(getName());
+		} else if ("ID".equals(recordType)) {
+			return new StringData(patientIdentifier);
+		} else {
 			//TODO: We need to figure out how to do these references better
 			return null;
 		}
