@@ -180,14 +180,6 @@ public class LoginForm extends Form implements IView
 	     return "userNotFound";
 	   }
 
-	   //*this method returns an Alert that states that the login was unsuccessful. @see validateUser()*/
-	   public javax.microedition.lcdui.Alert tryAgain() {
-	     javax.microedition.lcdui.Alert error = new javax.microedition.lcdui.Alert("Login Incorrect", "Please try again", null, AlertType.ERROR);
-
-	     System.out.println("error alert returned");
-	     return error;
-	   }
-
 	   public javax.microedition.lcdui.Alert successfulLogin() {
 		     javax.microedition.lcdui.Alert success = new javax.microedition.lcdui.Alert("Login Successful", "Loading your profile", null, AlertType.CONFIRMATION);
 		     return success;

@@ -7,8 +7,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
@@ -63,12 +66,7 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
 						returnArgs);
 			} else {
-				// /display an error that login failed and return to login
-				// screen
-				final javax.microedition.lcdui.Alert error = loginScreen.tryAgain();
-				parent.setDisplay(this, new IView() {public Object getScreenObject() { return error;}});
-				parent.setDisplay(this, this.loginScreen);
-
+				showError("Login Incorrect", "Please try again");
 			}
 		}
 		//#if javarosa.login.demobutton
@@ -76,14 +74,7 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 			//#if debug.output==verbose
 			System.out.println("demo button on login screen 1!");
 			//#endif
-			Hashtable returnArgs = new Hashtable();
-			returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
-			User u = new User();
-			u.setUsername(User.DEMO_USER);	// NOTE: Using a user type as a username also!
-			u.setUserType(User.DEMO_USER);
-			returnArgs.put(USER, u);
-			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-					returnArgs);
+			showError("Demo Mode", "You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.", this);			
 		}
 		//#endif
 		System.out.println("");
@@ -118,6 +109,19 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 
 	}
 
+	private void showError (String title, String message) {
+		showError(title, message, null);
+	}
+	
+    private void showError(String title, String message, CommandListener cl) {
+    	//#style mailAlert
+    	final Alert alert = new Alert(title, message, null, AlertType.ERROR);
+    	alert.setTimeout(Alert.FOREVER);
+    	if (cl != null)
+    		alert.setCommandListener(cl);
+    	parent.setDisplay(this, new IView() {public Object getScreenObject() { return alert; }});
+    }
+    
 	public void commandAction(Command c, Displayable d) {
 		if (c == loginScreen.CMD_CANCEL_LOGIN) {
 			Hashtable returnArgs = new Hashtable();
@@ -136,12 +140,7 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 						returnArgs);
 			} 
 			else {
-				// /display an error that login failed and return to login
-				// screen
-				final javax.microedition.lcdui.Alert error = loginScreen.tryAgain();
-				parent.setDisplay(this, new IView() {public Object getScreenObject() { return error;}});
-				parent.setDisplay(this, this.loginScreen);
-
+				showError("Login Incorrect", "Please try again");
 			}
 		}
 		//#if javarosa.login.demobutton
@@ -149,6 +148,11 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 			//#if debug.output==verbose
 			System.out.println("demo button on login screen 2!");
 			//#endif
+			
+			showError("Demo Mode", "You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.", this);			
+		} else if (d instanceof Alert) {
+			//returning from demo mode warning popup
+			
 			Hashtable returnArgs = new Hashtable();
 			returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
 			User u = new User();
