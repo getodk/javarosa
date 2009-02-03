@@ -14,6 +14,7 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.chsreferral.model.PatientReferral;
 import org.javarosa.chsreferral.storage.PatientReferralRMSUtility;
+import org.javarosa.chsreferral.util.PendingReferralsContext;
 import org.javarosa.chsreferral.view.PendingReferralsView;
 import org.javarosa.chsreferral.view.ReferralsDetailView;
 import org.javarosa.core.Context;
@@ -35,7 +36,7 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 	
 	IShell shell;
 	
-	Context context;
+	PendingReferralsContext context;
 	
 	Vector pendingRefs = new Vector();
 	
@@ -127,6 +128,7 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 	 * @see org.javarosa.core.api.IActivity#start(org.javarosa.core.Context)
 	 */
 	public void start(Context context) {
+		this.context = new PendingReferralsContext(context);
 		PatientReferralRMSUtility ref = (PatientReferralRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientReferralRMSUtility.getUtilityName());
 		PatientRMSUtility pat = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
 		
@@ -138,12 +140,15 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 			Enumeration en = pendingVector.elements();
 			while(en.hasMoreElements()) {
 				PatientReferral referral = (PatientReferral)en.nextElement();
-				Patient patient = new Patient();
-				pat.retrieveFromRMS(referral.getPatientId(), patient);
-				
-				pending.append(patient.getInitials() + " - " + referral.getType() + " - " + referral.getDateReferred(), null);
-				//TODO: Enforce that these two numbers are the same.
-				this.pendingRefs.addElement(referral);
+				if (this.context.getPatientId() == -1 || (referral.getPatientId() == this.context.getPatientId())) {
+					Patient patient = new Patient();
+					pat.retrieveFromRMS(referral.getPatientId(), patient);
+					pending.append(patient.getInitials() + " - "
+							+ referral.getType() + " - "
+							+ referral.getDateReferred(), null);
+					// TODO: Enforce that these two numbers are the same.
+					this.pendingRefs.addElement(referral);
+				}
 			}
 			
 			pending.addCommand(EXIT);
