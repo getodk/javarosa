@@ -77,6 +77,8 @@ public class PatientReferral implements Externalizable, IDRecordable {
 		this.dateReferred = ExtUtil.readDate(in);
 		this.referralId = ExtUtil.readString(in);
 		this.patientId = ExtUtil.readInt(in);
+		this.recordId = ExtUtil.readInt(in);
+		this.pending = ExtUtil.readBool(in);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
@@ -84,6 +86,8 @@ public class PatientReferral implements Externalizable, IDRecordable {
 		ExtUtil.writeDate(out, dateReferred);
 		ExtUtil.writeString(out, referralId);
 		ExtUtil.writeNumeric(out, patientId);
+		ExtUtil.writeNumeric(out, recordId);
+		ExtUtil.writeBool(out, pending);
 	}
 
 	public void setRecordId(int recordId) {

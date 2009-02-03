@@ -140,7 +140,7 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 			Enumeration en = pendingVector.elements();
 			while(en.hasMoreElements()) {
 				PatientReferral referral = (PatientReferral)en.nextElement();
-				if (this.context.getPatientId() == -1 || (referral.getPatientId() == this.context.getPatientId())) {
+				if (referral.isPending() && (this.context.getPatientId() == -1 || (referral.getPatientId() == this.context.getPatientId()))) {
 					Patient patient = new Patient();
 					pat.retrieveFromRMS(referral.getPatientId(), patient);
 					pending.append(patient.getInitials() + " - "

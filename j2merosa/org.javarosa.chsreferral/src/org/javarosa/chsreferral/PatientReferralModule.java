@@ -22,7 +22,6 @@ public class PatientReferralModule implements IModule {
 	public void registerModule(Context context) {
 		PatientReferralRMSUtility refRms = new PatientReferralRMSUtility(PatientReferralRMSUtility.getUtilityName());
 		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(refRms);
-
 	}
 
 }
