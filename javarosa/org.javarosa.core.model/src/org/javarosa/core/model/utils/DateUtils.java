@@ -417,7 +417,7 @@ public class DateUtils {
 	 * @return A string representing n, which has pad - #digits(n)
 	 * 0's preceding the number.
 	 */
-	private static String intPad (int n, int pad) {
+	public static String intPad (int n, int pad) {
 		String s = String.valueOf(n);
 		while (s.length() < pad)
 			s = "0" + s;

@@ -86,6 +86,7 @@ public class PatientEntryActivity implements IActivity {
 			
 			int patID =((Integer) this.context.getElement("PATIENT_ID")).intValue();
 			returnVals.put(NEW_PATIENT_ID, new Integer(patID));
+			returnVals.put("DATA_MODEL", globalContext.getElement("DATA_MODEL"));
 			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
 					returnVals);
 		}
