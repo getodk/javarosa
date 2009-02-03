@@ -5,6 +5,7 @@ import java.util.Vector;
 import org.javarosa.core.Context;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.utils.IModelProcessor;
 import org.javarosa.core.model.utils.IPreloadHandler;
 
 public class FormEntryContext extends Context {
@@ -15,6 +16,7 @@ public class FormEntryContext extends Context {
 	public static final String FUNCTION_HANDLERS = "FUNCTION_HANDLERS";
 	public static final String READ_ONLY = "fec_ro";
 	public static final String FIRST_QUESTION_INDEX = "fec_fqi";
+	public static final String MODEL_PROCESSOR_KEY = "fec_modelproc";
 	
 	public FormEntryContext(Context context) { 
 		super(context);
@@ -88,6 +90,13 @@ public class FormEntryContext extends Context {
 	
 	public FormIndex getFirstQuestionIndex() {
 		return (FormIndex)getElement(FIRST_QUESTION_INDEX);
-		
+	}
+	
+	public void setModelProcessor(IModelProcessor proc) {
+		this.setElement(MODEL_PROCESSOR_KEY, proc);
+	}
+	
+	public IModelProcessor getModelProcessor() {
+		return (IModelProcessor)this.getElement(MODEL_PROCESSOR_KEY);
 	}
 }

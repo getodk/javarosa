@@ -22,6 +22,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultiPointerAnswerData;
 import org.javarosa.core.model.data.PointerAnswerData;
+import org.javarosa.core.model.utils.IModelProcessor;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.controller.IControllerHost;
 import org.javarosa.formmanager.model.FormEntryModel;
@@ -61,6 +62,8 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	private LoadingScreenActivity loadingScreen = null;
 	
 	private int instanceID = -1;
+	
+	private IModelProcessor processor;
 
 	/** Loading error string **/
 	private final static String LOAD_ERROR = "Deepest Apologies. The form could not be loaded.";
@@ -138,6 +141,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		if (context instanceof FormEntryContext) {
 			this.context = (FormEntryContext) context;
 			this.instanceID = this.context.getInstanceID();
+			this.processor = this.context.getModelProcessor();
 		}
 		
 		// Start the loading screen
@@ -184,6 +188,12 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			returnArgs.put("FORM_COMPLETE", new Boolean(model.isFormComplete()));
 			returnArgs.put("QUIT_WITHOUT_SAVING", new Boolean(!model.isSaved()));
 
+			if(processor != null && model.isFormComplete() && model.isSaved()) {
+				processor.initializeContext(this.context);
+				processor.processModel(model.getForm().getDataModel());
+				processor.loadProcessedContext(this.context);
+			}
+			
 			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
 		} else if (Constants.ACTIVITY_TYPE_GET_IMAGES.equals(status)) {
 			Hashtable returnArgs = new Hashtable();
