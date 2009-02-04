@@ -60,8 +60,7 @@ public class PatientEntryActivity implements IActivity {
 	 * @see org.javarosa.core.api.IActivity#getActivityContext()
 	 */
 	public Context getActivityContext() {
-		// TODO Auto-generated method stub
-		return null;
+		return context;
 	}
 
 	/* (non-Javadoc)

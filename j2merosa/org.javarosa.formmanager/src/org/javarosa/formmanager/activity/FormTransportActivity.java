@@ -290,14 +290,7 @@ public class FormTransportActivity implements
 				returnForDestination();
 				break;
 			case SubmitScreen.SEND_LATER:
-				String userNotify = "Form has been saved. Check 'Saved Forms' list";
-				 alert = new Alert("Saved!!!",userNotify,null,AlertType.INFO);
-				 alert.setCommandListener(this);
-				shell.setDisplay(this,new IView() {public Object getScreenObject() {return alert;}});
-				// If we're going to send later, no reason to be in the
-				// transport activity
-				//shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-					//null);
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
 				break;
 			}
 
@@ -397,12 +390,6 @@ public class FormTransportActivity implements
 			submitStatusScreen.destroy();
 			submitStatusScreen = null;
 			shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
-		}
-		else if(d == alert)
-		{
-			if(c == alert.DISMISS_COMMAND) {
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,null);
-			}
 		}
 	}
 
