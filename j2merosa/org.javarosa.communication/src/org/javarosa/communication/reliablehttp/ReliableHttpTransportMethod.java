@@ -37,8 +37,8 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 	private IActivity destinationRetrievalActivity;
 	private ReliableWorkerThread primaryWorker;
 
-    //RL: Temporary values until we start using timeouts
     private static final int MAX_NUM_RETRIES = 7; 
+    private static final int DELAY_BEFORE_RETRY = 1000; 
     private static final int MAX_NUM_TRANSMISSIONS = 100; 
     private Object messageLock = new Object();
 
@@ -79,6 +79,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		//addMessage is not synchronized because we do not want to block any requests to append messages
 		public void addMessage(TransportMessage message) {
 		    if( messageQ.size()<=MAX_NUM_TRANSMISSIONS ){
+		        //Later: when writing to RMS ensure checks for when RMS is full.
 		        messageQ.addElement(message);
 		    } else {
 		        //RL - This is how errors are handled below. But it doesn't actually seem to generate an Alert
@@ -87,7 +88,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 System.out.println("Error! Too many transmissions requested" );
                 //#endif      		        
 		    }
-		    //also check to see if the same message is being sent multiple times
+		    //optional: check to see if the same message is being sent multiple times
 		}
 		
 		
@@ -236,7 +237,6 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		    
             in = pl.getPayloadStream();
 
-		    //Eventually we will use timeouts instead of maximum number of retries
 		    int numTries = 0;
             boolean sendFailed, isNotReliableServer = false;
             while (numTries<MAX_NUM_RETRIES){
@@ -244,6 +244,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 sendFailed = false;
 
                 if(!isNotReliableServer){
+                    //Request last byte received by server
                     int lastByte = reliableRequestLastByte(url, md5);
                     if (lastByte == -1 ){
                         isNotReliableServer = true;
@@ -284,7 +285,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                     int responseCode = con.getResponseCode();
                     String ETag = con.getHeaderField("ETag");
                     if (responseCode != HttpConnection.HTTP_OK){
-                        if (ETag == null || !md5.equalsIgnoreCase(ETag) ){ //Java supports short-circuit evaluations
+                        if (ETag == null || !md5.equalsIgnoreCase(ETag) ){
                             //The server has generated some unknown response code
                             throw new OtherIOException("IOEXCEPTION: Server response code: " + responseCode);    //feel free to change this back 
                         }
@@ -301,21 +302,20 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 if (sendFailed) {
                     cleanUp(out);
                     cleanUp(con);
-                    //Ask the server to transmit the last byte it has received
                     cleanUp(in);
                     in = pl.getPayloadStream();
                     try{
                         // many network errors are transient, so it's good to give a little buffer between re-tries
-                        Thread.sleep(1000);
+                        Thread.sleep(DELAY_BEFORE_RETRY);
                     } catch (InterruptedException e){}
                     continue;
                 }
-                //At this point, we have successfully transmitted the whole file and gotten a final ACK
                 if( numTries == MAX_NUM_RETRIES ){
                     //The connection is truly foo-bar'd. Give up. 
                     throw new IOException("Max num retransmits exceeded");
                 }                   
                 
+                //At this point, we have successfully transmitted the whole file and gotten a final ACK
                 in.close();
                 in = con.openInputStream();   
 
@@ -356,7 +356,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		            cleanUp(con);
                     // many network errors are transient, so it's good to give a little buffer between re-tries
                     try{
-                        Thread.sleep(5000);
+                        Thread.sleep(DELAY_BEFORE_RETRY);
                     } catch (InterruptedException e2){}
 		            continue;
 		        }
@@ -378,7 +378,6 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		private int readLastByteReceived(HttpConnection con) throws IOException
 		{
 	          String ETag = con.getHeaderField("ETag");
-	          // RL: This should check that ETag == MD5 of file. For now, just checks for non-null.
 	          if (ETag == null) return -1;
 	          if (!md5.equalsIgnoreCase(ETag)) return -1; 
               String bytesReceivedByServer = con.getHeaderField("Range");
