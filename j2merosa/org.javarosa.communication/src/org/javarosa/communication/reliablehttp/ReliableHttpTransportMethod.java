@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.Thread;
+import java.util.Vector;
 
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
@@ -38,6 +39,8 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 
     //RL: Temporary values until we start using timeouts
     private static final int MAX_NUM_RETRIES = 7; 
+    private static final int MAX_NUM_TRANSMISSIONS = 100; 
+    private Object messageLock = new Object();
 
     /*
 	 * (non-Javadoc)
@@ -46,10 +49,18 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 	 */
 	public void transmit(TransportMessage message, ITransportManager manager) {
 		cacheURL(message);		
+        //manager is not used for anything. Once it is, we can include its relevant data in the messageQueue
 		this.manager = manager;
-		primaryWorker = new ReliableWorkerThread();
-		primaryWorker.setMessage(message);	
-		new Thread(primaryWorker).start();
+		
+		synchronized(messageLock){
+		    if(primaryWorker==null || !(primaryWorker.isAlive()) ){
+	            primaryWorker = new ReliableWorkerThread();
+	            primaryWorker.addMessage(message);
+	            new Thread(primaryWorker).start();
+	            return;		        
+		    }
+		    primaryWorker.addMessage(message);
+		}
 	}
 
 	/**
@@ -62,10 +73,21 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		private OutputStream out = null;
 		private String md5;
 		
-		private TransportMessage message;
+		private Vector messageQ = new Vector();
+		private boolean isAlive = true;
 		
-		public void setMessage(TransportMessage message) {
-			this.message  = message;
+		//addMessage is not synchronized because we do not want to block any requests to append messages
+		public void addMessage(TransportMessage message) {
+		    if( messageQ.size()<=MAX_NUM_TRANSMISSIONS ){
+		        messageQ.addElement(message);
+		    } else {
+		        //RL - This is how errors are handled below. But it doesn't actually seem to generate an Alert
+                Alert alert = new Alert("ERROR! Too many transmissions requested", "", null, AlertType.ERROR);
+                //#if debug.output==verbose || debug.output==exception
+                System.out.println("Error! Too many transmissions requested" );
+                //#endif      		        
+		    }
+		    //also check to see if the same message is being sent multiple times
 		}
 		
 		
@@ -100,61 +122,73 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		 * @see java.lang.Thread#run()
 		 */
 		public void run() {
-			
-            try{
-    			IDataPayload payload = message.getPayloadData();
-    			HttpHeaderAppendingVisitor visitor = new HttpHeaderAppendingVisitor();
-    			IDataPayload httpload = (IDataPayload)payload.accept(visitor);
-    
-    			HttpTransportDestination destination = (HttpTransportDestination)message.getDestination();
-			
-    			reliableHttpPost(destination.getURL(),
-		            visitor.getOverallContentType(),httpload);		
+            if(messageQ.isEmpty()) return; 			
+		    while(true){
 
-				// update status
-				message.setStatus(TransportMessage.STATUS_DELIVERED);
-				//#if debug.output==verbose
-				System.out.println("Status: " + message.getStatus());
-				//#endif
-				message.setChanged();
-				message.notifyObservers(message.getReplyloadData());
+		        TransportMessage message = (TransportMessage)messageQ.firstElement();
+	            try{
+	                IDataPayload payload = message.getPayloadData();
+	                HttpHeaderAppendingVisitor visitor = new HttpHeaderAppendingVisitor();
+	                IDataPayload httpload = (IDataPayload)payload.accept(visitor);
+	    
+	                HttpTransportDestination destination = (HttpTransportDestination)message.getDestination();
+	            
+	                reliableHttpPost(destination.getURL(), visitor.getOverallContentType(),
+	                        httpload, message);      
 
-			} catch (ClassCastException e) {
-				Alert alert = new Alert("ERROR! cce", e.getMessage(), null, AlertType.ERROR);
-				throw new IllegalArgumentException(message.getDestination()
-						+ " is not a valid HTTP URL");
-			} catch (IOException e) {
-				Alert alert = new Alert("ERROR! ioe", e.getMessage(), null, AlertType.ERROR);
-				//#if debug.output==verbose || debug.output==exception
-				System.out.println("Error! ioe: " + e.getMessage());
-                e.printStackTrace();
-				//#endif
-			} catch (OtherIOException e){
-                Alert alert = new Alert("ERROR! oioe", e.getMessage(), null, AlertType.ERROR);
-                //#if debug.output==verbose || debug.output==exception
-                System.out.println("Error! oioe: " + e.getMessage() );
-                e.printStackTrace();
-                //#endif			  
-			} catch(java.lang.SecurityException se) {
-				Alert alert = new Alert("ERROR! se", se.getMessage(), null, AlertType.ERROR);
-	             /***
-                 * This exception was added to deal with the user denying access to airtime
-                 */
-			 // update status
-                message.setStatus(TransportMessage.STATUS_FAILED);
-        		//#if debug.output==verbose || debug.output==exception
-                System.out.println("Status: " + message.getStatus());
-                //#endif
-                message.setChanged();
-                message.notifyObservers(null); 
-		    }finally {
-				cleanUp(in);
-				cleanUp(out);
-				cleanUp(con);
-			}
+	                // update status
+	                message.setStatus(TransportMessage.STATUS_DELIVERED);
+	                //#if debug.output==verbose
+	                System.out.println("Status: " + message.getStatus());
+	                //#endif
+	                message.setChanged();
+	                message.notifyObservers(message.getReplyloadData());
+
+	            } catch (ClassCastException e) {
+	                Alert alert = new Alert("ERROR! cce", e.getMessage(), null, AlertType.ERROR);
+	                throw new IllegalArgumentException(message.getDestination()
+	                        + " is not a valid HTTP URL");
+	            } catch (IOException e) {
+	                Alert alert = new Alert("ERROR! ioe", e.getMessage(), null, AlertType.ERROR);
+	                //#if debug.output==verbose || debug.output==exception
+	                System.out.println("Error! ioe: " + e.getMessage());
+	                e.printStackTrace();
+	                //#endif
+	            } catch (OtherIOException e){
+	                Alert alert = new Alert("ERROR! oioe", e.getMessage(), null, AlertType.ERROR);
+	                //#if debug.output==verbose || debug.output==exception
+	                System.out.println("Error! oioe: " + e.getMessage() );
+	                e.printStackTrace();
+	                //#endif              
+	            } catch(java.lang.SecurityException se) {
+	                Alert alert = new Alert("ERROR! se", se.getMessage(), null, AlertType.ERROR);
+	                 /***
+	                 * This exception was added to deal with the user denying access to airtime
+	                 */
+	             // update status
+	                message.setStatus(TransportMessage.STATUS_FAILED);
+	                //#if debug.output==verbose || debug.output==exception
+	                System.out.println("Status: " + message.getStatus());
+	                //#endif
+	                message.setChanged();
+	                message.notifyObservers(null); 
+	            }finally {
+	                cleanUp(in);
+	                cleanUp(out);
+	                cleanUp(con);
+	            }
+		        
+		        synchronized (messageLock){
+		            messageQ.removeElementAt(0);
+		            if(messageQ.isEmpty()){
+		                isAlive = false;
+		                return;
+		            }
+		        }
+		    }   
 		}
 
-		private void process(InputStream in) throws IOException {
+		private void process(InputStream in, TransportMessage message) throws IOException {
             int len = (int) con.getLength();
             if (len > 0) {
                 int actual = 0;
@@ -164,17 +198,17 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                     actual = in.read(data, bytesread, len - bytesread);
                     bytesread += actual;
                 }
-                process(data);
+                process(data, message);
             } else {
                 int ch;
                 while ((ch = in.read()) != -1) {
-                    process((byte) ch);
+                    process((byte) ch, message);
                 }
             }
         }
 
 		
-		private void process(byte data) {
+		private void process(byte data, TransportMessage message) {
 			System.out.print(data);
 			byte[] temp = new byte[1];
 			temp[0] = data;
@@ -182,7 +216,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 			message.setReplyloadData(temp);
 		}
 
-		private void process(byte[] data) {
+		private void process(byte[] data, TransportMessage message) {
 			//#if debug.output==verbose
 			System.out.println(new String(data));
 			//#endif
@@ -193,7 +227,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		 * Sends a header of the form
 		 * POST /upload HTTP/1.1 / Host: example.com / If-Match: "vEpr6barcD" / Content-Length: 100 / Content-Range: 0-99/100
 		 */
-		private void reliableHttpPost(String url, String contentType, IDataPayload pl)
+		private void reliableHttpPost(String url, String contentType, IDataPayload pl, TransportMessage returnMessage)
 		    throws IOException, OtherIOException {
 
 		    InputStream in = pl.getPayloadStream();
@@ -286,7 +320,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 in = con.openInputStream();   
 
                 // Process the HTTP response
-                process(in);
+                process(in, returnMessage);
                 break;
             }
    		}
@@ -386,6 +420,12 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 	        OtherIOException(String msg){
 	            super(msg);
 	        }
+	    }
+	    
+	    private boolean isAlive(){
+	        //RL - for some reason, isAlive() does not produce reliable behaviour. I'm not sure why.
+	        //return Thread.currentThread().isAlive();
+	        return isAlive;
 	    }
 	}
 
