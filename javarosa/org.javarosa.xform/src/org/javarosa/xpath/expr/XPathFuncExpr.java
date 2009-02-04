@@ -121,6 +121,10 @@ public class XPathFuncExpr extends XPathExpression {
 			return DateUtils.roundDate(new Date());
 		} else if (name.equals("now") && args.length == 0) {
 			return new Date();
+		} else if (name.equals("checklist") && args.length >= 2) { //non-standard
+			return checklist(argVals);
+		} else if (name.equals("weighted-checklist") && args.length >= 2 && args.length % 2 == 0) { //non-standard
+			return checklistWeighted(argVals);
 		} else {
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
 			if (handler != null) {
@@ -350,7 +354,7 @@ public class XPathFuncExpr extends XPathExpression {
 			throw new XPathTypeMismatchException("not a nodeset");
 		}	
 	}
-	
+
 	public static Double sum (IFormDataModel model, Object o) {
 		if (o instanceof Vector) {
 			Vector v = (Vector)o;
@@ -363,6 +367,50 @@ public class XPathFuncExpr extends XPathExpression {
 		} else {
 			throw new XPathTypeMismatchException("not a nodeset");
 		}	
+	}
+
+	/*
+	 * arg_0 = min, negative if no min
+	 * arg_1 = max, negative if no max
+	 * arg_2 .. arg_n = true/false values
+	 * 
+	 * returns: true if the number of true values is between min and max
+	 */	
+	public static Boolean checklist (Object[] argVals) {
+		int min = toNumeric(argVals[0]).intValue();
+		int max = toNumeric(argVals[1]).intValue();
+		
+		int count = 0;
+		for (int i = 2; i < argVals.length; i++) {
+			if (toBoolean(argVals[i]).booleanValue())
+				count++;
+		}
+		
+		return new Boolean((min < 0 || count >= min) && (max < 0 || count <= max));
+	}
+
+	/*
+	 * arg_0 = min
+	 * arg_1 = max
+	 * arg_2, arg_4, arg_6, ... arg_(n - 1) = true/false values
+	 * arg_3, arg_5, arg_7, ... arg_n = floating point weights corresponding to arg_(i - 1)
+	 * 
+	 * returns: true if the sum of the weights corresponding to the true values is between min and max
+	 */	
+	public static Boolean checklistWeighted (Object[] argVals) {
+		double min = toNumeric(argVals[0]).doubleValue();
+		double max = toNumeric(argVals[1]).doubleValue();
+		
+		double sum = 0.;
+		for (int i = 2; i < argVals.length; i += 2) {
+			boolean flag = toBoolean(argVals[i]).booleanValue();
+			double weight = toNumeric(argVals[i + 1]).doubleValue();
+			
+			if (flag)
+				sum += weight;
+		}
+		
+		return new Boolean(sum >= min && sum <= max);
 	}
 
 }
