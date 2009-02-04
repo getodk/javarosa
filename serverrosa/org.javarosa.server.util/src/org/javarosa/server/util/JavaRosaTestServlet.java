@@ -90,8 +90,11 @@ public class JavaRosaTestServlet extends HttpServlet {
 			ByteArrayOutputStream body = new ByteArrayOutputStream();
 			File f;
 			if(MD5!=null){
+				/* This chunk of code skips receiving the same file twice.
+				 * However, we allow clients to submit the same file twice.
 				f = new File(_storageRoot + MD5 +"-complete.data");
-				if (f.exists()) return; //file has already been received correctly
+				if (f.exists()) return; 
+				*/
 				f = new File(_storageRoot + MD5 +"-in-progress.data");
 			}
 			else f = new File( this.getNewFileName("jrpost-in-progress" ));
@@ -124,20 +127,24 @@ public class JavaRosaTestServlet extends HttpServlet {
 			}
 
 			if( MD5 != null ){
-				String h = hashcode( _storageRoot + String.valueOf(MD5)+"-in-progress.data" );
-    			if( h != null && !MD5.equalsIgnoreCase(h) ){
+				String localMD5 = hashcode( _storageRoot + String.valueOf(MD5)+"-in-progress.data" );
+    			if( localMD5 != null && !MD5.equalsIgnoreCase(localMD5) ){
                     //File transmission was interrupted
                     return;
     			}
     			else {
     				//File transmission is complete
                     File g = new File(_storageRoot + String.valueOf(MD5)+"-in-progress.data");
-                    g.renameTo(new File(_storageRoot + String.valueOf(MD5)+"-complete.data"));
+                    File h = new File(_storageRoot + String.valueOf(MD5)+"-complete.data");
+                    for( int i=1 ; h.exists() ; i++ ){                    	
+                    	h = new File(_storageRoot + String.valueOf(MD5)+"-"+i+"-complete.data");                    	
+                    }
+                    g.renameTo(h);
                     md5toLastByteRead.remove(MD5);
                     body.close();
 
         			body = new ByteArrayOutputStream();
-        			InputStream in = new BufferedInputStream(new FileInputStream(new File(_storageRoot + String.valueOf(MD5)+"-complete.data")));
+        			InputStream in = new BufferedInputStream(new FileInputStream(h));
 					bufSize = 8192;
 					temp = new byte[bufSize];
 					bytesRead = in.read(temp);
