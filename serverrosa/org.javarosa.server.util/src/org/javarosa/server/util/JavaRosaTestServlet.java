@@ -438,6 +438,7 @@ public class JavaRosaTestServlet extends HttpServlet {
         md5toLastByteRead = new Hashtable<String,Long>();
 		//File transmission is complete
         File dir = new File(_storageRoot);
+        if( !dir.exists() || !dir.canWrite() ) throw new ServletException("storageRoot is not available.");
         File[] files = dir.listFiles();
         for (int i=0; i<files.length ; i++){
         	if (files[i].getName().endsWith(".data")){
