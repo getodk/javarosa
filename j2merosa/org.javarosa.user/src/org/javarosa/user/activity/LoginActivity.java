@@ -74,7 +74,12 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 			//#if debug.output==verbose
 			System.out.println("demo button on login screen 1!");
 			//#endif
-			showError("Demo Mode", "You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.", this);			
+			// TODO: fix this to be properly internationalized stuff...
+			//#if commcare.lang.sw
+			showError("Demo Mode", "Unafungua CommCare kwenye Demo. Demo ni kwa ajili ya mazoezi tu! Fungua kwa kutumia ufunguo kama taarifa hizi ni halisi za mgonjwa", this);
+			//#else
+			showError("Demo Mode", "You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.", this);
+			//#endif
 		}
 		//#endif
 		System.out.println("");
@@ -148,8 +153,11 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 			//#if debug.output==verbose
 			System.out.println("demo button on login screen 2!");
 			//#endif
-			
-			showError("Demo Mode", "You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.", this);			
+			//#if commcare.lang.sw
+			showError("Demo Mode", "Unafungua CommCare kwenye Demo. Demo ni kwa ajili ya mazoezi tu! Fungua kwa kutumia ufunguo kama taarifa hizi ni halisi za mgonjwa", this);
+			//#else
+			showError("Demo Mode", "You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.", this);
+			//#endif			
 		} else if (d instanceof Alert) {
 			//returning from demo mode warning popup
 			
