@@ -103,12 +103,6 @@ public class FormEntryController {
 	        instance.setFormId(form.getRecordId());
 	        instance.setDateSaved(new Date());
 
-	        //notify of save details
-	        //String info = "Form saved to 'Saved Forms' at "+ instance.getDateSaved().toString();
-			//Alert a = new Alert("Save Successful!", info, null, AlertType.INFO);
-			//a.setTimeout(2000);
-			//setDisplay(a);
-
 			if(instanceID == -1) {
 				instanceID = utility.writeToRMS(instance);
 			} else {

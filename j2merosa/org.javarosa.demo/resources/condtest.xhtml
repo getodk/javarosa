@@ -11,6 +11,12 @@
 	<instance>
 		<data xmlns="">
 	
+		<e1 />
+		<e2 />
+		<e3 />
+		<e4 />
+		<econd />
+	
 		<t />
 		<x />
 		<y />
@@ -30,6 +36,12 @@
 		</data>
 	</instance>
 	
+	<bind nodeset="e1" type="xsd:int" />
+	<bind nodeset="e2" type="xsd:int" />
+	<bind nodeset="e3" type="xsd:int" />
+	<bind nodeset="e4" type="xsd:int" />
+	<bind nodeset="econd" relevant="checklist(2, 3, ../e1 > 10, ../e2 > 10, ../e3 > 10, ../e4 > 10)" />
+	
 	<bind nodeset="a" type="xsd:int" />
 	<bind nodeset="b" type="xsd:int" relevant="../a > 3" constraint=". > 10" />
 	<bind nodeset="c" type="xsd:int" relevant="../a > 3" constraint=". > ../b + 5" jr:constraintMsg="you suck" />
@@ -43,6 +55,12 @@
     </model>
 </h:head>			
 <h:body>
+
+<input ref="e1"><label>e1</label></input>
+<input ref="e2"><label>e2</label></input>
+<input ref="e3"><label>e3</label></input>
+<input ref="e4"><label>e4</label></input>
+<input ref="econd"><label>e result</label></input>
 
 <input ref="t"><label>t</label></input>
 <group ref="w">
