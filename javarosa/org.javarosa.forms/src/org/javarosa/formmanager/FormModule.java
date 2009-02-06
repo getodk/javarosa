@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.javarosa.forms;
+package org.javarosa.formmanager;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.api.IModule;
