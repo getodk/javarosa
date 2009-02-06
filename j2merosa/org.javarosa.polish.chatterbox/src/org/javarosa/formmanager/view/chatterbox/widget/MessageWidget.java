@@ -64,4 +64,8 @@ public class MessageWidget implements IWidgetStyleEditable {
 	public int widgetType () {
 		return Constants.CONTROL_TRIGGER;
 	}
+
+	public int getPinnableHeight() {
+		return prompt.getContentHeight();
+	}
 }

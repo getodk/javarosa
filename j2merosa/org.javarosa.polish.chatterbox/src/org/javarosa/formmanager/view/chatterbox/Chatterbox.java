@@ -203,6 +203,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 		for (int i = 0; i < this.size(); ++i) {
 			FormIndex index = this.questionIndexes.get(i);
 			ChatterboxWidget cw = this.getWidgetAtIndex(i);
+
+			//First reset everything by default
+			cw.setPinned(false);
+			
 			if (cw.getViewState() == ChatterboxWidget.VIEW_LABEL) {
 				if (FormIndex.isSubElement(index, questionIndex)) {
 					cw.setPinned(true);
@@ -271,6 +275,11 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		if (activeQuestionIndex.isInForm()) {
     			ChatterboxWidget widget = (ChatterboxWidget)get(questionIndexes.indexOf(activeQuestionIndex, true));
     		
+    			//Feb 4, 2009 - csims@dimagi.com
+    			//The current widget's header should always be pinned in case it overruns the
+    			//screen with options
+    			widget.setPinned(true);
+    			
     			this.focus(widget, true);
     			widget.showCommands();
     		}
@@ -540,8 +549,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 			threshold = this.topFrame.getContentHeight();		
 		}
 		Vector headers = new Vector();
-    	for (int i = 0; i < size() -1; i++) {
-    		ChatterboxWidget cw = getWidgetAtIndex(i);    		
+    	for (int i = 0; i < size(); i++) {
+    		ChatterboxWidget cw = getWidgetAtIndex(i);
     		
     		//If the widget is in the screen area
     		if(cw.getAbsoluteY() + cw.getContentHeight()  > threshold ) {
@@ -553,10 +562,11 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		// Test for whether this is a header, and should be pinned to the top of the screen because it is above
     		// the visible area
     		if(cw.isPinned()) {
-	    		if(cw.getAbsoluteY() + cw.getContentHeight() < threshold ) {
+    			//if(cw.getAbsoluteY() + cw.getContentHeight() < threshold ) {
+	    		if(cw.getAbsoluteY() + cw.getPinnableHeight() < threshold ) {
 	    			//#style questiontext
 	    	    	StringItem item2 = new StringItem("","");
-	    	    	headers.addElement(cw.clone());
+	    	    	headers.addElement(cw.generateHeader());
 	    		}
     		}
     	}
