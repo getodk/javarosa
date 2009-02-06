@@ -36,11 +36,12 @@ public class PatientSelectActivity implements IActivity {
 	
 	public PatientSelectActivity (IShell parent, String title) {
 		this.parent = parent;
+		this.context = new Context();
 		selView = new PatientSelectView(this, title);
 	}
 
 	public void start(Context context) {
-		this.context = context;
+		this.context.mergeInContext(context);
 
 		entityRMS = (RMSUtility)context.getElement(ENTITY_RMS_KEY);
 		entityPrototype = (IEntity)context.getElement(ENTITY_PROTO_KEY);
