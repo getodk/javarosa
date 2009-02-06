@@ -83,4 +83,8 @@ public class CollapsedWidget implements IWidgetStyle {
 	public void setSeekable(boolean seekable) {
 		this.seekable = seekable;
 	}
+
+	public int getPinnableHeight() {
+		return prompt.getContentHeight();
+	}
 }

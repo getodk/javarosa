@@ -41,4 +41,10 @@ public interface IWidgetStyle {
 	 * @return A unique integer ID that will be used to represent this widget type
 	 */
 	int widgetType();
+	
+	/** 
+	 * @return The height of this widget that, when taken off screen, should result
+	 * in a pinned header.
+	 */
+	int getPinnableHeight();
 }

@@ -272,4 +272,20 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 		}
 		return null;
 	}
+	
+	public ChatterboxWidget generateHeader() {
+		//LabelWidget label = (LabelWidget)this.activeStyle
+		LabelWidget labelStyle = new LabelWidget();
+		ChatterboxWidget widget = new ChatterboxWidget(cbox, this.getBinding(), ChatterboxWidget.VIEW_LABEL, labelStyle , null);
+
+		return widget;
+	}
+	
+	/** 
+	 * @return The height of this widget that, when taken off screen, should result
+	 * in a pinned header.
+	 */
+	public int getPinnableHeight() {
+		return this.activeStyle.getPinnableHeight();
+	}
 }

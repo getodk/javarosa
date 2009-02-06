@@ -11,6 +11,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
 
 public abstract class ExpandedWidget implements IWidgetStyleEditable {
+
 	private StringItem prompt;
 	protected Item entryWidget;
 
@@ -70,6 +71,13 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	
 	public Item getInteractiveWidget () {
 		return entryWidget;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle#getPinnableHeight()
+	 */
+	public int getPinnableHeight() {
+		return prompt.getContentHeight();
 	}
 	
 	protected abstract Item getEntryWidget (QuestionDef question);
