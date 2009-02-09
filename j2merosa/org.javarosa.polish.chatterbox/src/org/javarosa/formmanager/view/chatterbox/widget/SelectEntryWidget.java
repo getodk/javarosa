@@ -26,13 +26,19 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 		ChoiceGroup cg = new ChoiceGroup("", style) {
 			public int getRelativeScrollYOffset() {
 				if (!this.enableScrolling && this.parent instanceof Container) {
-					//This line here (The + this.parent.relativeY part) is the fix.
+					
+					// Clayton Sims - Feb 9, 2009 : Had to go through and modify this code again.
+					// The offsets are now accumulated through all of the parent containers, not just
+					// one.
 					Item walker = this.parent;
 					int offset = 0;
+					
+					//Walk our parent containers and accumulate their offsets.
 					while(walker instanceof Container) {
 						offset += walker.relativeY;
 						walker = walker.getParent();
 					}
+					//This line here (The + offest part) is the fix.
 					return ((Container)this.parent).getScrollYOffset() + this.relativeY + offset;
 				}
 				int offset = this.targetYOffset;
