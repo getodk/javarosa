@@ -23,6 +23,7 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.storage.PatientRMSUtility;
@@ -133,6 +134,7 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 		PatientRMSUtility pat = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
 		
 		//TODO: Replace - Maybe with Entity Select Stuff? Seems super-appropriate.
+		//droos: yes it does
 		pending = new PendingReferralsView("Pending Referrals");
 		try {
 			Vector pendingVector = ref.getPendingReferrals();
@@ -145,7 +147,7 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 					pat.retrieveFromRMS(referral.getPatientId(), patient);
 					pending.append(patient.getInitials() + " - "
 							+ referral.getType() + " - "
-							+ referral.getDateReferred(), null);
+							+ DateUtils.formatDate(referral.getDateReferred(), DateUtils.FORMAT_HUMAN_READABLE_SHORT), null);
 					// TODO: Enforce that these two numbers are the same.
 					this.pendingRefs.addElement(referral);
 				}

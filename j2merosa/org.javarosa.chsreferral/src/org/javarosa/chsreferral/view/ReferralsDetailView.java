@@ -3,10 +3,17 @@
  */
 package org.javarosa.chsreferral.view;
 
+import java.io.IOException;
+
 import javax.microedition.lcdui.Form;
 
 import org.javarosa.chsreferral.model.PatientReferral;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
+import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.patient.model.Patient;
+import org.javarosa.patient.storage.PatientRMSUtility;
 
 /**
  * @author Clayton Sims
@@ -22,15 +29,23 @@ public class ReferralsDetailView extends Form implements IView {
 	
 	public void setReferral(PatientReferral ref) {
 		this.ref = ref;
-		//TODO: Get patient info here somehow.
+		
+		PatientRMSUtility prms = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
+		Patient p = new Patient();
+		try {
+			prms.retrieveFromRMS(ref.getPatientId(), p);
+		} catch (IOException e) {
+		} catch (DeserializationException e) {
+		}
+				
 		// Putting it in swahili.
 		//#if commcare.lang.sw
-		this.append("Jina: " + ref.getPatientId()); // Name
-		this.append("Tarehe ya rufaa: " + ref.getDateReferred()); // Date of referral
+		this.append("Jina: " + p.getName()); // Name
+		this.append("Tarehe ya rufaa: " + DateUtils.formatDate(ref.getDateReferred(), DateUtils.FORMAT_HUMAN_READABLE_SHORT)); // Date of referral
 		this.append("Aina ya rufaa: " + ref.getType()); // Referral type
 		//#else
-		this.append("Name: " + ref.getPatientId()); // Name
-		this.append("Date of referral: " + ref.getDateReferred()); // Date of referral
+		this.append("Name: " + p.getName()); // Name
+		this.append("Date of referral: " + DateUtils.formatDate(ref.getDateReferred(), DateUtils.FORMAT_HUMAN_READABLE_SHORT)); // Date of referral
 		this.append("Referral type: " + ref.getType()); // Referral type
 		//#endif
 	}
