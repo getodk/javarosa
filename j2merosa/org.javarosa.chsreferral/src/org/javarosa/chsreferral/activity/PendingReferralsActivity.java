@@ -122,7 +122,7 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 				shell.setDisplay(this, pending);
 			} else if(com.equals(RESOLVE)) {
 				returnArgs.put(RESOLVE, details.getReferral());
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs); //shouldn't this be ACTIVITY_NEEDS_RESOLUTION?
 			}
 		}
 	}
