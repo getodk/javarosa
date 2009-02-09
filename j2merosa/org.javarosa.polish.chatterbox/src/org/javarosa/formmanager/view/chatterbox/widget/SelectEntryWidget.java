@@ -27,7 +27,13 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 			public int getRelativeScrollYOffset() {
 				if (!this.enableScrolling && this.parent instanceof Container) {
 					//This line here (The + this.parent.relativeY part) is the fix.
-					return ((Container)this.parent).getScrollYOffset() + this.relativeY + this.parent.relativeY;
+					Item walker = this.parent;
+					int offset = 0;
+					while(walker instanceof Container) {
+						offset += walker.relativeY;
+						walker = walker.getParent();
+					}
+					return ((Container)this.parent).getScrollYOffset() + this.relativeY + offset;
 				}
 				int offset = this.targetYOffset;
 				//#ifdef polish.css.scroll-mode
