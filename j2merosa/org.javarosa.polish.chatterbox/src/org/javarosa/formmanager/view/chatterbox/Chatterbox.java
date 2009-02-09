@@ -278,7 +278,9 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			//Feb 4, 2009 - csims@dimagi.com
     			//The current widget's header should always be pinned in case it overruns the
     			//screen with options
-    			widget.setPinned(true);
+    			//Feb 9, 2009 - csims@dimagi.com
+    			//behaves strangely with the 3110c sized screens. Disabling for now.
+    			//widget.setPinned(true);
     			
     			this.focus(widget, true);
     			widget.showCommands();
