@@ -41,10 +41,12 @@ public class ReferralsDetailView extends Form implements IView {
 		// Putting it in swahili.
 		//#if commcare.lang.sw
 		this.append("Jina: " + p.getName()); // Name
+		this.append("Namba: " + p.getPatientIdentifier());
 		this.append("Tarehe ya rufaa: " + DateUtils.formatDate(ref.getDateReferred(), DateUtils.FORMAT_HUMAN_READABLE_SHORT)); // Date of referral
 		this.append("Aina ya rufaa: " + ref.getType()); // Referral type
 		//#else
 		this.append("Name: " + p.getName()); // Name
+		this.append("ID: " + p.getPatientIdentifier());
 		this.append("Date of referral: " + DateUtils.formatDate(ref.getDateReferred(), DateUtils.FORMAT_HUMAN_READABLE_SHORT)); // Date of referral
 		this.append("Referral type: " + ref.getType()); // Referral type
 		//#endif
