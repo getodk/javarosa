@@ -34,10 +34,19 @@ public class RMSProvider implements IStorageProvider
      */
     public void registerRMSUtility(RMSUtility utility)
     {
-        if (this.RMSRegistry.containsKey(utility.getName()))
+    	registerRMSUtility(utility, utility.getName());
+    }
+    
+    public void registerRMSUtility(RMSUtility utility, String name) {
+        if (this.RMSRegistry.containsKey(name))
             return;
     
-        this.RMSRegistry.put(utility.getName(), utility);            
+        this.RMSRegistry.put(name, utility);            
+    	
+    }
+    
+    public void unregisterRMSUtility(RMSUtility utility, String name) {
+    	this.RMSRegistry.remove(name);
     }
     
     /**
