@@ -4,6 +4,7 @@
 package org.javarosa.chsreferral.activity;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -27,6 +28,7 @@ import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.storage.PatientRMSUtility;
+import org.javarosa.xpath.expr.XPathFuncExpr;
 
 /**
  * @author Clayton Sims
@@ -145,9 +147,16 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 				if (referral.isPending() && (this.context.getPatientId() == -1 || (referral.getPatientId() == this.context.getPatientId()))) {
 					Patient patient = new Patient();
 					pat.retrieveFromRMS(referral.getPatientId(), patient);
-					pending.append(patient.getInitials() + " - "
+					
+					String ID = patient.getPatientIdentifier();
+					String shortID = ID.substring(Math.max(ID.length() - 2, 0)); //this logic is duplicated from CommCarePatientEntity!
+					
+					int daysAgo = (int)(XPathFuncExpr.toNumeric(new Date()).doubleValue() - XPathFuncExpr.toNumeric(referral.getDateReferred()).doubleValue());
+					String daysAgoStr = (daysAgo < 0 ? "From the futurrrrrre" : daysAgo == 0 ? "Today" : daysAgo == 1 ? "Yesterday" : daysAgo + " days ago");
+					
+					pending.append(patient.getInitials() + " - " + shortID + " - "
 							+ referral.getType() + " - "
-							+ DateUtils.formatDate(referral.getDateReferred(), DateUtils.FORMAT_HUMAN_READABLE_SHORT), null);
+							+ daysAgoStr, null);
 					// TODO: Enforce that these two numbers are the same.
 					this.pendingRefs.addElement(referral);
 				}
