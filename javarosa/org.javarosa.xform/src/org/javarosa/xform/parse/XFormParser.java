@@ -700,7 +700,7 @@ public class XFormParser {
 
 			String textID = (form == null ? id : id + ";" + form);  //kind of a hack
 			if (l.hasMapping(locale, textID))
-				throw new XFormParseException("duplicate definition for text ID and form");
+				throw new XFormParseException("duplicate definition for text ID \"" + id + "\" and form \"" + form + "\"");
 			l.setLocaleMapping(locale, textID, data);
 		}
 	}
