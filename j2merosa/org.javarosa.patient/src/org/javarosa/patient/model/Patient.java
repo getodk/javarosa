@@ -242,17 +242,16 @@ public class Patient implements Externalizable, IDRecordable {
 	public String getInitials() {
 		String s="";
 
-		if(getFamilyName() != null && getFamilyName().length() > 0)
-			s += getFamilyName().toLowerCase().charAt(0);
+		if(getGivenName() != null && getGivenName().length() > 0)
+			s += getGivenName().charAt(0);
 		
 		if(getMiddleName() != null && getMiddleName().length() > 0)
-			s += getMiddleName().toLowerCase().charAt(0);
+			s += getMiddleName().charAt(0);
 		
-		if(getGivenName() != null && getGivenName().length() > 0)
-			s += getGivenName().toLowerCase().charAt(0);
+		if(getFamilyName() != null && getFamilyName().length() > 0)
+			s += getFamilyName().charAt(0);
 
-
-		return s;
+		return s.toUpperCase();
 	}
 
 	/**
