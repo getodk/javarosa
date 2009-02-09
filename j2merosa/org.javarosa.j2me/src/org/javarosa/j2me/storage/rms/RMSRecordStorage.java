@@ -86,7 +86,15 @@ public class RMSRecordStorage implements IRecordStorage {
 		try {
 			//Open and close this store separately from this interface.
 			RecordStore scoresRecordStore1 = RecordStore.openRecordStore(name,true);
-			scoresRecordStore1.closeRecordStore();
+			
+			boolean reallyClosed = false;
+			while (!reallyClosed) {	
+				try {
+					scoresRecordStore1.closeRecordStore(); //a close must be called for every active 'open' that was called. since we don't balance these calls, we may have to close a lot of times
+				} catch (RecordStoreNotOpenException rsnoe) {
+					reallyClosed = true;
+				}
+			}
 			
 			RecordStore.deleteRecordStore(name);
 			
