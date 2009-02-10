@@ -484,6 +484,16 @@ public class XFormParser {
 				}
 			} else if ("value".equals(childName)) {
 				value = getXMLText(child, true);
+				
+				//validate
+				for (int k = 0; k < value.length(); k++) {
+					char c = value.charAt(k);
+					
+					if (!Character.isDigit(c) && !Character.isLowerCase(c) && !Character.isUpperCase(c) && c != '-' && c != '_') {
+						System.err.println("WARNING: Select question <value>s cannot contain spaces, and are recommended not to contain punctuation other than '-' and '_'. Offending value: [" + value + "]");
+						break;
+					}
+				}
 			}
 		}
 
