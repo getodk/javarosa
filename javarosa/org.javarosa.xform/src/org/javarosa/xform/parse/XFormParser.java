@@ -300,15 +300,22 @@ public class XFormParser {
 				saveInstanceNode(child);
 			} else if ("bind".equals(childName)) { //<instance> must come before <bind>s
 				parseBind(f, child);
-			} else {
-				if (type == Node.ELEMENT || type == Node.TEXT && getXMLText(e, i, true).length() != 0) {
-					throw new XFormParseException("Unrecognized top-level tag found within <model>");
+			} else { //invalid model content
+				if (type == Node.ELEMENT) {
+					throw new XFormParseException("Unrecognized top-level tag [" + childName + "] found within <model>");
+				} else if (type == Node.TEXT && getXMLText(e, i, true).length() != 0) {
+					throw new XFormParseException("Unrecognized text content found within <model>");					
 				}
 			}
 		}
 	}
 
 	private static void saveInstanceNode (Element instance) {
+		if (instanceNode != null) {
+			System.err.println("Multiple instances not supported. Ignoring subsequent instances.");
+			return;
+		}
+			
 		for (int i = 0; i < instance.getChildCount(); i++) {
 			if (instance.getType(i) == Node.ELEMENT) {
 				if (instanceNode != null) {
@@ -410,7 +417,7 @@ public class XFormParser {
 				q.setLongTextID(textRef + ";long", null);
 				q.setShortTextID(textRef + ";short", null);
 			} else {
-				throw new RuntimeException("malformed ref for <label>");
+				throw new RuntimeException("malformed ref [" + ref + "] for <label>");
 			}
 		} else {
 			q.setLongText(label);
@@ -433,7 +440,7 @@ public class XFormParser {
 				g.setLongTextID(textRef + ";long", null);
 				g.setShortTextID(textRef + ";short", null);
 			} else {
-				throw new RuntimeException("malformed ref for <label>");
+				throw new RuntimeException("malformed ref [" + ref + "] for <label>");
 			}
 		} else {
 			g.setLongText(label);
@@ -452,7 +459,7 @@ public class XFormParser {
 				verifyTextMappings(f, textRef, "<hint>", false);
 				q.setHelpTextID(textRef, null);
 			} else {
-				throw new RuntimeException("malformed ref for <hint>");
+				throw new RuntimeException("malformed ref [" + ref + "] for <hint>");
 			}
 		} else {
 			q.setHelpText(hint);
@@ -479,7 +486,7 @@ public class XFormParser {
 
 						verifyTextMappings(f, textRef, "Item <label>", false);
 					} else {
-						throw new XFormParseException("malformed ref for <item>");
+						throw new XFormParseException("malformed ref [" + ref + "] for <item>");
 					}
 				}
 			} else if ("value".equals(childName)) {
@@ -488,17 +495,22 @@ public class XFormParser {
 				//validate
 				for (int k = 0; k < value.length(); k++) {
 					char c = value.charAt(k);
-					
-					if (!Character.isDigit(c) && !Character.isLowerCase(c) && !Character.isUpperCase(c) && c != '-' && c != '_') {
-						System.err.println("WARNING: Select question <value>s cannot contain spaces, and are recommended not to contain punctuation other than '-' and '_'. Offending value: [" + value + "]");
+									
+					if (" \n\t\f\r\'\"`".indexOf(c) >= 0) {
+						boolean isMultiSelect = (q.getControlType() == Constants.CONTROL_SELECT_MULTI);
+						System.err.println("WARNING: " + (isMultiSelect ? "select" : "select1") + " question <value>s [" + value + "] " +
+								(isMultiSelect ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostraphes/quotation marks");
 						break;
 					}
 				}
 			}
 		}
-
-		if ((textRef == null && label == null) || value == null) {
-			throw new XFormParseException("<item> without proper <label> or <value>");
+		
+		if (textRef == null && label == null) {
+			throw new XFormParseException("<item> without proper <label>");
+		}
+		if (value == null) {
+			throw new XFormParseException("<item> without proper <value>");
 		}
 
 		if (textRef != null) {
@@ -525,7 +537,7 @@ public class XFormParser {
 		if (bind != null) {
 			DataBinding binding = (DataBinding)bindingsByID.get(bind);
 			if (binding == null) {
-				throw new XFormParseException("XForm Parse: invalid binding ID");
+				throw new XFormParseException("XForm Parse: invalid binding ID [" + bind + "]");
 			}
 			dataRef = binding.getReference();
 			refFromBind = true;
@@ -591,7 +603,7 @@ public class XFormParser {
 		
 		tref = tref.parent(parentRef);
 		if (tref == null) {
-			throw new XFormParseException("Binding path not legal");
+			throw new XFormParseException("Binding path [" + tref + "] not allowed with parent binding of [" + parentRef + "]");
 		}
 		
 		return new XPathReference(tref);
@@ -673,7 +685,7 @@ public class XFormParser {
 		String isDefault = trans.getAttributeValue("", "default");
 
 		if (!l.addAvailableLocale(lang))
-			throw new XFormParseException("duplicate <translation> for same language");
+			throw new XFormParseException("duplicate <translation> for language '" + lang + "'");
 
 		if (isDefault != null) {
 			if (l.getDefaultLocale() != null)
@@ -885,7 +897,7 @@ public class XFormParser {
 			}
 		}
 		if (hasElements && hasText) {
-			System.out.println("Warning: instance node contains both elements and text as children; text ignored");
+			System.out.println("Warning: instance node '" + node.getName() + "' contains both elements and text as children; text ignored");
 		}
 		
 		//check for repeat templating
@@ -894,7 +906,7 @@ public class XFormParser {
 		if (node.getAttributeValue(NAMESPACE_JAVAROSA, "template") != null) {
 			multiplicity = TreeReference.INDEX_TEMPLATE;
 			if (parent != null && parent.getChild(name, TreeReference.INDEX_TEMPLATE) != null) {
-				throw new XFormParseException("More than one node declared as the template for the same repeated set");
+				throw new XFormParseException("More than one node declared as the template for the same repeated set [" + name + "]");
 			}
 		} else {
 			multiplicity = (parent == null ? 0 : parent.getChildMultiplicity(name));
@@ -936,9 +948,6 @@ public class XFormParser {
 					continue;
 				
 				element.setAttribute(attrNamespace, attrName, node.getAttributeValue(i));
-				//#if debug.output==verbose
-				//System.out.println(element.getName()+ " has added attr: "+element.getAttributeName(i)+"="+element.getAttributeValue(i));
-				//#endif
 			}
 		}
 		
@@ -1056,10 +1065,10 @@ public class XFormParser {
 		
 		if (mult == TreeReference.INDEX_TEMPLATE) {
 			if (!templateAllowed) {
-				System.out.println("Warning: template nodes for sub-repeats must be located within the template node of the parent repeat; ignoring template...");
+				System.out.println("Warning: template nodes for sub-repeats must be located within the template node of the parent repeat; ignoring template... [" + instanceNode.getName() + "]");
 				return true;
 			} else if (!repeatable) {
-				System.out.println("Warning: template node found for ref that is not repeatable; ignoring...");
+				System.out.println("Warning: template node found for ref that is not repeatable; ignoring... [" + instanceNode.getName() + "]");
 				return true;
 			}
 		}
@@ -1101,7 +1110,7 @@ public class XFormParser {
 			}
 			
 			if (!instance.copyNode(firstMatch, templRef)) {
-				System.out.println("WARNING! Could not create a default repeat template; this is almost certainly a homogeneity error! Your form will not work!");
+				System.out.println("WARNING! Could not create a default repeat template; this is almost certainly a homogeneity error! Your form will not work! (Failed on " + templRef.toString() + ")");
 				//if the warning above is not heeded, this is the result
 			}
 			trimRepeatChildren(instance.resolveReference(templRef)); 
@@ -1126,7 +1135,7 @@ public class XFormParser {
 		int mult = node.getMult();
 		if (mult > 0) { //repeated node
 			if (!node.repeatable) {
-				System.out.println("Warning: repeated nodes detected that have no repeat binding in the form; DO NOT bind questions to these nodes or their children!");
+				System.out.println("Warning: repeated nodes [" + node.getName() + "] detected that have no repeat binding in the form; DO NOT bind questions to these nodes or their children!");
 				//we could do a more comprehensive safety check in the future
 			}
 		}
@@ -1145,14 +1154,14 @@ public class XFormParser {
 			for (int j = 0; j < nodes.size(); j++) {
 				TreeReference nref = (TreeReference)nodes.elementAt(j);
 				TreeElement node = instance.resolveReference(nref); 
-				if (node == null) //catch '/'
+				if (node == null) //don't crash on '/'... invalid repeat binding will be caught later
 					continue;
 				
 				if (template == null)
 					template = instance.getTemplate(nref);
 				
 				if (!DataModelTree.isHomogeneous(template, node)) {
-					System.out.println("WARNING! Not all repeated nodes for a given repeat binding are homogeneous! This will cause serious problems!");
+					System.out.println("WARNING! Not all repeated nodes for a given repeat binding [" + nref.toString() + "] are homogeneous! This will cause serious problems!");
 				}
 			}
 		}
@@ -1243,7 +1252,7 @@ public class XFormParser {
 				throw new XFormParseException("<repeat> member's binding [" + childBind.toString() + "] is not a descendant of <repeat> binding [" + repeatBind.toString() + "]!");
 			} else if (repeatBind.equals(childBind) && isRepeat) {
 				//catch <repeat nodeset="/a/b"><repeat nodeset="/a/b">...</repeat></repeat> (<repeat nodeset="/a/b"><input ref="/a/b" /></repeat> is ok)
-				throw new XFormParseException("child <repeat>s cannot bind to the same node as their parent <repeat>; only questions/groups can");
+				throw new XFormParseException("child <repeat>s [" + childBind.toString() + "] cannot bind to the same node as their parent <repeat>; only questions/groups can");
 			}
 			
 			//check that, in the instance, current node is not within the scope of any closer repeat binding
