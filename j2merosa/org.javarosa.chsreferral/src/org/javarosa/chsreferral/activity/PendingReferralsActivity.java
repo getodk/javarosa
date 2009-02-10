@@ -152,7 +152,12 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 					String shortID = ID.substring(Math.max(ID.length() - 2, 0)); //this logic is duplicated from CommCarePatientEntity!
 					
 					int daysAgo = (int)(XPathFuncExpr.toNumeric(new Date()).doubleValue() - XPathFuncExpr.toNumeric(referral.getDateReferred()).doubleValue());
-					String daysAgoStr = (daysAgo < 0 ? "From the futurrrrrre" : daysAgo == 0 ? "Today" : daysAgo == 1 ? "Yesterday" : daysAgo + " days ago");
+					String daysAgoStr = null;
+					//#if commcare.lang.sw
+					daysAgoStr = (daysAgo < 0 ? "From the futurrrrrre" : daysAgo == 0 ? "Leo" : daysAgo == 1 ? "Jana" : daysAgo == 2 ? "Juzi" : daysAgo + " days ago");
+					//#else
+					daysAgoStr = (daysAgo < 0 ? "From the futurrrrrre" : daysAgo == 0 ? "Today" : daysAgo == 1 ? "Yesterday" : daysAgo + " days ago");
+					//#endif
 					
 					pending.append(patient.getInitials() + " - " + shortID + " - "
 							+ referral.getType() + " - "
