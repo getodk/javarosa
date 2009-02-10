@@ -383,6 +383,7 @@ public class XFormParser {
 			}
 		}		
 
+		boolean isSelect = (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_SELECT_ONE);
 		question.setControlType(controlType);
 		question.setAppearanceAttr(e.getAttributeValue(null, "appearance"));
 
@@ -395,11 +396,12 @@ public class XFormParser {
 				parseQuestionLabel(f, question, child);
 			} else if ("hint".equals(childName)) {
 				parseHint(f, question, child);
-			} else if ((controlType == Constants.CONTROL_SELECT_MULTI ||
-					    controlType == Constants.CONTROL_SELECT_ONE) && "item".equals(childName)) {
+			} else if (isSelect && "item".equals(childName)) {
 				parseItem(f, question, child);
 			}
 		}
+		if (isSelect)
+			question.localizeSelectMap(null);		
 
 		parent.addChild(question);
 		return question;
