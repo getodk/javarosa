@@ -15,6 +15,7 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.chsreferral.model.PatientReferral;
 import org.javarosa.chsreferral.storage.PatientReferralRMSUtility;
+import org.javarosa.chsreferral.util.IPatientReferralFilter;
 import org.javarosa.chsreferral.util.PendingReferralsContext;
 import org.javarosa.chsreferral.view.PendingReferralsView;
 import org.javarosa.chsreferral.view.ReferralsDetailView;
@@ -24,7 +25,6 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.storage.PatientRMSUtility;
@@ -134,6 +134,7 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 		this.context = new PendingReferralsContext(context);
 		PatientReferralRMSUtility ref = (PatientReferralRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientReferralRMSUtility.getUtilityName());
 		PatientRMSUtility pat = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
+		IPatientReferralFilter filter = this.context.getReferralFilter();
 		
 		//TODO: Replace - Maybe with Entity Select Stuff? Seems super-appropriate.
 		//droos: yes it does
@@ -144,7 +145,9 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 			Enumeration en = pendingVector.elements();
 			while(en.hasMoreElements()) {
 				PatientReferral referral = (PatientReferral)en.nextElement();
-				if (referral.isPending() && (this.context.getPatientId() == -1 || (referral.getPatientId() == this.context.getPatientId()))) {
+				// TODO: Encode patient ID logic in a filter at the Shell Level. Right now this doesn't happen due to
+				// my desire to not make the patient code end up in multiple places.
+				if (filter.inFilter(referral) && (this.context.getPatientId() == -1 || (referral.getPatientId() == this.context.getPatientId()))) {
 					Patient patient = new Patient();
 					pat.retrieveFromRMS(referral.getPatientId(), patient);
 					
@@ -169,8 +172,16 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 			
 			pending.addCommand(EXIT);
 			if(this.pendingRefs.size() == 0) {
+				if(this.context.isReturnOnEmpty()) {
+					Hashtable returnArgs = new Hashtable();
+					returnArgs.put(Constants.RETURN_ARG_KEY, "EMPTY");
+					shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+					System.out.println("Bailing because there are no matching referrals!");
+					return;
+				} else {
 				pending.append("No Pending Referrals!", null);
 				pending.setSelectCommand(EXIT);
+				}
 			} else {
 				pending.addCommand(SELECT);
 				pending.setSelectCommand(SELECT);
