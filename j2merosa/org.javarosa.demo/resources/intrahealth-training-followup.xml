@@ -8,6 +8,10 @@
     <h:meta name="version" content="0.1" />
     <h:title>Training Followup</h:title>
 
+    <!-- fun idea
+    <jr:xpath-macro def="exclusive-choice" body="not(selected($1, $2) and count-selected($1) > 1)" />
+    -->
+
     <model>
       <instance>
         <training-followup xmlns="http://intrahealth.org/training-followup">
@@ -43,6 +47,7 @@
             <verbal />
             <written />
           </consent>
+          <test-performed />
           <testing>
             <supplies-in-place />
             <working-properly>
@@ -65,6 +70,7 @@
             <clear-language />
             <time-to-reflect />
           </post-test>
+          <test-result />
           <key-messages>
             <hiv-negative>
               <retest />
@@ -91,16 +97,38 @@
         </training-followup>
       </instance>
 
+      <bind nodeset="testing" relevant="../test-performed = 'yes'" />
+      <bind nodeset="post-test" relevant="../test-performed = 'yes'" />
+      <bind nodeset="test-result" relevant="../test-performed = 'yes'" />
+      <bind nodeset="key-messages" relevant="../test-performed = 'yes'" />
+      <bind nodeset="key-messages/hiv-positive" relevant="/training-followup/test-result = 'positive'" />
+      <bind nodeset="key-messages/hiv-negative" relevant="/training-followup/test-result = 'negative'" />
+
       <bind nodeset="meta/device-id" jr:preload="property" jr:preloadParams="DeviceID" />
       <bind nodeset="meta/start-time" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
       <bind nodeset="meta/end-time" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
 
-      <bind nodeset="date" type="xsd:date" jr:preload="date" jr:preloadParams="today" />
-      <!--
-      <bind nodeset="site/region" jr:preload="property" jr:preloadParams="Region" />
-      <bind nodeset="site/district" jr:preload="property" jr:preloadParams="District" />
-      -->
-      <!-- default trainer from user login? -->
+      <bind nodeset="date" type="xsd:date" required="true()" jr:preload="date" jr:preloadParams="today" />
+ <!-- <bind nodeset="site/region" required="true()" jr:preload="property" jr:preloadParams="Region" />
+      <bind nodeset="site/district" required="true()" jr:preload="property" jr:preloadParams="District" /> -->
+      <bind nodeset="site/facility" required="true()" />
+      <bind nodeset="trainer" required="true()" /> <!-- default from user login? -->
+      <bind nodeset="trainee" required="true()" />
+
+      <!-- for any multi-select question that contains an option like 'not observed'/'not done'/'none of the above'
+           which should only be allowed to the exclusion of all other options -->
+      <bind nodeset="pre-test/relationship-and-environment/greeting" required="true()"
+            constraint="not(selected(., 'not-observed') and count-selected(.) > 1)"
+            jr:constraintMsg="'Not observed' can only be selected by itself" />
+      <bind nodeset="pre-test/relationship-and-environment/atmosphere" required="true()"
+            constraint="not(selected(., 'not-observed') and count-selected(.) > 1)"
+            jr:constraintMsg="'Not observed' can only be selected by itself" />
+      <bind nodeset="pre-test/information/testing-benefit" required="true()"
+            constraint="not(selected(., 'not-done') and count-selected(.) > 1)"
+            jr:constraintMsg="'Not done' can only be selected by itself" />
+      <bind nodeset="testing/safe-practices" required="true()"
+            constraint="not(selected(., 'not-adhered') and count-selected(.) > 1)"
+            jr:constraintMsg="'Not adhered' can only be selected by itself" />
 
       <itext>
         <translation lang="English">
@@ -304,12 +332,26 @@
             <value form="long">Recommendation for improvement</value>
             <value form="short">Recommendation for improvement</value>
           </text>
+          <text id="q-test-performed">
+            <value form="long">Was an HIV test performed?</value>
+            <value form="short">Test performed?</value>
+          </text>
+          <text id="q-test-result">
+            <value form="long">What was the result of the HIV test?</value>
+            <value form="short">Test result</value>
+          </text>
 
           <text id="ch-yes">
             <value>Yes</value>
           </text>
           <text id="ch-no">
             <value>No</value>
+          </text>
+          <text id="ch-pos">
+            <value>Positive</value>
+          </text>
+          <text id="ch-neg">
+            <value>Negative</value>
           </text>
           <text id="ch-not-observed">
             <value>Not observed</value>
@@ -596,6 +638,13 @@
       </select1>
     </group>
 
+    <select1 ref="test-performed">
+      <label ref="jr:itext('q-test-performed')" />
+      
+      <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+      <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+    </select1>
+    
     <group ref="testing">
       <label ref="jr:itext('g-testing')" />
 
@@ -726,6 +775,13 @@
       </select1>
     </group>
 
+    <select1 ref="test-result">
+      <label ref="jr:itext('q-test-result')" />
+      
+      <item><label ref="jr:itext('ch-pos')" /><value>positive</value></item>
+      <item><label ref="jr:itext('ch-neg')" /><value>negative</value></item>
+    </select1>
+    
     <group ref="key-messages/hiv-negative">
       <label ref="jr:itext('g-key-messages-negative')" />
 
