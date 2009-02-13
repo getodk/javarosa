@@ -128,6 +128,7 @@ public class XPathPathExpr extends XPathExpression {
 
 		if (nodeset) {
 			return m.expandReference(ref);
+			//to fix conditions based on non-relevant data, filter the nodeset by relevancy
 		} else {
 			return getRefValue(model, ref);
 		}
@@ -139,6 +140,7 @@ public class XPathPathExpr extends XPathExpression {
 			throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
 		}
 		
+		//return unpackValue(node.isRelevant() ? node.getValue() : null);	to fix conditions based on non-relevant data	
 		return unpackValue(node.getValue());
 	}
 	
