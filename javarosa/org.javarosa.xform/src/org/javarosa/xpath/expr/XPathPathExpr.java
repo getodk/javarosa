@@ -127,8 +127,17 @@ public class XPathPathExpr extends XPathExpression {
 		}
 
 		if (nodeset) {
-			return m.expandReference(ref);
+			Vector nodesetRefs = m.expandReference(ref);
+			
 			//to fix conditions based on non-relevant data, filter the nodeset by relevancy
+//			for (int i = 0; i < nodesetRefs.size(); i++) {
+//				if (!m.resolveReference((TreeReference)nodesetRefs.elementAt(i)).isRelevant()) {
+//					nodesetRefs.removeElementAt(i);
+//					i--;
+//				}
+//			}
+			
+			return nodesetRefs;
 		} else {
 			return getRefValue(model, ref);
 		}
@@ -140,8 +149,8 @@ public class XPathPathExpr extends XPathExpression {
 			throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
 		}
 		
-		//return unpackValue(node.isRelevant() ? node.getValue() : null);	to fix conditions based on non-relevant data	
-		return unpackValue(node.getValue());
+		//to fix conditions based on non-relevant data	
+		return unpackValue(/*node.isRelevant() ?*/ node.getValue() /*: null*/);
 	}
 	
 	private static Object unpackValue (IAnswerData val) {
