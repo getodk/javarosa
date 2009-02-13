@@ -238,43 +238,43 @@
           </text>
           <text id="q-uses-culturally-appropriate-greetings">
             <value form="long">Uses culturally appropriate greeting gestures that convey respect and caring.</value>
-            <value form="short">Uses culturally appropriate greeting gestures that convey respect and caring.</value>
+            <value form="short">Culturally appropriate greetings</value>
           </text>
           <text id="q-provides-good-atmosphere">
             <value form="long">Provides comfortable, trusting atmosphere for patients to ask questions and responds to questions and concerns appropriately throughout the testing/counseling session.</value>
-            <value form="short">Provides comfortable, trusting atmosphere for patients to ask questions and responds to questions and concerns appropriately throughout the testing/counseling session.</value>
+            <value form="short">Comfortable, trusting atmosphere</value>
           </text>
           <text id="q-addresses-primary-complaint">
             <value form="long">Addresses primary concerns based on the what brought the person's to health facility</value>
-            <value form="short">Addresses primary concerns based on the what brought the person's to health facility</value>
+            <value form="short">Addresses what brought person to health facility</value>
           </text>
           <text id="q-mentions-hiv-testing-benefits">
             <value form="long">Did the trainee mention clinical and prevention benefit of HIV testing at individual level</value>
-            <value form="short">Did the trainee mention clinical and prevention benefit of HIV testing at individual level</value>
+            <value form="short">Mentions benefits of HIV testing</value>
           </text>
           <text id="q-explains-available-hiv-services">
             <value form="long">Did the trainee explain about services that are available for HIV Negative and Positive including availability of CTC</value>
-            <value form="short">Did the trainee explain about services that are available for HIV Negative and Positive including availability of CTC</value>
+            <value form="short">Explained available services</value>
           </text>
           <text id="q-explains-hiv-pos-window-period">
             <value form="long">Did trainee explain significance of a "window period" in relationship to possible HIV test results?</value>
-            <value form="short">Did trainee explain significance of a "window period" in relationship to possible HIV test results?</value>
+            <value form="short">Explained 'window period'</value>
           </text>
           <text id="q-allows-client-ask-questions">
             <value form="long">Did trainee allows person to ask questions</value>
-            <value form="short">Did trainee allows person to ask questions</value>
+            <value form="short">Allows person to ask questions</value>
           </text>
           <text id="q-observe-verbal-consent-obtained">
             <value form="long">Observe how verbal consent is obtained non-cohesively from client.</value>
-            <value form="short">Observe how verbal consent is obtained non-cohesively from client.</value>
+            <value form="short">Verbal consent</value>
           </text>
           <text id="q-observe-written-consent-obtained">
             <value form="long">Observe how written consent from parents or guardian for children's or person with disabilities (as started in NACP consent forms) is obtained.</value>
-            <value form="short">Observe how written consent from parents or guardian for children's or person with disabilities (as started in NACP consent forms) is obtained.</value>
+            <value form="short">Written consent</value>
           </text>
           <text id="q-hiv-test-kits-in-place">
             <value form="long">Are HIV test kits and supplies necessary for performing test are in place according to National Testing Algorithm?</value>
-            <value form="short">Are HIV test kits and supplies necessary for performing test are in place according to National Testing Algorithm?</value>
+            <value form="short">HIV test kits and supplies in place</value>
           </text>
           <text id="q-sd-bioline-working">
             <value form="long">SD Bioline</value>
@@ -290,95 +290,95 @@
           </text>
           <text id="q-adheres-rapid-hiv-testing-procedure">
             <value form="long">Did the trainee adhere to Lab SOP for performing rapid HIV testing to National Testing Algorithm?</value>
-            <value form="short">Did the trainee adhere to Lab SOP for performing rapid HIV testing to National Testing Algorithm?</value>
+            <value form="short">Adheres to Lab SOP?</value>
           </text>
           <text id="q-interpreted-results">
             <value form="long">Did the trainee interpret HIV test results and make use of the national testing algorithm?</value>
-            <value form="short">Did the trainee interpret HIV test results and make use of the national testing algorithm?</value>
+            <value form="short">Did interpret results?</value>
           </text>
           <text id="q-adheres-safe-work-practices">
             <value form="long">Observe adherence to safe work practices at the site</value>
-            <value form="short">Observe adherence to safe work practices at the site</value>
+            <value form="short">Safe work practices?</value>
           </text>
           <text id="q-incinerator-available">
             <value form="long">Look for availability of incinerator</value>
-            <value form="short">Look for availability of incinerator</value>
+            <value form="short">Incinerator available</value>
           </text>
           <text id="q-pits-available">
             <value form="long">Look for availability of pits</value>
-            <value form="short">Look for availability of pits</value>
+            <value form="short">Pits available</value>
           </text>
           <text id="q-sharps-disposal-available">
             <value form="long">Look for availability of sharps disposal (safety boxes)</value>
-            <value form="short">Look for availability of sharps disposal (safety boxes)</value>
+            <value form="short">Sharps disposal available</value>
           </text>
           <text id="q-assessed-readiness-to-receive-results">
             <value form="long">Did trainee assess person's readiness to receive HIV results through questions, signs of emotional reactions etc?</value>
-            <value form="short">Did trainee assess person's readiness to receive HIV results through questions, signs of emotional reactions etc?</value>
+            <value form="short">Assessed readiness to receive results</value>
           </text>
           <text id="q-reminds-possible-results-implications">
             <value form="long">Did the trainee remind the person what are the possible HIV results and their implications</value>
-            <value form="short">Did the trainee remind the person what are the possible HIV results and their implications</value>
+            <value form="short">Reminded of possible results and implications</value>
           </text>
           <text id="q-gives-results-clear-language">
             <value form="long">Give the HIV results in a simple and clear language</value>
-            <value form="short">Give the HIV results in a simple and clear language</value>
+            <value form="short">Results in clear language</value>
           </text>
           <text id="q-gives-patient-time-to-reflect">
             <value form="long">Give the person time to reflect on HIV results</value>
-            <value form="short">Give the person time to reflect on HIV results</value>
+            <value form="short">Gave time to reflect</value>
           </text>
           <text id="q-explains-negative-and-window-period">
             <value form="long">Explain the person that HIV was not detected at this time; however, since the person could be in the window period, recommends a second test after 3 months time.</value>
-            <value form="short">Explain the person that HIV was not detected at this time; however, since the person could be in the window period, recommends a second test after 3 months time.</value>
+            <value form="short">Explained negative result, window period, and retest</value>
           </text>
           <text id="q-reminds-prevention-strategies">
             <value form="long">Did the trainee remind person on prevention strategies</value>
-            <value form="short">Did the trainee remind person on prevention strategies</value>
+            <value form="short">Prevention strategies</value>
           </text>
           <text id="q-suggests-partner-testing">
             <value form="long">Did trainee explain to a person on the importance of notifying partner and to bring partner(s) in for HIV testing?</value>
-            <value form="short">Did trainee explain to a person on the importance of notifying partner and to bring partner(s) in for HIV testing?</value>
+            <value form="short">Importance of notifying partner; partner testing</value>
           </text>
           <text id="q-reminds-difference-hiv-aids">
             <value form="long">Had trainee reminds person on difference between HIV-infection and having AIDS</value>
-            <value form="short">Had trainee reminds person on difference between HIV-infection and having AIDS</value>
+            <value form="short">Reminded difference between HIV/AIDS</value>
           </text>
           <text id="q-reminds-importance-safe-sex">
             <value form="long">Had trainee reminds person of the need for safe sex to prevent increased risk to self or to others e.g. condoms for all sexual intercourse.</value>
-            <value form="short">Had trainee reminds person of the need for safe sex to prevent increased risk to self or to others e.g. condoms for all sexual intercourse.</value>
+            <value form="short">Safe sex</value>
           </text>
           <text id="q-explains-referral-services">
             <value form="long">Did the trainee explain to a person clearly the referral to CTC and services that are available at CTC?</value>
-            <value form="short">Did the trainee explain to a person clearly the referral to CTC and services that are available at CTC?</value>
+            <value form="short">Explained available CTC services</value>
           </text>
           <text id="q-suggests-partner-testing-with-disclosure">
             <value form="long">Did trainee explain to a person on the importance of disclosure to partner and to bring partner(s) in for HIV testing?</value>
-            <value form="short">Did trainee explain to a person on the importance of disclosure to partner and to bring partner(s) in for HIV testing?</value>
+            <value form="short">Importance of disclosure; partner testing</value>
           </text>
           <text id="q-assists-disclosure-plans">
             <value form="long">Did the trainee assist the person to make disclosure plans to partner/ guardian/friends/relative?</value>
-            <value form="short">Did the trainee assist the person to make disclosure plans to partner/ guardian/friends/relative?</value>
+            <value form="short">Assisted with disclosure plans</value>
           </text>
           <text id="q-gives-info-diet-staying-healthy">
             <value form="long">Did the trainee give information about what to eat and stay healthy.</value>
-            <value form="short">Did the trainee give information about what to eat and stay healthy.</value>
+            <value form="short">Information on staying healthy</value>
           </text>
           <text id="q-gives-info-community-support">
             <value form="long">Is the client given information about community support groups and other services?</value>
-            <value form="short">Is the client given information about community support groups and other services?</value>
+            <value form="short">Information on support groups</value>
           </text>
           <text id="q-referral-form-properly-filled">
             <value form="long">Observe if referral form was properly filled</value>
-            <value form="short">Observe if referral form was properly filled</value>
+            <value form="short">Referral form</value>
           </text>
           <text id="q-supervisor-gives-feedback">
             <value form="long">Trainer/supervisor review daily registers and give feedback on areas that need improvement.</value>
-            <value form="short">Trainer/supervisor review daily registers and give feedback on areas that need improvement.</value>
+            <value form="short">Trainer/supervisor reviews registers and gives feedback</value>
           </text>
           <text id="q-trainee-strengths">
             <value form="long">Briefly comment on trainees strengths</value>
-            <value form="short">Briefly comment on trainees strengths</value>
+            <value form="short">Strengths</value>
           </text>
           <text id="q-areas-for-improvement">
             <value form="long">Recommendation for improvement</value>
