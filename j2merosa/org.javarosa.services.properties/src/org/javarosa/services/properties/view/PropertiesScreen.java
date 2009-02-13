@@ -52,6 +52,8 @@ public class PropertiesScreen extends Form implements IView{
     }
 
     private void populateProperties() {
+    	Vector readOnlys = new Vector();
+    	
 		Vector rulesSets = propertyManager
 				.getRules();
 		Enumeration en = rulesSets.elements();
@@ -111,28 +113,45 @@ public class PropertiesScreen extends Form implements IView{
 					// possible choices here but
 					// for now, we'll stick with single-selection properties
 					if (propValues != null) {
-						if (propValues.size() <= 1
-								&& !rules.checkPropertyUserReadOnly(propertyName)) {
-							TextField input = new TextField(rules.getHumanReadableDescription(propertyName),
-									(String) propValues.elementAt(0), 50,
-									TextField.ANY);
-							this.append(input);
-							itemForPropertyName.put(input, propertyName);
+						if (propValues.size() <= 1) {
+								TextField input = new TextField(
+										rules
+												.getHumanReadableDescription(propertyName),
+										(String) propValues.elementAt(0), 50,
+										TextField.ANY);
+								
+								itemForPropertyName.put(input, propertyName);
+							if (rules.checkPropertyUserReadOnly(propertyName)) {
+								input.setConstraints(TextField.UNEDITABLE);
+								readOnlys.addElement(input);
+							} else {
+								this.append(input);
+							}
 
 						}
 					}
 					else {
-						if(!rules.checkPropertyUserReadOnly(propertyName)) {
 							TextField input = new TextField(rules.getHumanReadableDescription(propertyName),
 									"", 50,
 									TextField.ANY);
-							this.append(input);
 							itemForPropertyName.put(input, propertyName);
-						}
+							if(rules.checkPropertyUserReadOnly(propertyName)) {
+								input.setConstraints(TextField.UNEDITABLE);
+								readOnlys.addElement(input);
+							} else {
+								this.append(input);
+							}
 					}
 				}
 			}
 		}
+		
+		Enumeration enden = readOnlys.elements();
+		while(enden.hasMoreElements()) {
+			Item currentElement = (Item)enden.nextElement();
+			this.append(currentElement);
+		}
+		
 	}
 
     private void addRMSInfo() {
