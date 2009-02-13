@@ -94,6 +94,27 @@
             <strengths />
             <needs-improvement />
           </monitoring-and-evaluation>
+
+          <!-- facility drill-down hack until we support dynamic itemsets -->
+          <hack>
+            <district>
+              <r-arusha />
+              <r-mwanza />
+              <r-kigoma />
+            </district>
+            <facility>
+              <d-arusha-dist />
+              <d-arusha-muni />
+              <d-geita-dist />
+              <d-karatu-dist />
+              <d-kasulu-dist />
+              <d-kibondo-dist />
+              <d-kigoma-dist />
+              <d-kigoma-muni-ujiji />
+              <d-meru-dist />
+              <d-nyamagana-dist />
+            </facility>
+          </hack>
         </training-followup>
       </instance>
 
@@ -109,9 +130,10 @@
       <bind nodeset="meta/end-time" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
 
       <bind nodeset="date" type="xsd:date" required="true()" jr:preload="date" jr:preloadParams="today" />
- <!-- <bind nodeset="site/region" required="true()" jr:preload="property" jr:preloadParams="Region" />
-      <bind nodeset="site/district" required="true()" jr:preload="property" jr:preloadParams="District" /> -->
-      <bind nodeset="site/facility" required="true()" />
+      <bind nodeset="site/region" required="true()" jr:preload="property" jr:preloadParams="Region" />
+ <!-- there is no one 'district' or 'facility' question due to drill-down hack 
+      <bind nodeset="site/district" required="true()" jr:preload="property" jr:preloadParams="District" />
+      <bind nodeset="site/facility" required="true()" /> -->
       <bind nodeset="trainer" required="true()" /> <!-- default from user login? -->
       <bind nodeset="trainee" required="true()" />
 
@@ -129,6 +151,36 @@
       <bind nodeset="testing/safe-practices" required="true()"
             constraint="not(selected(., 'not-adhered') and count-selected(.) > 1)"
             jr:constraintMsg="'Not adhered' can only be selected by itself" />
+
+      <!-- drill-down hack binds -->
+      <bind nodeset="hack/district/r-arusha" relevant="/training-followup/site/region = 'arusha'"
+            required="true()" jr:preload="property" jr:preloadParams="District" />
+      <bind nodeset="hack/district/r-kigoma" relevant="/training-followup/site/region = 'kigoma'"
+            required="true()" jr:preload="property" jr:preloadParams="District" />
+      <bind nodeset="hack/district/r-mwanza" relevant="/training-followup/site/region = 'mwanza'"
+            required="true()" jr:preload="property" jr:preloadParams="District" />
+
+      <!-- need to check region again due to 'conditions based of non-relevant data' bug -->
+      <bind nodeset="hack/facility/d-arusha-dist" required="true()"
+            relevant="/training-followup/site/region = 'arusha' and ../../district/r-arusha = 'arusha-dist'" />
+      <bind nodeset="hack/facility/d-arusha-muni" required="true()"
+            relevant="/training-followup/site/region = 'arusha' and ../../district/r-arusha = 'arusha-muni'" />
+      <bind nodeset="hack/facility/d-geita-dist" required="true()"
+            relevant="/training-followup/site/region = 'mwanza' and ../../district/r-mwanza = 'geita-dist'" />
+      <bind nodeset="hack/facility/d-karatu-dist" required="true()"
+            relevant="/training-followup/site/region = 'arusha' and ../../district/r-arusha = 'karatu-dist'" />
+      <bind nodeset="hack/facility/d-kasulu-dist" required="true()"
+            relevant="/training-followup/site/region = 'kigoma' and ../../district/r-kigoma = 'kasulu-dist'" />
+      <bind nodeset="hack/facility/d-kibondo-dist" required="true()"
+            relevant="/training-followup/site/region = 'kigoma' and ../../district/r-kigoma = 'kibondo-dist'" />
+      <bind nodeset="hack/facility/d-kigoma-dist" required="true()"
+            relevant="/training-followup/site/region = 'kigoma' and ../../district/r-kigoma = 'kigoma-dist'" />
+      <bind nodeset="hack/facility/d-kigoma-muni-ujiji" required="true()"
+            relevant="/training-followup/site/region = 'kigoma' and ../../district/r-kigoma = 'kigoma-muni-ujiji'" />
+      <bind nodeset="hack/facility/d-meru-dist" required="true()"
+            relevant="/training-followup/site/region = 'arusha' and ../../district/r-arusha = 'meru-dist'" />
+      <bind nodeset="hack/facility/d-nyamagana-dist" required="true()"
+            relevant="/training-followup/site/region = 'mwanza' and ../../district/r-mwanza = 'nyamagana-dist'" />
 
       <itext>
         <translation lang="English">
@@ -537,9 +589,185 @@
   <h:body>
 
     <input ref="date"><label ref="jr:itext('q-date')" /></input>
-    <!-- region question -->
-    <!-- district question -->
-    <input ref="site/facility"><label ref="jr:itext('q-facility')" /></input>
+
+    <select1 ref="site/region">
+      <label ref="jr:itext('q-region')" />
+      
+      <item><label>Arusha</label><value>arusha</value></item>
+      <item><label>Mwanza</label><value>mwanza</value></item>
+      <item><label>Kigoma</label><value>kigoma</value></item>
+    </select1>
+    
+    <!-- no one district or facility question due to drill-down hack; answers are merged into site/district and site/facility during post-processing -->
+    
+    <!-- district questions (one per region) -->
+    
+    <select1 ref="hack/district/r-arusha">
+      <label ref="jr:itext('q-district')" />
+
+      <item><label>Arusha district</label><value>arusha-dist</value></item>
+      <item><label>Arusha municipal</label><value>arusha-muni</value></item>
+      <item><label>Karatu district</label><value>karatu-dist</value></item>
+      <item><label>Meru district</label><value>meru-dist</value></item>
+    </select1>
+
+    <select1 ref="hack/district/r-mwanza">
+      <label ref="jr:itext('q-district')" />
+
+      <item><label>Geita district</label><value>geita-dist</value></item>
+      <item><label>Nyamagana district</label><value>nyamagana-dist</value></item>
+    </select1>
+    
+    <select1 ref="hack/district/r-kigoma">
+      <label ref="jr:itext('q-district')" />
+
+      <item><label>Kasulu district</label><value>kasulu-dist</value></item>
+      <item><label>Kibondo district</label><value>kibondo-dist</value></item>
+      <item><label>Kigoma district</label><value>kigoma-dist</value></item>
+      <item><label>Kigoma municipal/Ujiji</label><value>kigoma-muni-ujiji</value></item>
+    </select1>
+
+    <!-- facility questions (one per district) -->
+    
+    <select1 ref="hack/facility/d-arusha-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[33] Oltrumet Health Centre</label><value>33-oltrumet-hctr</value></item>
+      <item><label>[34] Nduruma Health Centre</label><value>34-nduruma-hctr</value></item>
+      <item><label>[35] Oldonyosambu Dispensary</label><value>35-oldonyosambu-disp</value></item>
+      <item><label>[36] Olgilai Dispensary</label><value>36-olgilai-disp</value></item>
+      <item><label>[37] Sambasha Dispensary</label><value>37-sambasha-disp</value></item>
+      <item><label>[38] Bangata Government Dispensary</label><value>38-bangata-govt-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-arusha-muni">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[17] Mt. Meru Regional Hospital</label><value>17-mt-meru-reg-hosp</value></item>
+      <item><label>[18] St. Elizabeth Hospital</label><value>18-st-elizabeth-hosp</value></item>
+      <item><label>[19] Ithnaasher Hospital</label><value>19-ithnaasher-hosp</value></item>
+      <item><label>[20] Kaloleni Health Centre</label><value>20-kaloleni-hctr</value></item>
+      <item><label>[21] Ngarenaro Health Centre</label><value>21-ngarenaro-hctr</value></item>
+      <item><label>[22] Levolosi Health Centre</label><value>22-levolosi-hctr</value></item>
+      <item><label>[23] Themi Health Centre</label><value>23-themi-hctr</value></item>
+      <item><label>[24] Mkonoo Health Centre</label><value>24-mkonoo-hctr</value></item>
+      <item><label>[25] Upone Charitable Dispensary</label><value>25-upone-charitable-disp</value></item>
+      <item><label>[26] Heri Dispensary</label><value>26-heri-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-geita-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[40] Geita District Hospital</label><value>40-geita-dist-hosp</value></item>
+      <item><label>[41] Kashishi Health Centre</label><value>41-kashishi-hctr</value></item>
+      <item><label>[42] Kasamwa Health Centre</label><value>42-kasamwa-hctr</value></item>
+      <item><label>[43] Kharumwa Health Centre</label><value>43-kharumwa-hctr</value></item>
+      <item><label>[44] Chikobe Health Centre</label><value>44-chikobe-hctr</value></item>
+      <item><label>[45] Bukoli Health Centre</label><value>45-bukoli-hctr</value></item>
+      <item><label>[46] Nzera Health Centre</label><value>46-nzera-hctr</value></item>
+      <item><label>[47] Nyang'hwale Health Centre</label><value>47-nyanghwale-hctr</value></item>
+      <item><label>[48] Katoro Health Centre</label><value>48-katoro-hctr</value></item>
+      <item><label>[49] Nkome Dispensary</label><value>49-nkome-disp</value></item>
+      <item><label>[50] Lwamgasa Dispensary</label><value>50-lwamgasa-disp</value></item>
+      <item><label>[51] Nyarugusu Dispensary</label><value>51-nyarugusu-disp</value></item>
+      <item><label>[52] Busolwa Dispensary</label><value>52-busolwa-disp</value></item>
+      <item><label>[53] Chigunga Dispensary</label><value>53-chigunga-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-karatu-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[27] Karatu Health Centre</label><value>27-karatu-hctr</value></item>
+      <item><label>[28] Endabash Health Centre</label><value>28-endabash-hctr</value></item>
+      <item><label>[29] Mang'ula Health Centre</label><value>29-mangula-hctr</value></item>
+      <item><label>[30] Oldeani Health Centre</label><value>30-oldeani-hctr</value></item>
+      <item><label>[31] Rhotia Health Centre</label><value>31-rhotia-hctr</value></item>
+      <item><label>[32] Mang'ula Dispensary</label><value>32-mangula-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-kasulu-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[58] Kasulu District Hospital</label><value>58-kasulu-dist-hosp</value></item>
+      <item><label>[59] Kabanga Hospital</label><value>59-kabanga-hosp</value></item>
+      <item><label>[60] Kiganamo Health Centre</label><value>60-kiganamo-hctr</value></item>
+      <item><label>[61] Rusesa Health Centre</label><value>61-rusesa-hctr</value></item>
+      <item><label>[62] Janda Health Centre</label><value>62-janda-hctr</value></item>
+      <item><label>[63] Muyama Health Centre</label><value>63-muyama-hctr</value></item>
+      <item><label>[64] Nyakitonto Health Centre</label><value>64-nyakitonto-hctr</value></item>
+      <item><label>[65] Nyenge Health Centre</label><value>65-nyenge-hctr</value></item>
+   </select1>
+    
+    <select1 ref="hack/facility/d-kibondo-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[83] Kibondo District Hospital</label><value>83-kibondo-dist-hosp</value></item>
+      <item><label>[84] Kakonko Health Centre</label><value>84-kakonko-hctr</value></item>
+      <item><label>[85] Kifura Health Centre</label><value>85-kifura-hctr</value></item>
+      <item><label>[86] Nyazige Health Centre</label><value>86-nyazige-hctr</value></item>
+      <item><label>[87] Mabamba Health Centre</label><value>87-mabamba-hctr</value></item>
+   </select1>
+    
+    <select1 ref="hack/facility/d-kigoma-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[66] Bitale Health Centre</label><value>66-bitale-hctr</value></item>
+      <item><label>[67] Nguruka Health Centre</label><value>67-nguruka-hctr</value></item>
+      <item><label>[68] Mgambo Health Centre</label><value>68-mgambo-hctr</value></item>
+      <item><label>[69] Malagalasi Dispensary</label><value>69-malagalasi-disp</value></item>
+      <item><label>[70] Mahembe Dispensary</label><value>70-mahembe-disp</value></item>
+      <item><label>[71] Kalinzi Dispensary</label><value>71-kalinzi-disp</value></item>
+      <item><label>[72] Mtego wa noti Dispensary</label><value>72-mtego-wa-noti-disp</value></item>
+      <item><label>[73] Nyarubanda Dispensary</label><value>73-nyarubanda-disp</value></item>
+      <item><label>[74] Mkaboko Dispensary</label><value>74-mkaboko-disp</value></item>
+      <item><label>[75] Rukoma Dispensary</label><value>75-rukoma-disp</value></item>
+      <item><label>[76] Chankabwimba Dispensary</label><value>76-chankabwimba-disp</value></item>
+      <item><label>[77] Nyamhoza Dispensary</label><value>77-nyamhoza-disp</value></item>
+      <item><label>[78] Kizenga Dispensary</label><value>78-kizenga-disp</value></item>
+      <item><label>[79] Kaseke Dispensary</label><value>79-kaseke-disp</value></item>
+      <item><label>[80] Kalya Dispensary</label><value>80-kalya-disp</value></item>
+      <item><label>[81] Mkongoro Dispensary</label><value>81-mkongoro-disp</value></item>
+      <item><label>[82] Mganza Dispensary</label><value>82-mganza-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-kigoma-muni-ujiji">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[54] Maweni Regional Hospital</label><value>54-maweni-reg-hosp</value></item>
+      <item><label>[55] Ujiji Health Centre</label><value>55-ujiji-hctr</value></item>
+      <item><label>[56] Rusimbi Dispensary</label><value>56-rusimbi-disp</value></item>
+      <item><label>[57] Gungu Dispensary</label><value>57-gungu-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-meru-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[01] Meru District Hospital</label><value>01-meru-dist-hosp</value></item>
+      <item><label>[02] Mbuguni Health Centre</label><value>02-mbuguni-hctr</value></item>
+      <item><label>[03] Ngarenanyuki Health Centre</label><value>03-ngarenanyuki-hctr</value></item>
+      <item><label>[04] Mareu Dispensary</label><value>04-mareu-disp</value></item>
+      <item><label>[05] King'ori Dispensary</label><value>05-kingori-disp</value></item>
+      <item><label>[06] Nkoanrua Dispensary</label><value>06-nkoanrua-disp</value></item>
+      <item><label>[07] USA Government Dispensary</label><value>07-usa-govt-disp</value></item>
+      <item><label>[08] USA RC Dispensary</label><value>08-usa-rc-disp</value></item>
+      <item><label>[09] Ngurdoto RC Dispensary</label><value>09-ngurdoto-rc-disp</value></item>
+      <item><label>[10] Majengo Dispensary</label><value>10-majengo-disp</value></item>
+      <item><label>[11] Poli Dispensary</label><value>11-poli-disp</value></item>
+      <item><label>[12] Leguruki Dispensary</label><value>12-leguruki-disp</value></item>
+      <item><label>[13] Maji Ya Chai Dispensary</label><value>13-maji-ya-chai-disp</value></item>
+      <item><label>[14] Karangai Dispensary</label><value>14-karangai-disp</value></item>
+      <item><label>[15] Njeku Dispensary</label><value>15-njeku-disp</value></item>
+      <item><label>[16] Ngyani Dispensary</label><value>16-ngyani-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-nyamagana-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[39] Sekou Toure Regional Hospital</label><value>39-sekou-toure-reg-hosp</value></item>
+   </select1>
+
+    <!-- end drill-down hack -->
+    
     <input ref="trainer"><label ref="jr:itext('q-trainer')" /></input>
     <input ref="trainee"><label ref="jr:itext('q-trainee')" /></input>
       
@@ -887,6 +1115,7 @@
         <item><label ref="jr:itext('ch-not-done')" /><value>not-done</value></item>
       </select1>
 
+      <!-- should be textareas? -->
       <input ref="strengths"><label ref="jr:itext('q-trainee-strengths')" /></input>
       <input ref="needs-improvement"><label ref="jr:itext('q-areas-for-improvement')" /></input>
     </group>
