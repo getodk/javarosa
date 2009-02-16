@@ -39,11 +39,11 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 						walker = walker.getParent();
 					}
 					//This line here (The + offest part) is the fix.
-					//return ((Container)this.parent).getScrollYOffset() + this.relativeY + offset;
+					return ((Container)this.parent).getScrollYOffset() + this.relativeY + offset;
 					
 					// Clayton Sims - Feb 10, 2009 : Rolled back because it doesn't work on the 3110c, apparently!
 					// Fixing soon.
-					return ((Container)this.parent).getScrollYOffset() + this.relativeY + this.parent.relativeY;
+					//return ((Container)this.parent).getScrollYOffset() + this.relativeY + this.parent.relativeY;
 				}
 				int offset = this.targetYOffset;
 				//#ifdef polish.css.scroll-mode
