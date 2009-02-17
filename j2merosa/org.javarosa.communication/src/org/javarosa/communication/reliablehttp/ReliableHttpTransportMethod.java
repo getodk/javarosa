@@ -319,7 +319,10 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 }
                 
                 if (sendFailed) {
-                    cleanUp(out);
+	                //#if debug.output==verbose || debug.output==exception
+	                System.out.println("Transmission time out on reliablePost. Make sure firewall is not blocking." );
+	                //#endif                	
+                	cleanUp(out);
                     cleanUp(con);
                     cleanUp(in);
                     in = pl.getPayloadStream();
@@ -370,8 +373,11 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
     	            out.close();
     	            r = readLastByteReceived(con);
 		        } catch (IOException e){ 
+	                //#if debug.output==verbose || debug.output==exception
+	                System.out.println("Transmission time out on requestLastByte. Make sure firewall is not blocking." );
+	                //#endif
 		            //keep on trying until maximum retransmission timeout
-		            cleanUp(out);
+		        	cleanUp(out);
 		            cleanUp(con);
                     // many network errors are transient, so it's good to give a little buffer between re-tries
                     try{
