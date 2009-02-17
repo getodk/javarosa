@@ -16,6 +16,7 @@ public interface TransportMethod {
 	public static final int BLUETOOTH = 3;
 	public static final int HTTP_IO = 4;
 	public static final int SMS = 5;
+    public static final int RHTTP_GCF = 6;
 	
 	public static final String DESTINATION_KEY = "destination";
 

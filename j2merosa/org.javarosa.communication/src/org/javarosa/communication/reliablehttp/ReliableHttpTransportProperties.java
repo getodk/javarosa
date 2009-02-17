@@ -21,7 +21,11 @@ public class ReliableHttpTransportProperties implements IPropertyRules {
     public final static String POST_URL_PROPERTY = "PostURL";
     public final static String GET_URL_PROPERTY = "GetURL";
     public final static String AUTH_URL_PROPERTY = "AuthenticateURL";//for remote server user authentication
-
+    public final static String MAX_NUM_RETRIES_PROPERTY = "MaxNumRetries";
+    public final static String TIME_BETWEEN_RETRIES_PROPERTY = "TimeBetweenRetries";
+    public static final int DEFAULT_MAX_NUM_RETRIES = 7; 
+    public static final long DEFAULT_DELAY_BEFORE_RETRY = 1000;     
+    
     /**
      * Creates the JavaRosa set of property rules
      */
@@ -53,6 +57,14 @@ public class ReliableHttpTransportProperties implements IPropertyRules {
         Vector authUrls = new Vector();
         //getUrls.addElement(GET_URL_PROPERTY);
         rules.put(AUTH_URL_PROPERTY, authUrls);
+
+        // Maximum number of Retries Property
+        Vector maxNumRetries = new Vector();
+        rules.put(MAX_NUM_RETRIES_PROPERTY, maxNumRetries);
+        
+        // Time between Retries Property
+        Vector timeBetweenRetries = new Vector();
+        rules.put(TIME_BETWEEN_RETRIES_PROPERTY, timeBetweenRetries);
     }
 
     /** (non-Javadoc)
@@ -124,7 +136,11 @@ public class ReliableHttpTransportProperties implements IPropertyRules {
     		return "Current URL for POST's";
     	} else if(GET_URL_PROPERTY.equals(propertyName)) {
     		return "Current URL for GET's";
-     	}
+     	} else if(MAX_NUM_RETRIES_PROPERTY.equals(propertyName)) {
+            return "Maximum number of retransmission attempts";
+        } else if(TIME_BETWEEN_RETRIES_PROPERTY.equals(propertyName)) {
+            return "Time to wait between retransmission attempts (in ms)";
+        }
     	return propertyName;
     }
     
