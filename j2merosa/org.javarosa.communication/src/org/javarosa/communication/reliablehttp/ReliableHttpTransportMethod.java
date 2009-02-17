@@ -23,6 +23,7 @@ import org.javarosa.core.util.MD5InputStream;
 import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.http.HttpTransportDestination;
 import org.javarosa.communication.http.HttpHeaderAppendingVisitor;
+import org.javarosa.communication.http.HttpTransportProperties;
 
 /**
  * 
@@ -37,8 +38,6 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 	private IActivity destinationRetrievalActivity;
 	private ReliableWorkerThread primaryWorker;
 
-    private static final int MAX_NUM_RETRIES = 7; 
-    private static final int DELAY_BEFORE_RETRY = 1000; 
     private static final int MAX_NUM_TRANSMISSIONS = 100; 
     private Object messageLock = new Object();
 
@@ -239,13 +238,33 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 
 		    int numTries = 0;
             boolean sendFailed, isNotReliableServer = false;
-            while (numTries<MAX_NUM_RETRIES){
+            
+            //Set reliableHttp properties
+            int maxNumRetries = 0;
+            long delay = 0;
+            try{
+                String NUM_RETRIES = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(ReliableHttpTransportProperties.MAX_NUM_RETRIES_PROPERTY);
+                if(NUM_RETRIES!=null) maxNumRetries = Integer.parseInt(NUM_RETRIES);
+            } catch (NumberFormatException e) {} 
+            finally {
+                if ( maxNumRetries<=0 || maxNumRetries>100) maxNumRetries = ReliableHttpTransportProperties.DEFAULT_MAX_NUM_RETRIES;                
+            }
+
+            try{
+                String DELAY = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(ReliableHttpTransportProperties.TIME_BETWEEN_RETRIES_PROPERTY);    
+                if(DELAY!=null) delay = Long.parseLong(DELAY);
+            } catch (NumberFormatException e) {} 
+            finally {
+                if ( delay<=0 ) delay = ReliableHttpTransportProperties.DEFAULT_DELAY_BEFORE_RETRY;
+            }
+            
+            while ( numTries<maxNumRetries ){
                 numTries++;
                 sendFailed = false;
 
                 if(!isNotReliableServer){
                     //Request last byte received by server
-                    int lastByte = reliableRequestLastByte(url, md5);
+                    int lastByte = reliableRequestLastByte(url, md5, maxNumRetries, delay);
                     if (lastByte == -1 ){
                         isNotReliableServer = true;
                     } else if( lastByte>0 ){
@@ -306,11 +325,11 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                     in = pl.getPayloadStream();
                     try{
                         // many network errors are transient, so it's good to give a little buffer between re-tries
-                        Thread.sleep(DELAY_BEFORE_RETRY);
+                        Thread.sleep(delay);
                     } catch (InterruptedException e){}
                     continue;
                 }
-                if( numTries == MAX_NUM_RETRIES ){
+                if( numTries == maxNumRetries ){
                     //The connection is truly foo-bar'd. Give up. 
                     throw new IOException("Max num retransmits exceeded");
                 }                   
@@ -332,11 +351,11 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		* Content-Range: bytes *\/100
 		* @returns "-1" if not byte received
 		*/
-		private int reliableRequestLastByte (String url, String md5) throws IOException{
+		private int reliableRequestLastByte (String url, String md5, int maxNumRetries, long delay) throws IOException{
 		    //send out request
 		    int numTries = 0;
 		    int r = -1;
-		    while(numTries < MAX_NUM_RETRIES){
+		    while(numTries < maxNumRetries){
 		        numTries++;
                 try{
     	            HttpConnection con = (HttpConnection) Connector.open(url);
@@ -356,14 +375,14 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		            cleanUp(con);
                     // many network errors are transient, so it's good to give a little buffer between re-tries
                     try{
-                        Thread.sleep(DELAY_BEFORE_RETRY);
+                        Thread.sleep(delay);
                     } catch (InterruptedException e2){}
 		            continue;
 		        }
 	            break;
 		    }
 		    
-		    if (numTries >= MAX_NUM_RETRIES ){
+		    if (numTries >= maxNumRetries ){
     		    //The connection is truly messed up. Give up.
     		    throw new IOException("Max num retransmits exceeded");
 		    }
@@ -478,7 +497,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 	 * @see org.openmrs.transport.TransportMethod#getId()
 	 */
 	public int getId() {
-		return TransportMethod.HTTP_GCF;
+		return TransportMethod.RHTTP_GCF;
 	}
 
 	/*

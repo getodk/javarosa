@@ -10,7 +10,7 @@ public class ReliableHttpTransportModule implements IModule {
 	public void registerModule(Context context) {
 		
 		String[] classes = {
-				"org.javarosa.communication.reliablehttp.ReliableHttpTransportDestination",				
+				"org.javarosa.communication.http.HttpTransportDestination",				
 		};		
 		JavaRosaServiceProvider.instance().registerPrototypes(classes);
 		
