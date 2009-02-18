@@ -66,6 +66,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	private final String WTK_PATH = new String("wtk.path");
 	private final String NEW_FORM = new String("new.form");
 	private final String ORIGINAL_JAR_DIR = new String("original.jar.dir");
+	private final String OPEN_XML_WITH = new String("open.xml.with");
 	
 	private final String JAR_NAME = new String("JavaRosaFormTest.jar");
 	private final String JAD_NAME = new String("JavaRosaFormTest.jad");
@@ -82,6 +83,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	private String wtkPath = new String("C:\\WTK2.5.2\\");
 	private String origJarDir = new String("C:\\TEST\\");
 	private String newForm = new String("C:\\TEST\\b.xml");
+	private static String openXMLWith = new String("C:\\Program Files\\Internet Explorer\\iexplore.exe");
 	
 	private Button testBtn = null;
 	private Label status = new Label();
@@ -161,8 +163,9 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			
 			System.out.println("temp file written");
 			
-			System.out.println("launching xml viewer");
-			Runtime.getRuntime().exec(new String[] {"iexplore.exe", tempfile.getAbsolutePath()});
+			System.out.println("launching xml viewer:");
+			System.out.println("\t" + openXMLWith + " " + tempfile.getAbsolutePath() );
+			Runtime.getRuntime().exec(new String[] {openXMLWith, tempfile.getAbsolutePath()});
 		} catch (IOException ioe) { }
 	}
 	
@@ -642,6 +645,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		p.setProperty(this.WTK_PATH, this.wtkPath);
 		p.setProperty(this.NEW_FORM, this.newForm);
 		p.setProperty(this.ORIGINAL_JAR_DIR, this.origJarDir);
+		p.setProperty(this.OPEN_XML_WITH, this.openXMLWith);
 		
 		File f = new File(this.PROPERTIES_FILE);
 		try {
@@ -688,6 +692,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		this.wtkPath = props.getProperty(this.WTK_PATH);
 		this.newForm = props.getProperty(this.NEW_FORM);
 		this.origJarDir = props.getProperty(this.ORIGINAL_JAR_DIR);
+		this.openXMLWith = props.getProperty(this.OPEN_XML_WITH);
 	}
 	
 	private void emulate( String wtkPath, String jad) {
@@ -778,12 +783,6 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
-	}
-	
-	private void replaceInJar(String jar, String src, String dest) {
-		//JarFile jf = new JarFile(jar);
-	//	jf.
-		
 	}
 
 	private void unjar(String filename, String destDir) {
