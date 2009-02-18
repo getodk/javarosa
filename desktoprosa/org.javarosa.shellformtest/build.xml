@@ -62,6 +62,7 @@
 					<!--source dir="${dir.test}"/-->
 					<source dir="${basedir}/../org.javarosa.core/src/"/>
 					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
+					<source dir="${basedir}/../org.javarosa.forms/src/"/>
 					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
 					<source dir="${basedir}/../org.javarosa.j2me/src/"/>
 
