@@ -53,13 +53,31 @@ public class ContextPreloadHandler implements IPreloadHandler
 	//The context preload parameter
 	private IAnswerData preloadContext(String preloadParams) {
 		String value = "";
-		if ("UserID".equals(preloadParams)) {
+		
+		//#if javarosa.adduser.extended
+		if ("UserName".equalsIgnoreCase(preloadParams)) {
+			String userVal = this.context.getCurrentUser();
+			System.out.println("LOGIN NAME IS "+userVal);
+			
+			if (userVal != null && userVal.length() > 0)
+				value = userVal;
+		} else if( "UserID".equalsIgnoreCase(preloadParams)) {
+			Integer userID = this.context.getCurrentUserID();
+			System.out.println("USER ID is "+userID);
+			
+			if (userID != null )
+				value = userID.toString();
+		}
+		//#else
+		if ("UserID".equalsIgnoreCase(preloadParams)) {
 			String userVal = this.context.getCurrentUser();
 			System.out.println("LOGIN NAME IS "+userVal);
 			
 			if (userVal != null && userVal.length() > 0)
 				value = userVal;
 		}
+		//#endif
+	
 		System.out.println(value);
 		return new StringData(value);
 	}
