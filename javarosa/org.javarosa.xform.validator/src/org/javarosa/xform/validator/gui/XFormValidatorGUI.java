@@ -139,22 +139,29 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	
 	private static void showXMLOutput () {
 		try {
-			String line = null;
-			String xml = "";
+			System.out.println("xml output detected");
 			
-			line = brOut.readLine();
+			String xml = "";
+			String line = brOut.readLine();
 			while (!"ENDXMLOUTPUT".equals(line)) {
 				xml = xml + line;
 				line = brOut.readLine();
 			}
 			
+			System.out.println("xml output: " + xml);
+			
 			File tempfile = File.createTempFile("jrxform", ".xml");
 			tempfile.deleteOnExit();
 
+			System.out.println("temp file created: " + tempfile.getAbsolutePath());
+			
 			BufferedWriter out = new BufferedWriter(new FileWriter(tempfile));
 			out.write(xml);
 			out.close();
 			
+			System.out.println("temp file written");
+			
+			System.out.println("launching xml viewer");
 			Runtime.getRuntime().exec(new String[] {"iexplore.exe", tempfile.getAbsolutePath()});
 		} catch (IOException ioe) { }
 	}
