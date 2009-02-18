@@ -22,10 +22,12 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -135,14 +137,43 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		t.schedule(new CheckOutput(), 100, 100);
 	}
 	
+	private static void showXMLOutput () {
+		try {
+			String line = null;
+			String xml = "";
+			
+			line = brOut.readLine();
+			while (!"ENDXMLOUTPUT".equals(line)) {
+				xml = xml + line;
+				line = brOut.readLine();
+			}
+			
+			File tempfile = File.createTempFile("jrxform", ".xml");
+			tempfile.deleteOnExit();
+
+			BufferedWriter out = new BufferedWriter(new FileWriter(tempfile));
+			out.write(xml);
+			out.close();
+			
+			Runtime.getRuntime().exec(new String[] {"iexplore.exe", tempfile.getAbsolutePath()});
+		} catch (IOException ioe) { }
+	}
+	
 	// This is such hacky terrible code.  I hope no one ever looks at this file.
 	class CheckOutput extends TimerTask {
 		public void run() {
 			if(brErr != null && brOut != null) {
 				// Check if there's output.
 				try {
-					if(brOut.ready())
-						addToTextArea(brOut.readLine()+"\n");
+					if(brOut.ready()) {
+						String line = brOut.readLine();
+						if ("BEGINXMLOUTPUT".equals(line)) {
+							showXMLOutput();
+						} else {
+							addToTextArea(line+"\n");
+						}
+					}
+					
 					if(brErr.ready())
 						addToTextArea(brErr.readLine()+"\n");
 				} catch (IOException e) {

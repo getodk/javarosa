@@ -1,5 +1,8 @@
 package org.javarosa.shellformtest.shell;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
 
 import javax.microedition.midlet.MIDlet;
@@ -11,16 +14,18 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.CoreModelModule;
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.services.transport.ByteArrayPayload;
+import org.javarosa.core.services.transport.MultiMessagePayload;
 import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.utility.IFormDefRetrievalMethod;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
-import org.javarosa.formmanager.utility.ReferenceRetrievalMethod;
 import org.javarosa.j2me.storage.rms.RMSStorageModule;
+import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xform.util.XFormUtils;
 
@@ -40,8 +45,37 @@ public class JavaRosaFormTestShell implements IShell {
 		midlet.notifyDestroyed();		
 	}
 
-	public void returnFromActivity(IActivity activity, String returnCode,
-			Hashtable returnArgs) {
+	public void returnFromActivity(IActivity activity, String returnCode, Hashtable returnArgs) {
+		if (activity instanceof FormEntryActivity) {
+			//print xml output to console
+			if (((Boolean)returnArgs.get("FORM_COMPLETE")).booleanValue()) {
+				DataModelTree instance = (DataModelTree)returnArgs.get("DATA_MODEL");
+				ByteArrayPayload payload = null;
+				try {
+					payload = (ByteArrayPayload)(new XFormSerializingVisitor()).createSerializedPayload(instance);
+				} catch (IOException e) {
+					throw new RuntimeException("a");
+				}
+				InputStream is = payload.getPayloadStream();
+				int len = (int)(payload.getLength());
+				
+				byte[] data = new byte[len];
+				try {
+					is.read(data, 0, len);
+				} catch (IOException e) {
+					throw new RuntimeException("b");
+				}
+				
+				System.out.println("BEGINXMLOUTPUT");
+				try {
+					System.out.println(new String(data, "UTF-8"));
+				} catch (UnsupportedEncodingException e) {
+					throw new RuntimeException("c");
+				}
+				System.out.println("ENDXMLOUTPUT");
+			}			
+		}
+		
 		// We should display a screen, but we're just going to exit for now
 		exitShell();
 	}
