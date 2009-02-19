@@ -647,6 +647,8 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		p.setProperty(this.ORIGINAL_JAR_DIR, this.origJarDir);
 		p.setProperty(this.OPEN_XML_WITH, this.openXMLWith);
 		
+		System.out.println("writing properties: " + p);
+		
 		File f = new File(this.PROPERTIES_FILE);
 		try {
 			if( !f.exists() )
@@ -686,7 +688,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			e.printStackTrace();
 		}
 		
-		System.out.println(props);
+		System.out.println("read properties file: " + props);
 		
 		// Read in properties
 		this.wtkPath = props.getProperty(this.WTK_PATH);
