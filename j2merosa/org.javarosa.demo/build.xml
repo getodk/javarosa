@@ -230,7 +230,7 @@
 	
 	<target name="CreateJavadoc" depends="BuildClean" description="generates javadoc and also UML Diagram">
 		<mkdir dir="${dir.javadoc}"/>
-	        <javadoc sourcepath="${builtsource}" packagenames="org.javarosa.*" destdir="${dir.javadoc}"
+	        <javadoc useexternalfile="yes" sourcepath="${builtsource}" packagenames="org.javarosa.*" destdir="${dir.javadoc}"
 	        	classpathref="classpath.test" private="true">
 	        	   <doclet name="org.umlgraph.doclet.UmlGraphDoc"
 	        		  path="${dir.tools}/UMLGraph.jar">
