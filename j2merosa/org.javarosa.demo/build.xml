@@ -239,7 +239,7 @@
 	        	        <param name="-qualify" />
 	        	        <param name="-types" />
 	        	        <param name="-visibility" />
-	        	    </doclet>
+	        	    </doclet>	
 	        	    <link href="http://java.sun.com/javame/reference/apis/jsr030/"/>
 	        	    <link href="http://java.sun.com/javame/reference/apis/jsr118/"/>
 	        	    <link href="http://www.j2mepolish.org/javadoc/j2me/"/>
@@ -261,8 +261,8 @@
 			<arg value="obfuscation_mapping.txt" />
 		</exec-->
 	    <py-run script="${dir.tools}/jar_usage.py" optimize="0" python="${pythonexec}">
-	      <arg value="${dir.dist}/${app.jarName}"/>
-	      <arg value="${dir.dist}/obfuscation_mapping.txt"/>
+	      <arg value="${basedir}\\dist\\${app.jarName}"/>
+	      <arg value="${basedir}\\dist\\obfuscation_mapping.txt"/>
 	    </py-run>
 	</target>
 	
