@@ -122,7 +122,7 @@
 				<!-- Whether to run the obfuscator, which makes reverse engineering the byte-code
 					 more difficult, and compresses the built JAR -->
 				<!-- obfuscator settings: do not obfuscate when the test-property is true -->
-				<obfuscator name="ProGuard" unless="test or noobfuscate">
+				<obfuscator name="ProGuard" unless="(test or noobfuscate) and not release">
 					<parameter name="optimize" value="true" />
 					<parameter name="printmapping" value="${dir.dist}\obfuscation_mapping.txt" />
 					
@@ -190,7 +190,7 @@
 	</target>
 	
 	<!-- Main Target: Cleans, and then runs the build target -->
-	<target name="BuildClean" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, BuildPolish"/>
+	<target name="BuildClean" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, enableRelease, BuildPolish"/>
 
 	<!-- Main Target: Cleans, and then runs the build target with the emulator -->
 	<target name="BuildCleanRunEmulator" description="allows a clean build, and then launches the emulator" depends="Clean, enableEmulator, BuildPolish" />
@@ -278,6 +278,10 @@
 
 	<target name="supressOutput">
 		<property name="${debug.output}" value="none"/>
+	</target>
+	
+	<target name="enableRelease">
+		<property name="release" value="true"/>
 	</target>
 
 	<target name="disableObfuscator">
