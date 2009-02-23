@@ -38,11 +38,16 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 		
 		ChoiceGroup cg = new ChoiceGroup("", style) {
 			
-			/** Hack #1 **/
+			/** Hack #1 & Hack #3**/
 			// j2me polish refuses to produce events in the case where select items
 			// are already selected. This code intercepts key presses that toggle
 			// selection, and clear any existing selection to prevent the supression
 			// of the appropriate commands.
+			//
+			// Hack #3 is due to the fact that multiple choice items won't fire updates
+			// unless they haven't been selected by default. The return true here for them
+			// ensures that the system knows that fires on multi-select always signify
+			// a capture.
 			//
 			// NOTE: These changes are only necessary for Polish versions > 2.0.5 as far
 			// as I can tell. I have tested them on 2.0.4 and 2.0.7 and the changes
@@ -52,9 +57,18 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 						keyCode, gameAction);
 				if (gameActionIsFire) {
 					ChoiceItem choiceItem = (ChoiceItem) this.focusedItem;
-					choiceItem.isSelected = false;
+					if(this.choiceType != ChoiceGroup.MULTIPLE) {
+						//Hack #1
+						choiceItem.isSelected = false;
+					}
 				}
-				return super.handleKeyReleased(keyCode, gameAction);
+				boolean superReturn = super.handleKeyReleased(keyCode, gameAction);
+				if(gameActionIsFire && this.choiceType == ChoiceGroup.MULTIPLE) {
+					//Hack #3
+					return true;
+				} else {
+					return superReturn;
+				}
 			}
 			
 			/** Hack #2 **/
