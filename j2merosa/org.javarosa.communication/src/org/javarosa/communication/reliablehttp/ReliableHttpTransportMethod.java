@@ -38,9 +38,16 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 	private IActivity destinationRetrievalActivity;
 	private ReliableWorkerThread primaryWorker;
 
+    private static int maxNumRetries = ReliableHttpTransportProperties.DEFAULT_MAX_NUM_RETRIES; 
+    private static long delayBeforeRetry = ReliableHttpTransportProperties.DEFAULT_DELAY_BEFORE_RETRY;     
     private static final int MAX_NUM_TRANSMISSIONS = 100; 
     private Object messageLock = new Object();
-
+    
+    public ReliableHttpTransportMethod() {
+        //update properties to reflect what's stored in RMS
+        updateProperties();
+    }
+    
     /*
 	 * (non-Javadoc)
 	 * 
@@ -238,33 +245,14 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 
 		    int numTries = 0;
             boolean sendFailed, isNotReliableServer = false;
-            
-            //Set reliableHttp properties
-            int maxNumRetries = 0;
-            long delay = 0;
-            try{
-                String NUM_RETRIES = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(ReliableHttpTransportProperties.MAX_NUM_RETRIES_PROPERTY);
-                if(NUM_RETRIES!=null) maxNumRetries = Integer.parseInt(NUM_RETRIES);
-            } catch (NumberFormatException e) {} 
-            finally {
-                if ( maxNumRetries<=0 || maxNumRetries>100) maxNumRetries = ReliableHttpTransportProperties.DEFAULT_MAX_NUM_RETRIES;                
-            }
-
-            try{
-                String DELAY = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(ReliableHttpTransportProperties.TIME_BETWEEN_RETRIES_PROPERTY);    
-                if(DELAY!=null) delay = Long.parseLong(DELAY);
-            } catch (NumberFormatException e) {} 
-            finally {
-                if ( delay<=0 ) delay = ReliableHttpTransportProperties.DEFAULT_DELAY_BEFORE_RETRY;
-            }
-            
+                                    
             while ( numTries<maxNumRetries ){
                 numTries++;
                 sendFailed = false;
 
                 if(!isNotReliableServer){
                     //Request last byte received by server
-                    int lastByte = reliableRequestLastByte(url, md5, maxNumRetries, delay);
+                    int lastByte = reliableRequestLastByte(url, md5);
                     if (lastByte == -1 ){
                         isNotReliableServer = true;
                     } else if( lastByte>0 ){
@@ -320,7 +308,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                 
                 if (sendFailed) {
 	                //#if debug.output==verbose || debug.output==exception
-	                System.out.println("Transmission time out on reliablePost. Make sure firewall is not blocking." );
+	                System.out.println("Transmission time out on reliablePost. Make sure firewall is not blocking." + numTries);
 	                //#endif                	
                 	cleanUp(out);
                     cleanUp(con);
@@ -328,7 +316,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
                     in = pl.getPayloadStream();
                     try{
                         // many network errors are transient, so it's good to give a little buffer between re-tries
-                        Thread.sleep(delay);
+                        Thread.sleep(delayBeforeRetry);
                     } catch (InterruptedException e){}
                     continue;
                 }
@@ -354,7 +342,7 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 		* Content-Range: bytes *\/100
 		* @returns "-1" if not byte received
 		*/
-		private int reliableRequestLastByte (String url, String md5, int maxNumRetries, long delay) throws IOException{
+		private int reliableRequestLastByte (String url, String md5) throws IOException{
 		    //send out request
 		    int numTries = 0;
 		    int r = -1;
@@ -374,14 +362,14 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
     	            r = readLastByteReceived(con);
 		        } catch (IOException e){ 
 	                //#if debug.output==verbose || debug.output==exception
-	                System.out.println("Transmission time out on requestLastByte. Make sure firewall is not blocking." );
+	                System.out.println("Transmission time out on requestLastByte. Make sure firewall is not blocking." +  numTries );
 	                //#endif
 		            //keep on trying until maximum retransmission timeout
 		        	cleanUp(out);
 		            cleanUp(con);
                     // many network errors are transient, so it's good to give a little buffer between re-tries
                     try{
-                        Thread.sleep(delay);
+                        Thread.sleep(delayBeforeRetry);
                     } catch (InterruptedException e2){}
 		            continue;
 		        }
@@ -530,8 +518,30 @@ public class ReliableHttpTransportMethod extends HttpTransportMethod {
 	public void closeConnections() {
 		if(primaryWorker!=null){
 			primaryWorker.cleanStreams();
-		}
-		
-		
+		}	
 	}
+
+    public static synchronized void updateProperties(){
+        try{
+            int num = ReliableHttpTransportProperties.DEFAULT_MAX_NUM_RETRIES;
+            String mnr = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(ReliableHttpTransportProperties.MAX_NUM_RETRIES_PROPERTY);
+            if(mnr != null) num = Integer.parseInt(mnr);
+            setNumRetries(num);
+
+            long delay = ReliableHttpTransportProperties.DEFAULT_DELAY_BEFORE_RETRY;
+            String d = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(ReliableHttpTransportProperties.TIME_BETWEEN_RETRIES_PROPERTY);
+            if(d!=null) delay = Long.parseLong(d);
+            setDelay(delay);
+        } catch (NumberFormatException e) {}         
+    }
+    
+	public static synchronized void setNumRetries(int n){
+        if ( n<=0 || n>100) return;
+        else maxNumRetries = n;
+	}
+
+    public static synchronized void setDelay(long ms){
+        if ( ms<=0 ) return;
+        else delayBeforeRetry = ms;
+    }
 }

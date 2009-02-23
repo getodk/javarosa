@@ -4,8 +4,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.properties.IPropertyRules;
+import org.javarosa.core.services.transport.TransportMethod;
+import org.javarosa.core.util.PropertyUtils;
 
 /**
  * A set of rules for the properties of the Reliable Http Transport layer
@@ -131,15 +134,15 @@ public class ReliableHttpTransportProperties implements IPropertyRules {
      */
     public String getHumanReadableDescription(String propertyName) {
     	if(POST_URL_LIST_PROPERTY.equals(propertyName)) {
-    		return "List of possible POST URL's";
+    		return "Possible Reliable POST URL's";
     	} else if(POST_URL_PROPERTY.equals(propertyName)) {
-    		return "Current URL for POST's";
+    		return "URL for reliable POST's";
     	} else if(GET_URL_PROPERTY.equals(propertyName)) {
-    		return "Current URL for GET's";
+    		return "URL for reliable GET's";
      	} else if(MAX_NUM_RETRIES_PROPERTY.equals(propertyName)) {
-            return "Maximum number of retransmission attempts";
+            return "Max retransmission attempts";
         } else if(TIME_BETWEEN_RETRIES_PROPERTY.equals(propertyName)) {
-            return "Time to wait between retransmission attempts (in ms)";
+            return "Time between retransmit attempts (ms)";
         }
     	return propertyName;
     }
@@ -156,6 +159,7 @@ public class ReliableHttpTransportProperties implements IPropertyRules {
      * @see org.javarosa.core.services.properties.IPropertyRules#handlePropertyChanges(java.lang.String)
      */
     public void handlePropertyChanges(String propertyName) {
-    	//Nothing
+        ((ReliableHttpTransportMethod)JavaRosaServiceProvider.instance().getTransportManager().getTransportMethod(TransportMethod.RHTTP_GCF))
+                    .updateProperties();
     }
 }

@@ -14,9 +14,12 @@ public class ReliableHttpTransportModule implements IModule {
 		};		
 		JavaRosaServiceProvider.instance().registerPrototypes(classes);
 		
-		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new ReliableHttpTransportMethod());
+		// RL - must set properties before instantiating TransportMethod
+		// Properties can be modified from the 'Settings' menu on the main screen
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new ReliableHttpTransportProperties());
-		JavaRosaServiceProvider.instance().getTransportManager().setCurrentTransportMethod(new ReliableHttpTransportMethod().getId());
+		ReliableHttpTransportMethod rhtm = new ReliableHttpTransportMethod();
+        JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(rhtm);
+		JavaRosaServiceProvider.instance().getTransportManager().setCurrentTransportMethod(rhtm.getId());
 	}
 
 }
