@@ -23,6 +23,7 @@ import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.clforms.widgets.DateQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.NumericQuestionWidget;
+import org.javarosa.formmanager.view.clforms.widgets.DecimalQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.Select1QuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.SelectQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TextQuestionWidget;
@@ -113,6 +114,15 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener, 
 						widget = new NumericQuestionWidget(prompt,1);
 					else 
 						widget = new NumericQuestionWidget(prompt,"");	
+				break;
+			case Constants.DATATYPE_DECIMAL:
+				if (fromFormView == true)
+					widget = new DecimalQuestionWidget(prompt,'c');
+				else
+					if (direction == true)
+						widget = new DecimalQuestionWidget(prompt,1);
+					else 
+						widget = new DecimalQuestionWidget(prompt,"");	
 				break;
 			}
 			break;
