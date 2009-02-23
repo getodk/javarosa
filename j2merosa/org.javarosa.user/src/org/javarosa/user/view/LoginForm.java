@@ -27,6 +27,10 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 
+//#if javarosa.login.showbuild
+import edu.washington.commcare.util.CommCareContext;
+//#endif
+
 import de.enough.polish.util.StringTokenizer;
 
 public class LoginForm extends Form implements IView
@@ -102,6 +106,14 @@ public class LoginForm extends Form implements IView
 	      demoButton = new StringItem(null,"DEMO",Item.BUTTON);
 	      this.append(demoButton);
 	      demoButton.setDefaultCommand(demoButtonCommand);     // add Command to Item.
+	      //#endif
+	      
+	      //#if javarosa.login.showbuild
+	      if(parent.getActivityContext() instanceof CommCareContext) {
+	    	  CommCareContext c = (CommCareContext)parent.getActivityContext();
+	    	  this.append(new String("CommCare verison: " + c.getCommCareVersion()));
+	    	  this.append(new String("Build number: " + c.getCommCareBuild() + "-" + c.getJavaRosaBuild()));
+	      }
 	      //#endif
 	   }
 
