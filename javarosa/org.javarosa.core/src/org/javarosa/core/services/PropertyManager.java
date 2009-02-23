@@ -121,9 +121,10 @@ public class PropertyManager implements IService {
             boolean valid = true;
             Enumeration en = propertyValue.elements();
             while(en.hasMoreElements()) {
-                if(!(checkPropertyAllowed(propertyName) && checkValueAllowed(propertyName, (String)en.nextElement()))) {
+                // RL - checkPropertyAllowed is implicit in checkValueAllowed
+                if (!checkValueAllowed(propertyName, (String)en.nextElement())) {
                     valid = false;
-                }
+                } 
             }
             if(valid) {
                 propertyRMS.writeValue(propertyName, propertyValue);
@@ -221,7 +222,7 @@ public class PropertyManager implements IService {
 		} else {
 			boolean allowed = false;
 			Enumeration en = rulesList.elements();
-			while (en.hasMoreElements()) {
+			while (en.hasMoreElements() && !allowed) {
 				IPropertyRules rules = (IPropertyRules) en.nextElement();
 				if (rules.checkPropertyAllowed(propertyName)) {
 					if (rules.checkValueAllowed(propertyName, propertyValue)) {
