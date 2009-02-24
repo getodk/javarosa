@@ -1,6 +1,10 @@
 package org.javarosa.xform.validator.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Button;
+import java.awt.CardLayout;
+import java.awt.Checkbox;
+import java.awt.CheckboxGroup;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
@@ -15,6 +19,8 @@ import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
@@ -28,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -41,6 +48,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.xform.util.XFormUtils;
@@ -60,13 +69,14 @@ import org.javarosa.xform.util.XFormUtils;
  * please visit http://www.davidflanagan.com/javaexamples3.
  */
 
-public class XFormValidatorGUI extends Frame implements ActionListener, KeyListener {
+public class XFormValidatorGUI extends Frame implements ActionListener, KeyListener, ItemListener {
 
 	private final String PROPERTIES_FILE = new String("settings.properties");
 	private final String WTK_PATH = new String("wtk.path");
 	private final String NEW_FORM = new String("new.form");
 	private final String ORIGINAL_JAR_DIR = new String("original.jar.dir");
 	private final String OPEN_XML_WITH = new String("open.xml.with");
+	private final String OPEN_AT_END = new String("open.at.end");
 	
 	private final String JAR_NAME = new String("JavaRosaFormTest.jar");
 	private final String JAD_NAME = new String("JavaRosaFormTest.jad");
@@ -80,21 +90,30 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	private final int BUFFER = 2048;
 	private final int TF_SIZE = 70;
 	
+	// Properties that we save
 	private String wtkPath = new String("C:\\WTK2.5.2\\");
-	private String origJarDir = new String("C:\\TEST\\");
+	private String origJarDir = new String(".\\" + JAR_NAME );
 	private String newForm = new String("C:\\TEST\\b.xml");
 	private static String openXMLWith = new String("C:\\Program Files\\Internet Explorer\\iexplore.exe");
+	private static Boolean openAtEnd = new Boolean(true);
 	
+	// For the gui
+	private Panel mainScreen = null;
+	private CardLayout cl = null;
+	private final static String SETTINGS_SCREEN = "SETTINGS_SCREEN";
+	private final static String MAIN_SCREEN = "MAIN_SCREEN";
 	private Button testBtn = null;
 	private Label status = new Label();
 	private Label formName = new Label();
 	
+	private Checkbox noOpenAtEnd = null;
+	private Checkbox yesOpenAtEnd = null;
+	
 	private TextField wtkTF = null;
 	private TextField jarTF = null;
 	private TextField formTF = null;
+	private TextField viewerEXE = null;
 	
-	private Label filename = new Label();
-	private boolean hasFile = false;
 	private BufferLogger bufferedlogger = new BufferLogger();
 	public static TextArea textarea = new TextArea("", 24, 80);
 
@@ -118,6 +137,14 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			}
 		});
 		
+		File f = new File(".");
+		try {
+			this.origJarDir = f.getCanonicalPath() + "\\" + JAR_NAME;
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		// Read in the properties!
 		readProperties();
 		
@@ -137,6 +164,13 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		// Start a timer!
 		Timer t = new Timer();
 		t.schedule(new CheckOutput(), 100, 100);
+		
+		// Finally, check our settings
+		if(!checkParams()) {
+			addToTextArea("ERROR! Check settings and make sure you select a valid file!");
+		}else {
+			addToTextArea("All settings ok.");
+		}
 	}
 	
 	private static void showXMLOutput () {
@@ -163,9 +197,12 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			
 			System.out.println("temp file written");
 			
-			System.out.println("launching xml viewer:");
-			System.out.println("\t" + openXMLWith + " " + tempfile.getAbsolutePath() );
-			Runtime.getRuntime().exec(new String[] {openXMLWith, tempfile.getAbsolutePath()});
+			if( openAtEnd.booleanValue() ) {
+				System.out.println("launching xml viewer:");
+				System.out.println("\t" + openXMLWith + " " + tempfile.getAbsolutePath() );
+				Runtime.getRuntime().exec(new String[] {openXMLWith, tempfile.getAbsolutePath()});
+			} else 
+				System.out.println("not launching XML viewer");
 		} catch (IOException ioe) { }
 	}
 	
@@ -204,6 +241,11 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		}
 	}
 
+	public void itemStateChanged(ItemEvent e) {
+		// triggered by the checkboxes
+		openAtEnd = new Boolean(yesOpenAtEnd.getState());
+	}
+
 	/**
 	 * Handle button clicks
 	 */
@@ -212,15 +254,16 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		if (cmd.equals("eval")) {
 			// Clear the text area...
 			this.textarea.setText("");
-
+			
 			// If user clicked "validate" button
-			this.validateFile(); 
+			if(checkNewForm())
+				this.validateFile(); 
 		}else if(cmd.equals("test")) {
 			// Clear the text area...
 			this.textarea.setText("");
 
 			if(!checkParams()) {
-				this.addToTextArea("ERROR: Please check status and fix parameters!");
+				this.addToTextArea("ERROR: Please fix parameters on the settings screen!");
 				return;
 			}
 			
@@ -258,9 +301,12 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			}
 			
 			this.origJarDir = f.getDirectory();
-			this.jarTF.setText(f.getDirectory());
+			this.jarTF.setText(f.getDirectory() + f.getFile());
 			
 			f.dispose(); // Get rid of the dialog box
+			if(checkParams() )
+				updateStatus("All settings ok.");
+			
 		} else if(cmd.equals("form")){
 			// Create a file dialog box to prompt for a new file to display
 			FileDialog f = new FileDialog(this, "Open XForm", FileDialog.LOAD);
@@ -282,7 +328,46 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			this.formTF.setText(this.newForm);
 			
 			f.dispose(); // Get rid of the dialog box
-		} 
+			checkParams();
+		} else if(cmd.equals("viewerexe")) {
+			// Create a file dialog box to prompt for a new file to display
+			FileDialog f = new FileDialog(this, "Choose viewer EXE", FileDialog.LOAD);
+
+			f.setFilenameFilter(new FilenameFilter() {
+				public boolean accept(File directory, String filename) {
+					return (filename.endsWith(".exe"));
+				}
+			});
+			
+			String dir = this.viewerEXE.getText();
+			dir = dir.substring(0,dir.lastIndexOf("\\"));
+			f.setDirectory(dir);
+			
+			// Display the dialog and wait for the user's response
+			f.setVisible(true);
+
+			if( f.getFile() == null)
+				return;
+			
+			openXMLWith = f.getDirectory() + f.getFile();
+			this.viewerEXE.setText(openXMLWith);
+			
+			f.dispose(); // Get rid of the dialog box
+			
+			checkParams();
+		} else if(cmd.equals(SETTINGS_SCREEN)) {
+			if(checkParams())
+				updateStatus("All settings ok.");
+			this.cl.show(this.mainScreen, SETTINGS_SCREEN);
+		} else if(cmd.equals(MAIN_SCREEN)) {
+			this.cl.show(this.mainScreen, MAIN_SCREEN);
+		} else if(cmd.equals("save_settings")) {
+			if( checkParams() ) {
+				this.writeProperties();
+				updateStatus("All settings ok. Settings saved.");
+			} else
+				reportError(status.getText() + " - settings not saved!");
+		}
 	}
 	
 	// I'm a terrible person
@@ -356,81 +441,165 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 
 	
 	private void createGUI() {
-		this.setPreferredSize(new Dimension(900,600));
+		this.setPreferredSize(new Dimension(900,570));
+		
+		// Create the screen.
+		Panel screen = new Panel();
+		screen.setLayout(new BorderLayout());
+		
+		Panel p = createTabs();
+		Panel p2 = createMainScreen();
+		
+		screen.add("North", p);
+		screen.add("Center", p2);
+		
+		this.add(screen);
+	}
+	
+	private Panel createTabs() {
+		Panel p = new Panel();
+		p.setLayout(new FlowLayout());
+		Button b = new Button("Main Screen");
+		b.addActionListener(this);
+		b.setActionCommand(MAIN_SCREEN);
+		p.add(b);
+		b = new Button("Settings");
+		b.addActionListener(this);
+		b.setActionCommand(SETTINGS_SCREEN);
+		p.add(b);
+		return p;
+	}
+	
+	private Panel createMainScreen() {
+		mainScreen = new Panel();
+		cl = new CardLayout();
+		mainScreen.setLayout(cl);
+		mainScreen.add(createMainCard(), MAIN_SCREEN);
+		mainScreen.add(createSettingsCard(), SETTINGS_SCREEN);
+		return mainScreen;
+	}
+	
+	private Panel createSettingsCard() {
+		Panel settings = new Panel();
 		
 		// Using gridbag layout
 		GridBagConstraints gbc = new GridBagConstraints();
 		GridBagLayout gridBag = new GridBagLayout();
-		this.setLayout(gridBag);
+		settings.setLayout(gridBag);
 		
 		// Status
 		Label l = new Label("Status:");
 		l.setAlignment(Label.LEFT);
-//		gbc.gridy = 0;
 		gbc.gridx = 0;
 		gbc.gridwidth = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		this.add(l,gbc);
-		
+		settings.add(l,gbc);
+
 		updateStatus("The current status will be displayed here.");
 		status.setAlignment(Label.LEFT);
-//		gbc.gridy = 0;
 		gbc.gridx = 1;
 		gbc.gridwidth = 2;
-		this.add(this.status,gbc);
+		settings.add(this.status,gbc);
 
+		
 		// WTK DIR
 		l = new Label("Set the WTK directory:");
 		l.setAlignment(Label.LEFT);
 		gbc.gridx = 0;
-//		gbc.gridy = 0;
 		gbc.gridwidth = 3;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		this.add(l, gbc);
+		settings.add(l, gbc);
 		
 		this.wtkTF = new TextField(this.wtkPath, this.TF_SIZE);
 		this.wtkTF.addKeyListener(this);
-//		gbc.gridy = 1;
 		gbc.gridx = 0;
 		gbc.gridwidth = 3;
-		this.add(this.wtkTF, gbc);
-		
-		/*Button b = new Button("Choose Directory...");
-		b.addActionListener(this);
-		b.setActionCommand("wtkdir");
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.weightx = 0;
-		gbc.fill = GridBagConstraints.NONE;
-		this.add(b, gbc);*/
+		settings.add(this.wtkTF, gbc);
 		
 		// JAR
-		l = new Label("Set the directory for the JAR:");
+		l = new Label("Chose the JavaRosaFormTest JAR:");
 		l.setAlignment(Label.LEFT);
 		gbc.gridx = 0;
-//		gbc.gridy = 2;
 		gbc.gridwidth = 3;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		this.add(l, gbc);
+		settings.add(l, gbc);
 		
-		this.jarTF = new TextField(this.origJarDir, this.TF_SIZE);
+		this.jarTF = new TextField(this.origJarDir + "\\" + this.JAR_NAME, this.TF_SIZE);
 		this.jarTF.addKeyListener(this);
-//		gbc.gridy = 3;
 		gbc.gridx = 0;
 		gbc.gridwidth = 2;
-		this.add(this.jarTF, gbc);
+		settings.add(this.jarTF, gbc);
 		
 		Button b = new Button("Choose Jar...");
 		b.addActionListener(this);
 		b.setActionCommand("jarfile");
 		gbc.gridx = 2;
-//		gbc.gridy = 3;
 		gbc.weightx = 0;
 		gbc.fill = GridBagConstraints.NONE;
-		this.add(b, gbc);
+		settings.add(b, gbc);
 		
+		
+		// open at end?
+		l = new Label("Open viewer when emulator finishes?");
+		l.setAlignment(Label.LEFT);
+		gbc.gridx = 0;
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.fill = GridBagConstraints.NONE;
+		settings.add(l, gbc);
+		CheckboxGroup cbg = new CheckboxGroup();
+		yesOpenAtEnd = new Checkbox("Yes", cbg, openAtEnd.booleanValue());
+		yesOpenAtEnd.addItemListener(this);
+		noOpenAtEnd = new Checkbox("No", cbg, !openAtEnd.booleanValue());
+		noOpenAtEnd.addItemListener(this);
+		settings.add(yesOpenAtEnd,gbc);
+		settings.add(noOpenAtEnd,gbc);
+		
+		// viewer to use
+		l = new Label("Choose the executable for the viewer:");
+		l.setAlignment(Label.LEFT);
+		gbc.gridx = 0;
+		gbc.gridwidth = 3;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		settings.add(l, gbc);
+		
+		this.viewerEXE = new TextField(openXMLWith, this.TF_SIZE);
+		this.viewerEXE.addKeyListener(this);
+		gbc.gridx = 0;
+		gbc.gridwidth = 2;
+		settings.add(this.viewerEXE, gbc);
+		
+		b = new Button("Choose EXE...");
+		b.addActionListener(this);
+		b.setActionCommand("viewerexe");
+		gbc.gridx = 2;
+		gbc.weightx = 0;
+		gbc.fill = GridBagConstraints.NONE;
+		settings.add(b, gbc);
+		
+		// save button
+		b = new Button("Save settings");
+		b.addActionListener(this);
+		b.setActionCommand("save_settings");
+		Panel p = new Panel();
+		p.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+		p.add(b);
+		settings.add(p,gbc);
+		
+		return settings;
+	}
+	
+	private Panel createMainCard() {		
+		Panel main = new Panel();
+
+		// Using gridbag layout
+		GridBagConstraints gbc = new GridBagConstraints();
+		GridBagLayout gridBag = new GridBagLayout();
+		main.setLayout(gridBag);
+
 		// Create a TextArea to display the contents of the file in
 		textarea.setFont(new Font("MonoSpaced", Font.PLAIN, 12));
 		textarea.setEditable(false);
@@ -438,41 +607,36 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		gbc.gridx = 0;
 		gbc.gridwidth = 3;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		this.add(textarea,gbc); 
-		
+		main.add(textarea,gbc); 
 		
 		// form
-		l = new Label("Form to test:");
+		Label l = new Label("Form to test:");
 		l.setAlignment(Label.LEFT);
 		gbc.gridx = 0;
-//		gbc.gridy = 4;
 		gbc.gridwidth = 1;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		this.add(l, gbc);	
+		main.add(l, gbc);	
 		
 		// The form to test
 		this.formName = new Label(this.newForm.substring( this.newForm.lastIndexOf("\\")+1));
 		gbc.gridx = 1;
-//		gbc.gridy = 4;
 		gbc.gridwidth = 2;
-		this.add(this.formName, gbc);
+		main.add(this.formName, gbc);
 		
 		this.formTF = new TextField(this.newForm, this.TF_SIZE);
 		this.formTF.addKeyListener(this);
-//		gbc.gridy = 5;
 		gbc.gridx = 0;
 		gbc.gridwidth = 2;
-		this.add(this.formTF, gbc);
+		main.add(this.formTF, gbc);
 		
-		b = new Button("Choose form...");
+		Button b = new Button("Choose form...");
 		b.addActionListener(this);
 		b.setActionCommand("form");
 		gbc.gridx = 2;
-//		gbc.gridy = 5;
 		gbc.weightx = 0;
 		gbc.fill = GridBagConstraints.NONE;
-		this.add(b, gbc);//		this.add(p);
+		main.add(b, gbc);//		this.add(p);
 
 
 		// Test form button
@@ -483,15 +647,6 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		this.testBtn = new Button("Test Form");
 		this.testBtn.addActionListener(this);
 		this.testBtn.setActionCommand("test");
-		
-		//this.add(this.testBtn, gbc);
-		
-
-		// put the filename label at the top
-	//	filename.setText("Please load a file...");
-	//	this.add(this.filename, "North");
-
-		
 
 		// Create a bottom panel to hold a couple of buttons in
 		Panel p = new Panel();
@@ -513,13 +668,10 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 //		p.add(openfile);
 		p.add(eval);
 
-		this.add(p, gbc);
+		main.add(p, gbc);
 		textarea.setText("");
 
-		setSize(400, 1700);
-		
-//		this.get
-//		this.add(f);
+		return main;
 	}
 	
 	private void tryForm() {
@@ -645,9 +797,8 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		p.setProperty(this.WTK_PATH, this.wtkPath);
 		p.setProperty(this.NEW_FORM, this.newForm);
 		p.setProperty(this.ORIGINAL_JAR_DIR, this.origJarDir);
-		p.setProperty(this.OPEN_XML_WITH, this.openXMLWith);
-		
-		System.out.println("writing properties: " + p);
+		p.setProperty(this.OPEN_XML_WITH, openXMLWith);
+		p.setProperty(this.OPEN_AT_END, openAtEnd.toString());
 		
 		File f = new File(this.PROPERTIES_FILE);
 		try {
@@ -688,13 +839,12 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			e.printStackTrace();
 		}
 		
-		System.out.println("read properties file: " + props);
-		
 		// Read in properties
 		this.wtkPath = props.getProperty(this.WTK_PATH);
 		this.newForm = props.getProperty(this.NEW_FORM);
 		this.origJarDir = props.getProperty(this.ORIGINAL_JAR_DIR);
-		this.openXMLWith = props.getProperty(this.OPEN_XML_WITH);
+		openXMLWith = props.getProperty(this.OPEN_XML_WITH);
+		openAtEnd = new Boolean(props.getProperty(this.OPEN_AT_END));
 	}
 	
 	private void emulate( String wtkPath, String jad) {
@@ -847,6 +997,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		File form = new File(this.newForm);
 		if(!form.exists() || form.isDirectory()) {
 			reportError("Error: New form cannot be found!");
+			addToTextArea("Error! File \"" + this.newForm + "\" does not exist.  Please choose a new file.\n" );
 			return false;
 		}
 		return true;
@@ -884,11 +1035,14 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		if(ke.getComponent().equals(this.wtkTF)) {
 			this.wtkPath = this.wtkTF.getText();
 		}else if(ke.getComponent().equals(this.jarTF)) {
-			this.origJarDir = this.jarTF.getText();
+			String s = this.jarTF.getText();
+			this.origJarDir = s.substring(0,s.lastIndexOf("\\"));
 		}else if(ke.getComponent().equals(this.formTF)) {
 			String s = this.formTF.getText();
 			this.formName.setText(s.substring(s.lastIndexOf("\\")+1));
 			this.newForm = s;
+		}else if(ke.getComponent().equals(this.viewerEXE)) {
+			openXMLWith = this.viewerEXE.getText();
 		}
 	}
 
