@@ -280,7 +280,12 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			//screen with options
     			//Feb 9, 2009 - csims@dimagi.com
     			//behaves strangely with the 3110c sized screens. Disabling for now.
-    			//widget.setPinned(true);
+    			//Feb 20, 2009 - csims@dimagi.com
+    			//Tweaked a bunch of settings, should be fine for ~90% of our use cases now, if it's
+    			//causing problems, set the polish flag.
+    			//#if chatterbox.pinning.current != false
+    			widget.setPinned(true);
+    			//#endif
     			
     			this.focus(widget, true);
     			widget.showCommands();
@@ -545,10 +550,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
     
 	private void computeHeaders() {
-		int threshold = 0;
+		int threshold = this.contentY;
 		//bar.clearSpans();
 		if(this.topFrame != null && this.topFrame.size() != 0) {
-			threshold = this.topFrame.getContentHeight();		
+			threshold += this.topFrame.getContentHeight();		
 		}
 		Vector headers = new Vector();
     	for (int i = 0; i < size(); i++) {
