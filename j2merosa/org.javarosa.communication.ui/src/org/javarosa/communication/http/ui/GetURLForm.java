@@ -20,9 +20,14 @@ public class GetURLForm extends Form implements IView {
 		// destinationUrl = shell.getAppProperty("destination-file");
 		// TODO: put this back in when the property manager is
 		// complete again
+		String prefill = "";
+		HttpTransportDestination def = ((HttpTransportDestination)preload);
+		if(def != null) {
+			prefill = def.getURL();
+		}
 		textField = new TextField(
 				"Please enter destination path + filename",
-				((HttpTransportDestination)preload).getURL(), 140, TextField.ANY);
+				prefill, 140, TextField.ANY);
 
 		append(textField);
 		addCommand(CMD_OK);
