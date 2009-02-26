@@ -68,6 +68,8 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
         this.setCommandListener(this);
         
         rowIDs = new Vector();
+        
+        this.setScrollYOffset(0, false);
 	}
 
 	public void init () {
@@ -216,6 +218,18 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 		setActiveFrame(Graphics.BOTTOM);
 	}
 
+	protected boolean handleKeyPressed(int keyCode, int gameAction) {
+		//Supress these actions, letting the propogates screws up scrolling
+		//on some platforms.
+		if (gameAction == Canvas.UP && keyCode != Canvas.KEY_NUM2) {
+			return true;
+		} else if (gameAction == Canvas.DOWN && keyCode != Canvas.KEY_NUM8) {
+			return true;
+		}
+		return super.handleKeyReleased(keyCode, gameAction);
+	}
+
+	
 	protected boolean handleKeyReleased(int keyCode, int gameAction) {
 		if (gameAction == Canvas.UP && keyCode != Canvas.KEY_NUM2) {
 			stepIndex(false);
