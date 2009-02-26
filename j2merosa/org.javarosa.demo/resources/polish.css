@@ -401,6 +401,10 @@ alertcontent {
 	//#endif
 }
 
+.patselTitleRow extends patselRow {
+	background-color: #5CFFAD;
+}
+
 .patselDetailRow {
     font-size: small;
 	columns: 2;
