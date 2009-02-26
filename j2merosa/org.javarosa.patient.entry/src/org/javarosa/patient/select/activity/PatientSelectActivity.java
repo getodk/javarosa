@@ -170,6 +170,10 @@ public class PatientSelectActivity implements IActivity {
 		return ((IEntity)entities.elementAt(i)).getShortFields();
 	}
 	
+	public String[] getTitleData () {
+		return entityPrototype.getHeaders(false);
+	}
+	
 	public String getDataName (int i) {
 		return ((IEntity)entities.elementAt(i)).getName();
 	}
