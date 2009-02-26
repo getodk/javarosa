@@ -19,10 +19,10 @@ import de.enough.polish.ui.TextField;
 
 public class PatientSelectView extends FramedForm implements IView, ItemStateListener, CommandListener {
 	//#if javarosa.patientselect.formfactor == nokia-s40
-	private static final int MAX_ROWS_ON_SCREEN = 6;
+	private static final int MAX_ROWS_ON_SCREEN = 5;
 	private static final int SCROLL_INCREMENT = 4;	
 	//#else
-	private static final int MAX_ROWS_ON_SCREEN = 11;
+	private static final int MAX_ROWS_ON_SCREEN = 10;
 	private static final int SCROLL_INCREMENT = 5;	
 	//#endif
 	
@@ -180,6 +180,17 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	
 	private void refreshList () {
 		container.clear();
+		
+		//#style patselTitleRow
+		Container title = new Container(false);
+		
+		String[] titleData = controller.getTitleData();
+		for (int j = 0; j < titleData.length; j++) {
+			//#style patselCell
+			StringItem str = new StringItem("", titleData[j]);
+			title.add(str);
+		}
+		this.append(title);
 		
 		if (listIsEmpty()) {
 			this.append( new StringItem("", "(No matches)"));
