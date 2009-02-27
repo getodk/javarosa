@@ -230,7 +230,6 @@
 
 		<!-- add new test suites here -->
 		<fail if="testresult.global">Unit Tests Failed!</fail>
-		<fail/>
 	</target>
 	
 	<target name="CreateJavadoc" depends="BuildClean" description="generates javadoc and also UML Diagram">
