@@ -107,6 +107,8 @@ public class FeedbackReportActivity implements IActivity, CommandListener {
 			JavaRosaServiceProvider.instance().getTransportManager().send(tmessage, httpmethod);
 			
 			//TODO: Feedback!
+			
+			shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, new Hashtable());
 		} else if (c.equals(FeedbackReportScreen.CANCEL)) {
 			shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, new Hashtable());
 		}
