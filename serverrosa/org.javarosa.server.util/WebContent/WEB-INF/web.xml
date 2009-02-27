@@ -16,9 +16,23 @@
 			org.javarosa.server.util.JavaRosaTestServlet
 		</servlet-class>
 	</servlet>
+	<servlet>
+		<description>
+			Servlet Interface providing a CommCare Feedback Gateway
+		</description>
+		<display-name>CommCareFeedbackServlet</display-name>
+		<servlet-name>CommCareFeedbackServlet</servlet-name>
+		<servlet-class>
+			org.javarosa.server.util.CommCareFeedbackServlet
+		</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>JavaRosaTestServlet</servlet-name>
 		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>CommCareFeedbackServlet</servlet-name>
+		<url-pattern>/commcarefeedback</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
