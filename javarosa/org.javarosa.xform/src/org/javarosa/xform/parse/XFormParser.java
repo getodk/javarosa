@@ -242,9 +242,11 @@ public class XFormParser {
 		if (eh != null) {
 			eh.handle(f, e, parent);
 		} else {
-			//#if debug.output==verbose
-			System.err.println("XForm Parse: Unrecognized element [" + name + "]. Ignoring and processing children...");
-			//#endif
+			if (!name.equals("html") && !name.equals("head") && !name.equals("body")) {
+				//#if debug.output==verbose
+				System.err.println("XForm Parse: Unrecognized element [" + name	+ "]. Ignoring and processing children...");
+				//#endif
+			}
 			for (int i = 0; i < e.getChildCount(); i++) {
 				if (e.getType(i) == Element.ELEMENT) {
 					parseElement(f, e.getElement(i), parent, handlers);
@@ -500,7 +502,7 @@ public class XFormParser {
 									
 					if (" \n\t\f\r\'\"`".indexOf(c) >= 0) {
 						boolean isMultiSelect = (q.getControlType() == Constants.CONTROL_SELECT_MULTI);
-						System.err.println("WARNING: " + (isMultiSelect ? "select" : "select1") + " question <value>s [" + value + "] " +
+						System.err.println("XForm Parse WARNING: " + (isMultiSelect ? "select" : "select1") + " question <value>s [" + value + "] " +
 								(isMultiSelect ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostraphes/quotation marks");
 						break;
 					}
@@ -1182,7 +1184,7 @@ public class XFormParser {
 			} else {
 				Vector nodes = instance.expandReference(ref, true);
 				if (nodes.size() == 0) {
-					System.out.println("Bind [" + ref.toString() + "] matches no nodes; ignoring bind...");
+					System.out.println("WARNING: Bind [" + ref.toString() + "] matches no nodes; ignoring bind...");
 				}
 			}
 		}
@@ -1498,7 +1500,7 @@ public class XFormParser {
 			} else {
 				dataType = Constants.DATATYPE_UNSUPPORTED;
 				//#if debug.output==verbose
-				System.err.println("XForm Parse: unrecognized data type [" + type + "]");
+				System.err.println("XForm Parse WARNING: unrecognized data type [" + type + "]");
 				//#endif
 			}
 		}
