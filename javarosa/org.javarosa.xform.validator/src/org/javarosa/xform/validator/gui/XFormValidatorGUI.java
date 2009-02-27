@@ -175,7 +175,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	
 	private static void showXMLOutput () {
 		try {
-			System.out.println("xml output detected");
+			addLineToTextArea("xml output detected");
 			
 			String xml = "";
 			String line = brOut.readLine();
@@ -184,25 +184,25 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 				line = brOut.readLine();
 			}
 			
-			System.out.println("xml output: " + xml);
+			addLineToTextArea("xml output: " + xml);
 			
 			File tempfile = File.createTempFile("jrxform", ".xml");
 			tempfile.deleteOnExit();
 
-			System.out.println("temp file created: " + tempfile.getAbsolutePath());
+			addLineToTextArea("temp file created: " + tempfile.getAbsolutePath());
 			
 			BufferedWriter out = new BufferedWriter(new FileWriter(tempfile));
 			out.write(xml);
 			out.close();
 			
-			System.out.println("temp file written");
+			addLineToTextArea("temp file written");
 			
 			if( openAtEnd.booleanValue() ) {
-				System.out.println("launching xml viewer:");
-				System.out.println("\t" + openXMLWith + " " + tempfile.getAbsolutePath() );
+				addLineToTextArea("launching xml viewer:");
+				addLineToTextArea("\t" + openXMLWith + " " + tempfile.getAbsolutePath() );
 				Runtime.getRuntime().exec(new String[] {openXMLWith, tempfile.getAbsolutePath()});
 			} else 
-				System.out.println("not launching XML viewer");
+				addLineToTextArea("not launching XML viewer");
 		} catch (IOException ioe) { }
 	}
 	
@@ -368,6 +368,10 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			} else
 				reportError(status.getText() + " - settings not saved!");
 		}
+	}
+	
+	public static void addLineToTextArea( String s ) {
+		addToTextArea(s + "\n");
 	}
 	
 	// I'm a terrible person
