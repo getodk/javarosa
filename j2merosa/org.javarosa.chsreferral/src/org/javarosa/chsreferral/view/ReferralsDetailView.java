@@ -16,6 +16,8 @@ import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.storage.PatientRMSUtility;
 
 /**
+ * A Screen to provide formatted details about an individual referral.
+ * 
  * @author Clayton Sims
  * @date Jan 23, 2009 
  *
@@ -27,6 +29,9 @@ public class ReferralsDetailView extends Form implements IView {
 		super(title);
 	}
 	
+	/**
+	 * @param ref the referral whose information should be presented to the user. 
+	 */
 	public void setReferral(PatientReferral ref) {
 		this.ref = ref;
 		

@@ -10,6 +10,14 @@ import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 
+/**
+ * 
+ * The internal record store for patient referrals.
+ * 
+ * @author Clayton Sims
+ * @date Jan 23, 2009 
+ *
+ */
 public class PatientReferralRMSUtility extends RMSUtility {
 
 	public PatientReferralRMSUtility(String name) {
@@ -63,6 +71,13 @@ public class PatientReferralRMSUtility extends RMSUtility {
 		return pending;
 	}
 	
+	/**
+	 * Gets a patient referral based on the unique ID associated with it.
+	 * 
+	 * @param uid A String ID. Should be unique across the space of the Patient Records.
+	 * @return A Patient Referral with the Unique ID provided.
+	 * @throws DeserializationException If there is a problem with accessing the RMS
+	 */
 	public PatientReferral getRecordFromUid(String uid) throws DeserializationException {
 		PatientReferral ref;
 		IRecordStoreEnumeration en = this.enumerateRecords();

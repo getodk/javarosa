@@ -8,6 +8,8 @@ import javax.microedition.lcdui.List;
 import org.javarosa.core.api.IView;
 
 /**
+ * The List View for presenting pending referrals.
+ * 
  * @author Clayton Sims
  * @date Jan 23, 2009 
  *

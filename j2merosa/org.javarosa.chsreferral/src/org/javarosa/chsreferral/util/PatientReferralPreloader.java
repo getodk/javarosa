@@ -10,6 +10,9 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.IPreloadHandler;
 
 /**
+ * Provides a preloader for form entry interactions to access information about 
+ * existing patient referrals.
+ * 
  * @author Clayton Sims
  * @date Feb 3, 2009 
  *
@@ -18,6 +21,10 @@ public class PatientReferralPreloader implements IPreloadHandler {
 
 	private final PatientReferral referral;
 	
+	/**
+	 * Creates a preloader using the provided Referral.
+	 * @param referral The object that should be used to preload data.
+	 */
 	public PatientReferralPreloader(PatientReferral referral) {
 		this.referral = referral;
 	}
@@ -26,7 +33,7 @@ public class PatientReferralPreloader implements IPreloadHandler {
 	 * @see org.javarosa.core.model.utils.IPreloadHandler#handlePostProcess(org.javarosa.core.model.instance.TreeElement, java.lang.String)
 	 */
 	public boolean handlePostProcess(TreeElement node, String params) {
-		// TODO Auto-generated method stub
+		// No post-processing supported as of this time.
 		return false;
 	}
 
