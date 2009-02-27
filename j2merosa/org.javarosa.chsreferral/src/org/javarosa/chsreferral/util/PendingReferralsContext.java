@@ -7,6 +7,8 @@ import org.javarosa.chsreferral.model.PatientReferral;
 import org.javarosa.core.Context;
 
 /**
+ * The context for presenting pending referrals.
+ * 
  * @author Clayton Sims
  * @date Feb 3, 2009 
  *

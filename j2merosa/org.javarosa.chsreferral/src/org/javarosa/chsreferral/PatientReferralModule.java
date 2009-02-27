@@ -10,6 +10,9 @@ import org.javarosa.core.api.IModule;
  */
 
 /**
+ * The Patient referral module registers the rms storage objects and other 
+ * elements necessary to keep track of pending patient referrals.
+ * 
  * @author Clayton Sims
  * @date Jan 23, 2009 
  *

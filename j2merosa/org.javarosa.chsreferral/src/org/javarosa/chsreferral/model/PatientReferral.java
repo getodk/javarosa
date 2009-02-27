@@ -11,6 +11,16 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
+/**
+ * A patient referral is a persistent record associated with a patient.
+ * A referral represents that a patient was referred somewhere, and will
+ * be followed up with to resolve the issue that the referral was issued
+ * for. 
+ * 
+ * @author Clayton Sims
+ * @date Jan 23, 2009 
+ *
+ */
 public class PatientReferral implements Externalizable, IDRecordable {
 	private String type;
 	private Date dateReferred;
@@ -36,14 +46,14 @@ public class PatientReferral implements Externalizable, IDRecordable {
 	}
 
 	/**
-	 * @return the patientId
+	 * @return the internal record ID of the patient that this referral is associated with
 	 */
 	public int getPatientId() {
 		return patientId;
 	}
 
 	/**
-	 * @return the type
+	 * @return The Type of referral issued to the patient.
 	 */
 	public String getType() {
 		return type;

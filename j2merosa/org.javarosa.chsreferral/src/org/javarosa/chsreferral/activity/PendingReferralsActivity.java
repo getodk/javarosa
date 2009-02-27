@@ -31,6 +31,10 @@ import org.javarosa.patient.storage.PatientRMSUtility;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 
 /**
+ * The Pending Referrals activity is used to present a list of all of the
+ * patient referrals that have not been closed to the user, and allows
+ * for the opportunity to resolve those referrals.
+ * 
  * @author Clayton Sims
  * @date Jan 23, 2009 
  *
@@ -99,6 +103,10 @@ public class PendingReferralsActivity implements IActivity, CommandListener {
 		this.shell = shell;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.microedition.lcdui.CommandListener#commandAction(javax.microedition.lcdui.Command, javax.microedition.lcdui.Displayable)
+	 */
 	public void commandAction(Command com, Displayable view) {
 		Hashtable returnArgs = new Hashtable();
 		if(view.equals(pending)) {
