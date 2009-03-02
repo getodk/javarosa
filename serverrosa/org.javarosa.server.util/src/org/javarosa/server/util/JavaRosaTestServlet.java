@@ -34,6 +34,7 @@ public class JavaRosaTestServlet extends HttpServlet {
 
 	private static final String HEADER = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\">";
 	private static final String _storageRoot = "/usr/share/tomcat5.5/webapps/jrtest/store/";
+	//private static final String _storageRoot = "C:\\Users\\Rowena\\Documents\\Workspaceee\\userstore\\";
 	
 	private static final long serialVersionUID = 1L;
 	private String _lastPostParsable = null;
@@ -85,8 +86,6 @@ public class JavaRosaTestServlet extends HttpServlet {
 			}
 			int bufSize = 1400;
 			byte[] temp = new byte[bufSize];
-			InputStream stream = req.getInputStream();
-			int bytesRead = stream.read(temp);
 			ByteArrayOutputStream body = new ByteArrayOutputStream();
 			File f;
 			if(MD5!=null){
@@ -99,13 +98,13 @@ public class JavaRosaTestServlet extends HttpServlet {
 			}
 			else f = new File( this.getNewFileName("jrpost-in-progress" ));
 			if ( !f.exists() ) f.createNewFile();
+			if ( !f.canWrite() ) throw new IOException("Storage root not writable.");
 			OutputStream output = new BufferedOutputStream(new FileOutputStream(f,true));
             //if (isNewDownload) output.write(postData.getBytes());
+			int bytesRead = req.getInputStream().read(temp);
 			try {
 				// FileWriter always assumes default encoding is OK!
 				while (bytesRead != -1) {
-					totalBytesRead += bytesRead;
-					if( MD5 != null) md5toLastByteRead.put(MD5,new Long(totalBytesRead));
 					//If we didn't read in a full buffer.
 					if(bytesRead < bufSize) {
 						byte[] newTemp = new byte[bytesRead];
@@ -120,6 +119,9 @@ public class JavaRosaTestServlet extends HttpServlet {
 						output.write(temp);
 						body.write(temp);
 					}
+					output.flush();
+					totalBytesRead += bytesRead;
+					if( MD5 != null) md5toLastByteRead.put(MD5,new Long(totalBytesRead));
 					bytesRead = req.getInputStream().read(temp);
 				}
 			} finally {
