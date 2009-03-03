@@ -1,6 +1,10 @@
 package org.javarosa.xform.parse;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -867,13 +871,7 @@ public class XFormParser {
 			}
 		}
 	}
-	
-	public static DataModelTree parseDataModelTree(Document d) {
-		TreeElement root = buildInstanceStructure(d.getRootElement(), null);
-		DataModelTree tree = new DataModelTree(root);
-		return tree;
-	}
-	
+		
 	//e is the top-level _data_ node of the instance (immediate (and only) child of <instance>)
 	private static void parseInstance (FormDef f, Element e) {
 		TreeElement root = buildInstanceStructure(e, null);
@@ -1449,48 +1447,27 @@ public class XFormParser {
 		}
 	}
 	
-	//THIS IS BROKEN FOR THE TIME BEING
-	//it is needed by mesh4x; TODO fix later
-/*	public static DataModelTree parseDataModelTree(String xml, FormDef formDef) throws Exception {
-		// init variables
+	public static DataModelTree parseDataModelGhettoooooo (InputStream instanceXMLStream, InputStream formDefXMLStream) {
+		Document formDefXML = getXMLDocument(new InputStreamReader(formDefXMLStream));
+		Document instanceXML = getXMLDocument(new InputStreamReader(instanceXMLStream));
+
+		//copied from getFromDef
+		FormDef formDef = new FormDef();
+		
+		initBindHandlers();
 		initStateVars();
-		
-//		// add form def bindings
-		DataBinding binding;
-		for (int i = 0; i < formDef.getBindings().size(); i++) {
-			binding = (DataBinding)formDef.getBindings().elementAt(i);
-			addBinding(binding);
-		}
-		
-		// parse xml to DOM
-		Reader reader = new InputStreamReader(new ByteArrayInputStream(xml.getBytes("UTF-8")));
-		XmlPullParser xmlPullParser = new KXmlParser();
-		xmlPullParser.setInput(reader);
-				
-		Document doc = new Document();
-		doc.parse(xmlPullParser);
-		
-		// parse DOM to model
-		Element dataElement = null;
-		for (int i = 0; i < doc.getChildCount(); i++) {
-			if (doc.getType(i) == Node.ELEMENT) {
-				if (dataElement != null) {
-					throw new XFormParseException("XForm Parse: <instance> has more than one child element");
-				} else {
-					dataElement = doc.getElement(i);
-				}
-			}
-		}
 
-		TreeElement root = parseInstanceNodes(formDef, dataElement, "/").getRoot();
-		DataModelTree instanceModel = new DataModelTree(root);
+		parseElement(formDef, formDefXML.getRootElement(), formDef, topLevelHandlers);
+		collapseRepeatGroups(formDef);
+		
+		instanceNode = instanceXML.getRootElement(); //replace default form instance with our new instance
+		parseInstance(formDef, instanceNode);
 
-		instanceModel.setName(formDef.getName());
-		instanceModel.setFormReferenceId(formDef.getRecordId());
-		return instanceModel;
+		initStateVars();
+
+		return formDef.getDataModel();
 	}
-*/
-
+		
 	//returns data type corresponding to type string; doesn't handle defaulting to 'text' if type unrecognized/unknown
 	private static int getDataType(String type) {
 		int dataType = Constants.DATATYPE_NULL;
