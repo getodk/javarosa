@@ -111,8 +111,10 @@ public class XPathFuncExpr extends XPathExpression {
 			return boolStr(argVals[0]);
 		} else if (name.equals("if") && args.length == 3) { //non-standard
 			return ifThenElse(argVals[0], argVals[1], argVals[2]);	
-		} else if (name.equals("selected") && args.length == 2) { //non-standard
+		} else if ((name.equals("selected") || name.equals("is-selected")) && args.length == 2) { //non-standard
 			return multiSelected(argVals[0], argVals[1]);
+		} else if (name.equals("count-selected") && args.length == 1) { //non-standard
+			return countSelected(argVals[0]);		
 		} else if (name.equals("count") && args.length == 1) {
 			return count(argVals[0]);
 		} else if (name.equals("sum") && args.length == 1) {
@@ -345,6 +347,12 @@ public class XPathFuncExpr extends XPathExpression {
 		String s2 = ((String)o2).trim();
 		
 		return new Boolean((" " + s1 + " ").indexOf(" " + s2 + " ") != -1);
+	}
+	
+	public static Double countSelected (Object o) {
+		String s = (String)o;
+
+		return new Double(DateUtils.split(s, " ", true).size());
 	}
 	
 	public static Double count (Object o) {

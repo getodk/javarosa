@@ -13,6 +13,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
 import org.javarosa.core.Context;
+import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.activity.FormListActivity;
@@ -81,6 +82,10 @@ public class FormList extends List implements CommandListener, IView {
         //#if polish.usePolishGui
         this.addCommand(CMD_SETTINGS);
         //#endif
+        
+        for (int i = 0; i < parent.customCommands.size(); i++) {
+        	addCommand((Command)((ICommand)parent.customCommands.elementAt(i)).getCommand());
+        }
 	}
 
 	/**
@@ -171,9 +176,14 @@ public class FormList extends List implements CommandListener, IView {
 		}
 		//this case should be triggered when new custom commands are added
 		else {
-			Hashtable returnvals = new Hashtable();
-			returnvals.put(c.getLabel(), "");
-			this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);
+			for (int i = 0; i < parent.customCommands.size(); i++) {
+				ICommand ic = (ICommand)parent.customCommands.elementAt(i);
+				if (c == ic.getCommand()) {
+					Hashtable returnvals = new Hashtable();
+					returnvals.put(ic.getCommandId(), "");
+					this.parent.viewCompleted(returnvals, ViewTypes.FORM_LIST);		
+				}
+			}			
 		}
 	}
 	public Object getScreenObject() {
