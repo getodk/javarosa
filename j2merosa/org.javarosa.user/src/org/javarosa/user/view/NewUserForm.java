@@ -53,13 +53,13 @@ public class NewUserForm extends Form implements IView{
 	    //#if javarosa.adduser.extended
 	    this.append(userID);
 	    //#endif
-	    this.append(choice);
 
 	    userRMS = new UserRMSUtility("LoginMem");
 	    this.decorator = d;
 	    if(d!= null) {
 	    	initMeta();
 	    }
+	    this.append(choice);
 	}
 	
 	public NewUserForm(String title)
