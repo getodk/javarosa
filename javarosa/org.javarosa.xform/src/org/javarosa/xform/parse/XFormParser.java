@@ -1451,7 +1451,7 @@ public class XFormParser {
 	//not only do we have to re-parse the entire formdef, but it is not guaranteed that you can drop in a submitted instance
 	//back into its original form def and it will still parse. in particular, non-relevant nodes will be missing, which will
 	//really confuse the binding verifier and repeat homogeneity checker.
-	public static DataModelTree parseDataModelGhettoooooo (InputStream instanceXMLStream, InputStream formDefXMLStream) {
+	public static DataModelTree parseDataModelGhettoooooo (InputStream instanceXMLStream, InputStream formDefXMLStream, String locale) {
 		Document formDefXML = getXMLDocument(new InputStreamReader(formDefXMLStream));
 		Document instanceXML = getXMLDocument(new InputStreamReader(instanceXMLStream));
 
@@ -1469,6 +1469,12 @@ public class XFormParser {
 
 		initStateVars();
 
+		if (locale != null) {
+			formDef.getLocalizer().setToDefault();
+		} else {
+			formDef.getLocalizer().setLocale(locale);
+		}
+		
 		return formDef.getDataModel();
 	}
 		
