@@ -103,7 +103,7 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	 * @param transportMethod the ID of a TransportMethod registered with this manager
 	 * @throws IOException If the transport method requested is not available 
 	 */
-	private void enqueue(TransportMessage message, int transportMethod)
+	public void enqueue(TransportMessage message, int transportMethod)
 			throws IOException {
 		message.addObserver(this);
 		TransportMethod selectedMethod = getTransportMethod(transportMethod);
