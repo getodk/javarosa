@@ -1447,6 +1447,10 @@ public class XFormParser {
 		}
 	}
 	
+	//this is very badly done
+	//not only do we have to re-parse the entire formdef, but it is not guaranteed that you can drop in a submitted instance
+	//back into its original form def and it will still parse. in particular, non-relevant nodes will be missing, which will
+	//really confuse the binding verifier and repeat homogeneity checker.
 	public static DataModelTree parseDataModelGhettoooooo (InputStream instanceXMLStream, InputStream formDefXMLStream) {
 		Document formDefXML = getXMLDocument(new InputStreamReader(formDefXMLStream));
 		Document instanceXML = getXMLDocument(new InputStreamReader(instanceXMLStream));
