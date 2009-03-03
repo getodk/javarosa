@@ -49,6 +49,8 @@ public class FormListActivity implements IActivity {
 
 	private Context context;
 
+	public Vector customCommands = new Vector();
+	
 	public FormListActivity(IShell p, String title) {
 		this.parent = p;
 		this.formsList = new FormList(this,title);
@@ -222,7 +224,6 @@ public class FormListActivity implements IActivity {
 	}
 
 	public void annotateCommand(ICommand command) {
-		// TODO Auto-generated method stub
-		
+		customCommands.addElement(command);
 	}
 }
