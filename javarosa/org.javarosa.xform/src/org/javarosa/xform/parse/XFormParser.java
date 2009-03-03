@@ -868,6 +868,12 @@ public class XFormParser {
 		}
 	}
 	
+	public static DataModelTree parseDataModelTree(Document d) {
+		TreeElement root = buildInstanceStructure(d.getRootElement(), null);
+		DataModelTree tree = new DataModelTree(root);
+		return tree;
+	}
+	
 	//e is the top-level _data_ node of the instance (immediate (and only) child of <instance>)
 	private static void parseInstance (FormDef f, Element e) {
 		TreeElement root = buildInstanceStructure(e, null);
