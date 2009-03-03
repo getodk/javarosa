@@ -12,6 +12,7 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.Constants;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
+import org.javarosa.user.utility.IUserDecorator;
 
 
 
@@ -25,6 +26,10 @@ public class NewUserForm extends Form implements IView{
 	private TextField password;
 	private TextField confirmPassword;
 	
+	private TextField[] metaFields;
+	
+	private IUserDecorator decorator;
+	
 	//#if javarosa.adduser.extended
 	private TextField userID;
 	//#endif
@@ -32,8 +37,7 @@ public class NewUserForm extends Form implements IView{
 	private UserRMSUtility userRMS;
 	private ChoiceGroup choice = new ChoiceGroup("",Choice.MULTIPLE);
 
-	public NewUserForm(String title)
-	{
+	public NewUserForm(String title, IUserDecorator d) {
 		super(title);
 		userName = new TextField("Name (ie: loginID):", "", 10, TextField.ANY);
 	    password = new TextField("User Password:", "", 10, TextField.PASSWORD);
@@ -52,6 +56,15 @@ public class NewUserForm extends Form implements IView{
 	    this.append(choice);
 
 	    userRMS = new UserRMSUtility("LoginMem");
+	    this.decorator = d;
+	    if(d!= null) {
+	    	initMeta();
+	    }
+	}
+	
+	public NewUserForm(String title)
+	{
+		this(title, null);
 	}
 
 	public String readyToSave()
@@ -77,19 +90,36 @@ public class NewUserForm extends Form implements IView{
 		else
 		{
 			System.out.println("ready returned as true");
-			int userid = -1;
-			//#if javarosa.adduser.extended
-			userid = Integer.parseInt(userID.getString());
-			//#endif
-			if (choice.isSelected(0) == false)
-				userRMS.writeToRMS(new User (userName.getString() ,password.getString(), userid));
-			else 
-				userRMS.writeToRMS(new User (userName.getString() ,password.getString(), userid, Constants.ADMINUSER));
+			
+			userRMS.writeToRMS(constructUser(choice.isSelected(0)));
 			System.out.println("added user "+ userName.getString() + " passw: "+password.getString()+" = "+confirmPassword.getString() );
 			return "";
 		}
 	}
 
+	
+	private User constructUser(boolean hackForAdmin) {
+		int userid = -1;
+		//#if javarosa.adduser.extended
+		userid = Integer.parseInt(userID.getString());
+		//#endif
+		
+		User user;
+		
+		if (choice.isSelected(0) == false)
+			user = new User(userName.getString(), password.getString(), userid);
+		else
+			user = new User(userName.getString(), password.getString(), userid,
+					Constants.ADMINUSER);
+
+		if (decorator != null) {
+			String[] elements = decorator.getPertinentProperties();
+			for (int i = 0; i < elements.length; ++i) {
+				user.setProperty(elements[i], metaFields[i].getString());
+			}
+		}
+		return user;
+	}
 
 
 
@@ -128,6 +158,16 @@ public class NewUserForm extends Form implements IView{
 
 		   else return false;
 	}
+	
+	public void initMeta() {
+		String[] elements = decorator.getPertinentProperties();
+		metaFields = new TextField[elements.length];
+		for(int i = 0 ; i < elements.length ; ++i) {
+			metaFields[i] = new TextField(decorator.getHumanName(elements[i]), "", 100, TextField.ANY);
+			this.append(metaFields[i]);
+		}
+	}
+	
 	public Object getScreenObject() {
 		return this;
 	}

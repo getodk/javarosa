@@ -13,6 +13,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
+import org.javarosa.user.utility.AddUserContext;
 import org.javarosa.user.view.NewUserForm;
 
 /*
@@ -26,7 +27,7 @@ public class AddUserActivity implements IActivity, CommandListener {
 	public final Command CMD_CANCEL = new Command("Exit",Command.BACK, 1);
 	public static final String COMMAND_KEY = "command";
 
-	Context context;
+	AddUserContext context;
 	NewUserForm addUser = null;
 	
 	public AddUserActivity (IShell p) {
@@ -66,14 +67,14 @@ public class AddUserActivity implements IActivity, CommandListener {
 	
 	public void start(Context context) {
 		// TODO Auto-generated method stub
-		this.context = context;
+		this.context = new AddUserContext(context);
 		//this.newuserForm = new NewUserForm(this, "Login");
 		//this.loginScreen.setCommandListener(this);
 		//this.loginScreen.loginButton.setItemCommandListener(this);       // set item command listener
 		//parent.setDisplay(this, this.loginScreen);
 		
 		//take this out into an activity
-		addUser = new NewUserForm("Add User");
+		addUser = new NewUserForm("Add User", this.context.getDecorator());
 		addUser.addCommand(CMD_SAVE);
 		addUser.addCommand(CMD_CANCEL);
 		addUser.setCommandListener(this);
