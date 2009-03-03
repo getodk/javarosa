@@ -4,9 +4,12 @@ package org.javarosa.user.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Hashtable;
 
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -26,6 +29,9 @@ public class User implements Externalizable, IDRecordable
 	private String userType;
 	private int id;
 	private boolean rememberMe= false;
+	
+	/** String -> String **/
+	private Hashtable properties = new Hashtable(); 
 
 	private int [] formsApplied;
 
@@ -72,6 +78,7 @@ public class User implements Externalizable, IDRecordable
 			this.userType = in.readUTF();
 			this.id = in.readInt();
 			this.rememberMe = in.readBoolean();
+			this.properties = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 		}
 		catch (IOException ioe)
 		{
@@ -94,11 +101,12 @@ public class User implements Externalizable, IDRecordable
 	        out.writeUTF(this.userType);
 	        out.writeInt(this.id);
 	        out.writeBoolean(this.rememberMe);
+			ExtUtil.write(out, new ExtWrapMap(properties));
+
 
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage()); //$NON-NLS-1$
 		}
-
 	}
 
 	public String getUsername()
@@ -149,6 +157,13 @@ public class User implements Externalizable, IDRecordable
 		this.rememberMe = rememberMe;
 	}
 	
+	public void setProperty(String key, String val) {
+		this.properties.put(key, val);
+	} 
+	
+	public String getProperty(String key) {
+		return (String)this.properties.get(key);
+	}
 	
 
 }
