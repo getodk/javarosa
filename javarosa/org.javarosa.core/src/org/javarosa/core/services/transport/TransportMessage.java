@@ -128,6 +128,9 @@ public class TransportMessage extends Observable implements Externalizable {
 	 */
 	public TransportMessage() {
 		super();
+		this.replyloadData = new byte [1];
+		this.sender = "default_sender";
+		this.modelId = -1;
 	}
 
 	/**
