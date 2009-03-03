@@ -66,6 +66,8 @@ public class RmsStorage implements Storage {
 			this.messageRecordStore.setRecord(recordId, data, 0, data.length);
 		} catch (Exception e) {
 			//#if debug.output==verbose || debug.output==exception
+			e.printStackTrace();
+			System.out.println("exception message: " + e.getMessage());
 			System.out.println(e);
 			//#endif
 		} finally {
