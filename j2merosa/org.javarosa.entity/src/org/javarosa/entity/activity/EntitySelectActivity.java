@@ -1,4 +1,4 @@
-package org.javarosa.patient.select.activity;
+package org.javarosa.entity.activity;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -12,8 +12,11 @@ import org.javarosa.core.api.IView;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
+import org.javarosa.entity.model.IEntity;
+import org.javarosa.entity.model.view.EntitySelectDetailPopup;
+import org.javarosa.entity.model.view.EntitySelectView;
 
-public class PatientSelectActivity implements IActivity {
+public class EntitySelectActivity implements IActivity {
 	public static final String ENTITY_ID_KEY = "entity-id";
 	public static final String ENTITY_RMS_KEY = "entity-rms";
 	public static final String ENTITY_PROTO_KEY = "entity-type";
@@ -24,7 +27,7 @@ public class PatientSelectActivity implements IActivity {
 	private IShell parent;
 	private Context context;
 	private IView activeView;
-	private PatientSelectView selView;
+	private EntitySelectView selView;
 	
 	private RMSUtility entityRMS;
 	private IEntity entityPrototype;
@@ -34,10 +37,10 @@ public class PatientSelectActivity implements IActivity {
 	
 	Vector entities;	
 	
-	public PatientSelectActivity (IShell parent, String title) {
+	public EntitySelectActivity (IShell parent, String title) {
 		this.parent = parent;
 		this.context = new Context();
-		selView = new PatientSelectView(this, title);
+		selView = new EntitySelectView(this, title);
 	}
 
 	public void start(Context context) {
@@ -146,7 +149,7 @@ public class PatientSelectActivity implements IActivity {
 	
 	public void itemSelected (int i) {
 		IEntity entity = (IEntity)entities.elementAt(i);
-		PatientSelectDetailPopup psdp = new PatientSelectDetailPopup(this, entity, entityRMS);
+		EntitySelectDetailPopup psdp = new EntitySelectDetailPopup(this, entity, entityRMS);
 		psdp.show();
 	}
 	

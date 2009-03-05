@@ -23,6 +23,7 @@ colors {
 	focusedFontColor: #000;
 	bgColor:  #eee;
 	focusedBgColor:  #fff;
+	focusedBackground: yellow;
 	borderColor: fontColor;
 	focusedBorderColor: focusedFontColor;
 	menubarColor: #DDDD88;
@@ -212,20 +213,34 @@ rightcommand {
 	layout: expand | vshrink;
 }
 
+/**
+  * the colors which are defined in
+  * the colors section can later be referenced.
+  * This makes changes easy, since the color
+  * just needs to be changed in one position.
+  * Even default colors (like blue, green, lime, etc)
+  * can be changed here. 
+  */
+
 .buttonfocused {
 	font-color: black;
 	font-style: bold;
 	border-color: black;
 	border-width: 1;
-	background-color: buttonBgColor;
+	background-color: focusedBackground;
+
+/*
 	padding-vertical: 2;
 	padding-horizontal: 5;
+*/	
+	
 	layout: horizontal-center;
 	min-width: 80;
 }
 
 .button extends buttonfocused {
 	focused-style: buttonfocused;
+	background-color: buttonBgColor;
 }
 
 .split {

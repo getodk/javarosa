@@ -81,6 +81,7 @@
 					<source dir="${basedir}/../org.javarosa.patient/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.patient.entry/src/"/>
+					<source dir="${basedir}/../org.javarosa.entity/src/"/>
 					
 					<!--source dir="${basedir}/../org.mesh4j.sync/src/"/-->
 					<!--source dir="${basedir}/../org.mesh4j.sync.message/src/"/-->

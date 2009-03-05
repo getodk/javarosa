@@ -70,6 +70,7 @@
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
+					<source dir="${basedir}/../org.javarosa.entity/src/"/>
 					<!-- defunct
 					<source dir="${basedir}/../org.javarosa.clforms/test/"/>
 					<source dir="${basedir}/../org.javarosa.entitymgr/src/"/>

@@ -6,7 +6,6 @@ import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
 import java.io.ByteArrayInputStream;
-import java.util.Vector;
 
 import javax.microedition.lcdui.StringItem;
 

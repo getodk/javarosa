@@ -50,7 +50,7 @@ public class CommCareFeedbackServlet extends HttpServlet {
 		int bytesRead = stream.read(temp);
 		ByteArrayOutputStream body = new ByteArrayOutputStream();
 		
-		out.print("Body Read: " + body.toString());
+		out.println("Body Read: " + body.toString());
 
 		// FileWriter always assumes default encoding is OK!
 		while (bytesRead != -1) {
@@ -69,27 +69,31 @@ public class CommCareFeedbackServlet extends HttpServlet {
 			bytesRead = req.getInputStream().read(temp);
 		}
 		
-		  PasswordAuthentication auth = new PasswordAuthentication("commcare@dimagi.com","commcare4dimagi");
+		  //PasswordAuthentication auth = new PasswordAuthentication("commcare@dimagi.com","commcare4dimagi");
 		  
 		    Properties props = new Properties();
-		    props.put("mail.smtp.auth", "true");
+		    props.put("mail.smtp.from", "no-reply: CommCare Automated Feedback Gateway <blackhole@dimagi.com>");
+		    props.put("mail.smtp.starttls.enable", "true");
+		    //props.put("mail.smtp.auth", "true");
 		    props.put("mail.smtp.host", "smtp.gmail.com");
 		    props.put("mail.smtp.port", "465");
-		    props.put("mail.smtp.ssl.protocols", "tls");
+		    props.put("mail.smtp.ssl.protocols", "SSLv3 TLSv1");
 		    Session session = Session.getInstance(props, null);
-		    session.setPasswordAuthentication(new URLName("http://smtp.google.com:465"), auth);
+		    //session.setPasswordAuthentication(new URLName("smtp.gmail.com"), auth);
 
 		    try {
 		        MimeMessage msg = new MimeMessage(session);
-		        msg.setFrom(new InternetAddress("no-reply: CommCare Automated Feedback Gateway <blackhole@dimagi.com>"));
 		        msg.setRecipients(Message.RecipientType.TO,
-		                          "commcare@dimagi.com");
+		                          "csims@dimagi.com");
 		        msg.setSubject("Subject: CommCare Automated Feedback");
 		        msg.setSentDate(new Date());
 		        msg.setText(body.toString());
-		        Transport.send(msg);
+		        //Transport.send(msg);
+		        Transport t = session.getTransport("smtp");
+		        t.connect("commcare@dimagi.com","commcare4dimagi");
+		        t.sendMessage(msg, msg.getAllRecipients());
 		    } catch (MessagingException mex) {
-		        System.out.println("send failed, exception: " + mex);
+		        System.out.println("send failed, exception: " + mex.getMessage());
 		        out.println("Error! " + mex);
 		    }
 

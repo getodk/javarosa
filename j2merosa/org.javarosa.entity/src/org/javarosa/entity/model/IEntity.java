@@ -1,4 +1,4 @@
-package org.javarosa.patient.select.activity;
+package org.javarosa.entity.model;
 
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 
@@ -16,6 +16,8 @@ public interface IEntity {
 	String getName();
 	int getRecordID();
 	
+	// Clayton Sims - Mar 5, 2009 : These methods desperately need
+	// contracts for what they should be matching!
 	boolean matchID (String key);
 	boolean matchName (String key);
 
