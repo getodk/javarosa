@@ -1,4 +1,4 @@
-package org.javarosa.patient.select.activity;
+package org.javarosa.entity.model.view;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -6,20 +6,21 @@ import javax.microedition.lcdui.Displayable;
 import de.enough.polish.ui.ItemStateListener;
 
 import org.javarosa.core.api.IView;
+import org.javarosa.entity.activity.EntitySelectActivity;
 
 import de.enough.polish.ui.Choice;
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.Form;
 import de.enough.polish.ui.Item;
 
-public class PatientSelectSortPopup extends Form implements IView, CommandListener, ItemStateListener {
-	private PatientSelectView psv;
-	private PatientSelectActivity psa;
+public class EntitySelectSortPopup extends Form implements IView, CommandListener, ItemStateListener {
+	private EntitySelectView psv;
+	private EntitySelectActivity psa;
 	
     private ChoiceGroup sortField;
     private Command cancelCmd;
 
-    public PatientSelectSortPopup (PatientSelectView psv, PatientSelectActivity psa) {
+    public EntitySelectSortPopup (EntitySelectView psv, EntitySelectActivity psa) {
 		//#style patselSortPopup
 		super("Sort by...");
 

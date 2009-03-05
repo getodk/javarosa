@@ -29,6 +29,7 @@ import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.properties.DemoAppProperties;
+import org.javarosa.entity.activity.EntitySelectActivity;
 import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
@@ -49,7 +50,6 @@ import org.javarosa.patient.PatientModule;
 import org.javarosa.patient.entry.activity.PatientEntryActivity;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.select.activity.PatientEntity;
-import org.javarosa.patient.select.activity.PatientSelectActivity;
 import org.javarosa.patient.storage.PatientRMSUtility;
 import org.javarosa.referral.ReferralModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
@@ -92,12 +92,16 @@ public class JavaRosaDemoShell implements IShell {
 		
 		FormDefRMSUtility formDef = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 		if (formDef.getNumberOfRecords() == 0) {
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-a_draft.xhtml"));
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-b_draft.xhtml"));
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/shortform.xhtml"));
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/condtest.xhtml"));
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/generator.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-a_draft.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-b_draft.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/shortform.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/condtest.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/mexico_questions.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/smr.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/smff.xhtml"));
 		}
 		initTestPatients((PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName()));
 	}
@@ -148,8 +152,10 @@ public class JavaRosaDemoShell implements IShell {
 			
 			//#if javarosa.dev.shortcuts
 			
-			launchPatientSelectActivity(context);
+			//launchEntitySelectActivity(context);
 			
+			launchActivity(new FormListActivity(this, "Forms List"), context);				
+
 			//#else
 			
 			String passwordVAR = midlet.getAppProperty("username");
@@ -176,22 +182,22 @@ public class JavaRosaDemoShell implements IShell {
 					context.setElement("USER", user);
 				}
 
-				launchPatientSelectActivity(context);
+				launchEntitySelectActivity(context);
 			} else if (returnVal == "USER_CANCELLED") {
 				exitShell();
 			}
 						
-		} else if (returningActivity instanceof PatientSelectActivity) {
+		} else if (returningActivity instanceof EntitySelectActivity) {
 			
 			if (returnCode == Constants.ACTIVITY_COMPLETE) {
-				int patID = ((Integer)returnVals.get(PatientSelectActivity.ENTITY_ID_KEY)).intValue();
+				int patID = ((Integer)returnVals.get(EntitySelectActivity.ENTITY_ID_KEY)).intValue();
 				context.setElement("PATIENT_ID", new Integer(patID));
 				System.out.println("Patient " + patID + " selected");
 				
 				launchActivity(new FormListActivity(this, "Forms List"), context);				
 			} else if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 				String action = (String)returnVals.get("action");
-				if (PatientSelectActivity.ACTION_NEW_ENTITY.equals(action)) {
+				if (EntitySelectActivity.ACTION_NEW_ENTITY.equals(action)) {
 					launchActivity(new PatientEntryActivity(this), context);					
 				}
 			} else if (returnCode == Constants.ACTIVITY_CANCEL) {
@@ -207,9 +213,10 @@ public class JavaRosaDemoShell implements IShell {
 				launchActivity(new ModelListActivity(this), context);
 			} else if (returnVal == Commands.CMD_SELECT_XFORM) {
 				launchFormEntryActivity(context, ((Integer)returnVals.get(FormListActivity.FORM_ID_KEY)).intValue(), -1);
-			} else if (returnVal == Commands.CMD_EXIT) 
-				launchPatientSelectActivity(context);
-			  else if (returnVal == Commands.CMD_ADD_USER) 
+			} else if (returnVal == Commands.CMD_EXIT){ 
+				//launchEntitySelectActivity(context);
+				exitShell();
+			} else if (returnVal == Commands.CMD_ADD_USER) 
 				launchActivity( new AddUserActivity(this),context);
 			
 		} else if (returningActivity instanceof ModelListActivity) {
@@ -363,12 +370,12 @@ public class JavaRosaDemoShell implements IShell {
 		launchActivity(activity, context);
 	}
 	
-	private void launchPatientSelectActivity (Context context) {
-		PatientSelectActivity psa = new PatientSelectActivity(this, "Choose a Patient");
+	private void launchEntitySelectActivity (Context context) {
+		EntitySelectActivity psa = new EntitySelectActivity(this, "Choose a Patient");
 		PatientRMSUtility prms = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
-		context.setElement(PatientSelectActivity.ENTITY_PROTO_KEY, new PatientEntity());
-		context.setElement(PatientSelectActivity.ENTITY_RMS_KEY, prms);
-		context.setElement(PatientSelectActivity.NEW_ENTITY_ID_KEY_KEY, PatientEntryActivity.NEW_PATIENT_ID);
+		context.setElement(EntitySelectActivity.ENTITY_PROTO_KEY, new PatientEntity());
+		context.setElement(EntitySelectActivity.ENTITY_RMS_KEY, prms);
+		context.setElement(EntitySelectActivity.NEW_ENTITY_ID_KEY_KEY, PatientEntryActivity.NEW_PATIENT_ID);
 		
 		launchActivity(psa, context);
 	}

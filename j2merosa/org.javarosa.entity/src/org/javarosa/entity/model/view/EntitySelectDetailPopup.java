@@ -1,4 +1,6 @@
-package org.javarosa.patient.select.activity;
+package org.javarosa.entity.model.view;
+
+
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
@@ -7,13 +9,15 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.IView;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.entity.activity.EntitySelectActivity;
+import org.javarosa.entity.model.IEntity;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Form;
 import de.enough.polish.ui.StringItem;
 
-public class PatientSelectDetailPopup extends Form implements IView, CommandListener {
-	PatientSelectActivity psa;
+public class EntitySelectDetailPopup extends Form implements IView, CommandListener {
+	EntitySelectActivity psa;
 	
 	int recordID;
 	String[] headers;
@@ -22,7 +26,7 @@ public class PatientSelectDetailPopup extends Form implements IView, CommandList
 	Command okCmd;
 	Command backCmd;
 	
-	public PatientSelectDetailPopup (PatientSelectActivity psa, IEntity entity, RMSUtility entityRMS) {
+	public EntitySelectDetailPopup (EntitySelectActivity psa, IEntity entity, RMSUtility entityRMS) {
 		super(entity.entityType() + " Detail");
 		
 		this.psa = psa;

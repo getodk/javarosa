@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-j2mepolish-runtime.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-license.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/lib/enough-webprocessor.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entity"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,4 +1,4 @@
-package org.javarosa.patient.select.activity;
+package org.javarosa.entity.model.view;
 
 import java.util.Vector;
 
@@ -9,6 +9,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.api.IView;
+import org.javarosa.entity.activity.EntitySelectActivity;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
@@ -17,7 +18,7 @@ import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 
-public class PatientSelectView extends FramedForm implements IView, ItemStateListener, CommandListener {
+public class EntitySelectView extends FramedForm implements IView, ItemStateListener, CommandListener {
 	//#if javarosa.patientselect.formfactor == nokia-s40
 	private static final int MAX_ROWS_ON_SCREEN = 5;
 	private static final int SCROLL_INCREMENT = 4;	
@@ -37,7 +38,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 	public boolean wrapAround = false; //TODO: support this
 	public int newMode = NEW_IN_LIST;
 	
-	private PatientSelectActivity controller;
+	private EntitySelectActivity controller;
 	public String entityType;
 	
 	private TextField tf;
@@ -50,7 +51,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 		
 	private Vector rowIDs; //index into data corresponding to current matches
 	
-	public PatientSelectView(PatientSelectActivity controller, String title) {
+	public EntitySelectView(EntitySelectActivity controller, String title) {
 		super(title);
 		
 		this.controller = controller;
@@ -307,7 +308,7 @@ public class PatientSelectView extends FramedForm implements IView, ItemStateLis
 			if (cmd == exitCmd) {
 				controller.exit();
 			} else if (cmd == sortCmd) {
-				PatientSelectSortPopup pssw = new PatientSelectSortPopup(this, controller);
+				EntitySelectSortPopup pssw = new EntitySelectSortPopup(this, controller);
 				pssw.show();
 			} else if (cmd == newCmd) {
 				controller.newEntity();

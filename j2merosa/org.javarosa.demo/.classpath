@@ -29,5 +29,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.j2me"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient.entry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entity"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.forms"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

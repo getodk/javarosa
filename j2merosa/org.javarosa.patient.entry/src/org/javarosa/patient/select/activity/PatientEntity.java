@@ -8,6 +8,7 @@ import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.entity.model.IEntity;
 import org.javarosa.patient.model.Patient;
 
 public class PatientEntity implements IEntity {

@@ -11,7 +11,7 @@
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/nokia-ui.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/wmapi.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/fileconnection.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/enough-j2mepolish-client.jar" sourcepath="C:/Program Files/J2ME-Polish/j2mepolish-src/j2me"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/enough-j2mepolish-client.jar" sourcepath="C:/Program Files/J2ME-Polish2.0.7/j2mepolish-src/j2me"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.forms"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

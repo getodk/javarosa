@@ -3,7 +3,7 @@ import re
 import zipfile
 
 BYTE_KB = 1024.0
-default_jarfile = 'JavaRosaDemoP.jar'
+default_jarfile = 'JavaRosaDemo.jar'
 default_obfusmapfile = 'obfuscation_mapping.txt'
 default_outfile = 'jar_contents.csv'
 
