@@ -79,6 +79,7 @@ public class User implements Externalizable, IDRecordable
 			this.id = in.readInt();
 			this.rememberMe = in.readBoolean();
 			this.properties = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
+			this.recordId = in.readInt();
 		}
 		catch (IOException ioe)
 		{
@@ -102,7 +103,7 @@ public class User implements Externalizable, IDRecordable
 	        out.writeInt(this.id);
 	        out.writeBoolean(this.rememberMe);
 			ExtUtil.write(out, new ExtWrapMap(properties));
-
+			out.writeInt(recordId);
 
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage()); //$NON-NLS-1$

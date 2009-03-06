@@ -3,6 +3,7 @@
  */
 package org.javarosa.user.activity;
 
+import java.io.IOException;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.AlertType;
@@ -11,11 +12,15 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.Context;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.user.model.User;
+import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.AddUserContext;
 import org.javarosa.user.view.NewUserForm;
 
@@ -70,18 +75,34 @@ public class EditUserActivity implements IActivity, CommandListener {
 
 	
 	public void start(Context context) {
-		// TODO Auto-generated method stub
 		this.context = new AddUserContext(context);
 		//this.newuserForm = new NewUserForm(this, "Login");
 		//this.loginScreen.setCommandListener(this);
 		//this.loginScreen.loginButton.setItemCommandListener(this);       // set item command listener
 		//parent.setDisplay(this, this.loginScreen);
 		
+		
+		
 		//take this out into an activity
-		addUser = new NewUserForm("Add User", this.context.getDecorator());
+		addUser = new NewUserForm("Edit User", this.context.getDecorator());
 		addUser.addCommand(CMD_SAVE);
 		addUser.addCommand(CMD_CANCEL);
 		addUser.setCommandListener(this);
+		
+		UserRMSUtility userRMS = (UserRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(UserRMSUtility.getUtilityName());
+		User user = new User();
+		try {
+			userRMS.retrieveFromRMS(this.context.getCurrentUserID().intValue(), user);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeserializationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		addUser.loadUser(user);
+		
 		parent.setDisplay(this, addUser);
 
 	}
