@@ -66,10 +66,6 @@ public class PatientEntity implements IEntity {
 	public String getName() {
 		String name = "";
 		
-		if (familyName.length() > 0) {
-			name += familyName;
-		}
-		
 		if (givenName.length() > 0) {
 			if (name.length() > 0) {
 				name += ", ";
@@ -82,6 +78,10 @@ public class PatientEntity implements IEntity {
 				name += " ";
 			}
 			name += middleName;
+		}
+		
+		if (familyName.length() > 0) {
+			name += familyName;
 		}
 		
 		return name;
