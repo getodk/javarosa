@@ -18,5 +18,8 @@ public class UserRMSUtility  extends RMSUtility {
 	        super.writeToRMS(user, null);
 	 }
 
+	 public static String getUtilityName() {
+		 return "User RMS Utility";
+	 }
 
 }

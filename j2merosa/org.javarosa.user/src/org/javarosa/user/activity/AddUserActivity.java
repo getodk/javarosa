@@ -22,6 +22,8 @@ import org.javarosa.user.view.NewUserForm;
 
 public class AddUserActivity implements IActivity, CommandListener {
 
+	public final static String NEW_USER_KEY = "new_user";
+	
 	private IShell parent = null;
 	public final Command CMD_SAVE = new Command("Save", Command.OK, 1);
 	public final Command CMD_CANCEL = new Command("Exit",Command.BACK, 1);

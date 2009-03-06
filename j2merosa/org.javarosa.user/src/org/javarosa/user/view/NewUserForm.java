@@ -7,6 +7,7 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.Constants;
@@ -36,6 +37,8 @@ public class NewUserForm extends Form implements IView{
 	
 	private UserRMSUtility userRMS;
 	private ChoiceGroup choice = new ChoiceGroup("",Choice.MULTIPLE);
+	
+	private int editingId = -1;
 
 	public NewUserForm(String title, IUserDecorator d) {
 		super(title);
@@ -46,6 +49,7 @@ public class NewUserForm extends Form implements IView{
 	    userID = new TextField("User ID:", "", 10, TextField.NUMERIC);
 	    //#endif
 	    choice.append("Give this user admin rights?", null);
+	   
 
 	    this.append(userName);
 	    this.append(password);
@@ -54,7 +58,7 @@ public class NewUserForm extends Form implements IView{
 	    this.append(userID);
 	    //#endif
 
-	    userRMS = new UserRMSUtility("LoginMem");
+	    userRMS = (UserRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(UserRMSUtility.getUtilityName());
 	    this.decorator = d;
 	    if(d!= null) {
 	    	initMeta();
@@ -66,13 +70,36 @@ public class NewUserForm extends Form implements IView{
 	{
 		this(title, null);
 	}
+	
+	public void loadUser(User user) {
+		userName.setString(user.getUsername());
+		password.setString(user.getPassword());
+		
+		
+		//#if javarosa.adduser.extended
+		userID.setString(String.valueOf(user.getUserID()));
+		//#endif
+		
+		if(user.isAdminUser()) {
+			choice.setSelectedIndex(0, true);
+		}
+		
+		if (decorator != null) {
+			String[] elements = decorator.getPertinentProperties();
+			for (int i = 0; i < elements.length; ++i) {
+				 metaFields[i].setString(user.getProperty(elements[i]));
+			}
+		}
+		editingId = user.getRecordId();
+		System.out.println("Editing ID: " + editingId);
+	}
 
 	public String readyToSave()
 	{
 
 		System.out.println("reached this far");
 		boolean nameAlreadyTaken = checkNameExistsAlready();
-		if (nameAlreadyTaken == true)
+		if (nameAlreadyTaken == true && editingId == -1)
 		{
 			System.out.println("username taken love");
 			return "Username ("+userName.getString()+") already taken. Please choose another username.";
@@ -91,7 +118,13 @@ public class NewUserForm extends Form implements IView{
 		{
 			System.out.println("ready returned as true");
 			
-			userRMS.writeToRMS(constructUser(choice.isSelected(0)));
+			User user = constructUser(choice.isSelected(0));
+			if(editingId == -1) {
+				userRMS.writeToRMS(user);
+			} else {
+				userRMS.updateToRMS(editingId, user, null);
+			}
+			
 			System.out.println("added user "+ userName.getString() + " passw: "+password.getString()+" = "+confirmPassword.getString() );
 			return "";
 		}

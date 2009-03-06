@@ -12,26 +12,16 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
 
-import org.javarosa.communication.http.HttpTransportDestination;
-import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.services.TransportManager;
-import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
-import org.javarosa.core.services.transport.TransportMethod;
-import org.javarosa.core.util.Observable;
-import org.javarosa.core.util.Observer;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 
-//#if javarosa.login.showbuild
 import edu.washington.commcare.util.CommCareContext;
-//#endif
-
-import de.enough.polish.util.StringTokenizer;
 
 public class LoginForm extends Form implements IView
 {
@@ -64,7 +54,7 @@ public class LoginForm extends Form implements IView
 		   super(title);
 		   parent = loginActivity;
 
-		   userRMS = new UserRMSUtility("LoginMem");
+		   userRMS = (UserRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(UserRMSUtility.getUtilityName());
 
 	      if (userRMS.getNumberOfRecords() == 0){
 
