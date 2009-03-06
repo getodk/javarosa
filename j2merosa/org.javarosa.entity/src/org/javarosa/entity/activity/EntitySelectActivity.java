@@ -191,7 +191,10 @@ public class EntitySelectActivity implements IActivity {
 
 	public void annotateCommand(ICommand command) {
 		// TODO Auto-generated method stub
-		
 	}	
+	
+	public String getEntityType() {
+		return entityPrototype.entityType();
+	}
 
 }
