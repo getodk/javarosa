@@ -21,7 +21,9 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 
+//#if javarosa.login.showbuild
 import edu.washington.commcare.util.CommCareContext;
+//#endif
 
 public class LoginForm extends Form implements IView
 {
