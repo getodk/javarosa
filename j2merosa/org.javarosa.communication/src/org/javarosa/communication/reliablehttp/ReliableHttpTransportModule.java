@@ -5,6 +5,14 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.util.PropertyUtils;
 
+/*
+ * ReliableHttp is a proprietary protocol built on top of HTTP 1.0
+ * to handle retransmission of interrupted data in challenged network environments.
+ * While it can be used with any server, it will only add value if communicating
+ * with a reliable http server. 
+ * 
+ * @author <a href="mailto:rowenaluk@gmail.com">Rowena Luk</a>
+ */
 public class ReliableHttpTransportModule implements IModule {
 
 	public void registerModule(Context context) {
