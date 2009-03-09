@@ -2,6 +2,7 @@ package org.javarosa.user.activity;
 
 import java.util.Hashtable;
 
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -86,6 +87,12 @@ public class AddUserActivity implements IActivity, CommandListener {
 	
 	public void commandAction(Command c,Displayable d) {
 		
+		if(!d.equals(addUser)) {
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put(Constants.RETURN_ARG_KEY, addUser.getConstructedUser());
+			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
+		}
+		
 		if (c == this.CMD_SAVE)
 		{
 			String answer = addUser.readyToSave();
@@ -93,9 +100,11 @@ public class AddUserActivity implements IActivity, CommandListener {
     		if (answer.equals(""))	{///success
 
     			final javax.microedition.lcdui.Alert successfulNewUser  = new javax.microedition.lcdui.Alert("User added","User added successfully",null,javax.microedition.lcdui.AlertType.CONFIRMATION);
+    			successfulNewUser.setCommandListener(this);
+    			successfulNewUser.setTimeout(Alert.FOREVER);
     			
     			parent.setDisplay(this, new IView() {public Object getScreenObject() { return successfulNewUser;}});
-    			parent.setDisplay(this, this.addUser);
+    			//parent.setDisplay(this, this.addUser);
     		}
     		else if (answer.substring(0,10 ).equals("Username ("))///name already taken..
     		{
@@ -128,6 +137,7 @@ public class AddUserActivity implements IActivity, CommandListener {
 		else if (c == this.CMD_CANCEL)
 		{
 			Hashtable returnArgs = new Hashtable();
+			returnArgs.put(Constants.RETURN_ARG_KEY, addUser.getConstructedUser());
 			//returnArgs.put(COMMAND_KEY, Commands.CMD_ADD_USER);
 			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
 		//	parent.setDisplay(this, this.formsList);			
