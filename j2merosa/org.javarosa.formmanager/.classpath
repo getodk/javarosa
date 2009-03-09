@@ -8,5 +8,6 @@
 	<classpathentry kind="src" path="/org.javarosa.xform"/>
 	<classpathentry kind="src" path="/org.javarosa.user"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.activity"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.forms"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

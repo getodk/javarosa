@@ -187,6 +187,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			returnArgs.put("DATA_MODEL", model.getForm().getDataModel());
 			returnArgs.put("FORM_COMPLETE", new Boolean(model.isFormComplete()));
 			returnArgs.put("QUIT_WITHOUT_SAVING", new Boolean(!model.isSaved()));
+			returnArgs.put(FormEntryContext.FORM_ID, new Integer(model.getForm().getRecordId()));
 
 			if(processor != null && model.isFormComplete() && model.isSaved()) {
 				processor.initializeContext(this.context);

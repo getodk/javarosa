@@ -75,6 +75,7 @@ public class PatientEntryActivity implements IActivity {
 	 * @see org.javarosa.core.api.IActivity#resume(org.javarosa.core.Context)
 	 */
 	public void resume(Context globalContext) {
+		context.mergeInContext(globalContext);
 		Hashtable returnVals = new Hashtable();
 		if(((Boolean)globalContext.getElement("QUIT_WITHOUT_SAVING")).booleanValue()) {
 			parent.returnFromActivity(this,Constants.ACTIVITY_ERROR, returnVals);
