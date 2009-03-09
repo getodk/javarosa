@@ -38,6 +38,8 @@ public class NewUserForm extends Form implements IView{
 	private UserRMSUtility userRMS;
 	private ChoiceGroup choice = new ChoiceGroup("",Choice.MULTIPLE);
 	
+	private User constructedUser;
+	
 	private int editingId = -1;
 
 	public NewUserForm(String title, IUserDecorator d) {
@@ -118,11 +120,11 @@ public class NewUserForm extends Form implements IView{
 		{
 			System.out.println("ready returned as true");
 			
-			User user = constructUser(choice.isSelected(0));
+			constructedUser = constructUser(choice.isSelected(0));
 			if(editingId == -1) {
-				userRMS.writeToRMS(user);
+				userRMS.writeToRMS(constructedUser);
 			} else {
-				userRMS.updateToRMS(editingId, user, null);
+				userRMS.updateToRMS(editingId, constructedUser, null);
 			}
 			
 			System.out.println("added user "+ userName.getString() + " passw: "+password.getString()+" = "+confirmPassword.getString() );
@@ -199,6 +201,10 @@ public class NewUserForm extends Form implements IView{
 			metaFields[i] = new TextField(decorator.getHumanName(elements[i]), "", 100, TextField.ANY);
 			this.append(metaFields[i]);
 		}
+	}
+	
+	public User getConstructedUser() {
+		return constructedUser;
 	}
 	
 	public Object getScreenObject() {
