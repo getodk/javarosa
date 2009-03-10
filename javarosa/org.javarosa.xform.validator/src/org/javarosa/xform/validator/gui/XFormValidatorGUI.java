@@ -92,7 +92,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	
 	// Properties that we save
 	private String wtkPath = new String("C:\\WTK2.5.2\\");
-	private String origJarDir = new String(".\\" + JAR_NAME );
+	private String origJarDir = new String(""); // set in constructor
 	private String newForm = new String("C:\\TEST\\b.xml");
 	private static String openXMLWith = new String("C:\\Program Files\\Internet Explorer\\iexplore.exe");
 	private static Boolean openAtEnd = new Boolean(true);
@@ -139,7 +139,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		
 		File f = new File(".");
 		try {
-			this.origJarDir = f.getCanonicalPath() + "\\" + JAR_NAME;
+			this.origJarDir = f.getCanonicalPath();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -821,12 +821,17 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		}
 
 	}
+	
+	static boolean noRecurse = false;
+	
 	private void readProperties() {
 		File f = new File(this.PROPERTIES_FILE);
-		if(!f.exists()) {
+		if(!f.exists() && !noRecurse) {
 			// No settings, so make the default
 			System.out.println("Making a properties file");
 			writeProperties();
+			noRecurse = true;
+			readProperties();
 			return;
 		}
 		
