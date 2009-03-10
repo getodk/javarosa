@@ -288,7 +288,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	//assumes templates are built correctly and obey all data model validity rules
 	public TreeElement getTemplate (TreeReference ref) {
 		TreeElement node = getTemplatePath(ref);
-		return (node.repeatable ? node : null);
+		return (node == null ? null : node.repeatable ? node : null);
 	}
 	
 	public TreeElement getTemplatePath (TreeReference ref) {
