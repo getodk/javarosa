@@ -241,6 +241,10 @@ public class TreeReference implements Externalizable {
 	}
 	
 	public String toString () {
+		return toString(true);
+	}
+	
+	public String toString (boolean includePredicates) {
 		StringBuffer sb = new StringBuffer();
 		if (refLevel == REF_ABSOLUTE) {
 			sb.append("/");
@@ -253,13 +257,16 @@ public class TreeReference implements Externalizable {
 			int mult = ((Integer)multiplicity.elementAt(i)).intValue();
 			
 			sb.append(name);
-			switch (mult) {
-			case INDEX_UNBOUND: break;
-			case INDEX_TEMPLATE: sb.append("[@template]"); break;
-			default:
-				if (i > 0 || mult != 0)
-					sb.append("[" + (mult + 1) + "]");
-				break;
+			
+			if (includePredicates) {
+				switch (mult) {
+				case INDEX_UNBOUND: break;
+				case INDEX_TEMPLATE: sb.append("[@template]"); break;
+				default:
+					if (i > 0 || mult != 0)
+						sb.append("[" + (mult + 1) + "]");
+					break;
+				}
 			}
 			
 			if (i < size() - 1)

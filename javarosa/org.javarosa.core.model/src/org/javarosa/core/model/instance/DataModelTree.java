@@ -37,6 +37,8 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	/** The date that this model was taken and recorded */
 	private Date dateSaved;
 	
+	public String schema;
+	
 	public DataModelTree() { }
 	
 	/**
@@ -95,7 +97,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	public boolean copyNode (TreeElement src, TreeReference to) {
 		if (!to.isAbsolute())
 			return false;
-				
+			
 		//strip out dest node info and get dest parent
 		String dstName = (String)to.names.lastElement();
 		int dstMult = ((Integer)to.multiplicity.lastElement()).intValue();
@@ -285,6 +287,11 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	//return null if node is not repeatable
 	//assumes templates are built correctly and obey all data model validity rules
 	public TreeElement getTemplate (TreeReference ref) {
+		TreeElement node = getTemplatePath(ref);
+		return (node.repeatable ? node : null);
+	}
+	
+	public TreeElement getTemplatePath (TreeReference ref) {
 		if (!ref.isAbsolute())
 			return null;
 		
@@ -299,7 +306,8 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 				return null;
 			node = newNode;
 		}
-		return (node.repeatable ? node : null);
+		
+		return node;
 	}
 	
 	//determine if nodes are homogeneous, meaning their descendant structure is 'identical' for repeat purposes
