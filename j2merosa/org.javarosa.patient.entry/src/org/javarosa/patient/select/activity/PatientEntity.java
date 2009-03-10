@@ -81,6 +81,9 @@ public class PatientEntity implements IEntity {
 		}
 		
 		if (familyName.length() > 0) {
+			if (name.length() > 0) {
+				name += " ";
+			}
 			name += familyName;
 		}
 		
