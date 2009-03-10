@@ -34,6 +34,7 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 
+/* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
 /**
  * Provides conversion from xform to epihandy object model and vice vasa.
@@ -877,6 +878,7 @@ public class XFormParser {
 		TreeElement root = buildInstanceStructure(e, null);
 		DataModelTree instanceModel = new DataModelTree(root);
 		instanceModel.setName(f.getTitle());
+		instanceModel.schema = e.getNamespace();
 		
 		processRepeats(instanceModel);
 		verifyBindings(f, instanceModel);

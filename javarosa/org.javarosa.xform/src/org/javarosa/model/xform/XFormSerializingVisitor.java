@@ -119,6 +119,12 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 		TreeElement root = tree.getRoot();
 		if (root != null)
 			theXmlDoc.addChild(Node.ELEMENT, serializeNode(root));
+		
+		if (tree.schema != null) {
+			Element top = (Element)theXmlDoc.getChild(0);
+			top.setNamespace(tree.schema);
+			top.setPrefix("", tree.schema);
+		}
 	}
 
 	public Element serializeNode (TreeElement instanceNode) {
@@ -146,12 +152,23 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 					dataPointers.addElement(pointer[i]);
 				}
 			}
-
 		} else {
+			//make sure all children of the same tag name are written en bloc
+			Vector childNames = new Vector();
 			for (int i = 0; i < instanceNode.getNumChildren(); i++) {
-				Element child = serializeNode((TreeElement)instanceNode.getChildren().elementAt(i));
-				if (child != null)
-					e.addChild(Node.ELEMENT, child);
+				String childName = ((TreeElement)instanceNode.getChildren().elementAt(i)).getName();
+				if (!childNames.contains(childName))
+					childNames.addElement(childName);
+			}
+			
+			for (int i = 0; i < childNames.size(); i++) {
+				String childName = (String)childNames.elementAt(i);
+				int mult = instanceNode.getChildMultiplicity(childName);
+				for (int j = 0; j < mult; j++) {
+					Element child = serializeNode(instanceNode.getChild(childName, j));
+					if (child != null)
+						e.addChild(Node.ELEMENT, child);
+				}
 			}
 		}
 
