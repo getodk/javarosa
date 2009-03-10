@@ -191,6 +191,9 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 			StringItem str = new StringItem("", titleData[j]);
 			title.add(str);
 		}
+		//#style patselCell
+		StringItem number = new StringItem("","(" + String.valueOf(rowIDs.size()) + ")");
+		title.add(number);
 		this.append(title);
 		
 		if (listIsEmpty()) {
