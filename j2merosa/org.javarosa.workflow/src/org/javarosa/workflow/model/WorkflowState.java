@@ -37,7 +37,7 @@ public class WorkflowState {
 	 */
 	XPathExpression definition;
 	
-	/** Vector<IWorkflowAction> **/
+	/** Vector<WorkflowAction> **/
 	Vector actions;
 	
 	public WorkflowState(String name, XPathExpression definition, Vector actions) {
