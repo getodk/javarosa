@@ -151,7 +151,6 @@ public class XFormParser {
 		typeMappings.put("listItems", new Integer(Constants.DATATYPE_CHOICE_LIST));	    //xforms:	
 		typeMappings.put("select1", new Integer(Constants.DATATYPE_CHOICE));	        //non-standard	
 		typeMappings.put("select", new Integer(Constants.DATATYPE_CHOICE_LIST));	    //non-standard
-	    typeMappings.put("geopoint", new Integer(Constants.DATATYPE_GEOPOINT));         //non-standard
 	}
 	
 	private static void initBindHandlers() {
