@@ -136,7 +136,14 @@ public class NewUserForm extends Form implements IView{
 	private User constructUser(boolean hackForAdmin) {
 		int userid = -1;
 		//#if javarosa.adduser.extended
-		userid = Integer.parseInt(userID.getString());
+		// Clayton Sims - Mar 12, 2009 : this is stupid, and I hate it, but it is Java's
+		// only way of identifying whether userID is an int cleanly. If you have a cleaner
+		// 100% solid way of doing so, _please_ replace this code.
+		try {
+			userid = Integer.parseInt(userID.getString());
+		} catch(NumberFormatException e) {
+			//Do nothing. 
+		}
 		//#endif
 		
 		User user;
