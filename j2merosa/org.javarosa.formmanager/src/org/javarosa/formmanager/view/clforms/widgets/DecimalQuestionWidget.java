@@ -47,7 +47,7 @@ public class DecimalQuestionWidget extends SingleQuestionScreen
 	}
 
 	public IAnswerData getWidgetValue () {
-		String s = tf.getText();
+		String s = tf.getString();
 		
 		if (s == null || s.equals(""))
 			return null;
