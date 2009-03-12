@@ -380,7 +380,7 @@ public class DateUtils {
 	/* ==== UTILITY ==== */
 	
 	/**
-	 * Tokenizes a string based on the given delimeter string
+	 * Tokenizes a string based on the given delimiter string
 	 * @param original The string to be split
 	 * @param delimiter The delimeter to be used
 	 * @return An array of strings contained in original which were
