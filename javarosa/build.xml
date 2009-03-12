@@ -48,9 +48,8 @@
 	      <fileset dir="${core}/src/" includes="**/*"/>
 	      <fileset dir="${model}/src/" includes="**/*"/>
 	      <fileset dir="${forms}/src/" includes="**/*"/>
-      	<fileset dir="${xform}/src/" includes="**/*"/>
+      	  <fileset dir="${xform}/src/" includes="**/*"/>
 	    </jar>
 	  </target>
-	<target name="package-all" depends="package-library, package-source">
-	</target>
+	<target name="package-all" depends="package-library, package-source" />
 </project>

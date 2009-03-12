@@ -7,6 +7,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
+import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
@@ -88,7 +89,19 @@ public class XFormAnswerDataParser {
 
 			Date t = (trimmedText == null ? null : DateUtils.parseTime(trimmedText));
 			return (t == null ? null : new TimeData(t));
+		
+		case Constants.DATATYPE_GEOPOINT:
 
+            try {
+                String[] geopoint = (trimmedText == null ? null : trimmedText.split("[,]"));
+                double gp[] = new double[2];
+                gp[0] = Double.parseDouble(geopoint[0]);
+                gp[1] = Double.parseDouble(geopoint[0]);
+                return new GeoPointData(gp);
+            }   catch (NumberFormatException nfe) {
+                return null;
+            }
+            
 		default:
 
 			return null;
