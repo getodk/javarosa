@@ -9,7 +9,6 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.MultiPointerAnswerData;
@@ -48,7 +47,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData ||
 		    data instanceof SelectMultiData || data instanceof SelectOneData ||
 		    data instanceof IntegerData || data instanceof DecimalData || data instanceof PointerAnswerData	||
-		    data instanceof MultiPointerAnswerData || data instanceof GeoPointData) {
+		    data instanceof MultiPointerAnswerData ) {
 			return true;
 		} else {
 			return false;
@@ -156,11 +155,6 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		return ((Double)data.getValue()).toString();
 	}
 	
-	public Object serializeAnswerData(GeoPointData data) {
-	    Double[] gp =  ((Double[])data.getValue());
-	    return gp[0]+","+gp[1];
-	}
-	   
 	public Object serializeAnswerData(IAnswerData data, int dataType) {
 		// First, we want to go through the additional serializers, as they should
 		// take priority to the default serializations
