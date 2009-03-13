@@ -42,7 +42,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private String title;	/** The display title of the form. */
 	private String name;  /** A unique external name that is used to identify the form between machines */
 	private Localizer localizer;
-	private Vector conditions; //<Condition>
+	public Vector conditions; //<Condition>
 	private DataModelTree model;
 
 	private Hashtable conditionTriggerIndex; // <TreeReference, Vector<Condition>>

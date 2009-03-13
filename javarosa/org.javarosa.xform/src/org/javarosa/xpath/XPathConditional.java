@@ -21,9 +21,11 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
 
 public class XPathConditional implements IConditionExpr {
 	private XPathExpression expr;
+	public String xpath; //not serialized!
 	
 	public XPathConditional (String xpath) throws XPathSyntaxException {
 		this.expr = XPathParseTool.parseXPath(xpath);
+		this.xpath = xpath;
 	}
 	
 	public XPathConditional () {
