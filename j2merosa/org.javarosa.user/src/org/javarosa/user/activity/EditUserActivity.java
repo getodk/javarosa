@@ -33,8 +33,8 @@ import org.javarosa.user.view.NewUserForm;
 public class EditUserActivity implements IActivity, CommandListener {
 
 	private IShell parent = null;
-	public final Command CMD_SAVE = new Command("Save", Command.OK, 1);
-	public final Command CMD_CANCEL = new Command("Exit",Command.BACK, 1);
+	public final Command CMD_SAVE = new Command("Save", Command.OK, 2);
+	public final Command CMD_CANCEL = new Command("Exit",Command.EXIT, 2);
 	public static final String COMMAND_KEY = "command";
 
 	AddUserContext context;
