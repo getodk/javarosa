@@ -22,7 +22,9 @@ import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.LoginContext;
 
+//#if javarosa.login.showbuild
 import edu.washington.commcare.util.CommCareContext;
+//#endif
 
 public class LoginForm extends Form implements IView
 {
