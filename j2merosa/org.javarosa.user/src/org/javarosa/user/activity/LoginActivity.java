@@ -11,7 +11,6 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
@@ -24,6 +23,7 @@ import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.user.model.User;
+import org.javarosa.user.utility.LoginContext;
 import org.javarosa.user.view.LoginForm;
 
 /**
@@ -37,7 +37,7 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 	public static final String COMMAND_KEY = "command";
 	public static final String USER = "user";
 
-	Context context;
+	LoginContext context;
 
 	public LoginActivity(IShell p, String title) {
 		this.parent = p;
@@ -46,8 +46,9 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 
 	public void start(Context context) {
 
-		this.context = context;
+		this.context = new LoginContext(context);
 		this.loginScreen = new LoginForm(this, "Login");
+		this.loginScreen.setPasswordMode(this.context.getPasswordFormat());
 		this.loginScreen.setCommandListener(this);
 		this.loginScreen.loginButton.setItemCommandListener(this);       // set item command listener
 		parent.setDisplay(this, this.loginScreen);
@@ -57,9 +58,6 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 		if (c == this.loginScreen.loginButtonCommand) {
 			System.out.println("login pressed");
 			if (loginScreen.validateUser()) {
-				final javax.microedition.lcdui.Alert success = loginScreen
-						.successfulLogin();
-				parent.setDisplay(this, new IView() {public Object getScreenObject() { return success;}});
 				Hashtable returnArgs = new Hashtable();
 				returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
 				returnArgs.put(USER, loginScreen.getLoggedInUser());
@@ -69,6 +67,9 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 				showError("Login Incorrect", "Please try again");
 			}
 		}
+		
+		// TODO: fix this to not be ghetto preprocssed in.
+		
 		//#if javarosa.login.demobutton
 		else if (c == this.loginScreen.demoButtonCommand) {
 			//#if debug.output==verbose
