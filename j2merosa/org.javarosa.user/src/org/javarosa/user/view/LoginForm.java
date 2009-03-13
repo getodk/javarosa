@@ -20,10 +20,9 @@ import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
+import org.javarosa.user.utility.LoginContext;
 
-//#if javarosa.login.showbuild
 import edu.washington.commcare.util.CommCareContext;
-//#endif
 
 public class LoginForm extends Form implements IView
 {
@@ -108,6 +107,14 @@ public class LoginForm extends Form implements IView
 	      }
 	      //#endif
 	   }
+	  
+	  public void setPasswordMode(String passwordMode) {
+		  if(LoginContext.PASSWORD_FORMAT_NUMERIC.equals(passwordMode)) {
+			  password.setConstraints(TextField.PASSWORD | TextField.NUMERIC);
+		  } else if(LoginContext.PASSWORD_FORMAT_ALPHA_NUMERIC.equals(passwordMode)) {
+			  password.setConstraints(TextField.PASSWORD);
+		  }
+	  }
 
 
 	   public boolean validateUser() {
