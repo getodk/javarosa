@@ -14,6 +14,7 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathConditional;
@@ -76,11 +77,11 @@ public class FormOverview {
 			printChoices(q, indent + 1, sb);
 		}
 		
-		printConditionalProperty("relevant", f, instanceNode, indent + 1, sb);
+		printProperty("relevant", f, instanceNode, indent + 1, sb);
+		
+		printProperty("required", f, instanceNode, indent + 1, sb);
 
-		printConditionalProperty("required", f, instanceNode, indent + 1, sb);
-
-		printConditionalProperty("readonly", f, instanceNode, indent + 1, sb);
+		printProperty("readonly", f, instanceNode, indent + 1, sb);
 
 		String defaultValue = printDefault(instanceNode);
 		if (defaultValue != null) {
@@ -88,7 +89,7 @@ public class FormOverview {
 		}
 		
 		if (instanceNode.constraint != null) {
-			println(sb, indent + 1, "Constrant: " + printCondition(instanceNode.constraint.constraint));
+			println(sb, indent + 1, "Constraint: " + printCondition(instanceNode.constraint.constraint));
 		}
 		
 		println(sb);
@@ -101,7 +102,14 @@ public class FormOverview {
 		}
 	}
 	
-	private static void printConditionalProperty (String property, FormDef f, TreeElement instanceNode, int indent, StringBuffer sb) {
+	private static void printProperty (String property, FormDef f, TreeElement instanceNode, int indent, StringBuffer sb) {
+		String line = printConditionalProperty(property, f, instanceNode);
+		if (line != null) {
+			println(sb, indent, line);
+		}
+	}
+	
+	private static String printConditionalProperty (String property, FormDef f, TreeElement instanceNode) {
 		int action = -1;
 		String conditionHeader = null;
 		boolean absolute = false;
@@ -150,9 +158,7 @@ public class FormOverview {
 			line = absoluteHeader;
 		}
 		
-		if (line != null) {
-			println(sb, indent, line);
-		}
+		return line;
 	}
 	
 	private static String printDefault (TreeElement node) {
@@ -211,10 +217,25 @@ public class FormOverview {
 	
 	private static boolean listGroup (FormDef f, GroupDef g, int indent, StringBuffer sb) {
 		boolean repeat = g.getRepeat();
-		String caption = g.getLongText();
+		String caption = ExtUtil.nullIfEmpty(g.getLongText());
+		TreeElement instanceNode = getInstanceNode(f.getDataModel(), g.getBind());
 		
-		if (repeat || (caption != null && caption.length() > 0)) {
-			println(sb, indent, (repeat ? "Repeat" : "Group") + ": \"" + caption + "\"");
+		String relevant = printConditionalProperty("relevant", f, instanceNode);
+		String readonly = printConditionalProperty("readonly", f, instanceNode);
+		
+		if (repeat || caption != null || (relevant != null || readonly != null)) {
+			println(sb, indent, (repeat ? "Repeat" : "Group") + ":" + (caption != null ? " \"" + caption + "\"" : ""));
+			
+			if (relevant != null) {
+				println(sb, indent + 1, relevant);
+			}
+			
+			if (readonly != null) {
+				println(sb, indent + 1, readonly);
+			}
+				
+			println(sb);
+			
 			return true;
 		} else {
 			return false;
