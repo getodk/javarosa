@@ -77,4 +77,8 @@ public class LabelWidget implements IWidgetStyle {
 	public int getPinnableHeight() {
 		return label.getContentHeight();
 	}
+	
+	public int getMultiplicity() {
+		return multiplicity;
+	}
 }

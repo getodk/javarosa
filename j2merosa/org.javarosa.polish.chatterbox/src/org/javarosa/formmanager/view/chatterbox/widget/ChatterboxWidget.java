@@ -274,8 +274,12 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 	}
 	
 	public ChatterboxWidget generateHeader() {
-		//LabelWidget label = (LabelWidget)this.activeStyle
-		LabelWidget labelStyle = new LabelWidget();
+		int mult = -1;
+		if(this.activeStyle instanceof LabelWidget) {
+			LabelWidget label = (LabelWidget)this.activeStyle;
+			mult = label.getMultiplicity();
+		}
+		LabelWidget labelStyle = new LabelWidget(mult);
 		ChatterboxWidget widget = new ChatterboxWidget(cbox, this.getBinding(), ChatterboxWidget.VIEW_LABEL, labelStyle , null);
 
 		return widget;
