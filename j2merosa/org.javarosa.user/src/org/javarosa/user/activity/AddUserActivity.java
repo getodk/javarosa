@@ -80,6 +80,7 @@ public class AddUserActivity implements IActivity, CommandListener {
 		
 		//take this out into an activity
 		addUser = new NewUserForm("Add User", this.context.getDecorator());
+		addUser.setPasswordMode(this.context.getPasswordFormat());
 		addUser.addCommand(CMD_SAVE);
 		addUser.addCommand(CMD_CANCEL);
 		addUser.setCommandListener(this);

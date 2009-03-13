@@ -14,6 +14,7 @@ import org.javarosa.user.model.Constants;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.IUserDecorator;
+import org.javarosa.user.utility.LoginContext;
 
 
 
@@ -94,6 +95,16 @@ public class NewUserForm extends Form implements IView{
 		}
 		editingId = user.getRecordId();
 		System.out.println("Editing ID: " + editingId);
+	}
+	
+	public void setPasswordMode(String mode) {
+		  if(LoginContext.PASSWORD_FORMAT_NUMERIC.equals(mode)) {
+			  password.setConstraints(TextField.PASSWORD | TextField.NUMERIC);
+			  confirmPassword.setConstraints(TextField.PASSWORD | TextField.NUMERIC);
+		  } else if(LoginContext.PASSWORD_FORMAT_ALPHA_NUMERIC.equals(mode)) {
+			  password.setConstraints(TextField.PASSWORD);
+			  confirmPassword.setConstraints(TextField.PASSWORD);
+		  }
 	}
 
 	public String readyToSave()
