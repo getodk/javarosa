@@ -145,7 +145,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		//Default Mode: Start at first question
     		controller.stepQuestion(true);
     	}
-    	
+    	this.currentlyActiveContainer = this.container;
     }
     
     private void setUpCommands () {
@@ -288,6 +288,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			//#endif
     			
     			this.focus(widget, true);
+    			//this.
     			widget.showCommands();
     		}
     			
