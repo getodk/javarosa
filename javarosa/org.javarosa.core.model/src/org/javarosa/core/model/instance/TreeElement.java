@@ -39,9 +39,9 @@ public class TreeElement implements Externalizable {
 
     /* model properties */
 	public int dataType = Constants.DATATYPE_NULL;
-	public boolean relevant = true;
+	public boolean relevant = true;  //do not read this directly unless you know what you're doing!! use isRelevant() if not
 	public boolean required = false;
-	public boolean enabled = true;
+	public boolean enabled = true;   //do not read this directly unless you know what you're doing!! use isEnabled() if not
 	public Constraint constraint = null;
 	public String preloadHandler = null;
 	public String preloadParams = null;
