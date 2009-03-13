@@ -29,13 +29,15 @@ public class AddUserActivity implements IActivity, CommandListener {
 	public final Command CMD_SAVE = new Command("Save", Command.OK, 2);
 	public final Command CMD_CANCEL = new Command("Exit",Command.EXIT, 2);
 	public static final String COMMAND_KEY = "command";
+	
+	boolean success = false;
 
 	AddUserContext context;
 	NewUserForm addUser = null;
 	
 	public AddUserActivity (IShell p) {
 		this.parent = p;
-
+		success = false;
 	}
 	
 	public void contextChanged(Context globalContext) {
@@ -85,51 +87,66 @@ public class AddUserActivity implements IActivity, CommandListener {
 
 	}
 	
-	public void commandAction(Command c,Displayable d) {
-		
+	public void commandAction(Command c,Displayable d) {		
 		if(!d.equals(addUser)) {
-			Hashtable returnArgs = new Hashtable();
-			returnArgs.put(Constants.RETURN_ARG_KEY, addUser.getConstructedUser());
-			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
+			if (!success) {
+				parent.setDisplay(this, addUser);
+			} else {
+				System.out.println("About to return from activity");
+				Hashtable returnArgs = new Hashtable();
+				returnArgs.put(Constants.RETURN_ARG_KEY, addUser
+						.getConstructedUser());
+				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+						returnArgs);
+			}
 		}
 		
 		if (c == this.CMD_SAVE)
 		{
+	    	//#style mailAlert
+			final Alert successfulNewUser  = new Alert("User added","User added successfully",null,AlertType.CONFIRMATION);
+
 			String answer = addUser.readyToSave();
 
     		if (answer.equals(""))	{///success
 
-    			final javax.microedition.lcdui.Alert successfulNewUser  = new javax.microedition.lcdui.Alert("User added","User added successfully",null,javax.microedition.lcdui.AlertType.CONFIRMATION);
     			successfulNewUser.setCommandListener(this);
     			successfulNewUser.setTimeout(Alert.FOREVER);
     			
     			parent.setDisplay(this, new IView() {public Object getScreenObject() { return successfulNewUser;}});
-    			//parent.setDisplay(this, this.addUser);
+    			success = true;
     		}
     		else if (answer.substring(0,10 ).equals("Username ("))///name already taken..
     		{
 
-    			final javax.microedition.lcdui.Alert nameTakenError  = new javax.microedition.lcdui.Alert("Problem adding User - name taken",
+    	    	//#style mailAlert
+    			final Alert nameTakenError  = new Alert("Problem adding User - name taken",
 						answer, null,AlertType.ERROR);
+    			nameTakenError.setCommandListener(this);
+    			nameTakenError.setTimeout(Alert.FOREVER);
     			parent.setDisplay(this, new IView() {public Object getScreenObject() { return nameTakenError;}});
-    			parent.setDisplay(this, this.addUser);
     		}
     		else if (answer.substring(0,9).equals("Please fi") )
     		{
     			System.out.println(answer.substring(9));
-    			final javax.microedition.lcdui.Alert noInputError  = new javax.microedition.lcdui.Alert("Problem adding User - no input",
+    	    	//#style mailAlert
+    			final Alert noInputError  = new Alert("Problem adding User - no input",
 						answer, null,AlertType.ERROR);
+    			noInputError.setTimeout(Alert.FOREVER);
+    			noInputError.setCommandListener(this);
+
     			parent.setDisplay(this, new IView() {public Object getScreenObject() { return noInputError;}});
-    			parent.setDisplay(this, this.addUser);
     		}
     		else if (answer.substring(0,9).equals("Please re"))///password error
     		{
     			System.out.println(answer.substring(9));
-    			final javax.microedition.lcdui.Alert passwordMismatchError  = new javax.microedition.lcdui.Alert("Problem adding User - passwords don't match",
+    	    	//#style mailAlert
+    			final Alert passwordMismatchError  = new Alert("Problem adding User - passwords don't match",
 						answer, null,AlertType.ERROR);
-    			passwordMismatchError.setTimeout(javax.microedition.lcdui.Alert.FOREVER);
+    			passwordMismatchError.setTimeout(Alert.FOREVER);
+    			passwordMismatchError.setCommandListener(this);
+
     			parent.setDisplay(this, new IView() {public Object getScreenObject() { return passwordMismatchError;}});
-    			parent.setDisplay(this, this.addUser);
 
     		}
 
@@ -137,10 +154,7 @@ public class AddUserActivity implements IActivity, CommandListener {
 		else if (c == this.CMD_CANCEL)
 		{
 			Hashtable returnArgs = new Hashtable();
-			returnArgs.put(Constants.RETURN_ARG_KEY, addUser.getConstructedUser());
-			//returnArgs.put(COMMAND_KEY, Commands.CMD_ADD_USER);
 			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
-		//	parent.setDisplay(this, this.formsList);			
 		}
 	}
 	
