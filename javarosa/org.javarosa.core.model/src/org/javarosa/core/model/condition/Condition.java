@@ -27,10 +27,10 @@ public class Condition implements Externalizable {
 	public static final int ACTION_REQUIRE = 7;
 	public static final int ACTION_DONT_REQUIRE = 8;
 	
-	private IConditionExpr expr;
-	private int trueAction;
-	private int falseAction;
-	private Vector targets;
+	public IConditionExpr expr;
+	public int trueAction;
+	public int falseAction;
+	public Vector targets;
 	public TreeReference contextRef;  //generic ref used to turn triggers into absolute references
 		
 	public Condition () {
