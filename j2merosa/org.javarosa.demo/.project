@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.javarosa.rmstest</name>
+	<name>org.javarosa.demo</name>
 	<comment></comment>
-	<projects>
-	</projects>
-	<buildSpec>
-		<buildCommand>
+	<projects></projects>
+	<buildSpec><buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
 			<arguments>
 			</arguments>
-		</buildCommand>
-	</buildSpec>
-	<natures>
-		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>eclipseme.core.nature</nature>
-	</natures>
+		</buildCommand></buildSpec>
+	<natures><nature>org.eclipse.jdt.core.javanature</nature><nature>eclipseme.core.nature</nature></natures>
 </projectDescription>

@@ -1,0 +1,1124 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:jr="http://openrosa.org/javarosa">
+  <h:head>
+    <h:meta name="name" content="intrahealth-training-followup" />
+    <h:meta name="version" content="0.1" />
+    <h:title>Training Followup</h:title>
+
+    <!-- fun idea
+    <jr:xpath-macro def="exclusive-choice" body="not(selected($1, $2) and count-selected($1) > 1)" />
+    -->
+
+    <model>
+      <instance>
+        <training-followup xmlns="http://intrahealth.org/training-followup">
+          <meta>
+            <device-id />
+            <start-time />
+            <end-time />
+          </meta>
+
+          <date />
+          <site>
+            <region />
+            <district />
+            <facility />
+          </site>
+          <trainer />
+          <trainee />
+
+          <pre-test>
+            <relationship-and-environment>
+              <greeting />
+              <atmosphere />
+            </relationship-and-environment>
+            <information>
+              <primary-concerns />
+              <testing-benefit />
+              <available-services />
+              <window-period />
+              <allows-questions />
+            </information>
+          </pre-test>
+          <consent>
+            <verbal />
+            <written />
+          </consent>
+          <test-performed />
+          <testing>
+            <supplies-in-place />
+            <working-properly>
+              <sd-bioline />
+              <dertimine />
+              <unigold />
+            </working-properly>  
+            <adhere-lab-sop />
+            <interpret-results />
+            <safe-practices />
+            <availability>
+              <incinerator />
+              <pits />
+              <sharps-disposal />
+            </availability>
+          </testing>
+          <post-test>
+            <readiness />
+            <possibilities-implications />
+            <clear-language />
+            <time-to-reflect />
+          </post-test>
+          <test-result />
+          <key-messages>
+            <hiv-negative>
+              <retest />
+              <prevention />
+              <partner />
+            </hiv-negative>
+            <hiv-positive>
+              <hiv-vs-aids />
+              <safe-sex />
+              <ctc-services />
+              <partner />
+              <disclosure-plans />
+              <health-advice />
+              <community-support />
+              <allows-questions />
+              <referral-form />
+            </hiv-positive>            
+          </key-messages>
+          <monitoring-and-evaluation>
+            <supervisor-review-feedback />
+            <strengths />
+            <needs-improvement />
+          </monitoring-and-evaluation>
+
+          <!-- facility drill-down hack until we support dynamic itemsets -->
+          <hack>
+            <district>
+              <r-arusha />
+              <r-mwanza />
+              <r-kigoma />
+            </district>
+            <facility>
+              <d-arusha-dist />
+              <d-arusha-muni />
+              <d-geita-dist />
+              <d-karatu-dist />
+              <d-kasulu-dist />
+              <d-kibondo-dist />
+              <d-kigoma-dist />
+              <d-kigoma-muni-ujiji />
+              <d-meru-dist />
+              <d-nyamagana-dist />
+            </facility>
+          </hack>
+        </training-followup>
+      </instance>
+
+      <bind nodeset="testing" relevant="../test-performed = 'yes'" />
+      <bind nodeset="post-test" relevant="../test-performed = 'yes'" />
+      <bind nodeset="test-result" relevant="../test-performed = 'yes'" />
+      <bind nodeset="key-messages" relevant="../test-performed = 'yes'" />
+      <bind nodeset="key-messages/hiv-positive" relevant="/training-followup/test-result = 'positive'" />
+      <bind nodeset="key-messages/hiv-negative" relevant="/training-followup/test-result = 'negative'" />
+
+      <bind nodeset="meta/device-id" jr:preload="property" jr:preloadParams="DeviceID" />
+      <bind nodeset="meta/start-time" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
+      <bind nodeset="meta/end-time" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
+
+      <bind nodeset="date" type="xsd:date" required="true()" jr:preload="date" jr:preloadParams="today" />
+      <bind nodeset="site/region" required="true()" jr:preload="property" jr:preloadParams="Region" />
+ <!-- there is no one 'district' or 'facility' question due to drill-down hack 
+      <bind nodeset="site/district" required="true()" jr:preload="property" jr:preloadParams="District" />
+      <bind nodeset="site/facility" required="true()" /> -->
+      <bind nodeset="trainer" required="true()" /> <!-- default from user login? -->
+      <bind nodeset="trainee" required="true()" />
+
+      <!-- for any multi-select question that contains an option like 'not observed'/'not done'/'none of the above'
+           which should only be allowed to the exclusion of all other options -->
+      <bind nodeset="pre-test/relationship-and-environment/greeting" required="true()"
+            constraint="not(selected(., 'not-observed') and count-selected(.) > 1)"
+            jr:constraintMsg="'Not observed' can only be selected by itself" />
+      <bind nodeset="pre-test/relationship-and-environment/atmosphere" required="true()"
+            constraint="not(selected(., 'not-observed') and count-selected(.) > 1)"
+            jr:constraintMsg="'Not observed' can only be selected by itself" />
+      <bind nodeset="pre-test/information/testing-benefit" required="true()"
+            constraint="not(selected(., 'not-done') and count-selected(.) > 1)"
+            jr:constraintMsg="'Not done' can only be selected by itself" />
+      <bind nodeset="testing/safe-practices" required="true()"
+            constraint="not(selected(., 'not-adhered') and count-selected(.) > 1)"
+            jr:constraintMsg="'Not adhered' can only be selected by itself" />
+
+      <!-- drill-down hack binds -->
+      <bind nodeset="hack/district/r-arusha" relevant="/training-followup/site/region = 'arusha'"
+            required="true()" jr:preload="property" jr:preloadParams="District" />
+      <bind nodeset="hack/district/r-kigoma" relevant="/training-followup/site/region = 'kigoma'"
+            required="true()" jr:preload="property" jr:preloadParams="District" />
+      <bind nodeset="hack/district/r-mwanza" relevant="/training-followup/site/region = 'mwanza'"
+            required="true()" jr:preload="property" jr:preloadParams="District" />
+
+      <!-- need to check region again due to 'conditions based of non-relevant data' bug -->
+      <bind nodeset="hack/facility/d-arusha-dist" required="true()"
+            relevant="/training-followup/site/region = 'arusha' and ../../district/r-arusha = 'arusha-dist'" />
+      <bind nodeset="hack/facility/d-arusha-muni" required="true()"
+            relevant="/training-followup/site/region = 'arusha' and ../../district/r-arusha = 'arusha-muni'" />
+      <bind nodeset="hack/facility/d-geita-dist" required="true()"
+            relevant="/training-followup/site/region = 'mwanza' and ../../district/r-mwanza = 'geita-dist'" />
+      <bind nodeset="hack/facility/d-karatu-dist" required="true()"
+            relevant="/training-followup/site/region = 'arusha' and ../../district/r-arusha = 'karatu-dist'" />
+      <bind nodeset="hack/facility/d-kasulu-dist" required="true()"
+            relevant="/training-followup/site/region = 'kigoma' and ../../district/r-kigoma = 'kasulu-dist'" />
+      <bind nodeset="hack/facility/d-kibondo-dist" required="true()"
+            relevant="/training-followup/site/region = 'kigoma' and ../../district/r-kigoma = 'kibondo-dist'" />
+      <bind nodeset="hack/facility/d-kigoma-dist" required="true()"
+            relevant="/training-followup/site/region = 'kigoma' and ../../district/r-kigoma = 'kigoma-dist'" />
+      <bind nodeset="hack/facility/d-kigoma-muni-ujiji" required="true()"
+            relevant="/training-followup/site/region = 'kigoma' and ../../district/r-kigoma = 'kigoma-muni-ujiji'" />
+      <bind nodeset="hack/facility/d-meru-dist" required="true()"
+            relevant="/training-followup/site/region = 'arusha' and ../../district/r-arusha = 'meru-dist'" />
+      <bind nodeset="hack/facility/d-nyamagana-dist" required="true()"
+            relevant="/training-followup/site/region = 'mwanza' and ../../district/r-mwanza = 'nyamagana-dist'" />
+
+      <itext>
+        <translation lang="English">
+          <text id="g-pretest-relationship-environment">
+            <value>Pre-test: Establishing Relationship and Supportive Environment</value>
+          </text>
+          <text id="g-pretest-information-to-client">
+            <value>Pre-test: Information to Client</value>
+          </text>
+          <text id="g-consent">
+            <value>Consent to HIV Testing</value>
+          </text>
+          <text id="g-testing">
+            <value>HIV Testing</value>
+          </text>
+          <text id="g-posttest">
+            <value>Post-test Counseling</value>
+          </text>
+          <text id="g-key-messages-negative">
+            <value>Key Messages - HIV Negative</value>
+          </text>
+          <text id="g-key-messages-positive">
+            <value>Key Messages - HIV Positive</value>
+          </text>
+          <text id="g-monitoring-evaluation">
+            <value>Monitoring and Evaluation</value>
+          </text>
+          <text id="g-hiv-test-items-working">
+            <value>Check if HIV testing items are working properly (check expiration date)</value>
+          </text>
+
+          <text id="q-region">
+            <value form="long">Region</value>
+            <value form="short">Region</value>
+          </text>
+          <text id="q-district">
+            <value form="long">District</value>
+            <value form="short">District</value>
+          </text>
+          <text id="q-facility">
+            <value form="long">Facility</value>
+            <value form="short">Facility</value>
+          </text>
+          <text id="q-trainer">
+            <value form="long">Trainer</value>
+            <value form="short">Trainer</value>
+          </text>
+          <text id="q-trainee">
+            <value form="long">Trainee</value>
+            <value form="short">Trainee</value>
+          </text>
+          <text id="q-date">
+            <value form="long">Date of Report</value>
+            <value form="short">Date</value>
+          </text>
+          <text id="q-uses-culturally-appropriate-greetings">
+            <value form="long">Uses culturally appropriate greeting gestures that convey respect and caring.</value>
+            <value form="short">Culturally appropriate greetings</value>
+          </text>
+          <text id="q-provides-good-atmosphere">
+            <value form="long">Provides comfortable, trusting atmosphere for patients to ask questions and responds to questions and concerns appropriately throughout the testing/counseling session.</value>
+            <value form="short">Comfortable, trusting atmosphere</value>
+          </text>
+          <text id="q-addresses-primary-complaint">
+            <value form="long">Addresses primary concerns based on the what brought the person's to health facility</value>
+            <value form="short">Addresses what brought person to health facility</value>
+          </text>
+          <text id="q-mentions-hiv-testing-benefits">
+            <value form="long">Did the trainee mention clinical and prevention benefit of HIV testing at individual level</value>
+            <value form="short">Mentions benefits of HIV testing</value>
+          </text>
+          <text id="q-explains-available-hiv-services">
+            <value form="long">Did the trainee explain about services that are available for HIV Negative and Positive including availability of CTC</value>
+            <value form="short">Explained available services</value>
+          </text>
+          <text id="q-explains-hiv-pos-window-period">
+            <value form="long">Did trainee explain significance of a "window period" in relationship to possible HIV test results?</value>
+            <value form="short">Explained 'window period'</value>
+          </text>
+          <text id="q-allows-client-ask-questions">
+            <value form="long">Did trainee allows person to ask questions</value>
+            <value form="short">Allows person to ask questions</value>
+          </text>
+          <text id="q-observe-verbal-consent-obtained">
+            <value form="long">Observe how verbal consent is obtained non-cohesively from client.</value>
+            <value form="short">Verbal consent</value>
+          </text>
+          <text id="q-observe-written-consent-obtained">
+            <value form="long">Observe how written consent from parents or guardian for children's or person with disabilities (as started in NACP consent forms) is obtained.</value>
+            <value form="short">Written consent</value>
+          </text>
+          <text id="q-hiv-test-kits-in-place">
+            <value form="long">Are HIV test kits and supplies necessary for performing test are in place according to National Testing Algorithm?</value>
+            <value form="short">HIV test kits and supplies in place</value>
+          </text>
+          <text id="q-sd-bioline-working">
+            <value form="long">SD Bioline</value>
+            <value form="short">SD Bioline</value>
+          </text>
+          <text id="q-dertimine-working">
+            <value form="long">Dertimine</value>
+            <value form="short">Dertimine</value>
+          </text>
+          <text id="q-unigold-working">
+            <value form="long">Unigold</value>
+            <value form="short">Unigold</value>
+          </text>
+          <text id="q-adheres-rapid-hiv-testing-procedure">
+            <value form="long">Did the trainee adhere to Lab SOP for performing rapid HIV testing to National Testing Algorithm?</value>
+            <value form="short">Adheres to Lab SOP?</value>
+          </text>
+          <text id="q-interpreted-results">
+            <value form="long">Did the trainee interpret HIV test results and make use of the national testing algorithm?</value>
+            <value form="short">Did interpret results?</value>
+          </text>
+          <text id="q-adheres-safe-work-practices">
+            <value form="long">Observe adherence to safe work practices at the site</value>
+            <value form="short">Safe work practices?</value>
+          </text>
+          <text id="q-incinerator-available">
+            <value form="long">Look for availability of incinerator</value>
+            <value form="short">Incinerator available</value>
+          </text>
+          <text id="q-pits-available">
+            <value form="long">Look for availability of pits</value>
+            <value form="short">Pits available</value>
+          </text>
+          <text id="q-sharps-disposal-available">
+            <value form="long">Look for availability of sharps disposal (safety boxes)</value>
+            <value form="short">Sharps disposal available</value>
+          </text>
+          <text id="q-assessed-readiness-to-receive-results">
+            <value form="long">Did trainee assess person's readiness to receive HIV results through questions, signs of emotional reactions etc?</value>
+            <value form="short">Assessed readiness to receive results</value>
+          </text>
+          <text id="q-reminds-possible-results-implications">
+            <value form="long">Did the trainee remind the person what are the possible HIV results and their implications</value>
+            <value form="short">Reminded of possible results and implications</value>
+          </text>
+          <text id="q-gives-results-clear-language">
+            <value form="long">Give the HIV results in a simple and clear language</value>
+            <value form="short">Results in clear language</value>
+          </text>
+          <text id="q-gives-patient-time-to-reflect">
+            <value form="long">Give the person time to reflect on HIV results</value>
+            <value form="short">Gave time to reflect</value>
+          </text>
+          <text id="q-explains-negative-and-window-period">
+            <value form="long">Explain the person that HIV was not detected at this time; however, since the person could be in the window period, recommends a second test after 3 months time.</value>
+            <value form="short">Explained negative result, window period, and retest</value>
+          </text>
+          <text id="q-reminds-prevention-strategies">
+            <value form="long">Did the trainee remind person on prevention strategies</value>
+            <value form="short">Prevention strategies</value>
+          </text>
+          <text id="q-suggests-partner-testing">
+            <value form="long">Did trainee explain to a person on the importance of notifying partner and to bring partner(s) in for HIV testing?</value>
+            <value form="short">Importance of notifying partner; partner testing</value>
+          </text>
+          <text id="q-reminds-difference-hiv-aids">
+            <value form="long">Had trainee reminds person on difference between HIV-infection and having AIDS</value>
+            <value form="short">Reminded difference between HIV/AIDS</value>
+          </text>
+          <text id="q-reminds-importance-safe-sex">
+            <value form="long">Had trainee reminds person of the need for safe sex to prevent increased risk to self or to others e.g. condoms for all sexual intercourse.</value>
+            <value form="short">Safe sex</value>
+          </text>
+          <text id="q-explains-referral-services">
+            <value form="long">Did the trainee explain to a person clearly the referral to CTC and services that are available at CTC?</value>
+            <value form="short">Explained available CTC services</value>
+          </text>
+          <text id="q-suggests-partner-testing-with-disclosure">
+            <value form="long">Did trainee explain to a person on the importance of disclosure to partner and to bring partner(s) in for HIV testing?</value>
+            <value form="short">Importance of disclosure; partner testing</value>
+          </text>
+          <text id="q-assists-disclosure-plans">
+            <value form="long">Did the trainee assist the person to make disclosure plans to partner/ guardian/friends/relative?</value>
+            <value form="short">Assisted with disclosure plans</value>
+          </text>
+          <text id="q-gives-info-diet-staying-healthy">
+            <value form="long">Did the trainee give information about what to eat and stay healthy.</value>
+            <value form="short">Information on staying healthy</value>
+          </text>
+          <text id="q-gives-info-community-support">
+            <value form="long">Is the client given information about community support groups and other services?</value>
+            <value form="short">Information on support groups</value>
+          </text>
+          <text id="q-referral-form-properly-filled">
+            <value form="long">Observe if referral form was properly filled</value>
+            <value form="short">Referral form</value>
+          </text>
+          <text id="q-supervisor-gives-feedback">
+            <value form="long">Trainer/supervisor review daily registers and give feedback on areas that need improvement.</value>
+            <value form="short">Trainer/supervisor reviews registers and gives feedback</value>
+          </text>
+          <text id="q-trainee-strengths">
+            <value form="long">Briefly comment on trainees strengths</value>
+            <value form="short">Strengths</value>
+          </text>
+          <text id="q-areas-for-improvement">
+            <value form="long">Recommendation for improvement</value>
+            <value form="short">Recommendation for improvement</value>
+          </text>
+          <text id="q-test-performed">
+            <value form="long">Was an HIV test performed?</value>
+            <value form="short">Test performed?</value>
+          </text>
+          <text id="q-test-result">
+            <value form="long">What was the result of the HIV test?</value>
+            <value form="short">Test result</value>
+          </text>
+
+          <text id="ch-yes">
+            <value>Yes</value>
+          </text>
+          <text id="ch-no">
+            <value>No</value>
+          </text>
+          <text id="ch-pos">
+            <value>Positive</value>
+          </text>
+          <text id="ch-neg">
+            <value>Negative</value>
+          </text>
+          <text id="ch-not-observed">
+            <value>Not observed</value>
+          </text>
+          <text id="ch-not-applicable">
+            <value>Not applicable</value>
+          </text>
+          <text id="ch-done">
+            <value>Done</value>
+          </text>
+          <text id="ch-not-done">
+            <value>Not done</value>
+          </text>
+          <text id="ch-correct">
+            <value>Correct</value>
+          </text>
+          <text id="ch-incorrect">
+            <value>Incorrect</value>
+          </text>
+          <text id="ch-available-used">
+            <value>Available and used</value>
+          </text>
+          <text id="ch-available-not-used">
+            <value>Available but not used</value>
+          </text>
+          <text id="ch-not-available">
+            <value>Not available</value>
+          </text>
+          <text id="ch-expired">
+            <value>Expired</value>
+          </text>
+          <text id="ch-not-expired">
+            <value>Not expired</value>
+          </text>
+          <text id="ch-not-filled-out">
+            <value>Not filled out</value>
+          </text>
+          <text id="ch-abstinence">
+            <value>Abstinence</value>
+          </text>
+          <text id="ch-access-care-treatment">
+            <value>Access care and treatment</value>
+          </text>
+          <text id="ch-acknowledges">
+            <value>Acknowledges</value>
+          </text>
+          <text id="ch-blood-collection">
+            <value>Blood collection technique</value>
+          </text>
+          <text id="ch-blood-into-device">
+            <value>Putting blood into device</value>
+          </text>
+          <text id="ch-both-explained">
+            <value>Both were explained</value>
+          </text>
+          <text id="ch-condom">
+            <value>Demonstration and supply of condom</value>
+          </text>
+          <text id="ch-consent-forms">
+            <value>Consent forms in place</value>
+          </text>
+          <text id="ch-ct-register">
+            <value>CT register in place</value>
+          </text>
+          <text id="ch-dertimine">
+            <value>Dertimine in place</value>
+          </text>
+          <text id="ch-done-correct">
+            <value>Done, and form filled out correctly</value>
+          </text>
+          <text id="ch-done-incorrect">
+            <value>Done, but form not filled out correctly</value>
+          </text>
+          <text id="ch-done-refused">
+            <value>Done, but person refused testing</value>
+          </text>
+          <text id="ch-encouraging-words">
+            <value>Uses encouraging words</value>
+          </text>
+          <text id="ch-eye-contact">
+            <value>Eye contact</value>
+          </text>
+          <text id="ch-faithful">
+            <value>Being faithful to one partner uninfected</value>
+          </text>
+          <text id="ch-gloves">
+            <value>Wearing and removal of gloves</value>
+          </text>
+          <text id="ch-hand-finger-positioning">
+            <value>Positioning of the hand and finger</value>
+          </text>
+          <text id="ch-hand-washing">
+            <value>Hand washing</value>
+          </text>
+          <text id="ch-introduces-self">
+            <value>Introduces her/himself</value>
+          </text>
+          <text id="ch-ip">
+            <value>Supplies for IP in place</value>
+          </text>
+          <text id="ch-knowing-hiv-status">
+            <value>Knowing HIV status</value>
+          </text>
+          <text id="ch-non-verbal-communication">
+            <value>Non-verbal communication</value>
+          </text>
+          <text id="ch-not-adhered">
+            <value>Not adhered</value>
+          </text>
+          <text id="ch-other-preventative">
+            <value>Other preventive messages</value>
+          </text>
+          <text id="ch-pays-attention">
+            <value>Pays attention/Actively engaged</value>
+          </text>
+          <text id="ch-pricking">
+            <value>Pricking technique</value>
+          </text>
+          <text id="ch-privacy">
+            <value>Maintains privacy</value>
+          </text>
+          <text id="ch-reading-results">
+            <value>Reading results</value>
+          </text>
+          <text id="ch-reagents">
+            <value>Number of drops of reagents</value>
+          </text>
+          <text id="ch-reducing-risks">
+            <value>Reducing HIV risks</value>
+          </text>
+          <text id="ch-referral-forms">
+            <value>Referral forms in place</value>
+          </text>
+          <text id="ch-refused-testing">
+            <value>Person refused testing</value>
+          </text>
+          <text id="ch-safety-box">
+            <value>Use of safety box</value>
+          </text>
+          <text id="ch-sd-bioline">
+            <value>SD Bioline in place</value>
+          </text>
+          <text id="ch-services-to-negative">
+            <value>Services to HIV negative</value>
+          </text>
+          <text id="ch-services-to-positive">
+            <value>Services to HIV positive</value>
+          </text>
+          <text id="ch-shakes-hands">
+            <value>Shakes hands</value>
+          </text>
+          <text id="ch-smiles">
+            <value>Smiles</value>
+          </text>
+          <text id="ch-social-support">
+            <value>Social support services</value>
+          </text>
+          <text id="ch-specimen-collection">
+            <value>Supplies for specimen collection in place</value>
+          </text>
+          <text id="ch-timer">
+            <value>Timer/watch in place</value>
+          </text>
+          <text id="ch-tone-of-voice">
+            <value>Tone of voice</value>
+          </text>
+          <text id="ch-unigold">
+            <value>Unigold in place</value>
+          </text>
+          <text id="ch-verbal-consent-only">
+            <value>Obtained verbal consent only</value>
+          </text>
+          <text id="ch-verbal-greetings">
+            <value>Verbal greetings</value>
+          </text>
+          <text id="ch-waiting-time">
+            <value>Waiting time</value>
+          </text>
+        </translation>
+      </itext>
+    </model>
+  </h:head>
+  <h:body>
+
+    <input ref="date"><label ref="jr:itext('q-date')" /></input>
+
+    <select1 ref="site/region">
+      <label ref="jr:itext('q-region')" />
+      
+      <item><label>Arusha</label><value>arusha</value></item>
+      <item><label>Mwanza</label><value>mwanza</value></item>
+      <item><label>Kigoma</label><value>kigoma</value></item>
+    </select1>
+    
+    <!-- no one district or facility question due to drill-down hack; answers are merged into site/district and site/facility during post-processing -->
+    
+    <!-- district questions (one per region) -->
+    
+    <select1 ref="hack/district/r-arusha">
+      <label ref="jr:itext('q-district')" />
+
+      <item><label>Arusha district</label><value>arusha-dist</value></item>
+      <item><label>Arusha municipal</label><value>arusha-muni</value></item>
+      <item><label>Karatu district</label><value>karatu-dist</value></item>
+      <item><label>Meru district</label><value>meru-dist</value></item>
+    </select1>
+
+    <select1 ref="hack/district/r-mwanza">
+      <label ref="jr:itext('q-district')" />
+
+      <item><label>Geita district</label><value>geita-dist</value></item>
+      <item><label>Nyamagana district</label><value>nyamagana-dist</value></item>
+    </select1>
+    
+    <select1 ref="hack/district/r-kigoma">
+      <label ref="jr:itext('q-district')" />
+
+      <item><label>Kasulu district</label><value>kasulu-dist</value></item>
+      <item><label>Kibondo district</label><value>kibondo-dist</value></item>
+      <item><label>Kigoma district</label><value>kigoma-dist</value></item>
+      <item><label>Kigoma municipal/Ujiji</label><value>kigoma-muni-ujiji</value></item>
+    </select1>
+
+    <!-- facility questions (one per district) -->
+    
+    <select1 ref="hack/facility/d-arusha-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[33] Oltrumet Health Centre</label><value>33-oltrumet-hctr</value></item>
+      <item><label>[34] Nduruma Health Centre</label><value>34-nduruma-hctr</value></item>
+      <item><label>[35] Oldonyosambu Dispensary</label><value>35-oldonyosambu-disp</value></item>
+      <item><label>[36] Olgilai Dispensary</label><value>36-olgilai-disp</value></item>
+      <item><label>[37] Sambasha Dispensary</label><value>37-sambasha-disp</value></item>
+      <item><label>[38] Bangata Government Dispensary</label><value>38-bangata-govt-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-arusha-muni">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[17] Mt. Meru Regional Hospital</label><value>17-mt-meru-reg-hosp</value></item>
+      <item><label>[18] St. Elizabeth Hospital</label><value>18-st-elizabeth-hosp</value></item>
+      <item><label>[19] Ithnaasher Hospital</label><value>19-ithnaasher-hosp</value></item>
+      <item><label>[20] Kaloleni Health Centre</label><value>20-kaloleni-hctr</value></item>
+      <item><label>[21] Ngarenaro Health Centre</label><value>21-ngarenaro-hctr</value></item>
+      <item><label>[22] Levolosi Health Centre</label><value>22-levolosi-hctr</value></item>
+      <item><label>[23] Themi Health Centre</label><value>23-themi-hctr</value></item>
+      <item><label>[24] Mkonoo Health Centre</label><value>24-mkonoo-hctr</value></item>
+      <item><label>[25] Upone Charitable Dispensary</label><value>25-upone-charitable-disp</value></item>
+      <item><label>[26] Heri Dispensary</label><value>26-heri-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-geita-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[40] Geita District Hospital</label><value>40-geita-dist-hosp</value></item>
+      <item><label>[41] Kashishi Health Centre</label><value>41-kashishi-hctr</value></item>
+      <item><label>[42] Kasamwa Health Centre</label><value>42-kasamwa-hctr</value></item>
+      <item><label>[43] Kharumwa Health Centre</label><value>43-kharumwa-hctr</value></item>
+      <item><label>[44] Chikobe Health Centre</label><value>44-chikobe-hctr</value></item>
+      <item><label>[45] Bukoli Health Centre</label><value>45-bukoli-hctr</value></item>
+      <item><label>[46] Nzera Health Centre</label><value>46-nzera-hctr</value></item>
+      <item><label>[47] Nyang'hwale Health Centre</label><value>47-nyanghwale-hctr</value></item>
+      <item><label>[48] Katoro Health Centre</label><value>48-katoro-hctr</value></item>
+      <item><label>[49] Nkome Dispensary</label><value>49-nkome-disp</value></item>
+      <item><label>[50] Lwamgasa Dispensary</label><value>50-lwamgasa-disp</value></item>
+      <item><label>[51] Nyarugusu Dispensary</label><value>51-nyarugusu-disp</value></item>
+      <item><label>[52] Busolwa Dispensary</label><value>52-busolwa-disp</value></item>
+      <item><label>[53] Chigunga Dispensary</label><value>53-chigunga-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-karatu-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[27] Karatu Health Centre</label><value>27-karatu-hctr</value></item>
+      <item><label>[28] Endabash Health Centre</label><value>28-endabash-hctr</value></item>
+      <item><label>[29] Mang'ula Health Centre</label><value>29-mangula-hctr</value></item>
+      <item><label>[30] Oldeani Health Centre</label><value>30-oldeani-hctr</value></item>
+      <item><label>[31] Rhotia Health Centre</label><value>31-rhotia-hctr</value></item>
+      <item><label>[32] Mang'ula Dispensary</label><value>32-mangula-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-kasulu-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[58] Kasulu District Hospital</label><value>58-kasulu-dist-hosp</value></item>
+      <item><label>[59] Kabanga Hospital</label><value>59-kabanga-hosp</value></item>
+      <item><label>[60] Kiganamo Health Centre</label><value>60-kiganamo-hctr</value></item>
+      <item><label>[61] Rusesa Health Centre</label><value>61-rusesa-hctr</value></item>
+      <item><label>[62] Janda Health Centre</label><value>62-janda-hctr</value></item>
+      <item><label>[63] Muyama Health Centre</label><value>63-muyama-hctr</value></item>
+      <item><label>[64] Nyakitonto Health Centre</label><value>64-nyakitonto-hctr</value></item>
+      <item><label>[65] Nyenge Health Centre</label><value>65-nyenge-hctr</value></item>
+   </select1>
+    
+    <select1 ref="hack/facility/d-kibondo-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[83] Kibondo District Hospital</label><value>83-kibondo-dist-hosp</value></item>
+      <item><label>[84] Kakonko Health Centre</label><value>84-kakonko-hctr</value></item>
+      <item><label>[85] Kifura Health Centre</label><value>85-kifura-hctr</value></item>
+      <item><label>[86] Nyazige Health Centre</label><value>86-nyazige-hctr</value></item>
+      <item><label>[87] Mabamba Health Centre</label><value>87-mabamba-hctr</value></item>
+   </select1>
+    
+    <select1 ref="hack/facility/d-kigoma-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[66] Bitale Health Centre</label><value>66-bitale-hctr</value></item>
+      <item><label>[67] Nguruka Health Centre</label><value>67-nguruka-hctr</value></item>
+      <item><label>[68] Mgambo Health Centre</label><value>68-mgambo-hctr</value></item>
+      <item><label>[69] Malagalasi Dispensary</label><value>69-malagalasi-disp</value></item>
+      <item><label>[70] Mahembe Dispensary</label><value>70-mahembe-disp</value></item>
+      <item><label>[71] Kalinzi Dispensary</label><value>71-kalinzi-disp</value></item>
+      <item><label>[72] Mtego wa noti Dispensary</label><value>72-mtego-wa-noti-disp</value></item>
+      <item><label>[73] Nyarubanda Dispensary</label><value>73-nyarubanda-disp</value></item>
+      <item><label>[74] Mkaboko Dispensary</label><value>74-mkaboko-disp</value></item>
+      <item><label>[75] Rukoma Dispensary</label><value>75-rukoma-disp</value></item>
+      <item><label>[76] Chankabwimba Dispensary</label><value>76-chankabwimba-disp</value></item>
+      <item><label>[77] Nyamhoza Dispensary</label><value>77-nyamhoza-disp</value></item>
+      <item><label>[78] Kizenga Dispensary</label><value>78-kizenga-disp</value></item>
+      <item><label>[79] Kaseke Dispensary</label><value>79-kaseke-disp</value></item>
+      <item><label>[80] Kalya Dispensary</label><value>80-kalya-disp</value></item>
+      <item><label>[81] Mkongoro Dispensary</label><value>81-mkongoro-disp</value></item>
+      <item><label>[82] Mganza Dispensary</label><value>82-mganza-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-kigoma-muni-ujiji">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[54] Maweni Regional Hospital</label><value>54-maweni-reg-hosp</value></item>
+      <item><label>[55] Ujiji Health Centre</label><value>55-ujiji-hctr</value></item>
+      <item><label>[56] Rusimbi Dispensary</label><value>56-rusimbi-disp</value></item>
+      <item><label>[57] Gungu Dispensary</label><value>57-gungu-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-meru-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[01] Meru District Hospital</label><value>01-meru-dist-hosp</value></item>
+      <item><label>[02] Mbuguni Health Centre</label><value>02-mbuguni-hctr</value></item>
+      <item><label>[03] Ngarenanyuki Health Centre</label><value>03-ngarenanyuki-hctr</value></item>
+      <item><label>[04] Mareu Dispensary</label><value>04-mareu-disp</value></item>
+      <item><label>[05] King'ori Dispensary</label><value>05-kingori-disp</value></item>
+      <item><label>[06] Nkoanrua Dispensary</label><value>06-nkoanrua-disp</value></item>
+      <item><label>[07] USA Government Dispensary</label><value>07-usa-govt-disp</value></item>
+      <item><label>[08] USA RC Dispensary</label><value>08-usa-rc-disp</value></item>
+      <item><label>[09] Ngurdoto RC Dispensary</label><value>09-ngurdoto-rc-disp</value></item>
+      <item><label>[10] Majengo Dispensary</label><value>10-majengo-disp</value></item>
+      <item><label>[11] Poli Dispensary</label><value>11-poli-disp</value></item>
+      <item><label>[12] Leguruki Dispensary</label><value>12-leguruki-disp</value></item>
+      <item><label>[13] Maji Ya Chai Dispensary</label><value>13-maji-ya-chai-disp</value></item>
+      <item><label>[14] Karangai Dispensary</label><value>14-karangai-disp</value></item>
+      <item><label>[15] Njeku Dispensary</label><value>15-njeku-disp</value></item>
+      <item><label>[16] Ngyani Dispensary</label><value>16-ngyani-disp</value></item>
+    </select1>
+    
+    <select1 ref="hack/facility/d-nyamagana-dist">
+      <label ref="jr:itext('q-facility')" />
+
+      <item><label>[39] Sekou Toure Regional Hospital</label><value>39-sekou-toure-reg-hosp</value></item>
+   </select1>
+
+    <!-- end drill-down hack -->
+    
+    <input ref="trainer"><label ref="jr:itext('q-trainer')" /></input>
+    <input ref="trainee"><label ref="jr:itext('q-trainee')" /></input>
+      
+    <group ref="pre-test">
+      <group ref="relationship-and-environment">
+        <label ref="jr:itext('g-pretest-relationship-environment')" />
+
+        <select ref="greeting">
+          <label ref="jr:itext('q-uses-culturally-appropriate-greetings')" />
+          
+          <item><label ref="jr:itext('ch-smiles')" /><value>smiles</value></item>
+          <item><label ref="jr:itext('ch-eye-contact')" /><value>eye-contact</value></item>
+          <item><label ref="jr:itext('ch-shakes-hands')" /><value>shakes-hands</value></item>
+          <item><label ref="jr:itext('ch-verbal-greetings')" /><value>verbal-greetings</value></item>
+          <item><label ref="jr:itext('ch-tone-of-voice')" /><value>tone-of-voice</value></item>
+          <item><label ref="jr:itext('ch-introduces-self')" /><value>introduces-self</value></item>
+          <item><label ref="jr:itext('ch-not-observed')" /><value>not-observed</value></item>
+        </select>
+        
+        <select ref="atmosphere">
+          <label ref="jr:itext('q-provides-good-atmosphere')" />
+          
+          <item><label ref="jr:itext('ch-privacy')" /><value>privacy</value></item>
+          <item><label ref="jr:itext('ch-acknowledges')" /><value>acknowledges</value></item>
+          <item><label ref="jr:itext('ch-pays-attention')" /><value>pays-attention</value></item>
+          <item><label ref="jr:itext('ch-non-verbal-communication')" /><value>non-verbal-communication</value></item>
+          <item><label ref="jr:itext('ch-encouraging-words')" /><value>encouraging-words</value></item>
+          <item><label ref="jr:itext('ch-not-observed')" /><value>not-observed</value></item>
+        </select>
+      </group>
+
+      <group ref="information">
+        <label ref="jr:itext('g-pretest-information-to-client')" />
+
+        <select1 ref="primary-concerns">
+          <label ref="jr:itext('q-addresses-primary-complaint')" />
+          
+          <item><label ref="jr:itext('ch-done')" /><value>done</value></item>
+          <item><label ref="jr:itext('ch-not-done')" /><value>not-done</value></item>
+        </select1>
+
+        <select ref="testing-benefit">
+          <label ref="jr:itext('q-mentions-hiv-testing-benefits')" />
+          
+          <item><label ref="jr:itext('ch-knowing-hiv-status')" /><value>knowing-hiv-status</value></item>
+          <item><label ref="jr:itext('ch-reducing-risks')" /><value>reducing-risks</value></item>
+          <item><label ref="jr:itext('ch-access-care-treatment')" /><value>access-care-treatment</value></item>
+          <item><label ref="jr:itext('ch-social-support')" /><value>social-support</value></item>
+          <item><label ref="jr:itext('ch-not-done')" /><value>not-done</value></item>
+        </select>
+
+        <select1 ref="available-services">
+          <label ref="jr:itext('q-explains-available-hiv-services')" />
+          
+          <item><label ref="jr:itext('ch-services-to-positive')" /><value>services-to-positive</value></item>
+          <item><label ref="jr:itext('ch-services-to-negative')" /><value>services-to-negative</value></item>
+          <item><label ref="jr:itext('ch-both-explained')" /><value>both-explained</value></item>
+          <item><label ref="jr:itext('ch-not-done')" /><value>not-done</value></item>
+        </select1>
+
+        <select1 ref="window-period">
+          <label ref="jr:itext('q-explains-hiv-pos-window-period')" />
+          
+          <item><label ref="jr:itext('ch-done')" /><value>done</value></item>
+          <item><label ref="jr:itext('ch-not-done')" /><value>not-done</value></item>
+        </select1>
+
+        <select1 ref="allows-questions">
+          <label ref="jr:itext('q-allows-client-ask-questions')" />
+
+          <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+        </select1>
+      </group>
+    </group>
+
+    <group ref="consent">
+      <label ref="jr:itext('g-consent')" />
+
+      <select1 ref="verbal">
+        <label ref="jr:itext('q-observe-verbal-consent-obtained')" />
+
+        <item><label ref="jr:itext('ch-done')" /><value>done</value></item>
+        <item><label ref="jr:itext('ch-done-refused')" /><value>done-refused</value></item>
+        <item><label ref="jr:itext('ch-not-done')" /><value>not-done</value></item>
+      </select1>
+
+      <select1 ref="written">
+        <label ref="jr:itext('q-observe-written-consent-obtained')" />
+        
+        <item><label ref="jr:itext('ch-not-applicable')" /><value>not-applicable</value></item>
+        <item><label ref="jr:itext('ch-done-correct')" /><value>done-correct</value></item>
+        <item><label ref="jr:itext('ch-done-incorrect')" /><value>done-incorrect</value></item>
+        <item><label ref="jr:itext('ch-verbal-consent-only')" /><value>verbal-consent-only</value></item>
+        <item><label ref="jr:itext('ch-refused-testing')" /><value>refused-testing</value></item>
+      </select1>
+    </group>
+
+    <select1 ref="test-performed">
+      <label ref="jr:itext('q-test-performed')" />
+      
+      <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+      <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+    </select1>
+    
+    <group ref="testing">
+      <label ref="jr:itext('g-testing')" />
+
+      <select ref="supplies-in-place">
+        <label ref="jr:itext('q-hiv-test-kits-in-place')" />
+
+        <item><label ref="jr:itext('ch-sd-bioline')" /><value>sd-bioline</value></item>
+        <item><label ref="jr:itext('ch-dertimine')" /><value>dertimine</value></item>
+        <item><label ref="jr:itext('ch-unigold')" /><value>unigold</value></item>
+        <item><label ref="jr:itext('ch-ip')" /><value>ip-supplies</value></item>
+        <item><label ref="jr:itext('ch-specimen-collection')" /><value>specimen-collection</value></item>
+        <item><label ref="jr:itext('ch-timer')" /><value>timer</value></item>
+        <item><label ref="jr:itext('ch-ct-register')" /><value>ct-register</value></item>
+        <item><label ref="jr:itext('ch-consent-forms')" /><value>consent-forms</value></item>
+        <item><label ref="jr:itext('ch-referral-forms')" /><value>referral-forms</value></item>
+      </select>
+
+      <group ref="working-properly">
+        <label ref="jr:itext('g-hiv-test-items-working')" />
+
+        <select1 ref="sd-bioline">
+          <label ref="jr:itext('q-sd-bioline-working')" />
+          
+          <item><label ref="jr:itext('ch-expired')" /><value>expired</value></item>
+          <item><label ref="jr:itext('ch-not-expired')" /><value>not-expired</value></item>
+          <item><label ref="jr:itext('ch-not-available')" /><value>not-available</value></item>
+        </select1>
+
+        <select1 ref="dertimine">
+          <label ref="jr:itext('q-dertimine-working')" />
+          
+          <item><label ref="jr:itext('ch-expired')" /><value>expired</value></item>
+          <item><label ref="jr:itext('ch-not-expired')" /><value>not-expired</value></item>
+          <item><label ref="jr:itext('ch-not-available')" /><value>not-available</value></item>
+        </select1>
+
+        <select1 ref="unigold">
+          <label ref="jr:itext('q-unigold-working')" />
+          
+          <item><label ref="jr:itext('ch-expired')" /><value>expired</value></item>
+          <item><label ref="jr:itext('ch-not-expired')" /><value>not-expired</value></item>
+          <item><label ref="jr:itext('ch-not-available')" /><value>not-available</value></item>
+        </select1>
+      </group>
+
+      <select ref="adhere-lab-sop">
+        <label ref="jr:itext('q-adheres-rapid-hiv-testing-procedure')" />
+        
+        <item><label ref="jr:itext('ch-hand-finger-positioning')" /><value>hand-finger-positioning</value></item>
+        <item><label ref="jr:itext('ch-pricking')" /><value>pricking</value></item>
+        <item><label ref="jr:itext('ch-blood-collection')" /><value>blood-collection</value></item>
+        <item><label ref="jr:itext('ch-blood-into-device')" /><value>blood-into-device</value></item>
+        <item><label ref="jr:itext('ch-reagents')" /><value>reagents</value></item>
+        <item><label ref="jr:itext('ch-waiting-time')" /><value>waiting-time</value></item>
+        <item><label ref="jr:itext('ch-reading-results')" /><value>reading-results</value></item>
+      </select>
+
+      <select1 ref="interpret-results">
+        <label ref="jr:itext('q-interpreted-results')" />
+          
+        <item><label ref="jr:itext('ch-done')" /><value>done</value></item>
+        <item><label ref="jr:itext('ch-not-done')" /><value>not-done</value></item>
+      </select1>
+
+      <select ref="safe-practices">
+        <label ref="jr:itext('q-adheres-safe-work-practices')" />
+
+        <item><label ref="jr:itext('ch-gloves')" /><value>gloves</value></item>
+        <item><label ref="jr:itext('ch-safety-box')" /><value>safety-box</value></item>
+        <item><label ref="jr:itext('ch-hand-washing')" /><value>hand-washing</value></item>
+        <item><label ref="jr:itext('ch-not-adhered')" /><value>not-adhered</value></item>
+      </select>
+
+      <select1 ref="availability/incinerator">
+        <label ref="jr:itext('q-incinerator-available')" />
+        
+        <item><label ref="jr:itext('ch-available-used')" /><value>available-used</value></item>
+        <item><label ref="jr:itext('ch-available-not-used')" /><value>available-not-used</value></item>
+        <item><label ref="jr:itext('ch-not-available')" /><value>not-available</value></item>
+      </select1>
+
+      <select1 ref="availability/pits">
+        <label ref="jr:itext('q-pits-available')" />
+        
+        <item><label ref="jr:itext('ch-available-used')" /><value>available-used</value></item>
+        <item><label ref="jr:itext('ch-available-not-used')" /><value>available-not-used</value></item>
+        <item><label ref="jr:itext('ch-not-available')" /><value>not-available</value></item>
+      </select1>
+
+      <select1 ref="availability/sharps-disposal">
+        <label ref="jr:itext('q-sharps-disposal-available')" />
+        
+        <item><label ref="jr:itext('ch-available-used')" /><value>available-used</value></item>
+        <item><label ref="jr:itext('ch-available-not-used')" /><value>available-not-used</value></item>
+        <item><label ref="jr:itext('ch-not-available')" /><value>not-available</value></item>
+      </select1>
+    </group>
+
+    <group ref="post-test">
+      <label ref="jr:itext('g-posttest')" />
+
+      <select1 ref="readiness">
+        <label ref="jr:itext('q-assessed-readiness-to-receive-results')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="possibilities-implications">
+        <label ref="jr:itext('q-reminds-possible-results-implications')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="clear-language">
+        <label ref="jr:itext('q-gives-results-clear-language')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="time-to-reflect">
+        <label ref="jr:itext('q-gives-patient-time-to-reflect')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+    </group>
+
+    <select1 ref="test-result">
+      <label ref="jr:itext('q-test-result')" />
+      
+      <item><label ref="jr:itext('ch-pos')" /><value>positive</value></item>
+      <item><label ref="jr:itext('ch-neg')" /><value>negative</value></item>
+    </select1>
+    
+    <group ref="key-messages/hiv-negative">
+      <label ref="jr:itext('g-key-messages-negative')" />
+
+      <select1 ref="retest">
+        <label ref="jr:itext('q-explains-negative-and-window-period')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select ref="prevention">
+        <label ref="jr:itext('q-reminds-prevention-strategies')" />
+        
+        <item><label ref="jr:itext('ch-abstinence')" /><value>abstinence</value></item>
+        <item><label ref="jr:itext('ch-faithful')" /><value>faithful</value></item>
+        <item><label ref="jr:itext('ch-condom')" /><value>condom</value></item>
+        <item><label ref="jr:itext('ch-other-preventative')" /><value>other-preventative</value></item>
+      </select>
+
+      <select1 ref="partner">
+        <label ref="jr:itext('q-suggests-partner-testing')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+    </group>
+
+    <group ref="key-messages/hiv-positive">
+      <label ref="jr:itext('g-key-messages-positive')" />
+
+      <select1 ref="hiv-vs-aids">
+        <label ref="jr:itext('q-reminds-difference-hiv-aids')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="safe-sex">
+        <label ref="jr:itext('q-reminds-importance-safe-sex')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="ctc-services">
+        <label ref="jr:itext('q-explains-referral-services')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="partner">
+        <label ref="jr:itext('q-suggests-partner-testing-with-disclosure')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="disclosure-plans">
+        <label ref="jr:itext('q-assists-disclosure-plans')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="health-advice">
+        <label ref="jr:itext('q-gives-info-diet-staying-healthy')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="community-support">
+        <label ref="jr:itext('q-gives-info-community-support')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="allows-questions">
+        <label ref="jr:itext('q-allows-client-ask-questions')" />
+
+        <item><label ref="jr:itext('ch-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('ch-no')" /><value>no</value></item>
+      </select1>
+
+      <select1 ref="referral-form">
+        <label ref="jr:itext('q-referral-form-properly-filled')" />
+
+        <item><label ref="jr:itext('ch-correct')" /><value>correct</value></item>
+        <item><label ref="jr:itext('ch-incorrect')" /><value>incorrect</value></item>
+        <item><label ref="jr:itext('ch-not-filled-out')" /><value>not-filled-out</value></item>
+      </select1>
+    </group>
+
+    <group ref="monitoring-and-evaluation">
+      <label ref="jr:itext('g-monitoring-evaluation')" />
+
+      <select1 ref="supervisor-review-feedback">
+        <label ref="jr:itext('q-supervisor-gives-feedback')" />
+          
+        <item><label ref="jr:itext('ch-done')" /><value>done</value></item>
+        <item><label ref="jr:itext('ch-not-done')" /><value>not-done</value></item>
+      </select1>
+
+      <!-- should be textareas? -->
+      <input ref="strengths"><label ref="jr:itext('q-trainee-strengths')" /></input>
+      <input ref="needs-improvement"><label ref="jr:itext('q-areas-for-improvement')" /></input>
+    </group>
+
+  </h:body>
+</h:html>
