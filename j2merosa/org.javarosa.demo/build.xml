@@ -59,49 +59,6 @@
 				<!-- All source-level inclusions should be made here -->
 				<sources>
 					<source dir="${dir.src}"/>
-					<!--Taking this out for now...-->
-					<!--source dir="${dir.test}"/-->
-					<source dir="${basedir}/../org.javarosa.communication/src/"/>
-					<source dir="${basedir}/../org.javarosa.communication.ui/src/"/>
-					<source dir="${basedir}/../org.javarosa.clforms/src/"/>
-					<source dir="${basedir}/../org.javarosa.core/src/"/>
-					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
-					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
-					<source dir="${basedir}/../org.javarosa.forms/src/"/>
-					<source dir="${basedir}/../org.javarosa.j2me/src/"/>
-					
-					<!--source dir="${basedir}/../org.javarosa.mesh4j.sync.extensions/src/"/-->
-                    <source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
-					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
-					<source dir="${basedir}/../org.javarosa.polish.chatterbox.extensions/src/"/>  
-					<source dir="${basedir}/../org.javarosa.referral/src/"/>
-					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
-					<source dir="${basedir}/../org.javarosa.user/src/"/>
-					<source dir="${basedir}/../org.javarosa.utilities.file/src/"/>
-					<source dir="${basedir}/../org.javarosa.patient/src/"/>
-					<source dir="${basedir}/../org.javarosa.xform/src/"/>
-					<source dir="${basedir}/../org.javarosa.patient.entry/src/"/>
-					<source dir="${basedir}/../org.javarosa.entity/src/"/>
-					
-					<!--source dir="${basedir}/../org.mesh4j.sync/src/"/-->
-					<!--source dir="${basedir}/../org.mesh4j.sync.message/src/"/-->
-					<!-- Add back in Mesh4X code once we're satisfied with using Java5's in Polish -->
-					
-					
-					<source dir="${basedir}/../org.javarosa.clforms/test/" if="unittests"/>
-					<source dir="${basedir}/../org.javarosa.core/test/" if="unittests"/>
-					<source dir="${basedir}/../org.javarosa.core.model/test/" if="unittests"/>
-					<source dir="${basedir}/../org.javarosa.demo/test/" if="unittests"/>
-					<source dir="${basedir}/../org.javarosa.user/test/" if="unittests"/>
-					<source dir="${basedir}/../org.javarosa.patient/test/" if="unittests"/>
-					<source dir="${basedir}/../org.javarosa.xform/test/" if="unittests"/>
-					
-					<!-- defunct
-					<source dir="${basedir}/../org.javarosa.action/src/"/>
-					<source dir="${basedir}/../org.javarosa.util/src/"/>
-					<source dir="${basedir}/../org.javarosa.entitymgr/src/"/>
-					<source dir="${basedir}/../org.javarosa.patientmgr/src/"/>
-					-->
 				</sources>
 
 				<!-- Build variables -->
@@ -126,7 +83,7 @@
 				<!-- obfuscator settings: do not obfuscate when the test-property is true -->
 				<obfuscator name="ProGuard" unless="(noobfuscate or test) and not release">
 					<parameter name="optimize" value="true" />
-					<parameter name="printmapping" value="${dir.dist}\obfuscation_mapping.txt" />
+					<parameter name="printmapping" value="dist\obfuscation_mapping.txt" />
 					
 					<!-- none of the parameter names below can be the same, or else they will clobber previous parameters; hence the varied spacing -->
 					<parameter name="keep,allowshrinking" value="!abstract class org.javarosa.core.model.* implements org.javarosa.core.model.IFormElement" />
