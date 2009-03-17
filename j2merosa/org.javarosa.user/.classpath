@@ -7,7 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry kind="lib" path="/org.javarosa.demo/tools/j2meunit-javarosa.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entity"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.commcare.pf"/>
 	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
