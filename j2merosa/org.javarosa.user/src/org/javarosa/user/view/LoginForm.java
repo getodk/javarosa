@@ -23,10 +23,6 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 
-//#if javarosa.login.showbuild
-import edu.washington.commcare.util.CommCareContext;
-//#endif
-
 public class LoginForm extends FramedForm implements IView
 {
 	   public final Command CMD_CANCEL_LOGIN = new Command("EXIT",Command.SCREEN, 1);
@@ -102,13 +98,17 @@ public class LoginForm extends FramedForm implements IView
 	      demoButton.setDefaultCommand(demoButtonCommand);     // add Command to Item.
 	      //#endif
 	      
+	      
 	      //#if javarosa.login.showbuild
-	      CommCareContext c = new CommCareContext(parent.getActivityContext());
-	      if(c.getCommCareVersion() != null || !c.getCommCareVersion().equals("")) {
-	    	  this.append(new String("CommCare verison: " + c.getCommCareVersion()));
+	      String ccv = (String)parent.getActivityContext().getElement("COMMCARE_VERSION");
+	      String ccb = (String)parent.getActivityContext().getElement("COMMCARE_BUILD");
+	      String jrb = (String)parent.getActivityContext().getElement("JAVAROSA_BUILD");
+	      
+	      if(ccv != null && !ccv.equals("")) {
+	    	  this.append("CommCare verison: " + ccv);
 	      }
-	      if(c.getCommCareBuild() != null || !c.getCommCareBuild().equals("")) {
-	    	  this.append(new String("Build number: " + c.getCommCareBuild() + "-" + c.getJavaRosaBuild()));
+	      if((ccb != null && !ccb.equals("")) && (jrb != null && !jrb.equals(""))) {
+	    	  this.append("Build number: " + ccb + "-" + jrb);
 	      }
 	      //#endif
 	      
