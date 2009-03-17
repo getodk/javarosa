@@ -7,6 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry kind="lib" path="/org.javarosa.demo/tools/j2meunit-javarosa.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entity"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CommCare"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.commcare.pf"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
