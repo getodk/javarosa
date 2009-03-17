@@ -26,6 +26,7 @@ import org.javarosa.user.utility.LoginContext;
 import edu.washington.commcare.util.CommCareContext;
 //#endif
 
+
 public class LoginForm extends Form implements IView
 {
 	   public final Command CMD_CANCEL_LOGIN = new Command("EXIT",Command.SCREEN, 1);
@@ -102,9 +103,11 @@ public class LoginForm extends Form implements IView
 	      //#endif
 	      
 	      //#if javarosa.login.showbuild
-	      if(parent.getActivityContext() instanceof CommCareContext) {
-	    	  CommCareContext c = (CommCareContext)parent.getActivityContext();
+	      CommCareContext c = new CommCareContext(parent.getActivityContext());
+	      if(c.getCommCareVersion() != null || !c.getCommCareVersion().equals("")) {
 	    	  this.append(new String("CommCare verison: " + c.getCommCareVersion()));
+	      }
+	      if(c.getCommCareBuild() != null || !c.getCommCareBuild().equals("")) {
 	    	  this.append(new String("Build number: " + c.getCommCareBuild() + "-" + c.getJavaRosaBuild()));
 	      }
 	      //#endif
