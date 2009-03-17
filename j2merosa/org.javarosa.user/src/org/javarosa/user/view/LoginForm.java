@@ -7,10 +7,6 @@ import java.io.IOException;
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.StringItem;
-import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
@@ -22,19 +18,23 @@ import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.LoginContext;
 
+import de.enough.polish.ui.FramedForm;
+import de.enough.polish.ui.Item;
+import de.enough.polish.ui.StringItem;
+import de.enough.polish.ui.TextField;
+
 //#if javarosa.login.showbuild
 import edu.washington.commcare.util.CommCareContext;
 //#endif
 
-
-public class LoginForm extends Form implements IView
+public class LoginForm extends FramedForm implements IView
 {
 	   public final Command CMD_CANCEL_LOGIN = new Command("EXIT",Command.SCREEN, 1);
 	   public Command loginButtonCommand = new Command("Login", Command.ITEM, 1);
 	   private Alert alertdialog = new Alert("Web Service Error", "No response from server", null, AlertType.ERROR);
 
 	   private TextField userName;
-	   private TextField password;
+	   public TextField password;
 	   public UserRMSUtility userRMS;
 	   private User loggedInUser;
 	   public StringItem loginButton;
@@ -111,6 +111,9 @@ public class LoginForm extends Form implements IView
 	    	  this.append(new String("Build number: " + c.getCommCareBuild() + "-" + c.getJavaRosaBuild()));
 	      }
 	      //#endif
+	      
+	      this.focus(password);
+	      this.password.setDefaultCommand(loginButtonCommand);
 	   }
 	  
 	  public void setPasswordMode(String passwordMode) {

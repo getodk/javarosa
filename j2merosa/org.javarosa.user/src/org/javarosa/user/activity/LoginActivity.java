@@ -51,6 +51,7 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 		this.loginScreen.setPasswordMode(this.context.getPasswordFormat());
 		this.loginScreen.setCommandListener(this);
 		this.loginScreen.loginButton.setItemCommandListener(this);       // set item command listener
+		this.loginScreen.password.setItemCommandListener(this);
 		parent.setDisplay(this, this.loginScreen);
 	}
 
