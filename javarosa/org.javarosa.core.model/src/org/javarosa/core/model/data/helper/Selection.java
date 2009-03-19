@@ -26,6 +26,11 @@ public class Selection implements Externalizable {
 	public int index;
 	public QuestionDef question; //cannot hold reference directly to selectItems, as it is wiped out and rebuilt after every locale change
 	
+	//temporary hack to avoid serializing entire questiondef
+	//questiondef will be replenished via FormDef.hackFixSelectQuestionDeserialization
+	public int qID = -1;
+	public String xmlValue = null;
+	
 	/**
 	 * Note that this constructor should only be used for serialization/deserialization as 
 	 * the index and questiondef for a Selection shouldn't be changed after construction.
@@ -40,15 +45,28 @@ public class Selection implements Externalizable {
 	}
 	
 	public Selection clone () {
-		return new Selection(index, question);
+		Selection s = new Selection(index, question);
+		//i think question will always be set by the time clone() is called, but just to be safe...
+		s.qID = qID;
+		s.xmlValue = xmlValue;
+		return s;
 	}
 	
 	public String getText () {
-		return (String)question.getSelectItems().keyAt(index);
+		if (question != null) {
+			return (String)question.getSelectItems().keyAt(index);
+		} else {
+			System.err.println("Warning!! Calling Selection.getText() when QuestionDef not set!");
+			return "[cannot access choice caption]";
+		}
 	}
 	
 	public String getValue () {
-		return (String)question.getSelectItems().elementAt(index);
+		if (question != null) {
+			return (String)question.getSelectItems().elementAt(index);
+		} else {
+			return xmlValue;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -57,8 +75,12 @@ public class Selection implements Externalizable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		index = ExtUtil.readInt(in);
 
+		//temporary solution
+		
 		//setting QuestionDef in this way isn't correct; see note below
-		question = (QuestionDef)ExtUtil.read(in, QuestionDef.class, pf);
+		//question = (QuestionDef)ExtUtil.read(in, QuestionDef.class, pf);
+		qID = ExtUtil.readInt(in);
+		xmlValue = ExtUtil.readString(in);
 	}
  
 	/* (non-Javadoc)
@@ -80,7 +102,11 @@ public class Selection implements Externalizable {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, index);
 		
+		//temporary solution
+
 		//TODO: fix this
-		ExtUtil.write(out, question);
+		//ExtUtil.write(out, question);
+		ExtUtil.writeNumeric(out, question.getID());
+		ExtUtil.writeString(out, getValue());
 	}
 }
