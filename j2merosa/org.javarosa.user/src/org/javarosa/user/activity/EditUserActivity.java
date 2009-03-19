@@ -88,6 +88,7 @@ public class EditUserActivity implements IActivity, CommandListener {
 		
 		//take this out into an activity
 		addUser = new NewUserForm("Edit User", this.context.getDecorator());
+		addUser.setPasswordMode(this.context.getPasswordFormat());
 		addUser.addCommand(CMD_SAVE);
 		addUser.addCommand(CMD_CANCEL);
 		addUser.setCommandListener(this);
