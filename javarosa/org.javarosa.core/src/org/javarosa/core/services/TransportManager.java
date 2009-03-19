@@ -3,6 +3,7 @@ package org.javarosa.core.services;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
@@ -232,20 +233,42 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	}
 
 	public int getModelDeliveryStatus(int modelId, boolean notFoundOK) {
-
+		Vector v = new Vector();
+		v.addElement(new Integer(modelId));
+		return ((Integer)getModelDeliveryStatuses(v, notFoundOK).elementAt(0)).intValue();
+	}
+	
+	public Vector getModelDeliveryStatuses (Vector modelIDs, boolean notFoundOK) {
+		Hashtable statuses = new Hashtable();
+		
 		//TODO: Are we OK with using the transport manager here? There's coupling...
-		Enumeration qMessages = getMessages();
 		//TODO: The way we're doing this is fairly wasteful. We should store them
 		//locally, and update on change, instead of getting each one.
-		TransportMessage message;
-		while(qMessages.hasMoreElements())
-    	{
-			message = (TransportMessage) qMessages.nextElement();
-			if(message.getModelId()==modelId)
-				return message.getStatus();
-
+		Enumeration qMessages = getMessages();
+		while(qMessages.hasMoreElements()) {
+			TransportMessage message = (TransportMessage)qMessages.nextElement();
+			
+			int modelID = message.getModelId();
+			int status = message.getStatus();
+			
+			if (modelIDs.contains(new Integer(modelID))) {
+				statuses.put(new Integer(modelID), new Integer(status));
+			}
     	}
-		return (notFoundOK ? TransportMessage.STATUS_NOT_SENT : -1);
+		
+		Vector statusV = new Vector();
+		for (int i = 0; i < modelIDs.size(); i++) {
+			Integer modelID = (Integer)modelIDs.elementAt(i);
+			int status;
+			if (statuses.containsKey(modelID)) {
+				status = ((Integer)statuses.get(modelID)).intValue();
+			} else {
+				status = (notFoundOK ? TransportMessage.STATUS_NOT_SENT : -1);
+			}
+			
+			statusV.addElement(new Integer(status));
+		}
+		return statusV;
 	}
 	
 	/**
