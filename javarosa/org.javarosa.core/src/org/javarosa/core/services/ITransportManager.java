@@ -2,6 +2,7 @@ package org.javarosa.core.services;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Vector;
 
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
@@ -137,6 +138,7 @@ public interface ITransportManager extends IService {
 
 	
 	public int getModelDeliveryStatus (int modelID, boolean notFoundOK);
+	public Vector getModelDeliveryStatuses (Vector modelIDs, boolean notFoundOK);
 	
 	/**
 	 * 

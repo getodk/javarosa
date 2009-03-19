@@ -22,7 +22,7 @@ public class RMSUtility
     public static final int RMS_TYPE_STANDARD = 0;
     public static final int RMS_TYPE_META_DATA = 1;
     /** Creates a new instance of RMSUtility */
-    private String RS_NAME = "";
+    protected String RS_NAME = "";
     private int iType = RMSUtility.RMS_TYPE_STANDARD;
     protected RMSUtility metaDataRMS;
     private IRecordStorage recordStore = null;
