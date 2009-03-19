@@ -65,7 +65,11 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
 						returnArgs);
 			} else {
+				//#if commcare.lang.sw
+				showError("Umekosea kufungua", "Tafadhali jaribu tena");
+				//#else
 				showError("Login Incorrect", "Please try again");
+				//#endif
 			}
 		}
 		
