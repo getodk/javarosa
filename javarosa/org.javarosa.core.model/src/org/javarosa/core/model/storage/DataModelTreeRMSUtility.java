@@ -277,7 +277,7 @@ public class DataModelTreeRMSUtility extends RMSUtility {
 			ok = true;
 		}
     	
-		this.close();
+		//this.close();
 		return ok;
 	}
 }
