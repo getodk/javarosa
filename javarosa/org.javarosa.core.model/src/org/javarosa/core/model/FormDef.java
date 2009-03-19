@@ -529,7 +529,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			
 			for (int i = 0; i < selections.size(); i++) {
 				Selection s = (Selection)selections.elementAt(i);
-				int qID = s.question.getID();
+				int qID = s.qID;
 				QuestionDef properQ = (QuestionDef)questionMapping.get(new Integer(qID));
 				if (properQ == null) {
 					throw new RuntimeException("Error: cannot find referenced question def for select answer data");
