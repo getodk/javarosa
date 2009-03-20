@@ -3,7 +3,6 @@ package org.javarosa.core.model.data.helper;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Date;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -15,25 +14,25 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * A response to a question requesting a selection
  * from a list. 
  * 
- * Note that this class currently maintains a reference
- * to a QuestionDef object in order to determine values
- * and strings. This is fairly hacky and should be refactored.
- * 
  * @author Drew Roos
  *
  */
 public class Selection implements Externalizable {
 	public int index;
-	public QuestionDef question; //cannot hold reference directly to selectItems, as it is wiped out and rebuilt after every locale change
 	
-	//temporary hack to avoid serializing entire questiondef
-	//questiondef will be replenished via FormDef.hackFixSelectQuestionDeserialization
+	/* we need the questiondef to fetch natural-language captions for the selected choice
+	 * we can't hold a reference directly to the caption hashtable, as it's wiped out and
+	 * recreated every locale change
+	 * we don't serialize the questiondef, as it's huge, and unneeded outside of a formdef;
+	 * it is restored as a post-processing step during formdef deserialization
+	 */
+	public QuestionDef question; 
+	
 	public int qID = -1;
 	public String xmlValue = null;
 	
 	/**
-	 * Note that this constructor should only be used for serialization/deserialization as 
-	 * the index and questiondef for a Selection shouldn't be changed after construction.
+	 * for deserialization
 	 */
 	public Selection() {
 		
@@ -42,13 +41,19 @@ public class Selection implements Externalizable {
 	public Selection (int index, QuestionDef question) {
 		this.index = index;
 		this.question = question;
+		
+		//don't think setting these is strictly necessary, setting them only on deserialization is probably enough
+		this.qID = question.getID();
+		this.xmlValue = getValue();
 	}
 	
 	public Selection clone () {
 		Selection s = new Selection(index, question);
-		//i think question will always be set by the time clone() is called, but just to be safe...
+		
+		//don't think setting these is strictly necessary, question should always be set by the time clone() is called
 		s.qID = qID;
 		s.xmlValue = xmlValue;
+		
 		return s;
 	}
 	
@@ -74,39 +79,25 @@ public class Selection implements Externalizable {
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		index = ExtUtil.readInt(in);
-
-		//temporary solution
-		
-		//setting QuestionDef in this way isn't correct; see note below
-		//question = (QuestionDef)ExtUtil.read(in, QuestionDef.class, pf);
 		qID = ExtUtil.readInt(in);
 		xmlValue = ExtUtil.readString(in);
+
+		
+		
+		
+		//question = (QuestionDef)ExtUtil.read(in, QuestionDef.class, pf);
 	}
  
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
-	/* TODO: serializing the referenced QuestionDef directly isn't correct, and we're lucky it's not causing us
-	 * problems right now. The point of keeping a reference to the QuestionDef is so that we have easy access
-	 * to the localized text in the current locale. However, for this to work, the referenced QuestionDef must be
-	 * the SAME QuestionDef that the FormDef uses. Serializing/deserializing the QuestionDef like we are now results
-	 * in this object pointing to a DIFFERENT QuestionDef -- one that does not receive localization updates. (In fact,
-	 * a QuestionDef that is never properly localized in the first place). We need to change this so that this object
-	 * will point to the proper QuestionDef object.
-	 * 
-	 * The only reason this isn't biting us is because this Selection object will be discarded and rebuilt properly
-	 * by the time we ever need to access the QuestionDef. We only call getText after the question has been
-	 * skipped/answered, and when we answer/skip the select question, we create a new IAnswerData that overwrites this
-	 * one. This invariance seems fragile, however.
-	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, index);
-		
-		//temporary solution
-
-		//TODO: fix this
-		//ExtUtil.write(out, question);
-		ExtUtil.writeNumeric(out, question.getID());
+		ExtUtil.writeNumeric(out, question != null ? question.getID() : qID);
 		ExtUtil.writeString(out, getValue());
+
+		
+		
+		//ExtUtil.write(out, question);
 	}
 }
