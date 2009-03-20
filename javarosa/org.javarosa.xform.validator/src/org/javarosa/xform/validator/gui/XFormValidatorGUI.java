@@ -137,9 +137,10 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			}
 		});
 		
+		// Set the original JAR directory
 		File f = new File(".");
 		try {
-			this.origJarDir = f.getCanonicalPath();
+			this.origJarDir = f.getCanonicalPath() + "/";
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -694,7 +695,8 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		addToTextArea("Unpacking original JAR...\n");
 		
 		// expand jar into work
-		unjar(this.origJarDir + this.JAR_NAME, workDir.getAbsolutePath());
+		if( !unjar(this.origJarDir + this.JAR_NAME, workDir.getAbsolutePath()) )
+			return;
 		
 		updateStatus("Replacing file");
 		addToTextArea("Replacing file\n");
@@ -946,7 +948,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		}		
 	}
 
-	private void unjar(String filename, String destDir) {
+	private boolean unjar(String filename, String destDir) {
 		final int BUFFER = 2048;
 		// Make sure we end in a slash
 		if (destDir.charAt(destDir.length() - 1) != '/')
@@ -956,7 +958,13 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			BufferedOutputStream dest = null;
 			BufferedInputStream is = null;
 			JarEntry entry;
-			JarFile jarfile = new JarFile(filename);
+			JarFile jarfile;
+			try{
+				jarfile = new JarFile(filename);
+			}catch(Exception e) {
+				addToTextArea("\nError cannot find JAR t unpack: "+filename);
+				return false;
+			}
 			Enumeration e = jarfile.entries();
 			while (e.hasMoreElements()) {
 				entry = (JarEntry) e.nextElement();
@@ -994,6 +1002,8 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		return true;
 	}
 	
 	private boolean checkParams() {
