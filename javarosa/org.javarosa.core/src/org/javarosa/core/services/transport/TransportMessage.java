@@ -199,7 +199,11 @@ public class TransportMessage extends Observable implements Externalizable {
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 
-		//payload data is never used again, so it is not in serialized record
+		/* temporarily rollback r2132 until backup/restore is functional
+		 * //payload data is never used again, so it is not in serialized record
+		 */
+		payloadData = (IDataPayload)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		
 		this.destination = (ITransportDestination) ExtUtil.read(in,new ExtWrapTagged(),pf);		
 		this.sender = in.readUTF();
 		this.timestamp = new Date(in.readLong());
@@ -217,7 +221,11 @@ public class TransportMessage extends Observable implements Externalizable {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		
-		//payload data need not be serialized, as it is large and never read again by anybody
+		/* temporarily rollback r2132 until backup/restore is functional
+		 * //payload data need not be serialized, as it is large and never read again by anybody
+		 */
+		ExtUtil.write(out, new ExtWrapTagged(this.payloadData));
+		
 		ExtUtil.write(out, new ExtWrapTagged(this.destination));
 		out.writeUTF(this.sender);
 		out.writeLong(this.timestamp.getTime());
