@@ -149,29 +149,29 @@ public class RmsStorage implements Storage {
 
 	}
 
-	/**
-	 * Loads transport message with given record id from RMS
-	 * 
-	 * @param recordId
-	 * @throws IOException
-	 * @return
-	 */
-	public TransportMessage getMessage(int recordId) throws IOException, DeserializationException {
-		try {
-			init();
-			byte[] data = messageRecordStore.getRecord(recordId);
-			TransportMessage message = new TransportMessage();
-			ExtUtil.deserialize(data, message);
-			return message;
-		} catch (RecordStorageException e) {
-			System.out.println(e);
-			throw new IOException(e.getMessage());
-		}
-        catch (DeserializationException uee) {
-        	uee.printStackTrace();
-        	throw uee;
-        }
-	}
+//	/**
+//	 * Loads transport message with given record id from RMS
+//	 * 
+//	 * @param recordId
+//	 * @throws IOException
+//	 * @return
+//	 */
+//	public TransportMessage getMessage(int recordId) throws IOException, DeserializationException {
+//		try {
+//			init();
+//			byte[] data = messageRecordStore.getRecord(recordId);
+//			TransportMessage message = new TransportMessage();
+//			ExtUtil.deserialize(data, message);
+//			return message;
+//		} catch (RecordStorageException e) {
+//			System.out.println(e);
+//			throw new IOException(e.getMessage());
+//		}
+//        catch (DeserializationException uee) {
+//        	uee.printStackTrace();
+//        	throw uee;
+//        }
+//	}
 	
 	/**
 	 * @return
