@@ -106,10 +106,16 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 	}
 
 	public void commandAction(Command c, Displayable arg1) {
-		if(c.equals(CaseManagementScreen.SELECT_COMMAND)) {
+		if (c.equals(CaseManagementScreen.SELECT_COMMAND)) {
 			Hashtable returnArgs = new Hashtable();
-			returnArgs.put(Constants.RETURN_ARG_KEY, view.getString(view.getSelectedIndex()));
-			shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+			returnArgs.put(Constants.RETURN_ARG_KEY, view.getString(view
+					.getSelectedIndex()));
+			shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+					returnArgs);
+		} else if (c.equals(CaseManagementScreen.BACK)) {
+				Hashtable returnArgs = new Hashtable();
+				shell.returnFromActivity(this, Constants.ACTIVITY_CANCEL,
+						returnArgs);
 		}
 	}
 

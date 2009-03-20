@@ -14,9 +14,11 @@ import org.javarosa.core.api.IView;
  *
  */
 public class CaseManagementScreen extends List implements IView {
+	public final static Command BACK = new Command("Back", Command.BACK, 0);
 	
 	public CaseManagementScreen(String title) {
 		super(title, List.IMPLICIT);
+		this.addCommand(BACK);
 	}
 
 	/* (non-Javadoc)
