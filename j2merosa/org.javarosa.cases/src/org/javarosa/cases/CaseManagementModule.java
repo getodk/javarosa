@@ -3,7 +3,9 @@
  */
 package org.javarosa.cases;
 
+import org.javarosa.cases.storage.CaseRmsUtility;
 import org.javarosa.core.Context;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 
 /**
@@ -17,8 +19,7 @@ public class CaseManagementModule implements IModule {
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
 	public void registerModule(Context context) {
-		// TODO Auto-generated method stub
-
+		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(new CaseRmsUtility(CaseRmsUtility.getUtilityName()));
 	}
 
 }
