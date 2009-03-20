@@ -6,6 +6,7 @@ package org.javarosa.cases.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Hashtable;
 
 import org.javarosa.core.services.storage.utilities.IDRecordable;
@@ -21,10 +22,12 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class Case implements Externalizable, IDRecordable {
 	
 	private String typeId;
-	private String uid;
+	private String id;
 	private String name;
 	
-	private boolean closed; 
+	private boolean closed;
+	
+	private Date dateOpened;
 	
 	int recordId;
 
@@ -38,7 +41,8 @@ public class Case implements Externalizable, IDRecordable {
 	}
 	
 	public Case(String name, String typeId) {
-		
+		this.name = name;
+		this.typeId = typeId;
 	}
 	
 	/**
@@ -90,6 +94,34 @@ public class Case implements Externalizable, IDRecordable {
 		return recordId;
 	}
 	
+
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the dateOpened
+	 */
+	public Date getDateOpened() {
+		return dateOpened;
+	}
+
+	/**
+	 * @param dateOpened the dateOpened to set
+	 */
+	public void setDateOpened(Date dateOpened) {
+		this.dateOpened = dateOpened;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
