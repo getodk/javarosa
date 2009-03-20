@@ -33,15 +33,17 @@ public class SelectMultiDataTests extends TestCase {
 		super.setUp();
 		
 		question = new QuestionDef();
+		question.setID(57);
 		
 		OrderedHashtable oh = new OrderedHashtable();
-		oh.put("Selection 1", "Selection 1");
-		oh.put("Selection 2", "Selection 2");
-		oh.put("Selection 3", "Selection 3");
-		oh.put("Selection 4", "Selection 3");
-		
-		//question.setSelectItems();
-		
+		Vector v = new Vector();
+		for (int i = 0; i < 4; i++) {
+			oh.put("Selection " + i, "Selection " + i);
+			v.addElement(new Boolean(false));
+		}	
+		question.setSelectItemIDs(oh, v, null);
+		question.localizeSelectMap(null);
+				
 		one = new Selection(1, question);
 		two = new Selection(2, question);
 		three = new Selection(3, question);
