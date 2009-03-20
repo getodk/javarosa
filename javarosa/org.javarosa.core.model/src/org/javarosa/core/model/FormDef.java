@@ -494,7 +494,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * false if it is using an existing IDataModel
 	 */
 	public void initialize (boolean newInstance) {
-		hackFixSelectQuestionDeserialization();
+		fixSelectQuestionDeserialization();
 		
 		if (newInstance) {//only preload new forms (we may have to revisit this)
 			preloadModel(model.getRoot());
@@ -507,17 +507,17 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		}
 	}
 	
-	private void hackFixSelectQuestionDeserialization () {
+	private void fixSelectQuestionDeserialization () {
 		Hashtable questionMapping = new Hashtable();
-		hackGenQuestionMapping(this, questionMapping);
-		hackFixSelectQuestionDeserialization(model.getRoot(), questionMapping);
+		genSelectQuestionMapping(this, questionMapping);
+		fixSelectQuestionDeserialization(model.getRoot(), questionMapping);
 	}
 
-	private void hackFixSelectQuestionDeserialization (TreeElement node, Hashtable questionMapping) {
+	private void fixSelectQuestionDeserialization (TreeElement node, Hashtable questionMapping) {
 		IAnswerData data = node.getValue();
 		if (data == null) {
 			for (int i = 0; i < node.getNumChildren(); i++)
-				hackFixSelectQuestionDeserialization((TreeElement)node.getChildren().elementAt(i), questionMapping);
+				fixSelectQuestionDeserialization((TreeElement)node.getChildren().elementAt(i), questionMapping);
 		} else if (data instanceof SelectOneData || data instanceof SelectMultiData) {
 			Vector selections;
 			if (data instanceof SelectOneData) {
@@ -539,7 +539,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		}
 	}
 
-	private void hackGenQuestionMapping (IFormElement fe, Hashtable mapping) {
+	private void genSelectQuestionMapping (IFormElement fe, Hashtable mapping) {
 		if (fe instanceof QuestionDef) {
 			QuestionDef q = (QuestionDef)fe;
 			if (q.getControlType() == Constants.CONTROL_SELECT_ONE || q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
@@ -547,7 +547,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			}
 		} else {
 			for (int i = 0; i < fe.getChildren().size(); i++) {
-				hackGenQuestionMapping(fe.getChild(i), mapping);
+				genSelectQuestionMapping(fe.getChild(i), mapping);
 			}
 		}
 	}
