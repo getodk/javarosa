@@ -32,16 +32,23 @@ public class XPathReference implements IDataReference {
 	
 	public XPathReference (String nodeset) {
 		XPathExpression path;
+		boolean validNonPathExpr = false;
 		
 		try {
 			
 		path = XPathParseTool.parseXPath(nodeset);
 		if (!(path instanceof XPathPathExpr)) {
+			validNonPathExpr = true;
 			throw new XPathSyntaxException();
 		}
 		
 		} catch (XPathSyntaxException xse) {
-			throw new RuntimeException(); //TODO: check me
+			//make these checked exceptions?
+			if (validNonPathExpr) {
+				throw new RuntimeException("Expected XPath path, got XPath expression: [" + nodeset + "]");
+			} else {
+				throw new RuntimeException("Parse error in XPath path: [" + nodeset + "]");
+			}
 		}
 		
 		ref = ((XPathPathExpr)path).getReference();
