@@ -69,23 +69,23 @@ public class XPathPathExpr extends XPathExpression {
 			ref.refLevel = 0;
 			parentsAllowed = true;
 			break;
-		default: throw new XPathUnsupportedException();
+		default: throw new XPathUnsupportedException("filter expression");
 		}
 		
 		for (int i = 0; i < steps.length; i++) {
 			XPathStep step = steps[i];
 			
 			if (step.predicates.length > 0) {
-				throw new XPathUnsupportedException();
+				throw new XPathUnsupportedException("predicates");
 			}
 			
 			if (step.axis == XPathStep.AXIS_SELF) {
 				if (step.test != XPathStep.TEST_TYPE_NODE) {
-					throw new XPathUnsupportedException();
+					throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
 				}
 			} else if (step.axis == XPathStep.AXIS_PARENT) {
 				if (!parentsAllowed || step.test != XPathStep.TEST_TYPE_NODE) {
-					throw new XPathUnsupportedException();
+					throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
 				} else {
 					ref.refLevel++;
 				}
@@ -94,10 +94,10 @@ public class XPathPathExpr extends XPathExpression {
 					ref.add(step.name.toString(), TreeReference.INDEX_UNBOUND);
 					parentsAllowed = false;
 				} else {
-					throw new XPathUnsupportedException();
+					throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
 				}
 			} else {
-				throw new XPathUnsupportedException();
+				throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
 			}
 		}		
 		
