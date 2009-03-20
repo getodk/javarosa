@@ -390,6 +390,7 @@ alertcontent {
 	}	
 }
 
+
 .patselRow {
     font-size: small;
 	//#if javarosa.patientselect.formfactor == nokia-s40
@@ -399,6 +400,10 @@ alertcontent {
 	columns: 3;
 	columns-width: 140,65,25;
 	//#endif
+}
+
+.patselTitleRow extends patselRow {
+	background-color: #5CFFAD;
 }
 
 .patselDetailRow {
