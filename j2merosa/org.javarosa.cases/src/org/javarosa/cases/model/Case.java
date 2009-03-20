@@ -11,6 +11,9 @@ import java.util.Hashtable;
 
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -25,24 +28,25 @@ public class Case implements Externalizable, IDRecordable {
 	private String id;
 	private String name;
 	
-	private boolean closed;
+	private boolean closed = false;
 	
 	private Date dateOpened;
 	
 	int recordId;
 
-	Hashtable data;
+	Hashtable data = new Hashtable();
 	
 	/**
 	 * NOTE: This constructor is for serialization only.
 	 */
 	public Case() {
-		
+		dateOpened = new Date();
 	}
 	
 	public Case(String name, String typeId) {
 		this.name = name;
 		this.typeId = typeId;
+		dateOpened = new Date();
 	}
 	
 	/**
@@ -94,7 +98,6 @@ public class Case implements Externalizable, IDRecordable {
 		return recordId;
 	}
 	
-
 	/**
 	 * @return the id
 	 */
@@ -128,16 +131,26 @@ public class Case implements Externalizable, IDRecordable {
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
-		// TODO Auto-generated method stub
-
+		typeId = in.readUTF();
+		id = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
+		name =in.readUTF();
+		closed = in.readBoolean();
+		dateOpened = new Date(in.readLong());
+		recordId = in.readInt();
+		data = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		// TODO Auto-generated method stub
-
+		out.writeUTF(typeId);
+		ExtUtil.write(out, new ExtWrapNullable(id));
+		out.writeUTF(name);
+		out.writeBoolean(closed);
+		out.writeLong(dateOpened.getTime());
+		out.writeInt(recordId);
+		ExtUtil.write(out, new ExtWrapMap(data));
 	}
 
 	public void setRecordId(int recordId) {
