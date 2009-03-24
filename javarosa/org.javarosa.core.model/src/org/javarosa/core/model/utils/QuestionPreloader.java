@@ -242,6 +242,7 @@ public class QuestionPreloader {
 			JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propName, value);
 	}
 	
+	//ugh. why aren't we creating a DateData?
 	private StringData getTimestamp() {
 		return new StringData(DateUtils.formatDateTime(new Date(), DateUtils.FORMAT_ISO8601));
 	}

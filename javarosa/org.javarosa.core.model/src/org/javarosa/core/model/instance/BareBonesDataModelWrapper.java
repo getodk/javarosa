@@ -3,6 +3,7 @@ package org.javarosa.core.model.instance;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
@@ -15,6 +16,7 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
@@ -23,6 +25,8 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class BareBonesDataModelWrapper implements Externalizable {
+	public static final boolean GET_SELECT_VALUES_FROM_FORMDEF = true;
+	
 	private DataModelTree dm;
 	
 	public BareBonesDataModelWrapper (DataModelTree dm) {
@@ -38,6 +42,21 @@ public class BareBonesDataModelWrapper implements Externalizable {
 		bbdmw.readExternal(in, ExtUtil.defaultPrototypes());
 		return bbdmw.getDataModel();
 	}
+
+	public static DataModelTree cloneDataModel (DataModelTree orig) {
+		DataModelTree copy = new DataModelTree();
+		cloneDataModelFrom(copy, orig);
+		return copy;
+	}
+		
+	public static void cloneDataModelFrom (DataModelTree dst, DataModelTree src) {
+		dst.setId(src.getId());
+		dst.setFormId(src.getFormId());
+		dst.setName(src.getName());
+		dst.setDateSaved(src.getDateSaved());
+		dst.schema = src.schema;
+		dst.setRoot(src.getRoot().deepCopy(true));
+	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		if (dm == null) {
@@ -46,7 +65,9 @@ public class BareBonesDataModelWrapper implements Externalizable {
 		
 		dm.setId(ExtUtil.readInt(in));
 		dm.setFormId(ExtUtil.readInt(in));
-		dm.setDateSaved(ExtUtil.readDate(in));
+		dm.setName(ExtUtil.nullIfEmpty(ExtUtil.readString(in)));
+		dm.schema = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		dm.setDateSaved((Date)ExtUtil.read(in, new ExtWrapNullable(Date.class)));
 		
 		TreeElement root = dm.getRoot();
 		TreeReference rootRef = TreeReference.rootRef();
@@ -111,6 +132,7 @@ public class BareBonesDataModelWrapper implements Externalizable {
 		} else {
 			Class answerType;
 			switch (e.dataType) {
+			case Constants.DATATYPE_NULL: answerType = StringData.class; break;
 			case Constants.DATATYPE_TEXT: answerType = StringData.class; break;
 			case Constants.DATATYPE_INTEGER: answerType = IntegerData.class; break;
 			case Constants.DATATYPE_DECIMAL: answerType = DecimalData.class; break;
@@ -135,9 +157,16 @@ public class BareBonesDataModelWrapper implements Externalizable {
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
+		if (GET_SELECT_VALUES_FROM_FORMDEF) {
+			dm = cloneDataModel(dm);
+			purgeSelectValues(dm.getRoot());
+		}
+		
 		ExtUtil.writeNumeric(out, dm.getId());
 		ExtUtil.writeNumeric(out, dm.getFormId());
-		ExtUtil.writeDate(out, dm.getDateSaved());
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(dm.getName()));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(dm.schema));
+		ExtUtil.write(out, new ExtWrapNullable(dm.getDateSaved()));
 		
 		TreeElement root = dm.getRoot();
 		TreeReference rootRef = TreeReference.rootRef();
@@ -172,10 +201,35 @@ public class BareBonesDataModelWrapper implements Externalizable {
 			}
 		} else {
 			IAnswerData val = e.getValue();
-			if (e.dataType > 0 && e.dataType < 100) { //100 is upper range of reserved JavaRosa datatypes
+			if (e.dataType >= 0 && e.dataType < 100) { //100 is upper range of reserved JavaRosa datatypes
 				ExtUtil.write(out, new ExtWrapNullable(val));				
 			} else {
 				ExtUtil.write(out, new ExtWrapNullable(new ExtWrapTagged(val)));
+			}
+		}
+	}
+	
+	private void purgeSelectValues (TreeElement e) {
+		if (e.isChildable()) {
+			for (int i = 0; i < e.getNumChildren(); i++) {
+				purgeSelectValues((TreeElement)e.getChildren().elementAt(i));
+			}
+		} else {
+			IAnswerData val = e.getValue();
+			if (val instanceof SelectOneData || val instanceof SelectMultiData) {
+				Vector selections;
+				if (val instanceof SelectMultiData) {
+					selections = (Vector)val.getValue();
+				} else {
+					selections = new Vector();
+					selections.addElement((Selection)val.getValue());
+				}
+				
+				for (int i = 0; i < selections.size(); i++) {
+					Selection s = (Selection)selections.elementAt(i);
+					s.question = null;
+					s.xmlValue = "";
+				}
 			}
 		}
 	}
