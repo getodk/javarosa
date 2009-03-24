@@ -4,8 +4,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
-import javax.microedition.lcdui.Image;
-
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.ITransportManager;
