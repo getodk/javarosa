@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
+import org.javarosa.core.model.instance.BareBonesDataModelWrapper;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -114,7 +115,13 @@ public class DataModelTreeMetaData extends MetaDataObject{
 	 * setMetaDataParameters(java.lang.Object)
 	 */
 	public void setMetaDataParameters(Object object) {
-		DataModelTree data = (DataModelTree) object;
+		DataModelTree data;
+	//	if (object instanceof BareBonesDataModelWrapper) {
+	//		data = ((BareBonesDataModelWrapper)object).getDataModel();
+	//	} else {
+			data = (DataModelTree) object;
+	//	}
+		
 		this.formName = data.getName() + data.getId();
 		this.dateSaved = data.getDateSaved();
 		this.formIdReference = data.getFormId();

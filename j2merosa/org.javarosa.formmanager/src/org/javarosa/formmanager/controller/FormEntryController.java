@@ -96,7 +96,7 @@ public class FormEntryController {
 		if (!model.isSaved() || postProcessModified) {
 			FormDef form = model.getForm();
 			DataModelTreeRMSUtility utility = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
-			DataModelTree instance = (DataModelTree)form.getDataModel(); //worry about supporting other data model types later
+			DataModelTree instance = (DataModelTree)form.getDataModel();
 			int instanceID = model.getInstanceID();
 
 			instance.setName(form.getTitle());

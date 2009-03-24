@@ -1,10 +1,12 @@
 package org.javarosa.core.model.storage;
 
-import java.util.Calendar;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.instance.BareBonesDataModelWrapper;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.storage.utilities.IRecordStorage;
@@ -12,6 +14,8 @@ import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.services.transport.TransportMessage;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * The RMS persistent storage utility for DataModelTree
@@ -44,12 +48,33 @@ public class DataModelTreeRMSUtility extends RMSUtility {
 	 * @return new record ID
 	 */
 	public int writeToRMS(DataModelTree model) {
+		//return super.writeToRMS(new BareBonesDataModelWrapper(model), new DataModelTreeMetaData(model));
 		return super.writeToRMS(model, new DataModelTreeMetaData(model));
 	}
 
 	public void updateToRMS(int recordId, DataModelTree model) {
+		//updateToRMS(recordId, new BareBonesDataModelWrapper(model), getMetaDataFromId(recordId));
 		updateToRMS(recordId, model, getMetaDataFromId(recordId));
 	}
+	
+//    public void retrieveFromRMS(int recordId, DataModelTree blah) throws IOException, DeserializationException {
+//    	DataModelTreeMetaData dmtmd = this.getMetaDataFromId(recordId);
+//    	int formID = dmtmd.getFormIdReference();
+//    	
+//    	FormDefRMSUtility fdrmsu = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
+//    	FormDef f = new FormDef();
+//    	fdrmsu.retrieveFromRMS(formID, f);
+//    	
+//    	BareBonesDataModelWrapper bbdmw = new BareBonesDataModelWrapper(f.getDataModel());
+//    	super.retrieveFromRMS(recordId, bbdmw);
+//    	DataModelTree tree = bbdmw.getDataModel();
+//    	BareBonesDataModelWrapper.cloneDataModelFrom(blah, tree);
+//    	
+//    	if (BareBonesDataModelWrapper.GET_SELECT_VALUES_FROM_FORMDEF) {
+//    		f.setDataModel(blah);
+//    		f.initialize(false);
+//    	}
+//    }
 	
 	/**
 	 * Writes the block of bytes to this RMS with Meta DAta

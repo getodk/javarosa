@@ -42,15 +42,18 @@ public class Selection implements Externalizable {
 		this.index = index;
 		this.question = question;
 		
-		//don't think setting these is strictly necessary, setting them only on deserialization is probably enough
-		this.qID = question.getID();
-		this.xmlValue = getValue();
+		if (question != null) {
+			//don't think setting these is strictly necessary, setting them only on deserialization is probably enough
+			this.qID = question.getID();
+			this.xmlValue = getValue();
+		} //if question is null, these had better be set manually afterward!
 	}
 	
 	public Selection clone () {
 		Selection s = new Selection(index, question);
 		
 		//don't think setting these is strictly necessary, question should always be set by the time clone() is called
+		//on second thought, this might not be such a safe assumption
 		s.qID = qID;
 		s.xmlValue = xmlValue;
 		
@@ -82,7 +85,7 @@ public class Selection implements Externalizable {
 		
 		/* temporarily disabling r2117 until backup/restore is functional
 		 * qID = ExtUtil.readInt(in);
-		 * xmlValue = ExtUtil.readString(in);
+		 *  xmlValue = ExtUtil.readString(in);
 		 */
 		question = (QuestionDef)ExtUtil.read(in, QuestionDef.class, pf);
 	}
