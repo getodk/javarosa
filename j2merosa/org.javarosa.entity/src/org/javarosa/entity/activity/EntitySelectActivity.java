@@ -15,17 +15,14 @@ import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.entity.model.IEntity;
 import org.javarosa.entity.model.view.EntitySelectDetailPopup;
 import org.javarosa.entity.model.view.EntitySelectView;
+import org.javarosa.entity.util.EntitySelectContext;
 
 public class EntitySelectActivity implements IActivity {
 	public static final String ENTITY_ID_KEY = "entity-id";
-	public static final String ENTITY_RMS_KEY = "entity-rms";
-	public static final String ENTITY_PROTO_KEY = "entity-type";
-	public static final String NEW_ENTITY_ID_KEY_KEY = "new-entity-key";
-	public static final String NEW_MODE_KEY = "new-mode-key";
 	public static final String ACTION_NEW_ENTITY = "new-entity";
 	
 	private IShell parent;
-	private Context context;
+	private EntitySelectContext context;
 	private IView activeView;
 	private EntitySelectView selView;
 	
@@ -39,19 +36,19 @@ public class EntitySelectActivity implements IActivity {
 	
 	public EntitySelectActivity (IShell parent, String title) {
 		this.parent = parent;
-		this.context = new Context();
 		selView = new EntitySelectView(this, title);
 	}
 
 	public void start(Context context) {
-		this.context.mergeInContext(context);
+		this.context = new EntitySelectContext(context);
 
-		entityRMS = (RMSUtility)context.getElement(ENTITY_RMS_KEY);
-		entityPrototype = (IEntity)context.getElement(ENTITY_PROTO_KEY);
-		newEntityIDKey = (String)context.getElement(NEW_ENTITY_ID_KEY_KEY);
+		entityRMS = this.context.getRMSUtility();
+		entityPrototype = this.context.getEntityPrototype();
+		newEntityIDKey = this.context.getNewEntityIDKey();
+
 		selView.entityType = entityPrototype.entityType();
 		
-		Integer newMode = (Integer)context.getElement(NEW_MODE_KEY);
+		Integer newMode = this.context.getNewMode();
 		if(newMode != null) {
 			selView.newMode = newMode.intValue();
 		}
@@ -77,6 +74,7 @@ public class EntitySelectActivity implements IActivity {
 	private void loadEntity (int recordID) {
 		IEntity entity = entityPrototype.factory(recordID);
 		entity.readEntity(entity.fetchRMS(entityRMS));
+		this.context.getEntityFilter().isPermitted(entity);
 		entities.addElement(entity);		
 	}
 	

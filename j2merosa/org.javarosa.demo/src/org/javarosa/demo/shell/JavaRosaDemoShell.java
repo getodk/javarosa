@@ -30,6 +30,7 @@ import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.properties.DemoAppProperties;
 import org.javarosa.entity.activity.EntitySelectActivity;
+import org.javarosa.entity.util.EntitySelectContext;
 import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
@@ -373,11 +374,12 @@ public class JavaRosaDemoShell implements IShell {
 	private void launchEntitySelectActivity (Context context) {
 		EntitySelectActivity psa = new EntitySelectActivity(this, "Choose a Patient");
 		PatientRMSUtility prms = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
-		context.setElement(EntitySelectActivity.ENTITY_PROTO_KEY, new PatientEntity());
-		context.setElement(EntitySelectActivity.ENTITY_RMS_KEY, prms);
-		context.setElement(EntitySelectActivity.NEW_ENTITY_ID_KEY_KEY, PatientEntryActivity.NEW_PATIENT_ID);
+		EntitySelectContext esc = new EntitySelectContext(context);
+		esc.setEntityProtoype(new PatientEntity());
+		esc.setRMSUtility(prms);
+		esc.setNewEntityIDKey(PatientEntryActivity.NEW_PATIENT_ID);
 		
-		launchActivity(psa, context);
+		launchActivity(psa, esc);
 	}
 	
 	private void relaunchListActivity () {
