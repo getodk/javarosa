@@ -82,6 +82,7 @@ public class InstanceSchema {
 				break;
 			case Constants.DATATYPE_INTEGER: type = "integer"; break;
 			case Constants.DATATYPE_DECIMAL: type = "decimal"; break;
+			case Constants.DATATYPE_BARCODE: type = "barcode"; break;
 			case Constants.DATATYPE_DATE: type = "date"; break;
 			case Constants.DATATYPE_DATE_TIME: type = "dateTime"; break;
 			case Constants.DATATYPE_TIME: type = "time"; break;

@@ -49,6 +49,10 @@ public class XFormAnswerDataParser {
 		case Constants.DATATYPE_TEXT:
 
 			return new StringData(text);
+		
+		case Constants.DATATYPE_BARCODE:
+
+			return new StringData(text);
 
 		case Constants.DATATYPE_INTEGER:
 
