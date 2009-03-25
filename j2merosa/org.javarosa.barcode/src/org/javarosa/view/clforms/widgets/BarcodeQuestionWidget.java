@@ -44,19 +44,16 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 	public void creatView() {
 
 		setHint("Type in your answer");
-		// #style textBox
-		tf = new TextField("", "", 200, TextField.ANY);
-		if (qDef.instanceNode.required)
-			tf.setLabel("*" + ((QuestionDef) qDef.element).getLongText()); // visual
-		// symbol
-		// for
-		// required
-		else
-			tf.setLabel(((QuestionDef) qDef.element).getLongText());
+		//#style textBox
+		 tf = new TextField("", "", 200, TextField.ANY);
+		 if(qDef.instanceNode.required)
+				tf.setLabel("*"+((QuestionDef)qDef.element).getLongText()); //visual symbol for required
+				else
+					tf.setLabel(((QuestionDef)qDef.element).getLongText());
 		this.append(tf);
 		this.addNavigationButtons();
-		if (((QuestionDef) qDef.element).getHelpText() != null) {
-			setHint(((QuestionDef) qDef.element).getHelpText());
+		if (((QuestionDef)qDef.element).getHelpText()!=null){
+			setHint(((QuestionDef)qDef.element).getHelpText());
 		}
 
 	}
