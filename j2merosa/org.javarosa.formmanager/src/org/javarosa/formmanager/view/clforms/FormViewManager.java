@@ -142,15 +142,19 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 					else
 						widget = barcodeService.getWidget(prompt, "");
 
-				} catch (UnavailableServiceException se) { // if not, just use a
-					// text widget
+				} catch (UnavailableServiceException se) {
+					widget = null;
+				}
+				// if not, just use a
+				// text widget
+				if (widget == null)
 					if (fromFormView == true)
 						widget = new TextQuestionWidget(prompt, 'c');
 					else if (direction)
 						widget = new TextQuestionWidget(prompt, 1);
 					else
 						widget = new TextQuestionWidget(prompt, "");
-				}
+
 				break;
 			}
 			break;
