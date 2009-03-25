@@ -45,15 +45,19 @@ public class BarcodeAcquiringService implements IAcquiringService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.formmanager.view.clforms.acquire.IAcquiringService#getWidget(org.javarosa.formmanager.view.FormElementBinding)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.formmanager.view.clforms.acquire.IAcquiringService#getWidget
+	 * (org.javarosa.formmanager.view.FormElementBinding)
 	 * 
 	 * If there is a service that is able to process a barcode from an image,
 	 * return a barcode widget to capture the image
 	 */
 	public AcquiringQuestionScreen getWidget(FormElementBinding prompt) {
 		BarcodeQuestionWidget barcodeWidget = new BarcodeQuestionWidget(prompt);
-		;
+
 		try {
 			IBarcodeProcessingService barcodeProcessor = (IBarcodeProcessingService) JavaRosaServiceProvider
 					.instance().getService("Barcode Processing Service");
@@ -64,8 +68,12 @@ public class BarcodeAcquiringService implements IAcquiringService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.formmanager.view.clforms.acquire.IAcquiringService#getWidget(org.javarosa.formmanager.view.FormElementBinding, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.formmanager.view.clforms.acquire.IAcquiringService#getWidget
+	 * (org.javarosa.formmanager.view.FormElementBinding, java.lang.String)
 	 * 
 	 * If there is a service that is able to process a barcode from an image,
 	 * return a barcode widget to capture the image
@@ -84,8 +92,12 @@ public class BarcodeAcquiringService implements IAcquiringService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.formmanager.view.clforms.acquire.IAcquiringService#getWidget(org.javarosa.formmanager.view.FormElementBinding, char)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.formmanager.view.clforms.acquire.IAcquiringService#getWidget
+	 * (org.javarosa.formmanager.view.FormElementBinding, char)
 	 * 
 	 * If there is a service that is able to process a barcode from an image,
 	 * return a barcode widget to capture the image
@@ -93,7 +105,6 @@ public class BarcodeAcquiringService implements IAcquiringService {
 	public AcquiringQuestionScreen getWidget(FormElementBinding prompt, char str) {
 		BarcodeQuestionWidget barcodeWidget = new BarcodeQuestionWidget(prompt,
 				str);
-		;
 		try {
 			IBarcodeProcessingService barcodeProcessor = (IBarcodeProcessingService) JavaRosaServiceProvider
 					.instance().getService("Barcode Processing Service");
