@@ -101,7 +101,8 @@ public class Constants {
 	public static final int DATATYPE_CHOICE_LIST = 8;	/** This is a question with alist of options where more than one option can be selected at a time. */
 	public static final int DATATYPE_BOOLEAN = 9;	/** Question with true and false answers. */
 	public static final int DATATYPE_GEOPOINT = 10; /** Question with location answer. */
-
+	public static final int DATATYPE_BARCODE = 11; /** Question with barcode string answer. */
+	
 	
 	public static final int CONTROL_UNTYPED = -1;
 	public static final int CONTROL_INPUT = 1;
