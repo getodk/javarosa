@@ -402,6 +402,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		id = ExtUtil.readInt(in);
 		formId = ExtUtil.readInt(in);
 		name = (String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
+		//schema = (String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
 		dateSaved = (Date)ExtUtil.read(in, new ExtWrapNullable(Date.class), pf);
 		setRoot((TreeElement)ExtUtil.read(in, TreeElement.class, pf));
 	}
@@ -414,6 +415,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		ExtUtil.writeNumeric(out, id);
 		ExtUtil.writeNumeric(out, formId);
 		ExtUtil.write(out, new ExtWrapNullable(name));
+		//ExtUtil.write(out, new ExtWrapNullable(schema));
 		ExtUtil.write(out, new ExtWrapNullable(dateSaved));		
 		ExtUtil.write(out, getRoot());
 	}
@@ -454,51 +456,77 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	public void setRecordId(int recordId) {
 		setId(recordId);
 	}
+
+	public TreeReference addNode (TreeReference ambigRef) {
+		TreeReference ref = ambigRef.clone();
+		if (createNode(ref) != null) {
+			return ref;
+		} else {
+			return null;
+		}
+	}
+	
+	public TreeReference addNode (TreeReference ambigRef, IAnswerData data) {
+		TreeReference ref = ambigRef.clone();
+		TreeElement node = createNode(ref);
+		if (node != null) {
+			node.setValue(data);
+			return ref;
+		} else {
+			return null;
+		}
+	}
+	
+	/*
+	 * create the specified node in the tree, creating all intermediary nodes
+	 * at each step, if necessary. if specified node already exists, return null
+	 * if multiplicity =
+	 *   ALL or == count: always create a new node at the step
+	 *   [0,count): use that specific node
+	 * return the newly-created node; modify ref so that it's an unambiguous ref to the node
+	 */
+	private TreeElement createNode (TreeReference ref) {
+		TreeElement node = root;
+		
+		for (int k = 0; k < ref.size(); k++) {
+			String name = (String)ref.names.elementAt(k);
+			int count = node.getChildMultiplicity(name);
+			int mult = ((Integer)ref.multiplicity.elementAt(k)).intValue();
+			
+			TreeElement child;
+			if (mult >= 0 && mult < count) {
+				if (k == ref.size() - 1) {
+					return null; //final node must be a newly-created node
+				}
+				
+				//fetch existing
+				child = node.getChild(name, mult);
+				if (child == null) {
+					return null; //intermediate node does not exist, and not specified in a way that will cause it to be created
+				}
+			} else if (mult == TreeReference.INDEX_UNBOUND || mult == count) {
+				if (k == 0 && root.getNumChildren() != 0) {
+					return null; //can only be one top-level node, and it already exists
+				}
+				
+				if (!node.isChildable()) {
+					return null; //current node can't have children
+				}
+				
+				//create new
+				child = new TreeElement(name, count);
+				node.addChild(child);
+				ref.multiplicity.setElementAt(new Integer(count), k);
+			} else {
+				return null;
+			}
+		
+			node = child;
+		}
+		
+		return node;
+	}
+
+
 }
 
-
-//IS THIS FUNCTION NEEDED?
-//create the specified node in the tree, creating all intermediary nodes
-//terminal = true: create element, false: create group (albeit empty)
-//at each step, if multiplicity =
-//  ALL or count: always create a new node at the step
-//  [0,count): use that specific node
-//return a reference that unambiguously refers to the newly created node
-//public TreeReference createNode (IDataReference ref, boolean terminal) {
-//	QuestionDataGroup node = (QuestionDataGroup)root;
-//	TreeReference tref = unpackReference(ref);
-//	
-//	for (int k = 0; k < tref.size(); k++) {
-//		String name = (String)tref.names.elementAt(k);
-//		int count = node.getMultiplicity(name);
-//		int mult = ((Integer)tref.multiplicity.elementAt(k)).intValue();
-//		
-//		TreeElement child;
-//		if (mult < count) {
-//			//fetch existing
-//			child = node.getChild(name, mult);
-//			if (child == null)
-//				return null; //something wrong
-//		} else if (mult == TreeReference.INDEX_UNBOUND || mult == count) {
-//			//create new
-//			if (k == tref.size() - 1 && terminal) {
-//				child = new QuestionDataElement(name, count, null);
-//			} else {
-//				child = new QuestionDataGroup(name, count);
-//			}
-//			node.addChild(child);
-//			tref.multiplicity.setElementAt(new Integer(count), k);
-//		} else {
-//			return null;
-//		}
-//		
-//		if (k < tref.size() - 1) {
-//			if (child instanceof QuestionDataElement) {
-//				throw new IllegalArgumentException();
-//			}	
-//
-//			node = (QuestionDataGroup)child;
-//		}
-//	}
-//}
-//think this works
