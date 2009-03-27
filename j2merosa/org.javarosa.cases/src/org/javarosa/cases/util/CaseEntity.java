@@ -69,7 +69,7 @@ public class CaseEntity implements IEntity {
 	public String[] getHeaders(boolean detailed) {
 		String [] headers;
 		if(detailed) {
-			headers = new String[] {"Name", "ID", "Opened"};
+			headers = new String[] {"Name", "ID", "Date Opened", "Currently Open"};
 		} else {
 			headers = new String[] {"Name", "ID"};
 		}
@@ -87,7 +87,13 @@ public class CaseEntity implements IEntity {
 		} else {
 			date = c.getDateOpened().toString();
 		}
-		return new String[] {c.getName(), c.getId(), date};
+		String open;
+		if(c.isClosed()) {
+			open = "No";
+		} else {
+			open = "Yes";
+		}
+		return new String[] {c.getName(), c.getId(), date, open};
 	}
 	
 	/* (non-Javadoc)
