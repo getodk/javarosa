@@ -417,6 +417,21 @@ public class Patient implements Externalizable, IDRecordable {
 			s = "NAMELESS PatientId="+getPatientId();
 		return s;
 	}
+	
+	
+	public static final String ALIVE_KEY = "pat_al";
+	public boolean isAlive() {
+		Boolean record = (Boolean)this.records.get(ALIVE_KEY);
+		if(record != null) {
+			return record.booleanValue();
+		} else {
+			return true;
+		}
+	}
+	
+	public void setAlive(boolean alive) {
+		records.put(ALIVE_KEY, alive);
+	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		recordId = in.readInt();

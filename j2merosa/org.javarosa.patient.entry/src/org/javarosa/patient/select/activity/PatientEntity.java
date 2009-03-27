@@ -19,6 +19,8 @@ public class PatientEntity implements IEntity {
 	protected String middleName;
 	protected int age;	
 	protected int gender;
+	
+	protected boolean alive;
 		
 	protected String[] normalizedName;
 	protected String normalizedID;
@@ -45,6 +47,8 @@ public class PatientEntity implements IEntity {
 		
 		normalizedName = normalizeNames();
 		normalizedID = normalizeID(getID());
+		
+		alive = p.isAlive();
 	}
 
 	public Object fetchRMS (RMSUtility rmsu) {
@@ -92,6 +96,10 @@ public class PatientEntity implements IEntity {
 
 	public int getRecordID() {
 		return recordID;
+	}
+	
+	public boolean isAlive() {
+		return alive;
 	}
 	
 	protected static String normalizeID (String ID) {
