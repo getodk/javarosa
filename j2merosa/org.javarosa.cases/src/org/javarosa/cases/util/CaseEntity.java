@@ -22,6 +22,8 @@ public class CaseEntity implements IEntity {
 	
 	protected int recordId;
 	
+	protected boolean closed;
+	
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#entityType()
@@ -101,6 +103,10 @@ public class CaseEntity implements IEntity {
 	public String getName() {
 		return name;
 	}
+	
+	public boolean isClosed() {
+		return closed;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#getRecordID()
@@ -134,6 +140,8 @@ public class CaseEntity implements IEntity {
 		this.id = c.getId();
 		this.type = c.getTypeId();
 		this.recordId = c.getRecordId();
+		
+		this.closed = c.isClosed();
 	}
 
 }

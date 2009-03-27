@@ -156,5 +156,13 @@ public class Case implements Externalizable, IDRecordable {
 	public void setRecordId(int recordId) {
 		this.recordId = recordId;
 	}
+	
+	public void setProperty(String key, String value) {
+		this.data.put(key, value);
+	}
+	
+	public String getProperty(String key) {
+		return (String)data.get(key);
+	}
 
 }
