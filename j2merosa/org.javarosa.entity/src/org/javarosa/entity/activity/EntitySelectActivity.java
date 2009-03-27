@@ -74,8 +74,9 @@ public class EntitySelectActivity implements IActivity {
 	private void loadEntity (int recordID) {
 		IEntity entity = entityPrototype.factory(recordID);
 		entity.readEntity(entity.fetchRMS(entityRMS));
-		this.context.getEntityFilter().isPermitted(entity);
-		entities.addElement(entity);		
+		if(this.context.getEntityFilter().isPermitted(entity)) {
+			entities.addElement(entity);		
+		}
 	}
 	
 	public void setView (IView view) {
