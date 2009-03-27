@@ -430,7 +430,7 @@ public class Patient implements Externalizable, IDRecordable {
 	}
 	
 	public void setAlive(boolean alive) {
-		records.put(ALIVE_KEY, alive);
+		records.put(ALIVE_KEY, new Boolean(alive));
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
