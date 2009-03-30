@@ -8,6 +8,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.IPreloadHandler;
+import org.javarosa.core.model.utils.PreloadUtils;
 
 /**
  * @author Clayton Sims
@@ -34,7 +35,8 @@ public class CasePreloadHandler implements IPreloadHandler {
 	 * @see org.javarosa.core.model.utils.IPreloadHandler#handlePreload(java.lang.String)
 	 */
 	public IAnswerData handlePreload(String preloadParams) {
-		return new StringData(c.getProperty(preloadParams));
+		Object property = c.getProperty(preloadParams);
+		return PreloadUtils.wrapIndeterminedObject(property);
 	}
 
 	/* (non-Javadoc)
