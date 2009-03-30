@@ -120,21 +120,29 @@ public class CaseEntity implements IEntity {
 	public int getRecordID() {
 		return recordId;
 	}
-
 	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#matchID(java.lang.String)
+	 * @see org.javarosa.patient.select.activity.IEntity#matchID(java.lang.String)
 	 */
 	public boolean matchID(String key) {
-		// TODO Auto-generated method stub
+		//TODO: I don't really understand these methods. These should be matching
+		//pretty broadly, but should be reevaluated once the method contract is clear.
+		String[] fields = this.getShortFields();
+		for(int i = 0; i < fields.length; ++i) {
+			if(fields[i].indexOf(key) != -1) {
+				return true;
+			}
+		}
 		return false;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#matchName(java.lang.String)
+	 * @see org.javarosa.patient.select.activity.IEntity#matchName(java.lang.String)
 	 */
 	public boolean matchName(String key) {
-		// TODO Auto-generated method stub
-		return false;
+		
+		//TODO: I don't really understand these methods. These should be matching
+		//pretty broadly, but should be reevaluated once the method contract is clear.
+		return matchID(key);
 	}
 
 	/* (non-Javadoc)
@@ -143,7 +151,7 @@ public class CaseEntity implements IEntity {
 	public void readEntity(Object o) {
 		Case c = (Case)o;
 		this.name = c.getName();
-		this.id = c.getId();
+		this.id = c.getId() == null? "" : c.getId();
 		this.type = c.getTypeId();
 		this.recordId = c.getRecordId();
 		
