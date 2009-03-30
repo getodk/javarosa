@@ -246,6 +246,7 @@ public class TreeElement implements Externalizable {
 	public TreeElement deepCopy (boolean includeTemplates) {
 		TreeElement newNode = shallowCopy();
 		
+		newNode.children = null;
 		for (int i = 0; i < getNumChildren(); i++) {
 			TreeElement child = (TreeElement)children.elementAt(i);
 			if (includeTemplates || child.getMult() != TreeReference.INDEX_TEMPLATE) {
