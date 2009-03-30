@@ -1,6 +1,7 @@
 package org.javarosa.core.services.storage.utilities;
 
 import java.io.IOException;
+import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -128,6 +129,7 @@ public class RMSUtility
     			((IDRecordable)obj).setRecordId(recordId);
     		
             byte[] data = ExtUtil.serialize(obj);
+            
             //LOG
             this.recordStore.addRecord(data, 0, data.length);
             if (this.iType == RMSUtility.RMS_TYPE_META_DATA)
@@ -147,6 +149,24 @@ public class RMSUtility
             ioe.printStackTrace();
         }
         return recordId;
+    }
+    
+    public boolean writeToRMSusingID (IDRecordable obj) {
+    	int recID = obj.getRecordId();
+    	if (recID <= 0) {
+    		return false;
+    	}
+    	
+    	try {
+	    	if (retrieveByteDataFromRMS(recID) != null) {
+	    		return false;
+	    	}
+    	} catch (IOException ioe) {
+    		ioe.printStackTrace();
+    	}
+	    
+    	updateToRMS(recID, obj, newMetaData(obj));
+    	return true;
     }
     
     /**
@@ -353,6 +373,10 @@ public class RMSUtility
         return numRecords;
     }
 
+    public MetaDataObject newMetaData (Object o) {
+    	return null;
+    }
+    
     /**
      * Returns an enumeration of the meta data for the objects 
      * stored in this RMS Utility.
@@ -500,6 +524,50 @@ public class RMSUtility
     	space = remainingSize/totalSize;
     
     	return space;
+    }
+    
+    public boolean makeIDsAvailable (Vector recIDs) {
+    	int maxRecID = -1;
+    	for (int i = 0; i < recIDs.size(); i++) {
+    		maxRecID = Math.max(maxRecID, ((Integer)recIDs.elementAt(i)).intValue());
+    	}
+    	
+    	//allocate records up to the maximum needed id
+    	try {
+	    	while (maxRecID >= recordStore.getNextRecordID()) {
+	    		recordStore.addRecord(null, 0, 0);
+	    	}
+    	} catch (RecordStorageException rse) {
+    		return false;
+    	}
+	    	
+    	//test setting each record id
+    	for (int i = 0; i < recIDs.size(); i++) {
+    		int recID = ((Integer)recIDs.elementAt(i)).intValue();
+    		try {
+    			recordStore.setRecord(recID, null, 0, 0);
+    		} catch (RecordStorageException rse) {
+    			return false;
+    		}
+    	}
+    	
+    	//clean up record ids that are unused
+    	try {
+	    	for (IRecordStoreEnumeration e = recordStore.enumerateRecords(); e.hasNextElement(); ) {
+	    		int recID = e.nextRecordId();
+	    		if (!recIDs.contains(new Integer(recID)) && recordStore.getRecord(recID) == null) {
+	    			recordStore.deleteRecord(recID);
+	    		}
+	    	}
+    	} catch (RecordStorageException rse) {
+    		return false;
+    	}
+    	
+    	if (metaDataRMS != null) {
+    		return metaDataRMS.makeIDsAvailable(recIDs);
+    	} else {
+    	  	return true;
+    	}
     }
     
 }

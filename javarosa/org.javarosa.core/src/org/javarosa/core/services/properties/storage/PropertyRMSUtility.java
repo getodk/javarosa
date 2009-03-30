@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.storage.DataModelTreeMetaData;
 import org.javarosa.core.services.properties.Property;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -40,6 +43,10 @@ public class PropertyRMSUtility extends RMSUtility {
         super.writeToRMS(property, new PropertyMetaData(property));
     }
 
+	public MetaDataObject newMetaData (Object o) {
+		return new PropertyMetaData((Property)o);
+	}
+    
     /**
      * Gets the size of the record given by recordId
      * @param recordId The record that will be checked

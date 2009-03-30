@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -51,6 +53,10 @@ public class FormDefRMSUtility extends RMSUtility {
 
 	public void updateToRMS(int recordId, FormDef form) {
 		updateToRMS(recordId, form, getMetaDataFromId(recordId));
+	}
+	
+	public MetaDataObject newMetaData (Object o) {
+		return new FormDefMetaData((FormDef)o);
 	}
 	
 	/**

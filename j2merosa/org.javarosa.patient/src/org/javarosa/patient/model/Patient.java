@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -11,6 +12,11 @@ import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.util.restorable.Restorable;
+import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.Map;
@@ -34,7 +40,7 @@ import org.javarosa.patient.model.data.NumericListData;
  * @author daniel/ctsims(temp)
  *
  */
-public class Patient implements Externalizable, IDRecordable {
+public class Patient implements Externalizable, IDRecordable, Restorable {
 	public static final int SEX_MALE = 1;
 	public static final int SEX_FEMALE = 2;
 	public static final int SEX_UNKNOWN = 3;
@@ -55,13 +61,11 @@ public class Patient implements Externalizable, IDRecordable {
 	int gender;
 	Date birthDate;
 	boolean birthDateEstimated;
-	int age;
 	
 	Date treatmentStartDate;
 	String treatmentRegimen;
 	
 	String patientIdentifier;
-	Vector attributes; //Not serialized since we can generate it on the fly.
 	boolean isNewPatient;
 	
 
@@ -482,14 +486,6 @@ public class Patient implements Externalizable, IDRecordable {
 		ExternalizableHelperDeprecated.writeExternalStringValueMap(out, records);
 		ExtUtil.write(out, new ExtWrapMap(singles));
 	}
-	/** 
-	 * Gets a list of patient attributes.
-	 */
-	public Vector getAttributes(){
-		if(attributes == null)
-			setDefaultAttributes();
-		return attributes;
-	}
 	
 	public void setIdentifier(String identifier){
 		setPatientIdentifier(identifier);
@@ -517,41 +513,58 @@ public class Patient implements Externalizable, IDRecordable {
 	public String getValue(String type) {
 		return (String)singles.get(type);
 	}
-	
-	/**
-	 * Adds a patient attribute. This is the value appended to the atttribute name.
-	 * eg. "WHO Stage: II", "Last Visit Date: 01/01/2009", etc.
-	 * 
-	 * @param attribute
-	 */
-	public void addAttribute(String attribute){
-		if(attributes == null)
-			setDefaultAttributes();
-		attributes.addElement(attribute);
+		
+	public String getRestorableType () {
+		return "patient";
 	}
 	
-//	commented out until entitymgr compiles	
-//	public void addAttributes(EntityFieldList fields, EntityFieldValueList fieldVals){
-//		if(attributes == null)
-//			setDefaultAttributes();
-//		
-//		/*for(int i=0; i<fields.size(); i++){
-//			EntityField field = fields.getField(i);
-//			if(data.containsQuestion(field.getName()))
-//				data.setValue(field.getName(), fieldVals.getPatintFiledValue(field.getId(), getPatientId()));
-//		}
-//		
-//		attributes.addElement(attribute);*/
-//	}
+	public DataModelTree exportData() {
+		DataModelTree dm = RestoreUtils.createDataModel(this);
+		RestoreUtils.addData(dm, "pat-id", patientIdentifier);
+		RestoreUtils.addData(dm, "name/family", familyName);
+		RestoreUtils.addData(dm, "name/given", givenName);
+		RestoreUtils.addData(dm, "name/middle", middleName);
+		RestoreUtils.addData(dm, "name/prefix", prefix);
+		RestoreUtils.addData(dm, "gender", new Integer(gender));
+		RestoreUtils.addData(dm, "birthdate", birthDate);
+		RestoreUtils.addData(dm, "birth-est", new Boolean(birthDateEstimated));
+		
+		for (Enumeration e = singles.keys(); e.hasMoreElements(); ) {
+			String key = (String)e.nextElement();
+			RestoreUtils.addData(dm, "other/" + key, singles.get(key));
+		}
+				
+		return dm;
+	}
 	
-	private void setDefaultAttributes(){
-		attributes = new Vector();
-		attributes.addElement("Identifier: " + (getPatientIdentifier() != null ? getPatientIdentifier() : NULL_DISPLAY_VALUE));
-		attributes.addElement("Prefix: " + (getPrefix() != null ? getPrefix() : NULL_DISPLAY_VALUE));
-		attributes.addElement("FamilyName: " + (getFamilyName() != null ? getFamilyName() : NULL_DISPLAY_VALUE));
-		attributes.addElement("MiddleName: " + (getMiddleName() != null ? getMiddleName() : NULL_DISPLAY_VALUE));
-		attributes.addElement("GivenName: " + (getGivenName() != null ? getGivenName() : NULL_DISPLAY_VALUE));
-		attributes.addElement("Gender: " + (getGender() == SEX_MALE ? "Male" : getGender() == SEX_FEMALE ? "Female" : NULL_DISPLAY_VALUE));
-		attributes.addElement("BirthDate: " + (getBirthDate() != null ? DateUtils.getXMLStringValue(getBirthDate()) : NULL_DISPLAY_VALUE));
+	public void templateData (DataModelTree dm, TreeReference parentRef) {
+		RestoreUtils.applyDataType(dm, "pat-id", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "name/family", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "name/given", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "name/middle", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "name/prefix", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "gender", parentRef, Integer.class);
+		RestoreUtils.applyDataType(dm, "birthdate", parentRef, Date.class);
+		RestoreUtils.applyDataType(dm, "birth-est", parentRef, Boolean.class);
+		
+		// other/* defaults to string
+	}
+	
+	public void importData(DataModelTree dm) {
+		patientIdentifier = (String)RestoreUtils.getValue("pat-id", dm);
+        familyName = (String)RestoreUtils.getValue("name/family", dm);		
+        givenName = (String)RestoreUtils.getValue("name/given", dm);		
+        middleName = (String)RestoreUtils.getValue("name/middle", dm);		
+        prefix = (String)RestoreUtils.getValue("name/prefix", dm);		
+        gender = ((Integer)RestoreUtils.getValue("gender", dm)).intValue();		
+        birthDate = (Date)RestoreUtils.getValue("birthdate", dm);		
+        birthDateEstimated = RestoreUtils.getBoolean(RestoreUtils.getValue("birth-est", dm));	
+        
+        TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));
+        for (int i = 0; i < e.getNumChildren(); i++) {
+        	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
+        	String name = child.getName();
+        	singles.put(name, RestoreUtils.getValue("other/" + name, dm));
+        }
 	}
 }

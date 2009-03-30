@@ -2,7 +2,10 @@ package org.javarosa.referral.storage;
 
 import java.io.IOException;
 
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.storage.DataModelTreeMetaData;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -26,6 +29,12 @@ public class ReferralRMSUtility extends RMSUtility {
 		ReferralMetaData md = new ReferralMetaData();
 		md.setFormName(referrals.getFormName());
 		super.writeToRMS(referrals, md);
+	}
+	
+	public MetaDataObject newMetaData (Object o) {
+		ReferralMetaData rmd = new ReferralMetaData();
+		rmd.setFormName(((Referrals)o).getFormName());
+		return rmd;
 	}
 	
 	public Referrals retrieveFromRMS(String formName) throws IOException, IllegalAccessException, InstantiationException, DeserializationException {

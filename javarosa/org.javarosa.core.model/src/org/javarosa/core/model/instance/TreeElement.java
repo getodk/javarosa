@@ -223,7 +223,7 @@ public class TreeElement implements Externalizable {
 		return getChild(name, false).size();
 	}
 	
-	public TreeElement deepCopy (boolean includeTemplates) {
+	public TreeElement shallowCopy () {
 		TreeElement newNode = new TreeElement(name, multiplicity);
 		newNode.repeatable = repeatable;
 		newNode.dataType = dataType;
@@ -238,6 +238,13 @@ public class TreeElement implements Externalizable {
 		if(value != null) {
 			newNode.value = value.clone();
 		}
+		
+		newNode.children = children;
+		return newNode;
+	}
+	
+	public TreeElement deepCopy (boolean includeTemplates) {
+		TreeElement newNode = shallowCopy();
 		
 		for (int i = 0; i < getNumChildren(); i++) {
 			TreeElement child = (TreeElement)children.elementAt(i);

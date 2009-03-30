@@ -89,4 +89,8 @@ public class Property implements Externalizable, IDRecordable{
     public void setRecordId(int recordId) {
         this.recordId = recordId; 
     }
+    
+    public int getRecordId () {
+    	return recordId;
+    }
 }

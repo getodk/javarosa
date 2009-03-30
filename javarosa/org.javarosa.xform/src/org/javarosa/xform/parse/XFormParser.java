@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -21,7 +20,10 @@ import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.util.restorable.Restorable;
+import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.IXFormBindHandler;
@@ -892,7 +894,7 @@ public class XFormParser {
 	}
 	
 	//parse instance hierarchy and turn into a skeleton model; ignoring data content, but respecting repeated nodes and 'template' flags
-	private static TreeElement buildInstanceStructure (Element node, TreeElement parent) {
+	public static TreeElement buildInstanceStructure (Element node, TreeElement parent) {
 		TreeElement element = null;
 
 		//catch when text content is mixed with children
@@ -1556,5 +1558,19 @@ public class XFormParser {
 			text = text.trim();
 
 		return text;
+	}
+	
+	public static DataModelTree restoreDataModel (byte[] data, Class restorableType) {
+		Restorable r = (Restorable)PrototypeFactory.getInstance(restorableType);
+		
+		Document doc = getXMLDocument(new InputStreamReader(new ByteArrayInputStream(data)));
+		Element e = doc.getRootElement();
+		
+		TreeElement te = buildInstanceStructure(e, null);
+		DataModelTree dm = new DataModelTree(te);
+		RestoreUtils.templateData(r, dm, null);
+		loadInstanceData(e, te, null);
+		
+		return dm;
 	}
 }

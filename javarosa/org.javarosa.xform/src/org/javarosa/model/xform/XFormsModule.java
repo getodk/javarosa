@@ -1,8 +1,17 @@
 package org.javarosa.model.xform;
 
+import java.io.IOException;
+
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.util.restorable.IXFormyFactory;
+import org.javarosa.core.model.util.restorable.RestoreUtils;
+import org.javarosa.core.services.transport.IDataPayload;
+import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.util.XFormSerializer;
 import org.javarosa.xpath.XPathParseTool;
 
 public class XFormsModule implements IModule {
@@ -15,7 +24,23 @@ public class XFormsModule implements IModule {
 		
 		JavaRosaServiceProvider.instance().registerPrototypes(classes);
 		JavaRosaServiceProvider.instance().registerPrototypes(XPathParseTool.xpathClasses);
+		RestoreUtils.xfFact = new IXFormyFactory () {
+			public TreeReference ref (String refStr) {
+				return DataModelTree.unpackReference(new XPathReference(refStr));
+			}
+			
+			public IDataPayload serializeModel (DataModelTree dm) {
+				try {
+					return (new XFormSerializingVisitor()).createSerializedPayload(dm);
+				} catch (IOException e) {
+					return null;
+				}
+			}
 
+			public DataModelTree parseRestore(byte[] data, Class restorableType) {
+				return XFormParser.restoreDataModel(data, restorableType);
+			}
+		};
 	}
 
 }
