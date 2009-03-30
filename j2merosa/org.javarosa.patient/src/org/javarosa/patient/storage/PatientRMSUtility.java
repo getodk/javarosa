@@ -2,7 +2,10 @@ package org.javarosa.patient.storage;
 
 import java.util.Vector;
 
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.storage.DataModelTreeMetaData;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.patient.model.Patient;
@@ -41,6 +44,10 @@ public class PatientRMSUtility extends RMSUtility {
 
 	public void updateToRMS(int recordId, Patient patient) {
 		updateToRMS(recordId, patient, getMetaDataFromId(recordId));
+	}
+	
+	public MetaDataObject newMetaData (Object o) {
+		return new PatientMetaDataObject((Patient)o);
 	}
 	
 	/**

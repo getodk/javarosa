@@ -1,21 +1,17 @@
 package org.javarosa.core.model.storage;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.BareBonesDataModelWrapper;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.storage.utilities.IRecordStorage;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.services.transport.TransportMessage;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
  * The RMS persistent storage utility for DataModelTree
@@ -55,6 +51,10 @@ public class DataModelTreeRMSUtility extends RMSUtility {
 	public void updateToRMS(int recordId, DataModelTree model) {
 		//updateToRMS(recordId, new BareBonesDataModelWrapper(model), getMetaDataFromId(recordId));
 		updateToRMS(recordId, model, getMetaDataFromId(recordId));
+	}
+	
+	public MetaDataObject newMetaData (Object o) {
+		return new DataModelTreeMetaData((DataModelTree)o);
 	}
 	
 //    public void retrieveFromRMS(int recordId, DataModelTree blah) throws IOException, DeserializationException {

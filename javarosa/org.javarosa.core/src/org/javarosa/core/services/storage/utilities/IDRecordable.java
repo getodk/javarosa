@@ -16,4 +16,6 @@ public interface IDRecordable
      */
     public abstract void setRecordId(int recordId);
     
+    public abstract int getRecordId ();
+    
 }

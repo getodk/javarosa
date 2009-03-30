@@ -466,10 +466,14 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		}
 	}
 	
-	public TreeReference addNode (TreeReference ambigRef, IAnswerData data) {
+	public TreeReference addNode (TreeReference ambigRef, IAnswerData data, int dataType) {
 		TreeReference ref = ambigRef.clone();
 		TreeElement node = createNode(ref);
 		if (node != null) {
+			if (dataType >= 0) {
+				node.dataType = dataType;
+			}
+
 			node.setValue(data);
 			return ref;
 		} else {
@@ -480,12 +484,22 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 	/*
 	 * create the specified node in the tree, creating all intermediary nodes
 	 * at each step, if necessary. if specified node already exists, return null
-	 * if multiplicity =
-	 *   ALL or == count: always create a new node at the step
-	 *   [0,count): use that specific node
+	 * 
+	 * creating a duplicate node is only allowed at the final step. it will be done
+	 * if the multiplicity of the last step is ALL or equal to the count of nodes
+	 * already there
+	 * 
+	 * at intermediate steps, the specified existing node is used; if multiplicity is ALL:
+	 * if no nodes exist, a new one is created; if one node exists, it is used; if multiple
+	 * nodes exist, it's an error
+	 *
 	 * return the newly-created node; modify ref so that it's an unambiguous ref to the node
 	 */
 	private TreeElement createNode (TreeReference ref) {
+		if (root == null) {
+			root = new TreeElement(null, 0);
+		}
+		
 		TreeElement node = root;
 		
 		for (int k = 0; k < ref.size(); k++) {
@@ -494,31 +508,46 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 			int mult = ((Integer)ref.multiplicity.elementAt(k)).intValue();
 			
 			TreeElement child;
-			if (mult >= 0 && mult < count) {
-				if (k == ref.size() - 1) {
-					return null; //final node must be a newly-created node
+			if (k < ref.size() - 1) {
+				if (mult == TreeReference.INDEX_UNBOUND) {
+					if (count > 1) {
+						return null; //don't know which node to use
+					} else {
+						//will use existing (if one and only one) or create new
+						mult = 0;
+						ref.multiplicity.setElementAt(new Integer(0), k);
+					}
 				}
 				
-				//fetch existing
+				//fetch
 				child = node.getChild(name, mult);
 				if (child == null) {
-					return null; //intermediate node does not exist, and not specified in a way that will cause it to be created
+					if (mult == 0) {
+						//create
+						child = new TreeElement(name, count);
+						node.addChild(child);
+						ref.multiplicity.setElementAt(new Integer(count), k);
+					} else {
+						return null; //intermediate node does not exist
+					}
 				}
-			} else if (mult == TreeReference.INDEX_UNBOUND || mult == count) {
-				if (k == 0 && root.getNumChildren() != 0) {
-					return null; //can only be one top-level node, and it already exists
-				}
-				
-				if (!node.isChildable()) {
-					return null; //current node can't have children
-				}
-				
-				//create new
-				child = new TreeElement(name, count);
-				node.addChild(child);
-				ref.multiplicity.setElementAt(new Integer(count), k);
 			} else {
-				return null;
+				if (mult == TreeReference.INDEX_UNBOUND || mult == count) {
+					if (k == 0 && root.getNumChildren() != 0) {
+						return null; //can only be one top-level node, and it already exists
+					}
+					
+					if (!node.isChildable()) {
+						return null; //current node can't have children
+					}
+					
+					//create new
+					child = new TreeElement(name, count);
+					node.addChild(child);
+					ref.multiplicity.setElementAt(new Integer(count), k);
+				} else {
+					return null; //final node must be a newly-created node
+				}
 			}
 		
 			node = child;
@@ -526,7 +555,53 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		
 		return node;
 	}
-
+	
+	
+//	private TreeElement createNode (TreeReference ref) {
+//		if (root == null) {
+//			root = new TreeElement(null, 0);
+//		}
+//		
+//		TreeElement node = root;
+//		
+//		for (int k = 0; k < ref.size(); k++) {
+//			String name = (String)ref.names.elementAt(k);
+//			int count = node.getChildMultiplicity(name);
+//			int mult = ((Integer)ref.multiplicity.elementAt(k)).intValue();
+//			
+//			TreeElement child;
+//			if (mult >= 0 && mult < count) {
+//				if (k == ref.size() - 1) {
+//					return null; //final node must be a newly-created node
+//				}
+//				
+//				//fetch existing
+//				child = node.getChild(name, mult);
+//				if (child == null) {
+//					return null; //intermediate node does not exist, and not specified in a way that will cause it to be created
+//				}
+//			} else if (mult == TreeReference.INDEX_UNBOUND || mult == count) {
+//				if (k == 0 && root.getNumChildren() != 0) {
+//					return null; //can only be one top-level node, and it already exists
+//				}
+//				
+//				if (!node.isChildable()) {
+//					return null; //current node can't have children
+//				}
+//				
+//				//create new
+//				child = new TreeElement(name, count);
+//				node.addChild(child);
+//				ref.multiplicity.setElementAt(new Integer(count), k);
+//			} else {
+//				return null;
+//			}
+//		
+//			node = child;
+//		}
+//		
+//		return node;
+//	}
 
 }
 
