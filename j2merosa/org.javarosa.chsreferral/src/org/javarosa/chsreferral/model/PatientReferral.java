@@ -5,6 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.util.restorable.Restorable;
+import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -21,7 +25,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @date Jan 23, 2009 
  *
  */
-public class PatientReferral implements Externalizable, IDRecordable {
+public class PatientReferral implements Externalizable, IDRecordable, Restorable {
 	private String type;
 	private Date dateReferred;
 	private String referralId;
@@ -107,7 +111,37 @@ public class PatientReferral implements Externalizable, IDRecordable {
 	public int getRecordId() {
 		return recordId;
 	}
-	
-	
+
+
+	public String getRestorableType() {
+		return "referral";
+	}
+
+	public DataModelTree exportData() {
+		DataModelTree dm = RestoreUtils.createDataModel(this);
+		RestoreUtils.addData(dm, "type", type);	
+		RestoreUtils.addData(dm, "date", dateReferred);	
+		RestoreUtils.addData(dm, "ref-id", referralId);	
+		RestoreUtils.addData(dm, "pat-id", new Integer(patientId));	
+		RestoreUtils.addData(dm, "pending", new Boolean(pending));	
+		
+		return dm;
+	}
+
+	public void templateData(DataModelTree dm, TreeReference parentRef) {
+		RestoreUtils.applyDataType(dm, "type", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "date", parentRef, Date.class);
+		RestoreUtils.applyDataType(dm, "ref-id", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "pat-id", parentRef, Integer.class);
+		RestoreUtils.applyDataType(dm, "pending", parentRef, Boolean.class);
+	}
+
+	public void importData(DataModelTree dm) {
+		type = (String)RestoreUtils.getValue("type", dm);
+		dateReferred = (Date)RestoreUtils.getValue("date", dm);
+		referralId = (String)RestoreUtils.getValue("ref-id", dm);
+		patientId = ((Integer)RestoreUtils.getValue("pat-id", dm)).intValue();
+		pending = RestoreUtils.getBoolean(RestoreUtils.getValue("pending", dm));
+	}
 
 }

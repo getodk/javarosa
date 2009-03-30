@@ -4,8 +4,15 @@ package org.javarosa.user.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.util.restorable.Restorable;
+import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -15,7 +22,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
 
-public class User implements Externalizable, IDRecordable
+public class User implements Externalizable, IDRecordable, Restorable
 {
 	//USERTYPEs
 	public static final String ADMINUSER = "admin";
@@ -32,9 +39,6 @@ public class User implements Externalizable, IDRecordable
 	
 	/** String -> String **/
 	private Hashtable properties = new Hashtable(); 
-
-	private int [] formsApplied;
-
 
 	public User ()
 	{
@@ -166,5 +170,49 @@ public class User implements Externalizable, IDRecordable
 		return (String)this.properties.get(key);
 	}
 	
+	public String getRestorableType() {
+		return "user";
+	}
 
+	public DataModelTree exportData() {
+		DataModelTree dm = RestoreUtils.createDataModel(this);
+		RestoreUtils.addData(dm, "name", username);
+		RestoreUtils.addData(dm, "pass", password);
+		RestoreUtils.addData(dm, "type", userType);
+		RestoreUtils.addData(dm, "user-id", new Integer(id));
+		RestoreUtils.addData(dm, "remember", new Boolean(rememberMe));		
+		
+		for (Enumeration e = properties.keys(); e.hasMoreElements(); ) {
+			String key = (String)e.nextElement();
+			RestoreUtils.addData(dm, "other/" + key, properties.get(key));
+		}
+				
+		return dm;
+	}
+
+	public void templateData(DataModelTree dm, TreeReference parentRef) {
+		RestoreUtils.applyDataType(dm, "name", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "pass", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "type", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "user-id", parentRef, Integer.class);
+		RestoreUtils.applyDataType(dm, "remember", parentRef, Boolean.class);
+		
+		// other/* defaults to string
+	}
+
+	public void importData(DataModelTree dm) {
+		username = (String)RestoreUtils.getValue("name", dm);
+		password = (String)RestoreUtils.getValue("pass", dm);
+		userType = (String)RestoreUtils.getValue("type", dm);
+		id = ((Integer)RestoreUtils.getValue("user-id", dm)).intValue();
+		rememberMe = RestoreUtils.getBoolean(RestoreUtils.getValue("remember", dm));
+        
+        TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));
+        for (int i = 0; i < e.getNumChildren(); i++) {
+        	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
+        	String name = child.getName();
+        	properties.put(name, RestoreUtils.getValue("other/" + name, dm));
+        }
+	}
+	
 }
