@@ -241,7 +241,7 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 		} else if (gameAction == Canvas.DOWN && keyCode != Canvas.KEY_NUM8) {
 			return true;
 		}
-		return super.handleKeyReleased(keyCode, gameAction);
+		return super.handleKeyPressed(keyCode, gameAction);
 	}
 
 	
