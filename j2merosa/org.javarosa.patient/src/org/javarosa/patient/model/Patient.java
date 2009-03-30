@@ -420,17 +420,25 @@ public class Patient implements Externalizable, IDRecordable {
 	
 	
 	public static final String ALIVE_KEY = "pat_al";
+	private static final String ALIVE_YES = "a";
+	private static final String ALIVE_NO = "d";
 	public boolean isAlive() {
-		Boolean record = (Boolean)this.records.get(ALIVE_KEY);
-		if(record != null) {
-			return record.booleanValue();
+		String record = (String)this.singles.get(ALIVE_KEY);
+		//Don't report dead patients unless there is a recorded
+		//value that says they are
+		if(ALIVE_NO.equals(record)) {
+			return false;
 		} else {
 			return true;
 		}
 	}
 	
 	public void setAlive(boolean alive) {
-		records.put(ALIVE_KEY, new Boolean(alive));
+		if(!alive) {
+			singles.put(ALIVE_KEY,ALIVE_NO);
+		} else {
+			singles.put(ALIVE_KEY, ALIVE_YES);
+		}
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
