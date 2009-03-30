@@ -12,7 +12,7 @@ import java.util.Hashtable;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapMap;
+import org.javarosa.core.util.externalizable.ExtWrapMapPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -137,7 +137,7 @@ public class Case implements Externalizable, IDRecordable {
 		closed = in.readBoolean();
 		dateOpened = new Date(in.readLong());
 		recordId = in.readInt();
-		data = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
+		data = (Hashtable)ExtUtil.read(in, new ExtWrapMapPoly(String.class, true));
 	}
 
 	/* (non-Javadoc)
@@ -150,19 +150,20 @@ public class Case implements Externalizable, IDRecordable {
 		out.writeBoolean(closed);
 		out.writeLong(dateOpened.getTime());
 		out.writeInt(recordId);
-		ExtUtil.write(out, new ExtWrapMap(data));
+		ExtUtil.write(out, new ExtWrapMapPoly(data));
+
 	}
 
 	public void setRecordId(int recordId) {
 		this.recordId = recordId;
 	}
 	
-	public void setProperty(String key, String value) {
+	public void setProperty(String key, Object value) {
 		this.data.put(key, value);
 	}
 	
-	public String getProperty(String key) {
-		return (String)data.get(key);
+	public Object getProperty(String key) {
+		return data.get(key);
 	}
 
 }
