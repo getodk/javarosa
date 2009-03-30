@@ -148,7 +148,10 @@ public class RestoreUtils {
 	}
 	
 	public static void applyDataType (DataModelTree dm, String path, TreeReference parent, Class type) {
-		int dataType = getDataType(type);
+		applyDataType(dm, path, parent, getDataType(type));
+	}
+	
+	public static void applyDataType (DataModelTree dm, String path, TreeReference parent, int dataType) {
 		TreeReference ref = childRef(path, parent);
 		
 		Vector v = dm.expandReference(ref);
