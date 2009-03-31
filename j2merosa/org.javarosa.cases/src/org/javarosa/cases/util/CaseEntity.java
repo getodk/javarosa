@@ -6,6 +6,7 @@ package org.javarosa.cases.util;
 import java.io.IOException;
 
 import org.javarosa.cases.model.Case;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entity.model.IEntity;
@@ -83,9 +84,9 @@ public class CaseEntity implements IEntity {
 		Case c = (Case)o;
 		String date;
 		if(c.getDateOpened() == null) {
-			date = "none";
+			date = "unknown";
 		} else {
-			date = c.getDateOpened().toString();
+			date = DateUtils.formatDate(c.getDateOpened(), DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 		}
 		String open;
 		if(c.isClosed()) {
