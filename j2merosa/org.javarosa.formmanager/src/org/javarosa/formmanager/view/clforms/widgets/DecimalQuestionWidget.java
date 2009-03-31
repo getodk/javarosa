@@ -6,6 +6,7 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
@@ -39,6 +40,12 @@ public class DecimalQuestionWidget extends SingleQuestionScreen
 				tf.setLabel("*"+((QuestionDef)qDef.element).getLongText()); //visual symbol for required
 				else
 					tf.setLabel(((QuestionDef)qDef.element).getLongText());
+		
+		 IAnswerData answerData = qDef.instanceNode.getValue();
+		 if((answerData!=null)&& (answerData instanceof DecimalData))
+			 tf.setString(((DecimalData)answerData).getDisplayText());
+		 
+		 
 		this.append(tf);
 		this.addNavigationButtons();
 		if (((QuestionDef)qDef.element).getHelpText()!=null){

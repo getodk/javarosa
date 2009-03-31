@@ -1,5 +1,7 @@
 package org.javarosa.formmanager.view.clforms.widgets;
 
+import java.util.Date;
+
 import javax.microedition.lcdui.DateField;
 
 import org.javarosa.core.model.QuestionDef;
@@ -35,11 +37,12 @@ public class DateQuestionWidget extends SingleQuestionScreen
 		else
 			datePicker.setLabel(((QuestionDef)qDef.element).getLongText());
 		
-		//droos: shouldn't be getting default values this way
-//		//check if the field has already been filled in by default value- if so display value
-//		if (qDef.getDefaultValue() != null){
-//			datePicker.setDate((Date)qDef.getDefaultValue());
-//		}
+		// check if the field has already been filled in by default value- if so
+		// display value
+		IAnswerData answer = qDef.instanceNode.getValue();
+		if ((answer != null) && (answer instanceof DateData)) {
+			datePicker.setDate((Date) (((DateData) answer).getValue()));
+		}
 		this.append(datePicker);
 		this.addNavigationButtons();
 		if (((QuestionDef)qDef.element).getHelpText()!=null){
