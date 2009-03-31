@@ -193,7 +193,7 @@ public class RestoreUtils {
 		parentNode.addChild(childNode);
 	}
 	
-	public static DataModelTree exportRMS (RMSUtility rmsu, Class type, String parentTag /*, RecordFilter filterExpr */) {
+	public static DataModelTree exportRMS (RMSUtility rmsu, Class type, String parentTag, IRecordFilter filter) {
 		if (!Externalizable.class.isAssignableFrom(type) || !Restorable.class.isAssignableFrom(type)) {
 			return null;
 		}
@@ -219,7 +219,7 @@ public class RestoreUtils {
 				System.err.println("grief");
 			}
 			
-			if (true /*filter expression here*/) {
+			if (filter == null || filter.filter(obj)) {
 				DataModelTree objModel = ((Restorable)obj).exportData();
 				mergeDataModel(dm, objModel, topRef(dm));
 			}
@@ -246,9 +246,7 @@ public class RestoreUtils {
 		Vector children = e.getChild(childName);
 		
 		if (idMatters) {
-			if (rmsu.getNumberOfRecords() > 0) {
-				throw new RuntimeException("RMS to be imported [" + rmsu.getName() + "] is not empty!");
-			}
+			//should we check if RMS is empty? this presents problems for users, where the admin user is already defined
 			
 			Vector recIDs = new Vector();
 			for (int i = 0; i < children.size(); i++) {
@@ -260,7 +258,6 @@ public class RestoreUtils {
 				throw new RuntimeException("Cannot restore RMS using same IDs!");
 			}
 		}
-		
 		
 		for (int i = 0; i < children.size(); i++) {
 			DataModelTree child = subDataModel((TreeElement)children.elementAt(i));
