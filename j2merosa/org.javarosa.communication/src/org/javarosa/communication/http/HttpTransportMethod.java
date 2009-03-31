@@ -216,7 +216,7 @@ public class HttpTransportMethod implements TransportMethod {
                 System.out.println("Status: " + message.getStatus());
                 //#endif
                 message.setChanged();
-                message.notifyObservers("Http Transport Failure: Security Exception"); 
+                message.notifyObservers("Http Transport Failure: Security Exception".getBytes()); 
 		    }finally {
 				cleanUp(in);
 				cleanUp(out);
