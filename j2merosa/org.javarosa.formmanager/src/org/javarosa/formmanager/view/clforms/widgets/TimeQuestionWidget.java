@@ -1,8 +1,11 @@
 package org.javarosa.formmanager.view.clforms.widgets;
 
+import java.util.Date;
+
 import javax.microedition.lcdui.DateField;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.formmanager.view.FormElementBinding;
@@ -35,15 +38,17 @@ public class TimeQuestionWidget extends SingleQuestionScreen
 				else
 					timePicker.setLabel(((QuestionDef)qDef.element).getLongText());
 
-		 //droos: shouldn't be getting default values this way
-//		 //check if the field has already been filled in by default value- if so display value
-//		if (qDef.getDefaultValue() != null){
-//			timePicker.setDate((Date)qDef.getDefaultValue());
-//		}
+		// check if the field has already been filled in by default value- if so
+		// display value
+		IAnswerData answer = qDef.instanceNode.getValue();
+		if ((answer != null) && (answer instanceof TimeData)) {
+			timePicker.setDate((Date) (((TimeData) answer).getValue()));
+		}
+
 		this.append(timePicker);
 		this.addNavigationButtons();
-		if (((QuestionDef)qDef.element).getHelpText()!=null){
-			setHint(((QuestionDef)qDef.element).getHelpText());
+		if (((QuestionDef) qDef.element).getHelpText() != null) {
+			setHint(((QuestionDef) qDef.element).getHelpText());
 		}
 	}
 

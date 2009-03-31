@@ -42,13 +42,29 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 			cg = new ChoiceGroup(((QuestionDef)qDef.element).getLongText(),ChoiceGroup.EXCLUSIVE );}
 
 		Enumeration itr = ((QuestionDef)qDef.element).getSelectItems().keys();//access choices directly
-		int i = 0;
+		
+		int preselectionIndex=-1; //index of the preset value for the question, if any
+		String preselectionLabel=qDef.instanceNode.getValue()!=null?qDef.instanceNode.getValue().getDisplayText():null;
+		int count = 0;
+		
 		while (itr.hasMoreElements()) {
 			String label = (String) itr.nextElement();
+			
+			//check if the value is equal to the preset for this question
+			if ((preselectionLabel!=null)&&(label.equals(preselectionLabel)))
+				preselectionIndex=count;
+			
 			cg.append(label, null);//add options to choice group
-			i++;
+			
+			count++;
 		}
 		this.append(cg);
+		
+		//set the selection to the preset value, if any
+		if ((preselectionIndex>-1)&&(preselectionIndex < cg.size()))
+			cg.setSelectedIndex(preselectionIndex, true);
+		
+		
 		this.addNavigationButtons();
 		if (((QuestionDef)qDef.element).getHelpText()!=null){
 			setHint(((QuestionDef)qDef.element).getHelpText());

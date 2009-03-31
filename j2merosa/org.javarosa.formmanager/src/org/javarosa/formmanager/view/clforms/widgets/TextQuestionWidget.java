@@ -34,6 +34,11 @@ public class TextQuestionWidget extends SingleQuestionScreen {
 				tf.setLabel("*"+((QuestionDef)qDef.element).getLongText()); //visual symbol for required
 				else
 					tf.setLabel(((QuestionDef)qDef.element).getLongText());
+		 
+		 IAnswerData answerData = qDef.instanceNode.getValue();
+		 if((answerData!=null)&& (answerData instanceof StringData))
+			 tf.setString(((StringData)answerData).getDisplayText());
+		 
 		this.append(tf);
 		this.addNavigationButtons();
 		if (((QuestionDef)qDef.element).getHelpText()!=null){
