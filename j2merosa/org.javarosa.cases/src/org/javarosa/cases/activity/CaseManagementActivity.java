@@ -3,7 +3,9 @@
  */
 package org.javarosa.cases.activity;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -35,12 +37,21 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 	public static final String VIEW_OPEN = "View Open Cases";
 	public static final String RESOLVE = "Resolve Case";
 
+	Vector commands = new Vector();
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
 	 */
 	public void annotateCommand(ICommand command) {
-		// TODO Auto-generated method stub
-
+		this.commands.addElement(command);
+	}
+	
+	private void initCommands() {
+		Enumeration en = commands.elements();
+		while(en.hasMoreElements()) {
+			ICommand command = (ICommand)en.nextElement();
+			view.addCommand((Command)command.getCommand());
+		}
 	}
 
 	/* (non-Javadoc)
@@ -103,6 +114,7 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 		view.append(FOLLOWUP, null);
 		view.append(VIEW_OPEN, null);
 		view.append(RESOLVE, null);
+		initCommands();
 	}
 
 	public void commandAction(Command c, Displayable arg1) {
@@ -116,7 +128,16 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 				Hashtable returnArgs = new Hashtable();
 				shell.returnFromActivity(this, Constants.ACTIVITY_CANCEL,
 						returnArgs);
+		} else {
+			Hashtable returnArgs = new Hashtable();
+			Enumeration annotations = commands.elements();
+			while(annotations.hasMoreElements()) {
+				ICommand com = (ICommand)annotations.nextElement();
+				if(c.equals(com.getCommand())) {
+					returnArgs.put(Constants.RETURN_ARG_KEY, com.getCommandId());
+					this.shell.returnFromActivity(this,Constants.ACTIVITY_COMPLETE, returnArgs); 
+				}
+			}
 		}
 	}
-
 }
