@@ -1,5 +1,6 @@
 package org.javarosa.communication.http;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,7 +15,6 @@ import javax.microedition.lcdui.AlertType;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
-import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -168,26 +168,38 @@ public class HttpTransportMethod implements TransportMethod {
 				System.out.println("Content type: " + type);
 
 				// Get the length and process the data
-				int len = (int) con.getLength();
-				if (len > 0) {
-					int actual = 0;
-					int bytesread = 0;
-					byte[] data = new byte[len];
-					while ((bytesread != len) && (actual != -1)) {
-						actual = in.read(data, bytesread, len - bytesread);
-						bytesread += actual;
+				byte[] data;
+				int len = (int)con.getLength();
+				int read;
+				if (len >= 0) {
+					data = new byte[len];
+					read = 0;
+					while (read < len) {
+						int k = in.read(data, read, len - read);
+						if (k == -1)
+							break;
+						read += k;
 					}
-					process(data);
-					//#if debug.output==verbose
-					System.out.println("PRCSS DATA end");
-					//#endif
 				} else {
-					int ch;
-					while ((ch = in.read()) != -1) {
-						process((byte) ch);
+					ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+					while (true) {
+						int b = in.read();
+						if (b == -1) {
+							break;
+						}
+						buffer.write(b);
 					}
+					data = buffer.toByteArray();
+					read = data.length;
 				}
 
+				System.out.println(read + " bytes read");
+				if (len > 0 && read < len) {
+					System.out.println("WARNING: expected " + len + "!!");
+				}
+				System.out.println(new String(data, "UTF-8"));
+				process(data);
+				
 				// update status
 				message.setStatus(TransportMessage.STATUS_DELIVERED);
 				//#if debug.output==verbose

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
@@ -22,6 +23,8 @@ import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.patient.model.Patient;
+import org.javarosa.patient.storage.PatientRMSUtility;
 
 public class RestoreUtils {
 	public static final String RECORD_ID_TAG = "rec-id";
@@ -234,7 +237,12 @@ public class RestoreUtils {
 		return new DataModelTree(newTop);
 	}
 	
-	public static void importRMS(DataModelTree dm, RMSUtility rmsu, Class type, String path) {
+	public static void exportRMS (DataModelTree parent, Class type, String grouperName, RMSUtility rmsu, IRecordFilter filter) {
+		DataModelTree entities = RestoreUtils.exportRMS(rmsu, type, grouperName, filter);
+		RestoreUtils.mergeDataModel(parent, entities, ".");
+	}
+	
+	public static void importRMS (DataModelTree dm, RMSUtility rmsu, Class type, String path) {
 		if (!Externalizable.class.isAssignableFrom(type) || !Restorable.class.isAssignableFrom(type)) {
 			return;
 		}
