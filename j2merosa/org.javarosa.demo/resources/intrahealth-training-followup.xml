@@ -133,7 +133,8 @@
       <bind nodeset="site/region" required="true()" jr:preload="property" jr:preloadParams="Region" />
  <!-- there is no one 'district' or 'facility' question due to drill-down hack 
       <bind nodeset="site/district" required="true()" jr:preload="property" jr:preloadParams="District" />
-      <bind nodeset="site/facility" required="true()" /> -->
+      <bind nodeset="site/facility" required="true()" />
+  -->
       <bind nodeset="trainer" required="true()" /> <!-- default from user login? -->
       <bind nodeset="trainee" required="true()" />
 
