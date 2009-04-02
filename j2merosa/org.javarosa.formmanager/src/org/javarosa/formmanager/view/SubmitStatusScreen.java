@@ -25,10 +25,17 @@ public class SubmitStatusScreen extends Form implements ISubmitStatusScreen {
     public static final int TIMEOUT = 60000;
 
     public static String MSG_SENDING = "Sending...";
-    public static String MSG_SUCCESS = "Form has been submitted successfully! Your reference is: ";
-    public static String MSG_FAILED = "Submission failed! Please try to submit the form again later in 'View Saved'.";
-    public static String MSG_TOO_LONG = "Sending is taking a long time; you may check on the status and/or resend later in 'View Saved'";
-    public static String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
+  //#if commcare.lang.sw
+    public static final String MSG_SUCCESS = "Ujumbe umepokelewa!";
+    public static final String MSG_FAILED = "Ujumbe haujapokelewa ila umehifadhiwa.";
+    public static final String MSG_TOO_LONG = "Ujumbe haujapokelewa ila umehifadhiwa.";
+    public static final String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
+    //#else
+    public static final String MSG_SUCCESS = "Form has been submitted successfully! Your reference is: ";
+    public static final String MSG_FAILED = "Submission failed! Please try to submit the form again later in 'View Saved'.";
+    public static final String MSG_TOO_LONG = "Sending is taking a long time; you may check on the status and/or resend later in 'View Saved'";
+    public static final String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
+    //#endif
     
     public SubmitStatusScreen (CommandListener listener) {
     	this(listener, -1);

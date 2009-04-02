@@ -40,13 +40,22 @@ public class MultiSubmitStatusScreen extends Form implements ISubmitStatusScreen
     public static final int REFRESH_INTERVAL = 1000;
     public static final int TIMEOUT = 180000;
 
+    //#if commcare.lang.sw
+    public static final String MSG_N_COMP = "Umefanikiwa kutuma Fomu ";
+    public static final String MSG_SENDING_N = "\nSasa fomu ";
+    public static final String MSG_SUCCESS = "Ujumbe umepokelewa!";
+    public static final String MSG_FAILED = "Ujumbe haujapokelewa ila umehifadhiwa.";
+    public static final String MSG_TOO_LONG = "Ujumbe haujapokelewa ila umehifadhiwa.";
+    public static final String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
+    //#else
     public static final String MSG_N_COMP = "Succesfully Transmitted Form ";
     public static final String MSG_SENDING_N = "\nCurrently Sending Form ";
-    public static String MSG_SUCCESS = "Forms have been submitted successfully! Your reference is: ";
-    public static String MSG_FAILED = "Submission failed! Please try to submit the form again later in 'View Saved'.";
-    public static String MSG_TOO_LONG = "Sending is taking a long time; you may check on the status and/or resend later in 'View Saved'";
-    public static String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
-    
+    public static final String MSG_SUCCESS = "Form has been submitted successfully! Your reference is: ";
+    public static final String MSG_FAILED = "Submission failed! Please try to submit the form again later in 'View Saved'.";
+    public static final String MSG_TOO_LONG = "Sending is taking a long time; you may check on the status and/or resend later in 'View Saved'";
+    public static final String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
+    //#endif
+        
 	public MultiSubmitStatusScreen (CommandListener listener, int[] modelIDs) {
     	//#style submitPopup
 		super("Send Status");
@@ -106,7 +115,13 @@ public class MultiSubmitStatusScreen extends Form implements ISubmitStatusScreen
 	}
 	
 	private String getCurrentDisplay() {
-		return MSG_N_COMP + currentid + " of " + modelIDs.length + MSG_SENDING_N + (currentid+1) + " of " + modelIDs.length; 
+		String s = "";
+	    //#if commcare.lang.sw
+		s = MSG_N_COMP + currentid + " kati ya " + modelIDs.length + MSG_SENDING_N + (currentid+1) + " kati ya " + modelIDs.length + " inaenda";
+		//#else
+		s = MSG_N_COMP + currentid + " of " + modelIDs.length + MSG_SENDING_N + (currentid+1) + " of " + modelIDs.length;
+		//#endif
+		return s;
 	}
 	
 	public void destroy () {
