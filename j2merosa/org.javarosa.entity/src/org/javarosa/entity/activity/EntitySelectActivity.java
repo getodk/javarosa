@@ -148,7 +148,7 @@ public class EntitySelectActivity implements IActivity {
 	
 	public void itemSelected (int i) {
 		IEntity entity = (IEntity)entities.elementAt(i);
-		EntitySelectDetailPopup psdp = new EntitySelectDetailPopup(this, entity, entityRMS);
+		EntitySelectDetailPopup psdp = new EntitySelectDetailPopup(this, entity, entityPrototype, entityRMS);
 		psdp.show();
 	}
 	

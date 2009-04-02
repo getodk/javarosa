@@ -4,6 +4,7 @@
 package org.javarosa.cases.util;
 
 import org.javarosa.core.model.utils.IModelProcessor;
+import org.javarosa.entity.model.IEntity;
 
 /**
  * @author Clayton Sims
@@ -24,4 +25,5 @@ public interface ICaseType {
 	
 	public IModelProcessor getModelProcessor(String formType);
 	
+	public IEntity getUniqueEntity();
 }

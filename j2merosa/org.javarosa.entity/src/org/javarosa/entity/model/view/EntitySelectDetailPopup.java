@@ -26,15 +26,15 @@ public class EntitySelectDetailPopup extends Form implements IView, CommandListe
 	Command okCmd;
 	Command backCmd;
 	
-	public EntitySelectDetailPopup (EntitySelectActivity psa, IEntity entity, RMSUtility entityRMS) {
+	public EntitySelectDetailPopup (EntitySelectActivity psa, IEntity entity, IEntity prototype, RMSUtility entityRMS) {
 		super(entity.entityType() + " Detail");
 		
 		this.psa = psa;
 		
 		recordID = entity.getRecordID();
 		Object o = entity.fetchRMS(entityRMS);
-		headers = entity.getHeaders(true);
-		data = entity.getLongFields(o);
+		headers = prototype.getHeaders(true);
+		data = prototype.getLongFields(o);
 		
 		okCmd = new Command("OK", Command.OK, 1);
 		backCmd = new Command("Back", Command.BACK, 1);
