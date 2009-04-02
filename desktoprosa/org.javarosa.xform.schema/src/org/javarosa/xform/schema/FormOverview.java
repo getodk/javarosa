@@ -69,10 +69,13 @@ public class FormOverview {
 		String caption = q.getLongText();
 		int type = instanceNode.dataType;
 		
-		println(sb, indent, "Question: \"" + caption + "\"");
-		
-		println(sb, indent + 1, "Type: " + printType(type));
-
+		if (q.getControlType() != Constants.CONTROL_TRIGGER) {
+			println(sb, indent, "Question: \"" + caption + "\"");
+			println(sb, indent + 1, "Type: " + printType(type));
+		} else {
+			println(sb, indent, "Info: \"" + caption + "\"");
+		}
+			
 		if (q.getControlType() == Constants.CONTROL_SELECT_ONE || q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
 			printChoices(q, indent + 1, sb);
 		}
