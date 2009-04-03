@@ -551,6 +551,9 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
     
 	private void computeHeaders() {
+		// Clayton Sims - Apr 3, 2009 : Changed this. Appeared to be an artifact of an
+		// old strategy? Tested it and it seems to work, but if header pinning starts acting
+		// weird, this is a place to look.
 		int threshold = 0;//this.contentY;
 		//bar.clearSpans();
 		if(this.topFrame != null && this.topFrame.size() != 0) {
@@ -572,7 +575,6 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		if(cw.isPinned()) {
     			//if(cw.getAbsoluteY() + cw.getContentHeight() < threshold ) {
 	    		if(cw.getAbsoluteY() + cw.getPinnableHeight() < threshold ) {
-	    			System.out.println("Setting a pinned header at " + cw.getAbsoluteY() + cw.getPinnableHeight() + " With  threshhold " + threshold);
 	    			//#style questiontext
 	    	    	StringItem item2 = new StringItem("","");
 	    	    	headers.addElement(cw.generateHeader());
