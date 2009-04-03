@@ -551,10 +551,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
     
 	private void computeHeaders() {
-		int threshold = this.contentY;
+		int threshold = 0;//this.contentY;
 		//bar.clearSpans();
 		if(this.topFrame != null && this.topFrame.size() != 0) {
-			threshold += this.topFrame.getContentHeight();		
+			threshold += this.topFrame.getContentHeight();	
 		}
 		Vector headers = new Vector();
     	for (int i = 0; i < size(); i++) {
@@ -572,6 +572,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		if(cw.isPinned()) {
     			//if(cw.getAbsoluteY() + cw.getContentHeight() < threshold ) {
 	    		if(cw.getAbsoluteY() + cw.getPinnableHeight() < threshold ) {
+	    			System.out.println("Setting a pinned header at " + cw.getAbsoluteY() + cw.getPinnableHeight() + " With  threshhold " + threshold);
 	    			//#style questiontext
 	    	    	StringItem item2 = new StringItem("","");
 	    	    	headers.addElement(cw.generateHeader());
