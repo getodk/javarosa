@@ -8,6 +8,7 @@ import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
+import de.enough.polish.ui.MoreUIAccess;
 
 /**
  * The base widget for multi and single choice selections.
@@ -71,6 +72,10 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 				}
 			}
 			
+			public int getScrollHeight() {
+				return super.getScrollHeight();
+			}
+			
 			/** Hack #2 **/
 			//This is a slight UI hack that is in place to make the choicegroup properly
 			//intercept 'up' and 'down' inputs. Essentially Polish is very broken when it comes
@@ -91,11 +96,22 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 					
 					//Walk our parent containers and accumulate their offsets.
 					while(walker instanceof Container) {
-						offset += walker.relativeY;
+						// Clayton Sims - Apr 3, 2009 : 
+						// If the container can scroll, it's relativeY is useless, it's in a frame and
+						// the relativeY isn't actually applicable.
+						// Actually, this should almost certainly _just_ break out of the loop if
+						// we hit something that scrolls, but if we have multiple scrolling containers
+						// nested, someone _screwed up_.
+						if(!MoreUIAccess.isScrollingContainer((Container)walker)) {
+							offset += walker.relativeY;
+						}
 						walker = walker.getParent();
 					}
-					//This line here (The + offest part) is the fix.
-					return ((Container)this.parent).getScrollYOffset() + this.relativeY + offset;
+					
+					//The value returned here (The + offest part) is the fix.
+					int absOffset = ((Container)this.parent).getScrollYOffset() + this.relativeY + offset;
+					
+					return absOffset;
 					
 					// Clayton Sims - Feb 10, 2009 : Rolled back because it doesn't work on the 3110c, apparently!
 					// Fixing soon.
