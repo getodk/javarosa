@@ -5,8 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.util.SelectorParser;
 
@@ -71,13 +72,13 @@ public class NumericalRecord implements IPatientRecord {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		numericalRecordEntries = ExternalizableHelperDeprecated.readExternal(in, NumericalRecordEntry.class);
+		numericalRecordEntries = (Vector)ExtUtil.read(in, new ExtWrapList(NumericalRecordEntry.class));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelperDeprecated.writeExternal(numericalRecordEntries, out);		
+		ExtUtil.write(out, new ExtWrapList(numericalRecordEntries));
 	}
 }

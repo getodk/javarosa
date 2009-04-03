@@ -5,9 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -84,8 +85,7 @@ public class StudyDefList implements Externalizable {
 	 * @throws IllegalAccessException
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		if(!ExternalizableHelperDeprecated.isEOF(in))
-			setStudies(ExternalizableHelperDeprecated.readBig(in,new StudyDef().getClass()));
+		setStudies(ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(StudyDef.class))));
 		
 	}
 
@@ -96,7 +96,7 @@ public class StudyDefList implements Externalizable {
 	 * @throws IOException
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelperDeprecated.writeBig(getStudies(), out);
+		ExtUtil.write(out, new ExtWrapList(ExtUtil.emptyIfNull(getStudies())));
 		
 	}
 
