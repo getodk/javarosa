@@ -551,14 +551,15 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
     
 	private void computeHeaders() {
-		// Clayton Sims - Apr 3, 2009 : Changed this. Appeared to be an artifact of an
-		// old strategy? Tested it and it seems to work, but if header pinning starts acting
-		// weird, this is a place to look.
-		int threshold = 0;//this.contentY;
+		int threshold = this.contentY;
 		//bar.clearSpans();
-		if(this.topFrame != null && this.topFrame.size() != 0) {
-			threshold += this.topFrame.getContentHeight();	
-		}
+		
+		// Clayton Sims - Apr 3, 2009 : Removed this code. Tested on the MediaControlSkin
+		// and the 3110c, and it seems to be behaving correctly now. this should all
+		// be handled by this.contentY above.
+		//if(this.topFrame != null && this.topFrame.size() != 0) {
+		//	threshold += this.topFrame.getContentHeight();	
+		//}
 		Vector headers = new Vector();
     	for (int i = 0; i < size(); i++) {
     		ChatterboxWidget cw = getWidgetAtIndex(i);
@@ -593,6 +594,13 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
         	}
         	if(newHeaders.length == 0) {
         		this.calculateContentArea(0, 0,this.getWidth(), this.getHeight());
+        	}
+        	
+        	if(this.topFrame != null) {
+        		// Clayton Sims - Apr 3, 2009 
+        		//Nuclear Option: Just figure everything out again.
+        		//Might slow down bad phones. Not sure yet.
+        		this.topFrame.requestFullInit();
         	}
     	}
     }
