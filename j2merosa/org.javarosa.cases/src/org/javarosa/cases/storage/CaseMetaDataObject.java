@@ -10,7 +10,6 @@ import java.io.IOException;
 import org.javarosa.cases.model.Case;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
