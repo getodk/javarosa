@@ -889,8 +889,6 @@ public class XFormParser {
 		instanceModel.setName(f.getTitle());
 		
 		String schema = e.getNamespace();
-		System.out.println("a: [" + schema + "]");
-		System.out.println("b: [" + defaultNamespace + "]");
 		if (schema != null && schema.length() > 0 && !schema.equals(defaultNamespace)) {
 			instanceModel.schema = schema;
 		}
