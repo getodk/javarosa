@@ -8,7 +8,6 @@ import j2meunit.framework.TestSuite;
 import org.javarosa.core.util.externalizable.ExtWrapIntEncoding;
 import org.javarosa.core.util.externalizable.ExtWrapIntEncodingSmall;
 import org.javarosa.core.util.externalizable.ExtWrapIntEncodingUniform;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 
 public class NumericEncodingTest extends TestCase  {
 	public NumericEncodingTest(String name, TestMethod rTestMethod) {
