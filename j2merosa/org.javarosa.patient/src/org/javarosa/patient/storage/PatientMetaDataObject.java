@@ -5,8 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.model.Patient;
 
@@ -81,7 +82,7 @@ public class PatientMetaDataObject extends MetaDataObject {
         this.patientRecordId = in.readInt();
         
         this.patientName = in.readUTF();
-        this.patientId = ExternalizableHelperDeprecated.readUTF(in);
+        this.patientId = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
     }
 
    
@@ -95,7 +96,8 @@ public class PatientMetaDataObject extends MetaDataObject {
     	out.writeInt(this.getPatientRecordId());
     	
     	out.writeUTF(this.getName());
-    	ExternalizableHelperDeprecated.writeUTF(out, this.patientId);
+   
+		ExtUtil.write(out, new ExtWrapNullable(this.patientId));
     }
 
     /*

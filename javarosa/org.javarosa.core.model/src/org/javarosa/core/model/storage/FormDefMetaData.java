@@ -8,7 +8,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -81,7 +81,7 @@ public class FormDefMetaData extends MetaDataObject
      */
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
     	super.readExternal(in, pf);
-        this.formName = ExternalizableHelperDeprecated.readUTF(in);
+        this.formName = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
         this.formTitle = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
         this.version = in.readInt();
         this.type = in.readInt();
@@ -94,7 +94,7 @@ public class FormDefMetaData extends MetaDataObject
     public void writeExternal(DataOutputStream out) throws IOException
     {
     	super.writeExternal(out);
-        ExternalizableHelperDeprecated.writeUTF(out,this.formName);
+		ExtUtil.write(out, new ExtWrapNullable(this.formName));
         ExtUtil.writeString(out,ExtUtil.emptyIfNull(this.formTitle));
         out.writeInt(this.version);
         out.writeInt(type);

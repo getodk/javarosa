@@ -7,12 +7,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Enumeration;
 
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -72,13 +71,13 @@ public class ImmunizationRow implements Externalizable {
 	 * @see org.javarosa.core.util.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		vaccinationName = ExternalizableHelperDeprecated.readUTF(in);
+		vaccinationName = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
 		
 		for(int i = 0 ; i < 5 ; i++) {
 			vaccinationDoses[i] = in.readInt();
 		}
 		for(int i = 0 ; i < 5 ; i++) {
-			vaccinationDates[i] = ExternalizableHelperDeprecated.readDate(in);
+			vaccinationDates[i] = (Date)ExtUtil.read(in, new ExtWrapNullable(Date.class));
 		}
 		for(int i = 0 ; i < 5 ; i++) {
 			cellEnabled[i] = in.readBoolean();
@@ -90,13 +89,13 @@ public class ImmunizationRow implements Externalizable {
 	 * @see org.javarosa.core.util.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelperDeprecated.writeUTF(out, vaccinationName);
+		ExtUtil.write(out, new ExtWrapNullable(vaccinationName));
 		
 		for(int i = 0 ; i < 5 ; i++) {
 			out.writeInt(vaccinationDoses[i]);
 		}
 		for(int i = 0 ; i < 5 ; i++) {
-			ExternalizableHelperDeprecated.writeDate(out, vaccinationDates[i]);
+			ExtUtil.write(out, new ExtWrapNullable(vaccinationDates[i]));
 		}
 		for(int i = 0 ; i < 5 ; i++) {
 			out.writeBoolean(cellEnabled[i]);

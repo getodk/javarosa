@@ -5,9 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -37,7 +38,7 @@ public class DateValueTuple implements Externalizable {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		date = ExternalizableHelperDeprecated.readDate(in);
+		date = (Date)ExtUtil.read(in, new ExtWrapNullable(Date.class));
 		value = in.readInt();
 		
 	}
@@ -46,7 +47,7 @@ public class DateValueTuple implements Externalizable {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	 public void writeExternal(DataOutputStream out) throws IOException {
-		 ExternalizableHelperDeprecated.writeDate(out, date);
+		 ExtUtil.write(out, new ExtWrapNullable(date));
 		 out.writeInt(value);
 	 }
 	

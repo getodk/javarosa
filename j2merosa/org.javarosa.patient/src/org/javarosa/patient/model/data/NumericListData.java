@@ -7,8 +7,9 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.model.IPatientRecord;
 import org.javarosa.patient.util.DateValueTuple;
@@ -124,17 +125,14 @@ public class NumericListData implements IAnswerData, IPatientRecord {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		valueList = ExternalizableHelperDeprecated.readExternal(in, DateValueTuple.class);
-		if(valueList == null) {
-			valueList = new Vector();
-		}
+		valueList = (Vector)ExtUtil.read(in, new ExtWrapList(DateValueTuple.class));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	 public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelperDeprecated.writeExternal(valueList, out);
+		 ExtUtil.write(out, new ExtWrapList(valueList));
 	}
 
 	public IAnswerData clone() {

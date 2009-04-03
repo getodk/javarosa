@@ -17,14 +17,12 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
-import org.javarosa.core.util.Map;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.ImmunizationRow;
@@ -51,8 +49,6 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
 	/** RMS Record Id */
 	private int recordId = INVALID_RECORD_ID;
 	
-	/** Patient's medical record ID. Is made Integer instead of int because new patients dont have it. */
-	Integer patientId; //patientid 
 	String prefix;
 	
 	String familyName;  	/** Patient's Family name */
@@ -70,7 +66,7 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
 	
 
 	/* String->NumericListData */
-	private Map records = new Map();
+	private Hashtable records = new Hashtable();
 	
 	/* String->String */
 	private Hashtable singles = new Hashtable();
@@ -257,27 +253,6 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
 
 		return s.toUpperCase();
 	}
-
-	/**
-	 * Gets the current patient's Id
-	 * @return An Id number representing this patient. Negative ID's are 
-	 * assigned to new patients that have not been synchronized with a server.
-	 */
-	public Integer getPatientId() {
-		//For now, new patients have negative ids. assuming server does not assign negatives
-		//We use recordid value because is takes care of generating new ids for us.
-		if(isNewPatient())
-			return new Integer(-getRecordId());
-		
-		return patientId;
-	}
-
-	/**
-	 * @param patientId the patientId to set
-	 */
-	public void setPatientId(Integer patientId) {
-		this.patientId = patientId;
-	}
 	
 	public void setVaccinations(ImmunizationData data ){
 		this.vaccinationData = data;
@@ -335,7 +310,7 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
 		return record.getHistoricalRecords(selector);
 	}
 	
-	public void setRecord(String recordType, IPatientRecord record) {
+	public void setRecord(String recordType, NumericListData record) {
 		records.put(recordType, record);
 	}
 	
@@ -418,7 +393,7 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
 			s += " (NEW)";
 
 		if(s == null)
-			s = "NAMELESS PatientId="+getPatientId();
+			s = "NAMELESS PatientId="+getPatientIdentifier();
 		return s;
 	}
 	
@@ -446,44 +421,38 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
 	}
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		recordId = in.readInt();
-	
-		setPatientId(ExternalizableHelperDeprecated.readInteger(in));
-		setPrefix(ExternalizableHelperDeprecated.readUTF(in));
-		setFamilyName(ExternalizableHelperDeprecated.readUTF(in));
-		setMiddleName(ExternalizableHelperDeprecated.readUTF(in));
-		setGivenName(ExternalizableHelperDeprecated.readUTF(in));
-		setGender(ExternalizableHelperDeprecated.readNumInt(in, ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT));
-		setBirthDate(ExternalizableHelperDeprecated.readDate(in));
-		setTreatmentStartDate(ExternalizableHelperDeprecated.readDate(in));
-		setPatientIdentifier(ExternalizableHelperDeprecated.readUTF(in));
-		setNewPatient(in.readBoolean());
+		recordId = ExtUtil.readInt(in);
+		setPrefix((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+		setFamilyName((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+		setMiddleName((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+		setGivenName((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+		setGender(ExtUtil.readInt(in));
+		setBirthDate((Date)ExtUtil.read(in, new ExtWrapNullable(Date.class), pf));
+		setTreatmentStartDate((Date)ExtUtil.read(in, new ExtWrapNullable(Date.class), pf));
+		setPatientIdentifier((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
+		setNewPatient(ExtUtil.readBool(in));
 
-		vaccinationData = new ImmunizationData();
-		vaccinationData.readExternal(in, pf);
+		vaccinationData = (ImmunizationData)ExtUtil.read(in, ImmunizationData.class);
 		
-		records = ExternalizableHelperDeprecated.readExternalStringValueMap(in, NumericListData.class);
-		//singles = ExternalizableHelperDeprecated.readExternalStringValueMap(in, String.class);
+		records = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, NumericListData.class));
 		singles = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeInt(recordId);
-			
-		ExternalizableHelperDeprecated.writeInteger(out,getPatientId());
-		ExternalizableHelperDeprecated.writeUTF(out, getPrefix());
-		ExternalizableHelperDeprecated.writeUTF(out, getFamilyName());
-		ExternalizableHelperDeprecated.writeUTF(out, getMiddleName());
-		ExternalizableHelperDeprecated.writeUTF(out, getGivenName());
-		ExternalizableHelperDeprecated.writeNumeric(out, getGender(), ExternalizableHelperDeprecated.ENCODING_NUM_DEFAULT);
-		ExternalizableHelperDeprecated.writeDate(out, getBirthDate());
-		ExternalizableHelperDeprecated.writeDate(out, getTreatmentStartDate());
-		ExternalizableHelperDeprecated.writeUTF(out, getPatientIdentifier());
-		out.writeBoolean(isNewPatient());
+		ExtUtil.writeNumeric(out, recordId);
+		ExtUtil.write(out, new ExtWrapNullable(getPrefix()));
+		ExtUtil.write(out, new ExtWrapNullable(getFamilyName()));
+		ExtUtil.write(out, new ExtWrapNullable(getMiddleName()));
+		ExtUtil.write(out, new ExtWrapNullable(getGivenName()));
+		ExtUtil.writeNumeric(out, getGender());
+		ExtUtil.write(out, new ExtWrapNullable(getBirthDate()));
+		ExtUtil.write(out, new ExtWrapNullable(getTreatmentStartDate()));
+		ExtUtil.write(out, new ExtWrapNullable(getPatientIdentifier()));
+		ExtUtil.writeBool(out, isNewPatient());
 		
-		vaccinationData.writeExternal(out);
+		ExtUtil.write(out, vaccinationData);
 		
-		ExternalizableHelperDeprecated.writeExternalStringValueMap(out, records);
+		ExtUtil.write(out, new ExtWrapMap(records));
 		ExtUtil.write(out, new ExtWrapMap(singles));
 	}
 	
@@ -494,15 +463,7 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
 	public String getIdentifier(){
 		return getPatientIdentifier();
 	}
-	
-	public Integer getId(){
-		return getPatientId();
-	}
-	
-	public void setId(Integer id){
-		setPatientId(id);
-	}
-	
+		
 	//NOTE: This class is still super-shoddy. The things below aren't really well written.
 	//The system of attributes and individual values should be written, well, _better_.
 	

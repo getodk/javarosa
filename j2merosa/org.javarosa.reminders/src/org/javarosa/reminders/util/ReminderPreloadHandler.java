@@ -31,11 +31,7 @@ public class ReminderPreloadHandler implements IPreloadHandler {
 		if(dateData != null) {
 			Date date = (Date)dateData.getValue();
 			String patientName = patient.getName();
-			Integer patientIdValue = patient.getId();
-			int patientId = -1;
-			if(patientIdValue != null) {
-				patientId = patientIdValue.intValue();
-			}
+			int patientId = patient.getRecordId();
 			Reminder reminder = new Reminder(date,patientId,patientName, "Follow up with " + patientName, "Follow up");
 			reminderRms.writeToRMS(reminder);
 		}

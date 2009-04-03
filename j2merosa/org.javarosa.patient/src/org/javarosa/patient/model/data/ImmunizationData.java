@@ -6,16 +6,17 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * @author Clayton Sims
  *
  */
-public class ImmunizationData {
+public class ImmunizationData implements Externalizable {
 
 	/** ImmunizationRow */
 	Vector rows;
@@ -57,14 +58,14 @@ public class ImmunizationData {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		rows = ExternalizableHelperDeprecated.readExternal(in,ImmunizationRow.class);
+		rows = (Vector)ExtUtil.read(in, new ExtWrapList(ImmunizationRow.class));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExternalizableHelperDeprecated.writeExternal(rows, out);
+		ExtUtil.write(out, new ExtWrapList(rows));
 	}
 	public ImmunizationData clone() {
 		ImmunizationData clone = new ImmunizationData();

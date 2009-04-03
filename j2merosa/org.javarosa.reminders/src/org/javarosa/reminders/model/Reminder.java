@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -141,22 +143,22 @@ public class Reminder implements Externalizable, IDRecordable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		reminderId = in.readInt();
 		
-		followUpDate = ExternalizableHelperDeprecated.readDate(in);
+		followUpDate = (Date)ExtUtil.read(in, new ExtWrapNullable(Date.class));
 		patientId = in.readInt();
-		patientName = ExternalizableHelperDeprecated.readUTF(in);
-		title = ExternalizableHelperDeprecated.readUTF(in);
-		text = ExternalizableHelperDeprecated.readUTF(in);
+		patientName = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
+		title = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
+		text = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
 		notified = in.readBoolean();
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		out.writeInt(reminderId);
 		
-		ExternalizableHelperDeprecated.writeDate(out, followUpDate);
+		ExtUtil.write(out, new ExtWrapNullable(followUpDate));
 		out.writeInt(patientId);
-		ExternalizableHelperDeprecated.writeUTF(out, patientName);
-		ExternalizableHelperDeprecated.writeUTF(out, title);
-		ExternalizableHelperDeprecated.writeUTF(out, text);
+		ExtUtil.write(out, new ExtWrapNullable(patientName));
+		ExtUtil.write(out, new ExtWrapNullable(title));
+		ExtUtil.write(out, new ExtWrapNullable(text));
 		out.writeBoolean(notified);
 	}	
 }
