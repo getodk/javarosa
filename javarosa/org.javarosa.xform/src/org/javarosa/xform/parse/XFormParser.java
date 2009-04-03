@@ -65,7 +65,8 @@ public class XFormParser {
 	private static Vector selectOnes; //TreeReference
 	private static Vector selectMultis; //TreeReference
 	private static Element instanceNode; //top-level data node of the instance; saved off so it can be processed after the <bind>s
-
+	private static String defaultNamespace;
+	
 	private static DataModelTree repeatTree; //pseudo-data model tree that describes the repeat structure of the instance;
 										     //useful during instance processing and validation
 	
@@ -184,6 +185,7 @@ public class XFormParser {
 		selectMultis = new Vector();
 		instanceNode = null;
 		repeatTree = null;
+		defaultNamespace = null;
 	}
 
 	public static FormDef getFormDef(Reader reader) {
@@ -229,6 +231,8 @@ public class XFormParser {
 		initBindHandlers();
 		initStateVars();
 
+		defaultNamespace = doc.getRootElement().getNamespaceUri(null);
+		
 		parseElement(formDef, doc.getRootElement(), formDef, topLevelHandlers);
 		collapseRepeatGroups(formDef);
 		if(instanceNode != null) {
@@ -883,8 +887,14 @@ public class XFormParser {
 		TreeElement root = buildInstanceStructure(e, null);
 		DataModelTree instanceModel = new DataModelTree(root);
 		instanceModel.setName(f.getTitle());
-		instanceModel.schema = e.getNamespace();
 		
+		String schema = e.getNamespace();
+		System.out.println("a: [" + schema + "]");
+		System.out.println("b: [" + defaultNamespace + "]");
+		if (schema != null && schema.length() > 0 && !schema.equals(defaultNamespace)) {
+			instanceModel.schema = schema;
+		}
+			
 		processRepeats(instanceModel);
 		verifyBindings(f, instanceModel);
 		applyInstanceProperties(instanceModel);

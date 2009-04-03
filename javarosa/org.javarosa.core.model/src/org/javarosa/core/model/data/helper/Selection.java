@@ -83,11 +83,8 @@ public class Selection implements Externalizable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		index = ExtUtil.readInt(in);
 		
-		/* temporarily disabling r2117 until backup/restore is functional
-		 * qID = ExtUtil.readInt(in);
-		 *  xmlValue = ExtUtil.readString(in);
-		 */
-		question = (QuestionDef)ExtUtil.read(in, QuestionDef.class, pf);
+		qID = ExtUtil.readInt(in);
+		xmlValue = ExtUtil.readString(in);
 	}
  
 	/* (non-Javadoc)
@@ -96,10 +93,7 @@ public class Selection implements Externalizable {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, index);
 		
-		/* temporarily disabling r2117 until backup/restore is functional
-		 * ExtUtil.writeNumeric(out, question != null ? question.getID() : qID);
-		 * ExtUtil.writeString(out, getValue());
-		 */
-		ExtUtil.write(out, question);
+		ExtUtil.writeNumeric(out, question != null ? question.getID() : qID);
+		ExtUtil.writeString(out, getValue());
 	}
 }

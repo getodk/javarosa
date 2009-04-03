@@ -198,11 +198,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-
-		/* temporarily rollback r2132 until backup/restore is functional
-		 * //payload data is never used again, so it is not in serialized record
-		 */
-		payloadData = (IDataPayload)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		//payload data is never used again, so it is not in serialized record
 		
 		this.destination = (ITransportDestination) ExtUtil.read(in,new ExtWrapTagged(),pf);		
 		this.sender = in.readUTF();
@@ -220,11 +216,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		
-		/* temporarily rollback r2132 until backup/restore is functional
-		 * //payload data need not be serialized, as it is large and never read again by anybody
-		 */
-		ExtUtil.write(out, new ExtWrapTagged(this.payloadData));
+		//payload data need not be serialized, as it is large and never read again by anybody
 		
 		ExtUtil.write(out, new ExtWrapTagged(this.destination));
 		out.writeUTF(this.sender);

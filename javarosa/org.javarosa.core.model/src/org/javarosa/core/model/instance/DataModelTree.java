@@ -402,7 +402,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		id = ExtUtil.readInt(in);
 		formId = ExtUtil.readInt(in);
 		name = (String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
-		//schema = (String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
+		schema = (String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
 		dateSaved = (Date)ExtUtil.read(in, new ExtWrapNullable(Date.class), pf);
 		setRoot((TreeElement)ExtUtil.read(in, TreeElement.class, pf));
 	}
@@ -415,7 +415,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		ExtUtil.writeNumeric(out, id);
 		ExtUtil.writeNumeric(out, formId);
 		ExtUtil.write(out, new ExtWrapNullable(name));
-		//ExtUtil.write(out, new ExtWrapNullable(schema));
+		ExtUtil.write(out, new ExtWrapNullable(schema));
 		ExtUtil.write(out, new ExtWrapNullable(dateSaved));		
 		ExtUtil.write(out, getRoot());
 	}
