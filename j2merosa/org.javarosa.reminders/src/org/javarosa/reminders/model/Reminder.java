@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.ExternalizableHelperDeprecated;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class Reminder implements Externalizable, IDRecordable {
