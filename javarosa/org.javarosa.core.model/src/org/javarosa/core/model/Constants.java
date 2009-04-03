@@ -18,51 +18,6 @@ public class Constants {
 	/** ID not set to a value */
 	public static final int NULL_ID = -1;
 	
-	/** ID not set numeric value */
-	public static final String NULL_STRING_ID = "-1";
-	
-	/** Operator not set numeric value */
-	public static final int OPERATOR_NULL = 0;
-	
-	/** Operator Equal */
-	public static final int OPERATOR_EQUAL = 1;
-	
-	/** Operator Not Equal */
-	public static final int OPERATOR_NOT_EQUAL = 2;
-	
-	/** Operator Greater */
-	public static final int OPERATOR_GREATER = 3;
-	
-	/** Operator Greater of Equal */
-	public static final int OPERATOR_GREATER_EQUAL = 4;
-	
-	/** Operator Less */
-	public static final int OPERATOR_LESS = 5;
-	
-	/** Operator Less than */
-	public static final int OPERATOR_LESS_EQUAL = 6;
-	
-	/** No rule action specified */
-	public static final int ACTION_NONE = 0;
-	
-	/** Rule action to hide questions */
-	public static final int ACTION_HIDE= 1;
-	
-	/** Rule action to show questions */
-	public static final int ACTION_SHOW = 2;
-	
-	/** Rule action to disable questions */
-	public static final int ACTION_DISABLE = 3;
-	
-	/** Rule action to enable questions */
-	public static final int ACTION_ENABLE = 4;
-	
-	/** Rule action to make a question mandatory */
-	public static final int ACTION_MAKE_MANDATORY = 5;
-	
-	/** Rule action to make a question optional */
-	public static final int ACTION_MAKE_OPTIONAL = 6;
-	
 	/** Connection type not specified */
 	public static final int CONNECTION_NONE = 0;
 	
@@ -77,18 +32,7 @@ public class Constants {
 	
 	/** Over The Air or HTTP Connection */
 	public static final int CONNECTION_OTA = 4;
-	
-	public static final String NULLS_NOT_ALLOWED = "Nulls not allowed. Use empty string";
-	
-	/** The maximum number of characters for text input. */
-	public static final int MAX_NUM_CHARS = 500;
-	
-	/** The default study id for those that dont deal with studies, they just have forms. */
-	public static final int DEFAULT_STUDY_ID = 1;
-	
-	/** The default time zone. */
-	public static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("GMT");
-
+		
 	public static final int DATATYPE_UNSUPPORTED = -1;
 	public static final int DATATYPE_NULL = 0;  /* for nodes that have no data, or data type otherwise unknown */
 	public static final int DATATYPE_TEXT = 1;	/** Text question type. */
