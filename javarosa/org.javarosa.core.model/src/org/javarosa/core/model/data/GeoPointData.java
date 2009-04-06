@@ -48,14 +48,17 @@ public class GeoPointData implements IAnswerData {
 	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
 	 */
 	public Object getValue() {
-		return gp; 
+	    Double[] d = new Double[] {new Double(gp[0]), new Double(gp[1])};
+		return d;
 	}
 	
     public void setValue(Object o) {
         if(o == null) {
             throw new NullPointerException("Attempt to set an IAnswerData class to null.");
         }
-        gp = (double[]) o;
+        Double[] d = ((Double[]) o);
+        gp[0] = d[0].doubleValue();
+        gp[1] = d[1].doubleValue();
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

@@ -157,7 +157,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	}
 	
 	public Object serializeAnswerData(GeoPointData data) { 
-	    double[] gp = (double[]) data.getValue(); 
+	    Double[] gp = (Double[]) data.getValue(); 
 	    return gp[0]+","+gp[1]; 
      }
 	
@@ -197,15 +197,15 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			return serializeAnswerData((IntegerData)data);
 		} else if (data instanceof DecimalData) {
 			return serializeAnswerData((DecimalData)data);
-		} else if (data instanceof GeoPointData) {
-            return serializeAnswerData((GeoPointData)data);
 		} else if (data instanceof TimeData) {
 			return serializeAnswerData((TimeData)data);			
 		} else if (data instanceof PointerAnswerData) {
 			return serializeAnswerData((PointerAnswerData)data);
 		} else if (data instanceof MultiPointerAnswerData) {
 			return serializeAnswerData((MultiPointerAnswerData)data);			
-		}
+		} else if (data instanceof GeoPointData) {
+            return serializeAnswerData((GeoPointData)data);
+        }
 		
 		return null;
 	}
