@@ -23,8 +23,6 @@ import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.patient.model.Patient;
-import org.javarosa.patient.storage.PatientRMSUtility;
 
 public class RestoreUtils {
 	public static final String RECORD_ID_TAG = "rec-id";
