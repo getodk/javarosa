@@ -941,8 +941,10 @@ public class XFormParser {
 		if(modelType == null) {
 			element = new TreeElement(name, multiplicity);
 		} else {
-			element = (TreeElement)modelPrototypes.getNewInstance(((Integer)typeMappings.get(modelType)).toString());
-			
+            if( typeMappings.get(modelType) == null ){
+                throw new XFormParseException("ModelType " + modelType + " is not recognized.");                
+            }
+            element = (TreeElement)modelPrototypes.getNewInstance(((Integer)typeMappings.get(modelType)).toString());
 			if(element == null) {
 				element = new TreeElement(name, multiplicity);
 				System.out.println("No model type prototype available for " + modelType);
