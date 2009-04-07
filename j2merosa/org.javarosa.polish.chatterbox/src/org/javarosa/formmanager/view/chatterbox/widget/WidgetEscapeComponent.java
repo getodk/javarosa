@@ -8,8 +8,15 @@ public class WidgetEscapeComponent implements IWidgetComponentWrapper {
 	private StringItem nextItem;
 	
 	public WidgetEscapeComponent() {
+		
+		//#if commcare.lang.sw
+		//#style button
+		 nextItem = new StringItem(null,"Endelea",Item.BUTTON);
+	    //#else
 		//#style button
 		 nextItem = new StringItem(null,"Done",Item.BUTTON);
+		 //#endif
+		 
 	}
 
 	public void init() {
