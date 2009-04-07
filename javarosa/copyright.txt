@@ -1,0 +1,30 @@
+JavaRosa-Core Project
+
+Copyright (C) 1999-2009 by the following:
+
+# Contributing Organizations
+Cell-Life (http://cell-life.org)
+Dimagi (http://dimagi.com)
+
+# Contributing Individuals
+Yaw Anokwa (University of Washington)
+Brian DeRenzi (University of Washington)
+Mark Gerard (Business Objects)
+Carl Hartung (University of Washington)
+Daniel Kayiwa (Makerere University)
+Melissa Loudon (University of Cape Town)
+Rowena Luk (Dimagi)
+Alfred Mukudo (Cell-Life)
+Matthais Nuessler (Cell-Life)
+Munier Parker (Cell-Life)
+Drew Roos (Dimagi)
+Clayton Sims (Dimagi)
+Kieran Sharpey-Schafer (Cell-Life)
+Cory Zue (Dimagi)
+
+# Linked Libraries
+kXML (http://kobjects.org/kxml)
+java-cup (http://www2.cs.tum.edu/projects/cup)
+
+# Notes
+If you have contributed to the JavaRosa-Core Project and are not on this list, please contact us at http://code.javarosa.org/
