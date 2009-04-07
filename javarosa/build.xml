@@ -53,12 +53,14 @@ the License.
 				<include name="**/*.java"/>
 		</javac>
 	</target>
+	
 	<target name="package-library" depends="clean,init,compile" description="package code into jar file">
 		<mkdir dir="dist"/>
 		<jar destfile="dist/javarosa-library.jar">
 			<fileset dir="bin" includes="**/*"/>
 		</jar>
 	</target>
+	
 	 <target name="package-source" depends="clean,init,compile" description="package code into jar file">
 	    <mkdir dir="dist"/>
 	    <jar destfile="dist/javarosa-source.jar">
@@ -68,6 +70,16 @@ the License.
       	<fileset dir="${xform}/src/" includes="**/*"/>
 	    </jar>
 	  </target>
-	<target name="package-all" depends="package-library, package-source">
-	</target>
+	
+	 <target name="package-all" depends="clean,init,compile" description="package code into jar file">
+	    <mkdir dir="dist"/>
+	    <jar destfile="dist/javarosa.jar">
+	      <fileset dir="bin" includes="**/*"/>
+	      <fileset dir="${core}/src/" includes="**/*"/>
+	      <fileset dir="${model}/src/" includes="**/*"/>
+	      <fileset dir="${forms}/src/" includes="**/*"/>
+	      <fileset dir="${xform}/src/" includes="**/*"/>
+	    </jar>
+	  </target>
+	
 </project>
