@@ -25,6 +25,7 @@ Cory Zue (Dimagi)
 # Linked Libraries
 kXML (http://kobjects.org/kxml)
 java-cup (http://www2.cs.tum.edu/projects/cup)
+Fast MD5 (http://www.twmacinta.com/myjava/fast_md5.php)
 
 # Notes
 If you have contributed to the JavaRosa-Core Project and are not on this list, please contact us at http://code.javarosa.org/
