@@ -519,7 +519,13 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	if(keyCode == KEY_CENTER_LETS_HOPE && !(indexWhenKeyPressed == this.activeQuestionIndex)) {
     		//The previous select keypress was for a different item.
     	} else {
+    		//#if javarosa.supresscycle
+    		if(keyCode != LANGUAGE_CYCLE_KEYCODE) {
+        		super.keyReleased(keyCode);
+    		}
+    		//#else
     		super.keyReleased(keyCode);
+    		//#endif
     	}
     }
 
