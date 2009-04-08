@@ -11,6 +11,10 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
 
+//#if javarosa.usepolishlocalisation
+import de.enough.polish.util.Locale;
+//#endif
+
 /**
  * @author mel
  * 
@@ -72,7 +76,15 @@ public class BarcodeCaptureScreen extends ImageCaptureScreen {
 	 */
 	protected Command getSetCallingScreenDataCommand() {
 		if (takePictureCommand == null)
+		{
+			//#if javarosa.usepolishlocalisation
+			takePictureCommand = new Command(Locale.get( "menu.Scan"), Command.OK, 3);
+			//#elif
 			takePictureCommand = new Command("Scan", Command.OK, 3);
+			//#endif
+			
+		}
+			
 		return takePictureCommand;
 	}
 
