@@ -13,6 +13,10 @@ import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.clforms.acquire.AcquireScreen;
 import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
 
+//#if javarosa.usepolishlocalisation
+import de.enough.polish.util.Locale;
+//#endif
+
 /**
  * @author mel
  * 
@@ -43,7 +47,12 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 
 	public void creatView() {
 
+		//#if javarosa.usepolishlocalisation
+		setHint(Locale.get("hint.TypeOrScan"));
+		//#elif
 		setHint("Type in your answer");
+		//#endif
+		
 		//#style textBox
 		 tf = new TextField("", "", 200, TextField.ANY);
 		 if(qDef.instanceNode.required)
@@ -59,12 +68,20 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 	}
 
 	public Command getAcquireCommand() {
+		//#if javarosa.usepolishlocalisation
+		return new Command(Locale.get( "menu.Scan"), Command.SCREEN, 3);
+		//#elif
 		return new Command("Scan", Command.SCREEN, 3);
+		//#endif
 	}
 
 	public AcquireScreen getAcquireScreen(CommandListener callingListener) {
+		String title = "Scan barcode";
+		//#if javarosa.usepolishlocalisation
+		title = Locale.get( "title.ScanBarcode");
+		//#endif
 		BarcodeCaptureScreen bcScreen = new BarcodeCaptureScreen(
-				"Scan barcode", this, callingListener);
+				title, this, callingListener);
 		bcScreen.setBarcodeProcessor(barcodeProcessor);
 		return bcScreen;
 	}
