@@ -40,7 +40,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
 
 public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryModelListener, CommandListener{
-	private static final int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
+	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
 	private static final String PROMPT_REQUIRED_QUESTION = "Required question; you must answer";
 	private static final String PROMPT_DEFAULT_CONSTRAINT_VIOL = "Answer is outside of the allowed range";
@@ -110,6 +110,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	
     	//#if device.identifier == Sony-Ericsson/P1i
     	KEY_CENTER_LETS_HOPE = 13;
+    	//#endif
+    	
+    	//#if device.identifier == Sony-Ericsson/K610i
+    	LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_STAR;
     	//#endif
 
     }
