@@ -16,10 +16,12 @@
 
 package org.javarosa.core;
 
+import java.util.Date;
 import java.util.Hashtable;
 
 import org.javarosa.core.api.IDaemon;
 import org.javarosa.core.api.IDisplay;
+import org.javarosa.core.api.IIncidentLogger;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.services.IService;
 import org.javarosa.core.services.ITransportManager;
@@ -52,6 +54,8 @@ public class JavaRosaServiceProvider {
 	private StorageManager storageManager;
     private ITransportManager transportManager;
     private PropertyManager propertyManager;
+    
+    private IIncidentLogger logger;
 	
 	Hashtable services;
 	private PrefixTree prototypes;
@@ -173,6 +177,32 @@ public class JavaRosaServiceProvider {
 	public PrefixTree getPrototypes () {
 		return prototypes;
 	}
+	
+	public void registerIncidentLogger(IIncidentLogger logger) {
+		this.logger= logger;
+	}
+	
+	public IIncidentLogger getIncidentLogger() {
+		return logger;
+	}
+	
+	/**
+	 * Posts the given data to an existing Incident Log, if one has
+	 * been registered. 
+	 * 
+	 * NOTE: This method makes a best faith attempt to log the given
+	 * data, but will not produce any output if such attempts fail. 
+	 * @param type The type of incident to be logged. 
+	 * @param message A message describing the incident.
+	 */
+	public void logIncident(String type, String message) {
+		if(logger != null) {
+			logger.logIncident(type, message, new Date());
+		} else {
+			System.out.println(type + ": " + message);
+		}
+	}
+	
 	
 //	public void enableInactivityTimeout (int seconds) {
 //		imon = new InactivityMonitor(this, seconds);
