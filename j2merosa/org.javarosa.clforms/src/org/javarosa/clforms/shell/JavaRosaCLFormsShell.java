@@ -35,7 +35,7 @@ import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.utility.FormDefSerializer;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
-import org.javarosa.j2me.storage.rms.RMSStorageModule;
+import org.javarosa.j2me.J2MEModule;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
@@ -89,7 +89,7 @@ public class JavaRosaCLFormsShell implements IShell {
 	}
 
 	private void loadModules() {
-		new RMSStorageModule().registerModule(context);
+		new J2MEModule().registerModule(context);
 		new XFormsModule().registerModule(context);
 		new CoreModelModule().registerModule(context);
 		new HttpTransportModule().registerModule(context);
