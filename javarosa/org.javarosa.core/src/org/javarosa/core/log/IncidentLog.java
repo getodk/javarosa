@@ -20,6 +20,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class IncidentLog implements Externalizable {
 	
+	public static String LOG_TYPE_APPLICATION = "APP";
+	public static String LOG_TYPE_ACTIVITY = "ACTIVITY";
+	
 	Date time;
 	
 	String type;
