@@ -35,6 +35,11 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     Vector readOnlyProperties;
     
     public final static String DEVICE_ID_PROPERTY = "DeviceID";
+    
+    public final static String LOGS_ENABLED = "logenabled";
+    
+    public final static String LOGS_ENABLED_YES = "Enabled";
+    public final static String LOGS_ENABLED_NO = "Disabled";
 
     /**
      * Creates the JavaRosa set of property rules
@@ -45,7 +50,13 @@ public class JavaRosaPropertyRules implements IPropertyRules {
 
         //DeviceID Property
         rules.put(DEVICE_ID_PROPERTY, new Vector());
+        Vector logs = new Vector();
+        logs.addElement(LOGS_ENABLED_NO);
+        logs.addElement(LOGS_ENABLED_YES);
+        rules.put(LOGS_ENABLED, logs);
+        
         readOnlyProperties.addElement(DEVICE_ID_PROPERTY);
+        
     }
 
     /** (non-Javadoc)
@@ -113,6 +124,8 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     public String getHumanReadableDescription(String propertyName) {
     	if(DEVICE_ID_PROPERTY.equals(propertyName)) {
     		return "Unique Device ID";
+    	} else if(LOGS_ENABLED.equals(propertyName)) {
+    		return "Device Logging";
     	}
     	return propertyName;
     }
