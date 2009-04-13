@@ -21,6 +21,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.log.IncidentLog;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
@@ -211,7 +213,11 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	 */
 	public void update(Observable observable, Object arg) {
 		try {
-			storage.updateMessage((TransportMessage) observable);
+			TransportMessage msg = (TransportMessage)observable;
+			storage.updateMessage(msg);
+			if(msg != null && msg.getStatus() == TransportMessage.STATUS_FAILED) {
+				JavaRosaServiceProvider.instance().logIncident(IncidentLog.LOG_TYPE_APPLICATION, "Attempted Message Send Failure!");
+			}
 		} catch (IOException e) {
 			System.err.println(e);
 		}
