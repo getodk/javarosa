@@ -144,6 +144,10 @@ public class XFormAnswerDataParser {
 	private static Selection getSelection(String choice, QuestionDef q) {
 		q.localizeSelectMap(null);
 		int index = q.getSelectedItemIndex(choice); 
-		return (index != -1 ? new Selection(index, q) : null);
+		
+		Selection s = new Selection(choice);
+		s.setQuestionDef(q);
+		
+		return (index != -1 ? s : null);
 	}
 }
