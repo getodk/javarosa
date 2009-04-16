@@ -82,7 +82,12 @@ public class Select1QuestionWidget extends SingleQuestionScreen
 				break;
 			}
 		}
-		return (selectedIndex == -1 ? null : new SelectOneData(new Selection(selectedIndex, ((QuestionDef)qDef.element))));
+		
+		QuestionDef question = (QuestionDef)qDef.element; 
+		Selection s = new Selection((String)question.getSelectItemIDs().elementAt(selectedIndex));
+		s.setQuestionDef(question);
+		
+		return (selectedIndex == -1 ? null : new SelectOneData(s));
 	}
 
 

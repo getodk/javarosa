@@ -44,8 +44,12 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 		Vector vs = new Vector();
 		
 		for (int i = 0; i < choiceGroup().size(); i++) {
-			if (choiceGroup().isSelected(i))
-				vs.addElement(new Selection(i, question));
+			if (choiceGroup().isSelected(i)) {
+				Selection s = new Selection((String)question.getSelectItemIDs().elementAt(i));
+				s.setQuestionDef(question);
+			
+				vs.addElement(s);
+			}
 		}		
 		
 		return (vs.size() == 0 ? null : new SelectMultiData(vs));

@@ -60,8 +60,12 @@ public class SelectQuestionWidget extends SingleQuestionScreen
 		Vector vs = new Vector();
 
 		for (int i = 0; i < cg.size(); i++) {
-			if (cg.isSelected(i))
-				vs.addElement(new Selection(i, ((QuestionDef)qDef.element)));
+			if (cg.isSelected(i)) {
+				QuestionDef q = (QuestionDef)qDef.element;
+				Selection s  = new Selection((String)q.getSelectItemIDs().elementAt(i));
+				s.setQuestionDef(q);
+				vs.addElement(s);
+			}
 		}
 
 		return (vs.size() == 0 ? null : new SelectMultiData(vs));
