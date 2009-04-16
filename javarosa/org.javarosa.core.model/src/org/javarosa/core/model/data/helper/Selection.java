@@ -21,6 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
@@ -34,7 +35,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class Selection implements Externalizable {
-	public int index;
+	public int index = -1;
 	
 	/* we need the questiondef to fetch natural-language captions for the selected choice
 	 * we can't hold a reference directly to the caption hashtable, as it's wiped out and
@@ -54,9 +55,8 @@ public class Selection implements Externalizable {
 		
 	}
 	
-	public Selection (int index, QuestionDef question) {
-		this.index = index;
-		this.question = question;
+	public Selection (String xmlValue) {
+		this.xmlValue = xmlValue;
 		
 		if (question != null) {
 			//don't think setting these is strictly necessary, setting them only on deserialization is probably enough
@@ -66,14 +66,20 @@ public class Selection implements Externalizable {
 	}
 	
 	public Selection clone () {
-		Selection s = new Selection(index, question);
+		Selection s = new Selection(xmlValue);
 		
 		//don't think setting these is strictly necessary, question should always be set by the time clone() is called
 		//on second thought, this might not be such a safe assumption
 		s.qID = qID;
-		s.xmlValue = xmlValue;
+		s.question = question;
 		
 		return s;
+	}
+	
+	public void setQuestionDef(QuestionDef q) {
+		this.qID = q.getID();
+		this.question = q;
+		index =  q.getSelectedItemIndex(xmlValue); 
 	}
 	
 	public String getText () {

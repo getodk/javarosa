@@ -48,14 +48,16 @@ public class SelectOneDataTests extends TestCase {
 		OrderedHashtable oh = new OrderedHashtable();
 		Vector v = new Vector();
 		for (int i = 0; i < 3; i++) {
-			oh.put("Selection " + i, "Selection " + i);
+			oh.put("Selection" + i, "Selection" + i);
 			v.addElement(new Boolean(false));
 		}	
 		question.setSelectItemIDs(oh, v, null);
 		question.localizeSelectMap(null);
 		
-		one = new Selection(1, question);
-		two = new Selection(2, question);
+		one = new Selection("Selection1");
+		one.setQuestionDef(question);
+		two = new Selection("Selection2");
+		two.setQuestionDef(question);
 	}
 	
 	public SelectOneDataTests(String name, TestMethod rTestMethod) {

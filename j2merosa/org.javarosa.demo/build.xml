@@ -360,7 +360,7 @@
 	<path id="classpath.test">
       <pathelement location="${dir.dist}/${app.jarName}"/>
 	  <!--pathelement location="${dir.test}" /-->
-	  <pathelement location="${dir.lib}/j2meunit-javarosa.jar" />
+	  <pathelement location="${dir.tools}/j2meunit-javarosa.jar" />
 	  <pathelement location="${wtk.home}/lib/wma11.jar"/>
 	  <pathelement location="${wtk.home}/lib/midpapi21.jar"/>
 	  <path refid="classpath.base" />
