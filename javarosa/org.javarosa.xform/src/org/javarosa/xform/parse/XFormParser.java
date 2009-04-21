@@ -1456,7 +1456,7 @@ public class XFormParser {
 	}
 	
 	//find a questiondef that binds to ref, if the data type is a 'select' question type
-	private static QuestionDef ghettoGetQuestionDef (int dataType, FormDef f, TreeReference ref) {
+	public static QuestionDef ghettoGetQuestionDef (int dataType, FormDef f, TreeReference ref) {
 		if (dataType == Constants.DATATYPE_CHOICE || dataType == Constants.DATATYPE_CHOICE_LIST) {
 			return findBindingQuestion(f, ref);
 		} else {

@@ -23,10 +23,16 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.model.util.restorable.Restorable;
+import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -34,7 +40,7 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
-public class DataModelTree implements IFormDataModel, IDRecordable {
+public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 
 	/** The root of this tree */
 	private TreeElement root;
@@ -571,7 +577,151 @@ public class DataModelTree implements IFormDataModel, IDRecordable {
 		
 		return node;
 	}
+
+	public String getRestorableType() {
+		return "form";
+	}
 	
+	//TODO: include whether form was sent already (or restrict always to unsent forms)
+	
+	public DataModelTree exportData() {
+		DataModelTree dm = RestoreUtils.createDataModel(this);
+		RestoreUtils.addData(dm, "name", name);
+		RestoreUtils.addData(dm, "form-id", new Integer(formId));
+		RestoreUtils.addData(dm, "saved-on", dateSaved, Constants.DATATYPE_DATE_TIME);
+		RestoreUtils.addData(dm, "schema", schema);
+		RestoreUtils.mergeDataModel(dm, this, "data");
+		return dm;
+	}
+
+	public void templateData(DataModelTree dm, TreeReference parentRef) {
+		RestoreUtils.applyDataType(dm, "name", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "form-id", parentRef, Integer.class);
+		RestoreUtils.applyDataType(dm, "saved-on", parentRef, Constants.DATATYPE_DATE_TIME);
+		RestoreUtils.applyDataType(dm, "schema", parentRef, String.class);
+		
+		//don't touch data for now
+	}
+
+	public void importData(DataModelTree dm) {
+		name = (String)RestoreUtils.getValue("name", dm);
+        formId = ((Integer)RestoreUtils.getValue("form-id", dm)).intValue();		
+        dateSaved = (Date)RestoreUtils.getValue("saved-on", dm);		
+        schema = (String)RestoreUtils.getValue("schema", dm);		
+        
+		FormDefRMSUtility frms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
+		FormDef f = new FormDef();
+		try {
+			frms.retrieveFromRMS(formId, f);
+		} catch (IOException e) {
+
+		} catch (DeserializationException e) {
+
+		}
+		setRoot(processSavedDataModel(dm.resolveReference(RestoreUtils.absRef("data", dm)), f.getDataModel(), f));
+	}
+	
+	public TreeElement processSavedDataModel (TreeElement newInstanceRoot, DataModelTree template, FormDef f) {
+		TreeElement newModelRoot = template.getRoot().deepCopy(true);
+		TreeElement incomingRoot = (TreeElement)newInstanceRoot.getChildren().elementAt(0);
+
+		if (!newModelRoot.getName().equals(incomingRoot.getName()) || incomingRoot.getMult() != 0) {
+			throw new RuntimeException("Saved form instance to restore does not match form definition");
+		}
+		TreeReference ref = TreeReference.rootRef();
+		ref.add(newModelRoot.getName(), TreeReference.INDEX_UNBOUND);
+		populateNode(newModelRoot, incomingRoot, ref, f);
+		
+		return newModelRoot;
+	}
+	
+	//there's a lot of error checking we could do on the received instance, but it's
+	//easier to just ignore the parts that are incorrect
+	public void populateNode (TreeElement node, TreeElement incoming, TreeReference ref, FormDef f) {
+		if (node.isLeaf()) {
+			//check that incoming doesn't have children?
+			
+			IAnswerData value = incoming.getValue();
+			if (value == null) {
+				node.setValue(null);
+			} else if (node.dataType == Constants.DATATYPE_TEXT || node.dataType == Constants.DATATYPE_NULL) {
+				node.setValue(value); //value is a StringData
+			} else {
+				String textVal = (String)value.getValue();
+				IAnswerData typedVal = RestoreUtils.xfFact.parseData(textVal, node.dataType, ref, f);
+				node.setValue(typedVal);
+			}		
+		} else {
+			Vector names = new Vector();
+			for (int i = 0; i < node.getNumChildren(); i++) {
+				TreeElement child = (TreeElement)node.getChildren().elementAt(i);
+				if (!names.contains(child.getName())) {
+					names.addElement(child.getName());
+				}
+			}
+			
+			//remove all default repetitions from skeleton data model (_preserving_ templates, though)
+			for (int i = 0; i < node.getNumChildren(); i++) {
+				TreeElement child = (TreeElement)node.getChildren().elementAt(i);
+				if (child.repeatable && child.getMult() != TreeReference.INDEX_TEMPLATE) {
+					node.removeChildAt(i);
+					i--;
+				}
+			}
+			
+			//make sure ordering is preserved (needed for compliance with xsd schema)
+			if (node.getNumChildren() != names.size()) {
+				throw new RuntimeException("sanity check failed");
+			}
+			for (int i = 0; i < node.getNumChildren(); i++) {
+				TreeElement child = (TreeElement)node.getChildren().elementAt(i);
+				String expectedName = (String)names.elementAt(i);
+				
+				if (!child.getName().equals(expectedName)) {
+					TreeElement child2 = null;
+					int j;
+					
+					for (j = i + 1; j < node.getNumChildren(); j++) {
+						child2 = (TreeElement)node.getChildren().elementAt(j);
+						if (child2.getName().equals(expectedName)) {
+							break;
+						}
+					}
+					if (j == node.getNumChildren()) {
+						throw new RuntimeException("sanity check failed");
+					}
+				
+					node.removeChildAt(j);
+					node.getChildren().insertElementAt(child2, i);	
+				}
+			}
+			//java i hate you so much
+			
+			for (int i = 0; i < node.getNumChildren(); i++) {
+				TreeElement child = (TreeElement)node.getChildren().elementAt(i);
+				Vector newChildren = incoming.getChild(child.getName());
+				
+				TreeReference childRef = ref.clone();
+				childRef.add(child.getName(), TreeReference.INDEX_UNBOUND);
+				
+				if (child.repeatable) {
+					for (int k = 0; k < newChildren.size(); k++) {
+						TreeElement newChild = child.deepCopy(true); //ugh
+						newChild.setMult(k);
+						node.getChildren().insertElementAt(newChild, i + k + 1);
+						populateNode(newChild, (TreeElement)newChildren.elementAt(k), childRef, f);
+						i += k;
+					}
+				} else {
+					if (newChildren.size() == 0) {
+						child.setRelevant(false);
+					} else {
+						populateNode(child, (TreeElement)newChildren.elementAt(0), childRef, f);
+					}
+				}
+			}
+		}
+	}	
 	
 //	private TreeElement createNode (TreeReference ref) {
 //		if (root == null) {

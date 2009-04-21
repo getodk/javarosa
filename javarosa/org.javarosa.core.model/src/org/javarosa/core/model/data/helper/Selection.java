@@ -35,7 +35,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  */
 public class Selection implements Externalizable {
-	public int index = -1;
+	public String xmlValue = null;
 	
 	/* we need the questiondef to fetch natural-language captions for the selected choice
 	 * we can't hold a reference directly to the caption hashtable, as it's wiped out and
@@ -43,10 +43,9 @@ public class Selection implements Externalizable {
 	 * we don't serialize the questiondef, as it's huge, and unneeded outside of a formdef;
 	 * it is restored as a post-processing step during formdef deserialization
 	 */
-	public QuestionDef question; 
-	
+	public QuestionDef question = null; 	
 	public int qID = -1;
-	public String xmlValue = null;
+	public int index = -1;
 	
 	/**
 	 * for deserialization
@@ -54,33 +53,35 @@ public class Selection implements Externalizable {
 	public Selection() {
 		
 	}
+
+//	//won't 'question' now always be null?
+//	if (question != null) {
+//		//don't think setting these is strictly necessary, setting them only on deserialization is probably enough
+//		this.qID = question.getID();
+//		this.xmlValue = getValue();
+//	} //if question is null, these had better be set manually afterward!
 	
 	public Selection (String xmlValue) {
-		this.xmlValue = xmlValue;
-		
-		if (question != null) {
-			//don't think setting these is strictly necessary, setting them only on deserialization is probably enough
-			this.qID = question.getID();
-			this.xmlValue = getValue();
-		} //if question is null, these had better be set manually afterward!
+		this.xmlValue = xmlValue;		
 	}
 	
 	public Selection clone () {
 		Selection s = new Selection(xmlValue);
 		
-		//don't think setting these is strictly necessary, question should always be set by the time clone() is called
-		//on second thought, this might not be such a safe assumption
-		s.qID = qID;
 		s.question = question;
+		s.qID = qID;
+		s.index = index;
 		
 		return s;
 	}
 	
-	public void setQuestionDef(QuestionDef q) {
-		this.qID = q.getID();
+	public void attachQuestionDef(QuestionDef q) {
 		this.question = q;
+		this.qID = q.getID();
 		index =  q.getSelectedItemIndex(xmlValue); 
 	}
+	
+	
 	
 	public String getText () {
 		if (question != null) {
@@ -92,30 +93,26 @@ public class Selection implements Externalizable {
 	}
 	
 	public String getValue () {
-		if (question != null) {
-			return (String)question.getSelectItems().elementAt(index);
-		} else {
-			return xmlValue;
-		}
+		return xmlValue;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		index = ExtUtil.readInt(in);
+		xmlValue = ExtUtil.readString(in);
 		
 		qID = ExtUtil.readInt(in);
-		xmlValue = ExtUtil.readString(in);
+		index = ExtUtil.readInt(in);
 	}
  
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeNumeric(out, index);
-		
-		ExtUtil.writeNumeric(out, question != null ? question.getID() : qID);
 		ExtUtil.writeString(out, getValue());
+		
+		ExtUtil.writeNumeric(out, qID);
+		ExtUtil.writeNumeric(out, index);
 	}
 }

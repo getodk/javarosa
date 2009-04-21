@@ -205,6 +205,11 @@ public class RestoreUtils {
 	
 	public static void mergeDataModel (DataModelTree parent, DataModelTree child, TreeReference parentRef) {
 		TreeElement parentNode = parent.resolveReference(parentRef);
+		//ugly
+		if (parentNode == null) {
+			parentRef = parent.addNode(parentRef);
+			parentNode = parent.resolveReference(parentRef);
+		}
 		TreeElement childNode = child.getRoot();
 		
 		int mult = parentNode.getChildMultiplicity(childNode.getName());
