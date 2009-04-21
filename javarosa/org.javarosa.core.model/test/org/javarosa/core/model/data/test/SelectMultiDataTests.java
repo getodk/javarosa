@@ -61,11 +61,11 @@ public class SelectMultiDataTests extends TestCase {
 		question.localizeSelectMap(null);
 				
 		one = new Selection("Selection1");
-		one.setQuestionDef(question);
+		one.attachQuestionDef(question);
 		two = new Selection("Selection2");
-		two.setQuestionDef(question);
+		two.attachQuestionDef(question);
 		three = new Selection("Selection3");
-		three.setQuestionDef(question);
+		three.attachQuestionDef(question);
 		
 		firstTwo = new Vector();
 		firstTwo.addElement(one);

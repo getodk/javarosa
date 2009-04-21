@@ -55,9 +55,9 @@ public class SelectOneDataTests extends TestCase {
 		question.localizeSelectMap(null);
 		
 		one = new Selection("Selection1");
-		one.setQuestionDef(question);
+		one.attachQuestionDef(question);
 		two = new Selection("Selection2");
-		two.setQuestionDef(question);
+		two.attachQuestionDef(question);
 	}
 	
 	public SelectOneDataTests(String name, TestMethod rTestMethod) {
