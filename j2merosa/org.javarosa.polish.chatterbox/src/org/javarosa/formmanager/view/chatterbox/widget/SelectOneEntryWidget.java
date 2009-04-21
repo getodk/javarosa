@@ -39,7 +39,7 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 		}
 		
 		Selection s = new Selection((String)question.getSelectItemIDs().elementAt(selectedIndex));
-		s.setQuestionDef(question);
+		s.attachQuestionDef(question);
 		
 		return (selectedIndex == -1 ? null : new SelectOneData(s));
 	}

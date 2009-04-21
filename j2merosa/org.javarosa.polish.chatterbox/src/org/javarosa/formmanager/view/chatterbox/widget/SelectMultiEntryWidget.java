@@ -46,7 +46,7 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 		for (int i = 0; i < choiceGroup().size(); i++) {
 			if (choiceGroup().isSelected(i)) {
 				Selection s = new Selection((String)question.getSelectItemIDs().elementAt(i));
-				s.setQuestionDef(question);
+				s.attachQuestionDef(question);
 			
 				vs.addElement(s);
 			}

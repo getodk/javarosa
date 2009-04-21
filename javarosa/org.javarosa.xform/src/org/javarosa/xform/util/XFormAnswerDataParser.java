@@ -146,7 +146,7 @@ public class XFormAnswerDataParser {
 		int index = q.getSelectedItemIndex(choice); 
 		
 		Selection s = new Selection(choice);
-		s.setQuestionDef(q);
+		s.attachQuestionDef(q);
 		
 		return (index != -1 ? s : null);
 	}
