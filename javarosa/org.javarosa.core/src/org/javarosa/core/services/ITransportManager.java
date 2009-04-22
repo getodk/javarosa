@@ -156,7 +156,9 @@ public interface ITransportManager extends IService {
 	public int getModelDeliveryStatus (int modelID, boolean notFoundOK);
 	public Vector getModelDeliveryStatuses (Vector modelIDs, boolean notFoundOK);
 	
-	/**
+	public void markSent (int modelID, boolean checkQueue);
+
+		/**
 	 * 
 	 * @param i The index of the transport method whose current default destination
 	 * should be returned.

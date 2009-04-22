@@ -293,11 +293,16 @@ public class RestoreUtils {
 			DataModelTree child = subDataModel((TreeElement)children.elementAt(i));
 		
 			Restorable inst = (Restorable)PrototypeFactory.getInstance(type);
+			
+			//restore record id first so 'importData' has access to it
+			if (idMatters) {
+				((IDRecordable)inst).setRecordId(((Integer)getValue(RECORD_ID_TAG, child)).intValue());
+			}
+			
 			inst.importData(child);
 			
 			if (idMatters) {
 				IDRecordable instRec = (IDRecordable)inst;
-				instRec.setRecordId(((Integer)getValue(RECORD_ID_TAG, child)).intValue());
 				if (!rmsu.writeToRMSusingID(instRec)) {
 					throw new RuntimeException("Error importing RMS during restore! [" + rmsu.getName() + ":" + instRec.getRecordId() + "]");
 				}
