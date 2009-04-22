@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class HttpTransportDestination implements ITransportDestination {
@@ -30,7 +31,7 @@ public class HttpTransportDestination implements ITransportDestination {
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
-		URL = in.readUTF();
+		URL = ExtUtil.nullIfEmpty(in.readUTF());
 		
 	}
 
@@ -38,6 +39,6 @@ public class HttpTransportDestination implements ITransportDestination {
 	 * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeUTF(URL);
+		out.writeUTF(ExtUtil.emptyIfNull(URL));
 	}
 }

@@ -31,6 +31,7 @@ import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.core.util.Observable;
 import org.javarosa.core.util.Observer;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * The transport manager is responsible for the registration of different
@@ -44,6 +45,7 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	/**
 	 * The unique identifier of the device. Hard coded for now.
 	 */
+	
 	private static final String ID = "TestDevice";
 
 	/**
@@ -291,6 +293,44 @@ public class TransportManager implements Observer, IService, ITransportManager {
 			statusV.addElement(new Integer(status));
 		}
 		return statusV;
+	}
+	
+	public void markSent (int modelID, boolean checkQueue) {
+		TransportMessage message = null;
+		boolean newMessage;
+
+		if (checkQueue) {
+			for (Enumeration e = getMessages(); e.hasMoreElements(); ) {
+				TransportMessage tm = (TransportMessage)e.nextElement();
+				if (tm.getModelId() == modelID) {
+					message = tm;
+					break;
+				}
+			}
+		}
+		
+		newMessage = (message == null);
+		if (newMessage) {
+			ITransportDestination nulldest = null;
+			try {
+				nulldest = (ITransportDestination)PrototypeFactory.getInstance(Class.forName("org.javarosa.communication.http.HttpTransportDestination"));
+			} catch (ClassNotFoundException e) { }
+			message = new TransportMessage(null, nulldest, "", modelID);
+		}
+		
+		if (message.getStatus() != TransportMessage.STATUS_DELIVERED) {
+			message.setStatus(TransportMessage.STATUS_DELIVERED);
+		
+			try {
+				if (newMessage) {
+					storage.saveMessage(message);
+				} else {
+					storage.updateMessage(message);
+				}
+			} catch (IOException e) {
+				throw new RuntimeException();
+			}
+		}
 	}
 	
 	/**

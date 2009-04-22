@@ -30,11 +30,16 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.storage.DataModelTreeMetaData;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.IDataModelVisitor;
+import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.utilities.RecordStorageException;
+import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
@@ -590,6 +595,11 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 		RestoreUtils.addData(dm, "form-id", new Integer(formId));
 		RestoreUtils.addData(dm, "saved-on", dateSaved, Constants.DATATYPE_DATE_TIME);
 		RestoreUtils.addData(dm, "schema", schema);
+		
+		ITransportManager tm = JavaRosaServiceProvider.instance().getTransportManager();
+		boolean sent = (tm.getModelDeliveryStatus(id, true) == TransportMessage.STATUS_DELIVERED);
+		RestoreUtils.addData(dm, "sent", new Boolean(sent));
+		
 		RestoreUtils.mergeDataModel(dm, this, "data");
 		return dm;
 	}
@@ -599,6 +609,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 		RestoreUtils.applyDataType(dm, "form-id", parentRef, Integer.class);
 		RestoreUtils.applyDataType(dm, "saved-on", parentRef, Constants.DATATYPE_DATE_TIME);
 		RestoreUtils.applyDataType(dm, "schema", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "sent", parentRef, Boolean.class);
 		
 		//don't touch data for now
 	}
@@ -608,6 +619,13 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
         formId = ((Integer)RestoreUtils.getValue("form-id", dm)).intValue();		
         dateSaved = (Date)RestoreUtils.getValue("saved-on", dm);		
         schema = (String)RestoreUtils.getValue("schema", dm);		
+        
+        boolean sent = RestoreUtils.getBoolean(RestoreUtils.getValue("sent", dm));
+        if (sent) {
+        	System.out.println("here " + id);
+    		ITransportManager tm = JavaRosaServiceProvider.instance().getTransportManager();
+    		tm.markSent(id, false);
+        }
         
 		FormDefRMSUtility frms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 		FormDef f = new FormDef();
