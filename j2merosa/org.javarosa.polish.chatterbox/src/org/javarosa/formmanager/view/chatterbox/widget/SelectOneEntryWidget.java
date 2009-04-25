@@ -37,11 +37,14 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 				break;
 			}
 		}
+		if(selectedIndex == -1) {
+			return null;
+		}
 		
 		Selection s = new Selection((String)question.getSelectItemIDs().elementAt(selectedIndex));
 		s.attachQuestionDef(question);
 		
-		return (selectedIndex == -1 ? null : new SelectOneData(s));
+		return new SelectOneData(s);
 	}
 	
 	public boolean focus () {
