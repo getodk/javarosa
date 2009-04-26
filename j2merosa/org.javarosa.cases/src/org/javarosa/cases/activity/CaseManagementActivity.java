@@ -34,6 +34,7 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 	// be refactored at some point.
 	public static final String NEW = "New Case";
 	public static final String FOLLOWUP = "Follow Up on Existing Case";
+	public static final String REFERRAL = "Follow Up on Referral";
 	public static final String VIEW_OPEN = "View Open Cases";
 	public static final String RESOLVE = "Resolve Case";
 
@@ -113,6 +114,7 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 		view.append(NEW, null);
 		view.append(FOLLOWUP, null);
 		view.append(VIEW_OPEN, null);
+		view.append(REFERRAL, null);
 		view.append(RESOLVE, null);
 		initCommands();
 	}
