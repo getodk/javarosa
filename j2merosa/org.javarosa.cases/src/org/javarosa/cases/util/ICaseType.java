@@ -16,6 +16,7 @@ public interface ICaseType {
 	public final static String FORM_TYPE_NEW_CASE = "c_ft_nc";
 	public final static String FORM_TYPE_FOLLOWUP = "c_ft_fu";
 	public final static String FORM_TYPE_CLOSE = "c_ft_cc";
+	public final static String FORM_TYPE_REFERRAL = "c_ft_ref";
 	
 	public String getCaseTypeId();
 	
