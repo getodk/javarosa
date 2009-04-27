@@ -424,11 +424,10 @@ public class FormTransportActivity implements
 			int i = 0;
 			Enumeration en = multiData.elements();
 			while(en.hasMoreElements()) {
-				DataModelTree ndata = (DataModelTree)en.nextElement();
-				IDataPayload payload = dataModelSerializer.createSerializedPayload(ndata);
+				IDataPayload payload = (IDataPayload)en.nextElement();
 				JavaRosaServiceProvider.instance().getTransportManager().enqueue(payload,
-						destination, transportMethod, ndata.getId());
-				ids[i] = ndata.getId();
+						destination, transportMethod, payload.getTransportId());
+				ids[i] = payload.getTransportId();
 				i++;
 			}
 			submitStatusScreen = new MultiSubmitStatusScreen(this, ids);
