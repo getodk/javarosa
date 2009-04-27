@@ -538,8 +538,13 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	//#style mailAlert
     	Alert alert = new Alert(title, message, null, AlertType.ERROR);
     	alert.setTimeout(Alert.FOREVER);
-    	//alert.setCommandListener?
-    	Alert.setCurrent((Display)JavaRosaServiceProvider.instance().getDisplay().getDisplayObject(), alert, null);
+    	//alert.setCommandListener(this);
+    	
+    	// Clayton Sims - Apr 27, 2009 : 
+    	//Really not-thrilled with how this works. Unfortunately this is an instance of views not being able
+    	//to propogate up new views. Maybe there should be a centralized way to use alerts? Or are we fine
+    	//with using the existing elements?
+    	Alert.setCurrent((Display)JavaRosaServiceProvider.instance().getDisplay().getDisplayObject(), alert, this);
     }
 
 	public void setContext(FormEntryContext context) {
