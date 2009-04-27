@@ -114,5 +114,4 @@ public class HttpHeaderAppendingVisitor implements IDataPayloadVisitor {
 		}
 		return "text/plain";
 	}
-
 }

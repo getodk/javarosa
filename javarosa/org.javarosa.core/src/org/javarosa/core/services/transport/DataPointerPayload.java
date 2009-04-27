@@ -105,5 +105,9 @@ public class DataPointerPayload implements IDataPayload {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(pointer));
 	}
+	
+	public int getTransportId() {
+		return -1;
+	}
 
 }

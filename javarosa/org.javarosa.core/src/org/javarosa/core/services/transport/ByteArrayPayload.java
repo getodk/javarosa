@@ -122,4 +122,9 @@ public class ByteArrayPayload implements IDataPayload {
 	public long getLength() {
 		return payload.length;
 	}
+	
+	public int getTransportId() {
+		//TODO: Most messages can include this data
+		return -1;
+	}
 }
