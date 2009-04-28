@@ -52,7 +52,7 @@ public class RmsStorage implements Storage {
 	 * 
 	 * @see org.openmrs.transport.Storage#saveMessage(org.openmrs.transport.TransportMessage)
 	 */
-	public void saveMessage(TransportMessage message) throws IOException {
+	public synchronized void saveMessage(TransportMessage message) throws IOException {
 		try {
 			init();
 			int recordId = this.messageRecordStore.getNextRecordID();
@@ -74,7 +74,7 @@ public class RmsStorage implements Storage {
 	 * 
 	 * @see org.openmrs.transport.Storage#updateMessage(org.openmrs.transport.TransportMessage)
 	 */
-	public void updateMessage(TransportMessage message) {
+	public synchronized void updateMessage(TransportMessage message) {
 		int recordId = message.getRecordId();
 		try {
 			init();
@@ -96,7 +96,7 @@ public class RmsStorage implements Storage {
 	 * 
 	 * @see org.openmrs.transport.Storage#updateMessage(org.openmrs.transport.TransportMessage)
 	 */
-	public void deleteMessage(int msgIndex) {
+	public synchronized void deleteMessage(int msgIndex) {
 		try {
 			init();
 			this.messageRecordStore.deleteRecord(msgIndex);
@@ -112,7 +112,7 @@ public class RmsStorage implements Storage {
 	/**
 	 * @throws RecordStoreException
 	 */
-	private void init() throws RecordStorageException {
+	private synchronized void init() throws RecordStorageException {
 		if (this.messageRecordStore == null) {
 			messageRecordStore = JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getRecordStoreFactory().produceNewStore();
 			messageRecordStore.openAsRecordStorage(RS_MSG_NAME, true);
@@ -124,7 +124,7 @@ public class RmsStorage implements Storage {
 	 * 
 	 * @see org.openmrs.transport.Storage#close()
 	 */
-	public void close() {
+	public synchronized void close() {
 		if (this.messageRecordStore != null) {
 			try {
 				this.messageRecordStore.closeRecordStore();
@@ -144,7 +144,7 @@ public class RmsStorage implements Storage {
 	 * @throws IOException
 	 * @return
 	 */
-	private TransportMessage loadMessage(int recordId) throws IOException, DeserializationException{
+	private synchronized TransportMessage loadMessage(int recordId) throws IOException, DeserializationException{
 		try {
 			init();
 			byte[] data = messageRecordStore.getRecord(recordId);
@@ -192,7 +192,7 @@ public class RmsStorage implements Storage {
 	/**
 	 * @return
 	 */
-	public Vector getMessages() {
+	public synchronized Vector getMessages() {
 		Vector messages = new Vector();
 		IRecordStoreEnumeration en = null;
 		try {
@@ -225,7 +225,7 @@ public class RmsStorage implements Storage {
 	 * 
 	 * @see org.openmrs.transport.Storage#messageEnumeration()
 	 */
-	public Enumeration messageElements() {
+	public synchronized Enumeration messageElements() {
 		return getMessages().elements();
 	}
 
