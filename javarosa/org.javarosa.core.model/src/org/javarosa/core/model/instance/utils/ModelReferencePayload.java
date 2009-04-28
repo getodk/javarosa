@@ -128,6 +128,9 @@ public class ModelReferencePayload implements IDataPayload {
 				//Assertion, do not catch!
 				e.printStackTrace();
 				throw new RuntimeException("ModelReferencePayload failed to retrieve its model from rms");
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+				int g = 3;
 			}
 		}
 	}

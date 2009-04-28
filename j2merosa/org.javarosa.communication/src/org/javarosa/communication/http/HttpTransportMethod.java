@@ -229,7 +229,7 @@ public class HttpTransportMethod implements TransportMethod {
                 //#endif
                 message.setChanged();
                 message.notifyObservers("Http Transport Failure: Security Exception".getBytes()); 
-		    }finally {
+		    } finally {
 				cleanUp(in);
 				cleanUp(out);
 				cleanUp(con);

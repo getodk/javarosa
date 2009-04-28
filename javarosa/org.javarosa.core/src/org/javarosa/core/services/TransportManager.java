@@ -17,6 +17,7 @@
 package org.javarosa.core.services;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -264,6 +265,7 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	
 	public Vector getModelDeliveryStatuses (Vector modelIDs, boolean notFoundOK) {
 		Hashtable statuses = new Hashtable();
+		Hashtable times = new Hashtable();
 		
 		//TODO: Are we OK with using the transport manager here? There's coupling...
 		//TODO: The way we're doing this is fairly wasteful. We should store them
@@ -276,9 +278,19 @@ public class TransportManager implements Observer, IService, ITransportManager {
 			int status = message.getStatus();
 			
 			if (modelIDs.contains(new Integer(modelID))) {
-				statuses.put(new Integer(modelID), new Integer(status));
+				boolean replace = true;
+				if(statuses.containsKey(new Integer(modelID))) {
+					Date oldMessage = (Date)times.get(new Integer(modelID));
+					if(oldMessage.getTime() > message.getTimestamp().getTime()) {
+						replace = false;
+					}
+				}
+				if (replace) {
+					statuses.put(new Integer(modelID), new Integer(status));
+					times.put(new Integer(modelID), message.getTimestamp());
+				}
 			}
-    	}
+		}
 		
 		Vector statusV = new Vector();
 		for (int i = 0; i < modelIDs.size(); i++) {

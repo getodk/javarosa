@@ -421,17 +421,19 @@ public class FormTransportActivity implements
 	public void sendData(int transportMethod) throws IOException {
 		if (this.multiData != null) {
 			int[] ids = new int[multiData.size()];
-			int i = 0;
-			Enumeration en = multiData.elements();
-			while(en.hasMoreElements()) {
+			
+			for(int i = 0; i < ids.length; ++i) {
+				ids[i] = ((IDataPayload)multiData.elementAt(i)).getTransportId();
+			}
+			
+			submitStatusScreen = new MultiSubmitStatusScreen(this, ids);
+			shell.setDisplay(this, submitStatusScreen);
+			
+			for(Enumeration en = multiData.elements();en.hasMoreElements();) {
 				IDataPayload payload = (IDataPayload)en.nextElement();
 				JavaRosaServiceProvider.instance().getTransportManager().enqueue(payload,
 						destination, transportMethod, payload.getTransportId());
-				ids[i] = payload.getTransportId();
-				i++;
 			}
-			submitStatusScreen = new MultiSubmitStatusScreen(this, ids);
-			shell.setDisplay(this, submitStatusScreen);
 			
 		} else {
 			if (this.data != null) {
