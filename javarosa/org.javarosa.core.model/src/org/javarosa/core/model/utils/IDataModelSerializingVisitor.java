@@ -38,5 +38,7 @@ public interface IDataModelSerializingVisitor extends IDataModelVisitor {
 	public IDataPayload createSerializedPayload	(IFormDataModel model) throws IOException;
 	
 	void setAnswerDataSerializer(IAnswerDataSerializer ads);
+	
+	public IDataModelSerializingVisitor newInstance();
 
 }

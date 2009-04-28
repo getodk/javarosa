@@ -133,11 +133,12 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 	public void visit(DataModelTree tree) {
 		theXmlDoc = new Document();
 		TreeElement root = tree.getRoot();
-		if (root != null)
+		if (root != null) {
 			theXmlDoc.addChild(Node.ELEMENT, serializeNode(root));
+		}
 		
 		if (tree.schema != null) {
-			Element top = (Element)theXmlDoc.getChild(0);
+			Element top = theXmlDoc.getElement(0);
 			top.setNamespace(tree.schema);
 			top.setPrefix("", tree.schema);
 		}
@@ -182,8 +183,9 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 				int mult = instanceNode.getChildMultiplicity(childName);
 				for (int j = 0; j < mult; j++) {
 					Element child = serializeNode(instanceNode.getChild(childName, j));
-					if (child != null)
+					if (child != null) {
 						e.addChild(Node.ELEMENT, child);
+					}
 				}
 			}
 		}
@@ -207,5 +209,11 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 	 */
 	public void setAnswerDataSerializer(IAnswerDataSerializer ads) {
 		this.serializer = ads;
+	}
+	
+	public IDataModelSerializingVisitor newInstance() {
+		XFormSerializingVisitor modelSerializer = new XFormSerializingVisitor();
+		modelSerializer.setAnswerDataSerializer(this.serializer);
+		return modelSerializer;
 	}
 }
