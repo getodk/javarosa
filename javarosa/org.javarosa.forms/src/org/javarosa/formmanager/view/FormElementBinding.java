@@ -31,6 +31,10 @@ public class FormElementBinding implements FormElementStateListener {
 	public IFormElement element;
 	public TreeReference instanceRef;
 	public TreeElement instanceNode;
+	
+	private FormElementBinding() {
+		
+	}
 
 	public FormElementBinding (IQuestionWidget cw, FormIndex index, FormDef form) {
 		this(cw, form.getChild(index), index, form);
@@ -78,5 +82,14 @@ public class FormElementBinding implements FormElementStateListener {
 			throw new IllegalStateException("Widget received event from foreign question");
 		if (widget != null)
 			widget.refreshWidget(changeFlags);		
+	}
+	
+	public Object clone() {
+		FormElementBinding clone = new FormElementBinding();
+		clone.widget = widget;
+		clone.element = element;
+		clone.instanceNode = instanceNode;
+		clone.instanceRef = instanceRef;
+		return clone;
 	}
 }

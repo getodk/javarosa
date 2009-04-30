@@ -267,7 +267,8 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 	public Object clone() {
 		if(this.getViewState() == ChatterboxWidget.VIEW_LABEL) {
 			LabelWidget label = (LabelWidget)this.activeStyle;
-			ChatterboxWidget widget = new ChatterboxWidget(cbox, binding, this.getViewState(), (LabelWidget)label.clone(), null);
+			FormElementBinding newBinding = (FormElementBinding)binding.clone();
+			ChatterboxWidget widget = new ChatterboxWidget(cbox, newBinding, this.getViewState(), (LabelWidget)label.clone(), null);
 			return widget;
 		}
 		return null;
@@ -280,7 +281,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 			mult = label.getMultiplicity();
 		}
 		LabelWidget labelStyle = new LabelWidget(mult);
-		ChatterboxWidget widget = new ChatterboxWidget(cbox, this.getBinding(), ChatterboxWidget.VIEW_LABEL, labelStyle , null);
+		ChatterboxWidget widget = new ChatterboxWidget(cbox, (FormElementBinding)this.getBinding().clone(), ChatterboxWidget.VIEW_LABEL, labelStyle , null);
 
 		return widget;
 	}
