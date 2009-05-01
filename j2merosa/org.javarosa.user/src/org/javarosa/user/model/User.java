@@ -211,7 +211,10 @@ public class User implements Externalizable, IDRecordable, Restorable
         for (int i = 0; i < e.getNumChildren(); i++) {
         	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
         	String name = child.getName();
-        	properties.put(name, RestoreUtils.getValue("other/" + name, dm));
+        	Object value = RestoreUtils.getValue("other/" + name, dm);
+        	if (value != null){
+        	    properties.put(name, value);
+        	}
         }
 	}
 	
