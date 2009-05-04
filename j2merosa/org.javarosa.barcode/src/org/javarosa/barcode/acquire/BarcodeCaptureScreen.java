@@ -79,7 +79,7 @@ public class BarcodeCaptureScreen extends ImageCaptureScreen {
 		{
 			//#if javarosa.usepolishlocalisation
 			takePictureCommand = new Command(Locale.get( "menu.Scan"), Command.OK, 3);
-			//#elif
+			//#else
 			takePictureCommand = new Command("Scan", Command.OK, 3);
 			//#endif
 			

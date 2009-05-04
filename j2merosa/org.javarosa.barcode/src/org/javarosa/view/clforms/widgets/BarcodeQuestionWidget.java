@@ -49,7 +49,7 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 
 		//#if javarosa.usepolishlocalisation
 		setHint(Locale.get("hint.TypeOrScan"));
-		//#elif
+		//#else
 		setHint("Type in your answer");
 		//#endif
 		
@@ -70,7 +70,7 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 	public Command getAcquireCommand() {
 		//#if javarosa.usepolishlocalisation
 		return new Command(Locale.get( "menu.Scan"), Command.SCREEN, 3);
-		//#elif
+		//#else
 		return new Command("Scan", Command.SCREEN, 3);
 		//#endif
 	}
