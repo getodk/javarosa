@@ -21,7 +21,6 @@ import javax.microedition.io.file.FileSystemRegistry;
 public class FileUtility
 {
 	private static final String serviceName = "J2MEFileService";
-    private static final int CHUNK_SIZE = 1024;
 	
 	public String getName()
 	{
@@ -106,6 +105,7 @@ public class FileUtility
 	public static boolean createFile(String fullName, byte[] data) {
 		OutputStream fos = null;
 		FileConnection file = null;
+		boolean isSaved = false;
 		try {
 			file = (FileConnection) Connector.open(fullName);
 			if (!file.exists()) {
@@ -124,34 +124,7 @@ public class FileUtility
 		return true;
 	}
 
-    /**
-     * Create a file 
-     * @param fullName
-     * @param data
-     * @return whether the file was created
-     */
-    public static boolean createFile(String fullName, InputStream in) 
-        throws IOException {
-        OutputStream fout = null;
-        FileConnection file = null;
-        try {
-            file = (FileConnection) Connector.open( fullName );
-            if (!file.exists()) {
-                file.create();
-            }
-            fout = file.openOutputStream();
-            
-            byte[] b = new byte[CHUNK_SIZE];
-            int read;
-            while ((read = in.read(b)) != -1) {
-                fout.write(b, 0, read);
-            }
-        } finally {       
-            close(fout);
-            close(file);
-        }
-        return true;
-    }	
+	
 	/**
 	 * Delete a file
 	 * @param fileName
@@ -159,6 +132,7 @@ public class FileUtility
 	public static boolean deleteFile(String fileName) {
 		
 		FileConnection file = null;
+		boolean isSaved = false;
 		try {
 			file = (FileConnection) Connector.open(fileName);
 			if (file.exists()) {
@@ -180,42 +154,34 @@ public class FileUtility
 	 * @return
 	 */
 	public static byte[] getFileData(String fileName) {
-	    try {
-	        return getFileDataVerbose(fileName);
-	    } catch (Exception ex) {				
+		InputStream fis = null;
+		FileConnection file = null;
+		try {
+			file = (FileConnection) Connector.open(fileName);
+			int bytesToRead = (int) file.fileSize();
+			byte[] toReturn = new byte[bytesToRead];
+			fis = file.openInputStream();
+			int bytesRead = 0;
+			int blockSize = 1024;
+			/* RL - Should this be "while (bytesToRead >= bytesRead)"? */
+			while (bytesToRead > bytesRead) {
+				int thisBlock = blockSize;
+				if (bytesToRead - bytesRead < blockSize) {
+					thisBlock = bytesToRead-bytesRead;
+				}
+				fis.read(toReturn, bytesRead, thisBlock);
+				bytesRead += blockSize;
+			}
+			return toReturn;
+		} catch (Exception ex) {				
 			handleException(ex);
 		} 
+		finally {		
+			close(fis);
+			close(file);
+		}
 		return null;
 	}
-	
-    public static byte[] getFileDataVerbose(String fileName) 
-        throws Exception{
-        InputStream fis = null;
-        FileConnection file = null;
-        try {
-            file = (FileConnection) Connector.open(fileName);
-            int bytesToRead = (int) file.fileSize();
-            byte[] toReturn = new byte[bytesToRead];
-            fis = file.openInputStream();
-            int bytesRead = 0;
-            int blockSize = 1024;
-            /* RL - Should this be "while (bytesToRead >= bytesRead)"? */
-            while (bytesToRead > bytesRead) {
-                int thisBlock = blockSize;
-                if (bytesToRead - bytesRead < blockSize) {
-                    thisBlock = bytesToRead-bytesRead;
-                }
-                fis.read(toReturn, bytesRead, thisBlock);
-                bytesRead += blockSize;
-            }
-            return toReturn;
-        }
-        finally {
-            close(fis);
-            close(file);
-        }
-        return null;
-    }
 	
 	/**
 	 * Gets file data from the OS
