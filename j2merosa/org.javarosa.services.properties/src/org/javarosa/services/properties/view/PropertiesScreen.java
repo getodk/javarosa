@@ -115,7 +115,7 @@ public class PropertiesScreen extends Form implements IView{
 					// possible choices here but
 					// for now, we'll stick with single-selection properties
 					if (propValues != null) {
-						if (propValues.size() <= 1) {
+						if (propValues.size() <= 1 && propValues.size()>0) {
 								TextField input = new TextField(
 										rules
 												.getHumanReadableDescription(propertyName),
