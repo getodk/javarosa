@@ -298,17 +298,20 @@ public class DataModelTreeRMSUtility extends RMSUtility {
 			System.out.println("Saved Form Purge: " + deletables.size() + " purgable records");
 			
 			boolean emptyEnough = false;
-			int numPurged = 0;
+			Vector purged = new Vector();
 			for (int i = 0; i < deletables.size() && !emptyEnough; i++) {
 				int modelID = ((Integer)deletables.elementAt(i)).intValue();
 				deleteRecord(modelID);
-				numPurged++;
 				
+				purged.addElement(new Integer(modelID));
 				if (getUsageFactor() <= clearThreshold)
 					emptyEnough = true;
 			}
 			
-			System.out.println("Saved Form Purge: " + numPurged + " records purged; " +
+			//We also need to wipe the messages associated with the records we're deleting
+			tm.wipeAssociatedMessages(purged);
+			
+			System.out.println("Saved Form Purge: " + purged.size() + " records purged; " +
 					(100. * getUsageFactor()) + " pct consumed");
 			
 			ok = getUsageFactor() < triggerThreshold;
