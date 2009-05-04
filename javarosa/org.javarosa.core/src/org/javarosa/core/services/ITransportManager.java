@@ -157,6 +157,8 @@ public interface ITransportManager extends IService {
 	public Vector getModelDeliveryStatuses (Vector modelIDs, boolean notFoundOK);
 	
 	public void markSent (int modelID, boolean checkQueue);
+	
+	public void wipeAssociatedMessages(Vector modelIDs);
 
 		/**
 	 * 

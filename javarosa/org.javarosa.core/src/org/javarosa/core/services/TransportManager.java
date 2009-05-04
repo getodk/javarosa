@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Stack;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -354,5 +355,28 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	 */
 	public ITransportDestination getDefaultTransportDestination(int i) {
 		return ((TransportMethod)transportMethods.get(new Integer(i))).getDefaultDestination();
+	}
+	
+	public void wipeAssociatedMessages(Vector modelIDs) {
+		Stack toClear = new Stack();
+		
+		Enumeration qMessages = getMessages();
+		while(qMessages.hasMoreElements()) {
+			TransportMessage message = (TransportMessage)qMessages.nextElement();
+			
+			int modelID = message.getModelId();
+			if(modelIDs.contains(new Integer(modelID))) {
+				toClear.addElement(new Integer(message.getRecordId()));
+			}
+		}
+		
+		while(!toClear.isEmpty()) {
+			Integer mid = (Integer)toClear.pop();
+			try {
+				storage.deleteMessage(mid.intValue());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
