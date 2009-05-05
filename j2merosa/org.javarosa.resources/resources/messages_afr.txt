@@ -1,0 +1,104 @@
+polish.command.ok=OK
+polish.command.cancel=Terug
+polish.command.options=Opsies
+polish.command.exit=Gaan Uit
+polish.command.select=Kies
+polish.command.mark=Merk
+polish.command.unmark=Onmerk
+# for deleting a single char:
+polish.command.delete=Skrap
+# for deleting a complete TextField:
+polish.command.clear=Vee Uit
+# for hiding menus on BlackBerry devices:
+polish.command.hide=Hide
+# for showing a default title when no label
+# is defined in a TextField. This is only
+# used when no direct input mode is activated:
+polish.title.input=Voeg in
+# used for showing a screen for selecting symbols within TextFields:
+polish.command.entersymbol=Voeg simbool in
+# used by the HtmlBrowser for a links:
+polish.command.followlink=Gaan
+# used by the HtmlBrowser for submitting a form:
+polish.command.submit=Stuur
+# used by the RssBrowser for returning to the previous page:
+polish.command.back=Terug
+# RSS commands:
+polish.rss.command.select=Wys
+polish.rss.command.followlink=Gaan
+
+# used for predictive setup
+polish.predictive.command.enable=Enable Predictive Input
+polish.predictive.command.disable=Disable Predictive Input
+polish.predictive.command.install=Install Predictive Input
+polish.predictive.registerNewWord.label=New Word: 
+polish.predictive.registerNewWord.command=Add New Word
+polish.predictive.download.title=Predictive Text
+polish.predictive.download.message=The predictive dictionary  could not be found or has the wrong version. Press OK to exit the application and download the dictionary.
+polish.predictive.local.title=Predictive Text
+polish.predictive.local.message=The predictive dictionary has the wrong version or could not be found. Press OK to install the dictionary.
+polish.predictive.title=Predictive Input
+polish.predictive.wordNotFound=Word not found
+
+polish.predictive.setup.title=Predictive Setup
+polish.predictive.setup.info=Installing the dictionary used for predictive input. Please wait a moment ...
+polish.predictive.setup.status.delete=Deleting previous installation ...
+polish.predictive.setup.status.install=Installing ...
+polish.predictive.setup.status.finished=Finished, please press exit ...
+polish.predictive.setup.cancel=Do you really want to cancel the installation ? This may result in unwanted effects.
+polish.predictive.setup.error=An error has occured:
+polish.predictive.setup.cmd.cancel=Terug
+polish.predictive.setup.cmd.exit=Gaan Uit
+polish.predictive.setup.cmd.yes=Ja
+polish.predictive.setup.cmd.no=nee
+
+#Javarosa-specific
+menu.Save=Berg
+menu.Exit=Gaan Uit
+menu.GetNewForms=Kry Nuwe Vorms
+menu.Camera=Kamera
+menu.Recorder=Stemopnemer
+menu.ImageManagement=Beeld Bestuurem
+menu.ViewSaved=Hersien Gestoorde Vorms
+menu.Delete=Skrap
+menu.ShareForms=Deel Vorms
+menu.Settings=Instellings
+menu.SaveAndExit=Berg en Gaan Uit
+menu.SendForm=Stuur Vorm
+menu.Next=Volgende
+menu.Back=Terug
+menu.ViewAnswers=Bekyk Antwoorde
+menu.SendNow=Stuur Nou
+menu.SendLater=Stuur Later (Berg)
+menu.SendToNewServer=Stuur na nuwe adres
+menu.Scan=Neem af
+menu.SendData=Stuur Vorm
+menu.SendAllUnsent=Stuur Ongestuurde Vorms
+menu.Edit=Voeg Nog Info By
+menu.Review=Bekyk
+menu.Refresh=Hervat
+menu.MessageStatus=Boodskap Status
+menu.Empty=Maak Leeg
+
+hint.TypeOrScan=Tik jou antwoord in, of kies Neem af on die barcode af te neem
+
+title.ScanBarcode=Barcode
+title.FormsList=Vorms Lys
+title.Login=Login
+title.SavedForms=Gestoorde Vorms
+
+button.Next=VOLGENDE
+
+question.SendNow=Stuur data nou?
+
+message.SendingInProgress=Uitsending aan t'gang...
+message.SuccessfullyTransmitted=Vorm is gestuur!
+message.CurrentlySending=\nBesig on vorm te stuur
+message.SuccessfullySubmitted=Vorm is suksesvol gestuur! Rekordnommer:  
+message.SubmissionFailed=Submissie gefaal! Probeer om die vorm later te stuur onder \'Hersien Gestoorde Vorms\'.
+message.SubmissionTakingLong=Submissie duur tamelik lank; bekyk status of herstuur die vorm later onder \'Hersien Gestoorde Vorms\'
+message.SubmissionErrorUnknown=Onbekenste fout, vorm nie gestuur nie!
+message.CompulsoryQuestionsIncomplete=Daar is verpligtende vrae wat nie beantwoord is nie. Vrae wat met * begin more beantwoord wees.
+message.FormUneditable=Vorm is nie uitgeebaar nie.
+
+
