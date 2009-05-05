@@ -18,7 +18,7 @@ import org.javarosa.user.utility.AddUserContext;
 import org.javarosa.user.view.NewUserForm;
 
 //#if javarosa.usepolishlocalisation
-import de.enough.polish.util.Locale;
+//# import de.enough.polish.util.Locale;
 //#endif
 
 /*
@@ -32,8 +32,8 @@ public class AddUserActivity implements IActivity, CommandListener {
 	private IShell parent = null;
 	
 	//#if javarosa.usepolishlocalisation
-	private final Command CMD_SAVE = new Command(Locale.get( "menu.Save"), Command.OK, 2);
-	private final Command CMD_CANCEL = new Command(Locale.get( "menu.Exit"), Command.EXIT, 2);
+	//# private final Command CMD_SAVE = new Command(Locale.get( "menu.Save"), Command.OK, 2);
+	//# private final Command CMD_CANCEL = new Command(Locale.get( "menu.Exit"), Command.EXIT, 2);
 	
 	//#else
 	public final Command CMD_SAVE = new Command("Save", Command.OK, 2);
