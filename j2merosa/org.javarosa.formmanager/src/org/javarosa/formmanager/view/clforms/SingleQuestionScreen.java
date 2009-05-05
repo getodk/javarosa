@@ -16,6 +16,11 @@ import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.FormElementBinding;
 
+//#if javarosa.usepolishlocalisation
+import de.enough.polish.util.Locale;
+//#endif
+
+
 
 public abstract class SingleQuestionScreen extends Form implements IView {
 
@@ -31,11 +36,17 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	public static Command previousCommand;
 	public static Command nextCommand;
 	public static Command viewAnswersCommand;
-
-	public static Command nextItemCommand = new Command("next", Command.ITEM, 1);
 	
+	//#if javarosa.usepolishlocalisation
+	public static Command nextItemCommand = new Command(Locale.get("menu.Next"), Command.ITEM, 1);
+	//#style button
+	public StringItem nextItem = new StringItem(null,Locale.get("button.Next"),Item.BUTTON);
+	//#else
+	public static Command nextItemCommand = new Command("next", Command.ITEM, 1);
 	//#style button
 	public StringItem nextItem = new StringItem(null,"NEXT",Item.BUTTON);
+	//#endif
+	
 	public ItemCommandListener itemListner;
 
 	public SingleQuestionScreen(FormElementBinding prompt) {
@@ -110,9 +121,16 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	}
 
 	private void setUpCommands(){
+		//#if javarosa.usepolishlocalisation
+		nextCommand = new Command(Locale.get("menu.Next"), Command.SCREEN, 0);
+		previousCommand = new Command(Locale.get("menu.Back"), Command.SCREEN, 2);
+		viewAnswersCommand = new Command(Locale.get("menu.ViewAnswers"), Command.SCREEN, 3);
+		
+		//#else
 		nextCommand = new Command("next", Command.SCREEN, 0);
 		previousCommand = new Command("back", Command.SCREEN, 2);
 		viewAnswersCommand = new Command("View Answers", Command.SCREEN, 3);
+		//#endif
 
 		this.addCommand(previousCommand);
 		this.addCommand(viewAnswersCommand);

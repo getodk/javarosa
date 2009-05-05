@@ -10,6 +10,9 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.FormElementBinding;
+//#if javarosa.usepolishlocalisation
+import de.enough.polish.util.Locale;
+//#endif
 
 public class FormViewScreen extends List implements IView {
 
@@ -33,15 +36,23 @@ public class FormViewScreen extends List implements IView {
 	}
 
 	private void setUpCommands() {
+		//#if javarosa.usepolishlocalisation
+		exitNoSaveCommand = new Command(Locale.get("menu.Exit"), Command.EXIT, 4);
+		exitSaveCommand = new Command(Locale.get("menu.SaveAndExit"), Command.SCREEN, 4);
+		sendCommand = new Command(Locale.get("menu.SendForm"), Command.SCREEN, 4);
+		//#else
 		exitNoSaveCommand = new Command("Exit", Command.EXIT, 4);
 		exitSaveCommand = new Command("Save and Exit", Command.SCREEN, 4);
 		sendCommand = new Command("Send Form", Command.SCREEN, 4);
+		//#endif
 		//saveAndReloadCommand = new Command("SAVE&Reload", Command.ITEM, 3);
 
 		// next command is added on a per-widget basis
 		this.addCommand(exitNoSaveCommand);
 		//screen.addCommand(exitSaveCommand);
+		if(!model.isReadOnly()){
 		this.addCommand(sendCommand);
+		}
 		//screen.addCommand(saveAndReloadCommand);
 	}
 
