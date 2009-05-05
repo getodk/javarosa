@@ -17,6 +17,10 @@ import org.javarosa.core.api.IView;
 import org.javarosa.user.utility.AddUserContext;
 import org.javarosa.user.view.NewUserForm;
 
+//#if javarosa.usepolishlocalisation
+import de.enough.polish.util.Locale;
+//#endif
+
 /*
  * @author Julian Hulme
  */
@@ -26,8 +30,16 @@ public class AddUserActivity implements IActivity, CommandListener {
 	public final static String NEW_USER_KEY = "new_user";
 	
 	private IShell parent = null;
+	
+	//#if javarosa.usepolishlocalisation
+	private final Command CMD_SAVE = new Command(Locale.get( "menu.Save"), Command.OK, 2);
+	private final Command CMD_CANCEL = new Command(Locale.get( "menu.Exit"), Command.EXIT, 2);
+	
+	//#else
 	public final Command CMD_SAVE = new Command("Save", Command.OK, 2);
 	public final Command CMD_CANCEL = new Command("Exit",Command.EXIT, 2);
+	//#endif
+	
 	public static final String COMMAND_KEY = "command";
 	
 	boolean success = false;
