@@ -7,7 +7,7 @@ import javax.microedition.lcdui.Spacer;
 import org.javarosa.core.api.IView;
 
 //#if javarosa.usepolishlocalisation
-import de.enough.polish.util.Locale;
+//# import de.enough.polish.util.Locale;
 //#endif
 
 public class SubmitScreen extends Form implements IView {
@@ -17,9 +17,9 @@ public class SubmitScreen extends Form implements IView {
 	public static final int SEND_NOW_SPEC = 2;
 	
 	//#if javarosa.usepolishlocalisation
-	private static final String SEND_NOW_DEFAULT_STRING = Locale.get("menu.SendNow");
-	private static final String SEND_NOW_SPEC_STRING = Locale.get("menu.SendToNewServer");
-	private static final String SEND_LATER_STRING = Locale.get("menu.SendLater");
+	//# private static final String SEND_NOW_DEFAULT_STRING = Locale.get("menu.SendNow");
+	//# private static final String SEND_NOW_SPEC_STRING = Locale.get("menu.SendToNewServer");
+	//# private static final String SEND_LATER_STRING = Locale.get("menu.SendLater");
 	//#else
 	private static final String SEND_NOW_DEFAULT_STRING = "Send Now";
 	private static final String SEND_NOW_SPEC_STRING = "Send to new server";
@@ -35,7 +35,7 @@ public class SubmitScreen extends Form implements IView {
 		//Command selectCommand = new Command("OK", Command.OK, 1);
 		
 		//#if javarosa.usepolishlocalisation
-		cg = new ChoiceGroup(Locale.get("question.SendNow"), ChoiceGroup.EXCLUSIVE);
+		//# cg = new ChoiceGroup(Locale.get("question.SendNow"), ChoiceGroup.EXCLUSIVE);
 		//#else
 		//#style submitYesNo
 		cg = new ChoiceGroup("Send data now?", ChoiceGroup.EXCLUSIVE);
