@@ -35,6 +35,10 @@ import org.javarosa.formmanager.view.clforms.widgets.SelectQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TextQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TimeQuestionWidget;
 
+//#if javarosa.usepolishlocalisation
+import de.enough.polish.util.Locale;
+//#endif
+
 public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 		CommandListener, ItemCommandListener {
 	private FormEntryController controller;
@@ -222,7 +226,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 	}
 
 	public void formComplete() {
-
+		if(!model.isReadOnly()){
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException ie) {
@@ -230,7 +234,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 
 		controller.save();// always save form
 		controller.exit();
-
+		}
 	}
 
 	public void questionIndexChanged(FormIndex questionIndex) {
@@ -271,9 +275,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				}
 				if (counter > 0) {
 					// show alert
-					String txt = "There are "
-							+ counter
-							+ " unanswered compulsory questions and must be completed first to proceed";
+					String txt = "There are unanswered compulsory questions and must be completed first to proceed";
 					final Alert alert = new Alert("Question Required!", txt,
 							null, AlertType.ERROR);
 					controller.setView(new IView() {
@@ -285,11 +287,30 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 					model.setFormComplete();
 				// controller.exit();
 			} else if (command == List.SELECT_COMMAND) {
+				if (!model.isReadOnly()){
 				int i = formView.getSelectedIndex();
 				FormIndex b = formView.indexHash.get(i);
 				controller.selectQuestion(b);
-
 				this.showFormView = false;
+				}
+				else
+				{
+					String txt;
+					//#if javarosa.usepolishlocalisation
+					 txt = Locale.get("message.FormUneditable");
+					//#else
+					 txt = "You cannot edit your answers when reviewing the form";
+					//#endif
+					
+					// #style CL_Forms_Form
+					final Alert alert = new Alert("Cannot Edit Answers!", txt,
+							null, AlertType.ERROR);
+					controller.setView(new IView() {
+						public Object getScreenObject() {
+							return alert;
+						}
+					});	
+				}
 			}
 
 		} else {
@@ -298,7 +319,13 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				answer = widget.getWidgetValue();
 
 				if (prompt.instanceNode.required && answer == null) {
-					String txt = "This is a compulsory question and must be completed first to proceed";
+					String txt;
+					//#if javarosa.usepolishlocalisation
+					 txt = Locale.get("message.CompulsoryQuestionsIncomplete");
+					//#else
+					 txt = "This is a compulsory question and must be completed first to proceed";
+					//#endif
+					
 					// #style CL_Forms_Form
 					final Alert alert = new Alert("Question Required!", txt,
 							null, AlertType.ERROR);

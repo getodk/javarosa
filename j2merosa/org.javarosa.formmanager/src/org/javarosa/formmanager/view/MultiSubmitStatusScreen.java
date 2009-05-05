@@ -18,6 +18,10 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.services.transport.TransportMessage;
 
+//#if javarosa.usepolishlocalisation
+import de.enough.polish.util.Locale;
+//#endif
+
 /**
  * Note: This screen assumes that the model IDs provided will be sent in a more or
  * less sequential fashion.
@@ -40,13 +44,13 @@ public class MultiSubmitStatusScreen extends Form implements ISubmitStatusScreen
     public static final int REFRESH_INTERVAL = 1000;
     public static final int TIMEOUT = 180000;
 
-    //#if commcare.lang.sw
-    public static final String MSG_N_COMP = "Umefanikiwa kutuma Fomu ";
-    public static final String MSG_SENDING_N = "\nSasa fomu ";
-    public static final String MSG_SUCCESS = "Ujumbe umepokelewa!";
-    public static final String MSG_FAILED = "Ujumbe haujapokelewa ila umehifadhiwa.";
-    public static final String MSG_TOO_LONG = "Ujumbe haujapokelewa ila umehifadhiwa.";
-    public static final String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
+    //#if javarosa.usepolishlocalisation
+    public static final String MSG_N_COMP = Locale.get("message.SuccessfullyTransmitted");
+    public static final String MSG_SENDING_N = Locale.get("message.CurrentlySending");
+    public static final String MSG_SUCCESS = Locale.get("message.SuccessfullySubmitted");
+    public static final String MSG_FAILED = Locale.get("message.SubmissionFailed");
+    public static final String MSG_TOO_LONG = Locale.get("message.SubmissionTakingLong");
+    public static final String MSG_UNKNOWN_ERROR = Locale.get("message.SubmissionErrorUnknown");
     //#else
     public static final String MSG_N_COMP = "Succesfully Transmitted Form ";
     public static final String MSG_SENDING_N = "\nCurrently Sending Form ";
