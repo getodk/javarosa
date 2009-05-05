@@ -195,7 +195,7 @@ public class PatientEntity implements IEntity {
 
 	public String[] getHeaders(boolean detailed) {
 		//#if javarosa.patientselect.formfactor == nokia-s40
-		String[] shortHeaders = {"Name", "ID"};
+		//# String[] shortHeaders = {"Name", "ID"};
 		//#else
 		String[] shortHeaders = {"Name", "ID", "Age/Sex"};
 		//#endif

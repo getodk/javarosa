@@ -20,8 +20,8 @@ import de.enough.polish.ui.TextField;
 
 public class EntitySelectView extends FramedForm implements IView, ItemStateListener, CommandListener {
 	//#if javarosa.patientselect.formfactor == nokia-s40
-	private static final int MAX_ROWS_ON_SCREEN = 5;
-	private static final int SCROLL_INCREMENT = 4;	
+	//# private static final int MAX_ROWS_ON_SCREEN = 5;
+	//# private static final int SCROLL_INCREMENT = 4;	
 	//#else
 	private static final int MAX_ROWS_ON_SCREEN = 10;
 	private static final int SCROLL_INCREMENT = 5;	
