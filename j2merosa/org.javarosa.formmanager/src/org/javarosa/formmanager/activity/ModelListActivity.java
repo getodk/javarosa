@@ -57,15 +57,15 @@ public class ModelListActivity extends List implements CommandListener, IActivit
 	public final static String returnKey = "ModelListReturnCommand";
 
 	//#if javarosa.usepolishlocalisation
-	public final static Command CMD_BACK = new Command(Locale.get("menu.Back"), Command.BACK, 2);
-	public final static Command CMD_SEND = new Command(Locale.get("menu.SendData"),Command.SCREEN,1);
-	public static final Command CMD_SEND_ALL_UNSENT = new Command(Locale.get("menu.SendAllUnsent"), Command.SCREEN, 2);
-	public final static Command CMD_EDIT = new Command(Locale.get("menu.Edit"), Command.SCREEN, 2);
-	public final static Command CMD_REVIEW = new Command(Locale.get("menu.Review"), Command.SCREEN, 2);
-	public final static Command CMD_REFRESH = new Command(Locale.get("menu.Refresh"), Command.SCREEN, 3);
-	public final static Command CMD_MSGS = new Command(Locale.get("menu.MessageStatus"),Command.SCREEN,4);
-	public final static Command CMD_DELETE = new Command(Locale.get("menu.Delete"),Command.SCREEN,5);
-	public final static Command CMD_EMPTY = new Command(Locale.get("menu.Empty"), Command.SCREEN, 6);
+	//# public final static Command CMD_BACK = new Command(Locale.get("menu.Back"), Command.BACK, 2);
+	//# public final static Command CMD_SEND = new Command(Locale.get("menu.SendData"),Command.SCREEN,1);
+	//# public static final Command CMD_SEND_ALL_UNSENT = new Command(Locale.get("menu.SendAllUnsent"), Command.SCREEN, 2);
+	//# public final static Command CMD_EDIT = new Command(Locale.get("menu.Edit"), Command.SCREEN, 2);
+	//# public final static Command CMD_REVIEW = new Command(Locale.get("menu.Review"), Command.SCREEN, 2);
+	//# public final static Command CMD_REFRESH = new Command(Locale.get("menu.Refresh"), Command.SCREEN, 3);
+	//# public final static Command CMD_MSGS = new Command(Locale.get("menu.MessageStatus"),Command.SCREEN,4);
+	//# public final static Command CMD_DELETE = new Command(Locale.get("menu.Delete"),Command.SCREEN,5);
+	//# public final static Command CMD_EMPTY = new Command(Locale.get("menu.Empty"), Command.SCREEN, 6);
 	//#else
 	public final static Command CMD_BACK = new Command("Back", Command.BACK, 2);
 	public final static Command CMD_SEND = new Command("Send Data",Command.SCREEN,1);
@@ -118,7 +118,7 @@ public class ModelListActivity extends List implements CommandListener, IActivit
     public ModelListActivity(IShell mainShell)
     {
     	//#if javarosa.usepolishlocalisation
-    	super(Locale.get("title.SavedForms"), List.EXCLUSIVE);
+    	//# super(Locale.get("title.SavedForms"), List.EXCLUSIVE);
     	//#else
     	super("Saved Forms", List.EXCLUSIVE);
     	//#endif
