@@ -44,7 +44,7 @@ import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
 
 //#if javarosa.usepolishlocalisation
-import de.enough.polish.util.Locale;
+//# import de.enough.polish.util.Locale;
 //#endif
 
 /**
