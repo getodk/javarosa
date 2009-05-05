@@ -43,6 +43,8 @@ public class CoreModelModule implements IModule {
 				"org.javarosa.core.model.instance.DataModelTree",
 				"org.javarosa.core.model.data.StringData",
 				"org.javarosa.core.model.data.IntegerData",
+				"org.javarosa.core.model.data.DecimalData",
+				"org.javarosa.core.model.data.GeoPointData",
 				"org.javarosa.core.model.data.SelectOneData",
 				"org.javarosa.core.model.data.SelectMultiData",
 				"org.javarosa.core.model.data.DateData",
