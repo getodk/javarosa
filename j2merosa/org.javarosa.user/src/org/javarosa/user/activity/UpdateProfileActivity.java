@@ -13,7 +13,6 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.services.IPropertyManager;
-import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
 
 public class UpdateProfileActivity implements IActivity, CommandListener 
