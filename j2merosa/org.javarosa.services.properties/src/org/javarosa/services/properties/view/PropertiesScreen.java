@@ -16,7 +16,6 @@ import javax.microedition.rms.RecordStoreException;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
-import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.IPropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
