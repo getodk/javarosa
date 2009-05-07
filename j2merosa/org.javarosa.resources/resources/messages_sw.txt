@@ -53,11 +53,11 @@ polish.predictive.setup.cmd.yes=Yes
 polish.predictive.setup.cmd.no=No
 
 #Javarosa-specific
-menu.NewCase=New Case
-menu.FollowUp=Follow Up on Existing Case
-menu.Referral=Follow Up on Referral
-menu.ViewOpen=View Open Cases
-menu.Resolve=Resolve Case
+menu.NewCase=Jarida la kesi mpya
+menu.FollowUp=Fatilia jarida la kesi iliyopo
+menu.Referral=Fatilia kwa kurejea
+menu.ViewOpen=Angalia jarida la kesi iliyofunguliwa
+menu.Resolve=Rudia kutatua kesi
 menu.Save=Save
 menu.Exit=Exit
 menu.GetNewForms=Get New Forms
@@ -105,5 +105,4 @@ message.SubmissionTakingLong=Sending is taking a long time; you may check on the
 message.SubmissionErrorUnknown=Unknown sending error; form not sent!
 message.CompulsoryQuestionsIncomplete=There are unanswered compulsory questions and must be completed first to proceed
 message.FormUneditable=You cannot edit your answers when reviewing the form
-message.RequiredQuestion=Required question; You must answer
-
+message.RequiredQuestion=Swali hili lazima lijazwe

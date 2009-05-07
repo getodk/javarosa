@@ -39,10 +39,20 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
 
+//#if javarosa.usepolishlocalisation
+//# import de.enough.polish.util.Locale;
+//#endif
+
+
 public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryModelListener, CommandListener{
 	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
-	private static final String PROMPT_REQUIRED_QUESTION = "Required question; you must answer";
+    //#if javarosa.usepolishlocalisation
+    //# private static final String PROMPT_REQUIRED_QUESTION = Locale.get("message.RequiredQuestion");
+    //#else
+    private static final String PROMPT_REQUIRED_QUESTION = "Required question; You must answer";
+    //#endif
+
 	private static final String PROMPT_DEFAULT_CONSTRAINT_VIOL = "Answer is outside of the allowed range";
 	
     public static int KEY_CENTER_LETS_HOPE = -5;

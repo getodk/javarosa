@@ -18,6 +18,10 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 
+//#if javarosa.usepolishlocalisation
+//# import de.enough.polish.util.Locale;
+//#endif
+
 /**
  * @author Clayton Sims
  * @date Mar 19, 2009 
@@ -32,11 +36,20 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 	
 	// Clayton Sims - Mar 19, 2009 : I'm really not a fan of how this is done. Should
 	// be refactored at some point.
-	public static final String NEW = "New Case";
-	public static final String FOLLOWUP = "Follow Up on Existing Case";
-	public static final String REFERRAL = "Follow Up on Referral";
-	public static final String VIEW_OPEN = "View Open Cases";
-	public static final String RESOLVE = "Resolve Case";
+
+	//#if javarosa.usepolishlocalisation
+    //# public static final String NEW = Locale.get("menu.NewCase");
+    //# public static final String FOLLOWUP = Locale.get("menu.FollowUp");
+    //# public static final String REFERRAL = Locale.get("menu.Referral");
+    //# public static final String VIEW_OPEN = Locale.get("menu.ViewOpen");
+    //# public static final String RESOLVE = Locale.get("menu.Resolve");
+    //#else
+    public static final String NEW = "New Case";
+    public static final String FOLLOWUP = "Follow Up on Existing Case";
+    public static final String REFERRAL = "Follow Up on Referral";
+    public static final String VIEW_OPEN = "View Open Cases";
+    public static final String RESOLVE = "Resolve Case";
+    //#endif        
 
 	Vector commands = new Vector();
 
