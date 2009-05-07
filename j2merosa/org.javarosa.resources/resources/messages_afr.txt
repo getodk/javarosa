@@ -53,6 +53,11 @@ polish.predictive.setup.cmd.yes=Ja
 polish.predictive.setup.cmd.no=nee
 
 #Javarosa-specific
+menu.NewCase=New Case
+menu.FollowUp=Follow Up on Existing Case
+menu.Referral=Follow Up on Referral
+menu.ViewOpen=View Open Cases
+menu.Resolve=Resolve Case
 menu.Save=Berg
 menu.Exit=Gaan Uit
 menu.GetNewForms=Kry Nuwe Vorms
@@ -100,5 +105,6 @@ message.SubmissionTakingLong=Submissie duur tamelik lank; bekyk status of herstu
 message.SubmissionErrorUnknown=Onbekenste fout, vorm nie gestuur nie!
 message.CompulsoryQuestionsIncomplete=Daar is verpligtende vrae wat nie beantwoord is nie. Vrae wat met * begin more beantwoord wees.
 message.FormUneditable=Vorm is nie uitgeebaar nie.
+message.RequiredQuestion=Required question; You must answer
 
 
