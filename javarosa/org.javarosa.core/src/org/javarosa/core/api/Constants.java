@@ -54,4 +54,11 @@ public class Constants {
 	 */
 	final public static String ACTIVITY_TYPE_GET_IMAGES = "get_images";
 	final public static String ACTIVITY_TYPE_GET_AUDIO = "get_audio";
+	
+	/**
+	 * Service codes
+	 */
+	final public static String TRANSPORT_MANAGER = "Transport Manager";
+	final public static String PROPERTY_MANAGER = "Property Manager";
+
 }

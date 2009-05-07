@@ -17,13 +17,17 @@
 package org.javarosa.core;
 
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
+import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IDaemon;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IIncidentLogger;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.services.IService;
+import org.javarosa.core.services.IPropertyManager;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.StorageManager;
@@ -54,7 +58,7 @@ public class JavaRosaServiceProvider {
 	
 	private StorageManager storageManager;
     private ITransportManager transportManager;
-    private PropertyManager propertyManager;
+    private IPropertyManager propertyManager;
     
     private IIncidentLogger logger;
 	
@@ -81,6 +85,25 @@ public class JavaRosaServiceProvider {
 	 */
 	public void initialize() {
 		// For right now do nothing, to conserve memory we'll load Providers when they're asked for
+	    
+	}
+	/**
+	 * Initialize the platform.  Setup things like the RMS for the forms, the transport manager...
+	 */
+	public void initialize(Vector services) {
+		
+	    IService service;
+	    String name;
+	    for (Enumeration e = services.elements() ; e.hasMoreElements() ;) {
+	        service = (IService) e.nextElement();
+	        name = service.getName();
+	        if (name.equals(Constants.PROPERTY_MANAGER)) {
+                propertyManager = (IPropertyManager) service;
+            } else if (name.equals(Constants.TRANSPORT_MANAGER)) {
+	            transportManager = (ITransportManager) service;
+	        }
+            registerService(service);
+	    }
 	}
 
 	/**
@@ -128,7 +151,7 @@ public class JavaRosaServiceProvider {
 		return transportManager;
 	}
 	
-	public PropertyManager getPropertyManager() {
+	public IPropertyManager getPropertyManager() {
 		if(propertyManager == null) {
 			propertyManager = new PropertyManager();
 			this.registerService(propertyManager);
