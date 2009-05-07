@@ -1587,14 +1587,16 @@ public class XFormParser {
 	}
 	
 	public static DataModelTree restoreDataModel (byte[] data, Class restorableType) {
-		Restorable r = (Restorable)PrototypeFactory.getInstance(restorableType);
+		Restorable r = (restorableType != null ? (Restorable)PrototypeFactory.getInstance(restorableType) : null);
 		
 		Document doc = getXMLDocument(new InputStreamReader(new ByteArrayInputStream(data)));
 		Element e = doc.getRootElement();
 		
 		TreeElement te = buildInstanceStructure(e, null);
 		DataModelTree dm = new DataModelTree(te);
-		RestoreUtils.templateData(r, dm, null);
+		if (r != null) {
+			RestoreUtils.templateData(r, dm, null);
+		}
 		loadInstanceData(e, te, null);
 		
 		return dm;
