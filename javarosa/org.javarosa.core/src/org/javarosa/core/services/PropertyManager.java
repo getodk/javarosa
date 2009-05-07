@@ -34,7 +34,7 @@ import org.javarosa.core.services.properties.storage.PropertyRMSUtility;
  * @author Clayton Sims
  *
  */
-public class PropertyManager implements IService {
+public class PropertyManager implements IService,IPropertyManager {
 	/**
 	 * The name for the Persistent storage utility name
 	 */
