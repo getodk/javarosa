@@ -68,11 +68,13 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 	}
 
 	public Command getAcquireCommand() {
+		Command acquire;
 		//#if javarosa.usepolishlocalisation
-		return new Command(Locale.get( "menu.Scan"), Command.SCREEN, 3);
+		 acquire =  new Command(Locale.get( "menu.Scan"), Command.SCREEN, 3);
 		//#else
-		return new Command("Scan", Command.SCREEN, 3);
+		 acquire = new Command("Scan", Command.SCREEN, 3);
 		//#endif
+		return acquire;
 	}
 
 	public AcquireScreen getAcquireScreen(CommandListener callingListener) {

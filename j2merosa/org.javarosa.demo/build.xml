@@ -128,7 +128,7 @@
 				<!-- obfuscator settings: do not obfuscate when the test-property is true -->
 				<obfuscator name="ProGuard" unless="(noobfuscate or test) and not release">
 					<parameter name="optimize" value="true" />
-					<parameter name="printmapping" value="${dir.dist}\obfuscation_mapping.txt" />
+					<parameter name="printmapping" value="dist/obfuscation_mapping.txt" />
 					
 					<!-- none of the parameter names below can be the same, or else they will clobber previous parameters; hence the varied spacing -->
 					<parameter name="keep,allowshrinking" value="!abstract class org.javarosa.core.model.* implements org.javarosa.core.model.IFormElement" />

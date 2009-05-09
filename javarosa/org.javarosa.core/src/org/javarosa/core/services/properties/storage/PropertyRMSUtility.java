@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.storage.DataModelTreeMetaData;
+//import org.javarosa.core.model.instance.DataModelTree;
+//import org.javarosa.core.model.storage.DataModelTreeMetaData;
 import org.javarosa.core.services.properties.Property;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
