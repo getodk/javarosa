@@ -6,7 +6,7 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
-import org.javarosa.core.model.test.QuestionDefTest;
+
 import org.javarosa.user.model.User;
 
 public class UserTests extends TestCase  {
