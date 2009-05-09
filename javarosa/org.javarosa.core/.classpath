@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="test"/>
-	<classpathentry kind="lib" path="lib/cldc_crypto.zip"/>
-	<classpathentry kind="lib" path="lib/cldc_classes.zip"/>
-	<classpathentry kind="con" path="J2MELIB"/>
-	<classpathentry kind="lib" path="/org.javarosa.cdctz/lib/j2meunit-javarosa.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/cldc_crypto.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/cldc_classes.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/j2meunit-javarosa.jar"/>
+	<classpathentry exported="true" kind="con" path="J2MELIB"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
