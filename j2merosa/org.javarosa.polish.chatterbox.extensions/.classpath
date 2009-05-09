@@ -2,20 +2,14 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/midp-2.0.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/mmapi.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/nokia-ui.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/wmapi.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/fileconnection.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/enough-j2mepolish-client.jar" sourcepath="C:/Program Files/J2ME-Polish/j2mepolish-src/j2me"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.formmanager"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.chatterbox"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
-	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
-	<classpathentry kind="lib" path="/org.javarosa.demo/tools/j2meunit-javarosa.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.core"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.core.model"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.formmanager"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.polish.chatterbox"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.patient"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.xform"/>
+	<classpathentry exported="true" kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
+	<classpathentry exported="true" kind="con" path="J2MELIB"/>
+	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
