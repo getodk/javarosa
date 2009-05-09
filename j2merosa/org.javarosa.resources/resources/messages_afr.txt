@@ -107,4 +107,5 @@ message.CompulsoryQuestionsIncomplete=Daar is verpligtende vrae wat nie beantwoo
 message.FormUneditable=Vorm is nie uitgeebaar nie.
 message.RequiredQuestion=Required question; You must answer
 
-
+Pregnancy=Pregnancy
+NewBirth=New Birth

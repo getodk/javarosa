@@ -107,3 +107,5 @@ message.CompulsoryQuestionsIncomplete=There are unanswered compulsory questions 
 message.FormUneditable=You cannot edit your answers when reviewing the form
 message.RequiredQuestion=Required question; You must answer
 
+Pregnancy=Pregnancy
+NewBirth=New Birth
