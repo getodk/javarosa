@@ -65,7 +65,7 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.xform.util.XFormUtils;
