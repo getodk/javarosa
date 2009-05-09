@@ -7,13 +7,6 @@
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/midp-2.0.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/mmapi.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/nokia-ui.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/wmapi.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/fileconnection.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/enough-j2mepolish-client.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.formmanager"/>
 	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
@@ -31,5 +24,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entity"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.forms"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
