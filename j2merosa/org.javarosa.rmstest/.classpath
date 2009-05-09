@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="J2MELIB"/>
-	<classpathentry kind="lib" path="C:/Documents and Settings/Drew Roos/My Documents/eclipse/javarosa/org.javarosa.demo/tools/j2meunit-javarosa.jar"/>
+	<classpathentry kind="lib" path="/org.javarosa.demo/tools/j2meunit-javarosa.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

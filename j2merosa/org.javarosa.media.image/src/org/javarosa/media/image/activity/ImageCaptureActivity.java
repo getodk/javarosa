@@ -21,6 +21,7 @@ import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.view.DisplayViewFactory;
+//import org.javarosa.media.audio.service.J2MEAudioCaptureService;
 import org.javarosa.media.image.model.FileDataPointer;
 //import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.view.CameraCanvas;
