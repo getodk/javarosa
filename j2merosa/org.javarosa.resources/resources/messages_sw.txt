@@ -55,7 +55,7 @@ polish.predictive.setup.cmd.no=No
 #Javarosa-specific
 menu.NewCase=Jarida la kesi mpya
 menu.FollowUp=Fatilia jarida la kesi iliyopo
-menu.Referral=Fatilia kwa kurejea
+menu.Referral=Fatilia rufaa
 menu.ViewOpen=Angalia jarida la kesi iliyofunguliwa
 menu.Resolve=Rudia kutatua kesi
 menu.Save=Save
