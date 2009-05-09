@@ -106,3 +106,6 @@ message.SubmissionErrorUnknown=Unknown sending error; form not sent!
 message.CompulsoryQuestionsIncomplete=There are unanswered compulsory questions and must be completed first to proceed
 message.FormUneditable=You cannot edit your answers when reviewing the form
 message.RequiredQuestion=Swali hili lazima lijazwe
+
+Pregnancy=Ujauzito
+NewBirth=Uzazi mpya
