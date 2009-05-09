@@ -4,10 +4,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.j2me"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/midp-2.0.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/mmapi.jar"/>
 	<classpathentry kind="src" path="/org.javarosa.utilities.file"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
 	<classpathentry kind="src" path="/org.javarosa.media.image"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
