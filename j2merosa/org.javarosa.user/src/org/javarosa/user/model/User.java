@@ -208,13 +208,15 @@ public class User implements Externalizable, IDRecordable, Restorable
 		rememberMe = RestoreUtils.getBoolean(RestoreUtils.getValue("remember", dm));
         
         TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));
-        for (int i = 0; i < e.getNumChildren(); i++) {
-        	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
-        	String name = child.getName();
-        	Object value = RestoreUtils.getValue("other/" + name, dm);
-        	if (value != null){
-        	    properties.put(name, value);
-        	}
+        if (e != null) {
+            for (int i = 0; i < e.getNumChildren(); i++) {
+            	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
+            	String name = child.getName();
+            	Object value = RestoreUtils.getValue("other/" + name, dm);
+            	if (value != null){
+            	    properties.put(name, value);
+            	}
+            }
         }
 	}
 	

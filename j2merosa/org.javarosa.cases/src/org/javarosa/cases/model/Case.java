@@ -202,7 +202,7 @@ public class Case implements Externalizable, IDRecordable, Restorable {
 		typeId = (String)RestoreUtils.getValue("case-type-id", dm);		
 		name = (String)RestoreUtils.getValue("name", dm);		
 		dateOpened = (Date)RestoreUtils.getValue("dateopened", dm);		
-        closed = ((Boolean)RestoreUtils.getValue("closed", dm)).booleanValue();			
+        closed = RestoreUtils.getBoolean(RestoreUtils.getValue("closed", dm));
         
         
         // Clayton Sims - Apr 14, 2009 : NOTE: this is unfortunate, but we need 
@@ -213,7 +213,7 @@ public class Case implements Externalizable, IDRecordable, Restorable {
         	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
         	String name = child.getName();
         	int dataType = ((Integer)RestoreUtils.getValue("other/"+name+"/type", dm)).intValue();
-        	String value = (String)RestoreUtils.getValue("other/"+ name+"data", dm);
+        	String value = (String)RestoreUtils.getValue("other/"+ name+"/data", dm);
         	if(dataType == Constants.DATATYPE_CHOICE_LIST) {
         		//XFormAnswerDataParser.getAnswerData(value, dataType, q);
         	}
