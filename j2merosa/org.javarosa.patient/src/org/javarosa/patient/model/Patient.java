@@ -522,10 +522,12 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
         birthDateEstimated = RestoreUtils.getBoolean(RestoreUtils.getValue("birth-est", dm));	
         
         TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));
-        for (int i = 0; i < e.getNumChildren(); i++) {
-        	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
-        	String name = child.getName();
-        	singles.put(name, RestoreUtils.getValue("other/" + name, dm));
+        if ( e != null ){
+            for (int i = 0; i < e.getNumChildren(); i++) {
+            	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
+            	String name = child.getName();
+            	singles.put(name, RestoreUtils.getValue("other/" + name, dm));
+            }
         }
 	}
 }
