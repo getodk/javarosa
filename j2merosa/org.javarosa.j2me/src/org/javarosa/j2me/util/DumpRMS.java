@@ -48,6 +48,9 @@ public class DumpRMS {
 	public static void dumpRMS (DataOutputStream out) {
 		try {
 			String[] rmses = RecordStore.listRecordStores();
+			if (rmses == null) //seriously??
+				rmses = new String[0];
+			
 			ExtUtil.writeNumeric(out, rmses.length);
 			
 			for (int i = 0; i < rmses.length; i++) {				
