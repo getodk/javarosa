@@ -53,14 +53,14 @@ the License.
 		</javac>
 	</target>
 	
-	<target name="package-library" depends="clean,init,compile" description="package code into jar file">
+	<target name="package-binary" depends="clean,init,compile" description="package binary code into jar file">
 		<mkdir dir="dist"/>
-		<jar destfile="dist/javarosa-library.jar">
+		<jar destfile="dist/javarosa-binary.jar">
 			<fileset dir="bin" includes="**/*"/>
 		</jar>
 	</target>
 	
-	 <target name="package-source" depends="clean,init,compile" description="package code into jar file">
+	 <target name="package-source" depends="clean,init,compile" description="package source code into jar file">
 	    <mkdir dir="dist"/>
 	    <jar destfile="dist/javarosa-source.jar">
 	      <fileset dir="${core}/src/" includes="**/*"/>
@@ -70,7 +70,7 @@ the License.
 	    </jar>
 	  </target>
 	
-	 <target name="package-all" depends="clean,init,compile" description="package code into jar file">
+	 <target name="package-all" depends="clean,init,compile" description="package source and binary code into jar file">
 	    <mkdir dir="dist"/>
 	    <jar destfile="dist/javarosa.jar">
 	      <fileset dir="bin" includes="**/*"/>
