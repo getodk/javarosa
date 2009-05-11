@@ -36,12 +36,13 @@ public class DateUtils {
 	public static final int FORMAT_ISO8601 = 1;
 	public static final int FORMAT_HUMAN_READABLE_SHORT = 2;
 	//public static final int FORMAT_HUMAN_READABLE_LONG = 3;
+	public static final int FORMAT_TIMESTAMP_SUFFIX = 7;
 	
 	public DateUtils() {
 		super();
 	}
 
-	private static class DateFields {
+	public static class DateFields {
 		public DateFields () {
 			year = 1970;
 			month = 1;
@@ -72,7 +73,7 @@ public class DateUtils {
 		}
 	}
 	
-	private static DateFields getFields (Date d) {
+	public static DateFields getFields (Date d) {
 		Calendar cd = Calendar.getInstance();
 		cd.setTime(d);
 		
@@ -88,7 +89,7 @@ public class DateUtils {
 		return fields;
 	}
 	
-	private static Date getDate (DateFields f) {
+	public static Date getDate (DateFields f) {
 		Calendar cd = Calendar.getInstance();
 		cd.set(Calendar.YEAR, f.year);
 		cd.set(Calendar.MONTH, f.month - MONTH_OFFSET);
@@ -112,6 +113,7 @@ public class DateUtils {
 		String delim;
 		switch (format) {
 		case FORMAT_ISO8601: delim = "T"; break;
+		case FORMAT_TIMESTAMP_SUFFIX: delim = ""; break;
 		default: delim = " "; break;
 		}
 		
@@ -130,6 +132,7 @@ public class DateUtils {
 		switch (format) {
 		case FORMAT_ISO8601: return formatDateISO8601(f);
 		case FORMAT_HUMAN_READABLE_SHORT: return formatDateColloquial(f);
+		case FORMAT_TIMESTAMP_SUFFIX: return formatDateSuffix(f);
 		default: return null;
 		}	
 	}
@@ -138,6 +141,7 @@ public class DateUtils {
 		switch (format) {
 		case FORMAT_ISO8601: return formatTimeISO8601(f);
 		case FORMAT_HUMAN_READABLE_SHORT: return formatTimeColloquial(f);
+		case FORMAT_TIMESTAMP_SUFFIX: return formatTimeSuffix(f);
 		default: return null;
 		}	
 	}
@@ -150,6 +154,10 @@ public class DateUtils {
 		return intPad(f.day, 2) + "/" + intPad(f.month, 2) + "/" + (new Integer(f.year)).toString().substring(2, 4);
 	}
 
+	private static String formatDateSuffix (DateFields f) {
+		return f.year + intPad(f.month, 2) + intPad(f.day, 2);
+	}
+	
 	private static String formatTimeISO8601 (DateFields f) {
 		return intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":" + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
 		//want to add time zone info to be fully ISO-8601 compliant, but API is totally on crack!
@@ -158,7 +166,11 @@ public class DateUtils {
 	private static String formatTimeColloquial (DateFields f) {
 		return intPad(f.hour, 2) + ":" + intPad(f.minute, 2);
 	}
-		
+
+	private static String formatTimeSuffix (DateFields f) {
+		return intPad(f.hour, 2) + intPad(f.minute, 2) + intPad(f.second, 2);
+	}
+	
 	/* ==== PARSING DATES/TIMES ==== */
 	
 	public static Date parseDateTime (String str) {

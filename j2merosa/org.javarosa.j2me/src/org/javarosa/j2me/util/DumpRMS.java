@@ -3,26 +3,29 @@ package org.javarosa.j2me.util;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Vector;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
+import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.ExtUtil;
 
 public class DumpRMS {
 
-	//fileRoot should omit leading slash and have trailing slash
-	public static void dumpRMS (String fileRoot) {
+	//pathPrefix should omit leading slash; dump file name will be prefix appended with timestamp
+	public static void dumpRMS (String pathPrefix) {
 		try {
-			String filename = "rmsdump." + String.valueOf(System.currentTimeMillis() / 1000);
-			FileConnection fc = (FileConnection)Connector.open("file:///" + fileRoot + filename);
+			String filepath = dumpFilePath(pathPrefix);
+			FileConnection fc = (FileConnection)Connector.open("file:///" + filepath);
 			if (fc.exists()) {
-				System.err.println("Error: File " + filename + " already exists");
+				System.err.println("Error: File " + filepath + " already exists");
 				throw new RuntimeException("dump file already exists");
 			}
 			
@@ -35,6 +38,11 @@ public class DumpRMS {
 		} catch (IOException ioe) {
 			throw new RuntimeException("ioexception: " + ioe.getMessage());
 		}
+	}
+	
+	private static String dumpFilePath (String prefix) {
+		String suffix = DateUtils.formatDateTime(new Date(), DateUtils.FORMAT_TIMESTAMP_SUFFIX);
+		return prefix + "." + suffix;
 	}
 	
 	public static void dumpRMS (DataOutputStream out) {
@@ -81,24 +89,20 @@ public class DumpRMS {
 		}
 	}
 	
+	//path should omit leading slash
 	public static void restoreRMS (String filepath) {
 		try {
-			FileConnection fc = openRMSDump(filepath);
+			FileConnection fc = (FileConnection)Connector.open("file:///" + filepath);
+			if (!fc.exists()) {
+				System.err.println("Error: File " + filepath + " does not exist");
+				throw new RuntimeException("RMS image [" + filepath + "] not found");
+			}
+			
 			restoreRMS(fc.openDataInputStream(), true);
 			fc.close();			
 		} catch (IOException ioe) {
 			throw new RuntimeException("ioexception: " + ioe.getMessage());
 		}
-	}
-	
-	//path should omit leading slash
-	private static FileConnection openRMSDump (String path) throws IOException {
-		FileConnection fc = (FileConnection)Connector.open("file:///" + path, Connector.READ);
-		if (!fc.exists()) {
-			System.err.println("Error: File " + path + " does not exist");
-			throw new RuntimeException("dump file not found");
-		}
-		return fc;
 	}
 	
 	public static void restoreRMS (DataInputStream in, boolean deleteOtherRMSes) {
@@ -131,7 +135,7 @@ public class DumpRMS {
 				RecordStore rs = RecordStore.openRecordStore(rmsName, true);
 				if (!makeIDsAvailable(rs, recordIDs)) {
 					System.err.println("Error: could not create record placeholders");
-					throw new RuntimeException("error pre-filling record ids in rms");
+					throw new RuntimeException("error pre-filling record ids in rms [" + rmsName + "]");
 				}
 
 				//load record data
@@ -204,4 +208,26 @@ public class DumpRMS {
     	
     	return true;
     }
+    
+	public static void RMSRecoveryHook (MIDlet midlet) {
+		String DUMP_PATH_PREFIX_DEFAULT = "E:/rmsdump";
+		String RESTORE_FILE_PATH_DEFAULT = "E:/rmsrestore";
+		
+		String action = midlet.getAppProperty("RMS-Image");
+		String path = midlet.getAppProperty("RMS-Image-Path");
+		
+		if ("dump".equals(action)) {
+			if (path == null)
+				path = DUMP_PATH_PREFIX_DEFAULT;
+			
+			System.out.println("Dumping RMS image...");
+			dumpRMS(path);
+		} else if ("restore".equals(action)) {
+			if (path == null)
+				path = RESTORE_FILE_PATH_DEFAULT;
+			
+			System.out.println("Restoring RMS image...");
+			restoreRMS(path);
+		}		
+	}
 }
