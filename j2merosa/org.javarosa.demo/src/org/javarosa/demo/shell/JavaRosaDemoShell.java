@@ -45,6 +45,7 @@ import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.chatterbox.widget.ExtendedWidgetsModule;
 import org.javarosa.j2me.J2MEModule;
+import org.javarosa.j2me.util.DumpRMS;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.patient.PatientModule;
@@ -88,6 +89,8 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void init() {
+		DumpRMS.RMSRecoveryHook(midlet);
+		
 		loadModules();
 		loadProperties();
 		
