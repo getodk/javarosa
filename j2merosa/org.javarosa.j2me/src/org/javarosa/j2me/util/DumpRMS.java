@@ -18,11 +18,16 @@ import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.ExtUtil;
 
 public class DumpRMS {
-
+	public static final String DUMP_PATH_PREFIX_DEFAULT = "E:/rmsdump";
+	public static final String RESTORE_FILE_PATH_DEFAULT = "E:/rmsrestore";
+	
 	//pathPrefix should omit leading slash; dump file name will be prefix appended with timestamp
 	public static void dumpRMS (String pathPrefix) {
+		if (pathPrefix == null)
+			pathPrefix = DUMP_PATH_PREFIX_DEFAULT;
+		String filepath = dumpFilePath(pathPrefix);
+		
 		try {
-			String filepath = dumpFilePath(pathPrefix);
 			FileConnection fc = (FileConnection)Connector.open("file:///" + filepath);
 			if (fc.exists()) {
 				System.err.println("Error: File " + filepath + " already exists");
@@ -94,6 +99,9 @@ public class DumpRMS {
 	
 	//path should omit leading slash
 	public static void restoreRMS (String filepath) {
+		if (filepath == null)
+			filepath = RESTORE_FILE_PATH_DEFAULT;
+		
 		try {
 			FileConnection fc = (FileConnection)Connector.open("file:///" + filepath);
 			if (!fc.exists()) {
@@ -213,22 +221,13 @@ public class DumpRMS {
     }
     
 	public static void RMSRecoveryHook (MIDlet midlet) {
-		String DUMP_PATH_PREFIX_DEFAULT = "E:/rmsdump";
-		String RESTORE_FILE_PATH_DEFAULT = "E:/rmsrestore";
-		
 		String action = midlet.getAppProperty("RMS-Image");
 		String path = midlet.getAppProperty("RMS-Image-Path");
 		
 		if ("dump".equals(action)) {
-			if (path == null)
-				path = DUMP_PATH_PREFIX_DEFAULT;
-			
 			System.out.println("Dumping RMS image...");
 			dumpRMS(path);
 		} else if ("restore".equals(action)) {
-			if (path == null)
-				path = RESTORE_FILE_PATH_DEFAULT;
-			
 			System.out.println("Restoring RMS image...");
 			restoreRMS(path);
 		}		
