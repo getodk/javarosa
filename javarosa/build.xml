@@ -29,7 +29,6 @@ the License.
 		<path id="classpath">
 			<fileset dir="${xform}/lib/">
 				<include name="kxml2-2.3.0.jar"/>
-				<include name="cup.jar"/>
 			</fileset>
 		</path>
 	</target>
