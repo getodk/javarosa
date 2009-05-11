@@ -3,12 +3,9 @@
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="lib/kxml2-2.3.0.jar"/>
-	<classpathentry kind="lib" path="lib/minixpath.jar"/>
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
-	<classpathentry kind="lib" path="lib/cup.jar"/>
-	<classpathentry kind="lib" path="lib/JFlex.jar"/>
 	<classpathentry kind="lib" path="/org.javarosa.core/lib/j2meunit-javarosa.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
