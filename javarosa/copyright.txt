@@ -25,7 +25,6 @@ Cory Zue (Dimagi)
 
 # Linked Libraries
 kXML (http://kobjects.org/kxml)
-java-cup (http://www2.cs.tum.edu/projects/cup)
 Fast MD5 (http://www.twmacinta.com/myjava/fast_md5.php)
 
 # Notes
