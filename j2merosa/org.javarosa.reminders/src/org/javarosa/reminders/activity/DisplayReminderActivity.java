@@ -9,8 +9,6 @@ import java.util.Vector;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.ItemStateListener;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
