@@ -10,7 +10,6 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.api.IView;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
@@ -148,12 +147,13 @@ public abstract class SingleQuestionScreen extends Form implements IView {
     	super(formTitle);
 	}
 
+	/*
     private void initProgressBar () {
         //#style progressbar
         progressBar = new Gauge(null, false, model.getNumQuestions(), 0);
         this.append(progressBar);
     }
-
+*/
 	public void setItemCommandListner(ItemCommandListener itemListner) {
 		this.itemListner = itemListner;
 	}

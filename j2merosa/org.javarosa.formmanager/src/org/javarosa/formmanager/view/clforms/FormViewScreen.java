@@ -10,14 +10,13 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.FormElementBinding;
-//#if javarosa.usepolishlocalisation
+
 import de.enough.polish.util.Locale;
-//#endif
 
 public class FormViewScreen extends List implements IView {
 
 	private FormEntryModel model;
-	private FormViewManager parent;
+	//private FormViewManager parent;
 
 	public SortedIndexSet indexHash;
 

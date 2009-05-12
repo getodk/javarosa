@@ -5,15 +5,13 @@ import javax.microedition.lcdui.TextField;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.model.data.StringData;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
 
 public class DecimalQuestionWidget extends SingleQuestionScreen
 {
 	protected TextField tf;
-	private boolean isDecimal=false;
+	//private boolean isDecimal=false;
 
 	public DecimalQuestionWidget(FormElementBinding question){
 		super(question);

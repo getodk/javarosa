@@ -55,7 +55,7 @@ public class FormList extends List implements CommandListener, IView {
 	// others
     private final Command CMD_VIEWMODELS = new Command("View Saved", Command.SCREEN, 3);
     private final Command CMD_DELETE_FORM = new Command("Delete",Command.SCREEN,4);
-    private final Command CMD_SHAREFORMS = new Command("Share Forms", Command.SCREEN, 2);
+  //  private final Command CMD_SHAREFORMS = new Command("Share Forms", Command.SCREEN, 2);
     private final Command CMD_SETTINGS = new Command("Settings", Command.SCREEN, 3);
     //#endif
 
@@ -84,11 +84,11 @@ public class FormList extends List implements CommandListener, IView {
 
 	private void addScreenCommands() {
 		Context c = this.parent.getContext();
-		boolean demo = false;
+		//boolean demo = false;
 		if(c.getElement("USER")!=null){
-			User loggedInUser = (User)c.getElement("USER");
-			if (loggedInUser.getUserType().equals(User.DEMO_USER))
-				demo = true;
+			//User loggedInUser = (User)c.getElement("USER");
+			//if (loggedInUser.getUserType().equals(User.DEMO_USER))
+				//demo = true;
 		}
 		this.addCommand(CMD_EXIT);
         //this.addCommand(CMD_OPEN);
@@ -126,7 +126,7 @@ public class FormList extends List implements CommandListener, IView {
 
 
 	public void commandAction(Command c, Displayable arg1) {
-		Hashtable v = new Hashtable();
+		//Hashtable v = new Hashtable();
  
 		// TODO Auto-generated method stub
 		if (c == List.SELECT_COMMAND) {

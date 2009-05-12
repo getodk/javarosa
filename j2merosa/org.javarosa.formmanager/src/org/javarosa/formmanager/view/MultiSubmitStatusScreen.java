@@ -6,7 +6,6 @@ package org.javarosa.formmanager.view;
 import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -15,7 +14,6 @@ import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.transport.TransportMessage;
 
 //#if javarosa.usepolishlocalisation

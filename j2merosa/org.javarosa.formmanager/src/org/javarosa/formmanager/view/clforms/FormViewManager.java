@@ -23,21 +23,18 @@ import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
-
 import org.javarosa.formmanager.view.clforms.acquire.AcquireScreen;
 import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
 import org.javarosa.formmanager.view.clforms.acquire.IAcquiringService;
 import org.javarosa.formmanager.view.clforms.widgets.DateQuestionWidget;
-import org.javarosa.formmanager.view.clforms.widgets.NumericQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.DecimalQuestionWidget;
+import org.javarosa.formmanager.view.clforms.widgets.NumericQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.Select1QuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.SelectQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TextQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TimeQuestionWidget;
 
-//#if javarosa.usepolishlocalisation
 import de.enough.polish.util.Locale;
-//#endif
 
 public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 		CommandListener, ItemCommandListener {
@@ -249,14 +246,14 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 
 	public void commandAction(Command command, Displayable arg1) {
 		if (arg1 == formView) {
-			if (command == formView.backCommand) {
+			if (command == FormViewScreen.backCommand) {
 				this.show();
-			} else if (command == formView.exitNoSaveCommand) {
+			} else if (command == FormViewScreen.exitNoSaveCommand) {
 				controller.exit();
-			} else if (command == formView.exitSaveCommand) {
+			} else if (command == FormViewScreen.exitSaveCommand) {
 				controller.save();
 				controller.exit();
-			} else if (command == formView.sendCommand) {
+			} else if (command == FormViewScreen.sendCommand) {
 				// check if all required questions are complete
 				int counter = 0;
 
