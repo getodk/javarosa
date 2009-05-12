@@ -31,15 +31,15 @@ import org.javarosa.core.services.transport.TransportMethod;
 public class SmsTransportMethod implements TransportMethod {
 
 	private TransportMessage message;
-	private ITransportManager manager;
+	//private ITransportManager manager;
 	private IActivity destinationRetrievalActivity;
 	private WorkerThread primaryWorker;
 	private static final String name = "SMS";
-	private static final String SMSPort = "16498";	//TODO: Clarify - this was taken from previous CRS App
+	//private static final String SMSPort = "16498";	//TODO: Clarify - this was taken from previous CRS App
 	
 	public void transmit(TransportMessage message, ITransportManager manager) {
 		this.message = message;
-		this.manager = manager;
+	//	this.manager = manager;
 		primaryWorker = new WorkerThread();
 		new Thread(primaryWorker).start();
 	}

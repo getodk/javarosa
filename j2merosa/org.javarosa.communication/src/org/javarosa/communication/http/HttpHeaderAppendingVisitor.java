@@ -5,7 +5,6 @@ package org.javarosa.communication.http;
 
 import java.util.Enumeration;
 
-import org.javarosa.core.api.Constants;
 import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.DataPointerPayload;
 import org.javarosa.core.services.transport.IDataPayload;

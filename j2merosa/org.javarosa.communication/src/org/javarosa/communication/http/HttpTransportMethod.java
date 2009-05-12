@@ -9,8 +9,6 @@ import java.util.Vector;
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
@@ -28,7 +26,7 @@ public class HttpTransportMethod implements TransportMethod {
 
 	private static final String name = "HTTP";
 
-	private ITransportManager manager;
+	//private ITransportManager manager;
 	
 	private IActivity destinationRetrievalActivity;
 	private WorkerThread primaryWorker;
@@ -40,7 +38,7 @@ public class HttpTransportMethod implements TransportMethod {
 	 */
 	public void transmit(TransportMessage message, ITransportManager manager) {
 		cacheURL(message);		
-		this.manager = manager;
+		//this.manager = manager;
 		primaryWorker = new WorkerThread();
 		primaryWorker.setMessage(message);	
 		new Thread(primaryWorker).start();
@@ -209,16 +207,16 @@ public class HttpTransportMethod implements TransportMethod {
 				message.notifyObservers(message.getReplyloadData());
 
 			} catch (ClassCastException e) {
-				Alert alert = new Alert("ERROR! cce", e.getMessage(), null, AlertType.ERROR);
+				//Alert alert = new Alert("ERROR! cce", e.getMessage(), null, AlertType.ERROR);
 				throw new IllegalArgumentException(message.getDestination()
 						+ " is not a valid HTTP URL");
 			} catch (IOException e) {
-				Alert alert = new Alert("ERROR! ioe", e.getMessage(), null, AlertType.ERROR);
+			//	Alert alert = new Alert("ERROR! ioe", e.getMessage(), null, AlertType.ERROR);
 				//#if debug.output==verbose || debug.output==exception
 				System.out.println(e.getMessage());
 				//#endif
 			} catch(java.lang.SecurityException se) {
-				Alert alert = new Alert("ERROR! se", se.getMessage(), null, AlertType.ERROR);
+				//Alert alert = new Alert("ERROR! se", se.getMessage(), null, AlertType.ERROR);
 	             /***
                  * This exception was added to deal with the user denying access to airtime
                  */
@@ -235,7 +233,7 @@ public class HttpTransportMethod implements TransportMethod {
 				cleanUp(con);
 			}
 		}
-
+/*
 		private void process(byte data) {
 			System.out.print(data);
 			byte[] temp = new byte[1];
@@ -243,7 +241,7 @@ public class HttpTransportMethod implements TransportMethod {
 
 			message.setReplyloadData(temp);
 		}
-
+*/
 		private void process(byte[] data) {
 			//#if debug.output==verbose
 			System.out.println(new String(data));
