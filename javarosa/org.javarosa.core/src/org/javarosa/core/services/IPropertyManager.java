@@ -16,11 +16,9 @@
 
 package org.javarosa.core.services;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.services.properties.IPropertyRules;
-import org.javarosa.core.services.properties.storage.PropertyRMSUtility;
 
 /**
  * An IProperty Manager is responsible for setting and retrieving name/value pairs

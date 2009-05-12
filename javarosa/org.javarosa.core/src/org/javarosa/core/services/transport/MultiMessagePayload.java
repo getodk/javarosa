@@ -26,11 +26,9 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.api.Constants;
 import org.javarosa.core.util.MultiInputStream;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
