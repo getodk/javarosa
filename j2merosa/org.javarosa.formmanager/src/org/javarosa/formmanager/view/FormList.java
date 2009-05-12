@@ -17,7 +17,6 @@ import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.activity.FormListActivity;
-import org.javarosa.user.model.User;
 
 //#if javarosa.usepolishlocalisation
 //# import de.enough.polish.util.Locale;
