@@ -58,7 +58,7 @@ public class J2MEFileService implements IFileService
 		{
 			close(directory);
 		}
-		return dirCreated = false;
+		return dirCreated;
 	}
 	
 	public boolean deleteDirectory(String path) throws FileException
@@ -121,7 +121,7 @@ public class J2MEFileService implements IFileService
 		
 		return vectorToStringArr(enumerationList);
 	}
-	
+	/*
 	private static Object[] vectorToArr(Vector vec)
 	{
 		int vecSize = vec.size();
@@ -131,7 +131,7 @@ public class J2MEFileService implements IFileService
 		
 		return arr;
 	}
-	
+	*/
 	private static String[] vectorToStringArr(Vector vec)
 	{
 		int vecSize = vec.size();
@@ -534,7 +534,7 @@ public class J2MEFileService implements IFileService
 
 
 	public static long getFileLength(String fileName) {
-		InputStream fis = null;
+		//InputStream fis = null;
 		FileConnection file = null;
 		try {
 			file = (FileConnection) Connector.open(fileName);
