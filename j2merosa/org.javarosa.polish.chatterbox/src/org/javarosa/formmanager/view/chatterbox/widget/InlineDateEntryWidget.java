@@ -1,7 +1,6 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.util.Date;
-import java.util.Calendar;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
@@ -9,7 +8,6 @@ import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 
 import de.enough.polish.ui.Item;
-import de.enough.polish.ui.TextField;
 
 /**
  * Widget class for InlineDateField.

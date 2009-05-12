@@ -1,7 +1,5 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import javax.microedition.lcdui.Image;
-
 import org.javarosa.core.model.QuestionDef;
 
 import de.enough.polish.ui.ChoiceGroup;

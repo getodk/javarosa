@@ -1,9 +1,9 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.model.data.DecimalData;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.TextField;

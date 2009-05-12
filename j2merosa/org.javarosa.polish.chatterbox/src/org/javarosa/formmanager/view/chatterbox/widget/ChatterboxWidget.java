@@ -1,7 +1,5 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import java.io.InputStream;
-
 import javax.microedition.lcdui.Command;
 
 import org.javarosa.core.model.FormElementStateListener;
@@ -16,7 +14,6 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemCommandListener;
 import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.Style;
-import de.enough.polish.ui.TextField;
 
 public class ChatterboxWidget extends Container implements IQuestionWidget, ItemStateListener, ItemCommandListener {
 	public static final int VIEW_NOT_SET = -1;
