@@ -1,6 +1,5 @@
 package org.javarosa.patient.test;
 
-import java.util.Vector;
 
 //import org.javarosa.entitymgr.model.EntityData;
 //import org.javarosa.entitymgr.model.EntityField;
