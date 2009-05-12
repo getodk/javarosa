@@ -4,15 +4,12 @@ package org.javarosa.user.view;
 
 import java.io.IOException;
 
-import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IView;
-import org.javarosa.core.services.TransportManager;
-import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
@@ -27,7 +24,7 @@ public class LoginForm extends FramedForm implements IView
 {
 	   public final Command CMD_CANCEL_LOGIN = new Command("EXIT",Command.SCREEN, 1);
 	   public Command loginButtonCommand = new Command("Login", Command.ITEM, 1);
-	   private Alert alertdialog = new Alert("Web Service Error", "No response from server", null, AlertType.ERROR);
+	 //  private Alert alertdialog = new Alert("Web Service Error", "No response from server", null, AlertType.ERROR);
 
 	   private TextField userName;
 	   public TextField password;
