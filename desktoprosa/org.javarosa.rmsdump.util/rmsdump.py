@@ -9,18 +9,17 @@ def stream (data):
     yield c
 
 def read_int (dstr):
-  nb = []
-  i = None
+  (nb, c) = ([], None)
   try:
-    while i == None or i >= 128:
-      i = ord(dstr.next())
-      nb.append(i % 128)
+    while c == None or ord(c) >= 128:
+      c = dstr.next()
+      nb.append(c)
   except StopIteration:
     raise EndOfStream(nb)
 
+  nb = [ord(c) % 128 for c in nb]
   if nb[0] >= 64:
     nb[0] -= 128
-
   return reduce(lambda x, y: 128 * x + y, nb, 0)
 
 def read_string (dstr):
