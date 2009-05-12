@@ -83,6 +83,8 @@ public class DumpRMS {
 				for (int j = 0; j < recordIDs.size(); j++) {
 					int recID = ((Integer)recordIDs.elementAt(j)).intValue();
 					byte[] data = rs.getRecord(recID);
+					if (data == null) //seriously???
+						data = new byte[0];					
 					
 					ExtUtil.writeNumeric(out, data.length);
 					out.write(data);
