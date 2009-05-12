@@ -5,7 +5,6 @@ package org.javarosa.cases.util;
 
 import org.javarosa.cases.model.Case;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.model.utils.PreloadUtils;
