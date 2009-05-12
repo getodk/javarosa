@@ -3,8 +3,6 @@ package org.javarosa.reminders.util;
 import java.util.Date;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
