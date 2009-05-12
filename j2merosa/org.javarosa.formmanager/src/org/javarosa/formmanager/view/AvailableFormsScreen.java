@@ -6,6 +6,8 @@ import javax.microedition.lcdui.List;
 import org.javarosa.formmanager.activity.DisplayFormsHttpActivity;
 
 public class AvailableFormsScreen extends List{
+	
+	// TODO: this var is unused
 	private DisplayFormsHttpActivity parentActivity;
 	
 	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);

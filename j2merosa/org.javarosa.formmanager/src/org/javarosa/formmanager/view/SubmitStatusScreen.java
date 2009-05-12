@@ -11,7 +11,6 @@ import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.transport.TransportMessage;
 
 public class SubmitStatusScreen extends Form implements ISubmitStatusScreen {

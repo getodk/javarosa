@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.microedition.lcdui.DateField;
 
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.formmanager.view.FormElementBinding;
