@@ -1,5 +1,9 @@
 package org.javarosa.media.audio.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import javax.microedition.media.Manager;
 import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
@@ -9,13 +13,8 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.media.audio.AudioException;
 import org.javarosa.utilities.file.FileException;
-import org.javarosa.utilities.file.services.*;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.IOException;
+import org.javarosa.utilities.file.services.IFileService;
+import org.javarosa.utilities.file.services.J2MEFileService;
 
 /**
  * An audio capture service that utilizes J2ME's robust Media API
@@ -38,7 +37,7 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	private IFileService fileService;
 	private String recordFileName;
 	private String defaultFileName;
-	private String recordDirectory;
+	//private String recordDirectory;
 	private boolean recordingDeleted;
 	private boolean recordingCreated;
 	private boolean recordingDirectoryCreated;
@@ -277,7 +276,7 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	    
 	    if(!recordingDirectoryCreated)
 		{
-	    	recordDirectory = restorepath;
+	    	//recordDirectory = restorepath;
 			fileService.createDirectory(restorepath);
 			recordingDirectoryCreated = true;
 		}

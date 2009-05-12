@@ -35,7 +35,7 @@ class RecordForm extends Form implements CommandListener{
         this.addCommand(recordCommand);
         playCommand = new Command("Play", Command.SCREEN, 2);
         this.addCommand(playCommand);        
-        StringBuffer inhalt = new StringBuffer();        
+       // StringBuffer inhalt = new StringBuffer();        
         this.setCommandListener(this);
     }
     
@@ -51,7 +51,7 @@ class RecordForm extends Form implements CommandListener{
                 rc.startRecord();
                 p.start();
                 messageItem.setText("recording...");
-                Thread.currentThread().sleep(5000);
+                Thread.sleep(5000);
                 messageItem.setText("done!");
                 rc.commit();               
                 recordedSoundArray = output.toByteArray();                
