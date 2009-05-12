@@ -19,7 +19,6 @@ package org.javarosa.core.util.externalizable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Vector;
 
 
 public class ExtWrapBase extends ExternalizableWrapper {

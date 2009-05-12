@@ -16,9 +16,9 @@
 
 package org.javarosa.core.util;
 
-import java.util.Vector;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 public class OrderedHashtable extends Hashtable {
     private Vector orderedKeys;

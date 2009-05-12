@@ -16,9 +16,6 @@
 
 package org.javarosa.core.util;
 
-import java.util.Timer;
-
-import org.javarosa.core.api.IShell;
 
 public class InactivityMonitor {
 //	private IShell shell;

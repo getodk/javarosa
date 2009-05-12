@@ -26,8 +26,8 @@ import org.javarosa.core.api.IDaemon;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IIncidentLogger;
 import org.javarosa.core.api.IView;
-import org.javarosa.core.services.IService;
 import org.javarosa.core.services.IPropertyManager;
+import org.javarosa.core.services.IService;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.StorageManager;
@@ -35,7 +35,6 @@ import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.transport.storage.RmsStorage;
-import org.javarosa.core.util.InactivityMonitor;
 import org.javarosa.core.util.PrefixTree;
 import org.javarosa.core.util.externalizable.CannotCreateObjectException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -65,7 +64,7 @@ public class JavaRosaServiceProvider {
 	Hashtable services;
 	private PrefixTree prototypes;
 	
-	private InactivityMonitor imon;
+	//private InactivityMonitor imon;
 	
 	public JavaRosaServiceProvider() {
 		services = new Hashtable();

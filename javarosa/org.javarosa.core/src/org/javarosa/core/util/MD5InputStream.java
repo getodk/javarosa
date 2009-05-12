@@ -19,8 +19,6 @@ package org.javarosa.core.util;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.javarosa.core.util.MD5;
-
 public class MD5InputStream {
     InputStream in;
     
