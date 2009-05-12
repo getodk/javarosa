@@ -3,7 +3,6 @@
  */
 package org.javarosa.polish.activity.loadingscreen;
 
-import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 
@@ -15,8 +14,7 @@ import org.javarosa.core.api.IView;
  */
 public class LoadingView extends Form implements IView {
 	
-	private static final Command cancelCmd = new Command("Cancel",
-			Command.BACK, 2);
+	//private static final Command cancelCmd = new Command("Cancel",Command.BACK, 2);
 	
 	private Gauge g = null;
 	

@@ -3,8 +3,6 @@
  */
 package org.javarosa.polish.activity.loadingscreen;
 
-import javax.microedition.lcdui.Gauge;
-
 import org.javarosa.core.Context;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
