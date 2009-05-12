@@ -6,13 +6,12 @@
 
 package org.javarosa.media.audio.service;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.javarosa.core.services.IService;
 import org.javarosa.media.audio.AudioException;
 import org.javarosa.utilities.file.FileException;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.IOException;
 
 public interface IAudioCaptureService extends IService 
 {

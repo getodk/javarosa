@@ -7,12 +7,17 @@
 
 package org.javarosa.media.audio.activity;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Hashtable;
 
-import javax.microedition.lcdui.Canvas;
+import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.StringItem;
+import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -23,25 +28,15 @@ import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.view.DisplayViewFactory;
-import org.javarosa.utilities.file.services.*;
-import org.javarosa.utilities.file.FileException;
+import org.javarosa.media.audio.AudioException;
 import org.javarosa.media.audio.model.FileDataPointer;
-
 import org.javarosa.media.audio.service.IAudioCaptureService;
 import org.javarosa.media.audio.service.J2MEAudioCaptureService;
-import org.javarosa.media.audio.AudioException;
-
-
-import javax.microedition.io.ConnectionNotFoundException;
-
-/*Specify imports later on*/
-import java.io.*;
-import javax.microedition.midlet.*;
-import javax.microedition.lcdui.*;
+import org.javarosa.utilities.file.FileException;
 
 public class AudioCaptureActivity implements IActivity, CommandListener, Runnable 
 {
-	private final long FOREVER = 1000000;
+	//private final long FOREVER = 1000000;
 	private IShell parentShell;
 	private Context currentContext;
 		
@@ -61,7 +56,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
     Thread captureThread;    
     boolean captureThreadStarted = false;
     
-    private static int counter = 0; //Used for saving files
+   // private static int counter = 0; //Used for saving files
     
     MIDlet recMid;
     	
@@ -540,7 +535,7 @@ class RecorderForm extends Form
     	append(messageItem);
     	errorItem = new StringItem("", "");
     	append(errorItem);    	
-    	StringBuffer inhalt = new StringBuffer();    	
+    	//StringBuffer inhalt = new StringBuffer();    	
     }
     
     public StringItem getMessageItem()

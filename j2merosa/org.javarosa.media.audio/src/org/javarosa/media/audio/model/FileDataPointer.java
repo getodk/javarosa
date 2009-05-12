@@ -10,6 +10,7 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.media.image.utilities.FileUtility;
 
+
 /**
  * Implementation of the data pointer that represents an underlying file on the file system.
  * 
@@ -27,7 +28,7 @@ public class FileDataPointer implements IDataPointer {
 		//You shouldn't be calling this unless you are deserializing.
 	}
 	
-	/**
+	/**s
 	 * Create a FileDataPointer from a file name
 	 * @param fileName
 	 */
