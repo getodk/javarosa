@@ -236,7 +236,7 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	
 	/**
 	 * This method was used in memory profiling to loop take images at different resolutions until it fails
-	 */
+	
 	private void doCaptureLoop() {
 		byte[] jpg;
 		// add a loop to do this a lot and write them to individual files so we know when we fail
@@ -286,7 +286,7 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		}
 	}
 	
-	
+	 */
 	private String saveFile(String filename, byte[] image) throws FileException 
 	{
 		String rootName = fileService.getDefaultRoot();

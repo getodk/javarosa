@@ -105,7 +105,7 @@ public class FileUtility
 	public static boolean createFile(String fullName, byte[] data) {
 		OutputStream fos = null;
 		FileConnection file = null;
-		boolean isSaved = false;
+		//boolean isSaved = false;
 		try {
 			file = (FileConnection) Connector.open(fullName);
 			if (!file.exists()) {
@@ -132,7 +132,7 @@ public class FileUtility
 	public static boolean deleteFile(String fileName) {
 		
 		FileConnection file = null;
-		boolean isSaved = false;
+		//boolean isSaved = false;
 		try {
 			file = (FileConnection) Connector.open(fileName);
 			if (file.exists()) {
@@ -369,7 +369,7 @@ public class FileUtility
 
 
 	public static long getFileLength(String fileName) {
-		InputStream fis = null;
+		//InputStream fis = null;
 		FileConnection file = null;
 		try {
 			file = (FileConnection) Connector.open(fileName);

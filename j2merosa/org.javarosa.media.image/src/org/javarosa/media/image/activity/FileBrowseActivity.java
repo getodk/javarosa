@@ -19,7 +19,6 @@
 
 package org.javarosa.media.image.activity;
 
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.Alert;
@@ -39,9 +38,7 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
-//import org.javarosa.media.image.utilities.FileUtility;
-
-import org.javarosa.utilities.file.*;
+import org.javarosa.utilities.file.FileException;
 import org.javarosa.utilities.file.services.IFileService;
 import org.javarosa.utilities.file.services.J2MEFileService;
 
@@ -134,9 +131,9 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	}
 
 	public void start(Context context) {
-		boolean isAPIAvailable = false;
+	//	boolean isAPIAvailable = false;
 		if (System.getProperty("microedition.io.file.FileConnection.version") != null) {
-			isAPIAvailable = true;
+			//isAPIAvailable = true;
 			try 
 			{
 				showCurrDir();

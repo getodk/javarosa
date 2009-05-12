@@ -1,16 +1,7 @@
  package org.javarosa.media.image.utilities;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-//import javax.microedition.amms.GlobalManager;
-//import javax.microedition.amms.MediaProcessor;
-//import javax.microedition.amms.control.ImageFormatControl;
-//import javax.microedition.amms.control.imageeffect.ImageTransformControl;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
-import javax.microedition.media.MediaException;
 
 public class ImageUtility {
 

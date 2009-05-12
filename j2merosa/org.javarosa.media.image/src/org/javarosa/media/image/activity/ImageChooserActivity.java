@@ -305,6 +305,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	}
 
 	// utility method for memory debugging
+	/*
 	private void printMemories(String tag) {
 		String memory = System.getProperty("com.nokia.memoryramfree");
 		long jvmMemory = Runtime.getRuntime().freeMemory();
@@ -314,6 +315,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 //		mainFormOld.append("Available Memory " + tag + ": " + memory);
 //		mainFormOld.append("Available JVM Memory " + tag + ": " + jvmMemory);
 	}
+	*/
 
 
 	
