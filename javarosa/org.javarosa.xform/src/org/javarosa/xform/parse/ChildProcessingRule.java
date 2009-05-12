@@ -16,7 +16,6 @@
 
 package org.javarosa.xform.parse;
 
-import java.util.Hashtable;
 
 //unused for now
 
