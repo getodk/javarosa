@@ -1,17 +1,14 @@
 package org.javarosa.media.image.utilities;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.lcdui.Display;
-import javax.microedition.lcdui.List;
-
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.media.image.activity.ImageChooserActivity;
 import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.utilities.file.FileException;
-import org.javarosa.utilities.file.services.*;
-import org.javarosa.core.services.UnavailableServiceException;
+import org.javarosa.utilities.file.services.IFileService;
+import org.javarosa.utilities.file.services.J2MEFileService;
 
 /**
  * Image Sniffer that polls the contents of a directory and notifies someone when they change
@@ -142,11 +139,12 @@ public class ImageSniffer implements Runnable
 		//#endif
 		return service;
 	}
-	
+	/*
 	private void serviceUnavailable(Exception e)
 	{
 		System.err.println("The File Service is unavailable.\n QUITTING!");			
 		System.err.println(e.getMessage());
 	}
+	*/
 	
 }

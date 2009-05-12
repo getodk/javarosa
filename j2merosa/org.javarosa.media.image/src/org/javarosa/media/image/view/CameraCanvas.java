@@ -44,13 +44,13 @@ import javax.microedition.media.control.VideoControl;
 import javax.microedition.midlet.MIDlet;
 
 public class CameraCanvas extends Canvas {
-	private MIDlet mMIDlet;
+	//private MIDlet mMIDlet;
 	  
 	  public CameraCanvas(MIDlet midlet, VideoControl videoControl) {
 	    int width = getWidth();
 	    int height = getHeight();
 	    
-	    mMIDlet = midlet;
+	   // mMIDlet = midlet;
 	    
 	    videoControl.initDisplayMode(VideoControl.USE_DIRECT_VIDEO, this);
 	    try {
@@ -75,7 +75,7 @@ public class CameraCanvas extends Canvas {
 	  }
 	  
 	  public void keyPressed(int keyCode) {
-	    int action = getGameAction(keyCode);
+	   // int action = getGameAction(keyCode);
 	    //if (action == FIRE) 
 		//mSnapperMIDlet.capture();
 	  }
