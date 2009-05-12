@@ -2,7 +2,6 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.view.chatterbox.widget.table.Table;
 import org.javarosa.formmanager.view.chatterbox.widget.table.VaccinationTable;
 import org.javarosa.patient.model.data.ImmunizationAnswerData;
 import org.javarosa.patient.model.data.ImmunizationData;

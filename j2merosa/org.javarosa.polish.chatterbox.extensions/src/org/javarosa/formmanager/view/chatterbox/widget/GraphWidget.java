@@ -11,7 +11,6 @@ import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.view.chatterbox.widget.chart.IGraphTemplate;
 import org.javarosa.formmanager.view.chatterbox.widget.chart.LineChart;
 import org.javarosa.formmanager.view.chatterbox.widget.chart.LinePointsItem;
-import org.javarosa.formmanager.view.chatterbox.widget.chart.WHOWeightTemplate;
 import org.javarosa.patient.util.DateValueTuple;
 
 import de.enough.polish.ui.Item;
@@ -190,11 +189,11 @@ public class GraphWidget extends ExpandedWidget {
 			if(dateSpan == 0) {
 				dateSpan = 1;
 			}
-			int valSpan = maxVal.intValue() - minVal.intValue();
+			//int valSpan = maxVal.intValue() - minVal.intValue();
 			
 			long dateRes = dateSpan / numPoints;
 			
-			int valRes = valSpan / numPoints;
+			//int valRes = valSpan / numPoints;
 			
 			
 			Vector xpoints = new Vector();
