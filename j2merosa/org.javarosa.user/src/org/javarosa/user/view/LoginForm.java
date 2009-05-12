@@ -39,7 +39,7 @@ public class LoginForm extends FramedForm implements IView
 	   public Command demoButtonCommand = new Command("Demo", Command.ITEM, 1);
 	   //#endif
 	   public boolean validator;
-	   
+	   /* currently unused
 	   private TransportMessage message;
 	   private TransportManager transportManager;
 	   private String requestPayload = "#";
@@ -48,6 +48,7 @@ public class LoginForm extends FramedForm implements IView
 	   private String rememberMe;
 	   private static final String DO_REMEMBER_ME = "DoRememberMe";
        private static final String DONT_REMEMBER_ME = "DontRememberMe";
+       */
 	   IActivity parent;
 
 	  public LoginForm(IActivity loginActivity, String title) {
