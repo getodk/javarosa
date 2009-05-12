@@ -23,8 +23,6 @@ import org.javarosa.core.util.externalizable.ExtWrapMapPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.xform.util.XFormAnswerDataParser;
-import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 /**
  * @author Clayton Sims
@@ -207,13 +205,13 @@ public class Case implements Externalizable, IDRecordable, Restorable {
         
         // Clayton Sims - Apr 14, 2009 : NOTE: this is unfortunate, but we need 
         // to be able to unparse.
-        XFormAnswerDataSerializer s = new XFormAnswerDataSerializer();
+        //XFormAnswerDataSerializer s = new XFormAnswerDataSerializer();
         TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));
         for (int i = 0; i < e.getNumChildren(); i++) {
         	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
         	String name = child.getName();
         	int dataType = ((Integer)RestoreUtils.getValue("other/"+name+"/type", dm)).intValue();
-        	String value = (String)RestoreUtils.getValue("other/"+ name+"/data", dm);
+        //	String value = (String)RestoreUtils.getValue("other/"+ name+"/data", dm);
         	if(dataType == Constants.DATATYPE_CHOICE_LIST) {
         		//XFormAnswerDataParser.getAnswerData(value, dataType, q);
         	}
