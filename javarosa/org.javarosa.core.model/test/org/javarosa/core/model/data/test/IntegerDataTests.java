@@ -21,9 +21,6 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
-import java.util.Date;
-
-import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IntegerData;
 
 public class IntegerDataTests extends TestCase {

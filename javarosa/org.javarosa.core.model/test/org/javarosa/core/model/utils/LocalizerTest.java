@@ -24,8 +24,6 @@ import j2meunit.framework.TestSuite;
 import java.util.NoSuchElementException;
 
 import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.core.util.externalizable.Externalizable;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
 
 public class LocalizerTest extends TestCase  {
@@ -497,7 +495,7 @@ public class LocalizerTest extends TestCase  {
 	private static final int NON_DEFAULT_LOCALE = 2;
 	private static final int NEUTRAL_LOCALE = 3;
 
-	private static final int BASE_FORM = 1;
+	//private static final int BASE_FORM = 1;
 	private static final int CUSTOM_FORM = 2;
 		
 	public void testGetText (int localeCase, int formCase) {
@@ -612,7 +610,7 @@ public class LocalizerTest extends TestCase  {
 		l.setLocaleMapping("test", "textID", "text");
 		
 		try {
-			String text = l.getText("textID");
+			//String text = l.getText("textID");
 			
 			fail("Retrieved current locale text when current locale not set");
 		} catch (NoSuchElementException nsee) {

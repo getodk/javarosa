@@ -115,7 +115,7 @@ public class DateUtilsTests extends TestCase {
 		// TODO Auto-generated method stub
 		
 	}
-
+/*
 	private void testGetData() {
 		
 		Date rep = (Date)DateUtils.getDate(2008, 9, 20);
@@ -216,16 +216,17 @@ public class DateUtilsTests extends TestCase {
 		//get24HourTimeFromDate
 		
 		//Testing the Method daysInMonth
-		 int month = 9;
-		 int year = 2008;
+		// int month = 9;
+		 //int year = 2008;
 		 
 		//assertSame("DateUtils's daysInMonth returned an incorrect Time", DateUtils.daysInMonth(month, year));
 		
-		Date temp7 = new Date(currentTime.getTime());
+	//	Date temp7 = new Date(currentTime.getTime());
 		//currentTime.setTime(1234);
 		//assertEquals("DateUtils's daysInMonth was mutated incorrectly", DateUtils.daysInMonth(month, year), temp6);
 		
 		//daysInMonth
 		
 	}
+	*/
 }
