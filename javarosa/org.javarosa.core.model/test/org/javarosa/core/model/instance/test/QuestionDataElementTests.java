@@ -104,7 +104,7 @@ public class QuestionDataElementTests extends TestCase{
 			public void setReference(Object reference) {
 				this.intReference = (Integer)reference;
 			}
-			/*
+			
 			public boolean referenceMatches(IDataReference reference) {
 				return this.intReference.equals(reference.getReference());
 			}
@@ -122,7 +122,6 @@ public class QuestionDataElementTests extends TestCase{
 				newReference.setReference(intReference);
 				return newReference;
 			}
-			*/
 			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
 
 			public void writeExternal(DataOutputStream out) throws IOException {}
