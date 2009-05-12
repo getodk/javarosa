@@ -601,8 +601,6 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		if(cw.isPinned()) {
     			//if(cw.getAbsoluteY() + cw.getContentHeight() < threshold ) {
 	    		if(cw.getAbsoluteY() + cw.getPinnableHeight() < threshold ) {
-	    			//#style questiontext
-	    	    	//StringItem item2 = new StringItem("","");
 	    	    	headers.addElement(cw.generateHeader());
 	    		}
     		}
