@@ -3,7 +3,6 @@ package org.javarosa.communication.http;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
-import org.javarosa.core.util.PropertyUtils;
 
 public class HttpTransportModule implements IModule {
 

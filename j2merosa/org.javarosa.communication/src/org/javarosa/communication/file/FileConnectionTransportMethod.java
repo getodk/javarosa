@@ -9,8 +9,6 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
 
-import org.javarosa.communication.http.HttpTransportDestination;
-import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
@@ -68,9 +66,10 @@ public class FileConnectionTransportMethod implements TransportMethod {
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run() {
+			// TODO: why this=?
 			for (Enumeration en = FileSystemRegistry.listRoots(); en
 					.hasMoreElements();) {
-				String root = (String) en.nextElement();
+				en.nextElement();
 			}
 			FileTransportDestination destination = (FileTransportDestination)message.getDestination();
 			FileConnection fcon = null;
