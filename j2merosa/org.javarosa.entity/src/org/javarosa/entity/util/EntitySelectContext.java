@@ -18,6 +18,7 @@ public class EntitySelectContext extends Context {
 	public static final String NEW_ENTITY_ID_KEY_KEY = "new-entity-key";
 	public static final String NEW_MODE_KEY = "new-mode-key";
 	public static final String ENTITY_FILTER_KEY = "esc_filter_key";
+	public static final String BAIL_EMPTY = "esc_exit_empty";
 
 	
 	public EntitySelectContext(Context c) {
@@ -54,6 +55,19 @@ public class EntitySelectContext extends Context {
 	
 	public Integer getNewMode() {
 		return (Integer)getElement(NEW_MODE_KEY);
+	}
+	
+	public void setBailOnEmpty(boolean bail) {
+		setElement(BAIL_EMPTY, new Boolean(bail));
+	}
+	
+	public boolean isBailOnEmpty() {
+		Boolean bail = (Boolean)getElement(BAIL_EMPTY);
+		if(bail == null) {
+			return false;
+		} else {
+			return bail.booleanValue();
+		}
 	}
 	
 	public void setEntityFilter(IEntityFilter filter) {
