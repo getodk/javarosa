@@ -2,7 +2,6 @@ package org.javarosa.formmanager.view.chatterbox.widget.chart;
 
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.patient.model.Patient;
 
 /**
@@ -22,6 +21,7 @@ public class WHOWeightTemplate implements IGraphTemplate {
 	public static final int WHO_WEIGHT_TEMPLATE_ID = 1;
 	public static final String WHO_WEIGHT_TEMPLATE_NAME = "WHOWeightGraph";
 	
+	// TODO: this variable is currently unused
 	private Patient patient;
 
 	/*
