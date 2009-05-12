@@ -3,7 +3,6 @@
  */
 package org.javarosa.workflow.model;
 
-import org.javarosa.core.api.IActivity;
 
 /**
  * A workflow action encapsulates a possible interaction with a user,
