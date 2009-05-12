@@ -21,19 +21,10 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-//import java.text.DateFormat;
-//import java.text.ParseException;
-//import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.services.storage.utilities.MetaDataObject;
-//import org.javarosa.core.util.UnavailableExternalizerException;
 import org.javarosa.core.model.storage.DataModelTreeMetaData;
-import org.javarosa.core.model.instance.DataModelTree;
-//import org.javarosa.core.model.instance.test.QuestionDataGroupTests;
 
 public class DataModelTreeMetaDataTests extends TestCase{
 
