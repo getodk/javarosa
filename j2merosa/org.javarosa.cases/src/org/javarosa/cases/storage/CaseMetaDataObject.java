@@ -19,7 +19,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class CaseMetaDataObject extends MetaDataObject {
 	
-	private int recordId;
+	//private int recordId;
 	private int caseId;
 	
 	private String caseName;
