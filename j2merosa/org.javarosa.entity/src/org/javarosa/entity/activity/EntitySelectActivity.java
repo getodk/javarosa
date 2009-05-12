@@ -54,8 +54,12 @@ public class EntitySelectActivity implements IActivity {
 		}
 		
 		loadEntities();
-		selView.init();
-		showList();
+		if(this.context.isBailOnEmpty() && entities.isEmpty()) {
+			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, new Hashtable());
+		} else {
+			selView.init();
+			showList();
+		}
 	}
 
 	private void loadEntities () {
