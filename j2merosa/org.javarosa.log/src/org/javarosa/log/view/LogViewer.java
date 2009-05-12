@@ -5,7 +5,6 @@ package org.javarosa.log.view;
 
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
-import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.api.IView;
 
