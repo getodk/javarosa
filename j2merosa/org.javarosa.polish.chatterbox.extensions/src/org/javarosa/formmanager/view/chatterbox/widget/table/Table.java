@@ -65,8 +65,8 @@ public class Table extends CustomItem implements ItemCommandListener {
     private boolean isStringitem=false;
     private boolean isDatefield=false;
     
-    private int currentrow;
-    private int currentcol;
+    //private int currentrow;
+    //private int currentcol;
     
     public int length=25;
     
