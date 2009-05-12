@@ -239,7 +239,7 @@ public class LineChart extends CustomItem {
      * Return : 
      */
     public final void paint(Graphics g, int width, int height) {
-        Graphics g1 = g;
+       // Graphics g1 = g;
         marginAndFontHeight();
         int l = this.width - marginOne;
         int i1 = this.height - fontSpaceHeight;
