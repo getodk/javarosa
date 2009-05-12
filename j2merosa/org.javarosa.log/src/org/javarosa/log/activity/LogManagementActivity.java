@@ -23,8 +23,6 @@ import org.javarosa.core.api.IView;
 import org.javarosa.core.log.FlatLogSerializer;
 import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.IDataPayload;
-import org.javarosa.core.util.Observable;
-import org.javarosa.core.util.Observer;
 import org.javarosa.log.properties.LogPropertyRules;
 import org.javarosa.log.view.LogManagementView;
 import org.javarosa.log.view.LogViewer;

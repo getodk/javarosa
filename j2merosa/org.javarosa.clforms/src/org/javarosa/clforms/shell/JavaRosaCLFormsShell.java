@@ -44,8 +44,6 @@ import org.javarosa.user.activity.RemoteLoginActivity;
 import org.javarosa.user.activity.UpdateProfileActivity;
 import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
-
-import de.enough.polish.ui.splash.ApplicationInitializer;
 /**
  * This is the shell for the JavaRosa demo that handles switching all of the views
  * @author Brian DeRenzi

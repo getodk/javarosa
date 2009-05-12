@@ -4,7 +4,6 @@
 package org.javarosa.communication.reporting.view;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
 

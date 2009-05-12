@@ -1,9 +1,5 @@
 package org.javarosa.patient.activity;
 
-import org.javarosa.core.api.IShell;
-// import org.javarosa.entitymgr.activity.EntitySelectActivity;
-// import org.javarosa.patientmgr.Constants;
-// import org.javarosa.patientmgr.model.Patient;
 
 
 /**

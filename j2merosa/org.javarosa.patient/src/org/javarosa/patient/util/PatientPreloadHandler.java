@@ -1,11 +1,8 @@
 package org.javarosa.patient.util;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
-import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
