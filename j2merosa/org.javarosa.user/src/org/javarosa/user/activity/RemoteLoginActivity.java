@@ -52,9 +52,9 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 	public static final String PROFILE = "profile";
 	public static final String TYPE = "logintype";
 
-	private javax.microedition.lcdui.Alert success;
-	private javax.microedition.lcdui.Alert fail;
-	private javax.microedition.lcdui.Alert alertdialog;
+	// private javax.microedition.lcdui.Alert success;
+	// private javax.microedition.lcdui.Alert fail;
+	// private javax.microedition.lcdui.Alert alertdialog;
 
 
 	public RemoteLoginActivity(IShell parent, String title) {
@@ -275,7 +275,7 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 public void parseProfile(KXmlParser parser, Hashtable formInfo) throws XmlPullParserException{
 		
 		try {
-			boolean inItem = false;
+		//	boolean inItem = false;
 			parser.nextTag();
 			parser.require(XmlPullParser.START_TAG, null, "profile");
 			while( parser.nextTag() != XmlPullParser.END_TAG ){
@@ -288,12 +288,12 @@ public void parseProfile(KXmlParser parser, Hashtable formInfo) throws XmlPullPa
 System.out.println("<"+name+">"+text);				
 				if(name.equals("response") || name.equals("posturl") || name.equals("geturl") || name.equals("viewtype") )
 					{
-					inItem = true;
+					//inItem = true;
 					//items.addElement(text);
 					formInfo.put(name,text);
 					}
-				else
-					inItem = false;
+				//else
+					//inItem = false;
 
 				//parser.require(XmlPullParser.END_TAG, null, "form");
 			}
