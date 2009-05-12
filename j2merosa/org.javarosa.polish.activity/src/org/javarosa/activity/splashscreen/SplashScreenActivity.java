@@ -69,7 +69,7 @@ public class SplashScreenActivity implements IActivity, ApplicationInitializer {
 	public Displayable initApp() {
 		// TODO Auto-generated method stub
 		try{
-  		  Thread.currentThread().sleep(this.splashDelay);
+  		  Thread.sleep(this.splashDelay);
   		} catch(Exception e) {}
   		
   		// Tell the shell that the splash screen has completed
