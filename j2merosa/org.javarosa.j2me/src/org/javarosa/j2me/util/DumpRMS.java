@@ -94,8 +94,12 @@ public class DumpRMS {
 			throw new RuntimeException("ioexception: " + ioe.getMessage());
 		} catch (RecordStoreException rse) {
 			throw new RuntimeException("recordstoreexception: " + rse.getMessage());
+		} finally {
+			try {
+				out.flush();
+			} catch (IOException ioe) {	}
 		}
-	}
+	}	
 	
 	//path should omit leading slash
 	public static void restoreRMS (String filepath) {
