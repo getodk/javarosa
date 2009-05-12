@@ -21,7 +21,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.model.instance.BareBonesDataModelWrapper;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.util.externalizable.DeserializationException;

@@ -19,16 +19,9 @@ package org.javarosa.core.model;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
-import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.IntegerData;
-import org.javarosa.core.model.data.SelectMultiData;
-import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.data.TimeData;
-import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
-
+ 
 public class CoreModelModule implements IModule {
 
 	public void registerModule(Context context) {

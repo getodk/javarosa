@@ -19,7 +19,6 @@ package org.javarosa.core.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Date;
 
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.util.externalizable.DeserializationException;

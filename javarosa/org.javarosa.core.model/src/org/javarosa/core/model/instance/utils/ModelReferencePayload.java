@@ -12,7 +12,6 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
-import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.IDataPayloadVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -130,7 +129,7 @@ public class ModelReferencePayload implements IDataPayload {
 				throw new RuntimeException("ModelReferencePayload failed to retrieve its model from rms");
 			} catch (NullPointerException e) {
 				e.printStackTrace();
-				int g = 3;
+				//int g = 3;
 			}
 		}
 	}

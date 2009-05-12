@@ -17,7 +17,6 @@
 package org.javarosa.core.model.utils;
 
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -113,7 +112,7 @@ public class QuestionPreloader {
 			}
 		};
 		
-		
+		/*
 		//TODO: Finish this up.
 		IPreloadHandler meta = new IPreloadHandler() {
 			public String preloadHandled() {
@@ -138,7 +137,7 @@ public class QuestionPreloader {
 				return true;
 			}
 		};
-		
+		*/
 		addPreloadHandler(date);
 		addPreloadHandler(property);
 		addPreloadHandler(timestamp);

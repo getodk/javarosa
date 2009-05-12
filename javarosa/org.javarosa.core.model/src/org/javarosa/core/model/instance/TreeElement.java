@@ -504,7 +504,7 @@ public class TreeElement implements Externalizable {
 	 * @param attStrings
 	 */
 	public void setAttributesFromSingleStringVector(Vector attStrings){
-		Vector stringArrays = new Vector();
+		//Vector stringArrays = new Vector();
 		if (attStrings == null)
 			attributes = null;
 		else{
