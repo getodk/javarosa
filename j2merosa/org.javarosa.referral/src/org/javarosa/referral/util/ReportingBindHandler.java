@@ -27,7 +27,7 @@ public class ReportingBindHandler implements IXFormBindHandler {
 		if(referralValue != null) {
 			if(referralText != null) {
 				if (referralText.startsWith("jr:itext('") && referralText.endsWith("')")) {
-					String textRef = referralText.substring("jr:itext('".length(), referralText.indexOf("')"));				
+					//String textRef = referralText.substring("jr:itext('".length(), referralText.indexOf("')"));				
 					//is this incomplete?
 				}
 			}
