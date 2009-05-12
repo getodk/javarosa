@@ -20,7 +20,7 @@ public class ColorBar extends CustomItem {
 	private Vector stops = new Vector();
 	
 	private int height = 320;
-	
+	/*
 	private class Tuple {
 		public int t1;
 		public int t2;
@@ -30,7 +30,7 @@ public class ColorBar extends CustomItem {
 			this.t2 = t2;
 		}
 	}
-
+*/
 	protected ColorBar(String label) {
 		super(label);
 	}
@@ -73,7 +73,7 @@ public class ColorBar extends CustomItem {
 		int total = starts.size() + stops.size();
 		
 		
-		Vector snips = new Vector();
+		//Vector snips = new Vector();
 		
 		while(total != 0) {
 			int iterStart = start(curStart);

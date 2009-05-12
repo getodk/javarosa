@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 

@@ -82,7 +82,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     private Command saveCommand;
     private Command languageSubMenu;
     private Command[] languageCommands;
-    private Command deleteRepeatCommand; //TODO do something with this
+    //private Command deleteRepeatCommand; //TODO do something with this
     private Gauge progressBar;
         
     public Chatterbox (String formTitle, FormEntryModel model, FormEntryController controller) {
@@ -602,7 +602,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			//if(cw.getAbsoluteY() + cw.getContentHeight() < threshold ) {
 	    		if(cw.getAbsoluteY() + cw.getPinnableHeight() < threshold ) {
 	    			//#style questiontext
-	    	    	StringItem item2 = new StringItem("","");
+	    	    	//StringItem item2 = new StringItem("","");
 	    	    	headers.addElement(cw.generateHeader());
 	    		}
     		}
