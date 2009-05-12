@@ -9,9 +9,7 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.helper.Selection;
 
 import de.enough.polish.ui.ChoiceGroup;
-import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
-import de.enough.polish.ui.StringItem;
 
 public class SelectMultiEntryWidget extends SelectEntryWidget {
 	private WidgetEscapeComponent wec = new WidgetEscapeComponent();

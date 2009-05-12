@@ -2,16 +2,12 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.util.Calendar;
 import java.util.Date;
-import org.javarosa.core.model.utils.DateUtils;
 
-import javax.microedition.lcdui.Font;
-import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
-import de.enough.polish.ui.Item;
 import de.enough.polish.ui.CustomItem;
-import de.enough.polish.ui.Style;
 
 /**
  * 
@@ -20,11 +16,11 @@ import de.enough.polish.ui.Style;
 
 public class SimpleDateField extends CustomItem 
 {
-	private Calendar value;
+	//private Calendar value;
 	private Calendar selection;
 	
-	private final int MIN_MONTH = Calendar.JANUARY; //(Assuming it equals 0)
-	private final int MAX_MONTH = Calendar.DECEMBER; //(Assuming it equals 11)
+	//private final int MIN_MONTH = Calendar.JANUARY; //(Assuming it equals 0)
+	//private final int MAX_MONTH = Calendar.DECEMBER; //(Assuming it equals 11)
 	
 	private final int MIN_DAY = 1;
 	private final int MAX_DAY = 31;
@@ -94,7 +90,7 @@ public class SimpleDateField extends CustomItem
 		prevSelectionMode = -1;
 		selectionMode = MONTH; //Default is American format	
 		
-		value = null;
+		//value = null;
 		
 		currMonth = selection.get(Calendar.MONTH);
 		currDay = selection.get(Calendar.DAY_OF_MONTH);
@@ -703,7 +699,7 @@ public class SimpleDateField extends CustomItem
 	
 	/*
 	 * Resets all fields to 0
-	 */
+	 
 	private void resetFields()
 	{
 		firstField = 0;
@@ -711,7 +707,7 @@ public class SimpleDateField extends CustomItem
 		thirdField = 0; 
 		fourthField = 0;
 	}
-	
+	*/
 	private boolean isLeapYear()
 	{
 		return( ((currYear%4 == 0) && (currYear%100 != 0)) || (currYear%400 == 0) );

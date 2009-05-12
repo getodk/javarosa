@@ -3,7 +3,6 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import java.util.Date;
 
 import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;

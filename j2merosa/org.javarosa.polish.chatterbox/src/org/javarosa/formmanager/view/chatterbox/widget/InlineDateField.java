@@ -2,16 +2,15 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.util.Calendar;
 import java.util.Date;
-import org.javarosa.core.model.utils.DateUtils;
 
-import javax.microedition.lcdui.Font;
-import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
-import de.enough.polish.ui.Item;
+import org.javarosa.core.model.utils.DateUtils;
+
 import de.enough.polish.ui.CustomItem;
-import de.enough.polish.ui.Style;
 
 /**
  * Date field that fits into the chatterbox display.
@@ -32,7 +31,7 @@ public class InlineDateField extends CustomItem {
 	private final int MONTH = 3;
 	private final int YEAR = 4;
 	
-	private Command clearCmd;
+	//private Command clearCmd;
 	
 	private final String[] monthNames = {"January", "February",
 		"March", "April", "May", "June", "July",
