@@ -8,7 +8,7 @@ def stream (data):
   for c in data:
     yield c
 
-def read_int (dstr):
+def read_int (dstr, require_pos=False):
   (nb, c) = ([], None)
   try:
     while c == None or ord(c) >= 128:
@@ -17,10 +17,14 @@ def read_int (dstr):
   except StopIteration:
     raise EndOfStream(nb)
 
-  nb = [ord(c) % 128 for c in nb]
-  if nb[0] >= 64:
-    nb[0] -= 128
-  return reduce(lambda x, y: 128 * x + y, nb, 0)
+  nv = [ord(c) % 128 for c in nb]
+  if nv[0] >= 64:
+    nv[0] -= 128
+  val = reduce(lambda x, y: 128 * x + y, nv, 0)
+
+  if val < 0 and require_pos:
+    raise ValueError
+  return val
 
 def read_string (dstr):
   lb = [ord(i) for i in read_bytes(dstr, 2)]
@@ -55,6 +59,7 @@ def read_bytes (dstr, n):
 #  }
 #  where 'record' is dict {
 #    'id': record ID -- None if unreadable,
+#    'len': expected length of data -- None if unreadable,
 #    'data': raw content of record as a string -- None if could not read ID or data length, partial data
 #            if stream terminated while reading -- may be empty string,
 #    'status': status of record
@@ -72,7 +77,7 @@ def extract_rms (dstr):
   err = False
 
   try:
-    num_rms = read_int(dstr)
+    num_rms = read_int(dstr, True)
     for i in range(0, num_rms):
       rms = {'name': None, 'size': None, 'records': []}
       rmses.append(rms)
@@ -80,11 +85,11 @@ def extract_rms (dstr):
       rmsname = read_string(dstr)
       rms['name'] = rmsname
 
-      num_recs = read_int(dstr)
+      num_recs = read_int(dstr, True)
       rms['size'] = num_recs
 
       for j in range(0, num_recs):
-        rec = {'id': None, 'data': None, 'status': None}
+        rec = {'id': None, 'len': None, 'data': None, 'status': None}
         rms['records'].append(rec)
 
         id = read_int(dstr)
@@ -93,19 +98,22 @@ def extract_rms (dstr):
 
       for rec in rms['records']:
         try:
-          ln = read_int(dstr)
+          rec['len'] = read_int(dstr, True)
         except EndOfStream, eos:
           rec['status'] = 'corrupt length %s' % eos.bytes
           raise
+        except ValueError:
+          rec['status'] = 'corrupt length'
+          raise
 
         try:
-          rec['data'] = read_bytes(dstr, ln)
+          rec['data'] = read_bytes(dstr, rec['len'])
           rec['status'] = 'ok'
         except EndOfStream, eos:
           rec['status'] = 'partial data'
           rec['data'] = ''.join(eos.bytes)
           raise
-  except EndOfStream:
+  except (EndOfStream, ValueError):
     err = True
 
   return (rmses, num_rms, err)
@@ -139,6 +147,8 @@ def format_bytes (data, indent=4):
     hx = '%02x' % ord(c)
     if i > 0:
       if i % 30 == 0:
+        if (i + 15) % 1024 < 30:
+          strs.append('\n')
         strs.append('\n' + ' ' * indent)
       elif i % 10 == 0:
         strs.append('   ')
@@ -153,18 +163,30 @@ def coalesce (val, fallback):
 #pretty print the contents of all RMSes
 def print_contents (dlen, rmses, num_rms, err):
   print 'Data length: %d' % dlen
-  print '%d RMSes' % num_rms
-  print
+  if num_rms != None:
+    print '%d RMSes %s' % (num_rms, '(only %d recovered)' % len(rmses) if len(rmses) < num_rms else '')
+  else:
+    print '? RMSes'
 
   for rms in rmses:
     print '=== %s ===' % coalesce(rms['name'], '[no name]')
-    print 'Records: %s' % coalesce(rms['size'], '[no size]')
+    if rms['size'] != None:
+      print 'Records: %d %s' % (rms['size'], '(only %d recovered)' % len(rms['records']) if len(rms['records']) < rms['size'] else '')
+    else:
+      print 'Records: [no size]'
 
     for rec in rms['records']:
-      print '  ID: %s%s' % (coalesce(rec['id'], '[no id]'), '   (%d bytes)' % len(rec['data']) if rec['data'] or rec['status'] == 'ok' else '')
-      if rec['status'] != 'ok':
-        print '  Status: %s' % rec['status']
-      print format_bytes(rec['data']) if rec['data'] else '    [no data]'
+      print '  ID: %s' % coalesce(rec['id'], '[no id]')
+      if rec['status']:
+        if rec['status'] != 'ok':
+          print '  Status: %s' % rec['status']
+        if rec['len'] != None:
+          print '  Data: %d bytes %s' % (len(rec['data']), '(expected %d)' % rec['len'] if len(rec['data']) < rec['len'] else '')
+          if rec['data']:
+            print format_bytes(rec['data'])
+        else:
+          print '  Data: [no data]'
+          print
 
     print
 
