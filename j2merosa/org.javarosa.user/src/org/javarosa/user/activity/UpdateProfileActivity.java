@@ -1,7 +1,5 @@
 package org.javarosa.user.activity;
 
-import java.util.Vector;
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -13,12 +11,11 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.services.IPropertyManager;
-import org.javarosa.core.services.properties.IPropertyRules;
 
 public class UpdateProfileActivity implements IActivity, CommandListener 
 {
 	private IShell parent;
-	private Context context;
+	//private Context context;
 	private IPropertyManager propertyManager;
 
 	public UpdateProfileActivity(IShell parent) 
@@ -62,7 +59,7 @@ public class UpdateProfileActivity implements IActivity, CommandListener
 
 	public void start(Context context) {
 		
-		this.context = context;
+		//this.context = context;
 		
 		//prepare property manager
 		this.propertyManager = JavaRosaServiceProvider.instance().getPropertyManager();
