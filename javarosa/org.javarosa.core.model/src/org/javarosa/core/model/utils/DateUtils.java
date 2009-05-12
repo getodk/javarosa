@@ -18,10 +18,7 @@ package org.javarosa.core.model.utils;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.Vector;
-
-import org.javarosa.core.model.data.IntegerData;
 
 /**
  * Static utility methods for Dates in j2me 

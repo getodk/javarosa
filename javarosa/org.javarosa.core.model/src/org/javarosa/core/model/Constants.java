@@ -16,7 +16,6 @@
 
 package org.javarosa.core.model;
 
-import java.util.TimeZone;
 
 /**
  * Constants shared throught classes in the containing package.

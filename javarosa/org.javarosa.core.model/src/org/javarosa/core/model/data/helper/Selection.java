@@ -21,7 +21,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;

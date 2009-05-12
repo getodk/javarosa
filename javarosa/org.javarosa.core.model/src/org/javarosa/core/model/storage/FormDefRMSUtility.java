@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
