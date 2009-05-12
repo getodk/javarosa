@@ -87,7 +87,8 @@ public class DumpRMS {
 						data = new byte[0];					
 					
 					ExtUtil.writeNumeric(out, data.length);
-					out.write(data);
+					if (data.length > 0) //seriously?????
+						out.write(data);
 				}
 
 				rs.closeRecordStore();
