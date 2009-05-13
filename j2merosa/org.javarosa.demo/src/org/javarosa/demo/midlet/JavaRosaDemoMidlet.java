@@ -38,8 +38,8 @@ public class JavaRosaDemoMidlet extends MIDlet {
 		// Do NOT edit below
 		JavaRosaServiceProvider.instance().initialize();
 		JavaRosaServiceProvider.instance().setDisplay(new J2MEDisplay(Display.getDisplay(this)));
-		shell.run();
 		((JavaRosaDemoShell)shell).setMIDlet(this);
+		shell.run();
 	}
 
 }
