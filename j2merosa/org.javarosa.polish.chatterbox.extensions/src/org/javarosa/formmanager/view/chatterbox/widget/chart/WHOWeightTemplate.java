@@ -21,7 +21,7 @@ public class WHOWeightTemplate implements IGraphTemplate {
 	public static final int WHO_WEIGHT_TEMPLATE_ID = 1;
 	public static final String WHO_WEIGHT_TEMPLATE_NAME = "WHOWeightGraph";
 	
-	// TODO: this variable is currently unused
+	
 	private Patient patient;
 
 	/*
@@ -70,5 +70,10 @@ public class WHOWeightTemplate implements IGraphTemplate {
 	public void setPatient(Patient patient) {
 		this.patient = patient;
 	}
+
+	public Patient getPatient() {
+		return patient;
+	}
+	
 
 }
