@@ -280,9 +280,9 @@ public class QuestionDataGroupTests extends TestCase {
 	}
 	
 	private void testAddTreeChild() {
-		TreeElement subTree = new TreeElement("subtree");
-		TreeElement firstRootTree = new TreeElement("firstRoot");
-		TreeElement secondRootTree = new TreeElement("secondRoot");
+		//TreeElement subTree = new TreeElement("subtree");
+		//TreeElement firstRootTree = new TreeElement("firstRoot");
+		//TreeElement secondRootTree = new TreeElement("secondRoot");
 		
 		TreeElement subElement = new TreeElement("SubElement");
 		subElement.addChild(stringElement);
