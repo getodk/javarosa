@@ -74,16 +74,17 @@ public class JavaRosaDemoShell implements IShell {
 	IActivity currentActivity;
 	IActivity mostRecentListActivity; //should never be accessed, only checked for type
 
-	public JavaRosaDemoShell() {
+	public JavaRosaDemoShell(MIDlet midlet) {
 		stack = new WorkflowStack();
 		context = new Context();
+		setMIDlet(midlet);
 	}
 
 	public void exitShell() {
 		midlet.notifyDestroyed();
 	}
 
-	public void run() {
+	public void run() {	
 		init();
 		workflow(null, null, null);
 	}

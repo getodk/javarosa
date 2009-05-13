@@ -33,12 +33,11 @@ public class JavaRosaDemoMidlet extends MIDlet {
 		 * Duplicate this class and change the following line to 
 		 * create a custom midlet to launch from 
 		 */
-		shell = new JavaRosaDemoShell();
+		shell = new JavaRosaDemoShell(this);
 
 		// Do NOT edit below
 		JavaRosaServiceProvider.instance().initialize();
 		JavaRosaServiceProvider.instance().setDisplay(new J2MEDisplay(Display.getDisplay(this)));
-		((JavaRosaDemoShell)shell).setMIDlet(this);
 		shell.run();
 	}
 
