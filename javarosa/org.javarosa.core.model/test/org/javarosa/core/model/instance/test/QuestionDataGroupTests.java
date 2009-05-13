@@ -71,7 +71,7 @@ public class QuestionDataGroupTests extends TestCase {
 			public void setReference(Object reference) {
 				this.reference = (String)reference;
 			}
-			
+			/*
 			public boolean referenceMatches(IDataReference reference) {
 				return this.reference.equals(reference.getReference());
 			}
@@ -89,6 +89,7 @@ public class QuestionDataGroupTests extends TestCase {
 				newReference.setReference(reference);
 				return newReference;
 			}
+			*/
 			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
 
 			public void writeExternal(DataOutputStream out) throws IOException {};
@@ -105,7 +106,7 @@ public class QuestionDataGroupTests extends TestCase {
 			public void setReference(Object reference) {
 				this.intReference = (Integer)reference;
 			}
-			
+			/*
 			public boolean referenceMatches(IDataReference reference) {
 				return this.intReference.equals(reference.getReference());
 			}
@@ -123,6 +124,7 @@ public class QuestionDataGroupTests extends TestCase {
 				newReference.setReference(intReference);
 				return newReference;
 			}
+			*/
 			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {}
 
 			public void writeExternal(DataOutputStream out) throws IOException {};
@@ -251,7 +253,7 @@ public class QuestionDataGroupTests extends TestCase {
 	private void testAddLeafChild() {
 
 
-		boolean threw = false;
+		//boolean threw = false;
 		boolean added = false;
 		try {
 			group.addChild(stringElement);
@@ -264,7 +266,7 @@ public class QuestionDataGroupTests extends TestCase {
 		}
 		
 		added=false;
-		threw = false;
+		//threw = false;
 		try {
 			TreeElement leafGroup = new TreeElement("leaf group");
 			added = true;
@@ -274,7 +276,7 @@ public class QuestionDataGroupTests extends TestCase {
 			if(!added) {
 				fail("Group did not report success adding a valid child");
 			}
-			threw = true;
+			//threw = true;
 			
 		}
 	}
