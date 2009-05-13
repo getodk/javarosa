@@ -46,7 +46,7 @@ public class LogManagementActivity implements IActivity, CommandListener {
 	LogViewer viewer;
 	
 	public LogManagementActivity() {
-		String a = "as";
+		//String a = "as";
 	}
 
 	/* (non-Javadoc)
