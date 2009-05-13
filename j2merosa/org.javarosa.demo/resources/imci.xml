@@ -8,224 +8,224 @@
 
     <model>
       <instance>
-				<imci xmlns="http://dtree.org/e-imci">
-					<preamble>
-						<chief_complaint />
-						<other_complaint />
-						<danger_signs />
-						<cough_doublecheck />
-						<diarrhea_doublecheck />
-						<ear_doublecheck />
-						<visit_type />
-						<temp_type />
-						<temperature />
-						<age />
-						<age_unit />
-						<too_old_use_anyway />
-						<sex />
-						<weight />
-						<too_heavy_use_anyway />
-					</preamble>
+        <imci xmlns="http://dtree.org/e-imci">
+          <preamble>
+            <chief_complaint />
+            <other_complaint />
+            <danger_signs />
+            <cough_doublecheck />
+            <diarrhea_doublecheck />
+            <ear_doublecheck />
+            <visit_type />
+            <temp_type />
+            <temperature />
+            <age />
+            <age_unit />
+            <too_old_use_anyway />
+            <sex />
+            <weight />
+            <too_heavy_use_anyway />
+          </preamble>
 
 
 
 <blah />
 
           <tmp>
-						<sentinel>
-							<valid_complaint />
-							<first_visit />
-							<age_ok />
-							<do_protocol />
-						</sentinel>
-						<info>
-							<serious />
-							<first_visit_only />
-							<too_young />
-						</info>
-						<normalized>
-							<has_cough />
-							<has_diarrhea />
-							<has_ear />
-							<fever />
-							<age />
-						</normalized>
+            <sentinel>
+              <valid_complaint />
+              <first_visit />
+              <age_ok />
+              <do_protocol />
+            </sentinel>
+            <info>
+              <serious />
+              <first_visit_only />
+              <too_young />
+            </info>
+            <normalized>
+              <has_cough />
+              <has_diarrhea />
+              <has_ear />
+              <fever />
+              <age />
+            </normalized>
           </tmp>
-				</imci>
+        </imci>
       </instance>
       
       <bind nodeset="preamble/chief_complaint" constraint="not(selected(., 'none') and count-selected(.) > 1)"
         jr:constraintMsg="'Other/None of the above' cannot be selected with other choices" />
       <bind nodeset="preamble/other_complaint" relevant="count-selected(../chief_complaint) = 0 or
-        (count-selected(../chief_complaint) = 1 and selected(../chief_complaint, 'none'))" />
+                                                         (count-selected(../chief_complaint) = 1 and selected(../chief_complaint, 'none'))" />
       <bind nodeset="tmp/sentinel/valid_complaint" relevant="count-selected(/imci/preamble/chief_complaint) > 0 and not(selected(/imci/preamble/chief_complaint, 'none'))" />
 
-			<bind nodeset="tmp/info/serious" relevant="count-selected(/imci/preamble/danger_signs) > 0" />
+      <bind nodeset="tmp/info/serious" relevant="count-selected(/imci/preamble/danger_signs) > 0" />
 
-			<bind nodeset="preamble/cough_doublecheck" relevant="not(selected(../chief_complaint, 'cough'))" />
-			<bind nodeset="tmp/normalized/has_cough" calculate="selected(/imci/preamble/chief_complaint, 'cough') or /imci/preamble/cough_doublecheck = 'yes'" />
-			<bind nodeset="preamble/diarrhea_doublecheck" relevant="not(selected(../chief_complaint, 'diarrhea'))" />
-			<bind nodeset="tmp/normalized/has_diarrhea" calculate="selected(/imci/preamble/chief_complaint, 'diarrhea') or /imci/preamble/diarrhea_doublecheck = 'yes'" />
-			<bind nodeset="preamble/ear_doublecheck" relevant="not(selected(../chief_complaint, 'ear'))" />
-			<bind nodeset="tmp/normalized/has_ear" calculate="selected(/imci/preamble/chief_complaint, 'ear') or /imci/preamble/ear_doublecheck = 'yes'" />
+      <bind nodeset="preamble/cough_doublecheck" relevant="not(selected(../chief_complaint, 'cough'))" />
+      <bind nodeset="tmp/normalized/has_cough" calculate="selected(/imci/preamble/chief_complaint, 'cough') or /imci/preamble/cough_doublecheck = 'yes'" />
+      <bind nodeset="preamble/diarrhea_doublecheck" relevant="not(selected(../chief_complaint, 'diarrhea'))" />
+      <bind nodeset="tmp/normalized/has_diarrhea" calculate="selected(/imci/preamble/chief_complaint, 'diarrhea') or /imci/preamble/diarrhea_doublecheck = 'yes'" />
+      <bind nodeset="preamble/ear_doublecheck" relevant="not(selected(../chief_complaint, 'ear'))" />
+      <bind nodeset="tmp/normalized/has_ear" calculate="selected(/imci/preamble/chief_complaint, 'ear') or /imci/preamble/ear_doublecheck = 'yes'" />
 
-			<bind nodeset="tmp/info/first_visit_only" relevant="/imci/preamble/visit_type != 'first'" />
-			<bind nodeset="tmp/sentinel/first_visit" relevant="/imci/preamble/visit_type = 'first'" />
+      <bind nodeset="tmp/info/first_visit_only" relevant="/imci/preamble/visit_type != 'first'" />
+      <bind nodeset="tmp/sentinel/first_visit" relevant="/imci/preamble/visit_type = 'first'" />
 
-			<bind nodeset="preamble/temperature" type="decimal" relevant="../temp_type = 'therm'" required="true()" />
-			<!-- normalize/fever ? -->
-			
-			<bind nodeset="preamble/age" type="int" required="true()" />
-			<bind nodeset="tmp/normalized/age" calculate="if(/imci/preamble/age_unit = 'years', /imci/preamble/age,
-			                                              if(/imci/preamble/age_unit = 'months', /imc/preamble/age div 12, ''))" type="decimal" /> <!-- remove 'type' once calculate works -->
-			<bind nodeset="tmp/info/too_young" relevant="/imci/tmp/normalized/age < 2 div 12" />
-			<bind nodeset="preamble/too_old_use_anyway" relevant="/imci/tmp/normalized/age > 5.0" />
-			<bind nodeset="tmp/sentinel/age_ok" relevant="/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age <= 5.0 or /imci/preamble/too_old_use_anyway = 'yes')" />
-																										
-			<bind nodeset="preamble/weight" type="int" />
-			<bind nodeset="preamble/too_heavy_use_anyway" relevant="../weight >= 19" />
-			
-			<bind nodeset="tmp/sentinel/do_protocol" relevant="(count-selected(/imci/preamble/chief_complaint) > 0 and not(selected(/imci/preamble/chief_complaint, 'none'))) and
-																												 /imci/preamble/visit_type = 'first' and
-																												 (/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age <= 5.0 or /imci/preamble/too_old_use_anyway = 'yes')) and
-																												 (not(/imci/preamble/weight) or /imci/preamble/weight < 19 or /imci/preamble/too_heavy_use_anyway = 'yes')" />
+      <bind nodeset="preamble/temperature" type="decimal" relevant="../temp_type = 'therm'" required="true()" />
+      <!-- normalize/fever ? -->
+      
+      <bind nodeset="preamble/age" type="int" required="true()" />
+      <bind nodeset="tmp/normalized/age" calculate="if(/imci/preamble/age_unit = 'years', /imci/preamble/age,
+                                                    if(/imci/preamble/age_unit = 'months', /imc/preamble/age div 12, ''))" type="decimal" /> <!-- remove 'type' once calculate works -->
+      <bind nodeset="tmp/info/too_young" relevant="/imci/tmp/normalized/age < 2 div 12" />
+      <bind nodeset="preamble/too_old_use_anyway" relevant="/imci/tmp/normalized/age > 5.0" />
+      <bind nodeset="tmp/sentinel/age_ok" relevant="/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age <= 5.0 or /imci/preamble/too_old_use_anyway = 'yes')" />
+                                                    
+      <bind nodeset="preamble/weight" type="int" />
+      <bind nodeset="preamble/too_heavy_use_anyway" relevant="../weight >= 19" />
+      
+      <bind nodeset="tmp/sentinel/do_protocol" relevant="(count-selected(/imci/preamble/chief_complaint) > 0 and not(selected(/imci/preamble/chief_complaint, 'none'))) and
+                                                         /imci/preamble/visit_type = 'first' and
+                                                         (/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age <= 5.0 or /imci/preamble/too_old_use_anyway = 'yes')) and
+                                                         (not(/imci/preamble/weight) or /imci/preamble/weight < 19 or /imci/preamble/too_heavy_use_anyway = 'yes')" />
     </model>
   </h:head>
 
   <h:body>
 
-		<group ref="/imci/preamble">
-		
-			<select ref="/imci/preamble/chief_complaint">
-				<label>ASK: Child's problems</label>
-				<item><label>Cough or difficulty breathing</label><value>cough</value></item>
-				<item><label>Diarrhea</label><value>diarrhea</value></item>
-				<item><label>Fever</label><value>fever</value></item>
-				<item><label>Ear problem</label><value>ear</value></item>
-				<item><label>Other/None of the above</label><value>none</value></item>
-			</select>
+    <group ref="/imci/preamble">
+    
+      <select ref="/imci/preamble/chief_complaint">
+        <label>ASK: Child's problems</label>
+        <item><label>Cough or difficulty breathing</label><value>cough</value></item>
+        <item><label>Diarrhea</label><value>diarrhea</value></item>
+        <item><label>Fever</label><value>fever</value></item>
+        <item><label>Ear problem</label><value>ear</value></item>
+        <item><label>Other/None of the above</label><value>none</value></item>
+      </select>
 
-			<select1 ref="/imci/preamble/other_complaint">
-				<label>SORRY: this system only covers IMCI. Select the complaint then treat normally</label>
-				<item><label>Child has head fungus</label><value>fungus</value></item>
-				<item><label>Other complaint</label><value>other</value></item>
-			</select1>
-			<!-- END -->
+      <select1 ref="/imci/preamble/other_complaint">
+        <label>SORRY: this system only covers IMCI. Select the complaint then treat normally</label>
+        <item><label>Child has head fungus</label><value>fungus</value></item>
+        <item><label>Other complaint</label><value>other</value></item>
+      </select1>
+      <!-- END -->
 
-			<group ref="/imci/tmp/sentinel/valid_complaint">
+      <group ref="/imci/tmp/sentinel/valid_complaint">
 
-	      <!-- show/generate encounter id here? -->
-			
-				<select ref="/imci/preamble/danger_signs">
-					<label>ASK: Danger signs</label>
-					<item><label>Unable to drink/breastfeed</label><value>no_drink</value></item>
-					<item><label>Vomits everything</label><value>vomits</value></item>
-					<item><label>Convulsions</label><value>convuls</value></item>
-					<item><label>Lethargic/Unconscious</label><value>lethargy</value></item>
-				</select>
+        <!-- show/generate encounter id here? -->
+      
+        <select ref="/imci/preamble/danger_signs">
+          <label>ASK: Danger signs</label>
+          <item><label>Unable to drink/breastfeed</label><value>no_drink</value></item>
+          <item><label>Vomits everything</label><value>vomits</value></item>
+          <item><label>Convulsions</label><value>convuls</value></item>
+          <item><label>Lethargic/Unconscious</label><value>lethargy</value></item>
+        </select>
 
-				<trigger ref="/imci/tmp/info/serious">
-					<label>ALERT: This child has a serious problem. Complete assement quickly and refer urgently!</label>
-				</trigger>
+        <trigger ref="/imci/tmp/info/serious">
+          <label>ALERT: This child has a serious problem. Complete assement quickly and refer urgently!</label>
+        </trigger>
 
-				<select1 ref="/imci/preamble/cough_doublecheck">
-					<label>ASK: Just to check, does the child have a cough?</label>
-					<item><label>Yes</label><value>yes</value></item>
-					<item><label>No</label><value>no</value></item>
-				</select1>
-			
-				<select1 ref="/imci/preamble/diarrhea_doublecheck">
-					<label>ASK: Just to check, does the child have any diarrhea?</label>
-					<item><label>Yes</label><value>yes</value></item>
-					<item><label>No</label><value>no</value></item>
-				</select1>
+        <select1 ref="/imci/preamble/cough_doublecheck">
+          <label>ASK: Just to check, does the child have a cough?</label>
+          <item><label>Yes</label><value>yes</value></item>
+          <item><label>No</label><value>no</value></item>
+        </select1>
+      
+        <select1 ref="/imci/preamble/diarrhea_doublecheck">
+          <label>ASK: Just to check, does the child have any diarrhea?</label>
+          <item><label>Yes</label><value>yes</value></item>
+          <item><label>No</label><value>no</value></item>
+        </select1>
 
-				<select1 ref="/imci/preamble/ear_doublecheck">
-					<label>ASK: Just to check, does the child have any ear problems?</label>
-					<item><label>Yes</label><value>yes</value></item>
-					<item><label>No</label><value>no</value></item>
-				</select1>
+        <select1 ref="/imci/preamble/ear_doublecheck">
+          <label>ASK: Just to check, does the child have any ear problems?</label>
+          <item><label>Yes</label><value>yes</value></item>
+          <item><label>No</label><value>no</value></item>
+        </select1>
 
-				<select1 ref="/imci/preamble/visit_type">
-					<label>ASK: What kind of visit is this?</label>
-					<item><label>First visit</label><value>first</value></item>
-					<item><label>Follow-up visit</label><value>followup</value></item>
-				</select1>
-			
-				<trigger ref="/imci/tmp/info/first_visit_only">
-					<label>SORRY: this system is not yet suitable for follow-up visits. Please use standard procedures.</label>
-				</trigger>
-				<!-- END -->
+        <select1 ref="/imci/preamble/visit_type">
+          <label>ASK: What kind of visit is this?</label>
+          <item><label>First visit</label><value>first</value></item>
+          <item><label>Follow-up visit</label><value>followup</value></item>
+        </select1>
+      
+        <trigger ref="/imci/tmp/info/first_visit_only">
+          <label>SORRY: this system is not yet suitable for follow-up visits. Please use standard procedures.</label>
+        </trigger>
+        <!-- END -->
 
-				<group ref="/imci/tmp/sentinel/first_visit">
-				
-					<select1 ref="/imci/preamble/temp_type">
-						<label>ASK: Can you take the child's temperature?</label>
-						<item><label>Yes, I will use a thermometer</label><value>therm</value></item>
-						<item><label>No, but child feels hot or has had fever</label><value>fever</value></item>
-						<item><label>No, but child feels normal</label><value>normal</value></item>
-					</select1>
-				
-					<input ref="/imci/preamble/temperature">
-						<label>DO: Take the child's temperature (&#xb0;C)</label>
-					</input>
-				
-					<input ref="/imci/preamble/age">
-						<label>ASK: What is the child's age (in years or months)</label>
-					</input>
-				
-					<select1 ref="/imci/preamble/age_unit">
-						<label>Was the age in years or months?</label>
-						<item><label>Years</label><value>years</value></item>
-						<item><label>Months</label><value>months</value></item>
-					</select1>
-				
-					<!-- debugging question until calculate works -->
-					<input ref="/imci/tmp/normalized/age">
-						<label>DEBUG TEMP: age in years</label>
-					</input>
-				
-					<trigger ref="/imci/tmp/info/too_young">
-						<label>SORRY: this system is not yet suitable for children under two months</label>
-					</trigger>
-					<!-- END -->
-				
-					<select1 ref="/imci/preamble/too_old_use_anyway">
-						<label>SORRY: IMCI is meant for children 5-years-old or less. Do you want to continue anyway?</label>
-						<item><label>Yes</label><value>yes</value></item>
-						<item><label>No</label><value>no</value></item>
-					</select1>
-					<!-- END if no -->
-				
-					<group ref="/imci/tmp/sentinel/age_ok">
-					
-						<select1 ref="/imci/preamble/sex">
-							<label>ASK: What sex is the child?</label>
-							<item><label>Male</label><value>m</value></item>
-							<item><label>Female</label><value>f</value></item>
-						</select1>
-					
-						<input ref="/imci/preamble/weight">
-							<label>ASK: What is the child's weight in kg (skip if unknown)</label>
-						</input>
-				
-						<select1 ref="/imci/preamble/too_heavy_use_anyway">
-							<label>SORRY: IMCI is meant for children under 19 kgs. Correct dosings may not be available. Do you want to continue anyway?</label>
-							<item><label>Yes</label><value>yes</value></item>
-							<item><label>No</label><value>no</value></item>
-						</select1>
-						<!-- END if no -->
-				
-					</group>
-				</group>
-			</group>
-		</group>
+        <group ref="/imci/tmp/sentinel/first_visit">
+        
+          <select1 ref="/imci/preamble/temp_type">
+            <label>ASK: Can you take the child's temperature?</label>
+            <item><label>Yes, I will use a thermometer</label><value>therm</value></item>
+            <item><label>No, but child feels hot or has had fever</label><value>fever</value></item>
+            <item><label>No, but child feels normal</label><value>normal</value></item>
+          </select1>
+        
+          <input ref="/imci/preamble/temperature">
+            <label>DO: Take the child's temperature (&#xb0;C)</label>
+          </input>
+        
+          <input ref="/imci/preamble/age">
+            <label>ASK: What is the child's age (in years or months)</label>
+          </input>
+        
+          <select1 ref="/imci/preamble/age_unit">
+            <label>Was the age in years or months?</label>
+            <item><label>Years</label><value>years</value></item>
+            <item><label>Months</label><value>months</value></item>
+          </select1>
+        
+          <!-- debugging question until calculate works -->
+          <input ref="/imci/tmp/normalized/age">
+            <label>DEBUG TEMP: age in years</label>
+          </input>
+        
+          <trigger ref="/imci/tmp/info/too_young">
+            <label>SORRY: this system is not yet suitable for children under two months</label>
+          </trigger>
+          <!-- END -->
+        
+          <select1 ref="/imci/preamble/too_old_use_anyway">
+            <label>SORRY: IMCI is meant for children 5-years-old or less. Do you want to continue anyway?</label>
+            <item><label>Yes</label><value>yes</value></item>
+            <item><label>No</label><value>no</value></item>
+          </select1>
+          <!-- END if no -->
+        
+          <group ref="/imci/tmp/sentinel/age_ok">
+          
+            <select1 ref="/imci/preamble/sex">
+              <label>ASK: What sex is the child?</label>
+              <item><label>Male</label><value>m</value></item>
+              <item><label>Female</label><value>f</value></item>
+            </select1>
+          
+            <input ref="/imci/preamble/weight">
+              <label>ASK: What is the child's weight in kg (skip if unknown)</label>
+            </input>
+        
+            <select1 ref="/imci/preamble/too_heavy_use_anyway">
+              <label>SORRY: IMCI is meant for children under 19 kgs. Correct dosings may not be available. Do you want to continue anyway?</label>
+              <item><label>Yes</label><value>yes</value></item>
+              <item><label>No</label><value>no</value></item>
+            </select1>
+            <!-- END if no -->
+        
+          </group>
+        </group>
+      </group>
+    </group>
 
-		<group ref="/imci/tmp/sentinel/do_protocol">
-			<trigger ref="/imci/blah">
-				<label>welcome to the protocol</label>
-			</trigger>
-		
+    <group ref="/imci/tmp/sentinel/do_protocol">
+      <trigger ref="/imci/blah">
+        <label>welcome to the protocol</label>
+      </trigger>
+    
 
 
 
