@@ -32,7 +32,6 @@ import org.javarosa.formmanager.activity.GetFormHttpActivity;
 import org.javarosa.formmanager.activity.GetFormListHttpActivity;
 import org.javarosa.formmanager.activity.MemoryCheckActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
-import org.javarosa.formmanager.utility.FormDefSerializer;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
 import org.javarosa.j2me.J2MEModule;
@@ -96,7 +95,7 @@ public class JavaRosaCLFormsShell implements IShell {
 		new FormManagerModule().registerModule(context);
 		new CommunicationUIModule().registerModule(context);
 	}
-
+/*
 	private void generateSerializedForms(String originalResource) {
 		FormDef a = XFormUtils.getFormFromResource(originalResource);
 		FormDefSerializer fds = new FormDefSerializer();
@@ -104,7 +103,7 @@ public class JavaRosaCLFormsShell implements IShell {
 		fds.setFname(originalResource+".serialized");
 		new Thread(fds).start();
 	}
-
+*/
 	private void workflow(IActivity lastActivity, String returnCode, Hashtable returnVals) {
 		if (returnVals == null)
 			returnVals = new Hashtable(); //for easier processing
