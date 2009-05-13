@@ -610,7 +610,7 @@ public class LocalizerTest extends TestCase  {
 		l.setLocaleMapping("test", "textID", "text");
 		
 		try {
-			String text = l.getText("textID");
+			l.getText("textID");
 			
 			fail("Retrieved current locale text when current locale not set");
 		} catch (NoSuchElementException nsee) {
