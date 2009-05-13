@@ -67,15 +67,12 @@ public class DumpRMS {
 				ExtUtil.writeNumeric(out, numRecords);
 				
 				Vector recordIDs = new Vector();
-				int count = 0;
 				for (RecordEnumeration re = rs.enumerateRecords(null, null, false); re.hasNextElement(); ) {
 					int recID = re.nextRecordId();
 					recordIDs.addElement(new Integer(recID));
 					ExtUtil.writeNumeric(out, recID);
-
-					count++;
 				}
-				if (count != numRecords) {
+				if (recordIDs.size() != numRecords) {
 					System.err.println("Error: number of records in RMS did not match reported value");
 					throw new RuntimeException("inconsistent number of records in RMS");
 				}
