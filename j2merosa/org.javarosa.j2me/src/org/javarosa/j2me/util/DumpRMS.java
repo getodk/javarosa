@@ -31,7 +31,7 @@ public class DumpRMS {
 			FileConnection fc = (FileConnection)Connector.open("file:///" + filepath);
 			if (fc.exists()) {
 				System.err.println("Error: File " + filepath + " already exists");
-				throw new RuntimeException("dump file already exists");
+				fail("Dump file " + filepath + " already exists");
 			}
 			
 			fc.create();
@@ -41,7 +41,7 @@ public class DumpRMS {
 		
 			fc.close();
 		} catch (IOException ioe) {
-			throw new RuntimeException("ioexception: " + ioe.getMessage());
+			fail(ioe, "ioexception");
 		}
 	}
 	
@@ -74,7 +74,7 @@ public class DumpRMS {
 				}
 				if (recordIDs.size() != numRecords) {
 					System.err.println("Error: number of records in RMS did not match reported value");
-					throw new RuntimeException("inconsistent number of records in RMS");
+					fail("Inconsistent number of records in RMS " + rmsName + " (" + recordIDs.size() + " vs " + numRecords + ")");
 				}
 				
 				for (int j = 0; j < recordIDs.size(); j++) {
@@ -91,9 +91,9 @@ public class DumpRMS {
 				rs.closeRecordStore();
 			}
 		} catch (IOException ioe) {
-			throw new RuntimeException("ioexception: " + ioe.getMessage());
+			fail(ioe, "ioexception");
 		} catch (RecordStoreException rse) {
-			throw new RuntimeException("recordstoreexception: " + rse.getMessage());
+			fail(rse, "recstoreexception");
 		} finally {
 			try {
 				out.flush();
@@ -110,13 +110,13 @@ public class DumpRMS {
 			FileConnection fc = (FileConnection)Connector.open("file:///" + filepath);
 			if (!fc.exists()) {
 				System.err.println("Error: File " + filepath + " does not exist");
-				throw new RuntimeException("RMS image [" + filepath + "] not found");
+				fail("RMS image [" + filepath + "] not found");
 			}
 			
 			restoreRMS(fc.openDataInputStream(), true);
 			fc.close();			
 		} catch (IOException ioe) {
-			throw new RuntimeException("ioexception: " + ioe.getMessage());
+			fail(ioe, "ioexception");
 		}
 	}
 	
@@ -150,7 +150,7 @@ public class DumpRMS {
 				RecordStore rs = RecordStore.openRecordStore(rmsName, true);
 				if (!makeIDsAvailable(rs, recordIDs)) {
 					System.err.println("Error: could not create record placeholders");
-					throw new RuntimeException("error pre-filling record ids in rms [" + rmsName + "]");
+					fail("Error pre-filling record IDs in RMS " + rmsName);
 				}
 
 				//load record data
@@ -177,9 +177,9 @@ public class DumpRMS {
 				}
 			}
 		} catch (IOException ioe) {
-			throw new RuntimeException("ioexception: " + ioe.getMessage());
+			fail(ioe, "ioexception");
 		} catch (RecordStoreException rse) {
-			throw new RuntimeException("recordstoreexception: " + rse.getMessage());		
+			fail(rse, "recstoreexception");
 		}
 	}
 
@@ -235,5 +235,26 @@ public class DumpRMS {
 			System.out.println("Restoring RMS image...");
 			restoreRMS(path);
 		}		
+	}
+	
+	private static void fail (Exception e, String prefix) {
+		RuntimeException re;
+		
+		if (e == null) {
+			re = new RuntimeException("wtf exception is null; this is impossible");
+		} else {
+			String line = "";
+			if (prefix != null)
+				line += prefix + ": ";
+			line += e.getClass().getName();
+			if (e.getMessage() != null)
+				line += "(" + e.getMessage() + ")";
+			re = new RuntimeException(line);
+		}
+		throw re;
+	}
+	
+	private static void fail (String msg) {
+		throw new RuntimeException(msg);
 	}
 }
