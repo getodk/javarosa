@@ -90,7 +90,7 @@ public class ExtensionIntegrationTests extends TestCase {
 			System.out.println(classpath);
 			StringItem d = new StringItem("asfd","asfd");
 			if (d == null) {
-				int a = 3;
+				//int a = 3;
 			}
 			GraphWidget graph = new GraphWidget();			
 			testWidget(graph, SampleForms.getGraphWidgetForm());
