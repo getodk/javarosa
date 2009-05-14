@@ -14,11 +14,9 @@ import javax.microedition.lcdui.TextField;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.services.IPropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
-import org.javarosa.core.services.storage.utilities.RMSUtility;
 
 public class PropertiesScreen extends Form implements IView{
 
@@ -175,6 +173,8 @@ public class PropertiesScreen extends Form implements IView{
     	} catch (RecordStoreException rse) { }
     }
     
+    // TODO is this unused?
+    /*
     private void addRMSInfo() {
     	Vector stores = JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtilityNames();
         int consumedSpace[] = new int[stores.size()];
@@ -207,7 +207,8 @@ public class PropertiesScreen extends Form implements IView{
 		}
 
 	}
-
+     */
+    
     private String formatBytes (int bytes) {   	
     	int NUM_DIGITS = 2;
     	

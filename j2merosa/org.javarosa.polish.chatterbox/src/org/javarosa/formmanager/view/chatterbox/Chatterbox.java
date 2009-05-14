@@ -668,9 +668,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 		System.out.println("Click!");
 	}
 
+	/*
 	private void handleException(Exception e) {
 		Alert a = new Alert("Exception", e.toString(), null, null);
 		a.setTimeout(Alert.FOREVER);
 		//JavaRosaServiceProvider.instance().getDisplay().setCurrent(a, mMainForm);
-	}
+	}*/
 }
