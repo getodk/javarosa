@@ -26,202 +26,338 @@ import org.javarosa.formmanager.view.ViewTypes;
 import org.javarosa.user.model.User;
 
 
+
 /**
  * @author Brian DeRenzi
- *
+ * 
+ *         Activity when user selects to view forms
+ * 
+ * 
  */
 public class FormListActivity implements IActivity {
 
 	public static final String COMMAND_KEY = "command";
 	public static final String FORM_ID_KEY = "form_id";
-	//refactor these out.
-	public final Command CMD_ADD_USER = new Command("Add User", Command.SCREEN, 5);
+	// refactor these out.
+	public final Command CMD_ADD_USER = new Command("Add User", Command.SCREEN,
+			5);
 	public final Command CMD_SAVE = new Command("Save", Command.OK, 1);
-	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
+ 
+	 
+ 
 	
-	private FormList formsList = null;
-	private Map listOfForms = null;
-	private Vector formIDs = null;
+	// calling shell
+	 
+	 
+	// the view, which for this activity is a FormList
+	private FormList view = null;
+
+	// the structures into which the forms are read
+	private Vector forms = new Vector();
+	private Map formsPositionTitleMap = new Map();
+	private Vector formPositions = null;
+	
+	 
 	private IShell parent = null;
 	private Vector positionToId = null;
 
 	private Context context;
 
-	public Vector customCommands = new Vector();
-	
+	// TODO: what type are the elements?
+	private Vector customCommands = new Vector();
+
+	private FormDefRMSUtility formDefRMSUtility = null;
+
+	/**
+	 * 
+	 * @param p
+	 *            shell from which this activity is called
+	 * @param title
+	 *            title of the activity
+	 */
 	public FormListActivity(IShell p, String title) {
 		this.parent = p;
-		this.formsList = new FormList(this,title);
+		this.view = new FormList(this, title);
 	}
 
-	public void start(Context context) {
-		this.context = context;
-		
-		
-		this.listOfForms = new Map();
-		this.formIDs = new Vector();
-		getXForms();
+	public void start(Context ctx) {
+		this.context = ctx;
 
-		if(context.getElement("USER")!=null){
-			User loggedInUser = (User)context.getElement("USER");
+		initFormsRMSInterface();
+		
+		readXFormsFromRMS();
+
+		// if there is a logged in user, add the command "ADD USER"
+		// to the formsList (?)
+		if (ctx.getElement("USER") != null) {
+			User loggedInUser = (User) ctx.getElement("USER");
 			if (loggedInUser.isAdminUser())
-				this.formsList.addCommand(CMD_ADD_USER);
+				this.view.addCommand(this.CMD_ADD_USER);
 		}
-		this.positionToId = this.formsList.loadView(listOfForms);
-		parent.setDisplay(this, this.formsList);
-	}
-	
-	public Context getContext()	{
-		return this.context;
+
+		this.formPositions = this.view.loadView(this.formsPositionTitleMap);
+		this.parent.setDisplay(this, this.view);
 	}
 
 
-	public void viewCompleted(Hashtable returnvals, int view_ID) {
+	/**
+	 * 
+	 * method called following completion (exit?) from the view
+	 * 
+	 * @param commands
+	 *            Command-Integer hash
+	 * @param viewCompleted
+	 *            the view which has just been completed
+	 */
+	public void viewCompleted(Hashtable commands, int viewCompleted) {
 		// Determine which view just completed and act accordingly
-		switch(view_ID) {
+		switch (viewCompleted) {
 		case ViewTypes.FORM_LIST:
-			processFormsList(returnvals);
+			processCommandsFromView(commands);
 			break;
 		}
 	}
-
-	private void processFormsList(Hashtable returnvals) {
-		Enumeration en = returnvals.keys();
-		while(en.hasMoreElements()) {
-			String cmd = (String)en.nextElement();
-
-			if( cmd == Commands.CMD_SELECT_XFORM){
-				int selectedForm = ((Integer)returnvals.get(Commands.CMD_SELECT_XFORM)).intValue();
-				int formId = ((Integer)positionToId.elementAt(selectedForm)).intValue();
-				//#if debug.output==verbose
-				System.out.println("Selected form: " + formIDs.elementAt(formId));
-				//#endif
-				FormDefMetaData meta = (FormDefMetaData)formIDs.elementAt(formId);
-
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(FORM_ID_KEY, new Integer(meta.getRecordId()));
-				returnArgs.put(COMMAND_KEY, Commands.CMD_SELECT_XFORM);
-				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
-
-				break;
-
-			} else if (cmd == Commands.CMD_ADD_USER) {
-			   Hashtable returnArgs = new Hashtable(); 
-               returnArgs.put(COMMAND_KEY, Commands.CMD_ADD_USER); 
-               parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs ); 
-			} else if (cmd == Commands.CMD_EXIT) {
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, Commands.CMD_EXIT);
-				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
-			} else if (cmd == Commands.CMD_VIEW_DATA) {
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, Commands.CMD_VIEW_DATA);
-				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
-			} else if (cmd == Commands.CMD_SETTINGS) {
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, Commands.CMD_SETTINGS);
-				parent.returnFromActivity(this, Constants.ACTIVITY_SUSPEND, returnArgs );
-			} else if (cmd == Commands.CMD_GET_NEW_FORM) {
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, Commands.CMD_GET_NEW_FORM);
-				// Using activity complete means that the shell must actively recreate the
-				// forms list.  I think this is best to ensure that the list is updated
-				// - Brian DeRenzi 18 Aug 2008
-				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
-			} else if (cmd == Commands.CMD_DELETE_FORM) {
-				int selectedForm = ((Integer)returnvals.get(Commands.CMD_DELETE_FORM)).intValue();
-				int formId = ((Integer)positionToId.elementAt(selectedForm)).intValue();
-				//#if debug.output==verbose
-				System.out.println("Deleting form: " + formIDs.elementAt(formId));
-				//#endif
-				FormDefMetaData meta = (FormDefMetaData)formIDs.elementAt(formId);
-				FormDefRMSUtility rms = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-
-				// Delete!
-				rms.deleteRecord(meta.getRecordId());
-
-				// refresh
-				this.start(this.context);
-			} else {
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, cmd);
-				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
-			}
-		}
-	}
-
-	private void getXForms() {
-
-		FormDefRMSUtility formDefRMSUtility = (FormDefRMSUtility) JavaRosaServiceProvider
-				.instance().getStorageManager().getRMSStorageProvider()
-				.getUtility(FormDefRMSUtility.getUtilityName());
-		formDefRMSUtility.open();
-    	IRecordStoreEnumeration recordEnum = formDefRMSUtility.enumerateMetaData();
-    	int pos =0;
-    	while(recordEnum.hasNextElement())
-    	{
-    		int i;
-			try {
-				i = recordEnum.nextRecordId();
-				FormDefMetaData mdata = new FormDefMetaData();
-				formDefRMSUtility.retrieveMetaDataFromRMS(i,mdata);
-				// TODO fix it so that record id is part of the metadata serialization
-
-				// BWD 27/7/2008
-				// Getting rid of annoying numbers thing
-				//listOfForms.put(new Integer(pos), mdata.getRecordId()+"-"+mdata.getName());
-				listOfForms.put(new Integer(pos), mdata.getTitle());
-				formIDs.insertElementAt(mdata, pos);
-				pos++;
-			} catch (RecordStorageException e) {
-				// TODO Auto-generated catch block
-				//#if debug.output==verbose || debug.output==exception
-				e.printStackTrace();
-				//#endif
-			}
-		}
-    }
 
 	public void contextChanged(Context context) {
 		Vector contextChanges = this.context.mergeInContext(context);
 
 		Enumeration en = contextChanges.elements();
-		while(en.hasMoreElements()) {
-			String changedValue = (String)en.nextElement();
-			if(changedValue == Constants.USER_KEY) {
-				//update username somewhere
+		while (en.hasMoreElements()) {
+			String changedValue = (String) en.nextElement();
+			if (changedValue == Constants.USER_KEY) {
+				// TODO
+				// update username somewhere
 			}
 		}
 	}
 
-	public void halt() {
+	
 
-	}
 	public void resume(Context context) {
 		this.contextChanged(context);
-		//Possibly want to check for new/updated forms
-		JavaRosaServiceProvider.instance().showView(this.formsList);
+		// Possibly want to check for new/updated forms
+		JavaRosaServiceProvider.instance().showView(this.view);
 	}
-	public void destroy() {
 
-	}
-	public Context getActivityContext() {
-		return context;
-	}
+
 
 	public void addNewMenuCommand(Command c) {
-		this.formsList.addCommand(c);
+		this.view.addCommand(c);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
-	 */
+
+	// TODO - type of elements in customCommands?
+	public void addCustomCommand(String command){
+		this.customCommands.addElement(command);
+	}
+	public void annotateCommand(ICommand command) {
+		this.customCommands.addElement(command);
+	}
+	
+	
+	
+	// getters
+	public Context getActivityContext() {
+		return this.context;
+	}
+	public Context getContext() {
+		return this.context;
+	}
+	public Vector getCustomCommands(){
+		return this.customCommands;
+	}
+	
+	// setters
 	public void setShell(IShell shell) {
 		this.parent = shell;
 	}
 
-	public void annotateCommand(ICommand command) {
-		customCommands.addElement(command);
+	public void destroy() {
+		// do nothing?
 	}
+	public void halt() {
+		// do nothing?
+	}
+	
+	/**
+	 * @return the FormDefRMSUtility
+	 */
+	private FormDefRMSUtility initFormsRMSInterface() {
+		if (this.formDefRMSUtility == null) {
+			this.formDefRMSUtility = (FormDefRMSUtility) JavaRosaServiceProvider
+					.instance().getStorageManager().getRMSStorageProvider()
+					.getUtility(FormDefRMSUtility.getUtilityName());
+			this.formDefRMSUtility.open();
+		}
+		return this.formDefRMSUtility;
+	}
+	
+	/**
+	 * 
+	 * Select a form (metadata) from the forms read in, according to the params
+	 * 
+	 * @param command
+	 * @param commands
+	 * @return
+	 */
+	private FormDefMetaData getSelectedForm(String command, Hashtable commands) {
+		int selectedPosition = ((Integer) commands.get(command)).intValue();
+		int formPosition = ((Integer) this.formPositions
+				.elementAt(selectedPosition)).intValue();
+		// #if debug.output==verbose
+		System.out.println("Selecting form: "
+				+ this.forms.elementAt(formPosition) + " with command "
+				+ command);
+		// #endif
+		FormDefMetaData meta = (FormDefMetaData) this.forms
+				.elementAt(formPosition);
+		return meta;
+	}
+
+	/**
+	 * 
+	 * process the commands
+	 * 
+	 * 
+	 * @param commands
+	 *            Command-Integer hash
+	 */
+	private void processCommandsFromView(Hashtable commands) {
+		Enumeration en = commands.keys();
+		while (en.hasMoreElements()) {
+			String cmd = (String) en.nextElement();
+
+			
+			// select a form
+			if (cmd == Commands.CMD_SELECT_XFORM) {
+				FormDefMetaData meta = getSelectedForm(
+						Commands.CMD_SELECT_XFORM, commands);
+				parentReturnWithFormIdAndCommand(meta.getRecordId(),
+						Commands.CMD_SELECT_XFORM);
+				return;
+			} 
+			
+			
+			// delete a form
+			if (cmd == Commands.CMD_DELETE_FORM) {
+				FormDefMetaData formMetaData = getSelectedForm(
+						Commands.CMD_DELETE_FORM, commands);
+
+				FormDefRMSUtility rms = initFormsRMSInterface();
+				rms.deleteRecord(formMetaData.getRecordId());
+				
+				System.out.println("deleted form " + formMetaData.getRecordId());
+
+				// refresh following deletion
+				this.start(this.context);
+				
+				return;
+			} 
+
+			// other commands
+			if (cmd == Commands.CMD_ADD_USER) {
+				parentReturnWithCommand(Commands.CMD_ADD_USER);
+			} else if (cmd == Commands.CMD_EXIT) {
+				parentReturnWithCommand(Commands.CMD_EXIT);
+			} else if (cmd == Commands.CMD_VIEW_DATA) {
+				parentReturnWithCommand(Commands.CMD_VIEW_DATA);
+			} else if (cmd == Commands.CMD_SETTINGS) {
+				parentReturnWithCommand(Commands.CMD_SETTINGS);
+			} else if (cmd == Commands.CMD_GET_NEW_FORM) {
+				// Using activity complete means that the shell must actively
+				// recreate the
+				// forms list. I think this is best to ensure that the list is
+				// updated
+				// - Brian DeRenzi 18 Aug 2008
+
+				parentReturnWithCommand(Commands.CMD_GET_NEW_FORM);
+
+			} else {
+				parentReturnWithCommand(cmd);
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * invoke returnFromActivity from the parent shell, passing the command executed
+	 * 
+	 * @param command
+	 */
+	private void parentReturnWithCommand(String command) {
+		Hashtable returnArgs = new Hashtable();
+		returnArgs.put(COMMAND_KEY, command);
+		this.parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+				returnArgs);
+	}
+
+	/**
+	 * 
+	 * invoke returnFromActivity from the parent shell, passing the command executed
+	 * and the formid operated on
+	 * 
+	 * @param id
+	 * @param command
+	 */
+	private void parentReturnWithFormIdAndCommand(int id, String command) {
+		Hashtable returnArgs = new Hashtable();
+		returnArgs.put(COMMAND_KEY, command);
+		returnArgs.put(FORM_ID_KEY, new Integer(id));
+		this.parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+				returnArgs);
+	}
+
+	/**
+	 * 
+	 * Get forms from RMS and insert them into instance variables (title and id)
+	 * 
+	 */
+	private void readXFormsFromRMS() {
+
+		IRecordStoreEnumeration formsIds = this.formDefRMSUtility
+				.enumerateMetaData();
+		int pos = 0;
+		while (formsIds.hasNextElement()) {
+			int id;
+			try {
+				id = formsIds.nextRecordId();
+				FormDefMetaData formMetadata = retrieveForm(id);
+				// TODO fix it so that record id is part of the metadata
+				// serialization
+
+				// BWD 27/7/2008
+				// Getting rid of annoying numbers thing
+				// listOfForms.put(new Integer(pos),
+				// mdata.getRecordId()+"-"+mdata.getName());
+				this.formsPositionTitleMap.put(new Integer(pos), formMetadata
+						.getTitle());
+				this.forms.insertElementAt(formMetadata, pos);
+				pos++;
+			} catch (RecordStorageException e) {
+				// #if debug.output==verbose || debug.output==exception
+				e.printStackTrace();
+				// #endif
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * retrieve form with specific id from RMS
+	 * 
+	 * @param id
+	 * @param formDefRMSUtility
+	 * @return
+	 */
+	private FormDefMetaData retrieveForm(int id) {
+		FormDefMetaData formMetadata = new FormDefMetaData();
+		this.formDefRMSUtility.retrieveMetaDataFromRMS(id, formMetadata);
+		return formMetadata;
+	}
+
+	
+
+	
 }
+
+ 
