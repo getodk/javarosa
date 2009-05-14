@@ -229,9 +229,11 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		evaluateConditions(ref);		
 	}
 	
-	public void deleteRepeat(TreeReference deleteReference) {  
-	    TreeElement deleteChild = model.resolveReference(deleteReference);
-        TreeReference parentReferece = deleteReference.getParentRef();
+	public void deleteRepeat (FormIndex index) {  
+		TreeReference delRef = getChildInstanceRef(index);
+	    TreeElement deleteChild = model.resolveReference(delRef);
+	    
+        TreeReference parentReferece = delRef.getParentRef();
         TreeElement parent = model.resolveReference(parentReferece);
 
         int childMult = deleteChild.getMult();
