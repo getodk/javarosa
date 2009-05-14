@@ -298,6 +298,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 				}
 			}
 			
+			//droos 5/14: this this might be a bug? what if we encounter the same condition again, but the targets
+			//have since changed? we'll return the original condition (above), and not update this index
 			Vector targets = condition.getTargets();
 			for (int i = 0; i < targets.size(); i++) {
 				TreeReference target = (TreeReference)targets.elementAt(i);
@@ -333,13 +335,23 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			}
 			
 			if (applicable) {
-				evaluateCondition(c, rootRef);
+				evaluateCondition(c, rootRef, 0);
 			}
 		}
 	}
 
-	//ref: unambiguous ref of node that just changed
+	public static final int CONDITION_CHAINING_LIMIT = 100;
+	
 	public void evaluateConditions (TreeReference ref) {
+		evaluateConditions(ref, 0);
+	}
+		
+	//ref: unambiguous ref of node that just changed
+	public void evaluateConditions (TreeReference ref, int depth) {
+		if (depth > CONDITION_CHAINING_LIMIT) {
+			throw new RuntimeException("Exceeded condition chaining limit; you probably have dependency cycles in your conditions");
+		}
+		
 		//turn unambiguous ref into a generic ref
 		TreeReference genericRef = ref.genericize();
 		
@@ -351,16 +363,16 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		//for each condition
 		for (int i = 0; i < conditions.size(); i++) {
 			Condition condition = (Condition)conditions.elementAt(i);
-			evaluateCondition(condition, ref);
+			evaluateCondition(condition, ref, depth);
 		}
 	}
 	
-	private void evaluateCondition (Condition c, TreeReference anchorRef) {
+	private void evaluateCondition (Condition c, TreeReference anchorRef, int depth) {
 		TreeReference contextRef = c.contextRef.contextualize(anchorRef);
 		Vector v = model.expandReference(contextRef);
 		for (int j = 0; j < v.size(); j++) {
 			EvaluationContext ec = new EvaluationContext(conditionEvalContext, (TreeReference)v.elementAt(j));
-			c.apply(model, ec);
+			c.apply(model, ec, this, depth);
 		}
 	}
 	

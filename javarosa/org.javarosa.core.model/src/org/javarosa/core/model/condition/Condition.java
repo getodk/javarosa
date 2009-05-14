@@ -21,6 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
@@ -69,14 +70,19 @@ public class Condition implements Externalizable {
 		return expr.eval(model, evalContext);
 	}
 	
-	public void apply (IFormDataModel model, EvaluationContext evalContext) {
+	public void apply (IFormDataModel model, EvaluationContext evalContext, FormDef f, int depth) {
 		boolean result = eval(model, evalContext);
 
 		for (int i = 0; i < targets.size(); i++) {
 			TreeReference targetRef = ((TreeReference)targets.elementAt(i)).contextualize(evalContext.getContextRef());
 			Vector v = ((DataModelTree)model).expandReference(targetRef);		
 			for (int j = 0; j < v.size(); j++) {
-				performAction(((DataModelTree)model).resolveReference((TreeReference)v.elementAt(j)), result ? trueAction : falseAction);
+				TreeReference affectedRef = (TreeReference)v.elementAt(j);
+				performAction(((DataModelTree)model).resolveReference(affectedRef), result ? trueAction : falseAction);
+				if (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE) {
+					//changing the relevance of a node triggers conditions depending on that node
+					f.evaluateConditions(affectedRef, depth + 1);
+				}
 			}
 		}		
 	}
