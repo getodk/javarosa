@@ -24,7 +24,6 @@ import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.FormList;
 import org.javarosa.formmanager.view.ViewTypes;
 import org.javarosa.user.model.User;
-import org.javarosa.user.view.NewUserForm;
 
 
 /**
@@ -39,8 +38,7 @@ public class FormListActivity implements IActivity {
 	public final Command CMD_ADD_USER = new Command("Add User", Command.SCREEN, 5);
 	public final Command CMD_SAVE = new Command("Save", Command.OK, 1);
 	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
-	private NewUserForm addUser = null;
-
+	
 	private FormList formsList = null;
 	private Map listOfForms = null;
 	private Vector formIDs = null;

@@ -9,7 +9,6 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
@@ -41,6 +40,7 @@ import org.javarosa.formmanager.view.SubmitStatusScreen;
 /**
  *
  * TODO: This Activity needs to have most of its functionality delegated out to a controller. Badly.
+ * TODO: It also needs a lot of unused variables cleaned up.
  *
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
@@ -71,7 +71,7 @@ public class FormTransportActivity implements
 
 	private ISubmitStatusScreen submitStatusScreen;
 
-	private Display display;
+	//private Display display;
 
 	public Alert alert;
 
@@ -104,7 +104,7 @@ public class FormTransportActivity implements
 
 	private TransportContext context;
 
-	private String currentView;
+	//private String currentView;
 
 	Vector transportMethods;
 
@@ -135,7 +135,7 @@ public class FormTransportActivity implements
 
 	public void halt() {
 		//TODO: setup which view we're on.
-		currentView = TransportContext.MAIN_MENU;
+		//currentView = TransportContext.MAIN_MENU;
 	}
 
 	public void resume(Context globalContext) {
@@ -442,9 +442,9 @@ public class FormTransportActivity implements
 						.enqueue(payload, destination, transportMethod,
 								this.data.getId());
 			} else {
-				javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert(
-						"noDataAlert", "No data has been selected", null,
-						AlertType.ERROR);
+				//javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert(
+				//		"noDataAlert", "No data has been selected", null,
+				//		AlertType.ERROR);
 				shell.setDisplay(this, new IView() {
 					public Object getScreenObject() {
 						return mainMenu;

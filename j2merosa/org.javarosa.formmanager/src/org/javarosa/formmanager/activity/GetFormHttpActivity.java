@@ -32,7 +32,7 @@ public class GetFormHttpActivity implements IActivity,CommandListener,Observer {
 	private TransportMessage message;
 	private TransportManager transportManager;
 	private String getFormUrl;
-	private String formName = "";
+	//private String formName = "";
 	private IShell parent;
 
 	private ByteArrayInputStream bin;
@@ -128,9 +128,8 @@ public class GetFormHttpActivity implements IActivity,CommandListener,Observer {
 	}
 
 	public void process(byte[] data) {
-		String response;
-		response = new String(data).trim();
-		//System.out.println("MYFORM:"+response);
+		
+		//System.out.println("MYFORM:"+new String(data).trim());
 		FormDefRMSUtility formDef = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 
 		bin = new ByteArrayInputStream(data);

@@ -44,7 +44,6 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
 	public static final int SEX_UNKNOWN = 3;
 
 	private static final int INVALID_RECORD_ID = -1;
-	private static final String NULL_DISPLAY_VALUE = "";
 
 	/** RMS Record Id */
 	private int recordId = INVALID_RECORD_ID;
