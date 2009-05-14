@@ -165,8 +165,7 @@ public class XPathPathExpr extends XPathExpression {
 			throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
 		}
 		
-		//to fix conditions based on non-relevant data	
-		return unpackValue(/*node.isRelevant() ?*/ node.getValue() /*: null*/);
+		return unpackValue(node.isRelevant() ? node.getValue() : null);
 	}
 	
 	private static Object unpackValue (IAnswerData val) {
