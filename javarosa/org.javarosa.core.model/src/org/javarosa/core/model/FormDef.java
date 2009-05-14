@@ -228,6 +228,25 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		node.setAnswer(data);
 		evaluateConditions(ref);		
 	}
+	
+	public void deleteRepeat(TreeReference deleteReference) {  
+	    TreeElement deleteChild = model.resolveReference(deleteReference);
+        TreeReference parentReferece = deleteReference.getParentRef();
+        TreeElement parent = model.resolveReference(parentReferece);
+
+        int childMult = deleteChild.getMult();
+        parent.removeChild(deleteChild);
+        Vector v = parent.getChildren();
+        if (v != null) {
+	        for (int i = 0; i < v.size(); i++) {
+	        	TreeElement child = (TreeElement)v.elementAt(i);
+	            if (child.getMult() > childMult) {
+	                child.setMult(child.getMult() - 1);
+	            }
+	        }
+        }
+        evaluateConditions(parentReferece);  
+	}
 		
 	public void createNewRepeat (FormIndex index) {
 		TreeReference destRef = getChildInstanceRef(index);
