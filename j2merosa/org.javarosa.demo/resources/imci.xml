@@ -26,7 +26,20 @@
             <weight />
             <too_heavy_use_anyway />
           </preamble>
-
+					<cough>
+						<length />
+						<breath_rate_type />
+						<breate_rate />
+						<indrawing />
+						<stridor />
+						<classify>
+							<severe_pneumonia />
+							<pneumonia />
+							<persistent_cold />
+							<cold />
+							<override />
+						</classify>
+					</cough>
 
 
 <blah />
@@ -47,8 +60,18 @@
               <has_cough />
               <has_diarrhea />
               <has_ear />
-              <fever />
+							
+              <fever /> <!-- (high temp) or (feels hot) or (complain of fever) ?-->
               <age />
+							<fast_breath />
+							
+							<classification>
+							  <cough />
+							</classification>
+							<diagnosis>
+							  <cough />
+							</diagnosis>
+							
             </normalized>
           </tmp>
         </imci>
@@ -72,24 +95,42 @@
       <bind nodeset="tmp/info/first_visit_only" relevant="/imci/preamble/visit_type != 'first'" />
       <bind nodeset="tmp/sentinel/first_visit" relevant="/imci/preamble/visit_type = 'first'" />
 
-      <bind nodeset="preamble/temperature" type="decimal" relevant="../temp_type = 'therm'" required="true()" />
+      <bind nodeset="preamble/temperature" type="decimal" constraint="true()" relevant="../temp_type = 'therm'" required="true()" />
       <!-- normalize/fever ? -->
       
-      <bind nodeset="preamble/age" type="int" required="true()" />
+      <bind nodeset="preamble/age" type="int" required="true()" /> <!-- todo: add age/unit constraints -->
       <bind nodeset="tmp/normalized/age" calculate="if(/imci/preamble/age_unit = 'years', /imci/preamble/age,
                                                     if(/imci/preamble/age_unit = 'months', /imc/preamble/age div 12, ''))" type="decimal" /> <!-- remove 'type' once calculate works -->
       <bind nodeset="tmp/info/too_young" relevant="/imci/tmp/normalized/age < 2 div 12" />
-      <bind nodeset="preamble/too_old_use_anyway" relevant="/imci/tmp/normalized/age > 5.0" />
-      <bind nodeset="tmp/sentinel/age_ok" relevant="/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age <= 5.0 or /imci/preamble/too_old_use_anyway = 'yes')" />
+      <bind nodeset="preamble/too_old_use_anyway" relevant="/imci/tmp/normalized/age >= 6.0" />
+      <bind nodeset="tmp/sentinel/age_ok" relevant="/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age < 6.0 or /imci/preamble/too_old_use_anyway = 'yes')" />
                                                     
-      <bind nodeset="preamble/weight" type="int" />
+      <bind nodeset="preamble/weight" type="int" constraint="true()" />
       <bind nodeset="preamble/too_heavy_use_anyway" relevant="../weight >= 19" />
       
       <bind nodeset="tmp/sentinel/do_protocol" relevant="(count-selected(/imci/preamble/chief_complaint) > 0 and not(selected(/imci/preamble/chief_complaint, 'none'))) and
                                                          /imci/preamble/visit_type = 'first' and
-                                                         (/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age <= 5.0 or /imci/preamble/too_old_use_anyway = 'yes')) and
+                                                         (/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age < 6.0 or /imci/preamble/too_old_use_anyway = 'yes')) and
                                                          (not(/imci/preamble/weight) or /imci/preamble/weight < 19 or /imci/preamble/too_heavy_use_anyway = 'yes')" />
-    </model>
+																												 
+			<bind nodeset="cough/breath_rate" type="int" constraint="true()" relevant="../breath_rate_type = 'measure'" required="true()" />
+			<bind nodeset="tmp/normalized/fast_breath" calculate="/imci/cough/breath_rate_type = 'fast' or /imci/cough/breath_rate >= if(../age < 1.0, 50, 40)" />
+			
+			<bind nodeset="tmp/normalized/classification/cough" calculate="
+			  if(/imci/cough/indrawing = 'yes' or /imci/cough/stridor = 'yes' or count-selected(/imci/preamble/danger_signs) > 0, 'severe-pneumonia',
+			  if(/imci/tmp/normalized/fast_breath, 'pneumonia',
+				if(/imci/cough/length = 'over30', 'persistent-cold',
+				if(/imci/cough/length = 'under30', 'cold', ''))))" />
+			<bind nodeset="cough/classify/severe_pneumonia" relevant="/imci/tmp/normalized/classification/cough = 'severe-pneumonia'" />
+			<bind nodeset="cough/classify/pneumonia" relevant="/imci/tmp/normalized/classification/cough = 'pneumonia'" />
+			<bind nodeset="cough/classify/persistent_cold" relevant="/imci/tmp/normalized/classification/cough = 'persistent-cold'" />
+			<bind nodeset="cough/classify/cold" relevant="/imci/tmp/normalized/classification/cough = 'cold'" />
+			<bind nodeset="cough/classify/override" relevant="/imci/cough/classify/severe_pneumonia = 'disagree' or
+			                                                  /imci/cough/classify/pneumonia = 'disagree' or
+			                                                  /imci/cough/classify/persistent_cold = 'disagree' or
+			                                                  /imci/cough/classify/cold = 'disagree'" />
+			<bind nodeset="tmp/normalized/diagnosis/cough" calculate="if(/imci/cough/classify/override != '', /imci/cough/classify/override, ../../classification/cough)" />
+		</model>
   </h:head>
 
   <h:body>
@@ -201,8 +242,8 @@
           
             <select1 ref="/imci/preamble/sex">
               <label>ASK: What sex is the child?</label>
-              <item><label>Male</label><value>m</value></item>
-              <item><label>Female</label><value>f</value></item>
+              <item><label>Boy</label><value>m</value></item>
+              <item><label>Girl</label><value>f</value></item>
             </select1>
           
             <input ref="/imci/preamble/weight">
@@ -226,9 +267,72 @@
         <label>welcome to the protocol</label>
       </trigger>
     
+			<group ref="/imci/tmp/normalized/has_cough">
+					
+				<select1 ref="/imci/cough/length">
+					<label>ASK: How long has child had cough/difficulty breathing?</label>
+					<item><label>Less than 30 days</label><value>under30</value></item>
+					<item><label>30 days or more</label><value>over30</value></item>
+				</select1>
 
+				<select1 ref="/imci/cough/breath_rate_type">
+					<label>ASK: Can you measure the breathing rate?</label>
+					<item><label>Yes, I will count number of breaths per minute</label><value>measure</value></item>
+					<item><label>No, but breathing rate is normal</label><value>normal</value></item>
+					<item><label>No, but breathing rate is fast</label><value>fast</value></item>
+				</select1>
 
-
+				<input ref="/imci/cough/breath_rate">
+					<label>DO: What is the breathing rate in breaths per minute?</label>
+				</input>
+				
+				<select1 ref="/imci/cough/indrawing">
+					<label>LOOK: Is the chest indrawing?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>
+				
+				<select1 ref="/imci/cough/stridor">
+					<label>LISTEN: Is there stridor?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>
+				
+				<select1 ref="/imci/cough/classify/severe_pneumonia">
+					<label>CLASSIFY: Child should be treated for severe pneumonia or very severe disease</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<select1 ref="/imci/cough/classify/pneumonia">
+					<label>CLASSIFY: Child should be treated for pneumonia</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<select1 ref="/imci/cough/classify/persistent_cold">
+					<label>CLASSIFY: Child should be treated for persistent cough or cold, but no pneumonia</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<select1 ref="/imci/cough/classify/cold">
+					<label>CLASSIFY: Child should be treated for cough or cold, but no pneumonia</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<select1 ref="/imci/cough/classify/override">
+					<label>PLEASE: You have disagreed; select the correct classification</label>
+					<item><label>Cough with Cold</label><value>cold</value></item>
+					<item><label>Cough with Persistent Cold</label><value>persistent-cold</value></item>
+					<item><label>Cough with Pneumonia</label><value>pneumonia</value></item>
+					<item><label>Cough with Severe Pneumonia</label><value>severe-pneumonia</value></item>
+				</select1>
+			
+			
+			</group>
+			
     </group>
 
   </h:body>
