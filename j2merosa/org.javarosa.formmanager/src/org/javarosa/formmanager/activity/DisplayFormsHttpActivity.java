@@ -85,7 +85,7 @@ public class DisplayFormsHttpActivity implements IActivity,CommandListener,Obser
 public void processSurveyList(KXmlParser parser, Hashtable formInfo) throws XmlPullParserException{
 		
 		try {
-			boolean inItem = false;
+			//boolean inItem = false;
 			parser.nextTag();
 			parser.require(XmlPullParser.START_TAG, null, "forms");
 			while( parser.nextTag() != XmlPullParser.END_TAG ){
@@ -98,12 +98,12 @@ public void processSurveyList(KXmlParser parser, Hashtable formInfo) throws XmlP
 System.out.println("<"+name+">"+text+" "+url);				
 				if(name.equals("form"))
 					{
-					inItem = true;
+					//inItem = true;
 					//items.addElement(text);
 					formInfo.put(text, url);
 					}
 				else
-					inItem = false;
+					//inItem = false;
 
 				parser.require(XmlPullParser.END_TAG, null, "form");
 			}
