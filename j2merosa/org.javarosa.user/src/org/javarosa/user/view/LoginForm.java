@@ -1,23 +1,20 @@
 package org.javarosa.user.view;
 
-import java.io.IOException;
-
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IView;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.LoginContext;
+import org.javarosa.user.utility.Terms;
 
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
-import de.enough.polish.util.Locale;
 
 public class LoginForm extends FramedForm implements IView {
 
@@ -25,13 +22,13 @@ public class LoginForm extends FramedForm implements IView {
 
 	// #if javarosa.login.demobutton
 	private StringItem demoButton;
-	public final static Command CMD_DEMO_BUTTON = new Command("Demo",
+	public final static Command CMD_DEMO_BUTTON = new Command(Terms.DEMO_STR,
 			Command.ITEM, DEFAULT_COMMAND_PRIORITY);
 	// #endif
 
-	public final static Command CMD_CANCEL_LOGIN = new Command("EXIT",
+	public final static Command CMD_CANCEL_LOGIN = new Command(Terms.EXIT_STR,
 			Command.SCREEN, DEFAULT_COMMAND_PRIORITY);
-	public final static Command CMD_LOGIN_BUTTON = new Command("Login",
+	public final static Command CMD_LOGIN_BUTTON = new Command(Terms.LOGIN_STR,
 			Command.ITEM, DEFAULT_COMMAND_PRIORITY);
 
 	private StringItem loginButton;
@@ -41,15 +38,6 @@ public class LoginForm extends FramedForm implements IView {
 	private User loggedInUser;
 
 	private IActivity parent;
-
-	// internationalization
-	private final static String commcareVersion = Locale.get("commcare.version");
-	private final static String buildNumber = Locale.get("build.number");
-	private final static String usernamePrompt = Locale.get("username");
-	private final static String passwordPrompt = Locale.get("password");
-	private final static String loginPrompt = Locale.get("login");
-	private final static String loginSuccessful = Locale.get("login.successful");
-	private final static String loadingProfile = Locale.get("loading.profile");
 
 	// context attributes
 	private final static String CTX_USERNAME = "username";
@@ -65,16 +53,23 @@ public class LoginForm extends FramedForm implements IView {
 	private final static int DEFAULT_ADMIN_USERID = -1;
 
 	public LoginForm(IActivity loginActivity) {
-		super(loginPrompt);
+		super(Terms.loginPrompt);
 		init(loginActivity);
 	}
 
+	/**
+	 * @param loginActivity
+	 * @param title
+	 */
 	public LoginForm(IActivity loginActivity, String title) {
 		super(title);
 		init(loginActivity);
 
 	}
 
+	/**
+	 * @param loginActivity
+	 */
 	private void init(IActivity loginActivity) {
 		this.parent = loginActivity;
 
@@ -117,9 +112,9 @@ public class LoginForm extends FramedForm implements IView {
 	private void initLoginControls(String username) {
 
 		// create the username and password input fields
-		this.usernameField = new TextField(usernamePrompt, username, 50,
+		this.usernameField = new TextField(Terms.usernamePrompt, username, 50,
 				TextField.ANY);
-		this.passwordField = new TextField(passwordPrompt, "", 10,
+		this.passwordField = new TextField(Terms.passwordPrompt, "", 10,
 				TextField.PASSWORD);
 
 		// TODO:what this?
@@ -133,7 +128,7 @@ public class LoginForm extends FramedForm implements IView {
 		this.passwordField.setDefaultCommand(CMD_LOGIN_BUTTON);
 
 		// add the login button
-		this.loginButton = new StringItem(null, loginPrompt, Item.BUTTON);
+		this.loginButton = new StringItem(null, Terms.loginPrompt, Item.BUTTON);
 		append(this.loginButton);
 		this.loginButton.setDefaultCommand(CMD_LOGIN_BUTTON);
 
@@ -158,11 +153,11 @@ public class LoginForm extends FramedForm implements IView {
 				CTX_JAVAROSA_BUILD);
 
 		if (ccv != null && !ccv.equals("")) {
-			this.append(commcareVersion + " " + ccv);
+			this.append(Terms.commcareVersion + " " + ccv);
 		}
 		if ((ccb != null && !ccb.equals(""))
 				&& (jrb != null && !jrb.equals(""))) {
-			this.append(buildNumber + " " + ccb + "-" + jrb);
+			this.append(Terms.buildNumber + " " + ccb + "-" + jrb);
 		}
 		// #endif
 	}
@@ -235,8 +230,8 @@ public class LoginForm extends FramedForm implements IView {
 	 * @return
 	 */
 	public javax.microedition.lcdui.Alert successfulLoginAlert() {
-		return new javax.microedition.lcdui.Alert(loginSuccessful, loadingProfile, null,
-				AlertType.CONFIRMATION);
+		return new javax.microedition.lcdui.Alert(Terms.loginSuccessful,
+				Terms.loadingProfile, null, AlertType.CONFIRMATION);
 
 	}
 
@@ -274,36 +269,6 @@ public class LoginForm extends FramedForm implements IView {
 
 	public StringItem getLoginButton() {
 		return this.loginButton;
-	}
-
-	private String getLoggedInUserType() {
-
-		// /find user in RMS:
-		User discoveredUser = new User();
-		String usernameStr = usernameField.getString();
-		int index = 1;
-
-		while (index <= userRMS.getNumberOfRecords()) {
-			try {
-				userRMS.retrieveFromRMS(index, discoveredUser);
-			} catch (IOException ioe) {
-				System.out.println(ioe);
-			} catch (DeserializationException uee) {
-				System.out.println(uee);
-			}
-			if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))
-				break;
-
-			index++;
-		}
-
-		if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr)) {
-			System.out.println("found a user: " + discoveredUser.getUsername()
-					+ " with type: " + discoveredUser.getUserType());
-			return discoveredUser.getUserType();
-		}
-
-		return "userNotFound";
 	}
 
 }
