@@ -106,6 +106,15 @@ message.SubmissionErrorUnknown=Unknown sending error; form not sent!
 message.CompulsoryQuestionsIncomplete=There are unanswered compulsory questions and must be completed first to proceed
 message.FormUneditable=You cannot edit your answers when reviewing the form
 message.RequiredQuestion=Swali hili lazima lijazwe
+ 
+
+login.incorrect=Umekosea kufungua
+try.again=Tafadhali jaribu tena
+demo.mode=Demo Mode
+demo.mode.intro=Unafungua CommCare kwenye Demo. Demo ni kwa ajili ya mazoezi tu! Fungua kwa kutumia ufunguo kama taarifa hizi ni halisi za mgonjwa
+
+		 
 
 Pregnancy=Ujauzito
 NewBirth=Uzazi mpya
+ 

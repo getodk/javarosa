@@ -107,5 +107,31 @@ message.CompulsoryQuestionsIncomplete=There are unanswered compulsory questions 
 message.FormUneditable=You cannot edit your answers when reviewing the form
 message.RequiredQuestion=Required question; You must answer
 
+ 
+
+prop.healthunit=Health Unit
+prop.healthunitcode=Health Unit Code
+prop.subcounty=Subcounty
+prop.district=District
+prop.hsd=HSD
+prop.finyear=Financial Year
+
+
+
+commcare.version=CommCare Version
+build.number=Build Number
+username=Username:
+password=Password:
+login=Login
+login.successful=Login successful
+loading.profile=Loading your Profile
+login.incorrect=Login incorrect
+try.again=Please try again
+demo.mode=Demo Mode
+demo.mode.intro=You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.
+
+
+ 
+
 Pregnancy=Pregnancy
 NewBirth=New Birth
