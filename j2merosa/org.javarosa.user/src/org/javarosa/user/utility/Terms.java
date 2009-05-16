@@ -27,8 +27,7 @@ public class Terms {
 	public final static String USERID_STR = Locale.get("form.user.userid");
 	public final static String GIVE_ADMIN_STR = Locale.get("form.user.giveadmin");
 	
-
-	// internationalization
+ 
 	public final static String commcareVersion = Locale.get("form.login.commcareversion");
 	public final static String buildNumber = Locale.get("form.login.buildnumber");
 	public final static String usernamePrompt = Locale.get("form.login.username");
@@ -36,6 +35,11 @@ public class Terms {
 	public final static String loginPrompt = Locale.get("form.login.login");
 	public final static String loginSuccessful = Locale.get("form.login.login.successful");
 	public final static String loadingProfile = Locale.get("form.login.loading.profile");
+	
+	public final static String loginIncorrect = Locale.get("activity.login.loginincorrect");
+	public final static String tryAgain = Locale.get("activity.login.tryagain");
+	public final static String demoMode = Locale.get("activity.login.demomode");
+	public final static String demoModeIntro = Locale.get("activity.login.demomode.intro");
 
 	 
 
