@@ -104,9 +104,9 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 	
 	public void start(Context context) {
 		this.context=context;
-		logScr = new LoginForm(this,"Login");
+		logScr = new LoginForm(this);
 		logScr.setCommandListener(this);
-		logScr.loginButton.setItemCommandListener(this);
+		logScr.getLoginButton().setItemCommandListener(this);
 		parent.setDisplay(this, logScr);
 
 
@@ -126,9 +126,10 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 
 
 	public void commandAction(Command command, Item item) {
-		if(command==logScr.loginButtonCommand){
+		if(command==logScr.CMD_LOGIN_BUTTON){
 				if(validateUser()){
-					final javax.microedition.lcdui.Alert success = logScr.successfulLogin();
+					
+					final javax.microedition.lcdui.Alert success = logScr.successfulLoginAlert();
 					parent.setDisplay(this, new IView() {public Object getScreenObject() {return success;}});
 					
 					Hashtable returnArgs = new Hashtable();
@@ -230,7 +231,7 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
 			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
 		}else if(response.equalsIgnoreCase("OK")){
-			final javax.microedition.lcdui.Alert success = logScr.successfulLogin();
+			final javax.microedition.lcdui.Alert success = logScr.successfulLoginAlert();
 			parent.setDisplay(this, new IView() {public Object getScreenObject() {return success;}});
 			saveUser();
 			Hashtable returnArgs = new Hashtable();

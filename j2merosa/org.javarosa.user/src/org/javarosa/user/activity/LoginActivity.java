@@ -26,72 +26,158 @@ import org.javarosa.user.model.User;
 import org.javarosa.user.utility.LoginContext;
 import org.javarosa.user.view.LoginForm;
 
-/**
- * @author Kieran Sharpey - Schafer
- *
- */
-public class LoginActivity implements IActivity, CommandListener, ItemCommandListener {
+import de.enough.polish.util.Locale;
 
-	private LoginForm loginScreen = null;
+public class LoginActivity implements IActivity, CommandListener,
+		ItemCommandListener {
+
+	private LoginForm view = null;
 	private IShell parent = null;
+
 	public static final String COMMAND_KEY = "command";
 	public static final String USER = "user";
 
-	LoginContext context;
+	private LoginContext context;
 
-	public LoginActivity(IShell p, String title) {
+	private String title;
+
+	private final static String loginIncorrect = Locale.get("login.incorrect");
+	private final static String tryAgain = Locale.get("try.again");
+	private final static String demoMode = Locale.get("demo.mode");
+	private final static String demoModeIntro = Locale.get("demo.mode.intro");
+
+	public LoginActivity(IShell p, String s) {
 		this.parent = p;
+		this.title = s;
+	}
 
+	public LoginActivity(IShell p) {
+		this.parent = p;
 	}
 
 	public void start(Context context) {
-
 		this.context = new LoginContext(context);
-		this.loginScreen = new LoginForm(this, "Login");
-		this.loginScreen.setPasswordMode(this.context.getPasswordFormat());
-		this.loginScreen.setCommandListener(this);
-		this.loginScreen.loginButton.setItemCommandListener(this);       // set item command listener
-		this.loginScreen.password.setItemCommandListener(this);
-		parent.setDisplay(this, this.loginScreen);
+		this.view = initView();
+		this.parent.setDisplay(this, this.view);
 	}
 
-	public void commandAction(Command c, Item item) {
-		if (c == this.loginScreen.loginButtonCommand) {
-			System.out.println("login pressed");
-			if (loginScreen.validateUser()) {
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
-				returnArgs.put(USER, loginScreen.getLoggedInUser());
-				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-						returnArgs);
-			} else {
-				//#if commcare.lang.sw
-				showError("Umekosea kufungua", "Tafadhali jaribu tena");
-				//#else
-				showError("Login Incorrect", "Please try again");
-				//#endif
-			}
-		}
-		
-		// TODO: fix this to not be ghetto preprocssed in.
-		
-		//#if javarosa.login.demobutton
-		else if (c == this.loginScreen.demoButtonCommand) {
-			//#if debug.output==verbose
-			System.out.println("demo button on login screen 1!");
-			//#endif
-			// TODO: fix this to be properly internationalized stuff...
-			//#if commcare.lang.sw
-			showError("Demo Mode", "Unafungua CommCare kwenye Demo. Demo ni kwa ajili ya mazoezi tu! Fungua kwa kutumia ufunguo kama taarifa hizi ni halisi za mgonjwa", this);
-			//#else
-			showError("Demo Mode", "You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.", this);
-			//#endif
-		}
-		//#endif
-		System.out.println("");
+	/**
+	 * 
+	 */
+	private LoginForm initView() {
+		LoginForm loginForm;
+		if (this.title == null)
+			loginForm = new LoginForm(this);
+		else
+			loginForm = new LoginForm(this, this.title);
+		loginForm.setPasswordMode(this.context.getPasswordFormat());
+		loginForm.setCommandListener(this);
+
+		// listen to the password field and the login button also
+		loginForm.getLoginButton().setItemCommandListener(this);
+		loginForm.getPasswordField().setItemCommandListener(this);
+
+		return loginForm;
 	}
-	
-	public void viewCompleted(Hashtable returnvals, int view_ID) {
+
+	/*
+	 * listener for the String Item (login button)
+	 * 
+	 * @see
+	 * javax.microedition.lcdui.ItemCommandListener#commandAction(javax.microedition
+	 * .lcdui.Command, javax.microedition.lcdui.Item)
+	 */
+	public void commandAction(Command c, Item item) {
+		if (c == LoginForm.CMD_LOGIN_BUTTON) {
+
+			// user trying to login, must be validated..
+			if (this.view.validateUser()) {
+				userValidated();
+				return;
+
+			}
+			showError(loginIncorrect, tryAgain);
+
+		}
+
+		// #if javarosa.login.demobutton
+		else if (c == LoginForm.CMD_DEMO_BUTTON) {
+			showError(demoMode, demoModeIntro, this);
+		}
+		// #endif
+
+	}
+
+	private void userValidated() {
+		// user is validated, activity completed
+		Hashtable returnArgs = new Hashtable();
+		returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
+		returnArgs.put(USER, this.view.getLoggedInUser());
+		this.parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+				returnArgs);
+	}
+
+	// listener for the display
+	public void commandAction(Command c, Displayable d) {
+		if (c == LoginForm.CMD_CANCEL_LOGIN) {
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put(COMMAND_KEY, "USER_CANCELLED");
+			this.parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+					returnArgs);
+		} else if (c == LoginForm.CMD_LOGIN_BUTTON) {
+			if (this.view.validateUser()) {
+				
+				// TODO: why the alert here and not in the other listener?
+				final javax.microedition.lcdui.Alert success = this.view.successfulLoginAlert();
+				this.parent.setDisplay(this, new IView() {
+					public Object getScreenObject() {
+						return success;
+					}
+				});
+				userValidated();
+				return;
+			}
+			showError(loginIncorrect, tryAgain);
+
+		}
+
+		// #if javarosa.login.demobutton
+		else if (c == LoginForm.CMD_DEMO_BUTTON) {
+			showError(demoMode, demoModeIntro, this);
+		} else if (d instanceof Alert) {
+			// returning from demo mode warning popup
+			Hashtable returnArgs = new Hashtable();
+			returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
+			User u = new User();
+			u.setUsername(User.DEMO_USER); // NOTE: Using a user type as a
+			// username also!
+			u.setUserType(User.DEMO_USER);
+			returnArgs.put(USER, u);
+			this.parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+					returnArgs);
+		}
+		// #endif
+	}
+
+	public Context getActivityContext() {
+		return this.context;
+	}
+
+	private void showError(String s, String message) {
+		showError(s, message, null);
+	}
+
+	private void showError(String s, String message, CommandListener cl) {
+		// #style mailAlert
+		final Alert alert = new Alert(s, message, null, AlertType.ERROR);
+		alert.setTimeout(Alert.FOREVER);
+		if (cl != null)
+			alert.setCommandListener(cl);
+		this.parent.setDisplay(this, new IView() {
+			public Object getScreenObject() {
+				return alert;
+			}
+		});
 	}
 
 	public void contextChanged(Context context) {
@@ -106,93 +192,41 @@ public class LoginActivity implements IActivity, CommandListener, ItemCommandLis
 		}
 	}
 
-	public void halt() {
-
-	}
-
 	public void resume(Context context) {
 		this.contextChanged(context);
 		// Possibly want to check for new/updated forms
-		JavaRosaServiceProvider.instance().showView(this.loginScreen);
+		JavaRosaServiceProvider.instance().showView(this.view);
 	}
 
-	public void destroy() {
-
-	}
-
-	private void showError (String title, String message) {
-		showError(title, message, null);
-	}
-	
-    private void showError(String title, String message, CommandListener cl) {
-    	//#style mailAlert
-    	final Alert alert = new Alert(title, message, null, AlertType.ERROR);
-    	alert.setTimeout(Alert.FOREVER);
-    	if (cl != null)
-    		alert.setCommandListener(cl);
-    	parent.setDisplay(this, new IView() {public Object getScreenObject() { return alert; }});
-    }
-    
-	public void commandAction(Command c, Displayable d) {
-		if (c == loginScreen.CMD_CANCEL_LOGIN) {
-			Hashtable returnArgs = new Hashtable();
-			returnArgs.put(COMMAND_KEY, "USER_CANCELLED");
-			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,returnArgs);
-		} else if (c == loginScreen.loginButtonCommand) {
-			System.out.println("login pressed");
-			if (loginScreen.validateUser()) {
-				final javax.microedition.lcdui.Alert success = loginScreen
-						.successfulLogin();
-				parent.setDisplay(this, new IView() {public Object getScreenObject() { return success;}});
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
-				returnArgs.put(USER, loginScreen.getLoggedInUser());
-				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-						returnArgs);
-			} 
-			else {
-				showError("Login Incorrect", "Please try again");
-			}
-		}
-		//#if javarosa.login.demobutton
-		else if (c == this.loginScreen.demoButtonCommand) {
-			//#if debug.output==verbose
-			System.out.println("demo button on login screen 2!");
-			//#endif
-			//#if commcare.lang.sw
-			showError("Demo Mode", "Unafungua CommCare kwenye Demo. Demo ni kwa ajili ya mazoezi tu! Fungua kwa kutumia ufunguo kama taarifa hizi ni halisi za mgonjwa", this);
-			//#else
-			showError("Demo Mode", "You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.", this);
-			//#endif			
-		} else if (d instanceof Alert) {
-			//returning from demo mode warning popup
-			
-			Hashtable returnArgs = new Hashtable();
-			returnArgs.put(COMMAND_KEY, "USER_VALIDATED");
-			User u = new User();
-			u.setUsername(User.DEMO_USER);	// NOTE: Using a user type as a username also!
-			u.setUserType(User.DEMO_USER);
-			returnArgs.put(USER, u);
-			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-					returnArgs);
-		}
-		//#endif
-	}
-	public Context getActivityContext() {
-		return context;
-	}
-	
 	/*
 	 * (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 * 
+	 * @see
+	 * org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
 	 */
 	public void setShell(IShell shell) {
 		this.parent = shell;
 	}
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
+
+	public void halt() {
+		// do nothing?
+	}
+
+	public void destroy() {
+		// do nothing?
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api
+	 * .ICommand)
 	 */
 	public void annotateCommand(ICommand command) {
-		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
+		throw new RuntimeException(
+				"The Activity Class "
+						+ this.getClass().getName()
+						+ " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
 	}
 }

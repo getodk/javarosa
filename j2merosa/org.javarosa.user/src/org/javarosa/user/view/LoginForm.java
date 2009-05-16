@@ -1,5 +1,3 @@
-
-
 package org.javarosa.user.view;
 
 import java.io.IOException;
@@ -19,209 +17,293 @@ import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
+import de.enough.polish.util.Locale;
 
-public class LoginForm extends FramedForm implements IView
-{
-	   public final Command CMD_CANCEL_LOGIN = new Command("EXIT",Command.SCREEN, 1);
-	   public Command loginButtonCommand = new Command("Login", Command.ITEM, 1);
-	 //  private Alert alertdialog = new Alert("Web Service Error", "No response from server", null, AlertType.ERROR);
+public class LoginForm extends FramedForm implements IView {
 
-	   private TextField userName;
-	   public TextField password;
-	   public UserRMSUtility userRMS;
-	   private User loggedInUser;
-	   public StringItem loginButton;
-	   //#if javarosa.login.demobutton
-	   public StringItem demoButton;
-	   public Command demoButtonCommand = new Command("Demo", Command.ITEM, 1);
-	   //#endif
-	   public boolean validator;
-	   /* currently unused
-	   private TransportMessage message;
-	   private TransportManager transportManager;
-	   private String requestPayload = "#";
+	private final static int DEFAULT_COMMAND_PRIORITY = 1;
 
-	   ///these 4 variable is for a rememberMe option that could join the login menu
-	   private String rememberMe;
-	   private static final String DO_REMEMBER_ME = "DoRememberMe";
-       private static final String DONT_REMEMBER_ME = "DontRememberMe";
-       */
-	   IActivity parent;
+	// #if javarosa.login.demobutton
+	private StringItem demoButton;
+	public final static Command CMD_DEMO_BUTTON = new Command("Demo",
+			Command.ITEM, DEFAULT_COMMAND_PRIORITY);
+	// #endif
 
-	  public LoginForm(IActivity loginActivity, String title) {
-		   super(title);
-		   parent = loginActivity;
+	public final static Command CMD_CANCEL_LOGIN = new Command("EXIT",
+			Command.SCREEN, DEFAULT_COMMAND_PRIORITY);
+	public final static Command CMD_LOGIN_BUTTON = new Command("Login",
+			Command.ITEM, DEFAULT_COMMAND_PRIORITY);
 
-		   userRMS = (UserRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(UserRMSUtility.getUtilityName());
+	private StringItem loginButton;
+	private TextField usernameField;
+	private TextField passwordField;
+	private UserRMSUtility userRMS;
+	private User loggedInUser;
 
-	      if (userRMS.getNumberOfRecords() == 0){
+	private IActivity parent;
 
-	    	  String usernameVAR= (String)loginActivity.getActivityContext().getElement("username");
-	    	  String passwordVAR= (String)loginActivity.getActivityContext().getElement("password");
+	// internationalization
+	private final static String commcareVersion = Locale.get("commcare.version");
+	private final static String buildNumber = Locale.get("build.number");
+	private final static String usernamePrompt = Locale.get("username");
+	private final static String passwordPrompt = Locale.get("password");
+	private final static String loginPrompt = Locale.get("login");
+	private final static String loginSuccessful = Locale.get("login.successful");
+	private final static String loadingProfile = Locale.get("loading.profile");
 
-	    	  // BWD - giving the default admin user an ID of -1...
-	    	  loggedInUser = new User (usernameVAR,passwordVAR, -1, User.ADMINUSER);
-	    	  userRMS.writeToRMS(loggedInUser);
-	      }
+	// context attributes
+	private final static String CTX_USERNAME = "username";
+	private final static String CTX_PASSWORD = "password";
+	private final static String CTX_COMMCARE_VERSION = "COMMCARE_VERSION";
+	private final static String CTX_COMMCARE_BUILD = "COMMCARE_BUILD";
+	private final static String CTX_JAVAROSA_BUILD = "JAVAROSA_BUILD";
 
-		   //get first username from RMS
-		   User tempuser = new User();
-		   tempuser.setUsername("");
+	/**
+	 * @param loginActivity
+	 * @param title
+	 */
+	private final static int DEFAULT_ADMIN_USERID = -1;
 
-		   if (userRMS.getNumberOfRecords() != 0){
-			   	try {
-					userRMS.retrieveFromRMS(userRMS.getNextRecordID()-1, tempuser);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (DeserializationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+	public LoginForm(IActivity loginActivity) {
+		super(loginPrompt);
+		init(loginActivity);
+	}
+
+	public LoginForm(IActivity loginActivity, String title) {
+		super(title);
+		init(loginActivity);
+
+	}
+
+	private void init(IActivity loginActivity) {
+		this.parent = loginActivity;
+
+		this.userRMS = (UserRMSUtility) JavaRosaServiceProvider.instance()
+				.getStorageManager().getRMSStorageProvider().getUtility(
+						UserRMSUtility.getUtilityName());
+
+		boolean recordsExist = this.userRMS.getNumberOfRecords() > 0;
+
+		if (!recordsExist) {
+
+			this.loggedInUser = getLoggedInUser(loginActivity);
+			this.userRMS.writeToRMS(this.loggedInUser);
+		}
+
+		// get first username from RMS
+		User tempUser = new User();
+		tempUser.setUsername("");// ? needed
+
+		if (recordsExist) {
+
+			int userId = this.userRMS.getNextRecordID() - 1;
+			try {
+				this.userRMS.retrieveFromRMS(userId, tempUser);
+			} catch (Exception e) {
+				e.printStackTrace();
+				// do nothing for the user
+			}
+
+		}
+
+		initLoginControls(tempUser.getUsername());
+		showVersions();
+
+	}
+
+	/**
+	 * @param username
+	 */
+	private void initLoginControls(String username) {
+
+		// create the username and password input fields
+		this.usernameField = new TextField(usernamePrompt, username, 50,
+				TextField.ANY);
+		this.passwordField = new TextField(passwordPrompt, "", 10,
+				TextField.PASSWORD);
+
+		// TODO:what this?
+		addCommand(CMD_CANCEL_LOGIN);
+
+		append(this.usernameField);
+		append(this.passwordField);
+
+		// set the focus on the password field
+		this.focus(this.passwordField);
+		this.passwordField.setDefaultCommand(CMD_LOGIN_BUTTON);
+
+		// add the login button
+		this.loginButton = new StringItem(null, loginPrompt, Item.BUTTON);
+		append(this.loginButton);
+		this.loginButton.setDefaultCommand(CMD_LOGIN_BUTTON);
+
+		// #if javarosa.login.demobutton
+		this.demoButton = new StringItem(null, "DEMO", Item.BUTTON);
+		append(this.demoButton);
+		this.demoButton.setDefaultCommand(CMD_DEMO_BUTTON);
+		// #endif
+
+	}
+
+	/**
+	 * 
+	 */
+	private void showVersions() {
+		// #if javarosa.login.showbuild
+		String ccv = (String) this.parent.getActivityContext().getElement(
+				CTX_COMMCARE_VERSION);
+		String ccb = (String) this.parent.getActivityContext().getElement(
+				CTX_COMMCARE_BUILD);
+		String jrb = (String) this.parent.getActivityContext().getElement(
+				CTX_JAVAROSA_BUILD);
+
+		if (ccv != null && !ccv.equals("")) {
+			this.append(commcareVersion + " " + ccv);
+		}
+		if ((ccb != null && !ccb.equals(""))
+				&& (jrb != null && !jrb.equals(""))) {
+			this.append(buildNumber + " " + ccb + "-" + jrb);
+		}
+		// #endif
+	}
+
+	/**
+	 * @param loginActivity
+	 * @return
+	 */
+	private User getLoggedInUser(IActivity loginActivity) {
+		String username = (String) loginActivity.getActivityContext()
+				.getElement(CTX_USERNAME);
+		String password = (String) loginActivity.getActivityContext()
+				.getElement(CTX_PASSWORD);
+
+		User user = new User(username, password, DEFAULT_ADMIN_USERID,
+				User.ADMINUSER);
+		return user;
+	}
+
+	/**
+	 * 
+	 * After login button is clicked, activity asks form to validate user
+	 * 
+	 * @return
+	 */
+	public boolean validateUser() {
+
+		String usernameEntered = this.usernameField.getString().trim();
+		String passwordEntered = this.passwordField.getString().trim();
+
+		// /find user in RMS:
+		User userInRMS = new User();
+
+		int index = 1;
+
+		while (index <= this.userRMS.getNumberOfRecords()) {
+			try {
+				this.userRMS.retrieveFromRMS(index, userInRMS);
+			} catch (Exception ioe) {
+				ioe.printStackTrace();
+			}
+			if (userInRMS.getUsername().equalsIgnoreCase(usernameEntered)) {
+				if (userInRMS.getPassword().equals(passwordEntered)) {
+					setLoggedInUser(userInRMS);
+					return true;
 				}
-		      }
-		  userName = new TextField("Username:", tempuser.getUsername(), 50, TextField.ANY);
-	      password = new TextField("Password:", "", 10, TextField.PASSWORD);
-	      this.addCommand(CMD_CANCEL_LOGIN);
+			}
 
-	      this.append(userName);
-	      append(password);
-
-	      loginButton = new StringItem(null,"LOGIN",Item.BUTTON);
-	      this.append(loginButton);
-	      loginButton.setDefaultCommand(loginButtonCommand);     // add Command to Item.
-	      
-	      //#if javarosa.login.demobutton
-	      demoButton = new StringItem(null,"DEMO",Item.BUTTON);
-	      this.append(demoButton);
-	      demoButton.setDefaultCommand(demoButtonCommand);     // add Command to Item.
-	      //#endif
-	      
-	      
-	      //#if javarosa.login.showbuild
-	      String ccv = (String)parent.getActivityContext().getElement("COMMCARE_VERSION");
-	      String ccb = (String)parent.getActivityContext().getElement("COMMCARE_BUILD");
-	      String jrb = (String)parent.getActivityContext().getElement("JAVAROSA_BUILD");
-	      
-	      if(ccv != null && !ccv.equals("")) {
-	    	  this.append("CommCare verison: " + ccv);
-	      }
-	      if((ccb != null && !ccb.equals("")) && (jrb != null && !jrb.equals(""))) {
-	    	  this.append("Build number: " + ccb + "-" + jrb);
-	      }
-	      //#endif
-	      
-	      this.focus(password);
-	      this.password.setDefaultCommand(loginButtonCommand);
-	   }
-	  
-	  public void setPasswordMode(String passwordMode) {
-		  if(LoginContext.PASSWORD_FORMAT_NUMERIC.equals(passwordMode)) {
-			  password.setConstraints(TextField.PASSWORD | TextField.NUMERIC);
-		  } else if(LoginContext.PASSWORD_FORMAT_ALPHA_NUMERIC.equals(passwordMode)) {
-			  password.setConstraints(TextField.PASSWORD);
-		  }
-	  }
-
-
-	   public boolean validateUser() {
-
-		   boolean validLogin = false;
-		   ///find user in RMS:
-		   User discoveredUser = new User();
-		   String usernameStr = userName.getString().trim();
-		   int index = 1;
-
-		   while (index <= userRMS.getNumberOfRecords() )
-		   {
-			   try
-			   {
-				   userRMS.retrieveFromRMS(index, discoveredUser);
-			   }
-			   catch (IOException ioe) {
-				   System.out.println(ioe);
-			   }
-			   catch (DeserializationException uee) {
-				   System.out.println(uee);
-			   }
-			   if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))
-				   break;
-
-			   index++;
-		   }
-
-		   if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr)){
-			   if (discoveredUser.getPassword().equals(password.getString()))
-			   {
-				   System.out.println("login valid");
-				   validLogin = true;
-				   setLoggedInUser(discoveredUser);
-			   }
-			   }
-   
-	     return validLogin;
-
-	   }
-	   
-	   public String getLoggedInUserType() {
-
-
-		   ///find user in RMS:
-		   User discoveredUser = new User();
-		   String usernameStr = userName.getString();
-		   int index = 1;
-
-		   while (index <= userRMS.getNumberOfRecords() )
-		   {
-			   try
-			   {
-				   userRMS.retrieveFromRMS(index, discoveredUser);
-			   }
-			   catch (IOException ioe) {
-				   System.out.println(ioe);
-			   }
-			   catch (DeserializationException uee) {
-				   System.out.println(uee);
-			   }
-			   if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))
-				   break;
-
-			   index++;
-		   }
-
-		   if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))
-			   {
-			   System.out.println("found a user: "+discoveredUser.getUsername()+" with type: "+discoveredUser.getUserType());
-			   return discoveredUser.getUserType();
-			   }
-
-	     return "userNotFound";
-	   }
-
-	   public javax.microedition.lcdui.Alert successfulLogin() {
-		     javax.microedition.lcdui.Alert success = new javax.microedition.lcdui.Alert("Login Successful", "Loading your profile", null, AlertType.CONFIRMATION);
-		     return success;
-		   }
-		public UserRMSUtility getUserRMS() {
-				return this.userRMS;
+			index++;
 		}
-		
-		public String getPassWord() {
-			String pass = password.getString();
-			return pass;
+
+		return false;
+
+	}
+
+	/**
+	 * @param passwordMode
+	 */
+	public void setPasswordMode(String passwordMode) {
+		if (LoginContext.PASSWORD_FORMAT_NUMERIC.equals(passwordMode)) {
+			this.passwordField.setConstraints(TextField.PASSWORD
+					| TextField.NUMERIC);
+		} else if (LoginContext.PASSWORD_FORMAT_ALPHA_NUMERIC
+				.equals(passwordMode)) {
+			this.passwordField.setConstraints(TextField.PASSWORD);
 		}
-		
-		public String getUserName() {
-			String usr = userName.getString();
-			return usr;
-		}
+	}
+
+	/**
+	 * @return
+	 */
+	public javax.microedition.lcdui.Alert successfulLoginAlert() {
+		return new javax.microedition.lcdui.Alert(loginSuccessful, loadingProfile, null,
+				AlertType.CONFIRMATION);
+
+	}
+
+	public UserRMSUtility getUserRMS() {
+		return this.userRMS;
+	}
+
+	public String getPassWord() {
+		return this.passwordField.getString();
+
+	}
+
+	public String getUserName() {
+		return this.usernameField.getString();
+
+	}
+
 	public User getLoggedInUser() {
-		return loggedInUser;
+		return this.loggedInUser;
 	}
 
 	public void setLoggedInUser(User loggedInUser) {
 		this.loggedInUser = loggedInUser;
 	}
+
 	public Object getScreenObject() {
 		return this;
 	}
+
+	public TextField getPasswordField() {
+		return this.passwordField;
+	}
+
+	// ------------------------
+
+	public StringItem getLoginButton() {
+		return this.loginButton;
+	}
+
+	private String getLoggedInUserType() {
+
+		// /find user in RMS:
+		User discoveredUser = new User();
+		String usernameStr = usernameField.getString();
+		int index = 1;
+
+		while (index <= userRMS.getNumberOfRecords()) {
+			try {
+				userRMS.retrieveFromRMS(index, discoveredUser);
+			} catch (IOException ioe) {
+				System.out.println(ioe);
+			} catch (DeserializationException uee) {
+				System.out.println(uee);
+			}
+			if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr))
+				break;
+
+			index++;
+		}
+
+		if (discoveredUser.getUsername().equalsIgnoreCase(usernameStr)) {
+			System.out.println("found a user: " + discoveredUser.getUsername()
+					+ " with type: " + discoveredUser.getUserType());
+			return discoveredUser.getUserType();
+		}
+
+		return "userNotFound";
+	}
+
 }
