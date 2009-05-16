@@ -24,10 +24,13 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.LoginContext;
+import org.javarosa.user.utility.Terms;
 import org.javarosa.user.view.LoginForm;
 
-import de.enough.polish.util.Locale;
-
+/**
+ * Show the login form, and controls the login process, including error messages for invalid username/passwords
+ *
+ */
 public class LoginActivity implements IActivity, CommandListener,
 		ItemCommandListener {
 
@@ -40,11 +43,7 @@ public class LoginActivity implements IActivity, CommandListener,
 	private LoginContext context;
 
 	private String title;
-
-	private final static String loginIncorrect = Locale.get("login.incorrect");
-	private final static String tryAgain = Locale.get("try.again");
-	private final static String demoMode = Locale.get("demo.mode");
-	private final static String demoModeIntro = Locale.get("demo.mode.intro");
+ 
 
 	public LoginActivity(IShell p, String s) {
 		this.parent = p;
@@ -96,13 +95,13 @@ public class LoginActivity implements IActivity, CommandListener,
 				return;
 
 			}
-			showError(loginIncorrect, tryAgain);
+			showError(Terms.loginIncorrect, Terms.tryAgain);
 
 		}
 
 		// #if javarosa.login.demobutton
 		else if (c == LoginForm.CMD_DEMO_BUTTON) {
-			showError(demoMode, demoModeIntro, this);
+			showError(Terms.demoMode, Terms.demoModeIntro, this);
 		}
 		// #endif
 
@@ -137,13 +136,13 @@ public class LoginActivity implements IActivity, CommandListener,
 				userValidated();
 				return;
 			}
-			showError(loginIncorrect, tryAgain);
+			showError(Terms.loginIncorrect, Terms.tryAgain);
 
 		}
 
 		// #if javarosa.login.demobutton
 		else if (c == LoginForm.CMD_DEMO_BUTTON) {
-			showError(demoMode, demoModeIntro, this);
+			showError(Terms.demoMode, Terms.demoModeIntro, this);
 		} else if (d instanceof Alert) {
 			// returning from demo mode warning popup
 			Hashtable returnArgs = new Hashtable();
