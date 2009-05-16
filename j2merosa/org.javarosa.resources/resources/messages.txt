@@ -87,6 +87,8 @@ menu.Empty=Empty
 menu.Login=Login
 menu.Demo=Demo
 
+view.loading=Loading
+
 hint.TypeOrScan=Type in you answer, or choose Scan to scan the barcode
 
 title.ScanBarcode=Scan barcode
