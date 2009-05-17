@@ -3,7 +3,6 @@ package org.javarosa.user.view;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IView;
 import org.javarosa.user.model.User;
@@ -64,7 +63,6 @@ public class LoginForm extends FramedForm implements IView {
 	public LoginForm(IActivity loginActivity, String title) {
 		super(title);
 		init(loginActivity);
-
 	}
 
 	/**
@@ -73,23 +71,25 @@ public class LoginForm extends FramedForm implements IView {
 	private void init(IActivity loginActivity) {
 		this.parent = loginActivity;
 
-		this.userRMS = (UserRMSUtility) JavaRosaServiceProvider.instance()
-				.getStorageManager().getRMSStorageProvider().getUtility(
-						UserRMSUtility.getUtilityName());
+		this.userRMS = new UserRMSUtility(UserRMSUtility.getUtilityName());
 
+		// #debug debug
+		System.out.println("userRMS:" + this.userRMS);
 		boolean recordsExist = this.userRMS.getNumberOfRecords() > 0;
 
-		if (!recordsExist) {
+		// #debug debug
+		System.out.println("records in RMS:" + recordsExist);
 
+		if (!recordsExist && (loginActivity != null)) {
 			this.loggedInUser = getLoggedInUser(loginActivity);
 			this.userRMS.writeToRMS(this.loggedInUser);
 		}
 
-		// get first username from RMS
 		User tempUser = new User();
 		tempUser.setUsername("");// ? needed
 
 		if (recordsExist) {
+			// get first username from RMS
 
 			int userId = this.userRMS.getNextRecordID() - 1;
 			try {
@@ -100,8 +100,8 @@ public class LoginForm extends FramedForm implements IView {
 			}
 
 		}
-
 		initLoginControls(tempUser.getUsername());
+
 		showVersions();
 
 	}
