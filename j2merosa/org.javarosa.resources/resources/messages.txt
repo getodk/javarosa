@@ -53,6 +53,10 @@ polish.predictive.setup.cmd.yes=Yes
 polish.predictive.setup.cmd.no=No
 
 #Javarosa-specific
+
+splashscreen=/splash.gif
+
+
 menu.NewCase=New Case
 menu.FollowUp=Follow Up on Existing Case
 menu.Referral=Follow Up on Referral
@@ -96,20 +100,27 @@ title.FormsList=Forms List
 title.Login=Login
 title.SavedForms=Saved Forms
 
+
 button.Next=VOLGENDE
 
 question.SendNow=Send data now?
 
-message.SendingInProgress=Sending...
-message.SuccessfullyTransmitted=Succesfully Transmitted Form 
-message.CurrentlySending=\nCurrently Sending Form
-message.SuccessfullySubmitted=Form has been submitted successfully! Your reference is:  
-message.SubmissionFailed=Submission failed! Please try to submit the form again later in \'View Saved\'.
-message.SubmissionTakingLong=Sending is taking a long time; you may check on the status and/or resend later in \'View Saved\'
-message.SubmissionErrorUnknown=Unknown sending error; form not sent!
-message.CompulsoryQuestionsIncomplete=There are unanswered compulsory questions and must be completed first to proceed
-message.FormUneditable=You cannot edit your answers when reviewing the form
-message.RequiredQuestion=Required question; You must answer
+
+view.sending.SendStatus=Send Status
+view.sending.SendingInProgress=Sending...
+view.sending.SuccessfullyTransmitted=Succesfully Transmitted Form 
+view.sending.CurrentlySending=\nCurrently Sending Form
+view.sending.SuccessfullySubmitted=Form has been submitted successfully! Your reference is:  
+view.sending.SubmissionFailed=Submission failed! Please try to submit the form again later in \'View Saved\'.
+view.sending.SubmissionTakingLong=Sending is taking a long time; you may check on the status and/or resend later in \'View Saved\'
+view.sending.SubmissionErrorUnknown=Unknown sending error; form not sent!
+view.sending.CompulsoryQuestionsIncomplete=There are unanswered compulsory questions and must be completed first to proceed
+view.sending.FormUneditable=You cannot edit your answers when reviewing the form
+view.sending.RequiredQuestion=Required question; You must answer
+view.sending.of=of
+view.sending.ok=ok
+# inaenda in swahili
+view.sending.endOfSendingMessage=
 
  
 
