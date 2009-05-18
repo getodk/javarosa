@@ -9,180 +9,228 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.Context;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
+import org.javarosa.user.model.User;
+import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.AddUserContext;
-import org.javarosa.user.view.NewUserForm;
-
-//#if javarosa.usepolishlocalisation
-//# import de.enough.polish.util.Locale;
-//#endif
-
-/*
- * @author Julian Hulme
- */
+import org.javarosa.user.utility.Terms;
+import org.javarosa.user.utility.UserValidator;
+import org.javarosa.user.view.UserForm;
 
 public class AddUserActivity implements IActivity, CommandListener {
 
 	public final static String NEW_USER_KEY = "new_user";
-	
+
 	private IShell parent = null;
-	
-	//#if javarosa.usepolishlocalisation
-	//# private final Command CMD_SAVE = new Command(Locale.get( "menu.Save"), Command.OK, 2);
-	//# private final Command CMD_CANCEL = new Command(Locale.get( "menu.Exit"), Command.EXIT, 2);
-	
-	//#else
-	public final Command CMD_SAVE = new Command("Save", Command.OK, 2);
-	public final Command CMD_CANCEL = new Command("Exit",Command.EXIT, 2);
-	//#endif
-	
-	public static final String COMMAND_KEY = "command";
-	
-	boolean success = false;
 
-	AddUserContext context;
-	NewUserForm addUser = null;
-	
-	public AddUserActivity (IShell p) {
+	// --- menu commands?
+	public final static Command CMD_SAVE = new Command(Terms.SAVE_STR,
+			Command.OK, 2);
+	public final static Command CMD_CANCEL = new Command(Terms.EXIT_STR,
+			Command.EXIT, 2);
+
+	private boolean success = false;
+	private AddUserContext context;
+	private UserForm view;
+
+	public AddUserActivity(IShell p) {
 		this.parent = p;
-		success = false;
-	}
-	
-	public void contextChanged(Context globalContext) {
-		// TODO Auto-generated method stub
-
 	}
 
-
-	public void destroy() {
-		// TODO Auto-generated method stub
-
-	}
-
-
-	public Context getActivityContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	public void halt() {
-		// TODO Auto-generated method stub
-
-	}
-
-	
-	public void resume(Context globalContext) {
-		// TODO Auto-generated method stub
-
-	}
-
-	
-	public void start(Context context) {
-		// TODO Auto-generated method stub
-		this.context = new AddUserContext(context);
-		//this.newuserForm = new NewUserForm(this, "Login");
-		//this.loginScreen.setCommandListener(this);
-		//this.loginScreen.loginButton.setItemCommandListener(this);       // set item command listener
-		//parent.setDisplay(this, this.loginScreen);
-		
-		//take this out into an activity
-		addUser = new NewUserForm("Add User", this.context.getDecorator());
-		addUser.setPasswordMode(this.context.getPasswordFormat());
-		addUser.addCommand(CMD_SAVE);
-		addUser.addCommand(CMD_CANCEL);
-		addUser.setCommandListener(this);
-		parent.setDisplay(this, addUser);
-
-	}
-	
-	public void commandAction(Command c,Displayable d) {		
-		if(!d.equals(addUser)) {
-			if (!success) {
-				parent.setDisplay(this, addUser);
-			} else {
-				System.out.println("About to return from activity");
-				Hashtable returnArgs = new Hashtable();
-				returnArgs.put(Constants.RETURN_ARG_KEY, addUser
-						.getConstructedUser());
-				parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
-						returnArgs);
-			}
-		}
-		
-		if (c == this.CMD_SAVE)
-		{
-	    	//#style mailAlert
-			final Alert successfulNewUser  = new Alert("User added","User added successfully",null,AlertType.CONFIRMATION);
-
-			String answer = addUser.readyToSave();
-
-    		if (answer.equals(""))	{///success
-
-    			successfulNewUser.setCommandListener(this);
-    			successfulNewUser.setTimeout(Alert.FOREVER);
-    			
-    			parent.setDisplay(this, new IView() {public Object getScreenObject() { return successfulNewUser;}});
-    			success = true;
-    		}
-    		else if (answer.substring(0,10 ).equals("Username ("))///name already taken..
-    		{
-
-    	    	//#style mailAlert
-    			final Alert nameTakenError  = new Alert("Problem adding User - name taken",
-						answer, null,AlertType.ERROR);
-    			nameTakenError.setCommandListener(this);
-    			nameTakenError.setTimeout(Alert.FOREVER);
-    			parent.setDisplay(this, new IView() {public Object getScreenObject() { return nameTakenError;}});
-    		}
-    		else if (answer.substring(0,9).equals("Please fi") )
-    		{
-    			System.out.println(answer.substring(9));
-    	    	//#style mailAlert
-    			final Alert noInputError  = new Alert("Problem adding User - no input",
-						answer, null,AlertType.ERROR);
-    			noInputError.setTimeout(Alert.FOREVER);
-    			noInputError.setCommandListener(this);
-
-    			parent.setDisplay(this, new IView() {public Object getScreenObject() { return noInputError;}});
-    		}
-    		else if (answer.substring(0,9).equals("Please re"))///password error
-    		{
-    			System.out.println(answer.substring(9));
-    	    	//#style mailAlert
-    			final Alert passwordMismatchError  = new Alert("Problem adding User - passwords don't match",
-						answer, null,AlertType.ERROR);
-    			passwordMismatchError.setTimeout(Alert.FOREVER);
-    			passwordMismatchError.setCommandListener(this);
-
-    			parent.setDisplay(this, new IView() {public Object getScreenObject() { return passwordMismatchError;}});
-
-    		}
-
-    	}	
-		else if (c == this.CMD_CANCEL)
-		{
-			Hashtable returnArgs = new Hashtable();
-			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs );
-		}
-	}
-	
 	/*
 	 * (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 * 
+	 * @see org.javarosa.core.api.IActivity#start(org.javarosa.core.Context)
+	 */
+	public void start(Context context) {
+		this.context = new AddUserContext(context);
+		this.view = new UserForm(Terms.ADD_USER_STR, this.context
+				.getDecorator());
+		this.view.setPasswordMode(this.context.getPasswordFormat());
+		this.view.addCommand(CMD_SAVE);
+		this.view.addCommand(CMD_CANCEL);
+		this.view.setCommandListener(this);
+		this.parent.setDisplay(this, this.view);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.microedition.lcdui.CommandListener#commandAction(javax.microedition
+	 * .lcdui.Command, javax.microedition.lcdui.Displayable)
+	 */
+	public void commandAction(Command c, Displayable d) {
+		if (!d.equals(this.view)) {
+			if (!this.success) {
+				this.parent.setDisplay(this, this.view);
+			}
+		}
+
+		if (c == CMD_CANCEL) {
+			Hashtable returnArgs = new Hashtable();
+			this.parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+					returnArgs);
+			return;
+		}
+
+		if (c == CMD_SAVE) {
+			UserValidator validator = new UserValidator(this.view);
+			int status = validator.validateNewUser();
+
+			if (status == UserValidator.OK) {
+
+				User newUser = createNewUser();
+
+				saveNewUserToRMS(newUser);
+
+				alertUser(Terms.USER_ADDED_STR, Terms.USER_ADDED_SUCC_STR,
+						AlertType.CONFIRMATION);
+
+				// return control from activity
+				Hashtable returnArgs = new Hashtable();
+				returnArgs.put(Constants.RETURN_ARG_KEY, newUser);
+				this.parent.returnFromActivity(this,
+						Constants.ACTIVITY_COMPLETE, returnArgs);
+
+				return;
+
+			}
+
+			handleProblems(status);
+		}
+
+	}
+
+	/**
+	 * @param s1
+	 * @param s2
+	 * @param type
+	 */
+	private void alertUser(String s1, String s2, AlertType type) {
+		// #style mailAlert
+		final Alert a = new Alert(s1, s2, null, type);
+		a.setCommandListener(this);
+		a.setTimeout(Alert.FOREVER);
+
+		this.parent.setDisplay(this, new IView() {
+			public Object getScreenObject() {
+				return a;
+			}
+		});
+	}
+
+	/**
+	 * 
+	 * 
+	 * 
+	 * @param status
+	 */
+	private void handleProblems(int status) {
+
+		String s = Terms.PROBLEM_ADDING_STR;
+
+		if (status == UserValidator.USER_EXISTS)
+			s += ": " + Terms.PROBLEM_NAMETAKEN_STR;
+
+		if (status == UserValidator.USERORPASSWD_MISSING)
+			s += ": " + Terms.PROBLEM_EMPTYUSER_STR;
+
+		if (status == UserValidator.MISMATCHED_PASSWORDS) {
+			s += ": " + Terms.PROBLEM_MISMATCHPASSWD_STR;
+
+			alertUser(s, "", AlertType.ERROR);
+
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	private User createNewUser() {
+
+		User user;
+
+		final String username = this.view.getUsername();
+		final String password = this.view.getPassword();
+		int userid = this.view.getUserId();
+
+		if (!this.view.adminRightsSelected())
+			user = new User(username, password, userid);
+		else
+			user = new User(username, password, userid,
+					org.javarosa.user.model.Constants.ADMINUSER);
+
+		if (this.view.getDecorator() != null) {
+			String[] elements = this.view.getDecorator()
+					.getPertinentProperties();
+			for (int i = 0; i < elements.length; ++i) {
+				user.setProperty(elements[i], this.view.getMetaFields()[i]
+						.getString());
+			}
+		}
+		return user;
+	}
+
+	/**
+	 * @param u
+	 */
+	private void saveNewUserToRMS(User u) {
+		UserRMSUtility userRMS = (UserRMSUtility) JavaRosaServiceProvider
+				.instance().getStorageManager().getRMSStorageProvider()
+				.getUtility(UserRMSUtility.getUtilityName());
+
+		userRMS.writeToRMS(u);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
 	 */
 	public void setShell(IShell shell) {
 		this.parent = shell;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api
+	 * .ICommand)
 	 */
 	public void annotateCommand(ICommand command) {
-		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
+		throw new RuntimeException(
+				"The Activity Class "
+						+ this.getClass().getName()
+						+ " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
+	}
+
+	public void contextChanged(Context globalContext) {
+		// do nothing
+	}
+
+	public void destroy() {
+		// do nothing
+	}
+
+	public Context getActivityContext() {
+		return null;
+	}
+
+	public void halt() {
+		// do nothing
+	}
+
+	public void resume(Context globalContext) {
+		// do nothing
 	}
 }
