@@ -33,6 +33,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
+import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -805,7 +806,7 @@ public class XFormParser {
 				binding.relevantAbsolute = false;
 			} else {
 				Condition c = buildCondition(xpathRel, "relevant", ref);
-				c = f.addCondition(c);
+				c = (Condition)f.addTriggerable(c);
 				binding.relevancyCondition = c;
 			}
 		}
@@ -818,7 +819,7 @@ public class XFormParser {
 				binding.requiredAbsolute = false;
 			} else {
 				Condition c = buildCondition(xpathReq, "required", ref);
-				c = f.addCondition(c);
+				c = (Condition)f.addTriggerable(c);
 				binding.requiredCondition = c;
 			}
 		}
@@ -831,7 +832,7 @@ public class XFormParser {
 				binding.readonlyAbsolute = false;
 			} else {
 				Condition c = buildCondition(xpathRO, "readonly", ref);
-				c = f.addCondition(c);
+				c = (Condition)f.addTriggerable(c);
 				binding.readonlyCondition = c;
 			}
 		}
@@ -846,6 +847,13 @@ public class XFormParser {
 				//#endif
 			}
 			binding.constraintMessage = e.getAttributeValue(NAMESPACE_JAVAROSA, "constraintMsg");
+		}
+		
+		String xpathCalc = e.getAttributeValue(null, "calculate");
+		if (xpathCalc != null) {
+			Recalculate r = buildCalculate(xpathCalc, ref);
+			r = (Recalculate)f.addTriggerable(r);
+			binding.calculate = r;
 		}
 
 		binding.setPreload(e.getAttributeValue(NAMESPACE_JAVAROSA, "preload"));
@@ -886,6 +894,22 @@ public class XFormParser {
 				
 		Condition c = new Condition(cond, trueAction, falseAction, DataModelTree.unpackReference(contextRef));
 		return c;
+	}
+	
+	private static Recalculate buildCalculate (String xpath, IDataReference contextRef) {
+		XPathConditional calc;
+
+		try {
+			calc = new XPathConditional(xpath);
+		} catch (XPathSyntaxException xse) {
+			//#if debug.output==verbose
+			System.err.println("Invalid XPath expression [" + xpath + "]!");
+			//#endif
+			return null;
+		}
+				
+		Recalculate r = new Recalculate(calc, DataModelTree.unpackReference(contextRef));
+		return r;
 	}
 	
 	private static void addBinding (DataBinding binding) {
@@ -1355,6 +1379,9 @@ public class XFormParser {
 		}
 		if (bind.readonlyCondition != null) {
 			bind.readonlyCondition.addTarget(ref);
+		}
+		if (bind.calculate != null) {
+			bind.calculate.addTarget(ref);
 		}
 	}
 	

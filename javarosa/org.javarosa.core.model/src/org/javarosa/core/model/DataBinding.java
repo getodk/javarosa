@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
@@ -56,6 +57,7 @@ public class DataBinding  implements Externalizable {
 	public Condition readonlyCondition;
 	public boolean readonlyAbsolute;
 	public IConditionExpr constraint;
+	public Recalculate calculate;
 	
 	private String preload;
 	private String preloadParams;
@@ -147,7 +149,7 @@ public class DataBinding  implements Externalizable {
 		setPreloadParams((String)ExtUtil.read(in, new ExtWrapNullable(String.class), pf));
 		ref = (IDataReference)ExtUtil.read(in, new ExtWrapTagged());
 		
-		//don't bother reading relevancy/required/readonly right now; they're only used during parse anyway		
+		//don't bother reading relevancy/required/readonly/constraint/calculate right now; they're only used during parse anyway		
 	}
 
 	/* (non-Javadoc)
@@ -160,7 +162,7 @@ public class DataBinding  implements Externalizable {
 		ExtUtil.write(out, new ExtWrapNullable(getPreloadParams()));
 		ExtUtil.write(out, new ExtWrapTagged(ref));
 
-		//don't bother writing relevancy/required/readonly right now; they're only used during parse anyway
+		//don't bother writing relevancy/required/readonly/constraint/calculate right now; they're only used during parse anyway
 	}
 	
 	
