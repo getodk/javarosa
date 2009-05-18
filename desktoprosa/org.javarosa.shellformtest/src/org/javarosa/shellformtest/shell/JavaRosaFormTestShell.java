@@ -18,13 +18,12 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.transport.ByteArrayPayload;
-import org.javarosa.core.services.transport.MultiMessagePayload;
 import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.utility.IFormDefRetrievalMethod;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
-import org.javarosa.j2me.storage.rms.RMSStorageModule;
+import org.javarosa.j2me.J2MEModule;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.xform.util.XFormUtils;
@@ -85,7 +84,7 @@ public class JavaRosaFormTestShell implements IShell {
 	}
 	
 	private void init() {
-		new RMSStorageModule().registerModule(context);
+		new J2MEModule().registerModule(context);
 		new XFormsModule().registerModule(context);
 		new CoreModelModule().registerModule(context);
 		new HttpTransportModule().registerModule(context);

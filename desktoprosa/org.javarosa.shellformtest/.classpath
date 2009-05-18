@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.activity"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.user"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.forms"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
