@@ -29,7 +29,7 @@
 					<cough>
 						<length />
 						<breath_rate_type />
-						<breate_rate />
+						<breath_rate />
 						<indrawing />
 						<stridor />
 						<classify>
@@ -40,9 +40,6 @@
 							<override />
 						</classify>
 					</cough>
-
-
-<blah />
 
           <tmp>
             <sentinel>
@@ -100,7 +97,7 @@
       
       <bind nodeset="preamble/age" type="int" required="true()" /> <!-- todo: add age/unit constraints -->
       <bind nodeset="tmp/normalized/age" calculate="if(/imci/preamble/age_unit = 'years', /imci/preamble/age,
-                                                    if(/imci/preamble/age_unit = 'months', /imc/preamble/age div 12, ''))" type="decimal" /> <!-- remove 'type' once calculate works -->
+                                                    if(/imci/preamble/age_unit = 'months', /imci/preamble/age div 12, ''))" />
       <bind nodeset="tmp/info/too_young" relevant="/imci/tmp/normalized/age < 2 div 12" />
       <bind nodeset="preamble/too_old_use_anyway" relevant="/imci/tmp/normalized/age >= 6.0" />
       <bind nodeset="tmp/sentinel/age_ok" relevant="/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age < 6.0 or /imci/preamble/too_old_use_anyway = 'yes')" />
@@ -220,12 +217,7 @@
             <item><label>Years</label><value>years</value></item>
             <item><label>Months</label><value>months</value></item>
           </select1>
-        
-          <!-- debugging question until calculate works -->
-          <input ref="/imci/tmp/normalized/age">
-            <label>DEBUG TEMP: age in years</label>
-          </input>
-        
+                
           <trigger ref="/imci/tmp/info/too_young">
             <label>SORRY: this system is not yet suitable for children under two months</label>
           </trigger>
@@ -263,9 +255,6 @@
     </group>
 
     <group ref="/imci/tmp/sentinel/do_protocol">
-      <trigger ref="/imci/blah">
-        <label>welcome to the protocol</label>
-      </trigger>
     
 			<group ref="/imci/tmp/normalized/has_cough">
 					
