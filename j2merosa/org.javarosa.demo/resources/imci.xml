@@ -110,6 +110,8 @@
                                                          (/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age < 6.0 or /imci/preamble/too_old_use_anyway = 'yes')) and
                                                          (not(/imci/preamble/weight) or /imci/preamble/weight < 19 or /imci/preamble/too_heavy_use_anyway = 'yes')" />
 																												 
+			<bind nodeset="cough" relevant="/imci/tmp/normalized/has_cough" />
+																												 
 			<bind nodeset="cough/breath_rate" type="int" constraint="true()" relevant="../breath_rate_type = 'measure'" required="true()" />
 			<bind nodeset="tmp/normalized/fast_breath" calculate="/imci/cough/breath_rate_type = 'fast' or /imci/cough/breath_rate >= if(../age < 1.0, 50, 40)" />
 			
@@ -256,7 +258,7 @@
 
     <group ref="/imci/tmp/sentinel/do_protocol">
     
-			<group ref="/imci/tmp/normalized/has_cough">
+			<group ref="/imci/cough">
 					
 				<select1 ref="/imci/cough/length">
 					<label>ASK: How long has child had cough/difficulty breathing?</label>
