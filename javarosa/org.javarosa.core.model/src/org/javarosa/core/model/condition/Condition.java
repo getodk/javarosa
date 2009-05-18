@@ -33,7 +33,7 @@ import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
-public class Condition implements Externalizable {
+public class Condition extends Triggerable {
 	public static final int ACTION_NULL = 0;
 	public static final int ACTION_SHOW = 1;
 	public static final int ACTION_HIDE = 2;
@@ -44,14 +44,11 @@ public class Condition implements Externalizable {
 	public static final int ACTION_REQUIRE = 7;
 	public static final int ACTION_DONT_REQUIRE = 8;
 	
-	public IConditionExpr expr;
 	public int trueAction;
 	public int falseAction;
-	public Vector targets;
-	public TreeReference contextRef;  //generic ref used to turn triggers into absolute references
 		
 	public Condition () {
-		this(null, ACTION_NULL, ACTION_NULL, null);
+
 	}
 	
 	public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef) {
@@ -59,32 +56,28 @@ public class Condition implements Externalizable {
 	}
 	
 	public Condition (IConditionExpr expr, int trueAction, int falseAction, TreeReference contextRef, Vector targets) {
-		this.expr = expr;
+		super(expr, contextRef);
 		this.trueAction = trueAction;
 		this.falseAction = falseAction;
-		this.contextRef = contextRef;
 		this.targets = targets;
 	}
 	
-	public boolean eval (IFormDataModel model, EvaluationContext evalContext) {
-		return expr.eval(model, evalContext);
+	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
+		return new Boolean(expr.eval(model, evalContext));
 	}
 	
-	public void apply (IFormDataModel model, EvaluationContext evalContext, FormDef f, int depth) {
-		boolean result = eval(model, evalContext);
+	public boolean evalBool (IFormDataModel model, EvaluationContext evalContext) {
+		return ((Boolean)eval(model, evalContext)).booleanValue();
+	}
+	
+	public void apply (TreeReference ref, Object rawResult, IFormDataModel model, FormDef f, int depth) {
+		boolean result = ((Boolean)rawResult).booleanValue();
 
-		for (int i = 0; i < targets.size(); i++) {
-			TreeReference targetRef = ((TreeReference)targets.elementAt(i)).contextualize(evalContext.getContextRef());
-			Vector v = ((DataModelTree)model).expandReference(targetRef);		
-			for (int j = 0; j < v.size(); j++) {
-				TreeReference affectedRef = (TreeReference)v.elementAt(j);
-				performAction(((DataModelTree)model).resolveReference(affectedRef), result ? trueAction : falseAction);
-				if (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE) {
-					//changing the relevance of a node triggers conditions depending on that node
-					f.evaluateConditions(affectedRef, depth + 1);
-				}
-			}
-		}		
+		performAction(((DataModelTree)model).resolveReference(ref), result ? trueAction : falseAction);
+		if (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE) {
+			//changing the relevance of a node triggers conditions depending on that node
+			f.evaluateTriggerables(ref, depth + 1);
+		}
 	}
 
 	private void performAction (TreeElement node, int action) {
@@ -100,25 +93,7 @@ public class Condition implements Externalizable {
 		case ACTION_DONT_REQUIRE: node.setRequired(false); break;
 		}
 	}
-	
-	public void addTarget (TreeReference target) {
-		if (targets.indexOf(target) == -1)
-			targets.addElement(target);
-	}
-	
-	public Vector getTargets () {
-		return targets;
-	}
-	
-	public Vector getTriggers () {
-		Vector relTriggers = expr.getTriggers();
-		Vector absTriggers = new Vector();
-		for (int i = 0; i < relTriggers.size(); i++) {
-			absTriggers.addElement(((TreeReference)relTriggers.elementAt(i)).anchor(contextRef));
-		}
-		return absTriggers;		
-	}
-	
+		
 	//conditions are equal if they have the same actions, expression, and triggers, but NOT targets or context ref
 	public boolean equals (Object o) {
 		if (o instanceof Condition) {
@@ -126,44 +101,21 @@ public class Condition implements Externalizable {
 			if (this == c)
 				return true;
 			
-			if (this.trueAction == c.trueAction && this.falseAction == c.falseAction && this.expr.equals(c.expr)) {
-				//check triggers
-				Vector Atriggers = this.getTriggers();
-				Vector Btriggers = c.getTriggers();
-				
-				//order and quantity don't matter; all that matters is every trigger in A exists in B and vice versa
-				for (int k = 0; k < 2; k++) {
-					Vector v1 = (k == 0 ? Atriggers : Btriggers);
-					Vector v2 = (k == 0 ? Btriggers : Atriggers);
-				
-					for (int i = 0; i < v1.size(); i++) {
-						if (v2.indexOf(v1.elementAt(i)) == -1) {
-							return false;
-						}
-					}
-				}
-				return true;
-			} else {
-				return false;
-			}
+			return (this.trueAction == c.trueAction && this.falseAction == c.falseAction && super.equals(c));
 		} else {
 			return false;
 		}			
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		super.readExternal(in, pf);
 		trueAction = ExtUtil.readInt(in);
 		falseAction = ExtUtil.readInt(in);
-		expr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
-		contextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
-		targets = (Vector)ExtUtil.read(in, new ExtWrapList(TreeReference.class), pf);
 	}
 	
 	public void writeExternal(DataOutputStream out) throws IOException {
+		super.writeExternal(out);
 		ExtUtil.writeNumeric(out, trueAction);
 		ExtUtil.writeNumeric(out, falseAction);
-		ExtUtil.write(out, new ExtWrapTagged(expr));
-		ExtUtil.write(out, contextRef);
-		ExtUtil.write(out, new ExtWrapList(targets));
-	}	
+	}
 }

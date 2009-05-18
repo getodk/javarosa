@@ -26,6 +26,8 @@ import java.util.Vector;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.Recalculate;
+import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
@@ -58,21 +60,21 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private String title;	/** The display title of the form. */
 	private String name;  /** A unique external name that is used to identify the form between machines */
 	private Localizer localizer;
-	public Vector conditions; //<Condition>
+	public Vector triggerables; //<Triggerable>
 	private DataModelTree model;
 
-	private Hashtable conditionTriggerIndex; // <TreeReference, Vector<Condition>>
+	private Hashtable triggerIndex; // <TreeReference, Vector<Triggerable>>
 	private Hashtable conditionRepeatTargetIndex; //<TreeReference, Condition>; associates repeatable nodes with the Condition that determines their relevancy
-	private EvaluationContext conditionEvalContext;
+	private EvaluationContext exprEvalContext;
 	
 	private QuestionPreloader preloader = new QuestionPreloader();
 
 	public FormDef() {
 		setChildren(null);
-		conditions = new Vector();
-		conditionTriggerIndex = new Hashtable();
+		triggerables = new Vector();
+		triggerIndex = new Hashtable();
 		conditionRepeatTargetIndex = new Hashtable();
-		conditionEvalContext = new EvaluationContext();
+		exprEvalContext = new EvaluationContext();
 	}
 	
 	public Vector getChildren() {
@@ -219,14 +221,18 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		return null;
 	}
 	
-	public void setValue (IAnswerData data, TreeReference ref) {
-		setValue(data, ref, model.resolveReference(ref));
+	public void setValue (IAnswerData data, TreeReference ref, int depth) {
+		setValue(data, ref, model.resolveReference(ref), depth);
 	}
 	
-	//do we ever need to run this w/o evaluating conditions? or will we always just call on node directly?
 	public void setValue (IAnswerData data, TreeReference ref, TreeElement node) {
+		setValue(data, ref, node, 0);
+	}
+		
+	//do we ever need to run this w/o evaluating conditions? or will we always just call on node directly?
+	public void setValue (IAnswerData data, TreeReference ref, TreeElement node, int depth) {
 		node.setAnswer(data);
-		evaluateConditions(ref);		
+		evaluateTriggerables(ref, depth);		
 	}
 	
 	public void deleteRepeat (FormIndex index) {  
@@ -247,7 +253,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	            }
 	        }
         }
-        evaluateConditions(parentReferece);  
+        evaluateTriggerables(parentReferece);  
 	}
 		
 	public void createNewRepeat (FormIndex index) {
@@ -257,14 +263,14 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		model.copyNode(template, destRef);
 
 		preloadModel(model.resolveReference(destRef));
-		evaluateConditions(destRef); //trigger conditions that depend on the creation of this new node
-		initializeConditions(destRef); //initialize conditions for the node (and sub-nodes)
+		evaluateTriggerables(destRef); //trigger conditions that depend on the creation of this new node
+		initializeTriggerables(destRef); //initialize conditions for the node (and sub-nodes)
 	}
 	
 	public boolean canCreateRepeat (TreeReference repeatRef) {
 		Condition c = (Condition)conditionRepeatTargetIndex.get(repeatRef.genericize());
 		if (c != null) {
-			return c.eval(model, new EvaluationContext(conditionEvalContext, repeatRef));
+			return c.evalBool(model, new EvaluationContext(exprEvalContext, repeatRef));
 		} /* else
 		  check # child constraints of parent
 		} */
@@ -276,60 +282,69 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * Add a Condition to the form's Collection.
 	 * @param condition the condition to be set
 	 */
-	public Condition addCondition (Condition condition) {
-		int p = conditions.indexOf(condition);
-		if (p >= 0) {
-			//one node may control access to many nodes; this means many nodes effectively have the same condition
-			//let's identify when conditions are the same, and store and calculate it only once
+	public Triggerable addTriggerable (Triggerable t) {
+		int useExistingIx = -1;
+		if (t instanceof Condition) {
+			int p = triggerables.indexOf(t);
+			if (p >= 0) {
+				//one node may control access to many nodes; this means many nodes effectively have the same condition
+				//let's identify when conditions are the same, and store and calculate it only once
 
-			//note, if the contextRef is unnecessarily deep, the condition will be evaluated more times than needed
-			//perhaps detect when 'identical' condition has a shorter contextRef, and use that one instead?
-			return (Condition)conditions.elementAt(p);
+				//note, if the contextRef is unnecessarily deep, the condition will be evaluated more times than needed
+				//perhaps detect when 'identical' condition has a shorter contextRef, and use that one instead?
+				useExistingIx = p;
+			}
+		}
+
+		if (useExistingIx != -1) {
+			return (Condition)triggerables.elementAt(useExistingIx);
 		} else {
-			conditions.addElement(condition);
+			triggerables.addElement(t);
 			
-			Vector triggers = condition.getTriggers();
+			Vector triggers = t.getTriggers();
 			for (int i = 0; i < triggers.size(); i++) {
 				TreeReference trigger = (TreeReference)triggers.elementAt(i);
-				if (!conditionTriggerIndex.containsKey(trigger)) {
-					conditionTriggerIndex.put(trigger, new Vector());
+				if (!triggerIndex.containsKey(trigger)) {
+					triggerIndex.put(trigger, new Vector());
 				}
-				Vector triggeredConditions = (Vector)conditionTriggerIndex.get(trigger);
-				if (!triggeredConditions.contains(condition)) {
-					triggeredConditions.addElement(condition);
-				}
-			}
-			
-			//droos 5/14: this this might be a bug? what if we encounter the same condition again, but the targets
-			//have since changed? we'll return the original condition (above), and not update this index
-			Vector targets = condition.getTargets();
-			for (int i = 0; i < targets.size(); i++) {
-				TreeReference target = (TreeReference)targets.elementAt(i);
-				if (model.getTemplate(target) != null) {
-					conditionRepeatTargetIndex.put(target, condition);
+				Vector triggered = (Vector)triggerIndex.get(trigger);
+				if (!triggered.contains(t)) {
+					triggered.addElement(t);
 				}
 			}
 			
-			return condition;
+			if (t instanceof Condition) {		
+				//droos 5/14: this this might be a bug? what if we encounter the same condition again, but the targets
+				//have since changed? we'll return the original condition (above), and not update this index
+				Vector targets = t.getTargets();
+				for (int i = 0; i < targets.size(); i++) {
+					TreeReference target = (TreeReference)targets.elementAt(i);
+					if (model.getTemplate(target) != null) {
+						conditionRepeatTargetIndex.put(target, (Condition)t);
+					}
+				}
+			}
+			
+			return t;
 		}
 	}
 
-	public void initializeConditions () {
-		initializeConditions(TreeReference.rootRef());
+	public void initializeTriggerables () {
+		initializeTriggerables(TreeReference.rootRef());
 	}
 	
 	/**
 	 * Walks the current set of conditions, and evaluates each of them with the 
 	 * current context.
 	 */
-	public void initializeConditions (TreeReference rootRef) {
+	public void initializeTriggerables (TreeReference rootRef) {
 		TreeReference genericRoot = rootRef.genericize();
 		
-		for (int i = 0; i < conditions.size(); i++) {
-			Condition c = (Condition)conditions.elementAt(i);
+		for (int i = 0; i < triggerables.size(); i++) {
+			Triggerable t = (Triggerable)triggerables.elementAt(i);
 			boolean applicable = false;
-			for (int j = 0; j < c.getTargets().size(); j++) {
-				TreeReference target = (TreeReference)c.getTargets().elementAt(j);
+			for (int j = 0; j < t.getTargets().size(); j++) {
+				TreeReference target = (TreeReference)t.getTargets().elementAt(j);
 				if (genericRoot.isParentOf(target, false)) {
 					applicable = true;
 					break;
@@ -337,44 +352,44 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			}
 			
 			if (applicable) {
-				evaluateCondition(c, rootRef, 0);
+				evaluateTriggerable(t, rootRef, 0);
 			}
 		}
 	}
 
-	public static final int CONDITION_CHAINING_LIMIT = 100;
+	public static final int TRIGGERABLE_CHAINING_LIMIT = 30;
 	
-	public void evaluateConditions (TreeReference ref) {
-		evaluateConditions(ref, 0);
+	public void evaluateTriggerables (TreeReference ref) {
+		evaluateTriggerables(ref, 0);
 	}
 		
 	//ref: unambiguous ref of node that just changed
-	public void evaluateConditions (TreeReference ref, int depth) {
-		if (depth > CONDITION_CHAINING_LIMIT) {
-			throw new RuntimeException("Exceeded condition chaining limit; you probably have dependency cycles in your conditions");
+	public void evaluateTriggerables (TreeReference ref, int depth) {
+		if (depth > TRIGGERABLE_CHAINING_LIMIT) {
+			throw new RuntimeException("Exceeded chaining limit; you probably have dependency cycles in your conditions/calculates");
 		}
 		
 		//turn unambiguous ref into a generic ref
 		TreeReference genericRef = ref.genericize();
 		
 		//get conditions triggered by this node
-		Vector conditions = (Vector)conditionTriggerIndex.get(genericRef);
-		if (conditions == null)
+		Vector triggered = (Vector)triggerIndex.get(genericRef);
+		if (triggered == null)
 			return;
 
 		//for each condition
-		for (int i = 0; i < conditions.size(); i++) {
-			Condition condition = (Condition)conditions.elementAt(i);
-			evaluateCondition(condition, ref, depth);
+		for (int i = 0; i < triggered.size(); i++) {
+			Triggerable t = (Triggerable)triggered.elementAt(i);
+			evaluateTriggerable(t, ref, depth);
 		}
 	}
 	
-	private void evaluateCondition (Condition c, TreeReference anchorRef, int depth) {
-		TreeReference contextRef = c.contextRef.contextualize(anchorRef);
+	private void evaluateTriggerable (Triggerable t, TreeReference anchorRef, int depth) {
+		TreeReference contextRef = t.contextRef.contextualize(anchorRef);
 		Vector v = model.expandReference(contextRef);
 		for (int j = 0; j < v.size(); j++) {
-			EvaluationContext ec = new EvaluationContext(conditionEvalContext, (TreeReference)v.elementAt(j));
-			c.apply(model, ec, this, depth);
+			EvaluationContext ec = new EvaluationContext(exprEvalContext, (TreeReference)v.elementAt(j));
+			t.apply(model, ec, this, depth);
 		}
 	}
 	
@@ -387,7 +402,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		if (c == null)
 			return true;
 		
-		EvaluationContext ec = new EvaluationContext(conditionEvalContext, ref);
+		EvaluationContext ec = new EvaluationContext(exprEvalContext, ref);
 		ec.isConstraint = true;
 		ec.candidateValue = data;
 		
@@ -398,7 +413,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * @param ec The new Evaluation Context
 	 */
 	public void setEvaluationContext (EvaluationContext ec) {
-		this.conditionEvalContext = ec;
+		this.exprEvalContext = ec;
 	}
 	
 	/**
@@ -533,7 +548,10 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		
 		Vector vcond = (Vector)ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
 		for (Enumeration e = vcond.elements(); e.hasMoreElements(); )
-			addCondition((Condition)e.nextElement());		
+			addTriggerable((Condition)e.nextElement());		
+		Vector vcalc = (Vector)ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
+		for (Enumeration e = vcalc.elements(); e.hasMoreElements(); )
+			addTriggerable((Recalculate)e.nextElement());		
 	}
 
 	/**
@@ -549,7 +567,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			preloadModel(model.getRoot());
 		}
 		 
-		initializeConditions();
+		initializeTriggerables();
 
 		if (getLocalizer() != null && getLocalizer().getLocale() == null) {
 			getLocalizer().setToDefault();
@@ -615,7 +633,19 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
 		ExtUtil.write(dos, model);
 		ExtUtil.write(dos, new ExtWrapNullable(localizer));
+		
+		Vector conditions = new Vector();
+		Vector recalcs = new Vector();
+		for (int i = 0; i < triggerables.size(); i++) {
+			Triggerable t = (Triggerable)triggerables.elementAt(i);
+			if (t instanceof Condition) {
+				conditions.addElement(t);
+			} else if (t instanceof Recalculate) {
+				recalcs.addElement(t);
+			}
+		}
 		ExtUtil.write(dos, new ExtWrapList(conditions));
+		ExtUtil.write(dos, new ExtWrapList(recalcs));
 	}
 
 	public void collapseIndex (FormIndex index, Vector indexes, Vector multiplicities, Vector elements) {

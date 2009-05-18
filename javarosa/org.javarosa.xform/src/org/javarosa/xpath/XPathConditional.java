@@ -52,8 +52,12 @@ public class XPathConditional implements IConditionExpr {
 		return expr;
 	}
 	
+	public Object evalRaw (IFormDataModel model, EvaluationContext evalContext) {
+		return expr.eval(model, evalContext);
+	}
+	
 	public boolean eval (IFormDataModel model, EvaluationContext evalContext) {
-		return XPathFuncExpr.toBoolean(expr.eval(model, evalContext)).booleanValue();
+		return XPathFuncExpr.toBoolean(evalRaw(model, evalContext)).booleanValue();
 	}
 	
 	public Vector getTriggers () {
