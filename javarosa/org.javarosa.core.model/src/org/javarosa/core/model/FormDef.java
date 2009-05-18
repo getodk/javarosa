@@ -232,30 +232,62 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	//do we ever need to run this w/o evaluating conditions? or will we always just call on node directly?
 	public void setValue (IAnswerData data, TreeReference ref, TreeElement node, int depth) {
 		node.setAnswer(data);
-		evaluateTriggerables(ref, depth);		
+		evaluateTriggerables(ref, depth);
 	}
-	
-	public void deleteRepeat (FormIndex index) {  
-		TreeReference delRef = getChildInstanceRef(index);
-	    TreeElement deleteChild = model.resolveReference(delRef);
-	    
-        TreeReference parentReferece = delRef.getParentRef();
-        TreeElement parent = model.resolveReference(parentReferece);
 
-        int childMult = deleteChild.getMult();
-        parent.removeChild(deleteChild);
-        Vector v = parent.getChildren();
-        if (v != null) {
-	        for (int i = 0; i < v.size(); i++) {
-	        	TreeElement child = (TreeElement)v.elementAt(i);
-	            if (child.getMult() > childMult) {
-	                child.setMult(child.getMult() - 1);
-	            }
-	        }
-        }
-        evaluateTriggerables(parentReferece);  
+	/**
+	 * Deletes the inner-most repeat that this node belongs to and returns the
+	 * corresponding FormIndex. Behavior is currently undefined if you call this
+	 * method on a node that is not contained within a repeat.
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public FormIndex deleteRepeat (FormIndex index) {
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+		collapseIndex(index, indexes, multiplicities, elements);
+
+		// loop backwards through the elements, removing objects from each
+		// vector, until we find a repeat
+		// TODO: should probably check to make sure size > 0
+		for (int i = elements.size() - 1; i >= 0; i--) {
+			IFormElement e = (IFormElement) elements.elementAt(i);
+			if (e instanceof GroupDef && ((GroupDef) e).getRepeat()) {
+				break;
+			} else {
+				indexes.removeElementAt(i);
+				multiplicities.removeElementAt(i);
+				elements.removeElementAt(i);
+			}
+		}
+
+		// build new formIndex which includes everything
+		// up to the node we're going to remove
+		FormIndex deleteIndex = buildIndex(indexes, multiplicities, elements);
+
+		TreeReference deleteRef = getChildInstanceRef(deleteIndex);
+		TreeElement deleteElement = model.resolveReference(deleteRef);
+		TreeReference parentRef = deleteRef.getParentRef();
+		TreeElement parentElement = model.resolveReference(parentRef);
+
+		int childMult = deleteElement.getMult();
+		parentElement.removeChild(deleteElement);
+
+		// update multiplicities of other child nodes
+		Vector v = parentElement.getChildren();
+		for (int i = 0; i < v.size(); i++) {
+			TreeElement child = (TreeElement) v.elementAt(i);
+			if (child.getMult() > childMult) {
+				child.setMult(child.getMult() - 1);
+			}
+		}
+
+		evaluateTriggerables(parentRef);
+		return deleteIndex;
 	}
-		
+
 	public void createNewRepeat (FormIndex index) {
 		TreeReference destRef = getChildInstanceRef(index);
 		TreeElement template = model.getTemplate(destRef);
