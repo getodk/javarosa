@@ -143,7 +143,7 @@ public class JavaRosaDemoShell implements IShell {
 		}
 	}
 
-	//#if debug.output == verbose
+	 
 	private void debug(IActivity returningActivity, String returnCode,
 			Hashtable returnVals) {
 		String args = "";
@@ -160,7 +160,7 @@ public class JavaRosaDemoShell implements IShell {
 		System.out.println("\targs: " + args);
 	}
 
-	//#endif
+	 
 
 	/**
 	 * @param returningActivity
@@ -215,6 +215,8 @@ public class JavaRosaDemoShell implements IShell {
 			return;
 		}
 
+		
+		// after entity select
 		if (returningActivity instanceof EntitySelectActivity) {
 
 			if (returnCode == Constants.ACTIVITY_COMPLETE) {
@@ -226,14 +228,24 @@ public class JavaRosaDemoShell implements IShell {
 
 				launchActivity(new FormListActivity(this, "Forms List"),
 						context);
-			} else if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
+				return;
+			} 
+
+			if (returnCode == Constants.ACTIVITY_NEEDS_RESOLUTION) {
 				String action = (String) returnVals.get("action");
 				if (EntitySelectActivity.ACTION_NEW_ENTITY.equals(action)) {
 					launchActivity(new PatientEntryActivity(this), context);
 				}
-			} else if (returnCode == Constants.ACTIVITY_CANCEL) {
+				
+				return;
+			} 
+
+			if (returnCode == Constants.ACTIVITY_CANCEL) {
 				exitShell();
+				return;
 			}
+			
+			// TODO: should this throw exception here?
 			return;
 		}
 
