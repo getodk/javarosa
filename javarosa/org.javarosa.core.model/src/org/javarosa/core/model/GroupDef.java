@@ -22,15 +22,14 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.Localizable;
-import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.services.locale.Localizable;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-
 
 /** The definition of a group in a form or questionaire. 
  * 

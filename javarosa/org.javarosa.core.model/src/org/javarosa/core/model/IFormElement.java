@@ -18,7 +18,7 @@ package org.javarosa.core.model;
 
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.Localizable;
+import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 /**

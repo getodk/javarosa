@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -23,6 +26,7 @@ import org.javarosa.core.util.externalizable.ExtWrapMapPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xform.util.XFormAnswerDataParser;
 
 /**
  * @author Clayton Sims
@@ -211,9 +215,14 @@ public class Case implements Externalizable, IDRecordable, Restorable {
         	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
         	String name = child.getName();
         	int dataType = ((Integer)RestoreUtils.getValue("other/"+name+"/type", dm)).intValue();
-        //	String value = (String)RestoreUtils.getValue("other/"+ name+"/data", dm);
-        	if(dataType == Constants.DATATYPE_CHOICE_LIST) {
-        		//XFormAnswerDataParser.getAnswerData(value, dataType, q);
+        	String flatval = (String)RestoreUtils.getValue("other/"+ name+"/data", dm);
+        	IAnswerData interpreted = XFormAnswerDataParser.getAnswerData(flatval, dataType);
+        	if(interpreted != null) {
+        		Object value = interpreted.getValue();
+        		if(dataType == Constants.DATATYPE_CHOICE_LIST) {
+        			value = new SelectMultiData((Vector)value);
+        		}
+        		data.put(name, value);
         	}
         }
 	}
@@ -224,6 +233,8 @@ public class Case implements Externalizable, IDRecordable, Restorable {
 		RestoreUtils.applyDataType(dm, "name", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "dateopened", parentRef, Date.class);
 		RestoreUtils.applyDataType(dm, "closed", parentRef, Boolean.class);
+		
+		RestoreUtils.applyDataType(dm, "other/*/type", parentRef, Integer.class);
 		
 		// other/* defaults to string
 	}

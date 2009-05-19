@@ -30,7 +30,7 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;

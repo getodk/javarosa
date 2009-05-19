@@ -23,6 +23,8 @@ import j2meunit.framework.TestSuite;
 
 import java.util.NoSuchElementException;
 
+import org.javarosa.core.services.locale.Localizable;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.test.ExternalizableTest;
 

@@ -21,6 +21,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.GeoPointData;
@@ -54,6 +55,10 @@ choice list
 
 public class XFormAnswerDataParser {
 	//FIXME: the QuestionDef parameter is a hack until we find a better way to represent AnswerDatas for select questions
+	
+	public static IAnswerData getAnswerData (String text, int dataType) {
+		return getAnswerData(text, dataType, null);
+	}
 	public static IAnswerData getAnswerData (String text, int dataType, QuestionDef q) {
 		String trimmedText = text.trim();
 		if (trimmedText.length() == 0)
@@ -109,6 +114,14 @@ public class XFormAnswerDataParser {
 
 			Date t = (trimmedText == null ? null : DateUtils.parseTime(trimmedText));
 			return (t == null ? null : new TimeData(t));
+			
+		case Constants.DATATYPE_BOOLEAN:
+			
+			if(trimmedText == null) { 
+				return null;
+			} else {
+				return trimmedText.equals("t") ? new BooleanData(true) : new BooleanData(false);
+			}
 		
 		case Constants.DATATYPE_GEOPOINT:
 
@@ -142,12 +155,15 @@ public class XFormAnswerDataParser {
 	}
 	
 	private static Selection getSelection(String choice, QuestionDef q) {
-		q.localizeSelectMap(null);
-		int index = q.getSelectedItemIndex(choice); 
-		
 		Selection s = new Selection(choice);
-		s.attachQuestionDef(q);
 		
-		return (index != -1 ? s : null);
+		if(q != null) {
+			q.localizeSelectMap(null);
+			int index = q.getSelectedItemIndex(choice); 
+			s.attachQuestionDef(q);
+			return (index != -1 ? s : null);
+		}
+		
+		return s;
 	}
 }

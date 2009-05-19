@@ -390,6 +390,9 @@ public class RMSUtility
     }
 
     public MetaDataObject newMetaData (Object o) {
+    	if(this.iType == RMSUtility.RMS_TYPE_META_DATA) {
+    		throw new RuntimeException("RMS Utility " + this.RS_NAME + " is a meta data typed RMS, but doesn't implement the newMetaData method");
+    	}
     	return null;
     }
     

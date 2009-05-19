@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.core.model.utils;
+package org.javarosa.core.services.locale;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
