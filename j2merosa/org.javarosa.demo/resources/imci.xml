@@ -71,8 +71,14 @@
 							<eye_pus />
 							<clouding_cornea />
 						</measles>
-					
+						<classify>
+							<febrile />
+							<malaria />
+							<fever_only />
+							<override />
+						</classify>
 					</fever>
+					
           <tmp>
             <sentinel>
               <valid_complaint />
@@ -88,17 +94,23 @@
 							
               <age />
 							<fast_breath />
+							<measles_risk />
 							
 							<classification>
 							  <cough />
-
+								<fever />
 								
 								
 							</classification>
 							<diagnosis>
 							  <cough />
+								<fever />
+								
 							</diagnosis>
             </normalized>
+						<const>
+							<favor_malaria>1</favor_malaria>
+						</const>
           </tmp>
         </imci>
       </instance>
@@ -145,29 +157,52 @@
 			<bind nodeset="tmp/normalized/fast_breath" calculate="/imci/cough/breath_rate_type = 'fast' or /imci/cough/breath_rate >= if(../age < 1.0, 50, 40)" />
 			
 			<bind nodeset="tmp/normalized/classification/cough" calculate="
-			  if(/imci/cough/indrawing = 'yes' or /imci/cough/stridor = 'yes' or count-selected(/imci/preamble/danger_signs) > 0, 'severe-pneumonia',
-			  if(/imci/tmp/normalized/fast_breath, 'pneumonia',
-				if(/imci/cough/length = 'over30', 'persistent-cold',
-				if(/imci/cough/length = 'under30', 'cold', ''))))" />
+			  if(/imci/tmp/normalized/has_cough,
+			    if(/imci/cough/indrawing = 'yes' or /imci/cough/stridor = 'yes' or count-selected(/imci/preamble/danger_signs) > 0, 'severe-pneumonia',
+			    if(/imci/tmp/normalized/fast_breath, 'pneumonia',
+				  if(/imci/cough/length = 'over30', 'persistent-cold', 'cold'))),
+				'')" />
 			<bind nodeset="cough/classify/severe_pneumonia" relevant="/imci/tmp/normalized/classification/cough = 'severe-pneumonia'" />
 			<bind nodeset="cough/classify/pneumonia" relevant="/imci/tmp/normalized/classification/cough = 'pneumonia'" />
 			<bind nodeset="cough/classify/persistent_cold" relevant="/imci/tmp/normalized/classification/cough = 'persistent-cold'" />
 			<bind nodeset="cough/classify/cold" relevant="/imci/tmp/normalized/classification/cough = 'cold'" />
-			<bind nodeset="cough/classify/override" relevant="/imci/cough/classify/severe_pneumonia = 'disagree' or
-			                                                  /imci/cough/classify/pneumonia = 'disagree' or
-			                                                  /imci/cough/classify/persistent_cold = 'disagree' or
-			                                                  /imci/cough/classify/cold = 'disagree'" />
+			<bind nodeset="cough/classify/override" relevant="../severe_pneumonia = 'disagree' or
+			                                                  ../pneumonia = 'disagree' or
+			                                                  ../persistent_cold = 'disagree' or
+			                                                  ../cold = 'disagree'" />
 			<bind nodeset="tmp/normalized/diagnosis/cough" calculate="if(/imci/cough/classify/override != '', /imci/cough/classify/override, ../../classification/cough)" />
 			
 			<bind nodeset="diarrhea" relevant="/imci/tmp/normalized/has_diarrhea" />
 			
 			
 			
+			
+			
+			
+			
 			<bind nodeset="fever" relevant="/imci/tmp/normalized/has_fever" />
 			
 			<bind nodeset="fever/everyday" relevant="../length = 'long'" />
-			<bind nodeset="fever/measles" relevant="../had_measles = 'yes' or ../measles_symptoms = 'yes'" />
+			<bind nodeset="tmp/normalized/measles_risk" calculate="/imci/fever/had_measles = 'yes' or /imci/fever/measles_symptoms = 'yes'" />
+			<bind nodeset="fever/measles" relevant="/imci/tmp/normalized/measles_risk" />
 			<bind nodeset="fever/measles/deep" relevant="../mouth_ulcers = 'yes'" />
+			
+			<bind nodeset="tmp/normalized/classification/fever" calculate="
+			  if(/imci/tmp/normalized/has_fever,
+  				if(/imci/fever/stiff_neck = 'yes' or count-selected(/imci/preamble/danger_signs) > 0, 'febrile',
+  				if(/imci/tmp/const/favor_malaria or not(/imci/tmp/normalized/measles_risk or /imci/fever/runny_nose), 'malaria', 'fever-only'))
+				, '')" />
+			<!-- todo: include measles classifications in algorithm? also, 'fever only' is never chosen due to 'favor_malaria' -->
+			<bind nodeset="fever/classify/febrile" relevant="/imci/tmp/normalized/classification/fever = 'febrile'" />
+			<bind nodeset="fever/classify/malaria" relevant="/imci/tmp/normalized/classification/fever = 'malaria'" />
+			<bind nodeset="fever/classify/fever_only" relevant="/imci/tmp/normalized/classification/fever = 'fever-only'" />
+			<bind nodeset="fever/classify/override" relevant="../febrile = 'disagree' or
+			                                                  ../malaria = 'disagree' or
+																												../fever_only = 'disagree'" />
+			<bind nodeset="tmp/normalized/diagnosis/fever" calculate="if(/imci/fever/classify/override != '', /imci/fever/classify/override, ../../classification/fever)" />
+			
+			
+			
 			
 		</model>
   </h:head>
@@ -478,6 +513,34 @@
 
 				</group>
 				
+				<select1 ref="/imci/fever/classify/febrile">
+					<label>CLASSIFY: Child should be treated for severe febrile disease</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<select1 ref="/imci/fever/classify/malaria">
+					<label>CLASSIFY: Child should be treated for malaria</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<select1 ref="/imci/fever/classify/fever_only">
+					<label>CLASSIFY: Child should be treated for fever, but malaria unlikely</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>			
+			
+				<select1 ref="/imci/fever/classify/override">
+					<label>PLEASE: You have disagreed; select the correct classification</label>
+					<item><label>Severe Febrile Disease</label><value>febrile</value></item>
+					<item><label>Malaria</label><value>malaria</value></item>
+					<item><label>Fever; Malaria unlikely</label><value>fever_only</value></item>
+					<item><label>Severe Measles</label><value>severe-measles</value></item>
+					<item><label>Measles with Eye or Mouth Complications</label><value>measles-compl</value></item>
+					<item><label>Measles</label><value>measles</value></item>
+				</select1>
+
 			</group>
 			
     </group>
