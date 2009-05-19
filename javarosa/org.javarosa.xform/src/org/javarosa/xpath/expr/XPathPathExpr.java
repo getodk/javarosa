@@ -146,12 +146,12 @@ public class XPathPathExpr extends XPathExpression {
 			Vector nodesetRefs = m.expandReference(ref);
 			
 			//to fix conditions based on non-relevant data, filter the nodeset by relevancy
-//			for (int i = 0; i < nodesetRefs.size(); i++) {
-//				if (!m.resolveReference((TreeReference)nodesetRefs.elementAt(i)).isRelevant()) {
-//					nodesetRefs.removeElementAt(i);
-//					i--;
-//				}
-//			}
+			for (int i = 0; i < nodesetRefs.size(); i++) {
+				if (!m.resolveReference((TreeReference)nodesetRefs.elementAt(i)).isRelevant()) {
+					nodesetRefs.removeElementAt(i);
+					i--;
+				}
+			}
 			
 			return nodesetRefs;
 		} else {
