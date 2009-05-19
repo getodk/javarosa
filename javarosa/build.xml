@@ -17,68 +17,68 @@ the License.
 -->
 
 <project name="javarosa" default="package-all">
-	
+
 	<property name="core" value="org.javarosa.core"/>
 	<property name="model" value="org.javarosa.core.model"/>
 	<property name="forms" value="org.javarosa.forms"/>
 	<property name="xform" value="org.javarosa.xform"/>
-	
+
 	<tstamp/>
-		
-	<target name="init" description="initialization">
+
+	<target name="init" description="set classpath">
 		<path id="classpath">
 			<fileset dir="${xform}/lib/">
 				<include name="kxml2-2.3.0.jar"/>
 			</fileset>
 		</path>
 	</target>
-	
+
 	<target name="clean" description="delete dist and bin directories">
 		<delete dir="dist"/>
 		<delete dir="bin"/>
 	</target>
-	
+
 	<target name="compile" depends="init" description="compile the code">
 		<mkdir dir="bin"/>
 		<mkdir dir="dist"/>
 		<javac destdir="bin" classpathref="classpath" debug="true" debuglevel="lines,source">
 			<src path="${core}/src/"/>
-				<include name="**/*.java"/>
+			<include name="**/*.java"/>
 			<src path="${model}/src/"/>
-				<include name="**/*.java"/>
+			<include name="**/*.java"/>
 			<src path="${forms}/src/"/>
-				<include name="**/*.java"/>
+			<include name="**/*.java"/>
 			<src path="${xform}/src/" />
-				<include name="**/*.java"/>
+			<include name="**/*.java"/>
 		</javac>
 	</target>
-	
+
 	<target name="package-binary" depends="clean,init,compile" description="package binary code into jar file">
 		<mkdir dir="dist"/>
 		<jar destfile="dist/javarosa-binary.jar">
 			<fileset dir="bin" includes="**/*"/>
 		</jar>
 	</target>
-	
-	 <target name="package-source" depends="clean,init,compile" description="package source code into jar file">
-	    <mkdir dir="dist"/>
-	    <jar destfile="dist/javarosa-source.jar">
-	      <fileset dir="${core}/src/" includes="**/*"/>
-	      <fileset dir="${model}/src/" includes="**/*"/>
-	      <fileset dir="${forms}/src/" includes="**/*"/>
-      	<fileset dir="${xform}/src/" includes="**/*"/>
-	    </jar>
-	  </target>
-	
-	 <target name="package-all" depends="clean,init,compile" description="package source and binary code into jar file">
-	    <mkdir dir="dist"/>
-	    <jar destfile="dist/javarosa.jar">
-	      <fileset dir="bin" includes="**/*"/>
-	      <fileset dir="${core}/src/" includes="**/*"/>
-	      <fileset dir="${model}/src/" includes="**/*"/>
-	      <fileset dir="${forms}/src/" includes="**/*"/>
-	      <fileset dir="${xform}/src/" includes="**/*"/>
-	    </jar>
-	  </target>
-	
+
+	<target name="package-source" depends="clean,init,compile" description="package source code into jar file">
+		<mkdir dir="dist"/>
+		<jar destfile="dist/javarosa-source.jar">
+			<fileset dir="${core}/src/" includes="**/*"/>
+			<fileset dir="${model}/src/" includes="**/*"/>
+			<fileset dir="${forms}/src/" includes="**/*"/>
+			<fileset dir="${xform}/src/" includes="**/*"/>
+		</jar>
+	</target>
+
+	<target name="package-all" depends="clean,init,compile" description="package source and binary code into jar file">
+		<mkdir dir="dist"/>
+		<jar destfile="dist/javarosa.jar">
+			<fileset dir="bin" includes="**/*"/>
+			<fileset dir="${core}/src/" includes="**/*"/>
+			<fileset dir="${model}/src/" includes="**/*"/>
+			<fileset dir="${forms}/src/" includes="**/*"/>
+			<fileset dir="${xform}/src/" includes="**/*"/>
+		</jar>
+	</target>
+
 </project>
