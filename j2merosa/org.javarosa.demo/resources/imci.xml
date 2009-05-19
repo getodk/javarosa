@@ -25,6 +25,12 @@
             <sex />
             <weight />
             <too_heavy_use_anyway />
+						
+            <info>
+              <serious />
+              <first_visit_only />
+              <too_young />
+            </info>
           </preamble>
 					<cough>
 						<length />
@@ -40,7 +46,33 @@
 							<override />
 						</classify>
 					</cough>
-
+					<diarrhea>
+					  <length />
+						<blood />
+						<how_drinking />
+						<sunken_eyes />
+						<skin_pinch />
+						<fidgety />
+					
+						<info>
+							<offer_fluid />
+						</info>
+					</diarrhea>
+					<fever>
+						<length />
+						<everyday />
+						<had_measles />
+						<stiff_neck />
+						<runny_nose />
+						<measles_symptoms />
+						<measles>
+							<mouth_ulcers />
+							<deep />
+							<eye_pus />
+							<clouding_cornea />
+						</measles>
+					
+					</fever>
           <tmp>
             <sentinel>
               <valid_complaint />
@@ -48,27 +80,24 @@
               <age_ok />
               <do_protocol />
             </sentinel>
-            <info>
-              <serious />
-              <first_visit_only />
-              <too_young />
-            </info>
             <normalized>
               <has_cough />
               <has_diarrhea />
               <has_ear />
+              <has_fever />
 							
-              <fever /> <!-- (high temp) or (feels hot) or (complain of fever) ?-->
               <age />
 							<fast_breath />
 							
 							<classification>
 							  <cough />
+
+								
+								
 							</classification>
 							<diagnosis>
 							  <cough />
 							</diagnosis>
-							
             </normalized>
           </tmp>
         </imci>
@@ -80,7 +109,7 @@
                                                          (count-selected(../chief_complaint) = 1 and selected(../chief_complaint, 'none'))" />
       <bind nodeset="tmp/sentinel/valid_complaint" relevant="count-selected(/imci/preamble/chief_complaint) > 0 and not(selected(/imci/preamble/chief_complaint, 'none'))" />
 
-      <bind nodeset="tmp/info/serious" relevant="count-selected(/imci/preamble/danger_signs) > 0" />
+      <bind nodeset="preamble/info/serious" relevant="count-selected(/imci/preamble/danger_signs) > 0" />
 
       <bind nodeset="preamble/cough_doublecheck" relevant="not(selected(../chief_complaint, 'cough'))" />
       <bind nodeset="tmp/normalized/has_cough" calculate="selected(/imci/preamble/chief_complaint, 'cough') or /imci/preamble/cough_doublecheck = 'yes'" />
@@ -89,16 +118,16 @@
       <bind nodeset="preamble/ear_doublecheck" relevant="not(selected(../chief_complaint, 'ear'))" />
       <bind nodeset="tmp/normalized/has_ear" calculate="selected(/imci/preamble/chief_complaint, 'ear') or /imci/preamble/ear_doublecheck = 'yes'" />
 
-      <bind nodeset="tmp/info/first_visit_only" relevant="/imci/preamble/visit_type != 'first'" />
+      <bind nodeset="preamble/info/first_visit_only" relevant="/imci/preamble/visit_type != 'first'" />
       <bind nodeset="tmp/sentinel/first_visit" relevant="/imci/preamble/visit_type = 'first'" />
 
       <bind nodeset="preamble/temperature" type="decimal" constraint="true()" relevant="../temp_type = 'therm'" required="true()" />
-      <!-- normalize/fever ? -->
+      <bind nodeset="tmp/normalized/has_fever" calculate="/imci/preamble/chief_complaint = 'fever' or /imci/preamble/temp_type = 'fever' or /imci/preamble/temperature >= 37.4" />
       
       <bind nodeset="preamble/age" type="int" required="true()" /> <!-- todo: add age/unit constraints -->
       <bind nodeset="tmp/normalized/age" calculate="if(/imci/preamble/age_unit = 'years', /imci/preamble/age,
                                                     if(/imci/preamble/age_unit = 'months', /imci/preamble/age div 12, ''))" />
-      <bind nodeset="tmp/info/too_young" relevant="/imci/tmp/normalized/age < 2 div 12" />
+      <bind nodeset="preamble/info/too_young" relevant="/imci/tmp/normalized/age < 2 div 12" />
       <bind nodeset="preamble/too_old_use_anyway" relevant="/imci/tmp/normalized/age >= 6.0" />
       <bind nodeset="tmp/sentinel/age_ok" relevant="/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age < 6.0 or /imci/preamble/too_old_use_anyway = 'yes')" />
                                                     
@@ -129,6 +158,17 @@
 			                                                  /imci/cough/classify/persistent_cold = 'disagree' or
 			                                                  /imci/cough/classify/cold = 'disagree'" />
 			<bind nodeset="tmp/normalized/diagnosis/cough" calculate="if(/imci/cough/classify/override != '', /imci/cough/classify/override, ../../classification/cough)" />
+			
+			<bind nodeset="diarrhea" relevant="/imci/tmp/normalized/has_diarrhea" />
+			
+			
+			
+			<bind nodeset="fever" relevant="/imci/tmp/normalized/has_fever" />
+			
+			<bind nodeset="fever/everyday" relevant="../length = 'long'" />
+			<bind nodeset="fever/measles" relevant="../had_measles = 'yes' or ../measles_symptoms = 'yes'" />
+			<bind nodeset="fever/measles/deep" relevant="../mouth_ulcers = 'yes'" />
+			
 		</model>
   </h:head>
 
@@ -164,7 +204,7 @@
           <item><label>Lethargic/Unconscious</label><value>lethargy</value></item>
         </select>
 
-        <trigger ref="/imci/tmp/info/serious">
+        <trigger ref="/imci/preamble/info/serious">
           <label>ALERT: This child has a serious problem. Complete assement quickly and refer urgently!</label>
         </trigger>
 
@@ -192,7 +232,7 @@
           <item><label>Follow-up visit</label><value>followup</value></item>
         </select1>
       
-        <trigger ref="/imci/tmp/info/first_visit_only">
+        <trigger ref="/imci/preamble/info/first_visit_only">
           <label>SORRY: this system is not yet suitable for follow-up visits. Please use standard procedures.</label>
         </trigger>
         <!-- END -->
@@ -220,7 +260,7 @@
             <item><label>Months</label><value>months</value></item>
           </select1>
                 
-          <trigger ref="/imci/tmp/info/too_young">
+          <trigger ref="/imci/preamble/info/too_young">
             <label>SORRY: this system is not yet suitable for children under two months</label>
           </trigger>
           <!-- END -->
@@ -321,7 +361,123 @@
 					<item><label>Cough with Severe Pneumonia</label><value>severe-pneumonia</value></item>
 				</select1>
 			
+			</group>
 			
+			<group ref="/imci/diarrhea">
+			
+				<select1 ref="/imci/diarrhea/length">
+					<label>ASK: How long has the child had diarrhea?</label>
+					<item><label>Less than two weeks</label><value>under2</value></item>
+					<item><label>Two weeks or more</label><value>over2</value></item>
+				</select1>
+			
+				<select1 ref="/imci/diarrhea/blood">
+					<label>ASK: Is there blood in the stool?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>
+				
+				<trigger ref="/imci/diarrhea/info/offer_fluid">
+					<label>DO: Give the child fluid</label>
+				</trigger>
+				
+				<select1 ref="/imci/diarrhea/how_drinking">
+					<label>LOOK: How is the child drinking?</label>
+					<item><label>Not able to drink or drinking poorly</label><value>unable</value></item>
+					<item><label>Drinking eagerly; is thirsty</label><value>eager</value></item>
+					<item><label>Drinking, but not eagerly</label><value>not_eager</value></item>
+				</select1>
+				
+				<select1 ref="/imci/diarrhea/sunken_eyes">
+					<label>EXAMINE: Does the child have sunken eyes?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>
+
+				<select1 ref="/imci/diarrhea/skin_pinch">
+					<label>LOOK: Pinch the child's skin</label>
+					<item><label>Skin goes back very slowly (more than 2 seconds)</label><value>very_slow</value></item>
+					<item><label>Skin goes back slowly</label><value>slow</value></item>
+					<item><label>Skin goes back immediately</label><value>fast</value></item>
+				</select1>
+				
+				<select1 ref="/imci/diarrhea/fidgety">
+					<label>LOOK: Is the child restless and irritable?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>
+
+
+				
+			
+			</group>
+			
+			<group ref="/imci/fever">
+			
+				<select1 ref="/imci/fever/length">
+					<label>ASK: How long has the child had fever?</label>
+					<item><label>Less than a week</label><value>short</value></item>
+					<item><label>A week or more</label><value>long</value></item>
+				</select1>
+			
+				<select1 ref="/imci/fever/everyday">
+					<label>ASK: Has the fever been present every day?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>			
+			
+				<select1 ref="/imci/fever/had_measles">
+					<label>ASK: Has the child had measles within the last 3 months?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>	
+			
+				<select1 ref="/imci/fever/stiff_neck">
+					<label>LOOK: Does the child have a stiff neck?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>	
+
+				<select1 ref="/imci/fever/runny_nose">
+					<label>EXAMINE: Does the child have a runny nose?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>	
+
+				<select1 ref="/imci/fever/measles_symptoms">
+					<label>EXAMINE: Does the child have signs of measles? (generalized rash and cough, runny nose, or red eyes)</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>	
+
+				<group ref="/imci/fever/measles">
+				
+					<select1 ref="/imci/fever/measles/mouth_ulcers">
+						<label>LOOK: Does the child have mouth ulcers?</label>
+						<item><label>Yes</label><value>yes</value></item>
+						<item><label>No</label><value>no</value></item>
+					</select1>	
+
+					<select1 ref="/imci/fever/measles/deep">
+						<label>LOOK: Are the mouth ulcers deep or extensive?</label>
+						<item><label>Yes</label><value>yes</value></item>
+						<item><label>No</label><value>no</value></item>
+					</select1>					
+					
+					<select1 ref="/imci/fever/measles/eye_pus">
+						<label>ASK: Is pus draining from the eye?</label>
+						<item><label>Yes</label><value>yes</value></item>
+						<item><label>No</label><value>no</value></item>
+					</select1>	
+					
+					<select1 ref="/imci/fever/measles/clouding_cornea">
+						<label>EXAMINE: Does child have clouding of the cornea?</label>
+						<item><label>Yes</label><value>yes</value></item>
+						<item><label>No</label><value>no</value></item>
+					</select1>	
+
+				</group>
+				
 			</group>
 			
     </group>
