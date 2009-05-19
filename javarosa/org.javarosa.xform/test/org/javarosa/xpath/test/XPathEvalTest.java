@@ -112,7 +112,6 @@ public class XPathEvalTest extends TestCase {
 		testEval("/@blah", null, null, new XPathUnsupportedException());
 		testEval("/cant//support", null, null, new XPathUnsupportedException());
 		testEval("/text()", null, null, new XPathUnsupportedException());
-		testEval("/*", null, null, new XPathUnsupportedException());
 		testEval("/namespace:*", null, null, new XPathUnsupportedException());
 		testEval("/blah[5]", null, null, new XPathUnsupportedException());
 		testEval("(filter-expr)[5]", null, null, new XPathUnsupportedException());
