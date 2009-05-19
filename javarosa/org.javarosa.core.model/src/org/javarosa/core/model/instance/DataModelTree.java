@@ -298,7 +298,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 			for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
 				TreeElement child = (TreeElement)e.nextElement();
 				TreeReference newTemplateRef = (children.size() == 1 ? templateRef : templateRef.clone()); //don't clone templateRef unnecessarily
-				newTemplateRef.names.addElement(name);
+				newTemplateRef.names.addElement(child.getName());
 				newTemplateRef.multiplicity.addElement(new Integer(child.getMult()));
 				
 				expandReference(sourceRef, newTemplateRef, child, refs, includeTemplates);

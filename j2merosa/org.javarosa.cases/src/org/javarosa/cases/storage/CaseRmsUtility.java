@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import org.javarosa.cases.model.Case;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.utilities.MetaDataObject;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
 
@@ -180,4 +181,9 @@ public class CaseRmsUtility extends RMSUtility {
 		}
 		return metaDataList;
 	}
+	
+	public MetaDataObject newMetaData (Object o) {
+    	CaseMetaDataObject c = new CaseMetaDataObject((Case)o);
+    	return c;
+    }
 }

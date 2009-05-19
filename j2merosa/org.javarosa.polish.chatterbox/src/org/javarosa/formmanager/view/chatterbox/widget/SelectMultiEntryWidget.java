@@ -22,6 +22,9 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 		Vector vs = (Vector)o;
 		for (int i = 0; i < vs.size(); i++) {
 			Selection s = (Selection)vs.elementAt(i);
+			if(s.index == -1) {
+				s.attachQuestionDef(question);
+			}
 			choiceGroup().setSelectedIndex(s.index, true);			
 		}
 	}

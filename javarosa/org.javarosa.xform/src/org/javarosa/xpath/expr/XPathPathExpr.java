@@ -109,6 +109,9 @@ public class XPathPathExpr extends XPathExpression {
 				if (step.test == XPathStep.TEST_NAME) {
 					ref.add(step.name.toString(), TreeReference.INDEX_UNBOUND);
 					parentsAllowed = false;
+				} else if(step.test == XPathStep.TEST_NAME_WILDCARD) {
+					ref.add(TreeReference.NAME_WILDCARD, TreeReference.INDEX_UNBOUND);
+					parentsAllowed = false;
 				} else {
 					throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
 				}

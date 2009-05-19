@@ -133,11 +133,14 @@ public class TreeElement implements Externalizable {
 	public TreeElement getChild (String name, int multiplicity) {
 		if (children == null) {
 			return null;
-		} else {		
+		} else if(name.equals(TreeReference.NAME_WILDCARD)) {
+			return (TreeElement)children.elementAt(multiplicity);
+		} else {
 			for (int i = 0; i < children.size(); i++) {
 				TreeElement child = (TreeElement)children.elementAt(i);
-				if (name.equals(child.getName()) && child.getMult() == multiplicity)
+				if (name.equals(child.getName()) && child.getMult() == multiplicity) {
 					return child;
+				}
 			}
 			return null;
 		}
@@ -153,7 +156,7 @@ public class TreeElement implements Externalizable {
 		if (children != null) {
 			for (int i = 0; i < children.size(); i++) {
 				TreeElement child = (TreeElement)children.elementAt(i);
-				if (child.getName().equals(name) && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
+				if ((child.getName().equals(name) || name.equals(TreeReference.NAME_WILDCARD)) && (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
 					v.addElement(child);
 			}
 		}

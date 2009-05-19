@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.core.model.utils;
+package org.javarosa.core.services.locale;
 
 /**
  * Localizable objects are able to update their text

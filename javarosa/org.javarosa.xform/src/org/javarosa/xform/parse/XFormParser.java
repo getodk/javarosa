@@ -39,7 +39,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
-import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
