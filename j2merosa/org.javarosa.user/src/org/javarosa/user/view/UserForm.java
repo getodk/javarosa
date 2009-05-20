@@ -7,7 +7,6 @@ import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.api.IView;
 import org.javarosa.user.model.User;
-import org.javarosa.user.model.Constants;
 import org.javarosa.user.utility.IUserDecorator;
 import org.javarosa.user.utility.LoginContext;
 import org.javarosa.user.utility.Terms;
