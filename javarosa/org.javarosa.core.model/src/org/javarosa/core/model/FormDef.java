@@ -265,9 +265,9 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 
 		// build new formIndex which includes everything
 		// up to the node we're going to remove
-		FormIndex deleteIndex = buildIndex(indexes, multiplicities, elements);
+		FormIndex newIndex = buildIndex(indexes, multiplicities, elements);
 
-		TreeReference deleteRef = getChildInstanceRef(deleteIndex);
+		TreeReference deleteRef = getChildInstanceRef(newIndex);
 		TreeElement deleteElement = model.resolveReference(deleteRef);
 		TreeReference parentRef = deleteRef.getParentRef();
 		TreeElement parentElement = model.resolveReference(parentRef);
@@ -285,7 +285,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		}
 
 		evaluateTriggerables(parentRef);
-		return deleteIndex;
+		return newIndex;
 	}
 
 	public void createNewRepeat (FormIndex index) {
