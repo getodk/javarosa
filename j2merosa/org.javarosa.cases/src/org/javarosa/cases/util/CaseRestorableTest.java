@@ -3,14 +3,10 @@
  */
 package org.javarosa.cases.util;
 
-import java.io.IOException;
-
 import org.javarosa.cases.model.Case;
 import org.javarosa.cases.storage.CaseRmsUtility;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
-import org.javarosa.core.services.storage.utilities.RecordStorageException;
-import org.javarosa.core.util.externalizable.DeserializationException;
 
 /**
  * @author Clayton Sims

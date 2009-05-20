@@ -28,9 +28,6 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.ExtWrapList;
-import org.javarosa.core.util.externalizable.ExtWrapTagged;
-import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class Condition extends Triggerable {
