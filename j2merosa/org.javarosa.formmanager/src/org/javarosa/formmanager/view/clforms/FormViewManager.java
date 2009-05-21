@@ -294,7 +294,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				{
 					String txt;
 					//#if javarosa.usepolishlocalisation
-					 txt = Locale.get("message.FormUneditable");
+					 txt = Locale.get("view.sending.FormUneditable");
 					//#else
 					 txt = "You cannot edit your answers when reviewing the form";
 					//#endif
@@ -318,7 +318,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				if (prompt.instanceNode.required && answer == null) {
 					String txt;
 					//#if javarosa.usepolishlocalisation
-					 txt = Locale.get("message.CompulsoryQuestionsIncomplete");
+					 txt = Locale.get("view.sending.CompulsoryQuestionsIncomplete");
 					//#else
 					 txt = "This is a compulsory question and must be completed first to proceed";
 					//#endif

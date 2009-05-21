@@ -43,12 +43,12 @@ public class MultiSubmitStatusScreen extends Form implements ISubmitStatusScreen
     public static final int TIMEOUT = 180000;
 
     //#if javarosa.usepolishlocalisation
-	//# public static final String MSG_N_COMP = Locale.get("message.SuccessfullyTransmitted");
-	//# public static final String MSG_SENDING_N = Locale.get("message.CurrentlySending");
-	//# public static final String MSG_SUCCESS = Locale.get("message.SuccessfullySubmitted");
-	//# public static final String MSG_FAILED = Locale.get("message.SubmissionFailed");
-	//# public static final String MSG_TOO_LONG = Locale.get("message.SubmissionTakingLong");
-	//# public static final String MSG_UNKNOWN_ERROR = Locale.get("message.SubmissionErrorUnknown");
+	//# public static final String MSG_N_COMP = Locale.get("view.sending.SuccessfullyTransmitted");
+	//# public static final String MSG_SENDING_N = Locale.get("view.sending.CurrentlySending");
+	//# public static final String MSG_SUCCESS = Locale.get("view.sending.SuccessfullySubmitted");
+	//# public static final String MSG_FAILED = Locale.get("view.sending.SubmissionFailed");
+	//# public static final String MSG_TOO_LONG = Locale.get("view.sending.SubmissionTakingLong");
+	//# public static final String MSG_UNKNOWN_ERROR = Locale.get("view.sending.SubmissionErrorUnknown");
     //#else
     public static final String MSG_N_COMP = "Succesfully Transmitted Form ";
     public static final String MSG_SENDING_N = "\nCurrently Sending Form ";
