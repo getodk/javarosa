@@ -636,7 +636,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 		setRoot(processSavedDataModel(dm.resolveReference(RestoreUtils.absRef("data", dm)), f.getDataModel(), f));
 	}
 	
-	public TreeElement processSavedDataModel (TreeElement newInstanceRoot, DataModelTree template, FormDef f) {
+	public static TreeElement processSavedDataModel (TreeElement newInstanceRoot, DataModelTree template, FormDef f) {
 		TreeElement newModelRoot = template.getRoot().deepCopy(true);
 		TreeElement incomingRoot = (TreeElement)newInstanceRoot.getChildren().elementAt(0);
 
@@ -652,7 +652,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 	
 	//there's a lot of error checking we could do on the received instance, but it's
 	//easier to just ignore the parts that are incorrect
-	public void populateNode (TreeElement node, TreeElement incoming, TreeReference ref, FormDef f) {
+	public static void populateNode (TreeElement node, TreeElement incoming, TreeReference ref, FormDef f) {
 		if (node.isLeaf()) {
 			//check that incoming doesn't have children?
 			

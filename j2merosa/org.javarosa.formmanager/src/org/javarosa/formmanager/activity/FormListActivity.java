@@ -59,7 +59,6 @@ public class FormListActivity implements IActivity {
 	
 	 
 	private IShell parent = null;
-	private Vector positionToId = null;
 
 	private Context context;
 

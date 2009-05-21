@@ -11,7 +11,6 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.util.Map;
@@ -83,7 +82,7 @@ public class FormList extends List implements CommandListener, IView {
 	}
 
 	private void addScreenCommands() {
-		Context c = this.parent.getContext();
+//		Context c = this.parent.getContext();
 //		//boolean demo = false;
 //		if(c.getElement("USER")!=null){
 //			//User loggedInUser = (User)c.getElement("USER");
