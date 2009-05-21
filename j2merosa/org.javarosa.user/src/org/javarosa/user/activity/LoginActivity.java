@@ -167,7 +167,7 @@ public class LoginActivity implements IActivity, CommandListener,
 	}
 
 	private void showError(String s, String message, CommandListener cl) {
-		// #style mailAlert
+		//#style mailAlert
 		final Alert alert = new Alert(s, message, null, AlertType.ERROR);
 		alert.setTimeout(Alert.FOREVER);
 		if (cl != null)
