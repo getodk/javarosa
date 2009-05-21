@@ -53,7 +53,9 @@
 						<sunken_eyes />
 						<skin_pinch />
 						<fidgety />
-					
+						<classify>
+						
+						</classify>
 						<info>
 							<offer_fluid />
 						</info>
@@ -78,6 +80,33 @@
 							<override />
 						</classify>
 					</fever>
+					<ear>
+						<pain />
+						<discharge />
+						<dischg_length />
+						<pus />
+						<tender_swollen />
+						<classify>
+						  <mastoiditis />
+							<acute />
+							<chronic />
+							<none />
+							<override />
+						</classify>
+					</ear>
+					<interlude>
+						<breastfeeding />
+						<other_feed />
+						<feeding_change />
+					  <other_problems />
+					  <info>
+							<feed_other />
+							<keep_feeding />
+							<treat_problems />
+						</info>
+					</interlude>
+					
+					
 					
           <tmp>
             <sentinel>
@@ -99,17 +128,16 @@
 							<classification>
 							  <cough />
 								<fever />
-								
-								
+								<ear />
 							</classification>
 							<diagnosis>
 							  <cough />
 								<fever />
-								
+								<ear />
 							</diagnosis>
             </normalized>
 						<const>
-							<favor_malaria>1</favor_malaria>
+							<high_malaria_risk>1</high_malaria_risk>
 						</const>
           </tmp>
         </imci>
@@ -150,7 +178,8 @@
                                                          /imci/preamble/visit_type = 'first' and
                                                          (/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age < 6.0 or /imci/preamble/too_old_use_anyway = 'yes')) and
                                                          (not(/imci/preamble/weight) or /imci/preamble/weight < 19 or /imci/preamble/too_heavy_use_anyway = 'yes')" />
-																												 
+																								
+																								
 			<bind nodeset="cough" relevant="/imci/tmp/normalized/has_cough" />
 																												 
 			<bind nodeset="cough/breath_rate" type="int" constraint="true()" relevant="../breath_rate_type = 'measure'" required="true()" />
@@ -171,13 +200,14 @@
 			                                                  ../persistent_cold = 'disagree' or
 			                                                  ../cold = 'disagree'" />
 			<bind nodeset="tmp/normalized/diagnosis/cough" calculate="if(/imci/cough/classify/override != '', /imci/cough/classify/override, ../../classification/cough)" />
+
 			
 			<bind nodeset="diarrhea" relevant="/imci/tmp/normalized/has_diarrhea" />
+
+
 			
 			
-			
-			
-			
+			<!--end diarrhea-->
 			
 			
 			<bind nodeset="fever" relevant="/imci/tmp/normalized/has_fever" />
@@ -190,9 +220,9 @@
 			<bind nodeset="tmp/normalized/classification/fever" calculate="
 			  if(/imci/tmp/normalized/has_fever,
   				if(/imci/fever/stiff_neck = 'yes' or count-selected(/imci/preamble/danger_signs) > 0, 'febrile',
-  				if(/imci/tmp/const/favor_malaria or not(/imci/tmp/normalized/measles_risk or /imci/fever/runny_nose), 'malaria', 'fever-only'))
+  				if(/imci/tmp/const/high_malaria_risk or not(/imci/tmp/normalized/measles_risk) and not(/imci/fever/runny_nose), 'malaria', 'fever-only'))
 				, '')" />
-			<!-- todo: include measles classifications in algorithm? also, 'fever only' is never chosen due to 'favor_malaria' -->
+			<!-- todo: include measles classifications in algorithm? -->
 			<bind nodeset="fever/classify/febrile" relevant="/imci/tmp/normalized/classification/fever = 'febrile'" />
 			<bind nodeset="fever/classify/malaria" relevant="/imci/tmp/normalized/classification/fever = 'malaria'" />
 			<bind nodeset="fever/classify/fever_only" relevant="/imci/tmp/normalized/classification/fever = 'fever-only'" />
@@ -200,6 +230,35 @@
 			                                                  ../malaria = 'disagree' or
 																												../fever_only = 'disagree'" />
 			<bind nodeset="tmp/normalized/diagnosis/fever" calculate="if(/imci/fever/classify/override != '', /imci/fever/classify/override, ../../classification/fever)" />
+			
+			
+			<bind nodeset="ear" relevant="/imci/tmp/normalized/has_ear" />
+			
+			<bind nodeset="ear/dischg_length" relevant="../discharge = 'yes'" />
+			<!-- should 'pus' only be asked if 'discharge' is true? if 'discharge' is false but 'pus' is true, we return 'no serious ear problem' -->
+			
+			<bind nodeset="tmp/normalized/classification/ear" calculate="
+			  if(/imci/tmp/normalized/has_ear,
+				  if(/imci/ear/tender_swollen = 'yes', 'mastoiditis',
+					if(/imci/ear/pus = 'yes' and /imci/ear/dischg_length = 'short' or /imci/ear/pain = 'yes', 'acute',
+          if(/imci/ear/pus = 'yes' and /imci/ear/dischg_length = 'long', 'chronic', 'none')))
+				, '')" />
+			<bind nodeset="ear/classify/mastoiditis" relevant="/imci/tmp/normalized/classification/ear = 'mastoiditis'" />
+			<bind nodeset="ear/classify/acute" relevant="/imci/tmp/normalized/classification/ear = 'acute'" />
+			<bind nodeset="ear/classify/chronic" relevant="/imci/tmp/normalized/classification/ear = 'chronic'" />
+			<bind nodeset="ear/classify/none" relevant="/imci/tmp/normalized/classification/ear = 'none'" />
+			<bind nodeset="ear/classify/override" relevant="../mastoiditis = 'disagree' or
+			                                                ../acute = 'disagree' or
+			                                                ../chronic = 'disagree' or
+																											../none = 'disagree'" />
+			<bind nodeset="tmp/normalized/diagnosis/ear" calculate="if(/imci/ear/classify/override != '', /imci/ear/classify/override, ../../classification/ear)" />
+			
+			<bind nodeset="interlude/breastfeeding" relevant="/imci/tmp/normalized/age <= 2.0" />
+			<bind nodeset="interlude/other_feed" relevant="/imci/tmp/normalized/age <= 2.0" />
+			<bind nodeset="interlude/info/feed_other" relevant="../../other_feed = 'no' and /imci/tmp/normalized/age > 0.5" />
+			<bind nodeset="interlude/info/keep_feeding" relevant="../../feeding_change = 'yes'" />
+			<bind nodeset="interlude/info/treat_problems" relevant="../../other_problems = 'yes'" />
+			
 			
 			
 			
@@ -543,16 +602,112 @@
 
 			</group>
 			
+			<group ref="/imci/ear">
+			
+				<select1 ref="/imci/ear/pain">
+					<label>ASK: Is there ear pain?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>			
+			
+				<select1 ref="/imci/ear/discharge">
+					<label>ASK: Is there ear discharge?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>	
+			
+				<select1 ref="/imci/ear/dischg_length">
+					<label>ASK: How long has there been discharge?</label>
+					<item><label>Less than two weeks</label><value>short</value></item>
+					<item><label>Two weeks or more</label><value>long</value></item>
+				</select1>	
+
+				<select1 ref="/imci/ear/pus">
+					<label>LOOK: Is pus draining from the ear?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>	
+
+				<select1 ref="/imci/ear/tender_swollen">
+					<label>FEEL: Is there tenderness or swelling behind the ear?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>				
+			
+				<select1 ref="/imci/ear/classify/mastoiditis">
+					<label>CLASSIFY: Child should be treated for mastoiditis</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<select1 ref="/imci/ear/classify/acute">
+					<label>CLASSIFY: Child should be treated for an acute ear infection</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<select1 ref="/imci/ear/classify/chronic">
+					<label>CLASSIFY: Child should be treated for chronic ear problems</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<select1 ref="/imci/ear/classify/none">
+					<label>CLASSIFY: Child has no serious ear problem</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>			
+			
+				<select1 ref="/imci/ear/classify/override">
+					<label>PLEASE: You have disagreed; select the correct classification</label>
+					<item><label>Ear Mastoiditis</label><value>mastoiditis</value></item>
+					<item><label>Acute Ear Infection</label><value>acute</value></item>
+					<item><label>Chronic Ear Problems</label><value>chronic</value></item>
+					<item><label>No serious ear problem</label><value>none</value></item>
+				</select1>
+			
+			</group>
+			
+			<select1 ref="/imci/interlude/breastfeeding">
+				<label>ASK: Is the child breastfeeding?</label>
+				<item><label>Yes</label><value>yes</value></item>
+				<item><label>No</label><value>no</value></item>
+			</select1>	
+
+			<select1 ref="/imci/interlude/other_feed">
+				<label>ASK: Does the child take other food/fluids?</label>
+				<item><label>Yes</label><value>yes</value></item>
+				<item><label>No</label><value>no</value></item>
+			</select1>	
+
+			<trigger ref="/imci/interlude/info/feed_other">
+			  <label>ADVISE: Add other foods/fluids to the child's diet</label>
+			</trigger>
+			
+			<select1 ref="/imci/interlude/feeding_change">
+				<label>ASK: Did feeding for the child change during illness?</label>
+				<item><label>Yes</label><value>yes</value></item>
+				<item><label>No</label><value>no</value></item>
+			</select1>	
+
+			<trigger ref="/imci/interlude/info/keep_feeding">
+			  <label>ADVISE: Ensure that the child continues to feed during illness</label>
+			</trigger>
+
+			<select1 ref="/imci/interlude/other_problems">
+				<label>ASK: Does the child have any other problems?</label>
+				<item><label>Yes</label><value>yes</value></item>
+				<item><label>No</label><value>no</value></item>
+			</select1>	
+
+			<trigger ref="/imci/interlude/info/treat_problems">
+			  <label>DO: Treat the child's other problems</label>
+			</trigger>
+			
+			
+			
+			
     </group>
 
   </h:body>
 </h:html>
-
-
-<!--
-    <select ref="">
-      <label></label>
-      <item><label></label><value></value></item>
-    </select>
--->
-
