@@ -48,7 +48,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
     //#if javarosa.usepolishlocalisation
-    //# private static final String PROMPT_REQUIRED_QUESTION = Locale.get("message.RequiredQuestion");
+    //# private static final String PROMPT_REQUIRED_QUESTION = Locale.get("view.sending.RequiredQuestion");
     //#else
     private static final String PROMPT_REQUIRED_QUESTION = "Required question; You must answer";
     //#endif
