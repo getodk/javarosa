@@ -4,6 +4,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
@@ -31,12 +32,13 @@ public class MessageWidget implements IWidgetStyleEditable {
 		c.add(ok);
 	}
 
-	public void refreshWidget (IFormElement element, IAnswerData data, int changeFlags) {
-		if(!(element instanceof QuestionDef)) {
+	public void refreshWidget (FormElementBinding bind, int changeFlags) {
+		if(!(bind.element instanceof QuestionDef)) {
 			throw new IllegalArgumentException("element passed to refreshWidget that is not a QuestionDef");
 		}
-		QuestionDef question = (QuestionDef)element;
-		prompt.setText(question.getLongText());
+		
+		String caption = bind.form.fillTemplateString(((QuestionDef)bind.element).getLongText(), bind.instanceRef);
+		prompt.setText(caption);
 	}
 
 	public IAnswerData getData () {

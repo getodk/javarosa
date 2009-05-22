@@ -21,11 +21,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.data.IAnswerData;
@@ -62,7 +65,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	private Localizer localizer;
 	public Vector triggerables; //<Triggerable>
 	private DataModelTree model;
-
+	public Vector outputFragments; //<IConditionExpr> contents of <output> tags that serve as parameterized arguments to captions
+	
 	private Hashtable triggerIndex; // <TreeReference, Vector<Triggerable>>
 	private Hashtable conditionRepeatTargetIndex; //<TreeReference, Condition>; associates repeatable nodes with the Condition that determines their relevancy
 	private EvaluationContext exprEvalContext;
@@ -74,7 +78,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		triggerables = new Vector();
 		triggerIndex = new Hashtable();
 		conditionRepeatTargetIndex = new Hashtable();
-		exprEvalContext = new EvaluationContext();
+		setEvaluationContext(new EvaluationContext());
+		outputFragments = new Vector();
 	}
 	
 	public Vector getChildren() {
@@ -445,7 +450,76 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	 * @param ec The new Evaluation Context
 	 */
 	public void setEvaluationContext (EvaluationContext ec) {
+		initEvalContext(ec);
 		this.exprEvalContext = ec;
+	}
+	
+	private void initEvalContext (EvaluationContext ec) {
+		if (!ec.getFunctionHandlers().containsKey("jr:itext")) {
+			final FormDef f = this;
+			ec.addFunctionHandler(new IFunctionHandler () {
+				public String getName() { return "jr:itext"; }
+
+				public Object eval(Object[] args) {
+					String textID = (String)args[0];
+					try {
+						String text = f.getLocalizer().getText(textID);
+						return text == null ? "[itext:" + textID + "]" : text;
+					} catch (NoSuchElementException nsee) {
+						return "[nolocale]";
+					}
+				}
+
+				public Vector getPrototypes() {
+					Class[] proto = {String.class};
+					Vector v = new Vector();
+					v.addElement(proto);
+					return v;
+				}
+
+				public boolean rawArgs() { return false; }
+				public boolean realTime() { return false; }
+			});
+		}
+	}
+	
+	public static final int TEMPLATING_RECURSION_LIMIT = 10;
+	
+	public String fillTemplateString (String template, TreeReference contextRef) {
+		Hashtable args = new Hashtable();
+		
+		int depth = 0;
+		Vector outstandingArgs = Localizer.getArgs(template);
+		while (outstandingArgs.size() > 0) {
+			for (int i = 0; i < outstandingArgs.size(); i++) {
+				String argName = (String)outstandingArgs.elementAt(i);
+				if (!args.containsKey(argName)) {
+					int ix = -1;
+					try {
+						ix = Integer.parseInt(argName);
+					} catch (NumberFormatException nfe) {
+						System.err.println("Warning: expect arguments to be numeric [" + argName + "]");
+					}
+					
+					if (ix < 0 || ix >= outputFragments.size())
+						continue;
+				
+					IConditionExpr expr = (IConditionExpr)outputFragments.elementAt(ix);
+					String value = expr.evalReadable(this.getDataModel(), new EvaluationContext(exprEvalContext, contextRef));
+					args.put(argName, value);
+				}
+			}
+			
+			template = Localizer.processArguments(template, args);
+			outstandingArgs = Localizer.getArgs(template);
+			
+			depth++;
+			if (depth >= TEMPLATING_RECURSION_LIMIT) {
+				throw new RuntimeException("Dependency cycle in <output>s; recursion limit exceeded!!");
+			}
+		}
+	
+		return template;
 	}
 	
 	/**
@@ -584,6 +658,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		Vector vcalc = (Vector)ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
 		for (Enumeration e = vcalc.elements(); e.hasMoreElements(); )
 			addTriggerable((Recalculate)e.nextElement());		
+		
+		outputFragments = (Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 	}
 
 	/**
@@ -678,6 +754,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		}
 		ExtUtil.write(dos, new ExtWrapList(conditions));
 		ExtUtil.write(dos, new ExtWrapList(recalcs));
+		
+		ExtUtil.write(dos, new ExtWrapListPoly(outputFragments));
 	}
 
 	public void collapseIndex (FormIndex index, Vector indexes, Vector multiplicities, Vector elements) {

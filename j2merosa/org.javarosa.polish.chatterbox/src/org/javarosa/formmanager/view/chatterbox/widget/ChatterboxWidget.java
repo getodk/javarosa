@@ -90,7 +90,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 			activeStyle = getActiveStyle();
 			
 			activeStyle.initWidget(binding.element, this);
-			activeStyle.refreshWidget(binding.element, binding.getValue(), FormElementStateListener.CHANGE_INIT);
+			activeStyle.refreshWidget(binding, FormElementStateListener.CHANGE_INIT);
 			if (viewState == VIEW_EXPANDED) {
 				attachWidget();
 			} if(viewState == VIEW_COLLAPSED) {
@@ -138,7 +138,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 
 	//call-back from QuestionBinding
 	public void refreshWidget (int changeFlags) {
-		activeStyle.refreshWidget(binding.element, binding.getValue(), changeFlags);		
+		activeStyle.refreshWidget(binding, changeFlags);		
 	}
 		
 	private void attachWidget () {

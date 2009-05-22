@@ -60,6 +60,10 @@ public class XPathConditional implements IConditionExpr {
 		return XPathFuncExpr.toBoolean(evalRaw(model, evalContext)).booleanValue();
 	}
 	
+	public String evalReadable (IFormDataModel model, EvaluationContext evalContext) {
+		return XPathFuncExpr.toString(evalRaw(model, evalContext));
+	}
+	
 	public Vector getTriggers () {
 		Vector triggers = new Vector();
 		getTriggers(expr, triggers);

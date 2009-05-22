@@ -4,6 +4,7 @@ import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
@@ -37,15 +38,18 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		c.add(entryWidget);
 	}
 
-	public void refreshWidget (IFormElement element, IAnswerData data, int changeFlags) {
-		if(!(element instanceof QuestionDef)) {
+	public void refreshWidget (FormElementBinding bind, int changeFlags) {
+		if(!(bind.element instanceof QuestionDef)) {
 			throw new IllegalArgumentException("element passed to refreshWidget that is not a QuestionDef");
 		}
-		QuestionDef question = (QuestionDef)element;
-		prompt.setText(question.getLongText());
+		
+		QuestionDef question = (QuestionDef)bind.element;
+		String caption = bind.form.fillTemplateString(question.getLongText(), bind.instanceRef);
+		prompt.setText(caption);
 		updateWidget(question);
 		
 		//don't wipe out user-entered data, even on data-changed event
+		IAnswerData data = bind.getValue();
 		if (data != null && changeFlags == FormElementStateListener.CHANGE_INIT) {
 			setWidgetValue(data.getValue());
 		}

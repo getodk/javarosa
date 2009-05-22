@@ -4,7 +4,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.StringItem;
@@ -34,24 +34,22 @@ public class LabelWidget implements IWidgetStyle {
 		c.add(label);
 	}
 
-	public void refreshWidget(IFormElement element, IAnswerData data,
-			int changeFlags) {
+	public void refreshWidget(FormElementBinding bind, int changeFlags) {
 		
 		// Clayton Sims - Feb 6, 2009 : Labels are now applicable for questions, so that we can pin 
 		// question texts for long questions.
-		if(element instanceof GroupDef) {
-			GroupDef group = (GroupDef)element;
-			String text  = group.getLongText();
-			if(multiplicity != -1) {
-				text = text + ": " + multiplicity;
+		if(bind.element instanceof GroupDef) {
+			String caption = bind.form.fillTemplateString(((GroupDef)bind.element).getLongText(), bind.instanceRef);
+			if (multiplicity != -1) {
+				caption += ": " + multiplicity;
 			}
-			label.setText(text);
-		} else if(element instanceof QuestionDef) {
-			QuestionDef question = (QuestionDef)element;
-			label.setText(question.getLongText());
+			label.setText(caption);
+		} else if(bind.element instanceof QuestionDef) {
+			String caption = bind.form.fillTemplateString(((QuestionDef)bind.element).getLongText(), bind.instanceRef);
+			label.setText(caption);
 		}
 		else{
-			throw new IllegalStateException("Invalid type for a label's element. Type is: " + element.getClass().getName() );
+			throw new IllegalStateException("Invalid type for a label's element. Type is: " + bind.element.getClass().getName() );
 		}
 		
 

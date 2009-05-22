@@ -441,7 +441,7 @@ public class XFormParser {
 	}
 
 	private static void parseQuestionLabel (FormDef f, QuestionDef q, Element e) {
-		String label = getXMLText(e, true);
+		String label = getLabel(e, f);
 		String ref = e.getAttributeValue("", "ref");
 
 		if (ref != null) {
@@ -464,7 +464,7 @@ public class XFormParser {
 		if (g.getRepeat())
 			return; //ignore child <label>s for <repeat>; the appropriate <label> must be in the wrapping <group>
 		
-		String label = getXMLText(e, true);
+		String label = getLabel(e, f);
 		String ref = e.getAttributeValue("", "ref");
 
 		if (ref != null) {
@@ -482,7 +482,73 @@ public class XFormParser {
 			g.setShortText(label);
 		}
 	}
+	
+	private static String getLabel (Element e, FormDef f) {
+		boolean outputFound = false;
+		boolean otherStuffFound = false;
+		Vector outputs = new Vector();
+		for (int i = 0; i < e.getChildCount(); i++) {
+			if (e.getType(i) != Node.TEXT) {
+				if (e.getType(i) == Node.ELEMENT && "output".equals(e.getElement(i).getName())) {
+					outputFound = true;
+					outputs.addElement(new Integer(i));
+				} else {
+					otherStuffFound = true;
+				}
+			}
+		}
+		
+		if (outputFound && !otherStuffFound) {
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < outputs.size() + 1; i++) {
+				int ixStart = (i == 0 ? 0 : ((Integer)outputs.elementAt(i - 1)).intValue() + 1);
+				if (ixStart < e.getChildCount()) {
+					String piece = getXMLText(e, ixStart, false);
+					if (piece != null) {
+						sb.append(piece);
+					}
+				}
+				
+				if (i < outputs.size()) {
+					int ix = ((Integer)outputs.elementAt(i)).intValue();
+					sb.append("${" + parseOutput(e.getElement(ix), f) + "}");
+				}
+			}
+			return sb.toString().trim();
+		} else {
+			return getXMLText(e, true);
+		}
+	}	
+	
+	private static String parseOutput (Element e, FormDef f) {
+		String xpath = e.getAttributeValue(null, "ref");
+		if (xpath == null) {
+			xpath = e.getAttributeValue(null, "value");
+		}
+		if (xpath == null) {
+			throw new XFormParseException("XForm Parse: <output> without 'ref' or 'value'");	
+		}
+		
+		XPathConditional expr = null;
+		try {
+			expr = new XPathConditional(xpath);
+		} catch (XPathSyntaxException xse) {
+			//#if debug.output==verbose
+			System.err.println("Invalid XPath expression [" + xpath + "]!");
+			return "";
+			//#endif
+		}
 
+		int index = -1;
+		if (f.outputFragments.contains(expr)) {
+			index = f.outputFragments.indexOf(expr);
+		} else {
+			index = f.outputFragments.size();
+			f.outputFragments.addElement(expr);
+		}
+		return String.valueOf(index);
+	}
+	
 	private static void parseHint (FormDef f, QuestionDef q, Element e) {
 		String hint = getXMLText(e, true);
 		String ref = e.getAttributeValue("", "ref");
@@ -703,7 +769,7 @@ public class XFormParser {
 			if (trans == null || !trans.getName().equals("translation"))
 				continue;
 
-			parseTranslation(l, trans);
+			parseTranslation(l, trans, f);
 		}
 
 		if (l.getAvailableLocales().length == 0)
@@ -713,7 +779,7 @@ public class XFormParser {
 			l.setDefaultLocale(l.getAvailableLocales()[0]);
 	}
 
-	private static void parseTranslation (Localizer l, Element trans) {
+	private static void parseTranslation (Localizer l, Element trans, FormDef f) {
 		String lang = trans.getAttributeValue("", "lang");
 		if (lang == null || lang.length() == 0)
 			throw new XFormParseException("no language specified for <translation>");
@@ -733,12 +799,12 @@ public class XFormParser {
 			if (text == null || !text.getName().equals("text"))
 				continue;
 
-			parseTextHandle(l, lang, text);
+			parseTextHandle(l, lang, text, f);
 		}
 
 	}
 
-	private static void parseTextHandle (Localizer l, String locale, Element text) {
+	private static void parseTextHandle (Localizer l, String locale, Element text, FormDef f) {
 		String id = text.getAttributeValue("", "id");
 		if (id == null || id.length() == 0)
 			throw new XFormParseException("no id defined for <text>");
@@ -751,7 +817,7 @@ public class XFormParser {
 			String form = value.getAttributeValue("", "form");
 			if (form != null && form.length() == 0)
 				form = null;
-			String data = getXMLText(value, 0, true);
+			String data = getLabel(value, f);
 			if (data == null)
 				data = "";
 

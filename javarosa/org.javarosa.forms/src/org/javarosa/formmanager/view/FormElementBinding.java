@@ -32,6 +32,8 @@ public class FormElementBinding implements FormElementStateListener {
 	public TreeReference instanceRef;
 	public TreeElement instanceNode;
 	
+	public FormDef form;
+	
 	private FormElementBinding() {
 		
 	}
@@ -45,7 +47,8 @@ public class FormElementBinding implements FormElementStateListener {
 		this.element = q;
 		this.instanceRef = form.getChildInstanceRef(index);
         this.instanceNode = form.getDataModel().resolveReference(instanceRef);
-		
+        this.form = form;
+        
        	register();
 	}
 	
@@ -90,6 +93,7 @@ public class FormElementBinding implements FormElementStateListener {
 		clone.element = element;
 		clone.instanceNode = instanceNode;
 		clone.instanceRef = instanceRef;
+		clone.form = form;
 		return clone;
 	}
 }
