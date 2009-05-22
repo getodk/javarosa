@@ -21,6 +21,7 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
+import java.util.Hashtable;
 import java.util.NoSuchElementException;
 
 import org.javarosa.core.services.locale.Localizable;
@@ -57,7 +58,7 @@ public class LocalizerTest extends TestCase  {
 		return aSuite;
 	}
 
-	public final int NUM_TESTS = 30;
+	public final int NUM_TESTS = 32;
 	public void testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
@@ -92,6 +93,9 @@ public class LocalizerTest extends TestCase  {
 		case 28: testLocalizationObserverUpdateOnRegister(); break;
 		case 29: testNullArgs(); break;
 		case 30: testSerialization(); break;
+		case 31: testLinearSub(); break;
+		case 32: testHashSub(); break;
+		
 		}
 	}
 	
@@ -769,7 +773,7 @@ public class LocalizerTest extends TestCase  {
 		}	
 		
 		try {
-			l.getText("textID", null);
+			l.getText("textID", (String)null);
 			
 			fail("getText: Did not get expected exception");
 		} catch (NoSuchElementException nsee) {
@@ -832,5 +836,30 @@ public class LocalizerTest extends TestCase  {
 		
 		l.destroyLocale("locale2");
 		testSerialize(l, "locales with data 6");
+	}
+	
+	public void testLinearSub() {
+		final String F = "first";
+		final String S = "second";
+		assertEquals(Localizer.processArguments("${0}", new String[] {F}), F);
+		assertEquals(Localizer.processArguments("${0},${1}", new String[] {F,S}), F + "," + S);
+		assertEquals(Localizer.processArguments("testing ${0}", new String[] {F}), "testing " + F);
+		
+		assertEquals(Localizer.processArguments("1${arbitrary}2", new String[] {F}), "1" + F + "2");
+	}
+	
+	public void testHashSub() {
+		final String F = "first";
+		final String S = "second";
+		Hashtable h = new Hashtable();
+		h.put("fir", F);
+		h.put("also first", F);
+		h.put("sec", S);
+		
+		assertEquals(Localizer.processArguments("${fir}",h), F);
+		assertEquals(Localizer.processArguments("${fir},${sec}",h), F+","+S);
+		assertEquals(Localizer.processArguments("${sec},${fir}",h), S+","+F);
+		assertEquals(Localizer.processArguments("${empty}",h), "${empty}");
+		assertEquals(Localizer.processArguments("${fir},${fir},${also first}",h), F+","+F+","+F);
 	}
 }
