@@ -584,15 +584,43 @@ public class Localizer implements Externalizable {
 		return "${" + in + "}";
 	}
 	
-	public static String processArguments(String text, Hashtable args) {
-		for(Enumeration en = args.keys(); en.hasMoreElements(); ) {
-			String key = (String)en.nextElement();
-			int start = text.indexOf(arg(key));
-			while(start != -1) {
-				String val = (String)args.get(key);
-				text = text.substring(0, start) + val + text.substring(start + arg(key).length());
-				start = text.indexOf(arg(key));
+	public static Vector getArgs (String text) {
+		Vector args = new Vector();
+		int i = text.indexOf("${");
+		while (i != -1) {
+			int j = text.indexOf("}", i);
+			if (j == -1) {
+				System.err.println("Warning: unterminated ${...} arg");
+				break;
 			}
+			
+			String arg = text.substring(i + 2, j);
+			if (!args.contains(arg)) {
+				args.addElement(arg);
+			}
+			
+			i = text.indexOf("${", j + 1);
+		}
+		return args;
+	}
+	
+	public static String processArguments(String text, Hashtable args) {
+		int i = text.indexOf("${");
+		while (i != -1) {
+			int j = text.indexOf("}", i);
+			if (j == -1) {
+				System.err.println("Warning: unterminated ${...} arg");
+				break;
+			}
+
+			String argName = text.substring(i + 2, j);
+			String argVal = (String)args.get(argName);
+			if (argVal != null) {
+				text = text.substring(0, i) + argVal + text.substring(j + 1);
+				j = i + argVal.length() - 1;
+			}
+			
+			i = text.indexOf("${", j + 1);
 		}
 		return text;
 	}
