@@ -44,7 +44,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class TreeElement implements Externalizable {
 	private String name; // can be null only for hidden root node
-	public int multiplicity;
+	public int multiplicity;//TODO comment and make private
 	private Vector attributes;
 
 	public boolean repeatable;
@@ -56,8 +56,8 @@ public class TreeElement implements Externalizable {
 
 	/* model properties */
 	public int dataType = Constants.DATATYPE_NULL;
-	private boolean relevant = true;
-	public boolean required = false;
+	public boolean relevant = true;
+	public boolean required = false;//TODO
 	private boolean enabled = true;
 	private Constraint constraint = null;
 	private String preloadHandler = null;
@@ -82,7 +82,7 @@ public class TreeElement implements Externalizable {
 	}
 
 	public boolean isLeaf() {
-		return (children == null);
+		return (children.size()==0);
 	}
 
 	public boolean isChildable() {
@@ -146,8 +146,8 @@ public class TreeElement implements Externalizable {
 	public Vector getChild(String name, boolean includeTemplate) {
 		Vector v = new Vector();
 
-		for (int i = 0; i < children.size(); i++) {
-			TreeElement child = (TreeElement) children.elementAt(i);
+		for (int i = 0; i < this.children.size(); i++) {
+			TreeElement child = (TreeElement) this.children.elementAt(i);
 			if ((child.getName().equals(name) || name
 					.equals(TreeReference.NAME_WILDCARD))
 					&& (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
