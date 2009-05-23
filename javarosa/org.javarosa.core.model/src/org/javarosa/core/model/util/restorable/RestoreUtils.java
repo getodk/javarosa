@@ -273,7 +273,7 @@ public class RestoreUtils {
 		
 		String childName = ((Restorable)PrototypeFactory.getInstance(type)).getRestorableType();
 		TreeElement e = dm.resolveReference(absRef(path, dm));
-		Vector children = e.getChild(childName);
+		Vector children = e.getChildrenWithName(childName);
 		
 		if (idMatters) {
 			//should we check if RMS is empty? this presents problems for users, where the admin user is already defined
