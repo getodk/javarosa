@@ -499,7 +499,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 	    	if (status == FormEntryController.QUESTION_REQUIRED_BUT_EMPTY) {
 	    		showError(null, PROMPT_REQUIRED_QUESTION);
 	    	} else if (status == FormEntryController.QUESTION_CONSTRAINT_VIOLATED) {
-	    		String msg = frame.getBinding().instanceNode.constraint.constraintMsg; //yikes
+	    		String msg = frame.getBinding().instanceNode.getConstraint().constraintMsg; //yikes
 	    		showError(null, msg != null ? msg : PROMPT_DEFAULT_CONSTRAINT_VIOL);
 	     	}
     	}

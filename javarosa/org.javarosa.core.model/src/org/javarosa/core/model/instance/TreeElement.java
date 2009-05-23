@@ -43,9 +43,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 
 public class TreeElement implements Externalizable {
-	protected String name; //can be null only for hidden root node
-	protected int multiplicity;
-    protected Vector attributes;
+	private String name; //can be null only for hidden root node
+	public int multiplicity;
+	private Vector attributes;
     
     public boolean repeatable;
   //  public boolean isAttribute;  for when we support xml attributes as data nodes
@@ -54,20 +54,28 @@ public class TreeElement implements Externalizable {
     private Vector children;
 
     /* model properties */
-	public int dataType = Constants.DATATYPE_NULL;
-	public boolean relevant = true;  //do not read this directly unless you know what you're doing!! use isRelevant() if not
+    public int dataType = Constants.DATATYPE_NULL;
+	private boolean relevant = true;  
 	public boolean required = false;
-	public boolean enabled = true;   //do not read this directly unless you know what you're doing!! use isEnabled() if not
-	public Constraint constraint = null;
+	private boolean enabled = true;    
+	private Constraint constraint = null;
 	public String preloadHandler = null;
 	public String preloadParams = null;
    
-	public boolean relevantInherited = true;
-	public boolean enabledInherited = true;
+	private boolean relevantInherited = true;
+	private boolean enabledInherited = true;
 	
-	Vector observers;
+	private Vector observers;
 	
-    public TreeElement () {
+    public Constraint getConstraint() {
+		return constraint;
+	}
+
+	public void setConstraint(Constraint constraint) {
+		this.constraint = constraint;
+	}
+
+	public TreeElement () {
     	this(null, 0);
     }
 
@@ -78,11 +86,6 @@ public class TreeElement implements Externalizable {
 	public TreeElement (String name, int multiplicity) {
 		this.name = name;
 		this.multiplicity = multiplicity;
-		
-		attributes = null;
-		repeatable = false;
-		value = null;
-		children = null;
 	}
 	
 	public boolean isLeaf () {

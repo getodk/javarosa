@@ -435,7 +435,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 			return true;
 		
 		TreeElement node = model.resolveReference(ref);
-		Constraint c = node.constraint;
+		Constraint c = node.getConstraint();
 		if (c == null)
 			return true;
 		

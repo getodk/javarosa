@@ -1464,7 +1464,7 @@ public class XFormParser {
 			node.setEnabled(!bind.readonlyAbsolute);
 		}
 		if (bind.constraint != null) {
-			node.constraint = new Constraint(bind.constraint, bind.constraintMessage);
+			node.setConstraint( new Constraint(bind.constraint, bind.constraintMessage));
 		}
 			
 		node.preloadHandler = bind.getPreload();
