@@ -1468,7 +1468,7 @@ public class XFormParser {
 		}
 			
 		node.setPreloadHandler( bind.getPreload());
-		node.preloadParams = bind.getPreloadParams();
+		node.setPreloadParams(bind.getPreloadParams());
 	}
 	
 	//apply properties to instance nodes that are determined by controls bound to those nodes

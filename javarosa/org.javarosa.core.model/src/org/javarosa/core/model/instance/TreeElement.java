@@ -61,7 +61,7 @@ public class TreeElement implements Externalizable {
 	private boolean enabled = true;
 	private Constraint constraint = null;
 	private String preloadHandler = null;
-	public String preloadParams = null;
+	private String preloadParams = null;
 
 	private boolean relevantInherited = true;
 	private boolean enabledInherited = true;
@@ -717,4 +717,16 @@ public class TreeElement implements Externalizable {
 	public void setConstraint(Constraint constraint) {
 		this.constraint = constraint;
 	}
+
+	public String getPreloadParams() {
+		return preloadParams;
+	}
+
+	public void setPreloadParams(String preloadParams) {
+		this.preloadParams = preloadParams;
+	}
+	
+	
+	
+	
 }
