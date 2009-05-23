@@ -159,4 +159,62 @@ activity.edituser.edituser=Edit User
 
 Pregnancy=Ujauzito
 NewBirth=Uzazi mpya
+
+
+Back				= Rudi Nyuma
+Camera		      = Camera
+CurrentlySending 	      = Sasa 
+DebugLog			= Debug Log
+Delete			= Futa
+DeleteMessage		= DeleteMessage
+FormNotLoaded		= Fomu haijafunguka
+EndOfSendingMessage	= EndofSendingMessage
+Exit				= Toka
+GetNewForms			= Pata fomu mpya
+ImageManagement		= Image Management
+Ok				= Sawa
+Of				= ya
+LogMessages			= Log Messages
+MessageDetails		= Message Details
+Messages			= Messages
+Recorder			= Recorder
+SendMessage			= Send Message
+SendDataNow			= Tuma taarifa sasa
+SendingInProgress 	= Utumaji unaendelea
+SendLater			= Tuma baadae
+SendNow			= Tuma sasa
+SendStatus			= Matokeo ya Utumaji
+SendToNewServer		= Send to New Server
+SendUnsent			= Tuma taarifa ambazo hazijaenda
+Settings			= Mpangilio
+ShowDetails			= Show Details
+SuccessfullyTransmitted	= Taarifa imetumwa
+SuccessfullySubmitted	= Taarifa imewasilishwa
+SubmissionErrorUnknown	= Tatizo lisilojulikana katika uwasilishaji
+SubmissionTakingLong	= Utumaji unachukua muda mrefu mno
+SubmitForm			= Tuma  Fomu
+TransportMenu		= Transport Menu
+
+
+SubmissionFailed       =  Utumaji  haukufanikiwa
+PendingReferral     =  Rufaa  ambazo  hazijakamilika
+RecentFollowups    =  Ufuatiliaji wa Karibuni
+ChooseMgonjwa     =  Chagua  Mgonjwa
+Find                    =  Tafuta
+ReferralFor            =  Rufaa  kwa  ajili ya 
+Resolve                 =  Kamilisha
+Loading                 =  Inafunguka
+Sending                 =  Inatumwa
+Language                =  Lugha
+Save                    =  Tunza  
+SaveandExit          =  Tunza na  Toka
+Mark                    =  Chagua
+Unmark                  =  Usichague
+Clear                   =  Futa
+Next                    =  Mbele
+Review                  =  Pitia  tena 
+Update                  =  Badilisha         
+Sort                    =  Panga
+SortBy                 =  Panga kwa
+Cancel                  =  Kataa
  

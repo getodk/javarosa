@@ -170,3 +170,51 @@ activity.edituser.edituser=Edit User
 
 Pregnancy=Pregnancy
 NewBirth=New Birth
+
+
+PendingReferrals	= PendingReferrals
+Today				= Today
+Yesterday			= Yesterday
+NoPendingReferrals	= No Pending Referrals
+Select				= Select
+Resolve				= Resolve
+ReferralFor			= Referral For 
+Back				= Back
+Camera				= Camera
+CurrentlySending 	= Currently Sending
+DebugLog			= Debug Log
+Delete				= Delete
+DeleteMessage		= DeleteMessage
+FormNotLoaded		= Form Not Loaded
+EndOfSendingMessage	= 
+Exit				= Exit
+GetNewForms			= Get New Forms
+ImageManagement		= Image Management
+Ok					= OK
+Of					= of
+LogMessages			= Log Messages
+MessageDetails		= Message Details
+Messages			= Messages
+NoFormsToSend		= No Forms to Send
+Recorder			= Recorder
+SendMessage			= Send Message
+SendDataNow			= Send Data Now
+SendingInProgress 	= Sending in Progress
+SendLater			= Send Later
+SendNow				= Send Now
+SendStatus			= Send Status
+SendToNewServer		= Send to New Server
+SendUnsent			= Send Unsent
+Settings			= Settings
+ShowDetails			= Show Details
+SuccessfullyTransmitted		= Successfully Transmitted
+SuccessfullySubmitted		= Successfully Submitted
+SubmissionErrorUnknown		= Submission Error Uknown
+SubmissionFailed			= Submission Failed
+SubmissionTakingLong		= Submission Taking too Long
+SubmitForm			= Submit Form
+TransportMenu		= Transport Menu
+ViewSaved=View Saved
+
+
+
