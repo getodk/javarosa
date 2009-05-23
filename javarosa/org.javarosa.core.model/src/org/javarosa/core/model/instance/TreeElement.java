@@ -44,20 +44,27 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class TreeElement implements Externalizable {
 	private String name; // can be null only for hidden root node
-	public int multiplicity;//TODO comment and make private
-	private Vector attributes;
+	/**
+	 * multiplicity: can apparently take values: INDEX_UNBOUND, INDEX_TEMPLATE
+	 * (@see TreeReference)
+	 */
+	public int multiplicity;// TODO comment and make private
+	private Vector attributes = new Vector();
 
 	public boolean repeatable;
 	// public boolean isAttribute; for when we support xml attributes as data
 	// nodes
 
+	/**
+	 * value: without which the element can't have children?
+	 */
 	private IAnswerData value;
 	private Vector children = new Vector();
 
 	/* model properties */
 	public int dataType = Constants.DATATYPE_NULL;
-	public boolean relevant = true;//TODO: ask mvp project to use accessor
-	public boolean required = false;//TODO
+	public boolean relevant = true;// TODO: ask mvp project to use accessor
+	public boolean required = false;// TODO
 	private boolean enabled = true;
 	private Constraint constraint = null;
 	private String preloadHandler = null;
@@ -68,6 +75,9 @@ public class TreeElement implements Externalizable {
 
 	private Vector observers;
 
+	/**
+	 * TreeElement with null name and 0 multiplicity? (a "hidden root" node?)
+	 */
 	public TreeElement() {
 		this(null, 0);
 	}
@@ -82,9 +92,15 @@ public class TreeElement implements Externalizable {
 	}
 
 	public boolean isLeaf() {
-		return (children.size()==0);
+		return (children.size() == 0);
 	}
 
+	/**
+	 * 
+	 * cannot have children if it doesn't have a value?
+	 * 
+	 * @return
+	 */
 	public boolean isChildable() {
 		return (value == null);
 	}
@@ -97,7 +113,6 @@ public class TreeElement implements Externalizable {
 					"Can't set data value for node that has children!");
 		}
 	}
-
 
 	public TreeElement getChild(String name, int multiplicity) {
 		if (name.equals(TreeReference.NAME_WILDCARD)) {
@@ -115,7 +130,6 @@ public class TreeElement implements Externalizable {
 		return null;
 	}
 
- 
 	/**
 	 * 
 	 * Get all the child nodes of this element, with specific name
@@ -127,7 +141,6 @@ public class TreeElement implements Externalizable {
 		return getChildrenWithName(name, false);
 	}
 
-	 
 	private Vector getChildrenWithName(String name, boolean includeTemplate) {
 		Vector v = new Vector();
 
@@ -188,7 +201,7 @@ public class TreeElement implements Externalizable {
 
 	public void removeChild(TreeElement child) {
 		children.removeElement(child);
-	
+
 	}
 
 	public void removeChild(String name, int multiplicity) {
@@ -310,9 +323,10 @@ public class TreeElement implements Externalizable {
 		setEnabled(enabled, false);
 	}
 
-	public int getNumChildren(){
+	public int getNumChildren() {
 		return this.children.size();
 	}
+
 	public void setEnabled(boolean enabled, boolean inherited) {
 		boolean oldEnabled = isEnabled();
 		if (inherited) {
@@ -388,7 +402,7 @@ public class TreeElement implements Externalizable {
 	 * Returns the number of attributes of this element.
 	 */
 	public int getAttributeCount() {
-		return attributes == null ? 0 : attributes.size();
+		return attributes.size();
 	}
 
 	/**
@@ -444,8 +458,6 @@ public class TreeElement implements Externalizable {
 	 * 
 	 * */
 	public void setAttribute(String namespace, String name, String value) {
-		if (attributes == null)
-			attributes = new Vector();
 
 		if (namespace == null)
 			namespace = "";
@@ -475,7 +487,7 @@ public class TreeElement implements Externalizable {
 	 */
 	public Vector getSingleStringAttributeVector() {
 		Vector strings = new Vector();
-		if (attributes == null)
+		if (attributes.size() == 0)
 			return null;
 		else {
 			for (int i = 0; i < this.attributes.size(); i++) {
@@ -496,32 +508,33 @@ public class TreeElement implements Externalizable {
 	 * @param attStrings
 	 */
 	public void setAttributesFromSingleStringVector(Vector attStrings) {
-		// Vector stringArrays = new Vector();
-		if (attStrings == null)
-			attributes = null;
-		else {
-			this.attributes = new Vector();
+		this.attributes = new Vector();
+		if (attStrings != null) {
 			for (int i = 0; i < attStrings.size(); i++) {
-				String att = (String) attStrings.elementAt(i);
-				String[] array = new String[3];
-				int start = 0;
-				// get namespace
-				int pos = att.indexOf(":");
-				if (pos == -1) {
-					array[0] = null;
-					start = 0;
-				} else {
-					array[0] = att.substring(start, pos);
-					start = ++pos;
-				}
-				// get attribute name
-				pos = att.indexOf("=");
-				array[1] = att.substring(start, pos);
-				start = ++pos;
-				array[2] = att.substring(start);
-				this.setAttribute(array[0], array[1], array[2]);
+				addSingleAttribute(i, attStrings);
 			}
 		}
+	}
+
+	private void addSingleAttribute(int i, Vector attStrings) {
+		String att = (String) attStrings.elementAt(i);
+		String[] array = new String[3];
+		int start = 0;
+		// get namespace
+		int pos = att.indexOf(":");
+		if (pos == -1) {
+			array[0] = null;
+			start = 0;
+		} else {
+			array[0] = att.substring(start, pos);
+			start = ++pos;
+		}
+		// get attribute name
+		pos = att.indexOf("=");
+		array[1] = att.substring(start, pos);
+		start = ++pos;
+		array[2] = att.substring(start);
+		this.setAttribute(array[0], array[1], array[2]);
 	}
 
 	/* ==== SERIALIZATION ==== */
@@ -699,7 +712,6 @@ public class TreeElement implements Externalizable {
 	public void setPreloadParams(String preloadParams) {
 		this.preloadParams = preloadParams;
 	}
-	
 
 	public Vector getChildren() {
 		return children;
@@ -724,6 +736,5 @@ public class TreeElement implements Externalizable {
 	public IAnswerData getValue() {
 		return value;
 	}
-
 
 }
