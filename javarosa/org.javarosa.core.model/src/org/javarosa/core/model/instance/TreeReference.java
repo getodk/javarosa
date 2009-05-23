@@ -28,6 +28,7 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class TreeReference implements Externalizable {
+	public static final int DEFAULT_MUTLIPLICITY = 0;//multiplicity
 	public static final int INDEX_UNBOUND = -1;//multiplicity
 	public static final int INDEX_TEMPLATE = -2;//multiplicity
 	public static final int REF_ABSOLUTE = -1;
