@@ -575,8 +575,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 	public void preloadModel(TreeElement node) {
 		//if (node.isLeaf()) {
 			IAnswerData preload = null;
-			if (node.preloadHandler != null) {
-				preload = preloader.getQuestionPreload(node.preloadHandler, node.preloadParams);
+			if (node.getPreloadHandler() != null) {
+				preload = preloader.getQuestionPreload(node.getPreloadHandler(), node.preloadParams);
 			}
 			if (preload != null) { //what if we want to wipe out a value in the instance?
 				node.setAnswer(preload);
@@ -614,8 +614,8 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		//dependent on data written during post-processing is a bad practice anyway, and maybe we shouldn't support it.
 		
 		if (node.isLeaf()) {
-			if (node.preloadHandler != null) {
-				return preloader.questionPostProcess(node, node.preloadHandler, node.preloadParams);
+			if (node.getPreloadHandler() != null) {
+				return preloader.questionPostProcess(node, node.getPreloadHandler(), node.preloadParams);
 			} else {
 				return false;
 			}
