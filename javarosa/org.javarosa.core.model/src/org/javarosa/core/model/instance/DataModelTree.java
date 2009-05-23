@@ -45,7 +45,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 
 	/** The root of this tree */
-	private TreeElement root = new TreeElement(null, 0);
+	private TreeElement root = new TreeElement();
 	// represents '/'; always has one and only one child -- the top-level
 	// instance data node
 	// this node is never returned or manipulated directly
@@ -84,7 +84,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 	 *            The root of the tree for this data model.
 	 */
 	private void setRoot(TreeElement topLevel) {
-		root = new TreeElement(null, 0);
+		root = new TreeElement();
 		if (topLevel != null)
 			root.addChild(topLevel);
 	}
@@ -105,10 +105,6 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 	// throws classcastexception if not using XPathReference
 	public static TreeReference unpackReference(IDataReference ref) {
 		return (TreeReference) ref.getReference();
-	}
-
-	public boolean deleteNode(IDataReference ref) {
-		return false;
 	}
 
 	public boolean copyNode(TreeReference from, TreeReference to) {
