@@ -45,7 +45,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 
 	/** The root of this tree */
-	private TreeElement root;
+	private TreeElement root = new TreeElement(null, 0);
 	// represents '/'; always has one and only one child -- the top-level
 	// instance data node
 	// this node is never returned or manipulated directly
@@ -83,21 +83,21 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 	 * @param root
 	 *            The root of the tree for this data model.
 	 */
-	public void setRoot(TreeElement topLevel) {
+	private void setRoot(TreeElement topLevel) {
 		root = new TreeElement(null, 0);
 		if (topLevel != null)
 			root.addChild(topLevel);
 	}
 
 	/**
+	 * TODO: confusion between root and its first child?
+	 * 
 	 * @return This model's root tree element
 	 */
 	public TreeElement getRoot() {
-		if (root == null)
-			return null;
-		
+
 		if (root.getNumChildren() == 0)
-			return null;
+			throw new RuntimeException("root node has no children");
 
 		return (TreeElement) root.getChildren().elementAt(0);
 	}
@@ -304,7 +304,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 						children.addElement(child);
 					} else {
 						throw new IllegalStateException(); // missing/non-sequential
-															// nodes
+						// nodes
 					}
 				}
 				if (includeTemplates) {
@@ -324,7 +324,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 				TreeElement child = (TreeElement) e.nextElement();
 				TreeReference newTemplateRef = (children.size() == 1 ? templateRef
 						: templateRef.clone()); // don't clone templateRef
-												// unnecessarily
+				// unnecessarily
 				newTemplateRef.names.addElement(child.getName());
 				newTemplateRef.multiplicity.addElement(new Integer(child
 						.getMult()));
@@ -427,11 +427,11 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 
 	public void accept(IDataModelVisitor visitor) {
 		visitor.visit(this);
-		if (root != null) {
-			if (visitor instanceof ITreeVisitor) {
-				root.accept((ITreeVisitor) visitor);
-			}
+
+		if (visitor instanceof ITreeVisitor) {
+			root.accept((ITreeVisitor) visitor);
 		}
+
 	}
 
 	public void setDateSaved(Date dateSaved) {
@@ -578,9 +578,6 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 	 * to the node
 	 */
 	private TreeElement createNode(TreeReference ref) {
-		if (root == null) {
-			root = new TreeElement(null, 0);
-		}
 
 		TreeElement node = root;
 
@@ -617,7 +614,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 				if (mult == TreeReference.INDEX_UNBOUND || mult == count) {
 					if (k == 0 && root.getNumChildren() != 0) {
 						return null; // can only be one top-level node, and it
-										// already exists
+						// already exists
 					}
 
 					if (!node.isChildable()) {
@@ -797,7 +794,8 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 			for (int i = 0; i < node.getNumChildren(); i++) {
 				TreeElement child = (TreeElement) node.getChildren().elementAt(
 						i);
-				Vector newChildren = incoming.getChildrenWithName(child.getName());
+				Vector newChildren = incoming.getChildrenWithName(child
+						.getName());
 
 				TreeReference childRef = ref.clone();
 				childRef.add(child.getName(), TreeReference.INDEX_UNBOUND);

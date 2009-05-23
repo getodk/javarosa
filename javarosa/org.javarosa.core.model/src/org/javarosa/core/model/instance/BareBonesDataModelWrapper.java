@@ -59,19 +59,19 @@ public class BareBonesDataModelWrapper implements Externalizable {
 		return bbdmw.getDataModel();
 	}
 
-	public static DataModelTree cloneDataModel (DataModelTree orig) {
-		DataModelTree copy = new DataModelTree();
+	private static DataModelTree cloneDataModel (DataModelTree orig) {
+		DataModelTree copy = new DataModelTree(orig.getRoot().deepCopy(true));
 		cloneDataModelFrom(copy, orig);
 		return copy;
 	}
 		
-	public static void cloneDataModelFrom (DataModelTree dst, DataModelTree src) {
+	private static void cloneDataModelFrom (DataModelTree dst, DataModelTree src) {
 		dst.setId(src.getId());
 		dst.setFormId(src.getFormId());
 		dst.setName(src.getName());
 		dst.setDateSaved(src.getDateSaved());
 		dst.schema = src.schema;
-		dst.setRoot(src.getRoot().deepCopy(true));
+		//dst.setRoot(src.getRoot().deepCopy(true));
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
