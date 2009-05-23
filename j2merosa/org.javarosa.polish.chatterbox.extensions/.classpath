@@ -11,5 +11,6 @@
 	<classpathentry exported="true" kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
 	<classpathentry exported="true" kind="con" path="J2MELIB"/>
 	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.forms"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
