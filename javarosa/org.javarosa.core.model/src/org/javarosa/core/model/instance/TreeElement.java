@@ -52,7 +52,7 @@ public class TreeElement implements Externalizable {
 	// nodes
 
 	private IAnswerData value;
-	private Vector children;
+	private Vector children = new Vector();
 
 	/* model properties */
 	public int dataType = Constants.DATATYPE_NULL;
@@ -118,20 +118,12 @@ public class TreeElement implements Externalizable {
 		}
 	}
 
-	// may return null! this vector should not be manipulated outside of this
-	// class! (namely, don't delete stuff)
 	public Vector getChildren() {
 		return children;
 	}
 
-	public int getNumChildren() {
-		return (children == null ? 0 : children.size());
-	}
-
 	public TreeElement getChild(String name, int multiplicity) {
-		if (children == null) {
-			return null;
-		} else if (name.equals(TreeReference.NAME_WILDCARD)) {
+		if (name.equals(TreeReference.NAME_WILDCARD)) {
 			return (TreeElement) children.elementAt(multiplicity);
 		} else {
 			for (int i = 0; i < children.size(); i++) {
@@ -141,25 +133,25 @@ public class TreeElement implements Externalizable {
 					return child;
 				}
 			}
-			return null;
 		}
+
+		return null;
 	}
 
 	public Vector getChild(String name) {
 		return getChild(name, false);
 	}
 
+	// why not getChildren?
 	public Vector getChild(String name, boolean includeTemplate) {
 		Vector v = new Vector();
 
-		if (children != null) {
-			for (int i = 0; i < children.size(); i++) {
-				TreeElement child = (TreeElement) children.elementAt(i);
-				if ((child.getName().equals(name) || name
-						.equals(TreeReference.NAME_WILDCARD))
-						&& (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
-					v.addElement(child);
-			}
+		for (int i = 0; i < children.size(); i++) {
+			TreeElement child = (TreeElement) children.elementAt(i);
+			if ((child.getName().equals(name) || name
+					.equals(TreeReference.NAME_WILDCARD))
+					&& (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
+				v.addElement(child);
 		}
 
 		return v;
@@ -170,13 +162,12 @@ public class TreeElement implements Externalizable {
 	}
 
 	public void addChild(TreeElement child, boolean checkDuplicate) {
-		if (children == null) {
-			if (isChildable()) {
-				children = new Vector();
-			} else {
-				throw new RuntimeException(
-						"Can't add children to node that has data value!");
-			}
+
+		if (!isChildable()) {
+
+			throw new RuntimeException(
+					"Can't add children to node that has data value!");
+
 		}
 
 		if (child.multiplicity == TreeReference.INDEX_UNBOUND) {
@@ -212,7 +203,7 @@ public class TreeElement implements Externalizable {
 
 	public void removeChild(TreeElement child) {
 		children.removeElement(child);
-		nullChildren();
+	
 	}
 
 	public void removeChild(String name, int multiplicity) {
@@ -235,12 +226,7 @@ public class TreeElement implements Externalizable {
 
 	public void removeChildAt(int i) {
 		children.removeElementAt(i);
-		nullChildren();
-	}
 
-	private void nullChildren() {
-		if (children.size() == 0)
-			children = null;
 	}
 
 	public int getChildMultiplicity(String name) {
@@ -271,8 +257,8 @@ public class TreeElement implements Externalizable {
 	public TreeElement deepCopy(boolean includeTemplates) {
 		TreeElement newNode = shallowCopy();
 
-		newNode.children = null;
-		for (int i = 0; i < getNumChildren(); i++) {
+		newNode.children = new Vector();
+		for (int i = 0; i < children.size(); i++) {
 			TreeElement child = (TreeElement) children.elementAt(i);
 			if (includeTemplates
 					|| child.getMult() != TreeReference.INDEX_TEMPLATE) {
@@ -327,7 +313,7 @@ public class TreeElement implements Externalizable {
 		}
 
 		if (isRelevant() != oldRelevancy) {
-			for (int i = 0; i < getNumChildren(); i++) {
+			for (int i = 0; i < children.size(); i++) {
 				((TreeElement) children.elementAt(i)).setRelevant(isRelevant(),
 						true);
 			}
@@ -339,6 +325,9 @@ public class TreeElement implements Externalizable {
 		setEnabled(enabled, false);
 	}
 
+	public int getNumChildren(){
+		return this.children.size();
+	}
 	public void setEnabled(boolean enabled, boolean inherited) {
 		boolean oldEnabled = isEnabled();
 		if (inherited) {
@@ -348,7 +337,7 @@ public class TreeElement implements Externalizable {
 		}
 
 		if (isEnabled() != oldEnabled) {
-			for (int i = 0; i < getNumChildren(); i++) {
+			for (int i = 0; i < children.size(); i++) {
 				((TreeElement) children.elementAt(i)).setEnabled(isEnabled(),
 						true);
 			}
@@ -397,12 +386,12 @@ public class TreeElement implements Externalizable {
 	 */
 	public void accept(ITreeVisitor visitor) {
 		visitor.visit(this);
-		if (children != null) {
-			Enumeration en = children.elements();
-			while (en.hasMoreElements()) {
-				((TreeElement) en.nextElement()).accept(visitor);
-			}
+
+		Enumeration en = children.elements();
+		while (en.hasMoreElements()) {
+			((TreeElement) en.nextElement()).accept(visitor);
 		}
+
 	}
 
 	/*
@@ -693,8 +682,8 @@ public class TreeElement implements Externalizable {
 		ExtUtil.writeBool(out, relevantInherited);
 		ExtUtil.writeBool(out, enabledInherited);
 		ExtUtil.write(out, new ExtWrapNullable(constraint)); // TODO:
-																// inefficient
-																// for repeats
+		// inefficient
+		// for repeats
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(preloadHandler));
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(preloadParams));
 
@@ -725,8 +714,5 @@ public class TreeElement implements Externalizable {
 	public void setPreloadParams(String preloadParams) {
 		this.preloadParams = preloadParams;
 	}
-	
-	
-	
-	
+
 }
