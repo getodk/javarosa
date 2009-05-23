@@ -540,11 +540,11 @@ public class XFormParser {
 		}
 
 		int index = -1;
-		if (f.outputFragments.contains(expr)) {
-			index = f.outputFragments.indexOf(expr);
+		if (f.getOutputFragments().contains(expr)) {
+			index = f.getOutputFragments().indexOf(expr);
 		} else {
-			index = f.outputFragments.size();
-			f.outputFragments.addElement(expr);
+			index = f.getOutputFragments().size();
+			f.getOutputFragments().addElement(expr);
 		}
 		return String.valueOf(index);
 	}
@@ -1154,7 +1154,7 @@ public class XFormParser {
 		if (root.getNumChildren() == 0)
 			return null;
 		else
-			return new DataModelTree(root.getChild(topLevelName, 0));
+			return new DataModelTree(root.getChild(topLevelName, TreeReference.DEFAULT_MUTLIPLICITY));
 	}
 
 	//checks which repeat bindings have explicit template nodes; returns a vector of the bindings that do not

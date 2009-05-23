@@ -42,10 +42,11 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * 
  */
 
-public class TreeElement implements Externalizable {
+ public class TreeElement implements Externalizable {
 	private String name; // can be null only for hidden root node
 	/**
 	 * multiplicity: can apparently take values: INDEX_UNBOUND, INDEX_TEMPLATE
+	 * added: TreeReference.DEFAULT_MUTLIPLICITY 
 	 * (@see TreeReference)
 	 */
 	public int multiplicity;// TODO comment and make private
@@ -62,14 +63,15 @@ public class TreeElement implements Externalizable {
 	private Vector children = new Vector();
 
 	/* model properties */
-	public int dataType = Constants.DATATYPE_NULL;
-	public boolean relevant = true;// TODO: ask mvp project to use accessor
+	public int dataType = Constants.DATATYPE_NULL;//TODO
 	public boolean required = false;// TODO
-	private boolean enabled = true;
 	private Constraint constraint = null;
 	private String preloadHandler = null;
 	private String preloadParams = null;
 
+	public boolean relevant = true;// TODO: ask mvp project to use accessor
+	private boolean enabled = true;
+	// inherited properties 
 	private boolean relevantInherited = true;
 	private boolean enabledInherited = true;
 
@@ -79,11 +81,11 @@ public class TreeElement implements Externalizable {
 	 * TreeElement with null name and 0 multiplicity? (a "hidden root" node?)
 	 */
 	public TreeElement() {
-		this(null, 0);
+		this(null, TreeReference.DEFAULT_MUTLIPLICITY);
 	}
 
 	public TreeElement(String name) {
-		this(name, 0);
+		this(name, TreeReference.DEFAULT_MUTLIPLICITY);
 	}
 
 	public TreeElement(String name, int multiplicity) {
@@ -116,10 +118,10 @@ public class TreeElement implements Externalizable {
 
 	public TreeElement getChild(String name, int multiplicity) {
 		if (name.equals(TreeReference.NAME_WILDCARD)) {
-			return (TreeElement) children.elementAt(multiplicity);
+			return (TreeElement) this.children.elementAt(multiplicity);
 		} else {
-			for (int i = 0; i < children.size(); i++) {
-				TreeElement child = (TreeElement) children.elementAt(i);
+			for (int i = 0; i < this.children.size(); i++) {
+				TreeElement child = (TreeElement) this.children.elementAt(i);
 				if (name.equals(child.getName())
 						&& child.getMult() == multiplicity) {
 					return child;
@@ -155,11 +157,16 @@ public class TreeElement implements Externalizable {
 		return v;
 	}
 
+	/**
+	 * Add a child to this element
+	 * 
+	 * @param child
+	 */
 	public void addChild(TreeElement child) {
 		addChild(child, false);
 	}
 
-	public void addChild(TreeElement child, boolean checkDuplicate) {
+	private void addChild(TreeElement child, boolean checkDuplicate) {
 
 		if (!isChildable()) {
 
@@ -302,7 +309,7 @@ public class TreeElement implements Externalizable {
 		setRelevant(relevant, false);
 	}
 
-	public void setRelevant(boolean relevant, boolean inherited) {
+	private void setRelevant(boolean relevant, boolean inherited) {
 		boolean oldRelevancy = isRelevant();
 		if (inherited) {
 			this.relevantInherited = relevant;
