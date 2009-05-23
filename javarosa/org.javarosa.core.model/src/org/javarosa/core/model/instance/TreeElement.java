@@ -56,7 +56,7 @@ public class TreeElement implements Externalizable {
 
 	/* model properties */
 	public int dataType = Constants.DATATYPE_NULL;
-	public boolean relevant = true;
+	public boolean relevant = true;//TODO: ask mvp project to use accessor
 	public boolean required = false;//TODO
 	private boolean enabled = true;
 	private Constraint constraint = null;
@@ -89,26 +89,6 @@ public class TreeElement implements Externalizable {
 		return (value == null);
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public int getMult() {
-		return multiplicity;
-	}
-
-	public void setMult(int multiplicity) {
-		this.multiplicity = multiplicity;
-	}
-
-	public IAnswerData getValue() {
-		return value;
-	}
-
 	public void setValue(IAnswerData value) {
 		if (isLeaf()) {
 			this.value = value;
@@ -118,9 +98,6 @@ public class TreeElement implements Externalizable {
 		}
 	}
 
-	public Vector getChildren() {
-		return children;
-	}
 
 	public TreeElement getChild(String name, int multiplicity) {
 		if (name.equals(TreeReference.NAME_WILDCARD)) {
@@ -138,12 +115,20 @@ public class TreeElement implements Externalizable {
 		return null;
 	}
 
-	public Vector getChild(String name) {
-		return getChild(name, false);
+ 
+	/**
+	 * 
+	 * Get all the child nodes of this element, with specific name
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public Vector getChildrenWithName(String name) {
+		return getChildrenWithName(name, false);
 	}
 
-	// why not getChildren?
-	public Vector getChild(String name, boolean includeTemplate) {
+	 
+	private Vector getChildrenWithName(String name, boolean includeTemplate) {
 		Vector v = new Vector();
 
 		for (int i = 0; i < this.children.size(); i++) {
@@ -218,7 +203,7 @@ public class TreeElement implements Externalizable {
 	}
 
 	public void removeChildren(String name, boolean includeTemplate) {
-		Vector v = getChild(name, includeTemplate);
+		Vector v = getChildrenWithName(name, includeTemplate);
 		for (int i = 0; i < v.size(); i++) {
 			removeChild((TreeElement) v.elementAt(i));
 		}
@@ -230,7 +215,7 @@ public class TreeElement implements Externalizable {
 	}
 
 	public int getChildMultiplicity(String name) {
-		return getChild(name, false).size();
+		return getChildrenWithName(name, false).size();
 	}
 
 	public TreeElement shallowCopy() {
@@ -714,5 +699,31 @@ public class TreeElement implements Externalizable {
 	public void setPreloadParams(String preloadParams) {
 		this.preloadParams = preloadParams;
 	}
+	
+
+	public Vector getChildren() {
+		return children;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getMult() {
+		return multiplicity;
+	}
+
+	public void setMult(int multiplicity) {
+		this.multiplicity = multiplicity;
+	}
+
+	public IAnswerData getValue() {
+		return value;
+	}
+
 
 }
