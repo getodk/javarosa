@@ -576,7 +576,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		//if (node.isLeaf()) {
 			IAnswerData preload = null;
 			if (node.getPreloadHandler() != null) {
-				preload = preloader.getQuestionPreload(node.getPreloadHandler(), node.preloadParams);
+				preload = preloader.getQuestionPreload(node.getPreloadHandler(), node.getPreloadParams());
 			}
 			if (preload != null) { //what if we want to wipe out a value in the instance?
 				node.setAnswer(preload);
@@ -615,7 +615,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable, Externa
 		
 		if (node.isLeaf()) {
 			if (node.getPreloadHandler() != null) {
-				return preloader.questionPostProcess(node, node.getPreloadHandler(), node.preloadParams);
+				return preloader.questionPostProcess(node, node.getPreloadHandler(), node.getPreloadParams());
 			} else {
 				return false;
 			}
