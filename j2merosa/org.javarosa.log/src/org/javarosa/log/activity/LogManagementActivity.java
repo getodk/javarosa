@@ -29,99 +29,54 @@ import org.javarosa.log.view.LogViewer;
 
 /**
  * @author Clayton Sims
- * @date Apr 13, 2009 
- *
+ * @date Apr 13, 2009
+ * 
  */
 public class LogManagementActivity implements IActivity, CommandListener {
-	
-	public static final String CLEAR_LOGS = "Clear Logs";
-	public static final String VIEW_LOGS = "View Logs";
-	public static final String SEND_LOGS = "Send Logs";
-	
-	public static final Command EXIT = new Command("Back",Command.BACK, 0);
-	
-	Context context;
-	IShell shell;
-	LogManagementView manager;
-	LogViewer viewer;
-	
+
+	private static final String CLEAR_LOGS = "Clear Logs";
+	private static final String VIEW_LOGS = "View Logs";
+	private static final String SEND_LOGS = "Send Logs";
+
+	private static final Command EXIT = new Command("Back", Command.BACK, 0);
+
+	private IShell shell;
+	private LogManagementView manager;
+	private LogViewer viewer;
+
 	public LogManagementActivity() {
-		//String a = "as";
+		// 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
-	 */
-	public void annotateCommand(ICommand command) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#contextChanged(org.javarosa.core.Context)
-	 */
-	public void contextChanged(Context globalContext) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#destroy()
-	 */
-	public void destroy() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#getActivityContext()
-	 */
-	public Context getActivityContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#halt()
-	 */
-	public void halt() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#resume(org.javarosa.core.Context)
-	 */
-	public void resume(Context globalContext) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
-	 */
-	public void setShell(IShell shell) {
-		this.shell = shell;
-	}
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.javarosa.core.api.IActivity#start(org.javarosa.core.Context)
 	 */
 	public void start(Context context) {
-		this.context = context;
-		
-		manager = new LogManagementView();
-		manager.append(VIEW_LOGS, null);
-		manager.append(SEND_LOGS, null);
-		manager.append(CLEAR_LOGS, null);
-		
-		manager.addCommand(EXIT);
-		
-		manager.setCommandListener(this);
 
-		shell.setDisplay(this, manager);
+		this.manager = initView();
+		this.viewer = new LogViewer();
+
+		shell.setDisplay(this, this.manager);
 	}
 
+	/**
+	 * @return
+	 */
+	private LogManagementView initView() {
+		LogManagementView v = new LogManagementView();
+		v.append(VIEW_LOGS, null);
+		v.append(SEND_LOGS, null);
+		v.append(CLEAR_LOGS, null);
+		v.addCommand(EXIT);
+		v.setCommandListener(this);
+		return v;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.microedition.lcdui.CommandListener#commandAction(javax.microedition.lcdui.Command, javax.microedition.lcdui.Displayable)
+	 */
 	public void commandAction(Command com, Displayable d) {
 		if (d instanceof Alert) {
 			shell.setDisplay(this, manager);
@@ -129,58 +84,167 @@ public class LogManagementActivity implements IActivity, CommandListener {
 		if (d == manager) {
 			String action = manager.getString(manager.getSelectedIndex());
 			if (action.equals(CLEAR_LOGS)) {
-				JavaRosaServiceProvider.instance().getIncidentLogger()
-						.clearLogs();
-		    	//#style mailAlert
-		    	final Alert success = new Alert("Logs Cleared", "Logs cleared succesfully", null, AlertType.CONFIRMATION);
-				success.setTimeout(Alert.FOREVER);
-				IView successalert = new IView() {
-					public Object getScreenObject() {
-						return success;
-					}
-				};
-				shell.setDisplay(this, successalert);
-			} else if (action.equals(VIEW_LOGS)) {
-				viewer = new LogViewer();
-				byte[] logData = JavaRosaServiceProvider.instance().getIncidentLogger().serializeLogs(new FlatLogSerializer());
-				viewer.loadLogs(new String(logData));
-				viewer.setCommandListener(this);
-				viewer.addCommand(EXIT);
-				shell.setDisplay(this, viewer);
-			} else if (action.equals(SEND_LOGS)) {
-				byte[] logData = JavaRosaServiceProvider.instance().getIncidentLogger().serializeLogs(new FlatLogSerializer());
-				ByteArrayPayload payload = new ByteArrayPayload(logData,"",IDataPayload.PAYLOAD_TYPE_TEXT);
-				HttpTransportDestination destination = new HttpTransportDestination(JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(LogPropertyRules.LOG_SUBMIT_URL));
-				try {
-					JavaRosaServiceProvider.instance().getTransportManager().enqueue(payload, destination, JavaRosaServiceProvider.instance().getTransportManager().getCurrentTransportMethod(), 0);
-					//#style mailAlert
-			    	final Alert sending = new Alert("Sending Started", "Log Sending Started", null, AlertType.ERROR);
-			    	sending.setTimeout(Alert.FOREVER);
-					IView successalert = new IView() {
-						public Object getScreenObject() {
-							return sending;
-						}
-					};
-					shell.setDisplay(this, successalert);
-					
-				} catch (IOException e) {
-					//#style mailAlert
-			    	final Alert failure = new Alert("Send Failed", "Log sending failure", null, AlertType.ERROR);
-			    	failure.setTimeout(Alert.FOREVER);
-					IView successalert = new IView() {
-						public Object getScreenObject() {
-							return failure;
-						}
-					};
-					shell.setDisplay(this, successalert);
-				}
+				clearLogs();
 			}
-			if(com.equals(EXIT)) {
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, new Hashtable());
+
+			if (action.equals(VIEW_LOGS)) {
+				viewLogs();
 			}
-		}
-		else if(d == viewer) {
+
+			if (action.equals(SEND_LOGS)) {
+				sendLogs();
+			}
+			if (com.equals(EXIT)) {
+				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,
+						new Hashtable());
+			}
+		} else if (d == viewer) {
 			shell.setDisplay(this, manager);
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void sendLogs() {
+		byte[] logData = JavaRosaServiceProvider.instance().getIncidentLogger()
+				.serializeLogs(new FlatLogSerializer());
+		ByteArrayPayload payload = new ByteArrayPayload(logData, "",
+				IDataPayload.PAYLOAD_TYPE_TEXT);
+		HttpTransportDestination destination = new HttpTransportDestination(
+				JavaRosaServiceProvider.instance().getPropertyManager()
+						.getSingularProperty(LogPropertyRules.LOG_SUBMIT_URL));
+		try {
+			JavaRosaServiceProvider.instance().getTransportManager().enqueue(
+					payload,
+					destination,
+					JavaRosaServiceProvider.instance().getTransportManager()
+							.getCurrentTransportMethod(), 0);
+			// #style mailAlert
+			final Alert sending = new Alert("Sending Started",
+					"Log Sending Started", null, AlertType.ERROR);
+			sending.setTimeout(Alert.FOREVER);
+			IView successalert = new IView() {
+				public Object getScreenObject() {
+					return sending;
+				}
+			};
+			shell.setDisplay(this, successalert);
+
+		} catch (IOException e) {
+			// #style mailAlert
+			final Alert failure = new Alert("Send Failed",
+					"Log sending failure", null, AlertType.ERROR);
+			failure.setTimeout(Alert.FOREVER);
+			IView successalert = new IView() {
+				public Object getScreenObject() {
+					return failure;
+				}
+			};
+			shell.setDisplay(this, successalert);
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void viewLogs() {
+		this.viewer.deleteAll();
+		byte[] logData = JavaRosaServiceProvider.instance().getIncidentLogger()
+				.serializeLogs(new FlatLogSerializer());
+		this.viewer.loadLogs(new String(logData));
+		this.viewer.setCommandListener(this);
+		this.viewer.addCommand(EXIT);
+		shell.setDisplay(this, this.viewer);
+	}
+
+	/**
+	 * 
+	 */
+	private void clearLogs() {
+		JavaRosaServiceProvider.instance().getIncidentLogger().clearLogs();
+		// #style mailAlert
+		final Alert success = new Alert("Logs Cleared",
+				"Logs cleared succesfully", null, AlertType.CONFIRMATION);
+		success.setTimeout(Alert.FOREVER);
+		IView successalert = new IView() {
+			public Object getScreenObject() {
+				return success;
+			}
+		};
+		shell.setDisplay(this, successalert);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api
+	 * .ICommand)
+	 */
+	public void annotateCommand(ICommand command) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.core.api.IActivity#contextChanged(org.javarosa.core.Context)
+	 */
+	public void contextChanged(Context globalContext) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.javarosa.core.api.IActivity#destroy()
+	 */
+	public void destroy() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.javarosa.core.api.IActivity#getActivityContext()
+	 */
+	public Context getActivityContext() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.javarosa.core.api.IActivity#halt()
+	 */
+	public void halt() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.javarosa.core.api.IActivity#resume(org.javarosa.core.Context)
+	 */
+	public void resume(Context globalContext) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
+	 */
+	public void setShell(IShell shell) {
+		this.shell = shell;
 	}
 }
