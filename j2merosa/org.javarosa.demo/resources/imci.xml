@@ -139,6 +139,29 @@
 						<const>
 							<high_malaria_risk>1</high_malaria_risk>
 						</const>
+						<dosings>
+						  <alu />
+						  <amoxycillin>
+								<tablet />
+								<syrup />
+							</amoxycillin>
+						  <cotrimoxazole>
+								<adult />
+								<ped />
+								<syrup />
+							</cotrimoxazole>
+							<erythromycin />
+							<nalidixic_acid />
+							<paracetamol>
+							  <ped />
+								<adult />
+							</paracetamol>
+							<procaine_penicillin />
+							<quinine>
+								<injection />
+								<tablet />
+							</quinine>
+						</dosings>
           </tmp>
         </imci>
       </instance>
@@ -162,7 +185,7 @@
       <bind nodeset="tmp/sentinel/first_visit" relevant="/imci/preamble/visit_type = 'first'" />
 
       <bind nodeset="preamble/temperature" type="decimal" constraint="true()" relevant="../temp_type = 'therm'" required="true()" />
-      <bind nodeset="tmp/normalized/has_fever" calculate="/imci/preamble/chief_complaint = 'fever' or /imci/preamble/temp_type = 'fever' or /imci/preamble/temperature >= 37.4" />
+      <bind nodeset="tmp/normalized/has_fever" calculate="selected(/imci/preamble/chief_complaint, 'fever') or /imci/preamble/temp_type = 'fever' or /imci/preamble/temperature >= 37.4" />
       
       <bind nodeset="preamble/age" type="int" required="true()" /> <!-- todo: add age/unit constraints -->
       <bind nodeset="tmp/normalized/age" calculate="if(/imci/preamble/age_unit = 'years', /imci/preamble/age,
@@ -259,8 +282,100 @@
 			<bind nodeset="interlude/info/keep_feeding" relevant="../../feeding_change = 'yes'" />
 			<bind nodeset="interlude/info/treat_problems" relevant="../../other_problems = 'yes'" />
 			
-			
-			
+			<bind nodeset="tmp/dosings/alu" calculate="
+			  if(/imci/preamble/weight >= 5 and /imci/preamble/weight < 25,
+				  if(/imci/preamble/weight < 15, 'whole tablet', 'two tablets'),
+			  if(/imci/tmp/normalized/age >= 0.25 and /imci/tmp/normalized/age <= 8.0,
+				  if(/imci/tmp/normalized/age <= 3.0, 'whole tablet', 'two tablets'),
+				''))" />
+			<bind nodeset="tmp/dosings/amoxycillin/tablet" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 10, 'half tablet', 'whole tablet'),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 'whole tablet'),
+				''))" />
+			<bind nodeset="tmp/dosings/amoxycillin/syrup" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 10, '5mL', '10mL'),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 1.0, '5mL', '10mL'),
+				''))" />
+			<bind nodeset="tmp/dosings/cotrimoxazole/adult" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 10, 'half tablet', 'whole tablet'),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 'whole tablet'),
+				''))" />
+			<bind nodeset="tmp/dosings/cotrimoxazole/ped" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 10, 'two tablets', '4 tablets'),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 1.0, 'two tablets', '4 tablets'),
+				''))" />
+			<bind nodeset="tmp/dosings/cotrimoxazole/syrup" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 10, '5mL', '10mL'),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 1.0, '5mL', '10mL'),
+				''))" />
+			<bind nodeset="tmp/dosings/erythromycin" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 6, 'quarter tablet',
+					if(/imci/preamble/weight < 10, 'half tablet', 
+					  'whole tablet')),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 0.34, 'quarter tablet',
+					if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 
+					  'whole tablet')),
+				''))" />
+			<bind nodeset="tmp/dosings/nalidixic_acid" calculate="	
+  			if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 6, 'quarter tablet',
+					if(/imci/preamble/weight < 10, 'half tablet', 
+					  'whole tablet')),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 0.34, 'quarter tablet',
+					if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 
+					  'whole tablet')),
+				''))" />				
+			<bind nodeset="tmp/dosings/paracetamol/ped" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 14, 'whole tablet', '2.5 tablets'),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 3.0, 'whole tablet', '2.5 tablets'),
+				''))" />
+			<bind nodeset="tmp/dosings/paracetamol/adult" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 14, 'quarter tablet', 'half tablet'),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 3.0, 'quarter tablet', 'half tablet'),
+				''))" />
+			<bind nodeset="tmp/dosings/procaine_penicillin" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 10, '1mL injection', '2mL injection'),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 1.0, '1mL injection', '2mL injection'),
+				''))" />
+			<bind nodeset="tmp/dosings/quinine/injection" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 6, '1mL',
+					if(/imci/preamble/weight < 8, '1.5mL', 
+					if(/imci/preamble/weight < 10, '2mL', 
+					if(/imci/preamble/weight < 14, '2.5mL', 
+					  '3mL')))),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 0.34, '1mL',
+					if(/imci/tmp/normalized/age <= 0.75, '1.5mL', 
+					if(/imci/tmp/normalized/age <= 1.0, '2mL', 
+					if(/imci/tmp/normalized/age <= 3.0, '2.5mL', 
+					  '3mL')))),
+				''))" />
+			<bind nodeset="tmp/dosings/quinine/tablet" calculate="
+				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
+				  if(/imci/preamble/weight < 11, 'quarter tablet', 'half tablet'),
+			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
+				  if(/imci/tmp/normalized/age <= 1.0, 'quarter tablet', 'half tablet'),
+				''))" />
 			
 			
 		</model>
@@ -595,9 +710,11 @@
 					<item><label>Severe Febrile Disease</label><value>febrile</value></item>
 					<item><label>Malaria</label><value>malaria</value></item>
 					<item><label>Fever; Malaria unlikely</label><value>fever_only</value></item>
+				<!--
 					<item><label>Severe Measles</label><value>severe-measles</value></item>
 					<item><label>Measles with Eye or Mouth Complications</label><value>measles-compl</value></item>
 					<item><label>Measles</label><value>measles</value></item>
+				-->
 				</select1>
 
 			</group>
@@ -705,6 +822,14 @@
 			</trigger>
 			
 			
+			<!--
+			<select1 ref="">
+				<label>Which form of quinine would you like to use for the severe malaria?</label>
+				<item><label>Quinine Injection</label><value>injection</value></item>
+				<item><label>Quinine Tablet</label><value>tablet</value></item>
+				<item><label>Other Drug</label><value>other</value></item>
+			</select1>
+			-->
 			
 			
     </group>
