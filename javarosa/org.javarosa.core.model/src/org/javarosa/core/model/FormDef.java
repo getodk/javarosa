@@ -317,25 +317,14 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	 *            the condition to be set
 	 */
 	public Triggerable addTriggerable(Triggerable t) {
-		int useExistingIx = -1;
-		if (t instanceof Condition) {
-			int p = triggerables.indexOf(t);
-			if (p >= 0) {
-				// one node may control access to many nodes; this means many
-				// nodes effectively have the same condition
-				// let's identify when conditions are the same, and store and
-				// calculate it only once
+		int existingIx = triggerables.indexOf(t);
+		if (existingIx >= 0) {
+			//one node may control access to many nodes; this means many nodes effectively have the same condition
+			//let's identify when conditions are the same, and store and calculate it only once
 
-				// note, if the contextRef is unnecessarily deep, the condition
-				// will be evaluated more times than needed
-				// perhaps detect when 'identical' condition has a shorter
-				// contextRef, and use that one instead?
-				useExistingIx = p;
-			}
-		}
-
-		if (useExistingIx != -1) {
-			return (Condition) triggerables.elementAt(useExistingIx);
+			//note, if the contextRef is unnecessarily deep, the condition will be evaluated more times than needed
+			//perhaps detect when 'identical' condition has a shorter contextRef, and use that one instead?
+			return (Triggerable)triggerables.elementAt(existingIx);
 		} else {
 			triggerables.addElement(t);
 
