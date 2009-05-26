@@ -230,8 +230,19 @@ public class Localizer implements Externalizable {
 	
 	private void loadCurrentLocaleResources() {
 		this.currentLocaleData.clear();
-		OrderedHashtable table = (OrderedHashtable)this.localeData.get(currentLocale);
-		loadTable(currentLocaleData, table);
+		
+		
+		// If there's a default locale, we load all of its elements into memory first, then allow
+		// the current locale to overwrite any differences between the two.    
+		if (fallbackDefaultLocale && defaultLocale != null) {
+			loadTable(currentLocaleData, (OrderedHashtable)this.localeData.get(defaultLocale));
+			Vector defaultResources = (Vector) localeResources.get(defaultLocale);
+			for (int i = 0; i < defaultResources.size(); ++i) {
+				loadTable(currentLocaleData,loadLocaleResource((String) defaultResources.elementAt(i)));
+			}
+		}
+		
+		loadTable(currentLocaleData, (OrderedHashtable)this.localeData.get(currentLocale));
 		Vector resources = (Vector)localeResources.get(currentLocale);
 		for(int i = 0 ; i < resources.size() ; ++i ) {
 			loadTable(currentLocaleData, loadLocaleResource((String)resources.elementAt(i)));
@@ -257,19 +268,26 @@ public class Localizer implements Externalizable {
 		int curline = 0;
 		
 		try {
+			String line = "";
 			while (!done) {
 				int read = isr.read(cbuf, offset, chunk - offset);
 				if(read == -1) {
 					done = true;
 					break;
 				}
-				String line = "";
 				for(int i = 0 ; i < read ; ++i) {
 					//TODO: Endline formats?
 					if(cbuf[i] == '\n') {
+						curline ++;
 						//Newline. process our string and start the next one.
+						
+						//trim whitespace.
+						line = line.trim();
+						
 						//clear comments
-						line = line.substring(0, line.indexOf("#"));
+						while(line.indexOf("#") != -1) {
+							line = line.substring(0, line.indexOf("#"));
+						}
 						if(line.indexOf('=') == -1) {
 							// TODO: Invalid line. Empty lines are fine, especially with comments,
 							// but it might be hard to get all of those.
@@ -279,24 +297,20 @@ public class Localizer implements Externalizable {
 								System.out.println("Invalid line (#" + curline + ") read: " + line);
 							}
 						} else {
-							locale.put(line.substring(0, line.indexOf('=')), line.substring(line.indexOf('='),line.length()));
+							//Check to see if there's anything after the '=' first. Otherwise there
+							//might be some big problems.
+							if(line.indexOf('=') != line.length()-1) {
+								String value = line.substring(line.indexOf('=') + 1,line.length());
+								locale.put(line.substring(0, line.indexOf('=')), value);
+							}
+							 else {
+								System.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
+							}
 							line = "";
 						}
 					} else {
 						line += cbuf[i];
 					}
-					curline ++;
-				}
-				if(line.equals("")) {
-					//Start at the beginning, we read a clean line.
-					offset = 0;
-				} else {
-					//We have some characters that are in the middle of a line. Populate the array and prepare
-					//the offset.
-					for(int j = 0; j < line.length(); ++j) {
-						cbuf[j] = line.charAt(j);
-					}
-					offset = line.length();
 				}
 			}
 		} catch (IOException e) {
@@ -628,7 +642,7 @@ public class Localizer implements Externalizable {
 	public static String processArguments(String text, String[] args) {
 		String working = text;
 		int currentArg = 0;
-		while(working.indexOf("${") != -1 || args.length > currentArg) {
+		while(working.indexOf("${") != -1 && args.length > currentArg) {
 			String value = extractValue(text, args);
 			if(value == null) {
 				value = args[currentArg];
@@ -643,7 +657,7 @@ public class Localizer implements Externalizable {
 		int start = text.indexOf("${");
 		int end = text.indexOf("}");
 		
-		String index = text.substring(start + 2, end);
+		//String index = text.substring(start + 2, end);
 		//Search for that string in the current locale, updating any arguments.
 		return null;
 	}

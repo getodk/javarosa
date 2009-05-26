@@ -34,6 +34,7 @@ import org.javarosa.formmanager.activity.MemoryCheckActivity;
 import org.javarosa.formmanager.activity.ModelListActivity;
 import org.javarosa.formmanager.utility.TransportContext;
 import org.javarosa.formmanager.view.Commands;
+import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.j2me.J2MEModule;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
@@ -89,6 +90,7 @@ public class JavaRosaCLFormsShell implements IShell {
 
 	private void loadModules() {
 		new J2MEModule().registerModule(context);
+		new LanguagePackModule().registerModule(context);
 		new XFormsModule().registerModule(context);
 		new CoreModelModule().registerModule(context);
 		new HttpTransportModule().registerModule(context);
