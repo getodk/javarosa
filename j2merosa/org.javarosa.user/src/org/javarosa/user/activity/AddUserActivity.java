@@ -29,9 +29,9 @@ public class AddUserActivity implements IActivity, CommandListener {
 	private IShell parent = null;
 
 	// --- menu commands?
-	public final static Command CMD_SAVE = new Command(Terms.SAVE_STR,
+	public final static Command CMD_SAVE = new Command(JavaRosaServiceProvider.instance().localize("menu.Save"),
 			Command.OK, 2);
-	public final static Command CMD_CANCEL = new Command(Terms.EXIT_STR,
+	public final static Command CMD_CANCEL = new Command(JavaRosaServiceProvider.instance().localize("menu.Exit"),
 			Command.EXIT, 2);
 
 	private boolean success = false;
@@ -49,7 +49,7 @@ public class AddUserActivity implements IActivity, CommandListener {
 	 */
 	public void start(Context context) {
 		this.context = new AddUserContext(context);
-		this.view = new UserForm(Terms.ADD_USER_STR, this.context
+		this.view = new UserForm(JavaRosaServiceProvider.instance().localize("activity.adduser.adduser"), this.context
 				.getDecorator());
 		this.view.setPasswordMode(this.context.getPasswordFormat());
 		this.view.addCommand(CMD_SAVE);
@@ -90,7 +90,7 @@ public class AddUserActivity implements IActivity, CommandListener {
 
 				saveNewUserToRMS(newUser);
 
-				alertUser(Terms.USER_ADDED_STR, Terms.USER_ADDED_SUCC_STR,
+				alertUser(JavaRosaServiceProvider.instance().localize("activity.adduser.useradded"), JavaRosaServiceProvider.instance().localize("activity.adduser.useraddedsucc"),
 						AlertType.CONFIRMATION);
 
 				// return control from activity
@@ -134,20 +134,21 @@ public class AddUserActivity implements IActivity, CommandListener {
 	 */
 	private void handleProblems(int status) {
 
-		String s = Terms.PROBLEM_ADDING_STR;
+		String s = JavaRosaServiceProvider.instance().localize("activity.adduser.problem");
 
-		if (status == UserValidator.USER_EXISTS)
-			s += ": " + Terms.PROBLEM_NAMETAKEN_STR;
+		if (status == UserValidator.USER_EXISTS) {
+			s += ": " + JavaRosaServiceProvider.instance().localize("activity.adduser.problem.nametaken", new String[]{this.view.getUsername()});
+		}
 
-		if (status == UserValidator.USERORPASSWD_MISSING)
-			s += ": " + Terms.PROBLEM_EMPTYUSER_STR;
+		if (status == UserValidator.USERORPASSWD_MISSING) {
+			s += ": " + JavaRosaServiceProvider.instance().localize("activity.adduser.problem.emptyuser");
+		}
 
 		if (status == UserValidator.MISMATCHED_PASSWORDS) {
-			s += ": " + Terms.PROBLEM_MISMATCHPASSWD_STR;
-
-			alertUser(s, "", AlertType.ERROR);
-
+			s += ": " + JavaRosaServiceProvider.instance().localize("activity.adduser.problem.mismatchingpasswords");
 		}
+
+		alertUser(s, "", AlertType.ERROR);
 	}
 
 	/**
