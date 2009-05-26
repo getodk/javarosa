@@ -24,6 +24,7 @@ import java.util.Vector;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
@@ -70,9 +71,11 @@ public class XPathConditional implements IConditionExpr {
 		return triggers;
 	}
 	
-	private void getTriggers (XPathExpression x, Vector v) {
+	private static void getTriggers (XPathExpression x, Vector v) {
 		if (x instanceof XPathPathExpr) {
-			v.addElement(((XPathPathExpr)x).getReference());
+			TreeReference ref = ((XPathPathExpr)x).getReference();
+			if (!v.contains(ref))
+				v.addElement(ref);
 		} else if (x instanceof XPathBinaryOpExpr) {
 			getTriggers(((XPathBinaryOpExpr)x).a, v);
 			getTriggers(((XPathBinaryOpExpr)x).b, v);			
