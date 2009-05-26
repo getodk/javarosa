@@ -24,7 +24,7 @@
 		</copy>
 		
 		<!-- A property containing the path to the preprocessed source files -->
-		<property name="builtsource" value="${dir.build}/real/${device.identifier}/en/source/" />
+		<property name="builtsource" value="${dir.build}/real/${device.identifier}/none/source/" />
 		<buildPolish>
 			<info name="${app.name}"
 				version="${app.version}"
