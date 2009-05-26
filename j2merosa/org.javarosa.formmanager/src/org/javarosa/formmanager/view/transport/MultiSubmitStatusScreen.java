@@ -45,7 +45,7 @@ public class MultiSubmitStatusScreen extends Form implements
 	 * @param modelIDs
 	 */
 	public MultiSubmitStatusScreen(CommandListener listener) {
-		// #style submitPopup
+		//#style submitPopup
 		super(Terms.SEND_STATUS);
 
 		setCommandListener(listener);

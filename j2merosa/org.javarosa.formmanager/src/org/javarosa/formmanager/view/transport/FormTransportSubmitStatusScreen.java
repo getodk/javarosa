@@ -31,7 +31,7 @@ public class FormTransportSubmitStatusScreen extends Form implements
 	private static final int TIMEOUT = 60000;
 
 	public FormTransportSubmitStatusScreen(CommandListener activity) {
-		// #style submitPopup
+		//#style submitPopup
 		super(Terms.SEND_STATUS);
 		setCommandListener(this);
 
