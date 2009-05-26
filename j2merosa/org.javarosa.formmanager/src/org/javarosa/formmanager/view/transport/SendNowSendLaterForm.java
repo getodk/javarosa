@@ -18,10 +18,10 @@ public class SendNowSendLaterForm extends Form implements IView {
 	public static final int SEND_NOW_SPEC = 2;
 
 	public SendNowSendLaterForm(CommandListener activity) {
-		// #style submitPopup
+		//#style submitPopup
 		super(Terms.SUBMIT_FORM_STR);
 
-		// #style submitYesNo
+		//#style submitYesNo
 		this.cg = new ChoiceGroup(Terms.SEND_DATA_NOW_STR, Choice.EXCLUSIVE);
 
 		// NOTE! These Indexes are optimized to be added in a certain
