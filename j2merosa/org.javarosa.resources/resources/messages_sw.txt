@@ -142,13 +142,13 @@ form.user.userid=User ID:
 form.user.giveadmin=Give this user admin rights?
 form.user.fillinboth =Please fill in both username and password
 form.user.reenterpasswords=Please re-enter your password, the password and password confirmation box did not match
-form.user.usernametaken=Username {0} already taken. Please choose another username
+form.user.usernametaken=Username ${0} already taken. Please choose another username
 
 activity.adduser.adduser=Add User
 activity.adduser.useradded=User added 
 activity.adduser.useraddedsucc=User added successfully
 activity.adduser.problem=Problem:
-activity.adduser.problem.nametaken=Username is already taken
+activity.adduser.problem.nametaken=Username ${0} already taken. Please choose another username
 activity.adduser.problem.emptyuser=Username and password must both be given
 activity.adduser.problem.mismatchingpasswords=Passwords don't match
  
