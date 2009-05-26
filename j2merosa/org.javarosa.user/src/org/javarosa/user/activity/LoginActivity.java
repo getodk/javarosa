@@ -136,13 +136,13 @@ public class LoginActivity implements IActivity, CommandListener,
 				userValidated();
 				return;
 			}
-			showError(Terms.loginIncorrect, Terms.tryAgain);
+			showError(JavaRosaServiceProvider.instance().localize("activity.login.loginincorrect"), JavaRosaServiceProvider.instance().localize("activity.login.tryagain"));
 
 		}
 
 		// #if javarosa.login.demobutton
 		else if (c == LoginForm.CMD_DEMO_BUTTON) {
-			showError(Terms.demoMode, Terms.demoModeIntro, this);
+			showError(JavaRosaServiceProvider.instance().localize("activity.login.demomode"), JavaRosaServiceProvider.instance().localize("activity.login.demomode.intro"), this);
 		} else if (d instanceof Alert) {
 			// returning from demo mode warning popup
 			Hashtable returnArgs = new Hashtable();

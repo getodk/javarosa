@@ -5,11 +5,11 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.IUserDecorator;
 import org.javarosa.user.utility.LoginContext;
-import org.javarosa.user.utility.Terms;
 
 /**
  * Form accessible to admins for adding new users to an application
@@ -33,17 +33,17 @@ public class UserForm extends Form implements IView {
 
 	public UserForm(String title, IUserDecorator d) {
 		super(title);
-		this.usernameField = new TextField(Terms.UNAME_STR, "", 10,
+		this.usernameField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.name"), "", 10,
 				TextField.ANY);
-		this.passwordField = new TextField(Terms.PASSWRD_STR, "", 10,
+		this.passwordField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.password"), "", 10,
 				TextField.PASSWORD);
-		this.confirmPasswordField = new TextField(Terms.CONFIRMPASSWD_STR, "",
+		this.confirmPasswordField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.confirmpassword"), "",
 				10, TextField.PASSWORD);
 		// #if javarosa.adduser.extended
-		this.userIDField = new TextField(Terms.USERID_STR, "", 10,
+		this.userIDField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.userid"), "", 10,
 				TextField.NUMERIC);
 		// #endif
-		this.choice.append(Terms.GIVE_ADMIN_STR, null);
+		this.choice.append(JavaRosaServiceProvider.instance().localize("form.user.giveadmin"), null);
 
 		append(this.usernameField);
 		append(this.passwordField);
