@@ -144,7 +144,7 @@ public class LoginForm extends FramedForm implements IView {
 	 * 
 	 */
 	private void showVersions() {
-		// #if javarosa.login.showbuild
+		//#if javarosa.login.showbuild
 		String ccv = (String) this.parent.getActivityContext().getElement(
 				CTX_COMMCARE_VERSION);
 		String ccb = (String) this.parent.getActivityContext().getElement(
@@ -159,7 +159,7 @@ public class LoginForm extends FramedForm implements IView {
 				&& (jrb != null && !jrb.equals(""))) {
 			this.append(Terms.buildNumber + " " + ccb + "-" + jrb);
 		}
-		// #endif
+		//#endif
 	}
 
 	/**
