@@ -105,8 +105,27 @@
 							<treat_problems />
 						</info>
 					</interlude>
+					<dosing>
+						<malaria_quinine>
+							<severe_malaria_drug />
+							<dose />
+							<info_give_correct />
+						</malaria_quinine>
+						<pneumonia_antibiotic>
+							<pneumonia_drug />
+							<cotrim_adverse />
+							<info_no_cotrim />
+							<pneumonia_drug_2 />
+							<info_choose_other />
+							<choose_cotrim />
+							<choose_amoxy />
+							<dose />
+							<info_give_correct />
+						</pneumonia_antibiotic>
+					</dosing>
 					
 					
+					<stopgap />
 					
           <tmp>
             <sentinel>
@@ -135,6 +154,25 @@
 								<fever />
 								<ear />
 							</diagnosis>
+							<treatment>
+								<malaria_quinine>
+									<choice />
+									<amount />
+									<drug />
+									<variant />
+									<frequency />
+									<duration />
+								</malaria_quinine>
+								<pneumonia_antibiotic>
+									<category />
+									<choice />
+									<amount />
+									<drug />
+									<variant />
+									<frequency />
+									<duration />
+								</pneumonia_antibiotic>
+							</treatment>
             </normalized>
 						<const>
 							<high_malaria_risk>1</high_malaria_risk>
@@ -287,37 +325,37 @@
 				  if(/imci/preamble/weight < 15, 'whole tablet', 'two tablets'),
 			  if(/imci/tmp/normalized/age >= 0.25 and /imci/tmp/normalized/age <= 8.0,
 				  if(/imci/tmp/normalized/age <= 3.0, 'whole tablet', 'two tablets'),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/amoxycillin/tablet" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 10, 'half tablet', 'whole tablet'),
 			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
 				  if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 'whole tablet'),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/amoxycillin/syrup" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 10, '5mL', '10mL'),
 			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
 				  if(/imci/tmp/normalized/age <= 1.0, '5mL', '10mL'),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/cotrimoxazole/adult" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 10, 'half tablet', 'whole tablet'),
 			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
 				  if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 'whole tablet'),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/cotrimoxazole/ped" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 10, 'two tablets', '4 tablets'),
 			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
 				  if(/imci/tmp/normalized/age <= 1.0, 'two tablets', '4 tablets'),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/cotrimoxazole/syrup" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 10, '5mL', '10mL'),
 			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
 				  if(/imci/tmp/normalized/age <= 1.0, '5mL', '10mL'),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/erythromycin" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 6, 'quarter tablet',
@@ -327,7 +365,7 @@
 				  if(/imci/tmp/normalized/age <= 0.34, 'quarter tablet',
 					if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 
 					  'whole tablet')),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/nalidixic_acid" calculate="	
   			if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 6, 'quarter tablet',
@@ -337,48 +375,137 @@
 				  if(/imci/tmp/normalized/age <= 0.34, 'quarter tablet',
 					if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 
 					  'whole tablet')),
-				''))" />				
+				'[amount unavailable for age/weight]'))" />				
 			<bind nodeset="tmp/dosings/paracetamol/ped" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 14, 'whole tablet', '2.5 tablets'),
 			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
 				  if(/imci/tmp/normalized/age <= 3.0, 'whole tablet', '2.5 tablets'),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/paracetamol/adult" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 14, 'quarter tablet', 'half tablet'),
 			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
 				  if(/imci/tmp/normalized/age <= 3.0, 'quarter tablet', 'half tablet'),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/procaine_penicillin" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 10, '1mL injection', '2mL injection'),
 			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
 				  if(/imci/tmp/normalized/age <= 1.0, '1mL injection', '2mL injection'),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/quinine/injection" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-				  if(/imci/preamble/weight < 6, '1mL',
+				  if(/imci/preamble/weight < 6, '1.0mL',
 					if(/imci/preamble/weight < 8, '1.5mL', 
-					if(/imci/preamble/weight < 10, '2mL', 
+					if(/imci/preamble/weight < 10, '2.0mL', 
 					if(/imci/preamble/weight < 14, '2.5mL', 
-					  '3mL')))),
+					  '3.0mL')))),
 			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-				  if(/imci/tmp/normalized/age <= 0.34, '1mL',
+				  if(/imci/tmp/normalized/age <= 0.34, '1.0mL',
 					if(/imci/tmp/normalized/age <= 0.75, '1.5mL', 
-					if(/imci/tmp/normalized/age <= 1.0, '2mL', 
+					if(/imci/tmp/normalized/age <= 1.0, '2.0mL', 
 					if(/imci/tmp/normalized/age <= 3.0, '2.5mL', 
-					  '3mL')))),
-				''))" />
+					  '3.0mL')))),
+				'[amount unavailable for age/weight]'))" />
 			<bind nodeset="tmp/dosings/quinine/tablet" calculate="
 				if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
 				  if(/imci/preamble/weight < 11, 'quarter tablet', 'half tablet'),
 			  if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
 				  if(/imci/tmp/normalized/age <= 1.0, 'quarter tablet', 'half tablet'),
-				''))" />
+				'[amount unavailable for age/weight]'))" />
 			
+			<bind nodeset="dosing/malaria_quinine" relevant="/imci/tmp/normalized/diagnosis/fever = 'febrile' or /imci/tmp/normalized/diagnosis/fever = 'malaria'" />
+			<bind nodeset="dosing/malaria_quinine/severe_malaria_drug" relevant="/imci/tmp/normalized/diagnosis/fever = 'febrile'" />
+			<bind nodeset="tmp/normalized/treatment/malaria_quinine/choice" calculate="if(/imci/dosing/malaria_quinine/severe_malaria_drug != '', /imci/dosing/malaria_quinine/severe_malaria_drug,
+			                                                                           if(/imci/tmp/normalized/diagnosis/fever = 'malaria', 'alu', ''))" />
+			<bind nodeset="tmp/normalized/treatment/malaria_quinine/amount" calculate="
+			  if(../choice = 'quinine-injection', /imci/tmp/dosings/quinine/injection,
+				if(../choice = 'quinine-tablet', /imci/tmp/dosings/quinine/tablet,
+				if(../choice = 'alu', /imci/tmp/dosings/alu,
+				  '')))" />
+			<bind nodeset="tmp/normalized/treatment/malaria_quinine/drug" calculate="
+			  if(../choice = 'quinine-injection', 'QUININE INJECTION',
+				if(../choice = 'quinine-tablet', 'QUININE',
+				if(../choice = 'alu', 'ALU',
+				  '')))" />
+			<bind nodeset="tmp/normalized/treatment/malaria_quinine/variant" calculate="
+			  if(../choice = 'quinine-injection', '60mg/mL',
+				if(../choice = 'quinine-tablet', '300mg',
+				if(../choice = 'alu', '',
+				  '')))" />
+			<bind nodeset="tmp/normalized/treatment/malaria_quinine/frequency" calculate="
+			  if(../choice = 'quinine-injection', 'repeat after 8 hrs then every 12 hrs',
+				if(../choice = 'quinine-tablet', 'three times a day',
+				if(../choice = 'alu', 'twice a day',
+				  '')))" />
+			<bind nodeset="tmp/normalized/treatment/malaria_quinine/duration" calculate="
+			  if(../choice = 'quinine-injection', 'no more than one week',
+				if(../choice = 'quinine-tablet', '7 to 10 days',
+				if(../choice = 'alu', '3 days',
+				  '')))" />
+			<bind nodeset="dosing/malaria_quinine/dose" relevant="/imci/tmp/normalized/treatment/malaria_quinine/choice != 'other'" />
+			<bind nodeset="dosing/malaria_quinine/info_give_correct" relevant="../dose = 'disagree'" />
 			
-		</model>
+			<bind nodeset="dosing/pneumonia_antibiotic" relevant="/imci/tmp/normalized/diagnosis/cough = 'pneumonia' or /imci/tmp/normalized/diagnosis/cough = 'severe-pneumonia'" />
+			<bind nodeset="dosing/pneumonia_antibiotic/cotrim_adverse" relevant="../pneumonia_drug = 'cotrim'" />
+			<bind nodeset="dosing/pneumonia_antibiotic/info_no_cotrim" relevant="../cotrim_adverse = 'yes'" />
+			<bind nodeset="dosing/pneumonia_antibiotic/pneumonia_drug_2" relevant="../cotrim_adverse = 'yes'" />
+			<bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/category" calculate="if(/imci/dosing/pneumonia_antibiotic/pneumonia_drug_2 != '', /imci/dosing/pneumonia_antibiotic/pneumonia_drug_2,
+			                                                                                  if(/imci/dosing/pneumonia_antibiotic/pneumonia_drug != '', /imci/dosing/pneumonia_antibiotic/pneumonia_drug, ''))" />
+			<bind nodeset="dosing/pneumonia_antibiotic/info_choose_other" relevant="/imci/tmp/normalized/treatment/pneumonia_antibiotic/category = 'other'" />
+			<bind nodeset="dosing/pneumonia_antibiotic/choose_amoxy" relevant="/imci/tmp/normalized/treatment/pneumonia_antibiotic/category = 'amoxy'" />
+			<bind nodeset="dosing/pneumonia_antibiotic/choose_cotrim" relevant="/imci/tmp/normalized/treatment/pneumonia_antibiotic/category = 'cotrim'" />
+			<bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/choice" calculate="
+			  if(../category = 'amoxy', /imci/dosing/pneumonia_antibiotic/choose_amoxy,
+				if(../category = 'cotrim', /imci/dosing/pneumonia_antibiotic/choose_cotrim,
+				if(../category = 'procaine', 'procaine',
+				  '')))" />
+			<bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/amount" calculate="
+			  if(../choice = 'amoxy-tablet', /imci/tmp/dosings/amoxycillin/tablet,
+				if(../choice = 'amoxy-syrup', /imci/tmp/dosings/amoxycillin/syrup,
+				if(../choice = 'cotrim-adult', /imci/tmp/dosings/cotrimoxazole/adult,
+				if(../choice = 'cotrim-ped', /imci/tmp/dosings/cotrimoxazole/ped,
+				if(../choice = 'cotrim-syrup', /imci/tmp/dosings/cotrimoxazole/syrup,
+				if(../choice = 'procaine', /imci/tmp/dosings/procaine_penicillin,
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/drug" calculate="
+			  if(../choice = 'amoxy-tablet', 'AMOXYCILLIN',
+				if(../choice = 'amoxy-syrup', 'AMOXYCILLIN',
+				if(../choice = 'cotrim-adult', 'COTRIMOXAZOLE',
+				if(../choice = 'cotrim-ped', 'COTRIMOXAZOLE',
+				if(../choice = 'cotrim-syrup', 'COTRIMOXAZOLE',
+				if(../choice = 'procaine', 'PROCAINE PENICILLIN',
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/variant" calculate="
+			  if(../choice = 'amoxy-tablet', '250mg',
+				if(../choice = 'amoxy-syrup', '125mg/5mL',
+				if(../choice = 'cotrim-adult', '480mg',
+				if(../choice = 'cotrim-ped', '120mg',
+				if(../choice = 'cotrim-syrup', '240mg/5mL',
+				if(../choice = 'procaine', '400,000u/mL',
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/frequency" calculate="
+			  if(../choice = 'amoxy-tablet', 'three times a day',
+				if(../choice = 'amoxy-syrup', 'three times a day',
+				if(../choice = 'cotrim-adult', 'twice a day',
+				if(../choice = 'cotrim-ped', 'twice a day',
+				if(../choice = 'cotrim-syrup', 'twice a day',
+				if(../choice = 'procaine', 'once a day',
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/duration" calculate="
+			  if(../choice = 'amoxy-tablet', '5 days',
+				if(../choice = 'amoxy-syrup', '5 days',
+				if(../choice = 'cotrim-adult', '5 days',
+				if(../choice = 'cotrim-ped', '5 days',
+				if(../choice = 'cotrim-syrup', '5 days',
+				if(../choice = 'procaine', '5 days',
+				  ''))))))" />
+			<bind nodeset="dosing/pneumonia_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != ''" />
+			<bind nodeset="dosing/pneumonia_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
+
+
+  	</model>
   </h:head>
 
   <h:body>
@@ -820,17 +947,89 @@
 			<trigger ref="/imci/interlude/info/treat_problems">
 			  <label>DO: Treat the child's other problems</label>
 			</trigger>
+						
+			<group ref="/imci/dosing/malaria_quinine">
+			
+				<select1 ref="/imci/dosing/malaria_quinine/severe_malaria_drug">
+					<label>Which form of quinine would you like to use for the severe malaria?</label>
+					<item><label>Quinine Injection</label><value>quinine-injection</value></item>
+					<item><label>Quinine Tablet</label><value>quinine-tablet</value></item>
+					<item><label>Other Drug</label><value>other</value></item>
+				</select1>
+			
+				<select1 ref="/imci/dosing/malaria_quinine/dose">
+					<label>GIVE: <output value="/imci/tmp/normalized/treatment/malaria_quinine/amount" /> of <output value="/imci/tmp/normalized/treatment/malaria_quinine/variant" /> <output value="/imci/tmp/normalized/treatment/malaria_quinine/drug" /> <output value="/imci/tmp/normalized/treatment/malaria_quinine/frequency" /> for <output value="/imci/tmp/normalized/treatment/malaria_quinine/duration" /></label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<trigger ref="/imci/dosing/malaria_quinine/info_give_correct">
+					<label>DO: Give correct dose and tell observer</label>
+				</trigger>
+			
+			</group>
+			
+			<group ref="/imci/dosing/pneumonia_antibiotic">
+			
+				<select1 ref="/imci/dosing/pneumonia_antibiotic/pneumonia_drug">
+					<label>Which antibiotic would you like to use for the pneumonia?</label>
+					<item><label>Amoxycillin</label><value>amoxy</value></item>
+					<item><label>Procaine Penicillin</label><value>procaine</value></item>
+					<item><label>Cotrimoxazole</label><value>cotrim</value></item>					
+					<item><label>Other Drug</label><value>other</value></item>
+					<item><label>None</label><value>none</value></item>					
+				</select1>
+						
+				<select1 ref="/imci/dosing/pneumonia_antibiotic/cotrim_adverse">
+					<label>ASK: Has child ever had a bad reaction to SP?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>
+			
+				<trigger ref="/imci/dosing/pneumonia_antibiotic/info_no_cotrim">
+					<label>SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</label>
+				</trigger>
+				
+				<select1 ref="/imci/dosing/pneumonia_antibiotic/pneumonia_drug_2">
+					<label>Which antibiotic would you like to use for the pneumonia?</label>
+					<item><label>Amoxycillin</label><value>amoxy</value></item>
+					<item><label>Procaine Penicillin</label><value>procaine</value></item>
+					<item><label>Other Drug</label><value>other</value></item>
+					<item><label>None</label><value>none</value></item>					
+				</select1>
+
+				<trigger ref="/imci/dosing/pneumonia_antibiotic/info_choose_other">
+					<label>DO: Choose appropriate drug</label>
+				</trigger>
+				
+				<select1 ref="/imci/dosing/pneumonia_antibiotic/choose_amoxy">
+					<label>Which amoxycillin form would you like to use?</label>
+					<item><label>250mg tablet</label><value>amoxy-tablet</value></item>
+					<item><label>125mg / 5mL syrup</label><value>amoxy-syrup</value></item>				
+				</select1>
+				
+				<select1 ref="/imci/dosing/pneumonia_antibiotic/choose_cotrim">
+					<label>Which cotrimoxazole form would you like to use?</label>
+					<item><label>480mg adult tablet</label><value>cotrim-adult</value></item>
+					<item><label>120mg pediatric tablet</label><value>cotrim-ped</value></item>
+					<item><label>240mg / 5mL syrup</label><value>cotrim-syrup</value></item>			
+				</select1>
+				
+				<select1 ref="/imci/dosing/pneumonia_antibiotic/dose">
+					<label>GIVE: <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/duration" /></label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<trigger ref="/imci/dosing/pneumonia_antibiotic/info_give_correct">
+					<label>DO: Give correct dose and tell observer</label>
+				</trigger>
+			
+			</group>
 			
 			
-			<!--
-			<select1 ref="">
-				<label>Which form of quinine would you like to use for the severe malaria?</label>
-				<item><label>Quinine Injection</label><value>injection</value></item>
-				<item><label>Quinine Tablet</label><value>tablet</value></item>
-				<item><label>Other Drug</label><value>other</value></item>
-			</select1>
-			-->
 			
+			<input ref="/imci/stopgap"><label>catch</label></input>
 			
     </group>
 
