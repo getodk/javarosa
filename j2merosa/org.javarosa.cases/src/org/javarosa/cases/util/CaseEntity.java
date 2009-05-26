@@ -70,9 +70,17 @@ public class CaseEntity implements IEntity {
 	public String[] getHeaders(boolean detailed) {
 		String [] headers;
 		if(detailed) {
-			headers = new String[] {"Name", "ID", "Date Opened", "Currently Open"};
+			//#if commcare.lang.sw
+			headers = new String[] {"Jina", "Namba", "Tarehe ya kufunguliwa", "Bado inaendelea?"};
+			//#else
+			headers = new String[] {"Name", "ID", "Date Opened", "Currently Open"};			
+			//#endif
 		} else {
+			//#if commcare.lang.sw
+			headers = new String[] {"Jina", "Namba"};
+			//#else
 			headers = new String[] {"Name", "ID"};
+			//#endif
 		}
 		return headers;
 	}
@@ -90,9 +98,17 @@ public class CaseEntity implements IEntity {
 		}
 		String open;
 		if(c.isClosed()) {
+			//#if commcare.lang.sw
+			open = "Hapana";
+			//#else
 			open = "No";
+			//#endif
 		} else {
+			//#if commcare.lang.sw
+			open = "Ndiyo";
+			//#else
 			open = "Yes";
+			//#endif
 		}
 		return new String[] {c.getName(), c.getId(), date, open};
 	}
