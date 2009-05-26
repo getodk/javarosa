@@ -73,7 +73,8 @@
 					<!--source dir="${basedir}/../org.javarosa.mesh4j.sync.extensions/src/"/-->
                     <source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
-					<source dir="${basedir}/../org.javarosa.polish.chatterbox.extensions/src/"/>  
+					<source dir="${basedir}/../org.javarosa.polish.chatterbox.extensions/src/"/>
+					<source dir="${basedir}/../org.javarosa.resources/src/"/>
 					<source dir="${basedir}/../org.javarosa.referral/src/"/>
 					<source dir="${basedir}/../org.javarosa.services.properties/src/"/>
 					<source dir="${basedir}/../org.javarosa.user/src/"/>
@@ -112,13 +113,13 @@
 				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) -->
 				<resources
 					dir="${dir.resources}"
-					defaultexcludes="yes"
-					excludes="readme.txt">
+					defaultexcludes="no"
+					excludes="readme.txt, .svn, *.css">
 					<root dir="${dir.resources.external}"
 						excludes=".svn"/>
 					<!-- Set the language for the strings in the application -->
 					<localization>
-						<locale name="en" />
+						<locale name="none" />
 					</localization>
 				</resources>
 				

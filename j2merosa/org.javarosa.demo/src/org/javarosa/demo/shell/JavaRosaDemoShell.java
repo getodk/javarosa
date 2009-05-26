@@ -55,13 +55,12 @@ import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.select.activity.PatientEntity;
 import org.javarosa.patient.storage.PatientRMSUtility;
 import org.javarosa.referral.ReferralModule;
+import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.AddUserActivity;
 import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
-
-import de.enough.polish.util.Locale;
 
 /**
  * This is the shell for the JavaRosa demo that handles switching all of the
@@ -597,6 +596,7 @@ public class JavaRosaDemoShell implements IShell {
 
 	private void loadModules() {
 		new J2MEModule().registerModule(context);
+		new LanguagePackModule().registerModule(context);
 		new XFormsModule().registerModule(context);
 		new CoreModelModule().registerModule(context);
 		new HttpTransportModule().registerModule(context);

@@ -33,6 +33,7 @@ import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.StorageManager;
 import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.UnavailableServiceException;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.transport.storage.RmsStorage;
 import org.javarosa.core.util.PrefixTree;
@@ -58,6 +59,8 @@ public class JavaRosaServiceProvider {
 	private StorageManager storageManager;
     private ITransportManager transportManager;
     private IPropertyManager propertyManager;
+    
+    private Localizer localeManager;
     
     private IIncidentLogger logger;
 	
@@ -227,6 +230,21 @@ public class JavaRosaServiceProvider {
 			System.out.println(type + ": " + message);
 		}
 		}
+	}
+	
+	public Localizer getLocaleManager() {
+		if(localeManager == null) {
+		    localeManager = new Localizer(true, false);
+		}
+		return localeManager;
+	}
+	
+	public String localize(String id) {
+		return localize(id, new String[]{});
+	}
+	
+	public String localize(String id, String[] args) {
+		return localeManager.getText(id, args);
 	}
 	
 	
