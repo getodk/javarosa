@@ -292,6 +292,8 @@
         </imci>
       </instance>
       
+			<!-- INTRO/DEMOGRAPHIC QUESTIONS -->
+			
       <bind nodeset="preamble/chief_complaint" constraint="not(selected(., 'none') and count-selected(.) > 1)"
         jr:constraintMsg="'Other/None of the above' cannot be selected with other choices" />
       <bind nodeset="preamble/other_complaint" relevant="count-selected(../chief_complaint) = 0 or
@@ -328,6 +330,7 @@
                                                          (/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age < 6.0 or /imci/preamble/too_old_use_anyway = 'yes')) and
                                                          (not(/imci/preamble/weight) or /imci/preamble/weight < 19 or /imci/preamble/too_heavy_use_anyway = 'yes')" />
 																								
+			<!-- COUGH CLASSIFICATION -->
 																								
 			<bind nodeset="cough" relevant="/imci/tmp/normalized/has_cough" />
 																												 
@@ -350,6 +353,7 @@
 			                                                  ../cold = 'disagree'" />
 			<bind nodeset="tmp/normalized/diagnosis/cough" calculate="if(/imci/cough/classify/override != '', /imci/cough/classify/override, ../../classification/cough)" />
 
+			<!-- DIARRHEA CLASSIFICATION -->
 			
 			<bind nodeset="diarrhea" relevant="/imci/tmp/normalized/has_diarrhea" />
 
@@ -359,6 +363,7 @@
 			<bind nodeset="tmp/normalized/has_cholera" calculate="(true() or 'diarrhea-severe-dehydration') and ../age >= 2.0" /> <!-- todo: link up to dehyrdation classification -->
 			<!--end diarrhea-->
 			
+			<!-- FEVER CLASSIFICATION -->
 			
 			<bind nodeset="fever" relevant="/imci/tmp/normalized/has_fever" />
 			
@@ -381,6 +386,7 @@
 																												../fever_only = 'disagree'" />
 			<bind nodeset="tmp/normalized/diagnosis/fever" calculate="if(/imci/fever/classify/override != '', /imci/fever/classify/override, ../../classification/fever)" />
 			
+			<!-- EAR CLASSIFICATION -->
 			
 			<bind nodeset="ear" relevant="/imci/tmp/normalized/has_ear" />
 			
@@ -403,11 +409,15 @@
 																											../none = 'disagree'" />
 			<bind nodeset="tmp/normalized/diagnosis/ear" calculate="if(/imci/ear/classify/override != '', /imci/ear/classify/override, ../../classification/ear)" />
 			
+			<!-- INTERLUDE QUESTIONS -->
+			
 			<bind nodeset="interlude/breastfeeding" relevant="/imci/tmp/normalized/age <= 2.0" />
 			<bind nodeset="interlude/other_feed" relevant="/imci/tmp/normalized/age <= 2.0" />
 			<bind nodeset="interlude/info/feed_other" relevant="../../other_feed = 'no' and /imci/tmp/normalized/age > 0.5" />
 			<bind nodeset="interlude/info/keep_feeding" relevant="../../feeding_change = 'yes'" />
 			<bind nodeset="interlude/info/treat_problems" relevant="../../other_problems = 'yes'" />
+			
+			<!-- DOSINGS FOR ALL DRUGS BASED ON AGE/WEIGHT -->
 			
 			<bind nodeset="tmp/dosings/alu" calculate="
 			  if(/imci/preamble/weight >= 5 and /imci/preamble/weight < 25,
@@ -504,6 +514,7 @@
 				  if(/imci/tmp/normalized/age <= 1.0, 'quarter tablet', 'half tablet'),
 				'[amount unavailable for age/weight]'))" />
 			
+			<!-- TREATMENT: MALARIA QUININE -->
 			
 			<bind nodeset="dosing/malaria_quinine" relevant="/imci/tmp/normalized/diagnosis/fever = 'febrile' or /imci/tmp/normalized/diagnosis/fever = 'malaria'" />
 			<bind nodeset="dosing/malaria_quinine/severe_malaria_drug" relevant="/imci/tmp/normalized/diagnosis/fever = 'febrile'" />
@@ -537,6 +548,7 @@
 			<bind nodeset="dosing/malaria_quinine/dose" relevant="/imci/tmp/normalized/treatment/malaria_quinine/choice != 'other'" />
 			<bind nodeset="dosing/malaria_quinine/info_give_correct" relevant="../dose = 'disagree'" />
 			
+			<!-- TREATMENT: PNEUMONIA ANTIBIOTIC -->
 			
 			<bind nodeset="dosing/pneumonia_antibiotic" relevant="/imci/tmp/normalized/diagnosis/cough = 'pneumonia' or /imci/tmp/normalized/diagnosis/cough = 'severe-pneumonia'" />
 			<bind nodeset="dosing/pneumonia_antibiotic/cotrim_adverse" relevant="../pneumonia_drug = 'cotrim'" />
@@ -595,6 +607,7 @@
 			<bind nodeset="dosing/pneumonia_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != ''" />
 			<bind nodeset="dosing/pneumonia_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
 
+			<!-- TREATMENT: CHOLERA ANTIBIOTIC -->
 			
 			<bind nodeset="dosing/cholera_antibiotic" relevant="/imci/tmp/normalized/has_cholera" />
 			<bind nodeset="tmp/normalized/treatment/cholera_antibiotic/antibiotic_already" calculate="../../pneumonia_antibiotic/amount != ''" />
@@ -644,6 +657,7 @@
 			<bind nodeset="dosing/cholera_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/cholera_antibiotic/amount != ''" />
 			<bind nodeset="dosing/cholera_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
 			
+			<!-- TREATMENT: DYSENTERY ANTIBIOTIC -->
 			
 			<bind nodeset="dosing/dysentery_antibiotic" relevant="/imci/tmp/normalized/diagnosis/dysentery = 'yes'" />
 			<bind nodeset="tmp/normalized/treatment/dysentery_antibiotic/antibiotic_already" calculate="../../pneumonia_antibiotic/amount != '' or
@@ -694,6 +708,7 @@
 			<bind nodeset="dosing/dysentery_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != ''" />
 			<bind nodeset="dosing/dysentery_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
 			
+			<!-- TREATMENT: EAR ANTIBIOTIC -->
 			
 			<bind nodeset="dosing/ear_antibiotic" relevant="/imci/tmp/normalized/diagnosis/ear = 'mastoiditis' or /imci/tmp/normalized/diagnosis/ear = 'acute'" />
 			<bind nodeset="tmp/normalized/treatment/ear_antibiotic/antibiotic_already" calculate="../../pneumonia_antibiotic/amount != '' or
@@ -756,6 +771,71 @@
 				  ''))))))" />
 			<bind nodeset="dosing/ear_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/ear_antibiotic/amount != ''" />
 			<bind nodeset="dosing/ear_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
+			
+			<!-- TREATMENT: MALARIA ANTIBIOTIC -->
+			
+			<bind nodeset="dosing/malaria_antibiotic" relevant="/imci/tmp/normalized/diagnosis/fever = 'febrile'" />
+			<bind nodeset="tmp/normalized/treatment/malaria_antibiotic/antibiotic_already" calculate="../../pneumonia_antibiotic/amount != '' or
+			                                                                                          ../../cholera_antibiotic/amount != '' or
+			                                                                                          ../../dysentery_antibiotic/amount != '' or
+			                                                                                          ../../ear_antibiotic/amount != ''" />																																														
+			<bind nodeset="dosing/malaria_antibiotic/info_antibiotic_already" relevant="/imci/tmp/normalized/treatment/malaria_antibiotic/antibiotic_already" />
+			<bind nodeset="dosing/malaria_antibiotic/malaria_drug" relevant="not(/imci/tmp/normalized/treatment/malaria_antibiotic/antibiotic_already)" />
+			<bind nodeset="dosing/malaria_antibiotic/cotrim_adverse" relevant="../malaria_drug = 'cotrim'" />
+			<bind nodeset="dosing/malaria_antibiotic/info_no_cotrim" relevant="../cotrim_adverse = 'yes'" />
+			<bind nodeset="dosing/malaria_antibiotic/malaria_drug_2" relevant="../cotrim_adverse = 'yes'" />
+			<bind nodeset="tmp/normalized/treatment/malaria_antibiotic/category" calculate="if(/imci/dosing/malaria_antibiotic/malaria_drug_2 != '', /imci/dosing/malaria_antibiotic/malaria_drug_2,
+			                                                                                if(/imci/dosing/malaria_antibiotic/malaria_drug != '', /imci/dosing/malaria_antibiotic/malaria_drug, ''))" />
+			<bind nodeset="dosing/malaria_antibiotic/info_choose_other" relevant="/imci/tmp/normalized/treatment/malaria_antibiotic/category = 'other'" />
+			<bind nodeset="dosing/malaria_antibiotic/choose_amoxy" relevant="/imci/tmp/normalized/treatment/malaria_antibiotic/category = 'amoxy'" />
+			<bind nodeset="dosing/malaria_antibiotic/choose_cotrim" relevant="/imci/tmp/normalized/treatment/malaria_antibiotic/category = 'cotrim'" />
+			<bind nodeset="tmp/normalized/treatment/malaria_antibiotic/choice" calculate="
+			  if(../category = 'amoxy', /imci/dosing/malaria_antibiotic/choose_amoxy,
+				if(../category = 'cotrim', /imci/dosing/malaria_antibiotic/choose_cotrim,
+				if(../category = 'procaine', 'procaine',
+				  '')))" />
+			<bind nodeset="tmp/normalized/treatment/malaria_antibiotic/amount" calculate="
+			  if(../choice = 'amoxy-tablet', /imci/tmp/dosings/amoxycillin/tablet,
+				if(../choice = 'amoxy-syrup', /imci/tmp/dosings/amoxycillin/syrup,
+				if(../choice = 'cotrim-adult', /imci/tmp/dosings/cotrimoxazole/adult,
+				if(../choice = 'cotrim-ped', /imci/tmp/dosings/cotrimoxazole/ped,
+				if(../choice = 'cotrim-syrup', /imci/tmp/dosings/cotrimoxazole/syrup,
+				if(../choice = 'procaine', /imci/tmp/dosings/procaine_penicillin,
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/malaria_antibiotic/drug" calculate="
+			  if(../choice = 'amoxy-tablet', 'AMOXYCILLIN',
+				if(../choice = 'amoxy-syrup', 'AMOXYCILLIN',
+				if(../choice = 'cotrim-adult', 'COTRIMOXAZOLE',
+				if(../choice = 'cotrim-ped', 'COTRIMOXAZOLE',
+				if(../choice = 'cotrim-syrup', 'COTRIMOXAZOLE',
+				if(../choice = 'procaine', 'PROCAINE PENICILLIN',
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/malaria_antibiotic/variant" calculate="
+			  if(../choice = 'amoxy-tablet', '250mg',
+				if(../choice = 'amoxy-syrup', '125mg/5mL',
+				if(../choice = 'cotrim-adult', '480mg',
+				if(../choice = 'cotrim-ped', '120mg',
+				if(../choice = 'cotrim-syrup', '240mg/5mL',
+				if(../choice = 'procaine', '400,000u/mL',
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/malaria_antibiotic/frequency" calculate="
+			  if(../choice = 'amoxy-tablet', 'three times a day',
+				if(../choice = 'amoxy-syrup', 'three times a day',
+				if(../choice = 'cotrim-adult', 'twice a day',
+				if(../choice = 'cotrim-ped', 'twice a day',
+				if(../choice = 'cotrim-syrup', 'twice a day',
+				if(../choice = 'procaine', 'once a day',
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/malaria_antibiotic/duration" calculate="
+			  if(../choice = 'amoxy-tablet', '5 days',
+				if(../choice = 'amoxy-syrup', '5 days',
+				if(../choice = 'cotrim-adult', '5 days',
+				if(../choice = 'cotrim-ped', '5 days',
+				if(../choice = 'cotrim-syrup', '5 days',
+				if(../choice = 'procaine', '5 days',
+				  ''))))))" />
+			<bind nodeset="dosing/malaria_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/malaria_antibiotic/amount != ''" />
+			<bind nodeset="dosing/malaria_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
 			
   	</model>
   </h:head>
@@ -1458,7 +1538,73 @@
 			
 			</group>
 
+			<group ref="/imci/dosing/malaria_antibiotic">
+						
+				<trigger ref="/imci/dosing/malaria_antibiotic/info_antibiotic_already">
+					<label>An antibiotic has already been given for <output value="
+					  if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+			      if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+			      if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
+			      if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'the ear problem',
+			        '???'))))
+				  " />; there is no need to give an additional antibiotic for the malaria</label>
+				</trigger>
+			
+				<select1 ref="/imci/dosing/malaria_antibiotic/malaria_drug">
+					<label>Which antibiotic would you like to use for the malaria?</label>
+					<item><label>Amoxycillin</label><value>amoxy</value></item>
+					<item><label>Procaine Penicillin</label><value>procaine</value></item>
+					<item><label>Cotrimoxazole</label><value>cotrim</value></item>					
+					<item><label>Other Drug</label><value>other</value></item>
+					<item><label>None</label><value>none</value></item>					
+				</select1>
+						
+				<select1 ref="/imci/dosing/malaria_antibiotic/cotrim_adverse">
+					<label>ASK: Has child ever had a bad reaction to SP?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>
+			
+				<trigger ref="/imci/dosing/malaria_antibiotic/info_no_cotrim">
+					<label>SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</label>
+				</trigger>
+				
+				<select1 ref="/imci/dosing/malaria_antibiotic/malaria_drug_2">
+					<label>Which antibiotic would you like to use for the malaria?</label>
+					<item><label>Amoxycillin</label><value>amoxy</value></item>
+					<item><label>Procaine Penicillin</label><value>procaine</value></item>
+					<item><label>Other Drug</label><value>other</value></item>
+					<item><label>None</label><value>none</value></item>					
+				</select1>
 
+				<trigger ref="/imci/dosing/malaria_antibiotic/info_choose_other">
+					<label>DO: Choose appropriate drug</label>
+				</trigger>
+				
+				<select1 ref="/imci/dosing/malaria_antibiotic/choose_amoxy">
+					<label>Which amoxycillin form would you like to use?</label>
+					<item><label>250mg tablet</label><value>amoxy-tablet</value></item>
+					<item><label>125mg / 5mL syrup</label><value>amoxy-syrup</value></item>				
+				</select1>
+				
+				<select1 ref="/imci/dosing/malaria_antibiotic/choose_cotrim">
+					<label>Which cotrimoxazole form would you like to use?</label>
+					<item><label>480mg adult tablet</label><value>cotrim-adult</value></item>
+					<item><label>120mg pediatric tablet</label><value>cotrim-ped</value></item>
+					<item><label>240mg / 5mL syrup</label><value>cotrim-syrup</value></item>			
+				</select1>
+				
+				<select1 ref="/imci/dosing/malaria_antibiotic/dose">
+					<label>GIVE: <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/duration" /></label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<trigger ref="/imci/dosing/malaria_antibiotic/info_give_correct">
+					<label>DO: Give correct dose and tell observer</label>
+				</trigger>
+			
+			</group>
 			
 			<input ref="/imci/stopgap"><label>catch</label></input>
 			
