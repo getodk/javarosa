@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.test.ExternalizableTest;
 
@@ -549,7 +550,7 @@ public class LocalizerTest extends TestCase  {
 			} else if (!expected.equals(text2)) {
 				fail("Did not retrieve expected text");
 			}
-		} catch (NoSuchElementException nsee) {
+		} catch (NoLocalizedTextException nsee) {
 			if (expected != null) {
 				fail("Got unexpected exception");
 			}

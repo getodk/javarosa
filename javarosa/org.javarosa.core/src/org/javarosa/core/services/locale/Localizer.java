@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -228,6 +229,21 @@ public class Localizer implements Externalizable {
 		setLocale(defaultLocale);
 	}
 	
+	/**
+	 * Constructs a body of local resources to be the set of Current Locale Data.
+	 * 
+	 * After loading, the current locale data will contain definitions for each
+	 * entry defined by the current locale resources, as well as definitions for any
+	 * entry present in the fallback resources but not in those of the current locale.
+	 *  
+	 * The procedure to accomplish this set is as follows, with overwritting occuring 
+	 * when a collision occurs:
+	 * 
+	 * 1. Load all of the in memory definitions for the default locale if fallback is enabled
+	 * 2. For each resource file for the default locale, load each definition if fallback is enabled
+	 * 3. Load all of the in memory definitions for the current locale
+	 * 4. For each resource file for the current locale, load each definition
+	 */
 	private void loadCurrentLocaleResources() {
 		this.currentLocaleData.clear();
 		
@@ -249,19 +265,36 @@ public class Localizer implements Externalizable {
 		}
 	}
 	
-	private void loadTable(OrderedHashtable table, OrderedHashtable source) {
+	/**
+	 * Moves all relevant entries in the source dictionary into the destination dictionary
+	 * @param destination A dictionary of key/value locale pairs that will be modified 
+	 * @param source A dictionary of key/value locale pairs that will be copied into 
+	 * destination 
+	 */
+	private void loadTable(OrderedHashtable destination, OrderedHashtable source) {
 		for(Enumeration en = source.keys(); en.hasMoreElements(); ) {
 			String key = (String)en.nextElement();
-			table.put(key, (String)source.get(key));
+			destination.put(key, (String)source.get(key));
 		}
 	}
 
+	/**
+	 * @param resourceName A path to a resource file provided in the current environment
+	 *
+	 * @return a dictionary of key/value locale pairs from a file in the resource directory 
+	 */
 	private OrderedHashtable loadLocaleResource(String resourceName) {
 		InputStream is = System.class.getResourceAsStream(resourceName);
 		// TODO: This might very well fail. Best way to handle?
 		OrderedHashtable locale = new OrderedHashtable();
 		int chunk = 100;
-		InputStreamReader isr = new InputStreamReader(is);
+		InputStreamReader isr;
+		try {
+			isr = new InputStreamReader(is);
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Failed to load locale resource " + resourceName + ". Is it in the jar?");
+		}
 		boolean done = false;
 		char[] cbuf = new char[chunk];
 		int offset = 0;
@@ -322,6 +355,13 @@ public class Localizer implements Externalizable {
 
 	/* === MANAGING LOCALE DATA (TEXT MAPPINGS) === */
 	
+	/**
+	 * Registers a resource file as a source of locale data for the specified
+	 * locale.  
+	 * 
+	 * @param locale The locale of the definitions provided. 
+	 * @param resourceURI A URI pointing to a resource file containing locale data.
+	 */
 	public void registerLocaleResource (String locale, String resourceURI) {
 		Vector resources = new Vector();
 		if(localeResources.contains(locale)) {
@@ -329,6 +369,10 @@ public class Localizer implements Externalizable {
 		}
 		resources.addElement(resourceURI);
 		localeResources.put(locale, resources);
+		
+		if(locale.equals(currentLocale)) {
+			loadCurrentLocaleResources();
+		}
 	}
 	
 	/**
@@ -451,14 +495,17 @@ public class Localizer implements Externalizable {
 	 *
 	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
 	 * @param args arguments for string variables.
-	 * @return Localized text. If no text is found after using all fallbacks, return null.
+	 * @return Localized text
 	 * @throws NoSuchElementException If current locale is not set.
 	 * @throws NullPointerException if textID is null
+ 	 * @throws NoLocalizedTextException If there is no text for the specified id
 	 */
 	public String getText (String textID, String[] args) {
 		String text = getText(textID, currentLocale);
 		if(text != null) {
 			text = processArguments(text, args);
+		} else {
+			throw new NoLocalizedTextException("The Localizer could not find a definition for ID: " + textID + " in the '" + currentLocale + "' locale.");
 		}
 		return text;
 	}
@@ -470,11 +517,14 @@ public class Localizer implements Externalizable {
 	 * @return Localized text. If no text is found after using all fallbacks, return null.
 	 * @throws NoSuchElementException If current locale is not set.
 	 * @throws NullPointerException if textID is null
+	 * @throws NoLocalizedTextException If there is no text for the specified id
 	 */
 	public String getText (String textID, Hashtable args) {
 		String text = getText(textID, currentLocale);
 		if(text != null) {
 			text = processArguments(text, args);
+		} else {
+			throw new NoLocalizedTextException("The Localizer could not find a definition for ID: " + textID + " in the '" + currentLocale + "' locale.");
 		}
 		return text;
 	}
@@ -485,13 +535,14 @@ public class Localizer implements Externalizable {
 	 * 
 	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
 	 * @return Localized text
-	 * @throws NoSuchElementException If current locale is not set, or if no localized text is found.
+	 * @throws NoLocalizedTextException If there is no text for the specified id
+	 * @throws NoSuchElementException If current locale is not set
 	 * @throws NullPointerException if textID is null
 	 */
 	public String getLocalizedText (String textID) {
 	    String text = getText(textID);
 	    if (text == null)
-	    	throw new NoSuchElementException("Can't find localized text for current locale! text id: [" + textID + "]");
+	    	throw new NoLocalizedTextException("Can't find localized text for current locale! text id: [" + textID + "]");
 	    return text;
 	}
 	
