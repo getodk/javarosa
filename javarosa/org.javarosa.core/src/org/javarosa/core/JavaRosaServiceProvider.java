@@ -19,6 +19,7 @@ package org.javarosa.core;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.javarosa.core.api.Constants;
@@ -36,6 +37,7 @@ import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.transport.storage.RmsStorage;
+import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.PrefixTree;
 import org.javarosa.core.util.externalizable.CannotCreateObjectException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -232,6 +234,9 @@ public class JavaRosaServiceProvider {
 		}
 	}
 	
+	/**
+	 * @return The Locale Manager currently being used for internationalization.
+	 */
 	public Localizer getLocaleManager() {
 		if(localeManager == null) {
 		    localeManager = new Localizer(true, false);
@@ -239,10 +244,29 @@ public class JavaRosaServiceProvider {
 		return localeManager;
 	}
 	
+	/**
+	 * Retrieve the localized text for a text handle in the current locale. See getText(String, String) for details.
+	 *
+	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
+	 * @return Localized text
+	 * @throws NoSuchElementException If current locale is not set.
+	 * @throws NullPointerException if textID is null
+ 	 * @throws NoLocalizedTextException If there is no text for the specified id
+	 */
 	public String localize(String id) {
 		return localize(id, new String[]{});
 	}
 	
+	/**
+	 * Retrieve the localized text for a text handle in the current locale. See getText(String, String) for details.
+	 *
+	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
+	 * @param args arguments for string variables.
+	 * @return Localized text
+	 * @throws NoSuchElementException If current locale is not set.
+	 * @throws NullPointerException if textID is null
+ 	 * @throws NoLocalizedTextException If there is no text for the specified id
+	 */
 	public String localize(String id, String[] args) {
 		return localeManager.getText(id, args);
 	}
