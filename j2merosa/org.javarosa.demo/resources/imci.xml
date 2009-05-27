@@ -144,6 +144,30 @@
 							<dose />
 							<info_give_correct />
 						</dysentery_antibiotic>
+						<ear_antibiotic>
+						  <info_antibiotic_already />
+							<ear_drug />
+							<cotrim_adverse />
+							<info_no_cotrim />
+							<ear_drug_2 />
+							<info_choose_other />
+							<choose_amoxy />
+							<choose_cotrim />
+							<dose />
+							<info_give_correct />
+						</ear_antibiotic>
+						<malaria_antibiotic>
+						  <info_antibiotic_already />
+							<malaria_drug />
+							<cotrim_adverse />
+							<info_no_cotrim />
+							<malaria_drug_2 />
+							<info_choose_other />
+							<choose_amoxy />
+							<choose_cotrim />
+							<dose />
+							<info_give_correct />
+						</malaria_antibiotic>
 					</dosing>
 					
 					
@@ -216,6 +240,26 @@
 									<frequency />
 									<duration />
 								</dysentery_antibiotic>
+								<ear_antibiotic>
+								  <antibiotic_already />
+									<category />
+									<choice />
+									<amount />
+									<drug />
+									<variant />
+									<frequency />
+									<duration />
+								</ear_antibiotic>
+								<malaria_antibiotic>
+								  <antibiotic_already />
+									<category />
+									<choice />
+									<amount />
+									<drug />
+									<variant />
+									<frequency />
+									<duration />
+								</malaria_antibiotic>
 							</treatment>
             </normalized>
 						<const>
@@ -651,7 +695,67 @@
 			<bind nodeset="dosing/dysentery_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
 			
 			
-			
+			<bind nodeset="dosing/ear_antibiotic" relevant="/imci/tmp/normalized/diagnosis/ear = 'mastoiditis' or /imci/tmp/normalized/diagnosis/ear = 'acute'" />
+			<bind nodeset="tmp/normalized/treatment/ear_antibiotic/antibiotic_already" calculate="../../pneumonia_antibiotic/amount != '' or
+			                                                                                      ../../cholera_antibiotic/amount != '' or
+			                                                                                      ../../dysentery_antibiotic/amount != ''" />
+			<bind nodeset="dosing/ear_antibiotic/info_antibiotic_already" relevant="/imci/tmp/normalized/treatment/ear_antibiotic/antibiotic_already" />
+			<bind nodeset="dosing/ear_antibiotic/ear_drug" relevant="not(/imci/tmp/normalized/treatment/ear_antibiotic/antibiotic_already)" />
+			<bind nodeset="dosing/ear_antibiotic/cotrim_adverse" relevant="../ear_drug = 'cotrim'" />
+			<bind nodeset="dosing/ear_antibiotic/info_no_cotrim" relevant="../cotrim_adverse = 'yes'" />
+			<bind nodeset="dosing/ear_antibiotic/ear_drug_2" relevant="../cotrim_adverse = 'yes'" />
+			<bind nodeset="tmp/normalized/treatment/ear_antibiotic/category" calculate="if(/imci/dosing/ear_antibiotic/ear_drug_2 != '', /imci/dosing/ear_antibiotic/ear_drug_2,
+			                                                                            if(/imci/dosing/ear_antibiotic/ear_drug != '', /imci/dosing/ear_antibiotic/ear_drug, ''))" />
+			<bind nodeset="dosing/ear_antibiotic/info_choose_other" relevant="/imci/tmp/normalized/treatment/ear_antibiotic/category = 'other'" />
+			<bind nodeset="dosing/ear_antibiotic/choose_amoxy" relevant="/imci/tmp/normalized/treatment/ear_antibiotic/category = 'amoxy'" />
+			<bind nodeset="dosing/ear_antibiotic/choose_cotrim" relevant="/imci/tmp/normalized/treatment/ear_antibiotic/category = 'cotrim'" />
+			<bind nodeset="tmp/normalized/treatment/ear_antibiotic/choice" calculate="
+			  if(../category = 'amoxy', /imci/dosing/ear_antibiotic/choose_amoxy,
+				if(../category = 'cotrim', /imci/dosing/ear_antibiotic/choose_cotrim,
+				if(../category = 'procaine', 'procaine',
+				  '')))" />
+			<bind nodeset="tmp/normalized/treatment/ear_antibiotic/amount" calculate="
+			  if(../choice = 'amoxy-tablet', /imci/tmp/dosings/amoxycillin/tablet,
+				if(../choice = 'amoxy-syrup', /imci/tmp/dosings/amoxycillin/syrup,
+				if(../choice = 'cotrim-adult', /imci/tmp/dosings/cotrimoxazole/adult,
+				if(../choice = 'cotrim-ped', /imci/tmp/dosings/cotrimoxazole/ped,
+				if(../choice = 'cotrim-syrup', /imci/tmp/dosings/cotrimoxazole/syrup,
+				if(../choice = 'procaine', /imci/tmp/dosings/procaine_penicillin,
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/ear_antibiotic/drug" calculate="
+			  if(../choice = 'amoxy-tablet', 'AMOXYCILLIN',
+				if(../choice = 'amoxy-syrup', 'AMOXYCILLIN',
+				if(../choice = 'cotrim-adult', 'COTRIMOXAZOLE',
+				if(../choice = 'cotrim-ped', 'COTRIMOXAZOLE',
+				if(../choice = 'cotrim-syrup', 'COTRIMOXAZOLE',
+				if(../choice = 'procaine', 'PROCAINE PENICILLIN',
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/ear_antibiotic/variant" calculate="
+			  if(../choice = 'amoxy-tablet', '250mg',
+				if(../choice = 'amoxy-syrup', '125mg/5mL',
+				if(../choice = 'cotrim-adult', '480mg',
+				if(../choice = 'cotrim-ped', '120mg',
+				if(../choice = 'cotrim-syrup', '240mg/5mL',
+				if(../choice = 'procaine', '400,000u/mL',
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/ear_antibiotic/frequency" calculate="
+			  if(../choice = 'amoxy-tablet', 'three times a day',
+				if(../choice = 'amoxy-syrup', 'three times a day',
+				if(../choice = 'cotrim-adult', 'twice a day',
+				if(../choice = 'cotrim-ped', 'twice a day',
+				if(../choice = 'cotrim-syrup', 'twice a day',
+				if(../choice = 'procaine', 'once a day',
+				  ''))))))" />
+			<bind nodeset="tmp/normalized/treatment/ear_antibiotic/duration" calculate="
+			  if(../choice = 'amoxy-tablet', '5 days',
+				if(../choice = 'amoxy-syrup', '5 days',
+				if(../choice = 'cotrim-adult', '5 days',
+				if(../choice = 'cotrim-ped', '5 days',
+				if(../choice = 'cotrim-syrup', '5 days',
+				if(../choice = 'procaine', '5 days',
+				  ''))))))" />
+			<bind nodeset="dosing/ear_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/ear_antibiotic/amount != ''" />
+			<bind nodeset="dosing/ear_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
 			
   	</model>
   </h:head>
@@ -1287,7 +1391,74 @@
 			
 			</group>
 
+			<group ref="/imci/dosing/ear_antibiotic">
+						
+				<trigger ref="/imci/dosing/ear_antibiotic/info_antibiotic_already">
+					<label>An antibiotic has already been given for <output value="
+					  if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+			      if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+			      if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
+			        '???')))
+				  " />; there is no need to give an additional antibiotic for the ear problem</label>
+				</trigger>
 			
+				<select1 ref="/imci/dosing/ear_antibiotic/ear_drug">
+					<label>Which antibiotic would you like to use for the ear problem?</label>
+					<item><label>Amoxycillin</label><value>amoxy</value></item>
+					<item><label>Procaine Penicillin</label><value>procaine</value></item>
+					<item><label>Cotrimoxazole</label><value>cotrim</value></item>					
+					<item><label>Other Drug</label><value>other</value></item>
+					<item><label>None</label><value>none</value></item>					
+				</select1>
+						
+				<select1 ref="/imci/dosing/ear_antibiotic/cotrim_adverse">
+					<label>ASK: Has child ever had a bad reaction to SP?</label>
+					<item><label>Yes</label><value>yes</value></item>
+					<item><label>No</label><value>no</value></item>
+				</select1>
+			
+				<trigger ref="/imci/dosing/ear_antibiotic/info_no_cotrim">
+					<label>SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</label>
+				</trigger>
+				
+				<select1 ref="/imci/dosing/ear_antibiotic/ear_drug_2">
+					<label>Which antibiotic would you like to use for the ear problem?</label>
+					<item><label>Amoxycillin</label><value>amoxy</value></item>
+					<item><label>Procaine Penicillin</label><value>procaine</value></item>
+					<item><label>Other Drug</label><value>other</value></item>
+					<item><label>None</label><value>none</value></item>					
+				</select1>
+
+				<trigger ref="/imci/dosing/ear_antibiotic/info_choose_other">
+					<label>DO: Choose appropriate drug</label>
+				</trigger>
+				
+				<select1 ref="/imci/dosing/ear_antibiotic/choose_amoxy">
+					<label>Which amoxycillin form would you like to use?</label>
+					<item><label>250mg tablet</label><value>amoxy-tablet</value></item>
+					<item><label>125mg / 5mL syrup</label><value>amoxy-syrup</value></item>				
+				</select1>
+				
+				<select1 ref="/imci/dosing/ear_antibiotic/choose_cotrim">
+					<label>Which cotrimoxazole form would you like to use?</label>
+					<item><label>480mg adult tablet</label><value>cotrim-adult</value></item>
+					<item><label>120mg pediatric tablet</label><value>cotrim-ped</value></item>
+					<item><label>240mg / 5mL syrup</label><value>cotrim-syrup</value></item>			
+				</select1>
+				
+				<select1 ref="/imci/dosing/ear_antibiotic/dose">
+					<label>GIVE: <output value="/imci/tmp/normalized/treatment/ear_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/ear_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/ear_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/ear_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/ear_antibiotic/duration" /></label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<trigger ref="/imci/dosing/ear_antibiotic/info_give_correct">
+					<label>DO: Give correct dose and tell observer</label>
+				</trigger>
+			
+			</group>
+
+
 			
 			<input ref="/imci/stopgap"><label>catch</label></input>
 			
