@@ -1,5 +1,6 @@
 package org.javarosa.user.view;
 
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 
@@ -229,8 +230,9 @@ public class LoginForm extends FramedForm implements IView {
 	/**
 	 * @return
 	 */
-	public javax.microedition.lcdui.Alert successfulLoginAlert() {
-		return new javax.microedition.lcdui.Alert(JavaRosaServiceProvider.instance().localize("form.login.login.successful"),
+	public Alert successfulLoginAlert() {
+		//#style mailAlert
+		return new Alert(JavaRosaServiceProvider.instance().localize("form.login.login.successful"),
 				JavaRosaServiceProvider.instance().localize("form.login.loading.profile"), null, AlertType.CONFIRMATION);
 
 	}
