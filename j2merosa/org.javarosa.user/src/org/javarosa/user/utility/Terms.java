@@ -2,8 +2,6 @@ package org.javarosa.user.utility;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 
-import de.enough.polish.util.Locale;
-
 
 /**
  * 

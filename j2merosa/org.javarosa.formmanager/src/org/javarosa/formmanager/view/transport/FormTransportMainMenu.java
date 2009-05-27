@@ -1,7 +1,6 @@
 package org.javarosa.formmanager.view.transport;
 
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
@@ -11,7 +10,6 @@ import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.Constants;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 

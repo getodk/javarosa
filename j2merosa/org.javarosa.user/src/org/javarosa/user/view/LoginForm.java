@@ -9,7 +9,6 @@ import org.javarosa.core.api.IView;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.LoginContext;
-import org.javarosa.user.utility.Terms;
 
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
