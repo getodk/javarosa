@@ -127,7 +127,7 @@ public class LoginActivity implements IActivity, CommandListener,
 			if (this.view.validateUser()) {
 				
 				// TODO: why the alert here and not in the other listener?
-				final javax.microedition.lcdui.Alert success = this.view.successfulLoginAlert();
+				final Alert success = this.view.successfulLoginAlert();
 				this.parent.setDisplay(this, new IView() {
 					public Object getScreenObject() {
 						return success;

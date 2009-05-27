@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Hashtable;
 
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -129,7 +130,7 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 		if(command==logScr.CMD_LOGIN_BUTTON){
 				if(validateUser()){
 					
-					final javax.microedition.lcdui.Alert success = logScr.successfulLoginAlert();
+					final Alert success = logScr.successfulLoginAlert();
 					parent.setDisplay(this, new IView() {public Object getScreenObject() {return success;}});
 					
 					Hashtable returnArgs = new Hashtable();
@@ -231,7 +232,7 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
 			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
 		}else if(response.equalsIgnoreCase("OK")){
-			final javax.microedition.lcdui.Alert success = logScr.successfulLoginAlert();
+			final Alert success = logScr.successfulLoginAlert();
 			parent.setDisplay(this, new IView() {public Object getScreenObject() {return success;}});
 			saveUser();
 			Hashtable returnArgs = new Hashtable();
