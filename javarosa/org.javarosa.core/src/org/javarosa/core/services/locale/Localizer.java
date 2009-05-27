@@ -654,8 +654,8 @@ public class Localizer implements Externalizable {
 	}
 	
 	private static String extractValue(String text, String[] args) {
-		int start = text.indexOf("${");
-		int end = text.indexOf("}");
+		//int start = text.indexOf("${");
+		//int end = text.indexOf("}");
 		
 		//String index = text.substring(start + 2, end);
 		//Search for that string in the current locale, updating any arguments.

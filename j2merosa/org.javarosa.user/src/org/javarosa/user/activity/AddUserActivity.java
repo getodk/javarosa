@@ -18,7 +18,6 @@ import org.javarosa.core.api.IView;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.AddUserContext;
-import org.javarosa.user.utility.Terms;
 import org.javarosa.user.utility.UserValidator;
 import org.javarosa.user.view.UserForm;
 

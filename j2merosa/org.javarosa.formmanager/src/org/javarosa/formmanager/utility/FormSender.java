@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.lcdui.List;
-
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IShell;
