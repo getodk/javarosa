@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="/org.javarosa.core"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/cldc-1.1-java5.0.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/fileconnection.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/fileconnection.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.0-java5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
