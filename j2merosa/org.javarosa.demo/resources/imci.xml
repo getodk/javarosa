@@ -97,6 +97,7 @@
 							<override />
 						</classify>
 					</ear>
+					<other_severe />
 					<interlude>
 						<breastfeeding />
 						<other_feed />
@@ -189,6 +190,7 @@
               <has_ear />
               <has_fever />
 							<has_cholera />
+							<has_severe /> <!-- other than severe diarrhea/dehydration -->
 							
               <age />
 							<fast_breath />
@@ -460,6 +462,8 @@
 			<bind nodeset="tmp/normalized/diagnosis/ear" calculate="if(/imci/ear/classify/override != '', /imci/ear/classify/override, ../../classification/ear)" />
 			
 			<!-- INTERLUDE QUESTIONS -->
+			
+			<bind nodeset="tmp/normalized/has_severe" calculate="../diagnosis/cough = 'severe-pneumonia' or ../diagnosis/fever = 'febrile' or ../diagnosis/ear = 'mastoiditis' or /imci/other_severe = 'yes'" />
 			
 			<bind nodeset="interlude/breastfeeding" relevant="/imci/tmp/normalized/age <= 2.0" />
 			<bind nodeset="interlude/other_feed" relevant="/imci/tmp/normalized/age <= 2.0" />
@@ -1324,6 +1328,12 @@
 				</select1>
 			
 			</group>
+			
+			<select1 ref="/imci/other_severe">
+				<label>Does child have any other severe classification?</label>
+				<item><label>Yes</label><value>yes</value></item>
+				<item><label>No</label><value>no</value></item>
+			</select1>	
 			
 			<select1 ref="/imci/interlude/breastfeeding">
 				<label>ASK: Is the child breastfeeding?</label>
