@@ -34,8 +34,6 @@ import org.javarosa.formmanager.view.clforms.widgets.SelectQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TextQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TimeQuestionWidget;
 
-import de.enough.polish.util.Locale;
-
 public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 		CommandListener, ItemCommandListener {
 	private FormEntryController controller;
@@ -292,12 +290,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				}
 				else
 				{
-					String txt;
-					//#if javarosa.usepolishlocalisation
-					 txt = Locale.get("view.sending.FormUneditable");
-					//#else
-					 txt = "You cannot edit your answers when reviewing the form";
-					//#endif
+					String txt = JavaRosaServiceProvider.instance().localize("view.sending.FormUneditable");
 					
 					// #style CL_Forms_Form
 					final Alert alert = new Alert("Cannot Edit Answers!", txt,
@@ -316,12 +309,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				answer = widget.getWidgetValue();
 
 				if (prompt.instanceNode.required && answer == null) {
-					String txt;
-					//#if javarosa.usepolishlocalisation
-					 txt = Locale.get("view.sending.CompulsoryQuestionsIncomplete");
-					//#else
-					 txt = "This is a compulsory question and must be completed first to proceed";
-					//#endif
+					String txt = JavaRosaServiceProvider.instance().localize("view.sending.CompulsoryQuestionsIncomplete");
 					
 					// #style CL_Forms_Form
 					final Alert alert = new Alert("Question Required!", txt,

@@ -6,12 +6,11 @@ package org.javarosa.polish.activity.loadingscreen;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
-
-import de.enough.polish.ui.Form;
-import de.enough.polish.util.Locale;
 
 /**
  * @author Clayton Sims
@@ -22,7 +21,7 @@ public class LoadingScreen extends Form implements IView {
 
 	private Timer timer;
 
-	public final static String LOADING_STR = Locale.get("view.loading");
+	public final static String LOADING_STR = JavaRosaServiceProvider.instance().localize("view.loading");
 
 	public LoadingScreen() {
 		super(LOADING_STR);

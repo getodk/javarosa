@@ -175,7 +175,7 @@ public class JavaRosaDemoShell implements IShell {
 
 		// at application start, returning activity is null
 		if (returningActivity == null) {
-			launchActivity(new SplashScreenActivity(this, Locale.get("splashscreen")),
+			launchActivity(new SplashScreenActivity(this, JavaRosaServiceProvider.instance().localize("splashscreen")),
 					context);
 			return;
 		}
@@ -185,12 +185,12 @@ public class JavaRosaDemoShell implements IShell {
 
 			//#if javarosa.dev.shortcuts
 
-			launchActivity(new FormListActivity(this, Locale.get("title.FormsList")), context);
+			launchActivity(new FormListActivity(this, JavaRosaServiceProvider.instance().localize("title.FormsList")), context);
 
 			//#else
 			
 			prepareContextForLoginActivity();
-			launchActivity(new LoginActivity(this, Locale.get("title.Login")), context);
+			launchActivity(new LoginActivity(this, JavaRosaServiceProvider.instance().localize("title.Login")), context);
 			
 			//#endif
 

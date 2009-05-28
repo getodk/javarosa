@@ -24,25 +24,11 @@ public class SubmitStatusScreen extends Form implements ISubmitStatusScreen {
     public static final int TIMEOUT = 60000;
 
     
-    //#if commcare.lang.sw
-	//# public static final String MSG_SUCCESS = "Ujumbe umepokelewa!";
-	//# public static final String MSG_FAILED = "Ujumbe haujapokelewa ila umehifadhiwa.";
-	//# public static final String MSG_TOO_LONG = "Ujumbe haujapokelewa ila umehifadhiwa.";
-	//# public static final String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
-	//# public static String MSG_SENDING = "Sending...";
-    //#elif javarosa.usepolishlocalisation
-	//# public static final String MSG_SUCCESS = Locale.get("view.sending.SuccessfullySubmitted");
-	//# public static final String MSG_FAILED = Locale.get("view.sending.SubmissionFailed");
-	//# public static final String MSG_TOO_LONG = Locale.get("view.sending.SubmissionTakingLong");
-	//# public static final String MSG_UNKNOWN_ERROR = Locale.get("view.sending.SubmissionErrorUnknown");
-	//# public static String MSG_SENDING =  Locale.get("view.sending.SendingInProgress");
-    //#else
-    public static final String MSG_SUCCESS = "Form has been submitted successfully! Your reference is: ";
-    public static final String MSG_FAILED = "Submission failed! Please try to submit the form again later in 'View Saved'.";
-    public static final String MSG_TOO_LONG = "Sending is taking a long time; you may check on the status and/or resend later in 'View Saved'";
-    public static final String MSG_UNKNOWN_ERROR = "Unknown sending error; form not sent!";
-    public static String MSG_SENDING = "Sending...";
-    //#endif
+	public static final String MSG_SUCCESS = JavaRosaServiceProvider.instance().localize("view.sending.SuccessfullySubmitted");
+	public static final String MSG_FAILED = JavaRosaServiceProvider.instance().localize("view.sending.SubmissionFailed");
+	public static final String MSG_TOO_LONG = JavaRosaServiceProvider.instance().localize("view.sending.SubmissionTakingLong");
+	public static final String MSG_UNKNOWN_ERROR = JavaRosaServiceProvider.instance().localize("view.sending.SubmissionErrorUnknown");
+	public static String MSG_SENDING =  JavaRosaServiceProvider.instance().localize("view.sending.SendingInProgress");
     
     public SubmitStatusScreen (CommandListener listener) {
     	this(listener, -1);

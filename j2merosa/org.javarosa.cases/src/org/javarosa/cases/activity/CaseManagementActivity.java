@@ -13,14 +13,11 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.cases.view.CaseManagementScreen;
 import org.javarosa.core.Context;
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
-
-//#if javarosa.usepolishlocalisation
-//# import de.enough.polish.util.Locale;
-//#endif
 
 /**
  * @author Clayton Sims
@@ -37,19 +34,11 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 	// Clayton Sims - Mar 19, 2009 : I'm really not a fan of how this is done. Should
 	// be refactored at some point.
 
-	//#if javarosa.usepolishlocalisation
-    //# public static final String NEW = Locale.get("menu.NewCase");
-    //# public static final String FOLLOWUP = Locale.get("menu.FollowUp");
-    //# public static final String REFERRAL = Locale.get("menu.Referral");
-    //# public static final String VIEW_OPEN = Locale.get("menu.ViewOpen");
-    //# public static final String RESOLVE = Locale.get("menu.Resolve");
-    //#else
-    public static final String NEW = "New Case";
-    public static final String FOLLOWUP = "Follow Up on Existing Case";
-    public static final String REFERRAL = "Follow Up on Referral";
-    public static final String VIEW_OPEN = "View Open Cases";
-    public static final String RESOLVE = "Resolve Case";
-    //#endif        
+    public static final String NEW = JavaRosaServiceProvider.instance().localize("menu.NewCase");
+    public static final String FOLLOWUP = JavaRosaServiceProvider.instance().localize("menu.FollowUp");
+    public static final String REFERRAL = JavaRosaServiceProvider.instance().localize("menu.Referral");
+    public static final String VIEW_OPEN = JavaRosaServiceProvider.instance().localize("menu.ViewOpen");
+    public static final String RESOLVE = JavaRosaServiceProvider.instance().localize("menu.Resolve");
 
 	Vector commands = new Vector();
 
