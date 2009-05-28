@@ -183,8 +183,14 @@
 						<oral_advice />
 						<blood_sugar />
 						<info_refer />
+						<info_rehydrate />
+						<info_tetracycline />
+						<info_gentian_violet />
+						<info_vitamin_a />
+						<info_soothe_throat />
+						<info_ear_wick />
 					</other_treatment>
-					
+
 					<stopgap />
 					
           <tmp>
@@ -948,6 +954,12 @@
 			<bind nodeset="dosing/painkiller/info_give_correct" relevant="../dose = 'disagree'" />
 			
 			<bind nodeset="other_treatment/info_refer" relevant="/imci/tmp/normalized/has_severe or /imci/tmp/normalized/diagnosis/diarrhea = 'severe-persistent'" />
+			<bind nodeset="other_treatment/info_rehydrate" relevant="/imci/tmp/normalized/treatment/hydration_plan != ''" />
+			<bind nodeset="other_treatment/info_tetracycline" relevant="/imci/fever/measles/clouding_cornea = 'yes' or /imci/fever/measles/eye_pus = 'yes'" />
+			<bind nodeset="other_treatment/info_gentian_violet" relevant="/imci/fever/measles/mouth_ulcers = 'yes'" />
+			<bind nodeset="other_treatment/info_vitamin_a" relevant="false()" /> <!-- todo: link up to measles classifications -->
+			<bind nodeset="other_treatment/info_soothe_throat" relevant="/imci/tmp/normalized/diagnosis/cough = 'pneumonia' or /imci/tmp/normalized/diagnosis/cough = 'persistent-cold' or /imci/tmp/normalized/diagnosis/cough = 'cold'" />
+			<bind nodeset="other_treatment/info_ear_wick" relevant="/imci/ear/pus = 'yes' or /imci/tmp/normalized/diagnosis/ear = 'acute' or /imci/tmp/normalized/diagnosis/ear = 'chronic'" />
 			
   	</model>
   </h:head>
@@ -1795,10 +1807,40 @@
 				<label>REFER: urgently to hospital! <output value="if(/imci/tmp/normalized/diagnosis/dehydration = 'severe', concat('Give frequent sips of ORS on the way.', if(/imci/tmp/normalized/age < 2.0, ' Tell mother to continue breastfeeding.', '')), '')" /></label>
 			</trigger>
 			
+			<trigger ref="/imci/other_treatment/info_rehydrate">
+			  <label>TREAT: Re-hydration plan <output value="/imci/tmp/normalized/treatment/hydration_plan" /> from IMCI chart</label>
+			</trigger>
+			
+			<trigger ref="/imci/other_treatment/info_tetracycline">
+				<label>DO: Apply tetracycline eye ointment</label>
+			</trigger>
+			
+			<trigger ref="/imci/other_treatment/info_gentian_violet">
+				<label>DO: Treat mouth ulcers with gentian violet</label>
+			</trigger>
+
+			<trigger ref="/imci/other_treatment/info_vitamin_a">
+				<label>GIVE: Vitamin A</label>
+			</trigger>
+
+			<trigger ref="/imci/other_treatment/info_soothe_throat">
+				<label>TREAT: Soothe throat and relieve cough with a safe remedy</label>
+			</trigger>
+
+			<trigger ref="/imci/other_treatment/info_ear_wick">
+				<label>TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper
+				into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean
+				one and repeat these steps until the ear is dry</label>			
+			</trigger>
 			
 			
 			
 			
+
+
+
+
+
 			
 			
 			
