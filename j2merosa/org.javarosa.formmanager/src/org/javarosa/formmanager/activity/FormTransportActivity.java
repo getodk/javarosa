@@ -191,16 +191,9 @@ public class FormTransportActivity implements CommandListener, MessageListener,
 			this.parent
 					.setDisplay(this, this.views.getSendNowSendLaterScreen());
 		} else {
-			try {
-
-				// send the data
+				// send the data and create the appropriate display
 				this.sender.sendData();
-			} catch (IOException e) {
-				// TODO: Handle this exception reasonably!!!!!
-				e.printStackTrace();
-				// #debug error
-				System.out.println(e.getMessage());
-			}
+
 		}
 	}
 
@@ -235,15 +228,9 @@ public class FormTransportActivity implements CommandListener, MessageListener,
 			this.sender.setDefaultDestination();
 
 			if (this.sender.getDestination() != null) {
-
-				try {
+				
+				//Send the data and create the appropriate display
 					this.sender.sendData();
-
-				} catch (IOException e) {
-					// #debug error
-					System.out.println("UNABLE TO SEND: " + e.getMessage());
-					e.printStackTrace();
-				}
 			} else {
 				returnForDestination();
 			}
