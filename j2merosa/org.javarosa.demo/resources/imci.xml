@@ -182,6 +182,7 @@
 					<other_treatment>
 						<oral_advice />
 						<blood_sugar />
+						<info_refer />
 					</other_treatment>
 					
 					<stopgap />
@@ -946,6 +947,7 @@
 			<bind nodeset="dosing/painkiller/dose" relevant="/imci/tmp/normalized/treatment/painkiller/amount != ''" />
 			<bind nodeset="dosing/painkiller/info_give_correct" relevant="../dose = 'disagree'" />
 			
+			<bind nodeset="other_treatment/info_refer" relevant="/imci/tmp/normalized/has_severe or /imci/tmp/normalized/diagnosis/diarrhea = 'severe-persistent'" />
 			
   	</model>
   </h:head>
@@ -1789,7 +1791,9 @@
 			
 			</group>
 			
-			
+			<trigger ref="/imci/other_treatment/info_refer">
+				<label>REFER: urgently to hospital! <output value="if(/imci/tmp/normalized/diagnosis/dehydration = 'severe', concat('Give frequent sips of ORS on the way.', if(/imci/tmp/normalized/age < 2.0, ' Tell mother to continue breastfeeding.', '')), '')" /></label>
+			</trigger>
 			
 			
 			
