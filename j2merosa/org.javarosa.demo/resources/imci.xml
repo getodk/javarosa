@@ -189,10 +189,11 @@
 						<info_vitamin_a />
 						<info_soothe_throat />
 						<info_ear_wick />
+						<info_feed_diarrhea />
 					</other_treatment>
-
-					<stopgap />
-					
+					<info_return_if />
+					<info_followup_in />
+					<done />
           <tmp>
             <sentinel>
               <valid_complaint />
@@ -211,6 +212,11 @@
               <age />
 							<fast_breath />
 							<measles_risk />
+							
+							<followup>
+							  <time />
+								<if_no_improvement />
+							</followup>
 							
 							<classification>
 							  <cough />
@@ -960,6 +966,33 @@
 			<bind nodeset="other_treatment/info_vitamin_a" relevant="false()" /> <!-- todo: link up to measles classifications -->
 			<bind nodeset="other_treatment/info_soothe_throat" relevant="/imci/tmp/normalized/diagnosis/cough = 'pneumonia' or /imci/tmp/normalized/diagnosis/cough = 'persistent-cold' or /imci/tmp/normalized/diagnosis/cough = 'cold'" />
 			<bind nodeset="other_treatment/info_ear_wick" relevant="/imci/ear/pus = 'yes' or /imci/tmp/normalized/diagnosis/ear = 'acute' or /imci/tmp/normalized/diagnosis/ear = 'chronic'" />
+			<bind nodeset="other_treatment/info_feed_diarrhea" relevant="/imci/tmp/normalized/diagnosis/diarrhea = 'persistent' or /imci/tmp/normalized/diagnosis/diarrhea = 'severe-persistent'" />
+			
+			<!-- FOLLOWUPS -->
+			
+			<bind nodeset="info_return_if" relevant="/imci/tmp/normalized/diagnosis/cough = 'pneumonia' or
+			                                         /imci/tmp/normalized/diagnosis/cough = 'persistent-cold' or
+			                                         /imci/tmp/normalized/diagnosis/cough = 'cold' or
+			                                         /imci/tmp/normalized/diagnosis/dehydration = 'some' or
+			                                         /imci/tmp/normalized/diagnosis/dehydration = 'none'" />
+			<bind nodeset="info_followup_in" relevant="/imci/tmp/normalized/followup/time != ''" />
+			<bind nodeset="tmp/normalized/followup/time" calculate="
+				if(/imci/tmp/normalized/diagnosis/fever = 'malaria', 3,
+				if(/imci/tmp/normalized/diagnosis/cough = 'pneumonia' or
+ 			     /imci/tmp/normalized/diagnosis/dysentery = 'yes', 2,			
+			  if(/imci/tmp/normalized/diagnosis/cough = 'persistent-cold' or
+			     /imci/tmp/normalized/diagnosis/cough = 'cold' or
+			     /imci/tmp/normalized/diagnosis/dehydration = 'some' or
+			     /imci/tmp/normalized/diagnosis/dehydration = 'none' or
+			     /imci/tmp/normalized/diagnosis/ear = 'acute' or
+			     /imci/tmp/normalized/diagnosis/ear = 'chronic', 5,
+				  '')))" />
+			<bind nodeset="tmp/normalized/followup/if_no_improvement" calculate="
+			  /imci/tmp/normalized/diagnosis/cough = 'persistent-cold' or
+			  /imci/tmp/normalized/diagnosis/cough = 'cold' or
+			  /imci/tmp/normalized/diagnosis/dehydration = 'some' or
+			  /imci/tmp/normalized/diagnosis/dehydration = 'none'
+			" />
 			
   	</model>
   </h:head>
@@ -1833,19 +1866,25 @@
 				one and repeat these steps until the ear is dry</label>			
 			</trigger>
 			
+			<trigger ref="/imci/other_treatment/info_feed_diarrhea">
+				<label>ADVISE: how to feed a child who has persistent diarrhea</label>			
+			</trigger>
 			
-			
-			
+			<trigger ref="/imci/info_return_if">
+				<label>Tell mother to return immediately if child is not able to drink/breastfeed, becomes sicker, or <output value="if(/imci/tmp/normalized/has_fever, 'fever worsens', 'develops a fever')" /></label>
+			</trigger>
 
-
-
-
+			<trigger ref="/imci/info_followup_in">
+			  <label>Follow up in <output value="/imci/tmp/normalized/followup/time" /> days <output value="if(/imci/tmp/normalized/diagnosis/fever = 'malaria', 'if fever persists', if(/imci/tmp/normalized/followup/if_no_improvement, 'if no improvement', ''))" /></label>
+			</trigger>
 
 			
 			
 			
 			
-			<input ref="/imci/stopgap"><label>catch</label></input>
+			<trigger ref="/imci/done">
+				<label>The protocol is complete. Thank you for using E-IMCI.</label>
+			</trigger>
 			
     </group>
 
