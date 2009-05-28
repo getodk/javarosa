@@ -139,6 +139,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return DateUtils.roundDate(new Date());
 		} else if (name.equals("now") && args.length == 0) {
 			return new Date();
+		} else if (name.equals("concat")) {
+			return concat(argVals);
 		} else if (name.equals("checklist") && args.length >= 2) { //non-standard
 			return checklist(argVals);
 		} else if (name.equals("weighted-checklist") && args.length >= 2 && args.length % 2 == 0) { //non-standard
@@ -393,6 +395,16 @@ public class XPathFuncExpr extends XPathExpression {
 		}	
 	}
 
+	public static String concat (Object[] argVals) {
+		StringBuffer sb = new StringBuffer();
+		
+		for (int i = 0; i < argVals.length; i++) {
+			sb.append(toString(argVals[i]));
+		}
+		
+		return sb.toString();
+	}
+	
 	/*
 	 * arg_0 = min, negative if no min
 	 * arg_1 = max, negative if no max
