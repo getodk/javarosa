@@ -14,6 +14,7 @@ import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.formmanager.activity.FormTransportActivity;
+import org.javarosa.formmanager.view.ISubmitStatusScreen;
 import org.javarosa.formmanager.view.transport.FormTransportSubmitStatusScreen;
 import org.javarosa.formmanager.view.transport.MultiSubmitStatusScreen;
 
@@ -21,7 +22,7 @@ import org.javarosa.formmanager.view.transport.MultiSubmitStatusScreen;
  * Managing sending forms, both single forms, and multiple forms together
  * 
  */
-public class FormSender {
+public class FormSender implements Runnable {
 
 	/**
 	 * 
@@ -59,6 +60,8 @@ public class FormSender {
 	 * this is also used as a flag TODO: eliminate its usage as a flag
 	 */
 	private ITransportDestination destination;
+	
+	private ISubmitStatusScreen observer;
 
 	/**
 	 * @param shell
@@ -69,19 +72,14 @@ public class FormSender {
 		this.activity = activity;
 
 	}
-
-	public void sendData() throws IOException {
+	
+	public void sendData() {
 		// #debug debug
 		System.out.println("Sending data .. multiple=" + multiple);
-
-		if (this.multiple) {
-
-			sendMultiData();
-
-		} else {
-
-			sendSingle();
-		}
+		
+		initDisplay();
+		
+		new Thread(this).start();
 	}
 
 	/**
@@ -102,60 +100,65 @@ public class FormSender {
 				+ this.data.getId() + " length=" + payload.getLength());
 
 		send(payload, this.data.getId());
-		feedbackStatus();
 	}
+	
+	private void initDisplay() {
 
-	/**
-	 * 
-	 */
-	private void feedbackStatus() {
-		FormTransportSubmitStatusScreen statusScreen = ((FormTransportActivity) this.activity)
+		if (this.multiple) {
+			MultiSubmitStatusScreen s = ((FormTransportActivity) this.activity)
+					.getView().getMultiSubmitStatusScreen();
+
+			boolean noData = (this.multiData == null)
+					|| (this.multiData.size() == 0);
+
+			if (noData) {
+				s.reinitNodata();
+			} else {
+
+				String idsStr = "";
+				// #debug debug
+				System.out.println("Multi send");
+				int[] ids = new int[this.multiData.size()];
+
+				for (int i = 0; i < ids.length; ++i) {
+					ids[i] = ((IDataPayload) this.multiData.elementAt(i))
+							.getTransportId();
+					idsStr += " " + ids[i];
+				}
+
+				s.reinit(ids);
+
+				// #debug debug
+				System.out.println("ids: " + idsStr);
+			}
+
+			shell.setDisplay((IActivity) this.activity, (IView) s);
+			setObserver(s);
+		}
+		else {
+			FormTransportSubmitStatusScreen statusScreen = ((FormTransportActivity) this.activity)
 				.getView().getSubmitStatusScreen();
-		statusScreen.reinit(this.data.getId());
-		this.shell.setDisplay((IActivity) this.activity, statusScreen);
+			statusScreen.reinit(this.data.getId());
+			this.shell.setDisplay((IActivity) this.activity, statusScreen);
+			setObserver(statusScreen);
+		}
 	}
 
 	/**
 	 * @throws IOException
 	 */
 	private void sendMultiData() throws IOException {
-
-		MultiSubmitStatusScreen s = ((FormTransportActivity) this.activity)
-				.getView().getMultiSubmitStatusScreen();
-
+		
 		boolean noData = (this.multiData == null)
-				|| (this.multiData.size() == 0);
-
-		if (noData) {
-			s.reinitNodata();
-		} else {
-			 
-
-			String idsStr = "";
-			// #debug debug
-			System.out.println("Multi send");
-			int[] ids = new int[this.multiData.size()];
-
-			for (int i = 0; i < ids.length; ++i) {
-				ids[i] = ((IDataPayload) this.multiData.elementAt(i))
-						.getTransportId();
-				idsStr += " " + ids[i];
-			}
-
-			s.reinit(ids);
-
-			// #debug debug
-			System.out.println("ids: " + idsStr);
-		}
-
-		shell.setDisplay((IActivity) this.activity, (IView) s);
-
-		if (!noData)
+		|| (this.multiData.size() == 0);
+		
+		if (!noData) {
 			for (Enumeration en = this.multiData.elements(); en
 					.hasMoreElements();) {
 				IDataPayload payload = (IDataPayload) en.nextElement();
 				send(payload, payload.getTransportId());
 			}
+		}
 
 	}
 
@@ -187,6 +190,10 @@ public class FormSender {
 	}
 
 	// ----------- getters and setters
+	
+	public void setObserver(ISubmitStatusScreen o) {
+		this.observer = o;
+	}
 	public DataModelTree getData() {
 		return this.data;
 	}
@@ -222,6 +229,31 @@ public class FormSender {
 
 	public void setMultiData(Vector multiData) {
 		this.multiData = multiData;
+	}
+
+	public void run() {
+		if (this.multiple) {
+			try {
+				sendMultiData();
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+				if(observer != null) {
+					observer.receiveMessage(ISubmitStatusScreen.ERROR, e.getMessage());
+				}
+			}
+
+		} else {
+			try{ 
+				sendSingle();
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+				if(observer != null) {
+					observer.receiveMessage(ISubmitStatusScreen.ERROR, e.getMessage());
+				}
+			}
+		}
 	}
 
 }

@@ -207,7 +207,24 @@ public class MultiSubmitStatusScreen extends Form implements
 	 * @see org.javarosa.formmanager.view.ISubmitStatusScreen#destroy()
 	 */
 	public void destroy() {
+		this.deleteAll();
 		this.timer.cancel();
+	}
+	
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.formmanager.view.ISubmitStatusScreen#receiveMessage(int)
+	 */
+	public void receiveMessage(int message, String details) {
+		switch(message) {
+		    default:
+		    	//TODO: Specific sending error?
+				destroy();
+				StringItem failure = new StringItem("","");
+		    	failure.setText(JavaRosaServiceProvider.instance().localize("sending.status.error") + ": " + details);
+				this.append(failure);
+		}
 	}
 
 	/*
