@@ -172,8 +172,17 @@
 							<dose />
 							<info_give_correct />
 						</malaria_antibiotic>
+						<painkiller>
+							<choice />
+  						<info_choose_other />
+							<dose />
+							<info_give_correct />
+						</painkiller>
 					</dosing>
-					
+					<other_treatment>
+						<oral_advice />
+						<blood_sugar />
+					</other_treatment>
 					
 					<stopgap />
 					
@@ -270,6 +279,13 @@
 									<frequency />
 									<duration />
 								</malaria_antibiotic>
+								<painkiller>
+									<amount />
+									<drug />
+									<variant />
+									<frequency />
+								</painkiller>
+								<hydration_plan />
 							</treatment>
             </normalized>
 						<const>
@@ -412,6 +428,11 @@
 				../../classification/diarrhea)" />
 				
 			<bind nodeset="tmp/normalized/has_cholera" calculate="../diagnosis/dehydration = 'severe' and ../age >= 2.0 and /imci/tmp/const/cholera_risk" />
+			<bind nodeset="tmp/normalized/treatment/hydration_plan" calcualte="
+			  if(/imci/tmp/normalized/diagnosis/dehydration = 'none', 'A',
+				if(/imci/tmp/normalized/diagnosis/dehydration = 'some', 'B',
+				if(/imci/tmp/normalized/diagnosis/dehydration = 'severe' and not(/imci/other_severe), 'C',
+				  '')))" />
 			
 			<!-- FEVER CLASSIFICATION -->
 			
@@ -890,6 +911,41 @@
 				  ''))))))" />
 			<bind nodeset="dosing/malaria_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/malaria_antibiotic/amount != ''" />
 			<bind nodeset="dosing/malaria_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
+			
+			<!-- OTHER TREATMENTS -->
+			
+			<bind nodeset="other_treatment/oral_advice" relevant="/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '' or 
+                                                            /imci/tmp/normalized/treatment/cholera_antibiotic/amount != '' or 
+                                                            /imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '' or 
+                                                            /imci/tmp/normalized/treatment/ear_antibiotic/amount != '' or 
+                                                            /imci/tmp/normalized/treatment/malaria_antibiotic/amount != '' or 
+                                                            /imci/tmp/normalized/treatment/hydration_plan != ''" />
+																														<!-- i think this clause includes some non-oral treatments (procaine injections) and excludes other oral treatments (quinine tablet) -->
+			<bind nodeset="other_treatment/blood_sugar" relevant="/imci/tmp/normalized/diagnosis/fever = 'febrile'" />
+
+			<!-- PAINKILLER -->
+			<bind nodeset="dosing/painkiller" relevant="/imci/tmp/normalized/diagnosis/ear = 'mastoiditis' or /imci/tmp/normalized/diagnosis/ear = 'acute' or
+			                                            (/imci/preamble/temp_type = 'fever' or /imci/preamble/temperature >= 38.5)" />
+			<bind nodeset="dosing/painkiller/info_choose_other" relevant="/imci/dosing/painkiller/choice = 'other'" />
+			<bind nodeset="tmp/normalized/treatment/painkiller/amount" calculate="
+			  if(/imci/dosing/painkiller/choice = 'paracet-adult', /imci/tmp/dosings/paracetamol/adult,
+				if(/imci/dosing/painkiller/choice = 'paracet-ped', /imci/tmp/dosings/paracetamol/ped,
+				  ''))" />
+			<bind nodeset="tmp/normalized/treatment/painkiller/drug" calculate="
+			  if(/imci/dosing/painkiller/choice = 'paracet-adult', 'PARACETAMOL',
+				if(/imci/dosing/painkiller/choice = 'paracet-ped', 'PARACETAMOL',
+				  ''))" />
+			<bind nodeset="tmp/normalized/treatment/painkiller/variant" calculate="
+			  if(/imci/dosing/painkiller/choice = 'paracet-adult', '500mg',
+				if(/imci/dosing/painkiller/choice = 'paracet-ped', '100mg',
+				  ''))" />
+			<bind nodeset="tmp/normalized/treatment/painkiller/frequency" calculate="
+			  if(/imci/dosing/painkiller/choice = 'paracet-adult', 'every 6 hours as needed',
+				if(/imci/dosing/painkiller/choice = 'paracet-ped', 'every 6 hours as needed',
+				  ''))" />
+			<bind nodeset="dosing/painkiller/dose" relevant="/imci/tmp/normalized/treatment/painkiller/amount != ''" />
+			<bind nodeset="dosing/painkiller/info_give_correct" relevant="../dose = 'disagree'" />
+			
 			
   	</model>
   </h:head>
@@ -1696,6 +1752,52 @@
 				</trigger>
 			
 			</group>
+			
+			<select1 ref="/imci/other_treatment/oral_advice">
+				<label>DO: Explain how to give the treatment. Give the first treatment. Does the mother understand?</label>
+				<item><label>Yes</label><value>yes</value></item>
+				<item><label>No</label><value>no</value></item>
+			</select1>
+			
+			<trigger ref="/imci/other_treatment/blood_sugar">
+				<label>DO: Treat from the IMCI chart to avoid low blood sugar</label>
+			</trigger>
+			
+			<group ref="/imci/dosing/painkiller">
+						
+				<select1 ref="/imci/dosing/painkiller/choice">
+					<label>Which paracetamol form would you like to use?</label>
+					<item><label>500mg adult tablet</label><value>paracet-adult</value></item>
+					<item><label>100mg pediatric tablet</label><value>paracet-ped</value></item>
+					<item><label>Other Painkiller</label><value>other</value></item>
+					<item><label>None</label><value>none</value></item>					
+				</select1>
+
+				<trigger ref="/imci/dosing/painkiller/info_choose_other">
+					<label>DO: Choose appropriate painkiller</label>
+				</trigger>
+								
+				<select1 ref="/imci/dosing/painkiller/dose">
+					<label>GIVE: <output value="/imci/tmp/normalized/treatment/painkiller/amount" /> of <output value="/imci/tmp/normalized/treatment/painkiller/variant" /> <output value="/imci/tmp/normalized/treatment/painkiller/drug" /> <output value="/imci/tmp/normalized/treatment/painkiller/frequency" /></label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+			
+				<trigger ref="/imci/dosing/painkiller/info_give_correct">
+					<label>DO: Give correct dose and tell observer</label>
+				</trigger>
+			
+			</group>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			<input ref="/imci/stopgap"><label>catch</label></input>
 			
