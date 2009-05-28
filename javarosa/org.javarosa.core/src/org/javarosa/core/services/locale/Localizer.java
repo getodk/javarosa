@@ -23,11 +23,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
@@ -182,11 +182,11 @@ public class Localizer implements Externalizable {
 	 * Set the current locale. The locale must be defined. Will notify all registered ILocalizables of the change in locale.
 	 * 
 	 * @param currentLocale Locale. Must be defined and not null.
-	 * @throws NoSuchElementException If locale is null or not defined.
+	 * @throws UnregisteredLocaleException If locale is null or not defined.
 	 */
 	public void setLocale (String currentLocale) {
 		if (!hasLocale(currentLocale))
-			throw new NoSuchElementException("Attempted to set to a locale that is not defined");
+			throw new UnregisteredLocaleException("Attempted to set to a locale that is not defined");
 		
 		if (!currentLocale.equals(this.currentLocale)) {
 			this.currentLocale = currentLocale;
@@ -208,11 +208,11 @@ public class Localizer implements Externalizable {
 	 * Set the default locale. The locale must be defined.
 	 * 
 	 * @param defaultLocale Default locale. Must be defined. May be null, in which case there will be no default locale.
-	 * @throws NoSuchElementException If locale is not defined.
+	 * @throws UnregisteredLocaleException If locale is not defined.
 	 */
 	public void setDefaultLocale (String defaultLocale) {
 		if (defaultLocale != null && !hasLocale(defaultLocale))
-			throw new NoSuchElementException("Attempted to set default to a locale that is not defined");
+			throw new UnregisteredLocaleException("Attempted to set default to a locale that is not defined");
 		
 		this.defaultLocale = defaultLocale;
 	}
@@ -411,12 +411,12 @@ public class Localizer implements Externalizable {
 	 * 
 	 * @param locale Locale
 	 * @return Text mappings for locale.
-	 * @throws NoSuchElementException If locale is not defined or null.
+	 * @throws UnregisteredLocaleException If locale is not defined or null.
 	 */
 	public OrderedHashtable getLocaleMap (String locale) {
 		OrderedHashtable mapping = getLocaleData(locale);
 		if (mapping == null)
-			throw new NoSuchElementException("Attempted to access an undefined locale.");
+			throw new UnregisteredLocaleException("Attempted to access an undefined locale.");
 		return mapping;
 	}
 	
@@ -427,7 +427,7 @@ public class Localizer implements Externalizable {
 	 * @param textID Text handle. Must not be null. Need not be previously defined for this locale.
 	 * @param text Localized text for this text handle and locale. Will overwrite any previous mapping, if one existed.
 	 * If null, will remove any previous mapping for this text handle, if one existed.
-	 * @throws NoSuchElementException If locale is not defined or null.
+	 * @throws UnregisteredLocaleException If locale is not defined or null.
 	 * @throws NullPointerException if textID is null
 	 */
 	public void setLocaleMapping (String locale, String textID, String text) {
@@ -445,7 +445,7 @@ public class Localizer implements Externalizable {
 	 * @param locale Locale. Must be defined and not null.
 	 * @param textID Text handle.
 	 * @return True if a mapping exists for the text handle in the given locale.
-	 * @throws NoSuchElementException If locale is not defined.
+	 * @throws UnregisteredLocaleException If locale is not defined.
 	 */
 	public boolean hasMapping (String locale, String textID) {
 		OrderedHashtable localeData = getLocaleMap(locale);
@@ -483,7 +483,7 @@ public class Localizer implements Externalizable {
 	 *
 	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
 	 * @return Localized text. If no text is found after using all fallbacks, return null.
-	 * @throws NoSuchElementException If current locale is not set.
+	 * @throws UnregisteredLocaleException If current locale is not set.
 	 * @throws NullPointerException if textID is null
 	 */
 	public String getText (String textID) {
@@ -496,7 +496,7 @@ public class Localizer implements Externalizable {
 	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
 	 * @param args arguments for string variables.
 	 * @return Localized text
-	 * @throws NoSuchElementException If current locale is not set.
+	 * @throws UnregisteredLocaleException If current locale is not set.
 	 * @throws NullPointerException if textID is null
  	 * @throws NoLocalizedTextException If there is no text for the specified id
 	 */
@@ -515,7 +515,7 @@ public class Localizer implements Externalizable {
 	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
 	 * @param args arguments for string variables.
 	 * @return Localized text. If no text is found after using all fallbacks, return null.
-	 * @throws NoSuchElementException If current locale is not set.
+	 * @throws UnregisteredLocaleException If current locale is not set.
 	 * @throws NullPointerException if textID is null
 	 * @throws NoLocalizedTextException If there is no text for the specified id
 	 */
@@ -536,7 +536,7 @@ public class Localizer implements Externalizable {
 	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
 	 * @return Localized text
 	 * @throws NoLocalizedTextException If there is no text for the specified id
-	 * @throws NoSuchElementException If current locale is not set
+	 * @throws UnregisteredLocaleException If current locale is not set
 	 * @throws NullPointerException if textID is null
 	 */
 	public String getLocalizedText (String textID) {
@@ -564,7 +564,7 @@ public class Localizer implements Externalizable {
 	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
 	 * @param locale Locale. Must be defined and not null.
 	 * @return Localized text. If no text is found after using all fallbacks, return null.
-	 * @throws NoSuchElementException If the locale is not defined or null.
+	 * @throws UnregisteredLocaleException If the locale is not defined or null.
 	 * @throws NullPointerException if textID is null
 	 */
 	public String getText (String textID, String locale) {
@@ -586,12 +586,12 @@ public class Localizer implements Externalizable {
 	 * @param locale Locale. Must be defined and not null.
 	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
 	 * @return Localized text. Return null if none found.
-	 * @throws NoSuchElementException If the locale is not defined or null.
+	 * @throws UnregisteredLocaleException If the locale is not defined or null.
 	 * @throws NullPointerException if textID is null
 	 */
 	public String getRawText (String locale, String textID) {
 		if(locale == null) {
-			throw new NoSuchElementException();
+			throw new UnregisteredLocaleException("Null locale when attempting to fetch text id: " + textID);
 		}
 		if(locale.equals(currentLocale)) {
 			return (String)currentLocaleData.get(textID);

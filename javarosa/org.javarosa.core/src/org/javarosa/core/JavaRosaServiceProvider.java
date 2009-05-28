@@ -249,7 +249,7 @@ public class JavaRosaServiceProvider {
 	 *
 	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
 	 * @return Localized text
-	 * @throws NoSuchElementException If current locale is not set.
+	 * @throws UnregisteredLocaleException If current locale is not set.
 	 * @throws NullPointerException if textID is null
  	 * @throws NoLocalizedTextException If there is no text for the specified id
 	 */
@@ -263,12 +263,12 @@ public class JavaRosaServiceProvider {
 	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
 	 * @param args arguments for string variables.
 	 * @return Localized text
-	 * @throws NoSuchElementException If current locale is not set.
+	 * @throws UnregisteredLocaleException If current locale is not set.
 	 * @throws NullPointerException if textID is null
  	 * @throws NoLocalizedTextException If there is no text for the specified id
 	 */
 	public String localize(String id, String[] args) {
-		return localeManager.getText(id, args);
+		return getLocaleManager().getText(id, args);
 	}
 	
 	
