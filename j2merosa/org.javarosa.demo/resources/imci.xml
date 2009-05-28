@@ -54,7 +54,10 @@
 						<skin_pinch />
 						<fidgety />
 						<classify>
-						
+							<dysentery />
+							<diarrhea_dehydration />
+							<override_dys />
+							<override_dd />
 						</classify>
 						<info>
 							<offer_fluid />
@@ -195,12 +198,17 @@
 							  <cough />
 								<fever />
 								<ear />
+								<dysentery />
+								<dehydration />
+								<diarrhea />
 							</classification>
 							<diagnosis>
 							  <cough />
 								<fever />
 								<ear />
-								<dysentery>yes</dysentery> <!-- todo: hook this up to diarrhea classification -->
+								<dysentery />
+								<dehydration />
+								<diarrhea />
 							</diagnosis>
 							<treatment>
 								<malaria_quinine>
@@ -264,6 +272,7 @@
             </normalized>
 						<const>
 							<high_malaria_risk>1</high_malaria_risk>
+							<cholera_risk>1</cholera_risk>
 						</const>
 						<dosings>
 						  <alu />
@@ -343,6 +352,7 @@
 			    if(/imci/tmp/normalized/fast_breath, 'pneumonia',
 				  if(/imci/cough/length = 'over30', 'persistent-cold', 'cold'))),
 				'')" />
+			<!-- todo: these classifications can be simplified through use of <output> -->
 			<bind nodeset="cough/classify/severe_pneumonia" relevant="/imci/tmp/normalized/classification/cough = 'severe-pneumonia'" />
 			<bind nodeset="cough/classify/pneumonia" relevant="/imci/tmp/normalized/classification/cough = 'pneumonia'" />
 			<bind nodeset="cough/classify/persistent_cold" relevant="/imci/tmp/normalized/classification/cough = 'persistent-cold'" />
@@ -357,11 +367,49 @@
 			
 			<bind nodeset="diarrhea" relevant="/imci/tmp/normalized/has_diarrhea" />
 
-
-			
-			
-			<bind nodeset="tmp/normalized/has_cholera" calculate="(true() or 'diarrhea-severe-dehydration') and ../age >= 2.0" /> <!-- todo: link up to dehyrdation classification -->
-			<!--end diarrhea-->
+			<bind nodeset="tmp/normalized/classification/dysentery" calculate="if(/imci/tmp/normalized/has_diarrhea, if(/imci/diarrhea/blood = 'yes', 'yes', 'no'), '')" />
+			<bind nodeset="tmp/normalized/classification/dehydration" calculate="
+				if(/imci/tmp/normalized/has_diarrhea,
+				  if(checklist(2, -1,
+						   selected(/imci/preamble/danger_signs, 'lethargy'),
+							 /imci/diarrhea/sunken_eyes = 'yes',
+							 /imci/diarrhea/how_drinking = 'unable' or selected(/imci/preamble/danger_signs, 'no_drink'),
+							 /imci/diarrhea/skin_pinch = 'very_slow'
+						 ), 'severe',
+					if(checklist(2, -1,
+					     /imci/diarrhea/fidgety = 'yes',
+							 /imci/diarrhea/sunken_eyes = 'yes',
+							 /imci/diarrhea/how_drinking = 'eager' or /imci/diarrhea/how_drinking = 'unable' or selected(/imci/preamble/danger_signs, 'no_drink'),
+							 /imci/diarrhea/skin_pinch = 'slow' or /imci/diarrhea/skin_pinch = 'very_slow'
+						 ), 'some',
+					'none')),
+				'')" />
+			<bind nodeset="tmp/normalized/classification/diarrhea" calculate="
+			  if(/imci/tmp/normalized/has_diarrhea,
+				  if(/imci/diarrhea/length = 'over2', if(../dehydration != 'none', 'severe-persistent', 'persistent'), 'brief'),
+			  '')" />
+			<bind nodeset="diarrhea/classify/override_dys" relevant="../dysentery = 'disagree'" />
+			<bind nodeset="diarrhea/classify/override_dd" relevant="../diarrhea_dehydration = 'disagree'" />
+			<bind nodeset="tmp/normalized/diagnosis/dysentery" calculate="
+			  if(/imci/diarrhea/classify/dysentery = 'agree', ../../classification/dysentery,
+				if(/imci/diarrhea/classify/dysentery = 'disagree', if(../../classification/dysentery = 'yes', 'no', 'yes'),
+				''))" />
+			<bind nodeset="tmp/normalized/diagnosis/dehydration" calculate="
+			  if(/imci/diarrhea/classify/override_dd != '',
+				  if(/imci/diarrhea/classify/override_dd = 'brief-none' or /imci/diarrhea/classify/override_dd = 'pers-none', 'none',
+					if(/imci/diarrhea/classify/override_dd = 'brief-some' or /imci/diarrhea/classify/override_dd = 'pers-some', 'some',
+					if(/imci/diarrhea/classify/override_dd = 'brief-severe' or /imci/diarrhea/classify/override_dd = 'pers-severe', 'severe',
+					  ''))),
+				../../classification/dehydration)" />
+			<bind nodeset="tmp/normalized/diagnosis/diarrhea" calculate="
+			  if(/imci/diarrhea/classify/override_dd != '',
+				  if(/imci/diarrhea/classify/override_dd = 'brief-none' or /imci/diarrhea/classify/override_dd = 'brief-some' or /imci/diarrhea/classify/override_dd = 'brief-severe', 'brief',
+					if(/imci/diarrhea/classify/override_dd = 'pers-none', 'persistent',
+					if(/imci/diarrhea/classify/override_dd = 'pers-some' or /imci/diarrhea/classify/override_dd = 'pers-severe', 'severe-persistent',
+					  ''))),
+				../../classification/diarrhea)" />
+				
+			<bind nodeset="tmp/normalized/has_cholera" calculate="../diagnosis/dehydration = 'severe' and ../age >= 2.0 and /imci/tmp/const/cholera_risk" />
 			
 			<!-- FEVER CLASSIFICATION -->
 			
@@ -378,6 +426,7 @@
   				if(/imci/tmp/const/high_malaria_risk or not(/imci/tmp/normalized/measles_risk) and not(/imci/fever/runny_nose), 'malaria', 'fever-only'))
 				, '')" />
 			<!-- todo: include measles classifications in algorithm? -->
+			<!-- todo: these classifications can be simplified through use of <output> -->
 			<bind nodeset="fever/classify/febrile" relevant="/imci/tmp/normalized/classification/fever = 'febrile'" />
 			<bind nodeset="fever/classify/malaria" relevant="/imci/tmp/normalized/classification/fever = 'malaria'" />
 			<bind nodeset="fever/classify/fever_only" relevant="/imci/tmp/normalized/classification/fever = 'fever-only'" />
@@ -399,6 +448,7 @@
 					if(/imci/ear/pus = 'yes' and /imci/ear/dischg_length = 'short' or /imci/ear/pain = 'yes', 'acute',
           if(/imci/ear/pus = 'yes' and /imci/ear/dischg_length = 'long', 'chronic', 'none')))
 				, '')" />
+			<!-- todo: these classifications can be simplified through use of <output> -->
 			<bind nodeset="ear/classify/mastoiditis" relevant="/imci/tmp/normalized/classification/ear = 'mastoiditis'" />
 			<bind nodeset="ear/classify/acute" relevant="/imci/tmp/normalized/classification/ear = 'acute'" />
 			<bind nodeset="ear/classify/chronic" relevant="/imci/tmp/normalized/classification/ear = 'chronic'" />
@@ -1075,8 +1125,39 @@
 					<item><label>No</label><value>no</value></item>
 				</select1>
 
+				<select1 ref="/imci/diarrhea/classify/dysentery">
+					<label>CLASSIFY: Child should <output value="if(/imci/tmp/normalized/classification/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery</label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
 
+				<trigger ref="/imci/diarrhea/classify/override_dys">
+					<label>You have disagreed; new classification is 'Child should <output value="if(/imci/tmp/normalized/diagnosis/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery'</label>
+				</trigger>
 				
+				<select1 ref="/imci/diarrhea/classify/diarrhea_dehydration">
+					<label>CLASSIFY: Child should be treated for <output value="
+					  if(/imci/tmp/normalized/classification/diarrhea = 'severe-persistent', 'severe persistent diarrhea',
+						if(/imci/tmp/normalized/classification/diarrhea = 'persistent', 'persistent diarrhea',
+						  'diarrhea'))
+					" /> with <output value="
+					  if(/imci/tmp/normalized/classification/dehydration = 'severe', 'severe dehydration',
+						if(/imci/tmp/normalized/classification/dehydration = 'some', 'some dehydration',
+						  'no dehydration'))						
+					" /></label>
+					<item><label>Agree</label><value>agree</value></item>
+					<item><label>Disagree</label><value>disagree</value></item>
+				</select1>
+
+				<select1 ref="/imci/diarrhea/classify/override_dd">
+					<label>PLEASE: You have disagreed; select the correct classification</label>
+					<item><label>Diarrhea with no dehydration</label><value>brief-none</value></item>
+					<item><label>Diarrhea with some dehydration</label><value>brief-some</value></item>
+					<item><label>Diarrhea with severe dehydration</label><value>brief-severe</value></item>
+					<item><label>Persistent diarrhea with no dehydration</label><value>pers-none</value></item>
+					<item><label>Severe persistent diarrhea with some dehydration</label><value>pers-some</value></item>
+					<item><label>Severe persistent diarrhea with severe dehydration</label><value>pers-severe</value></item>
+				</select1>
 			
 			</group>
 			
