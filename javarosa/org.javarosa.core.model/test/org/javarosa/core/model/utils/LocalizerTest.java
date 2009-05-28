@@ -22,12 +22,12 @@ import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
 import java.util.Hashtable;
-import java.util.NoSuchElementException;
 
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.test.ExternalizableTest;
 
 public class LocalizerTest extends TestCase  {
@@ -217,7 +217,7 @@ public class LocalizerTest extends TestCase  {
 			l.setLocale(TEST_LOCALE);
 			
 			fail("Set current locale to a non-existent locale");
-		} catch (NoSuchElementException nsee) {
+		} catch (UnregisteredLocaleException nsee) {
 			//expected
 		}
 	}
@@ -232,7 +232,7 @@ public class LocalizerTest extends TestCase  {
 			l.setLocale(null);
 			
 			fail("Able to unset current locale");
-		} catch (NoSuchElementException nsee) {
+		} catch (UnregisteredLocaleException nsee) {
 			//expected
 		}
 	}
@@ -256,7 +256,7 @@ public class LocalizerTest extends TestCase  {
 			l.setDefaultLocale(TEST_LOCALE);
 			
 			fail("Set current locale to a non-existent locale");
-		} catch (NoSuchElementException nsee) {
+		} catch (UnregisteredLocaleException nsee) {
 			//expected
 		}
 	}
@@ -273,7 +273,7 @@ public class LocalizerTest extends TestCase  {
 			if (l.getDefaultLocale() != null) {
 				fail("Could not unset default locale");
 			}
-		} catch (NoSuchElementException nsee) {
+		} catch (UnregisteredLocaleException nsee) {
 			fail("Exception unsetting default locale");
 		}
 	}
@@ -441,7 +441,7 @@ public class LocalizerTest extends TestCase  {
 			l.getLocaleMap(TEST_LOCALE);
 			
 			fail("Did not throw exception when getting locale mapping for non-existent locale");
-		} catch (NoSuchElementException nsee) {
+		} catch (UnregisteredLocaleException nsee) {
 			//expected
 		}
 	}
@@ -620,7 +620,7 @@ public class LocalizerTest extends TestCase  {
 			l.getText("textID");
 			
 			fail("Retrieved current locale text when current locale not set");
-		} catch (NoSuchElementException nsee) {
+		} catch (UnregisteredLocaleException nsee) {
 			//expected
 		}
 	}
@@ -725,7 +725,7 @@ public class LocalizerTest extends TestCase  {
 			l.getLocaleMap(null);
 			
 			fail("getLocaleMap: Did not get expected exception");
-		} catch (NoSuchElementException nsee) {
+		} catch (UnregisteredLocaleException nsee) {
 			//expected
 		}		
 		
@@ -733,7 +733,7 @@ public class LocalizerTest extends TestCase  {
 			l.setLocaleMapping(null, "textID", "text");
 			
 			fail("setLocaleMapping: Did not get expected exception");
-		} catch (NoSuchElementException nsee) {
+		} catch (UnregisteredLocaleException nsee) {
 			//expected
 		}		
 		
@@ -757,7 +757,7 @@ public class LocalizerTest extends TestCase  {
 			l.hasMapping(null, "textID");
 			
 			fail("hasMapping: Did not get expected exception");
-		} catch (NoSuchElementException nsee) {
+		} catch (UnregisteredLocaleException nsee) {
 			//expected
 		}		
 		
@@ -777,7 +777,7 @@ public class LocalizerTest extends TestCase  {
 			l.getText("textID", (String)null);
 			
 			fail("getText: Did not get expected exception");
-		} catch (NoSuchElementException nsee) {
+		} catch (UnregisteredLocaleException nsee) {
 			//expected
 		}		
 		
