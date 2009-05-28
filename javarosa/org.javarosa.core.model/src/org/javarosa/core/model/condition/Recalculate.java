@@ -45,10 +45,14 @@ public class Recalculate extends Triggerable {
 		return expr.evalRaw(model, ec);
 	}
 	
-	public void apply (TreeReference ref, Object result, IFormDataModel model, FormDef f, int depth) {
-		f.setValue(wrapData(result), ref, depth + 1);		
+	public void apply (TreeReference ref, Object result, IFormDataModel model, FormDef f) {
+		f.setAnswer(wrapData(result), ref);		
 	}
 		
+	public boolean canCascade () {
+		return true;
+	}
+	
 	public boolean equals (Object o) {
 		if (o instanceof Recalculate) {
 			Recalculate r = (Recalculate)o;

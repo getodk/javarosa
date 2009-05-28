@@ -34,6 +34,7 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.Recalculate;
+import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -1003,7 +1004,10 @@ public class XFormParser {
 		verifyBindings(f, instanceModel);
 		applyInstanceProperties(instanceModel);
 		loadInstanceData(e, root, f); //FIXME: FormDef param is temporary
-
+		
+		checkDependencyCycles(f);
+		f.finalizeTriggerables();
+		
 		f.setDataModel(instanceModel);
 	}
 	
@@ -1570,6 +1574,78 @@ public class XFormParser {
 					return result;	
 			}
 			return null;
+		}
+	}
+	
+	private static void checkDependencyCycles (FormDef f) {
+		Vector vertices = new Vector();
+		Vector edges = new Vector();
+		
+		//build graph
+		for (Enumeration e = f.triggerIndex.keys(); e.hasMoreElements(); ) {
+			TreeReference trigger = (TreeReference)e.nextElement();
+			if (!vertices.contains(trigger))
+				vertices.addElement(trigger);
+			
+			Vector triggered = (Vector)f.triggerIndex.get(trigger);
+			Vector targets = new Vector();
+			for (int i = 0; i < triggered.size(); i++) {
+				Triggerable t = (Triggerable)triggered.elementAt(i);
+				for (int j = 0; j < t.getTargets().size(); j++) {
+					TreeReference target = (TreeReference)t.getTargets().elementAt(j);
+					if (!targets.contains(target))
+						targets.addElement(target);
+				}
+			}
+			
+			for (int i = 0; i < targets.size(); i++) {
+				TreeReference target = (TreeReference)targets.elementAt(i);
+				if (!vertices.contains(target))
+					vertices.addElement(target);
+				
+				TreeReference[] edge = {trigger, target};
+				edges.addElement(edge);
+			}
+		}
+		
+		//find cycles
+		boolean acyclic = true;
+		while (vertices.size() > 0) {
+			//determine leaf nodes
+			Vector leaves = new Vector();
+			for (int i = 0; i < vertices.size(); i++) {
+				leaves.addElement(vertices.elementAt(i));
+			}
+			for (int i = 0; i < edges.size(); i++) {
+				TreeReference[] edge = (TreeReference[])edges.elementAt(i);
+				leaves.removeElement(edge[0]);
+			}
+			
+			//if no leaf nodes while graph still has nodes, graph has cycles
+			if (leaves.size() == 0) {
+				acyclic = false;
+				break;
+			}
+
+			//remove leaf nodes and edges pointing to them
+			for (int i = 0; i < leaves.size(); i++) {
+				TreeReference leaf = (TreeReference)leaves.elementAt(i);
+				vertices.removeElement(leaf);
+			}			
+			for (int i = edges.size() - 1; i >= 0; i--) {
+				TreeReference[] edge = (TreeReference[])edges.elementAt(i);
+				if (leaves.contains(edge[1]))
+					edges.removeElementAt(i);
+			}
+		}
+		
+		if (!acyclic) {
+			System.err.println("XPath Dependency Cycle:");
+			for (int i = 0; i < edges.size(); i++) {
+				TreeReference[] edge = (TreeReference[])edges.elementAt(i);
+				System.err.println(edge[0].toString() + " => " + edge[1].toString());
+			}
+			throw new RuntimeException("Dependency cycles amongst the xpath expressions in relevant/calculate");
 		}
 	}
 	

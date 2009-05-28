@@ -67,16 +67,15 @@ public class Condition extends Triggerable {
 		return ((Boolean)eval(model, evalContext)).booleanValue();
 	}
 	
-	public void apply (TreeReference ref, Object rawResult, IFormDataModel model, FormDef f, int depth) {
+	public void apply (TreeReference ref, Object rawResult, IFormDataModel model, FormDef f) {
 		boolean result = ((Boolean)rawResult).booleanValue();
-
 		performAction(((DataModelTree)model).resolveReference(ref), result ? trueAction : falseAction);
-		if (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE) {
-			//changing the relevance of a node triggers conditions depending on that node
-			f.evaluateTriggerables(ref, depth + 1);
-		}
 	}
 
+	public boolean canCascade () {
+		return (trueAction == ACTION_SHOW || trueAction == ACTION_HIDE);
+	}
+	
 	private void performAction (TreeElement node, int action) {
 		switch (action) {
 		case ACTION_NULL: break;
