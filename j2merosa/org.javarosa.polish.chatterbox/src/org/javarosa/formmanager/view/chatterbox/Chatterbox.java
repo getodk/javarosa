@@ -39,19 +39,11 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
 
-//#if javarosa.usepolishlocalisation
-//# import de.enough.polish.util.Locale;
-//#endif
-
 
 public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryModelListener, CommandListener{
 	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
-    //#if javarosa.usepolishlocalisation
-    //# private static final String PROMPT_REQUIRED_QUESTION = Locale.get("view.sending.RequiredQuestion");
-    //#else
-    private static final String PROMPT_REQUIRED_QUESTION = "Required question; You must answer";
-    //#endif
+    private static final String PROMPT_REQUIRED_QUESTION = JavaRosaServiceProvider.instance().localize("view.sending.RequiredQuestion");
 
 	private static final String PROMPT_DEFAULT_CONSTRAINT_VIOL = "Answer is outside of the allowed range";
 	

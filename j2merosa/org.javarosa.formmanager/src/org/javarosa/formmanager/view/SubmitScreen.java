@@ -4,11 +4,9 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Spacer;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 
-//#if javarosa.usepolishlocalisation
-//# import de.enough.polish.util.Locale;
-//#endif
 
 public class SubmitScreen extends Form implements IView {
 	private ChoiceGroup cg;	
@@ -16,15 +14,9 @@ public class SubmitScreen extends Form implements IView {
 	public static final int SEND_LATER = 1;
 	public static final int SEND_NOW_SPEC = 2;
 	
-	//#if javarosa.usepolishlocalisation
-	//# private static final String SEND_NOW_DEFAULT_STRING = Locale.get("menu.SendNow");
-	//# private static final String SEND_NOW_SPEC_STRING = Locale.get("menu.SendToNewServer");
-	//# private static final String SEND_LATER_STRING = Locale.get("menu.SendLater");
-	//#else
-	private static final String SEND_NOW_DEFAULT_STRING = "Send Now";
-	private static final String SEND_NOW_SPEC_STRING = "Send to new server";
-	private static final String SEND_LATER_STRING = "Send Later";
-	//#endif
+	private static final String SEND_NOW_DEFAULT_STRING = JavaRosaServiceProvider.instance().localize("menu.SendNow");
+	private static final String SEND_NOW_SPEC_STRING = JavaRosaServiceProvider.instance().localize("menu.SendToNewServer");
+	private static final String SEND_LATER_STRING = JavaRosaServiceProvider.instance().localize("menu.SendLater");
 	
     //private Command selectCommand;
     
@@ -34,12 +26,8 @@ public class SubmitScreen extends Form implements IView {
 		
 		//Command selectCommand = new Command("OK", Command.OK, 1);
 		
-		//#if javarosa.usepolishlocalisation
-		//# cg = new ChoiceGroup(Locale.get("question.SendNow"), ChoiceGroup.EXCLUSIVE);
-		//#else
 		//#style submitYesNo
-		cg = new ChoiceGroup("Send data now?", ChoiceGroup.EXCLUSIVE);
-		//#endif
+		cg = new ChoiceGroup(JavaRosaServiceProvider.instance().localize("question.SendNow"), ChoiceGroup.EXCLUSIVE);
 		
 		//NOTE! These Indexes are optimized to be added in a certain
 		//order. _DO NOT_ change it without updating the static values

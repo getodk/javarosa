@@ -9,15 +9,12 @@ import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.Ticker;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.FormElementBinding;
-
-//#if javarosa.usepolishlocalisation
-//# import de.enough.polish.util.Locale;
-//#endif
 
 
 
@@ -36,15 +33,9 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	public static Command nextCommand;
 	public static Command viewAnswersCommand;
 	
-	//#if javarosa.usepolishlocalisation
-	//# public static Command nextItemCommand = new Command(Locale.get("menu.Next"), Command.ITEM, 1);
+	public static Command nextItemCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.Next"), Command.ITEM, 1);
 	//#style button
-	//# public StringItem nextItem = new StringItem(null,Locale.get("button.Next"),Item.BUTTON);
-	//#else
-	public static Command nextItemCommand = new Command("next", Command.ITEM, 1);
-	//#style button
-	public StringItem nextItem = new StringItem(null,"NEXT",Item.BUTTON);
-	//#endif
+	public StringItem nextItem = new StringItem(null,JavaRosaServiceProvider.instance().localize("button.Next"),Item.BUTTON);
 	
 	public ItemCommandListener itemListner;
 
@@ -120,16 +111,9 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	}
 
 	private void setUpCommands(){
-		//#if javarosa.usepolishlocalisation
-		//# nextCommand = new Command(Locale.get("menu.Next"), Command.SCREEN, 0);
-		//# previousCommand = new Command(Locale.get("menu.Back"), Command.SCREEN, 2);
-		//# viewAnswersCommand = new Command(Locale.get("menu.ViewAnswers"), Command.SCREEN, 3);
-		
-		//#else
-		nextCommand = new Command("next", Command.SCREEN, 0);
-		previousCommand = new Command("back", Command.SCREEN, 2);
-		viewAnswersCommand = new Command("View Answers", Command.SCREEN, 3);
-		//#endif
+		nextCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.Next"), Command.SCREEN, 0);
+		previousCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.Back"), Command.SCREEN, 2);
+		viewAnswersCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.ViewAnswers"), Command.SCREEN, 3);
 
 		this.addCommand(previousCommand);
 		this.addCommand(viewAnswersCommand);
