@@ -435,7 +435,7 @@
 				../../classification/diarrhea)" />
 				
 			<bind nodeset="tmp/normalized/has_cholera" calculate="../diagnosis/dehydration = 'severe' and ../age >= 2.0 and /imci/tmp/const/cholera_risk" />
-			<bind nodeset="tmp/normalized/treatment/hydration_plan" calcualte="
+			<bind nodeset="tmp/normalized/treatment/hydration_plan" calculate="
 			  if(/imci/tmp/normalized/diagnosis/dehydration = 'none', 'A',
 				if(/imci/tmp/normalized/diagnosis/dehydration = 'some', 'B',
 				if(/imci/tmp/normalized/diagnosis/dehydration = 'severe' and not(/imci/other_severe), 'C',
