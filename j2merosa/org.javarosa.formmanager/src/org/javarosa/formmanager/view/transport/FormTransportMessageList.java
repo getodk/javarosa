@@ -11,14 +11,13 @@ import javax.microedition.lcdui.List;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.formmanager.activity.FormTransportActivity;
-import org.javarosa.formmanager.utility.Terms;
 
 public class FormTransportMessageList extends List implements CommandListener {
 
 	private FormTransportActivity activity;
 
 	public FormTransportMessageList(CommandListener activity) {
-		super(Terms.MESSAGES_STR, Choice.IMPLICIT);
+		super(JavaRosaServiceProvider.instance().localize("message.list.messages"), Choice.IMPLICIT);
 		addCommand(FormTransportCommands.CMD_BACK);
 		addCommand(FormTransportCommands.CMD_DETAILS);
 		addCommand(FormTransportCommands.CMD_DELETEMSG);

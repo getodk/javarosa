@@ -12,7 +12,6 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.formmanager.activity.FormTransportActivity;
-import org.javarosa.formmanager.utility.Terms;
 
 public class FormTransportMessageDetailBox extends TextBox implements
 		CommandListener {
@@ -21,7 +20,7 @@ public class FormTransportMessageDetailBox extends TextBox implements
 
 	public FormTransportMessageDetailBox(CommandListener activity) {
 
-		super(Terms.MESSAGE_DETAILS_STR, null, 250, TextField.UNEDITABLE);
+		super(JavaRosaServiceProvider.instance().localize("sending.message.details"), null, 250, TextField.UNEDITABLE);
 		addCommand(FormTransportCommands.CMD_BACK);
 		addCommand(FormTransportCommands.CMD_SEND);
 		setCommandListener(activity);

@@ -14,7 +14,6 @@ import javax.microedition.lcdui.StringItem;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.formmanager.activity.FormTransportActivity;
-import org.javarosa.formmanager.utility.Terms;
 import org.javarosa.formmanager.view.ISubmitStatusScreen;
 
 public class FormTransportSubmitStatusScreen extends Form implements
@@ -32,7 +31,7 @@ public class FormTransportSubmitStatusScreen extends Form implements
 
 	public FormTransportSubmitStatusScreen(CommandListener activity) {
 		//#style submitPopup
-		super(Terms.SEND_STATUS);
+		super(JavaRosaServiceProvider.instance().localize("sending.status.title"));
 		setCommandListener(this);
 
 		
@@ -43,8 +42,8 @@ public class FormTransportSubmitStatusScreen extends Form implements
 	public void reinit(int modelId){
 		
 		setModelID(modelId);
-		this.okCommand = new Command(Terms.OK_STR, Command.OK, 1);
-		this.msg = new StringItem(null, Terms.MSG_SENDING);
+		this.okCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.ok"), Command.OK, 1);
+		this.msg = new StringItem(null, JavaRosaServiceProvider.instance().localize("sending.status.going"));
 
 		addCommand(this.okCommand);
 		append(new Spacer(80, 0));
@@ -89,17 +88,17 @@ public class FormTransportSubmitStatusScreen extends Form implements
 		String message;
 		switch (status) {
 		case TransportMessage.STATUS_NEW:
-			message = (this.counter < TIMEOUT ? Terms.MSG_SENDING
-					: Terms.MSG_TOO_LONG);
+			message = (this.counter < TIMEOUT ? JavaRosaServiceProvider.instance().localize("sending.status.going")
+					: JavaRosaServiceProvider.instance().localize("sending.status.long"));
 			break;
 		case TransportMessage.STATUS_DELIVERED:
-			message = Terms.MSG_SUCCESS + "  " + getServerResponse();
+			message = JavaRosaServiceProvider.instance().localize("sending.status.success") + "  " + getServerResponse();
 			break;
 		case TransportMessage.STATUS_FAILED:
-			message = Terms.MSG_FAILED;
+			message = JavaRosaServiceProvider.instance().localize("sending.status.failed");
 			break;
 		default:
-			message = Terms.MSG_UNKNOWN_ERROR;
+			message = JavaRosaServiceProvider.instance().localize("sending.status.error");
 			break;
 		}
 

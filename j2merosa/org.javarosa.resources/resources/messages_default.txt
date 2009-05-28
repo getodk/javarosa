@@ -154,13 +154,13 @@ form.user.userid=User ID:
 form.user.giveadmin=Give this user admin rights?
 form.user.fillinboth =Please fill in both username and password
 form.user.reenterpasswords=Please re-enter your password, the password and password confirmation box did not match
-form.user.usernametaken=Username {0} already taken. Please choose another username
+form.user.usernametaken=Username ${0} already taken. Please choose another username
 
 activity.adduser.adduser=Add User
 activity.adduser.useradded=User added 
 activity.adduser.useraddedsucc=User added successfully
 activity.adduser.problem=Problem:
-activity.adduser.problem.nametaken=Username is already taken
+activity.adduser.problem.nametaken=Username ${0} already taken. Please choose another username
 activity.adduser.problem.emptyuser=Username and password must both be given
 activity.adduser.problem.mismatchingpasswords=Passwords don't match
  
@@ -171,50 +171,59 @@ activity.edituser.edituser=Edit User
 Pregnancy=Pregnancy
 NewBirth=New Birth
 
+PendingReferrals= PendingReferrals
+Today= Today
+Yesterday= Yesterday
+NoPendingReferrals= No Pending Referrals
+Select= Select
+Resolve= Resolve
+ReferralFor= Referral For 
+Back= Back
+Camera= Camera
+Delete= Delete
+FormNotLoaded= Form Not Loaded
 
-PendingReferrals	= PendingReferrals
-Today				= Today
-Yesterday			= Yesterday
-NoPendingReferrals	= No Pending Referrals
-Select				= Select
-Resolve				= Resolve
-ReferralFor			= Referral For 
-Back				= Back
-Camera				= Camera
-CurrentlySending 	= Currently Sending
-DebugLog			= Debug Log
-Delete				= Delete
-DeleteMessage		= DeleteMessage
-FormNotLoaded		= Form Not Loaded
-EndOfSendingMessage	= 
-Exit				= Exit
-GetNewForms			= Get New Forms
-ImageManagement		= Image Management
-Ok					= OK
-Of					= of
-LogMessages			= Log Messages
-MessageDetails		= Message Details
-Messages			= Messages
-NoFormsToSend		= No Forms to Send
-Recorder			= Recorder
-SendMessage			= Send Message
-SendDataNow			= Send Data Now
-SendingInProgress 	= Sending in Progress
-SendLater			= Send Later
-SendNow				= Send Now
-SendStatus			= Send Status
-SendToNewServer		= Send to New Server
-SendUnsent			= Send Unsent
-Settings			= Settings
-ShowDetails			= Show Details
-SuccessfullyTransmitted		= Successfully Transmitted
-SuccessfullySubmitted		= Successfully Submitted
-SubmissionErrorUnknown		= Submission Error Uknown
-SubmissionFailed			= Submission Failed
-SubmissionTakingLong		= Submission Taking too Long
-SubmitForm			= Submit Form
-TransportMenu		= Transport Menu
+Exit= Exit
+GetNewForms= Get New Forms
+ImageManagement= Image Management
+menu.ok=OK
+
+
+
+Recorder= Recorder
+SendDataNow= Send Data Now
+
+sending.view.submit=Submit Form
+sending.view.now=Send Now
+sending.view.later=Send Later
+sending.view.when=Send Data Now
+sending.view.new=Send to New Server
+
+sending.status.multi=Currently sending ${0} of ${1}. Successfully transmitted ${2} of #{3}.
+sending.status.title=Send Status
+sending.status.none=No Forms to Send
+sending.status.going=Sending in Progress
+
+sending.message.details=Message Details
+sending.message.send=Send Message
+message.list.messages=Messages
+message.log=Log Messages
+message.details=Show Details
+message.send.unsent=Send Unsent
+message.delete=DeleteMessage
+
+debug.log=Debug Log
+
+sending.status.long=Submission Taking too Long
+sending.status.success=Successfully Submitted
+sending.status.failed=Submission Failed
+sending.status.error=Submission Error Unknown
+
+menu.transport=Transport Menu
+
+Settings= Settings
+
+
 ViewSaved=View Saved
-
 
 

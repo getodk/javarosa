@@ -7,8 +7,8 @@ import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.formmanager.activity.FormTransportActivity;
-import org.javarosa.formmanager.utility.Terms;
 
 public class FormTransportViews {
 	FormTransportActivity activity;
@@ -38,7 +38,7 @@ public class FormTransportViews {
 	}
 
 	private TextBox createLoggingTextBox() {
-		TextBox box = new TextBox(Terms.LOG_MESSAGES_STR, null, 1000,
+		TextBox box = new TextBox(JavaRosaServiceProvider.instance().localize("message.log"), null, 1000,
 				TextField.UNEDITABLE);
 		box.addCommand(FormTransportCommands.CMD_BACK);
 		return box;
@@ -50,7 +50,7 @@ public class FormTransportViews {
 		String[] elements = new String[mainMenuItems.size()];
 		mainMenuItems.copyInto(elements);
 		return new FormTransportMainMenu(this.activity,
-				Terms.TRANSPORT_MENU_STR, Choice.IMPLICIT, elements, null);
+				JavaRosaServiceProvider.instance().localize("menu.transport"), Choice.IMPLICIT, elements, null);
 
 	}
 
