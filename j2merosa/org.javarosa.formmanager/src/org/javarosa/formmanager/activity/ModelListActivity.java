@@ -45,7 +45,7 @@ public class ModelListActivity extends List implements CommandListener,
 
 	public final static Command CMD_BACK = new Command(JavaRosaServiceProvider.instance().localize("menu.Back"), Command.BACK, 2);
 	public final static Command CMD_SEND = new Command(JavaRosaServiceProvider.instance().localize("menu.SendData"),Command.SCREEN,1);
-	public static final Command CMD_SEND_ALL_UNSENT = new Command(JavaRosaServiceProvider.instance().localize("menu.SendAllUnsent"), Command.SCREEN, 2);
+	public static final Command CMD_SEND_ALL_UNSENT = new Command(JavaRosaServiceProvider.instance().localize("menu.send.all"), Command.SCREEN, 2);
 	public final static Command CMD_EDIT = new Command(JavaRosaServiceProvider.instance().localize("menu.Edit"), Command.SCREEN, 2);
 	public final static Command CMD_REVIEW = new Command(JavaRosaServiceProvider.instance().localize("menu.Review"), Command.SCREEN, 2);
 	public final static Command CMD_REFRESH = new Command(JavaRosaServiceProvider.instance().localize("menu.Refresh"), Command.SCREEN, 3);
