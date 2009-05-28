@@ -161,60 +161,69 @@ Pregnancy=Ujauzito
 NewBirth=Uzazi mpya
 
 
-Back				= Rudi Nyuma
-Camera		      = Camera
-CurrentlySending 	      =\nSasa fomu  
-DebugLog			= Debug Log
-Delete			= Futa
-DeleteMessage		= DeleteMessage
-FormNotLoaded		= Fomu haijafunguka
-EndOfSendingMessage	=  inaenda
-Exit				= Toka
-GetNewForms			= Pata fomu mpya
-ImageManagement		= Image Management
-Ok				= Sawa
-Of				= kati ya
-LogMessages			= Log Messages
-MessageDetails		= Message Details
-Messages			= Messages
-Recorder			= Recorder
-SendMessage			= Send Message
-SendDataNow			= Sasa fomu
-SendingInProgress 	= Utumaji unaendelea
-SendLater			= Tuma baadae
-SendNow			= Tuma sasa
-SendStatus			= Matokeo ya Utumaji
-SendToNewServer		= Send to New Server
-SendUnsent			= Tuma taarifa ambazo hazijaenda
-Settings			= Mpangilio
-ShowDetails			= Show Details
-SuccessfullyTransmitted	= Umefanikiwa kutuma Fomu 
-SuccessfullySubmitted	= Ujumbe umepokelewa!
-SubmissionErrorUnknown	= Tatizo lisilojulikana katika uwasilishaji
-SubmissionTakingLong	= Ujumbe haujapokelewa ila umehifadhiwa. (Utumaji unachukua muda mrefu mno)
-SubmitForm			= Tuma  Fomu
-TransportMenu		= Transport Menu
+Back= Rudi Nyuma
+Camera= Camera
+DebugLog= Debug Log
+Delete= Futa
+FormNotLoaded= Fomu haijafunguka
+Exit= Toka
+GetNewForms= Pata fomu mpya
+ImageManagement= Image Management
+Messages= Messages
+Recorder= Recorder 
+Settings= Mpangilio 
+TransportMenu= Transport Menu
 
+menu.ok=Sawa
+sending.view.submit=Tuma  Fomu
+sending.view.now=Tuma sasa
+sending.view.later=Tuma baadae
+sending.view.when=Sasa fomu
+sending.view.new=Send to New Server
+
+sending.status.multi=Sasa fomu ${0} kati ya ${1}. Umefanikiwa kutuma Fomu ${2} kati ya #{3} inaenda
+sending.status.title=Matokeo ya Utumaji
+sending.status.none=No Forms to Send
+sending.status.going=Utumaji unaendelea
+
+sending.message.details=Message Details
+sending.message.send=Send Message
+message.list.messages=Messages
+message.log=Log Messages
+message.details=Show Details
+message.send.unsent=Tuma taarifa ambazo hazijaenda
+message.delete=DeleteMessage
+
+debug.log=Debug Log
+
+sending.status.long=Ujumbe haujapokelewa ila umehifadhiwa. (Utumaji unachukua muda mrefu mno)
+sending.status.success=Ujumbe umepokelewa!
+sending.status.failed=Submission Failed
+sending.status.error=Tatizo lisilojulikana katika uwasilishaji
+
+menu.transport=Transport Menu
 
 SubmissionFailed1=Ujumbe haujapokelewa ila umehifadhiwa.
-PendingReferral     =  Rufaa  ambazo  hazijakamilika
-RecentFollowups    =  Ufuatiliaji wa Karibuni
-ChooseMgonjwa     =  Chagua  Mgonjwa
-Find                    =  Tafuta
-ReferralFor            =  Rufaa  kwa  ajili ya 
-Resolve                 =  Kamilisha
-Loading                 =  Inafunguka
-Sending                 =  Inatumwa
-Language                =  Lugha
-Save                    =  Tunza  
-SaveandExit          =  Tunza na  Toka
-Mark                    =  Chagua
-Unmark                  =  Usichague
-Clear                   =  Futa
-Next                    =  Mbele
-Review                  =  Pitia  tena 
-Update                  =  Badilisha         
-Sort                    =  Panga
-SortBy                 =  Panga kwa
-Cancel                  =  Kataa
+PendingReferral=  Rufaa  ambazo  hazijakamilika
+RecentFollowups=  Ufuatiliaji wa Karibuni
+ChooseMgonjwa=  Chagua  Mgonjwa
+Find=  Tafuta
+ReferralFor=  Rufaa  kwa  ajili ya 
+Resolve=  Kamilisha
+Loading=  Inafunguka
+Sending=  Inatumwa
+Language=  Lugha
+Save=  Tunza  
+SaveandExit=  Tunza na  Toka
+Mark=  Chagua
+Unmark=  Usichague
+Clear=  Futa
+Next=  Mbele
+Review=  Pitia  tena 
+Update=  Badilisha         
+Sort=  Panga
+SortBy=  Panga kwa
+Cancel=  Kataa
+
+
  
