@@ -408,7 +408,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 				throw new RuntimeException("Cannot create partial ordering of triggerables due to dependency cycle. Why wasn't this caught during parsing?");
 			}
 
-			//remove leaf nodes and edges pointing to them
+			//remove root nodes and edges originating from them
 			for (int i = 0; i < roots.size(); i++) {
 				Triggerable root = (Triggerable)roots.elementAt(i);
 				triggerables.addElement(root);
