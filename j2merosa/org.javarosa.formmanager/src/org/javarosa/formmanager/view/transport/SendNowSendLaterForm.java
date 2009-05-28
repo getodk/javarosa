@@ -7,8 +7,8 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.Spacer;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
-import org.javarosa.formmanager.utility.Terms;
 
 public class SendNowSendLaterForm extends Form implements IView {
 	private ChoiceGroup cg;
@@ -19,19 +19,20 @@ public class SendNowSendLaterForm extends Form implements IView {
 
 	public SendNowSendLaterForm(CommandListener activity) {
 		//#style submitPopup
-		super(Terms.SUBMIT_FORM_STR);
+		super(JavaRosaServiceProvider.instance().localize("sending.view.submit"));
 
 		//#style submitYesNo
-		this.cg = new ChoiceGroup(Terms.SEND_DATA_NOW_STR, Choice.EXCLUSIVE);
+		this.cg = new ChoiceGroup(JavaRosaServiceProvider.instance().localize("sending.view.when"), Choice.EXCLUSIVE);
 
 		// NOTE! These Indexes are optimized to be added in a certain
 		// order. _DO NOT_ change it without updating the static values
 		// for their numerical order.
-		this.cg.append(Terms.SEND_NOW_STR, null);
-		this.cg.append(Terms.SEND_LATER_STR, null);
+		this.cg.append(JavaRosaServiceProvider.instance().localize("sending.view.now"), null);
+		this.cg.append(JavaRosaServiceProvider.instance().localize("sending.view.later"), null);
 		
-		
-		//this.cg.append(Terms.SEND_TO_NEW_SERVER, null);// clients wont need to
+
+		//TODO: Add this back in for admin users. Who took it out?
+		//this.cg.append(JavaRosaServiceProvider.instance().localize("sending.view.new"), null);// clients wont need to
 		// see
 		// this
 

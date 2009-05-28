@@ -14,7 +14,6 @@ import javax.microedition.lcdui.StringItem;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.formmanager.activity.FormTransportActivity;
-import org.javarosa.formmanager.utility.Terms;
 import org.javarosa.formmanager.view.ISubmitStatusScreen;
 
 /**
@@ -46,11 +45,11 @@ public class MultiSubmitStatusScreen extends Form implements
 	 */
 	public MultiSubmitStatusScreen(CommandListener listener) {
 		//#style submitPopup
-		super(Terms.SEND_STATUS);
+		super(JavaRosaServiceProvider.instance().localize("sending.status.title"));
 
 		setCommandListener(listener);
 
-		addCommand(new Command(Terms.MSG_OK, Command.OK, 1));
+		addCommand(new Command(JavaRosaServiceProvider.instance().localize("menu.ok"), Command.OK, 1));
 
 		this.activity = (FormTransportActivity) listener;
 	}
@@ -67,7 +66,7 @@ public class MultiSubmitStatusScreen extends Form implements
 	 */
 	public void reinitNodata() {
 		deleteAll();
-		setMessage(Terms.MSG_NO_FORMS);
+		setMessage(JavaRosaServiceProvider.instance().localize("sending.status.none"));
 		addTimerTask();
 	}
 
@@ -94,7 +93,6 @@ public class MultiSubmitStatusScreen extends Form implements
 
 		// only command is ok
 		this.activity.returnComplete();
-
 	}
 
 	/**
@@ -139,7 +137,7 @@ public class MultiSubmitStatusScreen extends Form implements
 		case TransportMessage.STATUS_NEW:
 		case -1: {// TODO: what does -1 mean?
 			String message = (this.counter < TIMEOUT ? getCurrentDisplay()
-					: Terms.MSG_TOO_LONG);
+					: JavaRosaServiceProvider.instance().localize("sending.status.long"));
 			this.msg.setText(message);
 			break;
 		}
@@ -148,7 +146,7 @@ public class MultiSubmitStatusScreen extends Form implements
 
 			this.currentid++;
 			if (this.currentid == this.modelIDs.length) {
-				this.msg.setText(Terms.MSG_SUCCESS + " " + getServerResponse()
+				this.msg.setText(JavaRosaServiceProvider.instance().localize("sending.status.success") + " " + getServerResponse()
 						+ "\n");
 
 				// timer already cancelled above
@@ -163,7 +161,7 @@ public class MultiSubmitStatusScreen extends Form implements
 			// problem occured
 		case TransportMessage.STATUS_FAILED:
 
-			this.msg.setText(Terms.MSG_FAILED);
+			this.msg.setText(JavaRosaServiceProvider.instance().localize("sending.status.failed"));
 			break;
 
 		// another problem
@@ -172,7 +170,7 @@ public class MultiSubmitStatusScreen extends Form implements
 			System.out.println("Unrecognised status from Transport Manager: "
 					+ status);
 
-			this.msg.setText(Terms.MSG_UNKNOWN_ERROR);
+			this.msg.setText(JavaRosaServiceProvider.instance().localize("sending.status.error"));
 			break;
 		}
 
@@ -182,25 +180,12 @@ public class MultiSubmitStatusScreen extends Form implements
 	 * @return
 	 */
 	private String getCurrentDisplay() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(Terms.MSG_N_COMP);
-		sb.append(" ");
-		sb.append(this.currentid);
-		sb.append(" ");
-		sb.append(Terms.MSG_OF);
-		sb.append(" ");
-		sb.append(this.modelIDs.length);
-		sb.append(" ");
-		sb.append(Terms.MSG_SENDING_N);
-		sb.append(" ");
-		sb.append(this.currentid + 1);
-		sb.append(" ");
-		sb.append(Terms.MSG_OF);
-		sb.append(" ");
-		sb.append(this.modelIDs.length);
-		sb.append(" ");
-		sb.append(Terms.MSG_ENDSENDING);
-		return sb.toString();
+		return JavaRosaServiceProvider.instance().localize("sending.status.multi", new String[] {
+				String.valueOf(currentid), 
+				String.valueOf(modelIDs.length),
+				String.valueOf(currentid + 1),
+				String.valueOf(modelIDs.length)
+		});
 	}
 
 	/**
