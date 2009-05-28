@@ -1766,6 +1766,10 @@
 				</trigger>
 			
 			</group>
+
+			<trigger ref="/imci/other_treatment/info_rehydrate">
+			  <label>TREAT: Re-hydration plan <output value="/imci/tmp/normalized/treatment/hydration_plan" /> from IMCI chart</label>
+			</trigger>
 			
 			<select1 ref="/imci/other_treatment/oral_advice">
 				<label>DO: Explain how to give the treatment. Give the first treatment. Does the mother understand?</label>
@@ -1805,10 +1809,6 @@
 			
 			<trigger ref="/imci/other_treatment/info_refer">
 				<label>REFER: urgently to hospital! <output value="if(/imci/tmp/normalized/diagnosis/dehydration = 'severe', concat('Give frequent sips of ORS on the way.', if(/imci/tmp/normalized/age < 2.0, ' Tell mother to continue breastfeeding.', '')), '')" /></label>
-			</trigger>
-			
-			<trigger ref="/imci/other_treatment/info_rehydrate">
-			  <label>TREAT: Re-hydration plan <output value="/imci/tmp/normalized/treatment/hydration_plan" /> from IMCI chart</label>
 			</trigger>
 			
 			<trigger ref="/imci/other_treatment/info_tetracycline">
