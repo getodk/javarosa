@@ -49,9 +49,11 @@ public abstract class Triggerable implements Externalizable {
 	
 	protected abstract Object eval (IFormDataModel model, EvaluationContext ec);
 	
-	protected abstract void apply (TreeReference ref, Object result, IFormDataModel model, FormDef f, int depth);
+	protected abstract void apply (TreeReference ref, Object result, IFormDataModel model, FormDef f);
 	
-	public void apply (IFormDataModel model, EvaluationContext evalContext, FormDef f, int depth) {
+	public abstract boolean canCascade ();
+	
+	public void apply (IFormDataModel model, EvaluationContext evalContext, FormDef f) {
 		Object result = eval(model, evalContext);
 
 		for (int i = 0; i < targets.size(); i++) {
@@ -59,7 +61,7 @@ public abstract class Triggerable implements Externalizable {
 			Vector v = ((DataModelTree)model).expandReference(targetRef);		
 			for (int j = 0; j < v.size(); j++) {
 				TreeReference affectedRef = (TreeReference)v.elementAt(j);
-				apply(affectedRef, result, model, f, depth);
+				apply(affectedRef, result, model, f);
 			}
 		}		
 	}

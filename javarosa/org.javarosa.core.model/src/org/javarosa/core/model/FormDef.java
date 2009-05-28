@@ -60,8 +60,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class FormDef implements IFormElement, Localizable, IDRecordable,
 		Externalizable {
 
-	public static final int TRIGGERABLE_CHAINING_LIMIT = 30;
-
 	public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
 	private Vector children;// <IFormElement> 
@@ -75,13 +73,16 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	 * A unique external name that is used to identify the form between machines
 	 */
 	private Localizer localizer;
-	private Vector triggerables; // <Triggerable>
+	public Vector triggerables; // <Triggerable>; this list is topologically ordered, meaning for any tA and tB in
+	//the list, where tA comes before tB, evaluating tA cannot depend on any result from evaluating tB
+	private boolean triggerablesInOrder; //true if triggerables has been ordered topologically (DON'T DELETE ME EVEN THOUGH I'M UNUSED)
+	
 	private DataModelTree model;
 	private Vector outputFragments; // <IConditionExpr> contents of <output>
 	// tags that serve as parameterized
 	// arguments to captions
 
-	private Hashtable triggerIndex; // <TreeReference, Vector<Triggerable>>
+	public Hashtable triggerIndex; // <TreeReference, Vector<Triggerable>>
 	private Hashtable conditionRepeatTargetIndex; // <TreeReference, Condition>;
 	// associates repeatable
 	// nodes with the Condition
@@ -97,6 +98,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	public FormDef() {
 		setChildren(null);
 		triggerables = new Vector();
+		triggerablesInOrder = true;
 		triggerIndex = new Hashtable();
 		conditionRepeatTargetIndex = new Hashtable();
 		setEvaluationContext(new EvaluationContext());
@@ -215,22 +217,23 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 		throw new RuntimeException("method not implemented");
 	}
 
-	public void setValue(IAnswerData data, TreeReference ref, int depth) {
-		setValue(data, ref, model.resolveReference(ref), depth);
+	public void setValue(IAnswerData data, TreeReference ref) {
+		setValue(data, ref, model.resolveReference(ref));
 	}
 
 	public void setValue(IAnswerData data, TreeReference ref, TreeElement node) {
-		setValue(data, ref, node, 0);
+		setAnswer(data, node);
+		triggerTriggerables(ref);
 	}
 
-	// do we ever need to run this w/o evaluating conditions? or will we always
-	// just call on node directly?
-	private void setValue(IAnswerData data, TreeReference ref,
-			TreeElement node, int depth) {
+	public void setAnswer(IAnswerData data, TreeReference ref) {
+		setAnswer(data, model.resolveReference(ref));
+	}
+	
+	public void setAnswer(IAnswerData data, TreeElement node) {
 		node.setAnswer(data);
-		evaluateTriggerables(ref, depth);
 	}
-
+	
 	/**
 	 * Deletes the inner-most repeat that this node belongs to and returns the
 	 * corresponding FormIndex. Behavior is currently undefined if you call this
@@ -280,7 +283,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 			}
 		}
 
-		evaluateTriggerables(parentRef);
+		triggerTriggerables(parentRef);
 		return newIndex;
 	}
 
@@ -291,21 +294,19 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 		model.copyNode(template, destRef);
 
 		preloadModel(model.resolveReference(destRef));
-		evaluateTriggerables(destRef); // trigger conditions that depend on the
+		triggerTriggerables(destRef); // trigger conditions that depend on the
 		// creation of this new node
 		initializeTriggerables(destRef); // initialize conditions for the node
 		// (and sub-nodes)
 	}
 
 	public boolean canCreateRepeat(TreeReference repeatRef) {
-		Condition c = (Condition) conditionRepeatTargetIndex.get(repeatRef
-				.genericize());
+		Condition c = (Condition) conditionRepeatTargetIndex.get(repeatRef.genericize());
 		if (c != null) {
-			return c.evalBool(model, new EvaluationContext(exprEvalContext,
-					repeatRef));
-		} /*
-		 * else check # child constraints of parent }
-		 */
+			return c.evalBool(model, new EvaluationContext(exprEvalContext,	repeatRef));
+		} /* else check # child constraints of parent
+		
+		} */
 
 		return true;
 	}
@@ -327,6 +328,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 			return (Triggerable)triggerables.elementAt(existingIx);
 		} else {
 			triggerables.addElement(t);
+			triggerablesInOrder = false;
 
 			Vector triggers = t.getTriggers();
 			for (int i = 0; i < triggers.size(); i++) {
@@ -358,6 +360,70 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 		}
 	}
 
+	public void finalizeTriggerables () {
+		Vector partialOrdering = new Vector();
+		for (int i = 0; i < triggerables.size(); i++) {
+			Triggerable t = (Triggerable)triggerables.elementAt(i);
+			Vector deps = new Vector();
+			
+			if (t.canCascade()) {
+				for (int j = 0; j < t.getTargets().size(); j++) {
+					TreeReference target = (TreeReference)t.getTargets().elementAt(j);
+					Vector triggered = (Vector)triggerIndex.get(target);
+					if (triggered != null) {
+						for (int k = 0; k < triggered.size(); k++) {
+							Triggerable u = (Triggerable)triggered.elementAt(k);
+							if (!deps.contains(u))
+								deps.addElement(u);
+						}
+					}
+				}
+			}
+			
+			for (int j = 0; j < deps.size(); j++) {
+				Triggerable u = (Triggerable)deps.elementAt(j);
+				Triggerable[] edge = {t, u};
+				partialOrdering.addElement(edge);
+			}
+		}
+		
+		Vector vertices = new Vector();
+		for (int i = 0; i < triggerables.size(); i++)
+			vertices.addElement(triggerables.elementAt(i));
+		triggerables.removeAllElements();
+		
+		while (vertices.size() > 0) {
+			//determine root nodes
+			Vector roots = new Vector();
+			for (int i = 0; i < vertices.size(); i++) {
+				roots.addElement(vertices.elementAt(i));
+			}
+			for (int i = 0; i < partialOrdering.size(); i++) {
+				Triggerable[] edge = (Triggerable[])partialOrdering.elementAt(i);
+				roots.removeElement(edge[1]);
+			}
+			
+			//if no root nodes while graph still has nodes, graph has cycles
+			if (roots.size() == 0) {
+				throw new RuntimeException("Cannot create partial ordering of triggerables due to dependency cycle. Why wasn't this caught during parsing?");
+			}
+
+			//remove leaf nodes and edges pointing to them
+			for (int i = 0; i < roots.size(); i++) {
+				Triggerable root = (Triggerable)roots.elementAt(i);
+				triggerables.addElement(root);
+				vertices.removeElement(root);
+			}			
+			for (int i = partialOrdering.size() - 1; i >= 0; i--) {
+				Triggerable[] edge = (Triggerable[])partialOrdering.elementAt(i);
+				if (roots.contains(edge[0]))
+					partialOrdering.removeElementAt(i);
+			}
+		}
+		
+		triggerablesInOrder = true;
+	}
+	
 	public void initializeTriggerables() {
 		initializeTriggerables(TreeReference.rootRef());
 	}
@@ -369,58 +435,72 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	private void initializeTriggerables(TreeReference rootRef) {
 		TreeReference genericRoot = rootRef.genericize();
 
+		Vector applicable = new Vector();
 		for (int i = 0; i < triggerables.size(); i++) {
-			Triggerable t = (Triggerable) triggerables.elementAt(i);
-			boolean applicable = false;
+			Triggerable t = (Triggerable)triggerables.elementAt(i);
 			for (int j = 0; j < t.getTargets().size(); j++) {
-				TreeReference target = (TreeReference) t.getTargets()
-						.elementAt(j);
+				TreeReference target = (TreeReference)t.getTargets().elementAt(j);
 				if (genericRoot.isParentOf(target, false)) {
-					applicable = true;
+					applicable.addElement(t);
 					break;
 				}
 			}
-
-			if (applicable) {
-				evaluateTriggerable(t, rootRef, 0);
-			}
 		}
+		
+		evaluateTriggerables(applicable, rootRef);
 	}
-
-	public void evaluateTriggerables(TreeReference ref) {
-		evaluateTriggerables(ref, 0);
-	}
-
+	
 	// ref: unambiguous ref of node that just changed
-	public void evaluateTriggerables(TreeReference ref, int depth) {
-		if (depth > TRIGGERABLE_CHAINING_LIMIT) {
-			throw new RuntimeException(
-					"Exceeded chaining limit; you probably have dependency cycles in your conditions/calculates");
-		}
-
+	public void triggerTriggerables(TreeReference ref) {
 		// turn unambiguous ref into a generic ref
 		TreeReference genericRef = ref.genericize();
 
 		// get conditions triggered by this node
-		Vector triggered = (Vector) triggerIndex.get(genericRef);
+		Vector triggered = (Vector)triggerIndex.get(genericRef);
 		if (triggered == null)
 			return;
 
-		// for each condition
-		for (int i = 0; i < triggered.size(); i++) {
-			Triggerable t = (Triggerable) triggered.elementAt(i);
-			evaluateTriggerable(t, ref, depth);
-		}
+		Vector triggeredCopy = new Vector();
+		for (int i = 0; i < triggered.size(); i++)
+			triggeredCopy.addElement(triggered.elementAt(i));
+		evaluateTriggerables(triggeredCopy, ref);
 	}
 
-	private void evaluateTriggerable(Triggerable t, TreeReference anchorRef,
-			int depth) {
+	private void evaluateTriggerables(Vector tv, TreeReference anchorRef) {
+		//add all cascaded triggerables to queue
+		for (int i = 0; i < tv.size(); i++) {
+			Triggerable t = (Triggerable)tv.elementAt(i);
+			if (t.canCascade()) {
+				for (int j = 0; j < t.getTargets().size(); j++) {
+					TreeReference target = (TreeReference)t.getTargets().elementAt(j);
+					Vector triggered = (Vector)triggerIndex.get(target);
+					if (triggered != null) {
+						for (int k = 0; k < triggered.size(); k++) {
+							Triggerable u = (Triggerable)triggered.elementAt(k);
+							if (!tv.contains(u))
+								tv.addElement(u);
+						}
+					}
+				}
+			}
+		}
+		
+		//'triggerables' is topologically-ordered by dependencies, so evaluate the triggerables in 'tv'
+		//in the order they appear in 'triggerables'
+		for (int i = 0; i < triggerables.size(); i++) {
+			Triggerable t = (Triggerable)triggerables.elementAt(i);
+			if (tv.contains(t)) {
+				evaluateTriggerable(t, anchorRef);
+			}
+		}
+	}
+	
+	private void evaluateTriggerable(Triggerable t, TreeReference anchorRef) {
 		TreeReference contextRef = t.contextRef.contextualize(anchorRef);
 		Vector v = model.expandReference(contextRef);
-		for (int j = 0; j < v.size(); j++) {
-			EvaluationContext ec = new EvaluationContext(exprEvalContext,
-					(TreeReference) v.elementAt(j));
-			t.apply(model, ec, this, depth);
+		for (int i = 0; i < v.size(); i++) {
+			EvaluationContext ec = new EvaluationContext(exprEvalContext, (TreeReference)v.elementAt(i));
+			t.apply(model, ec, this);
 		}
 	}
 
@@ -674,29 +754,25 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void readExternal(DataInputStream dis, PrototypeFactory pf)
-			throws IOException, DeserializationException {
+	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
 		setName(ExtUtil.nullIfEmpty(ExtUtil.readString(dis)));
-		setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class),
-				pf));
+		setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setChildren((Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 
 		model = (DataModelTree) ExtUtil.read(dis, DataModelTree.class, pf);
 		model.setFormId(getID());
 
-		setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(
-				Localizer.class), pf));
+		setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
 
-		Vector vcond = (Vector) ExtUtil.read(dis, new ExtWrapList(
-				Condition.class), pf);
-		for (Enumeration e = vcond.elements(); e.hasMoreElements();)
+		Vector vcond = (Vector) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
+		for (Enumeration e = vcond.elements(); e.hasMoreElements(); )
 			addTriggerable((Condition) e.nextElement());
-		Vector vcalc = (Vector) ExtUtil.read(dis, new ExtWrapList(
-				Recalculate.class), pf);
+		Vector vcalc = (Vector) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
 		for (Enumeration e = vcalc.elements(); e.hasMoreElements();)
 			addTriggerable((Recalculate) e.nextElement());
-
+		finalizeTriggerables();
+		
 		outputFragments = (Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 	}
 
