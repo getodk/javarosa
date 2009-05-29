@@ -352,17 +352,19 @@
       <bind nodeset="preamble/info/first_visit_only" relevant="/imci/preamble/visit_type != 'first'" />
       <bind nodeset="tmp/sentinel/first_visit" relevant="/imci/preamble/visit_type = 'first'" />
 
-      <bind nodeset="preamble/temperature" type="decimal" constraint="true()" relevant="../temp_type = 'therm'" required="true()" />
+      <bind nodeset="preamble/temperature" type="decimal" constraint=". >= 32.0 and . <= 44.0" relevant="../temp_type = 'therm'" required="true()"
+			  jr:constraintMsg="Temperature must be between 32 and 44 degrees" />
       <bind nodeset="tmp/normalized/has_fever" calculate="selected(/imci/preamble/chief_complaint, 'fever') or /imci/preamble/temp_type = 'fever' or /imci/preamble/temperature >= 37.4" />
       
-      <bind nodeset="preamble/age" type="int" required="true()" /> <!-- todo: add age/unit constraints -->
+      <bind nodeset="preamble/age" type="int" required="true()" />
+			<bind nodeset="preamble/age_unit" constraint="../age >= 0 and ../age < if(. = 'years', 20, 240)" jr:constraintMsg="Age must be less than 20 years / 240 months" />
       <bind nodeset="tmp/normalized/age" calculate="if(/imci/preamble/age_unit = 'years', /imci/preamble/age,
                                                     if(/imci/preamble/age_unit = 'months', /imci/preamble/age div 12, ''))" />
       <bind nodeset="preamble/info/too_young" relevant="/imci/tmp/normalized/age < 2 div 12" />
       <bind nodeset="preamble/too_old_use_anyway" relevant="/imci/tmp/normalized/age >= 6.0" />
       <bind nodeset="tmp/sentinel/age_ok" relevant="/imci/tmp/normalized/age >= 2 div 12 and (/imci/tmp/normalized/age < 6.0 or /imci/preamble/too_old_use_anyway = 'yes')" />
                                                     
-      <bind nodeset="preamble/weight" type="int" constraint="true()" />
+      <bind nodeset="preamble/weight" type="int" constraint=". >= 5 and . <= 50" jr:constraintMsg="Weight must be between 5 and 50kg" />
       <bind nodeset="preamble/too_heavy_use_anyway" relevant="../weight >= 19" />
       
       <bind nodeset="tmp/sentinel/do_protocol" relevant="(count-selected(/imci/preamble/chief_complaint) > 0 and not(selected(/imci/preamble/chief_complaint, 'none'))) and
@@ -374,7 +376,8 @@
                                                 
       <bind nodeset="cough" relevant="/imci/tmp/normalized/has_cough" />
                                                          
-      <bind nodeset="cough/breath_rate" type="int" constraint="true()" relevant="../breath_rate_type = 'measure'" required="true()" />
+      <bind nodeset="cough/breath_rate" type="int" constraint=". >= 3 and . <= 200" relevant="../breath_rate_type = 'measure'" required="true()"
+			  jr:constraintMsg="Breating rate must be between 3 and 200 breaths per minute" />
       <bind nodeset="tmp/normalized/fast_breath" calculate="/imci/cough/breath_rate_type = 'fast' or /imci/cough/breath_rate >= if(../age < 1.0, 50, 40)" />
       
       <bind nodeset="tmp/normalized/classification/cough" calculate="
