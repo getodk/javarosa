@@ -623,6 +623,8 @@ public class JavaRosaDemoShell implements IShell {
 		PropertyUtils
 				.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY,
 						"http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
+		JavaRosaServiceProvider.instance().getLocaleManager().setLocale(
+				PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, "english"));
 	}
 
 	/**
