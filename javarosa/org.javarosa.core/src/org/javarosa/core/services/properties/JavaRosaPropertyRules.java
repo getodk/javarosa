@@ -21,6 +21,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.locale.Localizer;
 
 /**
  * A set of rules governing the allowable properties for JavaRosa's
@@ -35,6 +36,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     Vector readOnlyProperties;
     
     public final static String DEVICE_ID_PROPERTY = "DeviceID";
+    public final static String CURRENT_LOCALE = "cur_locale";
     
     public final static String LOGS_ENABLED = "logenabled";
     
@@ -55,6 +57,8 @@ public class JavaRosaPropertyRules implements IPropertyRules {
         logs.addElement(LOGS_ENABLED_YES);
         rules.put(LOGS_ENABLED, logs);
         
+        rules.put(CURRENT_LOCALE, new Vector());
+        
         readOnlyProperties.addElement(DEVICE_ID_PROPERTY);
         
     }
@@ -63,6 +67,15 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      *  @see org.javarosa.properties.IPropertyRules#allowableValues(String)
      */
     public Vector allowableValues(String propertyName) {
+    	if(CURRENT_LOCALE.equals(propertyName)) {
+    		Localizer l = JavaRosaServiceProvider.instance().getLocaleManager();
+    		Vector v = new Vector();
+    		String[] locales = l.getAvailableLocales();
+    		for(int i = 0 ; i < locales.length ; ++i) {
+    			v.addElement(locales[i]);
+    		}
+    		return v;
+    	}
         return (Vector)rules.get(propertyName);
     }
 
@@ -70,6 +83,9 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      *  @see org.javarosa.properties.IPropertyRules#checkValueAllowed(String, String)
      */
     public boolean checkValueAllowed(String propertyName, String potentialValue) {
+    	if(CURRENT_LOCALE.equals(propertyName)) {
+    		return JavaRosaServiceProvider.instance().getLocaleManager().hasLocale(potentialValue);
+    	}
         Vector prop = ((Vector)rules.get(propertyName));
         if(prop.size() != 0) {
             //Check whether this is a dynamic property
@@ -126,6 +142,8 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     		return "Unique Device ID";
     	} else if(LOGS_ENABLED.equals(propertyName)) {
     		return "Device Logging";
+    	} else if(CURRENT_LOCALE.equals(propertyName)) {
+    		return JavaRosaServiceProvider.instance().localize("settings.language");
     	}
     	return propertyName;
     }
@@ -143,6 +161,9 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      * @see org.javarosa.core.services.properties.IPropertyRules#handlePropertyChanges(java.lang.String)
      */
     public void handlePropertyChanges(String propertyName) {
-    	//Nothing
+    	if(CURRENT_LOCALE.equals(propertyName)) {
+    		String locale = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(propertyName);
+    		JavaRosaServiceProvider.instance().getLocaleManager().setLocale(locale);
+    	}
     }
 }
