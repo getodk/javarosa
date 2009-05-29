@@ -155,7 +155,7 @@ public class HttpTransportMethod implements TransportMethod {
 
 				responseCode = con.getResponseCode();
 				if (responseCode != HttpConnection.HTTP_OK) {
-					throw new IOException("Response code: " + responseCode);
+					throw new UnexpectedResponseCodeException(responseCode);
 				}
 
 				in = con.openInputStream();
@@ -227,7 +227,16 @@ public class HttpTransportMethod implements TransportMethod {
                 //#endif
                 message.setChanged();
                 message.notifyObservers("Http Transport Failure: Security Exception".getBytes()); 
-		    } finally {
+		    } catch (UnexpectedResponseCodeException e) {
+		    	//#if debug.output==verbose || debug.output==exception
+				System.out.println("Unexpected response code: " + e.getCode());
+				//#endif
+				
+				message.setStatus(TransportMessage.STATUS_FAILED);
+				
+				message.setChanged();
+				message.notifyObservers(message.getReplyloadData());
+			} finally {
 				cleanUp(in);
 				cleanUp(out);
 				cleanUp(con);
@@ -329,7 +338,15 @@ public class HttpTransportMethod implements TransportMethod {
 		if(primaryWorker!=null){
 			primaryWorker.cleanStreams();
 		}
-		
-		
+	}
+	
+	protected class UnexpectedResponseCodeException extends Exception{
+		int code;
+		public UnexpectedResponseCodeException(int code){
+			this.code = code;
+		}
+		public int getCode() {
+			return code;
+		}
 	}
 }

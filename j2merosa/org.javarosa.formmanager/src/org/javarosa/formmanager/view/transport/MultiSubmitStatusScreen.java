@@ -36,6 +36,7 @@ public class MultiSubmitStatusScreen extends Form implements
 	private int currentid;
 	private int counter = 0;
 	private int[] modelIDs;
+	private int failed = 0;
 
 	private FormTransportActivity activity;
 
@@ -59,6 +60,7 @@ public class MultiSubmitStatusScreen extends Form implements
 		setModelIDs(ids);
 		setMessage();
 		addTimerTask();
+		failed = 0;
 	}
 
 	/**
@@ -68,6 +70,7 @@ public class MultiSubmitStatusScreen extends Form implements
 		deleteAll();
 		setMessage(JavaRosaServiceProvider.instance().localize("sending.status.none"));
 		addTimerTask();
+		failed = 0;
 	}
 
 	private void setMessage(String s) {
@@ -127,6 +130,10 @@ public class MultiSubmitStatusScreen extends Form implements
 		this.counter += REFRESH_INTERVAL;
 
 		// stop the timer if the status is...(TODO: ? explain)
+		// Clayton Sims - May 29, 2009 : Seems like it's checking to see whether the 
+		// status of the latest message is new (unsent) or delivered (finished) and otherwise
+		// it's assuming that something failed, which seem like the wrong semantics for a batch
+		// send.
 		if (!(status == TransportMessage.STATUS_NEW
 				|| status == TransportMessage.STATUS_DELIVERED || status == -1)) {
 			this.timer.cancel();
@@ -146,9 +153,6 @@ public class MultiSubmitStatusScreen extends Form implements
 
 			this.currentid++;
 			if (this.currentid == this.modelIDs.length) {
-				this.msg.setText(JavaRosaServiceProvider.instance().localize("sending.status.success") + " " + getServerResponse()
-						+ "\n");
-
 				// timer already cancelled above
 				// this.timer.cancel();
 			} else {
@@ -160,8 +164,10 @@ public class MultiSubmitStatusScreen extends Form implements
 
 			// problem occured
 		case TransportMessage.STATUS_FAILED:
-
-			this.msg.setText(JavaRosaServiceProvider.instance().localize("sending.status.failed"));
+			//Move along to the next form.
+			this.currentid++;
+			failed++;
+			//this.msg.setText(JavaRosaServiceProvider.instance().localize("sending.status.failed"));
 			break;
 
 		// another problem
@@ -170,10 +176,30 @@ public class MultiSubmitStatusScreen extends Form implements
 			System.out.println("Unrecognised status from Transport Manager: "
 					+ status);
 
+			this.currentid++;
+			failed++;
 			this.msg.setText(JavaRosaServiceProvider.instance().localize("sending.status.error"));
 			break;
 		}
+		
+		if(this.currentid == this.modelIDs.length) {
+			constructFinalMessage();
+		}
 
+	}
+	
+	private void constructFinalMessage() {
+		String message = "";
+		if(failed > 0) { 
+			message += JavaRosaServiceProvider.instance().localize("sending.status.failures", new String[]{String.valueOf(failed)}) + "\n";
+		}
+		if(failed < this.modelIDs.length) {
+			message+= JavaRosaServiceProvider.instance().localize("sending.status.success") + " " + getServerResponse() + "\n";
+		}
+		if(failed == this.modelIDs.length) {
+			message = JavaRosaServiceProvider.instance().localize("sending.status.failed");
+		}
+		this.msg.setText(message);
 	}
 
 	/**
@@ -217,6 +243,9 @@ public class MultiSubmitStatusScreen extends Form implements
 	 * @see org.javarosa.formmanager.view.ISubmitStatusScreen#receiveMessage(int)
 	 */
 	public void receiveMessage(int message, String details) {
+		//NOTE: This message comes from the code that handles the overall Transport Manager
+		//communication, NOT from the transport method itself. Its failures happen at a high
+		//level and shouldn't be confused with errors returned from the transport method.
 		switch(message) {
 		    default:
 		    	//TODO: Specific sending error?

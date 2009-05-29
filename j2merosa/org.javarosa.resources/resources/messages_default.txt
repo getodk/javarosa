@@ -217,6 +217,7 @@ message.delete=DeleteMessage
 
 debug.log=Debug Log
 
+sending.status.failures=Some Errors Occured, ${0} forms were unsent
 sending.status.long=Submission Taking too Long
 sending.status.success=Successfully Submitted
 sending.status.failed=Submission Failed
