@@ -70,21 +70,21 @@ public class PatientEntity implements IEntity {
 	public String getName() {
 		String name = "";
 		
-		if (givenName.length() > 0) {
+		if ((givenName!=null) && (givenName.length() > 0)) {
 			if (name.length() > 0) {
 				name += ", ";
 			}
 			name += givenName;
 		}
 		
-		if (middleName.length() > 0) {
+		if ((middleName !=null) && (middleName.length() > 0)) {
 			if (name.length() > 0) {
 				name += " ";
 			}
 			name += middleName;
 		}
 		
-		if (familyName.length() > 0) {
+		if ((familyName !=null) && (familyName.length() > 0)) {
 			if (name.length() > 0) {
 				name += " ";
 			}
