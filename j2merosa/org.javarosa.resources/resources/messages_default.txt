@@ -92,6 +92,8 @@ menu.Empty=Empty
 menu.Login=Login
 menu.Demo=Demo
 
+settings.language=Language
+
 view.loading=Loading
 
 hint.TypeOrScan=Type in you answer, or choose Scan to scan the barcode

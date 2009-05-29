@@ -30,6 +30,7 @@ public class LanguagePackModule implements IModule {
 		locale.registerLocaleResource("afrikaans","/messages_afr.txt");
 		
 		locale.setDefaultLocale("default");
+		
 		locale.setLocale("english");
 	}
 
