@@ -29,6 +29,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 
 /**
+ * NOTE: All new fields should be added to the case class using the "data" class,
+ * as it demonstrated by the "userid" field. This prevents problems with datatype
+ * representation across versions.
+ * 
  * @author Clayton Sims
  * @date Mar 19, 2009 
  *
@@ -114,6 +118,20 @@ public class Case implements Externalizable, IDRecordable, Restorable {
 	 */
 	public String getId() {
 		return id;
+	}
+	
+	public int getUserId() {
+		Integer id = (Integer)data.get(org.javarosa.core.api.Constants.USER_ID_KEY);
+		if(id == null) {
+			return -1;
+		}
+		else {
+			return id.intValue();
+		}
+	}
+	
+	public void setUserId(int id) {
+		data.put(org.javarosa.core.api.Constants.USER_ID_KEY, new Integer(id));
 	}
 
 	/**

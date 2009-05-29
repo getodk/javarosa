@@ -22,6 +22,7 @@ public class CaseEntity implements IEntity {
 	protected String type;
 	
 	protected int recordId;
+	protected int userId;
 	
 	protected boolean closed;
 	
@@ -161,6 +162,10 @@ public class CaseEntity implements IEntity {
 		//pretty broadly, but should be reevaluated once the method contract is clear.
 		return matchID(key);
 	}
+	
+	public int getUserId() {
+		return userId;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#readEntity(java.lang.Object)
@@ -173,6 +178,8 @@ public class CaseEntity implements IEntity {
 		this.recordId = c.getRecordId();
 		
 		this.closed = c.isClosed();
+		
+		this.userId = c.getUserId();
 	}
 
 }
