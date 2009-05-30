@@ -13,7 +13,7 @@ import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.utils.Localizer;
+import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
