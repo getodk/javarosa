@@ -5,6 +5,6 @@
 	<classpathentry kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry kind="src" path="/org.javarosa.xform"/>
 	<classpathentry kind="src" path="/org.javarosa.core"/>
-	<classpathentry kind="lib" path="/org.commcare.core/lib/kxml2-2.3.0.jar"/>
+	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
