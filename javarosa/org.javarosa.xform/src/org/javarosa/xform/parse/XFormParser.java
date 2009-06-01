@@ -999,6 +999,8 @@ public class XFormParser {
 		if (schema != null && schema.length() > 0 && !schema.equals(defaultNamespace)) {
 			instanceModel.schema = schema;
 		}
+		
+		loadNamespaces(e, instanceModel);
 			
 		processRepeats(instanceModel);
 		verifyBindings(f, instanceModel);
@@ -1009,6 +1011,18 @@ public class XFormParser {
 		f.finalizeTriggerables();
 		
 		f.setDataModel(instanceModel);
+	}
+	
+	private static Hashtable loadNamespaces(Element e, DataModelTree tree) {
+		Hashtable prefixes = new Hashtable();
+		for(int i = 0 ; i < e.getNamespaceCount(); ++i ) {
+			String uri = e.getNamespaceUri(i);
+			String prefix = e.getNamespacePrefix(i);
+			if(uri != null && prefix != null) {
+				tree.addNamespace(prefix, uri);
+			}
+		}
+		return prefixes;
 	}
 	
 	//parse instance hierarchy and turn into a skeleton model; ignoring data content, but respecting repeated nodes and 'template' flags
@@ -1763,6 +1777,7 @@ public class XFormParser {
 		
 		TreeElement te = buildInstanceStructure(e, null);
 		DataModelTree dm = new DataModelTree(te);
+		loadNamespaces(e, dm);
 		if (r != null) {
 			RestoreUtils.templateData(r, dm, null);
 		}

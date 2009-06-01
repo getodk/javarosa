@@ -21,6 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -39,6 +40,7 @@ import org.javarosa.core.services.storage.utilities.IDRecordable;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -63,6 +65,8 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 	private Date dateSaved;
 
 	public String schema;
+	
+	private Hashtable namespaces = new Hashtable();
 
 	public DataModelTree() {
 	}
@@ -472,6 +476,8 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 				pf);
 		dateSaved = (Date) ExtUtil
 				.read(in, new ExtWrapNullable(Date.class), pf);
+		
+		namespaces = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 		setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
 	}
 
@@ -488,6 +494,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 		ExtUtil.write(out, new ExtWrapNullable(name));
 		ExtUtil.write(out, new ExtWrapNullable(schema));
 		ExtUtil.write(out, new ExtWrapNullable(dateSaved));
+		ExtUtil.write(out, new ExtWrapMap(namespaces));
 		ExtUtil.write(out, getRoot());
 	}
 
@@ -631,6 +638,24 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 
 		return node;
 	}
+	
+	public void addNamespace(String prefix, String URI) {
+		namespaces.put(prefix, URI);
+	}
+	
+	public String[] getNamespacePrefixes() {
+		String[] prefixes = new String[namespaces.size()];
+		int i = 0;
+		for(Enumeration en = namespaces.keys() ; en.hasMoreElements(); ) {
+			prefixes[i] = (String)en.nextElement();
+			++i;
+		}
+		return prefixes;
+	}
+	
+	public String getNamespaceURI(String prefix) {
+		return (String)namespaces.get(prefix);
+	}
 
 	public String getRestorableType() {
 		return "form";
@@ -651,6 +676,11 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 				.getTransportManager();
 		boolean sent = (tm.getModelDeliveryStatus(id, true) == TransportMessage.STATUS_DELIVERED);
 		RestoreUtils.addData(dm, "sent", new Boolean(sent));
+		
+		for (Enumeration e = namespaces.keys(); e.hasMoreElements(); ) {
+			String key = (String)e.nextElement();
+			RestoreUtils.addData(dm, "namespace/" + key, namespaces.get(key));
+		}
 
 		RestoreUtils.mergeDataModel(dm, this, "data");
 		return dm;
@@ -663,7 +693,6 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 				Constants.DATATYPE_DATE_TIME);
 		RestoreUtils.applyDataType(dm, "schema", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "sent", parentRef, Boolean.class);
-
 		// don't touch data for now
 	}
 
@@ -675,6 +704,20 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 
 		boolean sent = RestoreUtils.getBoolean(RestoreUtils
 				.getValue("sent", dm));
+		
+        TreeElement names = dm.resolveReference(RestoreUtils.absRef("namespace", dm));
+        if (names != null) {
+            for (int i = 0; i < names.getNumChildren(); i++) {
+            	TreeElement child = (TreeElement)names.getChildren().elementAt(i);
+            	String name = child.getName();
+            	Object value = RestoreUtils.getValue("namespace/" + name, dm);
+            	if (value != null){
+            	    namespaces.put(name, value);
+            	}
+            }
+        }
+
+		
 		if (sent) {
 			System.out.println("here " + id);
 			ITransportManager tm = JavaRosaServiceProvider.instance()

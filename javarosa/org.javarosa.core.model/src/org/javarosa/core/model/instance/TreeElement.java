@@ -528,7 +528,14 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		String[] array = new String[3];
 		int start = 0;
 		// get namespace
-		int pos = att.indexOf(":");
+		
+		int pos = -1;
+		//We want to find the _last_ possible ':'.
+		while(att.indexOf(":",pos+1) != -1) {
+			pos = att.indexOf(":",pos+1);
+		}
+
+		//int pos = att.indexOf(":");
 		if (pos == -1) {
 			array[0] = null;
 			start = 0;
