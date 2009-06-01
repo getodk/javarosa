@@ -91,8 +91,8 @@ public class FormOverview {
 			println(sb, indent + 1, "Default: " + defaultValue);
 		}
 		
-		if (instanceNode.constraint != null) {
-			println(sb, indent + 1, "Constraint: " + printCondition(instanceNode.constraint.constraint));
+		if (instanceNode.getConstraint() != null) {
+			println(sb, indent + 1, "Constraint: " + printCondition(instanceNode.getConstraint().constraint));
 		}
 		
 		println(sb);
@@ -134,7 +134,7 @@ public class FormOverview {
 		} else if (property.equals("readonly")) {
 			action = Condition.ACTION_DISABLE;
 			conditionHeader = "Conditionally Read-only";
-			absolute = instanceNode.enabled;
+			absolute = instanceNode.isEnabled();
 			absoluteReportable = false;
 			absoluteHeader = "Read-only";
 		}
@@ -167,35 +167,35 @@ public class FormOverview {
 	private static String printDefault (TreeElement node) {
 		String value = null;
 		
-		if (node.preloadHandler != null) {
-			if (node.preloadHandler.equals("date")) {
-				if (node.preloadParams.equals("today")) {
+		if (node.getPreloadHandler() != null) {
+			if (node.getPreloadHandler().equals("date")) {
+				if (node.getPreloadParams().equals("today")) {
 					value = "Today's Date";
 				}
-			} else if (node.preloadHandler.equals("property")) {
-				if (node.preloadParams.equals("DeviceID")) {
+			} else if (node.getPreloadHandler().equals("property")) {
+				if (node.getPreloadParams().equals("DeviceID")) {
 					value = "Device ID";
 				}
-			} else if (node.preloadHandler.equals("timestamp")) {
-				if (node.preloadParams.equals("start")) {
+			} else if (node.getPreloadHandler().equals("timestamp")) {
+				if (node.getPreloadParams().equals("start")) {
 					value = "Timestamp when form opened";
-				} else if (node.preloadParams.equals("end")) {
+				} else if (node.getPreloadParams().equals("end")) {
 					value = "Timestamp when form completed";
 				}
-			} else if (node.preloadHandler.equals("context")) {
-				if (node.preloadParams.equals("UserID")) {
+			} else if (node.getPreloadHandler().equals("context")) {
+				if (node.getPreloadParams().equals("UserID")) {
 					value = "User ID";
-				} else if (node.preloadParams.equals("UserName")) {
+				} else if (node.getPreloadParams().equals("UserName")) {
 					value = "User Name";
 				}	
-			} else if (node.preloadHandler.equals("patient")) {
-				value = "Patient Record: " + node.preloadParams;
+			} else if (node.getPreloadHandler().equals("patient")) {
+				value = "Patient Record: " + node.getPreloadParams();
 			}
 			
 			if (value == null) {
-				value = "Preload Handler: " + node.preloadHandler;
-				if (node.preloadParams != null) {
-					value = value + "; params: " + node.preloadParams;
+				value = "Preload Handler: " + node.getPreloadHandler();
+				if (node.getPreloadParams() != null) {
+					value = value + "; params: " + node.getPreloadParams();
 				}
 			}
 		} else {
