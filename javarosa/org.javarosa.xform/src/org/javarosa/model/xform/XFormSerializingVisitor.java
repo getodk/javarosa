@@ -137,8 +137,13 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 			theXmlDoc.addChild(Node.ELEMENT, serializeNode(root));
 		}
 		
+		Element top = theXmlDoc.getElement(0);
+		
+		String[] prefixes = tree.getNamespacePrefixes();
+		for(int i = 0 ; i < prefixes.length; ++i ) {
+			top.setPrefix(prefixes[i], tree.getNamespaceURI(prefixes[i]));
+		}
 		if (tree.schema != null) {
-			Element top = theXmlDoc.getElement(0);
 			top.setNamespace(tree.schema);
 			top.setPrefix("", tree.schema);
 		}
