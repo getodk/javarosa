@@ -26,6 +26,7 @@ import org.javarosa.formmanager.utility.RMSRetreivalMethod;
 import org.javarosa.j2me.J2MEModule;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
+import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.xform.util.XFormUtils;
 
 public class JavaRosaFormTestShell implements IShell {
@@ -85,6 +86,7 @@ public class JavaRosaFormTestShell implements IShell {
 	
 	private void init() {
 		new J2MEModule().registerModule(context);
+		new LanguagePackModule().registerModule(context);
 		new XFormsModule().registerModule(context);
 		new CoreModelModule().registerModule(context);
 		new HttpTransportModule().registerModule(context);

@@ -61,8 +61,14 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String helpText;	 /* The help text. */
 	private String helpTextID;
 
+	
+	// Clayton Sims - Jun 1, 2009 : These two elements _desperately_ need
+	// a solid description of what their arguments and function are, since
+	// they are complicit in so many bugs
 	private OrderedHashtable selectItems;  	/** String -> String */
 	private OrderedHashtable selectItemIDs;	/** String -> String */
+	
+	
 	private Vector selectItemsLocalizable;
 	
 	//this may be used in the future, but it is not the default value you're probably thinking about
