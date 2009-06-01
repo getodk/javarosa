@@ -139,7 +139,16 @@ public class ChatterboxWidgetFactory {
     	q.addSelectItem("Yes", "y");
     	q.addSelectItem("No", "n");
     	
+    	q.addSelectItemID("Yes", false, "y");
+    	q.addSelectItemID("No", false, "n");
+    	
     	FormElementBinding binding = new FormElementBinding(null, q, new TreeElement(null, 0));
+    	
+    	// Clayton Sims - Jun 1, 2009 : I added this setter because the repeat prompts were crashing when they
+    	// tried to use the fillTemplateString method. Not sure if that's exactly the right plan. If not, 
+    	// this next line should be removed, and another solution should be instituted. The offending line
+    	// attempting to access the formdef is in the ExpandedWidget class.
+    	binding.form = f;
 		
 		return new ChatterboxWidget(cbox, binding, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }

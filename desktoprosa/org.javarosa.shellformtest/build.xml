@@ -73,6 +73,7 @@
 
 					<source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
 					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
+					<source dir="${basedir}/../org.javarosa.resources/src/"/>
 					<source dir="${basedir}/../org.javarosa.xform/src/"/>
 					
 				</sources>
@@ -82,15 +83,16 @@
 					<variable file="configuration/configuration.properties" />
 				</variables>
 
+				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) -->
 				<resources
 					dir="${dir.resources}"
-					defaultexcludes="yes"
-					excludes="readme.txt">
+					defaultexcludes="no"
+					excludes="readme.txt, .svn, *.css">
 					<root dir="${dir.resources.external}"
 						excludes=".svn"/>
 					<!-- Set the language for the strings in the application -->
 					<localization>
-						<locale name="en" />
+						<locale name="none" />
 					</localization>
 				</resources>
 				
