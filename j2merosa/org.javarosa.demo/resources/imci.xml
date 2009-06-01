@@ -997,6 +997,635 @@
         /imci/tmp/normalized/diagnosis/dehydration = 'none'
       " />
       
+      <itext>
+        <translation lang="English">
+          <text id="c-100mg-tablet">
+            <value>100mg pediatric tablet</value>
+          </text>
+          <text id="c-120mg-tablet">
+            <value>120mg pediatric tablet</value>
+          </text>
+          <text id="c-125mg-syrup">
+            <value>125mg / 5mL syrup</value>
+          </text>
+          <text id="c-240mg-syrup">
+            <value>240mg / 5mL syrup</value>
+          </text>
+          <text id="c-250mg-tablet">
+            <value>250mg tablet</value>
+          </text>
+          <text id="c-480mg-tablet">
+            <value>480mg adult tablet</value>
+          </text>
+          <text id="c-500mg-tablet">
+            <value>500mg adult tablet</value>
+          </text>
+          <text id="c-acute-ear-infection">
+            <value>Acute Ear Infection</value>
+          </text>
+          <text id="c-agree">
+            <value>Agree</value>
+          </text>
+          <text id="c-amoxycillin">
+            <value>Amoxycillin</value>
+          </text>
+          <text id="c-boy">
+            <value>Boy</value>
+          </text>
+          <text id="c-breathing-rate-fast">
+            <value>No, but breathing rate is fast</value>
+          </text>
+          <text id="c-breathing-rate-normal">
+            <value>No, but breathing rate is normal</value>
+          </text>
+          <text id="c-breathing-rate-will-measure">
+            <value>Yes, I will count number of breaths per minute</value>
+          </text>
+          <text id="c-cant-drink-breastfeed">
+            <value>Unable to drink/breastfeed</value>
+          </text>
+          <text id="c-chronic-ear-problems">
+            <value>Chronic Ear Problems</value>
+          </text>
+          <text id="c-convulsions">
+            <value>Convulsions</value>
+          </text>
+          <text id="c-cotrimoxazole">
+            <value>Cotrimoxazole</value>
+          </text>
+          <text id="c-cough-cold">
+            <value>Cough with Cold</value>
+          </text>
+          <text id="c-cough-difficulty-breathing">
+            <value>Cough or difficulty breathing</value>
+          </text>
+          <text id="c-cough-persistent-cold">
+            <value>Cough with Persistent Cold</value>
+          </text>
+          <text id="c-cough-pneumonia">
+            <value>Cough with Pneumonia</value>
+          </text>
+          <text id="c-cough-severe-pneumonia">
+            <value>Cough with Severe Pneumonia</value>
+          </text>
+          <text id="c-diarrhea">
+            <value>Diarrhea</value>
+          </text>
+          <text id="c-diarrhea-no-dehydr">
+            <value>Diarrhea with no dehydration</value>
+          </text>
+          <text id="c-diarrhea-severe-dehydr">
+            <value>Diarrhea with severe dehydration</value>
+          </text>
+          <text id="c-diarrhea-some-dehydr">
+            <value>Diarrhea with some dehydration</value>
+          </text>
+          <text id="c-disagree">
+            <value>Disagree</value>
+          </text>
+          <text id="c-drinking-eagerly">
+            <value>Drinking eagerly; is thirsty</value>
+          </text>
+          <text id="c-drinking-not-eagerly">
+            <value>Drinking, but not eagerly</value>
+          </text>
+          <text id="c-ear-mastoiditis">
+            <value>Ear Mastoiditis</value>
+          </text>
+          <text id="c-ear-problem">
+            <value>Ear problem</value>
+          </text>
+          <text id="c-erythromycin">
+            <value>Erythromycin</value>
+          </text>
+          <text id="c-fever">
+            <value>Fever</value>
+          </text>
+          <text id="c-fever-no-malaria">
+            <value>Fever; Malaria unlikely</value>
+          </text>
+          <text id="c-first-visit">
+            <value>First visit</value>
+          </text>
+          <text id="c-followup-visit">
+            <value>Follow-up visit</value>
+          </text>
+          <text id="c-girl">
+            <value>Girl</value>
+          </text>
+          <text id="c-head-fungus">
+            <value>Child has head fungus</value>
+          </text>
+          <text id="c-lethargic-unconscious">
+            <value>Lethargic/Unconscious</value>
+          </text>
+          <text id="c-malaria">
+            <value>Malaria</value>
+          </text>
+          <text id="c-measles">
+            <value>Measles</value>
+          </text>
+          <text id="c-measles-eye-mouth-complications">
+            <value>Measles with Eye or Mouth Complications</value>
+          </text>
+          <text id="c-months">
+            <value>Months</value>
+          </text>
+          <text id="c-nalidixic-acid">
+            <value>Nalidixic Acid</value>
+          </text>
+          <text id="c-no">
+            <value>No</value>
+          </text>
+          <text id="c-no-ear-problem">
+            <value>No serious ear problem</value>
+          </text>
+          <text id="c-none">
+            <value>None</value>
+          </text>
+          <text id="c-not-drinking">
+            <value>Not able to drink or drinking poorly</value>
+          </text>
+          <text id="c-other-complaint">
+            <value>Other complaint</value>
+          </text>
+          <text id="c-other-drug">
+            <value>Other Drug</value>
+          </text>
+          <text id="c-other-none-of-the-above">
+            <value>Other/None of the above</value>
+          </text>
+          <text id="c-other-painkiller">
+            <value>Other Painkiller</value>
+          </text>
+          <text id="c-persistent-diarrhea-no-dehydr">
+            <value>Persistent diarrhea with no dehydration</value>
+          </text>
+          <text id="c-procaine-penicillin">
+            <value>Procaine Penicillin</value>
+          </text>
+          <text id="c-quinine-injection">
+            <value>Quinine Injection</value>
+          </text>
+          <text id="c-quinine-tablet">
+            <value>Quinine Tablet</value>
+          </text>
+          <text id="c-severe-febrile-disease">
+            <value>Severe Febrile Disease</value>
+          </text>
+          <text id="c-severe-measles">
+            <value>Severe Measles</value>
+          </text>
+          <text id="c-severe-persistent-diarrhea-severe-dehydr">
+            <value>Severe persistent diarrhea with severe dehydration</value>
+          </text>
+          <text id="c-severe-persistent-diarrhea-some-dehydr">
+            <value>Severe persistent diarrhea with some dehydration</value>
+          </text>
+          <text id="c-skin-back-immediately">
+            <value>Skin goes back immediately</value>
+          </text>
+          <text id="c-skin-back-slowly">
+            <value>Skin goes back slowly</value>
+          </text>
+          <text id="c-skin-back-very-slowly">
+            <value>Skin goes back very slowly (more than 2 seconds)</value>
+          </text>
+          <text id="c-temperature-hot">
+            <value>No, but child feels hot or has had fever</value>
+          </text>
+          <text id="c-temperature-normal">
+            <value>No, but child feels normal</value>
+          </text>
+          <text id="c-temperature-will-measure">
+            <value>Yes, I will use a thermometer</value>
+          </text>
+          <text id="c-thirty-days-over">
+            <value>30 days or more</value>
+          </text>
+          <text id="c-thirty-days-under">
+            <value>Less than 30 days</value>
+          </text>
+          <text id="c-two-weeks-over">
+            <value>Two weeks or more</value>
+          </text>
+          <text id="c-two-weeks-under">
+            <value>Less than two weeks</value>
+          </text>
+          <text id="c-vomits-everything">
+            <value>Vomits everything</value>
+          </text>
+          <text id="c-week-over">
+            <value>A week or more</value>
+          </text>
+          <text id="c-week-under">
+            <value>Less than a week</value>
+          </text>
+          <text id="c-years">
+            <value>Years</value>
+          </text>
+          <text id="c-yes">
+            <value>Yes</value>
+          </text>
+          <text id="m-add-foods-to-diet">
+            <value>ADVISE: Add other foods/fluids to the child's diet</value>
+          </text>
+          <text id="m-all-done">
+            <value>The protocol is complete. Thank you for using E-IMCI.</value>
+          </text>
+          <text id="m-antibiotic-already-cholera">
+            <value>An antibiotic has already been given for <output value="'pneumonia'" />; there is no need to give an additional antibiotic for cholera</value>
+          </text>
+          <text id="m-antibiotic-already-dysentery">
+            <value>An antibiotic has already been given for <output value="              if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',              if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',                '???'))            " />; there is no need to give an additional antibiotic for dysentery</value>
+          </text>
+          <text id="m-antibiotic-already-ear">
+            <value>An antibiotic has already been given for <output value="              if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',              if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',              if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',                '???')))            " />; there is no need to give an additional antibiotic for the ear problem</value>
+          </text>
+          <text id="m-antibiotic-already-malaria">
+            <value>An antibiotic has already been given for <output value="              if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',              if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',              if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',              if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'the ear problem',                '???'))))            " />; there is no need to give an additional antibiotic for the malaria</value>
+          </text>
+          <text id="m-apply-tetracycline-ointment">
+            <value>DO: Apply tetracycline eye ointment</value>
+          </text>
+          <text id="m-choose-correct-dose">
+            <value>DO: Give correct dose and tell observer</value>
+          </text>
+          <text id="m-choose-other-drug">
+            <value>DO: Choose appropriate drug</value>
+          </text>
+          <text id="m-choose-other-painkiller">
+            <value>DO: Choose appropriate painkiller</value>
+          </text>
+          <text id="m-complete-quickly-refer-urgently">
+            <value>ALERT: This child has a serious problem. Complete assement quickly and refer urgently!</value>
+          </text>
+          <text id="m-disagree-classification-dysentery">
+            <value>You have disagreed; new classification is 'Child should <output value="if(/imci/tmp/normalized/diagnosis/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery'</value>
+          </text>
+          <text id="m-ear-wick-instructions">
+            <value>TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper          into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean          one and repeat these steps until the ear is dry</value>
+          </text>
+          <text id="m-ensure-continues-feeding">
+            <value>ADVISE: Ensure that the child continues to feed during illness</value>
+          </text>
+          <text id="m-followup-in-n-days">
+            <value>Follow up in <output value="/imci/tmp/normalized/followup/time" /> days <output value="if(/imci/tmp/normalized/diagnosis/fever = 'malaria', 'if fever persists', if(/imci/tmp/normalized/followup/if_no_improvement, 'if no improvement', ''))" /></value>
+          </text>
+          <text id="m-give-fluid">
+            <value>DO: Give the child fluid</value>
+          </text>
+          <text id="m-give-vitamin-a">
+            <value>GIVE: Vitamin A</value>
+          </text>
+          <text id="m-no-cotrimoxazole">
+            <value>SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</value>
+          </text>
+          <text id="m-no-followups">
+            <value>SORRY: this system is not yet suitable for follow-up visits. Please use standard procedures.</value>
+          </text>
+          <text id="m-refer-urgently">
+            <value>REFER: urgently to hospital! <output value="if(/imci/tmp/normalized/diagnosis/dehydration = 'severe', concat('Give frequent sips of ORS on the way.', if(/imci/tmp/normalized/age < 2.0, ' Tell mother to continue breastfeeding.', '')), '')" /></value>
+          </text>
+          <text id="m-return-immediately-if">
+            <value>Tell mother to return immediately if child is not able to drink/breastfeed, becomes sicker, or <output value="if(/imci/tmp/normalized/has_fever, 'fever worsens', 'develops a fever')" /></value>
+          </text>
+          <text id="m-soothe-throat">
+            <value>TREAT: Soothe throat and relieve cough with a safe remedy</value>
+          </text>
+          <text id="m-too-young">
+            <value>SORRY: this system is not yet suitable for children under two months</value>
+          </text>
+          <text id="m-treat-low-blood-sugar">
+            <value>DO: Treat from the IMCI chart to avoid low blood sugar</value>
+          </text>
+          <text id="m-treat-mouth-ulcers">
+            <value>DO: Treat mouth ulcers with gentian violet</value>
+          </text>
+          <text id="m-treat-other-problems">
+            <value>DO: Treat the child's other problems</value>
+          </text>
+          <text id="m-treat-persistent-diarrhea">
+            <value>ADVISE: how to feed a child who has persistent diarrhea</value>
+          </text>
+          <text id="m-treat-rehydration">
+            <value>TREAT: Re-hydration plan <output value="/imci/tmp/normalized/treatment/hydration_plan" /> from IMCI chart</value>
+          </text>
+          <text id="p-age">
+            <value form="short">What is the child's age (in...</value>
+            <value form="long">ASK: What is the child's age (in years or months)</value>
+          </text>
+          <text id="p-age-unit">
+            <value form="short">Was the age in years or mon...</value>
+            <value form="long">Was the age in years or months?</value>
+          </text>
+          <text id="p-blood-in-stool">
+            <value form="short">Is there blood in the stool?</value>
+            <value form="long">ASK: Is there blood in the stool?</value>
+          </text>
+          <text id="p-breathing-rate">
+            <value form="short">Can you measure the breathi...</value>
+            <value form="long">ASK: Can you measure the breathing rate?</value>
+          </text>
+          <text id="p-can-take-temperature">
+            <value form="short">Can you take the child's te...</value>
+            <value form="long">ASK: Can you take the child's temperature?</value>
+          </text>
+          <text id="p-chest-indrawing">
+            <value form="short">Is the chest indrawing?</value>
+            <value form="long">LOOK: Is the chest indrawing?</value>
+          </text>
+          <text id="p-childs-problems">
+            <value form="short">Child's problems</value>
+            <value form="long">ASK: Child's problems</value>
+          </text>
+          <text id="p-classify-acute-ear-infection">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for an acute ear infection</value>
+          </text>
+          <text id="p-classify-chronic-ear-problems">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for chronic ear problems</value>
+          </text>
+          <text id="p-classify-cold">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for cough or cold, but no pneumonia</value>
+          </text>
+          <text id="p-classify-diarrhea">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for <output value="              if(/imci/tmp/normalized/classification/diarrhea = 'severe-persistent', 'severe persistent diarrhea',              if(/imci/tmp/normalized/classification/diarrhea = 'persistent', 'persistent diarrhea',                'diarrhea'))            " /> with <output value="              if(/imci/tmp/normalized/classification/dehydration = 'severe', 'severe dehydration',              if(/imci/tmp/normalized/classification/dehydration = 'some', 'some dehydration',                'no dehydration'))                        " /></value>
+          </text>
+          <text id="p-classify-dysentery">
+            <value form="short">Child should [output]</value>
+            <value form="long">CLASSIFY: Child should <output value="if(/imci/tmp/normalized/classification/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery</value>
+          </text>
+          <text id="p-classify-fever-no-malaria">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for fever, but malaria unlikely</value>
+          </text>
+          <text id="p-classify-malaria">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for malaria</value>
+          </text>
+          <text id="p-classify-mastoiditis">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for mastoiditis</value>
+          </text>
+          <text id="p-classify-no-ear-problem">
+            <value form="short">Child has no serious ear pr...</value>
+            <value form="long">CLASSIFY: Child has no serious ear problem</value>
+          </text>
+          <text id="p-classify-persistent-cold">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for persistent cough or cold, but no pneumonia</value>
+          </text>
+          <text id="p-classify-pneumonia">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for pneumonia</value>
+          </text>
+          <text id="p-classify-severe-febrile">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for severe febrile disease</value>
+          </text>
+          <text id="p-classify-severe-pneumonia">
+            <value form="short">Child should be treated for...</value>
+            <value form="long">CLASSIFY: Child should be treated for severe pneumonia or very severe disease</value>
+          </text>
+          <text id="p-cornea-clouding">
+            <value form="short">Does child have clouding of...</value>
+            <value form="long">EXAMINE: Does child have clouding of the cornea?</value>
+          </text>
+          <text id="p-cough-how-long">
+            <value form="short">How long has child had coug...</value>
+            <value form="long">ASK: How long has child had cough/difficulty breathing?</value>
+          </text>
+          <text id="p-danger-signs">
+            <value form="short">Danger signs</value>
+            <value form="long">ASK: Danger signs</value>
+          </text>
+          <text id="p-diarrhea-how-long">
+            <value form="short">How long has the child had ...</value>
+            <value form="long">ASK: How long has the child had diarrhea?</value>
+          </text>
+          <text id="p-did-feeding-change">
+            <value form="short">Did feeding for the child c...</value>
+            <value form="long">ASK: Did feeding for the child change during illness?</value>
+          </text>
+          <text id="p-disagree-classify">
+            <value form="short">You have disagreed; select ...</value>
+            <value form="long">PLEASE: You have disagreed; select the correct classification</value>
+          </text>
+          <text id="p-discharge-how-long">
+            <value form="short">How long has there been dis...</value>
+            <value form="long">ASK: How long has there been discharge?</value>
+          </text>
+          <text id="p-dosing-cholera">
+            <value form="short">[output]</value>
+            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/duration" /></value>
+          </text>
+          <text id="p-dosing-dysentery">
+            <value form="short">[output]</value>
+            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/duration" /></value>
+          </text>
+          <text id="p-dosing-ear">
+            <value form="short">[output]</value>
+            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/ear_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/ear_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/ear_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/ear_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/ear_antibiotic/duration" /></value>
+          </text>
+          <text id="p-dosing-malaria-antibiotic">
+            <value form="short">[output]</value>
+            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/duration" /></value>
+          </text>
+          <text id="p-dosing-malaria-quinine">
+            <value form="short">[output]</value>
+            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/malaria_quinine/amount" /> of <output value="/imci/tmp/normalized/treatment/malaria_quinine/variant" /> <output value="/imci/tmp/normalized/treatment/malaria_quinine/drug" /> <output value="/imci/tmp/normalized/treatment/malaria_quinine/frequency" /> for <output value="/imci/tmp/normalized/treatment/malaria_quinine/duration" /></value>
+          </text>
+          <text id="p-dosing-painkiller">
+            <value form="short">[output]</value>
+            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/painkiller/amount" /> of <output value="/imci/tmp/normalized/treatment/painkiller/variant" /> <output value="/imci/tmp/normalized/treatment/painkiller/drug" /> <output value="/imci/tmp/normalized/treatment/painkiller/frequency" /></value>
+          </text>
+          <text id="p-dosing-pneumonia">
+            <value form="short">[output]</value>
+            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/duration" /></value>
+          </text>
+          <text id="p-ear-discharge">
+            <value form="short">Is there ear discharge?</value>
+            <value form="long">ASK: Is there ear discharge?</value>
+          </text>
+          <text id="p-ear-pain">
+            <value form="short">Is there ear pain?</value>
+            <value form="long">ASK: Is there ear pain?</value>
+          </text>
+          <text id="p-ear-tenderness-swelling">
+            <value form="short">Is there tenderness or swel...</value>
+            <value form="long">FEEL: Is there tenderness or swelling behind the ear?</value>
+          </text>
+          <text id="p-explain-give-first-treatment">
+            <value form="short">Explain how to give the tre...</value>
+            <value form="long">DO: Explain how to give the treatment. Give the first treatment. Does the mother understand?</value>
+          </text>
+          <text id="p-fever-every-day">
+            <value form="short">Has the fever been present ...</value>
+            <value form="long">ASK: Has the fever been present every day?</value>
+          </text>
+          <text id="p-fever-how-long">
+            <value form="short">How long has the child had ...</value>
+            <value form="long">ASK: How long has the child had fever?</value>
+          </text>
+          <text id="p-has-cough-doublecheck">
+            <value form="short">Just to check, does the chi...</value>
+            <value form="long">ASK: Just to check, does the child have a cough?</value>
+          </text>
+          <text id="p-has-diarrhea-doublecheck">
+            <value form="short">Just to check, does the chi...</value>
+            <value form="long">ASK: Just to check, does the child have any diarrhea?</value>
+          </text>
+          <text id="p-has-ear-doublecheck">
+            <value form="short">Just to check, does the chi...</value>
+            <value form="long">ASK: Just to check, does the child have any ear problems?</value>
+          </text>
+          <text id="p-has-had-bad-reaction">
+            <value form="short">Has child ever had a bad re...</value>
+            <value form="long">ASK: Has child ever had a bad reaction to SP?</value>
+          </text>
+          <text id="p-has-other-classification">
+            <value form="short">Does child have any other s...</value>
+            <value form="long">Does child have any other severe classification?</value>
+          </text>
+          <text id="p-has-other-problems">
+            <value form="short">Does the child have any oth...</value>
+            <value form="long">ASK: Does the child have any other problems?</value>
+          </text>
+          <text id="p-how-drinking">
+            <value form="short">How is the child drinking?</value>
+            <value form="long">LOOK: How is the child drinking?</value>
+          </text>
+          <text id="p-is-breastfeeding">
+            <value form="short">Is the child breastfeeding?</value>
+            <value form="long">ASK: Is the child breastfeeding?</value>
+          </text>
+          <text id="p-measles-past-3-months">
+            <value form="short">Has the child had measles w...</value>
+            <value form="long">ASK: Has the child had measles within the last 3 months?</value>
+          </text>
+          <text id="p-measles-symptoms">
+            <value form="short">Does the child have signs o...</value>
+            <value form="long">EXAMINE: Does the child have signs of measles? (generalized rash and cough, runny nose, or red eyes)</value>
+          </text>
+          <text id="p-mouth-ulcers">
+            <value form="short">Does the child have mouth u...</value>
+            <value form="long">LOOK: Does the child have mouth ulcers?</value>
+          </text>
+          <text id="p-mouth-ulcers-severe">
+            <value form="short">Are the mouth ulcers deep o...</value>
+            <value form="long">LOOK: Are the mouth ulcers deep or extensive?</value>
+          </text>
+          <text id="p-not-imci-problem">
+            <value form="short">this system only covers IMC...</value>
+            <value form="long">SORRY: this system only covers IMCI. Select the complaint then treat normally</value>
+          </text>
+          <text id="p-pus-draining-from-eye">
+            <value form="short">Is pus draining from the eye?</value>
+            <value form="long">ASK: Is pus draining from the eye?</value>
+          </text>
+          <text id="p-pus-from-ear">
+            <value form="short">Is pus draining from the ear?</value>
+            <value form="long">LOOK: Is pus draining from the ear?</value>
+          </text>
+          <text id="p-restless-irritable">
+            <value form="short">Is the child restless and i...</value>
+            <value form="long">LOOK: Is the child restless and irritable?</value>
+          </text>
+          <text id="p-runny-nose">
+            <value form="short">Does the child have a runny...</value>
+            <value form="long">EXAMINE: Does the child have a runny nose?</value>
+          </text>
+          <text id="p-sex">
+            <value form="short">What sex is the child?</value>
+            <value form="long">ASK: What sex is the child?</value>
+          </text>
+          <text id="p-skin-pinch">
+            <value form="short">Pinch the child's skin</value>
+            <value form="long">LOOK: Pinch the child's skin</value>
+          </text>
+          <text id="p-stiff-neck">
+            <value form="short">Does the child have a stiff...</value>
+            <value form="long">LOOK: Does the child have a stiff neck?</value>
+          </text>
+          <text id="p-stridor">
+            <value form="short">Is there stridor?</value>
+            <value form="long">LISTEN: Is there stridor?</value>
+          </text>
+          <text id="p-sunken-eyes">
+            <value form="short">Does the child have sunken ...</value>
+            <value form="long">EXAMINE: Does the child have sunken eyes?</value>
+          </text>
+          <text id="p-take-breathing-rate">
+            <value form="short">What is the breathing rate ...</value>
+            <value form="long">DO: What is the breathing rate in breaths per minute?</value>
+          </text>
+          <text id="p-take-temperature">
+            <value form="short">Take the child's temperatur...</value>
+            <value form="long">DO: Take the child's temperature (&#xb0;C)</value>
+          </text>
+          <text id="p-takes-other-fluids">
+            <value form="short">Does the child take other f...</value>
+            <value form="long">ASK: Does the child take other food/fluids?</value>
+          </text>
+          <text id="p-too-heavy-continue">
+            <value form="short">IMCI is meant for children ...</value>
+            <value form="long">SORRY: IMCI is meant for children under 19 kgs. Correct dosings may not be available. Do you want to continue anyway?</value>
+          </text>
+          <text id="p-too-old-continue">
+            <value form="short">IMCI is meant for children ...</value>
+            <value form="long">SORRY: IMCI is meant for children 5-years-old or less. Do you want to continue anyway?</value>
+          </text>
+          <text id="p-visit-type">
+            <value form="short">What kind of visit is this?</value>
+            <value form="long">ASK: What kind of visit is this?</value>
+          </text>
+          <text id="p-weight">
+            <value form="short">What is the child's weight ...</value>
+            <value form="long">ASK: What is the child's weight in kg (skip if unknown)</value>
+          </text>
+          <text id="p-which-amoxycillin">
+            <value form="short">Which amoxycillin form woul...</value>
+            <value form="long">Which amoxycillin form would you like to use?</value>
+          </text>
+          <text id="p-which-cholera-antibiotic">
+            <value form="short">Which antibiotic would you ...</value>
+            <value form="long">Which antibiotic would you like to use for the cholera?</value>
+          </text>
+          <text id="p-which-cotrimoxazole">
+            <value form="short">Which cotrimoxazole form wo...</value>
+            <value form="long">Which cotrimoxazole form would you like to use?</value>
+          </text>
+          <text id="p-which-dysentery-antibiotic">
+            <value form="short">Which antibiotic would you ...</value>
+            <value form="long">Which antibiotic would you like to use for the dysentery?</value>
+          </text>
+          <text id="p-which-ear-antibiotic">
+            <value form="short">Which antibiotic would you ...</value>
+            <value form="long">Which antibiotic would you like to use for the ear problem?</value>
+          </text>
+          <text id="p-which-malaria-antibiotic">
+            <value form="short">Which antibiotic would you ...</value>
+            <value form="long">Which antibiotic would you like to use for the malaria?</value>
+          </text>
+          <text id="p-which-paracetamol">
+            <value form="short">Which paracetamol form woul...</value>
+            <value form="long">Which paracetamol form would you like to use?</value>
+          </text>
+          <text id="p-which-pneumonia-antibiotic">
+            <value form="short">Which antibiotic would you ...</value>
+            <value form="long">Which antibiotic would you like to use for the pneumonia?</value>
+          </text>
+          <text id="p-which-quinine">
+            <value form="short">Which form of quinine would...</value>
+            <value form="long">Which form of quinine would you like to use for the severe malaria?</value>
+          </text>
+        </translation>
+      </itext>
+			
     </model>
   </h:head>
 
@@ -1005,18 +1634,18 @@
     <group ref="/imci/preamble">
     
       <select ref="/imci/preamble/chief_complaint">
-        <label>ASK: Child's problems</label>
-        <item><label>Cough or difficulty breathing</label><value>cough</value></item>
-        <item><label>Diarrhea</label><value>diarrhea</value></item>
-        <item><label>Fever</label><value>fever</value></item>
-        <item><label>Ear problem</label><value>ear</value></item>
-        <item><label>Other/None of the above</label><value>none</value></item>
+        <label ref="jr:itext('p-childs-problems')" />
+        <item><label ref="jr:itext('c-cough-difficulty-breathing')" /><value>cough</value></item>
+        <item><label ref="jr:itext('c-diarrhea')" /><value>diarrhea</value></item>
+        <item><label ref="jr:itext('c-fever')" /><value>fever</value></item>
+        <item><label ref="jr:itext('c-ear-problem')" /><value>ear</value></item>
+        <item><label ref="jr:itext('c-other-none-of-the-above')" /><value>none</value></item>
       </select>
 
       <select1 ref="/imci/preamble/other_complaint">
-        <label>SORRY: this system only covers IMCI. Select the complaint then treat normally</label>
-        <item><label>Child has head fungus</label><value>fungus</value></item>
-        <item><label>Other complaint</label><value>other</value></item>
+        <label ref="jr:itext('p-not-imci-problem')" />
+        <item><label ref="jr:itext('c-head-fungus')" /><value>fungus</value></item>
+        <item><label ref="jr:itext('c-other-complaint')" /><value>other</value></item>
       </select1>
       <!-- END -->
 
@@ -1025,97 +1654,97 @@
         <!-- show/generate encounter id here? -->
       
         <select ref="/imci/preamble/danger_signs">
-          <label>ASK: Danger signs</label>
-          <item><label>Unable to drink/breastfeed</label><value>no_drink</value></item>
-          <item><label>Vomits everything</label><value>vomits</value></item>
-          <item><label>Convulsions</label><value>convuls</value></item>
-          <item><label>Lethargic/Unconscious</label><value>lethargy</value></item>
+          <label ref="jr:itext('p-danger-signs')" />
+          <item><label ref="jr:itext('c-cant-drink-breastfeed')" /><value>no_drink</value></item>
+          <item><label ref="jr:itext('c-vomits-everything')" /><value>vomits</value></item>
+          <item><label ref="jr:itext('c-convulsions')" /><value>convuls</value></item>
+          <item><label ref="jr:itext('c-lethargic-unconscious')" /><value>lethargy</value></item>
         </select>
 
         <trigger ref="/imci/preamble/info/serious">
-          <label>ALERT: This child has a serious problem. Complete assement quickly and refer urgently!</label>
+          <label ref="jr:itext('m-complete-quickly-refer-urgently')" />
         </trigger>
 
         <select1 ref="/imci/preamble/cough_doublecheck">
-          <label>ASK: Just to check, does the child have a cough?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-has-cough-doublecheck')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
       
         <select1 ref="/imci/preamble/diarrhea_doublecheck">
-          <label>ASK: Just to check, does the child have any diarrhea?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-has-diarrhea-doublecheck')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
 
         <select1 ref="/imci/preamble/ear_doublecheck">
-          <label>ASK: Just to check, does the child have any ear problems?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-has-ear-doublecheck')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
 
         <select1 ref="/imci/preamble/visit_type">
-          <label>ASK: What kind of visit is this?</label>
-          <item><label>First visit</label><value>first</value></item>
-          <item><label>Follow-up visit</label><value>followup</value></item>
+          <label ref="jr:itext('p-visit-type')" />
+          <item><label ref="jr:itext('c-first-visit')" /><value>first</value></item>
+          <item><label ref="jr:itext('c-followup-visit')" /><value>followup</value></item>
         </select1>
       
         <trigger ref="/imci/preamble/info/first_visit_only">
-          <label>SORRY: this system is not yet suitable for follow-up visits. Please use standard procedures.</label>
+          <label ref="jr:itext('m-no-followups')" />
         </trigger>
         <!-- END -->
 
         <group ref="/imci/tmp/sentinel/first_visit">
         
           <select1 ref="/imci/preamble/temp_type">
-            <label>ASK: Can you take the child's temperature?</label>
-            <item><label>Yes, I will use a thermometer</label><value>therm</value></item>
-            <item><label>No, but child feels hot or has had fever</label><value>fever</value></item>
-            <item><label>No, but child feels normal</label><value>normal</value></item>
+            <label ref="jr:itext('p-can-take-temperature')" />
+            <item><label ref="jr:itext('c-temperature-will-measure')" /><value>therm</value></item>
+            <item><label ref="jr:itext('c-temperature-hot')" /><value>fever</value></item>
+            <item><label ref="jr:itext('c-temperature-normal')" /><value>normal</value></item>
           </select1>
         
           <input ref="/imci/preamble/temperature">
-            <label>DO: Take the child's temperature (&#xb0;C)</label>
+            <label ref="jr:itext('p-take-temperature')" />
           </input>
         
           <input ref="/imci/preamble/age">
-            <label>ASK: What is the child's age (in years or months)</label>
+            <label ref="jr:itext('p-age')" />
           </input>
         
           <select1 ref="/imci/preamble/age_unit">
-            <label>Was the age in years or months?</label>
-            <item><label>Years</label><value>years</value></item>
-            <item><label>Months</label><value>months</value></item>
+            <label ref="jr:itext('p-age-unit')" />
+            <item><label ref="jr:itext('c-years')" /><value>years</value></item>
+            <item><label ref="jr:itext('c-months')" /><value>months</value></item>
           </select1>
                 
           <trigger ref="/imci/preamble/info/too_young">
-            <label>SORRY: this system is not yet suitable for children under two months</label>
+            <label ref="jr:itext('m-too-young')" />
           </trigger>
           <!-- END -->
         
           <select1 ref="/imci/preamble/too_old_use_anyway">
-            <label>SORRY: IMCI is meant for children 5-years-old or less. Do you want to continue anyway?</label>
-            <item><label>Yes</label><value>yes</value></item>
-            <item><label>No</label><value>no</value></item>
+            <label ref="jr:itext('p-too-old-continue')" />
+            <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+            <item><label ref="jr:itext('c-no')" /><value>no</value></item>
           </select1>
           <!-- END if no -->
         
           <group ref="/imci/tmp/sentinel/age_ok">
           
             <select1 ref="/imci/preamble/sex">
-              <label>ASK: What sex is the child?</label>
-              <item><label>Boy</label><value>m</value></item>
-              <item><label>Girl</label><value>f</value></item>
+              <label ref="jr:itext('p-sex')" />
+              <item><label ref="jr:itext('c-boy')" /><value>m</value></item>
+              <item><label ref="jr:itext('c-girl')" /><value>f</value></item>
             </select1>
           
             <input ref="/imci/preamble/weight">
-              <label>ASK: What is the child's weight in kg (skip if unknown)</label>
+              <label ref="jr:itext('p-weight')" />
             </input>
         
             <select1 ref="/imci/preamble/too_heavy_use_anyway">
-              <label>SORRY: IMCI is meant for children under 19 kgs. Correct dosings may not be available. Do you want to continue anyway?</label>
-              <item><label>Yes</label><value>yes</value></item>
-              <item><label>No</label><value>no</value></item>
+              <label ref="jr:itext('p-too-heavy-continue')" />
+              <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+              <item><label ref="jr:itext('c-no')" /><value>no</value></item>
             </select1>
             <!-- END if no -->
         
@@ -1129,64 +1758,64 @@
       <group ref="/imci/cough">
           
         <select1 ref="/imci/cough/length">
-          <label>ASK: How long has child had cough/difficulty breathing?</label>
-          <item><label>Less than 30 days</label><value>under30</value></item>
-          <item><label>30 days or more</label><value>over30</value></item>
+          <label ref="jr:itext('p-cough-how-long')" />
+          <item><label ref="jr:itext('c-thirty-days-under')" /><value>under30</value></item>
+          <item><label ref="jr:itext('c-thirty-days-over')" /><value>over30</value></item>
         </select1>
 
         <select1 ref="/imci/cough/breath_rate_type">
-          <label>ASK: Can you measure the breathing rate?</label>
-          <item><label>Yes, I will count number of breaths per minute</label><value>measure</value></item>
-          <item><label>No, but breathing rate is normal</label><value>normal</value></item>
-          <item><label>No, but breathing rate is fast</label><value>fast</value></item>
+          <label ref="jr:itext('p-breathing-rate')" />
+          <item><label ref="jr:itext('c-breathing-rate-will-measure')" /><value>measure</value></item>
+          <item><label ref="jr:itext('c-breathing-rate-normal')" /><value>normal</value></item>
+          <item><label ref="jr:itext('c-breathing-rate-fast')" /><value>fast</value></item>
         </select1>
 
         <input ref="/imci/cough/breath_rate">
-          <label>DO: What is the breathing rate in breaths per minute?</label>
+          <label ref="jr:itext('p-take-breathing-rate')" />
         </input>
         
         <select1 ref="/imci/cough/indrawing">
-          <label>LOOK: Is the chest indrawing?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-chest-indrawing')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
         
         <select1 ref="/imci/cough/stridor">
-          <label>LISTEN: Is there stridor?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-stridor')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
         
         <select1 ref="/imci/cough/classify/severe_pneumonia">
-          <label>CLASSIFY: Child should be treated for severe pneumonia or very severe disease</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-severe-pneumonia')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <select1 ref="/imci/cough/classify/pneumonia">
-          <label>CLASSIFY: Child should be treated for pneumonia</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-pneumonia')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <select1 ref="/imci/cough/classify/persistent_cold">
-          <label>CLASSIFY: Child should be treated for persistent cough or cold, but no pneumonia</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-persistent-cold')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <select1 ref="/imci/cough/classify/cold">
-          <label>CLASSIFY: Child should be treated for cough or cold, but no pneumonia</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-cold')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <select1 ref="/imci/cough/classify/override">
-          <label>PLEASE: You have disagreed; select the correct classification</label>
-          <item><label>Cough with Cold</label><value>cold</value></item>
-          <item><label>Cough with Persistent Cold</label><value>persistent-cold</value></item>
-          <item><label>Cough with Pneumonia</label><value>pneumonia</value></item>
-          <item><label>Cough with Severe Pneumonia</label><value>severe-pneumonia</value></item>
+          <label ref="jr:itext('p-disagree-classify')" />
+          <item><label ref="jr:itext('c-cough-cold')" /><value>cold</value></item>
+          <item><label ref="jr:itext('c-cough-persistent-cold')" /><value>persistent-cold</value></item>
+          <item><label ref="jr:itext('c-cough-pneumonia')" /><value>pneumonia</value></item>
+          <item><label ref="jr:itext('c-cough-severe-pneumonia')" /><value>severe-pneumonia</value></item>
         </select1>
       
       </group>
@@ -1194,55 +1823,55 @@
       <group ref="/imci/diarrhea">
       
         <select1 ref="/imci/diarrhea/length">
-          <label>ASK: How long has the child had diarrhea?</label>
-          <item><label>Less than two weeks</label><value>under2</value></item>
-          <item><label>Two weeks or more</label><value>over2</value></item>
+          <label ref="jr:itext('p-diarrhea-how-long')" />
+          <item><label ref="jr:itext('c-two-weeks-under')" /><value>under2</value></item>
+          <item><label ref="jr:itext('c-two-weeks-over')" /><value>over2</value></item>
         </select1>
       
         <select1 ref="/imci/diarrhea/blood">
-          <label>ASK: Is there blood in the stool?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-blood-in-stool')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
         
         <trigger ref="/imci/diarrhea/info/offer_fluid">
-          <label>DO: Give the child fluid</label>
+          <label ref="jr:itext('m-give-fluid')" />
         </trigger>
         
         <select1 ref="/imci/diarrhea/how_drinking">
-          <label>LOOK: How is the child drinking?</label>
-          <item><label>Not able to drink or drinking poorly</label><value>unable</value></item>
-          <item><label>Drinking eagerly; is thirsty</label><value>eager</value></item>
-          <item><label>Drinking, but not eagerly</label><value>not_eager</value></item>
+          <label ref="jr:itext('p-how-drinking')" />
+          <item><label ref="jr:itext('c-not-drinking')" /><value>unable</value></item>
+          <item><label ref="jr:itext('c-drinking-eagerly')" /><value>eager</value></item>
+          <item><label ref="jr:itext('c-drinking-not-eagerly')" /><value>not_eager</value></item>
         </select1>
         
         <select1 ref="/imci/diarrhea/sunken_eyes">
-          <label>EXAMINE: Does the child have sunken eyes?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-sunken-eyes')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
 
         <select1 ref="/imci/diarrhea/skin_pinch">
-          <label>LOOK: Pinch the child's skin</label>
-          <item><label>Skin goes back very slowly (more than 2 seconds)</label><value>very_slow</value></item>
-          <item><label>Skin goes back slowly</label><value>slow</value></item>
-          <item><label>Skin goes back immediately</label><value>fast</value></item>
+          <label ref="jr:itext('p-skin-pinch')" />
+          <item><label ref="jr:itext('c-skin-back-very-slowly')" /><value>very_slow</value></item>
+          <item><label ref="jr:itext('c-skin-back-slowly')" /><value>slow</value></item>
+          <item><label ref="jr:itext('c-skin-back-immediately')" /><value>fast</value></item>
         </select1>
         
         <select1 ref="/imci/diarrhea/fidgety">
-          <label>LOOK: Is the child restless and irritable?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-restless-irritable')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
 
         <select1 ref="/imci/diarrhea/classify/dysentery">
-          <label>CLASSIFY: Child should <output value="if(/imci/tmp/normalized/classification/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-dysentery')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
 
         <trigger ref="/imci/diarrhea/classify/override_dys">
-          <label>You have disagreed; new classification is 'Child should <output value="if(/imci/tmp/normalized/diagnosis/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery'</label>
+          <label ref="jr:itext('m-disagree-classification-dysentery')" />
         </trigger>
         
         <select1 ref="/imci/diarrhea/classify/diarrhea_dehydration">
@@ -1255,18 +1884,18 @@
             if(/imci/tmp/normalized/classification/dehydration = 'some', 'some dehydration',
               'no dehydration'))            
           " /></label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
 
         <select1 ref="/imci/diarrhea/classify/override_dd">
-          <label>PLEASE: You have disagreed; select the correct classification</label>
-          <item><label>Diarrhea with no dehydration</label><value>brief-none</value></item>
-          <item><label>Diarrhea with some dehydration</label><value>brief-some</value></item>
-          <item><label>Diarrhea with severe dehydration</label><value>brief-severe</value></item>
-          <item><label>Persistent diarrhea with no dehydration</label><value>pers-none</value></item>
-          <item><label>Severe persistent diarrhea with some dehydration</label><value>pers-some</value></item>
-          <item><label>Severe persistent diarrhea with severe dehydration</label><value>pers-severe</value></item>
+          <label ref="jr:itext('p-disagree-classify')" />
+          <item><label ref="jr:itext('c-diarrhea-no-dehydr')" /><value>brief-none</value></item>
+          <item><label ref="jr:itext('c-diarrhea-some-dehydr')" /><value>brief-some</value></item>
+          <item><label ref="jr:itext('c-diarrhea-severe-dehydr')" /><value>brief-severe</value></item>
+          <item><label ref="jr:itext('c-persistent-diarrhea-no-dehydr')" /><value>pers-none</value></item>
+          <item><label ref="jr:itext('c-severe-persistent-diarrhea-some-dehydr')" /><value>pers-some</value></item>
+          <item><label ref="jr:itext('c-severe-persistent-diarrhea-severe-dehydr')" /><value>pers-severe</value></item>
         </select1>
       
       </group>
@@ -1274,96 +1903,96 @@
       <group ref="/imci/fever">
       
         <select1 ref="/imci/fever/length">
-          <label>ASK: How long has the child had fever?</label>
-          <item><label>Less than a week</label><value>short</value></item>
-          <item><label>A week or more</label><value>long</value></item>
+          <label ref="jr:itext('p-fever-how-long')" />
+          <item><label ref="jr:itext('c-week-under')" /><value>short</value></item>
+          <item><label ref="jr:itext('c-week-over')" /><value>long</value></item>
         </select1>
       
         <select1 ref="/imci/fever/everyday">
-          <label>ASK: Has the fever been present every day?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-fever-every-day')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>      
       
         <select1 ref="/imci/fever/had_measles">
-          <label>ASK: Has the child had measles within the last 3 months?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-measles-past-3-months')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>  
       
         <select1 ref="/imci/fever/stiff_neck">
-          <label>LOOK: Does the child have a stiff neck?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-stiff-neck')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>  
 
         <select1 ref="/imci/fever/runny_nose">
-          <label>EXAMINE: Does the child have a runny nose?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-runny-nose')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>  
 
         <select1 ref="/imci/fever/measles_symptoms">
-          <label>EXAMINE: Does the child have signs of measles? (generalized rash and cough, runny nose, or red eyes)</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-measles-symptoms')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>  
 
         <group ref="/imci/fever/measles">
         
           <select1 ref="/imci/fever/measles/mouth_ulcers">
-            <label>LOOK: Does the child have mouth ulcers?</label>
-            <item><label>Yes</label><value>yes</value></item>
-            <item><label>No</label><value>no</value></item>
+            <label ref="jr:itext('p-mouth-ulcers')" />
+            <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+            <item><label ref="jr:itext('c-no')" /><value>no</value></item>
           </select1>  
 
           <select1 ref="/imci/fever/measles/deep">
-            <label>LOOK: Are the mouth ulcers deep or extensive?</label>
-            <item><label>Yes</label><value>yes</value></item>
-            <item><label>No</label><value>no</value></item>
+            <label ref="jr:itext('p-mouth-ulcers-severe')" />
+            <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+            <item><label ref="jr:itext('c-no')" /><value>no</value></item>
           </select1>          
           
           <select1 ref="/imci/fever/measles/eye_pus">
-            <label>ASK: Is pus draining from the eye?</label>
-            <item><label>Yes</label><value>yes</value></item>
-            <item><label>No</label><value>no</value></item>
+            <label ref="jr:itext('p-pus-draining-from-eye')" />
+            <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+            <item><label ref="jr:itext('c-no')" /><value>no</value></item>
           </select1>  
           
           <select1 ref="/imci/fever/measles/clouding_cornea">
-            <label>EXAMINE: Does child have clouding of the cornea?</label>
-            <item><label>Yes</label><value>yes</value></item>
-            <item><label>No</label><value>no</value></item>
+            <label ref="jr:itext('p-cornea-clouding')" />
+            <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+            <item><label ref="jr:itext('c-no')" /><value>no</value></item>
           </select1>  
 
         </group>
         
         <select1 ref="/imci/fever/classify/febrile">
-          <label>CLASSIFY: Child should be treated for severe febrile disease</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-severe-febrile')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <select1 ref="/imci/fever/classify/malaria">
-          <label>CLASSIFY: Child should be treated for malaria</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-malaria')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <select1 ref="/imci/fever/classify/fever_only">
-          <label>CLASSIFY: Child should be treated for fever, but malaria unlikely</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-fever-no-malaria')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>      
       
         <select1 ref="/imci/fever/classify/override">
-          <label>PLEASE: You have disagreed; select the correct classification</label>
-          <item><label>Severe Febrile Disease</label><value>febrile</value></item>
-          <item><label>Malaria</label><value>malaria</value></item>
-          <item><label>Fever; Malaria unlikely</label><value>fever_only</value></item>
+          <label ref="jr:itext('p-disagree-classify')" />
+          <item><label ref="jr:itext('c-severe-febrile-disease')" /><value>febrile</value></item>
+          <item><label ref="jr:itext('c-malaria')" /><value>malaria</value></item>
+          <item><label ref="jr:itext('c-fever-no-malaria')" /><value>fever_only</value></item>
         <!--
-          <item><label>Severe Measles</label><value>severe-measles</value></item>
-          <item><label>Measles with Eye or Mouth Complications</label><value>measles-compl</value></item>
-          <item><label>Measles</label><value>measles</value></item>
+          <item><label ref="jr:itext('c-severe-measles')" /><value>severe-measles</value></item>
+          <item><label ref="jr:itext('c-measles-eye-mouth-complications')" /><value>measles-compl</value></item>
+          <item><label ref="jr:itext('c-measles')" /><value>measles</value></item>
         -->
         </select1>
 
@@ -1372,128 +2001,128 @@
       <group ref="/imci/ear">
       
         <select1 ref="/imci/ear/pain">
-          <label>ASK: Is there ear pain?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-ear-pain')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>      
       
         <select1 ref="/imci/ear/discharge">
-          <label>ASK: Is there ear discharge?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-ear-discharge')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>  
       
         <select1 ref="/imci/ear/dischg_length">
-          <label>ASK: How long has there been discharge?</label>
-          <item><label>Less than two weeks</label><value>short</value></item>
-          <item><label>Two weeks or more</label><value>long</value></item>
+          <label ref="jr:itext('p-discharge-how-long')" />
+          <item><label ref="jr:itext('c-two-weeks-under')" /><value>short</value></item>
+          <item><label ref="jr:itext('c-two-weeks-over')" /><value>long</value></item>
         </select1>  
 
         <select1 ref="/imci/ear/pus">
-          <label>LOOK: Is pus draining from the ear?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-pus-from-ear')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>  
 
         <select1 ref="/imci/ear/tender_swollen">
-          <label>FEEL: Is there tenderness or swelling behind the ear?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-ear-tenderness-swelling')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>        
       
         <select1 ref="/imci/ear/classify/mastoiditis">
-          <label>CLASSIFY: Child should be treated for mastoiditis</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-mastoiditis')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <select1 ref="/imci/ear/classify/acute">
-          <label>CLASSIFY: Child should be treated for an acute ear infection</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-acute-ear-infection')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <select1 ref="/imci/ear/classify/chronic">
-          <label>CLASSIFY: Child should be treated for chronic ear problems</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-chronic-ear-problems')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <select1 ref="/imci/ear/classify/none">
-          <label>CLASSIFY: Child has no serious ear problem</label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-classify-no-ear-problem')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>      
       
         <select1 ref="/imci/ear/classify/override">
-          <label>PLEASE: You have disagreed; select the correct classification</label>
-          <item><label>Ear Mastoiditis</label><value>mastoiditis</value></item>
-          <item><label>Acute Ear Infection</label><value>acute</value></item>
-          <item><label>Chronic Ear Problems</label><value>chronic</value></item>
-          <item><label>No serious ear problem</label><value>none</value></item>
+          <label ref="jr:itext('p-disagree-classify')" />
+          <item><label ref="jr:itext('c-ear-mastoiditis')" /><value>mastoiditis</value></item>
+          <item><label ref="jr:itext('c-acute-ear-infection')" /><value>acute</value></item>
+          <item><label ref="jr:itext('c-chronic-ear-problems')" /><value>chronic</value></item>
+          <item><label ref="jr:itext('c-no-ear-problem')" /><value>none</value></item>
         </select1>
       
       </group>
       
       <select1 ref="/imci/other_severe">
-        <label>Does child have any other severe classification?</label>
-        <item><label>Yes</label><value>yes</value></item>
-        <item><label>No</label><value>no</value></item>
+        <label ref="jr:itext('p-has-other-classification')" />
+        <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('c-no')" /><value>no</value></item>
       </select1>  
       
       <select1 ref="/imci/interlude/breastfeeding">
-        <label>ASK: Is the child breastfeeding?</label>
-        <item><label>Yes</label><value>yes</value></item>
-        <item><label>No</label><value>no</value></item>
+        <label ref="jr:itext('p-is-breastfeeding')" />
+        <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('c-no')" /><value>no</value></item>
       </select1>  
 
       <select1 ref="/imci/interlude/other_feed">
-        <label>ASK: Does the child take other food/fluids?</label>
-        <item><label>Yes</label><value>yes</value></item>
-        <item><label>No</label><value>no</value></item>
+        <label ref="jr:itext('p-takes-other-fluids')" />
+        <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('c-no')" /><value>no</value></item>
       </select1>  
 
       <trigger ref="/imci/interlude/info/feed_other">
-        <label>ADVISE: Add other foods/fluids to the child's diet</label>
+        <label ref="jr:itext('m-add-foods-to-diet')" />
       </trigger>
       
       <select1 ref="/imci/interlude/feeding_change">
-        <label>ASK: Did feeding for the child change during illness?</label>
-        <item><label>Yes</label><value>yes</value></item>
-        <item><label>No</label><value>no</value></item>
+        <label ref="jr:itext('p-did-feeding-change')" />
+        <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('c-no')" /><value>no</value></item>
       </select1>  
 
       <trigger ref="/imci/interlude/info/keep_feeding">
-        <label>ADVISE: Ensure that the child continues to feed during illness</label>
+        <label ref="jr:itext('m-ensure-continues-feeding')" />
       </trigger>
 
       <select1 ref="/imci/interlude/other_problems">
-        <label>ASK: Does the child have any other problems?</label>
-        <item><label>Yes</label><value>yes</value></item>
-        <item><label>No</label><value>no</value></item>
+        <label ref="jr:itext('p-has-other-problems')" />
+        <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('c-no')" /><value>no</value></item>
       </select1>  
 
       <trigger ref="/imci/interlude/info/treat_problems">
-        <label>DO: Treat the child's other problems</label>
+        <label ref="jr:itext('m-treat-other-problems')" />
       </trigger>
             
       <group ref="/imci/dosing/malaria_quinine">
       
         <select1 ref="/imci/dosing/malaria_quinine/severe_malaria_drug">
-          <label>Which form of quinine would you like to use for the severe malaria?</label>
-          <item><label>Quinine Injection</label><value>quinine-injection</value></item>
-          <item><label>Quinine Tablet</label><value>quinine-tablet</value></item>
-          <item><label>Other Drug</label><value>other</value></item>
+          <label ref="jr:itext('p-which-quinine')" />
+          <item><label ref="jr:itext('c-quinine-injection')" /><value>quinine-injection</value></item>
+          <item><label ref="jr:itext('c-quinine-tablet')" /><value>quinine-tablet</value></item>
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
         </select1>
       
         <select1 ref="/imci/dosing/malaria_quinine/dose">
-          <label>GIVE: <output value="/imci/tmp/normalized/treatment/malaria_quinine/amount" /> of <output value="/imci/tmp/normalized/treatment/malaria_quinine/variant" /> <output value="/imci/tmp/normalized/treatment/malaria_quinine/drug" /> <output value="/imci/tmp/normalized/treatment/malaria_quinine/frequency" /> for <output value="/imci/tmp/normalized/treatment/malaria_quinine/duration" /></label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-dosing-malaria-quinine')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/malaria_quinine/info_give_correct">
-          <label>DO: Give correct dose and tell observer</label>
+          <label ref="jr:itext('m-choose-correct-dose')" />
         </trigger>
       
       </group>
@@ -1501,57 +2130,57 @@
       <group ref="/imci/dosing/pneumonia_antibiotic">
       
         <select1 ref="/imci/dosing/pneumonia_antibiotic/pneumonia_drug">
-          <label>Which antibiotic would you like to use for the pneumonia?</label>
-          <item><label>Amoxycillin</label><value>amoxy</value></item>
-          <item><label>Procaine Penicillin</label><value>procaine</value></item>
-          <item><label>Cotrimoxazole</label><value>cotrim</value></item>          
-          <item><label>Other Drug</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-pneumonia-antibiotic')" />
+          <item><label ref="jr:itext('c-amoxycillin')" /><value>amoxy</value></item>
+          <item><label ref="jr:itext('c-procaine-penicillin')" /><value>procaine</value></item>
+          <item><label ref="jr:itext('c-cotrimoxazole')" /><value>cotrim</value></item>          
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
             
         <select1 ref="/imci/dosing/pneumonia_antibiotic/cotrim_adverse">
-          <label>ASK: Has child ever had a bad reaction to SP?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-has-had-bad-reaction')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/pneumonia_antibiotic/info_no_cotrim">
-          <label>SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</label>
+          <label ref="jr:itext('m-no-cotrimoxazole')" />
         </trigger>
         
         <select1 ref="/imci/dosing/pneumonia_antibiotic/pneumonia_drug_2">
-          <label>Which antibiotic would you like to use for the pneumonia?</label>
-          <item><label>Amoxycillin</label><value>amoxy</value></item>
-          <item><label>Procaine Penicillin</label><value>procaine</value></item>
-          <item><label>Other Drug</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-pneumonia-antibiotic')" />
+          <item><label ref="jr:itext('c-amoxycillin')" /><value>amoxy</value></item>
+          <item><label ref="jr:itext('c-procaine-penicillin')" /><value>procaine</value></item>
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
 
         <trigger ref="/imci/dosing/pneumonia_antibiotic/info_choose_other">
-          <label>DO: Choose appropriate drug</label>
+          <label ref="jr:itext('m-choose-other-drug')" />
         </trigger>
         
         <select1 ref="/imci/dosing/pneumonia_antibiotic/choose_amoxy">
-          <label>Which amoxycillin form would you like to use?</label>
-          <item><label>250mg tablet</label><value>amoxy-tablet</value></item>
-          <item><label>125mg / 5mL syrup</label><value>amoxy-syrup</value></item>        
+          <label ref="jr:itext('p-which-amoxycillin')" />
+          <item><label ref="jr:itext('c-250mg-tablet')" /><value>amoxy-tablet</value></item>
+          <item><label ref="jr:itext('c-125mg-syrup')" /><value>amoxy-syrup</value></item>        
         </select1>
         
         <select1 ref="/imci/dosing/pneumonia_antibiotic/choose_cotrim">
-          <label>Which cotrimoxazole form would you like to use?</label>
-          <item><label>480mg adult tablet</label><value>cotrim-adult</value></item>
-          <item><label>120mg pediatric tablet</label><value>cotrim-ped</value></item>
-          <item><label>240mg / 5mL syrup</label><value>cotrim-syrup</value></item>      
+          <label ref="jr:itext('p-which-cotrimoxazole')" />
+          <item><label ref="jr:itext('c-480mg-tablet')" /><value>cotrim-adult</value></item>
+          <item><label ref="jr:itext('c-120mg-tablet')" /><value>cotrim-ped</value></item>
+          <item><label ref="jr:itext('c-240mg-syrup')" /><value>cotrim-syrup</value></item>      
         </select1>
         
         <select1 ref="/imci/dosing/pneumonia_antibiotic/dose">
-          <label>GIVE: <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/duration" /></label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-dosing-pneumonia')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/pneumonia_antibiotic/info_give_correct">
-          <label>DO: Give correct dose and tell observer</label>
+          <label ref="jr:itext('m-choose-correct-dose')" />
         </trigger>
       
       </group>
@@ -1559,53 +2188,53 @@
       <group ref="/imci/dosing/cholera_antibiotic">
       
         <trigger ref="/imci/dosing/cholera_antibiotic/info_antibiotic_already">
-          <label>An antibiotic has already been given for <output value="'pneumonia'" />; there is no need to give an additional antibiotic for cholera</label>
+          <label ref="jr:itext('m-antibiotic-already-cholera')" />
         </trigger>
       
         <select1 ref="/imci/dosing/cholera_antibiotic/cholera_drug">
-          <label>Which antibiotic would you like to use for the cholera?</label>
-          <item><label>Erythromycin</label><value>erythro</value></item>
-          <item><label>Cotrimoxazole</label><value>cotrim</value></item>          
-          <item><label>Other Drug</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-cholera-antibiotic')" />
+          <item><label ref="jr:itext('c-erythromycin')" /><value>erythro</value></item>
+          <item><label ref="jr:itext('c-cotrimoxazole')" /><value>cotrim</value></item>          
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
             
         <select1 ref="/imci/dosing/cholera_antibiotic/cotrim_adverse">
-          <label>ASK: Has child ever had a bad reaction to SP?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-has-had-bad-reaction')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/cholera_antibiotic/info_no_cotrim">
-          <label>SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</label>
+          <label ref="jr:itext('m-no-cotrimoxazole')" />
         </trigger>
         
         <select1 ref="/imci/dosing/cholera_antibiotic/cholera_drug_2">
-          <label>Which antibiotic would you like to use for the cholera?</label>
-          <item><label>Erythromycin</label><value>erythro</value></item>
-          <item><label>Other Drug</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-cholera-antibiotic')" />
+          <item><label ref="jr:itext('c-erythromycin')" /><value>erythro</value></item>
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
 
         <trigger ref="/imci/dosing/cholera_antibiotic/info_choose_other">
-          <label>DO: Choose appropriate drug</label>
+          <label ref="jr:itext('m-choose-other-drug')" />
         </trigger>
         
         <select1 ref="/imci/dosing/cholera_antibiotic/choose_cotrim">
-          <label>Which cotrimoxazole form would you like to use?</label>
-          <item><label>480mg adult tablet</label><value>cotrim-adult</value></item>
-          <item><label>120mg pediatric tablet</label><value>cotrim-ped</value></item>
-          <item><label>240mg / 5mL syrup</label><value>cotrim-syrup</value></item>      
+          <label ref="jr:itext('p-which-cotrimoxazole')" />
+          <item><label ref="jr:itext('c-480mg-tablet')" /><value>cotrim-adult</value></item>
+          <item><label ref="jr:itext('c-120mg-tablet')" /><value>cotrim-ped</value></item>
+          <item><label ref="jr:itext('c-240mg-syrup')" /><value>cotrim-syrup</value></item>      
         </select1>
         
         <select1 ref="/imci/dosing/cholera_antibiotic/dose">
-          <label>GIVE: <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/duration" /></label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-dosing-cholera')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/cholera_antibiotic/info_give_correct">
-          <label>DO: Give correct dose and tell observer</label>
+          <label ref="jr:itext('m-choose-correct-dose')" />
         </trigger>
       
       </group>
@@ -1621,49 +2250,49 @@
         </trigger>
       
         <select1 ref="/imci/dosing/dysentery_antibiotic/dysentery_drug">
-          <label>Which antibiotic would you like to use for the dysentery?</label>
-          <item><label>Nalidixic Acid</label><value>nalid</value></item>
-          <item><label>Cotrimoxazole</label><value>cotrim</value></item>          
-          <item><label>Other Drug</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-dysentery-antibiotic')" />
+          <item><label ref="jr:itext('c-nalidixic-acid')" /><value>nalid</value></item>
+          <item><label ref="jr:itext('c-cotrimoxazole')" /><value>cotrim</value></item>          
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
             
         <select1 ref="/imci/dosing/dysentery_antibiotic/cotrim_adverse">
-          <label>ASK: Has child ever had a bad reaction to SP?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-has-had-bad-reaction')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/dysentery_antibiotic/info_no_cotrim">
-          <label>SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</label>
+          <label ref="jr:itext('m-no-cotrimoxazole')" />
         </trigger>
         
         <select1 ref="/imci/dosing/dysentery_antibiotic/dysentery_drug_2">
-          <label>Which antibiotic would you like to use for the dysentery?</label>
-          <item><label>Nalidixic Acid</label><value>nalid</value></item>
-          <item><label>Other Drug</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-dysentery-antibiotic')" />
+          <item><label ref="jr:itext('c-nalidixic-acid')" /><value>nalid</value></item>
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
 
         <trigger ref="/imci/dosing/dysentery_antibiotic/info_choose_other">
-          <label>DO: Choose appropriate drug</label>
+          <label ref="jr:itext('m-choose-other-drug')" />
         </trigger>
         
         <select1 ref="/imci/dosing/dysentery_antibiotic/choose_cotrim">
-          <label>Which cotrimoxazole form would you like to use?</label>
-          <item><label>480mg adult tablet</label><value>cotrim-adult</value></item>
-          <item><label>120mg pediatric tablet</label><value>cotrim-ped</value></item>
-          <item><label>240mg / 5mL syrup</label><value>cotrim-syrup</value></item>      
+          <label ref="jr:itext('p-which-cotrimoxazole')" />
+          <item><label ref="jr:itext('c-480mg-tablet')" /><value>cotrim-adult</value></item>
+          <item><label ref="jr:itext('c-120mg-tablet')" /><value>cotrim-ped</value></item>
+          <item><label ref="jr:itext('c-240mg-syrup')" /><value>cotrim-syrup</value></item>      
         </select1>
         
         <select1 ref="/imci/dosing/dysentery_antibiotic/dose">
-          <label>GIVE: <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/duration" /></label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-dosing-dysentery')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/dysentery_antibiotic/info_give_correct">
-          <label>DO: Give correct dose and tell observer</label>
+          <label ref="jr:itext('m-choose-correct-dose')" />
         </trigger>
       
       </group>
@@ -1680,57 +2309,57 @@
         </trigger>
       
         <select1 ref="/imci/dosing/ear_antibiotic/ear_drug">
-          <label>Which antibiotic would you like to use for the ear problem?</label>
-          <item><label>Amoxycillin</label><value>amoxy</value></item>
-          <item><label>Procaine Penicillin</label><value>procaine</value></item>
-          <item><label>Cotrimoxazole</label><value>cotrim</value></item>          
-          <item><label>Other Drug</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-ear-antibiotic')" />
+          <item><label ref="jr:itext('c-amoxycillin')" /><value>amoxy</value></item>
+          <item><label ref="jr:itext('c-procaine-penicillin')" /><value>procaine</value></item>
+          <item><label ref="jr:itext('c-cotrimoxazole')" /><value>cotrim</value></item>          
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
             
         <select1 ref="/imci/dosing/ear_antibiotic/cotrim_adverse">
-          <label>ASK: Has child ever had a bad reaction to SP?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-has-had-bad-reaction')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/ear_antibiotic/info_no_cotrim">
-          <label>SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</label>
+          <label ref="jr:itext('m-no-cotrimoxazole')" />
         </trigger>
         
         <select1 ref="/imci/dosing/ear_antibiotic/ear_drug_2">
-          <label>Which antibiotic would you like to use for the ear problem?</label>
-          <item><label>Amoxycillin</label><value>amoxy</value></item>
-          <item><label>Procaine Penicillin</label><value>procaine</value></item>
-          <item><label>Other Drug</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-ear-antibiotic')" />
+          <item><label ref="jr:itext('c-amoxycillin')" /><value>amoxy</value></item>
+          <item><label ref="jr:itext('c-procaine-penicillin')" /><value>procaine</value></item>
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
 
         <trigger ref="/imci/dosing/ear_antibiotic/info_choose_other">
-          <label>DO: Choose appropriate drug</label>
+          <label ref="jr:itext('m-choose-other-drug')" />
         </trigger>
         
         <select1 ref="/imci/dosing/ear_antibiotic/choose_amoxy">
-          <label>Which amoxycillin form would you like to use?</label>
-          <item><label>250mg tablet</label><value>amoxy-tablet</value></item>
-          <item><label>125mg / 5mL syrup</label><value>amoxy-syrup</value></item>        
+          <label ref="jr:itext('p-which-amoxycillin')" />
+          <item><label ref="jr:itext('c-250mg-tablet')" /><value>amoxy-tablet</value></item>
+          <item><label ref="jr:itext('c-125mg-syrup')" /><value>amoxy-syrup</value></item>        
         </select1>
         
         <select1 ref="/imci/dosing/ear_antibiotic/choose_cotrim">
-          <label>Which cotrimoxazole form would you like to use?</label>
-          <item><label>480mg adult tablet</label><value>cotrim-adult</value></item>
-          <item><label>120mg pediatric tablet</label><value>cotrim-ped</value></item>
-          <item><label>240mg / 5mL syrup</label><value>cotrim-syrup</value></item>      
+          <label ref="jr:itext('p-which-cotrimoxazole')" />
+          <item><label ref="jr:itext('c-480mg-tablet')" /><value>cotrim-adult</value></item>
+          <item><label ref="jr:itext('c-120mg-tablet')" /><value>cotrim-ped</value></item>
+          <item><label ref="jr:itext('c-240mg-syrup')" /><value>cotrim-syrup</value></item>      
         </select1>
         
         <select1 ref="/imci/dosing/ear_antibiotic/dose">
-          <label>GIVE: <output value="/imci/tmp/normalized/treatment/ear_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/ear_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/ear_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/ear_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/ear_antibiotic/duration" /></label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-dosing-ear')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/ear_antibiotic/info_give_correct">
-          <label>DO: Give correct dose and tell observer</label>
+          <label ref="jr:itext('m-choose-correct-dose')" />
         </trigger>
       
       </group>
@@ -1748,119 +2377,119 @@
         </trigger>
       
         <select1 ref="/imci/dosing/malaria_antibiotic/malaria_drug">
-          <label>Which antibiotic would you like to use for the malaria?</label>
-          <item><label>Amoxycillin</label><value>amoxy</value></item>
-          <item><label>Procaine Penicillin</label><value>procaine</value></item>
-          <item><label>Cotrimoxazole</label><value>cotrim</value></item>          
-          <item><label>Other Drug</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-malaria-antibiotic')" />
+          <item><label ref="jr:itext('c-amoxycillin')" /><value>amoxy</value></item>
+          <item><label ref="jr:itext('c-procaine-penicillin')" /><value>procaine</value></item>
+          <item><label ref="jr:itext('c-cotrimoxazole')" /><value>cotrim</value></item>          
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
             
         <select1 ref="/imci/dosing/malaria_antibiotic/cotrim_adverse">
-          <label>ASK: Has child ever had a bad reaction to SP?</label>
-          <item><label>Yes</label><value>yes</value></item>
-          <item><label>No</label><value>no</value></item>
+          <label ref="jr:itext('p-has-had-bad-reaction')" />
+          <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+          <item><label ref="jr:itext('c-no')" /><value>no</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/malaria_antibiotic/info_no_cotrim">
-          <label>SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</label>
+          <label ref="jr:itext('m-no-cotrimoxazole')" />
         </trigger>
         
         <select1 ref="/imci/dosing/malaria_antibiotic/malaria_drug_2">
-          <label>Which antibiotic would you like to use for the malaria?</label>
-          <item><label>Amoxycillin</label><value>amoxy</value></item>
-          <item><label>Procaine Penicillin</label><value>procaine</value></item>
-          <item><label>Other Drug</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-malaria-antibiotic')" />
+          <item><label ref="jr:itext('c-amoxycillin')" /><value>amoxy</value></item>
+          <item><label ref="jr:itext('c-procaine-penicillin')" /><value>procaine</value></item>
+          <item><label ref="jr:itext('c-other-drug')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
 
         <trigger ref="/imci/dosing/malaria_antibiotic/info_choose_other">
-          <label>DO: Choose appropriate drug</label>
+          <label ref="jr:itext('m-choose-other-drug')" />
         </trigger>
         
         <select1 ref="/imci/dosing/malaria_antibiotic/choose_amoxy">
-          <label>Which amoxycillin form would you like to use?</label>
-          <item><label>250mg tablet</label><value>amoxy-tablet</value></item>
-          <item><label>125mg / 5mL syrup</label><value>amoxy-syrup</value></item>        
+          <label ref="jr:itext('p-which-amoxycillin')" />
+          <item><label ref="jr:itext('c-250mg-tablet')" /><value>amoxy-tablet</value></item>
+          <item><label ref="jr:itext('c-125mg-syrup')" /><value>amoxy-syrup</value></item>        
         </select1>
         
         <select1 ref="/imci/dosing/malaria_antibiotic/choose_cotrim">
-          <label>Which cotrimoxazole form would you like to use?</label>
-          <item><label>480mg adult tablet</label><value>cotrim-adult</value></item>
-          <item><label>120mg pediatric tablet</label><value>cotrim-ped</value></item>
-          <item><label>240mg / 5mL syrup</label><value>cotrim-syrup</value></item>      
+          <label ref="jr:itext('p-which-cotrimoxazole')" />
+          <item><label ref="jr:itext('c-480mg-tablet')" /><value>cotrim-adult</value></item>
+          <item><label ref="jr:itext('c-120mg-tablet')" /><value>cotrim-ped</value></item>
+          <item><label ref="jr:itext('c-240mg-syrup')" /><value>cotrim-syrup</value></item>      
         </select1>
         
         <select1 ref="/imci/dosing/malaria_antibiotic/dose">
-          <label>GIVE: <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/duration" /></label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-dosing-malaria-antibiotic')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/malaria_antibiotic/info_give_correct">
-          <label>DO: Give correct dose and tell observer</label>
+          <label ref="jr:itext('m-choose-correct-dose')" />
         </trigger>
       
       </group>
 
       <trigger ref="/imci/other_treatment/info_rehydrate">
-        <label>TREAT: Re-hydration plan <output value="/imci/tmp/normalized/treatment/hydration_plan" /> from IMCI chart</label>
+        <label ref="jr:itext('m-treat-rehydration')" />
       </trigger>
       
       <select1 ref="/imci/other_treatment/oral_advice">
-        <label>DO: Explain how to give the treatment. Give the first treatment. Does the mother understand?</label>
-        <item><label>Yes</label><value>yes</value></item>
-        <item><label>No</label><value>no</value></item>
+        <label ref="jr:itext('p-explain-give-first-treatment')" />
+        <item><label ref="jr:itext('c-yes')" /><value>yes</value></item>
+        <item><label ref="jr:itext('c-no')" /><value>no</value></item>
       </select1>
       
       <trigger ref="/imci/other_treatment/blood_sugar">
-        <label>DO: Treat from the IMCI chart to avoid low blood sugar</label>
+        <label ref="jr:itext('m-treat-low-blood-sugar')" />
       </trigger>
       
       <group ref="/imci/dosing/painkiller">
             
         <select1 ref="/imci/dosing/painkiller/choice">
-          <label>Which paracetamol form would you like to use?</label>
-          <item><label>500mg adult tablet</label><value>paracet-adult</value></item>
-          <item><label>100mg pediatric tablet</label><value>paracet-ped</value></item>
-          <item><label>Other Painkiller</label><value>other</value></item>
-          <item><label>None</label><value>none</value></item>          
+          <label ref="jr:itext('p-which-paracetamol')" />
+          <item><label ref="jr:itext('c-500mg-tablet')" /><value>paracet-adult</value></item>
+          <item><label ref="jr:itext('c-100mg-tablet')" /><value>paracet-ped</value></item>
+          <item><label ref="jr:itext('c-other-painkiller')" /><value>other</value></item>
+          <item><label ref="jr:itext('c-none')" /><value>none</value></item>          
         </select1>
 
         <trigger ref="/imci/dosing/painkiller/info_choose_other">
-          <label>DO: Choose appropriate painkiller</label>
+          <label ref="jr:itext('m-choose-other-painkiller')" />
         </trigger>
                 
         <select1 ref="/imci/dosing/painkiller/dose">
-          <label>GIVE: <output value="/imci/tmp/normalized/treatment/painkiller/amount" /> of <output value="/imci/tmp/normalized/treatment/painkiller/variant" /> <output value="/imci/tmp/normalized/treatment/painkiller/drug" /> <output value="/imci/tmp/normalized/treatment/painkiller/frequency" /></label>
-          <item><label>Agree</label><value>agree</value></item>
-          <item><label>Disagree</label><value>disagree</value></item>
+          <label ref="jr:itext('p-dosing-painkiller')" />
+          <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
+          <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
       
         <trigger ref="/imci/dosing/painkiller/info_give_correct">
-          <label>DO: Give correct dose and tell observer</label>
+          <label ref="jr:itext('m-choose-correct-dose')" />
         </trigger>
       
       </group>
       
       <trigger ref="/imci/other_treatment/info_refer">
-        <label>REFER: urgently to hospital! <output value="if(/imci/tmp/normalized/diagnosis/dehydration = 'severe', concat('Give frequent sips of ORS on the way.', if(/imci/tmp/normalized/age < 2.0, ' Tell mother to continue breastfeeding.', '')), '')" /></label>
+        <label ref="jr:itext('m-refer-urgently')" />
       </trigger>
       
       <trigger ref="/imci/other_treatment/info_tetracycline">
-        <label>DO: Apply tetracycline eye ointment</label>
+        <label ref="jr:itext('m-apply-tetracycline-ointment')" />
       </trigger>
       
       <trigger ref="/imci/other_treatment/info_gentian_violet">
-        <label>DO: Treat mouth ulcers with gentian violet</label>
+        <label ref="jr:itext('m-treat-mouth-ulcers')" />
       </trigger>
 
       <trigger ref="/imci/other_treatment/info_vitamin_a">
-        <label>GIVE: Vitamin A</label>
+        <label ref="jr:itext('m-give-vitamin-a')" />
       </trigger>
 
       <trigger ref="/imci/other_treatment/info_soothe_throat">
-        <label>TREAT: Soothe throat and relieve cough with a safe remedy</label>
+        <label ref="jr:itext('m-soothe-throat')" />
       </trigger>
 
       <trigger ref="/imci/other_treatment/info_ear_wick">
@@ -1870,15 +2499,15 @@
       </trigger>
       
       <trigger ref="/imci/other_treatment/info_feed_diarrhea">
-        <label>ADVISE: how to feed a child who has persistent diarrhea</label>      
+        <label ref="jr:itext('m-treat-persistent-diarrhea')" />      
       </trigger>
       
       <trigger ref="/imci/info_return_if">
-        <label>Tell mother to return immediately if child is not able to drink/breastfeed, becomes sicker, or <output value="if(/imci/tmp/normalized/has_fever, 'fever worsens', 'develops a fever')" /></label>
+        <label ref="jr:itext('m-return-immediately-if')" />
       </trigger>
 
       <trigger ref="/imci/info_followup_in">
-        <label>Follow up in <output value="/imci/tmp/normalized/followup/time" /> days <output value="if(/imci/tmp/normalized/diagnosis/fever = 'malaria', 'if fever persists', if(/imci/tmp/normalized/followup/if_no_improvement, 'if no improvement', ''))" /></label>
+        <label ref="jr:itext('m-followup-in-n-days')" />
       </trigger>
 
       
@@ -1886,10 +2515,11 @@
       
       
       <trigger ref="/imci/done">
-        <label>The protocol is complete. Thank you for using E-IMCI.</label>
+        <label ref="jr:itext('m-all-done')" />
       </trigger>
       
     </group>
 
   </h:body>
 </h:html>
+
