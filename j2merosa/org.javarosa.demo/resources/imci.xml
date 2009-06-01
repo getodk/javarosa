@@ -1237,13 +1237,28 @@
             <value>An antibiotic has already been given for <output value="'pneumonia'" />; there is no need to give an additional antibiotic for cholera</value>
           </text>
           <text id="m-antibiotic-already-dysentery">
-            <value>An antibiotic has already been given for <output value="              if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',              if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',                '???'))            " />; there is no need to give an additional antibiotic for dysentery</value>
+            <value>An antibiotic has already been given for <output value="
+ 						if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+ 						if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+ 						'???'))
+            " />; there is no need to give an additional antibiotic for dysentery</value>
           </text>
           <text id="m-antibiotic-already-ear">
-            <value>An antibiotic has already been given for <output value="              if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',              if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',              if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',                '???')))            " />; there is no need to give an additional antibiotic for the ear problem</value>
+            <value>An antibiotic has already been given for <output value="
+						if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+						if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+						if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
+						'???')))
+            " />; there is no need to give an additional antibiotic for the ear problem</value>
           </text>
           <text id="m-antibiotic-already-malaria">
-            <value>An antibiotic has already been given for <output value="              if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',              if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',              if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',              if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'the ear problem',                '???'))))            " />; there is no need to give an additional antibiotic for the malaria</value>
+            <value>An antibiotic has already been given for <output value="
+						if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+						if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+						if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
+						if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'the ear problem',
+						'???'))))
+            " />; there is no need to give an additional antibiotic for the malaria</value>
           </text>
           <text id="m-apply-tetracycline-ointment">
             <value>DO: Apply tetracycline eye ointment</value>
@@ -1264,7 +1279,9 @@
             <value>You have disagreed; new classification is 'Child should <output value="if(/imci/tmp/normalized/diagnosis/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery'</value>
           </text>
           <text id="m-ear-wick-instructions">
-            <value>TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper          into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean          one and repeat these steps until the ear is dry</value>
+            <value>TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper
+						into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean
+						one and repeat these steps until the ear is dry</value>
           </text>
           <text id="m-ensure-continues-feeding">
             <value>ADVISE: Ensure that the child continues to feed during illness</value>
@@ -1353,7 +1370,15 @@
           </text>
           <text id="p-classify-diarrhea">
             <value form="short">Child should be treated for...</value>
-            <value form="long">CLASSIFY: Child should be treated for <output value="              if(/imci/tmp/normalized/classification/diarrhea = 'severe-persistent', 'severe persistent diarrhea',              if(/imci/tmp/normalized/classification/diarrhea = 'persistent', 'persistent diarrhea',                'diarrhea'))            " /> with <output value="              if(/imci/tmp/normalized/classification/dehydration = 'severe', 'severe dehydration',              if(/imci/tmp/normalized/classification/dehydration = 'some', 'some dehydration',                'no dehydration'))                        " /></value>
+            <value form="long">CLASSIFY: Child should be treated for <output value="
+						if(/imci/tmp/normalized/classification/diarrhea = 'severe-persistent', 'severe persistent diarrhea',
+						if(/imci/tmp/normalized/classification/diarrhea = 'persistent', 'persistent diarrhea',
+						'diarrhea'))
+            " /> with <output value="
+						if(/imci/tmp/normalized/classification/dehydration = 'severe', 'severe dehydration',
+						if(/imci/tmp/normalized/classification/dehydration = 'some', 'some dehydration',
+						'no dehydration'))
+						" /></value>
           </text>
           <text id="p-classify-dysentery">
             <value form="short">Child should [output]</value>
@@ -1875,15 +1900,7 @@
         </trigger>
         
         <select1 ref="/imci/diarrhea/classify/diarrhea_dehydration">
-          <label>CLASSIFY: Child should be treated for <output value="
-            if(/imci/tmp/normalized/classification/diarrhea = 'severe-persistent', 'severe persistent diarrhea',
-            if(/imci/tmp/normalized/classification/diarrhea = 'persistent', 'persistent diarrhea',
-              'diarrhea'))
-          " /> with <output value="
-            if(/imci/tmp/normalized/classification/dehydration = 'severe', 'severe dehydration',
-            if(/imci/tmp/normalized/classification/dehydration = 'some', 'some dehydration',
-              'no dehydration'))            
-          " /></label>
+          <label ref="jr:itext('p-classify-diarrhea')" />
           <item><label ref="jr:itext('c-agree')" /><value>agree</value></item>
           <item><label ref="jr:itext('c-disagree')" /><value>disagree</value></item>
         </select1>
@@ -2242,11 +2259,7 @@
       <group ref="/imci/dosing/dysentery_antibiotic">
             
         <trigger ref="/imci/dosing/dysentery_antibiotic/info_antibiotic_already">
-          <label>An antibiotic has already been given for <output value="
-            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
-              '???'))
-          " />; there is no need to give an additional antibiotic for dysentery</label>
+          <label ref="jr:itext('m-antibiotic-already-dysentery')" />
         </trigger>
       
         <select1 ref="/imci/dosing/dysentery_antibiotic/dysentery_drug">
@@ -2300,12 +2313,7 @@
       <group ref="/imci/dosing/ear_antibiotic">
             
         <trigger ref="/imci/dosing/ear_antibiotic/info_antibiotic_already">
-          <label>An antibiotic has already been given for <output value="
-            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
-            if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
-              '???')))
-          " />; there is no need to give an additional antibiotic for the ear problem</label>
+          <label ref="jr:itext('m-antibiotic-already-ear')" />
         </trigger>
       
         <select1 ref="/imci/dosing/ear_antibiotic/ear_drug">
@@ -2367,13 +2375,7 @@
       <group ref="/imci/dosing/malaria_antibiotic">
             
         <trigger ref="/imci/dosing/malaria_antibiotic/info_antibiotic_already">
-          <label>An antibiotic has already been given for <output value="
-            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
-            if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
-            if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'the ear problem',
-              '???'))))
-          " />; there is no need to give an additional antibiotic for the malaria</label>
+          <label ref="jr:itext('m-antibiotic-already-malaria')" />
         </trigger>
       
         <select1 ref="/imci/dosing/malaria_antibiotic/malaria_drug">
@@ -2493,9 +2495,7 @@
       </trigger>
 
       <trigger ref="/imci/other_treatment/info_ear_wick">
-        <label>TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper
-        into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean
-        one and repeat these steps until the ear is dry</label>      
+        <label ref="jr:itext('m-ear-wick-instructions')" />
       </trigger>
       
       <trigger ref="/imci/other_treatment/info_feed_diarrhea">
