@@ -10,6 +10,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.condition.Triggerable;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -140,9 +141,12 @@ public class FormOverview {
 		}
 		
 		IConditionExpr expr = null;
-		for (int i = 0; i < f.conditions.size() && expr == null; i++) {
-			Condition c = (Condition)f.conditions.elementAt(i);
-			
+		
+		for (int i = 0; i < f.triggerables.size() && expr == null; i++) {
+			// Clayton Sims - Jun 1, 2009 : Not sure how legitimate this 
+			// cast is. It might work now, but break later.
+			Condition c = (Condition)f.triggerables.elementAt(i);
+						
 			if (c.trueAction == action) {
 				for (int j = 0; j < c.targets.size() && expr == null; j++) {
 					TreeReference target = (TreeReference)c.targets.elementAt(j);
