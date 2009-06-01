@@ -530,12 +530,14 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		// get namespace
 		
 		int pos = -1;
-		//We want to find the _last_ possible ':'.
+		
+		// Clayton Sims - Jun 1, 2009 : Updated this code:
+		//	We want to find the _last_ possible ':', not the
+		// first one. Namespaces can have URLs in them.
+		//int pos = att.indexOf(":");
 		while(att.indexOf(":",pos+1) != -1) {
 			pos = att.indexOf(":",pos+1);
 		}
-
-		//int pos = att.indexOf(":");
 		if (pos == -1) {
 			array[0] = null;
 			start = 0;
