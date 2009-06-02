@@ -117,6 +117,7 @@
 					<parameter name="keep  " value="!abstract class org.javarosa.** implements org.javarosa.core.data.IDataPointer"/>
 					<parameter name="keep,     allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.data.IDataPointer"/>
 					<parameter name="keep  ,   allowShrinking" value="class org.javarosa.model.GraphDataGroup"/>
+					<parameter name="keep   ,     allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.locale.LocaleDataSource"/>
 				</obfuscator>
 
 				<!-- log settings: only use debug setting when the test-property is true -->
