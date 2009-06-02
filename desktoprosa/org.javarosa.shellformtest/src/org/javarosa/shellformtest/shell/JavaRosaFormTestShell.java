@@ -18,6 +18,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.transport.ByteArrayPayload;
+import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.formmanager.activity.FormEntryActivity;
 import org.javarosa.formmanager.activity.FormEntryContext;
@@ -85,6 +86,7 @@ public class JavaRosaFormTestShell implements IShell {
 	}
 	
 	private void init() {
+		new JavaRosaCoreModule().registerModule(context);
 		new J2MEModule().registerModule(context);
 		new LanguagePackModule().registerModule(context);
 		new XFormsModule().registerModule(context);

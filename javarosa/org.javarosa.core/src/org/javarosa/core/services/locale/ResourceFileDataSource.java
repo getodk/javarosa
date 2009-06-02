@@ -1,0 +1,143 @@
+/**
+ * 
+ */
+package org.javarosa.core.services.locale;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+
+/**
+ * @author Clayton Sims
+ * @date Jun 1, 2009 
+ *
+ */
+public class ResourceFileDataSource implements LocaleDataSource {
+	
+	String resourceURI;
+	
+	/**
+	 * NOTE: FOR SERIALIZATION ONLY!
+	 */
+	public ResourceFileDataSource() {
+		
+	}
+	
+	/**
+	 * Creates a new Data Source for Locale data with the given resource URI.
+	 * 
+	 * @param resourceURI a URI to the resource file from which data should be loaded
+	 * @throws NullPointerException if resourceURI is null
+	 */
+	public ResourceFileDataSource(String resourceURI) {
+		if(resourceURI == null) {
+			throw new NullPointerException("Resource URI cannot be null when creating a Resource File Data Source");
+		}
+		this.resourceURI = resourceURI;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.services.locale.LocaleDataSource#getLocalizedText()
+	 */
+	public OrderedHashtable getLocalizedText() {
+		return loadLocaleResource(resourceURI);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
+	 */
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+			throws IOException, DeserializationException {
+		resourceURI = in.readUTF();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
+	 */
+	public void writeExternal(DataOutputStream out) throws IOException {
+		out.writeUTF(resourceURI);
+	}
+
+	/**
+	 * @param resourceName A path to a resource file provided in the current environment
+	 *
+	 * @return a dictionary of key/value locale pairs from a file in the resource directory 
+	 */
+	private OrderedHashtable loadLocaleResource(String resourceName) {
+		InputStream is = System.class.getResourceAsStream(resourceName);
+		// TODO: This might very well fail. Best way to handle?
+		OrderedHashtable locale = new OrderedHashtable();
+		int chunk = 100;
+		InputStreamReader isr;
+		try {
+			isr = new InputStreamReader(is);
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Failed to load locale resource " + resourceName + ". Is it in the jar?");
+		}
+		boolean done = false;
+		char[] cbuf = new char[chunk];
+		int offset = 0;
+		int curline = 0;
+		
+		try {
+			String line = "";
+			while (!done) {
+				int read = isr.read(cbuf, offset, chunk - offset);
+				if(read == -1) {
+					done = true;
+					break;
+				}
+				for(int i = 0 ; i < read ; ++i) {
+					//TODO: Endline formats?
+					if(cbuf[i] == '\n') {
+						curline ++;
+						//Newline. process our string and start the next one.
+						
+						//trim whitespace.
+						line = line.trim();
+						
+						//clear comments
+						while(line.indexOf("#") != -1) {
+							line = line.substring(0, line.indexOf("#"));
+						}
+						if(line.indexOf('=') == -1) {
+							// TODO: Invalid line. Empty lines are fine, especially with comments,
+							// but it might be hard to get all of those.
+							if(line.trim().equals("")) {
+								//Empty Line
+							} else {
+								System.out.println("Invalid line (#" + curline + ") read: " + line);
+							}
+						} else {
+							//Check to see if there's anything after the '=' first. Otherwise there
+							//might be some big problems.
+							if(line.indexOf('=') != line.length()-1) {
+								String value = line.substring(line.indexOf('=') + 1,line.length());
+								locale.put(line.substring(0, line.indexOf('=')), value);
+							}
+							 else {
+								System.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
+							}
+							line = "";
+						}
+					} else {
+						line += cbuf[i];
+					}
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return locale;
+	}
+
+
+}

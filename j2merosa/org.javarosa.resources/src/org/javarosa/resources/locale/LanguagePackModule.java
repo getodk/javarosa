@@ -7,6 +7,7 @@ import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.services.locale.ResourceFileDataSource;
 
 /**
  * @author Clayton Sims
@@ -24,10 +25,10 @@ public class LanguagePackModule implements IModule {
 		locale.addAvailableLocale("english");
 		locale.addAvailableLocale("swahili");
 		locale.addAvailableLocale("afrikaans");
-		locale.registerLocaleResource("default","/messages_default.txt");
-		locale.registerLocaleResource("english","/messages_en.txt");
-		locale.registerLocaleResource("swahili","/messages_sw.txt");
-		locale.registerLocaleResource("afrikaans","/messages_afr.txt");
+		locale.registerLocaleResource("default",new ResourceFileDataSource("/messages_default.txt"));
+		locale.registerLocaleResource("english",new ResourceFileDataSource("/messages_en.txt"));
+		locale.registerLocaleResource("swahili",new ResourceFileDataSource("/messages_sw.txt"));
+		locale.registerLocaleResource("afrikaans",new ResourceFileDataSource("/messages_afr.txt"));
 		
 		locale.setDefaultLocale("default");
 		

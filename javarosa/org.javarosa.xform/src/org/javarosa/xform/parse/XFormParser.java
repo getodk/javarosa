@@ -41,6 +41,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
@@ -794,18 +795,21 @@ public class XFormParser {
 				throw new XFormParseException("more than one <translation> set as default");
 			l.setDefaultLocale(lang);
 		}
+		
+		TableLocaleSource source = new TableLocaleSource();
 
 		for (int j = 0; j < trans.getChildCount(); j++) {
 			Element text = trans.getElement(j);
 			if (text == null || !text.getName().equals("text"))
 				continue;
 
-			parseTextHandle(l, lang, text, f);
+			parseTextHandle(source, text, f);
 		}
-
+		
+		l.registerLocaleResource(lang, source);
 	}
 
-	private static void parseTextHandle (Localizer l, String locale, Element text, FormDef f) {
+	private static void parseTextHandle (TableLocaleSource l, Element text, FormDef f) {
 		String id = text.getAttributeValue("", "id");
 		if (id == null || id.length() == 0)
 			throw new XFormParseException("no id defined for <text>");
@@ -823,9 +827,9 @@ public class XFormParser {
 				data = "";
 
 			String textID = (form == null ? id : id + ";" + form);  //kind of a hack
-			if (l.hasMapping(locale, textID))
+			if (l.hasMapping(textID))
 				throw new XFormParseException("duplicate definition for text ID \"" + id + "\" and form \"" + form + "\"");
-			l.setLocaleMapping(locale, textID, data);
+			l.setLocaleMapping(textID, data);
 		}
 	}
 
