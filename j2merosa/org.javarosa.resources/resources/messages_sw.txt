@@ -133,7 +133,7 @@ form.login.loading.profile=Loading your Profile
 activity.login.loginincorrect=Umekosea kufungua
 activity.login.tryagain=Tafadhali jaribu tena
 activity.login.demomode=Demo Mode
-activity.login.demomode.intro=Unafungua CommCare kwenye Demo. Demo ni kwa ajili ya mazoezi tu! Fungua kwa kutumia ufunguo kama taarifa hizi ni halisi za mgonjwa
+activity.login.demomode.intro=Unafungua CommCare kwenye Demo. Demo ni kwa ajili ya mazoezi tu! Fungua kwa kutumia ufunguo kama taarifa hizi ni halisi
 
 
 form.user.name=Name (ie: loginID):
@@ -149,7 +149,7 @@ activity.adduser.adduser=Add User
 activity.adduser.useradded=User added 
 activity.adduser.useraddedsucc=User added successfully
 activity.adduser.problem=Problem:
-activity.adduser.problem.nametaken=Username ${0} already taken. Please choose another username
+activity.adduser.problem.nametaken=Username already taken. Please choose another username
 activity.adduser.problem.emptyuser=Username and password must both be given
 activity.adduser.problem.mismatchingpasswords=Passwords don't match
  
@@ -184,7 +184,7 @@ sending.view.new=Send to New Server
 
 sending.status.multi=Sasa fomu ${0} kati ya ${1}. Umefanikiwa kutuma Fomu ${2} kati ya #{3} inaenda
 sending.status.title=Matokeo ya Utumaji
-sending.status.none=No Forms to Send
+sending.status.none=Hakuna taarifa za kutuma
 sending.status.going=Utumaji unaendelea
 
 sending.message.details=Message Details
