@@ -25,9 +25,11 @@ import java.util.Hashtable;
 
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.UnregisteredLocaleException;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
 
 public class LocalizerTest extends TestCase  {
@@ -59,7 +61,7 @@ public class LocalizerTest extends TestCase  {
 		return aSuite;
 	}
 
-	public final int NUM_TESTS = 32;
+	public final int NUM_TESTS = 30;
 	public void testMaster (int testID) {
 		//System.out.println("running " + testID);
 		
@@ -68,40 +70,40 @@ public class LocalizerTest extends TestCase  {
 		case 2: testAddLocale(); break;
 		case 3: testAddLocaleWithData(); break;
 		case 4: testAddExistingLocale(); break;
-		case 5: testAddExistingLocaleOverwrite(); break;
-		case 6: testSetCurrentLocaleExists(); break;
-		case 7: testSetCurrentLocaleNotExists(); break;
-		case 8: testUnsetCurrentLocale(); break;
-		case 9: testSetDefaultLocaleExists(); break;
-		case 10: testSetDefaultLocaleNotExists(); break;
-		case 11: testUnsetDefaultLocale(); break;
-		case 12: testSetToDefault(); break;
-		case 13: testSetToDefaultNoDefault(); break;
-		case 14: testDestroyLocale(); break;
-		case 15: testDestroyLocaleNotExist(); break;
-		case 16: testDestroyCurrentLocale(); break;
-		case 17: testDestroyDefaultLocale(); break;
-		case 18: testAvailableLocales(); break;
-		case 19: testGetNextLocale(); break;
-		case 20: testGetLocaleMap(); break;
-		case 21: testGetLocaleMapNotExist(); break;
-		case 22: testTextMapping(); break;
-		case 23: testTextMappingRemove(); break;
-		case 24: testTextMappingOverwrite(); break;
-		case 25: testGetText(); break;
-		case 26: testGetTextNoCurrentLocale(); break;
-		case 27: testLocalizationObservers(); break;
-		case 28: testLocalizationObserverUpdateOnRegister(); break;
-		case 29: testNullArgs(); break;
-		case 30: testSerialization(); break;
-		case 31: testLinearSub(); break;
-		case 32: testHashSub(); break;
+		case 5: testSetCurrentLocaleExists(); break;
+		case 6: testSetCurrentLocaleNotExists(); break;
+		case 7: testUnsetCurrentLocale(); break;
+		case 8: testSetDefaultLocaleExists(); break;
+		case 9: testSetDefaultLocaleNotExists(); break;
+		case 10: testUnsetDefaultLocale(); break;
+		case 11: testSetToDefault(); break;
+		case 12: testSetToDefaultNoDefault(); break;
+		case 13: testDestroyLocale(); break;
+		case 14: testDestroyLocaleNotExist(); break;
+		case 15: testDestroyCurrentLocale(); break;
+		case 16: testDestroyDefaultLocale(); break;
+		case 17: testAvailableLocales(); break;
+		case 18: testGetNextLocale(); break;
+		case 19: testGetLocaleMap(); break;
+		case 20: testGetLocaleMapNotExist(); break;
+		case 21: testTextMapping(); break;
+		case 22: testTextMappingOverwrite(); break;
+		case 23: testGetText(); break;
+		case 24: testGetTextNoCurrentLocale(); break;
+		case 25: testLocalizationObservers(); break;
+		case 26: testLocalizationObserverUpdateOnRegister(); break;
+		case 27: testNullArgs(); break;
+		case 28: testSerialization(); break;
+		case 29: testLinearSub(); break;
+		case 30: testHashSub(); break;
 		
 		}
 	}
 	
 	private void testSerialize (Localizer l, String msg) {
-		ExternalizableTest.testExternalizable(l, this, null, "Localizer [" + msg + "]");
+		PrototypeFactory pf = new PrototypeFactory();
+		pf.addClass(TableLocaleSource.class);
+		ExternalizableTest.testExternalizable(l, this, pf, "Localizer [" + msg + "]");
 	}
 	
 	public void testEmpty () {
@@ -144,20 +146,22 @@ public class LocalizerTest extends TestCase  {
 	public void testAddLocaleWithData () {
 		Localizer l = new Localizer();	
 		final String TEST_LOCALE = "test";
-		OrderedHashtable localeData = new OrderedHashtable();
-		localeData.put("textID", "text");
+		TableLocaleSource localeData = new TableLocaleSource();
+		localeData.setLocaleMapping("textID", "text");
+		
+		
 		
 		if (l.hasLocale(TEST_LOCALE)) {
 			fail("Localizer reports it contains non-existent locale");
 		}
-		boolean result = l.setLocaleData(TEST_LOCALE, localeData);
-		if (result) {
-			fail("Overwrote a non-existent locale");
-		}
+		
+		l.addAvailableLocale(TEST_LOCALE);
+		l.registerLocaleResource(TEST_LOCALE, localeData);
+		
 		if (!l.hasLocale(TEST_LOCALE)) {
 			fail("Localizer reports it does not contain newly added locale");
 		}
-		if (localeData != l.getLocaleData(TEST_LOCALE)) {
+		if (!localeData.getLocalizedText().equals(l.getLocaleData(TEST_LOCALE))) {
 			fail("Newly stored locale does not match source");
 		}	
 	}
@@ -167,34 +171,19 @@ public class LocalizerTest extends TestCase  {
 		final String TEST_LOCALE = "test";
 
 		l.addAvailableLocale(TEST_LOCALE);
-		l.setLocaleMapping(TEST_LOCALE, "textID", "text");
+		TableLocaleSource table = new TableLocaleSource();
+		table.setLocaleMapping("textID", "text");
+		l.registerLocaleResource(TEST_LOCALE, table);
+		
 		OrderedHashtable localeData = l.getLocaleData(TEST_LOCALE);
 		
 		boolean result = l.addAvailableLocale(TEST_LOCALE);
 		if (result) {
 			fail("Localizer overwrote existing locale");
 		}
-		if (localeData != l.getLocaleData(TEST_LOCALE)) {
+		
+		if (!localeData.equals(l.getLocaleData(TEST_LOCALE))) {
 			fail("Localizer overwrote existing locale");			
-		}
-	}
-		
-	public void testAddExistingLocaleOverwrite () {
-		Localizer l = new Localizer();
-		final String TEST_LOCALE = "test";
-
-		l.addAvailableLocale(TEST_LOCALE);
-		l.setLocaleMapping(TEST_LOCALE, "oldTextID", "oldText");
-		
-		OrderedHashtable localeData = new OrderedHashtable();
-		localeData.put("newTextID", "newText");
-		
-		boolean result = l.setLocaleData(TEST_LOCALE, localeData);
-		if (!result) {
-			fail("Localizer did not overwrite locale as expected");
-		}
-		if (localeData != l.getLocaleData(TEST_LOCALE)) {
-			fail("Newly overwritten locale does not match source");			
 		}
 	}
 	
@@ -428,7 +417,7 @@ public class LocalizerTest extends TestCase  {
 		final String TEST_LOCALE = "test";		
 		l.addAvailableLocale(TEST_LOCALE);
 
-		if (l.getLocaleMap(TEST_LOCALE) != l.getLocaleData(TEST_LOCALE)) {
+		if (!l.getLocaleMap(TEST_LOCALE).equals(l.getLocaleData(TEST_LOCALE))) {
 			fail();
 		}
 	}
@@ -454,7 +443,10 @@ public class LocalizerTest extends TestCase  {
 		if (l.hasMapping(TEST_LOCALE, "textID")) {
 			fail("Localizer contains text mapping that was not defined");
 		}
-		l.setLocaleMapping(TEST_LOCALE, "textID", "text");
+		TableLocaleSource table = new TableLocaleSource();
+		table.setLocaleMapping("textID", "text");
+		l.registerLocaleResource(TEST_LOCALE, table);
+		
 		if (!l.hasMapping(TEST_LOCALE, "textID")) {
 			fail("Localizer does not contain newly added text mapping");
 		}
@@ -463,25 +455,20 @@ public class LocalizerTest extends TestCase  {
 		}
 	}
 	
-	public void testTextMappingRemove () {
-		Localizer l = new Localizer();
-		final String TEST_LOCALE = "test";	
-		l.addAvailableLocale(TEST_LOCALE);
-		l.setLocaleMapping(TEST_LOCALE, "textID", "text");
-		
-		l.setLocaleMapping(TEST_LOCALE, "textID", null);
-		if (l.hasMapping(TEST_LOCALE, "textID")) {
-			fail("Text mapping not removed");
-		}
-	}
 
 	public void testTextMappingOverwrite () {
 		Localizer l = new Localizer();
 		final String TEST_LOCALE = "test";	
-		l.addAvailableLocale(TEST_LOCALE);
-		l.setLocaleMapping(TEST_LOCALE, "textID", "oldText");
 		
-		l.setLocaleMapping(TEST_LOCALE, "textID", "newText");
+		l.addAvailableLocale(TEST_LOCALE);
+		TableLocaleSource table = new TableLocaleSource();
+		
+		table.setLocaleMapping("textID", "oldText");
+		
+		table.setLocaleMapping("textID", "newText");
+		
+		l.registerLocaleResource(TEST_LOCALE, table);
+		
 		if (!l.hasMapping(TEST_LOCALE, "textID")) {
 			fail("Localizer does not contain overwritten text mapping");
 		}
@@ -559,23 +546,32 @@ public class LocalizerTest extends TestCase  {
 	
 	private Localizer buildLocalizer (int i, int j, int k, String ourLocale, String otherLocale) {
 		Localizer l = new Localizer(i / 2 == 0, i % 2 == 0);
+		
+		TableLocaleSource firstLocale = new TableLocaleSource();
+		TableLocaleSource secondLocale = new TableLocaleSource();
+		
 		l.addAvailableLocale(ourLocale);
+		l.registerLocaleResource(ourLocale, firstLocale);
+		
 		l.setLocale(ourLocale);
-		if (otherLocale != null)
+		if (otherLocale != null) {
 			l.addAvailableLocale(otherLocale);
-		if (l.hasLocale("default"))
+			l.registerLocaleResource(otherLocale, secondLocale);
+		}
+		if (l.hasLocale("default")) {
 			l.setDefaultLocale("default");
+		}
 		
 		if (j / 2 == 0)
-			l.setLocaleMapping(ourLocale, "textID", "text:" + ourLocale + ":base");
+			firstLocale.setLocaleMapping("textID", "text:" + ourLocale + ":base");
 		if (j % 2 == 0)
-			l.setLocaleMapping(ourLocale, "textID;form", "text:" + ourLocale + ":form");
+			firstLocale.setLocaleMapping("textID;form", "text:" + ourLocale + ":form");
 			
 		if (otherLocale != null) {
 			if (k / 2 == 0)
-				l.setLocaleMapping(otherLocale, "textID", "text:" + otherLocale + ":base");
+				secondLocale.setLocaleMapping("textID", "text:" + otherLocale + ":base");
 			if (k % 2 == 0)
-				l.setLocaleMapping(otherLocale, "textID;form", "text:" + otherLocale + ":form");	
+				secondLocale.setLocaleMapping("textID;form", "text:" + otherLocale + ":form");	
 		}
 		
 		return l;	
@@ -612,9 +608,12 @@ public class LocalizerTest extends TestCase  {
 	
 	public void testGetTextNoCurrentLocale () {
 		Localizer l = new Localizer();
+		TableLocaleSource table = new TableLocaleSource();
 		l.addAvailableLocale("test");
 		l.setDefaultLocale("test");
-		l.setLocaleMapping("test", "textID", "text");
+		
+		table.setLocaleMapping("textID", "text");
+		l.registerLocaleResource("test", table);
 		
 		try {
 			l.getText("textID");
@@ -689,6 +688,8 @@ public class LocalizerTest extends TestCase  {
 		Localizer l = new Localizer();
 		l.addAvailableLocale("test");
 		
+		TableLocaleSource table = new TableLocaleSource();
+		
 		try {
 			l.addAvailableLocale(null);
 			
@@ -702,7 +703,7 @@ public class LocalizerTest extends TestCase  {
 		}
 		
 		try {
-			l.setLocaleData(null, new OrderedHashtable());
+			l.registerLocaleResource(null, new TableLocaleSource());
 			
 			fail("setLocaleData: Did not get expected null pointer exception");
 		} catch (NullPointerException npe) {
@@ -710,7 +711,7 @@ public class LocalizerTest extends TestCase  {
 		}
 		
 		try {
-			l.setLocaleData("test", null);
+			l.registerLocaleResource("test", null);
 			
 			fail("setLocaleData: Did not get expected null pointer exception");
 		} catch (NullPointerException npe) {
@@ -727,18 +728,10 @@ public class LocalizerTest extends TestCase  {
 			fail("getLocaleMap: Did not get expected exception");
 		} catch (UnregisteredLocaleException nsee) {
 			//expected
-		}		
+		}			
 		
 		try {
-			l.setLocaleMapping(null, "textID", "text");
-			
-			fail("setLocaleMapping: Did not get expected exception");
-		} catch (UnregisteredLocaleException nsee) {
-			//expected
-		}		
-		
-		try {
-			l.setLocaleMapping("test", null, "text");
+			table.setLocaleMapping(null, "text");
 			
 			fail("setLocaleMapping: Did not get expected null pointer exception");
 		} catch (NullPointerException npe) {
@@ -746,7 +739,7 @@ public class LocalizerTest extends TestCase  {
 		}		
 		
 		try {
-			l.setLocaleMapping("test", null, null);
+			table.setLocaleMapping(null, null);
 			
 			fail("setLocaleMapping: Did not get expected null pointer exception");
 		} catch (NullPointerException npe) {
@@ -792,6 +785,9 @@ public class LocalizerTest extends TestCase  {
 	
 	public void testSerialization () {
 		Localizer l = new Localizer(true, true);
+		TableLocaleSource firstLocale = new TableLocaleSource();
+		TableLocaleSource secondLocale = new TableLocaleSource();
+		TableLocaleSource finalLocale = new TableLocaleSource();
 
 		testSerialize(l, "empty 1");
 		testSerialize(new Localizer(false, false), "empty 2");
@@ -807,7 +803,7 @@ public class LocalizerTest extends TestCase  {
 		l.setDefaultLocale("locale2");
 		testSerialize(l, "two empty locales + default");
 		
-		l.setToDefault();
+		l.setToDefault();	
 		testSerialize(l, "two empty locales + default/current");
 		
 		l.setLocale("locale1");
@@ -816,23 +812,25 @@ public class LocalizerTest extends TestCase  {
 		l.setDefaultLocale(null);
 		testSerialize(l, "two empty locales + current");
 		
-		l.setLocaleMapping("locale1", "id1", "text1");
+		l.registerLocaleResource("locale1", firstLocale);
+		l.registerLocaleResource("locale2", secondLocale);
+		
+		firstLocale.setLocaleMapping("id1", "text1");
 		testSerialize(l, "locales with data 1");
-		l.setLocaleMapping("locale1", "id2", "text2");
+		firstLocale.setLocaleMapping("id2", "text2");
 		testSerialize(l, "locales with data 2");
 		
-		l.setLocaleMapping("locale2", "id1", "text1");
-		l.setLocaleMapping("locale2", "id2", "text2");
-		l.setLocaleMapping("locale2", "id3", "text3");
+		secondLocale.setLocaleMapping("id1", "text1");
+		secondLocale.setLocaleMapping("id2", "text2");
+		secondLocale.setLocaleMapping("id3", "text3");
 		testSerialize(l, "locales with data 3");
 		
-		l.setLocaleMapping("locale2", "id2", null);
+		secondLocale.setLocaleMapping("id2", null);
 		testSerialize(l, "locales with data 4");
 		
-		OrderedHashtable loc3 = new OrderedHashtable();
-		loc3.put("id1", "text1");
-		loc3.put("id4", "text4");
-		l.setLocaleData("locale3", loc3);
+		finalLocale.setLocaleMapping("id1", "text1");
+		finalLocale.setLocaleMapping("id4", "text4");
+		l.registerLocaleResource("locale3", finalLocale);
 		testSerialize(l, "locales with data 5");
 		
 		l.destroyLocale("locale2");

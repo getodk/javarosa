@@ -31,6 +31,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -241,10 +242,13 @@ public class QuestionDefTest extends TestCase {
 		QuestionDef q = new QuestionDef();
 		
 		Localizer l = new Localizer();
+		TableLocaleSource table = new TableLocaleSource();
 		l.addAvailableLocale("locale");
-		l.setLocaleMapping("locale", "prompt;long", "loc: long text");
-		l.setLocaleMapping("locale", "prompt;short", "loc: short text");
-		l.setLocaleMapping("locale", "help", "loc: help text");
+		table.setLocaleMapping("prompt;long", "loc: long text");
+		table.setLocaleMapping("prompt;short", "loc: short text");
+		table.setLocaleMapping("help", "loc: help text");
+		l.registerLocaleResource("locale", table);
+		
 		l.setLocale("locale");
 		
 		q.setLongTextID("prompt;long", l);
@@ -319,8 +323,10 @@ public class QuestionDefTest extends TestCase {
 		
 		Localizer l = new Localizer();
 		l.addAvailableLocale("locale");
-		l.setLocaleMapping("locale", "choice1", "loc: choice1");
-		l.setLocaleMapping("locale", "choice2", "loc: choice2");
+		TableLocaleSource table = new TableLocaleSource();
+		table.setLocaleMapping("choice1", "loc: choice1");
+		table.setLocaleMapping("choice2", "loc: choice2");
+		l.registerLocaleResource("locale", table);
 		l.setLocale("locale");
 		
 		q.addSelectItemID("choice1", true, "val1");
@@ -372,8 +378,10 @@ public class QuestionDefTest extends TestCase {
 
 		Localizer l = new Localizer();
 		l.addAvailableLocale("locale");
-		l.setLocaleMapping("locale", "choice1", "loc: choice1");
-		l.setLocaleMapping("locale", "choice2", "loc: choice2");
+		TableLocaleSource table = new TableLocaleSource();
+		table.setLocaleMapping("choice1", "loc: choice1");
+		table.setLocaleMapping("choice2", "loc: choice2");
+		l.registerLocaleResource("locale", table);
 		l.setLocale("locale");
 		
 		OrderedHashtable choiceIDs = new OrderedHashtable();
@@ -407,11 +415,13 @@ public class QuestionDefTest extends TestCase {
 		q.registerStateObserver(qo);
 		
 		Localizer l = new Localizer();
+		TableLocaleSource table = new TableLocaleSource();
 		l.addAvailableLocale("en");
-		l.setLocaleMapping("en", "long text", "en: long text");
-		l.setLocaleMapping("en", "short text", "en: short text");
-		l.setLocaleMapping("en", "help text", "en: help text");
-		l.setLocaleMapping("en", "choice", "en: choice");
+		table.setLocaleMapping("long text", "en: long text");
+		table.setLocaleMapping("short text", "en: short text");
+		table.setLocaleMapping("help text", "en: help text");
+		table.setLocaleMapping("choice", "en: choice");
+		l.registerLocaleResource("en", table);
 		l.setLocale("en");
 		
 		q.localeChanged("locale", l);

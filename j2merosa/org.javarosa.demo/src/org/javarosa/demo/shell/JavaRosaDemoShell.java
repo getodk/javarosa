@@ -27,6 +27,7 @@ import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.transport.TransportMethod;
+import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.properties.DemoAppProperties;
@@ -597,6 +598,7 @@ public class JavaRosaDemoShell implements IShell {
 	}
 
 	private void loadModules() {
+		new JavaRosaCoreModule().registerModule(context);
 		new J2MEModule().registerModule(context);
 		new LanguagePackModule().registerModule(context);
 		new XFormsModule().registerModule(context);
