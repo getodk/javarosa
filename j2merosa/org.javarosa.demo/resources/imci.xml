@@ -353,11 +353,11 @@
       <bind nodeset="tmp/sentinel/first_visit" relevant="/imci/preamble/visit_type = 'first'" />
 
       <bind nodeset="preamble/temperature" type="decimal" constraint=". >= 32.0 and . <= 44.0" relevant="../temp_type = 'therm'" required="true()"
-			  jr:constraintMsg="Temperature must be between 32 and 44 degrees" />
+        jr:constraintMsg="Temperature must be between 32 and 44 degrees" />
       <bind nodeset="tmp/normalized/has_fever" calculate="selected(/imci/preamble/chief_complaint, 'fever') or /imci/preamble/temp_type = 'fever' or /imci/preamble/temperature >= 37.4" />
       
       <bind nodeset="preamble/age" type="int" required="true()" />
-			<bind nodeset="preamble/age_unit" constraint="../age >= 0 and ../age < if(. = 'years', 20, 240)" jr:constraintMsg="Age must be less than 20 years / 240 months" />
+      <bind nodeset="preamble/age_unit" constraint="../age >= 0 and ../age < if(. = 'years', 20, 240)" jr:constraintMsg="Age must be less than 20 years / 240 months" />
       <bind nodeset="tmp/normalized/age" calculate="if(/imci/preamble/age_unit = 'years', /imci/preamble/age,
                                                     if(/imci/preamble/age_unit = 'months', /imci/preamble/age div 12, ''))" />
       <bind nodeset="preamble/info/too_young" relevant="/imci/tmp/normalized/age < 2 div 12" />
@@ -377,7 +377,7 @@
       <bind nodeset="cough" relevant="/imci/tmp/normalized/has_cough" />
                                                          
       <bind nodeset="cough/breath_rate" type="int" constraint=". >= 3 and . <= 200" relevant="../breath_rate_type = 'measure'" required="true()"
-			  jr:constraintMsg="Breating rate must be between 3 and 200 breaths per minute" />
+        jr:constraintMsg="Breating rate must be between 3 and 200 breaths per minute" />
       <bind nodeset="tmp/normalized/fast_breath" calculate="/imci/cough/breath_rate_type = 'fast' or /imci/cough/breath_rate >= if(../age < 1.0, 50, 40)" />
       
       <bind nodeset="tmp/normalized/classification/cough" calculate="
@@ -512,97 +512,97 @@
       
       <bind nodeset="tmp/dosings/alu" calculate="
         if(/imci/preamble/weight >= 5 and /imci/preamble/weight < 25,
-          if(/imci/preamble/weight < 15, 'whole tablet', 'two tablets'),
+          if(/imci/preamble/weight < 15, 'v-whole-tab', 'v-2-tabs'),
         if(/imci/tmp/normalized/age >= 0.25 and /imci/tmp/normalized/age <= 8.0,
-          if(/imci/tmp/normalized/age <= 3.0, 'whole tablet', 'two tablets'),
+          if(/imci/tmp/normalized/age <= 3.0, 'v-whole-tab', 'v-2-tabs'),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/amoxycillin/tablet" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 10, 'half tablet', 'whole tablet'),
+          if(/imci/preamble/weight < 10, 'v-half-tab', 'v-whole-tab'),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 'whole tablet'),
+          if(/imci/tmp/normalized/age <= 1.0, 'v-half-tab', 'v-whole-tab'),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/amoxycillin/syrup" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 10, '5mL', '10mL'),
+          if(/imci/preamble/weight < 10, 'v-5ml', 'v-10ml'),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 1.0, '5mL', '10mL'),
+          if(/imci/tmp/normalized/age <= 1.0, 'v-5ml', 'v-10ml'),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/cotrimoxazole/adult" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 10, 'half tablet', 'whole tablet'),
+          if(/imci/preamble/weight < 10, 'v-half-tab', 'v-whole-tab'),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 'whole tablet'),
+          if(/imci/tmp/normalized/age <= 1.0, 'v-half-tab', 'v-whole-tab'),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/cotrimoxazole/ped" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 10, 'two tablets', '4 tablets'),
+          if(/imci/preamble/weight < 10, 'v-2-tabs', 'v-4-tabs'),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 1.0, 'two tablets', '4 tablets'),
+          if(/imci/tmp/normalized/age <= 1.0, 'v-2-tabs', 'v-4-tabs'),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/cotrimoxazole/syrup" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 10, '5mL', '10mL'),
+          if(/imci/preamble/weight < 10, 'v-5ml', 'v-10ml'),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 1.0, '5mL', '10mL'),
+          if(/imci/tmp/normalized/age <= 1.0, 'v-5ml', 'v-10ml'),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/erythromycin" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 6, 'quarter tablet',
-          if(/imci/preamble/weight < 10, 'half tablet', 
-            'whole tablet')),
+          if(/imci/preamble/weight < 6, 'v-quarter-tab',
+          if(/imci/preamble/weight < 10, 'v-half-tab', 
+            'v-whole-tab')),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 0.34, 'quarter tablet',
-          if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 
-            'whole tablet')),
+          if(/imci/tmp/normalized/age <= 0.34, 'v-quarter-tab',
+          if(/imci/tmp/normalized/age <= 1.0, 'v-half-tab', 
+            'v-whole-tab')),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/nalidixic_acid" calculate="  
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 6, 'quarter tablet',
-          if(/imci/preamble/weight < 10, 'half tablet', 
-            'whole tablet')),
+          if(/imci/preamble/weight < 6, 'v-quarter-tab',
+          if(/imci/preamble/weight < 10, 'v-half-tab', 
+            'v-whole-tab')),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 0.34, 'quarter tablet',
-          if(/imci/tmp/normalized/age <= 1.0, 'half tablet', 
-            'whole tablet')),
+          if(/imci/tmp/normalized/age <= 0.34, 'v-quarter-tab',
+          if(/imci/tmp/normalized/age <= 1.0, 'v-half-tab', 
+            'v-whole-tab')),
         '[amount unavailable for age/weight]'))" />        
       <bind nodeset="tmp/dosings/paracetamol/ped" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 14, 'whole tablet', '2.5 tablets'),
+          if(/imci/preamble/weight < 14, 'v-whole-tab', 'v-2.5-tabs'),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 3.0, 'whole tablet', '2.5 tablets'),
+          if(/imci/tmp/normalized/age <= 3.0, 'v-whole-tab', 'v-2.5-tabs'),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/paracetamol/adult" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 14, 'quarter tablet', 'half tablet'),
+          if(/imci/preamble/weight < 14, 'v-quarter-tab', 'v-half-tab'),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 3.0, 'quarter tablet', 'half tablet'),
+          if(/imci/tmp/normalized/age <= 3.0, 'v-quarter-tab', 'v-half-tab'),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/procaine_penicillin" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 10, '1mL injection', '2mL injection'),
+          if(/imci/preamble/weight < 10, 'v-1ml-inj', 'v-2ml-inj'),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 1.0, '1mL injection', '2mL injection'),
+          if(/imci/tmp/normalized/age <= 1.0, 'v-1ml-inj', 'v-2ml-inj'),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/quinine/injection" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 6, '1.0mL',
-          if(/imci/preamble/weight < 8, '1.5mL', 
-          if(/imci/preamble/weight < 10, '2.0mL', 
-          if(/imci/preamble/weight < 14, '2.5mL', 
-            '3.0mL')))),
+          if(/imci/preamble/weight < 6, 'v-1.0ml',
+          if(/imci/preamble/weight < 8, 'v-1.5ml', 
+          if(/imci/preamble/weight < 10, 'v-2.0ml', 
+          if(/imci/preamble/weight < 14, 'v-2.5ml', 
+            'v-3.0ml')))),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 0.34, '1.0mL',
-          if(/imci/tmp/normalized/age <= 0.75, '1.5mL', 
-          if(/imci/tmp/normalized/age <= 1.0, '2.0mL', 
-          if(/imci/tmp/normalized/age <= 3.0, '2.5mL', 
-            '3.0mL')))),
+          if(/imci/tmp/normalized/age <= 0.34, 'v-1.0ml',
+          if(/imci/tmp/normalized/age <= 0.75, 'v-1.5ml', 
+          if(/imci/tmp/normalized/age <= 1.0, 'v-2.0ml', 
+          if(/imci/tmp/normalized/age <= 3.0, 'v-2.5ml', 
+            'v-3.0ml')))),
         '[amount unavailable for age/weight]'))" />
       <bind nodeset="tmp/dosings/quinine/tablet" calculate="
         if(/imci/preamble/weight >= 4 and /imci/preamble/weight < 19,
-          if(/imci/preamble/weight < 11, 'quarter tablet', 'half tablet'),
+          if(/imci/preamble/weight < 11, 'v-quarter-tab', 'v-half-tab'),
         if(/imci/tmp/normalized/age >= 0.16 and /imci/tmp/normalized/age <= 5.0,
-          if(/imci/tmp/normalized/age <= 1.0, 'quarter tablet', 'half tablet'),
+          if(/imci/tmp/normalized/age <= 1.0, 'v-quarter-tab', 'v-half-tab'),
         '[amount unavailable for age/weight]'))" />
       
       <!-- TREATMENT: MALARIA QUININE -->
@@ -617,9 +617,9 @@
         if(../choice = 'alu', /imci/tmp/dosings/alu,
           '')))" />
       <bind nodeset="tmp/normalized/treatment/malaria_quinine/drug" calculate="
-        if(../choice = 'quinine-injection', 'QUININE INJECTION',
-        if(../choice = 'quinine-tablet', 'QUININE',
-        if(../choice = 'alu', 'ALU',
+        if(../choice = 'quinine-injection', 'v-quinine-inj',
+        if(../choice = 'quinine-tablet', 'v-quinine',
+        if(../choice = 'alu', 'v-alu',
           '')))" />
       <bind nodeset="tmp/normalized/treatment/malaria_quinine/variant" calculate="
         if(../choice = 'quinine-injection', '60mg/mL',
@@ -627,14 +627,14 @@
         if(../choice = 'alu', '',
           '')))" />
       <bind nodeset="tmp/normalized/treatment/malaria_quinine/frequency" calculate="
-        if(../choice = 'quinine-injection', 'repeat after 8 hrs then every 12 hrs',
-        if(../choice = 'quinine-tablet', 'three times a day',
-        if(../choice = 'alu', 'twice a day',
+        if(../choice = 'quinine-injection', 'v-8-12-hrs',
+        if(../choice = 'quinine-tablet', 'v-3-day',
+        if(../choice = 'alu', 'v-twice-day',
           '')))" />
       <bind nodeset="tmp/normalized/treatment/malaria_quinine/duration" calculate="
-        if(../choice = 'quinine-injection', 'no more than one week',
-        if(../choice = 'quinine-tablet', '7 to 10 days',
-        if(../choice = 'alu', '3 days',
+        if(../choice = 'quinine-injection', 'v-1-week-max',
+        if(../choice = 'quinine-tablet', 'v-7-10-days',
+        if(../choice = 'alu', 'v-3-days',
           '')))" />
       <bind nodeset="dosing/malaria_quinine/dose" relevant="/imci/tmp/normalized/treatment/malaria_quinine/choice != 'other'" />
       <bind nodeset="dosing/malaria_quinine/info_give_correct" relevant="../dose = 'disagree'" />
@@ -664,12 +664,12 @@
         if(../choice = 'procaine', /imci/tmp/dosings/procaine_penicillin,
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/drug" calculate="
-        if(../choice = 'amoxy-tablet', 'AMOXYCILLIN',
-        if(../choice = 'amoxy-syrup', 'AMOXYCILLIN',
-        if(../choice = 'cotrim-adult', 'COTRIMOXAZOLE',
-        if(../choice = 'cotrim-ped', 'COTRIMOXAZOLE',
-        if(../choice = 'cotrim-syrup', 'COTRIMOXAZOLE',
-        if(../choice = 'procaine', 'PROCAINE PENICILLIN',
+        if(../choice = 'amoxy-tablet', 'v-amoxycillin',
+        if(../choice = 'amoxy-syrup', 'v-amoxycillin',
+        if(../choice = 'cotrim-adult', 'v-cotrimoxazole',
+        if(../choice = 'cotrim-ped', 'v-cotrimoxazole',
+        if(../choice = 'cotrim-syrup', 'v-cotrimoxazole',
+        if(../choice = 'procaine', 'v-penicillin',
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/variant" calculate="
         if(../choice = 'amoxy-tablet', '250mg',
@@ -680,20 +680,20 @@
         if(../choice = 'procaine', '400,000u/mL',
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/frequency" calculate="
-        if(../choice = 'amoxy-tablet', 'three times a day',
-        if(../choice = 'amoxy-syrup', 'three times a day',
-        if(../choice = 'cotrim-adult', 'twice a day',
-        if(../choice = 'cotrim-ped', 'twice a day',
-        if(../choice = 'cotrim-syrup', 'twice a day',
-        if(../choice = 'procaine', 'once a day',
+        if(../choice = 'amoxy-tablet', 'v-3-day',
+        if(../choice = 'amoxy-syrup', 'v-3-day',
+        if(../choice = 'cotrim-adult', 'v-twice-day',
+        if(../choice = 'cotrim-ped', 'v-twice-day',
+        if(../choice = 'cotrim-syrup', 'v-twice-day',
+        if(../choice = 'procaine', 'v-once-day',
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/pneumonia_antibiotic/duration" calculate="
-        if(../choice = 'amoxy-tablet', '5 days',
-        if(../choice = 'amoxy-syrup', '5 days',
-        if(../choice = 'cotrim-adult', '5 days',
-        if(../choice = 'cotrim-ped', '5 days',
-        if(../choice = 'cotrim-syrup', '5 days',
-        if(../choice = 'procaine', '5 days',
+        if(../choice = 'amoxy-tablet', 'v-5-days',
+        if(../choice = 'amoxy-syrup', 'v-5-days',
+        if(../choice = 'cotrim-adult', 'v-5-days',
+        if(../choice = 'cotrim-ped', 'v-5-days',
+        if(../choice = 'cotrim-syrup', 'v-5-days',
+        if(../choice = 'procaine', 'v-5-days',
           ''))))))" />
       <bind nodeset="dosing/pneumonia_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != ''" />
       <bind nodeset="dosing/pneumonia_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
@@ -722,10 +722,10 @@
         if(../choice = 'erythro', /imci/tmp/dosings/erythromycin,
           ''))))" />
       <bind nodeset="tmp/normalized/treatment/cholera_antibiotic/drug" calculate="
-        if(../choice = 'cotrim-adult', 'COTRIMOXAZOLE',
-        if(../choice = 'cotrim-ped', 'COTRIMOXAZOLE',
-        if(../choice = 'cotrim-syrup', 'COTRIMOXAZOLE',
-        if(../choice = 'erythro', 'ERYTHROMYCIN',
+        if(../choice = 'cotrim-adult', 'v-cotrimoxazole',
+        if(../choice = 'cotrim-ped', 'v-cotrimoxazole',
+        if(../choice = 'cotrim-syrup', 'v-cotrimoxazole',
+        if(../choice = 'erythro', 'v-erythromycin',
           ''))))" />
       <bind nodeset="tmp/normalized/treatment/cholera_antibiotic/variant" calculate="
         if(../choice = 'cotrim-adult', '480mg',
@@ -734,16 +734,16 @@
         if(../choice = 'erythro', '250mg',
           ''))))" />
       <bind nodeset="tmp/normalized/treatment/cholera_antibiotic/frequency" calculate="
-        if(../choice = 'cotrim-adult', 'twice a day',
-        if(../choice = 'cotrim-ped', 'twice a day',
-        if(../choice = 'cotrim-syrup', 'twice a day',
-        if(../choice = 'erythro', '4 times a day',
+        if(../choice = 'cotrim-adult', 'v-twice-day',
+        if(../choice = 'cotrim-ped', 'v-twice-day',
+        if(../choice = 'cotrim-syrup', 'v-twice-day',
+        if(../choice = 'erythro', 'v-4-day',
           ''))))" />
       <bind nodeset="tmp/normalized/treatment/cholera_antibiotic/duration" calculate="
-        if(../choice = 'cotrim-adult', '5 days',
-        if(../choice = 'cotrim-ped', '5 days',
-        if(../choice = 'cotrim-syrup', '5 days',
-        if(../choice = 'erythro', '3 days',
+        if(../choice = 'cotrim-adult', 'v-5-days',
+        if(../choice = 'cotrim-ped', 'v-5-days',
+        if(../choice = 'cotrim-syrup', 'v-5-days',
+        if(../choice = 'erythro', 'v-3-days',
           ''))))" />
       <bind nodeset="dosing/cholera_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/cholera_antibiotic/amount != ''" />
       <bind nodeset="dosing/cholera_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
@@ -773,10 +773,10 @@
         if(../choice = 'nalid', /imci/tmp/dosings/nalidixic_acid,
           ''))))" />
       <bind nodeset="tmp/normalized/treatment/dysentery_antibiotic/drug" calculate="
-        if(../choice = 'cotrim-adult', 'COTRIMOXAZOLE',
-        if(../choice = 'cotrim-ped', 'COTRIMOXAZOLE',
-        if(../choice = 'cotrim-syrup', 'COTRIMOXAZOLE',
-        if(../choice = 'nalid', 'NALIDIXIC ACID',
+        if(../choice = 'cotrim-adult', 'v-cotrimoxazole',
+        if(../choice = 'cotrim-ped', 'v-cotrimoxazole',
+        if(../choice = 'cotrim-syrup', 'v-cotrimoxazole',
+        if(../choice = 'nalid', 'v-nalidixic',
           ''))))" />
       <bind nodeset="tmp/normalized/treatment/dysentery_antibiotic/variant" calculate="
         if(../choice = 'cotrim-adult', '480mg',
@@ -785,16 +785,16 @@
         if(../choice = 'nalid', '250mg',
           ''))))" />
       <bind nodeset="tmp/normalized/treatment/dysentery_antibiotic/frequency" calculate="
-        if(../choice = 'cotrim-adult', 'twice a day',
-        if(../choice = 'cotrim-ped', 'twice a day',
-        if(../choice = 'cotrim-syrup', 'twice a day',
-        if(../choice = 'nalid', '4 times a day',
+        if(../choice = 'cotrim-adult', 'v-twice-day',
+        if(../choice = 'cotrim-ped', 'v-twice-day',
+        if(../choice = 'cotrim-syrup', 'v-twice-day',
+        if(../choice = 'nalid', 'v-4-day',
           ''))))" />
       <bind nodeset="tmp/normalized/treatment/dysentery_antibiotic/duration" calculate="
-        if(../choice = 'cotrim-adult', '5 days',
-        if(../choice = 'cotrim-ped', '5 days',
-        if(../choice = 'cotrim-syrup', '5 days',
-        if(../choice = 'nalid', '5 days',
+        if(../choice = 'cotrim-adult', 'v-5-days',
+        if(../choice = 'cotrim-ped', 'v-5-days',
+        if(../choice = 'cotrim-syrup', 'v-5-days',
+        if(../choice = 'nalid', 'v-5-days',
           ''))))" />
       <bind nodeset="dosing/dysentery_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != ''" />
       <bind nodeset="dosing/dysentery_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
@@ -829,12 +829,12 @@
         if(../choice = 'procaine', /imci/tmp/dosings/procaine_penicillin,
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/ear_antibiotic/drug" calculate="
-        if(../choice = 'amoxy-tablet', 'AMOXYCILLIN',
-        if(../choice = 'amoxy-syrup', 'AMOXYCILLIN',
-        if(../choice = 'cotrim-adult', 'COTRIMOXAZOLE',
-        if(../choice = 'cotrim-ped', 'COTRIMOXAZOLE',
-        if(../choice = 'cotrim-syrup', 'COTRIMOXAZOLE',
-        if(../choice = 'procaine', 'PROCAINE PENICILLIN',
+        if(../choice = 'amoxy-tablet', 'v-amoxycillin',
+        if(../choice = 'amoxy-syrup', 'v-amoxycillin',
+        if(../choice = 'cotrim-adult', 'v-cotrimoxazole',
+        if(../choice = 'cotrim-ped', 'v-cotrimoxazole',
+        if(../choice = 'cotrim-syrup', 'v-cotrimoxazole',
+        if(../choice = 'procaine', 'v-penicillin',
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/ear_antibiotic/variant" calculate="
         if(../choice = 'amoxy-tablet', '250mg',
@@ -845,20 +845,20 @@
         if(../choice = 'procaine', '400,000u/mL',
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/ear_antibiotic/frequency" calculate="
-        if(../choice = 'amoxy-tablet', 'three times a day',
-        if(../choice = 'amoxy-syrup', 'three times a day',
-        if(../choice = 'cotrim-adult', 'twice a day',
-        if(../choice = 'cotrim-ped', 'twice a day',
-        if(../choice = 'cotrim-syrup', 'twice a day',
-        if(../choice = 'procaine', 'once a day',
+        if(../choice = 'amoxy-tablet', 'v-3-day',
+        if(../choice = 'amoxy-syrup', 'v-3-day',
+        if(../choice = 'cotrim-adult', 'v-twice-day',
+        if(../choice = 'cotrim-ped', 'v-twice-day',
+        if(../choice = 'cotrim-syrup', 'v-twice-day',
+        if(../choice = 'procaine', 'v-once-day',
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/ear_antibiotic/duration" calculate="
-        if(../choice = 'amoxy-tablet', '5 days',
-        if(../choice = 'amoxy-syrup', '5 days',
-        if(../choice = 'cotrim-adult', '5 days',
-        if(../choice = 'cotrim-ped', '5 days',
-        if(../choice = 'cotrim-syrup', '5 days',
-        if(../choice = 'procaine', '5 days',
+        if(../choice = 'amoxy-tablet', 'v-5-days',
+        if(../choice = 'amoxy-syrup', 'v-5-days',
+        if(../choice = 'cotrim-adult', 'v-5-days',
+        if(../choice = 'cotrim-ped', 'v-5-days',
+        if(../choice = 'cotrim-syrup', 'v-5-days',
+        if(../choice = 'procaine', 'v-5-days',
           ''))))))" />
       <bind nodeset="dosing/ear_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/ear_antibiotic/amount != ''" />
       <bind nodeset="dosing/ear_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
@@ -894,12 +894,12 @@
         if(../choice = 'procaine', /imci/tmp/dosings/procaine_penicillin,
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/malaria_antibiotic/drug" calculate="
-        if(../choice = 'amoxy-tablet', 'AMOXYCILLIN',
-        if(../choice = 'amoxy-syrup', 'AMOXYCILLIN',
-        if(../choice = 'cotrim-adult', 'COTRIMOXAZOLE',
-        if(../choice = 'cotrim-ped', 'COTRIMOXAZOLE',
-        if(../choice = 'cotrim-syrup', 'COTRIMOXAZOLE',
-        if(../choice = 'procaine', 'PROCAINE PENICILLIN',
+        if(../choice = 'amoxy-tablet', 'v-amoxycillin',
+        if(../choice = 'amoxy-syrup', 'v-amoxycillin',
+        if(../choice = 'cotrim-adult', 'v-cotrimoxazole',
+        if(../choice = 'cotrim-ped', 'v-cotrimoxazole',
+        if(../choice = 'cotrim-syrup', 'v-cotrimoxazole',
+        if(../choice = 'procaine', 'v-penicillin',
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/malaria_antibiotic/variant" calculate="
         if(../choice = 'amoxy-tablet', '250mg',
@@ -910,20 +910,20 @@
         if(../choice = 'procaine', '400,000u/mL',
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/malaria_antibiotic/frequency" calculate="
-        if(../choice = 'amoxy-tablet', 'three times a day',
-        if(../choice = 'amoxy-syrup', 'three times a day',
-        if(../choice = 'cotrim-adult', 'twice a day',
-        if(../choice = 'cotrim-ped', 'twice a day',
-        if(../choice = 'cotrim-syrup', 'twice a day',
-        if(../choice = 'procaine', 'once a day',
+        if(../choice = 'amoxy-tablet', 'v-3-day',
+        if(../choice = 'amoxy-syrup', 'v-3-day',
+        if(../choice = 'cotrim-adult', 'v-twice-day',
+        if(../choice = 'cotrim-ped', 'v-twice-day',
+        if(../choice = 'cotrim-syrup', 'v-twice-day',
+        if(../choice = 'procaine', 'v-once-day',
           ''))))))" />
       <bind nodeset="tmp/normalized/treatment/malaria_antibiotic/duration" calculate="
-        if(../choice = 'amoxy-tablet', '5 days',
-        if(../choice = 'amoxy-syrup', '5 days',
-        if(../choice = 'cotrim-adult', '5 days',
-        if(../choice = 'cotrim-ped', '5 days',
-        if(../choice = 'cotrim-syrup', '5 days',
-        if(../choice = 'procaine', '5 days',
+        if(../choice = 'amoxy-tablet', 'v-5-days',
+        if(../choice = 'amoxy-syrup', 'v-5-days',
+        if(../choice = 'cotrim-adult', 'v-5-days',
+        if(../choice = 'cotrim-ped', 'v-5-days',
+        if(../choice = 'cotrim-syrup', 'v-5-days',
+        if(../choice = 'procaine', 'v-5-days',
           ''))))))" />
       <bind nodeset="dosing/malaria_antibiotic/dose" relevant="/imci/tmp/normalized/treatment/malaria_antibiotic/amount != ''" />
       <bind nodeset="dosing/malaria_antibiotic/info_give_correct" relevant="../dose = 'disagree'" />
@@ -948,16 +948,16 @@
         if(/imci/dosing/painkiller/choice = 'paracet-ped', /imci/tmp/dosings/paracetamol/ped,
           ''))" />
       <bind nodeset="tmp/normalized/treatment/painkiller/drug" calculate="
-        if(/imci/dosing/painkiller/choice = 'paracet-adult', 'PARACETAMOL',
-        if(/imci/dosing/painkiller/choice = 'paracet-ped', 'PARACETAMOL',
+        if(/imci/dosing/painkiller/choice = 'paracet-adult', 'v-paracetamol',
+        if(/imci/dosing/painkiller/choice = 'paracet-ped', 'v-paracetamol',
           ''))" />
       <bind nodeset="tmp/normalized/treatment/painkiller/variant" calculate="
         if(/imci/dosing/painkiller/choice = 'paracet-adult', '500mg',
         if(/imci/dosing/painkiller/choice = 'paracet-ped', '100mg',
           ''))" />
       <bind nodeset="tmp/normalized/treatment/painkiller/frequency" calculate="
-        if(/imci/dosing/painkiller/choice = 'paracet-adult', 'every 6 hours as needed',
-        if(/imci/dosing/painkiller/choice = 'paracet-ped', 'every 6 hours as needed',
+        if(/imci/dosing/painkiller/choice = 'paracet-adult', 'v-6-hrs',
+        if(/imci/dosing/painkiller/choice = 'paracet-ped', 'v-6-hrs',
           ''))" />
       <bind nodeset="dosing/painkiller/dose" relevant="/imci/tmp/normalized/treatment/painkiller/amount != ''" />
       <bind nodeset="dosing/painkiller/info_give_correct" relevant="../dose = 'disagree'" />
@@ -1238,26 +1238,26 @@
           </text>
           <text id="m-antibiotic-already-dysentery">
             <value>An antibiotic has already been given for <output value="
- 						if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
- 						if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
- 						'???'))
+             if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+             if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+             '???'))
             " />; there is no need to give an additional antibiotic for dysentery</value>
           </text>
           <text id="m-antibiotic-already-ear">
             <value>An antibiotic has already been given for <output value="
-						if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-						if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
-						if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
-						'???')))
+            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+            if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
+            '???')))
             " />; there is no need to give an additional antibiotic for the ear problem</value>
           </text>
           <text id="m-antibiotic-already-malaria">
             <value>An antibiotic has already been given for <output value="
-						if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-						if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
-						if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
-						if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'the ear problem',
-						'???'))))
+            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+            if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
+            if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'the ear problem',
+            '???'))))
             " />; there is no need to give an additional antibiotic for the malaria</value>
           </text>
           <text id="m-apply-tetracycline-ointment">
@@ -1279,9 +1279,7 @@
             <value>You have disagreed; new classification is 'Child should <output value="if(/imci/tmp/normalized/diagnosis/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery'</value>
           </text>
           <text id="m-ear-wick-instructions">
-            <value>TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper
-						into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean
-						one and repeat these steps until the ear is dry</value>
+            <value>TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper  into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean one and repeat these steps until the ear is dry</value>
           </text>
           <text id="m-ensure-continues-feeding">
             <value>ADVISE: Ensure that the child continues to feed during illness</value>
@@ -1371,14 +1369,14 @@
           <text id="p-classify-diarrhea">
             <value form="short">Child should be treated for...</value>
             <value form="long">CLASSIFY: Child should be treated for <output value="
-						if(/imci/tmp/normalized/classification/diarrhea = 'severe-persistent', 'severe persistent diarrhea',
-						if(/imci/tmp/normalized/classification/diarrhea = 'persistent', 'persistent diarrhea',
-						'diarrhea'))
+            if(/imci/tmp/normalized/classification/diarrhea = 'severe-persistent', 'severe persistent diarrhea',
+            if(/imci/tmp/normalized/classification/diarrhea = 'persistent', 'persistent diarrhea',
+            'diarrhea'))
             " /> with <output value="
-						if(/imci/tmp/normalized/classification/dehydration = 'severe', 'severe dehydration',
-						if(/imci/tmp/normalized/classification/dehydration = 'some', 'some dehydration',
-						'no dehydration'))
-						" /></value>
+            if(/imci/tmp/normalized/classification/dehydration = 'severe', 'severe dehydration',
+            if(/imci/tmp/normalized/classification/dehydration = 'some', 'some dehydration',
+            'no dehydration'))
+            " /></value>
           </text>
           <text id="p-classify-dysentery">
             <value form="short">Child should [output]</value>
@@ -1446,31 +1444,31 @@
           </text>
           <text id="p-dosing-cholera">
             <value form="short">[output]</value>
-            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/duration" /></value>
+            <value form="long">GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/duration)" /></value>
           </text>
           <text id="p-dosing-dysentery">
             <value form="short">[output]</value>
-            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/duration" /></value>
+            <value form="long">GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/duration)" /></value>
           </text>
           <text id="p-dosing-ear">
             <value form="short">[output]</value>
-            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/ear_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/ear_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/ear_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/ear_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/ear_antibiotic/duration" /></value>
+            <value form="long">GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/ear_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/duration)" /></value>
           </text>
           <text id="p-dosing-malaria-antibiotic">
             <value form="short">[output]</value>
-            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/duration" /></value>
+            <value form="long">GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/duration)" /></value>
           </text>
           <text id="p-dosing-malaria-quinine">
             <value form="short">[output]</value>
-            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/malaria_quinine/amount" /> of <output value="/imci/tmp/normalized/treatment/malaria_quinine/variant" /> <output value="/imci/tmp/normalized/treatment/malaria_quinine/drug" /> <output value="/imci/tmp/normalized/treatment/malaria_quinine/frequency" /> for <output value="/imci/tmp/normalized/treatment/malaria_quinine/duration" /></value>
+            <value form="long">GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/amount)" /> of <output value="/imci/tmp/normalized/treatment/malaria_quinine/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/duration)" /></value>
           </text>
           <text id="p-dosing-painkiller">
             <value form="short">[output]</value>
-            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/painkiller/amount" /> of <output value="/imci/tmp/normalized/treatment/painkiller/variant" /> <output value="/imci/tmp/normalized/treatment/painkiller/drug" /> <output value="/imci/tmp/normalized/treatment/painkiller/frequency" /></value>
+            <value form="long">GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/amount)" /> of <output value="/imci/tmp/normalized/treatment/painkiller/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/frequency)" /></value>
           </text>
           <text id="p-dosing-pneumonia">
             <value form="short">[output]</value>
-            <value form="long">GIVE: <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount" /> of <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/variant" /> <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/drug" /> <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/frequency" /> for <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/duration" /></value>
+            <value form="long">GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/duration)" /></value>
           </text>
           <text id="p-ear-discharge">
             <value form="short">Is there ear discharge?</value>
@@ -1648,9 +1646,111 @@
             <value form="short">Which form of quinine would...</value>
             <value form="long">Which form of quinine would you like to use for the severe malaria?</value>
           </text>
+          <text id="v-quarter-tab">
+            <value>quarter tablet</value>
+          </text>
+          <text id="v-half-tab">
+            <value>half tablet</value>
+          </text>
+          <text id="v-whole-tab">
+            <value>whole tablet</value>
+          </text>
+          <text id="v-2-tabs">
+            <value>two tablets</value>
+          </text>
+          <text id="v-2.5-tabs">
+            <value>2.5 tablets</value>
+          </text>
+          <text id="v-4-tabs">
+            <value>4 tablets</value>
+          </text>
+          <text id="v-1ml-inj">
+            <value>1mL injection</value>
+          </text>
+          <text id="v-2ml-inj">
+            <value>2mL injection</value>
+          </text>
+          <text id="v-1.0ml">
+            <value>1.0mL</value>
+          </text>
+          <text id="v-1.5ml">
+            <value>1.5mL</value>
+          </text>
+          <text id="v-2.0ml">
+            <value>2.0mL</value>
+          </text>
+          <text id="v-2.5ml">
+            <value>2.5mL</value>
+          </text>
+          <text id="v-3.0ml">
+            <value>3.0mL</value>
+          </text>
+          <text id="v-5ml">
+            <value>5mL</value>
+          </text>
+          <text id="v-10ml">
+            <value>10mL</value>
+          </text>
+          <text id="v-quinine-inj">
+            <value>QUININE INJECTION</value>
+          </text>
+          <text id="v-quinine">
+            <value>QUININE</value>
+          </text>
+          <text id="v-alu">
+            <value>ALU</value>
+          </text>
+          <text id="v-amoxycillin">
+            <value>AMOXYCILLIN</value>
+          </text>
+          <text id="v-cotrimoxazole">
+            <value>COTRIMOXAZOLE</value>
+          </text>
+          <text id="v-penicillin">
+            <value>PROCAINE PENICILLIN</value>
+          </text>
+          <text id="v-erythromycin">
+            <value>ERYTHROMYCIN</value>
+          </text>
+          <text id="v-nalidixic">
+            <value>NALIDIXIC ACID</value>
+          </text>
+          <text id="v-paracetamol">
+            <value>PARACETAMOL</value>
+          </text>
+          <text id="v-once-day">
+            <value>once a day</value>
+          </text>
+          <text id="v-twice-day">
+            <value>twice a day</value>
+          </text>
+          <text id="v-3-day">
+            <value>3 times a day</value>
+          </text>
+          <text id="v-4-day">
+            <value>4 times a day</value>
+          </text>
+          <text id="v-6-hrs">
+            <value>every 6 hrs as needed</value>
+          </text>
+          <text id="v-8-12-hrs">
+            <value>repeat after 8 hrs, then every 12 hrs</value>
+          </text>
+          <text id="v-1-week-max">
+            <value>no more than one week</value>
+          </text>
+          <text id="v-7-10-days">
+            <value>7-10 days</value>
+          </text>
+          <text id="v-3-days">
+            <value>3 days</value>
+          </text>
+          <text id="v-5-days">
+            <value>5 days</value>
+          </text>
         </translation>
       </itext>
-			
+      
     </model>
   </h:head>
 
