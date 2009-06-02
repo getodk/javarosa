@@ -1749,6 +1749,757 @@
             <value>5 days</value>
           </text>
         </translation>
+        <translation lang="Swahili">
+          <text id="c-100mg-tablet">
+            <value>sw: 100mg pediatric tablet</value>
+          </text>
+          <text id="c-120mg-tablet">
+            <value>sw: 120mg pediatric tablet</value>
+          </text>
+          <text id="c-125mg-syrup">
+            <value>sw: 125mg / 5mL syrup</value>
+          </text>
+          <text id="c-240mg-syrup">
+            <value>sw: 240mg / 5mL syrup</value>
+          </text>
+          <text id="c-250mg-tablet">
+            <value>sw: 250mg tablet</value>
+          </text>
+          <text id="c-480mg-tablet">
+            <value>sw: 480mg adult tablet</value>
+          </text>
+          <text id="c-500mg-tablet">
+            <value>sw: 500mg adult tablet</value>
+          </text>
+          <text id="c-acute-ear-infection">
+            <value>sw: Acute Ear Infection</value>
+          </text>
+          <text id="c-agree">
+            <value>sw: Agree</value>
+          </text>
+          <text id="c-amoxycillin">
+            <value>sw: Amoxycillin</value>
+          </text>
+          <text id="c-boy">
+            <value>sw: Boy</value>
+          </text>
+          <text id="c-breathing-rate-fast">
+            <value>sw: No, but breathing rate is fast</value>
+          </text>
+          <text id="c-breathing-rate-normal">
+            <value>sw: No, but breathing rate is normal</value>
+          </text>
+          <text id="c-breathing-rate-will-measure">
+            <value>sw: Yes, I will count number of breaths per minute</value>
+          </text>
+          <text id="c-cant-drink-breastfeed">
+            <value>sw: Unable to drink/breastfeed</value>
+          </text>
+          <text id="c-chronic-ear-problems">
+            <value>sw: Chronic Ear Problems</value>
+          </text>
+          <text id="c-convulsions">
+            <value>sw: Convulsions</value>
+          </text>
+          <text id="c-cotrimoxazole">
+            <value>sw: Cotrimoxazole</value>
+          </text>
+          <text id="c-cough-cold">
+            <value>sw: Cough with Cold</value>
+          </text>
+          <text id="c-cough-difficulty-breathing">
+            <value>sw: Cough or difficulty breathing</value>
+          </text>
+          <text id="c-cough-persistent-cold">
+            <value>sw: Cough with Persistent Cold</value>
+          </text>
+          <text id="c-cough-pneumonia">
+            <value>sw: Cough with Pneumonia</value>
+          </text>
+          <text id="c-cough-severe-pneumonia">
+            <value>sw: Cough with Severe Pneumonia</value>
+          </text>
+          <text id="c-diarrhea">
+            <value>sw: Diarrhea</value>
+          </text>
+          <text id="c-diarrhea-no-dehydr">
+            <value>sw: Diarrhea with no dehydration</value>
+          </text>
+          <text id="c-diarrhea-severe-dehydr">
+            <value>sw: Diarrhea with severe dehydration</value>
+          </text>
+          <text id="c-diarrhea-some-dehydr">
+            <value>sw: Diarrhea with some dehydration</value>
+          </text>
+          <text id="c-disagree">
+            <value>sw: Disagree</value>
+          </text>
+          <text id="c-drinking-eagerly">
+            <value>sw: Drinking eagerly; is thirsty</value>
+          </text>
+          <text id="c-drinking-not-eagerly">
+            <value>sw: Drinking, but not eagerly</value>
+          </text>
+          <text id="c-ear-mastoiditis">
+            <value>sw: Ear Mastoiditis</value>
+          </text>
+          <text id="c-ear-problem">
+            <value>sw: Ear problem</value>
+          </text>
+          <text id="c-erythromycin">
+            <value>sw: Erythromycin</value>
+          </text>
+          <text id="c-fever">
+            <value>sw: Fever</value>
+          </text>
+          <text id="c-fever-no-malaria">
+            <value>sw: Fever; Malaria unlikely</value>
+          </text>
+          <text id="c-first-visit">
+            <value>sw: First visit</value>
+          </text>
+          <text id="c-followup-visit">
+            <value>sw: Follow-up visit</value>
+          </text>
+          <text id="c-girl">
+            <value>sw: Girl</value>
+          </text>
+          <text id="c-head-fungus">
+            <value>sw: Child has head fungus</value>
+          </text>
+          <text id="c-lethargic-unconscious">
+            <value>sw: Lethargic/Unconscious</value>
+          </text>
+          <text id="c-malaria">
+            <value>sw: Malaria</value>
+          </text>
+          <text id="c-measles">
+            <value>sw: Measles</value>
+          </text>
+          <text id="c-measles-eye-mouth-complications">
+            <value>sw: Measles with Eye or Mouth Complications</value>
+          </text>
+          <text id="c-months">
+            <value>sw: Months</value>
+          </text>
+          <text id="c-nalidixic-acid">
+            <value>sw: Nalidixic Acid</value>
+          </text>
+          <text id="c-no">
+            <value>sw: No</value>
+          </text>
+          <text id="c-no-ear-problem">
+            <value>sw: No serious ear problem</value>
+          </text>
+          <text id="c-none">
+            <value>sw: None</value>
+          </text>
+          <text id="c-not-drinking">
+            <value>sw: Not able to drink or drinking poorly</value>
+          </text>
+          <text id="c-other-complaint">
+            <value>sw: Other complaint</value>
+          </text>
+          <text id="c-other-drug">
+            <value>sw: Other Drug</value>
+          </text>
+          <text id="c-other-none-of-the-above">
+            <value>sw: Other/None of the above</value>
+          </text>
+          <text id="c-other-painkiller">
+            <value>sw: Other Painkiller</value>
+          </text>
+          <text id="c-persistent-diarrhea-no-dehydr">
+            <value>sw: Persistent diarrhea with no dehydration</value>
+          </text>
+          <text id="c-procaine-penicillin">
+            <value>sw: Procaine Penicillin</value>
+          </text>
+          <text id="c-quinine-injection">
+            <value>sw: Quinine Injection</value>
+          </text>
+          <text id="c-quinine-tablet">
+            <value>sw: Quinine Tablet</value>
+          </text>
+          <text id="c-severe-febrile-disease">
+            <value>sw: Severe Febrile Disease</value>
+          </text>
+          <text id="c-severe-measles">
+            <value>sw: Severe Measles</value>
+          </text>
+          <text id="c-severe-persistent-diarrhea-severe-dehydr">
+            <value>sw: Severe persistent diarrhea with severe dehydration</value>
+          </text>
+          <text id="c-severe-persistent-diarrhea-some-dehydr">
+            <value>sw: Severe persistent diarrhea with some dehydration</value>
+          </text>
+          <text id="c-skin-back-immediately">
+            <value>sw: Skin goes back immediately</value>
+          </text>
+          <text id="c-skin-back-slowly">
+            <value>sw: Skin goes back slowly</value>
+          </text>
+          <text id="c-skin-back-very-slowly">
+            <value>sw: Skin goes back very slowly (more than 2 seconds)</value>
+          </text>
+          <text id="c-temperature-hot">
+            <value>sw: No, but child feels hot or has had fever</value>
+          </text>
+          <text id="c-temperature-normal">
+            <value>sw: No, but child feels normal</value>
+          </text>
+          <text id="c-temperature-will-measure">
+            <value>sw: Yes, I will use a thermometer</value>
+          </text>
+          <text id="c-thirty-days-over">
+            <value>sw: 30 days or more</value>
+          </text>
+          <text id="c-thirty-days-under">
+            <value>sw: Less than 30 days</value>
+          </text>
+          <text id="c-two-weeks-over">
+            <value>sw: Two weeks or more</value>
+          </text>
+          <text id="c-two-weeks-under">
+            <value>sw: Less than two weeks</value>
+          </text>
+          <text id="c-vomits-everything">
+            <value>sw: Vomits everything</value>
+          </text>
+          <text id="c-week-over">
+            <value>sw: A week or more</value>
+          </text>
+          <text id="c-week-under">
+            <value>sw: Less than a week</value>
+          </text>
+          <text id="c-years">
+            <value>sw: Years</value>
+          </text>
+          <text id="c-yes">
+            <value>sw: Yes</value>
+          </text>
+          <text id="m-add-foods-to-diet">
+            <value>sw: ADVISE: Add other foods/fluids to the child's diet</value>
+          </text>
+          <text id="m-all-done">
+            <value>sw: The protocol is complete. Thank you for using E-IMCI.</value>
+          </text>
+          <text id="m-antibiotic-already-cholera">
+            <value>sw: An antibiotic has already been given for <output value="'pneumonia'" />; there is no need to give an additional antibiotic for cholera</value>
+          </text>
+          <text id="m-antibiotic-already-dysentery">
+            <value>sw: An antibiotic has already been given for <output value="
+             if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+             if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+             '???'))
+            " />; there is no need to give an additional antibiotic for dysentery</value>
+          </text>
+          <text id="m-antibiotic-already-ear">
+            <value>sw: An antibiotic has already been given for <output value="
+            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+            if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
+            '???')))
+            " />; there is no need to give an additional antibiotic for the ear problem</value>
+          </text>
+          <text id="m-antibiotic-already-malaria">
+            <value>sw: An antibiotic has already been given for <output value="
+            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
+            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+            if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
+            if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'the ear problem',
+            '???'))))
+            " />; there is no need to give an additional antibiotic for the malaria</value>
+          </text>
+          <text id="m-apply-tetracycline-ointment">
+            <value>sw: DO: Apply tetracycline eye ointment</value>
+          </text>
+          <text id="m-choose-correct-dose">
+            <value>sw: DO: Give correct dose and tell observer</value>
+          </text>
+          <text id="m-choose-other-drug">
+            <value>sw: DO: Choose appropriate drug</value>
+          </text>
+          <text id="m-choose-other-painkiller">
+            <value>sw: DO: Choose appropriate painkiller</value>
+          </text>
+          <text id="m-complete-quickly-refer-urgently">
+            <value>sw: ALERT: This child has a serious problem. Complete assement quickly and refer urgently!</value>
+          </text>
+          <text id="m-disagree-classification-dysentery">
+            <value>sw: You have disagreed; new classification is 'Child should <output value="if(/imci/tmp/normalized/diagnosis/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery'</value>
+          </text>
+          <text id="m-ear-wick-instructions">
+            <value>sw: TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper  into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean one and repeat these steps until the ear is dry</value>
+          </text>
+          <text id="m-ensure-continues-feeding">
+            <value>sw: ADVISE: Ensure that the child continues to feed during illness</value>
+          </text>
+          <text id="m-followup-in-n-days">
+            <value>sw: Follow up in <output value="/imci/tmp/normalized/followup/time" /> days <output value="if(/imci/tmp/normalized/diagnosis/fever = 'malaria', 'if fever persists', if(/imci/tmp/normalized/followup/if_no_improvement, 'if no improvement', ''))" /></value>
+          </text>
+          <text id="m-give-fluid">
+            <value>sw: DO: Give the child fluid</value>
+          </text>
+          <text id="m-give-vitamin-a">
+            <value>sw: GIVE: Vitamin A</value>
+          </text>
+          <text id="m-no-cotrimoxazole">
+            <value>sw: SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</value>
+          </text>
+          <text id="m-no-followups">
+            <value>sw: SORRY: this system is not yet suitable for follow-up visits. Please use standard procedures.</value>
+          </text>
+          <text id="m-refer-urgently">
+            <value>sw: REFER: urgently to hospital! <output value="if(/imci/tmp/normalized/diagnosis/dehydration = 'severe', concat('Give frequent sips of ORS on the way.', if(/imci/tmp/normalized/age < 2.0, ' Tell mother to continue breastfeeding.', '')), '')" /></value>
+          </text>
+          <text id="m-return-immediately-if">
+            <value>sw: Tell mother to return immediately if child is not able to drink/breastfeed, becomes sicker, or <output value="if(/imci/tmp/normalized/has_fever, 'fever worsens', 'develops a fever')" /></value>
+          </text>
+          <text id="m-soothe-throat">
+            <value>sw: TREAT: Soothe throat and relieve cough with a safe remedy</value>
+          </text>
+          <text id="m-too-young">
+            <value>sw: SORRY: this system is not yet suitable for children under two months</value>
+          </text>
+          <text id="m-treat-low-blood-sugar">
+            <value>sw: DO: Treat from the IMCI chart to avoid low blood sugar</value>
+          </text>
+          <text id="m-treat-mouth-ulcers">
+            <value>sw: DO: Treat mouth ulcers with gentian violet</value>
+          </text>
+          <text id="m-treat-other-problems">
+            <value>sw: DO: Treat the child's other problems</value>
+          </text>
+          <text id="m-treat-persistent-diarrhea">
+            <value>sw: ADVISE: how to feed a child who has persistent diarrhea</value>
+          </text>
+          <text id="m-treat-rehydration">
+            <value>sw: TREAT: Re-hydration plan <output value="/imci/tmp/normalized/treatment/hydration_plan" /> from IMCI chart</value>
+          </text>
+          <text id="p-age">
+            <value form="short">sw: What is the child's age (in...</value>
+            <value form="long">sw: ASK: What is the child's age (in years or months)</value>
+          </text>
+          <text id="p-age-unit">
+            <value form="short">sw: Was the age in years or mon...</value>
+            <value form="long">sw: Was the age in years or months?</value>
+          </text>
+          <text id="p-blood-in-stool">
+            <value form="short">sw: Is there blood in the stool?</value>
+            <value form="long">sw: ASK: Is there blood in the stool?</value>
+          </text>
+          <text id="p-breathing-rate">
+            <value form="short">sw: Can you measure the breathi...</value>
+            <value form="long">sw: ASK: Can you measure the breathing rate?</value>
+          </text>
+          <text id="p-can-take-temperature">
+            <value form="short">sw: Can you take the child's te...</value>
+            <value form="long">sw: ASK: Can you take the child's temperature?</value>
+          </text>
+          <text id="p-chest-indrawing">
+            <value form="short">sw: Is the chest indrawing?</value>
+            <value form="long">sw: LOOK: Is the chest indrawing?</value>
+          </text>
+          <text id="p-childs-problems">
+            <value form="short">sw: Child's problems</value>
+            <value form="long">sw: ASK: Child's problems</value>
+          </text>
+          <text id="p-classify-acute-ear-infection">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for an acute ear infection</value>
+          </text>
+          <text id="p-classify-chronic-ear-problems">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for chronic ear problems</value>
+          </text>
+          <text id="p-classify-cold">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for cough or cold, but no pneumonia</value>
+          </text>
+          <text id="p-classify-diarrhea">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for <output value="
+            if(/imci/tmp/normalized/classification/diarrhea = 'severe-persistent', 'severe persistent diarrhea',
+            if(/imci/tmp/normalized/classification/diarrhea = 'persistent', 'persistent diarrhea',
+            'diarrhea'))
+            " /> with <output value="
+            if(/imci/tmp/normalized/classification/dehydration = 'severe', 'severe dehydration',
+            if(/imci/tmp/normalized/classification/dehydration = 'some', 'some dehydration',
+            'no dehydration'))
+            " /></value>
+          </text>
+          <text id="p-classify-dysentery">
+            <value form="short">sw: Child should [output]</value>
+            <value form="long">sw: CLASSIFY: Child should <output value="if(/imci/tmp/normalized/classification/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery</value>
+          </text>
+          <text id="p-classify-fever-no-malaria">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for fever, but malaria unlikely</value>
+          </text>
+          <text id="p-classify-malaria">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for malaria</value>
+          </text>
+          <text id="p-classify-mastoiditis">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for mastoiditis</value>
+          </text>
+          <text id="p-classify-no-ear-problem">
+            <value form="short">sw: Child has no serious ear pr...</value>
+            <value form="long">sw: CLASSIFY: Child has no serious ear problem</value>
+          </text>
+          <text id="p-classify-persistent-cold">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for persistent cough or cold, but no pneumonia</value>
+          </text>
+          <text id="p-classify-pneumonia">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for pneumonia</value>
+          </text>
+          <text id="p-classify-severe-febrile">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for severe febrile disease</value>
+          </text>
+          <text id="p-classify-severe-pneumonia">
+            <value form="short">sw: Child should be treated for...</value>
+            <value form="long">sw: CLASSIFY: Child should be treated for severe pneumonia or very severe disease</value>
+          </text>
+          <text id="p-cornea-clouding">
+            <value form="short">sw: Does child have clouding of...</value>
+            <value form="long">sw: EXAMINE: Does child have clouding of the cornea?</value>
+          </text>
+          <text id="p-cough-how-long">
+            <value form="short">sw: How long has child had coug...</value>
+            <value form="long">sw: ASK: How long has child had cough/difficulty breathing?</value>
+          </text>
+          <text id="p-danger-signs">
+            <value form="short">sw: Danger signs</value>
+            <value form="long">sw: ASK: Danger signs</value>
+          </text>
+          <text id="p-diarrhea-how-long">
+            <value form="short">sw: How long has the child had ...</value>
+            <value form="long">sw: ASK: How long has the child had diarrhea?</value>
+          </text>
+          <text id="p-did-feeding-change">
+            <value form="short">sw: Did feeding for the child c...</value>
+            <value form="long">sw: ASK: Did feeding for the child change during illness?</value>
+          </text>
+          <text id="p-disagree-classify">
+            <value form="short">sw: You have disagreed; select ...</value>
+            <value form="long">sw: PLEASE: You have disagreed; select the correct classification</value>
+          </text>
+          <text id="p-discharge-how-long">
+            <value form="short">sw: How long has there been dis...</value>
+            <value form="long">sw: ASK: How long has there been discharge?</value>
+          </text>
+          <text id="p-dosing-cholera">
+            <value form="short">sw: [output]</value>
+            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/duration)" /></value>
+          </text>
+          <text id="p-dosing-dysentery">
+            <value form="short">sw: [output]</value>
+            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/duration)" /></value>
+          </text>
+          <text id="p-dosing-ear">
+            <value form="short">sw: [output]</value>
+            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/ear_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/duration)" /></value>
+          </text>
+          <text id="p-dosing-malaria-antibiotic">
+            <value form="short">sw: [output]</value>
+            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/duration)" /></value>
+          </text>
+          <text id="p-dosing-malaria-quinine">
+            <value form="short">sw: [output]</value>
+            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/amount)" /> of <output value="/imci/tmp/normalized/treatment/malaria_quinine/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/duration)" /></value>
+          </text>
+          <text id="p-dosing-painkiller">
+            <value form="short">sw: [output]</value>
+            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/amount)" /> of <output value="/imci/tmp/normalized/treatment/painkiller/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/frequency)" /></value>
+          </text>
+          <text id="p-dosing-pneumonia">
+            <value form="short">sw: [output]</value>
+            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/duration)" /></value>
+          </text>
+          <text id="p-ear-discharge">
+            <value form="short">sw: Is there ear discharge?</value>
+            <value form="long">sw: ASK: Is there ear discharge?</value>
+          </text>
+          <text id="p-ear-pain">
+            <value form="short">sw: Is there ear pain?</value>
+            <value form="long">sw: ASK: Is there ear pain?</value>
+          </text>
+          <text id="p-ear-tenderness-swelling">
+            <value form="short">sw: Is there tenderness or swel...</value>
+            <value form="long">sw: FEEL: Is there tenderness or swelling behind the ear?</value>
+          </text>
+          <text id="p-explain-give-first-treatment">
+            <value form="short">sw: Explain how to give the tre...</value>
+            <value form="long">sw: DO: Explain how to give the treatment. Give the first treatment. Does the mother understand?</value>
+          </text>
+          <text id="p-fever-every-day">
+            <value form="short">sw: Has the fever been present ...</value>
+            <value form="long">sw: ASK: Has the fever been present every day?</value>
+          </text>
+          <text id="p-fever-how-long">
+            <value form="short">sw: How long has the child had ...</value>
+            <value form="long">sw: ASK: How long has the child had fever?</value>
+          </text>
+          <text id="p-has-cough-doublecheck">
+            <value form="short">sw: Just to check, does the chi...</value>
+            <value form="long">sw: ASK: Just to check, does the child have a cough?</value>
+          </text>
+          <text id="p-has-diarrhea-doublecheck">
+            <value form="short">sw: Just to check, does the chi...</value>
+            <value form="long">sw: ASK: Just to check, does the child have any diarrhea?</value>
+          </text>
+          <text id="p-has-ear-doublecheck">
+            <value form="short">sw: Just to check, does the chi...</value>
+            <value form="long">sw: ASK: Just to check, does the child have any ear problems?</value>
+          </text>
+          <text id="p-has-had-bad-reaction">
+            <value form="short">sw: Has child ever had a bad re...</value>
+            <value form="long">sw: ASK: Has child ever had a bad reaction to SP?</value>
+          </text>
+          <text id="p-has-other-classification">
+            <value form="short">sw: Does child have any other s...</value>
+            <value form="long">sw: Does child have any other severe classification?</value>
+          </text>
+          <text id="p-has-other-problems">
+            <value form="short">sw: Does the child have any oth...</value>
+            <value form="long">sw: ASK: Does the child have any other problems?</value>
+          </text>
+          <text id="p-how-drinking">
+            <value form="short">sw: How is the child drinking?</value>
+            <value form="long">sw: LOOK: How is the child drinking?</value>
+          </text>
+          <text id="p-is-breastfeeding">
+            <value form="short">sw: Is the child breastfeeding?</value>
+            <value form="long">sw: ASK: Is the child breastfeeding?</value>
+          </text>
+          <text id="p-measles-past-3-months">
+            <value form="short">sw: Has the child had measles w...</value>
+            <value form="long">sw: ASK: Has the child had measles within the last 3 months?</value>
+          </text>
+          <text id="p-measles-symptoms">
+            <value form="short">sw: Does the child have signs o...</value>
+            <value form="long">sw: EXAMINE: Does the child have signs of measles? (generalized rash and cough, runny nose, or red eyes)</value>
+          </text>
+          <text id="p-mouth-ulcers">
+            <value form="short">sw: Does the child have mouth u...</value>
+            <value form="long">sw: LOOK: Does the child have mouth ulcers?</value>
+          </text>
+          <text id="p-mouth-ulcers-severe">
+            <value form="short">sw: Are the mouth ulcers deep o...</value>
+            <value form="long">sw: LOOK: Are the mouth ulcers deep or extensive?</value>
+          </text>
+          <text id="p-not-imci-problem">
+            <value form="short">sw: this system only covers IMC...</value>
+            <value form="long">sw: SORRY: this system only covers IMCI. Select the complaint then treat normally</value>
+          </text>
+          <text id="p-pus-draining-from-eye">
+            <value form="short">sw: Is pus draining from the eye?</value>
+            <value form="long">sw: ASK: Is pus draining from the eye?</value>
+          </text>
+          <text id="p-pus-from-ear">
+            <value form="short">sw: Is pus draining from the ear?</value>
+            <value form="long">sw: LOOK: Is pus draining from the ear?</value>
+          </text>
+          <text id="p-restless-irritable">
+            <value form="short">sw: Is the child restless and i...</value>
+            <value form="long">sw: LOOK: Is the child restless and irritable?</value>
+          </text>
+          <text id="p-runny-nose">
+            <value form="short">sw: Does the child have a runny...</value>
+            <value form="long">sw: EXAMINE: Does the child have a runny nose?</value>
+          </text>
+          <text id="p-sex">
+            <value form="short">sw: What sex is the child?</value>
+            <value form="long">sw: ASK: What sex is the child?</value>
+          </text>
+          <text id="p-skin-pinch">
+            <value form="short">sw: Pinch the child's skin</value>
+            <value form="long">sw: LOOK: Pinch the child's skin</value>
+          </text>
+          <text id="p-stiff-neck">
+            <value form="short">sw: Does the child have a stiff...</value>
+            <value form="long">sw: LOOK: Does the child have a stiff neck?</value>
+          </text>
+          <text id="p-stridor">
+            <value form="short">sw: Is there stridor?</value>
+            <value form="long">sw: LISTEN: Is there stridor?</value>
+          </text>
+          <text id="p-sunken-eyes">
+            <value form="short">sw: Does the child have sunken ...</value>
+            <value form="long">sw: EXAMINE: Does the child have sunken eyes?</value>
+          </text>
+          <text id="p-take-breathing-rate">
+            <value form="short">sw: What is the breathing rate ...</value>
+            <value form="long">sw: DO: What is the breathing rate in breaths per minute?</value>
+          </text>
+          <text id="p-take-temperature">
+            <value form="short">sw: Take the child's temperatur...</value>
+            <value form="long">sw: DO: Take the child's temperature (&#xb0;C)</value>
+          </text>
+          <text id="p-takes-other-fluids">
+            <value form="short">sw: Does the child take other f...</value>
+            <value form="long">sw: ASK: Does the child take other food/fluids?</value>
+          </text>
+          <text id="p-too-heavy-continue">
+            <value form="short">sw: IMCI is meant for children ...</value>
+            <value form="long">sw: SORRY: IMCI is meant for children under 19 kgs. Correct dosings may not be available. Do you want to continue anyway?</value>
+          </text>
+          <text id="p-too-old-continue">
+            <value form="short">sw: IMCI is meant for children ...</value>
+            <value form="long">sw: SORRY: IMCI is meant for children 5-years-old or less. Do you want to continue anyway?</value>
+          </text>
+          <text id="p-visit-type">
+            <value form="short">sw: What kind of visit is this?</value>
+            <value form="long">sw: ASK: What kind of visit is this?</value>
+          </text>
+          <text id="p-weight">
+            <value form="short">sw: What is the child's weight ...</value>
+            <value form="long">sw: ASK: What is the child's weight in kg (skip if unknown)</value>
+          </text>
+          <text id="p-which-amoxycillin">
+            <value form="short">sw: Which amoxycillin form woul...</value>
+            <value form="long">sw: Which amoxycillin form would you like to use?</value>
+          </text>
+          <text id="p-which-cholera-antibiotic">
+            <value form="short">sw: Which antibiotic would you ...</value>
+            <value form="long">sw: Which antibiotic would you like to use for the cholera?</value>
+          </text>
+          <text id="p-which-cotrimoxazole">
+            <value form="short">sw: Which cotrimoxazole form wo...</value>
+            <value form="long">sw: Which cotrimoxazole form would you like to use?</value>
+          </text>
+          <text id="p-which-dysentery-antibiotic">
+            <value form="short">sw: Which antibiotic would you ...</value>
+            <value form="long">sw: Which antibiotic would you like to use for the dysentery?</value>
+          </text>
+          <text id="p-which-ear-antibiotic">
+            <value form="short">sw: Which antibiotic would you ...</value>
+            <value form="long">sw: Which antibiotic would you like to use for the ear problem?</value>
+          </text>
+          <text id="p-which-malaria-antibiotic">
+            <value form="short">sw: Which antibiotic would you ...</value>
+            <value form="long">sw: Which antibiotic would you like to use for the malaria?</value>
+          </text>
+          <text id="p-which-paracetamol">
+            <value form="short">sw: Which paracetamol form woul...</value>
+            <value form="long">sw: Which paracetamol form would you like to use?</value>
+          </text>
+          <text id="p-which-pneumonia-antibiotic">
+            <value form="short">sw: Which antibiotic would you ...</value>
+            <value form="long">sw: Which antibiotic would you like to use for the pneumonia?</value>
+          </text>
+          <text id="p-which-quinine">
+            <value form="short">sw: Which form of quinine would...</value>
+            <value form="long">sw: Which form of quinine would you like to use for the severe malaria?</value>
+          </text>
+          <text id="v-quarter-tab">
+            <value>sw: quarter tablet</value>
+          </text>
+          <text id="v-half-tab">
+            <value>sw: half tablet</value>
+          </text>
+          <text id="v-whole-tab">
+            <value>sw: whole tablet</value>
+          </text>
+          <text id="v-2-tabs">
+            <value>sw: two tablets</value>
+          </text>
+          <text id="v-2.5-tabs">
+            <value>sw: 2.5 tablets</value>
+          </text>
+          <text id="v-4-tabs">
+            <value>sw: 4 tablets</value>
+          </text>
+          <text id="v-1ml-inj">
+            <value>sw: 1mL injection</value>
+          </text>
+          <text id="v-2ml-inj">
+            <value>sw: 2mL injection</value>
+          </text>
+          <text id="v-1.0ml">
+            <value>sw: 1.0mL</value>
+          </text>
+          <text id="v-1.5ml">
+            <value>sw: 1.5mL</value>
+          </text>
+          <text id="v-2.0ml">
+            <value>sw: 2.0mL</value>
+          </text>
+          <text id="v-2.5ml">
+            <value>sw: 2.5mL</value>
+          </text>
+          <text id="v-3.0ml">
+            <value>sw: 3.0mL</value>
+          </text>
+          <text id="v-5ml">
+            <value>sw: 5mL</value>
+          </text>
+          <text id="v-10ml">
+            <value>sw: 10mL</value>
+          </text>
+          <text id="v-quinine-inj">
+            <value>sw: QUININE INJECTION</value>
+          </text>
+          <text id="v-quinine">
+            <value>sw: QUININE</value>
+          </text>
+          <text id="v-alu">
+            <value>sw: ALU</value>
+          </text>
+          <text id="v-amoxycillin">
+            <value>sw: AMOXYCILLIN</value>
+          </text>
+          <text id="v-cotrimoxazole">
+            <value>sw: COTRIMOXAZOLE</value>
+          </text>
+          <text id="v-penicillin">
+            <value>sw: PROCAINE PENICILLIN</value>
+          </text>
+          <text id="v-erythromycin">
+            <value>sw: ERYTHROMYCIN</value>
+          </text>
+          <text id="v-nalidixic">
+            <value>sw: NALIDIXIC ACID</value>
+          </text>
+          <text id="v-paracetamol">
+            <value>sw: PARACETAMOL</value>
+          </text>
+          <text id="v-once-day">
+            <value>sw: once a day</value>
+          </text>
+          <text id="v-twice-day">
+            <value>sw: twice a day</value>
+          </text>
+          <text id="v-3-day">
+            <value>sw: 3 times a day</value>
+          </text>
+          <text id="v-4-day">
+            <value>sw: 4 times a day</value>
+          </text>
+          <text id="v-6-hrs">
+            <value>sw: every 6 hrs as needed</value>
+          </text>
+          <text id="v-8-12-hrs">
+            <value>sw: repeat after 8 hrs, then every 12 hrs</value>
+          </text>
+          <text id="v-1-week-max">
+            <value>sw: no more than one week</value>
+          </text>
+          <text id="v-7-10-days">
+            <value>sw: 7-10 days</value>
+          </text>
+          <text id="v-3-days">
+            <value>sw: 3 days</value>
+          </text>
+          <text id="v-5-days">
+            <value>sw: 5 days</value>
+          </text>
+        </translation>
       </itext>
       
     </model>
