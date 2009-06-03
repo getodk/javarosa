@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -64,8 +65,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
-
-
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.xform.util.XFormUtils;
@@ -93,6 +92,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	private final String ORIGINAL_JAR_DIR = new String("original.jar.dir");
 	private final String OPEN_XML_WITH = new String("open.xml.with");
 	private final String OPEN_AT_END = new String("open.at.end");
+	private final String DEPLOY_JAR_PATH = new String("deploy.jar.path");
 	
 	private final String JAR_NAME = new String("JavaRosaFormTest.jar");
 	private final String JAD_NAME = new String("JavaRosaFormTest.jad");
@@ -110,6 +110,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	private String wtkPath = new String("C:\\WTK2.5.2\\");
 	private String origJarDir = new String(""); // set in constructor
 	private String newForm = new String("C:\\TEST\\b.xml");
+	private String deployJar = "";
 	private static String openXMLWith = new String("C:\\Program Files\\Internet Explorer\\iexplore.exe");
 	private static Boolean openAtEnd = new Boolean(true);
 	
@@ -127,6 +128,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	
 	private TextField wtkTF = null;
 	private TextField jarTF = null;
+	private TextField deployJarTF = null;
 	private TextField formTF = null;
 	private TextField viewerEXE = null;
 	
@@ -297,6 +299,26 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			this.testBtn.setEnabled(false);
 			tryForm();
 			this.testBtn.setEnabled(true);
+		} else if(cmd.equals("deploy")) {
+			// Clear the text area...
+			this.textarea.setText("");
+
+			if(!checkDeployJar() || !checkNewForm()) {
+				this.addToTextArea("ERROR: Please fix parameters on the settings screen!");
+				return;
+			}
+			
+			// Run validation
+			if(!validateFile()) {
+				this.addToTextArea("\n\nERROR: cannot deploy form to new jar unless it validates!");
+				return;
+			}
+			
+			// We have good params, so save them
+			this.writeProperties();
+			
+			// Now run!
+			deploy();
 		} else if(cmd.equals("jarfile")) {
 			// Create a file dialog box to prompt for a new file to display
 			FileDialog f = new FileDialog(this, "Choose Jar", FileDialog.LOAD);
@@ -324,6 +346,29 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			if(checkParams() )
 				updateStatus("All settings ok.");
 			
+		} else if (cmd.equals("selectdeployjar")) {
+			// Create a file dialog box to prompt for a new file to display
+			FileDialog f = new FileDialog(this, "Choose Jar", FileDialog.LOAD);
+
+			String dir = this.deployJarTF.getText();
+			if(dir.lastIndexOf("\\") != -1) {
+				dir = dir.substring(0,dir.lastIndexOf("\\"));
+			}
+			System.out.println("default dir: " + dir);
+			f.setDirectory(dir);
+			
+			// Display the dialog and wait for the user's response
+			f.setVisible(true);
+
+			if( f.getFile() == null)
+				return;
+			
+			this.deployJarTF.setText(f.getDirectory() + f.getFile());
+			
+			f.dispose(); // Get rid of the dialog box
+			if(checkParams() )
+				updateStatus("All settings ok.");
+
 		} else if(cmd.equals("form")){
 			// Create a file dialog box to prompt for a new file to display
 			FileDialog f = new FileDialog(this, "Open XForm", FileDialog.LOAD);
@@ -561,6 +606,28 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		gbc.fill = GridBagConstraints.NONE;
 		settings.add(b, gbc);
 		
+		//Deployment JAR
+		Label deploylabel = new Label("Chose the JAR to Deploy to:");
+		deploylabel.setAlignment(Label.LEFT);
+		gbc.gridx = 0;
+		gbc.gridwidth = 3;
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		settings.add(deploylabel, gbc);
+		
+		this.deployJarTF = new TextField(this.deployJar);
+		this.deployJarTF.addKeyListener(this);
+		gbc.gridx = 0;
+		gbc.gridwidth = 2;
+		settings.add(this.deployJarTF, gbc);
+		
+		Button deploySelect = new Button("Choose Jar...");
+		deploySelect.addActionListener(this);
+		deploySelect.setActionCommand("selectdeployjar");
+		gbc.gridx = 2;
+		gbc.weightx = 0;
+		gbc.fill = GridBagConstraints.NONE;
+		settings.add(deploySelect, gbc);
 		
 		// open at end?
 		l = new Label("Open viewer when emulator finishes?");
@@ -673,7 +740,6 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		Panel p = new Panel();
 		p.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 5));
 		
-		p.add(this.testBtn);
 		//this.add(p, "South");
 
 		// Create the buttons and arrange to handle button clicks
@@ -688,11 +754,173 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		// eval.setFont(font);
 //		p.add(openfile);
 		p.add(eval);
+		
+		p.add(this.testBtn);
+		
+		Button deploy = new Button("Deploy");
+		deploy.addActionListener(this);
+		deploy.setActionCommand("deploy");
+		p.add(deploy);
 
 		main.add(p, gbc);
 		textarea.setText("");
 
 		return main;
+	}
+	
+	private static String extractPath(String file) {
+		return file.substring(0,file.lastIndexOf("\\"));
+	}
+	
+	private void deploy(){
+		addToTextArea("\n\n==================================\nStarting deployment\n==================================\n");
+		updateStatus("Creating work directory");
+		addToTextArea("Creating work directory\n");
+		
+		// mkdir work, delete if exists
+		File workDir = new File(extractPath(deployJarTF.getText()) + "work");
+		if(workDir.exists()) {
+			deleteDirectory(workDir);
+		}
+		workDir.mkdirs();
+		
+		updateStatus("Unpacking original JAR");
+		addToTextArea("Unpacking original JAR...\n");
+		
+		// expand jar into work
+		if( !unjar(deployJarTF.getText(), workDir.getAbsolutePath()) )
+			return;
+		
+		updateStatus("Replacing file");
+		addToTextArea("Replacing file\n");
+		
+		File newForm = new File(this.newForm);
+		String filename = newForm.getName();
+		
+		// modify the file
+		File form = new File( workDir.getAbsolutePath() + File.separator + filename );
+
+		if(!form.exists()) {
+			System.err.println("Error!  Can't find form to replace in JAR file, please make sure you have the correct JAR");
+			addToTextArea("\nError!  Can't find form to replace in JAR file, please make sure you have the correct JAR\n");
+			
+			deleteDirectory(workDir);
+			return;
+		}
+		if(!newForm.exists()) {
+			System.err.println("No new form to copy");
+			deleteDirectory(workDir);
+			return;
+		}
+		form.delete();
+		
+		try {
+			byte []data = new byte[BUFFER];
+			form.createNewFile();
+			
+			FileInputStream in = new FileInputStream(newForm);
+			FileOutputStream out = new FileOutputStream(form);
+			
+			int count;
+			while((count = in.read(data, 0, 
+					BUFFER)) != -1) {
+				out.write(data, 0, count);
+			}
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		updateStatus("Repacking JAR");
+		addToTextArea("Repacking JAR...\n");
+
+		File jar = new File(deployJarTF.getText());
+		
+		// recompress into test/JavaRosaFormTest.jad
+		long size = jar(workDir.getAbsolutePath(), extractPath(deployJarTF.getText()), jar.getName());
+		
+		// delete work
+		deleteDirectory(workDir);
+		
+		// get the JAR size
+		String jarSize = new String("" + size);
+		
+		updateStatus("Writing Jad File");
+		addToTextArea("Writing Jad File...\n");
+		// make the jad file
+		String outJad = deployJarTF.getText().replaceAll(".jar", ".jad");
+		
+		try {
+			updateJad(outJad, jarSize);
+		} catch(FileNotFoundException e) {
+			String message = "Jad file could not be found! Make sure that the file " + outJad + " exists along with your Jar file!\n";
+			addToTextArea(message);
+			System.err.print(message);
+			return;
+		}
+		
+		// launch emulator
+		updateStatus("Form Deployed!");
+		addToTextArea("\n\n==================================\nForm Succesfully Deployed!\n==================================\n");
+	}
+	
+	private void updateJad(String path, String newSize) throws FileNotFoundException {
+		File jad = new File(path);
+		if(!jad.exists()) {
+			throw new FileNotFoundException();
+		}
+		
+		File newJad = new File(path + ".tmp");
+		BufferedWriter writer = null;
+		if (newJad.exists()) {
+			newJad.delete();
+		}
+		try {
+			newJad.createNewFile();
+			writer = new BufferedWriter(new FileWriter(newJad));
+		} catch (IOException e) {
+			throw new FileNotFoundException("Problem Creating new Jad file");
+		}
+
+		BufferedReader reader = new BufferedReader(new FileReader(path));
+		try {
+			
+		String line = null;
+		while((line = reader.readLine()) != null) {
+			if(line.indexOf("MIDlet-Jar-Size:") != -1) {
+				writer.write("MIDlet-Jar-Size: " + newSize + "\n");
+			} else {
+				writer.write(line + "\n");
+			}
+		}
+		
+		writer.flush();
+		writer.close();
+		reader.close();
+		
+		if(!newJad.renameTo(jad)) {
+			jad.delete();
+			if(!newJad.renameTo(jad)) {
+				throw new RuntimeException("Could not write new jad file");
+			}
+		}
+		
+		}
+		catch(IOException e) {
+			//I don't even know.
+			throw new RuntimeException("Problem writing jad", e);
+		} finally {
+			try {
+				writer.close();
+				reader.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("Problem closing the streams for the files. Seriously.", e);
+			}
+		}
 	}
 	
 	private void tryForm() {
@@ -821,6 +1049,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		p.setProperty(this.ORIGINAL_JAR_DIR, this.origJarDir);
 		p.setProperty(this.OPEN_XML_WITH, openXMLWith);
 		p.setProperty(this.OPEN_AT_END, openAtEnd.toString());
+		p.setProperty(this.DEPLOY_JAR_PATH, deployJarTF.getText());
 		
 		File f = new File(this.PROPERTIES_FILE);
 		try {
@@ -872,6 +1101,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		this.origJarDir = props.getProperty(this.ORIGINAL_JAR_DIR);
 		openXMLWith = props.getProperty(this.OPEN_XML_WITH);
 		openAtEnd = new Boolean(props.getProperty(this.OPEN_AT_END));
+		deployJar = props.getProperty(this.DEPLOY_JAR_PATH);
 	}
 	
 	private void emulate( String wtkPath, String jad) {
@@ -1042,6 +1272,15 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		File jar = new File(this.origJarDir + "/" + this.JAR_NAME);
 		if(!jar.exists() || jar.isDirectory()) {
 			reportError("Error: " + this.JAR_NAME + " not found in jar directory");
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean checkDeployJar() {
+		File jar = new File(this.deployJarTF.getText());
+		if(!jar.exists() || jar.isDirectory()) {
+			reportError("Error: no jar file to deploy to found at " + this.deployJarTF);
 			return false;
 		}
 		return true;
