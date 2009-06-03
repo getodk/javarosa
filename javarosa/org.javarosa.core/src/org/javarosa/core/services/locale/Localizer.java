@@ -342,8 +342,8 @@ public class Localizer implements Externalizable {
 	 * @throws UnregisteredLocaleException If locale is not defined.
 	 */
 	public boolean hasMapping (String locale, String textID) {
-		if (!locales.contains(locale)) {
-			throw new UnregisteredLocaleException("Attempted to access an undefined locale while checking for a mapping for  " + textID);
+		if (locale == null || !locales.contains(locale)) {
+			throw new UnregisteredLocaleException("Attempted to access an undefined locale (" + locale + ") while checking for a mapping for  " + textID);
 		}
 		Vector resources = (Vector)localeResources.get(locale);
 		for(Enumeration en = resources.elements(); en.hasMoreElements(); ) {
