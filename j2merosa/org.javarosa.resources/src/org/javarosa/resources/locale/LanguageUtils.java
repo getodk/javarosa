@@ -17,20 +17,26 @@ public class LanguageUtils {
 	 * Initializes the language for the application in three steps 
 	 * 
 	 *  1. If the language property exists, fetch it and set the current locale
-	 *  2. Otherwise, set the default language to the preprocessed value 
-	 *  "javarosa.locale.default" if that preprocessed value exists
+	 *  2. Otherwise, if the useProperty argument is true, set the default language 
+	 *  to the preprocessed value "javarosa.locale.default" if that preprocessed value exists
 	 *  3. If the value does not exist, use the provided string to set the
 	 *  application's default language
 	 *  
+	 * @param useProperty Whether to attempt to pull the default language property
 	 * @param fallbackDefaultLanguage The language used as a fallback if none
 	 * can be fetched from the preprocessed value
 	 */
-	public static void initializeLanguage(String fallbackDefaultLanguage) {
+	public static void initializeLanguage(boolean useProperty, String fallbackDefaultLanguage) {
+		if(useProperty) {
 		//#ifdef javarosa.locale.default:defined
 		//#= JavaRosaServiceProvider.instance().getLocaleManager().setLocale(PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, "${javarosa.locale.default}"));
 		//#else
 		JavaRosaServiceProvider.instance().getLocaleManager().setLocale(
 				PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, fallbackDefaultLanguage));
 		//#endif
+		} else {
+			JavaRosaServiceProvider.instance().getLocaleManager().setLocale(
+					PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, fallbackDefaultLanguage));
+		}
 	}
 }
