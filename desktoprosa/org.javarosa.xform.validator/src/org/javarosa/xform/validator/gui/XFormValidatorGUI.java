@@ -1087,7 +1087,8 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		p.setProperty(this.ORIGINAL_JAR_DIR, this.origJarDir);
 		p.setProperty(this.OPEN_XML_WITH, openXMLWith);
 		p.setProperty(this.OPEN_AT_END, openAtEnd.toString());
-		p.setProperty(this.DEPLOY_JAR_PATH, deployJarTF.getText());
+		String deploy =  deployJarTF == null? "" : deployJarTF.getText();
+		p.setProperty(this.DEPLOY_JAR_PATH, deploy);
 		
 		File f = new File(this.PROPERTIES_FILE);
 		try {
