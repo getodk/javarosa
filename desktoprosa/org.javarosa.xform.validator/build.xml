@@ -58,6 +58,7 @@ the License.
 			<fileset dir="${base.dir}/../org.javarosa.core/src/" />
 			<fileset dir="${base.dir}/../org.javarosa.core.model/src/"/>
 			<fileset dir="${base.dir}/../org.javarosa.xform/src/"/>
+			<fileset dir="${base.dir}/../org.javarosa.xform.schema/src/"/>
 		</copy>
 
 		<javac 
