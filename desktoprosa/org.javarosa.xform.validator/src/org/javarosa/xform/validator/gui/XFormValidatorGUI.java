@@ -67,6 +67,7 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.xform.schema.FormOverview;
 import org.javarosa.xform.util.XFormUtils;
 
 /*
@@ -299,6 +300,18 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			this.testBtn.setEnabled(false);
 			tryForm();
 			this.testBtn.setEnabled(true);
+		} else if(cmd.equals("summary")) {
+			// Clear the text area...
+			this.textarea.setText("");
+			
+			// Run validation
+			if(!validateFile()) {
+				this.addToTextArea("\n\nERROR: cannot launch emulator until file validates!");
+				return;
+			}
+			
+			summarize();
+			
 		} else if(cmd.equals("deploy")) {
 			// Clear the text area...
 			this.textarea.setText("");
@@ -755,6 +768,11 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 //		p.add(openfile);
 		p.add(eval);
 		
+		Button summary = new Button("Summarize");
+		summary.addActionListener(this);
+		summary.setActionCommand("summary");
+		p.add(summary);
+		
 		p.add(this.testBtn);
 		
 		Button deploy = new Button("Deploy");
@@ -770,6 +788,26 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	
 	private static String extractPath(String file) {
 		return file.substring(0,file.lastIndexOf("\\"));
+	}
+	
+	private void summarize() {
+		addToTextArea("\n\n==================================\nForm Summary\n==================================\n");
+		updateStatus("Creating Summary");
+		
+		FileInputStream in;
+		try {
+			in = new FileInputStream(newForm);
+			FormDef f = XFormUtils.getFormFromInputStream(in);
+			addToTextArea(FormOverview.overview(f));
+			addToTextArea("\n\n==================================\nForm Summary Complete\n==================================\n");
+			updateStatus("Summary Completed");
+		} catch (FileNotFoundException e) {
+			addToTextArea("ERROR! File Not Found Exception when attempting to load form " + newForm);
+			e.printStackTrace();
+			updateStatus("Error while loading form");
+		}
+		 
+		
 	}
 	
 	private void deploy(){
