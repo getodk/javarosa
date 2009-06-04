@@ -1228,103 +1228,131 @@
             <value>Yes</value>
           </text>
           <text id="m-add-foods-to-diet">
-            <value>ADVISE: Add other foods/fluids to the child's diet</value>
+            <value form="short">[message]</value>
+            <value form="long">ADVISE: Add other foods/fluids to the child's diet</value>
           </text>
           <text id="m-all-done">
-            <value>The protocol is complete. Thank you for using E-IMCI.</value>
+            <value form="short">[message]</value>
+            <value form="long">The protocol is complete. Thank you for using E-IMCI.</value>
           </text>
           <text id="m-antibiotic-already-cholera">
-            <value>An antibiotic has already been given for <output value="'pneumonia'" />; there is no need to give an additional antibiotic for cholera</value>
+            <value form="short">[message]</value>
+            <value form="long">An antibiotic has already been given for <output value="'pneumonia'" />; there is no need to give an additional antibiotic for the potential cholera</value>
           </text>
           <text id="m-antibiotic-already-dysentery">
-            <value>An antibiotic has already been given for <output value="
+            <value form="short">[message]</value>
+            <value form="long">An antibiotic has already been given for <output value="
              if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-             if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+             if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'the potential cholera',
              '???'))
             " />; there is no need to give an additional antibiotic for dysentery</value>
           </text>
           <text id="m-antibiotic-already-ear">
-            <value>An antibiotic has already been given for <output value="
+            <value form="short">[message]</value>
+            <value form="long">An antibiotic has already been given for <output value="
             if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'the potential cholera',
             if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
             '???')))
             " />; there is no need to give an additional antibiotic for the ear problem</value>
           </text>
           <text id="m-antibiotic-already-malaria">
-            <value>An antibiotic has already been given for <output value="
+            <value form="short">[message]</value>
+            <value form="long">An antibiotic has already been given for <output value="
             if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'the potential cholera',
             if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
             if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'the ear problem',
             '???'))))
             " />; there is no need to give an additional antibiotic for the malaria</value>
           </text>
           <text id="m-apply-tetracycline-ointment">
-            <value>DO: Apply tetracycline eye ointment</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Apply tetracycline eye ointment</value>
           </text>
           <text id="m-choose-correct-dose">
-            <value>DO: Give correct dose and tell observer</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Give correct dose and tell observer</value>
           </text>
           <text id="m-choose-other-drug">
-            <value>DO: Choose appropriate drug</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Choose appropriate drug</value>
           </text>
           <text id="m-choose-other-painkiller">
-            <value>DO: Choose appropriate painkiller</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Choose appropriate painkiller</value>
           </text>
           <text id="m-complete-quickly-refer-urgently">
-            <value>ALERT: This child has a serious problem. Complete assement quickly and refer urgently!</value>
+            <value form="short">[message]</value>
+            <value form="long">ALERT: This child has a serious problem. Complete assement quickly and refer urgently!</value>
           </text>
           <text id="m-disagree-classification-dysentery">
-            <value>You have disagreed; new classification is 'Child should <output value="if(/imci/tmp/normalized/diagnosis/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery'</value>
+            <value form="short">[message]</value>
+            <value form="long">You have disagreed; new classification is 'Child should <output value="if(/imci/tmp/normalized/diagnosis/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery'</value>
           </text>
           <text id="m-ear-wick-instructions">
-            <value>TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper  into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean one and repeat these steps until the ear is dry</value>
+            <value form="short">[message]</value>
+            <value form="long">TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper  into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean one and repeat these steps until the ear is dry</value>
           </text>
           <text id="m-ensure-continues-feeding">
-            <value>ADVISE: Ensure that the child continues to feed during illness</value>
+            <value form="short">[message]</value>
+            <value form="long">ADVISE: Ensure that the child continues to feed during illness</value>
           </text>
           <text id="m-followup-in-n-days">
-            <value>Follow up in <output value="/imci/tmp/normalized/followup/time" /> days <output value="if(/imci/tmp/normalized/diagnosis/fever = 'malaria', 'if fever persists', if(/imci/tmp/normalized/followup/if_no_improvement, 'if no improvement', ''))" /></value>
+            <value form="short">[message]</value>
+            <value form="long">Follow up in <output value="/imci/tmp/normalized/followup/time" /> days <output value="if(/imci/tmp/normalized/diagnosis/fever = 'malaria', 'if fever persists', if(/imci/tmp/normalized/followup/if_no_improvement, 'if no improvement', ''))" /></value>
           </text>
           <text id="m-give-fluid">
-            <value>DO: Give the child fluid</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Give the child fluid</value>
           </text>
           <text id="m-give-vitamin-a">
-            <value>GIVE: Vitamin A</value>
+            <value form="short">[message]</value>
+            <value form="long">GIVE: Vitamin A</value>
           </text>
           <text id="m-no-cotrimoxazole">
-            <value>SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</value>
+            <value form="short">[message]</value>
+            <value form="long">SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</value>
           </text>
           <text id="m-no-followups">
-            <value>SORRY: this system is not yet suitable for follow-up visits. Please use standard procedures.</value>
+            <value form="short">[message]</value>
+            <value form="long">SORRY: this system is not yet suitable for follow-up visits. Please use standard procedures.</value>
           </text>
           <text id="m-refer-urgently">
-            <value>REFER: urgently to hospital! <output value="if(/imci/tmp/normalized/diagnosis/dehydration = 'severe', concat('Give frequent sips of ORS on the way.', if(/imci/tmp/normalized/age < 2.0, ' Tell mother to continue breastfeeding.', '')), '')" /></value>
+            <value form="short">[message]</value>
+            <value form="long">REFER: urgently to hospital! <output value="if(/imci/tmp/normalized/diagnosis/dehydration = 'severe', concat('Give frequent sips of ORS on the way.', if(/imci/tmp/normalized/age < 2.0, ' Tell mother to continue breastfeeding.', '')), '')" /></value>
           </text>
           <text id="m-return-immediately-if">
-            <value>Tell mother to return immediately if child is not able to drink/breastfeed, becomes sicker, or <output value="if(/imci/tmp/normalized/has_fever, 'fever worsens', 'develops a fever')" /></value>
+            <value form="short">[message]</value>
+            <value form="long">Tell mother to return immediately if child is not able to drink/breastfeed, becomes sicker, or <output value="if(/imci/tmp/normalized/has_fever, 'fever worsens', 'develops a fever')" /></value>
           </text>
           <text id="m-soothe-throat">
-            <value>TREAT: Soothe throat and relieve cough with a safe remedy</value>
+            <value form="short">[message]</value>
+            <value form="long">TREAT: Soothe throat and relieve cough with a safe remedy</value>
           </text>
           <text id="m-too-young">
-            <value>SORRY: this system is not yet suitable for children under two months</value>
+            <value form="short">[message]</value>
+            <value form="long">SORRY: this system is not yet suitable for children under two months</value>
           </text>
           <text id="m-treat-low-blood-sugar">
-            <value>DO: Treat from the IMCI chart to avoid low blood sugar</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Treat from the IMCI chart to avoid low blood sugar</value>
           </text>
           <text id="m-treat-mouth-ulcers">
-            <value>DO: Treat mouth ulcers with gentian violet</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Treat mouth ulcers with gentian violet</value>
           </text>
           <text id="m-treat-other-problems">
-            <value>DO: Treat the child's other problems</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Treat the child's other problems</value>
           </text>
           <text id="m-treat-persistent-diarrhea">
-            <value>ADVISE: how to feed a child who has persistent diarrhea</value>
+            <value form="short">[message]</value>
+            <value form="long">ADVISE: how to feed a child who has persistent diarrhea</value>
           </text>
           <text id="m-treat-rehydration">
-            <value>TREAT: Re-hydration plan <output value="/imci/tmp/normalized/treatment/hydration_plan" /> from IMCI chart</value>
+            <value form="short">[message]</value>
+            <value form="long">TREAT: Re-hydration plan <output value="/imci/tmp/normalized/treatment/hydration_plan" /> from IMCI chart</value>
           </text>
           <text id="p-age">
             <value form="short">What is the child's age (in...</value>
@@ -1616,7 +1644,7 @@
           </text>
           <text id="p-which-cholera-antibiotic">
             <value form="short">Which antibiotic would you ...</value>
-            <value form="long">Which antibiotic would you like to use for the cholera?</value>
+            <value form="long">Which antibiotic would you like to use for the potential cholera?</value>
           </text>
           <text id="p-which-cotrimoxazole">
             <value form="short">Which cotrimoxazole form wo...</value>
@@ -1751,375 +1779,408 @@
         </translation>
         <translation lang="Swahili">
           <text id="c-100mg-tablet">
-            <value>sw: 100mg pediatric tablet</value>
+            <value>kidonge cha miligramu 100 cha watoto</value>
           </text>
           <text id="c-120mg-tablet">
-            <value>sw: 120mg pediatric tablet</value>
+            <value>kidonge cha miligramu 120 cha watoto</value>
           </text>
           <text id="c-125mg-syrup">
-            <value>sw: 125mg / 5mL syrup</value>
+            <value>mililita 5 ya dawa ya majimaji yenye miligramu 125 ya dawa</value>
           </text>
           <text id="c-240mg-syrup">
-            <value>sw: 240mg / 5mL syrup</value>
+            <value>mililita 5 ya dawa ya majimaji yenye miligramu 240 ya dawa</value>
           </text>
           <text id="c-250mg-tablet">
-            <value>sw: 250mg tablet</value>
+            <value>kidonge cha miligramu 250</value>
           </text>
           <text id="c-480mg-tablet">
-            <value>sw: 480mg adult tablet</value>
+            <value>kidonge cha miligramu 480 kwa ajili ya watu wazima</value>
           </text>
           <text id="c-500mg-tablet">
-            <value>sw: 500mg adult tablet</value>
+            <value>kidonge cha miligramu 500 kwa ajili ya watu wazima</value>
           </text>
           <text id="c-acute-ear-infection">
-            <value>sw: Acute Ear Infection</value>
+            <value>Uambukizo mkali wa sikio</value>
           </text>
           <text id="c-agree">
-            <value>sw: Agree</value>
+            <value>[NEEDTRANS] Agree</value>
           </text>
           <text id="c-amoxycillin">
-            <value>sw: Amoxycillin</value>
+            <value>Amoxycillin</value>
           </text>
           <text id="c-boy">
-            <value>sw: Boy</value>
+            <value>Mme</value>
           </text>
           <text id="c-breathing-rate-fast">
-            <value>sw: No, but breathing rate is fast</value>
+            <value>[NEEDTRANS] No, but breathing rate is fast</value>
           </text>
           <text id="c-breathing-rate-normal">
-            <value>sw: No, but breathing rate is normal</value>
+            <value>[NEEDTRANS] No, but breathing rate is normal</value>
           </text>
           <text id="c-breathing-rate-will-measure">
-            <value>sw: Yes, I will count number of breaths per minute</value>
+            <value>[NEEDTRANS] Yes, I will count number of breaths per minute</value>
           </text>
           <text id="c-cant-drink-breastfeed">
-            <value>sw: Unable to drink/breastfeed</value>
+            <value>hawezi kunywa au kunyonya</value>
           </text>
           <text id="c-chronic-ear-problems">
-            <value>sw: Chronic Ear Problems</value>
+            <value>uambukizo sugu wa sikio</value>
           </text>
           <text id="c-convulsions">
-            <value>sw: Convulsions</value>
+            <value>degedege</value>
           </text>
           <text id="c-cotrimoxazole">
-            <value>sw: Cotrimoxazole</value>
+            <value>Cotrimoxazole</value>
           </text>
           <text id="c-cough-cold">
-            <value>sw: Cough with Cold</value>
+            <value>Kikohozi na mafua</value>
           </text>
           <text id="c-cough-difficulty-breathing">
-            <value>sw: Cough or difficulty breathing</value>
+            <value>Kukohoa au kupumua kwa shida</value>
           </text>
           <text id="c-cough-persistent-cold">
-            <value>sw: Cough with Persistent Cold</value>
+            <value>Kikohozi na mafua sugu</value>
           </text>
           <text id="c-cough-pneumonia">
-            <value>sw: Cough with Pneumonia</value>
+            <value>kikohozi na nimonia</value>
           </text>
           <text id="c-cough-severe-pneumonia">
-            <value>sw: Cough with Severe Pneumonia</value>
+            <value>Kikohozi na Nimonia</value>
           </text>
           <text id="c-diarrhea">
-            <value>sw: Diarrhea</value>
+            <value>Kuharisha</value>
           </text>
           <text id="c-diarrhea-no-dehydr">
-            <value>sw: Diarrhea with no dehydration</value>
+            <value>Kuharisha bila ya upungufu wa maji na chumvi mwilini</value>
           </text>
           <text id="c-diarrhea-severe-dehydr">
-            <value>sw: Diarrhea with severe dehydration</value>
+            <value>[NEEDTRANS] Diarrhea with severe dehydration</value>
           </text>
           <text id="c-diarrhea-some-dehydr">
-            <value>sw: Diarrhea with some dehydration</value>
+            <value>[NEEDTRANS] Diarrhea with some dehydration</value>
           </text>
           <text id="c-disagree">
-            <value>sw: Disagree</value>
+            <value>[NEEDTRANS] Disagree</value>
           </text>
           <text id="c-drinking-eagerly">
-            <value>sw: Drinking eagerly; is thirsty</value>
+            <value>Mtoto anakunywa kwa shauku au ana kiu</value>
           </text>
           <text id="c-drinking-not-eagerly">
-            <value>sw: Drinking, but not eagerly</value>
+            <value>Anakunywa, lakini siyo kwa shauku</value>
           </text>
           <text id="c-ear-mastoiditis">
-            <value>sw: Ear Mastoiditis</value>
+            <value>Mastoiditis</value>
           </text>
           <text id="c-ear-problem">
-            <value>sw: Ear problem</value>
+            <value>Tatizo la sikio</value>
           </text>
           <text id="c-erythromycin">
-            <value>sw: Erythromycin</value>
+            <value>Erythromycin</value>
           </text>
           <text id="c-fever">
-            <value>sw: Fever</value>
+            <value>Homa</value>
           </text>
           <text id="c-fever-no-malaria">
-            <value>sw: Fever; Malaria unlikely</value>
+            <value>homa bila malaria</value>
           </text>
           <text id="c-first-visit">
-            <value>sw: First visit</value>
+            <value>Hudhurio la kwanza</value>
           </text>
           <text id="c-followup-visit">
-            <value>sw: Follow-up visit</value>
+            <value>Ni hudhurio la ufuatiliaji</value>
           </text>
           <text id="c-girl">
-            <value>sw: Girl</value>
+            <value>Mke</value>
           </text>
           <text id="c-head-fungus">
-            <value>sw: Child has head fungus</value>
+            <value>Je, mtoto ana ugonjwa wa ngozi kichwani?</value>
           </text>
           <text id="c-lethargic-unconscious">
-            <value>sw: Lethargic/Unconscious</value>
+            <value>Mtoto amelegea sana au kukosa fahamu</value>
           </text>
           <text id="c-malaria">
-            <value>sw: Malaria</value>
+            <value>Malaria</value>
           </text>
           <text id="c-measles">
-            <value>sw: Measles</value>
+            <value>Surua</value>
           </text>
           <text id="c-measles-eye-mouth-complications">
-            <value>sw: Measles with Eye or Mouth Complications</value>
+            <value>Surua pamoja na matatizo ya macho au ya midomo</value>
           </text>
           <text id="c-months">
-            <value>sw: Months</value>
+            <value>Miezi</value>
           </text>
           <text id="c-nalidixic-acid">
-            <value>sw: Nalidixic Acid</value>
+            <value>Nalidixic Acid</value>
           </text>
           <text id="c-no">
-            <value>sw: No</value>
+            <value>Hapana</value>
           </text>
           <text id="c-no-ear-problem">
-            <value>sw: No serious ear problem</value>
+            <value>Hakuna uambukizo wa sikio</value>
           </text>
           <text id="c-none">
-            <value>sw: None</value>
+            <value>[NEEDTRANS] None</value>
           </text>
           <text id="c-not-drinking">
-            <value>sw: Not able to drink or drinking poorly</value>
+            <value>Anashindwa kunywa au anakunywa kwa shida</value>
           </text>
           <text id="c-other-complaint">
-            <value>sw: Other complaint</value>
+            <value>Matatizo mengine</value>
           </text>
           <text id="c-other-drug">
-            <value>sw: Other Drug</value>
+            <value>Dawa nyingine</value>
           </text>
           <text id="c-other-none-of-the-above">
-            <value>sw: Other/None of the above</value>
+            <value>[NEEDTRANS] Other/None of the above</value>
           </text>
           <text id="c-other-painkiller">
-            <value>sw: Other Painkiller</value>
+            <value>[NEEDTRANS] Other Painkiller</value>
           </text>
           <text id="c-persistent-diarrhea-no-dehydr">
-            <value>sw: Persistent diarrhea with no dehydration</value>
+            <value>kuharisha sugu bila upungufu wa maji na chumvi mwilini</value>
           </text>
           <text id="c-procaine-penicillin">
-            <value>sw: Procaine Penicillin</value>
+            <value>Procaine Penicillin</value>
           </text>
           <text id="c-quinine-injection">
-            <value>sw: Quinine Injection</value>
+            <value>Quinini ya sindano</value>
           </text>
           <text id="c-quinine-tablet">
-            <value>sw: Quinine Tablet</value>
+            <value>Quinini ya kidonge</value>
           </text>
           <text id="c-severe-febrile-disease">
-            <value>sw: Severe Febrile Disease</value>
+            <value>ugonjwa mkali sana wa homa</value>
           </text>
           <text id="c-severe-measles">
-            <value>sw: Severe Measles</value>
+            <value>Surua kali</value>
           </text>
           <text id="c-severe-persistent-diarrhea-severe-dehydr">
-            <value>sw: Severe persistent diarrhea with severe dehydration</value>
+            <value>[NEEDTRANS] Severe persistent diarrhea with severe dehydration</value>
           </text>
           <text id="c-severe-persistent-diarrhea-some-dehydr">
-            <value>sw: Severe persistent diarrhea with some dehydration</value>
+            <value>[NEEDTRANS] Severe persistent diarrhea with some dehydration</value>
           </text>
           <text id="c-skin-back-immediately">
-            <value>sw: Skin goes back immediately</value>
+            <value>ngozi inarudi haraka</value>
           </text>
           <text id="c-skin-back-slowly">
-            <value>sw: Skin goes back slowly</value>
+            <value>ngozi inarudi pole pole</value>
           </text>
           <text id="c-skin-back-very-slowly">
-            <value>sw: Skin goes back very slowly (more than 2 seconds)</value>
+            <value>ngozi inarudi pole pole sana (kwa zaidi ya sekunde 2)</value>
           </text>
           <text id="c-temperature-hot">
-            <value>sw: No, but child feels hot or has had fever</value>
+            <value>Je, mtoto ana homa sasa au historia ya homa?</value>
           </text>
           <text id="c-temperature-normal">
-            <value>sw: No, but child feels normal</value>
+            <value>Mtoto hana homa, hana dalili yoyote ya homa</value>
           </text>
           <text id="c-temperature-will-measure">
-            <value>sw: Yes, I will use a thermometer</value>
+            <value>Nitatumia kipima joto</value>
           </text>
           <text id="c-thirty-days-over">
-            <value>sw: 30 days or more</value>
+            <value>siku 30 au zaidi</value>
           </text>
           <text id="c-thirty-days-under">
-            <value>sw: Less than 30 days</value>
+            <value>pungufu ya siku 30</value>
           </text>
           <text id="c-two-weeks-over">
-            <value>sw: Two weeks or more</value>
+            <value>wiki 2 au zaidi</value>
           </text>
           <text id="c-two-weeks-under">
-            <value>sw: Less than two weeks</value>
+            <value>pungufu ya wiki mbili</value>
           </text>
           <text id="c-vomits-everything">
-            <value>sw: Vomits everything</value>
+            <value>anatapika kila kitu</value>
           </text>
           <text id="c-week-over">
-            <value>sw: A week or more</value>
+            <value>wiki moja au zaidi</value>
           </text>
           <text id="c-week-under">
-            <value>sw: Less than a week</value>
+            <value>pungufu ya wiki moja</value>
           </text>
           <text id="c-years">
-            <value>sw: Years</value>
+            <value>Miaka</value>
           </text>
           <text id="c-yes">
-            <value>sw: Yes</value>
+            <value>Ndiyo</value>
           </text>
           <text id="m-add-foods-to-diet">
-            <value>sw: ADVISE: Add other foods/fluids to the child's diet</value>
+            <value form="short">[message]</value>
+            <value form="long">ADVISE: Ongeza vyakula na vinywaji vingine kwa mtoto</value>
           </text>
           <text id="m-all-done">
-            <value>sw: The protocol is complete. Thank you for using E-IMCI.</value>
+            <value form="short">[message]</value>
+            <value form="long">Tumeshamaliza. Asante sana</value>
           </text>
           <text id="m-antibiotic-already-cholera">
-            <value>sw: An antibiotic has already been given for <output value="'pneumonia'" />; there is no need to give an additional antibiotic for cholera</value>
+            <value form="short">[message]</value>
+            <value form="long">antibiotiki imekwisha kutolewa kwa ajili ya <output value="'kikohozi'" />. hamna haja ya kutoa antibiotiki kwa ajili ya kipindupindu</value>
           </text>
           <text id="m-antibiotic-already-dysentery">
-            <value>sw: An antibiotic has already been given for <output value="
-             if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-             if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
+            <value form="short">[message]</value>
+            <value form="long">antibiotiki imekwisha kutolewa kwa ajili ya <output value="
+             if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'kikohozi',
+             if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'kipindupindu',
              '???'))
-            " />; there is no need to give an additional antibiotic for dysentery</value>
+            " />. hamna haja ya kutoa antibiotiki kwa ajili ya kuharisha damu</value>
           </text>
           <text id="m-antibiotic-already-ear">
-            <value>sw: An antibiotic has already been given for <output value="
-            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
-            if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
+            <value form="short">[message]</value>
+            <value form="long">antibiotiki imekwisha kutolewa kwa ajili ya <output value="
+            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'kikohozi',
+            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'kipindupindu',
+            if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'kuharisha damu',
             '???')))
-            " />; there is no need to give an additional antibiotic for the ear problem</value>
+            " />. hamna haja ya kutoa antibiotiki kwa ajili ya tatizo la sikio</value>
           </text>
           <text id="m-antibiotic-already-malaria">
-            <value>sw: An antibiotic has already been given for <output value="
-            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'pneumonia',
-            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'cholera',
-            if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'dysentery',
-            if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'the ear problem',
+            <value form="short">[message]</value>
+            <value form="long">antibiotiki imekwisha kutolewa kwa ajili ya <output value="
+            if(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount != '', 'kikohozi',
+            if(/imci/tmp/normalized/treatment/cholera_antibiotic/amount != '', 'kipindupindu',
+            if(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount != '', 'kuharisha damu',
+            if(/imci/tmp/normalized/treatment/ear_antibiotic/amount != '', 'tatizo la sikio',
             '???'))))
-            " />; there is no need to give an additional antibiotic for the malaria</value>
+            " />. hamna haja ya kutoa antibiotiki kwa ajili ya the malaria kali</value>
           </text>
           <text id="m-apply-tetracycline-ointment">
-            <value>sw: DO: Apply tetracycline eye ointment</value>
+            <value form="short">[message]</value>
+            <value form="long">[NEEDTRANS] DO: Apply tetracycline eye ointment</value>
           </text>
           <text id="m-choose-correct-dose">
-            <value>sw: DO: Give correct dose and tell observer</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Toa kipimo sahihi cha dawa na mueleze mwangalizi.</value>
           </text>
           <text id="m-choose-other-drug">
-            <value>sw: DO: Choose appropriate drug</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: chagua antibiotic inayofaa kwa ajili ya mtoto</value>
           </text>
           <text id="m-choose-other-painkiller">
-            <value>sw: DO: Choose appropriate painkiller</value>
+            <value form="short">[message]</value>
+            <value form="long">[NEEDTRANS] DO: Choose appropriate painkiller</value>
           </text>
           <text id="m-complete-quickly-refer-urgently">
-            <value>sw: ALERT: This child has a serious problem. Complete assement quickly and refer urgently!</value>
+            <value form="short">[message]</value>
+            <value form="long">ALERT: Mtoto ana tatizo la hatari, mchunguze haraka kasha umpe rufaa</value>
           </text>
           <text id="m-disagree-classification-dysentery">
-            <value>sw: You have disagreed; new classification is 'Child should <output value="if(/imci/tmp/normalized/diagnosis/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery'</value>
+            <value form="short">[message]</value>
+            <value form="long">[NEEDTRANS] You have disagreed; new classification is 'Child should <output value="if(/imci/tmp/normalized/diagnosis/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery'</value>
           </text>
           <text id="m-ear-wick-instructions">
-            <value>sw: TREAT: Dry the ear at least 3 times daily; Roll clean absorbent cloth or soft, strong tissue paper  into a wick; Place the wick in the child's ear; Remove the wick when wet; Replace the wick with a clean one and repeat these steps until the ear is dry</value>
+            <value form="short">[message]</value>
+            <value form="long">TREAT: kausha sikio angalau mara 3 kwa siku: tengeneza utambi wa kusafishia sikio kwa kutumia kitambaa kisafi au karatasi laini: weka utambi kwenye sikio la mtoto: ondoa utambi ukishakuwa umelowa: weka utambi mwingine na endelea hivyo hadi sikio liwe kavu</value>
           </text>
           <text id="m-ensure-continues-feeding">
-            <value>sw: ADVISE: Ensure that the child continues to feed during illness</value>
+            <value form="short">[message]</value>
+            <value form="long">ADVISE: Hakikisha mtoto anaendelea kula wakati wa ugonjwa</value>
           </text>
           <text id="m-followup-in-n-days">
-            <value>sw: Follow up in <output value="/imci/tmp/normalized/followup/time" /> days <output value="if(/imci/tmp/normalized/diagnosis/fever = 'malaria', 'if fever persists', if(/imci/tmp/normalized/followup/if_no_improvement, 'if no improvement', ''))" /></value>
+            <value form="short">[message]</value>
+            <value form="long">ufuatiliaji <output value="if(/imci/tmp/normalized/diagnosis/fever = 'malaria' or /imci/tmp/normalized/followup/if_no_improvement, 'baada ya', 'kwa')" /> siku <output value="/imci/tmp/normalized/followup/time" /> <output value="if(/imci/tmp/normalized/diagnosis/fever = 'malaria', 'kama homa inaendelea', if(/imci/tmp/normalized/followup/if_no_improvement, 'endapo hamna nafuu', ''))" /></value>
           </text>
           <text id="m-give-fluid">
-            <value>sw: DO: Give the child fluid</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Mpe mtoto kitu cha kunywa</value>
           </text>
           <text id="m-give-vitamin-a">
-            <value>sw: GIVE: Vitamin A</value>
+            <value form="short">[message]</value>
+            <value form="long">Tao Vitamini A</value>
           </text>
           <text id="m-no-cotrimoxazole">
-            <value>sw: SORRY: Do not use Cotrimoxazole if child has had a bad reaction to SP</value>
+            <value form="short">[message]</value>
+            <value form="long">SORRY: usitoe cotrimoxazole kama kuna historia ya madhara kwa ajili ya SP</value>
           </text>
           <text id="m-no-followups">
-            <value>sw: SORRY: this system is not yet suitable for follow-up visits. Please use standard procedures.</value>
+            <value form="short">[message]</value>
+            <value form="long">SORRY: Samahani, mfumo huu hautumiki kwa ajili ya hudhurio la ufuatiliaji. Tafadhali tumia utaratibu wa matibabu wa kawaida</value>
           </text>
           <text id="m-refer-urgently">
-            <value>sw: REFER: urgently to hospital! <output value="if(/imci/tmp/normalized/diagnosis/dehydration = 'severe', concat('Give frequent sips of ORS on the way.', if(/imci/tmp/normalized/age < 2.0, ' Tell mother to continue breastfeeding.', '')), '')" /></value>
+            <value form="short">[message]</value>
+            <value form="long"><output value="
+              if(/imci/tmp/normalized/diagnosis/dehydration = 'severe', 
+                if(/imci/tmp/normalized/age < 2.0,
+                  'toa rufaa kwenda hospitali haraka. mtoto apewe ORS mara kwa mara njiani. mwambie mama aendelee kumnyonyesha mtoto',
+                  'Mpe rufaa haraka kwenda hspitali. Toa ORS ili mtoto anywe kidogo kidogo akiwa njiani.'),
+                'haraka kwenda hospitali')" /></value>
           </text>
           <text id="m-return-immediately-if">
-            <value>sw: Tell mother to return immediately if child is not able to drink/breastfeed, becomes sicker, or <output value="if(/imci/tmp/normalized/has_fever, 'fever worsens', 'develops a fever')" /></value>
+            <value form="short">[message]</value>
+            <value form="long">mshauri mama arudi haraka endapo mtoto anashindwa kunywa au kunyonya au anakuwa mgonjwa zaidi au <output value="if(/imci/tmp/normalized/has_fever, 'anapata homa', 'anapata homa')" /></value>
           </text>
           <text id="m-soothe-throat">
-            <value>sw: TREAT: Soothe throat and relieve cough with a safe remedy</value>
+            <value form="short">[message]</value>
+            <value form="long">TREAT: lainisha koo na tuliza kikohozi kwa kitulizo salama</value>
           </text>
           <text id="m-too-young">
-            <value>sw: SORRY: this system is not yet suitable for children under two months</value>
+            <value form="short">[message]</value>
+            <value form="long">SORRY: Samahani, mfumo huu hautumiki kwa watoto chini ya miezi miwili.</value>
           </text>
           <text id="m-treat-low-blood-sugar">
-            <value>sw: DO: Treat from the IMCI chart to avoid low blood sugar</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: mpe mtoto matibabu ili kuepuka kiwango kidogo cha sukari kwenye damu</value>
           </text>
           <text id="m-treat-mouth-ulcers">
-            <value>sw: DO: Treat mouth ulcers with gentian violet</value>
+            <value form="short">[message]</value>
+            <value form="long">[NEEDTRANS] DO: Treat mouth ulcers with gentian violet</value>
           </text>
           <text id="m-treat-other-problems">
-            <value>sw: DO: Treat the child's other problems</value>
+            <value form="short">[message]</value>
+            <value form="long">DO: Tibu matatizo mengine ya mtoto</value>
           </text>
           <text id="m-treat-persistent-diarrhea">
-            <value>sw: ADVISE: how to feed a child who has persistent diarrhea</value>
+            <value form="short">[message]</value>
+            <value form="long">ADVISE: ushauri kwa mama kuhusu lishe ya mtoto mwenye kuharisha sugu</value>
           </text>
           <text id="m-treat-rehydration">
-            <value>sw: TREAT: Re-hydration plan <output value="/imci/tmp/normalized/treatment/hydration_plan" /> from IMCI chart</value>
+            <value form="short">[message]</value>
+            <value form="long">TREAT: taratibu <output value="/imci/tmp/normalized/treatment/hydration_plan" /></value>
           </text>
           <text id="p-age">
-            <value form="short">sw: What is the child's age (in...</value>
-            <value form="long">sw: ASK: What is the child's age (in years or months)</value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] ASK: What is the child's age (in years or months)</value>
           </text>
           <text id="p-age-unit">
-            <value form="short">sw: Was the age in years or mon...</value>
-            <value form="long">sw: Was the age in years or months?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] Was the age in years or months?</value>
           </text>
           <text id="p-blood-in-stool">
-            <value form="short">sw: Is there blood in the stool?</value>
-            <value form="long">sw: ASK: Is there blood in the stool?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, kuna damu kwenye kinyesi?</value>
           </text>
           <text id="p-breathing-rate">
-            <value form="short">sw: Can you measure the breathi...</value>
-            <value form="long">sw: ASK: Can you measure the breathing rate?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] ASK: Can you measure the breathing rate?</value>
           </text>
           <text id="p-can-take-temperature">
-            <value form="short">sw: Can you take the child's te...</value>
-            <value form="long">sw: ASK: Can you take the child's temperature?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] ASK: Can you take the child's temperature?</value>
           </text>
           <text id="p-chest-indrawing">
-            <value form="short">sw: Is the chest indrawing?</value>
-            <value form="long">sw: LOOK: Is the chest indrawing?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">LOOK: Kifua kimebonyea?</value>
           </text>
           <text id="p-childs-problems">
-            <value form="short">sw: Child's problems</value>
-            <value form="long">sw: ASK: Child's problems</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Matatizo ya mtoto</value>
           </text>
           <text id="p-classify-acute-ear-infection">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for an acute ear infection</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto apatiwe matibabu kwa ajili ya uambukizo mkali wa sikio</value>
           </text>
           <text id="p-classify-chronic-ear-problems">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for chronic ear problems</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto apatiwe matibabu kwa ajili ya uambukizo mkali wa sikio</value>
           </text>
           <text id="p-classify-cold">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for cough or cold, but no pneumonia</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto apatiwe matibabu kwa ajili ya kikohozi au kifua, lakini hakuna nimonia</value>
           </text>
           <text id="p-classify-diarrhea">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for <output value="
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] CLASSIFY: Child should be treated for <output value="
             if(/imci/tmp/normalized/classification/diarrhea = 'severe-persistent', 'severe persistent diarrhea',
             if(/imci/tmp/normalized/classification/diarrhea = 'persistent', 'persistent diarrhea',
             'diarrhea'))
@@ -2130,374 +2191,374 @@
             " /></value>
           </text>
           <text id="p-classify-dysentery">
-            <value form="short">sw: Child should [output]</value>
-            <value form="long">sw: CLASSIFY: Child should <output value="if(/imci/tmp/normalized/classification/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery</value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] CLASSIFY: Child should <output value="if(/imci/tmp/normalized/classification/dysentery = 'yes', 'be treated', 'NOT be treated')" /> for dysentery</value>
           </text>
           <text id="p-classify-fever-no-malaria">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for fever, but malaria unlikely</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto apatiwe matibabu kwa ajili ya homa, lakini siyo malaria</value>
           </text>
           <text id="p-classify-malaria">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for malaria</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto apatiwe matibabu kwa ajili ya malaria</value>
           </text>
           <text id="p-classify-mastoiditis">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for mastoiditis</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto apatiwe matibabu kwa ajili ya maistoiditis</value>
           </text>
           <text id="p-classify-no-ear-problem">
-            <value form="short">sw: Child has no serious ear pr...</value>
-            <value form="long">sw: CLASSIFY: Child has no serious ear problem</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto hana matatizo makubwa ya sikio</value>
           </text>
           <text id="p-classify-persistent-cold">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for persistent cough or cold, but no pneumonia</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto apatiwe matibabu kwa ajili ya kikohozi cha kudumu au kifua, lakini hakuna nimonia</value>
           </text>
           <text id="p-classify-pneumonia">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for pneumonia</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto apatiwe matibabu ya nimonia</value>
           </text>
           <text id="p-classify-severe-febrile">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for severe febrile disease</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto apatiwe matibabu kwa ajili ya ugonjwa mkali sana wa homa</value>
           </text>
           <text id="p-classify-severe-pneumonia">
-            <value form="short">sw: Child should be treated for...</value>
-            <value form="long">sw: CLASSIFY: Child should be treated for severe pneumonia or very severe disease</value>
+            <value form="short">[prompt]</value>
+            <value form="long">CLASSIFY: mtoto apewe matibabu kwa ajili ya nimonia kali au ugonjwa mkali sana</value>
           </text>
           <text id="p-cornea-clouding">
-            <value form="short">sw: Does child have clouding of...</value>
-            <value form="long">sw: EXAMINE: Does child have clouding of the cornea?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">EXAMINE: je, mtoto ana ukungu kwenye macho?</value>
           </text>
           <text id="p-cough-how-long">
-            <value form="short">sw: How long has child had coug...</value>
-            <value form="long">sw: ASK: How long has child had cough/difficulty breathing?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Ni kwa muda wa siku ngapi mtot ana kikohozi au kupumua kwa shida?</value>
           </text>
           <text id="p-danger-signs">
-            <value form="short">sw: Danger signs</value>
-            <value form="long">sw: ASK: Danger signs</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Dalili za hatari</value>
           </text>
           <text id="p-diarrhea-how-long">
-            <value form="short">sw: How long has the child had ...</value>
-            <value form="long">sw: ASK: How long has the child had diarrhea?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, ni kwa muda gani mtoto amekuwa anaharisha?</value>
           </text>
           <text id="p-did-feeding-change">
-            <value form="short">sw: Did feeding for the child c...</value>
-            <value form="long">sw: ASK: Did feeding for the child change during illness?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, umebadili lishe ya mtoto wakati wa ugonjwa huu?</value>
           </text>
           <text id="p-disagree-classify">
-            <value form="short">sw: You have disagreed; select ...</value>
-            <value form="long">sw: PLEASE: You have disagreed; select the correct classification</value>
+            <value form="short">[prompt]</value>
+            <value form="long">PLEASE: Hukubaliani, tafadhali chagua ainisho sahihi.</value>
           </text>
           <text id="p-discharge-how-long">
-            <value form="short">sw: How long has there been dis...</value>
-            <value form="long">sw: ASK: How long has there been discharge?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: je, ni kwa muda gani anatokwa na usaha masikioni?</value>
           </text>
           <text id="p-dosing-cholera">
-            <value form="short">sw: [output]</value>
-            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/duration)" /></value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/cholera_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/cholera_antibiotic/duration)" /></value>
           </text>
           <text id="p-dosing-dysentery">
-            <value form="short">sw: [output]</value>
-            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/duration)" /></value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/dysentery_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/dysentery_antibiotic/duration)" /></value>
           </text>
           <text id="p-dosing-ear">
-            <value form="short">sw: [output]</value>
-            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/ear_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/duration)" /></value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/ear_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/ear_antibiotic/duration)" /></value>
           </text>
           <text id="p-dosing-malaria-antibiotic">
-            <value form="short">sw: [output]</value>
-            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/duration)" /></value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/malaria_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_antibiotic/duration)" /></value>
           </text>
           <text id="p-dosing-malaria-quinine">
-            <value form="short">sw: [output]</value>
-            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/amount)" /> of <output value="/imci/tmp/normalized/treatment/malaria_quinine/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/duration)" /></value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/amount)" /> of <output value="/imci/tmp/normalized/treatment/malaria_quinine/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/malaria_quinine/duration)" /></value>
           </text>
           <text id="p-dosing-painkiller">
-            <value form="short">sw: [output]</value>
-            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/amount)" /> of <output value="/imci/tmp/normalized/treatment/painkiller/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/frequency)" /></value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/amount)" /> of <output value="/imci/tmp/normalized/treatment/painkiller/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/painkiller/frequency)" /></value>
           </text>
           <text id="p-dosing-pneumonia">
-            <value form="short">sw: [output]</value>
-            <value form="long">sw: GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/duration)" /></value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] GIVE: <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/amount)" /> of <output value="/imci/tmp/normalized/treatment/pneumonia_antibiotic/variant" /> <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/drug)" /> <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/frequency)" /> for <output value="jr:itext(/imci/tmp/normalized/treatment/pneumonia_antibiotic/duration)" /></value>
           </text>
           <text id="p-ear-discharge">
-            <value form="short">sw: Is there ear discharge?</value>
-            <value form="long">sw: ASK: Is there ear discharge?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: je, anatoka usaha masikioni?</value>
           </text>
           <text id="p-ear-pain">
-            <value form="short">sw: Is there ear pain?</value>
-            <value form="long">sw: ASK: Is there ear pain?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: je, kuna maumivu ya sikio?</value>
           </text>
           <text id="p-ear-tenderness-swelling">
-            <value form="short">sw: Is there tenderness or swel...</value>
-            <value form="long">sw: FEEL: Is there tenderness or swelling behind the ear?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">FEEL: je, kuna uvimbe wenye maumivu nyuma ya sikio?</value>
           </text>
           <text id="p-explain-give-first-treatment">
-            <value form="short">sw: Explain how to give the tre...</value>
-            <value form="long">sw: DO: Explain how to give the treatment. Give the first treatment. Does the mother understand?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">DO: Mueleze mama/mlezi jinsi ya kutoa tiba. Toa tiba ya mwanzo. Muulize mama/mlezi kama ameelewa?</value>
           </text>
           <text id="p-fever-every-day">
-            <value form="short">sw: Has the fever been present ...</value>
-            <value form="long">sw: ASK: Has the fever been present every day?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, mtoto amekuwa na homa kila siku?</value>
           </text>
           <text id="p-fever-how-long">
-            <value form="short">sw: How long has the child had ...</value>
-            <value form="long">sw: ASK: How long has the child had fever?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, ni kwa muda wa siku ngapi mtoto amekuwa na homa?</value>
           </text>
           <text id="p-has-cough-doublecheck">
-            <value form="short">sw: Just to check, does the chi...</value>
-            <value form="long">sw: ASK: Just to check, does the child have a cough?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, mtoto ana kikohozi?</value>
           </text>
           <text id="p-has-diarrhea-doublecheck">
-            <value form="short">sw: Just to check, does the chi...</value>
-            <value form="long">sw: ASK: Just to check, does the child have any diarrhea?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, mtoto anaharisha?</value>
           </text>
           <text id="p-has-ear-doublecheck">
-            <value form="short">sw: Just to check, does the chi...</value>
-            <value form="long">sw: ASK: Just to check, does the child have any ear problems?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, mtoto ana tatizo la sikio?</value>
           </text>
           <text id="p-has-had-bad-reaction">
-            <value form="short">sw: Has child ever had a bad re...</value>
-            <value form="long">sw: ASK: Has child ever had a bad reaction to SP?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: je, mtoto amewahi kupata madhara mabaya ya SP?</value>
           </text>
           <text id="p-has-other-classification">
-            <value form="short">sw: Does child have any other s...</value>
-            <value form="long">sw: Does child have any other severe classification?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] Does child have any other severe classification?</value>
           </text>
           <text id="p-has-other-problems">
-            <value form="short">sw: Does the child have any oth...</value>
-            <value form="long">sw: ASK: Does the child have any other problems?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, mtoto ana matatizo mengine?</value>
           </text>
           <text id="p-how-drinking">
-            <value form="short">sw: How is the child drinking?</value>
-            <value form="long">sw: LOOK: How is the child drinking?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">LOOK: Je, mtoto anakunywaje?</value>
           </text>
           <text id="p-is-breastfeeding">
-            <value form="short">sw: Is the child breastfeeding?</value>
-            <value form="long">sw: ASK: Is the child breastfeeding?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, mtoto ananyonya?</value>
           </text>
           <text id="p-measles-past-3-months">
-            <value form="short">sw: Has the child had measles w...</value>
-            <value form="long">sw: ASK: Has the child had measles within the last 3 months?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, mtoto amekuwa na surua katika miezi mitatu iliyopita?</value>
           </text>
           <text id="p-measles-symptoms">
-            <value form="short">sw: Does the child have signs o...</value>
-            <value form="long">sw: EXAMINE: Does the child have signs of measles? (generalized rash and cough, runny nose, or red eyes)</value>
+            <value form="short">[prompt]</value>
+            <value form="long">EXAMINE: je, mtoto ana dalili za surua? (vipele mwili nzima na kikohozi, mafua au macho mekundu)</value>
           </text>
           <text id="p-mouth-ulcers">
-            <value form="short">sw: Does the child have mouth u...</value>
-            <value form="long">sw: LOOK: Does the child have mouth ulcers?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">LOOK: je, mtoto ana vidonda mdomoni?</value>
           </text>
           <text id="p-mouth-ulcers-severe">
-            <value form="short">sw: Are the mouth ulcers deep o...</value>
-            <value form="long">sw: LOOK: Are the mouth ulcers deep or extensive?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">LOOK: je, vidonda vimechimbika na kuenea sana?</value>
           </text>
           <text id="p-not-imci-problem">
-            <value form="short">sw: this system only covers IMC...</value>
-            <value form="long">sw: SORRY: this system only covers IMCI. Select the complaint then treat normally</value>
+            <value form="short">[prompt]</value>
+            <value form="long">SORRY: Samahani, mfumo huu unatumia IMCI tu. Tafadhali chagua tatizo la mtoto na utibu kawaida.</value>
           </text>
           <text id="p-pus-draining-from-eye">
-            <value form="short">sw: Is pus draining from the eye?</value>
-            <value form="long">sw: ASK: Is pus draining from the eye?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: je, macho yanatoa usaha?</value>
           </text>
           <text id="p-pus-from-ear">
-            <value form="short">sw: Is pus draining from the ear?</value>
-            <value form="long">sw: LOOK: Is pus draining from the ear?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">LOOK: je, usaha unatoka masikioni?</value>
           </text>
           <text id="p-restless-irritable">
-            <value form="short">sw: Is the child restless and i...</value>
-            <value form="long">sw: LOOK: Is the child restless and irritable?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">LOOK: Je, mtoto anahangaika na kulialia?</value>
           </text>
           <text id="p-runny-nose">
-            <value form="short">sw: Does the child have a runny...</value>
-            <value form="long">sw: EXAMINE: Does the child have a runny nose?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">EXAMINE: Je, mtoto ana mafua?</value>
           </text>
           <text id="p-sex">
-            <value form="short">sw: What sex is the child?</value>
-            <value form="long">sw: ASK: What sex is the child?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Mtoto ana jinsia gani?</value>
           </text>
           <text id="p-skin-pinch">
-            <value form="short">sw: Pinch the child's skin</value>
-            <value form="long">sw: LOOK: Pinch the child's skin</value>
+            <value form="short">[prompt]</value>
+            <value form="long">LOOK: tomasa ngozi ya mtoto</value>
           </text>
           <text id="p-stiff-neck">
-            <value form="short">sw: Does the child have a stiff...</value>
-            <value form="long">sw: LOOK: Does the child have a stiff neck?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">LOOK: Je, mtoto anakakamaa shingo?</value>
           </text>
           <text id="p-stridor">
-            <value form="short">sw: Is there stridor?</value>
-            <value form="long">sw: LISTEN: Is there stridor?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">LISTEN: Je, mtoto ana strido</value>
           </text>
           <text id="p-sunken-eyes">
-            <value form="short">sw: Does the child have sunken ...</value>
-            <value form="long">sw: EXAMINE: Does the child have sunken eyes?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">EXAMINE: Je, macho ya mtoto yameingia ndani?</value>
           </text>
           <text id="p-take-breathing-rate">
-            <value form="short">sw: What is the breathing rate ...</value>
-            <value form="long">sw: DO: What is the breathing rate in breaths per minute?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] DO: What is the breathing rate in breaths per minute?</value>
           </text>
           <text id="p-take-temperature">
-            <value form="short">sw: Take the child's temperatur...</value>
-            <value form="long">sw: DO: Take the child's temperature (&#xb0;C)</value>
+            <value form="short">[prompt]</value>
+            <value form="long">DO: Joto la mwili la mtoto ni kiasi gani? (&#xb0;C)</value>
           </text>
           <text id="p-takes-other-fluids">
-            <value form="short">sw: Does the child take other f...</value>
-            <value form="long">sw: ASK: Does the child take other food/fluids?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, mtoto anakula vyakula vingine?</value>
           </text>
           <text id="p-too-heavy-continue">
-            <value form="short">sw: IMCI is meant for children ...</value>
-            <value form="long">sw: SORRY: IMCI is meant for children under 19 kgs. Correct dosings may not be available. Do you want to continue anyway?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">SORRY: Pole sana! Matibabu ya magonjwa ya watoto unatumika kwa watoto wenye uzito wa kilogramu 19. Matibabu sahihi ya mtoto wako yanaweza yasiwepo. Je, ungependa kuendelea?</value>
           </text>
           <text id="p-too-old-continue">
-            <value form="short">sw: IMCI is meant for children ...</value>
-            <value form="long">sw: SORRY: IMCI is meant for children 5-years-old or less. Do you want to continue anyway?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">SORRY: Pole sana! Matibabu ya magonjwa ya watoto yanatumika kwa watoto wenye umri wa miaka mitano au pungufu. Je, ungependa kuendelea?</value>
           </text>
           <text id="p-visit-type">
-            <value form="short">sw: What kind of visit is this?</value>
-            <value form="long">sw: ASK: What kind of visit is this?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">ASK: Je, hili ni hudhurio la ufuatiliaji?</value>
           </text>
           <text id="p-weight">
-            <value form="short">sw: What is the child's weight ...</value>
-            <value form="long">sw: ASK: What is the child's weight in kg (skip if unknown)</value>
+            <value form="short">[prompt]</value>
+            <value form="long">[NEEDTRANS] ASK: What is the child's weight in kg (skip if unknown)</value>
           </text>
           <text id="p-which-amoxycillin">
-            <value form="short">sw: Which amoxycillin form woul...</value>
-            <value form="long">sw: Which amoxycillin form would you like to use?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">je, ni aina gani ya amoxycillin utatoa?</value>
           </text>
           <text id="p-which-cholera-antibiotic">
-            <value form="short">sw: Which antibiotic would you ...</value>
-            <value form="long">sw: Which antibiotic would you like to use for the cholera?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">je, ni antibiotiki gani utatumia kwa ajili ya kipindupindu</value>
           </text>
           <text id="p-which-cotrimoxazole">
-            <value form="short">sw: Which cotrimoxazole form wo...</value>
-            <value form="long">sw: Which cotrimoxazole form would you like to use?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">je, ni aina gani ya cotrimoxazole utatoa?</value>
           </text>
           <text id="p-which-dysentery-antibiotic">
-            <value form="short">sw: Which antibiotic would you ...</value>
-            <value form="long">sw: Which antibiotic would you like to use for the dysentery?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">je, ni antibiotiki gani ungependa kutumia kwa ajili ya kuharisha damu?</value>
           </text>
           <text id="p-which-ear-antibiotic">
-            <value form="short">sw: Which antibiotic would you ...</value>
-            <value form="long">sw: Which antibiotic would you like to use for the ear problem?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">je, ni antibiotiki gani ungependa kutumia kwa ajili ya tatizo la sikio?</value>
           </text>
           <text id="p-which-malaria-antibiotic">
-            <value form="short">sw: Which antibiotic would you ...</value>
-            <value form="long">sw: Which antibiotic would you like to use for the malaria?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">Je, ni antibiotiki gani ungependa kutumia kwa ajili ya malaria kali</value>
           </text>
           <text id="p-which-paracetamol">
-            <value form="short">sw: Which paracetamol form woul...</value>
-            <value form="long">sw: Which paracetamol form would you like to use?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">je, ni aina gani ya paracetamol unayopenda kutumia?</value>
           </text>
           <text id="p-which-pneumonia-antibiotic">
-            <value form="short">sw: Which antibiotic would you ...</value>
-            <value form="long">sw: Which antibiotic would you like to use for the pneumonia?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">je, ni antibiotic gani utatumia kwa ajili ya nimonia?</value>
           </text>
           <text id="p-which-quinine">
-            <value form="short">sw: Which form of quinine would...</value>
-            <value form="long">sw: Which form of quinine would you like to use for the severe malaria?</value>
+            <value form="short">[prompt]</value>
+            <value form="long">Je, ni aina gani ya Quinini utatumia kutibu Malaria kali?</value>
           </text>
           <text id="v-quarter-tab">
-            <value>sw: quarter tablet</value>
+            <value>[NEEDTRANS] quarter tablet</value>
           </text>
           <text id="v-half-tab">
-            <value>sw: half tablet</value>
+            <value>[NEEDTRANS] half tablet</value>
           </text>
           <text id="v-whole-tab">
-            <value>sw: whole tablet</value>
+            <value>[NEEDTRANS] whole tablet</value>
           </text>
           <text id="v-2-tabs">
-            <value>sw: two tablets</value>
+            <value>[NEEDTRANS] two tablets</value>
           </text>
           <text id="v-2.5-tabs">
-            <value>sw: 2.5 tablets</value>
+            <value>[NEEDTRANS] 2.5 tablets</value>
           </text>
           <text id="v-4-tabs">
-            <value>sw: 4 tablets</value>
+            <value>[NEEDTRANS] 4 tablets</value>
           </text>
           <text id="v-1ml-inj">
-            <value>sw: 1mL injection</value>
+            <value>[NEEDTRANS] 1mL injection</value>
           </text>
           <text id="v-2ml-inj">
-            <value>sw: 2mL injection</value>
+            <value>[NEEDTRANS] 2mL injection</value>
           </text>
           <text id="v-1.0ml">
-            <value>sw: 1.0mL</value>
+            <value>1.0mL</value>
           </text>
           <text id="v-1.5ml">
-            <value>sw: 1.5mL</value>
+            <value>1.5mL</value>
           </text>
           <text id="v-2.0ml">
-            <value>sw: 2.0mL</value>
+            <value>2.0mL</value>
           </text>
           <text id="v-2.5ml">
-            <value>sw: 2.5mL</value>
+            <value>2.5mL</value>
           </text>
           <text id="v-3.0ml">
-            <value>sw: 3.0mL</value>
+            <value>3.0mL</value>
           </text>
           <text id="v-5ml">
-            <value>sw: 5mL</value>
+            <value>5mL</value>
           </text>
           <text id="v-10ml">
-            <value>sw: 10mL</value>
+            <value>10mL</value>
           </text>
           <text id="v-quinine-inj">
-            <value>sw: QUININE INJECTION</value>
+            <value>QUININI YA SINDANO</value>
           </text>
           <text id="v-quinine">
-            <value>sw: QUININE</value>
+            <value>QUININI YA KIDONGE</value>
           </text>
           <text id="v-alu">
-            <value>sw: ALU</value>
+            <value>ALU</value>
           </text>
           <text id="v-amoxycillin">
-            <value>sw: AMOXYCILLIN</value>
+            <value>AMOXYCILLIN</value>
           </text>
           <text id="v-cotrimoxazole">
-            <value>sw: COTRIMOXAZOLE</value>
+            <value>COTRIMOXAZOLE</value>
           </text>
           <text id="v-penicillin">
-            <value>sw: PROCAINE PENICILLIN</value>
+            <value>PROCAINE PENICILLIN</value>
           </text>
           <text id="v-erythromycin">
-            <value>sw: ERYTHROMYCIN</value>
+            <value>ERYTHROMYCIN</value>
           </text>
           <text id="v-nalidixic">
-            <value>sw: NALIDIXIC ACID</value>
+            <value>NALIDIXIC ACID</value>
           </text>
           <text id="v-paracetamol">
-            <value>sw: PARACETAMOL</value>
+            <value>PARACETAMOL</value>
           </text>
           <text id="v-once-day">
-            <value>sw: once a day</value>
+            <value>[NEEDTRANS] once a day</value>
           </text>
           <text id="v-twice-day">
-            <value>sw: twice a day</value>
+            <value>[NEEDTRANS] twice a day</value>
           </text>
           <text id="v-3-day">
-            <value>sw: 3 times a day</value>
+            <value>[NEEDTRANS] 3 times a day</value>
           </text>
           <text id="v-4-day">
-            <value>sw: 4 times a day</value>
+            <value>[NEEDTRANS] 4 times a day</value>
           </text>
           <text id="v-6-hrs">
-            <value>sw: every 6 hrs as needed</value>
+            <value>[NEEDTRANS] every 6 hrs as needed</value>
           </text>
           <text id="v-8-12-hrs">
-            <value>sw: repeat after 8 hrs, then every 12 hrs</value>
+            <value>[NEEDTRANS] repeat after 8 hrs, then every 12 hrs</value>
           </text>
           <text id="v-1-week-max">
-            <value>sw: no more than one week</value>
+            <value>[NEEDTRANS] no more than one week</value>
           </text>
           <text id="v-7-10-days">
-            <value>sw: 7-10 days</value>
+            <value>[NEEDTRANS] 7-10 days</value>
           </text>
           <text id="v-3-days">
-            <value>sw: 3 days</value>
+            <value>siku 3</value>
           </text>
           <text id="v-5-days">
-            <value>sw: 5 days</value>
+            <value>siku 5</value>
           </text>
         </translation>
       </itext>
