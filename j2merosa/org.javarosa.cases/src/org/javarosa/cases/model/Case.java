@@ -234,6 +234,9 @@ public class Case implements Externalizable, IDRecordable, Restorable {
         	String name = child.getName();
         	int dataType = ((Integer)RestoreUtils.getValue("other/"+name+"/type", dm)).intValue();
         	String flatval = (String)RestoreUtils.getValue("other/"+ name+"/data", dm);
+        	if(flatval == null) {
+        		flatval = "";
+        	}
         	IAnswerData interpreted = XFormAnswerDataParser.getAnswerData(flatval, dataType);
         	if(interpreted != null) {
         		Object value = interpreted.getValue();
