@@ -107,16 +107,19 @@
 					<!-- none of the parameter names below can be the same, or else they will clobber previous parameters; hence the varied spacing -->
 					<parameter name="keep,allowshrinking" value="!abstract class org.javarosa.core.model.* implements org.javarosa.core.model.IFormElement" />
 					<parameter name="keep, allowshrinking" value="!abstract class org.javarosa.core.model.instance.* implements org.javarosa.core.model.IFormDataModel" />
-					<parameter name="keep ,allowshrinking" value="!abstract class org.javarosa.core.model.data.* implements org.javarosa.core.model.data.IAnswerData" />
-					<parameter name="keep,  allowshrinking" value="!abstract class org.javarosa.model.xform.* implements org.javarosa.core.model.IDataReference" />
-					<parameter name="keep , allowshrinking" value="!abstract class org.javarosa.xpath.* implements org.javarosa.core.model.condition.IConditionExpr" />
-					<parameter name="keep  ,allowshrinking" value="!abstract class org.javarosa.xpath.expr.* extends org.javarosa.xpath.expr.XPathExpression" />
-					<parameter name="keep,   allowshrinking" value="!abstract class org.javarosa.communication.http.* implements org.javarosa.core.services.transport.ITransportDestination"/>
-					<parameter name="keep  ,allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.transport.IDataPayload"/>
+					<parameter name="keep ,allowshrinking" value="!abstract class org.javarosa.core.model.instance.* extends org.javarosa.core.model.instance.TreeElement" />
+					<parameter name="keep,  allowshrinking" value="class org.javarosa.core.model.instance.TreeElement" /> <!-- needed to avoid preverify error -->
+					<parameter name="keep , allowshrinking" value="!abstract class org.javarosa.core.model.data.* implements org.javarosa.core.model.data.IAnswerData" />
+					<parameter name="keep  ,allowshrinking" value="!abstract class org.javarosa.model.xform.* implements org.javarosa.core.model.IDataReference" />
+					<parameter name="keep,   allowshrinking" value="!abstract class org.javarosa.xpath.* implements org.javarosa.core.model.condition.IConditionExpr" />
+					<parameter name="keep ,  allowshrinking" value="!abstract class org.javarosa.xpath.expr.* extends org.javarosa.xpath.expr.XPathExpression" />
+					<parameter name="keep     " value="!abstract class org.javarosa.** implements org.javarosa.core.services.transport.ITransportDestination"/>
+					<parameter name="keep  ,  allowshrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.transport.ITransportDestination"/>
+					<parameter name="keep " value="!abstract class org.javarosa.** implements org.javarosa.core.services.transport.IDataPayload"/>
 					<parameter name="keep,    allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.transport.IDataPayload"/>
 					<parameter name="keep  " value="!abstract class org.javarosa.** implements org.javarosa.core.data.IDataPointer"/>
 					<parameter name="keep,     allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.data.IDataPointer"/>
-					<parameter name="keep  ,   allowShrinking" value="class org.javarosa.model.GraphDataGroup"/>
+					<parameter name="keep    ,   allowshrinking" value="class org.javarosa.model.GraphDataGroup" />
 					<parameter name="keep   ,     allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.locale.LocaleDataSource"/>
 				</obfuscator>
 
