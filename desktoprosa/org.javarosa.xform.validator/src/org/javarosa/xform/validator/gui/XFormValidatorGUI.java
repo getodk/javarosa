@@ -1335,7 +1335,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	private boolean checkParams() {
 		// Make sure everything exists.
 		// Check WTK directory
-		return checkWTK() && checkOriginalJAR() && checkNewForm();
+		return checkNewForm() && checkWTK() && checkOriginalJAR();
 	}
 	
 	private boolean checkNewForm() {
@@ -1347,6 +1347,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		}
 		
 		//Update the Available Languages for Summary
+		System.out.println("about to update language");
 		updateLang();
 		return true;
 	}
