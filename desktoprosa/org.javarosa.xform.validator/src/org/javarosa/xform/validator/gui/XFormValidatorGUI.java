@@ -21,6 +21,7 @@ import java.awt.Button;
 import java.awt.CardLayout;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
+import java.awt.Choice;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
@@ -29,6 +30,7 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Panel;
 import java.awt.TextArea;
@@ -132,6 +134,8 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	private TextField deployJarTF = null;
 	private TextField formTF = null;
 	private TextField viewerEXE = null;
+	
+	private Choice languages = null;
 	
 	private BufferLogger bufferedlogger = new BufferLogger();
 	public static TextArea textarea = new TextArea("", 24, 80);
@@ -745,40 +749,55 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		gbc.anchor = GridBagConstraints.NORTHEAST;
 //		gbc.gridy = 7;
 		gbc.gridx = 0;
-		this.testBtn = new Button("Test Form");
-		this.testBtn.addActionListener(this);
-		this.testBtn.setActionCommand("test");
 
 		// Create a bottom panel to hold a couple of buttons in
 		Panel p = new Panel();
-		p.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+		//p.setLayout(new GridLayout(2,4));
+		p.setLayout(new FlowLayout(FlowLayout.LEADING, 10, 5));
 		
 		//this.add(p, "South");
 
-		// Create the buttons and arrange to handle button clicks
-		// Font font = new Font("SansSerif", Font.BOLD, 14);
-//		Button openfile = new Button("Open File");
 		Button eval = new Button("Validate");
-//		openfile.addActionListener(this);
-//		openfile.setActionCommand("open");
-		// openfile.setFont(font);
 		eval.addActionListener(this);
 		eval.setActionCommand("eval");
-		// eval.setFont(font);
-//		p.add(openfile);
-		p.add(eval);
+		
+		Panel validatePanel = new Panel();
+		validatePanel.setLayout(new GridLayout(2,1));
+		validatePanel.add(eval);
+		
+		p.add(validatePanel);
+		
+		Panel summaryPanel = new Panel();
+		summaryPanel.setLayout(new GridLayout(2,1));
 		
 		Button summary = new Button("Summarize");
 		summary.addActionListener(this);
 		summary.setActionCommand("summary");
-		p.add(summary);
+		summaryPanel.add(summary);
 		
-		p.add(this.testBtn);
+		languages = new Choice();
+		languages.add("Language");
+		summaryPanel.add(languages);
+		
+		p.add(summaryPanel);
+		
+		this.testBtn = new Button("Test Form");
+		this.testBtn.addActionListener(this);
+		this.testBtn.setActionCommand("test");
+		
+		Panel testPanel = new Panel();
+		testPanel.setLayout(new GridLayout(2,1));
+		testPanel.add(testBtn);
+		p.add(testPanel);
 		
 		Button deploy = new Button("Deploy");
 		deploy.addActionListener(this);
 		deploy.setActionCommand("deploy");
-		p.add(deploy);
+		
+		Panel deployPanel = new Panel();
+		deployPanel.setLayout(new GridLayout(2,1));
+		deployPanel.add(deploy);
+		p.add(deployPanel);
 
 		main.add(p, gbc);
 		textarea.setText("");
@@ -798,7 +817,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		try {
 			in = new FileInputStream(newForm);
 			FormDef f = XFormUtils.getFormFromInputStream(in);
-			addToTextArea(FormOverview.overview(f));
+			addToTextArea(FormOverview.overview(f, this.languages.getSelectedItem()));
 			addToTextArea("\n\n==================================\nForm Summary Complete\n==================================\n");
 			updateStatus("Summary Completed");
 		} catch (FileNotFoundException e) {
@@ -1291,6 +1310,28 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		return true;
 	}
 	
+	private void updateLang() {
+		try {
+			languages.removeAll();
+			FileInputStream in = new FileInputStream(newForm);
+			FormDef f = XFormUtils.getFormFromInputStream(in);
+			if (f.getLocalizer() != null) {
+				String[] locales = f.getLocalizer().getAvailableLocales();
+				for (int i = 0; i < locales.length; ++i) {
+					languages.add(locales[i]);
+				}
+				languages.select(f.getLocalizer().getDefaultLocale());
+				languages.setVisible(true);
+			} else {
+				languages.setVisible(false);
+			}
+		} catch (Exception e) {
+			//All failures here should just get swallowed, this is tertiary functionality
+			e.printStackTrace();
+			languages.setVisible(false);
+		}
+	}
+	
 	private boolean checkParams() {
 		// Make sure everything exists.
 		// Check WTK directory
@@ -1304,6 +1345,9 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 			addToTextArea("Error! File \"" + this.newForm + "\" does not exist.  Please choose a new file.\n" );
 			return false;
 		}
+		
+		//Update the Available Languages for Summary
+		updateLang();
 		return true;
 	}
 	
