@@ -22,6 +22,10 @@ import org.javarosa.xpath.XPathConditional;
 
 public class FormOverview {
 	public static String overview (FormDef f) {
+		return overview(f, null);
+	}
+	
+	public static String overview (FormDef f, String locale) {
 		StringBuffer sb = new StringBuffer();
 				
 		println(sb, 0, "Form Name: " + f.getName());
@@ -37,7 +41,11 @@ public class FormOverview {
 				println(sb, 1, langs[i] + (langs[i].equals(l.getDefaultLocale()) ? " (default)" : ""));
 			}
 			
-			f.getLocalizer().setToDefault();
+			if(locale == null || !l.hasLocale(locale)) {
+				f.getLocalizer().setToDefault();
+			} else {
+				f.getLocalizer().setLocale(locale);
+			}
 		} else {
 			println(sb, 0, "Available Languages: 1 (no multi-lingual content)");
 		}
