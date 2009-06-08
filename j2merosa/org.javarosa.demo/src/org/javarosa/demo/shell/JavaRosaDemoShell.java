@@ -63,8 +63,6 @@ import org.javarosa.user.activity.LoginActivity;
 import org.javarosa.user.model.User;
 import org.javarosa.xform.util.XFormUtils;
 
-import de.enough.polish.util.Locale;
-
 /**
  * This is the shell for the JavaRosa demo that handles switching all of the
  * views

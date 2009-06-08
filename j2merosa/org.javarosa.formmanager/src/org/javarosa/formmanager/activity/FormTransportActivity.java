@@ -1,6 +1,5 @@
 package org.javarosa.formmanager.activity;
 
-import java.io.IOException;
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.Alert;
