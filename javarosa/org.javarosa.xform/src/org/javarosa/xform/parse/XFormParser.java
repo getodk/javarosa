@@ -373,11 +373,15 @@ public class XFormParser {
 			question.setControlType(Constants.CONTROL_IMAGE_CHOOSE);
 		}
 		else if("audio/*".equals(mediaType))
-		{			 
-			question.setControlType(Constants.CONTROL_AUDIO_CAPTURE);
-		}
-		return question;
-	}
+		{
+            question.setControlType(Constants.CONTROL_AUDIO_CAPTURE);
+        } 
+		else if ("video/*".equals(mediaType)) 
+		{
+            question.setControlType(Constants.CONTROL_VIDEO_CAPTURE);
+        }
+        return question;
+    }
 	
 	protected static QuestionDef parseControl (IFormElement parent, Element e, FormDef f, int controlType) {
 		QuestionDef question = new QuestionDef();

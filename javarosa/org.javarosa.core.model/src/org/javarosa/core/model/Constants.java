@@ -76,6 +76,7 @@ public class Constants {
 	public static final int CONTROL_IMAGE_CHOOSE = 10;
 	public static final int CONTROL_LABEL = 11;
 	public static final int CONTROL_AUDIO_CAPTURE = 12;
+	public static final int CONTROL_VIDEO_CAPTURE = 13;
 	
 	/** constants for xform tags */ 
 	public static final String XFTAG_UPLOAD = "upload";
