@@ -9,7 +9,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.AlertType;
-import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;

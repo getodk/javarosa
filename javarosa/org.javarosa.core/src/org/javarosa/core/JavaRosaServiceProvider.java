@@ -19,7 +19,6 @@ package org.javarosa.core;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.javarosa.core.api.Constants;
@@ -39,6 +38,7 @@ import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.transport.storage.RmsStorage;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.PrefixTree;
+import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.CannotCreateObjectException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
