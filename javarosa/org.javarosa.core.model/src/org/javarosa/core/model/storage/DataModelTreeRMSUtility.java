@@ -271,12 +271,14 @@ public class DataModelTreeRMSUtility extends RMSUtility {
 				DataModelTreeMetaData meta = null;
 				try {
 					meta = getMetaDataFromId(instances.nextRecordId());
-				} catch (RecordStorageException e) {
+
+					//Jun 9, 2009 - Moved this inside the loop so that we don't null-pointer exception
+					// on the meta calls.
+					if ((now.getTime() - meta.getDateSaved().getTime()) > ageThreshold * 86400000l)
+						deletables.addElement(new Integer(meta.getRecordId()));
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
-				if ((now.getTime() - meta.getDateSaved().getTime()) > ageThreshold * 86400000l)
-					deletables.addElement(new Integer(meta.getRecordId()));
 			}
 
 			//should really sort by date here so that the oldest get deleted first, but god, what a p.i.t.a.
