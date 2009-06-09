@@ -15,6 +15,7 @@ public class FileTransportModule implements IModule {
 		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new FileConnectionTransportMethod());
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FileTransportProperties());
+		JavaRosaServiceProvider.instance().getTransportManager().setCurrentTransportMethod(FileConnectionTransportMethod.FILE);
 	}
 
 }
