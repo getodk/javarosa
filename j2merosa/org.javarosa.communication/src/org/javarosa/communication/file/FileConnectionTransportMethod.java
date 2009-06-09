@@ -2,6 +2,7 @@ package org.javarosa.communication.file;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
@@ -67,10 +68,11 @@ public class FileConnectionTransportMethod implements TransportMethod {
 		 */
 		public void run() {
 			// TODO: why this=?
-			for (Enumeration en = FileSystemRegistry.listRoots(); en
+			/*for (Enumeration en = FileSystemRegistry.listRoots(); en
 					.hasMoreElements();) {
 				en.nextElement();
-			}
+			}*/
+			
 			FileTransportDestination destination = (FileTransportDestination)message.getDestination();
 			FileConnection fcon = null;
 			try {
@@ -79,7 +81,17 @@ public class FileConnectionTransportMethod implements TransportMethod {
 					fcon.create();
 				}
 				OutputStream out = fcon.openOutputStream();
-				out.write(ExtUtil.serialize(message));
+				
+				InputStream valueStream = message.getPayloadData().getPayloadStream();
+				int val = valueStream.read();
+				while(val != -1) {
+					out.write(val);
+					val = valueStream.read();
+				}
+				
+				//This is not legit. 
+				//out.write(ExtUtil.serialize(message));
+				
 				//update status
 				message.setStatus(TransportMessage.STATUS_DELIVERED);
 				message.setChanged();
