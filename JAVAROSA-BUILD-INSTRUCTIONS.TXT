@@ -1,2 +1,0 @@
-Instructions for getting started building the J2ME JavaRosa Client can be found at
-http://code.javarosa.org/wiki/GettingStarted
