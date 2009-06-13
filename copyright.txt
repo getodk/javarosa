@@ -1,0 +1,47 @@
+JavaRosa
+Copyright (C) 1999-2009 by the following:
+
+# Contributing Organizations
+Cell-Life (http://cell-life.org)
+Dimagi (http://dimagi.com)
+
+# Contributing Individuals
+Yaw Anokwa (University of Washington, Google)
+Brian DeRenzi (University of Washington)
+Mark Gerard (Makerere University, Business Objects)
+Carl Hartung (University of Washington, Google)
+Jonathan Jackson (Dimagi)
+Daniel Kayiwa (Makerere University)
+Melissa Loudon (University of Cape Town)
+Rowena Luk (Dimagi)
+Geoffrey Mimano (DataDyne)
+Alfred Mukudu (Cell-Life)
+Daniel Myung (Dimagi)
+Matthais Nuessler (Cell-Life)
+Ndubisi Onuora (Massachusetts Institute of Technology)
+Munier Parker (Cell-Life)
+Drew Roos (Dimagi)
+Thomas Routen (Things Prime)
+Clayton Sims (Dimagi)
+Kieran Sharpey-Schafer (Cell-Life)
+Thomas Smyth (Georgia Institute of Technology)
+Cory Zue (Dimagi)
+
+# Contributing Libraries
+kXML (http://kobjects.org/kxml)
+Fast MD5 (http://twmacinta.com/myjava/fast_md5.php)
+J2MEUnit (http://j2meunit.sourceforge.net)
+MicroEmulator (http://microemu.org)
+J2ME Polish (http://j2mepolish.org)
+minixpath (http://minixpath.sourceforge.net)
+BlueCove (http://bluecove.org)
+ZXing (http://code.google.com/p/zxing)
+UmlGraph (http://umlgraph.org)
+PyAntTasks (http://code.google.com/p/pyanttasks)
+
+# Contributing Source
+Java Examples in a Nutshell, 3rd Edition (http://oreilly.com/catalog/9780596006204)
+Sun Microsystems, Inc (SnapperMidlet, FileBrowser, FileBrowseActivity, CameraCanvas)
+
+# Notes
+If you have contributed to JavaRosa and are not included this list, please contact us at http://code.javarosa.org/
