@@ -35,7 +35,6 @@ tsvoronos
 Vijay Umapathy (Massachusetts Institute of Technology)
 Yaw Anokwa (University of Washington, Google)
 
-
 # Linked Libraries
 BlueCove (http://bluecove.org)
 Fast MD5 (http://twmacinta.com/myjava/fast_md5.php)
@@ -44,7 +43,6 @@ J2MEUnit (http://j2meunit.sourceforge.net)
 java-cup (http://www2.cs.tum.edu/projects/cup)
 kXML (http://kobjects.org/kxml)
 MicroEmulator (http://microemu.org)
-minixpath (http://minixpath.sourceforge.net)
 PyAntTasks (http://code.google.com/p/pyanttasks)
 UmlGraph (http://umlgraph.org)
 ZXing (http://code.google.com/p/zxing)
