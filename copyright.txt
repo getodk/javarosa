@@ -7,6 +7,7 @@ Dimagi (http://dimagi.com)
 
 # Contributing Individuals
 Alfred Mukudu (Cell-Life)
+Brotecs
 Brian DeRenzi (University of Washington)
 Carl Hartung (University of Washington, Google)
 cdunn
