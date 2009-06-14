@@ -27,7 +27,7 @@ Kieran Sharpey-Schafer (Cell-Life)
 Thomas Smyth (Georgia Institute of Technology)
 Cory Zue (Dimagi)
 
-# Contributing Libraries
+# Linked Libraries
 kXML (http://kobjects.org/kxml)
 Fast MD5 (http://twmacinta.com/myjava/fast_md5.php)
 J2MEUnit (http://j2meunit.sourceforge.net)
@@ -39,7 +39,7 @@ ZXing (http://code.google.com/p/zxing)
 UmlGraph (http://umlgraph.org)
 PyAntTasks (http://code.google.com/p/pyanttasks)
 
-# Contributing Source
+# Other Source
 Java Examples in a Nutshell, 3rd Edition (http://oreilly.com/catalog/9780596006204)
 Sun Microsystems, Inc (SnapperMidlet, FileBrowser, FileBrowseActivity, CameraCanvas)
 
