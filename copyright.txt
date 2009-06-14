@@ -9,6 +9,7 @@ Dimagi (http://dimagi.com)
 Alfred Mukudu (Cell-Life)
 Brian DeRenzi (University of Washington)
 Carl Hartung (University of Washington, Google)
+cdunn
 Clayton Sims (Dimagi)
 Cory Zue (Dimagi)
 Daniel Kayiwa (Makerere University)
@@ -20,15 +21,20 @@ Juan Marcelo Tondato (Mesh 4X)
 Julian Hulme (Cell-Life)
 Kieran Sharpey-Schafer (Cell-Life)
 Mark Gerard (Makerere University, Business Objects)
+masha
 Matthais Nuessler (Cell-Life)
+mel
 Melissa Loudon (University of Cape Town)
 Munier Parker (Cell-Life)
 Ndubisi Onuora (Massachusetts Institute of Technology)
 Rowena Luk (Dimagi)
+smuwanga
 Thomas Routen (Things Prime)
 Thomas Smyth (Georgia Institute of Technology)
+tsvoronos
 Vijay Umapathy (Massachusetts Institute of Technology)
 Yaw Anokwa (University of Washington, Google)
+
 
 # Linked Libraries
 BlueCove (http://bluecove.org)
