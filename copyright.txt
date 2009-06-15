@@ -7,10 +7,9 @@ Dimagi (http://dimagi.com)
 
 # Contributing Individuals
 Alfred Mukudu (Cell-Life)
-Brotecs
 Brian DeRenzi (University of Washington)
 Carl Hartung (University of Washington, Google)
-cdunn
+Catherine Dunn (Dimagi)
 Clayton Sims (Dimagi)
 Cory Zue (Dimagi)
 Daniel Kayiwa (Makerere University)
@@ -22,17 +21,15 @@ Juan Marcelo Tondato (Mesh 4X)
 Julian Hulme (Cell-Life)
 Kieran Sharpey-Schafer (Cell-Life)
 Mark Gerard (Makerere University, Business Objects)
-masha
 Matthais Nuessler (Cell-Life)
-mel
 Melissa Loudon (University of Cape Town)
 Munier Parker (Cell-Life)
 Ndubisi Onuora (Massachusetts Institute of Technology)
 Rowena Luk (Dimagi)
-smuwanga
+Simon Peter Muwanga (Makerere University)
 Thomas Routen (Things Prime)
 Thomas Smyth (Georgia Institute of Technology)
-tsvoronos
+Teddy Svoronos (Georgetown University)
 Vijay Umapathy (Massachusetts Institute of Technology)
 Yaw Anokwa (University of Washington, Google)
 
