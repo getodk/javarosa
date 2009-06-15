@@ -192,6 +192,9 @@ public class Case implements Externalizable, IDRecordable, Restorable {
 	}
 	
 	public Object getProperty(String key) {
+		if("case-id".equals(key)) {
+			return id;
+		}
 		return data.get(key);
 	}
 
