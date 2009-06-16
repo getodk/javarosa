@@ -8,6 +8,7 @@ import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -48,7 +49,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData ||
 		    data instanceof SelectMultiData || data instanceof SelectOneData ||
 		    data instanceof IntegerData || data instanceof DecimalData || data instanceof PointerAnswerData	||
-		    data instanceof MultiPointerAnswerData || data instanceof GeoPointData) {
+		    data instanceof MultiPointerAnswerData || data instanceof GeoPointData || data instanceof DateTimeData) {
 			return true;
 		} else {
 			return false;
@@ -70,6 +71,15 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	 */
 	public Object serializeAnswerData(DateData data) {
 		return DateUtils.formatDate((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
+	}
+	
+	/**
+	 * @param data The AnswerDataObject to be serialized
+	 * @return A String which contains a date in xsd:date
+	 * formatting
+	 */
+	public Object serializeAnswerData(DateTimeData data) {
+		return DateUtils.formatDateTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
 	}
 	
 	/**
@@ -171,16 +181,6 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 				return serializer.serializeAnswerData(data, dataType);
 			}
 		}
-		/**
-		 * Complications for date/datetime
-		 */
-		if (data instanceof DateData) {
-			if (dataType == Constants.DATATYPE_DATE) {
-				return serializeAnswerData((DateData)data);
-			} else { //date+time
-				return DateUtils.formatDateTime((Date)data.getValue(), DateUtils.FORMAT_ISO8601);
-			}
-		} 
 		//Defaults
 		Object result = serializeAnswerData(data);
 		return result;
@@ -197,6 +197,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			return serializeAnswerData((IntegerData)data);
 		} else if (data instanceof DecimalData) {
 			return serializeAnswerData((DecimalData)data);
+		} else if (data instanceof DateData) {
+			return serializeAnswerData((DateData)data);			
 		} else if (data instanceof TimeData) {
 			return serializeAnswerData((TimeData)data);			
 		} else if (data instanceof PointerAnswerData) {
@@ -205,6 +207,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			return serializeAnswerData((MultiPointerAnswerData)data);			
 		} else if (data instanceof GeoPointData) {
             return serializeAnswerData((GeoPointData)data);
+        } else if (data instanceof DateTimeData) {
+            return serializeAnswerData((DateTimeData)data);
         }
 		
 		return null;

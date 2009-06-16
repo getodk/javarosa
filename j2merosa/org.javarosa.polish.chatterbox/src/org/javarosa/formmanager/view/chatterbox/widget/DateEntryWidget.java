@@ -5,12 +5,24 @@ import java.util.Date;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
 
 import de.enough.polish.ui.DateField;
 import de.enough.polish.ui.Item;
 
 public class DateEntryWidget extends ExpandedWidget {
+	boolean dateTime = false;
+	
+	public DateEntryWidget() {
+		this(false);
+	}
+	
+	public DateEntryWidget(boolean dateTime) {
+		super();
+		this.dateTime = dateTime;
+	}
+	
 	public int getNextMode () {
 		return ChatterboxWidget.NEXT_ON_ENTRY;
 	}
@@ -32,7 +44,14 @@ public class DateEntryWidget extends ExpandedWidget {
 
 	protected IAnswerData getWidgetValue () {
 		Date d = dateField().getDate();
-		return (d == null ? null : new DateData(d));
+		if(d == null) {
+			return null;
+		}
+		if (dateTime) {
+			return  new DateTimeData(d);
+		} else {
+			return new DateData(d);
+		}
 	}
 	
 	/*

@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
@@ -82,7 +83,7 @@ public class RestoreUtils {
 		case Constants.DATATYPE_DECIMAL: val = new DecimalData((Double)data); break;
 		case Constants.DATATYPE_BOOLEAN: val = new StringData(((Boolean)data).booleanValue() ? "t" : "f"); break;
 		case Constants.DATATYPE_DATE: val = new DateData((Date)data); break;
-		case Constants.DATATYPE_DATE_TIME: val = new DateData((Date)data); break;
+		case Constants.DATATYPE_DATE_TIME: val = new DateTimeData((Date)data); break;
 		case Constants.DATATYPE_TIME: val = new TimeData((Date)data); break;
 		case Constants.DATATYPE_CHOICE_LIST: val = (SelectMultiData)data; break;
 		default: throw new IllegalArgumentException("Don't know how to handle data type [" + dataType + "]");
@@ -124,6 +125,7 @@ public class RestoreUtils {
 			dataType = Constants.DATATYPE_DECIMAL;
 		} else if (c == Date.class) {
 			dataType = Constants.DATATYPE_DATE;
+			//Clayton Sims - Jun 16, 2009 - How are we handling Date v. Time v. DateTime?
 		} else if (c == Boolean.class) {
 			dataType = Constants.DATATYPE_TEXT; //booleans are serialized as a literal 't'/'f'
 		} else {

@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.TreeElement;
@@ -241,7 +242,7 @@ public class QuestionPreloader {
 			JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propName, value);
 	}
 	
-	private DateData getTimestamp() {
-		return new DateData(new Date());
+	private DateTimeData getTimestamp() {
+		return new DateTimeData(new Date());
 	}
 }
