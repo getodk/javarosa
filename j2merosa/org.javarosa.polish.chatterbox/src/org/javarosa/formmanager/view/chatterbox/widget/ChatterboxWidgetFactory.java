@@ -65,6 +65,9 @@ public class ChatterboxWidgetFactory {
 			case Constants.DATATYPE_DECIMAL:
 				expandedStyle = new NumericEntryWidget(true);
 				break;
+			case Constants.DATATYPE_DATE_TIME:
+				expandedStyle = new DateEntryWidget(true);
+				break;
 			case Constants.DATATYPE_DATE:
 				//#if javarosa.useNewDatePicker 
 				expandedStyle = new SimpleDateEntryWidget();

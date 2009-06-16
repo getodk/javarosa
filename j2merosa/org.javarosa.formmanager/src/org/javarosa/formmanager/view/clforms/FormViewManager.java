@@ -90,6 +90,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 					widget = new TextQuestionWidget(prompt, "");
 				break;
 			case Constants.DATATYPE_DATE:
+			case Constants.DATATYPE_DATE_TIME:
 				// go to DateQuestion Widget
 				if (fromFormView == true)
 					widget = new DateQuestionWidget(prompt, 'c');// transition

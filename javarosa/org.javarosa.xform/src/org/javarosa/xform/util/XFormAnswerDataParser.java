@@ -7,6 +7,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -87,7 +88,7 @@ public class XFormAnswerDataParser {
 		case Constants.DATATYPE_DATE_TIME:
 
 			Date dt = (trimmedText == null ? null : DateUtils.parseDateTime(trimmedText));
-			return (dt == null ? null : new DateData(dt));
+			return (dt == null ? null : new DateTimeData(dt));
 
 		case Constants.DATATYPE_DATE:
 

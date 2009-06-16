@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -138,7 +139,7 @@ public class BareBonesDataModelWrapper implements Externalizable {
 			case Constants.DATATYPE_DECIMAL: answerType = DecimalData.class; break;
 			case Constants.DATATYPE_DATE: answerType = DateData.class; break;
 			case Constants.DATATYPE_TIME: answerType = TimeData.class; break;
-			case Constants.DATATYPE_DATE_TIME: answerType = DateData.class; break;
+			case Constants.DATATYPE_DATE_TIME: answerType = DateTimeData.class; break;
 			case Constants.DATATYPE_CHOICE: answerType = SelectOneData.class; break;
 			case Constants.DATATYPE_CHOICE_LIST: answerType = SelectMultiData.class; break;
 		//	case Constants.DATATYPE_BOOLEAN: answerType = *Data.class; break;
