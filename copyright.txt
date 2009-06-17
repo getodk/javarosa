@@ -47,7 +47,7 @@ ZXing (http://code.google.com/p/zxing)
 
 # Other Source
 Java Examples in a Nutshell, 3rd Edition (http://oreilly.com/catalog/9780596006204)
-Sun Microsystems, Inc (SnapperMidlet, FileBrowser, FileBrowseActivity, CameraCanvas)
+Sun Microsystems, Inc (SnapperMIDlet, FileBrowser, FileBrowseActivity, CameraCanvas)
 
 # Notes
 If you have contributed to JavaRosa and are not included this list, please contact us at http://code.javarosa.org/
