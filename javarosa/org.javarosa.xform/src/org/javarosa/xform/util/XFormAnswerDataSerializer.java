@@ -21,7 +21,6 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.data.IDataPointer;
-import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
