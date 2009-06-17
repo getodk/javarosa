@@ -2,6 +2,9 @@ package org.javarosa.core.model.condition;
 
 import java.util.Date;
 
+import javax.microedition.media.control.FramePositioningControl;
+
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.DateData;
@@ -30,7 +33,8 @@ public class Recalculate extends Triggerable {
 	}
 	
 	public void apply (TreeReference ref, Object result, IFormDataModel model, FormDef f) {
-		f.setAnswer(wrapData(result), ref);		
+		int dataType = f.getDataModel().resolveReference(ref).dataType;
+		f.setAnswer(wrapData(result, dataType), ref);
 	}
 		
 	public boolean canCascade () {
@@ -49,12 +53,18 @@ public class Recalculate extends Triggerable {
 		}			
 	}
 	
-	private static IAnswerData wrapData (Object val) {
+	private static IAnswerData wrapData (Object val, int dataType) {
 		if (val instanceof Boolean) {
 			return new IntegerData(((Boolean)val).booleanValue() ? 1 : 0);
 		} else if (val instanceof Double) {
 			double d = ((Double)val).doubleValue();
-			return Double.isNaN(d) ? null : new DecimalData(d);
+			if(Double.isNaN(d)) { return null; }
+			if(Constants.DATATYPE_DECIMAL == dataType) {
+				return new DecimalData(d);
+			} else if(Constants.DATATYPE_INTEGER == dataType) {
+				return new IntegerData((int)Math.floor(d));
+			} 
+			return new DecimalData(d);
 		} else if (val instanceof String) {
 			String s = (String)val;
 			return s.length() > 0 ? new StringData(s) : null;
