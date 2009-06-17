@@ -7,6 +7,7 @@ import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.MoreUIAccess;
+import de.enough.polish.ui.Style;
 
 /**
  * The base widget for multi and single choice selections.
@@ -122,6 +123,21 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 					}
 				//#endif
 				return offset;
+			}
+			
+			/** Hack #4! **/
+			//Clayton Sims - Jun 16, 2009
+			// Once again we're in the land of hacks.
+			// This particular hack is responsible for making it so that when a widget is
+			// brought up on the screen, its selected value (if one exists), is currently 
+			// highlighted. This vastly improves the back/forward usability.
+			// Only Tested on Polish 2.0.4
+			public Style focus (Style newStyle, int direction) {
+				Style retStyle = super.focus(newStyle, direction);
+				if(this.getSelectedIndex() > -1) {
+					this.focus(this.getSelectedIndex());
+				}
+				return retStyle; 
 			}
 		};
 		for (int i = 0; i < question.getSelectItems().size(); i++){
