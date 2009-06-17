@@ -18,8 +18,6 @@ package org.javarosa.core.model.condition;
 
 import java.util.Date;
 
-import javax.microedition.media.control.FramePositioningControl;
-
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
