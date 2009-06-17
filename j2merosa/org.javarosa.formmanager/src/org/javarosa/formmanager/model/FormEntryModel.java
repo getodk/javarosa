@@ -7,6 +7,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
@@ -51,6 +52,11 @@ public class FormEntryModel {
     
     public void setQuestionIndex (FormIndex index) {
     	if (!activeQuestionIndex.equals(index)) {
+    		
+    		//See if a hint exists that says we should have a model for this
+    		//already
+    		createModelIfNecessary(index);
+    		
     		activeQuestionIndex = index;
     		
     		for (Enumeration e = observers.elements(); e.hasMoreElements(); ) {
@@ -215,5 +221,42 @@ public class FormEntryModel {
 	 */
 	public FormIndex getStartIndex() {
 		return startIndex;
+	}
+	
+	/**
+	 * For the current index: Checks whether the index represents a node which 
+	 * should exist given a non-interactive repeat, along with a count for that repeat
+	 * which is beneath the dynamic level specified. 
+	 * 
+	 * If this index does represent such a node, the new model for the repeat is created 
+	 * behind the scenes and the index for the initial question is returned.
+	 * 
+	 * Note: This method will not prevent the addition of new repeat elements in the interface, 
+	 * it will merely use the xforms repeat hint to create new nodes that are assumed to exist
+	 * 
+	 * @param The index to be evaluated as to whether the underlying model is hinted to exist
+	 */
+	private void createModelIfNecessary(FormIndex index) {
+		if (index.isInForm()) {
+			IFormElement e = getForm().getChild(index);
+			if (e instanceof GroupDef) {
+				GroupDef g = (GroupDef) e;
+				if (g.getRepeat() && g.getCountReference() != null) {
+					IAnswerData count = getForm().getDataModel().getDataValue(g.getCountReference());
+					if (count != null) {
+						int fullcount = ((Integer) count.getValue()).intValue();
+						TreeReference ref = getForm()
+								.getChildInstanceRef(index);
+						TreeElement element = getForm().getDataModel()
+								.resolveReference(ref);
+						if (element == null) {
+							if (index.getInstanceIndex() < fullcount) {
+								getForm().createNewRepeat(index);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

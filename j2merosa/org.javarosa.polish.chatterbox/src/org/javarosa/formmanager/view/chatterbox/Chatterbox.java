@@ -204,31 +204,29 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	
     	if (questionIndex.isInForm() && !model.isRelevant(questionIndex))
 			throw new IllegalStateException();
-    	
-		// Determine what should and shouldn't be pinned.
-		for (int i = 0; i < this.size(); ++i) {
-			FormIndex index = this.questionIndexes.get(i);
-			ChatterboxWidget cw = this.getWidgetAtIndex(i);
 
-			//First reset everything by default
-			cw.setPinned(false);
-			
-			if (cw.getViewState() == ChatterboxWidget.VIEW_LABEL) {
-				if (FormIndex.isSubElement(index, questionIndex)) {
-					cw.setPinned(true);
-				} else {
-					cw.setPinned(false);
-				}
-			}
-		}
+		// Determine what should and shouldn't be pinned.
+    	updatePins(questionIndex);
+
     	//figure out kind of reference and how to handle it
     	Vector defs = model.getForm().explodeIndex(questionIndex);
     	IFormElement last = (defs.size() == 0 ? null : (IFormElement)defs.lastElement());
     	if (last instanceof GroupDef) {
-    		if (((GroupDef)last).getRepeat() &&
+    		if (((GroupDef)last).getRepeat() &&	
     			model.getForm().getDataModel().resolveReference(model.getForm().getChildInstanceRef(questionIndex)) == null) {
-    			//new repeat
-    			newRepeat = true;
+    			
+    			//We're at a repeat interstitial point. If the group has the right configuration, we are able
+    			//to trigger a new repeat here. Otherwise, we'll have to ask the controller to move along.
+    			
+    			if(((GroupDef)last).noAddRemove) {
+    				//We can't show anything meaningful here. Go back to the controller.
+    				boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
+    				controller.stepQuestion(forwards);
+    				return;
+    			} else {
+    				//All Systems Go. Display an interstitial "Add another FOO" question.
+        			newRepeat = true;	
+    			}
     		} else {
     			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
     			if(forwards) {
@@ -242,7 +240,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	} else if (questionIndex.isInForm() && model.isReadonly(questionIndex)) {
 			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
 			controller.stepQuestion(forwards);
-			return;    		
+			return;
     	}
     	    	
     	if (questionIndex.compareTo(activeQuestionIndex) > 0) {
@@ -305,6 +303,24 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	
     	//UI hacks ho!
     	babysitStyles();
+    }
+    
+    private void updatePins(FormIndex questionIndex) {
+		for (int i = 0; i < this.size(); ++i) {
+			FormIndex index = this.questionIndexes.get(i);
+			ChatterboxWidget cw = this.getWidgetAtIndex(i);
+
+			//First reset everything by default
+			cw.setPinned(false);
+			
+			if (cw.getViewState() == ChatterboxWidget.VIEW_LABEL) {
+				if (FormIndex.isSubElement(index, questionIndex)) {
+					cw.setPinned(true);
+				} else {
+					cw.setPinned(false);
+				}
+			}
+		}
     }
     
 
