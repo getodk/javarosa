@@ -214,6 +214,11 @@ public class XPathPathExpr extends XPathExpression {
 	public boolean equals (Object o) {
 		if (o instanceof XPathPathExpr) {
 			XPathPathExpr x = (XPathPathExpr)o;
+			
+			//Shortcuts for easily comparable values
+			if(init_context != x.init_context || steps.length != x.steps.length) {
+				return false;
+			}
 
 			Vector a = new Vector();
 			for (int i = 0; i < steps.length; i++)
@@ -222,7 +227,7 @@ public class XPathPathExpr extends XPathExpression {
 			for (int i = 0; i < x.steps.length; i++)
 				b.addElement(x.steps[i]);
 			
-			return init_context == x.init_context && ExtUtil.vectorEquals(a, b) &&
+			return ExtUtil.vectorEquals(a, b) &&
 				(init_context == INIT_CONTEXT_EXPR ? filtExpr.equals(x.filtExpr) : true);
 		} else {
 			return false;

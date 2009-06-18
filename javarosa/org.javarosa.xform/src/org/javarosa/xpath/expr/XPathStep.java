@@ -148,6 +148,18 @@ public class XPathStep implements Externalizable {
 		if (o instanceof XPathStep) {
 			XPathStep x = (XPathStep)o;
 			
+			//shortcuts for faster evaluation
+			if(axis != x.axis && test != x.test || predicates.length != x.predicates.length) {
+				return false;
+			}
+			
+			switch (test) {
+			case TEST_NAME: if(!name.equals(x.name)) {return false;} break;
+			case TEST_NAMESPACE_WILDCARD: if(!namespace.equals(x.namespace)) {return false;} break;
+			case TEST_TYPE_PROCESSING_INSTRUCTION: if(!ExtUtil.equals(literal, x.literal)) {return false;} break;
+			default: break;
+			}
+			
 			Vector a = new Vector();
 			for (int i = 0; i < predicates.length; i++)
 				a.addElement(predicates[i]);
@@ -155,16 +167,7 @@ public class XPathStep implements Externalizable {
 			for (int i = 0; i < x.predicates.length; i++)
 				b.addElement(x.predicates[i]);			
 			
-			if (axis == x.axis && test == x.test && ExtUtil.vectorEquals(a, b)) {
-				switch (test) {
-				case TEST_NAME: return name.equals(x.name);
-				case TEST_NAMESPACE_WILDCARD: return namespace.equals(x.namespace);
-				case TEST_TYPE_PROCESSING_INSTRUCTION: return ExtUtil.equals(literal, x.literal);
-				default: return true;
-				}					
-			} else {
-				return false;
-			}
+			return ExtUtil.vectorEquals(a, b);
 		} else {
 			return false;
 		}

@@ -67,6 +67,11 @@ public class XPathFuncExpr extends XPathExpression {
 	public boolean equals (Object o) {
 		if (o instanceof XPathFuncExpr) {
 			XPathFuncExpr x = (XPathFuncExpr)o;
+			
+			//Shortcuts for very easily comprable values
+			if(!id.equals(x.id) || args.length != x.args.length) {
+				return false;
+			}
 
 			Vector a = new Vector();
 			for (int i = 0; i < args.length; i++)
@@ -75,7 +80,7 @@ public class XPathFuncExpr extends XPathExpression {
 			for (int i = 0; i < x.args.length; i++)
 				b.addElement(x.args[i]);
 			
-			return id.equals(x.id) && ExtUtil.vectorEquals(a, b);
+			return ExtUtil.vectorEquals(a, b);
 		} else {
 			return false;
 		}
