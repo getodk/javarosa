@@ -160,14 +160,7 @@ public class XPathStep implements Externalizable {
 			default: break;
 			}
 			
-			Vector a = new Vector();
-			for (int i = 0; i < predicates.length; i++)
-				a.addElement(predicates[i]);
-			Vector b = new Vector();
-			for (int i = 0; i < x.predicates.length; i++)
-				b.addElement(x.predicates[i]);			
-			
-			return ExtUtil.vectorEquals(a, b);
+			return ExtUtil.arrayEquals(predicates, x.predicates);
 		} else {
 			return false;
 		}

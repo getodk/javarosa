@@ -219,16 +219,8 @@ public class XPathPathExpr extends XPathExpression {
 			if(init_context != x.init_context || steps.length != x.steps.length) {
 				return false;
 			}
-
-			Vector a = new Vector();
-			for (int i = 0; i < steps.length; i++)
-				a.addElement(steps[i]);
-			Vector b = new Vector();
-			for (int i = 0; i < x.steps.length; i++)
-				b.addElement(x.steps[i]);
 			
-			return ExtUtil.vectorEquals(a, b) &&
-				(init_context == INIT_CONTEXT_EXPR ? filtExpr.equals(x.filtExpr) : true);
+			return ExtUtil.arrayEquals(steps, x.steps) && (init_context == INIT_CONTEXT_EXPR ? filtExpr.equals(x.filtExpr) : true);
 		} else {
 			return false;
 		}

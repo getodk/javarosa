@@ -72,15 +72,8 @@ public class XPathFuncExpr extends XPathExpression {
 			if(!id.equals(x.id) || args.length != x.args.length) {
 				return false;
 			}
-
-			Vector a = new Vector();
-			for (int i = 0; i < args.length; i++)
-				a.addElement(args[i]);
-			Vector b = new Vector();
-			for (int i = 0; i < x.args.length; i++)
-				b.addElement(x.args[i]);
 			
-			return ExtUtil.vectorEquals(a, b);
+			return ExtUtil.arrayEquals(args, x.args);
 		} else {
 			return false;
 		}
