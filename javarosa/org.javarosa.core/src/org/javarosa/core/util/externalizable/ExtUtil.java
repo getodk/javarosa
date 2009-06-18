@@ -298,6 +298,20 @@ public class ExtUtil {
 		}
 	}
 	
+	public static boolean arrayEquals (Object[] a, Object[] b) {
+		if (a.length != b.length) {
+			return false;
+		} else {
+			for (int i = 0; i < a.length; i++) {
+				if (!equals(a[i], b[i])) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+	}
+	
 	public static boolean hashtableEquals (Hashtable a, Hashtable b) {
 		if (a.size() != b.size()) {
 			return false;
