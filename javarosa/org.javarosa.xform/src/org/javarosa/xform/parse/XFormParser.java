@@ -17,6 +17,7 @@
 package org.javarosa.xform.parse;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -211,6 +212,13 @@ public class XFormParser {
 		System.out.println("Parsing form...");
 		
 		Document doc = getXMLDocument(reader);
+		try {
+			reader.close();
+		} catch (IOException e) {
+			System.out.println("Error closing reader");
+			e.printStackTrace();
+		}
+		
 		if (doc != null) {
 			try {
 				return getFormDef(doc);
@@ -230,7 +238,7 @@ public class XFormParser {
 			KXmlParser parser = new KXmlParser();
 			parser.setInput(reader);
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
-
+			
 			doc.parse(parser);
 		} catch(Exception e){
 			//#if debug.output==verbose || debug.output==exception
@@ -246,14 +254,16 @@ public class XFormParser {
 
 	public static FormDef getFormDef(Document doc){
 		FormDef formDef = new FormDef();
-
+		
 		initBindHandlers();
 		initStateVars();
 
 		defaultNamespace = doc.getRootElement().getNamespaceUri(null);
 		
 		parseElement(formDef, doc.getRootElement(), formDef, topLevelHandlers);
+		
 		collapseRepeatGroups(formDef);
+		
 		if(instanceNode != null) {
 			parseInstance(formDef, instanceNode);
 		}
@@ -323,10 +333,11 @@ public class XFormParser {
 		modelFound = true;
 
 		for (int i = 0; i < e.getChildCount(); i++) {
+			
 			int type = e.getType(i);
 			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
 			String childName = (child != null ? child.getName() : null);
-
+			
 			if ("itext".equals(childName)) {
 				parseIText(f, child);
 			} else if ("instance".equals(childName)) {
@@ -342,7 +353,20 @@ public class XFormParser {
 					throw new XFormParseException("Unrecognized text content found within <model>: \"" + getXMLText(e, i, true) + "\"");					
 				}
 			}
+			
+			if(child == null || "bind".equals(childName) || "itext".equals(childName)) {
+				//Clayton Sims - Jun 17, 2009 - This code is used when the stinginess flag
+				//is set for the build. It dynamically wipes out old model nodes once they're
+				//used. This is sketchy if anything else plans on touching the nodes.
+				//This code can be removed once we're pull-parsing
+				//#if org.javarosa.xform.stingy
+				//# e.removeChild(i);
+				//# --i;
+				//#endif
+			}
 		}
+		
+		
 	}
 
 	private static void saveInstanceNode (Element instance) {
@@ -808,6 +832,14 @@ public class XFormParser {
 				continue;
 
 			parseTextHandle(source, text, f);
+			//Clayton Sims - Jun 17, 2009 - This code is used when the stinginess flag
+			//is set for the build. It dynamically wipes out old model nodes once they're
+			//used. This is sketchy if anything else plans on touching the nodes.
+			//This code can be removed once we're pull-parsing
+			//#if org.javarosa.xform.stingy
+			//# trans.removeChild(j);
+			//# --j;
+			//#endif
 		}
 		
 		l.registerLocaleResource(lang, source);
