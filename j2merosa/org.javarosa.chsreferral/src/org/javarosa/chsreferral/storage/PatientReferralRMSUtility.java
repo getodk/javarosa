@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.chsreferral.model.PatientReferral;
+import org.javarosa.chsreferral.util.IPatientReferralFilter;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
@@ -61,6 +62,12 @@ public class PatientReferralRMSUtility extends RMSUtility {
 	}
 	
 	public Vector getPendingReferrals() throws DeserializationException {
+		return getPendingReferrals(new IPatientReferralFilter() {
+			public boolean inFilter(PatientReferral ref) { return true;}
+		});
+	}
+	
+	public Vector getPendingReferrals(IPatientReferralFilter filter) throws DeserializationException {
 		Vector pending = new Vector();
 		IRecordStoreEnumeration en = enumerateRecords();
 		while(en.hasNextElement()) {
@@ -71,7 +78,7 @@ public class PatientReferralRMSUtility extends RMSUtility {
 			
 				ExtUtil.deserialize(next, ref);
 				
-				if(ref.isPending()) {
+				if(ref.isPending() && filter.inFilter(ref)) {
 					pending.addElement(ref);
 				}
 			} catch (RecordStorageException e) {

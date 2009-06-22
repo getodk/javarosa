@@ -27,6 +27,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
+import org.javarosa.cases.util.CaseContext;
 import org.javarosa.cases.view.CaseManagementScreen;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -42,7 +43,7 @@ import org.javarosa.core.api.IShell;
  */
 public class CaseManagementActivity implements IActivity, CommandListener {
 	
-	Context context;
+	CaseContext context;
 	IShell shell;
 	
 	CaseManagementScreen view;
@@ -52,7 +53,7 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 
     public static final String NEW = JavaRosaServiceProvider.instance().localize("menu.NewCase");
     public static final String FOLLOWUP = JavaRosaServiceProvider.instance().localize("menu.FollowUp");
-    public static final String REFERRAL = JavaRosaServiceProvider.instance().localize("menu.Referral");
+    public static String REFERRAL = JavaRosaServiceProvider.instance().localize("menu.Referral");
     public static final String VIEW_OPEN = JavaRosaServiceProvider.instance().localize("menu.ViewOpen");
     public static final String RESOLVE = JavaRosaServiceProvider.instance().localize("menu.Resolve");
 
@@ -121,7 +122,8 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 	 * @see org.javarosa.core.api.IActivity#start(org.javarosa.core.Context)
 	 */
 	public void start(Context context) {
-		this.context = context;
+		this.context = new CaseContext(context);
+		REFERRAL = JavaRosaServiceProvider.instance().localize("menu.Referral",new String[] {String.valueOf(this.context.getNumberOfReferrals())} );
 		view = new CaseManagementScreen("Select Action");
 		configView();
 		view.setCommandListener(this);
@@ -131,9 +133,9 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 	private void configView() {
 		view.append(NEW, null);
 		view.append(FOLLOWUP, null);
-		view.append(VIEW_OPEN, null);
 		view.append(REFERRAL, null);
 		view.append(RESOLVE, null);
+		view.append(VIEW_OPEN, null);
 		initCommands();
 	}
 
