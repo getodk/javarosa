@@ -47,7 +47,6 @@ import org.javarosa.formmanager.view.Commands;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
-import org.javarosa.polish.activity.loadingscreen.LoadingScreenActivity;
 
 public class FormReviewActivity implements IActivity, CommandListener, IControllerHost, ILoadHost {
 
@@ -74,8 +73,6 @@ public class FormReviewActivity implements IActivity, CommandListener, IControll
 
 	private FormLoadActivity formLoader = null;
 	
-	private LoadingScreenActivity loadingScreen = null;
-	
 	private int instanceID = -1;
 
 	/** Loading error string **/
@@ -86,7 +83,6 @@ public class FormReviewActivity implements IActivity, CommandListener, IControll
 		this.viewFactory = viewFactory;
 		
 		this.formLoader = new FormLoadActivity(this);
-		this.loadingScreen = new LoadingScreenActivity(this.parent);
 	}
 
 	public void contextChanged(Context context) {
@@ -102,10 +98,6 @@ public class FormReviewActivity implements IActivity, CommandListener, IControll
 	}
 
 	public void returnFromLoading(Context context) {
-		// Kill the thread for the loading screen
-		this.loadingScreen.halt();
-		this.loadingScreen = null;
-		
 		// get the form
 		FormDef theForm = (FormDef)context.getElement("theForm");
 		context = null;
@@ -145,11 +137,6 @@ public class FormReviewActivity implements IActivity, CommandListener, IControll
 			this.context = (FormEntryContext) context;
 			this.instanceID = this.context.getInstanceID();
 		}
-		
-		// Start the loading screen
-		//#if javarosa.useloadingscreen
-		this.loadingScreen.start(context);
-		//#endif
 		
 		// Start loading the form
 		this.formLoader.start(context);
