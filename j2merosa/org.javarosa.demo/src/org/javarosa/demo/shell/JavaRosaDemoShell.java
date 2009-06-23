@@ -595,18 +595,17 @@ public class JavaRosaDemoShell implements IShell {
 			// "/hmis-a_draft.xhtml"));
 			// formDef.writeToRMS(XFormUtils.getFormFromResource(
 			// "/hmis-b_draft.xhtml"));
-			// formDef.writeToRMS(XFormUtils.getFormFromResource(
-			// "/shortform.xhtml"));
+			//formDef.writeToRMS(XFormUtils.getFormFromResource("/shortform.xhtml"));
 			//formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL.xhtml")
 			// );
-			//formDef.writeToRMS(XFormUtils.getFormFromResource("/condtest.xhtml"
-			// ));
+			//formDef.writeToRMS(XFormUtils.getFormFromResource("/condtest.xhtml"));
 			// formDef.writeToRMS(XFormUtils.getFormFromResource(
 			// "/patient-entry.xhtml"));
 			// formDef.writeToRMS(XFormUtils.getFormFromResource(
 			// "/mexico_questions.xhtml"));
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/smr.xhtml"));
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/smff.xhtml"));
+			//formDef.writeToRMS(XFormUtils.getFormFromResource("/smr.xhtml"));
+			//formDef.writeToRMS(XFormUtils.getFormFromResource("/smff.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/imci.xml"));
 		}
 
 	}

@@ -48,7 +48,6 @@ import org.javarosa.formmanager.utility.ILoadHost;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
-import org.javarosa.polish.activity.loadingscreen.LoadingScreenActivity;
  
 public class FormEntryActivity implements IActivity, IControllerHost, CommandListener, ILoadHost {
 
@@ -75,8 +74,6 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 
 	private FormLoadActivity formLoader = null;
 	
-	private LoadingScreenActivity loadingScreen = null;
-	
 	private int instanceID = -1;
 	
 	private IModelProcessor processor;
@@ -89,7 +86,6 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		this.viewFactory = viewFactory;
 		
 		this.formLoader = new FormLoadActivity(this);
-		this.loadingScreen = new LoadingScreenActivity(this.parent);
 	}
 
 	public void contextChanged(Context context) {
@@ -105,10 +101,6 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	}
 
 	public void returnFromLoading(Context context) {
-		// Kill the thread for the loading screen
-		this.loadingScreen.halt();
-		this.loadingScreen = null;
-		
 		// get the form
 		FormDef theForm = (FormDef)context.getElement("theForm");
 		context = null;
@@ -159,11 +151,6 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			this.instanceID = this.context.getInstanceID();
 			this.processor = this.context.getModelProcessor();
 		}
-		
-		// Start the loading screen
-		//#if javarosa.useloadingscreen
-		this.loadingScreen.start(context);
-		//#endif
 		
 		// Start loading the form
 		this.formLoader.start(context);
