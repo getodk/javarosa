@@ -16,6 +16,9 @@
 
 package org.javarosa.communication.sms.trigger;
 
+import java.util.Vector;
+
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IDaemon;
 
 /**
@@ -24,30 +27,56 @@ import org.javarosa.core.api.IDaemon;
  *
  */
 public class SmsTriggerDaemon implements IDaemon {
+	
+	public static final String DAEMON_NAME = "SMS Trigger Daemon";
+	
+	boolean running = false;
+	String port;
+	SmsTriggerService service;
+	
+	public SmsTriggerDaemon() {
+		String propPort = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(SmsTriggerProperties.TRIGGER_DEFAULT_PORT);
+		if(propPort == null) {
+			propPort = "16361"; 
+		}
+		init(propPort);
+	}
+	
+	public SmsTriggerDaemon(String port) {
+		init(port);
+	}
+	
+	private void init(String port) {
+		this.port = port;
+		service = new SmsTriggerService();
+	}
 
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return DAEMON_NAME;
 	}
 
 	public boolean isRunning() {
-		// TODO Auto-generated method stub
-		return false;
+		return running;
 	}
 
 	public void restart() {
-		// TODO Auto-generated method stub
-
+		stop();
+		start();
 	}
 
 	public void start() {
-		// TODO Auto-generated method stub
-
+		if(!running) {
+			running = service.start(port);
+		}
 	}
 
 	public void stop() {
-		// TODO Auto-generated method stub
-
+		if(running) {
+			running = service.stop();
+		}
 	}
-
+	
+	public void addTrigger(ISmsTrigger trigger) {
+		service.addTrigger(trigger);
+	}
 }
