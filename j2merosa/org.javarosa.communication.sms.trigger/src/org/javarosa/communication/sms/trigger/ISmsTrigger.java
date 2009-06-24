@@ -16,6 +16,8 @@
 
 package org.javarosa.communication.sms.trigger;
 
+import javax.wireless.messaging.TextMessage;
+
 /**
  * An SMS trigger is an action that should be taken when
  * the phone receives an SMS message with a specific header.
@@ -24,5 +26,6 @@ package org.javarosa.communication.sms.trigger;
  *
  */
 public interface ISmsTrigger {
-
+	public boolean isConsumable(TextMessage message);
+	public void consume(TextMessage message);
 }
