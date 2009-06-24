@@ -38,13 +38,13 @@ public class FormElementBinding implements FormElementStateListener {
 		
 	}
 
-	public FormElementBinding (IQuestionWidget cw, FormIndex index, FormDef form) {
-		this(cw, form.getChild(index), index, form);
+	public FormElementBinding (IQuestionWidget questionWidget, FormIndex index, FormDef form) {
+		this(questionWidget, form.getChild(index), index, form);
 	}
 
-	public FormElementBinding (IQuestionWidget cw, IFormElement q, FormIndex index, FormDef form) {
-		this.widget = cw;
-		this.element = q;
+	public FormElementBinding (IQuestionWidget questionWidget, IFormElement formElement, FormIndex index, FormDef form) {
+		this.widget = questionWidget;
+		this.element = formElement;
 		this.instanceRef = form.getChildInstanceRef(index);
         this.instanceNode = form.getDataModel().resolveReference(instanceRef);
         this.form = form;
@@ -53,9 +53,9 @@ public class FormElementBinding implements FormElementStateListener {
 	}
 	
 	//constructor to use with pseudo-questions that aren't actually tied to any form or model
-	public FormElementBinding (IQuestionWidget cw, QuestionDef q, TreeElement instanceNode) {
-		this.widget = cw;
-		this.element = q;
+	public FormElementBinding (IQuestionWidget questionWidget, QuestionDef formElement, TreeElement instanceNode) {
+		this.widget = questionWidget;
+		this.element = formElement;
 		this.instanceNode = instanceNode;
 	}
 
