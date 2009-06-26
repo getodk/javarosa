@@ -49,7 +49,7 @@ public class UserForm extends Form implements IView {
 
 	public UserForm(String title, IUserDecorator d) {
 		super(title);
-		this.usernameField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.name"), "", 10,
+		this.usernameField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.name"), "", 25,
 				TextField.ANY);
 		this.passwordField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.password"), "", 10,
 				TextField.PASSWORD);
