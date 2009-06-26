@@ -79,6 +79,7 @@ public class IntegerDataTests extends TestCase {
 	public void testGetData() {
 		IntegerData data = new IntegerData(one);
 		assertEquals("IntegerData's getValue returned an incorrect integer", data.getValue(), one);
+		assertTrue(true);
 		
 	}
 	public void testSetData() {
