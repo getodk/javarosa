@@ -61,7 +61,7 @@ public class NewUserForm extends Form implements IView{
 
 	public NewUserForm(String title, IUserDecorator d) {
 		super(title);
-		userName = new TextField("Name (ie: loginID):", "", 10, TextField.ANY);
+		userName = new TextField("Name (ie: loginID):", "", 25, TextField.ANY);
 	    password = new TextField("User Password:", "", 10, TextField.PASSWORD);
 	    confirmPassword = new TextField("Confirm Password:", "", 10, TextField.PASSWORD);
 	    //#if javarosa.adduser.extended
