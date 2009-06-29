@@ -19,6 +19,7 @@ package org.javarosa.formmanager.view.clforms.acquire;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
 
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.data.IAnswerData;
@@ -29,7 +30,7 @@ import org.javarosa.core.model.data.IAnswerData;
  *         A screen that acquires the answer data for a question
  * 
  */
-public abstract class AcquireScreen extends javax.microedition.lcdui.Form
+public abstract class AcquireScreen extends Form
 		implements IView, CommandListener {
 
 	private AcquiringQuestionScreen questionScreen;
