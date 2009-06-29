@@ -47,8 +47,10 @@ import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
+import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.model.xform.XFormSerializingVisitor;
 
 /**
  * 
@@ -332,7 +334,18 @@ public class ModelListActivity extends List implements CommandListener,
 					data.getRecordId(), true)) {
 				// Do Nothing if already sent
 			} else {
-				unsent.addElement(model);
+				// June 29, 2009 - csims@dimagi.com
+				// This model list code is legacy, but I'm adding this hack to allow
+				// it to send data with the multiple screen again.
+				XFormSerializingVisitor visitor = new XFormSerializingVisitor();
+				IDataPayload payload;
+				try {
+					payload = visitor.createSerializedPayload(model);
+					unsent.addElement(payload);
+				} catch (IOException e) {
+					System.out.println("For some reason a model wasn't able to be serialized while sending all unsent. The particular model id was: " + model.getId());
+					e.printStackTrace();
+				}
 			}
 		}
 		
