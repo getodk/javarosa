@@ -18,6 +18,7 @@ package org.javarosa.formmanager.activity;
 
 import java.util.Hashtable;
 
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 
 import org.javarosa.core.Context;
@@ -91,7 +92,7 @@ public class MemoryCheckActivity implements IActivity
 		if(dataModelRMSUtility.computeSpace() <= 0.05 || formDefRMSUtility.computeSpace() <= 0.05) //less than 5% of memory left
 		{
 			String info = "Your phone memory is low and you may not be able to save more forms";
-			final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert("Memory low!", info, null, AlertType.ERROR);
+			final Alert a = new Alert("Memory low!", info, null, AlertType.ERROR);
 			a.setTimeout(2000);//calm down and read the alert first
 			mainShell.setDisplay(this, new IView() {public Object getScreenObject() { return a;}} );
 		}

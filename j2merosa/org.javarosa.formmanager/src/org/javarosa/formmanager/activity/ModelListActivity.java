@@ -24,6 +24,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -272,7 +273,7 @@ public class ModelListActivity extends List implements CommandListener,
 	 * 
 	 */
 	private void handleModelAlreadyDelivered(){
-		final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert(
+		final Alert a = new Alert(
 				"Resend restriction", "Form already submitted!", null,
 				AlertType.INFO);
 		this.parent.setDisplay(this, new IView() {
@@ -292,7 +293,7 @@ public class ModelListActivity extends List implements CommandListener,
 	 * @param e
 	 */
 	private void handleModelRetrieveException(Exception e){
-		final javax.microedition.lcdui.Alert a = new javax.microedition.lcdui.Alert(
+		final Alert a = new Alert(
 				"modelLoadError", "Error Loading Model", null,
 				AlertType.ERROR);
 		this.parent.setDisplay(this, new IView() {

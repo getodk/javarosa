@@ -158,7 +158,7 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 
 				}
 				else if(logScr.getUserName()==""||logScr.getPassWord()==""){
-					final javax.microedition.lcdui.Alert fail = new javax.microedition.lcdui.Alert("Error", "Enter Username and Password", null, AlertType.ERROR);
+					final Alert fail = new Alert("Error", "Enter Username and Password", null, AlertType.ERROR);
 					parent.setDisplay(this, new IView() {public Object getScreenObject() {return fail;}});
 					Hashtable returnArgs = new Hashtable();
 					returnArgs.put(COMMAND_KEY, "USER_NOT_VALIDATED");
@@ -243,7 +243,7 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 		String response = (String) temp.get("response");
 
 		if(response ==null){
-			final javax.microedition.lcdui.Alert alertdialog = new javax.microedition.lcdui.Alert("Web Service Error", "No response from server", null, AlertType.ERROR);
+			final Alert alertdialog = new Alert("Web Service Error", "No response from server", null, AlertType.ERROR);
 			alertdialog.setTimeout(1000);
 			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
 			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
@@ -260,7 +260,7 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 					returnArgs);
 
 		}else if(response.equals("authenticationerror")){
-			final javax.microedition.lcdui.Alert fail = new javax.microedition.lcdui.Alert("Error", "Invalid uID or Password: "+ response, null, AlertType.ERROR);
+			final Alert fail = new Alert("Error", "Invalid uID or Password: "+ response, null, AlertType.ERROR);
 			//fail.setTimeout(1000);
 			parent.setDisplay(this, new IView() {public Object getScreenObject() {return fail;}});
 			Hashtable returnArgs = new Hashtable();
@@ -268,7 +268,7 @@ public class RemoteLoginActivity implements IActivity,CommandListener,ItemComman
 			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE,returnArgs);
 			
 		}else if(response.equals("notfound")){
-			final javax.microedition.lcdui.Alert fail = new javax.microedition.lcdui.Alert("Error", "Server error: " +response, null, AlertType.ERROR);
+			final Alert fail = new Alert("Error", "Server error: " +response, null, AlertType.ERROR);
 			fail.setTimeout(1000);
 			parent.setDisplay(this, new IView() {public Object getScreenObject() {return fail;}});
 			Hashtable returnArgs = new Hashtable();
