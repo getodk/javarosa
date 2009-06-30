@@ -147,7 +147,12 @@ public class ReferralEntity implements IEntity {
 	 * @see org.javarosa.entity.model.IEntity#matchID(java.lang.String)
 	 */
 	public boolean matchID(String key) {
-		// TODO Auto-generated method stub
+		String[] fields = this.getShortFields();
+		for(int i = 0; i < fields.length; ++i) {
+			if(fields[i].indexOf(key) != -1) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -155,8 +160,7 @@ public class ReferralEntity implements IEntity {
 	 * @see org.javarosa.entity.model.IEntity#matchName(java.lang.String)
 	 */
 	public boolean matchName(String key) {
-		// TODO Auto-generated method stub
-		return false;
+		return matchID(key);
 	}
 
 	/* (non-Javadoc)
