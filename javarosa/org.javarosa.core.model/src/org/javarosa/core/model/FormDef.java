@@ -19,10 +19,14 @@ package org.javarosa.core.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.NoSuchElementException;
 import java.util.Vector;
+
+import me.regexp.RE;
 
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
@@ -38,6 +42,7 @@ import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.QuestionPreloader;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
@@ -62,7 +67,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 
 	public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
-	private Vector children;// <IFormElement> 
+	private Vector children;// <IFormElement>
 	/** A collection of group definitions. */
 	private int id;
 	/** The numeric unique identifier of the form definition on the local device */
@@ -73,10 +78,14 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	 * A unique external name that is used to identify the form between machines
 	 */
 	private Localizer localizer;
-	public Vector triggerables; // <Triggerable>; this list is topologically ordered, meaning for any tA and tB in
-	//the list, where tA comes before tB, evaluating tA cannot depend on any result from evaluating tB
-	private boolean triggerablesInOrder; //true if triggerables has been ordered topologically (DON'T DELETE ME EVEN THOUGH I'M UNUSED)
-	
+	public Vector triggerables; // <Triggerable>; this list is topologically
+	// ordered, meaning for any tA and tB in
+	// the list, where tA comes before tB, evaluating tA cannot depend on any
+	// result from evaluating tB
+	private boolean triggerablesInOrder; // true if triggerables has been
+	// ordered topologically (DON'T
+	// DELETE ME EVEN THOUGH I'M UNUSED)
+
 	private DataModelTree model;
 	private Vector outputFragments; // <IConditionExpr> contents of <output>
 	// tags that serve as parameterized
@@ -105,7 +114,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 		outputFragments = new Vector();
 	}
 
-	
 	// ---------- child elements
 	public void addChild(IFormElement fe) {
 		this.children.addElement(fe);
@@ -229,11 +237,11 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	public void setAnswer(IAnswerData data, TreeReference ref) {
 		setAnswer(data, model.resolveReference(ref));
 	}
-	
+
 	public void setAnswer(IAnswerData data, TreeElement node) {
 		node.setAnswer(data);
 	}
-	
+
 	/**
 	 * Deletes the inner-most repeat that this node belongs to and returns the
 	 * corresponding FormIndex. Behavior is currently undefined if you call this
@@ -301,12 +309,16 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	}
 
 	public boolean canCreateRepeat(TreeReference repeatRef) {
-		Condition c = (Condition) conditionRepeatTargetIndex.get(repeatRef.genericize());
+		Condition c = (Condition) conditionRepeatTargetIndex.get(repeatRef
+				.genericize());
 		if (c != null) {
-			return c.evalBool(model, new EvaluationContext(exprEvalContext,	repeatRef));
-		} /* else check # child constraints of parent
-		
-		} */
+			return c.evalBool(model, new EvaluationContext(exprEvalContext,
+					repeatRef));
+		} /*
+		 * else check # child constraints of parent
+		 * 
+		 * }
+		 */
 
 		return true;
 	}
@@ -320,12 +332,16 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	public Triggerable addTriggerable(Triggerable t) {
 		int existingIx = triggerables.indexOf(t);
 		if (existingIx >= 0) {
-			//one node may control access to many nodes; this means many nodes effectively have the same condition
-			//let's identify when conditions are the same, and store and calculate it only once
+			// one node may control access to many nodes; this means many nodes
+			// effectively have the same condition
+			// let's identify when conditions are the same, and store and
+			// calculate it only once
 
-			//note, if the contextRef is unnecessarily deep, the condition will be evaluated more times than needed
-			//perhaps detect when 'identical' condition has a shorter contextRef, and use that one instead?
-			return (Triggerable)triggerables.elementAt(existingIx);
+			// note, if the contextRef is unnecessarily deep, the condition will
+			// be evaluated more times than needed
+			// perhaps detect when 'identical' condition has a shorter
+			// contextRef, and use that one instead?
+			return (Triggerable) triggerables.elementAt(existingIx);
 		} else {
 			triggerables.addElement(t);
 			triggerablesInOrder = false;
@@ -360,70 +376,75 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 		}
 	}
 
-	public void finalizeTriggerables () {
+	public void finalizeTriggerables() {
 		Vector partialOrdering = new Vector();
 		for (int i = 0; i < triggerables.size(); i++) {
-			Triggerable t = (Triggerable)triggerables.elementAt(i);
+			Triggerable t = (Triggerable) triggerables.elementAt(i);
 			Vector deps = new Vector();
-			
+
 			if (t.canCascade()) {
 				for (int j = 0; j < t.getTargets().size(); j++) {
-					TreeReference target = (TreeReference)t.getTargets().elementAt(j);
-					Vector triggered = (Vector)triggerIndex.get(target);
+					TreeReference target = (TreeReference) t.getTargets()
+							.elementAt(j);
+					Vector triggered = (Vector) triggerIndex.get(target);
 					if (triggered != null) {
 						for (int k = 0; k < triggered.size(); k++) {
-							Triggerable u = (Triggerable)triggered.elementAt(k);
+							Triggerable u = (Triggerable) triggered
+									.elementAt(k);
 							if (!deps.contains(u))
 								deps.addElement(u);
 						}
 					}
 				}
 			}
-			
+
 			for (int j = 0; j < deps.size(); j++) {
-				Triggerable u = (Triggerable)deps.elementAt(j);
-				Triggerable[] edge = {t, u};
+				Triggerable u = (Triggerable) deps.elementAt(j);
+				Triggerable[] edge = { t, u };
 				partialOrdering.addElement(edge);
 			}
 		}
-		
+
 		Vector vertices = new Vector();
 		for (int i = 0; i < triggerables.size(); i++)
 			vertices.addElement(triggerables.elementAt(i));
 		triggerables.removeAllElements();
-		
+
 		while (vertices.size() > 0) {
-			//determine root nodes
+			// determine root nodes
 			Vector roots = new Vector();
 			for (int i = 0; i < vertices.size(); i++) {
 				roots.addElement(vertices.elementAt(i));
 			}
 			for (int i = 0; i < partialOrdering.size(); i++) {
-				Triggerable[] edge = (Triggerable[])partialOrdering.elementAt(i);
+				Triggerable[] edge = (Triggerable[]) partialOrdering
+						.elementAt(i);
 				roots.removeElement(edge[1]);
 			}
-			
-			//if no root nodes while graph still has nodes, graph has cycles
+
+			// if no root nodes while graph still has nodes, graph has cycles
 			if (roots.size() == 0) {
-				throw new RuntimeException("Cannot create partial ordering of triggerables due to dependency cycle. Why wasn't this caught during parsing?");
+				throw new RuntimeException(
+						"Cannot create partial ordering of triggerables due to dependency cycle. Why wasn't this caught during parsing?");
 			}
 
-			//remove root nodes and edges originating from them
+			// remove root nodes and edges originating from them
 			for (int i = 0; i < roots.size(); i++) {
-				Triggerable root = (Triggerable)roots.elementAt(i);
+				Triggerable root = (Triggerable) roots.elementAt(i);
 				triggerables.addElement(root);
 				vertices.removeElement(root);
-			}			
+			}
 			for (int i = partialOrdering.size() - 1; i >= 0; i--) {
-				Triggerable[] edge = (Triggerable[])partialOrdering.elementAt(i);
+				Triggerable[] edge = (Triggerable[]) partialOrdering
+						.elementAt(i);
 				if (roots.contains(edge[0]))
 					partialOrdering.removeElementAt(i);
 			}
 		}
-		
+
 		triggerablesInOrder = true;
 	}
-	
+
 	public void initializeTriggerables() {
 		initializeTriggerables(TreeReference.rootRef());
 	}
@@ -437,26 +458,27 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 
 		Vector applicable = new Vector();
 		for (int i = 0; i < triggerables.size(); i++) {
-			Triggerable t = (Triggerable)triggerables.elementAt(i);
+			Triggerable t = (Triggerable) triggerables.elementAt(i);
 			for (int j = 0; j < t.getTargets().size(); j++) {
-				TreeReference target = (TreeReference)t.getTargets().elementAt(j);
+				TreeReference target = (TreeReference) t.getTargets()
+						.elementAt(j);
 				if (genericRoot.isParentOf(target, false)) {
 					applicable.addElement(t);
 					break;
 				}
 			}
 		}
-		
+
 		evaluateTriggerables(applicable, rootRef);
 	}
-	
+
 	// ref: unambiguous ref of node that just changed
 	public void triggerTriggerables(TreeReference ref) {
 		// turn unambiguous ref into a generic ref
 		TreeReference genericRef = ref.genericize();
 
 		// get conditions triggered by this node
-		Vector triggered = (Vector)triggerIndex.get(genericRef);
+		Vector triggered = (Vector) triggerIndex.get(genericRef);
 		if (triggered == null)
 			return;
 
@@ -467,16 +489,18 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	}
 
 	private void evaluateTriggerables(Vector tv, TreeReference anchorRef) {
-		//add all cascaded triggerables to queue
+		// add all cascaded triggerables to queue
 		for (int i = 0; i < tv.size(); i++) {
-			Triggerable t = (Triggerable)tv.elementAt(i);
+			Triggerable t = (Triggerable) tv.elementAt(i);
 			if (t.canCascade()) {
 				for (int j = 0; j < t.getTargets().size(); j++) {
-					TreeReference target = (TreeReference)t.getTargets().elementAt(j);
-					Vector triggered = (Vector)triggerIndex.get(target);
+					TreeReference target = (TreeReference) t.getTargets()
+							.elementAt(j);
+					Vector triggered = (Vector) triggerIndex.get(target);
 					if (triggered != null) {
 						for (int k = 0; k < triggered.size(); k++) {
-							Triggerable u = (Triggerable)triggered.elementAt(k);
+							Triggerable u = (Triggerable) triggered
+									.elementAt(k);
 							if (!tv.contains(u))
 								tv.addElement(u);
 						}
@@ -484,22 +508,24 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 				}
 			}
 		}
-		
-		//'triggerables' is topologically-ordered by dependencies, so evaluate the triggerables in 'tv'
-		//in the order they appear in 'triggerables'
+
+		// 'triggerables' is topologically-ordered by dependencies, so evaluate
+		// the triggerables in 'tv'
+		// in the order they appear in 'triggerables'
 		for (int i = 0; i < triggerables.size(); i++) {
-			Triggerable t = (Triggerable)triggerables.elementAt(i);
+			Triggerable t = (Triggerable) triggerables.elementAt(i);
 			if (tv.contains(t)) {
 				evaluateTriggerable(t, anchorRef);
 			}
 		}
 	}
-	
+
 	private void evaluateTriggerable(Triggerable t, TreeReference anchorRef) {
 		TreeReference contextRef = t.contextRef.contextualize(anchorRef);
 		Vector v = model.expandReference(contextRef);
 		for (int i = 0; i < v.size(); i++) {
-			EvaluationContext ec = new EvaluationContext(exprEvalContext, (TreeReference)v.elementAt(i));
+			EvaluationContext ec = new EvaluationContext(exprEvalContext,
+					(TreeReference) v.elementAt(i));
 			t.apply(model, ec, this);
 		}
 	}
@@ -561,6 +587,96 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 				public boolean realTime() {
 					return false;
 				}
+			});
+		}
+		if (!ec.getFunctionHandlers().containsKey("regex")) {
+			ec.addFunctionHandler(new IFunctionHandler() {
+
+				public String getName() {
+					return "regex";
+				}
+
+				public Object eval(Object[] args) {
+					String input = args[0].toString();
+					String regEx = args[1].toString();
+
+					RE r = new RE(regEx);
+					r.setMatchFlags(RE.MATCH_CASEINDEPENDENT);
+					Boolean bool = new Boolean(r.match(input));
+					System.out.println("MATCH ??? " + bool);
+					return bool;
+				}
+
+				public Vector getPrototypes() {
+					Class[] proto = { String.class, String.class };
+					Vector p = new Vector();
+					p.addElement(proto);
+					return p;
+				}
+
+				public boolean rawArgs() {
+					return false;
+				}
+
+				public boolean realTime() {
+					return false;
+				}
+
+			});
+		}
+
+		if (!ec.getFunctionHandlers().containsKey("comparedate")) {
+			ec.addFunctionHandler(new IFunctionHandler() {
+
+				public String getName() {
+					return "comparedate";
+				}
+
+				public Object eval(Object[] args) {
+					System.out.println("her I am!");
+					Calendar c1 = Calendar.getInstance();
+					
+					Date date1 = (Date) args[0];
+					Date date2;
+					try {
+						date2 = (Date) args[1];
+					} catch (Exception nex) {
+						Calendar c = Calendar.getInstance();
+						date2 = c.getTime();
+					} 
+					int condition = Integer.parseInt(args[2].toString());
+					System.out.println("Condition: " + condition);
+
+					System.out.println("DATE1: " + date1.getTime() + "\t DATE2: "
+							+ date2.getTime());
+
+					int result = 0; 
+					if (date1.getTime() > date2.getTime()){
+						result = 1;
+					} else if (date1.getTime() < date2.getTime()) {
+						result = -1;
+					}
+					System.out.println("Result:" + result);
+					return new Boolean(result == condition);
+
+				}
+
+				public Vector getPrototypes() {
+					System.out.println("PROTOTYPES!");
+					Class[] proto = { Date.class, String.class, String.class };
+					Vector p = new Vector();
+					p.addElement(proto);
+					return p;
+				}
+
+				public boolean rawArgs() {
+					return false;
+				}
+
+				public boolean realTime() {
+					return false;
+				}
+
 			});
 		}
 	}
@@ -754,25 +870,30 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
+	public void readExternal(DataInputStream dis, PrototypeFactory pf)
+			throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
 		setName(ExtUtil.nullIfEmpty(ExtUtil.readString(dis)));
-		setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class),
+				pf));
 		setChildren((Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 
 		model = (DataModelTree) ExtUtil.read(dis, DataModelTree.class, pf);
 		model.setFormId(getID());
 
-		setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
+		setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(
+				Localizer.class), pf));
 
-		Vector vcond = (Vector) ExtUtil.read(dis, new ExtWrapList(Condition.class), pf);
-		for (Enumeration e = vcond.elements(); e.hasMoreElements(); )
+		Vector vcond = (Vector) ExtUtil.read(dis, new ExtWrapList(
+				Condition.class), pf);
+		for (Enumeration e = vcond.elements(); e.hasMoreElements();)
 			addTriggerable((Condition) e.nextElement());
-		Vector vcalc = (Vector) ExtUtil.read(dis, new ExtWrapList(Recalculate.class), pf);
+		Vector vcalc = (Vector) ExtUtil.read(dis, new ExtWrapList(
+				Recalculate.class), pf);
 		for (Enumeration e = vcalc.elements(); e.hasMoreElements();)
 			addTriggerable((Recalculate) e.nextElement());
 		finalizeTriggerables();
-		
+
 		outputFragments = (Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
 	}
 
