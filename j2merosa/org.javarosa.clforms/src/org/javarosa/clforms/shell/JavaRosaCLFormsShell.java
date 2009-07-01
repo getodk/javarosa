@@ -96,12 +96,12 @@ public class JavaRosaCLFormsShell implements IShell {
 
 		FormDefRMSUtility formDef = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
 		if (formDef.getNumberOfRecords() == 0) {
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL_Help.xhtml"));
-//			formDef.writeToRMS(XFormUtils.getFormFromResource("/onlineTest.xhtml"));
-//			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTOpenDay2.xhtml"));
-//			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTLT2.xhtml"));
+//			formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL_Help.xhtml"));
+			//formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTOpenDay2.xhtml"));
+			//formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTLT2.xhtml"));
 //		formDef.writeToRMS(XFormUtils.getFormFromResource("/hmis-a_draft.xhtml"));
-//		formDef.writeToRMS(XFormUtils.getFormFromResource("/MobileSurvey.xhtml"));
+		//formDef.writeToRMS(XFormUtils.getFormFromResource("/MobileSurvey.xhtml"));
+			formDef.writeToRMS(XFormUtils.getFormFromResource("/BasicQuiz.xhtml"));
 		}
 	}
 
@@ -151,6 +151,7 @@ public class JavaRosaCLFormsShell implements IShell {
 
 
 	private void workflowLaunch (IActivity returningActivity, String returnCode, Hashtable returnVals) {
+		
 		if (returningActivity == null) {
 
 			launchActivity(new SplashScreenActivity(this, "/splash.gif"), context);
@@ -393,13 +394,17 @@ public class JavaRosaCLFormsShell implements IShell {
 		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new JavaRosaPropertyRules());
 		//JavaRosaServiceProvider.instance().getPropertyManager().addRules(new DemoAppProperties());
 		PropertyUtils.initializeProperty("DeviceID", PropertyUtils.genGUID(25));
-		//PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://localhost/limesurvey/admin/post2lime.php");
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, postURL);
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, postURL);
-		//PropertyUtils.initializeProperty(HttpTransportProperties.GET_URL_PROPERTY, "http://update.cell-life.org/save_dump.php");
-		PropertyUtils.initializeProperty(HttpTransportProperties.GET_URL_PROPERTY, getURL);
-		//PropertyUtils.initializeProperty(HttpTransportProperties.AUTH_URL_PROPERTY, "http://dev.cell-life.org/javarosa/web/limesurvey/verifyremote.php");
-		PropertyUtils.initializeProperty(HttpTransportProperties.AUTH_URL_PROPERTY, authURL);
+
+		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, "http://localhost/limesurvey/admin/post2lime.php");
+		
+//		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, postURL);
+//		PropertyUtils.initializeProperty(HttpTransportProperties.GET_URL_PROPERTY, getURL);
+//		PropertyUtils.initializeProperty(HttpTransportProperties.AUTH_URL_PROPERTY, authURL);
+				
+		PropertyUtils.initializeProperty(HttpTransportProperties.AUTH_URL_PROPERTY, "http://localhost/limesurvey/verifyremote.php");
+		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, "http://localhost/limesurvey/admin/post2lime.php");
+		PropertyUtils.initializeProperty(HttpTransportProperties.GET_URL_PROPERTY, "http://localhost/limesurvey/listSurveys.php");
+
 
 	}
 
