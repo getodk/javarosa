@@ -368,7 +368,8 @@ public class XPathEvalTest extends TestCase {
 		testEval("concat('ab','cde','','fgh',1,false(),'ijklmnop')", null, ec, "abcdefgh1falseijklmnop");
 		testEval("check-types(55, '55', false(), '1999-09-09', get-custom(false()))", null, ec, Boolean.TRUE);
 		testEval("check-types(55, '55', false(), '1999-09-09', get-custom(true()))", null, ec, Boolean.TRUE);
-
+		testEval("regex('12345','[0-9]+')", null, ec, Boolean.TRUE);
+		
 		try {
 			testEval("null-proto()", null, ec, new XPathUnhandledException());
 			fail("Did not get expected null pointer");
@@ -519,6 +520,30 @@ public class XPathEvalTest extends TestCase {
 			public boolean realTime () { return false; }
 			public Object eval (Object[] args) { return Boolean.TRUE; }
 		});
+		
+		ec.addFunctionHandler(new IFunctionHandler(){
+
+			public String getName() { return "regex";	}
+			public Object eval(Object[] args) { 
+				System.out.println("EVAL REGEX TESTS:");
+				for (int i = 0; i< args.length; i++){
+					System.out.println("REGEX ARGS: " +args[i].toString());
+				}
+				
+				
+				return new Boolean(true); // String.re  args[0].
+				
+			}
+			public Vector getPrototypes () {
+				Vector p = new Vector();
+				p.addElement(allPrototypes[2]);
+				return p;
+			}
+			public boolean rawArgs() { return false; }
+			public boolean realTime() {	return false; }
+			
+		});
+		
 		
 		ec.addFunctionHandler(new IFunctionHandler () {
 			public String getName () { return "add"; }
