@@ -57,7 +57,7 @@ public class GeoPointData implements IAnswerData {
 	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
 	 */
 	public String getDisplayText() {
-		return gp[0]+","+gp[1];
+		return gp[0]+" "+gp[1];
 	}
 
 	/* (non-Javadoc)
