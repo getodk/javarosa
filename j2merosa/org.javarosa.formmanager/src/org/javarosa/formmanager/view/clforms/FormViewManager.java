@@ -238,14 +238,14 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 	}
 
 	public void formComplete() {
-		if(!model.isReadOnly()){
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException ie) {
-		}
+		if (!model.isReadOnly()) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ie) {
+			}
 
-		controller.save();// always save form
-		controller.exit();
+			controller.save();// always save form
+			controller.exit();
 		}
 	}
 
@@ -270,21 +270,8 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				controller.exit();
 			} else if (command == FormViewScreen.sendCommand) {
 				// check if all required questions are complete
-				int counter = 0;
-
-				for (FormIndex a = model.getForm().incrementIndex(
-						FormIndex.createBeginningOfFormIndex()); a
-						.compareTo(FormIndex.createEndOfFormIndex()) < 0; a = model
-						.getForm().incrementIndex(a)) {
-					FormElementBinding bind = new FormElementBinding(null, a,
-							model.getForm());
-
-					if (bind.instanceNode.required && bind.getValue() == null) {
-						// set counter for incomplete questions
-						counter++;
-					}
-
-				}
+				int counter = model.countUnansweredQuestions(true);
+				
 				if (counter > 0) {
 					// show alert
 					String txt = "There are unanswered compulsory questions and must be completed first to proceed";
@@ -299,16 +286,15 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 					model.setFormComplete();
 				// controller.exit();
 			} else if (command == List.SELECT_COMMAND) {
-				if (!model.isReadOnly()){
-				int i = formView.getSelectedIndex();
-				FormIndex b = formView.indexHash.get(i);
-				controller.selectQuestion(b);
-				this.showFormView = false;
-				}
-				else
-				{
-					String txt = JavaRosaServiceProvider.instance().localize("view.sending.FormUneditable");
-					
+				if (!model.isReadOnly()) {
+					int i = formView.getSelectedIndex();
+					FormIndex b = formView.indexHash.get(i);
+					controller.selectQuestion(b);
+					this.showFormView = false;
+				} else {
+					String txt = JavaRosaServiceProvider.instance().localize(
+							"view.sending.FormUneditable");
+
 					// #style CL_Forms_Form
 					final Alert alert = new Alert("Cannot Edit Answers!", txt,
 							null, AlertType.ERROR);
@@ -316,7 +302,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 						public Object getScreenObject() {
 							return alert;
 						}
-					});	
+					});
 				}
 			}
 
@@ -325,9 +311,14 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 					|| command == SingleQuestionScreen.nextCommand) {
 				answer = widget.getWidgetValue();
 
-				if (prompt.instanceNode.required && answer == null) {
-					String txt = JavaRosaServiceProvider.instance().localize("view.sending.CompulsoryQuestionsIncomplete");
+				int result = controller.questionAnswered(this.prompt,
+						this.answer);
+				if (result == controller.QUESTION_CONSTRAINT_VIOLATED) {
+//					System.out.println("answer validation constraint violated");
+//					TODO:   String txt = JavaRosaServiceProvider.instance().localize(
+//							"view.sending.CompulsoryQuestionsIncomplete");
 					
+					String txt = "Validation failure: data is not of the correct format.";
 					// #style CL_Forms_Form
 					final Alert alert = new Alert("Question Required!", txt,
 							null, AlertType.ERROR);
@@ -336,20 +327,23 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 							return alert;
 						}
 					});
-				} else {
-					// save and proceed to next question
-					controller.commitAnswer(this.prompt, answer);
-					if (model.getForm()
-							.incrementIndex(model.getQuestionIndex())
-							.isInForm()) {
-						direction = true;
-						controller.stepQuestion(direction);
-					} else {
-						controller.save();// always save
-						this.showFormView = true;
-						showFormViewScreen();
-					}
+
+				} else if (result == controller.QUESTION_REQUIRED_BUT_EMPTY) {
+//					System.out.println("answer required but empty");
+
+//					String txt = JavaRosaServiceProvider.instance().localize(
+//							"view.sending.CompulsoryQuestionsIncomplete");
+					String txt = "This question is compulsory. You must answer it.";
+					// #style CL_Forms_Form
+					final Alert alert = new Alert("Question Required!", txt,
+							null, AlertType.ERROR);
+					controller.setView(new IView() {
+						public Object getScreenObject() {
+							return alert;
+						}
+					});
 				}
+		
 			} else if (command == SingleQuestionScreen.previousCommand) {
 				direction = false;
 				controller.stepQuestion(direction);
@@ -387,6 +381,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 		}
 	}
 
+	
 	public void commandAction(Command c, Item item) {
 		if (c == SingleQuestionScreen.nextItemCommand) {
 			answer = widget.getWidgetValue();
