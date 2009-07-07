@@ -20,6 +20,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
+import org.javarosa.core.util.MathUtils;
+
 /**
  * Static utility methods for Dates in j2me 
  * 
@@ -34,6 +36,8 @@ public class DateUtils {
 	public static final int FORMAT_HUMAN_READABLE_SHORT = 2;
 	//public static final int FORMAT_HUMAN_READABLE_LONG = 3;
 	public static final int FORMAT_TIMESTAMP_SUFFIX = 7;
+	
+	public static final long DAY_IN_MS = 86400000l;
 	
 	public DateUtils() {
 		super();
@@ -99,7 +103,7 @@ public class DateUtils {
 		return cd.getTime();		
 	}
 	
-	/* ==== FORMATTING DATES/TIMES ==== */
+	/* ==== FORMATTING DATES/TIMES TO STANDARD STRINGS ==== */
 	
 	public static String formatDateTime (Date d, int format) {
 		if (d == null)
@@ -168,7 +172,7 @@ public class DateUtils {
 		return intPad(f.hour, 2) + intPad(f.minute, 2) + intPad(f.second, 2);
 	}
 	
-	/* ==== PARSING DATES/TIMES ==== */
+	/* ==== PARSING DATES/TIMES FROM STANDARD STRINGS ==== */
 	
 	public static Date parseDateTime (String str) {
 		DateFields fields = new DateFields();
@@ -292,6 +296,35 @@ public class DateUtils {
 		return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
 	}
 	
+	
+	/* ==== Parsing to Human Text ==== */
+	
+	/**
+	 * Provides text representing a span of time.
+	 * 
+	 * NOTE: Should probably just be a "format date" entry
+	 * 
+	 * @param d The date to be compared against the current date.
+	 * @return a string which is a human readable representation of the difference between
+	 * the provided date and the current date.  
+	 */
+	public static String getDifferenceFromToday(Date d) {
+		String daysAgoStr;
+		double daysAgo = (int)(DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d));
+		
+		//#if commcare.lang.sw
+		daysAgoStr = (daysAgo < 0 ? "From the futurrrrrre" : daysAgo == 0 ? "Leo" : daysAgo == 1 ? "Jana" : daysAgo == 2 ? "Juzi" : daysAgo + " days ago");
+		//#else
+		//TODO: Localize this
+		if(daysAgo >= 0 && daysAgo < 1) { return "Today";} 
+		else if(daysAgo >= 1 && daysAgo < 2) { return "Yesterday";}
+		else if(daysAgo >= 2 && daysAgo < 30) { return daysAgo + " days ago";}
+		else if(daysAgo < 0 && daysAgo > -1) { return "Tomorrow";}
+		else if(daysAgo < -1) { return daysAgo + " days from today";}
+		//#endif
+		return daysAgoStr;
+	}
+	
 	/* ==== DATE OPERATIONS ==== */
 	
     /**
@@ -345,7 +378,7 @@ public class DateUtils {
 			}
 
 			diff = (((current_dow - target_dow) + (7 + offset)) % 7 - offset) + (7 * nAgo) - (beginning ? 0 : 6); //booyah
-			d = new Date(ref.getTime() - diff * 86400000l);
+			d = new Date(ref.getTime() - diff * DAY_IN_MS);
 		} else if (type.equals("month")) {
 			//not supported
 		} else {
@@ -374,6 +407,17 @@ public class DateUtils {
 		int spanMonth = calendar.get(Calendar.MONTH);
 		int months = (spanYear - firstYear)*12 + (spanMonth - firstMonth);
 		return months;
+	}
+	
+	/**
+	 * @param date the date object to be analyzed
+	 * @return The number of days (as a double precision floating point) since the Epoch
+	 */
+	public static double daysSinceEpoch(Date date) {
+		//43200000l: 0.5 day in ms
+		return MathUtils.divLongNotSuck(
+				DateUtils.roundDate(date).getTime() - DateUtils.getDate(1970, 1, 1).getTime() + 43200000l,
+				DAY_IN_MS); //half-day offset is needed to handle differing DST offsets!
 	}
 	
 	/**

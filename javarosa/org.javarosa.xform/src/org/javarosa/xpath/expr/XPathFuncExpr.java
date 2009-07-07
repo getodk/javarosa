@@ -29,6 +29,7 @@ import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -228,15 +229,6 @@ public class XPathFuncExpr extends XPathExpression {
 			throw new XPathTypeMismatchException("converting to boolean");
 		}
 	}
-			
-	//a - b * floor(a / b)
-	private static long modLongNotSuck (long a, long b) {
-		return ((a % b) + b) % b;
-	}
-
-	private static long divLongNotSuck (long a, long b) {
-		return (a - modLongNotSuck(a, b)) / b;
-	}
 	
 	public static Double toNumeric (Object o) {
 		Double val = null;
@@ -266,9 +258,7 @@ public class XPathFuncExpr extends XPathExpression {
 				val = new Double(Double.NaN);
 			}
 		} else if (o instanceof Date) {
-			val = new Double(divLongNotSuck(
-					DateUtils.roundDate((Date)o).getTime() - DateUtils.getDate(1970, 1, 1).getTime() +	43200000l,
-					86400000l)); //43200000 offset (0.5 day in ms) is needed to handle differing DST offsets!
+			val = new Double(DateUtils.daysSinceEpoch((Date)o));
 		} else if (o instanceof IExprDataType) {
 			val = ((IExprDataType)o).toNumeric();
 		}
