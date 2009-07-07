@@ -20,9 +20,11 @@
 package org.javarosa.chsreferral.util;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.javarosa.chsreferral.model.PatientReferral;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entity.model.IEntity;
@@ -95,18 +97,7 @@ public class ReferralEntity implements IEntity {
 	 */
 	public String[] getLongFields(Object o) {
 		PatientReferral r = (PatientReferral)o;
-		return new String[] {r.getReferralId(), r.getType(), getDaysAgo(r.getDateReferred())};
-	}
-	
-	protected String getDaysAgo(Date d) {
-		String daysAgoStr;
-		int daysAgo = (int)(XPathFuncExpr.toNumeric(new Date()).doubleValue() - XPathFuncExpr.toNumeric(d).doubleValue());
-		//#if commcare.lang.sw
-		daysAgoStr = (daysAgo < 0 ? "From the futurrrrrre" : daysAgo == 0 ? "Leo" : daysAgo == 1 ? "Jana" : daysAgo == 2 ? "Juzi" : daysAgo + " days ago");
-		//#else
-		daysAgoStr = (daysAgo < 0 ? "From the futurrrrrre" : daysAgo == 0 ? "Today" : daysAgo == 1 ? "Yesterday" : daysAgo + " days ago");
-		//#endif
-		return daysAgoStr;
+		return new String[] {r.getReferralId(), r.getType(), DateUtils.getDifferenceFromToday(r.getDateReferred())};
 	}
 
 	/* (non-Javadoc)
@@ -140,7 +131,7 @@ public class ReferralEntity implements IEntity {
 	 * @see org.javarosa.entity.model.IEntity#getShortFields()
 	 */
 	public String[] getShortFields() {
-		return new String[] {getID(), type, getDaysAgo(date)};
+		return new String[] {getID(), type, DateUtils.getDifferenceFromToday(date)};
 	}
 
 	/* (non-Javadoc)
