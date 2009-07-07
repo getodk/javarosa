@@ -167,7 +167,11 @@ activity.adduser.problem.nametaken=Username ${0} already taken. Please choose an
 activity.adduser.problem.emptyuser=Username and password must both be given
 activity.adduser.problem.mismatchingpasswords=Passwords don't match
  
-
+formreview.period.select=Select Review Period
+formreview.period.today=Entered Today
+formreview.period.yesterday=Entered Yesterday
+formreview.period.week.this=Entered This Week
+formreview.period.week.last=Entered Last Week
 
 activity.edituser.edituser=Edit User
 
