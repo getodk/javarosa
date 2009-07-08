@@ -226,6 +226,15 @@ Sort=  Panga
 SortBy=  Panga kwa
 Cancel=  Kataa
 
+date=Tarehe
+time=Time
+name=Jina
+id=Namba
+
+model.name.long=Name of Form
+model.date.long=Date Entered
+model.time.long=Time Entered
+
 date.today=Leo
 date.yesterday=Jana
 date.twoago=Juzi
