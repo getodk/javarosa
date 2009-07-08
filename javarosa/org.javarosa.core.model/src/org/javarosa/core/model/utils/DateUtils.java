@@ -317,10 +317,10 @@ public class DateUtils {
 		if(daysAgo >= 0 && daysAgo < 1) { return JavaRosaServiceProvider.instance().localize("date.today");} 
 		else if(daysAgo >= 1 && daysAgo < 2) { JavaRosaServiceProvider.instance().localize("date.yesterday");}
 		else if(daysAgo >= 2 && daysAgo < 3) { return JavaRosaServiceProvider.instance().localize("date.twoago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
-		else if(daysAgo >= 2 && daysAgo < 30) { return JavaRosaServiceProvider.instance().localize("date.nago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
-		else if(daysAgo < 0 && daysAgo > -1) { return JavaRosaServiceProvider.instance().localize("date.tomorrow");} 
-		else if(daysAgo < -1) { return JavaRosaServiceProvider.instance().localize("date.nfromnow",new String[] {String.valueOf((int)Math.ceil(-daysAgo))});}
-		return daysAgoStr;
+		else if(daysAgo >= 2 && daysAgo <= 6) { return JavaRosaServiceProvider.instance().localize("date.nago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
+		else if(daysAgo < 0 && daysAgo >= -1) { return JavaRosaServiceProvider.instance().localize("date.tomorrow");} 
+		else if(daysAgo < -1 && daysAgo >= -6) { return JavaRosaServiceProvider.instance().localize("date.nfromnow",new String[] {String.valueOf((int)Math.ceil(-daysAgo))});}
+		return DateUtils.formatDate(f, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 	}
 	
 	/* ==== DATE OPERATIONS ==== */
