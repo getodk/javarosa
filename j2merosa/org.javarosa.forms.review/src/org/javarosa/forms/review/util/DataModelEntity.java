@@ -6,7 +6,6 @@ package org.javarosa.forms.review.util;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.utils.DateUtils;
@@ -23,6 +22,7 @@ public class DataModelEntity implements IEntity {
 	private String modelName;
 	private Date dateSaved;
 	private int recordId;
+	private int formId;
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#entityType()
@@ -63,9 +63,9 @@ public class DataModelEntity implements IEntity {
 	 */
 	public String[] getHeaders(boolean detailed) {
 		if(detailed) {
-			return new String[] {"Name of Form", "Date Entered", }; 
+			return new String[] {"Name of Form", "Date Entered", "Time Entered"}; 
 		} else {
-			return new String[] {"Name", "Date"};
+			return new String[] {"Name", "Date","Time"};
 		}
 	}
 
@@ -81,7 +81,7 @@ public class DataModelEntity implements IEntity {
 	 */
 	public String[] getLongFields(Object o) {
 		DataModelTree tree = (DataModelTree)o;
-		return new String[] {tree.getName(), DateUtils.getDifferenceFromToday(tree.getDateSaved())};
+		return new String[] {tree.getName(), DateUtils.getDifferenceFromToday(tree.getDateSaved()), DateUtils.formatTime(tree.getDateSaved(), DateUtils.FORMAT_HUMAN_READABLE_SHORT)};
 
 	}
 
@@ -107,7 +107,7 @@ public class DataModelEntity implements IEntity {
 	 * @see org.javarosa.entity.model.IEntity#getShortFields()
 	 */
 	public String[] getShortFields() {
-		return new String[] {modelName, DateUtils.getDifferenceFromToday(dateSaved)};
+		return new String[] {modelName, DateUtils.getDifferenceFromToday(dateSaved), DateUtils.formatTime(dateSaved, DateUtils.FORMAT_HUMAN_READABLE_SHORT)};
 	}
 
 	/* (non-Javadoc)
@@ -138,6 +138,7 @@ public class DataModelEntity implements IEntity {
 		dateSaved = tree.getDateSaved();
 		modelName = tree.getName();
 		recordId = tree.getRecordId();
+		formId = tree.getFormId();
 	}
 
 }

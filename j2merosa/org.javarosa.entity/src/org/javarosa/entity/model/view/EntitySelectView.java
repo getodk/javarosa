@@ -32,7 +32,9 @@ import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.StringItem;
+import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
+import de.enough.polish.ui.UiAccess;
 
 public class EntitySelectView extends FramedForm implements IView, ItemStateListener, CommandListener {
 	//#if javarosa.patientselect.formfactor == nokia-s40 or javarosa.patientselect.formfactor == sony-k610i
@@ -57,6 +59,7 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 	private EntitySelectActivity controller;
 	public String entityType;
 	
+	private String styleType;
 	private TextField tf;
 	private Command exitCmd;
 	private Command sortCmd;
@@ -122,6 +125,10 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 	
 	public Object getScreenObject() {
 		return this;
+	}
+	
+	public void setStyleKey(String key) {
+		styleType = key;
 	}
 
 	private void getMatches (String key) {
@@ -195,20 +202,58 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 			firstIndex = 0;
 	}
 	
+	private static final int TITLE = 0;
+	private static final int CELL = 1;
+	private static final int EVEN = 2;
+	private static final int ODD = 3;
+	private static final int SELECTED = 4;
+	
+	private void styleDynamically(Item i, int type) {
+		//#foreach esstyle in javarosa.patientselect.types
+		if("${esstyle}".equals(styleType)) {
+			switch(type) {
+			case TITLE:
+				//#style ${esstyle}SelectTitleRow, patselTitleRow
+				UiAccess.setStyle(i);
+				break;
+			case CELL:
+				//#style ${esstyle}SelectCell, patselCell
+				UiAccess.setStyle(i);
+				break;
+			case EVEN:
+				//#style ${esstyle}SelectEvenRow, patselSelectedRow
+				UiAccess.setStyle(i);
+				break;
+			case ODD:
+				//#style ${esstyle}SelectOddRow, patselEvenRow
+				UiAccess.setStyle(i);
+				break;
+			case SELECTED:
+				//#style ${esstyle}SelectSelectedRow, patselOddRow
+				UiAccess.setStyle(i);
+				break;
+			}
+		}
+		//#next esstyle
+	}
+	
 	private void refreshList () {
 		container.clear();
 		
 		//#style patselTitleRow
 		Container title = new Container(false);
+		styleDynamically(title, TITLE);
 		
 		String[] titleData = controller.getTitleData();
 		for (int j = 0; j < titleData.length; j++) {
 			//#style patselCell
 			StringItem str = new StringItem("", titleData[j]);
+			styleDynamically(str, CELL);
 			title.add(str);
 		}
 		//#style patselCell
-		StringItem number = new StringItem("","(" + String.valueOf(rowIDs.size()) + ")");
+		StringItem number = new StringItem("","(" + String.valueOf(rowIDs.size()));
+		styleDynamically(number, CELL);
 		title.add(number);
 		this.append(title);
 		
@@ -222,13 +267,16 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 			
 			if (i == selectedIndex) {
 				//#style patselSelectedRow
-				row = new Container(false);			
+				row = new Container(false);
+				styleDynamically(row, SELECTED);
 			} else if (i % 2 == 0) {
 				//#style patselEvenRow
 				row = new Container(false);
+				styleDynamically(row, EVEN);
 			} else {
 				//#style patselOddRow
 				row = new Container(false);
+				styleDynamically(row, ODD);
 			}
 			
 			if (rowID == INDEX_NEW) {
@@ -239,6 +287,7 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 				for (int j = 0; j < rowData.length; j++) {
 					//#style patselCell
 					StringItem str = new StringItem("", rowData[j]);
+					styleDynamically(str, CELL);
 					row.add(str);
 				}
 			}

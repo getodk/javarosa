@@ -103,19 +103,23 @@ public class SelectReviewPeriodActivity implements IActivity, CommandListener {
 			end = DateUtils.roundDate(new Date());
 			start = new Date(end.getTime() - DateUtils.DAY_IN_MS);
 		} else if(i == 2) {
-			Calendar c = Calendar.getInstance();
-			c.setTime(new Date());
-			c.set(Calendar.DAY_OF_WEEK, 0);
-			start = c.getTime();
+			start = getBeginningOfWeek();
 		} else if(i == 3) {
-			Calendar c = Calendar.getInstance();
-			c.setTime(new Date());
-			c.set(Calendar.DAY_OF_WEEK, 0);
-			end = c.getTime();
+			end = getBeginningOfWeek();
 			start = new Date(end.getTime() - DateUtils.DAY_IN_MS*7);
 		}
 		
 		return new DataModelDateFilter(start,end);
+	}
+	
+	private Date getBeginningOfWeek() {
+		Calendar c = Calendar.getInstance();
+		int dow = c.get(Calendar.DAY_OF_WEEK);
+		int dom = c.get(Calendar.DAY_OF_MONTH);
+		c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+		c.set(Calendar.DAY_OF_MONTH, dom - (dow - 1));
+		return DateUtils.roundDate(c.getTime());
+
 	}
 
 	private void startDisplay() {
