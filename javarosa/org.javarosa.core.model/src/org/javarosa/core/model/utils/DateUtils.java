@@ -309,7 +309,7 @@ public class DateUtils {
 	 * the provided date and the current date.  
 	 */
 	public static String getDifferenceFromToday(Date d) {
-		String daysAgoStr;
+		String daysAgoStr = "";
 		double daysAgo = (int)(DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d));
 		
 		//#if commcare.lang.sw
