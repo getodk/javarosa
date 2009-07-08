@@ -195,7 +195,13 @@ GetNewForms= Get New Forms
 ImageManagement= Image Management
 menu.ok=OK
 
+date=Date
+time=Time
+name=Name
 
+model.name.long=Name of Form
+model.date.long=Date Entered
+model.time.long=Time Entered
 
 Recorder= Recorder
 SendDataNow= Send Data Now
