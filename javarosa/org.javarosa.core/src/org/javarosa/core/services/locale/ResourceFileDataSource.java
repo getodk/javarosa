@@ -108,6 +108,9 @@ public class ResourceFileDataSource implements LocaleDataSource {
 				int read = isr.read(cbuf, offset, chunk - offset);
 				if(read == -1) {
 					done = true;
+					if(line != "") {
+						parseAndAdd(locale, line, curline);
+					}
 					break;
 				}
 				for(int i = 0 ; i < read ; ++i) {
@@ -115,34 +118,8 @@ public class ResourceFileDataSource implements LocaleDataSource {
 					if(cbuf[i] == '\n') {
 						curline ++;
 						//Newline. process our string and start the next one.
-						
-						//trim whitespace.
-						line = line.trim();
-						
-						//clear comments
-						while(line.indexOf("#") != -1) {
-							line = line.substring(0, line.indexOf("#"));
-						}
-						if(line.indexOf('=') == -1) {
-							// TODO: Invalid line. Empty lines are fine, especially with comments,
-							// but it might be hard to get all of those.
-							if(line.trim().equals("")) {
-								//Empty Line
-							} else {
-								System.out.println("Invalid line (#" + curline + ") read: " + line);
-							}
-						} else {
-							//Check to see if there's anything after the '=' first. Otherwise there
-							//might be some big problems.
-							if(line.indexOf('=') != line.length()-1) {
-								String value = line.substring(line.indexOf('=') + 1,line.length());
-								locale.put(line.substring(0, line.indexOf('=')), value);
-							}
-							 else {
-								System.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
-							}
-							line = "";
-						}
+						parseAndAdd(locale, line, curline);
+						line = "";
 					} else {
 						line += cbuf[i];
 					}
@@ -163,5 +140,34 @@ public class ResourceFileDataSource implements LocaleDataSource {
 		return locale;
 	}
 
+	private void parseAndAdd(OrderedHashtable locale, String line, int curline) {
+
+		//trim whitespace.
+		line = line.trim();
+		
+		//clear comments
+		while(line.indexOf("#") != -1) {
+			line = line.substring(0, line.indexOf("#"));
+		}
+		if(line.indexOf('=') == -1) {
+			// TODO: Invalid line. Empty lines are fine, especially with comments,
+			// but it might be hard to get all of those.
+			if(line.trim().equals("")) {
+				//Empty Line
+			} else {
+				System.out.println("Invalid line (#" + curline + ") read: " + line);
+			}
+		} else {
+			//Check to see if there's anything after the '=' first. Otherwise there
+			//might be some big problems.
+			if(line.indexOf('=') != line.length()-1) {
+				String value = line.substring(line.indexOf('=') + 1,line.length());
+				locale.put(line.substring(0, line.indexOf('=')), value);
+			}
+			 else {
+				System.out.println("Invalid line (#" + curline + ") read: '" + line + "'. No value follows the '='.");
+			}
+		}
+	}
 
 }
