@@ -63,6 +63,7 @@ public class EntitySelectActivity implements IActivity {
 		newEntityIDKey = this.context.getNewEntityIDKey();
 
 		selView.entityType = entityPrototype.entityType();
+		selView.setStyleKey(this.context.getStyleKey());
 		
 		Integer newMode = this.context.getNewMode();
 		if(newMode != null) {

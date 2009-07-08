@@ -35,6 +35,7 @@ public class EntitySelectContext extends Context {
 	public static final String NEW_MODE_KEY = "new-mode-key";
 	public static final String ENTITY_FILTER_KEY = "esc_filter_key";
 	public static final String BAIL_EMPTY = "esc_exit_empty";
+	public static final String ENTITY_STYLE_KEY = "esc_style_key";
 
 	
 	public EntitySelectContext(Context c) {
@@ -71,6 +72,14 @@ public class EntitySelectContext extends Context {
 	
 	public Integer getNewMode() {
 		return (Integer)getElement(NEW_MODE_KEY);
+	}
+	
+	public void setStyleKey(String key) {
+		setElement(ENTITY_STYLE_KEY, key);
+	}
+	
+	public String getStyleKey() {
+		return (String)getElement(ENTITY_STYLE_KEY);
 	}
 	
 	public void setBailOnEmpty(boolean bail) {
