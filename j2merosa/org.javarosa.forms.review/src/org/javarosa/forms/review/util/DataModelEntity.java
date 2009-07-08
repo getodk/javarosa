@@ -6,6 +6,7 @@ package org.javarosa.forms.review.util;
 import java.io.IOException;
 import java.util.Date;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.utils.DateUtils;
@@ -63,9 +64,13 @@ public class DataModelEntity implements IEntity {
 	 */
 	public String[] getHeaders(boolean detailed) {
 		if(detailed) {
-			return new String[] {"Name of Form", "Date Entered", "Time Entered"}; 
+			return new String[] {JavaRosaServiceProvider.instance().localize("model.name.long"),
+					JavaRosaServiceProvider.instance().localize("model.date.long"),
+					JavaRosaServiceProvider.instance().localize("model.time.long")};
 		} else {
-			return new String[] {"Name", "Date","Time"};
+			return new String[] {JavaRosaServiceProvider.instance().localize("name"),
+								JavaRosaServiceProvider.instance().localize("date"),
+								JavaRosaServiceProvider.instance().localize("time")};
 		}
 	}
 
