@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.util.MathUtils;
 
 /**
@@ -34,6 +35,7 @@ public class DateUtils {
 		
 	public static final int FORMAT_ISO8601 = 1;
 	public static final int FORMAT_HUMAN_READABLE_SHORT = 2;
+	public static final int FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY = 5;
 	//public static final int FORMAT_HUMAN_READABLE_LONG = 3;
 	public static final int FORMAT_TIMESTAMP_SUFFIX = 7;
 	
@@ -133,6 +135,7 @@ public class DateUtils {
 		switch (format) {
 		case FORMAT_ISO8601: return formatDateISO8601(f);
 		case FORMAT_HUMAN_READABLE_SHORT: return formatDateColloquial(f);
+		case FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY: return formatDaysFromToday(f);
 		case FORMAT_TIMESTAMP_SUFFIX: return formatDateSuffix(f);
 		default: return null;
 		}	
@@ -302,26 +305,21 @@ public class DateUtils {
 	/**
 	 * Provides text representing a span of time.
 	 * 
-	 * NOTE: Should probably just be a "format date" entry
-	 * 
-	 * @param d The date to be compared against the current date.
+	 * @param f The fields for the date to be compared against the current date.
 	 * @return a string which is a human readable representation of the difference between
 	 * the provided date and the current date.  
 	 */
-	public static String getDifferenceFromToday(Date d) {
+	private static String formatDaysFromToday(DateFields f) {
 		String daysAgoStr = "";
-		double daysAgo = (int)(DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d));
+		Date d = DateUtils.getDate(f);
+		double daysAgo = DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d);
 		
-		//#if commcare.lang.sw
-		daysAgoStr = (daysAgo < 0 ? "From the futurrrrrre" : daysAgo == 0 ? "Leo" : daysAgo == 1 ? "Jana" : daysAgo == 2 ? "Juzi" : daysAgo + " days ago");
-		//#else
-		//TODO: Localize this
-		if(daysAgo >= 0 && daysAgo < 1) { return "Today";} 
-		else if(daysAgo >= 1 && daysAgo < 2) { return "Yesterday";}
-		else if(daysAgo >= 2 && daysAgo < 30) { return daysAgo + " days ago";}
-		else if(daysAgo < 0 && daysAgo > -1) { return "Tomorrow";}
-		else if(daysAgo < -1) { return daysAgo + " days from today";}
-		//#endif
+		if(daysAgo >= 0 && daysAgo < 1) { return JavaRosaServiceProvider.instance().localize("date.today");} 
+		else if(daysAgo >= 1 && daysAgo < 2) { JavaRosaServiceProvider.instance().localize("date.yesterday");}
+		else if(daysAgo >= 2 && daysAgo < 3) { return JavaRosaServiceProvider.instance().localize("date.twoago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
+		else if(daysAgo >= 2 && daysAgo < 30) { return JavaRosaServiceProvider.instance().localize("date.nago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
+		else if(daysAgo < 0 && daysAgo > -1) { return JavaRosaServiceProvider.instance().localize("date.tomorrow");} 
+		else if(daysAgo < -1) { return JavaRosaServiceProvider.instance().localize("date.nfromnow",new String[] {String.valueOf((int)Math.ceil(-daysAgo))});}
 		return daysAgoStr;
 	}
 	

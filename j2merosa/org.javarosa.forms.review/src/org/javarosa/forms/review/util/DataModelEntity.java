@@ -86,7 +86,7 @@ public class DataModelEntity implements IEntity {
 	 */
 	public String[] getLongFields(Object o) {
 		DataModelTree tree = (DataModelTree)o;
-		return new String[] {tree.getName(), DateUtils.getDifferenceFromToday(tree.getDateSaved()), DateUtils.formatTime(tree.getDateSaved(), DateUtils.FORMAT_HUMAN_READABLE_SHORT)};
+		return new String[] {tree.getName(), DateUtils.formatDate(tree.getDateSaved(),DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY), DateUtils.formatTime(tree.getDateSaved(), DateUtils.FORMAT_HUMAN_READABLE_SHORT)};
 
 	}
 
@@ -112,7 +112,7 @@ public class DataModelEntity implements IEntity {
 	 * @see org.javarosa.entity.model.IEntity#getShortFields()
 	 */
 	public String[] getShortFields() {
-		return new String[] {modelName, DateUtils.getDifferenceFromToday(dateSaved), DateUtils.formatTime(dateSaved, DateUtils.FORMAT_HUMAN_READABLE_SHORT)};
+		return new String[] {modelName, DateUtils.formatDate(dateSaved,DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY), DateUtils.formatTime(dateSaved, DateUtils.FORMAT_HUMAN_READABLE_SHORT)};
 	}
 
 	/* (non-Javadoc)

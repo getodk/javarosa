@@ -234,10 +234,15 @@ sending.status.failed=Submission Failed
 sending.status.error=Submission Error Unknown
 
 menu.transport=Transport Menu
-
 Settings= Settings
-
-
 ViewSaved=View Saved
+
+
+date.today=Today
+date.yesterday=Yesterday
+date.twoago=${0} days ago
+date.tomorrow=Tomorrow
+date.nago=${0} days ago
+date.nfromnow=${0} days from today
 
 

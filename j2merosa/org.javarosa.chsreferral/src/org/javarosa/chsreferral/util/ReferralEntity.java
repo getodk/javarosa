@@ -97,7 +97,7 @@ public class ReferralEntity implements IEntity {
 	 */
 	public String[] getLongFields(Object o) {
 		PatientReferral r = (PatientReferral)o;
-		return new String[] {r.getReferralId(), r.getType(), DateUtils.getDifferenceFromToday(r.getDateReferred())};
+		return new String[] {r.getReferralId(), r.getType(), DateUtils.formatDate(r.getDateReferred(),DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY)};
 	}
 
 	/* (non-Javadoc)
@@ -131,7 +131,7 @@ public class ReferralEntity implements IEntity {
 	 * @see org.javarosa.entity.model.IEntity#getShortFields()
 	 */
 	public String[] getShortFields() {
-		return new String[] {getID(), type, DateUtils.getDifferenceFromToday(date)};
+		return new String[] {getID(), type, DateUtils.formatDate(date, DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY)};
 	}
 
 	/* (non-Javadoc)

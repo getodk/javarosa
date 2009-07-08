@@ -226,5 +226,9 @@ Sort=  Panga
 SortBy=  Panga kwa
 Cancel=  Kataa
 
-
- 
+date.today=Leo
+date.yesterday=Jana
+date.twoago=Juzi
+date.tomorrow=Tomorrow
+date.nago=${0} days ago
+date.nfromnow=${0} days from today
