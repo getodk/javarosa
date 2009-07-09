@@ -24,12 +24,13 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import me.regexp.RE;
+
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -136,6 +137,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return sum(model, argVals[0]);
 		} else if (name.equals("today") && args.length == 0) {
 			return DateUtils.roundDate(new Date());
+		} else if (name.equals("regex") && args.length==2){
+			return regex((String)argVals[0], (String)argVals[1]);
 		} else if (name.equals("now") && args.length == 0) {
 			return new Date();
 		} else if (name.equals("concat")) {
@@ -359,6 +362,16 @@ public class XPathFuncExpr extends XPathExpression {
 		String s = (String)o;
 
 		return new Double(DateUtils.split(s, " ", true).size());
+	}
+	
+	
+	public static Boolean regex(String str, String re){
+		System.out.println("String: " + str + " , RE: "+ re);
+		RE regexp = new RE(re);
+		boolean result = regexp.match(str);
+		System.out.println("RESULT: " + result);
+		return new Boolean(result);
+		
 	}
 	
 	public static Double count (Object o) {
