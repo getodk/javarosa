@@ -366,12 +366,9 @@ public class XPathFuncExpr extends XPathExpression {
 	
 	
 	public static Boolean regex(String str, String re){
-		System.out.println("String: " + str + " , RE: "+ re);
 		RE regexp = new RE(re);
 		boolean result = regexp.match(str);
-		System.out.println("RESULT: " + result);
 		return new Boolean(result);
-		
 	}
 	
 	public static Double count (Object o) {
