@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<project name="j2merosa" default="package">
+
+	<tstamp />
+	<property name="wtk" value="C:\WTK2.5.2\" />
+
+	<target name="init" description="set classpath and make needed directories">
+		<path id="classpath">
+			<fileset dir="lib/" includes="*.jar" />
+			<fileset dir="${wtk}/lib" includes="*.jar" />
+		</path>
+		<mkdir dir="bin/" />
+		<mkdir dir="dist/" />
+	</target>
+
+	<target name="clean" description="delete dist and bin directories">
+		<delete dir="dist/" />
+		<delete dir="bin/" />
+	</target>
+
+	<target name="compile" depends="clean,init" description="compile the source">
+		<javac srcdir="src/" destdir="bin/" classpathref="classpath" debug="true" debuglevel="lines,source" />
+	</target>
+
+	<target name="package" depends="compile" description="package source and binary into jar">
+		<jar destfile="dist/j2merosa.jar">
+			<fileset dir="bin/" includes="**/*.class" />
+			<fileset dir="src/" includes="**/*.java" />
+		</jar>
+	</target>
+
+</project>
