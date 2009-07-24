@@ -21,6 +21,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
 
 /**
@@ -68,7 +69,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      */
     public Vector allowableValues(String propertyName) {
     	if(CURRENT_LOCALE.equals(propertyName)) {
-    		Localizer l = JavaRosaServiceProvider.instance().getLocaleManager();
+    		Localizer l = Localization.getGlobalLocalizerAdvanced();
     		Vector v = new Vector();
     		String[] locales = l.getAvailableLocales();
     		for(int i = 0 ; i < locales.length ; ++i) {
@@ -84,7 +85,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      */
     public boolean checkValueAllowed(String propertyName, String potentialValue) {
     	if(CURRENT_LOCALE.equals(propertyName)) {
-    		return JavaRosaServiceProvider.instance().getLocaleManager().hasLocale(potentialValue);
+    		return Localization.getGlobalLocalizerAdvanced().hasLocale(potentialValue);
     	}
         Vector prop = ((Vector)rules.get(propertyName));
         if(prop.size() != 0) {
@@ -143,7 +144,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     	} else if(LOGS_ENABLED.equals(propertyName)) {
     		return "Device Logging";
     	} else if(CURRENT_LOCALE.equals(propertyName)) {
-    		return JavaRosaServiceProvider.instance().localize("settings.language");
+    		return Localization.get("settings.language");
     	}
     	return propertyName;
     }
@@ -163,7 +164,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     public void handlePropertyChanges(String propertyName) {
     	if(CURRENT_LOCALE.equals(propertyName)) {
     		String locale = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(propertyName);
-    		JavaRosaServiceProvider.instance().getLocaleManager().setLocale(locale);
+    		Localization.setLocale(locale);
     	}
     }
 }

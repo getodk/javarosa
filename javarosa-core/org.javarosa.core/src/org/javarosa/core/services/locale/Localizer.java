@@ -40,7 +40,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * ID's to the String values associated with them in different 
  * locales.
  * 
- * @author Drew Roos
+ * @author Drew Roos/Clayton Sims
  *
  */
 public class Localizer implements Externalizable {
@@ -183,7 +183,7 @@ public class Localizer implements Externalizable {
 	 */
 	public void setLocale (String currentLocale) {
 		if (!hasLocale(currentLocale))
-			throw new UnregisteredLocaleException("Attempted to set to a locale that is not defined");
+			throw new UnregisteredLocaleException("Attempted to set to a locale that is not defined. Attempted Locale: " + currentLocale);
 		
 		if (!currentLocale.equals(this.currentLocale)) {
 			this.currentLocale = currentLocale;
