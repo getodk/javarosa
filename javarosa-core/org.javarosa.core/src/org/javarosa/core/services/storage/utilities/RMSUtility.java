@@ -17,6 +17,8 @@
 package org.javarosa.core.services.storage.utilities;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
@@ -228,6 +230,7 @@ public class RMSUtility
      */
     public void writeBytesToRMS(byte [] data, MetaDataObject metaDataObject)
     {
+    	int metaID = -1;
     	try
     	{
     		int recordId = this.recordStore.getNextRecordID();
@@ -235,15 +238,30 @@ public class RMSUtility
     		{
     			metaDataObject.setRecordId(recordId);
     			metaDataObject.setSize(data.length);
-    			this.metaDataRMS.writeToRMS(metaDataObject, null);
+    			metaID = this.metaDataRMS.writeToRMS(metaDataObject, null);
     		}
+    	}
+    	catch (RecordStorageException rse)
+    	{
+    		rse.printStackTrace();
+    		//TODO: Replace this with a CHECKED exception
+    		throw new RuntimeException("Error Writing Meta Data record to RMS for a block of data");
+    	}
+    	
+    	try
+    	{
     		this.recordStore.addRecord(data, 0, data.length);
     	}
     	catch (RecordStorageException rse)
     	{
     		rse.printStackTrace();
+    		
+    		//Roll Back the Meta Data entry, since this one couldn't be written.
+    		this.metaDataRMS.deleteRecord(metaID);
+    		
+    		//TODO: Replace this with a CHECKED exception
+    		throw new RuntimeException("Error Writing Record to RMS for a block of data");
     	}
-
     }
 
     /**
@@ -320,6 +338,108 @@ public class RMSUtility
         	throw new DeserializationException(uee.getMessage());
         }
 
+    }
+    
+    public void synchronizeMetaData(Externalizable prototype, MetaDataObject metaPrototype) {
+    	if(this.iType == RMSUtility.RMS_TYPE_META_DATA) {
+    		Hashtable set = new Hashtable();
+    		
+    		// The goal is to look at all of the data without actually deserializing it, so
+    		// we have to handle this with the enumerations, not with fetching
+    		
+    		IRecordStoreEnumeration en = this.enumerateRecords();
+    		String output = "";
+    		output += "Record ID's: ";
+    		while(en.hasNextElement()) {
+    			int recordId = -1;
+    			try {
+					recordId = en.nextRecordId();
+					set.put(new Integer(recordId), Boolean.TRUE);
+					output += recordId + ", ";
+				} catch (RecordStorageException e) {
+					// Optimally, we would delete this record here, but it's difficult to identify
+					// how we'd find the id to do so...
+					e.printStackTrace();
+				}
+    		}
+    		output += "\n";
+    		output += "Meta Data ID's: "; 
+    		Vector toDelete = new Vector();
+    		IRecordStoreEnumeration enmd = this.enumerateMetaData();
+    		while(enmd.hasNextElement()) {
+    			try {
+    				MetaDataObject metaInstance = (MetaDataObject)metaPrototype.getClass().newInstance();
+					metaDataRMS.retrieveFromRMS(enmd.nextRecordId(), metaInstance);
+					Integer RecordID = new Integer(metaInstance.getRecordId());
+					output += RecordID.intValue() + ", ";
+					if(!set.containsKey(RecordID)) {
+						toDelete.addElement(RecordID);
+					} else {
+						set.remove(RecordID);
+					}
+				} catch (RecordStorageException e) {
+					// Optimally, we would delete this record here, but it's difficult to identify
+					// how we'd find the id to do so...
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (DeserializationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		}
+    		output += "\n";
+    		
+    		output += "Deleting: ";
+    		for(Enumeration dem = toDelete.elements() ; dem.hasMoreElements() ;) {
+    			int recordToDelete = ((Integer)dem.nextElement()).intValue();
+    			output += "" + recordToDelete + ", ";
+    			metaDataRMS.deleteRecord(recordToDelete);
+    		}
+    		
+    		output += "\n";
+    		output += "Creating new MetaData for Records: ";
+    		for(Enumeration formen = set.keys() ; formen.hasMoreElements(); ) {
+    			int recordWithNoMeta = ((Integer)formen.nextElement()).intValue();
+    			output += recordWithNoMeta;
+    			try {
+    				//Retrieve the full record so we can build the appropriate meta entry
+    				Externalizable dataInstance = (Externalizable)prototype.getClass().newInstance();
+					retrieveFromRMS(recordWithNoMeta, dataInstance);
+					
+					//Create a new instance for our meta data object.
+					MetaDataObject newMeta = (MetaDataObject)metaPrototype.getClass().newInstance();
+					newMeta.setMetaDataParameters(dataInstance);
+					
+					//Save the newly formed meta record
+					metaDataRMS.writeToRMS(newMeta, null);
+					output += "s";
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (DeserializationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    			output +=  ", ";
+    		}
+    		
+    		System.out.println(output);
+    		JavaRosaServiceProvider.instance().logIncident("Debug", output);
+    	}
     }
 
     /**
