@@ -20,7 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.MathUtils;
 
 /**
@@ -314,12 +314,12 @@ public class DateUtils {
 		Date d = DateUtils.getDate(f);
 		double daysAgo = DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d);
 		
-		if(daysAgo >= 0 && daysAgo < 1) { return JavaRosaServiceProvider.instance().localize("date.today");} 
-		else if(daysAgo >= 1 && daysAgo < 2) { JavaRosaServiceProvider.instance().localize("date.yesterday");}
-		else if(daysAgo >= 2 && daysAgo < 3) { return JavaRosaServiceProvider.instance().localize("date.twoago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
-		else if(daysAgo >= 2 && daysAgo <= 6) { return JavaRosaServiceProvider.instance().localize("date.nago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
-		else if(daysAgo < 0 && daysAgo >= -1) { return JavaRosaServiceProvider.instance().localize("date.tomorrow");} 
-		else if(daysAgo < -1 && daysAgo >= -6) { return JavaRosaServiceProvider.instance().localize("date.nfromnow",new String[] {String.valueOf((int)Math.ceil(-daysAgo))});}
+		if(daysAgo >= 0 && daysAgo < 1) { return Localization.get("date.today");} 
+		else if(daysAgo >= 1 && daysAgo < 2) { Localization.get("date.yesterday");}
+		else if(daysAgo >= 2 && daysAgo < 3) { return Localization.get("date.twoago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
+		else if(daysAgo >= 2 && daysAgo <= 6) { return Localization.get("date.nago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
+		else if(daysAgo < 0 && daysAgo >= -1) { return Localization.get("date.tomorrow");} 
+		else if(daysAgo < -1 && daysAgo >= -6) { return Localization.get("date.nfromnow",new String[] {String.valueOf((int)Math.ceil(-daysAgo))});}
 		return DateUtils.formatDate(f, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 	}
 	

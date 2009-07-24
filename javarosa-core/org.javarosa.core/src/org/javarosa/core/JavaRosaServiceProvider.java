@@ -62,8 +62,6 @@ public class JavaRosaServiceProvider {
     private ITransportManager transportManager;
     private IPropertyManager propertyManager;
     
-    private Localizer localeManager;
-    
     private IIncidentLogger logger;
 	
 	Hashtable services;
@@ -233,44 +231,6 @@ public class JavaRosaServiceProvider {
 		}
 		}
 	}
-	
-	/**
-	 * @return The Locale Manager currently being used for internationalization.
-	 */
-	public Localizer getLocaleManager() {
-		if(localeManager == null) {
-		    localeManager = new Localizer(true, false);
-		}
-		return localeManager;
-	}
-	
-	/**
-	 * Retrieve the localized text for a text handle in the current locale. See getText(String, String) for details.
-	 *
-	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
-	 * @return Localized text
-	 * @throws UnregisteredLocaleException If current locale is not set.
-	 * @throws NullPointerException if textID is null
- 	 * @throws NoLocalizedTextException If there is no text for the specified id
-	 */
-	public String localize(String id) {
-		return localize(id, new String[]{});
-	}
-	
-	/**
-	 * Retrieve the localized text for a text handle in the current locale. See getText(String, String) for details.
-	 *
-	 * @param textID Text handle (text ID appended with optional text form). Must not be null.
-	 * @param args arguments for string variables.
-	 * @return Localized text
-	 * @throws UnregisteredLocaleException If current locale is not set.
-	 * @throws NullPointerException if textID is null
- 	 * @throws NoLocalizedTextException If there is no text for the specified id
-	 */
-	public String localize(String id, String[] args) {
-		return getLocaleManager().getText(id, args);
-	}
-	
 	
 //	public void enableInactivityTimeout (int seconds) {
 //		imon = new InactivityMonitor(this, seconds);
