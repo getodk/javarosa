@@ -23,6 +23,7 @@ import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.IUserDecorator;
 import org.javarosa.user.utility.LoginContext;
@@ -49,17 +50,17 @@ public class UserForm extends Form implements IView {
 
 	public UserForm(String title, IUserDecorator d) {
 		super(title);
-		this.usernameField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.name"), "", 25,
+		this.usernameField = new TextField(Localization.get("form.user.name"), "", 25,
 				TextField.ANY);
-		this.passwordField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.password"), "", 10,
+		this.passwordField = new TextField(Localization.get("form.user.password"), "", 10,
 				TextField.PASSWORD);
-		this.confirmPasswordField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.confirmpassword"), "",
+		this.confirmPasswordField = new TextField(Localization.get("form.user.confirmpassword"), "",
 				10, TextField.PASSWORD);
 		// #if javarosa.adduser.extended
-		this.userIDField = new TextField(JavaRosaServiceProvider.instance().localize("form.user.userid"), "", 10,
+		this.userIDField = new TextField(Localization.get("form.user.userid"), "", 10,
 				TextField.NUMERIC);
 		// #endif
-		this.choice.append(JavaRosaServiceProvider.instance().localize("form.user.giveadmin"), null);
+		this.choice.append(Localization.get("form.user.giveadmin"), null);
 
 		append(this.usernameField);
 		append(this.passwordField);

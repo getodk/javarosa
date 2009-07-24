@@ -13,13 +13,13 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.forms.review.util.DataModelDateFilter;
 
 /**
@@ -123,11 +123,11 @@ public class SelectReviewPeriodActivity implements IActivity, CommandListener {
 	}
 
 	private void startDisplay() {
-		options = new List(JavaRosaServiceProvider.instance().localize("formreview.period.select"), List.IMPLICIT);
-		options.insert(0,JavaRosaServiceProvider.instance().localize("formreview.period.today"),null);
-		options.insert(1,JavaRosaServiceProvider.instance().localize("formreview.period.yesterday"),null);
-		options.insert(2,JavaRosaServiceProvider.instance().localize("formreview.period.week.this"),null);
-		options.insert(3,JavaRosaServiceProvider.instance().localize("formreview.period.week.last"),null);
+		options = new List(Localization.get("formreview.period.select"), List.IMPLICIT);
+		options.insert(0,Localization.get("formreview.period.today"),null);
+		options.insert(1,Localization.get("formreview.period.yesterday"),null);
+		options.insert(2,Localization.get("formreview.period.week.this"),null);
+		options.insert(3,Localization.get("formreview.period.week.last"),null);
 		//options.addCommand(List.SELECT_COMMAND);
 		options.addCommand(BACK);
 		

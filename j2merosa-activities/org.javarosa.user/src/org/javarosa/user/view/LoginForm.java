@@ -23,6 +23,7 @@ import javax.microedition.lcdui.Command;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.IView;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.LoginContext;
@@ -38,13 +39,13 @@ public class LoginForm extends FramedForm implements IView {
 
 	// #if javarosa.login.demobutton
 	private StringItem demoButton;
-	public final static Command CMD_DEMO_BUTTON = new Command(JavaRosaServiceProvider.instance().localize("menu.Demo"),
+	public final static Command CMD_DEMO_BUTTON = new Command(Localization.get("menu.Demo"),
 			Command.ITEM, DEFAULT_COMMAND_PRIORITY);
 	// #endif
 
-	public final static Command CMD_CANCEL_LOGIN = new Command(JavaRosaServiceProvider.instance().localize("menu.Exit"),
+	public final static Command CMD_CANCEL_LOGIN = new Command(Localization.get("menu.Exit"),
 			Command.SCREEN, DEFAULT_COMMAND_PRIORITY);
-	public final static Command CMD_LOGIN_BUTTON = new Command(JavaRosaServiceProvider.instance().localize("menu.Login"),
+	public final static Command CMD_LOGIN_BUTTON = new Command(Localization.get("menu.Login"),
 			Command.ITEM, DEFAULT_COMMAND_PRIORITY);
 
 	private StringItem loginButton;
@@ -69,7 +70,7 @@ public class LoginForm extends FramedForm implements IView {
 	private final static int DEFAULT_ADMIN_USERID = -1;
 
 	public LoginForm(IActivity loginActivity) {
-		super(JavaRosaServiceProvider.instance().localize("form.login.login"));
+		super(Localization.get("form.login.login"));
 		init(loginActivity);
 	}
 
@@ -129,9 +130,9 @@ public class LoginForm extends FramedForm implements IView {
 	private void initLoginControls(String username) {
 
 		// create the username and password input fields
-		this.usernameField = new TextField(JavaRosaServiceProvider.instance().localize("form.login.username"), username, 50,
+		this.usernameField = new TextField(Localization.get("form.login.username"), username, 50,
 				TextField.ANY);
-		this.passwordField = new TextField(JavaRosaServiceProvider.instance().localize("form.login.password"), "", 10,
+		this.passwordField = new TextField(Localization.get("form.login.password"), "", 10,
 				TextField.PASSWORD);
 
 		// TODO:what this?
@@ -145,7 +146,7 @@ public class LoginForm extends FramedForm implements IView {
 		this.passwordField.setDefaultCommand(CMD_LOGIN_BUTTON);
 
 		// add the login button
-		this.loginButton = new StringItem(null, JavaRosaServiceProvider.instance().localize("form.login.login"), Item.BUTTON);
+		this.loginButton = new StringItem(null, Localization.get("form.login.login"), Item.BUTTON);
 		append(this.loginButton);
 		this.loginButton.setDefaultCommand(CMD_LOGIN_BUTTON);
 
@@ -170,11 +171,11 @@ public class LoginForm extends FramedForm implements IView {
 				CTX_JAVAROSA_BUILD);
 
 		if (ccv != null && !ccv.equals("")) {
-			this.append(JavaRosaServiceProvider.instance().localize("form.login.commcareversion") + " " + ccv);
+			this.append(Localization.get("form.login.commcareversion") + " " + ccv);
 		}
 		if ((ccb != null && !ccb.equals(""))
 				&& (jrb != null && !jrb.equals(""))) {
-			this.append(JavaRosaServiceProvider.instance().localize("form.login.buildnumber") + " " + ccb + "-" + jrb);
+			this.append(Localization.get("form.login.buildnumber") + " " + ccb + "-" + jrb);
 		}
 		//#endif
 	}
@@ -253,8 +254,8 @@ public class LoginForm extends FramedForm implements IView {
 		// doing this for a reason.
 		
 		//#style mailAlert
-		return new Alert(JavaRosaServiceProvider.instance().localize("form.login.login.successful"),
-				JavaRosaServiceProvider.instance().localize("form.login.loading.profile"), null, AlertType.CONFIRMATION);
+		return new Alert(Localization.get("form.login.login.successful"),
+				Localization.get("form.login.loading.profile"), null, AlertType.CONFIRMATION);
 
 	}
 

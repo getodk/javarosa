@@ -6,10 +6,10 @@ package org.javarosa.forms.review.util;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entity.model.IEntity;
@@ -64,13 +64,13 @@ public class DataModelEntity implements IEntity {
 	 */
 	public String[] getHeaders(boolean detailed) {
 		if(detailed) {
-			return new String[] {JavaRosaServiceProvider.instance().localize("model.name.long"),
-					JavaRosaServiceProvider.instance().localize("model.date.long"),
-					JavaRosaServiceProvider.instance().localize("model.time.long")};
+			return new String[] {Localization.get("model.name.long"),
+					Localization.get("model.date.long"),
+					Localization.get("model.time.long")};
 		} else {
-			return new String[] {JavaRosaServiceProvider.instance().localize("name"),
-								JavaRosaServiceProvider.instance().localize("date"),
-								JavaRosaServiceProvider.instance().localize("time")};
+			return new String[] {Localization.get("name"),
+								Localization.get("date"),
+								Localization.get("time")};
 		}
 	}
 
