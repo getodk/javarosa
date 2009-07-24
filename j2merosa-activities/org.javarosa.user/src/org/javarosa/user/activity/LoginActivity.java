@@ -38,6 +38,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.LoginContext;
 import org.javarosa.user.utility.Terms;
@@ -152,13 +153,13 @@ public class LoginActivity implements IActivity, CommandListener,
 				userValidated();
 				return;
 			}
-			showError(JavaRosaServiceProvider.instance().localize("activity.login.loginincorrect"), JavaRosaServiceProvider.instance().localize("activity.login.tryagain"));
+			showError(Localization.get("activity.login.loginincorrect"), Localization.get("activity.login.tryagain"));
 
 		}
 
 		// #if javarosa.login.demobutton
 		else if (c == LoginForm.CMD_DEMO_BUTTON) {
-			showError(JavaRosaServiceProvider.instance().localize("activity.login.demomode"), JavaRosaServiceProvider.instance().localize("activity.login.demomode.intro"), this);
+			showError(Localization.get("activity.login.demomode"), Localization.get("activity.login.demomode.intro"), this);
 		} else if (d instanceof Alert) {
 			// returning from demo mode warning popup
 			Hashtable returnArgs = new Hashtable();
