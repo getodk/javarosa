@@ -33,6 +33,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.UnavailableServiceException;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
@@ -292,7 +293,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 					controller.selectQuestion(b);
 					this.showFormView = false;
 				} else {
-					String txt = JavaRosaServiceProvider.instance().localize(
+					String txt = Localization.get(
 							"view.sending.FormUneditable");
 
 					// #style CL_Forms_Form
@@ -315,7 +316,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 						this.answer);
 				if (result == controller.QUESTION_CONSTRAINT_VIOLATED) {
 //					System.out.println("answer validation constraint violated");
-//					TODO:   String txt = JavaRosaServiceProvider.instance().localize(
+//					TODO:   String txt = Locale.get(
 //							"view.sending.CompulsoryQuestionsIncomplete");
 					
 					String txt = "Validation failure: data is not of the correct format.";
@@ -331,7 +332,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				} else if (result == controller.QUESTION_REQUIRED_BUT_EMPTY) {
 //					System.out.println("answer required but empty");
 
-//					String txt = JavaRosaServiceProvider.instance().localize(
+//					String txt = Locale.get(
 //							"view.sending.CompulsoryQuestionsIncomplete");
 					String txt = "This question is compulsory. You must answer it.";
 					// #style CL_Forms_Form

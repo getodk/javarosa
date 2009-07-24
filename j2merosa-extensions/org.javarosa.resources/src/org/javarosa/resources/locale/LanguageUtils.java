@@ -19,7 +19,7 @@
  */
 package org.javarosa.resources.locale;
 
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.util.PropertyUtils;
 
@@ -45,13 +45,13 @@ public class LanguageUtils {
 	public static void initializeLanguage(boolean useProperty, String fallbackDefaultLanguage) {
 		if(useProperty) {
 		//#ifdef javarosa.locale.default:defined
-		//#= JavaRosaServiceProvider.instance().getLocaleManager().setLocale(PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, "${javarosa.locale.default}"));
+	    //#= Localization.setLocale(PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, "${javarosa.locale.default}"));
 		//#else
-		JavaRosaServiceProvider.instance().getLocaleManager().setLocale(
+		Localization.setLocale(
 				PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, fallbackDefaultLanguage));
 		//#endif
 		} else {
-			JavaRosaServiceProvider.instance().getLocaleManager().setLocale(
+			Localization.setLocale(
 					PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, fallbackDefaultLanguage));
 		}
 	}

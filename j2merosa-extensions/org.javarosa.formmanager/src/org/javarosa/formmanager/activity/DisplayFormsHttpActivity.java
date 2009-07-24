@@ -26,6 +26,7 @@ import java.util.Vector;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.List;
 
 import org.javarosa.core.Context;
 import org.javarosa.core.api.Constants;
@@ -39,8 +40,6 @@ import org.javarosa.formmanager.view.AvailableFormsScreen;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import javax.microedition.lcdui.List;
 
 public class DisplayFormsHttpActivity implements IActivity,CommandListener,Observer{
 	private AvailableFormsScreen formList;

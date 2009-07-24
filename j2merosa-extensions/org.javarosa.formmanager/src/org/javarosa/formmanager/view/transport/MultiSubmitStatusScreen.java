@@ -28,6 +28,7 @@ import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 import org.javarosa.formmanager.view.ISubmitStatusScreen;
@@ -62,11 +63,11 @@ public class MultiSubmitStatusScreen extends Form implements
 	 */
 	public MultiSubmitStatusScreen(CommandListener listener) {
 		//#style submitPopup
-		super(JavaRosaServiceProvider.instance().localize("sending.status.title"));
+		super(Localization.get("sending.status.title"));
 
 		setCommandListener(listener);
 
-		addCommand(new Command(JavaRosaServiceProvider.instance().localize("menu.ok"), Command.OK, 1));
+		addCommand(new Command(Localization.get("menu.ok"), Command.OK, 1));
 
 		this.activity = (FormTransportActivity) listener;
 	}
@@ -84,7 +85,7 @@ public class MultiSubmitStatusScreen extends Form implements
 	 */
 	public void reinitNodata() {
 		deleteAll();
-		setMessage(JavaRosaServiceProvider.instance().localize("sending.status.none"));
+		setMessage(Localization.get("sending.status.none"));
 		addTimerTask();
 		failed = 0;
 	}
@@ -160,7 +161,7 @@ public class MultiSubmitStatusScreen extends Form implements
 		case TransportMessage.STATUS_NEW:
 		case -1: {// TODO: what does -1 mean?
 			String message = (this.counter < TIMEOUT ? getCurrentDisplay()
-					: JavaRosaServiceProvider.instance().localize("sending.status.long"));
+					: Localization.get("sending.status.long"));
 			this.msg.setText(message);
 			break;
 		}
@@ -183,7 +184,7 @@ public class MultiSubmitStatusScreen extends Form implements
 			//Move along to the next form.
 			this.currentid++;
 			failed++;
-			//this.msg.setText(JavaRosaServiceProvider.instance().localize("sending.status.failed"));
+			//this.msg.setText(Locale.get("sending.status.failed"));
 			break;
 
 		// another problem
@@ -194,7 +195,7 @@ public class MultiSubmitStatusScreen extends Form implements
 
 			this.currentid++;
 			failed++;
-			this.msg.setText(JavaRosaServiceProvider.instance().localize("sending.status.error"));
+			this.msg.setText(Localization.get("sending.status.error"));
 			break;
 		}
 		
@@ -207,13 +208,13 @@ public class MultiSubmitStatusScreen extends Form implements
 	private void constructFinalMessage() {
 		String message = "";
 		if(failed > 0) { 
-			message += JavaRosaServiceProvider.instance().localize("sending.status.failures", new String[]{String.valueOf(failed)}) + "\n";
+			message += Localization.get("sending.status.failures", new String[]{String.valueOf(failed)}) + "\n";
 		}
 		if(failed < this.modelIDs.length) {
-			message+= JavaRosaServiceProvider.instance().localize("sending.status.success") + " " + getServerResponse() + "\n";
+			message+= Localization.get("sending.status.success") + " " + getServerResponse() + "\n";
 		}
 		if(failed == this.modelIDs.length) {
-			message = JavaRosaServiceProvider.instance().localize("sending.status.failed");
+			message = Localization.get("sending.status.failed");
 		}
 		this.msg.setText(message);
 	}
@@ -222,7 +223,7 @@ public class MultiSubmitStatusScreen extends Form implements
 	 * @return
 	 */
 	private String getCurrentDisplay() {
-		return JavaRosaServiceProvider.instance().localize("sending.status.multi", new String[] {
+		return Localization.get("sending.status.multi", new String[] {
 				String.valueOf(currentid), 
 				String.valueOf(modelIDs.length),
 				String.valueOf(currentid + 1),
@@ -267,7 +268,7 @@ public class MultiSubmitStatusScreen extends Form implements
 		    	//TODO: Specific sending error?
 				destroy();
 				StringItem failure = new StringItem("","");
-		    	failure.setText(JavaRosaServiceProvider.instance().localize("sending.status.error") + ": " + details);
+		    	failure.setText(Localization.get("sending.status.error") + ": " + details);
 				this.append(failure);
 		}
 	}

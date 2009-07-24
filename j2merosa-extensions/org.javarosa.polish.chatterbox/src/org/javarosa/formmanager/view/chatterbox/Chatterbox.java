@@ -36,6 +36,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
@@ -59,7 +60,7 @@ import de.enough.polish.ui.UiAccess;
 public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryModelListener, CommandListener{
 	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
-    private static final String PROMPT_REQUIRED_QUESTION = JavaRosaServiceProvider.instance().localize("view.sending.RequiredQuestion");
+    private static final String PROMPT_REQUIRED_QUESTION = Localization.get("view.sending.RequiredQuestion");
 
 	private static final String PROMPT_DEFAULT_CONSTRAINT_VIOL = "Answer is outside of the allowed range";
 	
