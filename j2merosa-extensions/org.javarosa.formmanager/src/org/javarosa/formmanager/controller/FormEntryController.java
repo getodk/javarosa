@@ -19,6 +19,7 @@ package org.javarosa.formmanager.controller;
 import java.util.Date;
 
 import javax.microedition.lcdui.Command;
+
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.FormDef;
@@ -27,8 +28,8 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.formmanager.model.FormEntryModel;
-import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.formmanager.view.IFormEntryView;
 
 public class FormEntryController {
 	public static final int QUESTION_OK = 0;

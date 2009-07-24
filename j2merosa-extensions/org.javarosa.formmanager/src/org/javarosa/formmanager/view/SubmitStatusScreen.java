@@ -27,6 +27,7 @@ import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.transport.TransportMessage;
 
 public class SubmitStatusScreen extends Form implements ISubmitStatusScreen {
@@ -40,11 +41,11 @@ public class SubmitStatusScreen extends Form implements ISubmitStatusScreen {
     public static final int TIMEOUT = 60000;
 
     
-	public static final String MSG_SUCCESS = JavaRosaServiceProvider.instance().localize("view.sending.SuccessfullySubmitted");
-	public static final String MSG_FAILED = JavaRosaServiceProvider.instance().localize("view.sending.SubmissionFailed");
-	public static final String MSG_TOO_LONG = JavaRosaServiceProvider.instance().localize("view.sending.SubmissionTakingLong");
-	public static final String MSG_UNKNOWN_ERROR = JavaRosaServiceProvider.instance().localize("view.sending.SubmissionErrorUnknown");
-	public static String MSG_SENDING =  JavaRosaServiceProvider.instance().localize("view.sending.SendingInProgress");
+	public static final String MSG_SUCCESS = Localization.get("view.sending.SuccessfullySubmitted");
+	public static final String MSG_FAILED = Localization.get("view.sending.SubmissionFailed");
+	public static final String MSG_TOO_LONG = Localization.get("view.sending.SubmissionTakingLong");
+	public static final String MSG_UNKNOWN_ERROR = Localization.get("view.sending.SubmissionErrorUnknown");
+	public static String MSG_SENDING =  Localization.get("view.sending.SendingInProgress");
     
     public SubmitStatusScreen (CommandListener listener) {
     	this(listener, -1);
@@ -103,7 +104,7 @@ public class SubmitStatusScreen extends Form implements ISubmitStatusScreen {
 		    	//TODO: Specific sending error?
 				destroy();
 				StringItem failure = new StringItem("","");
-		    	failure.setText(JavaRosaServiceProvider.instance().localize("sending.status.error") + ": " + details);
+		    	failure.setText(Localization.get("sending.status.error") + ": " + details);
 				this.append(failure);
 		}
 	}

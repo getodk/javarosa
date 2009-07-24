@@ -26,6 +26,7 @@ import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 
@@ -36,7 +37,7 @@ public class FormTransportMessageDetailBox extends TextBox implements
 
 	public FormTransportMessageDetailBox(CommandListener activity) {
 
-		super(JavaRosaServiceProvider.instance().localize("sending.message.details"), null, 250, TextField.UNEDITABLE);
+		super(Localization.get("sending.message.details"), null, 250, TextField.UNEDITABLE);
 		addCommand(FormTransportCommands.CMD_BACK);
 		addCommand(FormTransportCommands.CMD_SEND);
 		setCommandListener(activity);

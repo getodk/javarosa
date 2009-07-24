@@ -27,27 +27,27 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IView;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.activity.FormListActivity;
 
  
 public class FormList extends List implements CommandListener, IView {
 	
-	private final static Command CMD_EXIT = new Command(JavaRosaServiceProvider.instance().localize("menu.Exit"), Command.BACK, 2);
-	private final static Command CMD_GETNEWFORMS = new Command(JavaRosaServiceProvider.instance().localize("menu.GetNewForms"), Command.SCREEN, 2);
+	private final static Command CMD_EXIT = new Command(Localization.get("menu.Exit"), Command.BACK, 2);
+	private final static Command CMD_GETNEWFORMS = new Command(Localization.get("menu.GetNewForms"), Command.SCREEN, 2);
     // CZUE added for testing 
-	private final static Command CMD_CAMERA = new Command(JavaRosaServiceProvider.instance().localize("menu.Camera"), Command.SCREEN, 2);
+	private final static Command CMD_CAMERA = new Command(Localization.get("menu.Camera"), Command.SCREEN, 2);
     //Added for debugging(Ndubisi)
-	private final static Command CMD_RECORDER = new Command(JavaRosaServiceProvider.instance().localize("menu.Recorder"), Command.SCREEN, 2);
-	private final static Command CMD_IMAGE_BROWSE = new Command(JavaRosaServiceProvider.instance().localize("menu.ImageManagement"), Command.SCREEN, 2);
+	private final static Command CMD_RECORDER = new Command(Localization.get("menu.Recorder"), Command.SCREEN, 2);
+	private final static Command CMD_IMAGE_BROWSE = new Command(Localization.get("menu.ImageManagement"), Command.SCREEN, 2);
 	// others
-	private final static Command CMD_VIEWMODELS = new Command(JavaRosaServiceProvider.instance().localize("menu.ViewSaved"), Command.SCREEN, 3);
-	private final static Command CMD_DELETE_FORM = new Command(JavaRosaServiceProvider.instance().localize("menu.Delete"),Command.SCREEN,4);
-	private final static Command CMD_SHAREFORMS = new Command(JavaRosaServiceProvider.instance().localize("menu.ShareForms"), Command.SCREEN, 2);
-	private final static Command CMD_SETTINGS = new Command(JavaRosaServiceProvider.instance().localize("menu.Settings"), Command.SCREEN, 3);
+	private final static Command CMD_VIEWMODELS = new Command(Localization.get("menu.ViewSaved"), Command.SCREEN, 3);
+	private final static Command CMD_DELETE_FORM = new Command(Localization.get("menu.Delete"),Command.SCREEN,4);
+	private final static Command CMD_SHAREFORMS = new Command(Localization.get("menu.ShareForms"), Command.SCREEN, 2);
+	private final static Command CMD_SETTINGS = new Command(Localization.get("menu.Settings"), Command.SCREEN, 3);
 	
     private FormListActivity parent = null;
 
