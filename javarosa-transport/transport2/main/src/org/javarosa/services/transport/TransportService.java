@@ -5,11 +5,13 @@ import java.util.Vector;
 
 public interface TransportService {
 
+	 
 	/**
 	 * @param message
+	 * @return
 	 * @throws IOException
 	 */
-	public void send(TransportMessage message) throws IOException;
+	public String send(TransportMessage message) throws IOException;
 
 	/**
 	 * @return

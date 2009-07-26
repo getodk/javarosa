@@ -16,25 +16,41 @@
 
 package org.javarosa.transport.test;
 
-import jmunit.framework.cldc11.TestCase;
+import java.io.IOException;
 
-public class TestOne extends TestCase {
+import org.javarosa.services.transport.TransportService;
+import org.javarosa.services.transport.impl.BasicTransportService;
+import org.javarosa.services.transport.impl.http.HttpTransportMessage;
+
+public class TestOne  {
 	public static final String TEST_SERVER_URL = "http://localhost:90";
 	public static final String TEST_DATA = "testdata";
+	
+	private TransportService svc= new BasicTransportService();
 
 	 
-	public TestOne(int arg0, String arg1) {
-		super(arg0, arg1);
-		 
-	}
+//	public TestOne(int arg0, String arg1) {
+//		super(arg0, arg1);
+//		 
+//	}
 
 
 	public void test(int i) {
+		HttpTransportMessage message = new HttpTransportMessage();
+		message.setContent("Hello World".getBytes());
+		String url="http://www.google.co.tz/search?hl=en&q=";
+		message.setDestinationURL(url);
 		try {
-		//	new BasicTransportService().sendOverHttp("a test", TEST_SERVER_URL);
-		} catch (Exception e) {
+			svc.send(message);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+	}
+	
+	
+	public static void main(String[] args){
+		new TestOne( ).test(1);
 	}
 }

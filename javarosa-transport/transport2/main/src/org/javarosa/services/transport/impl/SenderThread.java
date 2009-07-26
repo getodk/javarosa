@@ -21,24 +21,39 @@ public class SenderThread extends Thread {
 	public void run() {
 		TransportMessage message = this.transporter.getMessage();
 		while ((tries > 0) && !message.isSuccess()) {
-			message = this.transporter.send();
-			if (message.isSuccess()) {
-				// remove from queue
-				try {
-					this.queue.dequeue(message);
-				} catch (IOException e) {
-
-					e.printStackTrace();
-				}
-			}else{
-				try {
-					wait((long)delay*1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+			message = attemptToSend();
 		}
 
+	}
+
+	private TransportMessage attemptToSend() {
+		TransportMessage message = this.transporter.send();
+		if (message.isSuccess()) {
+			onSuccess(message);
+		} else {
+			onFailure();
+		}
+		return message;
+	}
+
+	private void onSuccess(TransportMessage message) {
+		// remove from queue
+		try {
+			this.queue.dequeue(message);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void onFailure() {
+		// used another attempt
+		tries--;
+		try {
+			// pause before trying again
+			wait((long) delay * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
