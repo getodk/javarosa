@@ -19,14 +19,14 @@ package org.javarosa.transport.test;
 import java.io.IOException;
 
 import org.javarosa.services.transport.TransportService;
-import org.javarosa.services.transport.impl.BasicTransportService;
-import org.javarosa.services.transport.impl.http.HttpTransportMessage;
+import org.javarosa.services.transport.TransportService;
+import org.javarosa.services.transport.impl.http.SimpleHttpTransportMessage;
 
 public class TestOne  {
 	public static final String TEST_SERVER_URL = "http://localhost:90";
 	public static final String TEST_DATA = "testdata";
 	
-	private TransportService svc= new BasicTransportService();
+	private TransportService svc= new TransportService();
 
 	 
 //	public TestOne(int arg0, String arg1) {
@@ -36,7 +36,7 @@ public class TestOne  {
 
 
 	public void test(int i) {
-		HttpTransportMessage message = new HttpTransportMessage();
+		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage();
 		message.setContent("Hello World".getBytes());
 		String url="http://www.google.co.tz/search?hl=en&q=";
 		message.setDestinationURL(url);
