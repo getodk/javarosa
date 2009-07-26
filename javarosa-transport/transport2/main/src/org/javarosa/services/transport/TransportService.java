@@ -1,17 +1,24 @@
 package org.javarosa.services.transport;
 
-import org.javarosa.services.transport.impl.http.HttpTransportResult;
+import java.io.IOException;
+import java.util.Vector;
 
 public interface TransportService {
 
 	/**
-	 * 
-	 * Send a String to a destination over Http
-	 * 
-	 * @param message The String to send
-	 * @param url The destination
-	 * @return An object providing information regarding success or failure
+	 * @param message
+	 * @throws IOException
 	 */
-	public HttpTransportResult sendOverHttp(String message, String url);
+	public void send(TransportMessage message) throws IOException;
+
+	/**
+	 * @return
+	 */
+	public Vector getTransportQueue();
+
+	/**
+	 * @return
+	 */
+	public int getTransportQueueSize();
 
 }
