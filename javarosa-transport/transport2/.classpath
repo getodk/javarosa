@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="main/src"/>
+	<classpathentry kind="src" path="test/src"/>
 	<classpathentry kind="con" path="J2MELIB"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.transport.test"/>
+	<classpathentry kind="lib" path="lib/jmunit4cldc11-1.2.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
