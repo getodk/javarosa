@@ -18,8 +18,6 @@ package org.javarosa.transport.test;
 
 import jmunit.framework.cldc11.TestCase;
 
-import org.javarosa.services.transport.impl.BasicTransportService;
-
 public class TestOne extends TestCase {
 	public static final String TEST_SERVER_URL = "http://localhost:90";
 	public static final String TEST_DATA = "testdata";
@@ -33,7 +31,7 @@ public class TestOne extends TestCase {
 
 	public void test(int i) {
 		try {
-			new BasicTransportService().sendOverHttp("a test", TEST_SERVER_URL);
+		//	new BasicTransportService().sendOverHttp("a test", TEST_SERVER_URL);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
