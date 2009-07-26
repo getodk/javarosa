@@ -5,5 +5,6 @@
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.transport.test"/>
 	<classpathentry kind="lib" path="lib/jmunit4cldc11-1.2.1.jar"/>
+	<classpathentry kind="lib" path="C:/J2ME-Polish2.1.0/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
