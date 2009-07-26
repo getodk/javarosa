@@ -1,19 +1,23 @@
 package org.javarosa.services.transport.impl.http;
 
-import org.javarosa.services.transport.TransportMessage;
+import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 import de.enough.polish.io.Serializable;
 
-public class HttpTransportMessage extends BasicTransportMessage implements
+public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 		Serializable {
 
 	private String destinationURL;
-	
-	public int getTransportMethod() {
-		return TransportMessage.TRANSPORT_METHOD_HTTP;
-	}
 
+	 
+	/* (non-Javadoc)
+	 * @see org.javarosa.services.transport.TransportMessage#getTransporter()
+	 */
+	public Transporter getTransporter() {
+		return new SimpleHttpTransporter(this);
+	}
+	 
 	public String getDestinationURL() {
 		return destinationURL;
 	}

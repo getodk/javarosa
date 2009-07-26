@@ -5,7 +5,7 @@ public interface Transporter {
 	/**
 	 * 
 	 * A Transporter is given a TransportMessage in its constructor
-	 * and has the ability to send
+	 * and has the ability to send it via this method
 	 * 
 	 * @return The message being sent
 	 */

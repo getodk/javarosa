@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
-public class HttpConnectionPOSTText {
+public class SimpleHttpConnection {
 
 	private HttpConnection connection;
 
@@ -17,7 +17,7 @@ public class HttpConnectionPOSTText {
 	 * @throws IOException
 	 *             , ClassCastException
 	 */
-	public HttpConnectionPOSTText(String url) throws IOException,
+	public SimpleHttpConnection(String url) throws IOException,
 			ClassCastException {
 		super();
 		this.connection = (HttpConnection) Connector.open(url);

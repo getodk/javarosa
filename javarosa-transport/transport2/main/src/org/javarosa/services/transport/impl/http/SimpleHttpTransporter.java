@@ -11,11 +11,15 @@ import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.StreamsUtil;
 
+/**
+ * The SimpleHttpTransporter is able to send SimpleHttpTransportMessages
+ *
+ */
 public class SimpleHttpTransporter implements Transporter {
 
-	private HttpTransportMessage message;
+	private SimpleHttpTransportMessage message;
 
-	public SimpleHttpTransporter(HttpTransportMessage message) {
+	public SimpleHttpTransporter(SimpleHttpTransportMessage message) {
 		this.message = message;
 	}
 
@@ -23,10 +27,13 @@ public class SimpleHttpTransporter implements Transporter {
 		return this.message;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javarosa.services.transport.Transporter#send()
+	 */
 	public TransportMessage send() {
 
 		try {
-			HttpConnection_POST_Text conn = new HttpConnection_POST_Text(
+			SimpleHttpConnection conn = new SimpleHttpConnection(
 					message.getDestinationURL());
 
 			writeToConnection(conn, message.getContent());
@@ -60,7 +67,7 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @param bytes
 	 * @throws IOException
 	 */
-	private void writeToConnection(HttpConnection_POST_Text conn, byte[] bytes)
+	private void writeToConnection(SimpleHttpConnection conn, byte[] bytes)
 			throws IOException {
 		OutputStream out = null;
 		InputStream in = null;
@@ -95,8 +102,8 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @throws IOException
 	 * @throws ClassCastException
 	 */
-	private HttpTransportMessage readResponse(HttpConnection_POST_Text conn,
-			HttpTransportMessage message) throws IOException,
+	private SimpleHttpTransportMessage readResponse(SimpleHttpConnection conn,
+			SimpleHttpTransportMessage message) throws IOException,
 			ClassCastException {
 
 		int responseCode = conn.getConnection().getResponseCode();
@@ -120,7 +127,7 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @return
 	 * @throws IOException
 	 */
-	private String readResponseBody(HttpConnection_POST_Text conn)
+	private String readResponseBody(SimpleHttpConnection conn)
 			throws IOException {
 		InputStream in = null;
 		String r = null;

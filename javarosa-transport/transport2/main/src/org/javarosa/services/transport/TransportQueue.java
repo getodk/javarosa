@@ -1,25 +1,53 @@
-package org.javarosa.services.transport.impl;
+package org.javarosa.services.transport;
 
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.services.transport.TransportMessage;
-
 import de.enough.polish.io.RmsStorage;
 
 public class TransportQueue {
-	private RmsStorage queue = new RmsStorage();
-	private Hashtable testingQueue = new Hashtable();
-	private boolean testing = false;
-	private Hashtable cachedCounts = new Hashtable();
 
-	private static String RECENTLY_SENT_STORENAME = "JavaROSATransQSent";
+	/**
+	 * These constants are used to identify objects in persistent storage
+	 * 
+	 * Q_STORENAME - the queue of messages to be sent RECENTLY_SENT_STORENAME -
+	 * messages recently sent QID_STORENAME - storage for the message id counter
+	 * 
+	 */
+
 	private static String Q_STORENAME = "JavaROSATransQ";
 	private static String QID_STORENAME = "JavaROSATransQId";
+	private static String RECENTLY_SENT_STORENAME = "JavaROSATransQSent";
 
+	/**
+	 * The persistent store - it is partitioned into three corresponding to the
+	 * three constants above
+	 */
+	private RmsStorage queue = new RmsStorage();
+
+	/**
+	 * We cache the size (in terms of numbers of records) of each of the
+	 * persistent store partitions
+	 */
+	private Hashtable cachedCounts = new Hashtable();
+
+	// two vars to do with testing outside the emulator
+	private Hashtable testingQueue = new Hashtable();
+	private boolean testing = false;
+
+	/**
+	 * @param testing
+	 */
 	public TransportQueue(boolean testing) {
 		this.testing = testing;
+		
+		// cache the counts first
+		int queueSize = readAll(Q_STORENAME).size();
+		this.cachedCounts.put(Q_STORENAME, new Integer(queueSize));
+		int recentlySentSize = readAll(RECENTLY_SENT_STORENAME).size();
+		this.cachedCounts.put(RECENTLY_SENT_STORENAME, new Integer(
+				recentlySentSize));
 	}
 
 	/**
@@ -27,17 +55,21 @@ public class TransportQueue {
 	 */
 	public int getTransportQueueSize() {
 		Integer size = (Integer) this.cachedCounts.get(Q_STORENAME);
-		if (size == null) {
-			return 0;
-		}
 		return size.intValue();
 	}
 
 	/**
-	 * @return
+	 * @return A Vector of TransportMessages waiting to be sent
 	 */
 	public Vector getTransportQueue() {
 		return readAll(Q_STORENAME);
+	}
+
+	/**
+	 * @return A Vector of TransportMessages recently sent
+	 */
+	public Vector getRecentlySentMessages() {
+		return readAll(RECENTLY_SENT_STORENAME);
 	}
 
 	/**
@@ -104,13 +136,33 @@ public class TransportQueue {
 		return null;
 	}
 
-	public TransportMessage findQueuedMessage(String id) {
+	/**
+	 * Given an id, look in the send queue and the recently sent queue,
+	 * returning the message if it is found (null otherwise)
+	 * 
+	 * If the message is in the transport queue, then the success parameter will
+	 * be false (and if found in the recentlySent queue, it will be set to true)
+	 * 
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public TransportMessage findMessage(String id) {
 		Vector records = readAll(Q_STORENAME);
 		for (int i = 0; i < records.size(); i++) {
 			TransportMessage message = (TransportMessage) records.elementAt(i);
 			if (message.getQueueIdentifier().equals(id))
 				return message;
 		}
+
+		Vector sentRecords = readAll(RECENTLY_SENT_STORENAME);
+		for (int i = 0; i < sentRecords.size(); i++) {
+			TransportMessage message = (TransportMessage) sentRecords
+					.elementAt(i);
+			if (message.getQueueIdentifier().equals(id))
+				return message;
+		}
+
 		return null;
 	}
 
@@ -185,7 +237,7 @@ public class TransportQueue {
 			}
 			this.queue.save(records, store);
 		}
-		// update cached count
+		// update the cached count for this store
 		this.cachedCounts.put(store, new Integer(records.size()));
 	}
 

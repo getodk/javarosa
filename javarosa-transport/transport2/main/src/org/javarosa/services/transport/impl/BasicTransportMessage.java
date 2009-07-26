@@ -12,12 +12,6 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	private int failureCount;
 	private String queueIdentifier;
 
-	
-	
-	public abstract int getTransportMethod();
-
-	
-
 	public int getResponseCode() {
 		return this.responseCode;
 	}
@@ -25,8 +19,6 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	public void setResponseCode(int responseCode) {
 		this.responseCode = responseCode;
 	}
-
-	 
 
 	public String getContentType() {
 		return contentType;
@@ -68,18 +60,12 @@ public abstract class BasicTransportMessage implements TransportMessage {
 		this.failureCount++;
 	}
 
-
-
 	public String getQueueIdentifier() {
 		return queueIdentifier;
 	}
-
-
 
 	public void setQueueIdentifier(String queueIdentifier) {
 		this.queueIdentifier = queueIdentifier;
 	}
 
-	
-	
 }
