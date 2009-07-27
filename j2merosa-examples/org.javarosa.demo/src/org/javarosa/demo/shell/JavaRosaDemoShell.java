@@ -72,7 +72,7 @@ import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.select.activity.PatientEntity;
 import org.javarosa.patient.storage.PatientRMSUtility;
 import org.javarosa.referral.ReferralModule;
-+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.AddUserActivity;
@@ -639,7 +639,7 @@ public class JavaRosaDemoShell implements IShell {
 		PropertyUtils
 				.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY,
 						"http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
-		Localization.setLocale((
+		Localization.setLocale(
 				PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, "en"));
 	}
 
