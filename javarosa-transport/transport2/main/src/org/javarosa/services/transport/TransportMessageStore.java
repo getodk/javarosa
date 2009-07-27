@@ -33,16 +33,11 @@ public class TransportMessageStore {
 	 */
 	private Hashtable cachedCounts = new Hashtable();
 
-	// two vars to do with testing outside the emulator
-	private Hashtable testingStorage = new Hashtable();
-	private boolean testing = false;
-
 	/**
 	 * @param testing
 	 */
-	public TransportMessageStore(boolean testing) {
-		this.testing = testing;
-		
+	public TransportMessageStore() {
+
 		// cache the counts first
 		int queueSize = readAll(Q_STORENAME).size();
 		this.cachedCounts.put(Q_STORENAME, new Integer(queueSize));
@@ -63,37 +58,37 @@ public class TransportMessageStore {
 	 * @return A Vector of TransportMessages waiting to be sent
 	 */
 	public Vector getCachedMessages() {
-		Vector messages =  readAll(Q_STORENAME);
+		Vector messages = readAll(Q_STORENAME);
 		Vector cached = new Vector();
-		for(int i=0;i<messages.size();i++){
-			TransportMessage message = (TransportMessage)messages.elementAt(i);
-			if(message.getStatus()==MessageStatus.CACHED){
+		for (int i = 0; i < messages.size(); i++) {
+			TransportMessage message = (TransportMessage) messages.elementAt(i);
+			if (message.getStatus() == MessageStatus.CACHED) {
 				cached.addElement(message);
-			}else{
-				if(isQueuingExpired(message)){
+			} else {
+				if (isQueuingExpired(message)) {
 					cached.addElement(message);
 				}
 			}
 		}
 		return messages;
 	}
-	
+
 	/**
 	 * 
-	 * If a SenderThread is interrupted in some way, a message might not
-	 * get the "Cached" status and be stuck with the "Queued" status instead
+	 * If a SenderThread is interrupted in some way, a message might not get the
+	 * "Cached" status and be stuck with the "Queued" status instead
 	 * 
-	 * This method fixes that by checking the age of the message. If the
-	 * age is greater than the time it would live in the SenderThread, then
-	 * it should have the Cached status.
+	 * This method fixes that by checking the age of the message. If the age is
+	 * greater than the time it would live in the SenderThread, then it should
+	 * have the Cached status.
 	 * 
 	 * @param message
 	 * @return
 	 */
-	private boolean isQueuingExpired(TransportMessage message){
+	private boolean isQueuingExpired(TransportMessage message) {
 		long now = new Date().getTime();
 		long deadline = message.getQueuingDeadline().getTime();
-		return (deadline>now);
+		return (deadline > now);
 	}
 
 	/**
@@ -239,12 +234,8 @@ public class TransportMessageStore {
 	public Vector readAll(String store) {
 		Vector records = new Vector();
 		try {
-			if (testing) {
-				records = (Vector) testingStorage.get(store);
-				if (records == null)
-					return new Vector();
-			} else
-				records = (Vector) storage.read(store);
+
+			records = (Vector) storage.read(store);
 		} catch (IOException e) {
 			// storage doesn't yet exist (according to Polish)
 		}
@@ -257,18 +248,13 @@ public class TransportMessageStore {
 	 * @throws IOException
 	 */
 	private void saveAll(Vector records, String store) throws IOException {
-		if (testing) {
-			this.testingStorage.put(store, records);
-
-		} else {
-
-			try {
-				this.storage.delete(store);
-			} catch (IOException e) {
-				// storage didn't exist (according to Polish)
-			}
-			this.storage.save(records, store);
+		try {
+			this.storage.delete(store);
+		} catch (IOException e) {
+			// storage didn't exist (according to Polish)
 		}
+		this.storage.save(records, store);
+
 		// update the cached count for this store
 		this.cachedCounts.put(store, new Integer(records.size()));
 	}

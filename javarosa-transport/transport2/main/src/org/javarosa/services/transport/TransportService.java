@@ -6,16 +6,17 @@ import java.util.Vector;
 
 /**
  * The TransportService is generic and should not need to be changed when adding
- * new kinds of transport
+ * new kinds of transport or new kinds of messages
  * 
- * To add a new kind of transport, it is necessary to define 
+ * To add a new kind of transport, it is necessary to define
  * <ol>
- * <li> A new kind of <b>TransportMessage</b>
- * <li> A new kind of <b>Transporter</b> - an object with the ability to send one of the new kinds of message
+ * <li>A new kind of <b>TransportMessage</b>
+ * <li>A new kind of <b>Transporter</b> - an object with the ability to send one
+ * of the new kinds of message
  * </ol>
  * 
  * The TransportMessage interface is such that each TransportMessage is able to
- * create an appropriate Transporter (via the <code>getTransporter()</code>
+ * create an appropriate Transporter (via the <code>createTransporter()</code>
  * method) able to send it.
  * 
  * This is not ideal. To separate these would seem to make sense. Then we'd
@@ -28,7 +29,7 @@ import java.util.Vector;
  * </code>
  * 
  * The most intuitive programmer interface however involves the following steps
- * alone: 
+ * alone:
  * <ol>
  * <li>create a Message
  * <li>send the Message
@@ -46,47 +47,71 @@ public class TransportService {
 
 	/**
 	 * 
-	 * The transport service has a queue, via which messages to be sent are
-	 * persisted
+	 * The TransportService has a messageStore, in which all messages to be sent are
+	 * persisted immediately
 	 * 
 	 */
-	private static TransportMessageStore messageStore = new TransportMessageStore(false);
+	private static TransportMessageStore messageStore = new TransportMessageStore();
 
 	/**
 	 * 
-	 * The basic purpose of the transport service - to send TransportMessages
+	 * Send a message in a thread, using the default number of tries and the
+	 * default pause between tries
 	 * 
-	 * (1) The TransportMessage is persisted in the TransportQueue and given a
-	 * unique id (2) The message is asked for an appropriate Transporter (a
-	 * Transporter actually does the communication) (3) A SenderThread is
-	 * started, which tries and retries the Transporter (4) The unique id of the
-	 * message is returned
+	 * Sending a message happens like this:
 	 * 
+	 * <ol>
+	 * <li>The message creates an appropriate Transporter (which contains the message)
+	 * <li>The message is given a QueuingDeadline, equal to the maximum time it can spend in
+	 * a QueuingThread
+	 * <li>The message is persisted in the Message Store
+	 * <li>A QueuingThread is 
+	 * started, which tries and retries the Transporter's send method
+	 * until either the specified number of tries are exhausted, or the message is successfully
+	 * sent
+	 * <li>The QueuingThread is returned
+	 * </ol>
 	 * 
 	 * @param message
 	 * @return Thread used to try to send message
 	 * @throws IOException
 	 */
 	public QueuingThread send(TransportMessage message) throws IOException {
-		return send(message,QueuingThread.DEFAULT_TRIES,QueuingThread.DEFAULT_DELAY);
+		return send(message, QueuingThread.DEFAULT_TRIES,
+				QueuingThread.DEFAULT_DELAY);
 	}
-	public QueuingThread send(TransportMessage message,int tries,int delay) throws IOException {
+
+	/**
+	 * 
+	 * Send a message, specifying a number of tries and the pause between the
+	 * tries (in seconds)
+	 * 
+	 * 
+	 * @param message
+	 * @param tries
+	 * @param delay
+	 * @return
+	 * @throws IOException
+	 */
+	public QueuingThread send(TransportMessage message, int tries, int delay)
+			throws IOException {
 
 		// create the appropriate transporter
-		Transporter transporter = message.getTransporter();
-		// create a sender thread 
-		QueuingThread thread = new QueuingThread(transporter, messageStore);
+		Transporter transporter = message.createTransporter();
 		
+		// create a sender thread
+		QueuingThread thread = new QueuingThread(transporter, messageStore,tries,delay);
+
 		// record the deadline for the queuing phase in the message
 		message.setQueuingDeadline(getQueuingDeadline(thread.getTries(), thread
 				.getDelay()));
-		
+
 		// persist the message in the queue
 		messageStore.enqueue(message);
 
 		// start the queuing phase
 		thread.start();
-		
+
 		// return the sender thread
 		return thread;
 	}
@@ -132,9 +157,9 @@ public class TransportService {
 	 */
 	private void sendCachedMessage(TransportMessage message) throws IOException {
 		// create the appropriate transporter
-		Transporter transporter = message.getTransporter();
+		Transporter transporter = message.createTransporter();
 		// create a sender thread and start it
-		new QueuingThread(transporter, messageStore).start();
+		new QueuingThread(transporter, messageStore,1,0).start();
 	}
 
 	/**

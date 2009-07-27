@@ -4,9 +4,17 @@ import java.util.Date;
 
 import de.enough.polish.io.Serializable;
 
+/**
+ * TransportMessage is one of a pair of interfaces which must
+ * be implemented in order to extend the Transport Layer
+ * 
+ * The other is the Transporter interface
+ *
+ */
 public interface TransportMessage extends Serializable {
 
 	/**
+	 * 
 	 * 
 	 * Each <code>TransportMessage</code> has the ability 
 	 * to create a <code>Transporter</code> capable of sending itself
@@ -14,13 +22,13 @@ public interface TransportMessage extends Serializable {
 	 * e.g. 
 	 * <code>
 	 * public Transporter getTransporter(){
-	 * 	return new MyTransporter(this);
+	 * 	    return <b>new</b> MyTransporter(this);
 	 * }
 	 * </code>
 	 * 
 	 * @return
 	 */
-	public Transporter getTransporter();
+	public Transporter createTransporter();
 
 	/**
 	 * ¨
@@ -74,6 +82,19 @@ public interface TransportMessage extends Serializable {
 	public void setQueueIdentifier(String id);
 	
 	public Date getCreated();
+	/**
+	 * 
+	 * The TransportService first tries to send a message in a QueuingThread.
+	 * 
+	 * This poses an issue: if the QueuingThread is interrupted unexpectedly,
+	 * a Message could be stuck with a QUEUED status and never get onto the 
+	 * CACHED list which is sent via the "sendCached" method
+	 * 
+	 * To prevent Messages being stuck with a QUEUED status, a time-limit is set,
+	 * after which they are considered to be CACHED
+	 * 
+	 * @param date
+	 */
 	public void setQueuingDeadline(Date date);
 	public Date getQueuingDeadline();
 	

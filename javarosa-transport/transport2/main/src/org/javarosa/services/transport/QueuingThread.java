@@ -4,29 +4,39 @@ import java.io.IOException;
 
 /**
  * 
- * A SenderThread takes a Transporter object and calls its send method
+ * A QueuingThread takes a Transporter object and calls its send method
  * repeatedly until it succeeds, over a given number of tries, with a given
  * delay between each try
  * 
  */
 public class QueuingThread extends Thread {
 
-	// the Transporter has the TransportMessage, and knows how to send it
+	public final static int DEFAULT_TRIES = 5;
+	public final static int DEFAULT_DELAY = 60;
+
+	/**
+	 * the Transporter has the TransportMessage, and knows how to send it
+	 */
 	private Transporter transporter;
-	// The TransportQueue is needed so that we can remove successfully sent
-	// messages
+
+	/**
+	 * A reference to the TransportMessageStore is needed so that successfully
+	 * sent messages can be removed
+	 */
 	private TransportMessageStore queue;
 
-	// these are public so that the TransportService can figure out if a Message
-	// is to old to be Queued still
-	public static int DEFAULT_TRIES = 5;
-	public static int DEFAULT_DELAY = 60;
-
+	/**
+	 * Number of times to try
+	 */
 	private int tries = DEFAULT_TRIES;
+	/**
+	 * Length of pauses between tries (in seconds)
+	 */
 	private int delay = DEFAULT_DELAY;
 
-	
-	// Counting down the tries for this thread
+	/**
+	 * Variable used to count down remaining tries
+	 */
 	private int triesRemaining;
 
 	/**
@@ -60,8 +70,6 @@ public class QueuingThread extends Thread {
 		this.delay = delay;
 	}
 
-
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -70,7 +78,6 @@ public class QueuingThread extends Thread {
 	public void run() {
 		TransportMessage message = this.transporter.getMessage();
 
-		
 		this.triesRemaining = this.tries;
 		// try to send repeatedly for a given number of tries
 		// or until the message has been successfully sent

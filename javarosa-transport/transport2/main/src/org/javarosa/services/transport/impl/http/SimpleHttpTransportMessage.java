@@ -30,7 +30,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	/* (non-Javadoc)
 	 * @see org.javarosa.services.transport.TransportMessage#getTransporter()
 	 */
-	public Transporter getTransporter() {
+	public Transporter createTransporter() {
 		return new SimpleHttpTransporter(this);
 	}
 	 
