@@ -6,13 +6,14 @@ import java.io.OutputStream;
 
 import javax.microedition.io.HttpConnection;
 
+import org.javarosa.services.transport.MessageStatus;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.StreamsUtil;
 
 /**
  * The SimpleHttpTransporter is able to send SimpleHttpTransportMessages
- *
+ * 
  */
 public class SimpleHttpTransporter implements Transporter {
 
@@ -26,29 +27,25 @@ public class SimpleHttpTransporter implements Transporter {
 		return this.message;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.javarosa.services.transport.Transporter#send()
 	 */
 	public TransportMessage send() {
 
 		try {
-			SimpleHttpConnection conn = new SimpleHttpConnection(
-					message.getDestinationURL());
+			SimpleHttpConnection conn = new SimpleHttpConnection(message
+					.getDestinationURL());
 
 			writeToConnection(conn, message.getContent());
 
 			readResponse(conn, message);
-
+			// getting here doesn't necessarily indicate successful send
+			// (depends on HTTP response code)
 			conn.close();
-		} catch (ClassCastException e) {
-			e.printStackTrace();
-			message.setSuccess(false);
-			message.setFailureReason(e.getMessage());
-			message.incrementFailureCount();
-
 		} catch (IOException e) {
 			e.printStackTrace();
-			message.setSuccess(false);
 			message.setFailureReason(e.getMessage());
 			message.incrementFailureCount();
 		}
@@ -70,9 +67,10 @@ public class SimpleHttpTransporter implements Transporter {
 			throws IOException {
 		OutputStream out = null;
 		try {
-			// earlier code was commented: Problem exists here on 3110c CommCare Application: open hangs
+			// earlier code was commented: Problem exists here on 3110c CommCare
+			// Application: open hangs
 			out = conn.getConnection().openOutputStream();
-			System.out.println("writing: "+new String(bytes));
+			System.out.println("writing: " + new String(bytes));
 			StreamsUtil.writeToOutput(bytes, out);
 		} catch (IOException e) {
 			throw e;
@@ -82,7 +80,7 @@ public class SimpleHttpTransporter implements Transporter {
 				out.flush();
 				out.close();
 			}
-			
+
 		}
 
 	}
@@ -104,9 +102,9 @@ public class SimpleHttpTransporter implements Transporter {
 
 		int responseCode = conn.getConnection().getResponseCode();
 		if (responseCode == HttpConnection.HTTP_OK) {
-			message.setSuccess(true);
 			// TODO: what to do with the response body?
 			readResponseBody(conn);
+			message.setStatus(MessageStatus.SENT);
 		} else {
 			message.setResponseCode(responseCode);
 		}

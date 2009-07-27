@@ -15,8 +15,10 @@ public class SenderThread extends Thread {
 	private Transporter transporter;
 	private TransportQueue queue;
 
-	private int triesRemaining = 5;
-	private int delay = 60;
+	public static int TRIES = 5;
+	public static int DELAY = 60;
+	
+	private int triesRemaining=TRIES;
 
 	/**
 	 * @param transporter The transporter object which does the sending
@@ -37,7 +39,13 @@ public class SenderThread extends Thread {
 		while ((triesRemaining > 0) && !message.isSuccess()) {
 			message = attemptToSend();
 		}
-
+		
+		// if the loop was executed merely because the tries have been
+		// used up, then the message becomes cached, for sending
+		// via the "Send Unsent" user function
+		if(!message.isSuccess()){
+			message.setStatus(MessageStatus.CACHED);
+		}
 	}
 
 	/**
@@ -80,7 +88,7 @@ public class SenderThread extends Thread {
 		triesRemaining--;
 		try {
 			// pause before trying again
-			wait((long) delay * 1000);
+			wait((long) DELAY * 1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

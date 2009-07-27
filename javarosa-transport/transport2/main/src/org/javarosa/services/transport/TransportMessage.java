@@ -1,12 +1,22 @@
 package org.javarosa.services.transport;
 
+import java.util.Date;
+
 import de.enough.polish.io.Serializable;
 
 public interface TransportMessage extends Serializable {
 
 	/**
 	 * 
-	 * Each TransportMessage has the ability to create a Transporter capable of sending it
+	 * Each <code>TransportMessage</code> has the ability 
+	 * to create a <code>Transporter</code> capable of sending itself
+	 * 
+	 * e.g. 
+	 * <code>
+	 * public Transporter getTransporter(){
+	 * 	return new MyTransporter(this);
+	 * }
+	 * </code>
 	 * 
 	 * @return
 	 */
@@ -15,12 +25,12 @@ public interface TransportMessage extends Serializable {
 	/**
 	 * ¨
 	 * 
-	 * @return What is being sent
+	 * @return Whatever is being sent
 	 */
 	public byte[] getContent();
 
 	/**
-	 * @return MimeType of what is being sent
+	 * @return MimeType of that which is being sent
 	 */
 	public String getContentType();
 
@@ -30,12 +40,21 @@ public interface TransportMessage extends Serializable {
 	 * @return Whether sending has been successful or not
 	 */
 	public boolean isSuccess();
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public int getStatus();
+	public void setStatus(int status);
 
 	/**
 	 * @return A message, often from an exception, describing the (most recent)
 	 *         reason for failure
 	 */
 	public String getFailureReason();
+	public void setFailureReason(String reason);
 
 	/**
 	 * @return The number of times unsuccessful attempts have been made to send
@@ -53,5 +72,10 @@ public interface TransportMessage extends Serializable {
 	public String getQueueIdentifier();
 
 	public void setQueueIdentifier(String id);
+	
+	public Date getCreated();
+	
+	
+	
 
 }
