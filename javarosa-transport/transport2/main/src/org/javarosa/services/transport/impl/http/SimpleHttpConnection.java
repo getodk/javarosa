@@ -11,7 +11,8 @@ public class SimpleHttpConnection {
 
 	/**
 	 * 
-	 * <a href=http://java.sun.com/javame/reference/apis/jsr118/javax/microedition/io/HttpConnection.html>HttpConnection</a>
+	 * <a href=http://java.sun.com/javame/reference/apis/jsr118/javax/
+	 * microedition/io/HttpConnection.html>HttpConnection</a>
 	 * 
 	 * @param url
 	 * @throws IOException
@@ -28,7 +29,7 @@ public class SimpleHttpConnection {
 		this.connection.setRequestProperty("Content-Language", "en-US");
 		this.connection.setRequestProperty("MIME-version", "1.0");
 		this.connection.setRequestProperty("Content-Type", "text/plain");
-
+		
 	}
 
 	public HttpConnection getConnection() {

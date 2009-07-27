@@ -19,27 +19,24 @@ package org.javarosa.transport.test;
 import java.io.IOException;
 
 import org.javarosa.services.transport.TransportService;
-import org.javarosa.services.transport.TransportService;
 import org.javarosa.services.transport.impl.http.SimpleHttpTransportMessage;
 
-public class TestOne  {
+public class TestOne {
 	public static final String TEST_SERVER_URL = "http://localhost:90";
 	public static final String TEST_DATA = "testdata";
-	
-	private TransportService svc= new TransportService();
 
-	 
-//	public TestOne(int arg0, String arg1) {
-//		super(arg0, arg1);
-//		 
-//	}
+	private TransportService svc = new TransportService();
 
+	// public TestOne(int arg0, String arg1) {
+	// super(arg0, arg1);
+	//		 
+	// }
 
 	public void test(int i) {
-		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage();
-		message.setContent("Hello World".getBytes());
-		String url="http://www.google.co.tz/search?hl=en&q=";
-		message.setDestinationURL(url);
+		String url = "http://www.google.co.tz/search?hl=en&q=";
+		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(
+				"Hellow World", url);
+
 		try {
 			svc.send(message);
 		} catch (IOException e) {
@@ -48,9 +45,8 @@ public class TestOne  {
 		}
 
 	}
-	
-	
-	public static void main(String[] args){
-		new TestOne( ).test(1);
+
+	public static void main(String[] args) {
+		new TestOne().test(1);
 	}
 }

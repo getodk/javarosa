@@ -9,8 +9,8 @@ public class StreamsUtil {
 
 	/**
 	 * 
-	 * Write everything from input stream to output stream, byte by byte
-	 * then close the streams
+	 * Write everything from input stream to output stream, byte by byte then
+	 * close the streams
 	 * 
 	 * 
 	 * @param in
@@ -24,19 +24,22 @@ public class StreamsUtil {
 			out.write(val);
 			val = in.read();
 		}
-		
-		// close the input stream
-		in.close();
-		
-		// flush and close the output stream
-		out.flush();
-		out.close();
+
+	}
+
+	public static void writeToOutput(byte[] bytes, OutputStream out)
+			throws IOException {
+
+		for (int i = 0; i < bytes.length; i++) {
+			out.write(bytes[i]);
+		}
+
 	}
 
 	/**
 	 * 
-	 * Read bytes from an input stream into a byte array
-	 * then close the input stream
+	 * Read bytes from an input stream into a byte array then close the input
+	 * stream
 	 * 
 	 * @param in
 	 * @param len
@@ -69,15 +72,14 @@ public class StreamsUtil {
 			data = buffer.toByteArray();
 			read = data.length;
 		}
-		in.close();
-		
-		 
+
 		if (len > 0 && read < len) {
-			//System.out.println("WARNING: expected " + len + "!!");
-			throw new RuntimeException("expected: "+len+" bytes but read "+read);
+			// System.out.println("WARNING: expected " + len + "!!");
+			throw new RuntimeException("expected: " + len + " bytes but read "
+					+ read);
 		}
 		// replyS
-		//System.out.println(new String(data, "UTF-8"));
+		// System.out.println(new String(data, "UTF-8"));
 
 		return data;
 	}
