@@ -72,6 +72,7 @@ import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.select.activity.PatientEntity;
 import org.javarosa.patient.storage.PatientRMSUtility;
 import org.javarosa.referral.ReferralModule;
++import org.javarosa.core.services.locale.Localization;
 import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.services.properties.activity.PropertyScreenActivity;
 import org.javarosa.user.activity.AddUserActivity;
@@ -190,7 +191,7 @@ public class JavaRosaDemoShell implements IShell {
 
 		// at application start, returning activity is null
 		if (returningActivity == null) {
-			launchActivity(new SplashScreenActivity(this, JavaRosaServiceProvider.instance().localize("splashscreen")),
+			launchActivity(new SplashScreenActivity(this, Localization.get("splashscreen")),
 					context);
 			return;
 		}
@@ -200,12 +201,12 @@ public class JavaRosaDemoShell implements IShell {
 
 			//#if javarosa.dev.shortcuts
 
-			launchActivity(new FormListActivity(this, JavaRosaServiceProvider.instance().localize("title.FormsList")), context);
+			launchActivity(new FormListActivity(this, Localization.get("title.FormsList")), context);
 
 			//#else
 			
 			prepareContextForLoginActivity();
-			launchActivity(new LoginActivity(this, JavaRosaServiceProvider.instance().localize("title.Login")), context);
+			launchActivity(new LoginActivity(this, Localization.get("title.Login")), context);
 			
 			//#endif
 
@@ -638,8 +639,8 @@ public class JavaRosaDemoShell implements IShell {
 		PropertyUtils
 				.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY,
 						"http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
-		JavaRosaServiceProvider.instance().getLocaleManager().setLocale(
-				PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, "english"));
+		Localization.setLocale((
+				PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, "en"));
 	}
 
 	/**
