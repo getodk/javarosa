@@ -1,6 +1,7 @@
 package org.javarosa.services.transport;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -61,8 +62,29 @@ public class TransportQueue {
 	/**
 	 * @return A Vector of TransportMessages waiting to be sent
 	 */
-	public Vector getTransportQueue() {
-		return readAll(Q_STORENAME);
+	public Vector getCachedMessages() {
+		Vector messages =  readAll(Q_STORENAME);
+		Vector cached = new Vector();
+		for(int i=0;i<messages.size();i++){
+			TransportMessage message = (TransportMessage)messages.elementAt(i);
+			if(message.getStatus()==MessageStatus.CACHED){
+				cached.addElement(message);
+			}else{
+				if(isQueuingExpired(message)){
+					cached.addElement(message);
+				}
+			}
+		}
+		return messages;
+	}
+	
+	private boolean isQueuingExpired(TransportMessage message){
+		long created = message.getCreated().getTime();
+		long now = new Date().getTime();
+		long diff = (now - created);
+		long expiry = SenderThread.TRIES*(SenderThread.DELAY*1000);
+		return (diff>expiry);
+		
 	}
 
 	/**
@@ -82,6 +104,7 @@ public class TransportQueue {
 	public String enqueue(TransportMessage message) throws IOException {
 		String id = getNextQueueIdentifier();
 		message.setQueueIdentifier(id);
+		message.setStatus(MessageStatus.QUEUED);
 		Vector records = readAll(Q_STORENAME);
 		records.addElement(message);
 		saveAll(records, Q_STORENAME);
