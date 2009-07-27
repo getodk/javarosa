@@ -52,6 +52,7 @@ public class TransportService {
 	 * 
 	 */
 	private static TransportMessageStore MESSAGE_STORE = new TransportMessageStore();
+	private static TransportMethodStore METHOD_STORE = new TransportMethodStore();
 
 	/**
 	 * 
@@ -76,7 +77,12 @@ public class TransportService {
 	 * @return Thread used to try to send message
 	 * @throws IOException
 	 */
-	public QueuingThread send(TransportMessage message) throws IOException {
+	public QueuingThread send(TransportMessage message) throws TransportException {
+		
+		// find some way of selecting which transport method to use. - Either read a default, or read a queue of methods or 
+		// whatever - but we should't be getting it from the Message.
+		//ITransportMethod transportMethod = METHOD_STORE.getTransportMethod()
+		
 		return send(message, QueuingThread.DEFAULT_TRIES,
 				QueuingThread.DEFAULT_DELAY);
 	}
@@ -94,7 +100,7 @@ public class TransportService {
 	 * @throws IOException
 	 */
 	public QueuingThread send(TransportMessage message, int tries, int delay)
-			throws IOException {
+			throws TransportException {
 
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
@@ -107,7 +113,13 @@ public class TransportService {
 				.getDelay()));
 
 		// persist the message in the queue
-		MESSAGE_STORE.enqueue(message);
+		
+		try {
+			MESSAGE_STORE.enqueue(message);
+		} catch (IOException e) {
+			throw new TransportException();
+		}
+		
 
 		// start the queuing phase
 		thread.start();
@@ -130,10 +142,11 @@ public class TransportService {
 	 * 
 	 * Applications can activate new attempts to send the CachedMessages via
 	 * this sendCached method
+	 * @throws TransportException 
 	 * 
 	 * 
 	 */
-	public void sendCached() {
+	public void sendCached() throws TransportException {
 		Vector messages = getCachedMessages();
 		for (int i = 0; i < messages.size(); i++) {
 			TransportMessage message = (TransportMessage) messages.elementAt(i);
@@ -145,8 +158,8 @@ public class TransportService {
 				try {
 					MESSAGE_STORE.updateMessage(message);
 				} catch (IOException e1) {
-					// do nothing
 					e1.printStackTrace();
+					throw new TransportException();
 				}
 			}
 		}
@@ -195,6 +208,10 @@ public class TransportService {
 	 */
 	public TransportMessage retrieve(String id) {
 		return MESSAGE_STORE.findMessage(id);
+	}
+
+	public void registerTransportMethod(ITransportMethod transportMethod) {
+		METHOD_STORE.register(transportMethod);
 	}
 
 }
