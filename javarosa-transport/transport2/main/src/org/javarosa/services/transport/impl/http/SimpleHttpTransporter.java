@@ -1,6 +1,5 @@
 package org.javarosa.services.transport.impl.http;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,12 +69,11 @@ public class SimpleHttpTransporter implements Transporter {
 	private void writeToConnection(SimpleHttpConnection conn, byte[] bytes)
 			throws IOException {
 		OutputStream out = null;
-		InputStream in = null;
 		try {
-			in = new ByteArrayInputStream(bytes);
+			// earlier code was commented: Problem exists here on 3110c CommCare Application: open hangs
 			out = conn.getConnection().openOutputStream();
-
-			StreamsUtil.writeFromInputToOutput(in, out);
+			System.out.println("writing: "+new String(bytes));
+			StreamsUtil.writeToOutput(bytes, out);
 		} catch (IOException e) {
 			throw e;
 
@@ -84,9 +82,7 @@ public class SimpleHttpTransporter implements Transporter {
 				out.flush();
 				out.close();
 			}
-			if (in != null) {
-				in.close();
-			}
+			
 		}
 
 	}
