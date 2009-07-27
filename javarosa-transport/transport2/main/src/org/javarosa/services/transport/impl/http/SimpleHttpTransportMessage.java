@@ -18,6 +18,10 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 		setContent(str.getBytes());
 		this.destinationURL = destinationURL;
 	}
+	public SimpleHttpTransportMessage(byte[] str,String destinationURL) {
+		setContent(str);
+		this.destinationURL = destinationURL;
+	}
 	public SimpleHttpTransportMessage(InputStream is,String destinationURL) throws IOException {
 		setContent(StreamsUtil.readFromStream(is, -1));
 		this.destinationURL = destinationURL;
