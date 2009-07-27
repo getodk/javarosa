@@ -7,7 +7,7 @@ import java.util.Vector;
 
 import de.enough.polish.io.RmsStorage;
 
-public class TransportQueue {
+public class TransportMessageStore {
 
 	/**
 	 * These constants are used to identify objects in persistent storage
@@ -25,7 +25,7 @@ public class TransportQueue {
 	 * The persistent store - it is partitioned into three corresponding to the
 	 * three constants above
 	 */
-	private RmsStorage queue = new RmsStorage();
+	private RmsStorage storage = new RmsStorage();
 
 	/**
 	 * We cache the size (in terms of numbers of records) of each of the
@@ -34,13 +34,13 @@ public class TransportQueue {
 	private Hashtable cachedCounts = new Hashtable();
 
 	// two vars to do with testing outside the emulator
-	private Hashtable testingQueue = new Hashtable();
+	private Hashtable testingStorage = new Hashtable();
 	private boolean testing = false;
 
 	/**
 	 * @param testing
 	 */
-	public TransportQueue(boolean testing) {
+	public TransportMessageStore(boolean testing) {
 		this.testing = testing;
 		
 		// cache the counts first
@@ -78,13 +78,22 @@ public class TransportQueue {
 		return messages;
 	}
 	
+	/**
+	 * 
+	 * If a SenderThread is interrupted in some way, a message might not
+	 * get the "Cached" status and be stuck with the "Queued" status instead
+	 * 
+	 * This method fixes that by checking the age of the message. If the
+	 * age is greater than the time it would live in the SenderThread, then
+	 * it should have the Cached status.
+	 * 
+	 * @param message
+	 * @return
+	 */
 	private boolean isQueuingExpired(TransportMessage message){
-		long created = message.getCreated().getTime();
 		long now = new Date().getTime();
-		long diff = (now - created);
-		long expiry = SenderThread.TRIES*(SenderThread.DELAY*1000);
-		return (diff>expiry);
-		
+		long deadline = message.getQueuingDeadline().getTime();
+		return (deadline>now);
 	}
 
 	/**
@@ -231,11 +240,11 @@ public class TransportQueue {
 		Vector records = new Vector();
 		try {
 			if (testing) {
-				records = (Vector) testingQueue.get(store);
+				records = (Vector) testingStorage.get(store);
 				if (records == null)
 					return new Vector();
 			} else
-				records = (Vector) queue.read(store);
+				records = (Vector) storage.read(store);
 		} catch (IOException e) {
 			// storage doesn't yet exist (according to Polish)
 		}
@@ -249,16 +258,16 @@ public class TransportQueue {
 	 */
 	private void saveAll(Vector records, String store) throws IOException {
 		if (testing) {
-			this.testingQueue.put(store, records);
+			this.testingStorage.put(store, records);
 
 		} else {
 
 			try {
-				this.queue.delete(store);
+				this.storage.delete(store);
 			} catch (IOException e) {
 				// storage didn't exist (according to Polish)
 			}
-			this.queue.save(records, store);
+			this.storage.save(records, store);
 		}
 		// update the cached count for this store
 		this.cachedCounts.put(store, new Integer(records.size()));

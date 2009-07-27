@@ -74,6 +74,8 @@ public interface TransportMessage extends Serializable {
 	public void setQueueIdentifier(String id);
 	
 	public Date getCreated();
+	public void setQueuingDeadline(Date date);
+	public Date getQueuingDeadline();
 	
 	
 	
