@@ -51,7 +51,7 @@ public class TransportService {
 	 * persisted immediately
 	 * 
 	 */
-	private static TransportMessageStore messageStore = new TransportMessageStore();
+	private static TransportMessageStore MESSAGE_STORE = new TransportMessageStore();
 
 	/**
 	 * 
@@ -100,14 +100,14 @@ public class TransportService {
 		Transporter transporter = message.createTransporter();
 		
 		// create a sender thread
-		QueuingThread thread = new QueuingThread(transporter, messageStore,tries,delay);
+		QueuingThread thread = new QueuingThread(transporter, MESSAGE_STORE,tries,delay);
 
 		// record the deadline for the queuing phase in the message
 		message.setQueuingDeadline(getQueuingDeadline(thread.getTries(), thread
 				.getDelay()));
 
 		// persist the message in the queue
-		messageStore.enqueue(message);
+		MESSAGE_STORE.enqueue(message);
 
 		// start the queuing phase
 		thread.start();
@@ -142,6 +142,12 @@ public class TransportService {
 			} catch (IOException e) {
 				e.printStackTrace();
 				message.setFailureReason(e.getMessage());
+				try {
+					MESSAGE_STORE.updateMessage(message);
+				} catch (IOException e1) {
+					// do nothing
+					e1.printStackTrace();
+				}
 			}
 		}
 	}
@@ -149,7 +155,7 @@ public class TransportService {
 	/**
 	 * 
 	 * 
-	 * Try to send one cached message
+	 * Try to send one cached message, by creating a QueuingThread which will try just once
 	 * 
 	 * 
 	 * @param message
@@ -159,21 +165,21 @@ public class TransportService {
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
 		// create a sender thread and start it
-		new QueuingThread(transporter, messageStore,1,0).start();
+		new QueuingThread(transporter, MESSAGE_STORE,1,0).start();
 	}
 
 	/**
 	 * @return
 	 */
 	public Vector getCachedMessages() {
-		return messageStore.getCachedMessages();
+		return MESSAGE_STORE.getCachedMessages();
 	}
 
 	/**
 	 * @return
 	 */
 	public int getTransportQueueSize() {
-		return messageStore.getTransportQueueSize();
+		return MESSAGE_STORE.getTransportQueueSize();
 	}
 
 	/**
@@ -188,7 +194,7 @@ public class TransportService {
 	 *         message was found)
 	 */
 	public TransportMessage retrieve(String id) {
-		return messageStore.findMessage(id);
+		return MESSAGE_STORE.findMessage(id);
 	}
 
 }

@@ -258,5 +258,18 @@ public class TransportMessageStore {
 		// update the cached count for this store
 		this.cachedCounts.put(store, new Integer(records.size()));
 	}
+	
+	public void updateMessage(TransportMessage message) throws IOException{
+		Vector records = readAll(Q_STORENAME);
+		for (int i = 0; i < records.size(); i++) {
+			TransportMessage m = (TransportMessage) records.elementAt(i);
+			if (m.getQueueIdentifier().equals(message.getQueueIdentifier())){
+				records.removeElementAt(i);
+				records.setElementAt(message, i);
+			}
+		}
+		saveAll(records,Q_STORENAME);
+
+	}
 
 }

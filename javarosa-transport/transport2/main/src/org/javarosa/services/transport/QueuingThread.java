@@ -23,7 +23,7 @@ public class QueuingThread extends Thread {
 	 * A reference to the TransportMessageStore is needed so that successfully
 	 * sent messages can be removed
 	 */
-	private TransportMessageStore queue;
+	private TransportMessageStore messageStore;
 
 	/**
 	 * Number of times to try
@@ -49,7 +49,7 @@ public class QueuingThread extends Thread {
 	 */
 	public QueuingThread(Transporter transporter, TransportMessageStore queue) {
 		this.transporter = transporter;
-		this.queue = queue;
+		this.messageStore = queue;
 		this.tries = DEFAULT_TRIES;
 		this.delay = DEFAULT_DELAY;
 	}
@@ -65,7 +65,7 @@ public class QueuingThread extends Thread {
 	public QueuingThread(Transporter transporter, TransportMessageStore queue,
 			int tries, int delay) {
 		this.transporter = transporter;
-		this.queue = queue;
+		this.messageStore = queue;
 		this.tries = tries;
 		this.delay = delay;
 	}
@@ -81,7 +81,7 @@ public class QueuingThread extends Thread {
 		this.triesRemaining = this.tries;
 		// try to send repeatedly for a given number of tries
 		// or until the message has been successfully sent
-		while ((triesRemaining > 0) && !message.isSuccess()) {
+		while ((this.triesRemaining > 0) && !message.isSuccess()) {
 			message = attemptToSend();
 		}
 
@@ -90,6 +90,12 @@ public class QueuingThread extends Thread {
 		// via the "Send Unsent" user function
 		if (!message.isSuccess()) {
 			message.setStatus(MessageStatus.CACHED);
+		}
+		try {
+			this.messageStore.updateMessage(message);
+		} catch (IOException e) {
+			// TODO: what to do?
+			e.printStackTrace();
 		}
 	}
 
@@ -119,7 +125,7 @@ public class QueuingThread extends Thread {
 	private void onSuccess(TransportMessage message) {
 		// remove from queue
 		try {
-			this.queue.dequeue(message);
+			this.messageStore.dequeue(message);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
