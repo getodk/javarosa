@@ -81,8 +81,8 @@ public class TransportService {
 		
 		// find some way of selecting which transport method to use. - Either read a default, or read a queue of methods or 
 		// whatever - but we should't be getting it from the Message.
+
 		//ITransportMethod transportMethod = METHOD_STORE.getTransportMethod()
-		
 		return send(message, QueuingThread.DEFAULT_TRIES,
 				QueuingThread.DEFAULT_DELAY);
 	}
