@@ -15,15 +15,15 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	private int failureCount;
 	private String queueIdentifier;
 	private Date created;
-	private Date queuingDeadline;
+	private long queuingDeadline;
 	
 	
 	
-	public Date getQueuingDeadline() {
+	public long getQueuingDeadline() {
 		return queuingDeadline;
 	}
 
-	public void setQueuingDeadline(Date queuingDeadline) {
+	public void setQueuingDeadline(long queuingDeadline) {
 		this.queuingDeadline = queuingDeadline;
 	}
 
