@@ -47,8 +47,8 @@ public class TransportService {
 
 	/**
 	 * 
-	 * The TransportService has a messageStore, in which all messages to be sent are
-	 * persisted immediately
+	 * The TransportService has a messageStore, in which all messages to be sent
+	 * are persisted immediately
 	 * 
 	 */
 	private static TransportMessageStore MESSAGE_STORE = new TransportMessageStore();
@@ -62,14 +62,14 @@ public class TransportService {
 	 * Sending a message happens like this:
 	 * 
 	 * <ol>
-	 * <li>The message creates an appropriate Transporter (which contains the message)
-	 * <li>The message is given a QueuingDeadline, equal to the maximum time it can spend in
-	 * a QueuingThread
+	 * <li>The message creates an appropriate Transporter (which contains the
+	 * message)
+	 * <li>The message is given a QueuingDeadline, equal to the maximum time it
+	 * can spend in a QueuingThread
 	 * <li>The message is persisted in the Message Store
-	 * <li>A QueuingThread is 
-	 * started, which tries and retries the Transporter's send method
-	 * until either the specified number of tries are exhausted, or the message is successfully
-	 * sent
+	 * <li>A QueuingThread is started, which tries and retries the Transporter's
+	 * send method until either the specified number of tries are exhausted, or
+	 * the message is successfully sent
 	 * <li>The QueuingThread is returned
 	 * </ol>
 	 * 
@@ -77,12 +77,14 @@ public class TransportService {
 	 * @return Thread used to try to send message
 	 * @throws IOException
 	 */
-	public QueuingThread send(TransportMessage message) throws TransportException {
-		
-		// find some way of selecting which transport method to use. - Either read a default, or read a queue of methods or 
+	public QueuingThread send(TransportMessage message)
+			throws TransportException {
+
+		// find some way of selecting which transport method to use. - Either
+		// read a default, or read a queue of methods or
 		// whatever - but we should't be getting it from the Message.
 
-		//ITransportMethod transportMethod = METHOD_STORE.getTransportMethod()
+		// ITransportMethod transportMethod = METHOD_STORE.getTransportMethod()
 		return send(message, QueuingThread.DEFAULT_TRIES,
 				QueuingThread.DEFAULT_DELAY);
 	}
@@ -102,24 +104,36 @@ public class TransportService {
 	public QueuingThread send(TransportMessage message, int tries, int delay)
 			throws TransportException {
 
+		System.out.println("message: " + message);
+
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
-		
-		// create a sender thread
-		QueuingThread thread = new QueuingThread(transporter, MESSAGE_STORE,tries,delay);
 
+		System.out.println("Transporter: " + transporter);
+
+		// create a sender thread
+		QueuingThread thread = new QueuingThread(transporter, MESSAGE_STORE,
+				tries, delay);
+
+		System.out.println("thread: " + thread);
+		
+		long deadline=getQueuingDeadline(thread.getTries(), thread
+				.getDelay());
+
+		System.out.println("deadline: " + deadline);
+		
 		// record the deadline for the queuing phase in the message
-		message.setQueuingDeadline(getQueuingDeadline(thread.getTries(), thread
-				.getDelay()));
+		message.setQueuingDeadline(deadline);
 
 		// persist the message in the queue
-		
+
 		try {
+			System.out.println("queing message ");
 			MESSAGE_STORE.enqueue(message);
 		} catch (IOException e) {
-			throw new TransportException("Unable to queue message: "+e.getMessage());
+			throw new TransportException("Unable to queue message: "
+					+ e.getMessage());
 		}
-		
 
 		// start the queuing phase
 		thread.start();
@@ -128,11 +142,11 @@ public class TransportService {
 		return thread;
 	}
 
-	private Date getQueuingDeadline(int tries, int delay) {
+	private long getQueuingDeadline(int tries, int delay) {
 		long deadline = (tries * delay * 1000);
 		long now = new Date().getTime();
-		Date queuingDeadline = new Date(deadline + now);
-		return queuingDeadline;
+		return (deadline + now);
+
 	}
 
 	/**
@@ -142,7 +156,8 @@ public class TransportService {
 	 * 
 	 * Applications can activate new attempts to send the CachedMessages via
 	 * this sendCached method
-	 * @throws TransportException 
+	 * 
+	 * @throws TransportException
 	 * 
 	 * 
 	 */
@@ -159,9 +174,12 @@ public class TransportService {
 					MESSAGE_STORE.updateMessage(message);
 				} catch (IOException e1) {
 					e1.printStackTrace();
-					throw new TransportException("Unable to persist change in message: "+e1.getMessage());
+					throw new TransportException(
+							"Unable to persist change in message: "
+									+ e1.getMessage());
 				}
-				throw new TransportException("Unable to send cached message: "+e.getMessage());
+				throw new TransportException("Unable to send cached message: "
+						+ e.getMessage());
 			}
 		}
 	}
@@ -169,7 +187,8 @@ public class TransportService {
 	/**
 	 * 
 	 * 
-	 * Try to send one cached message, by creating a QueuingThread which will try just once
+	 * Try to send one cached message, by creating a QueuingThread which will
+	 * try just once
 	 * 
 	 * 
 	 * @param message
@@ -179,7 +198,7 @@ public class TransportService {
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
 		// create a sender thread and start it
-		new QueuingThread(transporter, MESSAGE_STORE,1,0).start();
+		new QueuingThread(transporter, MESSAGE_STORE, 1, 0).start();
 	}
 
 	/**

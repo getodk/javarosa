@@ -87,7 +87,7 @@ public class TransportMessageStore {
 	 */
 	private boolean isQueuingExpired(TransportMessage message) {
 		long now = new Date().getTime();
-		long deadline = message.getQueuingDeadline().getTime();
+		long deadline = message.getQueuingDeadline();
 		return (deadline > now);
 	}
 
