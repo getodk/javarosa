@@ -117,7 +117,7 @@ public class TransportService {
 		try {
 			MESSAGE_STORE.enqueue(message);
 		} catch (IOException e) {
-			throw new TransportException();
+			throw new TransportException("Unable to queue message: "+e.getMessage());
 		}
 		
 
@@ -159,8 +159,9 @@ public class TransportService {
 					MESSAGE_STORE.updateMessage(message);
 				} catch (IOException e1) {
 					e1.printStackTrace();
-					throw new TransportException();
+					throw new TransportException("Unable to persist change in message: "+e1.getMessage());
 				}
+				throw new TransportException("Unable to send cached message: "+e.getMessage());
 			}
 		}
 	}
