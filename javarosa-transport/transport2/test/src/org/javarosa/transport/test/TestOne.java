@@ -16,35 +16,38 @@
 
 package org.javarosa.transport.test;
 
-import org.javarosa.services.transport.TransportException;
-import org.javarosa.services.transport.TransportMessage;
-import org.javarosa.services.transport.TransportService;
-import org.javarosa.services.transport.impl.http.SimpleHttpTransportMessage;
-import org.javarosa.services.transport.methods.BluetoothTransport;
-import org.javarosa.services.transport.methods.HTTPTransport;
-import org.javarosa.services.transport.methods.SMSTransport;
+import java.io.IOException;
+
+import javax.microedition.io.Connector;
 
 public class TestOne {
 	public static final String TEST_SERVER_URL = "http://localhost:90";
 	public static final String TEST_DATA = "testdata";
 
-	private TransportService svc = new TransportService();
+	//private TransportService svc = new TransportService();
+
+	// public TestOne(int arg0, String arg1) {
+	// super(arg0, arg1);
+	//		 
+	// }
 
 	public void test(int i) {
-		
-		svc.registerTransportMethod(new HTTPTransport());
-		svc.registerTransportMethod(new SMSTransport());
-		svc.registerTransportMethod(new BluetoothTransport());
-		
 		String url = "http://www.google.co.tz/search?hl=en&q=";
-		TransportMessage message = new SimpleHttpTransportMessage(
-				"Hellow World", url);
-		
 		try {
-			svc.send(message);
-		} catch (TransportException e) {
+			Connector.open(url);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+//		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(
+//				"Hellow World", url);
+//
+//		try {
+//			svc.send(message);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 	}
 

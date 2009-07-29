@@ -37,20 +37,14 @@ public class TransportMessageStore {
 	 * @param testing
 	 */
 	public TransportMessageStore() {
-
-		// cache the counts first
-		int queueSize = readAll(Q_STORENAME).size();
-		this.cachedCounts.put(Q_STORENAME, new Integer(queueSize));
-		int recentlySentSize = readAll(RECENTLY_SENT_STORENAME).size();
-		this.cachedCounts.put(RECENTLY_SENT_STORENAME, new Integer(
-				recentlySentSize));
+		updateCachedCounts();
 	}
 
 	/**
 	 * @return
 	 */
-	public int getTransportQueueSize() {
-		Integer size = (Integer) this.cachedCounts.get(Q_STORENAME);
+	public int getCachedMessagesSize() {
+		Integer size = (Integer) this.cachedCounts.get(Integer.toString(TransportMessageStatus.CACHED));
 		return size.intValue();
 	}
 
@@ -62,7 +56,7 @@ public class TransportMessageStore {
 		Vector cached = new Vector();
 		for (int i = 0; i < messages.size(); i++) {
 			TransportMessage message = (TransportMessage) messages.elementAt(i);
-			if (message.getStatus() == MessageStatus.CACHED) {
+			if (message.getStatus() == TransportMessageStatus.CACHED) {
 				cached.addElement(message);
 			} else {
 				if (isQueuingExpired(message)) {
@@ -108,7 +102,7 @@ public class TransportMessageStore {
 	public String enqueue(TransportMessage message) throws IOException {
 		String id = getNextQueueIdentifier();
 		message.setQueueIdentifier(id);
-		message.setStatus(MessageStatus.QUEUED);
+		message.setStatus(TransportMessageStatus.QUEUED);
 		Vector records = readAll(Q_STORENAME);
 		records.addElement(message);
 		saveAll(records, Q_STORENAME);
@@ -255,20 +249,51 @@ public class TransportMessageStore {
 		}
 		this.storage.save(records, store);
 
-		// update the cached count for this store
-		this.cachedCounts.put(store, new Integer(records.size()));
+		updateCachedCounts();
 	}
-	
-	public void updateMessage(TransportMessage message) throws IOException{
+
+	/**
+	 * 
+	 */
+	private void updateCachedCounts() {
+		int queued = 0;
+		int cached = 0;
+		// cache the counts first
+		Vector messages = readAll(Q_STORENAME);
+		for (int i = 0; i < messages.size(); i++) {
+			TransportMessage message = (TransportMessage) messages.elementAt(i);
+			if (message.getStatus() == TransportMessageStatus.QUEUED)
+				queued++;
+			if (message.getStatus() == TransportMessageStatus.CACHED)
+				cached++;
+			if (message.getStatus() == TransportMessageStatus.SENT)
+				throw new RuntimeException("Sent message in the queue");
+		}
+		this.cachedCounts.put(Integer.toString(TransportMessageStatus.CACHED),
+				new Integer(cached));
+		this.cachedCounts.put(Integer.toString(TransportMessageStatus.QUEUED),
+				new Integer(queued));
+
+		// sent messages in another store
+		int recentlySentSize = readAll(RECENTLY_SENT_STORENAME).size();
+		this.cachedCounts.put(Integer.toString(TransportMessageStatus.QUEUED),
+				new Integer(recentlySentSize));
+	}
+
+	/**
+	 * @param message
+	 * @throws IOException
+	 */
+	public void updateMessage(TransportMessage message) throws IOException {
 		Vector records = readAll(Q_STORENAME);
 		for (int i = 0; i < records.size(); i++) {
 			TransportMessage m = (TransportMessage) records.elementAt(i);
-			if (m.getQueueIdentifier().equals(message.getQueueIdentifier())){
-				records.removeElementAt(i);
-				records.setElementAt(message, i);
+			if (m.getQueueIdentifier().equals(message.getQueueIdentifier())) {
+				m.setStatus(message.getStatus());
+				m.setFailureReason(message.getFailureReason());
 			}
 		}
-		saveAll(records,Q_STORENAME);
+		saveAll(records, Q_STORENAME);
 
 	}
 
