@@ -61,42 +61,40 @@
 					<source dir="${dir.src}"/>
 					<!--Taking this out for now...-->
 					<!--source dir="${dir.test}"/-->
-					<source dir="${dir.j2merosa.extras}/org.javarosa.communication/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.communication.ui/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.clforms/src/"/>
-					<source dir="${dir.javarosa}/org.javarosa.core/src/"/>
-					<source dir="${dir.javarosa}/org.javarosa.core.model/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.formmanager/src/"/>
-					<source dir="${dir.javarosa}/org.javarosa.forms/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.communication/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.communication.ui/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.clforms/src/"/>
+					<source dir="${dir.javarosa-core}/org.javarosa.core/src/"/>
+					<source dir="${dir.javarosa-core}/org.javarosa.core.model/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.formmanager/src/"/>
+					<source dir="${dir.javarosa-core}/org.javarosa.forms/src/"/>
 					<source dir="${dir.j2merosa}/org.javarosa.j2me/src/"/>
 					
 					<!--source dir="${basedir}/../org.javarosa.mesh4j.sync.extensions/src/"/-->
-                    <source dir="${dir.j2merosa.extras}/org.javarosa.polish.activity/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.polish.chatterbox/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.polish.chatterbox.extensions/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.resources/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.referral/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.services.properties/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.user/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.utilities.file/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.patient/src/"/>
-					<source dir="${dir.javarosa}/org.javarosa.xform/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.patient.entry/src/"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.entity/src/"/>
-					<source dir="${dir.j2merosa.extras}/regexp-me/src/"/>
+                    <source dir="${dir.j2merosa.activities}/org.javarosa.polish.activity/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.polish.chatterbox/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.polish.chatterbox.extensions/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.resources/src/"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.referral/src/"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.services.properties/src/"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.user/src/"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.patient/src/"/>
+					<source dir="${dir.javarosa-core}/org.javarosa.xform/src/"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.patient.entry/src/"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.entity/src/"/>
 					
 					<!--source dir="${basedir}/../org.mesh4j.sync/src/"/-->
 					<!--source dir="${basedir}/../org.mesh4j.sync.message/src/"/-->
 					<!-- Add back in Mesh4X code once we're satisfied with using Java5's in Polish -->
 					
 					
-					<source dir="${dir.j2merosa.extras}/org.javarosa.clforms/test/" if="unittests"/>
-					<source dir="${dir.javarosa}/org.javarosa.core/test/" if="unittests"/>
-					<source dir="${dir.javarosa}/org.javarosa.core.model/test/" if="unittests"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.clforms/test/" if="unittests"/>
+					<source dir="${dir.javarosa-core}/org.javarosa.core/test/" if="unittests"/>
+					<source dir="${dir.javarosa-core}/org.javarosa.core.model/test/" if="unittests"/>
 					<source dir="${dir.j2merosa.examples}/org.javarosa.demo/test/" if="unittests"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.user/test/" if="unittests"/>
-					<source dir="${dir.j2merosa.extras}/org.javarosa.patient/test/" if="unittests"/>
-					<source dir="${dir.javarosa}/org.javarosa.xform/test/" if="unittests"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.user/test/" if="unittests"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.patient/test/" if="unittests"/>
+					<source dir="${dir.javarosa-core}/org.javarosa.xform/test/" if="unittests"/>
 					
 					<!-- defunct
 					<source dir="${basedir}/../org.javarosa.action/src/"/>
