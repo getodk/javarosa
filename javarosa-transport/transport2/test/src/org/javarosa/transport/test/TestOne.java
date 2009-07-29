@@ -32,10 +32,6 @@ public class TestOne {
 
 	public void test(int i) {
 		
-		svc.registerTransportMethod(new HTTPTransport());
-		svc.registerTransportMethod(new SMSTransport());
-		svc.registerTransportMethod(new BluetoothTransport());
-		
 		String url = "http://www.google.co.tz/search?hl=en&q=";
 		TransportMessage message = new SimpleHttpTransportMessage(
 				"Hellow World", url);
