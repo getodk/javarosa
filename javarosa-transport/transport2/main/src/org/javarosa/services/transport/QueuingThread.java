@@ -1,7 +1,5 @@
 package org.javarosa.services.transport;
 
-import java.io.IOException;
-
 /**
  * 
  * A QueuingThread takes a Transporter object and calls its send method
@@ -82,7 +80,13 @@ public class QueuingThread extends Thread {
 		// try to send repeatedly for a given number of tries
 		// or until the message has been successfully sent
 		while ((this.triesRemaining > 0) && !message.isSuccess()) {
-			message = attemptToSend();
+			try {
+				message = attemptToSend();
+			} catch (TransportException e) {
+				e.printStackTrace();
+				// can't log and throw this from within the API
+				// and since this is in a thread, nothing to do
+			}
 		}
 
 		// if the loop was executed merely because the tries have been
@@ -105,8 +109,8 @@ public class QueuingThread extends Thread {
 	 * 
 	 * @return The message being sent (with updated status)
 	 */
-	private TransportMessage attemptToSend() {
-		System.out.println("Attempts left: "+this.triesRemaining);
+	private TransportMessage attemptToSend() throws TransportException {
+		System.out.println("Attempts left: " + this.triesRemaining);
 		TransportMessage message = this.transporter.send();
 		if (message.isSuccess()) {
 			onSuccess(message);
@@ -122,13 +126,11 @@ public class QueuingThread extends Thread {
 	 * 
 	 * @param message
 	 */
-	private void onSuccess(TransportMessage message) {
+	private void onSuccess(TransportMessage message) throws TransportException {
 		// remove from queue
-		try {
-			this.messageStore.dequeue(message);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		this.messageStore.dequeue(message);
+
 	}
 
 	/**

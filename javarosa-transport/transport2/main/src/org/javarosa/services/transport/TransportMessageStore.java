@@ -44,7 +44,8 @@ public class TransportMessageStore {
 	 * @return
 	 */
 	public int getCachedMessagesSize() {
-		Integer size = (Integer) this.cachedCounts.get(Integer.toString(TransportMessageStatus.CACHED));
+		Integer size = (Integer) this.cachedCounts.get(Integer
+				.toString(TransportMessageStatus.CACHED));
 		return size.intValue();
 	}
 
@@ -99,7 +100,7 @@ public class TransportMessageStore {
 	 * @param message
 	 * @throws IOException
 	 */
-	public String enqueue(TransportMessage message) throws IOException {
+	public String enqueue(TransportMessage message) throws TransportException {
 		String id = getNextQueueIdentifier();
 		message.setQueueIdentifier(id);
 		message.setStatus(TransportMessageStatus.QUEUED);
@@ -117,7 +118,7 @@ public class TransportMessageStore {
 	 * @param success
 	 * @throws IOException
 	 */
-	public void dequeue(TransportMessage message) throws IOException {
+	public void dequeue(TransportMessage message) throws TransportException {
 		Vector records = readAll(Q_STORENAME);
 		TransportMessage m = find(message.getQueueIdentifier(), records);
 		if (m == null)
@@ -196,7 +197,7 @@ public class TransportMessageStore {
 	 * @return
 	 * @throws IOException
 	 */
-	private String getNextQueueIdentifier() throws IOException {
+	private String getNextQueueIdentifier() throws TransportException {
 		// get the most recently used id
 		Vector v = readAll(QID_STORENAME);
 		if ((v == null) || (v.size() == 0)) {
@@ -241,13 +242,18 @@ public class TransportMessageStore {
 	 * @param c
 	 * @throws IOException
 	 */
-	private void saveAll(Vector records, String store) throws IOException {
+	private void saveAll(Vector records, String store)
+			throws TransportException {
 		try {
 			this.storage.delete(store);
 		} catch (IOException e) {
 			// storage didn't exist (according to Polish)
 		}
-		this.storage.save(records, store);
+		try {
+			this.storage.save(records, store);
+		} catch (IOException e) {
+			throw new TransportException(e);
+		}
 
 		updateCachedCounts();
 	}
@@ -284,7 +290,8 @@ public class TransportMessageStore {
 	 * @param message
 	 * @throws IOException
 	 */
-	public void updateMessage(TransportMessage message) throws IOException {
+	public void updateMessage(TransportMessage message)
+			throws TransportException {
 		Vector records = readAll(Q_STORENAME);
 		for (int i = 0; i < records.size(); i++) {
 			TransportMessage m = (TransportMessage) records.elementAt(i);
@@ -293,6 +300,7 @@ public class TransportMessageStore {
 				m.setFailureReason(message.getFailureReason());
 			}
 		}
+
 		saveAll(records, Q_STORENAME);
 
 	}

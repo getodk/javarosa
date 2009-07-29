@@ -76,7 +76,8 @@ public class TransportService {
 	 * @return Thread used to try to send message
 	 * @throws IOException
 	 */
-	public QueuingThread send(TransportMessage message) throws IOException {
+	public QueuingThread send(TransportMessage message)
+			throws TransportException {
 		return send(message, QueuingThread.DEFAULT_TRIES,
 				QueuingThread.DEFAULT_DELAY);
 	}
@@ -94,13 +95,14 @@ public class TransportService {
 	 * @throws IOException
 	 */
 	public QueuingThread send(TransportMessage message, int tries, int delay)
-			throws IOException {
+			throws TransportException {
 
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
-		
+
 		// create a sender thread
-		QueuingThread thread = new QueuingThread(transporter, MESSAGE_STORE,tries,delay);
+		QueuingThread thread = new QueuingThread(transporter, MESSAGE_STORE,
+				tries, delay);
 
 		// record the deadline for the queuing phase in the message
 		message.setQueuingDeadline(getQueuingDeadline(thread.getTries(), thread
@@ -112,7 +114,7 @@ public class TransportService {
 		// start the queuing phase
 		thread.start();
 
-		// return the sender thread in case 
+		// return the sender thread in case
 		// an application wants to permit the user to cancel it
 		return thread;
 	}
@@ -133,7 +135,7 @@ public class TransportService {
 	 * 
 	 * 
 	 */
-	public void sendCached() {
+	public void sendCached() throws TransportException {
 		Vector messages = getCachedMessages();
 		for (int i = 0; i < messages.size(); i++) {
 			TransportMessage message = (TransportMessage) messages.elementAt(i);
@@ -142,12 +144,9 @@ public class TransportService {
 			} catch (IOException e) {
 				e.printStackTrace();
 				message.setFailureReason(e.getMessage());
-				try {
-					MESSAGE_STORE.updateMessage(message);
-				} catch (IOException e1) {
-					// do nothing
-					e1.printStackTrace();
-				}
+
+				MESSAGE_STORE.updateMessage(message);
+
 			}
 		}
 	}
