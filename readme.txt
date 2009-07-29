@@ -1,0 +1,1 @@
+Go to http://code.javarosa.org to learn how to get started with JavaRosa.
