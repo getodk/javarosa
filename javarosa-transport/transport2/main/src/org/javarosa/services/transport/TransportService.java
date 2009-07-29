@@ -52,7 +52,6 @@ public class TransportService {
 	 * 
 	 */
 	private static TransportMessageStore MESSAGE_STORE = new TransportMessageStore();
-	private static TransportMethodStore METHOD_STORE = new TransportMethodStore();
 
 	/**
 	 * 
@@ -228,10 +227,6 @@ public class TransportService {
 	 */
 	public TransportMessage retrieve(String id) {
 		return MESSAGE_STORE.findMessage(id);
-	}
-
-	public void registerTransportMethod(ITransportMethod transportMethod) {
-		METHOD_STORE.register(transportMethod);
 	}
 
 }
