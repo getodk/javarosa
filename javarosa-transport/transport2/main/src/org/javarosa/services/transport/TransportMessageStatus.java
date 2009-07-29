@@ -5,7 +5,7 @@ package org.javarosa.services.transport;
  * 
  *
  */
-public class MessageStatus {
+public class TransportMessageStatus {
 	
 	// when the message is in a QueuingThread
 	public final static int QUEUED=1;

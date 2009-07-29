@@ -2,8 +2,8 @@ package org.javarosa.services.transport.impl;
 
 import java.util.Date;
 
-import org.javarosa.services.transport.MessageStatus;
 import org.javarosa.services.transport.TransportMessage;
+import org.javarosa.services.transport.TransportMessageStatus;
 
 public abstract class BasicTransportMessage implements TransportMessage {
 
@@ -15,6 +15,7 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	private int failureCount;
 	private String queueIdentifier;
 	private Date created;
+	private Date sent;
 	private long queuingDeadline;
 	
 	
@@ -68,7 +69,7 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	}
 	
 	public boolean isSuccess(){
-		return this.status==MessageStatus.SENT;
+		return this.status==TransportMessageStatus.SENT;
 	}
 
 	public String getFailureReason() {
