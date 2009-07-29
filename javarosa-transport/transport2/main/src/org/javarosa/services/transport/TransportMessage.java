@@ -95,7 +95,7 @@ public interface TransportMessage extends Serializable {
 	 * 
 	 * @param date
 	 */
-	public void setQueuingDeadline(long time);
+	public void setQueuingDeadline(long date);
 	public long getQueuingDeadline();
 	
 	

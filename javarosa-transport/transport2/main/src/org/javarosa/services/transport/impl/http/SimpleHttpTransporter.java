@@ -6,7 +6,7 @@ import java.io.OutputStream;
 
 import javax.microedition.io.HttpConnection;
 
-import org.javarosa.services.transport.MessageStatus;
+import org.javarosa.services.transport.TransportMessageStatus;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.StreamsUtil;
@@ -33,21 +33,30 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @see org.javarosa.services.transport.Transporter#send()
 	 */
 	public TransportMessage send() {
-
+		SimpleHttpConnection conn = null;
 		try {
-			SimpleHttpConnection conn = new SimpleHttpConnection(message
-					.getDestinationURL());
 
-			writeToConnection(conn, message.getContent());
+			conn = new SimpleHttpConnection(message.getDestinationURL());
 
-			readResponse(conn, message);
-			// getting here doesn't necessarily indicate successful send
-			// (depends on HTTP response code)
+			if (conn.getResponseCode() == HttpConnection.HTTP_OK) {
+
+				writeToConnection(conn, message.getContent());
+
+				readResponse(conn, message);
+			}
+
 			conn.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println("Connection failed: ");
 			message.setFailureReason(e.getMessage());
 			message.incrementFailureCount();
+		} finally {
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (IOException e) {
+					// do nothing 
+				}
 		}
 
 		return message;
@@ -64,7 +73,7 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @throws IOException
 	 */
 	private void writeToConnection(SimpleHttpConnection conn, byte[] bytes)
-			throws IOException {
+			throws Exception {
 		OutputStream out = null;
 		try {
 			// earlier code was commented: Problem exists here on 3110c CommCare
@@ -72,12 +81,13 @@ public class SimpleHttpTransporter implements Transporter {
 			out = conn.getConnection().openOutputStream();
 			System.out.println("writing: " + new String(bytes));
 			StreamsUtil.writeToOutput(bytes, out);
-		} catch (IOException e) {
+
+		} catch (Exception e) {
+			e.printStackTrace();
 			throw e;
 
 		} finally {
 			if (out != null) {
-				out.flush();
 				out.close();
 			}
 
@@ -97,14 +107,13 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @throws ClassCastException
 	 */
 	private SimpleHttpTransportMessage readResponse(SimpleHttpConnection conn,
-			SimpleHttpTransportMessage message) throws IOException,
-			ClassCastException {
+			SimpleHttpTransportMessage message) throws IOException {
 
 		int responseCode = conn.getConnection().getResponseCode();
 		if (responseCode == HttpConnection.HTTP_OK) {
 			// TODO: what to do with the response body?
 			readResponseBody(conn);
-			message.setStatus(MessageStatus.SENT);
+			message.setStatus(TransportMessageStatus.SENT);
 		} else {
 			message.setResponseCode(responseCode);
 		}
@@ -131,6 +140,7 @@ public class SimpleHttpTransporter implements Transporter {
 			byte[] response = StreamsUtil.readFromStream(in, len);
 			r = new String(response);
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw e;
 		} finally {
 			if (in != null) {

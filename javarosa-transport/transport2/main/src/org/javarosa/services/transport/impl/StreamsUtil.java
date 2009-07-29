@@ -33,6 +33,8 @@ public class StreamsUtil {
 		for (int i = 0; i < bytes.length; i++) {
 			out.write(bytes[i]);
 		}
+		
+		//out.flush();
 
 	}
 

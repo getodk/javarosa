@@ -10,7 +10,7 @@ import java.io.IOException;
  * 
  */
 public class QueuingThread extends Thread {
-	  
+
 	public final static int DEFAULT_TRIES = 5;
 	public final static int DEFAULT_DELAY = 60;
 
@@ -89,12 +89,11 @@ public class QueuingThread extends Thread {
 		// used up, then the message becomes cached, for sending
 		// via the "Send Unsent" user function
 		if (!message.isSuccess()) {
-			message.setStatus(MessageStatus.CACHED);
+			message.setStatus(TransportMessageStatus.CACHED);
 		}
 		try {
 			this.messageStore.updateMessage(message);
-		} catch (IOException e) {
-			// TODO: what to do?
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -107,6 +106,7 @@ public class QueuingThread extends Thread {
 	 * @return The message being sent (with updated status)
 	 */
 	private TransportMessage attemptToSend() {
+		System.out.println("Attempts left: "+this.triesRemaining);
 		TransportMessage message = this.transporter.send();
 		if (message.isSuccess()) {
 			onSuccess(message);
@@ -140,7 +140,7 @@ public class QueuingThread extends Thread {
 		triesRemaining--;
 		try {
 			// pause before trying again
-			wait((long) delay * 1000);
+			sleep((long) delay * 1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
