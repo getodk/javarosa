@@ -29,9 +29,11 @@ public class TransportMessageStore {
 	 * 
 	 */
 
-	private static String Q_STORENAME = "JavaROSATransQ";
-	private static String QID_STORENAME = "JavaROSATransQId";
-	private static String RECENTLY_SENT_STORENAME = "JavaROSATransQSent";
+	private final static String Q_STORENAME = "JavaROSATransQ";
+	private final static String QID_STORENAME = "JavaROSATransQId";
+	private final static String RECENTLY_SENT_STORENAME = "JavaROSATransQSent";
+	
+	private final static int RECENTLY_SENT_STORE_MAXSIZE=15;
 
 	/**
 	 * The persistent store - it is partitioned into three corresponding to the
@@ -145,6 +147,12 @@ public class TransportMessageStore {
 			Vector recentlySent = readAll(RECENTLY_SENT_STORENAME);
 			if (recentlySent == null)
 				recentlySent = new Vector();
+			
+			// ensure that the recently sent store doesn't grow indefinitely
+			// by limiting its size
+			if(recentlySent.size()==RECENTLY_SENT_STORE_MAXSIZE)
+				recentlySent.removeElementAt(0);
+			
 			recentlySent.addElement(message);
 			saveAll(recentlySent, RECENTLY_SENT_STORENAME);
 		}
