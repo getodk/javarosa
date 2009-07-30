@@ -7,7 +7,7 @@ import org.javarosa.services.transport.TransportMessageStatus;
 
 public abstract class BasicTransportMessage implements TransportMessage {
 
-	private byte[] content;
+	private Object content;
 	private String contentType;
 	private int status;
 	private int responseCode;
@@ -20,6 +20,14 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	
 	
 	
+	public Date getSent() {
+		return sent;
+	}
+
+	public void setSent(Date sent) {
+		this.sent = sent;
+	}
+
 	public long getQueuingDeadline() {
 		return queuingDeadline;
 	}
@@ -52,11 +60,11 @@ public abstract class BasicTransportMessage implements TransportMessage {
 		this.contentType = contentType;
 	}
 
-	public byte[] getContent() {
+	public Object getContent() {
 		return content;
 	}
 
-	public void setContent(byte[] content) {
+	public void setContent(Object content) {
 		this.content = content;
 	}
 

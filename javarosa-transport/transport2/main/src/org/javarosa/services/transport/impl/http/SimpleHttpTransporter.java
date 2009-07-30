@@ -6,8 +6,8 @@ import java.io.OutputStream;
 
 import javax.microedition.io.HttpConnection;
 
-import org.javarosa.services.transport.TransportMessageStatus;
 import org.javarosa.services.transport.TransportMessage;
+import org.javarosa.services.transport.TransportMessageStatus;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.StreamsUtil;
 
@@ -40,7 +40,7 @@ public class SimpleHttpTransporter implements Transporter {
 
 			if (conn.getResponseCode() == HttpConnection.HTTP_OK) {
 
-				writeToConnection(conn, message.getContent());
+				writeToConnection(conn,(byte[]) message.getContent());
 
 				readResponse(conn, message);
 			}
