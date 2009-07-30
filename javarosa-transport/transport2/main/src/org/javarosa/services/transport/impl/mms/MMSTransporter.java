@@ -50,7 +50,7 @@ public class MMSTransporter implements Transporter {
 
 			// Prepare the multipart message
 			MultipartMessage mm = (MultipartMessage) conn
-					.newMessage(MessageConnection.MULTIPART_MESSAGE);
+					.newMessage(MessageConnection.BINARY_MESSAGE);
 
 			// Set the destination address
 			mm.setAddress("mms://" + message.getPhoneNumber());
