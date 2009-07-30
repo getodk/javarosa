@@ -13,7 +13,7 @@ import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 
 /**
- * An SMSTransporter can send the SMSTransportMessage passed to it in its
+ * An MMSTransporter can send the MMSTransportMessage passed to it in its
  * constructor
  * 
  */
@@ -58,7 +58,6 @@ public class MMSTransporter implements Transporter {
 			mm.setSubject(this.message.getSubject());
 
 			// Set the priority
-			String priority = "normal"; // "high", "normal" or "low"
 			mm.setHeader("X-Mms-Priority", this.message.getPriority());
 
 			// Set the message part
