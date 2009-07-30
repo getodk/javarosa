@@ -29,11 +29,11 @@ public class HttpGetTransportMessage extends DefaultGetTransportMessage implemen
 		return new HttpGetTransporter();
 	}
 	
-	public Object getContent(){
+	public Object getReturnedContent(){
 		return this.data;
 	}
 	
-	public void setContent(byte[] data){
+	public void setReturnedContent(byte[] data){
 		this.data = data;
 	}
 
