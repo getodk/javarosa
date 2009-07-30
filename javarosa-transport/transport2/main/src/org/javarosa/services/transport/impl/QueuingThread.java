@@ -12,7 +12,13 @@ import org.javarosa.services.transport.Transporter;
  */
 public class QueuingThread extends Thread {
 
+	/**
+	 * 
+	 */
 	public final static int DEFAULT_TRIES = 5;
+	/**
+	 * 
+	 */
 	public final static int DEFAULT_DELAY = 60;
 
 	/**
@@ -151,10 +157,16 @@ public class QueuingThread extends Thread {
 		}
 	}
 
+	/**
+	 * @return
+	 */
 	public int getTries() {
 		return tries;
 	}
 
+	/**
+	 * @return
+	 */
 	public int getDelay() {
 		return delay;
 	}

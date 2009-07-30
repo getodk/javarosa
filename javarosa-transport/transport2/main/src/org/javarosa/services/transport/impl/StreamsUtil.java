@@ -27,6 +27,14 @@ public class StreamsUtil {
 
 	}
 
+	/**
+	 * 
+	 * Write the byte array to the output stream 
+	 * 
+	 * @param bytes
+	 * @param out
+	 * @throws IOException
+	 */
 	public static void writeToOutput(byte[] bytes, OutputStream out)
 			throws IOException {
 
