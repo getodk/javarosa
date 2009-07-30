@@ -1,7 +1,6 @@
 package org.javarosa.services.transport.threading;
 
 import org.javarosa.services.transport.impl.TransportException;
-import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.listeners.IGetTransportMessage;
 import org.javarosa.services.transport.listeners.IGetTransporter;
 import org.javarosa.services.transport.listeners.IOnDataReturned;
