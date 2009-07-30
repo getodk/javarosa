@@ -5,43 +5,33 @@ import java.util.Date;
 import java.util.Vector;
 
 /**
- * The TransportService is generic and should not need to be changed when adding
- * new kinds of transport or new kinds of messages
+ * The TransportService is generic. Its capabilities are extended by defining new
+ * kinds of Transport.
  * 
- * To add a new kind of transport, it is necessary to define
+ * To define a new kind of transport, it is necessary to implement two interfaces:
  * <ol>
- * <li>A new kind of <b>TransportMessage</b>
- * <li>A new kind of <b>Transporter</b> - an object with the ability to send one
- * of the new kinds of message
+ * <li>TransportMessage
+ * <li>Transporter - an object with the ability to send one of the new kinds of message
  * </ol>
  * 
- * The TransportMessage interface is such that each TransportMessage is able to
+ * A TransportMessage must be able to
  * create an appropriate Transporter (via the <code>createTransporter()</code>
- * method) able to send it.
+ * method) whose constructor takes the message itself.
  * 
- * This is not ideal. To separate these would seem to make sense. Then we'd
- * have:
- * 
- * <code>
- * TransportMessage m = new SomeTransportMessage() 
- * Transporter tr = new SomeTransporter(m); 
- * new TransportService().send(tr);
- * </code>
- * 
- * The most intuitive programmer interface however involves the following steps
+ * The result is an intuitive programmer interface which involves the following steps
  * alone:
  * <ol>
  * <li>create a Message
- * <li>send the Message
+ * <li>ask the TransportService to send the Message
  * </ol>
+ * 
+ * For example:
  * 
  * <code>
  * TransportMessage m = new SomeTransportMessage() 
  * new TransportService().send(m);
  * </code>
  * 
- * Requiring a Message to be able to create a Transporter is considered a price
- * worth paying.
  */
 public class TransportService {
 
