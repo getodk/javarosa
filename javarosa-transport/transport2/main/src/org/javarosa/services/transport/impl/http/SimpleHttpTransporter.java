@@ -18,12 +18,21 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
  */
 public class SimpleHttpTransporter implements Transporter {
 
+	/**
+	 * The message to be sent by this Transporter
+	 */
 	private SimpleHttpTransportMessage message;
 
+	/**
+	 * @param message The message to be sent
+	 */
 	public SimpleHttpTransporter(SimpleHttpTransportMessage message) {
 		this.message = message;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javarosa.services.transport.Transporter#getMessage()
+	 */
 	public TransportMessage getMessage() {
 		return this.message;
 	}
@@ -67,7 +76,7 @@ public class SimpleHttpTransporter implements Transporter {
 	/**
 	 * 
 	 * 
-	 * 
+	 * Write the byte array to the HttpConnection
 	 * 
 	 * @param conn
 	 * @param bytes
@@ -98,7 +107,8 @@ public class SimpleHttpTransporter implements Transporter {
 
 	/**
 	 * 
-	 * 
+	 * Read the response from the HttpConnection and record
+	 * in the SimpleHttpTransportMessage
 	 * 
 	 * 
 	 * @param conn
@@ -112,8 +122,7 @@ public class SimpleHttpTransporter implements Transporter {
 
 		int responseCode = conn.getResponseCode();
 		if (responseCode == HttpConnection.HTTP_OK) {
-			// TODO: what to do with the response body?
-			readResponseBody(conn);
+			message.setResponseBody(readResponseBody(conn));
 			message.setStatus(TransportMessageStatus.SENT);
 		} else {
 			message.setResponseCode(responseCode);
@@ -150,6 +159,11 @@ public class SimpleHttpTransporter implements Transporter {
 		return r;
 	}
 
+	/**
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
 	private HttpConnection getConnection(String url) throws IOException {
 		HttpConnection conn;
 		Object o = Connector.open(url);

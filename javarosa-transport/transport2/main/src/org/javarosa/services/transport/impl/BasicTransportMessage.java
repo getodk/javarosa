@@ -5,24 +5,22 @@ import java.util.Date;
 import org.javarosa.services.transport.TransportMessage;
 
 /**
- * Abstract part implementation of TransportMessage, for subclassing by full implementations
- *
+ * Abstract part implementation of TransportMessage, for subclassing by full
+ * implementations
+ * 
  */
 public abstract class BasicTransportMessage implements TransportMessage {
 
 	private Object content;
 	private String contentType;
 	private int status;
-	private int responseCode;
 	private String failureReason;
 	private int failureCount;
 	private String queueIdentifier;
 	private Date created;
 	private Date sent;
 	private long queuingDeadline;
-	
-	
-	
+
 	public Date getSent() {
 		return sent;
 	}
@@ -45,14 +43,6 @@ public abstract class BasicTransportMessage implements TransportMessage {
 
 	public void setCreated(Date created) {
 		this.created = created;
-	}
-
-	public int getResponseCode() {
-		return this.responseCode;
-	}
-
-	public void setResponseCode(int responseCode) {
-		this.responseCode = responseCode;
 	}
 
 	public String getContentType() {
@@ -78,9 +68,9 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	public void setStatus(int status) {
 		this.status = status;
 	}
-	
-	public boolean isSuccess(){
-		return this.status==TransportMessageStatus.SENT;
+
+	public boolean isSuccess() {
+		return this.status == TransportMessageStatus.SENT;
 	}
 
 	public String getFailureReason() {
