@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
-import org.javarosa.services.transport.impl.StreamsUtil;
+import org.javarosa.services.transport.util.StreamsUtil;
 
 import de.enough.polish.io.Serializable;
 
