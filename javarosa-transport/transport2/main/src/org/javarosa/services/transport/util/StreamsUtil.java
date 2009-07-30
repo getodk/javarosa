@@ -1,6 +1,7 @@
-package org.javarosa.services.transport.impl;
+package org.javarosa.services.transport.util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -92,6 +93,33 @@ public class StreamsUtil {
 		// System.out.println(new String(data, "UTF-8"));
 
 		return data;
+	}
+
+	public static byte[] readFromStream(DataInputStream in) throws IOException {
+		byte[] data = null;
+		String serverResponse;
+		StringBuffer message = new StringBuffer();
+		
+		try{
+			int numOfForms = in.readByte();
+			
+			if(numOfForms != -1 && numOfForms > 0){
+				
+				for(int x = 0; x < numOfForms; x++){
+					
+					serverResponse = in.readUTF();
+					message.append(serverResponse);
+				}
+			}
+			
+			data = message.toString().getBytes();
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+		
+		return data;
+		
 	}
 
 }

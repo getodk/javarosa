@@ -30,4 +30,6 @@ public class TransportMessageStatus {
 	 */
 	public final static int SENT = 3;
 
+	public static final int DOWNLOADED = 4;
+
 }
