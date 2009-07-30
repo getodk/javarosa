@@ -35,7 +35,7 @@ public interface TransportMessage extends Serializable {
 	 * 
 	 * @return Whatever is being sent
 	 */
-	public byte[] getContent();
+	public Object getContent();
 
 	/**
 	 * @return MimeType of that which is being sent
