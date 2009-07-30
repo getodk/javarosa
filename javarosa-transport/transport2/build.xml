@@ -1,0 +1,10 @@
+<project name="JavaROSATransport" default="build">
+	<target name="compile">
+		<available file="lib/enough-j2mepolish-client-java5.jar" property="test.test"/>
+		<echo message="${test.test}"/>
+		<javac source="1.3" target="1.3" srcdir="main/src" classpath="lib/enough-j2mepolish-client-java5.jar"/>
+	</target>
+	<target name="build" depends="">
+		<jar destfile="transport.jar" basedir="bin" includes="**/*.class" />
+	</target>
+</project>
