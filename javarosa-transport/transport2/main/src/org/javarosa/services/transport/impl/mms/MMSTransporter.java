@@ -1,7 +1,6 @@
 package org.javarosa.services.transport.impl.mms;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.microedition.io.Connector;
 import javax.wireless.messaging.MessageConnection;
@@ -44,14 +43,17 @@ public class MMSTransporter implements Transporter {
 	public TransportMessage send() {
 		try {
 			// create a MessageConnection
-			MessageConnection conn = getConnection(message.getAddress());
+			String address = "mms://" + message.getPhoneNumber();
+			if (message.getApplicationID() != null)
+				address += ":" + message.getApplicationID();
+			MessageConnection conn = getConnection(address);
 
 			// Prepare the multipart message
 			MultipartMessage mm = (MultipartMessage) conn
 					.newMessage(MessageConnection.MULTIPART_MESSAGE);
 
 			// Set the destination address
-			mm.setAddress(this.message.getAddress());
+			mm.setAddress("mms://" + message.getPhoneNumber());
 
 			// Set the subject
 
@@ -61,9 +63,12 @@ public class MMSTransporter implements Transporter {
 			mm.setHeader("X-Mms-Priority", this.message.getPriority());
 
 			// Set the message part
+			MessagePart[] parts = (MessagePart[])this.message.getContent();
 
-			MessagePart messagePart = createMsgPart();
-			mm.addMessagePart(messagePart);
+			for (int i = 0; i < parts.length; i++) {
+				mm.addMessagePart(parts[i]);
+			}
+
 		} catch (SizeExceededException ex) {
 			// TODO: Exception handling
 		} catch (IOException ex) {
@@ -74,27 +79,7 @@ public class MMSTransporter implements Transporter {
 
 	}
 
-	/**
-	 * Constructs a MessagePart which can be added to a MultipartMessage.
-	 * 
-	 * @return the constructed MessagePart
-	 * @throws javax.wireless.messaging.SizeExceededException
-	 *             if the contents is larger than the available memory or
-	 *             supported size for the message part
-	 * @throws java.io.IOException
-	 *             if the resource cannot be read
-	 */
-	private MessagePart createMsgPart() throws SizeExceededException,
-			IOException {
-		String imageContentID = this.message.getContentId();
-		String imageContentLocation = this.message.getContentLocation();
-		String jpgMIME = this.message.getContentMimeType();
-		InputStream imageContent = getClass().getResourceAsStream(
-				imageContentLocation);
-		MessagePart messagePart = new MessagePart(imageContent, jpgMIME,
-				imageContentID, imageContentLocation, null);
-		return messagePart;
-	}
+
 
 	/**
 	 * @param url

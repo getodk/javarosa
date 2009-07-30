@@ -8,6 +8,10 @@ import org.javarosa.services.transport.impl.BasicTransportMessage;
 import de.enough.polish.io.Serializable;
 
 /**
+ * 
+ * Wireless Messaging API (JSR-120 or WMA) 
+ * 
+ * 
  * SMS message object
  * 
  * Since the message to be sent may require to be partitioned into

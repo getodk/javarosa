@@ -1,42 +1,48 @@
 package org.javarosa.services.transport.impl.mms;
 
+import javax.wireless.messaging.MessagePart;
+
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 import de.enough.polish.io.Serializable;
 
- 
 public class MMSTransportMessage extends BasicTransportMessage implements
 		Serializable {
 
- 
-	public MMSTransportMessage(String str, String address,String subject,String priority,String contentId,String contentLocation,String contentMimeType) {
-		setAddress(address);
+	public MMSTransportMessage(String phoneNumber, String subject,
+			String priority, MessagePart[] parts, String applicationID) {
+		setPhoneNumber(phoneNumber);
 		setSubject(subject);
 		setPriority(priority);
-		setContentId(contentId);
-		setContentLocation(contentLocation);
-		setContentMimeType(contentMimeType);
+		setApplicationID(applicationID);
+		setContent(parts);
 	}
-
-	 
 
 	/**
 	 * 
 	 */
-	private String address;
+	private String phoneNumber;
+
 	private String subject;
 	private String priority; // "high", "normal" or "low"
-	private String contentId;
-	private String contentLocation;
-	private String contentMimeType;
 
-	public String getAddress() {
-		return address;
+	private String applicationID;
+
+	public String getApplicationID() {
+		return applicationID;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setApplicationID(String applicationID) {
+		this.applicationID = applicationID;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 
 	public String getSubject() {
@@ -54,32 +60,6 @@ public class MMSTransportMessage extends BasicTransportMessage implements
 	public void setPriority(String priority) {
 		this.priority = priority;
 	}
-
-	public String getContentId() {
-		return contentId;
-	}
-
-	public void setContentId(String contentId) {
-		this.contentId = contentId;
-	}
-
-	public String getContentLocation() {
-		return contentLocation;
-	}
-
-	public void setContentLocation(String contentLocation) {
-		this.contentLocation = contentLocation;
-	}
-
-	public String getContentMimeType() {
-		return contentMimeType;
-	}
-
-	public void setContentMimeType(String contentMimeType) {
-		this.contentMimeType = contentMimeType;
-	}
-
-
 
 	/*
 	 * (non-Javadoc)
