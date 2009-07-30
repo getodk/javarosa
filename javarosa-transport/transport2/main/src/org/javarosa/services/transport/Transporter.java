@@ -6,7 +6,7 @@ public interface Transporter {
 	/**
 	 * 
 	 * A Transporter is given a TransportMessage in its constructor
-	 * and has the ability to send it via this method
+	 * and has the ability to send it via the send method
 	 * 
 	 * Example Transporter constructor:
 	 * <code>
@@ -15,7 +15,9 @@ public interface Transporter {
 	 * }
 	 * </code>
 	 * 
-	 * 
+	 * The TransportService spawns a thread which calls the send method.
+	 * So exceptions are caught and are recorded via message object method:
+	 * <code>setFailureReason()</code> and <code>setStatus()</code>
 	 * 
 	 * @return The message being sent
 	 */

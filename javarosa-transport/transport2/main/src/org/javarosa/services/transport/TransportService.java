@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
+import org.javarosa.services.transport.impl.QueuingThread;
+import org.javarosa.services.transport.impl.TransportException;
+import org.javarosa.services.transport.impl.TransportMessageStore;
+
 /**
  * The TransportService is generic. Its capabilities are extended by defining new
  * kinds of Transport.

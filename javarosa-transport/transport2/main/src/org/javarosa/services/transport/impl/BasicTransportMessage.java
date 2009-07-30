@@ -3,8 +3,11 @@ package org.javarosa.services.transport.impl;
 import java.util.Date;
 
 import org.javarosa.services.transport.TransportMessage;
-import org.javarosa.services.transport.TransportMessageStatus;
 
+/**
+ * Abstract part implementation of TransportMessage, for subclassing by full implementations
+ *
+ */
 public abstract class BasicTransportMessage implements TransportMessage {
 
 	private Object content;
