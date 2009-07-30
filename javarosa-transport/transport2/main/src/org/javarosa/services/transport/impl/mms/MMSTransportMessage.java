@@ -1,4 +1,4 @@
-package org.javarosa.services.transport.impl.sms;
+package org.javarosa.services.transport.impl.mms;
 
 import java.util.Vector;
 
@@ -7,16 +7,8 @@ import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 import de.enough.polish.io.Serializable;
 
-/**
- * SMS message object
- * 
- * Since the message to be sent may require to be partitioned into
- * more than one SMS payloads, the content of the SMSTransportMessage
- * is a Vector of Strings (in the simplest case, vector size = 1)
- * 
- * 
- */
-public class SMSTransportMessage extends BasicTransportMessage implements
+ 
+public class MMSTransportMessage extends BasicTransportMessage implements
 		Serializable {
 
 	/**
@@ -27,14 +19,67 @@ public class SMSTransportMessage extends BasicTransportMessage implements
 	/**
 	 * 
 	 */
-	private String destinationURL;
+	private String address;
+	private String subject;
+	private String priority;
+	private String contentId;
+	private String contentLocation;
+	private String contentMimeType;
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public String getPriority() {
+		return priority;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
+	public String getContentId() {
+		return contentId;
+	}
+
+	public void setContentId(String contentId) {
+		this.contentId = contentId;
+	}
+
+	public String getContentLocation() {
+		return contentLocation;
+	}
+
+	public void setContentLocation(String contentLocation) {
+		this.contentLocation = contentLocation;
+	}
+
+	public String getContentMimeType() {
+		return contentMimeType;
+	}
+
+	public void setContentMimeType(String contentMimeType) {
+		this.contentMimeType = contentMimeType;
+	}
 
 	/**
 	 * @param str
 	 * @param destinationURL
 	 */
-	public SMSTransportMessage(String str, String destinationURL) {
-		this.destinationURL = destinationURL;
+	public MMSTransportMessage(String str, String address) {
+		setAddress(address);
 		setContent(splitSMS(str));
 	}
 
@@ -66,19 +111,7 @@ public class SMSTransportMessage extends BasicTransportMessage implements
 		return v;
 	}
 
-	/**
-	 * @return
-	 */
-	public String getDestinationURL() {
-		return destinationURL;
-	}
-
-	/**
-	 * @param destinationURL
-	 */
-	public void setDestinationURL(String destinationURL) {
-		this.destinationURL = destinationURL;
-	}
+ 
 
 	/*
 	 * (non-Javadoc)
@@ -86,7 +119,7 @@ public class SMSTransportMessage extends BasicTransportMessage implements
 	 * @see org.javarosa.services.transport.TransportMessage#createTransporter()
 	 */
 	public Transporter createTransporter() {
-		return new SMSTransporter(this);
+		return new MMSTransporter(this);
 	}
 
 }
