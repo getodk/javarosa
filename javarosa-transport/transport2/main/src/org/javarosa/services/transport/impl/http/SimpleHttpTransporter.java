@@ -8,12 +8,12 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
 import org.javarosa.services.transport.TransportMessage;
-import org.javarosa.services.transport.TransportMessageStatus;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.StreamsUtil;
+import org.javarosa.services.transport.impl.TransportMessageStatus;
 
 /**
- * The SimpleHttpTransporter is able to send SimpleHttpTransportMessages
+ * The SimpleHttpTransporter is able to send SimpleHttpTransportMessages (text over POST)
  * 
  */
 public class SimpleHttpTransporter implements Transporter {

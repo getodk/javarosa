@@ -2,13 +2,15 @@ package org.javarosa.services.transport;
 
 import java.util.Date;
 
+import org.javarosa.services.transport.impl.TransportMessageStatus;
+
 import de.enough.polish.io.Serializable;
 
 /**
  * TransportMessage is one of a pair of interfaces which must
  * be implemented in order to extend the Transport Layer
  * 
- * The other is the Transporter interface
+ * The other is Transporter
  *
  */
 public interface TransportMessage extends Serializable {
@@ -21,12 +23,12 @@ public interface TransportMessage extends Serializable {
 	 * 
 	 * e.g. 
 	 * <code>
-	 * public Transporter getTransporter(){
-	 * 	    return <b>new</b> MyTransporter(this);
+	 * public Transporter createTransporter(){
+	 * 	    return <b>new</b> SimpleHttpTransporter(this);
 	 * }
 	 * </code>
 	 * 
-	 * @return
+	 * @return A Transporter object able to send this message
 	 */
 	public Transporter createTransporter();
 
@@ -52,7 +54,9 @@ public interface TransportMessage extends Serializable {
 	/**
 	 * 
 	 * 
-	 * @return
+	 * @return An integer representing the status of the message (whether queued, cached or sent)
+	 * 
+	 * @see TransportMessageStatus
 	 */
 	public int getStatus();
 	public void setStatus(int status);
@@ -75,30 +79,38 @@ public interface TransportMessage extends Serializable {
 	 * made to send it When persisted in the message queue, it is given a unique
 	 * id
 	 * 
-	 * @return
+	 * @return The queue-unique identifier assigned to the message
 	 */
 	public String getQueueIdentifier();
 
 	public void setQueueIdentifier(String id);
 	
-	public Date getCreated();
 	/**
 	 * 
 	 * The TransportService first tries to send a message in a QueuingThread.
 	 * 
 	 * This poses an issue: if the QueuingThread is interrupted unexpectedly,
-	 * a Message could be stuck with a QUEUED status and never get onto the 
-	 * CACHED list which is sent via the "sendCached" method
+	 * a TransportMessage could be stuck with a QUEUED status and never get onto the 
+	 * CACHED list to be sent via the "sendCached" method
 	 * 
 	 * To prevent Messages being stuck with a QUEUED status, a time-limit is set,
 	 * after which they are considered to be CACHED
-	 * 
-	 * @param date
 	 */
-	public void setQueuingDeadline(long date);
+	public void setQueuingDeadline(long time);
+	/**
+	 * @return The time at which the TransportService concludes that the message is no longer
+	 * within its initial QueuingThread
+	 * 
+	 * @see QueueingThread
+	 */
 	public long getQueuingDeadline();
 	
-	
+
+	/**
+	 * to be commented
+	 */
+	public Date getCreated();
+	public Date getSent();
 	
 
 }

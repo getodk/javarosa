@@ -7,6 +7,10 @@ import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 import de.enough.polish.io.Serializable;
 
+/**
+ * SMS transport - content is a Vector of strings 
+ *
+ */
 public class SMSTransportMessage extends BasicTransportMessage implements
 		Serializable {
 
@@ -44,9 +48,11 @@ public class SMSTransportMessage extends BasicTransportMessage implements
 		this.destinationURL = destinationURL;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.javarosa.services.transport.TransportMessage#createTransporter()
+	 */
 	public Transporter createTransporter() {
-		// TODO Auto-generated method stub
-		return null;
+		return new SMSTransporter(this);
 	}
 
 }
