@@ -113,6 +113,14 @@ public class TransportService {
 		return thread;
 	}
 
+	/**
+	 * 
+	 * Compute the lifetime of a queuing thread with the given parameters 
+	 * 
+	 * @param tries
+	 * @param delay
+	 * @return
+	 */
 	private long getQueuingDeadline(int tries, int delay) {
 		long deadline = (tries * delay * 1000);
 		long now = new Date().getTime();
