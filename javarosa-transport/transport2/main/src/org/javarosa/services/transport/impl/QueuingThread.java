@@ -108,6 +108,12 @@ public class QueuingThread extends Thread {
 			this.messageStore.updateMessage(message);
 		} catch (Exception e) {
 			e.printStackTrace();
+			// if this update fails, the QUEUED status
+			// isn't permanent (the message doesn't fall through
+			// a gap) because we note the duration of the QueuingThread
+			// and, should a message be found with the status QUEUED
+			// and yet was created before (now-queuing thread duration)
+			// then it is considered to have the CACHED status
 		}
 	}
 
