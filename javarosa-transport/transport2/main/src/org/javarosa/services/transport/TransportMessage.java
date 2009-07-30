@@ -83,6 +83,9 @@ public interface TransportMessage extends Serializable {
 	 */
 	public String getQueueIdentifier();
 
+	/**
+	 * @param id
+	 */
 	public void setQueueIdentifier(String id);
 	
 	/**
