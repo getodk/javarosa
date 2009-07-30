@@ -17,30 +17,90 @@ import de.enough.polish.io.Serializable;
 public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 		Serializable {
 
+	/**
+	 * An http url, to which the message will be POSTed
+	 */
 	private String destinationURL;
 
+	/**
+	 * Http response code
+	 */
+	private int responseCode;
+
+	/**
+	 * 
+	 */
+	private String responseBody;
+
+	/**
+	 * @param str
+	 * @param destinationURL
+	 */
 	public SimpleHttpTransportMessage(String str, String destinationURL) {
 		setContent(str.getBytes());
 		this.destinationURL = destinationURL;
 	}
 
+	/**
+	 * @param str
+	 * @param destinationURL
+	 */
 	public SimpleHttpTransportMessage(byte[] str, String destinationURL) {
 		setContent(str);
 		this.destinationURL = destinationURL;
 	}
 
+	/**
+	 * @param is
+	 * @param destinationURL
+	 * @throws IOException
+	 */
 	public SimpleHttpTransportMessage(InputStream is, String destinationURL)
 			throws IOException {
 		setContent(StreamsUtil.readFromStream(is, -1));
 		this.destinationURL = destinationURL;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getDestinationURL() {
 		return destinationURL;
 	}
 
+	/**
+	 * @param destinationURL
+	 */
 	public void setDestinationURL(String destinationURL) {
 		this.destinationURL = destinationURL;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getResponseCode() {
+		return responseCode;
+	}
+
+	/**
+	 * @param responseCode
+	 */
+	public void setResponseCode(int responseCode) {
+		this.responseCode = responseCode;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getResponseBody() {
+		return responseBody;
+	}
+
+	/**
+	 * @param responseBody
+	 */
+	public void setResponseBody(String responseBody) {
+		this.responseBody = responseBody;
 	}
 
 	/*
