@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
 import org.javarosa.services.transport.TransportMessage;
@@ -33,14 +34,14 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @see org.javarosa.services.transport.Transporter#send()
 	 */
 	public TransportMessage send() {
-		SimpleHttpConnection conn = null;
+		HttpConnection conn = null;
 		try {
 
-			conn = new SimpleHttpConnection(message.getDestinationURL());
+			conn = getConnection(message.getDestinationURL());
 
 			if (conn.getResponseCode() == HttpConnection.HTTP_OK) {
 
-				writeToConnection(conn,(byte[]) message.getContent());
+				writeToConnection(conn, (byte[]) message.getContent());
 
 				readResponse(conn, message);
 			}
@@ -55,7 +56,7 @@ public class SimpleHttpTransporter implements Transporter {
 				try {
 					conn.close();
 				} catch (IOException e) {
-					// do nothing 
+					// do nothing
 				}
 		}
 
@@ -72,13 +73,13 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @param bytes
 	 * @throws IOException
 	 */
-	private void writeToConnection(SimpleHttpConnection conn, byte[] bytes)
+	private void writeToConnection(HttpConnection conn, byte[] bytes)
 			throws Exception {
 		OutputStream out = null;
 		try {
 			// earlier code was commented: Problem exists here on 3110c CommCare
 			// Application: open hangs
-			out = conn.getConnection().openOutputStream();
+			out = conn.openOutputStream();
 			System.out.println("writing: " + new String(bytes));
 			StreamsUtil.writeToOutput(bytes, out);
 
@@ -106,10 +107,10 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @throws IOException
 	 * @throws ClassCastException
 	 */
-	private SimpleHttpTransportMessage readResponse(SimpleHttpConnection conn,
+	private SimpleHttpTransportMessage readResponse(HttpConnection conn,
 			SimpleHttpTransportMessage message) throws IOException {
 
-		int responseCode = conn.getConnection().getResponseCode();
+		int responseCode = conn.getResponseCode();
 		if (responseCode == HttpConnection.HTTP_OK) {
 			// TODO: what to do with the response body?
 			readResponseBody(conn);
@@ -130,13 +131,12 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @return
 	 * @throws IOException
 	 */
-	private String readResponseBody(SimpleHttpConnection conn)
-			throws IOException {
+	private String readResponseBody(HttpConnection conn) throws IOException {
 		InputStream in = null;
 		String r = null;
 		try {
-			in = conn.getConnection().openInputStream();
-			int len = (int) conn.getConnection().getLength();
+			in = conn.openInputStream();
+			int len = (int) conn.getLength();
 			byte[] response = StreamsUtil.readFromStream(in, len);
 			r = new String(response);
 		} catch (IOException e) {
@@ -148,6 +148,24 @@ public class SimpleHttpTransporter implements Transporter {
 			}
 		}
 		return r;
+	}
+
+	private HttpConnection getConnection(String url) throws IOException {
+		HttpConnection conn;
+		Object o = Connector.open(url);
+		if (o instanceof HttpConnection) {
+			conn = (HttpConnection) o;
+			conn.setRequestMethod(HttpConnection.POST);
+			conn.setRequestProperty("User-Agent",
+					"Profile/MIDP-2.0 Configuration/CLDC-1.1");
+			conn.setRequestProperty("Content-Language", "en-US");
+			conn.setRequestProperty("MIME-version", "1.0");
+			conn.setRequestProperty("Content-Type", "text/plain");
+		} else {
+			throw new IllegalArgumentException("Not HTTP URL:" + url);
+		}
+		return conn;
+
 	}
 
 }
