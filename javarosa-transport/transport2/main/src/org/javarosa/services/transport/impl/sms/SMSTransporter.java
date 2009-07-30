@@ -47,6 +47,9 @@ public class SMSTransporter implements Transporter {
 
 			// create a MessageConnection
 			conn = getConnection(message.getDestinationURL());
+			
+			//int segments = conn.numberOfSegments(message);
+			
 
 			// the SMS content has been split into n parts of not more than 140
 			// characters

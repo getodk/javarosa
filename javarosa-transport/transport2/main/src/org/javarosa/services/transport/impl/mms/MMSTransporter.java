@@ -47,6 +47,7 @@ public class MMSTransporter implements Transporter {
 			if (message.getApplicationID() != null)
 				address += ":" + message.getApplicationID();
 			MessageConnection conn = getConnection(address);
+			//conn.setMessageListener(this);
 
 			// Prepare the multipart message
 			MultipartMessage mm = (MultipartMessage) conn
