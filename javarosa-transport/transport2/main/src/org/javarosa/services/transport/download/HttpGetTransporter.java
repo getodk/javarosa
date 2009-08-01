@@ -57,7 +57,7 @@ public class HttpGetTransporter implements IGetTransporter {
 		
 		HttpGetTransportMessage downloadedMessage = message;
 		
-		downloadedMessage.setContent(data);
+		downloadedMessage.setReturnedContent(data);
 		downloadedMessage.setDownloadedDate(downloadWatchDate.getTime());
 		downloadedMessage.setStatus(TransportMessageStatus.DOWNLOADED);
 		
