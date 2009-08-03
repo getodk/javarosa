@@ -2,6 +2,7 @@ package org.javarosa.services.transport.impl;
 
 import java.util.Date;
 
+import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
 
 /**
@@ -20,6 +21,7 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	private Date created;
 	private Date sent;
 	private long queuingDeadline;
+	private TransportListener tranportListener;
 
 	public Date getSent() {
 		return sent;
@@ -96,5 +98,15 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	public void setQueueIdentifier(String queueIdentifier) {
 		this.queueIdentifier = queueIdentifier;
 	}
+
+	public TransportListener getTransportListener() {
+		return this.tranportListener;
+	}
+
+	public void setTransportListener(TransportListener listener) {
+		this.tranportListener=listener;
+		
+	}
+
 
 }

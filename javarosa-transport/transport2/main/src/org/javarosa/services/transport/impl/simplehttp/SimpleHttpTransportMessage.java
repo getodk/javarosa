@@ -3,9 +3,11 @@ package org.javarosa.services.transport.impl.simplehttp;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.microedition.io.HttpConnection;
+
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
-import org.javarosa.services.transport.util.StreamsUtil;
+import org.javarosa.services.transport.impl.StreamsUtil;
 
 import de.enough.polish.io.Serializable;
 
@@ -31,23 +33,33 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	 * 
 	 */
 	private String responseBody;
-
+	
 	/**
-	 * @param str
-	 * @param destinationURL
+	 * Constants from HttpConnection class:
+	 * 
+	 * HttpConnection.POST
+	 * HttpConnection.GET
 	 */
-	public SimpleHttpTransportMessage(String str, String destinationURL) {
+	private String requestType;
+
+	 
+	public SimpleHttpTransportMessage( String str, String destinationURL) {
 		setContent(str.getBytes());
 		this.destinationURL = destinationURL;
+		this.requestType=HttpConnection.POST;
+	}
+	
+	public SimpleHttpTransportMessage(String requestType,String str, String destinationURL) {
+		setContent(str.getBytes());
+		this.destinationURL = destinationURL;
+		this.requestType=requestType;
 	}
 
-	/**
-	 * @param str
-	 * @param destinationURL
-	 */
-	public SimpleHttpTransportMessage(byte[] str, String destinationURL) {
+	 
+	public SimpleHttpTransportMessage(String requestType,byte[] str, String destinationURL) {
 		setContent(str);
 		this.destinationURL = destinationURL;
+		this.requestType=requestType;
 	}
 
 	/**
@@ -101,6 +113,14 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	 */
 	public void setResponseBody(String responseBody) {
 		this.responseBody = responseBody;
+	}
+
+	public String getRequestType() {
+		return requestType;
+	}
+
+	public void setRequestType(String requestType) {
+		this.requestType = requestType;
 	}
 
 	/*

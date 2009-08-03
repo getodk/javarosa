@@ -81,7 +81,9 @@ public class MMSTransporter implements Transporter {
 	}
 
 
-
+	public TransportMessage fetch(){
+		throw new RuntimeException("No fetch defined for MMS");
+	}
 	/**
 	 * @param url
 	 * @return
