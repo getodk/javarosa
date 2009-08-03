@@ -176,6 +176,7 @@ public class XFormParser {
 		typeMappings.put("select", new Integer(Constants.DATATYPE_CHOICE_LIST));        //non-standard
 		typeMappings.put("geopoint", new Integer(Constants.DATATYPE_GEOPOINT));         //non-standard
 		typeMappings.put("barcode", new Integer(Constants.DATATYPE_BARCODE));           //non-standard
+        typeMappings.put("binary", new Integer(Constants.DATATYPE_BINARY));             //non-standard
 	    
 	}
 	

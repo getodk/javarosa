@@ -69,13 +69,11 @@ public class XFormAnswerDataParser {
 		case Constants.DATATYPE_NULL:
 		case Constants.DATATYPE_UNSUPPORTED:
 		case Constants.DATATYPE_TEXT:
+	    case Constants.DATATYPE_BARCODE:
+	    case Constants.DATATYPE_BINARY:
 
 			return new StringData(text);
 		
-		case Constants.DATATYPE_BARCODE:
-
-			return new StringData(text);
-
 		case Constants.DATATYPE_INTEGER:
 
 			try {
