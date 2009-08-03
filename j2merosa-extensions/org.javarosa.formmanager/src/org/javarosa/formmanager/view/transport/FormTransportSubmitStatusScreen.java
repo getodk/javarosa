@@ -28,6 +28,7 @@ import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.formmanager.activity.FormTransportActivity;
 import org.javarosa.formmanager.view.ISubmitStatusScreen;
@@ -47,7 +48,7 @@ public class FormTransportSubmitStatusScreen extends Form implements
 
 	public FormTransportSubmitStatusScreen(CommandListener activity) {
 		//#style submitPopup
-		super(JavaRosaServiceProvider.instance().localize("sending.status.title"));
+		super(Localization.get("sending.status.title"));
 		setCommandListener(this);
 
 		
@@ -58,8 +59,8 @@ public class FormTransportSubmitStatusScreen extends Form implements
 	public void reinit(int modelId){
 		
 		setModelID(modelId);
-		this.okCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.ok"), Command.OK, 1);
-		this.msg = new StringItem(null, JavaRosaServiceProvider.instance().localize("sending.status.going"));
+		this.okCommand = new Command(Localization.get("menu.ok"), Command.OK, 1);
+		this.msg = new StringItem(null, Localization.get("sending.status.going"));
 
 		addCommand(this.okCommand);
 		append(new Spacer(80, 0));
@@ -104,17 +105,17 @@ public class FormTransportSubmitStatusScreen extends Form implements
 		String message;
 		switch (status) {
 		case TransportMessage.STATUS_NEW:
-			message = (this.counter < TIMEOUT ? JavaRosaServiceProvider.instance().localize("sending.status.going")
-					: JavaRosaServiceProvider.instance().localize("sending.status.long"));
+			message = (this.counter < TIMEOUT ? Localization.get("sending.status.going")
+					: Localization.get("sending.status.long"));
 			break;
 		case TransportMessage.STATUS_DELIVERED:
-			message = JavaRosaServiceProvider.instance().localize("sending.status.success") + "  " + getServerResponse();
+			message = Localization.get("sending.status.success") + "  " + getServerResponse();
 			break;
 		case TransportMessage.STATUS_FAILED:
-			message = JavaRosaServiceProvider.instance().localize("sending.status.failed");
+			message = Localization.get("sending.status.failed");
 			break;
 		default:
-			message = JavaRosaServiceProvider.instance().localize("sending.status.error");
+			message = Localization.get("sending.status.error");
 			break;
 		}
 
@@ -132,7 +133,7 @@ public class FormTransportSubmitStatusScreen extends Form implements
 		    	//TODO: Specific sending error?
 				destroy();
 				StringItem failure = new StringItem("","");
-		    	failure.setText(JavaRosaServiceProvider.instance().localize("sending.status.error") + ": " + details);
+		    	failure.setText(Localization.get("sending.status.error") + ": " + details);
 				this.append(failure);
 		}
 	}

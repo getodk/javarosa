@@ -46,6 +46,7 @@ import org.javarosa.core.model.storage.DataModelTreeMetaData;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
 import org.javarosa.core.services.transport.IDataPayload;
@@ -61,15 +62,15 @@ public class ModelListActivity extends List implements CommandListener,
 		IActivity, IView {
 
 
-	public final static Command CMD_BACK = new Command(JavaRosaServiceProvider.instance().localize("menu.Back"), Command.BACK, 2);
-	public final static Command CMD_SEND = new Command(JavaRosaServiceProvider.instance().localize("menu.SendData"),Command.SCREEN,1);
-	public static final Command CMD_SEND_ALL_UNSENT = new Command(JavaRosaServiceProvider.instance().localize("menu.send.all"), Command.SCREEN, 2);
-	public final static Command CMD_EDIT = new Command(JavaRosaServiceProvider.instance().localize("menu.Edit"), Command.SCREEN, 2);
-	public final static Command CMD_REVIEW = new Command(JavaRosaServiceProvider.instance().localize("menu.Review"), Command.SCREEN, 2);
-	public final static Command CMD_REFRESH = new Command(JavaRosaServiceProvider.instance().localize("menu.Refresh"), Command.SCREEN, 3);
-	public final static Command CMD_MSGS = new Command(JavaRosaServiceProvider.instance().localize("menu.MessageStatus"),Command.SCREEN,4);
-	public final static Command CMD_DELETE = new Command(JavaRosaServiceProvider.instance().localize("menu.Delete"),Command.SCREEN,5);
-	public final static Command CMD_EMPTY = new Command(JavaRosaServiceProvider.instance().localize("menu.Empty"), Command.SCREEN, 6);	
+	public final static Command CMD_BACK = new Command(Localization.get("menu.Back"), Command.BACK, 2);
+	public final static Command CMD_SEND = new Command(Localization.get("menu.SendData"),Command.SCREEN,1);
+	public static final Command CMD_SEND_ALL_UNSENT = new Command(Localization.get("menu.send.all"), Command.SCREEN, 2);
+	public final static Command CMD_EDIT = new Command(Localization.get("menu.Edit"), Command.SCREEN, 2);
+	public final static Command CMD_REVIEW = new Command(Localization.get("menu.Review"), Command.SCREEN, 2);
+	public final static Command CMD_REFRESH = new Command(Localization.get("menu.Refresh"), Command.SCREEN, 3);
+	public final static Command CMD_MSGS = new Command(Localization.get("menu.MessageStatus"),Command.SCREEN,4);
+	public final static Command CMD_DELETE = new Command(Localization.get("menu.Delete"),Command.SCREEN,5);
+	public final static Command CMD_EMPTY = new Command(Localization.get("menu.Empty"), Command.SCREEN, 6);	
 	
 	public final static String returnKey = "ModelListReturnCommand";
 
@@ -98,7 +99,7 @@ public class ModelListActivity extends List implements CommandListener,
 	 *            The shell from which this activity was invoked
 	 */
 	public ModelListActivity(IShell shell) {
-		super(JavaRosaServiceProvider.instance().localize("title.SavedForms"), List.EXCLUSIVE);
+		super(Localization.get("title.SavedForms"), List.EXCLUSIVE);
 		
 		this.parent = shell;
 		initRMSUtilities();

@@ -31,6 +31,7 @@ import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.AddUserContext;
@@ -44,9 +45,9 @@ public class AddUserActivity implements IActivity, CommandListener {
 	private IShell parent = null;
 
 	// --- menu commands?
-	public final static Command CMD_SAVE = new Command(JavaRosaServiceProvider.instance().localize("menu.Save"),
+	public final static Command CMD_SAVE = new Command(Localization.get("menu.Save"),
 			Command.OK, 2);
-	public final static Command CMD_CANCEL = new Command(JavaRosaServiceProvider.instance().localize("menu.Exit"),
+	public final static Command CMD_CANCEL = new Command(Localization.get("menu.Exit"),
 			Command.EXIT, 2);
 
 	private boolean success = false;
@@ -64,7 +65,7 @@ public class AddUserActivity implements IActivity, CommandListener {
 	 */
 	public void start(Context context) {
 		this.context = new AddUserContext(context);
-		this.view = new UserForm(JavaRosaServiceProvider.instance().localize("activity.adduser.adduser"), this.context
+		this.view = new UserForm(Localization.get("activity.adduser.adduser"), this.context
 				.getDecorator());
 		this.view.setPasswordMode(this.context.getPasswordFormat());
 		this.view.addCommand(CMD_SAVE);
@@ -105,7 +106,7 @@ public class AddUserActivity implements IActivity, CommandListener {
 
 				saveNewUserToRMS(newUser);
 
-				alertUser(JavaRosaServiceProvider.instance().localize("activity.adduser.useradded"), JavaRosaServiceProvider.instance().localize("activity.adduser.useraddedsucc"),
+				alertUser(Localization.get("activity.adduser.useradded"), Localization.get("activity.adduser.useraddedsucc"),
 						AlertType.CONFIRMATION);
 
 				// return control from activity
@@ -149,18 +150,18 @@ public class AddUserActivity implements IActivity, CommandListener {
 	 */
 	private void handleProblems(int status) {
 
-		String s = JavaRosaServiceProvider.instance().localize("activity.adduser.problem");
+		String s = Localization.get("activity.adduser.problem");
 
 		if (status == UserValidator.USER_EXISTS) {
-			s += ": " + JavaRosaServiceProvider.instance().localize("activity.adduser.problem.nametaken", new String[]{this.view.getUsername()});
+			s += ": " + Localization.get("activity.adduser.problem.nametaken", new String[]{this.view.getUsername()});
 		}
 
 		if (status == UserValidator.USERORPASSWD_MISSING) {
-			s += ": " + JavaRosaServiceProvider.instance().localize("activity.adduser.problem.emptyuser");
+			s += ": " + Localization.get("activity.adduser.problem.emptyuser");
 		}
 
 		if (status == UserValidator.MISMATCHED_PASSWORDS) {
-			s += ": " + JavaRosaServiceProvider.instance().localize("activity.adduser.problem.mismatchingpasswords");
+			s += ": " + Localization.get("activity.adduser.problem.mismatchingpasswords");
 		}
 
 		alertUser(s, "", AlertType.ERROR);
