@@ -40,9 +40,6 @@ import org.javarosa.services.transport.impl.TransportMessageStore;
  * 
  */
 public class TransportService {
-	
-	
-
 
 	/**
 	 * 
@@ -78,13 +75,39 @@ public class TransportService {
 	 */
 	public QueuingThread send(TransportMessage message)
 			throws TransportException {
-		return send(message, QueuingThread.DEFAULT_TRIES,
-				QueuingThread.DEFAULT_DELAY);
+		return queueForTransport(QueuingThread.SENDING, message,
+				QueuingThread.DEFAULT_TRIES, QueuingThread.DEFAULT_DELAY);
+	}
+
+	public QueuingThread send(TransportMessage message, int tries, int delay)
+			throws TransportException {
+		return queueForTransport(QueuingThread.SENDING, message, tries, delay);
 	}
 
 	/**
 	 * 
-	 * Send a message, specifying a number of tries and the pause between the
+	 * fetch an object in a thread, using the default number of tries and the
+	 * default pause between tries
+	 * 
+	 * 
+	 * @param message
+	 * @return
+	 * @throws TransportException
+	 */
+	public QueuingThread fetch(TransportMessage message)
+			throws TransportException {
+		return queueForTransport(QueuingThread.FETCHING, message,
+				QueuingThread.DEFAULT_TRIES, QueuingThread.DEFAULT_DELAY);
+	}
+
+	public QueuingThread fetch(TransportMessage message, int tries, int delay)
+			throws TransportException {
+		return queueForTransport(QueuingThread.SENDING, message, tries, delay);
+	}
+
+	/**
+	 * 
+	 * queue a message, specifying a number of tries and the pause between the
 	 * tries (in seconds)
 	 * 
 	 * 
@@ -94,15 +117,16 @@ public class TransportService {
 	 * @return
 	 * @throws IOException
 	 */
-	public QueuingThread send(TransportMessage message, int tries, int delay)
+	public QueuingThread queueForTransport(int transportType,
+			TransportMessage message, int tries, int delay)
 			throws TransportException {
 
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
 
 		// create a sender thread
-		QueuingThread thread = new QueuingThread(QueuingThread.SENDING,transporter, MESSAGE_STORE,
-				tries, delay);
+		QueuingThread thread = new QueuingThread(transportType, transporter,
+				MESSAGE_STORE, tries, delay);
 
 		// record the deadline for the queuing phase in the message
 		message.setQueuingDeadline(getQueuingDeadline(thread.getTries(), thread
@@ -196,7 +220,8 @@ public class TransportService {
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
 		// create a sender thread and start it
-		new Thread(new QueuingThread(QueuingThread.SENDING,transporter, MESSAGE_STORE, 1, 0)).start();
+		new Thread(new QueuingThread(QueuingThread.SENDING, transporter,
+				MESSAGE_STORE, 1, 0)).start();
 	}
 
 	/**
