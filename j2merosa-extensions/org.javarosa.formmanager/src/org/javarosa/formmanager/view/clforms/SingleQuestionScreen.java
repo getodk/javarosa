@@ -25,9 +25,9 @@ import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.Ticker;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.FormElementBinding;
@@ -49,9 +49,9 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	public static Command nextCommand;
 	public static Command viewAnswersCommand;
 	
-	public static Command nextItemCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.Next"), Command.ITEM, 1);
+	public static Command nextItemCommand = new Command(Localization.get("menu.Next"), Command.ITEM, 1);
 	//#style button
-	public StringItem nextItem = new StringItem(null,JavaRosaServiceProvider.instance().localize("button.Next"),Item.BUTTON);
+	public StringItem nextItem = new StringItem(null,Localization.get("button.Next"),Item.BUTTON);
 	
 	public ItemCommandListener itemListner;
 
@@ -127,9 +127,9 @@ public abstract class SingleQuestionScreen extends Form implements IView {
 	}
 
 	private void setUpCommands(){
-		nextCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.Next"), Command.SCREEN, 0);
-		previousCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.Back"), Command.SCREEN, 2);
-		viewAnswersCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.ViewAnswers"), Command.SCREEN, 3);
+		nextCommand = new Command(Localization.get("menu.Next"), Command.SCREEN, 0);
+		previousCommand = new Command(Localization.get("menu.Back"), Command.SCREEN, 2);
+		viewAnswersCommand = new Command(Localization.get("menu.ViewAnswers"), Command.SCREEN, 3);
 
 		this.addCommand(previousCommand);
 		this.addCommand(viewAnswersCommand);

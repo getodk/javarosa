@@ -20,8 +20,8 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Spacer;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
+import org.javarosa.core.services.locale.Localization;
 
 
 public class SubmitScreen extends Form implements IView {
@@ -30,9 +30,9 @@ public class SubmitScreen extends Form implements IView {
 	public static final int SEND_LATER = 1;
 	public static final int SEND_NOW_SPEC = 2;
 	
-	private static final String SEND_NOW_DEFAULT_STRING = JavaRosaServiceProvider.instance().localize("menu.SendNow");
-	private static final String SEND_NOW_SPEC_STRING = JavaRosaServiceProvider.instance().localize("menu.SendToNewServer");
-	private static final String SEND_LATER_STRING = JavaRosaServiceProvider.instance().localize("menu.SendLater");
+	private static final String SEND_NOW_DEFAULT_STRING = Localization.get("menu.SendNow");
+	private static final String SEND_NOW_SPEC_STRING = Localization.get("menu.SendToNewServer");
+	private static final String SEND_LATER_STRING = Localization.get("menu.SendLater");
 	
     //private Command selectCommand;
     
@@ -43,7 +43,7 @@ public class SubmitScreen extends Form implements IView {
 		//Command selectCommand = new Command("OK", Command.OK, 1);
 		
 		//#style submitYesNo
-		cg = new ChoiceGroup(JavaRosaServiceProvider.instance().localize("question.SendNow"), ChoiceGroup.EXCLUSIVE);
+		cg = new ChoiceGroup(Localization.get("question.SendNow"), ChoiceGroup.EXCLUSIVE);
 		
 		//NOTE! These Indexes are optimized to be added in a certain
 		//order. _DO NOT_ change it without updating the static values

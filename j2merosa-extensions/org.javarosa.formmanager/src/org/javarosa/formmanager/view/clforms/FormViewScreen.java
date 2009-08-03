@@ -19,11 +19,11 @@ package org.javarosa.formmanager.view.clforms;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.List;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.FormElementBinding;
@@ -50,9 +50,9 @@ public class FormViewScreen extends List implements IView {
 	}
 
 	private void setUpCommands() {
-		exitNoSaveCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.Exit"), Command.EXIT, 4);
-		exitSaveCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.SaveAndExit"), Command.SCREEN, 4);
-		sendCommand = new Command(JavaRosaServiceProvider.instance().localize("menu.SendForm"), Command.SCREEN, 4);
+		exitNoSaveCommand = new Command(Localization.get("menu.Exit"), Command.EXIT, 4);
+		exitSaveCommand = new Command(Localization.get("menu.SaveAndExit"), Command.SCREEN, 4);
+		sendCommand = new Command(Localization.get("menu.SendForm"), Command.SCREEN, 4);
 
 		//saveAndReloadCommand = new Command("SAVE&Reload", Command.ITEM, 3);
 

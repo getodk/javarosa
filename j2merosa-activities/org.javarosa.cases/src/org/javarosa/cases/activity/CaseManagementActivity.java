@@ -30,11 +30,11 @@ import javax.microedition.lcdui.Displayable;
 import org.javarosa.cases.util.CaseContext;
 import org.javarosa.cases.view.CaseManagementScreen;
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.services.locale.Localization;
 
 /**
  * @author Clayton Sims
@@ -51,11 +51,11 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 	// Clayton Sims - Mar 19, 2009 : I'm really not a fan of how this is done. Should
 	// be refactored at some point.
 
-    public static final String NEW = JavaRosaServiceProvider.instance().localize("menu.NewCase");
-    public static final String FOLLOWUP = JavaRosaServiceProvider.instance().localize("menu.FollowUp");
-    public static String REFERRAL = JavaRosaServiceProvider.instance().localize("menu.Referral");
-    public static final String VIEW_OPEN = JavaRosaServiceProvider.instance().localize("menu.ViewOpen");
-    public static final String RESOLVE = JavaRosaServiceProvider.instance().localize("menu.Resolve");
+    public static final String NEW = Localization.get("menu.NewCase");
+    public static final String FOLLOWUP = Localization.get("menu.FollowUp");
+    public static String REFERRAL = Localization.get("menu.Referral");
+    public static final String VIEW_OPEN = Localization.get("menu.ViewOpen");
+    public static final String RESOLVE = Localization.get("menu.Resolve");
 
 	Vector commands = new Vector();
 
@@ -123,7 +123,7 @@ public class CaseManagementActivity implements IActivity, CommandListener {
 	 */
 	public void start(Context context) {
 		this.context = new CaseContext(context);
-		REFERRAL = JavaRosaServiceProvider.instance().localize("menu.Referral",new String[] {String.valueOf(this.context.getNumberOfReferrals())} );
+		REFERRAL = Localization.get("menu.Referral",new String[] {String.valueOf(this.context.getNumberOfReferrals())} );
 		view = new CaseManagementScreen("Select Action");
 		configView();
 		view.setCommandListener(this);
