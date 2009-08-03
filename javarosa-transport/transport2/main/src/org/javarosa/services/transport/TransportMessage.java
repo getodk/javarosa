@@ -115,5 +115,7 @@ public interface TransportMessage extends Serializable {
 	public Date getCreated();
 	public Date getSent();
 	
+	public TransportListener getTransportListener();
+	public void setTransportListener(TransportListener listener);
 
 }

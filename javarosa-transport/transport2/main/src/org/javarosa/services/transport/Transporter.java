@@ -25,6 +25,15 @@ public interface Transporter {
 	 * @return The message being sent
 	 */
 	public TransportMessage send();
+	
+	/**
+	 * 
+	 * (Attempt to) fetch data, given the info in the message given to the Transporter in its constructor
+	 * 
+	 * @return The message containing the info regarding the object being fetched
+	 */
+	public TransportMessage fetch();
+
 
 	/**
 	 * 

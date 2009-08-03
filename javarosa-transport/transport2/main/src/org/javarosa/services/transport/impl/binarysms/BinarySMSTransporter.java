@@ -65,6 +65,10 @@ public class BinarySMSTransporter implements Transporter {
 		return message;
 	}
 
+	public TransportMessage fetch(){
+		throw new RuntimeException("No fetch defined for Binary SMS");
+	}
+	
 	/**
 	 * 
 	 * Send single sms over a MessageConnection

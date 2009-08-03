@@ -9,8 +9,8 @@ import javax.microedition.io.HttpConnection;
 
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.impl.StreamsUtil;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
-import org.javarosa.services.transport.util.StreamsUtil;
 
 /**
  * The SimpleHttpTransporter is able to send SimpleHttpTransportMessages (text over POST)
@@ -73,6 +73,44 @@ public class SimpleHttpTransporter implements Transporter {
 
 	}
 
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.javarosa.services.transport.Transporter#send()
+	 */
+	public TransportMessage fetch() {
+		HttpConnection conn = null;
+		try {
+
+			conn = getConnection(message.getDestinationURL());
+
+			if (conn.getResponseCode() == HttpConnection.HTTP_OK) {
+
+				writeToConnection(conn, (byte[]) message.getContent());
+
+				readResponse(conn, message);
+			}
+
+			conn.close();
+		} catch (Exception e) {
+			System.out.println("Connection failed: ");
+			message.setFailureReason(e.getMessage());
+			message.incrementFailureCount();
+		} finally {
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (IOException e) {
+					// do nothing
+				}
+		}
+
+		return message;
+
+	}
+	
+	
 	/**
 	 * 
 	 * 
@@ -169,7 +207,7 @@ public class SimpleHttpTransporter implements Transporter {
 		Object o = Connector.open(url);
 		if (o instanceof HttpConnection) {
 			conn = (HttpConnection) o;
-			conn.setRequestMethod(HttpConnection.POST);
+			conn.setRequestMethod(this.message.getRequestType());
 			conn.setRequestProperty("User-Agent",
 					"Profile/MIDP-2.0 Configuration/CLDC-1.1");
 			conn.setRequestProperty("Content-Language", "en-US");

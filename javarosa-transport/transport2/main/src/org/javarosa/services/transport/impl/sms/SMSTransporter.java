@@ -76,6 +76,10 @@ public class SMSTransporter implements Transporter {
 		return message;
 	}
 
+	
+	public TransportMessage fetch(){
+		throw new RuntimeException("No fetch defined for SMS");
+	}
 	/**
 	 * 
 	 * Send single sms over a MessageConnection
