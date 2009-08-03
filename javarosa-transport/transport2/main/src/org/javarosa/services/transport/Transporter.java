@@ -20,26 +20,12 @@ public interface Transporter {
 
 	/**
 	 * 
-	 * (Attempt to) send the message given to the Transporter in its constructor
+	 * (Attempt to) send the message given
 	 * 
-	 * @return The message being sent
 	 */
-	public TransportMessage send();
+	public void send(TransportMessage message);
 	
-	/**
-	 * 
-	 * (Attempt to) fetch data, given the info in the message given to the Transporter in its constructor
-	 * 
-	 * @return The message containing the info regarding the object being fetched
-	 */
-	public TransportMessage fetch();
-
-
-	/**
-	 * 
-	 * 
-	 * @return The message being sent
-	 */
-	public TransportMessage getMessage();
-
+	public Transporter getTransporter();
+	
+	public void stop();
 }

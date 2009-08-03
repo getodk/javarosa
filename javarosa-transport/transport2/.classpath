@@ -3,8 +3,10 @@
 	<classpathentry kind="src" path="main/src"/>
 	<classpathentry kind="src" path="test/src"/>
 	<classpathentry kind="lib" path="lib/jmunit4cldc11-1.2.1.jar"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client.jar"/>
 	<classpathentry exported="true" kind="con" path="J2MELIB"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.1.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/midp-2.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

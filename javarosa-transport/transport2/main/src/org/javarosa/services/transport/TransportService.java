@@ -49,190 +49,95 @@ public class TransportService {
 	 */
 
 	private static TransportMessageStore MESSAGE_STORE = new TransportMessageStore();
-
+	
 	/**
+	 * Attempts to send the provided message, storing it inside of the cache until it
+	 * has successfully been transported.  
 	 * 
-	 * Send a message in a thread, using the default number of tries and the
-	 * default pause between tries
+	 * @param message The message that is to be sent.
+	 * @return The transporter which will be used to send the message. This object can
+	 * be used to cancel the current send if necessary. 
 	 * 
-	 * Sending a message happens like this:
-	 * 
-	 * <ol>
-	 * <li>The message creates an appropriate Transporter (which contains the
-	 * message)
-	 * <li>The message is given a QueuingDeadline, equal to the maximum time it
-	 * can spend in a QueuingThread
-	 * <li>The message is persisted in the Message Store
-	 * <li>A QueuingThread is started, which tries and retries the Transporter's
-	 * send method until either the specified number of tries are exhausted, or
-	 * the message is successfully sent
-	 * <li>The QueuingThread is returned
-	 * </ol>
-	 * 
-	 * @param message
-	 * @return Thread used to try to send message
-	 * @throws IOException
+	 * @throws TransportException If there are problems enqueuing or dequeuing the message
+	 * from the cache 
 	 */
-	public QueuingThread send(TransportMessage message)
-			throws TransportException {
-		return queueForTransport(QueuingThread.SENDING, message,
-				QueuingThread.DEFAULT_TRIES, QueuingThread.DEFAULT_DELAY);
-	}
-
-	public QueuingThread send(TransportMessage message, int tries, int delay)
-			throws TransportException {
-		return queueForTransport(QueuingThread.SENDING, message, tries, delay);
-	}
-
-	/**
-	 * 
-	 * fetch an object in a thread, using the default number of tries and the
-	 * default pause between tries
-	 * 
-	 * 
-	 * @param message
-	 * @return
-	 * @throws TransportException
-	 */
-	public QueuingThread fetch(TransportMessage message)
-			throws TransportException {
-		return queueForTransport(QueuingThread.FETCHING, message,
-				QueuingThread.DEFAULT_TRIES, QueuingThread.DEFAULT_DELAY);
-	}
-
-	public QueuingThread fetch(TransportMessage message, int tries, int delay)
-			throws TransportException {
-		return queueForTransport(QueuingThread.SENDING, message, tries, delay);
-	}
-
-	/**
-	 * 
-	 * queue a message, specifying a number of tries and the pause between the
-	 * tries (in seconds)
-	 * 
-	 * 
-	 * @param message
-	 * @param tries
-	 * @param delay
-	 * @return
-	 * @throws IOException
-	 */
-	public QueuingThread queueForTransport(int transportType,
-			TransportMessage message, int tries, int delay)
-			throws TransportException {
-
-		// create the appropriate transporter
+	public Transporter send(TransportMessage message) throws TransportException{
+		final TransportMessage tmessage = message;
 		Transporter transporter = message.createTransporter();
-
-		// create a sender thread
-		QueuingThread thread = new QueuingThread(transportType, transporter,
-				MESSAGE_STORE, tries, delay);
-
-		// record the deadline for the queuing phase in the message
-		message.setQueuingDeadline(getQueuingDeadline(thread.getTries(), thread
-				.getDelay()));
-
-		// persist the message in the queue
 		MESSAGE_STORE.enqueue(message);
+		
+		message.addTransportListener(new TransportListener() {
 
-		// start the queuing phase
-		thread.start();
+			public void onFailure(TransportMessage msg, int failureType, String failureMessage) {
+				//Don't do anything, we don't really need to
+			}
 
-		// return the sender thread in case
-		// an application wants to permit the user to cancel it
-		return thread;
+			public void onSuccess(TransportMessage msg, byte[] response) {
+				try {
+					MESSAGE_STORE.dequeue(tmessage);
+				} catch (TransportException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			public void onUpdate(TransportMessage msg, String message) {
+				//Don't do anything, if the outside is listening, they'll do something
+			}
+			
+		});
+		
+		transporter.send(message);
+		return transporter;
 	}
-
+	
 	/**
+	 * Attempts to send the provided transport message and retrieve a response from
+	 * the destination. If the Transport Service cannot successfully transport the message
+	 * or elicit a response, a TransportException is thrown outlining the problems.
 	 * 
-	 * Send a message, blocking for the response
+	 * Note that the blocking form of transport does not queue the messages to be 
+	 * resent later in the case of failure.
 	 * 
-	 * @param message
-	 * @return
-	 * @throws TransportException
+	 * @param message The message which should be sent.
+	 * @return A byte[] containing the data of the response from the server.
+	 * @throws TransportException If there are any problems sending the message
+	 * to the server, or retrieving a response.
 	 */
-	public TransportMessage sendBlocking(TransportMessage message)
-			throws TransportException {
-		// create the appropriate transporter
+	public byte[] sendBlocking(TransportMessage message) throws TransportException {
 		Transporter transporter = message.createTransporter();
-
-		// persist the message in the queue
-		MESSAGE_STORE.enqueue(message);
-
-		TransportMessage m = transporter.send();
-		if (m.isSuccess()) {
-			MESSAGE_STORE.dequeue(message);
-		}
-		return m;
-	}
-
-	/**
-	 * 
-	 * Compute the lifetime of a queuing thread with the given parameters
-	 * 
-	 * @param tries
-	 * @param delay
-	 * @return
-	 */
-	private long getQueuingDeadline(int tries, int delay) {
-		long deadline = (tries * delay * 1000);
-		long now = new Date().getTime();
-		return (deadline + now);
-	}
-
-	/**
-	 * 
-	 * Any messages which aren't successfully sent in QueuingThreads are then
-	 * "Cached".
-	 * 
-	 * Applications can activate new attempts to send the CachedMessages via
-	 * this sendCached method
-	 * 
-	 * 
-	 */
-	public void sendCached() throws TransportException {
-		Vector messages = getCachedMessages();
-		for (int i = 0; i < messages.size(); i++) {
-			TransportMessage message = (TransportMessage) messages.elementAt(i);
+		
+		transporter.send(message);
+		
+		while(message.getStatus() == TransportListener.TRANSPORTING) {
+			//Wait until the status has changed.
+			
+			//TODO: Configure this parameter to be reasonable.
 			try {
-				sendCachedMessage(message);
-			} catch (IOException e) {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
-				message.setFailureReason(e.getMessage());
-
-				MESSAGE_STORE.updateMessage(message);
-
 			}
 		}
+		if(message.getStatus() == TransportListener.SUCCESS) {
+			return message.getResponse();
+		} else {
+			throw new TransportException("Problem while sending message. Failure was: " + new String(message.getResponse()));
+		}
 	}
 
 	/**
 	 * 
-	 * 
-	 * Try to send one cached message, by creating a QueuingThread which will
-	 * try just once
-	 * 
-	 * 
-	 * @param message
-	 * @throws IOException
-	 */
-	private void sendCachedMessage(TransportMessage message) throws IOException {
-		// create the appropriate transporter
-		Transporter transporter = message.createTransporter();
-		// create a sender thread and start it
-		new Thread(new QueuingThread(QueuingThread.SENDING, transporter,
-				MESSAGE_STORE, 1, 0)).start();
-	}
-
-	/**
-	 * @return
+	 * @return a Vector<TransportMessage> of messages which have been queued in the past, but 
+	 * never successfully sent off of the phone.
 	 */
 	public Vector getCachedMessages() {
 		return MESSAGE_STORE.getCachedMessages();
 	}
 
 	/**
-	 * @return
+	 * @return The number of messages which are in the unsent cache.
 	 */
 	public int getCachedMessagesSize() {
 		return MESSAGE_STORE.getCachedMessagesSize();
@@ -252,5 +157,4 @@ public class TransportService {
 	public TransportMessage retrieve(String id) {
 		return MESSAGE_STORE.findMessage(id);
 	}
-
 }
