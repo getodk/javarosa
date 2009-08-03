@@ -846,7 +846,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 						node.getChildren().insertElementAt(newChild, i + k + 1);
 						populateNode(newChild, (TreeElement) newChildren
 								.elementAt(k), childRef, f);
-						i += k;
+						i += k + 1;
 					}
 				} else {
 					if (newChildren.size() == 0) {
