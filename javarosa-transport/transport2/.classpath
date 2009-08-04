@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="main/src"/>
 	<classpathentry kind="src" path="test/src"/>
 	<classpathentry kind="lib" path="lib/jmunit4cldc11-1.2.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/enough-j2mepolish-client.jar"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/J2MELIB"/>

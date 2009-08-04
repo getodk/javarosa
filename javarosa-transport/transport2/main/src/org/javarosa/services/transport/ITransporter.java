@@ -18,7 +18,7 @@ import org.javarosa.services.transport.message.TransportMessage;
  * <code>setFailureReason()</code> and <code>setStatus()</code>
  * 
  */
-public interface Transporter {
+public interface ITransporter {
 
 	/**
 	 * 
@@ -27,7 +27,7 @@ public interface Transporter {
 	 */
 	public void send(TransportMessage message);
 	
-	public Transporter getTransporter();
+	public ITransporter getTransporter();
 	
 	public void stop();
 }

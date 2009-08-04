@@ -2,7 +2,7 @@ package org.javarosa.services.transport.impl.sms;
 
 import java.util.Vector;
 
-import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.ITransporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 import de.enough.polish.io.Serializable;
@@ -20,7 +20,7 @@ import de.enough.polish.io.Serializable;
  * 
  * 
  */
-public class SMSTransportMessage extends BasicTransportMessage implements
+public class SMSTransportMessage implements
 		Serializable {
 
 	/**
@@ -89,7 +89,7 @@ public class SMSTransportMessage extends BasicTransportMessage implements
 	 * 
 	 * @see org.javarosa.services.transport.TransportMessage#createTransporter()
 	 */
-	public Transporter createTransporter() {
+	public ITransporter createTransporter() {
 		return new SMSTransporter(this);
 	}
 

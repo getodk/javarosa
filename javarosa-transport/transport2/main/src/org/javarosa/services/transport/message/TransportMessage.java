@@ -3,7 +3,7 @@ package org.javarosa.services.transport.message;
 import java.io.InputStream;
 import java.util.Date;
 
-import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.ITransporter;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.listeners.TransportListener;
 
@@ -33,7 +33,7 @@ public interface TransportMessage extends Serializable {
 	 * 
 	 * @return A Transporter object able to send this message
 	 */
-	public Transporter createTransporter();
+	public ITransporter createTransporter();
 
 	/**
 	 * ¨

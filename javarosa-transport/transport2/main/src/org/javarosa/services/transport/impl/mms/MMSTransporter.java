@@ -8,7 +8,7 @@ import javax.wireless.messaging.MessagePart;
 import javax.wireless.messaging.MultipartMessage;
 import javax.wireless.messaging.SizeExceededException;
 
-import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.ITransporter;
 import org.javarosa.services.transport.message.TransportMessage;
 
 /**
@@ -16,7 +16,7 @@ import org.javarosa.services.transport.message.TransportMessage;
  * constructor
  * 
  */
-public class MMSTransporter implements Transporter {
+public class MMSTransporter implements ITransporter {
 	/**
 	 * The message to be sent by this transporter
 	 */

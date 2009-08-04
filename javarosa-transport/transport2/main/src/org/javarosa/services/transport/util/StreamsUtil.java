@@ -101,11 +101,11 @@ public class StreamsUtil {
 		StringBuffer message = new StringBuffer();
 		
 		try{
-			int numOfForms = in.readByte();
+			int interationCounter = in.readByte();
 			
-			if(numOfForms != -1 && numOfForms > 0){
+			if(interationCounter != -1 && interationCounter > 0){
 				
-				for(int x = 0; x < numOfForms; x++){
+				for(int x = 0; x < interationCounter; x++){
 					
 					serverResponse = in.readUTF();
 					message.append(serverResponse);

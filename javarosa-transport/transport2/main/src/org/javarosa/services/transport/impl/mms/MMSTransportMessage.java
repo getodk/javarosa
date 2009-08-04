@@ -2,12 +2,12 @@ package org.javarosa.services.transport.impl.mms;
 
 import javax.wireless.messaging.MessagePart;
 
-import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.ITransporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 import de.enough.polish.io.Serializable;
 
-public class MMSTransportMessage extends BasicTransportMessage implements
+public class MMSTransportMessage implements
 		Serializable {
 
 	public MMSTransportMessage(String phoneNumber, String subject,
@@ -66,7 +66,7 @@ public class MMSTransportMessage extends BasicTransportMessage implements
 	 * 
 	 * @see org.javarosa.services.transport.TransportMessage#createTransporter()
 	 */
-	public Transporter createTransporter() {
+	public ITransporter createTransporter() {
 		return new MMSTransporter(this);
 	}
 

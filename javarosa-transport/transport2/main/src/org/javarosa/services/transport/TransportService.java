@@ -63,9 +63,9 @@ public class TransportService {
 	 * @throws TransportException If there are problems enqueuing or dequeuing the message
 	 * from the cache 
 	 */
-	public Transporter send(TransportMessage message) throws TransportException{
+	public ITransporter send(TransportMessage message) throws TransportException{
 		final TransportMessage tmessage = message;
-		Transporter transporter = message.createTransporter();
+		ITransporter transporter = message.createTransporter();
 		MESSAGE_STORE.enqueue(message);
 		
 		message.addTransportListener(new TransportListener() {
@@ -107,7 +107,7 @@ public class TransportService {
 	 * to the server, or retrieving a response.
 	 */
 	public byte[] sendBlocking(TransportMessage message) throws TransportException {
-		Transporter transporter = message.createTransporter();
+		ITransporter transporter = message.createTransporter();
 		
 		transporter.send(message);
 		

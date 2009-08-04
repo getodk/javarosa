@@ -6,7 +6,7 @@ import javax.microedition.io.Connector;
 import javax.wireless.messaging.BinaryMessage;
 import javax.wireless.messaging.MessageConnection;
 
-import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.ITransporter;
 import org.javarosa.services.transport.message.TransportMessage;
 
 /**
@@ -14,7 +14,7 @@ import org.javarosa.services.transport.message.TransportMessage;
  * constructor
  * 
  */
-public class BinarySMSTransporter implements Transporter {
+public class BinarySMSTransporter implements ITransporter {
 	/**
 	 * The message to be sent by this transporter
 	 */

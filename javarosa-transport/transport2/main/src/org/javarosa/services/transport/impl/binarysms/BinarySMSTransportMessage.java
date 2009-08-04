@@ -1,6 +1,6 @@
 package org.javarosa.services.transport.impl.binarysms;
 
-import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.ITransporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 import de.enough.polish.io.Serializable;
@@ -14,7 +14,7 @@ import de.enough.polish.io.Serializable;
  * 
  * 
  */
-public class BinarySMSTransportMessage extends BasicTransportMessage implements
+public class BinarySMSTransportMessage implements
 		Serializable {
 
 	/**
@@ -50,7 +50,7 @@ public class BinarySMSTransportMessage extends BasicTransportMessage implements
 	 * 
 	 * @see org.javarosa.services.transport.TransportMessage#createTransporter()
 	 */
-	public Transporter createTransporter() {
+	public ITransporter createTransporter() {
 		return new BinarySMSTransporter(this);
 	}
 
