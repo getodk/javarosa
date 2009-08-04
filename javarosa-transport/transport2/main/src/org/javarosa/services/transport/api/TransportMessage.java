@@ -1,9 +1,8 @@
-package org.javarosa.services.transport.message;
+package org.javarosa.services.transport.api;
 
 import java.io.InputStream;
 import java.util.Date;
 
-import org.javarosa.services.transport.ITransporter;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.listeners.TransportListener;
 

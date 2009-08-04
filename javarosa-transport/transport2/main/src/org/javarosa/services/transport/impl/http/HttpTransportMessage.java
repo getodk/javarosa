@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.javarosa.services.transport.http;
+package org.javarosa.services.transport.impl.http;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -10,9 +10,9 @@ import java.util.Vector;
 
 import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.IDataPayload;
-import org.javarosa.services.transport.ITransporter;
+import org.javarosa.services.transport.api.ITransporter;
+import org.javarosa.services.transport.api.TransportMessage;
 import org.javarosa.services.transport.listeners.TransportListener;
-import org.javarosa.services.transport.message.TransportMessage;
 
 /**
  * @author ctsims
