@@ -32,4 +32,6 @@ public class TransportMessageStatus {
 
 	public static final int DOWNLOADED = 4;
 
+	public static final int FAILED = 5;
+
 }
