@@ -7,16 +7,6 @@ package org.javarosa.services.transport.api;
  */
 public interface TransportListener {
 	
-	public static int FAILURE_DESTINATION = 0;
-	public static int FAILURE_TRANSPORTING = 1;
-	public static int FAILURE_UNKNOWN = 2;
-	
-	public static int SUCCESS = 4;
-	
-	public static int TRANSPORTING = 8;
-	
-	public static int CANCELED = 16;
-	
 	/**
 	 * Handler called when a the provided message has been successfully transported
 	 * 

@@ -33,5 +33,18 @@ public class TransportMessageStatus {
 	public static final int DOWNLOADED = 4;
 
 	public static final int FAILED = 5;
+	
+	
+	public static int SUCCESS = 6;
+	
+	public static int TRANSPORTING = 7;
+	
+	public static int CANCELED = 8;
+
+	public static int FAILURE_DESTINATION = 9;
+	
+	public static int FAILURE_TRANSPORTING = 10;
+	
+	public static int FAILURE_UNKNOWN =11;
 
 }

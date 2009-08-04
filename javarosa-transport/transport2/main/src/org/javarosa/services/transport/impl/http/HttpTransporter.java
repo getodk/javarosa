@@ -12,8 +12,8 @@ import javax.microedition.io.HttpConnection;
 import org.javarosa.core.util.Queue;
 import org.javarosa.services.transport.api.ITransporter;
 import org.javarosa.services.transport.api.TransportMessage;
-import org.javarosa.services.transport.impl.StreamsUtil;
-import org.javarosa.services.transport.listeners.TransportListener;
+import org.javarosa.services.transport.impl.TransportMessageStatus;
+import org.javarosa.services.transport.util.StreamsUtil;
 
 /**
  * @author ctsims
@@ -87,7 +87,7 @@ public class HttpTransporter implements ITransporter, Runnable {
 			currentMessage = (HttpTransportMessage)messageQueue.poll();
 			if(currentMessage.isReady()) {
 				sendThread(currentMessage);
-				if(currentMessage.getStatus() != TransportListener.SUCCESS && currentMessage.getAttemptsLeft() == 0) {
+				if(currentMessage.getStatus() != TransportMessageStatus.SUCCESS && currentMessage.getAttemptsLeft() == 0) {
 					//We're out of attempts. Let the thread expire if necessary, but don't attempt to 
 					//resend this element.
 				} else {
@@ -117,9 +117,9 @@ public class HttpTransporter implements ITransporter, Runnable {
 			conn.close();
 		} catch (IOException e) {
 			System.out.println("Connection failed: ");
-			message.fail("Http transport attempt failed with exception: " + e.getMessage(), TransportListener.FAILURE_TRANSPORTING);
+			message.fail("Http transport attempt failed with exception: " + e.getMessage(), TransportMessageStatus.FAILURE_TRANSPORTING);
 		} catch(IllegalArgumentException iae) {
-			message.fail(iae.getMessage(), TransportListener.FAILURE_DESTINATION, true);
+			message.fail(iae.getMessage(), TransportMessageStatus.FAILURE_DESTINATION, true);
 		} finally {
 			if (conn != null) {
 				try {

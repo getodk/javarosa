@@ -1,15 +1,13 @@
 package org.javarosa.services.transport;
 
-import java.io.IOException;
-import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.services.transport.api.ITransporter;
+import org.javarosa.services.transport.api.TransportListener;
 import org.javarosa.services.transport.api.TransportMessage;
-import org.javarosa.services.transport.impl.QueuingThread;
 import org.javarosa.services.transport.impl.TransportException;
+import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.TransportMessageStore;
-import org.javarosa.services.transport.listeners.TransportListener;
 
 /**
  * The TransportService is generic. Its capabilities are extended by defining
@@ -112,7 +110,7 @@ public class TransportService {
 		
 		transporter.send(message);
 		
-		while(message.getStatus() == TransportListener.TRANSPORTING) {
+		while(message.getStatus() == TransportMessageStatus.TRANSPORTING) {
 			//Wait until the status has changed.
 			
 			//TODO: Configure this parameter to be reasonable.
@@ -123,7 +121,7 @@ public class TransportService {
 				e.printStackTrace();
 			}
 		}
-		if(message.getStatus() == TransportListener.SUCCESS) {
+		if(message.getStatus() == TransportMessageStatus.SUCCESS) {
 			return message.getResponse();
 		} else {
 			throw new TransportException("Problem while sending message. Failure was: " + new String(message.getResponse()));
