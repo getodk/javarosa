@@ -10,6 +10,7 @@ import javax.microedition.io.HttpConnection;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.listeners.IGetTransportMessage;
 import org.javarosa.services.transport.listeners.IGetTransporter;
+import org.javarosa.services.transport.message.HttpGetTransportMessage;
 import org.javarosa.services.transport.util.StreamsUtil;
 
 public class HttpGetTransporter implements IGetTransporter {

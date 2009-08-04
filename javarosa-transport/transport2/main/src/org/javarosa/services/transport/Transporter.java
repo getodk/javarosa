@@ -1,5 +1,7 @@
 package org.javarosa.services.transport;
 
+import org.javarosa.services.transport.message.TransportMessage;
+
 /**
  * 
  * A Transporter is given a TransportMessage in its constructor and has the

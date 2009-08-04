@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.services.transport.TransportMessage;
+import org.javarosa.services.transport.message.TransportMessage;
 
 import de.enough.polish.io.RmsStorage;
 

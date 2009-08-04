@@ -1,7 +1,7 @@
 package org.javarosa.services.transport.impl;
 
-import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.message.TransportMessage;
 
 /**
  * 

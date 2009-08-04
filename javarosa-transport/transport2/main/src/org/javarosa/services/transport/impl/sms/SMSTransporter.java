@@ -7,8 +7,8 @@ import javax.microedition.io.Connector;
 import javax.wireless.messaging.MessageConnection;
 import javax.wireless.messaging.TextMessage;
 
-import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.message.TransportMessage;
 
 /**
  * An SMSTransporter can send the SMSTransportMessage passed to it in its

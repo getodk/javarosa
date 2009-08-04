@@ -1,10 +1,10 @@
 package org.javarosa.services.transport.threading;
 
-import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.TransportMessageStore;
+import org.javarosa.services.transport.message.TransportMessage;
 
 /**
  * 

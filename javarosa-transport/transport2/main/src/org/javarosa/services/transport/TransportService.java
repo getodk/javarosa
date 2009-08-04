@@ -7,6 +7,8 @@ import java.util.Vector;
 import org.javarosa.services.transport.impl.QueuingThread;
 import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStore;
+import org.javarosa.services.transport.listeners.TransportListener;
+import org.javarosa.services.transport.message.TransportMessage;
 
 /**
  * The TransportService is generic. Its capabilities are extended by defining
