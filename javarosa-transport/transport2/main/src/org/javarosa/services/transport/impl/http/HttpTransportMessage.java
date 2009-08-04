@@ -12,7 +12,8 @@ import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.services.transport.api.ITransporter;
 import org.javarosa.services.transport.api.TransportMessage;
-import org.javarosa.services.transport.listeners.TransportListener;
+import org.javarosa.services.transport.api.TransportListener;
+import org.javarosa.services.transport.impl.TransportMessageStatus;
 
 /**
  * @author ctsims
@@ -25,7 +26,7 @@ public class HttpTransportMessage implements TransportMessage {
 	private Date sent;
 	
 	private Vector transportListeners = new Vector();
-	private int status = TransportListener.TRANSPORTING;
+	private int status = TransportMessageStatus.TRANSPORTING;
 	
 	private String URI;
 	
@@ -86,7 +87,7 @@ public class HttpTransportMessage implements TransportMessage {
 	protected void setSuccesfulResponse(byte[] response) {
 		this.response = response;
 		this.sent = new Date();
-		this.status = TransportListener.SUCCESS;
+		this.status = TransportMessageStatus.SUCCESS;
 		this.succeedListeners(response);
 	}
 	

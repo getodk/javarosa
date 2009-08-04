@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.Date;
 
 import org.javarosa.services.transport.impl.TransportMessageStatus;
-import org.javarosa.services.transport.listeners.TransportListener;
+import org.javarosa.services.transport.api.TransportListener;
 
 import de.enough.polish.io.Serializable;
 
