@@ -1,7 +1,8 @@
-package org.javarosa.services.transport.download;
+package org.javarosa.services.transport.message;
 
 import java.util.Date;
 
+import org.javarosa.services.transport.download.HttpGetTransporter;
 import org.javarosa.services.transport.listeners.IGetTransporter;
 import org.javarosa.services.transport.send.impl.DefaultGetTransportMessage;
 

@@ -1,4 +1,6 @@
-package org.javarosa.services.transport;
+package org.javarosa.services.transport.listeners;
+
+import org.javarosa.services.transport.message.TransportMessage;
 
 /**
  * TransportListeners are notified on success and failure

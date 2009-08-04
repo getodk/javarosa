@@ -2,8 +2,8 @@ package org.javarosa.services.transport.impl;
 
 import java.util.Date;
 
-import org.javarosa.services.transport.TransportListener;
-import org.javarosa.services.transport.TransportMessage;
+import org.javarosa.services.transport.listeners.TransportListener;
+import org.javarosa.services.transport.message.TransportMessage;
 
 /**
  * Abstract part implementation of TransportMessage, for subclassing by full

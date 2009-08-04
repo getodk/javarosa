@@ -8,8 +8,8 @@ import javax.wireless.messaging.MessagePart;
 import javax.wireless.messaging.MultipartMessage;
 import javax.wireless.messaging.SizeExceededException;
 
-import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.message.TransportMessage;
 
 /**
  * An MMSTransporter can send the MMSTransportMessage passed to it in its

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.javarosa.service.transport.http;
+package org.javarosa.services.transport.http;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,10 +10,10 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
 import org.javarosa.core.util.Queue;
-import org.javarosa.services.transport.TransportListener;
-import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.StreamsUtil;
+import org.javarosa.services.transport.listeners.TransportListener;
+import org.javarosa.services.transport.message.TransportMessage;
 
 /**
  * @author ctsims
