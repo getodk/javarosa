@@ -2,7 +2,7 @@ package org.javarosa.services.transport.impl.sms;
 
 import java.util.Vector;
 
-import org.javarosa.services.transport.ITransporter;
+import org.javarosa.services.transport.api.ITransporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 import de.enough.polish.io.Serializable;

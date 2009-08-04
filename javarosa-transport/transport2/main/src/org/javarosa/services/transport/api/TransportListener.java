@@ -1,4 +1,4 @@
-package org.javarosa.services.transport;
+package org.javarosa.services.transport.api;
 
 /**
  * TransportListeners are notified on success and failure

@@ -1,6 +1,6 @@
 package org.javarosa.services.transport.impl.binarysms;
 
-import org.javarosa.services.transport.ITransporter;
+import org.javarosa.services.transport.api.ITransporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 import de.enough.polish.io.Serializable;

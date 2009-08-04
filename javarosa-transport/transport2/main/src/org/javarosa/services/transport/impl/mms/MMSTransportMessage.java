@@ -2,7 +2,7 @@ package org.javarosa.services.transport.impl.mms;
 
 import javax.wireless.messaging.MessagePart;
 
-import org.javarosa.services.transport.ITransporter;
+import org.javarosa.services.transport.api.ITransporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 import de.enough.polish.io.Serializable;

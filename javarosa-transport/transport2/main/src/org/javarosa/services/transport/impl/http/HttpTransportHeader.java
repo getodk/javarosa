@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.services.transport.http;
+package org.javarosa.services.transport.impl.http;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;

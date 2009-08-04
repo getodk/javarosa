@@ -1,6 +1,5 @@
-package org.javarosa.services.transport;
+package org.javarosa.services.transport.api;
 
-import org.javarosa.services.transport.message.TransportMessage;
 
 /**
  * 

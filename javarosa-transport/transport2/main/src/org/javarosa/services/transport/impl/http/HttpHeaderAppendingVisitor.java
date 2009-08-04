@@ -17,7 +17,7 @@
 /**
  * 
  */
-package org.javarosa.services.transport.http;
+package org.javarosa.services.transport.impl.http;
 
 import java.util.Enumeration;
 
