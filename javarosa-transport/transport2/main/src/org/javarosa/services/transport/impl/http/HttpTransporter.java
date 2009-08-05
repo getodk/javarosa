@@ -87,7 +87,7 @@ public class HttpTransporter implements ITransporter, Runnable {
 			currentMessage = (HttpTransportMessage)messageQueue.poll();
 			if(currentMessage.isReady()) {
 				sendThread(currentMessage);
-				if(currentMessage.getStatus() != TransportMessageStatus.SUCCESS && currentMessage.getAttemptsLeft() == 0) {
+				if(currentMessage.getStatus() != TransportMessageStatus.COMPLETED && currentMessage.getAttemptsLeft() == 0) {
 					//We're out of attempts. Let the thread expire if necessary, but don't attempt to 
 					//resend this element.
 				} else {
