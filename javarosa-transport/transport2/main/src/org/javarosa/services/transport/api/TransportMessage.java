@@ -72,4 +72,7 @@ public interface TransportMessage extends Serializable {
 	 * @return
 	 */
 	public byte[] getResponse();
+	
+	public void setCacheId(String cacheId);
+	public String getCacheId();
 }

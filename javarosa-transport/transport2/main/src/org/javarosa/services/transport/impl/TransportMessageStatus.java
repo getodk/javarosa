@@ -15,36 +15,21 @@ package org.javarosa.services.transport.impl;
 public class TransportMessageStatus {
 
 	/**
-	 * the message is in a QueuingThread
-	 */
-	public final static int QUEUED = 1;
-
-	/**
 	 * the message has failed in a QueuingThread
 	 * and has not been sent
 	 */
-	public final static int CACHED = 2;
+	public final static int CACHED = 1;
 
-	/**
-	 * the message has been sent
-	 */
-	public final static int SENT = 3;
-
-	public static final int DOWNLOADED = 4;
-
-	public static final int FAILED = 5;
+	public static int COMPLETED = 2;
 	
-	
-	public static int SUCCESS = 6;
-	
-	public static int TRANSPORTING = 7;
+	public static int TRANSPORTING = 4;
 	
 	public static int CANCELED = 8;
 
-	public static int FAILURE_DESTINATION = 9;
+	public static int FAILURE_DESTINATION = 16;
 	
-	public static int FAILURE_TRANSPORTING = 10;
+	public static int FAILURE_TRANSPORTING = 32;
 	
-	public static int FAILURE_UNKNOWN =11;
+	public static int FAILURE_UNKNOWN =64;
 
 }

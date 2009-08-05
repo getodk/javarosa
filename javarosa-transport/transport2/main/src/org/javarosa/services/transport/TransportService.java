@@ -121,7 +121,7 @@ public class TransportService {
 				e.printStackTrace();
 			}
 		}
-		if(message.getStatus() == TransportMessageStatus.SUCCESS) {
+		if(message.getStatus() == TransportMessageStatus.COMPLETED) {
 			return message.getResponse();
 		} else {
 			throw new TransportException("Problem while sending message. Failure was: " + new String(message.getResponse()));

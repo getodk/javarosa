@@ -40,6 +40,8 @@ public class HttpTransportMessage implements TransportMessage {
 	
 	private long nextReady;
 	
+	private String cacheId;
+	
 	/**
 	 * NOTE: For Serialization only!!!
 	 */
@@ -87,7 +89,7 @@ public class HttpTransportMessage implements TransportMessage {
 	protected void setSuccesfulResponse(byte[] response) {
 		this.response = response;
 		this.sent = new Date();
-		this.status = TransportMessageStatus.SUCCESS;
+		this.status = TransportMessageStatus.COMPLETED;
 		this.succeedListeners(response);
 	}
 	
@@ -156,5 +158,11 @@ public class HttpTransportMessage implements TransportMessage {
 
 	public void addTransportListener(TransportListener listener) {
 		transportListeners.addElement(listener);
+	}
+	public String getCacheId() {
+		return cacheId;
+	}
+	public void setCacheId(String cacheId) {
+		this.cacheId = cacheId;
 	}
 }
