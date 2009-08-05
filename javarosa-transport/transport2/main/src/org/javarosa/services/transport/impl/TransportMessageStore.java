@@ -81,6 +81,15 @@ public class TransportMessageStore {
 	public Vector getRecentlySentMessages() {
 		return readAll(RECENTLY_SENT_STORENAME);
 	}
+	
+	public void clearCache() {
+		try {
+			storage.delete(Q_STORENAME);
+			storage.save(new Vector(),Q_STORENAME);
+		} catch (IOException e) {
+			throw new RuntimeException("Problem clearing the cache of TransportMessages.");
+		}
+	}
 
 	/**
 	 * 
@@ -90,12 +99,17 @@ public class TransportMessageStore {
 	 * @throws IOException
 	 */
 	public String enqueue(TransportMessage message) throws TransportException {
-		String id = this.getNextCacheIdentifier();
-		Vector records = readAll(Q_STORENAME);
-		message.setCacheId(id);
-		records.addElement(message);
-		saveAll(records, Q_STORENAME);
-		return id;
+		//First ensure that the provided message is not already in the queue;
+		if (message.getCacheId() != null && this.findMessage(message.getCacheId()) != null) {
+			String id = this.getNextCacheIdentifier();
+			Vector records = readAll(Q_STORENAME);
+			message.setCacheId(id);
+			records.addElement(message);
+			saveAll(records, Q_STORENAME);
+			return id;
+		} else {
+			return message.getCacheId();
+		}
 	}
 
 	/**
@@ -163,7 +177,8 @@ public class TransportMessageStore {
 	 * be false (and if found in the recentlySent queue, it will be set to true)
 	 * 
 	 * 
-	 * @param id
+	 * @param id A string id corresponding to the record to be retrieved. May
+	 * be null.
 	 * @return
 	 */
 	public TransportMessage findMessage(String id) {
