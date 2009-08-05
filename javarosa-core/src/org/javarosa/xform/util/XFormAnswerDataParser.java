@@ -125,7 +125,7 @@ public class XFormAnswerDataParser {
 		case Constants.DATATYPE_GEOPOINT:
 
             try {
-                Vector gpv = (trimmedText == null ? null : DateUtils.split(trimmedText,",",false));
+                Vector gpv = (trimmedText == null ? null : DateUtils.split(trimmedText," ",false));
                 double gp[] = new double[2];
                 gp[0] = Double.parseDouble(((String)gpv.elementAt(0)));
                 gp[1] = Double.parseDouble(((String)gpv.elementAt(1)));
