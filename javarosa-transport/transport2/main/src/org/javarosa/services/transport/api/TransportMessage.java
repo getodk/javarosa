@@ -4,27 +4,25 @@ import java.io.InputStream;
 import java.util.Date;
 
 import org.javarosa.services.transport.impl.TransportMessageStatus;
-import org.javarosa.services.transport.api.TransportListener;
 
 import de.enough.polish.io.Serializable;
 
 /**
- * TransportMessage is one of a pair of interfaces which must
- * be implemented in order to extend the Transport Layer
+ * TransportMessage is one of a pair of interfaces which must be implemented in
+ * order to extend the utility of the TransportService, the other being Transporter.
  * 
  * The other is Transporter
- *
+ * 
  */
 public interface TransportMessage extends Serializable {
 
 	/**
 	 * 
 	 * 
-	 * Each <code>TransportMessage</code> has the ability 
-	 * to create a <code>Transporter</code> capable of sending itself
+	 * Each <code>TransportMessage</code> has the ability to create a
+	 * <code>Transporter</code> capable of sending itself
 	 * 
-	 * e.g. 
-	 * <code>
+	 * e.g. <code>
 	 * public Transporter createTransporter(){
 	 * 	    return <b>new</b> HttpTransporter(this);
 	 * }
@@ -32,20 +30,20 @@ public interface TransportMessage extends Serializable {
 	 * 
 	 * @return A Transporter object able to send this message
 	 */
-	public ITransporter createTransporter();
+	Transporter createTransporter();
 
 	/**
 	 * ¨
 	 * 
 	 * @return Whatever is being sent
 	 */
-	public InputStream getContentStream();
+	InputStream getContentStream();
 
 	/**
 	 * @return MimeType of that which is being sent
 	 */
-	public String getContentType();
-	
+	String getContentType();
+
 	/**
 	 * 
 	 * 
@@ -53,26 +51,34 @@ public interface TransportMessage extends Serializable {
 	 * 
 	 * @see TransportMessageStatus
 	 */
-	public int getStatus();
+	int getStatus();
 
 	/**
 	 * to be commented
 	 */
-	public Date getCreated();
-	public Date getSent();
+	Date getCreated();
 
-	public void addTransportListener(TransportListener listener);
+	Date getSent();
+
+	/**
+	 * TransportListeners have methods which are called at various
+	 * points in the transporting of a message.
+	 * 
+	 * @param listener
+	 */
+	void addTransportListener(TransportListener listener);
 
 	/**
 	 * Gets the response from the destination for this message.
 	 * 
-	 *  NOTE: This value must be non-null for any object whose status
-	 *  has been changed from TransportListener.TRANSPORTING. 
+	 * NOTE: This value must be non-null for any object whose status has been
+	 * changed from TransportListener.TRANSPORTING.
 	 * 
 	 * @return
 	 */
-	public byte[] getResponse();
-	
-	public void setCacheId(String cacheId);
-	public String getCacheId();
+	byte[] getResponse();
+
+	void setCacheId(String cacheId);
+
+	String getCacheId();
 }

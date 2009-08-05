@@ -10,7 +10,7 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
 import org.javarosa.core.util.Queue;
-import org.javarosa.services.transport.api.ITransporter;
+import org.javarosa.services.transport.api.Transporter;
 import org.javarosa.services.transport.api.TransportMessage;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.util.StreamsUtil;
@@ -19,7 +19,7 @@ import org.javarosa.services.transport.util.StreamsUtil;
  * @author ctsims
  *
  */
-public class HttpTransporter implements ITransporter, Runnable {
+public class HttpTransporter implements Transporter, Runnable {
 	
 	/** In order to effectively queue, we want one transporter in memory at a time. **/
 	static HttpTransporter activeTransporter;
@@ -47,7 +47,7 @@ public class HttpTransporter implements ITransporter, Runnable {
 	 * (non-Javadoc)
 	 * @see org.javarosa.services.transport.Transporter#getTransporter()
 	 */
-	public ITransporter getTransporter() {
+	public Transporter getTransporter() {
 		if(activeTransporter != null) {
 			activeTransporter = new HttpTransporter();
 		}

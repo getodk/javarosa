@@ -8,6 +8,10 @@ import java.io.OutputStream;
 
 public class StreamsUtil {
 
+	private StreamsUtil() {
+		// class has only static methods
+	}
+
 	/**
 	 * 
 	 * Write everything from input stream to output stream, byte by byte then
@@ -30,7 +34,7 @@ public class StreamsUtil {
 
 	/**
 	 * 
-	 * Write the byte array to the output stream 
+	 * Write the byte array to the output stream
 	 * 
 	 * @param bytes
 	 * @param out
@@ -42,8 +46,8 @@ public class StreamsUtil {
 		for (int i = 0; i < bytes.length; i++) {
 			out.write(bytes[i]);
 		}
-		
-		//out.flush();
+
+		// out.flush();
 
 	}
 
@@ -60,15 +64,16 @@ public class StreamsUtil {
 	public static byte[] readFromStream(InputStream in, int len)
 			throws IOException {
 
-		byte[] data;
-		int read;
+		byte[] data = null;
+		int read = 0;
 		if (len >= 0) {
 			data = new byte[len];
 			read = 0;
 			while (read < len) {
 				int k = in.read(data, read, len - read);
-				if (k == -1)
+				if (k == -1) {
 					break;
+				}
 				read += k;
 			}
 		} else {
@@ -95,31 +100,30 @@ public class StreamsUtil {
 		return data;
 	}
 
+	/**
+	 * @param in
+	 * @return
+	 */
 	public static byte[] readFromStream(DataInputStream in) throws IOException {
 		byte[] data = null;
-		String serverResponse;
+		String serverResponse = null;
 		StringBuffer message = new StringBuffer();
-		
-		try{
-			int interationCounter = in.readByte();
-			
-			if(interationCounter != -1 && interationCounter > 0){
-				
-				for(int x = 0; x < interationCounter; x++){
-					
-					serverResponse = in.readUTF();
-					message.append(serverResponse);
-				}
+
+		int interationCounter = in.readByte();
+
+		if (interationCounter != -1 && interationCounter > 0) {
+
+			for (int x = 0; x < interationCounter; x++) {
+
+				serverResponse = in.readUTF();
+				message.append(serverResponse);
 			}
-			
-			data = message.toString().getBytes();
 		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
-		
+
+		data = message.toString().getBytes();
+
 		return data;
-		
+
 	}
 
 }

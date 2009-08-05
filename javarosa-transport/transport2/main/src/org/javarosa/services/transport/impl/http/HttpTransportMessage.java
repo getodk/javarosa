@@ -10,7 +10,7 @@ import java.util.Vector;
 
 import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.IDataPayload;
-import org.javarosa.services.transport.api.ITransporter;
+import org.javarosa.services.transport.api.Transporter;
 import org.javarosa.services.transport.api.TransportMessage;
 import org.javarosa.services.transport.api.TransportListener;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
@@ -58,7 +58,7 @@ public class HttpTransportMessage implements TransportMessage {
 		nextReady = new Date().getTime();
 	}
 
-	public ITransporter createTransporter() {
+	public Transporter createTransporter() {
 		return new HttpTransporter().getTransporter();
 	}
 

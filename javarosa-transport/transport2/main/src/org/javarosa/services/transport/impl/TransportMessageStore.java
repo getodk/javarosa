@@ -1,7 +1,6 @@
 package org.javarosa.services.transport.impl;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -13,11 +12,11 @@ import de.enough.polish.io.RmsStorage;
  * A TransportMessageStore is necessary since not all attempts to send succeed.
  * 
  * Every message given to the TransportService is persisted immediately, but
- * distinctions are made when querying the TransportMessageStore based on 
- * the message status (i.e. the number of "cached" messages is not equal
- * to the number of messages in the store, but the number of messages in 
- * the store with the status CACHED)
- *
+ * distinctions are made when querying the TransportMessageStore based on the
+ * message status (i.e. the number of "cached" messages is not equal to the
+ * number of messages in the store, but the number of messages in the store with
+ * the status CACHED)
+ * 
  */
 public class TransportMessageStore {
 
@@ -29,11 +28,11 @@ public class TransportMessageStore {
 	 * 
 	 */
 
-	private final static String Q_STORENAME = "JavaROSATransQ";
-	private final static String QID_STORENAME = "JavaROSATransQId";
-	private final static String RECENTLY_SENT_STORENAME = "JavaROSATransQSent";
-	
-	private final static int RECENTLY_SENT_STORE_MAXSIZE=15;
+	private static final String Q_STORENAME = "JavaROSATransQ";
+	private static final String QID_STORENAME = "JavaROSATransQId";
+	private static final String RECENTLY_SENT_STORENAME = "JavaROSATransQSent";
+
+	private static final int RECENTLY_SENT_STORE_MAXSIZE = 15;
 
 	/**
 	 * The persistent store - it is partitioned into three corresponding to the
@@ -75,7 +74,7 @@ public class TransportMessageStore {
 		}
 		return messages;
 	}
-	
+
 	/**
 	 * @return A Vector of TransportMessages recently sent
 	 */
@@ -110,9 +109,10 @@ public class TransportMessageStore {
 	public void dequeue(TransportMessage message) throws TransportException {
 		Vector records = readAll(Q_STORENAME);
 		TransportMessage m = find(message.getCacheId(), records);
-		if (m == null)
+		if (m == null) {
 			throw new IllegalArgumentException("No queued message with id="
 					+ message.getCacheId());
+		}
 		records.removeElement(m);
 		saveAll(records, Q_STORENAME);
 
@@ -120,14 +120,16 @@ public class TransportMessageStore {
 		// then transfer it to the recently sent list
 		if (message.getStatus() == TransportMessageStatus.COMPLETED) {
 			Vector recentlySent = readAll(RECENTLY_SENT_STORENAME);
-			if (recentlySent == null)
+			if (recentlySent == null) {
 				recentlySent = new Vector();
-			
+			}
+
 			// ensure that the recently sent store doesn't grow indefinitely
 			// by limiting its size
-			if(recentlySent.size()==RECENTLY_SENT_STORE_MAXSIZE)
+			if (recentlySent.size() == RECENTLY_SENT_STORE_MAXSIZE) {
 				recentlySent.removeElementAt(0);
-			
+			}
+
 			recentlySent.addElement(message);
 			saveAll(recentlySent, RECENTLY_SENT_STORENAME);
 		}
@@ -271,7 +273,8 @@ public class TransportMessageStore {
 
 		// sent messages in another store
 		int recentlySentSize = readAll(RECENTLY_SENT_STORENAME).size();
-		this.cachedCounts.put(Integer.toString(TransportMessageStatus.COMPLETED),
-				new Integer(recentlySentSize));
+		this.cachedCounts.put(Integer
+				.toString(TransportMessageStatus.COMPLETED), new Integer(
+				recentlySentSize));
 	}
 }
