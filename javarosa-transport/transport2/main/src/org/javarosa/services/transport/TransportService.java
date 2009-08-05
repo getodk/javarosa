@@ -62,7 +62,7 @@ public class TransportService {
 	 * @throws TransportException If there are problems enqueuing or dequeuing the message
 	 * from the cache 
 	 */
-	public ITransporter send(TransportMessage message) throws TransportException{
+	public static ITransporter send(TransportMessage message) throws TransportException{
 		final TransportMessage tmessage = message;
 		ITransporter transporter = message.createTransporter();
 		MESSAGE_STORE.enqueue(message);
@@ -105,7 +105,7 @@ public class TransportService {
 	 * @throws TransportException If there are any problems sending the message
 	 * to the server, or retrieving a response.
 	 */
-	public byte[] sendBlocking(TransportMessage message) throws TransportException {
+	public static byte[] sendBlocking(TransportMessage message) throws TransportException {
 		ITransporter transporter = message.createTransporter();
 		
 		transporter.send(message);
@@ -133,15 +133,29 @@ public class TransportService {
 	 * @return a Vector<TransportMessage> of messages which have been queued in the past, but 
 	 * never successfully sent off of the phone.
 	 */
-	public Vector getCachedMessages() {
+	public static Vector getCachedMessages() {
 		return MESSAGE_STORE.getCachedMessages();
 	}
 
 	/**
 	 * @return The number of messages which are in the unsent cache.
 	 */
-	public int getCachedMessagesSize() {
+	public static int getCachedMessagesSize() {
 		return MESSAGE_STORE.getCachedMessagesSize();
+	}
+	
+	public static void removeFromCache(TransportMessage m) {
+		if(MESSAGE_STORE.findMessage(m.getCacheId()) != null) {
+			try {
+				MESSAGE_STORE.dequeue(m);
+			} catch (TransportException e) {
+				throw new RuntimeException("Problem removing TransportMessage from Cache!");
+			}
+		}
+	}
+	
+	public static void clearCachedMessages() {
+		MESSAGE_STORE.clearCache();
 	}
 
 	/**
@@ -155,7 +169,7 @@ public class TransportService {
 	 * @return The TransportMessage identified by the id (or null if no such
 	 *         message was found)
 	 */
-	public TransportMessage retrieve(String id) {
+	public static TransportMessage retrieve(String id) {
 		return MESSAGE_STORE.findMessage(id);
 	}
 }
