@@ -134,6 +134,18 @@ public interface IStorageUtility {
 	 * Delete the storage utility itself, along with all stored records and meta-data
 	 */
 	void destroy ();
+
+	/**
+	 * Perform any clean-up/consolidation of the StorageUtility's underlying datastructures that is too expensive to do during
+	 * normal usage (e.g., if all the records are scattered among 10 half-empty RMSes, repack them into 5 full RMSes)
+	 */
+	void repack ();
+	
+	/**
+	 * If the StorageUtility has been left in a corrupt/inconsistent state, restore it to a non-corrupt state, even if it results
+	 * in data loss
+	 */
+	void repair ();
 	
 	/**
 	 * Fetch the object that acts as the synchronization lock for this StorageUtility
