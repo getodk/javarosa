@@ -10,6 +10,7 @@ import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.util.externalizable.CannotCreateObjectException;
@@ -48,7 +49,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * These two schemes should not be mixed within the same StorageUtility.
  * 
  */
-public class RMSStorageUtility {
+public class RMSStorageUtility implements IStorageUtility {
 	private static final int MAX_RMS_NAME_LENGTH = 32;		//maximum length of an RMS name
 	private static final int SUFFIX_LENGTH = 3;				//how much of RMS name that we need to reserve for our own purposes
 	
@@ -428,6 +429,30 @@ public class RMSStorageUtility {
 	public int getRecordSize (int id) {
 		throw new RuntimeException("not implemented yet");
 	}
+	
+	/**
+	 * Delete the storage utility itself, along with all stored records and meta-data
+	 */
+	public void destroy () {
+		throw new RuntimeException("not implemented yet");
+	}
+
+	/**
+	 * Perform any clean-up/consolidation of the StorageUtility's underlying datastructures that is too expensive to do during
+	 * normal usage (e.g., if all the records are scattered among 10 half-empty RMSes, repack them into 5 full RMSes)
+	 */
+	public void repack () {
+		throw new RuntimeException("not implemented yet");
+	}
+	
+	/**
+	 * If the StorageUtility has been left in a corrupt/inconsistent state, restore it to a non-corrupt state, even if it results
+	 * in data loss
+	 */
+	public void repair () {
+		throw new RuntimeException("not implemented yet");
+	}
+
 	
 	/**
 	 * Attempt to commit all changes to the indexing and meta-data structures after a record operation (add/update/remove) has been
@@ -842,7 +867,7 @@ public class RMSStorageUtility {
 	 * @param size number of bytes to reserve (or 0 to release)
 	 * @return true if bytes were allocated successfully; false if full
 	 */
-	public boolean setReserveBuffer (int size) {
+	private boolean setReserveBuffer (int size) {
 		int bufsize = (size <= 0 ? 1 : size + RESERVE_BUFFER_SIZE);
 		return getIndexStore().updateRecord(RESERVE_BUFFER_REC_ID, new byte[bufsize]);
 	}
@@ -864,7 +889,7 @@ public class RMSStorageUtility {
 	 * 
 	 * @return lock object
 	 */
-	private Object getAccessLock () {
+	public Object getAccessLock () {
 		synchronized (accessLocks) {
 			return accessLocks.get(basename);
 		}
