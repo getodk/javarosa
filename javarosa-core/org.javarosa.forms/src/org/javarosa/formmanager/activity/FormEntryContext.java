@@ -108,11 +108,11 @@ public class FormEntryContext extends Context {
 		return (FormIndex)getElement(FIRST_QUESTION_INDEX);
 	}
 	
-	public void setModelProcessor(IModelProcessor proc) {
-		this.setElement(MODEL_PROCESSOR_KEY, proc);
+	public void addModelProcessor(IModelProcessor proc) {
+		addHandler(proc, MODEL_PROCESSOR_KEY);
 	}
 	
-	public IModelProcessor getModelProcessor() {
-		return (IModelProcessor)this.getElement(MODEL_PROCESSOR_KEY);
+	public Vector getModelProcessors() {
+		return (Vector)getElement(MODEL_PROCESSOR_KEY);
 	}
 }
