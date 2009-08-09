@@ -1,10 +1,12 @@
 package org.javarosa.services.transport.impl;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.services.transport.api.TransportMessage;
+import org.javarosa.services.transport.TransportCache;
+import org.javarosa.services.transport.TransportMessage;
 
 import de.enough.polish.io.RmsStorage;
 
@@ -18,7 +20,7 @@ import de.enough.polish.io.RmsStorage;
  * the status CACHED)
  * 
  */
-public class TransportMessageStore {
+public class TransportMessageStore implements TransportCache {
 
 	/**
 	 * These constants are used to identify objects in persistent storage
@@ -70,9 +72,33 @@ public class TransportMessageStore {
 		Vector cached = new Vector();
 		for (int i = 0; i < messages.size(); i++) {
 			TransportMessage message = (TransportMessage) messages.elementAt(i);
-			cached.addElement(message);
+			if (message.getStatus() == TransportMessageStatus.CACHED) {
+				cached.addElement(message);
+			} else {
+				if (isQueuingExpired(message)) {
+					cached.addElement(message);
+				}
+			}
 		}
 		return messages;
+	}
+
+	/**
+	 * 
+	 * If a SenderThread is interrupted in some way, a message might not get the
+	 * "Cached" status and be stuck with the "Queued" status instead
+	 * 
+	 * This method fixes that by checking the age of the message. If the age is
+	 * greater than the time it would live in the SenderThread, then it should
+	 * have the Cached status.
+	 * 
+	 * @param message
+	 * @return
+	 */
+	private static boolean isQueuingExpired(TransportMessage message) {
+		long now = new Date().getTime();
+		long deadline = message.getQueuingDeadline();
+		return (deadline > now);
 	}
 
 	/**
@@ -80,15 +106,6 @@ public class TransportMessageStore {
 	 */
 	public Vector getRecentlySentMessages() {
 		return readAll(RECENTLY_SENT_STORENAME);
-	}
-	
-	public void clearCache() {
-		try {
-			storage.delete(Q_STORENAME);
-			storage.save(new Vector(),Q_STORENAME);
-		} catch (IOException e) {
-			throw new RuntimeException("Problem clearing the cache of TransportMessages.");
-		}
 	}
 
 	/**
@@ -98,18 +115,14 @@ public class TransportMessageStore {
 	 * @param message
 	 * @throws IOException
 	 */
-	public String enqueue(TransportMessage message) throws TransportException {
-		//First ensure that the provided message is not already in the queue;
-		if (message.getCacheId() != null && this.findMessage(message.getCacheId()) != null) {
-			String id = this.getNextCacheIdentifier();
-			Vector records = readAll(Q_STORENAME);
-			message.setCacheId(id);
-			records.addElement(message);
-			saveAll(records, Q_STORENAME);
-			return id;
-		} else {
-			return message.getCacheId();
-		}
+	public String cache(TransportMessage message) throws TransportException {
+		String id = getNextQueueIdentifier();
+		message.setQueueIdentifier(id);
+		message.setStatus(TransportMessageStatus.QUEUED);
+		Vector records = readAll(Q_STORENAME);
+		records.addElement(message);
+		saveAll(records, Q_STORENAME);
+		return id;
 	}
 
 	/**
@@ -120,19 +133,19 @@ public class TransportMessageStore {
 	 * @param success
 	 * @throws IOException
 	 */
-	public void dequeue(TransportMessage message) throws TransportException {
+	public void decache(TransportMessage message) throws TransportException {
 		Vector records = readAll(Q_STORENAME);
-		TransportMessage m = find(message.getCacheId(), records);
+		TransportMessage m = find(message.getQueueIdentifier(), records);
 		if (m == null) {
 			throw new IllegalArgumentException("No queued message with id="
-					+ message.getCacheId());
+					+ message.getQueueIdentifier());
 		}
 		records.removeElement(m);
 		saveAll(records, Q_STORENAME);
 
 		// if we're dequeuing a successfully sent message
 		// then transfer it to the recently sent list
-		if (message.getStatus() == TransportMessageStatus.COMPLETED) {
+		if (message.isSuccess()) {
 			Vector recentlySent = readAll(RECENTLY_SENT_STORENAME);
 			if (recentlySent == null) {
 				recentlySent = new Vector();
@@ -163,7 +176,7 @@ public class TransportMessageStore {
 	private TransportMessage find(String id, Vector records) {
 		for (int i = 0; i < records.size(); i++) {
 			TransportMessage message = (TransportMessage) records.elementAt(i);
-			if (message.getCacheId().equals(id))
+			if (message.getQueueIdentifier().equals(id))
 				return message;
 		}
 		return null;
@@ -177,15 +190,14 @@ public class TransportMessageStore {
 	 * be false (and if found in the recentlySent queue, it will be set to true)
 	 * 
 	 * 
-	 * @param id A string id corresponding to the record to be retrieved. May
-	 * be null.
+	 * @param id
 	 * @return
 	 */
 	public TransportMessage findMessage(String id) {
 		Vector records = readAll(Q_STORENAME);
 		for (int i = 0; i < records.size(); i++) {
 			TransportMessage message = (TransportMessage) records.elementAt(i);
-			if (message.getCacheId().equals(id))
+			if (message.getQueueIdentifier().equals(id))
 				return message;
 		}
 
@@ -193,7 +205,7 @@ public class TransportMessageStore {
 		for (int i = 0; i < sentRecords.size(); i++) {
 			TransportMessage message = (TransportMessage) sentRecords
 					.elementAt(i);
-			if (message.getCacheId().equals(id))
+			if (message.getQueueIdentifier().equals(id))
 				return message;
 		}
 
@@ -209,7 +221,7 @@ public class TransportMessageStore {
 	 * @return
 	 * @throws IOException
 	 */
-	private String getNextCacheIdentifier() throws TransportException {
+	private String getNextQueueIdentifier() throws TransportException {
 		// get the most recently used id
 		Vector v = readAll(QID_STORENAME);
 		if ((v == null) || (v.size() == 0)) {
@@ -274,22 +286,57 @@ public class TransportMessageStore {
 	 * 
 	 */
 	private void updateCachedCounts() {
+		int queued = 0;
 		int cached = 0;
 		// cache the counts first
 		Vector messages = readAll(Q_STORENAME);
 		for (int i = 0; i < messages.size(); i++) {
 			TransportMessage message = (TransportMessage) messages.elementAt(i);
-			if (message.getStatus() == TransportMessageStatus.COMPLETED)
+			if (message.getStatus() == TransportMessageStatus.QUEUED)
+				queued++;
+			if (message.getStatus() == TransportMessageStatus.CACHED)
+				cached++;
+			if (message.getStatus() == TransportMessageStatus.SENT)
 				throw new RuntimeException("Sent message in the queue");
-			cached++;
 		}
 		this.cachedCounts.put(Integer.toString(TransportMessageStatus.CACHED),
 				new Integer(cached));
+		this.cachedCounts.put(Integer.toString(TransportMessageStatus.QUEUED),
+				new Integer(queued));
 
 		// sent messages in another store
 		int recentlySentSize = readAll(RECENTLY_SENT_STORENAME).size();
-		this.cachedCounts.put(Integer
-				.toString(TransportMessageStatus.COMPLETED), new Integer(
-				recentlySentSize));
+		this.cachedCounts.put(Integer.toString(TransportMessageStatus.QUEUED),
+				new Integer(recentlySentSize));
 	}
+
+	/**
+	 * @param message
+	 * @throws IOException
+	 */
+	public void updateMessage(TransportMessage message)
+			throws TransportException {
+		Vector records = readAll(Q_STORENAME);
+		for (int i = 0; i < records.size(); i++) {
+			TransportMessage m = (TransportMessage) records.elementAt(i);
+			if (m.getQueueIdentifier().equals(message.getQueueIdentifier())) {
+				m.setStatus(message.getStatus());
+				m.setFailureReason(message.getFailureReason());
+			}
+		}
+
+		saveAll(records, Q_STORENAME);
+
+	}
+
+	public void clearCache() {
+		try {
+			storage.delete(Q_STORENAME);
+			storage.save(new Vector(), Q_STORENAME);
+		} catch (IOException e) {
+			throw new RuntimeException(
+					"Problem clearing the cache of TransportMessages.");
+		}
+	}
+
 }
