@@ -176,5 +176,9 @@ public abstract class SenderThread extends Thread {
 			((TransportListener) this.listeners.elementAt(i)).onStatusChange(message);
 		}
 	}
+	
+	public void cancel(){
+		this.interrupt();
+	}
 
 }

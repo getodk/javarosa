@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.javarosa.services.transport.impl.TransportException;
+import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.TransportMessageStore;
 import org.javarosa.services.transport.senders.BulkSenderThread;
 import org.javarosa.services.transport.senders.SenderThread;
@@ -120,13 +121,24 @@ public class TransportService {
 		return thread;
 	}
 
-	public static TransportMessage sendBlocking(TransportMessage message) {
+	public static TransportMessage sendBlocking(TransportMessage message) throws TransportException {
+		if (message.isCacheable()) {
+			// persist the message
+			MESSAGE_STORE.cache(message);
+		}
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
 
 		transporter.setMessage(message);
 
 		transporter.send();
+		
+		if(message.getStatus()==TransportMessageStatus.SENT){
+			MESSAGE_STORE.decache(message);
+		}else{
+			message.setStatus(TransportMessageStatus.CACHED);
+			MESSAGE_STORE.updateMessage(message);
+		}
 		return message;
 	}
 
