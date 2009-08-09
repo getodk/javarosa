@@ -7,7 +7,7 @@ import java.util.Vector;
 import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.TransportMessageStore;
-import org.javarosa.services.transport.senders.BulkSenderThread;
+import org.javarosa.services.transport.senders.BulkSender;
 import org.javarosa.services.transport.senders.SenderThread;
 import org.javarosa.services.transport.senders.SimpleSenderThread;
 
@@ -108,7 +108,7 @@ public class TransportService {
 			// record the deadline for the queuing phase in the message
 			message.setQueuingDeadline(getQueuingDeadline(thread.getTries(),
 					thread.getDelay()));
-			
+
 			// persist the message
 			MESSAGE_STORE.cache(message);
 		}
@@ -121,7 +121,8 @@ public class TransportService {
 		return thread;
 	}
 
-	public static TransportMessage sendBlocking(TransportMessage message) throws TransportException {
+	public static TransportMessage sendBlocking(TransportMessage message)
+			throws TransportException {
 		if (message.isCacheable()) {
 			// persist the message
 			MESSAGE_STORE.cache(message);
@@ -132,10 +133,10 @@ public class TransportService {
 		transporter.setMessage(message);
 
 		transporter.send();
-		
-		if(message.getStatus()==TransportMessageStatus.SENT){
+
+		if (message.getStatus() == TransportMessageStatus.SENT) {
 			MESSAGE_STORE.decache(message);
-		}else{
+		} else {
 			message.setStatus(TransportMessageStatus.CACHED);
 			MESSAGE_STORE.updateMessage(message);
 		}
@@ -152,17 +153,18 @@ public class TransportService {
 	 * 
 	 * 
 	 */
-	public static SenderThread sendCached(TransportListener listener) throws TransportException {
+	public static void sendCached(TransportListener listener)
+			throws TransportException {
 		Vector messages = getCachedMessages();
 		if (messages.size() > 0) {
 			// create an appropriate transporter
 			TransportMessage m = (TransportMessage) messages.elementAt(0);
 			Transporter transporter = m.createTransporter();
-			BulkSenderThread thread = new BulkSenderThread(transporter,
-					messages, MESSAGE_STORE, 1, 0);
-			thread.addListener(listener);
-			thread.start();
-			return thread;
+			BulkSender sender = new BulkSender(transporter,
+					messages, MESSAGE_STORE,listener);
+			
+			sender.send();
+			
 
 		}
 		throw new TransportException("No cached messages to send");
