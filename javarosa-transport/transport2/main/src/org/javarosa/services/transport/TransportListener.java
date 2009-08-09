@@ -1,10 +1,9 @@
 package org.javarosa.services.transport;
 
+
 public interface TransportListener {
-	
-	
-	void onSuccess();
-	void onFailure();
-	void onUpdate();
+
+	void onChange(TransportMessage message,String remark);
+	void onStatusChange(TransportMessage message);
 
 }
