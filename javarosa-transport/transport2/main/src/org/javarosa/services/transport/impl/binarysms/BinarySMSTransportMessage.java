@@ -1,5 +1,8 @@
 package org.javarosa.services.transport.impl.binarysms;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 
@@ -58,4 +61,7 @@ public class BinarySMSTransportMessage extends BasicTransportMessage implements
 		return new BinarySMSTransporter(this);
 	}
 
+	public InputStream getContentStream() {
+		return new ByteArrayInputStream((byte[]) getContent());
+	}
 }

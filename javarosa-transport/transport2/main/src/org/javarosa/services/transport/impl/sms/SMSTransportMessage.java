@@ -1,5 +1,7 @@
 package org.javarosa.services.transport.impl.sms;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Vector;
 
 import org.javarosa.services.transport.Transporter;
@@ -95,6 +97,11 @@ public class SMSTransportMessage extends BasicTransportMessage implements
 	 */
 	public Transporter createTransporter() {
 		return new SMSTransporter(this);
+	}
+	
+	// TODO: content is a string Vector, so this is wrong
+	public InputStream getContentStream(){
+		return new ByteArrayInputStream((byte[])getContent());
 	}
 
 }
