@@ -1,7 +1,6 @@
-package org.javarosa.services.transport.util;
+package org.javarosa.services.transport.impl;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,7 +8,7 @@ import java.io.OutputStream;
 public class StreamsUtil {
 
 	private StreamsUtil() {
-		// class has only static methods
+		// private constructor
 	}
 
 	/**
@@ -34,7 +33,7 @@ public class StreamsUtil {
 
 	/**
 	 * 
-	 * Write the byte array to the output stream
+	 * Write the byte array to the output stream 
 	 * 
 	 * @param bytes
 	 * @param out
@@ -46,8 +45,8 @@ public class StreamsUtil {
 		for (int i = 0; i < bytes.length; i++) {
 			out.write(bytes[i]);
 		}
-
-		// out.flush();
+		
+		//out.flush();
 
 	}
 
@@ -64,16 +63,15 @@ public class StreamsUtil {
 	public static byte[] readFromStream(InputStream in, int len)
 			throws IOException {
 
-		byte[] data = null;
-		int read = 0;
+		byte[] data;
+		int read;
 		if (len >= 0) {
 			data = new byte[len];
 			read = 0;
 			while (read < len) {
 				int k = in.read(data, read, len - read);
-				if (k == -1) {
+				if (k == -1)
 					break;
-				}
 				read += k;
 			}
 		} else {
@@ -98,32 +96,6 @@ public class StreamsUtil {
 		// System.out.println(new String(data, "UTF-8"));
 
 		return data;
-	}
-
-	/**
-	 * @param in
-	 * @return
-	 */
-	public static byte[] readFromStream(DataInputStream in) throws IOException {
-		byte[] data = null;
-		String serverResponse = null;
-		StringBuffer message = new StringBuffer();
-
-		int interationCounter = in.readByte();
-
-		if (interationCounter != -1 && interationCounter > 0) {
-
-			for (int x = 0; x < interationCounter; x++) {
-
-				serverResponse = in.readUTF();
-				message.append(serverResponse);
-			}
-		}
-
-		data = message.toString().getBytes();
-
-		return data;
-
 	}
 
 }

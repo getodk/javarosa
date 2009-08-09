@@ -9,14 +9,27 @@ package org.javarosa.services.transport.impl;
 public class TransportException extends Exception {
 	
 	/**
+	 * 
+	 */
+	private Exception underlyingException;
+
+	/**
 	 * @param underlyingException
 	 */
 	public TransportException(Exception underlyingException) {
-		super("TransportLayer exception ("+underlyingException.getClass()+") : "+underlyingException.getMessage());
+	
+		this.underlyingException = underlyingException;
 	}
 	
-	public TransportException(String msg) {
-		super(msg);
+	public TransportException(String message){
+		this.underlyingException=new RuntimeException(message);
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Throwable#getMessage()
+	 */
+	public String getMessage(){
+		return "TransportLayer exception ("+this.underlyingException.getClass()+") : "+this.underlyingException.getMessage();
 	}
 
 }

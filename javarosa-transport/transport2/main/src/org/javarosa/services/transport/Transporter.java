@@ -1,4 +1,4 @@
-package org.javarosa.services.transport.api;
+package org.javarosa.services.transport;
 
 /**
  * 
@@ -20,12 +20,19 @@ public interface Transporter {
 
 	/**
 	 * 
-	 * (Attempt to) send the message given
+	 * (Attempt to) send the message given to the Transporter in its constructor
 	 * 
+	 * @return The message being sent
 	 */
-	void send(TransportMessage message);
+	TransportMessage send();
 
-	Transporter getTransporter();
+	/**
+	 * 
+	 * 
+	 * @return The message being sent
+	 */
+	TransportMessage getMessage();
+	
+	void setMessage(TransportMessage message);
 
-	void stop();
 }
