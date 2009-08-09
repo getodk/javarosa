@@ -1,5 +1,6 @@
 package org.javarosa.services.transport;
 
+import java.io.InputStream;
 import java.util.Date;
 
 import org.javarosa.services.transport.impl.TransportMessageStatus;
@@ -39,6 +40,8 @@ public interface TransportMessage extends Serializable {
 	 * @return Whatever is being sent
 	 */
 	Object getContent();
+	
+	InputStream getContentStream();
 
 	/**
 	 * 

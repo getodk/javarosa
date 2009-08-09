@@ -33,7 +33,7 @@ public class StreamsUtil {
 
 	/**
 	 * 
-	 * Write the byte array to the output stream 
+	 * Write the byte array to the output stream
 	 * 
 	 * @param bytes
 	 * @param out
@@ -45,8 +45,6 @@ public class StreamsUtil {
 		for (int i = 0; i < bytes.length; i++) {
 			out.write(bytes[i]);
 		}
-		
-		//out.flush();
 
 	}
 

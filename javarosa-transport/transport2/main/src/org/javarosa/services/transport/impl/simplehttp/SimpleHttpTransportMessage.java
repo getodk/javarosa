@@ -1,5 +1,6 @@
 package org.javarosa.services.transport.impl.simplehttp;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -40,6 +41,8 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 		setContent(str.getBytes());
 		this.destinationURL = destinationURL;
 	}
+	
+	 
 
 	/**
 	 * @param str
@@ -114,6 +117,17 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	 */
 	public Transporter createTransporter() {
 		return new SimpleHttpTransporter(this);
+	}
+	
+	public String toString(){
+		String s= "#"+getQueueIdentifier()+" (http)";
+		if(getResponseCode()>0)
+			s+=" "+getResponseCode();
+		return s;
+	}
+	
+	public InputStream getContentStream(){
+		return new ByteArrayInputStream((byte[])getContent());
 	}
 
 }

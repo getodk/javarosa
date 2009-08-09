@@ -133,7 +133,8 @@ public class TransportService {
 		transporter.setMessage(message);
 
 		transporter.send();
-
+		
+		
 		if (message.getStatus() == TransportMessageStatus.SENT) {
 			MESSAGE_STORE.decache(message);
 		} else {

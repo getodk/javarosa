@@ -1,5 +1,6 @@
 package org.javarosa.services.transport.impl.simplehttp;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,7 +43,7 @@ public class SimpleHttpTransporter implements Transporter {
 	}
 
 	public void setMessage(TransportMessage m) {
-		this.message = (SimpleHttpTransportMessage)m;
+		this.message = (SimpleHttpTransportMessage) m;
 	}
 
 	/*
@@ -54,20 +55,22 @@ public class SimpleHttpTransporter implements Transporter {
 		HttpConnection conn = null;
 		try {
 
-			conn = getConnection(message.getDestinationURL());
+			String url = message.getDestinationURL();
+			System.out.println("Sending to URL: " + url);
+			conn = getConnection(url);
 
 			if (conn.getResponseCode() == HttpConnection.HTTP_OK) {
 
-				writeToConnection(conn, (byte[]) message.getContent());
+				writeToConnection(conn, this.message.getContentStream());
 
-				readResponse(conn, message);
+				readResponse(conn, this.message);
 			}
 
 			conn.close();
 		} catch (Exception e) {
 			System.out.println("Connection failed: ");
-			message.setFailureReason(e.getMessage());
-			message.incrementFailureCount();
+			this.message.setFailureReason(e.getMessage());
+			this.message.incrementFailureCount();
 		} finally {
 			if (conn != null)
 				try {
@@ -90,15 +93,15 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @param bytes
 	 * @throws IOException
 	 */
-	private void writeToConnection(HttpConnection conn, byte[] bytes)
+	private void writeToConnection(HttpConnection conn, InputStream is)
 			throws Exception {
 		OutputStream out = null;
 		try {
 			// earlier code was commented: Problem exists here on 3110c CommCare
 			// Application: open hangs
 			out = conn.openOutputStream();
-			System.out.println("writing: " + new String(bytes));
-			StreamsUtil.writeToOutput(bytes, out);
+
+			StreamsUtil.writeFromInputToOutput(is, out);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -106,6 +109,7 @@ public class SimpleHttpTransporter implements Transporter {
 
 		} finally {
 			if (out != null) {
+				out.flush();
 				out.close();
 			}
 
@@ -182,7 +186,7 @@ public class SimpleHttpTransporter implements Transporter {
 					"Profile/MIDP-2.0 Configuration/CLDC-1.1");
 			conn.setRequestProperty("Content-Language", "en-US");
 			conn.setRequestProperty("MIME-version", "1.0");
-			conn.setRequestProperty("Content-Type", "text/plain");
+			// conn.setRequestProperty("Content-Type", "text/plain");
 		} else {
 			throw new IllegalArgumentException("Not HTTP URL:" + url);
 		}
