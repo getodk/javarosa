@@ -74,7 +74,7 @@ public class TransportService {
 	 * @return Thread used to try to send message
 	 * @throws IOException
 	 */
-	public SenderThread send(TransportMessage message)
+	public static SenderThread send(TransportMessage message)
 			throws TransportException {
 		return send(message, SenderThread.DEFAULT_TRIES,
 				SenderThread.DEFAULT_DELAY);
@@ -92,8 +92,8 @@ public class TransportService {
 	 * @return
 	 * @throws IOException
 	 */
-	public SenderThread send(TransportMessage message, int tries, int delay)
-			throws TransportException {
+	public static SenderThread send(TransportMessage message, int tries,
+			int delay) throws TransportException {
 
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
@@ -102,11 +102,12 @@ public class TransportService {
 		SenderThread thread = new SimpleSenderThread(transporter,
 				MESSAGE_STORE, tries, delay);
 
-		// record the deadline for the queuing phase in the message
-		message.setQueuingDeadline(getQueuingDeadline(thread.getTries(), thread
-				.getDelay()));
-
 		if (message.isCacheable()) {
+
+			// record the deadline for the queuing phase in the message
+			message.setQueuingDeadline(getQueuingDeadline(thread.getTries(),
+					thread.getDelay()));
+			
 			// persist the message
 			MESSAGE_STORE.cache(message);
 		}
@@ -119,7 +120,7 @@ public class TransportService {
 		return thread;
 	}
 
-	public TransportMessage sendBlocking(TransportMessage message) {
+	public static TransportMessage sendBlocking(TransportMessage message) {
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
 
@@ -139,7 +140,7 @@ public class TransportService {
 	 * 
 	 * 
 	 */
-	public SenderThread sendCached() throws TransportException {
+	public static SenderThread sendCached(TransportListener listener) throws TransportException {
 		Vector messages = getCachedMessages();
 		if (messages.size() > 0) {
 			// create an appropriate transporter
@@ -147,6 +148,7 @@ public class TransportService {
 			Transporter transporter = m.createTransporter();
 			BulkSenderThread thread = new BulkSenderThread(transporter,
 					messages, MESSAGE_STORE, 1, 0);
+			thread.addListener(listener);
 			thread.start();
 			return thread;
 
@@ -172,14 +174,14 @@ public class TransportService {
 	/**
 	 * @return
 	 */
-	public Vector getCachedMessages() {
+	public static Vector getCachedMessages() {
 		return MESSAGE_STORE.getCachedMessages();
 	}
 
 	/**
 	 * @return
 	 */
-	public int getCachedMessagesSize() {
+	public static int getCachedMessagesSize() {
 		return MESSAGE_STORE.getCachedMessagesSize();
 	}
 
@@ -194,7 +196,7 @@ public class TransportService {
 	 * @return The TransportMessage identified by the id (or null if no such
 	 *         message was found)
 	 */
-	public TransportMessage retrieve(String id) {
+	public static TransportMessage retrieve(String id) {
 		return MESSAGE_STORE.findMessage(id);
 	}
 

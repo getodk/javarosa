@@ -1,10 +1,10 @@
 package org.javarosa.services.transport.senders;
 
+import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
-import org.javarosa.services.transport.impl.TransportMessageStore;
 
 /**
  * 
@@ -16,13 +16,13 @@ import org.javarosa.services.transport.impl.TransportMessageStore;
 public class SimpleSenderThread extends SenderThread {
 
 	public SimpleSenderThread(Transporter transporter,
-			TransportMessageStore queue, int tries, int delay) {
+			TransportCache queue, int tries, int delay) {
 		super(transporter, queue, tries, delay);
 
 	}
 
 	public SimpleSenderThread(Transporter transporter,
-			TransportMessageStore queue) {
+			TransportCache queue) {
 		super(transporter, queue);
 
 	}
@@ -49,6 +49,7 @@ public class SimpleSenderThread extends SenderThread {
 			// via the "Send Unsent" user function
 			if (!message.isSuccess()) {
 				message.setStatus(TransportMessageStatus.CACHED);
+				notifyStatusChange(message);
 			}
 			try {
 				this.messageStore.updateMessage(message);

@@ -1,5 +1,9 @@
 package org.javarosa.services.transport.senders;
 
+import java.util.Vector;
+
+import org.javarosa.services.transport.TransportCache;
+import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.TransportException;
@@ -23,6 +27,8 @@ public abstract class SenderThread extends Thread {
 	 */
 	public static final int DEFAULT_DELAY = 60;
 
+	public Vector listeners = new Vector();
+
 	/**
 	 * the Transporter has the TransportMessage, and knows how to send it
 	 */
@@ -32,7 +38,7 @@ public abstract class SenderThread extends Thread {
 	 * A reference to the TransportMessageStore is needed so that successfully
 	 * sent messages can be removed
 	 */
-	protected TransportMessageStore messageStore;
+	protected TransportCache messageStore;
 
 	/**
 	 * Number of times to try
@@ -56,7 +62,7 @@ public abstract class SenderThread extends Thread {
 	 *            messages which are successfully sent can be removed from the
 	 *            queue
 	 */
-	protected SenderThread(Transporter transporter, TransportMessageStore queue) {
+	protected SenderThread(Transporter transporter, TransportCache queue) {
 		this.transporter = transporter;
 		this.messageStore = queue;
 		this.tries = DEFAULT_TRIES;
@@ -71,8 +77,8 @@ public abstract class SenderThread extends Thread {
 	 *            messages which are successfully sent can be removed from the
 	 *            queue
 	 */
-	protected SenderThread(Transporter transporter,
-			TransportMessageStore queue, int tries, int delay) {
+	protected SenderThread(Transporter transporter, TransportCache queue,
+			int tries, int delay) {
 		this.transporter = transporter;
 		this.messageStore = queue;
 		this.tries = tries;
@@ -98,10 +104,14 @@ public abstract class SenderThread extends Thread {
 	 * @return The message being sent (with updated status)
 	 */
 	protected TransportMessage attemptToSend() throws TransportException {
-		System.out.println("Attempts left: " + this.triesRemaining);
+
+		notifyChange(this.transporter.getMessage(), "Attempts left: "
+				+ this.triesRemaining);
 		TransportMessage message = this.transporter.send();
 		if (message.isSuccess()) {
+
 			onSuccess(message);
+			notifyStatusChange(message);
 		} else {
 			onFailure();
 		}
@@ -118,7 +128,6 @@ public abstract class SenderThread extends Thread {
 			throws TransportException {
 		if (message.isCacheable()) {
 			// remove from queue
-
 			this.messageStore.decache(message);
 		}
 	}
@@ -150,6 +159,22 @@ public abstract class SenderThread extends Thread {
 	 */
 	public int getDelay() {
 		return delay;
+	}
+
+	public void addListener(TransportListener listener) {
+		this.listeners.addElement(listener);
+	}
+
+	public void notifyChange(TransportMessage message, String remark) {
+		for (int i = 0; i < this.listeners.size(); i++) {
+			((TransportListener) this.listeners.elementAt(i)).onChange(message,
+					remark);
+		}
+	}
+	public void notifyStatusChange(TransportMessage message) {
+		for (int i = 0; i < this.listeners.size(); i++) {
+			((TransportListener) this.listeners.elementAt(i)).onStatusChange(message);
+		}
 	}
 
 }

@@ -2,25 +2,25 @@ package org.javarosa.services.transport.senders;
 
 import java.util.Vector;
 
+import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
-import org.javarosa.services.transport.impl.TransportMessageStore;
 
 public class BulkSenderThread extends SenderThread {
 
 	private Vector messages;
 
 	public BulkSenderThread(Transporter transporter, Vector messages,
-			TransportMessageStore queue, int tries, int delay) {
+			TransportCache queue, int tries, int delay) {
 		super(transporter, queue, tries, delay);
 		this.messages = messages;
 
 	}
 
 	public BulkSenderThread(Transporter transporter, Vector messages,
-			TransportMessageStore queue) {
+			TransportCache queue) {
 		super(transporter, queue);
 		this.messages = messages;
 	}
@@ -51,6 +51,7 @@ public class BulkSenderThread extends SenderThread {
 				// via the "Send Unsent" user function
 				if (!message.isSuccess()) {
 					message.setStatus(TransportMessageStatus.CACHED);
+					notifyStatusChange(message);
 				}
 				try {
 					this.messageStore.updateMessage(message);
