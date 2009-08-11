@@ -10,13 +10,14 @@ public interface TransportCache {
 
 	void decache(TransportMessage message) throws TransportException;
 
+	void updateMessage(TransportMessage message) throws TransportException;
+
 	TransportMessage findMessage(String id);
 
-	int getCachedMessagesSize();
+	int getCachedMessagesCount();
 
 	Vector getCachedMessages();
 
 	void clearCache();
 
-	void updateMessage(TransportMessage message) throws TransportException;
 }

@@ -32,6 +32,15 @@ public interface TransportMessage extends Serializable {
 	 */
 	Transporter createTransporter();
 
+	/**
+	 * 
+	 * Some transport types can sensibly make use of the TransportService's
+	 * persistent store (e.g. http), some others not (e.g. sms).
+	 * 
+	 * This method returns true if this kind of Message is cacheable
+	 * 
+	 * @return
+	 */
 	boolean isCacheable();
 	
 	/**
