@@ -141,7 +141,7 @@ public abstract class SenderThread extends Thread {
 		triesRemaining--;
 		try {
 			// pause before trying again
-			wait((long) delay * 1000);
+			sleep((long) delay * 1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

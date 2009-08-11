@@ -58,7 +58,7 @@ public class TransportMessageStore implements TransportCache {
 	/**
 	 * @return
 	 */
-	public int getCachedMessagesSize() {
+	public int getCachedMessagesCount() {
 		Integer size = (Integer) this.cachedCounts.get(Integer
 				.toString(TransportMessageStatus.CACHED));
 		return size.intValue();

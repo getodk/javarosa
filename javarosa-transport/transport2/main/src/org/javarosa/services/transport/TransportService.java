@@ -197,7 +197,7 @@ public class TransportService {
 	 * @return
 	 */
 	public static int getCachedMessagesSize() {
-		return MESSAGE_STORE.getCachedMessagesSize();
+		return MESSAGE_STORE.getCachedMessagesCount();
 	}
 
 	/**
