@@ -1,8 +1,10 @@
 package org.javarosa.j2me.storage.rms;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.microedition.rms.InvalidRecordIDException;
+import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreFullException;
@@ -52,6 +54,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class RMSStorageUtility implements IStorageUtility {
 	private static final int MAX_RMS_NAME_LENGTH = 32;		//maximum length of an RMS name
 	private static final int SUFFIX_LENGTH = 3;				//how much of RMS name that we need to reserve for our own purposes
+	private static final int MAX_DATA_STORES = 100;			//max number of data RMSes
 	
 	/* hard-coded ID numbers of specific records in the indexing RMS */
 	private static final int TX_FLAG_REC_ID = 1;			//status flag
@@ -161,17 +164,14 @@ public class RMSStorageUtility implements IStorageUtility {
 		byte[] data = ExtUtil.serialize(p);
 		
 		RMSRecordLoc newLoc = null;
-		boolean updateIndex = false;
-		boolean full = false;
 
 		synchronized (getAccessLock()) {
 			Hashtable idIndex = getIDIndexRecord();
 			RMSStorageInfo info = getInfoRecord();
+			boolean recordExists = idIndex.containsKey(new Integer(id));
 
 			setDirty();
 			
-			boolean recordExists = idIndex.containsKey(new Integer(id));
-
 			//reserve space for updating index/metadata
 			int bytesNeededEstimate = (recordExists ? 20 : 40);
 			if (!setReserveBuffer(bytesNeededEstimate)) {
@@ -183,35 +183,24 @@ public class RMSStorageUtility implements IStorageUtility {
 			if (recordExists) {
 				RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
 				newLoc = updateRecord(loc, data, info);
-
-				if (newLoc == null) {
-					full = true;
-				} else if (!newLoc.equals(loc)) {
-					updateIndex = true;
-				}
 			} else {
 				newLoc = addRecord(data, info);
-				
-				if (newLoc == null) {
-					full = true;
-				} else {
+				if (newLoc != null) {
 					info.numRecords++;
-					updateIndex = true;
 				}
 			}
 			
 			//release the space we reserved
 			setReserveBuffer(0);
 			
-			if (full) {
+			if (newLoc == null) {
 				setClean();
 				throw new StorageFullException();
-			} else if (updateIndex) {
-				idIndex.put(new Integer(id), newLoc);
-				
+			} else {
+				idIndex.put(new Integer(id), newLoc);	
 				commitIndex(info, idIndex);
 				setClean();
-			}
+			}			
 		}
 	}
 	
@@ -297,19 +286,19 @@ public class RMSStorageUtility implements IStorageUtility {
 			}
 			
 			RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
-			RMSRecordLoc newLoc = updateRecord(loc, data, info);
+			loc = updateRecord(loc, data, info);
 	
 			//release the space we reserved
 			setReserveBuffer(0);
 			
-			if (newLoc == null) {
+			if (loc == null) {
 				setClean();
 				throw new StorageFullException();
-			} else if (!newLoc.equals(loc)) {
-				idIndex.put(new Integer(id), newLoc);
+			} else {
+				idIndex.put(new Integer(id), loc);
 				commitIndex(info, idIndex);
+				setClean();
 			}
-			setClean();
 		}
 	}
 	
@@ -427,7 +416,23 @@ public class RMSStorageUtility implements IStorageUtility {
 	 * @throws IllegalArgumentException if no record exists for that ID
 	 */
 	public int getRecordSize (int id) {
-		throw new RuntimeException("not implemented yet");
+		synchronized (getAccessLock()) {
+
+			checkNotCorrupt();
+			
+			Hashtable idIndex = getIDIndexRecord();
+			if (idIndex.containsKey(new Integer(id))) {			
+				RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
+				try {
+					return getDataStore(loc.rmsID).rms.getRecordSize(loc.recID);
+				} catch (RecordStoreException e) {
+					throw new RuntimeException("error getting record size");
+				}
+			} else {
+				throw new IllegalArgumentException("Record ID [" + id + "] not found");	
+			}
+			
+		}
 	}
 	
 	/**
@@ -452,7 +457,6 @@ public class RMSStorageUtility implements IStorageUtility {
 	public void repair () {
 		throw new RuntimeException("not implemented yet");
 	}
-
 	
 	/**
 	 * Attempt to commit all changes to the indexing and meta-data structures after a record operation (add/update/remove) has been
@@ -517,16 +521,17 @@ public class RMSStorageUtility implements IStorageUtility {
 				throw new RuntimeException("Error opening index record: " + rse.getMessage());
 			}
 			
-			if (ix == null) {
-				ix = initIndexStore();
+			if (ix != null) {
+				this.indexstore = ix;
+			} else {
+				initIndexStore();
 			}
 			
-			checkInitialized();
-			
-			this.indexstore = ix;
+			checkInitialized();			
+
 			this.datastores = new RMS[0];
 			getInfoRecord();
-
+			
 		}
 	}
 	
@@ -535,7 +540,7 @@ public class RMSStorageUtility implements IStorageUtility {
 	 *  
 	 * @return a reference to the RMS
 	 */
-	private RMS initIndexStore () {
+	private void initIndexStore () {
 		RMS ix = null;
 		try {
 			ix = new RMS(indexStoreName(), true);
@@ -569,9 +574,9 @@ public class RMSStorageUtility implements IStorageUtility {
 			throw new RuntimeException("Error building meta RMS: record not assigned to expected ID");
 		}
 		
-		setClean();
+		this.indexstore = ix;
 		
-		return ix;
+		setClean();
 	}
 	
 	/**
@@ -589,20 +594,20 @@ public class RMSStorageUtility implements IStorageUtility {
 		RMSRecordLoc newID = null;
 		int iDatastore;
 		
-		for (iDatastore = 0; iDatastore < info.numDataStores; iDatastore++) {
+		for (iDatastore = info.numDataStores - 1; iDatastore >= 0; iDatastore--) {
 			RMS rs = getDataStore(iDatastore);
 			int recID = rs.addRecord(data);
+
 			if (recID != -1) {
 				newID = new RMSRecordLoc(iDatastore, recID);
 				break;
 			} //else, not enough space in recordstore for record
 		}
-		
+
 		if (newID == null) {
 			RMS rs = newDataStore(info);
 			if (rs != null) {
 				iDatastore = info.numDataStores - 1;
-				
 				int recID = rs.addRecord(data);
 				if (recID != -1) {
 					newID = new RMSRecordLoc(iDatastore, recID);
@@ -618,28 +623,22 @@ public class RMSStorageUtility implements IStorageUtility {
 	}
 
 	/**
-	 * Update a record in the data stores. First attempt to update it in place. If the size of the record has increased too
-	 * much and it no longer fits in its current RMS, add the updated record to a different RMS using the algorithm from
-	 * addRecord(), and then delete the old record from the original RMS.
+	 * Update a record in the data stores. It always tries to add a new record with the updated data, and then delete the
+	 * old record. This is because (on some phones, at least), the RMS gets completely hosed if you try to update a record
+	 * in place and there isn't enough space.
 	 * 
 	 * @param curLoc current location (RMS #, record ID) of the record
 	 * @param data serialized byte data for record
 	 * @param info StorageUtility info record
-	 * @return final location of the record (will be same as curLoc if record was updated in place); null if storage is full
+	 * @return new location of the record; null if storage is full
 	 */
 	private RMSRecordLoc updateRecord (RMSRecordLoc curLoc, byte[] data, RMSStorageInfo info) {
-		RMS rs = getDataStore(curLoc.rmsID);
-		boolean updated = rs.updateRecord(curLoc.recID, data);
-		if (updated) {
-			return curLoc;
+		RMSRecordLoc newID = addRecord(data, info);
+		if (newID != null) {
+			getDataStore(curLoc.rmsID).removeRecord(curLoc.recID);
+			return newID;
 		} else {
-			RMSRecordLoc newID = addRecord(data, info);
-			if (newID != null) {
-				rs.removeRecord(curLoc.recID);
-				return newID;
-			} else {
-				return null;
-			}
+			return null;
 		}
 	}
 	
@@ -685,9 +684,14 @@ public class RMSStorageUtility implements IStorageUtility {
 	 * Create (and cache) a new data store RMS for spillover
 	 * 
 	 * @param info StorageUtility info record
-	 * @return a reference to the new data store RMS
+	 * @return a reference to the new data store RMS, null if the entire device is full or max # of data stores exceeded
 	 */
 	private RMS newDataStore (RMSStorageInfo info) {
+		if (info.numDataStores == MAX_DATA_STORES) {
+			System.out.println("Warning: maximum number of data RMSes exceeded in StorageUtility [" + basename + "]; repacking the StorageUtility may reclaim space and allow more records to be added");
+			return null;
+		}
+		
 		RMS rs = null;
 		try {
 			rs = new RMS(dataStoreName(info.numDataStores), true);
@@ -770,8 +774,8 @@ public class RMSStorageUtility implements IStorageUtility {
 	 * @return RMS name
 	 */
 	private String dataStoreName (int i) {
-		if (i < 0 || i > 99) {
-			throw new IllegalArgumentException("Data stores can only be numbered 0 through 99 [" + i + "]");
+		if (i < 0 || i >= MAX_DATA_STORES) {
+			throw new IllegalArgumentException("Data stores can only be numbered 0 through " + MAX_DATA_STORES + " [" + i + "]");
 		}
 		return basename + "_" + DateUtils.intPad(i, 2);
 	}
@@ -826,7 +830,7 @@ public class RMSStorageUtility implements IStorageUtility {
 	 * @return true if record committed successfully; false if full
 	 */
 	private boolean writeInfoRecord (RMSStorageInfo info) {
-		return getIndexStore().updateRecord(STORAGE_INFO_REC_ID, ExtUtil.serialize(info));
+		return getIndexStore().updateRecord(STORAGE_INFO_REC_ID, ExtUtil.serialize(info), true);
 	}
 	
 	/**
@@ -856,7 +860,7 @@ public class RMSStorageUtility implements IStorageUtility {
 	 * @return true if record committed successfully; false if full
 	 */
 	private boolean writeIDIndexRecord (Hashtable idIndex) {
-		return getIndexStore().updateRecord(ID_INDEX_REC_ID, ExtUtil.serialize(new ExtWrapMap(idIndex)));
+		return getIndexStore().updateRecord(ID_INDEX_REC_ID, ExtUtil.serialize(new ExtWrapMap(idIndex)), true);
 	}
 	
 	/**
@@ -869,7 +873,7 @@ public class RMSStorageUtility implements IStorageUtility {
 	 */
 	private boolean setReserveBuffer (int size) {
 		int bufsize = (size <= 0 ? 1 : size + RESERVE_BUFFER_SIZE);
-		return getIndexStore().updateRecord(RESERVE_BUFFER_REC_ID, new byte[bufsize]);
+		return getIndexStore().updateRecord(RESERVE_BUFFER_REC_ID, new byte[bufsize], true);
 	}
 	
 	/**
@@ -922,14 +926,7 @@ public class RMSStorageUtility implements IStorageUtility {
 	 * @param dirtyOK if true, DIRTY is an allowed status; if false, the DIRTY status will cause a fatal exception
 	 */
 	private void checkStatusOK (boolean dirtyOK) {
-		Integer statusObj = null;
-		try {
-			statusObj = (Integer)getIndexStore().readRecord(TX_FLAG_REC_ID, Integer.class);
-		} catch (RuntimeException re) {
-			//do nothing
-			System.err.println("RuntimeException while trying to read StorageUtility status flag; could be transient or could be a serious problem with RMS; " + re.getMessage());
-		}
-		int status = (statusObj != null ? statusObj.intValue() : STATUS_UNINITIALIZED);
+		int status = getStatus();
 		
 		if (status == STATUS_DIRTY) {
 			if (!dirtyOK) {
@@ -941,19 +938,35 @@ public class RMSStorageUtility implements IStorageUtility {
 	}
 	
 	/**
+	 * Fetch the StorageUtility status flag
+	 * 
+	 * @return status flag code
+	 */
+	private int getStatus () {
+		Integer statusObj = null;
+		try {
+			statusObj = (Integer)getIndexStore().readRecord(TX_FLAG_REC_ID, Integer.class);
+		} catch (RuntimeException re) {
+			//do nothing
+			System.err.println("RuntimeException while trying to read StorageUtility status flag; could be transient or could be a serious problem with RMS; " + re.getMessage());
+		}
+		return (statusObj != null ? statusObj.intValue() : STATUS_UNINITIALIZED);
+	}
+	
+	/**
 	 * Set the status to DIRTY, indicating a transaction is in progress. Checks first to see that the status is
 	 * CLEAN, else throws a fatal exception.
 	 */
 	private void setDirty () {
 		checkNotCorrupt();
-		getIndexStore().updateRecord(TX_FLAG_REC_ID, ExtUtil.serialize(new Integer(STATUS_DIRTY)));			
+		getIndexStore().updateRecord(TX_FLAG_REC_ID, ExtUtil.serialize(new Integer(STATUS_DIRTY)), true);			
 	}
 	
 	/**
 	 * Set the status to CLEAN, indicating any transaction is now complete, and the StorageUtility is in a consistent state.
 	 */
 	private void setClean () {
-		getIndexStore().updateRecord(TX_FLAG_REC_ID, ExtUtil.serialize(new Integer(STATUS_CLEAN)));
+		getIndexStore().updateRecord(TX_FLAG_REC_ID, ExtUtil.serialize(new Integer(STATUS_CLEAN)), true);
 	}
 	
 	/**
@@ -961,7 +974,7 @@ public class RMSStorageUtility implements IStorageUtility {
 	 * automatically opening/closing the RecordStore to free up space.
 	 */
 	private class RMS {
-		public RecordStore rms;		//the RecordStore object being wrapper
+		public RecordStore rms;		//the RecordStore object being wrapped
 		public String name;			//the name of this RecordStore
 		
 		/**
@@ -976,58 +989,87 @@ public class RMSStorageUtility implements IStorageUtility {
 			this.rms = RecordStore.openRecordStore(name, create);
 		}
 		
+		public int addRecord (byte[] data) {
+			return addRecord(data, false);
+		}
+		
 		/**
-		 * Simple wrapper for RecordStore.addRecord(). If, on first attempt, RecordStore is full, it will
-		 * close/reopen the record store to free up any available space, then try once more.
+		 * Simple wrapper for RecordStore.addRecord().
+		 * 
+		 * Optionally, if, on first attempt, RecordStore is full, it will close/reopen the record store to free up
+		 * any available space, then try once more. (This may have a hefty performance penalty)
 		 * 
 		 * @param data record to add
+		 * @param tryHard if true, will close/reopen the record store on a 'full' error and try again
 		 * @return id of added record; -1 if full and no record was added
 		 */
-		public int addRecord (byte[] data) {
+		public int addRecord (byte[] data, boolean tryHard) {
 			try {
+				int id = -1;
+				
 				try {
-					return rms.addRecord(data, 0, data.length);
+					id = rms.addRecord(data, 0, data.length);
 				} catch (RecordStoreFullException rsfe) {
 					//do nothing
 				}
 				
-				cycle();
-				try {
-					return rms.addRecord(data, 0, data.length);
-				} catch (RecordStoreFullException rsfe2) {
-					return -1;
+				if (id == -1 && tryHard) {
+					cycle();
+					try {
+						id = rms.addRecord(data, 0, data.length);
+					} catch (RecordStoreFullException rsfe2) {
+						//do nothing
+					}
 				}
+				
+				return id;
 			} catch (RecordStoreException rse) {
 				throw new RuntimeException("Error adding record to RMS; " + rse.getMessage());
 			}
 		}
 		
+		public boolean updateRecord (int id, byte[] data) {
+			return updateRecord(id, data, false);
+		}
+		
 		/**
-		 * Simple wrapper for RecordStore.updateRecord(). If, on first attempt, RecordStore is full, it will
-		 * close/reopen the record store to free up any available space, then try once more.
+		 * Simple wrapper for RecordStore.updateRecord().
+		 * 
+		 * Optionally, if, on first attempt, RecordStore is full, it will close/reopen the record store to free up
+		 * any available space, then try once more. (This may have a hefty performance penalty)
+		 * 
+		 * BUG: on the Nokia 6085 (and probably others, the RMS becomes hosed if you try to update a record and run
+		 * out of space, so 'tryHard' will not save you here
 		 * 
 		 * Error if no record for 'id' exists
 		 * 
 		 * @param id id of record to update
 		 * @param data updated record data
+		 * @param tryHard if true, will close/reopen the record store on a 'full' error and try again
 		 * @return true if the record was updated; false if full
 		 */
-		public boolean updateRecord (int id, byte[] data) {
+		public boolean updateRecord (int id, byte[] data, boolean tryHard) {
 			try {
+				boolean success = false;
+				
 				try {
 					rms.setRecord(id, data, 0, data.length);
-					return true;
+					success = true;
 				} catch (RecordStoreFullException rsfe) {
 					//do nothing
 				}
 				
-				cycle();
-				try {
-					rms.setRecord(id, data, 0, data.length);
-					return true;
-				} catch (RecordStoreFullException rsfe2) {
-					return false;
+				if (!success && tryHard) {
+					cycle();
+					try {
+						rms.setRecord(id, data, 0, data.length);
+						success = true;
+					} catch (RecordStoreFullException rsfe2) {
+						//do nothing
+					}
 				}
+				
+				return success;
 			} catch (InvalidRecordIDException e) {
 				throw new RuntimeException("Attempted to update a record that does not exist [" + id + "]");
 			} catch (RecordStoreException e) {
@@ -1127,7 +1169,7 @@ public class RMSStorageUtility implements IStorageUtility {
 		 */
 		public void ensureOpen () {
 			try {
-				rms.getName();
+				rms.getName(); //presumably the simplest operation that will trigger a 'not open' exception
 			} catch (RecordStoreNotOpenException e) {
 				try {
 					rms = RecordStore.openRecordStore(name, false);
@@ -1148,6 +1190,48 @@ public class RMSStorageUtility implements IStorageUtility {
 				throw new RuntimeException("error cycling recordstore");
 			}
 		}
+	}
+	
+	/* ========== DEBUGGING CODE ============ */
+	
+	public String debugInfo () {
+		StringBuffer sb = new StringBuffer();
+		sb.append("=================\n");
+		
+		RMSStorageInfo info = getInfoRecord();
+		Hashtable ix = getIDIndexRecord();
+		
+		sb.append(basename + "(" + type.getName() + ") -- " + getStatus() + "\n");
+		sb.append(info.numRecords + ":" + info.numDataStores + ":" + info.nextRecordID + "\n");
+		
+		sb.append("rec index:\n");
+		for (Enumeration e = ix.keys(); e.hasMoreElements(); ) {
+			int id = ((Integer)e.nextElement()).intValue();
+			RMSRecordLoc loc = (RMSRecordLoc)ix.get(new Integer(id));
+			sb.append("  " + id + " => (" + loc.rmsID + ", " + loc.recID + ")\n");
+		}
+		
+		sb.append(printRMSInfo(getIndexStore().rms));
+		for (int i = 0; i < info.numDataStores; i++) {
+			sb.append(printRMSInfo(getDataStore(i).rms));
+		}
+		
+		sb.append("\n");
+		return sb.toString();
+	}
+	
+	private String printRMSInfo (RecordStore rs) {
+		StringBuffer sb = new StringBuffer();
+		try {
+			sb.append("RMS: " + rs.getName() + " [" + rs.getNumRecords() + "]\n");
+			for (RecordEnumeration e = rs.enumerateRecords(null, null, false); e.hasNextElement(); ) {
+				int id = e.nextRecordId();
+				sb.append("  " + id + " => [" + rs.getRecordSize(id) + "]\n");
+			}
+		} catch (RecordStoreException e) {
+			sb.append("RecordStoreException! " + e.getClass().getName() + " " + e.getMessage() + "\n");
+		}
+		return sb.toString();
 	}
 }
 
