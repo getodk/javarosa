@@ -124,6 +124,13 @@ public interface IStorageUtility {
 	int getRecordSize (int id);
 	
 	/**
+	 * Return an iterator to iterate through all records in this store
+	 * 
+	 * @return record iterator
+	 */
+	IStorageIterator iterate ();
+	
+	/**
 	 * Close all resources associated with this StorageUtility. Any attempt to use this StorageUtility after this call will result
 	 * in error. Though not strictly necessary, it is a good idea to call this when you are done with the StorageUtility, as closing
 	 * may trigger clean-up in the underlying device storage (reclaiming unused space, etc.).
