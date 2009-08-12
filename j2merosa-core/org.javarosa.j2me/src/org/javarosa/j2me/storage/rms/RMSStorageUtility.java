@@ -2,6 +2,7 @@ package org.javarosa.j2me.storage.rms;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
@@ -12,6 +13,7 @@ import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.services.storage.StorageFullException;
@@ -78,8 +80,8 @@ public class RMSStorageUtility implements IStorageUtility {
 															   in a way we could not recover from (meaning the StorageUtility
 															   must be repaired before it can be used again) */
 	
-	/* static collection of synchronization locks (one per unique StorageUtility name) */
-	private static Hashtable accessLocks = new Hashtable();
+	/* static collection of storage-related objects -- one per unique StorageUtility name -- mainly useful for thread management */
+	private static Hashtable storageStaticInfo = new Hashtable();
 	
 	private String basename;		//unique name identifying this collection of records
 	private Class type;				//type of object this StorageUtility stores
@@ -101,7 +103,7 @@ public class RMSStorageUtility implements IStorageUtility {
 		this.basename = basename;
 		this.type = type;
 
-		initAccessLock();
+		initStaticInfo();
 			
 		loadIndexStore();
 	}
@@ -196,11 +198,12 @@ public class RMSStorageUtility implements IStorageUtility {
 			if (newLoc == null) {
 				setClean();
 				throw new StorageFullException();
-			} else {
-				idIndex.put(new Integer(id), newLoc);	
-				commitIndex(info, idIndex);
-				setClean();
-			}			
+			}
+			
+			idIndex.put(new Integer(id), newLoc);	
+			commitIndex(info, idIndex);
+			setClean();
+			storageModified();			
 		}
 	}
 	
@@ -249,6 +252,7 @@ public class RMSStorageUtility implements IStorageUtility {
 			
 			commitIndex(info, idIndex);
 			setClean();
+			storageModified();
 			
 			return id;
 		}	
@@ -294,11 +298,12 @@ public class RMSStorageUtility implements IStorageUtility {
 			if (loc == null) {
 				setClean();
 				throw new StorageFullException();
-			} else {
-				idIndex.put(new Integer(id), loc);
-				commitIndex(info, idIndex);
-				setClean();
 			}
+			
+			idIndex.put(new Integer(id), loc);
+			commitIndex(info, idIndex);
+			setClean();
+			storageModified();
 		}
 	}
 	
@@ -325,6 +330,7 @@ public class RMSStorageUtility implements IStorageUtility {
 			idIndex.remove(new Integer(id));
 			commitIndex(info, idIndex);
 			setClean();
+			storageModified();
 		}
 	}
 	
@@ -506,6 +512,33 @@ public class RMSStorageUtility implements IStorageUtility {
 	}
 	
 	/**
+	 * Return an iterator to iterate through all records in this StorageUtility
+	 * 
+	 * @returns record iterator
+	 */
+	public IStorageIterator iterate () {
+		synchronized (getAccessLock()) {
+			
+			checkNotCorrupt();
+			
+			Vector IDs = new Vector();
+			for (Enumeration e = getIDIndexRecord().keys(); e.hasMoreElements(); ) {
+				IDs.addElement(e.nextElement());
+			}
+
+			return newIterator(IDs);
+			
+		}
+	}
+	
+	/**
+	 * Trigger for when something modifies the data in the storage utility
+	 */
+	private void storageModified () {
+		invalidateIterators();
+	}
+	
+	/**
 	 * Load the indexing/meta-data RMS when this StorageUtility is first instantiated, and check its integrity. Create
 	 * it if it doesn't exist. 
 	 */
@@ -537,8 +570,6 @@ public class RMSStorageUtility implements IStorageUtility {
 	
 	/**
 	 * Create a new indexing/meta-data RMS. The RMS must not exist already.
-	 *  
-	 * @return a reference to the RMS
 	 */
 	private void initIndexStore () {
 		RMS ix = null;
@@ -877,29 +908,6 @@ public class RMSStorageUtility implements IStorageUtility {
 	}
 	
 	/**
-	 * Create an entry for this StorageUtility (unique to this utility's base name) in the static table of synchronization
-	 * locks.
-	 */
-	private void initAccessLock () {
-		synchronized (accessLocks) {
-			if (!accessLocks.containsKey(basename)) {
-				accessLocks.put(basename, new Object());
-			}
-		}
-	}
-	
-	/**
-	 * Fetch the object that acts as the synchronization lock for this StorageUtility
-	 * 
-	 * @return lock object
-	 */
-	public Object getAccessLock () {
-		synchronized (accessLocks) {
-			return accessLocks.get(basename);
-		}
-	}
-	
-	/**
 	 * Check that the StorageUtility has been properly initialized. Throw an exception if it is not
 	 */
 	public void checkInitialized () {
@@ -1189,6 +1197,86 @@ public class RMSStorageUtility implements IStorageUtility {
 			} catch (RecordStoreException e) {
 				throw new RuntimeException("error cycling recordstore");
 			}
+		}
+	}
+	
+	/**
+	 * Create an entry for this StorageUtility (unique to this utility's base name) in the static table of synchronization
+	 * objects.
+	 */
+	private void initStaticInfo () {
+		synchronized (storageStaticInfo) {
+			if (!storageStaticInfo.containsKey(basename)) {
+				storageStaticInfo.put(basename, new StorageStaticEntity());
+			}
+		}
+	}
+	
+	/**
+	 * Fetch the object that acts as the synchronization lock for this StorageUtility
+	 * 
+	 * @return lock object
+	 */
+	public Object getAccessLock () {
+		synchronized (storageStaticInfo) {
+			return ((StorageStaticEntity)storageStaticInfo.get(basename)).lock;
+		}
+	}
+	
+	/**
+	 * Create a new record iterator and register it
+	 * 
+	 * @param IDs list of record IDs to iterate over
+	 * @return record iterator
+	 */
+	private RMSStorageIterator newIterator (Vector IDs) {
+		RMSStorageIterator iter = new RMSStorageIterator(this, IDs);
+		
+		synchronized (storageStaticInfo) {
+			((StorageStaticEntity)storageStaticInfo.get(basename)).iterators.addElement(iter);
+		}
+		
+		return iter;
+	}
+	
+	/**
+	 * Callback from iterator when its iteration is complete
+	 * 
+	 * @param iter iterator making the callback
+	 */
+	public void iteratorComplete (RMSStorageIterator iter) {
+		synchronized (storageStaticInfo) {
+			((StorageStaticEntity)storageStaticInfo.get(basename)).iterators.removeElement(iter);
+		}
+	}	
+	
+	/**
+	 * When this StorageUtility has been modified (record add/update/remove), this will invalidate and
+	 * unregister all active iterators
+	 */
+	private void invalidateIterators () {
+		synchronized (storageStaticInfo) {
+			Vector iterators = ((StorageStaticEntity)storageStaticInfo.get(basename)).iterators;
+			
+			for (int i = 0; i < iterators.size(); i++) {
+				((RMSStorageIterator)iterators.elementAt(i)).invalidate();
+			}
+			
+			iterators.removeAllElements();
+		}
+	}
+	
+	/**
+	 * Stores objects that need to be maintained per storage entity (meaning, per unique basename). Multiple StorageUtilitys
+	 * can be instantiated at once with the same basename, so this shared object is necessary.
+	 */
+	private class StorageStaticEntity {
+		public Object lock;					//synchronization lock for this storage
+		public Vector iterators;			//list of active record enumerations over this storage
+		
+		public StorageStaticEntity () {
+			lock = new Object();
+			iterators = new Vector();
 		}
 	}
 	
