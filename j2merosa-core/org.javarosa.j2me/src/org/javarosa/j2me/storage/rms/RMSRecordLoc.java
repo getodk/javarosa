@@ -19,6 +19,8 @@ public class RMSRecordLoc implements Externalizable {
 	public int rmsID;
 	public int recID;
 	
+	public RMSRecordLoc () { }
+	
 	public RMSRecordLoc (int rmsID, int recID) {
 		this.rmsID = rmsID;
 		this.recID = recID;
