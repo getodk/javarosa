@@ -16,6 +16,8 @@
 
 package org.javarosa.core.services.storage.utilities;
 
+/* DEPRECATED */
+
 /**
  * IDRecordable classes represent a record with an integer
  * ID.  

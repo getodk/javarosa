@@ -23,6 +23,8 @@ import java.util.Vector;
 import org.javarosa.core.services.storage.IStorageProvider;
 import org.javarosa.core.services.storage.RMSProvider;
 
+/* droos: what is the future of this class? i think it will take a different form with the new storage API */
+
 /**
  * Manages StorageProviders for JavaRosa, which maintain persistent
  * data on a device.

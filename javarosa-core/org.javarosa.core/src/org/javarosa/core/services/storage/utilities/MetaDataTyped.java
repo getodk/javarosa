@@ -25,6 +25,9 @@
 
 package org.javarosa.core.services.storage.utilities;
 
+/* DEPRECATED */
+
+
 /**
  * MetaDataTyped objects represent meta data for some object
  * @author Munier
