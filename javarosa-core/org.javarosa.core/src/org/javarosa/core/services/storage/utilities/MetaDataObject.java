@@ -16,6 +16,9 @@
 
 package org.javarosa.core.services.storage.utilities;
 
+/* DEPRECATED */
+
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

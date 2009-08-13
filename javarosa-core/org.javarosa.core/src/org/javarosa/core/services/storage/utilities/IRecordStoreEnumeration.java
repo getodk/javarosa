@@ -16,6 +16,8 @@
 
 package org.javarosa.core.services.storage.utilities;
 
+/* DEPRECATED */
+
 
 public interface IRecordStoreEnumeration {
 
