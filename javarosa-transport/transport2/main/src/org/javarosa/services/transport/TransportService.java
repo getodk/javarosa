@@ -133,13 +133,14 @@ public class TransportService {
 		transporter.setMessage(message);
 
 		transporter.send();
-		
-		
-		if (message.getStatus() == TransportMessageStatus.SENT) {
-			MESSAGE_STORE.decache(message);
-		} else {
-			message.setStatus(TransportMessageStatus.CACHED);
-			MESSAGE_STORE.updateMessage(message);
+
+		if (message.isCacheable()) {
+			if (message.getStatus() == TransportMessageStatus.SENT) {
+				MESSAGE_STORE.decache(message);
+			} else {
+				message.setStatus(TransportMessageStatus.CACHED);
+				MESSAGE_STORE.updateMessage(message);
+			}
 		}
 		return message;
 	}
@@ -161,11 +162,10 @@ public class TransportService {
 			// create an appropriate transporter
 			TransportMessage m = (TransportMessage) messages.elementAt(0);
 			Transporter transporter = m.createTransporter();
-			BulkSender sender = new BulkSender(transporter,
-					messages, MESSAGE_STORE,listener);
-			
+			BulkSender sender = new BulkSender(transporter, messages,
+					MESSAGE_STORE, listener);
+
 			sender.send();
-			
 
 		}
 		throw new TransportException("No cached messages to send");
