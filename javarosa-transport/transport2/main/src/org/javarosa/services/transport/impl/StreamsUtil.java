@@ -25,6 +25,7 @@ public class StreamsUtil {
 			throws IOException {
 		int val = in.read();
 		while (val != -1) {
+			System.out.println("writing to stream: "+val);
 			out.write(val);
 			val = in.read();
 		}

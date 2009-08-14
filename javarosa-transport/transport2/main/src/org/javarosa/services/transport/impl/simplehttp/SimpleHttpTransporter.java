@@ -97,8 +97,7 @@ public class SimpleHttpTransporter implements Transporter {
 			throws Exception {
 		OutputStream out = null;
 		try {
-			// earlier code was commented: Problem exists here on 3110c CommCare
-			// Application: open hangs
+
 			out = conn.openOutputStream();
 
 			StreamsUtil.writeFromInputToOutput(is, out);
