@@ -20,8 +20,6 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 
-import org.javarosa.core.api.IActivity;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
@@ -32,7 +30,7 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 
-public class LoginForm extends FramedForm implements IView {
+public class LoginForm extends FramedForm {
 
 	private final static int DEFAULT_COMMAND_PRIORITY = 1;
 
@@ -52,14 +50,7 @@ public class LoginForm extends FramedForm implements IView {
 	private TextField passwordField;
 	private UserRMSUtility userRMS;
 	private User loggedInUser;
-
-	// context attributes
-	private final static String CTX_USERNAME = "username";
-	private final static String CTX_PASSWORD = "password";
-	private final static String CTX_COMMCARE_VERSION = "COMMCARE_VERSION";
-	private final static String CTX_COMMCARE_BUILD = "COMMCARE_BUILD";
-	private final static String CTX_JAVAROSA_BUILD = "JAVAROSA_BUILD";
-
+	
 	/**
 	 * @param loginActivity
 	 * @param title
@@ -75,7 +66,7 @@ public class LoginForm extends FramedForm implements IView {
 	 * @param loginActivity
 	 * @param title
 	 */
-	public LoginForm(IActivity loginActivity, String title) {
+	public LoginForm(String title) {
 		super(title);
 		init();
 	}

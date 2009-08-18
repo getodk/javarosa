@@ -16,7 +16,6 @@ import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.user.api.transitions.LoginStateTransitions;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.LoginContext;
-import org.javarosa.user.utility.Terms;
 import org.javarosa.user.view.LoginForm;
 
 /**
@@ -60,13 +59,13 @@ public class LoginState implements State<LoginStateTransitions>, CommandListener
 				return;
 
 			}
-			showError(Terms.loginIncorrect, Terms.tryAgain, this);
+			showError(Localization.get("activity.login.loginincorrect"), Localization.get("activity.login.tryagain"), this);
 
 		}
 
 		// #if javarosa.login.demobutton
 		else if (c == LoginForm.CMD_DEMO_BUTTON) {
-			showError(Terms.demoMode, Terms.demoModeIntro, this);
+			showError(Localization.get("activity.login.demomode"), Localization.get("activity.login.demomode.intro"), this);
 		}
 		// #endif
 
