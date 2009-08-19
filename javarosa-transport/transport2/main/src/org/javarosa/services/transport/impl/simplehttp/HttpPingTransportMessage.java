@@ -3,8 +3,7 @@ package org.javarosa.services.transport.impl.simplehttp;
 import de.enough.polish.io.Serializable;
 
 /**
- * A message which implements the simplest Http transfer - plain text via POST
- * request
+ 
  * 
  */
 public class HttpPingTransportMessage extends SimpleHttpTransportMessage
