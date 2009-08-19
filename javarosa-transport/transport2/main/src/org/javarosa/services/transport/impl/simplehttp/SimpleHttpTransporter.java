@@ -1,10 +1,9 @@
 package org.javarosa.services.transport.impl.simplehttp;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Enumeration;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
@@ -13,8 +12,6 @@ import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.StreamsUtil;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
-import org.javarosa.services.transport.impl.simplehttp.httpwrapper.HttpConnectionWrapper;
-import org.javarosa.services.transport.impl.simplehttp.httpwrapper.Level;
 
 /**
  * The SimpleHttpTransporter is able to send SimpleHttpTransportMessages (text
@@ -56,57 +53,53 @@ public class SimpleHttpTransporter implements Transporter {
 	 */
 	public TransportMessage send() {
 		HttpConnection conn = null;
-		byte[] o = (byte[]) this.message.getContent();
-
-		String content = new String(o);
-		System.out.println("Getting ready to send: " + content);
 		DataInputStream is = null;
-		DataOutputStream os = null;
+		OutputStream os = null;
 		try {
-			HttpConnectionWrapper.logger.setLevel(Level.FINE);
-			conn = new HttpConnectionWrapper(getConnection(message
-					.getDestinationURL()));
-			conn.setRequestProperty("Content-Length", new Integer(content
-					.length()).toString());
 
-			//this.message.setResponseCode(conn.getResponseCode());
-			//if (conn.getResponseCode() == HttpConnection.HTTP_OK) {
-				os = (DataOutputStream) conn.openDataOutputStream();
+			conn = getConnection();
 
-				os.writeUTF(content);
-			//	os.flush();
+			os = conn.openOutputStream();
+			byte[] o = (byte[]) this.message.getContent();
+			StreamsUtil.writeToOutput(o, os);
+			os.close();
 
-				// Get the response
-				is = (DataInputStream) conn.openDataInputStream();
-				// is = c.openInputStream();
-				int ch;
-				StringBuffer sb = new StringBuffer();
-				while ((ch = is.read()) != -1) {
-					sb.append((char) ch);
-				}
-				System.out.println("messge: " + sb.toString());
-				message.setResponseBody(sb.toString());
-				is.close();
-				this.message.setResponseCode(conn.getResponseCode());
-			//}
-
+			// Get the response
+			is = (DataInputStream) conn.openDataInputStream();
+			int ch;
+			StringBuffer sb = new StringBuffer();
+			while ((ch = is.read()) != -1) {
+				sb.append((char) ch);
+			}
+			is.close();
+			int responseCode = conn.getResponseCode();
+			
+			
+			// set return information in the message
+			this.message.setResponseBody(sb.toString());
+			this.message.setResponseCode(responseCode);
+			if (responseCode == HttpConnection.HTTP_OK) {
+				this.message.setStatus(TransportMessageStatus.SENT);
+			}
+			
 			conn.close();
 		} catch (Exception e) {
 			System.out.println("Connection failed: " + e.getClass() + " : "
 					+ e.getMessage());
-			message.setFailureReason(e.getMessage());
-			message.incrementFailureCount();
+			this.message.setFailureReason(e.getMessage());
+			this.message.incrementFailureCount();
 		} finally {
-			if (is != null) {
+
+			if (os != null) {
 				try {
-					is.close();
+					os.close();
 				} catch (IOException e) {
 					// do nothing
 				}
 			}
-			if (os != null) {
+			if (is != null) {
 				try {
-					os.close();
+					is.close();
 				} catch (IOException e) {
 					// do nothing
 				}
@@ -119,94 +112,8 @@ public class SimpleHttpTransporter implements Transporter {
 				}
 		}
 
-		return message;
+		return this.message;
 
-	}
-
-	/**
-	 * 
-	 * 
-	 * Write the byte array to the HttpConnection
-	 * 
-	 * @param conn
-	 * @param bytes
-	 * @throws IOException
-	 */
-	private void writeToConnection(HttpConnection conn, InputStream is)
-			throws Exception {
-		OutputStream out = null;
-		try {
-
-			out = conn.openOutputStream();
-
-			StreamsUtil.writeFromInputToOutput(is, out);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-
-		} finally {
-			if (out != null) {
-				out.flush();
-				out.close();
-			}
-
-		}
-
-	}
-
-	/**
-	 * 
-	 * Read the response from the HttpConnection and record in the
-	 * SimpleHttpTransportMessage
-	 * 
-	 * 
-	 * @param conn
-	 * @param result
-	 * @return
-	 * @throws IOException
-	 * @throws ClassCastException
-	 */
-	private SimpleHttpTransportMessage readResponse(HttpConnection conn,
-			SimpleHttpTransportMessage message) throws IOException {
-
-		int responseCode = conn.getResponseCode();
-		if (responseCode == HttpConnection.HTTP_OK) {
-			message.setResponseBody(readResponseBody(conn));
-			message.setStatus(TransportMessageStatus.SENT);
-		} else {
-			message.setResponseCode(responseCode);
-		}
-
-		return message;
-
-	}
-
-	/**
-	 * 
-	 * 
-	 * 
-	 * @param conn
-	 * @return
-	 * @throws IOException
-	 */
-	private String readResponseBody(HttpConnection conn) throws IOException {
-		InputStream in = null;
-		String r = null;
-		try {
-			in = conn.openInputStream();
-			int len = (int) conn.getLength();
-			byte[] response = StreamsUtil.readFromStream(in, len);
-			r = new String(response);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw e;
-		} finally {
-			if (in != null) {
-				in.close();
-			}
-		}
-		return r;
 	}
 
 	/**
@@ -214,14 +121,29 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @return
 	 * @throws IOException
 	 */
-	private HttpConnection getConnection(String url) throws IOException {
-		HttpConnection conn = (HttpConnection) Connector.open(url);
+	private HttpConnection getConnection() throws IOException {
+		HttpConnection conn = (HttpConnection) Connector.open(this.message
+				.getUrl());
 		conn.setRequestMethod(HttpConnection.POST);
-		conn.setRequestProperty("User-Agent",
-				"Profile/MIDP-2.0 Configuration/CLDC-1.1");
-		conn.setRequestProperty("Content-Language", "en-US");
-		conn.setRequestProperty("MIME-version", "1.0");
-		conn.setRequestProperty("Content-Type", "text/plain");
+		conn.setRequestProperty("User-Agent", this.message
+				.getConnectionProperties().getUserAgent());
+		conn.setRequestProperty("Content-Language", this.message
+				.getConnectionProperties().getContentLanguage());
+		conn.setRequestProperty("MIME-version", this.message
+				.getConnectionProperties().getMimeVersion());
+		conn.setRequestProperty("Content-Type", this.message
+				.getConnectionProperties().getContentType());
+
+		conn.setRequestProperty("Content-Length", new Integer(
+				((byte[]) this.message.getContent()).length).toString());
+		// any others
+		Enumeration keys=this.message.getConnectionProperties().getOtherProperties().keys();
+		while(keys.hasMoreElements()){
+			String key = (String)keys.nextElement();
+			String value = (String)this.message.getConnectionProperties().getOtherProperties().get(key);
+			conn.setRequestProperty(key, value);
+		}
+
 		return conn;
 
 	}
