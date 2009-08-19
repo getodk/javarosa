@@ -21,7 +21,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	/**
 	 * An http url, to which the message will be POSTed
 	 */
-	private String destinationURL;
+	private String url;
 
 	/**
 	 * Http response code
@@ -34,23 +34,26 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	private String responseBody;
 
 	/**
-	 * @param str
-	 * @param destinationURL
+	 * 
 	 */
-	public SimpleHttpTransportMessage(String str, String destinationURL) {
-		setContent(str.getBytes());
-		this.destinationURL = destinationURL;
-	}
-	
-	 
+	private HttpConnectionProperties connectionProperties = new HttpConnectionProperties();
 
 	/**
 	 * @param str
 	 * @param destinationURL
 	 */
-	public SimpleHttpTransportMessage(byte[] str, String destinationURL) {
+	public SimpleHttpTransportMessage(String str, String url) {
+		setContent(str.getBytes());
+		this.url = url;
+	}
+
+	/**
+	 * @param str
+	 * @param destinationURL
+	 */
+	public SimpleHttpTransportMessage(byte[] str, String url) {
 		setContent(str);
-		this.destinationURL = destinationURL;
+		this.url = url;
 	}
 
 	/**
@@ -58,28 +61,24 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	 * @param destinationURL
 	 * @throws IOException
 	 */
-	public SimpleHttpTransportMessage(InputStream is, String destinationURL)
+	public SimpleHttpTransportMessage(ByteArrayInputStream is, String url)
 			throws IOException {
+
 		setContent(StreamsUtil.readFromStream(is, -1));
-		this.destinationURL = destinationURL;
+		this.url = url;
+	}
+
+	public HttpConnectionProperties getConnectionProperties() {
+		return connectionProperties;
+	}
+
+	public void setConnectionProperties(
+			HttpConnectionProperties connectionProperties) {
+		this.connectionProperties = connectionProperties;
 	}
 
 	public boolean isCacheable() {
 		return true;
-	}
-
-	/**
-	 * @return
-	 */
-	public String getDestinationURL() {
-		return destinationURL;
-	}
-
-	/**
-	 * @param destinationURL
-	 */
-	public void setDestinationURL(String destinationURL) {
-		this.destinationURL = destinationURL;
 	}
 
 	/**
@@ -110,6 +109,14 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 		this.responseBody = responseBody;
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -118,16 +125,16 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	public Transporter createTransporter() {
 		return new SimpleHttpTransporter(this);
 	}
-	
-	public String toString(){
-		String s= "#"+getQueueIdentifier()+" (http)";
-		if(getResponseCode()>0)
-			s+=" "+getResponseCode();
+
+	public String toString() {
+		String s = "#" + getQueueIdentifier() + " (http)";
+		if (getResponseCode() > 0)
+			s += " " + getResponseCode();
 		return s;
 	}
-	
-	public InputStream getContentStream(){
-		return new ByteArrayInputStream((byte[])getContent());
+
+	public InputStream getContentStream() {
+		return new ByteArrayInputStream((byte[]) getContent());
 	}
 
 }
