@@ -73,15 +73,14 @@ public class SimpleHttpTransporter implements Transporter {
 			}
 			is.close();
 			int responseCode = conn.getResponseCode();
-			
-			
+
 			// set return information in the message
 			this.message.setResponseBody(sb.toString());
 			this.message.setResponseCode(responseCode);
 			if (responseCode == HttpConnection.HTTP_OK) {
 				this.message.setStatus(TransportMessageStatus.SENT);
 			}
-			
+
 			conn.close();
 		} catch (Exception e) {
 			System.out.println("Connection failed: " + e.getClass() + " : "
@@ -126,21 +125,23 @@ public class SimpleHttpTransporter implements Transporter {
 				.getUrl());
 		conn.setRequestMethod(HttpConnection.POST);
 		conn.setRequestProperty("User-Agent", this.message
-				.getConnectionProperties().getUserAgent());
+				.getRequestProperties().getUserAgent());
 		conn.setRequestProperty("Content-Language", this.message
-				.getConnectionProperties().getContentLanguage());
+				.getRequestProperties().getContentLanguage());
 		conn.setRequestProperty("MIME-version", this.message
-				.getConnectionProperties().getMimeVersion());
+				.getRequestProperties().getMimeVersion());
 		conn.setRequestProperty("Content-Type", this.message
-				.getConnectionProperties().getContentType());
+				.getRequestProperties().getContentType());
 
 		conn.setRequestProperty("Content-Length", new Integer(
 				((byte[]) this.message.getContent()).length).toString());
 		// any others
-		Enumeration keys=this.message.getConnectionProperties().getOtherProperties().keys();
-		while(keys.hasMoreElements()){
-			String key = (String)keys.nextElement();
-			String value = (String)this.message.getConnectionProperties().getOtherProperties().get(key);
+		Enumeration keys = this.message.getRequestProperties()
+				.getOtherProperties().keys();
+		while (keys.hasMoreElements()) {
+			String key = (String) keys.nextElement();
+			String value = (String) this.message.getRequestProperties()
+					.getOtherProperties().get(key);
 			conn.setRequestProperty(key, value);
 		}
 

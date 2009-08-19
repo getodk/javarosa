@@ -36,7 +36,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	/**
 	 * 
 	 */
-	private HttpConnectionProperties connectionProperties = new HttpConnectionProperties();
+	private HttpRequestProperties requestProperties = new HttpRequestProperties();
 
 	/**
 	 * @param str
@@ -68,13 +68,12 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 		this.url = url;
 	}
 
-	public HttpConnectionProperties getConnectionProperties() {
-		return connectionProperties;
+	public HttpRequestProperties getRequestProperties() {
+		return requestProperties;
 	}
 
-	public void setConnectionProperties(
-			HttpConnectionProperties connectionProperties) {
-		this.connectionProperties = connectionProperties;
+	public void setRequestProperties(HttpRequestProperties requestProperties) {
+		this.requestProperties = requestProperties;
 	}
 
 	public boolean isCacheable() {
