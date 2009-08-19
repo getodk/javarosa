@@ -121,6 +121,11 @@ public class TransportService {
 		return thread;
 	}
 
+	/**
+	 * @param message
+	 * @return
+	 * @throws TransportException
+	 */
 	public static TransportMessage sendBlocking(TransportMessage message)
 			throws TransportException {
 		if (message.isCacheable()) {
@@ -147,7 +152,7 @@ public class TransportService {
 
 	/**
 	 * 
-	 * Any messages which aren't successfully sent in QueuingThreads are then
+	 * Any messages which aren't successfully sent in SendingThreads are then
 	 * "Cached".
 	 * 
 	 * Applications can activate new attempts to send the CachedMessages via
