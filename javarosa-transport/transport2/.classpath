@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="main/src"/>
 	<classpathentry kind="con" path="J2MELIB"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jmunit4cldc11-1.2.1.jar"/>
 	<classpathentry kind="lib" path="C:/J2ME-Polish2.1.0/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry kind="output" path="bin"/>
