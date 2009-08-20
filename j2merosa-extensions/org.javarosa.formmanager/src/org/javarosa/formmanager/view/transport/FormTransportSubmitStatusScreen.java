@@ -109,7 +109,7 @@ public class FormTransportSubmitStatusScreen extends Form implements
 					: Localization.get("sending.status.long"));
 			break;
 		case TransportMessage.STATUS_DELIVERED:
-			message = Localization.get("sending.status.success") + "  " + getServerResponse();
+			message = Localization.get("sending.status.success");// + "  " + getServerResponse();
 			break;
 		case TransportMessage.STATUS_FAILED:
 			message = Localization.get("sending.status.failed");
