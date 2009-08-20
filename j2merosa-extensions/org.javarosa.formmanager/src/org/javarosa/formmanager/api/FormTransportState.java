@@ -38,9 +38,8 @@ public class FormTransportState implements State<FormTransportStateTransitions>,
 		screen = views.getSubmitStatusScreen();
 	}
 	
-	public State<FormTransportStateTransitions> enter(FormTransportStateTransitions transitions) {
+	public void enter(FormTransportStateTransitions transitions) {
 		this.transitions = transitions;
-		return this;
 	}
 
 	public void start() {

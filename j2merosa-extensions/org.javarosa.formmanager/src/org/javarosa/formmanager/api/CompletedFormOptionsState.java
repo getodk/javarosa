@@ -27,9 +27,8 @@ public class CompletedFormOptionsState implements State<CompletedFormOptionsStat
 		view = new SendNowSendLaterForm(this);
 	}
 
-	public State<CompletedFormOptionsStateTransitions> enter(CompletedFormOptionsStateTransitions transitions) {
+	public void enter(CompletedFormOptionsStateTransitions transitions) {
 		this.transitions = transitions;
-		return this;
 	}
 
 	public void start() {
