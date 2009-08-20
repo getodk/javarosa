@@ -46,10 +46,8 @@ public class CaseManagementState implements State<CaseManagementTransitions>, Co
 		view.setCommandListener(this);
 	}
 	
-	public State<CaseManagementTransitions> enter(
-			CaseManagementTransitions transitions) {
+	public void enter(CaseManagementTransitions transitions) {
 		this.transitions = transitions;
-		return this;
 	}
 
 	public void start() {
