@@ -16,7 +16,13 @@
 
 package org.javarosa.user.utility;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.CommandListener;
+
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.view.UserForm;
@@ -42,7 +48,7 @@ public class UserValidator {
 	/**
 	 * @return
 	 */
-	public int validateEditUser() {
+	public int validateUserEdit() {
 		final String username = this.view.getUsername();
 		final String password = this.view.getPassword();
 		final String passwordConfirmed = this.view.getPasswordConfirmation();
@@ -88,7 +94,65 @@ public class UserValidator {
 		return OK;
 
 	}
+	
+	private void alertUser(String s1, String s2, AlertType type, CommandListener listener) {
+		// #style mailAlert
+		final Alert a = new Alert(s1, s2, null, type);
+		a.setCommandListener(listener);
+		a.setTimeout(Alert.FOREVER);
+		J2MEDisplay.getDisplay().setCurrent(a);
+	}
 
+	/**
+	 * 
+	 * 
+	 * 
+	 * @param status
+	 */
+	public void handleInvalidUser(int status, CommandListener listener) {
+
+		String s = Localization.get("activity.adduser.problem");
+
+		if (status == UserValidator.USER_EXISTS) {
+			s += ": " + Localization.get("activity.adduser.problem.nametaken", new String[]{this.view.getUsername()});
+		}
+
+		if (status == UserValidator.USERORPASSWD_MISSING) {
+			s += ": " + Localization.get("activity.adduser.problem.emptyuser");
+		}
+
+		if (status == UserValidator.MISMATCHED_PASSWORDS) {
+			s += ": " + Localization.get("activity.adduser.problem.mismatchingpasswords");
+		}
+
+		alertUser(s, "", AlertType.ERROR, listener);
+	}
+
+
+	public User constructUser() {
+		User user;
+
+		final String username = this.view.getUsername();
+		final String password = this.view.getPassword();
+		int userid = this.view.getUserId();
+
+		if (!this.view.adminRightsSelected())
+			user = new User(username, password, userid);
+		else
+			user = new User(username, password, userid,
+					org.javarosa.user.model.Constants.ADMINUSER);
+
+		if (this.view.getDecorator() != null) {
+			String[] elements = this.view.getDecorator()
+					.getPertinentProperties();
+			for (int i = 0; i < elements.length; ++i) {
+				user.setProperty(elements[i], this.view.getMetaFields()[i]
+						.getString());
+			}
+		}
+		return user;
+	}
+	
 	/**
 	 * 
 	 * returns true if the given username is already in existence within the RMS

@@ -20,9 +20,6 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 
-import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IActivity;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
@@ -33,7 +30,7 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 
-public class LoginForm extends FramedForm implements IView {
+public class LoginForm extends FramedForm {
 
 	private final static int DEFAULT_COMMAND_PRIORITY = 1;
 
@@ -53,42 +50,31 @@ public class LoginForm extends FramedForm implements IView {
 	private TextField passwordField;
 	private UserRMSUtility userRMS;
 	private User loggedInUser;
-
-	private IActivity parent;
-
-	// context attributes
-	private final static String CTX_USERNAME = "username";
-	private final static String CTX_PASSWORD = "password";
-	private final static String CTX_COMMCARE_VERSION = "COMMCARE_VERSION";
-	private final static String CTX_COMMCARE_BUILD = "COMMCARE_BUILD";
-	private final static String CTX_JAVAROSA_BUILD = "JAVAROSA_BUILD";
-
+	
 	/**
 	 * @param loginActivity
 	 * @param title
 	 */
 	private final static int DEFAULT_ADMIN_USERID = -1;
 
-	public LoginForm(IActivity loginActivity) {
+	public LoginForm() {
 		super(Localization.get("form.login.login"));
-		init(loginActivity);
+		init();
 	}
 
 	/**
 	 * @param loginActivity
 	 * @param title
 	 */
-	public LoginForm(IActivity loginActivity, String title) {
+	public LoginForm(String title) {
 		super(title);
-		init(loginActivity);
+		init();
 	}
 
 	/**
 	 * @param loginActivity
 	 */
-	private void init(IActivity loginActivity) {
-		this.parent = loginActivity;
-
+	private void init() {
 		this.userRMS = new UserRMSUtility(UserRMSUtility.getUtilityName());
 
 		// #debug debug
@@ -97,11 +83,6 @@ public class LoginForm extends FramedForm implements IView {
 
 		// #debug debug
 		System.out.println("records in RMS:" + recordsExist);
-
-		if (!recordsExist && (loginActivity != null)) {
-			this.loggedInUser = getLoggedInUser(loginActivity);
-			this.userRMS.writeToRMS(this.loggedInUser);
-		}
 
 		User tempUser = new User();
 		tempUser.setUsername("");// ? needed
@@ -163,36 +144,21 @@ public class LoginForm extends FramedForm implements IView {
 	 */
 	private void showVersions() {
 		//#if javarosa.login.showbuild
-		String ccv = (String) this.parent.getActivityContext().getElement(
-				CTX_COMMCARE_VERSION);
-		String ccb = (String) this.parent.getActivityContext().getElement(
-				CTX_COMMCARE_BUILD);
-		String jrb = (String) this.parent.getActivityContext().getElement(
-				CTX_JAVAROSA_BUILD);
+		//String ccv = (String) this.parent.getActivityContext().getElement(
+		//		CTX_COMMCARE_VERSION);
+		//String ccb = (String) this.parent.getActivityContext().getElement(
+		//		CTX_COMMCARE_BUILD);
+		//String jrb = (String) this.parent.getActivityContext().getElement(
+		//		CTX_JAVAROSA_BUILD);
 
-		if (ccv != null && !ccv.equals("")) {
-			this.append(Localization.get("form.login.commcareversion") + " " + ccv);
-		}
-		if ((ccb != null && !ccb.equals(""))
-				&& (jrb != null && !jrb.equals(""))) {
-			this.append(Localization.get("form.login.buildnumber") + " " + ccb + "-" + jrb);
-		}
+		//if (ccv != null && !ccv.equals("")) {
+		//	this.append(Localization.get("form.login.commcareversion") + " " + ccv);
+		//}
+		//if ((ccb != null && !ccb.equals(""))
+		//		&& (jrb != null && !jrb.equals(""))) {
+		//	this.append(Localization.get("form.login.buildnumber") + " " + ccb + "-" + jrb);
+		//}
 		//#endif
-	}
-
-	/**
-	 * @param loginActivity
-	 * @return
-	 */
-	private User getLoggedInUser(IActivity loginActivity) {
-		String username = (String) loginActivity.getActivityContext()
-				.getElement(CTX_USERNAME);
-		String password = (String) loginActivity.getActivityContext()
-				.getElement(CTX_PASSWORD);
-
-		User user = new User(username, password, DEFAULT_ADMIN_USERID,
-				User.ADMINUSER);
-		return user;
 	}
 
 	/**

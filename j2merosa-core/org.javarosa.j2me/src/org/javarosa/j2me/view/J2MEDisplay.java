@@ -19,16 +19,15 @@ package org.javarosa.j2me.view;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.util.IncompatibleViewException;
 
-public class J2MEDisplay implements IDisplay {
+public class J2MEDisplay {
 
-	private final Display display;
+	private static Display display;
 	
-	public J2MEDisplay(Display display) {
-		this.display = display;
+	public static void setDisplay(Display display) {
+		J2MEDisplay.display = display;
 	}
 	
 	/* (non-Javadoc)
@@ -45,11 +44,11 @@ public class J2MEDisplay implements IDisplay {
 		}
 	}
 	
-	public Object getDisplayObject() {
+	public static Object getDisplayObject() {
 		return getDisplay();
 	}
 	
-	public Display getDisplay() {
+	public static Display getDisplay() {
 		return display;
 	}
 }

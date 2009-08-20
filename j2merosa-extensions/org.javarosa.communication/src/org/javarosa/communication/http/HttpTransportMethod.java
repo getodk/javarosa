@@ -150,18 +150,18 @@ public class HttpTransportMethod implements TransportMethod {
 				
 				out = con.openOutputStream(); // Problem exists here on 3110c CommCare Application: open hangs
 					
-				//ByteArrayOutputStream bis = new ByteArrayOutputStream();  //For Testing!
+				ByteArrayOutputStream bis = new ByteArrayOutputStream();  //For Testing!
 				
 				InputStream valueStream = httpload.getPayloadStream();
 				int val = valueStream.read();
 				while(val != -1) {
-					//bis.write(val); // For Testing!
+					bis.write(val); // For Testing!
 					out.write(val);
 					val = valueStream.read();
 				}
-				//byte[] newArr = bis.toByteArray();// For Testing!
-				//String theVal = new String(newArr); //For Testing!
-				//System.out.println(theVal);// For Testing!
+				byte[] newArr = bis.toByteArray();// For Testing!
+				String theVal = new String(newArr); //For Testing!
+				System.out.println(theVal);// For Testing!
 				
 				//#if debug.output==verbose
 				//System.out.println("PAYLOADDATA:"+new String(message.getPayloadData())+"\nENDPLDATA\n");
