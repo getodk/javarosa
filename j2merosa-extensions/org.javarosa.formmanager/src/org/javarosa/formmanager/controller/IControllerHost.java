@@ -16,10 +16,10 @@
 
 package org.javarosa.formmanager.controller;
 
-import org.javarosa.core.api.IView;
+import org.javarosa.formmanager.view.IFormEntryView;
 
 public interface IControllerHost {
-	void setView (IView view);
+	void setView (IFormEntryView view);
 	
 	void controllerReturn (String status);
 }

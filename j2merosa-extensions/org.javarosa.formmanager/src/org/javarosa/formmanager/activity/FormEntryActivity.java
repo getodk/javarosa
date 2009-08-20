@@ -67,38 +67,12 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	/** Current running context **/
 	private FormEntryContext context;
 
-	/** The parent shell **/
-	private IShell parent;
-
-	private IFormEntryViewFactory viewFactory;
-
-	private FormLoadActivity formLoader = null;
-	
 	private int instanceID = -1;
 	
 	private IModelProcessor processor;
 
 	/** Loading error string **/
 	private final static String LOAD_ERROR = "Deepest Apologies. The form could not be loaded.";
-
-	public FormEntryActivity(IShell parent, IFormEntryViewFactory viewFactory) {
-		this.parent = parent;
-		this.viewFactory = viewFactory;
-		
-		this.formLoader = new FormLoadActivity(this);
-	}
-
-	public void contextChanged(Context context) {
-		Vector contextChanges = this.context.mergeInContext(context);
-
-		Enumeration en = contextChanges.elements();
-		while(en.hasMoreElements()) {
-			String changedValue = (String)en.nextElement();
-			if(changedValue == Constants.USER_KEY) {
-				//Do we need to update the username?
-			}
-		}
-	}
 
 	public void returnFromLoading(Context context) {
 		// get the form
@@ -122,68 +96,23 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			displayError(LOAD_ERROR);
 		}
 	}
-	
-	private IAnswerData getAnswerData(String type, Object value) 
-	{
-		if(Constants.RETURN_ARG_TYPE_DATA_POINTER_LIST.equals(type)) 
-		{
-			IDataPointer[] answers = (IDataPointer[]) value;
-			IAnswerData toReturn = new MultiPointerAnswerData(answers);
-			return toReturn;
-		} 
-		else if(Constants.RETURN_ARG_TYPE_DATA_POINTER.equals(type))
-		{
-			IDataPointer answer = (IDataPointer)value;
-			IAnswerData toReturn = new PointerAnswerData(answer);
-			return toReturn;
-		}
-		else 
-		{
-			throw new RuntimeException("Unable to build answer data for return type: " + type);
-		}
-	}
-	
+		
 	public void start (Context context) {
-		this.instanceID = -1;
 		
 		if (context instanceof FormEntryContext) {
 			this.context = (FormEntryContext) context;
 			this.instanceID = this.context.getInstanceID();
 			this.processor = this.context.getModelProcessor();
 		}
-		
-		// Start loading the form
-		this.formLoader.start(context);
-	}
-
-	public void halt () {
-		//need to do anything?
-		System.out.println("whoa, nelly! we're halting!");
-	}
-
-	public void resume (Context globalContext) {
-		// this is a hacky non-generic solution to the "pass data back to the form" problem,
-		// but can be readily modified
-		view.show();
-		Object returnArg =  globalContext.getElement(Constants.RETURN_ARG_KEY);
-		if (globalContext.getElement(Constants.RETURN_ARG_KEY) != null) {
-			String returnArgType = (String) globalContext.getElement(Constants.RETURN_ARG_TYPE_KEY);
-			IAnswerData dataBack = getAnswerData(returnArgType, returnArg);
-			
-			controller.questionAnswered(new FormElementBinding(null, model.getQuestionIndex(), model.getForm()), dataBack);
-		}
 	}
 
 	public void destroy () {
 
 	}
-
-	public void setView(IView v) {
-		parent.setDisplay(this, v);
-	}
-
 	public void controllerReturn (String status) {
 		if ("exit".equals(status)) {
+			
+			
 			Hashtable returnArgs = new Hashtable();
 
 			returnArgs.put("INSTANCE_ID", new Integer(model.getInstanceID()));
@@ -233,25 +162,5 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		//setView(alert);
 		//For some reason that I really can't figure out, this alert won't display the error text
 		alert.setCommandListener(this);
-	}
-	public Context getActivityContext() {
-		return context;
-	}
-	
-	public void setRetrievalMethod(IFormDefRetrievalMethod method) {
-		this.formLoader.setRetrievalMethod(method);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
-	 */
-	public void setShell(IShell shell) {
-		this.parent = shell;
-	}
-
-	public void annotateCommand(ICommand command) {
-		// TODO Auto-generated method stub
-		
 	}
 }

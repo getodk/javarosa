@@ -23,10 +23,9 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.Spacer;
 
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.locale.Localization;
 
-public class SendNowSendLaterForm extends Form implements IView {
+public class SendNowSendLaterForm extends Form {
 	private ChoiceGroup cg;
 
 	public static final int SEND_NOW_DEFAULT = 0;
@@ -62,10 +61,6 @@ public class SendNowSendLaterForm extends Form implements IView {
 
 	public int getCommandChoice() {
 		return this.cg.getSelectedIndex();
-	}
-
-	public Object getScreenObject() {
-		return this;
 	}
 
 }

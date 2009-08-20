@@ -21,40 +21,32 @@ import org.javarosa.formmanager.activity.FormEntryContext;
  */
 public class ModelRmsRetrievalMethod implements IFormDefRetrievalMethod {
 
+	RMSRetreivalMethod method;
+	
+	public ModelRmsRetrievalMethod(DataModelTree model) throws IOException, DeserializationException  {
+		construct(model);
+	}
+	
+	public ModelRmsRetrievalMethod(int modelId) throws DeserializationException, IOException {
+		DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility) JavaRosaServiceProvider
+			.instance().getStorageManager().getRMSStorageProvider()
+			.getUtility(DataModelTreeRMSUtility.getUtilityName());
+		
+			DataModelTree theModel = new DataModelTree();
+			
+			modelUtil.retrieveFromRMS(modelId, theModel);
+			
+			construct(theModel);
+	}
+	
+	private void construct(DataModelTree model) throws IOException, DeserializationException  {
+		method = new RMSRetreivalMethod(model.getFormId());
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.formmanager.utility.IFormDefRetrievalMethod#retreiveFormDef(org.javarosa.core.Context)
 	 */
-	public FormDef retreiveFormDef(Context context) {
-		FormEntryContext formContext = (FormEntryContext) context;
-
-		try {
-			DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility) JavaRosaServiceProvider
-					.instance().getStorageManager().getRMSStorageProvider()
-					.getUtility(DataModelTreeRMSUtility.getUtilityName());
-			IFormDataModel theModel = new DataModelTree();
-			modelUtil.retrieveFromRMS(formContext.getInstanceID(), theModel);
-			
-			int formId = theModel.getFormId();
-			
-			FormDefRMSUtility formUtil = (FormDefRMSUtility) JavaRosaServiceProvider
-					.instance().getStorageManager().getRMSStorageProvider()
-					.getUtility(FormDefRMSUtility.getUtilityName());
-			FormDef theForm = new FormDef();
-			
-			formUtil.retrieveFromRMS(formId, theForm);
-
-			if(theForm == null) {
-				throw new RuntimeException("Couldn't retrieve form From RMS based on model. FormId = " + formId + ". ModelId = " + formContext.getInstanceID());
-			}
-			
-			return theForm;
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("IO Exception while trying to load a Form from a saved Model ID. ModelId = " + formContext.getInstanceID());
-		} catch (DeserializationException uee) {
-			uee.printStackTrace();
-			throw new RuntimeException("Problem deserializing while trying to load a Form from a saved Model ID. ModelId = " + formContext.getInstanceID());
-		}
-
+	public FormDef retreiveFormDef() {
+		return method.retreiveFormDef();
 	}
 }

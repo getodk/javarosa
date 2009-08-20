@@ -16,8 +16,6 @@
 
 package org.javarosa.formmanager.view;
 
-import org.javarosa.core.api.IView;
-import org.javarosa.formmanager.activity.FormEntryContext;
 
 /**
  * 
@@ -29,10 +27,8 @@ import org.javarosa.formmanager.activity.FormEntryContext;
  */
 
 //this is generic enough to be renamed 'IActivityView'
-public interface IFormEntryView extends IView {
+public interface IFormEntryView {
 	public void destroy ();
 	
 	public void show();
-	
-	public void setContext(FormEntryContext context);
 }
