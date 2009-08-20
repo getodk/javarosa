@@ -16,6 +16,9 @@
 
 package org.javarosa.j2me.view;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
@@ -39,38 +42,33 @@ public class J2MEDisplay {
 		return display;
 	}
 	
-	public void setView (Displayable d) {
+	public static void setView (Displayable d) {
 		display.setCurrent(d);
 	}
 	
+	public static void showError (String title, String message) {
+		showError(title, message, null, null);
+	}
 	
-//    //good utility function
-//    private void showError(String title, String message) {
-//    	//#style mailAlert
-//    	Alert alert = new Alert(title, message, null, AlertType.ERROR);
-//    	alert.setTimeout(Alert.FOREVER);
-//    	//alert.setCommandListener(this);
-//    	
-//    	// Clayton Sims - Apr 27, 2009 : 
-//    	//Really not-thrilled with how this works. Unfortunately this is an instance of views not being able
-//    	//to propogate up new views. Maybe there should be a centralized way to use alerts? Or are we fine
-//    	//with using the existing elements?
-//    	Alert.setCurrent((Display)JavaRosaServiceProvider.instance().getDisplay().getDisplayObject(), alert, this);
-//    }
-//    
-//    
-//	private void showError(String s, String message) {
-//		showError(s, message, this);
-//	}
-//
-//	private void showError(String s, String message, CommandListener cl) {
-//		//#style mailAlert
-//		final Alert alert = new Alert(s, message, null, AlertType.ERROR);
-//		alert.setTimeout(Alert.FOREVER);
-//		if (cl != null) {
-//			//alert.setCommandListener(cl);
-//		}
-//		J2MEDisplay.getDisplay().setCurrent(alert, view);
-//	}
-	
+	public static Alert showError (String title, String message, Displayable next, CommandListener customListener) {
+		//#style mailAlert
+		final Alert alert = new Alert(title, message, null, AlertType.ERROR);
+		alert.setTimeout(Alert.FOREVER);
+
+		if (customListener != null) {
+			if (next != null) {
+				System.err.println("Warning: alert invoked with both custom listener and 'next' displayable. 'next' will be ignored; it must be switched to explicitly in the custom handler");
+			}
+			
+			alert.setCommandListener(customListener);
+		}
+		
+		if (next == null) {
+			display.setCurrent(alert);
+		} else {
+			display.setCurrent(alert, next);
+		}
+		
+		return alert;
+	}
 }
