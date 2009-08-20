@@ -41,9 +41,8 @@ public class FormEntryState implements State<FormEntryTransitions>, IControllerH
 	}
 	
 
-	public State<FormEntryTransitions> enter(FormEntryTransitions transitions) {
+	public void enter(FormEntryTransitions transitions) {
 		this.transitions = transitions;
-		return this;
 	}
 	
 	/* (non-Javadoc)

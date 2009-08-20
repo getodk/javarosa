@@ -39,9 +39,8 @@ public class FormBatchTransportState implements State<FormBatchTransportStateTra
 		screen = views.getMultiSubmitStatusScreen();
 	}
 
-	public State<FormBatchTransportStateTransitions> enter(FormBatchTransportStateTransitions transitions) {
+	public void enter(FormBatchTransportStateTransitions transitions) {
 		this.transitions = transitions;
-		return this;
 	}
 
 	public void start() {
