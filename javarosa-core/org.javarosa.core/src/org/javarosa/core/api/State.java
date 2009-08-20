@@ -8,6 +8,6 @@ package org.javarosa.core.api;
  *
  */
 public interface State<T extends Transitions> {
-	public State<T> enter(T transitions);
+	public void enter(T transitions);
 	public void start();
 }
