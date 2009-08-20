@@ -43,7 +43,11 @@ public class SimpleHttpTransporter implements Transporter {
 	}
 
 	public void setMessage(TransportMessage m) {
+
 		this.message = (SimpleHttpTransportMessage) m;
+		// if the message is set from a bulk sender
+		// we are sharing a connection but each message
+		// may have its own request properties
 	}
 
 	/*
@@ -56,11 +60,18 @@ public class SimpleHttpTransporter implements Transporter {
 		DataInputStream is = null;
 		OutputStream os = null;
 		try {
+			
+			System.out.println("Ready to send: "+this.message);
 
 			conn = getConnection();
+			
+			System.out.println("Connection: "+conn);
+
 
 			os = conn.openOutputStream();
 			byte[] o = (byte[]) this.message.getContent();
+			
+			System.out.println("content: "+new String(o));
 			StreamsUtil.writeToOutput(o, os);
 			os.close();
 
@@ -73,7 +84,7 @@ public class SimpleHttpTransporter implements Transporter {
 			}
 			is.close();
 			int responseCode = conn.getResponseCode();
-
+			System.out.println("response code: "+responseCode);
 			// set return information in the message
 			this.message.setResponseBody(sb.toString());
 			this.message.setResponseCode(responseCode);
@@ -83,6 +94,7 @@ public class SimpleHttpTransporter implements Transporter {
 
 			conn.close();
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Connection failed: " + e.getClass() + " : "
 					+ e.getMessage());
 			this.message.setFailureReason(e.getMessage());
@@ -121,8 +133,15 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @throws IOException
 	 */
 	private HttpConnection getConnection() throws IOException {
+		if(this.message==null)throw new RuntimeException("Null message in getConnection()");
+		
 		HttpConnection conn = (HttpConnection) Connector.open(this.message
 				.getUrl());
+		if(conn==null)throw new RuntimeException("Null conn in getConnection()");
+		if(this.message.getRequestProperties()==null)throw new RuntimeException("Null message.getRequestProperties() in getConnection()");
+		if(this.message.getContent()==null)throw new RuntimeException("Null message.getContent() in getConnection()");
+		
+		
 		conn.setRequestMethod(HttpConnection.POST);
 		conn.setRequestProperty("User-Agent", this.message
 				.getRequestProperties().getUserAgent());

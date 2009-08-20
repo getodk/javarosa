@@ -79,6 +79,8 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	public boolean isCacheable() {
 		return true;
 	}
+	
+	
 
 	/**
 	 * @return
@@ -126,7 +128,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	}
 
 	public String toString() {
-		String s = "#" + getQueueIdentifier() + " (http)";
+		String s = "#" + getCacheIdentifier() + " (http)";
 		if (getResponseCode() > 0)
 			s += " " + getResponseCode();
 		return s;

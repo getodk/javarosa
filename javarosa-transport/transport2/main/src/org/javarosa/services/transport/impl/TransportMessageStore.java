@@ -117,7 +117,7 @@ public class TransportMessageStore implements TransportCache {
 	 */
 	public String cache(TransportMessage message) throws TransportException {
 		String id = getNextQueueIdentifier();
-		message.setQueueIdentifier(id);
+		message.setCacheIdentifier(id);
 		message.setStatus(TransportMessageStatus.QUEUED);
 		Vector records = readAll(Q_STORENAME);
 		records.addElement(message);
@@ -135,10 +135,10 @@ public class TransportMessageStore implements TransportCache {
 	 */
 	public void decache(TransportMessage message) throws TransportException {
 		Vector records = readAll(Q_STORENAME);
-		TransportMessage m = find(message.getQueueIdentifier(), records);
+		TransportMessage m = find(message.getCacheIdentifier(), records);
 		if (m == null) {
 			throw new IllegalArgumentException("No queued message with id="
-					+ message.getQueueIdentifier());
+					+ message.getCacheIdentifier());
 		}
 		records.removeElement(m);
 		saveAll(records, Q_STORENAME);
@@ -176,7 +176,7 @@ public class TransportMessageStore implements TransportCache {
 	private TransportMessage find(String id, Vector records) {
 		for (int i = 0; i < records.size(); i++) {
 			TransportMessage message = (TransportMessage) records.elementAt(i);
-			if (message.getQueueIdentifier().equals(id))
+			if (message.getCacheIdentifier().equals(id))
 				return message;
 		}
 		return null;
@@ -197,7 +197,7 @@ public class TransportMessageStore implements TransportCache {
 		Vector records = readAll(Q_STORENAME);
 		for (int i = 0; i < records.size(); i++) {
 			TransportMessage message = (TransportMessage) records.elementAt(i);
-			if (message.getQueueIdentifier().equals(id))
+			if (message.getCacheIdentifier().equals(id))
 				return message;
 		}
 
@@ -205,7 +205,7 @@ public class TransportMessageStore implements TransportCache {
 		for (int i = 0; i < sentRecords.size(); i++) {
 			TransportMessage message = (TransportMessage) sentRecords
 					.elementAt(i);
-			if (message.getQueueIdentifier().equals(id))
+			if (message.getCacheIdentifier().equals(id))
 				return message;
 		}
 
@@ -319,7 +319,7 @@ public class TransportMessageStore implements TransportCache {
 		Vector records = readAll(Q_STORENAME);
 		for (int i = 0; i < records.size(); i++) {
 			TransportMessage m = (TransportMessage) records.elementAt(i);
-			if (m.getQueueIdentifier().equals(message.getQueueIdentifier())) {
+			if (m.getCacheIdentifier().equals(message.getCacheIdentifier())) {
 				m.setStatus(message.getStatus());
 				m.setFailureReason(message.getFailureReason());
 			}

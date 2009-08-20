@@ -18,12 +18,12 @@ public class TransportMessageStatus {
 		// private constructor
 	}
 	/**
-	 * the message is in a QueuingThread
+	 * the message is in a SenderThread
 	 */
 	public static final int QUEUED = 1;
 
 	/**
-	 * the message has failed in a QueuingThread and has not been sent
+	 * the message has failed in a SenderThread and has not been sent
 	 */
 	public static final int CACHED = 2;
 

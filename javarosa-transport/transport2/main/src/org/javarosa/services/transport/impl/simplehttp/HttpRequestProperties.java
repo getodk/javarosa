@@ -4,7 +4,9 @@ import java.util.Hashtable;
 
 import javax.microedition.io.HttpConnection;
 
-public class HttpRequestProperties {
+import de.enough.polish.io.Serializable;
+
+public class HttpRequestProperties implements Serializable {
  
 	
 	private String requestMethod = HttpConnection.POST;
