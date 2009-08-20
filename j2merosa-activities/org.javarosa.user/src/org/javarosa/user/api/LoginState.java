@@ -31,12 +31,11 @@ public class LoginState implements State<LoginStateTransitions>, CommandListener
 		
 	}
 
-	public State<LoginStateTransitions> enter(LoginStateTransitions transitions) {
+	public void enter(LoginStateTransitions transitions) {
 		this.transitions = transitions;
 		view = new LoginForm();
 		view.setCommandListener(this);
 		view.setPasswordMode(LoginContext.PASSWORD_FORMAT_NUMERIC);
-		return this;
 	}
 	
 	public void start() {

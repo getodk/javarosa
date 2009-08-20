@@ -54,9 +54,8 @@ public class EditUserState implements State<EditUserStateTransitions>, CommandLi
 		view.loadUser(userToEdit);
 	}
 
-	public State<EditUserStateTransitions> enter(EditUserStateTransitions transitions) {
+	public void enter(EditUserStateTransitions transitions) {
 		this.transitions = transitions;
-		return this;
 	}
 
 	public void start() {

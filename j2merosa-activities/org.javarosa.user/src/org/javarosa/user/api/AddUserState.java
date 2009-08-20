@@ -45,9 +45,8 @@ public class AddUserState implements State<AddUserStateTransitions>, CommandList
 
 	}
 	
-	public State<AddUserStateTransitions> enter(AddUserStateTransitions transitions) {
+	public void enter(AddUserStateTransitions transitions) {
 		 this.transitions = transitions;
-		 return this;
 	}
 
 	public void start() {
