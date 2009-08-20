@@ -47,6 +47,9 @@ public class SMSTransportMessage extends BasicTransportMessage implements
 	public boolean isCacheable() {
 		return false;
 	}
+	public boolean isShareTransporter(){
+		return false;
+	}
 
 	/**
 	 * 

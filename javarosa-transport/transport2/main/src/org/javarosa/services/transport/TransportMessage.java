@@ -35,13 +35,15 @@ public interface TransportMessage extends Serializable {
 	/**
 	 * 
 	 * Some transport types can sensibly make use of the TransportService's
-	 * persistent store (e.g. http), some others not (e.g. sms).
+	 * persistent store (e.g. http), some others not (e.g. sms) so that
+	 * when transport fails, messages are cached to be retried later
 	 * 
 	 * This method returns true if this kind of Message is cacheable
 	 * 
 	 * @return
 	 */
 	boolean isCacheable();
+	
 	
 	/**
 	 * ¨
@@ -86,31 +88,31 @@ public interface TransportMessage extends Serializable {
 
 	/**
 	 * 
-	 * Every message is persisted in the message queue before any attempt is
-	 * made to send it When persisted in the message queue, it is given a unique
+	 * Every message is persisted in the transport cache before any attempt is
+	 * made to send it When persisted in the transport cache, it is given a unique
 	 * id
 	 * 
-	 * @return The queue-unique identifier assigned to the message
+	 * @return The cache-unique identifier assigned to the message
 	 */
-	String getQueueIdentifier();
+	String getCacheIdentifier();
 
 	/**
 	 * @param id
 	 */
-	void setQueueIdentifier(String id);
+	void setCacheIdentifier(String id);
 
 	/**
 	 * 
-	 * The TransportService first tries to send a message in a QueuingThread.
+	 * The TransportService first tries to send a message in a SenderThread.
 	 * 
-	 * This poses an issue: if the QueuingThread is interrupted unexpectedly, a
-	 * TransportMessage could be stuck with a QUEUED status and never get onto
+	 * This poses an issue: if the SenderThread is interrupted unexpectedly, a
+	 * TransportMessage could be stuck with a CACHED status and never get onto
 	 * the CACHED list to be sent via the "sendCached" method
 	 * 
 	 * To prevent Messages being stuck with a QUEUED status, a time-limit is
 	 * set, after which they are considered to be CACHED
 	 */
-	void setQueuingDeadline(long time);
+	void setSendingThreadDeadline(long time);
 
 	/**
 	 * @return The time at which the TransportService concludes that the message

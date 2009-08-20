@@ -2,12 +2,14 @@ package org.javarosa.services.transport;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.TransportMessageStore;
-import org.javarosa.services.transport.senders.BulkSender;
+import org.javarosa.services.transport.senders.TransporterSharingSender;
 import org.javarosa.services.transport.senders.SenderThread;
 import org.javarosa.services.transport.senders.SimpleSenderThread;
 
@@ -18,9 +20,8 @@ import org.javarosa.services.transport.senders.SimpleSenderThread;
  * To define a new kind of transport, it is necessary to implement two
  * interfaces:
  * <ol>
- * <li>TransportMessage
- * <li>Transporter - an object with the ability to send one of the new kinds of
- * message
+ * <li>TransportMessage - a new kind of message
+ * <li>Transporter - an object with the ability to send one of the new messages
  * </ol>
  * 
  * A TransportMessage must be able to create an appropriate Transporter (via the
@@ -38,7 +39,7 @@ import org.javarosa.services.transport.senders.SimpleSenderThread;
  * 
  * <code>
  * TransportMessage m = new SomeTransportMessage() 
- * new TransportService().send(m);
+ * TransportService.send(m);
  * </code>
  * 
  */
@@ -46,11 +47,11 @@ public class TransportService {
 
 	/**
 	 * 
-	 * The TransportService has a messageStore, in which all messages to be sent
-	 * are persisted immediately
+	 * The TransportService has a cache, in which all messages to be sent are
+	 * persisted immediately
 	 * 
 	 */
-	private static TransportMessageStore MESSAGE_STORE = new TransportMessageStore();
+	private static TransportMessageStore CACHE = new TransportMessageStore();
 
 	/**
 	 * 
@@ -62,13 +63,13 @@ public class TransportService {
 	 * <ol>
 	 * <li>The message creates an appropriate Transporter (which contains the
 	 * message)
-	 * <li>The message is given a QueuingDeadline, equal to the maximum time it
-	 * can spend in a QueuingThread
-	 * <li>The message is persisted in the Message Store
-	 * <li>A QueuingThread is started, which tries and retries the Transporter's
+	 * <li>The message is given a SenderDeadline, equal to the maximum time it
+	 * can spend in a SenderThread
+	 * <li>The message is persisted in the cache
+	 * <li>A SenderThread is started, which tries and retries the Transporter's
 	 * send method until either the specified number of tries are exhausted, or
 	 * the message is successfully sent
-	 * <li>The QueuingThread is returned
+	 * <li>The SenderThread is returned
 	 * </ol>
 	 * 
 	 * @param message
@@ -100,20 +101,23 @@ public class TransportService {
 		Transporter transporter = message.createTransporter();
 
 		// create a sender thread
-		SenderThread thread = new SimpleSenderThread(transporter,
-				MESSAGE_STORE, tries, delay);
+		SenderThread thread = new SimpleSenderThread(transporter, CACHE, tries,
+				delay);
 
+		// if the message should be stored and never lost
 		if (message.isCacheable()) {
 
-			// record the deadline for the queuing phase in the message
-			message.setQueuingDeadline(getQueuingDeadline(thread.getTries(),
-					thread.getDelay()));
+			// record the deadline for the sending thread phase in the message
+			message.setSendingThreadDeadline(getSendingThreadDeadline(thread
+					.getTries(), thread.getDelay()));
 
-			// persist the message
-			MESSAGE_STORE.cache(message);
+			synchronized (CACHE) {
+				// persist the message
+				CACHE.cache(message);
+			}
 		}
 
-		// start the queuing phase
+		// start the sender thread
 		thread.start();
 
 		// return the sender thread in case
@@ -128,23 +132,29 @@ public class TransportService {
 	 */
 	public static TransportMessage sendBlocking(TransportMessage message)
 			throws TransportException {
+
+		// if the message should be saved in case of sending failure
 		if (message.isCacheable()) {
 			// persist the message
-			MESSAGE_STORE.cache(message);
+			CACHE.cache(message);
 		}
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
 
 		transporter.setMessage(message);
-
+		// and get the transporter to try to send the message
 		transporter.send();
 
+		// if the message had been cached..
 		if (message.isCacheable()) {
+
 			if (message.getStatus() == TransportMessageStatus.SENT) {
-				MESSAGE_STORE.decache(message);
+				// if it was sent successfully, then remove it from cache
+				CACHE.decache(message);
 			} else {
+				// otherwise, set the status to cached
 				message.setStatus(TransportMessageStatus.CACHED);
-				MESSAGE_STORE.updateMessage(message);
+				CACHE.updateMessage(message);
 			}
 		}
 		return message;
@@ -162,29 +172,37 @@ public class TransportService {
 	 */
 	public static void sendCached(TransportListener listener)
 			throws TransportException {
+
+		// get all the cached messages
 		Vector messages = getCachedMessages();
+
 		if (messages.size() > 0) {
-			// create an appropriate transporter
+
+			// create one appropriate transporter (to share a connection, for
+			// example)
 			TransportMessage m = (TransportMessage) messages.elementAt(0);
+
 			Transporter transporter = m.createTransporter();
-			BulkSender sender = new BulkSender(transporter, messages,
-					MESSAGE_STORE, listener);
+			// get a bulk sender to use the transporter to send all messages
+			TransporterSharingSender sender = new TransporterSharingSender(
+					transporter, messages, CACHE, listener);
 
 			sender.send();
 
 		}
-		throw new TransportException("No cached messages to send");
+		//throw new TransportException("No cached messages to send");
 	}
 
 	/**
 	 * 
-	 * Compute the lifetime of a queuing thread with the given parameters
+	 * Compute the lifetime of a sending thread with the given parameters and
+	 * returns the time in the future at which this duration would have elapsed
 	 * 
 	 * @param tries
 	 * @param delay
 	 * @return
 	 */
-	private static long getQueuingDeadline(int tries, int delay) {
+	private static long getSendingThreadDeadline(int tries, int delay) {
 		long duration = (new Long(tries).longValue()
 				* new Long(delay).longValue() * 1000);
 		long now = new Date().getTime();
@@ -195,14 +213,14 @@ public class TransportService {
 	 * @return
 	 */
 	public static Vector getCachedMessages() {
-		return MESSAGE_STORE.getCachedMessages();
+		return CACHE.getCachedMessages();
 	}
 
 	/**
 	 * @return
 	 */
 	public static int getCachedMessagesSize() {
-		return MESSAGE_STORE.getCachedMessagesCount();
+		return CACHE.getCachedMessagesCount();
 	}
 
 	/**
@@ -217,7 +235,7 @@ public class TransportService {
 	 *         message was found)
 	 */
 	public static TransportMessage retrieve(String id) {
-		return MESSAGE_STORE.findMessage(id);
+		return CACHE.findMessage(id);
 	}
 
 }

@@ -33,7 +33,7 @@ public abstract class BasicTransportMessage implements TransportMessage {
 		return queuingDeadline;
 	}
 
-	public void setQueuingDeadline(long queuingDeadline) {
+	public void setSendingThreadDeadline(long queuingDeadline) {
 		this.queuingDeadline = queuingDeadline;
 	}
 
@@ -89,11 +89,11 @@ public abstract class BasicTransportMessage implements TransportMessage {
 		this.failureCount++;
 	}
 
-	public String getQueueIdentifier() {
+	public String getCacheIdentifier() {
 		return queueIdentifier;
 	}
 
-	public void setQueueIdentifier(String queueIdentifier) {
+	public void setCacheIdentifier(String queueIdentifier) {
 		this.queueIdentifier = queueIdentifier;
 	}
 

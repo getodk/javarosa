@@ -8,7 +8,7 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
 
 /**
  * 
- * A QueuingThread takes a Transporter object and calls its send method
+ * A SimpleSenderThread takes a Transporter object and calls its send method
  * repeatedly until it succeeds, over a given number of tries, with a given
  * delay between each try
  * 
@@ -55,11 +55,11 @@ public class SimpleSenderThread extends SenderThread {
 				this.messageStore.updateMessage(message);
 			} catch (Exception e) {
 				e.printStackTrace();
-				// if this update fails, the QUEUED status
+				// if this update fails, the CACHED status
 				// isn't permanent (the message doesn't fall through
-				// a gap) because we note the duration of the QueuingThread
-				// and, should a message be found with the status QUEUED
-				// and yet was created before (now-queuing thread duration)
+				// a gap) because we note the duration of the SenderThread
+				// and, should a message be found with the status CACHED
+				// and yet was created before (now-sender thread duration)
 				// then it is considered to have the CACHED status
 			}
 		}

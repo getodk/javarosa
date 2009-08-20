@@ -7,11 +7,10 @@ import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.TransportException;
-import org.javarosa.services.transport.impl.TransportMessageStore;
 
 /**
  * 
- * A QueuingThread takes a Transporter object and calls its send method
+ * A SenderThread takes a Transporter object and calls its send method
  * repeatedly until it succeeds, over a given number of tries, with a given
  * delay between each try
  * 
@@ -85,6 +84,8 @@ public abstract class SenderThread extends Thread {
 		this.delay = delay;
 	}
 
+	protected abstract void send();
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -93,8 +94,6 @@ public abstract class SenderThread extends Thread {
 	public void run() {
 		send();
 	}
-
-	protected abstract void send();
 
 	/**
 	 * 
@@ -119,7 +118,7 @@ public abstract class SenderThread extends Thread {
 	}
 
 	/**
-	 * If the message has been successfully sent, it should be removed from the
+	 * If the message has been successfully sent, and had been cached, it should be removed from the
 	 * TransportQueue
 	 * 
 	 * @param message
@@ -161,23 +160,38 @@ public abstract class SenderThread extends Thread {
 		return delay;
 	}
 
+	/**
+	 * @param listener
+	 */
 	public void addListener(TransportListener listener) {
 		this.listeners.addElement(listener);
 	}
 
+	/**
+	 * @param message
+	 * @param remark
+	 */
 	public void notifyChange(TransportMessage message, String remark) {
 		for (int i = 0; i < this.listeners.size(); i++) {
 			((TransportListener) this.listeners.elementAt(i)).onChange(message,
 					remark);
 		}
 	}
+
+	/**
+	 * @param message
+	 */
 	public void notifyStatusChange(TransportMessage message) {
 		for (int i = 0; i < this.listeners.size(); i++) {
-			((TransportListener) this.listeners.elementAt(i)).onStatusChange(message);
+			((TransportListener) this.listeners.elementAt(i))
+					.onStatusChange(message);
 		}
 	}
-	
-	public void cancel(){
+
+	/**
+	 * 
+	 */
+	public void cancel() {
 		this.interrupt();
 	}
 
