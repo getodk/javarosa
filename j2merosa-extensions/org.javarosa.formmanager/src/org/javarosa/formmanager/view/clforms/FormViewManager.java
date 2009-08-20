@@ -276,16 +276,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				if (counter > 0) {
 					// show alert
 					String txt = "There are unanswered compulsory questions and must be completed first to proceed";
-					final Alert alert = new Alert("Question Required!", txt,
-							null, AlertType.ERROR);
-					controller.setView(new IFormEntryView() {
-						public void destroy() {}
-
-						public void show() {
-							J2MEDisplay.set
-						}
-						
-					});
+					J2MEDisplay.showError("Question Required!", txt);
 				} else
 					model.setFormComplete();
 				// controller.exit();
@@ -298,18 +289,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				} else {
 					String txt = Localization.get(
 							"view.sending.FormUneditable");
-
-					// #style CL_Forms_Form
-					final Alert alert = new Alert("Cannot Edit Answers!", txt,
-							null, AlertType.ERROR);
-					controller.setView(new IFormEntryView() {
-						public void destroy() {}
-
-						public void show() {
-							// TODO Auto-generated method stub
-							J2MEDisplay.
-						}
-					});
+					J2MEDisplay.showError("Cannot Edit Answers!", txt);
 				}
 			}
 
@@ -326,29 +306,13 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 //							"view.sending.CompulsoryQuestionsIncomplete");
 					
 					String txt = "Validation failure: data is not of the correct format.";
-					// #style CL_Forms_Form
-					final Alert alert = new Alert("Question Required!", txt,
-							null, AlertType.ERROR);
-					controller.setView(new IView() {
-						public Object getScreenObject() {
-							return alert;
-						}
-					});
-
+					
+					J2MEDisplay.showError("Question Required!", txt);
 				} else if (result == controller.QUESTION_REQUIRED_BUT_EMPTY) {
-//					System.out.println("answer required but empty");
-
 //					String txt = Locale.get(
 //							"view.sending.CompulsoryQuestionsIncomplete");
 					String txt = "This question is compulsory. You must answer it.";
-					// #style CL_Forms_Form
-					final Alert alert = new Alert("Question Required!", txt,
-							null, AlertType.ERROR);
-					controller.setView(new IView() {
-						public Object getScreenObject() {
-							return alert;
-						}
-					});
+					J2MEDisplay.showError("Question Required!", txt);
 				}
 		
 			} else if (command == SingleQuestionScreen.previousCommand) {

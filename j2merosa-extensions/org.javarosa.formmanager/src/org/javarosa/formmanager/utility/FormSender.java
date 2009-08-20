@@ -26,8 +26,7 @@ import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
-import org.javarosa.formmanager.activity.FormTransportActivity;
-import org.javarosa.formmanager.view.ISubmitStatusScreen;
+import org.javarosa.formmanager.view.ISubmitStatusObserver;
 import org.javarosa.formmanager.view.transport.FormTransportSubmitStatusScreen;
 import org.javarosa.formmanager.view.transport.FormTransportViews;
 import org.javarosa.formmanager.view.transport.MultiSubmitStatusScreen;
@@ -67,7 +66,7 @@ public class FormSender implements Runnable {
 	 */
 	private ITransportDestination destination;
 	
-	private ISubmitStatusScreen observer;
+	private ISubmitStatusObserver observer;
 	
 	private FormTransportViews views;
 
@@ -195,7 +194,7 @@ public class FormSender implements Runnable {
 
 	// ----------- getters and setters
 	
-	public void setObserver(ISubmitStatusScreen o) {
+	public void setObserver(ISubmitStatusObserver o) {
 		this.observer = o;
 	}
 	public DataModelTree getData() {
@@ -243,7 +242,7 @@ public class FormSender implements Runnable {
 			catch(IOException e) {
 				e.printStackTrace();
 				if(observer != null) {
-					observer.receiveMessage(ISubmitStatusScreen.ERROR, e.getMessage());
+					observer.receiveMessage(ISubmitStatusObserver.ERROR, e.getMessage());
 				}
 			}
 
@@ -254,7 +253,7 @@ public class FormSender implements Runnable {
 			catch(IOException e) {
 				e.printStackTrace();
 				if(observer != null) {
-					observer.receiveMessage(ISubmitStatusScreen.ERROR, e.getMessage());
+					observer.receiveMessage(ISubmitStatusObserver.ERROR, e.getMessage());
 				}
 			}
 		}

@@ -30,7 +30,7 @@ import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.transport.TransportMessage;
 
-public class SubmitStatusScreen extends Form implements ISubmitStatusScreen {
+public class SubmitStatusScreen extends Form implements ISubmitStatusObserver {
 	private int modelID;
     private StringItem msg;
     private Command okCommand;

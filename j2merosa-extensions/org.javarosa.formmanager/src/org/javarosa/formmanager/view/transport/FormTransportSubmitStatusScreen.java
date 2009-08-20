@@ -30,18 +30,15 @@ import javax.microedition.lcdui.StringItem;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.transport.TransportMessage;
-import org.javarosa.formmanager.activity.FormTransportActivity;
-import org.javarosa.formmanager.view.ISubmitStatusScreen;
+import org.javarosa.formmanager.view.ISubmitStatusObserver;
 
 public class FormTransportSubmitStatusScreen extends Form implements
-		ISubmitStatusScreen, CommandListener {
+		ISubmitStatusObserver, CommandListener {
 	private int modelID = -1;
 	private StringItem msg;
 	private Command okCommand;
 	private Timer timer;
 	private int counter = 0;
-
-	private FormTransportActivity activity;
 
 	private static final int REFRESH_INTERVAL = 1000;
 	private static final int TIMEOUT = 60000;
@@ -50,9 +47,6 @@ public class FormTransportSubmitStatusScreen extends Form implements
 		//#style submitPopup
 		super(Localization.get("sending.status.title"));
 		setCommandListener(this);
-
-		
-		this.activity = (FormTransportActivity) activity;
 	}
 
 	
@@ -71,8 +65,6 @@ public class FormTransportSubmitStatusScreen extends Form implements
 	
 	
 	public void commandAction(Command c, Displayable d) {
-		//destroy status screen was here
-		this.activity.returnComplete();
 	}
 
 	private void initTimer() {
@@ -157,10 +149,6 @@ public class FormTransportSubmitStatusScreen extends Form implements
 		// terribly robust
 
 		return receipt;
-	}
-
-	public Object getScreenObject() {
-		return this;
 	}
 
 	public void setModelID(int modelID) {

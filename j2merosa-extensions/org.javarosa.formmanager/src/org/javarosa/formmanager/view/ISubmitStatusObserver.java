@@ -16,7 +16,7 @@
 
 package org.javarosa.formmanager.view;
 
-public interface ISubmitStatusScreen {
+public interface ISubmitStatusObserver {
 	/**
 	 * Destroys the current status screen and cleans up any running
 	 * processes.
