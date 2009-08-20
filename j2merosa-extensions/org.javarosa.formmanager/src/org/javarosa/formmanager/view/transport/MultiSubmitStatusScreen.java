@@ -30,8 +30,7 @@ import javax.microedition.lcdui.StringItem;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.transport.TransportMessage;
-import org.javarosa.formmanager.activity.FormTransportActivity;
-import org.javarosa.formmanager.view.ISubmitStatusScreen;
+import org.javarosa.formmanager.view.ISubmitStatusObserver;
 
 /**
  * Note: This screen assumes that the model IDs provided will be sent in a more
@@ -42,7 +41,7 @@ import org.javarosa.formmanager.view.ISubmitStatusScreen;
  * 
  */
 public class MultiSubmitStatusScreen extends Form implements
-		ISubmitStatusScreen, CommandListener {
+		ISubmitStatusObserver, CommandListener {
 
 	private static final int REFRESH_INTERVAL = 1000;
 	private static final int TIMEOUT = 180000;
@@ -54,8 +53,6 @@ public class MultiSubmitStatusScreen extends Form implements
 	private int counter = 0;
 	private int[] modelIDs;
 	private int failed = 0;
-
-	private FormTransportActivity activity;
 
 	/**
 	 * @param listener
@@ -69,7 +66,6 @@ public class MultiSubmitStatusScreen extends Form implements
 
 		addCommand(new Command(Localization.get("menu.ok"), Command.OK, 1));
 
-		this.activity = (FormTransportActivity) listener;
 	}
 
 	public void reinit(int[] ids) {
@@ -110,9 +106,6 @@ public class MultiSubmitStatusScreen extends Form implements
 	}
 
 	public void commandAction(Command c, Displayable d) {
-
-		// only command is ok
-		this.activity.returnComplete();
 	}
 
 	/**
@@ -271,15 +264,6 @@ public class MultiSubmitStatusScreen extends Form implements
 		    	failure.setText(Localization.get("sending.status.error") + ": " + details);
 				this.append(failure);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.javarosa.core.api.IView#getScreenObject()
-	 */
-	public Object getScreenObject() {
-		return this;
 	}
 
 	public int[] getModelIDs() {

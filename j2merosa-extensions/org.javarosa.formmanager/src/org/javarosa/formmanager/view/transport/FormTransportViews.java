@@ -19,37 +19,33 @@ package org.javarosa.formmanager.view.transport;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Choice;
+import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.List;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.formmanager.activity.FormTransportActivity;
 
 public class FormTransportViews {
-	FormTransportActivity activity;
 	// ----------- subviews
-	private FormTransportMainMenu mainMenu;
-	private FormTransportMessageList messageList;
+//	private FormTransportMainMenu mainMenu;
+//	private FormTransportMessageList messageList;
 	private TextBox loggingTextBox;
-	private FormTransportMessageDetailBox messageDetailTextBox;
+//	private FormTransportMessageDetailBox messageDetailTextBox;
 	private SendNowSendLaterForm sendNowSendLater;
 	private FormTransportSubmitStatusScreen submitStatusScreen;
 	private MultiSubmitStatusScreen multiSubmitStatusScreen;
 
-	public FormTransportViews(FormTransportActivity activity) {
+	public FormTransportViews(CommandListener observer) {
 		super();
-		this.activity = activity;
-		this.mainMenu = constructMainMenu();
-		this.messageList = new FormTransportMessageList(this.activity);
+//		this.mainMenu = constructMainMenu(observer);
+//		this.messageList = new FormTransportMessageList(observer);
 		this.loggingTextBox = createLoggingTextBox();
-		this.messageDetailTextBox = new FormTransportMessageDetailBox(
-				this.activity);
-		this.sendNowSendLater = new SendNowSendLaterForm(this.activity);
-		this.submitStatusScreen = new FormTransportSubmitStatusScreen(
-				this.activity);
+//		this.messageDetailTextBox = new FormTransportMessageDetailBox(observer);
+		this.sendNowSendLater = new SendNowSendLaterForm(observer);
+		this.submitStatusScreen = new FormTransportSubmitStatusScreen(observer);
 
-		this.multiSubmitStatusScreen = new MultiSubmitStatusScreen(this.activity);
+		this.multiSubmitStatusScreen = new MultiSubmitStatusScreen(observer);
 
 	}
 
@@ -60,39 +56,35 @@ public class FormTransportViews {
 		return box;
 
 	}
-
-	private FormTransportMainMenu constructMainMenu() {
-		Vector mainMenuItems = FormTransportMainMenu.getMenuItems();
-		String[] elements = new String[mainMenuItems.size()];
-		mainMenuItems.copyInto(elements);
-		return new FormTransportMainMenu(this.activity,
-				Localization.get("menu.transport"), Choice.IMPLICIT, elements, null);
-
-	}
+//
+//	private FormTransportMainMenu constructMainMenu(CommandListener observer) {
+//		Vector mainMenuItems = FormTransportMainMenu.getMenuItems();
+//		String[] elements = new String[mainMenuItems.size()];
+//		mainMenuItems.copyInto(elements);
+//		return new FormTransportMainMenu(observer,
+//				Localization.get("menu.transport"), Choice.IMPLICIT, elements, null);
+//
+//	}
 
 	public void destroyStatusScreen() {
 		this.submitStatusScreen.destroy();
 	}
 
-	public FormTransportActivity getActivity() {
-		return this.activity;
-	}
-
-	public List getMainMenu() {
-		return this.mainMenu;
-	}
-
-	public FormTransportMessageList getMessageList() {
-		return this.messageList;
-	}
-
-	public TextBox getLoggingTextBox() {
-		return this.loggingTextBox;
-	}
-
-	public TextBox getMessageDetailTextBox() {
-		return this.messageDetailTextBox;
-	}
+//	public List getMainMenu() {
+//		return this.mainMenu;
+//	}
+//
+//	public FormTransportMessageList getMessageList() {
+//		return this.messageList;
+//	}
+//
+//	public TextBox getLoggingTextBox() {
+//		return this.loggingTextBox;
+//	}
+//
+//	public TextBox getMessageDetailTextBox() {
+//		return this.messageDetailTextBox;
+//	}
 
 	public SendNowSendLaterForm getSendNowSendLaterScreen() {
 		return this.sendNowSendLater;
