@@ -1,95 +1,43 @@
 /**
  * 
  */
-package org.javarosa.forms.review.activity;
+package org.javarosa.forms.review.api;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Hashtable;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import org.javarosa.core.Context;
-import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IActivity;
-import org.javarosa.core.api.ICommand;
-import org.javarosa.core.api.IShell;
-import org.javarosa.core.api.IView;
+import org.javarosa.core.api.State;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.forms.review.api.transitions.ReviewSelectionStateTransitions;
 import org.javarosa.forms.review.util.DataModelDateFilter;
+import org.javarosa.j2me.view.J2MEDisplay;
+
 
 /**
  * @author ctsims
  *
  */
-public class SelectReviewPeriodActivity implements IActivity, CommandListener {
-	
+public class ReviewSelectionState implements State<ReviewSelectionStateTransitions>, CommandListener {
+
 	private static Command BACK = new Command("Back", Command.BACK, 1);
 	
-	IShell shell;
-	
+	ReviewSelectionStateTransitions transitions;
 	List options;
-	
-	Context context;
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
-	 */
-	public void annotateCommand(ICommand command) {
-		throw new RuntimeException("Command annotation is unsupported by the Select Review Period Activity");
-	}
 
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#contextChanged(org.javarosa.core.Context)
-	 */
-	public void contextChanged(Context globalContext) {
-		this.context.mergeInContext(globalContext);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#destroy()
-	 */
-	public void destroy() {
-		options = null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#getActivityContext()
-	 */
-	public Context getActivityContext() {
-		return context;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#halt()
-	 */
-	public void halt() {
-		//nothing
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#resume(org.javarosa.core.Context)
-	 */
-	public void resume(Context globalContext) {
-		startDisplay();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
-	 */
-	public void setShell(IShell shell) {
-		this.shell = shell;
+	public void enter(ReviewSelectionStateTransitions transitions) {
+		this.transitions = transitions;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IActivity#start(org.javarosa.core.Context)
 	 */
-	public void start(Context context) {
-		this.context = context;
+	public void start() {
 		startDisplay();
 	}
 	
@@ -132,26 +80,18 @@ public class SelectReviewPeriodActivity implements IActivity, CommandListener {
 		options.addCommand(BACK);
 		
 		options.setCommandListener(this);
-		shell.setDisplay(this, new IView() {
-			public Object getScreenObject() {
-				// TODO Auto-generated method stub
-				return options;
-			}
-			
-		});
+		J2MEDisplay.setView(options);
 	}
 
 	public void commandAction(Command c, Displayable d) {
-		Hashtable returnArgs = new Hashtable();
 		if(c == BACK ) {
-			shell.returnFromActivity(this,Constants.ACTIVITY_CANCEL, returnArgs);
+			transitions.back();
 		} else {
 			int index = options.getSelectedIndex();
 			if(index == -1) {
 				System.out.println("How did we do this???");
 			} else {
-				returnArgs.put(Constants.RETURN_ARG_KEY, getFilterForOption(index));
-				shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+				transitions.filterSelected(getFilterForOption(index));
 			}
 		}
 	}
