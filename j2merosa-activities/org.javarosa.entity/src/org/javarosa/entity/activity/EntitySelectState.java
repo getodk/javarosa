@@ -15,8 +15,9 @@ package org.javarosa.entity.activity;
  * the License.
  */
 
-import java.util.Hashtable;
 import java.util.Vector;
+
+import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
@@ -26,13 +27,12 @@ import org.javarosa.entity.model.IEntity;
 import org.javarosa.entity.model.view.EntitySelectDetailPopup;
 import org.javarosa.entity.model.view.EntitySelectView;
 import org.javarosa.entity.util.IEntityFilter;
-
-import com.sun.j2me.global.Constants;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 public class EntitySelectState implements State<EntitySelectTransitions> {
 	private EntitySelectTransitions transitions;
 	
-	private IView activeView;
+	private Displayable activeView;
 	private EntitySelectView selView;
 	
 	private RMSUtility entityRMS;
@@ -58,7 +58,7 @@ public class EntitySelectState implements State<EntitySelectTransitions> {
 		this.filter = filter;
 
 		selView = new EntitySelectView(this, title, entityPrototype.entityType(), newMode);
-		selView.setStyleKey(styleKey); //what is this?
+		selView.setStyleKey(styleKey); //droos: what is this?
 	}
 
 	public void enter (EntitySelectTransitions transitions) {
@@ -98,9 +98,9 @@ public class EntitySelectState implements State<EntitySelectTransitions> {
 		}
 	}
 	
-	public void setView (IView view) {
+	public void setView (Displayable view) {
 		activeView = view;
-		parent.setDisplay(this, view); //TODO: how do we set displays now?
+		J2MEDisplay.setView(view);
 	}
 
 	public void newEntity (int newEntityID) {

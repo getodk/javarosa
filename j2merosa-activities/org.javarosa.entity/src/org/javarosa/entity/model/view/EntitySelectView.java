@@ -34,7 +34,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 import de.enough.polish.ui.UiAccess;
 
-public class EntitySelectView extends FramedForm implements IView, ItemStateListener, CommandListener {
+public class EntitySelectView extends FramedForm implements ItemStateListener, CommandListener {
 	//#if javarosa.patientselect.formfactor == nokia-s40 or javarosa.patientselect.formfactor == sony-k610i
 	//# private static final int MAX_ROWS_ON_SCREEN = 5;
 	//# private static final int SCROLL_INCREMENT = 4;	
@@ -119,10 +119,6 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 	public void show () {
 		this.setActiveFrame(Graphics.BOTTOM);
 		controller.setView(this);
-	}
-	
-	public Object getScreenObject() {
-		return this;
 	}
 	
 	public void setStyleKey(String key) {
@@ -347,7 +343,7 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 		refresh();
 	}
 	
-	//can't believe i'm writing a fucking sort function
+	//can't believe i'm writing a .. sort function
 	private void sortRows () {
 		for (int i = rowIDs.size() - 1; i > 0; i--) {
 			for (int j = 0; j < i; j++) {

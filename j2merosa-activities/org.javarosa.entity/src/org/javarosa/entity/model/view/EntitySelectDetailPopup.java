@@ -31,7 +31,7 @@ import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Form;
 import de.enough.polish.ui.StringItem;
 
-public class EntitySelectDetailPopup extends Form implements IView, CommandListener {
+public class EntitySelectDetailPopup extends Form implements CommandListener {
 	EntitySelectState psa;
 	
 	int recordID;
@@ -72,10 +72,6 @@ public class EntitySelectDetailPopup extends Form implements IView, CommandListe
 	
 	public void show () {
 		psa.setView(this);
-	}
-
-	public Object getScreenObject() {
-		return this;
 	}
 
 	public void commandAction(Command cmd, Displayable d) {

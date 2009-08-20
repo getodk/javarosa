@@ -29,7 +29,7 @@ import de.enough.polish.ui.Form;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
 
-public class EntitySelectSortPopup extends Form implements IView, CommandListener, ItemStateListener {
+public class EntitySelectSortPopup extends Form implements CommandListener, ItemStateListener {
 	private EntitySelectView psv;
 	private EntitySelectState psa;
 	
@@ -54,10 +54,6 @@ public class EntitySelectSortPopup extends Form implements IView, CommandListene
 		addCommand(cancelCmd);
 		setCommandListener(this);
     }
-
-	public Object getScreenObject() {
-		return this;
-	}
     
     public void show () {
     	psa.setView(this);
