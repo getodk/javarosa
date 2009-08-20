@@ -21,7 +21,6 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 
-import org.javarosa.core.api.IView;
 import org.javarosa.core.model.data.IAnswerData;
 
 /**
@@ -31,7 +30,7 @@ import org.javarosa.core.model.data.IAnswerData;
  * 
  */
 public abstract class AcquireScreen extends Form
-		implements IView, CommandListener {
+		implements CommandListener {
 
 	private AcquiringQuestionScreen questionScreen;
 	private CommandListener listenerToReturnTo;
@@ -90,15 +89,6 @@ public abstract class AcquireScreen extends Form
 	 *         attempt to return the acquired data as answer data
 	 */
 	protected abstract Command getSetCallingScreenDataCommand();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.javarosa.core.api.IView#getScreenObject()
-	 */
-	public Object getScreenObject() {
-		return this;
-	}
 
 	/**
 	 * @return the question screen for which data is being acquired

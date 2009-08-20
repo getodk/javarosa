@@ -27,7 +27,6 @@ import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.List;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
@@ -50,6 +49,7 @@ import org.javarosa.formmanager.view.clforms.widgets.Select1QuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.SelectQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TextQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TimeQuestionWidget;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 		CommandListener, ItemCommandListener {
@@ -278,10 +278,13 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 					String txt = "There are unanswered compulsory questions and must be completed first to proceed";
 					final Alert alert = new Alert("Question Required!", txt,
 							null, AlertType.ERROR);
-					controller.setView(new IView() {
-						public Object getScreenObject() {
-							return alert;
+					controller.setView(new IFormEntryView() {
+						public void destroy() {}
+
+						public void show() {
+							J2MEDisplay.set
 						}
+						
 					});
 				} else
 					model.setFormComplete();
@@ -299,9 +302,12 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 					// #style CL_Forms_Form
 					final Alert alert = new Alert("Cannot Edit Answers!", txt,
 							null, AlertType.ERROR);
-					controller.setView(new IView() {
-						public Object getScreenObject() {
-							return alert;
+					controller.setView(new IFormEntryView() {
+						public void destroy() {}
+
+						public void show() {
+							// TODO Auto-generated method stub
+							J2MEDisplay.
 						}
 					});
 				}
@@ -398,10 +404,6 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 
 	public void setShowOverView(boolean showOverView) {
 		this.showFormView = showOverView;
-	}
-
-	public Object getScreenObject() {
-		return parent.getScreenObject();
 	}
 
 	public void startOfForm() {

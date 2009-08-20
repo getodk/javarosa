@@ -27,14 +27,12 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import org.javarosa.core.api.ICommand;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.Map;
 import org.javarosa.formmanager.activity.FormListActivity;
 
  
-public class FormList extends List implements CommandListener, IView {
+public class FormList extends List implements CommandListener {
 	
 	private final static Command CMD_EXIT = new Command(Localization.get("menu.Exit"), Command.BACK, 2);
 	private final static Command CMD_GETNEWFORMS = new Command(Localization.get("menu.GetNewForms"), Command.SCREEN, 2);
@@ -49,15 +47,12 @@ public class FormList extends List implements CommandListener, IView {
 	private final static Command CMD_SHAREFORMS = new Command(Localization.get("menu.ShareForms"), Command.SCREEN, 2);
 	private final static Command CMD_SETTINGS = new Command(Localization.get("menu.Settings"), Command.SCREEN, 3);
 	
-    private FormListActivity parent = null;
-
-	public FormList(FormListActivity p, String title) {
-		this(p, title, Choice.IMPLICIT);
+	public FormList(String title) {
+		this(title, Choice.IMPLICIT);
 	}
 
-	public FormList(FormListActivity p, String title, int listType) {
+	public FormList(String title, int listType) {
 		super(title, listType);
-		this.parent = p;
 	}
 
 	/**
@@ -140,7 +135,7 @@ public class FormList extends List implements CommandListener, IView {
         if (c == CMD_DELETE_FORM) {
 			Hashtable commands = new Hashtable();
 			commands.put(Commands.CMD_DELETE_FORM, new Integer(this.getSelectedIndex()));
-			// TODO check for any form dependancies
+			// TODO check for any form dependencies
 			this.parent.viewCompleted(commands, ViewTypes.FORM_LIST);
 		}
 
@@ -208,8 +203,4 @@ public class FormList extends List implements CommandListener, IView {
 			}			
 		}
 	}
-	public Object getScreenObject() {
-		return this;
-	}
-
 }
