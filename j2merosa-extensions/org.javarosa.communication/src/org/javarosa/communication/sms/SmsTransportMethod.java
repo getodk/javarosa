@@ -38,7 +38,6 @@ import javax.wireless.messaging.MessageConnection;
 import javax.wireless.messaging.MessageListener;
 import javax.wireless.messaging.TextMessage;
 
-import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -48,7 +47,6 @@ public class SmsTransportMethod implements TransportMethod {
 
 	private TransportMessage message;
 	//private ITransportManager manager;
-	private IActivity destinationRetrievalActivity;
 	private WorkerThread primaryWorker;
 	private static final String name = "SMS";
 	//private static final String SMSPort = "16498";	//TODO: Clarify - this was taken from previous CRS App
@@ -71,10 +69,6 @@ public class SmsTransportMethod implements TransportMethod {
 	}
 
 
-	public IActivity getDestinationRetrievalActivity() {
-		return destinationRetrievalActivity;
-	}
-
 	public int getId() {
 		return TransportMethod.SMS;
 	}
@@ -83,10 +77,6 @@ public class SmsTransportMethod implements TransportMethod {
 		return name;
 	}
 
-	public void setDestinationRetrievalActivity(IActivity activity) {
-		destinationRetrievalActivity = activity;
-	}
-	
 	private class WorkerThread implements Runnable, MessageListener{
 		private MessageConnection mconn;
 		

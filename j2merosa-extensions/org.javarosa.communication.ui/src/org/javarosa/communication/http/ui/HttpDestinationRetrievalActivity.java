@@ -27,9 +27,6 @@ import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IActivity;
-import org.javarosa.core.api.ICommand;
-import org.javarosa.core.api.IShell;
 import org.javarosa.core.services.transport.TransportMethod;
 
 public class HttpDestinationRetrievalActivity implements IActivity,

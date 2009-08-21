@@ -36,11 +36,12 @@ public class CompletedFormOptionsState implements State<CompletedFormOptionsStat
 	}
 
 	public void commandAction(Command c, Displayable arg1) {
-		if(c.equals(SendNowSendLaterForm.SEND_NOW_DEFAULT)) {
+		int choice = view.getCommandChoice();
+		if(choice == SendNowSendLaterForm.SEND_NOW_DEFAULT) {
 			transitions.sendData(data);
-		} else if(c.equals(SendNowSendLaterForm.SEND_LATER)) {
+		} else if(choice == SendNowSendLaterForm.SEND_LATER) {
 			transitions.skipSend();
-		} else if(c.equals(SendNowSendLaterForm.SEND_NOW_SPEC)) {
+		} else if(choice == SendNowSendLaterForm.SEND_NOW_SPEC) {
 			transitions.sendToFreshLocation(data);
 		}
 	}

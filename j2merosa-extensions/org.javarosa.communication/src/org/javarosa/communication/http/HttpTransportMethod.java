@@ -27,7 +27,6 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
@@ -44,7 +43,6 @@ public class HttpTransportMethod implements TransportMethod {
 
 	//private ITransportManager manager;
 	
-	private IActivity destinationRetrievalActivity;
 	private WorkerThread primaryWorker;
 
 	/*
@@ -341,14 +339,6 @@ public class HttpTransportMethod implements TransportMethod {
 			return new HttpTransportDestination(url);
 		}
 	}
-	public void setDestinationRetrievalActivity(IActivity activity) {
-		destinationRetrievalActivity = activity;
-	}
-	
-	public IActivity getDestinationRetrievalActivity() {
-		return destinationRetrievalActivity;
-	}
-
 	
 	public void closeConnections() {
 		if(primaryWorker!=null){
