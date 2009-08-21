@@ -16,7 +16,6 @@
 
 package org.javarosa.core.services.transport;
 
-import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
 
 /**
@@ -57,10 +56,6 @@ public interface TransportMethod {
 	 * Method.
 	 */
 	public ITransportDestination getDefaultDestination();
-	
-	public void setDestinationRetrievalActivity(IActivity activity);
-	
-	public IActivity getDestinationRetrievalActivity();
 	
 	public void closeConnections();
 	
