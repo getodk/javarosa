@@ -74,7 +74,7 @@ public class FormSender implements Runnable {
 	 * @param shell
 	 * @param activity
 	 */
-	public FormSender(FormTransportViews views) {
+	public FormSender(FormTransportViews views, ITransportDestination destination) {
 		this.views = views;
 	}
 	

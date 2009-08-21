@@ -48,6 +48,7 @@ import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Alert;
 import de.enough.polish.ui.Container;
@@ -570,16 +571,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 
     //good utility function
     private void showError(String title, String message) {
-    	//#style mailAlert
-    	Alert alert = new Alert(title, message, null, AlertType.ERROR);
-    	alert.setTimeout(Alert.FOREVER);
-    	//alert.setCommandListener(this);
-    	
-    	// Clayton Sims - Apr 27, 2009 : 
-    	//Really not-thrilled with how this works. Unfortunately this is an instance of views not being able
-    	//to propogate up new views. Maybe there should be a centralized way to use alerts? Or are we fine
-    	//with using the existing elements?
-    	Alert.setCurrent((Display)JavaRosaServiceProvider.instance().getDisplay().getDisplayObject(), alert, this);
+    	J2MEDisplay.showError(title, message);
     }
 
 	public void setContext(FormEntryContext context) {

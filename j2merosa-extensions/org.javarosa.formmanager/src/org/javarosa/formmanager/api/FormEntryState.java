@@ -13,6 +13,7 @@ import org.javarosa.formmanager.controller.IControllerHost;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.view.IFormEntryView;
+import org.javarosa.formmanager.view.IFormEntryViewFactory;
 
 /**
  * @author ctsims
@@ -26,16 +27,16 @@ public class FormEntryState implements State<FormEntryTransitions>, IControllerH
 
 	FormEntryTransitions transitions;
 	
-	public FormEntryState(IFormEntryView view, FormDefFetcher fetcher, boolean readOnly) {
+	public FormEntryState(IFormEntryViewFactory view, FormDefFetcher fetcher, boolean readOnly) {
 		this(view, fetcher, readOnly, FormIndex.createBeginningOfFormIndex());
 	}
-	public FormEntryState(IFormEntryView view, FormDefFetcher fetcher, boolean readOnly, FormIndex firstQuestion) {
+	public FormEntryState(IFormEntryViewFactory view, FormDefFetcher fetcher, boolean readOnly, FormIndex firstQuestion) {
 		FormDef theForm = fetcher.getFormDef();
 		
 		//Create MVC;
 		model = new FormEntryModel(theForm, theForm.getDataModel().getId(), firstQuestion); //Any reason we're not getting id inside hte method? 
 		controller = new FormEntryController(model, this);
-		this.view = view; // Hmmmm, created here or elsewhere?
+		this.view = view.getFormEntryView("Title", model, controller); // Hmmmm, created here or elsewhere?
 		
 		model.setReadOnly(readOnly);
 	}
