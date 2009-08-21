@@ -102,13 +102,7 @@ public class LoginState implements State<LoginStateTransitions>, CommandListener
 	}
 
 	private void showError(String s, String message, CommandListener cl) {
-		//#style mailAlert
-		final Alert alert = new Alert(s, message, null, AlertType.ERROR);
-		alert.setTimeout(Alert.FOREVER);
-		if (cl != null) {
-			//alert.setCommandListener(cl);
-		}
-		J2MEDisplay.getDisplay().setCurrent(alert, view);
+		J2MEDisplay.showError(s, message);
 	}
 
 }

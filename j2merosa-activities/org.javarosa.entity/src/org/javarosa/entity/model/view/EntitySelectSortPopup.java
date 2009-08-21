@@ -20,7 +20,6 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.entity.activity.EntitySelectActivity;
 import org.javarosa.entity.activity.EntitySelectState;
 
 import de.enough.polish.ui.Choice;
