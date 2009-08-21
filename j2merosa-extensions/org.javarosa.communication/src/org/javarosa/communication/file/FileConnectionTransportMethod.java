@@ -25,7 +25,6 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
@@ -44,8 +43,6 @@ public class FileConnectionTransportMethod implements TransportMethod {
 
 	private ITransportManager manager;
 	
-	private IActivity destinationRetrievalActivity;
-
 	/**
 	 * Creates a new instance of <code>FileConnectionTransportMethod</code>
 	 */
@@ -159,15 +156,6 @@ public class FileConnectionTransportMethod implements TransportMethod {
 			return new FileTransportDestination(uri);
 		}
 	}
-	
-	public void setDestinationRetrievalActivity(IActivity activity) {
-		destinationRetrievalActivity = activity;
-	}
-	
-	public IActivity getDestinationRetrievalActivity() {
-		return destinationRetrievalActivity;
-	}
-
 	
 	public void closeConnections() {
 		// TODO release all open connections and resources
