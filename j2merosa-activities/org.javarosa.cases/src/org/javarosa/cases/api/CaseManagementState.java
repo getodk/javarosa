@@ -31,6 +31,7 @@ public class CaseManagementState implements State<CaseManagementTransitions>, Co
 	CaseManagementTransitions transitions;
 
 	private void configView() {
+		view = new CaseManagementScreen("Select Action");
 		view.insert(0,NEW,null);
 		view.insert(1,FOLLOWUP,null);
 		view.insert(2,REFERRAL,null);
@@ -42,7 +43,6 @@ public class CaseManagementState implements State<CaseManagementTransitions>, Co
 	public CaseManagementState(int numberOfReferrals) {
 		REFERRAL = Localization.get("menu.Referral",new String[] {String.valueOf(numberOfReferrals)} );
 		configView();
-		view = new CaseManagementScreen("Select Action");
 		view.setCommandListener(this);
 	}
 	
