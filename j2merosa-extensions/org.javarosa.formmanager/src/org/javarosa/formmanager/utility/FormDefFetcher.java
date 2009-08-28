@@ -36,6 +36,7 @@ public class FormDefFetcher {
 	DataModelTree instance;
 	
 	public FormDefFetcher(IFormDefRetrievalMethod retriever, Vector preloadHandlers) {
+		this.fetcher = retriever;
 		this.preloadHandlers = preloadHandlers; 	
 	}
 	

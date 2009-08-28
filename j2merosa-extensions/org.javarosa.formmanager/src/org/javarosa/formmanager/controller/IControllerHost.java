@@ -16,10 +16,10 @@
 
 package org.javarosa.formmanager.controller;
 
-import org.javarosa.formmanager.view.IFormEntryView;
+import javax.microedition.lcdui.Displayable;
 
 public interface IControllerHost {
-	void setView (IFormEntryView view);
+	void setView (Displayable view);
 	
 	void controllerReturn (String status);
 }

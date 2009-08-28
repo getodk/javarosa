@@ -19,6 +19,7 @@ package org.javarosa.formmanager.controller;
 import java.util.Date;
 
 import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.FormDef;
@@ -149,7 +150,7 @@ public class FormEntryController {
 		setLanguage(model.getForm().getLocalizer().getNextLocale());
 	}
 
-	public void setView (IFormEntryView d) {
+	public void setView (Displayable d) {
 		parent.setView(d);
 	}
 	public void suspendActivity(Command command) {

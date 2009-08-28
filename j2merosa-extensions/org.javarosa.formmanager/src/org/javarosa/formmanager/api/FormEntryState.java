@@ -3,6 +3,8 @@
  */
 package org.javarosa.formmanager.api;
 
+import javax.microedition.lcdui.Displayable;
+
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.State;
 import org.javarosa.core.model.FormDef;
@@ -14,6 +16,7 @@ import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
  * @author ctsims
@@ -28,8 +31,9 @@ public class FormEntryState implements State<FormEntryTransitions>, IControllerH
 	FormEntryTransitions transitions;
 	
 	public FormEntryState(IFormEntryViewFactory view, FormDefFetcher fetcher, boolean readOnly) {
-		this(view, fetcher, readOnly, FormIndex.createBeginningOfFormIndex());
+		this(view, fetcher, readOnly, null);
 	}
+	
 	public FormEntryState(IFormEntryViewFactory view, FormDefFetcher fetcher, boolean readOnly, FormIndex firstQuestion) {
 		FormDef theForm = fetcher.getFormDef();
 		
@@ -50,8 +54,9 @@ public class FormEntryState implements State<FormEntryTransitions>, IControllerH
 	 * @see org.javarosa.core.api.State#start()
 	 */
 	public void start() {
-		controller.setView(view);
+		view.show();
 	}
+	
 	public void controllerReturn(String status) {
 		if ("exit".equals(status)) {
 			
@@ -67,7 +72,7 @@ public class FormEntryState implements State<FormEntryTransitions>, IControllerH
 			
 		}
 	}
-	public void setView(IFormEntryView view) {
-		view.show();
+	public void setView(Displayable view) {
+		J2MEDisplay.setView(view);
 	}
 }
