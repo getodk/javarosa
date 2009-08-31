@@ -840,15 +840,15 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 				childRef.add(child.getName(), TreeReference.INDEX_UNBOUND);
 
 				if (child.repeatable) {
-					for (int k = 0; k < newChildren.size(); k++) {
-						TreeElement newChild = child.deepCopy(true); // ugh
-						newChild.setMult(k);
-						node.getChildren().insertElementAt(newChild, k);
-						populateNode(newChild, (TreeElement) newChildren
-								.elementAt(k), childRef, f);
-						i++;
-					}
+				    for (int k = 0; k < newChildren.size(); k++) {
+				        TreeElement newChild = child.deepCopy(true);
+				        newChild.setMult(k);
+				        node.getChildren().insertElementAt(newChild, i + k + 1);
+				        populateNode(newChild, (TreeElement) newChildren.elementAt(k), childRef, f);
+				    }
+				    i += newChildren.size();
 				} else {
+
 					if (newChildren.size() == 0) {
 						child.setRelevant(false);
 					} else {
