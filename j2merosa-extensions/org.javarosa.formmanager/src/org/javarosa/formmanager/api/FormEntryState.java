@@ -30,17 +30,21 @@ public class FormEntryState implements State<FormEntryTransitions>, IControllerH
 
 	FormEntryTransitions transitions;
 	
-	public FormEntryState(IFormEntryViewFactory view, FormDefFetcher fetcher, boolean readOnly) {
-		this(view, fetcher, readOnly, null);
+	public FormEntryState(IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly) {
+		this(-1, viewFactory, fetcher, readOnly, null);
+	}
+
+	public FormEntryState(int savedInstanceID, IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly) {
+		this(savedInstanceID, viewFactory, fetcher, readOnly, null);
 	}
 	
-	public FormEntryState(IFormEntryViewFactory view, FormDefFetcher fetcher, boolean readOnly, FormIndex firstQuestion) {
+	public FormEntryState(int savedInstanceID, IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly, FormIndex firstQuestion) {
 		FormDef theForm = fetcher.getFormDef();
 		
 		//Create MVC;
-		model = new FormEntryModel(theForm, theForm.getDataModel().getId(), firstQuestion); //Any reason we're not getting id inside hte method? 
+		model = new FormEntryModel(theForm, savedInstanceID, firstQuestion); 
 		controller = new FormEntryController(model, this);
-		this.view = view.getFormEntryView("Title", model, controller); // Hmmmm, created here or elsewhere?
+		view = viewFactory.getFormEntryView("Title", model, controller); // Hmmmm, created here or elsewhere?
 		
 		model.setReadOnly(readOnly);
 	}
