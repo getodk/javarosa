@@ -45,11 +45,15 @@ public class EntitySelectState implements State<EntitySelectTransitions> {
 	Vector entities;
 	
 	public EntitySelectState (String title, RMSUtility entityRMS, IEntity entityPrototype) {
-		this(title, entityRMS, entityPrototype, true, EntitySelectView.NEW_IN_LIST, false, null, null);
+		this(title, entityRMS, entityPrototype, EntitySelectView.NEW_IN_LIST, true, false, null, null);
+	}
+	
+	public EntitySelectState (String title, RMSUtility entityRMS, IEntity entityPrototype, int newMode, boolean immediatelySelectNewlyCreated) {
+		this(title, entityRMS, entityPrototype, newMode, immediatelySelectNewlyCreated, false, null, null);
 	}
 	
 	public EntitySelectState (String title, RMSUtility entityRMS, IEntity entityPrototype,
-			boolean immediatelySelectNewlyCreated, int newMode, boolean bailOnEmpty, IEntityFilter filter, String styleKey) {
+			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter filter, String styleKey) {
 		this.entityRMS = entityRMS;
 		this.entityPrototype = entityPrototype;
 
