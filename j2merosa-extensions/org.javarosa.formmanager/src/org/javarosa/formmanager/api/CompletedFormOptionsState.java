@@ -26,7 +26,7 @@ public class CompletedFormOptionsState implements State<CompletedFormOptionsStat
 	
 	public CompletedFormOptionsState(DataModelTree formData) {
 		this.data = formData;
-		view = new SendNowSendLaterForm(this);
+		view = new SendNowSendLaterForm(this, this);
 	}
 
 	public void enter(CompletedFormOptionsStateTransitions transitions) {

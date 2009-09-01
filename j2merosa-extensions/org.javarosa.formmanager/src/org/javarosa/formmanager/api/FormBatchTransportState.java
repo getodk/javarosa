@@ -8,6 +8,8 @@ import java.util.Vector;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.ItemStateListener;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
@@ -22,7 +24,7 @@ import org.javarosa.j2me.view.J2MEDisplay;
  * @author ctsims
  *
  */
-public class FormBatchTransportState implements State<FormBatchTransportStateTransitions>, CommandListener {
+public class FormBatchTransportState implements State<FormBatchTransportStateTransitions>, CommandListener, ItemStateListener {
 
 	MultiSubmitStatusScreen screen;
 	
@@ -32,7 +34,7 @@ public class FormBatchTransportState implements State<FormBatchTransportStateTra
 
 	
 	public FormBatchTransportState(Vector dataModels, IDataModelSerializingVisitor serializer, ITransportDestination destination) {
-		FormTransportViews views = new FormTransportViews(this);
+		FormTransportViews views = new FormTransportViews(this, this);
 		sender = new FormSender(views,destination);
 		sender.setSerializer(serializer);
 		sender.setMultiple(true);
@@ -51,6 +53,12 @@ public class FormBatchTransportState implements State<FormBatchTransportStateTra
 	}
 
 	public void commandAction(Command c, Displayable arg1) {
+		//It's pretty atrocious, but I don't have time to completely rewrite this right now. 
+		//Any exit from the multiscreen is just a bail.
+		transitions.done();
+	}
+
+	public void itemStateChanged(Item arg0) {
 		//It's pretty atrocious, but I don't have time to completely rewrite this right now. 
 		//Any exit from the multiscreen is just a bail.
 		transitions.done();

@@ -76,6 +76,7 @@ public class FormSender implements Runnable {
 	 */
 	public FormSender(FormTransportViews views, ITransportDestination destination) {
 		this.views = views;
+		this.destination = destination;
 	}
 	
 	public void sendData() {

@@ -16,11 +16,8 @@
 
 package org.javarosa.formmanager.view.transport;
 
-import java.util.Vector;
-
-import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.List;
+import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.TextBox;
 import javax.microedition.lcdui.TextField;
 
@@ -36,13 +33,13 @@ public class FormTransportViews {
 	private FormTransportSubmitStatusScreen submitStatusScreen;
 	private MultiSubmitStatusScreen multiSubmitStatusScreen;
 
-	public FormTransportViews(CommandListener observer) {
+	public FormTransportViews(CommandListener observer, ItemStateListener stateListener) {
 		super();
 //		this.mainMenu = constructMainMenu(observer);
 //		this.messageList = new FormTransportMessageList(observer);
 		this.loggingTextBox = createLoggingTextBox();
 //		this.messageDetailTextBox = new FormTransportMessageDetailBox(observer);
-		this.sendNowSendLater = new SendNowSendLaterForm(observer);
+		this.sendNowSendLater = new SendNowSendLaterForm(observer,stateListener);
 		this.submitStatusScreen = new FormTransportSubmitStatusScreen(observer);
 
 		this.multiSubmitStatusScreen = new MultiSubmitStatusScreen(observer);

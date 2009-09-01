@@ -32,7 +32,7 @@ public class SendNowSendLaterForm extends Form {
 	public static final int SEND_LATER = 1;
 	public static final int SEND_NOW_SPEC = 2;
 
-	public SendNowSendLaterForm(CommandListener activity) {
+	public SendNowSendLaterForm(CommandListener activity, ItemStateListener itemListener) {
 		//#style submitPopup
 		super(Localization.get("sending.view.submit"));
 
@@ -56,7 +56,7 @@ public class SendNowSendLaterForm extends Form {
 		append(new Spacer(80, 0));
 
 		setCommandListener(activity);
-		setItemStateListener((ItemStateListener)activity);
+		setItemStateListener(itemListener);
 	}
 
 	public int getCommandChoice() {
