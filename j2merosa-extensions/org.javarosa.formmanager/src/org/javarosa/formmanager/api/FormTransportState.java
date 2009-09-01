@@ -3,11 +3,11 @@
  */
 package org.javarosa.formmanager.api;
 
-import java.util.Vector;
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.ItemStateListener;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.model.instance.DataModelTree;
@@ -23,7 +23,7 @@ import org.javarosa.j2me.view.J2MEDisplay;
  * @author ctsims
  *
  */
-public class FormTransportState implements State<FormTransportStateTransitions>, CommandListener {
+public class FormTransportState implements State<FormTransportStateTransitions>, CommandListener, ItemStateListener {
 	
 	FormTransportStateTransitions transitions;
 	FormTransportSubmitStatusScreen screen;
@@ -31,7 +31,7 @@ public class FormTransportState implements State<FormTransportStateTransitions>,
 	FormSender sender;
 
 	public FormTransportState(DataModelTree dataModel, IDataModelSerializingVisitor serializer, ITransportDestination destination) {
-		FormTransportViews views = new FormTransportViews(this);
+		FormTransportViews views = new FormTransportViews(this, this);
 		sender = new FormSender(views, destination);
 		sender.setSerializer(serializer);
 		sender.setMultiple(false);
@@ -50,6 +50,12 @@ public class FormTransportState implements State<FormTransportStateTransitions>,
 	}
 
 	public void commandAction(Command arg0, Displayable arg1) {
+		//The way this works now is crazy and needs to be rewritten when we have more time
+		//For now, and command means done.
+		transitions.done();
+	}
+
+	public void itemStateChanged(Item arg0) {
 		//The way this works now is crazy and needs to be rewritten when we have more time
 		//For now, and command means done.
 		transitions.done();
