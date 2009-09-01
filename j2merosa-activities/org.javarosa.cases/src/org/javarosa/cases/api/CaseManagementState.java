@@ -8,7 +8,9 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
+import org.commcare.core.util.CommCareUtil;
 import org.javarosa.cases.api.transitions.CaseManagementTransitions;
+import org.javarosa.cases.util.ICaseType;
 import org.javarosa.cases.view.CaseManagementScreen;
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.locale.Localization;
@@ -27,6 +29,7 @@ public class CaseManagementState implements State<CaseManagementTransitions>, Co
     public static final String VIEW_OPEN = Localization.get("menu.ViewOpen");
     public static final String RESOLVE = Localization.get("menu.Resolve");
     
+    ICaseType type;
 	CaseManagementScreen view;
 	CaseManagementTransitions transitions;
 
@@ -39,9 +42,11 @@ public class CaseManagementState implements State<CaseManagementTransitions>, Co
 		view.insert(4,VIEW_OPEN,null);		
 	}
 
-	
-	public CaseManagementState(int numberOfReferrals) {
-		REFERRAL = Localization.get("menu.Referral",new String[] {String.valueOf(numberOfReferrals)} );
+	public CaseManagementState(ICaseType type) {
+		this.type = type;
+		
+		REFERRAL = Localization.get("menu.Referral",new String[] {String.valueOf(CommCareUtil.getNumberOfOpenReferrals(type.getCaseTypeId()))} );
+		view = new CaseManagementScreen("Select Action");
 		configView();
 		view.setCommandListener(this);
 	}
@@ -78,5 +83,6 @@ public class CaseManagementState implements State<CaseManagementTransitions>, Co
 			transitions.exit();
 		}
 	}
+
 
 }
