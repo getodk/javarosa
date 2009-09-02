@@ -137,8 +137,6 @@ public class XPathFuncExpr extends XPathExpression {
 			return sum(model, argVals[0]);
 		} else if (name.equals("today") && args.length == 0) {
 			return DateUtils.roundDate(new Date());
-		} else if (name.equals("regex") && args.length==2){
-			return regex((String)argVals[0], (String)argVals[1]);
 		} else if (name.equals("now") && args.length == 0) {
 			return new Date();
 		} else if (name.equals("concat")) {
@@ -147,6 +145,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return checklist(argVals);
 		} else if (name.equals("weighted-checklist") && args.length >= 2 && args.length % 2 == 0) { //non-standard
 			return checklistWeighted(argVals);
+		} else if (name.equals("regex") && args.length == 2) {
+			return regex(argVals[0], argVals[1]);
 		} else {
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
 			if (handler != null) {
@@ -220,6 +220,8 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (o instanceof String) {
 			String s = (String)o;
 			val = new Boolean(s.length() > 0);
+		} else if (o instanceof Date) {
+			val = Boolean.TRUE;
 		} else if (o instanceof Vector) {
 			return new Boolean(count(o).doubleValue() > 0);
 		} else if (o instanceof IExprDataType) {
@@ -364,13 +366,6 @@ public class XPathFuncExpr extends XPathExpression {
 		return new Double(DateUtils.split(s, " ", true).size());
 	}
 	
-	
-	public static Boolean regex(String str, String re){
-		RE regexp = new RE(re);
-		boolean result = regexp.match(str);
-		return new Boolean(result);
-	}
-	
 	public static Double count (Object o) {
 		if (o instanceof Vector) {
 			return new Double(((Vector)o).size());
@@ -445,6 +440,15 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 		
 		return new Boolean(sum >= min && sum <= max);
+	}
+	
+	public static Boolean regex (Object o1, Object o2) {
+		String str = toString(o1);
+		String re = toString(o2);
+		
+		RE regexp = new RE(re);
+		boolean result = regexp.match(str);
+		return new Boolean(result);
 	}
 
 }
