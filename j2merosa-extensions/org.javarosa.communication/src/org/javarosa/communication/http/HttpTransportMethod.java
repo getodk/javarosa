@@ -229,6 +229,11 @@ public class HttpTransportMethod implements TransportMethod {
 				//#if debug.output==verbose || debug.output==exception
 				System.out.println(e.getMessage());
 				//#endif
+				message.setStatus(TransportMessage.STATUS_FAILED);
+				
+				message.setChanged();
+				message.notifyObservers(message.getReplyloadData());
+
 			} catch(java.lang.SecurityException se) {
 				//Alert alert = new Alert("ERROR! se", se.getMessage(), null, AlertType.ERROR);
 	             /***
