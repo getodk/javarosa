@@ -25,7 +25,6 @@ import java.util.TimerTask;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.locale.Localization;
 
 /**
@@ -33,7 +32,7 @@ import org.javarosa.core.services.locale.Localization;
  * @date Jan 21, 2009
  * 
  */
-public class LoadingScreen extends Form implements IView {
+public class LoadingScreen extends Form {
 
 	private Timer timer;
 
