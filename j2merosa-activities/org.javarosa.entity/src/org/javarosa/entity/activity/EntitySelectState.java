@@ -29,31 +29,30 @@ import org.javarosa.entity.model.view.EntitySelectView;
 import org.javarosa.entity.util.IEntityFilter;
 import org.javarosa.j2me.view.J2MEDisplay;
 
-public class EntitySelectState implements State<EntitySelectTransitions> {
+public class EntitySelectState<E extends IEntity> implements State<EntitySelectTransitions> {
 	private EntitySelectTransitions transitions;
 	
-	private Displayable activeView;
 	private EntitySelectView selView;
 	
 	private RMSUtility entityRMS;
-	private IEntity entityPrototype;
+	private E entityPrototype;
 	
 	boolean immediatelySelectNewlyCreated;
 	boolean bailOnEmpty;
-	IEntityFilter filter;
+	IEntityFilter<E> filter;
 	
 	Vector entities;
 	
-	public EntitySelectState (String title, RMSUtility entityRMS, IEntity entityPrototype) {
+	public EntitySelectState (String title, RMSUtility entityRMS, E entityPrototype) {
 		this(title, entityRMS, entityPrototype, EntitySelectView.NEW_IN_LIST, true, false, null, null);
 	}
 	
-	public EntitySelectState (String title, RMSUtility entityRMS, IEntity entityPrototype, int newMode, boolean immediatelySelectNewlyCreated) {
+	public EntitySelectState (String title, RMSUtility entityRMS, E entityPrototype, int newMode, boolean immediatelySelectNewlyCreated) {
 		this(title, entityRMS, entityPrototype, newMode, immediatelySelectNewlyCreated, false, null, null);
 	}
 	
-	public EntitySelectState (String title, RMSUtility entityRMS, IEntity entityPrototype,
-			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter filter, String styleKey) {
+	public EntitySelectState (String title, RMSUtility entityRMS, E entityPrototype,
+			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter<E> filter, String styleKey) {
 		this.entityRMS = entityRMS;
 		this.entityPrototype = entityPrototype;
 
@@ -95,7 +94,7 @@ public class EntitySelectState implements State<EntitySelectTransitions> {
 	}
 	
 	private void loadEntity (int recordID) {
-		IEntity entity = entityPrototype.factory(recordID);
+		E entity = (E) entityPrototype.factory(recordID);
 		entity.readEntity(entity.fetchRMS(entityRMS));
 		if(filter == null || filter.isPermitted(entity)) {
 			entities.addElement(entity);		
@@ -103,7 +102,6 @@ public class EntitySelectState implements State<EntitySelectTransitions> {
 	}
 	
 	public void setView (Displayable view) {
-		activeView = view;
 		J2MEDisplay.setView(view);
 	}
 

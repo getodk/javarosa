@@ -42,5 +42,5 @@ public interface ICaseType {
 	
 	public IModelProcessor getModelProcessor(String formType, int thisidisahack);
 	
-	public IEntity getUniqueEntity();
+	public CaseEntity getUniqueEntity();
 }
