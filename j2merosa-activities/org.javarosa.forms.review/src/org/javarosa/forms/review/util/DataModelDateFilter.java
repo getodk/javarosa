@@ -12,7 +12,7 @@ import org.javarosa.entity.util.IEntityFilter;
  * @author ctsims
  *
  */
-public class DataModelDateFilter implements IEntityFilter {
+public class DataModelDateFilter implements IEntityFilter<DataModelEntity> {
 	
 	private Date startDate;
 	private Date endDate;
@@ -25,13 +25,8 @@ public class DataModelDateFilter implements IEntityFilter {
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.util.IEntityFilter#isPermitted(org.javarosa.entity.model.IEntity)
 	 */
-	public boolean isPermitted(IEntity entity) {
-		if(!(entity instanceof DataModelEntity)) {
-			return false;
-		}
-		
-		DataModelEntity dme = (DataModelEntity)entity;
-		Date modelDate = dme.getDateSaved();
+	public boolean isPermitted(DataModelEntity entity) {
+		Date modelDate = entity.getDateSaved();
 		
 		if(modelDate.getTime() < startDate.getTime()) {
 			return false;

@@ -27,7 +27,7 @@ import org.javarosa.entity.util.IEntityFilter;
  * @date Mar 24, 2009 
  *
  */
-public class CaseTypeEntityFilter implements IEntityFilter {
+public class CaseTypeEntityFilter implements IEntityFilter<CaseEntity> {
 	
 	boolean filterClosed;
 	
@@ -51,8 +51,7 @@ public class CaseTypeEntityFilter implements IEntityFilter {
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.util.IEntityFilter#isPermitted(org.javarosa.entity.model.IEntity)
 	 */
-	public boolean isPermitted(IEntity entity) {
-		CaseEntity ce = (CaseEntity)entity;
+	public boolean isPermitted(CaseEntity entity) {
 		
 		//OK, so I'll admit this -2 thing isn't good.
 		if(userId != -2) {
@@ -60,16 +59,16 @@ public class CaseTypeEntityFilter implements IEntityFilter {
 			//Note that we don't handle any sort of adminstrative user control here.
 			//If administrive users shouldn't filter cases, that should be handled elsewhere.
 			
-			int caseuserid = ce.getUserId();
+			int caseuserid = entity.getUserId();
 			//If the case's userid is -1 (unset), just don't worry about it.
-			if(ce.getUserId() != -1) {
+			if(entity.getUserId() != -1) {
 				if(userId != caseuserid) {
 					return false;
 				}
 			}
 		}
 		
-		return !ce.isClosed() && ce.type.equals(caseTypeId);
+		return !entity.isClosed() && entity.type.equals(caseTypeId);
 	}
 
 }
