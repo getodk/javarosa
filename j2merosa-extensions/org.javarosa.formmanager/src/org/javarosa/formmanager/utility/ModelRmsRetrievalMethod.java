@@ -22,9 +22,11 @@ import org.javarosa.formmanager.activity.FormEntryContext;
 public class ModelRmsRetrievalMethod implements IFormDefRetrievalMethod {
 
 	RMSRetreivalMethod method;
+	DataModelTree model;
 	
 	public ModelRmsRetrievalMethod(DataModelTree model) throws IOException, DeserializationException  {
 		construct(model);
+		this.model = model;
 	}
 	
 	public ModelRmsRetrievalMethod(int modelId) throws DeserializationException, IOException {
