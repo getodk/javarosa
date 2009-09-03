@@ -241,3 +241,5 @@ date.twoago=Juzi
 date.tomorrow=Tomorrow
 date.nago=${0} days ago
 date.nfromnow=${0} days from today
+
+pregnancy.edd.approaching=Approaching

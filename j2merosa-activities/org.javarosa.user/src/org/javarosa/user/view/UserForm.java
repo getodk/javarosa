@@ -21,8 +21,6 @@ import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
-import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.IUserDecorator;
@@ -32,7 +30,7 @@ import org.javarosa.user.utility.LoginContext;
  * Form accessible to admins for adding new users to an application
  * 
  */
-public class UserForm extends Form implements IView {
+public class UserForm extends Form {
 
 	// ------ fields
 	private TextField usernameField;
