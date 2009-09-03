@@ -3,17 +3,17 @@
  */
 package org.javarosa.user.api;
 
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.user.api.transitions.AddUserStateTransitions;
 import org.javarosa.user.model.User;
+import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.IUserDecorator;
 import org.javarosa.user.utility.UserValidator;
 import org.javarosa.user.view.UserForm;
@@ -25,7 +25,10 @@ import org.javarosa.user.view.UserForm;
 public class AddUserState implements State<AddUserStateTransitions>, CommandListener {
 
 	private AddUserStateTransitions transitions;
-	private UserForm view; 
+	private UserForm view;
+	
+	public final static String PASSWORD_FORMAT_ALPHA_NUMERIC = "a";
+	public final static String PASSWORD_FORMAT_NUMERIC = "n";
 	
 	public final static Command CMD_SAVE = new Command(Localization.get("menu.Save"),
 			Command.OK, 2);
@@ -60,6 +63,8 @@ public class AddUserState implements State<AddUserStateTransitions>, CommandList
 			if(status == UserValidator.OK) {
 				User u = validator.constructUser();
 				//Save to RMS
+				UserRMSUtility utility = (UserRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(UserRMSUtility.getUtilityName());
+				utility.writeToRMS(u);
 				transitions.userAdded(u);
 			} else {
 				validator.handleInvalidUser(status, this);
