@@ -32,8 +32,6 @@ public interface IEntity {
 	String getName();
 	int getRecordID();
 	
-	// Clayton Sims - Mar 5, 2009 : These methods desperately need
-	// contracts for what they should be matching!
 	boolean matchID (String key);
 	boolean matchName (String key);
 

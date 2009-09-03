@@ -19,24 +19,23 @@ package org.javarosa.entity.model.view;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import de.enough.polish.ui.ItemStateListener;
 
-import org.javarosa.core.api.IView;
-import org.javarosa.entity.activity.EntitySelectActivity;
+import org.javarosa.entity.activity.EntitySelectState;
 
 import de.enough.polish.ui.Choice;
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.Form;
 import de.enough.polish.ui.Item;
+import de.enough.polish.ui.ItemStateListener;
 
-public class EntitySelectSortPopup extends Form implements IView, CommandListener, ItemStateListener {
+public class EntitySelectSortPopup extends Form implements CommandListener, ItemStateListener {
 	private EntitySelectView psv;
-	private EntitySelectActivity psa;
+	private EntitySelectState psa;
 	
     private ChoiceGroup sortField;
     private Command cancelCmd;
 
-    public EntitySelectSortPopup (EntitySelectView psv, EntitySelectActivity psa) {
+    public EntitySelectSortPopup (EntitySelectView psv, EntitySelectState psa) {
 		//#style patselSortPopup
 		super("Sort by...");
 
@@ -54,10 +53,6 @@ public class EntitySelectSortPopup extends Form implements IView, CommandListene
 		addCommand(cancelCmd);
 		setCommandListener(this);
     }
-
-	public Object getScreenObject() {
-		return this;
-	}
     
     public void show () {
     	psa.setView(this);

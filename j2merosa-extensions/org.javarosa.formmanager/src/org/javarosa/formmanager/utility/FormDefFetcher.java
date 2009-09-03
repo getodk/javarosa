@@ -16,34 +16,77 @@
 
 package org.javarosa.formmanager.utility;
 
-import org.javarosa.core.Context;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Vector;
+
+import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
+import org.javarosa.core.model.utils.IPreloadHandler;
+import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class FormDefFetcher {
 	IFormDefRetrievalMethod fetcher;
+	Vector preloadHandlers;
+	
+	DataModelTree instance;
+	
+	public FormDefFetcher(IFormDefRetrievalMethod retriever, Vector preloadHandlers) {
+		this.fetcher = retriever;
+		this.preloadHandlers = preloadHandlers; 	
+	}
+	
+	public FormDefFetcher(IFormDefRetrievalMethod retriever, Vector preloadHandlers, int instanceId) throws IOException, DeserializationException {
+		this(retriever, preloadHandlers);
+		loadModel(instanceId);
+	}
+	
+	private void loadModel(int instanceId) throws IOException, DeserializationException {
+		DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
+		instance = new DataModelTree();
+		modelUtil.retrieveFromRMS(instanceId, instance);
+	}
 
-	public FormDef getFormDef(Context context) {
-		if(fetcher != null) {
-			return fetcher.retreiveFormDef(context);
+	public FormDef getFormDef() {
+		FormDef form = fetcher.retreiveFormDef(); 
+		if(instance != null) {
+			form.setDataModel(instance);
 		}
-		else {
-			return null;
+		
+		//A lot of this should probably not be with the form.
+		initPreloadHandlers(form);
+		form.initialize(instance == null);
+		form.setEvaluationContext(initEvaluationContext());
+		
+		return form;
+	}
+	
+	private void initPreloadHandlers (FormDef f) {
+		if(preloadHandlers != null) {
+			Enumeration en = preloadHandlers.elements();
+			while(en.hasMoreElements()) {
+				f.getPreloader().addPreloadHandler((IPreloadHandler)en.nextElement());
+			}
 		}
 	}
 	
-	/**
-	 * @return the fetcher
-	 */
-	public IFormDefRetrievalMethod getFetcher() {
-		return fetcher;
+	private EvaluationContext initEvaluationContext () {
+		EvaluationContext ec = new EvaluationContext();
+		
+		Vector functionHandlers = new Vector(); //get this vector
+		if(functionHandlers != null) {
+			Enumeration en = functionHandlers.elements();
+			while(en.hasMoreElements()) {
+				ec.addFunctionHandler((IFunctionHandler)en.nextElement());
+			}
+		}
+		
+		return ec;
 	}
 
-	/**
-	 * @param fetcher the fetcher to set
-	 */
-	public void setFetcher(IFormDefRetrievalMethod fetcher) {
-		this.fetcher = fetcher;
-	}
-	
-	
+
 }

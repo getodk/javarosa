@@ -23,9 +23,7 @@ import java.util.Vector;
 
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IDaemon;
-import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IIncidentLogger;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.IPropertyManager;
 import org.javarosa.core.services.IService;
 import org.javarosa.core.services.ITransportManager;
@@ -56,8 +54,6 @@ public class JavaRosaServiceProvider {
 	
 	private Hashtable daemons;
 
-	private IDisplay display;
-	
 	private StorageManager storageManager;
     private ITransportManager transportManager;
     private IPropertyManager propertyManager;
@@ -108,29 +104,6 @@ public class JavaRosaServiceProvider {
 	    }
 	}
 
-	/**
-	 * Should be called by the midlet to set the display
-	 * @param d - the j2me disply
-	 */
-	public void setDisplay(IDisplay d) {
-		instance.display = d;
-	}
-
-	/**
-	 * @return the display
-	 */
-	public IDisplay getDisplay() {
-		return instance.display;
-	}
-
-	/**
-	 * Display the view that is passed in.
-	 * @param view
-	 */
-	public void showView(IView view) {
-		instance.display.setView(view);
-	}
-	
 	public StorageManager getStorageManager() {
 			if(storageManager == null) {
 				storageManager = new StorageManager();

@@ -21,33 +21,22 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IActivity;
-import org.javarosa.core.api.IShell;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
-import org.javarosa.formmanager.activity.FormTransportActivity;
-import org.javarosa.formmanager.view.ISubmitStatusScreen;
+import org.javarosa.formmanager.view.ISubmitStatusObserver;
 import org.javarosa.formmanager.view.transport.FormTransportSubmitStatusScreen;
+import org.javarosa.formmanager.view.transport.FormTransportViews;
 import org.javarosa.formmanager.view.transport.MultiSubmitStatusScreen;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
  * Managing sending forms, both single forms, and multiple forms together
  * 
  */
 public class FormSender implements Runnable {
-
-	/**
-	 * 
-	 */
-	private IShell shell;
-	/**
-	 * 
-	 */
-	private IActivity activity;
 
 	/**
 	 * true if many forms will be sent at once
@@ -77,16 +66,17 @@ public class FormSender implements Runnable {
 	 */
 	private ITransportDestination destination;
 	
-	private ISubmitStatusScreen observer;
+	private ISubmitStatusObserver observer;
+	
+	private FormTransportViews views;
 
 	/**
 	 * @param shell
 	 * @param activity
 	 */
-	public FormSender(IShell shell, IActivity activity) {
-		this.shell = shell;
-		this.activity = activity;
-
+	public FormSender(FormTransportViews views, ITransportDestination destination) {
+		this.views = views;
+		this.destination = destination;
 	}
 	
 	public void sendData() {
@@ -121,8 +111,7 @@ public class FormSender implements Runnable {
 	private void initDisplay() {
 
 		if (this.multiple) {
-			MultiSubmitStatusScreen s = ((FormTransportActivity) this.activity)
-					.getView().getMultiSubmitStatusScreen();
+			MultiSubmitStatusScreen s = views.getMultiSubmitStatusScreen();
 
 			boolean noData = (this.multiData == null)
 					|| (this.multiData.size() == 0);
@@ -148,14 +137,13 @@ public class FormSender implements Runnable {
 				System.out.println("ids: " + idsStr);
 			}
 
-			shell.setDisplay((IActivity) this.activity, (IView) s);
+			J2MEDisplay.getDisplay().setCurrent(s);
 			setObserver(s);
 		}
 		else {
-			FormTransportSubmitStatusScreen statusScreen = ((FormTransportActivity) this.activity)
-				.getView().getSubmitStatusScreen();
+			FormTransportSubmitStatusScreen statusScreen = views.getSubmitStatusScreen();
 			statusScreen.reinit(this.data.getId());
-			this.shell.setDisplay((IActivity) this.activity, statusScreen);
+			J2MEDisplay.getDisplay().setCurrent(statusScreen);
 			setObserver(statusScreen);
 		}
 	}
@@ -207,7 +195,7 @@ public class FormSender implements Runnable {
 
 	// ----------- getters and setters
 	
-	public void setObserver(ISubmitStatusScreen o) {
+	public void setObserver(ISubmitStatusObserver o) {
 		this.observer = o;
 	}
 	public DataModelTree getData() {
@@ -255,7 +243,7 @@ public class FormSender implements Runnable {
 			catch(IOException e) {
 				e.printStackTrace();
 				if(observer != null) {
-					observer.receiveMessage(ISubmitStatusScreen.ERROR, e.getMessage());
+					observer.receiveMessage(ISubmitStatusObserver.ERROR, e.getMessage());
 				}
 			}
 
@@ -266,7 +254,7 @@ public class FormSender implements Runnable {
 			catch(IOException e) {
 				e.printStackTrace();
 				if(observer != null) {
-					observer.receiveMessage(ISubmitStatusScreen.ERROR, e.getMessage());
+					observer.receiveMessage(ISubmitStatusObserver.ERROR, e.getMessage());
 				}
 			}
 		}

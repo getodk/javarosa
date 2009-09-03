@@ -24,19 +24,17 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
-import org.javarosa.core.api.IView;
-import org.javarosa.entity.activity.EntitySelectActivity;
+import org.javarosa.entity.activity.EntitySelectState;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.StringItem;
-import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
 import de.enough.polish.ui.UiAccess;
 
-public class EntitySelectView extends FramedForm implements IView, ItemStateListener, CommandListener {
+public class EntitySelectView extends FramedForm implements ItemStateListener, CommandListener {
 	//#if javarosa.patientselect.formfactor == nokia-s40 or javarosa.patientselect.formfactor == sony-k610i
 	//# private static final int MAX_ROWS_ON_SCREEN = 5;
 	//# private static final int SCROLL_INCREMENT = 4;	
@@ -56,8 +54,8 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 	public boolean wrapAround = false; //TODO: support this
 	public int newMode = NEW_IN_LIST;
 	
-	private EntitySelectActivity controller;
-	public String entityType;
+	private EntitySelectState controller;
+	private String entityType;
 	
 	private String styleType;
 	private TextField tf;
@@ -70,11 +68,13 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 		
 	private Vector rowIDs; //index into data corresponding to current matches
 	
-	public EntitySelectView(EntitySelectActivity controller, String title) {
+	public EntitySelectView(EntitySelectState controller, String title, String entityType, int newMode) {
 		super(title);
 		
 		this.controller = controller;
-
+		this.entityType = entityType;
+		this.newMode = newMode;
+		
 		tf = new TextField("Find:  ", "", 20, TextField.ANY);
 		tf.setInputMode(TextField.MODE_UPPERCASE);
 		tf.setItemStateListener(this);
@@ -85,6 +85,10 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
         sortCmd = new Command("Sort", Command.SCREEN, 3);
         addCommand(exitCmd);
         addCommand(sortCmd);
+        if (newMode == NEW_IN_MENU) {
+        	newCmd = new Command("New " + entityType, Command.SCREEN, 4);
+        	addCommand(newCmd);
+        }
         this.setCommandListener(this);
         
         rowIDs = new Vector();
@@ -95,12 +99,6 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 	public void init () {
         selectedIndex = 0;
         firstIndex = 0;
-
-        //can't go in constructor, as entityType is not set there yet
-        if (newMode == NEW_IN_MENU) {
-        	newCmd = new Command("New " + entityType, Command.SCREEN, 4);
-        	addCommand(newCmd);
-        }
         
         refresh();
 	}
@@ -121,10 +119,6 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 	public void show () {
 		this.setActiveFrame(Graphics.BOTTOM);
 		controller.setView(this);
-	}
-	
-	public Object getScreenObject() {
-		return this;
 	}
 	
 	public void setStyleKey(String key) {
@@ -349,7 +343,7 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 		refresh();
 	}
 	
-	//can't believe i'm writing a fucking sort function
+	//can't believe i'm writing a .. sort function
 	private void sortRows () {
 		for (int i = rowIDs.size() - 1; i > 0; i--) {
 			for (int j = 0; j < i; j++) {

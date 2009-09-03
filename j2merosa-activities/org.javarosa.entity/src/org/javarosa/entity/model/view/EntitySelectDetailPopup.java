@@ -23,17 +23,16 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.entity.activity.EntitySelectActivity;
+import org.javarosa.entity.activity.EntitySelectState;
 import org.javarosa.entity.model.IEntity;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Form;
 import de.enough.polish.ui.StringItem;
 
-public class EntitySelectDetailPopup extends Form implements IView, CommandListener {
-	EntitySelectActivity psa;
+public class EntitySelectDetailPopup extends Form implements CommandListener {
+	EntitySelectState psa;
 	
 	int recordID;
 	String[] headers;
@@ -42,7 +41,7 @@ public class EntitySelectDetailPopup extends Form implements IView, CommandListe
 	Command okCmd;
 	Command backCmd;
 	
-	public EntitySelectDetailPopup (EntitySelectActivity psa, IEntity entity, IEntity prototype, RMSUtility entityRMS) {
+	public EntitySelectDetailPopup (EntitySelectState psa, IEntity entity, IEntity prototype, RMSUtility entityRMS) {
 		super(entity.entityType() + " Detail");
 		
 		this.psa = psa;
@@ -73,10 +72,6 @@ public class EntitySelectDetailPopup extends Form implements IView, CommandListe
 	
 	public void show () {
 		psa.setView(this);
-	}
-
-	public Object getScreenObject() {
-		return this;
 	}
 
 	public void commandAction(Command cmd, Displayable d) {

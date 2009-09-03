@@ -16,40 +16,59 @@
 
 package org.javarosa.j2me.view;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.midlet.MIDlet;
 
-import org.javarosa.core.api.IDisplay;
-import org.javarosa.core.api.IView;
-import org.javarosa.core.util.IncompatibleViewException;
-
-public class J2MEDisplay implements IDisplay {
-
-	private final Display display;
+public class J2MEDisplay {
+	private static Display display;
 	
-	public J2MEDisplay(Display display) {
-		this.display = display;
+	public static void init (MIDlet m) {
+		setDisplay(Display.getDisplay(m));
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IDisplay#setView(org.javarosa.core.api.IView)
-	 */
-	public void setView(IView view) {
-		if(view instanceof Displayable) {
-			display.setCurrent((Displayable)view);
-		} else if(view.getScreenObject() instanceof Displayable) {
-			display.setCurrent((Displayable)view.getScreenObject());
+	public static void setDisplay (Display display) {
+		J2MEDisplay.display = display;
+	}
+
+	public static Display getDisplay () {
+		if (display == null) {
+			throw new RuntimeException("Display has not been set from MIDlet; call J2MEDisplay.init()");
 		}
-		else {
-			throw new IncompatibleViewException("J2ME Display did not recognize the type of a view " + view.toString());
-		}
-	}
-	
-	public Object getDisplayObject() {
-		return getDisplay();
-	}
-	
-	public Display getDisplay() {
+		
 		return display;
+	}
+	
+	public static void setView (Displayable d) {
+		display.setCurrent(d);
+	}
+	
+	public static void showError (String title, String message) {
+		showError(title, message, null, null);
+	}
+	
+	public static Alert showError (String title, String message, Displayable next, CommandListener customListener) {
+		//#style mailAlert
+		final Alert alert = new Alert(title, message, null, AlertType.ERROR);
+		alert.setTimeout(Alert.FOREVER);
+
+		if (customListener != null) {
+			if (next != null) {
+				System.err.println("Warning: alert invoked with both custom listener and 'next' displayable. 'next' will be ignored; it must be switched to explicitly in the custom handler");
+			}
+			
+			alert.setCommandListener(customListener);
+		}
+		
+		if (next == null) {
+			display.setCurrent(alert);
+		} else {
+			display.setCurrent(alert, next);
+		}
+		
+		return alert;
 	}
 }

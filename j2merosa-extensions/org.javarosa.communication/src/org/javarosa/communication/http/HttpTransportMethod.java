@@ -27,7 +27,6 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IActivity;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
@@ -44,7 +43,6 @@ public class HttpTransportMethod implements TransportMethod {
 
 	//private ITransportManager manager;
 	
-	private IActivity destinationRetrievalActivity;
 	private WorkerThread primaryWorker;
 
 	/*
@@ -150,18 +148,18 @@ public class HttpTransportMethod implements TransportMethod {
 				
 				out = con.openOutputStream(); // Problem exists here on 3110c CommCare Application: open hangs
 					
-				//ByteArrayOutputStream bis = new ByteArrayOutputStream();  //For Testing!
+				ByteArrayOutputStream bis = new ByteArrayOutputStream();  //For Testing!
 				
 				InputStream valueStream = httpload.getPayloadStream();
 				int val = valueStream.read();
 				while(val != -1) {
-					//bis.write(val); // For Testing!
+					bis.write(val); // For Testing!
 					out.write(val);
 					val = valueStream.read();
 				}
-				//byte[] newArr = bis.toByteArray();// For Testing!
-				//String theVal = new String(newArr); //For Testing!
-				//System.out.println(theVal);// For Testing!
+				byte[] newArr = bis.toByteArray();// For Testing!
+				String theVal = new String(newArr); //For Testing!
+				System.out.println(theVal);// For Testing!
 				
 				//#if debug.output==verbose
 				//System.out.println("PAYLOADDATA:"+new String(message.getPayloadData())+"\nENDPLDATA\n");
@@ -231,6 +229,11 @@ public class HttpTransportMethod implements TransportMethod {
 				//#if debug.output==verbose || debug.output==exception
 				System.out.println(e.getMessage());
 				//#endif
+				message.setStatus(TransportMessage.STATUS_FAILED);
+				
+				message.setChanged();
+				message.notifyObservers(message.getReplyloadData());
+
 			} catch(java.lang.SecurityException se) {
 				//Alert alert = new Alert("ERROR! se", se.getMessage(), null, AlertType.ERROR);
 	             /***
@@ -341,28 +344,11 @@ public class HttpTransportMethod implements TransportMethod {
 			return new HttpTransportDestination(url);
 		}
 	}
-	public void setDestinationRetrievalActivity(IActivity activity) {
-		destinationRetrievalActivity = activity;
-	}
-	
-	public IActivity getDestinationRetrievalActivity() {
-		return destinationRetrievalActivity;
-	}
-
 	
 	public void closeConnections() {
 		if(primaryWorker!=null){
 			primaryWorker.cleanStreams();
 		}
 	}
-	
-	protected class UnexpectedResponseCodeException extends Exception{
-		int code;
-		public UnexpectedResponseCodeException(int code){
-			this.code = code;
-		}
-		public int getCode() {
-			return code;
-		}
-	}
+
 }

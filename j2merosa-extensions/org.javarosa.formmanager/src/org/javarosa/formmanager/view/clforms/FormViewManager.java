@@ -27,7 +27,6 @@ import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.List;
 
 import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IView;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
@@ -50,6 +49,7 @@ import org.javarosa.formmanager.view.clforms.widgets.Select1QuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.SelectQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TextQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TimeQuestionWidget;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 		CommandListener, ItemCommandListener {
@@ -276,13 +276,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				if (counter > 0) {
 					// show alert
 					String txt = "There are unanswered compulsory questions and must be completed first to proceed";
-					final Alert alert = new Alert("Question Required!", txt,
-							null, AlertType.ERROR);
-					controller.setView(new IView() {
-						public Object getScreenObject() {
-							return alert;
-						}
-					});
+					J2MEDisplay.showError("Question Required!", txt);
 				} else
 					model.setFormComplete();
 				// controller.exit();
@@ -295,15 +289,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 				} else {
 					String txt = Localization.get(
 							"view.sending.FormUneditable");
-
-					// #style CL_Forms_Form
-					final Alert alert = new Alert("Cannot Edit Answers!", txt,
-							null, AlertType.ERROR);
-					controller.setView(new IView() {
-						public Object getScreenObject() {
-							return alert;
-						}
-					});
+					J2MEDisplay.showError("Cannot Edit Answers!", txt);
 				}
 			}
 
@@ -320,29 +306,13 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 //							"view.sending.CompulsoryQuestionsIncomplete");
 					
 					String txt = "Validation failure: data is not of the correct format.";
-					// #style CL_Forms_Form
-					final Alert alert = new Alert("Question Required!", txt,
-							null, AlertType.ERROR);
-					controller.setView(new IView() {
-						public Object getScreenObject() {
-							return alert;
-						}
-					});
-
+					
+					J2MEDisplay.showError("Question Required!", txt);
 				} else if (result == controller.QUESTION_REQUIRED_BUT_EMPTY) {
-//					System.out.println("answer required but empty");
-
 //					String txt = Locale.get(
 //							"view.sending.CompulsoryQuestionsIncomplete");
 					String txt = "This question is compulsory. You must answer it.";
-					// #style CL_Forms_Form
-					final Alert alert = new Alert("Question Required!", txt,
-							null, AlertType.ERROR);
-					controller.setView(new IView() {
-						public Object getScreenObject() {
-							return alert;
-						}
-					});
+					J2MEDisplay.showError("Question Required!", txt);
 				}
 		
 			} else if (command == SingleQuestionScreen.previousCommand) {
@@ -398,10 +368,6 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 
 	public void setShowOverView(boolean showOverView) {
 		this.showFormView = showOverView;
-	}
-
-	public Object getScreenObject() {
-		return parent.getScreenObject();
 	}
 
 	public void startOfForm() {
