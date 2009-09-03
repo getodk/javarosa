@@ -94,14 +94,6 @@ public class UserValidator {
 		return OK;
 
 	}
-	
-	private void alertUser(String s1, String s2, AlertType type, CommandListener listener) {
-		// #style mailAlert
-		final Alert a = new Alert(s1, s2, null, type);
-		a.setCommandListener(listener);
-		a.setTimeout(Alert.FOREVER);
-		J2MEDisplay.getDisplay().setCurrent(a);
-	}
 
 	/**
 	 * 
@@ -124,8 +116,8 @@ public class UserValidator {
 		if (status == UserValidator.MISMATCHED_PASSWORDS) {
 			s += ": " + Localization.get("activity.adduser.problem.mismatchingpasswords");
 		}
-
-		alertUser(s, "", AlertType.ERROR, listener);
+		
+		J2MEDisplay.showError("",s);
 	}
 
 

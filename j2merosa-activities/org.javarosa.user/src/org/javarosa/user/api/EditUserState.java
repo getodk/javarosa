@@ -49,8 +49,6 @@ public class EditUserState implements State<EditUserStateTransitions>, CommandLi
 		view.addCommand(CMD_CANCEL);
 		view.setCommandListener(this);
 		
-		
-		
 		view.loadUser(userToEdit);
 	}
 
