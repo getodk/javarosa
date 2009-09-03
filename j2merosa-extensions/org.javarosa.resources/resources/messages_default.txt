@@ -176,6 +176,8 @@ formreview.period.week.last=Entered Last Week
 activity.edituser.edituser=Edit User
 
 Pregnancy=Pregnancy
+household.visit=Household Visit
+household.id=Household ID
 NewBirth=New Birth
 
 PendingReferrals= PendingReferrals
