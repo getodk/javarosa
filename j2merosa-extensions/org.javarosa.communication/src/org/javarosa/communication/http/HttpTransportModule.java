@@ -16,13 +16,12 @@
 
 package org.javarosa.communication.http;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 
 public class HttpTransportModule implements IModule {
 
-	public void registerModule(Context context) {
+	public void registerModule() {
 		
 		String[] classes = {
 				"org.javarosa.communication.http.HttpTransportDestination",

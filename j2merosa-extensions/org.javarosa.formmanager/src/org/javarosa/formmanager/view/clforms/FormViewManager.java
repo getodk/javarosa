@@ -33,7 +33,6 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
@@ -213,11 +212,6 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 
 	public void destroy() {
 		model.unregisterObservable(this);
-	}
-
-	public void setContext(FormEntryContext context) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void show() {

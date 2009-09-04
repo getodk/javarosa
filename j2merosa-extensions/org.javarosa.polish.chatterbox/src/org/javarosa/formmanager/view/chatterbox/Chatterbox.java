@@ -37,13 +37,11 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.formmanager.activity.FormEntryContext;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.IFormEntryView;
-import org.javarosa.formmanager.view.chatterbox.util.ChatterboxContext;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
@@ -574,16 +572,6 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	J2MEDisplay.showError(title, message);
     }
 
-	public void setContext(FormEntryContext context) {
-		if(context instanceof ChatterboxContext && context != null) {
-			ChatterboxContext cbcontext = (ChatterboxContext)context;
-			Enumeration en = cbcontext.getCustomWidgets().elements();
-			while(en.hasMoreElements()) {
-				IWidgetStyle widget = (IWidgetStyle)en.nextElement();
-				this.widgetFactory.registerExtendedWidget(widget.widgetType(), widget);
-			}
-		}
-	}
 	public Object getScreenObject() {
 		return this;
 	}

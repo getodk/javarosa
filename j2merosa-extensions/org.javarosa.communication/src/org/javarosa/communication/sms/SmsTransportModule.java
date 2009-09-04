@@ -16,12 +16,11 @@
 
 package org.javarosa.communication.sms;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 
 public class SmsTransportModule implements IModule{
-	public void registerModule(Context context) {
+	public void registerModule() {
 		
 		String[] classes = {
 				"org.javarosa.communication.sms.SmsTransportDestination",				
