@@ -4,7 +4,6 @@
 package org.javarosa.user.api;
 
 import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -15,7 +14,6 @@ import org.javarosa.core.services.locale.Localization;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.user.api.transitions.LoginStateTransitions;
 import org.javarosa.user.model.User;
-import org.javarosa.user.utility.LoginContext;
 import org.javarosa.user.view.LoginForm;
 
 /**
@@ -35,7 +33,7 @@ public class LoginState implements State<LoginStateTransitions>, CommandListener
 		this.transitions = transitions;
 		view = new LoginForm();
 		view.setCommandListener(this);
-		view.setPasswordMode(LoginContext.PASSWORD_FORMAT_NUMERIC);
+		view.setPasswordMode(AddUserState.PASSWORD_FORMAT_NUMERIC);
 	}
 	
 	public void start() {

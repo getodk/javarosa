@@ -21,9 +21,9 @@ import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.user.api.AddUserState;
 import org.javarosa.user.model.User;
 import org.javarosa.user.storage.UserRMSUtility;
-import org.javarosa.user.utility.LoginContext;
 
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
@@ -201,10 +201,10 @@ public class LoginForm extends FramedForm {
 	 * @param passwordMode
 	 */
 	public void setPasswordMode(String passwordMode) {
-		if (LoginContext.PASSWORD_FORMAT_NUMERIC.equals(passwordMode)) {
+		if (AddUserState.PASSWORD_FORMAT_NUMERIC.equals(passwordMode)) {
 			this.passwordField.setConstraints(TextField.PASSWORD
 					| TextField.NUMERIC);
-		} else if (LoginContext.PASSWORD_FORMAT_ALPHA_NUMERIC
+		} else if (AddUserState.PASSWORD_FORMAT_ALPHA_NUMERIC
 				.equals(passwordMode)) {
 			this.passwordField.setConstraints(TextField.PASSWORD);
 		}
