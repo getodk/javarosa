@@ -104,8 +104,7 @@ public class ReferralEntity implements IEntity {
 	 * @see org.javarosa.entity.model.IEntity#getName()
 	 */
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return getType();
 	}
 	
 	public String getType() { 
