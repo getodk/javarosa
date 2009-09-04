@@ -103,7 +103,7 @@ title.FormsList=Forms List
 title.Login=Login
 title.SavedForms=Saved Forms
 
-
+chatterbox.button.next=Done
 button.Next=VOLGENDE
 
 question.SendNow=Send data now?
