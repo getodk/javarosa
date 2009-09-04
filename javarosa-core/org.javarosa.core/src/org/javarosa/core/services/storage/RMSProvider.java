@@ -16,6 +16,8 @@
 
 package org.javarosa.core.services.storage;
 
+/* DEPRECATED */
+
 
 import java.util.Enumeration;
 import java.util.Hashtable;

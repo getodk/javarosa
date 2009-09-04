@@ -16,6 +16,9 @@
 
 package org.javarosa.j2me.storage.rms;
 
+/* DEPRECATED */
+
+
 import javax.microedition.rms.InvalidRecordIDException;
 import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordStoreException;

@@ -27,6 +27,9 @@ import org.javarosa.core.services.storage.utilities.IRecordStorage;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
 
+/* DEPRECATED */
+
+
 public class RMSRecordStorage implements IRecordStorage {
 	
 	private RecordStore store;

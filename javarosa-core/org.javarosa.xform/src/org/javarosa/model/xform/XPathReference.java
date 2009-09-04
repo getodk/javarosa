@@ -45,6 +45,11 @@ public class XPathReference implements IDataReference {
 	}
 	
 	public XPathReference (String nodeset) {
+		ref = getPathExpr(nodeset).getReference();
+		this.nodeset = nodeset;
+	}
+	
+	public static XPathPathExpr getPathExpr (String nodeset) {
 		XPathExpression path;
 		boolean validNonPathExpr = false;
 		
@@ -64,9 +69,8 @@ public class XPathReference implements IDataReference {
 				throw new RuntimeException("Parse error in XPath path: [" + nodeset + "]");
 			}
 		}
-		
-		ref = ((XPathPathExpr)path).getReference();
-		this.nodeset = nodeset;
+
+		return (XPathPathExpr)path;
 	}
 	
 	public XPathReference (XPathPathExpr path) {
