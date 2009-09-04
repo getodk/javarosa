@@ -85,9 +85,14 @@ public class RMSStorageUtility implements IStorageUtility {
 	
 	private String basename;		//unique name identifying this collection of records
 	private Class type;				//type of object this StorageUtility stores
+	private boolean allocateIDs;    //if true, will auto-assign IDs to Persistables with an ID of -1
 	
 	private RMS indexstore;			//RMS wrapper for the indexing RMS
 	private RMS[] datastores;		//RMS wrappers for 1..n data RMSes (are loaded as needed, so entries may be null)
+	
+	public RMSStorageUtility (String basename, Class type) {
+		this(basename, type, true);
+	}
 	
 	/**
 	 * Instantiate a new StorageUtility. Will create the underlying skeleton RMSes if they don't exist
@@ -96,16 +101,25 @@ public class RMSStorageUtility implements IStorageUtility {
 	 *   can be kept distinct by giving their StorageUtilitys different names (e.g., "PATIENTS" and "DEMO_PATIENTS")
 	 * @param type object type that this StorageUtility stores and retrieves. this class must implement Externalizable
 	 */
-	public RMSStorageUtility (String basename, Class type) {
+	public RMSStorageUtility (String basename, Class type, boolean allocateIDs) {
 		validateName(basename);
 		validateDataType(type);
 		
 		this.basename = basename;
 		this.type = type;
-
+		this.allocateIDs = allocateIDs;
+		
 		initStaticInfo();
 			
 		loadIndexStore();
+	}
+	
+	public String getName () {
+		return basename;
+	}
+	
+	public Class getType () {
+		return type;
 	}
 	
 	/**
@@ -161,15 +175,21 @@ public class RMSStorageUtility implements IStorageUtility {
 	 */
 	public void write (Persistable p) throws StorageFullException {
 		typeCheck(p);
-		
-		int id = p.getID();
-		byte[] data = ExtUtil.serialize(p);
-		
+
 		RMSRecordLoc newLoc = null;
 
 		synchronized (getAccessLock()) {
+			RMSStorageInfo info = getInfoRecord();			
+			
+			int id = p.getID();
+			if (id == -1 && allocateIDs) {
+				p.setID(info.nextRecordID);
+				info.nextRecordID++;
+			}
+						
+			byte[] data = ExtUtil.serialize(p);
+			
 			Hashtable idIndex = getIDIndexRecord();
-			RMSStorageInfo info = getInfoRecord();
 			boolean recordExists = idIndex.containsKey(new Integer(id));
 
 			setDirty();
