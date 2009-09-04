@@ -16,8 +16,6 @@
 
 package org.javarosa.core.api;
 
-import org.javarosa.core.Context;
-
 /**
  * The Module Interface represents an integration point
  * for an extensible set of JavaRosa code. A Module is
@@ -34,5 +32,5 @@ public interface IModule {
 	 * a module, and perform that configuration and registration
 	 * with the current application.
 	 */
-	public void registerModule(Context context);
+	public void registerModule();
 }
