@@ -46,28 +46,28 @@ public class ReviewSelectionState implements State<ReviewSelectionStateTransitio
 		Date end = new Date();
 		
 		if(i == 0) {
+			//Today
 			start = DateUtils.roundDate(new Date());
 		} else if(i == 1) {
+			//Yesterday
 			end = DateUtils.roundDate(new Date());
 			start = new Date(end.getTime() - DateUtils.DAY_IN_MS);
 		} else if(i == 2) {
-			start = getBeginningOfWeek();
+			//This Week
+			start = getBeginningOfWeek(0);
 		} else if(i == 3) {
-			end = getBeginningOfWeek();
-			start = new Date(end.getTime() - DateUtils.DAY_IN_MS*7);
+			//Last Week
+			end = getBeginningOfWeek(0);
+			start = getBeginningOfWeek(1);	
 		}
+		
+		System.out.println(DateUtils.formatDate(start, DateUtils.FORMAT_HUMAN_READABLE_SHORT) + " -> " + DateUtils.formatDate(end, DateUtils.FORMAT_HUMAN_READABLE_SHORT));
 		
 		return new DataModelDateFilter(start,end);
 	}
 	
-	private Date getBeginningOfWeek() {
-		Calendar c = Calendar.getInstance();
-		int dow = c.get(Calendar.DAY_OF_WEEK);
-		int dom = c.get(Calendar.DAY_OF_MONTH);
-		c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-		c.set(Calendar.DAY_OF_MONTH, dom - (dow - 1));
-		return DateUtils.roundDate(c.getTime());
-
+	private Date getBeginningOfWeek(int weeksago) {
+		return DateUtils.getPastPeriodDate(new Date(), "week", "sun", true, true, weeksago);
 	}
 
 	private void startDisplay() {
