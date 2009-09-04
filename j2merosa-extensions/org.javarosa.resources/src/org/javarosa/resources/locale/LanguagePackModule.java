@@ -19,7 +19,6 @@
  */
 package org.javarosa.resources.locale;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.locale.Localization;
@@ -36,7 +35,7 @@ public class LanguagePackModule implements IModule {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
-	public void registerModule(Context context) {
+	public void registerModule() {
 		Localization.registerLanguageFile("default", "/messages_default.txt");
 		Localization.registerLanguageFile("en", "/messages_en.txt");
 		Localization.registerLanguageFile("sw","/messages_sw.txt");

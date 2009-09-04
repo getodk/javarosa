@@ -5,7 +5,6 @@ package org.javarosa.formmanager.utility;
 
 import java.io.IOException;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
@@ -13,7 +12,6 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.formmanager.activity.FormEntryContext;
 
 /**
  * @author ctsims
