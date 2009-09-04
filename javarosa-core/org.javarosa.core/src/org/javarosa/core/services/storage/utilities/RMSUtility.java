@@ -16,6 +16,9 @@
 
 package org.javarosa.core.services.storage.utilities;
 
+/* DEPRECATED */
+
+
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -162,10 +165,6 @@ public class RMSUtility
         {
             rse.printStackTrace();
         }
-        catch (IOException ioe)
-        {
-            ioe.printStackTrace();
-        }
         return recordId;
     }
     
@@ -215,10 +214,6 @@ public class RMSUtility
     	catch (RecordStorageException rse)
     	{
     		rse.printStackTrace();
-    	}
-    	catch (IOException ioe)
-    	{
-    		ioe.printStackTrace();
     	}
     }
     

@@ -16,6 +16,9 @@
 
 package org.javarosa.core.services.transport;
 
+/* DEPRECATED */
+
+
 import java.io.IOException;
 import java.util.Enumeration;
 

@@ -16,6 +16,9 @@
 
 package org.javarosa.core.services.storage.utilities;
 
+/* DEPRECATED */
+
+
 public interface IRecordStorage {
 	
 	public void openAsRecordStorage(String name, boolean createIfNotExist) throws RecordStorageException;
