@@ -19,7 +19,6 @@
  */
 package org.javarosa.formmanager;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.api.IModule;
 
 /**
@@ -32,7 +31,7 @@ public class FormModule implements IModule {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
-	public void registerModule(Context context) {
+	public void registerModule() {
 	}
 
 }

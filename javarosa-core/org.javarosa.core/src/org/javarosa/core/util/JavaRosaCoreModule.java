@@ -19,7 +19,6 @@
  */
 package org.javarosa.core.util;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 
@@ -33,7 +32,7 @@ public class JavaRosaCoreModule implements IModule {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
-	public void registerModule(Context context) {
+	public void registerModule() {
 		String[] classes = {
 				"org.javarosa.core.services.locale.ResourceFileDataSource",
 				"org.javarosa.core.services.locale.TableLocaleSource"
