@@ -1,4 +1,4 @@
-package org.javarosa.entity.activity;
+package org.javarosa.entity.api;
 /*
  * Copyright (C) 2009 JavaRosa
  *
@@ -23,6 +23,7 @@ import org.javarosa.core.api.State;
 import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.services.storage.utilities.RecordStorageException;
+import org.javarosa.entity.api.transitions.EntitySelectTransitions;
 import org.javarosa.entity.model.IEntity;
 import org.javarosa.entity.model.view.EntitySelectDetailPopup;
 import org.javarosa.entity.model.view.EntitySelectView;

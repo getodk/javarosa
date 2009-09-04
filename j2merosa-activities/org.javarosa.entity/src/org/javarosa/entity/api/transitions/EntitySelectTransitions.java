@@ -1,4 +1,4 @@
-package org.javarosa.entity.activity;
+package org.javarosa.entity.api.transitions;
 import org.javarosa.core.api.Transitions;
 
 
