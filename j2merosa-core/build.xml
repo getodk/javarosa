@@ -1,14 +1,21 @@
 <?xml version="1.0"?>
 
-<project name="j2merosa" default="package">
-
-	<tstamp />
-	<property name="wtk" value="C:\WTK2.5.2\" />
+<project default="package">
+	
+	<property file="build.properties" />
+	<property name="name" value="j2merosa-core" />
+	<property name="version" value="1.0" />
+    	<exec executable="hg" outputproperty="revision">
+        	<arg value="tip"/>
+        	<arg value="--template"/>
+        	<arg value="{rev}"/>
+    	</exec>
+	<property name="jar" value="${name}-${version}.${revision}.jar" />
 
 	<target name="init" description="set classpath and make needed directories">
 		<path id="classpath">
-			<fileset dir="lib/" includes="*.jar" />
-			<fileset dir="${wtk}/lib" includes="*.jar" />
+			<fileset dir="../j2merosa-libraries" includes="*.jar" />
+			<fileset dir="${wtk.home}/lib" includes="*.jar" />
 		</path>
 		<mkdir dir="bin/" />
 		<mkdir dir="dist/" />
@@ -23,11 +30,12 @@
 		<javac srcdir="src/" destdir="bin/" classpathref="classpath" debug="true" debuglevel="lines,source" />
 	</target>
 
-	<target name="package" depends="compile" description="package source and binary into jar">
-		<jar destfile="dist/j2merosa.jar">
+	<target name="package" depends="compile" description="package binary into jar">
+		<jar destfile="dist/${jar}">
 			<fileset dir="bin/" includes="**/*.class" />
-			<fileset dir="src/" includes="**/*.java" />
 		</jar>
+		<mkdir dir="../j2merosa-libraries"/>
+		<copy file="dist/${jar}" todir="../j2merosa-libraries" />
 	</target>
 
 </project>
