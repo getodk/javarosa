@@ -7,10 +7,9 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entity.model.IEntity;
 
@@ -44,19 +43,8 @@ public class DataModelEntity implements IEntity {
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#fetchRMS(org.javarosa.core.services.storage.utilities.RMSUtility)
 	 */
-	public Object fetchRMS(RMSUtility rmsu) {
-		DataModelTreeRMSUtility rms = (DataModelTreeRMSUtility)rmsu;
-		DataModelTree tree = new DataModelTree();
-		try {
-			rms.retrieveFromRMS(this.recordId, tree);
-			return tree;
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error loading DataModelTree from RMS to load as an Entity.");
-		} catch (DeserializationException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error loading DataModelTree from RMS to load as an Entity.");
-		}
+	public Object fetch(IStorageUtility models) {
+		return (DataModelTree)models.read(recordId);
 	}
 
 	/* (non-Javadoc)
@@ -142,7 +130,7 @@ public class DataModelEntity implements IEntity {
 		DataModelTree tree = (DataModelTree)o;
 		dateSaved = tree.getDateSaved();
 		modelName = tree.getName();
-		recordId = tree.getRecordId();
+		recordId = tree.getID();
 		formId = tree.getFormId();
 	}
 

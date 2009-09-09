@@ -21,8 +21,10 @@ import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.services.storage.IStorageIterator;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.user.model.User;
-import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.LoginContext;
 
 import de.enough.polish.ui.FramedForm;
@@ -48,7 +50,7 @@ public class LoginForm extends FramedForm {
 	private StringItem loginButton;
 	private TextField usernameField;
 	private TextField passwordField;
-	private UserRMSUtility userRMS;
+	private IStorageUtility users;
 	private User loggedInUser;
 	
 	/**
@@ -75,11 +77,9 @@ public class LoginForm extends FramedForm {
 	 * @param loginActivity
 	 */
 	private void init() {
-		this.userRMS = new UserRMSUtility(UserRMSUtility.getUtilityName());
+		this.users = StorageManager.getStorage(User.STORAGE_KEY);
 
-		// #debug debug
-		System.out.println("userRMS:" + this.userRMS);
-		boolean recordsExist = this.userRMS.getNumberOfRecords() > 0;
+		boolean recordsExist = this.users.getNumRecords() > 0;
 
 		// #debug debug
 		System.out.println("records in RMS:" + recordsExist);
@@ -88,16 +88,15 @@ public class LoginForm extends FramedForm {
 		tempUser.setUsername("");// ? needed
 
 		if (recordsExist) {
-			// get first username from RMS
-
-			int userId = this.userRMS.getNextRecordID() - 1;
-			try {
-				this.userRMS.retrieveFromRMS(userId, tempUser);
-			} catch (Exception e) {
-				e.printStackTrace();
-				// do nothing for the user
+			int lowestID = -1;
+			IStorageIterator ui = users.iterate();
+			while (ui.hasMore()) {
+				int userID = ui.nextID();
+				if (lowestID == -1 || userID < lowestID)
+					lowestID = userID;
 			}
-
+			
+			tempUser = (User)users.read(lowestID);
 		}
 		initLoginControls(tempUser.getUsername());
 
@@ -172,27 +171,15 @@ public class LoginForm extends FramedForm {
 		String usernameEntered = this.usernameField.getString().trim();
 		String passwordEntered = this.passwordField.getString().trim();
 
-		// /find user in RMS:
-		User userInRMS = new User();
-
-		int index = 1;
-
-		while (index <= this.userRMS.getNumberOfRecords()) {
-			try {
-				this.userRMS.retrieveFromRMS(index, userInRMS);
-			} catch (Exception ioe) {
-				ioe.printStackTrace();
+		IStorageIterator ui = users.iterate();
+		while (ui.hasMore()) {
+			User u = (User)ui.nextRecord();
+			if (u.getUsername().equalsIgnoreCase(usernameEntered) && u.getPassword().equals(passwordEntered)) {
+				setLoggedInUser(u);
+				return true;
 			}
-			if (userInRMS.getUsername().equalsIgnoreCase(usernameEntered)) {
-				if (userInRMS.getPassword().equals(passwordEntered)) {
-					setLoggedInUser(userInRMS);
-					return true;
-				}
-			}
-
-			index++;
 		}
-
+		
 		return false;
 
 	}
@@ -223,10 +210,6 @@ public class LoginForm extends FramedForm {
 		return new Alert(Localization.get("form.login.login.successful"),
 				Localization.get("form.login.loading.profile"), null, AlertType.CONFIRMATION);
 
-	}
-
-	public UserRMSUtility getUserRMS() {
-		return this.userRMS;
 	}
 
 	public String getPassWord() {

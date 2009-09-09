@@ -30,11 +30,10 @@ import javax.microedition.lcdui.TextField;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
-import org.javarosa.core.api.IView;
 import org.javarosa.core.services.IPropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
 
-public class PropertiesScreen extends Form implements IView{
+public class PropertiesScreen extends Form{
 
     Hashtable itemChoices;
 
@@ -283,7 +282,4 @@ public class PropertiesScreen extends Form implements IView{
     public String nameFromItem(Item item) {
     	return (String)itemForPropertyName.get(item);
     }
-	public Object getScreenObject() {
-		return this;
-	}
 }

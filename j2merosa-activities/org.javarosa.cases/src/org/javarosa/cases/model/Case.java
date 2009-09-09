@@ -35,12 +35,11 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
-import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMapPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 
@@ -53,7 +52,8 @@ import org.javarosa.xform.util.XFormAnswerDataParser;
  * @date Mar 19, 2009 
  *
  */
-public class Case implements Externalizable, IDRecordable, Restorable {
+public class Case implements Persistable, Restorable {
+	public static String STORAGE_KEY = "CASE";
 	
 	private String typeId;
 	private String id;
@@ -75,6 +75,7 @@ public class Case implements Externalizable, IDRecordable, Restorable {
 	}
 	
 	public Case(String name, String typeId) {
+		setID(-1);
 		this.name = name;
 		this.typeId = typeId;
 		dateOpened = new Date();
@@ -125,17 +126,14 @@ public class Case implements Externalizable, IDRecordable, Restorable {
 	/**
 	 * @return the recordId
 	 */
-	public int getRecordId() {
+	public int getID() {
 		return recordId;
 	}
 	
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
+	public void setID (int id) {
+		this.recordId = id;
 	}
-	
+		
 	public int getUserId() {
 		Integer id = (Integer)data.get(org.javarosa.core.api.Constants.USER_ID_KEY);
 		if(id == null) {
@@ -153,7 +151,7 @@ public class Case implements Externalizable, IDRecordable, Restorable {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(String id) {
+	public void setLongID(String id) {
 		this.id = id;
 	}
 
@@ -198,10 +196,6 @@ public class Case implements Externalizable, IDRecordable, Restorable {
 		ExtUtil.write(out, new ExtWrapMapPoly(data));
 
 	}
-
-	public void setRecordId(int recordId) {
-		this.recordId = recordId;
-	}
 	
 	public void setProperty(String key, Object value) {
 		this.data.put(key, value);
@@ -209,7 +203,7 @@ public class Case implements Externalizable, IDRecordable, Restorable {
 	
 	public Object getProperty(String key) {
 		if("case-id".equals(key)) {
-			return id;
+			return id + recordId;
 		}
 		return data.get(key);
 	}

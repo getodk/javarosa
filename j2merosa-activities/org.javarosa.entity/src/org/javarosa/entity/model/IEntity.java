@@ -16,7 +16,7 @@
 
 package org.javarosa.entity.model;
 
-import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.core.services.storage.IStorageUtility;
 
 //representation of an entity for use in the entity select activity
 //it reads in the object is represents through readEntity, and caches all the values it needs
@@ -26,7 +26,7 @@ public interface IEntity {
 	String entityType ();
 	IEntity factory (int recordID);
 	void readEntity (Object o);
-	Object fetchRMS (RMSUtility rmsu);
+	Object fetch (IStorageUtility entities);
 	
 	String getID();
 	String getName();
