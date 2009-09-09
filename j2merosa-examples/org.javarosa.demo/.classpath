@@ -2,28 +2,26 @@
 <classpath>
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="lib" path="tools/j2meunit-javarosa.jar"/>
 	<classpathentry kind="con" path="J2MELIB"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.formmanager"/>
-	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.services.properties"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.chatterbox"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.user"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.activity"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.chatterbox.extensions"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.clforms"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication.ui"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.referral"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.j2me"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient.entry"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entity"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.forms"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.resources"/>
+	<classpathentry kind="lib" path="lib/kxml2-2.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/regexp-me.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-core-1.0.664.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-clforms-1.0.275.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-communication-ui-1.0.275.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-communication-1.0.275.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-entity-1.0.202.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-formmanager-1.0.275.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-patient-1.0.202.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-patient-entry-1.0.202.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-polish-activity-1.0.202.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-polish-chatterbox-1.0.275.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-polish-chatterbox-extensions-1.0.275.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-referral-1.0.202.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-resources-1.0.275.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-services-properties-1.0.202.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-user-1.0.202.jar"/>
+	<classpathentry kind="lib" path="lib/javarosa-core-1.0.272.jar"/>
+	<classpathentry kind="lib" path="tools/j2meunit-javarosa.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
