@@ -2,6 +2,7 @@
 
 <project default="package">
 
+	<property file="../j2merosa-libraries/build.properties" />
 	<property name="name" value="javarosa-core" />
 	<property name="version" value="1.0" />
     	<exec executable="hg" outputproperty="revision">
@@ -12,8 +13,12 @@
 	<property name="jar" value="${name}-${version}.${revision}.jar" />
 
 	<target name="init" description="set classpath and make needed directories">
+		<mkdir dir="lib/" />
 		<path id="classpath">
 			<fileset dir="lib/" includes="*.jar" />
+			<fileset dir="${wtk.home}/lib" includes="${wtk.includes}" />
+			<fileset dir="${polish.home}/import" includes="${polish.includes}" />
+			<fileset dir="../j2merosa-libraries" includes="*.jar" />
 		</path>
 		<mkdir dir="bin/" />
 		<mkdir dir="dist/" />
