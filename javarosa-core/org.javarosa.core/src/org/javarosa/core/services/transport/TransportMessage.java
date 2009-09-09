@@ -21,11 +21,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.Observable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
-import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -33,8 +33,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  *
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
-public class TransportMessage extends Observable implements Externalizable {
-
+public class TransportMessage extends Observable implements Persistable {
+	public static final String STORAGE_KEY = "TX_MSG";
+	
 	/**
 	 * Message has not been select for sending
 	 */
@@ -120,6 +121,7 @@ public class TransportMessage extends Observable implements Externalizable {
 		this.destination = destination;
 		this.sender = sender;
 		this.modelId = modelId;
+		this.recordId = -1;
 	}
 
 	/**
@@ -137,6 +139,7 @@ public class TransportMessage extends Observable implements Externalizable {
 		this.sender = sender;
 		this.modelId = modelId;
 		this.replyloadData = replyloadDataIn;
+		this.recordId = -1;
 	}
 
 	/**
@@ -147,6 +150,7 @@ public class TransportMessage extends Observable implements Externalizable {
 		this.replyloadData = new byte [1];
 		this.sender = "default_sender";
 		this.modelId = -1;
+		this.recordId = -1;
 	}
 
 	/**
@@ -294,7 +298,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	/**
 	 * @return the recordId
 	 */
-	public int getRecordId() {
+	public int getID() {
 		return recordId;
 	}
 
@@ -302,7 +306,7 @@ public class TransportMessage extends Observable implements Externalizable {
 	 * @param recordId
 	 *            the recordId to set
 	 */
-	public void setRecordId(int recordId) {
+	public void setID(int recordId) {
 		this.recordId = recordId;
 	}
 
