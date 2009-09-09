@@ -26,7 +26,9 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
@@ -112,19 +114,19 @@ public class FormEntryController {
 
 		if (!model.isSaved() || postProcessModified) {
 			FormDef form = model.getForm();
-			DataModelTreeRMSUtility utility = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
+			IStorageUtility instances = StorageManager.getStorage(DataModelTree.STORAGE_KEY);
 			DataModelTree instance = (DataModelTree)form.getDataModel();
 			int instanceID = model.getInstanceID();
 
 			instance.setName(form.getTitle());
-	        instance.setFormId(form.getRecordId());
+	        instance.setFormId(form.getID());
 	        instance.setDateSaved(new Date());
 
-			if(instanceID == -1) {
-				instanceID = utility.writeToRMS(instance);
-			} else {
-				utility.updateToRMS(instanceID, instance);
-			}
+	        try {
+	        	instances.write(instance);
+    		} catch (StorageFullException e) {
+    			throw new RuntimeException("uh-oh, storage full [datamodeltrees]"); //TODO: handle this
+    		}
 
 			model.modelSaved(instanceID);
 		}
