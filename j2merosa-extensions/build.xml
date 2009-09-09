@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<project default="package">
+	<target name="package">
+		
+		<ant dir="org.javarosa.communication" target="package" />
+		<ant dir="org.javarosa.communication.ui" target="package" />
+		
+		<ant dir="../j2merosa-activities/org.javarosa.entity" target="package" />
+		<ant dir="../j2merosa-activities/org.javarosa.user" target="package" />
+		<ant dir="org.javarosa.formmanager" target="package" />
+		
+		<ant dir="../j2merosa-activities/org.javarosa.services.properties" target="package" />
+		<ant dir="../j2merosa-activities/org.javarosa.polish.activity" target="package" />
+		<ant dir="org.javarosa.polish.chatterbox" target="package" />
+		<ant dir="org.javarosa.resources" target="package" />
+		<ant dir="org.javarosa.clforms" target="package" />
+		
+		<ant dir="../j2merosa-activities/org.javarosa.patient" target="package" />
+		<ant dir="org.javarosa.polish.chatterbox.extensions" target="package" />
+
+		<ant dir="org.javarosa.communication.bluetooth" target="package" />
+		<ant dir="org.javarosa.communication.bluetooth.client" target="package" />
+		<ant dir="org.javarosa.communication.bluetooth.server" target="package" />
+
+		<ant dir="org.javarosa.communication.reporting" target="package" />
+		<ant dir="org.javarosa.communication.sms.trigger" target="package" />
+		<ant dir="org.javarosa.log" target="package" />
+		
+		<ant dir="../j2merosa-activities/org.javarosa.utilities.file" target="package" />
+		<ant dir="org.javarosa.media.image" target="package" />
+		<ant dir="org.javarosa.media.audio" target="package" />
+		<ant dir="org.javarosa.barcode" target="package" />
+		
+	</target>
+</project>
