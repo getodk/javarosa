@@ -17,10 +17,12 @@
 package org.javarosa.formmanager.utility;
 
 import java.io.IOException;
+import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.IStorageUtilityIndexed;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class RMSRetreivalMethod implements IFormDefRetrievalMethod {
@@ -31,16 +33,24 @@ public class RMSRetreivalMethod implements IFormDefRetrievalMethod {
 	}
 	
 	public RMSRetreivalMethod(String formName) throws IOException, DeserializationException {
-		FormDefRMSUtility formUtil = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());  //whoa!
-		load(formUtil.getIDfromName(formName));
+		IStorageUtilityIndexed forms = (IStorageUtilityIndexed)StorageManager.getStorage(FormDef.STORAGE_KEY);
+		int id;
+		
+        Vector IDs = forms.getIDsForValue("DESCRIPTOR", formName);
+        if (IDs.size() == 1) {
+        	id = ((Integer)IDs.elementAt(0)).intValue();
+        } else {
+        	throw new RuntimeException("No form found for descriptor [" + formName + "]");
+        }
+
+        load(id);
 	}
 	
 	private void load(int id) throws IOException, DeserializationException  {
-		FormDefRMSUtility formUtil = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());  //whoa!
-		FormDef theForm = new FormDef();
-		formUtil.retrieveFromRMS(id, theForm);
-		// TODO: Better heuristic for whether retrieval worked!
-		if (theForm.getID() != -1) {
+		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
+		FormDef theForm = (FormDef)forms.read(id);
+		
+		if (theForm != null) {
 			this.def = theForm;
 		} else {
 			String error = "Form loader couldn't retrieve form for ";

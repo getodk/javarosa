@@ -42,11 +42,11 @@ public class FormEntryState implements State<FormEntryTransitions>, IControllerH
 		FormDef theForm = fetcher.getFormDef();
 		
 		//Create MVC;
-		model = new FormEntryModel(theForm, savedInstanceID, firstQuestion);
-		model.setReadOnly(readOnly);
+		model = new FormEntryModel(theForm, savedInstanceID, firstQuestion); 
 		controller = new FormEntryController(model, this);
 		view = viewFactory.getFormEntryView("Title", model, controller); // Hmmmm, created here or elsewhere?
 		
+		model.setReadOnly(readOnly);
 	}
 	
 

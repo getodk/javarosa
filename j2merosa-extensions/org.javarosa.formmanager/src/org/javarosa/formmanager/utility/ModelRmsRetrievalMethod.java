@@ -5,15 +5,12 @@ package org.javarosa.formmanager.utility;
 
 import java.io.IOException;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
-import org.javarosa.core.model.storage.FormDefRMSUtility;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.formmanager.activity.FormEntryContext;
 
 /**
  * @author ctsims
@@ -22,23 +19,14 @@ import org.javarosa.formmanager.activity.FormEntryContext;
 public class ModelRmsRetrievalMethod implements IFormDefRetrievalMethod {
 
 	RMSRetreivalMethod method;
-	DataModelTree model;
 	
 	public ModelRmsRetrievalMethod(DataModelTree model) throws IOException, DeserializationException  {
 		construct(model);
-		this.model = model;
 	}
 	
 	public ModelRmsRetrievalMethod(int modelId) throws DeserializationException, IOException {
-		DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility) JavaRosaServiceProvider
-			.instance().getStorageManager().getRMSStorageProvider()
-			.getUtility(DataModelTreeRMSUtility.getUtilityName());
-		
-			DataModelTree theModel = new DataModelTree();
-			
-			modelUtil.retrieveFromRMS(modelId, theModel);
-			
-			construct(theModel);
+		IStorageUtility instances = StorageManager.getStorage(DataModelTree.STORAGE_KEY);
+		construct((DataModelTree)instances.read(modelId));
 	}
 	
 	private void construct(DataModelTree model) throws IOException, DeserializationException  {

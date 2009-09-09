@@ -40,7 +40,7 @@ public class SMSSplitTransportMessage implements SplitTransportMessage {
 	
 	
 	public SMSSplitTransportMessage(TransportMessage tm) {
-		this.formID = tm.getRecordId();
+		this.formID = tm.getID();
 		this.payload = tm.getPayloadData();
 	}
 	
