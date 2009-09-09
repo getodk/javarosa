@@ -25,10 +25,13 @@ import java.util.Vector;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.log.IncidentLog;
+import org.javarosa.core.services.storage.IStorageIterator;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
-import org.javarosa.core.services.transport.Storage;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.services.transport.TransportMethod;
 import org.javarosa.core.util.Observable;
@@ -60,11 +63,6 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	 * Listens for messages from different transport methods
 	 */
 	private MessageListener messageListener;
-
-	/**
-	 * A storage element for placing received messages
-	 */
-	private Storage storage;
 	
 	/**
 	 * The current transport method that has been set for use
@@ -76,12 +74,8 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	 *
 	 * @param storage
 	 */
-	public TransportManager(Storage storage) {
-		if (storage == null) {
-			throw new IllegalArgumentException(
-					"Parameter storage must not be null");
-		}
-		this.storage = storage;
+	public TransportManager() {
+
 	}
 	
 	/* (non-Javadoc)
@@ -130,7 +124,12 @@ public class TransportManager implements Observer, IService, ITransportManager {
 			throws IOException {
 		message.addObserver(this);
 		TransportMethod selectedMethod = getTransportMethod(transportMethod);
-		storage.saveMessage(message);
+		IStorageUtility messages = StorageManager.getStorage(TransportMessage.STORAGE_KEY);
+		try {
+			messages.write(message);
+		} catch (StorageFullException e) {
+			throw new RuntimeException("uh-oh, storage full [transportmessages]"); //TODO: handle this
+		}
 		if (selectedMethod == null) {
 			throw new IOException("Selected transport method not available");
 		}
@@ -199,13 +198,6 @@ public class TransportManager implements Observer, IService, ITransportManager {
 		return transportMethods.elements();
 	}
 
-	/**
-	 *
-	 */
-	public void cleanUp() {
-		storage.close();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 *
@@ -216,14 +208,11 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	 * @see org.javarosa.core.services.ITransportManager#update(org.javarosa.core.util.Observable, java.lang.Object)
 	 */
 	public void update(Observable observable, Object arg) {
-		try {
-			TransportMessage msg = (TransportMessage)observable;
-			storage.updateMessage(msg);
-			if(msg != null && msg.getStatus() == TransportMessage.STATUS_FAILED) {
-				JavaRosaServiceProvider.instance().logIncident(IncidentLog.LOG_TYPE_APPLICATION, "Attempted Message Send Failure!");
-			}
-		} catch (IOException e) {
-			System.err.println(e);
+		TransportMessage msg = (TransportMessage)observable;
+		updateMessage(msg);
+
+		if(msg != null && msg.getStatus() == TransportMessage.STATUS_FAILED) {
+			JavaRosaServiceProvider.instance().logIncident(IncidentLog.LOG_TYPE_APPLICATION, "Attempted Message Send Failure!");
 		}
 	}
 
@@ -237,25 +226,33 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	 * @see org.javarosa.core.services.ITransportManager#deleteMessage(int)
 	 */
 	public void deleteMessage(int msgIndex) {
-		try {
-			storage.deleteMessage(msgIndex);
-		} catch (IOException e) {
-			System.err.println(e);
-		}
+		IStorageUtility messages = StorageManager.getStorage(TransportMessage.STORAGE_KEY);
+		messages.remove(msgIndex);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.ITransportManager#getMessages()
 	 */
 	public Enumeration getMessages() {
-		return storage.messageElements();
+		Vector elem = new Vector();
+		IStorageUtility messages = StorageManager.getStorage(TransportMessage.STORAGE_KEY);
+		IStorageIterator mi = messages.iterate();
+		while (mi.hasMore()) {
+			elem.addElement(mi.nextRecord());
+		}
+		return elem.elements();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.ITransportManager#updateMessage(org.javarosa.core.services.transport.TransportMessage)
 	 */
-	public void updateMessage(TransportMessage message) throws IOException {
-		storage.updateMessage(message);
+	public void updateMessage(TransportMessage message) {
+		IStorageUtility messages = StorageManager.getStorage(TransportMessage.STORAGE_KEY);
+		try {
+			messages.write(message);
+		} catch (StorageFullException e) {
+			throw new RuntimeException("uh-oh, storage full [transportmessages]"); //TODO: handle this
+		}
 	}
 
 	public int getModelDeliveryStatus(int modelId, boolean notFoundOK) {
@@ -334,14 +331,11 @@ public class TransportManager implements Observer, IService, ITransportManager {
 		if (message.getStatus() != TransportMessage.STATUS_DELIVERED) {
 			message.setStatus(TransportMessage.STATUS_DELIVERED);
 		
+			IStorageUtility messages = StorageManager.getStorage(TransportMessage.STORAGE_KEY);
 			try {
-				if (newMessage) {
-					storage.saveMessage(message);
-				} else {
-					storage.updateMessage(message);
-				}
-			} catch (IOException e) {
-				throw new RuntimeException();
+				messages.write(message);
+			} catch (StorageFullException e) {
+				throw new RuntimeException("uh-oh, storage full [transportmessages]"); //TODO: handle this
 			}
 		}
 	}
@@ -366,17 +360,13 @@ public class TransportManager implements Observer, IService, ITransportManager {
 			
 			int modelID = message.getModelId();
 			if(modelIDs.contains(new Integer(modelID))) {
-				toClear.addElement(new Integer(message.getRecordId()));
+				toClear.addElement(new Integer(message.getID()));
 			}
 		}
 		
 		while(!toClear.isEmpty()) {
 			Integer mid = (Integer)toClear.pop();
-			try {
-				storage.deleteMessage(mid.intValue());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			deleteMessage(mid.intValue());
 		}
 	}
 }

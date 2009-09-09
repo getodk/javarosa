@@ -16,7 +16,6 @@
 
 package org.javarosa.core.model.util.restorable;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
@@ -32,12 +31,10 @@ import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.services.storage.utilities.IDRecordable;
-import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
-import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.services.storage.utilities.RecordStorageException;
+import org.javarosa.core.services.storage.IStorageIterator;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.services.transport.ByteArrayPayload;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -75,8 +72,8 @@ public class RestoreUtils {
 	public static DataModelTree createDataModel (Restorable r) {
 		DataModelTree dm = newDataModel(r.getRestorableType());
 		
-		if (r instanceof IDRecordable) {
-			addData(dm, RECORD_ID_TAG, new Integer(((IDRecordable)r).getRecordId()));
+		if (r instanceof Persistable) {
+			addData(dm, RECORD_ID_TAG, new Integer(((Persistable)r).getID()));
 		}
 		
 		return dm;
@@ -194,7 +191,7 @@ public class RestoreUtils {
 		if (parent == null)
 			parent = topRef(dm);
 		
-		if (r instanceof IDRecordable) {
+		if (r instanceof Persistable) {
 			applyDataType(dm, RECORD_ID_TAG, parent, Integer.class);
 		}
 		
@@ -220,31 +217,16 @@ public class RestoreUtils {
 		parentNode.addChild(childNode);
 	}
 	
-	public static DataModelTree exportRMS (RMSUtility rmsu, Class type, String parentTag, IRecordFilter filter) {
+	public static DataModelTree exportRMS (IStorageUtility storage, Class type, String parentTag, IRecordFilter filter) {
 		if (!Externalizable.class.isAssignableFrom(type) || !Restorable.class.isAssignableFrom(type)) {
 			return null;
 		}
 				
 		DataModelTree dm = newDataModel(parentTag);
 		
-		IRecordStoreEnumeration re = rmsu.enumerateRecords();
-		while (re.hasNextElement()) {
-			int recID = -1;
-			try {
-				recID = re.nextRecordId();
-			} catch (RecordStorageException e) {
-				System.err.println("grrr");
-			}
-			
-			Object obj = PrototypeFactory.getInstance(type);
-			
-			try {
-				rmsu.retrieveFromRMS(recID, (Externalizable)obj);
-			} catch (IOException e) {
-				System.err.println("glaven");
-			} catch (DeserializationException e) {
-				System.err.println("grief");
-			}
+		IStorageIterator ri = storage.iterate();
+		while (ri.hasMore()) {
+			Object obj = ri.nextRecord();
 			
 			if (filter == null || filter.filter(obj)) {
 				DataModelTree objModel = ((Restorable)obj).exportData();
@@ -261,35 +243,21 @@ public class RestoreUtils {
 		return new DataModelTree(newTop);
 	}
 	
-	public static void exportRMS (DataModelTree parent, Class type, String grouperName, RMSUtility rmsu, IRecordFilter filter) {
-		DataModelTree entities = RestoreUtils.exportRMS(rmsu, type, grouperName, filter);
+	public static void exportRMS (DataModelTree parent, Class type, String grouperName, IStorageUtility storage, IRecordFilter filter) {
+		DataModelTree entities = RestoreUtils.exportRMS(storage, type, grouperName, filter);
 		RestoreUtils.mergeDataModel(parent, entities, ".");
 	}
 	
-	public static void importRMS (DataModelTree dm, RMSUtility rmsu, Class type, String path) {
+	public static void importRMS (DataModelTree dm, IStorageUtility storage, Class type, String path) {
 		if (!Externalizable.class.isAssignableFrom(type) || !Restorable.class.isAssignableFrom(type)) {
 			return;
 		}
 
-		boolean idMatters = IDRecordable.class.isAssignableFrom(type);
+		boolean idMatters = Persistable.class.isAssignableFrom(type);
 		
 		String childName = ((Restorable)PrototypeFactory.getInstance(type)).getRestorableType();
 		TreeElement e = dm.resolveReference(absRef(path, dm));
 		Vector children = e.getChildrenWithName(childName);
-		
-		if (idMatters) {
-			//should we check if RMS is empty? this presents problems for users, where the admin user is already defined
-			
-			Vector recIDs = new Vector();
-			for (int i = 0; i < children.size(); i++) {
-				int recID = ((Integer)((TreeElement)children.elementAt(i)).getChild(RECORD_ID_TAG, 0).getValue().getValue()).intValue();
-				recIDs.addElement(new Integer(recID));
-			}
-			
-			if (!rmsu.makeIDsAvailable(recIDs)) {
-				throw new RuntimeException("Cannot restore RMS using same IDs!");
-			}
-		}
 		
 		for (int i = 0; i < children.size(); i++) {
 			DataModelTree child = subDataModel((TreeElement)children.elementAt(i));
@@ -297,19 +265,22 @@ public class RestoreUtils {
 			Restorable inst = (Restorable)PrototypeFactory.getInstance(type);
 			
 			//restore record id first so 'importData' has access to it
+			int recID = -1;
 			if (idMatters) {
-				((IDRecordable)inst).setRecordId(((Integer)getValue(RECORD_ID_TAG, child)).intValue());
+				recID = ((Integer)getValue(RECORD_ID_TAG, child)).intValue();
+				((Persistable)inst).setID(recID);
 			}
 			
 			inst.importData(child);
 			
-			if (idMatters) {
-				IDRecordable instRec = (IDRecordable)inst;
-				if (!rmsu.writeToRMSusingID(instRec)) {
-					throw new RuntimeException("Error importing RMS during restore! [" + rmsu.getName() + ":" + instRec.getRecordId() + "]");
+			try {
+				if (idMatters) {
+					storage.write((Persistable)inst);
+				} else {
+					storage.add((Externalizable)inst);
 				}
-			} else {
-				rmsu.writeToRMS(inst, rmsu.newMetaData(inst));
+			} catch (Exception ex) {
+				throw new RuntimeException("Error importing RMS during restore! [" + type.getName() + ":" + recID + "]; " + ex.getMessage());
 			}
 		}
 	}

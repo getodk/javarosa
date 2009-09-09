@@ -20,7 +20,10 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.services.properties.IPropertyRules;
-import org.javarosa.core.services.properties.storage.PropertyRMSUtility;
+import org.javarosa.core.services.properties.Property;
+import org.javarosa.core.services.storage.IStorageUtilityIndexed;
+import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.services.storage.StorageManager;
 
 /**
  * PropertyManager is a class that is used to set and retrieve name/value pairs
@@ -38,7 +41,7 @@ public class PropertyManager implements IService,IPropertyManager {
 	/**
 	 * The name for the Persistent storage utility name
 	 */
-    public static final String PROPERTY_RMS = "PROPERTY_RMS";
+    public static final String STORAGE_KEY = "PROPERTY";
 
     /**
      * The list of rules 
@@ -48,7 +51,7 @@ public class PropertyManager implements IService,IPropertyManager {
     /**
      * The persistent storage utility
      */
-    private PropertyRMSUtility propertyRMS;
+    private IStorageUtilityIndexed properties;
     
     public String getName() {
     	return "Property Manager";
@@ -58,8 +61,8 @@ public class PropertyManager implements IService,IPropertyManager {
      * Constructor for this PropertyManager
      */
     public PropertyManager() {
-        this.propertyRMS = new PropertyRMSUtility(PROPERTY_RMS);
-        rulesList = new Vector();
+    	this.properties = (IStorageUtilityIndexed)StorageManager.getStorage(STORAGE_KEY);
+    	rulesList = new Vector();
     }
 
     /**
@@ -72,7 +75,7 @@ public class PropertyManager implements IService,IPropertyManager {
     public String getSingularProperty(String propertyName) {
     	String retVal = null;
         if((rulesList.size() == 0 || checkPropertyAllowed(propertyName))) {
-        	Vector value = (Vector)propertyRMS.getValue(propertyName);
+        	Vector value = getValue(propertyName);
         	if(value != null && value.size() == 1) {
         		retVal = (String)value.elementAt(0);
         	}
@@ -95,11 +98,11 @@ public class PropertyManager implements IService,IPropertyManager {
      */
     public Vector getProperty(String propertyName) {
         if(rulesList.size() == 0) {
-            return propertyRMS.getValue(propertyName);
+            return getValue(propertyName);
         }
         else {
             if(checkPropertyAllowed(propertyName)) {
-                return propertyRMS.getValue(propertyName);
+                return getValue(propertyName);
             }
             else
             {
@@ -131,7 +134,7 @@ public class PropertyManager implements IService,IPropertyManager {
     		return;
     	}
         if(rulesList.size() == 0) {
-           propertyRMS.writeValue(propertyName, propertyValue);
+           writeValue(propertyName, propertyValue);
         }
         else {
             boolean valid = true;
@@ -143,7 +146,7 @@ public class PropertyManager implements IService,IPropertyManager {
                 } 
             }
             if(valid) {
-                propertyRMS.writeValue(propertyName, propertyValue);
+                writeValue(propertyName, propertyValue);
                 notifyChanges(propertyName);
             }
             //#if debug.output==verbose
@@ -271,4 +274,27 @@ public class PropertyManager implements IService,IPropertyManager {
     	}
     	
     }
+
+    public Vector getValue (String name) {
+    	Property p = (Property)properties.getRecordForValue("NAME", name);
+    	return (p != null ? p.value : null);
+    }
+    
+    public void writeValue(String propertyName, Vector value) {
+        Property theProp = new Property();
+        theProp.name = propertyName;
+        theProp.value = value;
+
+        Vector IDs = properties.getIDsForValue("NAME", propertyName);
+        if (IDs.size() == 1) {
+        	theProp.setID(((Integer)IDs.elementAt(0)).intValue());
+        }
+        
+        try {
+        	properties.write(theProp);
+        } catch (StorageFullException e) {
+			throw new RuntimeException("uh-oh, storage full [properties]"); //TODO: handle this
+        }
+    }
+    
 }
