@@ -1,18 +1,17 @@
 <?xml version="1.0"?>
-
 <project default="package">
 	<target name="package" depends="clean">
-   		<ant dir="../javarosa-core" target="package" />
-   		<ant dir="../j2merosa-core" target="package" />
+		<ant dir="../javarosa-core" target="package"/>
+		<ant dir="../j2merosa-core" target="package"/>
+		<ant dir="../j2merosa-extensions" target="package"/>
+		<ant dir="../j2merosa-activities" target="package"/>
+		
 	</target>
 	<target name="clean">
-		<ant dir="../javarosa-core" target="clean" />
-		<ant dir="../j2merosa-core" target="clean" />
-	        <delete>
+		<delete>
 			<fileset dir=".">
-                                <include name="*.jar" />
-                        </fileset>
-                </delete>   
-
+				<include name="*.jar"/>
+			</fileset>
+		</delete>
 	</target>
 </project>
