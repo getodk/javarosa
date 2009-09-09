@@ -183,7 +183,8 @@ public class RMSStorageUtility implements IStorageUtility {
 			
 			int id = p.getID();
 			if (id == -1 && allocateIDs) {
-				p.setID(info.nextRecordID);
+				id = info.nextRecordID;
+				p.setID(id);
 				info.nextRecordID++;
 			}
 						
