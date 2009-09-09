@@ -20,17 +20,18 @@ import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.CommandListener;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.services.storage.IStorageIterator;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.user.model.User;
-import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.view.UserForm;
 
 public class UserValidator {
 
 	private UserForm view;
-	private UserRMSUtility userRMS;
+	private IStorageUtility users;
 
 	public final static int OK = 0;
 	public final static int USER_EXISTS = 1;
@@ -39,10 +40,7 @@ public class UserValidator {
 
 	public UserValidator(UserForm view) {
 		this.view = view;
-		this.userRMS = (UserRMSUtility) JavaRosaServiceProvider.instance()
-				.getStorageManager().getRMSStorageProvider().getUtility(
-						UserRMSUtility.getUtilityName());
-
+		this.users = StorageManager.getStorage(User.STORAGE_KEY);
 	}
 
 	/**
@@ -162,22 +160,11 @@ public class UserValidator {
 	 */
 	private boolean usernameExistsInRMS(String username) {
 
-		User userInRMS = new User();
-
-		int numberOfUsers = this.userRMS.getNumberOfRecords();
-
-		for (int i = 0; i < numberOfUsers; i++) {
-			try {
-
-				this.userRMS.retrieveFromRMS(i + 1, userInRMS);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				// nothing to do for user
-			}
-			if (userInRMS.getUsername().equalsIgnoreCase(username))
+		IStorageIterator ui = users.iterate();
+		while (ui.hasMore()) {
+			User u = (User)ui.nextRecord();
+			if (u.getUsername().equalsIgnoreCase(username))
 				return true;
-
 		}
 
 		return false;

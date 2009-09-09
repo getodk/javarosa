@@ -20,9 +20,8 @@ import java.util.Vector;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
-import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
-import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.services.storage.utilities.RecordStorageException;
+import org.javarosa.core.services.storage.IStorageIterator;
+import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.entity.model.IEntity;
 import org.javarosa.entity.model.view.EntitySelectDetailPopup;
 import org.javarosa.entity.model.view.EntitySelectView;
@@ -34,7 +33,7 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	
 	private EntitySelectView selView;
 	
-	private RMSUtility entityRMS;
+	private IStorageUtility entityStorage;
 	private E entityPrototype;
 	
 	boolean immediatelySelectNewlyCreated;
@@ -43,17 +42,17 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	
 	Vector entities;
 	
-	public EntitySelectState (String title, RMSUtility entityRMS, E entityPrototype) {
-		this(title, entityRMS, entityPrototype, EntitySelectView.NEW_IN_LIST, true, false, null, null);
+	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype) {
+		this(title, entityStorage, entityPrototype, EntitySelectView.NEW_IN_LIST, true, false, null, null);
 	}
 	
-	public EntitySelectState (String title, RMSUtility entityRMS, E entityPrototype, int newMode, boolean immediatelySelectNewlyCreated) {
-		this(title, entityRMS, entityPrototype, newMode, immediatelySelectNewlyCreated, false, null, null);
+	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype, int newMode, boolean immediatelySelectNewlyCreated) {
+		this(title, entityStorage, entityPrototype, newMode, immediatelySelectNewlyCreated, false, null, null);
 	}
 	
-	public EntitySelectState (String title, RMSUtility entityRMS, E entityPrototype,
+	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype,
 			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter<E> filter, String styleKey) {
-		this.entityRMS = entityRMS;
+		this.entityStorage = entityStorage;
 		this.entityPrototype = entityPrototype;
 
 		this.immediatelySelectNewlyCreated = immediatelySelectNewlyCreated;
@@ -83,19 +82,15 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	private void loadEntities () {
 		entities = new Vector();
 		
-		IRecordStoreEnumeration recenum = entityRMS.enumerateMetaData();
-		while (recenum.hasNextElement()) {
-			try {
-				loadEntity(recenum.nextRecordId());
-			} catch (RecordStorageException e) {
-				e.printStackTrace();
-			}
+		IStorageIterator ei = entityStorage.iterate();
+		while (ei.hasMore()) {
+			loadEntity(ei.nextID());
 		}
 	}
 	
 	private void loadEntity (int recordID) {
-		E entity = (E) entityPrototype.factory(recordID);
-		entity.readEntity(entity.fetchRMS(entityRMS));
+		E entity = (E)entityPrototype.factory(recordID);
+		entity.readEntity(entity.fetch(entityStorage));
 		if(filter == null || filter.isPermitted(entity)) {
 			entities.addElement(entity);		
 		}
@@ -140,7 +135,7 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	
 	public void itemSelected (int i) {
 		IEntity entity = (IEntity)entities.elementAt(i);
-		EntitySelectDetailPopup psdp = new EntitySelectDetailPopup(this, entity, entityPrototype, entityRMS);
+		EntitySelectDetailPopup psdp = new EntitySelectDetailPopup(this, entity, entityPrototype, entityStorage);
 		psdp.show();
 	}
 	

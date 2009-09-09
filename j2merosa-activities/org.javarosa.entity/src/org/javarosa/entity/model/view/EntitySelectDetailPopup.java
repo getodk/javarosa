@@ -23,7 +23,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.entity.activity.EntitySelectState;
 import org.javarosa.entity.model.IEntity;
 
@@ -41,13 +41,13 @@ public class EntitySelectDetailPopup extends Form implements CommandListener {
 	Command okCmd;
 	Command backCmd;
 	
-	public EntitySelectDetailPopup (EntitySelectState psa, IEntity entity, IEntity prototype, RMSUtility entityRMS) {
+	public EntitySelectDetailPopup (EntitySelectState psa, IEntity entity, IEntity prototype, IStorageUtility entityStorage) {
 		super(entity.entityType() + " Detail");
 		
 		this.psa = psa;
 		
 		recordID = entity.getRecordID();
-		Object o = entity.fetchRMS(entityRMS);
+		Object o = entity.fetch(entityStorage);
 		headers = prototype.getHeaders(true);
 		data = prototype.getLongFields(o);
 		

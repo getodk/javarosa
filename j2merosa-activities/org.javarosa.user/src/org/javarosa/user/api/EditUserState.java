@@ -3,20 +3,15 @@
  */
 package org.javarosa.user.api;
 
-import java.io.IOException;
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.user.api.transitions.EditUserStateTransitions;
 import org.javarosa.user.model.User;
-import org.javarosa.user.storage.UserRMSUtility;
 import org.javarosa.user.utility.IUserDecorator;
 import org.javarosa.user.utility.UserValidator;
 import org.javarosa.user.view.UserForm;
