@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<project default="package">
+	<target name="package">		
+		<ant dir="org.javarosa.entity" target="package" />
+		<ant dir="org.javarosa.cases" target="package" /> 
+		<ant dir="org.javarosa.user" target="package" />
+		<ant dir="org.javarosa.patient" target="package" />
+		<ant dir="org.javarosa.chsreferral" target="package" />
+		<ant dir="org.javarosa.forms.review" target="package" />
+		<ant dir="org.javarosa.patient.entry" target="package" />
+		<ant dir="org.javarosa.polish.activity" target="package" />
+		<ant dir="org.javarosa.referral" target="package" />
+		<ant dir="org.javarosa.reminders" target="package" />
+		<ant dir="org.javarosa.rmstest" target="package" />
+		<ant dir="org.javarosa.services.properties" target="package" />
+		<ant dir="org.javarosa.utilities.file" target="package" />
+		<ant dir="org.javarosa.workflow" target="package" />
+	</target>
+</project>
