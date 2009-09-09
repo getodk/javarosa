@@ -384,38 +384,38 @@ public class EntitySelectView extends FramedForm implements IView, ItemStateList
 		}
 	}
 	
-	//#if polish.hasPointerEvents
+  //#if polish.hasPointerEvents
 	
-	/* (non-Javadoc)
-	 * @see de.enough.polish.ui.Container#handlePointerPressed(int, int)
-	 */
-	protected boolean handlePointerPressed(int x, int y) {
-		boolean handled = false;
-		
-		int screenIndex = 0;
-		for (int i = 0; i < this.container.size(); i++) {
-			Item item = this.container.getItems()[i];
-			if (item instanceof Container) {
-				if (this.container.isInItemArea(x - this.container.getAbsoluteX(), y - this.container.getAbsoluteY(), item)) {
-					selectedIndex = selectedIndexFromScreen(screenIndex);
-					refreshList();
-					processSelect();
-					
-					handled = true;
-					break;
-				}
-				
-				screenIndex++;
-			}
-		}
-		
-		if (handled){
-			return true;
-		} else {
-			return super.handlePointerPressed(x, y);
-		}
-	}
-	
-	//#endif
+  //#/* (non-Javadoc)
+  //# * @see de.enough.polish.ui.Container#handlePointerPressed(int, int)
+  //# */
+  //#protected boolean handlePointerPressed(int x, int y) {
+  //#	boolean handled = false;
+  //#	
+  //#	int screenIndex = 0;
+  //#	for (int i = 0; i < this.container.size(); i++) {
+  //#		Item item = this.container.getItems()[i];
+  //#		if (item instanceof Container) {
+  //#			if (this.container.isInItemArea(x - this.container.getAbsoluteX(), y - this.container.getAbsoluteY(), item)) {
+  //#				selectedIndex = selectedIndexFromScreen(screenIndex);
+  //#				refreshList();
+  //#				processSelect();
+  //#				
+  //#				handled = true;
+  //#				break;
+  //#			}
+  //#			
+  //#			screenIndex++;
+  //#		}
+  //#	}
+  //#	
+  //#	if (handled){
+  //#		return true;
+  //#	} else {
+  //#		return super.handlePointerPressed(x, y);
+  //#	}
+  //#}
+  
+  //#endif
 
 }	
