@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <project default="package">
 	<target name="package" depends="clean">
+		<property name="ant.build.javac.compiler" value="1.5"/>
+		<property name="ant.build.javac.source" value="1.5"/>
+		<property name="ant.build.javac.target" value="1.5"/>
 		<ant dir="../javarosa-core" target="package"/>
 		<ant dir="../j2merosa-core" target="package"/>
 		<ant dir="../j2merosa-extensions" target="package"/>
