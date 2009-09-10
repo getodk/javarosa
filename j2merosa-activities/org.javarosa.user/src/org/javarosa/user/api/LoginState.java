@@ -25,6 +25,8 @@ public class LoginState implements State<LoginStateTransitions>, CommandListener
 	LoginStateTransitions transitions;
 	LoginForm view;
 	
+	Alert demoModeAlert = null;
+	
 	public LoginState() {
 		
 	}
@@ -56,13 +58,13 @@ public class LoginState implements State<LoginStateTransitions>, CommandListener
 				return;
 
 			}
-			showError(Localization.get("activity.login.loginincorrect"), Localization.get("activity.login.tryagain"), this);
+			J2MEDisplay.showError(Localization.get("activity.login.loginincorrect"), Localization.get("activity.login.tryagain"));
 
 		}
 
 		// #if javarosa.login.demobutton
 		else if (c == LoginForm.CMD_DEMO_BUTTON) {
-			showError(Localization.get("activity.login.demomode"), Localization.get("activity.login.demomode.intro"), this);
+			demoModeAlert = J2MEDisplay.showError(Localization.get("activity.login.demomode"), Localization.get("activity.login.demomode.intro"), null, this);
 		}
 		// #endif
 
@@ -77,14 +79,14 @@ public class LoginState implements State<LoginStateTransitions>, CommandListener
 				transitions.loggedIn(view.getLoggedInUser());
 				return;
 			}
-			showError(Localization.get("activity.login.loginincorrect"), Localization.get("activity.login.tryagain"));
+			J2MEDisplay.showError(Localization.get("activity.login.loginincorrect"), Localization.get("activity.login.tryagain"));
 
 		}
 
 		// #if javarosa.login.demobutton
 		else if (c == LoginForm.CMD_DEMO_BUTTON) {
-			showError(Localization.get("activity.login.demomode"), Localization.get("activity.login.demomode.intro"), this);
-		} else if (d instanceof Alert) {
+			demoModeAlert = J2MEDisplay.showError(Localization.get("activity.login.demomode"), Localization.get("activity.login.demomode.intro"), null, this);
+		} else if (d == demoModeAlert) {
 			// returning from demo mode warning popup
 			User u = new User();
 			u.setUsername(User.DEMO_USER); // NOTE: Using a user type as a
@@ -93,14 +95,6 @@ public class LoginState implements State<LoginStateTransitions>, CommandListener
 			transitions.loggedIn(u);
 		}
 		// #endif
-	}
-
-	private void showError(String s, String message) {
-		showError(s, message, this);
-	}
-
-	private void showError(String s, String message, CommandListener cl) {
-		J2MEDisplay.showError(s, message);
 	}
 
 }
