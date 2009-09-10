@@ -44,12 +44,21 @@ public class RmsStorage implements Storage {
 	 * 
 	 */
 	private IRecordStorage messageRecordStore;
-
+	private String name;
+	
 	/**
 	 * Name of the record store containing the messages
 	 */
-	private static final String RS_MSG_NAME = "RS_MSG";
+	private static final String RS_MSG = "RS_MSG";
 
+	public RmsStorage () {
+		this(RS_MSG);
+	}
+	
+	public RmsStorage (String name) {
+		this.name = name;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -118,7 +127,7 @@ public class RmsStorage implements Storage {
 	private synchronized void init() throws RecordStorageException {
 		if (this.messageRecordStore == null) {
 			messageRecordStore = JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getRecordStoreFactory().produceNewStore();
-			messageRecordStore.openAsRecordStorage(RS_MSG_NAME, true);
+			messageRecordStore.openAsRecordStorage(name, true);
 		}
 	}
 

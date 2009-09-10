@@ -77,6 +77,10 @@ public class TransportManager implements Observer, IService, ITransportManager {
 	 * @param storage
 	 */
 	public TransportManager(Storage storage) {
+		setStorage(storage);
+	}
+	
+	public void setStorage (Storage storage) {
 		if (storage == null) {
 			throw new IllegalArgumentException(
 					"Parameter storage must not be null");
