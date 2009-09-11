@@ -17,4 +17,20 @@
 		<ant dir="org.javarosa.utilities.file" target="package" />
 		<ant dir="org.javarosa.workflow" target="package" />
 	</target>
+	<target name="clean">		
+		<ant dir="org.javarosa.entity" target="clean" />
+		<ant dir="org.javarosa.cases" target="clean" /> 
+		<ant dir="org.javarosa.user" target="clean" />
+		<ant dir="org.javarosa.patient" target="clean" />
+		<ant dir="org.javarosa.chsreferral" target="clean" />
+		<ant dir="org.javarosa.forms.review" target="clean" />
+		<ant dir="org.javarosa.patient.entry" target="clean" />
+		<ant dir="org.javarosa.polish.activity" target="clean" />
+		<ant dir="org.javarosa.referral" target="clean" />
+		<ant dir="org.javarosa.reminders" target="clean" />
+		<ant dir="org.javarosa.rmstest" target="clean" />
+		<ant dir="org.javarosa.services.properties" target="clean" />
+		<ant dir="org.javarosa.utilities.file" target="clean" />
+		<ant dir="org.javarosa.workflow" target="clean" />
+	</target>
 </project>
