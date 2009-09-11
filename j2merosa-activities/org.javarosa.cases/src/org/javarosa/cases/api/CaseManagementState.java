@@ -3,6 +3,9 @@
  */
 package org.javarosa.cases.api;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -21,36 +24,70 @@ import org.javarosa.j2me.view.J2MEDisplay;
  *
  */
 public class CaseManagementState implements State<CaseManagementTransitions>, CommandListener {
-
-	
-    public static final String NEW = Localization.get("menu.NewCase");
-    public static final String FOLLOWUP = Localization.get("menu.FollowUp");
-    public static String REFERRAL = Localization.get("menu.Referral");
-    public static final String VIEW_OPEN = Localization.get("menu.ViewOpen");
-    public static final String RESOLVE = Localization.get("menu.Resolve");
+    public static final String NEW = "menu.NewCase";
+    public static final String FOLLOWUP = "menu.FollowUp";
+    public static final String REFERRAL = "menu.Referral";
+    public static final String VIEW_OPEN = "menu.ViewOpen";
+    public static final String RESOLVE = "menu.Resolve";
     
     ICaseType type;
 	CaseManagementScreen view;
 	CaseManagementTransitions transitions;
 
-	private void configView() {
-		view = new CaseManagementScreen("Select Action");
-		view.insert(0,NEW,null);
-		view.insert(1,FOLLOWUP,null);
-		view.insert(2,REFERRAL,null);
-		view.insert(3,RESOLVE,null);
-		view.insert(4,VIEW_OPEN,null);		
-	}
-
+	Vector indexMapping = new Vector();
+	
 	public CaseManagementState(ICaseType type) {
 		this.type = type;
 		
-		REFERRAL = Localization.get("menu.Referral",new String[] {String.valueOf(CommCareUtil.getNumberOfOpenReferrals(type.getCaseTypeId()))} );
 		view = new CaseManagementScreen("Select Action");
 		configView();
 		view.setCommandListener(this);
 	}
 	
+	private void configView() {
+		int[] order = type.getActionListing();
+		if (order != null) {
+			for (int i = 0; i < order.length; i++) {
+				addOption(order[i]);
+			}
+		} else {
+			addOption(ICaseType.ACTION_NEW);
+			addOption(ICaseType.ACTION_FOLLOWUP);
+			addOption(ICaseType.ACTION_REFERRALS);
+			addOption(ICaseType.ACTION_CLOSE);
+			addOption(ICaseType.ACTION_BROWSE);		
+		}
+	}
+
+	private String captionForAction (int action) {
+		Hashtable capov = type.getCaptionOverrides();
+		String locKey = (String)capov.get(new Integer(action));
+		if (locKey == null) {		
+			switch (action) {
+			case ICaseType.ACTION_NEW: locKey = NEW; break;
+			case ICaseType.ACTION_FOLLOWUP: locKey = FOLLOWUP; break;
+			case ICaseType.ACTION_REFERRALS: locKey = REFERRAL; break;
+			case ICaseType.ACTION_CLOSE: locKey = RESOLVE; break;
+			case ICaseType.ACTION_BROWSE: locKey = VIEW_OPEN; break;
+			}
+		}
+
+		String caption;
+		if (action == ICaseType.ACTION_REFERRALS) {
+			caption = Localization.get(locKey, new String[] {String.valueOf(CommCareUtil.getNumberOfOpenReferrals(type.getCaseTypeId()))});			
+		} else {
+			caption = Localization.get(locKey);
+		}
+		
+		return caption;
+	}
+	
+	private void addOption (int action) {
+		String caption = captionForAction(action);
+		indexMapping.addElement(new Integer(action));
+		view.insert(action, caption, null);
+	}
+		
 	public void enter(CaseManagementTransitions transitions) {
 		this.transitions = transitions;
 	}
@@ -61,20 +98,22 @@ public class CaseManagementState implements State<CaseManagementTransitions>, Co
 
 	public void commandAction(Command c, Displayable arg1) {
 		if(c.equals(List.SELECT_COMMAND)) {
-			switch(view.getSelectedIndex()) {
-				case 0:
+			int action = ((Integer)indexMapping.elementAt(view.getSelectedIndex())).intValue();
+			
+			switch(action) {
+				case ICaseType.ACTION_NEW:
 					transitions.newCase();
 					break;
-				case 1:
+				case ICaseType.ACTION_FOLLOWUP:
 					transitions.followUpOnCase();
 					break;
-				case 2:
+				case ICaseType.ACTION_REFERRALS:
 					transitions.viewReferrals();
 					break;
-				case 3:
+				case ICaseType.ACTION_CLOSE:
 					transitions.closeCase();
 					break;
-				case 4:
+				case ICaseType.ACTION_BROWSE:
 					transitions.viewOpen();
 					break;
 			}

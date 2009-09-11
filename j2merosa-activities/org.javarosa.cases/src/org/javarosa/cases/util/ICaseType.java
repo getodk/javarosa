@@ -19,8 +19,10 @@
  */
 package org.javarosa.cases.util;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 import org.javarosa.core.model.utils.IModelProcessor;
-import org.javarosa.entity.model.IEntity;
 
 /**
  * @author Clayton Sims
@@ -28,6 +30,11 @@ import org.javarosa.entity.model.IEntity;
  *
  */
 public interface ICaseType {
+	public static final int ACTION_NEW = 0;
+	public static final int ACTION_FOLLOWUP = 1;
+	public static final int ACTION_REFERRALS = 2;
+	public static final int ACTION_CLOSE = 3;
+	public static final int ACTION_BROWSE = 4;	
 	
 	public final static String FORM_TYPE_NEW_CASE = "c_ft_nc";
 	public final static String FORM_TYPE_FOLLOWUP = "c_ft_fu";
@@ -43,4 +50,8 @@ public interface ICaseType {
 	public IModelProcessor getModelProcessor(String formType, int thisidisahack);
 	
 	public CaseEntity getUniqueEntity();
+	
+	public Hashtable getCaptionOverrides ();
+	
+	public int[] getActionListing ();
 }
