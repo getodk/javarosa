@@ -13,7 +13,7 @@
 	<target name="clean">
 		<delete>
 			<fileset dir=".">
-				<include name="*.jar"/>
+				<include name="j*rosa*.jar"/>
 			</fileset>
 		</delete>
 	</target>
