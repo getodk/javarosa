@@ -58,7 +58,7 @@ splashscreen=/splash.gif
 
 
 menu.NewCase=New Case
-menu.FollowUp=Follow Up on Existing Case
+menu.FollowUp=Follow Up Visit
 menu.Referral=Follow Up on Referral
 menu.ViewOpen=View Open Cases
 menu.Resolve=Resolve Case
