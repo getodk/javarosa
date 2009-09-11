@@ -33,4 +33,36 @@
 		<ant dir="org.javarosa.barcode" target="package" />
 		
 	</target>
+	<target name="clean">
+
+		<ant dir="org.javarosa.communication" target="clean" />
+		<ant dir="org.javarosa.communication.ui" target="clean" />
+
+		<ant dir="../j2merosa-activities/org.javarosa.entity" target="clean" />
+		<ant dir="../j2merosa-activities/org.javarosa.user" target="clean" />
+		<ant dir="org.javarosa.formmanager" target="clean" />
+
+		<ant dir="../j2merosa-activities/org.javarosa.services.properties" target="clean" />
+		<ant dir="../j2merosa-activities/org.javarosa.polish.activity" target="clean" />
+		<ant dir="org.javarosa.polish.chatterbox" target="clean" />
+		<ant dir="org.javarosa.resources" target="clean" />
+		<ant dir="org.javarosa.clforms" target="clean" />
+
+		<ant dir="../j2merosa-activities/org.javarosa.patient" target="clean" />
+		<ant dir="org.javarosa.polish.chatterbox.extensions" target="clean" />
+
+		<ant dir="org.javarosa.communication.bluetooth" target="clean" />
+		<ant dir="org.javarosa.communication.bluetooth.client" target="clean" />
+		<ant dir="org.javarosa.communication.bluetooth.server" target="clean" />
+
+		<ant dir="org.javarosa.communication.reporting" target="clean" />
+		<ant dir="org.javarosa.communication.sms.trigger" target="clean" />
+		<ant dir="org.javarosa.log" target="clean" />
+
+		<ant dir="../j2merosa-activities/org.javarosa.utilities.file" target="clean" />
+		<ant dir="org.javarosa.media.image" target="clean" />
+		<ant dir="org.javarosa.media.audio" target="clean" />
+		<ant dir="org.javarosa.barcode" target="clean" />
+
+	</target>
 </project>
