@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entity"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.j2me"/>
+	<classpathentry kind="src" path="/org.commcare.core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
