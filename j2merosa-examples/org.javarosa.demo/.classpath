@@ -5,36 +5,6 @@
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry kind="lib" path="tools/j2meunit-javarosa.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-bluetooth-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-cases-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-chsreferral-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-clforms-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-communication-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-communication-reporting-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-communication-ui-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-core-1.0.667.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-entity-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-formmanager-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-forms-review-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-log-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-media-audio-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-media-image-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-patient-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-patient-entry-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-polish-activity-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-polish-chatterbox-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-polish-chatterbox-extensions-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-referral-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-reminders-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-resources-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-rms-test-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-services-properties-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-sms-trigger-1.0.278.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-user-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-utilities-file-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/j2merosa-workflow-1.0.204.jar"/>
-	<classpathentry kind="lib" path="lib/javarosa-core-1.0.273.jar"/>
-	<classpathentry kind="lib" path="lib/kxml2-2.3.0.jar"/>
-	<classpathentry kind="lib" path="lib/regexp-me.jar"/>
+	<classpathentry kind="lib" path="lib/j2merosa-libraries-20090914.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
