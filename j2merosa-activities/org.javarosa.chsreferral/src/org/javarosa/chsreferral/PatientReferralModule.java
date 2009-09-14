@@ -16,9 +16,10 @@
 
 package org.javarosa.chsreferral;
 
-import org.javarosa.chsreferral.storage.PatientReferralRMSUtility;
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.chsreferral.model.PatientReferral;
+import org.javarosa.core.Context;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.services.storage.StorageManager;
 
 /**
  * 
@@ -37,9 +38,8 @@ public class PatientReferralModule implements IModule {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
-	public void registerModule() {
-		PatientReferralRMSUtility refRms = new PatientReferralRMSUtility(PatientReferralRMSUtility.getUtilityName());
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(refRms);
+	public void registerModule(Context context) {
+		StorageManager.registerStorage(PatientReferral.STORAGE_KEY, PatientReferral.class);
 	}
 
 }

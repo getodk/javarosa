@@ -67,7 +67,7 @@ public class BareBonesDataModelWrapper implements Externalizable {
 	}
 		
 	private static void cloneDataModelFrom (DataModelTree dst, DataModelTree src) {
-		dst.setId(src.getId());
+		dst.setID(src.getID());
 		dst.setFormId(src.getFormId());
 		dst.setName(src.getName());
 		dst.setDateSaved(src.getDateSaved());
@@ -80,7 +80,7 @@ public class BareBonesDataModelWrapper implements Externalizable {
 			throw new DeserializationException("Template data model is not set!");
 		}
 		
-		dm.setId(ExtUtil.readInt(in));
+		dm.setID(ExtUtil.readInt(in));
 		dm.setFormId(ExtUtil.readInt(in));
 		dm.setName(ExtUtil.nullIfEmpty(ExtUtil.readString(in)));
 		dm.schema = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
@@ -179,7 +179,7 @@ public class BareBonesDataModelWrapper implements Externalizable {
 			purgeSelectValues(dm.getRoot());
 		}
 		
-		ExtUtil.writeNumeric(out, dm.getId());
+		ExtUtil.writeNumeric(out, dm.getID());
 		ExtUtil.writeNumeric(out, dm.getFormId());
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(dm.getName()));
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(dm.schema));
