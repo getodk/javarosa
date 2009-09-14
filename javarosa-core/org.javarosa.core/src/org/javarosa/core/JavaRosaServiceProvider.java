@@ -28,12 +28,13 @@ import org.javarosa.core.services.IPropertyManager;
 import org.javarosa.core.services.IService;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.PropertyManager;
-import org.javarosa.core.services.StorageManager;
 import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
-import org.javarosa.core.services.transport.storage.RmsStorage;
+import org.javarosa.core.services.properties.Property;
+import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.PrefixTree;
 import org.javarosa.core.util.UnregisteredLocaleException;
@@ -54,7 +55,6 @@ public class JavaRosaServiceProvider {
 	
 	private Hashtable daemons;
 
-	private StorageManager storageManager;
     private ITransportManager transportManager;
     private IPropertyManager propertyManager;
     
@@ -103,24 +103,18 @@ public class JavaRosaServiceProvider {
             registerService(service);
 	    }
 	}
-
-	public StorageManager getStorageManager() {
-			if(storageManager == null) {
-				storageManager = new StorageManager();
-				this.registerService(storageManager);
-			}
-			return storageManager;
-	}
 	
 	public ITransportManager getTransportManager() {
 		if(transportManager == null) {
+			//this should be moved to a module initialization
 			String[] classes = {
 					"org.javarosa.core.services.transport.ByteArrayPayload",
 					"org.javarosa.core.services.transport.MultiMessagePayload",
 					"org.javarosa.core.services.transport.DataPointerPayload"
 			};		
 			registerPrototypes(classes);
-			transportManager = new TransportManager(new RmsStorage());
+			StorageManager.registerStorage(TransportMessage.STORAGE_KEY, TransportMessage.class);
+			transportManager = new TransportManager();
 			this.registerService(transportManager);
 		}
 		return transportManager;
@@ -128,6 +122,7 @@ public class JavaRosaServiceProvider {
 	
 	public IPropertyManager getPropertyManager() {
 		if(propertyManager == null) {
+			StorageManager.registerStorage(PropertyManager.STORAGE_KEY, Property.class);			
 			propertyManager = new PropertyManager();
 			this.registerService(propertyManager);
 		}

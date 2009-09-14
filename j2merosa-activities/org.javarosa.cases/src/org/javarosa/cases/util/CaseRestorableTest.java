@@ -20,9 +20,9 @@
 package org.javarosa.cases.util;
 
 import org.javarosa.cases.model.Case;
-import org.javarosa.cases.storage.CaseRmsUtility;
-import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
+import org.javarosa.core.services.storage.IStorageIterator;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageManager;
 
 /**
  * @author Clayton Sims
@@ -31,12 +31,11 @@ import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
  */
 public class CaseRestorableTest {
 	public static void test() {
-		CaseRmsUtility utility = (CaseRmsUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(CaseRmsUtility.getUtilityName());
-		for (IRecordStoreEnumeration en = utility.enumerateMetaData(); en.hasNextElement(); ) {
-			Case c = new Case();
+		IStorageUtility cases = StorageManager.getStorage(Case.STORAGE_KEY);
+		IStorageIterator ci = cases.iterate();
+		while (ci.hasMore()) {
 			try {
-				utility.retrieveFromRMS(en.nextRecordId(), c);
-				RestorableTestHarness.evaluateRestorable(c);
+				RestorableTestHarness.evaluateRestorable((Case)ci.nextRecord());
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new RuntimeException("Case was busted!");

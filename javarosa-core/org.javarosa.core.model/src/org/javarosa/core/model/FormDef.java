@@ -41,13 +41,13 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.QuestionPreloader;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
-import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.services.storage.IMetaData;
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -57,9 +57,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @author Daniel Kayiwa, Drew Roos
  * 
  */
-public class FormDef implements IFormElement, Localizable, IDRecordable,
-		Externalizable {
-
+public class FormDef implements IFormElement, Localizable, Persistable, IMetaData {
+	public static final String STORAGE_KEY = "FORMDEF";
 	public static final int TEMPLATING_RECURSION_LIMIT = 10;
 
 	private Vector children;// <IFormElement> 
@@ -96,6 +95,7 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 	 * 
 	 */
 	public FormDef() {
+		setID(-1);
 		setChildren(null);
 		triggerables = new Vector();
 		triggerablesInOrder = true;
@@ -1155,16 +1155,6 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 		this.name = name;
 	}
 
-	// treating id and record id as the same until we resolve the need for both
-	// of them
-	public int getRecordId() {
-		return getID();
-	}
-
-	public void setRecordId(int recordId) {
-		setID(recordId);
-	}
-
 	public Localizer getLocalizer() {
 		return localizer;
 	}
@@ -1185,4 +1175,25 @@ public class FormDef implements IFormElement, Localizable, IDRecordable,
 		this.outputFragments = outputFragments;
 	}
 
+	public Hashtable getMetaData() {
+		Hashtable metadata = new Hashtable();
+		String[] fields = getMetaDataFields();
+		for (int i = 0; i < fields.length; i++) {
+			metadata.put(fields[i], getMetaData(fields[i]));
+		}
+		return metadata;
+	}
+
+	public Object getMetaData(String fieldName) {
+		if (fieldName.equals("DESCRIPTOR")) {
+			return name;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+
+	public String[] getMetaDataFields() {
+		return new String[] {"DESCRIPTOR"};
+	}
+	
 }

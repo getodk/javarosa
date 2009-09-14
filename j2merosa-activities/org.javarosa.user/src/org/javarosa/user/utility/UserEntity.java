@@ -21,7 +21,7 @@ package org.javarosa.user.utility;
 
 import java.io.IOException;
 
-import org.javarosa.core.services.storage.utilities.RMSUtility;
+import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entity.model.IEntity;
 import org.javarosa.user.model.User;
@@ -58,16 +58,8 @@ public class UserEntity implements IEntity {
 	/* (non-Javadoc)
 	 * @see org.javarosa.patient.select.activity.IEntity#fetchRMS(org.javarosa.core.services.storage.utilities.RMSUtility)
 	 */
-	public Object fetchRMS(RMSUtility rmsu) {
-		User user = new User();
-		try {
-			rmsu.retrieveFromRMS(recordID, user);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (DeserializationException e) {
-			e.printStackTrace();
-		}
-		return user;
+	public Object fetch(IStorageUtility storage) {
+		return (User)storage.read(recordID);
 	}
 
 	/* (non-Javadoc)
