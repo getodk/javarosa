@@ -54,10 +54,10 @@ polish.predictive.setup.cmd.no=No
 
 #Javarosa-specific
 menu.NewCase=Jarida la kesi mpya
-menu.FollowUp=Fatilia jarida la kesi iliyopo
-menu.Referral=Fatilia rufaa
-menu.ViewOpen=Angalia jarida la kesi iliyofunguliwa
-menu.Resolve=Rudia kutatua kesi
+menu.FollowUp=Ufuatilia
+menu.Referral=Rufaa
+menu.ViewOpen=Orodha ya wajawazito
+menu.Resolve=Hitimisho la Ujauzito
 menu.Save=Save
 menu.Exit=Exit
 menu.GetNewForms=Get New Forms
@@ -87,6 +87,18 @@ menu.MessageStatus=Message Status
 menu.Empty=Empty
 
 hint.TypeOrScan=Type in you answer, or choose Scan to scan the barcode
+
+
+formreview.period.select=Kuangalia taarifa
+formreview.period.today=Taarifa za leo
+formreview.period.yesterday=Taarifa za jana
+formreview.period.week.this=Taarifa za wiki hii
+formreview.period.week.last=Taarifa za wiki iliyopita
+
+model.name.long=Jina la fomu
+model.date.long=Tarehe
+model.time.long=Muda
+
 
 title.ScanBarcode=Scan barcode
 title.FormsList=Forms List
@@ -159,7 +171,8 @@ activity.adduser.problem.mismatchingpasswords=Passwords don't match
 activity.edituser.edituser=Edit User
  
 
-Pregnancy=Ujauzito
+household.visit=Fomu za kutembelea kaya
+Pregnancy=Fomu za wajawazito
 NewBirth=Uzazi mpya
 
 
@@ -227,8 +240,9 @@ Sort=  Panga
 SortBy=  Panga kwa
 Cancel=  Kataa
 
-date=Tarehe
-time=Time
+#seems to be used by entity select screen
+date=Tar.
+time=Muda
 name=Jina
 id=Namba
 
