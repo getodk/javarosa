@@ -20,9 +20,8 @@ import java.util.Vector;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
-import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
-import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.services.storage.utilities.RecordStorageException;
+import org.javarosa.core.services.storage.IStorageIterator;
+import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.entity.api.transitions.EntitySelectTransitions;
 import org.javarosa.entity.model.IEntity;
 import org.javarosa.entity.model.view.EntitySelectDetailPopup;

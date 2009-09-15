@@ -19,7 +19,6 @@
  */
 package org.javarosa.user.activity;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.user.model.User;
@@ -31,7 +30,7 @@ import org.javarosa.user.model.User;
  */
 public class UserModule implements IModule {
 
-	public void registerModule(Context context) {
+	public void registerModule() {
 		StorageManager.registerStorage(User.STORAGE_KEY, User.class);
 	}
 

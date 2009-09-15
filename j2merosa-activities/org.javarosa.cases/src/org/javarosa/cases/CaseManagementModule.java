@@ -20,7 +20,6 @@
 package org.javarosa.cases;
 
 import org.javarosa.cases.model.Case;
-import org.javarosa.core.Context;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.storage.StorageManager;
 
@@ -34,7 +33,7 @@ public class CaseManagementModule implements IModule {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
-	public void registerModule(Context context) {
+	public void registerModule() {
 		StorageManager.registerStorage(Case.STORAGE_KEY, Case.class);
 	}
 

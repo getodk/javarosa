@@ -24,7 +24,7 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.services.storage.IStorageUtility;
-import org.javarosa.entity.activity.EntitySelectState;
+import org.javarosa.entity.api.EntitySelectState;
 import org.javarosa.entity.model.IEntity;
 
 import de.enough.polish.ui.Container;
