@@ -58,6 +58,7 @@ public class LoginForm extends FramedForm {
 	private final static int DEFAULT_ADMIN_USERID = -1;
 
 	public LoginForm() {
+		//#style loginView
 		super(Localization.get("form.login.login"));
 		init();
 	}
@@ -67,6 +68,7 @@ public class LoginForm extends FramedForm {
 	 * @param title
 	 */
 	public LoginForm(String title) {
+		//#style loginView
 		super(title);
 		init();
 	}
