@@ -19,7 +19,6 @@
  */
 package org.javarosa.j2me;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.storage.IStorageFactory;
@@ -38,7 +37,7 @@ public class J2MEModule implements IModule {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
-	public void registerModule(Context context) {
+	public void registerModule() {
 		StorageManager.setStorageFactory(new IStorageFactory () {
 			public IStorageUtility newStorage(String name, Class type) {
 				return new RMSStorageUtilityIndexed(name, type);

@@ -367,6 +367,22 @@ public class RMSStorageUtility implements IStorageUtility {
 		remove(p.getID());
 	}
 
+	public void removeAll () {
+		synchronized (getAccessLock()) {
+			Vector IDs = new Vector();
+			
+			IStorageIterator ii = iterate();
+			while (ii.hasMore()) {
+				IDs.addElement(new Integer(ii.nextID()));
+			}
+			
+			for (int i = 0; i < IDs.size(); i++) {
+				int id = ((Integer)IDs.elementAt(i)).intValue();
+				remove(id);
+			}
+		}
+	}
+	
 	/**
 	 * Return the number of records in the store
 	 * 
