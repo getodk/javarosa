@@ -11,10 +11,10 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import org.commcare.core.util.CommCareUtil;
 import org.javarosa.cases.api.transitions.CaseManagementTransitions;
 import org.javarosa.cases.util.ICaseType;
 import org.javarosa.cases.view.CaseManagementScreen;
+import org.javarosa.chsreferral.util.PatientReferralUtil;
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -74,7 +74,7 @@ public class CaseManagementState implements State<CaseManagementTransitions>, Co
 
 		String caption;
 		if (action == ICaseType.ACTION_REFERRALS) {
-			caption = Localization.get(locKey, new String[] {String.valueOf(CommCareUtil.getNumberOfOpenReferrals(type.getCaseTypeId()))});			
+			caption = Localization.get(locKey, new String[] {String.valueOf(PatientReferralUtil.getNumberOfOpenReferralsByType(type.getCaseTypeId()))});			
 		} else {
 			caption = Localization.get(locKey);
 		}
