@@ -54,7 +54,7 @@ polish.predictive.setup.cmd.no=No
 
 #Javarosa-specific
 menu.NewCase=Jarida la kesi mpya
-menu.FollowUp=Ufuatilia
+menu.FollowUp=Ufuatiliaji
 menu.Referral=Rufaa
 menu.ViewOpen=Orodha ya wajawazito
 menu.Resolve=Hitimisho la Ujauzito
