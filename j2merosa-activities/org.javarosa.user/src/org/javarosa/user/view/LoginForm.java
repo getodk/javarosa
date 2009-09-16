@@ -88,15 +88,15 @@ public class LoginForm extends FramedForm {
 		tempUser.setUsername("");// ? needed
 
 		if (recordsExist) {
-			int lowestID = -1;
+			int highestID = -1;
 			IStorageIterator ui = users.iterate();
 			while (ui.hasMore()) {
 				int userID = ui.nextID();
-				if (lowestID == -1 || userID < lowestID)
-					lowestID = userID;
+				if (highestID == -1 || userID > highestID)
+					highestID = userID;
 			}
 			
-			tempUser = (User)users.read(lowestID);
+			tempUser = (User)users.read(highestID);
 
 		}
 		initLoginControls(tempUser.getUsername());
