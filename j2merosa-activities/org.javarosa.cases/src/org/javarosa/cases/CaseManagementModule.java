@@ -19,9 +19,9 @@
  */
 package org.javarosa.cases;
 
-import org.javarosa.cases.storage.CaseRmsUtility;
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.cases.model.Case;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.services.storage.StorageManager;
 
 /**
  * @author Clayton Sims
@@ -34,7 +34,7 @@ public class CaseManagementModule implements IModule {
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
 	public void registerModule() {
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(new CaseRmsUtility(CaseRmsUtility.getUtilityName()));
+		StorageManager.registerStorage(Case.STORAGE_KEY, Case.class);
 	}
 
 }

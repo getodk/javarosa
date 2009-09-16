@@ -85,6 +85,8 @@ public interface IStorageUtility {
 	 */
 	void remove (Persistable p);
 
+	void removeAll ();
+	
 	/**
 	 * Return the number of records in the store
 	 * 

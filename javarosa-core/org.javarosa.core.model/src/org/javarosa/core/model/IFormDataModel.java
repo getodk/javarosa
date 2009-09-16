@@ -34,7 +34,7 @@ import org.javarosa.core.util.externalizable.Externalizable;
  * @author Clayton Sims
  *
  */
-public interface IFormDataModel extends Externalizable {
+public interface IFormDataModel {
 	
 	/**
 	 * @return the name of this Model
@@ -44,7 +44,7 @@ public interface IFormDataModel extends Externalizable {
 	/**
 	 * @return The Id of this particular Model
 	 */
-	int getId();	
+	int getID();	
 	
 	/**
 	 * @return The id of the form that this is a model for.

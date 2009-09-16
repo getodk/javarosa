@@ -28,24 +28,25 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
-import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
-import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
 
-public class User implements Externalizable, IDRecordable, Restorable
+public class User implements Persistable, Restorable
 {
+	public static final String STORAGE_KEY = "USER";
+	
 	//USERTYPEs
 	public static final String ADMINUSER = "admin";
 	public static final String USERTYPE1 = "TLP";
 	public static final String STANDARD = "standard";
 	public static final String DEMO_USER = "demo_user";
 
-	private int recordId = 0; //this objects ID in the RMS
+	private int recordId = -1; //TODO: replace recordID with just user id
 	private String username;
 	private String password;
 	private String userType;
@@ -139,13 +140,13 @@ public class User implements Externalizable, IDRecordable, Restorable
 		return password;
 	}
 
-	public void setRecordId(int recordId)
+	public void setID(int recordId)
 	{
 
 		this.recordId = recordId;
 	}
 
-	public int getRecordId() {
+	public int getID() {
 		return recordId;
 	}
 

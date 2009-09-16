@@ -25,10 +25,9 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
-import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -41,7 +40,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @date Jan 23, 2009 
  *
  */
-public class PatientReferral implements Externalizable, IDRecordable, Restorable {
+public class PatientReferral implements Persistable, Restorable {
+	public static final String STORAGE_KEY = "PAT_REFERRAL";
+	
 	private String type;
 	private Date dateReferred;
 	private String referralId;
@@ -59,6 +60,7 @@ public class PatientReferral implements Externalizable, IDRecordable, Restorable
 	}
 	
 	public PatientReferral(String type, Date dateReferred, String referralId, int patientId) {
+		setID(-1);
 		this.type = type;
 		this.dateReferred = dateReferred;
 		this.referralId = referralId;
@@ -120,11 +122,11 @@ public class PatientReferral implements Externalizable, IDRecordable, Restorable
 		ExtUtil.writeBool(out, pending);
 	}
 
-	public void setRecordId(int recordId) {
+	public void setID(int recordId) {
 		this.recordId = recordId;
 	}
 	
-	public int getRecordId() {
+	public int getID() {
 		return recordId;
 	}
 

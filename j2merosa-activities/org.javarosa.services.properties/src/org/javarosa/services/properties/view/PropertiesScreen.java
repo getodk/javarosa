@@ -176,14 +176,14 @@ public class PropertiesScreen extends Form{
 				String rmsName = stores[i];
 				RecordStore rms = RecordStore.openRecordStore(rmsName, false);
 				int size = rms.getSize();
-				int avail = rms.getSizeAvailable();
+			//	int avail = rms.getSizeAvailable();
 				int numRecs = rms.getNumRecords();
 				int perRecord = (numRecs == 0 ? -1 : size / numRecs);
 				
 				this.append(new StringItem(null, rmsName));
 				this.append(new StringItem(null, "Used: " + formatBytes(size)));
 				this.append(new StringItem(null, "Records: " + numRecs + (numRecs > 0 ? " (" + formatBytes(perRecord) + " per record)" : "")));
-				this.append(new StringItem(null, "Available: " + formatBytes(avail)));
+				//this.append(new StringItem(null, "Available: " + formatBytes(avail)));
 			}
     	} catch (RecordStoreException rse) { }
     }

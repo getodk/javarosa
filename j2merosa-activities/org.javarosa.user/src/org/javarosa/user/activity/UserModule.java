@@ -19,9 +19,9 @@
  */
 package org.javarosa.user.activity;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
-import org.javarosa.user.storage.UserRMSUtility;
+import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.user.model.User;
 
 /**
  * @author Clayton Sims
@@ -31,8 +31,7 @@ import org.javarosa.user.storage.UserRMSUtility;
 public class UserModule implements IModule {
 
 	public void registerModule() {
-		UserRMSUtility UserRms = new UserRMSUtility(UserRMSUtility.getUtilityName());
-		JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().registerRMSUtility(UserRms);
+		StorageManager.registerStorage(User.STORAGE_KEY, User.class);
 	}
 
 }

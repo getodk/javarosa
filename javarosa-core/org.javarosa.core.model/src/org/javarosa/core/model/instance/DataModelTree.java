@@ -31,12 +31,13 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
-import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.services.ITransportManager;
-import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.Persistable;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -44,8 +45,10 @@ import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
-public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
+public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 
+	public static final String STORAGE_KEY = "FORMDATA";
+	
 	/** The root of this tree */
 	private TreeElement root = new TreeElement();
 	// represents '/'; always has one and only one child -- the top-level
@@ -78,6 +81,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 	 *            The root of the tree for this data model.
 	 */
 	public DataModelTree(TreeElement root) {
+		setID(-1);
 		setRoot(root);
 	}
 
@@ -522,22 +526,12 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 	 * 
 	 * @see org.javarosa.core.model.IFormDataModel#getId()
 	 */
-	public int getId() {
+	public int getID() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setID(int id) {
 		this.id = id;
-	}
-
-	// treating id and record id as the same until we resolve the need for both
-	// of them
-	public int getRecordId() {
-		return getId();
-	}
-
-	public void setRecordId(int recordId) {
-		setId(recordId);
 	}
 
 	public TreeReference addNode(TreeReference ambigRef) {
@@ -725,19 +719,9 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 			tm.markSent(id, false);
 		}
 
-		FormDefRMSUtility frms = (FormDefRMSUtility) JavaRosaServiceProvider
-				.instance().getStorageManager().getRMSStorageProvider()
-				.getUtility(FormDefRMSUtility.getUtilityName());
-		FormDef f = new FormDef();
-		try {
-			frms.retrieveFromRMS(formId, f);
-		} catch (IOException e) {
-
-		} catch (DeserializationException e) {
-
-		}
-		setRoot(processSavedDataModel(dm.resolveReference(RestoreUtils.absRef(
-				"data", dm)), f.getDataModel(), f));
+		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
+		FormDef f = (FormDef)forms.read(formId);
+		setRoot(processSavedDataModel(dm.resolveReference(RestoreUtils.absRef("data", dm)), f.getDataModel(), f));
 	}
 
 	public static TreeElement processSavedDataModel(

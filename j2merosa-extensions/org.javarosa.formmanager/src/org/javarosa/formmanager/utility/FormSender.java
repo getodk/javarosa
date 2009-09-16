@@ -103,9 +103,9 @@ public class FormSender implements Runnable {
 
 		// #debug debug
 		System.out.println("Sending single datum, serialized id="
-				+ this.data.getId() + " length=" + payload.getLength());
+				+ this.data.getID() + " length=" + payload.getLength());
 
-		send(payload, this.data.getId());
+		send(payload, this.data.getID());
 	}
 	
 	private void initDisplay() {
@@ -142,7 +142,7 @@ public class FormSender implements Runnable {
 		}
 		else {
 			FormTransportSubmitStatusScreen statusScreen = views.getSubmitStatusScreen();
-			statusScreen.reinit(this.data.getId());
+			statusScreen.reinit(this.data.getID());
 			J2MEDisplay.getDisplay().setCurrent(statusScreen);
 			setObserver(statusScreen);
 		}
