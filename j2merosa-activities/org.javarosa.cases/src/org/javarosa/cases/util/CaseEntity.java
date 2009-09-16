@@ -88,7 +88,8 @@ public String[] getHeaders(boolean detailed) {
 	String [] headers;
 	if(detailed) {
 		//#if commcare.lang.sw
-		headers = new String[] {"Jina", "Namba", "Tarehe ya mkutano wa kwanza", "Bado inaendelea?"};
+		//headers = new String[] {"Jina", "Namba", "Tarehe ya mkutano wa kwanza", "Bado inaendelea?"};
+		headers = new String[] {"Jina", "Namba", "Tar.", "Bado inaendelea?"};
 		//#else
 		headers = new String[] {"Name", "ID", "Date Opened", "Currently Open"};			
 		//#endif
