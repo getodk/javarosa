@@ -26,35 +26,42 @@ import java.util.Vector;
 import org.javarosa.core.api.IIncidentLogger;
 import org.javarosa.core.log.ILogSerializer;
 import org.javarosa.core.log.IncidentLog;
-import org.javarosa.core.services.storage.utilities.IRecordStoreEnumeration;
-import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.services.storage.utilities.RecordStorageException;
+import org.javarosa.core.services.storage.IStorageIterator;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.j2me.storage.rms.RMSStorageUtility;
 
 /**
  * @author Clayton Sims
  * @date Apr 10, 2009 
  *
  */
-public class J2MEIncidentLogger extends RMSUtility implements IIncidentLogger {
+public class J2MEIncidentLogger implements IIncidentLogger {
+		
+	IStorageUtility logStorage;
 	
-	// Clayton Sims - Apr 10, 2009 : 
-	//NOTE: This class is actually a logger and an RMS Utility. It is possible that it would be
-	//more useful in the future to handle those activities with two different classes.
-	
-	public static String getUtilityName() {
-		return "RMS_INCIDENT_LOGGER";
-	}
-
 	public J2MEIncidentLogger() {
-		super(getUtilityName(), RMSUtility.RMS_TYPE_STANDARD);
+		logStorage = new RMSStorageUtility("LOG", IncidentLog.class);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IIncidentLogger#clearLogs()
 	 */
 	public void clearLogs() {
-		this.tempEmpty();
+		//'destroy' not supported yet
+		//logStorage.destroy();
+		//logStorage = new RMSStorageUtility("LOG", IncidentLog.class);
+		
+		Vector ids = new Vector();
+		IStorageIterator li = logStorage.iterate();
+		while (li.hasMore()) {
+			ids.addElement(new Integer(li.nextID()));
+		}
+		for (int i = 0; i < ids.size(); i++) {
+			int id = ((Integer)ids.elementAt(i)).intValue();
+			logStorage.remove(id);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -62,7 +69,11 @@ public class J2MEIncidentLogger extends RMSUtility implements IIncidentLogger {
 	 */
 	public void logIncident(String type, String message, Date logDate) {
 		IncidentLog log = new IncidentLog(type, message, logDate);
-		this.writeToRMS(log, null);
+		try {
+			logStorage.add(log);
+		} catch (StorageFullException e) {
+			throw new RuntimeException("uh-oh, storage full [incidentlog]"); //TODO: handle this
+		}
 	}
 
 	/* (non-Javadoc)
@@ -70,22 +81,9 @@ public class J2MEIncidentLogger extends RMSUtility implements IIncidentLogger {
 	 */
 	public byte[] serializeLogs(ILogSerializer serializer) {
 		Vector logs = new Vector();
-		IRecordStoreEnumeration e = this.enumerateRecords();
-		while(e.hasNextElement()) {
-			IncidentLog log = new IncidentLog();
-	    	try {
-				super.retrieveFromRMS(e.nextRecordId(), log);
-				logs.addElement(log);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (DeserializationException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (RecordStorageException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+		IStorageIterator li = logStorage.iterate();
+		while (li.hasMore()) {
+			logs.addElement(li.nextRecord());
 		}
 		IncidentLog[] collection = new IncidentLog[logs.size()];
 		logs.copyInto(collection);

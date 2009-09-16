@@ -20,10 +20,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.services.storage.utilities.IDRecordable;
-import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.services.storage.IMetaData;
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
@@ -35,10 +36,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @date Jan-20-2008
  * 
  */
-public class Property implements Externalizable, IDRecordable{
+public class Property implements Persistable, IMetaData {
     public String name;
     public Vector value;
-    public int recordId;
+    public int recordId = -1;
    
     /** (non-Javadoc)
      *  @see org.javarosa.core.util.externalizable.clforms.storage.Externalizable#readExternal(DataInputStream)
@@ -102,11 +103,32 @@ public class Property implements Externalizable, IDRecordable{
     /** (non-Javadoc)
      *  @see org.javarosa.clforms.storage.IDRecordable#setRecordId(int)
      */
-    public void setRecordId(int recordId) {
+    public void setID(int recordId) {
         this.recordId = recordId; 
     }
     
-    public int getRecordId () {
+    public int getID () {
     	return recordId;
     }
+
+	public Hashtable getMetaData() {
+		Hashtable metadata = new Hashtable();
+		String[] fields = getMetaDataFields();
+		for (int i = 0; i < fields.length; i++) {
+			metadata.put(fields[i], getMetaData(fields[i]));
+		}
+		return metadata;
+	}
+
+	public Object getMetaData(String fieldName) {
+		if (fieldName.equals("NAME")) {
+			return name;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+
+	public String[] getMetaDataFields() {
+		return new String[] {"NAME"};
+	}
 }

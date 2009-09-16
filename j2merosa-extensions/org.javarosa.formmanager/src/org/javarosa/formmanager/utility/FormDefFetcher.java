@@ -20,13 +20,13 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 import org.javarosa.core.model.utils.IPreloadHandler;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class FormDefFetcher {
@@ -46,9 +46,8 @@ public class FormDefFetcher {
 	}
 	
 	private void loadModel(int instanceId) throws IOException, DeserializationException {
-		DataModelTreeRMSUtility modelUtil = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
-		instance = new DataModelTree();
-		modelUtil.retrieveFromRMS(instanceId, instance);
+		IStorageUtility instances = StorageManager.getStorage(DataModelTree.STORAGE_KEY);
+		instance = (DataModelTree)instances.read(instanceId);
 	}
 
 	public FormDef getFormDef() {
