@@ -11,13 +11,12 @@ import javax.microedition.lcdui.ItemStateListener;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
-import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.formmanager.api.transitions.FormTransportStateTransitions;
 import org.javarosa.formmanager.utility.FormSender;
 import org.javarosa.formmanager.view.transport.FormTransportSubmitStatusScreen;
 import org.javarosa.formmanager.view.transport.FormTransportViews;
 import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.services.transport.TransportMessage;
 
 /**
  * @author ctsims
@@ -30,12 +29,10 @@ public class FormTransportState implements State<FormTransportStateTransitions>,
 	
 	FormSender sender;
 
-	public FormTransportState(DataModelTree dataModel, IDataModelSerializingVisitor serializer, ITransportDestination destination) {
+	public FormTransportState(DataModelTree dataModel, TransportMessage message) {
 		FormTransportViews views = new FormTransportViews(this, this);
-		sender = new FormSender(views, destination);
-		sender.setSerializer(serializer);
+		sender = new FormSender(views, message);
 		sender.setMultiple(false);
-		sender.setData(dataModel);
 		screen = views.getSubmitStatusScreen();
 	}
 	

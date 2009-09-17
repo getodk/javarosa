@@ -20,17 +20,15 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
-import org.javarosa.core.services.ITransportManager;
-import org.javarosa.core.services.transport.IDataPayload;
-import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.formmanager.view.ISubmitStatusObserver;
 import org.javarosa.formmanager.view.transport.FormTransportSubmitStatusScreen;
 import org.javarosa.formmanager.view.transport.FormTransportViews;
 import org.javarosa.formmanager.view.transport.MultiSubmitStatusScreen;
 import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.services.transport.TransportMessage;
+import org.javarosa.services.transport.TransportService;
+import org.javarosa.services.transport.impl.TransportException;
+import org.javarosa.services.transport.senders.SenderThread;
 
 /**
  * Managing sending forms, both single forms, and multiple forms together
@@ -45,26 +43,12 @@ public class FormSender implements Runnable {
 	 */
 	private boolean multiple;
 
-	/**
-	 * The data to be sent when multiple = false
-	 * 
-	 * TODO: eliminate in favour of using Vector for both multiple and single
-	 */
-	private DataModelTree data;
+	TransportMessage message;
 
 	/**
 	 * The data to be sent when multiple = true
 	 */
-	private Vector multiData;
-
-	/**
-	 * 
-	 */
-	private IDataModelSerializingVisitor serializer;
-	/**
-	 * this is also used as a flag TODO: eliminate its usage as a flag
-	 */
-	private ITransportDestination destination;
+	private Vector messages;
 	
 	private ISubmitStatusObserver observer;
 	
@@ -74,9 +58,18 @@ public class FormSender implements Runnable {
 	 * @param shell
 	 * @param activity
 	 */
-	public FormSender(FormTransportViews views, ITransportDestination destination) {
+	public FormSender(FormTransportViews views, TransportMessage message) {
 		this.views = views;
-		this.destination = destination;
+		this.message = message;
+	}
+	
+	/**
+	 * @param shell
+	 * @param activity
+	 */
+	public FormSender(FormTransportViews views, Vector messages) {
+		this.views = views;
+		this.messages = messages;
 	}
 	
 	public void sendData() {
@@ -92,20 +85,17 @@ public class FormSender implements Runnable {
 	 * @param mainMenu
 	 * @throws IOException
 	 */
-	private void sendSingle() throws IOException {
+	private void sendSingle() throws TransportException {
 
-		if (this.data == null)
+		if (this.message == null)
 			throw new RuntimeException(
 					"null data when trying to send single data");
 
-		IDataPayload payload = this.serializer
-				.createSerializedPayload(this.data);
-
 		// #debug debug
 		System.out.println("Sending single datum, serialized id="
-				+ this.data.getID() + " length=" + payload.getLength());
+				+ this.message.getCacheIdentifier());
 
-		send(payload, this.data.getID());
+		send(message);
 	}
 	
 	private void initDisplay() {
@@ -113,8 +103,8 @@ public class FormSender implements Runnable {
 		if (this.multiple) {
 			MultiSubmitStatusScreen s = views.getMultiSubmitStatusScreen();
 
-			boolean noData = (this.multiData == null)
-					|| (this.multiData.size() == 0);
+			boolean noData = (this.messages == null)
+					|| (this.messages.size() == 0);
 
 			if (noData) {
 				s.reinitNodata();
@@ -123,11 +113,11 @@ public class FormSender implements Runnable {
 				String idsStr = "";
 				// #debug debug
 				System.out.println("Multi send");
-				int[] ids = new int[this.multiData.size()];
+				String[] ids = new String[this.messages.size()];
 
 				for (int i = 0; i < ids.length; ++i) {
-					ids[i] = ((IDataPayload) this.multiData.elementAt(i))
-							.getTransportId();
+					ids[i] = ((TransportMessage) this.messages.elementAt(i))
+							.getCacheIdentifier();
 					idsStr += " " + ids[i];
 				}
 
@@ -142,7 +132,7 @@ public class FormSender implements Runnable {
 		}
 		else {
 			FormTransportSubmitStatusScreen statusScreen = views.getSubmitStatusScreen();
-			statusScreen.reinit(this.data.getID());
+			statusScreen.reinit(this.message.getCacheIdentifier());
 			J2MEDisplay.getDisplay().setCurrent(statusScreen);
 			setObserver(statusScreen);
 		}
@@ -151,71 +141,30 @@ public class FormSender implements Runnable {
 	/**
 	 * @throws IOException
 	 */
-	private void sendMultiData() throws IOException {
+	private void sendMultiData() throws TransportException {
 		
-		boolean noData = (this.multiData == null)
-		|| (this.multiData.size() == 0);
+		boolean noData = (this.messages == null)
+		|| (this.messages.size() == 0);
 		
 		if (!noData) {
-			for (Enumeration en = this.multiData.elements(); en
+			for (Enumeration en = this.messages.elements(); en
 					.hasMoreElements();) {
-				IDataPayload payload = (IDataPayload) en.nextElement();
-				send(payload, payload.getTransportId());
+				TransportMessage message = (TransportMessage) en.nextElement();
+				send(message);
 			}
 		}
 
 	}
 
-	private void send(IDataPayload payload, int id) throws IOException {
-		JavaRosaServiceProvider.instance().getTransportManager().enqueue(
-				payload, this.destination, getCurrentTransportMethod(), id);
-	}
-
-	/**
-	 * @return
-	 */
-	private ITransportDestination getDefaultDestination() {
-		ITransportManager tmanager = JavaRosaServiceProvider.instance()
-				.getTransportManager();
-		int currentMethod = tmanager.getCurrentTransportMethod();
-		ITransportDestination d = tmanager
-				.getDefaultTransportDestination(currentMethod);
-		return d;
-	}
-
-	public void setDefaultDestination() {
-		this.destination = getDefaultDestination();
-	}
-
-	private int getCurrentTransportMethod() {
-		return JavaRosaServiceProvider.instance().getTransportManager()
-				.getCurrentTransportMethod();
-
+	private void send(TransportMessage message) throws TransportException {
+		SenderThread thread = TransportService.send(message);
+		thread.addListener(observer);
 	}
 
 	// ----------- getters and setters
 	
 	public void setObserver(ISubmitStatusObserver o) {
 		this.observer = o;
-	}
-	public DataModelTree getData() {
-		return this.data;
-	}
-
-	public void setData(DataModelTree data) {
-		this.data = data;
-	}
-
-	public void setSerializer(IDataModelSerializingVisitor serializer) {
-		this.serializer = serializer;
-	}
-
-	public ITransportDestination getDestination() {
-		return this.destination;
-	}
-
-	public void setDestination(ITransportDestination destination) {
-		this.destination = destination;
 	}
 
 	public boolean isMultiple() {
@@ -226,24 +175,15 @@ public class FormSender implements Runnable {
 		this.multiple = multiple;
 	}
 
-	// -- multiple
-	public Vector getMultiData() {
-		return this.multiData;
-	}
-
-	public void setMultiData(Vector multiData) {
-		this.multiData = multiData;
-	}
-
 	public void run() {
 		if (this.multiple) {
 			try {
 				sendMultiData();
 			}
-			catch(IOException e) {
+			catch(TransportException e) {
 				e.printStackTrace();
 				if(observer != null) {
-					observer.receiveMessage(ISubmitStatusObserver.ERROR, e.getMessage());
+					observer.receiveError(e.getMessage());
 				}
 			}
 
@@ -251,10 +191,10 @@ public class FormSender implements Runnable {
 			try{ 
 				sendSingle();
 			}
-			catch(IOException e) {
+			catch(TransportException e) {
 				e.printStackTrace();
 				if(observer != null) {
-					observer.receiveMessage(ISubmitStatusObserver.ERROR, e.getMessage());
+					observer.receiveError(e.getMessage());
 				}
 			}
 		}

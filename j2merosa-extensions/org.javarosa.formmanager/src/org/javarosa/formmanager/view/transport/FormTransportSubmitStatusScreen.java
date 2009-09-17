@@ -16,7 +16,6 @@
 
 package org.javarosa.formmanager.view.transport;
 
-import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,14 +26,15 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.formmanager.view.ISubmitStatusObserver;
+import org.javarosa.services.transport.TransportMessage;
+import org.javarosa.services.transport.TransportService;
+import org.javarosa.services.transport.impl.TransportMessageStatus;
 
 public class FormTransportSubmitStatusScreen extends Form implements
-		ISubmitStatusObserver, CommandListener {
-	private int modelID = -1;
+	ISubmitStatusObserver, CommandListener {
+	private String cacheId = null;
 	private StringItem msg;
 	private Command okCommand;
 	private Timer timer;
@@ -50,9 +50,9 @@ public class FormTransportSubmitStatusScreen extends Form implements
 	}
 
 	
-	public void reinit(int modelId){
+	public void reinit(String cacheId){
 		
-		setModelID(modelId);
+		setCacheId(cacheId);
 		this.okCommand = new Command(Localization.get("menu.ok"), Command.OK, 1);
 		this.msg = new StringItem(null, Localization.get("sending.status.going"));
 
@@ -80,30 +80,31 @@ public class FormTransportSubmitStatusScreen extends Form implements
 	 * 
 	 */
 	public void updateStatus() {
-		int status = JavaRosaServiceProvider.instance().getTransportManager()
-				.getModelDeliveryStatus(this.modelID, false);
-		updateStatus(status);
+		TransportMessage message = TransportService.retrieve(cacheId);
+		
+		updateStatus(message);
 	}
 
 	/**
 	 * @param status
 	 */
-	public void updateStatus(int status) {
+	public void updateStatus(TransportMessage transportMessage) {
 		this.counter += REFRESH_INTERVAL;
 
-		if (status != TransportMessage.STATUS_NEW)
+		int status = transportMessage.getStatus();
+		if (status != TransportMessageStatus.QUEUED)
 			this.timer.cancel();
 
 		String message;
 		switch (status) {
-		case TransportMessage.STATUS_NEW:
+		case TransportMessageStatus.QUEUED:
 			message = (this.counter < TIMEOUT ? Localization.get("sending.status.going")
 					: Localization.get("sending.status.long"));
 			break;
-		case TransportMessage.STATUS_DELIVERED:
+		case TransportMessageStatus.SENT:
 			message = Localization.get("sending.status.success");// + "  " + getServerResponse();
 			break;
-		case TransportMessage.STATUS_FAILED:
+		case TransportMessageStatus.CACHED:
 			message = Localization.get("sending.status.failed");
 			break;
 		default:
@@ -113,23 +114,6 @@ public class FormTransportSubmitStatusScreen extends Form implements
 
 		this.msg.setText(message);
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.formmanager.view.ISubmitStatusScreen#receiveMessage(int)
-	 */
-	public void receiveMessage(int message, String details) {
-		//TODO: Handle messages specifically, if any other than error occur
-		switch(message) {
-		    default:
-		    	//TODO: Specific sending error?
-				destroy();
-				StringItem failure = new StringItem("","");
-		    	failure.setText(Localization.get("sending.status.error") + ": " + details);
-				this.append(failure);
-		}
-	}
-
 
 	public void destroy() {
 		deleteAll();
@@ -139,20 +123,32 @@ public class FormTransportSubmitStatusScreen extends Form implements
 	/**
 	 * @return
 	 */
-	public String getServerResponse() {
-		Enumeration messages = JavaRosaServiceProvider.instance()
-				.getTransportManager().getMessages();
-		String receipt = "";
-
-		TransportMessage response = (TransportMessage) messages.nextElement();
-		receipt = new String(response.getReplyloadData()); // this does not seem
+	public String getServerResponse(TransportMessage message) {
+		//receipt = new String(message.); // this does not seem
 		// terribly robust
 
-		return receipt;
+		//we aren't using this anyway, right now, but we should figure out how to generically get this
+		return "";
 	}
 
-	public void setModelID(int modelID) {
-		this.modelID = modelID;
+	public void setCacheId(String cacheId) {
+		this.cacheId = cacheId;
+	}
+
+
+	public void onChange(TransportMessage message,String remark) {
+		updateStatus(message);
+	}
+
+
+	public void onStatusChange(TransportMessage message) {
+		updateStatus(message);
+	}
+
+
+	public void receiveError(String details) {
+		this.timer.cancel();
+		this.msg.setText(Localization.get("sending.status.error") + " details");
 	}
 
 }

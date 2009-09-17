@@ -42,7 +42,7 @@ public class CompletedFormOptionsState implements State<CompletedFormOptionsStat
 		if(choice == SendNowSendLaterForm.SEND_NOW_DEFAULT) {
 			transitions.sendData(data);
 		} else if(choice == SendNowSendLaterForm.SEND_LATER) {
-			transitions.skipSend();
+			transitions.skipSend(data);
 		} else if(choice == SendNowSendLaterForm.SEND_NOW_SPEC) {
 			transitions.sendToFreshLocation(data);
 		}
@@ -54,7 +54,9 @@ public class CompletedFormOptionsState implements State<CompletedFormOptionsStat
 			transitions.sendData(data);
 			break;
 		case SendNowSendLaterForm.SEND_LATER:
-			transitions.skipSend();
+			//Since caching and sending later are now part of the queue, we need
+			//to let the transition have the data now. Possibly revisit this later.
+			transitions.skipSend(data);
 			break;
 		case SendNowSendLaterForm.SEND_NOW_SPEC:
 			transitions.sendToFreshLocation(data);

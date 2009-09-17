@@ -16,7 +16,9 @@
 
 package org.javarosa.formmanager.view;
 
-public interface ISubmitStatusObserver {
+import org.javarosa.services.transport.TransportListener;
+
+public interface ISubmitStatusObserver extends TransportListener {
 	/**
 	 * Destroys the current status screen and cleans up any running
 	 * processes.
@@ -27,8 +29,6 @@ public interface ISubmitStatusObserver {
 	 * 
 	 */
 	
-	public static final int ERROR = 1;
-	
 	/**
 	 * Receive a message from the sender which breaks the contract between
 	 * the sender and the screen .
@@ -36,5 +36,5 @@ public interface ISubmitStatusObserver {
 	 * @param message A coded message for an issue which arose
 	 * @param details The details (if any) of the failure
 	 */
-	public void receiveMessage(int message, String details); 
+	public void receiveError(String details); 
 }

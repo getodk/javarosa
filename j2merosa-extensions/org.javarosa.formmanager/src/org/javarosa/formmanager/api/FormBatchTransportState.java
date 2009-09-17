@@ -12,8 +12,6 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
 
 import org.javarosa.core.api.State;
-import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
-import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.formmanager.api.transitions.FormBatchTransportStateTransitions;
 import org.javarosa.formmanager.utility.FormSender;
 import org.javarosa.formmanager.view.transport.FormTransportViews;
@@ -33,12 +31,10 @@ public class FormBatchTransportState implements State<FormBatchTransportStateTra
 	FormBatchTransportStateTransitions transitions;
 
 	
-	public FormBatchTransportState(Vector dataModels, IDataModelSerializingVisitor serializer, ITransportDestination destination) {
+	public FormBatchTransportState(Vector messages) {
 		FormTransportViews views = new FormTransportViews(this, this);
-		sender = new FormSender(views,destination);
-		sender.setSerializer(serializer);
+		sender = new FormSender(views,messages);
 		sender.setMultiple(true);
-		sender.setMultiData(dataModels);
 		screen = views.getMultiSubmitStatusScreen();
 	}
 
