@@ -36,7 +36,7 @@ public class FormEntryState implements State<FormEntryTransitions>, IControllerH
 
 	public FormEntryState(int savedInstanceID, IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly) {
 		this(savedInstanceID, viewFactory, fetcher, readOnly, null);
-	}
+	}	
 	
 	public FormEntryState(int savedInstanceID, IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly, FormIndex firstQuestion) {
 		FormDef theForm = fetcher.getFormDef();

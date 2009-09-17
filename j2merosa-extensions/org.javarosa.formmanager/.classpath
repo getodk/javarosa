@@ -4,7 +4,6 @@
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication"/>
 	<classpathentry kind="src" path="/org.javarosa.xform"/>
 	<classpathentry kind="src" path="/org.javarosa.user"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.activity"/>
@@ -12,5 +11,6 @@
 	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.j2me"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.transport"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

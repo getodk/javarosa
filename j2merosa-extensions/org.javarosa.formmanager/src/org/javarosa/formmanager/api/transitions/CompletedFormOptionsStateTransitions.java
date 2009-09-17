@@ -12,6 +12,6 @@ import org.javarosa.core.model.instance.DataModelTree;
  */
 public interface CompletedFormOptionsStateTransitions extends Transitions {
 	public void sendData(DataModelTree data);
-	public void skipSend();
+	public void skipSend(DataModelTree data);
 	public void sendToFreshLocation(DataModelTree data);
 }
