@@ -61,7 +61,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	 * @param destinationURL
 	 * @throws IOException
 	 */
-	public SimpleHttpTransportMessage(ByteArrayInputStream is, String url)
+	public SimpleHttpTransportMessage(InputStream is, String url)
 			throws IOException {
 
 		setContent(StreamsUtil.readFromStream(is, -1));
