@@ -47,7 +47,7 @@ public interface ICaseType {
 	
 	public String getFormName(String formType);
 	
-	public IModelProcessor getModelProcessor(String formType, int thisidisahack);
+	public ICaseModelProcessor getModelProcessor(String formType, int thisidisahack);
 	
 	public CaseEntity getUniqueEntity();
 	

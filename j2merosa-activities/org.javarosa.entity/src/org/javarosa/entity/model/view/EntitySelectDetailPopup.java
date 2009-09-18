@@ -41,15 +41,15 @@ public class EntitySelectDetailPopup extends Form implements CommandListener {
 	Command okCmd;
 	Command backCmd;
 	
-	public EntitySelectDetailPopup (EntitySelectState psa, IEntity entity, IEntity prototype, IStorageUtility entityStorage) {
+	public EntitySelectDetailPopup (EntitySelectState psa, IEntity entity, IStorageUtility entityStorage) {
 		super(entity.entityType() + " Detail");
 		
 		this.psa = psa;
 		
 		recordID = entity.getRecordID();
 		Object o = entity.fetch(entityStorage);
-		headers = prototype.getHeaders(true);
-		data = prototype.getLongFields(o);
+		headers = entity.getHeaders(true);
+		data = entity.getLongFields(o);
 		
 		okCmd = new Command("OK", Command.OK, 1);
 		backCmd = new Command("Back", Command.BACK, 1);
