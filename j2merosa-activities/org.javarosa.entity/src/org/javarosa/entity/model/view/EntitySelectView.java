@@ -16,6 +16,7 @@
 
 package org.javarosa.entity.model.view;
 
+import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
@@ -25,6 +26,9 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.entity.api.EntitySelectState;
+import org.javarosa.entity.util.IDComparator;
+import org.javarosa.entity.util.IEntityComparator;
+import org.javarosa.entity.util.NameComparator;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
@@ -50,9 +54,11 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 	private static final int INDEX_NEW = -1;
 	
 	//behavior configuration options
-	public boolean sortByName = true; //if false, sort by ID
 	public boolean wrapAround = false; //TODO: support this
 	public int newMode = NEW_IN_LIST;
+	
+	private Vector sorts;
+	protected IEntityComparator currentSort;
 	
 	private EntitySelectState controller;
 	private String entityType;
@@ -69,6 +75,10 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 	private Vector rowIDs; //index into data corresponding to current matches
 	
 	public EntitySelectView(EntitySelectState controller, String title, String entityType, int newMode) {
+		this(controller, title, entityType, newMode, null);
+	}
+	
+	public EntitySelectView(EntitySelectState controller, String title, String entityType, int newMode, Vector comparators) {
 		super(title);
 		
 		this.controller = controller;
@@ -94,6 +104,16 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
         rowIDs = new Vector();
         
         this.setScrollYOffset(0, false);
+        
+        sorts = new Vector();
+        
+        if(comparators != null) {for(Enumeration en = comparators.elements(); en.hasMoreElements();) {
+        	sorts.addElement(en.nextElement());
+        }}
+        
+        sorts.addElement(new NameComparator());
+        sorts.addElement(new IDComparator());
+        currentSort = (IEntityComparator)sorts.elementAt(0);
 	}
 
 	public void init () {
@@ -338,8 +358,8 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 		}
 	}	
 	
-	public void changeSort (boolean sortByName) {
-		this.sortByName = sortByName;
+	public void changeSort (IEntityComparator c) {
+		this.currentSort = c;
 		refresh();
 	}
 	
@@ -349,15 +369,7 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 			for (int j = 0; j < i; j++) {
 				int rowA = rowID(j);
 				int rowB = rowID(j + 1);
-				String keyA, keyB;
-				if (sortByName) {
-					keyA = controller.getDataName(rowA);
-					keyB = controller.getDataName(rowB);
-				} else {
-					keyA = controller.getDataID(rowA);
-					keyB = controller.getDataID(rowB);
-				}
-				if (keyA.compareTo(keyB) > 0) {
+				if(currentSort.compare(controller.getEntity(rowA), controller.getEntity(rowB)) > 0) {
 					rowIDs.setElementAt(new Integer(rowB), j);
 					rowIDs.setElementAt(new Integer(rowA), j + 1);
 				}
@@ -370,7 +382,7 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 			if (cmd == exitCmd) {
 				controller.exit();
 			} else if (cmd == sortCmd) {
-				EntitySelectSortPopup pssw = new EntitySelectSortPopup(this, controller);
+				EntitySelectSortPopup pssw = new EntitySelectSortPopup(this, controller, sorts);
 				pssw.show();
 			} else if (cmd == newCmd) {
 				controller.newEntity();
