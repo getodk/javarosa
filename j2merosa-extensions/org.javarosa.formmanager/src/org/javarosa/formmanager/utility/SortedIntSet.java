@@ -16,10 +16,19 @@
 
 package org.javarosa.formmanager.utility;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Vector;
 
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+
 //maintain an array of integers in sorted order. no duplicates allowed.
-public class SortedIntSet {
+public class SortedIntSet implements Externalizable {
 	Vector v;
 	
 	public SortedIntSet () {
@@ -85,5 +94,13 @@ public class SortedIntSet {
 	//return underlying vector (outside modification may corrupt the datastructure)
 	public Vector getVector () {
 		return v;
+	}
+
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		v = (Vector)ExtUtil.read(in, new ExtWrapList(Integer.class));
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExtUtil.write(out, new ExtWrapList(v));
 	}
 }
