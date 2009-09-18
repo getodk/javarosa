@@ -136,7 +136,7 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	
 	public void itemSelected (int i) {
 		IEntity entity = (IEntity)entities.elementAt(i);
-		EntitySelectDetailPopup psdp = new EntitySelectDetailPopup(this, entity, entityPrototype, entityStorage);
+		EntitySelectDetailPopup psdp = new EntitySelectDetailPopup(this, entity, entityStorage);
 		psdp.show();
 	}
 	
