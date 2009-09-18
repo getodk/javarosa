@@ -16,11 +16,16 @@
 
 package org.javarosa.entity.model.view;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.entity.api.EntitySelectState;
+import org.javarosa.entity.util.IEntityComparator;
 
 import de.enough.polish.ui.Choice;
 import de.enough.polish.ui.ChoiceGroup;
@@ -34,8 +39,9 @@ public class EntitySelectSortPopup extends Form implements CommandListener, Item
 	
     private ChoiceGroup sortField;
     private Command cancelCmd;
+    private Hashtable map;
 
-    public EntitySelectSortPopup (EntitySelectView psv, EntitySelectState psa) {
+    public EntitySelectSortPopup (EntitySelectView psv, EntitySelectState psa, Vector comparators) {
 		//#style patselSortPopup
 		super("Sort by...");
 
@@ -43,10 +49,18 @@ public class EntitySelectSortPopup extends Form implements CommandListener, Item
 		this.psa = psa;
 		
 		sortField = new ChoiceGroup("", Choice.EXCLUSIVE);
-		sortField.append("Name", null);
-		sortField.append("ID", null);
-		sortField.setSelectedIndex(psv.sortByName ? 0 : 1, true);
+		map = new Hashtable();
+		
+		for(Enumeration en = comparators.elements(); en.hasMoreElements();) {
+			IEntityComparator comp = (IEntityComparator)en.nextElement();
+			int index = sortField.append(comp.getName(), null);
+			map.put(new Integer(index), comp);
+			if(psv.currentSort.equals(comp)) {
+				sortField.setSelectedIndex(index, true);
+			}
+		}
 		append(sortField);
+		
 		sortField.setItemStateListener(this);
 		
 		cancelCmd = new Command("Cancel", Command.CANCEL, 1);
@@ -69,7 +83,7 @@ public class EntitySelectSortPopup extends Form implements CommandListener, Item
 	public void itemStateChanged(Item item) {
 		if (item == sortField) {
 			System.out.println(sortField.getSelectedIndex());
-			psv.changeSort(sortField.getSelectedIndex() == 0);
+			psv.changeSort((IEntityComparator)map.get(new Integer(sortField.getSelectedIndex())));
 			psa.showList();
 		}
 	}

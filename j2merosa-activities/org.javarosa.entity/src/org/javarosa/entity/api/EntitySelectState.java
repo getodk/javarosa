@@ -44,15 +44,20 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	Vector entities;
 	
 	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype) {
-		this(title, entityStorage, entityPrototype, EntitySelectView.NEW_IN_LIST, true, false, null, null);
+		this(title, entityStorage, entityPrototype, EntitySelectView.NEW_IN_LIST, true, false, null, null,null);
 	}
 	
 	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype, int newMode, boolean immediatelySelectNewlyCreated) {
-		this(title, entityStorage, entityPrototype, newMode, immediatelySelectNewlyCreated, false, null, null);
+		this(title, entityStorage, entityPrototype, newMode, immediatelySelectNewlyCreated, false, null, null,null);
 	}
-	
 	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype,
 			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter<E> filter, String styleKey) {
+		this(title, entityStorage, entityPrototype, newMode, immediatelySelectNewlyCreated, bailOnEmpty,filter,styleKey,null);
+	}
+	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype,
+			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter<E> filter, String styleKey, Vector comparators) {
+		//This argument list is getting out of hand. Some of this should be in a controller, some of it should be in the view,
+		//but seriously, this is absurd.
 		this.entityStorage = entityStorage;
 		this.entityPrototype = entityPrototype;
 
@@ -60,7 +65,7 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 		this.bailOnEmpty = bailOnEmpty;
 		this.filter = filter;
 
-		selView = new EntitySelectView(this, title, entityPrototype.entityType(), newMode);
+		selView = new EntitySelectView(this, title, entityPrototype.entityType(), newMode,comparators);
 		selView.setStyleKey(styleKey); //droos: what is this?
 	}
 
@@ -166,6 +171,10 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	
 	public String getDataID (int i) {
 		return ((IEntity)entities.elementAt(i)).getID();
+	}	
+	
+	public IEntity getEntity (int i) {
+		return (IEntity)entities.elementAt(i);
 	}	
 
 	public int getRecordID (int i) {
