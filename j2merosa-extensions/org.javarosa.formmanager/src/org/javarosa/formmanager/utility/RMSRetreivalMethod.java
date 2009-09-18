@@ -32,7 +32,7 @@ public class RMSRetreivalMethod implements IFormDefRetrievalMethod {
 		load(formId);
 	}
 	
-	public RMSRetreivalMethod(String formName) throws IOException, DeserializationException {
+	public RMSRetreivalMethod(String formName) {
 		IStorageUtilityIndexed forms = (IStorageUtilityIndexed)StorageManager.getStorage(FormDef.STORAGE_KEY);
 		int id;
 		
@@ -46,7 +46,7 @@ public class RMSRetreivalMethod implements IFormDefRetrievalMethod {
         load(id);
 	}
 	
-	private void load(int id) throws IOException, DeserializationException  {
+	private void load(int id) {
 		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
 		FormDef theForm = (FormDef)forms.read(id);
 		
