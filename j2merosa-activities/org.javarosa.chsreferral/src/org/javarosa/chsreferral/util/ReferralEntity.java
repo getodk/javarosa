@@ -19,13 +19,11 @@
  */
 package org.javarosa.chsreferral.util;
 
-import java.io.IOException;
 import java.util.Date;
 
 import org.javarosa.chsreferral.model.PatientReferral;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.IStorageUtility;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entity.model.IEntity;
 
 /**
@@ -37,8 +35,8 @@ public class ReferralEntity implements IEntity {
 	
 	protected int recordId;
 	String id;
-	String type;
-	Date date;
+	protected String type;
+	protected Date date;
 	boolean pending;
 	
 	/* (non-Javadoc)
