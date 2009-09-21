@@ -39,7 +39,7 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	
 	boolean immediatelySelectNewlyCreated;
 	boolean bailOnEmpty;
-	IEntityFilter<E> filter;
+	IEntityFilter<? super E> filter;
 	
 	Vector entities;
 	
@@ -51,11 +51,11 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 		this(title, entityStorage, entityPrototype, newMode, immediatelySelectNewlyCreated, false, null, null,null);
 	}
 	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype,
-			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter<E> filter, String styleKey) {
+			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter<? super E> filter, String styleKey) {
 		this(title, entityStorage, entityPrototype, newMode, immediatelySelectNewlyCreated, bailOnEmpty,filter,styleKey,null);
 	}
 	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype,
-			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter<E> filter, String styleKey, Vector comparators) {
+			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter<? super E> filter, String styleKey, Vector comparators) {
 		//This argument list is getting out of hand. Some of this should be in a controller, some of it should be in the view,
 		//but seriously, this is absurd.
 		this.entityStorage = entityStorage;
