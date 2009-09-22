@@ -49,10 +49,17 @@ public class InstanceSchema {
 		schema.setPrefix("", "http://www.w3.org/2001/XMLSchema");
 		schema.setAttribute(null, "targetNamespace", f.getDataModel().schema);
 		schema.setAttribute(null, "elementFormDefault", "qualified");
-
+		
+		String formVersion = f.getDataModel().formVersion;
+		String uiVersion = f.getDataModel().uiVersion;
+		if (formVersion != null)
+			schema.setAttribute(null, "version", formVersion);
+		if (uiVersion != null)
+			schema.setAttribute(null, "uiVersion", uiVersion);
+		
 		processSelectChoices(schema, f, f.getDataModel());
 		schema.addChild(Node.ELEMENT, schemizeInstance(f.getDataModel().getRoot()));
-				
+		
 		Document schemaXML = new Document();
 		schemaXML.addChild(Node.ELEMENT, schema);
 		
