@@ -33,12 +33,11 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
-import org.javarosa.core.services.storage.utilities.IDRecordable;
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
-import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.ImmunizationRow;
@@ -54,7 +53,7 @@ import org.javarosa.patient.model.data.NumericListData;
  * @author daniel/ctsims(temp)
  *
  */
-public class Patient implements Externalizable, IDRecordable, Restorable {
+public class Patient implements Persistable, Restorable {
 	public static final int SEX_MALE = 1;
 	public static final int SEX_FEMALE = 2;
 	public static final int SEX_UNKNOWN = 3;
@@ -153,14 +152,14 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
 	/**
 	 * @return the recordId
 	 */
-	public int getRecordId() {
+	public int getID() {
 		return recordId;
 	}
 
 	/**
 	 * @param recordId the recordId to set
 	 */
-	public void setRecordId(int recordId) {
+	public void setID(int recordId) {
 		this.recordId = recordId;
 	}
 
@@ -242,7 +241,7 @@ public class Patient implements Externalizable, IDRecordable, Restorable {
 	 * @return true if the record is new.
 	 */
 	public boolean isNew(){
-		return getRecordId() == INVALID_RECORD_ID;
+		return getID() == INVALID_RECORD_ID;
 	}
 	
 

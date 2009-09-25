@@ -126,7 +126,7 @@ public class UserEntity extends Entity<User> {
 		} else {
 			throw new RuntimeException("Sort Key [" + fieldKey + "] is not supported by this entity");
 		}
-	}	
+	}
 
 
 
