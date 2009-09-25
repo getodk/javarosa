@@ -89,7 +89,7 @@ public abstract class Entity <E extends Persistable> {
 	/**
 	 * Match this entity against a search string. Searching semantics are completely up to the entity
 	 * 
-	 * @param key search key
+	 * @param key search key; will always have non-zero length
 	 * @return true if this entity matches the key
 	 */
 	public boolean match (String key) {

@@ -24,16 +24,15 @@ import java.util.Date;
 import org.javarosa.chsreferral.model.PatientReferral;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.IStorageUtility;
-import org.javarosa.entity.model.IEntity;
+import org.javarosa.entity.model.Entity;
 
 /**
  * @author Clayton Sims
  * @date Apr 26, 2009 
  *
  */
-public class ReferralEntity implements IEntity {
+public class ReferralEntity extends Entity<PatientReferral> {
 	
-	protected int recordId;
 	String id;
 	protected String type;
 	protected Date date;
@@ -49,19 +48,20 @@ public class ReferralEntity implements IEntity {
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#factory(int)
 	 */
-	public IEntity factory(int recordID) {
-		ReferralEntity e = new ReferralEntity();
-		e.recordId = recordID;
-		return e;
+	public ReferralEntity factory() {
+		return new ReferralEntity();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#fetchRMS(org.javarosa.core.services.storage.utilities.RMSUtility)
+	 * @see org.javarosa.entity.model.IEntity#readEntity(java.lang.Object)
 	 */
-	public Object fetch(IStorageUtility referrals) {
-		return (PatientReferral)referrals.read(recordId);
+	public void loadEntity (PatientReferral r) {
+		this.id = r.getReferralId();
+		this.type = r.getType();
+		this.date = r.getDateReferred();
+		this.pending = r.isPending();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#getHeaders(boolean)
 	 */
@@ -74,25 +74,30 @@ public class ReferralEntity implements IEntity {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#getID()
+	 * @see org.javarosa.entity.model.IEntity#getShortFields()
 	 */
-	public String getID() {
-		return id;
+	public String[] getShortFields() {
+		return new String[] {id, type, DateUtils.formatDate(date, DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY)};
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#getLongFields(java.lang.Object)
 	 */
-	public String[] getLongFields(Object o) {
-		PatientReferral r = (PatientReferral)o;
-		return new String[] {r.getReferralId(), r.getType(), DateUtils.formatDate(r.getDateReferred(),DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY)};
+	public String[] getLongFields(PatientReferral r) {
+		return getShortFields();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#getName()
+	 * @see org.javarosa.entity.model.IEntity#matchID(java.lang.String)
 	 */
-	public String getName() {
-		return getType();
+	public boolean match (String key) {
+		String[] fields = this.getShortFields();
+		for(int i = 0; i < fields.length; ++i) {
+			if(fields[i].indexOf(key) != -1) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public String getType() { 
@@ -102,54 +107,12 @@ public class ReferralEntity implements IEntity {
 	public Date getDate() {
 		return date;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#getRecordID()
-	 */
-	public int getRecordID() {
-		return recordId;
-	}
 	
 	public boolean isPending() {
 		return pending;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#getShortFields()
-	 */
-	public String[] getShortFields() {
-		return new String[] {getID(), type, DateUtils.formatDate(date, DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY)};
+	
+	public String getID() {
+		return id;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#matchID(java.lang.String)
-	 */
-	public boolean matchID(String key) {
-		String[] fields = this.getShortFields();
-		for(int i = 0; i < fields.length; ++i) {
-			if(fields[i].indexOf(key) != -1) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#matchName(java.lang.String)
-	 */
-	public boolean matchName(String key) {
-		return matchID(key);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#readEntity(java.lang.Object)
-	 */
-	public void readEntity(Object o) {
-		PatientReferral r = (PatientReferral)o;
-		this.recordId = r.getID();
-		this.type = r.getType();
-		this.date = r.getDateReferred();
-		this.pending = r.isPending();
-	}
-
 }

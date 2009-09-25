@@ -16,10 +16,6 @@
 
 package org.javarosa.entity.model.view;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -27,7 +23,6 @@ import javax.microedition.lcdui.Displayable;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectState;
 import org.javarosa.entity.model.Entity;
-import org.javarosa.entity.util.IEntityComparator;
 
 import de.enough.polish.ui.Choice;
 import de.enough.polish.ui.ChoiceGroup;

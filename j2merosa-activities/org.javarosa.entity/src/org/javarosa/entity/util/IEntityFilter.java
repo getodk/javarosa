@@ -17,5 +17,5 @@
 package org.javarosa.entity.util;
 
 public interface IEntityFilter<E> {
-	public boolean isPermitted(E e);
+	public boolean matches(E e);
 }
