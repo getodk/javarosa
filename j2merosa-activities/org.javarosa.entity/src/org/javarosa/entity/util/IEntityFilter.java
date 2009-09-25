@@ -16,8 +16,6 @@
 
 package org.javarosa.entity.util;
 
-import org.javarosa.entity.model.IEntity;
-
-public interface IEntityFilter<E extends IEntity> {
-	public boolean isPermitted(E entity);
+public interface IEntityFilter<E> {
+	public boolean isPermitted(E e);
 }

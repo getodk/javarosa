@@ -16,7 +16,7 @@
 
 package org.javarosa.entity.model.view;
 
-import java.util.Enumeration;
+import java.util.Date;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
@@ -25,10 +25,10 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
+import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectState;
-import org.javarosa.entity.util.IDComparator;
-import org.javarosa.entity.util.IEntityComparator;
-import org.javarosa.entity.util.NameComparator;
+import org.javarosa.entity.model.Entity;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
@@ -38,7 +38,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 import de.enough.polish.ui.UiAccess;
 
-public class EntitySelectView extends FramedForm implements ItemStateListener, CommandListener {
+public class EntitySelectView<E extends Persistable> extends FramedForm implements ItemStateListener, CommandListener {
 	//#if javarosa.patientselect.formfactor == nokia-s40 or javarosa.patientselect.formfactor == sony-k610i
 	//# private static final int MAX_ROWS_ON_SCREEN = 5;
 	//# private static final int SCROLL_INCREMENT = 4;	
@@ -56,14 +56,11 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 	//behavior configuration options
 	public boolean wrapAround = false; //TODO: support this
 	public int newMode = NEW_IN_LIST;
+		
+	private EntitySelectState<E> controller;
+	private Entity<E> entityPrototype;
+	private String baseTitle;
 	
-	private Vector sorts;
-	protected IEntityComparator currentSort;
-	
-	private EntitySelectState controller;
-	private String entityType;
-	
-	private String styleType;
 	private TextField tf;
 	private Command exitCmd;
 	private Command sortCmd;
@@ -71,19 +68,19 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 	
 	private int firstIndex;
 	private int selectedIndex;
-		
-	private Vector rowIDs; //index into data corresponding to current matches
+	private String sortField;
 	
-	public EntitySelectView(EntitySelectState controller, String title, String entityType, int newMode) {
-		this(controller, title, entityType, newMode, null);
-	}
+	private Vector<Integer> rowIDs; //index into data corresponding to current matches
 	
-	public EntitySelectView(EntitySelectState controller, String title, String entityType, int newMode, Vector comparators) {
+	public EntitySelectView (EntitySelectState<E> controller, Entity<E> entityPrototype, String title, int newMode) {
 		super(title);
+		this.baseTitle = title;
 		
 		this.controller = controller;
-		this.entityType = entityType;
+		this.entityPrototype = entityPrototype;
 		this.newMode = newMode;
+		
+		this.sortField = getDefaultSortField();
 		
 		tf = new TextField("Find:  ", "", 20, TextField.ANY);
 		tf.setInputMode(TextField.MODE_UPPERCASE);
@@ -94,28 +91,20 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
         exitCmd = new Command("Cancel", Command.CANCEL, 4);
         sortCmd = new Command("Sort", Command.SCREEN, 3);
         addCommand(exitCmd);
-        addCommand(sortCmd);
+        if (getNumSortFields() > 1) {
+        	addCommand(sortCmd);
+        }
         if (newMode == NEW_IN_MENU) {
-        	newCmd = new Command("New " + entityType, Command.SCREEN, 4);
+        	newCmd = new Command("New " + entityPrototype.entityType(), Command.SCREEN, 4);
         	addCommand(newCmd);
         }
         this.setCommandListener(this);
         
-        rowIDs = new Vector();
+        rowIDs = new Vector<Integer>();
         
         this.setScrollYOffset(0, false);
-        
-        sorts = new Vector();
-        
-        if(comparators != null) {for(Enumeration en = comparators.elements(); en.hasMoreElements();) {
-        	sorts.addElement(en.nextElement());
-        }}
-        
-        sorts.addElement(new NameComparator());
-        sorts.addElement(new IDComparator());
-        currentSort = (IEntityComparator)sorts.elementAt(0);
 	}
-
+	
 	public void init () {
         selectedIndex = 0;
         firstIndex = 0;
@@ -139,10 +128,6 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 	public void show () {
 		this.setActiveFrame(Graphics.BOTTOM);
 		controller.setView(this);
-	}
-	
-	public void setStyleKey(String key) {
-		styleType = key;
 	}
 
 	private void getMatches (String key) {
@@ -185,16 +170,16 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 		return selectedEntityID;
 	}
 	
+	private int numMatches () {
+		return rowIDs.size() - (newMode == NEW_IN_LIST ? 1 : 0);	
+	}
+	
 	private boolean listIsEmpty () {
-		return rowIDs.size() == 0 || (rowIDs.size() == 1 && newMode == NEW_IN_LIST);
+		return numMatches() <= 0;
 	}
 	
 	private int rowID (int i) {
-		return ((Integer)rowIDs.elementAt(i)).intValue();
-	}
-
-	private int selectedIndexFromScreen (int i) {
-		return firstIndex + i;
+		return rowIDs.elementAt(i).intValue();
 	}
 	
 	private void selectEntity (int entityID) {
@@ -216,59 +201,22 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 			firstIndex = 0;
 	}
 	
-	private static final int TITLE = 0;
-	private static final int CELL = 1;
-	private static final int EVEN = 2;
-	private static final int ODD = 3;
-	private static final int SELECTED = 4;
-	
-	private void styleDynamically(Item i, int type) {
-		//#foreach esstyle in javarosa.patientselect.types
-		if("${esstyle}".equals(styleType)) {
-			switch(type) {
-			case TITLE:
-				//#style ${esstyle}SelectTitleRow, patselTitleRow
-				UiAccess.setStyle(i);
-				break;
-			case CELL:
-				//#style ${esstyle}SelectCell, patselCell
-				UiAccess.setStyle(i);
-				break;
-			case EVEN:
-				//#style ${esstyle}SelectEvenRow, patselEvenRow
-				UiAccess.setStyle(i);
-				break;
-			case ODD:
-				//#style ${esstyle}SelectOddRow, patselOddRow
-				UiAccess.setStyle(i);
-				break;
-			case SELECTED:
-				//#style ${esstyle}SelectSelectedRow, patselSelectedRow
-				UiAccess.setStyle(i);
-				break;
-			}
-		}
-		//#next esstyle
-	}
-	
 	private void refreshList () {
 		container.clear();
+
+		this.setTitle(baseTitle + " (" + numMatches() + ")");
 		
 		//#style patselTitleRow
 		Container title = new Container(false);
-		styleDynamically(title, TITLE);
+		applyStyle(title, STYLE_TITLE);
 		
 		String[] titleData = controller.getTitleData();
 		for (int j = 0; j < titleData.length; j++) {
 			//#style patselCell
 			StringItem str = new StringItem("", titleData[j]);
-			styleDynamically(str, CELL);
+			applyStyle(str, STYLE_CELL);
 			title.add(str);
 		}
-		//#style patselCell
-		StringItem number = new StringItem("","(" + String.valueOf(rowIDs.size()));
-		styleDynamically(number, CELL);
-		title.add(number);
 		this.append(title);
 		
 		if (listIsEmpty()) {
@@ -282,26 +230,26 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 			if (i == selectedIndex) {
 				//#style patselSelectedRow
 				row = new Container(false);
-				styleDynamically(row, SELECTED);
+				applyStyle(row, STYLE_SELECTED);
 			} else if (i % 2 == 0) {
 				//#style patselEvenRow
 				row = new Container(false);
-				styleDynamically(row, EVEN);
+				applyStyle(row, STYLE_EVEN);
 			} else {
 				//#style patselOddRow
 				row = new Container(false);
-				styleDynamically(row, ODD);
+				applyStyle(row, STYLE_ODD);
 			}
 			
 			if (rowID == INDEX_NEW) {
-				row.add(new StringItem("", "Add New " + entityType));
+				row.add(new StringItem("", "Add New " + entityPrototype.entityType()));
 			} else {
 				String[] rowData = controller.getDataFields(rowID);
 				
 				for (int j = 0; j < rowData.length; j++) {
 					//#style patselCell
 					StringItem str = new StringItem("", rowData[j]);
-					styleDynamically(str, CELL);
+					applyStyle(str, STYLE_CELL);
 					row.add(str);
 				}
 			}
@@ -312,9 +260,47 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 		setActiveFrame(Graphics.BOTTOM);
 	}
 
+	private static final int STYLE_TITLE = 0;
+	private static final int STYLE_CELL = 1;
+	private static final int STYLE_EVEN = 2;
+	private static final int STYLE_ODD = 3;
+	private static final int STYLE_SELECTED = 4;
+	
+	private void applyStyle(Item i, int type) {
+		if (entityPrototype.getStyleKey() == null) {
+			return;
+		}
+			
+		//#foreach esstyle in javarosa.patientselect.types
+		if("${esstyle}".equals(entityPrototype.getStyleKey())) {
+			switch(type) {
+			case STYLE_TITLE:
+				//#style ${esstyle}SelectTitleRow, patselTitleRow
+				UiAccess.setStyle(i);
+				break;
+			case STYLE_CELL:
+				//#style ${esstyle}SelectCell, patselCell
+				UiAccess.setStyle(i);
+				break;
+			case STYLE_EVEN:
+				//#style ${esstyle}SelectEvenRow, patselEvenRow
+				UiAccess.setStyle(i);
+				break;
+			case STYLE_ODD:
+				//#style ${esstyle}SelectOddRow, patselOddRow
+				UiAccess.setStyle(i);
+				break;
+			case STYLE_SELECTED:
+				//#style ${esstyle}SelectSelectedRow, patselSelectedRow
+				UiAccess.setStyle(i);
+				break;
+			}
+		}
+		//#next esstyle
+	}
+	
 	protected boolean handleKeyPressed(int keyCode, int gameAction) {
-		//Supress these actions, letting the propogates screws up scrolling
-		//on some platforms.
+		//Supress these actions, letting the propogates screws up scrolling on some platforms.
 		if (gameAction == Canvas.UP && keyCode != Canvas.KEY_NUM2) {
 			return true;
 		} else if (gameAction == Canvas.DOWN && keyCode != Canvas.KEY_NUM8) {
@@ -323,7 +309,6 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 		return super.handleKeyPressed(keyCode, gameAction);
 	}
 
-	
 	protected boolean handleKeyReleased(int keyCode, int gameAction) {
 		if (gameAction == Canvas.UP && keyCode != Canvas.KEY_NUM2) {
 			stepIndex(false);
@@ -358,9 +343,13 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 		}
 	}	
 	
-	public void changeSort (IEntityComparator c) {
-		this.currentSort = c;
+	public void changeSort (String sortField) {
+		this.sortField = sortField;
 		refresh();
+	}
+	
+	public String getSortField () {
+		return sortField;
 	}
 	
 	//can't believe i'm writing a .. sort function
@@ -369,7 +358,7 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 			for (int j = 0; j < i; j++) {
 				int rowA = rowID(j);
 				int rowB = rowID(j + 1);
-				if(currentSort.compare(controller.getEntity(rowA), controller.getEntity(rowB)) > 0) {
+				if (compare(controller.getEntity(rowA), controller.getEntity(rowB)) > 0) {
 					rowIDs.setElementAt(new Integer(rowB), j);
 					rowIDs.setElementAt(new Integer(rowA), j + 1);
 				}
@@ -377,12 +366,64 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 		}
 	}
 
+	private int compare (Entity<E> eA, Entity<E> eB) {
+		if (sortField == null) {
+			return 0;
+		}
+		
+		Object valA = eA.getSortKey(sortField);
+		Object valB = eB.getSortKey(sortField);
+		
+		if (valA == null && valB == null) {
+			return 0;
+		} else if (valA == null) {
+			return 1;
+		} else if (valB == null) {
+			return -1;
+		}
+		
+		if (valA instanceof Integer) {
+			return compareInt(((Integer)valA).intValue(), ((Integer)valB).intValue());
+		} else if (valA instanceof Long) {
+			return compareInt(((Long)valA).longValue(), ((Long)valB).longValue());
+		} else if (valA instanceof Double) {
+			return compareFloat(((Double)valA).doubleValue(), ((Double)valB).doubleValue());
+		} else if (valA instanceof String) {
+			return compareStr((String)valA, (String)valB);
+		} else if (valA instanceof Date) {
+			return compareInt((int)DateUtils.daysSinceEpoch((Date)valA), (int)DateUtils.daysSinceEpoch((Date)valB));
+		} else {
+			throw new RuntimeException ("Don't know how to order type [" + valA.getClass().getName() + "]; only int, long, double, string, and date are supported");
+		}
+	}
+	
+	private int compareInt (long a, long b) {
+		return (a == b ? 0 : (a < b ? -1 : 1));
+	}
+	
+	private int compareFloat (double a, double b) {
+		return (a == b ? 0 : (a < b ? -1 : 1));
+	}
+	
+	private int compareStr (String a, String b) {
+		return a.compareTo(b);
+	}
+	
+	private int getNumSortFields () {
+		String[] fields = entityPrototype.getSortFields();
+		return (fields == null ? 0 : fields.length);
+	}
+	
+	private String getDefaultSortField () {
+		return (getNumSortFields() == 0 ? null : entityPrototype.getSortFields()[0]);
+	}
+	
 	public void commandAction(Command cmd, Displayable d) {
 		if (d == this) {
 			if (cmd == exitCmd) {
 				controller.exit();
 			} else if (cmd == sortCmd) {
-				EntitySelectSortPopup pssw = new EntitySelectSortPopup(this, controller, sorts);
+				EntitySelectSortPopup<E> pssw = new EntitySelectSortPopup<E>(this, controller, entityPrototype);
 				pssw.show();
 			} else if (cmd == newCmd) {
 				controller.newEntity();
@@ -391,6 +432,10 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 	}
 	
 	//#if polish.hasPointerEvents
+	
+	private int selectedIndexFromScreen (int i) {
+		return firstIndex + i;
+	}
 	
 	/* (non-Javadoc)
 	 * @see de.enough.polish.ui.Container#handlePointerPressed(int, int)
@@ -415,7 +460,7 @@ public class EntitySelectView extends FramedForm implements ItemStateListener, C
 			}
 		}
 		
-		if (handled){
+		if (handled) {
 			return true;
 		} else {
 			return super.handlePointerPressed(x, y);
