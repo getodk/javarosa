@@ -24,15 +24,16 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectState;
-import org.javarosa.entity.model.IEntity;
+import org.javarosa.entity.model.Entity;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Form;
 import de.enough.polish.ui.StringItem;
 
-public class EntitySelectDetailPopup extends Form implements CommandListener {
-	EntitySelectState psa;
+public class EntitySelectDetailPopup<E extends Persistable> extends Form implements CommandListener {
+	EntitySelectState<E> psa;
 	
 	int recordID;
 	String[] headers;
@@ -41,15 +42,14 @@ public class EntitySelectDetailPopup extends Form implements CommandListener {
 	Command okCmd;
 	Command backCmd;
 	
-	public EntitySelectDetailPopup (EntitySelectState psa, IEntity entity, IStorageUtility entityStorage) {
+	public EntitySelectDetailPopup (EntitySelectState<E> psa, Entity<E> entity, IStorageUtility storage) {
 		super(entity.entityType() + " Detail");
 		
 		this.psa = psa;
 		
 		recordID = entity.getRecordID();
-		Object o = entity.fetch(entityStorage);
 		headers = entity.getHeaders(true);
-		data = entity.getLongFields(o);
+		data = entity.getLongFields((E)storage.read(recordID));
 		
 		okCmd = new Command("OK", Command.OK, 1);
 		backCmd = new Command("Back", Command.BACK, 1);
@@ -62,6 +62,7 @@ public class EntitySelectDetailPopup extends Form implements CommandListener {
 	
 	public void loadData() {
 		for (int i = 0; i < data.length; i++) {
+			//TODO: make these styles dynamically configurable as well (like on the main list view)
 			//#style patselDetailRow
 			Container c = new Container(false);
 			c.add(new StringItem("", headers[i] + ":"));

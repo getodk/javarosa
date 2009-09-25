@@ -24,7 +24,9 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectState;
+import org.javarosa.entity.model.Entity;
 import org.javarosa.entity.util.IEntityComparator;
 
 import de.enough.polish.ui.Choice;
@@ -33,34 +35,34 @@ import de.enough.polish.ui.Form;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
 
-public class EntitySelectSortPopup extends Form implements CommandListener, ItemStateListener {
-	private EntitySelectView psv;
-	private EntitySelectState psa;
+public class EntitySelectSortPopup<E extends Persistable> extends Form implements CommandListener, ItemStateListener {
+	private EntitySelectView<E> psv;
+	private EntitySelectState<E> psa;
+	private Entity<E> entityPrototype;
 	
     private ChoiceGroup sortField;
     private Command cancelCmd;
-    private Hashtable map;
 
-    public EntitySelectSortPopup (EntitySelectView psv, EntitySelectState psa, Vector comparators) {
+    public EntitySelectSortPopup (EntitySelectView<E> psv, EntitySelectState<E> psa, Entity<E> entityPrototype) {
 		//#style patselSortPopup
 		super("Sort by...");
 
 		this.psv = psv;
 		this.psa = psa;
+		this.entityPrototype = entityPrototype;
 		
 		sortField = new ChoiceGroup("", Choice.EXCLUSIVE);
-		map = new Hashtable();
-		
-		for(Enumeration en = comparators.elements(); en.hasMoreElements();) {
-			IEntityComparator comp = (IEntityComparator)en.nextElement();
-			int index = sortField.append(comp.getName(), null);
-			map.put(new Integer(index), comp);
-			if(psv.currentSort.equals(comp)) {
-				sortField.setSelectedIndex(index, true);
+
+		String[] sortFields = entityPrototype.getSortFields();
+		String[] sortFieldNames = entityPrototype.getSortFieldNames();
+		for (int i = 0; i < sortFieldNames.length; i++) {
+			sortField.append(sortFieldNames[i], null);
+			if (sortFields[i].equals(psv.getSortField())) {
+				sortField.setSelectedIndex(i, true);
 			}
 		}
-		append(sortField);
 		
+		append(sortField);
 		sortField.setItemStateListener(this);
 		
 		cancelCmd = new Command("Cancel", Command.CANCEL, 1);
@@ -82,8 +84,7 @@ public class EntitySelectSortPopup extends Form implements CommandListener, Item
 
 	public void itemStateChanged(Item item) {
 		if (item == sortField) {
-			System.out.println(sortField.getSelectedIndex());
-			psv.changeSort((IEntityComparator)map.get(new Integer(sortField.getSelectedIndex())));
+			psv.changeSort(entityPrototype.getSortFields()[sortField.getSelectedIndex()]);
 			psa.showList();
 		}
 	}

@@ -22,51 +22,44 @@ import javax.microedition.lcdui.Displayable;
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.transitions.EntitySelectTransitions;
-import org.javarosa.entity.model.IEntity;
+import org.javarosa.entity.model.Entity;
 import org.javarosa.entity.model.view.EntitySelectDetailPopup;
 import org.javarosa.entity.model.view.EntitySelectView;
 import org.javarosa.entity.util.IEntityFilter;
 import org.javarosa.j2me.view.J2MEDisplay;
 
-public class EntitySelectState<E extends IEntity> implements State<EntitySelectTransitions> {
+public class EntitySelectState <E extends Persistable> implements State<EntitySelectTransitions> {
 	private EntitySelectTransitions transitions;
 	
-	private EntitySelectView selView;
+	private EntitySelectView<E> selView;
 	
 	private IStorageUtility entityStorage;
-	private E entityPrototype;
+	private Entity<E> entityPrototype;
 	
 	boolean immediatelySelectNewlyCreated;
 	boolean bailOnEmpty;
-	IEntityFilter<? super E> filter;
 	
-	Vector entities;
+	Vector<Entity<E>> entities;
 	
-	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype) {
-		this(title, entityStorage, entityPrototype, EntitySelectView.NEW_IN_LIST, true, false, null, null,null);
+	public EntitySelectState (String title, IStorageUtility entityStorage, Entity<E> entityPrototype) {
+		this(title, entityStorage, entityPrototype, EntitySelectView.NEW_IN_LIST, true, false);
 	}
 	
-	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype, int newMode, boolean immediatelySelectNewlyCreated) {
-		this(title, entityStorage, entityPrototype, newMode, immediatelySelectNewlyCreated, false, null, null,null);
+	public EntitySelectState (String title, IStorageUtility entityStorage, Entity<E> entityPrototype, int newMode, boolean immediatelySelectNewlyCreated) {
+		this(title, entityStorage, entityPrototype, newMode, immediatelySelectNewlyCreated, false);
 	}
-	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype,
-			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter<? super E> filter, String styleKey) {
-		this(title, entityStorage, entityPrototype, newMode, immediatelySelectNewlyCreated, bailOnEmpty,filter,styleKey,null);
-	}
-	public EntitySelectState (String title, IStorageUtility entityStorage, E entityPrototype,
-			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty, IEntityFilter<? super E> filter, String styleKey, Vector comparators) {
-		//This argument list is getting out of hand. Some of this should be in a controller, some of it should be in the view,
-		//but seriously, this is absurd.
+
+	public EntitySelectState (String title, IStorageUtility entityStorage, Entity<E> entityPrototype,
+			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty) {
 		this.entityStorage = entityStorage;
 		this.entityPrototype = entityPrototype;
 
 		this.immediatelySelectNewlyCreated = immediatelySelectNewlyCreated;
 		this.bailOnEmpty = bailOnEmpty;
-		this.filter = filter;
 
-		selView = new EntitySelectView(this, title, entityPrototype.entityType(), newMode,comparators);
-		selView.setStyleKey(styleKey); //droos: what is this?
+		selView = new EntitySelectView<E>(this, entityPrototype, title, newMode);
 	}
 
 	public void enter (EntitySelectTransitions transitions) {
@@ -86,20 +79,23 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	}
 
 	private void loadEntities () {
-		entities = new Vector();
+		entities = new Vector<Entity<E>>();
+		IEntityFilter<? super E> filter = entityPrototype.getFilter();
 		
 		IStorageIterator ei = entityStorage.iterate();
 		while (ei.hasMore()) {
-			loadEntity(ei.nextID());
+			E obj = (E)ei.nextRecord();
+			
+			if (filter == null || filter.isPermitted(obj)) {
+				loadEntity(obj);
+			}
 		}
 	}
 	
-	private void loadEntity (int recordID) {
-		E entity = (E)entityPrototype.factory(recordID);
-		entity.readEntity(entity.fetch(entityStorage));
-		if(filter == null || filter.isPermitted(entity)) {
-			entities.addElement(entity);		
-		}
+	private void loadEntity (E obj) {
+		Entity<E> entity = entityPrototype.factory();
+		entity.readEntity(obj);
+		entities.addElement(entity);
 	}
 	
 	public void setView (Displayable view) {
@@ -107,26 +103,27 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	}
 
 	public void newEntity (int newEntityID) {
+		//note: it is assumed that the newly created entity satisfies any filters in effect
 		if (immediatelySelectNewlyCreated) {
 			entityChosen(newEntityID);
 		} else {
-			loadEntity(newEntityID);
+			E obj = (E)entityStorage.read(newEntityID);
+			loadEntity(obj);
 			selView.refresh(newEntityID);
 			showList();
 		}
 	}
 	
-	public Vector search (String key) {
-		Vector matches = new Vector();
+	public Vector<Integer> search (String key) {
+		Vector<Integer> matches = new Vector<Integer>();
 		
 		if (key == null || key.equals("")) {
 			for (int i = 0; i < entities.size(); i++)
 				matches.addElement(new Integer(i));
 		} else {
 			for (int i = 0; i < entities.size(); i++) {
-				IEntity entity = (IEntity)entities.elementAt(i);
-				
-				if (entity.matchID(key) || entity.matchName(key)) {
+				Entity<E> entity = entities.elementAt(i);
+				if (entity.match(key)) {
 					matches.addElement(new Integer(i));
 				}
 			}
@@ -140,8 +137,8 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	}
 	
 	public void itemSelected (int i) {
-		IEntity entity = (IEntity)entities.elementAt(i);
-		EntitySelectDetailPopup psdp = new EntitySelectDetailPopup(this, entity, entityStorage);
+		Entity<E> entity = entities.elementAt(i);
+		EntitySelectDetailPopup<E> psdp = new EntitySelectDetailPopup<E>(this, entity, entityStorage);
 		psdp.show();
 	}
 	
@@ -158,31 +155,18 @@ public class EntitySelectState<E extends IEntity> implements State<EntitySelectT
 	}
 	
 	public String[] getDataFields (int i) {
-		return ((IEntity)entities.elementAt(i)).getShortFields();
+		return entities.elementAt(i).getShortFields();
 	}
 	
 	public String[] getTitleData () {
 		return entityPrototype.getHeaders(false);
 	}
 	
-	public String getDataName (int i) {
-		return ((IEntity)entities.elementAt(i)).getName();
-	}
-	
-	public String getDataID (int i) {
-		return ((IEntity)entities.elementAt(i)).getID();
-	}	
-	
-	public IEntity getEntity (int i) {
-		return (IEntity)entities.elementAt(i);
+	public Entity<E> getEntity (int i) {
+		return entities.elementAt(i);
 	}	
 
 	public int getRecordID (int i) {
-		return ((IEntity)entities.elementAt(i)).getRecordID();
+		return entities.elementAt(i).getRecordID();
 	}
-	
-	public String getEntityType() {
-		return entityPrototype.entityType();
-	}
-
 }
