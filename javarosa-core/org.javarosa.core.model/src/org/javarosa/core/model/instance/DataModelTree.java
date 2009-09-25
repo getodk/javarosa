@@ -758,8 +758,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 				node.setValue(value); // value is a StringData
 			} else {
 				String textVal = (String) value.getValue();
-				IAnswerData typedVal = RestoreUtils.xfFact.parseData(textVal,
-						node.dataType, ref, f);
+				IAnswerData typedVal = RestoreUtils.xfFact.parseData(textVal, node.dataType, ref, f);
 				node.setValue(typedVal);
 			}
 		} else {
