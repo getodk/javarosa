@@ -16,20 +16,16 @@
 
 package org.javarosa.patient.select.activity;
 
-import java.io.IOException;
 import java.util.Random;
 import java.util.Vector;
 
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.services.storage.utilities.RMSUtility;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.entity.model.Entity;
 import org.javarosa.patient.model.Patient;
 
-public class PatientEntity implements Entity {
-	protected int recordID;
-	protected String ID;	
+public class PatientEntity extends Entity<Patient> {
+	protected String ID;
 	protected String familyName;
 	protected String givenName;
 	protected String middleName;
@@ -41,19 +37,15 @@ public class PatientEntity implements Entity {
 	protected String[] normalizedName;
 	protected String normalizedID;
 	
-	public Entity factory (int recordID) {
-		PatientEntity pe = new PatientEntity();
-		pe.recordID = recordID;
-		return pe;
+	public PatientEntity factory () {
+		return new PatientEntity();
 	}
 	
 	public String entityType() {
 		return "Patient";
 	}
 
-	public void readEntity(Object o) {
-		Patient p = (Patient)o;
-					
+	public void loadEntity(Patient p) {
 		ID = ExtUtil.emptyIfNull(p.getIdentifier());
 		familyName = ExtUtil.emptyIfNull(p.getFamilyName());
 		givenName = ExtUtil.emptyIfNull(p.getGivenName());
@@ -66,21 +58,9 @@ public class PatientEntity implements Entity {
 		
 		alive = p.isAlive();
 	}
-
-	public Object fetchRMS (RMSUtility rmsu) {
-		Patient p = new Patient();
-		try {
-			rmsu.retrieveFromRMS(recordID, p);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (DeserializationException e) {
-			e.printStackTrace();
-		}
-		return p;
-	}
 	
 	public String getID() {
-		return ID == null ? "" : ID;
+		return ID;
 	}
 
 	public String getName() {
@@ -108,10 +88,6 @@ public class PatientEntity implements Entity {
 		}
 		
 		return name;
-	}
-
-	public int getRecordID() {
-		return recordID;
 	}
 	
 	public boolean isAlive() {
@@ -164,6 +140,10 @@ public class PatientEntity implements Entity {
 				return str.startsWith(key);
 			}
 		}
+	}
+	
+	public boolean match (String key) {
+		return matchID(key) || matchName(key);
 	}
 	
 	public boolean matchID(String key) {
@@ -242,9 +222,7 @@ public class PatientEntity implements Entity {
 		return fields;
 	}
 
-	public String[] getLongFields(Object o) {
-		Patient p = (Patient)o;
-
+	public String[] getLongFields(Patient p) {
 		String[] fields = new String[getHeaders(true).length];
 	
 		String sexStr;
@@ -278,10 +256,28 @@ public class PatientEntity implements Entity {
 		fields[1] = getID();
 		fields[2] = sexStr;
 		fields[3] = DateUtils.formatDate(p.getBirthDate(), DateUtils.FORMAT_HUMAN_READABLE_SHORT);
-		fields[4] = (age == -1 ? "" : age + "");
+		fields[4] = (age == -1 ? "?" : age + "");
 		fields[5] = phone;
 		fields[6] = village;
 		
 		return fields;
+	}
+	
+	public String[] getSortFields () {
+		return new String[] {"NAME", "ID"};
+	}
+	
+	public String[] getSortFieldNames () {
+		return new String[] {"Name", "ID"};
+	}
+		
+	public Object getSortKey (String fieldKey) {
+		if (fieldKey.equals("NAME")) {
+			return getName();
+		} else if (fieldKey.equals("ID")) {
+			return getID();
+		} else {
+			throw new RuntimeException("Sort Key [" + fieldKey + "] is not supported by this entity");
+		}
 	}
 }
