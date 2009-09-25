@@ -159,7 +159,8 @@ public class XFormAnswerDataParser {
 		Selection s = new Selection(choice);
 		
 		if(q != null) {
-			q.localizeSelectMap(null);
+			if (q.getSelectItems() == null)
+				q.localizeSelectMap(null);
 			int index = q.getSelectedItemIndex(choice); 
 			s.attachQuestionDef(q);
 			return (index != -1 ? s : null);
