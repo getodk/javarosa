@@ -19,30 +19,22 @@
  */
 package org.javarosa.cases.util;
 
-import java.io.IOException;
-
 import org.javarosa.cases.model.Case;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.services.storage.IStorageUtility;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.entity.model.IEntity;
+import org.javarosa.entity.model.Entity;
 
 /**
  * @author Clayton Sims
  * @date Mar 19, 2009 
  *
  */
-public class CaseEntity implements IEntity {
+public class CaseEntity extends Entity<Case> {
 	protected String name;
 	protected String id;
 	protected String type;
-	
-	protected int recordId;
 	protected int userId;
-	
 	protected boolean closed;
-	
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#entityType()
@@ -54,24 +46,8 @@ public class CaseEntity implements IEntity {
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#factory(int)
 	 */
-	public IEntity factory(int recordID) {
-		CaseEntity entity = new CaseEntity();
-		entity.recordId = recordID;
-		return entity;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#fetchRMS(org.javarosa.core.services.storage.utilities.RMSUtility)
-	 */
-	public Object fetch(IStorageUtility entities) {
-		return (Case)entities.read(recordId);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#getID()
-	 */
-	public String getID() {
-		return id;
+	public CaseEntity factory() {
+		return new CaseEntity();
 	}
 	
 	/* (non-Javadoc)
@@ -99,14 +75,14 @@ public class CaseEntity implements IEntity {
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#getLongFields(java.lang.Object)
 	 */
-	public String[] getLongFields(Object o) {
-		Case c = (Case)o;
+	public String[] getLongFields(Case c) {
 		String date;
 		if(c.getDateOpened() == null) {
 			date = "unknown";
 		} else {
 			date = DateUtils.formatDate(c.getDateOpened(), DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 		}
+
 		String open;
 		if(c.isClosed()) {
 			//#if commcare.lang.sw
@@ -132,28 +108,9 @@ public class CaseEntity implements IEntity {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#getName()
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	public boolean isClosed() {
-		return closed;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.entity.model.IEntity#getRecordID()
-	 */
-	public int getRecordID() {
-		return recordId;
-	}
-	/* (non-Javadoc)
 	 * @see org.javarosa.patient.select.activity.IEntity#matchID(java.lang.String)
 	 */
-	public boolean matchID(String key) {
-		//TODO: I don't really understand these methods. These should be matching
-		//pretty broadly, but should be reevaluated once the method contract is clear.
+	public boolean match (String key) {
 		String[] fields = this.getShortFields();
 		for(int i = 0; i < fields.length; ++i) {
 			if(fields[i].indexOf(key) != -1) {
@@ -162,34 +119,49 @@ public class CaseEntity implements IEntity {
 		}
 		return false;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.patient.select.activity.IEntity#matchName(java.lang.String)
-	 */
-	public boolean matchName(String key) {
 		
-		//TODO: I don't really understand these methods. These should be matching
-		//pretty broadly, but should be reevaluated once the method contract is clear.
-		return matchID(key);
+	public String[] getSortFields () {
+		return new String[] {"NAME", "ID"};
 	}
 	
-	public int getUserId() {
-		return userId;
+	public String[] getSortFieldNames () {
+		return new String[] {"Name", "Case ID"};
+	}
+	
+	public Object getSortKey (String fieldKey) {
+		if (fieldKey.equals("NAME")) {
+			return getName();
+		} else if (fieldKey.equals("ID")) {
+			return getID();
+		} else {
+			throw new RuntimeException("Sort Key [" + fieldKey + "] is not supported by this entity");
+		}
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#readEntity(java.lang.Object)
 	 */
-	public void readEntity(Object o) {
-		Case c = (Case)o;
+	public void loadEntity(Case c) {
 		this.name = c.getName();
 		this.id = ExtUtil.emptyIfNull((String)c.getProperty("case-id"));
 		this.type = c.getTypeId();
-		this.recordId = c.getID();
-		
 		this.closed = c.isClosed();
-		
 		this.userId = c.getUserId();
 	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public boolean isClosed() {
+		return closed;
+	}
+	
+	public int getUserId() {
+		return userId;
+	}
 
+	public String getID() {
+		return id;
+	}
 }

@@ -86,7 +86,7 @@ public class EntitySelectState <E extends Persistable> implements State<EntitySe
 		while (ei.hasMore()) {
 			E obj = (E)ei.nextRecord();
 			
-			if (filter == null || filter.isPermitted(obj)) {
+			if (filter == null || filter.matches(obj)) {
 				loadEntity(obj);
 			}
 		}

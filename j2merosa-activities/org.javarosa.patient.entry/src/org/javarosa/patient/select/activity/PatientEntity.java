@@ -24,10 +24,10 @@ import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.utilities.RMSUtility;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.entity.model.IEntity;
+import org.javarosa.entity.model.Entity;
 import org.javarosa.patient.model.Patient;
 
-public class PatientEntity implements IEntity {
+public class PatientEntity implements Entity {
 	protected int recordID;
 	protected String ID;	
 	protected String familyName;
@@ -41,7 +41,7 @@ public class PatientEntity implements IEntity {
 	protected String[] normalizedName;
 	protected String normalizedID;
 	
-	public IEntity factory (int recordID) {
+	public Entity factory (int recordID) {
 		PatientEntity pe = new PatientEntity();
 		pe.recordID = recordID;
 		return pe;
