@@ -374,6 +374,10 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		Object valA = eA.getSortKey(sortField);
 		Object valB = eB.getSortKey(sortField);
 		
+		return compareVal(valA, valB);
+	}
+	
+	private int compareVal (Object valA, Object valB) {
 		if (valA == null && valB == null) {
 			return 0;
 		} else if (valA == null) {
@@ -392,6 +396,16 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 			return compareStr((String)valA, (String)valB);
 		} else if (valA instanceof Date) {
 			return compareInt((int)DateUtils.daysSinceEpoch((Date)valA), (int)DateUtils.daysSinceEpoch((Date)valB));
+		} else if (valA instanceof Object[]) {
+			Object[] arrA = (Object[])valA;
+			Object[] arrB = (Object[])valB;
+			
+			for (int i = 0; i < arrA.length && i < arrB.length; i++) {
+				int cmp = compareVal(arrA[i], arrB[i]);
+				if (cmp != 0)
+					return cmp;
+			}
+			return compareInt(arrA.length, arrB.length);
 		} else {
 			throw new RuntimeException ("Don't know how to order type [" + valA.getClass().getName() + "]; only int, long, double, string, and date are supported");
 		}

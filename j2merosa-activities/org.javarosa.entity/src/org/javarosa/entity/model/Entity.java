@@ -171,7 +171,8 @@ public abstract class Entity <E extends Persistable> {
 	 * 
 	 * The returned key should be of type Integer, Long, Double, String, or Date. Or null if not applicable
 	 * (entities with null keys will be placed at the end). Other types are not comparable and will throw
-	 * an exception.
+	 * an exception. This method should always return the same type for a given sort field, mixing types
+	 * within the same sort field will throw an exception.
 	 * 
 	 * @param fieldKey active sort field
 	 * @return sort key

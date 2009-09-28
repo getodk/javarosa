@@ -30,6 +30,49 @@ import org.javarosa.entity.model.view.EntitySelectView;
 import org.javarosa.entity.util.IEntityFilter;
 import org.javarosa.j2me.view.J2MEDisplay;
 
+/**
+ * Entity Select is a reusable activity for selecting a single record from a set of like records. For
+ * example, choosing a patient from a list of patients, selecting a saved form from a list of recently
+ * saved forms, etc.
+ * 
+ * Two things must be passed to the activity to make this work:
+ * 
+ *   1) A StorageUtility from which the set of records will be read
+ *   
+ *   2) A wrapper class specific to the type of record that provides methods to control the UI and
+ *      behavior of the activity (such as which columns to display and their contents, sorting, searching,
+ *      and also filtering which records from the StorageUtility to include in the set). This is referred
+ *      to as the 'Entity'. The Entity passed in is simply an empty prototype, but a new Entity is cloned
+ *      for each record in the selectable set.
+ * 
+ * When a record is selected, the activity exits via the 'entitySelected' transition, passing the record ID
+ * of the chosen record.
+ * 
+ * Optionally, it is possible to branch off to a 'create new entity' workflow from this activity, via the
+ * 'newEntity' transition. Once a new entity has been created, this activity can be resumed with the new
+ * entity added to the list, or the new entity can be immediately 'selected'. Resuming is done via the
+ * newEntity() method in this class. Wiring up to the proper 'entity creation' activity, as well as keeping
+ * a reference to this activity (for resuming) is the responsibility of the workflow architect. 'Create new'
+ * behavior can be disabled.
+ * 
+ * Overall flow of the activity:
+ * 
+ *   * The set of selectable records is read from the StorageUtility, a new entity wrapper is created for
+ *     each record, relevant fields are cached.
+ *   * All entities are displayed as a list, with a few short summary fields displayed for each record
+ *   * The user may scroll through the list, and also filter the list based on a search key. They may also
+ *     change the sorting of the list, or branch off to create a new entity (if enabled).
+ *   * The user selects an entity, and this brings them to a new screen that shows detailed information for
+ *     just that record.
+ *   * If they have the right record, they may select it and the activity exits. Or, they may go back to the
+ *     list view to choose a different record.
+ * 
+ * @author Drew Roos
+ *
+ * @param <E> underlying base class (e.g., patient, case, saved form, referral, ...) that this activity
+ *    will be used to select
+ */
+
 public class EntitySelectState <E extends Persistable> implements State<EntitySelectTransitions> {
 	private EntitySelectTransitions transitions;
 	
@@ -51,6 +94,18 @@ public class EntitySelectState <E extends Persistable> implements State<EntitySe
 		this(title, entityStorage, entityPrototype, newMode, immediatelySelectNewlyCreated, false);
 	}
 
+	/**
+	 * Create a new Entity Select activity instance
+	 * 
+	 * @param title UI screen title
+	 * @param entityStorage StorageUtility to pull records from (must return records of type <E>)
+	 * @param entityPrototype an instance of the Entity -- the wrapper class for the records
+	 * @param newMode EntitySelectView.NEW_*; controls if and how you can create new entities from this activity
+	 * @param immediatelySelectNewlyCreated if you're allowed to create new entities, whether to immediately select
+	 *    the entity just created
+	 * @param bailOnEmpty if true, immediately exit the activity via the 'empty' transition if there are no entities
+	 *    in the set and creating new entities is disabled
+	 */
 	public EntitySelectState (String title, IStorageUtility entityStorage, Entity<E> entityPrototype,
 			int newMode, boolean immediatelySelectNewlyCreated, boolean bailOnEmpty) {
 		this.entityStorage = entityStorage;
