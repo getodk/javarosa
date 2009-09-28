@@ -25,6 +25,11 @@ import org.javarosa.entity.util.IEntityFilter;
  * govern its appearance and behavior inside the activity. For example: info columns and their
  * content, sorting, filtering, styling, etc.
  * 
+ * Note that this base Entity class is abstract. You have to provide some base functionality
+ * in your specific entity (reading and caching fields from the object, determining the columns
+ * to display and their contents, etc.), while other functionality has defaults provided here
+ * that need only be overridden if desired (filtering, sorting, etc.).
+ * 
  * @author Drew Roos
  *
  * @param <E> underlying entity type
@@ -34,10 +39,14 @@ public abstract class Entity <E extends Persistable> {
 	/**
 	 * All selectable entities must implement persistable, as the activity iterates over a
 	 * designated StorageUtility, and the activity returns only record IDs, not the entity
-	 * itself. This field stores the entity's record ID.
+	 * itself. This field caches the entity's record ID.
 	 */
-	protected int recordID;
-		
+	private int recordID;
+	
+	/**
+	 * Your specific entity implementation should cache other fields from the base object <E>
+	 */
+	
 	/**
 	 * Factory method
 	 * 
@@ -120,7 +129,7 @@ public abstract class Entity <E extends Persistable> {
 	 * Return the data to be shown for this entity on the detail screen. Data should correspond one-for-one
 	 * with the headers from getHeaders(true)
 	 * 
-	 * It is likely that we want to display here for information than we cached for use on the list screen.
+	 * It is likely that we want to display here more information than we cached for use on the list screen.
 	 * Therefore, the underlying entity object is provided, so you can extract additional data. You may still
 	 * access the cached fields, though.
 	 * 
