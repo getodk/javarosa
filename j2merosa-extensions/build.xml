@@ -1,5 +1,21 @@
 <?xml version="1.0"?>
 <project default="package">
+	<target name="packagePolish">
+		<ant dir="org.javarosa.communication" target="packagePolish"/>
+		<ant dir="org.javarosa.communication.ui" target="packagePolish"/>
+		<ant dir="../j2merosa-activities/org.javarosa.entity" target="packagePolish"/>
+		<ant dir="../j2merosa-activities/org.javarosa.user" target="packagePolish"/>
+		<ant dir="org.javarosa.formmanager" target="packagePolish"/>
+		<ant dir="../j2merosa-activities/org.javarosa.services.properties" target="packagePolish"/>
+		<ant dir="../j2merosa-activities/org.javarosa.polish.activity" target="packagePolish"/>
+		<ant dir="org.javarosa.polish.chatterbox" target="packagePolish"/>
+		<ant dir="org.javarosa.resources" target="packagePolish"/>
+		<ant dir="org.javarosa.clforms" target="packagePolish"/>
+		<ant dir="../j2merosa-activities/org.javarosa.patient" target="packagePolish"/>
+		<ant dir="org.javarosa.polish.chatterbox.extensions" target="packagePolish"/>
+		<ant dir="org.javarosa.communication.reporting" target="packagePolish"/>
+		<ant dir="org.javarosa.log" target="packagePolish"/>
+	</target>
 	<target name="package">
 		<ant dir="org.javarosa.communication" target="package"/>
 		<ant dir="org.javarosa.communication.ui" target="package"/>
