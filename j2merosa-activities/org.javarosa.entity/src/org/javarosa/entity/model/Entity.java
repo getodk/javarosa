@@ -137,7 +137,7 @@ public abstract class Entity <E extends Persistable> {
 	 * @return data to display 
 	 */	
 	public abstract String[] getLongFields (E e);
-
+	
 	/**
 	 * Return a list of text keys that identify the various fields by which this entity may be sorted.
 	 * If more than one key is provided, the user will be able to choose between the different sort fields.
@@ -176,7 +176,8 @@ public abstract class Entity <E extends Persistable> {
 	 * 
 	 * @param fieldKey active sort field
 	 * @return sort key
-	 * @throws RuntimeException fieldKey is not in the list of available sort fields
+	 * @throws RuntimeException if fieldKey is not in the list of available sort fields
+	 * @throws ClassCastException if a consistent type is not always returned for the same fieldKey
 	 */
 	public Object getSortKey (String fieldKey) {
 		if (fieldKey.equals("DEFAULT")) {
