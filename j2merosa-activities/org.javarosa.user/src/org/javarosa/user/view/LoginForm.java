@@ -121,6 +121,10 @@ public class LoginForm extends FramedForm {
 		// TODO:what this?
 		addCommand(CMD_CANCEL_LOGIN);
 
+		//#if !commcare.release
+		append("***TEST BUILD***");
+		//#endif
+		
 		append(this.usernameField);
 		append(this.passwordField);
 
