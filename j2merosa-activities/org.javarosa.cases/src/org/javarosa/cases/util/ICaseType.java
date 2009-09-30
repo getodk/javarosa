@@ -54,4 +54,6 @@ public interface ICaseType {
 	public Hashtable getCaptionOverrides ();
 	
 	public int[] getActionListing ();
+	
+	public int getReferralFollowupLength (String refType);
 }
