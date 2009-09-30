@@ -25,6 +25,7 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -64,6 +65,11 @@ public class PatientReferral implements Persistable, Restorable {
 		this(type, createdOn, referralId, linkedId, null);
 	}
 	
+	public PatientReferral(String type, String referralId, int linkedId, int dueIn) {
+		this(type, DateUtils.roundDate(new Date()), referralId, linkedId,
+				new Date(DateUtils.roundDate(new Date()).getTime() + DateUtils.DAY_IN_MS * dueIn));
+	}
+		
 	public PatientReferral(String type, Date createdOn, String referralId, int linkedId, Date dueOn) {
 		setID(-1);
 		this.type = type;
@@ -96,6 +102,14 @@ public class PatientReferral implements Persistable, Restorable {
 
 	public Date getDateDue () {
 		return dueOn;
+	}
+	
+	public void setDateDue (Date dueOn) {
+		this.dueOn = dueOn;
+	}
+	
+	public void setDueInNDays (int n) {
+		this.dueOn = new Date(DateUtils.roundDate(new Date()).getTime() + DateUtils.DAY_IN_MS * n);
 	}
 	
 	/**
