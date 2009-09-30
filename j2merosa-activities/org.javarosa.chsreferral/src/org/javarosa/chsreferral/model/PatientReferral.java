@@ -44,9 +44,10 @@ public class PatientReferral implements Persistable, Restorable {
 	public static final String STORAGE_KEY = "PAT_REFERRAL";
 	
 	private String type;
-	private Date dateReferred;
 	private String referralId;
-	private int patientId;
+	private int linkedId; //ID of patient or case this referral is linked to
+	private Date createdOn;
+	private Date dueOn;
 	
 	private int recordId;
 	
@@ -59,19 +60,24 @@ public class PatientReferral implements Persistable, Restorable {
 		
 	}
 	
-	public PatientReferral(String type, Date dateReferred, String referralId, int patientId) {
+	public PatientReferral(String type, Date createdOn, String referralId, int linkedId) {
+		this(type, createdOn, referralId, linkedId, null);
+	}
+	
+	public PatientReferral(String type, Date createdOn, String referralId, int linkedId, Date dueOn) {
 		setID(-1);
 		this.type = type;
-		this.dateReferred = dateReferred;
+		this.createdOn = createdOn;
+		this.dueOn = dueOn;
 		this.referralId = referralId;
-		this.patientId = patientId;
+		this.linkedId = linkedId;
 	}
 
 	/**
 	 * @return the internal record ID of the patient that this referral is associated with
 	 */
-	public int getPatientId() {
-		return patientId;
+	public int getLinkedId() {
+		return linkedId;
 	}
 
 	/**
@@ -84,10 +90,14 @@ public class PatientReferral implements Persistable, Restorable {
 	/**
 	 * @return the dateReferred
 	 */
-	public Date getDateReferred() {
-		return dateReferred;
+	public Date getDateCreated() {
+		return createdOn;
 	}
 
+	public Date getDateDue () {
+		return dueOn;
+	}
+	
 	/**
 	 * @return the referralId
 	 */
@@ -106,18 +116,20 @@ public class PatientReferral implements Persistable, Restorable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
 		this.type  = ExtUtil.readString(in);
-		this.dateReferred = ExtUtil.readDate(in);
+		this.createdOn = ExtUtil.readDate(in);
+		this.dueOn = ExtUtil.readDate(in);
 		this.referralId = ExtUtil.readString(in);
-		this.patientId = ExtUtil.readInt(in);
+		this.linkedId = ExtUtil.readInt(in);
 		this.recordId = ExtUtil.readInt(in);
 		this.pending = ExtUtil.readBool(in);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeString(out,type);
-		ExtUtil.writeDate(out, dateReferred);
+		ExtUtil.writeDate(out, createdOn);
+		ExtUtil.writeDate(out, dueOn);
 		ExtUtil.writeString(out, referralId);
-		ExtUtil.writeNumeric(out, patientId);
+		ExtUtil.writeNumeric(out, linkedId);
 		ExtUtil.writeNumeric(out, recordId);
 		ExtUtil.writeBool(out, pending);
 	}
@@ -138,9 +150,10 @@ public class PatientReferral implements Persistable, Restorable {
 	public DataModelTree exportData() {
 		DataModelTree dm = RestoreUtils.createDataModel(this);
 		RestoreUtils.addData(dm, "type", type);	
-		RestoreUtils.addData(dm, "date", dateReferred);	
+		RestoreUtils.addData(dm, "created", createdOn);	
+		RestoreUtils.addData(dm, "due", dueOn);	
 		RestoreUtils.addData(dm, "ref-id", referralId);	
-		RestoreUtils.addData(dm, "pat-id", new Integer(patientId));	
+		RestoreUtils.addData(dm, "parent-id", new Integer(linkedId));	
 		RestoreUtils.addData(dm, "pending", new Boolean(pending));	
 		
 		return dm;
@@ -148,17 +161,19 @@ public class PatientReferral implements Persistable, Restorable {
 
 	public void templateData(DataModelTree dm, TreeReference parentRef) {
 		RestoreUtils.applyDataType(dm, "type", parentRef, String.class);
-		RestoreUtils.applyDataType(dm, "date", parentRef, Date.class);
+		RestoreUtils.applyDataType(dm, "created", parentRef, Date.class);
+		RestoreUtils.applyDataType(dm, "due", parentRef, Date.class);
 		RestoreUtils.applyDataType(dm, "ref-id", parentRef, String.class);
-		RestoreUtils.applyDataType(dm, "pat-id", parentRef, Integer.class);
+		RestoreUtils.applyDataType(dm, "parent-id", parentRef, Integer.class);
 		RestoreUtils.applyDataType(dm, "pending", parentRef, Boolean.class);
 	}
 
 	public void importData(DataModelTree dm) {
 		type = (String)RestoreUtils.getValue("type", dm);
-		dateReferred = (Date)RestoreUtils.getValue("date", dm);
+		createdOn = (Date)RestoreUtils.getValue("created", dm);
+		dueOn = (Date)RestoreUtils.getValue("due", dm);
 		referralId = (String)RestoreUtils.getValue("ref-id", dm);
-		patientId = ((Integer)RestoreUtils.getValue("pat-id", dm)).intValue();
+		linkedId = ((Integer)RestoreUtils.getValue("parent-id", dm)).intValue();
 		pending = RestoreUtils.getBoolean(RestoreUtils.getValue("pending", dm));
 	}
 

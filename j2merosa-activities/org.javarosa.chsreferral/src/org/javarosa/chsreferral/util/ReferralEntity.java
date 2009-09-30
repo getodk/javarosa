@@ -58,7 +58,7 @@ public class ReferralEntity extends Entity<PatientReferral> {
 	public void loadEntity (PatientReferral r) {
 		this.id = r.getReferralId();
 		this.type = r.getType();
-		this.date = r.getDateReferred();
+		this.date = r.getDateCreated();
 		this.pending = r.isPending();
 	}
 	
