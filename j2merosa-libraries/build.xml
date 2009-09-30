@@ -9,16 +9,19 @@
 		<ant dir="../j2merosa-core" target="packagePolish"/>
 		<ant dir="../j2merosa-extensions" target="packagePolish"/>
 		<ant dir="../j2merosa-activities" target="packagePolish"/>
+	</target>
+	<target name="distribute">
 		<delete dir="dist/"/>
 		<mkdir dir="dist/"/>
-		<zip destfile="dist/j2merosa-libraries-${DSTAMP}.jar">
-			<zipgroupfileset dir="." includes="javarosa-core-*, j2merosa-core-*, j2merosa-communication-2*, j2merosa-communication-ui-*, j2merosa-formmanager-*, j2merosa-patient-*, j2merosa-patient-entry-*, j2merosa-entity-*, j2merosa-polish-activity-*, j2merosa-polish-chatterbox-*, j2merosa-polish-chatterbox-extensions-*, j2merosa-referral-*, j2merosa-resources-*, j2merosa-services-properties-*, j2merosa-user-*, kxml2-*, regexp-me*"/>
+		<zip destfile="dist/Generic-j2merosa-libraries-${DSTAMP}.jar">
+			<zipgroupfileset dir="." includes="javarosa-core-*, Generic-j2merosa-core-*, Generic-j2merosa-communication-2*, Generic-j2merosa-communication-ui-*, Generic-j2merosa-formmanager-*, Generic-j2merosa-patient-*, Generic-j2merosa-patient-entry-*, Generic-j2merosa-entity-*, Generic-j2merosa-polish-activity-*, Generic-j2merosa-polish-chatterbox-*, Generic-j2merosa-polish-chatterbox-extensions-*, Generic-j2merosa-referral-*, Generic-j2merosa-resources-*, Generic-j2merosa-services-properties-*, Generic-j2merosa-user-*"/>
+			<zipgroupfileset dir="." includes="kxml2-*.regex-me*"/>
 		</zip>
 	</target>
 	<target name="clean">
 		<delete>
 			<fileset dir=".">
-				<include name="j*rosa*.jar"/>
+				<include name="*.jar"/>
 			</fileset>
 		</delete>
 		<delete dir="dist/"/>
