@@ -35,7 +35,8 @@ public class ReferralEntity extends Entity<PatientReferral> {
 	
 	String id;
 	protected String type;
-	protected Date date;
+	protected Date dateCreated;
+	protected Date dateDue;
 	boolean pending;
 	
 	/* (non-Javadoc)
@@ -58,7 +59,8 @@ public class ReferralEntity extends Entity<PatientReferral> {
 	public void loadEntity (PatientReferral r) {
 		this.id = r.getReferralId();
 		this.type = r.getType();
-		this.date = r.getDateCreated();
+		this.dateCreated = r.getDateCreated();
+		this.dateDue = r.getDateDue();
 		this.pending = r.isPending();
 	}
 	
@@ -77,7 +79,7 @@ public class ReferralEntity extends Entity<PatientReferral> {
 	 * @see org.javarosa.entity.model.IEntity#getShortFields()
 	 */
 	public String[] getShortFields() {
-		return new String[] {id, type, DateUtils.formatDate(date, DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY)};
+		return new String[] {id, type, DateUtils.formatDate(dateCreated, DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY)};
 	}
 	
 	/* (non-Javadoc)
@@ -104,8 +106,12 @@ public class ReferralEntity extends Entity<PatientReferral> {
 		return type;
 	}
 	
-	public Date getDate() {
-		return date;
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+	
+	public Date getDateDue() {
+		return dateDue;
 	}
 	
 	public boolean isPending() {
