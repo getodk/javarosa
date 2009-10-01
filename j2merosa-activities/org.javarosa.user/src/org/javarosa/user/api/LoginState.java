@@ -3,6 +3,8 @@
  */
 package org.javarosa.user.api;
 
+import java.util.Vector;
+
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -26,14 +28,19 @@ public class LoginState implements State<LoginStateTransitions>, CommandListener
 	LoginForm view;
 	
 	Alert demoModeAlert = null;
+	private String extraText;
 	
 	public LoginState() {
 		
 	}
+	
+	public LoginState(String extraText) {
+		this.extraText = extraText;
+	}
 
 	public void enter(LoginStateTransitions transitions) {
 		this.transitions = transitions;
-		view = new LoginForm();
+		view = new LoginForm(Localization.get("form.login.login"), this.extraText);
 		view.setCommandListener(this);
 		view.setPasswordMode(AddUserState.PASSWORD_FORMAT_NUMERIC);
 	}
