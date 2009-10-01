@@ -267,6 +267,10 @@ public class DateUtils {
 		return getDate(f.year, f.month, f.day);
 	}
 	
+	public static Date today () {
+		return roundDate(new Date());
+	}
+	
 	/* ==== CALENDAR FUNCTIONS ==== */
 	
 	/**
@@ -411,37 +415,32 @@ public class DateUtils {
 	 * @param date the date object to be analyzed
 	 * @return The number of days (as a double precision floating point) since the Epoch
 	 */
-	public static double daysSinceEpoch(Date date) {
-		//43200000l: 0.5 day in ms
-		return MathUtils.divLongNotSuck(
-				DateUtils.roundDate(date).getTime() - DateUtils.getDate(1970, 1, 1).getTime() + 43200000l,
-				DAY_IN_MS); //half-day offset is needed to handle differing DST offsets!
+	public static int daysSinceEpoch(Date date) {
+		return dateDiff(getDate(1970, 1, 1), date);
 	}
 	
 	/**
-	 * @param earlierDate The earlier of the two dates to Diff
-	 * @param laterDate The later of the two dates to Diff
-	 * @return The approximate difference, in days, between the two dates given.
-	 * The estimate is most likely to be a small underestimate.
+	 * add n days to date d
+	 * 
+	 * @param d
+	 * @param n
+	 * @return
 	 */
-	//who added this shit!?!
-	public static int getApproxDaysDifference(Date earlierDate, Date laterDate) {
-		Date span = new Date(laterDate.getTime() - earlierDate.getTime());
-		Date firstDate = new Date(0);
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(firstDate);
-		int firstYear = calendar.get(Calendar.YEAR);
-		int firstMonth = calendar.get(Calendar.MONTH);
-		int firstDay = calendar.get(Calendar.DAY_OF_MONTH);
-		
-		calendar.setTime(span);
-		int spanYear = calendar.get(Calendar.YEAR);
-		int spanMonth = calendar.get(Calendar.MONTH);
-		int spanDay = calendar.get(Calendar.DAY_OF_MONTH);
-		
-		int days = (spanYear - firstYear)*365 + (spanMonth - firstMonth)*30 + (spanDay - firstDay);
-		
-		return days;
+	public static Date dateAdd (Date d, int n) {
+		return roundDate(new Date(roundDate(d).getTime() + DAY_IN_MS * n + DAY_IN_MS / 2));
+		//half-day offset is needed to handle differing DST offsets!
+	}
+	
+	/**
+	 * return the number of days between a and b, positive if b is later than a
+	 * 
+	 * @param a
+	 * @param b
+	 * @return # days difference
+	 */
+	public static int dateDiff (Date a, Date b) {
+		return (int)MathUtils.divLongNotSuck(roundDate(b).getTime() - roundDate(a).getTime() + DAY_IN_MS / 2, DAY_IN_MS);
+		//half-day offset is needed to handle differing DST offsets!
 	}
 	
 	/* ==== UTILITY ==== */
