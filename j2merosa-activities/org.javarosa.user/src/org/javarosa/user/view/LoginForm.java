@@ -52,11 +52,9 @@ public class LoginForm extends FramedForm {
 	private TextField passwordField;
 	private IStorageUtility users;
 	private User loggedInUser;
+
+	private String extraText;
 	
-	/**
-	 * @param loginActivity
-	 * @param title
-	 */
 	private final static int DEFAULT_ADMIN_USERID = -1;
 
 	public LoginForm() {
@@ -66,12 +64,23 @@ public class LoginForm extends FramedForm {
 	}
 
 	/**
-	 * @param loginActivity
 	 * @param title
 	 */
 	public LoginForm(String title) {
 		//#style loginView
 		super(title);
+		init();
+	}
+
+	/**
+	 * 
+	 * @param title
+	 * @param extraText
+	 */
+	public LoginForm(String title, String extraText) {
+		//#style loginView
+		super(title);
+		this.extraText = extraText;
 		init();
 	}
 
@@ -121,6 +130,10 @@ public class LoginForm extends FramedForm {
 		// TODO:what this?
 		addCommand(CMD_CANCEL_LOGIN);
 
+		//#if !commcare.release
+		append("***TEST BUILD***");
+		//#endif
+		
 		append(this.usernameField);
 		append(this.passwordField);
 
@@ -139,6 +152,9 @@ public class LoginForm extends FramedForm {
 		this.demoButton.setDefaultCommand(CMD_DEMO_BUTTON);
 		// #endif
 
+		// put the extra text if it's been set
+		if(this.extraText != null)
+			append(this.extraText);
 	}
 
 	/**
