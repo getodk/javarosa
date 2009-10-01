@@ -66,8 +66,8 @@ public class PatientReferral implements Persistable, Restorable {
 	}
 	
 	public PatientReferral(String type, String referralId, int linkedId, int dueIn) {
-		this(type, DateUtils.roundDate(new Date()), referralId, linkedId,
-				new Date(DateUtils.roundDate(new Date()).getTime() + DateUtils.DAY_IN_MS * dueIn));
+		this(type, DateUtils.today(), referralId, linkedId, null);
+		setDueInNDays(dueIn);
 	}
 		
 	public PatientReferral(String type, Date createdOn, String referralId, int linkedId, Date dueOn) {
@@ -109,7 +109,7 @@ public class PatientReferral implements Persistable, Restorable {
 	}
 	
 	public void setDueInNDays (int n) {
-		this.dueOn = new Date(DateUtils.roundDate(new Date()).getTime() + DateUtils.DAY_IN_MS * n);
+		this.dueOn = DateUtils.dateAdd(DateUtils.today(), n);
 	}
 	
 	/**
