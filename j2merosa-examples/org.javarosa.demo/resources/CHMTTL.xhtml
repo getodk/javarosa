@@ -1,0 +1,1257 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+  <title>CHMT TLP Report</title>
+  <meta jr:name="chmttlp"/>
+  <xf:model id="final CHMT">
+    <xf:instance xmlns="">
+    <root>
+	  <Meta>
+		<UserID/>
+		<DeviceID/>
+		<TimeStartRecorded />
+		<TimeEndRecorded />
+	  </Meta>
+        <Date qid="817" gid="131">2008-07-20</Date>
+      <Prov qid="818" gid="131">2</Prov>
+      <Where qid="819" gid="131">8</Where>
+      <Whereother qid="820" gid="131"/>
+      <LocWCHC qid="835" gid="131"/>
+      <LocWCHCother qid="833" gid="131"/>
+      <LocWCSC qid="832" gid="131"/>
+      <LocWCSCother qid="834" gid="131"/>
+      <LocECHC qid="836" gid="131"/>
+      <LocECHCother qid="97" gid="131"/>
+      <LocECSC qid="884" gid="131"/>
+      <LocECSCother qid="837" gid="131"/>
+      <LocGPHC qid="827" gid="131"/>
+      <LocGPHCother qid="838" gid="131"/>
+      <LocFSSCother qid="889" gid="131"/>
+      <LocLPSCother qid="951" gid="131"/>
+      <LocMPSCother qid="952" gid="131"/>
+      <LocNCSCother qid="954" gid="131"/>
+      <LocNWSCother qid="953" gid="131"/>
+      <Male qid="825" gid="131"/>
+      <Female qid="826" gid="131"/>
+      <TimeStart qid="831" gid="131"/>
+      <TimeEnd qid="830" gid="131"/>
+      <AVKit qid="846" gid="132"/>
+      <CHMTDVD qid="847" gid="132"/>
+      <Chmtscrutinize qid="848" gid="132"/>
+      <ChmtSparesBesties qid="849" gid="132"/>
+      <ChmtPSA qid="850" gid="132"/>
+      <CofacilitateCHMT qid="873" gid="132"/>
+      <CofacilitatorCHMT qid="872" gid="132"/>
+      <Clinic qid="851" gid="133"/>
+      <Clinicother qid="854" gid="133"/>
+      <Mindsetuse qid="852" gid="133"/>
+      <MindsetTV qid="853" gid="133"/>
+      <Grade qid="855" gid="134"/>
+      <Print qid="856" gid="134"/>
+      <Confirmed qid="857" gid="135"/>
+      <Topics1 qid="858" gid="136"/>
+      <Topicother1 qid="859" gid="136"/>
+      <Topics2 qid="860" gid="136"/>
+      <Topicother2 qid="864" gid="136"/>
+      <Topics3 qid="861" gid="136"/>
+      <Topicother3 qid="865" gid="136"/>
+      <Topics4 qid="862" gid="136"/>
+      <Topicother4 qid="865" gid="136"/>
+      <Topics5 qid="863" gid="136"/>
+      <Topicother5 qid="867" gid="136"/>
+      <Support qid="868" gid="137"/>
+      <Individual qid="869" gid="137"/>
+      <Mon qid="870" gid="138"/>
+      
+      <LocGPSC />
+      <LocGPSCother />
+      <LocKZNHC />
+      <LocKZNHCother />
+      <LocKZNSC />
+      <LocKZNSCother />
+      <LocFSHC />
+      <LocFSHCother />
+      
+      </root>
+    </xf:instance>
+	<xf:bind id="hidden1" nodeset="/root/Meta/UserID" type="xsd:string" jr:preload="context" jr:preloadParams="UserID" />
+	<xf:bind id="hidden2" nodeset="/root/Meta/DeviceID" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
+	<xf:bind id="hidden3" nodeset="/root/Meta/TimeStartRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
+	<xf:bind id="hidden4" nodeset="/root/Meta/TimeEndRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
+	<xf:bind id="5" nodeset="/root/Date" required="true()" readonly="true()" type="xsd:date" />
+    <xf:bind id="6" nodeset="/root/Prov" type="xsd:string" readonly="true()"/>
+    <xf:bind id="7" nodeset="/root/Where" type="xsd:string" readonly="true()"/>
+    <xf:bind id="8" nodeset="/root/Whereother" type="xsd:string" relevant="/root/Where='99'" />
+    <xf:bind id="9" nodeset="/root/LocWCHC" type="xsd:string" relevant="/root/Prov='9' and /root/Where='1'"/>
+    <xf:bind id="10" nodeset="/root/LocWCHCother" type="xsd:string" relevant="/root/LocWCHC='999'"/>
+    <xf:bind id="11" nodeset="/root/LocWCSC" type="xsd:string" relevant="/root/Prov='9' and /root/Where!='1'"/>
+    <xf:bind id="12" nodeset="/root/LocWCSCother" type="xsd:string" relevant="/root/Prov='9' and /root/LocWCSC='999'"/>
+    <xf:bind id="13" nodeset="/root/LocECHC" type="xsd:string" relevant="/root/Where='1' and /root/Prov='1'"/>
+    <xf:bind id="14" nodeset="/root/LocECHCother" type="xsd:string" relevant="/root/LocECHC='999'"/>
+    <xf:bind id="15" nodeset="/root/LocECSC" type="xsd:string" relevant="/root/Where!='1' and /root/Prov='1'"/>
+    <xf:bind id="16" nodeset="/root/LocECSCother" type="xsd:string" relevant="/root/Prov='1' and /root/LocECSC='999'"/>
+    <xf:bind id="17" nodeset="/root/LocGPHC" type="xsd:string" relevant="/root/Prov='2' and /root/Where='1'"/>
+    <xf:bind id="18" nodeset="/root/LocGPHCother" type="xsd:string" relevant="/root/LocGPHC='999'"/>
+    <xf:bind id="19" nodeset="/root/LocGPSC" type="xsd:string" relevant="/root/Prov='2' and /root/Where!='1'"/>
+    <xf:bind id="20" nodeset="/root/LocGPSCother" type="xsd:string" relevant="/root/LocGPSC='999'"/>
+    <xf:bind id="21" nodeset="/root/LocKZNHC" type="xsd:string" relevant="/root/Where='1' and /root/Prov='4'"/>
+    <xf:bind id="22" nodeset="/root/LocKZNHCother" type="xsd:string" relevant="/root/LocKZNHC='63'"/>
+    <xf:bind id="23" nodeset="/root/LocKZNSC" type="xsd:string" relevant="/root/Where!='1' and /root/Prov='4'"/>
+    <xf:bind id="24" nodeset="/root/LocKZNSCother" type="xsd:string" relevant="/root/LocKZNSC='999'"/>
+    <xf:bind id="25" nodeset="/root/LocFSHC" type="xsd:string" relevant="/root/Where='1' and /root/Prov='3'"/>
+    <xf:bind id="26" nodeset="/root/LocFSHCother" type="xsd:string" relevant="/root/LocFSHC='999'"/>
+    <xf:bind id="27" nodeset="/root/LocFSSCother" type="xsd:string" relevant="/root/Where!='1' and /root/Prov='3'"/>
+    <xf:bind id="28" nodeset="/root/LocLPSCother" type="xsd:string" relevant="/root/Prov='5'"/>
+    <xf:bind id="29" nodeset="/root/LocMPSCother" type="xsd:string" relevant="/root/Prov='6'"/>
+    <xf:bind id="30" nodeset="/root/LocNCSCother" type="xsd:string" relevant="/root/Prov='8'"/>
+    <xf:bind id="31" nodeset="/root/LocNWSCother" type="xsd:string" relevant="/root/Prov='7'"/>
+    <xf:bind id="32" nodeset="/root/Male" type="xsd:int"/>
+    <xf:bind id="33" nodeset="/root/Female" type="xsd:int" required="true()" readonly="../Male >= 10" />
+    <xf:bind id="34" nodeset="/root/TimeStart" type="xsd:time"/>
+    <xf:bind id="35" nodeset="/root/TimeEnd" type="xsd:time"/>
+    <xf:bind id="49" nodeset="/root/Topics1" type="xsd:string"/>
+    <xf:bind id="50" nodeset="/root/Topicother1" type="xsd:string" relevant="/root/Topics1='20'"/>
+    <xf:bind id="51" nodeset="/root/Topics2" type="xsd:string"/>
+    <xf:bind id="52" nodeset="/root/Topicother2" type="xsd:string" relevant="/root/Topics2='20'"/>
+    <xf:bind id="53" nodeset="/root/Topics3" type="xsd:string"/>
+    <xf:bind id="54" nodeset="/root/Topicother3" type="xsd:string" relevant="/root/Topics3='20'"/>
+    <xf:bind id="55" nodeset="/root/Topics4" type="xsd:string"/>
+    <xf:bind id="56" nodeset="/root/Topicother4" type="xsd:string" relevant="/root/Topics4='20'"/>
+    <xf:bind id="57" nodeset="/root/Topics5" type="xsd:string"/>
+    <xf:bind id="58" nodeset="/root/Topicother5" type="xsd:string" relevant="/root/Topics5='20'"/>
+    <xf:bind id="44" nodeset="/root/Support" type="xsd:select1"/>
+    <xf:bind id="45" nodeset="/root/Individual" type="xsd:select1"/>
+    <xf:bind id="36" nodeset="/root/Mon" type="xsd:select1" relevant="/root/MindsetTV='Y'"/>
+    <xf:bind id="37" nodeset="/root/AVKit" type="xsd:select1"/>
+    <xf:bind id="38" nodeset="/root/CHMTDVD" type="xsd:select1"/>
+    <xf:bind id="39" nodeset="/root/Chmtscrutinize" type="xsd:select1"/>
+    <xf:bind id="40" nodeset="/root/ChmtSparesBesties" type="xsd:select1"/>
+    <xf:bind id="41" nodeset="/root/ChmtPSA" type="xsd:select1"/>
+    <xf:bind id="42" nodeset="/root/CofacilitateCHMT" type="xsd:select1"/>
+    <xf:bind id="43" nodeset="/root/CofacilitatorCHMT" type="xsd:string" relevant="/root/CofacilitateCHMT='Y'"/>
+    <xf:bind id="1" nodeset="/root/Clinic" type="xsd:string" relevant="/root/Where='1'"/>
+    <xf:bind id="2" nodeset="/root/Clinicother" type="xsd:string" relevant="/root/Clinic='99'"/>
+    <xf:bind id="3" nodeset="/root/Mindsetuse" type="xsd:select1" relevant="/root/Where='1'"/>
+    <xf:bind id="4" nodeset="/root/MindsetTV" type="xsd:select1" relevant="/root/Where='1'"/>
+    <xf:bind id="46" nodeset="/root/Grade" type="xsd:string" relevant="/root/Where='2' and /root/Where='3'"/>
+    <xf:bind id="47" nodeset="/root/Print" type="xsd:select1" relevant="/root/Where='2' and /root/Where='3'"/>
+    <xf:bind id="48" nodeset="/root/Confirmed" type="xsd:select1"/>
+  </xf:model>
+
+  <xf:input bind="5">
+    <xf:label>On what date was the session held?</xf:label>
+  </xf:input>
+  <xf:select1 bind="6">
+    <xf:label>Which Province?</xf:label>
+    <xf:item>
+      <xf:label>Eastern Cape</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Gauteng</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Free State</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Kwazulu Natal</xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Limpopo</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Mpumalanga</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>North West Province</xf:label>
+      <xf:value>7</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Northern Cape</xf:label>
+      <xf:value>8</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Western Cape</xf:label>
+      <xf:value>9</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="7">
+    <xf:label>Where was the session held?</xf:label>
+    <xf:item>
+      <xf:label>Clinic/hospital</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Secondary school</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Primary school</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Youth Centre</xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Community Centre</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Church</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Shopping Centre</xf:label>
+      <xf:value>7</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Taxi Rank</xf:label>
+      <xf:value>8</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other</xf:label>
+      <xf:value>99</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="8">
+    <xf:label>Other (specify)</xf:label>
+  </xf:input>
+  <xf:select1 bind="9"  relevant="/root/Prov='9' and /root/Where='1'">
+    <xf:label>What is the name of the hospital or clinic in the Western Cape where you had the session?</xf:label>
+    <xf:item>
+      <xf:label>2lungile Commnity Health Centre </xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Crossroads Health Centre/Clinic</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Dunoon clinic</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>GF Jooste Hospital</xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Hermanus Provincial Hospital</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Khayelitsha Day Hospital</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Langa Clinic</xf:label>
+      <xf:value>7</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Langa Community Health Centre</xf:label>
+      <xf:value>8</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Nolungile Clinic</xf:label>
+      <xf:value>9</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Nolungile Community Health Centre</xf:label>
+      <xf:value>10</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other (WC):</xf:label>
+      <xf:value>999</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="10">
+    <xf:label>Other Hospital / Clinic (WC):</xf:label>
+  </xf:input>
+  <xf:select1 bind="11" >
+    <xf:label>What is the name of the place in the Western Cape where you had the session?</xf:label>
+    <xf:item>
+      <xf:label>Langa High</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Mfuleni High School</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Qhayiya Secondary</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>TC Newman Paarl</xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>CHMT Office</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other (WC):</xf:label>
+      <xf:value>999</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="12">
+    <xf:label>What was the name of this Other Location (WC):</xf:label>
+  </xf:input>
+  <xf:select1 bind="13">
+    <xf:label>What is the name of the hospital or clinic in the Eastern Cape where you had the session?</xf:label>
+    <xf:item>
+      <xf:label>Bisho Hospital</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Cecelia Makhiwane Hospital</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Duncan Village Day Hospital</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>East London Day Hospital</xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Frere Hospital</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grey Hospital</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other (specify)</xf:label>
+      <xf:value>999</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="14">
+    <xf:label>Other Hospital / Clinic (EC):</xf:label>
+  </xf:input>
+  <xf:select1 bind="15">
+    <xf:label>What is the name of the place in the Eastern Cape where you had the session?</xf:label>
+    <xf:item>
+      <xf:label>David Mama Comprehensive </xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other (WC):</xf:label>
+      <xf:value>999</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="16">
+    <xf:label>What was the name of this Other Location (EC):</xf:label>
+  </xf:input>
+  <xf:select1 bind="17">
+    <xf:label>What is the name of the hospital or clinic in Gauteng where you had the session?</xf:label>
+    <xf:item>
+      <xf:label>Andries Raditsela Clinic</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Empilisweni Clinic</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Joburg General Hospital</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Kingsway Clinic</xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Mamelodi Day Hospital </xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Nokuthela Ngwenya Community Health Centre</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Pholosong Hospital</xf:label>
+      <xf:value>7</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Sebei Motoeneng Clinic</xf:label>
+      <xf:value>8</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Sekokeng Hospital</xf:label>
+      <xf:value>9</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Soshanguve Clinic</xf:label>
+      <xf:value>10</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Stanza Bopape</xf:label>
+      <xf:value>11</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Tembisa Health Care Centre</xf:label>
+      <xf:value>12</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other (Gauteng):</xf:label>
+      <xf:value>999</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="18">
+    <xf:label>Other Hospital / Clinic (GP):</xf:label>
+  </xf:input>
+  <xf:select1 bind="19">
+    <xf:label>What is the name of the place in Gauteng where you had the session?</xf:label>
+    <xf:item>
+      <xf:label>Asser Maloka Secondary</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Bervely Hills High School</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Buhlebemfundo Secondary</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other (Gauteng):</xf:label>
+      <xf:value>999</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="20">
+    <xf:label>What was the name of this Other Location(GP):</xf:label>
+  </xf:input>
+  <xf:select1 bind="21">
+    <xf:label>What is the name of the hospital/clinic in Kwa-Zulu Natal where you had the session?</xf:label>
+    <xf:item>
+      <xf:label>Addington Hospital</xf:label>
+      <xf:value>41</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Amanzimtoti Clinic</xf:label>
+      <xf:value>42</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Bevies Hospice</xf:label>
+      <xf:value>43</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Edendale Hospital</xf:label>
+      <xf:value>44</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Gingindlovu Hospital</xf:label>
+      <xf:value>45</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Hope Clinic</xf:label>
+      <xf:value>46</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Inanda Community Clinic</xf:label>
+      <xf:value>47</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Kwa Msane Clinic</xf:label>
+      <xf:value>48</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Mahatma Ghandi Hospital</xf:label>
+      <xf:value>49</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Mtuba Fixed Clinic</xf:label>
+      <xf:value>50</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Nduduzweni Hospice</xf:label>
+      <xf:value>51</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Prince Mshiyeni Hospital</xf:label>
+      <xf:value>52</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>RK Khan Hospital</xf:label>
+      <xf:value>53</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>St Marys Clinic</xf:label>
+      <xf:value>54</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Ubuntu Bethu Crisis Center</xf:label>
+      <xf:value>55</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Umlazi Clinic</xf:label>
+      <xf:value>56</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Wyebank Clinic</xf:label>
+      <xf:value>57</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Bevies Hospice</xf:label>
+      <xf:value>58</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other (KZN):</xf:label>
+      <xf:value>63</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="22">
+    <xf:label>Other Hospital / Clinic (KZN):</xf:label>
+  </xf:input>
+  <xf:select1 bind="23">
+    <xf:label>What is the name of the place in Kwa-Zulu Natal where you had the session?</xf:label>
+    <xf:item>
+      <xf:label>Enaleni High School</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Zwelethu High School</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Nduduzweni Hospice</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Ubuntu Bethu Crisis Center</xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other (KZN):</xf:label>
+      <xf:value>999</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="24">
+    <xf:label>Other Location (KZN):</xf:label>
+  </xf:input>
+  <xf:select1 bind="25">
+    <xf:label>What is the name of the hospital / clinic in the Free State where you had the session?</xf:label>
+    <xf:item>
+      <xf:label>Bongani Hospital</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Matjabeng Clinic</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Welkom Clinic</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other (Free State):</xf:label>
+      <xf:value>999</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="26">
+    <xf:label>Other Hospital / Clinic (FS):</xf:label>
+  </xf:input>
+  <xf:input bind="27">
+    <xf:label>What was the name of this Other Location (FS):</xf:label>
+  </xf:input>
+  <xf:input bind="28">
+    <xf:label>What was the name of this Other Location (LP):</xf:label>
+  </xf:input>
+  <xf:input bind="29">
+    <xf:label>What was the name of this Other Location (MP):</xf:label>
+  </xf:input>
+  <xf:input bind="30">
+    <xf:label>What was the name of this Other Location (NC):</xf:label>
+  </xf:input>
+  <xf:input bind="31">
+    <xf:label>What was the name of this Other Location (NW):</xf:label>
+  </xf:input>
+  <xf:input bind="32">
+    <xf:label>Number of session participants (male)</xf:label>
+  </xf:input>
+  <xf:input bind="33">
+    <xf:label>Number of session participants (female)</xf:label>
+  </xf:input>
+  <xf:input bind="34">
+    <xf:label>What time did the session start?</xf:label>
+  </xf:input>
+  <xf:input bind="35">
+    <xf:label>What time did the session end?</xf:label>
+  </xf:input>
+<xf:select1 bind="49">
+    <xf:label>What was the #1 topic discussed?</xf:label>
+    <xf:item>
+      <xf:label>ARVs and Adherence</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>ARV Readiness</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Children and HIV </xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>HIV and the Immune System </xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Human Rights</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Nutrition</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Opportunistic infections  </xf:label>
+      <xf:value>7</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Palliative and Home based care</xf:label>
+      <xf:value>8</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PEP and Rape</xf:label>
+      <xf:value>9</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PMTCT and Maternal Health</xf:label>
+      <xf:value>10</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Positive Living </xf:label>
+      <xf:value>11</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Prevention </xf:label>
+      <xf:value>12</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Safer sex</xf:label>
+      <xf:value>13</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Sexuality</xf:label>
+      <xf:value>14</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>STIs</xf:label>
+      <xf:value>15</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Teenage Pregnancy</xf:label>
+      <xf:value>16</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>TB</xf:label>
+      <xf:value>17</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>VCT </xf:label>
+      <xf:value>18</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Womanâ€™s Health  </xf:label>
+      <xf:value>19</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other topic</xf:label>
+      <xf:value>20</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="50">
+    <xf:label>Other topic:</xf:label>
+  </xf:input>
+  <xf:select1 bind="51">
+    <xf:label>What was the #2 topic discussed?</xf:label>
+    <xf:item>
+      <xf:label>ARVs and Adherence</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>ARV Readiness</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Children and HIV </xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>HIV and the Immune System </xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Human Rights</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Nutrition</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Opportunistic infections  </xf:label>
+      <xf:value>7</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Palliative and Home based care</xf:label>
+      <xf:value>8</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PEP and Rape</xf:label>
+      <xf:value>9</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PMTCT and Maternal Health</xf:label>
+      <xf:value>10</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Positive Living </xf:label>
+      <xf:value>11</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Prevention </xf:label>
+      <xf:value>12</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Safer sex </xf:label>
+      <xf:value>13</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Sexuality</xf:label>
+      <xf:value>14</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>STIs</xf:label>
+      <xf:value>15</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Teenage Pregnancy</xf:label>
+      <xf:value>16</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>TB</xf:label>
+      <xf:value>17</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>VCT </xf:label>
+      <xf:value>18</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Womanâ€™s Health  </xf:label>
+      <xf:value>19</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other topic</xf:label>
+      <xf:value>20</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="52">
+    <xf:label>Other topic:</xf:label>
+  </xf:input>
+  <xf:select1 bind="53">
+    <xf:label>What was the #3 topic discussed?</xf:label>
+    <xf:item>
+      <xf:label>ARVs and Adherence</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>ARV Readiness</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Children and HIV </xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>HIV and the Immune System </xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Human Rights</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Nutrition</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Opportunistic infections  </xf:label>
+      <xf:value>7</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Palliative and Home based care</xf:label>
+      <xf:value>8</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PEP and Rape</xf:label>
+      <xf:value>9</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PMTCT and Maternal Health</xf:label>
+      <xf:value>10</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Positive Living </xf:label>
+      <xf:value>11</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Prevention </xf:label>
+      <xf:value>12</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Safer sex</xf:label>
+      <xf:value>13</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Sexuality</xf:label>
+      <xf:value>14</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>STIs</xf:label>
+      <xf:value>15</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Teenage Pregnancy</xf:label>
+      <xf:value>16</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>TB</xf:label>
+      <xf:value>17</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>VCT </xf:label>
+      <xf:value>18</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Womanâ€™s Health  </xf:label>
+      <xf:value>19</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other topic</xf:label>
+      <xf:value>20</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="54">
+    <xf:label>Other topic:</xf:label>
+  </xf:input>
+  <xf:select1 bind="55">
+    <xf:label>What was the #4 topic discussed?</xf:label>
+    <xf:item>
+      <xf:label>ARVs and Adherence</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>ARV Readiness</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Children and HIV </xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>HIV and the Immune System </xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Human Rights</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Nutrition</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Opportunistic infections  </xf:label>
+      <xf:value>7</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Palliative and Home based care</xf:label>
+      <xf:value>8</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PEP and Rape </xf:label>
+      <xf:value>9</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PMTCT and Maternal Health</xf:label>
+      <xf:value>10</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Positive Living </xf:label>
+      <xf:value>11</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Prevention </xf:label>
+      <xf:value>12</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Safer sex</xf:label>
+      <xf:value>13</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Sexuality</xf:label>
+      <xf:value>14</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>STIs</xf:label>
+      <xf:value>15</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Teenage Pregnancy</xf:label>
+      <xf:value>16</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>TB</xf:label>
+      <xf:value>17</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>VCT </xf:label>
+      <xf:value>18</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Womanâ€™s Health  </xf:label>
+      <xf:value>19</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other topic</xf:label>
+      <xf:value>20</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="56">
+    <xf:label>Other topic:</xf:label>
+  </xf:input>
+  <xf:select1 bind="57">
+    <xf:label>What was the #5 topic discussed?</xf:label>
+    <xf:item>
+      <xf:label>ARVs and Adherence</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>ARV Readiness</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Children and HIV </xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>HIV and the Immune System </xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Human Rights </xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Nutrition</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Opportunistic infections  </xf:label>
+      <xf:value>7</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Palliative and Home based care</xf:label>
+      <xf:value>8</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PEP and Rape</xf:label>
+      <xf:value>9</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PMTCT and Maternal Health</xf:label>
+      <xf:value>10</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Positive Living </xf:label>
+      <xf:value>11</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Prevention </xf:label>
+      <xf:value>12</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Safer sex</xf:label>
+      <xf:value>13</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Sexuality</xf:label>
+      <xf:value>14</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>STIs</xf:label>
+      <xf:value>15</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Teenage Pregnancy</xf:label>
+      <xf:value>16</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>TB</xf:label>
+      <xf:value>17</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>VCT </xf:label>
+      <xf:value>18</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Womans Health  </xf:label>
+      <xf:value>19</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other topic</xf:label>
+      <xf:value>20</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="58">
+    <xf:label>Other topic:</xf:label>
+  </xf:input>
+  <xf:select1 bind="44">
+    <xf:label>Was your session with a support group?</xf:label>
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="45">
+    <xf:label>Was your session a one-on-one individual session?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="37">
+    <xf:label>Did you use a CHMT AV Kit?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="38">
+    <xf:label>Did you show a CHMT DVD?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="39">
+    <xf:label>Did you use Scrutinize material?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="40">
+    <xf:label>Did you show a Spares and Besties DVD?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="41">
+    <xf:label>Did you show a CHMT PSA?</xf:label>
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="42">
+    <xf:label>Did someone from CHMT co-facilitate the session with you?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="43">
+    <xf:label>What was the name of the co-facilitator(s)?</xf:label>
+  </xf:input>
+  <xf:select1 bind="1">
+    <xf:label>Where in the hospital / clinic was the session held?</xf:label>
+    <xf:item>
+      <xf:label>ARV clinic</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>PMTCT / Antenatal Clinic</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>STI clinic</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>TB clinic</xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>General / waiting room</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Other (specify):</xf:label>
+      <xf:value>99</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:input bind="2">
+    <xf:label>Other(clinic):</xf:label>
+  </xf:input>
+  <xf:select1 bind="3">
+    <xf:label>Did you use Mindset DVD in your session?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="4">
+    <xf:label>Did the session location have a Mindset TV?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="36">
+    <xf:label>Was the Mind set equipment on when you arrived?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select bind="46">
+    <xf:label>What grade were the learners?</xf:label>
+    <xf:item>
+      <xf:label>Grade 1</xf:label>
+      <xf:value>1</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 2</xf:label>
+      <xf:value>2</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 3</xf:label>
+      <xf:value>3</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 4</xf:label>
+      <xf:value>4</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 5</xf:label>
+      <xf:value>5</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 6</xf:label>
+      <xf:value>6</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 7</xf:label>
+      <xf:value>7</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 8</xf:label>
+      <xf:value>8</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 9</xf:label>
+      <xf:value>9</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 10</xf:label>
+      <xf:value>10</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 11</xf:label>
+      <xf:value>11</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>Grade 12</xf:label>
+      <xf:value>12</xf:value>
+    </xf:item>
+  </xf:select>
+  <xf:select1 bind="47">
+    <xf:label>Did you use CHMT print materials in your session?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+  <xf:select1 bind="48">
+    <xf:label>Has this session been confirmed with a signature or a stamp?</xf:label>
+
+    <xf:item>
+      <xf:label>Yes</xf:label>
+      <xf:value>Y</xf:value>
+    </xf:item>
+    <xf:item>
+      <xf:label>No</xf:label>
+      <xf:value>N</xf:value>
+    </xf:item>
+  </xf:select1>
+
+</html>
