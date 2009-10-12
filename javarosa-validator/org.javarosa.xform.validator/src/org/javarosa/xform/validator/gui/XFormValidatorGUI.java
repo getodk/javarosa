@@ -70,6 +70,7 @@ import java.util.zip.ZipEntry;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.xform.schema.FormOverview;
+import org.javarosa.xform.schema.FormTranslationFormatter;
 import org.javarosa.xform.util.XFormUtils;
 
 /*
@@ -817,7 +818,8 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		try {
 			in = new FileInputStream(newForm);
 			FormDef f = XFormUtils.getFormFromInputStream(in);
-			addToTextArea(FormOverview.overview(f, this.languages.getSelectedItem()));
+			//addToTextArea(FormOverview.overview(f, this.languages.getSelectedItem()));
+			addToTextArea(FormTranslationFormatter.dumpTranslationsIntoCSV(f).toString());
 			addToTextArea("\n\n==================================\nForm Summary Complete\n==================================\n");
 			updateStatus("Summary Completed");
 		} catch (FileNotFoundException e) {
