@@ -65,6 +65,8 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 	private Date dateSaved;
 
 	public String schema;
+	public String formVersion;
+	public String uiVersion;
 	
 	private Hashtable namespaces = new Hashtable();
 
