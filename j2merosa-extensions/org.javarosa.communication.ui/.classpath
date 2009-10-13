@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
+	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="J2MELIB"/> 
+</classpath>
