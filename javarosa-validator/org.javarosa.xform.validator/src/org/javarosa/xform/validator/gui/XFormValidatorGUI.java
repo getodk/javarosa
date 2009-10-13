@@ -818,8 +818,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		try {
 			in = new FileInputStream(newForm);
 			FormDef f = XFormUtils.getFormFromInputStream(in);
-			//addToTextArea(FormOverview.overview(f, this.languages.getSelectedItem()));
-			addToTextArea(FormTranslationFormatter.dumpTranslationsIntoCSV(f).toString());
+			addToTextArea(FormOverview.overview(f, this.languages.getSelectedItem()));
 			addToTextArea("\n\n==================================\nForm Summary Complete\n==================================\n");
 			updateStatus("Summary Completed");
 		} catch (FileNotFoundException e) {
