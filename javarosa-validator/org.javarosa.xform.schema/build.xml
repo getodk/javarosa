@@ -38,15 +38,16 @@
 		<mkdir dir="${build.dir}/src"/>
 		<copy todir="${build.dir}/src">
 			<fileset dir="${base.dir}/src/" />
-			<fileset dir="${base.dir}/../org.javarosa.core/src/" />
-			<fileset dir="${base.dir}/../org.javarosa.core.model/src/"/>
-			<fileset dir="${base.dir}/../org.javarosa.xform/src/"/>
+			<fileset dir="${base.dir}/../../javarosa-core/src/" />
+<!--			<fileset dir="${base.dir}/../../javarosa-core/src/org/javarosa/core/" />
+			<fileset dir="${base.dir}/../../javarosa-core/src/org/javarosa/core/model/"/>
+			<fileset dir="${base.dir}/../../javarosa-core/src/org/javarosa/xform/"/> -->
 		</copy>
 
 		<javac 
 			srcdir="${build.dir}/src"
 			destdir="${build.dir}/classes" 
-			classpath="${base.dir}/lib/kxml2-2.3.0.jar"
+			classpath="${base.dir}/lib/kxml2-2.3.0.jar;${base.dir}/../../javarosa-core/lib/regexp-me.jar"
 			includeAntRuntime="false"
 			debug="${build.debug}" 
 			deprecation="${build.deprecation}" />
