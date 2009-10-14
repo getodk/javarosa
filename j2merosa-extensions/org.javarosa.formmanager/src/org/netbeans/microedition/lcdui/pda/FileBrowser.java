@@ -113,7 +113,8 @@ public class FileBrowser extends List implements CommandListener {
                 } catch (SecurityException e) {
                     Alert alert = new Alert("Error", "You are not authorized to access the restricted API", null, AlertType.ERROR);
                     alert.setTimeout(2000);
-                    display.setCurrent(alert, FileBrowser.this);
+                    //This should be set with a JavaRosa alert, not via the normal display
+                    //display.setCurrent(alert, FileBrowser.this);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

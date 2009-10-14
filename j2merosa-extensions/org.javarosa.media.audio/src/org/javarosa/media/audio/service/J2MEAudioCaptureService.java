@@ -276,11 +276,12 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	private IFileService getFileService() throws UnavailableServiceException
 	{
 		//#if app.usefileconnections
-		JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
-		IFileService fService = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		//# JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
+		//# IFileService fService = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		//# return fService;
+		//#else
+		throw new UnavailableServiceException("Unavailable service: " +  J2MEFileService.serviceName);
 		//#endif
-		
-		return fService;
 	}
 	
 	private void createFileName(String fileName) throws FileException
