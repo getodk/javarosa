@@ -12,5 +12,6 @@
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.j2me"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.transport"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.1-java5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
