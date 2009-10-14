@@ -1040,6 +1040,8 @@ public class XFormParser {
 		if (schema != null && schema.length() > 0 && !schema.equals(defaultNamespace)) {
 			instanceModel.schema = schema;
 		}
+		instanceModel.formVersion = e.getAttributeValue(null, "version");
+		instanceModel.uiVersion = e.getAttributeValue(null, "uiVersion");
 		
 		loadNamespaces(e, instanceModel);
 			
