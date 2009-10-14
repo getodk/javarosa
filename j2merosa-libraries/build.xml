@@ -1,26 +1,113 @@
 <?xml version="1.0"?>
 <project default="package">
 	<tstamp/>
+	
+	<property file="build.properties"/>
+		
+	<path id="jr.classpath">
+		<fileset dir="../javarosa-core">
+			<include name="**/lib/*.jar"/>
+		</fileset>
+		<fileset dir="../j2merosa-core">
+			<include name="**/lib/*.jar"/>
+		</fileset>
+		<fileset dir="../j2merosa-extensions">
+			<include name="**/lib/*.jar"/>
+		</fileset>
+		<fileset dir="../j2merosa-activities">
+			<include name="**/lib/*.jar"/>
+		</fileset>
+		<fileset dir="${wtk.home}/lib" includes="${wtk.includes}"/>
+		<fileset dir="${polish.home}/import" includes="${polish.includes}"/>
+	</path>
+	
 	<target name="package" depends="clean">
+		<!-- first set source compliance. Java5 is correct, since we're postprocessing -->
 		<property name="ant.build.javac.compiler" value="1.5"/>
 		<property name="ant.build.javac.source" value="1.5"/>
 		<property name="ant.build.javac.target" value="1.5"/>
-		<ant dir="../javarosa-core" target="package"/>
-		<ant dir="../j2merosa-core" target="packagePolish"/>
-		<ant dir="../j2merosa-extensions" target="packagePolish"/>
-		<ant dir="../j2merosa-activities" target="packagePolish"/>
-		<delete dir="dist/"/>
-		<mkdir dir="dist/"/>
-		<zip destfile="dist/j2merosa-libraries-${DSTAMP}.jar">
-			<zipgroupfileset dir="." includes="javarosa-core-*, j2merosa-core-*, j2merosa-communication-2*, j2merosa-communication-ui-*, j2merosa-formmanager-*, j2merosa-patient-*, j2merosa-patient-entry-*, j2merosa-entity-*, j2merosa-polish-activity-*, j2merosa-polish-chatterbox-*, j2merosa-polish-chatterbox-extensions-*, j2merosa-referral-*, j2merosa-resources-*, j2merosa-services-properties-*, j2merosa-user-*, kxml2-*, regexp-me*"/>
-		</zip>
-	</target>
-	<target name="clean">
-		<delete>
-			<fileset dir=".">
-				<include name="j*rosa*.jar"/>
+		
+		<mkdir dir="dist"/>
+		<mkdir dir="build"/>
+		
+		
+		<!-- collect all relevant sources and put them into one big source chunk -->
+		<copy todir="build">
+			<!-- Note: These source inclusions should be possible to assign id's to, and to include
+			in the javac at the bottom, this will prevent errors! -->
+		    <fileset dir="../javarosa-core/">
+		    	<include name="**/src/**/*.java"/>
 			</fileset>
-		</delete>
-		<delete dir="dist/"/>
+		    <fileset dir="../j2merosa-core">
+		    	<include name="**/src/**/*.java"/>
+			</fileset>
+		    <fileset dir="../j2merosa-extensions/">
+		    	<include name="**/src/**/*.java"/>
+		    	<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
+				<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
+			</fileset>
+		    <fileset dir="../j2merosa-activities/">
+		    	<include name="**/src/**/*.java"/>
+			</fileset>
+			
+			<!-- This lets us translate from an absolute reference to a reference at a merged source level -->
+			<regexpmapper from="^(.*)src(.*)$$" to="src\2"/>
+		</copy>
+		
+		<!-- Now it's time to make the big file that lets Polish index the source code. This part's tricky,
+		so pay attention.
+		
+		First, create a fileset containing all of the source we've collected -->
+		<fileset id="dist.contents" dir="build/src/" includes="**/*.java"/>
+		
+		<!-- Now, convert that source list into a property which is newline seperated, and contains references
+		that start assuming you're in a zip file and in the src directory already -->
+		<pathconvert pathsep="${line.separator}" property="buildcontents" refid="dist.contents">
+			<chainedmapper>
+				<!-- first, make sure we're using zip file file seperators -->
+				<filtermapper>
+				  <replacestring from="\" to="/"/>
+				</filtermapper>
+				<!-- Now, cut all non-local elements from the path -->
+				<regexpmapper from="^(.*)src(.*)$$" to="\2"/>
+				<!-- Finally, trim leading seperators -->
+				<globmapper from="/*" to="*"/>
+			</chainedmapper>
+		</pathconvert>
+
+		<!-- This is where our magic polish source map goes -->
+		<mkdir dir="build/build/"/>
+	
+		<!-- This echo dumps our filelist path from above into the file j2mepolish.index.text, and creates 
+		the file itself -->
+		<echo file="build/build/j2mepolish.index.txt" append="false">${buildcontents}${line.separator}</echo>
+		
+		<!-- The file also needs to contain the files from polish, so we'll grab them from the resources
+		directory. In the future this should be set up even more thoroughly to pull the file _directly_ from
+		a polish jar file, which should be easy enough -->
+		<concat destfile="build/build/j2mepolish.index.txt" append="true">
+			<filelist dir="resources" files="j2mepolish.index.txt"/>
+		</concat>
+		
+		<!-- Ok, so now compile all of the source so that when people put this jar on their eclipse path and
+		stuff, they can link to the bytecode. It's not necessary for the polsh build, but important for if
+		one wants to look at this like it's a real jar file (it's not) -->
+		<javac destdir="build" classpathref="jr.classpath">
+			<src path="../javarosa-core"/>
+			<src path="../j2merosa-core"/>
+			<src path="../j2merosa-extensions"/>
+			<src path="../j2merosa-activities"/>
+			<include name="**/src/**/*.java"/>
+	    	<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
+			<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
+		</javac>
+		
+		<!-- Schweet, now turn it into a 'jar' file! -->
+		<zip destfile="dist/j2merosa-libraries.jar" basedir="build"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="dist"/>
+		<delete dir="build"/>
 	</target>
 </project>
