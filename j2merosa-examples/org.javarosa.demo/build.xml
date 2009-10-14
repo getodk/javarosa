@@ -308,7 +308,7 @@
 	<property name="TALK" value="true" />
 
 	<!-- Definition of the J2ME Polish task:                      -->
-	<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
+	<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
 	<path id="classpath.base">
 	</path>
 	
