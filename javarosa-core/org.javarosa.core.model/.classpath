@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
-	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="test"/>
-	<classpathentry kind="con" path="J2MELIB"/>
-	<classpathentry kind="lib" path="/org.javarosa.core/lib/j2meunit-javarosa.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
