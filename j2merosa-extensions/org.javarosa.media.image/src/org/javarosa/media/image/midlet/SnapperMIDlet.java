@@ -161,7 +161,9 @@ public class SnapperMIDlet
   private void handleException(Exception e) {
     Alert a = new Alert("Exception", e.toString(), null, null);
     a.setTimeout(Alert.FOREVER);
-    mDisplay.setCurrent(a, mMainForm);
+    //Throw with a proper JR alert. Crash for now until someone fixes this.
+    //mDisplay.setCurrent(a, mMainForm);
+    throw new RuntimeException("Snapper MIDLlet exception needs to be displayed as an alert, but fixed to use j2me properly");
   }
   
   

@@ -122,7 +122,7 @@ public abstract class SingleQuestionScreen extends Form implements IView {
     public abstract IAnswerData getWidgetValue ();
     
 	public void setHint(String helpText) {
-		Ticker tick = new Ticker("HELP: "+helpText);
+		javax.microedition.lcdui.Ticker tick = new javax.microedition.lcdui.Ticker("HELP: "+helpText);
 		this.setTicker(tick);
 	}
 
