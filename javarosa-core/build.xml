@@ -1,68 +1,31 @@
 <?xml version="1.0"?>
-
-<project name="javarosa" default="package-all">
-
-	<property name="core" value="org.javarosa.core"/>
-	<property name="model" value="org.javarosa.core.model"/>
-	<property name="forms" value="org.javarosa.forms"/>
-	<property name="xform" value="org.javarosa.xform"/>
-
-	<tstamp/>
-
-	<target name="init" description="set classpath">
+<project default="package">
+	<property name="name" value="javarosa-core"/>
+	<property name="version" value="1.0"/>
+	<exec executable="hg" outputproperty="revision">
+		<arg value="tip"/>
+		<arg value="--template"/>
+		<arg value="{rev}"/>
+	</exec>
+	<property name="jar" value="${name}-${version}.${revision}.jar"/>
+	<target name="init" description="set classpath and make needed directories">
 		<path id="classpath">
-			<fileset dir="${xform}/lib/">
-				<include name="kxml2-2.3.0.jar"/>
-			</fileset>
+			<fileset dir="lib/" includes="*.jar"/>
 		</path>
+		<mkdir dir="bin/"/>
+		<mkdir dir="dist/"/>
 	</target>
-
 	<target name="clean" description="delete dist and bin directories">
-		<delete dir="dist"/>
-		<delete dir="bin"/>
+		<delete dir="dist/"/>
+		<delete dir="bin/"/>
 	</target>
-
-	<target name="compile" depends="init" description="compile the code">
-		<mkdir dir="bin"/>
-		<mkdir dir="dist"/>
-		<javac destdir="bin" classpathref="classpath" debug="true" debuglevel="lines,source">
-			<src path="${core}/src/"/>
-			<include name="**/*.java"/>
-			<src path="${model}/src/"/>
-			<include name="**/*.java"/>
-			<src path="${forms}/src/"/>
-			<include name="**/*.java"/>
-			<src path="${xform}/src/" />
-			<include name="**/*.java"/>
-		</javac>
+	<target name="compile" depends="clean,init" description="compile the source">
+		<javac srcdir="src/" destdir="bin/" classpathref="classpath" debug="true" debuglevel="lines,source"/>
 	</target>
-
-	<target name="package-binary" depends="clean,init,compile" description="package binary code into jar file">
-		<mkdir dir="dist"/>
-		<jar destfile="dist/javarosa-binary.jar">
-			<fileset dir="bin" includes="**/*"/>
+	<target name="package" depends="compile" description="package into jar">
+		<jar destfile="dist/${jar}">
+			<fileset dir="bin/" includes="**/*.class"/>
+			<fileset dir="src/" includes="**/*.java"/>
 		</jar>
 	</target>
-
-	<target name="package-source" depends="clean,init,compile" description="package source code into jar file">
-		<mkdir dir="dist"/>
-		<jar destfile="dist/javarosa-source.jar">
-			<fileset dir="${core}/src/" includes="**/*"/>
-			<fileset dir="${model}/src/" includes="**/*"/>
-			<fileset dir="${forms}/src/" includes="**/*"/>
-			<fileset dir="${xform}/src/" includes="**/*"/>
-		</jar>
-	</target>
-
-	<target name="package-all" depends="clean,init,compile" description="package source and binary code into jar file">
-		<mkdir dir="dist"/>
-		<jar destfile="dist/javarosa.jar">
-			<fileset dir="bin" includes="**/*"/>
-			<fileset dir="${core}/src/" includes="**/*"/>
-			<fileset dir="${model}/src/" includes="**/*"/>
-			<fileset dir="${forms}/src/" includes="**/*"/>
-			<fileset dir="${xform}/src/" includes="**/*"/>
-		</jar>
-	</target>
-
 </project>
