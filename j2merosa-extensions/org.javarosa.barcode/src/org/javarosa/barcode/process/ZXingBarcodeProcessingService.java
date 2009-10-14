@@ -16,6 +16,9 @@
 
 package org.javarosa.barcode.process;
 
+//This condition turns off compilation of this file unless javarosa.barcode is set to true
+//#condition javarosa.barcode
+
 import java.util.Hashtable;
 
 import javax.microedition.lcdui.Image;
