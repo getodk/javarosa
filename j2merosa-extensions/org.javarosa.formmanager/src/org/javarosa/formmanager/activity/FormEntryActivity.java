@@ -76,7 +76,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 	
 	private int instanceID = -1;
 	
-	private IModelProcessor processor;
+	private Vector processors; //<IModelProcessor>
 
 	/** Loading error string **/
 	private final static String LOAD_ERROR = "Deepest Apologies. The form could not be loaded.";
@@ -149,7 +149,7 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 		if (context instanceof FormEntryContext) {
 			this.context = (FormEntryContext) context;
 			this.instanceID = this.context.getInstanceID();
-			this.processor = this.context.getModelProcessor();
+			this.processors = this.context.getModelProcessors();
 		}
 		
 		// Start loading the form
@@ -192,10 +192,13 @@ public class FormEntryActivity implements IActivity, IControllerHost, CommandLis
 			returnArgs.put("QUIT_WITHOUT_SAVING", new Boolean(!model.isSaved()));
 			returnArgs.put(FormEntryContext.FORM_ID, new Integer(model.getForm().getRecordId()));
 
-			if(processor != null && model.isFormComplete() && model.isSaved()) {
-				processor.initializeContext(this.context);
-				processor.processModel(model.getForm().getDataModel());
-				processor.loadProcessedContext(this.context);
+			if(processors != null && processors.size() > 0 && model.isFormComplete() && model.isSaved()) {
+				for (int i = 0; i < processors.size(); i++) {
+					IModelProcessor processor = (IModelProcessor)processors.elementAt(i);
+					processor.initializeContext(this.context);
+					processor.processModel(model.getForm().getDataModel());
+					processor.loadProcessedContext(this.context);
+				}			
 			}
 			
 			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
