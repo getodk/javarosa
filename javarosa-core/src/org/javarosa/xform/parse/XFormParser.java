@@ -603,6 +603,8 @@ public class XFormParser {
 	}
 
 	private static void parseItem (FormDef f, QuestionDef q, Element e) {
+		final int MAX_VALUE_LEN = 32;
+		
 		String label = null;
 		String textRef = null;
 		String value = null;
@@ -628,8 +630,8 @@ public class XFormParser {
 			} else if ("value".equals(childName)) {
 				value = getXMLText(child, true);
 				
-				if (value.length() > 32) {
-					System.err.println("WARNING: choice value [" + value + "] is too long; max. suggested length 32 chars");
+				if (value.length() > MAX_VALUE_LEN) {
+					System.err.println("WARNING: choice value [" + value + "] is too long; max. suggested length " + MAX_VALUE_LEN + " chars");
 				}
 				
 				//validate
