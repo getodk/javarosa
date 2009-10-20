@@ -13,16 +13,7 @@
 <project name="JavaRosa" default="LaunchEmulator">
 	<!-- Main Target: Call to build the project -->
 	<!-- This is the main work target, it actually builds the code -->
-	<target name="BuildPolish" depends="init" description="This is the controller for the J2ME build process.">
-		
-		<!-- Since the <libraries> call won't filter, we have to do so ahead of time. -->
-		<mkdir dir="${dir.lib.working}"/>
-		<copy todir="${dir.lib.working}">
-			<fileset dir="${dir.lib}">
-				<exclude name=".svn"/>
-			</fileset>
-		</copy>
-		
+	<target name="BuildPolish" depends="init,CompileAndLinkSource" description="This is the controller for the J2ME build process.">
 		<!-- A property containing the path to the preprocessed source files -->
 		<property name="builtsource" value="${dir.build}/real/${device.identifier}/none/source/" />
 		<buildPolish>
@@ -48,7 +39,7 @@
 				destDir="${dir.dist}">
 				
 				<libraries>
-					<library dir="${dir.lib.working}" />
+					<library dir="${dir.lib}" />
 					<library file="${dir.tools}/j2meunit-javarosa.jar" if="unittests" />
 				</libraries>
 
@@ -132,8 +123,11 @@
 			</emulator>
 
 		</buildPolish>
-		<!-- Clean up our temporary directory -->
-		<delete dir="${dir.lib.working}"/>
+	</target>
+	
+	<target name="CompileAndLinkSource" if="compile.from.source.true">
+			<ant antfile="${dir.jrlibs}/build.xml" target="package" inheritAll="false" inheritRefs="false"/>
+			<copy file="${dir.jrlibs}/dist/j2merosa-libraries.jar" todir="${dir.tools}"/>
 	</target>
 
 	<!-- Main Target: Call to build the project and call up the emulator -->
@@ -145,7 +139,6 @@
 	<target name="Clean" description="allows a clean build. You should call [ant clean] whenever you made changes to devices.xml, vendors.xml or groups.xml">
 		<delete dir="${dir.build}" />
 		<delete dir="${dir.dist}" />
-		<delete dir="${dir.lib.working}" />
 	</target>
 	
 	<!-- Main Target: Call to clean the emulator's RMS -->
@@ -241,6 +234,9 @@
 	<target name="init">
 		<!-- Disable the Emulator by default -->
 		<property name="test" value="false" />
+		<condition property="compile.from.source.true">
+			<equals arg1="${compile.source}" arg2="true" />
+		</condition>
 	</target>
 
 	<target name="supressOutput">
@@ -325,6 +321,7 @@
 	  <pathelement location="${dir.tools}/j2meunit-javarosa.jar" />
 	  <pathelement location="${wtk.home}/lib/wma11.jar"/>
 	  <pathelement location="${wtk.home}/lib/midpapi21.jar"/>
+	  <pathelement location="${dir.lib}/j2merosa-test-libraries.jar"/>
 	  <path refid="classpath.base" />
 	</path>
 </project>
