@@ -54,8 +54,6 @@ public class LoginForm extends FramedForm {
 	private User loggedInUser;
 
 	private String extraText;
-
-	private boolean testingMode;
 	
 	private final static int DEFAULT_ADMIN_USERID = -1;
 
@@ -79,11 +77,10 @@ public class LoginForm extends FramedForm {
 	 * @param title
 	 * @param extraText
 	 */
-	public LoginForm(String title, String extraText, boolean testingMode) {
+	public LoginForm(String title, String extraText) {
 		//#style loginView
 		super(title);
 		this.extraText = extraText;
-		this.testingMode = testingMode;
 		init();
 	}
 
@@ -133,8 +130,9 @@ public class LoginForm extends FramedForm {
 		// TODO:what this?
 		addCommand(CMD_CANCEL_LOGIN);
 
-		if(this.testingMode)
-			append("***TEST BUILD***");
+		//#if !commcare.release
+		append("***TEST BUILD***");
+		//#endif
 		
 		append(this.usernameField);
 		append(this.passwordField);

@@ -1,0 +1,158 @@
+package org.javarosa.core.services.storage;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.Externalizable;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
+
+/**
+ * A wrapper implementation of IStorageUtility that lets you serialize an object with a serialization
+ * scheme other than the default scheme provided by the object's readExternal/writeExternal methods.
+ * 
+ * For example, DataModelTree contains lots of redundant information about the structure of the instance
+ * which doesn't change among saved instances. The extra space used for this redundant info can seriously
+ * limit the number of saved forms we can store on a device. We can use this utility to serialize
+ * DataModelTrees in a different way that excludes this redundant info (meaning we have to take the more
+ * complicated step of restoring it from elsewhere during deserialization), with the benefit of much
+ * smaller record sizes.
+ * 
+ * The alternate scheme is provided via a wrapper object, which accepts the base object and whose
+ * readExternal/writeExternal methods implement the new scheme.
+ * 
+ * @author Drew Roos
+ *
+ */
+public class WrappingStorageUtility implements IStorageUtility {
+	IStorageUtility storage;
+	SerializationWrapper wrapper;
+	
+	/* kind of like ExternalizableWrapper -- but not quite a drop-in replacement */
+	public interface SerializationWrapper extends Externalizable {
+		void setData (Externalizable e);
+		Externalizable getData ();
+		Class baseType ();
+	}
+	
+	public WrappingStorageUtility (String name, SerializationWrapper wrapper, IStorageFactory storageFactory) {
+		this.storage = storageFactory.newStorage(name, wrapper.getClass());
+		this.wrapper = wrapper;
+	}
+	
+	public Externalizable read(int id) {
+		return ((SerializationWrapper)storage.read(id)).getData();
+	}
+
+	public void write(final Persistable p) throws StorageFullException {
+		wrapper.setData(p);
+		storage.write(new Persistable () {
+			public int getID() {
+				return p.getID();
+			}
+
+			public void setID(int ID) {
+				p.setID(ID);
+			}
+
+			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+				wrapper.readExternal(in, pf);
+			}
+
+			public void writeExternal(DataOutputStream out) throws IOException {
+				wrapper.writeExternal(out);
+			}
+		});
+	}
+	
+	public int add(Externalizable e) throws StorageFullException {
+		wrapper.setData(e);
+		return storage.add(wrapper);
+	}
+	
+	public void update(int id, Externalizable e) throws StorageFullException {
+		wrapper.setData(e);
+		storage.update(id, wrapper);
+	}
+	
+	public IStorageIterator iterate() {
+		final IStorageIterator baseIterator = storage.iterate();
+		return new IStorageIterator () {
+			public boolean hasMore() {
+				return baseIterator.hasMore();
+			}
+
+			public int nextID() {
+				return baseIterator.nextID();
+			}
+
+			public Externalizable nextRecord() {
+				return ((SerializationWrapper)baseIterator.nextRecord()).getData();
+			}
+
+			public int numRecords() {
+				return baseIterator.numRecords();
+			}
+		};
+	}
+
+	/* pass-through methods */
+	
+	public byte[] readBytes(int id) {
+		return storage.readBytes(id);
+	}
+	
+	public void remove(int id) {
+		storage.remove(id);
+	}
+
+	public void remove(Persistable p) {
+		storage.remove(p);
+	}
+
+	public void removeAll() {
+		storage.removeAll();
+	}
+	
+	public boolean exists(int id) {
+		return storage.exists(id);
+	}
+
+	public boolean isEmpty() {
+		return storage.isEmpty();
+	}
+	
+	public int getNumRecords() {
+		return storage.getNumRecords();
+	}
+
+	public int getRecordSize(int id) {
+		return storage.getRecordSize(id);
+	}
+
+	public int getTotalSize() {
+		return storage.getTotalSize();
+	}
+	
+	public void close() {
+		storage.close();
+	}
+
+	public void destroy() {
+		storage.destroy();
+	}
+
+	public void repack() {
+		storage.repack();
+	}
+
+	public void repair() {
+		storage.repair();
+	}
+
+	public Object getAccessLock() {
+		return storage.getAccessLock();
+	}
+
+}

@@ -13,16 +13,7 @@
 <project name="JavaRosa" default="LaunchEmulator">
 	<!-- Main Target: Call to build the project -->
 	<!-- This is the main work target, it actually builds the code -->
-	<target name="BuildPolish" depends="init" description="This is the controller for the J2ME build process.">
-		
-		<!-- Since the <libraries> call won't filter, we have to do so ahead of time. -->
-		<mkdir dir="${dir.lib.working}"/>
-		<copy todir="${dir.lib.working}">
-			<fileset dir="${dir.lib}">
-				<exclude name=".svn"/>
-			</fileset>
-		</copy>
-		
+	<target name="BuildPolish" depends="init,CompileAndLinkSource" description="This is the controller for the J2ME build process.">
 		<!-- A property containing the path to the preprocessed source files -->
 		<property name="builtsource" value="${dir.build}/real/${device.identifier}/none/source/" />
 		<buildPolish>
@@ -48,7 +39,7 @@
 				destDir="${dir.dist}">
 				
 				<libraries>
-					<library dir="${dir.lib.working}" />
+					<library dir="${dir.lib}" />
 					<library file="${dir.tools}/j2meunit-javarosa.jar" if="unittests" />
 				</libraries>
 
@@ -59,49 +50,6 @@
 				<!-- All source-level inclusions should be made here -->
 				<sources>
 					<source dir="${dir.src}"/>
-					<!--Taking this out for now...-->
-					<!--source dir="${dir.test}"/-->
-					<source dir="${dir.j2merosa.util}/org.javarosa.communication/src/"/>
-					<source dir="${dir.j2merosa.util}/org.javarosa.communication.ui/src/"/>
-					<source dir="${dir.j2merosa.util}/org.javarosa.clforms/src/"/>
-					<source dir="${dir.javarosa-core}/org.javarosa.core/src/"/>
-					<source dir="${dir.javarosa-core}/org.javarosa.core.model/src/"/>
-					<source dir="${dir.j2merosa.util}/org.javarosa.formmanager/src/"/>
-					<source dir="${dir.javarosa-core}/org.javarosa.forms/src/"/>
-					<source dir="${dir.j2merosa}/org.javarosa.j2me/src/"/>
-					
-					<!--source dir="${basedir}/../org.javarosa.mesh4j.sync.extensions/src/"/-->
-                    <source dir="${dir.j2merosa.activities}/org.javarosa.polish.activity/src/"/>
-					<source dir="${dir.j2merosa.util}/org.javarosa.polish.chatterbox/src/"/>
-					<source dir="${dir.j2merosa.util}/org.javarosa.polish.chatterbox.extensions/src/"/>
-					<source dir="${dir.j2merosa.util}/org.javarosa.resources/src/"/>
-					<source dir="${dir.j2merosa.activities}/org.javarosa.referral/src/"/>
-					<source dir="${dir.j2merosa.activities}/org.javarosa.services.properties/src/"/>
-					<source dir="${dir.j2merosa.activities}/org.javarosa.user/src/"/>
-					<source dir="${dir.j2merosa.activities}/org.javarosa.patient/src/"/>
-					<source dir="${dir.javarosa-core}/org.javarosa.xform/src/"/>
-					<source dir="${dir.j2merosa.activities}/org.javarosa.patient.entry/src/"/>
-					<source dir="${dir.j2merosa.activities}/org.javarosa.entity/src/"/>
-					
-					<!--source dir="${basedir}/../org.mesh4j.sync/src/"/-->
-					<!--source dir="${basedir}/../org.mesh4j.sync.message/src/"/-->
-					<!-- Add back in Mesh4X code once we're satisfied with using Java5's in Polish -->
-					
-					
-					<source dir="${dir.j2merosa.util}/org.javarosa.clforms/test/" if="unittests"/>
-					<source dir="${dir.javarosa-core}/org.javarosa.core/test/" if="unittests"/>
-					<source dir="${dir.javarosa-core}/org.javarosa.core.model/test/" if="unittests"/>
-					<source dir="${dir.j2merosa.examples}/org.javarosa.demo/test/" if="unittests"/>
-					<source dir="${dir.j2merosa.activities}/org.javarosa.user/test/" if="unittests"/>
-					<source dir="${dir.j2merosa.activities}/org.javarosa.patient/test/" if="unittests"/>
-					<source dir="${dir.javarosa-core}/org.javarosa.xform/test/" if="unittests"/>
-					
-					<!-- defunct
-					<source dir="${basedir}/../org.javarosa.action/src/"/>
-					<source dir="${basedir}/../org.javarosa.util/src/"/>
-					<source dir="${basedir}/../org.javarosa.entitymgr/src/"/>
-					<source dir="${basedir}/../org.javarosa.patientmgr/src/"/>
-					-->
 				</sources>
 
 				<!-- Build variables -->
@@ -114,8 +62,8 @@
 					dir="${dir.resources}"
 					defaultexcludes="no"
 					excludes="readme.txt, .svn, *.css">
-					<root dir="${dir.resources.external}"
-						excludes=".svn"/>
+					<!-- <root dir="${dir.resources.external}"
+						excludes=".svn"/> -->
 					<!-- Set the language for the strings in the application -->
 					<localization>
 						<locale name="none" />
@@ -156,8 +104,7 @@
 				<!-- Properties of the actual javac compiler -->
 				<compiler debug="on" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/wmapi.jar"/>
 				
-				<!--postcompiler name="java5" /-->
-				<!-- Add back when we're satisfied with everyone using it -->
+				<postcompiler name="java5"/>
 
 			</build>
 
@@ -176,8 +123,11 @@
 			</emulator>
 
 		</buildPolish>
-		<!-- Clean up our temporary directory -->
-		<delete dir="${dir.lib.working}"/>
+	</target>
+	
+	<target name="CompileAndLinkSource" if="compile.from.source.true">
+			<ant antfile="${dir.jrlibs}/build.xml" target="package" inheritAll="false" inheritRefs="false"/>
+			<copy file="${dir.jrlibs}/dist/j2merosa-libraries.jar" todir="${dir.tools}"/>
 	</target>
 
 	<!-- Main Target: Call to build the project and call up the emulator -->
@@ -187,8 +137,8 @@
 
 	<!-- Main Target: Call to clean directories created by a build -->
 	<target name="Clean" description="allows a clean build. You should call [ant clean] whenever you made changes to devices.xml, vendors.xml or groups.xml">
-		<delete dir="build" />
-		<delete dir="dist" />
+		<delete dir="${dir.build}" />
+		<delete dir="${dir.dist}" />
 	</target>
 	
 	<!-- Main Target: Call to clean the emulator's RMS -->
@@ -284,6 +234,9 @@
 	<target name="init">
 		<!-- Disable the Emulator by default -->
 		<property name="test" value="false" />
+		<condition property="compile.from.source.true">
+			<equals arg1="${compile.source}" arg2="true" />
+		</condition>
 	</target>
 
 	<target name="supressOutput">
@@ -351,7 +304,7 @@
 	<property name="TALK" value="true" />
 
 	<!-- Definition of the J2ME Polish task:                      -->
-	<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${polish.home}/lib/j2me-lib_1.1.jar:${polish.home}/lib/microewt_0.92.jar:${polish.home}/lib/microEWT-Examples.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
+	<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
 	<path id="classpath.base">
 	</path>
 	
@@ -368,6 +321,7 @@
 	  <pathelement location="${dir.tools}/j2meunit-javarosa.jar" />
 	  <pathelement location="${wtk.home}/lib/wma11.jar"/>
 	  <pathelement location="${wtk.home}/lib/midpapi21.jar"/>
+	  <pathelement location="${dir.lib}/j2merosa-test-libraries.jar"/>
 	  <path refid="classpath.base" />
 	</path>
 </project>

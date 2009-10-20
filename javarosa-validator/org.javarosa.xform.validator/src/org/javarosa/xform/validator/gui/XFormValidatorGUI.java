@@ -70,6 +70,7 @@ import java.util.zip.ZipEntry;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.xform.schema.FormOverview;
+import org.javarosa.xform.schema.FormTranslationFormatter;
 import org.javarosa.xform.util.XFormUtils;
 
 /*

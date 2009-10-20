@@ -25,6 +25,7 @@
 		<jar jarfile="${build.dir}/javarosa-xform-validator.jar">
 			<zipfileset dir="${build.dir}/classes" prefix="" />
 			<zipfileset src="${base.dir}/lib/kxml2-2.3.0.jar" />
+			<zipfileset src="${base.dir}/lib/regexp-me.jar" />
 			<fileset dir="${build.dir}/classes" />
 			<manifest>
 				<attribute name="Specification-Version" value="${version}" />
@@ -40,16 +41,13 @@
 		<copy todir="${build.dir}/src">
 			<fileset dir="${base.dir}/src/" />
 			<fileset dir="${base.dir}/../../javarosa-core/src/" />
-<!--			<fileset dir="${base.dir}/../../javarosa-core/src/org/javarosa/core/" />
-			<fileset dir="${base.dir}/../../javarosa-core/src/org/javarosa/core/model/"/>
-			<fileset dir="${base.dir}/../../javarosa-core/src/org/javarosa/xform/"/> -->
 			<fileset dir="${base.dir}/../org.javarosa.xform.schema/src/"/>
 		</copy>
 
 		<javac 
 			srcdir="${build.dir}/src"
 			destdir="${build.dir}/classes" 
-			classpath="${base.dir}/lib/kxml2-2.3.0.jar;${base.dir}/../../javarosa-core/lib/regexp-me.jar"
+			classpath="${base.dir}/lib/kxml2-2.3.0.jar:${base.dir}/lib/regexp-me.jar"
 			includeAntRuntime="false"
 			debug="${build.debug}" 
 			deprecation="${build.deprecation}" />

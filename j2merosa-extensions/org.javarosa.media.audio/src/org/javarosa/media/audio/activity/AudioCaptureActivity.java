@@ -504,11 +504,12 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  private IAudioCaptureService getAudioCaptureService() throws UnavailableServiceException
 	  {
 		  //#if app.useJ2MEAudioLib
-		  JavaRosaServiceProvider.instance().registerService(new J2MEAudioCaptureService());  
-		  IAudioCaptureService audioCaptureService = (J2MEAudioCaptureService)JavaRosaServiceProvider.instance().getService(J2MEAudioCaptureService.serviceName);
+		  //# JavaRosaServiceProvider.instance().registerService(new J2MEAudioCaptureService());  
+		  //# IAudioCaptureService audioCaptureService = (J2MEAudioCaptureService)JavaRosaServiceProvider.instance().getService(J2MEAudioCaptureService.serviceName);
+		  //# return audioCaptureService;
+     	  //#else
+		  throw new UnavailableServiceException("Unavailable service: " +  J2MEAudioCaptureService.serviceName);
 		  //#endif
-		  		  
-		  return audioCaptureService;
 	  }	  	  
 	  
 	  //Record audio in a separate thread to keep the command listener alert for stopping
