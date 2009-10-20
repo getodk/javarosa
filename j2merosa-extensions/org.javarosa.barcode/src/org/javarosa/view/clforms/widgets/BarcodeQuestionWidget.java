@@ -64,7 +64,7 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 	public void creatView() {
 
 		//#if javarosa.usepolishlocalisation
-		setHint(Locale.get("hint.TypeOrScan"));
+		//setHint(Locale.get("hint.TypeOrScan"));
 		//#else
 		setHint("Type in your answer");
 		//#endif
@@ -86,7 +86,7 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 	public Command getAcquireCommand() {
 		Command acquire;
 		//#if javarosa.usepolishlocalisation
-		 acquire =  new Command(Locale.get( "menu.Scan"), Command.SCREEN, 3);
+		// acquire =  new Command(Locale.get( "menu.Scan"), Command.SCREEN, 3);
 		//#else
 		 acquire = new Command("Scan", Command.SCREEN, 3);
 		//#endif
@@ -96,7 +96,7 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 	public AcquireScreen getAcquireScreen(CommandListener callingListener) {
 		String title = "Scan barcode";
 		//#if javarosa.usepolishlocalisation
-		title = Locale.get( "title.ScanBarcode");
+		//title = Locale.get( "title.ScanBarcode");
 		//#endif
 		BarcodeCaptureScreen bcScreen = new BarcodeCaptureScreen(
 				title, this, callingListener);

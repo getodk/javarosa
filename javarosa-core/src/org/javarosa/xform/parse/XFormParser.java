@@ -464,9 +464,13 @@ public class XFormParser {
 				parseItem(f, question, child);
 			}
 		}
-		if (isSelect)
+		if (isSelect) {
+			if (question.getSelectItemIDs().size() == 0) {
+				throw new XFormParseException("Select question has no choices");
+			}
 			question.localizeSelectMap(null);		
-
+		}
+			
 		parent.addChild(question);
 		return question;
 	}
@@ -599,6 +603,8 @@ public class XFormParser {
 	}
 
 	private static void parseItem (FormDef f, QuestionDef q, Element e) {
+		final int MAX_VALUE_LEN = 32;
+		
 		String label = null;
 		String textRef = null;
 		String value = null;
@@ -623,6 +629,10 @@ public class XFormParser {
 				}
 			} else if ("value".equals(childName)) {
 				value = getXMLText(child, true);
+				
+				if (value.length() > MAX_VALUE_LEN) {
+					System.err.println("WARNING: choice value [" + value + "] is too long; max. suggested length " + MAX_VALUE_LEN + " chars");
+				}
 				
 				//validate
 				for (int k = 0; k < value.length(); k++) {

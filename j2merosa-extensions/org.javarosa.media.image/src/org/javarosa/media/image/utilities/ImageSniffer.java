@@ -150,10 +150,12 @@ public class ImageSniffer implements Runnable
 	private IFileService getFileService() throws UnavailableServiceException
 	{
 		//#if app.usefileconnections
-		JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
-		IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		//# JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
+		//# IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
+		//# return service;
+		//#else
+		throw new UnavailableServiceException("Unavailable service: " +  J2MEFileService.serviceName);
 		//#endif
-		return service;
 	}
 	/*
 	private void serviceUnavailable(Exception e)

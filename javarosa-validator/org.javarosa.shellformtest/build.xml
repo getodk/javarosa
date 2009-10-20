@@ -60,21 +60,18 @@
 					<source dir="${dir.src}"/>
 					<!--Taking this out for now...-->
 					<!--source dir="${dir.test}"/-->
-					<source dir="${basedir}/../org.javarosa.core/src/"/>
-					<source dir="${basedir}/../org.javarosa.core.model/src/"/>
-					<source dir="${basedir}/../org.javarosa.entity/src/"/>
+					<source dir="${dir.javarosa-core}/src/"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.entity/src/"/>
 						
-					<source dir="${basedir}/../org.javarosa.forms/src/"/>
-					<source dir="${basedir}/../org.javarosa.formmanager/src/"/>
-					<source dir="${basedir}/../org.javarosa.j2me/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.formmanager/src/"/>
+					<source dir="${dir.j2merosa}/src/"/>
 
-					<source dir="${basedir}/../org.javarosa.user/src/"/>
-					<source dir="${basedir}/../org.javarosa.communication/src/"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.user/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.communication/src/"/>
 
-					<source dir="${basedir}/../org.javarosa.polish.activity/src/"/>
-					<source dir="${basedir}/../org.javarosa.polish.chatterbox/src/"/>
-					<source dir="${basedir}/../org.javarosa.resources/src/"/>
-					<source dir="${basedir}/../org.javarosa.xform/src/"/>
+					<source dir="${dir.j2merosa.activities}/org.javarosa.polish.activity/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.polish.chatterbox/src/"/>
+					<source dir="${dir.j2merosa.util}/org.javarosa.resources/src/"/>
 					
 				</sources>
 

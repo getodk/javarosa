@@ -28,6 +28,8 @@ public class Harness {
 	public static final int MODE_SCHEMA = 1;
 	public static final int MODE_SUMMARY_TEXT = 2;
 	public static final int MODE_SUMMARY_SPREADSHEET = 3;
+	public static final int MODE_CSV_DUMP = 4;
+	public static final int MODE_CSV_IMPORT = 5;
 	
 	public static void main(String[] args) {
 		int mode = -1;
@@ -38,13 +40,25 @@ public class Harness {
 			mode = MODE_SCHEMA;
 		} else if (args[0].equals("summary")) {
 			mode = MODE_SUMMARY_TEXT;
+		} else if (args[0].equals("csvdump")) {
+			mode = MODE_CSV_DUMP;
+		} else if (args[0].equals("csvimport")) {
+			mode = MODE_CSV_IMPORT;
 		} else {
-			System.out.println("Usage: java -jar form_translate.jar [schema|summary] < form.xml > output");
+			System.out.println("Usage: java -jar form_translate.jar [schema|summary|csvdump] < form.xml > output");
+			System.out.println("or: java -jar form_translate.jar [csvimport] < translations.csv > itextoutput");
 			System.exit(1);
 		}
 		
+		
 		PrintStream sysOut = System.out;
 		System.setOut(System.err);
+		
+		if(mode == MODE_CSV_IMPORT) {
+			System.setOut(sysOut);
+			System.out.println(FormTranslationFormatter.turnTranslationsCSVtoItext(System.in));
+			System.exit(0);
+		}
 		FormDef f = XFormUtils.getFormFromInputStream(System.in);
 		System.setOut(sysOut);
 		
@@ -60,6 +74,8 @@ public class Harness {
 			}
 		} else if (mode == MODE_SUMMARY_TEXT) {
 			System.out.println(FormOverview.overview(f));
+		} else if (mode == MODE_CSV_DUMP) {
+			System.out.println(FormTranslationFormatter.dumpTranslationsIntoCSV(f));
 		}
 	}
 }

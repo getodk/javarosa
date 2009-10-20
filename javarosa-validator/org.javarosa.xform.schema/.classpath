@@ -2,11 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="src" path="/org.javarosa.core.model"/>
-	<classpathentry kind="src" path="/org.javarosa.xform"/>
-	<classpathentry kind="src" path="/org.javarosa.core"/>
-	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
-	<classpathentry kind="src" path="/javarosa-core"/>
 	<classpathentry kind="lib" path="/javarosa-core/lib/kxml2-2.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/xpp3-1.1.4.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
