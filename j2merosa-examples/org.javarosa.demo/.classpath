@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="J2MELIB"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
+	<classpathentry kind="lib" path="tools/j2meunit-javarosa.jar"/>
+	<classpathentry kind="lib" path="tools/j2merosa-libraries.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
