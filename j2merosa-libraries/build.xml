@@ -36,9 +36,9 @@
 	
 	<fileset id="jr.sources" dir="../">
 		<include name="javarosa-core/**/src/**/*.java"/>
+		<include name="j2merosa-core**/src/**/*.java"/>
 		<include name="j2merosa-extensions/**/src/**/*.java"/>
 	    <include name="j2merosa-activities/**/src/**/*.java"/>
-		<include name="/j2merosa-core**/src/**/*.java"/>
 		<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
 		<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
 		<!-- This lets us translate from an absolute reference to a reference at a merged source level -->
