@@ -29,7 +29,7 @@
 	<path id="jr.classpath.test">
 		<path refid="jr.compiled.classpath" />
 		<fileset dir="lib" includes="j2meunit-javarosa.jar"/>
-		<dirset dir=".">
+		<dirset dir="${basedir}">
 			<include name="buildTest/**"/>
 		</dirset>
 	</path>
@@ -150,6 +150,13 @@
 			</chainedmapper>
 		</pathconvert>
 		
+		<typedef name="instanceof" classname="org.javarosa.build.InstanceOfCondition" onerror="report">
+			<classpath>
+			   <pathelement location="tools/javarosa-ant-libs.jar"/>
+			   <path refid="jr.classpath.test" />
+			</classpath>
+		</typedef>
+		
 		<for list="${testclasses}" delimiter="${line.separator}" param="name">
 			<sequential>
 				<if>
@@ -220,13 +227,6 @@
 		    <pathelement location="tools/ant-contrib.jar"/>
 		  </classpath>
 	</taskdef>
-	
-	<typedef name="instanceof" classname="org.javarosa.build.InstanceOfCondition" onerror="report">
-		<classpath>
-		   <pathelement location="tools/javarosa-ant-libs.jar"/>
-		   <path refid="jr.classpath.test" />
-		</classpath>
-	</typedef>
 
 	<target name="clean">
 		<delete dir="dist"/>
