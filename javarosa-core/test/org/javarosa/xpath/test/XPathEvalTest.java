@@ -91,7 +91,7 @@ public class XPathEvalTest extends TestCase {
 					fail("Doubles outside of tolerance");
 				}
 			} else if (!expected.equals(result)) {
-				fail("Did not get expected result");
+				fail("Did not get expected result for expression: " + expr);
 			}
 		} catch (XPathException xpex) {
 			if (!exceptionExpected) {
@@ -334,7 +334,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("'0017.' = 17" , null, null, Boolean.TRUE);
 		testEval("'017.' = '17.000'", null, null, Boolean.FALSE);
 		testEval("date('2004-05-01') = date('2004-05-01')" , null, null, Boolean.TRUE);
-		testEval("true() != date('1999-09-09')" , null, null, new XPathTypeMismatchException());
+		testEval("true() != date('1999-09-09')" , null, null, Boolean.FALSE);
 		testEval("false() and true() != true()" , null, null, Boolean.FALSE);
 		testEval("(false() and true()) != true()" , null, null, Boolean.TRUE);
 		testEval("-3 < 3 = 6 >= 6" , null, null, Boolean.TRUE);
@@ -354,13 +354,12 @@ public class XPathEvalTest extends TestCase {
 			//(double, double) prototype takes precedence and strings are convertible to doubles
 		testEval("proto(1.1, 'asdf', true())", null, ec, "[Double:1.1,String:asdf,Boolean:true]");
 		testEval("proto(false(), false(), false())", null, ec, "[Double:0.0,String:false,Boolean:false]");
-		testEval("proto(1.1, 'asdf', date('1995-07-16'))", null, ec, new XPathTypeMismatchException());
+		testEval("proto(1.1, 'asdf', inconvertible())", null, ec, new XPathTypeMismatchException());
 		testEval("proto(1.1, 'asdf', true(), 16)", null, ec, new XPathTypeMismatchException());
 		testEval("raw()", null, ec, "[]");
 		testEval("raw(5, 5)", null, ec, "[Double:5.0,Double:5.0]");
 		testEval("raw('7', '7')", null, ec, "[String:7,String:7]");
 		testEval("raw('1.1', 'asdf', 17)", null, ec, "[Double:1.1,String:asdf,Boolean:true]"); //convertible to prototype
-		testEval("raw('1.1', 'asdf', date('1995-07-16'))", null, ec, "[String:1.1,String:asdf,Date:1995-07-16]"); //not convertible to prototype
 		testEval("raw(get-custom(false()), get-custom(true()))", null, ec, "[CustomType:,CustomSubType:]");
 		testEval("concat()", null, ec, "");
 		testEval("concat('a')", null, ec, "a");
