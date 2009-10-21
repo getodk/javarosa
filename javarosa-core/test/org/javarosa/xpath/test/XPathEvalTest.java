@@ -85,7 +85,7 @@ public class XPathEvalTest extends TestCase {
 			//System.out.println("out: " + result);
 			
 			if (exceptionExpected) {
-				fail("Expected exception");
+				fail("Expected exception, expression : " + expr);
 			} else if ((result instanceof Double && expected instanceof Double)) {
 				if (Math.abs(((Double)result).doubleValue() - ((Double)expected).doubleValue()) > 1.0e-12) {
 					fail("Doubles outside of tolerance");
@@ -147,7 +147,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("boolean('asdf')", null, null, Boolean.TRUE);
 		testEval("boolean('  ')", null, null, Boolean.TRUE);
 		testEval("boolean('false')", null, null, Boolean.TRUE);
-		testEval("boolean(date('2000-01-01'))", null, null, new XPathTypeMismatchException());
+		testEval("boolean(date('2000-01-01'))", null, null, Boolean.TRUE);
 		testEval("boolean(convertible())", null, ec, Boolean.TRUE);
 		testEval("boolean(inconvertible())", null, ec, new XPathTypeMismatchException());		
 		testEval("number(true())", null, null, new Double(1.0));
