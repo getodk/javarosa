@@ -464,9 +464,13 @@ public class XFormParser {
 				parseItem(f, question, child);
 			}
 		}
-		if (isSelect)
+		if (isSelect) {
+			if (question.getSelectItemIDs().size() == 0) {
+				throw new XFormParseException("Select question has no choices");
+			}
 			question.localizeSelectMap(null);		
-
+		}
+			
 		parent.addChild(question);
 		return question;
 	}
@@ -623,6 +627,10 @@ public class XFormParser {
 				}
 			} else if ("value".equals(childName)) {
 				value = getXMLText(child, true);
+				
+				if (value.length() > 32) {
+					System.err.println("WARNING: choice value [" + value + "] is too long; max. suggested length 32 chars");
+				}
 				
 				//validate
 				for (int k = 0; k < value.length(); k++) {
@@ -1040,6 +1048,8 @@ public class XFormParser {
 		if (schema != null && schema.length() > 0 && !schema.equals(defaultNamespace)) {
 			instanceModel.schema = schema;
 		}
+		instanceModel.formVersion = e.getAttributeValue(null, "version");
+		instanceModel.uiVersion = e.getAttributeValue(null, "uiVersion");
 		
 		loadNamespaces(e, instanceModel);
 			
