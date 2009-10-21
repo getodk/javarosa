@@ -16,6 +16,14 @@
 	<target name="BuildPolish" depends="init,CompileAndLinkSource" description="This is the controller for the J2ME build process.">
 		<!-- A property containing the path to the preprocessed source files -->
 		<property name="builtsource" value="${dir.build}/real/${device.identifier}/none/source/" />
+		
+
+		<!-- Definition of the J2ME Polish task:                      -->
+		<!-- Note that this takes place here (rather than in the script in general) in order to allow the libraries jar to be compiled from source before the classpath is evaluated-->
+		<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
+			<path id="classpath.base">
+		</path>
+		
 		<buildPolish>
 			<info name="${app.name}"
 				version="${app.version}"
@@ -209,11 +217,6 @@
 
 	<!-- import global properties                                 -->
 	<property file="${polish.home}/global.properties" />
-
-	<!-- Definition of the J2ME Polish task:                      -->
-	<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
-	<path id="classpath.base">
-	</path>
 
 	<!-- Defines the py-run task                                  -->
 	<taskdef name="py-run" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.2.jar"/>
