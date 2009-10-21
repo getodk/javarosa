@@ -47,12 +47,23 @@ public class InstanceSchema {
 		schema.setName("schema");
 		schema.setNamespace("http://www.w3.org/2001/XMLSchema");
 		schema.setPrefix("", "http://www.w3.org/2001/XMLSchema");
-		schema.setAttribute(null, "targetNamespace", f.getDataModel().schema);
+		if (f.getDataModel().schema != null) {
+			schema.setAttribute(null, "targetNamespace", f.getDataModel().schema);
+		} else {
+			System.err.println("Warning: instance has no schema");
+		}
 		schema.setAttribute(null, "elementFormDefault", "qualified");
-
+		
+		String formVersion = f.getDataModel().formVersion;
+		String uiVersion = f.getDataModel().uiVersion;
+		if (formVersion != null)
+			schema.setAttribute(null, "version", formVersion);
+		if (uiVersion != null)
+			schema.setAttribute(null, "uiVersion", uiVersion);
+		
 		processSelectChoices(schema, f, f.getDataModel());
 		schema.addChild(Node.ELEMENT, schemizeInstance(f.getDataModel().getRoot()));
-				
+		
 		Document schemaXML = new Document();
 		schemaXML.addChild(Node.ELEMENT, schema);
 		
