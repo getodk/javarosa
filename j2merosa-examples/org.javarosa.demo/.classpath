@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
-	<classpathentry kind="lib" path="tools/j2meunit-javarosa.jar"/>
 	<classpathentry kind="lib" path="tools/j2merosa-libraries.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
