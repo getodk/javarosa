@@ -845,6 +845,25 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 		}
 	}
 
+	public DataModelTree clone () {
+		DataModelTree cloned = new DataModelTree(this.getRoot().deepCopy(true));
+		
+		cloned.setID(this.getID());
+		cloned.setFormId(this.getFormId());
+		cloned.setName(this.getName());
+		cloned.setDateSaved(this.getDateSaved());
+		cloned.schema = this.schema;
+		cloned.formVersion = this.formVersion;
+		cloned.uiVersion = this.uiVersion;
+		cloned.namespaces = new Hashtable();
+		for (Enumeration e = this.namespaces.keys(); e.hasMoreElements(); ) {
+			Object key = e.nextElement();
+			cloned.namespaces.put(key, this.namespaces.get(key));
+		}
+		
+		return cloned;
+	}
+	
 	// private TreeElement createNode (TreeReference ref) {
 	// if (root == null) {
 	// root = new TreeElement(null, 0);

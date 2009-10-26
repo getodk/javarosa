@@ -77,10 +77,15 @@ public class Selection implements Externalizable {
 	public void attachQuestionDef(QuestionDef q) {
 		this.question = q;
 		this.qID = q.getID();
-		index =  q.getSelectedItemIndex(xmlValue); 
+		
+		if (xmlValue != null && xmlValue.length() > 0) {
+			index =  q.getSelectedItemIndex(xmlValue); 			
+		} else if (index != -1) {
+			xmlValue = (String)q.getSelectItemIDs().elementAt(index);
+		} else {
+			throw new RuntimeException("insufficient data in selection");
+		}
 	}
-	
-	
 	
 	public String getText () {
 		if (question != null) {
@@ -92,7 +97,11 @@ public class Selection implements Externalizable {
 	}
 	
 	public String getValue () {
-		return xmlValue;
+		if (xmlValue != null && xmlValue.length() > 0) {
+			return xmlValue;
+		} else {
+			throw new RuntimeException("don't know xml value! perhaps selection was stored as index only and has not yet been linked up to a formdef?");
+		}
 	}
 
 	/* (non-Javadoc)
