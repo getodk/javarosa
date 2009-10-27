@@ -31,7 +31,7 @@ import org.javarosa.formmanager.view.IFormEntryView;
  * 
  */
 public abstract class AcquireScreen extends Form
-		implements CommandListener, IFormEntryView {
+		implements CommandListener /* , IFormEntryView */ {
 
 	private AcquiringQuestionScreen questionScreen;
 	private CommandListener listenerToReturnTo;
