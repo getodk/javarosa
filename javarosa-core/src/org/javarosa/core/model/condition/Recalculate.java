@@ -73,6 +73,9 @@ public class Recalculate extends Triggerable {
 		} else if (val instanceof Double) {
 			double d = ((Double)val).doubleValue();
 			if(Double.isNaN(d)) { return null; }
+			
+			//droos: i think this should be reworked
+			//instead, write IntData if integral, DecData if float, regardless of data type
 			if(Constants.DATATYPE_DECIMAL == dataType) {
 				return new DecimalData(d);
 			} else if(Constants.DATATYPE_INTEGER == dataType) {

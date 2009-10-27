@@ -22,20 +22,50 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * The alternate scheme is provided via a wrapper object, which accepts the base object and whose
  * readExternal/writeExternal methods implement the new scheme.
  * 
+ * All methods pass through to an underlying StorageUtility; you may get warnings about type mismatches
+ * 
  * @author Drew Roos
  *
  */
 public class WrappingStorageUtility implements IStorageUtility {
-	IStorageUtility storage;
-	SerializationWrapper wrapper;
+	IStorageUtility storage;		/* underlying StorageUtility */
+	SerializationWrapper wrapper;   /* wrapper that defines the alternate serialization scheme; the wrapper is set once for
+	                                 * the life of the StorageUtility and is re-used all read and write calls
+	                                 */
 	
-	/* kind of like ExternalizableWrapper -- but not quite a drop-in replacement */
+	/**
+	 * Defines an alternate serialization scheme. The alternate scheme is implemented in this class's
+	 * readExternal and writeExternal methods.
+	 * 
+	 * (kind of like ExternalizableWrapper -- but not quite a drop-in replacement)
+	 */
 	public interface SerializationWrapper extends Externalizable {
+		/**
+		 * set the underlying object (to be followed by a call to writeExternal)
+		 * @param e
+		 */
 		void setData (Externalizable e);
+		
+		/**
+		 * retrieve the underlying object (to be followed by a call to readExternal)
+		 * @return
+		 */
 		Externalizable getData ();
+		
+		/**
+		 * return type of underlying object
+		 * @return
+		 */
 		Class baseType ();
 	}
 	
+	/**
+	 * Create a new wrapping StorageUtility
+
+	 * @param name unique name for underlying StorageUtility
+	 * @param wrapper serialization wrapper
+	 * @param storageFactory factory to create underlying StorageUtility
+	 */
 	public WrappingStorageUtility (String name, SerializationWrapper wrapper, IStorageFactory storageFactory) {
 		this.storage = storageFactory.newStorage(name, wrapper.getClass());
 		this.wrapper = wrapper;
