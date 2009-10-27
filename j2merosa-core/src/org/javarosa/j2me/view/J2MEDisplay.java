@@ -66,7 +66,9 @@ public class J2MEDisplay {
 		if (next == null) {
 			display.setCurrent(alert);
 		} else {
-			display.setCurrent(alert, next);
+			//display.setCurrent(alert, next);
+			throw new RuntimeException("temporarily disabled due to polish build issue");
+			//TODO: figure this out!!
 		}
 		
 		return alert;
