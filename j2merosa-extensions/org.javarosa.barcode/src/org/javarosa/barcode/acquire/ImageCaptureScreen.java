@@ -28,13 +28,11 @@ import javax.microedition.media.Player;
 import javax.microedition.media.control.GUIControl;
 import javax.microedition.media.control.VideoControl;
 
-import org.javarosa.core.api.IView;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.view.clforms.acquire.AcquireScreen;
 import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
 
-public abstract class ImageCaptureScreen extends AcquireScreen implements
-		IView, CommandListener {
+public abstract class ImageCaptureScreen extends AcquireScreen implements CommandListener {
 
 	protected Player player;
 	protected VideoControl videoControl;
@@ -119,10 +117,6 @@ public abstract class ImageCaptureScreen extends AcquireScreen implements
 		if (takePictureCommand == null)
 			takePictureCommand = new Command("Take Picture", Command.OK, 3);
 		return takePictureCommand;
-	}
-
-	public Object getScreenObject() {
-		return this;
 	}
 
 	public Image getSnapshotImage() throws MediaException {

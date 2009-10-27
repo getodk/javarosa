@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.j2me"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication.ui"/>
+	<classpathentry kind="src" path="/javarosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
