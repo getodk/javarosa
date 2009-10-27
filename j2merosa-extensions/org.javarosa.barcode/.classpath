@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.forms"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
+	<classpathentry kind="src" path="/javarosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
