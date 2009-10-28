@@ -15,6 +15,7 @@ import org.javarosa.formmanager.api.transitions.FormTransportStateTransitions;
 import org.javarosa.formmanager.utility.FormSender;
 import org.javarosa.formmanager.view.transport.FormTransportSubmitStatusScreen;
 import org.javarosa.formmanager.view.transport.FormTransportViews;
+import org.javarosa.formmanager.view.transport.TransportResponseProcessor;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.services.transport.TransportMessage;
 
@@ -30,7 +31,11 @@ public class FormTransportState implements State<FormTransportStateTransitions>,
 	FormSender sender;
 
 	public FormTransportState(DataModelTree dataModel, TransportMessage message) {
-		FormTransportViews views = new FormTransportViews(this, this);
+		this(dataModel, message, null);
+	}
+	
+	public FormTransportState(DataModelTree dataModel, TransportMessage message, TransportResponseProcessor responder) {
+		FormTransportViews views = new FormTransportViews(this, this, responder);
 		sender = new FormSender(views, message);
 		sender.setMultiple(false);
 		screen = views.getSubmitStatusScreen();

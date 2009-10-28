@@ -12,5 +12,7 @@
 	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry kind="src" path="/org.javarosa.transport"/>
+	<classpathentry kind="src" path="/javarosa-core"/>
+	<classpathentry kind="src" path="/j2merosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

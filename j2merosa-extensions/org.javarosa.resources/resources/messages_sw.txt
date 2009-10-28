@@ -196,8 +196,8 @@ sending.view.new=Send to New Server
 
 sending.status.multi=Fomu ${0} kati ya ${1}. Umefanikiwa kutuma Fomu ${2} kati ya ${3} subiri.
 sending.status.title=Matokeo ya Utumaji
-sending.status.none=Hakuna taarifa za kutuma
-sending.status.going=Utumaji unaendelea
+sending.status.none=Taarifa zako zote zimeshaenda!
+sending.status.going=Utumaji unaendelea. Tafadali subiri kidogo.
 
 sending.message.details=Message Details
 sending.message.send=Send Message
