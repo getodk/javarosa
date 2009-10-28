@@ -297,6 +297,15 @@ public class Localizer implements Externalizable {
 		if(locale == null || !this.locales.contains(locale)) {
 			return null;
 		}
+		
+		//It's very important that any default locale contain the appropriate strings to localize the interface
+		//for any possible language. As such, we'll keep around a table with only the default locale keys to
+		//ensure that there are no localizations which are only present in another locale, which causes ugly
+		//and difficult to trace errors.
+		OrderedHashtable defaultLocaleKeys = new OrderedHashtable();
+		
+		//This table will be loaded with the default values first (when applicable), and then with any
+		//language specific translations overwriting the existing values.
 		OrderedHashtable data = new OrderedHashtable();
 		
 		// If there's a default locale, we load all of its elements into memory first, then allow
@@ -306,11 +315,37 @@ public class Localizer implements Externalizable {
 			for (int i = 0; i < defaultResources.size(); ++i) {
 				loadTable(data,((LocaleDataSource)defaultResources.elementAt(i)).getLocalizedText());
 			}
+			for(Enumeration en = data.keys(); en.hasMoreElements();) {
+				defaultLocaleKeys.put(en.nextElement(), Boolean.TRUE);
+			}
 		}
 		
 		Vector resources = (Vector)localeResources.get(locale);
 		for(int i = 0 ; i < resources.size() ; ++i ) {
 			loadTable(data,((LocaleDataSource)resources.elementAt(i)).getLocalizedText());
+		}
+		
+		//If we're using a default locale, now we want to make sure that it has all of the keys
+		//that the locale we want to use does. Otherwise, the app will crash when we switch to 
+		//a locale that doesn't contain the key.
+		if(fallbackDefaultLocale && defaultLocale != null) {
+			String missingKeys = "";
+			int keysmissing = 0;
+			for(Enumeration en = data.keys(); en.hasMoreElements();) {
+				String key = (String)en.nextElement();
+				if(!defaultLocaleKeys.containsKey(key)) {
+					missingKeys += key + ",";
+					keysmissing++;
+				}
+			}
+			if(keysmissing > 0) {
+				//Is there a good way to localize these exceptions?
+				throw new NoLocalizedTextException("Error loading locale " + locale + 
+						". There were " + keysmissing + " keys which were contained in this locale, but were not " + 
+						"properly registered in the default Locale. Any keys which are added to a locale should always " +
+						"be added to the default locale to ensure appropriate functioning.\n" +
+						"The missing translations were for the keys: " + missingKeys,missingKeys, defaultLocale);
+			}
 		}
 		
 		return data;
@@ -405,7 +440,7 @@ public class Localizer implements Externalizable {
 		if(text != null) {
 			text = processArguments(text, args);
 		} else {
-			throw new NoLocalizedTextException("The Localizer could not find a definition for ID: " + textID + " in the '" + currentLocale + "' locale.");
+			throw new NoLocalizedTextException("The Localizer could not find a definition for ID: " + textID + " in the '" + currentLocale + "' locale.", textID, currentLocale);
 		}
 		return text;
 	}
@@ -424,7 +459,7 @@ public class Localizer implements Externalizable {
 		if(text != null) {
 			text = processArguments(text, args);
 		} else {
-			throw new NoLocalizedTextException("The Localizer could not find a definition for ID: " + textID + " in the '" + currentLocale + "' locale.");
+			throw new NoLocalizedTextException("The Localizer could not find a definition for ID: " + textID + " in the '" + currentLocale + "' locale.",textID, currentLocale);
 		}
 		return text;
 	}
@@ -442,7 +477,7 @@ public class Localizer implements Externalizable {
 	public String getLocalizedText (String textID) {
 	    String text = getText(textID);
 	    if (text == null)
-	    	throw new NoLocalizedTextException("Can't find localized text for current locale! text id: [" + textID + "]");
+	    	throw new NoLocalizedTextException("Can't find localized text for current locale! text id: [" + textID + "]", textID, currentLocale);
 	    return text;
 	}
 	
