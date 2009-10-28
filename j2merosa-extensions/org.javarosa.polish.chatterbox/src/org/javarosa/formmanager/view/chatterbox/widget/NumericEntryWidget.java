@@ -23,6 +23,7 @@ import org.javarosa.core.model.data.IntegerData;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.TextField;
+import de.enough.polish.ui.UiAccess;
 
 public class NumericEntryWidget extends TextEntryWidget {
 	private boolean isDecimal;
@@ -39,6 +40,7 @@ public class NumericEntryWidget extends TextEntryWidget {
 	protected Item getEntryWidget (QuestionDef question) {
 		TextField tf = textField();
 		tf.setConstraints(isDecimal ? TextField.DECIMAL : TextField.NUMERIC);
+		//UiAccess.setInputMode(tf,UiAccess.MODE_NUMBERS);
 		return super.getEntryWidget(question);
 	}
 

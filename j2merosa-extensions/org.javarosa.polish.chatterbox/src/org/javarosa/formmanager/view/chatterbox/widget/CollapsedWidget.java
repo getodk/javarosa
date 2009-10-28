@@ -35,6 +35,8 @@ import de.enough.polish.ui.UiAccess;
 public class CollapsedWidget implements IWidgetStyle {
 	public static String UPDATE_TEXT = "Update";
 	
+	private static final Command updateCommand =  new Command(UPDATE_TEXT, Command.ITEM, 1);
+	
 	private StringItem prompt;
 	private StringItem answer;
 	
@@ -57,8 +59,8 @@ public class CollapsedWidget implements IWidgetStyle {
 		Container test = new Container(false);
 		prompt = new StringItem(null, null);
 		if(this.seekable) {
-			prompt.setDefaultCommand(new Command(UPDATE_TEXT, Command.ITEM, 1));
-			test.setDefaultCommand(new Command(UPDATE_TEXT, Command.ITEM, 1));
+			prompt.setDefaultCommand(updateCommand);
+			test.setDefaultCommand(updateCommand);
 		}
 		test.add(new StringItem(null, null));
 		test.add(prompt);

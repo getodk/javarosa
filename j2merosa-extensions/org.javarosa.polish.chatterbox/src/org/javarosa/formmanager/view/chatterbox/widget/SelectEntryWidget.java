@@ -151,7 +151,7 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 			public Style focus (Style newStyle, int direction) {
 				Style retStyle = super.focus(newStyle, direction);
 				if(this.getSelectedIndex() > -1) {
-					this.focus(this.getSelectedIndex());
+					this.focusChild(this.getSelectedIndex());
 				}
 				return retStyle; 
 			}

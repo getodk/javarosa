@@ -18,19 +18,15 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -45,11 +41,10 @@ import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
-import org.javarosa.formmanager.view.chatterbox.widget.IWidgetStyle;
 import org.javarosa.j2me.view.J2MEDisplay;
 
-import de.enough.polish.ui.Alert;
 import de.enough.polish.ui.Container;
+import de.enough.polish.ui.Display;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
@@ -293,7 +288,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		activeQuestionIndex = questionIndex;
 
     		if (activeQuestionIndex.isInForm()) {
-    			ChatterboxWidget widget = (ChatterboxWidget)get(questionIndexes.indexOf(activeQuestionIndex, true));
+    			int index = questionIndexes.indexOf(activeQuestionIndex, true);
+    			ChatterboxWidget widget = (ChatterboxWidget)get(index);
     		
     			//Feb 4, 2009 - csims@dimagi.com
     			//The current widget's header should always be pinned in case it overruns the
@@ -306,10 +302,19 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			//#if chatterbox.pinning.current != false
     			widget.setPinned(true);
     			//#endif
+
+    			widget.showCommands();
+    			
+    			//Focus's efforts end up trying to scroll the focussed item upwards as if it were
+    			//already displayed. If we supress the scrolling ahead of time we prevent the
+    			//new item from getting a double-dose of scrolling.
+    			int prevheight = this.container.getScrollHeight();
+    			this.container.setScrollHeight(-1);
     			
     			this.focus(widget, true);
-    			//this.
-    			widget.showCommands();
+    			
+    			//Return to normal scrolling behavior.
+    			this.container.setScrollHeight(prevheight);
     		}
     			
     		//FIXME: no!
@@ -382,6 +387,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     private void putFrame (ChatterboxWidget widget, FormIndex questionIndex) {
     	int frameIndex = questionIndexes.add(questionIndex);
     	insert(frameIndex, widget);
+    	widget.requestInit();
     }
     
     //remove the frame corresponding to a particular question from display
@@ -449,6 +455,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			break;
     		}
     	}
+    	this.requestInit();
+    	this.requestRepaint();
     }
     
     public void commandAction(Command command, Displayable s) {
@@ -521,10 +529,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	} else {
 	    	int status = controller.questionAnswered(frame.getBinding(), frame.getData());
 	    	if (status == FormEntryController.QUESTION_REQUIRED_BUT_EMPTY) {
-	    		showError(null, PROMPT_REQUIRED_QUESTION);
+	        	J2MEDisplay.showError(null, PROMPT_REQUIRED_QUESTION);
 	    	} else if (status == FormEntryController.QUESTION_CONSTRAINT_VIOLATED) {
 	    		String msg = frame.getBinding().instanceNode.getConstraint().constraintMsg; //yikes
-	    		showError(null, msg != null ? msg : PROMPT_DEFAULT_CONSTRAINT_VIOL);
+	    		J2MEDisplay.showError(null, msg != null ? msg : PROMPT_DEFAULT_CONSTRAINT_VIOL);
 	     	}
     	}
     }
@@ -565,11 +573,6 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		super.keyReleased(keyCode);
     		//#endif
     	}
-    }
-
-    //good utility function
-    private void showError(String title, String message) {
-    	J2MEDisplay.showError(title, message);
     }
 
 	public Object getScreenObject() {

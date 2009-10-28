@@ -64,7 +64,7 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 	}
 	
 	public boolean focus () {
-		choiceGroup().focus(choiceGroup().getSelectedIndex());
+		choiceGroup().focusChild(choiceGroup().getSelectedIndex());
 		return true;
 	}
 	
