@@ -33,16 +33,16 @@ public class FormTransportViews {
 	private FormTransportSubmitStatusScreen submitStatusScreen;
 	private MultiSubmitStatusScreen multiSubmitStatusScreen;
 
-	public FormTransportViews(CommandListener observer, ItemStateListener stateListener) {
+	public FormTransportViews(CommandListener observer, ItemStateListener stateListener, TransportResponseProcessor responder) {
 		super();
 //		this.mainMenu = constructMainMenu(observer);
 //		this.messageList = new FormTransportMessageList(observer);
 		this.loggingTextBox = createLoggingTextBox();
 //		this.messageDetailTextBox = new FormTransportMessageDetailBox(observer);
 		this.sendNowSendLater = new SendNowSendLaterForm(observer,stateListener);
-		this.submitStatusScreen = new FormTransportSubmitStatusScreen(observer);
+		this.submitStatusScreen = new FormTransportSubmitStatusScreen(observer, responder);
 
-		this.multiSubmitStatusScreen = new MultiSubmitStatusScreen(observer);
+		this.multiSubmitStatusScreen = new MultiSubmitStatusScreen(observer, responder);
 
 	}
 

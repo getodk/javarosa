@@ -40,13 +40,16 @@ public class FormTransportSubmitStatusScreen extends Form implements
 	private Timer timer;
 	private int counter = 0;
 
+	private TransportResponseProcessor responder;
+	
 	private static final int REFRESH_INTERVAL = 1000;
 	private static final int TIMEOUT = 60000;
 
-	public FormTransportSubmitStatusScreen(CommandListener listener) {
+	public FormTransportSubmitStatusScreen(CommandListener listener, TransportResponseProcessor responder) {
 		//#style submitPopup
 		super(Localization.get("sending.status.title"));
 		setCommandListener(listener);
+		this.responder = responder;
 	}
 
 	
@@ -102,7 +105,7 @@ public class FormTransportSubmitStatusScreen extends Form implements
 					: Localization.get("sending.status.long"));
 			break;
 		case TransportMessageStatus.SENT:
-			message = Localization.get("sending.status.success");// + "  " + getServerResponse();
+			message = getResponseMessage(transportMessage);
 			break;
 		case TransportMessageStatus.CACHED:
 			message = Localization.get("sending.status.failed");
@@ -115,20 +118,17 @@ public class FormTransportSubmitStatusScreen extends Form implements
 		this.msg.setText(message);
 	}
 
+	private String getResponseMessage (TransportMessage message) {
+		if (responder != null) {
+			return responder.getResponseMessage(message);
+		} else {
+			return Localization.get("sending.status.success");
+		}
+	}
+	
 	public void destroy() {
 		deleteAll();
 		this.timer.cancel();
-	}
-
-	/**
-	 * @return
-	 */
-	public String getServerResponse(TransportMessage message) {
-		//receipt = new String(message.); // this does not seem
-		// terribly robust
-
-		//we aren't using this anyway, right now, but we should figure out how to generically get this
-		return "";
 	}
 
 	public void setCacheId(String cacheId) {

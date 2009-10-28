@@ -16,6 +16,7 @@ import org.javarosa.formmanager.api.transitions.FormBatchTransportStateTransitio
 import org.javarosa.formmanager.utility.FormSender;
 import org.javarosa.formmanager.view.transport.FormTransportViews;
 import org.javarosa.formmanager.view.transport.MultiSubmitStatusScreen;
+import org.javarosa.formmanager.view.transport.TransportResponseProcessor;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
@@ -30,9 +31,12 @@ public class FormBatchTransportState implements State<FormBatchTransportStateTra
 	
 	FormBatchTransportStateTransitions transitions;
 
-	
 	public FormBatchTransportState(Vector messages) {
-		FormTransportViews views = new FormTransportViews(this, this);
+		this(messages, null);
+	}
+	
+	public FormBatchTransportState(Vector messages, TransportResponseProcessor responder) {
+		FormTransportViews views = new FormTransportViews(this, this, responder);
 		sender = new FormSender(views,messages);
 		sender.setMultiple(true);
 		screen = views.getMultiSubmitStatusScreen();

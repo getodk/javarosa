@@ -54,11 +54,13 @@ public class MultiSubmitStatusScreen extends Form implements
 	private Hashtable ids;
 	private int failed = 0;
 
+	private TransportResponseProcessor responder;
+	
 	/**
 	 * @param listener
 	 * @param modelIDs
 	 */
-	public MultiSubmitStatusScreen(CommandListener listener) {
+	public MultiSubmitStatusScreen(CommandListener listener, TransportResponseProcessor responder) {
 		//#style submitPopup
 		super(Localization.get("sending.status.title"));
 
@@ -66,6 +68,7 @@ public class MultiSubmitStatusScreen extends Form implements
 
 		addCommand(new Command(Localization.get("menu.ok"), Command.OK, 1));
 
+		this.responder = responder;
 	}
 
 	public void reinit(String[] ids) {
@@ -96,7 +99,7 @@ public class MultiSubmitStatusScreen extends Form implements
 	private void setMessage() {
 		append(new Spacer(80, 0));
 		if (this.ids.size() == 0)
-			this.msg = new StringItem(null, "No forms to send");
+			this.msg = new StringItem(null, Localization.get("sending.status.none"));
 		else
 			this.msg = new StringItem(null, getCurrentDisplay());
 		append(this.msg);
@@ -109,8 +112,10 @@ public class MultiSubmitStatusScreen extends Form implements
 	/**
 	 * @param status
 	 */
-	private void updateStatusDisplay(int status) {
+	private void updateStatusDisplay(TransportMessage transportMessage) {
 
+		int status = transportMessage.getStatus();
+		
 		System.out.println("updateStatusDisplay status= " + status);
 		this.counter += REFRESH_INTERVAL;
 
@@ -153,18 +158,18 @@ public class MultiSubmitStatusScreen extends Form implements
 		}
 		
 		if(this.currentid == ids.size()) {
-			constructFinalMessage();
+			constructFinalMessage(transportMessage);
 		}
 
 	}
 	
-	private void constructFinalMessage() {
+	private void constructFinalMessage(TransportMessage transportMessage) {
 		String message = "";
 		if(failed > 0) { 
 			message += Localization.get("sending.status.failures", new String[]{String.valueOf(failed)}) + "\n";
 		}
 		if(failed < this.ids.size()) {
-			message+= Localization.get("sending.status.success") + " " + getServerResponse() + "\n";
+			message+= getResponseMessage(transportMessage) + "\n";
 		}
 		if(failed == this.ids.size()) {
 			message = Localization.get("sending.status.failed");
@@ -172,6 +177,14 @@ public class MultiSubmitStatusScreen extends Form implements
 		this.msg.setText(message);
 	}
 
+	private String getResponseMessage (TransportMessage message) {
+		if (responder != null) {
+			return responder.getResponseMessage(message);
+		} else {
+			return Localization.get("sending.status.success");
+		}
+	}
+	
 	/**
 	 * @return
 	 */
@@ -182,14 +195,6 @@ public class MultiSubmitStatusScreen extends Form implements
 				String.valueOf(currentid + 1),
 				String.valueOf(ids.size())
 		});
-	}
-
-	/**
-	 * @return
-	 */
-	public String getServerResponse() {
-		//currently unused;
-		return "";
 	}
 
 	/*
@@ -222,7 +227,7 @@ public class MultiSubmitStatusScreen extends Form implements
 	}
 
 	public void onStatusChange(TransportMessage message) {
-		updateStatusDisplay(message.getStatus());
+		updateStatusDisplay(message);
 	}
 
 }
