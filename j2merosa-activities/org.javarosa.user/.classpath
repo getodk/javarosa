@@ -5,12 +5,11 @@
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
-	<classpathentry kind="lib" path="/org.javarosa.demo/tools/j2meunit-javarosa.jar"/>
+	<classpathentry kind="var" path="JRLibs/j2meunit-javarosa.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entity"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.communication"/>
 	<classpathentry kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.dev.states"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.j2me"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
