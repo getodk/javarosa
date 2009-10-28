@@ -53,9 +53,7 @@ public class LoginForm extends FramedForm {
 	private IStorageUtility users;
 	private User loggedInUser;
 
-	private String extraText;
-
-	private boolean testingMode;
+	private String[] extraText;
 	
 	private final static int DEFAULT_ADMIN_USERID = -1;
 
@@ -79,11 +77,10 @@ public class LoginForm extends FramedForm {
 	 * @param title
 	 * @param extraText
 	 */
-	public LoginForm(String title, String extraText, boolean testingMode) {
+	public LoginForm(String title, String[] extraText) {
 		//#style loginView
 		super(title);
 		this.extraText = extraText;
-		this.testingMode = testingMode;
 		init();
 	}
 
@@ -133,9 +130,6 @@ public class LoginForm extends FramedForm {
 		// TODO:what this?
 		addCommand(CMD_CANCEL_LOGIN);
 
-		if(this.testingMode)
-			append("***TEST BUILD***");
-		
 		append(this.usernameField);
 		append(this.passwordField);
 
@@ -156,7 +150,9 @@ public class LoginForm extends FramedForm {
 
 		// put the extra text if it's been set
 		if(this.extraText != null)
-			append(this.extraText);
+			for (int i = 0; i < extraText.length; i++) {
+				append(this.extraText[i]);
+			}
 	}
 
 	/**

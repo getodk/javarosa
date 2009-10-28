@@ -28,21 +28,19 @@ public class LoginState implements State<LoginStateTransitions>, CommandListener
 	LoginForm view;
 	
 	Alert demoModeAlert = null;
-	private String extraText;
-	private boolean testingMode;
+	private String[] extraText;
 	
 	public LoginState() {
 		
 	}
 	
-	public LoginState(String extraText, boolean testingMode) {
+	public LoginState(String[] extraText) {
 		this.extraText = extraText;
-		this.testingMode = testingMode;
 	}
 
 	public void enter(LoginStateTransitions transitions) {
 		this.transitions = transitions;
-		view = new LoginForm(Localization.get("form.login.login"), this.extraText, this.testingMode);
+		view = new LoginForm(Localization.get("form.login.login"), this.extraText);
 		view.setCommandListener(this);
 		view.setPasswordMode(AddUserState.PASSWORD_FORMAT_NUMERIC);
 	}
