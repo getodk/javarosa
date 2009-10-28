@@ -184,10 +184,8 @@ FormNotLoaded= Fomu haijafunguka
 Exit= Toka
 GetNewForms= Pata fomu mpya
 ImageManagement= Image Management
-Messages= Messages
 Recorder= Recorder 
 Settings= Mpangilio 
-TransportMenu= Transport Menu
 
 menu.ok=Sawa
 sending.view.submit=Tuma  Fomu
@@ -218,7 +216,6 @@ sending.status.error=Tatizo lisilojulikana katika uwasilishaji
 
 menu.transport=Transport Menu
 
-SubmissionFailed1=Ujumbe haujapokelewa ila umehifadhiwa.
 PendingReferral=  Rufaa  ambazo  hazijakamilika
 RecentFollowups=  Ufuatiliaji wa Karibuni
 ChooseMgonjwa=  Chagua  Mgonjwa
