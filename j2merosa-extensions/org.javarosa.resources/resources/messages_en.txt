@@ -78,7 +78,6 @@ menu.SendLater=Send Later (Save)
 menu.SendToNewServer=Send to new server
 menu.Scan=Scan
 menu.SendData=Send Data
-menu.SendAllUnsent=Send All Unsent
 menu.Edit=Edit
 menu.Review=Review
 menu.Refresh=Refresh
