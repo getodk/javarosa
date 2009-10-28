@@ -21,9 +21,9 @@ package org.javarosa.formmanager.view.chatterbox;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
+import de.enough.polish.ui.Command;
+import de.enough.polish.ui.CommandListener;
+import de.enough.polish.ui.Displayable;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
 
