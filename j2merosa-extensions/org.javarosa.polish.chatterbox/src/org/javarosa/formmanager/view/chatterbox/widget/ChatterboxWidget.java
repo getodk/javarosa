@@ -16,8 +16,6 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import javax.microedition.lcdui.Command;
-
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.view.FormElementBinding;
@@ -25,6 +23,7 @@ import org.javarosa.formmanager.view.IQuestionWidget;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.ui.ChoiceGroup;
+import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemCommandListener;
@@ -173,7 +172,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 			widget.setDefaultCommand(nextCommand);
 			break;
 		}
-		this.focus(this.itemsList.size()-1);
+		this.focusChild(this.itemsList.size()-1);
 	}
 	
 	private void detachWidget () {
@@ -186,10 +185,12 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 			widget.setItemStateListener(null);
 			break;
 		case NEXT_ON_SELECT:
-			widget.setDefaultCommand(null);
+			if(widget.getDefaultCommand() != null) {
+				widget.removeCommand(widget.getDefaultCommand());
+			}
 			break;
 		}
-		
+				
 		widget.removeCommand(nextCommand);
 		widget.setItemCommandListener((ItemCommandListener)null);
 	}
