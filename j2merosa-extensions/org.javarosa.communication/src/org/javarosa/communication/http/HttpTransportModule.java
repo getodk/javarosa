@@ -18,6 +18,7 @@ package org.javarosa.communication.http;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.services.PropertyManager;
 
 public class HttpTransportModule implements IModule {
 
@@ -30,7 +31,7 @@ public class HttpTransportModule implements IModule {
 		JavaRosaServiceProvider.instance().registerPrototypes(classes);
 		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new HttpTransportMethod());
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new HttpTransportProperties());
+		PropertyManager._().addRules(new HttpTransportProperties());
 		JavaRosaServiceProvider.instance().getTransportManager().setCurrentTransportMethod(new HttpTransportMethod().getId());
 	}
 
