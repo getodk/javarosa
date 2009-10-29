@@ -50,10 +50,10 @@ public class FormEntryModel {
 	}
 
 	public FormEntryModel(FormDef form, int instanceID) {
-		this(form, instanceID, null);
+		this(form, instanceID, null, false);
 	}
 
-	public FormEntryModel(FormDef form, int instanceID, FormIndex firstIndex) {
+	public FormEntryModel(FormDef form, int instanceID, FormIndex firstIndex, boolean readOnly) {
 		this.form = form;
 		this.instanceID = instanceID;
 		this.observers = new Vector();
@@ -63,6 +63,8 @@ public class FormEntryModel {
 									// initially, even with nothing in it
 		this.formCompleted = false;
 		this.startIndex = firstIndex;
+		
+		this.setReadOnly(readOnly);
 	}
 
 	public FormIndex getQuestionIndex() {
@@ -123,8 +125,7 @@ public class FormEntryModel {
 			unsavedChanges = true;
 
 			for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-				((FormEntryModelListener) e.nextElement()).saveStateChanged(
-						instanceID, unsavedChanges);
+				((FormEntryModelListener) e.nextElement()).saveStateChanged(instanceID, unsavedChanges);
 			}
 		}
 	}
@@ -134,8 +135,7 @@ public class FormEntryModel {
 		unsavedChanges = false;
 
 		for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-			((FormEntryModelListener) e.nextElement()).saveStateChanged(
-					instanceID, unsavedChanges);
+			((FormEntryModelListener) e.nextElement()).saveStateChanged(instanceID, unsavedChanges);
 		}
 	}
 

@@ -28,6 +28,11 @@ package org.javarosa.formmanager.view;
 
 //this is generic enough to be renamed 'IActivityView'
 public interface IFormEntryView {
+	
+	/* form entry views MUST call controller.setFormEntryView(this) in their constructors before they
+	 * make any calls to the controller!
+	 */
+	
 	public void destroy ();
 	
 	public void show();

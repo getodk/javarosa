@@ -22,6 +22,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.api.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
@@ -29,9 +30,13 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
 import org.javarosa.formmanager.model.FormEntryModel;
+import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
+import org.javarosa.formmanager.view.IFormEntryViewFactory;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 public class FormEntryController {
 	public static final int QUESTION_OK = 0;
@@ -40,13 +45,40 @@ public class FormEntryController {
 	
 	FormEntryModel model;
 	IFormEntryView view;
-	IControllerHost parent;
-
-	public FormEntryController (FormEntryModel model, IControllerHost parent) {
-		this.model = model;
-		this.parent = parent;
+	
+	FormEntryTransitions transitions;
+	
+	public FormEntryController (IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly) {
+		this(-1, viewFactory, fetcher, readOnly, null);
 	}
 
+	public FormEntryController (int savedInstanceID, IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly) {
+		this(savedInstanceID, viewFactory, fetcher, readOnly, null);
+	}	
+	
+	public FormEntryController (int savedInstanceID, IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly, FormIndex firstQuestion) {
+		FormDef theForm = fetcher.getFormDef();
+		
+		//droos 10/29: what about loading in the old saved instance?
+		
+		model = new FormEntryModel(theForm, savedInstanceID, firstQuestion, readOnly);
+		
+		//the view constructor MUST call setFormEntryView before it makes any calls to the controller
+		//pretty confusing, but that's how it works right now
+		viewFactory.getFormEntryView("Title", model, this);
+	}
+	
+	public void setTransitions (FormEntryTransitions transitions) {
+		this.transitions = transitions;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.State#start()
+	 */
+	public void start() {
+		view.show();
+	}
+	
 	public void setFormEntryView (IFormEntryView view) {
 		this.view = view;
 	}
@@ -133,17 +165,15 @@ public class FormEntryController {
 	}
 
 	public void exit () {
-		this.exit("exit");
-	}
-	public void exit (String code) {
 		view.destroy();
-		parent.controllerReturn(code);
+
+		if(!model.isSaved()) {
+			transitions.abort();
+		} else {
+			transitions.formEntrySaved(model.getForm(), model.getForm().getDataModel(), model.isFormComplete());
+		}
 	}
-
-	public void startOver () {
-
-	}
-
+	
 	public void setLanguage (String language) {
 		model.getForm().getLocalizer().setLocale(language);
 	}
@@ -152,11 +182,13 @@ public class FormEntryController {
 		setLanguage(model.getForm().getLocalizer().getNextLocale());
 	}
 
-	public void setView (Displayable d) {
-		parent.setView(d);
+	public void setView (Displayable view) {
+		J2MEDisplay.setView(view);
 	}
-	public void suspendActivity(Command command) {
-		// added for image choosing
-		parent.controllerReturn(command.getLabel());
+	
+	// added for image choosing
+	public void suspendActivity(int mediaType) {
+		transitions.suspendForMediaCapture(mediaType);
 	}
+	
 }

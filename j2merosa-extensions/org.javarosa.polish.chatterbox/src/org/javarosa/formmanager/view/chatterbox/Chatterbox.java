@@ -33,6 +33,7 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
 import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
@@ -472,18 +473,20 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		controller.exit();
     	} else if (command == saveCommand) {
     		commitAndSave();
-    	} else if (command.getLabel()== Constants.ACTIVITY_TYPE_GET_IMAGES) {
-    		suspendActivity(command);
-    	} else if (command.getLabel()== Constants.ACTIVITY_TYPE_GET_AUDIO) {
-        	suspendActivity(command);
-    	} else if (command.getLabel()== "Capture") {
+    	} else if (command.getLabel() == Constants.ACTIVITY_TYPE_GET_IMAGES) {
+    		suspendActivity(FormEntryTransitions.MEDIA_IMAGE);
+    	} else if (command.getLabel() == Constants.ACTIVITY_TYPE_GET_AUDIO) {
+        	suspendActivity(FormEntryTransitions.MEDIA_AUDIO);
+    	} else if (command.getLabel() == "Capture") {
     		doCapture();
-    	} else if (command.getLabel()== "Back") {
+    	} else if (command.getLabel() == "Back") {
     		backFromCamera();
     	} else if (command.getLabel().equals(CollapsedWidget.UPDATE_TEXT)) { //TODO: Put this static string in a better place.
     		//Return to shell providing the question index.
     		model.setQuestionIndex(this.questionIndexes.get(this.getCurrentIndex()));
-    		controller.exit("update");
+    		
+    		throw new RuntimeException("NOT YET IMPLEMENTED: i don't where to transit to [droos 10/29]");
+    		//controller.exit("update");
     	} else {
     		String language = null;
     		if (multiLingual) {
@@ -504,9 +507,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
 
     
-	private void suspendActivity(Command command) {
-		controller.suspendActivity(command);
+	private void suspendActivity(int mediaType) {
+		controller.suspendActivity(mediaType);
 	}
+	
     private void commitAndSave () {
        	ChatterboxWidget frame = (activeIsInterstitial ? null : activeFrame());
     	if (frame != null) {
