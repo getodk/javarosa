@@ -16,7 +16,8 @@ import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.services.PropertyManager;
-import org.javarosa.services.properties.api.PropertyUpdateState;
+import org.javarosa.core.util.TrivialTransitions;
+import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.services.properties.view.PropertiesScreen;
 
 /**
@@ -29,14 +30,14 @@ public class PropertyUpdateController implements CommandListener, ItemStateListe
 	
     private Hashtable changes;
 
-	private PropertyUpdateState listener;
+	private TrivialTransitions listener;
     
     public static Command CMD_DONE = new Command("Done", Command.BACK, 1);
     public static Command CMD_CANCEL = new Command("Cancel", Command.BACK, 1);
 
 
-	public PropertyUpdateController(PropertyUpdateState listener, PropertiesScreen screen) {
-		this.screen = screen;
+	public PropertyUpdateController(TrivialTransitions listener) {
+		this.screen = new PropertiesScreen(PropertyManager._());
 		this.listener = listener;
 		changes = new Hashtable();
 		this.screen.setCommandListener(this);
@@ -45,6 +46,10 @@ public class PropertyUpdateController implements CommandListener, ItemStateListe
 		this.screen.addCommand(CMD_CANCEL);
 	}
 
+	public void start() {
+		J2MEDisplay.setView(screen);
+	}
+	
 	public void commandAction(Command command, Displayable arg1) {
 		if(command == CMD_DONE) {
 			commitChanges(changes);
