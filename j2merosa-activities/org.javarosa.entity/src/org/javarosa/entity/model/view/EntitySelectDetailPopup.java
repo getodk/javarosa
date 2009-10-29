@@ -25,7 +25,7 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
-import org.javarosa.entity.api.EntitySelectState;
+import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.model.Entity;
 
 import de.enough.polish.ui.Container;
@@ -33,7 +33,7 @@ import de.enough.polish.ui.Form;
 import de.enough.polish.ui.StringItem;
 
 public class EntitySelectDetailPopup<E extends Persistable> extends Form implements CommandListener {
-	EntitySelectState<E> psa;
+	EntitySelectController<E> psa;
 	
 	int recordID;
 	String[] headers;
@@ -42,7 +42,7 @@ public class EntitySelectDetailPopup<E extends Persistable> extends Form impleme
 	Command okCmd;
 	Command backCmd;
 	
-	public EntitySelectDetailPopup (EntitySelectState<E> psa, Entity<E> entity, IStorageUtility storage) {
+	public EntitySelectDetailPopup (EntitySelectController<E> psa, Entity<E> entity, IStorageUtility storage) {
 		super(entity.entityType() + " Detail");
 		
 		this.psa = psa;

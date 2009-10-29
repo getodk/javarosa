@@ -21,7 +21,7 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.services.storage.Persistable;
-import org.javarosa.entity.api.EntitySelectState;
+import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.model.Entity;
 
 import de.enough.polish.ui.Choice;
@@ -32,13 +32,13 @@ import de.enough.polish.ui.ItemStateListener;
 
 public class EntitySelectSortPopup<E extends Persistable> extends Form implements CommandListener, ItemStateListener {
 	private EntitySelectView<E> psv;
-	private EntitySelectState<E> psa;
+	private EntitySelectController<E> psa;
 	private Entity<E> entityPrototype;
 	
     private ChoiceGroup sortField;
     private Command cancelCmd;
 
-    public EntitySelectSortPopup (EntitySelectView<E> psv, EntitySelectState<E> psa, Entity<E> entityPrototype) {
+    public EntitySelectSortPopup (EntitySelectView<E> psv, EntitySelectController<E> psa, Entity<E> entityPrototype) {
 		//#style patselSortPopup
 		super("Sort by...");
 

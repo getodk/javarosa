@@ -27,6 +27,7 @@ import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.Persistable;
+import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.api.EntitySelectState;
 import org.javarosa.entity.model.Entity;
 
@@ -57,7 +58,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	public boolean wrapAround = false; //TODO: support this
 	public int newMode = NEW_IN_LIST;
 		
-	private EntitySelectState<E> controller;
+	private EntitySelectController<E> controller;
 	private Entity<E> entityPrototype;
 	private String baseTitle;
 	
@@ -72,7 +73,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	
 	private Vector<Integer> rowIDs; //index into data corresponding to current matches
 	
-	public EntitySelectView (EntitySelectState<E> controller, Entity<E> entityPrototype, String title, int newMode) {
+	public EntitySelectView (EntitySelectController<E> controller, Entity<E> entityPrototype, String title, int newMode) {
 		super(title);
 		this.baseTitle = title;
 		
