@@ -28,6 +28,6 @@ public abstract class EntitySelectState <E extends Persistable> implements Entit
 		controller.start();
 	}
 	
-	public abstract EntitySelectController<E> getController ();
+	protected abstract EntitySelectController<E> getController ();
 	
 }

@@ -13,7 +13,7 @@ import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.j2me.view.J2MEDisplay;
-import org.javarosa.user.api.transitions.AddUserStateTransitions;
+import org.javarosa.user.api.transitions.AddUserTransitions;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.IUserDecorator;
 import org.javarosa.user.utility.UserValidator;
@@ -23,9 +23,9 @@ import org.javarosa.user.view.UserForm;
  * @author ctsims
  *
  */
-public class AddUserState implements State<AddUserStateTransitions>, CommandListener {
+public class AddUserState implements State<AddUserTransitions>, CommandListener {
 
-	private AddUserStateTransitions transitions;
+	private AddUserTransitions transitions;
 	private UserForm view;
 	
 	public final static String PASSWORD_FORMAT_ALPHA_NUMERIC = "a";
@@ -49,7 +49,7 @@ public class AddUserState implements State<AddUserStateTransitions>, CommandList
 
 	}
 	
-	public void enter(AddUserStateTransitions transitions) {
+	public void enter(AddUserTransitions transitions) {
 		 this.transitions = transitions;
 	}
 
