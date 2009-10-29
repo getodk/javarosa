@@ -20,7 +20,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.locale.Localizer;
 
@@ -92,7 +92,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
             //Check whether this is a dynamic property
             if(prop.size() == 1 && checkPropertyAllowed((String)prop.elementAt(0))) {
                 // If so, get its list of available values, and see whether the potentival value is acceptable.
-                return ((Vector)JavaRosaServiceProvider.instance().getPropertyManager().getProperty((String)prop.elementAt(0))).contains(potentialValue);
+                return ((Vector)PropertyManager._().getProperty((String)prop.elementAt(0))).contains(potentialValue);
             }
             else {
                 return ((Vector)rules.get(propertyName)).contains(potentialValue);
@@ -163,7 +163,7 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      */
     public void handlePropertyChanges(String propertyName) {
     	if(CURRENT_LOCALE.equals(propertyName)) {
-    		String locale = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(propertyName);
+    		String locale = PropertyManager._().getSingularProperty(propertyName);
     		Localization.setLocale(locale);
     	}
     }
