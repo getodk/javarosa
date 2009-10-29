@@ -18,6 +18,7 @@ package org.javarosa.communication.file;
 
 import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.services.PropertyManager;
 
 public class FileTransportModule implements IModule {
 
@@ -29,7 +30,7 @@ public class FileTransportModule implements IModule {
 		JavaRosaServiceProvider.instance().registerPrototypes(classes);
 		
 		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new FileConnectionTransportMethod());
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FileTransportProperties());
+		PropertyManager._().addRules(new FileTransportProperties());
 		JavaRosaServiceProvider.instance().getTransportManager().setCurrentTransportMethod(FileConnectionTransportMethod.FILE);
 	}
 

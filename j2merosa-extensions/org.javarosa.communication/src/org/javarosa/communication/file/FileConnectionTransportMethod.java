@@ -24,8 +24,8 @@ import java.io.OutputStream;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.MessageListener;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -149,7 +149,7 @@ public class FileConnectionTransportMethod implements TransportMethod {
 	 * @see org.javarosa.core.services.transport.TransportMethod#getDefaultDestination()
 	 */
 	public ITransportDestination getDefaultDestination() {
-		String uri = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(FileTransportProperties.SAVE_URI_PROPERTY);
+		String uri = PropertyManager._().getSingularProperty(FileTransportProperties.SAVE_URI_PROPERTY);
 		if(uri == null) {
 			return null;
 		} else {

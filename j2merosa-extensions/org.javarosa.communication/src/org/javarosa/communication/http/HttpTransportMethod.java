@@ -26,8 +26,8 @@ import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.ITransportDestination;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -60,15 +60,14 @@ public class HttpTransportMethod implements TransportMethod {
 	
 	protected void cacheURL(TransportMessage message) {
 		String destinationUrl = ((HttpTransportDestination)message.getDestination()).getURL();
-		Vector existingURLs = JavaRosaServiceProvider.instance()
-		.getPropertyManager().getProperty(
+		Vector existingURLs = PropertyManager._().getProperty(
 				HttpTransportProperties.POST_URL_LIST_PROPERTY);
 		
 		if(existingURLs!=null){
 			if (!existingURLs.contains(destinationUrl)) {
 				existingURLs.addElement(destinationUrl);
-				JavaRosaServiceProvider.instance().getPropertyManager()
-				.setProperty(
+				
+				PropertyManager._().setProperty(
 						HttpTransportProperties.POST_URL_LIST_PROPERTY,
 						existingURLs);
 			}	
@@ -337,7 +336,7 @@ public class HttpTransportMethod implements TransportMethod {
 	 * @see org.javarosa.core.services.transport.TransportMethod#getDefaultDestination()
 	 */
 	public ITransportDestination getDefaultDestination() {
-		String url = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(HttpTransportProperties.POST_URL_PROPERTY);
+		String url = PropertyManager._().getSingularProperty(HttpTransportProperties.POST_URL_PROPERTY);
 		if(url == null) {
 			return null;
 		} else {

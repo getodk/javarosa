@@ -20,7 +20,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
 
 /**
@@ -49,9 +49,9 @@ public class HttpTransportProperties implements IPropertyRules {
         // PostURL List Property
         rules.put(POST_URL_LIST_PROPERTY, new Vector());
         readOnlyProperties.addElement(POST_URL_LIST_PROPERTY);
-        Vector postList = JavaRosaServiceProvider.instance().getPropertyManager().getProperty(POST_URL_LIST_PROPERTY);
+        Vector postList = PropertyManager._().getProperty(POST_URL_LIST_PROPERTY);
         if(postList == null) {
-        	JavaRosaServiceProvider.instance().getPropertyManager().setProperty(POST_URL_LIST_PROPERTY, new Vector());
+        	PropertyManager._().setProperty(POST_URL_LIST_PROPERTY, new Vector());
         }
         
 
@@ -87,7 +87,7 @@ public class HttpTransportProperties implements IPropertyRules {
             //Check whether this is a dynamic property
             if(prop.size() == 1 && checkPropertyAllowed((String)prop.elementAt(0))) {
                 // If so, get its list of available values, and see whether the potentival value is acceptable.
-                return ((Vector)JavaRosaServiceProvider.instance().getPropertyManager().getProperty((String)prop.elementAt(0))).contains(potentialValue);
+                return ((Vector)PropertyManager._().getProperty((String)prop.elementAt(0))).contains(potentialValue);
             }
             else {
                 return ((Vector)rules.get(propertyName)).contains(potentialValue);
