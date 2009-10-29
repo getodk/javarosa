@@ -23,7 +23,8 @@ import org.javarosa.j2me.view.J2MEDisplay;
  * @author ctsims
  *
  */
-public class FormBatchTransportState implements State<FormBatchTransportStateTransitions>, CommandListener, ItemStateListener {
+public abstract class FormBatchTransportState implements FormBatchTransportStateTransitions, State, CommandListener, ItemStateListener {
+	//not separating out state/controller/etc, as form send is already kind of a mess
 
 	MultiSubmitStatusScreen screen;
 	
@@ -40,10 +41,7 @@ public class FormBatchTransportState implements State<FormBatchTransportStateTra
 		sender = new FormSender(views,messages);
 		sender.setMultiple(true);
 		screen = views.getMultiSubmitStatusScreen();
-	}
-
-	public void enter(FormBatchTransportStateTransitions transitions) {
-		this.transitions = transitions;
+		this.transitions = this;
 	}
 
 	public void start() {
