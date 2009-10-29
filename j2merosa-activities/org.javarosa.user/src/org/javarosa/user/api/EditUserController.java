@@ -20,23 +20,21 @@ import org.javarosa.user.view.UserForm;
  * @author ctsims
  *
  */
-public class EditUserState implements State<EditUserTransitions>, CommandListener {
+public class EditUserController implements CommandListener {
 	
 	EditUserTransitions transitions;
 	
 	UserForm view;
 	
-	public final static Command CMD_SAVE = new Command(Localization.get("menu.Save"),
-			Command.OK, 2);
-	public final static Command CMD_CANCEL = new Command(Localization.get("menu.Exit"),
-			Command.EXIT, 2);
+	public final static Command CMD_SAVE = new Command(Localization.get("menu.Save"), Command.OK, 2);
+	public final static Command CMD_CANCEL = new Command(Localization.get("menu.Exit"), Command.EXIT, 2);
 
 	
-	public EditUserState(String passwordFormat, User userToEdit) {
+	public EditUserController(String passwordFormat, User userToEdit) {
 		this(passwordFormat, userToEdit, null);
 	}
 	
-	public EditUserState(String passwordFormat, User userToEdit, IUserDecorator decorator) {
+	public EditUserController(String passwordFormat, User userToEdit, IUserDecorator decorator) {
 		//take this out into an activity
 		view = new UserForm("Edit User", decorator);
 		view.setPasswordMode(passwordFormat);
@@ -47,7 +45,7 @@ public class EditUserState implements State<EditUserTransitions>, CommandListene
 		view.loadUser(userToEdit);
 	}
 
-	public void enter(EditUserTransitions transitions) {
+	public void setTransitions (EditUserTransitions transitions) {
 		this.transitions = transitions;
 	}
 

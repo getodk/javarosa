@@ -36,7 +36,7 @@ public class LoginController implements CommandListener {
 		this.extraText = extraText;
 		view = new LoginForm(Localization.get("form.login.login"), this.extraText);
 		view.setCommandListener(this);
-		view.setPasswordMode(AddUserState.PASSWORD_FORMAT_NUMERIC);
+		view.setPasswordMode(AddUserController.PASSWORD_FORMAT_NUMERIC);
 	}
 
 	public void setTransitions (LoginTransitions transitions) {

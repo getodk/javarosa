@@ -24,7 +24,7 @@ import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
-import org.javarosa.user.api.AddUserState;
+import org.javarosa.user.api.AddUserController;
 import org.javarosa.user.model.User;
 
 import de.enough.polish.ui.FramedForm;
@@ -206,10 +206,10 @@ public class LoginForm extends FramedForm {
 	 * @param passwordMode
 	 */
 	public void setPasswordMode(String passwordMode) {
-		if (AddUserState.PASSWORD_FORMAT_NUMERIC.equals(passwordMode)) {
+		if (AddUserController.PASSWORD_FORMAT_NUMERIC.equals(passwordMode)) {
 			this.passwordField.setConstraints(TextField.PASSWORD
 					| TextField.NUMERIC);
-		} else if (AddUserState.PASSWORD_FORMAT_ALPHA_NUMERIC
+		} else if (AddUserController.PASSWORD_FORMAT_ALPHA_NUMERIC
 				.equals(passwordMode)) {
 			this.passwordField.setConstraints(TextField.PASSWORD);
 		}
