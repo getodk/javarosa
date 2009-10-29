@@ -23,7 +23,7 @@ import org.javarosa.j2me.view.J2MEDisplay;
  * @author ctsims
  *
  */
-public class CaseManagementState implements State<CaseManagementTransitions>, CommandListener {
+public class CaseManagementController implements CommandListener {
     public static final String NEW = "menu.NewCase";
     public static final String FOLLOWUP = "menu.FollowUp";
     public static final String REFERRAL = "menu.Referral";
@@ -36,12 +36,20 @@ public class CaseManagementState implements State<CaseManagementTransitions>, Co
 
 	Vector indexMapping = new Vector();
 	
-	public CaseManagementState(ICaseType type) {
+	public CaseManagementController(ICaseType type) {
 		this.type = type;
 		
 		view = new CaseManagementScreen("Select Action");
 		configView();
 		view.setCommandListener(this);
+	}
+	
+	public void setTransitions (CaseManagementTransitions transitions) {
+		this.transitions = transitions;
+	}
+
+	public void start() {
+		J2MEDisplay.getDisplay().setCurrent(view);
 	}
 	
 	private void configView() {
@@ -86,14 +94,6 @@ public class CaseManagementState implements State<CaseManagementTransitions>, Co
 		String caption = captionForAction(action);
 		indexMapping.addElement(new Integer(action));
 		view.insert(action, caption, null);
-	}
-		
-	public void enter(CaseManagementTransitions transitions) {
-		this.transitions = transitions;
-	}
-
-	public void start() {
-		J2MEDisplay.getDisplay().setCurrent(view);
 	}
 
 	public void commandAction(Command c, Displayable arg1) {

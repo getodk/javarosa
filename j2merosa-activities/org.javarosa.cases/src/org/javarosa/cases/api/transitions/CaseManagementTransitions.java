@@ -3,13 +3,12 @@
  */
 package org.javarosa.cases.api.transitions;
 
-import org.javarosa.core.api.Transitions;
 
 /**
  * @author ctsims
  *
  */
-public interface CaseManagementTransitions extends Transitions{
+public interface CaseManagementTransitions {
 	public void newCase();
 	public void followUpOnCase();
 	public void viewReferrals();
