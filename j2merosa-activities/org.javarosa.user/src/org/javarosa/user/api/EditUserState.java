@@ -10,7 +10,7 @@ import javax.microedition.lcdui.Displayable;
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.j2me.view.J2MEDisplay;
-import org.javarosa.user.api.transitions.EditUserStateTransitions;
+import org.javarosa.user.api.transitions.EditUserTransitions;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.IUserDecorator;
 import org.javarosa.user.utility.UserValidator;
@@ -20,9 +20,9 @@ import org.javarosa.user.view.UserForm;
  * @author ctsims
  *
  */
-public class EditUserState implements State<EditUserStateTransitions>, CommandListener {
+public class EditUserState implements State<EditUserTransitions>, CommandListener {
 	
-	EditUserStateTransitions transitions;
+	EditUserTransitions transitions;
 	
 	UserForm view;
 	
@@ -47,7 +47,7 @@ public class EditUserState implements State<EditUserStateTransitions>, CommandLi
 		view.loadUser(userToEdit);
 	}
 
-	public void enter(EditUserStateTransitions transitions) {
+	public void enter(EditUserTransitions transitions) {
 		this.transitions = transitions;
 	}
 

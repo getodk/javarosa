@@ -3,18 +3,15 @@
  */
 package org.javarosa.user.api;
 
-import java.util.Vector;
-
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
 
-import org.javarosa.core.api.State;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.j2me.view.J2MEDisplay;
-import org.javarosa.user.api.transitions.LoginStateTransitions;
+import org.javarosa.user.api.transitions.LoginTransitions;
 import org.javarosa.user.model.User;
 import org.javarosa.user.view.LoginForm;
 
@@ -22,27 +19,28 @@ import org.javarosa.user.view.LoginForm;
  * @author ctsims
  *
  */
-public class LoginState implements State<LoginStateTransitions>, CommandListener {
+public class LoginController implements CommandListener {
 	
-	LoginStateTransitions transitions;
+	LoginTransitions transitions;
+
 	LoginForm view;
 	
 	Alert demoModeAlert = null;
 	private String[] extraText;
 	
-	public LoginState() {
-		
+	public LoginController() {
+		this(null);
 	}
 	
-	public LoginState(String[] extraText) {
+	public LoginController(String[] extraText) {
 		this.extraText = extraText;
-	}
-
-	public void enter(LoginStateTransitions transitions) {
-		this.transitions = transitions;
 		view = new LoginForm(Localization.get("form.login.login"), this.extraText);
 		view.setCommandListener(this);
 		view.setPasswordMode(AddUserState.PASSWORD_FORMAT_NUMERIC);
+	}
+
+	public void setTransitions (LoginTransitions transitions) {
+		this.transitions = transitions;
 	}
 	
 	public void start() {

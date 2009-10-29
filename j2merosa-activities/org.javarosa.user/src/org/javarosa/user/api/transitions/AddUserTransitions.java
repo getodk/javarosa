@@ -10,8 +10,7 @@ import org.javarosa.user.model.User;
  * @author ctsims
  *
  */
-public interface EditUserStateTransitions extends Transitions {
-	public void userEdited(User editedUser);
-	
+public interface AddUserTransitions extends Transitions {
+	public void userAdded(User newUser);
 	public void cancel();
 }
