@@ -3,14 +3,10 @@
  */
 package org.javarosa.formmanager.utility;
 
-import java.io.IOException;
-
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
-import org.javarosa.core.util.externalizable.DeserializationException;
 
 /**
  * @author ctsims
@@ -21,17 +17,17 @@ public class ModelRmsRetrievalMethod implements IFormDefRetrievalMethod {
 	RMSRetreivalMethod method;
 	DataModelTree model;
 	
-	public ModelRmsRetrievalMethod(DataModelTree model) throws IOException, DeserializationException  {
+	public ModelRmsRetrievalMethod(DataModelTree model) {
 		construct(model);
 		this.model = model;
 	}
 	
-	public ModelRmsRetrievalMethod(int modelId) throws DeserializationException, IOException {
+	public ModelRmsRetrievalMethod(int modelId) {
 		IStorageUtility instances = StorageManager.getStorage(DataModelTree.STORAGE_KEY);
 		construct((DataModelTree)instances.read(modelId));
 	}
 	
-	private void construct(DataModelTree model) throws IOException, DeserializationException  {
+	private void construct(DataModelTree model) {
 		method = new RMSRetreivalMethod(model.getFormId());
 	}
 	
