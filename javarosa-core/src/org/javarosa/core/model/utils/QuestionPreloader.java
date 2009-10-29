@@ -19,12 +19,12 @@ package org.javarosa.core.model.utils;
 import java.util.Date;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.util.Map;
 import org.javarosa.core.util.PropertyUtils;
 
@@ -243,7 +243,7 @@ public class QuestionPreloader {
 	 */
 	private IAnswerData preloadProperty(String preloadParams) {
 		String propname = preloadParams;
-		String propval = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(propname);
+		String propval = PropertyManager._().getSingularProperty(propname);
 		StringData data = null;
 		if (propval != null && propval.length() > 0) {
 			data = new StringData(propval);
@@ -255,7 +255,7 @@ public class QuestionPreloader {
 		IAnswerData answer = node.getValue();
 		String value = (answer == null ? null : answer.getDisplayText());
 		if (propName != null && propName.length() > 0 && value != null && value.length() > 0)
-			JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propName, value);
+			PropertyManager._().setProperty(propName, value);
 	}
 	
 	private DateTimeData getTimestamp() {
