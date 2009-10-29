@@ -35,17 +35,14 @@ public class PropertyUpdateController implements CommandListener, ItemStateListe
     public static Command CMD_CANCEL = new Command("Cancel", Command.BACK, 1);
 
 
-	public PropertyUpdateController(PropertiesScreen screen) {
+	public PropertyUpdateController(PropertyUpdateState listener, PropertiesScreen screen) {
 		this.screen = screen;
+		this.listener = listener;
 		changes = new Hashtable();
 		this.screen.setCommandListener(this);
 		this.screen.setItemStateListener(this);
 		this.screen.addCommand(CMD_DONE);
 		this.screen.addCommand(CMD_CANCEL);
-	}
-	
-	public void setListener(PropertyUpdateState listener) {
-		this.listener = listener;
 	}
 
 	public void commandAction(Command command, Displayable arg1) {
