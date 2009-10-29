@@ -23,28 +23,26 @@ import org.javarosa.services.transport.TransportMessage;
  * @author ctsims
  *
  */
-public class FormTransportState implements State<FormTransportStateTransitions>, CommandListener, ItemStateListener {
+public abstract class FormTransportState implements FormTransportStateTransitions, State, CommandListener, ItemStateListener {
+	//not separating out state/controller/etc, as form send is already kind of a mess
 	
 	FormTransportStateTransitions transitions;
 	FormTransportSubmitStatusScreen screen;
 	
 	FormSender sender;
 
-	public FormTransportState(DataModelTree dataModel, TransportMessage message) {
-		this(dataModel, message, null);
+	public FormTransportState(TransportMessage message) {
+		this(message, null);
 	}
 	
-	public FormTransportState(DataModelTree dataModel, TransportMessage message, TransportResponseProcessor responder) {
+	public FormTransportState(TransportMessage message, TransportResponseProcessor responder) {
 		FormTransportViews views = new FormTransportViews(this, this, responder);
 		sender = new FormSender(views, message);
 		sender.setMultiple(false);
 		screen = views.getSubmitStatusScreen();
+		this.transitions = this;
 	}
 	
-	public void enter(FormTransportStateTransitions transitions) {
-		this.transitions = transitions;
-	}
-
 	public void start() {
 		sender.setObserver(screen);
 		sender.sendData();

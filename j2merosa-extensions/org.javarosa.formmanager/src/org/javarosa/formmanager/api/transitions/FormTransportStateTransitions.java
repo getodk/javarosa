@@ -3,13 +3,13 @@
  */
 package org.javarosa.formmanager.api.transitions;
 
-import org.javarosa.core.api.Transitions;
 
 /**
  * @author ctsims
  *
  */
-public interface FormTransportStateTransitions extends Transitions{
+public interface FormTransportStateTransitions {
+	
 	public void done();
 	
 	//TODO: Add an argument here for a thread manager
