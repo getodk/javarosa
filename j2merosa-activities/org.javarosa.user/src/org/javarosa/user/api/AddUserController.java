@@ -23,7 +23,7 @@ import org.javarosa.user.view.UserForm;
  * @author ctsims
  *
  */
-public class AddUserState implements State<AddUserTransitions>, CommandListener {
+public class AddUserController implements CommandListener {
 
 	private AddUserTransitions transitions;
 	private UserForm view;
@@ -36,11 +36,10 @@ public class AddUserState implements State<AddUserTransitions>, CommandListener 
 	public final static Command CMD_CANCEL = new Command(Localization.get("menu.Exit"),
 			Command.EXIT, 2);
 
-	
-	public AddUserState(String passwordFormat) {
+	public AddUserController(String passwordFormat) {
 		this(passwordFormat, null);
 	}
-	public AddUserState(String passwordFormat, IUserDecorator decorator) {
+	public AddUserController(String passwordFormat, IUserDecorator decorator) {
 		this.view = new UserForm(Localization.get("activity.adduser.adduser"), decorator);
 		this.view.setPasswordMode(passwordFormat);
 		this.view.addCommand(CMD_SAVE);
@@ -49,7 +48,7 @@ public class AddUserState implements State<AddUserTransitions>, CommandListener 
 
 	}
 	
-	public void enter(AddUserTransitions transitions) {
+	public void setTransitions(AddUserTransitions transitions) {
 		 this.transitions = transitions;
 	}
 
