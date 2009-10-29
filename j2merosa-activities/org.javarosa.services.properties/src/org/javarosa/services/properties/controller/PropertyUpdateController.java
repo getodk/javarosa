@@ -15,7 +15,8 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.TextField;
 
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.PropertyManager;
+import org.javarosa.services.properties.api.PropertyUpdateState;
 import org.javarosa.services.properties.view.PropertiesScreen;
 
 /**
@@ -28,7 +29,7 @@ public class PropertyUpdateController implements CommandListener, ItemStateListe
 	
     private Hashtable changes;
 
-	private PropertyUpdateControllerListener listener;
+	private PropertyUpdateState listener;
     
     public static Command CMD_DONE = new Command("Done", Command.BACK, 1);
     public static Command CMD_CANCEL = new Command("Cancel", Command.BACK, 1);
@@ -43,7 +44,7 @@ public class PropertyUpdateController implements CommandListener, ItemStateListe
 		this.screen.addCommand(CMD_CANCEL);
 	}
 	
-	public void setListener(PropertyUpdateControllerListener listener) {
+	public void setListener(PropertyUpdateState listener) {
 		this.listener = listener;
 	}
 
@@ -51,7 +52,7 @@ public class PropertyUpdateController implements CommandListener, ItemStateListe
 		if(command == CMD_DONE) {
 			commitChanges(changes);
 		}
-		listener.finished();
+		listener.done();
 	}
 
     public void itemStateChanged(Item item) {
@@ -65,7 +66,7 @@ public class PropertyUpdateController implements CommandListener, ItemStateListe
                 // This is a weird way to do this, but essentially works as long
                 // as there is only
                 // one possible property (which is true for now).
-                if (JavaRosaServiceProvider.instance().getPropertyManager().getProperty(propertyName)
+                if (PropertyManager._().getProperty(propertyName)
                         .contains(selection)) {
                     changes.remove(propertyName);
                 } else {
@@ -78,7 +79,7 @@ public class PropertyUpdateController implements CommandListener, ItemStateListe
             // This is a weird way to do this, but essentially works as long as
             // there is only
             // one possible property (which is true for now).
-            Vector prop = JavaRosaServiceProvider.instance().getPropertyManager().getProperty(propertyName);
+            Vector prop = PropertyManager._().getProperty(propertyName);
             if(prop == null) {
             	prop = new Vector();
             }
@@ -100,7 +101,7 @@ public class PropertyUpdateController implements CommandListener, ItemStateListe
         while (iter.hasMoreElements()) {
             String propertyName = iter.nextElement().toString();
             String value = changes.get(propertyName).toString();
-            JavaRosaServiceProvider.instance().getPropertyManager().setProperty(propertyName, value);
+            PropertyManager._().setProperty(propertyName, value);
 			//#if debug.output==verbose
             System.out.println("Property " + propertyName + " is now " + value);
             //#endif
