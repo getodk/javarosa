@@ -24,20 +24,15 @@ import java.util.Vector;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IDaemon;
 import org.javarosa.core.api.IIncidentLogger;
-import org.javarosa.core.services.IPropertyManager;
 import org.javarosa.core.services.IService;
 import org.javarosa.core.services.ITransportManager;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.UnavailableServiceException;
-import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
-import org.javarosa.core.services.properties.Property;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.services.transport.TransportMessage;
-import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.PrefixTree;
-import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.core.util.externalizable.CannotCreateObjectException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -56,7 +51,6 @@ public class JavaRosaServiceProvider {
 	private Hashtable daemons;
 
     private ITransportManager transportManager;
-    private IPropertyManager propertyManager;
     
     private IIncidentLogger logger;
 	
@@ -95,9 +89,7 @@ public class JavaRosaServiceProvider {
 	    for (Enumeration e = services.elements() ; e.hasMoreElements() ;) {
 	        service = (IService) e.nextElement();
 	        name = service.getName();
-	        if (name.equals(Constants.PROPERTY_MANAGER)) {
-                propertyManager = (IPropertyManager) service;
-            } else if (name.equals(Constants.TRANSPORT_MANAGER)) {
+            if (name.equals(Constants.TRANSPORT_MANAGER)) {
 	            transportManager = (ITransportManager) service;
 	        }
             registerService(service);
@@ -120,14 +112,7 @@ public class JavaRosaServiceProvider {
 		return transportManager;
 	}
 	
-	public IPropertyManager getPropertyManager() {
-		if(propertyManager == null) {
-			StorageManager.registerStorage(PropertyManager.STORAGE_KEY, Property.class);			
-			propertyManager = new PropertyManager();
-			this.registerService(propertyManager);
-		}
-		return propertyManager;
-	}
+
 	
 
 	public void registerDaemon(IDaemon daemon, String name) {
@@ -191,7 +176,7 @@ public class JavaRosaServiceProvider {
 	 * @param message A message describing the incident.
 	 */
 	public void logIncident(String type, String message) {
-		if(JavaRosaPropertyRules.LOGS_ENABLED_YES.equals(this.getPropertyManager().getSingularProperty(JavaRosaPropertyRules.LOGS_ENABLED))){
+		if(JavaRosaPropertyRules.LOGS_ENABLED_YES.equals(PropertyManager._().getSingularProperty(JavaRosaPropertyRules.LOGS_ENABLED))){
 		if(logger != null) {
 			logger.logIncident(type, message, new Date());
 		} else {

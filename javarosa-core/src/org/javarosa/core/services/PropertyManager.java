@@ -37,12 +37,35 @@ import org.javarosa.core.services.storage.StorageManager;
  * @author Clayton Sims
  *
  */
-public class PropertyManager implements IService,IPropertyManager {
+public class PropertyManager implements IPropertyManager {
+	
+	///// manage global property manager /////
+	
+    private static IPropertyManager instance; //a global instance of the property manager
+
+    public static void setPropertyManager (IPropertyManager pm) {
+    	instance = pm;
+    }
+    
+    public static void initDefaultPropertyManager () {
+		StorageManager.registerStorage(PropertyManager.STORAGE_KEY, Property.class);			
+   		setPropertyManager(new PropertyManager());
+    }
+    	
+    public static IPropertyManager _ () {
+   		if (instance == null) {
+   			initDefaultPropertyManager();
+   		}
+  		return instance;
+    }
+    
+    //////////////////////////////////////////
+    
 	/**
 	 * The name for the Persistent storage utility name
 	 */
     public static final String STORAGE_KEY = "PROPERTY";
-
+    
     /**
      * The list of rules 
      */
@@ -53,10 +76,6 @@ public class PropertyManager implements IService,IPropertyManager {
      */
     private IStorageUtilityIndexed properties;
     
-    public String getName() {
-    	return "Property Manager";
-    }
-
     /**
      * Constructor for this PropertyManager
      */
@@ -64,7 +83,7 @@ public class PropertyManager implements IService,IPropertyManager {
     	this.properties = (IStorageUtilityIndexed)StorageManager.getStorage(STORAGE_KEY);
     	rulesList = new Vector();
     }
-
+    
     /**
      * Retrieves the singular property specified, as long as it exists in one of the current rulesets
      *

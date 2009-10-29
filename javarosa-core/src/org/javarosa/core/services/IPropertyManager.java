@@ -26,9 +26,8 @@ import org.javarosa.core.services.properties.IPropertyRules;
  * @author Yaw Anokwa
  *
  */
-public interface IPropertyManager extends IService {
+public interface IPropertyManager {
 
-    public String getName();
     public Vector getProperty(String propertyName);
     public void setProperty(String propertyName, String propertyValue);
     public void setProperty(String propertyName, Vector propertyValue);
