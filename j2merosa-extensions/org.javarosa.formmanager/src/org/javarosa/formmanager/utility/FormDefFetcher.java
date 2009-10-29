@@ -40,12 +40,12 @@ public class FormDefFetcher {
 		this.preloadHandlers = preloadHandlers; 	
 	}
 	
-	public FormDefFetcher(IFormDefRetrievalMethod retriever, Vector preloadHandlers, int instanceId) throws IOException, DeserializationException {
+	public FormDefFetcher(IFormDefRetrievalMethod retriever, Vector preloadHandlers, int instanceId) {
 		this(retriever, preloadHandlers);
 		loadModel(instanceId);
 	}
 	
-	private void loadModel(int instanceId) throws IOException, DeserializationException {
+	private void loadModel(int instanceId) {
 		IStorageUtility instances = StorageManager.getStorage(DataModelTree.STORAGE_KEY);
 		instance = (DataModelTree)instances.read(instanceId);
 	}

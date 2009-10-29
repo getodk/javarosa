@@ -16,19 +16,17 @@
 
 package org.javarosa.formmanager.utility;
 
-import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.IStorageUtilityIndexed;
 import org.javarosa.core.services.storage.StorageManager;
-import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class RMSRetreivalMethod implements IFormDefRetrievalMethod {
 	private FormDef def;
 
-	public RMSRetreivalMethod(int formId) throws IOException, DeserializationException {
+	public RMSRetreivalMethod(int formId) {
 		load(formId);
 	}
 	
