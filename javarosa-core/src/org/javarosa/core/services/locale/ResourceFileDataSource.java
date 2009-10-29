@@ -92,7 +92,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 		int chunk = 100;
 		InputStreamReader isr;
 		try {
-			isr = new InputStreamReader(is);
+			isr = new InputStreamReader(is,"UTF-8");
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to load locale resource " + resourceName + ". Is it in the jar?");
@@ -101,7 +101,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 		char[] cbuf = new char[chunk];
 		int offset = 0;
 		int curline = 0;
-		
+
 		try {
 			String line = "";
 			while (!done) {
@@ -113,7 +113,29 @@ public class ResourceFileDataSource implements LocaleDataSource {
 					}
 					break;
 				}
-				for(int i = 0 ; i < read ; ++i) {
+				String stringchunk = String.valueOf(cbuf);
+				
+				int index = 0;
+				
+				while(index != -1) {
+					int nindex = stringchunk.indexOf('\n',index);
+					//UTF-8 often doesn't encode with newline, but with CR, so if we 
+					//didn't find one, we'll try that
+					if(nindex == -1) { nindex = stringchunk.indexOf('\r',index); }
+					if(nindex == -1) {
+						line += stringchunk.substring(index);
+						break;
+					}
+					else {
+						line += stringchunk.substring(index,nindex);
+						//Newline. process our string and start the next one.
+						curline++;
+						parseAndAdd(locale, line, curline);
+						line = "";
+					}
+					index = nindex + 1;
+				}
+				/*for(int i = 0 ; i < read ; ++i) {
 					//TODO: Endline formats?
 					if(cbuf[i] == '\n') {
 						curline ++;
@@ -123,7 +145,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 					} else {
 						line += cbuf[i];
 					}
-				}
+				}*/
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
