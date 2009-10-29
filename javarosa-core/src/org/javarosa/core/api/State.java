@@ -7,7 +7,9 @@ package org.javarosa.core.api;
  * @author ctsims
  *
  */
-public interface State<T extends Transitions> {
-	public void enter(T transitions);
+public interface State {
+
 	public void start();
+
 }
+
