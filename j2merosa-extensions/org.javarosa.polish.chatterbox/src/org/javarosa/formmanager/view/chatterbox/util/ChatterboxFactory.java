@@ -18,8 +18,7 @@ public class ChatterboxFactory implements IFormEntryViewFactory {
 	/* (non-Javadoc)
 	 * @see org.javarosa.formmanager.view.IFormEntryViewFactory#getFormEntryView(java.lang.String, org.javarosa.formmanager.model.FormEntryModel, org.javarosa.formmanager.controller.FormEntryController)
 	 */
-	public IFormEntryView getFormEntryView(String viewType,
-			FormEntryModel model, FormEntryController controller) {
+	public IFormEntryView getFormEntryView(String viewType, FormEntryModel model, FormEntryController controller) {
 		return new Chatterbox(viewType, model, controller);
 	}
 
