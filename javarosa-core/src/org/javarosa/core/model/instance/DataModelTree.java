@@ -24,7 +24,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
@@ -35,6 +34,7 @@ import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.ServiceRegistry;
 import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;

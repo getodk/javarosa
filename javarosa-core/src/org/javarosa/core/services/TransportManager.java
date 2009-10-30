@@ -44,7 +44,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * 
  * @author <a href="mailto:m.nuessler@gmail.com">Matthias Nuessler</a>
  */
-public class TransportManager implements Observer, IService, ITransportManager {
+public class TransportManager implements Observer, ITransportManager {
 
 	//////////////////// global /////////////////////
 	

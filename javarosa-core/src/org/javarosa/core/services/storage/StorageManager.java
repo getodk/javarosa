@@ -16,11 +16,7 @@
 
 package org.javarosa.core.services.storage;
 
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
-
-import org.javarosa.core.services.IService;
 
 /* droos: what is the future of this class? i think it will take a different form with the new storage API */
 
