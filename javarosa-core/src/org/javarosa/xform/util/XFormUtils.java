@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -45,7 +46,14 @@ public class XFormUtils {
 
 	public static FormDef getFormFromInputStream(InputStream is) {
 		FormDef returnForm = null;
-		InputStreamReader isr = new InputStreamReader(is);
+		InputStreamReader isr;
+		try {
+			isr = new InputStreamReader(is,"UTF-8");
+		} catch(UnsupportedEncodingException uee) {
+			System.out.println("UTF 8 encoding unavailable, trying default encoding");
+			isr = new InputStreamReader(is); 
+		}
+		
 		if(isr != null) {
 			returnForm = XFormParser.getFormDef(isr);
 		}
