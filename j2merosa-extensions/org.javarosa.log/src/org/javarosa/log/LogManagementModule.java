@@ -19,8 +19,8 @@
  */
 package org.javarosa.log;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.services.ServiceRegistry;
 import org.javarosa.log.properties.LogPropertyRules;
 
 /**
@@ -34,7 +34,7 @@ public class LogManagementModule implements IModule {
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
 	public void registerModule() {
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new LogPropertyRules());
+		ServiceRegistry.instance().getPropertyManager().addRules(new LogPropertyRules());
 	}
 
 }

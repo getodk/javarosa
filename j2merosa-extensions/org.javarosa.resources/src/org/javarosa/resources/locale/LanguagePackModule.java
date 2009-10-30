@@ -19,11 +19,9 @@
  */
 package org.javarosa.resources.locale;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.services.locale.Localizer;
-import org.javarosa.core.services.locale.ResourceFileDataSource;
+
 
 /**
  * @author Clayton Sims

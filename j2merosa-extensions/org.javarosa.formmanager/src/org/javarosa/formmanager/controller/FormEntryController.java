@@ -21,12 +21,12 @@ import java.util.Date;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.services.ServiceRegistry;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;

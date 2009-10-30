@@ -30,13 +30,13 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.communication.http.HttpTransportDestination;
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.log.FlatLogSerializer;
+import org.javarosa.core.services.ServiceRegistry;
 import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.log.properties.LogPropertyRules;
@@ -123,18 +123,18 @@ public class LogManagementActivity implements IActivity, CommandListener {
 	 * 
 	 */
 	private void sendLogs() {
-		byte[] logData = JavaRosaServiceProvider.instance().getIncidentLogger()
+		byte[] logData = ServiceRegistry.instance().getIncidentLogger()
 				.serializeLogs(new FlatLogSerializer());
 		ByteArrayPayload payload = new ByteArrayPayload(logData, "",
 				IDataPayload.PAYLOAD_TYPE_TEXT);
 		HttpTransportDestination destination = new HttpTransportDestination(
-				JavaRosaServiceProvider.instance().getPropertyManager()
+				ServiceRegistry.instance().getPropertyManager()
 						.getSingularProperty(LogPropertyRules.LOG_SUBMIT_URL));
 		try {
-			JavaRosaServiceProvider.instance().getTransportManager().enqueue(
+			ServiceRegistry.instance().getTransportManager().enqueue(
 					payload,
 					destination,
-					JavaRosaServiceProvider.instance().getTransportManager()
+					ServiceRegistry.instance().getTransportManager()
 							.getCurrentTransportMethod(), 0);
 			// #style mailAlert
 			final Alert sending = new Alert("Sending Started",
@@ -166,7 +166,7 @@ public class LogManagementActivity implements IActivity, CommandListener {
 	 */
 	private void viewLogs() {
 		this.viewer.deleteAll();
-		byte[] logData = JavaRosaServiceProvider.instance().getIncidentLogger()
+		byte[] logData = ServiceRegistry.instance().getIncidentLogger()
 				.serializeLogs(new FlatLogSerializer());
 		this.viewer.loadLogs(new String(logData));
 		this.viewer.setCommandListener(this);
@@ -178,7 +178,7 @@ public class LogManagementActivity implements IActivity, CommandListener {
 	 * 
 	 */
 	private void clearLogs() {
-		JavaRosaServiceProvider.instance().getIncidentLogger().clearLogs();
+		ServiceRegistry.instance().getIncidentLogger().clearLogs();
 		// #style mailAlert
 		final Alert success = new Alert("Logs Cleared",
 				"Logs cleared succesfully", null, AlertType.CONFIRMATION);

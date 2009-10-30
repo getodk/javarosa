@@ -16,7 +16,6 @@
 
 package org.javarosa.formmanager.view.clforms.acquire;
 
-import org.javarosa.core.services.IService;
 import org.javarosa.formmanager.view.FormElementBinding;
 
 /**
@@ -25,7 +24,7 @@ import org.javarosa.formmanager.view.FormElementBinding;
  * A service that provides data acquisition widgets
  *
  */
-public interface IAcquiringService extends IService {
+public interface IAcquiringService {
 
 	public String getName();
 	

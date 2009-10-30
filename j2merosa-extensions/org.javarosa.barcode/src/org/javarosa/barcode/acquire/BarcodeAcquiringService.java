@@ -17,7 +17,7 @@
 package org.javarosa.barcode.acquire;
 
 import org.javarosa.barcode.process.IBarcodeProcessingService;
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.ServiceRegistry;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
@@ -52,7 +52,7 @@ public class BarcodeAcquiringService implements IAcquiringService {
 		BarcodeQuestionWidget barcodeWidget = new BarcodeQuestionWidget(prompt,
 				temp);
 		try {
-			IBarcodeProcessingService barcodeProcessor = (IBarcodeProcessingService) JavaRosaServiceProvider
+			IBarcodeProcessingService barcodeProcessor = (IBarcodeProcessingService) ServiceRegistry
 					.instance().getService("Barcode Processing Service");
 			barcodeWidget.setBarcodeProcessor(barcodeProcessor);
 			return barcodeWidget;
@@ -75,7 +75,7 @@ public class BarcodeAcquiringService implements IAcquiringService {
 		BarcodeQuestionWidget barcodeWidget = new BarcodeQuestionWidget(prompt);
 
 		try {
-			IBarcodeProcessingService barcodeProcessor = (IBarcodeProcessingService) JavaRosaServiceProvider
+			IBarcodeProcessingService barcodeProcessor = (IBarcodeProcessingService) ServiceRegistry
 					.instance().getService("Barcode Processing Service");
 			barcodeWidget.setBarcodeProcessor(barcodeProcessor);
 			return barcodeWidget;
@@ -99,7 +99,7 @@ public class BarcodeAcquiringService implements IAcquiringService {
 		BarcodeQuestionWidget barcodeWidget = new BarcodeQuestionWidget(prompt,
 				str);
 		try {
-			IBarcodeProcessingService barcodeProcessor = (IBarcodeProcessingService) JavaRosaServiceProvider
+			IBarcodeProcessingService barcodeProcessor = (IBarcodeProcessingService) ServiceRegistry
 					.instance().getService("Barcode Processing Service");
 			barcodeWidget.setBarcodeProcessor(barcodeProcessor);
 			return barcodeWidget;
@@ -122,7 +122,7 @@ public class BarcodeAcquiringService implements IAcquiringService {
 		BarcodeQuestionWidget barcodeWidget = new BarcodeQuestionWidget(prompt,
 				str);
 		try {
-			IBarcodeProcessingService barcodeProcessor = (IBarcodeProcessingService) JavaRosaServiceProvider
+			IBarcodeProcessingService barcodeProcessor = (IBarcodeProcessingService) ServiceRegistry
 					.instance().getService("Barcode Processing Service");
 			barcodeWidget.setBarcodeProcessor(barcodeProcessor);
 			return barcodeWidget;
