@@ -16,9 +16,10 @@
 
 package org.javarosa.communication.file;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.services.TransportManager;
 
 public class FileTransportModule implements IModule {
 
@@ -27,11 +28,11 @@ public class FileTransportModule implements IModule {
 		String[] classes = {
 				"org.javarosa.communication.file.FileTransportDestination",				
 		};		
-		JavaRosaServiceProvider.instance().registerPrototypes(classes);
+		PrototypeManager.registerPrototypes(classes);
 		
-		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new FileConnectionTransportMethod());
+		TransportManager._().registerTransportMethod(new FileConnectionTransportMethod());
 		PropertyManager._().addRules(new FileTransportProperties());
-		JavaRosaServiceProvider.instance().getTransportManager().setCurrentTransportMethod(FileConnectionTransportMethod.FILE);
+		TransportManager._().setCurrentTransportMethod(FileConnectionTransportMethod.FILE);
 	}
 
 }
