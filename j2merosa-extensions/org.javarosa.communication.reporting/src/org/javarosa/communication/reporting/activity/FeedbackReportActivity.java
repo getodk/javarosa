@@ -30,11 +30,11 @@ import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.reporting.properties.FeedbackReportProperties;
 import org.javarosa.communication.reporting.view.FeedbackReportScreen;
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.services.ServiceRegistry;
 import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.services.transport.TransportMessage;
@@ -111,16 +111,16 @@ public class FeedbackReportActivity implements IActivity, CommandListener {
 		if(c.equals(FeedbackReportScreen.SEND_REPORT)) {
 			String message = screen.getString();
 			
-			String url = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(FeedbackReportProperties.FEEDBACK_REPORT_SERVER);
+			String url = ServiceRegistry.instance().getPropertyManager().getSingularProperty(FeedbackReportProperties.FEEDBACK_REPORT_SERVER);
 			
-			String id = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty("DeviceID");
+			String id = ServiceRegistry.instance().getPropertyManager().getSingularProperty("DeviceID");
 			
 			//TODO: For now, only http is supported, so we hack this to switch to that.
 			int httpmethod = (new HttpTransportMethod()).getId();
-			JavaRosaServiceProvider.instance().getTransportManager().setCurrentTransportMethod(httpmethod);
+			ServiceRegistry.instance().getTransportManager().setCurrentTransportMethod(httpmethod);
 			
 			TransportMessage tmessage = new TransportMessage(new ByteArrayPayload(message.getBytes(), "Feedback Message",IDataPayload.PAYLOAD_TYPE_TEXT), new HttpTransportDestination(url),id,-1);
-			JavaRosaServiceProvider.instance().getTransportManager().send(tmessage, httpmethod);
+			ServiceRegistry.instance().getTransportManager().send(tmessage, httpmethod);
 			
 			//TODO: Feedback!
 			

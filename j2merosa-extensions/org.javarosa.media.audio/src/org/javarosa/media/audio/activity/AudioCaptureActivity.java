@@ -36,12 +36,12 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IDisplay;
 import org.javarosa.core.api.IShell;
+import org.javarosa.core.services.ServiceRegistry;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.audio.AudioException;
@@ -79,13 +79,13 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	public AudioCaptureActivity(IShell shell)
 	{
 		parentShell = shell;
-		display = JavaRosaServiceProvider.instance().getDisplay();		
+		display = ServiceRegistry.instance().getDisplay();		
 	}
 	
 	public AudioCaptureActivity(IShell shell, MIDlet m)
 	{
 		parentShell = shell;
-		display = JavaRosaServiceProvider.instance().getDisplay();		
+		display = ServiceRegistry.instance().getDisplay();		
 		recMid = m;
 	}
 	

@@ -17,13 +17,13 @@
 package org.javarosa.communication.reporting;
 
 import org.javarosa.communication.reporting.properties.FeedbackReportProperties;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.services.ServiceRegistry;
 
 public class FeedbackReportModule implements IModule {
 
 	public void registerModule() {
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new FeedbackReportProperties());
+		ServiceRegistry.instance().getPropertyManager().addRules(new FeedbackReportProperties());
 	}
 
 }
