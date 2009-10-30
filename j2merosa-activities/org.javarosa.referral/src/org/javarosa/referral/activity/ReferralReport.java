@@ -16,125 +16,69 @@
 
 package org.javarosa.referral.activity;
 
-import java.io.IOException;
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IActivity;
-import org.javarosa.core.api.ICommand;
-import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.State;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
-import org.javarosa.core.model.storage.FormDefRMSUtility;
-import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.services.storage.IStorageIterator;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.core.util.TrivialTransitions;
+import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.referral.model.Referrals;
-import org.javarosa.referral.storage.ReferralRMSUtility;
-import org.javarosa.referral.util.ReportContext;
 import org.javarosa.referral.view.ReportView;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
-public class ReferralReport implements IActivity, CommandListener {
+public abstract class ReferralReport implements TrivialTransitions, State, CommandListener {
 
-	private IShell parent;
 	private Referrals referrals;
 	private DataModelTree model;
 	private ReportView view;
-	
-	private ReportContext context;
-	
-	public ReferralReport(IShell parent) {
-		this.parent = parent;
-	}
-	
-	public void contextChanged(Context globalContext) {
-		// TODO Auto-generated method stub
 
-	}
-
-	public void destroy() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void halt() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void resume(Context globalContext) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void start(Context context) {
-		FormDef temp = new FormDef();
-		if(context instanceof ReportContext) {
-			this.context = (ReportContext)context;
-			String formName = ((ReportContext)context).getFormName();
-			int modelId = ((ReportContext)context).getModelId();
-			
-			ReferralRMSUtility referralRms = (ReferralRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(ReferralRMSUtility.getUtilityName());
-			DataModelTreeRMSUtility modelUtility = (DataModelTreeRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(DataModelTreeRMSUtility.getUtilityName());
-			FormDefRMSUtility rmsUtility = (FormDefRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(FormDefRMSUtility.getUtilityName());
-			if(!referralRms.containsFormReferrals(formName)) {
-				this.referrals = new Referrals();
-			} else {
-				try {
-					this.referrals = referralRms.retrieveFromRMS(formName);
-					rmsUtility.retrieveFromRMS(this.context.getFormId(),temp);
-					
-					this.model = new DataModelTree();
-					modelUtility.retrieveFromRMS(modelId, this.model);
-					temp.setDataModel(model);
-					temp.initialize(false);
-
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (DeserializationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+	public ReferralReport (String formName, int modelID, int formID) {
+		IStorageUtility referrals = StorageManager.getStorage(Referrals.STORAGE_KEY);
+		IStorageUtility models = StorageManager.getStorage(DataModelTree.STORAGE_KEY);
+		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
+		
+		IStorageIterator ri = referrals.iterate();
+		this.referrals = null;
+		boolean found = false;
+		while (ri.hasMore()) {
+			this.referrals = (Referrals)ri.nextRecord();
+			if (formName.equals(this.referrals.getFormName())) {
+				found = true;
+				break;
 			}
 		}
+		if (!found)
+			this.referrals = null;
 		
+		if(this.referrals == null) {
+			this.referrals = new Referrals();
+		} else {
+			FormDef temp = (FormDef)forms.read(formID);			
+			model = (DataModelTree)models.read(modelID);
+			temp.setDataModel(model);
+			temp.initialize(false);
+		}
+		
+	}
+	
+	public void start() {
 		view = new ReportView("Referral Report");
 		view.setReferrals(referrals.getPositiveReferrals(model, new XFormAnswerDataSerializer()));
 		view.setCommandListener(this);
 		
-		parent.setDisplay(this, view);
-	}
-	public Context getActivityContext() {
-		return context;
+		J2MEDisplay.setView(view);
 	}
 
 	public void commandAction(Command arg0, Displayable arg1) {
-		parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, null);
+		done();
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#setShell(org.javarosa.core.api.IShell)
-	 */
-	public void setShell(IShell shell) {
-		this.parent = shell;
-	}
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
-	 */
-	public void annotateCommand(ICommand command) {
-		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
-	}
+
 }

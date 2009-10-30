@@ -7,5 +7,8 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.xform"/>
 	<classpathentry exported="true" kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.patient"/>
+	<classpathentry kind="src" path="/javarosa-core"/>
+	<classpathentry kind="lib" path="/javarosa-core/lib/kxml2-2.3.0.jar"/>
+	<classpathentry kind="src" path="/j2merosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

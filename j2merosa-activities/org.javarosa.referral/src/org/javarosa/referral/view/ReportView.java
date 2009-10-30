@@ -23,9 +23,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 
-import org.javarosa.core.api.IView;
-
-public class ReportView extends Form implements IView {
+public class ReportView extends Form {
 
 	private StringItem label;
 	public ReportView(String title) {
@@ -47,8 +45,5 @@ public class ReportView extends Form implements IView {
 			label = new StringItem("No Referral Necessary", "");
 			this.append(label);
 		}
-	}
-	public Object getScreenObject() {
-		return this;
 	}
 }
