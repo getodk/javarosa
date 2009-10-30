@@ -35,61 +35,30 @@
 	</path>
 	
 	<fileset id="jr.sources" dir="../">
-		<include name="javarosa-core/**/src/**/*.java"/>
-		<include name="j2merosa-core**/src/**/*.java"/>
+		<include name="javarosa-core/src/**/*.java"/>
+		<include name="j2merosa-core/src/**/*.java"/>
 		<include name="j2merosa-extensions/**/src/**/*.java"/>
 	    <include name="j2merosa-activities/**/src/**/*.java"/>
 		<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
 		<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
-		<!-- This lets us translate from an absolute reference to a reference at a merged source level -->
 
-			<!-- Note: These source inclusions should be possible to assign id's to, and to include
-			in the javac at the bottom, this will prevent errors! -->
-		    <fileset dir="../javarosa-core/">
-		    	<include name="**/src/**/*.java"/>
-			</fileset>
-		    <fileset dir="../j2merosa-core">
-		    	<include name="**/src/**/*.java"/>
-			</fileset>
-		    <fileset dir="../j2merosa-extensions/">
-		    	<include name="**/src/**/*.java"/>
-		    	<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
-				<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
+		<!-- TEMP: exclusions for stuff that doesn't yet build on the new framework -->
+		<exclude name="**/org.javarosa.media.*/**/*.java"/>
+		<exclude name="**/org.javarosa.log/**/*.java"/>
+		<exclude name="**/org.javarosa.polish.chatterbox.extensions/**/*.java"/>
+		<exclude name="**/org.javarosa.communication.ui/**/*.java"/>
+		<exclude name="**/org.javarosa.communication.reporting/**/*.java"/>
+		<exclude name="**/org.javarosa.communication.sms.trigger/**/*.java"/>
+		<exclude name="**/org.javarosa.barcode/**/*.java"/>
+		<exclude name="**/org.javarosa.patient/**/*.java"/>
+		<exclude name="**/org.javarosa.patient.entry/**/*.java"/>
+		<exclude name="**/org.javarosa.referral/**/*.java"/>
+		<exclude name="**/org.javarosa.reminders/**/*.java"/>
+		<exclude name="**/org.javarosa.workflow/**/*.java"/>
+		<exclude name="**/org.javarosa.polish.activity/**/*.java"/>
 		    	
-		    	
-		    	<!-- temp exclusions for commcare build -->
-				<exclude name="**/org.javarosa.media.*/**/*.java"/>
-				<exclude name="**/org.javarosa.log/**/*.java"/>
-				<exclude name="**/org.javarosa.polish.chatterbox.extensions/**/*.java"/>
-				<exclude name="**/org.javarosa.communication.ui/**/*.java"/>
-				<exclude name="**/org.javarosa.communication.reporting/**/*.java"/>
-				<exclude name="**/org.javarosa.communication.sms.trigger/**/*.java"/>
-				<exclude name="**/org.javarosa.barcode/**/*.java"/>
-
-					
-					
-			</fileset>
-		    <fileset dir="../j2merosa-activities/">
-		    	<include name="**/src/**/*.java"/>
-		    	
-		    	
-				<exclude name="**/org.javarosa.patient/**/*.java"/>
-				<exclude name="**/org.javarosa.patient.entry/**/*.java"/>
-				<exclude name="**/org.javarosa.referral/**/*.java"/>
-				<exclude name="**/org.javarosa.reminders/**/*.java"/>
-				<exclude name="**/org.javarosa.workflow/**/*.java"/>
-				<exclude name="**/org.javarosa.polish.activity/**/*.java"/>
-		    	
-			</fileset>
-			
-		    <fileset dir="../javarosa-transport/">
-		    	<include name="**/src/**/*.java"/>
-				<exclude name="**/test/**/*.java"/>
-			</fileset>
-			
-			
-		
-
+		<!-- TEMP: transport layer is not yet merged in -->
+	    <include name="javarosa-transport/transport2/src/**/*.java"/>
 
 	</fileset>
 
@@ -166,8 +135,13 @@
 			<src path="../j2merosa-core"/>
 			<src path="../j2merosa-extensions"/>
 			<src path="../j2merosa-activities"/>
+
+			<!-- TEMP: transport layer not yet merged in -->
+		    <src path="../javarosa-transport/"/>
+
 			<include name="**/test**/*.java"/>
-		   	<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
+
+			<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
 			<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
 		</javac>
 	</target>
