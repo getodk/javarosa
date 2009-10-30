@@ -17,22 +17,22 @@
 package org.javarosa.core.services;
 
 /**
- * A Service provides access to some external source of 
- * data. 
  * 
- * This interface should be more robustly expanded
- * to cover more common ground between services in the
- * future.
- * 
- * @author Clayton Sims
+ * A FileException corresponds to any type of error received by the IFileService
+ * during a File I/O operation.
+ * @author Ndubisi Onuora
  *
  */
-public interface IService {
-	
+
+public class FileException extends Exception 
+{
 	/**
-	 * Gets the unique name for this service
 	 * 
-	 * @return A unique string identifying this service.
 	 */
-	public String getName();
+	private static final long serialVersionUID = 1L;
+
+	public FileException(String message)
+	{
+		super(message);
+	}
 }

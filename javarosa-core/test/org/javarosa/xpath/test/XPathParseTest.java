@@ -21,7 +21,7 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.ServiceRegistry;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -205,7 +205,7 @@ public class XPathParseTest extends TestCase {
 	static PrototypeFactory pf;
 	
 	static {
-		JavaRosaServiceProvider.instance().registerPrototypes(XPathParseTool.xpathClasses);
+		ServiceRegistry.instance().registerPrototypes(XPathParseTool.xpathClasses);
 		pf = ExtUtil.defaultPrototypes();
 	}
 	

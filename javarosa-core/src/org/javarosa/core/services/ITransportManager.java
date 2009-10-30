@@ -34,7 +34,7 @@ import org.javarosa.core.util.Observable;
  * @author 
  *
  */
-public interface ITransportManager extends IService {
+public interface ITransportManager {
 
 	public abstract String getName();
 
