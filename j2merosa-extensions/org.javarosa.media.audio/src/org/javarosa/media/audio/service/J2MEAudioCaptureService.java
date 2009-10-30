@@ -25,7 +25,7 @@ import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
 import javax.microedition.media.control.RecordControl;
 
-import org.javarosa.core.services.ServiceRegistry;
+import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.media.audio.AudioException;
 import org.javarosa.utilities.file.FileException;

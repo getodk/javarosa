@@ -30,7 +30,7 @@ import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.IActivity;
 import org.javarosa.core.api.ICommand;
 import org.javarosa.core.api.IShell;
-import org.javarosa.core.services.ServiceRegistry;
+import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.transport.TransportMethod;
 
 public class SmsDestinationRetrievalActivity implements IActivity, CommandListener {
@@ -60,7 +60,7 @@ public class SmsDestinationRetrievalActivity implements IActivity, CommandListen
 	}
 
 	public void start(Context context) {
-		form = new GetSmsURLForm(((SmsTransportMethod) ServiceRegistry.instance().getTransportManager().getTransportMethod(
+		form = new GetSmsURLForm(((SmsTransportMethod) DataCaptureServiceRegistry.instance().getTransportManager().getTransportMethod(
 				new SmsTransportMethod().getId())).getDefaultDestination());
 		form.setCommandListener(this);
 		shell.setDisplay(this, form);
