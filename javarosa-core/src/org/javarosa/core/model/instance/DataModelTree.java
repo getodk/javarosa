@@ -35,6 +35,7 @@ import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.services.ITransportManager;
+import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.services.storage.StorageManager;
@@ -668,8 +669,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 				Constants.DATATYPE_DATE_TIME);
 		RestoreUtils.addData(dm, "schema", schema);
 
-		ITransportManager tm = JavaRosaServiceProvider.instance()
-				.getTransportManager();
+		ITransportManager tm = TransportManager._();
 		boolean sent = (tm.getModelDeliveryStatus(id, true) == TransportMessage.STATUS_DELIVERED);
 		RestoreUtils.addData(dm, "sent", new Boolean(sent));
 		
@@ -716,8 +716,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 		
 		if (sent) {
 			System.out.println("here " + id);
-			ITransportManager tm = JavaRosaServiceProvider.instance()
-					.getTransportManager();
+			ITransportManager tm = TransportManager._();
 			tm.markSent(id, false);
 		}
 
