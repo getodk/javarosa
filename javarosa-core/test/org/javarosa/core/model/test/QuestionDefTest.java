@@ -29,7 +29,7 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.services.ServiceRegistry;
+import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.OrderedHashtable;
@@ -53,7 +53,7 @@ public class QuestionDefTest extends TestCase {
 	static PrototypeFactory pf;
 	
 	static {
-		ServiceRegistry.instance().registerPrototype("org.javarosa.model.xform.XPathReference");
+		DataCaptureServiceRegistry.instance().registerPrototype("org.javarosa.model.xform.XPathReference");
 		pf = ExtUtil.defaultPrototypes();
 	}
 		
