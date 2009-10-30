@@ -33,6 +33,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 public class Referrals implements Externalizable {
+	public static final String STORAGE_KEY = "REFERRALS";
+	
 	//The id of the form that these referrals are for
 	private String formName;
 	

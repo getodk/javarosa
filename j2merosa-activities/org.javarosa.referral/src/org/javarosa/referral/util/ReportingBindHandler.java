@@ -18,13 +18,14 @@ package org.javarosa.referral.util;
 
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.referral.model.ReferralCondition;
 import org.javarosa.referral.model.Referrals;
-import org.javarosa.referral.storage.ReferralRMSUtility;
 import org.javarosa.xform.util.IXFormBindHandler;
 import org.kxml2.kdom.Element;
 
@@ -65,8 +66,11 @@ public class ReportingBindHandler implements IXFormBindHandler {
 	}
 	
 	public void postProcess(FormDef formDef) {
-		ReferralRMSUtility referralRms =(ReferralRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(ReferralRMSUtility.getUtilityName());
-		Referrals referrals = new Referrals(formDef.getName(), this.getReferralConditions());
-		referralRms.writeToRMS(referrals);
+		IStorageUtility referrals = StorageManager.getStorage(Referrals.STORAGE_KEY);
+		try {
+			referrals.add(new Referrals(formDef.getName(), this.getReferralConditions()));
+		} catch (StorageFullException e) {
+			throw new RuntimeException("uh-oh, storage full [referralss]"); //TODO: handle this
+		}
 	}
 }
