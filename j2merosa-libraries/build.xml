@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project default="package">
+<project name="J2ME Rosa Library Build" default="package">
 	<tstamp/>
 	
 	<property file="build.properties"/>
@@ -21,18 +21,28 @@
 		<fileset dir="${polish.home}/import" includes="${polish.includes}"/>
 	</path>
 	
-	<target name="package" depends="clean">
-		<!-- first set source compliance. Java5 is correct, since we're postprocessing -->
-		<property name="ant.build.javac.compiler" value="1.5"/>
-		<property name="ant.build.javac.source" value="1.5"/>
-		<property name="ant.build.javac.target" value="1.5"/>
-		
-		<mkdir dir="dist"/>
-		<mkdir dir="build"/>
-		
-		
-		<!-- collect all relevant sources and put them into one big source chunk -->
-		<copy todir="build">
+	<path id="jr.compiled.classpath">
+		<path refid="jr.classpath"/>
+		<fileset dir="dist" includes="j2merosa-libraries.jar"/>
+	</path>
+	
+	<path id="jr.classpath.test">
+		<path refid="jr.compiled.classpath" />
+		<fileset dir="lib" includes="j2meunit-javarosa.jar"/>
+		<dirset dir="${basedir}">
+			<include name="buildTest/**"/>
+		</dirset>
+	</path>
+	
+	<fileset id="jr.sources" dir="../">
+		<include name="javarosa-core/**/src/**/*.java"/>
+		<include name="j2merosa-core**/src/**/*.java"/>
+		<include name="j2merosa-extensions/**/src/**/*.java"/>
+	    <include name="j2merosa-activities/**/src/**/*.java"/>
+		<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
+		<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
+		<!-- This lets us translate from an absolute reference to a reference at a merged source level -->
+
 			<!-- Note: These source inclusions should be possible to assign id's to, and to include
 			in the javac at the bottom, this will prevent errors! -->
 		    <fileset dir="../javarosa-core/">
@@ -78,7 +88,24 @@
 			</fileset>
 			
 			
-			<!-- This lets us translate from an absolute reference to a reference at a merged source level -->
+		
+
+
+	</fileset>
+
+	<target name="package" depends="clean">
+		<!-- first set source compliance. Java5 is correct, since we're postprocessing -->
+		<property name="ant.build.javac.compiler" value="1.5"/>
+		<property name="ant.build.javac.source" value="1.5"/>
+		<property name="ant.build.javac.target" value="1.5"/>
+		
+		<mkdir dir="dist"/>
+		<mkdir dir="build"/>
+		
+		
+		<!-- collect all relevant sources and put them into one big source chunk -->
+		<copy todir="build">
+			<fileset refid="jr.sources"/>
 			<regexpmapper from="^(.*)src(.*)$$" to="src\2"/>
 		</copy>
 		
@@ -129,8 +156,125 @@
 		<zip destfile="dist/j2merosa-libraries.jar" basedir="build"/>
 	</target>
 	
+	<target name="buildTests" depends="package">
+		<!-- Ok, so now compile all of the source so that when people put this jar on their eclipse path and
+				stuff, they can link to the bytecode. It's not necessary for the polsh build, but important for if
+				one wants to look at this like it's a real jar file (it's not) -->
+		<mkdir dir="buildTest"/>
+		<javac destdir="buildTest" classpathref="jr.classpath.test">
+			<src path="../javarosa-core"/>
+			<src path="../j2merosa-core"/>
+			<src path="../j2merosa-extensions"/>
+			<src path="../j2merosa-activities"/>
+			<include name="**/test**/*.java"/>
+		   	<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
+			<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
+		</javac>
+	</target>
+	
+	<!--target name="RunUnitTests" description="Runs all unit tests found in the code" depends="buildTests"-->
+	<target name="RunUnitTests" description="Runs all unit tests found in the code" depends="buildTests">
+		<fileset id="dist.contents.test" dir="buildTest" includes="**/*.class" excludes="**/*$*.class"/>
+		
+		<!-- Now, convert that source list into a property which is newline seperated, and contains references
+				that start assuming you're in a zip file and in the src directory already -->
+		<pathconvert pathsep="${line.separator}" property="testclasses" refid="dist.contents.test">
+			<chainedmapper>
+				<!-- Cut all non-local elements from the path -->
+				<regexpmapper from="^(.*)buildTest(.*)$$" to="\2"/>
+				<!-- Now covert from seperators to package seperators -->
+				<filtermapper>
+				  <replacestring from="\" to="."/>
+				  <replacestring from="/" to="."/>
+				</filtermapper>
+				<!-- Trim leading seperators -->
+				<globmapper from=".*" to="*"/>
+				<!-- snip the .class, we should now be left with fully qualified classnames -->
+				<globmapper from="*.class" to="*"/>
+			</chainedmapper>
+		</pathconvert>
+		
+		<typedef name="instanceof" classname="org.javarosa.build.InstanceOfCondition" onerror="report">
+			<classpath>
+			   <pathelement location="tools/javarosa-ant-libs.jar"/>
+			   <path refid="jr.classpath.test" />
+			</classpath>
+		</typedef>
+		
+		<for list="${testclasses}" delimiter="${line.separator}" param="name">
+			<sequential>
+				<if>
+					<instanceof classname="@{name}" baseclass="j2meunit.framework.TestCase"/>
+						<then>
+							<RunTestSuite suite="@{name}"/>
+						</then>
+				</if>
+			</sequential>
+		</for>
+		<fail if="testresult.global">Unit Tests Failed!</fail>
+	</target>
+
+	<target name="CreateJavadoc" depends="package" description="generates javadoc and also UML Diagram">
+		<mkdir dir="${dir.javadoc}"/>
+	        <javadoc useexternalfile="yes" sourcepath="build\src" packagenames="org.javarosa.*" destdir="${dir.javadoc}"
+	        	classpathref="jr.compiled.classpath" private="true">
+	        	   <doclet name="org.umlgraph.doclet.UmlGraphDoc"
+	        		  path="${dir.tools}/UMLGraph.jar">
+	        	        <param name="-attributes" />
+	        	        <param name="-operations" />
+	        	        <param name="-qualify" />
+	        	        <param name="-types" />
+	        	        <param name="-visibility" />
+	        	    </doclet>	
+	        	    <link href="http://java.sun.com/javame/reference/apis/jsr030/"/>
+	        	    <link href="http://java.sun.com/javame/reference/apis/jsr118/"/>
+	        	    <link href="http://www.j2mepolish.org/javadoc/j2me/"/>
+	        	  </javadoc>
+		  <apply executable="dot" dest="${dir.documentation}" parallel="false">
+		    <arg value="-Tpng"/>
+		    <arg value="-o"/>
+		     <targetfile/>
+		     <srcfile/>
+		     <fileset dir="${dir.documentation}" includes="*.dot"/>
+		     <mapper type="glob" from="*.dot" to="*.png"/>
+		  </apply>
+	</target>
+	
+	<target name="BuildRelease" depends="package,CreateJavadoc,RunUnitTests"/>
+	
+	<!-- Macro: Runs a test suite, and sets testresult.global to be true on failure -->
+	<macrodef name="RunTestSuite" description="Runs a test suite, and sets testresult.global to be true on failure">
+		<attribute name="suite"/>
+			<!-- Note: The reason that we are using @{suite} as a property is because properties in ANT
+			are immutable, and this is a unique identifier -->
+		<sequential>
+		<java classname="j2meunit.textui.TestRunner" failonerror="false" fork="true" resultproperty="@{suite}">
+							<classpath refid="jr.classpath.test" />
+							<arg value="@{suite}"/>
+				</java>
+				<condition property="testresult.global">
+					<not>
+						<equals arg1="${@{suite}}" arg2="0"/>
+				 	</not>
+				</condition>
+			</sequential>
+	</macrodef>
+	
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" onerror="report">
+	  <classpath>
+	    <pathelement location="tools/ant-contrib.jar"/>
+	  </classpath>
+	</taskdef>
+	
+	<taskdef name="for" classname="net.sf.antcontrib.logic.For" onerror="report">
+		  <classpath>
+		    <pathelement location="tools/ant-contrib.jar"/>
+		  </classpath>
+	</taskdef>
+
 	<target name="clean">
 		<delete dir="dist"/>
 		<delete dir="build"/>
+		<delete dir="buildTest"/>
 	</target>
 </project>
