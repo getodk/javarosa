@@ -19,8 +19,8 @@
  */
 package org.javarosa.j2me;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.services.IncidentLogger;
 import org.javarosa.core.services.storage.IStorageFactory;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
@@ -44,7 +44,7 @@ public class J2MEModule implements IModule {
 			}
 		});
 
-		JavaRosaServiceProvider.instance().registerIncidentLogger(new J2MEIncidentLogger());
+		IncidentLogger.registerIncidentLogger(new J2MEIncidentLogger());
 	}
 
 }
