@@ -16,9 +16,10 @@
 
 package org.javarosa.communication.sms;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.services.PrototypeManager;
+import org.javarosa.core.services.TransportManager;
 
 public class SmsTransportModule implements IModule{
 	public void registerModule() {
@@ -26,11 +27,11 @@ public class SmsTransportModule implements IModule{
 		String[] classes = {
 				"org.javarosa.communication.sms.SmsTransportDestination",				
 		};		
-		JavaRosaServiceProvider.instance().registerPrototypes(classes);
+		PrototypeManager.registerPrototypes(classes);
 		
-		JavaRosaServiceProvider.instance().getTransportManager().registerTransportMethod(new SmsTransportMethod());
+		TransportManager._().registerTransportMethod(new SmsTransportMethod());
 		PropertyManager._().addRules(new SmsTransportProperties());
-		JavaRosaServiceProvider.instance().getTransportManager().setCurrentTransportMethod(new SmsTransportMethod().getId());
+		TransportManager._().setCurrentTransportMethod(new SmsTransportMethod().getId());
 	}
 
 }
