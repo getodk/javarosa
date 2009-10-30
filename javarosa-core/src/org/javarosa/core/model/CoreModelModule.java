@@ -16,9 +16,9 @@
 
 package org.javarosa.core.model;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.storage.StorageManager;
  
 public class CoreModelModule implements IModule {
@@ -44,7 +44,7 @@ public class CoreModelModule implements IModule {
 				"org.javarosa.core.model.data.MultiPointerAnswerData",
 				"org.javarosa.core.model.data.helper.BasicDataPointer"
 		};		
-		JavaRosaServiceProvider.instance().registerPrototypes(classes);
+		PrototypeManager.registerPrototypes(classes);
 	}
 
 }

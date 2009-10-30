@@ -23,7 +23,6 @@ import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.log.IncidentLog;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -47,6 +46,37 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class TransportManager implements Observer, IService, ITransportManager {
 
+	//////////////////// global /////////////////////
+	
+	private static ITransportManager txMgr;
+	
+	public static ITransportManager _ () {
+		if (txMgr == null) {
+			registerDefaultTransportManager();
+		}
+		return txMgr;
+	}
+	
+	public static void registerTransportManager (ITransportManager tm) {
+		txMgr = tm;
+	}
+	
+	private static void registerDefaultTransportManager () {
+		//this should be moved to a module initialization
+		String[] classes = {
+				"org.javarosa.core.services.transport.ByteArrayPayload",
+				"org.javarosa.core.services.transport.MultiMessagePayload",
+				"org.javarosa.core.services.transport.DataPointerPayload"
+		};		
+		PrototypeManager.registerPrototypes(classes);
+		StorageManager.registerStorage(TransportMessage.STORAGE_KEY, TransportMessage.class);
+
+		registerTransportManager(new TransportManager());
+	}
+	
+	/////////////////////////////////////////////////
+	
+	
 	/**
 	 * The unique identifier of the device. Hard coded for now.
 	 */
@@ -212,7 +242,7 @@ public class TransportManager implements Observer, IService, ITransportManager {
 		updateMessage(msg);
 
 		if(msg != null && msg.getStatus() == TransportMessage.STATUS_FAILED) {
-			JavaRosaServiceProvider.instance().logIncident(IncidentLog.LOG_TYPE_APPLICATION, "Attempted Message Send Failure!");
+			IncidentLogger.logIncident(IncidentLog.LOG_TYPE_APPLICATION, "Attempted Message Send Failure!");
 		}
 	}
 

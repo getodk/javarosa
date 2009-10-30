@@ -16,25 +16,11 @@
 
 package org.javarosa.core;
 
-import java.util.Date;
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
 
-import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IDaemon;
-import org.javarosa.core.api.IIncidentLogger;
 import org.javarosa.core.services.IService;
 import org.javarosa.core.services.ITransportManager;
-import org.javarosa.core.services.PropertyManager;
-import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.UnavailableServiceException;
-import org.javarosa.core.services.properties.JavaRosaPropertyRules;
-import org.javarosa.core.services.storage.StorageManager;
-import org.javarosa.core.services.transport.TransportMessage;
-import org.javarosa.core.util.PrefixTree;
-import org.javarosa.core.util.externalizable.CannotCreateObjectException;
-import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
  * JavaRosaServiceProvider is a singleton class that grants access to JavaRosa's
@@ -48,21 +34,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class JavaRosaServiceProvider {
 	protected static JavaRosaServiceProvider instance;
 	
-	private Hashtable daemons;
-
-    private ITransportManager transportManager;
-    
-    private IIncidentLogger logger;
-	
 	Hashtable services;
-	private PrefixTree prototypes;
-	
-	//private InactivityMonitor imon;
 	
 	public JavaRosaServiceProvider() {
 		services = new Hashtable();
-		prototypes = new PrefixTree();
-		daemons = new Hashtable();
 	}
 	
 	public static JavaRosaServiceProvider instance() {
@@ -72,59 +47,6 @@ public class JavaRosaServiceProvider {
 		return instance;
 	}
 
-	/**
-	 * Initialize the platform.  Setup things like the RMS for the forms, the transport manager...
-	 */
-	public void initialize() {
-		// For right now do nothing, to conserve memory we'll load Providers when they're asked for
-	    
-	}
-	/**
-	 * Initialize the platform.  Setup things like the RMS for the forms, the transport manager...
-	 */
-	public void initialize(Vector services) {
-		
-	    IService service;
-	    String name;
-	    for (Enumeration e = services.elements() ; e.hasMoreElements() ;) {
-	        service = (IService) e.nextElement();
-	        name = service.getName();
-            if (name.equals(Constants.TRANSPORT_MANAGER)) {
-	            transportManager = (ITransportManager) service;
-	        }
-            registerService(service);
-	    }
-	}
-	
-	public ITransportManager getTransportManager() {
-		if(transportManager == null) {
-			//this should be moved to a module initialization
-			String[] classes = {
-					"org.javarosa.core.services.transport.ByteArrayPayload",
-					"org.javarosa.core.services.transport.MultiMessagePayload",
-					"org.javarosa.core.services.transport.DataPointerPayload"
-			};		
-			registerPrototypes(classes);
-			StorageManager.registerStorage(TransportMessage.STORAGE_KEY, TransportMessage.class);
-			transportManager = new TransportManager();
-			this.registerService(transportManager);
-		}
-		return transportManager;
-	}
-	
-
-	
-
-	public void registerDaemon(IDaemon daemon, String name) {
-		daemons.put(name, daemon);
-	}
-	
-	public IDaemon getDaemon(String name) {
-		IDaemon daemon = (IDaemon)daemons.get(name);
-		//Do we want to handle the null case with an exception, like with services?
-		return daemon;
-	}
-	
 	public void registerService(IService service) {
 		services.put(service.getName(), service);
 	}
@@ -137,73 +59,5 @@ public class JavaRosaServiceProvider {
 			return service; 
 		}
 	}
-	
-	public void registerPrototype (String className) {
-		prototypes.addString(className);
-		
-		try {
-			PrototypeFactory.getInstance(Class.forName(className));
-		} catch (ClassNotFoundException e) {
-			throw new CannotCreateObjectException(className + ": not found");
-		}
-	}
-	
-	public void registerPrototypes (String[] classNames) {
-		for (int i = 0; i < classNames.length; i++)
-			registerPrototype(classNames[i]);
-	}
-	
-	public PrefixTree getPrototypes () {
-		return prototypes;
-	}
-	
-	public void registerIncidentLogger(IIncidentLogger logger) {
-		this.logger= logger;
-	}
-	
-	public IIncidentLogger getIncidentLogger() {
-		return logger;
-	}
-	
-	/**
-	 * Posts the given data to an existing Incident Log, if one has
-	 * been registered and if logging is enabled on the device. 
-	 * 
-	 * NOTE: This method makes a best faith attempt to log the given
-	 * data, but will not produce any output if such attempts fail.
-	 * 
-	 * @param type The type of incident to be logged. 
-	 * @param message A message describing the incident.
-	 */
-	public void logIncident(String type, String message) {
-		if(JavaRosaPropertyRules.LOGS_ENABLED_YES.equals(PropertyManager._().getSingularProperty(JavaRosaPropertyRules.LOGS_ENABLED))){
-		if(logger != null) {
-			logger.logIncident(type, message, new Date());
-		} else {
-			System.out.println(type + ": " + message);
-		}
-		}
-	}
-	
-//	public void enableInactivityTimeout (int seconds) {
-//		imon = new InactivityMonitor(this, seconds);
-//	}
-//	
-//	public void activateInactivityTimeout () {
-//		if (imon != null) {
-//			imon.activate();
-//		}
-//	}
-//
-//	public void deactivateInactivityTimeout () {
-//		if (imon != null) {
-//			imon.deactivate();
-//		}
-//	}
-//
-//	public void notifyActivity () {
-//		if (imon != null) {
-//			imon.notifyActivity();
-//		}
-//	}
+
 }

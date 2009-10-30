@@ -28,7 +28,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
+import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.util.OrderedHashtable;
 
 public class ExtUtil {
@@ -73,7 +73,7 @@ public class ExtUtil {
 	}
 	
 	public static PrototypeFactory defaultPrototypes () {
-		return new PrototypeFactory(JavaRosaServiceProvider.instance().getPrototypes());
+		return new PrototypeFactory(PrototypeManager.getPrototypes());
 	}
 	
 	public static void write (DataOutputStream out, Object data) throws IOException {

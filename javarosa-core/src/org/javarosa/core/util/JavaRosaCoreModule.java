@@ -19,8 +19,8 @@
  */
 package org.javarosa.core.util;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.services.PrototypeManager;
 
 /**
  * @author Clayton Sims
@@ -37,6 +37,6 @@ public class JavaRosaCoreModule implements IModule {
 				"org.javarosa.core.services.locale.ResourceFileDataSource",
 				"org.javarosa.core.services.locale.TableLocaleSource"
 		};		
-		JavaRosaServiceProvider.instance().registerPrototypes(classes);
+		PrototypeManager.registerPrototypes(classes);
 	}
 }
