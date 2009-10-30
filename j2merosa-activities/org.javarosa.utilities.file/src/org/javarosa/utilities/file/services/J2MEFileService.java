@@ -16,18 +16,19 @@
 
 package org.javarosa.utilities.file.services;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
-import java.util.Vector;
-import java.util.Enumeration;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Vector;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
 
-import org.javarosa.utilities.file.FileException;
+import org.javarosa.core.services.FileException;
+import org.javarosa.core.services.IFileService;
 
 
 /**
@@ -39,13 +40,6 @@ import org.javarosa.utilities.file.FileException;
 
 public class J2MEFileService implements IFileService 
 {
-	public static final String serviceName = "J2MEFileService";
-	
-	public String getName()
-	{
-		return serviceName;
-	}
-	
 	/**
 	 * Create a directory from the path
 	 * @param path
@@ -544,7 +538,7 @@ public class J2MEFileService implements IFileService
 	private static void handleException(Exception ex) 
 	{
 		// TODO Auto-generated method stub
-		System.out.println("Exception caught in " + serviceName + ex.getMessage());
+		System.out.println("Exception caught in J2MEFileService" + ex.getMessage());
 		ex.printStackTrace();
 	}
 
