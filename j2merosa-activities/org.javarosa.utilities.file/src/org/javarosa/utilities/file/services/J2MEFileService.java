@@ -27,9 +27,6 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
 
-import org.javarosa.core.services.FileException;
-import org.javarosa.core.services.IFileService;
-
 
 /**
  * 
