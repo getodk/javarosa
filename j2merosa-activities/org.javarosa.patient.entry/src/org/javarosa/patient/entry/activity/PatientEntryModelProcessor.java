@@ -19,17 +19,17 @@ package org.javarosa.patient.entry.activity;
 import java.util.Date;
 import java.util.Vector;
 
-import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.IModelProcessor;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.model.data.NumericListData;
-import org.javarosa.patient.storage.PatientRMSUtility;
 import org.javarosa.patient.util.DateValueTuple;
 
 public class PatientEntryModelProcessor implements IModelProcessor {
@@ -82,8 +82,13 @@ public class PatientEntryModelProcessor implements IModelProcessor {
 	}
 	
 	private int writePatient(Patient newPatient) {
-		PatientRMSUtility utility = (PatientRMSUtility)JavaRosaServiceProvider.instance().getStorageManager().getRMSStorageProvider().getUtility(PatientRMSUtility.getUtilityName());
-		return utility.writeToRMS(newPatient);
+		IStorageUtility patients = StorageManager.getStorage(Patient.STORAGE_KEY);
+		try {
+			patients.write(newPatient);
+		} catch (StorageFullException e) {
+			throw new RuntimeException("uh-oh, storage full [patients]"); //TODO: handle this
+		}
+		return newPatient.getID();
 	}
 	
 	private Object getValue (String xpath, TreeReference context, DataModelTree tree) {
@@ -97,14 +102,5 @@ public class PatientEntryModelProcessor implements IModelProcessor {
 	
 	public int getPatId() {
 		return patId;
-	}
-
-	public void initializeContext(Context context) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void loadProcessedContext(Context context) {
-		context.setElement("PATIENT_ID", new Integer(patId));
 	}
 }

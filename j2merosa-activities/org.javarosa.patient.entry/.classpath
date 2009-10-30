@@ -8,5 +8,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.xform"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.entity"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
+	<classpathentry kind="src" path="/javarosa-core"/>
+	<classpathentry kind="src" path="/org.javarosa.formmanager"/>
+	<classpathentry kind="src" path="/org.javarosa.polish.chatterbox"/>
+	<classpathentry kind="src" path="/j2merosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

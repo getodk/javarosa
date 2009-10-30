@@ -16,15 +16,13 @@
 
 package org.javarosa.patient;
 
-import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.patient.model.Patient;
 
 public class PatientModule implements IModule {
 
-	public void registerModule(Context context) {
+	public void registerModule() {
 		StorageManager.registerStorage(Patient.STORAGE_KEY, Patient.class);
 	}
    

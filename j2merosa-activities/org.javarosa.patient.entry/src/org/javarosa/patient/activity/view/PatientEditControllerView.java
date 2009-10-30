@@ -17,8 +17,14 @@
 package org.javarosa.patient.activity.view;
 
 import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.api.IView;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.patient.activity.EditPatientTransitions;
 import org.javarosa.patient.model.Patient;
 
 import de.enough.polish.ui.Choice;
@@ -26,13 +32,14 @@ import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.DateField;
 import de.enough.polish.ui.FramedForm;
-import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
 
-public class PatientEditView extends FramedForm implements IView {
+public class PatientEditControllerView extends FramedForm implements CommandListener {
 
 	public static final Command DONE = new Command("Done",Command.SCREEN, 1);
 	public static final Command CANCEL = new Command("Cancel",Command.CANCEL, 1);
+	
+	EditPatientTransitions transitions;
 	
 	Patient savedPatient;
 	
@@ -48,8 +55,14 @@ public class PatientEditView extends FramedForm implements IView {
 	ChoiceGroup gender;
 	
 	
-	public PatientEditView(String title) {
+	public PatientEditControllerView(String title, int patID) {
 		super(title);
+		
+		IStorageUtility patients = StorageManager.getStorage(Patient.STORAGE_KEY);
+		setPatient((Patient)patients.read(patID));
+		
+		setCommandListener(this);
+		
 		givenName = new TextField("Given Name", "",50,TextField.ANY);
 		familyName = new TextField("Family Name", "",50,TextField.ANY);
 		patientId = new TextField("Patient ID", "",50,TextField.ANY);
@@ -73,8 +86,12 @@ public class PatientEditView extends FramedForm implements IView {
 		this.addCommand(CANCEL);
 	}
 	
-	public PatientEditView(String title, Style style) {
-		super(title, style);
+	public void setTransitions (EditPatientTransitions transitions) {
+		this.transitions = transitions;
+	}
+	
+	public void start () {
+		J2MEDisplay.setView(this);
 	}
 	
 	public Patient getPatient() {
@@ -116,10 +133,23 @@ public class PatientEditView extends FramedForm implements IView {
 			gender.setSelectedIndex(2, true);
 			break;
 		}
+		
 		this.savedPatient = patient;
 	}
+	
+	public void commandAction(Command c, Displayable d) {
+		if(c.equals(PatientEditControllerView.CANCEL)) {
+			transitions.cancel();
+		} else{
+			Patient pat = getPatient();
+			IStorageUtility patients = StorageManager.getStorage(Patient.STORAGE_KEY);
+			try {
+				patients.write(pat);
+			} catch (StorageFullException e) {
+				throw new RuntimeException("uh-oh, storage full [patients]"); //TODO: handle this
+			}
 
-	public Object getScreenObject() {
-		return this;
+			transitions.done();
+		}
 	}
 }
