@@ -26,7 +26,7 @@ import org.javarosa.communication.http.HttpTransportDestination;
 import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.core.Context;
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.services.ServiceRegistry;
+import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.transport.TransportMethod;
 
 public class HttpDestinationRetrievalActivity implements IActivity,
@@ -60,7 +60,7 @@ public class HttpDestinationRetrievalActivity implements IActivity,
 	}
 
 	public void start(Context context) {
-		form = new GetURLForm(((HttpTransportMethod) ServiceRegistry.instance().getTransportManager().getTransportMethod(
+		form = new GetURLForm(((HttpTransportMethod) DataCaptureServiceRegistry.instance().getTransportManager().getTransportMethod(
 				new HttpTransportMethod().getId())).getDefaultDestination());
 		form.setCommandListener(this);
 		shell.setDisplay(this, form);

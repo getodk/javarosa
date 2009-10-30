@@ -18,15 +18,15 @@ package org.javarosa.formmanager.controller;
 
 import java.util.Date;
 
-import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.api.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.services.ServiceRegistry;
+import org.javarosa.core.services.DataCaptureService;
+import org.javarosa.core.services.DataCaptureServiceRegistry;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
@@ -45,19 +45,22 @@ public class FormEntryController {
 	
 	FormEntryModel model;
 	IFormEntryView view;
+	DataCaptureServiceRegistry dataCapture;
 	
 	FormEntryTransitions transitions;
 	
 	public FormEntryController (IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly) {
-		this(-1, viewFactory, fetcher, readOnly, null);
+		this(-1, viewFactory, fetcher, readOnly, null, null);
 	}
 
 	public FormEntryController (int savedInstanceID, IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly) {
-		this(savedInstanceID, viewFactory, fetcher, readOnly, null);
+		this(savedInstanceID, viewFactory, fetcher, readOnly, null, null);
 	}	
 	
-	public FormEntryController (int savedInstanceID, IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly, FormIndex firstQuestion) {
+	public FormEntryController (int savedInstanceID, IFormEntryViewFactory viewFactory, FormDefFetcher fetcher, boolean readOnly,
+			FormIndex firstQuestion, DataCaptureServiceRegistry dataCapture) {
 		FormDef theForm = fetcher.getFormDef();
+		this.dataCapture = dataCapture;
 		
 		//droos 10/29: what about loading in the old saved instance?
 		
@@ -184,6 +187,14 @@ public class FormEntryController {
 
 	public void setView (Displayable view) {
 		J2MEDisplay.setView(view);
+	}
+	
+	public DataCaptureService getDataCaptureService (String type) throws UnavailableServiceException {
+		if (dataCapture == null) {
+			throw new UnavailableServiceException("Data capture services have not been provided");
+		} else {
+			return dataCapture.getService(type);
+		}
 	}
 	
 	// added for image choosing

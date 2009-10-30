@@ -30,7 +30,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.services.ServiceRegistry;
+import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.formmanager.controller.FormEntryController;
@@ -149,7 +149,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 
 			case Constants.DATATYPE_BARCODE:
 				try { // is there a service that can acquire a barcode?
-					IAcquiringService barcodeService = (IAcquiringService)ServiceRegistry.getService("Barcode Acquiring Service");
+					IAcquiringService barcodeService = (IAcquiringService)controller.getDataCaptureService("Barcode Acquiring Service");
 					if (fromFormView == true)
 						widget = barcodeService.getWidget(prompt, 'c');
 					else if (direction)

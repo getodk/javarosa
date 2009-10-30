@@ -21,16 +21,16 @@ import org.javarosa.communication.http.ui.HttpDestinationRetrievalActivity;
 import org.javarosa.communication.sms.SmsTransportMethod;
 import org.javarosa.communication.sms.ui.SmsDestinationRetrievalActivity;
 import org.javarosa.core.api.IModule;
-import org.javarosa.core.services.ServiceRegistry;
+import org.javarosa.core.services.DataCaptureServiceRegistry;
 
 public class CommunicationUIModule implements IModule {
 
 	public void registerModule() {
-		HttpTransportMethod http = (HttpTransportMethod)ServiceRegistry.instance().getTransportManager().getTransportMethod(new HttpTransportMethod().getId());
+		HttpTransportMethod http = (HttpTransportMethod)DataCaptureServiceRegistry.instance().getTransportManager().getTransportMethod(new HttpTransportMethod().getId());
 		if(http != null) {
 			http.setDestinationRetrievalActivity(new HttpDestinationRetrievalActivity());
 		}
-		SmsTransportMethod sms = (SmsTransportMethod)ServiceRegistry.instance().getTransportManager().getTransportMethod(new SmsTransportMethod().getId());
+		SmsTransportMethod sms = (SmsTransportMethod)DataCaptureServiceRegistry.instance().getTransportManager().getTransportMethod(new SmsTransportMethod().getId());
 		if(sms != null) {
 			sms.setDestinationRetrievalActivity(new SmsDestinationRetrievalActivity());
 		}
