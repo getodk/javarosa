@@ -54,6 +54,7 @@
 				<exclude name="**/org.javarosa.communication.ui/**/*.java"/>
 				<exclude name="**/org.javarosa.communication.reporting/**/*.java"/>
 				<exclude name="**/org.javarosa.communication.sms.trigger/**/*.java"/>
+				<exclude name="**/org.javarosa.barcode/**/*.java"/>
 
 					
 					
