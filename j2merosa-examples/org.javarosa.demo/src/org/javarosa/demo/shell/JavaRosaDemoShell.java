@@ -47,6 +47,7 @@ import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.WorkflowStack;
 import org.javarosa.demo.properties.DemoAppProperties;
+import org.javarosa.demo.util.FormEntryViewFactory;
 import org.javarosa.entity.activity.EntitySelectActivity;
 import org.javarosa.entity.util.EntitySelectContext;
 import org.javarosa.formmanager.FormManagerModule;
@@ -191,24 +192,13 @@ public class JavaRosaDemoShell implements IShell {
 
 		// at application start, returning activity is null
 		if (returningActivity == null) {
-			launchActivity(new SplashScreenActivity(this, Localization.get("splashscreen")),
+			launchActivity(new SplashScreenActivity(this, ),
 					context);
 			return;
 		}
 
 		// once the splash screen has returned control
 		if (returningActivity instanceof SplashScreenActivity) {
-
-			//#if javarosa.dev.shortcuts
-
-			launchActivity(new FormListActivity(this, Localization.get("title.FormsList")), context);
-
-			//#else
-			
-			prepareContextForLoginActivity();
-			launchActivity(new LoginActivity(this, Localization.get("title.Login")), context);
-			
-			//#endif
 
 			return;
 		}
@@ -267,8 +257,7 @@ public class JavaRosaDemoShell implements IShell {
 		}
 
 		if (returningActivity instanceof FormListActivity) {
-			String returnVal = (String) returnVals
-					.get(FormListActivity.COMMAND_KEY);
+			String returnVal = (String) returnVals.get(FormListActivity.COMMAND_KEY);
 			if (returnVal == Commands.CMD_SETTINGS) {
 				launchActivity(new PropertyScreenActivity(this), context);
 			} else if (returnVal == Commands.CMD_VIEW_DATA) {
@@ -384,22 +373,6 @@ public class JavaRosaDemoShell implements IShell {
 		}
 	}
 
-	
-	/**
-	 * 
-	 */
-	private void prepareContextForLoginActivity(){
-		String passwordVAR = this.midlet.getAppProperty("username");
-		String usernameVAR = this.midlet.getAppProperty("password");
-		if ((usernameVAR == null) || (passwordVAR == null)) {
-			context.setElement("username", "admin");
-			context.setElement("password", "p");
-		} else {
-			context.setElement("username", usernameVAR);
-			context.setElement("password", passwordVAR);
-		}
-		context.setElement("authorization", "admin");
-	}
 	/**
 	 * @param suspendedActivity
 	 * @param completingActivity
@@ -585,147 +558,4 @@ public class JavaRosaDemoShell implements IShell {
 		this.midlet.notifyDestroyed();
 	}
 
-	private void loadDemoForms() {
-		FormDefRMSUtility formDef = (FormDefRMSUtility) JavaRosaServiceProvider
-				.instance().getStorageManager().getRMSStorageProvider()
-				.getUtility(FormDefRMSUtility.getUtilityName());
-		if (formDef.getNumberOfRecords() == 0) {
-			// formDef.writeToRMS(XFormUtils.getFormFromResource(
-			// "/generator.xhtml"));
-			// formDef.writeToRMS(XFormUtils.getFormFromResource(
-			// "/hmis-a_draft.xhtml"));
-			// formDef.writeToRMS(XFormUtils.getFormFromResource(
-			// "/hmis-b_draft.xhtml"));
-			//formDef.writeToRMS(XFormUtils.getFormFromResource("/shortform.xhtml"));
-			//formDef.writeToRMS(XFormUtils.getFormFromResource("/CHMTTL.xhtml")
-			// );
-			//formDef.writeToRMS(XFormUtils.getFormFromResource("/condtest.xhtml"));
-			// formDef.writeToRMS(XFormUtils.getFormFromResource(
-			// "/patient-entry.xhtml"));
-			// formDef.writeToRMS(XFormUtils.getFormFromResource(
-			// "/mexico_questions.xhtml"));
-			//formDef.writeToRMS(XFormUtils.getFormFromResource("/smr.xhtml"));
-			//formDef.writeToRMS(XFormUtils.getFormFromResource("/smff.xhtml"));
-			formDef.writeToRMS(XFormUtils.getFormFromResource("/imci.xml"));
-		}
-
-	}
-
-	private void loadModules() {
-		new JavaRosaCoreModule().registerModule(context);
-		new J2MEModule().registerModule(context);
-		new LanguagePackModule().registerModule(context);
-		new XFormsModule().registerModule(context);
-		new CoreModelModule().registerModule(context);
-		new HttpTransportModule().registerModule(context);
-		new FormManagerModule().registerModule(context);
-		new ExtendedWidgetsModule().registerModule(context);
-		new CommunicationUIModule().registerModule(context);
-		new ReferralModule().registerModule(context);
-		new PatientModule().registerModule(context);
-	}
-
-	private void loadProperties() {
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(
-				new JavaRosaPropertyRules());
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(
-				new DemoAppProperties());
-
-		PropertyUtils.initializeProperty("DeviceID", PropertyUtils.genGUID(25));
-		PropertyUtils
-				.initializeProperty(
-						HttpTransportProperties.POST_URL_LIST_PROPERTY,
-						"http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
-		PropertyUtils
-				.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY,
-						"http://dev.cell-life.org/javarosa/web/limesurvey/admin/post2lime.php");
-		Localization.setLocale(
-				PropertyUtils.initializeProperty(JavaRosaPropertyRules.CURRENT_LOCALE, "en"));
-	}
-
-	/**
-	 * 
-	 * generate and store in RMS several sample patients from the file
-	 * "testpatients"
-	 * 
-	 * 
-	 * @param prms
-	 */
-	private void loadDemoPatients() {
-
-		PatientRMSUtility prms = (PatientRMSUtility) JavaRosaServiceProvider
-				.instance().getStorageManager().getRMSStorageProvider()
-				.getUtility(PatientRMSUtility.getUtilityName());
-
-		final String patientsFile = "/testpatients";
-
-		// #debug debug
-		System.out.println("Initializing the test patients ");
-
-		if (prms.getNumberOfRecords() == 0) {
-			// read test patient data into byte buffer
-			byte[] buffer = new byte[4000]; // make sure buffer is big enough
-			// for entire file; it will not grow
-			// to file size (budget 40 bytes per
-			// patient)
-			InputStream is = System.class.getResourceAsStream(patientsFile);
-			if (is == null) {
-				String err = "Test patient data file: " + patientsFile
-						+ " not found";
-				// #debug error
-				System.out.println(err);
-				throw new RuntimeException(err);
-			}
-
-			int len = 0;
-			try {
-				len = is.read(buffer);
-			} catch (IOException e) {
-				// #debug error
-				e.printStackTrace();
-				throw new RuntimeException(e.getMessage());
-			}
-
-			// copy byte buffer into character string
-			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < len; i++)
-				sb.append((char) buffer[i]);
-			buffer = null;
-			String data = sb.toString();
-
-			// split lines
-			Vector lines = DateUtils.split(data, "\n", false);
-			data = null;
-
-			// parse patients
-			for (int i = 0; i < lines.size(); i++) {
-				String line = (String)lines.elementAt(i);
-				if(line.trim().length()==0)
-					continue;
-				Vector pat = DateUtils.split(line, "|", false);
-				if (pat.size() != 6)
-					throw new RuntimeException("Malformed patient data at line: "
-							+ (i + 1));
-
-				
-				Patient p = parseSinglePatient(i, pat);
-				prms.writeToRMS(p);
-			}
-		}
-	}
-
-	private Patient parseSinglePatient(int i, Vector pat) {
-		
-		Patient p = new Patient();
-		p.setFamilyName((String) pat.elementAt(0));
-		p.setGivenName((String) pat.elementAt(1));
-		p.setMiddleName((String) pat.elementAt(2));
-		p.setPatientIdentifier((String) pat.elementAt(3));
-		p.setGender("m".equals((String) pat.elementAt(4)) ? Patient.SEX_MALE
-				: Patient.SEX_FEMALE);
-		p.setBirthDate(new Date((new Date()).getTime() - 86400000l
-				* Integer.parseInt((String) pat.elementAt(5))));
-
-		return p;
-	}
 }
