@@ -459,3 +459,14 @@ alertcontent {
     layout: vertical-center | horizontal-shrink | vertical-shrink;
     repaint-previous-screen: true;
 }
+
+.loginView {
+	background {
+		color: white;
+		anchor: bottom | horizontal-center;
+	}
+	background-bottom: menubar;	
+	margin-bottom: 5;
+	layout: horizontal-center;
+}
+

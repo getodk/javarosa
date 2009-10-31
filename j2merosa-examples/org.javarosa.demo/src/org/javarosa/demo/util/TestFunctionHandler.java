@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.demo.shell;
+package org.javarosa.demo.util;
 
 import java.util.Vector;
 
