@@ -25,6 +25,9 @@ package org.javarosa.j2me.services;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.javarosa.j2me.services.exception.AudioException;
+import org.javarosa.j2me.services.exception.FileException;
+
 public interface AudioCaptureService extends DataCaptureService 
 {
 	public static final int	IDLE = 0;
@@ -33,9 +36,6 @@ public interface AudioCaptureService extends DataCaptureService
 	public static final int PLAYBACK_STARTED = 3;
 	public static final int PLAYBACK_STOPPED = 4;
 	public static final int CLOSED = 5;
-	
-	//Get the name of the service
-	public String getName();
 	
 	//Returns the state of this service
 	public int getState();

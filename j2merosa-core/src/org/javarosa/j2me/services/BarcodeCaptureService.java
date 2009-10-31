@@ -16,15 +16,19 @@
 
 package org.javarosa.j2me.services;
 
-public class AudioException extends Exception
-{
-	public AudioException()
-	{
-		
-	}
-	
-	public AudioException(String message)
-	{
-		super(message);
-	}
+import javax.microedition.lcdui.Image;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.j2me.services.exception.ImageProcessingException;
+
+/**
+ * @author mel
+ * 
+ * A service that decodes barcode data from images.
+ *
+ */
+public interface BarcodeCaptureService extends DataCaptureService {
+
+	public IAnswerData processImage(Image image) throws ImageProcessingException;
+
 }

@@ -50,7 +50,7 @@ public class DataCaptureServiceRegistry {
 	}
 	
 	public void registerService (DataCaptureService service) {
-		String type = service.getName();
+		String type = service.getType();
 		validateServiceType(type, service);
 		services.put(type, service);
 	}
@@ -75,9 +75,9 @@ public class DataCaptureServiceRegistry {
 	private static void validateServiceType (String type, DataCaptureService service) {
 	  	if (/*
 	  		(DataCaptureService.IMAGE.equals(type) && !(service instanceof ImageCaptureService)) || */
-			(DataCaptureService.AUDIO.equals(type) && !(service instanceof AudioCaptureService)) /*||
-			(DataCaptureService.VIDEO.equals(type) && !(service instanceof VideoCaptureService)) ||
-			(DataCaptureService.BARCODE.equals(type) && !(service instanceof BarcodeCaptureService)) ||
+			(DataCaptureService.AUDIO.equals(type) && !(service instanceof AudioCaptureService)) || /*
+			(DataCaptureService.VIDEO.equals(type) && !(service instanceof VideoCaptureService)) || */
+			(DataCaptureService.BARCODE.equals(type) && !(service instanceof BarcodeCaptureService)) /*||
 			(DataCaptureService.LOCATION.equals(type) && !(service instanceof LocationCaptureService)) ||
 			(DataCaptureService.RFID.equals(type) && !(service instanceof RFIDCaptureService))*/) {
 			throw new RuntimeException("Service is not of the proper type!");
@@ -100,11 +100,13 @@ public class DataCaptureServiceRegistry {
 	public VideoCaptureService getVideoCaptureService () throws UnavailableServiceException {
 		return (VideoCaptureService)getService(DataCaptureService.VIDEO);
 	}
+	*/
 
 	public BarcodeCaptureService getBarcodeCaptureService () throws UnavailableServiceException {
 		return (BarcodeCaptureService)getService(DataCaptureService.BARCODE);
 	}
 
+	/*
 	public LocationCaptureService getLocationCaptureService () throws UnavailableServiceException {
 		return (LocationCaptureService)getService(DataCaptureService.LOCATION);
 	}
