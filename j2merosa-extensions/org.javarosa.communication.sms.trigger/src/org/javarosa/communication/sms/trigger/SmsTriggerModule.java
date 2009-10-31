@@ -16,14 +16,13 @@
 
 package org.javarosa.communication.sms.trigger;
 
-import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.services.PropertyManager;
 
 public class SmsTriggerModule implements IModule {
 
-	public void registerModule(Context context) {
-		JavaRosaServiceProvider.instance().getPropertyManager().addRules(new SmsTriggerProperties());
+	public void registerModule() {
+		PropertyManager._().addRules(new SmsTriggerProperties());
 		SmsTriggerDaemon daemon = new SmsTriggerDaemon();
 		JavaRosaServiceProvider.instance().registerDaemon(daemon, daemon.getName());
 	}

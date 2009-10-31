@@ -39,8 +39,8 @@ import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.view.DisplayViewFactory;
 import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.utilities.file.FileException;
-import org.javarosa.utilities.file.services.IFileService;
-import org.javarosa.utilities.file.services.J2MEFileService;
+import org.javarosa.utilities.file.FileService;
+import org.javarosa.utilities.file.J2MEFileService;
 
 /**
  * The <code>FileBrowser</code> custom component lets the user list files and
@@ -64,7 +64,7 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	
 	private IShell shell;
 	private IDisplay display;
-	private IFileService fileService;
+	private FileService fileService;
 
 
 	private final static String UP_DIRECTORY = "/";
@@ -306,7 +306,7 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		System.err.println(e.getMessage());
 	}
 	
-	private IFileService getFileService() throws UnavailableServiceException
+	private FileService getFileService() throws UnavailableServiceException
 	{
 		//#if app.usefileconnections
 		//# JavaRosaServiceProvider.instance().registerService(new J2MEFileService());

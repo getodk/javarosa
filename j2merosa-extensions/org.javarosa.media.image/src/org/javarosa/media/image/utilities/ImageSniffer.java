@@ -18,13 +18,12 @@ package org.javarosa.media.image.utilities;
 
 import java.util.Vector;
 
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.services.UnavailableServiceException;
+import org.javarosa.j2me.services.FileException;
+import org.javarosa.j2me.services.FileService;
 import org.javarosa.media.image.activity.ImageChooserActivity;
 import org.javarosa.media.image.model.FileDataPointer;
-import org.javarosa.utilities.file.FileException;
-import org.javarosa.utilities.file.services.IFileService;
-import org.javarosa.utilities.file.services.J2MEFileService;
+import org.javarosa.utilities.file.J2MEFileService;
 
 /**
  * Image Sniffer that polls the contents of a directory and notifies someone when they change
@@ -40,7 +39,7 @@ public class ImageSniffer implements Runnable
 	private ImageChooserActivity chooser;
 	private String directoryToUse;
 	
-	private IFileService fileService;
+	private FileService fileService;
 	
 	public ImageSniffer(String directory, ImageChooserActivity chooser) 
 	{
@@ -147,12 +146,10 @@ public class ImageSniffer implements Runnable
 		quit = true;
 	}
 	
-	private IFileService getFileService() throws UnavailableServiceException
+	private FileService getFileService() throws UnavailableServiceException
 	{
 		//#if app.usefileconnections
-		//# JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
-		//# IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
-		//# return service;
+		//#  return new J2MEFileService();
 		//#else
 		throw new UnavailableServiceException("Unavailable service: " +  J2MEFileService.serviceName);
 		//#endif

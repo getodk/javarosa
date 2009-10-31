@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.core.model"/>
 	<classpathentry kind="src" path="/javarosa-core"/>
+	<classpathentry kind="src" path="/j2merosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -20,7 +20,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.services.DataCaptureServiceRegistry;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
 
 public class FeedbackReportProperties implements IPropertyRules {
@@ -64,8 +64,7 @@ public class FeedbackReportProperties implements IPropertyRules {
 					&& checkPropertyAllowed((String) prop.elementAt(0))) {
 				// If so, get its list of available values, and see whether the
 				// potential value is acceptable.
-				return ((Vector) DataCaptureServiceRegistry.instance()
-						.getPropertyManager().getProperty(
+				return ((Vector)PropertyManager._().getProperty(
 								(String) prop.elementAt(0)))
 						.contains(potentialValue);
 			} else {

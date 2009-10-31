@@ -35,32 +35,24 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.midlet.MIDlet;
 
-import org.javarosa.core.Context;
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IActivity;
-import org.javarosa.core.api.ICommand;
-import org.javarosa.core.api.IDisplay;
-import org.javarosa.core.api.IShell;
-import org.javarosa.core.services.DataCaptureServiceRegistry;
+import org.javarosa.core.api.State;
 import org.javarosa.core.services.UnavailableServiceException;
-import org.javarosa.j2me.view.DisplayViewFactory;
-import org.javarosa.media.audio.AudioException;
+import org.javarosa.j2me.services.AudioCaptureService;
+import org.javarosa.j2me.services.AudioException;
+import org.javarosa.j2me.services.DataCaptureServiceRegistry;
+import org.javarosa.j2me.services.FileException;
+import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.media.audio.model.FileDataPointer;
-import org.javarosa.media.audio.service.IAudioCaptureService;
 import org.javarosa.media.audio.service.J2MEAudioCaptureService;
-import org.javarosa.utilities.file.FileException;
 
-public class AudioCaptureActivity implements IActivity, CommandListener, Runnable 
+public class AudioCaptureState implements DataCaptureTransitions, State, CommandListener, Runnable 
 {
 	//private final long FOREVER = 1000000;
-	private IShell parentShell;
-	private Context currentContext;
-		
-	private IAudioCaptureService recordService;
+	private AudioCaptureService recordService;
 		
 	private Command recordCommand, playCommand, stopCommand, backCommand, 
 	                saveCommand, eraseCommand, finishCommand;
-	private IDisplay display;
 	private OutputStream audioDataStream;
 	private String fullName, audioFileName;
 	private RecorderForm form;
@@ -75,24 +67,19 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
    // private static int counter = 0; //Used for saving files
     
     MIDlet recMid;
-    	
-	public AudioCaptureActivity(IShell shell)
-	{
-		parentShell = shell;
-		display = DataCaptureServiceRegistry.instance().getDisplay();		
-	}
+	DataCaptureServiceRegistry dc;
+    DataCaptureTransitions transitions;
 	
-	public AudioCaptureActivity(IShell shell, MIDlet m)
+	public AudioCaptureState (MIDlet m, DataCaptureServiceRegistry dc)
 	{
-		parentShell = shell;
-		display = DataCaptureServiceRegistry.instance().getDisplay();		
 		recMid = m;
+		this.dc = dc;
+		transitions = this;
 	}
 	
 	//Finish off construction of Activity
-	public void start(Context context)
+	public void start()
 	{		
-		currentContext = context;
 		form = new RecorderForm();
 		
 		messageItem = form.getMessageItem();
@@ -100,17 +87,12 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 			
 		initCommands();
 		audioFileName = null;
-		//Display.getDisplay(this).setCurrent(new RecordForm());
-		display.setView(DisplayViewFactory.createView(form));
+		J2MEDisplay.setView(form);
 		form.setCommandListener(this);
 		
 		try
 		{			
-			recordService = getAudioCaptureService();			
-		}
-		catch(ClassCastException ce)
-		{
-			serviceUnavailable(ce);
+			recordService = dc.getAudioCaptureService();			
 		}
 		catch(UnavailableServiceException ue)
 		{
@@ -119,14 +101,6 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 		captureThread = new Thread(this, "CaptureThread");
 	}
 
-	//@Override
-	public void contextChanged(Context globalContext) 
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	//@Override
 	public void destroy() 
 	{
 		try
@@ -139,40 +113,6 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 			System.err.println("An error occurred while closing the streams of the AudioCaptureService.");
 			ioe.printStackTrace();
 		}
-	}
-
-	//@Override
-	public Context getActivityContext() 
-	{
-		// TODO Auto-generated method stub
-		return currentContext;
-	}
-
-	//@Override
-	/*
-	 * Pauses the recorder 
-	 * Should have a placeholder to keep track of position of recorder
-	 */
-	public void halt() 
-	{
-		// TODO Auto-generated method stub		
-	}
-
-	//@Override
-	public void resume(Context globalContext) 
-	{
-		// TODO Auto-generated method stub		
-	}
-
-	//@Override
-	public void setShell(IShell shell) 
-	{
-		parentShell = shell;		
-	}
-	
-	public void annotateCommand(ICommand c)
-	{
-		throw new RuntimeException("This method has not been implemented in " + getClass()+ "!");
 	}
 	
 	private void initCommands()
@@ -309,11 +249,11 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  public void stop() throws AudioException
 	  {
 		  //If currently recording
-		  if(recordService.getState() == IAudioCaptureService.CAPTURE_STARTED)
+		  if(recordService.getState() == AudioCaptureService.CAPTURE_STARTED)
 		  {
 			  stopCapturing();
 		  }
-		  else if(recordService.getState() == IAudioCaptureService.PLAYBACK_STARTED)
+		  else if(recordService.getState() == AudioCaptureService.PLAYBACK_STARTED)
 		  {
 			  stopPlaying();
 		  }
@@ -405,7 +345,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 			   * stop command. Recorder player must be started but not closed. 
 			   */
 			  
-			  if(recordService.getState() == IAudioCaptureService.CAPTURE_STARTED && recordService.getState() != IAudioCaptureService.CLOSED)
+			  if(recordService.getState() == AudioCaptureService.CAPTURE_STARTED && recordService.getState() != AudioCaptureService.CLOSED)
 			  {
 				  stopCapturing();				  
 			  }
@@ -472,20 +412,21 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 	  public void moveBack()
 	  {
 		  System.err.println("Moving back");
-		  parentShell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);		  		
+		  destroy();
+		  transitions.cancel();		  		
 	  }	  
 	  
 	  //Finish capturing audio, inform shell, and return data as well
 	  public void finalizeTask()
 	  {
 		  System.err.println("Finalizing audio capture");
-		  Hashtable returnArgs = new Hashtable();
 		  
-		  if(recordFile != null)
-			  returnArgs.put(Constants.RETURN_ARG_KEY, recordFile);
-		  returnArgs.put(Constants.RETURN_ARG_TYPE_KEY, Constants.RETURN_ARG_TYPE_DATA_POINTER);
-		  
-		  parentShell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+		  destroy();
+		  if (recordFile != null) {
+			  transitions.captured(recordFile);
+		  } else {
+			  transitions.noCapture();
+		  }
 	  }	  
 	  
 	  //Actions to perform when service is unavailable
@@ -499,19 +440,7 @@ public class AudioCaptureActivity implements IActivity, CommandListener, Runnabl
 			
 		  System.err.println(e.getMessage());
 	  }	  
-	  
-	  //Retrieve a reference to the appropriate available service
-	  private IAudioCaptureService getAudioCaptureService() throws UnavailableServiceException
-	  {
-		  //#if app.useJ2MEAudioLib
-		  //# JavaRosaServiceProvider.instance().registerService(new J2MEAudioCaptureService());  
-		  //# IAudioCaptureService audioCaptureService = (J2MEAudioCaptureService)JavaRosaServiceProvider.instance().getService(J2MEAudioCaptureService.serviceName);
-		  //# return audioCaptureService;
-     	  //#else
-		  throw new UnavailableServiceException("Unavailable service: " +  J2MEAudioCaptureService.serviceName);
-		  //#endif
-	  }	  	  
-	  
+	  	  
 	  //Record audio in a separate thread to keep the command listener alert for stopping
 	  public void run()
 	  {		  

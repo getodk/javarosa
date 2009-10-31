@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Command;
+import de.enough.polish.ui.Command;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 

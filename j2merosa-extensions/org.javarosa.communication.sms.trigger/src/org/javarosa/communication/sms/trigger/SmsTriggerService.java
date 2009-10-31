@@ -23,15 +23,10 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.microedition.io.Connector;
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.wireless.messaging.Message;
 import javax.wireless.messaging.MessageConnection;
 import javax.wireless.messaging.MessageListener;
 import javax.wireless.messaging.TextMessage;
-
-import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IView;
 
 /**
  * The SmsTriggerService is a background process which polls
@@ -81,12 +76,7 @@ public class SmsTriggerService extends TimerTask implements MessageListener {
 	public void run() {
 		synchronized (this) {
 			if (pending > 0) {
-				final Alert alert = new Alert("test@!", "test/2@d!", null, AlertType.ALARM);
-				JavaRosaServiceProvider.instance().showView(new IView() {
-					public Object getScreenObject() {
-						return alert;
-					}
-				});
+				J2MEDisplay.showError("test@!", "test/2@d!");
 				try {
 					Message mess = connection.receive();
 					pending--;

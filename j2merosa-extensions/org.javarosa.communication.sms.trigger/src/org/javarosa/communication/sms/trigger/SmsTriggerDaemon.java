@@ -16,10 +16,8 @@
 
 package org.javarosa.communication.sms.trigger;
 
-import java.util.Vector;
+import org.javarosa.core.services.PropertyManager;
 
-import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.IDaemon;
 
 /**
  * 
@@ -35,7 +33,7 @@ public class SmsTriggerDaemon implements IDaemon {
 	SmsTriggerService service;
 	
 	public SmsTriggerDaemon() {
-		String propPort = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(SmsTriggerProperties.TRIGGER_DEFAULT_PORT);
+		String propPort = PropertyManager._().getSingularProperty(SmsTriggerProperties.TRIGGER_DEFAULT_PORT);
 		if(propPort == null) {
 			propPort = "16361"; 
 		}
