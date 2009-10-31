@@ -20,7 +20,7 @@
 package org.javarosa.log;
 
 import org.javarosa.core.api.IModule;
-import org.javarosa.core.services.DataCaptureServiceRegistry;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.log.properties.LogPropertyRules;
 
 /**
@@ -34,7 +34,7 @@ public class LogManagementModule implements IModule {
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
 	public void registerModule() {
-		DataCaptureServiceRegistry.instance().getPropertyManager().addRules(new LogPropertyRules());
+		PropertyManager._().addRules(new LogPropertyRules());
 	}
 
 }
