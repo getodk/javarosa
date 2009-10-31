@@ -42,14 +42,10 @@
 		<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
 		<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
 
-		<!-- stuff that doesn't build on the new framework -->
+		<!-- stuff that hasn't been updated to build on the new framework -->
 		<exclude name="**/org.javarosa.reminders/**/*.java"/>
 		<exclude name="**/org.javarosa.communication.sms.trigger/**/*.java"/>
 		
-		<!-- TEMP: exclusions for stuff that doesn't yet build on the new framework -->
-		<!--<exclude name="**/org.javarosa.media.*/**/*.java"/>-->
-		<exclude name="**/org.javarosa.barcode/**/*.java"/>
-		    	
 		<!-- TEMP: transport layer is not yet merged in -->
 	    <include name="javarosa-transport/transport2/src/**/*.java"/>
 
