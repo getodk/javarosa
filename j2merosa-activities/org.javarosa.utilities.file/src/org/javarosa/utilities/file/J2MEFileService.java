@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.utilities.file.services;
+package org.javarosa.utilities.file;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +27,9 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.io.file.FileSystemRegistry;
 
+import org.javarosa.j2me.services.FileException;
+import org.javarosa.j2me.services.FileService;
+
 
 /**
  * 
@@ -35,8 +38,10 @@ import javax.microedition.io.file.FileSystemRegistry;
  *
  */
 
-public class J2MEFileService implements IFileService 
+public class J2MEFileService implements FileService 
 {
+	public static final String serviceName = "file-io";
+	
 	/**
 	 * Create a directory from the path
 	 * @param path

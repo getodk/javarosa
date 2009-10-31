@@ -6,5 +6,6 @@
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/fileconnection.jar"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.0-java5.0.jar"/>
 	<classpathentry kind="src" path="/javarosa-core"/>
+	<classpathentry kind="src" path="/j2merosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
