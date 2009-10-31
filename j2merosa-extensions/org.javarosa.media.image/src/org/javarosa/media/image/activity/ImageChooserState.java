@@ -21,24 +21,18 @@ import java.util.Hashtable;
 import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable; 
+import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
-import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IActivity;
-import org.javarosa.core.api.ICommand;
-import org.javarosa.core.api.IDisplay;
-import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.State;
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.services.UnavailableServiceException;
-import org.javarosa.j2me.view.DisplayViewFactory;
+import org.javarosa.j2me.services.FileService;
+import org.javarosa.j2me.services.exception.FileException;
+import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.media.image.model.FileDataPointer;
-//import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.utilities.ImageSniffer;
-import org.javarosa.utilities.file.FileException;
-import org.javarosa.utilities.file.FileService;
 import org.javarosa.utilities.file.J2MEFileService;
 
 import de.enough.polish.ui.ChoiceGroup;
@@ -55,16 +49,12 @@ import de.enough.polish.util.ArrayList;
  * @author Cory Zue
  * 
  */
-public class ImageChooserActivity implements IActivity, CommandListener {
-	public static final String ACTIVITY_KEY = "ACTIVITY_KEY";
+public abstract class ImageChooserState implements DataCaptureTransitions, State, CommandListener {
 	
 	/**
 	 * String -> IDataPointer map of image names to references
 	 **/
 	private Hashtable allImages;
-	private Context context;
-	private IShell shell;
-	private IDisplay display;
 	// private FileRMSUtility dataModel;
 	//private Form mainFormOld;
 	private Form mainForm;
@@ -82,30 +72,24 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	 * This holds the key to lookup the return value from a capture or browse activity
 	 * when it gets control back.
 	 */
-	private String currentReturnValueKey;
 	private Thread snifferThread;
 	private ImageSniffer sniffer;
 	private MIDlet midlet;
 
 	private String sniffingPath;
 	private FileService fileService;
-	
-	private int callBackActivity = ACTIVITY_NONE;
-	private static final int ACTIVITY_NONE = 0;
-	private static final int ACTIVITY_DIRECTORY_CHANGE = 1;
+	private DataCaptureTransitions transitions;
 	
 	private boolean isSniffingImages = true;
 
 	private boolean isActivelySniffing = false;
 
 	
-	public ImageChooserActivity(IShell shell, MIDlet midlet) 
+	public ImageChooserState(MIDlet midlet) 
 	{
-		this.shell = shell;
 		this.midlet = midlet;
+		transitions = this;
 		allImages = new Hashtable();
-		display = JavaRosaServiceProvider.instance().getDisplay();
-		// dataModel = new FileRMSUtility("image_store");
 
 		cancelCommand = new Command("Cancel", Command.CANCEL, 0);
 		returnCommand = new Command("Return", Command.OK, 0);
@@ -126,48 +110,27 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		
 	}
 
-	public void contextChanged(Context globalContext) {
-
-	}
-
 	public void destroy() {
 		if (sniffer != null) {
 			sniffer.quit();
 		}
 	}
 
-	public Context getActivityContext() {
-		return context;
-	}
-
-	public void halt() {
-		// No need to override the default behavior.
-	}
-
-	public void resume(Context globalContext) {
-		Object o = globalContext.getElement(currentReturnValueKey);
-		IDataPointer pointer = (IDataPointer) o;
-		if (callBackActivity == ACTIVITY_DIRECTORY_CHANGE) {
-			changeSniffingDirectory(pointer.getDisplayText());
-		} else {
-			addImageToUI(pointer);
-		}
+	public void imageFetched (IDataPointer data) {
+		addImageToUI(data);
 		updateView();
-		callBackActivity = ACTIVITY_NONE;
 	}
-
 	
+	public void dirChanged (IDataPointer data) {
+		changeSniffingDirectory(data.getDisplayText());
+		updateView();
+	}
+		
 	private void updateView() {
-		display.setView(DisplayViewFactory.createView(mainForm));
+		J2MEDisplay.setView(mainForm);
 	}
 
-	public void setShell(IShell shell) {
-		this.shell = shell;
-
-	}
-
-	public void start(Context context) {
-		this.context = context;
+	public void start() {
 
 		// mainList = new List("Available Images", List.IMPLICIT);
 		mainForm = new Form("Image Chooser");
@@ -195,7 +158,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 				System.err.println("An error occurred while getting image sniffing path.");
 				System.err.println("Sniffer could not be created. QUITTING!!!");
 				fe.printStackTrace();
-				returnFromActivity(this);
+				processCancel();
 			}
 			snifferThread = new Thread(sniffer);
 			snifferThread.start();
@@ -364,8 +327,9 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	}
 
 	private void processReturn() {
-		// null indicates we're done done
-		returnFromActivity(null);
+		// if we're going back to the original caller then add the images 
+		destroy();
+		transitions.captured(getSelectedImages());
 	}
 
 	private IDataPointer[] getSelectedImages() {
@@ -394,7 +358,8 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	}
 
 	private void processCancel() {
-		shell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
+		destroy();
+		transitions.cancel();
 	}
 
 	private void processView(String file) {
@@ -408,64 +373,69 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	}
 
 	private void processBrowser() {
-		try {
-			currentReturnValueKey = FileBrowseActivity.FILE_POINTER;
-			returnFromActivity(new FileBrowseActivity(shell));
-		} catch (Exception e) {
-			System.out.println("Exception: " + e.getMessage());
-			e.printStackTrace();
-		}
+		new FileBrowseState () {
+			public void cancel() {
+				updateView();
+			}
+
+			public void captured(IDataPointer data) {
+				imageFetched(data);
+			}
+
+			public void captured(IDataPointer[] data) {
+				throw new RuntimeException("not applicable");		
+			}
+
+			public void noCapture() {
+				cancel();
+			}
+		}.start();
 	}
 
 	private void processChangeDirectory() {
-		currentReturnValueKey = FileBrowseActivity.FILE_POINTER;
-		callBackActivity = ACTIVITY_DIRECTORY_CHANGE;
-		FileBrowseActivity activity = new FileBrowseActivity(shell);
-		activity.setMode(FileBrowseActivity.MODE_DIRECTORY);
-		returnFromActivity(activity);
-	}
+		new FileBrowseState (FileBrowseState.MODE_DIRECTORY) {
+			public void cancel() {
+				updateView();
+			}
 
+			public void captured(IDataPointer data) {
+				dirChanged(data);
+			}
+
+			public void captured(IDataPointer[] data) {
+				throw new RuntimeException("not applicable");		
+			}
+
+			public void noCapture() {
+				cancel();
+			}
+		}.start();
+	}
 
 	private void processCamera() {
-		currentReturnValueKey = ImageCaptureActivity.IMAGE_KEY;
-		returnFromActivity(new ImageCaptureActivity(shell));
-	}
+		new ImageCaptureState () {
+			public void cancel() {
+				updateView();
+			}
 
-	private void returnFromActivity(IActivity activity) {
-		Hashtable returnArgs = buildReturnArgsFromActivity(activity);
-		String returnCode =Constants.ACTIVITY_NEEDS_RESOLUTION; 
-		if (activity == null) {
-			returnCode = Constants.ACTIVITY_COMPLETE;
-		}
-		shell.returnFromActivity(this, returnCode,returnArgs);
-	}
+			public void captured(IDataPointer data) {
+				imageFetched(data);
+			}
 
-	private Hashtable buildReturnArgsFromActivity(IActivity activity) {
-		Hashtable table = new Hashtable();
-		if (activity == null) {
-			// if we're going back to the original caller then add the images 
-			IDataPointer[] imageList = getSelectedImages();
-			table.put(Constants.RETURN_ARG_KEY, imageList);
-			table.put(Constants.RETURN_ARG_TYPE_KEY, Constants.RETURN_ARG_TYPE_DATA_POINTER_LIST);
-		} else {
-			// otherwise add the callback
-			table.put(ACTIVITY_KEY, activity);
-		}
-		return table;
-	}
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
-	 */
-	public void annotateCommand(ICommand command) {
-		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
+			public void captured(IDataPointer[] data) {
+				throw new RuntimeException("not applicable");
+			}
+
+			public void noCapture() {
+				cancel();
+			}
+		}.start();
 	}
 	
 	private FileService getFileService() throws UnavailableServiceException
 	{
 		//#if app.usefileconnections
-		//# JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
-		//# IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
-		//# return service;
+		//#  return new J2MEFileService();
 		//#else
 		throw new UnavailableServiceException("Unavailable service: " +  J2MEFileService.serviceName);
 		//#endif
@@ -475,5 +445,13 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	{
 		System.err.println("The File Service is unavailable.\n QUITTING!");			
 		System.err.println(e.getMessage());
+	}
+	
+	public void captured (IDataPointer data) {
+		throw new RuntimeException("not applicable");
+	}
+	
+	public void noCapture () {
+		throw new RuntimeException("not applicable");
 	}
 }

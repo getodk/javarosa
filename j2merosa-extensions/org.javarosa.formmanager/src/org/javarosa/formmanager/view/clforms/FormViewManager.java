@@ -149,7 +149,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 
 			case Constants.DATATYPE_BARCODE:
 				try { // is there a service that can acquire a barcode?
-					IAcquiringService barcodeService = (IAcquiringService)controller.getDataCaptureService("Barcode Acquiring Service");
+					IAcquiringService barcodeService = (IAcquiringService)controller.getDataCaptureService("clforms-barcode");
 					if (fromFormView == true)
 						widget = barcodeService.getWidget(prompt, 'c');
 					else if (direction)

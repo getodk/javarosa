@@ -19,9 +19,9 @@ package org.javarosa.media.image.utilities;
 import java.util.Vector;
 
 import org.javarosa.core.services.UnavailableServiceException;
-import org.javarosa.j2me.services.FileException;
 import org.javarosa.j2me.services.FileService;
-import org.javarosa.media.image.activity.ImageChooserActivity;
+import org.javarosa.j2me.services.exception.FileException;
+import org.javarosa.media.image.activity.ImageChooserState;
 import org.javarosa.media.image.model.FileDataPointer;
 import org.javarosa.utilities.file.J2MEFileService;
 
@@ -36,12 +36,12 @@ public class ImageSniffer implements Runnable
 	private boolean quit = false;
 	private String directory;
 	private Vector foundFiles;
-	private ImageChooserActivity chooser;
+	private ImageChooserState chooser;
 	private String directoryToUse;
 	
 	private FileService fileService;
 	
-	public ImageSniffer(String directory, ImageChooserActivity chooser) 
+	public ImageSniffer(String directory, ImageChooserState chooser) 
 	{
 		this.directory = directory;
 		this.chooser = chooser;

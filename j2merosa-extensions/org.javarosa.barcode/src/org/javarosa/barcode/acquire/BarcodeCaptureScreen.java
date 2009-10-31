@@ -21,15 +21,11 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Image;
 import javax.microedition.media.MediaException;
 
-import org.javarosa.barcode.process.IBarcodeProcessingService;
-import org.javarosa.barcode.process.ImageProcessingException;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
-
-//#if javarosa.usepolishlocalisation
-import de.enough.polish.util.Locale;
-//#endif
+import org.javarosa.j2me.services.BarcodeCaptureService;
+import org.javarosa.j2me.services.exception.ImageProcessingException;
 
 /**
  * @author mel
@@ -41,12 +37,12 @@ import de.enough.polish.util.Locale;
 public class BarcodeCaptureScreen extends ImageCaptureScreen {
 
 	private StringData scannedCode;
-	private IBarcodeProcessingService barcodeProcessor;
+	private BarcodeCaptureService barcodeProcessor;
 
 	/**
 	 * @return the barcode processing service being used
 	 */
-	public IBarcodeProcessingService getBarcodeProcessor() {
+	public BarcodeCaptureService getBarcodeProcessor() {
 		return barcodeProcessor;
 	}
 
@@ -54,7 +50,7 @@ public class BarcodeCaptureScreen extends ImageCaptureScreen {
 	 * @param barcodeProcessor
 	 *            the barcode processing service to use
 	 */
-	public void setBarcodeProcessor(IBarcodeProcessingService barcodeProcessor) {
+	public void setBarcodeProcessor(BarcodeCaptureService barcodeProcessor) {
 		this.barcodeProcessor = barcodeProcessor;
 	}
 

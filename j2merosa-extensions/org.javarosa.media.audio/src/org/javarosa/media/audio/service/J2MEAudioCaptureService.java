@@ -27,10 +27,10 @@ import javax.microedition.media.control.RecordControl;
 
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.services.AudioCaptureService;
-import org.javarosa.j2me.services.AudioException;
 import org.javarosa.j2me.services.DataCaptureService;
-import org.javarosa.j2me.services.FileException;
 import org.javarosa.j2me.services.FileService;
+import org.javarosa.j2me.services.exception.AudioException;
+import org.javarosa.j2me.services.exception.FileException;
 import org.javarosa.utilities.file.J2MEFileService;
 
 /**
@@ -81,7 +81,7 @@ public class J2MEAudioCaptureService implements AudioCaptureService
 		audioFormat = ".wav"; //Default audio format is WAV
 	}
 
-	public String getName()
+	public String getType()
 	{
 		return serviceName;		
 	}
