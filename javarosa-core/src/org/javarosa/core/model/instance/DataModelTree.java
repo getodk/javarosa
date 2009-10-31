@@ -34,7 +34,6 @@ import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 import org.javarosa.core.services.ITransportManager;
-import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.TransportManager;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
@@ -45,6 +44,7 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 
 public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 

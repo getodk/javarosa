@@ -29,13 +29,13 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
+import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 
 public class QuestionDefTest extends TestCase {
 	public QuestionDefTest(String name, TestMethod rTestMethod) {

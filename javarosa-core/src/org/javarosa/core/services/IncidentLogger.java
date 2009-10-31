@@ -12,7 +12,7 @@ public class IncidentLogger {
 		logger = theLogger;
 	}
 	
-	public static IIncidentLogger getIncidentLogger() {
+	public static IIncidentLogger _ () {
 		return logger;
 	}
 	
