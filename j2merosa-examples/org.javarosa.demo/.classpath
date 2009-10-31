@@ -13,5 +13,7 @@
 	<classpathentry kind="src" path="/javarosa-core"/>
 	<classpathentry kind="src" path="/j2merosa-core"/>
 	<classpathentry kind="src" path="/org.javarosa.services.properties"/>
+	<classpathentry kind="src" path="/org.javarosa.formmanager"/>
+	<classpathentry kind="src" path="/org.javarosa.polish.chatterbox"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Vector;
 
+import org.javarosa.core.api.State;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.IStorageIterator;
@@ -12,6 +13,8 @@ import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.demo.applogic.JRDemoContext;
+import org.javarosa.demo.applogic.JRDemoFormListState;
+import org.javarosa.demo.applogic.JRDemoSavedFormListState;
 import org.javarosa.demo.applogic.JRDemoSplashScreenState;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.user.model.Constants;
@@ -31,6 +34,10 @@ public class JRDemoUtil {
 	
 	public static void exit () {
 		JRDemoContext._().getMidlet().notifyDestroyed();
+	}
+	
+	public static void goToList (boolean formList) {
+		((State)(formList ? new JRDemoFormListState() : new JRDemoSavedFormListState())).start();
 	}
 	
 	/**
