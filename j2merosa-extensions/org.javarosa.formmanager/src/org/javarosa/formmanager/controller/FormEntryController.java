@@ -151,7 +151,6 @@ public class FormEntryController {
 			FormDef form = model.getForm();
 			IStorageUtility instances = StorageManager.getStorage(DataModelTree.STORAGE_KEY);
 			DataModelTree instance = (DataModelTree)form.getDataModel();
-			int instanceID = model.getInstanceID();
 
 			instance.setName(form.getTitle());
 	        instance.setFormId(form.getID());
@@ -163,7 +162,7 @@ public class FormEntryController {
     			throw new RuntimeException("uh-oh, storage full [datamodeltrees]"); //TODO: handle this
     		}
 
-			model.modelSaved(instanceID);
+			model.modelSaved(instance.getID());
 		}
 	}
 
