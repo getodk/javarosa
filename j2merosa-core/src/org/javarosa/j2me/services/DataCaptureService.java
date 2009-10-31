@@ -9,6 +9,6 @@ public interface DataCaptureService {
 	String RFID = "rfid";
 	String SMELLOVISION = "scent";
 
-	String getName ();
+	String getType ();
 	
 }

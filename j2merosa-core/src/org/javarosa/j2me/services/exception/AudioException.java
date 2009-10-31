@@ -1,4 +1,3 @@
-package org.javarosa.j2me.services;
 /*
  * Copyright (C) 2009 JavaRosa
  *
@@ -15,24 +14,16 @@ package org.javarosa.j2me.services;
  * the License.
  */
 
+package org.javarosa.j2me.services.exception;
 
-
-/**
- * 
- * A FileException corresponds to any type of error received by the IFileService
- * during a File I/O operation.
- * @author Ndubisi Onuora
- *
- */
-
-public class FileException extends Exception 
+public class AudioException extends Exception
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public FileException(String message)
+	public AudioException()
+	{
+		
+	}
+	
+	public AudioException(String message)
 	{
 		super(message);
 	}

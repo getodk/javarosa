@@ -19,6 +19,8 @@ package org.javarosa.j2me.services;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.javarosa.j2me.services.exception.FileException;
+
 /**
  * 
  * Service providing an interface for File I/O
