@@ -25,6 +25,9 @@ import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.j2me.services.BarcodeCaptureService;
+import org.javarosa.j2me.services.DataCaptureService;
+import org.javarosa.j2me.services.exception.ImageProcessingException;
 
 import com.google.zxing.MonochromeBitmapSource;
 import com.google.zxing.Reader;
@@ -40,10 +43,10 @@ import com.google.zxing.qrcode.QRCodeReader;
  * http://code.google.com/p/zxing/
  *
  */
-public class ZXingBarcodeProcessingService implements IBarcodeProcessingService {
+public class ZXingBarcodeProcessingService implements BarcodeCaptureService {
 
-	public String getName() {
-		return "Barcode Processing Service";
+	public String getType() {
+		return DataCaptureService.BARCODE;
 	}
 
 	public IAnswerData processImage(Image image)

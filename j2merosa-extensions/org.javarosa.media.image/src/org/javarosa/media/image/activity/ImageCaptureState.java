@@ -17,7 +17,6 @@
 package org.javarosa.media.image.activity;
 
 import java.io.IOException;
-import java.util.Hashtable;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
@@ -28,22 +27,16 @@ import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
 import javax.microedition.media.control.VideoControl;
 
-import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IActivity;
-import org.javarosa.core.api.ICommand;
-import org.javarosa.core.api.IDisplay;
-import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.State;
 import org.javarosa.core.services.UnavailableServiceException;
-import org.javarosa.j2me.view.DisplayViewFactory;
-//import org.javarosa.media.audio.service.J2MEAudioCaptureService;
+import org.javarosa.j2me.services.FileService;
+import org.javarosa.j2me.services.exception.FileException;
+import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.media.image.model.FileDataPointer;
-//import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.view.CameraCanvas;
-import org.javarosa.utilities.file.*;
+import org.javarosa.utilities.file.J2MEFileService;
 
-
+//TODO: image capture should be factored out into a service
 
 /**
  * An Activity that represents the capture of a single Image.  This will talk to the
@@ -52,21 +45,14 @@ import org.javarosa.utilities.file.*;
  * @author Cory Zue
  *
  */
-public class ImageCaptureActivity implements IActivity, CommandListener
+public abstract class ImageCaptureState implements DataCaptureTransitions, State, CommandListener
 {
-
-	public static final String IMAGE_KEY = "IMAGE_KEY";
-	private Context context;
-	private IShell shell;
-	
-
 	// camera needed variables
 	
 	private Player mPlayer;
 	private VideoControl mVideoControl;
 	private Command mBackCommand;
 	private Command mCaptureCommand;
-	private IDisplay display;
 	private byte[] imageData;
 	private int width;
 	private int height;
@@ -74,12 +60,12 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	
 	private FileService fileService;
 	
-	public ImageCaptureActivity(IShell shell)
+	DataCaptureTransitions transitions;
+	
+	public ImageCaptureState()
 	{
-		this.shell = shell;
-		display = JavaRosaServiceProvider.instance().getDisplay();
-		width = 640;
-		height = 480;
+		transitions = this;
+		setResolution(width, height);
 		try
 		{
 			fileService = getFileService();
@@ -88,12 +74,6 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		{
 			serviceUnavailable(ue);
 		}
-	}
-
-	
-	public void contextChanged(Context globalContext) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void destroy() {
@@ -102,41 +82,15 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		mVideoControl = null;
 	}
 
-	public Context getActivityContext() {
-		return context;
-	}
-
-	public void halt() {
-		// no need to modify the default behavior
-	}
-
-	public void resume(Context globalContext) {
-		// no need to modify the default behavior
-	}
-
-	public void setShell(IShell shell) {
-		this.shell = shell;
-	}
-
-	public void start(Context context) {
+	public void start() {
 		// initialize GUI
 		// take a pointer to the context and shell
-		this.context = context;
 		showCamera();
-		try
-		{
-			fileService = getFileService();
-		}
-		catch(UnavailableServiceException ue)
-		{
-			serviceUnavailable(ue);
-		}
 	}
 	
 	public void setResolution(int width, int height) {
 		this.width = width;
 		this.height = height;
-		
 	}
 	
 	
@@ -145,21 +99,13 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	 * Other images are deleted?
 	 */
 	private void doFinish() {
-		Hashtable args = buildReturnArgs();
-		shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, args);
+		destroy();
+		transitions.captured(new FileDataPointer(fullName));
 	}
 
 	private void doError() {
-		shell.returnFromActivity(this, Constants.ACTIVITY_ERROR, null);
-	}
-
-	private Hashtable buildReturnArgs() {
-		// stick the picture in here. 
-		Hashtable table = new Hashtable();
-		FileDataPointer p = new FileDataPointer(fullName);
-		//BasicDataPointer p = new BasicDataPointer("Image", imageData);
-		table.put(IMAGE_KEY, p);
-		return table;
+		destroy();
+		transitions.cancel();
 	}
 	
 	private void showCamera() {
@@ -179,7 +125,7 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 			canvas.addCommand(mCaptureCommand);
 			canvas.setCommandListener(this);
 			
-			display.setView(DisplayViewFactory.createView(canvas));
+			J2MEDisplay.setView(canvas);
 			mPlayer.start();
 		} catch (IOException ioe) {
 			handleException(ioe);
@@ -222,8 +168,8 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	}
 
 	private void goBack() {
-		this.shell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-		
+		destroy();
+		transitions.cancel();
 	}
 
 	private void doCapture() {
@@ -316,20 +262,11 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		}
 		
 	}
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
-	 */
-	public void annotateCommand(ICommand command) 
-	{
-		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
-	}
 	
 	private FileService getFileService() throws UnavailableServiceException
 	{
 		//#if app.usefileconnections
-		//# JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
-		//# IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
-		//# return service;
+		//#  return new J2MEFileService();
 		//#else
 		throw new UnavailableServiceException("Unavailable service: " +  J2MEFileService.serviceName);
 		//#endif

@@ -25,7 +25,6 @@ package org.javarosa.media.audio.activity;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Hashtable;
 
 import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Command;
@@ -35,18 +34,17 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.midlet.MIDlet;
 
-import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.services.AudioCaptureService;
-import org.javarosa.j2me.services.AudioException;
 import org.javarosa.j2me.services.DataCaptureServiceRegistry;
-import org.javarosa.j2me.services.FileException;
+import org.javarosa.j2me.services.exception.AudioException;
+import org.javarosa.j2me.services.exception.FileException;
 import org.javarosa.j2me.view.J2MEDisplay;
-import org.javarosa.media.audio.model.FileDataPointer;
-import org.javarosa.media.audio.service.J2MEAudioCaptureService;
+import org.javarosa.media.image.activity.DataCaptureTransitions;
+import org.javarosa.media.image.model.FileDataPointer;
 
-public class AudioCaptureState implements DataCaptureTransitions, State, CommandListener, Runnable 
+public abstract class AudioCaptureState implements DataCaptureTransitions, State, CommandListener, Runnable 
 {
 	//private final long FOREVER = 1000000;
 	private AudioCaptureService recordService;

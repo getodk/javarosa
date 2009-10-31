@@ -21,6 +21,7 @@ import org.javarosa.core.api.IModule;
 public class BarcodeModule implements IModule {
 
 	public void registerModule() {
+		
 	};
 
 }

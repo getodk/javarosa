@@ -25,8 +25,6 @@ import org.javarosa.formmanager.view.FormElementBinding;
  *
  */
 public interface IAcquiringService {
-
-	public String getName();
 	
 	public AcquiringQuestionScreen getWidget(FormElementBinding prompt, int temp);
 

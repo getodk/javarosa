@@ -19,8 +19,6 @@
 
 package org.javarosa.media.image.activity;
 
-import java.util.Hashtable;
-
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
@@ -28,18 +26,12 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
-import org.javarosa.core.api.Constants;
-import org.javarosa.core.api.IActivity;
-import org.javarosa.core.api.ICommand;
-import org.javarosa.core.api.IDisplay;
-import org.javarosa.core.api.IShell;
+import org.javarosa.core.api.State;
 import org.javarosa.core.services.UnavailableServiceException;
-import org.javarosa.j2me.view.DisplayViewFactory;
+import org.javarosa.j2me.services.FileService;
+import org.javarosa.j2me.services.exception.FileException;
+import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.media.image.model.FileDataPointer;
-import org.javarosa.utilities.file.FileException;
-import org.javarosa.utilities.file.FileService;
 import org.javarosa.utilities.file.J2MEFileService;
 
 /**
@@ -52,7 +44,7 @@ import org.javarosa.utilities.file.J2MEFileService;
  * @author Cory Zue
  */
 
-public class FileBrowseActivity implements IActivity, CommandListener {
+public abstract class FileBrowseState implements DataCaptureTransitions, State, CommandListener {
 
 	private String currDirName;
 
@@ -61,30 +53,28 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	private Command back = new Command("Back", Command.BACK, 2);
 	private Command cancel = new Command("Cancel", Command.CANCEL, 4);
 
-	
-	private IShell shell;
-	private IDisplay display;
 	private FileService fileService;
-
+	private DataCaptureTransitions transitions;
 
 	private final static String UP_DIRECTORY = "/";
 	private final static String MEGA_ROOT = "/";
 	private final static String SEP_STR = "/";
 	private final static char SEP = '/';
 
-	private int mode = MODE_FILE;
-
-	
-	public static final String FILE_POINTER = "FILE_POINTER";
+	private int mode;
 
 	public static final int MODE_FILE = 0;
 	public static final int MODE_DIRECTORY = 1;
 	
 	
-	public FileBrowseActivity(IShell shell) 
+	public FileBrowseState() {
+		this(MODE_FILE);
+	}
+	
+	public FileBrowseState (int mode)
 	{
-		this.shell = shell;
-		this.display = JavaRosaServiceProvider.instance().getDisplay();
+		transitions = this;
+		setMode(mode);
 		//this.currDirName = FileUtility.getDefaultRoot();
 		try
 		{
@@ -101,43 +91,14 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		}
 			
 	}
-	public void contextChanged(Context globalContext) {
-		// TODO Auto-generated method stub
 
-	}
-
-	public void destroy() {
-		
-	}
-
-	public Context getActivityContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void halt() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void resume(Context globalContext) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void setShell(IShell shell) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void start(Context context) {
+	public void start() {
 	//	boolean isAPIAvailable = false;
 		if (System.getProperty("microedition.io.file.FileConnection.version") != null) {
 			//isAPIAvailable = true;
 			try 
 			{
 				showCurrDir();
-				System.out.println("h5");
 			} 
 			catch (SecurityException e) 
 			{
@@ -152,7 +113,7 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 			Alert splashScreen = new Alert(null, splashText, null,
 					AlertType.INFO);
 			splashScreen.setTimeout(3000);
-			display.setView(DisplayViewFactory.createView(splashScreen));
+			J2MEDisplay.setView(splashScreen);
 		}
 	}
 
@@ -187,7 +148,7 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 			}
 		} 
 		else if (c == cancel) {
-			shell.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null); 
+			transitions.cancel(); 
 		}
 	}
 
@@ -243,7 +204,7 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		
 		browser.addCommand(cancel);
 		browser.setCommandListener(this);
-		display.setView(DisplayViewFactory.createView(browser));
+		J2MEDisplay.setView(browser);
 	}
 
 	private void traverseDirectory(String fileName) {
@@ -285,21 +246,13 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 		}
 		String fullName = "file://localhost/" + currDirName + fileName;
 		FileDataPointer fdp = new FileDataPointer(fullName);
-		Hashtable returnArgs = new Hashtable();
-		returnArgs.put(FILE_POINTER, fdp);
-		shell.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
+		transitions.captured(fdp);
 	}
 	
 	private void returnDirectory(String name) {
 		returnFile(name);
 	}
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
-	 */
-	public void annotateCommand(ICommand command) {
-		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
-	}
-	
+
 	private void serviceUnavailable(Exception e)
 	{
 		System.err.println("The File Service is unavailable.\n QUITTING!");			
@@ -309,9 +262,7 @@ public class FileBrowseActivity implements IActivity, CommandListener {
 	private FileService getFileService() throws UnavailableServiceException
 	{
 		//#if app.usefileconnections
-		//# JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
-		//# IFileService service = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
-		//# return service;
+		//# return new J2MEFileService();
 		//#else
 		throw new UnavailableServiceException("Unavailable service: " +  J2MEFileService.serviceName);
 		//#endif
