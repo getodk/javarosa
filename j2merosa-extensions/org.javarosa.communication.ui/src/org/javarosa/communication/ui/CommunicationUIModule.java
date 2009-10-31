@@ -17,23 +17,23 @@
 package org.javarosa.communication.ui;
 
 import org.javarosa.communication.http.HttpTransportMethod;
-import org.javarosa.communication.http.ui.HttpDestinationRetrievalActivity;
+import org.javarosa.communication.http.ui.HttpDestinationRetrievalState;
 import org.javarosa.communication.sms.SmsTransportMethod;
-import org.javarosa.communication.sms.ui.SmsDestinationRetrievalActivity;
+import org.javarosa.communication.sms.ui.SmsDestinationRetrievalState;
 import org.javarosa.core.api.IModule;
-import org.javarosa.core.services.DataCaptureServiceRegistry;
+import org.javarosa.core.services.TransportManager;
 
 public class CommunicationUIModule implements IModule {
 
 	public void registerModule() {
-		HttpTransportMethod http = (HttpTransportMethod)DataCaptureServiceRegistry.instance().getTransportManager().getTransportMethod(new HttpTransportMethod().getId());
-		if(http != null) {
-			http.setDestinationRetrievalActivity(new HttpDestinationRetrievalActivity());
-		}
-		SmsTransportMethod sms = (SmsTransportMethod)DataCaptureServiceRegistry.instance().getTransportManager().getTransportMethod(new SmsTransportMethod().getId());
-		if(sms != null) {
-			sms.setDestinationRetrievalActivity(new SmsDestinationRetrievalActivity());
-		}
+//		HttpTransportMethod http = (HttpTransportMethod)TransportManager._().getTransportMethod(new HttpTransportMethod().getId());
+//		if(http != null) {
+//			http.setDestinationRetrievalActivity(new HttpDestinationRetrievalState());
+//		}
+//		SmsTransportMethod sms = (SmsTransportMethod)TransportManager._().getTransportMethod(new SmsTransportMethod().getId());
+//		if(sms != null) {
+//			sms.setDestinationRetrievalActivity(new SmsDestinationRetrievalState());
+//		}
 	}
 
 }

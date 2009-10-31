@@ -22,9 +22,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.Context;
-import org.javarosa.core.JavaRosaServiceProvider;
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
@@ -36,7 +35,7 @@ import org.javarosa.xform.parse.XFormParser;
 
 public class ExtendedWidgetsModule implements IModule {
 	
-	public void registerModule(Context context) {
+	public void registerModule() {
 		
 		GraphElementHandler graphHandler = new GraphElementHandler();
 		graphHandler.registerGraphType(WHOWeightTemplate.WHO_WEIGHT_TEMPLATE_NAME);
@@ -51,14 +50,14 @@ public class ExtendedWidgetsModule implements IModule {
 				"org.javarosa.model.GraphDataGroup",
 		};
 		
-		JavaRosaServiceProvider.instance().registerPrototypes(classes);
+		PrototypeManager.registerPrototypes(classes);
 		ByteArrayOutputStream bis = new ByteArrayOutputStream();
 		DataOutputStream out = new DataOutputStream(bis);
 		try {
 			ExtUtil.write(out, new ExtWrapTagged(new GraphDataGroup()));
 			byte[] test = bis.toByteArray();
 			DataInputStream in = new DataInputStream(new ByteArrayInputStream(test));
-			ExtUtil.read(in, new ExtWrapTagged(), new PrototypeFactory(JavaRosaServiceProvider.instance().getPrototypes()));
+			ExtUtil.read(in, new ExtWrapTagged());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

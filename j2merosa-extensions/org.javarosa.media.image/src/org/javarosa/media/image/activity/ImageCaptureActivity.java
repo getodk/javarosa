@@ -42,7 +42,6 @@ import org.javarosa.media.image.model.FileDataPointer;
 //import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.view.CameraCanvas;
 import org.javarosa.utilities.file.*;
-import org.javarosa.utilities.file.services.*;
 
 
 
@@ -73,7 +72,7 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 	private int height;
 	private String fullName;
 	
-	private IFileService fileService;
+	private FileService fileService;
 	
 	public ImageCaptureActivity(IShell shell)
 	{
@@ -325,7 +324,7 @@ public class ImageCaptureActivity implements IActivity, CommandListener
 		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
 	}
 	
-	private IFileService getFileService() throws UnavailableServiceException
+	private FileService getFileService() throws UnavailableServiceException
 	{
 		//#if app.usefileconnections
 		//# JavaRosaServiceProvider.instance().registerService(new J2MEFileService());

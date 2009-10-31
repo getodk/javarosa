@@ -17,11 +17,11 @@
 package org.javarosa.barcode.acquire;
 
 import org.javarosa.barcode.process.IBarcodeProcessingService;
-import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
 import org.javarosa.formmanager.view.clforms.acquire.IAcquiringService;
+import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 import org.javarosa.view.clforms.widgets.BarcodeQuestionWidget;
 
 /**

@@ -24,8 +24,6 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.services.DataCaptureService;
-import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
@@ -36,6 +34,8 @@ import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
+import org.javarosa.j2me.services.DataCaptureService;
+import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 public class FormEntryController {

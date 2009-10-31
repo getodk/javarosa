@@ -11,5 +11,9 @@
 	<classpathentry exported="true" kind="con" path="J2MELIB"/>
 	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.forms"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.1-java5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/J2ME-Polish/import/enough-j2mepolish-client-java5.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/midp-2.0.jar"/>
+	<classpathentry kind="src" path="/javarosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

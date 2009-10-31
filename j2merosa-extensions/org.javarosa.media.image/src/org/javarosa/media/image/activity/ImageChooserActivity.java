@@ -38,8 +38,8 @@ import org.javarosa.media.image.model.FileDataPointer;
 //import org.javarosa.media.image.utilities.FileUtility;
 import org.javarosa.media.image.utilities.ImageSniffer;
 import org.javarosa.utilities.file.FileException;
-import org.javarosa.utilities.file.services.IFileService;
-import org.javarosa.utilities.file.services.J2MEFileService;
+import org.javarosa.utilities.file.FileService;
+import org.javarosa.utilities.file.J2MEFileService;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
@@ -88,7 +88,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 	private MIDlet midlet;
 
 	private String sniffingPath;
-	private IFileService fileService;
+	private FileService fileService;
 	
 	private int callBackActivity = ACTIVITY_NONE;
 	private static final int ACTIVITY_NONE = 0;
@@ -460,7 +460,7 @@ public class ImageChooserActivity implements IActivity, CommandListener {
 		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
 	}
 	
-	private IFileService getFileService() throws UnavailableServiceException
+	private FileService getFileService() throws UnavailableServiceException
 	{
 		//#if app.usefileconnections
 		//# JavaRosaServiceProvider.instance().registerService(new J2MEFileService());

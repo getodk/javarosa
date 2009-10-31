@@ -17,7 +17,7 @@
 package org.javarosa.media.audio;
 
 import org.javarosa.core.api.IModule;
-import org.javarosa.core.services.DataCaptureServiceRegistry;
+import org.javarosa.core.services.PrototypeManager;
 
 public class RecordModule implements IModule 
 {
@@ -27,6 +27,6 @@ public class RecordModule implements IModule
 		String[] classes = { 
 				"org.javarosa.media.audio.model.FileDataPointer",
 		};		
-		DataCaptureServiceRegistry.instance().registerPrototypes(classes);
+		PrototypeManager.registerPrototypes(classes);
 	}
 }

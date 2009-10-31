@@ -25,12 +25,13 @@ import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
 import javax.microedition.media.control.RecordControl;
 
-import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.UnavailableServiceException;
-import org.javarosa.media.audio.AudioException;
-import org.javarosa.utilities.file.FileException;
-import org.javarosa.utilities.file.services.IFileService;
-import org.javarosa.utilities.file.services.J2MEFileService;
+import org.javarosa.j2me.services.AudioCaptureService;
+import org.javarosa.j2me.services.AudioException;
+import org.javarosa.j2me.services.DataCaptureService;
+import org.javarosa.j2me.services.FileException;
+import org.javarosa.j2me.services.FileService;
+import org.javarosa.utilities.file.J2MEFileService;
 
 /**
  * An audio capture service that utilizes J2ME's robust Media API
@@ -38,9 +39,9 @@ import org.javarosa.utilities.file.services.J2MEFileService;
  * @author Ndubisi Onuora
  */
 
-public class J2MEAudioCaptureService implements IAudioCaptureService 
+public class J2MEAudioCaptureService implements AudioCaptureService 
 {
-	public static final String serviceName = "J2MEAudioCaptureService";
+	public static final String serviceName = DataCaptureService.AUDIO;
 	private int serviceState;
 	
 	private Player recordP;
@@ -50,7 +51,7 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	private Player playP;
 	private InputStream recordedInputStream;
 	
-	private IFileService fileService;
+	private FileService fileService;
 	private String recordFileName;
 	private String defaultFileName;
 	//private String recordDirectory;
@@ -72,7 +73,7 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 			ue.printStackTrace();
 			throw new UnavailableServiceException("File service is unavailable. Unable to start " + serviceName);
 		}
-		serviceState = IAudioCaptureService.IDLE;
+		serviceState = AudioCaptureService.IDLE;
 		recordingDeleted = false;
 		recordingCreated = false;
 		recordingDirectoryCreated = false;
@@ -133,7 +134,7 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	    * If the method does not die before here, 
 	    * then the capture has officially started.	    
 	    */	   
-			serviceState = IAudioCaptureService.CAPTURE_STARTED;
+			serviceState = AudioCaptureService.CAPTURE_STARTED;
 		}
 		catch(MediaException me)
 		{
@@ -154,7 +155,7 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 			recordControl.commit();
 			recordP.stop();	
 			
-			serviceState = IAudioCaptureService.CAPTURE_STOPPED;
+			serviceState = AudioCaptureService.CAPTURE_STOPPED;
 		}
 		catch(MediaException me)
 		{
@@ -193,7 +194,7 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 			playP.prefetch();
 			playP.start();		
 	    
-			serviceState = IAudioCaptureService.PLAYBACK_STARTED;
+			serviceState = AudioCaptureService.PLAYBACK_STARTED;
 		}
 		catch(MediaException me)
 		{
@@ -208,12 +209,12 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	//@Override
 	public void stopPlayback() throws AudioException 
 	{
-		if( recordingCreated && (serviceState == IAudioCaptureService.PLAYBACK_STARTED) )			
+		if( recordingCreated && (serviceState == AudioCaptureService.PLAYBACK_STARTED) )			
 		{		
 			try
 			{
 				playP.stop();
-				serviceState = IAudioCaptureService.PLAYBACK_STOPPED;
+				serviceState = AudioCaptureService.PLAYBACK_STOPPED;
 			}
 			catch(MediaException me)
 			{
@@ -273,12 +274,10 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 	}
 	
 	  //Retrieve a reference to the first available service
-	private IFileService getFileService() throws UnavailableServiceException
+	private FileService getFileService() throws UnavailableServiceException
 	{
 		//#if app.usefileconnections
-		//# JavaRosaServiceProvider.instance().registerService(new J2MEFileService());
-		//# IFileService fService = (J2MEFileService)JavaRosaServiceProvider.instance().getService(J2MEFileService.serviceName);
-		//# return fService;
+		//#  return new J2MEFileService();
 		//#else
 		throw new UnavailableServiceException("Unavailable service: " +  J2MEFileService.serviceName);
 		//#endif
@@ -338,6 +337,6 @@ public class J2MEAudioCaptureService implements IAudioCaptureService
 		closeRecordingStream();
 		closePlaybackStream();
 		
-		serviceState = IAudioCaptureService.CLOSED;		
+		serviceState = AudioCaptureService.CLOSED;		
 	}
 }

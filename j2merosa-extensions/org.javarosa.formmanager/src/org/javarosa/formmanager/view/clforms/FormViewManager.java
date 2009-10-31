@@ -30,7 +30,6 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.services.DataCaptureServiceRegistry;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.formmanager.controller.FormEntryController;
@@ -48,6 +47,7 @@ import org.javarosa.formmanager.view.clforms.widgets.Select1QuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.SelectQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TextQuestionWidget;
 import org.javarosa.formmanager.view.clforms.widgets.TimeQuestionWidget;
+import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 public class FormViewManager implements IFormEntryView, FormEntryModelListener,
