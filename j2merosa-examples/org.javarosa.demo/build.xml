@@ -16,6 +16,14 @@
 	<target name="BuildPolish" depends="init,CompileAndLinkSource" description="This is the controller for the J2ME build process.">
 		<!-- A property containing the path to the preprocessed source files -->
 		<property name="builtsource" value="${dir.build}/real/${device.identifier}/none/source/" />
+		
+
+		<!-- Definition of the J2ME Polish task:                      -->
+		<!-- Note that this takes place here (rather than in the script in general) in order to allow the libraries jar to be compiled from source before the classpath is evaluated-->
+		<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
+			<path id="classpath.base">
+		</path>
+		
 		<buildPolish>
 			<info name="${app.name}"
 				version="${app.version}"
@@ -40,7 +48,6 @@
 				
 				<libraries>
 					<library dir="${dir.lib}" />
-					<library file="${dir.tools}/j2meunit-javarosa.jar" if="unittests" />
 				</libraries>
 
 				<!-- midlets definition -->
@@ -157,62 +164,6 @@
 
 	<!-- Main Target: Runs the build with all debug properties enabled -->
 	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
-
-	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
-	<target name="RunJ2MEUnitTests" depends="supressOutput, disableObfuscator, enableTesting, BuildClean" description="Runs j2mepolish Unit Tests on constructed jars">
-		<!--RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.FormViewManagerTest"/-->
-		<!--RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.CLFormsWidgetsTest"/-->
-		<RunTestSuite suite="org.javarosa.patient.test.SelectorTest"/>
-		<RunTestSuite suite="org.javarosa.xpath.test.XPathParseTest"/>
-		<RunTestSuite suite="org.javarosa.xpath.test.XPathEvalTest"/>
-		<RunTestSuite suite="org.javarosa.xform.util.test.XFormAnswerDataSerializerTest"/>
-		<RunTestSuite suite="org.javarosa.core.model.test.QuestionDefTest"/>
-		<RunTestSuite suite="org.javarosa.core.util.test.NumericEncodingTest"/>
-		<RunTestSuite suite="org.javarosa.core.util.test.PrefixTreeTest"/>
-		<RunTestSuite suite="org.javarosa.core.model.utils.LocalizerTest"/>
-		<RunTestSuite suite="org.javarosa.core.util.test.ExternalizableTest"/>
-		<RunTestSuite suite="org.javarosa.demo.xform.test.DemoFormsTest"/>
-		<RunTestSuite suite="org.javarosa.core.model.data.test.DateDataTests"/>
-		<RunTestSuite suite="org.javarosa.core.model.data.test.IntegerDataTests"/>
-		<RunTestSuite suite="org.javarosa.core.model.data.test.StringDataTests"/>
-		<RunTestSuite suite="org.javarosa.core.model.data.test.TimeDataTests"/>
-		<RunTestSuite suite="org.javarosa.core.model.data.test.SelectOneDataTests"/>
-		<RunTestSuite suite="org.javarosa.core.model.data.test.SelectMultiDataTests"/>
-		<RunTestSuite suite="org.javarosa.core.model.instance.test.QuestionDataElementTests"/>
-		<RunTestSuite suite="org.javarosa.core.model.instance.test.QuestionDataGroupTests"/>
-		<RunTestSuite suite="org.javarosa.user.model.test.UserTests"/>
-		<!--RunTestSuite suite="org.javarosa.formmanager.test.ExtensionIntegrationTests"/-->
-		<RunTestSuite suite="org.javarosa.core.model.utils.DateUtilsTests"/>
-
-		<!-- add new test suites here -->
-		<fail if="testresult.global">Unit Tests Failed!</fail>
-	</target>
-	
-	<target name="CreateJavadoc" depends="BuildClean" description="generates javadoc and also UML Diagram">
-		<mkdir dir="${dir.javadoc}"/>
-	        <javadoc useexternalfile="yes" sourcepath="${builtsource}" packagenames="org.javarosa.*" destdir="${dir.javadoc}"
-	        	classpathref="classpath.test" private="true">
-	        	   <doclet name="org.umlgraph.doclet.UmlGraphDoc"
-	        		  path="${dir.tools}/UMLGraph.jar">
-	        	        <param name="-attributes" />
-	        	        <param name="-operations" />
-	        	        <param name="-qualify" />
-	        	        <param name="-types" />
-	        	        <param name="-visibility" />
-	        	    </doclet>	
-	        	    <link href="http://java.sun.com/javame/reference/apis/jsr030/"/>
-	        	    <link href="http://java.sun.com/javame/reference/apis/jsr118/"/>
-	        	    <link href="http://www.j2mepolish.org/javadoc/j2me/"/>
-	        	  </javadoc>
-		  <apply executable="dot" dest="${dir.documentation}" parallel="false">
-		    <arg value="-Tpng"/>
-		    <arg value="-o"/>
-		     <targetfile/>
-		     <srcfile/>
-		     <fileset dir="${dir.documentation}" includes="*.dot"/>
-		     <mapper type="glob" from="*.dot" to="*.png"/>
-		  </apply>
-	</target>
 	
 	<target name="DecomposeJar" depends="BuildClean">
 		<!--exec executable="python" failifexecutionfails="false" dir="dist">
@@ -227,7 +178,7 @@
 	</target>
 	
 	<!-- This target should prevent us from needing to re-run BuildClean for additional targets -->
-	<target name="BuildServerExtras" depends="BuildClean,CreateJavadoc,DecomposeJar"/>
+	<target name="BuildServerExtras" depends="BuildClean,DecomposeJar"/>
 	      	
 
 	<!-- Initialization for the build targets                    -->
@@ -261,67 +212,12 @@
 		<property name="dir.work" value="build/test" />
 	</target>
 	
-	<target name="enableTesting">
-		<property name="unittests" value="true"/>
-	</target>
-
-	<target name="build-xpath-parser">
-		<ant antfile="../org.javarosa.xform/build.xml" target="build-xpath-parser" dir="../org.javarosa.xform" />
-	</target>
-
-	<!-- Macro: Runs a test suite, and sets testresult.global to be true on failure -->
-	<macrodef name="RunTestSuite" description="Runs a test suite, and sets testresult.global to be true on failure">
-		<attribute name="suite"/>
-		<sequential>
-			<!-- Note: The reason that we are using @{suite} as a property is because properties in ANT
-			are immutable, and this is a unique identifier -->
-		<java classname="j2meunit.textui.TestRunner" failonerror="false" fork="true" resultproperty="@{suite}">
-							<classpath refid="classpath.test" />
-							<arg value="@{suite}"/>
-				</java>
-		<condition property="testresult.global">
-					<not>
-						<equals arg1="${@{suite}}" arg2="0"/>
-				 	</not>
-				</condition>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="propertycopy">
-	  <attribute name="name"/>
-	  <attribute name="from"/>
-	  <sequential>
-	    <property name="@{name}" value="${@{from}}"/>
-	  </sequential>
-	</macrodef>
-
 	<!-- import user specific properties                          -->
 	<property file="${basedir}/build.properties" />
 
 	<!-- import global properties                                 -->
 	<property file="${polish.home}/global.properties" />
 
-	<property name="TALK" value="true" />
-
-	<!-- Definition of the J2ME Polish task:                      -->
-	<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
-	<path id="classpath.base">
-	</path>
-	
-
 	<!-- Defines the py-run task                                  -->
 	<taskdef name="py-run" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.2.jar"/>
-
-	<!-- Note that most of this testing code was here to test our auto-integration tester, and isn't actually
-	     usable for testing J2ME code -->
-	<!-- The classpath that should be used for tests -->
-	<path id="classpath.test">
-      <pathelement location="${dir.dist}/${app.jarName}"/>
-	  <!--pathelement location="${dir.test}" /-->
-	  <pathelement location="${dir.tools}/j2meunit-javarosa.jar" />
-	  <pathelement location="${wtk.home}/lib/wma11.jar"/>
-	  <pathelement location="${wtk.home}/lib/midpapi21.jar"/>
-	  <pathelement location="${dir.lib}/j2merosa-test-libraries.jar"/>
-	  <path refid="classpath.base" />
-	</path>
 </project>
