@@ -1,13 +1,8 @@
 <?xml version="1.0"?>
 <project default="package">
 	<property name="name" value="javarosa-libraries"/>
-	<property name="version" value="1.0"/>
-	<exec executable="hg" outputproperty="revision">
-		<arg value="tip"/>
-		<arg value="--template"/>
-		<arg value="{rev}"/>
-	</exec>
-	<property name="jar" value="${name}.jar"/>
+	<property name="version" value="v0.9"/>
+	<property name="jar" value="${name}_${version}.jar"/>
 	<target name="init" description="set classpath and make needed directories">
 		<mkdir dir="lib/"/>
 		<path id="classpath">
