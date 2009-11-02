@@ -22,12 +22,22 @@ import org.javarosa.entity.api.transitions.EntitySelectTransitions;
 
 public abstract class EntitySelectState <E extends Persistable> implements EntitySelectTransitions, State {
 	
+	protected EntitySelectController<E> controller;
+	
 	public void start () {
-		EntitySelectController<E> controller = getController();
+		controller = getController();
 		controller.setTransitions(this);
 		controller.start();
 	}
 	
 	protected abstract EntitySelectController<E> getController ();
+	
+	public void newEntityCreated (int entityID) {
+		if (entityID != -1) {
+			controller.newEntity(entityID);
+		} else {
+			controller.showList();
+		}
+	}
 	
 }
