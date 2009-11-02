@@ -46,7 +46,7 @@
 		<exclude name="**/org.javarosa.reminders/**/*.java"/>
 		<exclude name="**/org.javarosa.communication.sms.trigger/**/*.java"/>
 		
-		<!-- TEMP: transport layer is not yet merged in -->
+		<!-- TEMP: new transport layer is not yet merged in -->
 	    <include name="javarosa-transport/transport2/src/**/*.java"/>
 
 	</fileset>
@@ -125,7 +125,7 @@
 			<src path="../j2merosa-extensions"/>
 			<src path="../j2merosa-activities"/>
 
-			<!-- TEMP: transport layer not yet merged in -->
+			<!-- TEMP: new transport layer not yet merged in -->
 		    <src path="../javarosa-transport/"/>
 
 			<include name="**/test**/*.java"/>
