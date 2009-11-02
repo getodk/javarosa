@@ -32,6 +32,10 @@ public abstract class PatientEntryState extends FormEntryState {
 	protected String formName;
 	protected IModelProcessor processor;
 	
+	public PatientEntryState () {
+		this(new PatientEntryModelProcessor());
+	}
+	
 	public PatientEntryState (IModelProcessor processor) {
 		this(processor, false);
 	}
