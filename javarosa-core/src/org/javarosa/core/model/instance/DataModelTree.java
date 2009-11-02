@@ -89,7 +89,7 @@ public class DataModelTree implements IFormDataModel, IDRecordable, Restorable {
 	 * @param root
 	 *            The root of the tree for this data model.
 	 */
-	private void setRoot(TreeElement topLevel) {
+	public void setRoot(TreeElement topLevel) {
 		root = new TreeElement();
 		if (topLevel != null)
 			root.addChild(topLevel);
