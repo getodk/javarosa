@@ -49,7 +49,7 @@ public class CaseManagementController implements CommandListener {
 	}
 
 	public void start() {
-		J2MEDisplay.getDisplay().setCurrent(view);
+		J2MEDisplay.setView(view);
 	}
 	
 	private void configView() {

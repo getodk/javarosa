@@ -53,7 +53,7 @@ public class AddUserController implements CommandListener {
 	}
 
 	public void start() {
-		J2MEDisplay.getDisplay().setCurrent(view);
+		J2MEDisplay.setView(view);
 	}
 	
 	public void commandAction(Command c, Displayable arg1) {
