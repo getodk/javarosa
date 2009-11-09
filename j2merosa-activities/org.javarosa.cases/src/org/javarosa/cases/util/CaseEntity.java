@@ -113,7 +113,7 @@ public class CaseEntity extends Entity<Case> {
 	public boolean match (String key) {
 		String[] fields = this.getShortFields();
 		for(int i = 0; i < fields.length; ++i) {
-			if(fields[i].indexOf(key) != -1) {
+			if(fields[i].startsWith(key)) {
 				return true;
 			}
 		}

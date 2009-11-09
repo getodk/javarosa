@@ -143,7 +143,7 @@ public class LoginForm extends FramedForm {
 		this.loginButton.setDefaultCommand(CMD_LOGIN_BUTTON);
 
 		// #if javarosa.login.demobutton
-		this.demoButton = new StringItem(null, "DEMO", Item.BUTTON);
+		this.demoButton = new StringItem(null, Localization.get("menu.Demo"), Item.BUTTON);
 		append(this.demoButton);
 		this.demoButton.setDefaultCommand(CMD_DEMO_BUTTON);
 		// #endif
