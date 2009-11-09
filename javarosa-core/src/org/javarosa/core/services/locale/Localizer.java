@@ -187,9 +187,9 @@ public class Localizer implements Externalizable {
 		
 		if (!currentLocale.equals(this.currentLocale)) {
 			this.currentLocale = currentLocale;
-			loadCurrentLocaleResources();
-			alertLocalizables();
 		}
+		loadCurrentLocaleResources();
+		alertLocalizables();
 	}
 	
 	/**
