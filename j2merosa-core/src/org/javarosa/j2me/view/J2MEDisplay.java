@@ -25,9 +25,11 @@ import javax.microedition.midlet.MIDlet;
 
 public class J2MEDisplay {
 	private static Display display;
+	private static LoadingScreenThread loading;
 	
 	public static void init (MIDlet m) {
 		setDisplay(Display.getDisplay(m));
+		loading = new LoadingScreenThread(getDisplay());
 	}
 	
 	public static void setDisplay (Display display) {
@@ -42,7 +44,16 @@ public class J2MEDisplay {
 		return display;
 	}
 	
+	public static void startLoading() {
+		loading.startLoading(null);
+	}
+	
+	public static void startLoading(ProgressIndicator indicator) {
+		loading.startLoading(indicator);
+	}
+	
 	public static void setView (Displayable d) {
+		loading.cancelLoading();
 		display.setCurrent(d);
 	}
 	
@@ -64,8 +75,9 @@ public class J2MEDisplay {
 		}
 		
 		if (next == null) {
-			display.setCurrent(alert);
+			setView(alert);
 		} else {
+			loading.cancelLoading();
 			display.setCurrent(alert, next);
 		}
 		
