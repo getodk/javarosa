@@ -127,13 +127,13 @@ public class FormSender implements Runnable {
 				System.out.println("ids: " + idsStr);
 			}
 
-			J2MEDisplay.getDisplay().setCurrent(s);
+			J2MEDisplay.setView(s);
 			setObserver(s);
 		}
 		else {
 			FormTransportSubmitStatusScreen statusScreen = views.getSubmitStatusScreen();
 			statusScreen.reinit(this.message.getCacheIdentifier());
-			J2MEDisplay.getDisplay().setCurrent(statusScreen);
+			J2MEDisplay.setView(statusScreen);
 			setObserver(statusScreen);
 		}
 	}
