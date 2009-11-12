@@ -69,8 +69,7 @@
 					dir="${dir.resources}"
 					defaultexcludes="no"
 					excludes="readme.txt, .svn, *.css">
-					<!-- <root dir="${dir.resources.external}"
-						excludes=".svn"/> -->
+					<root dir="${dir.resources.external}"/>
 					<!-- Set the language for the strings in the application -->
 					<localization>
 						<locale name="none" />

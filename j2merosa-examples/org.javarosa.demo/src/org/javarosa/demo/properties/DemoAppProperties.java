@@ -41,6 +41,11 @@ public class DemoAppProperties implements IPropertyRules {
 	    public final static String HSD_PROPERTY = "hsd";    
 	    public final static String FIN_YEAR_PROPERTY = "fin-year";    
 	    
+
+		// http, since it doesn't go in transport layer anymore
+	    public final static String POST_URL_LIST_PROPERTY = "PostURLlist";
+	    public final static String POST_URL_PROPERTY = "PostURL";
+	    
 	    /**
 	     * Creates the JavaRosa set of property rules
 	     */
@@ -56,6 +61,18 @@ public class DemoAppProperties implements IPropertyRules {
 	        rules.put(DISTRICT_PROPERTY, new Vector());
 	        rules.put(HSD_PROPERTY, new Vector());
 	        rules.put(FIN_YEAR_PROPERTY, new Vector());
+	        // PostURL List Property
+	        rules.put(POST_URL_LIST_PROPERTY, new Vector());
+	        readOnlyProperties.addElement(POST_URL_LIST_PROPERTY);
+	        Vector postList = PropertyManager._().getProperty(POST_URL_LIST_PROPERTY);
+	        if(postList == null) {
+	        	PropertyManager._().setProperty(POST_URL_LIST_PROPERTY, new Vector());
+	        }
+	        
+	        // PostURL Property
+	        Vector postUrls = new Vector();
+	        postUrls.addElement(POST_URL_LIST_PROPERTY);
+	        rules.put(POST_URL_PROPERTY, postUrls);
 	    }
 
 	    /** (non-Javadoc)

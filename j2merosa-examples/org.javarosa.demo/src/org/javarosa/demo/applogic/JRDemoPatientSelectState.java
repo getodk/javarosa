@@ -1,14 +1,16 @@
 package org.javarosa.demo.applogic;
 
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.api.EntitySelectState;
 import org.javarosa.patient.entry.activity.PatientEntryState;
 import org.javarosa.patient.model.Patient;
+import org.javarosa.patient.select.activity.PatientEntity;
 
 public class JRDemoPatientSelectState extends EntitySelectState<Patient> {
 
 	protected EntitySelectController<Patient> getController() {
-		return null;
+		return new EntitySelectController<Patient>("Patient Select", StorageManager.getStorage(Patient.STORAGE_KEY) , new PatientEntity());
 	}
 
 	public void cancel() {
