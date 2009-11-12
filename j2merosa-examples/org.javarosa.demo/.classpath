@@ -2,9 +2,7 @@
 <classpath>
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
-	<classpathentry kind="lib" path="tools/j2meunit-javarosa.jar"/>
 	<classpathentry kind="src" path="/org.javarosa.polish.activity"/>
 	<classpathentry kind="src" path="/org.javarosa.user"/>
 	<classpathentry kind="src" path="/org.javarosa.entity"/>
@@ -15,5 +13,8 @@
 	<classpathentry kind="src" path="/org.javarosa.services.properties"/>
 	<classpathentry kind="src" path="/org.javarosa.formmanager"/>
 	<classpathentry kind="src" path="/org.javarosa.polish.chatterbox"/>
+	<classpathentry kind="lib" path="tools/j2merosa-libraries.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/midp-2.0.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.1-java5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

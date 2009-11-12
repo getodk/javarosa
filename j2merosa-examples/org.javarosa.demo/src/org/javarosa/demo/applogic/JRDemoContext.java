@@ -5,11 +5,6 @@ import java.util.Vector;
 
 import javax.microedition.midlet.MIDlet;
 
-import org.javarosa.cases.model.Case;
-import org.javarosa.cases.util.CasePreloadHandler;
-import org.javarosa.cases.util.ICaseType;
-import org.javarosa.chsreferral.model.PatientReferral;
-import org.javarosa.chsreferral.util.PatientReferralPreloader;
 import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
@@ -26,6 +21,7 @@ import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.demo.properties.DemoAppProperties;
 import org.javarosa.demo.util.JRDemoUtil;
+import org.javarosa.demo.util.MetaPreloadHandler;
 import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.j2me.J2MEModule;
 import org.javarosa.j2me.util.DumpRMS;
@@ -111,8 +107,6 @@ public class JRDemoContext {
 	
 	
 	private void addCustomLanguages() {
-		Localization.registerLanguageFile("default","/messages_cc_default.txt");
-		Localization.registerLanguageFile("sw","/messages_cc_swahili.txt");
 	}
 	
 	private void setProperties() {
@@ -158,9 +152,6 @@ public class JRDemoContext {
 	///////////////////
 	
 	
-
-	private ICaseType recentCaseType;
-	
 	private boolean inDemoMode;
 	private String weeklySurvey = new String("brac_chp_weekly_update");
 	
@@ -170,62 +161,18 @@ public class JRDemoContext {
 		//as possible_ so that we don't either (A) blow up the memory or (B) lose the ability
 		//to send payloads > than the phones' heap.
 		try {
-			return new SimpleHttpTransportMessage(payload.getPayloadStream(), PropertyManager._().getSingularProperty(CommCareProperties.POST_URL_PROPERTY));
+			return new SimpleHttpTransportMessage(payload.getPayloadStream(), PropertyManager._().getSingularProperty(DemoAppProperties.POST_URL_PROPERTY));
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error Serializing Data to be transported");
 		}
 	}
 	
-	
-	public Vector<ICaseType> getCaseTypes () {
-		Vector<ICaseType> v = new Vector<ICaseType>();
-		
-		v.addElement(new HouseVisitType());
-		v.addElement(new PregnancyType());
-	
-		return v;
-	}
-	
 	public Vector<IPreloadHandler> getPreloaders() {
-		return getPreloaders(null, null);
-	}
-	
-	public Vector<IPreloadHandler> getPreloaders(PatientReferral r) {
-		int id = r.getLinkedId();
-		Case c = BracUtil.getCase(id);
-		return getPreloaders(c, r);
-	}
-	
-	public Vector<IPreloadHandler> getPreloaders(Case c) {
-		return getPreloaders(c, null);
-	}
-	
-	public Vector<IPreloadHandler> getPreloaders(Case c, PatientReferral r) {
 		Vector<IPreloadHandler> handlers = new Vector<IPreloadHandler>();
-		if(c != null) {
-			CasePreloadHandler p = new CasePreloadHandler(c);
-			handlers.addElement(p);
-		}
-		if(r != null) {
-			PatientReferralPreloader rp = new PatientReferralPreloader(r);
-			handlers.addElement(rp);
-		}
 		MetaPreloadHandler meta = new MetaPreloadHandler(this.getUser());
 		handlers.addElement(meta);
 		return handlers;		
-	}
-	
-	public ICaseType getLastCaseType() {
-		return recentCaseType;
-	}
-	
-	public void setLastCaseType(ICaseType type) {
-		recentCaseType = type;
-	}
-	
-	public String getWeeklySurvey() {
-		return weeklySurvey;
 	}
 	
 	private void registerDemoStorage (String key, Class type) {
@@ -238,13 +185,9 @@ public class JRDemoContext {
 		if (demoOn != inDemoMode) {
 			inDemoMode = demoOn;
 			if (demoOn) {
-				registerDemoStorage(Case.STORAGE_KEY, Case.class);
-				registerDemoStorage(PatientReferral.STORAGE_KEY, PatientReferral.class);
 				registerDemoStorage(DataModelTree.STORAGE_KEY, DataModelTree.class);
 				//TODO: Use new transport message queue
 			} else {
-				StorageManager.registerStorage(Case.STORAGE_KEY, Case.class);
-				StorageManager.registerStorage(PatientReferral.STORAGE_KEY, PatientReferral.class);
 				StorageManager.registerStorage(DataModelTree.STORAGE_KEY, DataModelTree.class);
 				//TODO: Use new transport message queue
 			}
@@ -254,9 +197,7 @@ public class JRDemoContext {
 	public void resetDemoData() {
 		//#debug debug
 		System.out.println("Resetting demo data");
-	
-		StorageManager.getStorage(Case.STORAGE_KEY).removeAll();
-		StorageManager.getStorage(PatientReferral.STORAGE_KEY).removeAll();
+		
 		StorageManager.getStorage(DataModelTree.STORAGE_KEY).removeAll();
 		//TODO: Use new transport message queue
 	}

@@ -20,7 +20,7 @@ public class JRDemoFormListState implements JRDemoFormListTransitions, State {
 	}
 
 	public void viewSaved() {
-		new JRDemoSavedFormListState().start();
+		//new JRDemoSavedFormListState().start();
 	}
 
 	public void back() {

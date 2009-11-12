@@ -172,27 +172,4 @@ public class JRDemoUtil {
 	public static String getCommCareVersion () {
 		return getAppProperty(MIDLET_VERSION_PROPERTY);
 	}
-		
-	
-	public static void goHome () {
-		ICaseType lastCaseType = BracContext._().getLastCaseType();
-		
-		if(lastCaseType != null) {
-			new BracCaseManagementState(lastCaseType).start();
-		} else {
-			new BracHomeState().start();
-		}
-	}
-	
-	public static Case getCase (int id) {
-		IStorageUtility cases = StorageManager.getStorage(Case.STORAGE_KEY);
-		return (Case)cases.read(id);
-	}
-	 
-	public static PatientReferral getReferral (int id) {
-		IStorageUtility referrals = StorageManager.getStorage(PatientReferral.STORAGE_KEY);
-		return (PatientReferral)referrals.read(id);
-	}
-
-	
 }
