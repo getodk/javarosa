@@ -82,8 +82,8 @@ public class UserTests extends TestCase  {
 			fail("Password getter/setter broken");
 		}
 
-		u.setRecordId(1);
-		if (u.getRecordId() != 1) {
+		u.setID(1);
+		if (u.getID() != 1) {
 			fail("RecordId getter/setter broken");
 		}
 	}
