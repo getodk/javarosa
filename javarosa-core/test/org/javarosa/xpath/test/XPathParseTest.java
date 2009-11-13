@@ -21,11 +21,11 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
+import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.test.ExternalizableTest;
-import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -205,7 +205,7 @@ public class XPathParseTest extends TestCase {
 	static PrototypeFactory pf;
 	
 	static {
-		DataCaptureServiceRegistry.instance().registerPrototypes(XPathParseTool.xpathClasses);
+		PrototypeManager.registerPrototypes(XPathParseTool.xpathClasses);
 		pf = ExtUtil.defaultPrototypes();
 	}
 	
