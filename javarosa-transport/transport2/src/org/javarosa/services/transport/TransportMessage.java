@@ -46,7 +46,7 @@ public interface TransportMessage extends Serializable {
 	
 	
 	/**
-	 * ¨
+	 *
 	 * 
 	 * @return Whatever is being sent
 	 */
