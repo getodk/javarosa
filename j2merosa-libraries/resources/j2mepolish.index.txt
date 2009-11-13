@@ -230,16 +230,9 @@ de/enough/polish/io/Serializable.java
 de/enough/polish/io/Serializer.java
 de/enough/polish/io/Storage.java
 de/enough/polish/io/StringReader.java
-de/enough/polish/io/file/FileSystemNode.java
-de/enough/polish/io/file/FileSystemTreeModel.java
-de/enough/polish/io/file/ItemCreator.java
-de/enough/polish/io/file/UiFileSystemTreeModel.java
 de/enough/polish/io/xmlrpc/XmlRpcSerializer.java
 de/enough/polish/java5/Autobox.java
 de/enough/polish/java5/Enum.java
-de/enough/polish/location/FallbackLocationListener.java
-de/enough/polish/location/FallbackLocationProvider.java
-de/enough/polish/location/LocationService.java
 de/enough/polish/log/LogEntry.java
 de/enough/polish/log/LogHandler.java
 de/enough/polish/log/bluetooth/BluetoothLogHandler.java
@@ -265,7 +258,6 @@ de/enough/polish/midp/ui/NativeDisplayImpl.java
 de/enough/polish/midp/ui/TextBox.java
 de/enough/polish/multimedia/AdvancedMultimediaManager.java
 de/enough/polish/multimedia/AudioPlayer.java
-de/enough/polish/multimedia/StreamingMp3Server.java
 de/enough/polish/pim/ContactAddress.java
 de/enough/polish/pim/ContactName.java
 de/enough/polish/pim/PimChangeItem.java
@@ -394,7 +386,6 @@ de/enough/polish/ui/TimeTitleItem.java
 de/enough/polish/ui/TitleMenuBar.java
 de/enough/polish/ui/Transition.java
 de/enough/polish/ui/TreeItem.java
-de/enough/polish/ui/TreeModel.java
 de/enough/polish/ui/UiAccess.java
 de/enough/polish/ui/UiElement.java
 de/enough/polish/ui/backgrounds/AnimatedGifBackground.java
@@ -565,7 +556,6 @@ de/enough/polish/ui/texteffects/DropShadowTextEffect.java
 de/enough/polish/ui/texteffects/FadeTextEffect.java
 de/enough/polish/ui/texteffects/FadingAlienGlowTextEffect.java
 de/enough/polish/ui/texteffects/FlashTextEffect.java
-de/enough/polish/ui/texteffects/HtmlTextEffect.java
 de/enough/polish/ui/texteffects/LighthouseTextEffect.java
 de/enough/polish/ui/texteffects/OutlineTextEffect.java
 de/enough/polish/ui/texteffects/RotateTextEffect.java
