@@ -44,7 +44,6 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 
 public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 
