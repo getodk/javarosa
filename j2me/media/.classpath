@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="J2MELIB"/>
+	<classpathentry kind="src" path="/javarosa-core"/>
+	<classpathentry kind="src" path="/j2merosa-core"/>
+	<classpathentry kind="src" path="/form-entry"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
