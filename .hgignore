@@ -13,6 +13,7 @@ build/
 deployed/
 dist/
 webdocs/
+j2mepolish.index.txt
 
 #IDE and polish
 .eclipseme.tmp/

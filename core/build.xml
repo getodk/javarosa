@@ -6,7 +6,7 @@
 	<target name="init" description="set classpath and make needed directories">
 		<mkdir dir="lib/"/>
 		<path id="classpath">
-			<fileset dir="lib/" includes="*.jar"/>
+			<fileset dir="../lib/" includes="*.jar"/>
 		</path>
 		<mkdir dir="bin/"/>
 		<mkdir dir="dist/"/>
