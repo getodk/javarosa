@@ -5,16 +5,15 @@
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry kind="src" path="/org.javarosa.polish.activity"/>
 	<classpathentry kind="src" path="/org.javarosa.user"/>
-	<classpathentry kind="src" path="/org.javarosa.entity"/>
 	<classpathentry kind="src" path="/org.javarosa.patient.entry"/>
 	<classpathentry kind="src" path="/org.javarosa.patient"/>
-	<classpathentry kind="src" path="/javarosa-core"/>
-	<classpathentry kind="src" path="/j2merosa-core"/>
-	<classpathentry kind="src" path="/org.javarosa.services.properties"/>
-	<classpathentry kind="src" path="/org.javarosa.formmanager"/>
-	<classpathentry kind="src" path="/org.javarosa.polish.chatterbox"/>
 	<classpathentry kind="lib" path="tools/j2merosa-libraries.jar"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/midp-2.0.jar"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.1-java5.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-entity-select"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-form-entry"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-properties"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/java-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
