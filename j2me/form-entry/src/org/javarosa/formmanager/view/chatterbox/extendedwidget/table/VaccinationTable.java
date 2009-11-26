@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.chatterbox.widget.table;
+package org.javarosa.formmanager.view.chatterbox.extendedwidget.table;
 
 import org.javarosa.patient.model.data.ImmunizationData;
 

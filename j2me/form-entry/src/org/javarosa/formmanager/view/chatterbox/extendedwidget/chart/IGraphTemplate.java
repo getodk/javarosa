@@ -14,12 +14,24 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.chatterbox.widget.util;
+package org.javarosa.formmanager.view.chatterbox.extendedwidget.chart;
 
-public class ExtensionConstants {
-	/** Constants block for ImmunizationData */
-	public final static int VACCINATION_GIVEN = 1;
-	public final static int VACCINATION_NOT_GIVEN = 2;
-	public final static int VACCINATION_UNKOWN = 3;
-	public final static int VACCINATION_GIVEN_ON_DATE = 4;
+import java.util.Vector;
+
+public interface IGraphTemplate {
+	
+	/**
+	 * @return the name that is used in XFroms, etc, to distinguish this 
+	 * template. 
+	 */
+	String getTemplateName();
+	
+	/**
+	 * @param data A Vector<DateValueTuple> that represents the data
+	 * to be drawn on the graph
+	 * @return A Vector<Vector<LinePointsItem>> of data values which
+	 * includes the data which was passed in, along with any other
+	 * lines for the template.
+	 */
+	Vector getLines(Vector data);
 }
