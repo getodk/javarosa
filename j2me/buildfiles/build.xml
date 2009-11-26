@@ -5,17 +5,8 @@
 	<property file="build.properties"/>
 
 	<path id="jr.classpath">
-		<fileset dir="../javarosa-core">
-			<include name="**/lib/*.jar"/>
-		</fileset>
-		<fileset dir="../j2merosa-core">
-			<include name="**/lib/*.jar"/>
-		</fileset>
-		<fileset dir="../j2merosa-extensions">
-			<include name="**/lib/*.jar"/>
-		</fileset>
-		<fileset dir="../j2merosa-activities">
-			<include name="**/lib/*.jar"/>
+		<fileset dir="../../lib">
+			<include name="*.jar"/>
 		</fileset>
 		<fileset dir="${wtk.home}/lib" includes="${wtk.includes}"/>
 		<fileset dir="${polish.home}/import" includes="${polish.includes}"/>
@@ -28,26 +19,26 @@
 
 	<path id="jr.classpath.test">
 		<path refid="jr.compiled.classpath" />
-		<fileset dir="lib" includes="j2meunit-javarosa.jar"/>
+		<fileset dir="../../lib" includes="j2meunit-javarosa.jar"/>
 		<dirset dir="${basedir}">
 			<include name="buildTest/**"/>
 		</dirset>
 	</path>
 
-	<fileset id="jr.sources" dir="../">
-		<include name="javarosa-core/src/**/*.java"/>
-		<include name="j2merosa-core/src/**/*.java"/>
-		<include name="j2merosa-extensions/**/src/**/*.java"/>
-		<include name="j2merosa-activities/**/src/**/*.java"/>
-		<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
-		<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
+	<fileset id="jr.sources" dir="../../">
+		<include name="core/src/**/*.java"/>
+		<include name="j2me/**/src/**/*.java"/>
+
+		<!-- exclude this until we've worked out issues with bluetooth apis -->
+		<exclude name="j2me/communication/src/org/javarosa/communication/bluetooth/**/*.java"/>
+		<exclude name="j2me/communication/src/org/javarosa/communication/sim/**/*.java"/>
+		<!-- exclude this until we've worked out issues with barcode apis -->
+		<exclude name="j2me/media/src/org/javarosa/barcode/**/*.java"/>
+		<exclude name="j2me/media/src/org/javarosa/view/**/Barcode*.java"/>
 
 		<!-- stuff that hasn't been updated to build on the new framework -->
-		<exclude name="**/org.javarosa.reminders/**/*.java"/>
-		<exclude name="**/org.javarosa.communication.sms.trigger/**/*.java"/>
-
-		<!-- TEMP: new transport layer is not yet merged in -->
-		<include name="javarosa-transport/transport2/src/**/*.java"/>
+		<exclude name="j2me/deprecated/org.javarosa.reminders/**/*.java"/>
+		<exclude name="j2me/communication/src/org/javarosa/communication/sms/trigger/**/*.java"/>
 
 	</fileset>
 
@@ -59,7 +50,7 @@
 
 		<mkdir dir="dist"/>
 		<mkdir dir="build"/>
-
+		<mkdir dir="build/src"/>
 
 		<!-- collect all relevant sources and put them into one big source chunk -->
 		<copy todir="build">
@@ -120,18 +111,12 @@
 				one wants to look at this like it's a real jar file (it's not) -->
 		<mkdir dir="buildTest"/>
 		<javac destdir="buildTest" classpathref="jr.classpath.test">
-			<src path="../javarosa-core"/>
-			<src path="../j2merosa-core"/>
-			<src path="../j2merosa-extensions"/>
-			<src path="../j2merosa-activities"/>
-
-			<!-- TEMP: new transport layer not yet merged in -->
-			<src path="../javarosa-transport/"/>
+			<src path="../../core"/>
+			<src path="../../j2me"/>
 
 			<include name="**/test**/*.java"/>
 
-			<!-- exclude this until it's properly pre-processible to depend on bluetooth apis -->
-			<exclude name="**/org.javarosa.communication.bluetooth*/**/*.java"/>
+			<!-- TODO: do we need to exclude neglected/uncoverted code here? -->
 		</javac>
 	</target>
 

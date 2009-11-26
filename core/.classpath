@@ -2,9 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/j2meunit-javarosa.jar"/>
-	<classpathentry kind="lib" path="lib/kxml2-2.3.0.jar"/>
-	<classpathentry kind="lib" path="lib/regexp-me.jar"/>
+	<classpathentry kind="lib" path="/javarosa-libs/j2meunit-javarosa.jar"/>
+	<classpathentry kind="lib" path="/javarosa-libs/kxml2-2.3.0.jar"/>
+	<classpathentry kind="lib" path="/javarosa-libs/regexp-me.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.1-java5.0.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
