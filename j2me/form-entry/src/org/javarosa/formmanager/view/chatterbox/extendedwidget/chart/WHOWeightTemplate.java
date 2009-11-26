@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.chatterbox.widget.chart;
+package org.javarosa.formmanager.view.chatterbox.extendedwidget.chart;
 
 import java.util.Vector;
 

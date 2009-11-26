@@ -28,6 +28,8 @@ import javax.wireless.messaging.MessageConnection;
 import javax.wireless.messaging.MessageListener;
 import javax.wireless.messaging.TextMessage;
 
+import org.javarosa.j2me.view.J2MEDisplay;
+
 /**
  * The SmsTriggerService is a background process which polls
  * for incoming SMS messages, attempts to identify messages

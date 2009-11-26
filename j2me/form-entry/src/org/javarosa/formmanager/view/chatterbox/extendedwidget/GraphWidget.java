@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.chatterbox.widget;
+package org.javarosa.formmanager.view.chatterbox.extendedwidget;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -24,9 +24,12 @@ import javax.microedition.lcdui.Font;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.util.Map;
-import org.javarosa.formmanager.view.chatterbox.widget.chart.IGraphTemplate;
-import org.javarosa.formmanager.view.chatterbox.widget.chart.LineChart;
-import org.javarosa.formmanager.view.chatterbox.widget.chart.LinePointsItem;
+import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.IGraphTemplate;
+import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.LineChart;
+import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.LinePointsItem;
+import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
+import org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget;
+import org.javarosa.formmanager.view.chatterbox.widget.WidgetEscapeComponent;
 import org.javarosa.patient.util.DateValueTuple;
 
 import de.enough.polish.ui.Item;

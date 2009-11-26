@@ -15,7 +15,7 @@
  */
 
 
-package org.javarosa.formmanager.view.chatterbox.widget.table;
+package org.javarosa.formmanager.view.chatterbox.extendedwidget.table;
 /**
  *  
  * @author Brotecs
@@ -31,7 +31,7 @@ import de.enough.polish.ui.Command;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
-import org.javarosa.formmanager.view.chatterbox.widget.util.ExtensionConstants;
+import org.javarosa.formmanager.view.chatterbox.extendedwidget.ExtensionConstants;
 import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.ImmunizationRow;
 

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="**/GraphDataGroup.java|**/GraphElementHandler.java|**/chatterbox/extendedwidget/" kind="src" path="src"/>
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-communication"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-entity-select"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/java-core"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

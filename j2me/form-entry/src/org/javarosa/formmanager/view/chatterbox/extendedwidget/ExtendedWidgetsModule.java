@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.chatterbox.widget;
+package org.javarosa.formmanager.view.chatterbox.extendedwidget;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,7 +28,7 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.formmanager.view.chatterbox.widget.chart.WHOWeightTemplate;
+import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.WHOWeightTemplate;
 import org.javarosa.model.GraphDataGroup;
 import org.javarosa.xform.parse.GraphElementHandler;
 import org.javarosa.xform.parse.XFormParser;

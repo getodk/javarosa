@@ -14,11 +14,13 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.chatterbox.widget;
+package org.javarosa.formmanager.view.chatterbox.extendedwidget;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.view.chatterbox.widget.table.VaccinationTable;
+import org.javarosa.formmanager.view.chatterbox.extendedwidget.table.VaccinationTable;
+import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
+import org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget;
 import org.javarosa.patient.model.data.ImmunizationAnswerData;
 import org.javarosa.patient.model.data.ImmunizationData;
 
