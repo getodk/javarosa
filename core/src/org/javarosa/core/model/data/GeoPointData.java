@@ -32,7 +32,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class GeoPointData implements IAnswerData {
     
-    private double[] gp = new double[2];
+    private double[] gp = new double[4];
     
 	/**
 	 * Empty Constructor, necessary for dynamic construction during deserialization.
@@ -57,14 +57,14 @@ public class GeoPointData implements IAnswerData {
 	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
 	 */
 	public String getDisplayText() {
-		return gp[0]+" "+gp[1];
+	    return gp[0]+" "+gp[1] + " " + gp[2]+" "+gp[3];
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getValue()
 	 */
 	public Object getValue() {
-	    Double[] d = new Double[] {new Double(gp[0]), new Double(gp[1])};
+        Double[] d = new Double[] {new Double(gp[0]), new Double(gp[1]),new Double(gp[2]),new Double(gp[3])};
 		return d;
 	}
 	
@@ -75,15 +75,21 @@ public class GeoPointData implements IAnswerData {
         Double[] d = ((Double[]) o);
         gp[0] = d[0].doubleValue();
         gp[1] = d[1].doubleValue();
+        gp[2] = d[2].doubleValue();
+        gp[3] = d[3].doubleValue();
     }
 
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         gp[0] = ExtUtil.readDecimal(in);
         gp[1] = ExtUtil.readDecimal(in);
+        gp[2] = ExtUtil.readDecimal(in);
+        gp[3] = ExtUtil.readDecimal(in);
     }
 
     public void writeExternal(DataOutputStream out) throws IOException {
         ExtUtil.writeDecimal(out, gp[0]);
         ExtUtil.writeDecimal(out, gp[1]);
+        ExtUtil.writeDecimal(out, gp[2]);
+        ExtUtil.writeDecimal(out, gp[3]);
     }
 }
