@@ -182,8 +182,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	}
 	
 	public Object serializeAnswerData(GeoPointData data) { 
-	    Double[] gp = (Double[]) data.getValue(); 
-	    return gp[0]+" "+gp[1] + " " + gp[2]+" "+gp[3];
+	    return data.getDisplayText();
      }
 	
 	public Object serializeAnswerData(IAnswerData data, int dataType) {
