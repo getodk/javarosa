@@ -126,11 +126,12 @@ public class XFormAnswerDataParser {
 
             try {
                 Vector gpv = (trimmedText == null ? null : DateUtils.split(trimmedText," ",false));
-                double gp[] = new double[2];
-                gp[0] = Double.parseDouble(((String)gpv.elementAt(0)));
-                gp[1] = Double.parseDouble(((String)gpv.elementAt(1)));
-                gp[2] = Double.parseDouble(((String)gpv.elementAt(2)));
-                gp[3] = Double.parseDouble(((String)gpv.elementAt(3)));
+                
+                int len = gpv.size();
+                double gp[] = new double[len];
+                for(int i=0;i<len;i++) {
+                   gp[i] = Double.parseDouble(((String)gpv.elementAt(i)));
+                }
                 return new GeoPointData(gp);
             }   catch (NumberFormatException nfe) {
                 return null;
