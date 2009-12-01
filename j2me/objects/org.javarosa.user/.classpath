@@ -6,7 +6,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-communication"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-entity-select"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/java-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry kind="lib" path="/javarosa-libs/j2meunit-javarosa.jar"/>
 	<classpathentry kind="output" path="bin"/>

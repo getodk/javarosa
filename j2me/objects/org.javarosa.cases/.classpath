@@ -7,6 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.chsreferral"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-entity-select"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/java-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
