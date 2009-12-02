@@ -101,6 +101,8 @@
 					<parameter name="keep  ,   allowShrinking" value="class org.javarosa.model.GraphDataGroup"/>
 					<parameter name="keep      " value="!abstract class org.javarosa.** implements org.javarosa.core.services.locale.LocaleDataSource"/>
 					<parameter name="keep   ,     allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.locale.LocaleDataSource"/>
+					<parameter name="keep        ,       allowShrinking" value="class * implements org.javarosa.services.transport.TransportMessage"/>
+					<parameter name="keep       ,         allowShrinking" value="class * implements org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper"/>
 				</obfuscator>
 
 				<!-- log settings: only use debug setting when the test-property is true -->
