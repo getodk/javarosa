@@ -59,6 +59,8 @@ public class PatientReferralPreloader implements IPreloadHandler {
 	public IAnswerData handlePreload(String preloadParams) {
 		if(preloadParams.equals("id")) {
 			return new StringData(referral.getReferralId());
+		} if(preloadParams.equals("type")) {
+			return new StringData(referral.getType());
 		} else {
 			return null;
 		}

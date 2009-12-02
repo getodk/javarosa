@@ -4,9 +4,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-communication"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-entity-select"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.1-java5.0.jar"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/midp-2.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -20,12 +20,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Hashtable;
 
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -41,12 +43,12 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @date Jan 23, 2009 
  *
  */
-public class PatientReferral implements Persistable, Restorable {
+public class PatientReferral implements Persistable, Restorable, IMetaData {
 	public static final String STORAGE_KEY = "PAT_REFERRAL";
 	
 	private String type;
 	private String referralId;
-	private int linkedId; //ID of patient or case this referral is linked to
+	private String linkedId; //ID of patient or case this referral is linked to
 	private Date createdOn;
 	private Date dueOn;
 	
@@ -61,16 +63,16 @@ public class PatientReferral implements Persistable, Restorable {
 		
 	}
 	
-	public PatientReferral(String type, Date createdOn, String referralId, int linkedId) {
+	public PatientReferral(String type, Date createdOn, String referralId, String linkedId) {
 		this(type, createdOn, referralId, linkedId, null);
 	}
 	
-	public PatientReferral(String type, String referralId, int linkedId, int dueIn) {
+	public PatientReferral(String type, String referralId, String linkedId, int dueIn) {
 		this(type, DateUtils.today(), referralId, linkedId, null);
 		setDueInNDays(dueIn);
 	}
 		
-	public PatientReferral(String type, Date createdOn, String referralId, int linkedId, Date dueOn) {
+	public PatientReferral(String type, Date createdOn, String referralId, String linkedId, Date dueOn) {
 		setID(-1);
 		this.type = type;
 		this.createdOn = createdOn;
@@ -82,7 +84,7 @@ public class PatientReferral implements Persistable, Restorable {
 	/**
 	 * @return the internal record ID of the patient that this referral is associated with
 	 */
-	public int getLinkedId() {
+	public String getLinkedId() {
 		return linkedId;
 	}
 
@@ -133,7 +135,7 @@ public class PatientReferral implements Persistable, Restorable {
 		this.createdOn = ExtUtil.readDate(in);
 		this.dueOn = ExtUtil.readDate(in);
 		this.referralId = ExtUtil.readString(in);
-		this.linkedId = ExtUtil.readInt(in);
+		this.linkedId = ExtUtil.readString(in);
 		this.recordId = ExtUtil.readInt(in);
 		this.pending = ExtUtil.readBool(in);
 	}
@@ -143,7 +145,7 @@ public class PatientReferral implements Persistable, Restorable {
 		ExtUtil.writeDate(out, createdOn);
 		ExtUtil.writeDate(out, dueOn);
 		ExtUtil.writeString(out, referralId);
-		ExtUtil.writeNumeric(out, linkedId);
+		ExtUtil.writeString(out, linkedId);
 		ExtUtil.writeNumeric(out, recordId);
 		ExtUtil.writeBool(out, pending);
 	}
@@ -167,7 +169,7 @@ public class PatientReferral implements Persistable, Restorable {
 		RestoreUtils.addData(dm, "created", createdOn);	
 		RestoreUtils.addData(dm, "due", dueOn);	
 		RestoreUtils.addData(dm, "ref-id", referralId);	
-		RestoreUtils.addData(dm, "parent-id", new Integer(linkedId));	
+		RestoreUtils.addData(dm, "parent-id", linkedId);	
 		RestoreUtils.addData(dm, "pending", new Boolean(pending));	
 		
 		return dm;
@@ -187,8 +189,26 @@ public class PatientReferral implements Persistable, Restorable {
 		createdOn = (Date)RestoreUtils.getValue("created", dm);
 		dueOn = (Date)RestoreUtils.getValue("due", dm);
 		referralId = (String)RestoreUtils.getValue("ref-id", dm);
-		linkedId = ((Integer)RestoreUtils.getValue("parent-id", dm)).intValue();
+		linkedId = (String)RestoreUtils.getValue("parent-id", dm);
 		pending = RestoreUtils.getBoolean(RestoreUtils.getValue("pending", dm));
+	}
+
+	public Hashtable getMetaData() {
+		Hashtable meta = new Hashtable();
+		meta.put("referral-id",referralId);
+		return meta;
+	}
+
+	public Object getMetaData(String fieldName) {
+		if("referral-id".equals(fieldName)) {
+			return referralId;
+		} else {
+			throw new IllegalArgumentException("No metadata field " + fieldName  + " in the case storage system");
+		}
+	}
+
+	public String[] getMetaDataFields() {
+		return new String[] {"referral-id"};
 	}
 
 }

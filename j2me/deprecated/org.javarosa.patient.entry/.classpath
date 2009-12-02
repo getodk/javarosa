@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-form-entry"/>
