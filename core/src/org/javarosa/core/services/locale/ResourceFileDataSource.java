@@ -113,7 +113,7 @@ public class ResourceFileDataSource implements LocaleDataSource {
 					}
 					break;
 				}
-				String stringchunk = String.valueOf(cbuf);
+				String stringchunk = String.valueOf(cbuf,offset,read);
 				
 				int index = 0;
 				
@@ -135,17 +135,6 @@ public class ResourceFileDataSource implements LocaleDataSource {
 					}
 					index = nindex + 1;
 				}
-				/*for(int i = 0 ; i < read ; ++i) {
-					//TODO: Endline formats?
-					if(cbuf[i] == '\n') {
-						curline ++;
-						//Newline. process our string and start the next one.
-						parseAndAdd(locale, line, curline);
-						line = "";
-					} else {
-						line += cbuf[i];
-					}
-				}*/
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
