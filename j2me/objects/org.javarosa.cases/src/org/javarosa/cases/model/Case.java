@@ -35,6 +35,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
+import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -52,7 +53,7 @@ import org.javarosa.xform.util.XFormAnswerDataParser;
  * @date Mar 19, 2009 
  *
  */
-public class Case implements Persistable, Restorable {
+public class Case implements Persistable, Restorable, IMetaData {
 	public static String STORAGE_KEY = "CASE";
 	
 	private String typeId;
@@ -151,8 +152,12 @@ public class Case implements Persistable, Restorable {
 	/**
 	 * @param id the id to set
 	 */
-	public void setLongID(String id) {
+	public void setCaseId(String id) {
 		this.id = id;
+	}
+	
+	public String getCaseId() {
+		return id;
 	}
 
 	/**
@@ -203,7 +208,7 @@ public class Case implements Persistable, Restorable {
 	
 	public Object getProperty(String key) {
 		if("case-id".equals(key)) {
-			return id + recordId;
+			return id;
 		}
 		return data.get(key);
 	}
@@ -271,6 +276,23 @@ public class Case implements Persistable, Restorable {
 		RestoreUtils.applyDataType(dm, "other/*/type", parentRef, Integer.class);
 		
 		// other/* defaults to string
+	}
+
+	public Hashtable getMetaData() {
+		Hashtable h = new Hashtable();
+		h.put("case-id",id);
+		return h;
+	}
+
+	public Object getMetaData(String fieldName) {
+		if(fieldName.equals("case-id")) {
+			return id;
+		}
+		throw new IllegalArgumentException("No metadata field " + fieldName  + " in the case storage system");
+	}
+
+	public String[] getMetaDataFields() {
+		return new String[] { "case-id"};
 	}
 
 }

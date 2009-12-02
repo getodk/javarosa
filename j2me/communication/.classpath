@@ -2,8 +2,6 @@
 <classpath>
 	<classpathentry excluding="**/bluetooth/|**/sms/trigger/" kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.1-java5.0.jar"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
 	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/wmapi.jar"/>
 	<classpathentry kind="output" path="bin"/>

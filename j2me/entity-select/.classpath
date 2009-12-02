@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.1-java5.0.jar"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="var" path="J2ME_POLISH_HOME/lib/enough-j2mepolish-client-java5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
 	<classpathentry kind="output" path="bin"/>
