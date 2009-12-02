@@ -1,13 +1,18 @@
 package org.javarosa.services.transport.impl.sms;
 
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Vector;
 
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.ExtWrapList;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
-
-import de.enough.polish.io.Serializable;
 
 /**
  * 
@@ -22,8 +27,7 @@ import de.enough.polish.io.Serializable;
  * 
  * 
  */
-public class SMSTransportMessage extends BasicTransportMessage implements
-		Serializable {
+public class SMSTransportMessage extends BasicTransportMessage {
 
 	/**
 	 * SMS messages can be no longer than 140 characters in length
@@ -34,14 +38,23 @@ public class SMSTransportMessage extends BasicTransportMessage implements
 	 * 
 	 */
 	private String destinationURL;
+	
+	private Vector content;
 
+	/**
+	 * NOTE: DO NOT USE. ONLY FOR SERIALIZATION
+	 */
+	public SMSTransportMessage() {
+		//ONLY FOR SERIALIZATION
+	}
+	
 	/**
 	 * @param str
 	 * @param destinationURL
 	 */
 	public SMSTransportMessage(String str, String destinationURL) {
 		this.destinationURL = destinationURL;
-		setContent(splitSMS(str));
+		content = splitSMS(str);
 	}
 
 	public boolean isCacheable() {
@@ -49,6 +62,11 @@ public class SMSTransportMessage extends BasicTransportMessage implements
 	}
 	public boolean isShareTransporter(){
 		return false;
+	}
+	
+
+	public Object getContent() {
+		return content;
 	}
 
 	/**
@@ -105,6 +123,16 @@ public class SMSTransportMessage extends BasicTransportMessage implements
 	// TODO: content is a string Vector, so this is wrong
 	public InputStream getContentStream(){
 		return new ByteArrayInputStream((byte[])getContent());
+	}
+	
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		super.readExternal(in, pf);
+		content = (Vector)ExtUtil.read(in, new ExtWrapList(String.class));
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		super.writeExternal(out);
+		ExtUtil.write(out, new ExtWrapList(content));
 	}
 
 }

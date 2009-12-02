@@ -111,6 +111,8 @@
 				<compiler debug="on" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/wmapi.jar:${wtk.home}/lib/jsr75.jar"/>
 				
 				<postcompiler name="java5"/>
+				<postcompiler name="serialization" if="org.javarosa.polish.serialization"/>
+				
 
 			</build>
 
@@ -218,5 +220,5 @@
 	<property file="${polish.home}/global.properties" />
 
 	<!-- Defines the py-run task                                  -->
-	<taskdef name="py-run" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.2.jar"/>
+	<taskdef name="py-run" onerror="report" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.2.jar"/>
 </project>

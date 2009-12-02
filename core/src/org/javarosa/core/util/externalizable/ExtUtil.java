@@ -133,6 +133,10 @@ public class ExtUtil {
 		writeNumeric(out, val.getTime());
 		//time zone?
 	}
+	public static void writeBytes(DataOutputStream out, byte[] bytes) throws IOException {
+		ExtUtil.writeNumeric(out, bytes.length);
+		out.write(bytes);
+	}
 	
 	public static Object read (DataInputStream in, Class type) throws IOException, DeserializationException {
 		return read(in, type, null);
@@ -220,6 +224,18 @@ public class ExtUtil {
 	public static Date readDate (DataInputStream in) throws	IOException {
 		return new Date(readNumeric(in));
 		//time zone?
+	}
+	
+	public static byte[] readBytes(DataInputStream in) throws IOException {
+		int size = (int)ExtUtil.readNumeric(in);
+		byte[] bytes = new byte[size];
+		int read = 0;
+		int toread = size;
+		while(read != size) {
+			read = in.read(bytes, 0, toread);
+			toread -= read;
+		}
+		return bytes;
 	}
 	
 	public static int toInt (long l) {

@@ -1,14 +1,10 @@
 package org.javarosa.services.transport.impl.simplehttp;
 
-import de.enough.polish.io.Serializable;
-
 /**
  
  * 
  */
-public class HttpPingTransportMessage extends SimpleHttpTransportMessage
-		implements Serializable {
-
+public class HttpPingTransportMessage extends SimpleHttpTransportMessage {
 	/**
 	 * @param str
 	 * @param destinationURL

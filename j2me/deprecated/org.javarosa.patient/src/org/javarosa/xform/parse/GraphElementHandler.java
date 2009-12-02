@@ -21,7 +21,7 @@ import java.util.Vector;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.formmanager.view.chatterbox.widget.GraphWidget;
+import org.javarosa.formmanager.view.chatterbox.extendedwidget.GraphWidget;
 import org.kxml2.kdom.Element;
 
 public class GraphElementHandler implements IElementHandler{
