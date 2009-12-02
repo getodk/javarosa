@@ -3,7 +3,10 @@ package org.javarosa.core.services.storage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
+import java.util.NoSuchElementException;
+import java.util.Vector;
+ 
+import org.javarosa.core.util.InvalidIndexException;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -27,7 +30,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @author Drew Roos
  *
  */
-public class WrappingStorageUtility implements IStorageUtility {
+public class WrappingStorageUtility implements IStorageUtilityIndexed {
 	IStorageUtility storage;		/* underlying StorageUtility */
 	SerializationWrapper wrapper;   /* wrapper that defines the alternate serialization scheme; the wrapper is set once for
 	                                 * the life of the StorageUtility and is re-used all read and write calls
@@ -77,24 +80,13 @@ public class WrappingStorageUtility implements IStorageUtility {
 
 	public void write(final Persistable p) throws StorageFullException {
 		wrapper.setData(p);
-		storage.write(new Persistable () {
-			public int getID() {
-				return p.getID();
-			}
-
-			public void setID(int ID) {
-				p.setID(ID);
-			}
-
-			public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-				wrapper.readExternal(in, pf);
-			}
-
-			public void writeExternal(DataOutputStream out) throws IOException {
-				wrapper.writeExternal(out);
-			}
-		});
+		if(wrapper instanceof IMetaData) {
+			storage.write(new FauxIndexedPersistable(p, wrapper, (IMetaData)wrapper));
+		} else {
+			storage.write(new FauxIndexedPersistable(p, wrapper));
+		}
 	}
+			 	
 	
 	public int add(Externalizable e) throws StorageFullException {
 		wrapper.setData(e);
@@ -183,6 +175,22 @@ public class WrappingStorageUtility implements IStorageUtility {
 
 	public Object getAccessLock() {
 		return storage.getAccessLock();
+	}
+	
+	public Vector getIDsForValue(String fieldName, Object value) {
+		return indexedStorage().getIDsForValue(fieldName, value);
+	}
+		
+	public Externalizable getRecordForValue(String fieldName, Object value)
+			throws NoSuchElementException, InvalidIndexException {
+		return indexedStorage().getRecordForValue(fieldName, value);
+	}
+		
+	private IStorageUtilityIndexed indexedStorage() {
+		if(!(storage instanceof IStorageUtilityIndexed)) {
+			throw new RuntimeException("WrappingStorageUtility's factory is not of an indexed type, but had indexed operations requested. Please implement storage " + storage.getClass().getName() + " as indexed storage");
+		}
+		return (IStorageUtilityIndexed)storage;
 	}
 
 }

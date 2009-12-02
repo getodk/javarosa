@@ -17,6 +17,7 @@
 package org.javarosa.core.services;
 
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.javarosa.core.services.properties.IPropertyRules;
@@ -295,8 +296,12 @@ public class PropertyManager implements IPropertyManager {
     }
 
     public Vector getValue (String name) {
-    	Property p = (Property)properties.getRecordForValue("NAME", name);
-    	return (p != null ? p.value : null);
+    	try {
+    		Property p = (Property)properties.getRecordForValue("NAME", name);
+	       	return p.value;
+    	} catch(NoSuchElementException nsee) {
+    		return null;
+    	}
     }
     
     public void writeValue(String propertyName, Vector value) {

@@ -2,6 +2,7 @@ package org.javarosa.j2me.storage.rms;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.javarosa.core.services.storage.IMetaData;
@@ -9,6 +10,7 @@ import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtilityIndexed;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.util.InvalidIndexException;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -102,11 +104,11 @@ public class RMSStorageUtilityIndexed extends RMSStorageUtility implements IStor
 	}
 	
 	public void write (Persistable p) throws StorageFullException {
-		Persistable old = null;
+		IMetaData old = null;
 		if (hasMetaData) {
 			checkIndex();
 			if (exists(p.getID()))
-				old = (Persistable)read(p.getID());
+				old = (IMetaData)read(p.getID());
 		}
 		
 		super.write(p);
@@ -169,14 +171,14 @@ public class RMSStorageUtilityIndexed extends RMSStorageUtility implements IStor
 		return (IDs == null ? new Vector(): IDs);
 	}
 	
-	public Externalizable getRecordForValue (String fieldName, Object value) {
+	public Externalizable getRecordForValue (String fieldName, Object value) throws NoSuchElementException {
 		Vector IDs = getIDsForValue(fieldName, value);
 		if (IDs.size() == 1) {
 			return read(((Integer)IDs.elementAt(0)).intValue());
 		} else if (IDs.size() == 0){
-			return null;
+			throw new NoSuchElementException("Storage utility " + getName() +  " does not contain any records with the index " + fieldName + " equal to " + value.toString());
 		} else {
-			throw new RuntimeException("more than one record with value [" + value.toString() + "] in field [" + fieldName + "]");
+			throw new InvalidIndexException(fieldName + " is not a valid unique index. More than one record was found with value [" + value.toString() + "] in field [" + fieldName + "]",fieldName);
 		}
 	}
 }
