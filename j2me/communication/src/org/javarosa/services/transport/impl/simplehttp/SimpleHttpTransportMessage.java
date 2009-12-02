@@ -1,23 +1,27 @@
 package org.javarosa.services.transport.impl.simplehttp;
 
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 import org.javarosa.services.transport.impl.StreamsUtil;
-
-import de.enough.polish.io.Serializable;
 
 /**
  * A message which implements the simplest Http transfer - plain text via POST
  * request
  * 
  */
-public class SimpleHttpTransportMessage extends BasicTransportMessage implements
-		Serializable {
+public class SimpleHttpTransportMessage extends BasicTransportMessage {
 
+	
+	private byte[] content;
 	/**
 	 * An http url, to which the message will be POSTed
 	 */
@@ -33,17 +37,17 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	 */
 	private String responseBody;
 
-	/**
-	 * 
-	 */
-	private HttpRequestProperties requestProperties = new HttpRequestProperties();
 
+	public SimpleHttpTransportMessage() {
+		//ONLY FOR SERIALIZATION
+	}
+	
 	/**
 	 * @param str
 	 * @param destinationURL
 	 */
 	public SimpleHttpTransportMessage(String str, String url) {
-		setContent(str.getBytes());
+		content = str.getBytes();
 		this.url = url;
 	}
 
@@ -52,7 +56,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	 * @param destinationURL
 	 */
 	public SimpleHttpTransportMessage(byte[] str, String url) {
-		setContent(str);
+		content = str;
 		this.url = url;
 	}
 
@@ -64,24 +68,23 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 	public SimpleHttpTransportMessage(InputStream is, String url)
 			throws IOException {
 
-		setContent(StreamsUtil.readFromStream(is, -1));
+		content = StreamsUtil.readFromStream(is, -1);
 		this.url = url;
 	}
 
 	public HttpRequestProperties getRequestProperties() {
-		return requestProperties;
-	}
-
-	public void setRequestProperties(HttpRequestProperties requestProperties) {
-		this.requestProperties = requestProperties;
+		return new HttpRequestProperties();
 	}
 
 	public boolean isCacheable() {
 		return true;
 	}
 	
-	
 
+	public Object getContent() {
+		return content;
+	}
+	
 	/**
 	 * @return
 	 */
@@ -136,6 +139,23 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage implements
 
 	public InputStream getContentStream() {
 		return new ByteArrayInputStream((byte[]) getContent());
+	}
+
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		super.readExternal(in, pf);
+		url = ExtUtil.readString(in);
+		responseCode = (int)ExtUtil.readNumeric(in);
+		responseBody = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		content = ExtUtil.readBytes(in);
+	}
+		
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		super.writeExternal(out);
+		ExtUtil.writeString(out,url);
+		ExtUtil.writeNumeric(out,responseCode);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(responseBody));
+		ExtUtil.writeBytes(out,content);
 	}
 
 }

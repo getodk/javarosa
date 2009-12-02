@@ -11,7 +11,6 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.services.PropertyManager;
-import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;

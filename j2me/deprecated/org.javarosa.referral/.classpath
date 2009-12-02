@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="con" path="J2MELIB"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.core"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.core.model"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.xform"/>
-	<classpathentry exported="true" kind="lib" path="/org.javarosa.xform/lib/kxml2-2.3.0.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.patient"/>
-	<classpathentry kind="src" path="/javarosa-core"/>
-	<classpathentry kind="lib" path="/javarosa-core/lib/kxml2-2.3.0.jar"/>
-	<classpathentry kind="src" path="/j2merosa-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -21,8 +21,8 @@ import java.io.InputStream;
 
 import javax.microedition.io.HttpConnection;
 
-import org.javarosa.services.transport.TransportResult;
 import org.javarosa.services.transport.StreamsUtil;
+import org.javarosa.services.transport.TransportResult;
 
 public class HttpTransport {
 

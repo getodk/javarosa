@@ -1,12 +1,16 @@
 package org.javarosa.services.transport.impl.binarysms;
 
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
-
-import de.enough.polish.io.Serializable;
 
 /**
  * SMS message object
@@ -17,8 +21,9 @@ import de.enough.polish.io.Serializable;
  * 
  * 
  */
-public class BinarySMSTransportMessage extends BasicTransportMessage implements
-		Serializable {
+public class BinarySMSTransportMessage extends BasicTransportMessage {
+	
+	byte[] content;
 
 	/**
 	 * 
@@ -26,16 +31,26 @@ public class BinarySMSTransportMessage extends BasicTransportMessage implements
 	private String destinationURL;
 
 	/**
+	 * FOR DESERIALIZATION ONLY!
+	 */
+	public BinarySMSTransportMessage() {
+		//ONLY FOR DESERIALIZING
+	}
+	/**
 	 * @param str
 	 * @param destinationURL
 	 */
 	public BinarySMSTransportMessage(byte[] bytes, String destinationURL) {
 		this.destinationURL = destinationURL;
-		setContent(bytes);
+		this.content = bytes;
 	}
 
 	public boolean isCacheable() {
 		return true;
+	}
+	
+	public Object getContent() {
+		return content;
 	}
 
 	/**
@@ -64,4 +79,18 @@ public class BinarySMSTransportMessage extends BasicTransportMessage implements
 	public InputStream getContentStream() {
 		return new ByteArrayInputStream((byte[]) getContent());
 	}
+
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+			throws IOException, DeserializationException {
+		super.readExternal(in, pf);
+		destinationURL = ExtUtil.readString(in);
+		content = ExtUtil.readBytes(in);
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		super.writeExternal(out);
+		ExtUtil.writeString(out, destinationURL);
+		ExtUtil.writeBytes(out, content);
+	}
+
 }

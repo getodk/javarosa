@@ -36,9 +36,13 @@
 
 package org.javarosa.services.transport.impl.simplehttp.httpwrapper;
 
-import java.io.*;
-import java.util.*;
-import javax.microedition.rms.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Hashtable;
+
+import javax.microedition.rms.RecordStore;
+import javax.microedition.rms.RecordStoreException;
 
 
 // A simple logging class loosely adapted from

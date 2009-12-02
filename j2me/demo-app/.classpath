@@ -12,7 +12,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-entity-select"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-form-entry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-properties"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
 	<classpathentry kind="lib" path="/javarosa-libs/j2meunit-javarosa.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-communication"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-shared-resources"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

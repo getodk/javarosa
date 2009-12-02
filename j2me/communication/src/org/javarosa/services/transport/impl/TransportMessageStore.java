@@ -3,12 +3,16 @@ package org.javarosa.services.transport.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import org.javarosa.core.services.storage.IStorageIterator;
+import org.javarosa.core.services.storage.IStorageUtilityIndexed;
+import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportMessage;
-
-import de.enough.polish.io.RmsStorage;
 
 /**
  * A TransportMessageStore is necessary since not all attempts to send succeed.
@@ -26,21 +30,14 @@ public class TransportMessageStore implements TransportCache {
 	 * These constants are used to identify objects in persistent storage
 	 * 
 	 * Q_STORENAME - the queue of messages to be sent RECENTLY_SENT_STORENAME -
-	 * messages recently sent QID_STORENAME - storage for the message id counter
+	 * messages recently sent
 	 * 
 	 */
 
-	private static final String Q_STORENAME = "JavaROSATransQ";
-	private static final String QID_STORENAME = "JavaROSATransQId";
-	private static final String RECENTLY_SENT_STORENAME = "JavaROSATransQSent";
+	public static final String Q_STORENAME = "JavaROSATransQ";
+	public static final String RECENTLY_SENT_STORENAME = "JavaROSATransQSent";
 
 	private static final int RECENTLY_SENT_STORE_MAXSIZE = 15;
-
-	/**
-	 * The persistent store - it is partitioned into three corresponding to the
-	 * three constants above
-	 */
-	private RmsStorage storage = new RmsStorage();
 
 	/**
 	 * We cache the size (in terms of numbers of records) of each of the
@@ -68,10 +65,9 @@ public class TransportMessageStore implements TransportCache {
 	 * @return A Vector of TransportMessages waiting to be sent
 	 */
 	public Vector getCachedMessages() {
-		Vector messages = readAll(Q_STORENAME);
 		Vector cached = new Vector();
-		for (int i = 0; i < messages.size(); i++) {
-			TransportMessage message = (TransportMessage) messages.elementAt(i);
+		for(IStorageIterator en = storage(Q_STORENAME).iterate(); en.hasMore() ;) {
+			TransportMessage message = (TransportMessage)en.nextRecord();
 			if (message.getStatus() == TransportMessageStatus.CACHED) {
 				cached.addElement(message);
 			} else {
@@ -80,7 +76,7 @@ public class TransportMessageStore implements TransportCache {
 				}
 			}
 		}
-		return messages;
+		return cached;
 	}
 
 	/**
@@ -102,13 +98,6 @@ public class TransportMessageStore implements TransportCache {
 	}
 
 	/**
-	 * @return A Vector of TransportMessages recently sent
-	 */
-	public Vector getRecentlySentMessages() {
-		return readAll(RECENTLY_SENT_STORENAME);
-	}
-
-	/**
 	 * 
 	 * Add a new message to the send queue
 	 * 
@@ -119,9 +108,12 @@ public class TransportMessageStore implements TransportCache {
 		String id = getNextQueueIdentifier();
 		message.setCacheIdentifier(id);
 		message.setStatus(TransportMessageStatus.QUEUED);
-		Vector records = readAll(Q_STORENAME);
-		records.addElement(message);
-		saveAll(records, Q_STORENAME);
+		try {
+			storage(Q_STORENAME).write(message);
+		} catch (StorageFullException e) {
+			throw new TransportException(e);
+		}
+		updateCachedCounts();
 		return id;
 	}
 
@@ -134,54 +126,30 @@ public class TransportMessageStore implements TransportCache {
 	 * @throws IOException
 	 */
 	public void decache(TransportMessage message) throws TransportException {
-		Vector records = readAll(Q_STORENAME);
-		TransportMessage m = find(message.getCacheIdentifier(), records);
-		if (m == null) {
-			throw new IllegalArgumentException("No queued message with id="
-					+ message.getCacheIdentifier());
-		}
-		records.removeElement(m);
-		saveAll(records, Q_STORENAME);
+		
+		storage(Q_STORENAME).remove(message);
+		message.setID(-1);
 
 		// if we're dequeuing a successfully sent message
 		// then transfer it to the recently sent list
 		if (message.isSuccess()) {
-			Vector recentlySent = readAll(RECENTLY_SENT_STORENAME);
-			if (recentlySent == null) {
-				recentlySent = new Vector();
-			}
-
+			IStorageUtilityIndexed recent = storage(RECENTLY_SENT_STORENAME);
 			// ensure that the recently sent store doesn't grow indefinitely
 			// by limiting its size
-			if (recentlySent.size() == RECENTLY_SENT_STORE_MAXSIZE) {
-				recentlySent.removeElementAt(0);
+			if(recent.getNumRecords() == RECENTLY_SENT_STORE_MAXSIZE) {
+				int first = recent.iterate().nextID();
+				recent.remove(first);
+				//ITERATOR IS NOW INVALID
 			}
-
-			recentlySent.addElement(message);
-			saveAll(recentlySent, RECENTLY_SENT_STORENAME);
+			try {
+				recent.write(message);
+			} catch (StorageFullException e) {
+				throw new TransportException(e);
+			}
 		}
-
+		updateCachedCounts();
 	}
-
-	/**
-	 * 
-	 * 
-	 * Given a vector of messages, find the message with the given id
-	 * 
-	 * 
-	 * @param id
-	 * @param records
-	 * @return
-	 */
-	private TransportMessage find(String id, Vector records) {
-		for (int i = 0; i < records.size(); i++) {
-			TransportMessage message = (TransportMessage) records.elementAt(i);
-			if (message.getCacheIdentifier().equals(id))
-				return message;
-		}
-		return null;
-	}
-
+	
 	/**
 	 * Given an id, look in the send queue and the recently sent queue,
 	 * returning the message if it is found (null otherwise)
@@ -194,21 +162,21 @@ public class TransportMessageStore implements TransportCache {
 	 * @return
 	 */
 	public TransportMessage findMessage(String id) {
-		Vector records = readAll(Q_STORENAME);
-		for (int i = 0; i < records.size(); i++) {
-			TransportMessage message = (TransportMessage) records.elementAt(i);
-			if (message.getCacheIdentifier().equals(id))
-				return message;
+		try{
+			return (TransportMessage)storage(Q_STORENAME).getRecordForValue("cache-id", id);
+		}
+		catch(NoSuchElementException e) {
+			//Not there. Not a big deal.
+		}
+		
+		try{
+			return (TransportMessage)storage(RECENTLY_SENT_STORENAME).getRecordForValue("cache-id", id);
+		}
+		catch(NoSuchElementException e) {
+			//Not there. Not a big deal.
 		}
 
-		Vector sentRecords = readAll(RECENTLY_SENT_STORENAME);
-		for (int i = 0; i < sentRecords.size(); i++) {
-			TransportMessage message = (TransportMessage) sentRecords
-					.elementAt(i);
-			if (message.getCacheIdentifier().equals(id))
-				return message;
-		}
-
+		//Couldn't find it!
 		return null;
 	}
 
@@ -221,65 +189,10 @@ public class TransportMessageStore implements TransportCache {
 	 * @return
 	 * @throws IOException
 	 */
-	private String getNextQueueIdentifier() throws TransportException {
-		// get the most recently used id
-		Vector v = readAll(QID_STORENAME);
-		if ((v == null) || (v.size() == 0)) {
-			// null means there wasn't one, so create, save and return one
-			Integer i = new Integer(1);
-			v = new Vector();
-			v.addElement(i);
-			saveAll(v, QID_STORENAME);
-			return i.toString();
-		} else {
-
-			Integer i = (Integer) v.firstElement();
-
-			// increment the count to create a new one, save it and return it
-			Integer newI = new Integer(i.intValue() + 1);
-
-			v.removeAllElements();
-			v.addElement(newI);
-			saveAll(v, QID_STORENAME);
-			return newI.toString();
-		}
-
-	}
-
-	/**
-	 * @param store
-	 * @return
-	 */
-	public Vector readAll(String store) {
-		Vector records = new Vector();
-		try {
-
-			records = (Vector) storage.read(store);
-		} catch (IOException e) {
-			// storage doesn't yet exist (according to Polish)
-		}
-		return records;
-	}
-
-	/**
-	 * @param records
-	 * @param c
-	 * @throws IOException
-	 */
-	private void saveAll(Vector records, String store)
-			throws TransportException {
-		try {
-			this.storage.delete(store);
-		} catch (IOException e) {
-			// storage didn't exist (according to Polish)
-		}
-		try {
-			this.storage.save(records, store);
-		} catch (IOException e) {
-			throw new TransportException(e);
-		}
-
+	private String getNextQueueIdentifier() {
+		String qid = PropertyUtils.genGUID(25);
 		updateCachedCounts();
+		return qid;
 	}
 
 	/**
@@ -289,9 +202,8 @@ public class TransportMessageStore implements TransportCache {
 		int queued = 0;
 		int cached = 0;
 		// cache the counts first
-		Vector messages = readAll(Q_STORENAME);
-		for (int i = 0; i < messages.size(); i++) {
-			TransportMessage message = (TransportMessage) messages.elementAt(i);
+		for(IStorageIterator en = storage(Q_STORENAME).iterate(); en.hasMore() ;) {
+			TransportMessage message = (TransportMessage)en.nextRecord();
 			if (message.getStatus() == TransportMessageStatus.QUEUED)
 				queued++;
 			if (message.getStatus() == TransportMessageStatus.CACHED)
@@ -305,7 +217,7 @@ public class TransportMessageStore implements TransportCache {
 				new Integer(queued));
 
 		// sent messages in another store
-		int recentlySentSize = readAll(RECENTLY_SENT_STORENAME).size();
+		int recentlySentSize = storage(RECENTLY_SENT_STORENAME).getNumRecords();
 		this.cachedCounts.put(Integer.toString(TransportMessageStatus.QUEUED),
 				new Integer(recentlySentSize));
 	}
@@ -314,29 +226,24 @@ public class TransportMessageStore implements TransportCache {
 	 * @param message
 	 * @throws IOException
 	 */
-	public void updateMessage(TransportMessage message)
-			throws TransportException {
-		Vector records = readAll(Q_STORENAME);
-		for (int i = 0; i < records.size(); i++) {
-			TransportMessage m = (TransportMessage) records.elementAt(i);
-			if (m.getCacheIdentifier().equals(message.getCacheIdentifier())) {
-				m.setStatus(message.getStatus());
-				m.setFailureReason(message.getFailureReason());
+	public void updateMessage(TransportMessage message) throws TransportException {
+		try {
+			if(message.getStatus() == TransportMessageStatus.CACHED) {
+				IStorageUtilityIndexed cache = storage(Q_STORENAME);
+				if(cache.getIDsForValue("cache-id",message.getCacheIdentifier()).size() > 0) {
+					storage(Q_STORENAME).write(message);
+				}
 			}
+		} catch(StorageFullException e) {
+			throw new TransportException(e);
 		}
-
-		saveAll(records, Q_STORENAME);
-
 	}
 
 	public void clearCache() {
-		try {
-			storage.delete(Q_STORENAME);
-			storage.save(new Vector(), Q_STORENAME);
-		} catch (IOException e) {
-			throw new RuntimeException(
-					"Problem clearing the cache of TransportMessages.");
-		}
+		storage(Q_STORENAME).removeAll();
 	}
-
+	
+	private IStorageUtilityIndexed storage(String name) {
+		return (IStorageUtilityIndexed)StorageManager.getStorage(name);
+	}
 }

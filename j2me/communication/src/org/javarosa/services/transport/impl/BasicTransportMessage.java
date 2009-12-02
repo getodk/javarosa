@@ -1,7 +1,13 @@
 package org.javarosa.services.transport.impl;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Date;
 
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.services.transport.TransportMessage;
 
 /**
@@ -11,7 +17,6 @@ import org.javarosa.services.transport.TransportMessage;
  */
 public abstract class BasicTransportMessage implements TransportMessage {
 
-	private Object content;
 	private String contentType;
 	private int status;
 	private String failureReason;
@@ -20,6 +25,7 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	private Date created;
 	private Date sent;
 	private long queuingDeadline;
+	private int recordId = -1;
 
 	public Date getSent() {
 		return sent;
@@ -51,14 +57,6 @@ public abstract class BasicTransportMessage implements TransportMessage {
 
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
-	}
-
-	public Object getContent() {
-		return content;
-	}
-
-	public void setContent(Object content) {
-		this.content = content;
 	}
 
 	public int getStatus() {
@@ -97,4 +95,40 @@ public abstract class BasicTransportMessage implements TransportMessage {
 		this.queueIdentifier = queueIdentifier;
 	}
 
+	public int getID() {
+		return recordId;
+	}
+
+	public void setID(int ID) {
+		this.recordId = ID;
+	}
+	
+
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+			throws IOException, DeserializationException {
+		contentType = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		status = (int)ExtUtil.readNumeric(in);
+		failureReason = ExtUtil.readString(in);
+		failureCount = (int)ExtUtil.readNumeric(in);
+		queueIdentifier = ExtUtil.readString(in);
+		created = ExtUtil.readDate(in);
+		created = created.getTime() == 0 ? null : created;
+		sent = ExtUtil.readDate(in);
+		sent = sent.getTime() == 0 ? null : sent;
+		queuingDeadline = ExtUtil.readNumeric(in);
+		recordId = (int)ExtUtil.readNumeric(in);
+	}
+
+	public void writeExternal(DataOutputStream out) throws IOException {
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(contentType));
+		ExtUtil.writeNumeric(out, status);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(failureReason));
+		ExtUtil.writeNumeric(out, failureCount);
+		ExtUtil.writeString(out, queueIdentifier);
+		ExtUtil.writeDate(out, created == null? new Date(0) : created );
+		ExtUtil.writeDate(out, sent == null? new Date(0) : sent );
+		ExtUtil.writeNumeric(out, queuingDeadline);
+		ExtUtil.writeNumeric(out, recordId);
+
+	}
 }

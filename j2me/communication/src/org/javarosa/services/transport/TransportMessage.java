@@ -3,9 +3,8 @@ package org.javarosa.services.transport;
 import java.io.InputStream;
 import java.util.Date;
 
+import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
-
-import de.enough.polish.io.Serializable;
 
 /**
  * TransportMessage is one of a pair of interfaces which must be implemented in
@@ -14,8 +13,10 @@ import de.enough.polish.io.Serializable;
  * The other is Transporter
  * 
  */
-public interface TransportMessage extends Serializable {
+public interface TransportMessage extends Persistable {
 
+	public static final String STORAGE_NAME = "transport-message-store";
+	
 	/**
 	 * 
 	 * 
