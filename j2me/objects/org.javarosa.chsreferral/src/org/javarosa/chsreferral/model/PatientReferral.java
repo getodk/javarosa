@@ -180,7 +180,7 @@ public class PatientReferral implements Persistable, Restorable, IMetaData {
 		RestoreUtils.applyDataType(dm, "created", parentRef, Date.class);
 		RestoreUtils.applyDataType(dm, "due", parentRef, Date.class);
 		RestoreUtils.applyDataType(dm, "ref-id", parentRef, String.class);
-		RestoreUtils.applyDataType(dm, "parent-id", parentRef, Integer.class);
+		RestoreUtils.applyDataType(dm, "parent-id", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "pending", parentRef, Boolean.class);
 	}
 
