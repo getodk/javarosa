@@ -48,7 +48,7 @@ public class TransportMessageSerializationWrapper implements SerializationWrappe
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
-		m = (TransportMessage)ExtUtil.read(in, new ExtWrapTagged());
+		m = (TransportMessage)ExtUtil.read(in, new ExtWrapTagged(),pf);
 	}
 
 	/* (non-Javadoc)
