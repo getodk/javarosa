@@ -17,7 +17,7 @@
 package org.javarosa.entity.model;
 
 import org.javarosa.core.services.storage.Persistable;
-import org.javarosa.entity.util.IEntityFilter;
+import org.javarosa.entity.util.EntityFilter;
 
 /**
  * Entity is a wrapper class around an object to be used inside the Entity Select activity. It
@@ -195,7 +195,7 @@ public abstract class Entity <E extends Persistable> {
 	 * 
 	 * @return filter
 	 */
-	public IEntityFilter<? super E> getFilter () {
+	public EntityFilter<? super E> getFilter () {
 		return null;
 	}
 	
