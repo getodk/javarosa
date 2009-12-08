@@ -13,6 +13,7 @@ import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.IncidentLogger;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
@@ -498,7 +499,68 @@ public class RMSStorageUtility implements IStorageUtility {
 	 * in data loss
 	 */
 	public void repair () {
-		throw new RuntimeException("not implemented yet");
+		synchronized (getAccessLock()) {
+		
+			try {
+				checkNotCorrupt();
+				
+				//integrity is ok
+				return;
+				
+			} catch (IllegalStateException ise) {
+				//utility is corrupt; fix it
+				IncidentLogger.logIncident("RMS", "storage utility [" + basename + "] is corrupt");
+			
+				RMSStorageInfo info = getInfoRecord();
+				Hashtable idIndex = getIDIndexRecord();
+
+				//check index for entries where record does not exist in rms
+				Vector invalidIDs = new Vector();
+				int max_datastore = -1;
+				for (Enumeration e = idIndex.keys(); e.hasMoreElements(); ) {
+					int id = ((Integer)e.nextElement()).intValue();
+					RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
+					if (loc.rmsID > max_datastore) {
+						max_datastore = loc.rmsID;
+					}
+					
+					boolean recordExists = false;
+					RMS rms = getDataStore(loc.rmsID);
+					if (rms != null && rms.readRecord(loc.recID) != null) {
+						recordExists = true;
+					}
+					
+					if (!recordExists) {
+						invalidIDs.addElement(new Integer(id));
+					}
+				}
+				for (int i = 0; i < invalidIDs.size(); i++) {
+					idIndex.remove((Integer)invalidIDs.elementAt(i));
+				}
+				
+				//check for rms records that have no corresponding index entry
+				//note: this is hte most likely failure scenario
+				//TODO -- it's not going to hurt anything for now
+				
+				info.numRecords = idIndex.size();
+				info.numDataStores = max_datastore + 1;
+				info.nextRecordID = info.numRecords + 1;
+				
+				commitIndex(info, idIndex);
+				setClean();
+				storageModified();	
+				
+				//check again
+				try {
+					checkNotCorrupt();
+					IncidentLogger.logIncident("RMS", "storage utility repaired successfully");
+				} catch (IllegalStateException ise2) {
+					IncidentLogger.logIncident("RMS", "unable to repair storage utility!!!");
+					throw new IllegalStateException("Storage utility [" + basename + "] is corrupt and could not be repaired");
+				}
+			}
+
+		}
 	}
 	
 	/**
