@@ -16,6 +16,7 @@
 
 package org.javarosa.core.services.storage;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 /* droos: what is the future of this class? i think it will take a different form with the new storage API */
@@ -31,7 +32,7 @@ import java.util.Hashtable;
  */
 public class StorageManager {
 	
-	private static Hashtable storageRegistry = new Hashtable();
+	private static Hashtable<String, IStorageUtility> storageRegistry = new Hashtable<String, IStorageUtility>();
 	private static IStorageFactory storageFactory;
 	
 	public static void setStorageFactory (IStorageFactory fact) {
@@ -62,4 +63,9 @@ public class StorageManager {
 		}
 	}
 	
+	public static void repairAll () {
+		for (Enumeration e = storageRegistry.elements(); e.hasMoreElements(); ) {
+			((IStorageUtility)e.nextElement()).repair();
+		}
+	}
 }
