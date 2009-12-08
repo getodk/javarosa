@@ -183,10 +183,14 @@ public class RMSStorageUtility implements IStorageUtility {
 			RMSStorageInfo info = getInfoRecord();			
 			
 			int id = p.getID();
-			if (id == -1 && allocateIDs) {
-				id = info.nextRecordID;
-				p.setID(id);
-				info.nextRecordID++;
+			if (allocateIDs) {			
+				if (id == -1) {
+					id = info.nextRecordID;
+					p.setID(id);
+					info.nextRecordID++;
+				} else if (id >= info.nextRecordID) {
+					info.nextRecordID = id + 1;
+				}
 			}
 						
 			byte[] data = ExtUtil.serialize(p);
