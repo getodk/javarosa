@@ -5,7 +5,7 @@
 	<property file="build.properties"/>
 
 	<path id="jr.classpath">
-		<fileset dir="../../lib">
+		<fileset dir="${dir.lib}">
 			<include name="*.jar"/>
 		</fileset>
 		<fileset dir="${wtk.home}/lib" includes="${wtk.includes}"/>
@@ -19,7 +19,7 @@
 
 	<path id="jr.classpath.test">
 		<path refid="jr.compiled.classpath" />
-		<fileset dir="../../lib" includes="j2meunit-javarosa.jar"/>
+		<fileset dir="${dir.lib}" includes="j2meunit-javarosa.jar"/>
 		<dirset dir="${basedir}">
 			<include name="buildTest/**"/>
 		</dirset>
@@ -144,7 +144,7 @@
 
 		<typedef name="instanceof" classname="org.javarosa.build.InstanceOfCondition" onerror="report">
 			<classpath>
-				<pathelement location="tools/javarosa-ant-libs.jar"/>
+				<pathelement location="${dir.tools}/javarosa-ant-libs.jar"/>
 				<path refid="jr.classpath.test" />
 			</classpath>
 		</typedef>
@@ -210,19 +210,19 @@
 
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties" onerror="report">
 		<classpath>
-			<pathelement location="tools/ant-contrib.jar"/>
+			<pathelement location="${dir.tools}/ant-contrib.jar"/>
 		</classpath>
 	</taskdef>
 
 	<taskdef name="for" classname="net.sf.antcontrib.logic.For" onerror="report">
 		<classpath>
-			<pathelement location="tools/ant-contrib.jar"/>
+			<pathelement location="${dir.tools}/ant-contrib.jar"/>
 		</classpath>
 	</taskdef>
 
 	<taskdef name="trycatch" classname="net.sf.antcontrib.logic.TryCatchTask" onerror="report">
 		<classpath>
-			<pathelement location="tools/ant-contrib.jar"/>
+			<pathelement location="${dir.tools}/ant-contrib.jar"/>
 		</classpath>
 	</taskdef>
 

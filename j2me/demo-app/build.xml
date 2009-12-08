@@ -47,7 +47,7 @@
 				destDir="${dir.dist}">
 				
 				<libraries>
-					<library dir="${basedir}/../../lib/" />
+					<library dir="${dir.lib}" />
 				</libraries>
 
 				<!-- midlets definition -->
