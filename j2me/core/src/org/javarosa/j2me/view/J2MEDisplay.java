@@ -29,7 +29,7 @@ public class J2MEDisplay {
 	
 	public static void init (MIDlet m) {
 		setDisplay(Display.getDisplay(m));
-		loading = new LoadingScreenThread(getDisplay());
+		loading = new LoadingScreenThread(display);
 	}
 	
 	public static void setDisplay (Display display) {
@@ -45,10 +45,11 @@ public class J2MEDisplay {
 	}
 	
 	public static void startLoading() {
-		loading.startLoading(null);
+		startLoading(null);
 	}
 	
 	public static void startLoading(ProgressIndicator indicator) {
+		loading = new LoadingScreenThread(display);
 		loading.startLoading(indicator);
 	}
 	
