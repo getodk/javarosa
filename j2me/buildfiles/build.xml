@@ -117,6 +117,7 @@
 			<include name="**/test**/*.java"/>
 
 			<!-- TODO: do we need to exclude neglected/uncoverted code here? -->
+			<exclude name="demo-app/test/**/*.java"/>
 		</javac>
 	</target>
 
