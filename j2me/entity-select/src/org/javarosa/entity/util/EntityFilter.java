@@ -16,6 +16,12 @@
 
 package org.javarosa.entity.util;
 
-public interface IEntityFilter<E> {
-	public boolean matches(E e);
+import java.util.Hashtable;
+
+public abstract class EntityFilter<E> {
+	
+	public boolean preFilter (int id, Hashtable<String, Object> metaData) {
+		return true;
+	}
+	public abstract boolean matches(E e);
 }
