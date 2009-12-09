@@ -233,6 +233,7 @@ public class TransportMessageStore implements TransportCache {
 				if(cache.getIDsForValue("cache-id",message.getCacheIdentifier()).size() > 0) {
 					storage(Q_STORENAME).write(message);
 				}
+				updateCachedCounts();
 			}
 		} catch(StorageFullException e) {
 			throw new TransportException(e);
