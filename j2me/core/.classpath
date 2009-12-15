@@ -8,7 +8,7 @@
 	<classpathentry exported="true" kind="lib" path="/javarosa-libs/kxml2-2.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/javarosa-libs/regexp-me.jar"/>
 	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/mmapi.jar"/>
-	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/enough-j2mepolish-client-java5.jar"/>
+	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/enough-j2mepolish-client-java5.jar" sourcepath="/J2ME_POLISH_HOME/j2mepolish-src"/>
 	<classpathentry exported="true" kind="lib" path="/javarosa-libs/j2meunit-javarosa.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
