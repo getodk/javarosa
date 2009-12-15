@@ -654,7 +654,7 @@ public class RMSStorageUtility implements IStorageUtility {
 			} catch (RecordStoreNotFoundException rsnfe) {
 				//do nothing; will create record store next
 			} catch (RecordStoreException rse) {
-				throw new RuntimeException("Error opening index record: " + rse.getMessage());
+				throw new RuntimeException("Error + (" + rse.getClass().getName() + ") opening index record for store " + basename + " : " + rse.getMessage());
 			}
 			
 			if (ix != null) {
