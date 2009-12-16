@@ -24,6 +24,6 @@ package org.javarosa.core.log;
  * @date Apr 10, 2009 
  *
  */
-public interface ILogSerializer {
-	public byte[] serializeLogs(IncidentLog[] logs);
+public interface ILogSerializer<T> {
+	public T serializeLogs(IncidentLog[] logs);
 }

@@ -68,4 +68,14 @@ public class StorageManager {
 			((IStorageUtility)e.nextElement()).repair();
 		}
 	}
+	
+	public static String[] listRegisteredUtilities() {
+		String[] returnVal = new String[storageRegistry.size()];
+		int i = 0;
+		for (Enumeration e = storageRegistry.keys(); e.hasMoreElements(); ) {
+			returnVal[i] = (String)e.nextElement();
+			i++;
+		}
+		return returnVal;
+	}
 }

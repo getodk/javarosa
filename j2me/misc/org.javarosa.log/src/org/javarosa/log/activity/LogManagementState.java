@@ -115,8 +115,8 @@ public abstract class LogManagementState implements TrivialTransitions, State, C
 	 * 
 	 */
 	private void sendLogs() {
-		byte[] logData = IncidentLogger._().serializeLogs(new FlatLogSerializer());
-		ByteArrayPayload payload = new ByteArrayPayload(logData, "",
+		String logData = IncidentLogger._().serializeLogs(new FlatLogSerializer());
+		ByteArrayPayload payload = new ByteArrayPayload(logData.getBytes(), "",
 				IDataPayload.PAYLOAD_TYPE_TEXT);
 		HttpTransportDestination destination = new HttpTransportDestination(
 				PropertyManager._().getSingularProperty(LogPropertyRules.LOG_SUBMIT_URL));
@@ -137,8 +137,8 @@ public abstract class LogManagementState implements TrivialTransitions, State, C
 	 */
 	private void viewLogs() {
 		this.viewer.deleteAll();
-		byte[] logData = IncidentLogger._().serializeLogs(new FlatLogSerializer());
-		this.viewer.loadLogs(new String(logData));
+		String logData = IncidentLogger._().serializeLogs(new FlatLogSerializer());
+		this.viewer.loadLogs(logData);
 		this.viewer.setCommandListener(this);
 		this.viewer.addCommand(EXIT);
 		J2MEDisplay.setView(this.viewer);
