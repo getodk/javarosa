@@ -20,11 +20,11 @@ public abstract class SenderThread extends Thread {
 	/**
 	 * 
 	 */
-	public static final int DEFAULT_TRIES = 5;
+	public static final int DEFAULT_TRIES = 2;
 	/**
 	 * 
 	 */
-	public static final int DEFAULT_DELAY = 60;
+	public static final int DEFAULT_DELAY = 30;
 
 	public Vector listeners = new Vector();
 
