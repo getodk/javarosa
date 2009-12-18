@@ -1187,13 +1187,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public Object getMetaData(String fieldName) {
 		if (fieldName.equals("DESCRIPTOR")) {
 			return name;
+		} if (fieldName.equals("XMLNS")) {
+			return model.schema;
 		} else {
 			throw new IllegalArgumentException();
 		}
 	}
 
 	public String[] getMetaDataFields() {
-		return new String[] {"DESCRIPTOR"};
+		return new String[] {"DESCRIPTOR","XMLNS"};
 	}
 	
 }
