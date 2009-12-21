@@ -26,13 +26,6 @@ import org.javarosa.formmanager.view.clforms.FormViewManager;
 
 public class FormEntryViewFactory implements IFormEntryViewFactory {
 	public IFormEntryView getFormEntryView (String viewType, FormEntryModel model, FormEntryController controller) {
-		if (FormManagerProperties.VIEW_CHATTERBOX.equals(viewType)) {
-			return new Chatterbox("Chatterbox", model, controller);
-		} else if (FormManagerProperties.VIEW_CLFORMS.equals(viewType)) {
-			return new FormViewManager("CLForms", model, controller);
-		}
-		else {
-			return null;
-		}
+		return new Chatterbox("Chatterbox", model, controller);
 	}
 }
