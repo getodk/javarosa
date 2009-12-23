@@ -91,7 +91,7 @@ title.FormsList=Forms List
 title.Login=Login
 title.SavedForms=Saved Forms
 
-button.Next=VOLGENDE
+button.Next=NEXT
 
 question.SendNow=Send data now?
 
