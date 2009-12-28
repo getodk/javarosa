@@ -1188,7 +1188,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		if (fieldName.equals("DESCRIPTOR")) {
 			return name;
 		} if (fieldName.equals("XMLNS")) {
-			return model.schema;
+			return ExtUtil.emptyIfNull(model.schema);
 		} else {
 			throw new IllegalArgumentException();
 		}
