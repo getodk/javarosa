@@ -79,7 +79,7 @@ public class J2MEIncidentLogger implements IIncidentLogger {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IIncidentLogger#serializeLogs()
 	 */
-	public byte[] serializeLogs(ILogSerializer serializer) {
+	public <T> T serializeLogs(ILogSerializer<T> serializer) {
 		Vector logs = new Vector();
 		IStorageIterator li = logStorage.iterate();
 		while (li.hasMore()) {
