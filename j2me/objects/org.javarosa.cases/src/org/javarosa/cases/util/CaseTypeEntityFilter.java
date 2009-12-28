@@ -20,15 +20,14 @@
 package org.javarosa.cases.util;
 
 import org.javarosa.cases.model.Case;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.entity.util.IEntityFilter;
+import org.javarosa.entity.util.EntityFilter;
 
 /**
  * @author Clayton Sims
  * @date Mar 24, 2009 
  *
  */
-public class CaseTypeEntityFilter implements IEntityFilter<Case> {
+public class CaseTypeEntityFilter extends EntityFilter<Case> {
 	
 	boolean filterClosed;
 	

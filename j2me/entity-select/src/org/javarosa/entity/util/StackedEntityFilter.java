@@ -3,20 +3,26 @@
  */
 package org.javarosa.entity.util;
 
+import java.util.Hashtable;
+
 
 /**
  * @author ctsims
  *
  */
-public class StackedEntityFilter<E> implements IEntityFilter<E> {
+public class StackedEntityFilter<E> extends EntityFilter<E> {
 	
-	IEntityFilter<E> one, two;
+	EntityFilter<E> one, two;
 	
-	public StackedEntityFilter(IEntityFilter<E> one, IEntityFilter<E> two) {
+	public StackedEntityFilter(EntityFilter<E> one, EntityFilter<E> two) {
 		this.one = one;
 		this.two = two;
 	}
 
+	public boolean preFilter (int id, Hashtable<String, Object> metaData) {
+		return one.preFilter(id, metaData) && two.preFilter(id, metaData);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.util.IEntityFilter#isPermitted(org.javarosa.entity.model.IEntity)
 	 */

@@ -24,7 +24,7 @@ package org.javarosa.core.log;
  * @date Apr 10, 2009 
  *
  */
-public class FlatLogSerializer implements ILogSerializer {
+public class FlatLogSerializer implements ILogSerializer<String> {
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.log.ILogSerializer#serializeLog(org.javarosa.core.log.IncidentLog)
@@ -36,12 +36,12 @@ public class FlatLogSerializer implements ILogSerializer {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.log.ILogSerializer#serializeLogs(org.javarosa.core.log.IncidentLog[])
 	 */
-	public byte[] serializeLogs(IncidentLog[] logs) {
+	public String serializeLogs(IncidentLog[] logs) {
 		String log = ""; 
 		for(int i = 0; i < logs.length; ++i ) {
 			log += this.serializeLog(logs[i]);
 		}
-		return log.getBytes();
+		return log;
 	}
 
 }

@@ -27,7 +27,7 @@ import org.javarosa.entity.api.transitions.EntitySelectTransitions;
 import org.javarosa.entity.model.Entity;
 import org.javarosa.entity.model.view.EntitySelectDetailPopup;
 import org.javarosa.entity.model.view.EntitySelectView;
-import org.javarosa.entity.util.IEntityFilter;
+import org.javarosa.entity.util.EntityFilter;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
@@ -135,15 +135,27 @@ public class EntitySelectController <E extends Persistable> {
 
 	private void loadEntities () {
 		entities = new Vector<Entity<E>>();
-		IEntityFilter<? super E> filter = entityPrototype.getFilter();
+		EntityFilter<? super E> filter = entityPrototype.getFilter();
 		
 		IStorageIterator ei = entityStorage.iterate();
 		while (ei.hasMore()) {
-			E obj = (E)ei.nextRecord();
+			E obj = null;
 			
-			if (filter == null || filter.matches(obj)) {
-				loadEntity(obj);
+			if (filter == null) {
+				obj = (E)ei.nextRecord();
+			} else {
+				int id = ei.nextID();
+				if (filter.preFilter(id, null)) {
+					E candidateObj = (E)entityStorage.read(id);
+					if (filter.matches(candidateObj)) {
+						obj = candidateObj;
+					}
+				}
 			}
+			
+			if (obj != null) {
+				loadEntity(obj);
+			}			
 		}
 	}
 	
