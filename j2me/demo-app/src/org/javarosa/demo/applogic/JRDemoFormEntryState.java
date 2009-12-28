@@ -6,7 +6,7 @@ import java.util.Vector;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IPreloadHandler;
-import org.javarosa.demo.util.FormEntryViewFactory;
+import org.javarosa.demo.util.JRDemoFormEntryViewFactory;
 import org.javarosa.demo.util.JRDemoUtil;
 import org.javarosa.formmanager.api.CompletedFormOptionsState;
 import org.javarosa.formmanager.api.FormEntryState;
@@ -41,7 +41,7 @@ public class JRDemoFormEntryState extends FormEntryState {
 		Vector<IPreloadHandler> preloaders = JRDemoContext._().getPreloaders();
 		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(formID), preloaders);
 		
-		return new FormEntryController(new FormEntryViewFactory(), fetcher, false);
+		return new FormEntryController(new JRDemoFormEntryViewFactory(), fetcher, false);
 	}
 
 	public void abort() {
