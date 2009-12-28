@@ -68,7 +68,7 @@ public class FormEntryController {
 		
 		//the view constructor MUST call setFormEntryView before it makes any calls to the controller
 		//pretty confusing, but that's how it works right now
-		viewFactory.getFormEntryView("Title", model, this);
+		viewFactory.getFormEntryView(model, this);
 	}
 	
 	public void setTransitions (FormEntryTransitions transitions) {
