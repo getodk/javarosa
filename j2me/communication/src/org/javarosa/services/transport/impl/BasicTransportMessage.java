@@ -108,8 +108,16 @@ public abstract class BasicTransportMessage implements TransportMessage {
 			throws IOException, DeserializationException {
 		contentType = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		status = (int)ExtUtil.readNumeric(in);
+		
+		//The concept of being queued is really only relevant for _in memory_ messages.
+		//Once something's been read from memory, if it still thinks it's queued, it's 
+		//almost certainly wrong
+		if(status == TransportMessageStatus.QUEUED) {
+			status = TransportMessageStatus.CACHED;
+		}
 		failureReason = ExtUtil.readString(in);
 		failureCount = (int)ExtUtil.readNumeric(in);
+		failureCount = 0;
 		queueIdentifier = ExtUtil.readString(in);
 		created = ExtUtil.readDate(in);
 		created = created.getTime() == 0 ? null : created;

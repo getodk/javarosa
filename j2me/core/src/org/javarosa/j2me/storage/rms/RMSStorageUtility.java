@@ -13,6 +13,7 @@ import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.IncidentLogger;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
@@ -24,6 +25,9 @@ import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.ExternalizableWrapper;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.j2me.log.StatusReportException;
+import org.javarosa.j2me.log.XmlStatusProvider;
+import org.kxml2.kdom.Element;
 
 /**
  * class StorageUtility
@@ -53,7 +57,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * These two schemes should not be mixed within the same StorageUtility.
  * 
  */
-public class RMSStorageUtility implements IStorageUtility {
+public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	private static final int MAX_RMS_NAME_LENGTH = 32;		//maximum length of an RMS name
 	private static final int SUFFIX_LENGTH = 3;				//how much of RMS name that we need to reserve for our own purposes
 	private static final int MAX_DATA_STORES = 100;			//max number of data RMSes
@@ -182,10 +186,14 @@ public class RMSStorageUtility implements IStorageUtility {
 			RMSStorageInfo info = getInfoRecord();			
 			
 			int id = p.getID();
-			if (id == -1 && allocateIDs) {
-				id = info.nextRecordID;
-				p.setID(id);
-				info.nextRecordID++;
+			if (allocateIDs) {			
+				if (id == -1) {
+					id = info.nextRecordID;
+					p.setID(id);
+					info.nextRecordID++;
+				} else if (id >= info.nextRecordID) {
+					info.nextRecordID = id + 1;
+				}
 			}
 						
 			byte[] data = ExtUtil.serialize(p);
@@ -498,7 +506,68 @@ public class RMSStorageUtility implements IStorageUtility {
 	 * in data loss
 	 */
 	public void repair () {
-		throw new RuntimeException("not implemented yet");
+		synchronized (getAccessLock()) {
+		
+			try {
+				checkNotCorrupt();
+				
+				//integrity is ok
+				return;
+				
+			} catch (IllegalStateException ise) {
+				//utility is corrupt; fix it
+				IncidentLogger.logIncident("RMS", "storage utility [" + basename + "] is corrupt");
+			
+				RMSStorageInfo info = getInfoRecord();
+				Hashtable idIndex = getIDIndexRecord();
+
+				//check index for entries where record does not exist in rms
+				Vector invalidIDs = new Vector();
+				int max_datastore = -1;
+				for (Enumeration e = idIndex.keys(); e.hasMoreElements(); ) {
+					int id = ((Integer)e.nextElement()).intValue();
+					RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
+					if (loc.rmsID > max_datastore) {
+						max_datastore = loc.rmsID;
+					}
+					
+					boolean recordExists = false;
+					RMS rms = getDataStore(loc.rmsID);
+					if (rms != null && rms.readRecord(loc.recID) != null) {
+						recordExists = true;
+					}
+					
+					if (!recordExists) {
+						invalidIDs.addElement(new Integer(id));
+					}
+				}
+				for (int i = 0; i < invalidIDs.size(); i++) {
+					idIndex.remove((Integer)invalidIDs.elementAt(i));
+				}
+				
+				//check for rms records that have no corresponding index entry
+				//note: this is hte most likely failure scenario
+				//TODO -- it's not going to hurt anything for now
+				
+				info.numRecords = idIndex.size();
+				info.numDataStores = max_datastore + 1;
+				info.nextRecordID = info.numRecords + 1;
+				
+				commitIndex(info, idIndex);
+				setClean();
+				storageModified();	
+				
+				//check again
+				try {
+					checkNotCorrupt();
+					IncidentLogger.logIncident("RMS", "storage utility repaired successfully");
+				} catch (IllegalStateException ise2) {
+					IncidentLogger.logIncident("RMS", "unable to repair storage utility!!!");
+					throw new IllegalStateException("Storage utility [" + basename + "] is corrupt and could not be repaired");
+				}
+			}
+
+		}
 	}
 	
 	/**
@@ -588,7 +657,7 @@ public class RMSStorageUtility implements IStorageUtility {
 			} catch (RecordStoreNotFoundException rsnfe) {
 				//do nothing; will create record store next
 			} catch (RecordStoreException rse) {
-				throw new RuntimeException("Error opening index record: " + rse.getMessage());
+				throw new RuntimeException("Error + (" + rse.getClass().getName() + ") opening index record for store " + basename + " : " + rse.getMessage());
 			}
 			
 			if (ix != null) {
@@ -1357,6 +1426,62 @@ public class RMSStorageUtility implements IStorageUtility {
 			sb.append("RecordStoreException! " + e.getClass().getName() + " " + e.getMessage() + "\n");
 		}
 		return sb.toString();
+	}
+
+	public Element getStatusReport() throws StatusReportException {
+		Element storage = new Element();
+		storage.setName("storage_utility");
+		storage.setAttribute(null, "name",this.getName());
+		
+		
+		Element total = storage.createElement(null, "total_records");
+		total.addChild(Element.TEXT,getNumRecords() + "");
+		storage.addChild(Element.ELEMENT, total);
+		
+		Element size = storage.createElement(null, "total_size");
+		size.addChild(Element.TEXT,getTotalSize() + "");
+		storage.addChild(Element.ELEMENT, size);
+		
+		Element status = storage.createElement(null, "status_flag");
+		String statusText;
+		int statusFlag = getStatus();
+		switch(statusFlag) {
+			case STATUS_CLEAN: statusText = "CLEAN"; break;
+			case STATUS_DIRTY: statusText = "DIRTY"; break;
+			case STATUS_UNINITIALIZED: statusText = "UNINITIALIZED"; break;
+			default: statusText = "UNKNOWN: " + statusFlag; break;
+		}
+		status.addChild(Element.TEXT, statusText);
+		storage.addChild(Element.ELEMENT, status);
+		
+		RMSStorageInfo info = getInfoRecord();
+
+		for (int i = 0; i < info.numDataStores; i++) {
+			RMS rmsStore = getDataStore(i);
+			
+			Element store = storage.createElement(null,"rms_store");
+			store.setAttribute(null,"name", rmsStore.name);
+			store.setAttribute(null,"index",i + "");
+			
+			try {
+				Element storeRecords = storage.createElement(null,"num_records");
+				storeRecords.addChild(Element.TEXT, rmsStore.rms.getNumRecords() + "");
+				store.addChild(Element.ELEMENT,storeRecords);
+				
+				Element sizeUsed = storage.createElement(null,"size_used");
+				sizeUsed.addChild(Element.TEXT, rmsStore.rms.getSize() + "");
+				store.addChild(Element.ELEMENT,sizeUsed);
+			
+				Element sizeAvail = storage.createElement(null,"size_available");
+				sizeAvail.addChild(Element.TEXT, rmsStore.rms.getSizeAvailable() + "");
+				store.addChild(Element.ELEMENT,sizeAvail);
+			} catch (RecordStoreNotOpenException e) {
+				throw new StatusReportException(e, "storage_utility","Storage: " + this.getName() + " Record Store Not Open");
+			}
+			rmsStore.close();
+			storage.addChild(Element.ELEMENT, store);
+		}
+		return storage;
 	}
 }
 
