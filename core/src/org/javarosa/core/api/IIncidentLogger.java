@@ -37,5 +37,5 @@ public interface IIncidentLogger {
 	
 	public void clearLogs();
 	
-	public byte[] serializeLogs(ILogSerializer serializer);
+	public <T> T serializeLogs(ILogSerializer<T> serializer);
 }

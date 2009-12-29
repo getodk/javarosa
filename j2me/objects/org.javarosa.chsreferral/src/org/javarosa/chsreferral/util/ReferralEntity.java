@@ -25,7 +25,7 @@ import org.javarosa.chsreferral.model.PatientReferral;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.entity.model.Entity;
-import org.javarosa.entity.util.IEntityFilter;
+import org.javarosa.entity.util.EntityFilter;
 
 /**
  * @author Clayton Sims
@@ -124,7 +124,7 @@ public class ReferralEntity extends Entity<PatientReferral> {
 	}
 	
 	
-	public IEntityFilter<PatientReferral> getFilter () {
+	public EntityFilter<PatientReferral> getFilter () {
 		return new ReferralEntityPendingFilter();
 	}
 }

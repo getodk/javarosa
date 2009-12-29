@@ -152,7 +152,7 @@ public interface IStorageUtility {
 	
 	/**
 	 * If the StorageUtility has been left in a corrupt/inconsistent state, restore it to a non-corrupt state, even if it results
-	 * in data loss
+	 * in data loss. If the integrity is intact, do nothing
 	 */
 	void repair ();
 	
