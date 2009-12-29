@@ -64,4 +64,7 @@ public abstract class SplashScreenState implements TrivialTransitions, State, Ap
 		//J2ME docs
 	}
 	
+	//added for Nokia JVM bug
+	public abstract void done ();
+	
 }
