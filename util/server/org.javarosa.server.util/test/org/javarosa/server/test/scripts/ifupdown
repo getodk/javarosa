@@ -1,0 +1,52 @@
+#! /bin/bash
+# This linux script will bring the network interface IF
+# up for a random interval between 1 and 10
+
+prog=ifupdown
+
+start() {
+echo $$ > /var/run/${prog}.pid
+[ -f ifupdown.conf ] && . ifupdown.conf
+
+MIN_UP_TIME=${MIN_UP_TIME:-1}
+RANGE_UP_TIME=${RANGE_UP_TIME:-1}
+DOWN_TIME=${DOWN_TIME:-1}
+IF=${IF:eth0}
+
+while true; do
+	# Tear down network
+	ifdown $IF
+
+	sleep $DOWN_TIME
+
+	ifup $IF
+
+	# Turn network on for a random interval 
+	# between MIN_UP_TIME and MIN_UP_TIME+RANGE_UP_TIME 
+	SECONDS=`echo "scale=0; $RANDOM / (32767/$RANGE_UP_TIME) + $MIN_UP_TIME" | bc`
+	sleep $SECONDS
+done
+
+}
+
+stop() {
+kill -9 `cat /var/run/${prog}.pid`
+rm /var/run/${prog}.pid
+}
+
+usage() {
+echo "Usage: ${prog} [start|stop]"
+}
+
+case "$1" in
+  start)
+      start
+      ;;
+  stop)
+      stop
+      ;;
+  *)
+      usage
+      ;;
+esac
+
