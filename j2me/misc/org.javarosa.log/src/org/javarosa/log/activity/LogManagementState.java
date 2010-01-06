@@ -19,26 +19,16 @@
  */
 package org.javarosa.log.activity;
 
-import java.io.IOException;
-
 import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.communication.http.HttpTransportDestination;
 import org.javarosa.core.api.State;
 import org.javarosa.core.log.FlatLogSerializer;
 import org.javarosa.core.services.IncidentLogger;
-import org.javarosa.core.services.PropertyManager;
-import org.javarosa.core.services.TransportManager;
-import org.javarosa.core.services.transport.ByteArrayPayload;
-import org.javarosa.core.services.transport.IDataPayload;
 import org.javarosa.core.util.TrivialTransitions;
-import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 import org.javarosa.j2me.view.J2MEDisplay;
-import org.javarosa.log.properties.LogPropertyRules;
 import org.javarosa.log.view.LogManagementView;
 import org.javarosa.log.view.LogViewer;
 
@@ -115,21 +105,23 @@ public abstract class LogManagementState implements TrivialTransitions, State, C
 	 * 
 	 */
 	private void sendLogs() {
-		String logData = IncidentLogger._().serializeLogs(new FlatLogSerializer());
-		ByteArrayPayload payload = new ByteArrayPayload(logData.getBytes(), "",
-				IDataPayload.PAYLOAD_TYPE_TEXT);
-		HttpTransportDestination destination = new HttpTransportDestination(
-				PropertyManager._().getSingularProperty(LogPropertyRules.LOG_SUBMIT_URL));
-		try {
-			TransportManager._().enqueue(
-					payload,
-					destination,
-					TransportManager._().getCurrentTransportMethod(), 0);
-			
-			J2MEDisplay.showError("Sending Started", "Log Sending Started");
-		} catch (IOException e) {
-			J2MEDisplay.showError("Send Failed", "Log sending failure");
-		}
+		throw new RuntimeException("LogManagementState.sendLogs(): need to convert to new transport layer");
+		
+//		String logData = IncidentLogger._().serializeLogs(new FlatLogSerializer());
+//		ByteArrayPayload payload = new ByteArrayPayload(logData.getBytes(), "",
+//				IDataPayload.PAYLOAD_TYPE_TEXT);
+//		HttpTransportDestination destination = new HttpTransportDestination(
+//				PropertyManager._().getSingularProperty(LogPropertyRules.LOG_SUBMIT_URL));
+//		try {
+//			TransportManager._().enqueue(
+//					payload,
+//					destination,
+//					TransportManager._().getCurrentTransportMethod(), 0);
+//			
+//			J2MEDisplay.showError("Sending Started", "Log Sending Started");
+//		} catch (IOException e) {
+//			J2MEDisplay.showError("Send Failed", "Log sending failure");
+//		}
 	}
 
 	/**

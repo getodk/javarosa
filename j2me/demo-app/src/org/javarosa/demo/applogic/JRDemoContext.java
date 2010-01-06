@@ -5,7 +5,6 @@ import java.util.Vector;
 
 import javax.microedition.midlet.MIDlet;
 
-import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
@@ -15,7 +14,7 @@ import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
-import org.javarosa.core.services.transport.IDataPayload;
+import org.javarosa.core.services.transport.payload.IDataPayload;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.demo.properties.DemoAppProperties;
@@ -111,13 +110,12 @@ public class JRDemoContext {
 	private void setProperties() {
 		final String POST_URL = "http://test.commcarehq.org/submit";
 		
-		
 		PropertyManager._().addRules(new JavaRosaPropertyRules());
 		PropertyManager._().addRules(new DemoAppProperties());
 		PropertyUtils.initializeProperty("DeviceID", PropertyUtils.genGUID(25));
 
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, POST_URL);
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, POST_URL);
+		PropertyUtils.initializeProperty(DemoAppProperties.POST_URL_LIST_PROPERTY, POST_URL);
+		PropertyUtils.initializeProperty(DemoAppProperties.POST_URL_PROPERTY, POST_URL);
         
 		LanguageUtils.initializeLanguage(true, "en");
 	}
