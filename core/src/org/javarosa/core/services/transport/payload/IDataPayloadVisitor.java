@@ -17,7 +17,7 @@
 /**
  * 
  */
-package org.javarosa.core.services.transport;
+package org.javarosa.core.services.transport.payload;
 
 /**
  * @author Clayton Sims

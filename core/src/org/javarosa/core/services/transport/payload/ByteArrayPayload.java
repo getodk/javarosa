@@ -17,7 +17,7 @@
 /**
  * 
  */
-package org.javarosa.core.services.transport;
+package org.javarosa.core.services.transport.payload;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.core.services.transport;
+package org.javarosa.core.services.transport.payload;
 
 import java.io.InputStream;
 
