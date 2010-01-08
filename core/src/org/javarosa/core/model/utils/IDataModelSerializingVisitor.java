@@ -21,7 +21,7 @@ import java.io.IOException;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.core.services.transport.IDataPayload;
+import org.javarosa.core.services.transport.payload.IDataPayload;
 
 /**
  * An IDataModelSerializingVisitor serializes a DataModel

@@ -20,7 +20,7 @@
 package org.javarosa.cases.util;
 
 import org.javarosa.cases.model.Case;
-import org.javarosa.entity.util.EntityFilter;
+import org.javarosa.core.services.storage.EntityFilter;
 
 /**
  * @author Clayton Sims

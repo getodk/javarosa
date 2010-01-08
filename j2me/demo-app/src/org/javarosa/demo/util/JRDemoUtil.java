@@ -158,18 +158,4 @@ public class JRDemoUtil {
 		}
 		return formList;
 	}
-	
-	
-	//////////////////////
-	private final static String MIDLET_VERSION_PROPERTY = "MIDlet-Version";
-	private static final String COMMCARE_RELEASE_PROPERTY = "CommCare-Release";
-	
-	
-	public static boolean isTestingMode() {
-		return getAppProperty(COMMCARE_RELEASE_PROPERTY).equals("false");
-	}
-	
-	public static String getCommCareVersion () {
-		return getAppProperty(MIDLET_VERSION_PROPERTY);
-	}
 }

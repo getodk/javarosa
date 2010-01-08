@@ -55,6 +55,7 @@ import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -1826,6 +1827,10 @@ public class XFormParser {
 		Restorable r = (restorableType != null ? (Restorable)PrototypeFactory.getInstance(restorableType) : null);
 		
 		Document doc = getXMLDocument(new InputStreamReader(new ByteArrayInputStream(data)));
+		if (doc == null) {
+			throw new RuntimeException("syntax error in XML instance; could not parse");
+		}
+		
 		Element e = doc.getRootElement();
 		
 		TreeElement te = buildInstanceStructure(e, null);
