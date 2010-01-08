@@ -245,7 +245,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 				PatientReferral r = getReferral(referralId,refType);
 				r.setDateDue(followup);
 				Vector dateCloseds = kid.getChildrenWithName("date_closed");
-				if(dateCloseds.size() > 0) {
+				if(dateCloseds.size() > 0 && ((TreeElement)dateCloseds.elementAt(0)).isRelevant()) {
 					r.close();
 				}
 				commit(r);
