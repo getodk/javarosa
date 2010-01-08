@@ -166,7 +166,7 @@ public class XFormParser {
 		typeMappings.put("gDay", new Integer(Constants.DATATYPE_UNSUPPORTED));          //xsd:
 		typeMappings.put("gYearMonth", new Integer(Constants.DATATYPE_UNSUPPORTED));    //xsd:
 		typeMappings.put("gMonthDay", new Integer(Constants.DATATYPE_UNSUPPORTED));     //xsd:
-		typeMappings.put("boolean", new Integer(Constants.DATATYPE_UNSUPPORTED));       //xsd:
+		typeMappings.put("boolean", new Integer(Constants.DATATYPE_BOOLEAN));           //xsd:
 		typeMappings.put("base64Binary", new Integer(Constants.DATATYPE_UNSUPPORTED));  //xsd:
 		typeMappings.put("hexBinary", new Integer(Constants.DATATYPE_UNSUPPORTED));     //xsd:
 		typeMappings.put("anyURI", new Integer(Constants.DATATYPE_UNSUPPORTED));        //xsd:
