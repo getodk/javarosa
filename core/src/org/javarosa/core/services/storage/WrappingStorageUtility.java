@@ -137,6 +137,10 @@ public class WrappingStorageUtility implements IStorageUtilityIndexed {
 		storage.removeAll();
 	}
 	
+	public void removeAll(EntityFilter ef) {
+		storage.removeAll(ef);
+	}
+	
 	public boolean exists(int id) {
 		return storage.exists(id);
 	}
