@@ -276,3 +276,10 @@ Cancel=  Kataa
 
 id=Namba
 
+user.registration.title=User Registration
+user.registration.attempt=Contacting Server to Register User...
+user.registration.failmessage=User registration couldn't be completed, server couldn't be contacted. Retry attempt?
+
+command.retry=Retry
+command.cancel=Cancel
+

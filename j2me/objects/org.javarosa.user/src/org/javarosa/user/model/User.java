@@ -50,6 +50,7 @@ public class User implements Persistable, Restorable
 	private String username;
 	private String password;
 	private String userType;
+	private String uniqueId;
 	private int id;
 	private boolean rememberMe= false;
 	
@@ -176,6 +177,19 @@ public class User implements Persistable, Restorable
 
 	public void setRememberMe(boolean rememberMe) {
 		this.rememberMe = rememberMe;
+	}
+	
+	public void setUuid(String uuid) {
+		this.uniqueId = uuid;
+	}
+	
+	public String getUniqueId() {
+		return uniqueId;
+	}
+	
+	
+	public Enumeration listProperties() {
+		return this.properties.keys();
 	}
 	
 	public void setProperty(String key, String val) {
