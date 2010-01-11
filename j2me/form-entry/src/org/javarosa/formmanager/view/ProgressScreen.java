@@ -26,6 +26,7 @@ public class ProgressScreen extends Form{
 	private GaugeUpdater gupd = new GaugeUpdater();
 	private Thread updater_T;
 	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
+	public final Command CMD_RETRY = new Command("Retry",Command.ITEM, 1);
 
 	public ProgressScreen(String title,String msg,CommandListener cmdListener) {
 		super(title);
@@ -35,6 +36,10 @@ public class ProgressScreen extends Form{
 		setCommandListener(cmdListener);
 		updater_T = new Thread(gupd);
 		updater_T.start();
+	}
+	
+	public void setText(String text) {
+		progressbar.setLabel(text);
 	}
 	
 	public void closeThread(){
