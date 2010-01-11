@@ -1,182 +1,129 @@
-///*
-// * Copyright (C) 2009 JavaRosa
-// *
-// * Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// * use this file except in compliance with the License. You may obtain a copy of
-// * the License at
-// *
-// * http://www.apache.org/licenses/LICENSE-2.0
-// *
-// * Unless required by applicable law or agreed to in writing, software
-// * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// * License for the specific language governing permissions and limitations under
-// * the License.
-// */
-//
-//package org.javarosa.formmanager.activity;
-//
-//import java.util.Hashtable;
-//
-//import javax.microedition.lcdui.Alert;
-//import javax.microedition.lcdui.AlertType;
-//import javax.microedition.lcdui.Command;
-//import javax.microedition.lcdui.CommandListener;
-//import javax.microedition.lcdui.Displayable;
-//
-//import org.javarosa.communication.http.HttpTransportDestination;
-//import org.javarosa.communication.http.HttpTransportProperties;
-//import org.javarosa.core.Context;
-//import org.javarosa.core.JavaRosaServiceProvider;
-//import org.javarosa.core.api.Constants;
-//import org.javarosa.core.api.IActivity;
-//import org.javarosa.core.api.ICommand;
-//import org.javarosa.core.api.IShell;
-//import org.javarosa.core.api.IView;
-//import org.javarosa.core.services.TransportManager;
-//import org.javarosa.core.services.transport.ByteArrayPayload;
-//import org.javarosa.core.services.transport.IDataPayload;
-//import org.javarosa.core.services.transport.ITransportDestination;
-//import org.javarosa.core.services.transport.TransportMessage;
-//import org.javarosa.core.services.transport.TransportMethod;
-//import org.javarosa.core.util.Observable;
-//import org.javarosa.core.util.Observer;
-//import org.javarosa.formmanager.view.ProgressScreen;
-//
-//public class GetFormListHttpActivity implements IActivity,CommandListener,Observer{
-//	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
-//	private ProgressScreen progressScreen = new ProgressScreen("Searching","Please Wait. Contacting Server...",this);
-//	private Alert alertdialog = new Alert("Web Service Error", "No response from server", null, AlertType.ERROR);
-//	private TransportMessage message;
-//	private TransportManager transportManager;
-//	private IShell parent;
-//	private String getListUrl;
-//	private String credentials;
-//	private Context context;
-//	
-//	public static final String RETURN_KEY = "returnval";
-//	
-//	private String requestPayload = "#";
-//	
-//	
-//
-//	public GetFormListHttpActivity(IShell parent) {
-//		this.parent = parent;
-//		
-//	}
-//	
-//	private void init(){
-//		//System.out.println("NOW STARTING RETRIEVE");
-//		getListUrl = JavaRosaServiceProvider.instance().getPropertyManager().getSingularProperty(HttpTransportProperties.GET_URL_PROPERTY);
-//		credentials = "?user="+context.getCurrentUser();
-//		requestPayload = credentials;
-//	}
-//
-//	public void contextChanged(Context globalContext) {
-//		context.mergeInContext(globalContext);
-//		
-//	}
-//
-//	public void destroy() {
-//		if(progressScreen!=null){
-//			progressScreen.closeThread();
-//			progressScreen =null;
-//		}
-//		if(transportManager!=null){
-//			//transportManager.closeSend();
-//			transportManager = null;
-//		}
-//	}
-//
-//	public Context getActivityContext() {
-//		
-//		return context;
-//	}
-//
-//	public void halt() {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
-//	public void resume(Context globalContext) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
-//	public void start(Context context) {
-//		this.context = context;
-//		
-//		progressScreen.addCommand(CMD_CANCEL);
-//		parent.setDisplay(this, new IView() {public Object getScreenObject() {return progressScreen;}});
-//		init();
-//		fetchList();
-//	}
-//	
-//	public void fetchList() {
-//		ITransportDestination requestDest= new HttpTransportDestination(getListUrl+credentials);//send username and url
-//		message = new TransportMessage();
-//		message.setPayloadData(new ByteArrayPayload(requestPayload.getBytes(),null,IDataPayload.PAYLOAD_TYPE_TEXT)); // TODO change this to send xml msg with search options /uname, form type
-//		// TODO add url stuff here below
-//		message.setDestination(requestDest);
-//		message.addObserver(this);
-//		transportManager = (TransportManager)JavaRosaServiceProvider.instance().getTransportManager();
-//		transportManager.send(message, TransportMethod.HTTP_GCF);
-//
-//	}
-//	
-//	
-//
-//	public void commandAction(Command command, Displayable display) {
-//		
-//		if(display== progressScreen){
-//			if(command == CMD_CANCEL){
-//				parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-//				
-//			}
-//			
-//		}
-//		
-//	}
-//
-//	public void update(Observable observable, Object arg) {
-//
-//		byte[] data = (byte[])arg;
-//		process(data);
-//		
-//	}
-//
-//	
-//
-//	public void process(byte[] data) {
-//		String response;
-//		response = new String(data).trim();
-//		
-//		//FIXME - resolve the responses to be received from the webserver
-//		if(response ==null){
-//			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
-//			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-//		}else if(response.equals("WebServerResponses.GET_LIST_ERROR")){
-//			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
-//			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-//		}else if(response.equals("WebServerResponses.GET_LIST_NO_SURVEY")){
-//			parent.setDisplay(this, new IView() {public Object getScreenObject() {return alertdialog;}});
-//			parent.returnFromActivity(this, Constants.ACTIVITY_CANCEL, null);
-//		}else{
-//			Hashtable returnArgs = new Hashtable();
-//			returnArgs.put(RETURN_KEY, data);
-//			parent.returnFromActivity(this, Constants.ACTIVITY_COMPLETE, returnArgs);
-//		}
-//		
-//	}
-//
-//	public void setShell(IShell shell) {
-//		this.parent = shell;
-//		
-//	}
-//	/* (non-Javadoc)
-//	 * @see org.javarosa.core.api.IActivity#annotateCommand(org.javarosa.core.api.ICommand)
-//	 */
-//	public void annotateCommand(ICommand command) {
-//		throw new RuntimeException("The Activity Class " + this.getClass().getName() + " Does Not Yet Implement the annotateCommand Interface Method. Please Implement It.");
-//	}
-//}
+/*
+ * Copyright (C) 2009 JavaRosa
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
+package org.javarosa.formmanager.activity;
+
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Displayable;
+
+import org.javarosa.core.api.State;
+import org.javarosa.formmanager.api.transitions.HttpFetchTransitions;
+import org.javarosa.formmanager.view.ProgressScreen;
+import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.services.transport.TransportListener;
+import org.javarosa.services.transport.TransportMessage;
+import org.javarosa.services.transport.TransportService;
+import org.javarosa.services.transport.impl.TransportException;
+import org.javarosa.services.transport.impl.TransportMessageStatus;
+import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
+import org.javarosa.services.transport.senders.SenderThread;
+
+public abstract class GetFormListHttpActivity implements State,CommandListener,TransportListener, HttpFetchTransitions{
+
+	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
+	public final Command CMD_RETRY = new Command("Retry",Command.BACK, 1);
+	private ProgressScreen progressScreen = new ProgressScreen("Searching","Please Wait. Contacting Server...",this);
+	
+	private String getListUrl;
+	private String credentials;
+	
+	private String requestPayload = "#";
+	
+	private SenderThread thread;
+
+	public GetFormListHttpActivity() {
+		
+	}
+	
+	public abstract String getUrl();
+	
+	public abstract String getUserName();
+	
+	private void init(){
+		getListUrl = getUrl(); 
+		credentials = "?user=" + getUserName();
+		requestPayload = credentials;
+	}
+	
+	public void start() {
+		progressScreen.addCommand(CMD_CANCEL);
+		J2MEDisplay.setView(progressScreen);
+		init();
+		fetchList();
+	}
+	
+	public void fetchList() {
+		SimpleHttpTransportMessage message= new SimpleHttpTransportMessage(requestPayload,getListUrl+credentials);//send username and url
+		message.setCacheable(false);
+		
+		try {
+			thread = TransportService.send(message);
+			thread.addListener(this);
+		} catch (TransportException e) {
+			fail("Error Downloading List! Transport Exception while downloading forms list " + e.getMessage());
+		}
+	}
+	
+	private void fail(String message) {
+		progressScreen.setText(message);
+		progressScreen.addCommand(CMD_RETRY);
+	}
+
+	public void commandAction(Command command, Displayable display) {
+		
+		if(display== progressScreen){
+			if(command == CMD_CANCEL){
+				cancel();
+			}
+			if(command == CMD_RETRY) {
+				progressScreen = new ProgressScreen("Searching","Please Wait. Contacting Server...",this);
+				progressScreen.addCommand(CMD_CANCEL);
+				J2MEDisplay.setView(progressScreen);
+				fetchList();
+			}
+		}
+		
+	}
+
+	public void process(String response) {
+		//FIXME - resolve the responses to be received from the webserver
+		if(response ==null){
+			//TODO: I don't think this is even possible.
+			fail("Null Response from server");
+		}else if(response.equals("WebServerResponses.GET_LIST_ERROR")){
+			fail("Get List Error from Server");
+		}else if(response.equals("WebServerResponses.GET_LIST_NO_SURVEY")){
+			fail("No survey error from server");
+		}else{
+			fetched();
+		}
+		
+	}
+	
+	public void onChange(TransportMessage message, String remark) {
+		progressScreen.setText(remark);
+	}
+
+	public void onStatusChange(TransportMessage message) {
+		if(message.getStatus() == TransportMessageStatus.SENT) {
+			//TODO: Response codes signal statuses?
+			process(((SimpleHttpTransportMessage)message).getResponseBody());
+		} else {
+			fail("Transport Failure: " + message.getFailureReason());
+		}
+	}
+}
