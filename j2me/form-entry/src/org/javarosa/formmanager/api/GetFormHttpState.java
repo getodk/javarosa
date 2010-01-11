@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.activity;
+package org.javarosa.formmanager.api;
 
 import java.io.ByteArrayInputStream;
 
@@ -38,7 +38,7 @@ import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessag
 import org.javarosa.services.transport.senders.SenderThread;
 import org.javarosa.xform.util.XFormUtils;
 
-public abstract class GetFormHttpActivity implements State,TrivialTransitions,CommandListener,TransportListener {
+public abstract class GetFormHttpState implements State,TrivialTransitions,CommandListener,TransportListener {
 
 	private ProgressScreen progressScreen =  new ProgressScreen("Downloadng","Please Wait. Fetching Form...", this);
 
@@ -47,7 +47,7 @@ public abstract class GetFormHttpActivity implements State,TrivialTransitions,Co
 	private SenderThread sendThread;
 
 
-	public GetFormHttpActivity() {
+	public GetFormHttpState() {
 	}
 	
 	public abstract String getURL();
