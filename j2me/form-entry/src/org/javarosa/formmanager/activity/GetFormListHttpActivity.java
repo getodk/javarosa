@@ -38,7 +38,7 @@ public abstract class GetFormListHttpActivity implements State,CommandListener,T
 	public final Command CMD_RETRY = new Command("Retry",Command.BACK, 1);
 	private ProgressScreen progressScreen = new ProgressScreen("Searching","Please Wait. Contacting Server...",this);
 	
-	private String getListUrl;
+	private String getListUrl; 
 	private String credentials;
 	
 	private String requestPayload = "#";
