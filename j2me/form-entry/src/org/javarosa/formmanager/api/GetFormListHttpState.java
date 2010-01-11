@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.activity;
+package org.javarosa.formmanager.api;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -32,7 +32,7 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.services.transport.senders.SenderThread;
 
-public abstract class GetFormListHttpActivity implements State,CommandListener,TransportListener, HttpFetchTransitions{
+public abstract class GetFormListHttpState implements State,CommandListener,TransportListener, HttpFetchTransitions{
 
 	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
 	public final Command CMD_RETRY = new Command("Retry",Command.BACK, 1);
@@ -45,7 +45,7 @@ public abstract class GetFormListHttpActivity implements State,CommandListener,T
 	
 	private SenderThread thread;
 
-	public GetFormListHttpActivity() {
+	public GetFormListHttpState() {
 		
 	}
 	

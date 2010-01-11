@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.activity;
+package org.javarosa.formmanager.api;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-public abstract class DisplayFormsHttpActivity implements FormListTransitions, State, CommandListener {
+public abstract class DisplayFormsHttpState implements FormListTransitions, State, CommandListener {
 	private AvailableFormsScreen formList;
 	private ByteArrayInputStream bin;
 
@@ -48,7 +48,7 @@ public abstract class DisplayFormsHttpActivity implements FormListTransitions, S
 	public static final String FORM_URL = "selected_form_url";
 
 
-	public DisplayFormsHttpActivity(byte[] formsListXml) {
+	public DisplayFormsHttpState(byte[] formsListXml) {
 		init(formsListXml);
 	}
 
