@@ -141,7 +141,7 @@ public class JRDemoUtil {
 
 	public static User demoUser () {
 		User demo = new User("demo", "", 999);
-		demo.setUserType(User.DEMO_USER);
+		demo.setUserType(User.ADMINUSER);
 		return demo;
 	}
 	

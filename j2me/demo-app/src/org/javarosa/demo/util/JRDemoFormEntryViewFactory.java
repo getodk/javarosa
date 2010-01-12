@@ -23,7 +23,7 @@ import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
-import org.javarosa.formmanager.view.clforms.FormViewManager;
+import org.javarosa.formmanager.view.oneqps.OneQPSManager;
 
 public class JRDemoFormEntryViewFactory implements IFormEntryViewFactory {
 	public IFormEntryView getFormEntryView (FormEntryModel model, FormEntryController controller) {
@@ -33,7 +33,7 @@ public class JRDemoFormEntryViewFactory implements IFormEntryViewFactory {
 			return new Chatterbox("Chatterbox", model, controller);
 			
 		} else if (FormManagerProperties.VIEW_CLFORMS.equals(viewType)) {
-			return new FormViewManager("1QpS", model, controller);
+			return new OneQPSManager("1QpS", model, controller);
 			
 		} else {
 			throw new RuntimeException("No view known for type [" + viewType + "]");
