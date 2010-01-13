@@ -44,6 +44,30 @@ public class FormEntryModel {
 								// for progress bar
 
 	private boolean readOnly;
+	
+	
+	
+	
+	
+	
+	//Start New stuff today.
+	
+	public int getEvent(FormIndex index) {
+		if (index.isBeginningOfFormIndex()) {
+			//TODO: REMOVE THESE MODEL CALLBACKS
+			notifyStartOfForm();
+			return FormEntryController.BEGINNING_OF_FORM_EVENT;
+		} else if (index.isEndOfFormIndex()) {
+			//TODO: REMOVE THESE MODEL CALLBACKS
+			setFormComplete();
+			return FormEntryController.END_OF_FORM_EVENT;
+		}
+		
+	}
+	
+	//end new stuff
+	
+	
 
 	public FormEntryModel(FormDef form) {
 		this(form, -1);
