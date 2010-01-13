@@ -35,9 +35,9 @@ public class TreeReference implements Externalizable {
 	
 	public static final String NAME_WILDCARD = "*";
 	
-	public int refLevel; //0 = context node, 1 = parent, 2 = grandparent ...
-	public Vector names; //Vector<String>
-	public Vector multiplicity; //Vector<Integer>
+	private int refLevel; //0 = context node, 1 = parent, 2 = grandparent ...
+	private Vector names; //Vector<String>
+	private Vector multiplicity; //Vector<Integer>
 	
 	public static TreeReference rootRef () {
 		TreeReference root = new TreeReference();
@@ -54,6 +54,14 @@ public class TreeReference implements Externalizable {
 	public TreeReference () {
 		names = new Vector();
 		multiplicity = new Vector();		
+	}
+	
+	public int getMultiplicity(int index) {
+		return ((Integer)multiplicity.elementAt(index)).intValue();
+	}
+	
+	public String getNames(int index) {
+		return (String)names.elementAt(index);
 	}
 
 	public int size () {
