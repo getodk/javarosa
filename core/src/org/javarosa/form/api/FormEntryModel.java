@@ -76,14 +76,17 @@ public class FormEntryModel {
         }
     }
 
-
-    /**
-     * 
+	protected TreeElement getTreeElement(FormIndex index) {
+		return form.getDataModel().resolveReference(index.getReference());
+	}
+	
+    /* 
      * @return the event for the current FormIndex
      */
     public int getCurrentEvent() {
         return getEvent(currentFormindex);
-    }
+	}
+	
 
 
     public String[] getGroupHierarchy() {

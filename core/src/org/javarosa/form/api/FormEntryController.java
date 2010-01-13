@@ -18,7 +18,7 @@ package org.javarosa.form.api;
 
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.core.model.instance.TreeElement;
 
 public class FormEntryController {
 	public static final int QUESTION_OK = 0;
@@ -45,23 +45,24 @@ public class FormEntryController {
 		
 	}
 
-	public int questionAnswered (FormElementBinding binding, IAnswerData data) {
-		if (binding.instanceNode.required && data == null) {
+	public int questionAnswered (FormIndex index, IAnswerData data) {
+		TreeElement element = model.getTreeElement(index);
+		if (element.required && data == null) {
 			return QUESTION_REQUIRED_BUT_EMPTY;
-		} else if (!model.getForm().evaluateConstraint(binding.instanceRef, data)) {
+		} else if (!model.getForm().evaluateConstraint(index.getReference(), data)) {
 			return QUESTION_CONSTRAINT_VIOLATED;
 		} else {
-			commitAnswer(binding, data);
+			commitAnswer(element, index, data);
 			return QUESTION_OK;
 		}
 	}
 
 	//TODO: constraint isn't checked here, meaning if you 'save' on a question with invalid data entered in, that data will save
 	//without complaint... seems wrong (but oh-so right?)
-	private boolean commitAnswer (FormElementBinding binding, IAnswerData data) {
-		if (data != null || binding.getValue() != null) {
+	private boolean commitAnswer (TreeElement element, FormIndex index,IAnswerData data) {
+		if (data != null || element.getValue() != null) {
 			//we should check if the data to be saved is already the same as the data in the model, but we can't (no IAnswerData.equals())
-			model.getForm().setValue(data, binding.instanceRef, binding.instanceNode);
+			model.getForm().setValue(data, index.getReference(), element);
 			model.modelChanged();
 			return true;
 		} else {
