@@ -111,6 +111,6 @@ public class FormEntryController {
 	}
 	
 	public void setLanguage(String language) {
-		
+		model.setCurrentLanguage(language);
 	}
 }
