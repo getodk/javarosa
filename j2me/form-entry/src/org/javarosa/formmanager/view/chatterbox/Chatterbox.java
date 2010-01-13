@@ -512,7 +512,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		}
     		
     		if (language != null) {
-    			controller.(language);
+    			controller.setLanguage(language);
     		} else {
     			System.err.println("Chatterbox: Unknown command event received [" + command.getLabel() + "]");
     		}
@@ -521,15 +521,17 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 
     
 	private void suspendActivity(int mediaType) {
-		controller.suspendActivity(mediaType);
+		//TODO: DEAL
+		//controller.suspendActivity(mediaType);
 	}
 	
     private void commitAndSave () {
        	ChatterboxWidget frame = (activeIsInterstitial ? null : activeFrame());
     	if (frame != null) {
-    		controller.commitAnswer(frame.getBinding(), frame.getData());
+    		controller.questionAnswered(this.model.getCurrentFormIndex(), frame.getData());
     	}
-    	controller.save();
+    	//TODO: DEAL;
+    	//controller.save();
     }
     
     public void questionAnswered () {
@@ -542,9 +544,9 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			controller.newRepeat(activeQuestionIndex);
     			createHeaderForElement(activeQuestionIndex);
     		}
-    		controller.stepQuestion(true);
+    		controller.stepToNextEvent();
     	} else {
-	    	int status = controller.questionAnswered(frame.getBinding(), frame.getData());
+    		int status = controller.questionAnswered(this.model.getCurrentFormIndex(), frame.getData());
 	    	if (status == FormEntryController.QUESTION_REQUIRED_BUT_EMPTY) {
 	        	J2MEDisplay.showError(null, PROMPT_REQUIRED_QUESTION);
 	    	} else if (status == FormEntryController.QUESTION_CONSTRAINT_VIOLATED) {
@@ -566,7 +568,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
     	super.keyPressed(keyCode);
     	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
-    		controller.cycleLanguage();
+    		//TODO: CYCLE LANGUAGES
+    		//this.cyclelanguagesomehow
     	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
     		if (keyDownSelectedWidget == this.activeQuestionIndex) {
 				ChatterboxWidget widget = activeFrame();
