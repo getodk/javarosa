@@ -16,6 +16,8 @@
 
 package org.javarosa.core.model;
 
+import org.javarosa.core.model.instance.TreeReference;
+
 /**
  * A Form Index is an immutable index into a specific question definition that 
  * will appear in an interaction with a user.
@@ -47,15 +49,17 @@ public class FormIndex {
 	
 	/** The next level of this index */
 	private FormIndex nextLevel;
+	
+	private TreeReference reference;
 
 	public static FormIndex createBeginningOfFormIndex() {
-		FormIndex begin = new FormIndex(-1);
+		FormIndex begin = new FormIndex(-1, null);
 		begin.beginningOfForm = true;
 		return begin;
 	}
 	
 	public static FormIndex createEndOfFormIndex() {
-		FormIndex end = new FormIndex(-1);
+		FormIndex end = new FormIndex(-1,null);
 		end.endOfForm = true;
 		return end;
 	}
@@ -64,9 +68,11 @@ public class FormIndex {
 	 * Constructs a simple form index that references a specific element in
 	 * a list of elements.
 	 * @param localIndex An integer index into a flat list of elements
+	 * @param reference A reference to the instance element identified by this index;
 	 */
-	public FormIndex(int localIndex) {
+	public FormIndex(int localIndex, TreeReference reference) {
 		this.localIndex = localIndex;
+		this.reference = reference;
 		
 	}
 	/**
@@ -75,11 +81,13 @@ public class FormIndex {
 	 * @param localIndex An integer index into a flat list of elements
 	 * @param instanceIndex An integer index expressing the multiplicity
 	 * of the current level
+	 * @param reference A reference to the instance element identified by this index;
 	 * 
 	 */
-	public FormIndex(int localIndex, int instanceIndex) {
+	public FormIndex(int localIndex, int instanceIndex,TreeReference reference) {
 		this.localIndex = localIndex;
 		this.instanceIndex = instanceIndex;
+		this.reference = reference;
 	}
 	
 	/** 
@@ -88,10 +96,11 @@ public class FormIndex {
 	 * 
 	 * @param nextLevel An index into the referenced element's index
 	 * @param localIndex An index to an element at the current level, a child
-	 * element of which will be referenced by the nextLevel index. 
+	 * element of which will be referenced by the nextLevel index.
+	 * @param reference A reference to the instance element identified by this index; 
 	 */
-	public FormIndex(FormIndex nextLevel, int localIndex) {
-		this(localIndex);
+	public FormIndex(FormIndex nextLevel, int localIndex,TreeReference reference) {
+		this(localIndex, reference);
 		this.nextLevel = nextLevel;
 	}
 
@@ -106,10 +115,12 @@ public class FormIndex {
 			this.nextLevel = nextLevel.nextLevel;
 			this.localIndex = nextLevel.localIndex;
 			this.instanceIndex = nextLevel.instanceIndex;
+			this.reference = nextLevel.reference;
 		} else {
 			this.nextLevel = nextLevel;
 			this.localIndex = currentLevel.getLocalIndex();
 			this.instanceIndex = currentLevel.getInstanceIndex();
+			this.reference = nextLevel.reference;
 		}
 	}
 	
@@ -124,8 +135,8 @@ public class FormIndex {
 	 * @param instanceIndex How many times the element referenced has been 
 	 * repeated.
 	 */
-	public FormIndex(FormIndex nextLevel, int localIndex, int instanceIndex) {
-		this(nextLevel, localIndex);
+	public FormIndex(FormIndex nextLevel, int localIndex, int instanceIndex, TreeReference reference) {
+		this(nextLevel, localIndex, reference);
 		this.instanceIndex = instanceIndex;
 	}
 
@@ -154,6 +165,10 @@ public class FormIndex {
 	 */
 	public FormIndex getNextLevel() {
 		return nextLevel;
+	}
+	
+	public TreeReference getReference() {
+		return reference;
 	}
 	
 	/**
@@ -277,7 +292,7 @@ public class FormIndex {
 	 * @return Only the local component of this Form Index.
 	 */
 	public FormIndex snip() {
-		FormIndex retval = new FormIndex(localIndex, instanceIndex);
+		FormIndex retval = new FormIndex(localIndex, instanceIndex,reference);
 		return retval;
 	}
 
