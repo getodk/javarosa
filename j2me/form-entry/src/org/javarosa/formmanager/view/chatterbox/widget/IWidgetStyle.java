@@ -17,7 +17,7 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.IFormElement;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Container;
 
@@ -35,7 +35,7 @@ public interface IWidgetStyle {
 	 * @param question question object this widget represents
 	 * @param c top-level container item of the widget, to which GUI items are added. 'c' may also be styled.
 	 */
-	void initWidget (IFormElement question, Container c);
+	void initWidget (FormEntryPrompt prompt, Container c);
 	
 	/**
 	 * Refresh the widget in response to a change in the question, such as locale, data value, etc. Will be called
@@ -44,7 +44,7 @@ public interface IWidgetStyle {
 	 * @param bind grouper class containing information about the question
 	 * @param changeFlags bitmap represent what specifically has changed in the question (see QuestionStateListener)
 	 */
-	void refreshWidget (FormElementBinding bind, int changeFlags);
+	void refreshWidget (FormEntryPrompt prompt, int changeFlags);
 	
 	/**
 	 * Erase all state associated with this widget. If this widget is to be used again, initWidget() will be called again
