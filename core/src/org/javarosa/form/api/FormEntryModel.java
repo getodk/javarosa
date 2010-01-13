@@ -22,6 +22,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -96,8 +97,11 @@ public class FormEntryModel {
 
     
     public FormEntryPrompt getQuestionPrompt(FormIndex index) {
-        //TODO
-        return null
+    	if(form.getChild(index) instanceof QuestionDef) {    		
+    		return new FormEntryPrompt((QuestionDef)form.getChild(index), form.getDataModel().resolveReference(index.getReference()));
+    	} else {
+    		throw new RuntimeException("Invalid query for Question prompt. Non-Question object at the form index");
+    	}
     }
 
     public FormEntryPrompt getQuestionPrompt() {
