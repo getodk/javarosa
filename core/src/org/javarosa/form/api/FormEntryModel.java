@@ -35,10 +35,7 @@ public class FormEntryModel {
     // total number of questions in the form; used for progress bar
     public int totalQuestions; 
 
-
-
     // Start New stuff today.
-
 
     /**
      * Given a FormIndex, returns the event this formindex should display in a view.
@@ -206,8 +203,6 @@ public class FormEntryModel {
 
         if (relevant) { // if instance flag/condition says relevant, we still
             // have to check the <group>/<repeat> hierarchy
-            Vector defs = form.explodeIndex(questionIndex);
-
             FormIndex ancestorIndex = questionIndex;
             while(ancestorIndex != null) {
             	ancestorIndex = ancestorIndex.getNextLevel();
@@ -224,10 +219,6 @@ public class FormEntryModel {
 
         return relevant;
     }
-
-
-
-
 
     /**
      * For the current index: Checks whether the index represents a node which
