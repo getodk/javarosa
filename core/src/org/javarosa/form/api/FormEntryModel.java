@@ -303,7 +303,7 @@ public class FormEntryModel {
             FormIndex cur = null;
             FormIndex qcur = questionIndex;
             for (int i = 0; i < defs.size() - 1; i++) {
-                FormIndex next = new FormIndex(qcur.getLocalIndex(), qcur.getInstanceIndex());
+                FormIndex next = new FormIndex(qcur.getLocalIndex(), qcur.getInstanceIndex(),qcur.getReference());
                 if (ancestorIndex == null) {
                     ancestorIndex = next;
                     cur = next;
@@ -314,8 +314,7 @@ public class FormEntryModel {
                 qcur = qcur.getNextLevel();
 
                 TreeElement ancestorNode =
-                        form.getDataModel().resolveReference(
-                                form.getChildInstanceRef(ancestorIndex));
+                        form.getDataModel().resolveReference(ancestorIndex.getReference());
                 if (!ancestorNode.isRelevant()) {
                     relevant = false;
                     break;
