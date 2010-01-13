@@ -4,9 +4,7 @@
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService;
 
@@ -19,9 +17,20 @@ import de.enough.polish.ui.StyleSheet;
  */
 public class SingleQuestionScreenFactory {
 
+	/**
+	 * Return an appropriate SingleQuestionScreen to display the prompt
+	 * 
+	 * @param prompt
+	 * @param fromFormView
+	 * @param goingForward
+	 *            - i.e. are we going to the next question in the form (rather
+	 *            than the previous one)
+	 * @return
+	 * @throws IllegalStateException
+	 */
 	public static SingleQuestionScreen getQuestionScreen(
 			FormElementBinding prompt, boolean fromFormView,
-			boolean goingForward) {
+			boolean goingForward) throws IllegalStateException {
 		SingleQuestionScreen screenToReturn = null;
 		int qType = prompt.instanceNode.dataType;
 		int contType = ((QuestionDef) prompt.element).getControlType();
@@ -41,7 +50,6 @@ public class SingleQuestionScreenFactory {
 				break;
 			case Constants.DATATYPE_DATE:
 			case Constants.DATATYPE_DATE_TIME:
-
 				screenToReturn = new DateQuestionScreen(prompt, style);
 
 				break;
@@ -66,34 +74,43 @@ public class SingleQuestionScreenFactory {
 				screenToReturn = new TextQuestionScreen(prompt, style);
 
 			}
-
+			break;
+			
 		case Constants.CONTROL_SELECT_ONE:
 			screenToReturn = new Select1QuestionScreen(prompt, style);
-
 			break;
+			
 		case Constants.CONTROL_SELECT_MULTI:
 			screenToReturn = new SelectQuestionScreen(prompt, style);
-
 			break;
+			
 		case Constants.CONTROL_TEXTAREA:
 			screenToReturn = new TextQuestionScreen(prompt, style);
-
 			break;
+			
 		default:
 			throw new IllegalStateException(
 					"No appropriate screen to render question");
 
 		}
-
 		return screenToReturn;
 	}
 
+	/**
+	 * Get a SingleQuestionScreen for acquiring data by methods other than
+	 * direct user input (e.g. a barcode)
+	 * 
+	 * @param prompt
+	 * @param fromFormView
+	 * @param goingForward
+	 *            - i.e. are we going to the next question in the form (rather
+	 *            than the previous one)
+	 * @param barcodeService
+	 * @return
+	 */
 	public static SingleQuestionScreen getQuestionScreen(
 			FormElementBinding prompt, boolean fromFormView,
 			boolean goingForward, IAcquiringService barcodeService) {
-		SingleQuestionScreen screenToReturn = null;
-		int qType = prompt.instanceNode.dataType;
-		int contType = ((QuestionDef) prompt.element).getControlType();
 
 		Style style = StyleSheet
 				.getStyle(fromFormView || goingForward ? "OneQPS_Form_Right"

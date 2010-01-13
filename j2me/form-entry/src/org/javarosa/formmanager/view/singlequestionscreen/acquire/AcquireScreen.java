@@ -22,7 +22,6 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.view.IFormEntryView;
 
 /**
  * @author mel

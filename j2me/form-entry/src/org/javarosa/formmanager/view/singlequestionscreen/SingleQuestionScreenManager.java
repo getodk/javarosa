@@ -38,29 +38,19 @@ import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquiringQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.DateQuestionScreen;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.DecimalQuestionScreen;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.NumericQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.Select1QuestionScreen;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.SelectQuestionScreen;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.TextQuestionScreen;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.TimeQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
 import org.javarosa.j2me.view.J2MEDisplay;
 
-import de.enough.polish.ui.Style;
-import de.enough.polish.ui.StyleSheet;
-
-public class SingleQuestionScreenManager implements IFormEntryView, FormEntryModelListener,
-		CommandListener, ItemCommandListener {
+public class SingleQuestionScreenManager implements IFormEntryView,
+		FormEntryModelListener, CommandListener, ItemCommandListener {
 	private FormEntryController controller;
 	private FormEntryModel model;
-	private FormViewScreen parent;
 
 	private FormIndex index;
 	private FormElementBinding prompt;
 	private IAnswerData answer;
-	private SingleQuestionScreen widget;
+	private SingleQuestionScreen currentQuestionScreen;
 	Gauge progressBar;
 	private boolean showFormView;
 	private boolean goingForward;
@@ -71,7 +61,6 @@ public class SingleQuestionScreenManager implements IFormEntryView, FormEntryMod
 			FormEntryController controller) {
 		this.model = model;
 		this.controller = controller;
-		this.parent = new FormViewScreen(model);
 		this.showFormView = true;
 		model.registerObservable(this);
 		// immediately setup question, need to decide if this is the best place
@@ -87,10 +76,30 @@ public class SingleQuestionScreenManager implements IFormEntryView, FormEntryMod
 	}
 
 	public void getView(FormIndex qIndex, boolean fromFormView) {
+		prompt = new FormElementBinding(null, qIndex, model
+				.getForm());
+		if (((QuestionDef) prompt.element).getControlType() == Constants.DATATYPE_BARCODE) {
+			try { // is there a service that can acquire a barcode?
+				IAcquiringService barcodeService = (IAcquiringService) controller
+						.getDataCaptureService("clforms-barcode");
+
+				currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(
+						prompt, fromFormView, goingForward, barcodeService);
+
+			} catch (UnavailableServiceException se) {
+				//otherwise just get whatever else can handle the question type
+				currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(
+						prompt, fromFormView, goingForward);
+			}
+
+		} else {
+			currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(prompt,
+					fromFormView, goingForward);
+		}
 		
-		widget.setCommandListener(this);
-		widget.setItemCommandListner(this);
-		controller.setView(widget);
+		currentQuestionScreen.setCommandListener(this);
+		currentQuestionScreen.setItemCommandListner(this);
+		controller.setView(currentQuestionScreen);
 	}
 
 	public void destroy() {
@@ -163,7 +172,7 @@ public class SingleQuestionScreenManager implements IFormEntryView, FormEntryMod
 					FormIndex b = formView.indexHash.get(i);
 					controller.selectQuestion(b);
 					this.showFormView = false;
-					this.goingForward=true;
+					this.goingForward = true;
 				} else {
 					String txt = Localization
 							.get("view.sending.FormUneditable");
@@ -174,12 +183,12 @@ public class SingleQuestionScreenManager implements IFormEntryView, FormEntryMod
 		} else {
 			if (command == SingleQuestionScreen.nextItemCommand
 					|| command == SingleQuestionScreen.nextCommand) {
-				answer = widget.getWidgetValue();
+				answer = currentQuestionScreen.getWidgetValue();
 
-				this.goingForward=true;
+				this.goingForward = true;
 				int result = controller.questionAnswered(this.prompt,
 						this.answer);
-				if (result == controller.QUESTION_CONSTRAINT_VIOLATED) {
+				if (result == FormEntryController.QUESTION_CONSTRAINT_VIOLATED) {
 					// System.out.println("answer validation constraint violated");
 					// TODO: String txt = Locale.get(
 					// "view.sending.CompulsoryQuestionsIncomplete");
@@ -187,7 +196,7 @@ public class SingleQuestionScreenManager implements IFormEntryView, FormEntryMod
 					String txt = "Validation failure: data is not of the correct format.";
 
 					J2MEDisplay.showError("Question Required!", txt);
-				} else if (result == controller.QUESTION_REQUIRED_BUT_EMPTY) {
+				} else if (result == FormEntryController.QUESTION_REQUIRED_BUT_EMPTY) {
 					// String txt = Locale.get(
 					// "view.sending.CompulsoryQuestionsIncomplete");
 					String txt = "This question is compulsory. You must answer it.";
@@ -195,7 +204,7 @@ public class SingleQuestionScreenManager implements IFormEntryView, FormEntryMod
 				}
 
 			} else if (command == SingleQuestionScreen.previousCommand) {
-				this.goingForward=false;
+				this.goingForward = false;
 				controller.stepQuestion(false);
 
 			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
@@ -233,7 +242,7 @@ public class SingleQuestionScreenManager implements IFormEntryView, FormEntryMod
 
 	public void commandAction(Command c, Item item) {
 		if (c == SingleQuestionScreen.nextItemCommand) {
-			answer = widget.getWidgetValue();
+			answer = currentQuestionScreen.getWidgetValue();
 			controller.questionAnswered(this.prompt, answer);// store answers
 			refreshView();
 
