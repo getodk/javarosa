@@ -63,7 +63,6 @@ public class FormEntryController {
 		if (data != null || element.getValue() != null) {
 			//we should check if the data to be saved is already the same as the data in the model, but we can't (no IAnswerData.equals())
 			model.getForm().setValue(data, index.getReference(), element);
-			model.modelChanged();
 			return true;
 		} else {
 			return false;
@@ -79,7 +78,7 @@ public class FormEntryController {
 	}
 	
 	private int stepEvent(boolean forward) {
-		FormIndex index = model.getQuestionIndex();
+		FormIndex index = model.getCurrentFormIndex();
 
 		do {
 			if (forward) {
