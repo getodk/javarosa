@@ -16,7 +16,6 @@
 
 package org.javarosa.form.api;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
@@ -26,7 +25,6 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.formmanager.view.FormElementBinding;
 
 
 
@@ -80,18 +78,14 @@ public class FormEntryModel {
     public int getCurrentEvent() {
         return getEvent(currentFormindex);
 	}
-	
-
-
-    public String[] getGroupHierarchy() {
-        //TODO 
-        return null;
-    }
-
 
     public String getEventTitle() {
-        //TODO
-        return null;
+    	return getEventTitle(currentFormindex);
+    }
+
+    public String getEventTitle(FormIndex index) {
+    	IFormElement element = form.getChild(index);
+    	return element.getTitle();
     }
 
 
@@ -103,10 +97,14 @@ public class FormEntryModel {
         return form.getTitle();
     }
 
-
-    public FormEntryPrompt getQuestionPrompt() {
+    
+    public FormEntryPrompt getQuestionPrompt(FormIndex index) {
         //TODO
         return null
+    }
+
+    public FormEntryPrompt getQuestionPrompt() {
+        return getQuestionPrompt(currentFormindex);
     }
 
 
