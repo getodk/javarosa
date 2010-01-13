@@ -18,7 +18,6 @@ package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 //import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.StringItem;
@@ -26,8 +25,6 @@ import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.formmanager.controller.FormEntryController;
-import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.j2me.view.J2MEDisplay;
