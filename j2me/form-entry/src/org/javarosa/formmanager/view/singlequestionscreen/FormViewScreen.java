@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.oneqps;
+package org.javarosa.formmanager.view.singlequestionscreen;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.List;

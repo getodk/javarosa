@@ -14,14 +14,14 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.oneqps.acquire;
+package org.javarosa.formmanager.view.singlequestionscreen.acquire;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.view.FormElementBinding;
-import org.javarosa.formmanager.view.oneqps.screen.OneQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.OneQuestionScreen;
 
 import de.enough.polish.ui.Style;
 

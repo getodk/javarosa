@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.oneqps.acquire;
+package org.javarosa.formmanager.view.singlequestionscreen.acquire;
 
 import org.javarosa.formmanager.view.FormElementBinding;
 

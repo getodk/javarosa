@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.oneqps.screen;
+package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import javax.microedition.lcdui.TextField;
 

@@ -1,14 +1,14 @@
 /**
  * 
  */
-package org.javarosa.formmanager.view.oneqps.screen;
+package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.formmanager.view.FormElementBinding;
-import org.javarosa.formmanager.view.oneqps.acquire.IAcquiringService;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService;
 
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.StyleSheet;
