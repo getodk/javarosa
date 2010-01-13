@@ -78,11 +78,11 @@ public class XPathPathExpr extends XPathExpression {
 		
 		switch (init_context) {
 		case XPathPathExpr.INIT_CONTEXT_ROOT:
-			ref.refLevel = TreeReference.REF_ABSOLUTE;
+			ref.setRefLevel(TreeReference.REF_ABSOLUTE);
 			parentsAllowed = false;
 			break;
 		case XPathPathExpr.INIT_CONTEXT_RELATIVE:
-			ref.refLevel = 0;
+			ref.setRefLevel(0);
 			parentsAllowed = true;
 			break;
 		default: throw new XPathUnsupportedException("filter expression");
@@ -103,7 +103,7 @@ public class XPathPathExpr extends XPathExpression {
 				if (!parentsAllowed || step.test != XPathStep.TEST_TYPE_NODE) {
 					throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
 				} else {
-					ref.refLevel++;
+					ref.incrementRefLevel();
 				}
 			} else if (step.axis == XPathStep.AXIS_CHILD) {
 				if (step.test == XPathStep.TEST_NAME) {
@@ -136,8 +136,8 @@ public class XPathPathExpr extends XPathExpression {
 		boolean nodeset = false;
 		TreeReference repeatTestRef = TreeReference.rootRef();
 		for (int i = 0; i < ref.size(); i++) {
-			repeatTestRef.add((String)ref.names.elementAt(i), ((Integer)ref.multiplicity.elementAt(i)).intValue());
-			if (((Integer)ref.multiplicity.elementAt(i)).intValue() == TreeReference.INDEX_UNBOUND) {
+			repeatTestRef.add(ref.getName(i), ref.getMultiplicity(i));
+			if (ref.getMultiplicity(i) == TreeReference.INDEX_UNBOUND) {
 				if (m.getTemplate(repeatTestRef) != null) {
 					nodeset = true;
 					break;
