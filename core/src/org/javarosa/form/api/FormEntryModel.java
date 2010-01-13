@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2009 JavaRosa
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -26,316 +26,382 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.view.FormElementBinding;
 
+
+
 public class FormEntryModel {
-	private FormDef form;
+    private FormDef form;
 
-	private FormIndex activeQuestionIndex;
-	private FormIndex startIndex;
-	private int instanceID;
-	private boolean unsavedChanges;
-	private boolean formCompleted;
+    private FormIndex currentFormindex;
+    private FormIndex startIndex;
+    private int instanceID;
+    private boolean unsavedChanges;
+    private boolean formCompleted;
 
-	private Vector observers;
+    private Vector observers;
 
-	public int totalQuestions; // total number of questions in the form; used
-								// for progress bar
+    public int totalQuestions; // total number of questions in the form; used
+    // for progress bar
 
-	private boolean readOnly;
-	
-	
-	
-	
-	
-	
-	//Start New stuff today.
-	
-	public int getEvent(FormIndex index) {
-		if (index.isBeginningOfFormIndex()) {
-			//TODO: REMOVE THESE MODEL CALLBACKS
-			notifyStartOfForm();
-			return FormEntryController.BEGINNING_OF_FORM_EVENT;
-		} else if (index.isEndOfFormIndex()) {
-			//TODO: REMOVE THESE MODEL CALLBACKS
-			setFormComplete();
-			return FormEntryController.END_OF_FORM_EVENT;
-		}
-		
-	}
-	
-	//end new stuff
-	
-	
+    private boolean readOnly;
 
-	public FormEntryModel(FormDef form) {
-		this(form, -1);
-	}
 
-	public FormEntryModel(FormDef form, int instanceID) {
-		this(form, instanceID, null, false);
-	}
 
-	public FormEntryModel(FormDef form, int instanceID, FormIndex firstIndex, boolean readOnly) {
-		this.form = form;
-		this.instanceID = instanceID;
-		this.observers = new Vector();
+    // Start New stuff today.
 
-		this.activeQuestionIndex = FormIndex.createBeginningOfFormIndex();
-		this.unsavedChanges = true; // we want them to be able to save the form
-									// initially, even with nothing in it
-		this.formCompleted = false;
-		this.startIndex = firstIndex;
-		
-		this.setReadOnly(readOnly);
-	}
 
-	public FormIndex getQuestionIndex() {
-		return activeQuestionIndex;
-	}
+    /**
+     * Given a FormIndex, returns the event this formindex should display in a view.
+     * 
+     */
+    public int getEvent(FormIndex index) {
+        if (index.isBeginningOfFormIndex()) {
+            return FormEntryController.BEGINNING_OF_FORM_EVENT;
+        } else if (index.isEndOfFormIndex()) {
+            return FormEntryController.END_OF_FORM_EVENT;
+        }
 
-	public void setQuestionIndex(FormIndex index) {
-		if (!activeQuestionIndex.equals(index)) {
+        Vector defs = form.explodeIndex(index);
+        IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
+        if (last instanceof GroupDef) {
+            if (((GroupDef) last).getRepeat()
+                    && form.getDataModel().resolveReference(form.getChildInstanceRef(index)) == null) {
+                return FormEntryController.PROMPT_NEW_REPEAT_EVENT;
+            } else {
+                return FormEntryController.GROUP_EVENT;
+            }
+        } else {
+            return FormEntryController.QUESTION_EVENT;
+        }
+    }
 
-			// See if a hint exists that says we should have a model for this
-			// already
-			createModelIfNecessary(index);
 
-			activeQuestionIndex = index;
+    /**
+     * 
+     * @return the event for the current FormIndex
+     */
+    public int getCurrentEvent() {
+        return getEvent(currentFormindex);
+    }
 
-			for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-				((FormEntryModelListener) e.nextElement())
-						.questionIndexChanged(activeQuestionIndex);
-			}
-		}
-	}
 
-	// depending on boolean, counts the number of unanswered required questions,
-	// or
-	// counts the number of unanswered questions.
-	public int countUnansweredQuestions(boolean countRequiredOnly) {
-		int counter = 0;
+    public String[] getGroupHierarchy() {
+        //TODO 
+        return null;
+    }
 
-		for (FormIndex a = form.incrementIndex(FormIndex
-				.createBeginningOfFormIndex()); a.compareTo(FormIndex
-				.createEndOfFormIndex()) < 0; a = form.incrementIndex(a)) {
-			FormElementBinding bind = new FormElementBinding(null, a, form);
 
-			if (countRequiredOnly && bind.instanceNode.required
-					&& bind.getValue() == null) {
-				counter++;
-			} else if (bind.getValue() == null) {
-				counter++;
-			}
-		}
-		return counter;
-	}
+    public String getEventTitle() {
+        //TODO
+        return null;
+    }
 
-	public FormDef getForm() {
-		return form;
-	}
 
-	public int getInstanceID() {
-		return instanceID;
-	}
+    /**
+     * 
+     * @return Form title
+     */
+    public String getFormTitle() {
+        return form.getTitle();
+    }
 
-	public boolean isSaved() {
-		return !unsavedChanges;
-	}
 
-	public void modelChanged() {
-		if (!unsavedChanges) {
-			unsavedChanges = true;
+    public Prompt getQuestionPrompt() {
+        //TODO
+        return null
+    }
 
-			for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-				((FormEntryModelListener) e.nextElement()).saveStateChanged(instanceID, unsavedChanges);
-			}
-		}
-	}
 
-	public void modelSaved(int instanceID) {
-		this.instanceID = instanceID;
-		unsavedChanges = false;
+    /**
+     * 
+     * @return an array of Strings of the current langauges. Null if there are
+     *         none.
+     */
+    public String[] getLanguages() {
+        if (form.getLocalizer() != null) {
+            return form.getLocalizer().getAvailableLocales();
+        }
+        return null;
+    }
 
-		for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-			((FormEntryModelListener) e.nextElement()).saveStateChanged(instanceID, unsavedChanges);
-		}
-	}
 
-	public boolean isFormComplete() {
-		return formCompleted;
-	}
+    public int getCurrentRelevantQuestionCount() {
+        // TODO
+        return 0;
+    }
 
-	public void setFormComplete() {
-		if (!formCompleted) {
-			formCompleted = true;
 
-			if (!activeQuestionIndex.isEndOfFormIndex()) {
-				setQuestionIndex(FormIndex.createEndOfFormIndex());
-			}
+    public int getTotalRelevantQuestionCount() {
+        // TODO
+        return 0;
+    }
 
-			for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-				((FormEntryModelListener) e.nextElement()).formComplete();
-			}
-		}
-	}
 
-	public void notifyStartOfForm() {
-		for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-			((FormEntryModelListener) e.nextElement()).startOfForm();
-		}
-	}
+    public FormIndex getCurrentFormIndex() {
+        return currentFormindex;
+    } 
+    
+    // end new stuff
 
-	public int getNumQuestions() {
-		return form.getDeepChildCount();
-	}
 
-	protected boolean isAskNewRepeat(FormIndex questionIndex) {
-		Vector defs = form.explodeIndex(questionIndex);
-		IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs
-				.lastElement());
-		if (last instanceof GroupDef
-				&& ((GroupDef) last).getRepeat()
-				&& form.getDataModel().resolveReference(
-						form.getChildInstanceRef(questionIndex)) == null) {
-			return true;
-		}
-		return false;
-	}
 
-	public boolean isReadonly(FormIndex questionIndex) {
-		TreeReference ref = form.getChildInstanceRef(questionIndex);
-		boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
+    
 
-		if (isAskNewRepeat) {
-			return false;
-		} else {
-			TreeElement node = form.getDataModel().resolveReference(ref);
-			return !node.isEnabled();
-		}
-	}
 
-	public boolean isRelevant(FormIndex questionIndex) {
-		TreeReference ref = form.getChildInstanceRef(questionIndex);
-		boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
+    public void setQuestionIndex(FormIndex index) {
+        if (!currentFormindex.equals(index)) {
 
-		boolean relevant;
-		if (isAskNewRepeat) {
-			relevant = form.canCreateRepeat(ref);
-		} else {
-			TreeElement node = form.getDataModel().resolveReference(ref);
-			relevant = node.isRelevant(); // check instance flag first
-		}
+            // See if a hint exists that says we should have a model for this
+            // already
+            createModelIfNecessary(index);
 
-		if (relevant) { // if instance flag/condition says relevant, we still
-						// have to check the <group>/<repeat> hierarchy
-			Vector defs = form.explodeIndex(questionIndex);
+            currentFormindex = index;
 
-			FormIndex ancestorIndex = null;
-			FormIndex cur = null;
-			FormIndex qcur = questionIndex;
-			for (int i = 0; i < defs.size() - 1; i++) {
-				FormIndex next = new FormIndex(qcur.getLocalIndex(), qcur
-						.getInstanceIndex());
-				if (ancestorIndex == null) {
-					ancestorIndex = next;
-					cur = next;
-				} else {
-					cur.setNextLevel(next);
-					cur = next;
-				}
-				qcur = qcur.getNextLevel();
+            for (Enumeration e = observers.elements(); e.hasMoreElements();) {
+                ((FormEntryModelListener) e.nextElement())
+                        .questionIndexChanged(currentFormindex);
+            }
+        }
+    }
 
-				TreeElement ancestorNode = form.getDataModel()
-						.resolveReference(
-								form.getChildInstanceRef(ancestorIndex));
-				if (!ancestorNode.isRelevant()) {
-					relevant = false;
-					break;
-				}
-			}
-		}
 
-		return relevant;
-	}
+    // depending on boolean, counts the number of unanswered required questions,
+    // or
+    // counts the number of unanswered questions.
+    public int countUnansweredQuestions(boolean countRequiredOnly) {
+        int counter = 0;
 
-	public void registerObservable(FormEntryModelListener feml) {
-		if (!observers.contains(feml)) {
-			observers.addElement(feml);
-		}
-	}
+        for (FormIndex a = form.incrementIndex(FormIndex.createBeginningOfFormIndex()); a
+                .compareTo(FormIndex.createEndOfFormIndex()) < 0; a = form.incrementIndex(a)) {
+            FormElementBinding bind = new FormElementBinding(null, a, form);
 
-	public void unregisterObservable(FormEntryModelListener feml) {
-		observers.removeElement(feml);
-	}
+            if (countRequiredOnly && bind.instanceNode.required && bind.getValue() == null) {
+                counter++;
+            } else if (bind.getValue() == null) {
+                counter++;
+            }
+        }
+        return counter;
+    }
 
-	public void unregisterAll() {
-		observers.removeAllElements();
-	}
 
-	/**
-	 * @return Whether or not the form model should be written to.
-	 */
-	public boolean isReadOnly() {
-		return readOnly;
-	}
+    public FormDef getForm() {
+        return form;
+    }
 
-	/**
-	 * @param readOnly
-	 *            Whether or not the form model should be changed by the form
-	 *            entry interaction.
-	 */
-	public void setReadOnly(boolean readOnly) {
-		this.readOnly = readOnly;
-	}
 
-	/**
-	 * @return the startIndex
-	 */
-	public FormIndex getStartIndex() {
-		return startIndex;
-	}
+    public int getInstanceID() {
+        return instanceID;
+    }
 
-	/**
-	 * For the current index: Checks whether the index represents a node which
-	 * should exist given a non-interactive repeat, along with a count for that
-	 * repeat which is beneath the dynamic level specified.
-	 * 
-	 * If this index does represent such a node, the new model for the repeat is
-	 * created behind the scenes and the index for the initial question is
-	 * returned.
-	 * 
-	 * Note: This method will not prevent the addition of new repeat elements in
-	 * the interface, it will merely use the xforms repeat hint to create new
-	 * nodes that are assumed to exist
-	 * 
-	 * @param The
-	 *            index to be evaluated as to whether the underlying model is
-	 *            hinted to exist
-	 */
-	private void createModelIfNecessary(FormIndex index) {
-		if (index.isInForm()) {
-			IFormElement e = getForm().getChild(index);
-			if (e instanceof GroupDef) {
-				GroupDef g = (GroupDef) e;
-				if (g.getRepeat() && g.getCountReference() != null) {
-					IAnswerData count = getForm().getDataModel().getDataValue(
-							g.getCountReference());
-					if (count != null) {
-						int fullcount = ((Integer) count.getValue()).intValue();
-						TreeReference ref = getForm()
-								.getChildInstanceRef(index);
-						TreeElement element = getForm().getDataModel()
-								.resolveReference(ref);
-						if (element == null) {
-							if (index.getInstanceIndex() < fullcount) {
-								getForm().createNewRepeat(index);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+
+    public boolean isSaved() {
+        return !unsavedChanges;
+    }
+
+
+    public void modelChanged() {
+        if (!unsavedChanges) {
+            unsavedChanges = true;
+
+            for (Enumeration e = observers.elements(); e.hasMoreElements();) {
+                ((FormEntryModelListener) e.nextElement()).saveStateChanged(instanceID,
+                        unsavedChanges);
+            }
+        }
+    }
+
+
+    public void modelSaved(int instanceID) {
+        this.instanceID = instanceID;
+        unsavedChanges = false;
+
+        for (Enumeration e = observers.elements(); e.hasMoreElements();) {
+            ((FormEntryModelListener) e.nextElement()).saveStateChanged(instanceID, unsavedChanges);
+        }
+    }
+
+
+    public boolean isFormComplete() {
+        return formCompleted;
+    }
+
+
+    public void setFormComplete() {
+        if (!formCompleted) {
+            formCompleted = true;
+
+            if (!currentFormindex.isEndOfFormIndex()) {
+                setQuestionIndex(FormIndex.createEndOfFormIndex());
+            }
+
+            for (Enumeration e = observers.elements(); e.hasMoreElements();) {
+                ((FormEntryModelListener) e.nextElement()).formComplete();
+            }
+        }
+    }
+
+
+    public void notifyStartOfForm() {
+        for (Enumeration e = observers.elements(); e.hasMoreElements();) {
+            ((FormEntryModelListener) e.nextElement()).startOfForm();
+        }
+    }
+
+
+    public int getNumQuestions() {
+        return form.getDeepChildCount();
+    }
+
+
+    protected boolean isAskNewRepeat(FormIndex questionIndex) {
+        Vector defs = form.explodeIndex(questionIndex);
+        IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
+        if (last instanceof GroupDef
+                && ((GroupDef) last).getRepeat()
+                && form.getDataModel().resolveReference(form.getChildInstanceRef(questionIndex)) == null) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public boolean isReadonly(FormIndex questionIndex) {
+        TreeReference ref = form.getChildInstanceRef(questionIndex);
+        boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
+
+        if (isAskNewRepeat) {
+            return false;
+        } else {
+            TreeElement node = form.getDataModel().resolveReference(ref);
+            return !node.isEnabled();
+        }
+    }
+
+
+    public boolean isRelevant(FormIndex questionIndex) {
+        TreeReference ref = form.getChildInstanceRef(questionIndex);
+        boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
+
+        boolean relevant;
+        if (isAskNewRepeat) {
+            relevant = form.canCreateRepeat(ref);
+        } else {
+            TreeElement node = form.getDataModel().resolveReference(ref);
+            relevant = node.isRelevant(); // check instance flag first
+        }
+
+        if (relevant) { // if instance flag/condition says relevant, we still
+            // have to check the <group>/<repeat> hierarchy
+            Vector defs = form.explodeIndex(questionIndex);
+
+            FormIndex ancestorIndex = null;
+            FormIndex cur = null;
+            FormIndex qcur = questionIndex;
+            for (int i = 0; i < defs.size() - 1; i++) {
+                FormIndex next = new FormIndex(qcur.getLocalIndex(), qcur.getInstanceIndex());
+                if (ancestorIndex == null) {
+                    ancestorIndex = next;
+                    cur = next;
+                } else {
+                    cur.setNextLevel(next);
+                    cur = next;
+                }
+                qcur = qcur.getNextLevel();
+
+                TreeElement ancestorNode =
+                        form.getDataModel().resolveReference(
+                                form.getChildInstanceRef(ancestorIndex));
+                if (!ancestorNode.isRelevant()) {
+                    relevant = false;
+                    break;
+                }
+            }
+        }
+
+        return relevant;
+    }
+
+
+    public void registerObservable(FormEntryModelListener feml) {
+        if (!observers.contains(feml)) {
+            observers.addElement(feml);
+        }
+    }
+
+
+    public void unregisterObservable(FormEntryModelListener feml) {
+        observers.removeElement(feml);
+    }
+
+
+    public void unregisterAll() {
+        observers.removeAllElements();
+    }
+
+
+    /**
+     * @return Whether or not the form model should be written to.
+     */
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+
+    /**
+     * @param readOnly Whether or not the form model should be changed by the
+     *        form entry interaction.
+     */
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
+
+    /**
+     * @return the startIndex
+     */
+    public FormIndex getStartIndex() {
+        return startIndex;
+    }
+
+
+    /**
+     * For the current index: Checks whether the index represents a node which
+     * should exist given a non-interactive repeat, along with a count for that
+     * repeat which is beneath the dynamic level specified.
+     * 
+     * If this index does represent such a node, the new model for the repeat is
+     * created behind the scenes and the index for the initial question is
+     * returned.
+     * 
+     * Note: This method will not prevent the addition of new repeat elements in
+     * the interface, it will merely use the xforms repeat hint to create new
+     * nodes that are assumed to exist
+     * 
+     * @param The index to be evaluated as to whether the underlying model is
+     *        hinted to exist
+     */
+    private void createModelIfNecessary(FormIndex index) {
+        if (index.isInForm()) {
+            IFormElement e = getForm().getChild(index);
+            if (e instanceof GroupDef) {
+                GroupDef g = (GroupDef) e;
+                if (g.getRepeat() && g.getCountReference() != null) {
+                    IAnswerData count =
+                            getForm().getDataModel().getDataValue(g.getCountReference());
+                    if (count != null) {
+                        int fullcount = ((Integer) count.getValue()).intValue();
+                        TreeReference ref = getForm().getChildInstanceRef(index);
+                        TreeElement element = getForm().getDataModel().resolveReference(ref);
+                        if (element == null) {
+                            if (index.getInstanceIndex() < fullcount) {
+                                getForm().createNewRepeat(index);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
