@@ -49,6 +49,7 @@ import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.model.xform.XPathReference;
 
 /**
  * Definition of a form. This has some meta data about the form definition and a
@@ -908,12 +909,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		for (int i = indexes.size() - 1; i >= 0; i--) {
 			int ix = ((Integer) indexes.elementAt(i)).intValue();
 			int mult = ((Integer) multiplicities.elementAt(i)).intValue();
+			//TODO: ... No words. Just fix it.
+			TreeReference ref = (TreeReference)((XPathReference)((IFormElement)elements.elementAt(i)).getBind()).getReference();
 			if (!(elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements
 					.elementAt(i)).getRepeat())) {
 				mult = -1;
 			}
 
-			cur = new FormIndex(cur, ix, mult);
+			cur = new FormIndex(cur, ix, mult,ref);
 		}
 		return cur;
 	}
