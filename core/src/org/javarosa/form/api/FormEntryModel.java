@@ -62,10 +62,13 @@ public class FormEntryModel {
             return FormEntryController.END_OF_FORM_EVENT;
         }
 
-        Vector defs = form.explodeIndex(index);
-        IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
-        if (last instanceof GroupDef) {
-            if (((GroupDef) last).getRepeat()
+        //This came from chatterbox, and is unclear how correct it is, commented out for now. 
+        //DELETEME: If things work fine
+        //Vector defs = form.explodeIndex(index);
+        //IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
+        IFormElement element = form.getChild(index);
+        if (element instanceof GroupDef) {
+            if (((GroupDef) element).getRepeat()
                     && form.getDataModel().resolveReference(form.getChildInstanceRef(index)) == null) {
                 return FormEntryController.PROMPT_NEW_REPEAT_EVENT;
             } else {
