@@ -1211,7 +1211,7 @@ public class XFormParser {
 			
 			TreeElement cur = root;
 			for (int j = 0; j < repeatRef.size(); j++) {
-				String name = (String)repeatRef.names.elementAt(j);
+				String name = repeatRef.getName(j);
 				TreeElement child = cur.getChild(name, 0);
 				if (child == null) {
 					child = new TreeElement(name, 0);
@@ -1302,7 +1302,7 @@ public class XFormParser {
 			//make template ref generic and choose first matching node
 			TreeReference ref = templRef.clone();
 			for (int j = 0; j < ref.size(); j++) {
-				ref.multiplicity.setElementAt(new Integer(TreeReference.INDEX_UNBOUND), j);
+				ref.setMultiplicity(j, TreeReference.INDEX_UNBOUND);
 			}
 			Vector nodes = instance.expandReference(ref);
 			if (nodes.size() == 0) {
@@ -1465,7 +1465,7 @@ public class XFormParser {
 			if (repeatNode != null) {
 				repeatAncestry.addElement(repeatNode);			
 				for (int j = 1; j < childBind.size(); j++) {
-					repeatNode = repeatNode.getChild((String)childBind.names.elementAt(j), 0);
+					repeatNode = repeatNode.getChild(childBind.getName(j), 0);
 					if (repeatNode != null) {
 						repeatAncestry.addElement(repeatNode);
 					} else {

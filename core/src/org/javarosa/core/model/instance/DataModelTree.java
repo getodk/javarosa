@@ -131,8 +131,8 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 			return false;
 
 		// strip out dest node info and get dest parent
-		String dstName = (String) to.names.lastElement();
-		int dstMult = ((Integer) to.multiplicity.lastElement()).intValue();
+		String dstName = to.getNameLast();
+		int dstMult = to.getMultLast();
 		TreeReference toParent = to.getParentRef();
 
 		TreeElement parent = resolveReference(toParent);
@@ -200,8 +200,8 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 
 		TreeElement node = root;
 		for (int i = 0; i < ref.size(); i++) {
-			String name = (String) ref.names.elementAt(i);
-			int mult = ((Integer) ref.multiplicity.elementAt(i)).intValue();
+			String name = ref.getName(i);
+			int mult = ref.getMultiplicity(i);
 			if (mult == TreeReference.INDEX_UNBOUND) {
 				if (node.getChildMultiplicity(name) == 1) {
 					mult = 0;
@@ -230,8 +230,8 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 		Vector nodes = new Vector();
 		TreeElement cur = root;
 		for (int i = 0; i < ref.size(); i++) {
-			String name = (String) ref.names.elementAt(i);
-			int mult = ((Integer) ref.multiplicity.elementAt(i)).intValue();
+			String name = ref.getName(i);
+			int mult = ref.getMultiplicity(i);
 			if (mult == TreeReference.INDEX_UNBOUND) {
 				if (cur.getChildMultiplicity(name) == 1) {
 					mult = 0;
@@ -292,9 +292,8 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 		if (depth == sourceRef.size()) {
 			refs.addElement(templateRef);
 		} else if (node.getNumChildren() > 0) {
-			String name = (String) sourceRef.names.elementAt(depth);
-			int mult = ((Integer) sourceRef.multiplicity.elementAt(depth))
-					.intValue();
+			String name = sourceRef.getName(depth);
+			int mult = sourceRef.getMultiplicity(depth);
 
 			Vector children = new Vector();
 			if (mult == TreeReference.INDEX_UNBOUND) {
@@ -323,15 +322,11 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 
 			for (Enumeration e = children.elements(); e.hasMoreElements();) {
 				TreeElement child = (TreeElement) e.nextElement();
-				TreeReference newTemplateRef = (children.size() == 1 ? templateRef
-						: templateRef.clone()); // don't clone templateRef
+				TreeReference newTemplateRef = (children.size() == 1 ? templateRef : templateRef.clone()); // don't clone templateRef
 				// unnecessarily
-				newTemplateRef.names.addElement(child.getName());
-				newTemplateRef.multiplicity.addElement(new Integer(child
-						.getMult()));
+				newTemplateRef.add(child.getName(), child.getMult());
 
-				expandReference(sourceRef, newTemplateRef, child, refs,
-						includeTemplates);
+				expandReference(sourceRef, newTemplateRef, child, refs,	includeTemplates);
 			}
 		}
 	}
@@ -352,10 +347,9 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 
 		TreeElement node = root;
 		for (int i = 0; i < ref.size(); i++) {
-			String name = (String) ref.names.elementAt(i);
+			String name = ref.getName(i);
 
-			TreeElement newNode = node.getChild(name,
-					TreeReference.INDEX_TEMPLATE);
+			TreeElement newNode = node.getChild(name, TreeReference.INDEX_TEMPLATE);
 			if (newNode == null)
 				newNode = node.getChild(name, 0);
 			if (newNode == null)
@@ -576,9 +570,9 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 		TreeElement node = root;
 
 		for (int k = 0; k < ref.size(); k++) {
-			String name = (String) ref.names.elementAt(k);
+			String name = ref.getName(k);
 			int count = node.getChildMultiplicity(name);
-			int mult = ((Integer) ref.multiplicity.elementAt(k)).intValue();
+			int mult = ref.getMultiplicity(k);
 
 			TreeElement child;
 			if (k < ref.size() - 1) {
@@ -588,7 +582,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 					} else {
 						// will use existing (if one and only one) or create new
 						mult = 0;
-						ref.multiplicity.setElementAt(new Integer(0), k);
+						ref.setMultiplicity(k, 0);
 					}
 				}
 
@@ -599,7 +593,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 						// create
 						child = new TreeElement(name, count);
 						node.addChild(child);
-						ref.multiplicity.setElementAt(new Integer(count), k);
+						ref.setMultiplicity(k, count);
 					} else {
 						return null; // intermediate node does not exist
 					}
@@ -617,8 +611,8 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 
 					// create new
 					child = new TreeElement(name, count);
-					node.addChild(child);
-					ref.multiplicity.setElementAt(new Integer(count), k);
+					node.addChild(child);					
+					ref.setMultiplicity(k, count);
 				} else {
 					return null; // final node must be a newly-created node
 				}
