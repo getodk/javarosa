@@ -34,15 +34,8 @@ public class FormEntryController {
 	
 	FormEntryModel model;
 	
-	public FormEntryController (FormEntryModel model, boolean readOnly) {
+	public FormEntryController (FormEntryModel model) {
 		this.model = model;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.api.State#start()
-	 */
-	public void start() {
-		
 	}
 	
 	public FormEntryModel getModel() {
