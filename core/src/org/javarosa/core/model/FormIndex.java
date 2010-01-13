@@ -16,6 +16,8 @@
 
 package org.javarosa.core.model;
 
+import org.javarosa.core.model.instance.TreeReference;
+
 /**
  * A Form Index is an immutable index into a specific question definition that 
  * will appear in an interaction with a user.
@@ -47,6 +49,8 @@ public class FormIndex {
 	
 	/** The next level of this index */
 	private FormIndex nextLevel;
+	
+	private TreeReference instanceReference;
 
 	public static FormIndex createBeginningOfFormIndex() {
 		FormIndex begin = new FormIndex(-1);
@@ -154,6 +158,10 @@ public class FormIndex {
 	 */
 	public FormIndex getNextLevel() {
 		return nextLevel;
+	}
+	
+	public TreeReference getReference() {
+		return instanceReference;
 	}
 	
 	/**
