@@ -14,27 +14,31 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.oneqps.screen;
+package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Style;
 
-public class NumericQuestionScreen extends OneQuestionScreen {
+public class DecimalQuestionScreen extends OneQuestionScreen {
 	protected TextField tf;
 
-	public NumericQuestionScreen(FormElementBinding qDef,  Style style) {
-		super(qDef,  style);
+	// private boolean isDecimal=false;
+
+	public DecimalQuestionScreen(FormElementBinding qDef, Style style) {
+		super(qDef,style);
 	}
 
 	public void createView() {
+
 		// #style textBox
-		tf = new TextField("", "", 200, TextField.NUMERIC);
+		tf = new TextField("", "", 200, TextField.DECIMAL);
+
 		if (qDef.instanceNode.required)
 			tf.setLabel("*" + ((QuestionDef) qDef.element).getLongText()); // visual
 																			// symbol
@@ -44,8 +48,8 @@ public class NumericQuestionScreen extends OneQuestionScreen {
 			tf.setLabel(((QuestionDef) qDef.element).getLongText());
 
 		IAnswerData answerData = qDef.instanceNode.getValue();
-		if ((answerData != null) && (answerData instanceof IntegerData))
-			tf.setString(((IntegerData) answerData).getDisplayText());
+		if ((answerData != null) && (answerData instanceof DecimalData))
+			tf.setString(((DecimalData) answerData).getDisplayText());
 
 		this.append(tf);
 		this.addNavigationButtons();
@@ -56,18 +60,19 @@ public class NumericQuestionScreen extends OneQuestionScreen {
 
 	public IAnswerData getWidgetValue() {
 		String s = tf.getString();
-		// if empty
+
 		if (s == null || s.equals(""))
 			return null;
 
-		// check answer integrity
-		int i = -99999;
+		double d = -999999999;
 		try {
-			i = Integer.parseInt(s);
+			d = Double.parseDouble(s);
+
 		} catch (NumberFormatException nfe) {
 			System.err.println("Non-numeric data in numeric entry field!");
 		}
-		return new IntegerData(i);
+		return new DecimalData(d);
+
 	}
 
 }

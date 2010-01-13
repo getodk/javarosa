@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.oneqps;
+package org.javarosa.formmanager.view.singlequestionscreen;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -35,17 +35,17 @@ import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
-import org.javarosa.formmanager.view.oneqps.acquire.AcquireScreen;
-import org.javarosa.formmanager.view.oneqps.acquire.AcquiringQuestionScreen;
-import org.javarosa.formmanager.view.oneqps.acquire.IAcquiringService;
-import org.javarosa.formmanager.view.oneqps.screen.DateQuestionScreen;
-import org.javarosa.formmanager.view.oneqps.screen.DecimalQuestionScreen;
-import org.javarosa.formmanager.view.oneqps.screen.NumericQuestionScreen;
-import org.javarosa.formmanager.view.oneqps.screen.OneQuestionScreen;
-import org.javarosa.formmanager.view.oneqps.screen.Select1QuestionScreen;
-import org.javarosa.formmanager.view.oneqps.screen.SelectQuestionScreen;
-import org.javarosa.formmanager.view.oneqps.screen.TextQuestionScreen;
-import org.javarosa.formmanager.view.oneqps.screen.TimeQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquiringQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.DateQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.DecimalQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.NumericQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.OneQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.Select1QuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.SelectQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.TextQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.TimeQuestionScreen;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Style;
