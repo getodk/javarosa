@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.clforms.acquire;
+package org.javarosa.formmanager.view.oneqps.acquire;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;

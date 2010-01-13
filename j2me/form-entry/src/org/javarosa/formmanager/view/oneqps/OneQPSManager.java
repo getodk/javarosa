@@ -14,10 +14,8 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.clforms;
+package org.javarosa.formmanager.view.oneqps;
 
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -37,20 +35,23 @@ import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
-import org.javarosa.formmanager.view.clforms.acquire.AcquireScreen;
-import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
-import org.javarosa.formmanager.view.clforms.acquire.IAcquiringService;
-import org.javarosa.formmanager.view.clforms.widgets.DateQuestionWidget;
-import org.javarosa.formmanager.view.clforms.widgets.DecimalQuestionWidget;
-import org.javarosa.formmanager.view.clforms.widgets.NumericQuestionWidget;
-import org.javarosa.formmanager.view.clforms.widgets.Select1QuestionWidget;
-import org.javarosa.formmanager.view.clforms.widgets.SelectQuestionWidget;
-import org.javarosa.formmanager.view.clforms.widgets.TextQuestionWidget;
-import org.javarosa.formmanager.view.clforms.widgets.TimeQuestionWidget;
-import org.javarosa.j2me.services.DataCaptureServiceRegistry;
+import org.javarosa.formmanager.view.oneqps.acquire.AcquireScreen;
+import org.javarosa.formmanager.view.oneqps.acquire.AcquiringQuestionScreen;
+import org.javarosa.formmanager.view.oneqps.acquire.IAcquiringService;
+import org.javarosa.formmanager.view.oneqps.screen.DateQuestionScreen;
+import org.javarosa.formmanager.view.oneqps.screen.DecimalQuestionScreen;
+import org.javarosa.formmanager.view.oneqps.screen.NumericQuestionScreen;
+import org.javarosa.formmanager.view.oneqps.screen.OneQuestionScreen;
+import org.javarosa.formmanager.view.oneqps.screen.Select1QuestionScreen;
+import org.javarosa.formmanager.view.oneqps.screen.SelectQuestionScreen;
+import org.javarosa.formmanager.view.oneqps.screen.TextQuestionScreen;
+import org.javarosa.formmanager.view.oneqps.screen.TimeQuestionScreen;
 import org.javarosa.j2me.view.J2MEDisplay;
 
-public class FormViewManager implements IFormEntryView, FormEntryModelListener,
+import de.enough.polish.ui.Style;
+import de.enough.polish.ui.StyleSheet;
+
+public class OneQPSManager implements IFormEntryView, FormEntryModelListener,
 		CommandListener, ItemCommandListener {
 	private FormEntryController controller;
 	private FormEntryModel model;
@@ -59,14 +60,14 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 	private FormIndex index;
 	private FormElementBinding prompt;
 	private IAnswerData answer;
-	private SingleQuestionScreen widget;
+	private OneQuestionScreen widget;
 	Gauge progressBar;
 	private boolean showFormView;
+	private boolean goingForward;
 	private FormViewScreen formView;
-	private boolean direction;
 
 	// GUI elements
-	public FormViewManager(String formTitle, FormEntryModel model,
+	public OneQPSManager(String formTitle, FormEntryModel model,
 			FormEntryController controller) {
 		this.model = model;
 		this.controller = controller;
@@ -86,124 +87,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 	}
 
 	public void getView(FormIndex qIndex, boolean fromFormView) {
-		prompt = new FormElementBinding(null, qIndex, model.getForm());
-		// checks question type
-		int qType = prompt.instanceNode.dataType;
-		int contType = ((QuestionDef) prompt.element).getControlType();
-
-		switch (contType) {
-		case Constants.CONTROL_INPUT:
-			switch (qType) {
-			case Constants.DATATYPE_TEXT:
-			case Constants.DATATYPE_NULL:
-			case Constants.DATATYPE_UNSUPPORTED:
-				// go to TextQuestion Widget
-				if (fromFormView == true)
-					widget = new TextQuestionWidget(prompt, 'c');
-				else if (direction)
-					widget = new TextQuestionWidget(prompt, 1);
-				else
-					widget = new TextQuestionWidget(prompt, "");
-				break;
-			case Constants.DATATYPE_DATE:
-			case Constants.DATATYPE_DATE_TIME:
-				// go to DateQuestion Widget
-				if (fromFormView == true)
-					widget = new DateQuestionWidget(prompt, 'c');// transition
-				// must be
-				// fromAnswerScreen
-				// style
-				else if (direction == true)
-					widget = new DateQuestionWidget(prompt, 1);// transition =
-				// next style
-				else
-					widget = new DateQuestionWidget(prompt, ""); // transition =
-				// back
-				// style
-				break;
-			case Constants.DATATYPE_TIME:
-				// go to TimeQuestion Widget
-				if (fromFormView == true)
-					widget = new TimeQuestionWidget(prompt, 'c');
-				else if (direction == true)
-					widget = new TimeQuestionWidget(prompt, 1);
-				else
-					widget = new TimeQuestionWidget(prompt, "");
-				break;
-			case Constants.DATATYPE_INTEGER:
-				if (fromFormView == true)
-					widget = new NumericQuestionWidget(prompt, 'c');
-				else if (direction == true)
-					widget = new NumericQuestionWidget(prompt, 1);
-				else
-					widget = new NumericQuestionWidget(prompt, "");
-				break;
-			case Constants.DATATYPE_DECIMAL:
-				if (fromFormView == true)
-					widget = new DecimalQuestionWidget(prompt, 'c');
-				else if (direction == true)
-					widget = new DecimalQuestionWidget(prompt, 1);
-				else
-					widget = new DecimalQuestionWidget(prompt, "");
-				break;
-
-			case Constants.DATATYPE_BARCODE:
-				try { // is there a service that can acquire a barcode?
-					IAcquiringService barcodeService = (IAcquiringService)controller.getDataCaptureService("clforms-barcode");
-					if (fromFormView == true)
-						widget = barcodeService.getWidget(prompt, 'c');
-					else if (direction)
-						widget = barcodeService.getWidget(prompt, 1);
-					else
-						widget = barcodeService.getWidget(prompt, "");
-
-				} catch (UnavailableServiceException se) {
-					widget = null;
-				}
-				// if not, just use a
-				// text widget
-				if (widget == null)
-					if (fromFormView == true)
-						widget = new TextQuestionWidget(prompt, 'c');
-					else if (direction)
-						widget = new TextQuestionWidget(prompt, 1);
-					else
-						widget = new TextQuestionWidget(prompt, "");
-
-				break;
-			}
-			break;
-		case Constants.CONTROL_SELECT_ONE:
-			// go to SelectQuestion widget
-			if (fromFormView == true)
-				widget = new Select1QuestionWidget(prompt, 'c');
-			else if (direction == true)
-				widget = new Select1QuestionWidget(prompt, 1);
-			else
-				widget = new Select1QuestionWidget(prompt, "");
-			break;
-		case Constants.CONTROL_SELECT_MULTI:
-			// go to SelectQuestion Widget
-			if (fromFormView == true)
-				widget = new SelectQuestionWidget(prompt, 'c');
-			else if (direction == true)
-				widget = new SelectQuestionWidget(prompt, 1);
-			else
-				widget = new SelectQuestionWidget(prompt, "");
-			break;
-		case Constants.CONTROL_TEXTAREA:
-			// go to TextQuestion Widget
-			if (fromFormView == true)
-				widget = new TextQuestionWidget(prompt, 'c');
-			else if (direction == true)
-				widget = new TextQuestionWidget(prompt, 1);
-			else
-				widget = new TextQuestionWidget(prompt, "");
-			break;
-		default:
-			System.out.println("Unsupported type!");
-			break;
-		}
+		
 		widget.setCommandListener(this);
 		widget.setItemCommandListner(this);
 		controller.setView(widget);
@@ -265,7 +149,7 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 			} else if (command == FormViewScreen.sendCommand) {
 				// check if all required questions are complete
 				int counter = model.countUnansweredQuestions(true);
-				
+
 				if (counter > 0) {
 					// show alert
 					String txt = "There are unanswered compulsory questions and must be completed first to proceed";
@@ -279,45 +163,47 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 					FormIndex b = formView.indexHash.get(i);
 					controller.selectQuestion(b);
 					this.showFormView = false;
+					this.goingForward=true;
 				} else {
-					String txt = Localization.get(
-							"view.sending.FormUneditable");
+					String txt = Localization
+							.get("view.sending.FormUneditable");
 					J2MEDisplay.showError("Cannot Edit Answers!", txt);
 				}
 			}
 
 		} else {
-			if (command == SingleQuestionScreen.nextItemCommand
-					|| command == SingleQuestionScreen.nextCommand) {
+			if (command == OneQuestionScreen.nextItemCommand
+					|| command == OneQuestionScreen.nextCommand) {
 				answer = widget.getWidgetValue();
 
+				this.goingForward=true;
 				int result = controller.questionAnswered(this.prompt,
 						this.answer);
 				if (result == controller.QUESTION_CONSTRAINT_VIOLATED) {
-//					System.out.println("answer validation constraint violated");
-//					TODO:   String txt = Locale.get(
-//							"view.sending.CompulsoryQuestionsIncomplete");
-					
+					// System.out.println("answer validation constraint violated");
+					// TODO: String txt = Locale.get(
+					// "view.sending.CompulsoryQuestionsIncomplete");
+
 					String txt = "Validation failure: data is not of the correct format.";
-					
+
 					J2MEDisplay.showError("Question Required!", txt);
 				} else if (result == controller.QUESTION_REQUIRED_BUT_EMPTY) {
-//					String txt = Locale.get(
-//							"view.sending.CompulsoryQuestionsIncomplete");
+					// String txt = Locale.get(
+					// "view.sending.CompulsoryQuestionsIncomplete");
 					String txt = "This question is compulsory. You must answer it.";
 					J2MEDisplay.showError("Question Required!", txt);
 				}
-		
-			} else if (command == SingleQuestionScreen.previousCommand) {
-				direction = false;
-				controller.stepQuestion(direction);
 
-			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
+			} else if (command == OneQuestionScreen.previousCommand) {
+				this.goingForward=false;
+				controller.stepQuestion(false);
+
+			} else if (command == OneQuestionScreen.viewAnswersCommand) {
 				controller.selectQuestion(FormIndex
 						.createBeginningOfFormIndex());
 				this.showFormView = true;
 				showFormViewScreen();
-			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
+			} else if (command == OneQuestionScreen.viewAnswersCommand) {
 				controller.selectQuestion(FormIndex
 						.createBeginningOfFormIndex());
 				this.showFormView = true;
@@ -345,9 +231,8 @@ public class FormViewManager implements IFormEntryView, FormEntryModelListener,
 		}
 	}
 
-	
 	public void commandAction(Command c, Item item) {
-		if (c == SingleQuestionScreen.nextItemCommand) {
+		if (c == OneQuestionScreen.nextItemCommand) {
 			answer = widget.getWidgetValue();
 			controller.questionAnswered(this.prompt, answer);// store answers
 			refreshView();
