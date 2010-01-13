@@ -32,19 +32,10 @@ import org.javarosa.formmanager.view.FormElementBinding;
 
 public class FormEntryModel {
     private FormDef form;
-
     private FormIndex currentFormindex;
-    private FormIndex startIndex;
-    private int instanceID;
-    private boolean unsavedChanges;
-    private boolean formCompleted;
 
-    private Vector observers;
-
-    public int totalQuestions; // total number of questions in the form; used
-    // for progress bar
-
-    private boolean readOnly;
+    // total number of questions in the form; used for progress bar
+    public int totalQuestions; 
 
 
 
@@ -113,7 +104,7 @@ public class FormEntryModel {
     }
 
 
-    public Prompt getQuestionPrompt() {
+    public FormEntryPrompt getQuestionPrompt() {
         //TODO
         return null
     }
@@ -157,105 +148,22 @@ public class FormEntryModel {
 
     public void setQuestionIndex(FormIndex index) {
         if (!currentFormindex.equals(index)) {
-
-            // See if a hint exists that says we should have a model for this
-            // already
+            // See if a hint exists that says we should have a model for this already
             createModelIfNecessary(index);
-
             currentFormindex = index;
-
-            for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-                ((FormEntryModelListener) e.nextElement())
-                        .questionIndexChanged(currentFormindex);
-            }
         }
     }
 
-
-    // depending on boolean, counts the number of unanswered required questions,
-    // or
-    // counts the number of unanswered questions.
-    public int countUnansweredQuestions(boolean countRequiredOnly) {
-        int counter = 0;
-
-        for (FormIndex a = form.incrementIndex(FormIndex.createBeginningOfFormIndex()); a
-                .compareTo(FormIndex.createEndOfFormIndex()) < 0; a = form.incrementIndex(a)) {
-            FormElementBinding bind = new FormElementBinding(null, a, form);
-
-            if (countRequiredOnly && bind.instanceNode.required && bind.getValue() == null) {
-                counter++;
-            } else if (bind.getValue() == null) {
-                counter++;
-            }
-        }
-        return counter;
-    }
-
-
+    
     public FormDef getForm() {
         return form;
     }
 
-
-    public int getInstanceID() {
-        return instanceID;
-    }
-
-
-    public boolean isSaved() {
-        return !unsavedChanges;
-    }
-
-
-    public void modelChanged() {
-        if (!unsavedChanges) {
-            unsavedChanges = true;
-
-            for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-                ((FormEntryModelListener) e.nextElement()).saveStateChanged(instanceID,
-                        unsavedChanges);
-            }
-        }
-    }
-
-
-    public void modelSaved(int instanceID) {
-        this.instanceID = instanceID;
-        unsavedChanges = false;
-
-        for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-            ((FormEntryModelListener) e.nextElement()).saveStateChanged(instanceID, unsavedChanges);
-        }
-    }
-
-
-    public boolean isFormComplete() {
-        return formCompleted;
-    }
-
-
-    public void setFormComplete() {
-        if (!formCompleted) {
-            formCompleted = true;
-
-            if (!currentFormindex.isEndOfFormIndex()) {
-                setQuestionIndex(FormIndex.createEndOfFormIndex());
-            }
-
-            for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-                ((FormEntryModelListener) e.nextElement()).formComplete();
-            }
-        }
-    }
-
-
-    public void notifyStartOfForm() {
-        for (Enumeration e = observers.elements(); e.hasMoreElements();) {
-            ((FormEntryModelListener) e.nextElement()).startOfForm();
-        }
-    }
-
-
+    
+    /**
+     * 
+     * @return total number of questions in the form
+     */
     public int getNumQuestions() {
         return form.getDeepChildCount();
     }
@@ -329,46 +237,7 @@ public class FormEntryModel {
     }
 
 
-    public void registerObservable(FormEntryModelListener feml) {
-        if (!observers.contains(feml)) {
-            observers.addElement(feml);
-        }
-    }
 
-
-    public void unregisterObservable(FormEntryModelListener feml) {
-        observers.removeElement(feml);
-    }
-
-
-    public void unregisterAll() {
-        observers.removeAllElements();
-    }
-
-
-    /**
-     * @return Whether or not the form model should be written to.
-     */
-    public boolean isReadOnly() {
-        return readOnly;
-    }
-
-
-    /**
-     * @param readOnly Whether or not the form model should be changed by the
-     *        form entry interaction.
-     */
-    public void setReadOnly(boolean readOnly) {
-        this.readOnly = readOnly;
-    }
-
-
-    /**
-     * @return the startIndex
-     */
-    public FormIndex getStartIndex() {
-        return startIndex;
-    }
 
 
     /**
