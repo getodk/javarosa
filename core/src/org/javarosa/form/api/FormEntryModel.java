@@ -77,16 +77,6 @@ public class FormEntryModel {
         return getEvent(currentFormindex);
 	}
 
-    public String getEventTitle() {
-    	return getEventTitle(currentFormindex);
-    }
-
-    public String getEventTitle(FormIndex index) {
-    	IFormElement element = form.getChild(index);
-    	return element.getTitle();
-    }
-
-
     /**
      * 
      * @return Form title
