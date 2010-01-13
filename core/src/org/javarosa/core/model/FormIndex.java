@@ -134,6 +134,7 @@ public class FormIndex {
 	 * element of which will be referenced by the nextLevel index.
 	 * @param instanceIndex How many times the element referenced has been 
 	 * repeated.
+	 * @param reference A reference to the instance element identified by this index;
 	 */
 	public FormIndex(FormIndex nextLevel, int localIndex, int instanceIndex, TreeReference reference) {
 		this(nextLevel, localIndex, reference);
@@ -185,10 +186,6 @@ public class FormIndex {
 	
 	public boolean isBeginningOfFormIndex() {
 		return beginningOfForm;
-	}
-	
-	public void setNextLevel (FormIndex next) {
-		this.nextLevel = next;
 	}
 	
 	public boolean equals(Object o) {

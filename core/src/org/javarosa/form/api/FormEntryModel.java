@@ -208,22 +208,13 @@ public class FormEntryModel {
             // have to check the <group>/<repeat> hierarchy
             Vector defs = form.explodeIndex(questionIndex);
 
-            FormIndex ancestorIndex = null;
-            FormIndex cur = null;
-            FormIndex qcur = questionIndex;
-            for (int i = 0; i < defs.size() - 1; i++) {
-                FormIndex next = new FormIndex(qcur.getLocalIndex(), qcur.getInstanceIndex(),qcur.getReference());
-                if (ancestorIndex == null) {
-                    ancestorIndex = next;
-                    cur = next;
-                } else {
-                    cur.setNextLevel(next);
-                    cur = next;
-                }
-                qcur = qcur.getNextLevel();
+            FormIndex ancestorIndex = questionIndex;
+            while(ancestorIndex != null) {
+            	ancestorIndex = ancestorIndex.getNextLevel();
 
-                TreeElement ancestorNode =
-                        form.getDataModel().resolveReference(ancestorIndex.getReference());
+            	//This should be safe now that the TreeReference is contained in the ancestor index itself
+                TreeElement ancestorNode = form.getDataModel().resolveReference(ancestorIndex.getReference());
+                
                 if (!ancestorNode.isRelevant()) {
                     relevant = false;
                     break;
