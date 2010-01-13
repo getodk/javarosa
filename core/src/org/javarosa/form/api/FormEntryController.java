@@ -44,6 +44,10 @@ public class FormEntryController {
 	public void start() {
 		
 	}
+	
+	public FormEntryModel getModel() {
+		return model;
+	}
 
 	public int questionAnswered (FormIndex index, IAnswerData data) {
 		TreeElement element = model.getTreeElement(index);
@@ -104,5 +108,9 @@ public class FormEntryController {
 	
 	public FormIndex deleteRepeat (FormIndex questionIndex) {
 		return model.getForm().deleteRepeat(questionIndex);
+	}
+	
+	public void setLanguage(String language) {
+		
 	}
 }

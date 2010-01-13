@@ -21,9 +21,6 @@ package org.javarosa.formmanager.view.chatterbox;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
-import de.enough.polish.ui.Command;
-import de.enough.polish.ui.CommandListener;
-import de.enough.polish.ui.Displayable;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
 
@@ -33,9 +30,9 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
-import org.javarosa.formmanager.controller.FormEntryController;
-import org.javarosa.formmanager.model.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.IFormEntryView;
@@ -44,8 +41,10 @@ import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
 import org.javarosa.j2me.view.J2MEDisplay;
 
+import de.enough.polish.ui.Command;
+import de.enough.polish.ui.CommandListener;
 import de.enough.polish.ui.Container;
-import de.enough.polish.ui.Display;
+import de.enough.polish.ui.Displayable;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
@@ -89,11 +88,12 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     //private Command deleteRepeatCommand; //TODO do something with this
     private Gauge progressBar;
         
-    public Chatterbox (String formTitle, FormEntryModel model, FormEntryController controller) {
+    public Chatterbox (String formTitle, FormEntryController controller) {
         //#style framedForm
     	super(formTitle);
     	
-    	if(model.isReadOnly()) {
+    	//TODO: READONLY FLAG!
+    	if(false) {
     		//#style ReviewFramedForm
     		UiAccess.setStyle(this);
     	}
@@ -108,17 +108,17 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		}
     	};
     	
-    	this.model = model;
+    	this.model = controller.getModel();
     	this.controller = controller;
-    	controller.setFormEntryView(this);
 
     	widgetFactory = new ChatterboxWidgetFactory(this);
-    	widgetFactory.setReadOnly(this.model.isReadOnly());
+    	
+    	//TODO: READONLY FLAG!
+    	widgetFactory.setReadOnly(false);
+    	
     	multiLingual = (model.getForm().getLocalizer() != null);
     	questionIndexes = new SortedIndexSet();
     	activeQuestionIndex = FormIndex.createBeginningOfFormIndex(); //null is not allowed
-    	
-    	model.registerObservable(this);
     	
     	initGUI();
     	
@@ -136,12 +136,10 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	for (int i = 0; i < size(); i++) {
     		((ChatterboxWidget)get(i)).destroy();
     	}
-    	
-    	model.unregisterObservable(this);
     }
     
     public void show () {
-    	controller.setView(this);
+    	J2MEDisplay.setView(this);
     }
     
     private void initGUI () {
@@ -149,19 +147,20 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	initProgressBar();
     	
     	//Mode 1: Read only review screen.
-    	if(model.isReadOnly()) {
-    		while(!model.getQuestionIndex().isEndOfFormIndex()) {
-    			controller.stepQuestion(true);
+    	//TODO: READONLY FLAG!
+    	if(false) {
+    		while(controller.stepToNextEvent() != FormEntryController.END_OF_FORM_EVENT) {
+    			//TODO: Anything?
     		}
-    	} else if(model.getStartIndex() != null) {
+    	} else if(null != null) { //TODO: Starting from a specific question
     		
     		//Mode 2: Seek to current question
-    		while(!model.getQuestionIndex().equals(model.getStartIndex())) {
-    			controller.stepQuestion(true);
+    		while(!model.getCurrentFormIndex().equals(null)) {
+    			controller.stepToNextEvent();
     		}
     	} else {
     		//Default Mode: Start at first question
-    		controller.stepQuestion(true);
+    		controller.stepToNextEvent();
     	}
     	this.currentlyActiveContainer = this.container;
     }
@@ -179,7 +178,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
         
         //next command is added on a per-widget basis
         
-        if(!model.isReadOnly()) {
+        //TODO: READ ONLY FLAG!
+        if(false) {
             addCommand(backCommand);
             addCommand(exitSaveCommand);
             addCommand(saveCommand);
@@ -233,7 +233,11 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			if(((GroupDef)last).noAddRemove) {
     				//We can't show anything meaningful here. Go back to the controller.
     				boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
-    				controller.stepQuestion(forwards);
+    				if(forwards) {
+    					controller.stepToNextEvent();
+    				} else {
+    					controller.stepPreviousEvent();
+    				}
     				return;
     			} else {
     				//All Systems Go. Display an interstitial "Add another FOO" question.
@@ -246,12 +250,20 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     			} else {
     				removeHeaderForElement(questionIndex);
     			}
-    			controller.stepQuestion(forwards);
+    			if(forwards) {
+					controller.stepToNextEvent();
+				} else {
+					controller.stepPreviousEvent();
+				}
     			return;
     		}
     	} else if (questionIndex.isInForm() && model.isReadonly(questionIndex)) {
 			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
-			controller.stepQuestion(forwards);
+			if(forwards) {
+				controller.stepToNextEvent();
+			} else {
+				controller.stepPreviousEvent();
+			}
 			return;
     	}
     	    	
@@ -407,7 +419,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     }
     
     public void formComplete () {
-    	if(!model.isReadOnly()) {
+    	//TODO: READONLY FLAG!
+    	if(false) {
 	    	jumpToQuestion(FormIndex.createEndOfFormIndex());
 	    	babysitStyles();
 			progressBar.setValue(progressBar.getMaxValue());
@@ -417,16 +430,13 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
 				Thread.sleep(1000); //let them bask in their completeness
 			} catch (InterruptedException ie) { }
 				
-			controller.save();
-			controller.exit();
+//			controller.save();
+//			controller.exit();
     	} else { 
     		
     	}
     }
     
-    public void startOfForm () {
-    	controller.selectQuestion(activeQuestionIndex);
-    }
     
     private ChatterboxWidget activeFrame () {
     	int frameIndex = questionIndexes.indexOf(activeQuestionIndex, true);
@@ -442,7 +452,8 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		ChatterboxWidget cw = (ChatterboxWidget)get(i);
     		switch (cw.getViewState()) {
     		case ChatterboxWidget.VIEW_COLLAPSED:
-    			if(model.isReadOnly()) {
+    			//TODO: READONLY FLAG!
+    			if(false) {
     				//#style ReviewSplit
     				UiAccess.setStyle(cw);
     			} else {
@@ -465,12 +476,14 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     	
     	if (command == backCommand) {
     		System.out.println("back");
-    		controller.stepQuestion(false);
+    		controller.stepPreviousEvent();
     	} else if (command == exitNoSaveCommand) {
-    		controller.exit();
+    		//TODO: EXIT?
+    		//controller.exit();
     	} else if (command == exitSaveCommand) {
     		commitAndSave();
-    		controller.exit();
+    		//controller.exit();
+    		//TODO: EXIT?
     	} else if (command == saveCommand) {
     		commitAndSave();
     	} else if (command.getLabel() == Constants.ACTIVITY_TYPE_GET_IMAGES) {
@@ -499,7 +512,7 @@ public class Chatterbox extends FramedForm implements IFormEntryView, FormEntryM
     		}
     		
     		if (language != null) {
-    			controller.setLanguage(language);
+    			controller.(language);
     		} else {
     			System.err.println("Chatterbox: Unknown command event received [" + command.getLabel() + "]");
     		}
