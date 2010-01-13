@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.controller;
+package org.javarosa.form.api;
 
 import java.util.Date;
 
@@ -44,7 +44,6 @@ public class FormEntryController {
 	public static final int QUESTION_CONSTRAINT_VIOLATED = 2;
 	
 	FormEntryModel model;
-	IFormEntryView view;
 	DataCaptureServiceRegistry dataCapture;
 	
 	FormEntryTransitions transitions;

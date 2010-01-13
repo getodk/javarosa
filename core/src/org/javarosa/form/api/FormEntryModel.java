@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.model;
+package org.javarosa.form.api;
 
 import java.util.Enumeration;
 import java.util.Vector;
