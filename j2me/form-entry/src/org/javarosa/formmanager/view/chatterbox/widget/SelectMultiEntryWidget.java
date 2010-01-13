@@ -23,6 +23,7 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.Item;
@@ -49,7 +50,7 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 		}
 	}
 	
-	protected Item getEntryWidget(QuestionDef question) {
+	protected Item getEntryWidget(FormEntryPrompt prompt) {
 		return wec.wrapEntryWidget(super.getEntryWidget(question));
 	}
 	

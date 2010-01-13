@@ -21,6 +21,7 @@ import java.util.Date;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.TimeData;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.DateField;
 import de.enough.polish.ui.Item;
@@ -30,7 +31,7 @@ public class TimeEntryWidget extends ExpandedWidget {
 		return ChatterboxWidget.NEXT_ON_ENTRY;
 	}
 	
-	protected Item getEntryWidget (QuestionDef question) {
+	protected Item getEntryWidget (FormEntryPrompt prompt) {
 		//#style textBox
 		return new DateField(null, DateField.TIME);
 	}
@@ -40,7 +41,7 @@ public class TimeEntryWidget extends ExpandedWidget {
 		return (DateField)entryWidget;    
 	}
 
-	protected void updateWidget (QuestionDef question) { /* do nothing */ }
+	protected void updateWidget (FormEntryPrompt prompt) { /* do nothing */ }
 	
 	protected void setWidgetValue (Object o) {
 		dateField().setDate((Date)o);

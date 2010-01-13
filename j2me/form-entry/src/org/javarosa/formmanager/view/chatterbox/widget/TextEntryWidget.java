@@ -20,6 +20,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.TextField;
@@ -55,7 +56,7 @@ public class TextEntryWidget extends ExpandedWidget {
 		return wec.wrapNextMode(ChatterboxWidget.NEXT_ON_SELECT);
 	}
 	
-	protected Item getEntryWidget (QuestionDef question) {
+	protected Item getEntryWidget (FormEntryPrompt prompt) {
 		return wec.wrapEntryWidget(textField);
 	}
 	
@@ -67,7 +68,7 @@ public class TextEntryWidget extends ExpandedWidget {
 		return textField;    
 	}
 
-	protected void updateWidget (QuestionDef question) { /* do nothing */ }
+	protected void updateWidget (FormEntryPrompt prompt) { /* do nothing */ }
 	
 	protected void setWidgetValue (Object o) {
 		textField().setText((String)o);
