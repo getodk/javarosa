@@ -138,7 +138,11 @@ public class FormEntryModel {
 
 
 
-    
+    protected void setCurrentLanguage(String language) {
+    	if(form.getLocalizer() != null) {
+    		form.getLocalizer().setLocale(language);
+    	}
+    }
 
 
     public void setQuestionIndex(FormIndex index) {
