@@ -41,7 +41,7 @@ import org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringServ
 import org.javarosa.formmanager.view.singlequestionscreen.screen.DateQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.DecimalQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.NumericQuestionScreen;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.OneQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.Select1QuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SelectQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.TextQuestionScreen;
@@ -51,7 +51,7 @@ import org.javarosa.j2me.view.J2MEDisplay;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.StyleSheet;
 
-public class OneQPSManager implements IFormEntryView, FormEntryModelListener,
+public class SingleQuestionScreenManager implements IFormEntryView, FormEntryModelListener,
 		CommandListener, ItemCommandListener {
 	private FormEntryController controller;
 	private FormEntryModel model;
@@ -60,14 +60,14 @@ public class OneQPSManager implements IFormEntryView, FormEntryModelListener,
 	private FormIndex index;
 	private FormElementBinding prompt;
 	private IAnswerData answer;
-	private OneQuestionScreen widget;
+	private SingleQuestionScreen widget;
 	Gauge progressBar;
 	private boolean showFormView;
 	private boolean goingForward;
 	private FormViewScreen formView;
 
 	// GUI elements
-	public OneQPSManager(String formTitle, FormEntryModel model,
+	public SingleQuestionScreenManager(String formTitle, FormEntryModel model,
 			FormEntryController controller) {
 		this.model = model;
 		this.controller = controller;
@@ -172,8 +172,8 @@ public class OneQPSManager implements IFormEntryView, FormEntryModelListener,
 			}
 
 		} else {
-			if (command == OneQuestionScreen.nextItemCommand
-					|| command == OneQuestionScreen.nextCommand) {
+			if (command == SingleQuestionScreen.nextItemCommand
+					|| command == SingleQuestionScreen.nextCommand) {
 				answer = widget.getWidgetValue();
 
 				this.goingForward=true;
@@ -194,16 +194,16 @@ public class OneQPSManager implements IFormEntryView, FormEntryModelListener,
 					J2MEDisplay.showError("Question Required!", txt);
 				}
 
-			} else if (command == OneQuestionScreen.previousCommand) {
+			} else if (command == SingleQuestionScreen.previousCommand) {
 				this.goingForward=false;
 				controller.stepQuestion(false);
 
-			} else if (command == OneQuestionScreen.viewAnswersCommand) {
+			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
 				controller.selectQuestion(FormIndex
 						.createBeginningOfFormIndex());
 				this.showFormView = true;
 				showFormViewScreen();
-			} else if (command == OneQuestionScreen.viewAnswersCommand) {
+			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
 				controller.selectQuestion(FormIndex
 						.createBeginningOfFormIndex());
 				this.showFormView = true;
@@ -232,7 +232,7 @@ public class OneQPSManager implements IFormEntryView, FormEntryModelListener,
 	}
 
 	public void commandAction(Command c, Item item) {
-		if (c == OneQuestionScreen.nextItemCommand) {
+		if (c == SingleQuestionScreen.nextItemCommand) {
 			answer = widget.getWidgetValue();
 			controller.questionAnswered(this.prompt, answer);// store answers
 			refreshView();

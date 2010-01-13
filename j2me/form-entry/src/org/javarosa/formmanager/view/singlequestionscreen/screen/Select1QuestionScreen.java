@@ -28,7 +28,7 @@ import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Style;
 
-public class Select1QuestionScreen extends OneQuestionScreen {
+public class Select1QuestionScreen extends SingleQuestionScreen {
 	protected ChoiceGroup cg;
 
 	public Select1QuestionScreen(FormElementBinding qDef,  Style style) {
