@@ -25,7 +25,7 @@ import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Style;
 
-public class DecimalQuestionScreen extends OneQuestionScreen {
+public class DecimalQuestionScreen extends SingleQuestionScreen {
 	protected TextField tf;
 
 	// private boolean isDecimal=false;

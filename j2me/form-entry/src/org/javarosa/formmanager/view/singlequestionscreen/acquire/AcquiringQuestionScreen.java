@@ -21,7 +21,7 @@ import javax.microedition.lcdui.CommandListener;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.view.FormElementBinding;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.OneQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 
 import de.enough.polish.ui.Style;
 
@@ -30,7 +30,7 @@ import de.enough.polish.ui.Style;
  *         for the question by capturing (and possibly processing) some data
  * 
  */
-public abstract class AcquiringQuestionScreen extends OneQuestionScreen {
+public abstract class AcquiringQuestionScreen extends SingleQuestionScreen {
 	protected IAnswerData acquiredData;
 	public Command acquireCommand;
 	AcquireScreen acquireScreen;

@@ -27,7 +27,7 @@ import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Style;
 
-public class TimeQuestionScreen extends OneQuestionScreen {
+public class TimeQuestionScreen extends SingleQuestionScreen {
 	protected DateField timePicker;
 
 	public TimeQuestionScreen(FormElementBinding qDef,  Style style) {

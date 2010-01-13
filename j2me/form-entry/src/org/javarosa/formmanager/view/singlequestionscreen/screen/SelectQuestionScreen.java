@@ -29,7 +29,7 @@ import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Style;
 
-public class SelectQuestionScreen extends OneQuestionScreen {
+public class SelectQuestionScreen extends SingleQuestionScreen {
 	ChoiceGroup cg;
 
 	public SelectQuestionScreen(FormElementBinding qDef, Style style) {

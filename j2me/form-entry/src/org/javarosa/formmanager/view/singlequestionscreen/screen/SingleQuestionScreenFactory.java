@@ -17,12 +17,12 @@ import de.enough.polish.ui.StyleSheet;
  * @author melissa
  * 
  */
-public class OneQuestionScreenFactory {
+public class SingleQuestionScreenFactory {
 
-	public static OneQuestionScreen getQuestionScreen(
+	public static SingleQuestionScreen getQuestionScreen(
 			FormElementBinding prompt, boolean fromFormView,
 			boolean goingForward) {
-		OneQuestionScreen screenToReturn = null;
+		SingleQuestionScreen screenToReturn = null;
 		int qType = prompt.instanceNode.dataType;
 		int contType = ((QuestionDef) prompt.element).getControlType();
 
@@ -88,10 +88,10 @@ public class OneQuestionScreenFactory {
 		return screenToReturn;
 	}
 
-	public static OneQuestionScreen getQuestionScreen(
+	public static SingleQuestionScreen getQuestionScreen(
 			FormElementBinding prompt, boolean fromFormView,
 			boolean goingForward, IAcquiringService barcodeService) {
-		OneQuestionScreen screenToReturn = null;
+		SingleQuestionScreen screenToReturn = null;
 		int qType = prompt.instanceNode.dataType;
 		int contType = ((QuestionDef) prompt.element).getControlType();
 

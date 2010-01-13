@@ -35,7 +35,7 @@ import org.javarosa.j2me.view.J2MEDisplay;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Style;
 
-public abstract class OneQuestionScreen extends FramedForm implements IFormEntryView {
+public abstract class SingleQuestionScreen extends FramedForm implements IFormEntryView {
 
 	protected FormElementBinding qDef;
 	protected IAnswerData answer;
@@ -54,7 +54,7 @@ public abstract class OneQuestionScreen extends FramedForm implements IFormEntry
 
 	public ItemCommandListener itemListner;
 
-	public OneQuestionScreen(FormElementBinding prompt,  Style style) {
+	public SingleQuestionScreen(FormElementBinding prompt,  Style style) {
 		super(prompt.element.getTitle(), style);
 		this.qDef = prompt;
 		this.createView();

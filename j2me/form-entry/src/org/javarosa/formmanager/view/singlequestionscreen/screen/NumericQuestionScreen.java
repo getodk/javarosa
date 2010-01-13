@@ -25,7 +25,7 @@ import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Style;
 
-public class NumericQuestionScreen extends OneQuestionScreen {
+public class NumericQuestionScreen extends SingleQuestionScreen {
 	protected TextField tf;
 
 	public NumericQuestionScreen(FormElementBinding qDef,  Style style) {
