@@ -168,29 +168,24 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * @param multiplicities
 	 * @return
 	 */
-	public TreeReference getChildInstanceRef(Vector elements,
-			Vector multiplicities) {
+	public TreeReference getChildInstanceRef(Vector elements, Vector multiplicities) {
 		if (elements.size() == 0)
 			return null;
 
 		// get reference for target element
-		TreeReference ref = DataModelTree.unpackReference(
-				((IFormElement) elements.lastElement()).getBind()).clone();
+		TreeReference ref = DataModelTree.unpackReference(((IFormElement) elements.lastElement()).getBind()).clone();
 		for (int i = 0; i < ref.size(); i++) {
-			ref.multiplicity.setElementAt(new Integer(0), i);
+			ref.setMultiplicity(i, 0);
 		}
 
 		// fill in multiplicities for repeats along the way
 		for (int i = 0; i < elements.size(); i++) {
 			IFormElement temp = (IFormElement) elements.elementAt(i);
 			if (temp instanceof GroupDef && ((GroupDef) temp).getRepeat()) {
-				TreeReference repRef = DataModelTree.unpackReference(temp
-						.getBind());
+				TreeReference repRef = DataModelTree.unpackReference(temp.getBind());
 				if (repRef.isParentOf(ref, false)) {
-					int repMult = ((Integer) multiplicities.elementAt(i))
-							.intValue();
-					ref.multiplicity.setElementAt(new Integer(repMult), repRef
-							.size() - 1);
+					int repMult = ((Integer) multiplicities.elementAt(i)).intValue();
+					ref.setMultiplicity(repRef.size() - 1, repMult);
 				} else {
 					return null; // question/repeat hierarchy is not consistent
 					// with instance model and bindings

@@ -60,10 +60,22 @@ public class TreeReference implements Externalizable {
 		return ((Integer)multiplicity.elementAt(index)).intValue();
 	}
 	
-	public String getNames(int index) {
+	public String getName(int index) {
 		return (String)names.elementAt(index);
 	}
 
+	public int getMultLast () {
+		return ((Integer)multiplicity.lastElement()).intValue();
+	}
+	
+	public String getNameLast () {
+		return (String)names.lastElement();
+	}
+	
+	public void setMultiplicity (int i, int mult) {
+		multiplicity.setElementAt(new Integer(mult), i);
+	}
+	
 	public int size () {
 		return names.size();
 	}
@@ -73,6 +85,20 @@ public class TreeReference implements Externalizable {
 		multiplicity.addElement(new Integer(index));
 	}
 	
+	public int getRefLevel () {
+		return refLevel;
+	}
+	
+	public void setRefLevel (int refLevel) {
+		this.refLevel = refLevel;
+	}
+	
+	public void incrementRefLevel () {
+		if (!isAbsolute()) {
+			refLevel++;
+		}
+	}
+	
 	public boolean isAbsolute () {
 		return refLevel == REF_ABSOLUTE;
 	}
@@ -80,10 +106,9 @@ public class TreeReference implements Externalizable {
 	//return a copy of the ref
 	public TreeReference clone () {
 		TreeReference newRef = new TreeReference();
-		newRef.refLevel = refLevel;
-		for (int i = 0; i < size(); i++) {
-			newRef.names.addElement(names.elementAt(i));
-			newRef.multiplicity.addElement(multiplicity.elementAt(i));
+		newRef.setRefLevel(this.refLevel);
+		for (int i = 0; i < this.size(); i++) {
+			newRef.add(this.getName(i), this.getMultiplicity(i));
 		}
 		return newRef;
 	}
@@ -95,7 +120,7 @@ public class TreeReference implements Externalizable {
 	public boolean removeLastLevel () {
 		int size = size();
 		if (size == 0) {
-			if (refLevel == REF_ABSOLUTE) {
+			if (isAbsolute()) {
 				return false;
 			} else {
 				refLevel++;
@@ -122,13 +147,13 @@ public class TreeReference implements Externalizable {
 	//if this ref has 'parent' steps (..), it can only be anchored if the parent ref is a relative ref consisting only of other 'parent' steps
 	//return null in these invalid situations
 	public TreeReference parent (TreeReference parentRef) {
-		if (refLevel == REF_ABSOLUTE) {
+		if (isAbsolute()) {
 			return this;
 		} else {
 			TreeReference newRef = parentRef.clone();
 
 			if (refLevel > 0) {
-				if (parentRef.refLevel != REF_ABSOLUTE && parentRef.size() == 0) {
+				if (!parentRef.isAbsolute() && parentRef.size() == 0) {
 					parentRef.refLevel += refLevel;
 				} else {
 					return null;
@@ -136,7 +161,7 @@ public class TreeReference implements Externalizable {
 			}
 			
 			for (int i = 0; i < names.size(); i++) {
-				newRef.add((String)names.elementAt(i), ((Integer)multiplicity.elementAt(i)).intValue());
+				newRef.add(this.getName(i), this.getMultiplicity(i));
 			}
 
 			return newRef;			
@@ -150,9 +175,9 @@ public class TreeReference implements Externalizable {
 	//NOTE: this function still works even when contextRef contains INDEX_UNBOUND multiplicites... conditions depend on this behavior,
 	//  even though it's slightly icky
 	public TreeReference anchor (TreeReference contextRef) {
-		if (refLevel == REF_ABSOLUTE) {
+		if (isAbsolute()) {
 			return this.clone();
-		} else if (contextRef.refLevel != REF_ABSOLUTE) {
+		} else if (!contextRef.isAbsolute()) {
 			return null;
 		} else {
 			TreeReference newRef = contextRef.clone();
@@ -164,7 +189,7 @@ public class TreeReference implements Externalizable {
 					newRef.removeLastLevel();
 				}
 				for (int i = 0; i < size(); i++) {
-					newRef.add((String)names.elementAt(i), ((Integer)multiplicity.elementAt(i)).intValue());
+					newRef.add(this.getName(i), this.getMultiplicity(i));
 				}		
 				return newRef;
 			}
@@ -174,14 +199,14 @@ public class TreeReference implements Externalizable {
 	//TODO: merge anchor() and parent()
 		
 	public TreeReference contextualize (TreeReference contextRef) {
-		if (contextRef.refLevel != REF_ABSOLUTE)
+		if (!contextRef.isAbsolute())
 			return null;
 		
 		TreeReference newRef = anchor(contextRef);
 		
 		for (int i = 0; i < contextRef.size() && i < newRef.size(); i++) {
-			if (((String)contextRef.names.elementAt(i)).equals(newRef.names.elementAt(i))) {
-				newRef.multiplicity.setElementAt(contextRef.multiplicity.elementAt(i), i);
+			if (contextRef.getName(i).equals(newRef.getName(i))) {
+				newRef.setMultiplicity(i, contextRef.getMultiplicity(i));
 			} else {
 				break;
 			}
@@ -194,7 +219,7 @@ public class TreeReference implements Externalizable {
 	public TreeReference genericize () {	
 		TreeReference genericRef = clone();
 		for (int i = 0; i < genericRef.size(); i++) {
-			genericRef.multiplicity.setElementAt(new Integer(TreeReference.INDEX_UNBOUND), i);
+			genericRef.setMultiplicity(i, INDEX_UNBOUND);
 		}
 		return genericRef;
 	}
@@ -208,12 +233,12 @@ public class TreeReference implements Externalizable {
 			return false;
 		
 		for (int i = 0; i < size(); i++) {
-			if (!((String)names.elementAt(i)).equals((String)child.names.elementAt(i))) {
+			if (!this.getName(i).equals(child.getName(i))) {
 				return false;
 			}
 			
-			int parMult = ((Integer)multiplicity.elementAt(i)).intValue();
-			int childMult = ((Integer)child.multiplicity.elementAt(i)).intValue();
+			int parMult = this.getMultiplicity(i);
+			int childMult = child.getMultiplicity(i);
 			if (parMult != INDEX_UNBOUND && parMult != childMult && !(i == 0 && parMult == 0 && childMult == INDEX_UNBOUND)) {
 				return false;
 			}
@@ -230,10 +255,10 @@ public class TreeReference implements Externalizable {
 			
 			if (this.refLevel == ref.refLevel && this.size() == ref.size()) {
 				for (int i = 0; i < this.size(); i++) {
-					String nameA = (String)this.names.elementAt(i);
-					String nameB = (String)ref.names.elementAt(i);
-					int multA = ((Integer)this.multiplicity.elementAt(i)).intValue();
-					int multB = ((Integer)ref.multiplicity.elementAt(i)).intValue();
+					String nameA = this.getName(i);
+					String nameB = ref.getName(i);
+					int multA = this.getMultiplicity(i);
+					int multB = ref.getMultiplicity(i);
 					
 					if (!nameA.equals(nameB)) {
 						return false;
@@ -257,11 +282,11 @@ public class TreeReference implements Externalizable {
 	public int hashCode () {
 		int hash = (new Integer(refLevel)).hashCode();
 		for (int i = 0; i < size(); i++) {
-			Integer mult = (Integer)multiplicity.elementAt(i);
+			Integer mult = getMultiplicity(i);
 			if (i == 0 && mult.intValue() == INDEX_UNBOUND)
 				mult = new Integer(0);
 			
-			hash ^= ((String)names.elementAt(i)).hashCode();
+			hash ^= getName(i).hashCode();
 			hash ^= mult.hashCode();
 		}
 		return hash;
@@ -273,15 +298,15 @@ public class TreeReference implements Externalizable {
 	
 	public String toString (boolean includePredicates) {
 		StringBuffer sb = new StringBuffer();
-		if (refLevel == REF_ABSOLUTE) {
+		if (isAbsolute()) {
 			sb.append("/");
 		} else {
 			for (int i = 0; i < refLevel; i++)
 				sb.append("../");
 		}
 		for (int i = 0; i < size(); i++) {
-			String name = (String)names.elementAt(i);
-			int mult = ((Integer)multiplicity.elementAt(i)).intValue();
+			String name = getName(i);
+			int mult = getMultiplicity(i);
 			
 			sb.append(name);
 			
