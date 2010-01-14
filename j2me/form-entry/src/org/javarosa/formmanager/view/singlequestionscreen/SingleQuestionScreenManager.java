@@ -123,13 +123,13 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 				IAnswerData answer = currentQuestionScreen.getWidgetValue();
 				this.goingForward = true;
 				int result = controller.questionAnswered(answer);
-				if (result == FormEntryController.QUESTION_OK) {
+				if (result == FormEntryController.ANSWER_OK) {
 					controller.stepToNextEvent();
 					refreshView();
-				} else if (result == FormEntryController.QUESTION_CONSTRAINT_VIOLATED) {
+				} else if (result == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
 					J2MEDisplay.showError("Validation failure", model
 							.getQuestionPrompt().getConstraintText());
-				} else if (result == FormEntryController.QUESTION_REQUIRED_BUT_EMPTY) {
+				} else if (result == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
 					String txt = Locale
 							.get("view.sending.CompulsoryQuestionIncomplete");
 					J2MEDisplay.showError("Question Required", txt);
