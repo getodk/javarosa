@@ -18,11 +18,9 @@ package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import javax.microedition.lcdui.TextField;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Style;
 
