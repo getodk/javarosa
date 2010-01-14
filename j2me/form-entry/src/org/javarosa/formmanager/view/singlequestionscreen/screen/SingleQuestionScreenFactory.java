@@ -77,7 +77,7 @@ public class SingleQuestionScreenFactory {
 			break;
 			
 		case Constants.CONTROL_SELECT_ONE:
-			screenToReturn = new Select1QuestionScreen(prompt,groupTitle, style);
+			screenToReturn = new SelectOneQuestionScreen(prompt,groupTitle, style);
 			break;
 			
 		case Constants.CONTROL_SELECT_MULTI:

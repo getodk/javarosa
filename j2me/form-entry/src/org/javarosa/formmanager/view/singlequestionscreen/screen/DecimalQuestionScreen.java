@@ -27,8 +27,6 @@ import de.enough.polish.ui.Style;
 public class DecimalQuestionScreen extends SingleQuestionScreen {
 	protected TextField tf;
 
-	// private boolean isDecimal=false;
-
 	public DecimalQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
 		super(prompt,groupName,style);
 	}
@@ -39,10 +37,7 @@ public class DecimalQuestionScreen extends SingleQuestionScreen {
 		tf = new TextField("", "", 200, TextField.DECIMAL);
 
 		if (prompt.isRequired())
-			tf.setLabel("*" + prompt.getLongText()); // visual
-																			// symbol
-																			// for
-																			// required
+			tf.setLabel("*" + prompt.getLongText());
 		else
 			tf.setLabel(prompt.getLongText());
 

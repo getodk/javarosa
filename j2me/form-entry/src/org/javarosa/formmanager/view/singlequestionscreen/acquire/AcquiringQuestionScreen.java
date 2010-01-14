@@ -20,7 +20,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 
 import de.enough.polish.ui.Style;
@@ -35,8 +35,8 @@ public abstract class AcquiringQuestionScreen extends SingleQuestionScreen {
 	public Command acquireCommand;
 	AcquireScreen acquireScreen;
 
-	public AcquiringQuestionScreen(FormElementBinding qDef, Style style) {
-		super(qDef, style);
+	public AcquiringQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+		super(prompt, groupName,style);
 		addAcquireCommand();
 
 	}
