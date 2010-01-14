@@ -40,10 +40,7 @@ public class TimeQuestionScreen extends SingleQuestionScreen {
 		// set question
 		if (prompt.isRequired())
 			timePicker.setLabel("*"
-					+ prompt.getLongText()); // visual
-																	// symbol
-																	// for
-																	// required
+					+ prompt.getLongText()); 
 		else
 			timePicker.setLabel(prompt.getLongText());
 

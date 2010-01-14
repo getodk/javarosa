@@ -37,10 +37,7 @@ public class TextQuestionScreen extends SingleQuestionScreen {
 		// #style textBox
 		tf = new TextField("", "", 200, TextField.ANY);
 		if (prompt.isRequired())
-			tf.setLabel("*" + prompt.getLongText()); // visual
-																			// symbol
-																			// for
-																			// required
+			tf.setLabel("*" + prompt.getLongText());
 		else
 			tf.setLabel(prompt.getLongText());
 

@@ -16,7 +16,6 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
-//import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
@@ -52,7 +51,7 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 	public StringItem nextItem = new StringItem(null, Localization
 			.get("button.Next"), Item.BUTTON);
 
-	public ItemCommandListener itemListner;
+	public ItemCommandListener itemListener;
 
 
 	public SingleQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
@@ -89,7 +88,7 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 		this.append(nextItem);
 		nextItem.setDefaultCommand(nextItemCommand); // add Command to Item.
 		
-		if(!groupName.equals("")){
+		if(!((groupName==null)||(groupName.equals("")))){
 			//#style groupName
 			 StringItem groupNameTitle = new StringItem(null,groupName, Item.LAYOUT_EXPAND);
 			 append(Graphics.BOTTOM, groupNameTitle);
@@ -98,7 +97,7 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 	}
 
 	public void setItemCommandListner(ItemCommandListener itemListner) {
-		this.itemListner = itemListner;
+		this.itemListener = itemListner;
 	}
 
 	public void destroy() {

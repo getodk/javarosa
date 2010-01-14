@@ -24,7 +24,7 @@ import org.javarosa.barcode.acquire.BarcodeCaptureScreen;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquiringQuestionScreen;
 import org.javarosa.j2me.services.BarcodeCaptureService;
@@ -43,8 +43,8 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 	protected TextField tf;
 	protected BarcodeCaptureService barcodeProcessor;
 
-	public BarcodeQuestionWidget(FormElementBinding qDef, Style style) {
-		super(question,style);
+	public BarcodeQuestionWidget(FormEntryPrompt prompt, String groupName, Style style) {
+		super(prompt, groupName,style);
 	}
 
 	public void createView() {
