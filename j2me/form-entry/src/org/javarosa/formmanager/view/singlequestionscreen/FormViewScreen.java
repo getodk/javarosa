@@ -16,8 +16,8 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen;
 
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.List;
+import de.enough.polish.ui.Command;
+import de.enough.polish.ui.List;
 
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;

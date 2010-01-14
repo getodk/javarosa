@@ -317,6 +317,36 @@ public class FormIndex {
 		return retval;
 	}
 
+	/**
+	 * Takes in a form index which is a subset of this index, and returns the 
+	 * total difference between them. This is useful for stepping up the level
+	 * of index specificty. If the subIndex is not a valid subIndex of this index,
+	 * null is returned. Since the FormIndex represented by null is always a subset,
+	 * if null is passed in as a subIndex, the full index is returned
+	 * 
+	 * For example:
+	 * Indices
+	 * a = 1_0,2,1,3
+	 * b = 1,3
+	 * 
+	 * a.diff(b) = 1_0,2
+	 *  
+	 * @param subIndex
+	 * @return
+	 */
+	public FormIndex diff(FormIndex subIndex) {
+		if(subIndex == null) {
+			return this;
+		}
+		if(!isSubElement(this,subIndex)) {
+			return null;
+		}
+		if(subIndex.equals(this)) {
+			return null;
+		}
+		return new FormIndex(nextLevel.diff(subIndex),this.snip());
+	}
+
 	public String toString() {
 		String ret = "";
 		FormIndex ref = this;

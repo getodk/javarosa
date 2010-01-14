@@ -51,20 +51,19 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen {
 		
 		int preselectionIndex = -1; // index of the preset value for the
 									// question, if any
-		String preselectionLabel = prompt.getAnswerText()!= null ? prompt.getAnswerText()
+		String presetAnswerLabel = prompt.getAnswerValue()!= null ? prompt.getAnswerValue().getDisplayText()
 				: null;
 		int count = 0;
 
 		while (itr.hasMoreElements()) {
 			SelectChoice choice = (SelectChoice) itr.nextElement();
-			String label = choice.getCaption();
 			
 			// check if the value is equal to the preset for this question
-			if ((preselectionLabel != null)
-					&& (label.equals(preselectionLabel)))
+			if ((presetAnswerLabel != null)
+					&& (choice.getValue().equals(presetAnswerLabel)))
 				preselectionIndex = count;
 
-			cg.append(label, null);// add options to choice group
+			cg.append(choice.getValue(), null);// add options to choice group
 
 			count++;
 		}

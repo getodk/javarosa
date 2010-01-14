@@ -81,7 +81,7 @@ public class SingleQuestionScreenFactory {
 			break;
 			
 		case Constants.CONTROL_SELECT_MULTI:
-			screenToReturn = new SelectQuestionScreen(prompt,groupTitle, style);
+			screenToReturn = new SelectMultiQuestionScreen(prompt,groupTitle, style);
 			break;
 			
 		case Constants.CONTROL_TEXTAREA:
