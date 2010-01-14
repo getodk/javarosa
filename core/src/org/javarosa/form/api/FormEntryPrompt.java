@@ -19,6 +19,7 @@ package org.javarosa.form.api;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.util.OrderedHashtable;
 
@@ -54,7 +55,7 @@ public class FormEntryPrompt {
         return null;
     }
 
-    public Object getAnswerObject() {
+    public IAnswerData getAnswerValue() {
         return mTreeElement.getValue();
     }
 

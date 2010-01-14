@@ -22,6 +22,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Item;
 
@@ -42,11 +43,11 @@ public class InlineDateEntryWidget extends ExpandedWidget {
 		return ChatterboxWidget.NEXT_ON_SELECT;
 	}
 	
-	protected Item getEntryWidget (QuestionDef question) {
+	protected Item getEntryWidget (FormEntryPrompt prompt) {
 		return dateField;
 	}
 
-	protected void updateWidget (QuestionDef question) { /* do nothing */ }
+	protected void updateWidget (FormEntryPrompt prompt) { /* do nothing */ }
 	
 	protected void setWidgetValue (Object o) {
 		dateField.setValue((Date)o);

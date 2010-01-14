@@ -17,6 +17,7 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
@@ -41,7 +42,7 @@ import de.enough.polish.ui.Style;
  */
 public abstract class SelectEntryWidget extends ExpandedWidget {
 	private int style;
-	protected QuestionDef question;
+	protected FormEntryPrompt prompt;
 	
 	private ChoiceGroup choicegroup;
 	
@@ -49,8 +50,8 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 		this.style = style;
 	}
 	
-	protected Item getEntryWidget (QuestionDef question) {
-		this.question = question;
+	protected Item getEntryWidget (FormEntryPrompt prompt) {
+		this.prompt = prompt;
 		
 		ChoiceGroup cg = new ChoiceGroup("", style) {
 			
@@ -170,7 +171,7 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 		return this.choicegroup;
 	}
 
-	protected void updateWidget (QuestionDef question) {
+	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
 			choiceGroup().getItem(i).setText((String)question.getSelectItems().keyAt(i));
 		}
