@@ -57,7 +57,7 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 			return null;
 		}
 		
-		Selection s = new Selection(prompt.getSelectChoices().elementAt(selectedIndex));
+		Selection s = prompt.getSelectChoices().elementAt(selectedIndex).selection();
 		return new SelectOneData(s);
 	}
 	

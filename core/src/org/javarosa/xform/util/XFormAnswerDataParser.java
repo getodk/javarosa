@@ -166,7 +166,7 @@ public class XFormAnswerDataParser {
 			s = new Selection(choiceValue);
 		} else {
 			SelectChoice choice = q.getChoiceForValue(choiceValue);
-			s = (choice != null ? new Selection(choice) : null);
+			s = (choice != null ? choice.selection() : null);
 		}
 		
 		return s;

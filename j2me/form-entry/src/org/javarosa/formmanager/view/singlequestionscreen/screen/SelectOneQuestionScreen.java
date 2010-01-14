@@ -92,7 +92,7 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen {
 			}
 		}
 
-		Selection s = new Selection(prompt.getSelectChoices().elementAt(selectedIndex));
+		Selection s = prompt.getSelectChoices().elementAt(selectedIndex).selection();
 		return (selectedIndex == -1 ? null : new SelectOneData(s));
 	}
 

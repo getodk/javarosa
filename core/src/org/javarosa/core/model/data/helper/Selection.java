@@ -68,8 +68,7 @@ public class Selection implements Externalizable {
 	}
 	
 	public Selection (SelectChoice choice) {
-		attachChoice(choice);
-		
+		attachChoice(choice);	
 	}
 	
 	public Selection (String xmlValue) {

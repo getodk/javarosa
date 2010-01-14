@@ -60,7 +60,7 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 		
 		for (int i = 0; i < choiceGroup().size(); i++) {
 			if (choiceGroup().isSelected(i)) {
-				Selection s = new Selection(prompt.getSelectChoices().elementAt(i));
+				Selection s = prompt.getSelectChoices().elementAt(i).selection();
 			
 				vs.addElement(s);
 			}

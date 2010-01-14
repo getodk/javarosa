@@ -427,15 +427,13 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	 * @return
 	 */
 	private Selection makeSelection (Object o) {
-		Selection s = new Selection();
 		if (o instanceof String) {
-			s.xmlValue = (String)o;
+			return new Selection((String)o);
 		} else if (o instanceof Integer) {
-			s.index = ((Integer)o).intValue();
+			return new Selection(((Integer)o).intValue());
 		} else {
 			throw new RuntimeException();
 		}
-		return s;
 	}
 	
 	/**

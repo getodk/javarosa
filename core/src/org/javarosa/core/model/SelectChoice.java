@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -87,5 +88,8 @@ public class SelectChoice implements Externalizable, Localizable {
 		}
 	}
 	
+	public Selection selection () {
+		return new Selection(this);
+	}
 	
 }

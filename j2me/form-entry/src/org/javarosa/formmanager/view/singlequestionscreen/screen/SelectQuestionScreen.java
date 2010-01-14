@@ -69,7 +69,7 @@ public class SelectQuestionScreen extends SingleQuestionScreen {
 		for (int i = 0; i < cg.size(); i++) {
 			if (cg.isSelected(i)) {
 
-				Selection s = new Selection(prompt.getSelectChoices().elementAt(i));
+				Selection s = prompt.getSelectChoices().elementAt(i).selection();
 				
 				vs.addElement(s);
 			}
