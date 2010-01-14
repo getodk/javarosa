@@ -182,8 +182,13 @@ public class FormEntryModel {
 			remaining = remaining.getNextLevel();
 			FormIndex localIndex = index.diff(remaining);
 			IFormElement element = form.getChild(localIndex);
-			if (!(element instanceof FormDef)) {
-				FormEntryCaption caption = new FormEntryCaption(getForm(), localIndex);
+			if (element != null) {
+				FormEntryCaption caption = null;
+				if (element instanceof GroupDef)
+					caption = new FormEntryCaption(getForm(), localIndex);
+				else if (element instanceof QuestionDef)
+					caption = new FormEntryPrompt(getForm(), localIndex);
+				
 				if(caption != null) {
 					captions.add(caption);
 				}
