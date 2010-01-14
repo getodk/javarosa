@@ -92,8 +92,12 @@ title.Login=Login
 title.SavedForms=Saved Forms
 
 button.Next=NEXT
+button.Yes=YES
+button.No=NO
 
 question.SendNow=Send data now?
+
+view.repeat.addNew=Add new repeat?
 
 view.sending.SendStatus=Send Status
 view.sending.SendingInProgress=Sending...

@@ -386,7 +386,7 @@ public class Chatterbox extends FramedForm implements CommandListener{
     	} else if (model.getForm().explodeIndex(questionIndex).lastElement() instanceof GroupDef) {
     		//do nothing
     	} else if (model.isRelevant(questionIndex)) { //FIXME relevancy check
-    		cw = widgetFactory.getWidget(questionIndex, model.getForm(),
+    		cw = widgetFactory.getWidget(questionIndex, model,
     									  expanded ? ChatterboxWidget.VIEW_EXPANDED
     									    	   : ChatterboxWidget.VIEW_COLLAPSED);
     	}
@@ -528,7 +528,7 @@ public class Chatterbox extends FramedForm implements CommandListener{
     private void commitAndSave () {
        	ChatterboxWidget frame = (activeIsInterstitial ? null : activeFrame());
     	if (frame != null) {
-    		controller.questionAnswered(this.model.getCurrentFormIndex(), frame.getData());
+    		controller.answerQuestion(this.model.getCurrentFormIndex(), frame.getData());
     	}
     	//TODO: DEAL;
     	//controller.save();
@@ -546,10 +546,10 @@ public class Chatterbox extends FramedForm implements CommandListener{
     		}
     		controller.stepToNextEvent();
     	} else {
-    		int status = controller.questionAnswered(this.model.getCurrentFormIndex(), frame.getData());
-	    	if (status == FormEntryController.QUESTION_REQUIRED_BUT_EMPTY) {
+    		int status = controller.answerQuestion(this.model.getCurrentFormIndex(), frame.getData());
+	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
 	        	J2MEDisplay.showError(null, PROMPT_REQUIRED_QUESTION);
-	    	} else if (status == FormEntryController.QUESTION_CONSTRAINT_VIOLATED) {
+	    	} else if (status == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
 	    		String msg = model.getQuestionPrompt().getConstraintText();
 	    		J2MEDisplay.showError(null, msg != null ? msg : PROMPT_DEFAULT_CONSTRAINT_VIOL);
 	     	}
