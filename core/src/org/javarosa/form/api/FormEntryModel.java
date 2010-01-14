@@ -157,9 +157,9 @@ public class FormEntryModel {
     	while(index != null) {
     		//Get the new caption prompt
     		//String title = this.get(index);
-    		if(title != null) {
-    			tempStrings.add(title);
-    		}
+    		//if(title != null) {
+    		//	tempStrings.add(title);
+    		//}
     	}
     	String[] output = new String[tempStrings.size()];
     	tempStrings.toArray(output);
@@ -202,10 +202,8 @@ public class FormEntryModel {
 
         if (relevant) { // if instance flag/condition says relevant, we still
             // have to check the <group>/<repeat> hierarchy
-            FormIndex ancestorIndex = questionIndex;
+            FormIndex ancestorIndex = questionIndex.getNextLevel();
             while(ancestorIndex != null) {
-            	ancestorIndex = ancestorIndex.getNextLevel();
-
             	//This should be safe now that the TreeReference is contained in the ancestor index itself
                 TreeElement ancestorNode = form.getDataModel().resolveReference(ancestorIndex.getReference());
                 
@@ -213,6 +211,7 @@ public class FormEntryModel {
                     relevant = false;
                     break;
                 }
+            	ancestorIndex = ancestorIndex.getNextLevel();
             }
         }
 
