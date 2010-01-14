@@ -46,4 +46,12 @@ public class FormEntryCaption {
 	public String substituteStringArgs(String templateStr) {
 		return form.fillTemplateString(templateStr, index.getReference());
 	}
+	
+	public int getMultiplicity() {
+	    return index.getElementMultiplicity();
+	}
+	
+	public boolean repeats() {
+	    return groupDef == null ? false : groupDef.getRepeat();
+	}
 }
