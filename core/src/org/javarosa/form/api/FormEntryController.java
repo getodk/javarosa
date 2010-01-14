@@ -42,6 +42,10 @@ public class FormEntryController {
 		return model;
 	}
 
+	public int questionAnswered(IAnswerData data){
+		return questionAnswered(model.getCurrentFormIndex(), data);
+	}
+	
 	public int questionAnswered (FormIndex index, IAnswerData data) {
 		TreeElement element = model.getTreeElement(index);
 		if (element.required && data == null) {
