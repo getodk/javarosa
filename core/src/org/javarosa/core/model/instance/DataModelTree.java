@@ -40,6 +40,8 @@ import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
+import android.util.Log;
+
 public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 
 	public static final String STORAGE_KEY = "FORMDATA";
@@ -195,10 +197,13 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 	// ref is '/'
 	// can be used to retrieve template nodes
 	public TreeElement resolveReference(TreeReference ref) {
-		if (!ref.isAbsolute())
+		if (!ref.isAbsolute()){
+		    Log.e("carl", "returning null because no absolute");
 			return null;
+		}
 
 		TreeElement node = root;
+		Log.e("Carl", "ref size = " + ref.size());
 		for (int i = 0; i < ref.size(); i++) {
 			String name = ref.getName(i);
 			int mult = ref.getMultiplicity(i);
@@ -206,6 +211,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 				if (node.getChildMultiplicity(name) == 1) {
 					mult = 0;
 				} else {
+				    Log.e("carl", "returning null because reference is not ambiguous");
 					// reference is not unambiguous
 					node = null;
 					break;
@@ -216,6 +222,9 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 			if (node == null)
 				break;
 		}
+		if (node == root)
+		    Log.e("carl", "returning null because we're at root");
+		
 		return (node == root ? null : node); // never return a reference to '/'
 	}
 

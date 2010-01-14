@@ -105,7 +105,10 @@ public class FormEntryController {
 			} else {
 				index = model.getForm().decrementIndex(index);
 			}
-			//System.out.println("Question Index: " + index.toString() + " relevancy is: " + model.isRelevant(index));
+			if (index.isInForm()) {
+			    System.out.println("Question Index: " + index.toString());
+			    //+ " relevancy is: " + model.isRelevant(index));
+			}
 		} while (index.isInForm() && !model.isRelevant(index));
 	
 		return jumpToIndex(index);
