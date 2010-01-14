@@ -20,45 +20,44 @@ import java.util.Date;
 
 import javax.microedition.lcdui.DateField;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.TimeData;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
 public class TimeQuestionScreen extends SingleQuestionScreen {
 	protected DateField timePicker;
 
-	public TimeQuestionScreen(FormElementBinding qDef,  Style style) {
-		super(qDef,  style);
+	public TimeQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+		super(prompt,groupName,style);
 	}
 
 	public void createView() {
 		// #style textBox
-		timePicker = new DateField(((QuestionDef) qDef.element).getShortText(),
+		timePicker = new DateField(prompt.getShortText(),
 				DateField.TIME);
 		// set question
-		if (qDef.instanceNode.required)
+		if (prompt.isRequired())
 			timePicker.setLabel("*"
-					+ ((QuestionDef) qDef.element).getLongText()); // visual
+					+ prompt.getLongText()); // visual
 																	// symbol
 																	// for
 																	// required
 		else
-			timePicker.setLabel(((QuestionDef) qDef.element).getLongText());
+			timePicker.setLabel(prompt.getLongText());
 
 		// check if the field has already been filled in by default value- if so
 		// display value
-		IAnswerData answer = qDef.instanceNode.getValue();
+		IAnswerData answer = prompt.getAnswerValue();
 		if ((answer != null) && (answer instanceof TimeData)) {
 			timePicker.setDate((Date) (((TimeData) answer).getValue()));
 		}
 
 		this.append(timePicker);
-		this.addNavigationButtons();
-		if (((QuestionDef) qDef.element).getHelpText() != null) {
-			setHint(((QuestionDef) qDef.element).getHelpText());
+		this.addNavigationWidgets();
+		if (prompt.getHelpText() != null) {
+			setHint(prompt.getHelpText());
 		}
 	}
 
