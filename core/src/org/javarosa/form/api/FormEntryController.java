@@ -76,7 +76,7 @@ public class FormEntryController {
 	       commitAnswer(element, index, data);
 	}
 
-	//TODO: constraint isn't checked here, meaning if you 'save' on a question with invalid data entered in, that data will save
+	// constraint isn't checked here, meaning if you 'save' on a question with invalid data entered in, that data will save
 	//without complaint... seems wrong (but oh-so right?)
 	private boolean commitAnswer (TreeElement element, FormIndex index,IAnswerData data) {
 		if (data != null || element.getValue() != null) {
