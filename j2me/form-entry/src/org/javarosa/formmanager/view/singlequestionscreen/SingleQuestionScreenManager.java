@@ -28,6 +28,7 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.NewRepeatScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -48,6 +49,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	private SingleQuestionScreen currentQuestionScreen;
 	private boolean goingForward;
 	private FormViewScreen formView;
+	private NewRepeatScreen newRepeatScreen;
 
 	// GUI elements
 	public SingleQuestionScreenManager(String formTitle,
@@ -117,6 +119,14 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	public void commandAction(Command command, Displayable arg1) {
 		if (arg1 == formView) {
 			formViewCommands(command);
+		} else if (arg1 == newRepeatScreen){
+			if (command.getLabel() == org.javarosa.core.api.Constants.ACTIVITY_COMPLETE){
+				controller.newRepeat(model.getCurrentFormIndex());
+				refreshView();
+			} else {
+				int event = controller.stepToNextEvent();
+				processModelEvent(event);
+			}
 		} else {
 			if (command == SingleQuestionScreen.nextItemCommand
 					|| command == SingleQuestionScreen.nextCommand) {
@@ -196,10 +206,11 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 			viewAnswers();
 			break;
 		case FormEntryController.REPEAT_EVENT:
-			// TODO
+			nextEvent = goingForward ? controller.stepToNextEvent()
+					: controller.stepToPreviousEvent();
 			break;
 		case FormEntryController.PROMPT_NEW_REPEAT_EVENT:
-			// TODO
+			promptForNewRepeat();
 			break;
 		case FormEntryController.GROUP_EVENT:
 			nextEvent = goingForward ? controller.stepToNextEvent()
@@ -215,16 +226,19 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 			processModelEvent(nextEvent);
 	}
 
+	private void promptForNewRepeat() {
+		newRepeatScreen = new NewRepeatScreen();
+		newRepeatScreen.setCommandListener(this);
+		controller.setView(newRepeatScreen);
+	}
+
 	private void formViewCommands(Command command) {
 		if (command == FormViewScreen.backCommand) {
 			this.show();
 		} else if (command == FormViewScreen.exitNoSaveCommand) {
-			// TODO: FIXME
-			// controller.exit();
+			 controller.abort();
 		} else if (command == FormViewScreen.exitSaveCommand) {
-			// TODO: FIXME
-			// controller.save();
-			// controller.exit();
+			 controller.saveAndExit();
 		} else if (command == FormViewScreen.sendCommand) {
 			int counter = countUnansweredQuestions(true);
 			if (counter > 0) {
