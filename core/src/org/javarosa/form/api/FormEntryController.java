@@ -46,6 +46,12 @@ public class FormEntryController {
 		return questionAnswered(model.getCurrentFormIndex(), data);
 	}
 	
+	/**
+	 * Attempts to save the current answer into the datamodel.
+	 * @param index
+	 * @param data
+	 * @return OK if save was successful, error if a constraint was violated.
+	 */
 	public int questionAnswered (FormIndex index, IAnswerData data) {
 		TreeElement element = model.getTreeElement(index);
 		if (element.required && data == null) {
@@ -56,6 +62,18 @@ public class FormEntryController {
 			commitAnswer(element, index, data);
 			return QUESTION_OK;
 		}
+	}
+	
+	/**
+	 * saveAnswer saves the current answer into the data model without doing any constraint checking.  
+	 * Only use this if you know what you're doing.  For normal form filling you should always
+	 * use questionAnswered.
+	 * @param index
+	 * @param data
+	 */
+	public void saveAnswer (FormIndex index, IAnswerData data) {
+	       TreeElement element = model.getTreeElement(index);
+	       commitAnswer(element, index, data);
 	}
 
 	//TODO: constraint isn't checked here, meaning if you 'save' on a question with invalid data entered in, that data will save
