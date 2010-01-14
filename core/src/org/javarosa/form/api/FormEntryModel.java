@@ -183,7 +183,10 @@ public class FormEntryModel {
 			FormIndex localIndex = index.diff(remaining);
 			IFormElement element = form.getChild(localIndex);
 			if (!(element instanceof FormDef)) {
-				captions.add(new FormEntryCaption(getForm(), localIndex));
+				FormEntryCaption caption = new FormEntryCaption(getForm(), localIndex);
+				if(caption != null) {
+					captions.add(caption);
+				}
 			}
 		}
 		FormEntryCaption[] captionArray = new FormEntryCaption[captions.size()];
