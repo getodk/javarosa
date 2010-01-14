@@ -20,41 +20,40 @@ import java.util.Date;
 
 import javax.microedition.lcdui.DateField;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
 public class DateQuestionScreen extends SingleQuestionScreen {
 	protected DateField datePicker;
 
-	public DateQuestionScreen(FormElementBinding qDef,  Style style) {
-		super(qDef,  style);
+	public DateQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+		super(prompt,groupName,style);
 	}
 
 	public void createView() {
 		// #style textBox
-		datePicker = new DateField(((QuestionDef) qDef.element).getShortText(),
+		datePicker = new DateField(prompt.getShortText(),
 				DateField.DATE);
 		// set question
-		if (qDef.instanceNode.required)
+		if (prompt.isRequired())
 			datePicker.setLabel("*"
-					+ ((QuestionDef) qDef.element).getLongText());
+					+ prompt.getLongText());
 		else
-			datePicker.setLabel(((QuestionDef) qDef.element).getLongText());
+			datePicker.setLabel(prompt.getLongText());
 
 		// check if the field has already been filled in by default value- if so
 		// display value
-		IAnswerData answer = qDef.instanceNode.getValue();
+		IAnswerData answer = prompt.getAnswerValue();
 		if ((answer != null) && (answer instanceof DateData)) {
 			datePicker.setDate((Date) (((DateData) answer).getValue()));
 		}
 		this.append(datePicker);
-		this.addNavigationButtons();
-		if (((QuestionDef) qDef.element).getHelpText() != null) {
-			setHint(((QuestionDef) qDef.element).getHelpText());
+		this.addNavigationWidgets();
+		if (prompt.getHelpText() != null) {
+			setHint(prompt.getHelpText());
 		}
 	}
 

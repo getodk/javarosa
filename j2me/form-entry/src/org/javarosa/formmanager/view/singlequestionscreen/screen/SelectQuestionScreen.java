@@ -25,31 +25,30 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
 public class SelectQuestionScreen extends SingleQuestionScreen {
 	ChoiceGroup cg;
 
-	public SelectQuestionScreen(FormElementBinding qDef, Style style) {
-		super(qDef, style);
+	public SelectQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+		super(prompt,groupName,style);
 	}
 
 	public void createView() {
-		if (qDef.instanceNode.required) {
+		if (prompt.isRequired()) {
 			// #style choiceGroup
 			cg = new ChoiceGroup("*"
-					+ ((QuestionDef) qDef.element).getLongText(),
+					+ prompt.getLongText(),
 					ChoiceGroup.MULTIPLE);
 		} else {
 			// #style choiceGroup
-			cg = new ChoiceGroup(((QuestionDef) qDef.element).getLongText(),
+			cg = new ChoiceGroup(prompt.getLongText(),
 					ChoiceGroup.MULTIPLE);
 		}
-		Enumeration itr = ((QuestionDef) qDef.element).getSelectItems().keys();// access
-																				// choices
-																				// directly
+		Enumeration itr = (prompt.getSelectItems().keys());
+		
 		int i = 0;
 		while (itr.hasMoreElements()) {
 			String label = (String) itr.nextElement();
@@ -57,9 +56,9 @@ public class SelectQuestionScreen extends SingleQuestionScreen {
 			i++;
 		}
 		this.append(cg);
-		this.addNavigationButtons();
-		if (((QuestionDef) qDef.element).getHelpText() != null) {
-			setHint(((QuestionDef) qDef.element).getHelpText());
+		this.addNavigationWidgets();
+		if (prompt.getHelpText() != null) {
+			setHint(prompt.getHelpText());
 		}
 	}
 
@@ -68,10 +67,9 @@ public class SelectQuestionScreen extends SingleQuestionScreen {
 
 		for (int i = 0; i < cg.size(); i++) {
 			if (cg.isSelected(i)) {
-				QuestionDef q = (QuestionDef) qDef.element;
-				Selection s = new Selection((String) q.getSelectItemIDs()
-						.elementAt(i));
-				s.attachQuestionDef(q);
+
+				Selection s = new Selection((String) prompt.getSelectItems().elementAt(i));
+				
 				vs.addElement(s);
 			}
 		}
