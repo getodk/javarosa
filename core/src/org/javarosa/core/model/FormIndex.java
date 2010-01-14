@@ -158,6 +158,14 @@ public class FormIndex {
 	public int getInstanceIndex() {
 		return instanceIndex;
 	}
+	
+	/**
+	 * For the fully qualified element, get the multiplicity of the element's reference
+	 * @return The terminal element (fully qualified)'s instance index
+	 */
+	public int getElementMultiplicity() {
+		return getTerminal().instanceIndex;
+	}
 
 	/**
 	 * @return An index into the next level of specificity past the current context. An
@@ -177,11 +185,15 @@ public class FormIndex {
 	 * FormIndex.
 	 */
 	public TreeReference getReference() {
+		return getTerminal().reference;
+	}
+	
+	public FormIndex getTerminal() {
 		FormIndex walker = this;
 		while(walker.nextLevel != null) {
 			walker = walker.nextLevel;
 		}
-		return walker.reference;
+		return walker;
 	}
 	
 	/**
