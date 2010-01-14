@@ -92,7 +92,7 @@ public class FormEntryController {
 		return stepEvent(true);
 	}
 	
-	public int stepPreviousEvent () {
+	public int stepToPreviousEvent () {
 		return stepEvent(false);
 	}
 	

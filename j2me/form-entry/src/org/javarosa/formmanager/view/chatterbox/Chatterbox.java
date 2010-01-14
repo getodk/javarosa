@@ -235,7 +235,7 @@ public class Chatterbox extends FramedForm implements CommandListener{
     				if(forwards) {
     					controller.stepToNextEvent();
     				} else {
-    					controller.stepPreviousEvent();
+    					controller.stepToPreviousEvent();
     				}
     				return;
     			} else {
@@ -252,7 +252,7 @@ public class Chatterbox extends FramedForm implements CommandListener{
     			if(forwards) {
 					controller.stepToNextEvent();
 				} else {
-					controller.stepPreviousEvent();
+					controller.stepToPreviousEvent();
 				}
     			return;
     		}
@@ -261,7 +261,7 @@ public class Chatterbox extends FramedForm implements CommandListener{
 			if(forwards) {
 				controller.stepToNextEvent();
 			} else {
-				controller.stepPreviousEvent();
+				controller.stepToPreviousEvent();
 			}
 			return;
     	}
@@ -476,7 +476,7 @@ public class Chatterbox extends FramedForm implements CommandListener{
     	
     	if (command == backCommand) {
     		System.out.println("back");
-    		controller.stepPreviousEvent();
+    		controller.stepToPreviousEvent();
     	} else if (command == exitNoSaveCommand) {
     		//TODO: EXIT?
     		//controller.exit();
