@@ -161,6 +161,19 @@ public class FormEntryModel {
     public FormDef getForm() {
         return form;
     }
+    
+    public String[] getCaptionHeirarchy(FormIndex index) {
+    	Vector tempStrings = new Vector();
+    	while(index != null) {
+    		String title = getEventTitle(index);
+    		if(title != null) {
+    			tempStrings.add(title);
+    		}
+    	}
+    	String[] output = new String[tempStrings.size()];
+    	tempStrings.toArray(output);
+    	return output;
+    }
 
     
     /**

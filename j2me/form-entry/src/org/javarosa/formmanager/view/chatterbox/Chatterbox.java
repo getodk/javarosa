@@ -381,7 +381,7 @@ public class Chatterbox extends FramedForm implements CommandListener{
     		return;
     	
     	if (expanded && newRepeat) {
-    		cw = widgetFactory.getNewRepeatWidget(questionIndex, model.getForm(), this);
+    		cw = widgetFactory.getNewRepeatWidget(questionIndex, model, this);
     		activeIsInterstitial = true;
     	} else if (model.getForm().explodeIndex(questionIndex).lastElement() instanceof GroupDef) {
     		//do nothing
