@@ -157,7 +157,7 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 				return retStyle; 
 			}
 		};
-		for (int i = 0; i < question.getSelectItems().size(); i++){
+		for (int i = 0; i < prompt.getSelectChoices().size(); i++){
 			cg.append("", null);
 		}
 		
@@ -173,7 +173,7 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 
 	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
-			choiceGroup().getItem(i).setText((String)question.getSelectItems().keyAt(i));
+			choiceGroup().getItem(i).setText(prompt.getSelectChoices().elementAt(i).getCaption());
 		}
 	}
 }

@@ -733,8 +733,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setChildren((Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 
-		model = (DataModelTree) ExtUtil.read(dis, DataModelTree.class, pf);
-		model.setFormId(getID());
+		setDataModel((DataModelTree) ExtUtil.read(dis, DataModelTree.class, pf));
 
 		setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
 
@@ -757,8 +756,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 *            false if it is using an existing IDataModel
 	 */
 	public void initialize(boolean newInstance) {
-		fixSelectQuestionDeserialization();
-
 		if (newInstance) {// only preload new forms (we may have to revisit
 			// this)
 			preloadModel(model.getRoot());
@@ -768,58 +765,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 		if (getLocalizer() != null && getLocalizer().getLocale() == null) {
 			getLocalizer().setToDefault();
-		}
-	}
-
-	private void fixSelectQuestionDeserialization() {
-		Hashtable questionMapping = new Hashtable();
-		genSelectQuestionMapping(this, questionMapping);
-		fixSelectQuestionDeserialization(model.getRoot(), questionMapping);
-	}
-
-	private void fixSelectQuestionDeserialization(TreeElement node,
-			Hashtable questionMapping) {
-		IAnswerData data = node.getValue();
-		if (data == null) {
-			for (int i = 0; i < node.getNumChildren(); i++)
-				fixSelectQuestionDeserialization((TreeElement) node
-						.getChildren().elementAt(i), questionMapping);
-		} else if (data instanceof SelectOneData
-				|| data instanceof SelectMultiData) {
-			Vector selections;
-			if (data instanceof SelectOneData) {
-				selections = new Vector();
-				selections.addElement((Selection) data.getValue());
-			} else {
-				selections = (Vector) data.getValue();
-			}
-
-			for (int i = 0; i < selections.size(); i++) {
-				Selection s = (Selection) selections.elementAt(i);
-
-				int qID = s.qID;
-				QuestionDef properQ = (QuestionDef) questionMapping
-						.get(new Integer(qID));
-				if (properQ == null) {
-					throw new RuntimeException(
-							"Error: cannot find referenced question def for select answer data");
-				}
-				s.question = properQ;
-			}
-		}
-	}
-
-	private void genSelectQuestionMapping(IFormElement fe, Hashtable mapping) {
-		if (fe instanceof QuestionDef) {
-			QuestionDef q = (QuestionDef) fe;
-			if (q.getControlType() == Constants.CONTROL_SELECT_ONE
-					|| q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
-				mapping.put(new Integer(q.getID()), q);
-			}
-		} else {
-			for (int i = 0; i < fe.getChildren().size(); i++) {
-				genSelectQuestionMapping(fe.getChild(i), mapping);
-			}
 		}
 	}
 
@@ -1152,7 +1097,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 
 	public void setDataModel(IFormDataModel model) {
-		this.model = (DataModelTree) model;
+		if (getID() != model.getFormId()) {
+			System.err.println("Warning: assinging incompatible model (type " + model.getFormId() + ") to a formdef (type " + getID() + ")");
+		}
+		
+		model.setFormId(getID());
+		this.model = (DataModelTree)model;
+		attachControlsToInstanceData();
 	}
 
 	public Vector getOutputFragments() {
@@ -1185,5 +1136,58 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public String[] getMetaDataFields() {
 		return new String[] {"DESCRIPTOR","XMLNS"};
 	}
-	
+
+	/**
+	 * Link a deserialized instance back up with its parent FormDef. this allows select/select1 questions to be
+	 * internationalizable in chatterbox, and (if using CHOICE_INDEX mode) allows the instance to be serialized
+	 * to xml
+	 */
+	public void attachControlsToInstanceData () {
+		TreeElement root = model.getRoot();
+		attachControlsToInstanceData(root, TreeReference.initRef(root));
+	}
+		
+	private void attachControlsToInstanceData (TreeElement node, TreeReference ref) {
+		for (int i = 0; i < node.getNumChildren(); i++) {
+			TreeElement child = (TreeElement)node.getChildren().elementAt(i);
+			attachControlsToInstanceData(child, ref.extendRef(child.getName(), TreeReference.INDEX_UNBOUND));
+		}
+		
+		IAnswerData val = node.getValue();
+		Vector selections = null;
+		if (val instanceof SelectOneData) {
+			selections = new Vector();
+			selections.addElement(val.getValue());
+		} else if (val instanceof SelectMultiData) {
+			selections = (Vector)val.getValue();
+		}
+			
+		if (selections != null) {
+			QuestionDef q = findQuestionByRef(ref, this);
+			if (q == null) {
+				throw new RuntimeException("FormDef.attachControlsToInstanceData: can't find question to link");
+			}
+			
+			for (int i = 0; i < selections.size(); i++) {
+				Selection s = (Selection)selections.elementAt(i);
+				s.attachChoice(q);
+			}
+		}
+	}
+		
+	private static QuestionDef findQuestionByRef (TreeReference ref, IFormElement fe) {
+		if (fe instanceof QuestionDef) {
+			QuestionDef q = (QuestionDef)fe;
+			TreeReference bind = (TreeReference)q.getBind().getReference();
+			return (ref.equals(bind) ? q : null);
+		} else {
+			for (int i = 0; i < fe.getChildren().size(); i++) {
+				QuestionDef ret = findQuestionByRef(ref, fe.getChild(i));
+				if (ret != null)
+					return ret;
+			}
+			return null;
+		}
+	}
+
 }

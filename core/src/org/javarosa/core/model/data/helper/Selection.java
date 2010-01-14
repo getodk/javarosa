@@ -21,6 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
@@ -30,21 +31,34 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * A response to a question requesting a selection
  * from a list. 
  * 
+ * This class may exist in 3 states:
+ *
+ * 1) only index has a value
+ * 2) only xmlValue has a value
+ * 3) index, xmlValue, and choice have values, where index and xmlValue are simply cached copies of the values in 'choice'
+ * 
+ * the 3rd form is the most full-featured, and is required for situations where you want to recover the captions for the
+ * choices, such as form entry. the choice objects used in the form entry model will receive localization updates,
+ * allowing you to retrieve the appropriate caption.
+ * 
+ * the 2nd form is useful when dealing with DataModelTrees without having to worry about the FormDef or the captions
+ * from the <select> or <select1> controls. this form contains enough information to convert to an XML instance
+ * 
+ * the 1st form is used when serializing data-models in an ultra-compact manner, but requires linking to a FormDef before
+ * you can do anything useful with the data model (insufficient info to convert to XML instance).
+ * 
  * @author Drew Roos
  *
  */
 public class Selection implements Externalizable {
 	public String xmlValue = null;
-	
-	/* we need the questiondef to fetch natural-language captions for the selected choice
-	 * we can't hold a reference directly to the caption hashtable, as it's wiped out and
-	 * recreated every locale change
-	 * we don't serialize the questiondef, as it's huge, and unneeded outside of a formdef;
-	 * it is restored as a post-processing step during formdef deserialization
-	 */
-	public QuestionDef question = null; 	
-	public int qID = -1;
 	public int index = -1;
+	
+	/* in order to get localizable captions for this selection, the choice object must be the
+	 * same object in the form model, or else it won't receive localization updates from form
+	 * entry session
+	 */
+	public SelectChoice choice;
 	
 	/**
 	 * for deserialization
@@ -52,46 +66,56 @@ public class Selection implements Externalizable {
 	public Selection() {
 		
 	}
-
-//	//won't 'question' now always be null?
-//	if (question != null) {
-//		//don't think setting these is strictly necessary, setting them only on deserialization is probably enough
-//		this.qID = question.getID();
-//		this.xmlValue = getValue();
-//	} //if question is null, these had better be set manually afterward!
+	
+	public Selection (SelectChoice choice) {
+		attachChoice(choice);
+		
+	}
 	
 	public Selection (String xmlValue) {
 		this.xmlValue = xmlValue;		
 	}
 	
+	public Selection (int index) {
+		this.index = index;
+	}
+	
 	public Selection clone () {
-		Selection s = new Selection(xmlValue);
-		
-		s.question = question;
-		s.qID = qID;
+		Selection s = new Selection();
+		s.choice = choice;
+		s.xmlValue = xmlValue;
 		s.index = index;
-		
+
 		return s;
 	}
 	
-	public void attachQuestionDef(QuestionDef q) {
-		this.question = q;
-		this.qID = q.getID();
+	public void attachChoice (SelectChoice choice) {
+		this.choice = choice;
+		this.xmlValue = choice.getValue();
+		this.index = choice.getIndex();
+	}
 		
-		if (xmlValue != null && xmlValue.length() > 0) {
-			index =  q.getSelectedItemIndex(xmlValue); 			
-		} else if (index != -1) {
-			xmlValue = (String)q.getSelectItemIDs().elementAt(index);
+	public void attachChoice (QuestionDef q) {
+		SelectChoice choice = null;
+		
+		if (index != -1 && index < q.getNumChoices()) {
+			choice = q.getChoice(index);
+		} else if (xmlValue != null && xmlValue.length() > 0) {
+			choice = q.getChoiceForValue(xmlValue);
+		}
+		
+		if (choice != null) {
+			attachChoice(choice);
 		} else {
-			throw new RuntimeException("insufficient data in selection");
+			throw new RuntimeException("insufficient data in selection to reconstruct");
 		}
 	}
 	
 	public String getText () {
-		if (question != null) {
-			return (String)question.getSelectItems().keyAt(index);
+		if (choice != null) {
+			return choice.getCaption();
 		} else {
-			System.err.println("Warning!! Calling Selection.getText() when QuestionDef not set!");
+			System.err.println("Warning!! Calling Selection.getText() when Choice object not linked!");
 			return "[cannot access choice caption]";
 		}
 	}
@@ -109,8 +133,6 @@ public class Selection implements Externalizable {
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		xmlValue = ExtUtil.readString(in);
-		
-		qID = ExtUtil.readInt(in);
 		index = ExtUtil.readInt(in);
 	}
  
@@ -119,8 +141,6 @@ public class Selection implements Externalizable {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeString(out, getValue());
-		
-		ExtUtil.writeNumeric(out, qID);
 		ExtUtil.writeNumeric(out, index);
 	}
 }

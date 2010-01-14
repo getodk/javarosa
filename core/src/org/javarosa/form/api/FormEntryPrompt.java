@@ -18,9 +18,9 @@ package org.javarosa.form.api;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.util.OrderedHashtable;
 
 public class FormEntryPrompt extends FormEntryCaption {
 
@@ -56,8 +56,10 @@ public class FormEntryPrompt extends FormEntryCaption {
         return mTreeElement.getConstraint().constraintMsg;
     }
 
-    public OrderedHashtable getSelectItems() {
-        return getQuestionDef().getSelectItems();
+    }
+    
+    public Vector<SelectChoice> getSelectChoices() {
+        return mQuestionDef.getChoices();
     }
  
     public String getHelpText() {

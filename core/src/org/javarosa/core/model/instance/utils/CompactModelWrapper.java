@@ -123,7 +123,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 		//formID, name, schema, versions, and namespaces are all invariants of the template model
 		
 		TreeElement root = model.getRoot();
-		readTreeElement(root, initRef(root), in, pf);
+		readTreeElement(root, TreeReference.initRef(root), in, pf);
 	}
 	
 	/**
@@ -139,7 +139,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 		ExtUtil.write(out, new ExtWrapNullable(model.getDateSaved()));
 				
 		TreeElement root = model.getRoot();
-		writeTreeElement(out, root, initRef(root));
+		writeTreeElement(out, root, TreeReference.initRef(root));
 	}
 	
 	private DataModelTree getTemplateModel (int formID) {
@@ -166,30 +166,6 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	}
 	
 	/**
-	 * create the tree reference for the data model root node
-	 * @param root
-	 * @return
-	 */
-	private static TreeReference initRef (TreeElement root) {
-		TreeReference rootRef = TreeReference.rootRef();
-		rootRef.add(root.getName(), 0);
-		return rootRef;
-	}
-	
-	/**
-	 * clone and extend a reference by one level
-	 * @param ref
-	 * @param name
-	 * @param mult
-	 * @return
-	 */
-	private static TreeReference extendRef (TreeReference ref, String name, int mult) {
-		TreeReference childRef = ref.clone();
-		childRef.add(name, mult);
-		return childRef;
-	}
-
-	/**
 	 * recursively read in a node of the instance, by filling out the template model
 	 * @param e
 	 * @param ref
@@ -214,7 +190,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 			for (int i = 0; i < childTypes.size(); i++) {
 				String childName = (String)childTypes.elementAt(i);
 					
-				TreeReference childTemplRef = extendRef(ref, childName, 0);
+				TreeReference childTemplRef = ref.extendRef(childName, 0);
 				TreeElement childTempl = model.getTemplatePath(childTemplRef);
 				
 				boolean repeatable = childTempl.repeatable;
@@ -232,7 +208,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 					}
 					
 					for (int j = 0; j < n; j++) {
-						TreeReference dstRef = extendRef(ref, childName, j);
+						TreeReference dstRef = ref.extendRef(childName, j);
 						model.copyNode(childTempl, dstRef);
 						
 						TreeElement child = e.getChild(childName, j);
@@ -243,7 +219,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 					TreeElement child = e.getChild(childName, 0);
 					child.setRelevant(relevant);
 					if (relevant) {
-						readTreeElement(child, extendRef(ref, childName, 0), in, pf);
+						readTreeElement(child, ref.extendRef(childName, 0), in, pf);
 					}
 				}
 			}
@@ -277,7 +253,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 					
 					ExtUtil.writeNumeric(out, mult);
 					for (int j = 0; j < mult; j++) {
-						writeTreeElement(out, e.getChild(childName, j), extendRef(ref, childName, j));
+						writeTreeElement(out, e.getChild(childName, j), ref.extendRef(childName, j));
 					}
 				}
 			}
@@ -483,62 +459,4 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 		}
 	}
 	
-	//random utility code; putting it here for now
-	
-	/**
-	 * Link a deserialized instance back up with its parent FormDef. this allows select/select1 questions to be
-	 * internationalizable in chatterbox, and (if using CHOICE_INDEX mode) allows the instance to be serialized
-	 * to xml
-	 */
-	public static void linkSelectQuestions (DataModelTree model, FormDef f) {
-		if (f.getID() != model.getFormId()) {
-			throw new RuntimeException("model is not compatible with formdef");
-		}
-		
-		TreeElement root = model.getRoot();
-		linkSelectQuestions(root, initRef(root), f);
-	}
-		
-	private static void linkSelectQuestions (TreeElement node, TreeReference ref, FormDef f) {
-		for (int i = 0; i < node.getNumChildren(); i++) {
-			TreeElement child = (TreeElement)node.getChildren().elementAt(i);
-			linkSelectQuestions(child, extendRef(ref, child.getName(), TreeReference.INDEX_UNBOUND), f);
-		}
-		
-		IAnswerData val = node.getValue();
-		Vector selections = null;
-		if (val instanceof SelectOneData) {
-			selections = new Vector();
-			selections.addElement(val.getValue());
-		} else if (val instanceof SelectMultiData) {
-			selections = (Vector)val.getValue();
-		}
-			
-		if (selections != null) {
-			QuestionDef q = findQuestionByRef(ref, f);
-			if (q == null) {
-				throw new RuntimeException("can't find question to link");
-			}
-			
-			for (int i = 0; i < selections.size(); i++) {
-				Selection s = (Selection)selections.elementAt(i);
-				s.attachQuestionDef(q);
-			}
-		}
-	}
-		
-	private static QuestionDef findQuestionByRef (TreeReference ref, IFormElement fe) {
-		if (fe instanceof QuestionDef) {
-			QuestionDef q = (QuestionDef)fe;
-			TreeReference bind = (TreeReference)q.getBind().getReference();
-			return (ref.equals(bind) ? q : null);
-		} else {
-			for (int i = 0; i < fe.getChildren().size(); i++) {
-				QuestionDef ret = findQuestionByRef(ref, fe.getChild(i));
-				if (ret != null)
-					return ret;
-			}
-			return null;
-		}
-	}
 }
