@@ -77,16 +77,6 @@ public class FormEntryModel {
         return getEvent(currentFormindex);
 	}
 
-    public String getEventTitle() {
-    	return getEventTitle(currentFormindex);
-    }
-
-    public String getEventTitle(FormIndex index) {
-    	IFormElement element = form.getChild(index);
-    	return element.getTitle();
-    }
-
-
     /**
      * 
      * @return Form title
@@ -97,8 +87,8 @@ public class FormEntryModel {
 
     
     public FormEntryPrompt getQuestionPrompt(FormIndex index) {
-    	if(form.getChild(index) instanceof QuestionDef) {    		
-    		return new FormEntryPrompt((QuestionDef)form.getChild(index), form.getDataModel().resolveReference(index.getReference()));
+    	if(form.getChild(index) instanceof QuestionDef) {
+    		return new FormEntryPrompt(form, index);
     	} else {
     		throw new RuntimeException("Invalid query for Question prompt. Non-Question object at the form index");
     	}

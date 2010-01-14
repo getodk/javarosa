@@ -47,10 +47,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class QuestionDef implements IFormElement, Localizable {
 	private int id;
-	private String name;
 	private IDataReference binding;	/** reference to a location in the model to store data in */
 	
-	//int dataType -- can we get away with storing this only in the instance node?
 	private int controlType;  /* The type of widget. eg TextInput,Slider,List etc. */
 	private String appearanceAttr;
 	
@@ -62,38 +60,27 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String helpTextID;
 
 	
-	// Clayton Sims - Jun 1, 2009 : These two elements _desperately_ need
-	// a solid description of what their arguments and function are, since
-	// they are complicit in so many bugs
 	private OrderedHashtable selectItems;  	/** String -> String */
 	private OrderedHashtable selectItemIDs;	/** String -> String */
-	
-	
 	private Vector selectItemsLocalizable;
-	
-	//this may be used in the future, but it is not the default value you're probably thinking about
-	//"these are not the default values you are looking for..."
-	//"not your mothers's default value anymore!"
-	//private IAnswerData defaultValue;
-		
+			
 	Vector observers;
 	
 	public QuestionDef () {
-		this(Constants.NULL_ID, null, Constants.DATATYPE_TEXT);
+		this(Constants.NULL_ID, Constants.DATATYPE_TEXT);
 	}
 	
-	public QuestionDef (int id, String name, int controlType) {
+	public QuestionDef (int id, int controlType) {
 		setID(id);
-		setTitle(name);
 		setControlType(controlType);
 		observers = new Vector();
 	}
 		
+	//is this function necessary?
 	public boolean equals (Object o) {
 		if (o instanceof QuestionDef) {
 			QuestionDef q = (QuestionDef)o;
 			return (id == q.id &&
-					ExtUtil.equals(name, q.name) &&
 					ExtUtil.equals(binding, q.binding) &&
 					controlType == q.controlType &&
 					ExtUtil.equals(appearanceAttr, q.appearanceAttr) &&
@@ -120,14 +107,6 @@ public class QuestionDef implements IFormElement, Localizable {
 		this.id = id;
 	}
 	
-	public String getTitle() {
-		return name;
-	}
-	
-	public void setTitle(String name) {
-		this.name = name;
-	}
-
 	public IDataReference getBind() {
 		return binding;
 	}
@@ -160,6 +139,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		this.longText = longText;
 	}
 
+	//not used during normal usage
     public String getLongTextID () {
         return longTextID;
     }
@@ -179,6 +159,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		this.shortText = shortText;
 	}
 
+	//not used during normal usage
     public String getShortTextID () {
         return shortTextID;
     }
@@ -331,7 +312,6 @@ public class QuestionDef implements IFormElement, Localizable {
 	 */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
-		setTitle((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
@@ -359,7 +339,6 @@ public class QuestionDef implements IFormElement, Localizable {
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		ExtUtil.writeNumeric(dos, getID());
-		ExtUtil.write(dos, new ExtWrapNullable(getTitle()));
 		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
 		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));

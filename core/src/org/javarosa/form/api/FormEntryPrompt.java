@@ -16,6 +16,8 @@
 
 package org.javarosa.form.api;
 
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
@@ -23,9 +25,18 @@ import org.javarosa.core.util.OrderedHashtable;
 
 public class FormEntryPrompt {
 
+	FormDef form;
+	FormIndex index;
     QuestionDef mQuestionDef;
     TreeElement mTreeElement;
 
+    public FormEntryPrompt(FormDef form, FormIndex index) {
+    	this.form = form;
+    	this.index = index;
+    	this.mQuestionDef = (QuestionDef)form.getChild(index);
+    	this.mTreeElement = form.getDataModel().resolveReference(index.getReference());
+    }
+    
     public FormEntryPrompt(QuestionDef mQuestionDef, TreeElement mTreeElement) {
         this.mTreeElement = mTreeElement;
         this.mQuestionDef = mQuestionDef;
@@ -57,7 +68,7 @@ public class FormEntryPrompt {
     }
 
     public String getLongText() {
-        return mQuestionDef.getLongText();
+        return substituteStringArgs(mQuestionDef.getLongText());
     }
     
     public OrderedHashtable getSelectItems() {
@@ -65,7 +76,7 @@ public class FormEntryPrompt {
     }
  
     public String getShortText() {
-        return mQuestionDef.getShortText();
+    	return substituteStringArgs(mQuestionDef.getShortText());
     }
     
     public String getHelpText() {
@@ -80,5 +91,8 @@ public class FormEntryPrompt {
         return !mTreeElement.isEnabled();
     }
     
+    public String substituteStringArgs (String templateStr) {
+		return form.fillTemplateString(templateStr, index.getReference());
+    }
 
 }
