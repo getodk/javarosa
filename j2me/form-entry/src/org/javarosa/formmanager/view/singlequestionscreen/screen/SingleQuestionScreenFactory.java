@@ -20,7 +20,7 @@ public class SingleQuestionScreenFactory {
 	/**
 	 * Return an appropriate SingleQuestionScreen to display the prompt
 	 * 
-	 * @param prompt
+	 * @param binding
 	 * @param fromFormView
 	 * @param goingForward
 	 *            - i.e. are we going to the next question in the form (rather

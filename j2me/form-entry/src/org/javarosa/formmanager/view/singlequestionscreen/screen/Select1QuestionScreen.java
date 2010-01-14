@@ -20,7 +20,6 @@ import java.util.Enumeration;
 
 import javax.microedition.lcdui.ChoiceGroup;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
