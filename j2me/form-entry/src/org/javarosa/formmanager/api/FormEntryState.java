@@ -14,11 +14,10 @@ import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
 public abstract class FormEntryState implements FormEntryTransitions, State {
 
 	public void start () {
-		FormEntryController controller = getController();
+		JrFormEntryController controller = getController();
 		controller.setTransitions(this);
 		controller.start();
 	}
 	
-	protected abstract FormEntryController getController ();
-
+	protected abstract JrFormEntryController getController ();
 }
