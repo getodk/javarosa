@@ -30,6 +30,7 @@ import org.javarosa.core.util.externalizable.Externalizable;
  *
  */
 public interface IFormElement extends Localizable, Externalizable {
+	
 	/**
 	 * @return The unique ID of this element
 	 */
@@ -39,9 +40,6 @@ public interface IFormElement extends Localizable, Externalizable {
 	 * @param id The new unique ID of this element
 	 */
 	void setID (int id);
-	
-	String getTitle ();
-	void setTitle (String name);
 	
 	/**
 	 * @return A vector containing any children that this element
