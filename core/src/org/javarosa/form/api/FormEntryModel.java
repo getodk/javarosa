@@ -172,7 +172,7 @@ public class FormEntryModel {
      * FormIndex
      * 
      * @param index
-     * @return list of FormEntryCaptions, FormEntryCaptions of current index
+     * @return list of FormEntryCaptions, FormEntryCaption of current index
      *         first.
      */
 	public FormEntryCaption[] getCaptionHeirarchy(FormIndex index) {

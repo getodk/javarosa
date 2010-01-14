@@ -41,4 +41,8 @@ public class JrFormEntryController extends FormEntryController {
 	public void saveAndExit() {
 		transitions.formEntrySaved(this.getModel().getForm(),this.getModel().getForm().getDataModel(),true);
 	}
+	
+	public void suspendActivity(int mediaType) {
+		transitions.suspendForMediaCapture(mediaType);
+	}
 }
