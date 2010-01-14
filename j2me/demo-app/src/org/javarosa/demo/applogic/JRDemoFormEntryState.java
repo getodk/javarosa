@@ -8,10 +8,9 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.demo.util.JRDemoFormEntryViewFactory;
 import org.javarosa.demo.util.JRDemoUtil;
+import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.CompletedFormOptionsState;
 import org.javarosa.formmanager.api.FormEntryState;
-import org.javarosa.formmanager.api.FormTransportState;
-import org.javarosa.formmanager.controller.FormEntryController;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
 

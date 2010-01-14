@@ -42,7 +42,7 @@ public class Property implements Persistable, IMetaData {
     public int recordId = -1;
    
     /** (non-Javadoc)
-     *  @see org.javarosa.core.util.externalizable.clforms.storage.Externalizable#readExternal(DataInputStream)
+     *  @see org.javarosa.core.util.externalizable.singlequestionscreen.storage.Externalizable#readExternal(DataInputStream)
      */
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException {
         String fullString = "";
@@ -82,7 +82,7 @@ public class Property implements Persistable, IMetaData {
     }
 
     /** (non-Javadoc)
-     *  @see org.javarosa.core.util.externalizable.clforms.storage.Externalizable#writeExternal(DataOutputStream)
+     *  @see org.javarosa.core.util.externalizable.singlequestionscreen.storage.Externalizable#writeExternal(DataOutputStream)
      */
     public void writeExternal(DataOutputStream out) throws IOException {
         String outputString = name;
@@ -101,7 +101,7 @@ public class Property implements Persistable, IMetaData {
     }
     
     /** (non-Javadoc)
-     *  @see org.javarosa.clforms.storage.IDRecordable#setRecordId(int)
+     *  @see org.javarosa.singlequestionscreen.storage.IDRecordable#setRecordId(int)
      */
     public void setID(int recordId) {
         this.recordId = recordId; 
