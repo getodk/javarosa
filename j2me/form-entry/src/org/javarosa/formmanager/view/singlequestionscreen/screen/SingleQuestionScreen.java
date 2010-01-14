@@ -17,10 +17,6 @@
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.ItemCommandListener;
-import javax.microedition.lcdui.StringItem;
-import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.locale.Localization;
@@ -30,7 +26,11 @@ import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
 import de.enough.polish.ui.FramedForm;
+import de.enough.polish.ui.Item;
+import de.enough.polish.ui.ItemCommandListener;
+import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
+import de.enough.polish.ui.Ticker;
 
 public abstract class SingleQuestionScreen extends FramedForm implements IFormEntryView {
 
@@ -41,6 +41,8 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 	public static Command previousCommand;
 	public static Command nextCommand;
 	public static Command viewAnswersCommand;
+	public static Command languageSubMenu;
+	public static Command[] languageCommands;
 
 	public static Command nextItemCommand = new Command(Localization
 			.get("menu.Next"), Command.ITEM, 1);
@@ -95,6 +97,19 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 			
 		}
 	}
+	
+	public void addLanguageCommands(String[] availableLocales)
+	{
+		languageSubMenu = new Command("Language", Command.SCREEN, 2);
+		addCommand(languageSubMenu);
+		
+		languageCommands = new Command[availableLocales.length];
+    	for (int i = 0; i < languageCommands.length; i++){
+    		languageCommands[i] = new Command(availableLocales[i], Command.SCREEN, 3);
+    		this.addSubCommand(languageCommands[i], languageSubMenu);
+    	}
+	}
+	
 
 	public void setItemCommandListner(ItemCommandListener itemListner) {
 		this.itemListener = itemListner;
