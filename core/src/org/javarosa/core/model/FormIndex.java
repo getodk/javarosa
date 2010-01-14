@@ -338,7 +338,7 @@ public class FormIndex {
 		if(subIndex == null) {
 			return this;
 		}
-		if(!isSubElement(this,subIndex)) {
+		if(!isSubIndex(this,subIndex)) {
 			return null;
 		}
 		if(subIndex.equals(this)) {
@@ -373,6 +373,17 @@ public class FormIndex {
 			} else {
 				return index;
 			}
+		}
+	}
+	
+	public static boolean isSubIndex(FormIndex parent, FormIndex child) {
+		if(child.equals(parent)) {
+			return true;
+		} else {
+			if(parent == null) {
+				return false;
+			}
+			return isSubIndex(parent.nextLevel, child);
 		}
 	}
 	
