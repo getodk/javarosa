@@ -247,7 +247,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 
 		setControlType(ExtUtil.readInt(dis));
-		choices = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new ExtWrapList(SelectChoice.class), pf));
+		choices = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
 		for (int i = 0; i < getNumChoices(); i++) {
 			choices.elementAt(i).setIndex(i);
 		}
