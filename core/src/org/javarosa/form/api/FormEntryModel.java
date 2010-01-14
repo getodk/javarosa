@@ -34,8 +34,7 @@ public class FormEntryModel {
 
 	// total number of questions in the form; used for progress bar
 	public int totalQuestions;
-	
-	
+
 	public FormEntryModel(FormDef form) {
 		this.form = form;
 		this.currentFormindex = FormIndex.createBeginningOfFormIndex();
@@ -87,13 +86,14 @@ public class FormEntryModel {
 		// defs.lastElement());
 		IFormElement element = form.getChild(index);
 		if (element instanceof GroupDef) {
-            if (((GroupDef) element).getRepeat()) {
-            	if(form.getDataModel().resolveReference(form.getChildInstanceRef(index)) == null){
-            		return FormEntryController.PROMPT_NEW_REPEAT_EVENT;
-            	}else {
-            		return FormEntryController.REPEAT_EVENT;
-            	}
-            } else {
+			if (((GroupDef) element).getRepeat()) {
+				if (form.getDataModel().resolveReference(
+						form.getChildInstanceRef(index)) == null) {
+					return FormEntryController.PROMPT_NEW_REPEAT_EVENT;
+				} else {
+					return FormEntryController.REPEAT_EVENT;
+				}
+			} else {
 				return FormEntryController.GROUP_EVENT;
 			}
 		} else {
@@ -112,19 +112,20 @@ public class FormEntryModel {
 		return getEvent(currentFormindex);
 	}
 
-    /**
-     * 
-     * @return Form title
-     */
-    public String getFormTitle() {
-        return form.getTitle();
-    }
+	/**
+	 * 
+	 * @return Form title
+	 */
+	public String getFormTitle() {
+		return form.getTitle();
+	}
 
-    public FormEntryPrompt getQuestionPrompt(FormIndex index) {    
-    	if(form.getChild(index) instanceof QuestionDef) {
-    		return new FormEntryPrompt(form, index);
+	public FormEntryPrompt getQuestionPrompt(FormIndex index) {
+		if (form.getChild(index) instanceof QuestionDef) {
+			return new FormEntryPrompt(form, index);
 		} else {
-			throw new RuntimeException("Invalid query for Question prompt. Non-Question object at the form index");
+			throw new RuntimeException(
+					"Invalid query for Question prompt. Non-Question object at the form index");
 		}
 	}
 
@@ -182,20 +183,26 @@ public class FormEntryModel {
 	public FormDef getForm() {
 		return form;
 	}
-    
-    public String[] getCaptionHeirarchy(FormIndex index) {
-    	Vector tempStrings = new Vector();
-    	while(index != null) {
-    		//Get the new caption prompt
-    		//String title = this.get(index);
-    		//if(title != null) {
-    		//	tempStrings.add(title);
-    		//}
-    	}
-    	String[] output = new String[tempStrings.size()];
-    	tempStrings.toArray(output);
-    	return output;
-    }
+
+	/**
+	 * Returns a hierarchical list of FormEntryCaption objects for the given
+	 * FormIndex
+	 * 
+	 * @param index
+	 * @return list of FormEntryCaptions, FormEntryCaptions of current index
+	 *         first.
+	 */
+	public Vector getCaptionHeirarchy(FormIndex index) {
+		Vector captions = new Vector();
+		while (index != null) {
+			IFormElement element = form.getChild(index);
+			if (!(element instanceof FormDef)) {
+				captions.add(new FormEntryCaption(getForm(), index));
+			}
+			index = index.getNextLevel();
+		}
+		return captions;
+	}
 
 	/**
 	 * 
@@ -205,10 +212,9 @@ public class FormEntryModel {
 		return form.getDeepChildCount();
 	}
 
-
 	public boolean isReadonly(FormIndex questionIndex) {
 		TreeReference ref = form.getChildInstanceRef(questionIndex);
-       		boolean isAskNewRepeat = getEvent(questionIndex) == FormEntryController.PROMPT_NEW_REPEAT_EVENT;
+		boolean isAskNewRepeat = getEvent(questionIndex) == FormEntryController.PROMPT_NEW_REPEAT_EVENT;
 
 		if (isAskNewRepeat) {
 			return false;
@@ -220,7 +226,7 @@ public class FormEntryModel {
 
 	public boolean isRelevant(FormIndex questionIndex) {
 		TreeReference ref = form.getChildInstanceRef(questionIndex);
-	        boolean isAskNewRepeat = getEvent(questionIndex) == FormEntryController.PROMPT_NEW_REPEAT_EVENT;
+		boolean isAskNewRepeat = getEvent(questionIndex) == FormEntryController.PROMPT_NEW_REPEAT_EVENT;
 
 		boolean relevant;
 		if (isAskNewRepeat) {
@@ -244,7 +250,7 @@ public class FormEntryModel {
 					relevant = false;
 					break;
 				}
-            	ancestorIndex = ancestorIndex.getNextLevel();
+				ancestorIndex = ancestorIndex.getNextLevel();
 			}
 		}
 

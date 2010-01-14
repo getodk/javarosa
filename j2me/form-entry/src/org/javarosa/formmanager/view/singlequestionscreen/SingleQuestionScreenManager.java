@@ -16,6 +16,8 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen;
 
+import java.util.Vector;
+
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -25,12 +27,12 @@ import javax.microedition.lcdui.List;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquiringQuestionScreen;
@@ -45,7 +47,6 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	private FormEntryController controller;
 	private FormEntryModel model;
 
-	private FormElementBinding binding;
 	private SingleQuestionScreen currentQuestionScreen;
 	private boolean goingForward;
 	private FormViewScreen formView;
@@ -59,12 +60,19 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	}
 
 	public SingleQuestionScreen getView(FormIndex qIndex, boolean fromFormView) {
-		binding = new FormElementBinding(null, qIndex, model.getForm());
-		if (((QuestionDef) binding.element).getControlType() == Constants.DATATYPE_BARCODE) {
+		FormEntryPrompt prompt = model.getQuestionPrompt(qIndex);
+		Vector captionHeirarchy = model.getCaptionHeirarchy(qIndex);
+		String groupTitle = null;
+		if (captionHeirarchy.size() > 1) {
+			FormEntryCaption caption = (FormEntryCaption) captionHeirarchy
+					.elementAt(1);
+			groupTitle = caption.getShortText();
+		}
+		if (prompt.getControlType() == Constants.DATATYPE_BARCODE) {
 			// TODO: FIXME
 			// try { // is there a service that can acquire a barcode?
 			// IAcquiringService barcodeService = (IAcquiringService) controller
-			// .getDataCaptureService("singlequestionscreen-barcode");			
+			// .getDataCaptureService("singlequestionscreen-barcode");
 			//
 			// currentQuestionScreen = SingleQuestionScreenFactory
 			// .getQuestionScreen(prompt, fromFormView, goingForward,
@@ -78,7 +86,8 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 
 		} else {
 			currentQuestionScreen = SingleQuestionScreenFactory
-					.getQuestionScreen(binding, fromFormView, goingForward);
+					.getQuestionScreen(prompt, groupTitle, fromFormView,
+							goingForward);
 		}
 
 		currentQuestionScreen.setCommandListener(this);
@@ -105,27 +114,6 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 		J2MEDisplay.setView(view);
 	}
 
-	// public void formComplete() {
-	// if (!model.isReadOnly()) {
-	// try {
-	// Thread.sleep(1000);
-	// } catch (InterruptedException ie) {
-	// }
-	//
-	// controller.save();// always save form
-	// controller.exit();
-	// }
-	// }
-
-	// public void questionIndexChanged(FormIndex questionIndex) {
-	// if (questionIndex.isInForm())
-	// getView(model.getCurrentFormIndex(), this.showFormView);// refresh
-	// // view
-	// }
-
-	public void saveStateChanged(int instanceID, boolean dirty) {
-	}
-
 	public void commandAction(Command command, Displayable arg1) {
 		if (arg1 == formView) {
 			extracted(command);
@@ -146,13 +134,14 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 							.get("view.sending.CompulsoryQuestionIncomplete");
 					J2MEDisplay.showError("Question Required", txt);
 				}
+				int event = controller.stepToNextEvent();
+				processModelEvent(event);
 			} else if (command == SingleQuestionScreen.previousCommand) {
 				this.goingForward = false;
-				controller.stepPreviousEvent();
-				refreshView();
+				int event = controller.stepToPreviousEvent();
+				processModelEvent(event);
 			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
-				controller.jumpToIndex(FormIndex.createBeginningOfFormIndex());
-				showFormViewScreen();
+				viewAnswers();
 			} else if ((arg1 instanceof AcquireScreen)) {
 				// handle additional commands for acquring screens
 				AcquireScreen source = (AcquireScreen) arg1;
@@ -173,6 +162,44 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 			}
 
 		}
+	}
+
+	private void viewAnswers() {
+		controller.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+		showFormViewScreen();
+	}
+
+	private void processModelEvent(int event) {
+		int nextEvent = -1;
+		switch (event) {
+		case FormEntryController.BEGINNING_OF_FORM_EVENT:
+			if (goingForward)
+				nextEvent = controller.stepToNextEvent();
+			else {
+				viewAnswers();
+			}
+			break;
+		case FormEntryController.END_OF_FORM_EVENT:
+			viewAnswers();
+			break;
+		case FormEntryController.REPEAT_EVENT:
+			// TODO
+			break;
+		case FormEntryController.PROMPT_NEW_REPEAT_EVENT:
+			// TODO
+			break;
+		case FormEntryController.GROUP_EVENT:
+			nextEvent = goingForward ? controller.stepToNextEvent()
+					: controller.stepToPreviousEvent();
+			break;
+		case FormEntryController.QUESTION_EVENT:
+			refreshView();
+			break;
+		default:
+			break;
+		}
+		if (nextEvent > 0)
+			processModelEvent(nextEvent);
 	}
 
 	private void extracted(Command command) {
@@ -204,8 +231,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 				this.goingForward = true;
 				refreshView();
 			} else {
-				String txt = Localization
-						.get("view.sending.FormUneditable");
+				String txt = Localization.get("view.sending.FormUneditable");
 				J2MEDisplay.showError("Cannot Edit Answers!", txt);
 			}
 		}
