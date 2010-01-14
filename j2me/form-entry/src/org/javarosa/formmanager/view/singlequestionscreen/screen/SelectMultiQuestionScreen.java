@@ -29,10 +29,10 @@ import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
-public class SelectQuestionScreen extends SingleQuestionScreen {
+public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 	ChoiceGroup cg;
 
-	public SelectQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+	public SelectMultiQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
 		super(prompt,groupName,style);
 	}
 
