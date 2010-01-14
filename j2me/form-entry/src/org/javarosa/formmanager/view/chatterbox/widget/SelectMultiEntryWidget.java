@@ -51,7 +51,7 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 	}
 	
 	protected Item getEntryWidget(FormEntryPrompt prompt) {
-		return wec.wrapEntryWidget(super.getEntryWidget(question));
+		return wec.wrapEntryWidget(super.getEntryWidget(prompt));
 	}
 	
 	public Item getInteractiveWidget() {
@@ -67,8 +67,7 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 		
 		for (int i = 0; i < choiceGroup().size(); i++) {
 			if (choiceGroup().isSelected(i)) {
-				Selection s = new Selection((String)question.getSelectItemIDs().elementAt(i));
-				s.attachQuestionDef(question);
+				Selection s = new Selection(prompt.getSelectChoices().elementAt(i));
 			
 				vs.addElement(s);
 			}

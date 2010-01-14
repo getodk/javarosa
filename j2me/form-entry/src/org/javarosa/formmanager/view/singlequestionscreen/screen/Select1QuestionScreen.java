@@ -95,8 +95,7 @@ public class Select1QuestionScreen extends SingleQuestionScreen {
 		}
 
 		QuestionDef question = (QuestionDef) qDef.element;
-		Selection s = new Selection((String) question.getSelectItemIDs()
-				.elementAt(selectedIndex));
+		Selection s = new Selection((String) question.getChoice(selectedIndex).getValue());
 		s.attachQuestionDef(question);
 
 		return (selectedIndex == -1 ? null : new SelectOneData(s));

@@ -16,12 +16,14 @@
 
 package org.javarosa.form.api;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.util.OrderedHashtable;
 
 public class FormEntryPrompt {
 
@@ -71,8 +73,8 @@ public class FormEntryPrompt {
         return substituteStringArgs(mQuestionDef.getLongText());
     }
     
-    public OrderedHashtable getSelectItems() {
-        return mQuestionDef.getSelectItems();
+    public Vector<SelectChoice> getSelectChoices() {
+        return mQuestionDef.getChoices();
     }
  
     public String getShortText() {

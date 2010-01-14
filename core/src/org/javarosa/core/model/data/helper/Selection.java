@@ -21,6 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
@@ -35,16 +36,13 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class Selection implements Externalizable {
 	public String xmlValue = null;
-	
-	/* we need the questiondef to fetch natural-language captions for the selected choice
-	 * we can't hold a reference directly to the caption hashtable, as it's wiped out and
-	 * recreated every locale change
-	 * we don't serialize the questiondef, as it's huge, and unneeded outside of a formdef;
-	 * it is restored as a post-processing step during formdef deserialization
-	 */
-	public QuestionDef question = null; 	
-	public int qID = -1;
 	public int index = -1;
+	
+	/* in order to get localizable captions for this selection, the choice object must be the
+	 * same object in the form model, or else it won't receive localization updates from form
+	 * entry session
+	 */
+	public SelectChoice choice;
 	
 	/**
 	 * for deserialization
@@ -52,13 +50,12 @@ public class Selection implements Externalizable {
 	public Selection() {
 		
 	}
-
-//	//won't 'question' now always be null?
-//	if (question != null) {
-//		//don't think setting these is strictly necessary, setting them only on deserialization is probably enough
-//		this.qID = question.getID();
-//		this.xmlValue = getValue();
-//	} //if question is null, these had better be set manually afterward!
+	
+	public Selection (SelectChoice choice) {
+		this.choice = choice;
+		this.xmlValue = choice.getValue();
+		this.index = choice.getIndex();
+	}
 	
 	public Selection (String xmlValue) {
 		this.xmlValue = xmlValue;		
@@ -66,11 +63,8 @@ public class Selection implements Externalizable {
 	
 	public Selection clone () {
 		Selection s = new Selection(xmlValue);
-		
-		s.question = question;
-		s.qID = qID;
-		s.index = index;
-		
+		s.choice = choice;
+
 		return s;
 	}
 	
@@ -88,10 +82,10 @@ public class Selection implements Externalizable {
 	}
 	
 	public String getText () {
-		if (question != null) {
-			return (String)question.getSelectItems().keyAt(index);
+		if (choice != null) {
+			return choice.getCaption();
 		} else {
-			System.err.println("Warning!! Calling Selection.getText() when QuestionDef not set!");
+			System.err.println("Warning!! Calling Selection.getText() when Choice object not linked!");
 			return "[cannot access choice caption]";
 		}
 	}

@@ -69,8 +69,7 @@ public class SelectQuestionScreen extends SingleQuestionScreen {
 		for (int i = 0; i < cg.size(); i++) {
 			if (cg.isSelected(i)) {
 				QuestionDef q = (QuestionDef) qDef.element;
-				Selection s = new Selection((String) q.getSelectItemIDs()
-						.elementAt(i));
+				Selection s = new Selection((String) q.getChoice(i).getValue());
 				s.attachQuestionDef(q);
 				vs.addElement(s);
 			}
