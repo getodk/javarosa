@@ -177,12 +177,14 @@ public class FormEntryModel {
      */
 	public FormEntryCaption[] getCaptionHeirarchy(FormIndex index) {
 		Vector captions = new Vector();
-		while (index != null) {
-			IFormElement element = form.getChild(index);
+		FormIndex remaining = index;
+		while (remaining != null) {
+			remaining = remaining.getNextLevel();
+			FormIndex localIndex = index.diff(remaining);
+			IFormElement element = form.getChild(localIndex);
 			if (!(element instanceof FormDef)) {
-				captions.add(new FormEntryCaption(getForm(), index));
+				captions.add(new FormEntryCaption(getForm(), localIndex));
 			}
-			index = index.getNextLevel();
 		}
 		FormEntryCaption[] captionArray = new FormEntryCaption[captions.size()];
 		captions.copyInto(captionArray);
