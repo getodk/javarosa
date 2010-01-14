@@ -21,9 +21,9 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 
 public class FormEntryController {
-	public static final int QUESTION_OK = 0;
-	public static final int QUESTION_REQUIRED_BUT_EMPTY = 1;
-	public static final int QUESTION_CONSTRAINT_VIOLATED = 2;
+	public static final int ANSWER_OK = 0;
+	public static final int ANSWER_REQUIRED_BUT_EMPTY = 1;
+	public static final int ANSWER_CONSTRAINT_VIOLATED = 2;
 	
 	public static final int BEGINNING_OF_FORM_EVENT = 0;
 	public static final int END_OF_FORM_EVENT = 1;
@@ -55,12 +55,12 @@ public class FormEntryController {
 	public int questionAnswered (FormIndex index, IAnswerData data) {
 		TreeElement element = model.getTreeElement(index);
 		if (element.required && data == null) {
-			return QUESTION_REQUIRED_BUT_EMPTY;
+			return ANSWER_REQUIRED_BUT_EMPTY;
 		} else if (!model.getForm().evaluateConstraint(index.getReference(), data)) {
-			return QUESTION_CONSTRAINT_VIOLATED;
+			return ANSWER_CONSTRAINT_VIOLATED;
 		} else {
 			commitAnswer(element, index, data);
-			return QUESTION_OK;
+			return ANSWER_OK;
 		}
 	}
 	
