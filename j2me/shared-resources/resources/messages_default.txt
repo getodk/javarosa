@@ -105,9 +105,12 @@ title.SavedForms=Saved Forms
 
 chatterbox.button.next=Done
 button.Next=VOLGENDE
+button.Yes=YES
+button.No=NO
 
 question.SendNow=Send data now?
 
+view.repeat.addNew=Add new repeat?
 
 view.sending.SendStatus=Send Status
 view.sending.SendingInProgress=Sending...
