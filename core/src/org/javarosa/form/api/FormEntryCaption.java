@@ -16,6 +16,7 @@ public class FormEntryCaption {
 	public FormEntryCaption(FormDef form, FormIndex index) {
 		this.form = form;
 		this.index = index;
+
 		IFormElement element = form.getChild(index);
 		if (element instanceof GroupDef){
 			this.groupDef = (GroupDef) element;
