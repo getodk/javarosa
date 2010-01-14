@@ -76,6 +76,10 @@ public class Selection implements Externalizable {
 		this.xmlValue = xmlValue;		
 	}
 	
+	public Selection (int index) {
+		this.index = index;
+	}
+	
 	public Selection clone () {
 		Selection s = new Selection();
 		s.choice = choice;

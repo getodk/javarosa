@@ -39,14 +39,7 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 		Vector vs = (Vector)o;
 		for (int i = 0; i < vs.size(); i++) {
 			Selection s = (Selection)vs.elementAt(i);
-			if(s.index == -1) {
-				s.attachQuestionDef(question);
-			}
-			if(s.index != -1) {
-				choiceGroup().setSelectedIndex(s.index, true);
-			} else {
-				System.out.println("Invalid selection for multi select widget in value. Possibly due to changes in available values do to differing submit schema or a backup/restore. Selection value is " + s.xmlValue);
-			}
+			choiceGroup().setSelectedIndex(s.index, true);
 		}
 	}
 	
