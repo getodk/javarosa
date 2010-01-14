@@ -31,6 +31,22 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * A response to a question requesting a selection
  * from a list. 
  * 
+ * This class may exist in 3 states:
+ *
+ * 1) only index has a value
+ * 2) only xmlValue has a value
+ * 3) index, xmlValue, and choice have values, where index and xmlValue are simply cached copies of the values in 'choice'
+ * 
+ * the 3rd form is the most full-featured, and is required for situations where you want to recover the captions for the
+ * choices, such as form entry. the choice objects used in the form entry model will receive localization updates,
+ * allowing you to retrieve the appropriate caption.
+ * 
+ * the 2nd form is useful when dealing with DataModelTrees without having to worry about the FormDef or the captions
+ * from the <select> or <select1> controls. this form contains enough information to convert to an XML instance
+ * 
+ * the 1st form is used when serializing data-models in an ultra-compact manner, but requires linking to a FormDef before
+ * you can do anything useful with the data model (insufficient info to convert to XML instance).
+ * 
  * @author Drew Roos
  *
  */
@@ -52,9 +68,8 @@ public class Selection implements Externalizable {
 	}
 	
 	public Selection (SelectChoice choice) {
-		this.choice = choice;
-		this.xmlValue = choice.getValue();
-		this.index = choice.getIndex();
+		attachChoice(choice);
+		
 	}
 	
 	public Selection (String xmlValue) {
@@ -62,22 +77,33 @@ public class Selection implements Externalizable {
 	}
 	
 	public Selection clone () {
-		Selection s = new Selection(xmlValue);
+		Selection s = new Selection();
 		s.choice = choice;
+		s.xmlValue = xmlValue;
+		s.index = index;
 
 		return s;
 	}
 	
-	public void attachQuestionDef(QuestionDef q) {
-		this.question = q;
-		this.qID = q.getID();
+	public void attachChoice (SelectChoice choice) {
+		this.choice = choice;
+		this.xmlValue = choice.getValue();
+		this.index = choice.getIndex();
+	}
 		
-		if (xmlValue != null && xmlValue.length() > 0) {
-			index =  q.getSelectedItemIndex(xmlValue); 			
-		} else if (index != -1) {
-			xmlValue = (String)q.getSelectItemIDs().elementAt(index);
+	public void attachChoice (QuestionDef q) {
+		SelectChoice choice = null;
+		
+		if (index != -1 && index < q.getNumChoices()) {
+			choice = q.getChoice(index);
+		} else if (xmlValue != null && xmlValue.length() > 0) {
+			choice = q.getChoiceForValue(xmlValue);
+		}
+		
+		if (choice != null) {
+			attachChoice(choice);
 		} else {
-			throw new RuntimeException("insufficient data in selection");
+			throw new RuntimeException("insufficient data in selection to reconstruct");
 		}
 	}
 	
@@ -103,8 +129,6 @@ public class Selection implements Externalizable {
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		xmlValue = ExtUtil.readString(in);
-		
-		qID = ExtUtil.readInt(in);
 		index = ExtUtil.readInt(in);
 	}
  
@@ -113,8 +137,6 @@ public class Selection implements Externalizable {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeString(out, getValue());
-		
-		ExtUtil.writeNumeric(out, qID);
 		ExtUtil.writeNumeric(out, index);
 	}
 }
