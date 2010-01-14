@@ -155,10 +155,11 @@ public class FormEntryModel {
     public String[] getCaptionHeirarchy(FormIndex index) {
     	Vector tempStrings = new Vector();
     	while(index != null) {
-    		String title = getEventTitle(index);
-    		if(title != null) {
-    			tempStrings.add(title);
-    		}
+    		//Get the new caption prompt
+    		//String title = this.get(index);
+    		//if(title != null) {
+    		//	tempStrings.add(title);
+    		//}
     	}
     	String[] output = new String[tempStrings.size()];
     	tempStrings.toArray(output);
@@ -174,22 +175,9 @@ public class FormEntryModel {
         return form.getDeepChildCount();
     }
 
-
-    protected boolean isAskNewRepeat(FormIndex questionIndex) {
-        Vector defs = form.explodeIndex(questionIndex);
-        IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
-        if (last instanceof GroupDef
-                && ((GroupDef) last).getRepeat()
-                && form.getDataModel().resolveReference(form.getChildInstanceRef(questionIndex)) == null) {
-            return true;
-        }
-        return false;
-    }
-
-
     public boolean isReadonly(FormIndex questionIndex) {
         TreeReference ref = form.getChildInstanceRef(questionIndex);
-        boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
+        boolean isAskNewRepeat = getEvent(questionIndex) == FormEntryController.PROMPT_NEW_REPEAT_EVENT;
 
         if (isAskNewRepeat) {
             return false;
@@ -202,7 +190,7 @@ public class FormEntryModel {
 
     public boolean isRelevant(FormIndex questionIndex) {
         TreeReference ref = form.getChildInstanceRef(questionIndex);
-        boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
+        boolean isAskNewRepeat = getEvent(questionIndex) == FormEntryController.PROMPT_NEW_REPEAT_EVENT;
 
         boolean relevant;
         if (isAskNewRepeat) {
@@ -214,10 +202,8 @@ public class FormEntryModel {
 
         if (relevant) { // if instance flag/condition says relevant, we still
             // have to check the <group>/<repeat> hierarchy
-            FormIndex ancestorIndex = questionIndex;
+            FormIndex ancestorIndex = questionIndex.getNextLevel();
             while(ancestorIndex != null) {
-            	ancestorIndex = ancestorIndex.getNextLevel();
-
             	//This should be safe now that the TreeReference is contained in the ancestor index itself
                 TreeElement ancestorNode = form.getDataModel().resolveReference(ancestorIndex.getReference());
                 
@@ -225,6 +211,7 @@ public class FormEntryModel {
                     relevant = false;
                     break;
                 }
+            	ancestorIndex = ancestorIndex.getNextLevel();
             }
         }
 
