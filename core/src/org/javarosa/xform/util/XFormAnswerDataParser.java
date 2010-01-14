@@ -119,6 +119,8 @@ public class XFormAnswerDataParser {
 			if(trimmedText == null) { 
 				return null;
 			} else {
+				if(trimmedText.equals("1")) { return new BooleanData(true); } 
+				if(trimmedText.equals("0")) { return new BooleanData(false); }
 				return trimmedText.equals("t") ? new BooleanData(true) : new BooleanData(false);
 			}
 		

@@ -68,7 +68,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 				if(kid.isRelevant()) {
 					c = processCaseCreate(kid,caseId, date);
 				}
-			} else if(kid.getName().equals("mutate")) {
+			} else if(kid.getName().equals("update")) {
 				if(c == null) {
 					c = getCase(caseId);
 				}
@@ -193,7 +193,17 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 				c.setDateOpened((Date)(kid.getValue().getValue()));
 			} else{
 				String vname = kid.getName();
-				c.setProperty(vname,kid.getValue());
+				
+				//ctsims: Yeah, this sucks, it's basically in place so that multi-select data stuff
+				//can work correctly. We should address the ways in which this sucks, probably by
+				//storing everything as a serialized value and deserializing and transforming at
+				//preload time.
+				Object value = kid.getValue().getValue();
+				if(value instanceof Vector) {
+					value = kid.getValue();
+				}
+				
+				c.setProperty(vname,value);
 			}
 		}
 		commit(c);
@@ -245,7 +255,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 				PatientReferral r = getReferral(referralId,refType);
 				r.setDateDue(followup);
 				Vector dateCloseds = kid.getChildrenWithName("date_closed");
-				if(dateCloseds.size() > 0) {
+				if(dateCloseds.size() > 0 && ((TreeElement)dateCloseds.elementAt(0)).isRelevant()) {
 					r.close();
 				}
 				commit(r);

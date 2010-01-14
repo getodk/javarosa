@@ -17,10 +17,9 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.FormElementStateListener;
-import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
@@ -36,17 +35,13 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		reset();
 	}
 
-	public void initWidget (IFormElement element, Container c) {
-		if(!(element instanceof QuestionDef)) {
-			throw new IllegalArgumentException("element passed to refreshWidget that is not a QuestionDef");
-		}
-		QuestionDef question = (QuestionDef)element;
+	public void initWidget (FormEntryPrompt fep, Container c) {
 		//#style container
 		UiAccess.setStyle(c); //it is dubious whether this works properly; Chatterbox.babysitStyles() takes care of this for now
 		
 		//#style questiontext
 		prompt = new StringItem(null, null);
-		entryWidget = getEntryWidget(question);
+		entryWidget = getEntryWidget(fep);
 		//#style textBox
 		UiAccess.setStyle(entryWidget);
 		
@@ -54,18 +49,13 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		c.add(entryWidget);
 	}
 
-	public void refreshWidget (FormElementBinding bind, int changeFlags) {
-		if(!(bind.element instanceof QuestionDef)) {
-			throw new IllegalArgumentException("element passed to refreshWidget that is not a QuestionDef");
-		}
-		
-		QuestionDef question = (QuestionDef)bind.element;
-		String caption = bind.form.fillTemplateString(question.getLongText(), bind.instanceRef);
+	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
+		String caption = fep.getLongText();
 		prompt.setText(caption);
-		updateWidget(question);
+		updateWidget(fep);
 		
 		//don't wipe out user-entered data, even on data-changed event
-		IAnswerData data = bind.getValue();
+		IAnswerData data = fep.getAnswerValue();
 		if (data != null && changeFlags == FormElementStateListener.CHANGE_INIT) {
 			setWidgetValue(data.getValue());
 		}
@@ -100,8 +90,8 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		return prompt.getContentHeight();
 	}
 	
-	protected abstract Item getEntryWidget (QuestionDef question);
-	protected abstract void updateWidget (QuestionDef question);
+	protected abstract Item getEntryWidget (FormEntryPrompt prompt);
+	protected abstract void updateWidget (FormEntryPrompt prompt);
 	protected abstract void setWidgetValue (Object o);
 	protected abstract IAnswerData getWidgetValue ();
 }

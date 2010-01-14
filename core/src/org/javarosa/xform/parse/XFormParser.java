@@ -55,6 +55,7 @@ import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -166,7 +167,7 @@ public class XFormParser {
 		typeMappings.put("gDay", new Integer(Constants.DATATYPE_UNSUPPORTED));          //xsd:
 		typeMappings.put("gYearMonth", new Integer(Constants.DATATYPE_UNSUPPORTED));    //xsd:
 		typeMappings.put("gMonthDay", new Integer(Constants.DATATYPE_UNSUPPORTED));     //xsd:
-		typeMappings.put("boolean", new Integer(Constants.DATATYPE_UNSUPPORTED));       //xsd:
+		typeMappings.put("boolean", new Integer(Constants.DATATYPE_BOOLEAN));           //xsd:
 		typeMappings.put("base64Binary", new Integer(Constants.DATATYPE_UNSUPPORTED));  //xsd:
 		typeMappings.put("hexBinary", new Integer(Constants.DATATYPE_UNSUPPORTED));     //xsd:
 		typeMappings.put("anyURI", new Integer(Constants.DATATYPE_UNSUPPORTED));        //xsd:
@@ -1210,7 +1211,7 @@ public class XFormParser {
 			
 			TreeElement cur = root;
 			for (int j = 0; j < repeatRef.size(); j++) {
-				String name = (String)repeatRef.names.elementAt(j);
+				String name = repeatRef.getName(j);
 				TreeElement child = cur.getChild(name, 0);
 				if (child == null) {
 					child = new TreeElement(name, 0);
@@ -1301,7 +1302,7 @@ public class XFormParser {
 			//make template ref generic and choose first matching node
 			TreeReference ref = templRef.clone();
 			for (int j = 0; j < ref.size(); j++) {
-				ref.multiplicity.setElementAt(new Integer(TreeReference.INDEX_UNBOUND), j);
+				ref.setMultiplicity(j, TreeReference.INDEX_UNBOUND);
 			}
 			Vector nodes = instance.expandReference(ref);
 			if (nodes.size() == 0) {
@@ -1464,7 +1465,7 @@ public class XFormParser {
 			if (repeatNode != null) {
 				repeatAncestry.addElement(repeatNode);			
 				for (int j = 1; j < childBind.size(); j++) {
-					repeatNode = repeatNode.getChild((String)childBind.names.elementAt(j), 0);
+					repeatNode = repeatNode.getChild(childBind.getName(j), 0);
 					if (repeatNode != null) {
 						repeatAncestry.addElement(repeatNode);
 					} else {
@@ -1826,6 +1827,10 @@ public class XFormParser {
 		Restorable r = (restorableType != null ? (Restorable)PrototypeFactory.getInstance(restorableType) : null);
 		
 		Document doc = getXMLDocument(new InputStreamReader(new ByteArrayInputStream(data)));
+		if (doc == null) {
+			throw new RuntimeException("syntax error in XML instance; could not parse");
+		}
+		
 		Element e = doc.getRootElement();
 		
 		TreeElement te = buildInstanceStructure(e, null);

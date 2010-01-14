@@ -26,7 +26,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.IXFormyFactory;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.PrototypeManager;
-import org.javarosa.core.services.transport.IDataPayload;
+import org.javarosa.core.services.transport.payload.IDataPayload;
 import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xpath.XPathParseTool;

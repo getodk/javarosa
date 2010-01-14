@@ -23,16 +23,10 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.communication.http.HttpTransportDestination;
-import org.javarosa.communication.http.HttpTransportMethod;
 import org.javarosa.communication.reporting.properties.FeedbackReportProperties;
 import org.javarosa.communication.reporting.view.FeedbackReportScreen;
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.PropertyManager;
-import org.javarosa.core.services.TransportManager;
-import org.javarosa.core.services.transport.ByteArrayPayload;
-import org.javarosa.core.services.transport.IDataPayload;
-import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.TrivialTransitions;
 import org.javarosa.j2me.view.J2MEDisplay;
 
@@ -58,17 +52,18 @@ public abstract class FeedbackReportState implements TrivialTransitions, State, 
 			String url = PropertyManager._().getSingularProperty(FeedbackReportProperties.FEEDBACK_REPORT_SERVER);
 			
 			String id = PropertyManager._().getSingularProperty("DeviceID");
-			
-			//TODO: For now, only http is supported, so we hack this to switch to that.
-			int httpmethod = (new HttpTransportMethod()).getId();
-			TransportManager._().setCurrentTransportMethod(httpmethod);
-			
-			TransportMessage tmessage = new TransportMessage(new ByteArrayPayload(message.getBytes(), "Feedback Message",IDataPayload.PAYLOAD_TYPE_TEXT), new HttpTransportDestination(url),id,-1);
-			TransportManager._().send(tmessage, httpmethod);
-			
-			//TODO: Feedback!
-			
-			done();
+
+			throw new RuntimeException("Feedback Reporting: needs to be converted to new transport layer");
+//			//TODO: For now, only http is supported, so we hack this to switch to that.
+//			int httpmethod = (new HttpTransportMethod()).getId();
+//			TransportManager._().setCurrentTransportMethod(httpmethod);
+//			
+//			TransportMessage tmessage = new TransportMessage(new ByteArrayPayload(message.getBytes(), "Feedback Message",IDataPayload.PAYLOAD_TYPE_TEXT), new HttpTransportDestination(url),id,-1);
+//			TransportManager._().send(tmessage, httpmethod);
+//			
+//			//TODO: Feedback!
+//			
+//			done();
 		} else if (c.equals(FeedbackReportScreen.CANCEL)) {
 			done();
 		}

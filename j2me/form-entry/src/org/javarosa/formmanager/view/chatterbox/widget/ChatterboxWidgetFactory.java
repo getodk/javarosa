@@ -172,6 +172,11 @@ public class ChatterboxWidgetFactory {
 		return new ChatterboxWidget(cbox, binding, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }
     
+    public ChatterboxWidget getNewLabelWidget(FormIndex index, String text){
+    	//Label Widget;
+    	//ChatterboxWidget newLabel = new ChatterboxWidget(cbox, binding,ChatterboxWidget.VIEW_LABEL, new LabelWidget(mult), null);
+    }
+    
     public ChatterboxWidget getNewLabelWidget(FormIndex index, FormDef f, Chatterbox cbox){
     	IFormElement element = f.getChild(index);
     	if(!(element instanceof GroupDef)) {

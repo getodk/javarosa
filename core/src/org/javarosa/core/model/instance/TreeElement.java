@@ -63,7 +63,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	private Vector children = new Vector();
 
 	/* model properties */
-	public int dataType = Constants.DATATYPE_NULL;//TODO
+	public int dataType = Constants.DATATYPE_NULL; //TODO
 	public boolean required = false;// TODO
 	private Constraint constraint = null;
 	private String preloadHandler = null;

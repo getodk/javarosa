@@ -14,6 +14,7 @@ import javax.microedition.rms.RecordStoreNotOpenException;
 
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.storage.EntityFilter;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
@@ -376,14 +377,34 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	}
 
 	public void removeAll () {
+		removeAll(null);
+	}
+	
+	public void removeAll (EntityFilter filter) {
 		synchronized (getAccessLock()) {
 			Vector IDs = new Vector();
 			
 			IStorageIterator ii = iterate();
 			while (ii.hasMore()) {
-				IDs.addElement(new Integer(ii.nextID()));
+				int id = ii.nextID();
+				boolean toRemove;
+				
+				if (filter == null) {
+					toRemove = true;
+				} else {
+					switch (filter.preFilter(id, null)) {
+					case EntityFilter.PREFILTER_INCLUDE: toRemove = true; break;
+					case EntityFilter.PREFILTER_EXCLUDE: toRemove = false; break;
+					case EntityFilter.PREFILTER_FILTER: toRemove = filter.matches(read(id)); break;
+					default: throw new RuntimeException();
+					}
+				}
+
+				if (toRemove) {
+					IDs.addElement(new Integer(id));
+				}
 			}
-			
+						
 			for (int i = 0; i < IDs.size(); i++) {
 				int id = ((Integer)IDs.elementAt(i)).intValue();
 				remove(id);

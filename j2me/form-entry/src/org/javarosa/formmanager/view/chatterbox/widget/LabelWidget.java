@@ -18,8 +18,8 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.GroupDef;
-import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.FormElementBinding;
 
 import de.enough.polish.ui.Container;
@@ -40,7 +40,7 @@ public class LabelWidget implements IWidgetStyle {
 		multiplicity = mult;
 	}
 	
-	public void initWidget(IFormElement element, Container c) {
+	public void initWidget(FormEntryPrompt prompt, Container c) {
 		//#style container
 		UiAccess.setStyle(c); //it is dubious whether this works properly; Chatterbox.babysitStyles() takes care of this for now
 		
@@ -50,25 +50,15 @@ public class LabelWidget implements IWidgetStyle {
 		c.add(label);
 	}
 
-	public void refreshWidget(FormElementBinding bind, int changeFlags) {
+	public void refreshWidget(FormEntryPrompt prompt, int changeFlags) {
 		
 		// Clayton Sims - Feb 6, 2009 : Labels are now applicable for questions, so that we can pin 
 		// question texts for long questions.
-		if(bind.element instanceof GroupDef) {
-			String caption = bind.form.fillTemplateString(((GroupDef)bind.element).getLongText(), bind.instanceRef);
-			if (multiplicity != -1) {
-				caption += ": " + multiplicity;
-			}
-			label.setText(caption);
-		} else if(bind.element instanceof QuestionDef) {
-			String caption = bind.form.fillTemplateString(((QuestionDef)bind.element).getLongText(), bind.instanceRef);
-			label.setText(caption);
+		String caption = prompt.getLongText();
+		if(multiplicity != -1) {
+			caption += ": " + multiplicity;
 		}
-		else{
-			throw new IllegalStateException("Invalid type for a label's element. Type is: " + bind.element.getClass().getName() );
-		}
-		
-
+		label.setText(caption);
 	}
 
 	public void reset() {

@@ -36,6 +36,8 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	 * 
 	 */
 	private String responseBody;
+	
+	private boolean cacheable = true;
 
 
 	public SimpleHttpTransportMessage() {
@@ -77,7 +79,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	}
 
 	public boolean isCacheable() {
-		return true;
+		return cacheable;
 	}
 	
 
@@ -119,6 +121,10 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	
+	public void setCacheable(boolean cacheable) {
+		this.cacheable = cacheable;
 	}
 
 	/*

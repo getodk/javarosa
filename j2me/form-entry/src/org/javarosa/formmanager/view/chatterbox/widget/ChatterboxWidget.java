@@ -18,6 +18,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IQuestionWidget;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
@@ -49,31 +50,27 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 	private Chatterbox cbox;
 	private Command nextCommand;
 	
-	private FormElementBinding binding;
-	
 	private int viewState = VIEW_NOT_SET;
 	private IWidgetStyle collapsedStyle;
 	private IWidgetStyleEditable expandedStyle;
+	
+	private FormEntryPrompt prompt;
 
 	private IWidgetStyle activeStyle;
 	//private Style blankSlateStyle;
 	
-	public ChatterboxWidget (Chatterbox cbox, FormElementBinding binding, int viewState,
-			IWidgetStyle collapsedStyle, IWidgetStyleEditable expandedStyle) {
-		this(cbox, binding, viewState, collapsedStyle, expandedStyle, null);
+	public ChatterboxWidget (Chatterbox cbox, FormEntryPrompt prompt, int viewState, IWidgetStyle collapsedStyle, IWidgetStyleEditable expandedStyle) {
+		this(cbox, prompt, viewState, collapsedStyle, expandedStyle, null);
 	}
 			
-	public ChatterboxWidget (Chatterbox cbox, FormElementBinding binding, int viewState,
-			IWidgetStyle collapsedStyle, IWidgetStyleEditable expandedStyle, 
+	public ChatterboxWidget (Chatterbox cbox, FormEntryPrompt prompt, int viewState, IWidgetStyle collapsedStyle, IWidgetStyleEditable expandedStyle, 
 			Style style) {
 		super(false, style);
 		//blankSlateStyle = this.getStyle();
 
 		this.cbox = cbox;
         this.nextCommand = new Command("Next", Command.ITEM, 1);
-        
-        this.binding = binding;
-        binding.widget = this;
+        this.prompt = prompt;
         
 		this.collapsedStyle = collapsedStyle;
 		this.expandedStyle = expandedStyle;
@@ -84,12 +81,6 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 	public void destroy () {
 		if (viewState == VIEW_EXPANDED)
 			detachWidget();
-		
-		binding.unregister();
-	}
-	
-	public FormElementBinding getBinding () {
-		return binding;
 	}
 		
 	public int getViewState () {
@@ -104,8 +95,8 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 			this.viewState = viewState;
 			activeStyle = getActiveStyle();
 			
-			activeStyle.initWidget(binding.element, this);
-			activeStyle.refreshWidget(binding, FormElementStateListener.CHANGE_INIT);
+			activeStyle.initWidget(prompt, this);
+			activeStyle.refreshWidget(prompt, FormElementStateListener.CHANGE_INIT);
 			if (viewState == VIEW_EXPANDED) {
 				attachWidget();
 			} if(viewState == VIEW_COLLAPSED) {
@@ -153,7 +144,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 
 	//call-back from QuestionBinding
 	public void refreshWidget (int changeFlags) {
-		activeStyle.refreshWidget(binding, changeFlags);		
+		activeStyle.refreshWidget(prompt, changeFlags);		
 	}
 		
 	private void attachWidget () {
@@ -281,8 +272,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 	public Object clone() {
 		if(this.getViewState() == ChatterboxWidget.VIEW_LABEL) {
 			LabelWidget label = (LabelWidget)this.activeStyle;
-			FormElementBinding newBinding = (FormElementBinding)binding.clone();
-			ChatterboxWidget widget = new ChatterboxWidget(cbox, newBinding, this.getViewState(), (LabelWidget)label.clone(), null);
+			ChatterboxWidget widget = new ChatterboxWidget(cbox, prompt, this.getViewState(), (LabelWidget)label.clone(), null);
 			return widget;
 		}
 		return null;
@@ -295,7 +285,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 			mult = label.getMultiplicity();
 		}
 		LabelWidget labelStyle = new LabelWidget(mult);
-		ChatterboxWidget widget = new ChatterboxWidget(cbox, (FormElementBinding)this.getBinding().clone(), ChatterboxWidget.VIEW_LABEL, labelStyle , null);
+		ChatterboxWidget widget = new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_LABEL, labelStyle , null);
 
 		return widget;
 	}
