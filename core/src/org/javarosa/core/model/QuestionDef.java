@@ -63,12 +63,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	private OrderedHashtable selectItems;  	/** String -> String */
 	private OrderedHashtable selectItemIDs;	/** String -> String */
 	private Vector selectItemsLocalizable;
-	
-	//this may be used in the future, but it is not the default value you're probably thinking about
-	//"these are not the default values you are looking for..."
-	//"not your mothers's default value anymore!"
-	//private IAnswerData defaultValue;
-		
+			
 	Vector observers;
 	
 	public QuestionDef () {
@@ -81,6 +76,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		observers = new Vector();
 	}
 		
+	//is this function necessary?
 	public boolean equals (Object o) {
 		if (o instanceof QuestionDef) {
 			QuestionDef q = (QuestionDef)o;
@@ -143,6 +139,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		this.longText = longText;
 	}
 
+	//not used during normal usage
     public String getLongTextID () {
         return longTextID;
     }
@@ -162,6 +159,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		this.shortText = shortText;
 	}
 
+	//not used during normal usage
     public String getShortTextID () {
         return shortTextID;
     }

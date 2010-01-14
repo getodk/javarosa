@@ -574,18 +574,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 					try {
 						ix = Integer.parseInt(argName);
 					} catch (NumberFormatException nfe) {
-						System.err
-								.println("Warning: expect arguments to be numeric ["
-										+ argName + "]");
+						System.err.println("Warning: expect arguments to be numeric [" + argName + "]");
 					}
 
 					if (ix < 0 || ix >= outputFragments.size())
 						continue;
 
-					IConditionExpr expr = (IConditionExpr) outputFragments
-							.elementAt(ix);
-					String value = expr.evalReadable(this.getDataModel(),
-							new EvaluationContext(exprEvalContext, contextRef));
+					IConditionExpr expr = (IConditionExpr) outputFragments.elementAt(ix);
+					String value = expr.evalReadable(this.getDataModel(), new EvaluationContext(exprEvalContext, contextRef));
 					args.put(argName, value);
 				}
 			}
@@ -595,32 +591,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 			depth++;
 			if (depth >= TEMPLATING_RECURSION_LIMIT) {
-				throw new RuntimeException(
-						"Dependency cycle in <output>s; recursion limit exceeded!!");
+				throw new RuntimeException("Dependency cycle in <output>s; recursion limit exceeded!!");
 			}
 		}
 
 		return template;
 	}
 
-	/**
-	 * Note that this method doesn't yet deal with groups in any way, and will
-	 * fail if this form contains any groups.
-	 * 
-	 * @param questionID
-	 *            the unique integer ID of the question.
-	 * @return A quesiton associated with the given ID.
-	 */
-	// public QuestionDef getQuesitonByID (int questionID) {
-	// for (int i = 0; i < children.size(); i++) {
-	// QuestionDef q = (QuestionDef)children.elementAt(i);
-	// if (questionID == q.getID()) {
-	// return q;
-	// }
-	// }
-	//		
-	// return null;
-	// }
 	/**
 	 * @return the preloads
 	 */

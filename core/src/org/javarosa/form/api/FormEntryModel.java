@@ -87,8 +87,8 @@ public class FormEntryModel {
 
     
     public FormEntryPrompt getQuestionPrompt(FormIndex index) {
-    	if(form.getChild(index) instanceof QuestionDef) {    		
-    		return new FormEntryPrompt((QuestionDef)form.getChild(index), form.getDataModel().resolveReference(index.getReference()));
+    	if(form.getChild(index) instanceof QuestionDef) {
+    		return new FormEntryPrompt(form, index);
     	} else {
     		throw new RuntimeException("Invalid query for Question prompt. Non-Question object at the form index");
     	}
