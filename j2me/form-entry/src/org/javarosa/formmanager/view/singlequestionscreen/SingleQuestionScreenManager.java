@@ -61,11 +61,10 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 
 	public SingleQuestionScreen getView(FormIndex qIndex, boolean fromFormView) {
 		FormEntryPrompt prompt = model.getQuestionPrompt(qIndex);
-		Vector captionHeirarchy = model.getCaptionHeirarchy(qIndex);
+		FormEntryCaption[] captionHeirarchy = model.getCaptionHeirarchy(qIndex);
 		String groupTitle = null;
-		if (captionHeirarchy.size() > 1) {
-			FormEntryCaption caption = (FormEntryCaption) captionHeirarchy
-					.elementAt(1);
+		if (captionHeirarchy.length > 1) {
+			FormEntryCaption caption = captionHeirarchy[1];
 			groupTitle = caption.getShortText();
 		}
 		if (prompt.getControlType() == Constants.DATATYPE_BARCODE) {

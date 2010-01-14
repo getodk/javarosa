@@ -192,7 +192,7 @@ public class FormEntryModel {
 	 * @return list of FormEntryCaptions, FormEntryCaptions of current index
 	 *         first.
 	 */
-	public Vector getCaptionHeirarchy(FormIndex index) {
+	public FormEntryCaption[] getCaptionHeirarchy(FormIndex index) {
 		Vector captions = new Vector();
 		while (index != null) {
 			IFormElement element = form.getChild(index);
@@ -201,7 +201,9 @@ public class FormEntryModel {
 			}
 			index = index.getNextLevel();
 		}
-		return captions;
+		FormEntryCaption[] captionArray = new FormEntryCaption[captions.size()];
+		captions.copyInto(captionArray);
+		return captionArray;
 	}
 
 	/**
