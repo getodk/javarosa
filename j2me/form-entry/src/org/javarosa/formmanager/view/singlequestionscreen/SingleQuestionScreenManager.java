@@ -18,13 +18,6 @@ package org.javarosa.formmanager.view.singlequestionscreen;
 
 import java.util.Vector;
 
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.ItemCommandListener;
-import javax.microedition.lcdui.List;
-
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
@@ -35,11 +28,16 @@ import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
-import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquiringQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
 import org.javarosa.j2me.view.J2MEDisplay;
 
+import de.enough.polish.ui.Command;
+import de.enough.polish.ui.CommandListener;
+import de.enough.polish.ui.Displayable;
+import de.enough.polish.ui.Item;
+import de.enough.polish.ui.ItemCommandListener;
+import de.enough.polish.ui.List;
 import de.enough.polish.util.Locale;
 
 public class SingleQuestionScreenManager implements IFormEntryView,
@@ -89,6 +87,9 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 							goingForward);
 		}
 
+		if (model.getLanguages().length > 0) {
+			currentQuestionScreen.addLanguageCommands(model.getLanguages());
+		}
 		currentQuestionScreen.setCommandListener(this);
 		currentQuestionScreen.setItemCommandListner(this);
 		return currentQuestionScreen;
@@ -141,31 +142,60 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 				processModelEvent(event);
 			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
 				viewAnswers();
-			} else if ((arg1 instanceof AcquireScreen)) {
-				// handle additional commands for acquring screens
-				AcquireScreen source = (AcquireScreen) arg1;
-				System.out.println("Got event from AcquireScreen");
-				if (command == source.cancelCommand) {
-					AcquiringQuestionScreen questionScreen = source
-							.getQuestionScreen();
-					questionScreen.setCommandListener(this);
-					J2MEDisplay.setView(questionScreen);
+			} 
+			
+//			TODO: FIXME
+			else if ((arg1 instanceof AcquireScreen)) {
+//				// handle additional commands for acquring screens
+//				AcquireScreen source = (AcquireScreen) arg1;
+//				System.out.println("Got event from AcquireScreen");
+//				if (command == source.cancelCommand) {
+//					AcquiringQuestionScreen questionScreen = source
+//							.getQuestionScreen();
+//					questionScreen.setCommandListener(this);
+//					J2MEDisplay.setView(questionScreen);
+//				}
+//			} else if (arg1 instanceof AcquiringQuestionScreen) {
+//				// handle additional commands for acquring question screens
+//				AcquiringQuestionScreen aqQuestionScreen = (AcquiringQuestionScreen) arg1;
+//				if (command == aqQuestionScreen.acquireCommand) {
+//					J2MEDisplay
+//							.setView(aqQuestionScreen.getAcquireScreen(this));
+//				}
+			} else // should be a command in the language submenu
+			{
+				String language = null;
+				for (int i = 0; i < SingleQuestionScreen.languageCommands.length; i++) {
+					if (command == SingleQuestionScreen.languageCommands[i]) {
+						language = command.getLabel();
+						break;
+					}
 				}
-			} else if (arg1 instanceof AcquiringQuestionScreen) {
-				// handle additional commands for acquring question screens
-				AcquiringQuestionScreen aqQuestionScreen = (AcquiringQuestionScreen) arg1;
-				if (command == aqQuestionScreen.acquireCommand) {
-					J2MEDisplay
-							.setView(aqQuestionScreen.getAcquireScreen(this));
+
+				if (language != null) {
+					controller.setLanguage(language);
+					switchViewLanguage();
+				} else {
+					System.err.println("Unknown command event received ["
+							+ command.getLabel() + "]");
 				}
 			}
 
 		}
 	}
+	
 
 	private void viewAnswers() {
 		controller.jumpToIndex(FormIndex.createBeginningOfFormIndex());
 		showFormViewScreen();
+	}
+	
+	private void switchViewLanguage()
+	{
+		IAnswerData answer = currentQuestionScreen.getWidgetValue();
+		this.goingForward = true;
+		controller.questionAnswered(answer);
+		refreshView();
 	}
 
 	private void processModelEvent(int event) {
