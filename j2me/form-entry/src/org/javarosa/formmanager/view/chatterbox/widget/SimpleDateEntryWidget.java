@@ -22,6 +22,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Item;
 
@@ -51,7 +52,7 @@ public class SimpleDateEntryWidget extends ExpandedWidget
 		return (d == null ? null : new DateData(d));
 	}
 
-	protected void updateWidget(QuestionDef question) 
+	protected void updateWidget(FormEntryPrompt prompt) 
 	{
 		// TODO Auto-generated method stub
 
@@ -68,7 +69,7 @@ public class SimpleDateEntryWidget extends ExpandedWidget
 		return Constants.CONTROL_INPUT;
 	}
 	
-	protected Item getEntryWidget(QuestionDef question) 
+	protected Item getEntryWidget(FormEntryPrompt prompt) 
 	{
 		// TODO Auto-generated method stub
 		return dateField;

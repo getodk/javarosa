@@ -221,8 +221,7 @@ public class Chatterbox extends FramedForm implements CommandListener{
     	updatePins(questionIndex);
 
     	//figure out kind of reference and how to handle it
-    	Vector defs = model.getForm().explodeIndex(questionIndex);
-    	IFormElement last = (defs.size() == 0 ? null : (IFormElement)defs.lastElement());
+    	IFormElement last = model.getForm().getChild(questionIndex);
     	if (last instanceof GroupDef) {
     		if (((GroupDef)last).getRepeat() &&	
     			model.getForm().getDataModel().resolveReference(model.getForm().getChildInstanceRef(questionIndex)) == null) {
@@ -359,8 +358,9 @@ public class Chatterbox extends FramedForm implements CommandListener{
     
 
 	private void createHeaderForElement(FormIndex questionIndex) {
-    	ChatterboxWidget headerWidget = widgetFactory.getNewLabelWidget(questionIndex, model.getForm(), this);
-		if(headerWidget != null) {
+		String headerText = model.getEventTitle(questionIndex);
+		if(headerText != null) {
+			ChatterboxWidget headerWidget = widgetFactory.getNewLabelWidget(questionIndex, headerText);
 			//If there is no valid header, there's no valid header. Possibly no label.
 			this.append(headerWidget);
 			this.questionIndexes.add(questionIndex);
@@ -541,8 +541,8 @@ public class Chatterbox extends FramedForm implements CommandListener{
     		//'new repeat?' answered
     		String answer = ((Selection)frame.getData().getValue()).getValue();
     		if (answer.equals("y")) {
-    			controller.newRepeat(activeQuestionIndex);
-    			createHeaderForElement(activeQuestionIndex);
+    			controller.newRepeat(this.model.getCurrentFormIndex());
+    			createHeaderForElement(this.model.getCurrentFormIndex());
     		}
     		controller.stepToNextEvent();
     	} else {
