@@ -16,6 +16,8 @@
 
 package org.javarosa.form.api;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
@@ -55,11 +57,9 @@ public class FormEntryPrompt extends FormEntryCaption {
     public String getConstraintText() {
         return mTreeElement.getConstraint().constraintMsg;
     }
-
-    }
     
     public Vector<SelectChoice> getSelectChoices() {
-        return mQuestionDef.getChoices();
+        return getQuestionDef().getChoices();
     }
  
     public String getHelpText() {

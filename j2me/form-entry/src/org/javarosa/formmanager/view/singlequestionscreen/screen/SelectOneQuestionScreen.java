@@ -20,6 +20,7 @@ import java.util.Enumeration;
 
 import javax.microedition.lcdui.ChoiceGroup;
 
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
@@ -46,7 +47,7 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen {
 					ChoiceGroup.EXCLUSIVE);
 		}
 
-		Enumeration itr = (prompt.getSelectItems().keys());
+		Enumeration itr = (prompt.getSelectChoices().elements());
 		
 		int preselectionIndex = -1; // index of the preset value for the
 									// question, if any
@@ -55,8 +56,9 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen {
 		int count = 0;
 
 		while (itr.hasMoreElements()) {
-			String label = (String) itr.nextElement();
-
+			SelectChoice choice = (SelectChoice) itr.nextElement();
+			String label = choice.getCaption();
+			
 			// check if the value is equal to the preset for this question
 			if ((preselectionLabel != null)
 					&& (label.equals(preselectionLabel)))
@@ -90,7 +92,7 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen {
 			}
 		}
 
-		Selection s = new Selection((String) prompt.getSelectItems().elementAt(selectedIndex));
+		Selection s = new Selection(prompt.getSelectChoices().elementAt(selectedIndex));
 		return (selectedIndex == -1 ? null : new SelectOneData(s));
 	}
 

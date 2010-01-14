@@ -21,6 +21,7 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.ChoiceGroup;
 
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.helper.Selection;
@@ -46,11 +47,12 @@ public class SelectQuestionScreen extends SingleQuestionScreen {
 			cg = new ChoiceGroup(prompt.getLongText(),
 					ChoiceGroup.MULTIPLE);
 		}
-		Enumeration itr = (prompt.getSelectItems().keys());
+		Enumeration itr = (prompt.getSelectChoices().elements());
 		
 		int i = 0;
 		while (itr.hasMoreElements()) {
-			String label = (String) itr.nextElement();
+			SelectChoice choice = (SelectChoice)itr.nextElement();
+			String label = choice.getCaption();
 			cg.append(label, null);// add options to choice group
 			i++;
 		}
@@ -67,7 +69,7 @@ public class SelectQuestionScreen extends SingleQuestionScreen {
 		for (int i = 0; i < cg.size(); i++) {
 			if (cg.isSelected(i)) {
 
-				Selection s = new Selection((String) prompt.getSelectItems().elementAt(i));
+				Selection s = new Selection(prompt.getSelectChoices().elementAt(i));
 				
 				vs.addElement(s);
 			}
