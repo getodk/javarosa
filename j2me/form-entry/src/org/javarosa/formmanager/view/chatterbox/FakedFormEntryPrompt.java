@@ -1,7 +1,9 @@
 package org.javarosa.formmanager.view.chatterbox;
 
+import java.util.Vector;
+
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.form.api.FormEntryPrompt;
 
 public class FakedFormEntryPrompt extends FormEntryPrompt {
@@ -49,9 +51,9 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 		return null;
 	}
 
-	public OrderedHashtable getSelectItems() {
+	public Vector<SelectChoice> getSelectChoices() {
 		// TODO Auto-generated method stub
-		return super.getSelectItems();
+		return super.getSelectChoices();
 	}
 
 	public String getShortText() {

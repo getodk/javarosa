@@ -32,6 +32,7 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.Recalculate;
@@ -55,7 +56,6 @@ import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -466,10 +466,9 @@ public class XFormParser {
 			}
 		}
 		if (isSelect) {
-			if (question.getSelectItemIDs().size() == 0) {
+			if (question.getNumChoices() == 0) {
 				throw new XFormParseException("Select question has no choices");
 			}
-			question.localizeSelectMap(null);		
 		}
 			
 		parent.addChild(question);
@@ -657,9 +656,9 @@ public class XFormParser {
 		}
 
 		if (textRef != null) {
-			q.addSelectItemID(textRef, true, value);
+			q.addSelectChoice(new SelectChoice(textRef, value));
 		} else {
-			q.addSelectItemID(label, false, value);
+			q.addSelectChoice(new SelectChoice(label, value, false));
 		}
 	}
 

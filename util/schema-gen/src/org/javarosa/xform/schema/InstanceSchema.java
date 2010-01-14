@@ -16,23 +16,17 @@
 
 package org.javarosa.xform.schema;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.xform.util.XFormUtils;
-import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
@@ -148,7 +142,7 @@ public class InstanceSchema {
 			
 			if (controlType == Constants.CONTROL_SELECT_ONE || controlType == Constants.CONTROL_SELECT_MULTI) {
 				String choiceTypeName = getChoiceTypeName(ref);
-				writeChoices(e, choiceTypeName, q.getSelectItemIDs().elements());
+				writeChoices(e, choiceTypeName, q.getChoices());
 				
 				if (controlType == Constants.CONTROL_SELECT_MULTI) {
 					writeListType(e, choiceTypeName);
@@ -168,7 +162,7 @@ public class InstanceSchema {
 		return ref.toString(false).replace('/', '_');
 	}
 	
-	private static void writeChoices (Element e, String typeName, Enumeration choices) {
+	private static void writeChoices (Element e, String typeName, Vector<SelectChoice> choices) {
 		Element st = new Element();
 		st.setName("simpleType");
 		st.setAttribute(null, "name", typeName);
@@ -179,8 +173,8 @@ public class InstanceSchema {
 		restr.setAttribute(null, "base", "string");
 		st.addChild(Node.ELEMENT, restr);
 		
-		while (choices.hasMoreElements()) {
-			String value = (String)choices.nextElement();
+		for (int i = 0; i < choices.size(); i++) {
+			String value = choices.elementAt(i).getValue();
 			
 			Element choice = new Element();
 			choice.setName("enumeration");

@@ -59,10 +59,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String helpText;	 /* The help text. */
 	private String helpTextID;
 
-	
-	private OrderedHashtable selectItems;  	/** String -> String */
-	private OrderedHashtable selectItemIDs;	/** String -> String */
-	private Vector selectItemsLocalizable;
+	private Vector<SelectChoice> choices;
 			
 	Vector observers;
 	
@@ -74,29 +71,6 @@ public class QuestionDef implements IFormElement, Localizable {
 		setID(id);
 		setControlType(controlType);
 		observers = new Vector();
-	}
-		
-	//is this function necessary?
-	public boolean equals (Object o) {
-		if (o instanceof QuestionDef) {
-			QuestionDef q = (QuestionDef)o;
-			return (id == q.id &&
-					ExtUtil.equals(binding, q.binding) &&
-					controlType == q.controlType &&
-					ExtUtil.equals(appearanceAttr, q.appearanceAttr) &&
-					ExtUtil.equals(longText, q.longText) &&
-					ExtUtil.equals(longTextID, q.longTextID) &&
-					ExtUtil.equals(shortText, q.shortText) &&
-					ExtUtil.equals(shortTextID, q.shortTextID) &&
-					ExtUtil.equals(helpText, q.helpText) &&
-					ExtUtil.equals(helpTextID, q.helpTextID) &&
-					ExtUtil.equals(ExtUtil.nullIfEmpty(selectItemIDs), ExtUtil.nullIfEmpty(q.selectItemIDs)) &&
-					ExtUtil.equals(ExtUtil.nullIfEmpty(selectItemsLocalizable), ExtUtil.nullIfEmpty(q.selectItemsLocalizable))
-					);
-				//no defaultValue, selectItems
-		} else {
-			return false;
-		}
 	}
 	
 	public int getID () {
@@ -174,11 +148,12 @@ public class QuestionDef implements IFormElement, Localizable {
 	public String getHelpText () {
 		return helpText;
 	}
-	
+
 	public void setHelpText (String helpText) {
 		this.helpText = helpText;
 	}
 
+	//not used during normal usage
     public String getHelpTextID () {
         return helpTextID;
     }
@@ -190,86 +165,35 @@ public class QuestionDef implements IFormElement, Localizable {
         }
     }
 
-	public OrderedHashtable getSelectItems () {
-		return selectItems;
-	}
-
-	//this function is dangerous: QuestionDef will not serialize properly unless selectItemIDs is set as well
-	public void setSelectItems (OrderedHashtable selectItems) {
-		this.selectItems = selectItems;
-	}
-	
-	//this function is dangerous: QuestionDef will not serialize properly unless selectItemIDs is set as well
-	public void addSelectItem (String label, String value) {
-		if (selectItems == null)
-			selectItems = new OrderedHashtable();
-		selectItems.put(label, value);
-	}
-	
-	public OrderedHashtable getSelectItemIDs () {
-		return selectItemIDs;
-	}
-	
-	public Vector getSelectItemsLocalizable () {
-		return selectItemsLocalizable;
-	}
-	
-	public void setSelectItemIDs (OrderedHashtable selectItemIDs, Vector selectItemsLocalizable, Localizer localizer) {
-		this.selectItemIDs = selectItemIDs;
-		this.selectItemsLocalizable = selectItemsLocalizable;
-		if(localizer != null) {
-			localizeSelectMap(localizer);
-		}
-	}
-	
-	public void addSelectItemID (String labelID, boolean type, String value) {
-		if (selectItemIDs == null) {
-			selectItemIDs = new OrderedHashtable();
-			selectItemsLocalizable = new Vector();
-		}
-		selectItemIDs.put(labelID, value);
-		selectItemsLocalizable.addElement(new Boolean(type));
-	}
-	
-	//calling when localizer == null is meant for when there is no localization data and selectIDMap contains only
-	//fixed strings (trans is always false)
-	public void localizeSelectMap (Localizer localizer) {
-		selectItems = null;
-		
-		String label;
-		for (int i = 0; i < selectItemIDs.size(); i++) {
-			String key = (String)selectItemIDs.keyAt(i);
-			boolean translate = ((Boolean)selectItemsLocalizable.elementAt(i)).booleanValue();
-			if (translate) {
-				label = (localizer == null ? "[itext:" + i + "]" : localizer.getLocalizedText(key));
-			} else {
-				label = key;
-			}
-			addSelectItem(label, (String)selectItemIDs.get(key));
-		}
-	}
-  
-	public int getSelectedItemIndex(String value) {
-		if (selectItems != null) {
-			for (int i = 0; i < selectItems.size(); i++) {
-				if (((String)selectItems.elementAt(i)).equals(value)) {
-					return i;
-				}
+    public void addSelectChoice (SelectChoice choice) {
+    	if (choices == null) {
+    		choices = new Vector<SelectChoice>();
+    	}
+    	choice.setIndex(choices.size());
+    	choices.addElement(choice);
+    }
+    
+    public Vector<SelectChoice> getChoices () {
+    	return choices;
+    }
+    
+    public SelectChoice getChoice (int i) {
+    	return choices.elementAt(i);
+    }
+    
+    public int getNumChoices () {
+    	return (choices != null ? choices.size() : 0);
+    }
+    
+	public SelectChoice getChoiceForValue (String value) {
+		for (int i = 0; i < getNumChoices(); i++) {
+			if (getChoice(i).getValue().equals(value)) {
+				return getChoice(i);
 			}
 		}
-		return -1;
-	}
-		
-	/*
-	public IAnswerData getDefaultValue() {
-		return defaultValue;
+		return null;
 	}
 	
-	public void setDefaultValue(IAnswerData defaultValue) {
-		this.defaultValue = defaultValue;
-	}
-    */
-
     public void localeChanged(String locale, Localizer localizer) {
     	if(longTextID != null) {
     		longText = localizer.getLocalizedText(longTextID);
@@ -283,8 +207,10 @@ public class QuestionDef implements IFormElement, Localizable {
     		helpText = localizer.getLocalizedText(helpTextID);
     	}
     	
-    	if (selectItemIDs != null) {
-    		localizeSelectMap(localizer);
+    	if (choices != null) {
+    		for (int i = 0; i < choices.size(); i++) {
+    			choices.elementAt(i).localeChanged(null, localizer);
+    		}
     	}
     	
     	alertStateObservers(FormElementStateListener.CHANGE_LOCALE);
@@ -321,13 +247,9 @@ public class QuestionDef implements IFormElement, Localizable {
 		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 
 		setControlType(ExtUtil.readInt(dis));
-
-		setSelectItemIDs(
-				(OrderedHashtable)ExtUtil.nullIfEmpty((OrderedHashtable)ExtUtil.read(dis, new ExtWrapMap(String.class, String.class, true), pf)),
-				ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(Boolean.class), pf)),
-				null);
-		if (getSelectItemIDs() != null && (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_SELECT_ONE)) {
-			localizeSelectMap(null); //even for non-multilingual forms, text must be initially 'localized'
+		choices = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
+		for (int i = 0; i < getNumChoices(); i++) {
+			choices.elementAt(i).setIndex(i);
 		}
 
 		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
@@ -349,9 +271,7 @@ public class QuestionDef implements IFormElement, Localizable {
 				
 		ExtUtil.writeNumeric(dos, getControlType());
 		
-		//selectItems should not be serialized
-		ExtUtil.write(dos, new ExtWrapMap(ExtUtil.emptyIfNull(getSelectItemIDs())));
-		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(selectItemsLocalizable)));
+		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(choices)));
 
 		ExtUtil.write(dos, new ExtWrapNullable(binding == null ? null : new ExtWrapTagged(binding)));
 	}
