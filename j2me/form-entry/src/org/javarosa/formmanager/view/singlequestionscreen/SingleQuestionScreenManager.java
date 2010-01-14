@@ -94,10 +94,9 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	}
 
 	private void showFormViewScreen() {
-		model.setQuestionIndex(FormIndex.createBeginningOfFormIndex());
+		controller.jumpToIndex(FormIndex.createBeginningOfFormIndex());
 		formView = new FormViewScreen(this.model);
 		formView.setCommandListener(this);
-		J2MEDisplay.setView(formView);
 	}
 
 	public void refreshView() {
