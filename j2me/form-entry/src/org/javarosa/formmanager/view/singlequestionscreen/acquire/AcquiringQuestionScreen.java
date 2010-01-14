@@ -14,14 +14,16 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.clforms.acquire;
+package org.javarosa.formmanager.view.singlequestionscreen.acquire;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.formmanager.view.FormElementBinding;
-import org.javarosa.formmanager.view.clforms.SingleQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
+
+import de.enough.polish.ui.Style;
 
 /**
  * @author mel An extended SingleQuestionScreen that acquires the answer data
@@ -33,28 +35,8 @@ public abstract class AcquiringQuestionScreen extends SingleQuestionScreen {
 	public Command acquireCommand;
 	AcquireScreen acquireScreen;
 
-	public AcquiringQuestionScreen(FormElementBinding prompt) {
-
-		super(prompt);
-		addAcquireCommand();
-
-	}
-
-	public AcquiringQuestionScreen(FormElementBinding prompt, int temp) {
-
-		super(prompt, temp);
-		addAcquireCommand();
-
-	}
-
-	public AcquiringQuestionScreen(FormElementBinding prompt, String str) {
-
-		super(prompt, str);
-		addAcquireCommand();
-	}
-
-	public AcquiringQuestionScreen(FormElementBinding prompt, char str) {
-		super(prompt, str);
+	public AcquiringQuestionScreen(FormElementBinding qDef, Style style) {
+		super(qDef, style);
 		addAcquireCommand();
 
 	}

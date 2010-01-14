@@ -26,36 +26,31 @@
 /**
  * Cell-Life specific styles!
  */
-.CL_Forms_Form{
+.View_All_Form{
 	padding: 2;
 	background-color: gray;
 	screen-change-animation: particle;
 	layout: bottom | horizontal-center;	
 }
 
-
-.nextQuestion{
+.OneQPS_Form{
+	padding: 2;
+	background-color: gray;
 	screen-change-animation: right;
-	background-color: gray;
-	right-screen-change-animation-speed: 8; 
-    right-screen-change-animation-move-previous: true; 
-	
+	layout: bottom | horizontal-center;
+	always-include: true;
 }
 
-.prevQuestion{
+.OneQPS_Form_Right extends OneQPS_Form {
+	screen-change-animation: right;
+	always-include: true;
+
+}
+
+.OneQPS_Form_Left extends OneQPS_Form {
 	screen-change-animation: left;
-	background-color: gray;
-	left-screen-change-animation-speed: 8;  
-    left-screen-change-animation-move-previous: true; 
-	
-}
+	always-include: true;
 
-
-fromViewAnswers
-{
-	screen-change-animation: particle;
-	background-color: gray;
-	
 }
 
 
