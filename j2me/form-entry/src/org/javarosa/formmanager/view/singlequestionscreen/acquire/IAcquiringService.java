@@ -14,9 +14,11 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.clforms.acquire;
+package org.javarosa.formmanager.view.singlequestionscreen.acquire;
 
 import org.javarosa.formmanager.view.FormElementBinding;
+
+import de.enough.polish.ui.Style;
 
 /**
  * @author mel
@@ -26,12 +28,6 @@ import org.javarosa.formmanager.view.FormElementBinding;
  */
 public interface IAcquiringService {
 	
-	public AcquiringQuestionScreen getWidget(FormElementBinding prompt, int temp);
+	public AcquiringQuestionScreen getWidget(FormElementBinding prompt, Style style);
 
-	public AcquiringQuestionScreen getWidget(FormElementBinding prompt);
-
-	public AcquiringQuestionScreen getWidget(FormElementBinding prompt,
-			String str);
-
-	public AcquiringQuestionScreen getWidget(FormElementBinding prompt, char str);
 }

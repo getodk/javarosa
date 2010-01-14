@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view.clforms;
+package org.javarosa.formmanager.view.singlequestionscreen;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.List;
@@ -42,7 +42,7 @@ public class FormViewScreen extends List implements IFormEntryView {
 	public static Command backCommand;
 
 	public FormViewScreen (FormEntryModel model) {
-        //#style CL_Forms_Form
+        //#style View_All_Form
     	super(model.getForm().getTitle(),List.IMPLICIT);
     	this.model = model;
     	createView();
@@ -54,15 +54,12 @@ public class FormViewScreen extends List implements IFormEntryView {
 		exitSaveCommand = new Command(Localization.get("menu.SaveAndExit"), Command.SCREEN, 4);
 		sendCommand = new Command(Localization.get("menu.SendForm"), Command.SCREEN, 4);
 
-		//saveAndReloadCommand = new Command("SAVE&Reload", Command.ITEM, 3);
-
 		// next command is added on a per-widget basis
 		this.addCommand(exitNoSaveCommand);
 		//screen.addCommand(exitSaveCommand);
 		if(!model.isReadOnly()){
 		this.addCommand(sendCommand);
 		}
-		//screen.addCommand(saveAndReloadCommand);
 	}
 
 	protected void createView() {
