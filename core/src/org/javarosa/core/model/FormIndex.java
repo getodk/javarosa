@@ -120,7 +120,7 @@ public class FormIndex {
 			this.nextLevel = nextLevel;
 			this.localIndex = currentLevel.getLocalIndex();
 			this.instanceIndex = currentLevel.getInstanceIndex();
-			this.reference = nextLevel.reference;
+			this.reference = currentLevel.reference;
 		}
 	}
 	
