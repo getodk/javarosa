@@ -233,7 +233,7 @@ public class FormEntryModel {
 				// This should be safe now that the TreeReference is contained
 				// in the ancestor index itself
 				TreeElement ancestorNode = form.getDataModel()
-						.resolveReference(ancestorIndex.getReference());
+						.resolveReference(ancestorIndex.getLocalReference());
 
 				if (!ancestorNode.isRelevant()) {
 					relevant = false;
