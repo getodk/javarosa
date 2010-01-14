@@ -48,7 +48,7 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 	
 	private String groupName = "";
 	
-	// #style button
+	//#style button
 	public StringItem nextItem = new StringItem(null, Localization
 			.get("button.Next"), Item.BUTTON);
 
@@ -90,7 +90,7 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 		nextItem.setDefaultCommand(nextItemCommand); // add Command to Item.
 		
 		if(!groupName.equals("")){
-			// #style groupName
+			//#style groupName
 			 StringItem groupNameTitle = new StringItem(null,groupName, Item.LAYOUT_EXPAND);
 			 append(Graphics.BOTTOM, groupNameTitle);
 			
