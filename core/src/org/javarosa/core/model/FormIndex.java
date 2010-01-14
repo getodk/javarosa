@@ -168,8 +168,20 @@ public class FormIndex {
 		return nextLevel;
 	}
 	
-	public TreeReference getReference() {
+	public TreeReference getLocalReference() {
 		return reference;
+	}
+	
+	/**
+	 * @return The TreeReference of the fully qualified element described by this
+	 * FormIndex.
+	 */
+	public TreeReference getReference() {
+		FormIndex walker = this;
+		while(walker.nextLevel != null) {
+			walker = walker.nextLevel;
+		}
+		return walker.reference;
 	}
 	
 	/**
