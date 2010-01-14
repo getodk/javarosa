@@ -23,7 +23,7 @@ import javax.microedition.media.MediaException;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquiringQuestionScreen;
 import org.javarosa.j2me.services.BarcodeCaptureService;
 import org.javarosa.j2me.services.exception.ImageProcessingException;
 

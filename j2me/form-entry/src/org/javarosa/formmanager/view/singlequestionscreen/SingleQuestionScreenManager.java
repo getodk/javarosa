@@ -30,8 +30,8 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.formmanager.controller.FormEntryController;
-import org.javarosa.formmanager.model.FormEntryModel;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
@@ -81,7 +81,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 		if (((QuestionDef) prompt.element).getControlType() == Constants.DATATYPE_BARCODE) {
 			try { // is there a service that can acquire a barcode?
 				IAcquiringService barcodeService = (IAcquiringService) controller
-						.getDataCaptureService("clforms-barcode");
+						.getDataCaptureService("singlequestionscreen-barcode");
 
 				currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(
 						prompt, fromFormView, goingForward, barcodeService);

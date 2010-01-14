@@ -32,7 +32,7 @@ public class JRDemoFormEntryViewFactory implements IFormEntryViewFactory {
 		if (FormManagerProperties.VIEW_CHATTERBOX.equals(viewType)) {
 			return new Chatterbox("Chatterbox", model, controller);
 			
-		} else if (FormManagerProperties.VIEW_CLFORMS.equals(viewType)) {
+		} else if (FormManagerProperties.VIEW_singlequestionscreen.equals(viewType)) {
 			return new SingleQuestionScreenManager("1QpS", model, controller);
 			
 		} else {
