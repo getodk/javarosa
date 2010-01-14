@@ -16,36 +16,23 @@
 
 package org.javarosa.form.api;
 
-import java.util.Vector;
-
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 
-public class FormEntryPrompt {
+public class FormEntryPrompt extends FormEntryCaption {
 
-	FormDef form;
-	FormIndex index;
-    QuestionDef mQuestionDef;
     TreeElement mTreeElement;
 
     public FormEntryPrompt(FormDef form, FormIndex index) {
-    	this.form = form;
-    	this.index = index;
-    	this.mQuestionDef = (QuestionDef)form.getChild(index);
+    	super(form, index);
     	this.mTreeElement = form.getDataModel().resolveReference(index.getReference());
-    }
-    
-    public FormEntryPrompt(QuestionDef mQuestionDef, TreeElement mTreeElement) {
-        this.mTreeElement = mTreeElement;
-        this.mQuestionDef = mQuestionDef;
     }
 
     public int getControlType() {
-        return mQuestionDef.getControlType();
+        return getQuestionDef().getControlType();
     }
 
     public int getDataType() {
@@ -69,20 +56,14 @@ public class FormEntryPrompt {
         return mTreeElement.getConstraint().constraintMsg;
     }
 
-    public String getLongText() {
-        return substituteStringArgs(mQuestionDef.getLongText());
     }
     
     public Vector<SelectChoice> getSelectChoices() {
         return mQuestionDef.getChoices();
     }
  
-    public String getShortText() {
-    	return substituteStringArgs(mQuestionDef.getShortText());
-    }
-    
     public String getHelpText() {
-        return mQuestionDef.getHelpText();
+        return getQuestionDef().getHelpText();
     }
 
     public boolean isRequired() {
@@ -92,9 +73,4 @@ public class FormEntryPrompt {
     public boolean isReadOnly() {
         return !mTreeElement.isEnabled();
     }
-    
-    public String substituteStringArgs (String templateStr) {
-		return form.fillTemplateString(templateStr, index.getReference());
-    }
-
 }

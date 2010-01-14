@@ -37,7 +37,7 @@ public class FormManagerProperties implements IPropertyRules {
 		
 		// View Types
 	    public static final String VIEW_CHATTERBOX = "v_chatterbox";
-	    public static final String VIEW_CLFORMS = "v_clforms";
+	    public static final String VIEW_SINGLEQUESTIONSCREEN = "v_singlequestionscreen";
 	    
 	    /**
 	     * Creates the JavaRosa set of property rules
@@ -49,7 +49,7 @@ public class FormManagerProperties implements IPropertyRules {
 
 	        Vector allowableDisplays = new Vector();
 	        allowableDisplays.addElement(VIEW_CHATTERBOX);
-	        allowableDisplays.addElement(VIEW_CLFORMS);
+	        allowableDisplays.addElement(VIEW_SINGLEQUESTIONSCREEN);
 	        rules.put(VIEW_TYPE_PROPERTY, allowableDisplays);
 
 	    }
@@ -130,7 +130,7 @@ public class FormManagerProperties implements IPropertyRules {
 	    	if(VIEW_TYPE_PROPERTY.equals(propertyName)) {
 	    		if(VIEW_CHATTERBOX.equals(value)) {
 	    			return "Chatterbox";
-	    		} else if(VIEW_CLFORMS.equals(value)) {
+	    		} else if(VIEW_SINGLEQUESTIONSCREEN.equals(value)) {
 	    			return "One Question Per Screen"; 
 	    		}
 	     	}

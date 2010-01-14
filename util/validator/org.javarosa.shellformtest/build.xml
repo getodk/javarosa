@@ -122,7 +122,7 @@
 
 				<!-- log settings: only use debug setting when the test-property is true -->
 				<debug if="test" showLogOnError="true" verbose="true" level="error">
-					<filter pattern="org.celllife.clforms.*" level="debug" />
+					<filter pattern="org.javarosa.formmanager.view.singlequestionscreen.*" level="debug" />
 				</debug>
 				<!-- Properties of the actual javac compiler -->
 				<compiler debug="on" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/wmapi.jar"/>
@@ -179,8 +179,8 @@
 
 	<!-- Main Target: Builds project and runs j2mepolish Unit Tests on constructed jars -->
 	<target name="RunJ2MEUnitTests" depends="supressOutput, disableObfuscator, enableTesting, BuildClean" description="Runs j2mepolish Unit Tests on constructed jars">
-		<!--RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.FormViewManagerTest"/-->
-		<!--RunTestSuite suite="org.javarosa.formmanager.view.clforms.test.CLFormsWidgetsTest"/-->
+		<!--RunTestSuite suite="org.javarosa.formmanager.view.singlequestionscreen.test.FormViewManagerTest"/-->
+		<!--RunTestSuite suite="org.javarosa.formmanager.view.singlequestionscreen.test.singlequestionscreenWidgetsTest"/-->
 		
 
 		<!-- add new test suites here -->

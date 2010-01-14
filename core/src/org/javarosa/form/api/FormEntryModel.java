@@ -27,19 +27,20 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 
-
-
 public class FormEntryModel {
     private FormDef form;
     private FormIndex currentFormindex;
 
-    // total number of questions in the form; used for progress bar
-    public int totalQuestions; 
 
-    // Start New stuff today.
+    public FormEntryModel(FormDef form) {
+        this.form = form;
+        this.currentFormindex = FormIndex.createBeginningOfFormIndex();
+    }
+
 
     /**
-     * Given a FormIndex, returns the event this formindex should display in a view.
+     * Given a FormIndex, returns the event this FormIndex should display in a
+     * view.
      * 
      */
     public int getEvent(FormIndex index) {
@@ -49,15 +50,20 @@ public class FormEntryModel {
             return FormEntryController.END_OF_FORM_EVENT;
         }
 
-        //This came from chatterbox, and is unclear how correct it is, commented out for now. 
-        //DELETEME: If things work fine
-        //Vector defs = form.explodeIndex(index);
-        //IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
+        // This came from chatterbox, and is unclear how correct it is,
+        // commented out for now.
+        // DELETEME: If things work fine
+        // Vector defs = form.explodeIndex(index);
+        // IFormElement last = (defs.size() == 0 ? null : (IFormElement)
+        // defs.lastElement());
         IFormElement element = form.getChild(index);
         if (element instanceof GroupDef) {
-            if (((GroupDef) element).getRepeat()
-                    && form.getDataModel().resolveReference(form.getChildInstanceRef(index)) == null) {
-                return FormEntryController.PROMPT_NEW_REPEAT_EVENT;
+            if (((GroupDef) element).getRepeat()) {
+                if (form.getDataModel().resolveReference(form.getChildInstanceRef(index)) == null) {
+                    return FormEntryController.PROMPT_NEW_REPEAT_EVENT;
+                } else {
+                    return FormEntryController.REPEAT_EVENT;
+                }
             } else {
                 return FormEntryController.GROUP_EVENT;
             }
@@ -66,16 +72,19 @@ public class FormEntryModel {
         }
     }
 
-	protected TreeElement getTreeElement(FormIndex index) {
-		return form.getDataModel().resolveReference(index.getReference());
-	}
-	
-    /* 
+
+    protected TreeElement getTreeElement(FormIndex index) {
+        return form.getDataModel().resolveReference(index.getReference());
+    }
+
+
+    /**
      * @return the event for the current FormIndex
      */
     public int getCurrentEvent() {
         return getEvent(currentFormindex);
-	}
+    }
+
 
     /**
      * 
@@ -85,14 +94,16 @@ public class FormEntryModel {
         return form.getTitle();
     }
 
-    
+
     public FormEntryPrompt getQuestionPrompt(FormIndex index) {
-    	if(form.getChild(index) instanceof QuestionDef) {
-    		return new FormEntryPrompt(form, index);
-    	} else {
-    		throw new RuntimeException("Invalid query for Question prompt. Non-Question object at the form index");
-    	}
+        if (form.getChild(index) instanceof QuestionDef) {
+            return new FormEntryPrompt(form, index);
+        } else {
+            throw new RuntimeException(
+                    "Invalid query for Question prompt. Non-Question object at the form index");
+        }
     }
+
 
     public FormEntryPrompt getQuestionPrompt() {
         return getQuestionPrompt(currentFormindex);
@@ -113,46 +124,72 @@ public class FormEntryModel {
 
 
     public int getCurrentRelevantQuestionCount() {
-        // TODO
+        // TODO: Implement me.
         return 0;
     }
 
 
     public int getTotalRelevantQuestionCount() {
-        // TODO
+        // TODO: Implement me.
         return 0;
     }
 
 
     public FormIndex getCurrentFormIndex() {
         return currentFormindex;
-    } 
-    
-    // end new stuff
-
+    }
 
 
     protected void setCurrentLanguage(String language) {
-    	if(form.getLocalizer() != null) {
-    		form.getLocalizer().setLocale(language);
-    	}
+        if (form.getLocalizer() != null) {
+            form.getLocalizer().setLocale(language);
+        }
+    }
+
+
+    public String getCurrentLanguage() {
+        return form.getLocalizer().getLocale();
     }
 
 
     public void setQuestionIndex(FormIndex index) {
         if (!currentFormindex.equals(index)) {
-            // See if a hint exists that says we should have a model for this already
+            // See if a hint exists that says we should have a model for this
+            // already
             createModelIfNecessary(index);
             currentFormindex = index;
         }
     }
 
-    
+
     public FormDef getForm() {
         return form;
     }
 
-    
+
+    /**
+     * Returns a hierarchical list of FormEntryCaption objects for the given
+     * FormIndex
+     * 
+     * @param index
+     * @return list of FormEntryCaptions, FormEntryCaptions of current index
+     *         first.
+     */
+	public FormEntryCaption[] getCaptionHeirarchy(FormIndex index) {
+		Vector captions = new Vector();
+		while (index != null) {
+			IFormElement element = form.getChild(index);
+			if (!(element instanceof FormDef)) {
+				captions.add(new FormEntryCaption(getForm(), index));
+			}
+			index = index.getNextLevel();
+		}
+		FormEntryCaption[] captionArray = new FormEntryCaption[captions.size()];
+		captions.copyInto(captionArray);
+		return captionArray;
+    }
+
+
     /**
      * 
      * @return total number of questions in the form
@@ -162,21 +199,10 @@ public class FormEntryModel {
     }
 
 
-    protected boolean isAskNewRepeat(FormIndex questionIndex) {
-        Vector defs = form.explodeIndex(questionIndex);
-        IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
-        if (last instanceof GroupDef
-                && ((GroupDef) last).getRepeat()
-                && form.getDataModel().resolveReference(form.getChildInstanceRef(questionIndex)) == null) {
-            return true;
-        }
-        return false;
-    }
-
-
     public boolean isReadonly(FormIndex questionIndex) {
         TreeReference ref = form.getChildInstanceRef(questionIndex);
-        boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
+        boolean isAskNewRepeat =
+                getEvent(questionIndex) == FormEntryController.PROMPT_NEW_REPEAT_EVENT;
 
         if (isAskNewRepeat) {
             return false;
@@ -187,9 +213,17 @@ public class FormEntryModel {
     }
 
 
+    /**
+     * Determine if the current FormIndex is relevant. Only relevant indexes
+     * should be returned when filling out a form.
+     * 
+     * @param questionIndex
+     * @return
+     */
     public boolean isRelevant(FormIndex questionIndex) {
         TreeReference ref = form.getChildInstanceRef(questionIndex);
-        boolean isAskNewRepeat = isAskNewRepeat(questionIndex);
+        boolean isAskNewRepeat =
+                getEvent(questionIndex) == FormEntryController.PROMPT_NEW_REPEAT_EVENT;
 
         boolean relevant;
         if (isAskNewRepeat) {
@@ -201,22 +235,25 @@ public class FormEntryModel {
 
         if (relevant) { // if instance flag/condition says relevant, we still
             // have to check the <group>/<repeat> hierarchy
-            FormIndex ancestorIndex = questionIndex;
-            while(ancestorIndex != null) {
-            	ancestorIndex = ancestorIndex.getNextLevel();
 
-            	//This should be safe now that the TreeReference is contained in the ancestor index itself
-                TreeElement ancestorNode = form.getDataModel().resolveReference(ancestorIndex.getReference());
-                
+            FormIndex ancestorIndex = questionIndex;
+            while (!ancestorIndex.isTerminal()) {
+                // This should be safe now that the TreeReference is contained
+                // in the ancestor index itself
+                TreeElement ancestorNode =
+                        form.getDataModel().resolveReference(ancestorIndex.getLocalReference());
+
                 if (!ancestorNode.isRelevant()) {
                     relevant = false;
                     break;
                 }
+                ancestorIndex = ancestorIndex.getNextLevel();
             }
         }
 
         return relevant;
     }
+
 
     /**
      * For the current index: Checks whether the index represents a node which

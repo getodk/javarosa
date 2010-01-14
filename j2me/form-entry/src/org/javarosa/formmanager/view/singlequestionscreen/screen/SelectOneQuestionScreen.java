@@ -20,41 +20,37 @@ import java.util.Enumeration;
 
 import javax.microedition.lcdui.ChoiceGroup;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
-public class Select1QuestionScreen extends SingleQuestionScreen {
+public class SelectOneQuestionScreen extends SingleQuestionScreen {
 	protected ChoiceGroup cg;
 
-	public Select1QuestionScreen(FormElementBinding qDef,  Style style) {
-		super(qDef,  style);
+	public SelectOneQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+		super(prompt,groupName,style);
 	}
 
 	public void createView() {
-		if (qDef.instanceNode.required) {
+		if (prompt.isRequired()) {
 			// #style choiceGroup
 			cg = new ChoiceGroup("*"
-					+ ((QuestionDef) qDef.element).getLongText(),
+					+ prompt.getLongText(),
 					ChoiceGroup.EXCLUSIVE);
 		} else {
 			// #style choiceGroup
-			cg = new ChoiceGroup(((QuestionDef) qDef.element).getLongText(),
+			cg = new ChoiceGroup(prompt.getLongText(),
 					ChoiceGroup.EXCLUSIVE);
 		}
 
-		Enumeration itr = ((QuestionDef) qDef.element).getSelectItems().keys();// access
-																				// choices
-																				// directly
-
+		Enumeration itr = (prompt.getSelectItems().keys());
+		
 		int preselectionIndex = -1; // index of the preset value for the
 									// question, if any
-		String preselectionLabel = qDef.instanceNode.getValue() != null ? qDef.instanceNode
-				.getValue().getDisplayText()
+		String preselectionLabel = prompt.getAnswerText()!= null ? prompt.getAnswerText()
 				: null;
 		int count = 0;
 
@@ -76,9 +72,9 @@ public class Select1QuestionScreen extends SingleQuestionScreen {
 		if ((preselectionIndex > -1) && (preselectionIndex < cg.size()))
 			cg.setSelectedIndex(preselectionIndex, true);
 
-		this.addNavigationButtons();
-		if (((QuestionDef) qDef.element).getHelpText() != null) {
-			setHint(((QuestionDef) qDef.element).getHelpText());
+		this.addNavigationWidgets();
+		if (prompt.getHelpText() != null) {
+			setHint(prompt.getHelpText());
 		}
 
 	}
@@ -94,10 +90,7 @@ public class Select1QuestionScreen extends SingleQuestionScreen {
 			}
 		}
 
-		QuestionDef question = (QuestionDef) qDef.element;
-		Selection s = new Selection((String) question.getChoice(selectedIndex).getValue());
-		s.attachQuestionDef(question);
-
+		Selection s = new Selection((String) prompt.getSelectItems().elementAt(selectedIndex));
 		return (selectedIndex == -1 ? null : new SelectOneData(s));
 	}
 

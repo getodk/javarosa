@@ -16,8 +16,7 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
-//import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.StringItem;
@@ -25,16 +24,17 @@ import javax.microedition.lcdui.Ticker;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.j2me.view.J2MEDisplay;
 
+import de.enough.polish.ui.Command;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Style;
 
 public abstract class SingleQuestionScreen extends FramedForm implements IFormEntryView {
 
-	protected FormElementBinding qDef;
+	protected FormEntryPrompt prompt;
 	protected IAnswerData answer;
 
 	// GUI elements
@@ -45,15 +45,19 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 	public static Command nextItemCommand = new Command(Localization
 			.get("menu.Next"), Command.ITEM, 1);
 	
-	// #style button
+	private String groupName = "";
+	
+	//#style button
 	public StringItem nextItem = new StringItem(null, Localization
 			.get("button.Next"), Item.BUTTON);
 
-	public ItemCommandListener itemListner;
+	public ItemCommandListener itemListener;
 
-	public SingleQuestionScreen(FormElementBinding prompt,  Style style) {
-		super(prompt.element.getTitle(), style);
-		this.qDef = prompt;
+
+	public SingleQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+		super(prompt.getShortText(), style);
+		this.prompt = prompt;
+		this.groupName=groupName;
 		this.createView();
 		this.setUpCommands();
 	}
@@ -80,13 +84,20 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 		this.addCommand(nextCommand);
 	}
 
-	public void addNavigationButtons() {
+	public void addNavigationWidgets() {
 		this.append(nextItem);
 		nextItem.setDefaultCommand(nextItemCommand); // add Command to Item.
+		
+		if(!((groupName==null)||(groupName.equals("")))){
+			//#style groupName
+			 StringItem groupNameTitle = new StringItem(null,groupName, Item.LAYOUT_EXPAND);
+			 append(Graphics.BOTTOM, groupNameTitle);
+			
+		}
 	}
 
 	public void setItemCommandListner(ItemCommandListener itemListner) {
-		this.itemListner = itemListner;
+		this.itemListener = itemListner;
 	}
 
 	public void destroy() {

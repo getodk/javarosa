@@ -6,14 +6,14 @@ import java.util.Vector;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IPreloadHandler;
-import org.javarosa.demo.util.JRDemoFormEntryViewFactory;
 import org.javarosa.demo.util.JRDemoUtil;
+import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.CompletedFormOptionsState;
 import org.javarosa.formmanager.api.FormEntryState;
-import org.javarosa.formmanager.api.FormTransportState;
-import org.javarosa.formmanager.controller.FormEntryController;
+import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
+import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 public class JRDemoFormEntryState extends FormEntryState {
 
@@ -36,12 +36,17 @@ public class JRDemoFormEntryState extends FormEntryState {
 		this.cameFromFormList = cameFromFormList;
 	}
 	
-	protected FormEntryController getController() {
+	protected JrFormEntryController getController() {
 
 		Vector<IPreloadHandler> preloaders = JRDemoContext._().getPreloaders();
 		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(formID), preloaders);
+		FormDef form = fetcher.getFormDef();
 		
-		return new FormEntryController(new JRDemoFormEntryViewFactory(), fetcher, false);
+		
+		JrFormEntryController controller =  new JrFormEntryController(new FormEntryModel(form));
+		//TODO: Use Chatterbox/OQPS depending on the correct property.
+		controller.setView(new Chatterbox("Chatterbox",controller.getModel(),controller));
+		return controller;
 	}
 
 	public void abort() {

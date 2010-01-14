@@ -18,20 +18,17 @@ package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import javax.microedition.lcdui.TextField;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
 public class DecimalQuestionScreen extends SingleQuestionScreen {
 	protected TextField tf;
 
-	// private boolean isDecimal=false;
-
-	public DecimalQuestionScreen(FormElementBinding qDef, Style style) {
-		super(qDef,style);
+	public DecimalQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+		super(prompt,groupName,style);
 	}
 
 	public void createView() {
@@ -39,22 +36,19 @@ public class DecimalQuestionScreen extends SingleQuestionScreen {
 		// #style textBox
 		tf = new TextField("", "", 200, TextField.DECIMAL);
 
-		if (qDef.instanceNode.required)
-			tf.setLabel("*" + ((QuestionDef) qDef.element).getLongText()); // visual
-																			// symbol
-																			// for
-																			// required
+		if (prompt.isRequired())
+			tf.setLabel("*" + prompt.getLongText());
 		else
-			tf.setLabel(((QuestionDef) qDef.element).getLongText());
+			tf.setLabel(prompt.getLongText());
 
-		IAnswerData answerData = qDef.instanceNode.getValue();
+		IAnswerData answerData = prompt.getAnswerValue();
 		if ((answerData != null) && (answerData instanceof DecimalData))
 			tf.setString(((DecimalData) answerData).getDisplayText());
 
 		this.append(tf);
-		this.addNavigationButtons();
-		if (((QuestionDef) qDef.element).getHelpText() != null) {
-			setHint(((QuestionDef) qDef.element).getHelpText());
+		this.addNavigationWidgets();
+		if (prompt.getHelpText() != null) {
+			setHint(prompt.getHelpText());
 		}
 	}
 

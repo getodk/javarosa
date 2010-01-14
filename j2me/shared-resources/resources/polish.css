@@ -10,6 +10,30 @@
   * need to be specified in such polish.css files. 
   */
 
+/**
+  * the colors which are defined in
+  * the colors section can later be referenced.
+  * This makes changes easy, since the color
+  * just needs to be changed in one position.
+  * Even default colors (like blue, green, lime, etc)
+  * can be changed here. 
+  */
+
+colors {
+	fontColor: rgb( 30, 85, 86 );
+	focusedFontColor: #000;
+	bgColor:  #eee;
+	focusedBgColor:  #fff;
+	focusedBackground: yellow;
+	borderColor: fontColor;
+	focusedBorderColor: focusedFontColor;
+	menubarColor: rgb( 240, 240, 240 );
+	menubottombarColor: rgb( 210, 210, 210 );
+	oldQuestionColor: #E2E2E2;	
+	overlay: argb( 150, 255, 255, 255 );
+	buttonBgColor: #ffeecc;
+}
+
 
 .loginView {
 	background {
@@ -54,15 +78,6 @@
 }
 
 
-/**
-  * the colors which are defined in
-  * the colors section can later be referenced.
-  * This makes changes easy, since the color
-  * just needs to be changed in one position.
-  * Even default colors (like blue, green, lime, etc)
-  * can be changed here. 
-  */
-
 .buttonfocused {
 	font-color: black;
 	font-style: bold;
@@ -83,21 +98,18 @@
 	focused-style: buttonfocused;
 	background-color: buttonBgColor;
 }
-  
-colors {
-	fontColor: rgb( 30, 85, 86 );
-	focusedFontColor: #000;
-	bgColor:  #eee;
-	focusedBgColor:  #fff;
-	focusedBackground: yellow;
-	borderColor: fontColor;
-	focusedBorderColor: focusedFontColor;
-	menubarColor: rgb( 240, 240, 240 );
-	menubottombarColor: rgb( 210, 210, 210 );
-	oldQuestionColor: #E2E2E2;	
-	overlay: argb( 150, 255, 255, 255 );
-	buttonBgColor: #ffeecc;
+
+.groupName {
+	font-color: black;
+	font-style: italic;
+	background {
+		type: round-rect;
+		arc: 9;
+		color: buttonBgColor;
+
+	}
 }
+  
 
 title {
 	padding: 1;
