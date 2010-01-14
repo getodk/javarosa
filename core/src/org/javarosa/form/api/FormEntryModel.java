@@ -228,7 +228,7 @@ public class FormEntryModel {
 
 		if (relevant) { // if instance flag/condition says relevant, we still
 			// have to check the <group>/<repeat> hierarchy
-             FormIndex ancestorIndex = questionIndex.getNextLevel();
+            FormIndex ancestorIndex = questionIndex;
 			while (ancestorIndex != null) {
 				// This should be safe now that the TreeReference is contained
 				// in the ancestor index itself
