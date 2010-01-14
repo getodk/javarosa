@@ -32,8 +32,8 @@ public class JRDemoFormEntryViewFactory implements IFormEntryViewFactory {
 		if (FormManagerProperties.VIEW_CHATTERBOX.equals(viewType)) {
 			return new Chatterbox("Chatterbox", model, controller);
 			
-		} else if (FormManagerProperties.VIEW_singlequestionscreen.equals(viewType)) {
-			return new SingleQuestionScreenManager("1QpS", model, controller);
+		} else if (FormManagerProperties.VIEW_SINGLEQUESTIONSCREEN.equals(viewType)) {
+			return new SingleQuestionScreenManager("Single Question Screen", model, controller);
 			
 		} else {
 			throw new RuntimeException("No view known for type [" + viewType + "]");
