@@ -16,8 +16,6 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen;
 
-import java.util.Vector;
-
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
@@ -122,7 +120,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 					|| command == SingleQuestionScreen.nextCommand) {
 				IAnswerData answer = currentQuestionScreen.getWidgetValue();
 				this.goingForward = true;
-				int result = controller.questionAnswered(answer);
+				int result = controller.answerQuestion(answer);
 				if (result == FormEntryController.ANSWER_OK) {
 					controller.stepToNextEvent();
 					refreshView();
@@ -194,7 +192,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	{
 		IAnswerData answer = currentQuestionScreen.getWidgetValue();
 		this.goingForward = true;
-		controller.questionAnswered(answer);
+		controller.answerQuestion(answer);
 		refreshView();
 	}
 
@@ -242,7 +240,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 			// controller.save();
 			// controller.exit();
 		} else if (command == FormViewScreen.sendCommand) {
-			int counter = model.countUnansweredQuestions(true);
+			int counter = model.getCurrentRelevantQuestionCount();
 			if (counter > 0) {
 				String txt = Locale
 						.get("view.sending.CompulsoryQuestionsIncomplete");
@@ -269,7 +267,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	public void commandAction(Command c, Item item) {
 		if (c == SingleQuestionScreen.nextItemCommand) {
 			IAnswerData answer = currentQuestionScreen.getWidgetValue();
-			controller.questionAnswered(answer);// store answers
+			controller.answerQuestion(answer);// store answers
 			refreshView();
 		}
 	}
