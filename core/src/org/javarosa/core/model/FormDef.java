@@ -879,12 +879,19 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			Vector elements) {
 		FormIndex cur = null;
 		Vector curMultiplicities = new Vector();
+		for(int j = 0; j < multiplicities.size() ; ++j) {
+			curMultiplicities.add(multiplicities.elementAt(j));	
+		}
+		
 		Vector curElements = new Vector();
+		for(int j = 0; j < elements.size() ; ++j) {
+			curElements.add(elements.elementAt(j));	
+		}
+		
 		for (int i = indexes.size() - 1; i >= 0; i--) {
 			int ix = ((Integer) indexes.elementAt(i)).intValue();
 			int mult = ((Integer) multiplicities.elementAt(i)).intValue();
-			curMultiplicities.add(multiplicities.elementAt(i));
-			curElements.add(elements.elementAt(i));
+
 			//TODO: ... No words. Just fix it.
 			TreeReference ref = (TreeReference)((XPathReference)((IFormElement)elements.elementAt(i)).getBind()).getReference();
 			if (!(elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements
@@ -893,6 +900,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			}
 
 			cur = new FormIndex(cur, ix, mult,getChildInstanceRef(curElements,curMultiplicities));
+			curMultiplicities.remove(curMultiplicities.size() - 1);
+			curElements.remove(curElements.size() - 1);
 		}
 		return cur;
 	}
