@@ -51,9 +51,9 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 
 	public ItemCommandListener itemListner;
 
-	public SingleQuestionScreen(FormElementBinding prompt,  Style style) {
-		super(prompt.element.getTitle(), style);
-		this.qDef = prompt;
+	public SingleQuestionScreen(FormElementBinding binding,  Style style) {
+		super(binding.element.getTitle(), style);
+		this.qDef = binding;
 		this.createView();
 		this.setUpCommands();
 	}
