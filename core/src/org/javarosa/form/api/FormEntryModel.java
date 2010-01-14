@@ -55,9 +55,12 @@ public class FormEntryModel {
         //IFormElement last = (defs.size() == 0 ? null : (IFormElement) defs.lastElement());
         IFormElement element = form.getChild(index);
         if (element instanceof GroupDef) {
-            if (((GroupDef) element).getRepeat()
-                    && form.getDataModel().resolveReference(form.getChildInstanceRef(index)) == null) {
-                return FormEntryController.PROMPT_NEW_REPEAT_EVENT;
+            if (((GroupDef) element).getRepeat()) {
+            	if(form.getDataModel().resolveReference(form.getChildInstanceRef(index)) == null){
+            		return FormEntryController.PROMPT_NEW_REPEAT_EVENT;
+            	}else {
+            		return FormEntryController.REPEAT_EVENT;
+            	}
             } else {
                 return FormEntryController.GROUP_EVENT;
             }
