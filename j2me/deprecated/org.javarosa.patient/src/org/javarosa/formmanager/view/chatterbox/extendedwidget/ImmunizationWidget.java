@@ -45,7 +45,7 @@ public class ImmunizationWidget extends ExpandedWidget {
 		container.add(table);
 	}
 
-	protected Item getEntryWidget(FormEntryCaption prompt) {
+	protected Item getEntryWidget(FormEntryPrompt prompt) {
 		return container;
 	}
 

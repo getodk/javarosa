@@ -16,9 +16,8 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen;
 
-import java.util.Vector;
-
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.locale.Localization;
@@ -26,6 +25,7 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
@@ -42,7 +42,7 @@ import de.enough.polish.util.Locale;
 
 public class SingleQuestionScreenManager implements IFormEntryView,
 		CommandListener, ItemCommandListener {
-	private FormEntryController controller;
+	private JrFormEntryController controller;
 	private FormEntryModel model;
 
 	private SingleQuestionScreen currentQuestionScreen;
@@ -51,7 +51,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 
 	// GUI elements
 	public SingleQuestionScreenManager(String formTitle,
-			FormEntryController controller) {
+			JrFormEntryController controller) {
 		this.controller = controller;
 		this.model = controller.getModel();
 		this.goingForward = true;
@@ -111,38 +111,23 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	public void refreshView() {
 		SingleQuestionScreen view = getView(model.getCurrentFormIndex(),
 				this.goingForward);
-		J2MEDisplay.setView(view);
+		controller.setView(view);
 	}
 
 	public void commandAction(Command command, Displayable arg1) {
 		if (arg1 == formView) {
-			extracted(command);
+			formViewCommands(command);
 		} else {
 			if (command == SingleQuestionScreen.nextItemCommand
 					|| command == SingleQuestionScreen.nextCommand) {
-				IAnswerData answer = currentQuestionScreen.getWidgetValue();
-				this.goingForward = true;
-				int result = controller.questionAnswered(answer);
-				if (result == FormEntryController.ANSWER_OK) {
-					controller.stepToNextEvent();
-					refreshView();
-				} else if (result == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
-					J2MEDisplay.showError("Validation failure", model
-							.getQuestionPrompt().getConstraintText());
-				} else if (result == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
-					String txt = Locale
-							.get("view.sending.CompulsoryQuestionIncomplete");
-					J2MEDisplay.showError("Question Required", txt);
-				}
-				int event = controller.stepToNextEvent();
-				processModelEvent(event);
+				answerQuestion();
 			} else if (command == SingleQuestionScreen.previousCommand) {
 				this.goingForward = false;
 				int event = controller.stepToPreviousEvent();
 				processModelEvent(event);
 			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
 				viewAnswers();
-			} 
+			}
 			
 //			TODO: FIXME
 			else if ((arg1 instanceof AcquireScreen)) {
@@ -194,7 +179,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	{
 		IAnswerData answer = currentQuestionScreen.getWidgetValue();
 		this.goingForward = true;
-		controller.questionAnswered(answer);
+		controller.answerQuestion(answer);
 		refreshView();
 	}
 
@@ -231,7 +216,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 			processModelEvent(nextEvent);
 	}
 
-	private void extracted(Command command) {
+	private void formViewCommands(Command command) {
 		if (command == FormViewScreen.backCommand) {
 			this.show();
 		} else if (command == FormViewScreen.exitNoSaveCommand) {
@@ -242,7 +227,7 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 			// controller.save();
 			// controller.exit();
 		} else if (command == FormViewScreen.sendCommand) {
-			int counter = model.countUnansweredQuestions(true);
+			int counter = countUnansweredQuestions(true);
 			if (counter > 0) {
 				String txt = Locale
 						.get("view.sending.CompulsoryQuestionsIncomplete");
@@ -268,9 +253,51 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 
 	public void commandAction(Command c, Item item) {
 		if (c == SingleQuestionScreen.nextItemCommand) {
-			IAnswerData answer = currentQuestionScreen.getWidgetValue();
-			controller.questionAnswered(answer);// store answers
-			refreshView();
+			answerQuestion();
 		}
+	}
+
+	private void answerQuestion() {
+		IAnswerData answer = currentQuestionScreen.getWidgetValue();
+		this.goingForward = true;
+		int result = controller.answerQuestion(answer);
+		if (result == FormEntryController.ANSWER_OK) {
+			controller.stepToNextEvent();
+			refreshView();
+		} else if (result == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
+			J2MEDisplay.showError("Validation failure", model
+					.getQuestionPrompt().getConstraintText());
+		} else if (result == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
+			String txt = Locale
+					.get("view.sending.CompulsoryQuestionIncomplete");
+			J2MEDisplay.showError("Question Required", txt);
+		}
+		int event = controller.stepToNextEvent();
+		processModelEvent(event);
+	}
+
+	/**
+	 * @param countRequiredOnly
+	 *            if true count only the questions that are unanswered and also
+	 *            required
+	 * @return number of unanswered questions
+	 */
+	public int countUnansweredQuestions(boolean countRequiredOnly) {
+		// TODO - should this include only relevant questions?
+		int counter = 0;
+
+		FormIndex index = FormIndex.createBeginningOfFormIndex();
+		FormDef form = model.getForm();
+		while (!index.isEndOfFormIndex()){
+			FormEntryPrompt prompt = new FormEntryPrompt(form, index);
+			if (countRequiredOnly && prompt.isRequired() && prompt.getAnswerValue() == null) {
+				counter++;
+			} else if (prompt.getAnswerValue() == null) {
+				counter++;
+			}
+			index = form.incrementIndex(index);
+		}
+		
+		return counter;
 	}
 }

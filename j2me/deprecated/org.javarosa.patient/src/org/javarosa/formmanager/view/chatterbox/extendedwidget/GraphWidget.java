@@ -135,7 +135,7 @@ public class GraphWidget extends ExpandedWidget {
 	 * (non-Javadoc)
 	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#getEntryWidget(org.javarosa.core.model.QuestionDef)
 	 */
-	protected Item getEntryWidget(FormEntryCaption prompt) {		
+	protected Item getEntryWidget(FormEntryPrompt prompt) {		
 		return wec.wrapEntryWidget(chart);
 	}
 	
