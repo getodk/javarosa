@@ -24,6 +24,7 @@ import javax.microedition.lcdui.Font;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.util.Map;
+import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.IGraphTemplate;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.LineChart;
@@ -134,7 +135,7 @@ public class GraphWidget extends ExpandedWidget {
 	 * (non-Javadoc)
 	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#getEntryWidget(org.javarosa.core.model.QuestionDef)
 	 */
-	protected Item getEntryWidget(FormEntryPrompt prompt) {		
+	protected Item getEntryWidget(FormEntryCaption prompt) {		
 		return wec.wrapEntryWidget(chart);
 	}
 	
