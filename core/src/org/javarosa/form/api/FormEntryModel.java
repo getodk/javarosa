@@ -34,6 +34,12 @@ public class FormEntryModel {
 
 	// total number of questions in the form; used for progress bar
 	public int totalQuestions;
+	
+	
+	public FormEntryModel(FormDef form) {
+		this.form = form;
+		this.currentFormindex = FormIndex.createBeginningOfFormIndex();
+	}
 
 	// Start New stuff today.
 
