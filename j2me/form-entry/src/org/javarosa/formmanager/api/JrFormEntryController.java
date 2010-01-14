@@ -19,8 +19,11 @@ public class JrFormEntryController extends FormEntryController {
 	FormEntryTransitions transitions;
 	Displayable view;
 	
-	public JrFormEntryController(FormEntryModel model, FormEntryTransitions transitions, Displayable view) {
+	public JrFormEntryController(FormEntryModel model, Displayable view) {
 		super(model);
+	}
+	
+	public void setTransitions(FormEntryTransitions transitions) {
 		this.transitions = transitions;
 	}
 	
