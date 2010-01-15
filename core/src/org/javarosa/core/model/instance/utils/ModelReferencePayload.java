@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
+import org.javarosa.core.model.utils.IInstanceSerializingVisitor;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.services.transport.payload.IDataPayload;
@@ -48,7 +48,7 @@ public class ModelReferencePayload implements IDataPayload {
 	int recordId;
 	IDataPayload payload;
 	
-	IDataModelSerializingVisitor serializer;
+	IInstanceSerializingVisitor serializer;
 	
 	//NOTE: Should only be used for serializaiton.
 	public ModelReferencePayload() {
@@ -62,7 +62,7 @@ public class ModelReferencePayload implements IDataPayload {
 	/**
 	 * @param serializer the serializer to set
 	 */
-	public void setSerializer(IDataModelSerializingVisitor serializer) {
+	public void setSerializer(IInstanceSerializingVisitor serializer) {
 		this.serializer = serializer;
 	}
 

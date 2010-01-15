@@ -24,21 +24,21 @@ import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.services.transport.payload.IDataPayload;
 
 /**
- * An IDataModelSerializingVisitor serializes a DataModel
+ * An IInstanceSerializingVisitor serializes a DataModel
  * 
  * @author Clayton Sims
  *
  */
-public interface IDataModelSerializingVisitor extends IInstanceVisitor {
+public interface IInstanceSerializingVisitor extends IInstanceVisitor {
 	
-	byte[] serializeDataModel(IFormDataModel model, FormDef formDef) throws IOException;
+	byte[] serializeInstance(IFormDataModel model, FormDef formDef) throws IOException;
 	
-	byte[] serializeDataModel(IFormDataModel model) throws IOException;
+	byte[] serializeInstance(IFormDataModel model) throws IOException;
 	
 	public IDataPayload createSerializedPayload	(IFormDataModel model) throws IOException;
 	
 	void setAnswerDataSerializer(IAnswerDataSerializer ads);
 	
-	public IDataModelSerializingVisitor newInstance();
+	public IInstanceSerializingVisitor newInstance();
 
 }

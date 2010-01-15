@@ -18,7 +18,7 @@ package org.javarosa.patient.entry.activity;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.utils.IModelProcessor;
+import org.javarosa.core.model.utils.IInstanceProcessor;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.FormEntryState;
 import org.javarosa.formmanager.api.JrFormEntryController;
@@ -30,17 +30,17 @@ public abstract class PatientEntryState extends FormEntryState {
 	protected String batchRegForm = "jr-patient-batch-reg";
 
 	protected String formName;
-	protected IModelProcessor processor;
+	protected IInstanceProcessor processor;
 
 	public PatientEntryState() {
 		this(new PatientEntryModelProcessor());
 	}
 
-	public PatientEntryState(IModelProcessor processor) {
+	public PatientEntryState(IInstanceProcessor processor) {
 		this(processor, false);
 	}
 
-	public PatientEntryState(IModelProcessor processor, boolean batchMode) {
+	public PatientEntryState(IInstanceProcessor processor, boolean batchMode) {
 		this.formName = (batchMode ? batchRegForm : singleRegForm);
 		this.processor = processor;
 	}
@@ -62,7 +62,7 @@ public abstract class PatientEntryState extends FormEntryState {
 	public void formEntrySaved(FormDef form, FormInstance instanceData,
 			boolean formWasCompleted) {
 		if (formWasCompleted) {
-			processor.processModel(instanceData);
+			processor.processInstance(instanceData);
 			onward(instanceData.getID());
 		} else {
 			abort();

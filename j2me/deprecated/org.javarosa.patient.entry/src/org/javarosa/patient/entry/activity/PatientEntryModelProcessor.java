@@ -23,7 +23,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.utils.IModelProcessor;
+import org.javarosa.core.model.utils.IInstanceProcessor;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
@@ -32,11 +32,11 @@ import org.javarosa.patient.model.Patient;
 import org.javarosa.patient.model.data.NumericListData;
 import org.javarosa.patient.util.DateValueTuple;
 
-public class PatientEntryModelProcessor implements IModelProcessor {
+public class PatientEntryModelProcessor implements IInstanceProcessor {
 	
 	int patId;
 
-	public void processModel(FormInstance tree) {
+	public void processInstance(FormInstance tree) {
 		patId = -1;
 		
 		Vector patientRefs = tree.expandReference(newRef("/patients/patient"));
