@@ -358,7 +358,7 @@ public class Chatterbox extends FramedForm implements CommandListener{
     
 
 	private void createHeaderForElement(FormIndex questionIndex) {
-		String headerText = model.getEventTitle(questionIndex);
+		String headerText = model.getQuestionPrompt(questionIndex).getLongText();
 		if(headerText != null) {
 			ChatterboxWidget headerWidget = widgetFactory.getNewLabelWidget(questionIndex, headerText);
 			//If there is no valid header, there's no valid header. Possibly no label.

@@ -13,17 +13,21 @@ public class FormEntryCaption {
 	private GroupDef groupDef;
 	private QuestionDef questionDef;
 
+	public FormEntryCaption() {
+	}
+
 	public FormEntryCaption(FormDef form, FormIndex index) {
 		this.form = form;
 		this.index = index;
 
 		IFormElement element = form.getChild(index);
-		if (element instanceof GroupDef){
+		if (element instanceof GroupDef) {
 			this.groupDef = (GroupDef) element;
-		} else if (element instanceof QuestionDef){
+		} else if (element instanceof QuestionDef) {
 			this.questionDef = (QuestionDef) element;
 		} else {
-			throw new IllegalArgumentException("Unexpected type of IFormElement");
+			throw new IllegalArgumentException(
+					"Unexpected type of IFormElement");
 		}
 	}
 
