@@ -29,12 +29,12 @@ import org.javarosa.core.model.instance.TreeReference;
 
 public class FormEntryModel {
     private FormDef form;
-    private FormIndex currentFormindex;
+    private FormIndex currentFormIndex;
 
 
     public FormEntryModel(FormDef form) {
         this.form = form;
-        this.currentFormindex = FormIndex.createBeginningOfFormIndex();
+        this.currentFormIndex = FormIndex.createBeginningOfFormIndex();
     }
 
 
@@ -82,7 +82,7 @@ public class FormEntryModel {
      * @return the event for the current FormIndex
      */
     public int getCurrentEvent() {
-        return getEvent(currentFormindex);
+        return getEvent(currentFormIndex);
     }
 
 
@@ -95,6 +95,8 @@ public class FormEntryModel {
 
 
     /**
+     * When you have a question event, a QuestionPrompt will have all the
+     * information needed to display to the user.
      * 
      * @param index
      * @return
@@ -110,7 +112,24 @@ public class FormEntryModel {
 
 
     public FormEntryPrompt getCurrentQuestionPrompt() {
-        return getQuestionPrompt(currentFormindex);
+        return getQuestionPrompt(currentFormIndex);
+    }
+
+
+    /**
+     * When you have a non-question event, a CaptionPrompt will have all the
+     * information needed to display to the user.
+     * 
+     * @param index
+     * @return
+     */
+    public FormEntryCaption getCaptionPrompt(FormIndex index) {
+        return new FormEntryCaption(form, index);
+    }
+
+
+    public FormEntryCaption getCurrentCaptionPrompt() {
+        return getCaptionPrompt(currentFormIndex);
     }
 
 
@@ -140,7 +159,7 @@ public class FormEntryModel {
 
 
     public FormIndex getCurrentFormIndex() {
-        return currentFormindex;
+        return currentFormIndex;
     }
 
 
@@ -157,11 +176,11 @@ public class FormEntryModel {
 
 
     public void setQuestionIndex(FormIndex index) {
-        if (!currentFormindex.equals(index)) {
+        if (!currentFormIndex.equals(index)) {
             // See if a hint exists that says we should have a model for this
             // already
             createModelIfNecessary(index);
-            currentFormindex = index;
+            currentFormIndex = index;
         }
     }
 
