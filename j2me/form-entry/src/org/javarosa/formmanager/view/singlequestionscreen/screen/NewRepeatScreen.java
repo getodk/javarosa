@@ -16,7 +16,7 @@ public class NewRepeatScreen extends FramedForm {
 	private Command yesCommand = new Command(Constants.ACTIVITY_COMPLETE, Command.ITEM, 1);
 
 	public NewRepeatScreen() {
-		super("Add new repeat?");//Locale.get("view.repeat.addNew"));
+		super(Locale.get("view.repeat.addNew"));
 		createView();
 		addCommands();
 	}
