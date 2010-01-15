@@ -32,6 +32,7 @@ import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.IFormEntryView;
@@ -61,7 +62,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     
     public static final int UIHACK_SELECT_PRESS = 1;
 	
-	private FormEntryController controller;
+	private JrFormEntryController controller;
     private FormEntryModel model;
     
     private ChatterboxWidgetFactory widgetFactory;
@@ -87,7 +88,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     //private Command deleteRepeatCommand; //TODO do something with this
     private Gauge progressBar;
         
-    public Chatterbox (String formTitle, FormEntryController controller) {
+    public Chatterbox (String formTitle, JrFormEntryController controller) {
         //#style framedForm
     	super(formTitle);
     	
@@ -437,8 +438,8 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     
     public void formComplete () {
     	//TODO: READONLY FLAG!
-    	if(false) {
-	    	jumpToQuestion(FormIndex.createEndOfFormIndex());
+    	if(true) {
+	    	controller.jumpToIndex(FormIndex.createEndOfFormIndex());
 	    	babysitStyles();
 			progressBar.setValue(progressBar.getMaxValue());
 			
@@ -447,8 +448,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
 				Thread.sleep(1000); //let them bask in their completeness
 			} catch (InterruptedException ie) { }
 				
-//			controller.save();
-//			controller.exit();
+			controller.saveAndExit();
     	} else { 
     		
     	}
@@ -554,6 +554,12 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     public void questionAnswered () {
     	ChatterboxWidget frame = activeFrame();
 	
+    	if(activeQuestionIndex != this.model.getCurrentFormIndex()) {
+    		//this is an error that comes from polish sending two events for button up and button
+    		//down. We need to make it not send that message twice.
+    		System.out.println("mismatching indices");
+    		return;
+    	}
     	if (activeIsInterstitial) {
     		//'new repeat?' answered
     		String answer = ((Selection)frame.getData().getValue()).getValue();
