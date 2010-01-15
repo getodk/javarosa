@@ -147,7 +147,9 @@ public class SingleQuestionScreenManager extends FramedForm implements
 				String language = null;
 				for (int i = 0; i < SingleQuestionScreen.languageCommands.length; i++) {
 					if (command == SingleQuestionScreen.languageCommands[i]) {
-						language = command.getLabel();
+						String label = command.getLabel(); //has form language > mylanguage
+    					int sep = label.indexOf(">");
+    					language = label.substring(sep+1, label.length()).trim();
 						break;
 					}
 				}

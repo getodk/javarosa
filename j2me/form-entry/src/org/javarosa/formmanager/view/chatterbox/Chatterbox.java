@@ -521,7 +521,9 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		if (multiLingual) {
     			for (int i = 0; i < languageCommands.length; i++) {
     				if (command == languageCommands[i]) {
-    					language = command.getLabel();
+    					String label = command.getLabel(); //has form language > mylanguage
+    					int sep = label.indexOf(">");
+    					language = label.substring(sep+1, label.length()).trim();
     					break;
     				}
     			}
