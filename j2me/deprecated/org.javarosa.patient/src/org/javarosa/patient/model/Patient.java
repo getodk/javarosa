@@ -540,7 +540,7 @@ public class Patient implements Persistable, Restorable {
         TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));
         if ( e != null ){
             for (int i = 0; i < e.getNumChildren(); i++) {
-            	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
+            	TreeElement child = e.getChildAt(i);
             	String name = child.getName();
             	singles.put(name, RestoreUtils.getValue("other/" + name, dm));
             }

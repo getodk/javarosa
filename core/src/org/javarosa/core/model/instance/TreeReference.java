@@ -103,6 +103,18 @@ public class TreeReference implements Externalizable {
 		return refLevel == REF_ABSOLUTE;
 	}
 	
+	//return true if this ref contains any unbound multiplicities... ie, there is ANY chance this ref
+	//could ambiguously refer to more than one instance node.
+	public boolean isAmbiguous () {
+		//ignore level 0, as /data implies /data[0]
+		for (int i = 1; i < size(); i++) {
+			if (getMultiplicity(i) == INDEX_UNBOUND) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	//return a copy of the ref
 	public TreeReference clone () {
 		TreeReference newRef = new TreeReference();
