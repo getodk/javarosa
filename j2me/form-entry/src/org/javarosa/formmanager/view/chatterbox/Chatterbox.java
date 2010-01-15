@@ -180,7 +180,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
         //next command is added on a per-widget basis
         
         //TODO: READ ONLY FLAG!
-        if(false) {
+        if(true) {
             addCommand(backCommand);
             addCommand(exitSaveCommand);
             addCommand(saveCommand);
