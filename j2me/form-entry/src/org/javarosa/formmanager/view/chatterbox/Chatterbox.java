@@ -212,7 +212,16 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     }
     
     private void step(int event) {
-    	jumpToQuestion(model.getCurrentFormIndex());
+    	switch(event) {
+    	case FormEntryController.BEGINNING_OF_FORM_EVENT:
+    		break;
+    	case FormEntryController.END_OF_FORM_EVENT:
+    		formComplete();
+    		break;
+    		default:
+    			jumpToQuestion(model.getCurrentFormIndex());
+    			break;
+    	}
     }
     
     //make given question active; deal with all necessary questions in between
