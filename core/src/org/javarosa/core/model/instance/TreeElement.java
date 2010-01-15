@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package org.javarosa.core.model.instance;
 
 import java.io.DataInputStream;
@@ -23,10 +22,12 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
+import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
@@ -38,27 +39,21 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 /**
  * An element of a DataModelTree.
  * 
+ * TreeElements represent an XML node in the instance. It may either have a value (e.g., <name>Drew</name>),
+ * a number of TreeElement children (e.g., <meta><device /><timestamp /><user_id /></meta>), or neither (e.g.,
+ * <empty_node />)
+ * 
  * @author Clayton Sims
  * 
  */
 
  public class TreeElement implements Externalizable {
 	private String name; // can be null only for hidden root node
-	/**
-	 * multiplicity: can apparently take values: INDEX_UNBOUND, INDEX_TEMPLATE
-	 * added: TreeReference.DEFAULT_MUTLIPLICITY 
-	 * (@see TreeReference)
-	 */
-	public int multiplicity;// TODO comment and make private
-	private Vector attributes = new Vector();
-
+	public int multiplicity; // see TreeReference for special values
+	private TreeElement parent;
 	public boolean repeatable;
-	// public boolean isAttribute; for when we support xml attributes as data
-	// nodes
+	//public boolean isAttribute; for when we support xml attributes as data nodes
 
-	/**
-	 * value: without which the element can't have children?
-	 */
 	private IAnswerData value;
 	private Vector children = new Vector();
 
@@ -69,7 +64,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	private String preloadHandler = null;
 	private String preloadParams = null;
 
-	public boolean relevant = true;// TODO: ask mvp project to use accessor
+	private boolean relevant = true;
 	private boolean enabled = true;
 	// inherited properties 
 	private boolean relevantInherited = true;
@@ -77,6 +72,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	private Vector observers;
 
+	private Vector attributes = new Vector();
+	
 	/**
 	 * TreeElement with null name and 0 multiplicity? (a "hidden root" node?)
 	 */
@@ -91,18 +88,13 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	public TreeElement(String name, int multiplicity) {
 		this.name = name;
 		this.multiplicity = multiplicity;
+		this.parent = null;
 	}
 
 	public boolean isLeaf() {
 		return (children.size() == 0);
 	}
 
-	/**
-	 * 
-	 * cannot have children if it doesn't have a value?
-	 * 
-	 * @return
-	 */
 	public boolean isChildable() {
 		return (value == null);
 	}
@@ -111,8 +103,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		if (isLeaf()) {
 			this.value = value;
 		} else {
-			throw new RuntimeException(
-					"Can't set data value for node that has children!");
+			throw new RuntimeException("Can't set data value for node that has children!");
 		}
 	}
 
@@ -122,8 +113,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		} else {
 			for (int i = 0; i < this.children.size(); i++) {
 				TreeElement child = (TreeElement) this.children.elementAt(i);
-				if (name.equals(child.getName())
-						&& child.getMult() == multiplicity) {
+				if (name.equals(child.getName()) && child.getMult() == multiplicity) {
 					return child;
 				}
 			}
@@ -157,6 +147,14 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		return v;
 	}
 
+	public int getNumChildren() {
+		return this.children.size();
+	}
+
+	public TreeElement getChildAt (int i) {
+		return (TreeElement)children.elementAt(i);
+	}
+	
 	/**
 	 * Add a child to this element
 	 * 
@@ -167,17 +165,12 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	}
 
 	private void addChild(TreeElement child, boolean checkDuplicate) {
-
 		if (!isChildable()) {
-
-			throw new RuntimeException(
-					"Can't add children to node that has data value!");
-
+			throw new RuntimeException("Can't add children to node that has data value!");
 		}
 
 		if (child.multiplicity == TreeReference.INDEX_UNBOUND) {
-			throw new RuntimeException(
-					"Cannot add child with an unbound index!");
+			throw new RuntimeException("Cannot add child with an unbound index!");
 		}
 
 		if (checkDuplicate) {
@@ -195,13 +188,13 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 				i = children.indexOf(anchor);
 		} else {
 			TreeElement anchor = getChild(child.getName(),
-					(child.getMult() == 0 ? TreeReference.INDEX_TEMPLATE
-							: child.getMult() - 1));
+					(child.getMult() == 0 ? TreeReference.INDEX_TEMPLATE : child.getMult() - 1));
 			if (anchor != null)
 				i = children.indexOf(anchor) + 1;
 		}
 		children.insertElementAt(child, i);
-
+		child.setParent(this);
+		
 		child.setRelevant(isRelevant(), true);
 		child.setEnabled(isEnabled(), true);
 	}
@@ -240,6 +233,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	public TreeElement shallowCopy() {
 		TreeElement newNode = new TreeElement(name, multiplicity);
+		newNode.parent = parent;
 		newNode.repeatable = repeatable;
 		newNode.dataType = dataType;
 		newNode.relevant = relevant;
@@ -249,8 +243,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		newNode.preloadHandler = preloadHandler;
 		newNode.preloadParams = preloadParams;
 
-		newNode
-				.setAttributesFromSingleStringVector(getSingleStringAttributeVector());
+		newNode.setAttributesFromSingleStringVector(getSingleStringAttributeVector());
 		if (value != null) {
 			newNode.value = value.clone();
 		}
@@ -265,8 +258,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		newNode.children = new Vector();
 		for (int i = 0; i < children.size(); i++) {
 			TreeElement child = (TreeElement) children.elementAt(i);
-			if (includeTemplates
-					|| child.getMult() != TreeReference.INDEX_TEMPLATE) {
+			if (includeTemplates || child.getMult() != TreeReference.INDEX_TEMPLATE) {
 				newNode.addChild(child.deepCopy(includeTemplates));
 			}
 		}
@@ -328,10 +320,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	public void setEnabled(boolean enabled) {
 		setEnabled(enabled, false);
-	}
-
-	public int getNumChildren() {
-		return this.children.size();
 	}
 
 	public void setEnabled(boolean enabled, boolean inherited) {
@@ -574,13 +562,11 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * org.javarosa.core.services.storage.utilities.Externalizable#readExternal
 	 * (java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		name = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		multiplicity = ExtUtil.readInt(in);
 		repeatable = ExtUtil.readBool(in);
-		value = (IAnswerData) ExtUtil.read(in, new ExtWrapNullable(
-				new ExtWrapTagged()), pf);
+		value = (IAnswerData) ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
 
 		// children = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new
 		// ExtWrapList(TreeElement.class), pf));
@@ -606,17 +592,18 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 			// 3.
 			for (int i = 0; i < numChildren; ++i) {
 				boolean normal = ExtUtil.readBool(in);
+				TreeElement child;
+				
 				if (normal) {
 					// 3.1
-					TreeElement child = new TreeElement();
+					child = new TreeElement();
 					child.readExternal(in, pf);
-					children.addElement(child);
 				} else {
 					// 3.2
-					TreeElement child = (TreeElement) ExtUtil.read(in,
-							new ExtWrapTagged(), pf);
-					children.addElement(child);
+					child = (TreeElement) ExtUtil.read(in, new ExtWrapTagged(), pf);
 				}
+				child.setParent(this);
+				children.addElement(child);
 			}
 		}
 
@@ -649,8 +636,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(name));
 		ExtUtil.writeNumeric(out, multiplicity);
 		ExtUtil.writeBool(out, repeatable);
-		ExtUtil.write(out, new ExtWrapNullable(value == null ? null
-				: new ExtWrapTagged(value)));
+		ExtUtil.write(out, new ExtWrapNullable(value == null ? null : new ExtWrapTagged(value)));
 
 		// Jan 22, 2009 - csims@dimagi.com
 		// old line: ExtUtil.write(out, new
@@ -695,9 +681,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		ExtUtil.writeBool(out, enabled);
 		ExtUtil.writeBool(out, relevantInherited);
 		ExtUtil.writeBool(out, enabledInherited);
-		ExtUtil.write(out, new ExtWrapNullable(constraint)); // TODO:
-		// inefficient
-		// for repeats
+		ExtUtil.write(out, new ExtWrapNullable(constraint)); // TODO: inefficient for repeats
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(preloadHandler));
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(preloadParams));
 
@@ -705,6 +689,119 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		ExtUtil.write(out, new ExtWrapList(ExtUtil.emptyIfNull(attStrings)));
 	}
 
+	//rebuilding a node from an imported instance
+	//  there's a lot of error checking we could do on the received instance, but it's
+	//  easier to just ignore the parts that are incorrect
+	public void populate(TreeElement incoming, TreeReference ref, FormDef f) {
+		if (this.isLeaf()) {
+			// check that incoming doesn't have children?
+
+			IAnswerData value = incoming.getValue();
+			if (value == null) {
+				this.setValue(null);
+			} else if (this.dataType == Constants.DATATYPE_TEXT
+					|| this.dataType == Constants.DATATYPE_NULL) {
+				this.setValue(value); // value is a StringData
+			} else {
+				String textVal = (String) value.getValue();
+				IAnswerData typedVal = RestoreUtils.xfFact.parseData(textVal, this.dataType, ref, f);
+				this.setValue(typedVal);
+			}
+		} else {
+			Vector names = new Vector();
+			for (int i = 0; i < this.getNumChildren(); i++) {
+				TreeElement child = this.getChildAt(i);
+				if (!names.contains(child.getName())) {
+					names.addElement(child.getName());
+				}
+			}
+
+			// remove all default repetitions from skeleton data model (_preserving_ templates, though)
+			for (int i = 0; i < this.getNumChildren(); i++) {
+				TreeElement child = this.getChildAt(i);
+				if (child.repeatable && child.getMult() != TreeReference.INDEX_TEMPLATE) {
+					this.removeChildAt(i);
+					i--;
+				}
+			}
+
+			// make sure ordering is preserved (needed for compliance with xsd schema)
+			if (this.getNumChildren() != names.size()) {
+				throw new RuntimeException("sanity check failed");
+			}
+			
+			for (int i = 0; i < this.getNumChildren(); i++) {
+				TreeElement child = this.getChildAt(i);
+				String expectedName = (String) names.elementAt(i);
+
+				if (!child.getName().equals(expectedName)) {
+					TreeElement child2 = null;
+					int j;
+
+					for (j = i + 1; j < this.getNumChildren(); j++) {
+						child2 = this.getChildAt(j);
+						if (child2.getName().equals(expectedName)) {
+							break;
+						}
+					}
+					if (j == this.getNumChildren()) {
+						throw new RuntimeException("sanity check failed");
+					}
+
+					this.removeChildAt(j);
+					this.children.insertElementAt(child2, i);
+				}
+			}
+			// java i hate you so much
+
+			for (int i = 0; i < this.getNumChildren(); i++) {
+				TreeElement child = this.getChildAt(i);
+				Vector newChildren = incoming.getChildrenWithName(child.getName());
+
+				TreeReference childRef = ref.extendRef(child.getName(), TreeReference.INDEX_UNBOUND);
+
+				if (child.repeatable) {
+				    for (int k = 0; k < newChildren.size(); k++) {
+				        TreeElement newChild = child.deepCopy(true);
+				        newChild.setMult(k);
+				        this.children.insertElementAt(newChild, i + k + 1);
+				        newChild.populate((TreeElement)newChildren.elementAt(k), childRef, f);
+				    }
+				    i += newChildren.size();
+				} else {
+
+					if (newChildren.size() == 0) {
+						child.setRelevant(false);
+					} else {
+						child.populate((TreeElement)newChildren.elementAt(0), childRef, f);
+					}
+				}
+			}
+		}
+	}
+	
+	//return the tree reference that corresponds to this tree element
+	public TreeReference getRef () {
+		TreeElement elem = this;
+		TreeReference ref = TreeReference.selfRef();
+		
+		while (elem != null) {
+			TreeReference step;
+			
+			if (name != null) {
+				step = TreeReference.selfRef();
+				step.add(this.name, this.multiplicity);
+			} else {
+				step = TreeReference.rootRef();
+			}
+						
+			ref = ref.parent(step);
+			elem = elem.parent;
+		}
+		
+		return ref;
+	}
+	
 	public String getPreloadHandler() {
 		return preloadHandler;
 	}
@@ -729,10 +826,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		this.preloadParams = preloadParams;
 	}
 
-	public Vector getChildren() {
-		return children;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -749,6 +842,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		this.multiplicity = multiplicity;
 	}
 
+	public void setParent (TreeElement parent) {
+		this.parent = parent;
+	}
+	
 	public IAnswerData getValue() {
 		return value;
 	}

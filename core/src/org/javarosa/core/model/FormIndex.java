@@ -16,6 +16,8 @@
 
 package org.javarosa.core.model;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.instance.TreeReference;
 
 /**
@@ -415,4 +417,5 @@ public class FormIndex {
 		//Barring all of these cases, it should be true.
 		return true;
 	}
+	
 }

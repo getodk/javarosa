@@ -105,7 +105,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 		if (root.getNumChildren() == 0)
 			throw new RuntimeException("root node has no children");
 
-		return (TreeElement) root.getChildren().elementAt(0);
+		return root.getChildAt(0);
 	}
 
 	// throws classcastexception if not using XPathReference
@@ -383,8 +383,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 				TreeElement n2 = (k == 0 ? b : a);
 
 				for (int i = 0; i < n1.getNumChildren(); i++) {
-					TreeElement child1 = (TreeElement) n1.getChildren()
-							.elementAt(i);
+					TreeElement child1 = n1.getChildAt(i);
 					if (child1.repeatable)
 						continue;
 					TreeElement child2 = n2.getChild(child1.getName(), 0);
@@ -397,7 +396,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 
 			// compare children
 			for (int i = 0; i < a.getNumChildren(); i++) {
-				TreeElement childA = (TreeElement) a.getChildren().elementAt(i);
+				TreeElement childA = a.getChildAt(i);
 				if (childA.repeatable)
 					continue;
 				TreeElement childB = b.getChild(childA.getName(), 0);
@@ -698,7 +697,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
         TreeElement names = dm.resolveReference(RestoreUtils.absRef("namespace", dm));
         if (names != null) {
             for (int i = 0; i < names.getNumChildren(); i++) {
-            	TreeElement child = (TreeElement)names.getChildren().elementAt(i);
+            	TreeElement child = names.getChildAt(i);
             	String name = child.getName();
             	Object value = RestoreUtils.getValue("namespace/" + name, dm);
             	if (value != null){
@@ -720,123 +719,18 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 //		setRoot(processSavedDataModel(dm.resolveReference(RestoreUtils.absRef("data", dm)), f.getDataModel(), f));
 	}
 
-	public static TreeElement processSavedDataModel(
-			TreeElement newInstanceRoot, DataModelTree template, FormDef f) {
+	public static TreeElement processSavedDataModel(TreeElement newInstanceRoot, DataModelTree template, FormDef f) {
 		TreeElement newModelRoot = template.getRoot().deepCopy(true);
-		TreeElement incomingRoot = (TreeElement) newInstanceRoot.getChildren()
-				.elementAt(0);
+		TreeElement incomingRoot = newInstanceRoot.getChildAt(0);
 
-		if (!newModelRoot.getName().equals(incomingRoot.getName())
-				|| incomingRoot.getMult() != 0) {
-			throw new RuntimeException(
-					"Saved form instance to restore does not match form definition");
+		if (!newModelRoot.getName().equals(incomingRoot.getName()) || incomingRoot.getMult() != 0) {
+			throw new RuntimeException("Saved form instance to restore does not match form definition");
 		}
 		TreeReference ref = TreeReference.rootRef();
 		ref.add(newModelRoot.getName(), TreeReference.INDEX_UNBOUND);
-		populateNode(newModelRoot, incomingRoot, ref, f);
+		newModelRoot.populate(incomingRoot, ref, f);
 
 		return newModelRoot;
-	}
-
-	// there's a lot of error checking we could do on the received instance, but
-	// it's
-	// easier to just ignore the parts that are incorrect
-	public static void populateNode(TreeElement node, TreeElement incoming,
-			TreeReference ref, FormDef f) {
-		if (node.isLeaf()) {
-			// check that incoming doesn't have children?
-
-			IAnswerData value = incoming.getValue();
-			if (value == null) {
-				node.setValue(null);
-			} else if (node.dataType == Constants.DATATYPE_TEXT
-					|| node.dataType == Constants.DATATYPE_NULL) {
-				node.setValue(value); // value is a StringData
-			} else {
-				String textVal = (String) value.getValue();
-				IAnswerData typedVal = RestoreUtils.xfFact.parseData(textVal, node.dataType, ref, f);
-				node.setValue(typedVal);
-			}
-		} else {
-			Vector names = new Vector();
-			for (int i = 0; i < node.getNumChildren(); i++) {
-				TreeElement child = (TreeElement) node.getChildren().elementAt(
-						i);
-				if (!names.contains(child.getName())) {
-					names.addElement(child.getName());
-				}
-			}
-
-			// remove all default repetitions from skeleton data model
-			// (_preserving_ templates, though)
-			for (int i = 0; i < node.getNumChildren(); i++) {
-				TreeElement child = (TreeElement) node.getChildren().elementAt(
-						i);
-				if (child.repeatable
-						&& child.getMult() != TreeReference.INDEX_TEMPLATE) {
-					node.removeChildAt(i);
-					i--;
-				}
-			}
-
-			// make sure ordering is preserved (needed for compliance with xsd
-			// schema)
-			if (node.getNumChildren() != names.size()) {
-				throw new RuntimeException("sanity check failed");
-			}
-			for (int i = 0; i < node.getNumChildren(); i++) {
-				TreeElement child = (TreeElement) node.getChildren().elementAt(
-						i);
-				String expectedName = (String) names.elementAt(i);
-
-				if (!child.getName().equals(expectedName)) {
-					TreeElement child2 = null;
-					int j;
-
-					for (j = i + 1; j < node.getNumChildren(); j++) {
-						child2 = (TreeElement) node.getChildren().elementAt(j);
-						if (child2.getName().equals(expectedName)) {
-							break;
-						}
-					}
-					if (j == node.getNumChildren()) {
-						throw new RuntimeException("sanity check failed");
-					}
-
-					node.removeChildAt(j);
-					node.getChildren().insertElementAt(child2, i);
-				}
-			}
-			// java i hate you so much
-
-			for (int i = 0; i < node.getNumChildren(); i++) {
-				TreeElement child = (TreeElement) node.getChildren().elementAt(
-						i);
-				Vector newChildren = incoming.getChildrenWithName(child
-						.getName());
-
-				TreeReference childRef = ref.clone();
-				childRef.add(child.getName(), TreeReference.INDEX_UNBOUND);
-
-				if (child.repeatable) {
-				    for (int k = 0; k < newChildren.size(); k++) {
-				        TreeElement newChild = child.deepCopy(true);
-				        newChild.setMult(k);
-				        node.getChildren().insertElementAt(newChild, i + k + 1);
-				        populateNode(newChild, (TreeElement) newChildren.elementAt(k), childRef, f);
-				    }
-				    i += newChildren.size();
-				} else {
-
-					if (newChildren.size() == 0) {
-						child.setRelevant(false);
-					} else {
-						populateNode(child, (TreeElement) newChildren
-								.elementAt(0), childRef, f);
-					}
-				}
-			}
-		}
 	}
 
 	public DataModelTree clone () {
