@@ -250,7 +250,7 @@ public class Case implements Persistable, Restorable, IMetaData {
         //XFormAnswerDataSerializer s = new XFormAnswerDataSerializer();
         TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));
         for (int i = 0; i < e.getNumChildren(); i++) {
-        	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
+        	TreeElement child = e.getChildAt(i);
         	String name = child.getName();
         	int dataType = ((Integer)RestoreUtils.getValue("other/"+name+"/type", dm)).intValue();
         	String flatval = (String)RestoreUtils.getValue("other/"+ name+"/data", dm);
