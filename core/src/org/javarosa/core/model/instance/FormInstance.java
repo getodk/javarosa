@@ -32,7 +32,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
-import org.javarosa.core.model.utils.IDataModelVisitor;
+import org.javarosa.core.model.utils.IInstanceVisitor;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -423,7 +423,7 @@ public class FormInstance implements IFormDataModel, Persistable, Restorable {
 		return resolveReference(unpackReference(binding));
 	}
 
-	public void accept(IDataModelVisitor visitor) {
+	public void accept(IInstanceVisitor visitor) {
 		visitor.visit(this);
 
 		if (visitor instanceof ITreeVisitor) {
@@ -720,18 +720,18 @@ public class FormInstance implements IFormDataModel, Persistable, Restorable {
 //		setRoot(processSavedDataModel(dm.resolveReference(RestoreUtils.absRef("data", dm)), f.getDataModel(), f));
 	}
 
-	public static TreeElement processSavedDataModel(TreeElement newInstanceRoot, FormInstance template, FormDef f) {
-		TreeElement newModelRoot = template.getRoot().deepCopy(true);
+	public static TreeElement processSavedInstance(TreeElement newInstanceRoot, FormInstance template, FormDef f) {
+		TreeElement fixedInstanceRoot = template.getRoot().deepCopy(true);
 		TreeElement incomingRoot = newInstanceRoot.getChildAt(0);
 
-		if (!newModelRoot.getName().equals(incomingRoot.getName()) || incomingRoot.getMult() != 0) {
+		if (!fixedInstanceRoot.getName().equals(incomingRoot.getName()) || incomingRoot.getMult() != 0) {
 			throw new RuntimeException("Saved form instance to restore does not match form definition");
 		}
 		TreeReference ref = TreeReference.rootRef();
-		ref.add(newModelRoot.getName(), TreeReference.INDEX_UNBOUND);
-		newModelRoot.populate(incomingRoot, ref, f);
+		ref.add(fixedInstanceRoot.getName(), TreeReference.INDEX_UNBOUND);
+		fixedInstanceRoot.populate(incomingRoot, ref, f);
 
-		return newModelRoot;
+		return fixedInstanceRoot;
 	}
 
 	public FormInstance clone () {

@@ -18,7 +18,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * For example, FormInstance contains lots of redundant information about the structure of the instance
  * which doesn't change among saved instances. The extra space used for this redundant info can seriously
  * limit the number of saved forms we can store on a device. We can use this utility to serialize
- * DataModelTrees in a different way that excludes this redundant info (meaning we have to take the more
+ * FormInstances in a different way that excludes this redundant info (meaning we have to take the more
  * complicated step of restoring it from elsewhere during deserialization), with the benefit of much
  * smaller record sizes.
  * 

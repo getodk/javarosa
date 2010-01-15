@@ -59,7 +59,7 @@ public class FormEntryModel {
         IFormElement element = form.getChild(index);
         if (element instanceof GroupDef) {
             if (((GroupDef) element).getRepeat()) {
-                if (form.getDataModel().resolveReference(form.getChildInstanceRef(index)) == null) {
+                if (form.getInstance().resolveReference(form.getChildInstanceRef(index)) == null) {
                     return FormEntryController.PROMPT_NEW_REPEAT_EVENT;
                 } else {
                     return FormEntryController.REPEAT_EVENT;
@@ -74,7 +74,7 @@ public class FormEntryModel {
 
 
     protected TreeElement getTreeElement(FormIndex index) {
-        return form.getDataModel().resolveReference(index.getReference());
+        return form.getInstance().resolveReference(index.getReference());
     }
 
 
@@ -240,7 +240,7 @@ public class FormEntryModel {
         if (isAskNewRepeat) {
             return false;
         } else {
-            TreeElement node = form.getDataModel().resolveReference(ref);
+            TreeElement node = form.getInstance().resolveReference(ref);
             return !node.isEnabled();
         }
     }
@@ -262,7 +262,7 @@ public class FormEntryModel {
         if (isAskNewRepeat) {
             relevant = form.canCreateRepeat(ref);
         } else {
-            TreeElement node = form.getDataModel().resolveReference(ref);
+            TreeElement node = form.getInstance().resolveReference(ref);
             relevant = node.isRelevant(); // check instance flag first
         }
 
@@ -274,7 +274,7 @@ public class FormEntryModel {
                 // This should be safe now that the TreeReference is contained
                 // in the ancestor index itself
                 TreeElement ancestorNode =
-                        form.getDataModel().resolveReference(ancestorIndex.getLocalReference());
+                        form.getInstance().resolveReference(ancestorIndex.getLocalReference());
 
                 if (!ancestorNode.isRelevant()) {
                     relevant = false;
@@ -311,11 +311,11 @@ public class FormEntryModel {
                 GroupDef g = (GroupDef) e;
                 if (g.getRepeat() && g.getCountReference() != null) {
                     IAnswerData count =
-                            getForm().getDataModel().getDataValue(g.getCountReference());
+                            getForm().getInstance().getDataValue(g.getCountReference());
                     if (count != null) {
                         int fullcount = ((Integer) count.getValue()).intValue();
                         TreeReference ref = getForm().getChildInstanceRef(index);
-                        TreeElement element = getForm().getDataModel().resolveReference(ref);
+                        TreeElement element = getForm().getInstance().resolveReference(ref);
                         if (element == null) {
                             if (index.getInstanceIndex() < fullcount) {
                                 getForm().createNewRepeat(index);

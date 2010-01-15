@@ -18,7 +18,7 @@ package org.javarosa.core.model.instance.utils;
 
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.utils.IDataModelVisitor;
+import org.javarosa.core.model.utils.IInstanceVisitor;
 
 /**
  * ITreeVisitor is a visitor interface for the elements of the 
@@ -29,7 +29,7 @@ import org.javarosa.core.model.utils.IDataModelVisitor;
  * @author Clayton Sims
  *
  */
-public interface ITreeVisitor extends IDataModelVisitor {
+public interface ITreeVisitor extends IInstanceVisitor {
 	public void visit(FormInstance tree);
 	public void visit(TreeElement element);
 }

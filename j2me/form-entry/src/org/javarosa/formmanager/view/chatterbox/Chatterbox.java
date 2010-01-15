@@ -238,7 +238,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	IFormElement last = model.getForm().getChild(questionIndex);
     	if (last instanceof GroupDef) {
     		if (((GroupDef)last).getRepeat() &&	
-    			model.getForm().getDataModel().resolveReference(model.getForm().getChildInstanceRef(questionIndex)) == null) {
+    			model.getForm().getInstance().resolveReference(model.getForm().getChildInstanceRef(questionIndex)) == null) {
     			
     			//We're at a repeat interstitial point. If the group has the right configuration, we are able
     			//to trigger a new repeat here. Otherwise, we'll have to ask the controller to move along.
