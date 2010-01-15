@@ -239,8 +239,8 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 		this.goingForward = true;
 		int result = controller.answerQuestion(controller.getModel().getCurrentFormIndex(),answer);
 		if (result == FormEntryController.ANSWER_OK) {
-			controller.stepToNextEvent();
-			refreshView();
+			int event = controller.stepToNextEvent();
+			processModelEvent(event);
 		} else if (result == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
 			J2MEDisplay.showError("Validation failure", model
 					.getQuestionPrompt(controller.getModel().getCurrentFormIndex()
@@ -250,8 +250,7 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 			String txt = "There are unanswered compulsory questions and must be completed first to proceed";
 			J2MEDisplay.showError("Question Required", txt);
 		}
-		int event = controller.stepToNextEvent();
-		processModelEvent(event);
+		
 	}
 
 	/**
