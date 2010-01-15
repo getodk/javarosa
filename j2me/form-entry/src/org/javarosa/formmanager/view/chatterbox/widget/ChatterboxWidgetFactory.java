@@ -146,10 +146,14 @@ public class ChatterboxWidgetFactory {
     	
     	String label = model.getCaptionPrompt(index).getLongText();
     	
-    	FormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?", Constants.CONTROL_SELECT_ONE,Constants.DATATYPE_TEXT);
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?", Constants.CONTROL_SELECT_ONE,Constants.DATATYPE_TEXT);
 
-    	// q.addSelectChoice(new SelectChoice("Yes", "y", false));
-    	// q.addSelectChoice(new SelectChoice("No", "n", false));
+    	SelectChoice yes = new SelectChoice("Yes", "y", false);
+    	yes.setIndex(0);
+    	prompt.addSelectChoice(yes);
+    	SelectChoice no = new SelectChoice("No", "n", false);
+    	no.setIndex(1);
+    	prompt.addSelectChoice(no);
 		
 		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }

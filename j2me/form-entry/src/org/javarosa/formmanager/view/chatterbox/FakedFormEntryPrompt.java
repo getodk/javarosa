@@ -11,11 +11,14 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 	private String text;
 	private int controlType;
 	private int dataType;
+	
+	private Vector<SelectChoice> choices;
 
 	public FakedFormEntryPrompt(String text, int controlType, int dataType) {
 		this.text = text;
 		this.controlType = controlType;
 		this.dataType = dataType;
+		choices = new Vector<SelectChoice>();
 	}
 
 	public String getAnswerText() {
@@ -52,8 +55,11 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 	}
 
 	public Vector<SelectChoice> getSelectChoices() {
-		// TODO Auto-generated method stub
-		return new Vector<SelectChoice>();
+		return choices;
+	}
+	
+	public void addSelectChoice(SelectChoice choice) {
+		choices.addElement(choice);
 	}
 
 	public String getShortText() {
