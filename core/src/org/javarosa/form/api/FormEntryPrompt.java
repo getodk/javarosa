@@ -35,6 +35,13 @@ public class FormEntryPrompt extends FormEntryCaption {
     TreeElement mTreeElement;
 
 
+    /**
+     * This empty constructor exists for convenience of any supertypes of this prompt
+     */
+    protected FormEntryPrompt() {
+    	
+    }
+    
     public FormEntryPrompt(FormDef form, FormIndex index) {
         super(form, index);
         this.mTreeElement = form.getDataModel().resolveReference(index.getReference());
