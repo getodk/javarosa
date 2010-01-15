@@ -11,7 +11,7 @@ import java.util.Vector;
 
 import org.javarosa.cases.model.Case;
 import org.javarosa.chsreferral.model.PatientReferral;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.IModelProcessor;
@@ -36,9 +36,9 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.utils.IModelProcessor#processModel(org.javarosa.core.model.instance.DataModelTree)
+	 * @see org.javarosa.core.model.utils.IModelProcessor#processModel(org.javarosa.core.model.instance.FormInstance)
 	 */
-	public void processModel(DataModelTree tree) {
+	public void processModel(FormInstance tree) {
 		Vector caseElements = scrapeForCaseElements(tree);
 		for(int i=0; i < caseElements.size(); ++i) {
 			try {
@@ -257,7 +257,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		}
 	}
 	
-	private Vector scrapeForCaseElements(DataModelTree tree) {
+	private Vector scrapeForCaseElements(FormInstance tree) {
 		Vector caseElements = new Vector();
 		
 		Stack children = new Stack();

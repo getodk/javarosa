@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
@@ -190,8 +190,8 @@ public class User implements Persistable, Restorable
 		return "user";
 	}
 
-	public DataModelTree exportData() {
-		DataModelTree dm = RestoreUtils.createDataModel(this);
+	public FormInstance exportData() {
+		FormInstance dm = RestoreUtils.createDataModel(this);
 		RestoreUtils.addData(dm, "name", username);
 		RestoreUtils.addData(dm, "pass", password);
 		RestoreUtils.addData(dm, "type", userType);
@@ -206,7 +206,7 @@ public class User implements Persistable, Restorable
 		return dm;
 	}
 
-	public void templateData(DataModelTree dm, TreeReference parentRef) {
+	public void templateData(FormInstance dm, TreeReference parentRef) {
 		RestoreUtils.applyDataType(dm, "name", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "pass", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "type", parentRef, String.class);
@@ -216,7 +216,7 @@ public class User implements Persistable, Restorable
 		// other/* defaults to string
 	}
 
-	public void importData(DataModelTree dm) {
+	public void importData(FormInstance dm) {
 		username = (String)RestoreUtils.getValue("name", dm);
 		password = (String)RestoreUtils.getValue("pass", dm);
 		userType = (String)RestoreUtils.getValue("type", dm);

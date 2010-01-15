@@ -1,6 +1,6 @@
 package org.javarosa.core.model.instance.utils;
 
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 
 /**
  * Used by CompactModelWrapper to retrieve the template DataModelTrees (from the original FormDef)
@@ -12,11 +12,11 @@ import org.javarosa.core.model.instance.DataModelTree;
 public interface DataModelTemplateManager {
 
 	/**
-	 * return DataModelTree for the FormDef with the given form ID
+	 * return FormInstance for the FormDef with the given form ID
 	 * @param formID
 	 * @return
 	 */
-	DataModelTree getTemplateModel (int formID);
+	FormInstance getTemplateModel (int formID);
 
 }
 

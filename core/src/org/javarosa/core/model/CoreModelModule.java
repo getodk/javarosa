@@ -17,7 +17,7 @@
 package org.javarosa.core.model;
 
 import org.javarosa.core.api.IModule;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.storage.StorageManager;
  
@@ -25,12 +25,12 @@ public class CoreModelModule implements IModule {
 	
 	public void registerModule() {
 		StorageManager.registerStorage(FormDef.STORAGE_KEY, FormDef.class);
-		StorageManager.registerStorage(DataModelTree.STORAGE_KEY, DataModelTree.class);
+		StorageManager.registerStorage(FormInstance.STORAGE_KEY, FormInstance.class);
 		
 		String[] classes = {
 				"org.javarosa.core.model.QuestionDef",
 				"org.javarosa.core.model.GroupDef",
-				"org.javarosa.core.model.instance.DataModelTree",
+				"org.javarosa.core.model.instance.FormInstance",
 				"org.javarosa.core.model.data.StringData",
 				"org.javarosa.core.model.data.IntegerData",
 				"org.javarosa.core.model.data.DecimalData",

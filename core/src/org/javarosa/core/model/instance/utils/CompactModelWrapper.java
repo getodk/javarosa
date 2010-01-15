@@ -37,7 +37,7 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -56,10 +56,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 /**
  * An alternate serialization format for DataModelTrees (saved form instances) that drastically reduces the 
  * resultant record size by cutting out redundant information. Size savings are typically 90-95%. The trade-off is
- * that in order to deserialize, a template DataModelTree (typically from the original FormDef) must be provided.
+ * that in order to deserialize, a template FormInstance (typically from the original FormDef) must be provided.
  * 
  * In general, the format is thus:
- * 1) write the fields from the DataModelTree object (e.g., date saved), excluding those that never change for a given
+ * 1) write the fields from the FormInstance object (e.g., date saved), excluding those that never change for a given
  *    form type (e.g., schema).
  * 2) walk the tree depth-first. for each node: if repeatable, write the number of repetitions at the current level; if
  *    not, write a boolean indicating if the node is relevant. non-relevant nodes are not descended into. repeated nodes
@@ -85,7 +85,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	public static final int CHOICE_MODE = CHOICE_INDEX;
 	
 	private DataModelTemplateManager templateMgr;	/* model template provider; provides templates needed for deserialization. */
-	private DataModelTree model;					/* underlying DataModelTree to serialize/deserialize */
+	private FormInstance model;					/* underlying FormInstance to serialize/deserialize */
 	
 	public CompactModelWrapper () {
 		this(null);
@@ -100,11 +100,11 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	}
 	
 	public Class baseType () {
-		return DataModelTree.class;
+		return FormInstance.class;
 	}
 	
 	public void setData (Externalizable e) {
-		this.model = (DataModelTree)e;
+		this.model = (FormInstance)e;
 	}
 	
 	public Externalizable getData () {
@@ -142,11 +142,11 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 		writeTreeElement(out, root, TreeReference.initRef(root));
 	}
 	
-	private DataModelTree getTemplateModel (int formID) {
+	private FormInstance getTemplateModel (int formID) {
 		if (templateMgr != null) {
 			return templateMgr.getTemplateModel(formID);
 		} else {
-			DataModelTree template = loadTemplateModel(formID);
+			FormInstance template = loadTemplateModel(formID);
 			if (template == null) {
 				throw new RuntimeException("no formdef found for form id [" + formID + "]");
 			}
@@ -159,7 +159,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	 * @param formID
 	 * @return
 	 */
-	public static DataModelTree loadTemplateModel (int formID) {
+	public static FormInstance loadTemplateModel (int formID) {
 		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
 		FormDef f = (FormDef)forms.read(formID);
 		return (f != null ? f.getDataModel() : null);
@@ -437,7 +437,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	}
 	
 	/**
-	 * map xforms data types to the Class that represents that data in a DataModelTree
+	 * map xforms data types to the Class that represents that data in a FormInstance
 	 * @param dataType
 	 * @return
 	 */

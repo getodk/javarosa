@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.demo.util.JRDemoUtil;
 import org.javarosa.form.api.FormEntryModel;
@@ -54,12 +54,12 @@ public class JRDemoFormEntryState extends FormEntryState {
 		JRDemoUtil.goToList(cameFromFormList);
 	}
 
-	public void formEntrySaved(FormDef form, DataModelTree instanceData, boolean formWasCompleted) {
+	public void formEntrySaved(FormDef form, FormInstance instanceData, boolean formWasCompleted) {
 		if (formWasCompleted) {
 			
 			CompletedFormOptionsState completed = new CompletedFormOptionsState(instanceData) {
 
-				public void sendData(DataModelTree data) {
+				public void sendData(FormInstance data) {
 					JRDemoFormTransportState send;
 					try {
 						send = new JRDemoFormTransportState(data) {
@@ -79,11 +79,11 @@ public class JRDemoFormEntryState extends FormEntryState {
 					send.start();
 				}
 
-				public void sendToFreshLocation(DataModelTree data) {
+				public void sendToFreshLocation(FormInstance data) {
 					throw new RuntimeException("Sending to non-default location disabled");
 				}
 
-				public void skipSend(DataModelTree data) {
+				public void skipSend(FormInstance data) {
 					abort();
 				}
 			};

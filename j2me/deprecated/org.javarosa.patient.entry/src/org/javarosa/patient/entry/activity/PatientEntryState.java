@@ -17,7 +17,7 @@
 package org.javarosa.patient.entry.activity;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IModelProcessor;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.FormEntryState;
@@ -57,9 +57,9 @@ public abstract class PatientEntryState extends FormEntryState {
 	 * @see
 	 * org.javarosa.formmanager.api.transitions.FormEntryTransitions#formEntrySaved
 	 * (org.javarosa.core.model.FormDef,
-	 * org.javarosa.core.model.instance.DataModelTree, boolean)
+	 * org.javarosa.core.model.instance.FormInstance, boolean)
 	 */
-	public void formEntrySaved(FormDef form, DataModelTree instanceData,
+	public void formEntrySaved(FormDef form, FormInstance instanceData,
 			boolean formWasCompleted) {
 		if (formWasCompleted) {
 			processor.processModel(instanceData);

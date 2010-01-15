@@ -58,7 +58,7 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 
 	public SingleQuestionScreen getView(FormIndex qIndex, boolean fromFormView) {
 		FormEntryPrompt prompt = model.getQuestionPrompt(qIndex);
-		FormEntryCaption[] captionHeirarchy = model.getCaptionHeirarchy(qIndex);
+		FormEntryCaption[] captionHeirarchy = model.getCaptionHierarchy(qIndex);
 		String groupTitle = null;
 		if (captionHeirarchy.length > 1) {
 			FormEntryCaption caption = captionHeirarchy[1];

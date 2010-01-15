@@ -37,7 +37,7 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
- * An element of a DataModelTree.
+ * An element of a FormInstance.
  * 
  * TreeElements represent an XML node in the instance. It may either have a value (e.g., <name>Drew</name>),
  * a number of TreeElement children (e.g., <meta><device /><timestamp /><user_id /></meta>), or neither (e.g.,

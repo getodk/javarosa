@@ -23,7 +23,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -58,7 +58,7 @@ public abstract class Triggerable implements Externalizable {
 
 		for (int i = 0; i < targets.size(); i++) {
 			TreeReference targetRef = ((TreeReference)targets.elementAt(i)).contextualize(evalContext.getContextRef());
-			Vector v = ((DataModelTree)model).expandReference(targetRef);		
+			Vector v = ((FormInstance)model).expandReference(targetRef);		
 			for (int j = 0; j < v.size(); j++) {
 				TreeReference affectedRef = (TreeReference)v.elementAt(j);
 				apply(affectedRef, result, model, f);

@@ -387,7 +387,7 @@ public class XPathEvalTest extends TestCase {
 			fail("Custom function handler did not successfully send data to external source");
 		
 		/* fetching from model */
-//		DataModelTree dm1 = newDataModel();
+//		FormInstance dm1 = newDataModel();
 //		testEval("/", dm1, null, "");
 //		testEval("/non-existent", dm1, null, "");
 //		
@@ -427,11 +427,11 @@ public class XPathEvalTest extends TestCase {
 //		//testEval("/..", null, null, new XPathUnsupportedException());
 	}
 	/*
-	private DataModelTree newDataModel () {
-		return new DataModelTree(new TreeElement());
+	private FormInstance newDataModel () {
+		return new FormInstance(new TreeElement());
 	}
 	
-	private void addDataRef (DataModelTree dm, String ref, IAnswerData data) {
+	private void addDataRef (FormInstance dm, String ref, IAnswerData data) {
 		addNodeRef(dm, ref, true);
 		
 		if (data != null) {
@@ -439,7 +439,7 @@ public class XPathEvalTest extends TestCase {
 		}
 	}
 	
-	private void addNodeRef (DataModelTree dm, String ref, boolean terminal) {
+	private void addNodeRef (FormInstance dm, String ref, boolean terminal) {
 		Vector pieces = new Vector();
 		
 		//split ref by '/', assume first char is '/'

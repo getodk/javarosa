@@ -21,7 +21,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.IModelProcessor;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -36,7 +36,7 @@ public class PatientEntryModelProcessor implements IModelProcessor {
 	
 	int patId;
 
-	public void processModel(DataModelTree tree) {
+	public void processModel(FormInstance tree) {
 		patId = -1;
 		
 		Vector patientRefs = tree.expandReference(newRef("/patients/patient"));
@@ -47,7 +47,7 @@ public class PatientEntryModelProcessor implements IModelProcessor {
 		} 
 	}
 	
-	public int parsePatientFromModel(DataModelTree tree, TreeReference patRef) {
+	public int parsePatientFromModel(FormInstance tree, TreeReference patRef) {
 		Patient newPatient = new Patient();
 		
 		String id = (String)getValue("/patients/patient/id", patRef, tree);
@@ -91,13 +91,13 @@ public class PatientEntryModelProcessor implements IModelProcessor {
 		return newPatient.getID();
 	}
 	
-	private Object getValue (String xpath, TreeReference context, DataModelTree tree) {
+	private Object getValue (String xpath, TreeReference context, FormInstance tree) {
 		IAnswerData val = tree.resolveReference(newRef(xpath).contextualize(context)).getValue();
 		return (val == null ? null : val.getValue());
 	}
 	
 	private TreeReference newRef (String xpath) {
-		return DataModelTree.unpackReference(new XPathReference(xpath));
+		return FormInstance.unpackReference(new XPathReference(xpath));
 	}
 	
 	public int getPatId() {

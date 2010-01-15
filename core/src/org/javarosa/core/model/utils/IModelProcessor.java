@@ -19,7 +19,7 @@
  */
 package org.javarosa.core.model.utils;
 
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 
 /**
  * An interface for classes which are capable of parsing and performing actions
@@ -36,5 +36,5 @@ public interface IModelProcessor {
 	 * 
 	 * @param tree The data model that will be handled.
 	 */
-	public void processModel(DataModelTree tree);
+	public void processModel(FormInstance tree);
 }

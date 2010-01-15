@@ -31,7 +31,7 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -124,7 +124,7 @@ public class XPathPathExpr extends XPathExpression {
 	}
 	
 	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
-		DataModelTree m = (DataModelTree)model;
+		FormInstance m = (FormInstance)model;
 		TreeReference ref = getReference().contextualize(evalContext.getContextRef());
 		
 		if (evalContext.isConstraint && ref.equals(evalContext.getContextRef())) {
@@ -163,7 +163,7 @@ public class XPathPathExpr extends XPathExpression {
 	}
 	
 	public static Object getRefValue (IFormDataModel model, TreeReference ref) {
-		TreeElement node = ((DataModelTree)model).resolveReference(ref);
+		TreeElement node = ((FormInstance)model).resolveReference(ref);
 		if (node == null) {
 			throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
 		}

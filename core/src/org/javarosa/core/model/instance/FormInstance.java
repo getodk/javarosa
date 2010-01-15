@@ -41,7 +41,7 @@ import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
-public class DataModelTree implements IFormDataModel, Persistable, Restorable {
+public class FormInstance implements IFormDataModel, Persistable, Restorable {
 
 	public static final String STORAGE_KEY = "FORMDATA";
 	
@@ -69,7 +69,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 	
 	private Hashtable namespaces = new Hashtable();
 
-	public DataModelTree() {
+	public FormInstance() {
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 	 * @param root
 	 *            The root of the tree for this data model.
 	 */
-	public DataModelTree(TreeElement root) {
+	public FormInstance(TreeElement root) {
 		setID(-1);
 		setFormId(-1);
 		setRoot(root);
@@ -652,8 +652,8 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 	// TODO: include whether form was sent already (or restrict always to unsent
 	// forms)
 
-	public DataModelTree exportData() {
-		DataModelTree dm = RestoreUtils.createDataModel(this);
+	public FormInstance exportData() {
+		FormInstance dm = RestoreUtils.createDataModel(this);
 		RestoreUtils.addData(dm, "name", name);
 		RestoreUtils.addData(dm, "form-id", new Integer(formId));
 		RestoreUtils.addData(dm, "saved-on", dateSaved,
@@ -661,7 +661,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 		RestoreUtils.addData(dm, "schema", schema);
 
 /////////////
-		throw new RuntimeException("DataModelTree.exportData(): must be updated to use new transport layer");
+		throw new RuntimeException("FormInstance.exportData(): must be updated to use new transport layer");
 //		ITransportManager tm = TransportManager._();
 //		boolean sent = (tm.getModelDeliveryStatus(id, true) == TransportMessage.STATUS_DELIVERED);
 //		RestoreUtils.addData(dm, "sent", new Boolean(sent));
@@ -676,7 +676,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 //		return dm;
 	}
 
-	public void templateData(DataModelTree dm, TreeReference parentRef) {
+	public void templateData(FormInstance dm, TreeReference parentRef) {
 		RestoreUtils.applyDataType(dm, "name", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "form-id", parentRef, Integer.class);
 		RestoreUtils.applyDataType(dm, "saved-on", parentRef,
@@ -686,7 +686,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 		// don't touch data for now
 	}
 
-	public void importData(DataModelTree dm) {
+	public void importData(FormInstance dm) {
 		name = (String) RestoreUtils.getValue("name", dm);
 		formId = ((Integer) RestoreUtils.getValue("form-id", dm)).intValue();
 		dateSaved = (Date) RestoreUtils.getValue("saved-on", dm);
@@ -708,7 +708,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
         }
 
 /////////////
-		throw new RuntimeException("DataModelTree.importData(): must be updated to use new transport layer");
+		throw new RuntimeException("FormInstance.importData(): must be updated to use new transport layer");
 //		if (sent) {			
 //			ITransportManager tm = TransportManager._();
 //			tm.markSent(id, false);
@@ -720,7 +720,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 //		setRoot(processSavedDataModel(dm.resolveReference(RestoreUtils.absRef("data", dm)), f.getDataModel(), f));
 	}
 
-	public static TreeElement processSavedDataModel(TreeElement newInstanceRoot, DataModelTree template, FormDef f) {
+	public static TreeElement processSavedDataModel(TreeElement newInstanceRoot, FormInstance template, FormDef f) {
 		TreeElement newModelRoot = template.getRoot().deepCopy(true);
 		TreeElement incomingRoot = newInstanceRoot.getChildAt(0);
 
@@ -734,8 +734,8 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 		return newModelRoot;
 	}
 
-	public DataModelTree clone () {
-		DataModelTree cloned = new DataModelTree(this.getRoot().deepCopy(true));
+	public FormInstance clone () {
+		FormInstance cloned = new FormInstance(this.getRoot().deepCopy(true));
 		
 		cloned.setID(this.getID());
 		cloned.setFormId(this.getFormId());

@@ -24,7 +24,7 @@ import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
 import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
@@ -39,7 +39,7 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 
 /**
- * A visitor-esque class which walks a DataModelTree and constructs an XML document
+ * A visitor-esque class which walks a FormInstance and constructs an XML document
  * containing its instance.
  *
  * The XML node elements are constructed in a depth-first manner, consistent with
@@ -121,8 +121,8 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 	 * @see org.javarosa.core.model.utils.IDataModelVisitor#visit(org.javarosa.core.model.IFormDataModel)
 	 */
 	public void visit(IFormDataModel dataModel) {
-		if(dataModel instanceof DataModelTree) {
-			this.visit((DataModelTree)dataModel);
+		if(dataModel instanceof FormInstance) {
+			this.visit((FormInstance)dataModel);
 		}
 	}
 	
@@ -130,7 +130,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.DataModelTree)
 	 */
-	public void visit(DataModelTree tree) {
+	public void visit(FormInstance tree) {
 		theXmlDoc = new Document();
 		TreeElement root = tree.getRoot();
 		if (root != null) {

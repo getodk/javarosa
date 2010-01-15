@@ -3,7 +3,7 @@ package org.javarosa.core.model.instance.utils;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 
 /**
  * Model template manager that caches the template data models in memory. Useful for when deserializing
@@ -23,7 +23,7 @@ import org.javarosa.core.model.instance.DataModelTree;
  */
 public class CachingModelTemplateManager implements DataModelTemplateManager {
 
-	private Hashtable<Integer, DataModelTree> templateCache;
+	private Hashtable<Integer, FormInstance> templateCache;
 	private Vector<Integer> allowedFormTypes;
 	private boolean restrictFormTypes;
 	
@@ -38,7 +38,7 @@ public class CachingModelTemplateManager implements DataModelTemplateManager {
 	 *     form types with addFormType(). if false, all form types will be handled and cached
 	 */
 	public CachingModelTemplateManager (boolean restrictFormTypes) {
-		this.templateCache = new Hashtable<Integer, DataModelTree>();
+		this.templateCache = new Hashtable<Integer, FormInstance>();
 		this.restrictFormTypes = restrictFormTypes;
 		this.allowedFormTypes = new Vector<Integer>();
 	}
@@ -71,12 +71,12 @@ public class CachingModelTemplateManager implements DataModelTemplateManager {
 	 * Return the template model for the given form type. Serves the template out of the cache, if cached; fetches it
 	 * fresh and caches it otherwise. If form types are restricted and the given form type is not allowed, throw an error
 	 */
-	public DataModelTree getTemplateModel (int formID) {
+	public FormInstance getTemplateModel (int formID) {
 		if (restrictFormTypes && !allowedFormTypes.contains(new Integer(formID))) {
 			throw new RuntimeException ("form ID [" + formID + "] is not an allowed form type!");
 		}
 		
-		DataModelTree template = templateCache.get(new Integer(formID));
+		FormInstance template = templateCache.get(new Integer(formID));
 		if (template == null) {
 			template = CompactModelWrapper.loadTemplateModel(formID);
 			if (template == null) {

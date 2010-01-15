@@ -24,7 +24,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.kxml2.kdom.Document;
@@ -134,7 +134,7 @@ public class InstanceSchema {
 		return e;
 	}
 	
-	private static void processSelectChoices (Element e, IFormElement fe, DataModelTree model) {
+	private static void processSelectChoices (Element e, IFormElement fe, FormInstance model) {
 		if (fe instanceof QuestionDef) {
 			QuestionDef q = (QuestionDef)fe;
 			int controlType = q.getControlType();

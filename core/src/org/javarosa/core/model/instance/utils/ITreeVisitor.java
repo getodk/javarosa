@@ -16,13 +16,13 @@
 
 package org.javarosa.core.model.instance.utils;
 
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.IDataModelVisitor;
 
 /**
  * ITreeVisitor is a visitor interface for the elements of the 
- * DataModelTree tree elements. In the case of composite elements,
+ * FormInstance tree elements. In the case of composite elements,
  * method dispatch for composite members occurs following dispatch
  * for the composing member.
  * 
@@ -30,6 +30,6 @@ import org.javarosa.core.model.utils.IDataModelVisitor;
  *
  */
 public interface ITreeVisitor extends IDataModelVisitor {
-	public void visit(DataModelTree tree);
+	public void visit(FormInstance tree);
 	public void visit(TreeElement element);
 }

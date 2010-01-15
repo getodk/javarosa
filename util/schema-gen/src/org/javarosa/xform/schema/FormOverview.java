@@ -32,7 +32,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.IConditionExpr;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.locale.Localizer;
@@ -310,7 +310,7 @@ public class FormOverview {
 		}
 	}
 	
-	private static TreeElement getInstanceNode (DataModelTree d, IDataReference ref) {
+	private static TreeElement getInstanceNode (FormInstance d, IDataReference ref) {
 		return d.getTemplatePath((TreeReference)ref.getReference());
 	}
 	

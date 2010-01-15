@@ -24,7 +24,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
@@ -123,9 +123,9 @@ public class ModelReferencePayload implements IDataPayload {
 	
 	private void memoize() {
 		if(payload == null) {
-			IStorageUtility instances = StorageManager.getStorage(DataModelTree.STORAGE_KEY);
+			IStorageUtility instances = StorageManager.getStorage(FormInstance.STORAGE_KEY);
 			try {
-				DataModelTree tree = (DataModelTree)instances.read(recordId);
+				FormInstance tree = (FormInstance)instances.read(recordId);
 				payload = serializer.createSerializedPayload(tree);
 			} catch (IOException e) {
 				//Assertion, do not catch!

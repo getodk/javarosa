@@ -35,7 +35,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.QuestionPreloader;
@@ -77,7 +77,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	//the list, where tA comes before tB, evaluating tA cannot depend on any result from evaluating tB
 	private boolean triggerablesInOrder; //true if triggerables has been ordered topologically (DON'T DELETE ME EVEN THOUGH I'M UNUSED)
 	
-	private DataModelTree model;
+	private FormInstance model;
 	private Vector outputFragments; // <IConditionExpr> contents of <output>
 	// tags that serve as parameterized
 	// arguments to captions
@@ -174,7 +174,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			return null;
 
 		// get reference for target element
-		TreeReference ref = DataModelTree.unpackReference(((IFormElement) elements.lastElement()).getBind()).clone();
+		TreeReference ref = FormInstance.unpackReference(((IFormElement) elements.lastElement()).getBind()).clone();
 		for (int i = 0; i < ref.size(); i++) {
 			ref.setMultiplicity(i, 0);
 		}
@@ -183,7 +183,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		for (int i = 0; i < elements.size(); i++) {
 			IFormElement temp = (IFormElement) elements.elementAt(i);
 			if (temp instanceof GroupDef && ((GroupDef) temp).getRepeat()) {
-				TreeReference repRef = DataModelTree.unpackReference(temp.getBind());
+				TreeReference repRef = FormInstance.unpackReference(temp.getBind());
 				if (repRef.isParentOf(ref, false)) {
 					int repMult = ((Integer) multiplicities.elementAt(i)).intValue();
 					ref.setMultiplicity(repRef.size() - 1, repMult);
@@ -722,7 +722,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setChildren((Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 
-		setDataModel((DataModelTree) ExtUtil.read(dis, DataModelTree.class, pf));
+		setDataModel((FormInstance) ExtUtil.read(dis, FormInstance.class, pf));
 
 		setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
 
@@ -1081,17 +1081,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return localizer;
 	}
 
-	public DataModelTree getDataModel() {
+	public FormInstance getDataModel() {
 		return model;
 	}
 
 	public void setDataModel(IFormDataModel model) {
 		if (model.getFormId() != -1 && getID() != model.getFormId()) {
-			System.err.println("Warning: assinging incompatible model (type " + model.getFormId() + ") to a formdef (type " + getID() + ")");
+			System.err.println("Warning: assigning incompatible model (type " + model.getFormId() + ") to a formdef (type " + getID() + ")");
 		}
 		
 		model.setFormId(getID());
-		this.model = (DataModelTree)model;
+		this.model = (FormInstance)model;
 		attachControlsToInstanceData();
 	}
 
