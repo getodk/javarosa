@@ -19,11 +19,11 @@ package org.javarosa.patient.entry.activity;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IModelProcessor;
+import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.FormEntryState;
-import org.javarosa.formmanager.controller.FormEntryController;
+import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
-import org.javarosa.formmanager.view.chatterbox.util.ChatterboxFactory;
 
 public abstract class PatientEntryState extends FormEntryState {
 	protected String singleRegForm = "jr-patient-single-reg";
@@ -45,9 +45,9 @@ public abstract class PatientEntryState extends FormEntryState {
 		this.processor = processor;
 	}
 	
-	protected FormEntryController getController() {
+	protected JrFormEntryController getController() {
 		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(formName), null);
-		return new FormEntryController(new ChatterboxFactory(), fetcher, false);
+		return new JrFormEntryController(new FormEntryModel(fetcher.getFormDef()));
 	}
 	
 	/* (non-Javadoc)
