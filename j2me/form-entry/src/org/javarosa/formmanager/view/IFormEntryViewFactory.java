@@ -16,9 +16,8 @@
 
 package org.javarosa.formmanager.view;
 
-import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.formmanager.api.JrFormEntryController;
 
 public interface IFormEntryViewFactory {
-	IFormEntryView getFormEntryView (FormEntryModel model, FormEntryController controller);
+	IFormEntryView getFormEntryView (JrFormEntryController controller);
 }

@@ -4,7 +4,6 @@
 package org.javarosa.formmanager.api;
 
 import org.javarosa.core.api.State;
-import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
 
 /**
