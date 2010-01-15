@@ -63,7 +63,7 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen {
 					&& (choice.getValue().equals(presetAnswerLabel)))
 				preselectionIndex = count;
 
-			cg.append(choice.getValue(), null);// add options to choice group
+			cg.append(choice.getCaption(), null);// add options to choice group
 
 			count++;
 		}

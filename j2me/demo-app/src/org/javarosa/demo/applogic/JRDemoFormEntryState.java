@@ -13,7 +13,6 @@ import org.javarosa.formmanager.api.FormEntryState;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
-import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 import org.javarosa.formmanager.view.singlequestionscreen.SingleQuestionScreenManager;
 
 public class JRDemoFormEntryState extends FormEntryState {
@@ -46,7 +45,6 @@ public class JRDemoFormEntryState extends FormEntryState {
 		JrFormEntryController controller =  new JrFormEntryController(new FormEntryModel(form));
 		//TODO: Use Chatterbox/OQPS depending on the correct property.
 		controller.setView(new SingleQuestionScreenManager(controller));
-		controller.setView(new Chatterbox("Chatterbox",controller));
 		return controller;
 	}
 
