@@ -144,7 +144,7 @@ public class ChatterboxWidgetFactory {
     	}
     	int multiplicity = end.getInstanceIndex();
     	
-    	String label = model.getQuestionPrompt(index).getLongText();
+    	String label = model.getCaptionPrompt(index).getLongText();
     	
     	FormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?", Constants.CONTROL_SELECT_ONE,Constants.DATATYPE_TEXT);
 
