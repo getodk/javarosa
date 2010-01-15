@@ -20,6 +20,12 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 
+/**
+ * This class is used to navigate through an xform and appropriately manipulate
+ * the FormEntryModel's state.
+ * 
+ * 
+ */
 public class FormEntryController {
     public static final int ANSWER_OK = 0;
     public static final int ANSWER_REQUIRED_BUT_EMPTY = 1;
@@ -46,19 +52,21 @@ public class FormEntryController {
 
 
     /**
-     * Helper method to save an answer to the current FormIndex.
+     * Attempts to save answer at the current FormIndex into the datamodel.
      * 
      * @param data
      * @return
      */
-    public int answerQuestion(IAnswerData data) {
+    public int answerCurrentQuestion(IAnswerData data) {
+        // TODO: Do we need checks here to make sure the current formindex
+        // references a question?
         return answerQuestion(model.getCurrentFormIndex(), data);
     }
 
 
     /**
-     * Attempts to save the current answer into the datamodel. This is what you
-     * should be using for normal form filling.
+     * Attempts to save the answer at the specified FormIndex into the
+     * datamodel.
      * 
      * @param index
      * @param data
@@ -78,19 +86,29 @@ public class FormEntryController {
 
 
     /**
-     * saveAnswer saves the current answer into the data model without doing any
-     * constraint checking. Only use this if you know what you're doing. For
-     * normal form filling you should always use answerQuestion.
+     * saveAnswer attempts to save the current answer into the data model
+     * without doing any constraint checking. Only use this if you know what
+     * you're doing. For normal form filling you should always use
+     * answerQuestion or answerCurrentQuestion.
      * 
      * @param index
      * @param data
+     * @return true if saved successfully, false otherwise.
      */
-    public void saveAnswer(FormIndex index, IAnswerData data) {
+    public boolean saveAnswer(FormIndex index, IAnswerData data) {
         TreeElement element = model.getTreeElement(index);
-        commitAnswer(element, index, data);
+        return commitAnswer(element, index, data);
     }
 
 
+    /**
+     * commitAnswer actually saves the data into the datamodel.
+     * 
+     * @param element
+     * @param index
+     * @param data
+     * @return true if saved successfully, false otherwise
+     */
     private boolean commitAnswer(TreeElement element, FormIndex index, IAnswerData data) {
         if (data != null || element.getValue() != null) {
             // we should check if the data to be saved is already the same as
@@ -103,11 +121,21 @@ public class FormEntryController {
     }
 
 
+    /**
+     * Navigates forward in the form.
+     * 
+     * @return the next event that should be handled by a view.
+     */
     public int stepToNextEvent() {
         return stepEvent(true);
     }
 
 
+    /**
+     * Navigates backward in the form.
+     * 
+     * @return the next event that should be handled by a view.
+     */
     public int stepToPreviousEvent() {
         return stepEvent(false);
     }
@@ -115,6 +143,7 @@ public class FormEntryController {
 
     /**
      * Moves the current FormIndex to the next/previous relevant position.
+     * 
      * @param forward
      * @return
      */
@@ -133,17 +162,36 @@ public class FormEntryController {
     }
 
 
+    /**
+     * Jumps to a given FormIndex.
+     * 
+     * @param index
+     * @return EVENT for the specified Index.
+     */
     public int jumpToIndex(FormIndex index) {
         model.setQuestionIndex(index);
         return model.getEvent(index);
     }
 
 
+    /**
+     * Creates a new repeated instance of the group referenced by the specified
+     * FormIndex.
+     * 
+     * @param questionIndex
+     */
     public void newRepeat(FormIndex questionIndex) {
         model.getForm().createNewRepeat(questionIndex);
     }
 
 
+    /**
+     * Deletes a repeated instance of a group referenced by the specified
+     * FormIndex.
+     * 
+     * @param questionIndex
+     * @return
+     */
     public FormIndex deleteRepeat(FormIndex questionIndex) {
         return model.getForm().deleteRepeat(questionIndex);
     }

@@ -24,54 +24,69 @@ import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 
+/**
+ * This class gives you all the information you need to display a question when
+ * your current FormIndex references a QuestionEvent.
+ * 
+ * 
+ */
 public class FormEntryPrompt extends FormEntryCaption {
 
     TreeElement mTreeElement;
 
-    public FormEntryPrompt(){
-    }
-    
+
     public FormEntryPrompt(FormDef form, FormIndex index) {
-    	super(form, index);
-    	this.mTreeElement = form.getDataModel().resolveReference(index.getReference());
+        super(form, index);
+        this.mTreeElement = form.getDataModel().resolveReference(index.getReference());
     }
+
 
     public int getControlType() {
         return getQuestionDef().getControlType();
     }
 
+
     public int getDataType() {
         return mTreeElement.dataType;
     }
 
+
     // attributes available in the bind, instance and body
     public String getPromptAttributes() {
+        // TODO: implement me.
         return null;
     }
+
 
     public IAnswerData getAnswerValue() {
         return mTreeElement.getValue();
     }
 
+
     public String getAnswerText() {
         return mTreeElement.getValue().getDisplayText();
     }
 
+
     public String getConstraintText() {
         return mTreeElement.getConstraint().constraintMsg;
     }
-    
+
+
     public Vector<SelectChoice> getSelectChoices() {
         return getQuestionDef().getChoices();
     }
- 
+
+
     public String getHelpText() {
         return getQuestionDef().getHelpText();
     }
 
+
     public boolean isRequired() {
         return mTreeElement.required;
     }
+
 
     public boolean isReadOnly() {
         return !mTreeElement.isEnabled();

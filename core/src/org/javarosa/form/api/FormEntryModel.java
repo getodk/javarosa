@@ -87,7 +87,6 @@ public class FormEntryModel {
 
 
     /**
-     * 
      * @return Form title
      */
     public String getFormTitle() {
@@ -95,6 +94,11 @@ public class FormEntryModel {
     }
 
 
+    /**
+     * 
+     * @param index
+     * @return
+     */
     public FormEntryPrompt getQuestionPrompt(FormIndex index) {
         if (form.getChild(index) instanceof QuestionDef) {
             return new FormEntryPrompt(form, index);
@@ -105,7 +109,7 @@ public class FormEntryModel {
     }
 
 
-    public FormEntryPrompt getQuestionPrompt() {
+    public FormEntryPrompt getCurrentQuestionPrompt() {
         return getQuestionPrompt(currentFormindex);
     }
 
@@ -175,34 +179,34 @@ public class FormEntryModel {
      * @return list of FormEntryCaptions, FormEntryCaption of current index
      *         first.
      */
-	public FormEntryCaption[] getCaptionHeirarchy(FormIndex index) {
-		Vector captions = new Vector();
-		FormIndex remaining = index;
-		while (remaining != null) {
-			remaining = remaining.getNextLevel();
-			FormIndex localIndex = index.diff(remaining);
-			IFormElement element = form.getChild(localIndex);
-			if (element != null) {
-				FormEntryCaption caption = null;
-				if (element instanceof GroupDef)
-					caption = new FormEntryCaption(getForm(), localIndex);
-				else if (element instanceof QuestionDef)
-					caption = new FormEntryPrompt(getForm(), localIndex);
-				
-				if(caption != null) {
-					captions.add(caption);
-				}
-			}
-		}
-		FormEntryCaption[] captionArray = new FormEntryCaption[captions.size()];
-		captions.copyInto(captionArray);
-		return captionArray;
+    public FormEntryCaption[] getCaptionHeirarchy(FormIndex index) {
+        Vector captions = new Vector();
+        FormIndex remaining = index;
+        while (remaining != null) {
+            remaining = remaining.getNextLevel();
+            FormIndex localIndex = index.diff(remaining);
+            IFormElement element = form.getChild(localIndex);
+            if (element != null) {
+                FormEntryCaption caption = null;
+                if (element instanceof GroupDef)
+                    caption = new FormEntryCaption(getForm(), localIndex);
+                else if (element instanceof QuestionDef)
+                    caption = new FormEntryPrompt(getForm(), localIndex);
+
+                if (caption != null) {
+                    captions.add(caption);
+                }
+            }
+        }
+        FormEntryCaption[] captionArray = new FormEntryCaption[captions.size()];
+        captions.copyInto(captionArray);
+        return captionArray;
     }
 
 
     /**
      * 
-     * @return total number of questions in the form
+     * @return total number of questions in the form, regardless of relevancy
      */
     public int getNumQuestions() {
         return form.getDeepChildCount();
