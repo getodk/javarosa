@@ -61,7 +61,7 @@ public class Selection implements Externalizable {
 	public SelectChoice choice;
 	
 	/**
-	 * for deserialization
+	 * for deserialization only
 	 */
 	public Selection() {
 		
