@@ -160,7 +160,7 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 	private void switchViewLanguage() {
 		IAnswerData answer = currentQuestionScreen.getWidgetValue();
 		this.goingForward = true;
-		controller.answerQuestion(answer);
+		controller.answerCurrentQuestion(answer);
 		refreshView();
 	}
 
@@ -241,13 +241,13 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 	private void answerQuestion() {
 		IAnswerData answer = currentQuestionScreen.getWidgetValue();
 		this.goingForward = true;
-		int result = controller.answerQuestion(answer);
+		int result = controller.answerCurrentQuestion(answer);
 		if (result == FormEntryController.ANSWER_OK) {
 			controller.stepToNextEvent();
 			refreshView();
 		} else if (result == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
 			J2MEDisplay.showError("Validation failure", model
-					.getQuestionPrompt().getConstraintText());
+					.getCurrentQuestionPrompt().getConstraintText());
 		} else if (result == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
 			String txt = Locale
 					.get("view.sending.CompulsoryQuestionIncomplete");
