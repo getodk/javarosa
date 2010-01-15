@@ -80,6 +80,7 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 	 */
 	public DataModelTree(TreeElement root) {
 		setID(-1);
+		setFormId(-1);
 		setRoot(root);
 	}
 
