@@ -198,7 +198,7 @@ public class FormEntryModel {
      * @return list of FormEntryCaptions, FormEntryCaption of current index
      *         first.
      */
-    public FormEntryCaption[] getCaptionHeirarchy(FormIndex index) {
+    public FormEntryCaption[] getCaptionHierarchy(FormIndex index) {
         Vector captions = new Vector();
         FormIndex remaining = index;
         while (remaining != null) {
