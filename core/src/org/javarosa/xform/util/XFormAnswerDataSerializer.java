@@ -22,6 +22,7 @@ import java.util.Vector;
 
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.IAnswerDataSerializer;
+import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
@@ -185,6 +186,14 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	    return data.getDisplayText();
      }
 	
+	public Object serializeAnswerData(BooleanData data) {
+		if(((Boolean)data.getValue()).booleanValue()) {
+			return "1";
+		} else {
+			return "0";
+		}
+	}
+	
 	public Object serializeAnswerData(IAnswerData data, int dataType) {
 		// First, we want to go through the additional serializers, as they should
 		// take priority to the default serializations
@@ -223,6 +232,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
             return serializeAnswerData((GeoPointData)data);
         } else if (data instanceof DateTimeData) {
             return serializeAnswerData((DateTimeData)data);
+        } else if (data instanceof BooleanData) {
+            return serializeAnswerData((BooleanData)data);
         }
 		
 		return null;

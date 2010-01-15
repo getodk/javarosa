@@ -20,6 +20,7 @@ import java.util.Vector;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
+import org.javarosa.core.services.storage.EntityFilter;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
@@ -27,7 +28,6 @@ import org.javarosa.entity.api.transitions.EntitySelectTransitions;
 import org.javarosa.entity.model.Entity;
 import org.javarosa.entity.model.view.EntitySelectDetailPopup;
 import org.javarosa.entity.model.view.EntitySelectView;
-import org.javarosa.entity.util.EntityFilter;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
@@ -145,9 +145,11 @@ public class EntitySelectController <E extends Persistable> {
 				obj = (E)ei.nextRecord();
 			} else {
 				int id = ei.nextID();
-				if (filter.preFilter(id, null)) {
+				int preFilt = filter.preFilter(id, null);
+				
+				if (preFilt != EntityFilter.PREFILTER_EXCLUDE) {
 					E candidateObj = (E)entityStorage.read(id);
-					if (filter.matches(candidateObj)) {
+					if (preFilt == EntityFilter.PREFILTER_INCLUDE || filter.matches(candidateObj)) {
 						obj = candidateObj;
 					}
 				}

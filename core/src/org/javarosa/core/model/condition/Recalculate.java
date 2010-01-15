@@ -21,6 +21,7 @@ import java.util.Date;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormDataModel;
+import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -68,8 +69,30 @@ public class Recalculate extends Triggerable {
 	}
 	
 	private static IAnswerData wrapData (Object val, int dataType) {
+		if(Constants.DATATYPE_BOOLEAN == dataType) {
+			//ctsims: We should really be using the boolean datatype for real, it's 
+			//necessary for backend calculations and XSD compliance
+			if(val instanceof Boolean) {
+				return new BooleanData((Boolean)val);
+			}
+			int outcome;
+			if(val instanceof Integer) {
+				outcome = ((Integer)val).intValue();
+			} else if(val instanceof Double) {
+				outcome = ((Double)val).intValue();
+			} else if(val instanceof Long) {
+				outcome = (int)((Long)val).longValue();
+			} else {
+				throw new RuntimeException("unrecognized data representation while trying to convert to BOOLEAN");
+			}
+			if(outcome == 1) {
+				return new BooleanData(Boolean.TRUE);
+			} else {
+				return new BooleanData(Boolean.FALSE);
+			}
+		}
 		if (val instanceof Boolean) {
-			return new IntegerData(((Boolean)val).booleanValue() ? 1 : 0);
+			return new BooleanData((Boolean)val);
 		} else if (val instanceof Double) {
 			double d = ((Double)val).doubleValue();
 			if(Double.isNaN(d)) { return null; }
@@ -82,6 +105,12 @@ public class Recalculate extends Triggerable {
 				return new IntegerData((int)Math.floor(d));
 			} 
 			return new DecimalData(d);
+		} else if (val instanceof Long){
+			if(Constants.DATATYPE_TEXT == dataType) {
+				return new StringData(String.valueOf(((Long)val).longValue()));
+			} else {
+				return new IntegerData((int)((Long)val).longValue());
+			}
 		} else if (val instanceof String) {
 			String s = (String)val;
 			return s.length() > 0 ? new StringData(s) : null;

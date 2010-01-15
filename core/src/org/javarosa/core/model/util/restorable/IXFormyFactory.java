@@ -20,7 +20,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.services.transport.IDataPayload;
+import org.javarosa.core.services.transport.payload.IDataPayload;
 
 public interface IXFormyFactory {
 	TreeReference ref (String refStr);

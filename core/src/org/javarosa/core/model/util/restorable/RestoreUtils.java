@@ -34,7 +34,7 @@ import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
-import org.javarosa.core.services.transport.ByteArrayPayload;
+import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 

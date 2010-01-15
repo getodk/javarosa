@@ -28,8 +28,8 @@ import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
-import org.javarosa.core.services.transport.IDataPayload;
-import org.javarosa.core.services.transport.IDataPayloadVisitor;
+import org.javarosa.core.services.transport.payload.IDataPayload;
+import org.javarosa.core.services.transport.payload.IDataPayloadVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 

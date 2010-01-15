@@ -14,19 +14,18 @@
  * the License.
  */
 
-package org.javarosa.formmanager.view;
+/**
+ * 
+ */
+package org.javarosa.core.services.transport.payload;
 
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.List;
-
-public class AvailableFormsScreen extends List{
-	
-	
-	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
-
-	public AvailableFormsScreen(String label,String[] elements) {
-		super(label, List.IMPLICIT,elements,null);
-		addCommand(CMD_CANCEL);
-	}
-
+/**
+ * @author Clayton Sims
+ * @date Dec 18, 2008 
+ *
+ */
+public interface IDataPayloadVisitor {
+	public Object visit(ByteArrayPayload payload);
+	public Object visit(MultiMessagePayload payload);
+	public Object visit(DataPointerPayload payload);
 }

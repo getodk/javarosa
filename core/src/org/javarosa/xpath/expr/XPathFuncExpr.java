@@ -117,6 +117,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return toBoolean(argVals[0]);
 		} else if (name.equals("number") && args.length == 1) {
 			return toNumeric(argVals[0]);
+		} else if (name.equals("int") && args.length == 1) {
+			return toInt(argVals[0]);
 		} else if (name.equals("string") && args.length == 1) {
 			return toString(argVals[0]);			
 		} else if (name.equals("date") && args.length == 1) { //non-standard
@@ -235,6 +237,12 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 	
+	public static Long toInt (Object o) {
+		Double val = toNumeric(o);
+		
+		return new Long((long)Math.floor(val.doubleValue()));
+	}
+	
 	public static Double toNumeric (Object o) {
 		Double val = null;
 		
@@ -314,9 +322,10 @@ public class XPathFuncExpr extends XPathExpression {
 			if (Math.abs(d - (int)d) > 1.0e-12) {
 				throw new XPathTypeMismatchException("converting non-integer to date");
 			}
-			
+			o = toInt(o);
+		} if (o instanceof Long) {
 			Date dt = DateUtils.getDate(1970, 1, 1);
-			dt.setTime(dt.getTime() + (long)d * 86400000l + 43200000l); //43200000 offset (0.5 day in ms) is needed to handle differing DST offsets!
+			dt.setTime(dt.getTime() + ((Long)o).longValue() * 86400000l + 43200000l); //43200000 offset (0.5 day in ms) is needed to handle differing DST offsets!
 			return DateUtils.roundDate(dt);
 		} else if (o instanceof String) {
 			Date d = DateUtils.parseDate((String)o);

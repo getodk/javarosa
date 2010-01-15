@@ -23,6 +23,8 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
+import org.javarosa.core.api.State;
+
 public class J2MEDisplay {
 	private static Display display;
 	private static LoadingScreenThread loading;
@@ -44,13 +46,19 @@ public class J2MEDisplay {
 		return display;
 	}
 	
-	public static void startLoading() {
-		startLoading(null);
+	public static void startStateWithLoadingScreen(State state) {
+		startStateWithLoadingScreen(state,null);
 	}
 	
-	public static void startLoading(ProgressIndicator indicator) {
+	public static void startStateWithLoadingScreen(State state, ProgressIndicator indicator) {
+		final State s = state;
 		loading = new LoadingScreenThread(display);
 		loading.startLoading(indicator);
+		new Thread(new Runnable() {
+			public void run() {
+				s.start();
+			}
+		}).start();
 	}
 	
 	public static void setView (Displayable d) {
