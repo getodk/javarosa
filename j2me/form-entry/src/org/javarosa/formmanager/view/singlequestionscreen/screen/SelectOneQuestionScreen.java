@@ -83,15 +83,16 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen {
 	public IAnswerData getWidgetValue() {
 
 		int selectedIndex = -1;
+		Selection s = null;
 
 		for (int i = 0; i < cg.size(); i++) {
 			if (cg.isSelected(i)) {
 				selectedIndex = i;
+				s = prompt.getSelectChoices().elementAt(selectedIndex).selection();
 				break;
 			}
 		}
 
-		Selection s = prompt.getSelectChoices().elementAt(selectedIndex).selection();
 		return (selectedIndex == -1 ? null : new SelectOneData(s));
 	}
 

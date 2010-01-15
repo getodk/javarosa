@@ -9,6 +9,7 @@ import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
@@ -87,6 +88,7 @@ public class JRDemoContext {
 			forms.write(XFormUtils.getFormFromResource("/condtest.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/imci.xml"));
+			forms.write(XFormUtils.getFormFromResource("/PhysicoChemTestsDemo.xhtml"));
 		} catch (StorageFullException e) {
 			throw new RuntimeException("uh-oh, storage full [forms]"); //TODO: handle this
 		}
@@ -107,6 +109,11 @@ public class JRDemoContext {
 	
 	
 	private void addCustomLanguages() {
+		Localization.registerLanguageFile("Afrikaans", "./messages_afr.txt");
+		Localization.registerLanguageFile("Dari", "./messages_dari.txt");
+		Localization.registerLanguageFile("Espagnol", "./messages_es.txt");
+		Localization.registerLanguageFile("Swahili", "./messages_sw.txt");
+		Localization.registerLanguageFile("English", "./messages_en.txt");		
 	}
 	
 	private void setProperties() {
