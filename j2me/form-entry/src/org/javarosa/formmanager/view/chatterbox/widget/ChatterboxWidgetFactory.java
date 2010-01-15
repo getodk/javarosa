@@ -147,7 +147,7 @@ public class ChatterboxWidgetFactory {
     	String label = model.getQuestionPrompt(index).getLongText();
     	
     	FormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?", Constants.CONTROL_SELECT_ONE,Constants.DATATYPE_TEXT);
-    	
+
     	// q.addSelectChoice(new SelectChoice("Yes", "y", false));
     	// q.addSelectChoice(new SelectChoice("No", "n", false));
 		

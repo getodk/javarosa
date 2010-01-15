@@ -550,7 +550,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
 	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
 	        	J2MEDisplay.showError(null, PROMPT_REQUIRED_QUESTION);
 	    	} else if (status == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
-	    		String msg = model.getQuestionPrompt().getConstraintText();
+	    		String msg = model.getQuestionPrompt(this.model.getCurrentFormIndex()).getConstraintText();
 	    		J2MEDisplay.showError(null, msg != null ? msg : PROMPT_DEFAULT_CONSTRAINT_VIOL);
 	     	}
     	}

@@ -38,7 +38,6 @@ import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemCommandListener;
 import de.enough.polish.ui.List;
-import de.enough.polish.util.Locale;
 
 public class SingleQuestionScreenManager extends FramedForm implements IFormEntryView,
 		CommandListener, ItemCommandListener {
@@ -160,7 +159,7 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 	private void switchViewLanguage() {
 		IAnswerData answer = currentQuestionScreen.getWidgetValue();
 		this.goingForward = true;
-		controller.answerQuestion(answer);
+		controller.answerQuestion(controller.getModel().getCurrentFormIndex(),answer);
 		refreshView();
 	}
 
@@ -210,8 +209,7 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 		} else if (command == FormViewScreen.sendCommand) {
 			int counter = countUnansweredQuestions(true);
 			if (counter > 0) {
-				String txt = Locale
-						.get("view.sending.CompulsoryQuestionsIncomplete");
+				String txt = "There are unanswered compulsory questions and must be completed first to proceed";
 				J2MEDisplay.showError("Question Required!", txt);
 			} else {
 				// TODO: FIXME
@@ -241,16 +239,17 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 	private void answerQuestion() {
 		IAnswerData answer = currentQuestionScreen.getWidgetValue();
 		this.goingForward = true;
-		int result = controller.answerQuestion(answer);
+		int result = controller.answerQuestion(controller.getModel().getCurrentFormIndex(),answer);
 		if (result == FormEntryController.ANSWER_OK) {
 			controller.stepToNextEvent();
 			refreshView();
 		} else if (result == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
 			J2MEDisplay.showError("Validation failure", model
-					.getQuestionPrompt().getConstraintText());
+					.getQuestionPrompt(controller.getModel().getCurrentFormIndex()
+					).getConstraintText());
 		} else if (result == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
-			String txt = Locale
-					.get("view.sending.CompulsoryQuestionIncomplete");
+			//TODO localise
+			String txt = "There are unanswered compulsory questions and must be completed first to proceed";
 			J2MEDisplay.showError("Question Required", txt);
 		}
 		int event = controller.stepToNextEvent();
