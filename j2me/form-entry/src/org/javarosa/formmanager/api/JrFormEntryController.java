@@ -3,12 +3,10 @@
  */
 package org.javarosa.formmanager.api;
 
-import javax.microedition.lcdui.Displayable;
-
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
-import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.formmanager.view.IFormEntryView;
 
 /**
  * @author ctsims
@@ -17,13 +15,13 @@ import org.javarosa.j2me.view.J2MEDisplay;
 public class JrFormEntryController extends FormEntryController {
 
 	FormEntryTransitions transitions;
-	Displayable view;
+	IFormEntryView view;
 	
 	public JrFormEntryController(FormEntryModel model) {
 		super(model);
 	}
 
-	public void setView(Displayable view) {
+	public void setView(IFormEntryView view) {
 		this.view = view;
 	}
 	public void setTransitions(FormEntryTransitions transitions) {
@@ -31,7 +29,7 @@ public class JrFormEntryController extends FormEntryController {
 	}
 	
 	public void start() {
-		J2MEDisplay.setView(view);
+		view.show();
 	}
 	
 	public void abort() {
