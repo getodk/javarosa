@@ -1086,7 +1086,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 
 	public void setDataModel(IFormDataModel model) {
-		if (getID() != model.getFormId()) {
+		if (model.getFormId() != -1 && getID() != model.getFormId()) {
 			System.err.println("Warning: assinging incompatible model (type " + model.getFormId() + ") to a formdef (type " + getID() + ")");
 		}
 		
