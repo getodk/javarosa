@@ -825,12 +825,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		FormIndex cur = null;
 		Vector curMultiplicities = new Vector();
 		for(int j = 0; j < multiplicities.size() ; ++j) {
-			curMultiplicities.add(multiplicities.elementAt(j));	
+			curMultiplicities.addElement(multiplicities.elementAt(j));	
 		}
 		
 		Vector curElements = new Vector();
 		for(int j = 0; j < elements.size() ; ++j) {
-			curElements.add(elements.elementAt(j));	
+			curElements.addElement(elements.elementAt(j));	
 		}
 		
 		for (int i = indexes.size() - 1; i >= 0; i--) {
@@ -845,8 +845,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			}
 
 			cur = new FormIndex(cur, ix, mult,getChildInstanceRef(curElements,curMultiplicities));
-			curMultiplicities.remove(curMultiplicities.size() - 1);
-			curElements.remove(curElements.size() - 1);
+			curMultiplicities.removeElementAt(curMultiplicities.size() - 1);
+			curElements.removeElementAt(curElements.size() - 1);
 		}
 		return cur;
 	}

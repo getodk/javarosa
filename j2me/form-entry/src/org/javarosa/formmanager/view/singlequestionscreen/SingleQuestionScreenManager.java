@@ -210,7 +210,7 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 		} else if (command == FormViewScreen.sendCommand) {
 			int counter = countUnansweredQuestions(true);
 			if (counter > 0) {
-				String txt = Locale
+				String txt = Localization
 						.get("view.sending.CompulsoryQuestionsIncomplete");
 				J2MEDisplay.showError("Question Required!", txt);
 			} else {
@@ -249,7 +249,7 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 			J2MEDisplay.showError("Validation failure", model
 					.getCurrentQuestionPrompt().getConstraintText());
 		} else if (result == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
-			String txt = Locale
+			String txt = Localization
 					.get("view.sending.CompulsoryQuestionIncomplete");
 			J2MEDisplay.showError("Question Required", txt);
 		}

@@ -194,7 +194,7 @@ public class FormEntryModel {
                     caption = new FormEntryPrompt(getForm(), localIndex);
 
                 if (caption != null) {
-                    captions.add(caption);
+                    captions.addElement(caption);
                 }
             }
         }
