@@ -33,7 +33,6 @@ import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
-import org.javarosa.formmanager.utility.FormEntryModelListener;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
@@ -219,7 +218,11 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		formComplete();
     		break;
     		default:
-    			jumpToQuestion(model.getCurrentFormIndex());
+    			FormIndex index = model.getCurrentFormIndex();
+    			if(index.isEndOfFormIndex()) {
+    				System.out.println("SAY WHAHAAAAAT?");
+    			}
+    			jumpToQuestion(index);
     			break;
     	}
     }
@@ -372,7 +375,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     
 
 	private void createHeaderForElement(FormIndex questionIndex) {
-		String headerText = model.getQuestionPrompt(questionIndex).getLongText();
+		String headerText = model.getCaptionPrompt(questionIndex).getLongText();
 		if(headerText != null) {
 			ChatterboxWidget headerWidget = widgetFactory.getNewLabelWidget(questionIndex, headerText);
 			//If there is no valid header, there's no valid header. Possibly no label.

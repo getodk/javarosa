@@ -15,7 +15,6 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 	private int dataType;
 
 	public FakedFormEntryPrompt(String text, int controlType, int dataType) {
-		super(null,null);
 		this.text = text;
 		this.controlType = controlType;
 		this.dataType = dataType;
