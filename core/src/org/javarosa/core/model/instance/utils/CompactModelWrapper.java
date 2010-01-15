@@ -181,7 +181,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 		if (isGroup) {
 			Vector childTypes = new Vector();
 			for (int i = 0; i < templ.getNumChildren(); i++) {
-				String childName = ((TreeElement)templ.getChildren().elementAt(i)).getName();				
+				String childName = templ.getChildAt(i).getName();				
 				if (!childTypes.contains(childName)) {
 					childTypes.addElement(childName);
 				}
@@ -242,7 +242,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 		if (isGroup) {
 			Vector childTypesHandled = new Vector();
 			for (int i = 0; i < templ.getNumChildren(); i++) {
-				String childName = ((TreeElement)templ.getChildren().elementAt(i)).getName();
+				String childName = templ.getChildAt(i).getName();
 				if (!childTypesHandled.contains(childName)) {
 					childTypesHandled.addElement(childName);
 					

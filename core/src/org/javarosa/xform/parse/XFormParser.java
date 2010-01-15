@@ -1249,7 +1249,7 @@ public class XFormParser {
 		}
 			
 		for (int i = 0; i < repeatTreeNode.getNumChildren(); i++) {
-			checkRepeatsForTemplate((TreeElement)repeatTreeNode.getChildren().elementAt(i), ref, instance, missing);
+			checkRepeatsForTemplate(repeatTreeNode.getChildAt(i), ref, instance, missing);
 		}
 	}
 	
@@ -1279,7 +1279,7 @@ public class XFormParser {
 			templateAllowed = false;
 		
 		for (int i = 0; i < instanceNode.getNumChildren(); i++) {
-			TreeElement child = (TreeElement)instanceNode.getChildren().elementAt(i);
+			TreeElement child = instanceNode.getChildAt(i);
 			TreeElement rchild = (repeatTreeNode == null ? null : repeatTreeNode.getChild(child.getName(), 0));
 			
 			if (removeInvalidTemplates(child, rchild, templateAllowed)) {
@@ -1323,7 +1323,7 @@ public class XFormParser {
 	//  and # of repeats for a given repeat node is a kind of data. trust me
 	private static void trimRepeatChildren (TreeElement node) {
 		for (int i = 0; i < node.getNumChildren(); i++) {
-			TreeElement child = (TreeElement)node.getChildren().elementAt(i);
+			TreeElement child = node.getChildAt(i);
 			if (child.repeatable) {
 				node.removeChildAt(i);
 				i--;
@@ -1343,7 +1343,7 @@ public class XFormParser {
 		}
 		
 		for (int i = 0; i < node.getNumChildren(); i++) {
-			checkDuplicateNodesAreRepeatable((TreeElement)node.getChildren().elementAt(i));
+			checkDuplicateNodesAreRepeatable(node.getChildAt(i));
 		}
 	}
 	
