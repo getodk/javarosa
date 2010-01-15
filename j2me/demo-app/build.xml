@@ -217,7 +217,10 @@
 		<property name="dir.work" value="build/test" />
 	</target>
 	
-	<!-- import user specific properties                          -->
+	<!-- import local specific properties                          -->
+	<property file="${basedir}/local.properties" />
+	
+	<!-- import build specific properties                          -->
 	<property file="${basedir}/build.properties" />
 
 	<!-- import global properties                                 -->

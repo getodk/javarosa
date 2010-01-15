@@ -7,7 +7,6 @@ import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
@@ -29,6 +28,7 @@ import org.javarosa.patient.PatientModule;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.resources.locale.LanguageUtils;
+import org.javarosa.services.transport.TransportManagerModule;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.user.activity.UserModule;
@@ -98,6 +98,7 @@ public class JRDemoContext {
 		new CoreModelModule().registerModule();
 		new XFormsModule().registerModule();
 		new LanguagePackModule().registerModule();
+		new TransportManagerModule().registerModule();
 		new UserModule().registerModule();
 		new PatientModule().registerModule();
 		new FormManagerModule().registerModule();
