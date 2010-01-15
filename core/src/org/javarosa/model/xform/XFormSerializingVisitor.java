@@ -178,7 +178,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 			//make sure all children of the same tag name are written en bloc
 			Vector childNames = new Vector();
 			for (int i = 0; i < instanceNode.getNumChildren(); i++) {
-				String childName = ((TreeElement)instanceNode.getChildren().elementAt(i)).getName();
+				String childName = instanceNode.getChildAt(i).getName();
 				if (!childNames.contains(childName))
 					childNames.addElement(childName);
 			}
