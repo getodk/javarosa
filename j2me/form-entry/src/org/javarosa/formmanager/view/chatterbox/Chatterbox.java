@@ -495,8 +495,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		System.out.println("back");
     		controller.stepToPreviousEvent();
     	} else if (command == exitNoSaveCommand) {
-    		//TODO: EXIT?
-    		//controller.exit();
+    		controller.abort();
     	} else if (command == exitSaveCommand) {
     		commitAndSave();
     		//controller.exit();

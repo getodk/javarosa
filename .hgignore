@@ -30,3 +30,4 @@ devices/
 *.rej
 *.orig
 
+glob:local.properties
