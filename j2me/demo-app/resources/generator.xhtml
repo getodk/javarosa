@@ -1,0 +1,164 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/2002/xforms"
+	  xmlns:ev="http://www.w3.org/2001/xml-events"
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	  xmlns:jr="http://openrosa.org/javarosa">
+<h:head>
+    <h:title>Generator Questionaire</h:title>
+    <meta jr:name="ccem-doc-8-v.0.1"/>
+    <model>
+
+	<instance>
+		<generator xmlns="">
+		    <alevel>
+		      <level2/>
+		      <level3/>
+		      <level4/>
+		      <level5/>
+		      <hfname/>
+		    </alevel>
+		    
+		    <record/>
+		    <totalrecords/>
+		    
+		    <mname/>
+		    <manname/>
+		    
+		    <snum/>
+		    <powers/>
+		    <prating/>
+		    <autostart/>
+		    
+		    <numphase/>
+		    <usedfor/>
+		    
+		    <yearsupply/>
+		    
+		    <status/>
+		    
+		    <supply/>
+		    
+		    <utliization/>
+		    
+		    <user>
+		       <name/>
+		       <date/>
+		    </user>		   
+		    
+		    <message/> 
+
+		</generator>
+	</instance>
+	
+	
+		      <bind nodeset="/generator/alevel/level2" required="true()" />
+		      <bind nodeset="/generator/alevel/level3" required="true()" />
+		      <bind nodeset="/generator/alevel/level4" required="true()" />
+		      <bind nodeset="/generator/alevel/level5" required="true()" />
+		      <bind nodeset="/generator/alevel/hfname" required="true()" />
+		    
+		    <bind nodeset="record" type="xsd:int"/>
+		    <bind nodeset="totalrecords" type="xsd:int"/>
+		    
+		    <bind nodeset="mname"/>
+		    <bind nodeset="manname"/>
+		    
+		    <bind nodeset="snum"/>
+		    <bind nodeset="powers"/>
+		    <bind nodeset="prating" type="xsd:int"/>
+		    <bind nodeset="autostart"/>
+		    
+		    <bind nodeset="numphase"/>
+		    <bind nodeset="usedfor"/>
+		    
+		    <bind nodeset="yearsupply" type="xsd:int"/>
+		    
+		    <bind nodeset="status"/>
+		    
+		    <bind nodeset="supply"/>
+		    
+		    <bind nodeset="utliization"/>
+		    
+		       <bind nodeset="/generator/user/name"/>
+		       <bind nodeset="/generator/user/date" jr:preload="timestamp" jr:preloadParams="end" />
+	
+    </model>
+</h:head>			
+<h:body>
+
+<input ref="/generator/alevel/level2"><label>Administrative Level 2</label></input>
+<input ref="/generator/alevel/level3"><label>Administrative Level 3</label></input>
+<input ref="/generator/alevel/level4"><label>Administrative Level 4</label></input>
+<input ref="/generator/alevel/level5"><label>Administrative Level 5</label></input>
+
+<input ref="/generator/alevel/hfname"><label>Health Facility Name</label></input>
+
+<input ref="record"><label>Current Generator Record</label></input>
+<input ref="totalrecords"><label>Total Number of Records</label></input>
+
+<input ref="mname"><label>Model Name</label></input>
+<input ref="manname"><label>Manufacturer Name</label></input>		    
+<input ref="snum"><label>Serial Number</label></input>
+
+  <select1 ref="powers">
+    <label>Power Sources</label>
+    <item><label>Diesel</label><value>d</value></item>
+    <item><label>Petrol</label><value>p</value></item>
+  </select1>
+
+<input ref="prating"><label>Power Rating (kW)</label></input>
+
+
+<select1 ref="autostart">
+    <label>Automatic Start Mechanism</label>
+    <item><label>Yes</label><value>y</value></item>
+    <item><label>No</label><value>n</value></item>
+ </select1>
+		    
+<select1 ref="numphase">
+    <label>Number of Phases</label>
+    <item><label>One</label><value>1</value></item>
+    <item><label>Three</label><value>3</value></item>
+ </select1>
+ 
+<select ref="usedfor">
+   <label>Used For</label>
+   <item><label>Refrigerators</label><value>r</value></item>
+   <item><label>Cold Rooms</label><value>c</value></item>
+   <item><label>Lighting</label><value>l</value></item>
+   <item><label>Other</label><value>o</value></item>
+</select>
+		    
+<input ref="yearsupply"><label>Year of Supply</label></input>
+		    
+<select1 ref="status">
+    <label>Working Status</label>
+    <item><label>Working Well</label><value>ww</value></item>
+    <item><label>Working, Needs Service</label><value>wns</value></item>
+    <item><label>Not Working</label><value>nw</value></item>
+ </select1>
+		    
+<select1 ref="supply">
+    <label>Source of Supply</label>
+    <item><label>MOH</label><value>moh</value></item>
+    <item><label>Private Donation</label><value>pd</value></item>
+    <item><label>NGO</label><value>ngo</value></item>
+    <item><label>Unknown</label><value>uk</value></item>
+ </select1>
+ 
+<trigger ref="message">
+	<label>For the next question, clarify directly with cold chain representative if the generator is not in use, if is
+available for allocation.</label>
+</trigger>
+		    
+<select1 ref="utliization">
+    <label>Equipment Utilization</label>
+    <item><label>In Use</label><value>moh</value></item>
+    <item><label>In store, for allocation</label><value>pd</value></item>
+    <item><label>Not In Use</label><value>ngo</value></item>
+ </select1>		    
+		    
+<input ref="/generator/user/name"><label>Surveyor Name</label></input>
+		    
+</h:body>
+</h:html>
