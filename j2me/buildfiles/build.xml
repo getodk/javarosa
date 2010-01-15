@@ -2,6 +2,7 @@
 <project name="J2ME Rosa Library Build" default="package">
 	<tstamp/>
 
+	<property file="local.properties"/>
 	<property file="build.properties"/>
 
 	<path id="jr.classpath">
