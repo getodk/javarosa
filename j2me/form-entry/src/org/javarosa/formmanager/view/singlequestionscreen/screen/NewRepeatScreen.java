@@ -11,11 +11,13 @@ import de.enough.polish.ui.StringItem;
 
 public class NewRepeatScreen extends FramedForm {
 
-	public Command noCommand = new Command(Constants.ACTIVITY_CANCEL, Command.ITEM, 1);
-	private Command yesCommand = new Command(Constants.ACTIVITY_COMPLETE, Command.ITEM, 1);
+	public Command noCommand = new Command(Constants.ACTIVITY_CANCEL,
+			Command.ITEM, 1);
+	private Command yesCommand = new Command(Constants.ACTIVITY_COMPLETE,
+			Command.ITEM, 1);
 
 	public NewRepeatScreen() {
-		super(Localization.get("formview.repeat.addNew"));
+		super("Add new repeat?");//Localization.get("formview.repeat.addNew"));
 		createView();
 		addCommands();
 	}
@@ -29,8 +31,8 @@ public class NewRepeatScreen extends FramedForm {
 				.get("button.Yes"), Item.BUTTON);
 		yesItem.setDefaultCommand(yesCommand);
 		// #style button
-		StringItem noItem = new StringItem(null, Localization
-				.get("button.No"), Item.BUTTON);
+		StringItem noItem = new StringItem(null, Localization.get("button.No"),
+				Item.BUTTON);
 		noItem.setDefaultCommand(noCommand);
 
 		this.append(yesItem);

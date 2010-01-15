@@ -79,12 +79,13 @@ public class FormViewScreen extends List implements IFormEntryView {
 		while (!index.isEndOfFormIndex()) {
 			if (index.isInForm() && model.isRelevant(index)) {
 				String line = "";
-				IFormElement element = form.getChild(index);
-				if (element instanceof GroupDef) {
-					FormEntryCaption caption = model.getCaptionPrompt(index);
-					line = "--" + caption.getLongText() + "--";
-				} else {
-					FormEntryPrompt prompt = model.getQuestionPrompt(index);
+				FormEntryCaption[] hierachy = model.getCaptionHierarchy(index);
+				System.out.println("================");
+				for (FormEntryCaption caption : hierachy) {
+					System.out.println(caption.getLongText());
+				}
+				if (hierachy[hierachy.length-1] instanceof FormEntryPrompt) {
+					FormEntryPrompt prompt = (FormEntryPrompt) hierachy[hierachy.length-1];
 					if (prompt.isRequired()) {
 						line += "*";
 					}
@@ -94,13 +95,23 @@ public class FormViewScreen extends List implements IFormEntryView {
 					if (answerValue != null) {
 						line += answerValue.getDisplayText();
 					}
+				} else {
+					String header = getHierachyLevelString(hierachy.length);
+					line = header + hierachy[hierachy.length-1].getLongText() + header;
 				}
-				System.out.println(line);
 				((List) this).append(line, null);
 				indexHash.add(index);// map list index to question index.
 			}
 			index = form.incrementIndex(index);
 		}
+	}
+
+	private String getHierachyLevelString(int length) {
+		String header = "";
+		for (int i = 0; i < length; i++) {
+			header += "-";
+		}
+		return header;
 	}
 
 	public void destroy() {
