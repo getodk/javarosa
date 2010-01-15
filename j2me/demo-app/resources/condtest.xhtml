@@ -1,0 +1,82 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/2002/xforms"
+	  xmlns:ev="http://www.w3.org/2001/xml-events"
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  	  xmlns:jr="http://openrosa.org/javarosa">
+<h:head>
+    <h:title>Conditions Test</h:title>
+    <meta jr:name="dimagi-scratch-ctest"/>
+    <model>
+
+	<instance>
+		<data xmlns="">
+	
+		<e1 />
+		<e2 />
+		<e3 />
+		<e4 />
+		<econd />
+	
+		<t />
+		<x />
+		<y />
+		<z />
+		<w />
+		
+		<a />
+		<b />
+		<c />
+		<d>
+			<a />
+			<b />
+			<c />
+			<d />		
+		</d>
+		
+		</data>
+	</instance>
+	
+	<bind nodeset="e1" type="xsd:int" />
+	<bind nodeset="e2" type="xsd:int" />
+	<bind nodeset="e3" type="xsd:int" />
+	<bind nodeset="e4" type="xsd:int" />
+	<bind nodeset="econd" relevant="checklist(2, 3, ../e1 > 10, ../e2 > 10, ../e3 > 10, ../e4 > 10)" />
+	
+	<bind nodeset="a" type="xsd:int" />
+	<bind nodeset="b" type="xsd:int" relevant="../a > 3" constraint=". > 10" />
+	<bind nodeset="c" type="xsd:int" relevant="../a > 3" constraint=". > ../b + 5" jr:constraintMsg="you suck" />
+	<bind nodeset="d/a" type="xsd:int" />
+	<bind nodeset="d/b" type="xsd:int" relevant="../a > 3" />
+	<bind nodeset="d/c" type="xsd:int" relevant="../a > 3" />
+	<bind nodeset="d/d" type="xsd:int" relevant="../../a > 3" />
+						
+	<bind nodeset="/data/w" relevant="/data/t = 'A'" />
+						
+    </model>
+</h:head>			
+<h:body>
+
+<input ref="e1"><label>e1</label></input>
+<input ref="e2"><label>e2</label></input>
+<input ref="e3"><label>e3</label></input>
+<input ref="e4"><label>e4</label></input>
+<input ref="econd"><label>e result</label></input>
+
+<input ref="t"><label>t</label></input>
+<group ref="w">
+<label>i have nothing to do with my children</label>
+<input ref="/data/x"><label>x</label></input>
+<input ref="/data/y"><label>y</label></input>
+<input ref="/data/z"><label>z</label></input>
+</group>
+
+<input ref="a"><label>q:a</label></input>
+<input ref="b"><label>q:b</label></input>
+<input ref="c"><label>q:c</label></input>
+<input ref="d/a"><label>q:d:a</label></input>
+<input ref="d/b"><label>q:d:b</label></input>
+<input ref="d/c"><label>q:d:c</label></input>
+<input ref="d/d"><label>q:d:d</label></input>
+
+</h:body>
+</h:html>
