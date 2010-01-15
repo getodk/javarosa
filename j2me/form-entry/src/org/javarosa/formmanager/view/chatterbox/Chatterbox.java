@@ -490,13 +490,11 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	
     	if (command == backCommand) {
     		System.out.println("back");
-    		controller.stepToPreviousEvent();
+    		step(controller.stepToPreviousEvent());
     	} else if (command == exitNoSaveCommand) {
     		controller.abort();
     	} else if (command == exitSaveCommand) {
     		commitAndSave();
-    		//controller.exit();
-    		//TODO: EXIT?
     	} else if (command == saveCommand) {
     		commitAndSave();
     	} else if (command.getLabel() == Constants.ACTIVITY_TYPE_GET_IMAGES) {
@@ -546,7 +544,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		controller.answerQuestion(this.model.getCurrentFormIndex(), frame.getData());
     	}
     	//TODO: DEAL;
-    	//controller.save();
+    	controller.saveAndExit();
     }
     
     public void questionAnswered () {
