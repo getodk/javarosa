@@ -31,29 +31,36 @@ public abstract class PatientEntryState extends FormEntryState {
 
 	protected String formName;
 	protected IModelProcessor processor;
-	
-	public PatientEntryState () {
+
+	public PatientEntryState() {
 		this(new PatientEntryModelProcessor());
 	}
-	
-	public PatientEntryState (IModelProcessor processor) {
+
+	public PatientEntryState(IModelProcessor processor) {
 		this(processor, false);
 	}
-	
-	public PatientEntryState (IModelProcessor processor, boolean batchMode) {
+
+	public PatientEntryState(IModelProcessor processor, boolean batchMode) {
 		this.formName = (batchMode ? batchRegForm : singleRegForm);
 		this.processor = processor;
 	}
-	
+
 	protected JrFormEntryController getController() {
-		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(formName), null);
+		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(
+				formName), null);
 		return new JrFormEntryController(new FormEntryModel(fetcher.getFormDef()));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.formmanager.api.transitions.FormEntryTransitions#formEntrySaved(org.javarosa.core.model.FormDef, org.javarosa.core.model.instance.DataModelTree, boolean)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.formmanager.api.transitions.FormEntryTransitions#formEntrySaved
+	 * (org.javarosa.core.model.FormDef,
+	 * org.javarosa.core.model.instance.DataModelTree, boolean)
 	 */
-	public void formEntrySaved(FormDef form, DataModelTree instanceData, boolean formWasCompleted) {
+	public void formEntrySaved(FormDef form, DataModelTree instanceData,
+			boolean formWasCompleted) {
 		if (formWasCompleted) {
 			processor.processModel(instanceData);
 			onward(instanceData.getID());
@@ -66,6 +73,6 @@ public abstract class PatientEntryState extends FormEntryState {
 		throw new RuntimeException("transition not applicable");
 	}
 
-	public abstract void onward (int recID);
+	public abstract void onward(int recID);
 
 }
