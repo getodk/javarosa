@@ -20,11 +20,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class XPathCmpExpr extends XPathBinaryOpExpr {
 	public static final int LT = 0;
@@ -41,7 +41,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 		this.op = op;
 	}
 	
-	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
+	public Object eval (FormInstance model, EvaluationContext evalContext) {
 		Object aval = a.eval(model, evalContext);
 		Object bval = b.eval(model, evalContext);
 		boolean result = false;

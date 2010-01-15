@@ -27,7 +27,6 @@ import java.util.Vector;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.util.restorable.Restorable;
@@ -41,7 +40,7 @@ import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
-public class FormInstance implements IFormDataModel, Persistable, Restorable {
+public class FormInstance implements Persistable, Restorable {
 
 	public static final String STORAGE_KEY = "FORMDATA";
 	

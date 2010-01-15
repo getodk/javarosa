@@ -23,7 +23,6 @@ import java.util.Vector;
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -67,7 +66,7 @@ public class XFormSerializingVisitor implements IInstanceSerializingVisitor {
 		dataPointers = new Vector();
 	}
 
-	public byte[] serializeInstance(IFormDataModel model, FormDef formDef) throws IOException {
+	public byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException {
 		init();
 		this.schema = formDef;
 		return serializeInstance(model);
@@ -77,7 +76,7 @@ public class XFormSerializingVisitor implements IInstanceSerializingVisitor {
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#serializeDataModel(org.javarosa.core.model.IFormDataModel)
 	 */
-	public byte[] serializeInstance(IFormDataModel model) throws IOException {
+	public byte[] serializeInstance(FormInstance model) throws IOException {
 		init();
 		if(this.serializer == null) {
 			this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
@@ -91,7 +90,7 @@ public class XFormSerializingVisitor implements IInstanceSerializingVisitor {
 		}
 	}
 	
-	public IDataPayload createSerializedPayload	(IFormDataModel model) throws IOException {
+	public IDataPayload createSerializedPayload	(FormInstance model) throws IOException {
 		init();
 		if(this.serializer == null) {
 			this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
@@ -116,16 +115,6 @@ public class XFormSerializingVisitor implements IInstanceSerializingVisitor {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.utils.IInstanceVisitor#visit(org.javarosa.core.model.IFormDataModel)
-	 */
-	public void visit(IFormDataModel dataModel) {
-		if(dataModel instanceof FormInstance) {
-			this.visit((FormInstance)dataModel);
-		}
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.DataModelTree)
