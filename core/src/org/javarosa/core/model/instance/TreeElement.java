@@ -780,6 +780,28 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		}
 	}
 	
+	//return the tree reference that corresponds to this tree element
+	public TreeReference getRef () {
+		TreeElement elem = this;
+		TreeReference ref = TreeReference.selfRef();
+		
+		while (elem != null) {
+			TreeReference step;
+			
+			if (name != null) {
+				step = TreeReference.selfRef();
+				step.add(this.name, this.multiplicity);
+			} else {
+				step = TreeReference.rootRef();
+			}
+						
+			ref = ref.parent(step);
+			elem = elem.parent;
+		}
+		
+		return ref;
+	}
+	
 	public String getPreloadHandler() {
 		return preloadHandler;
 	}
