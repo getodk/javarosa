@@ -4,7 +4,7 @@
 package org.javarosa.chsreferral.util;
 
 import org.javarosa.chsreferral.model.PatientReferral;
-import org.javarosa.entity.util.EntityFilter;
+import org.javarosa.core.services.storage.EntityFilter;
 
 /**
  * @author ctsims

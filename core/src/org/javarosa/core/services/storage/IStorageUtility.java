@@ -87,6 +87,8 @@ public interface IStorageUtility {
 
 	void removeAll ();
 	
+	void removeAll (EntityFilter ef);
+	
 	/**
 	 * Return the number of records in the store
 	 * 

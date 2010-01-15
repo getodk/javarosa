@@ -33,12 +33,7 @@ import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.IDataModelVisitor;
-import org.javarosa.core.services.ITransportManager;
-import org.javarosa.core.services.TransportManager;
-import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
-import org.javarosa.core.services.storage.StorageManager;
-import org.javarosa.core.services.transport.TransportMessage;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
@@ -668,17 +663,20 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
 				Constants.DATATYPE_DATE_TIME);
 		RestoreUtils.addData(dm, "schema", schema);
 
-		ITransportManager tm = TransportManager._();
-		boolean sent = (tm.getModelDeliveryStatus(id, true) == TransportMessage.STATUS_DELIVERED);
-		RestoreUtils.addData(dm, "sent", new Boolean(sent));
+/////////////
+		throw new RuntimeException("DataModelTree.exportData(): must be updated to use new transport layer");
+//		ITransportManager tm = TransportManager._();
+//		boolean sent = (tm.getModelDeliveryStatus(id, true) == TransportMessage.STATUS_DELIVERED);
+//		RestoreUtils.addData(dm, "sent", new Boolean(sent));
+/////////////
 		
-		for (Enumeration e = namespaces.keys(); e.hasMoreElements(); ) {
-			String key = (String)e.nextElement();
-			RestoreUtils.addData(dm, "namespace/" + key, namespaces.get(key));
-		}
-
-		RestoreUtils.mergeDataModel(dm, this, "data");
-		return dm;
+//		for (Enumeration e = namespaces.keys(); e.hasMoreElements(); ) {
+//			String key = (String)e.nextElement();
+//			RestoreUtils.addData(dm, "namespace/" + key, namespaces.get(key));
+//		}
+//
+//		RestoreUtils.mergeDataModel(dm, this, "data");
+//		return dm;
 	}
 
 	public void templateData(DataModelTree dm, TreeReference parentRef) {
@@ -712,16 +710,17 @@ public class DataModelTree implements IFormDataModel, Persistable, Restorable {
             }
         }
 
+/////////////
+		throw new RuntimeException("DataModelTree.importData(): must be updated to use new transport layer");
+//		if (sent) {			
+//			ITransportManager tm = TransportManager._();
+//			tm.markSent(id, false);
+//		}
+/////////////
 		
-		if (sent) {
-			System.out.println("here " + id);
-			ITransportManager tm = TransportManager._();
-			tm.markSent(id, false);
-		}
-
-		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
-		FormDef f = (FormDef)forms.read(formId);
-		setRoot(processSavedDataModel(dm.resolveReference(RestoreUtils.absRef("data", dm)), f.getDataModel(), f));
+//		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
+//		FormDef f = (FormDef)forms.read(formId);
+//		setRoot(processSavedDataModel(dm.resolveReference(RestoreUtils.absRef("data", dm)), f.getDataModel(), f));
 	}
 
 	public static TreeElement processSavedDataModel(

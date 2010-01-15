@@ -97,7 +97,7 @@ public class CaseEntity extends Entity<Case> {
 			open = "Yes";
 			//#endif
 		}
-		return new String[] {c.getName(), ExtUtil.emptyIfNull((String)c.getProperty("case-id")), date, open};
+		return new String[] {c.getName(), ExtUtil.emptyIfNull(this.getID()), date, open};
 	}
 	
 	/* (non-Javadoc)

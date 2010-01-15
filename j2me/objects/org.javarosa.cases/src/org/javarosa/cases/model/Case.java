@@ -209,6 +209,8 @@ public class Case implements Persistable, Restorable, IMetaData {
 	public Object getProperty(String key) {
 		if("case-id".equals(key)) {
 			return id;
+		} else if("name".equals(key)) {
+			return name;
 		}
 		return data.get(key);
 	}
