@@ -1179,4 +1179,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
+	public String getLongText() {
+		return null;
+	}
+
+
+	public String getShortText() {
+		return null;
+	}
+
 }

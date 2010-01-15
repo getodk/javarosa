@@ -20,7 +20,6 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.QuestionDef;
 
 /**
  * This class gives you all the information you need to display a caption when
@@ -32,10 +31,8 @@ import org.javarosa.core.model.QuestionDef;
 public class FormEntryCaption {
 
     FormDef form;
-    FormIndex index;
-    private GroupDef groupDef;
-    private QuestionDef questionDef;
-
+	FormIndex index;
+	private IFormElement element;
 
     public FormEntryCaption() {
     }
@@ -44,31 +41,17 @@ public class FormEntryCaption {
     public FormEntryCaption(FormDef form, FormIndex index) {
         this.form = form;
         this.index = index;
-
-        IFormElement element = form.getChild(index);
-        if (element instanceof GroupDef) {
-            this.groupDef = (GroupDef) element;
-        } else if (element instanceof QuestionDef) {
-            this.questionDef = (QuestionDef) element;
-        } else {
-            throw new IllegalArgumentException("Unexpected type of IFormElement");
-        }
+        this.element = form.getChild(index);
     }
-
-
-    protected QuestionDef getQuestionDef() {
-        return questionDef;
-    }
-
 
     public String getLongText() {
-        String longText = groupDef == null ? questionDef.getLongText() : groupDef.getLongText();
+        String longText = element.getLongText();
         return substituteStringArgs(longText);
     }
 
 
     public String getShortText() {
-        String shortText = groupDef == null ? questionDef.getShortText() : groupDef.getShortText();
+        String shortText = element.getShortText();
         return substituteStringArgs(shortText);
     }
 
@@ -81,9 +64,16 @@ public class FormEntryCaption {
     public int getMultiplicity() {
         return index.getElementMultiplicity();
     }
-
+    
+    public IFormElement getFormElement() {
+		return element;
+	}
 
     public boolean repeats() {
-        return groupDef == null ? false : groupDef.getRepeat();
+    	if (element instanceof GroupDef){
+    		return ((GroupDef) element).getRepeat();
+    	} else {
+    		return false;
+    	}
     }
 }

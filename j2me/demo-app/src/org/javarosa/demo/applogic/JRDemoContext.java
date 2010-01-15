@@ -101,6 +101,7 @@ public class JRDemoContext {
 		new UserModule().registerModule();
 		new PatientModule().registerModule();
 		new FormManagerModule().registerModule();
+		new LanguagePackModule().registerModule();
 	}
 	
 	

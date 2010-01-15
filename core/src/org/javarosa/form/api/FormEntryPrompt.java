@@ -20,6 +20,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
@@ -33,6 +34,7 @@ import org.javarosa.core.model.instance.TreeElement;
 public class FormEntryPrompt extends FormEntryCaption {
 
     TreeElement mTreeElement;
+	private QuestionDef questionDef;
 
 
     /**
@@ -44,12 +46,15 @@ public class FormEntryPrompt extends FormEntryCaption {
     
     public FormEntryPrompt(FormDef form, FormIndex index) {
         super(form, index);
+        if (!(getFormElement() instanceof QuestionDef))
+        	throw new IllegalArgumentException("FormEntryPrompt can only be created for QuestionDef elements");
+        questionDef = (QuestionDef) getFormElement();
         this.mTreeElement = form.getInstance().resolveReference(index.getReference());
     }
 
 
     public int getControlType() {
-        return getQuestionDef().getControlType();
+        return questionDef.getControlType();
     }
 
 
@@ -81,12 +86,12 @@ public class FormEntryPrompt extends FormEntryCaption {
 
 
     public Vector<SelectChoice> getSelectChoices() {
-        return getQuestionDef().getChoices();
+        return questionDef.getChoices();
     }
 
 
     public String getHelpText() {
-        return getQuestionDef().getHelpText();
+        return questionDef.getHelpText();
     }
 
 

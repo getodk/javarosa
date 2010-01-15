@@ -18,6 +18,8 @@ package org.javarosa.formmanager.view.singlequestionscreen;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryCaption;
@@ -39,8 +41,8 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemCommandListener;
 import de.enough.polish.ui.List;
 
-public class SingleQuestionScreenManager extends FramedForm implements IFormEntryView,
-		CommandListener, ItemCommandListener {
+public class SingleQuestionScreenManager extends FramedForm implements
+		IFormEntryView, CommandListener, ItemCommandListener {
 	private JrFormEntryController controller;
 	private FormEntryModel model;
 
@@ -160,7 +162,8 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 	private void switchViewLanguage() {
 		IAnswerData answer = currentQuestionScreen.getWidgetValue();
 		this.goingForward = true;
-		controller.answerQuestion(controller.getModel().getCurrentFormIndex(),answer);
+		controller.answerQuestion(controller.getModel().getCurrentFormIndex(),
+				answer);
 		refreshView();
 	}
 
@@ -237,17 +240,15 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 	private void answerQuestion() {
 		IAnswerData answer = currentQuestionScreen.getWidgetValue();
 		this.goingForward = true;
-		int result = controller.answerQuestion(controller.getModel().getCurrentFormIndex(),answer);
+		int result = controller.answerQuestion(controller.getModel()
+				.getCurrentFormIndex(), answer);
 		if (result == FormEntryController.ANSWER_OK) {
 			int event = controller.stepToNextEvent();
 			processModelEvent(event);
 		} else if (result == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
-			J2MEDisplay.showError("Validation failure", model
-					.getQuestionPrompt(controller.getModel().getCurrentFormIndex()
-					).getConstraintText());
+			J2MEDisplay.showError("Validation failure", model.getCurrentQuestionPrompt().getConstraintText());
 		} else if (result == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
-			//TODO localise
-			String txt = "There are unanswered compulsory questions and must be completed first to proceed";
+			String txt = Localization.get("formview.CompulsoryQuestionIncomplete");
 			J2MEDisplay.showError("Question Required", txt);
 		}
 		
@@ -266,12 +267,15 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 		FormIndex index = FormIndex.createBeginningOfFormIndex();
 		FormDef form = model.getForm();
 		while (!index.isEndOfFormIndex()) {
-			FormEntryPrompt prompt = new FormEntryPrompt(form, index);
-			if (countRequiredOnly && prompt.isRequired()
-					&& prompt.getAnswerValue() == null) {
-				counter++;
-			} else if (prompt.getAnswerValue() == null) {
-				counter++;
+			IFormElement element = form.getChild(index);
+			if (element instanceof QuestionDef) {
+				FormEntryPrompt prompt = model.getQuestionPrompt(index);
+				if (countRequiredOnly && prompt.isRequired()
+						&& prompt.getAnswerValue() == null) {
+					counter++;
+				} else if (prompt.getAnswerValue() == null) {
+					counter++;
+				}
 			}
 			index = form.incrementIndex(index);
 		}

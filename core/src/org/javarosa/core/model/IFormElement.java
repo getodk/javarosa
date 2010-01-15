@@ -88,4 +88,14 @@ public interface IFormElement extends Localizable, Externalizable {
 	 * @param qsl
 	 */
 	public void unregisterStateObserver (FormElementStateListener qsl);
+
+	/**
+	 * @return
+	 */
+	public String getShortText();
+
+	/**
+	 * @return
+	 */
+	public String getLongText();
 }

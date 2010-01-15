@@ -97,8 +97,6 @@ button.No=NO
 
 question.SendNow=Send data now?
 
-view.repeat.addNew=Add new repeat?
-
 view.sending.SendStatus=Send Status
 view.sending.SendingInProgress=Sending...
 view.sending.SuccessfullyTransmitted=Succesfully Transmitted Form 
@@ -108,7 +106,6 @@ view.sending.SubmissionFailed=Submission failed! Please try to submit the form a
 view.sending.SubmissionTakingLong=Sending is taking a long time; you may check on the status and/or resend later in \'View Saved\'
 view.sending.SubmissionErrorUnknown=Unknown sending error; form not sent!
 view.sending.CompulsoryQuestionsIncomplete=There are unanswered compulsory questions and must be completed first to proceed
-view.sending.CompulsoryQuestionIncomplete=This question is compulsory. Please answer it to continue.
 view.sending.FormUneditable=You cannot edit your answers when reviewing the form
 view.sending.RequiredQuestion=Required question; You must answer
 view.sending.of=of
@@ -124,7 +121,8 @@ prop.district=District
 prop.hsd=HSD
 prop.finyear=Financial Year
 
-
+formview.repeat.addNew=Add new repeat?
+formview.CompulsoryQuestionIncomplete=This question is compulsory. Please answer it to continue.
 
 form.login.commcareversion=CommCare Version
 form.login.buildnumber=Build Number

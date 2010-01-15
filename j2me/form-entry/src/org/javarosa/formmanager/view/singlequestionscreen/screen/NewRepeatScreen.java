@@ -8,7 +8,6 @@ import org.javarosa.core.services.locale.Localization;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
-import de.enough.polish.util.Locale;
 
 public class NewRepeatScreen extends FramedForm {
 
@@ -16,7 +15,7 @@ public class NewRepeatScreen extends FramedForm {
 	private Command yesCommand = new Command(Constants.ACTIVITY_COMPLETE, Command.ITEM, 1);
 
 	public NewRepeatScreen() {
-		super("Add new repeat?");//Locale.get("view.repeat.addNew"));
+		super(Localization.get("formview.repeat.addNew"));
 		createView();
 		addCommands();
 	}

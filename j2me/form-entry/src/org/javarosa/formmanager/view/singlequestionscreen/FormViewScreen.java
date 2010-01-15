@@ -16,17 +16,20 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen;
 
-import de.enough.polish.ui.Command;
-import de.enough.polish.ui.List;
-
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.GroupDef;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.utility.SortedIndexSet;
-import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IFormEntryView;
+
+import de.enough.polish.ui.Command;
+import de.enough.polish.ui.List;
 
 public class FormViewScreen extends List implements IFormEntryView {
 
@@ -68,45 +71,35 @@ public class FormViewScreen extends List implements IFormEntryView {
 	}
 
 	protected void createView() {
-
-		// Check who's relevant and display
-		// form.calculateRelevantAll();
-
-		// first ensure clean gui
 		((List) this).deleteAll();
 		indexHash = new SortedIndexSet();
 
-		for (FormIndex i = model.getForm().incrementIndex(
-				FormIndex.createBeginningOfFormIndex()); i.compareTo(FormIndex
-				.createEndOfFormIndex()) < 0; i = model.getForm()
-				.incrementIndex(i)) {
-			// Check if relevant
-			if (model.isRelevant(i)) {
-				FormElementBinding bind = new FormElementBinding(null, i, model
-						.getForm());
-
-				String stringVal;
-				// Get current value as STring
-				IAnswerData val = bind.getValue();
-				// check for null answers
-				if (val == null) {
-					stringVal = "";
+		FormIndex index = FormIndex.createBeginningOfFormIndex();
+		FormDef form = model.getForm();
+		while (!index.isEndOfFormIndex()) {
+			if (index.isInForm() && model.isRelevant(index)) {
+				String line = "";
+				IFormElement element = form.getChild(index);
+				if (element instanceof GroupDef) {
+					FormEntryCaption caption = model.getCaptionPrompt(index);
+					line = "--" + caption.getLongText() + "--";
 				} else {
-					stringVal = val.getDisplayText();
-				}
+					FormEntryPrompt prompt = model.getQuestionPrompt(index);
+					if (prompt.isRequired()) {
+						line += "*";
+					}
+					line += prompt.getLongText() + " => ";
 
-				if (bind.instanceNode.required) {
-					// Append to list
-					((List) this).append("*"
-							+ ((QuestionDef) bind.element).getShortText()
-							+ " => " + stringVal, null);
-				} else {
-					((List) this).append(((QuestionDef) bind.element)
-							.getShortText()
-							+ " => " + stringVal, null);
+					IAnswerData answerValue = prompt.getAnswerValue();
+					if (answerValue != null) {
+						line += answerValue.getDisplayText();
+					}
 				}
-				indexHash.add(i);// map list index to question index.
+				System.out.println(line);
+				((List) this).append(line, null);
+				indexHash.add(index);// map list index to question index.
 			}
+			index = form.incrementIndex(index);
 		}
 	}
 
