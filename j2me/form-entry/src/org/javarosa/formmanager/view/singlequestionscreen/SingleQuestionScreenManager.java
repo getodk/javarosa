@@ -16,6 +16,7 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen;
 
+import org.javarosa.core.api.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IFormElement;
@@ -29,6 +30,7 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.NewRepeatScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -49,6 +51,7 @@ public class SingleQuestionScreenManager extends FramedForm implements
 	private SingleQuestionScreen currentQuestionScreen;
 	private boolean goingForward;
 	private FormViewScreen formView;
+	private NewRepeatScreen repeatScreen;
 
 	// GUI elements
 	public SingleQuestionScreenManager(JrFormEntryController controller) {
@@ -101,6 +104,13 @@ public class SingleQuestionScreenManager extends FramedForm implements
 	public void commandAction(Command command, Displayable arg1) {
 		if (arg1 == formView) {
 			formViewCommands(command);
+		} else if (arg1 == repeatScreen){
+			if (command.getLabel().equals(Constants.ACTIVITY_COMPLETE)){
+				controller.newRepeat(model.getCurrentFormIndex());
+				refreshView();
+			} else {
+				processModelEvent(controller.stepToNextEvent());
+			}
 		} else {
 			if (command == SingleQuestionScreen.nextItemCommand
 					|| command == SingleQuestionScreen.nextCommand) {
@@ -168,6 +178,7 @@ public class SingleQuestionScreenManager extends FramedForm implements
 	}
 
 	private void processModelEvent(int event) {
+		System.out.println("event = " + event);
 		int nextEvent = -1;
 		switch (event) {
 		case FormEntryController.BEGINNING_OF_FORM_EVENT:
@@ -181,14 +192,14 @@ public class SingleQuestionScreenManager extends FramedForm implements
 			viewAnswers();
 			break;
 		case FormEntryController.REPEAT_EVENT:
-			// TODO
-			break;
-		case FormEntryController.PROMPT_NEW_REPEAT_EVENT:
-			// TODO
-			break;
 		case FormEntryController.GROUP_EVENT:
 			nextEvent = goingForward ? controller.stepToNextEvent()
 					: controller.stepToPreviousEvent();
+			break;
+		case FormEntryController.PROMPT_NEW_REPEAT_EVENT:
+			repeatScreen = new NewRepeatScreen();
+			repeatScreen.setCommandListener(this);
+			J2MEDisplay.setView(repeatScreen);
 			break;
 		case FormEntryController.QUESTION_EVENT:
 			refreshView();
@@ -219,15 +230,10 @@ public class SingleQuestionScreenManager extends FramedForm implements
 			}
 		} else if (command == List.SELECT_COMMAND) {
 			int i = formView.getSelectedIndex();
-			FormIndex b = formView.indexHash.get(i);
-			if (!model.isReadonly(b)) {
-				controller.jumpToIndex(b);
-				this.goingForward = true;
-				refreshView();
-			} else {
-				String txt = Localization.get("view.sending.FormUneditable");
-				J2MEDisplay.showError("Cannot Edit Answers!", txt);
-			}
+			FormIndex index = formView.indexHash.get(i);
+			int event = controller.jumpToIndex(index);
+			this.goingForward = true;
+			processModelEvent(event);
 		}
 	}
 
@@ -246,12 +252,14 @@ public class SingleQuestionScreenManager extends FramedForm implements
 			int event = controller.stepToNextEvent();
 			processModelEvent(event);
 		} else if (result == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
-			J2MEDisplay.showError("Validation failure", model.getCurrentQuestionPrompt().getConstraintText());
+			J2MEDisplay.showError("Validation failure", model
+					.getCurrentQuestionPrompt().getConstraintText());
 		} else if (result == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
-			String txt = Localization.get("formview.CompulsoryQuestionIncomplete");
+			String txt = Localization
+					.get("formview.CompulsoryQuestionIncomplete");
 			J2MEDisplay.showError("Question Required", txt);
 		}
-		
+
 	}
 
 	/**
