@@ -51,7 +51,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
 
 
-public class Chatterbox extends FramedForm implements CommandListener{
+public class Chatterbox extends FramedForm implements CommandListener, IFormEntryView{
 	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
     private static final String PROMPT_REQUIRED_QUESTION = Localization.get("view.sending.RequiredQuestion");
