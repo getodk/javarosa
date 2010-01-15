@@ -16,7 +16,6 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen;
 
-import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
@@ -28,7 +27,6 @@ import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
-import org.javarosa.formmanager.view.singlequestionscreen.screen.NewRepeatScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -36,12 +34,13 @@ import org.javarosa.j2me.view.J2MEDisplay;
 import de.enough.polish.ui.Command;
 import de.enough.polish.ui.CommandListener;
 import de.enough.polish.ui.Displayable;
+import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemCommandListener;
 import de.enough.polish.ui.List;
 import de.enough.polish.util.Locale;
 
-public class SingleQuestionScreenManager implements IFormEntryView,
+public class SingleQuestionScreenManager extends FramedForm implements IFormEntryView,
 		CommandListener, ItemCommandListener {
 	private JrFormEntryController controller;
 	private FormEntryModel model;
@@ -49,11 +48,10 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	private SingleQuestionScreen currentQuestionScreen;
 	private boolean goingForward;
 	private FormViewScreen formView;
-	private NewRepeatScreen newRepeatScreen;
 
 	// GUI elements
-	public SingleQuestionScreenManager(String formTitle,
-			JrFormEntryController controller) {
+	public SingleQuestionScreenManager(JrFormEntryController controller) {
+		super(controller.getModel().getFormTitle());
 		this.controller = controller;
 		this.model = controller.getModel();
 		this.goingForward = true;
@@ -67,27 +65,9 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 			FormEntryCaption caption = captionHeirarchy[1];
 			groupTitle = caption.getShortText();
 		}
-		if (prompt.getControlType() == Constants.DATATYPE_BARCODE) {
-			// TODO: FIXME
-			// try { // is there a service that can acquire a barcode?
-			// IAcquiringService barcodeService = (IAcquiringService) controller
-			// .getDataCaptureService("singlequestionscreen-barcode");
-			//
-			// currentQuestionScreen = SingleQuestionScreenFactory
-			// .getQuestionScreen(prompt, fromFormView, goingForward,
-			// barcodeService);
-			//
-			// } catch (UnavailableServiceException se) {
-			// // otherwise just get whatever else can handle the question type
-			// currentQuestionScreen = SingleQuestionScreenFactory
-			// .getQuestionScreen(prompt, fromFormView, goingForward);
-			// }
 
-		} else {
-			currentQuestionScreen = SingleQuestionScreenFactory
-					.getQuestionScreen(prompt, groupTitle, fromFormView,
-							goingForward);
-		}
+		currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(
+				prompt, groupTitle, fromFormView, goingForward);
 
 		if (model.getLanguages().length > 0) {
 			currentQuestionScreen.addLanguageCommands(model.getLanguages());
@@ -119,14 +99,6 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 	public void commandAction(Command command, Displayable arg1) {
 		if (arg1 == formView) {
 			formViewCommands(command);
-		} else if (arg1 == newRepeatScreen){
-			if (command.getLabel() == org.javarosa.core.api.Constants.ACTIVITY_COMPLETE){
-				controller.newRepeat(model.getCurrentFormIndex());
-				refreshView();
-			} else {
-				int event = controller.stepToNextEvent();
-				processModelEvent(event);
-			}
 		} else {
 			if (command == SingleQuestionScreen.nextItemCommand
 					|| command == SingleQuestionScreen.nextCommand) {
@@ -206,11 +178,10 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 			viewAnswers();
 			break;
 		case FormEntryController.REPEAT_EVENT:
-			nextEvent = goingForward ? controller.stepToNextEvent()
-					: controller.stepToPreviousEvent();
+			// TODO
 			break;
 		case FormEntryController.PROMPT_NEW_REPEAT_EVENT:
-			promptForNewRepeat();
+			// TODO
 			break;
 		case FormEntryController.GROUP_EVENT:
 			nextEvent = goingForward ? controller.stepToNextEvent()
@@ -226,19 +197,16 @@ public class SingleQuestionScreenManager implements IFormEntryView,
 			processModelEvent(nextEvent);
 	}
 
-	private void promptForNewRepeat() {
-		newRepeatScreen = new NewRepeatScreen();
-		newRepeatScreen.setCommandListener(this);
-		controller.setView(newRepeatScreen);
-	}
-
 	private void formViewCommands(Command command) {
 		if (command == FormViewScreen.backCommand) {
 			this.show();
 		} else if (command == FormViewScreen.exitNoSaveCommand) {
-			 controller.abort();
+			// TODO: FIXME
+			// controller.exit();
 		} else if (command == FormViewScreen.exitSaveCommand) {
-			 controller.saveAndExit();
+			// TODO: FIXME
+			// controller.save();
+			// controller.exit();
 		} else if (command == FormViewScreen.sendCommand) {
 			int counter = countUnansweredQuestions(true);
 			if (counter > 0) {
