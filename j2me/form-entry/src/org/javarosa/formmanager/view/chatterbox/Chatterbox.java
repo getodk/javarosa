@@ -220,9 +220,6 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		break;
     		default:
     			FormIndex index = model.getCurrentFormIndex();
-    			if(index.isEndOfFormIndex()) {
-    				System.out.println("SAY WHAHAAAAAT?");
-    			}
     			jumpToQuestion(index);
     			break;
     	}
@@ -251,9 +248,9 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     				//We can't show anything meaningful here. Go back to the controller.
     				boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
     				if(forwards) {
-    					controller.stepToNextEvent();
+    					step(controller.stepToNextEvent());
     				} else {
-    					controller.stepToPreviousEvent();
+    					step(controller.stepToPreviousEvent());
     				}
     				return;
     			} else {
@@ -268,18 +265,18 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     				removeHeaderForElement(questionIndex);
     			}
     			if(forwards) {
-					controller.stepToNextEvent();
+					step(controller.stepToNextEvent());
 				} else {
-					controller.stepToPreviousEvent();
+					step(controller.stepToPreviousEvent());
 				}
     			return;
     		}
     	} else if (questionIndex.isInForm() && model.isReadonly(questionIndex)) {
 			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
 			if(forwards) {
-				controller.stepToNextEvent();
+				step(controller.stepToNextEvent());
 			} else {
-				controller.stepToPreviousEvent();
+				step(controller.stepToPreviousEvent());
 			}
 			return;
     	}
@@ -568,7 +565,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     			controller.newRepeat(this.model.getCurrentFormIndex());
     			createHeaderForElement(this.model.getCurrentFormIndex());
     		}
-    		controller.stepToNextEvent();
+    		step(controller.stepToNextEvent());
     	} else {
     		int status = controller.answerQuestion(this.model.getCurrentFormIndex(), frame.getData());
 	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
