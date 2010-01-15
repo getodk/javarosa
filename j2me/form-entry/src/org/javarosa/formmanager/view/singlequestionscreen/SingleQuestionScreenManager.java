@@ -68,7 +68,7 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 		currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(
 				prompt, groupTitle, fromFormView, goingForward);
 
-		if (model.getLanguages().length > 0) {
+		if (model.getLanguages() != null && model.getLanguages().length > 0) {
 			currentQuestionScreen.addLanguageCommands(model.getLanguages());
 		}
 		currentQuestionScreen.setCommandListener(this);
@@ -201,12 +201,9 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 		if (command == FormViewScreen.backCommand) {
 			this.show();
 		} else if (command == FormViewScreen.exitNoSaveCommand) {
-			// TODO: FIXME
-			// controller.exit();
+			controller.abort();
 		} else if (command == FormViewScreen.exitSaveCommand) {
-			// TODO: FIXME
-			// controller.save();
-			// controller.exit();
+			controller.saveAndExit();
 		} else if (command == FormViewScreen.sendCommand) {
 			int counter = countUnansweredQuestions(true);
 			if (counter > 0) {
