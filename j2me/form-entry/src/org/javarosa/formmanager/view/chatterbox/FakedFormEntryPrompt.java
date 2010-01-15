@@ -19,7 +19,7 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 	}
 	
 	public String getAnswerText() {
-		
+		return null;
 	}
 
 	public IAnswerData getAnswerValue() {
