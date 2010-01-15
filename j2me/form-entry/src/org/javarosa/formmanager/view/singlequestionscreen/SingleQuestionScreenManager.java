@@ -58,7 +58,7 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 
 	public SingleQuestionScreen getView(FormIndex qIndex, boolean fromFormView) {
 		FormEntryPrompt prompt = model.getQuestionPrompt(qIndex);
-		FormEntryCaption[] captionHeirarchy = model.getCaptionHeirarchy(qIndex);
+		FormEntryCaption[] captionHeirarchy = model.getCaptionHierarchy(qIndex);
 		String groupTitle = null;
 		if (captionHeirarchy.length > 1) {
 			FormEntryCaption caption = captionHeirarchy[1];
@@ -87,12 +87,13 @@ public class SingleQuestionScreenManager extends FramedForm implements IFormEntr
 		controller.jumpToIndex(FormIndex.createBeginningOfFormIndex());
 		formView = new FormViewScreen(this.model);
 		formView.setCommandListener(this);
+		J2MEDisplay.setView(formView);
 	}
 
 	public void refreshView() {
 		SingleQuestionScreen view = getView(model.getCurrentFormIndex(),
 				this.goingForward);
-		controller.setView(view);
+		J2MEDisplay.setView(view);
 	}
 
 	public void commandAction(Command command, Displayable arg1) {
