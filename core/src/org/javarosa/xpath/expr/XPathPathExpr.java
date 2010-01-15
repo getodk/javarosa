@@ -21,7 +21,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
@@ -123,8 +122,7 @@ public class XPathPathExpr extends XPathExpression {
 		return ref;
 	}
 	
-	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
-		FormInstance m = (FormInstance)model;
+	public Object eval (FormInstance m, EvaluationContext evalContext) {
 		TreeReference ref = getReference().contextualize(evalContext.getContextRef());
 		
 		if (evalContext.isConstraint && ref.equals(evalContext.getContextRef())) {
@@ -158,11 +156,11 @@ public class XPathPathExpr extends XPathExpression {
 			
 			return nodesetRefs;
 		} else {
-			return getRefValue(model, ref);
+			return getRefValue(m, ref);
 		}
 	}
 	
-	public static Object getRefValue (IFormDataModel model, TreeReference ref) {
+	public static Object getRefValue (FormInstance model, TreeReference ref) {
 		TreeElement node = ((FormInstance)model).resolveReference(ref);
 		if (node == null) {
 			throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");

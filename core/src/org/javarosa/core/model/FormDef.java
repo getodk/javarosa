@@ -1085,13 +1085,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return instance;
 	}
 
-	public void setInstance(IFormDataModel instance) {
+	public void setInstance(FormInstance instance) {
 		if (instance.getFormId() != -1 && getID() != instance.getFormId()) {
 			System.err.println("Warning: assigning incompatible instance (type " + instance.getFormId() + ") to a formdef (type " + getID() + ")");
 		}
 		
 		instance.setFormId(getID());
-		this.instance = (FormInstance)instance;
+		this.instance = instance;
 		attachControlsToInstanceData();
 	}
 

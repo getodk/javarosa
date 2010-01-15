@@ -20,8 +20,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -32,7 +32,7 @@ public class XPathNumNegExpr extends XPathUnaryOpExpr {
 		super(a);
 	}
 	
-	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
+	public Object eval (FormInstance model, EvaluationContext evalContext) {
 		double aval = XPathFuncExpr.toNumeric(a.eval(model, evalContext)).doubleValue();
 		return new Double(-aval);
 	}
