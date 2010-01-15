@@ -162,7 +162,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	public static FormInstance loadTemplateModel (int formID) {
 		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
 		FormDef f = (FormDef)forms.read(formID);
-		return (f != null ? f.getDataModel() : null);
+		return (f != null ? f.getInstance() : null);
 	}
 	
 	/**

@@ -29,7 +29,7 @@ import org.javarosa.core.services.transport.payload.IDataPayload;
  * @author Clayton Sims
  *
  */
-public interface IDataModelSerializingVisitor extends IDataModelVisitor {
+public interface IDataModelSerializingVisitor extends IInstanceVisitor {
 	
 	byte[] serializeDataModel(IFormDataModel model, FormDef formDef) throws IOException;
 	

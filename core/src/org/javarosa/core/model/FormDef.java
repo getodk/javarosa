@@ -77,7 +77,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	//the list, where tA comes before tB, evaluating tA cannot depend on any result from evaluating tB
 	private boolean triggerablesInOrder; //true if triggerables has been ordered topologically (DON'T DELETE ME EVEN THOUGH I'M UNUSED)
 	
-	private FormInstance model;
+	private FormInstance instance;
 	private Vector outputFragments; // <IConditionExpr> contents of <output>
 	// tags that serve as parameterized
 	// arguments to captions
@@ -189,7 +189,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 					ref.setMultiplicity(repRef.size() - 1, repMult);
 				} else {
 					return null; // question/repeat hierarchy is not consistent
-					// with instance model and bindings
+					// with instance instance and bindings
 				}
 			}
 		}
@@ -214,7 +214,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 
 	public void setValue(IAnswerData data, TreeReference ref) {
-		setValue(data, ref, model.resolveReference(ref));
+		setValue(data, ref, instance.resolveReference(ref));
 	}
 
 	public void setValue(IAnswerData data, TreeReference ref, TreeElement node) {
@@ -223,7 +223,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 
 	public void setAnswer(IAnswerData data, TreeReference ref) {
-		setAnswer(data, model.resolveReference(ref));
+		setAnswer(data, instance.resolveReference(ref));
 	}
 	
 	public void setAnswer(IAnswerData data, TreeElement node) {
@@ -263,9 +263,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		FormIndex newIndex = buildIndex(indexes, multiplicities, elements);
 
 		TreeReference deleteRef = getChildInstanceRef(newIndex);
-		TreeElement deleteElement = model.resolveReference(deleteRef);
+		TreeElement deleteElement = instance.resolveReference(deleteRef);
 		TreeReference parentRef = deleteRef.getParentRef();
-		TreeElement parentElement = model.resolveReference(parentRef);
+		TreeElement parentElement = instance.resolveReference(parentRef);
 
 		int childMult = deleteElement.getMult();
 		parentElement.removeChild(deleteElement);
@@ -284,11 +284,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 	public void createNewRepeat(FormIndex index) {
 		TreeReference destRef = getChildInstanceRef(index);
-		TreeElement template = model.getTemplate(destRef);
+		TreeElement template = instance.getTemplate(destRef);
 
-		model.copyNode(template, destRef);
+		instance.copyNode(template, destRef);
 
-		preloadModel(model.resolveReference(destRef));
+		preloadInstance(instance.resolveReference(destRef));
 		triggerTriggerables(destRef); // trigger conditions that depend on the
 		// creation of this new node
 		initializeTriggerables(destRef); // initialize conditions for the node
@@ -298,7 +298,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public boolean canCreateRepeat(TreeReference repeatRef) {
 		Condition c = (Condition) conditionRepeatTargetIndex.get(repeatRef.genericize());
 		if (c != null) {
-			return c.evalBool(model, new EvaluationContext(exprEvalContext,	repeatRef));
+			return c.evalBool(instance, new EvaluationContext(exprEvalContext,	repeatRef));
 		} /* else check # child constraints of parent
 		
 		} */
@@ -345,7 +345,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				Vector targets = t.getTargets();
 				for (int i = 0; i < targets.size(); i++) {
 					TreeReference target = (TreeReference) targets.elementAt(i);
-					if (model.getTemplate(target) != null) {
+					if (instance.getTemplate(target) != null) {
 						conditionRepeatTargetIndex.put(target, (Condition) t);
 					}
 				}
@@ -492,10 +492,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	
 	private void evaluateTriggerable(Triggerable t, TreeReference anchorRef) {
 		TreeReference contextRef = t.contextRef.contextualize(anchorRef);
-		Vector v = model.expandReference(contextRef);
+		Vector v = instance.expandReference(contextRef);
 		for (int i = 0; i < v.size(); i++) {
 			EvaluationContext ec = new EvaluationContext(exprEvalContext, (TreeReference)v.elementAt(i));
-			t.apply(model, ec, this);
+			t.apply(instance, ec, this);
 		}
 	}
 
@@ -503,7 +503,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		if (data == null)
 			return true;
 
-		TreeElement node = model.resolveReference(ref);
+		TreeElement node = instance.resolveReference(ref);
 		Constraint c = node.getConstraint();
 		if (c == null)
 			return true;
@@ -512,7 +512,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		ec.isConstraint = true;
 		ec.candidateValue = data;
 
-		return c.constraint.eval(model, ec);
+		return c.constraint.eval(instance, ec);
 	}
 
 	/**
@@ -580,7 +580,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 						continue;
 
 					IConditionExpr expr = (IConditionExpr) outputFragments.elementAt(ix);
-					String value = expr.evalReadable(this.getDataModel(), new EvaluationContext(exprEvalContext, contextRef));
+					String value = expr.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, contextRef));
 					args.put(argName, value);
 				}
 			}
@@ -633,7 +633,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * Preload the Data Model with the preload values that are enumerated in the
 	 * data bindings.
 	 */
-	public void preloadModel(TreeElement node) {
+	public void preloadInstance(TreeElement node) {
 		// if (node.isLeaf()) {
 		IAnswerData preload = null;
 		if (node.getPreloadHandler() != null) {
@@ -650,23 +650,23 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				TreeElement child = node.getChildAt(i);
 				if (child.getMult() != TreeReference.INDEX_TEMPLATE)
 					// don't preload templates; new repeats are preloaded as they're created
-					preloadModel(child);
+					preloadInstance(child);
 			}
 		}
 		// }
 	}
 
-	public boolean postProcessModel() {
-		return postProcessModel(model.getRoot());
+	public boolean postProcessInstance() {
+		return postProcessInstance(instance.getRoot());
 	}
 
 	/**
 	 * Iterate over the form's data bindings, and evaluate all post procesing
 	 * calls.
 	 * 
-	 * @return true if the model was modified in any way. false otherwise.
+	 * @return true if the instance was modified in any way. false otherwise.
 	 */
-	private boolean postProcessModel(TreeElement node) {
+	private boolean postProcessInstance(TreeElement node) {
 		// we might have issues with ordering, for example, a handler that
 		// writes a value to a node,
 		// and a handler that does something external with the node. if both
@@ -694,20 +694,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				return false;
 			}
 		} else {
-			boolean modelModified = false;
+			boolean instanceModified = false;
 			for (int i = 0; i < node.getNumChildren(); i++) {
 				TreeElement child = node.getChildAt(i);
 				if (child.getMult() != TreeReference.INDEX_TEMPLATE)
-					modelModified |= postProcessModel(child);
+					instanceModified |= postProcessInstance(child);
 			}
-			return modelModified;
+			return instanceModified;
 		}
 	}
 
 	/**
 	 * Reads the form definition object from the supplied stream.
 	 * 
-	 * Requires that the model has been set to a prototype of the model that
+	 * Requires that the instance has been set to a prototype of the instance that
 	 * should be used for deserialization.
 	 * 
 	 * @param dis
@@ -722,7 +722,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		setTitle((String) ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setChildren((Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 
-		setDataModel((FormInstance) ExtUtil.read(dis, FormInstance.class, pf));
+		setInstance((FormInstance) ExtUtil.read(dis, FormInstance.class, pf));
 
 		setLocalizer((Localizer) ExtUtil.read(dis, new ExtWrapNullable(Localizer.class), pf));
 
@@ -747,7 +747,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public void initialize(boolean newInstance) {
 		if (newInstance) {// only preload new forms (we may have to revisit
 			// this)
-			preloadModel(model.getRoot());
+			preloadInstance(instance.getRoot());
 		}
 
 		initializeTriggerables();
@@ -769,7 +769,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(getName()));
 		ExtUtil.write(dos, new ExtWrapNullable(getTitle()));
 		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
-		ExtUtil.write(dos, model);
+		ExtUtil.write(dos, instance);
 		ExtUtil.write(dos, new ExtWrapNullable(localizer));
 
 		Vector conditions = new Vector();
@@ -878,7 +878,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				// specified instance actually exists
 				GroupDef group = (GroupDef) elements.elementAt(i);
 				if (group.getRepeat()) {
-					if (model.resolveReference(getChildInstanceRef(elements,
+					if (instance.resolveReference(getChildInstanceRef(elements,
 							multiplicities)) == null) {
 						descend = false; // repeat instance does not exist; do
 						// not descend into it
@@ -1003,7 +1003,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			Vector multiplicities) {
 		// find out if node is repeatable
 		TreeReference nodeRef = getChildInstanceRef(elements, multiplicities);
-		TreeElement node = model.resolveReference(nodeRef);
+		TreeElement node = instance.resolveReference(nodeRef);
 		if (node == null || node.repeatable) { // node == null if there are no
 			// instances of the repeat
 			int mult;
@@ -1011,7 +1011,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				mult = 0; // no repeats; next is 0
 			} else {
 				String name = node.getName();
-				TreeElement parentNode = model.resolveReference(nodeRef
+				TreeElement parentNode = instance.resolveReference(nodeRef
 						.getParentRef());
 				mult = parentNode.getChildMultiplicity(name);
 			}
@@ -1081,17 +1081,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return localizer;
 	}
 
-	public FormInstance getDataModel() {
-		return model;
+	public FormInstance getInstance() {
+		return instance;
 	}
 
-	public void setDataModel(IFormDataModel model) {
-		if (model.getFormId() != -1 && getID() != model.getFormId()) {
-			System.err.println("Warning: assigning incompatible model (type " + model.getFormId() + ") to a formdef (type " + getID() + ")");
+	public void setInstance(IFormDataModel instance) {
+		if (instance.getFormId() != -1 && getID() != instance.getFormId()) {
+			System.err.println("Warning: assigning incompatible instance (type " + instance.getFormId() + ") to a formdef (type " + getID() + ")");
 		}
 		
-		model.setFormId(getID());
-		this.model = (FormInstance)model;
+		instance.setFormId(getID());
+		this.instance = (FormInstance)instance;
 		attachControlsToInstanceData();
 	}
 
@@ -1116,7 +1116,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		if (fieldName.equals("DESCRIPTOR")) {
 			return name;
 		} if (fieldName.equals("XMLNS")) {
-			return ExtUtil.emptyIfNull(model.schema);
+			return ExtUtil.emptyIfNull(instance.schema);
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -1132,7 +1132,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * to xml
 	 */
 	public void attachControlsToInstanceData () {
-		TreeElement root = model.getRoot();
+		TreeElement root = instance.getRoot();
 		attachControlsToInstanceData(root, TreeReference.initRef(root));
 	}
 		

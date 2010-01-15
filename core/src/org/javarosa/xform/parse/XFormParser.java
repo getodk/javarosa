@@ -1063,7 +1063,7 @@ public class XFormParser {
 		checkDependencyCycles(f);
 		f.finalizeTriggerables();
 		
-		f.setDataModel(instanceModel);
+		f.setInstance(instanceModel);
 	}
 	
 	private static Hashtable loadNamespaces(Element e, FormInstance tree) {
@@ -1744,7 +1744,7 @@ public class XFormParser {
 			formDef.getLocalizer().setLocale(locale);
 		}
 		
-		return formDef.getDataModel();
+		return formDef.getInstance();
 	}
 		
 	//returns data type corresponding to type string; doesn't handle defaulting to 'text' if type unrecognized/unknown

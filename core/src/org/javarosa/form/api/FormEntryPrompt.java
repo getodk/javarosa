@@ -44,7 +44,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     
     public FormEntryPrompt(FormDef form, FormIndex index) {
         super(form, index);
-        this.mTreeElement = form.getDataModel().resolveReference(index.getReference());
+        this.mTreeElement = form.getInstance().resolveReference(index.getReference());
     }
 
 

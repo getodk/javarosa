@@ -118,7 +118,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.utils.IDataModelVisitor#visit(org.javarosa.core.model.IFormDataModel)
+	 * @see org.javarosa.core.model.utils.IInstanceVisitor#visit(org.javarosa.core.model.IFormDataModel)
 	 */
 	public void visit(IFormDataModel dataModel) {
 		if(dataModel instanceof FormInstance) {

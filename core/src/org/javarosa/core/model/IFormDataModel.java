@@ -19,7 +19,7 @@ package org.javarosa.core.model;
 import java.util.Date;
 
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.utils.IDataModelVisitor;
+import org.javarosa.core.model.utils.IInstanceVisitor;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
@@ -86,6 +86,6 @@ public interface IFormDataModel {
 	 * 
 	 * @param visitor
 	 */
-	void accept(IDataModelVisitor visitor);
+	void accept(IInstanceVisitor visitor);
 	
 }

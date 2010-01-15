@@ -53,7 +53,7 @@ public class FormDefFetcher {
 	public FormDef getFormDef() {
 		FormDef form = fetcher.retreiveFormDef(); 
 		if(instance != null) {
-			form.setDataModel(instance);
+			form.setInstance(instance);
 		}
 		
 		//A lot of this should probably not be with the form.
