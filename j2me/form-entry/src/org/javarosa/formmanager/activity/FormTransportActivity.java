@@ -33,7 +33,7 @@
 //import org.javarosa.core.api.IShell;
 //import org.javarosa.core.api.IView;
 //import org.javarosa.core.model.instance.FormInstance;
-//import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
+//import org.javarosa.core.model.utils.IInstanceSerializingVisitor;
 //import org.javarosa.core.services.transport.ITransportDestination;
 //import org.javarosa.core.services.transport.MessageListener;
 //import org.javarosa.core.services.transport.TransportMessage;
@@ -219,7 +219,7 @@
 //	 *            the dataModelSerializer to set
 //	 */
 //	public void setDataModelSerializer(
-//			IDataModelSerializingVisitor dataModelSerializer) {
+//			IInstanceSerializingVisitor dataModelSerializer) {
 //		this.sender.setSerializer(dataModelSerializer);
 //	}
 //

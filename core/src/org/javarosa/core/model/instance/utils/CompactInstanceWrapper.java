@@ -54,7 +54,7 @@ import org.javarosa.core.util.externalizable.ExternalizableWrapper;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
- * An alternate serialization format for DataModelTrees (saved form instances) that drastically reduces the 
+ * An alternate serialization format for FormInstances (saved form instances) that drastically reduces the 
  * resultant record size by cutting out redundant information. Size savings are typically 90-95%. The trade-off is
  * that in order to deserialize, a template FormInstance (typically from the original FormDef) must be provided.
  * 
@@ -73,21 +73,21 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @author Drew Roos
  *
  */
-public class CompactModelWrapper implements WrappingStorageUtility.SerializationWrapper {
+public class CompactInstanceWrapper implements WrappingStorageUtility.SerializationWrapper {
 	public static final int CHOICE_VALUE = 0;	/* serialize multiple-select choices by writing out the <value> */
 	public static final int CHOICE_INDEX = 1;   /* serialize multiple-select choices by writing out only the index of the
 	                                             * choice; much more compact than CHOICE_VALUE, but the deserialized
-	                                             * model must be explicitly re-attached to the parent FormDef (not just
-	                                             * the template data model) before the instance can be serialized to xml
+	                                             * instance must be explicitly re-attached to the parent FormDef (not just
+	                                             * the template data instance) before the instance can be serialized to xml
 	                                             * (otherwise the actual xml <value>s are still unknown)
 	                                             */
 
 	public static final int CHOICE_MODE = CHOICE_INDEX;
 	
-	private DataModelTemplateManager templateMgr;	/* model template provider; provides templates needed for deserialization. */
-	private FormInstance model;					/* underlying FormInstance to serialize/deserialize */
+	private InstanceTemplateManager templateMgr;	/* instance template provider; provides templates needed for deserialization. */
+	private FormInstance instance;					/* underlying FormInstance to serialize/deserialize */
 	
-	public CompactModelWrapper () {
+	public CompactInstanceWrapper () {
 		this(null);
 	}
 	
@@ -95,7 +95,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	 * 
 	 * @param templateMgr template provider; if null, template is always fetched on-demand from RMS (slow!)
 	 */
-	public CompactModelWrapper (DataModelTemplateManager templateMgr) {
+	public CompactInstanceWrapper (InstanceTemplateManager templateMgr) {
 		this.templateMgr = templateMgr;
 	}
 	
@@ -104,49 +104,49 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	}
 	
 	public void setData (Externalizable e) {
-		this.model = (FormInstance)e;
+		this.instance = (FormInstance)e;
 	}
 	
 	public Externalizable getData () {
-		return model;
+		return instance;
 	}
 
 	/**
-	 * deserialize a compact model. note the retrieval of the template data model
+	 * deserialize a compact instance. note the retrieval of the template data instance
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		int formID = ExtUtil.readInt(in);
-		model = getTemplateModel(formID).clone();
+		instance = getTemplateInstance(formID).clone();
 		
-		model.setID(ExtUtil.readInt(in));
-		model.setDateSaved((Date)ExtUtil.read(in, new ExtWrapNullable(Date.class)));
-		//formID, name, schema, versions, and namespaces are all invariants of the template model
+		instance.setID(ExtUtil.readInt(in));
+		instance.setDateSaved((Date)ExtUtil.read(in, new ExtWrapNullable(Date.class)));
+		//formID, name, schema, versions, and namespaces are all invariants of the template instance
 		
-		TreeElement root = model.getRoot();
+		TreeElement root = instance.getRoot();
 		readTreeElement(root, TreeReference.initRef(root), in, pf);
 	}
 	
 	/**
-	 * serialize a compact model
+	 * serialize a compact instance
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		if (model == null) {
-			throw new RuntimeException("model has not yet been set via setData()");
+		if (instance == null) {
+			throw new RuntimeException("instance has not yet been set via setData()");
 		}
 		
-		ExtUtil.writeNumeric(out, model.getFormId());
-		ExtUtil.writeNumeric(out, model.getID());
-		ExtUtil.write(out, new ExtWrapNullable(model.getDateSaved()));
+		ExtUtil.writeNumeric(out, instance.getFormId());
+		ExtUtil.writeNumeric(out, instance.getID());
+		ExtUtil.write(out, new ExtWrapNullable(instance.getDateSaved()));
 				
-		TreeElement root = model.getRoot();
+		TreeElement root = instance.getRoot();
 		writeTreeElement(out, root, TreeReference.initRef(root));
 	}
 	
-	private FormInstance getTemplateModel (int formID) {
+	private FormInstance getTemplateInstance (int formID) {
 		if (templateMgr != null) {
-			return templateMgr.getTemplateModel(formID);
+			return templateMgr.getTemplateInstance(formID);
 		} else {
-			FormInstance template = loadTemplateModel(formID);
+			FormInstance template = loadTemplateInstance(formID);
 			if (template == null) {
 				throw new RuntimeException("no formdef found for form id [" + formID + "]");
 			}
@@ -155,18 +155,18 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	}
 	
 	/**
-	 * load a template model fresh from the original FormDef, retrieved from RMS
+	 * load a template instance fresh from the original FormDef, retrieved from RMS
 	 * @param formID
 	 * @return
 	 */
-	public static FormInstance loadTemplateModel (int formID) {
+	public static FormInstance loadTemplateInstance (int formID) {
 		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
 		FormDef f = (FormDef)forms.read(formID);
 		return (f != null ? f.getInstance() : null);
 	}
 	
 	/**
-	 * recursively read in a node of the instance, by filling out the template model
+	 * recursively read in a node of the instance, by filling out the template instance
 	 * @param e
 	 * @param ref
 	 * @param in
@@ -175,7 +175,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	 * @throws DeserializationException
 	 */
 	private void readTreeElement (TreeElement e, TreeReference ref, DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		TreeElement templ = model.getTemplatePath(ref);
+		TreeElement templ = instance.getTemplatePath(ref);
 		boolean isGroup = !templ.isLeaf();
 				
 		if (isGroup) {
@@ -191,7 +191,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 				String childName = (String)childTypes.elementAt(i);
 					
 				TreeReference childTemplRef = ref.extendRef(childName, 0);
-				TreeElement childTempl = model.getTemplatePath(childTemplRef);
+				TreeElement childTempl = instance.getTemplatePath(childTemplRef);
 				
 				boolean repeatable = childTempl.repeatable;
 				int n = ExtUtil.readInt(in);
@@ -209,7 +209,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 					
 					for (int j = 0; j < n; j++) {
 						TreeReference dstRef = ref.extendRef(childName, j);
-						model.copyNode(childTempl, dstRef);
+						instance.copyNode(childTempl, dstRef);
 						
 						TreeElement child = e.getChild(childName, j);
 						child.setRelevant(true);
@@ -236,7 +236,7 @@ public class CompactModelWrapper implements WrappingStorageUtility.Serialization
 	 * @throws IOException
 	 */
 	private void writeTreeElement (DataOutputStream out, TreeElement e, TreeReference ref) throws IOException {
-		TreeElement templ = model.getTemplatePath(ref);
+		TreeElement templ = instance.getTemplatePath(ref);
 		boolean isGroup = !templ.isLeaf();
 				
 		if (isGroup) {

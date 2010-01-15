@@ -286,7 +286,7 @@ public class RestoreUtils {
 	}
 	
 	public static ByteArrayPayload dispatch (FormInstance dm) {
-		return (ByteArrayPayload)xfFact.serializeModel(dm);
+		return (ByteArrayPayload)xfFact.serializeInstance(dm);
 	}
 	
 	public static FormInstance receive (byte[] payload, Class restorableType) {

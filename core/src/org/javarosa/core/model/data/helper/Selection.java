@@ -41,11 +41,11 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * choices, such as form entry. the choice objects used in the form entry model will receive localization updates,
  * allowing you to retrieve the appropriate caption.
  * 
- * the 2nd form is useful when dealing with DataModelTrees without having to worry about the FormDef or the captions
+ * the 2nd form is useful when dealing with FormInstances without having to worry about the FormDef or the captions
  * from the <select> or <select1> controls. this form contains enough information to convert to an XML instance
  * 
- * the 1st form is used when serializing data-models in an ultra-compact manner, but requires linking to a FormDef before
- * you can do anything useful with the data model (insufficient info to convert to XML instance).
+ * the 1st form is used when serializing instances in an ultra-compact manner, but requires linking to a FormDef before
+ * you can do anything useful with the instance (insufficient info to convert to XML instance).
  * 
  * @author Drew Roos
  *

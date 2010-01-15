@@ -14,7 +14,7 @@ import org.javarosa.chsreferral.model.PatientReferral;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.model.utils.IModelProcessor;
+import org.javarosa.core.model.utils.IInstanceProcessor;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.IStorageUtilityIndexed;
 import org.javarosa.core.services.storage.StorageFullException;
@@ -36,9 +36,9 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.utils.IModelProcessor#processModel(org.javarosa.core.model.instance.FormInstance)
+	 * @see org.javarosa.core.model.utils.IInstanceProcessor#processModel(org.javarosa.core.model.instance.FormInstance)
 	 */
-	public void processModel(FormInstance tree) {
+	public void processInstance(FormInstance tree) {
 		Vector caseElements = scrapeForCaseElements(tree);
 		for(int i=0; i < caseElements.size(); ++i) {
 			try {

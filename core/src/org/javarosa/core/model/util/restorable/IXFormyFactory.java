@@ -24,7 +24,7 @@ import org.javarosa.core.services.transport.payload.IDataPayload;
 
 public interface IXFormyFactory {
 	TreeReference ref (String refStr);
-	IDataPayload serializeModel (FormInstance dm);
+	IDataPayload serializeInstance (FormInstance dm);
 	FormInstance parseRestore (byte[] data, Class restorableType);
 	IAnswerData parseData (String textVal, int dataType, TreeReference ref, FormDef f);
 }
