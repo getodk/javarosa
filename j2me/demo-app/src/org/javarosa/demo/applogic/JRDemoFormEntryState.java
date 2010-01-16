@@ -43,7 +43,6 @@ public class JRDemoFormEntryState extends FormEntryState {
 		FormDef form = fetcher.getFormDef();
 		
 		JrFormEntryController controller =  new JrFormEntryController(new FormEntryModel(form));
-		//TODO: Use Chatterbox/OQPS depending on the correct property.
 		controller.setView(new JRDemoFormEntryViewFactory().getFormEntryView(controller));
 		return controller;
 	}

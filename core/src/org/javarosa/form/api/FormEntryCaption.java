@@ -76,4 +76,8 @@ public class FormEntryCaption {
     		return false;
     	}
     }
+
+	public FormIndex getIndex() {
+		return index;
+	}
 }

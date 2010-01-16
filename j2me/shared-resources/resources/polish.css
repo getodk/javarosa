@@ -32,6 +32,8 @@ colors {
 	oldQuestionColor: #E2E2E2;	
 	overlay: argb( 150, 255, 255, 255 );
 	buttonBgColor: #ffeecc;
+	requiredColor: 	#FF7F50;
+	requiredColorFocus: #DC143C;
 }
 
 
@@ -68,16 +70,33 @@ colors {
 .OneQPS_Form_Right extends OneQPS_Form {
 	screen-change-animation: right;
 	always-include: true;
-
 }
 
 .OneQPS_Form_Left extends OneQPS_Form {
 	screen-change-animation: left;
 	always-include: true;
-
 }
 
+.OneQPS_Form_Top extends OneQPS_Form {
+	screen-change-animation: top;
+	always-include: true;
+}
 
+.OneQPS_Compulsory extends OneQPS_Form {
+	background-color: requiredColor;
+	layout: left | expand;
+	focused-style: focusHighlight
+}
+
+.childNode {
+	padding-left: 5;
+}
+
+focusHighlight extends focused {
+	background-color: requiredColorFocus;
+	font-color: white;
+}
+	
 .buttonfocused {
 	font-color: black;
 	font-style: bold;

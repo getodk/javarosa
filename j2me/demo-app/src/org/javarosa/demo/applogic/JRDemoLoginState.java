@@ -17,7 +17,7 @@ public class JRDemoLoginState extends LoginState {
 
 	public void loggedIn(User u) {
 		JRDemoContext._().setUser(u);
-		new JRDemoPatientSelectState().start();
+		new JRDemoFormListState().start();
 	}
 
 }

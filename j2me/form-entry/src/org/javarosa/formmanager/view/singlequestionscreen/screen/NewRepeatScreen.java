@@ -8,6 +8,7 @@ import org.javarosa.core.services.locale.Localization;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
+import de.enough.polish.ui.StyleSheet;
 
 public class NewRepeatScreen extends FramedForm {
 
@@ -16,8 +17,8 @@ public class NewRepeatScreen extends FramedForm {
 	private Command yesCommand = new Command(Constants.ACTIVITY_COMPLETE,
 			Command.ITEM, 1);
 
-	public NewRepeatScreen() {
-		super("Add new repeat?");//Localization.get("formview.repeat.addNew"));
+	public NewRepeatScreen(String title) {
+		super(title, StyleSheet.getStyle("OneQPS_Form_Top"));//Localization.get("formview.repeat.addNew"));
 		createView();
 		addCommands();
 	}

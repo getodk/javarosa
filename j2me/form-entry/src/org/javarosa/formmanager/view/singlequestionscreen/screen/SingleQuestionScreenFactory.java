@@ -36,8 +36,8 @@ public class SingleQuestionScreenFactory {
 		int contType = prompt.getControlType();
 
 		Style style = StyleSheet
-				.getStyle(fromFormView || goingForward ? "OneQPS_Form_Right"
-						: "OneQPS_Form_Left");
+				.getStyle(fromFormView || goingForward ? org.javarosa.core.api.Constants.STYLE_TRANSISION_RIGHT
+						: org.javarosa.core.api.Constants.STYLE_TRANSISION_LEFT);
 
 		switch (contType) {
 		case Constants.CONTROL_INPUT:

@@ -163,7 +163,7 @@ public class SingleQuestionScreenManager extends FramedForm implements
 				}
 			}
 
-		}
+		} 
 	}
 
 	private void viewAnswers() {
@@ -199,7 +199,8 @@ public class SingleQuestionScreenManager extends FramedForm implements
 					: controller.stepToPreviousEvent();
 			break;
 		case FormEntryController.PROMPT_NEW_REPEAT_EVENT:
-			repeatScreen = new NewRepeatScreen();
+			FormEntryCaption[] hierachy = model.getCaptionHierarchy(model.getCurrentFormIndex());
+			repeatScreen = new NewRepeatScreen(hierachy[hierachy.length -1].getLongText());
 			repeatScreen.setCommandListener(this);
 			J2MEDisplay.setView(repeatScreen);
 			break;
@@ -230,16 +231,17 @@ public class SingleQuestionScreenManager extends FramedForm implements
 				// model.setFormComplete();
 				// controller.exit();
 			}
-		} else if (command == List.SELECT_COMMAND) {
-			int i = formView.getSelectedIndex();
-			FormIndex index = formView.indexHash.get(i);
+		} else if (command == FormViewScreen.selectCommand) {
+			FormIndex index = formView.getSelectedIndex();
 			int event = controller.jumpToIndex(index);
 			this.goingForward = true;
+			System.out.println(index);
 			processModelEvent(event);
 		}
 	}
 
 	public void commandAction(Command c, Item item) {
+		System.out.println("item selected: " + item.getLabel());
 		if (c == SingleQuestionScreen.nextItemCommand) {
 			answerQuestion();
 		}
