@@ -36,7 +36,6 @@ colors {
 	requiredColorFocus: #DC143C;
 }
 
-
 .loginView {
 	background {
 		
@@ -86,6 +85,10 @@ colors {
 	background-color: requiredColor;
 	layout: left | expand;
 	focused-style: focusHighlight
+}
+
+.formGroup {
+	layout: expand | left;
 }
 
 .childNode {

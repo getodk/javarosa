@@ -16,6 +16,7 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen;
 
+
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -30,6 +31,7 @@ import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Form;
 import de.enough.polish.ui.IconItem;
 import de.enough.polish.ui.Item;
+import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.StyleSheet;
 import de.enough.polish.ui.TreeItem;
@@ -83,8 +85,7 @@ public class FormViewScreen extends Form implements IFormEntryView {
 	protected void createView() {
 		tree = new TreeItem("Form");
 		tree.setDefaultCommand(selectCommand);
-		javax.microedition.lcdui.Item appendToRoot = tree.appendToRoot("Inbox",null);
-		javax.microedition.lcdui.Item appendToNode = tree.appendToNode(appendToRoot, "from", null );
+
 		itemHash = new HashMap();
 		indexHash = new HashMap();
 		FormIndex index = FormIndex.createBeginningOfFormIndex();
@@ -93,7 +94,6 @@ public class FormViewScreen extends Form implements IFormEntryView {
 			if (index.isInForm() && model.isRelevant(index)) {
 				FormEntryCaption[] hierachy = model.getCaptionHierarchy(index);
 				String previous = null;
-				System.out.println("===============");
 				for (FormEntryCaption caption : hierachy) {
 					FormIndex capIndex = caption.getIndex();
 					System.out.println(capIndex.toString());
@@ -103,8 +103,6 @@ public class FormViewScreen extends Form implements IFormEntryView {
 					} else {
 						Item node = previous == null ? null : (Item) indexHash
 								.get(previous);
-						System.out.println("prev: " + (previous == null));
-						System.out.println("node: " + (node == null));
 						addItemToNode(node, caption, capIndex);
 					}
 				}
@@ -114,17 +112,10 @@ public class FormViewScreen extends Form implements IFormEntryView {
 		this.append(tree);
 	}
 
-	private String getStyleName(FormEntryPrompt prompt) {
-		if (prompt.isRequired() && prompt.getAnswerValue() == null) {
-			return Constants.STYLE_COMPULSORY;
-		}
-		return null;
-	}
-
 	private void addItemToNode(Item node, FormEntryCaption formEntryCaption,
 			FormIndex index) {
 		String line = "";
-		String styleName = StyleSheet.defaultStyle.name;
+		String styleName = null;
 		if (formEntryCaption instanceof FormEntryPrompt) {
 			FormEntryPrompt prompt = (FormEntryPrompt) formEntryCaption;
 			styleName = getStyleName(prompt);
@@ -134,32 +125,26 @@ public class FormViewScreen extends Form implements IFormEntryView {
 			if (answerValue != null) {
 				line += answerValue.getDisplayText();
 			}
-		} else {
-			line += formEntryCaption.getLongText();
+		} else if (!formEntryCaption.getFormElement().getChildren().isEmpty()) {
+			 styleName = "formGroup";
+			 line += formEntryCaption.getLongText();
 		}
 		Style style = styleName == null ? null : StyleSheet.getStyle(styleName);
-		Item appended;
+		Item appended = new StringItem("", line);
 		if (node != null) {
-			System.out.println("add to node: " + line);
-			style = StyleSheet.getStyle(Constants.STYLE_COMPULSORY);
-			appended = tree.appendToNode(node, line, null, style);
+			tree.appendToNode(node, appended, style);
 		} else {
-			System.out.println("add to root: " + line);
-			style = null;
-			appended = new IconItem(line, null, style);
-			tree.appendToRoot(appended);
+			tree.appendToRoot(appended, style);
 		}
 		itemHash.put(appended, index);
 		indexHash.put(index.toString(), appended);
-
 	}
-
-	private String getHierachyLevelString(int length) {
-		String header = "";
-		for (int i = 0; i < length; i++) {
-			header += "-";
+	
+	private String getStyleName(FormEntryPrompt prompt) {
+		if (prompt.isRequired() && prompt.getAnswerValue() == null) {
+			return Constants.STYLE_COMPULSORY;
 		}
-		return header;
+		return null;
 	}
 
 	public void destroy() {
@@ -170,7 +155,7 @@ public class FormViewScreen extends Form implements IFormEntryView {
 	}
 
 	public FormIndex getSelectedIndex() {
-		de.enough.polish.ui.Item item = tree.getFocusedItem();
+		Item item = tree.getFocusedItem();
 		if (item == null) {
 			return null;
 		}
