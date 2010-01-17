@@ -29,13 +29,11 @@ import org.javarosa.formmanager.view.IFormEntryView;
 
 import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Form;
-import de.enough.polish.ui.IconItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.StyleSheet;
 import de.enough.polish.ui.TreeItem;
-import de.enough.polish.ui.UiAccess;
 import de.enough.polish.util.HashMap;
 
 public class FormViewScreen extends Form implements IFormEntryView {
