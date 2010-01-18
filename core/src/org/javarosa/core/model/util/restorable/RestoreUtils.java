@@ -28,7 +28,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.storage.IStorageIterator;
@@ -47,7 +47,7 @@ public class RestoreUtils {
 		return xfFact.ref(refStr);
 	}
 	
-	public static TreeReference absRef (String refStr, DataModelTree dm) {
+	public static TreeReference absRef (String refStr, FormInstance dm) {
 		TreeReference ref = ref(refStr);
 		if (!ref.isAbsolute()) {
 			ref = ref.parent(topRef(dm));
@@ -55,7 +55,7 @@ public class RestoreUtils {
 		return ref;
 	}
 	
-	public static TreeReference topRef (DataModelTree dm) {
+	public static TreeReference topRef (FormInstance dm) {
 		return ref("/" + dm.getRoot().getName());
 	}
 	
@@ -63,14 +63,14 @@ public class RestoreUtils {
 		return ref(childPath).parent(parentRef);
 	}
 	
-	private static DataModelTree newDataModel (String topTag) {
-		DataModelTree dm = new DataModelTree();
+	private static FormInstance newDataModel (String topTag) {
+		FormInstance dm = new FormInstance();
 		dm.addNode(ref("/" + topTag));
 		return dm;
 	}
 	
-	public static DataModelTree createDataModel (Restorable r) {
-		DataModelTree dm = newDataModel(r.getRestorableType());
+	public static FormInstance createDataModel (Restorable r) {
+		FormInstance dm = newDataModel(r.getRestorableType());
 		
 		if (r instanceof Persistable) {
 			addData(dm, RECORD_ID_TAG, new Integer(((Persistable)r).getID()));
@@ -79,11 +79,11 @@ public class RestoreUtils {
 		return dm;
 	}
 	
-	public static void addData (DataModelTree dm, String xpath, Object data) {
+	public static void addData (FormInstance dm, String xpath, Object data) {
 		addData(dm, xpath, data, getDataType(data));
 	}
 	
-	public static void addData (DataModelTree dm, String xpath, Object data, int dataType) {
+	public static void addData (FormInstance dm, String xpath, Object data, int dataType) {
 		if (data == null) {
 			dataType = -1;
 		}
@@ -148,11 +148,11 @@ public class RestoreUtils {
 		return dataType;
 	}
 	
-	public static Object getValue (String xpath, DataModelTree tree) {
+	public static Object getValue (String xpath, FormInstance tree) {
 		return getValue(xpath, topRef(tree), tree);
 	}
 	
-	public static Object getValue (String xpath, TreeReference context, DataModelTree tree) {
+	public static Object getValue (String xpath, TreeReference context, FormInstance tree) {
 		TreeElement node = tree.resolveReference(ref(xpath).contextualize(context));
 		if (node == null) {
 			throw new RuntimeException("Could not find node [" + xpath + "] when parsing saved instance!");
@@ -166,11 +166,11 @@ public class RestoreUtils {
 		}
 	}
 	
-	public static void applyDataType (DataModelTree dm, String path, TreeReference parent, Class type) {
+	public static void applyDataType (FormInstance dm, String path, TreeReference parent, Class type) {
 		applyDataType(dm, path, parent, getDataType(type));
 	}
 	
-	public static void applyDataType (DataModelTree dm, String path, TreeReference parent, int dataType) {
+	public static void applyDataType (FormInstance dm, String path, TreeReference parent, int dataType) {
 		TreeReference ref = childRef(path, parent);
 		
 		Vector v = dm.expandReference(ref);
@@ -180,14 +180,14 @@ public class RestoreUtils {
 		}
 	}
 	
-	public static void templateChild (DataModelTree dm, String prefixPath, TreeReference parent, Restorable r) {	
+	public static void templateChild (FormInstance dm, String prefixPath, TreeReference parent, Restorable r) {	
 		TreeReference childRef = (prefixPath == null ? parent : RestoreUtils.childRef(prefixPath, parent));
 		childRef = childRef(r.getRestorableType(), childRef);
 		
 		templateData(r, dm, childRef);
 	}
 	
-	public static void templateData (Restorable r, DataModelTree dm, TreeReference parent) {
+	public static void templateData (Restorable r, FormInstance dm, TreeReference parent) {
 		if (parent == null)
 			parent = topRef(dm);
 		
@@ -198,11 +198,11 @@ public class RestoreUtils {
 		r.templateData(dm, parent);
 	}
 	
-	public static void mergeDataModel (DataModelTree parent, DataModelTree child, String xpathParent) {
+	public static void mergeDataModel (FormInstance parent, FormInstance child, String xpathParent) {
 		mergeDataModel(parent, child, absRef(xpathParent, parent));
 	}
 	
-	public static void mergeDataModel (DataModelTree parent, DataModelTree child, TreeReference parentRef) {
+	public static void mergeDataModel (FormInstance parent, FormInstance child, TreeReference parentRef) {
 		TreeElement parentNode = parent.resolveReference(parentRef);
 		//ugly
 		if (parentNode == null) {
@@ -217,19 +217,19 @@ public class RestoreUtils {
 		parentNode.addChild(childNode);
 	}
 	
-	public static DataModelTree exportRMS (IStorageUtility storage, Class type, String parentTag, IRecordFilter filter) {
+	public static FormInstance exportRMS (IStorageUtility storage, Class type, String parentTag, IRecordFilter filter) {
 		if (!Externalizable.class.isAssignableFrom(type) || !Restorable.class.isAssignableFrom(type)) {
 			return null;
 		}
 				
-		DataModelTree dm = newDataModel(parentTag);
+		FormInstance dm = newDataModel(parentTag);
 		
 		IStorageIterator ri = storage.iterate();
 		while (ri.hasMore()) {
 			Object obj = ri.nextRecord();
 			
 			if (filter == null || filter.filter(obj)) {
-				DataModelTree objModel = ((Restorable)obj).exportData();
+				FormInstance objModel = ((Restorable)obj).exportData();
 				mergeDataModel(dm, objModel, topRef(dm));
 			}
 		}
@@ -237,18 +237,18 @@ public class RestoreUtils {
 		return dm;
 	}
 	
-	public static DataModelTree subDataModel (TreeElement top) {
+	public static FormInstance subDataModel (TreeElement top) {
 		TreeElement newTop = top.shallowCopy();
 		newTop.setMult(0);
-		return new DataModelTree(newTop);
+		return new FormInstance(newTop);
 	}
 	
-	public static void exportRMS (DataModelTree parent, Class type, String grouperName, IStorageUtility storage, IRecordFilter filter) {
-		DataModelTree entities = RestoreUtils.exportRMS(storage, type, grouperName, filter);
+	public static void exportRMS (FormInstance parent, Class type, String grouperName, IStorageUtility storage, IRecordFilter filter) {
+		FormInstance entities = RestoreUtils.exportRMS(storage, type, grouperName, filter);
 		RestoreUtils.mergeDataModel(parent, entities, ".");
 	}
 	
-	public static void importRMS (DataModelTree dm, IStorageUtility storage, Class type, String path) {
+	public static void importRMS (FormInstance dm, IStorageUtility storage, Class type, String path) {
 		if (!Externalizable.class.isAssignableFrom(type) || !Restorable.class.isAssignableFrom(type)) {
 			return;
 		}
@@ -260,7 +260,7 @@ public class RestoreUtils {
 		Vector children = e.getChildrenWithName(childName);
 		
 		for (int i = 0; i < children.size(); i++) {
-			DataModelTree child = subDataModel((TreeElement)children.elementAt(i));
+			FormInstance child = subDataModel((TreeElement)children.elementAt(i));
 		
 			Restorable inst = (Restorable)PrototypeFactory.getInstance(type);
 			
@@ -285,11 +285,11 @@ public class RestoreUtils {
 		}
 	}
 	
-	public static ByteArrayPayload dispatch (DataModelTree dm) {
-		return (ByteArrayPayload)xfFact.serializeModel(dm);
+	public static ByteArrayPayload dispatch (FormInstance dm) {
+		return (ByteArrayPayload)xfFact.serializeInstance(dm);
 	}
 	
-	public static DataModelTree receive (byte[] payload, Class restorableType) {
+	public static FormInstance receive (byte[] payload, Class restorableType) {
 		return xfFact.parseRestore(payload, restorableType);
 	}
 	

@@ -31,7 +31,7 @@ import org.javarosa.core.api.IShell;
 import org.javarosa.core.api.IView;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.storage.FormDefRMSUtility;
 import org.javarosa.core.services.transport.ByteArrayPayload;
 import org.javarosa.core.util.JavaRosaCoreModule;

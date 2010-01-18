@@ -44,17 +44,14 @@ public class GraphDataGroup extends TreeElement {
 	
 	public IAnswerData getValue() {
 		NumericListData returnVal = new NumericListData();
-		Vector children = this.getChildren();
-		Enumeration en = children.elements();
-		while(en.hasMoreElements()) {
-			TreeElement element = (TreeElement)en.nextElement();
-				Vector subchildren = element.getChildren();
+		for (int k1 = 0; k1 < this.getNumChildren(); k1++) {
+			TreeElement element = this.getChildAt(k1);
 				
 				Date dateValue = null;
 				Integer intValue = null;
-				Enumeration subEn = subchildren.elements();
-				while(subEn.hasMoreElements()) {
-					TreeElement subElement = (TreeElement)subEn.nextElement();
+				
+				for (int k2 = 0; k2 < element.getNumChildren(); k2++) {
+					TreeElement subElement = element.getChildAt(k2);
 					if("date".equals(subElement.getName())) {
 						IAnswerData dateAnswer = (IAnswerData)subElement.getValue();
 						if(dateAnswer != null) {
@@ -104,10 +101,8 @@ public class GraphDataGroup extends TreeElement {
 	}
 	
 	private void clearDataNodes() {
-		Vector children = this.getChildren();
-		Enumeration en = children.elements();
-		while(en.hasMoreElements()) {
-			TreeElement element = (TreeElement)en.nextElement();
+		for (int i = 0; i < this.getNumChildren(); i++) {
+			TreeElement element = this.getChildAt(i);
 			
 			if(element.getName() == "data") {
 				this.removeChild(element);

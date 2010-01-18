@@ -46,7 +46,7 @@ public class FormElementBinding implements FormElementStateListener {
 		this.widget = questionWidget;
 		this.element = formElement;
 		this.instanceRef = form.getChildInstanceRef(index);
-        this.instanceNode = form.getDataModel().resolveReference(instanceRef);
+        this.instanceNode = form.getInstance().resolveReference(instanceRef);
         this.form = form;
         
        	register();

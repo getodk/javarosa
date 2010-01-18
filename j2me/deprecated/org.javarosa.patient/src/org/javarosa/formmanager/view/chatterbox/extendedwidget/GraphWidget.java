@@ -24,6 +24,8 @@ import javax.microedition.lcdui.Font;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.util.Map;
+import org.javarosa.form.api.FormEntryCaption;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.IGraphTemplate;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.LineChart;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.LinePointsItem;
@@ -133,7 +135,7 @@ public class GraphWidget extends ExpandedWidget {
 	 * (non-Javadoc)
 	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#getEntryWidget(org.javarosa.core.model.QuestionDef)
 	 */
-	protected Item getEntryWidget(QuestionDef question) {		
+	protected Item getEntryWidget(FormEntryPrompt prompt) {		
 		return wec.wrapEntryWidget(chart);
 	}
 	
@@ -247,8 +249,8 @@ public class GraphWidget extends ExpandedWidget {
 	 * (non-Javadoc)
 	 * @see org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget#updateWidget(org.javarosa.core.model.QuestionDef)
 	 */
-	protected void updateWidget(QuestionDef question) {
-		currentTemplate = (IGraphTemplate)templates.get(question.getAppearanceAttr());
+	protected void updateWidget(FormEntryPrompt prompt) {
+		currentTemplate = (IGraphTemplate)templates.get(prompt.getPromptAttributes());
         chart.resetData();
 		applyTemplate(data);
 		applyData();

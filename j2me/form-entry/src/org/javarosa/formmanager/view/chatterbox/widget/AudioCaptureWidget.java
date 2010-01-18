@@ -23,6 +23,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.PointerAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
@@ -40,7 +41,7 @@ public class AudioCaptureWidget extends ExpandedWidget
 	private PointerAnswerData data;	
 	private StringItem label;
 	
-	protected Item getEntryWidget(QuestionDef question)
+	protected Item getEntryWidget(FormEntryPrompt prompt)
 	{
 		updateLabel();
 		return label;
@@ -53,7 +54,7 @@ public class AudioCaptureWidget extends ExpandedWidget
 	}
 
 	//@Override
-	protected void updateWidget(QuestionDef question) 
+	protected void updateWidget(FormEntryPrompt prompt) 
 	{
 		// TODO Auto-generated method stub
 	}

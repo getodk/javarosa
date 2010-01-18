@@ -20,7 +20,7 @@
 
 		<!-- Definition of the J2ME Polish task:                      -->
 		<!-- Note that this takes place here (rather than in the script in general) in order to allow the libraries jar to be compiled from source before the classpath is evaluated-->
-		<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar" />
+		<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/pim.jar" />
 			<path id="classpath.base">
 		</path>
 		
@@ -107,10 +107,10 @@
 
 				<!-- log settings: only use debug setting when the test-property is true -->
 				<debug if="test" showLogOnError="true" verbose="true" level="error">
-					<filter pattern="org.celllife.clforms.*" level="debug" />
+					<filter pattern="org.celllife.singlequestionscreen.*" level="debug" />
 				</debug>
 				<!-- Properties of the actual javac compiler -->
-				<compiler debug="on" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/wmapi.jar:${wtk.home}/lib/jsr75.jar"/>
+				<compiler debug="on" includeJavaRuntime="yes" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/wmapi.jar:${wtk.home}/lib/jsr75.jar:${polish.home}/import/pim.jar"/>
 				
 				<postcompiler name="java5"/>
 				<postcompiler name="serialization" if="org.javarosa.polish.serialization"/>
@@ -217,7 +217,10 @@
 		<property name="dir.work" value="build/test" />
 	</target>
 	
-	<!-- import user specific properties                          -->
+	<!-- import local specific properties                          -->
+	<property file="${basedir}/local.properties" />
+	
+	<!-- import build specific properties                          -->
 	<property file="${basedir}/build.properties" />
 
 	<!-- import global properties                                 -->

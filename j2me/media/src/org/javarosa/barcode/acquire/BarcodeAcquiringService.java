@@ -18,12 +18,12 @@ package org.javarosa.barcode.acquire;
 
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.formmanager.view.FormElementBinding;
-import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
-import org.javarosa.formmanager.view.clforms.acquire.IAcquiringService;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquiringQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService;
 import org.javarosa.j2me.services.BarcodeCaptureService;
 import org.javarosa.j2me.services.DataCaptureService;
 import org.javarosa.j2me.services.DataCaptureServiceRegistry;
-import org.javarosa.view.clforms.widgets.BarcodeQuestionWidget;
+import org.javarosa.view.singlequestionscreen.widgets.BarcodeQuestionWidget;
 
 /**
  * @author mel
@@ -33,7 +33,7 @@ import org.javarosa.view.clforms.widgets.BarcodeQuestionWidget;
  *         a BarcodeProcessingService is used to decode it to a string.
  * 
  */
-//not a real data capture service... seems too tied to the clforms api
+//not a real data capture service... seems too tied to the singlequestionscreen api
 public class BarcodeAcquiringService implements DataCaptureService, IAcquiringService {
 
 	BarcodeCaptureService barcoder;
@@ -47,14 +47,14 @@ public class BarcodeAcquiringService implements DataCaptureService, IAcquiringSe
 	}
 	
 	public String getType() {
-		return "clforms-barcode";
+		return "singlequestionscreen-barcode";
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.javarosa.formmanager.view.clforms.acquire.IAcquiringService#getWidget
+	 * org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService#getWidget
 	 * (org.javarosa.formmanager.view.FormElementBinding, int)
 	 * 
 	 * If there is a service that is able to process a barcode from an image,
@@ -71,7 +71,7 @@ public class BarcodeAcquiringService implements DataCaptureService, IAcquiringSe
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.javarosa.formmanager.view.clforms.acquire.IAcquiringService#getWidget
+	 * org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService#getWidget
 	 * (org.javarosa.formmanager.view.FormElementBinding)
 	 * 
 	 * If there is a service that is able to process a barcode from an image,
@@ -88,7 +88,7 @@ public class BarcodeAcquiringService implements DataCaptureService, IAcquiringSe
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.javarosa.formmanager.view.clforms.acquire.IAcquiringService#getWidget
+	 * org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService#getWidget
 	 * (org.javarosa.formmanager.view.FormElementBinding, java.lang.String)
 	 * 
 	 * If there is a service that is able to process a barcode from an image,
@@ -106,7 +106,7 @@ public class BarcodeAcquiringService implements DataCaptureService, IAcquiringSe
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.javarosa.formmanager.view.clforms.acquire.IAcquiringService#getWidget
+	 * org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService#getWidget
 	 * (org.javarosa.formmanager.view.FormElementBinding, char)
 	 * 
 	 * If there is a service that is able to process a barcode from an image,

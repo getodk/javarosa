@@ -23,7 +23,7 @@ import java.util.Vector;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
@@ -33,7 +33,7 @@ public class FormDefFetcher {
 	IFormDefRetrievalMethod fetcher;
 	Vector preloadHandlers;
 	
-	DataModelTree instance;
+	FormInstance instance;
 	
 	public FormDefFetcher(IFormDefRetrievalMethod retriever, Vector preloadHandlers) {
 		this.fetcher = retriever;
@@ -46,14 +46,14 @@ public class FormDefFetcher {
 	}
 	
 	private void loadModel(int instanceId) {
-		IStorageUtility instances = StorageManager.getStorage(DataModelTree.STORAGE_KEY);
-		instance = (DataModelTree)instances.read(instanceId);
+		IStorageUtility instances = StorageManager.getStorage(FormInstance.STORAGE_KEY);
+		instance = (FormInstance)instances.read(instanceId);
 	}
 
 	public FormDef getFormDef() {
 		FormDef form = fetcher.retreiveFormDef(); 
 		if(instance != null) {
-			form.setDataModel(instance);
+			form.setInstance(instance);
 		}
 		
 		//A lot of this should probably not be with the form.

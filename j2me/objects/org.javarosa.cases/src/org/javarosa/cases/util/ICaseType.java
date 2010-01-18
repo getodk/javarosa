@@ -22,7 +22,7 @@ package org.javarosa.cases.util;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.javarosa.core.model.utils.IModelProcessor;
+import org.javarosa.core.model.utils.IInstanceProcessor;
 
 /**
  * @author Clayton Sims

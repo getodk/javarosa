@@ -1,7 +1,7 @@
 package org.javarosa.formmanager.api.transitions;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 
 public interface FormEntryTransitions {
 	final int MEDIA_IMAGE = 1;
@@ -10,7 +10,7 @@ public interface FormEntryTransitions {
 
 	public void abort();
 	
-	public void formEntrySaved(FormDef form, DataModelTree instanceData, boolean formWasCompleted);
+	public void formEntrySaved(FormDef form, FormInstance instanceData, boolean formWasCompleted);
 	
 	public void suspendForMediaCapture (int captureType);
 	

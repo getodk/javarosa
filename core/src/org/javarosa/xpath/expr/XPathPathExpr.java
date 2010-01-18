@@ -21,7 +21,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
@@ -31,7 +30,7 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -78,11 +77,11 @@ public class XPathPathExpr extends XPathExpression {
 		
 		switch (init_context) {
 		case XPathPathExpr.INIT_CONTEXT_ROOT:
-			ref.refLevel = TreeReference.REF_ABSOLUTE;
+			ref.setRefLevel(TreeReference.REF_ABSOLUTE);
 			parentsAllowed = false;
 			break;
 		case XPathPathExpr.INIT_CONTEXT_RELATIVE:
-			ref.refLevel = 0;
+			ref.setRefLevel(0);
 			parentsAllowed = true;
 			break;
 		default: throw new XPathUnsupportedException("filter expression");
@@ -103,7 +102,7 @@ public class XPathPathExpr extends XPathExpression {
 				if (!parentsAllowed || step.test != XPathStep.TEST_TYPE_NODE) {
 					throw new XPathUnsupportedException("step other than 'child::name', '.', '..'");
 				} else {
-					ref.refLevel++;
+					ref.incrementRefLevel();
 				}
 			} else if (step.axis == XPathStep.AXIS_CHILD) {
 				if (step.test == XPathStep.TEST_NAME) {
@@ -123,8 +122,7 @@ public class XPathPathExpr extends XPathExpression {
 		return ref;
 	}
 	
-	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
-		DataModelTree m = (DataModelTree)model;
+	public Object eval (FormInstance m, EvaluationContext evalContext) {
 		TreeReference ref = getReference().contextualize(evalContext.getContextRef());
 		
 		if (evalContext.isConstraint && ref.equals(evalContext.getContextRef())) {
@@ -136,8 +134,8 @@ public class XPathPathExpr extends XPathExpression {
 		boolean nodeset = false;
 		TreeReference repeatTestRef = TreeReference.rootRef();
 		for (int i = 0; i < ref.size(); i++) {
-			repeatTestRef.add((String)ref.names.elementAt(i), ((Integer)ref.multiplicity.elementAt(i)).intValue());
-			if (((Integer)ref.multiplicity.elementAt(i)).intValue() == TreeReference.INDEX_UNBOUND) {
+			repeatTestRef.add(ref.getName(i), ref.getMultiplicity(i));
+			if (ref.getMultiplicity(i) == TreeReference.INDEX_UNBOUND) {
 				if (m.getTemplate(repeatTestRef) != null) {
 					nodeset = true;
 					break;
@@ -158,12 +156,12 @@ public class XPathPathExpr extends XPathExpression {
 			
 			return nodesetRefs;
 		} else {
-			return getRefValue(model, ref);
+			return getRefValue(m, ref);
 		}
 	}
 	
-	public static Object getRefValue (IFormDataModel model, TreeReference ref) {
-		TreeElement node = ((DataModelTree)model).resolveReference(ref);
+	public static Object getRefValue (FormInstance model, TreeReference ref) {
+		TreeElement node = ((FormInstance)model).resolveReference(ref);
 		if (node == null) {
 			throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
 		}

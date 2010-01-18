@@ -17,15 +17,15 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.GroupDef;
-import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
+import org.javarosa.formmanager.view.chatterbox.FakedFormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;
 
@@ -52,22 +52,16 @@ public class ChatterboxWidgetFactory {
 	 * @param initViewState
 	 * @return
 	 */
-	public ChatterboxWidget getWidget (FormIndex questionIndex, FormDef form, int initViewState) {
+	public ChatterboxWidget getWidget (FormIndex questionIndex, FormEntryModel model, int initViewState) {
 		IWidgetStyle collapsedStyle = null;
 		IWidgetStyleEditable expandedStyle = null;
 		
-		FormElementBinding binding = new FormElementBinding(null, questionIndex, form);
+		FormEntryPrompt prompt = model.getQuestionPrompt(questionIndex);
 		
-		if(!(binding.element instanceof QuestionDef)) {
-			throw new IllegalArgumentException("Only QuestionDefs can be currently resolved from getWidget()");
-		}
+		int controlType = prompt.getControlType();
+		int dataType = prompt.getDataType();
 		
-		QuestionDef question = (QuestionDef)binding.element;
-		
-		int controlType = question.getControlType();
-		int dataType = binding.instanceNode.dataType;
-		
-		String appearanceAttr = question.getAppearanceAttr();
+		String appearanceAttr = prompt.getPromptAttributes();
 		
 		collapsedStyle = new CollapsedWidget();
 		((CollapsedWidget)collapsedStyle).setSeekable(this.readOnly);
@@ -137,11 +131,11 @@ public class ChatterboxWidgetFactory {
 		if (collapsedStyle == null || expandedStyle == null)
 			throw new IllegalStateException("No appropriate widget to render question");
 		
-		return new ChatterboxWidget(cbox, binding, initViewState, collapsedStyle, expandedStyle);
+		return new ChatterboxWidget(cbox, prompt, initViewState, collapsedStyle, expandedStyle);
 	}
 	
-    public ChatterboxWidget getNewRepeatWidget (FormIndex index, FormDef f, Chatterbox cbox) {
-    	GroupDef repeat = (GroupDef)f.explodeIndex(index).lastElement();
+    public ChatterboxWidget getNewRepeatWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
+    	//GroupDef repeat = (GroupDef)f.explodeIndex(index).lastElement();
 
     	//damn linked lists...
     	FormIndex end = index;
@@ -150,43 +144,37 @@ public class ChatterboxWidgetFactory {
     	}
     	int multiplicity = end.getInstanceIndex();
     	
-    	QuestionDef q = new QuestionDef(-1, "New Repeat?", Constants.CONTROL_SELECT_ONE);
+    	String label = model.getCaptionPrompt(index).getLongText();
     	
-    	String label = repeat.getLongText();
-    	
-    	q.setLongText("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?"); //this caption will not localize, even though repeat label is taken from the current locale
-    	q.addSelectItem("Yes", "y");
-    	q.addSelectItem("No", "n");
-    	
-    	q.addSelectItemID("Yes", false, "y");
-    	q.addSelectItemID("No", false, "n");
-    	
-    	FormElementBinding binding = new FormElementBinding(null, q, new TreeElement(null, 0));
-    	
-    	// Clayton Sims - Jun 1, 2009 : I added this setter because the repeat prompts were crashing when they
-    	// tried to use the fillTemplateString method. Not sure if that's exactly the right plan. If not, 
-    	// this next line should be removed, and another solution should be instituted. The offending line
-    	// attempting to access the formdef is in the ExpandedWidget class.
-    	binding.form = f;
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?", Constants.CONTROL_SELECT_ONE,Constants.DATATYPE_TEXT);
+
+    	SelectChoice yes = new SelectChoice("Yes", "y", false);
+    	yes.setIndex(0);
+    	prompt.addSelectChoice(yes);
+    	SelectChoice no = new SelectChoice("No", "n", false);
+    	no.setIndex(1);
+    	prompt.addSelectChoice(no);
 		
-		return new ChatterboxWidget(cbox, binding, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
+		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }
     
-    public ChatterboxWidget getNewLabelWidget(FormIndex index, FormDef f, Chatterbox cbox){
-    	IFormElement element = f.getChild(index);
-    	if(!(element instanceof GroupDef)) {
-    		throw new IllegalArgumentException("Attempted to create a Label for something that was not a Group");
-    	}
-    	GroupDef group = (GroupDef)element;
+    public ChatterboxWidget getNewLabelWidget(FormIndex index, String text){
+    	//Label Widget;
+    	int multiplicity = index.getInstanceIndex();
+    	FormEntryPrompt fakePrompt = new FakedFormEntryPrompt(text, Constants.DATATYPE_TEXT, Constants.CONTROL_LABEL);
+    	return new ChatterboxWidget(cbox, fakePrompt,ChatterboxWidget.VIEW_LABEL, new LabelWidget(multiplicity), null);
+    }
+    
+    public ChatterboxWidget getNewLabelWidget(FormIndex index, FormEntryModel model, Chatterbox cbox){
     	
-    	String labelText = group.getLongText();
+    	String labelText = model.getQuestionPrompt(index).getLongText();
     	if(labelText != null && labelText != "") {
-    		FormElementBinding binding = new FormElementBinding(null, index, f);
+    		FormEntryPrompt fakePrompt = new FakedFormEntryPrompt(labelText, Constants.DATATYPE_TEXT, Constants.CONTROL_LABEL);
     		int mult = -1;
-    		if(group.getRepeat()) {
-    			mult = binding.instanceNode.getMult() + 1;
+    		if(model.getEvent(index) == FormEntryController.REPEAT_EVENT) {
+    			mult = index.getInstanceIndex() + 1;
     		}
-    		ChatterboxWidget newLabel = new ChatterboxWidget(cbox, binding,ChatterboxWidget.VIEW_LABEL, new LabelWidget(mult), null);
+    		ChatterboxWidget newLabel = new ChatterboxWidget(cbox, fakePrompt,ChatterboxWidget.VIEW_LABEL, new LabelWidget(mult), null);
     		return newLabel;
     	} else {
     		return null;

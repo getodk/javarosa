@@ -21,9 +21,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -53,15 +53,15 @@ public class XPathConditional implements IConditionExpr {
 		return expr;
 	}
 	
-	public Object evalRaw (IFormDataModel model, EvaluationContext evalContext) {
+	public Object evalRaw (FormInstance model, EvaluationContext evalContext) {
 		return expr.eval(model, evalContext);
 	}
 	
-	public boolean eval (IFormDataModel model, EvaluationContext evalContext) {
+	public boolean eval (FormInstance model, EvaluationContext evalContext) {
 		return XPathFuncExpr.toBoolean(evalRaw(model, evalContext)).booleanValue();
 	}
 	
-	public String evalReadable (IFormDataModel model, EvaluationContext evalContext) {
+	public String evalReadable (FormInstance model, EvaluationContext evalContext) {
 		return XPathFuncExpr.toString(evalRaw(model, evalContext));
 	}
 	

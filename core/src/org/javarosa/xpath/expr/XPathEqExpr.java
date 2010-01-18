@@ -21,8 +21,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -38,7 +38,7 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
 		this.equal = equal;
 	}
 	
-	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
+	public Object eval (FormInstance model, EvaluationContext evalContext) {
 		Object aval = a.eval(model, evalContext);
 		Object bval = b.eval(model, evalContext);
 		boolean eq = false;
