@@ -233,9 +233,9 @@ public class SingleQuestionScreenManager extends FramedForm implements
 			}
 		} else if (command == FormViewScreen.selectCommand) {
 			FormIndex index = formView.getSelectedIndex();
+			System.out.println("---- going to - " + index);
 			int event = controller.jumpToIndex(index);
 			this.goingForward = true;
-			System.out.println(index);
 			processModelEvent(event);
 		}
 	}

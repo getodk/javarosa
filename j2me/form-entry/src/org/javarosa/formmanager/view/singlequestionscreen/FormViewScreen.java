@@ -26,9 +26,11 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.IFormEntryView;
+import org.javarosa.formmanager.view.chatterbox.widget.LabelWidget;
 
 import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Form;
+import de.enough.polish.ui.IconItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
@@ -81,6 +83,7 @@ public class FormViewScreen extends Form implements IFormEntryView {
 	}
 
 	protected void createView() {
+		//#style formGroup
 		tree = new TreeItem("Form");
 		tree.setDefaultCommand(selectCommand);
 
@@ -94,7 +97,6 @@ public class FormViewScreen extends Form implements IFormEntryView {
 				String previous = null;
 				for (FormEntryCaption caption : hierachy) {
 					FormIndex capIndex = caption.getIndex();
-					System.out.println(capIndex.toString());
 					if (indexHash.containsKey(capIndex.toString())) {
 						previous = capIndex.toString();
 						continue;
@@ -128,7 +130,7 @@ public class FormViewScreen extends Form implements IFormEntryView {
 			 line += formEntryCaption.getLongText();
 		}
 		Style style = styleName == null ? null : StyleSheet.getStyle(styleName);
-		Item appended = new StringItem("", line);
+		Item appended = new IconItem(line, null);
 		if (node != null) {
 			tree.appendToNode(node, appended, style);
 		} else {
@@ -157,6 +159,7 @@ public class FormViewScreen extends Form implements IFormEntryView {
 		if (item == null) {
 			return null;
 		}
-		return (FormIndex) itemHash.get(item);
+		FormIndex formIndex = (FormIndex) itemHash.get(item);
+		return formIndex;
 	}
 }

@@ -89,6 +89,7 @@ colors {
 
 .formGroup {
 	layout: expand | left;
+	expand-items: true;
 }
 
 .childNode {
