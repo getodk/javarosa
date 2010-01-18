@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -47,21 +46,21 @@ public abstract class Triggerable implements Externalizable {
 		this.targets = new Vector();
 	}
 	
-	protected abstract Object eval (IFormDataModel model, EvaluationContext ec);
+	protected abstract Object eval (FormInstance instance, EvaluationContext ec);
 	
-	protected abstract void apply (TreeReference ref, Object result, IFormDataModel model, FormDef f);
+	protected abstract void apply (TreeReference ref, Object result, FormInstance instance, FormDef f);
 	
 	public abstract boolean canCascade ();
 	
-	public void apply (IFormDataModel model, EvaluationContext evalContext, FormDef f) {
-		Object result = eval(model, evalContext);
+	public void apply (FormInstance instance, EvaluationContext evalContext, FormDef f) {
+		Object result = eval(instance, evalContext);
 
 		for (int i = 0; i < targets.size(); i++) {
 			TreeReference targetRef = ((TreeReference)targets.elementAt(i)).contextualize(evalContext.getContextRef());
-			Vector v = ((DataModelTree)model).expandReference(targetRef);		
+			Vector v = instance.expandReference(targetRef);		
 			for (int j = 0; j < v.size(); j++) {
 				TreeReference affectedRef = (TreeReference)v.elementAt(j);
-				apply(affectedRef, result, model, f);
+				apply(affectedRef, result, instance, f);
 			}
 		}		
 	}

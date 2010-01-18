@@ -16,23 +16,17 @@
 
 package org.javarosa.xform.schema;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.util.OrderedHashtable;
-import org.javarosa.xform.util.XFormUtils;
-import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
@@ -47,22 +41,22 @@ public class InstanceSchema {
 		schema.setName("schema");
 		schema.setNamespace("http://www.w3.org/2001/XMLSchema");
 		schema.setPrefix("", "http://www.w3.org/2001/XMLSchema");
-		if (f.getDataModel().schema != null) {
-			schema.setAttribute(null, "targetNamespace", f.getDataModel().schema);
+		if (f.getInstance().schema != null) {
+			schema.setAttribute(null, "targetNamespace", f.getInstance().schema);
 		} else {
 			System.err.println("Warning: instance has no schema");
 		}
 		schema.setAttribute(null, "elementFormDefault", "qualified");
 		
-		String formVersion = f.getDataModel().formVersion;
-		String uiVersion = f.getDataModel().uiVersion;
+		String formVersion = f.getInstance().formVersion;
+		String uiVersion = f.getInstance().uiVersion;
 		if (formVersion != null)
 			schema.setAttribute(null, "version", formVersion);
 		if (uiVersion != null)
 			schema.setAttribute(null, "uiVersion", uiVersion);
 		
-		processSelectChoices(schema, f, f.getDataModel());
-		schema.addChild(Node.ELEMENT, schemizeInstance(f.getDataModel().getRoot()));
+		processSelectChoices(schema, f, f.getInstance());
+		schema.addChild(Node.ELEMENT, schemizeInstance(f.getInstance().getRoot()));
 		
 		Document schemaXML = new Document();
 		schemaXML.addChild(Node.ELEMENT, schema);
@@ -140,7 +134,7 @@ public class InstanceSchema {
 		return e;
 	}
 	
-	private static void processSelectChoices (Element e, IFormElement fe, DataModelTree model) {
+	private static void processSelectChoices (Element e, IFormElement fe, FormInstance model) {
 		if (fe instanceof QuestionDef) {
 			QuestionDef q = (QuestionDef)fe;
 			int controlType = q.getControlType();
@@ -148,7 +142,7 @@ public class InstanceSchema {
 			
 			if (controlType == Constants.CONTROL_SELECT_ONE || controlType == Constants.CONTROL_SELECT_MULTI) {
 				String choiceTypeName = getChoiceTypeName(ref);
-				writeChoices(e, choiceTypeName, q.getSelectItemIDs().elements());
+				writeChoices(e, choiceTypeName, q.getChoices());
 				
 				if (controlType == Constants.CONTROL_SELECT_MULTI) {
 					writeListType(e, choiceTypeName);
@@ -168,7 +162,7 @@ public class InstanceSchema {
 		return ref.toString(false).replace('/', '_');
 	}
 	
-	private static void writeChoices (Element e, String typeName, Enumeration choices) {
+	private static void writeChoices (Element e, String typeName, Vector<SelectChoice> choices) {
 		Element st = new Element();
 		st.setName("simpleType");
 		st.setAttribute(null, "name", typeName);
@@ -179,8 +173,8 @@ public class InstanceSchema {
 		restr.setAttribute(null, "base", "string");
 		st.addChild(Node.ELEMENT, restr);
 		
-		while (choices.hasMoreElements()) {
-			String value = (String)choices.nextElement();
+		for (int i = 0; i < choices.size(); i++) {
+			String value = choices.elementAt(i).getValue();
 			
 			Element choice = new Element();
 			choice.setName("enumeration");

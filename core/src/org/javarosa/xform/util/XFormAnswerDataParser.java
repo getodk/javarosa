@@ -21,6 +21,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
@@ -158,15 +159,14 @@ public class XFormAnswerDataParser {
 		return v;
 	}
 	
-	private static Selection getSelection(String choice, QuestionDef q) {
-		Selection s = new Selection(choice);
+	private static Selection getSelection(String choiceValue, QuestionDef q) {
+		Selection s;
 		
-		if(q != null) {
-			if (q.getSelectItems() == null)
-				q.localizeSelectMap(null);
-			int index = q.getSelectedItemIndex(choice); 
-			s.attachQuestionDef(q);
-			return (index != -1 ? s : null);
+		if (q == null) {
+			s = new Selection(choiceValue);
+		} else {
+			SelectChoice choice = q.getChoiceForValue(choiceValue);
+			s = (choice != null ? choice.selection() : null);
 		}
 		
 		return s;

@@ -32,7 +32,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.IConditionExpr;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.locale.Localizer;
@@ -105,7 +105,7 @@ public class FormOverview {
 	}
 	
 	private static void listQuestion (FormDef f, QuestionDef q, int indent, StringBuffer sb) {
-		TreeElement instanceNode = getInstanceNode(f.getDataModel(), q.getBind());
+		TreeElement instanceNode = getInstanceNode(f.getInstance(), q.getBind());
 		
 		String caption = q.getLongText();
 		int type = instanceNode.dataType;
@@ -195,7 +195,7 @@ public class FormOverview {
 				for (int j = 0; j < c.targets.size() && expr == null; j++) {
 					TreeReference target = (TreeReference)c.targets.elementAt(j);
 					
-					if (instanceNode == getInstanceNode(f.getDataModel(), new XPathReference(target))) {
+					if (instanceNode == getInstanceNode(f.getInstance(), new XPathReference(target))) {
 						expr = c.expr;
 					}
 				}
@@ -270,7 +270,7 @@ public class FormOverview {
 	private static boolean listGroup (FormDef f, GroupDef g, int indent, StringBuffer sb) {
 		boolean repeat = g.getRepeat();
 		String caption = ExtUtil.nullIfEmpty(g.getLongText());
-		TreeElement instanceNode = getInstanceNode(f.getDataModel(), g.getBind());
+		TreeElement instanceNode = getInstanceNode(f.getInstance(), g.getBind());
 		
 		String relevant = printConditionalProperty("relevant", f, instanceNode);
 		String readonly = printConditionalProperty("readonly", f, instanceNode);
@@ -310,7 +310,7 @@ public class FormOverview {
 		}
 	}
 	
-	private static TreeElement getInstanceNode (DataModelTree d, IDataReference ref) {
+	private static TreeElement getInstanceNode (FormInstance d, IDataReference ref) {
 		return d.getTemplatePath((TreeReference)ref.getReference());
 	}
 	

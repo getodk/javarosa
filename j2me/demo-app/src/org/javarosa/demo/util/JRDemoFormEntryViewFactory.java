@@ -17,23 +17,23 @@
 package org.javarosa.demo.util;
 
 import org.javarosa.core.services.PropertyManager;
-import org.javarosa.formmanager.controller.FormEntryController;
-import org.javarosa.formmanager.model.FormEntryModel;
+import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.IFormEntryViewFactory;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
-import org.javarosa.formmanager.view.clforms.FormViewManager;
+import org.javarosa.formmanager.view.singlequestionscreen.SingleQuestionScreenManager;
+
 
 public class JRDemoFormEntryViewFactory implements IFormEntryViewFactory {
-	public IFormEntryView getFormEntryView (FormEntryModel model, FormEntryController controller) {
+	public IFormEntryView getFormEntryView (JrFormEntryController controller) {
 		String viewType = PropertyManager._().getSingularProperty(FormManagerProperties.VIEW_TYPE_PROPERTY);		
 		
 		if (FormManagerProperties.VIEW_CHATTERBOX.equals(viewType)) {
-			return new Chatterbox("Chatterbox", model, controller);
+			return new Chatterbox("Chatterbox", controller);
 			
-		} else if (FormManagerProperties.VIEW_CLFORMS.equals(viewType)) {
-			return new FormViewManager("1QpS", model, controller);
+		} else if (FormManagerProperties.VIEW_SINGLEQUESTIONSCREEN.equals(viewType)) {
+			return new SingleQuestionScreenManager(controller);
 			
 		} else {
 			throw new RuntimeException("No view known for type [" + viewType + "]");
