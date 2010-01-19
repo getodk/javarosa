@@ -161,7 +161,7 @@ public class XPathPathExpr extends XPathExpression {
 	}
 	
 	public static Object getRefValue (FormInstance model, TreeReference ref) {
-		TreeElement node = ((FormInstance)model).resolveReference(ref);
+		TreeElement node = model.resolveReference(ref);
 		if (node == null) {
 			throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
 		}
