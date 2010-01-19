@@ -37,6 +37,9 @@ public class JrFormEntryController extends FormEntryController {
 	}
 	
 	public void saveAndExit() {
+		//TODO: This implies done-ness. We should set up a way to save without done-ness eventually to
+		//prevent post-processing.
+		this.getModel().getForm().postProcessInstance();
 		transitions.formEntrySaved(this.getModel().getForm(),this.getModel().getForm().getInstance(),true);
 	}
 	
