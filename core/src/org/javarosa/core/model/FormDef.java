@@ -123,7 +123,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 	public IFormElement getChild(FormIndex index) {
 		IFormElement element = this;
-		while (index != null) {
+		while (index != null && index.isInForm()) {
 			element = element.getChild(index.getLocalIndex());
 			index = index.getNextLevel();
 		}
