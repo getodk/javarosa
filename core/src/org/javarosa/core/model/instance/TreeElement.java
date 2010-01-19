@@ -788,9 +788,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		while (elem != null) {
 			TreeReference step;
 			
-			if (name != null) {
+			if (elem.name != null) {
 				step = TreeReference.selfRef();
-				step.add(this.name, this.multiplicity);
+				step.add(elem.name, elem.multiplicity);
 			} else {
 				step = TreeReference.rootRef();
 			}
