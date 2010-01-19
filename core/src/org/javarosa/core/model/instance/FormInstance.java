@@ -158,24 +158,6 @@ public class FormInstance implements Persistable, Restorable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.javarosa.core.model.IFormDataModel#updateDataValue(IDataBinding,
-	 * Object)
-	 */
-	// don't think this is used anymore
-	public boolean updateDataValue(IDataReference questionBinding,
-			IAnswerData value) {
-		TreeElement treeElement = resolveReference(questionBinding);
-		if (treeElement != null) {
-			treeElement.setValue(value);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.javarosa.core.model.IFormDataModel#getDataValue(org.javarosa.core
 	 * .model.IDataReference)
@@ -190,10 +172,8 @@ public class FormInstance implements Persistable, Restorable {
 		}
 	}
 
-	// take a ref that unambiguously refers to a single node and return that
-	// node
-	// return null if ref is ambiguous, node does not exist, ref is relative, or
-	// ref is '/'
+	// take a ref that unambiguously refers to a single node and return that node
+	// return null if ref is ambiguous, node does not exist, ref is relative, or ref is '/'
 	// can be used to retrieve template nodes
 	public TreeElement resolveReference(TreeReference ref) {
 		if (!ref.isAbsolute()){
@@ -260,16 +240,11 @@ public class FormInstance implements Persistable, Restorable {
 		return expandReference(ref, false);
 	}
 
-	// take in a potentially-ambiguous ref, and return a vector of refs for all
-	// nodes that match the passed-in ref
-	// meaning, search out all repeated nodes that match the pattern of the
-	// passed-in ref
-	// every ref in the returned vector will be unambiguous (no index will ever
-	// be INDEX_UNBOUND)
-	// does not return template nodes when matching INDEX_UNBOUND, but will
-	// match templates when INDEX_TEMPLATE is explicitly set
-	// return null if ref is relative, otherwise return vector of refs (but
-	// vector will be empty is no refs match)
+	// take in a potentially-ambiguous ref, and return a vector of refs for all nodes that match the passed-in ref
+	// meaning, search out all repeated nodes that match the pattern of the passed-in ref
+	// every ref in the returned vector will be unambiguous (no index will ever be INDEX_UNBOUND)
+	// does not return template nodes when matching INDEX_UNBOUND, but will match templates when INDEX_TEMPLATE is explicitly set
+	// return null if ref is relative, otherwise return vector of refs (but vector will be empty is no refs match)
 	// '/' returns {'/'}
 	// can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
 	public Vector expandReference(TreeReference ref, boolean includeTemplates) {
@@ -277,7 +252,7 @@ public class FormInstance implements Persistable, Restorable {
 			return null;
 
 		Vector v = new Vector();
-		expandReference(ref, TreeReference.rootRef(), root, v, includeTemplates);
+		expandReference(ref, root, v, includeTemplates);
 		return v;
 	}
 
@@ -287,13 +262,11 @@ public class FormInstance implements Persistable, Restorable {
 	// templateRef: explicit path that refers to the current node
 	// refs: Vector to collect matching paths; if 'node' is a target node that
 	// matches sourceRef, templateRef is added to refs
-	private void expandReference(TreeReference sourceRef,
-			TreeReference templateRef, TreeElement node, Vector refs,
-			boolean includeTemplates) {
-		int depth = templateRef.size();
+	private void expandReference(TreeReference sourceRef, TreeElement node, Vector refs, boolean includeTemplates) {
+		int depth = node.getDepth();
 
 		if (depth == sourceRef.size()) {
-			refs.addElement(templateRef);
+			refs.addElement(node.getRef());
 		} else if (node.getNumChildren() > 0) {
 			String name = sourceRef.getName(depth);
 			int mult = sourceRef.getMultiplicity(depth);
@@ -311,8 +284,7 @@ public class FormInstance implements Persistable, Restorable {
 					}
 				}
 				if (includeTemplates) {
-					TreeElement template = node.getChild(name,
-							TreeReference.INDEX_TEMPLATE);
+					TreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
 					if (template != null) {
 						children.addElement(template);
 					}
@@ -324,21 +296,14 @@ public class FormInstance implements Persistable, Restorable {
 			}
 
 			for (Enumeration e = children.elements(); e.hasMoreElements();) {
-				TreeElement child = (TreeElement) e.nextElement();
-				TreeReference newTemplateRef = (children.size() == 1 ? templateRef : templateRef.clone()); // don't clone templateRef
-				// unnecessarily
-				newTemplateRef.add(child.getName(), child.getMult());
-
-				expandReference(sourceRef, newTemplateRef, child, refs,	includeTemplates);
+				expandReference(sourceRef, (TreeElement)e.nextElement(), refs, includeTemplates);
 			}
 		}
 	}
 
-	// retrieve the template node for a given repeated node
-	// ref may be ambiguous
+	// retrieve the template node for a given repeated node ref may be ambiguous
 	// return null if node is not repeatable
-	// assumes templates are built correctly and obey all data model validity
-	// rules
+	// assumes templates are built correctly and obey all data model validity rules
 	public TreeElement getTemplate(TreeReference ref) {
 		TreeElement node = getTemplatePath(ref);
 		return (node == null ? null : node.repeatable ? node : null);
@@ -363,14 +328,10 @@ public class FormInstance implements Persistable, Restorable {
 		return node;
 	}
 
-	// determine if nodes are homogeneous, meaning their descendant structure is
-	// 'identical' for repeat purposes
-	// identical means all children match, and the children's children match,
-	// and so on
-	// repeatable children are ignored; as they do not have to exist in the same
-	// quantity for nodes to be homogeneous
-	// however, the child repeatable nodes MUST be verified amongst themselves
-	// for homogeneity later
+	// determine if nodes are homogeneous, meaning their descendant structure is 'identical' for repeat purposes
+	// identical means all children match, and the children's children match, and so on
+	// repeatable children are ignored; as they do not have to exist in the same quantity for nodes to be homogeneous
+	// however, the child repeatable nodes MUST be verified amongst themselves for homogeneity later
 	// this function ignores the names of the two nodes
 	public static boolean isHomogeneous(TreeElement a, TreeElement b) {
 		if (a.isLeaf() && b.isLeaf()) {
@@ -464,15 +425,12 @@ public class FormInstance implements Persistable, Restorable {
 	 * org.javarosa.core.services.storage.utilities.Externalizable#readExternal
 	 * (java.io.DataInputStream)
 	 */
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		id = ExtUtil.readInt(in);
 		formId = ExtUtil.readInt(in);
 		name = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
-		schema = (String) ExtUtil.read(in, new ExtWrapNullable(String.class),
-				pf);
-		dateSaved = (Date) ExtUtil
-				.read(in, new ExtWrapNullable(Date.class), pf);
+		schema = (String) ExtUtil.read(in, new ExtWrapNullable(String.class), pf);
+		dateSaved = (Date) ExtUtil.read(in, new ExtWrapNullable(Date.class), pf);
 		
 		namespaces = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 		setRoot((TreeElement) ExtUtil.read(in, TreeElement.class, pf));
@@ -536,8 +494,7 @@ public class FormInstance implements Persistable, Restorable {
 		}
 	}
 
-	public TreeReference addNode(TreeReference ambigRef, IAnswerData data,
-			int dataType) {
+	public TreeReference addNode(TreeReference ambigRef, IAnswerData data, int dataType) {
 		TreeReference ref = ambigRef.clone();
 		TreeElement node = createNode(ref);
 		if (node != null) {
@@ -719,17 +676,15 @@ public class FormInstance implements Persistable, Restorable {
 //		setRoot(processSavedDataModel(dm.resolveReference(RestoreUtils.absRef("data", dm)), f.getDataModel(), f));
 	}
 
-	public static TreeElement processSavedInstance(TreeElement newInstanceRoot, FormInstance template, FormDef f) {
+	public TreeElement processSaved(FormInstance template, FormDef f) {
 		TreeElement fixedInstanceRoot = template.getRoot().deepCopy(true);
-		TreeElement incomingRoot = newInstanceRoot.getChildAt(0);
+		TreeElement incomingRoot = root.getChildAt(0);
 
 		if (!fixedInstanceRoot.getName().equals(incomingRoot.getName()) || incomingRoot.getMult() != 0) {
 			throw new RuntimeException("Saved form instance to restore does not match form definition");
 		}
-		TreeReference ref = TreeReference.rootRef();
-		ref.add(fixedInstanceRoot.getName(), TreeReference.INDEX_UNBOUND);
-		fixedInstanceRoot.populate(incomingRoot, ref, f);
 
+		fixedInstanceRoot.populate(incomingRoot, f);
 		return fixedInstanceRoot;
 	}
 
@@ -752,51 +707,4 @@ public class FormInstance implements Persistable, Restorable {
 		return cloned;
 	}
 	
-	// private TreeElement createNode (TreeReference ref) {
-	// if (root == null) {
-	// root = new TreeElement(null, 0);
-	// }
-	//		
-	// TreeElement node = root;
-	//		
-	// for (int k = 0; k < ref.size(); k++) {
-	// String name = (String)ref.names.elementAt(k);
-	// int count = node.getChildMultiplicity(name);
-	// int mult = ((Integer)ref.multiplicity.elementAt(k)).intValue();
-	//			
-	// TreeElement child;
-	// if (mult >= 0 && mult < count) {
-	// if (k == ref.size() - 1) {
-	// return null; //final node must be a newly-created node
-	// }
-	//				
-	// //fetch existing
-	// child = node.getChild(name, mult);
-	// if (child == null) {
-	// return null; //intermediate node does not exist, and not specified in a
-	// way that will cause it to be created
-	// }
-	// } else if (mult == TreeReference.INDEX_UNBOUND || mult == count) {
-	// if (k == 0 && root.getNumChildren() != 0) {
-	// return null; //can only be one top-level node, and it already exists
-	// }
-	//				
-	// if (!node.isChildable()) {
-	// return null; //current node can't have children
-	// }
-	//				
-	// //create new
-	// child = new TreeElement(name, count);
-	// node.addChild(child);
-	// ref.multiplicity.setElementAt(new Integer(count), k);
-	// } else {
-	// return null;
-	// }
-	//		
-	// node = child;
-	// }
-	//		
-	// return node;
-	// }
-
 }

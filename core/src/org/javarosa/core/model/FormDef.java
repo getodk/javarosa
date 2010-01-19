@@ -667,29 +667,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * @return true if the instance was modified in any way. false otherwise.
 	 */
 	private boolean postProcessInstance(TreeElement node) {
-		// we might have issues with ordering, for example, a handler that
-		// writes a value to a node,
-		// and a handler that does something external with the node. if both
-		// handlers are bound to the
-		// same node, we need to make sure the one that alters the node executes
-		// first. deal with that later.
+		// we might have issues with ordering, for example, a handler that writes a value to a node,
+		// and a handler that does something external with the node. if both handlers are bound to the
+		// same node, we need to make sure the one that alters the node executes first. deal with that later.
 		// can we even bind multiple handlers to the same node currently?
 
-		// also have issues with conditions. it is hard to detect what
-		// conditions are affected by the actions
-		// of the post-processor. normally, it wouldn't matter because we only
-		// post-process when we are exiting
-		// the form, so the result of any triggered conditions is irrelevant.
-		// however, if we save a form in the
-		// interim, post-processing occurs, and then we continue to edit the
-		// form. it seems like having conditions
-		// dependent on data written during post-processing is a bad practice
-		// anyway, and maybe we shouldn't support it.
+		// also have issues with conditions. it is hard to detect what conditions are affected by the actions
+		// of the post-processor. normally, it wouldn't matter because we only post-process when we are exiting
+		// the form, so the result of any triggered conditions is irrelevant. however, if we save a form in the
+		// interim, post-processing occurs, and then we continue to edit the form. it seems like having conditions
+		// dependent on data written during post-processing is a bad practice anyway, and maybe we shouldn't support it.
 
 		if (node.isLeaf()) {
 			if (node.getPreloadHandler() != null) {
-				return preloader.questionPostProcess(node, node
-						.getPreloadHandler(), node.getPreloadParams());
+				return preloader.questionPostProcess(node, node.getPreloadHandler(), node.getPreloadParams());
 			} else {
 				return false;
 			}
@@ -788,8 +779,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		ExtUtil.write(dos, new ExtWrapListPoly(outputFragments));
 	}
 
-	public void collapseIndex(FormIndex index, Vector indexes,
-			Vector multiplicities, Vector elements) {
+	public void collapseIndex(FormIndex index, Vector indexes, Vector multiplicities, Vector elements) {
 		if (!index.isInForm()) {
 			return;
 		}
@@ -800,17 +790,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			element = element.getChild(i);
 
 			indexes.addElement(new Integer(i));
-			multiplicities.addElement(new Integer(
-					index.getInstanceIndex() == -1 ? 0 : index
-							.getInstanceIndex()));
+			multiplicities.addElement(new Integer(index.getInstanceIndex() == -1 ? 0 : index.getInstanceIndex()));
 			elements.addElement(element);
 
 			index = index.getNextLevel();
 		}
 	}
 
-	public FormIndex buildIndex(Vector indexes, Vector multiplicities,
-			Vector elements) {
+	public FormIndex buildIndex(Vector indexes, Vector multiplicities, Vector elements) {
 		FormIndex cur = null;
 		Vector curMultiplicities = new Vector();
 		for(int j = 0; j < multiplicities.size() ; ++j) {
@@ -828,8 +815,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 			//TODO: ... No words. Just fix it.
 			TreeReference ref = (TreeReference)((XPathReference)((IFormElement)elements.elementAt(i)).getBind()).getReference();
-			if (!(elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements
-					.elementAt(i)).getRepeat())) {
+			if (!(elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements.elementAt(i)).getRepeat())) {
 				mult = -1;
 			}
 
@@ -864,8 +850,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
-	private void incrementHelper(Vector indexes, Vector multiplicities,
-			Vector elements) {
+	private void incrementHelper(Vector indexes, Vector multiplicities,	Vector elements) {
 		int i = indexes.size() - 1;
 		boolean exitRepeat = false;
 
@@ -878,8 +863,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				// specified instance actually exists
 				GroupDef group = (GroupDef) elements.elementAt(i);
 				if (group.getRepeat()) {
-					if (instance.resolveReference(getChildInstanceRef(elements,
-							multiplicities)) == null) {
+					if (instance.resolveReference(getChildInstanceRef(elements,	multiplicities)) == null) {
 						descend = false; // repeat instance does not exist; do
 						// not descend into it
 						exitRepeat = true;
@@ -890,8 +874,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			if (descend) {
 				indexes.addElement(new Integer(0));
 				multiplicities.addElement(new Integer(0));
-				elements.addElement((i == -1 ? this : (IFormElement) elements
-						.elementAt(i)).getChild(0));
+				elements.addElement((i == -1 ? this : (IFormElement) elements.elementAt(i)).getChild(0));
 				return;
 			}
 		}
@@ -901,16 +884,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			// repeat instance that does not exist and was not created
 			// (repeat-not-existing can only happen at lowest level; exitRepeat
 			// will be true)
-			if (!exitRepeat && elements.elementAt(i) instanceof GroupDef
-					&& ((GroupDef) elements.elementAt(i)).getRepeat()) {
-				multiplicities.setElementAt(
-						new Integer(((Integer) multiplicities.elementAt(i))
-								.intValue() + 1), i);
+			if (!exitRepeat && elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements.elementAt(i)).getRepeat()) {
+				multiplicities.setElementAt(new Integer(((Integer) multiplicities.elementAt(i)).intValue() + 1), i);
 				return;
 			}
 
-			IFormElement parent = (i == 0 ? this : (IFormElement) elements
-					.elementAt(i - 1));
+			IFormElement parent = (i == 0 ? this : (IFormElement) elements.elementAt(i - 1));
 			int curIndex = ((Integer) indexes.elementAt(i)).intValue();
 
 			// increment to the next element on the current level
@@ -955,8 +934,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
-	private void decrementHelper(Vector indexes, Vector multiplicities,
-			Vector elements) {
+	private void decrementHelper(Vector indexes, Vector multiplicities,	Vector elements) {
 		int i = indexes.size() - 1;
 
 		if (i != -1) {
@@ -970,8 +948,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				// set node to previous element
 				indexes.setElementAt(new Integer(curIndex - 1), i);
 				multiplicities.setElementAt(new Integer(0), i);
-				elements.setElementAt((i == 0 ? this : (IFormElement) elements
-						.elementAt(i - 1)).getChild(curIndex - 1), i);
+				elements.setElementAt((i == 0 ? this : (IFormElement) elements.elementAt(i - 1)).getChild(curIndex - 1), i);
 
 				if (setRepeatNextMultiplicity(elements, multiplicities))
 					return;
@@ -984,8 +961,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			}
 		}
 
-		IFormElement element = (i < 0 ? this : (IFormElement) elements
-				.elementAt(i));
+		IFormElement element = (i < 0 ? this : (IFormElement) elements.elementAt(i));
 		while (!(element instanceof QuestionDef)) {
 			int subIndex = element.getChildren().size() - 1;
 			element = element.getChild(subIndex);
@@ -999,8 +975,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
-	private boolean setRepeatNextMultiplicity(Vector elements,
-			Vector multiplicities) {
+	private boolean setRepeatNextMultiplicity(Vector elements, Vector multiplicities) {
 		// find out if node is repeatable
 		TreeReference nodeRef = getChildInstanceRef(elements, multiplicities);
 		TreeElement node = instance.resolveReference(nodeRef);
@@ -1011,12 +986,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				mult = 0; // no repeats; next is 0
 			} else {
 				String name = node.getName();
-				TreeElement parentNode = instance.resolveReference(nodeRef
-						.getParentRef());
+				TreeElement parentNode = instance.resolveReference(nodeRef.getParentRef());
 				mult = parentNode.getChildMultiplicity(name);
 			}
-			multiplicities.setElementAt(new Integer(mult), multiplicities
-					.size() - 1);
+			multiplicities.setElementAt(new Integer(mult), multiplicities.size() - 1);
 			return true;
 		} else {
 			return false;
@@ -1132,14 +1105,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * to xml
 	 */
 	public void attachControlsToInstanceData () {
-		TreeElement root = instance.getRoot();
-		attachControlsToInstanceData(root, TreeReference.initRef(root));
+		attachControlsToInstanceData(instance.getRoot());
 	}
 		
-	private void attachControlsToInstanceData (TreeElement node, TreeReference ref) {
+	private void attachControlsToInstanceData (TreeElement node) {
 		for (int i = 0; i < node.getNumChildren(); i++) {
-			TreeElement child = node.getChildAt(i);
-			attachControlsToInstanceData(child, ref.extendRef(child.getName(), TreeReference.INDEX_UNBOUND));
+			attachControlsToInstanceData(node.getChildAt(i));
 		}
 		
 		IAnswerData val = node.getValue();
@@ -1152,7 +1123,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 			
 		if (selections != null) {
-			QuestionDef q = findQuestionByRef(ref, this);
+			QuestionDef q = findQuestionByRef(node.getRef(), this);
 			if (q == null) {
 				throw new RuntimeException("FormDef.attachControlsToInstanceData: can't find question to link");
 			}
@@ -1164,10 +1135,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 		
-	private static QuestionDef findQuestionByRef (TreeReference ref, IFormElement fe) {
+	public static QuestionDef findQuestionByRef (TreeReference ref, IFormElement fe) {
+		if (fe instanceof FormDef) {
+			ref = ref.genericize();
+		}
+		
 		if (fe instanceof QuestionDef) {
 			QuestionDef q = (QuestionDef)fe;
-			TreeReference bind = (TreeReference)q.getBind().getReference();
+			TreeReference bind = FormInstance.unpackReference(q.getBind());
 			return (ref.equals(bind) ? q : null);
 		} else {
 			for (int i = 0; i < fe.getChildren().size(); i++) {
@@ -1178,7 +1153,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			return null;
 		}
 	}
-
+	
 	public String getLongText() {
 		return null;
 	}
