@@ -286,7 +286,6 @@ public class FormEntryModel {
         return relevant;
     }
 
-
     /**
      * For the current index: Checks whether the index represents a node which
      * should exist given a non-interactive repeat, along with a count for that

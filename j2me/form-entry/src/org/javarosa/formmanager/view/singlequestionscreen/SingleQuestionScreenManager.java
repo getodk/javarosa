@@ -41,7 +41,6 @@ import de.enough.polish.ui.Displayable;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemCommandListener;
-import de.enough.polish.ui.List;
 
 public class SingleQuestionScreenManager extends FramedForm implements
 		IFormEntryView, CommandListener, ItemCommandListener {
@@ -105,8 +104,9 @@ public class SingleQuestionScreenManager extends FramedForm implements
 		if (arg1 == formView) {
 			formViewCommands(command);
 		} else if (arg1 == repeatScreen){
-			if (command.getLabel().equals(Constants.ACTIVITY_COMPLETE)){
+			if (command == NewRepeatScreen.yesCommand){
 				controller.newRepeat(model.getCurrentFormIndex());
+				controller.stepToNextEvent();
 				refreshView();
 			} else {
 				processModelEvent(controller.stepToNextEvent());
@@ -200,7 +200,7 @@ public class SingleQuestionScreenManager extends FramedForm implements
 			break;
 		case FormEntryController.PROMPT_NEW_REPEAT_EVENT:
 			FormEntryCaption[] hierachy = model.getCaptionHierarchy(model.getCurrentFormIndex());
-			repeatScreen = new NewRepeatScreen(hierachy[hierachy.length -1].getLongText());
+			repeatScreen = new NewRepeatScreen("Add a new " + hierachy[hierachy.length -1].getLongText());
 			repeatScreen.setCommandListener(this);
 			J2MEDisplay.setView(repeatScreen);
 			break;
@@ -231,8 +231,8 @@ public class SingleQuestionScreenManager extends FramedForm implements
 				// model.setFormComplete();
 				// controller.exit();
 			}
-		} else if (command == FormViewScreen.selectCommand) {
-			FormIndex index = formView.getSelectedIndex();
+		} else if (command.getCommandType() == Command.ITEM) {
+			FormIndex index = formView.getFormIndex();
 			System.out.println("---- going to - " + index);
 			int event = controller.jumpToIndex(index);
 			this.goingForward = true;
