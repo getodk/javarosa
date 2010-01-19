@@ -119,6 +119,7 @@ view.sending.SubmissionFailed=Submission failed! Please try to submit the form a
 view.sending.SubmissionTakingLong=Sending is taking a long time; you may check on the status and/or resend later in \'View Saved\'
 view.sending.SubmissionErrorUnknown=Unknown sending error; form not sent!
 view.sending.CompulsoryQuestionsIncomplete=There are unanswered compulsory questions and must be completed first to proceed
+view.sending.CompulsoryQuestionIncomplete=This question is compulsory. Please answer it to continue.
 view.sending.FormUneditable=You cannot edit your answers when reviewing the form
 view.sending.RequiredQuestion=Required question; You must answer
 view.sending.of=of
