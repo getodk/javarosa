@@ -47,15 +47,23 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 			cg = new ChoiceGroup(prompt.getLongText(),
 					ChoiceGroup.MULTIPLE);
 		}
-		Enumeration itr = (prompt.getSelectChoices().elements());
+		
+		SelectMultiData answerValue = (SelectMultiData) prompt.getAnswerValue();
+		Vector<String> selectionStrings = getSelectionStrings(answerValue);
+		Vector<SelectChoice> choices = prompt.getSelectChoices();
+		Enumeration itr = choices.elements();
 		
 		int i = 0;
+		boolean[] selectedFlags = new boolean[choices.size()];
 		while (itr.hasMoreElements()) {
 			SelectChoice choice = (SelectChoice)itr.nextElement();
+			selectedFlags[i] = selectionStrings.contains(choice.getCaption());
 			String label = choice.getCaption();
-			cg.append(label, null);// add options to choice group
+			cg.append(label, null);
 			i++;
 		}
+
+		cg.setSelectedFlags(selectedFlags);
 		this.append(cg);
 		this.addNavigationWidgets();
 		if (prompt.getHelpText() != null) {
@@ -63,14 +71,21 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 		}
 	}
 
+	private Vector<String> getSelectionStrings(SelectMultiData answerValue) {
+		Vector<Selection> selections = (Vector<Selection>) answerValue.getValue();
+		Vector<String> strings = new Vector<String>();
+		for (Selection selection : selections) {
+			strings.addElement(selection.choice.getCaption());
+		}
+		return strings;
+	}
+
 	public IAnswerData getWidgetValue() {
-		Vector vs = new Vector();
+		Vector<Selection> vs = new Vector<Selection>();
 
 		for (int i = 0; i < cg.size(); i++) {
 			if (cg.isSelected(i)) {
-
 				Selection s = prompt.getSelectChoices().elementAt(i).selection();
-				
 				vs.addElement(s);
 			}
 		}

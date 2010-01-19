@@ -6,6 +6,9 @@ import java.util.Vector;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IPreloadHandler;
+import org.javarosa.core.services.storage.IStorageUtility;
+import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.demo.util.JRDemoFormEntryViewFactory;
 import org.javarosa.demo.util.JRDemoUtil;
 import org.javarosa.form.api.FormEntryModel;
@@ -52,6 +55,7 @@ public class JRDemoFormEntryState extends FormEntryState {
 	}
 
 	public void formEntrySaved(FormDef form, FormInstance instanceData, boolean formWasCompleted) {
+		System.out.println("form is complete: " + formWasCompleted);
 		if (formWasCompleted) {
 			
 			CompletedFormOptionsState completed = new CompletedFormOptionsState(instanceData) {
@@ -81,6 +85,13 @@ public class JRDemoFormEntryState extends FormEntryState {
 				}
 
 				public void skipSend(FormInstance data) {
+					IStorageUtility storage = StorageManager.getStorage(FormInstance.STORAGE_KEY);
+					try {
+						System.out.println("writing data: " + data.getName());
+						storage.write(data);
+					} catch (StorageFullException e) {
+						new RuntimeException("Storage full, unable to save data.");
+					}
 					abort();
 				}
 			};
