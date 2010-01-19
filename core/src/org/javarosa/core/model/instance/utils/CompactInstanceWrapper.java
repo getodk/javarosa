@@ -123,7 +123,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		//formID, name, schema, versions, and namespaces are all invariants of the template instance
 		
 		TreeElement root = instance.getRoot();
-		readTreeElement(root, TreeReference.initRef(root), in, pf);
+		readTreeElement(root, in, pf);
 	}
 	
 	/**
@@ -138,8 +138,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		ExtUtil.writeNumeric(out, instance.getID());
 		ExtUtil.write(out, new ExtWrapNullable(instance.getDateSaved()));
 				
-		TreeElement root = instance.getRoot();
-		writeTreeElement(out, root, TreeReference.initRef(root));
+		writeTreeElement(out, instance.getRoot());
 	}
 	
 	private FormInstance getTemplateInstance (int formID) {
@@ -174,8 +173,8 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	 * @throws IOException
 	 * @throws DeserializationException
 	 */
-	private void readTreeElement (TreeElement e, TreeReference ref, DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		TreeElement templ = instance.getTemplatePath(ref);
+	private void readTreeElement (TreeElement e, DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		TreeElement templ = instance.getTemplatePath(e.getRef());
 		boolean isGroup = !templ.isLeaf();
 				
 		if (isGroup) {
@@ -190,7 +189,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 			for (int i = 0; i < childTypes.size(); i++) {
 				String childName = (String)childTypes.elementAt(i);
 					
-				TreeReference childTemplRef = ref.extendRef(childName, 0);
+				TreeReference childTemplRef = e.getRef().extendRef(childName, 0);
 				TreeElement childTempl = instance.getTemplatePath(childTemplRef);
 				
 				boolean repeatable = childTempl.repeatable;
@@ -208,18 +207,18 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 					}
 					
 					for (int j = 0; j < n; j++) {
-						TreeReference dstRef = ref.extendRef(childName, j);
+						TreeReference dstRef = e.getRef().extendRef(childName, j);
 						instance.copyNode(childTempl, dstRef);
 						
 						TreeElement child = e.getChild(childName, j);
 						child.setRelevant(true);
-						readTreeElement(child, dstRef, in, pf);
+						readTreeElement(child, in, pf);
 					}
 				} else {
 					TreeElement child = e.getChild(childName, 0);
 					child.setRelevant(relevant);
 					if (relevant) {
-						readTreeElement(child, ref.extendRef(childName, 0), in, pf);
+						readTreeElement(child, in, pf);
 					}
 				}
 			}
@@ -235,8 +234,8 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	 * @param ref
 	 * @throws IOException
 	 */
-	private void writeTreeElement (DataOutputStream out, TreeElement e, TreeReference ref) throws IOException {
-		TreeElement templ = instance.getTemplatePath(ref);
+	private void writeTreeElement (DataOutputStream out, TreeElement e) throws IOException {
+		TreeElement templ = instance.getTemplatePath(e.getRef());
 		boolean isGroup = !templ.isLeaf();
 				
 		if (isGroup) {
@@ -253,7 +252,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 					
 					ExtUtil.writeNumeric(out, mult);
 					for (int j = 0; j < mult; j++) {
-						writeTreeElement(out, e.getChild(childName, j), ref.extendRef(childName, j));
+						writeTreeElement(out, e.getChild(childName, j));
 					}
 				}
 			}

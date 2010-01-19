@@ -1238,8 +1238,7 @@ public class XFormParser {
 	private static void checkRepeatsForTemplate (TreeElement repeatTreeNode, TreeReference ref, FormInstance instance, Vector missing) {
 		String name = repeatTreeNode.getName();
 		int mult = (repeatTreeNode.repeatable ? TreeReference.INDEX_TEMPLATE : 0);
-		ref = ref.clone();
-		ref.add(name, mult);
+		ref = ref.extendRef(name, mult);
 		
 		if (repeatTreeNode.repeatable) {
 			TreeElement template = instance.resolveReference(ref);
@@ -1498,7 +1497,7 @@ public class XFormParser {
 			}
 			for (int j = 0; j < nodes.size(); j++) {
 				TreeReference nref = (TreeReference)nodes.elementAt(j);
-				attachBind(instance.resolveReference(nref), ref, bind);	
+				attachBind(instance.resolveReference(nref), bind);	
 			}				
 		}
 		
@@ -1522,7 +1521,7 @@ public class XFormParser {
 		}
 	}
 	
-	private static void attachBind(TreeElement node, TreeReference genericRef, DataBinding bind) {
+	private static void attachBind(TreeElement node, DataBinding bind) {
 		node.dataType = bind.getDataType();
 			
 		if (bind.relevancyCondition == null) {
@@ -1568,16 +1567,10 @@ public class XFormParser {
 	}
 	
 	//TODO: hook here for turning sub-trees into complex IAnswerData objects (like for immunizations)
-	private static void loadInstanceData (Element node, TreeElement cur, FormDef f) {
-		TreeReference topRef = TreeReference.rootRef();
-		topRef.add(cur.getName(), TreeReference.INDEX_UNBOUND);
-		loadInstanceData(node, cur, topRef, f);
-	}
-	
 	//FIXME: the 'ref' and FormDef parameters (along with the helper function above that initializes them) are only needed so that we
 	//can fetch QuestionDefs bound to the given node, as the QuestionDef reference is needed to properly represent answers
 	//to select questions. obviously, we want to fix this.
-	private static void loadInstanceData (Element node, TreeElement cur, TreeReference ref, FormDef f) {		
+	private static void loadInstanceData (Element node, TreeElement cur, FormDef f) {		
 		int numChildren = node.getChildCount();		
 		boolean hasElements = false;
 		for (int i = 0; i < numChildren; i++) {
@@ -1604,9 +1597,7 @@ public class XFormParser {
 						multiplicities.put(name, new Integer(index));
 					}
 					
-					TreeReference childRef = ref.clone();
-					childRef.add(name, TreeReference.INDEX_UNBOUND);
-					loadInstanceData(child, cur.getChild(name, index), childRef, f);
+					loadInstanceData(child, cur.getChild(name, index), f);
 				}
 			}	
 		} else {
@@ -1614,7 +1605,7 @@ public class XFormParser {
 			if (text != null && text.trim().length() > 0) { //ignore text that is only whitespace
 				//TODO: custom data types? modelPrototypes?
 				
-				cur.setValue(XFormAnswerDataParser.getAnswerData(text, cur.dataType, ghettoGetQuestionDef(cur.dataType, f, ref)));
+				cur.setValue(XFormAnswerDataParser.getAnswerData(text, cur.dataType, ghettoGetQuestionDef(cur.dataType, f, cur.getRef())));
 			}
 		}		
 	}
@@ -1622,24 +1613,8 @@ public class XFormParser {
 	//find a questiondef that binds to ref, if the data type is a 'select' question type
 	public static QuestionDef ghettoGetQuestionDef (int dataType, FormDef f, TreeReference ref) {
 		if (dataType == Constants.DATATYPE_CHOICE || dataType == Constants.DATATYPE_CHOICE_LIST) {
-			return findBindingQuestion(f, ref);
+			return FormDef.findQuestionByRef(ref, f);
 		} else {
-			return null;
-		}
-	}
-	
-	private static QuestionDef findBindingQuestion (IFormElement fe, TreeReference ref) {
-		if (fe instanceof QuestionDef) {
-			if (ref.equals(FormInstance.unpackReference(((QuestionDef)fe).getBind())))
-				return (QuestionDef)fe;
-			else
-				return null;
-		} else {
-			for (int i = 0; i < fe.getChildren().size(); i++) {
-				QuestionDef result = findBindingQuestion((IFormElement)fe.getChildren().elementAt(i), ref);
-				if (result != null)
-					return result;	
-			}
 			return null;
 		}
 	}

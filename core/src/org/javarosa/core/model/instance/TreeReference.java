@@ -258,18 +258,7 @@ public class TreeReference implements Externalizable {
 		
 		return true;
 	}
-	
-	/**
-	 * create the tree reference for the data model root node
-	 * @param root
-	 * @return
-	 */
-	public static TreeReference initRef (TreeElement root) {
-		TreeReference rootRef = rootRef();
-		rootRef.add(root.getName(), 0);
-		return rootRef;
-	}
-	
+		
 	/**
 	 * clone and extend a reference by one level
 	 * @param ref

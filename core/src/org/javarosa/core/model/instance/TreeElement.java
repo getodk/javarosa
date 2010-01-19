@@ -438,9 +438,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 */
 	public String getAttributeValue(String namespace, String name) {
 		for (int i = 0; i < getAttributeCount(); i++) {
-			if (name.equals(getAttributeName(i))
-					&& (namespace == null || namespace
-							.equals(getAttributeNamespace(i)))) {
+			if (name.equals(getAttributeName(i)) && (namespace == null || namespace.equals(getAttributeNamespace(i)))) {
 				return getAttributeValue(i);
 			}
 		}
@@ -692,7 +690,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	//rebuilding a node from an imported instance
 	//  there's a lot of error checking we could do on the received instance, but it's
 	//  easier to just ignore the parts that are incorrect
-	public void populate(TreeElement incoming, TreeReference ref, FormDef f) {
+	public void populate(TreeElement incoming, FormDef f) {
 		if (this.isLeaf()) {
 			// check that incoming doesn't have children?
 
@@ -704,7 +702,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 				this.setValue(value); // value is a StringData
 			} else {
 				String textVal = (String) value.getValue();
-				IAnswerData typedVal = RestoreUtils.xfFact.parseData(textVal, this.dataType, ref, f);
+				IAnswerData typedVal = RestoreUtils.xfFact.parseData(textVal, this.dataType, this.getRef(), f);
 				this.setValue(typedVal);
 			}
 		} else {
@@ -758,14 +756,12 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 				TreeElement child = this.getChildAt(i);
 				Vector newChildren = incoming.getChildrenWithName(child.getName());
 
-				TreeReference childRef = ref.extendRef(child.getName(), TreeReference.INDEX_UNBOUND);
-
 				if (child.repeatable) {
 				    for (int k = 0; k < newChildren.size(); k++) {
 				        TreeElement newChild = child.deepCopy(true);
 				        newChild.setMult(k);
 				        this.children.insertElementAt(newChild, i + k + 1);
-				        newChild.populate((TreeElement)newChildren.elementAt(k), childRef, f);
+				        newChild.populate((TreeElement)newChildren.elementAt(k), f);
 				    }
 				    i += newChildren.size();
 				} else {
@@ -773,7 +769,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 					if (newChildren.size() == 0) {
 						child.setRelevant(false);
 					} else {
-						child.populate((TreeElement)newChildren.elementAt(0), childRef, f);
+						child.populate((TreeElement)newChildren.elementAt(0), f);
 					}
 				}
 			}
@@ -800,6 +796,18 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		}
 		
 		return ref;
+	}
+	
+	public int getDepth () {
+		TreeElement elem = this;
+		int depth = 0;
+		
+		while (elem.name != null) {
+			depth++;
+			elem = elem.parent;
+		}
+		
+		return depth;
 	}
 	
 	public String getPreloadHandler() {
