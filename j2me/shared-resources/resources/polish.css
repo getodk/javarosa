@@ -76,8 +76,8 @@ colors {
 	always-include: true;
 }
 
-.OneQPS_Form_Top extends OneQPS_Form {
-	screen-change-animation: top;
+.OneQPS_Form_Flash extends OneQPS_Form {
+	screen-change-animation: flash;
 	always-include: true;
 }
 
@@ -85,15 +85,6 @@ colors {
 	background-color: requiredColor;
 	layout: left | expand;
 	focused-style: focusHighlight
-}
-
-.formGroup {
-	layout: expand | left;
-	expand-items: true;
-}
-
-.childNode {
-	padding-left: 5;
 }
 
 focusHighlight extends focused {
