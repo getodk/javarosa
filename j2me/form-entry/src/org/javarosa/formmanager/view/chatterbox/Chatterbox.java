@@ -142,6 +142,10 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	J2MEDisplay.setView(this);
     }
     
+    public void show (FormIndex index) {
+    	J2MEDisplay.setView(this);
+    }
+    
     private void initGUI () {
     	setUpCommands();
     	initProgressBar();
@@ -445,7 +449,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
 				Thread.sleep(1000); //let them bask in their completeness
 			} catch (InterruptedException ie) { }
 				
-			controller.saveAndExit();
+			controller.saveAndExit(true);
     	} else { 
     		
     	}
@@ -544,7 +548,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		controller.answerQuestion(this.model.getCurrentFormIndex(), frame.getData());
     	}
     	//TODO: DEAL;
-    	controller.saveAndExit();
+    	controller.saveAndExit(true);
     }
     
     public void questionAnswered () {

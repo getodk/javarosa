@@ -21,18 +21,16 @@ import javax.microedition.lcdui.Graphics;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
-import de.enough.polish.ui.ItemCommandListener;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.Ticker;
 
-public abstract class SingleQuestionScreen extends FramedForm implements IFormEntryView {
+public abstract class SingleQuestionScreen extends FramedForm {
 
 	protected FormEntryPrompt prompt;
 	protected IAnswerData answer;
@@ -52,9 +50,6 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
 	//#style button
 	public StringItem nextItem = new StringItem(null, Localization
 			.get("button.Next"), Item.BUTTON);
-
-	public ItemCommandListener itemListener;
-
 
 	public SingleQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
 		super(prompt.getShortText(), style);
@@ -108,14 +103,6 @@ public abstract class SingleQuestionScreen extends FramedForm implements IFormEn
     		languageCommands[i] = new Command(availableLocales[i], Command.SCREEN, 3);
     		this.addSubCommand(languageCommands[i], languageSubMenu);
     	}
-	}
-	
-
-	public void setItemCommandListner(ItemCommandListener itemListner) {
-		this.itemListener = itemListner;
-	}
-
-	public void destroy() {
 	}
 
 	public void show() {

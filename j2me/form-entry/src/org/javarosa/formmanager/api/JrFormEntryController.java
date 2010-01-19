@@ -3,6 +3,7 @@
  */
 package org.javarosa.formmanager.api;
 
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
@@ -32,15 +33,23 @@ public class JrFormEntryController extends FormEntryController {
 		view.show();
 	}
 	
+	/**
+	 * Start from a specific index
+	 * @param index
+	 */
+	public void start(FormIndex index){
+		view.show(index);
+	}
+	
 	public void abort() {
 		transitions.abort();
 	}
 	
-	public void saveAndExit() {
-		//TODO: This implies done-ness. We should set up a way to save without done-ness eventually to
-		//prevent post-processing.
-		this.getModel().getForm().postProcessInstance();
-		transitions.formEntrySaved(this.getModel().getForm(),this.getModel().getForm().getInstance(),true);
+	public void saveAndExit(boolean formComplete) {
+		if (formComplete){
+			this.getModel().getForm().postProcessInstance();
+		}
+		transitions.formEntrySaved(this.getModel().getForm(),this.getModel().getForm().getInstance(),formComplete);
 	}
 	
 	public void suspendActivity(int mediaType) {

@@ -6,18 +6,19 @@ import org.javarosa.user.model.User;
 
 public class JRDemoLoginState extends LoginState {
 
-	public void start () {
+	public void start() {
 		JRDemoContext._().setUser(null);
 		super.start();
 	}
-	
+
 	public void exit() {
 		JRDemoUtil.exit();
 	}
 
 	public void loggedIn(User u) {
 		JRDemoContext._().setUser(u);
-		new JRDemoFormListState().start();
+		new JRDemoPatientSelectState().start();
+//		new JRDemoFormListState().start();
 	}
 
 }
