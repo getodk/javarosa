@@ -5,6 +5,7 @@ import java.util.Vector;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.view.IQuestionWidget;
 
 public class FakedFormEntryPrompt extends FormEntryPrompt {
 	
@@ -74,4 +75,14 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 		return true;
 	}
 
+	//==== observer pattern ====//
+	
+	public void register (IQuestionWidget widget) {
+		//do nothing -- this fake prompt is not bound to anything real in the instance
+	}
+	
+	public void unregister () {
+		//do nothing -- this fake prompt is not bound to anything real in the instance		
+	}
+	
 }

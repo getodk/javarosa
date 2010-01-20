@@ -55,4 +55,9 @@ public class JrFormEntryController extends FormEntryController {
 	public void suspendActivity(int mediaType) {
 		transitions.suspendForMediaCapture(mediaType);
 	}
+	
+	public void cycleLanguage () {
+		setLanguage(getModel().getForm().getLocalizer().getNextLocale());
+	}
+
 }
