@@ -5,6 +5,7 @@ syntax: glob
 *.jar
 *.jad
 *.zip
+*.rar
 *.pyc
 
 #build process
