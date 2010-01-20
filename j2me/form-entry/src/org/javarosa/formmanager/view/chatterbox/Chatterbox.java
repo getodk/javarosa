@@ -581,20 +581,19 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	}
     }
     
-    public void questionIndexChanged (FormIndex questionIndex) {
-   		jumpToQuestion(questionIndex);
-    }    
+//    public void questionIndexChanged (FormIndex questionIndex) {
+//   		jumpToQuestion(questionIndex);
+//    }    
     
-	public void saveStateChanged (int instanceID, boolean dirty) {
-		//do nothing
-	}
+//	public void saveStateChanged (int instanceID, boolean dirty) {
+//		//do nothing
+//	}
 	
     public void keyPressed(int keyCode) {
     	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
     	super.keyPressed(keyCode);
     	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
-    		//TODO: CYCLE LANGUAGES
-    		//this.cyclelanguagesomehow
+    		controller.cycleLanguage();
     	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
     		if (keyDownSelectedWidget == this.activeQuestionIndex) {
 				ChatterboxWidget widget = activeFrame();
@@ -619,10 +618,6 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		//#endif
     	}
     }
-
-	public Object getScreenObject() {
-		return this;
-	}
 	
     public ChatterboxWidget getWidgetAtIndex(int index) {
     	return (ChatterboxWidget)get(index);

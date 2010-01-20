@@ -19,7 +19,6 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.IQuestionWidget;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 

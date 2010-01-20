@@ -18,10 +18,8 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
-import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
