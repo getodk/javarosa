@@ -20,10 +20,12 @@ import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.formmanager.view.IQuestionWidget;
 
 /**
  * This class gives you all the information you need to display a question when
@@ -34,8 +36,6 @@ import org.javarosa.core.model.instance.TreeElement;
 public class FormEntryPrompt extends FormEntryCaption {
 
     TreeElement mTreeElement;
-	private QuestionDef questionDef;
-
 
     /**
      * This empty constructor exists for convenience of any supertypes of this prompt
@@ -46,15 +46,14 @@ public class FormEntryPrompt extends FormEntryCaption {
     
     public FormEntryPrompt(FormDef form, FormIndex index) {
         super(form, index);
-        if (!(getFormElement() instanceof QuestionDef))
+        if (!(element instanceof QuestionDef))
         	throw new IllegalArgumentException("FormEntryPrompt can only be created for QuestionDef elements");
-        questionDef = (QuestionDef) getFormElement();
         this.mTreeElement = form.getInstance().resolveReference(index.getReference());
     }
 
 
     public int getControlType() {
-        return questionDef.getControlType();
+        return getQuestion().getControlType();
     }
 
 
@@ -86,12 +85,12 @@ public class FormEntryPrompt extends FormEntryCaption {
 
 
     public Vector<SelectChoice> getSelectChoices() {
-        return questionDef.getChoices();
+        return getQuestion().getChoices();
     }
 
 
     public String getHelpText() {
-        return questionDef.getHelpText();
+        return getQuestion().getHelpText();
     }
 
 
@@ -103,4 +102,28 @@ public class FormEntryPrompt extends FormEntryCaption {
     public boolean isReadOnly() {
         return !mTreeElement.isEnabled();
     }
+    
+    public QuestionDef getQuestion() {
+    	return (QuestionDef)element;
+    }
+    
+    
+    //==== observer pattern ====//
+    
+	public void register (IQuestionWidget viewWidget) {
+		super.register(viewWidget);
+		mTreeElement.registerStateObserver(this);
+	}
+
+	public void unregister () {
+		mTreeElement.unregisterStateObserver(this);
+		super.unregister();
+	}
+		
+	public void formElementStateChanged(TreeElement instanceNode, int changeFlags) {
+		if (this.mTreeElement != instanceNode)
+			throw new IllegalStateException("Widget received event from foreign question");
+		if (viewWidget != null)
+			viewWidget.refreshWidget(changeFlags);		
+	}
 }
