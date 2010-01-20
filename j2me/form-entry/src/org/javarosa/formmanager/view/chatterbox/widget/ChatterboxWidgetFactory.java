@@ -131,7 +131,9 @@ public class ChatterboxWidgetFactory {
 		if (collapsedStyle == null || expandedStyle == null)
 			throw new IllegalStateException("No appropriate widget to render question");
 		
-		return new ChatterboxWidget(cbox, prompt, initViewState, collapsedStyle, expandedStyle);
+		ChatterboxWidget widget = new ChatterboxWidget(cbox, prompt, initViewState, collapsedStyle, expandedStyle);
+		prompt.register(widget);
+		return widget;
 	}
 	
     public ChatterboxWidget getNewRepeatWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
