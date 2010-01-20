@@ -17,9 +17,13 @@
 package org.javarosa.form.api;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.formmanager.view.IQuestionWidget;
 
 /**
  * This class gives you all the information you need to display a caption when
@@ -28,12 +32,14 @@ import org.javarosa.core.model.IFormElement;
  * 
  * 
  */
-public class FormEntryCaption {
+public class FormEntryCaption implements FormElementStateListener {
 
     FormDef form;
 	FormIndex index;
-	private IFormElement element;
+	protected IFormElement element;
 
+	protected IQuestionWidget viewWidget;
+	
     public FormEntryCaption() {
     }
 
@@ -42,6 +48,7 @@ public class FormEntryCaption {
         this.form = form;
         this.index = index;
         this.element = form.getChild(index);
+        this.viewWidget = null;
     }
 
     public String getLongText() {
@@ -83,4 +90,29 @@ public class FormEntryCaption {
 	public FormIndex getIndex() {
 		return index;
 	}
+	
+	
+    //==== observer pattern ====//
+	
+	public void register (IQuestionWidget viewWidget) {
+		this.viewWidget = viewWidget;
+		element.registerStateObserver(this);
+	}
+
+	public void unregister () {
+		this.viewWidget = null;
+		element.unregisterStateObserver(this);
+	}
+	
+	public void formElementStateChanged(IFormElement element, int changeFlags) {
+		if (this.element != element)
+			throw new IllegalStateException("Widget received event from foreign question");
+		if (viewWidget != null)
+			viewWidget.refreshWidget(changeFlags);
+	}
+	
+	public void formElementStateChanged(TreeElement instanceNode, int changeFlags) {
+		throw new RuntimeException("cannot happen");
+	}
+	
 }

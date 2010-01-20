@@ -146,14 +146,10 @@ public class ChatterboxWidgetFactory {
     	
     	String label = model.getCaptionPrompt(index).getLongText();
     	
-    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?", Constants.CONTROL_SELECT_ONE,Constants.DATATYPE_TEXT);
-
-    	SelectChoice yes = new SelectChoice("Yes", "y", false);
-    	yes.setIndex(0);
-    	prompt.addSelectChoice(yes);
-    	SelectChoice no = new SelectChoice("No", "n", false);
-    	no.setIndex(1);
-    	prompt.addSelectChoice(no);
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?",
+    										Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
+    	prompt.addSelectChoice(new SelectChoice("Yes", "y", false));
+    	prompt.addSelectChoice(new SelectChoice("No", "n", false));
 		
 		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }
@@ -161,26 +157,10 @@ public class ChatterboxWidgetFactory {
     public ChatterboxWidget getNewLabelWidget(FormIndex index, String text){
     	//Label Widget;
     	int multiplicity = index.getInstanceIndex();
-    	FormEntryPrompt fakePrompt = new FakedFormEntryPrompt(text, Constants.DATATYPE_TEXT, Constants.CONTROL_LABEL);
+    	FormEntryPrompt fakePrompt = new FakedFormEntryPrompt(text, Constants.CONTROL_LABEL, Constants.DATATYPE_TEXT);
     	return new ChatterboxWidget(cbox, fakePrompt,ChatterboxWidget.VIEW_LABEL, new LabelWidget(multiplicity), null);
     }
-    
-    public ChatterboxWidget getNewLabelWidget(FormIndex index, FormEntryModel model, Chatterbox cbox){
-    	
-    	String labelText = model.getQuestionPrompt(index).getLongText();
-    	if(labelText != null && labelText != "") {
-    		FormEntryPrompt fakePrompt = new FakedFormEntryPrompt(labelText, Constants.DATATYPE_TEXT, Constants.CONTROL_LABEL);
-    		int mult = -1;
-    		if(model.getEvent(index) == FormEntryController.REPEAT_EVENT) {
-    			mult = index.getInstanceIndex() + 1;
-    		}
-    		ChatterboxWidget newLabel = new ChatterboxWidget(cbox, fakePrompt,ChatterboxWidget.VIEW_LABEL, new LabelWidget(mult), null);
-    		return newLabel;
-    	} else {
-    		return null;
-    	}
-    }
-    
+        
     public void setReadOnly(boolean readOnly) {
     	this.readOnly = readOnly;
     }

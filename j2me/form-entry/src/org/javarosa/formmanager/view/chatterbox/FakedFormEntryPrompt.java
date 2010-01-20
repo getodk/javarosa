@@ -26,7 +26,6 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 	}
 
 	public IAnswerData getAnswerValue() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -59,6 +58,7 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 	}
 	
 	public void addSelectChoice(SelectChoice choice) {
+		choice.setIndex(choices.size());
 		choices.addElement(choice);
 	}
 
