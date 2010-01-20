@@ -81,6 +81,8 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 	public void destroy () {
 		if (viewState == VIEW_EXPANDED)
 			detachWidget();
+		
+		prompt.unregister();
 	}
 		
 	public int getViewState () {
@@ -296,5 +298,9 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 	 */
 	public int getPinnableHeight() {
 		return this.activeStyle.getPinnableHeight();
+	}
+	
+	public FormEntryPrompt getPrompt () {
+		return prompt;
 	}
 }
