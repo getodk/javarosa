@@ -24,12 +24,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
+import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.utils.IInstanceSerializingVisitor;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
-import org.javarosa.core.services.transport.IDataPayload;
-import org.javarosa.core.services.transport.IDataPayloadVisitor;
+import org.javarosa.core.services.transport.payload.IDataPayload;
+import org.javarosa.core.services.transport.payload.IDataPayloadVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
@@ -48,7 +48,7 @@ public class ModelReferencePayload implements IDataPayload {
 	int recordId;
 	IDataPayload payload;
 	
-	IDataModelSerializingVisitor serializer;
+	IInstanceSerializingVisitor serializer;
 	
 	//NOTE: Should only be used for serializaiton.
 	public ModelReferencePayload() {
@@ -62,7 +62,7 @@ public class ModelReferencePayload implements IDataPayload {
 	/**
 	 * @param serializer the serializer to set
 	 */
-	public void setSerializer(IDataModelSerializingVisitor serializer) {
+	public void setSerializer(IInstanceSerializingVisitor serializer) {
 		this.serializer = serializer;
 	}
 
@@ -123,9 +123,9 @@ public class ModelReferencePayload implements IDataPayload {
 	
 	private void memoize() {
 		if(payload == null) {
-			IStorageUtility instances = StorageManager.getStorage(DataModelTree.STORAGE_KEY);
+			IStorageUtility instances = StorageManager.getStorage(FormInstance.STORAGE_KEY);
 			try {
-				DataModelTree tree = (DataModelTree)instances.read(recordId);
+				FormInstance tree = (FormInstance)instances.read(recordId);
 				payload = serializer.createSerializedPayload(tree);
 			} catch (IOException e) {
 				//Assertion, do not catch!

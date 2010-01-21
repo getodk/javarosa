@@ -19,10 +19,10 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import java.util.Date;
 
 import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.DateField;
 import de.enough.polish.ui.Item;
@@ -43,7 +43,7 @@ public class DateEntryWidget extends ExpandedWidget {
 		return ChatterboxWidget.NEXT_ON_ENTRY;
 	}
 	
-	protected Item getEntryWidget (QuestionDef question) {
+	protected Item getEntryWidget (FormEntryPrompt prompt) {
 		//#style textBox
 		return new DateField(null, DateField.DATE);
 	}
@@ -52,7 +52,7 @@ public class DateEntryWidget extends ExpandedWidget {
 		return (DateField)entryWidget;    
 	}
 
-	protected void updateWidget (QuestionDef question) { /* do nothing */ }
+	protected void updateWidget (FormEntryPrompt prompt) { /* do nothing */ }
 	
 	protected void setWidgetValue (Object o) {
 		dateField().setDate((Date)o);

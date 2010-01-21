@@ -32,11 +32,12 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.Recalculate;
 import org.javarosa.core.model.condition.Triggerable;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
@@ -87,7 +88,7 @@ public class XFormParser {
 	private static Element instanceNode; //top-level data node of the instance; saved off so it can be processed after the <bind>s
 	private static String defaultNamespace;
 	
-	private static DataModelTree repeatTree; //pseudo-data model tree that describes the repeat structure of the instance;
+	private static FormInstance repeatTree; //pseudo-data model tree that describes the repeat structure of the instance;
 										     //useful during instance processing and validation
 	
 	static {
@@ -465,10 +466,9 @@ public class XFormParser {
 			}
 		}
 		if (isSelect) {
-			if (question.getSelectItemIDs().size() == 0) {
+			if (question.getNumChoices() == 0) {
 				throw new XFormParseException("Select question has no choices");
 			}
-			question.localizeSelectMap(null);		
 		}
 			
 		parent.addChild(question);
@@ -656,9 +656,9 @@ public class XFormParser {
 		}
 
 		if (textRef != null) {
-			q.addSelectItemID(textRef, true, value);
+			q.addSelectChoice(new SelectChoice(textRef, value));
 		} else {
-			q.addSelectItemID(label, false, value);
+			q.addSelectChoice(new SelectChoice(label, value, false));
 		}
 	}
 
@@ -1010,7 +1010,7 @@ public class XFormParser {
 			return null;
 		}
 				
-		Condition c = new Condition(cond, trueAction, falseAction, DataModelTree.unpackReference(contextRef));
+		Condition c = new Condition(cond, trueAction, falseAction, FormInstance.unpackReference(contextRef));
 		return c;
 	}
 	
@@ -1026,7 +1026,7 @@ public class XFormParser {
 			return null;
 		}
 				
-		Recalculate r = new Recalculate(calc, DataModelTree.unpackReference(contextRef));
+		Recalculate r = new Recalculate(calc, FormInstance.unpackReference(contextRef));
 		return r;
 	}
 	
@@ -1043,7 +1043,7 @@ public class XFormParser {
 	//e is the top-level _data_ node of the instance (immediate (and only) child of <instance>)
 	private static void parseInstance (FormDef f, Element e) {
 		TreeElement root = buildInstanceStructure(e, null);
-		DataModelTree instanceModel = new DataModelTree(root);
+		FormInstance instanceModel = new FormInstance(root);
 		instanceModel.setName(f.getTitle());
 		
 		String schema = e.getNamespace();
@@ -1063,10 +1063,10 @@ public class XFormParser {
 		checkDependencyCycles(f);
 		f.finalizeTriggerables();
 		
-		f.setDataModel(instanceModel);
+		f.setInstance(instanceModel);
 	}
 	
-	private static Hashtable loadNamespaces(Element e, DataModelTree tree) {
+	private static Hashtable loadNamespaces(Element e, FormInstance tree) {
 		Hashtable prefixes = new Hashtable();
 		for(int i = 0 ; i < e.getNamespaceCount(); ++i ) {
 			String uri = e.getNamespaceUri(i);
@@ -1163,7 +1163,7 @@ public class XFormParser {
 	// 4) generate template nodes for repeat bindings that do not have one defined explicitly
 	// 5) give a stern warning for any repeated instance nodes that do not correspond to a repeat binding
 	// 6) verify that all sets of repeated nodes are homogeneous
-	private static void processRepeats (DataModelTree instance) {
+	private static void processRepeats (FormInstance instance) {
 		flagRepeatables(instance);
 		processTemplates(instance);
 		checkDuplicateNodesAreRepeatable(instance.getRoot());	
@@ -1171,7 +1171,7 @@ public class XFormParser {
 	}
 
 	//flag all nodes identified by repeat bindings as repeatable
-	private static void flagRepeatables (DataModelTree instance) {
+	private static void flagRepeatables (FormInstance instance) {
 		for (int i = 0; i < repeats.size(); i++) {
 			TreeReference ref = (TreeReference)repeats.elementAt(i);
 			Vector nodes = instance.expandReference(ref, true);
@@ -1184,7 +1184,7 @@ public class XFormParser {
 		}		
 	}
 	
-	private static void processTemplates (DataModelTree instance) {
+	private static void processTemplates (FormInstance instance) {
 		repeatTree = buildRepeatTree(repeats, instance.getRoot().getName());
 		
 		Vector missingTemplates = new Vector(); //Vector<TreeReference>
@@ -1195,10 +1195,10 @@ public class XFormParser {
 	}
 	
 	//build a pseudo-data model tree that describes the repeat structure of the instance
-	//result is a DataModelTree collapsed where all indexes are 0, and repeatable nodes are flagged as such
+	//result is a FormInstance collapsed where all indexes are 0, and repeatable nodes are flagged as such
 	//return null if no repeats
 	//ignores (invalid) repeats that bind outside the top-level instance data node
-	private static DataModelTree buildRepeatTree (Vector repeatRefs, String topLevelName) {
+	private static FormInstance buildRepeatTree (Vector repeatRefs, String topLevelName) {
 		TreeElement root = new TreeElement(null, 0);
 		
 		for (int i = 0; i < repeatRefs.size(); i++) {
@@ -1210,7 +1210,7 @@ public class XFormParser {
 			
 			TreeElement cur = root;
 			for (int j = 0; j < repeatRef.size(); j++) {
-				String name = (String)repeatRef.names.elementAt(j);
+				String name = repeatRef.getName(j);
 				TreeElement child = cur.getChild(name, 0);
 				if (child == null) {
 					child = new TreeElement(name, 0);
@@ -1225,21 +1225,20 @@ public class XFormParser {
 		if (root.getNumChildren() == 0)
 			return null;
 		else
-			return new DataModelTree(root.getChild(topLevelName, TreeReference.DEFAULT_MUTLIPLICITY));
+			return new FormInstance(root.getChild(topLevelName, TreeReference.DEFAULT_MUTLIPLICITY));
 	}
 
 	//checks which repeat bindings have explicit template nodes; returns a vector of the bindings that do not
-	private static void checkRepeatsForTemplate (DataModelTree instance, DataModelTree repeatTree, Vector missingTemplates) {
+	private static void checkRepeatsForTemplate (FormInstance instance, FormInstance repeatTree, Vector missingTemplates) {
 		if (repeatTree != null)
 			checkRepeatsForTemplate(repeatTree.getRoot(), TreeReference.rootRef(), instance, missingTemplates);
 	}
 	
 	//helper function for checkRepeatsForTemplate
-	private static void checkRepeatsForTemplate (TreeElement repeatTreeNode, TreeReference ref, DataModelTree instance, Vector missing) {
+	private static void checkRepeatsForTemplate (TreeElement repeatTreeNode, TreeReference ref, FormInstance instance, Vector missing) {
 		String name = repeatTreeNode.getName();
 		int mult = (repeatTreeNode.repeatable ? TreeReference.INDEX_TEMPLATE : 0);
-		ref = ref.clone();
-		ref.add(name, mult);
+		ref = ref.extendRef(name, mult);
 		
 		if (repeatTreeNode.repeatable) {
 			TreeElement template = instance.resolveReference(ref);
@@ -1249,14 +1248,14 @@ public class XFormParser {
 		}
 			
 		for (int i = 0; i < repeatTreeNode.getNumChildren(); i++) {
-			checkRepeatsForTemplate((TreeElement)repeatTreeNode.getChildren().elementAt(i), ref, instance, missing);
+			checkRepeatsForTemplate(repeatTreeNode.getChildAt(i), ref, instance, missing);
 		}
 	}
 	
 	//iterates through instance and removes template nodes that are not valid. a template is invalid if:
 	//  it is declared for a node that is not repeatable
 	//  it is for a repeat that is a child of another repeat and is not located within the parent's template node
-	private static void removeInvalidTemplates (DataModelTree instance, DataModelTree repeatTree) {
+	private static void removeInvalidTemplates (FormInstance instance, FormInstance repeatTree) {
 		removeInvalidTemplates(instance.getRoot(), (repeatTree == null ? null : repeatTree.getRoot()), true);
 	}
 	
@@ -1279,7 +1278,7 @@ public class XFormParser {
 			templateAllowed = false;
 		
 		for (int i = 0; i < instanceNode.getNumChildren(); i++) {
-			TreeElement child = (TreeElement)instanceNode.getChildren().elementAt(i);
+			TreeElement child = instanceNode.getChildAt(i);
 			TreeElement rchild = (repeatTreeNode == null ? null : repeatTreeNode.getChild(child.getName(), 0));
 			
 			if (removeInvalidTemplates(child, rchild, templateAllowed)) {
@@ -1291,7 +1290,7 @@ public class XFormParser {
 	}
 	
 	//if repeatables have no template node, duplicate first as template
-	private static void createMissingTemplates (DataModelTree instance, Vector missingTemplates) {
+	private static void createMissingTemplates (FormInstance instance, Vector missingTemplates) {
 		//it is VERY important that the missing template refs are listed in depth-first or breadth-first order... namely, that
 		//every ref is listed after a ref that could be its parent. checkRepeatsForTemplate currently behaves this way
 		for (int i = 0; i < missingTemplates.size(); i++) {
@@ -1301,7 +1300,7 @@ public class XFormParser {
 			//make template ref generic and choose first matching node
 			TreeReference ref = templRef.clone();
 			for (int j = 0; j < ref.size(); j++) {
-				ref.multiplicity.setElementAt(new Integer(TreeReference.INDEX_UNBOUND), j);
+				ref.setMultiplicity(j, TreeReference.INDEX_UNBOUND);
 			}
 			Vector nodes = instance.expandReference(ref);
 			if (nodes.size() == 0) {
@@ -1323,7 +1322,7 @@ public class XFormParser {
 	//  and # of repeats for a given repeat node is a kind of data. trust me
 	private static void trimRepeatChildren (TreeElement node) {
 		for (int i = 0; i < node.getNumChildren(); i++) {
-			TreeElement child = (TreeElement)node.getChildren().elementAt(i);
+			TreeElement child = node.getChildAt(i);
 			if (child.repeatable) {
 				node.removeChildAt(i);
 				i--;
@@ -1343,12 +1342,12 @@ public class XFormParser {
 		}
 		
 		for (int i = 0; i < node.getNumChildren(); i++) {
-			checkDuplicateNodesAreRepeatable((TreeElement)node.getChildren().elementAt(i));
+			checkDuplicateNodesAreRepeatable(node.getChildAt(i));
 		}
 	}
 	
 	//check repeat sets for homogeneity
-	private static void checkHomogeneity (DataModelTree instance) {
+	private static void checkHomogeneity (FormInstance instance) {
 		for (int i = 0; i < repeats.size(); i++) {
 			TreeReference ref = (TreeReference)repeats.elementAt(i);
 			TreeElement template = null;
@@ -1362,18 +1361,18 @@ public class XFormParser {
 				if (template == null)
 					template = instance.getTemplate(nref);
 				
-				if (!DataModelTree.isHomogeneous(template, node)) {
+				if (!FormInstance.isHomogeneous(template, node)) {
 					System.out.println("WARNING! Not all repeated nodes for a given repeat binding [" + nref.toString() + "] are homogeneous! This will cause serious problems!");
 				}
 			}
 		}
 	}
 	
-	private static void verifyBindings (FormDef f, DataModelTree instance) {
+	private static void verifyBindings (FormDef f, FormInstance instance) {
 		//check <bind>s (can't bind to '/', bound nodes actually exist)
 		for (int i = 0; i < bindings.size(); i++) {
 			DataBinding bind = (DataBinding)bindings.elementAt(i);
-			TreeReference ref = DataModelTree.unpackReference(bind.getReference());
+			TreeReference ref = FormInstance.unpackReference(bind.getReference());
 			
 			if (ref.size() == 0) {
 				System.out.println("Cannot bind to '/'; ignoring bind...");
@@ -1403,7 +1402,7 @@ public class XFormParser {
 		verifyRepeatMemberBindings(f, instance, null);
 	}
 	
-	private static void verifyControlBindings (IFormElement fe, DataModelTree instance) {
+	private static void verifyControlBindings (IFormElement fe, FormInstance instance) {
 		if (fe.getChildren() == null)
 			return;
 		
@@ -1419,7 +1418,7 @@ public class XFormParser {
 				ref = ((QuestionDef)child).getBind();
 				type = "Control";
 			}
-			TreeReference tref = DataModelTree.unpackReference(ref);
+			TreeReference tref = FormInstance.unpackReference(ref);
 
 			if (child instanceof QuestionDef && tref.size() == 0) {
 				System.out.println("Warning! Cannot bind control to '/'"); //group can bind to '/'; repeat can't, but that's checked above
@@ -1436,7 +1435,7 @@ public class XFormParser {
 		}
 	}
 	
-	private static void verifyRepeatMemberBindings (IFormElement fe, DataModelTree instance, GroupDef parentRepeat) {
+	private static void verifyRepeatMemberBindings (IFormElement fe, FormInstance instance, GroupDef parentRepeat) {
 		if (fe.getChildren() == null)
 			return;
 		
@@ -1445,8 +1444,8 @@ public class XFormParser {
 			boolean isRepeat = (child instanceof GroupDef && ((GroupDef)child).getRepeat());
 			
 			//get bindings of current node and nearest enclosing repeat
-			TreeReference repeatBind = (parentRepeat == null ? TreeReference.rootRef() : DataModelTree.unpackReference(parentRepeat.getBind()));
-			TreeReference childBind = DataModelTree.unpackReference(child.getBind());
+			TreeReference repeatBind = (parentRepeat == null ? TreeReference.rootRef() : FormInstance.unpackReference(parentRepeat.getBind()));
+			TreeReference childBind = FormInstance.unpackReference(child.getBind());
 			
 			//check if current binding is within scope of repeat binding
 			if (!repeatBind.isParentOf(childBind, false)) {
@@ -1464,7 +1463,7 @@ public class XFormParser {
 			if (repeatNode != null) {
 				repeatAncestry.addElement(repeatNode);			
 				for (int j = 1; j < childBind.size(); j++) {
-					repeatNode = repeatNode.getChild((String)childBind.names.elementAt(j), 0);
+					repeatNode = repeatNode.getChild(childBind.getName(j), 0);
 					if (repeatNode != null) {
 						repeatAncestry.addElement(repeatNode);
 					} else {
@@ -1487,10 +1486,10 @@ public class XFormParser {
 		}
 	}
 	
-	private static void applyInstanceProperties (DataModelTree instance) {
+	private static void applyInstanceProperties (FormInstance instance) {
 		for (int i = 0; i < bindings.size(); i++) {
 			DataBinding bind = (DataBinding)bindings.elementAt(i);
-			TreeReference ref = DataModelTree.unpackReference(bind.getReference());
+			TreeReference ref = FormInstance.unpackReference(bind.getReference());
 			Vector nodes = instance.expandReference(ref, true);
 			
 			if (nodes.size() > 0) {
@@ -1498,7 +1497,7 @@ public class XFormParser {
 			}
 			for (int j = 0; j < nodes.size(); j++) {
 				TreeReference nref = (TreeReference)nodes.elementAt(j);
-				attachBind(instance.resolveReference(nref), ref, bind);	
+				attachBind(instance.resolveReference(nref), bind);	
 			}				
 		}
 		
@@ -1506,7 +1505,7 @@ public class XFormParser {
 	}	
 		
 	private static void attachBindGeneral (DataBinding bind) {
-		TreeReference ref = DataModelTree.unpackReference(bind.getReference());
+		TreeReference ref = FormInstance.unpackReference(bind.getReference());
 		
 		if (bind.relevancyCondition != null) {
 			bind.relevancyCondition.addTarget(ref);
@@ -1522,7 +1521,7 @@ public class XFormParser {
 		}
 	}
 	
-	private static void attachBind(TreeElement node, TreeReference genericRef, DataBinding bind) {
+	private static void attachBind(TreeElement node, DataBinding bind) {
 		node.dataType = bind.getDataType();
 			
 		if (bind.relevancyCondition == null) {
@@ -1545,7 +1544,7 @@ public class XFormParser {
 	//apply properties to instance nodes that are determined by controls bound to those nodes
 	//this should make you feel slightly dirty, but it allows us to be somewhat forgiving with the form
 	//(e.g., a select question bound to a 'text' type node) 
-	private static void applyControlProperties (DataModelTree instance) {
+	private static void applyControlProperties (FormInstance instance) {
 		for (int h = 0; h < 2; h++) {
 			Vector selectRefs = (h == 0 ? selectOnes : selectMultis);
 			int type = (h == 0 ? Constants.DATATYPE_CHOICE : Constants.DATATYPE_CHOICE_LIST);
@@ -1568,16 +1567,10 @@ public class XFormParser {
 	}
 	
 	//TODO: hook here for turning sub-trees into complex IAnswerData objects (like for immunizations)
-	private static void loadInstanceData (Element node, TreeElement cur, FormDef f) {
-		TreeReference topRef = TreeReference.rootRef();
-		topRef.add(cur.getName(), TreeReference.INDEX_UNBOUND);
-		loadInstanceData(node, cur, topRef, f);
-	}
-	
 	//FIXME: the 'ref' and FormDef parameters (along with the helper function above that initializes them) are only needed so that we
 	//can fetch QuestionDefs bound to the given node, as the QuestionDef reference is needed to properly represent answers
 	//to select questions. obviously, we want to fix this.
-	private static void loadInstanceData (Element node, TreeElement cur, TreeReference ref, FormDef f) {		
+	private static void loadInstanceData (Element node, TreeElement cur, FormDef f) {		
 		int numChildren = node.getChildCount();		
 		boolean hasElements = false;
 		for (int i = 0; i < numChildren; i++) {
@@ -1604,9 +1597,7 @@ public class XFormParser {
 						multiplicities.put(name, new Integer(index));
 					}
 					
-					TreeReference childRef = ref.clone();
-					childRef.add(name, TreeReference.INDEX_UNBOUND);
-					loadInstanceData(child, cur.getChild(name, index), childRef, f);
+					loadInstanceData(child, cur.getChild(name, index), f);
 				}
 			}	
 		} else {
@@ -1614,7 +1605,7 @@ public class XFormParser {
 			if (text != null && text.trim().length() > 0) { //ignore text that is only whitespace
 				//TODO: custom data types? modelPrototypes?
 				
-				cur.setValue(XFormAnswerDataParser.getAnswerData(text, cur.dataType, ghettoGetQuestionDef(cur.dataType, f, ref)));
+				cur.setValue(XFormAnswerDataParser.getAnswerData(text, cur.dataType, ghettoGetQuestionDef(cur.dataType, f, cur.getRef())));
 			}
 		}		
 	}
@@ -1622,24 +1613,8 @@ public class XFormParser {
 	//find a questiondef that binds to ref, if the data type is a 'select' question type
 	public static QuestionDef ghettoGetQuestionDef (int dataType, FormDef f, TreeReference ref) {
 		if (dataType == Constants.DATATYPE_CHOICE || dataType == Constants.DATATYPE_CHOICE_LIST) {
-			return findBindingQuestion(f, ref);
+			return FormDef.findQuestionByRef(ref, f);
 		} else {
-			return null;
-		}
-	}
-	
-	private static QuestionDef findBindingQuestion (IFormElement fe, TreeReference ref) {
-		if (fe instanceof QuestionDef) {
-			if (ref.equals(DataModelTree.unpackReference(((QuestionDef)fe).getBind())))
-				return (QuestionDef)fe;
-			else
-				return null;
-		} else {
-			for (int i = 0; i < fe.getChildren().size(); i++) {
-				QuestionDef result = findBindingQuestion((IFormElement)fe.getChildren().elementAt(i), ref);
-				if (result != null)
-					return result;	
-			}
 			return null;
 		}
 	}
@@ -1720,7 +1695,7 @@ public class XFormParser {
 	//not only do we have to re-parse the entire formdef, but it is not guaranteed that you can drop in a submitted instance
 	//back into its original form def and it will still parse. in particular, non-relevant nodes will be missing, which will
 	//really confuse the binding verifier and repeat homogeneity checker.
-	public static DataModelTree parseDataModelGhettoooooo (InputStream instanceXMLStream, InputStream formDefXMLStream, String locale) {
+	public static FormInstance parseDataModelGhettoooooo (InputStream instanceXMLStream, InputStream formDefXMLStream, String locale) {
 		Document formDefXML = getXMLDocument(new InputStreamReader(formDefXMLStream));
 		Document instanceXML = getXMLDocument(new InputStreamReader(instanceXMLStream));
 
@@ -1744,7 +1719,7 @@ public class XFormParser {
 			formDef.getLocalizer().setLocale(locale);
 		}
 		
-		return formDef.getDataModel();
+		return formDef.getInstance();
 	}
 		
 	//returns data type corresponding to type string; doesn't handle defaulting to 'text' if type unrecognized/unknown
@@ -1822,14 +1797,18 @@ public class XFormParser {
 		return text;
 	}
 	
-	public static DataModelTree restoreDataModel (byte[] data, Class restorableType) {
+	public static FormInstance restoreDataModel (byte[] data, Class restorableType) {
 		Restorable r = (restorableType != null ? (Restorable)PrototypeFactory.getInstance(restorableType) : null);
 		
 		Document doc = getXMLDocument(new InputStreamReader(new ByteArrayInputStream(data)));
+		if (doc == null) {
+			throw new RuntimeException("syntax error in XML instance; could not parse");
+		}
+		
 		Element e = doc.getRootElement();
 		
 		TreeElement te = buildInstanceStructure(e, null);
-		DataModelTree dm = new DataModelTree(te);
+		FormInstance dm = new FormInstance(te);
 		loadNamespaces(e, dm);
 		if (r != null) {
 			RestoreUtils.templateData(r, dm, null);

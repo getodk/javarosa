@@ -28,7 +28,7 @@ import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
@@ -495,8 +495,8 @@ public class Patient implements Persistable, Restorable {
 		return "patient";
 	}
 	
-	public DataModelTree exportData() {
-		DataModelTree dm = RestoreUtils.createDataModel(this);
+	public FormInstance exportData() {
+		FormInstance dm = RestoreUtils.createDataModel(this);
 		RestoreUtils.addData(dm, "pat-id", patientIdentifier);
 		RestoreUtils.addData(dm, "name/family", familyName);
 		RestoreUtils.addData(dm, "name/given", givenName);
@@ -514,7 +514,7 @@ public class Patient implements Persistable, Restorable {
 		return dm;
 	}
 	
-	public void templateData (DataModelTree dm, TreeReference parentRef) {
+	public void templateData (FormInstance dm, TreeReference parentRef) {
 		RestoreUtils.applyDataType(dm, "pat-id", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "name/family", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "name/given", parentRef, String.class);
@@ -527,7 +527,7 @@ public class Patient implements Persistable, Restorable {
 		// other/* defaults to string
 	}
 	
-	public void importData(DataModelTree dm) {
+	public void importData(FormInstance dm) {
 		patientIdentifier = (String)RestoreUtils.getValue("pat-id", dm);
         familyName = (String)RestoreUtils.getValue("name/family", dm);		
         givenName = (String)RestoreUtils.getValue("name/given", dm);		
@@ -540,7 +540,7 @@ public class Patient implements Persistable, Restorable {
         TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));
         if ( e != null ){
             for (int i = 0; i < e.getNumChildren(); i++) {
-            	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
+            	TreeElement child = e.getChildAt(i);
             	String name = child.getName();
             	singles.put(name, RestoreUtils.getValue("other/" + name, dm));
             }

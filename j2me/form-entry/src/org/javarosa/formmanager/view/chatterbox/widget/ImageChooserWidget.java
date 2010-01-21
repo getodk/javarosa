@@ -23,6 +23,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.MultiPointerAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
@@ -57,7 +58,7 @@ public class ImageChooserWidget extends ExpandedWidget {
 	}
 
 
-	protected void updateWidget(QuestionDef question) {
+	protected void updateWidget(FormEntryPrompt prompt) {
 		// do nothing? 
 		
 	}
@@ -66,7 +67,7 @@ public class ImageChooserWidget extends ExpandedWidget {
 		return Constants.CONTROL_IMAGE_CHOOSE;
 	}
 	
-	protected Item getEntryWidget (QuestionDef question) {
+	protected Item getEntryWidget (FormEntryPrompt prompt) {
 		// //#style textBox
 		
 		updateLabel();

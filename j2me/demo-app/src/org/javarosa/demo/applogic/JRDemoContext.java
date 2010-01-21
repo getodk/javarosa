@@ -5,17 +5,16 @@ import java.util.Vector;
 
 import javax.microedition.midlet.MIDlet;
 
-import org.javarosa.communication.http.HttpTransportProperties;
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
-import org.javarosa.core.services.transport.IDataPayload;
+import org.javarosa.core.services.transport.payload.IDataPayload;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.demo.properties.DemoAppProperties;
@@ -30,6 +29,7 @@ import org.javarosa.patient.PatientModule;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.resources.locale.LanguageUtils;
+import org.javarosa.services.transport.TransportManagerModule;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.user.activity.UserModule;
@@ -88,6 +88,7 @@ public class JRDemoContext {
 			forms.write(XFormUtils.getFormFromResource("/condtest.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/imci.xml"));
+			forms.write(XFormUtils.getFormFromResource("/PhysicoChemTestsDemo.xhtml"));
 		} catch (StorageFullException e) {
 			throw new RuntimeException("uh-oh, storage full [forms]"); //TODO: handle this
 		}
@@ -99,25 +100,31 @@ public class JRDemoContext {
 		new CoreModelModule().registerModule();
 		new XFormsModule().registerModule();
 		new LanguagePackModule().registerModule();
+		new TransportManagerModule().registerModule();
 		new UserModule().registerModule();
 		new PatientModule().registerModule();
 		new FormManagerModule().registerModule();
+		new LanguagePackModule().registerModule();
 	}
 	
 	
 	private void addCustomLanguages() {
+		Localization.registerLanguageFile("Afrikaans", "./messages_afr.txt");
+		Localization.registerLanguageFile("Dari", "./messages_dari.txt");
+		Localization.registerLanguageFile("Espagnol", "./messages_es.txt");
+		Localization.registerLanguageFile("Swahili", "./messages_sw.txt");
+		Localization.registerLanguageFile("English", "./messages_en.txt");		
 	}
 	
 	private void setProperties() {
 		final String POST_URL = "http://test.commcarehq.org/submit";
 		
-		
 		PropertyManager._().addRules(new JavaRosaPropertyRules());
 		PropertyManager._().addRules(new DemoAppProperties());
 		PropertyUtils.initializeProperty("DeviceID", PropertyUtils.genGUID(25));
 
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_LIST_PROPERTY, POST_URL);
-		PropertyUtils.initializeProperty(HttpTransportProperties.POST_URL_PROPERTY, POST_URL);
+		PropertyUtils.initializeProperty(DemoAppProperties.POST_URL_LIST_PROPERTY, POST_URL);
+		PropertyUtils.initializeProperty(DemoAppProperties.POST_URL_PROPERTY, POST_URL);
         
 		LanguageUtils.initializeLanguage(true, "en");
 	}
@@ -138,22 +145,6 @@ public class JRDemoContext {
 		return this.patientID;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	///////////////////
-	
-	
-	private boolean inDemoMode;
-	private String weeklySurvey = new String("brac_chp_weekly_update");
-	
 	public TransportMessage buildMessage(IDataPayload payload) {
 		//Right now we have to just give the message the stream, rather than the payload,
 		//since the transport layer won't take payloads. This should be fixed _as soon 
@@ -173,35 +164,5 @@ public class JRDemoContext {
 		handlers.addElement(meta);
 		return handlers;		
 	}
-	
-	private void registerDemoStorage (String key, Class type) {
-		StorageManager.registerStorage(key, "DEMO_" + key, type);
-	}
-	
-	public void toggleDemoMode(boolean demoOn) {
-		boolean changed = false;
-		
-		if (demoOn != inDemoMode) {
-			inDemoMode = demoOn;
-			if (demoOn) {
-				registerDemoStorage(DataModelTree.STORAGE_KEY, DataModelTree.class);
-				//TODO: Use new transport message queue
-			} else {
-				StorageManager.registerStorage(DataModelTree.STORAGE_KEY, DataModelTree.class);
-				//TODO: Use new transport message queue
-			}
-		}
-	}
-	
-	public void resetDemoData() {
-		//#debug debug
-		System.out.println("Resetting demo data");
-		
-		StorageManager.getStorage(DataModelTree.STORAGE_KEY).removeAll();
-		//TODO: Use new transport message queue
-	}
-
-	
-	
 	
 }

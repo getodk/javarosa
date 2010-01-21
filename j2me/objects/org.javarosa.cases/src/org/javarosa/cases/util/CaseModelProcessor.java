@@ -11,10 +11,10 @@ import java.util.Vector;
 
 import org.javarosa.cases.model.Case;
 import org.javarosa.chsreferral.model.PatientReferral;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.model.utils.IModelProcessor;
+import org.javarosa.core.model.utils.IInstanceProcessor;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.IStorageUtilityIndexed;
 import org.javarosa.core.services.storage.StorageFullException;
@@ -36,9 +36,9 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.javarosa.core.model.utils.IModelProcessor#processModel(org.javarosa.core.model.instance.DataModelTree)
+	 * @see org.javarosa.core.model.utils.IInstanceProcessor#processModel(org.javarosa.core.model.instance.FormInstance)
 	 */
-	public void processModel(DataModelTree tree) {
+	public void processInstance(FormInstance tree) {
 		Vector caseElements = scrapeForCaseElements(tree);
 		for(int i=0; i < caseElements.size(); ++i) {
 			try {
@@ -50,7 +50,6 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 	}
 	
 	private void processCase(TreeElement caseElement) throws MalformedCaseModelException {
-		Vector childElements = caseElement.getChildren();
 		Vector caseIdKids = caseElement.getChildrenWithName("case_id");
 		if(caseIdKids.size() < 1) {
 			throw new MalformedCaseModelException("Invalid <case> model. Required element (case_id) is missing.","<case>");
@@ -62,8 +61,8 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		}
 		Date date = (Date)((TreeElement)dateModified.elementAt(0)).getValue().getValue();
 		
-		for(int i=0; i < childElements.size(); ++i ){
-			TreeElement kid = (TreeElement)childElements.elementAt(i);
+		for(int i=0; i < caseElement.getNumChildren(); ++i ){
+			TreeElement kid = caseElement.getChildAt(i);
 			if(kid.getName().equals("create")) {
 				if(kid.isRelevant()) {
 					c = processCaseCreate(kid,caseId, date);
@@ -148,9 +147,8 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		String caseName = null;
 		int userId = -1;
 		
-		Vector childElements = create.getChildren();
-		for(int i=0; i < childElements.size(); ++i ){
-			TreeElement kid = (TreeElement)childElements.elementAt(i);
+		for(int i=0; i < create.getNumChildren(); ++i ){
+			TreeElement kid = create.getChildAt(i);
 			if(kid.getName().equals("case_type_id")) {
 				caseTypeId = (String)serializer.serializeAnswerData(kid.getValue());
 			}
@@ -179,10 +177,8 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 	}
 	
 	private void processCaseMutate(TreeElement mutate,Case c, Date date) throws MalformedCaseModelException {
-		Vector childElements = mutate.getChildren();
-		
-		for(int i=0; i < childElements.size(); ++i ){
-			TreeElement kid = (TreeElement)childElements.elementAt(i);
+		for(int i=0; i < mutate.getNumChildren(); ++i ){
+			TreeElement kid = mutate.getChildAt(i);
 			if(kid.getName().equals("case_type_id")) {
 				c.setTypeId((String)serializer.serializeAnswerData(kid.getValue()));
 			}
@@ -229,10 +225,8 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 			followup = (Date)(((TreeElement)followupDates.elementAt(0))).getValue().getValue();
 		}
 		
-		Vector childElements = referral.getChildren();
-		
-		for(int i=0; i < childElements.size(); ++i ){
-			TreeElement kid = (TreeElement)childElements.elementAt(i);
+		for(int i=0; i < referral.getNumChildren(); ++i ){
+			TreeElement kid = referral.getChildAt(i);
 			if(kid.getName().equals("open")) {
 				Vector types = kid.getChildrenWithName("referral_types");
 				if(types.size() < 1) {
@@ -263,16 +257,15 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		}
 	}
 	
-	private Vector scrapeForCaseElements(DataModelTree tree) {
+	private Vector scrapeForCaseElements(FormInstance tree) {
 		Vector caseElements = new Vector();
 		
 		Stack children = new Stack();
 		children.push(tree.getRoot());
 		while(!children.empty()) {
 			TreeElement element = (TreeElement)children.pop();
-			Vector newElements = element.getChildren();
-			for(int i =0; i < newElements.size(); ++i) {
-				TreeElement caseElement = (TreeElement)newElements.elementAt(i);
+			for(int i =0; i < element.getNumChildren(); ++i) {
+				TreeElement caseElement = element.getChildAt(i);
 				if(caseElement.getName().equals("case")) {
 					caseElements.addElement(caseElement);
 				} else {				

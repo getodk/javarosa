@@ -16,13 +16,13 @@
 
 package org.javarosa.xpath.expr;
 
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 public abstract class XPathExpression implements Externalizable {
 	
-	public abstract Object eval (IFormDataModel model, EvaluationContext evalContext);
+	public abstract Object eval (FormInstance model, EvaluationContext evalContext);
 	
 	/*======= DEBUGGING ========*/
 	// should not compile onto phone

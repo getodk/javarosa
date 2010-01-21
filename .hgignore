@@ -5,6 +5,7 @@ syntax: glob
 *.jar
 *.jad
 *.zip
+*.rar
 *.pyc
 
 #build process
@@ -30,3 +31,4 @@ devices/
 *.rej
 *.orig
 
+glob:local.properties

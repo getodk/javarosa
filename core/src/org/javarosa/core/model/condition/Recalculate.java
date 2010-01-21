@@ -20,13 +20,13 @@ import java.util.Date;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 
 public class Recalculate extends Triggerable {
@@ -43,12 +43,12 @@ public class Recalculate extends Triggerable {
 		addTarget(target);
 	}
 	
-	public Object eval (IFormDataModel model, EvaluationContext ec) {
+	public Object eval (FormInstance model, EvaluationContext ec) {
 		return expr.evalRaw(model, ec);
 	}
 	
-	public void apply (TreeReference ref, Object result, IFormDataModel model, FormDef f) {
-		int dataType = f.getDataModel().resolveReference(ref).dataType;
+	public void apply (TreeReference ref, Object result, FormInstance model, FormDef f) {
+		int dataType = f.getInstance().resolveReference(ref).dataType;
 		f.setAnswer(wrapData(result, dataType), ref);
 	}
 		
