@@ -39,11 +39,15 @@ public class FormEntryCaption implements FormElementStateListener {
 
 	protected IQuestionWidget viewWidget;
 
+	/**
+	 * This empty constructor exists for convenience of any supertypes of this
+	 * prompt
+	 */
 	public FormEntryCaption() {
 	}
 
 	/**
-	 * Creates a FormEntryCaption for the element at index in the form.
+	 * Creates a FormEntryCaption for the element at the given index in the form.
 	 * 
 	 * @param form
 	 * @param index

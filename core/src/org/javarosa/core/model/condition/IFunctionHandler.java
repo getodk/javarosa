@@ -20,7 +20,7 @@ import java.util.Vector;
 
 public interface IFunctionHandler {
 	/**
-	 * Name of function being handled
+	 * @return The name of function being handled
 	 */
 	String getName();
 
