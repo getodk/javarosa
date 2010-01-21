@@ -40,6 +40,9 @@ import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
+/**
+ * This class represents the xform model instance
+ */
 public class FormInstance implements Persistable, Restorable {
 
 	public static final String STORAGE_KEY = "FORMDATA";
@@ -155,13 +158,6 @@ public class FormInstance implements Persistable, Restorable {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.javarosa.core.model.IFormDataModel#getDataValue(org.javarosa.core
-	 * .model.IDataReference)
-	 */
 	// don't think this is used anymore
 	public IAnswerData getDataValue(IDataReference questionReference) {
 		TreeElement element = resolveReference(questionReference);
@@ -400,20 +396,10 @@ public class FormInstance implements Persistable, Restorable {
 		this.formId = formId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.javarosa.core.model.IFormDataModel#getDateSaved()
-	 */
 	public Date getDateSaved() {
 		return this.dateSaved;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.javarosa.core.model.IFormDataModel#getFormReferenceId()
-	 */
 	public int getFormId() {
 		return this.formId;
 	}
@@ -453,11 +439,6 @@ public class FormInstance implements Persistable, Restorable {
 		ExtUtil.write(out, getRoot());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.javarosa.core.model.IFormDataModel#getName()
-	 */
 	public String getName() {
 		return name;
 	}
@@ -472,11 +453,6 @@ public class FormInstance implements Persistable, Restorable {
 		this.name = name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.javarosa.core.model.IFormDataModel#getId()
-	 */
 	public int getID() {
 		return id;
 	}

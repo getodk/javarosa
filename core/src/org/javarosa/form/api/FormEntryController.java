@@ -23,20 +23,18 @@ import org.javarosa.core.model.instance.TreeElement;
 /**
  * This class is used to navigate through an xform and appropriately manipulate
  * the FormEntryModel's state.
- * 
- * 
  */
 public class FormEntryController {
     public static final int ANSWER_OK = 0;
     public static final int ANSWER_REQUIRED_BUT_EMPTY = 1;
     public static final int ANSWER_CONSTRAINT_VIOLATED = 2;
 
-    public static final int BEGINNING_OF_FORM_EVENT = 0;
-    public static final int END_OF_FORM_EVENT = 1;
-    public static final int PROMPT_NEW_REPEAT_EVENT = 2;
-    public static final int QUESTION_EVENT = 4;
-    public static final int GROUP_EVENT = 8;
-    public static final int REPEAT_EVENT = 16;
+    public static final int EVENT_BEGINNING_OF_FORM = 0;
+    public static final int EVENT_END_OF_FORM = 1;
+    public static final int EVENT_PROMPT_NEW_REPEAT = 2;
+    public static final int EVENT_QUESTION = 4;
+    public static final int EVENT_GROUP = 8;
+    public static final int EVENT_REPEAT = 16;
 
     FormEntryModel model;
 
@@ -58,8 +56,9 @@ public class FormEntryController {
      * @return
      */
     public int answerCurrentQuestion(IAnswerData data) {
-        // TODO: Do we need checks here to make sure the current formindex
-        // references a question?
+    	if (model.getCurrentEvent() != FormEntryController.EVENT_QUESTION){
+    		throw new RuntimeException("Non-Question object at the form index.");
+    	}
         return answerQuestion(model.getCurrentFormIndex(), data);
     }
 

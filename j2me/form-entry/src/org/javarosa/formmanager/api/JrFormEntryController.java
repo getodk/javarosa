@@ -10,6 +10,8 @@ import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
 import org.javarosa.formmanager.view.IFormEntryView;
 
 /**
+ * Extension of {@link FormEntryController} for J2ME.
+ * 
  * @author ctsims
  *
  */

@@ -18,6 +18,12 @@ package org.javarosa.formmanager.view;
 
 import org.javarosa.formmanager.api.JrFormEntryController;
 
+/**
+ * Implementations of this interface are used to select an
+ * {@link IFormEntryView} at runtime. This enables dynamic selection of the
+ * interface to use for form entry.
+ * 
+ */
 public interface IFormEntryViewFactory {
-	IFormEntryView getFormEntryView (JrFormEntryController controller);
+	IFormEntryView getFormEntryView(JrFormEntryController controller);
 }
