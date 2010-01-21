@@ -16,7 +16,6 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;
@@ -34,7 +33,7 @@ import de.enough.polish.ui.Style;
  * of conflicting changes in new Polish versions with this code. I have outlined
  * the latest versions of polish in which the changes appear to work.
  * 
- * Questions should be directed to csims@dimagi.com
+ * Questions should be directed to csimsdimagi.com
  * 
  * @author Clayton Sims
  * @date Feb 16, 2009 

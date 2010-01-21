@@ -98,7 +98,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		UiAccess.setStyle(this);
     	}
     	
-    	//22 Jan, 2009 - csims@dimagi.com
+    	//22 Jan, 2009 - csimsdimagi.com
     	//This constructor code supresses the ability to scroll the chatterbox by dragging the mouse
     	//pointer. This "Feature" was causing tons of problems for our nurses. Let me know if anyone else
     	//wants to make this a customizable inclusion.
@@ -153,7 +153,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	//Mode 1: Read only review screen.
     	//TODO: READONLY FLAG!
     	if(false) {
-    		while(controller.stepToNextEvent() != FormEntryController.END_OF_FORM_EVENT) {
+    		while(controller.stepToNextEvent() != FormEntryController.EVENT_END_OF_FORM) {
     			//TODO: Anything?
     		}
     	} else if(null != null) { //TODO: Starting from a specific question
@@ -217,9 +217,9 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     
     private void step(int event) {
     	switch(event) {
-    	case FormEntryController.BEGINNING_OF_FORM_EVENT:
+    	case FormEntryController.EVENT_BEGINNING_OF_FORM:
     		break;
-    	case FormEntryController.END_OF_FORM_EVENT:
+    	case FormEntryController.EVENT_END_OF_FORM:
     		formComplete();
     		break;
     		default:
@@ -322,12 +322,12 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     			int index = questionIndexes.indexOf(activeQuestionIndex, true);
     			ChatterboxWidget widget = (ChatterboxWidget)get(index);
     		
-    			//Feb 4, 2009 - csims@dimagi.com
+    			//Feb 4, 2009 - csimsdimagi.com
     			//The current widget's header should always be pinned in case it overruns the
     			//screen with options
-    			//Feb 9, 2009 - csims@dimagi.com
+    			//Feb 9, 2009 - csimsdimagi.com
     			//behaves strangely with the 3110c sized screens. Disabling for now.
-    			//Feb 20, 2009 - csims@dimagi.com
+    			//Feb 20, 2009 - csimsdimagi.com
     			//Tweaked a bunch of settings, should be fine for ~90% of our use cases now, if it's
     			//causing problems, set the polish flag.
     			//#if chatterbox.pinning.current != false

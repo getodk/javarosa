@@ -180,28 +180,28 @@ public class SingleQuestionView extends FramedForm implements
 	private void processModelEvent(int event) {
 		int nextEvent = -1;
 		switch (event) {
-		case FormEntryController.BEGINNING_OF_FORM_EVENT:
+		case FormEntryController.EVENT_BEGINNING_OF_FORM:
 			if (goingForward)
 				nextEvent = controller.stepToNextEvent();
 			else {
 				viewAnswers();
 			}
 			break;
-		case FormEntryController.END_OF_FORM_EVENT:
+		case FormEntryController.EVENT_END_OF_FORM:
 			viewAnswers();
 			break;
-		case FormEntryController.REPEAT_EVENT:
-		case FormEntryController.GROUP_EVENT:
+		case FormEntryController.EVENT_REPEAT:
+		case FormEntryController.EVENT_GROUP:
 			nextEvent = goingForward ? controller.stepToNextEvent()
 					: controller.stepToPreviousEvent();
 			break;
-		case FormEntryController.PROMPT_NEW_REPEAT_EVENT:
+		case FormEntryController.EVENT_PROMPT_NEW_REPEAT:
 			FormEntryCaption[] hierachy = model.getCaptionHierarchy(model.getCurrentFormIndex());
 			repeatScreen = new NewRepeatScreen("Add a new " + hierachy[hierachy.length -1].getLongText());
 			repeatScreen.setCommandListener(this);
 			J2MEDisplay.setView(repeatScreen);
 			break;
-		case FormEntryController.QUESTION_EVENT:
+		case FormEntryController.EVENT_QUESTION:
 			refreshView();
 			break;
 		default:

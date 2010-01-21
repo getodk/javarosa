@@ -21,7 +21,6 @@ import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.formmanager.view.IQuestionWidget;
 
@@ -30,89 +29,95 @@ import org.javarosa.formmanager.view.IQuestionWidget;
  * your current FormIndex references a GroupEvent, RepeatPromptEvent, or
  * RepeatEvent.
  * 
- * 
+ * @author Simon Kelly
  */
 public class FormEntryCaption implements FormElementStateListener {
 
-    FormDef form;
+	FormDef form;
 	FormIndex index;
 	protected IFormElement element;
 
 	protected IQuestionWidget viewWidget;
-	
-    public FormEntryCaption() {
-    }
 
+	public FormEntryCaption() {
+	}
 
-    public FormEntryCaption(FormDef form, FormIndex index) {
-        this.form = form;
-        this.index = index;
-        this.element = form.getChild(index);
-        this.viewWidget = null;
-    }
+	/**
+	 * Creates a FormEntryCaption for the element at index in the form.
+	 * 
+	 * @param form
+	 * @param index
+	 */
+	public FormEntryCaption(FormDef form, FormIndex index) {
+		this.form = form;
+		this.index = index;
+		this.element = form.getChild(index);
+		this.viewWidget = null;
+	}
 
-    public String getLongText() {
-        String longText = element.getLongText();
-        return substituteStringArgs(longText);
-    }
+	public String getLongText() {
+		String longText = element.getLongText();
+		return substituteStringArgs(longText);
+	}
 
+	public String getShortText() {
+		String shortText = element.getShortText();
+		return substituteStringArgs(shortText);
+	}
 
-    public String getShortText() {
-        String shortText = element.getShortText();
-        return substituteStringArgs(shortText);
-    }
+	public String substituteStringArgs(String templateStr) {
+		if (templateStr == null) {
+			return null;
+		}
+		return form.fillTemplateString(templateStr, index.getReference());
+	}
 
+	public int getMultiplicity() {
+		return index.getElementMultiplicity();
+	}
 
-    public String substituteStringArgs(String templateStr) {
-        if(templateStr == null) {
-        	return null;
-        }
-        return form.fillTemplateString(templateStr, index.getReference());
-    }
-
-
-    public int getMultiplicity() {
-        return index.getElementMultiplicity();
-    }
-    
-    public IFormElement getFormElement() {
+	public IFormElement getFormElement() {
 		return element;
 	}
 
-    public boolean repeats() {
-    	if (element instanceof GroupDef){
-    		return ((GroupDef) element).getRepeat();
-    	} else {
-    		return false;
-    	}
-    }
+	/**
+	 * @return true if this represents a <repeat> element
+	 */
+	public boolean repeats() {
+		if (element instanceof GroupDef) {
+			return ((GroupDef) element).getRepeat();
+		} else {
+			return false;
+		}
+	}
 
 	public FormIndex getIndex() {
 		return index;
 	}
-	
-	
-    //==== observer pattern ====//
-	
-	public void register (IQuestionWidget viewWidget) {
+
+	// ==== observer pattern ====//
+
+	public void register(IQuestionWidget viewWidget) {
 		this.viewWidget = viewWidget;
 		element.registerStateObserver(this);
 	}
 
-	public void unregister () {
+	public void unregister() {
 		this.viewWidget = null;
 		element.unregisterStateObserver(this);
 	}
-	
+
 	public void formElementStateChanged(IFormElement element, int changeFlags) {
 		if (this.element != element)
-			throw new IllegalStateException("Widget received event from foreign question");
+			throw new IllegalStateException(
+					"Widget received event from foreign question");
 		if (viewWidget != null)
 			viewWidget.refreshWidget(changeFlags);
 	}
-	
-	public void formElementStateChanged(TreeElement instanceNode, int changeFlags) {
+
+	public void formElementStateChanged(TreeElement instanceNode,
+			int changeFlags) {
 		throw new RuntimeException("cannot happen");
 	}
-	
+
 }
