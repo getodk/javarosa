@@ -38,7 +38,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class GroupDef implements IFormElement, Localizable {
 	private Vector children;	/** A list of questions on a group. */	
-	private boolean repeat;
+	private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
 	private int id;	/** The group number. */
 	private IDataReference binding;	/** reference to a location in the model to store data in */
 	
@@ -100,6 +100,9 @@ public class GroupDef implements IFormElement, Localizable {
 		}
 	}
 	
+	/**
+	 * @return true if this represents a <repeat> element
+	 */
 	public boolean getRepeat () {
 		return repeat;
 	}
@@ -116,6 +119,9 @@ public class GroupDef implements IFormElement, Localizable {
 		this.longText = longText;
 	}
 
+    /**
+     * @return the iText id for the long text
+     */
     public String getLongTextID () {
         return longTextID;
     }
@@ -135,6 +141,9 @@ public class GroupDef implements IFormElement, Localizable {
 		this.shortText = shortText;
 	}
 
+    /**
+     * @return the iText id for the short text
+     */
     public String getShortTextID () {
         return shortTextID;
     }

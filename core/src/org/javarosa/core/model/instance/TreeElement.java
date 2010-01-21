@@ -569,7 +569,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		// children = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new
 		// ExtWrapList(TreeElement.class), pf));
 
-		// Jan 22, 2009 - csims@dimagi.com
+		// Jan 22, 2009 - Clayton Sims@dimagi.com
 		// old line: children = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(in, new
 		// ExtWrapList(TreeElement.class), pf));
 		// New Child deserialization
@@ -636,7 +636,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		ExtUtil.writeBool(out, repeatable);
 		ExtUtil.write(out, new ExtWrapNullable(value == null ? null : new ExtWrapTagged(value)));
 
-		// Jan 22, 2009 - csims@dimagi.com
+		// Jan 22, 2009 - Clayton Sims@dimagi.com
 		// old line: ExtUtil.write(out, new
 		// ExtWrapList(ExtUtil.emptyIfNull(children)));
 		// New Child serialization

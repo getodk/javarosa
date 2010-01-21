@@ -16,8 +16,6 @@
 
 package org.javarosa.core.model;
 
-import java.util.Vector;
-
 import org.javarosa.core.model.instance.TreeReference;
 
 /**
@@ -171,7 +169,7 @@ public class FormIndex {
 
 	/**
 	 * @return An index into the next level of specificity past the current context. An
-	 * example would be an index to a parent element of the element referenced
+	 * example would be an index  into an element that is a child of the element referenced
 	 * by the local index. 
 	 */
 	public FormIndex getNextLevel() {
