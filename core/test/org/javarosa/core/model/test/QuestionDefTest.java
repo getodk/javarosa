@@ -28,6 +28,7 @@ import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.locale.Localizer;
@@ -101,13 +102,13 @@ public class QuestionDefTest extends TestCase {
 		QuestionDef q;
 		
 		q = new QuestionDef();
-		if (q.getID() != -1 || q.getTitle() != null) {
+		if (q.getID() != -1) {
 			fail("QuestionDef not initialized properly (default constructor)");
 		}
 		testSerialize(q, "a");
 		
-		q = new QuestionDef(17, "test question", Constants.CONTROL_RANGE);
-		if (q.getID() != 17 || !"test question".equals(q.getTitle())) {
+		q = new QuestionDef(17,Constants.CONTROL_RANGE);
+		if (q.getID() != 17) {
 			fail("QuestionDef not initialized properly");
 		}
 		testSerialize(q, "b");
@@ -128,12 +129,6 @@ public class QuestionDefTest extends TestCase {
 			fail("ID getter/setter broken");
 		}
 		testSerialize(q, "c");
-
-		q.setTitle("rosebud");
-		if (!"rosebud".equals(q.getTitle())) {
-			fail("Name getter/setter broken");
-		}
-		testSerialize(q, "d");
 
 		IDataReference ref = newRef("/data");
 		q.setBind(ref);
@@ -272,47 +267,29 @@ public class QuestionDefTest extends TestCase {
 
 	public void testSelectChoicesNoLocalizer () {
 		QuestionDef q = new QuestionDef();
-		if (q.getSelectItems() != null || q.getSelectItemIDs() != null || q.getSelectItemsLocalizable() != null) {
+		if (q.getChoices() != null) {
 			fail("Select choices not null on init");
 		}
 
-		q.addSelectItem("choice", "val");
-		q.addSelectItem("stacey's", "mom");
-		if (!q.getSelectItems().toString().equals("[choice => val, stacey's => mom]")) {
+		q.addSelectChoice(new SelectChoice("choice", "val",false));
+		q.addSelectChoice(new SelectChoice("stacey's", "mom",false));
+		if (!q.getChoices().toString().equals("[choice => val, stacey's => mom]")) {
 			fail("Could not add individual select choice");
 		}
 		//won't work: testSerialize(q, "w");
-		
-		OrderedHashtable newChoices = new OrderedHashtable();
-		newChoices.put("alpha", "beta");
-		q.setSelectItems(newChoices);
-		if (q.getSelectItems() != newChoices) {
-			fail("Could not set select choices en masse");
-		}
-		//won't work: testSerialize(q, "x");
 	}
 	
 	public void testSelectChoiceIDsNoLocalizer () {
 		QuestionDef q = new QuestionDef();
 		
-		q.addSelectItemID("choice1 id", true, "val1");
-		q.addSelectItemID("loc: choice2", false, "val2");
-		if (!q.getSelectItemIDs().toString().equals("[choice1 id => val1, loc: choice2 => val2]") ||
+		q.addSelectChoice(new SelectChoice("choice1 id", "val1",true));
+		q.addSelectChoice(new SelectChoice("loc: choice2", "val2",false));
+		if (!q.getChoices().toString().equals("[choice1 id => val1, loc: choice2 => val2]") ||
 			!q.getSelectItemsLocalizable().toString().equals("[true, false]") ||
 			q.getSelectItems() != null) {
 			fail("Could not add individual select choice ID");
 		}
 		testSerialize(q, "y");
-
-		OrderedHashtable newChoiceIDs = new OrderedHashtable();
-		Vector newChoiceLocs = new Vector();
-		newChoiceIDs.put("alpha", "beta");
-		newChoiceLocs.addElement(Boolean.TRUE);
-		q.setSelectItemIDs(newChoiceIDs, newChoiceLocs, null);
-		if (q.getSelectItemIDs() != newChoiceIDs || q.getSelectItemsLocalizable() != newChoiceLocs || q.getSelectItems() != null) {
-			fail("Could not set select choices en masse");
-		}
-		testSerialize(q, "z");
 	}
 	
 	public void testLocalizeSelectMap () {

@@ -26,7 +26,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
@@ -240,9 +239,6 @@ public class QuestionDataElementTests extends TestCase{
 			}
 			public void visit(TreeElement element) {
 				visitorAccepted.bool = true;
-			}
-			public void visit(IFormDataModel dataModel) {
-				dispatchedWrong.bool = true;
 			}
 		};
 		

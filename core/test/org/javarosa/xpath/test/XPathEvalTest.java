@@ -24,9 +24,9 @@ import j2meunit.framework.TestSuite;
 import java.util.Date;
 import java.util.Vector;
 
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathException;
@@ -63,7 +63,7 @@ public class XPathEvalTest extends TestCase {
 		return aSuite;
 	}
 		
-	private void testEval (String expr, IFormDataModel model, EvaluationContext ec, Object expected) {
+	private void testEval (String expr, FormInstance model, EvaluationContext ec, Object expected) {
 		//System.out.println("[" + expr + "]");
 		
 		XPathExpression xpe = null;
