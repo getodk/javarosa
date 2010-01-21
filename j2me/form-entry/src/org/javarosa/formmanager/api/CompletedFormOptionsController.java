@@ -9,7 +9,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
 
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.formmanager.api.transitions.CompletedFormOptionsTransitions;
 import org.javarosa.formmanager.view.transport.SendNowSendLaterForm;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -20,10 +20,10 @@ import org.javarosa.j2me.view.J2MEDisplay;
  */
 public class CompletedFormOptionsController implements CommandListener, ItemStateListener {
 	CompletedFormOptionsTransitions transitions;
-	DataModelTree data;
+	FormInstance data;
 	SendNowSendLaterForm view;
 	
-	public CompletedFormOptionsController(DataModelTree formData) {
+	public CompletedFormOptionsController(FormInstance formData) {
 		this.data = formData;
 		view = new SendNowSendLaterForm(this, this);
 	}

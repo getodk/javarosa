@@ -19,7 +19,7 @@
  */
 package org.javarosa.cases.util;
 
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.util.restorable.Restorable;
 
 /**
@@ -29,7 +29,7 @@ import org.javarosa.core.model.util.restorable.Restorable;
  */
 public class RestorableTestHarness {
 	public static boolean evaluateRestorable(Restorable r) {
-		DataModelTree tree = r.exportData();
+		FormInstance tree = r.exportData();
 		r.importData(tree);
 		
 		//If exceptions were thrown, this'll fail.

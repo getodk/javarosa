@@ -16,6 +16,10 @@
 
 package org.javarosa.core.model;
 
+import java.util.Vector;
+
+import org.javarosa.core.model.instance.TreeReference;
+
 /**
  * A Form Index is an immutable index into a specific question definition that 
  * will appear in an interaction with a user.
@@ -47,15 +51,17 @@ public class FormIndex {
 	
 	/** The next level of this index */
 	private FormIndex nextLevel;
+	
+	private TreeReference reference;
 
 	public static FormIndex createBeginningOfFormIndex() {
-		FormIndex begin = new FormIndex(-1);
+		FormIndex begin = new FormIndex(-1, null);
 		begin.beginningOfForm = true;
 		return begin;
 	}
 	
 	public static FormIndex createEndOfFormIndex() {
-		FormIndex end = new FormIndex(-1);
+		FormIndex end = new FormIndex(-1,null);
 		end.endOfForm = true;
 		return end;
 	}
@@ -64,9 +70,11 @@ public class FormIndex {
 	 * Constructs a simple form index that references a specific element in
 	 * a list of elements.
 	 * @param localIndex An integer index into a flat list of elements
+	 * @param reference A reference to the instance element identified by this index;
 	 */
-	public FormIndex(int localIndex) {
+	public FormIndex(int localIndex, TreeReference reference) {
 		this.localIndex = localIndex;
+		this.reference = reference;
 		
 	}
 	/**
@@ -75,11 +83,13 @@ public class FormIndex {
 	 * @param localIndex An integer index into a flat list of elements
 	 * @param instanceIndex An integer index expressing the multiplicity
 	 * of the current level
+	 * @param reference A reference to the instance element identified by this index;
 	 * 
 	 */
-	public FormIndex(int localIndex, int instanceIndex) {
+	public FormIndex(int localIndex, int instanceIndex,TreeReference reference) {
 		this.localIndex = localIndex;
 		this.instanceIndex = instanceIndex;
+		this.reference = reference;
 	}
 	
 	/** 
@@ -88,10 +98,11 @@ public class FormIndex {
 	 * 
 	 * @param nextLevel An index into the referenced element's index
 	 * @param localIndex An index to an element at the current level, a child
-	 * element of which will be referenced by the nextLevel index. 
+	 * element of which will be referenced by the nextLevel index.
+	 * @param reference A reference to the instance element identified by this index; 
 	 */
-	public FormIndex(FormIndex nextLevel, int localIndex) {
-		this(localIndex);
+	public FormIndex(FormIndex nextLevel, int localIndex,TreeReference reference) {
+		this(localIndex, reference);
 		this.nextLevel = nextLevel;
 	}
 
@@ -106,10 +117,12 @@ public class FormIndex {
 			this.nextLevel = nextLevel.nextLevel;
 			this.localIndex = nextLevel.localIndex;
 			this.instanceIndex = nextLevel.instanceIndex;
+			this.reference = nextLevel.reference;
 		} else {
 			this.nextLevel = nextLevel;
 			this.localIndex = currentLevel.getLocalIndex();
 			this.instanceIndex = currentLevel.getInstanceIndex();
+			this.reference = currentLevel.reference;
 		}
 	}
 	
@@ -123,9 +136,10 @@ public class FormIndex {
 	 * element of which will be referenced by the nextLevel index.
 	 * @param instanceIndex How many times the element referenced has been 
 	 * repeated.
+	 * @param reference A reference to the instance element identified by this index;
 	 */
-	public FormIndex(FormIndex nextLevel, int localIndex, int instanceIndex) {
-		this(nextLevel, localIndex);
+	public FormIndex(FormIndex nextLevel, int localIndex, int instanceIndex, TreeReference reference) {
+		this(nextLevel, localIndex, reference);
 		this.instanceIndex = instanceIndex;
 	}
 
@@ -146,14 +160,42 @@ public class FormIndex {
 	public int getInstanceIndex() {
 		return instanceIndex;
 	}
+	
+	/**
+	 * For the fully qualified element, get the multiplicity of the element's reference
+	 * @return The terminal element (fully qualified)'s instance index
+	 */
+	public int getElementMultiplicity() {
+		return getTerminal().instanceIndex;
+	}
 
 	/**
 	 * @return An index into the next level of specificity past the current context. An
-	 * example would be an index into an element that is a child of the element referenced
+	 * example would be an index to a parent element of the element referenced
 	 * by the local index. 
 	 */
 	public FormIndex getNextLevel() {
 		return nextLevel;
+	}
+	
+	public TreeReference getLocalReference() {
+		return reference;
+	}
+	
+	/**
+	 * @return The TreeReference of the fully qualified element described by this
+	 * FormIndex.
+	 */
+	public TreeReference getReference() {
+		return getTerminal().reference;
+	}
+	
+	public FormIndex getTerminal() {
+		FormIndex walker = this;
+		while(walker.nextLevel != null) {
+			walker = walker.nextLevel;
+		}
+		return walker;
 	}
 	
 	/**
@@ -170,10 +212,6 @@ public class FormIndex {
 	
 	public boolean isBeginningOfFormIndex() {
 		return beginningOfForm;
-	}
-	
-	public void setNextLevel (FormIndex next) {
-		this.nextLevel = next;
 	}
 	
 	public boolean equals(Object o) {
@@ -277,8 +315,38 @@ public class FormIndex {
 	 * @return Only the local component of this Form Index.
 	 */
 	public FormIndex snip() {
-		FormIndex retval = new FormIndex(localIndex, instanceIndex);
+		FormIndex retval = new FormIndex(localIndex, instanceIndex,reference);
 		return retval;
+	}
+
+	/**
+	 * Takes in a form index which is a subset of this index, and returns the 
+	 * total difference between them. This is useful for stepping up the level
+	 * of index specificty. If the subIndex is not a valid subIndex of this index,
+	 * null is returned. Since the FormIndex represented by null is always a subset,
+	 * if null is passed in as a subIndex, the full index is returned
+	 * 
+	 * For example:
+	 * Indices
+	 * a = 1_0,2,1,3
+	 * b = 1,3
+	 * 
+	 * a.diff(b) = 1_0,2
+	 *  
+	 * @param subIndex
+	 * @return
+	 */
+	public FormIndex diff(FormIndex subIndex) {
+		if(subIndex == null) {
+			return this;
+		}
+		if(!isSubIndex(this,subIndex)) {
+			return null;
+		}
+		if(subIndex.equals(this)) {
+			return null;
+		}
+		return new FormIndex(nextLevel.diff(subIndex),this.snip());
 	}
 
 	public String toString() {
@@ -310,6 +378,17 @@ public class FormIndex {
 		}
 	}
 	
+	public static boolean isSubIndex(FormIndex parent, FormIndex child) {
+		if(child.equals(parent)) {
+			return true;
+		} else {
+			if(parent == null) {
+				return false;
+			}
+			return isSubIndex(parent.nextLevel, child);
+		}
+	}
+	
 	public static boolean isSubElement(FormIndex parent, FormIndex child) {
 		while(!parent.isTerminal() && !child.isTerminal()) {
 			if(parent.getLocalIndex() != child.getLocalIndex()) {
@@ -338,4 +417,5 @@ public class FormIndex {
 		//Barring all of these cases, it should be true.
 		return true;
 	}
+	
 }

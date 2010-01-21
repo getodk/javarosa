@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.view.clforms.widgets;
+package org.javarosa.view.singlequestionscreen.widgets;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -24,10 +24,12 @@ import org.javarosa.barcode.acquire.BarcodeCaptureScreen;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.formmanager.view.FormElementBinding;
-import org.javarosa.formmanager.view.clforms.acquire.AcquireScreen;
-import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquiringQuestionScreen;
 import org.javarosa.j2me.services.BarcodeCaptureService;
+
+import de.enough.polish.ui.Style;
 
 /**
  * @author mel
@@ -41,23 +43,11 @@ public class BarcodeQuestionWidget extends AcquiringQuestionScreen {
 	protected TextField tf;
 	protected BarcodeCaptureService barcodeProcessor;
 
-	public BarcodeQuestionWidget(FormElementBinding question) {
-		super(question);
+	public BarcodeQuestionWidget(FormEntryPrompt prompt, String groupName, Style style) {
+		super(prompt, groupName,style);
 	}
 
-	public BarcodeQuestionWidget(FormElementBinding prompt, int num) {
-		super(prompt, num);
-	}
-
-	public BarcodeQuestionWidget(FormElementBinding prompt, String str) {
-		super(prompt, str);
-	}
-
-	public BarcodeQuestionWidget(FormElementBinding prompt, char c) {
-		super(prompt, c);
-	}
-
-	public void creatView() {
+	public void createView() {
 
 		//#if javarosa.usepolishlocalisation
 		//setHint(Locale.get("hint.TypeOrScan"));

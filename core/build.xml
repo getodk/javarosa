@@ -3,10 +3,11 @@
 	<property name="name" value="javarosa-libraries"/>
 	<property name="version" value="v0.9"/>
 	<property name="jar" value="${name}_${version}.jar"/>
+	<property name="dir.lib" value="../lib/"/>
 	<target name="init" description="set classpath and make needed directories">
 		<mkdir dir="lib/"/>
 		<path id="classpath">
-			<fileset dir="../lib/" includes="*.jar"/>
+			<fileset dir="${dir.lib}" includes="*.jar"/>
 		</path>
 		<mkdir dir="bin/"/>
 		<mkdir dir="dist/"/>

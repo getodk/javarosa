@@ -26,10 +26,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.IDataReference;
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -225,16 +224,12 @@ public class QuestionDataGroupTests extends TestCase {
 		final MutableBoolean dispatchedWrong = new MutableBoolean(false);
 		ITreeVisitor sampleVisitor = new ITreeVisitor() {
 			
-			public void visit(DataModelTree tree) {
+			public void visit(FormInstance tree) {
 				dispatchedWrong.setValue(true);
 
 			}
 			public void visit(TreeElement element) {
 				visitorAccepted.setValue(true);
-			}
-			public void visit(IFormDataModel dataModel) {
-				dispatchedWrong.setValue(true);
-
 			}
 		};
 		
@@ -257,7 +252,8 @@ public class QuestionDataGroupTests extends TestCase {
 		boolean added = false;
 		try {
 			group.addChild(stringElement);
-			assertTrue("Added element was not in Question Data Group's children!",group.getChildren().contains(stringElement));
+			group.getChildAt(0);
+			assertTrue("Added element was not in Question Data Group's children!",group.getChildAt(0).equals(stringElement));
 		} 
 		catch(RuntimeException e) {
 			if(!added) {
@@ -265,12 +261,10 @@ public class QuestionDataGroupTests extends TestCase {
 			}
 		}
 		
-		added=false;
-		//threw = false;
 		try {
 			TreeElement leafGroup = new TreeElement("leaf group");
-			added = true;
-			group.getChildren().contains(leafGroup);
+			group.addChild(leafGroup);
+			assertTrue("Added element was not in Question Data Group's children",group.getChildAt(1).equals(leafGroup));
 		}
 		catch (RuntimeException e) {
 			if(!added) {

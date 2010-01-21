@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.javarosa.patient"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>

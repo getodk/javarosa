@@ -16,14 +16,13 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.TextField;
-import de.enough.polish.ui.UiAccess;
 
 public class NumericEntryWidget extends TextEntryWidget {
 	private boolean isDecimal;
@@ -37,11 +36,11 @@ public class NumericEntryWidget extends TextEntryWidget {
 		this.isDecimal = dec;
 	}
 	
-	protected Item getEntryWidget (QuestionDef question) {
+	protected Item getEntryWidget (FormEntryPrompt prompt) {
 		TextField tf = textField();
 		tf.setConstraints(isDecimal ? TextField.DECIMAL : TextField.NUMERIC);
 		//UiAccess.setInputMode(tf,UiAccess.MODE_NUMBERS);
-		return super.getEntryWidget(question);
+		return super.getEntryWidget(prompt);
 	}
 
 	protected void setWidgetValue (Object o) {

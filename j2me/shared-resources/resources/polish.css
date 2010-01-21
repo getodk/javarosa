@@ -10,6 +10,31 @@
   * need to be specified in such polish.css files. 
   */
 
+/**
+  * the colors which are defined in
+  * the colors section can later be referenced.
+  * This makes changes easy, since the color
+  * just needs to be changed in one position.
+  * Even default colors (like blue, green, lime, etc)
+  * can be changed here. 
+  */
+
+colors {
+	fontColor: rgb( 30, 85, 86 );
+	focusedFontColor: #000;
+	bgColor:  #eee;
+	focusedBgColor:  #fff;
+	focusedBackground: yellow;
+	borderColor: fontColor;
+	focusedBorderColor: focusedFontColor;
+	menubarColor: rgb( 240, 240, 240 );
+	menubottombarColor: rgb( 210, 210, 210 );
+	oldQuestionColor: #E2E2E2;	
+	overlay: argb( 150, 255, 255, 255 );
+	buttonBgColor: #ffeecc;
+	requiredColor: 	#FF7F50;
+	requiredColorFocus: #DC143C;
+}
 
 .loginView {
 	background {
@@ -26,48 +51,47 @@
 /**
  * Cell-Life specific styles!
  */
-.CL_Forms_Form{
+.View_All_Form{
 	padding: 2;
 	background-color: gray;
 	screen-change-animation: particle;
 	layout: bottom | horizontal-center;	
 }
 
-
-.nextQuestion{
+.OneQPS_Form{
+	padding: 2;
+	background-color: gray;
 	screen-change-animation: right;
-	background-color: gray;
-	right-screen-change-animation-speed: 8; 
-    right-screen-change-animation-move-previous: true; 
-	
+	layout: bottom | horizontal-center;
+	always-include: true;
 }
 
-.prevQuestion{
+.OneQPS_Form_Right extends OneQPS_Form {
+	screen-change-animation: right;
+	always-include: true;
+}
+
+.OneQPS_Form_Left extends OneQPS_Form {
 	screen-change-animation: left;
-	background-color: gray;
-	left-screen-change-animation-speed: 8;  
-    left-screen-change-animation-move-previous: true; 
-	
+	always-include: true;
 }
 
-
-fromViewAnswers
-{
-	screen-change-animation: particle;
-	background-color: gray;
-	
+.OneQPS_Form_Flash extends OneQPS_Form {
+	screen-change-animation: flash;
+	always-include: true;
 }
 
+.OneQPS_Compulsory extends OneQPS_Form {
+	background-color: requiredColor;
+	layout: left | expand;
+	focused-style: focusHighlight
+}
 
-/**
-  * the colors which are defined in
-  * the colors section can later be referenced.
-  * This makes changes easy, since the color
-  * just needs to be changed in one position.
-  * Even default colors (like blue, green, lime, etc)
-  * can be changed here. 
-  */
-
+focusHighlight extends focused {
+	background-color: requiredColorFocus;
+	font-color: white;
+}
+	
 .buttonfocused {
 	font-color: black;
 	font-style: bold;
@@ -88,21 +112,18 @@ fromViewAnswers
 	focused-style: buttonfocused;
 	background-color: buttonBgColor;
 }
-  
-colors {
-	fontColor: rgb( 30, 85, 86 );
-	focusedFontColor: #000;
-	bgColor:  #eee;
-	focusedBgColor:  #fff;
-	focusedBackground: yellow;
-	borderColor: fontColor;
-	focusedBorderColor: focusedFontColor;
-	menubarColor: rgb( 240, 240, 240 );
-	menubottombarColor: rgb( 210, 210, 210 );
-	oldQuestionColor: #E2E2E2;	
-	overlay: argb( 150, 255, 255, 255 );
-	buttonBgColor: #ffeecc;
+
+.groupName {
+	font-color: black;
+	font-style: italic;
+	background {
+		type: round-rect;
+		arc: 9;
+		color: buttonBgColor;
+
+	}
 }
+  
 
 title {
 	padding: 1;

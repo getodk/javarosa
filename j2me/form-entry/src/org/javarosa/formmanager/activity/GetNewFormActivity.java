@@ -49,7 +49,7 @@
 //
 ////TODO: This class needs to be pulled out of this project (Or at least the part that is dependent
 ////      on the io.file library that isn't available on a large number of phones)
-//public class GetNewFormActivity implements IActivity, CommandListener {
+//public class GetNewFormActivity implements State, CommandListener {
 //
 //	public static final String FILENAME_KEY = "filename";
 //	
