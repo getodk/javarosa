@@ -10,10 +10,8 @@ import java.util.Enumeration;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
-import org.javarosa.core.services.storage.IStorageUtility;
-import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.services.transport.UnrecognizedResponseException;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
-import org.javarosa.user.api.RegisterUserState;
 import org.javarosa.user.model.User;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.io.KXmlSerializer;
@@ -26,17 +24,15 @@ import org.xmlpull.v1.XmlSerializer;
 public class HttpUserRegistrationTranslator implements UserRegistrationTranslator<SimpleHttpTransportMessage>{
 	
 	User user;
-	RegisterUserState s;
-	IStorageUtility userStorage;
+	String registrationUrl;
 
-	public HttpUserRegistrationTranslator(User user, RegisterUserState s, IStorageUtility userStorage) {
+	public HttpUserRegistrationTranslator(User user, String registrationUrl) {
 		this.user = user;
-		this.s = s;
-		this.userStorage = userStorage;
+		this.registrationUrl = registrationUrl;
 	}
 	
-	public SimpleHttpTransportMessage getUserRegistrationMessage() {
-		return s.buildHttpMesage(getStreamFromRegistration(createXmlRegistrationDoc(user)));
+	public SimpleHttpTransportMessage getUserRegistrationMessage() throws IOException {
+		return new SimpleHttpTransportMessage(getStreamFromRegistration(createXmlRegistrationDoc(user)),registrationUrl);
 	}
 	
 	private InputStream getStreamFromRegistration(Document registration) {
@@ -56,7 +52,7 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 
 	}
 
-	public boolean readResponse(SimpleHttpTransportMessage message) {
+	public User readResponse(SimpleHttpTransportMessage message) throws UnrecognizedResponseException {
 		String body = message.getResponseBody();
 		KXmlParser parser = new KXmlParser();
 		try {
@@ -64,18 +60,22 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
 			Document response = new Document();
 			response.parse(parser);
-			readResponseDocument(response);
-			return true;
+			return readResponseDocument(response);
 		} catch (XmlPullParserException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Error Parsing Server Response to User Registration!");
+		    throw new UnrecognizedResponseException("Invalid XML Received from Server!");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error Parsing Server Response to User Registration!");
 		}
 	}
 	
-	private void readResponseDocument(Document response) {
+	/**
+	 * 
+	 * @param response
+	 * @return
+	 */
+	private User readResponseDocument(Document response) throws UnrecognizedResponseException {
 		boolean updates = false;
 		for(int i = 0; i < response.getChildCount(); ++i) {
 			Object o = response.getChild(i);
@@ -100,14 +100,7 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 				}
 			}
 		}
-		if(updates) {
-			try {
-				userStorage.write(user);
-			} catch (StorageFullException e) {
-				e.printStackTrace();
-				throw new RuntimeException("User Storage is full! Trying to update user based on registration response from server!");
-			}
-		}
+		return user;
 	}
 	
 	private Document createXmlRegistrationDoc(User u) {

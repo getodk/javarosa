@@ -89,6 +89,7 @@ public class User implements Persistable, Restorable
 		else
 			System.out.println("while creating user, an invalid isAAdmin variable was passed in: options are \"STANDARD\" or \"ADMINSUER\" or \"USERTYPE1\"");
 		this.id = id;
+		this.uniqueId = String.valueOf(id);
 	}
 
 	///fetch the value for the default user and password from the RMS

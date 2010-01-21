@@ -284,6 +284,8 @@ id=Namba
 user.registration.title=User Registration
 user.registration.attempt=Contacting Server to Register User...
 user.registration.failmessage=User registration couldn't be completed, server couldn't be contacted. Retry attempt?
+user.registration.success=User Succesfully Registered!
+user.registration.badresponse=User Registration Received, but Response Couldn't be Recognized. Continue?
 
 command.retry=Retry
 command.cancel=Cancel
