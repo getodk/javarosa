@@ -1,0 +1,140 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:jr="http://openrosa.org/javarosa">
+  <h:head>
+    <h:meta name="name" content="demo" />
+    <h:meta name="version" content="0.1" />
+    <h:title>Demo Form</h:title>
+
+    <model>
+      <instance>
+        <patient>
+          <form-id>4523534653252</form-id>
+          <first-name>DREW</first-name>
+          <last-name>ROOS</last-name>
+          <date-of-birth>1983-10-06</date-of-birth>
+          <sex>m</sex>
+          <pregnant />
+          <number-of-children/>
+          <favorite-foods>ice-cream ugali</favorite-foods>
+          <address />
+        </patient>
+      </instance>
+
+      <bind nodeset="first-name" required="true()" />
+      <bind nodeset="last-name" required="true()" />
+      <bind nodeset="date-of-birth" type="xsd:date" constraint=". &lt;= today()" jr:constraintMsg="Date of birth cannot be in future" />
+      <bind nodeset="pregnant" relevant="/patient/sex = 'f'" />
+      <bind nodeset="number-of-children" type="xsd:int" constraint=". &lt;= 20" jr:constraintMsg="# children must be less than 20" />
+
+      <itext>
+        <translation lang="English">
+          <text id="q1">
+            <value>First Name</value>
+          </text>
+          <text id="q2">
+            <value>Last Name</value>
+          </text>
+          <text id="sex">
+            <value>Sex</value>
+          </text>
+          <text id="m">
+            <value>Male</value>
+          </text>
+          <text id="f">
+            <value>Female</value>
+          </text>
+        </translation>
+
+        <translation lang="Swahili" default="">
+          <text id="q1">
+            <value>Jina</value>
+          </text>
+          <text id="q2">
+            <value>Jina 2</value>
+          </text>
+          <text id="sex">
+            <value>Jinsia</value>
+          </text>
+          <text id="m">
+            <value>Kiume</value>
+          </text>
+          <text id="f">
+            <value>Kike</value>
+          </text>
+        </translation>
+      </itext>
+      
+    </model>
+  </h:head>
+  <h:body>
+
+    <input ref="first-name">
+      <label ref="jr:itext('q1')"/>
+    </input>
+
+    <input ref="last-name">
+      <label ref="jr:itext('q2')"/>
+    </input>
+
+    <input ref="date-of-birth">
+      <label>Date of Birth</label>
+    </input>
+
+    <select1 ref="sex">
+      <label ref="jr:itext('sex')"/>
+
+      <item>
+        <label ref="jr:itext('m')"/>
+        <value>m</value>
+      </item>
+      <item>
+        <label ref="jr:itext('f')"/>
+        <value>f</value>
+      </item>
+    </select1>
+
+    <select1 ref="pregnant">
+      <label>Pregnant</label>
+
+      <item>
+        <label>Yes</label>
+        <value>y</value>
+      </item>
+      <item>
+        <label>No</label>
+        <value>n</value>
+      </item>
+    </select1>
+
+    <input ref="number-of-children">
+      <label># Children</label>
+    </input>
+
+    <select ref="favorite-foods">
+      <label>Likes foods</label>
+
+      <item>
+        <label>Ice cream</label>
+        <value>ice-cream</value>
+      </item>
+      <item>
+        <label>Mishkaki</label>
+        <value>mishkaki</value>
+      </item>
+      <item>
+        <label>Ugali</label>
+        <value>ugali</value>
+      </item>
+     </select>
+
+    <input ref="address">
+      <label>Address</label>
+    </input>
+
+
+
+  </h:body>
+</h:html>
