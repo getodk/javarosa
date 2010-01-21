@@ -337,7 +337,7 @@ package org.javarosa.demo.activity.savedformlist;
 //					data.getRecordId(), true)) {
 //				// Do Nothing if already sent
 //			} else {
-//				// June 29, 2009 - csimsdimagi.com
+//				// June 29, 2009 - csims@dimagi.com
 //				// This model list code is legacy, but I'm adding this hack to allow
 //				// it to send data with the multiple screen again.
 //				XFormSerializingVisitor visitor = new XFormSerializingVisitor();

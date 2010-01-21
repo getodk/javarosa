@@ -98,7 +98,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		UiAccess.setStyle(this);
     	}
     	
-    	//22 Jan, 2009 - csimsdimagi.com
+    	//22 Jan, 2009 - csims@dimagi.com
     	//This constructor code supresses the ability to scroll the chatterbox by dragging the mouse
     	//pointer. This "Feature" was causing tons of problems for our nurses. Let me know if anyone else
     	//wants to make this a customizable inclusion.
@@ -322,12 +322,12 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     			int index = questionIndexes.indexOf(activeQuestionIndex, true);
     			ChatterboxWidget widget = (ChatterboxWidget)get(index);
     		
-    			//Feb 4, 2009 - csimsdimagi.com
+    			//Feb 4, 2009 - csims@dimagi.com
     			//The current widget's header should always be pinned in case it overruns the
     			//screen with options
-    			//Feb 9, 2009 - csimsdimagi.com
+    			//Feb 9, 2009 - csims@dimagi.com
     			//behaves strangely with the 3110c sized screens. Disabling for now.
-    			//Feb 20, 2009 - csimsdimagi.com
+    			//Feb 20, 2009 - csims@dimagi.com
     			//Tweaked a bunch of settings, should be fine for ~90% of our use cases now, if it's
     			//causing problems, set the polish flag.
     			//#if chatterbox.pinning.current != false

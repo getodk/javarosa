@@ -33,7 +33,7 @@ import de.enough.polish.ui.Style;
  * of conflicting changes in new Polish versions with this code. I have outlined
  * the latest versions of polish in which the changes appear to work.
  * 
- * Questions should be directed to csimsdimagi.com
+ * Questions should be directed to csims@dimagi.com
  * 
  * @author Clayton Sims
  * @date Feb 16, 2009 
