@@ -24,6 +24,7 @@ import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.user.model.User;
 import org.javarosa.user.view.UserForm;
@@ -140,6 +141,7 @@ public class UserValidator {
 						.getString());
 			}
 		}
+		user.setUuid(PropertyUtils.genGUID(25));
 		return user;
 	}
 	

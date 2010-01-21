@@ -3,8 +3,6 @@
  */
 package org.javarosa.user.api;
 
-import java.io.InputStream;
-
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.user.api.transitions.RegisterUserTransitions;
 import org.javarosa.user.model.User;
@@ -18,7 +16,7 @@ public abstract class RegisterUserState implements RegisterUserTransitions {
 	
 	User user;
 	
-	public RegisterUserState(User u) {
+	public RegisterUserState(User user) {
 		this.user = user;
 	}
 	
@@ -29,11 +27,10 @@ public abstract class RegisterUserState implements RegisterUserTransitions {
 	}
 	
 	protected RegisterUserController<SimpleHttpTransportMessage> getController () {
-		throw new RuntimeException();
-		//return new RegisterUserController<SimpleHttpTransportMessage>(new HttpUserRegistrationTranslator(user), this);
+		return new RegisterUserController<SimpleHttpTransportMessage>(new HttpUserRegistrationTranslator(user,getRegistrationURL()));
 	}
 
-	public abstract SimpleHttpTransportMessage buildHttpMesage(InputStream payloadStream);
+	public abstract String getRegistrationURL();
 	
 	
 }

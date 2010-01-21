@@ -3,9 +3,11 @@
  */
 package org.javarosa.user.transport;
 
-import java.io.DataInputStream;
+import java.io.IOException;
 
 import org.javarosa.services.transport.TransportMessage;
+import org.javarosa.services.transport.UnrecognizedResponseException;
+import org.javarosa.user.model.User;
 
 /**
  * @author ctsims
@@ -13,7 +15,7 @@ import org.javarosa.services.transport.TransportMessage;
  */
 public interface UserRegistrationTranslator<M extends TransportMessage> {
 	
-	public M getUserRegistrationMessage();
+	public M getUserRegistrationMessage() throws IOException;
 	
-	public boolean readResponse(M message);
+	public User readResponse(M message) throws UnrecognizedResponseException;
 }
