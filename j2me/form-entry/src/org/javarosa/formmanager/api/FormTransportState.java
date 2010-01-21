@@ -10,7 +10,6 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
 
 import org.javarosa.core.api.State;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.formmanager.api.transitions.FormTransportStateTransitions;
 import org.javarosa.formmanager.utility.FormSender;
 import org.javarosa.formmanager.view.transport.FormTransportSubmitStatusScreen;
