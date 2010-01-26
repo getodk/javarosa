@@ -86,14 +86,13 @@ public class CaseManagementController implements CommandListener {
 		} else {
 			caption = Localization.get(locKey);
 		}
-		
 		return caption;
 	}
 	
 	private void addOption (int action) {
 		String caption = captionForAction(action);
 		indexMapping.addElement(new Integer(action));
-		view.insert(action, caption, null);
+		view.append(caption, null);
 	}
 
 	public void commandAction(Command c, Displayable arg1) {

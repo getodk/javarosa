@@ -198,12 +198,14 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 				//can work correctly. We should address the ways in which this sucks, probably by
 				//storing everything as a serialized value and deserializing and transforming at
 				//preload time.
-				Object value = kid.getValue().getValue();
-				if(value instanceof Vector) {
-					value = kid.getValue();
+				if (kid.getValue() != null) {
+					Object value = kid.getValue().getValue();
+					if (value instanceof Vector) {
+						value = kid.getValue();
+					}
+
+					c.setProperty(vname, value);
 				}
-				
-				c.setProperty(vname,value);
 			}
 		}
 		commit(c);
