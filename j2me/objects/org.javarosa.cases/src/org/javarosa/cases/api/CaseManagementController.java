@@ -82,7 +82,7 @@ public class CaseManagementController implements CommandListener {
 
 		String caption;
 		if (action == ICaseType.ACTION_REFERRALS) {
-			caption = Localization.get(locKey, new String[] {String.valueOf(PatientReferralUtil.getNumberOfOpenReferralsByType(type.getCaseTypeId()))});			
+			caption = Localization.get(locKey, new String[] {String.valueOf(PatientReferralUtil.getNumberOfOpenReferralsByType(null))});			
 		} else {
 			caption = Localization.get(locKey);
 		}
