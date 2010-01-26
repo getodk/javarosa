@@ -241,7 +241,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 					throw new MalformedCaseModelException("Invalid <open> model. Required element (referral_types) is missing.","<referral>");
 				}
 				String typeString = (String)serializer.serializeAnswerData(((TreeElement)types.elementAt(0)).getValue());
-				Vector referralTypeList = DateUtils.split(typeString, " ", false);
+				Vector referralTypeList = DateUtils.split(typeString, " ", true);
 				for(int ir = 0; ir < referralTypeList.size(); ++ir) {
 					String referralType = (String)referralTypeList.elementAt(ir);
 					PatientReferral r = new PatientReferral(referralType, date, referralId, c.getCaseId(), followup);
