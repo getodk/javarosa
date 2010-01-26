@@ -22,11 +22,11 @@ public class PatientReferralUtil {
 		return pending;
 	}
 	
-	public static int getNumberOfOpenReferralsByType(String caseTypeId) {
-		final String internalid = caseTypeId;
+	//how did this ever work? ref.getType() is the referral type, yet we're comparing it against the case type
+	public static int getNumberOfOpenReferralsByType(final String caseTypeId) {
 		return getNumberOfOpenReferrals(new IPatientReferralFilter() {
 			public boolean inFilter(PatientReferral ref) {
-				return ref.getType().equals(internalid);
+				return caseTypeId == null || ref.getType().equals(caseTypeId);
 			}
 		});
 	}

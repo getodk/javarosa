@@ -70,9 +70,9 @@ public class ReferralEntity extends Entity<PatientReferral> {
 	 */
 	public String[] getHeaders(boolean detailed) {
 		if(detailed) {
-			return new String[] {"ID", "Type", "Date"};
+			return new String[] {"ID", "Type", "Created", "Due"};
 		} else {
-			return new String[] {"ID", "Type", "Date"};
+			return new String[] {"ID", "Type", "Due"};
 		}
 	}
 
@@ -80,14 +80,16 @@ public class ReferralEntity extends Entity<PatientReferral> {
 	 * @see org.javarosa.entity.model.IEntity#getShortFields()
 	 */
 	public String[] getShortFields() {
-		return new String[] {id, type, DateUtils.formatDate(dateCreated, DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY)};
+		return new String[] {id, type, DateUtils.formatDate(dateDue, DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY)};
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.javarosa.entity.model.IEntity#getLongFields(java.lang.Object)
 	 */
 	public String[] getLongFields(PatientReferral r) {
-		return getShortFields();
+		return new String[] {id, type,
+				DateUtils.formatDate(dateCreated, DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY),
+				DateUtils.formatDate(dateDue, DateUtils.FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY)};
 	}
 
 	/* (non-Javadoc)
