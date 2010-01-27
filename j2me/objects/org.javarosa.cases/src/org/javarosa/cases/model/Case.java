@@ -30,7 +30,7 @@ import java.util.Vector;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
@@ -215,8 +215,8 @@ public class Case implements Persistable, Restorable, IMetaData {
 		return data.get(key);
 	}
 
-	public DataModelTree exportData() {
-		DataModelTree dm = RestoreUtils.createDataModel(this);
+	public FormInstance exportData() {
+		FormInstance dm = RestoreUtils.createDataModel(this);
 		RestoreUtils.addData(dm, "case-id", id);
 		RestoreUtils.addData(dm, "case-type-id", typeId);
 		RestoreUtils.addData(dm, "name", name);
@@ -237,7 +237,7 @@ public class Case implements Persistable, Restorable, IMetaData {
 		return "case";
 	}
 
-	public void importData(DataModelTree dm) {
+	public void importData(FormInstance dm) {
 		id = (String)RestoreUtils.getValue("case-id", dm);
 		typeId = (String)RestoreUtils.getValue("case-type-id", dm);		
 		name = (String)RestoreUtils.getValue("name", dm);		
@@ -250,7 +250,7 @@ public class Case implements Persistable, Restorable, IMetaData {
         //XFormAnswerDataSerializer s = new XFormAnswerDataSerializer();
         TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));
         for (int i = 0; i < e.getNumChildren(); i++) {
-        	TreeElement child = (TreeElement)e.getChildren().elementAt(i);
+        	TreeElement child = e.getChildAt(i);
         	String name = child.getName();
         	int dataType = ((Integer)RestoreUtils.getValue("other/"+name+"/type", dm)).intValue();
         	String flatval = (String)RestoreUtils.getValue("other/"+ name+"/data", dm);
@@ -268,7 +268,7 @@ public class Case implements Persistable, Restorable, IMetaData {
         }
 	}
 
-	public void templateData(DataModelTree dm, TreeReference parentRef) {
+	public void templateData(FormInstance dm, TreeReference parentRef) {
 		RestoreUtils.applyDataType(dm, "case-id", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "case-type-id", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "name", parentRef, String.class);

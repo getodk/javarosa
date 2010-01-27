@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Hashtable;
 
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
@@ -163,8 +163,8 @@ public class PatientReferral implements Persistable, Restorable, IMetaData {
 		return "referral";
 	}
 
-	public DataModelTree exportData() {
-		DataModelTree dm = RestoreUtils.createDataModel(this);
+	public FormInstance exportData() {
+		FormInstance dm = RestoreUtils.createDataModel(this);
 		RestoreUtils.addData(dm, "type", type);	
 		RestoreUtils.addData(dm, "created", createdOn);	
 		RestoreUtils.addData(dm, "due", dueOn);	
@@ -175,7 +175,7 @@ public class PatientReferral implements Persistable, Restorable, IMetaData {
 		return dm;
 	}
 
-	public void templateData(DataModelTree dm, TreeReference parentRef) {
+	public void templateData(FormInstance dm, TreeReference parentRef) {
 		RestoreUtils.applyDataType(dm, "type", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "created", parentRef, Date.class);
 		RestoreUtils.applyDataType(dm, "due", parentRef, Date.class);
@@ -184,7 +184,7 @@ public class PatientReferral implements Persistable, Restorable, IMetaData {
 		RestoreUtils.applyDataType(dm, "pending", parentRef, Boolean.class);
 	}
 
-	public void importData(DataModelTree dm) {
+	public void importData(FormInstance dm) {
 		type = (String)RestoreUtils.getValue("type", dm);
 		createdOn = (Date)RestoreUtils.getValue("created", dm);
 		dueOn = (Date)RestoreUtils.getValue("due", dm);

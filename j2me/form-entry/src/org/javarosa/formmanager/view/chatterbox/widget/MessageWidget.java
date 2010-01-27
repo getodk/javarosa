@@ -17,10 +17,8 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
-import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
@@ -35,7 +33,7 @@ public class MessageWidget implements IWidgetStyleEditable {
 		reset();
 	}
 
-	public void initWidget (IFormElement element, Container c) {
+	public void initWidget (FormEntryPrompt fep, Container c) {
 		//#style container
 		UiAccess.setStyle(c); //it is dubious whether this works properly; Chatterbox.babysitStyles() takes care of this for now
 		
@@ -48,13 +46,8 @@ public class MessageWidget implements IWidgetStyleEditable {
 		c.add(ok);
 	}
 
-	public void refreshWidget (FormElementBinding bind, int changeFlags) {
-		if(!(bind.element instanceof QuestionDef)) {
-			throw new IllegalArgumentException("element passed to refreshWidget that is not a QuestionDef");
-		}
-		
-		String caption = bind.form.fillTemplateString(((QuestionDef)bind.element).getLongText(), bind.instanceRef);
-		prompt.setText(caption);
+	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
+		prompt.setText(fep.getLongText());
 	}
 
 	public IAnswerData getData () {

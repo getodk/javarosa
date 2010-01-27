@@ -18,6 +18,8 @@ package org.javarosa.formmanager.view.chatterbox.extendedwidget;
 
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryCaption;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.table.VaccinationTable;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget;
@@ -43,7 +45,7 @@ public class ImmunizationWidget extends ExpandedWidget {
 		container.add(table);
 	}
 
-	protected Item getEntryWidget(QuestionDef question) {
+	protected Item getEntryWidget(FormEntryPrompt prompt) {
 		return container;
 	}
 
@@ -59,7 +61,7 @@ public class ImmunizationWidget extends ExpandedWidget {
 		}
 	}
 
-	protected void updateWidget(QuestionDef question) {
+	protected void updateWidget(FormEntryPrompt prompt) {
 	}
 	
 

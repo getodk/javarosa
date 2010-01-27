@@ -29,7 +29,7 @@ import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -225,7 +225,7 @@ public class QuestionDataGroupTests extends TestCase {
 		final MutableBoolean dispatchedWrong = new MutableBoolean(false);
 		ITreeVisitor sampleVisitor = new ITreeVisitor() {
 			
-			public void visit(DataModelTree tree) {
+			public void visit(FormInstance tree) {
 				dispatchedWrong.setValue(true);
 
 			}

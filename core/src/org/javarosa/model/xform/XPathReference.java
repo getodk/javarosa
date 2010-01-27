@@ -37,7 +37,7 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
  * 
  */
 public class XPathReference implements IDataReference {
-	private TreeReference ref;	
+	private TreeReference ref;
 	private String nodeset;
 	
 	public XPathReference () {

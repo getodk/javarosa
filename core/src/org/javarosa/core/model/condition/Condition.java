@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -59,17 +58,17 @@ public class Condition extends Triggerable {
 		this.targets = targets;
 	}
 	
-	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
+	public Object eval (FormInstance model, EvaluationContext evalContext) {
 		return new Boolean(expr.eval(model, evalContext));
 	}
 	
-	public boolean evalBool (IFormDataModel model, EvaluationContext evalContext) {
+	public boolean evalBool (FormInstance model, EvaluationContext evalContext) {
 		return ((Boolean)eval(model, evalContext)).booleanValue();
 	}
 	
-	public void apply (TreeReference ref, Object rawResult, IFormDataModel model, FormDef f) {
+	public void apply (TreeReference ref, Object rawResult, FormInstance model, FormDef f) {
 		boolean result = ((Boolean)rawResult).booleanValue();
-		performAction(((DataModelTree)model).resolveReference(ref), result ? trueAction : falseAction);
+		performAction(model.resolveReference(ref), result ? trueAction : falseAction);
 	}
 
 	public boolean canCascade () {

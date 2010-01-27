@@ -16,10 +16,7 @@
 
 package org.javarosa.formmanager.view.transport;
 
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;

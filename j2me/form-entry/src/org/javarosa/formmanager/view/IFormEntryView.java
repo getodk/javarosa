@@ -16,6 +16,8 @@
 
 package org.javarosa.formmanager.view;
 
+import org.javarosa.core.model.FormIndex;
+
 
 /**
  * 
@@ -36,4 +38,10 @@ public interface IFormEntryView {
 	public void destroy ();
 	
 	public void show();
+
+	/**
+	 * Show the form and set the focus to the specified index.
+	 * @param index
+	 */
+	public void show(FormIndex index);
 }

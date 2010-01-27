@@ -38,9 +38,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  */
 public class GroupDef implements IFormElement, Localizable {
 	private Vector children;	/** A list of questions on a group. */	
-	private boolean repeat;
+	private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
 	private int id;	/** The group number. */
-	private String name;	/** The name of the group. */
 	private IDataReference binding;	/** reference to a location in the model to store data in */
 	
 	private String longText;
@@ -55,11 +54,10 @@ public class GroupDef implements IFormElement, Localizable {
 	public IDataReference count = null;
 	
 	public GroupDef () {
-		this(Constants.NULL_ID, null, null, false);
+		this(Constants.NULL_ID, null, false);
 	}
 	
-	public GroupDef(int id, String name, Vector children, boolean repeat) {
-		setTitle(name);
+	public GroupDef(int id, Vector children, boolean repeat) {
 		setID(id);
 		setChildren(children);
 		setRepeat(repeat);
@@ -74,14 +72,6 @@ public class GroupDef implements IFormElement, Localizable {
 		this.id = id;
 	}
 	
-	public String getTitle() {
-		return name;
-	}
-
-	public void setTitle(String name) {
-		this.name = name;
-	}
-
 	public IDataReference getBind() {
 		return binding;
 	}
@@ -110,6 +100,9 @@ public class GroupDef implements IFormElement, Localizable {
 		}
 	}
 	
+	/**
+	 * @return true if this represents a <repeat> element
+	 */
 	public boolean getRepeat () {
 		return repeat;
 	}
@@ -126,6 +119,9 @@ public class GroupDef implements IFormElement, Localizable {
 		this.longText = longText;
 	}
 
+    /**
+     * @return the iText id for the long text
+     */
     public String getLongTextID () {
         return longTextID;
     }
@@ -145,6 +141,9 @@ public class GroupDef implements IFormElement, Localizable {
 		this.shortText = shortText;
 	}
 
+    /**
+     * @return the iText id for the short text
+     */
     public String getShortTextID () {
         return shortTextID;
     }
@@ -197,7 +196,7 @@ public class GroupDef implements IFormElement, Localizable {
     }
 	
 	public String toString() {
-		return getTitle();
+		return "<group>";
 	}
 	/*
 	 * (non-Javadoc)
@@ -215,7 +214,6 @@ public class GroupDef implements IFormElement, Localizable {
 	/** Reads a group definition object from the supplied stream. */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
-		setTitle((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setBind((IDataReference)ExtUtil.read(dis, new ExtWrapTagged(), pf));
 		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
@@ -235,7 +233,6 @@ public class GroupDef implements IFormElement, Localizable {
 	/** Write the group definition object to the supplied stream. */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		ExtUtil.writeNumeric(dos, getID());
-		ExtUtil.write(dos, new ExtWrapNullable(getTitle()));
 		ExtUtil.write(dos, new ExtWrapTagged(getBind()));
 		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
