@@ -52,6 +52,7 @@ public class CaseTypeEntityFilter extends EntityFilter<Case> {
 	 * @see org.javarosa.entity.util.IEntityFilter#isPermitted(org.javarosa.entity.model.IEntity)
 	 */
 	public boolean matches(Case c) {
+		
 		//OK, so I'll admit this -2 thing isn't good.
 		if(userId != -2) {
 			

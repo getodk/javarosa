@@ -16,7 +16,6 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;

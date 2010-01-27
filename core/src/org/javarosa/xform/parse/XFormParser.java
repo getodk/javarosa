@@ -703,9 +703,6 @@ public class XFormParser {
 		group.setBind(dataRef);
 		if (group.getRepeat()) {
 			repeats.addElement((TreeReference)dataRef.getReference());
-		}
-		
-		if (group.getRepeat()) {
 			//group.startEmpty = (e.getAttributeValue(NAMESPACE_JAVAROSA, "startEmpty") != null); //TODO: still may need this but for alternate purpose, e.g., startWithN
 			group.noAddRemove = (e.getAttributeValue(NAMESPACE_JAVAROSA, "noAddRemove") != null);
 			String countRef = e.getAttributeValue(NAMESPACE_JAVAROSA, "count");

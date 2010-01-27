@@ -20,7 +20,6 @@ import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
@@ -31,7 +30,7 @@ import org.javarosa.formmanager.view.IQuestionWidget;
  * This class gives you all the information you need to display a question when
  * your current FormIndex references a QuestionEvent.
  * 
- * 
+ * @author Yaw Anokwa
  */
 public class FormEntryPrompt extends FormEntryCaption {
 
@@ -41,9 +40,14 @@ public class FormEntryPrompt extends FormEntryCaption {
      * This empty constructor exists for convenience of any supertypes of this prompt
      */
     protected FormEntryPrompt() {
-    	
     }
     
+    /**
+	 * Creates a FormEntryPrompt for the element at the given index in the form.
+	 * 
+	 * @param form
+	 * @param index
+	 */
     public FormEntryPrompt(FormDef form, FormIndex index) {
         super(form, index);
         if (!(element instanceof QuestionDef))
@@ -51,16 +55,13 @@ public class FormEntryPrompt extends FormEntryCaption {
         this.mTreeElement = form.getInstance().resolveReference(index.getReference());
     }
 
-
     public int getControlType() {
         return getQuestion().getControlType();
     }
 
-
     public int getDataType() {
         return mTreeElement.dataType;
     }
-
 
     // attributes available in the bind, instance and body
     public String getPromptAttributes() {
@@ -68,36 +69,29 @@ public class FormEntryPrompt extends FormEntryCaption {
         return null;
     }
 
-
     public IAnswerData getAnswerValue() {
         return mTreeElement.getValue();
     }
-
 
     public String getAnswerText() {
         return mTreeElement.getValue().getDisplayText();
     }
 
-
     public String getConstraintText() {
         return mTreeElement.getConstraint().constraintMsg;
     }
-
 
     public Vector<SelectChoice> getSelectChoices() {
         return getQuestion().getChoices();
     }
 
-
     public String getHelpText() {
         return getQuestion().getHelpText();
     }
 
-
     public boolean isRequired() {
         return mTreeElement.required;
     }
-
 
     public boolean isReadOnly() {
         return !mTreeElement.isEnabled();
@@ -106,7 +100,6 @@ public class FormEntryPrompt extends FormEntryCaption {
     public QuestionDef getQuestion() {
     	return (QuestionDef)element;
     }
-    
     
     //==== observer pattern ====//
     

@@ -18,7 +18,6 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.util.Date;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.form.api.FormEntryPrompt;
