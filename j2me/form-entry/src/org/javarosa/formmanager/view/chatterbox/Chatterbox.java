@@ -153,7 +153,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	//Mode 1: Read only review screen.
     	//TODO: READONLY FLAG!
     	if(false) {
-    		while(controller.stepToNextEvent() != FormEntryController.END_OF_FORM_EVENT) {
+    		while(controller.stepToNextEvent() != FormEntryController.EVENT_END_OF_FORM) {
     			//TODO: Anything?
     		}
     	} else if(null != null) { //TODO: Starting from a specific question
@@ -217,9 +217,9 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     
     private void step(int event) {
     	switch(event) {
-    	case FormEntryController.BEGINNING_OF_FORM_EVENT:
+    	case FormEntryController.EVENT_BEGINNING_OF_FORM:
     		break;
-    	case FormEntryController.END_OF_FORM_EVENT:
+    	case FormEntryController.EVENT_END_OF_FORM:
     		formComplete();
     		break;
     		default:

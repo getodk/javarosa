@@ -46,7 +46,7 @@ public class FormSummaryView extends List {
 		FormDef form = model.getForm();
 		while (!index.isEndOfFormIndex()) {
 			if (index.isInForm() && model.isRelevant(index)) {
-				if (model.getEvent(index) == FormEntryController.QUESTION_EVENT) {
+				if (model.getEvent(index) == FormEntryController.EVENT_QUESTION) {
 					FormEntryPrompt prompt = model.getQuestionPrompt(index);
 					String styleName = getStyleName(prompt);
 					String line = prompt.getLongText() + " => ";

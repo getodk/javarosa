@@ -322,15 +322,23 @@ public class DateUtils {
 	private static String formatDaysFromToday(DateFields f) {
 		String daysAgoStr = "";
 		Date d = DateUtils.getDate(f);
-		double daysAgo = DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d);
+		int daysAgo = DateUtils.daysSinceEpoch(new Date()) - DateUtils.daysSinceEpoch(d);
 		
-		if(daysAgo >= 0 && daysAgo < 1) { return Localization.get("date.today");} 
-		else if(daysAgo >= 1 && daysAgo < 2) { Localization.get("date.yesterday");}
-		else if(daysAgo >= 2 && daysAgo < 3) { return Localization.get("date.twoago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
-		else if(daysAgo >= 2 && daysAgo <= 6) { return Localization.get("date.nago",new String[] {String.valueOf((int)Math.ceil(daysAgo))});}
-		else if(daysAgo < 0 && daysAgo >= -1) { return Localization.get("date.tomorrow");} 
-		else if(daysAgo < -1 && daysAgo >= -6) { return Localization.get("date.nfromnow",new String[] {String.valueOf((int)Math.ceil(-daysAgo))});}
-		return DateUtils.formatDate(f, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
+		if (daysAgo == 0) {
+			return Localization.get("date.today");
+		} else if (daysAgo == 1) {
+			return Localization.get("date.yesterday");
+		} else if (daysAgo == 2) {
+			return Localization.get("date.twoago", new String[] {String.valueOf(daysAgo)});
+		} else if (daysAgo > 2 && daysAgo <= 6) {
+			return Localization.get("date.nago", new String[] {String.valueOf(daysAgo)});
+		} else if (daysAgo == -1) {
+			return Localization.get("date.tomorrow");
+		} else if (daysAgo < -1 && daysAgo >= -6) {
+			return Localization.get("date.nfromnow", new String[] {String.valueOf(-daysAgo)});
+		} else {
+			return DateUtils.formatDate(f, DateUtils.FORMAT_HUMAN_READABLE_SHORT);
+		}
 	}
 	
 	/* ==== DATE OPERATIONS ==== */

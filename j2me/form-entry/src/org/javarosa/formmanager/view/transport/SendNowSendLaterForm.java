@@ -19,15 +19,18 @@ package org.javarosa.formmanager.view.transport;
 import javax.microedition.lcdui.Choice;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.Spacer;
 
 import org.javarosa.core.services.locale.Localization;
 
-public class SendNowSendLaterForm extends Form {
+import de.enough.polish.ui.FramedForm;
+
+public class SendNowSendLaterForm extends FramedForm {
 	private ChoiceGroup cg;
 
+	private boolean seenKeyPressed = false;
+	
 	public static final int SEND_NOW_DEFAULT = 0;
 	public static final int SEND_LATER = 1;
 	public static final int SEND_NOW_SPEC = 2;
@@ -62,5 +65,20 @@ public class SendNowSendLaterForm extends Form {
 	public int getCommandChoice() {
 		return this.cg.getSelectedIndex();
 	}
-
+	
+	// fix bug in polish 2.1.0 (and possibly earlier) where keydown event answers the last question
+	// in the form, and the keyup event from the same button press is passed to this view, automatically
+	// selecting 'send now'
+	//
+    public void keyPressed(int keyCode) {
+    	super.keyPressed(keyCode);
+    	seenKeyPressed = true;
+    }
+    //
+    public void keyReleased(int keyCode) {
+    	if (seenKeyPressed) {
+    		super.keyReleased(keyCode);
+    	}
+    }
+    //////
 }

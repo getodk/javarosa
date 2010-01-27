@@ -16,7 +16,6 @@
 
 package org.javarosa.formmanager.utility;
 
-import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -27,7 +26,6 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
-import org.javarosa.core.util.externalizable.DeserializationException;
 
 public class FormDefFetcher {
 	IFormDefRetrievalMethod fetcher;
