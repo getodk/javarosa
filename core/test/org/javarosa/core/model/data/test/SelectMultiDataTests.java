@@ -24,6 +24,7 @@ import j2meunit.framework.TestSuite;
 import java.util.Vector;
 
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
@@ -49,23 +50,17 @@ public class SelectMultiDataTests extends TestCase {
 		super.setUp();
 		
 		question = new QuestionDef();
-		question.setID(57);
 		
-		OrderedHashtable oh = new OrderedHashtable();
-		Vector v = new Vector();
 		for (int i = 0; i < 4; i++) {
-			oh.put("Selection" + i, "Selection " + i);
-			v.addElement(new Boolean(false));
+			question.addSelectChoice(new SelectChoice("Selection" + i, "Selection " + i, false));
 		}	
-		question.setSelectItemIDs(oh, v, null);
-		question.localizeSelectMap(null);
 				
-		one = new Selection("Selection1");
-		one.attachQuestionDef(question);
-		two = new Selection("Selection2");
-		two.attachQuestionDef(question);
-		three = new Selection("Selection3");
-		three.attachQuestionDef(question);
+		one = new Selection("Selection 1");
+		one.attachChoice(question);
+		two = new Selection("Selection 2");
+		two.attachChoice(question);
+		three = new Selection("Selection 3");
+		three.attachChoice(question);
 		
 		firstTwo = new Vector();
 		firstTwo.addElement(one);
