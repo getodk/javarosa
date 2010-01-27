@@ -180,8 +180,14 @@ public class DateUtils {
 	public static Date parseDateTime (String str) {
 		DateFields fields = new DateFields();
 		int i = str.indexOf("T");
-		if (!parseDate(str.substring(0, i), fields) || !parseTime(str.substring(i + 1), fields)) {
-			return null;
+		if (i != -1) {
+			if (!parseDate(str.substring(0, i), fields) || !parseTime(str.substring(i + 1), fields)) {
+				return null;
+			}
+		} else {
+			if (!parseDate(str, fields)) {
+				return null;
+			}
 		}
 		return getDate(fields);
 	}

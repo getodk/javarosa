@@ -7,9 +7,9 @@ import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.DataModelTree;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
@@ -29,6 +29,7 @@ import org.javarosa.patient.PatientModule;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.resources.locale.LanguageUtils;
+import org.javarosa.services.transport.TransportManagerModule;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.user.activity.UserModule;
@@ -87,6 +88,7 @@ public class JRDemoContext {
 			forms.write(XFormUtils.getFormFromResource("/condtest.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/imci.xml"));
+			forms.write(XFormUtils.getFormFromResource("/PhysicoChemTestsDemo.xhtml"));
 		} catch (StorageFullException e) {
 			throw new RuntimeException("uh-oh, storage full [forms]"); //TODO: handle this
 		}
@@ -98,13 +100,20 @@ public class JRDemoContext {
 		new CoreModelModule().registerModule();
 		new XFormsModule().registerModule();
 		new LanguagePackModule().registerModule();
+		new TransportManagerModule().registerModule();
 		new UserModule().registerModule();
 		new PatientModule().registerModule();
 		new FormManagerModule().registerModule();
+		new LanguagePackModule().registerModule();
 	}
 	
 	
 	private void addCustomLanguages() {
+		Localization.registerLanguageFile("Afrikaans", "./messages_afr.txt");
+		Localization.registerLanguageFile("Dari", "./messages_dari.txt");
+		Localization.registerLanguageFile("Espagnol", "./messages_es.txt");
+		Localization.registerLanguageFile("Swahili", "./messages_sw.txt");
+		Localization.registerLanguageFile("English", "./messages_en.txt");		
 	}
 	
 	private void setProperties() {

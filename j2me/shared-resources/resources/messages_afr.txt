@@ -104,6 +104,7 @@ view.sending.SubmissionFailed=Submissie gefaal! Probeer om die vorm later te stu
 view.sending.SubmissionTakingLong=Submissie duur tamelik lank; bekyk status of herstuur die vorm later onder \'Hersien Gestoorde Vorms\'
 view.sending.SubmissionErrorUnknown=Onbekenste fout, vorm nie gestuur nie!
 view.sending.CompulsoryQuestionsIncomplete=Daar is verpligtende vrae wat nie beantwoord is nie. Vrae wat met * begin more beantwoord wees.
+view.sending.CompulsoryQuestionIncomplete=Hierdie vraag is verpligtend. Please answer dit om voort te gaan.
 view.sending.FormUneditable=Vorm is nie uitgeebaar nie.
 view.sending.RequiredQuestion=Required question; You must answer
 view.sending.of=of

@@ -17,45 +17,52 @@
 package org.javarosa.patient.entry.activity;
 
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.instance.DataModelTree;
-import org.javarosa.core.model.utils.IModelProcessor;
+import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.utils.IInstanceProcessor;
+import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.FormEntryState;
-import org.javarosa.formmanager.controller.FormEntryController;
+import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
-import org.javarosa.formmanager.view.chatterbox.util.ChatterboxFactory;
 
 public abstract class PatientEntryState extends FormEntryState {
 	protected String singleRegForm = "jr-patient-single-reg";
 	protected String batchRegForm = "jr-patient-batch-reg";
 
 	protected String formName;
-	protected IModelProcessor processor;
-	
-	public PatientEntryState () {
+	protected IInstanceProcessor processor;
+
+	public PatientEntryState() {
 		this(new PatientEntryModelProcessor());
 	}
-	
-	public PatientEntryState (IModelProcessor processor) {
+
+	public PatientEntryState(IInstanceProcessor processor) {
 		this(processor, false);
 	}
-	
-	public PatientEntryState (IModelProcessor processor, boolean batchMode) {
+
+	public PatientEntryState(IInstanceProcessor processor, boolean batchMode) {
 		this.formName = (batchMode ? batchRegForm : singleRegForm);
 		this.processor = processor;
 	}
-	
-	protected FormEntryController getController() {
-		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(formName), null);
-		return new FormEntryController(new ChatterboxFactory(), fetcher, false);
+
+	protected JrFormEntryController getController() {
+		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(
+				formName), null);
+		return new JrFormEntryController(new FormEntryModel(fetcher.getFormDef()));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.formmanager.api.transitions.FormEntryTransitions#formEntrySaved(org.javarosa.core.model.FormDef, org.javarosa.core.model.instance.DataModelTree, boolean)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.formmanager.api.transitions.FormEntryTransitions#formEntrySaved
+	 * (org.javarosa.core.model.FormDef,
+	 * org.javarosa.core.model.instance.FormInstance, boolean)
 	 */
-	public void formEntrySaved(FormDef form, DataModelTree instanceData, boolean formWasCompleted) {
+	public void formEntrySaved(FormDef form, FormInstance instanceData,
+			boolean formWasCompleted) {
 		if (formWasCompleted) {
-			processor.processModel(instanceData);
+			processor.processInstance(instanceData);
 			onward(instanceData.getID());
 		} else {
 			abort();
@@ -66,6 +73,6 @@ public abstract class PatientEntryState extends FormEntryState {
 		throw new RuntimeException("transition not applicable");
 	}
 
-	public abstract void onward (int recID);
+	public abstract void onward(int recID);
 
 }

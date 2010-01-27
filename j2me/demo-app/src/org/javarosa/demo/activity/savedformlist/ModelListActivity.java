@@ -42,7 +42,7 @@ package org.javarosa.demo.activity.savedformlist;
 //import org.javarosa.core.api.IShell;
 //import org.javarosa.core.api.IView;
 //import org.javarosa.core.model.FormDef;
-//import org.javarosa.core.model.instance.DataModelTree;
+//import org.javarosa.core.model.instance.FormInstance;
 //import org.javarosa.core.model.storage.DataModelTreeMetaData;
 //import org.javarosa.core.model.storage.DataModelTreeRMSUtility;
 //import org.javarosa.core.model.storage.FormDefRMSUtility;
@@ -232,7 +232,7 @@ package org.javarosa.demo.activity.savedformlist;
 //				.elementAt(getSelectedIndex());
 //		ITransportManager transportManager = JavaRosaServiceProvider.instance()
 //				.getTransportManager();
-//		DataModelTree model = new DataModelTree();
+//		FormInstance model = new FormInstance();
 //		
 //		try {
 //			
@@ -317,7 +317,7 @@ package org.javarosa.demo.activity.savedformlist;
 //		while (en.hasMoreElements()) {
 //			DataModelTreeMetaData data = (DataModelTreeMetaData) en
 //					.nextElement();
-//			DataModelTree model = new DataModelTree();
+//			FormInstance model = new FormInstance();
 //			ITransportManager tm = JavaRosaServiceProvider.instance()
 //					.getTransportManager();
 //			try {
@@ -393,7 +393,7 @@ package org.javarosa.demo.activity.savedformlist;
 //		System.out.println("Form retrieve OK\nAttempt retreive model: "
 //				+ data.getRecordId());
 //		// #endif
-//		DataModelTree formData = new DataModelTree();
+//		FormInstance formData = new FormInstance();
 //		
 //		// TODO: why no exception handling here?
 //		this.dataModelRMSUtility.retrieveFromRMS(data.getRecordId(), formData);
@@ -426,7 +426,7 @@ package org.javarosa.demo.activity.savedformlist;
 //		System.out.println("Form retrieve OK\nAttempt retreive model: "
 //				+ data.getRecordId());
 //		// #endif
-//		DataModelTree formData = new DataModelTree();
+//		FormInstance formData = new FormInstance();
 //		this.dataModelRMSUtility.retrieveFromRMS(data.getRecordId(), formData);
 //		selectedForm.setTitle(this.formDefRMSUtility.getName(data
 //				.getFormIdReference()));

@@ -23,11 +23,10 @@ import java.util.Vector;
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
-import org.javarosa.core.model.IFormDataModel;
-import org.javarosa.core.model.instance.DataModelTree;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.utils.IDataModelSerializingVisitor;
+import org.javarosa.core.model.utils.IInstanceSerializingVisitor;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
 import org.javarosa.core.services.transport.payload.DataPointerPayload;
 import org.javarosa.core.services.transport.payload.IDataPayload;
@@ -39,7 +38,7 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 
 /**
- * A visitor-esque class which walks a DataModelTree and constructs an XML document
+ * A visitor-esque class which walks a FormInstance and constructs an XML document
  * containing its instance.
  *
  * The XML node elements are constructed in a depth-first manner, consistent with
@@ -48,7 +47,7 @@ import org.kxml2.kdom.Node;
  * @author Clayton Sims
  *
  */
-public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
+public class XFormSerializingVisitor implements IInstanceSerializingVisitor {
 
 	/** The XML document containing the instance that is to be returned */
 	Document theXmlDoc;
@@ -67,17 +66,17 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 		dataPointers = new Vector();
 	}
 
-	public byte[] serializeDataModel(IFormDataModel model, FormDef formDef) throws IOException {
+	public byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException {
 		init();
 		this.schema = formDef;
-		return serializeDataModel(model);
+		return serializeInstance(model);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.utils.IDataModelSerializingVisitor#serializeDataModel(org.javarosa.core.model.IFormDataModel)
+	 * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#serializeDataModel(org.javarosa.core.model.IFormDataModel)
 	 */
-	public byte[] serializeDataModel(IFormDataModel model) throws IOException {
+	public byte[] serializeInstance(FormInstance model) throws IOException {
 		init();
 		if(this.serializer == null) {
 			this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
@@ -91,7 +90,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 		}
 	}
 	
-	public IDataPayload createSerializedPayload	(IFormDataModel model) throws IOException {
+	public IDataPayload createSerializedPayload	(FormInstance model) throws IOException {
 		init();
 		if(this.serializer == null) {
 			this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
@@ -118,19 +117,9 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.utils.IDataModelVisitor#visit(org.javarosa.core.model.IFormDataModel)
-	 */
-	public void visit(IFormDataModel dataModel) {
-		if(dataModel instanceof DataModelTree) {
-			this.visit((DataModelTree)dataModel);
-		}
-	}
-	
-	/*
-	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.utils.ITreeVisitor#visit(org.javarosa.core.model.DataModelTree)
 	 */
-	public void visit(DataModelTree tree) {
+	public void visit(FormInstance tree) {
 		theXmlDoc = new Document();
 		TreeElement root = tree.getRoot();
 		if (root != null) {
@@ -178,7 +167,7 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 			//make sure all children of the same tag name are written en bloc
 			Vector childNames = new Vector();
 			for (int i = 0; i < instanceNode.getNumChildren(); i++) {
-				String childName = ((TreeElement)instanceNode.getChildren().elementAt(i)).getName();
+				String childName = instanceNode.getChildAt(i).getName();
 				if (!childNames.contains(childName))
 					childNames.addElement(childName);
 			}
@@ -210,13 +199,13 @@ public class XFormSerializingVisitor implements IDataModelSerializingVisitor {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.javarosa.core.model.utils.IDataModelSerializingVisitor#setAnswerDataSerializer(org.javarosa.core.model.IAnswerDataSerializer)
+	 * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#setAnswerDataSerializer(org.javarosa.core.model.IAnswerDataSerializer)
 	 */
 	public void setAnswerDataSerializer(IAnswerDataSerializer ads) {
 		this.serializer = ads;
 	}
 	
-	public IDataModelSerializingVisitor newInstance() {
+	public IInstanceSerializingVisitor newInstance() {
 		XFormSerializingVisitor modelSerializer = new XFormSerializingVisitor();
 		modelSerializer.setAnswerDataSerializer(this.serializer);
 		return modelSerializer;

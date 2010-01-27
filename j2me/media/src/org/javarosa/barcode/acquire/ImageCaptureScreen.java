@@ -29,8 +29,8 @@ import javax.microedition.media.control.GUIControl;
 import javax.microedition.media.control.VideoControl;
 
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.formmanager.view.clforms.acquire.AcquireScreen;
-import org.javarosa.formmanager.view.clforms.acquire.AcquiringQuestionScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquiringQuestionScreen;
 
 public abstract class ImageCaptureScreen extends AcquireScreen implements CommandListener {
 
@@ -111,7 +111,7 @@ public abstract class ImageCaptureScreen extends AcquireScreen implements Comman
 	}
 
 	/* (non-Javadoc)
-	 * @see org.javarosa.formmanager.view.clforms.acquire.AcquireScreen#getSetCallingScreenDataCommand()
+	 * @see org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen#getSetCallingScreenDataCommand()
 	 */
 	protected Command getSetCallingScreenDataCommand() {
 		if (takePictureCommand == null)

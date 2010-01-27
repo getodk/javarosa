@@ -47,7 +47,7 @@ public class MetaPreloadHandler implements IPreloadHandler {
 	 * @see org.javarosa.core.model.utils.IPreloadHandler#preloadHandled()
 	 */
 	public String preloadHandled() {
-		return "meta";
+		return "context";
 	}
 
 }

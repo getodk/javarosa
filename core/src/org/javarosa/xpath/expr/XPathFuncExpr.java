@@ -26,9 +26,9 @@ import java.util.Vector;
 
 import me.regexp.RE;
 
-import org.javarosa.core.model.IFormDataModel;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -99,7 +99,7 @@ public class XPathFuncExpr extends XPathExpression {
 		ExtUtil.write(out, new ExtWrapListPoly(v));
 	}
 	
-	public Object eval (IFormDataModel model, EvaluationContext evalContext) {
+	public Object eval (FormInstance model, EvaluationContext evalContext) {
 		String name = id.toString();
 		Object[] argVals = new Object[args.length];
 		
@@ -383,7 +383,7 @@ public class XPathFuncExpr extends XPathExpression {
 		}	
 	}
 
-	public static Double sum (IFormDataModel model, Object o) {
+	public static Double sum (FormInstance model, Object o) {
 		if (o instanceof Vector) {
 			Vector v = (Vector)o;
 			double sum = 0.0;
