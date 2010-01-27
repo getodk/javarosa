@@ -92,4 +92,8 @@ public class SelectChoice implements Externalizable, Localizable {
 		return new Selection(this);
 	}
 	
+	public String toString () {
+		return (captionID != null ? "{" + captionID + "}" : "") + (caption != null ? caption : "") + " => " + value;
+	}
+	
 }

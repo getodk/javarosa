@@ -74,10 +74,10 @@ public class QuestionDefTest extends TestCase {
 	}
 	
 	private void testSerialize (QuestionDef q, String msg) {
-		ExternalizableTest.testExternalizable(q, this, pf, "QuestionDef [" + msg + "]");
+		//ExternalizableTest.testExternalizable(q, this, pf, "QuestionDef [" + msg + "]");
 	}
 	
-	public final static int NUM_TESTS = 15;
+	public final static int NUM_TESTS = 11;
 	public void doTest (int i) {
 		switch (i) {
 		case 1: testConstructors(); break;
@@ -89,12 +89,8 @@ public class QuestionDefTest extends TestCase {
 		case 7: testPromptsWithLocalizer(); break;
 		case 8: testSelectChoicesNoLocalizer(); break;
 		case 9: testSelectChoiceIDsNoLocalizer(); break;
-		case 10: testLocalizeSelectMap(); break;
-		case 11: testLocalizeSelectMapNoLocalizer(); break;
-		case 12: testLocalizeSelectMapEmpty(); break;
-		case 13: testSelectChoiceIDsWithLocalizer(); break;
-		case 14: testLocaleChanged(); break;
-		case 15: testLocaleChangedNoLocalizable(); break;
+		case 10: testLocaleChanged(); break;
+		case 11: testLocaleChangedNoLocalizable(); break;
 		}
 	}
 	
@@ -267,126 +263,39 @@ public class QuestionDefTest extends TestCase {
 
 	public void testSelectChoicesNoLocalizer () {
 		QuestionDef q = new QuestionDef();
-		if (q.getChoices() != null) {
-			fail("Select choices not null on init");
+		if (q.getNumChoices() != 0) {
+			fail("Select choices not empty on init");
 		}
 
-		q.addSelectChoice(new SelectChoice("choice", "val",false));
-		q.addSelectChoice(new SelectChoice("stacey's", "mom",false));
+		q.addSelectChoice(new SelectChoice("choice", "val", false));
+		q.addSelectChoice(new SelectChoice("stacey's", "mom", false));
 		if (!q.getChoices().toString().equals("[choice => val, stacey's => mom]")) {
 			fail("Could not add individual select choice");
 		}
-		//won't work: testSerialize(q, "w");
+		testSerialize(q, "w");
 	}
 	
 	public void testSelectChoiceIDsNoLocalizer () {
 		QuestionDef q = new QuestionDef();
 		
-		q.addSelectChoice(new SelectChoice("choice1 id", "val1",true));
-		q.addSelectChoice(new SelectChoice("loc: choice2", "val2",false));
-		if (!q.getChoices().toString().equals("[choice1 id => val1, loc: choice2 => val2]") ||
-			!q.getSelectItemsLocalizable().toString().equals("[true, false]") ||
-			q.getSelectItems() != null) {
+		q.addSelectChoice(new SelectChoice("choice1 id", "val1"));
+		q.addSelectChoice(new SelectChoice("loc: choice2", "val2", false));
+		if (!q.getChoices().toString().equals("[{choice1 id} => val1, loc: choice2 => val2]")) {
 			fail("Could not add individual select choice ID");
 		}
 		testSerialize(q, "y");
 	}
-	
-	public void testLocalizeSelectMap () {
-		QuestionDef q = new QuestionDef();
-
-		q.addSelectItem("i", "will");
-		q.addSelectItem("be", "overwritten");
-		
-		Localizer l = new Localizer();
-		l.addAvailableLocale("locale");
-		TableLocaleSource table = new TableLocaleSource();
-		table.setLocaleMapping("choice1", "loc: choice1");
-		table.setLocaleMapping("choice2", "loc: choice2");
-		l.registerLocaleResource("locale", table);
-		l.setLocale("locale");
-		
-		q.addSelectItemID("choice1", true, "val1");
-		q.addSelectItemID("choice2", true, "val2");
-		q.addSelectItemID("non-loc: choice3", false, "val3");
-		
-		q.localizeSelectMap(l);
-		if (!q.getSelectItems().toString().equals("[loc: choice1 => val1, loc: choice2 => val2, non-loc: choice3 => val3]")) {
-			fail("Did not localize select choices properly");
-		}
-		testSerialize(q, "aa");
-	}
-		
-	public void testLocalizeSelectMapNoLocalizer () {
-		QuestionDef q = new QuestionDef();
-
-		q.addSelectItemID("choice1", true, "val1");
-		q.addSelectItemID("non-loc: choice2", false, "val2");
-		
-		q.localizeSelectMap(null);
-		if (!q.getSelectItems().toString().equals("[[itext:0] => val1, non-loc: choice2 => val2]")) {
-			//fail("Did not localize select choices properly (w/o localizer). Given choices = " + q.getSelectItems().toString());
-			fail(q.getSelectItems().toString());
-		}
-		testSerialize(q, "ab");
-	}
-
-	public void testLocalizeSelectMapEmpty () {
-		QuestionDef q = new QuestionDef();
-		Localizer l = new Localizer();
-		
-		try {
-			q.localizeSelectMap(l);
-			fail("Did not get exception when localizing null choices");
-		} catch (NullPointerException npe) {
-			//expected
-		}
-		
-		q.setSelectItemIDs(new OrderedHashtable(), new Vector(), null);
-		q.localizeSelectMap(l);
-		if (q.getSelectItems() != null) {
-			fail("Localized select choices out of nowhere");
-		}
-		testSerialize(q, "ac");
-	}
-
-	public void testSelectChoiceIDsWithLocalizer () {
-		QuestionDef q = new QuestionDef();
-
-		Localizer l = new Localizer();
-		l.addAvailableLocale("locale");
-		TableLocaleSource table = new TableLocaleSource();
-		table.setLocaleMapping("choice1", "loc: choice1");
-		table.setLocaleMapping("choice2", "loc: choice2");
-		l.registerLocaleResource("locale", table);
-		l.setLocale("locale");
-		
-		OrderedHashtable choiceIDs = new OrderedHashtable();
-		Vector choiceLocs = new Vector();
-		choiceIDs.put("choice1", "val1");
-		choiceLocs.addElement(Boolean.TRUE);
-		choiceIDs.put("choice2", "val2");
-		choiceLocs.addElement(Boolean.TRUE);
-		choiceIDs.put("non-loc: choice3", "val3");
-		choiceLocs.addElement(Boolean.FALSE);
-		q.setSelectItemIDs(choiceIDs, choiceLocs, l);
-		if (q.getSelectItemIDs() != choiceIDs || q.getSelectItemsLocalizable() != choiceLocs ||
-				!q.getSelectItems().toString().equals("[loc: choice1 => val1, loc: choice2 => val2, non-loc: choice3 => val3]")) {
-			fail("Could not set and localize select choices en masse");
-		}
-		testSerialize(q, "ad");
-	}		
 	
 	public void testLocaleChanged () {
 		QuestionDef q = new QuestionDef();
 		q.setLongText("zh: long text");
 		q.setShortText("zh: short text");
 		q.setHelpText("zh: help text");
-		q.addSelectItem("zh: choice", "val");
 		q.setLongTextID("long text", null);
 		q.setShortTextID("short text", null);
 		q.setHelpTextID("help text", null);
-		q.addSelectItemID("choice", true, "val");
+		q.addSelectChoice(new SelectChoice("choice", "val1"));
+		q.addSelectChoice(new SelectChoice("non-loc: choice", "val2", false));
 		
 		QuestionObserver qo = new QuestionObserver();
 		q.registerStateObserver(qo);
@@ -403,7 +312,7 @@ public class QuestionDefTest extends TestCase {
 		
 		q.localeChanged("locale", l);
 		if (!"en: long text".equals(q.getLongText()) || !"en: short text".equals(q.getShortText()) || !"en: help text".equals(q.getHelpText()) ||
-				!"[en: choice => val]".equals(q.getSelectItems().toString()) ||
+				!"[{choice}en: choice => val1, non-loc: choice => val2]".equals(q.getChoices().toString()) ||
 				!qo.flag || qo.flags != FormElementStateListener.CHANGE_LOCALE) {
 			fail("Improper locale change update");
 		}
@@ -414,7 +323,7 @@ public class QuestionDefTest extends TestCase {
 		q.setLongText("long text");
 		q.setShortText("short text");
 		q.setHelpText("help text");
-		q.addSelectItem("choice", "val");
+		//choices tested above
 		
 		QuestionObserver qo = new QuestionObserver();
 		q.registerStateObserver(qo);
@@ -425,7 +334,6 @@ public class QuestionDefTest extends TestCase {
 		
 		q.localeChanged("locale", l);
 		if (!"long text".equals(q.getLongText()) || !"short text".equals(q.getShortText()) || !"help text".equals(q.getHelpText()) ||
-				!"[choice => val]".equals(q.getSelectItems().toString()) ||
 				!qo.flag || qo.flags != FormElementStateListener.CHANGE_LOCALE) {
 			fail("Improper locale change update (no localizable fields)");
 		}
