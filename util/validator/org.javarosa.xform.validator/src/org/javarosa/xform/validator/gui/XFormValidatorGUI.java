@@ -105,7 +105,7 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 	private final String JAD_START = new String("MIDlet-Name: JavaRosaFormTest\nMIDlet-Version: 0.0.1\n" +
 			"MIDlet-Vendor: OpenRosa Consortium\nMIDlet-Jar-URL: JavaRosaFormTest.jar\nMIDlet-Jar-Size: ");
 	private final String JAD_FINISH = new String("\nMIDlet-Info-URL: http://code.dimagi.com/JavaRosa/\n" + 
-			"MIDlet-1: JavaRosaFormTest,,org.javarosa.shellformtest.midlet.JavaRosaFormTestMidlet");
+			"MIDlet-1: JavaRosaFormTest,,org.javarosa.shellformtest.midlet.JRFormTestMidlet");
 	
 	private final int BUFFER = 2048;
 	private final int TF_SIZE = 70;
