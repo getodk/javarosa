@@ -140,9 +140,9 @@ public class FormOverview {
 	}
 	
 	private static void printChoices (QuestionDef q, int indent, StringBuffer sb) {
-		println(sb, indent, "Choices: " + q.getSelectItems().size());
-		for (Enumeration e = q.getSelectItems().keys(); e.hasMoreElements(); ) {
-			println(sb, indent + 1, "\"" + (String)e.nextElement() + "\"");
+		println(sb, indent, "Choices: " + q.getNumChoices());
+		for (int i = 0; i < q.getNumChoices(); i++) {
+			println(sb, indent + 1, "\"" + q.getChoice(i).getCaption() + "\"");
 		}
 	}
 	
@@ -163,7 +163,7 @@ public class FormOverview {
 		if (property.equals("relevant")) {
 			action = Condition.ACTION_SHOW;
 			conditionHeader = "Relevant if";
-			absolute = instanceNode.relevant;
+			absolute = instanceNode.isRelevant();
 			absoluteReportable = false;
 			absoluteHeader = "Never relevant";
 		} else if (property.equals("required")) {

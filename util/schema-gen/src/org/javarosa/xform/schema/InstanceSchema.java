@@ -95,7 +95,7 @@ public class InstanceSchema {
 			ct.addChild(Node.ELEMENT, seq);
 			
 			for (int i = 0; i < node.getNumChildren(); i++) {
-				Element child = schemizeInstance((TreeElement)node.getChildren().elementAt(i));
+				Element child = schemizeInstance((TreeElement)node.getChildAt(i));
 				if (child != null) {
 					seq.addChild(Node.ELEMENT, child);
 				}

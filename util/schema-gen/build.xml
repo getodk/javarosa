@@ -2,10 +2,11 @@
 <project name="form-translator" default="compile">
 	
 	<property name="base.dir" location="." />
-	<property name="build.dir" location="target" />
+	<property name="root.dir" location="../../" />
+	<property name="lib.dir" location="${root.dir}/lib/" />
+	<property name="build.dir" location="build" />
 	<property name="build.debug" value="on" />
 	<property name="build.deprecation" value="on" />
-	<property name="lib.classes" value="${base.dir}/lib.classes" />
 
 	<target name="init">
 		<tstamp/>
@@ -23,9 +24,9 @@
 	<target name="jar" depends="javac">
 		<jar jarfile="${build.dir}/form_translate.jar">
 			<zipfileset dir="${build.dir}/classes" prefix="" />
-			<zipfileset src="${base.dir}/lib/kxml2-2.3.0.jar" />
+			<zipfileset src="${lib.dir}/kxml2-2.3.0.jar" />
+			<zipfileset src="${lib.dir}/regexp-me.jar"/>
 			<zipfileset src="${base.dir}/lib/xpp3-1.1.4.jar" />
-			<zipfileset src="${base.dir}/lib/regexp-me.jar"/>
 			<fileset dir="${build.dir}/classes" />
 			<manifest>
 				<attribute name="Specification-Version" value="${version}" />
@@ -40,13 +41,13 @@
 		<mkdir dir="${build.dir}/src"/>
 		<copy todir="${build.dir}/src">
 			<fileset dir="${base.dir}/src/" />
-			<fileset dir="${base.dir}/../../javarosa-core/src/" />
+			<fileset dir="${root.dir}/core/src/" />
 		</copy>
 
 		<javac 
 			srcdir="${build.dir}/src"
 			destdir="${build.dir}/classes" 
-			classpath="${base.dir}/lib/kxml2-2.3.0.jar;${base.dir}/lib/xpp3-1.1.4.jar;${base.dir}/lib/regexp-me.jar"
+			classpath="${lib.dir}/kxml2-2.3.0.jar;${base.dir}/lib/xpp3-1.1.4.jar;${lib.dir}/regexp-me.jar"
 			includeAntRuntime="false"
 			debug="${build.debug}" 
 			deprecation="${build.deprecation}" />
