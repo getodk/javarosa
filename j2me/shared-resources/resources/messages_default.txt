@@ -239,6 +239,7 @@ sending.status.long=Submission Taking too Long
 sending.status.success=Successfully Submitted
 sending.status.failed=Submission Failed
 sending.status.error=Submission Error Unknown
+sending.status.didnotunderstand=Did not understand the response from the server [${0}]
 
 menu.transport=Transport Menu
 Settings= Settings
