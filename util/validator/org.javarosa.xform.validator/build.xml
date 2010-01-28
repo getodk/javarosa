@@ -5,7 +5,7 @@
 	<property name="base.dir" location="." />
 	<property name="root.dir" location="../../../" />
 	<property name="lib.dir" location="${root.dir}/lib/" />
-	<property name="build.dir" location="target" />
+	<property name="build.dir" location="build" />
 	<property name="build.debug" value="on" />
 	<property name="build.deprecation" value="on" />
 
@@ -27,6 +27,7 @@
 			<zipfileset dir="${build.dir}/classes" prefix="" />
 			<zipfileset src="${lib.dir}/kxml2-2.3.0.jar" />
 			<zipfileset src="${lib.dir}/regexp-me.jar" />
+			<zipfileset src="${base.dir}/../../schema-gen/lib/xpp3-1.1.4.jar" />
 			<fileset dir="${build.dir}/classes" />
 			<manifest>
 				<attribute name="Specification-Version" value="${version}" />
@@ -48,7 +49,7 @@
 		<javac 
 			srcdir="${build.dir}/src"
 			destdir="${build.dir}/classes" 
-			classpath="${lib.dir}/kxml2-2.3.0.jar:${lib.dir}/regexp-me.jar"
+			classpath="${lib.dir}/kxml2-2.3.0.jar:${lib.dir}/regexp-me.jar:${base.dir}/../../schema-gen/lib/xpp3-1.1.4.jar"
 			includeAntRuntime="false"
 			debug="${build.debug}" 
 			deprecation="${build.deprecation}" />

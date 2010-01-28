@@ -16,14 +16,6 @@
 
 package org.javarosa.xform.schema;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.TreeMap;
-import java.util.Vector;
-
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
@@ -36,17 +28,10 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.locale.Localizer;
-import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathConditional;
-import org.kxml2.kdom.Document;
-import org.kxml2.kdom.Element;
-import org.xmlpull.mxp1_serializer.MXSerializer;
-
-import com.csvreader.CsvReader;
-import com.csvreader.CsvWriter;
 
 public class FormOverview {
 	public static String overview (FormDef f) {
