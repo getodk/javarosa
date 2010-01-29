@@ -65,17 +65,14 @@
 				</variables>
 
 				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) -->
-				<resources
-					dir="${dir.resources}"
-					defaultexcludes="no"
-					excludes="readme.txt, .svn, *.css">
-					<root dir="${dir.resources.external}"/>
-					<!-- Set the language for the strings in the application -->
-					<localization>
-						<locale name="none" />
-					</localization>
-				</resources>
-				
+                <resources defaultexcludes="no" excludes="readme.txt">
+                    <root dir="${dir.resources-external}" />
+                    <root dir="${dir.resources}" />
+                    <!-- Set the language for the strings in the application -->
+                    <localization>
+                        <locale name="none" />
+                    </localization>
+                </resources>
 
 				<!-- Whether to run the obfuscator, which makes reverse engineering the byte-code
 					 more difficult, and compresses the built JAR -->
