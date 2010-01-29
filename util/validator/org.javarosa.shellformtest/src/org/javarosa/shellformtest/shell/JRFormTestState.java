@@ -24,7 +24,7 @@ public class JRFormTestState extends FormEntryState {
 		int formID = 1;
 		
 		Vector<IPreloadHandler> preloaders = JRFormTestUtil.getPreloaders();
-		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(formID), preloaders);
+		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(formID), preloaders, null);
 		FormDef form = fetcher.getFormDef();
 		
 		JrFormEntryController controller =  new JrFormEntryController(new FormEntryModel(form));
