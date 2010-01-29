@@ -29,17 +29,21 @@ import org.javarosa.core.services.storage.StorageManager;
 
 public class FormDefFetcher {
 	IFormDefRetrievalMethod fetcher;
-	Vector preloadHandlers;
+	Vector<IPreloadHandler> preloadHandlers;
+	Vector<IFunctionHandler> funcHandlers;
 	
 	FormInstance instance;
 	
-	public FormDefFetcher(IFormDefRetrievalMethod retriever, Vector preloadHandlers) {
+	public FormDefFetcher(IFormDefRetrievalMethod retriever,
+			Vector<IPreloadHandler> preloadHandlers, Vector <IFunctionHandler> funcHandlers) {
 		this.fetcher = retriever;
-		this.preloadHandlers = preloadHandlers; 	
+		this.preloadHandlers = preloadHandlers;
+		this.funcHandlers = funcHandlers;
 	}
 	
-	public FormDefFetcher(IFormDefRetrievalMethod retriever, Vector preloadHandlers, int instanceId) {
-		this(retriever, preloadHandlers);
+	public FormDefFetcher(IFormDefRetrievalMethod retriever, int instanceId,
+			Vector<IPreloadHandler> preloadHandlers, Vector <IFunctionHandler> funcHandlers) {
+		this(retriever, preloadHandlers, funcHandlers);
 		loadModel(instanceId);
 	}
 	
@@ -64,9 +68,8 @@ public class FormDefFetcher {
 	
 	private void initPreloadHandlers (FormDef f) {
 		if(preloadHandlers != null) {
-			Enumeration en = preloadHandlers.elements();
-			while(en.hasMoreElements()) {
-				f.getPreloader().addPreloadHandler((IPreloadHandler)en.nextElement());
+			for (int i = 0; i < preloadHandlers.size(); i++) {
+				f.getPreloader().addPreloadHandler(preloadHandlers.elementAt(i));
 			}
 		}
 	}
@@ -74,11 +77,9 @@ public class FormDefFetcher {
 	private EvaluationContext initEvaluationContext () {
 		EvaluationContext ec = new EvaluationContext();
 		
-		Vector functionHandlers = new Vector(); //get this vector
-		if(functionHandlers != null) {
-			Enumeration en = functionHandlers.elements();
-			while(en.hasMoreElements()) {
-				ec.addFunctionHandler((IFunctionHandler)en.nextElement());
+		if(funcHandlers != null) {
+			for (int i = 0; i < funcHandlers.size(); i++) {
+				ec.addFunctionHandler(funcHandlers.elementAt(i));
 			}
 		}
 		

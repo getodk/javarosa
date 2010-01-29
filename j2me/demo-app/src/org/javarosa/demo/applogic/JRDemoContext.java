@@ -7,6 +7,7 @@ import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.locale.Localization;
@@ -165,4 +166,7 @@ public class JRDemoContext {
 		return handlers;		
 	}
 	
+	public Vector<IFunctionHandler> getFuncHandlers () {
+		return null;
+	}
 }
