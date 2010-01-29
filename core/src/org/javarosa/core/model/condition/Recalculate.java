@@ -68,48 +68,42 @@ public class Recalculate extends Triggerable {
 		}			
 	}
 	
+	//droos 1/29/10: we need to come up with a consistent rule for whether the resulting data is determined
+	//by the type of the instance node, or the type of the expression result. right now it's a mix and a mess
+	//note a caveat with going by instance node type is that untyped nodes default to string!
+	
+	//for now, these are the rules:
+	// if node type == bool, convert to boolean (for numbers, zero = f, non-zero = t; all other datatypes -> error)
+	// if numeric data, convert to int if node type is int OR data is an integer; else convert to double
+	// if string data or date data, keep as is
 	private static IAnswerData wrapData (Object val, int dataType) {
-		if(Constants.DATATYPE_BOOLEAN == dataType) {
+		if (Constants.DATATYPE_BOOLEAN == dataType) {
 			//ctsims: We should really be using the boolean datatype for real, it's 
 			//necessary for backend calculations and XSD compliance
-			if(val instanceof Boolean) {
-				return new BooleanData((Boolean)val);
-			}
-			int outcome;
-			if(val instanceof Integer) {
-				outcome = ((Integer)val).intValue();
-			} else if(val instanceof Double) {
-				outcome = ((Double)val).intValue();
-			} else if(val instanceof Long) {
-				outcome = (int)((Long)val).longValue();
+			
+			boolean b;
+			
+			if (val instanceof Boolean) {
+				b = ((Boolean)val).booleanValue();
+			} else if (val instanceof Double) {
+				Double d = (Double)val;
+				b = Math.abs(d.doubleValue()) > 1.0e-12 && !Double.isNaN(d);
 			} else {
 				throw new RuntimeException("unrecognized data representation while trying to convert to BOOLEAN");
 			}
-			if(outcome == 1) {
-				return new BooleanData(Boolean.TRUE);
-			} else {
-				return new BooleanData(Boolean.FALSE);
-			}
-		}
-		if (val instanceof Boolean) {
-			return new BooleanData((Boolean)val);
+
+			return new BooleanData(b);
 		} else if (val instanceof Double) {
 			double d = ((Double)val).doubleValue();
-			if(Double.isNaN(d)) { return null; }
+			if (Double.isNaN(d)) {
+				return null;
+			}
 			
-			//droos: i think this should be reworked
-			//instead, write IntData if integral, DecData if float, regardless of data type
-			if(Constants.DATATYPE_DECIMAL == dataType) {
-				return new DecimalData(d);
-			} else if(Constants.DATATYPE_INTEGER == dataType) {
-				return new IntegerData((int)Math.floor(d));
-			} 
-			return new DecimalData(d);
-		} else if (val instanceof Long){
-			if(Constants.DATATYPE_TEXT == dataType) {
-				return new StringData(String.valueOf(((Long)val).longValue()));
+			boolean isIntegral = Math.abs(d - (int)d) < 1.0e-9;			
+			if(Constants.DATATYPE_INTEGER == dataType || isIntegral) {
+				return new IntegerData((int)d);
 			} else {
-				return new IntegerData((int)((Long)val).longValue());
+				return new DecimalData(d);
 			}
 		} else if (val instanceof String) {
 			String s = (String)val;
