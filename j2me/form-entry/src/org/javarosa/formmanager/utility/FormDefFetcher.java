@@ -60,8 +60,8 @@ public class FormDefFetcher {
 		
 		//A lot of this should probably not be with the form.
 		initPreloadHandlers(form);
-		form.initialize(instance == null);
 		form.setEvaluationContext(initEvaluationContext());
+		form.initialize(instance == null);
 		
 		return form;
 	}
