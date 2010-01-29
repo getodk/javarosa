@@ -237,12 +237,6 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 	
-	public static Long toInt (Object o) {
-		Double val = toNumeric(o);
-		
-		return new Long((long)Math.floor(val.doubleValue()));
-	}
-	
 	public static Double toNumeric (Object o) {
 		Double val = null;
 		
@@ -283,6 +277,23 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 
+	public static Double toInt (Object o) {
+		Double val = toNumeric(o);
+		
+		if (val.isInfinite() || val.isNaN()) {
+			return val;
+		} else if (val.doubleValue() >= Long.MAX_VALUE || val.doubleValue() <= Long.MIN_VALUE) {
+			return val;
+		} else {
+			long l = val.longValue();
+			Double dbl = new Double(l);
+			if (l == 0 && (val.doubleValue() < 0. || val.equals(new Double(-0.)))) {
+				dbl = new Double(-0.);
+			}
+			return dbl;
+		}
+	}
+	
 	public static String toString (Object o) {
 		String val = null;
 		
@@ -318,15 +329,13 @@ public class XPathFuncExpr extends XPathExpression {
 
 	public static Date toDate (Object o) {
 		if (o instanceof Double) {
-			double d = ((Double)o).doubleValue();
-			if (Math.abs(d - (int)d) > 1.0e-12) {
-				throw new XPathTypeMismatchException("converting non-integer to date");
+			Double n = toInt(o);
+			
+			if (n.isInfinite() || n.isNaN() || n.doubleValue() > Integer.MAX_VALUE || n.doubleValue() < Integer.MIN_VALUE) {
+				throw new XPathTypeMismatchException("converting out-of-range value to date");				
 			}
-			o = toInt(o);
-		} if (o instanceof Long) {
-			Date dt = DateUtils.getDate(1970, 1, 1);
-			dt.setTime(dt.getTime() + ((Long)o).longValue() * 86400000l + 43200000l); //43200000 offset (0.5 day in ms) is needed to handle differing DST offsets!
-			return DateUtils.roundDate(dt);
+
+			return DateUtils.dateAdd(DateUtils.getDate(1970, 1, 1), n.intValue());
 		} else if (o instanceof String) {
 			Date d = DateUtils.parseDate((String)o);
 			if (d == null) {
