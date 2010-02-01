@@ -47,7 +47,8 @@ public abstract class PatientEntryState extends FormEntryState {
 
 	protected JrFormEntryController getController() {
 		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(formName), null, null);
-		return new JrFormEntryController(new FormEntryModel(fetcher.getFormDef()));
+		throw new RuntimeException("unimplemented: need to set view on controller before returning it");
+		//return new JrFormEntryController(new FormEntryModel(fetcher.getFormDef()));
 	}
 
 	/*
