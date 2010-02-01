@@ -208,7 +208,7 @@ public class XPathEvalTest extends TestCase {
 		testEval("date('1983-09-31')", null, null, new XPathTypeMismatchException());
 		testEval("date('not a date')", null, null, new XPathTypeMismatchException());
 		testEval("date(0)", null, null, DateUtils.getDate(1970, 1, 1));
-		testEval("date(6.5)", null, null, new XPathTypeMismatchException());
+		testEval("date(6.5)", null, null, DateUtils.getDate(1970, 1, 7));
 		testEval("date(1)", null, null, DateUtils.getDate(1970, 1, 2));
 		testEval("date(-1)", null, null, DateUtils.getDate(1969, 12, 31));
 		testEval("date(14127)", null, null, DateUtils.getDate(2008, 9, 5));
