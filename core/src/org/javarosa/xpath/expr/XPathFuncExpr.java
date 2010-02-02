@@ -39,9 +39,20 @@ import org.javarosa.xpath.IExprDataType;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 
+/**
+ * Representation of an xpath function expression.
+ * 
+ * All of the built-in xpath functions are included here, as well as the xpath type conversion logic
+ * 
+ * Evaluation of functions can delegate out to custom function handlers that must be registered at
+ * runtime.
+ * 
+ * @author Drew Roos
+ *
+ */
 public class XPathFuncExpr extends XPathExpression {
-	public XPathQName id;
-	public XPathExpression[] args;
+	public XPathQName id;			//name of the function
+	public XPathExpression[] args;	//argument list
 
 	public XPathFuncExpr () { } //for deserialization
 	
@@ -98,7 +109,18 @@ public class XPathFuncExpr extends XPathExpression {
 		ExtUtil.write(out, id);
 		ExtUtil.write(out, new ExtWrapListPoly(v));
 	}
-	
+
+	/**
+	 * Evaluate the function call.
+	 * 
+	 * First check if the function is a member of the built-in function suite. If not, then check
+	 * for any custom handlers registered to handler the function. If not, throw and exception.
+	 * 
+	 * Both function name and appropriate arguments are taken into account when finding a suitable
+	 * handler. For built-in functions, the number of arguments must match; for custom functions,
+	 * the supplied arguments must match one of the function prototypes defined by the handler.
+	 * 
+	 */
 	public Object eval (FormInstance model, EvaluationContext evalContext) {
 		String name = id.toString();
 		Object[] argVals = new Object[args.length];
@@ -109,6 +131,7 @@ public class XPathFuncExpr extends XPathExpression {
 			argVals[i] = args[i].eval(model, evalContext);
 		}
 		
+		//check built-in functions
 		if (name.equals("true") && args.length == 0) {
 			return Boolean.TRUE;
 		} else if (name.equals("false") && args.length == 0) {
@@ -117,7 +140,7 @@ public class XPathFuncExpr extends XPathExpression {
 			return toBoolean(argVals[0]);
 		} else if (name.equals("number") && args.length == 1) {
 			return toNumeric(argVals[0]);
-		} else if (name.equals("int") && args.length == 1) {
+		} else if (name.equals("int") && args.length == 1) { //non-standard
 			return toInt(argVals[0]);
 		} else if (name.equals("string") && args.length == 1) {
 			return toString(argVals[0]);			
@@ -147,9 +170,10 @@ public class XPathFuncExpr extends XPathExpression {
 			return checklist(argVals);
 		} else if (name.equals("weighted-checklist") && args.length >= 2 && args.length % 2 == 0) { //non-standard
 			return checklistWeighted(argVals);
-		} else if (name.equals("regex") && args.length == 2) {
+		} else if (name.equals("regex") && args.length == 2) { //non-standard
 			return regex(argVals[0], argVals[1]);
 		} else {
+			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
 			if (handler != null) {
 				return evalCustomFunction(handler, argVals);
@@ -159,6 +183,18 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 	
+	/**
+	 * Given a handler registered to handle the function, try to coerce the function arguments into
+	 * one of the prototypes defined by the handler. If no suitable prototype found, throw an eval
+	 * exception. Otherwise, evaluate.
+	 * 
+	 * Note that if the handler supports 'raw args', it will receive the full, unaltered argument
+	 * list if no prototype matches. (this lets functions support variable-length argument lists)
+	 * 
+	 * @param handler
+	 * @param args
+	 * @return
+	 */
 	private Object evalCustomFunction (IFunctionHandler handler, Object[] args) {
 		Vector prototypes = handler.getPrototypes();
 		Enumeration e = prototypes.elements();
@@ -177,6 +213,16 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 	
+	/**
+	 * Given a prototype defined by the function handler, attempt to coerce the function arguments
+	 * to match that prototype (checking # args, type conversion, etc.). If it is coercible, return
+	 * the type-converted argument list -- these will be the arguments used to evaluate the function.
+	 * If not coercible, return null.
+	 * 
+	 * @param args
+	 * @param prototype
+	 * @return
+	 */
 	private Object[] matchPrototype (Object[] args, Class[] prototype) {
 		Object[] typed = null;
 
@@ -211,6 +257,32 @@ public class XPathFuncExpr extends XPathExpression {
 		return typed;
 	}
 	
+	/******** HANDLERS FOR BUILT-IN FUNCTIONS ********
+	 * 
+	 * the functions below are the handlers for the built-in xpath function suite
+	 * 
+	 * if you add a function to the suite, it should adhere to the following pattern:
+	 * 
+	 *   * the function takes in its arguments as objects (DO NOT cast the arguments when calling
+	 *     the handler up in eval() (i.e., return stringLength((String)argVals[0])  <--- NO!)
+	 *     
+	 *   * the function converts the generic argument(s) to the desired type using the built-in
+	 *     xpath type conversion functions (toBoolean(), toNumeric(), toString(), toDate())
+	 *     
+	 *   * the function MUST return an object of type Boolean, Double, String, or Date; it may
+	 *     never return null (instead return the empty string or NaN)
+	 *   
+	 *   * the function may throw exceptions, but should try as hard as possible not to, and if
+	 *     it must, strive to make it an XPathException
+	 * 
+	 */
+	
+	/**
+	 * convert a value to a boolean using xpath's type conversion rules
+     *
+	 * @param o
+	 * @return
+	 */
 	public static Boolean toBoolean (Object o) {
 		Boolean val = null;
 		
@@ -237,6 +309,13 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 	
+	/**
+	 * convert a value to a number using xpath's type conversion rules (note that xpath itself makes
+	 * no distinction between integer and floating point numbers)
+	 * 
+	 * @param o
+	 * @return
+	 */
 	public static Double toNumeric (Object o) {
 		Double val = null;
 		
@@ -277,6 +356,14 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 
+	/**
+	 * convert a number to an integer by truncating the fractional part. if non-numeric, coerce the
+	 * value to a number first. note that the resulting return value is still a Double, as required
+	 * by the xpath engine
+	 * 
+	 * @param o
+	 * @return
+	 */
 	public static Double toInt (Object o) {
 		Double val = toNumeric(o);
 		
@@ -294,6 +381,12 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 	
+	/**
+	 * convert a value to a string using xpath's type conversion rules
+	 * 
+	 * @param o
+	 * @return
+	 */
 	public static String toString (Object o) {
 		String val = null;
 		
@@ -327,6 +420,14 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 	}
 
+	/**
+	 * convert a value to a date. note that xpath has no intrinsic representation of dates, so this
+	 * is off-spec. dates convert to strings as 'yyyy-mm-dd', convert to numbers as # of days since
+	 * the unix epoch, and convert to booleans always as 'true'
+	 * 
+	 * @param o
+	 * @return
+	 */
 	public static Date toDate (Object o) {
 		if (o instanceof Double) {
 			Double n = toInt(o);
@@ -368,22 +469,38 @@ public class XPathFuncExpr extends XPathExpression {
 		return (b ? o2 : o3);
 	}
 	
-	//return whether a particular choice of a multi-select is selected
-	//arg1: XML-serialized answer to multi-select question (space-delimited choice values)
-	//arg2: choice to look for
+	/**
+	 * return whether a particular choice of a multi-select is selected
+	 * 
+	 * @param o1 XML-serialized answer to multi-select question (i.e, space-delimited choice values)
+	 * @param o2 choice to look for
+	 * @return
+	 */
 	public static Boolean multiSelected (Object o1, Object o2) {
 		String s1 = (String)o1;
 		String s2 = ((String)o2).trim();
 		
 		return new Boolean((" " + s1 + " ").indexOf(" " + s2 + " ") != -1);
 	}
-	
+
+	/**
+	 * return the number of choices in a multi-select answer
+	 * 
+	 * @param o XML-serialized answer to multi-select question (i.e, space-delimited choice values)
+	 * @return
+	 */
 	public static Double countSelected (Object o) {
 		String s = (String)o;
 
 		return new Double(DateUtils.split(s, " ", true).size());
 	}
 	
+	/**
+	 * count the number of nodes in a nodeset
+	 * 
+	 * @param o
+	 * @return
+	 */
 	public static Double count (Object o) {
 		if (o instanceof Vector) {
 			return new Double(((Vector)o).size());
@@ -392,6 +509,13 @@ public class XPathFuncExpr extends XPathExpression {
 		}	
 	}
 
+	/**
+	 * sum the values in a nodeset; each element is coerced to a numeric value
+	 * 
+	 * @param model
+	 * @param o
+	 * @return
+	 */
 	public static Double sum (FormInstance model, Object o) {
 		if (o instanceof Vector) {
 			Vector v = (Vector)o;
@@ -406,6 +530,12 @@ public class XPathFuncExpr extends XPathExpression {
 		}	
 	}
 
+	/**
+	 * concatenate an abritrary-length argument list of string values together
+	 * 
+	 * @param argVals
+	 * @return
+	 */
 	public static String concat (Object[] argVals) {
 		StringBuffer sb = new StringBuffer();
 		
@@ -416,13 +546,19 @@ public class XPathFuncExpr extends XPathExpression {
 		return sb.toString();
 	}
 	
-	/*
-	 * arg_0 = min, negative if no min
-	 * arg_1 = max, negative if no max
-	 * arg_2 .. arg_n = true/false values
+	/**
+	 * perform a 'checklist' computation, enabling expressions like 'if there are at least 3 risk
+	 * factors active'
 	 * 
-	 * returns: true if the number of true values is between min and max
-	 */	
+	 * @param argVals
+	 *   the first argument is a numeric value expressing the minimum number of factors required.
+	 *     if -1, no minimum is applicable
+	 *   the second argument is a numeric value expressing the maximum number of allowed factors.
+	 *     if -1, no maximum is applicalbe
+	 *   arguments 3 through the end are the individual factors, each coerced to a boolean value
+	 * @return true if the count of 'true' factors is between the applicable minimum and maximum,
+	 *   inclusive
+	 */
 	public static Boolean checklist (Object[] argVals) {
 		int min = toNumeric(argVals[0]).intValue();
 		int max = toNumeric(argVals[1]).intValue();
@@ -436,14 +572,21 @@ public class XPathFuncExpr extends XPathExpression {
 		return new Boolean((min < 0 || count >= min) && (max < 0 || count <= max));
 	}
 
-	/*
-	 * arg_0 = min
-	 * arg_1 = max
-	 * arg_2, arg_4, arg_6, ... arg_(n - 1) = true/false values
-	 * arg_3, arg_5, arg_7, ... arg_n = floating point weights corresponding to arg_(i - 1)
+	/**
+	 * very similar to checklist, only each factor is assigned a real-number 'weight'.
 	 * 
-	 * returns: true if the sum of the weights corresponding to the true values is between min and max
-	 */	
+	 * the first and second args are again the minimum and maximum, but -1 no longer means
+	 * 'not applicable'.
+	 * 
+	 * subsequent arguments come in pairs: first the boolean value, then the floating-point
+	 * weight for that value
+	 * 
+	 * the weights of all the 'true' factors are summed, and the function returns whether
+	 * this sum is between the min and max
+	 * 
+	 * @param argVals
+	 * @return
+	 */
 	public static Boolean checklistWeighted (Object[] argVals) {
 		double min = toNumeric(argVals[0]).doubleValue();
 		double max = toNumeric(argVals[1]).doubleValue();
@@ -460,6 +603,13 @@ public class XPathFuncExpr extends XPathExpression {
 		return new Boolean(sum >= min && sum <= max);
 	}
 	
+	/**
+	 * determine if a string matches a regular expression. 
+	 * 
+	 * @param o1 string being matched
+	 * @param o2 regular expression
+	 * @return
+	 */
 	public static Boolean regex (Object o1, Object o2) {
 		String str = toString(o1);
 		String re = toString(o2);

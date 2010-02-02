@@ -70,12 +70,17 @@ public class Recalculate extends Triggerable {
 	
 	//droos 1/29/10: we need to come up with a consistent rule for whether the resulting data is determined
 	//by the type of the instance node, or the type of the expression result. right now it's a mix and a mess
-	//note a caveat with going by instance node type is that untyped nodes default to string!
+	//note a caveat with going solely by instance node type is that untyped nodes default to string!
 	
 	//for now, these are the rules:
 	// if node type == bool, convert to boolean (for numbers, zero = f, non-zero = t; all other datatypes -> error)
 	// if numeric data, convert to int if node type is int OR data is an integer; else convert to double
 	// if string data or date data, keep as is
+	/**
+	 * convert the data object returned by the xpath expression into an IAnswerData suitable for
+	 * storage in the FormInstance
+	 * 
+	 */
 	private static IAnswerData wrapData (Object val, int dataType) {
 		if (Constants.DATATYPE_BOOLEAN == dataType) {
 			//ctsims: We should really be using the boolean datatype for real, it's 
