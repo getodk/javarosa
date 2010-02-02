@@ -73,15 +73,21 @@ public class Recalculate extends Triggerable {
 	//note a caveat with going solely by instance node type is that untyped nodes default to string!
 	
 	//for now, these are the rules:
-	// if node type == bool, convert to boolean (for numbers, zero = f, non-zero = t; all other datatypes -> error)
+	// if node type == bool, convert to boolean (for numbers, zero = f, non-zero = t; empty string = f, all other datatypes -> error)
 	// if numeric data, convert to int if node type is int OR data is an integer; else convert to double
 	// if string data or date data, keep as is
+	// if NaN or empty string, null
 	/**
 	 * convert the data object returned by the xpath expression into an IAnswerData suitable for
 	 * storage in the FormInstance
 	 * 
 	 */
 	private static IAnswerData wrapData (Object val, int dataType) {
+		if ((val instanceof String && ((String)val).length() == 0) ||
+			(val instanceof Double && ((Double)val).isNaN())) {
+			return null;
+		}
+		
 		if (Constants.DATATYPE_BOOLEAN == dataType) {
 			//ctsims: We should really be using the boolean datatype for real, it's 
 			//necessary for backend calculations and XSD compliance
@@ -93,6 +99,9 @@ public class Recalculate extends Triggerable {
 			} else if (val instanceof Double) {
 				Double d = (Double)val;
 				b = Math.abs(d.doubleValue()) > 1.0e-12 && !Double.isNaN(d);
+			} else if (val instanceof String) {
+				String s = (String)val;
+				b = s.length() > 0;
 			} else {
 				throw new RuntimeException("unrecognized data representation while trying to convert to BOOLEAN");
 			}
@@ -100,10 +109,6 @@ public class Recalculate extends Triggerable {
 			return new BooleanData(b);
 		} else if (val instanceof Double) {
 			double d = ((Double)val).doubleValue();
-			if (Double.isNaN(d)) {
-				return null;
-			}
-			
 			boolean isIntegral = Math.abs(d - (int)d) < 1.0e-9;			
 			if(Constants.DATATYPE_INTEGER == dataType || isIntegral) {
 				return new IntegerData((int)d);
@@ -111,8 +116,7 @@ public class Recalculate extends Triggerable {
 				return new DecimalData(d);
 			}
 		} else if (val instanceof String) {
-			String s = (String)val;
-			return s.length() > 0 ? new StringData(s) : null;
+			return new StringData((String)val);
 		} else if (val instanceof Date) {
 			return new DateData((Date)val);
 		} else {

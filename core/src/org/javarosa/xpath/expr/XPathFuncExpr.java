@@ -425,20 +425,38 @@ public class XPathFuncExpr extends XPathExpression {
 	 * is off-spec. dates convert to strings as 'yyyy-mm-dd', convert to numbers as # of days since
 	 * the unix epoch, and convert to booleans always as 'true'
 	 * 
+	 * string and int conversions are reversable, however:
+	 *   * cannot convert bool to date
+	 *   * empty string and NaN (xpath's 'null values') go unchanged, instead of being converted
+	 *     into a date (which would cause an error, since Date has no null value (other than java
+	 *     null, which the xpath engine can't handle))
+	 *   * note, however, than non-empty strings that aren't valid dates _will_ cause an error
+	 *     during conversion
+	 * 
 	 * @param o
 	 * @return
 	 */
-	public static Date toDate (Object o) {
-		if (o instanceof Double) {
+	public static Object toDate (Object o) {
+		if (o instanceof Double) {			
 			Double n = toInt(o);
 			
-			if (n.isInfinite() || n.isNaN() || n.doubleValue() > Integer.MAX_VALUE || n.doubleValue() < Integer.MIN_VALUE) {
+			if (n.isNaN()) {
+				return n;
+			}
+			
+			if (n.isInfinite() || n.doubleValue() > Integer.MAX_VALUE || n.doubleValue() < Integer.MIN_VALUE) {
 				throw new XPathTypeMismatchException("converting out-of-range value to date");				
 			}
 
 			return DateUtils.dateAdd(DateUtils.getDate(1970, 1, 1), n.intValue());
 		} else if (o instanceof String) {
-			Date d = DateUtils.parseDate((String)o);
+			String s = (String)o;
+			
+			if (s.length() == 0) {
+				return s;
+			}
+			
+			Date d = DateUtils.parseDate(s);
 			if (d == null) {
 				throw new XPathTypeMismatchException("converting to date");
 			} else {
