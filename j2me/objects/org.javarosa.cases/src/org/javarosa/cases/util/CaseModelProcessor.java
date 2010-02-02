@@ -144,6 +144,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 	
 	private Case processCaseCreate(TreeElement create, String caseId, Date date) throws MalformedCaseModelException {
 		String caseTypeId = null;
+		String extId = null;
 		String caseName = null;
 		int userId = -1;
 		
@@ -151,6 +152,9 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 			TreeElement kid = create.getChildAt(i);
 			if(kid.getName().equals("case_type_id")) {
 				caseTypeId = (String)serializer.serializeAnswerData(kid.getValue());
+			}
+			if(kid.getName().equals("external_id")) {
+				extId = (String)serializer.serializeAnswerData(kid.getValue());
 			}
 			if(kid.getName().equals("user_id")) {
 				try { 
@@ -170,6 +174,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		}
 		Case c = new Case(caseName, caseTypeId);
 		c.setCaseId(caseId);
+		c.setExternalId(extId);
 		c.setDateOpened(date);
 		c.setUserId(userId);
 		commit(c);
