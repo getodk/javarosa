@@ -282,19 +282,29 @@ public class Case implements Persistable, Restorable, IMetaData {
 
 	public Hashtable getMetaData() {
 		Hashtable h = new Hashtable();
-		h.put("case-id",id);
+		String[] fields = getMetaDataFields();
+		for (int i = 0; i < fields.length; i++) {
+			String field = fields[i];
+			Object value = getMetaData(field);
+			if (value != null) {
+				h.put(field, value);
+			}
+		}
 		return h;
 	}
 
 	public Object getMetaData(String fieldName) {
-		if(fieldName.equals("case-id")) {
+		if (fieldName.equals("case-id")) {
 			return id;
+		} else if (fieldName.equals("case-type")) {
+			return typeId;
+		} else {
+			throw new IllegalArgumentException("No metadata field " + fieldName  + " in the case storage system");
 		}
-		throw new IllegalArgumentException("No metadata field " + fieldName  + " in the case storage system");
 	}
 
 	public String[] getMetaDataFields() {
-		return new String[] { "case-id"};
+		return new String[] {"case-id", "case-type"};
 	}
 
 }
