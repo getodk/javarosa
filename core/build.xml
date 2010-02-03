@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<project default="package">
+	<property name="name" value="javarosa-libraries"/>
+	<property name="jar" value="${name}.jar"/>
+	<property name="dir.lib" value="../lib/"/>
+	<target name="init" description="set classpath and make needed directories">
+		<mkdir dir="lib/"/>
+		<path id="classpath">
+			<fileset dir="${dir.lib}" includes="*.jar"/>
+		</path>
+		<mkdir dir="bin/"/>
+		<mkdir dir="dist/"/>
+	</target>
+	<target name="clean" description="delete dist and bin directories">
+		<delete dir="dist/"/>
+		<delete dir="bin/"/>
+	</target>
+	<target name="compile" depends="clean,init" description="compile the source">
+		<javac srcdir="src/" destdir="bin/" classpathref="classpath" debug="true" debuglevel="lines,source" source="1.5" target="1.5"/>
+	</target>
+	<target name="package" depends="compile" description="package binary into jar">
+		<jar destfile="dist/${jar}">
+			<fileset dir="bin/" includes="**/*.class"/>
+		</jar>
+	</target>
+</project>
