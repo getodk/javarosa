@@ -58,6 +58,7 @@ public class Case implements Persistable, Restorable, IMetaData {
 	
 	private String typeId;
 	private String id;
+	private String extId;
 	private String name;
 	
 	private boolean closed = false;
@@ -160,6 +161,14 @@ public class Case implements Persistable, Restorable, IMetaData {
 		return id;
 	}
 
+	public void setExternalId (String extId) {
+		this.extId = extId;
+	}
+	
+	public String getExternalId () {
+		return extId;
+	}
+	
 	/**
 	 * @return the dateOpened
 	 */
@@ -177,14 +186,14 @@ public class Case implements Persistable, Restorable, IMetaData {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
 	 */
-	public void readExternal(DataInputStream in, PrototypeFactory pf)
-			throws IOException, DeserializationException {
-		typeId = in.readUTF();
-		id = (String)ExtUtil.read(in, new ExtWrapNullable(String.class));
-		name =in.readUTF();
-		closed = in.readBoolean();
-		dateOpened = new Date(in.readLong());
-		recordId = in.readInt();
+	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+		typeId = ExtUtil.readString(in);
+		id = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		extId = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		name = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		closed = ExtUtil.readBool(in);
+		dateOpened = (Date)ExtUtil.read(in, new ExtWrapNullable(Date.class));
+		recordId = ExtUtil.readInt(in);
 		data = (Hashtable)ExtUtil.read(in, new ExtWrapMapPoly(String.class, true));
 	}
 
@@ -192,12 +201,13 @@ public class Case implements Persistable, Restorable, IMetaData {
 	 * @see org.javarosa.core.util.externalizable.Externalizable#writeExternal(java.io.DataOutputStream)
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
-		out.writeUTF(typeId);
-		ExtUtil.write(out, new ExtWrapNullable(id));
-		out.writeUTF(name);
-		out.writeBoolean(closed);
-		out.writeLong(dateOpened.getTime());
-		out.writeInt(recordId);
+		ExtUtil.writeString(out, typeId);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(id));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(extId));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(name));
+		ExtUtil.writeBool(out, closed);
+		ExtUtil.write(out, new ExtWrapNullable(dateOpened));
+		ExtUtil.writeNumeric(out, recordId);
 		ExtUtil.write(out, new ExtWrapMapPoly(data));
 
 	}
@@ -211,6 +221,8 @@ public class Case implements Persistable, Restorable, IMetaData {
 			return id;
 		} else if("name".equals(key)) {
 			return name;
+		} else if("external-id".equals(key)) {
+			return extId;
 		}
 		return data.get(key);
 	}
@@ -219,6 +231,7 @@ public class Case implements Persistable, Restorable, IMetaData {
 		FormInstance dm = RestoreUtils.createDataModel(this);
 		RestoreUtils.addData(dm, "case-id", id);
 		RestoreUtils.addData(dm, "case-type-id", typeId);
+		RestoreUtils.addData(dm, "ext-id", extId);
 		RestoreUtils.addData(dm, "name", name);
 		RestoreUtils.addData(dm, "dateopened", dateOpened);
 		RestoreUtils.addData(dm, "closed", new Boolean(closed));
@@ -240,6 +253,7 @@ public class Case implements Persistable, Restorable, IMetaData {
 	public void importData(FormInstance dm) {
 		id = (String)RestoreUtils.getValue("case-id", dm);
 		typeId = (String)RestoreUtils.getValue("case-type-id", dm);		
+		extId = (String)RestoreUtils.getValue("ext-id", dm);		
 		name = (String)RestoreUtils.getValue("name", dm);		
 		dateOpened = (Date)RestoreUtils.getValue("dateopened", dm);		
         closed = RestoreUtils.getBoolean(RestoreUtils.getValue("closed", dm));
@@ -271,6 +285,7 @@ public class Case implements Persistable, Restorable, IMetaData {
 	public void templateData(FormInstance dm, TreeReference parentRef) {
 		RestoreUtils.applyDataType(dm, "case-id", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "case-type-id", parentRef, String.class);
+		RestoreUtils.applyDataType(dm, "ext-id", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "name", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "dateopened", parentRef, Date.class);
 		RestoreUtils.applyDataType(dm, "closed", parentRef, Boolean.class);
@@ -298,13 +313,15 @@ public class Case implements Persistable, Restorable, IMetaData {
 			return id;
 		} else if (fieldName.equals("case-type")) {
 			return typeId;
+		} else if (fieldName.equals("external-id")) {
+			return extId;
 		} else {
 			throw new IllegalArgumentException("No metadata field " + fieldName  + " in the case storage system");
 		}
 	}
 
 	public String[] getMetaDataFields() {
-		return new String[] {"case-id", "case-type"};
+		return new String[] {"case-id", "case-type", "external-id"};
 	}
 
 }
