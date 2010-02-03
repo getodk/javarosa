@@ -224,5 +224,5 @@
 	<property file="${polish.home}/global.properties" />
 
 	<!-- Defines the py-run task                                  -->
-	<taskdef name="py-run" onerror="report" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.2.jar"/>
+	<taskdef name="py-run" onerror="report" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.3.jar"/>
 </project>
