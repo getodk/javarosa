@@ -65,6 +65,7 @@ public class RestoreUtils {
 	
 	private static FormInstance newDataModel (String topTag) {
 		FormInstance dm = new FormInstance();
+		dm.schema = "http://www.commcarehq.org/backup";
 		dm.addNode(ref("/" + topTag));
 		return dm;
 	}

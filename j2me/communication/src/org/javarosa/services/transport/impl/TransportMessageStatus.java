@@ -11,6 +11,9 @@ package org.javarosa.services.transport.impl;
  * 
  * SENT - message has been sent
  * 
+ * FAILED - could not send the message; all active attempts to send have ceased,
+ *   and the message is not cached for a future re-send
+ * 
  */
 public class TransportMessageStatus {
 
@@ -32,4 +35,5 @@ public class TransportMessageStatus {
 	 */
 	public static final int SENT = 3;
 
+	public static final int FAILED = 4;
 }
