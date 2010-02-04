@@ -31,6 +31,7 @@ import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
@@ -65,7 +66,6 @@ public class RestoreUtils {
 	
 	private static FormInstance newDataModel (String topTag) {
 		FormInstance dm = new FormInstance();
-		dm.schema = "http://www.commcarehq.org/backup";
 		dm.addNode(ref("/" + topTag));
 		return dm;
 	}
@@ -78,6 +78,13 @@ public class RestoreUtils {
 		}
 		
 		return dm;
+	}
+	
+	public static FormInstance createRootDataModel (Restorable r) {
+		FormInstance inst = createDataModel(r);
+		inst.schema = "http://www.commcarehq.org/backup";
+		addData(inst, "timestamp", new Date(), Constants.DATATYPE_DATE_TIME);
+		return inst;
 	}
 	
 	public static void addData (FormInstance dm, String xpath, Object data) {
@@ -189,8 +196,10 @@ public class RestoreUtils {
 	}
 	
 	public static void templateData (Restorable r, FormInstance dm, TreeReference parent) {
-		if (parent == null)
+		if (parent == null) {
 			parent = topRef(dm);
+			applyDataType(dm, "timestamp", parent, Date.class);
+		}
 		
 		if (r instanceof Persistable) {
 			applyDataType(dm, RECORD_ID_TAG, parent, Integer.class);
