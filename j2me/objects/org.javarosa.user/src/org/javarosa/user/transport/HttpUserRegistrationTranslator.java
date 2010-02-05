@@ -10,6 +10,7 @@ import java.util.Enumeration;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
+import org.javarosa.services.transport.CommUtil;
 import org.javarosa.services.transport.UnrecognizedResponseException;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.user.model.User;
@@ -32,7 +33,7 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 	}
 	
 	public SimpleHttpTransportMessage getUserRegistrationMessage() throws IOException {
-		return new SimpleHttpTransportMessage(getStreamFromRegistration(createXmlRegistrationDoc(user)),registrationUrl);
+		return new SimpleHttpTransportMessage(getStreamFromRegistration(createXmlRegistrationDoc(user)), registrationUrl);
 	}
 	
 	private InputStream getStreamFromRegistration(Document registration) {
@@ -51,23 +52,14 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 		 return bis;
 
 	}
-
+	
 	public User readResponse(SimpleHttpTransportMessage message) throws UnrecognizedResponseException {
-		String body = message.getResponseBody();
-		KXmlParser parser = new KXmlParser();
-		try {
-			parser.setInput(new ByteArrayInputStream(body.getBytes()),null);
-			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
-			Document response = new Document();
-			response.parse(parser);
-			return readResponseDocument(response);
-		} catch (XmlPullParserException e) {
-			e.printStackTrace();
-		    throw new UnrecognizedResponseException("Invalid XML Received from Server!");
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error Parsing Server Response to User Registration!");
+		Document doc = CommUtil.getXMLResponse(message.getResponseBody());
+		if (doc == null) {
+			throw new UnrecognizedResponseException("can't parse xml");
 		}
+		
+		return readResponseDocument(doc);
 	}
 	
 	/**
@@ -76,6 +68,10 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 	 * @return
 	 */
 	private User readResponseDocument(Document response) throws UnrecognizedResponseException {
+		//do we want to look for some kind of 'ok' message? otherwise the server could send back
+		//gibberish and we'd still interpret it as a successful registration. ideally, we should
+		//require a certain 'ok' token, and throw the exception if it's not present
+		
 		boolean updates = false;
 		for(int i = 0; i < response.getChildCount(); ++i) {
 			Object o = response.getChild(i);
@@ -136,4 +132,5 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 		e.addChild(Element.TEXT, text);
 		parent.addChild(Element.ELEMENT, e);
 	}
+
 }
