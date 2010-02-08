@@ -35,7 +35,7 @@ import org.javarosa.core.model.instance.TreeReference;
 public class FormEntryModel {
 	private FormDef form;
 	private FormIndex currentFormIndex;
-
+	
 	public FormEntryModel(FormDef form) {
 		this.form = form;
 		this.currentFormIndex = FormIndex.createBeginningOfFormIndex();
