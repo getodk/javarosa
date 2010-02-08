@@ -500,11 +500,10 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	} else if (command.getLabel() == "Back") {
     		backFromCamera();
     	} else if (command.getLabel().equals(CollapsedWidget.UPDATE_TEXT)) { //TODO: Put this static string in a better place.
-    		//Return to shell providing the question index.
-    		model.setQuestionIndex(this.questionIndexes.get(this.getCurrentIndex()));
+    		System.out.println("not implemented: updating answers from review mode");
     		
-    		throw new RuntimeException("NOT YET IMPLEMENTED: i don't where to transit to [droos 10/29]");
-    		//controller.exit("update");
+//    		model.setQuestionIndex(this.questionIndexes.get(this.getCurrentIndex()));
+//    		throw new RuntimeException("NOT YET IMPLEMENTED: i don't where to transit to [droos 10/29]");
     	} else {
     		String language = null;
     		if (multiLingual) {
