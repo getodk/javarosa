@@ -31,8 +31,8 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.JrFormEntryController;
+import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.IFormEntryView;
@@ -63,7 +63,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     public static final int UIHACK_SELECT_PRESS = 1;
 	
 	private JrFormEntryController controller;
-    private FormEntryModel model;
+    private JrFormEntryModel model;
     
     private ChatterboxWidgetFactory widgetFactory;
     private boolean multiLingual;
@@ -91,9 +91,10 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     public Chatterbox (String formTitle, JrFormEntryController controller) {
         //#style framedForm
     	super(formTitle);
+    	this.controller = controller;
+    	this.model = controller.getModel();
     	
-    	//TODO: READONLY FLAG!
-    	if(false) {
+    	if (model.isReadOnlyMode()) {
     		//#style ReviewFramedForm
     		UiAccess.setStyle(this);
     	}
@@ -107,14 +108,9 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     			return false;
     		}
     	};
-    	
-    	this.model = controller.getModel();
-    	this.controller = controller;
 
     	widgetFactory = new ChatterboxWidgetFactory(this);
-    	
-    	//TODO: READONLY FLAG!
-    	widgetFactory.setReadOnly(false);
+    	widgetFactory.setReadOnly(model.isReadOnlyMode());
     	
     	multiLingual = (model.getForm().getLocalizer() != null);
     	questionIndexes = new SortedIndexSet();
@@ -151,16 +147,15 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	initProgressBar();
     	
     	//Mode 1: Read only review screen.
-    	//TODO: READONLY FLAG!
-    	if(false) {
+    	if(model.isReadOnlyMode()) {
     		while(controller.stepToNextEvent() != FormEntryController.EVENT_END_OF_FORM) {
-    			//TODO: Anything?
+    			jumpToQuestion(FormIndex.createEndOfFormIndex());
     		}
-    	} else if(null != null) { //TODO: Starting from a specific question
-    		
+    	} else if (null /*model.getStartIndex()*/ != null) { //TODO: Starting from a specific question
     		//Mode 2: Seek to current question
     		while(!model.getCurrentFormIndex().equals(null)) {
     			controller.stepToNextEvent();
+        		jumpToQuestion(model.getCurrentFormIndex());
     		}
     	} else {
     		//Default Mode: Start at first question
@@ -183,8 +178,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
         
         //next command is added on a per-widget basis
         
-        //TODO: READ ONLY FLAG!
-        if(true) {
+        if(!model.isReadOnlyMode()) {
             addCommand(backCommand);
             addCommand(exitSaveCommand);
             addCommand(saveCommand);
@@ -438,8 +432,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     }
     
     public void formComplete () {
-    	//TODO: READONLY FLAG!
-    	if(true) {
+    	if(!model.isReadOnlyMode()) {
 	    	controller.jumpToIndex(FormIndex.createEndOfFormIndex());
 	    	babysitStyles();
 			progressBar.setValue(progressBar.getMaxValue());
@@ -450,8 +443,6 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
 			} catch (InterruptedException ie) { }
 				
 			controller.saveAndExit(true);
-    	} else { 
-    		
     	}
     }
     
@@ -470,8 +461,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		ChatterboxWidget cw = (ChatterboxWidget)get(i);
     		switch (cw.getViewState()) {
     		case ChatterboxWidget.VIEW_COLLAPSED:
-    			//TODO: READONLY FLAG!
-    			if(false) {
+    			if(model.isReadOnlyMode()) {
     				//#style ReviewSplit
     				UiAccess.setStyle(cw);
     			} else {
