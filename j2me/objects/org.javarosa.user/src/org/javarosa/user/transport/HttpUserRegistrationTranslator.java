@@ -102,7 +102,7 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 	private Document createXmlRegistrationDoc(User u) {
 		Document document = new Document();
 		Element root = document.createElement(null,"registration");
-		root.setNamespace("openrosa.org/user-registration");
+		root.setNamespace("http://openrosa.org/user-registration");
 		
 		addChildWithText(root,"username",u.getUsername());
 		

@@ -82,7 +82,7 @@ public class RestoreUtils {
 	
 	public static FormInstance createRootDataModel (Restorable r) {
 		FormInstance inst = createDataModel(r);
-		inst.schema = "http://www.commcarehq.org/backup";
+		inst.schema = "http://openrosa.org/backup";
 		addData(inst, "timestamp", new Date(), Constants.DATATYPE_DATE_TIME);
 		return inst;
 	}
