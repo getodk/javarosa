@@ -105,8 +105,7 @@
 		<exec executable="hg" outputproperty="jr-build-version">
 			<arg line="parents --template {node|short}"/>
 		</exec>		
-		<mkdir dir="build/META-INF/" />
-		<echo message="JR-Build-Version: ${jr-build-version}" file="build/META-INF/MANIFEST.MF" />
+		<echo message="jr-build-version=${jr-build-version}" file="build/javarosa.properties" />
 		
 		<!-- Schweet, now turn it into a 'jar' file! -->
 		<zip destfile="dist/j2merosa-libraries.jar" basedir="build"/>
