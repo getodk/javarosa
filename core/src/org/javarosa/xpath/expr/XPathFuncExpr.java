@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.Vector;
 
 import me.regexp.RE;
@@ -31,6 +32,7 @@ import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -165,13 +167,38 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("now") && args.length == 0) {
 			return new Date();
 		} else if (name.equals("concat")) {
-			return concat(argVals);
+			if (args.length == 1 && argVals[0] instanceof Vector) {
+				return join("", nodesetToArgList(model, (Vector)argVals[0]));
+			} else {
+				return join("", argVals);
+			}
+		} else if (name.equals("join") && args.length >= 1) {
+			if (args.length == 2 && argVals[1] instanceof Vector) {
+				return join(argVals[0], nodesetToArgList(model, (Vector)argVals[1]));
+			} else {
+				return join(argVals[0], subsetArgList(argVals, 1));
+			}
 		} else if (name.equals("checklist") && args.length >= 2) { //non-standard
-			return checklist(argVals);
+			if (args.length == 3 && argVals[2] instanceof Vector) {
+				return checklist(argVals[0], argVals[1], nodesetToArgList(model, (Vector)argVals[2]));
+			} else {
+				return checklist(argVals[0], argVals[1], subsetArgList(argVals, 2));
+			}
 		} else if (name.equals("weighted-checklist") && args.length >= 2 && args.length % 2 == 0) { //non-standard
-			return checklistWeighted(argVals);
+			if (args.length == 4 && argVals[2] instanceof Vector && argVals[3] instanceof Vector) {
+				Object[] factors = nodesetToArgList(model, (Vector)argVals[2]);
+				Object[] weights = nodesetToArgList(model, (Vector)argVals[3]);
+				if (factors.length != weights.length) {
+					throw new XPathTypeMismatchException("weighted-checklist: nodesets not same length");
+				}
+				return checklistWeighted(argVals[0], argVals[1], factors, weights);
+			} else {
+				return checklistWeighted(argVals[0], argVals[1], subsetArgList(argVals, 2, 2), subsetArgList(argVals, 3, 2));
+			}
 		} else if (name.equals("regex") && args.length == 2) { //non-standard
 			return regex(argVals[0], argVals[1]);
+		} else if (name.equals("rand") && args.length == 0) { //non-standard
+			return getRand();
 		} else {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
@@ -195,7 +222,7 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @param args
 	 * @return
 	 */
-	private Object evalCustomFunction (IFunctionHandler handler, Object[] args) {
+	private static Object evalCustomFunction (IFunctionHandler handler, Object[] args) {
 		Vector prototypes = handler.getPrototypes();
 		Enumeration e = prototypes.elements();
 		Object[] typedArgs = null;
@@ -207,7 +234,7 @@ public class XPathFuncExpr extends XPathExpression {
 		if (typedArgs != null) {
 			return handler.eval(typedArgs);
 		} else if (handler.rawArgs()) {
-			return handler.eval(args);
+			return handler.eval(args);  //should we have support for expanding nodesets here?
 		} else {
 			throw new XPathTypeMismatchException("for function \'" + handler.getName() + "\'");
 		}
@@ -223,7 +250,7 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @param prototype
 	 * @return
 	 */
-	private Object[] matchPrototype (Object[] args, Class[] prototype) {
+	private static Object[] matchPrototype (Object[] args, Class[] prototype) {
 		Object[] typed = null;
 
 		if (prototype.length == args.length) {
@@ -554,11 +581,14 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @param argVals
 	 * @return
 	 */
-	public static String concat (Object[] argVals) {
+	public static String join (Object oSep, Object[] argVals) {
+		String sep = toString(oSep);
 		StringBuffer sb = new StringBuffer();
 		
 		for (int i = 0; i < argVals.length; i++) {
 			sb.append(toString(argVals[i]));
+			if (i < argVals.length - 1)
+				sb.append(sep);
 		}
 		
 		return sb.toString();
@@ -577,13 +607,13 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @return true if the count of 'true' factors is between the applicable minimum and maximum,
 	 *   inclusive
 	 */
-	public static Boolean checklist (Object[] argVals) {
-		int min = toNumeric(argVals[0]).intValue();
-		int max = toNumeric(argVals[1]).intValue();
+	public static Boolean checklist (Object oMin, Object oMax, Object[] factors) {
+		int min = toNumeric(oMin).intValue();
+		int max = toNumeric(oMax).intValue();
 		
 		int count = 0;
-		for (int i = 2; i < argVals.length; i++) {
-			if (toBoolean(argVals[i]).booleanValue())
+		for (int i = 0; i < factors.length; i++) {
+			if (toBoolean(factors[i]).booleanValue())
 				count++;
 		}
 		
@@ -605,14 +635,14 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @param argVals
 	 * @return
 	 */
-	public static Boolean checklistWeighted (Object[] argVals) {
-		double min = toNumeric(argVals[0]).doubleValue();
-		double max = toNumeric(argVals[1]).doubleValue();
+	public static Boolean checklistWeighted (Object oMin, Object oMax, Object[] flags, Object[] weights) {
+		double min = toNumeric(oMin).doubleValue();
+		double max = toNumeric(oMax).doubleValue();
 		
 		double sum = 0.;
-		for (int i = 2; i < argVals.length; i += 2) {
-			boolean flag = toBoolean(argVals[i]).booleanValue();
-			double weight = toNumeric(argVals[i + 1]).doubleValue();
+		for (int i = 0; i < flags.length; i++) {
+			boolean flag = toBoolean(flags[i]).booleanValue();
+			double weight = toNumeric(weights[i]).doubleValue();
 			
 			if (flag)
 				sum += weight;
@@ -637,4 +667,61 @@ public class XPathFuncExpr extends XPathExpression {
 		return new Boolean(result);
 	}
 
+	static Random r;
+	public static Double getRand () {
+		if (r == null) {
+			r = new Random();
+		}
+		return new Double(r.nextDouble());
+	}
+	
+	/**
+	 * convert a nodeset argument into a standard argument list
+	 * 
+	 * @param model
+	 * @param nodeset
+	 * @return
+	 */
+	private static Object[] nodesetToArgList (FormInstance model, Vector nodeset) {
+		Object[] args = new Object[nodeset.size()];
+		
+		for (int i = 0; i < nodeset.size(); i++) {
+			TreeReference ref = (TreeReference)nodeset.elementAt(i);
+			Object val = XPathPathExpr.getRefValue(model, ref);
+			
+			//sanity check
+			if (val == null) {
+				throw new RuntimeException("retrived a null value out of a nodeset! shouldn't happen!");
+			}
+			
+			args[i] = val;
+		}
+		
+		return args;
+	}
+
+	private static Object[] subsetArgList (Object[] args, int start) {
+		return subsetArgList(args, start, 1);
+	}
+	
+	/**
+	 * return a subset of an argument list as a new arguments list
+	 * 
+	 * @param args
+	 * @param start index to start at
+	 * @param skip sub-list will contain every nth argument, where n == skip (default: 1)
+	 * @return
+	 */
+	private static Object[] subsetArgList (Object[] args, int start, int skip) {
+		if (start > args.length || skip < 1) {
+			throw new RuntimeException("error in subsetting arglist");
+		}
+		
+		Object[] subargs = new Object[(int)MathUtils.divLongNotSuck(args.length - start - 1, skip) + 1];
+		for (int i = start, j = 0; i < args.length; i += skip, j++) {
+			subargs[j] = args[i];
+		}
+		
+		return subargs;
+	}
 }
