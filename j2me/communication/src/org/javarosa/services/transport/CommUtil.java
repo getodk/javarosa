@@ -8,6 +8,13 @@ import org.xmlpull.v1.XmlPullParser;
 
 import de.enough.polish.io.StringReader;
 
+/**
+ * utility class for extracting an xml document out of a string or bytestream, typically used for
+ * processing xml payloads sent in response to server requests
+ * 
+ * @author Drew Roos
+ *
+ */
 public class CommUtil {
 
 	public static Document getXMLResponse (String response) {
