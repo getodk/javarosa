@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Random;
 import java.util.Vector;
 
 import me.regexp.RE;
@@ -197,8 +196,6 @@ public class XPathFuncExpr extends XPathExpression {
 			}
 		} else if (name.equals("regex") && args.length == 2) { //non-standard
 			return regex(argVals[0], argVals[1]);
-		} else if (name.equals("rand") && args.length == 0) { //non-standard
-			return getRand();
 		} else {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
@@ -667,14 +664,6 @@ public class XPathFuncExpr extends XPathExpression {
 		return new Boolean(result);
 	}
 
-	static Random r;
-	public static Double getRand () {
-		if (r == null) {
-			r = new Random();
-		}
-		return new Double(r.nextDouble());
-	}
-	
 	/**
 	 * convert a nodeset argument into a standard argument list
 	 * 
