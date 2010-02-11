@@ -5,27 +5,6 @@
 	<property file="local.properties"/>
 	<property file="build.properties"/>
 
-	<path id="jr.classpath">
-		<fileset dir="${dir.lib}">
-			<include name="*.jar"/>
-		</fileset>
-		<fileset dir="${wtk.home}/lib" includes="${wtk.includes}"/>
-		<fileset dir="${polish.home}/import" includes="${polish.includes}"/>
-	</path>
-
-	<path id="jr.compiled.classpath">
-		<path refid="jr.classpath"/>
-		<fileset dir="dist" includes="j2merosa-libraries.jar"/>
-	</path>
-
-	<path id="jr.classpath.test">
-		<path refid="jr.compiled.classpath" />
-		<fileset dir="${dir.lib}" includes="j2meunit-javarosa.jar"/>
-		<dirset dir="${basedir}">
-			<include name="buildTest/**"/>
-		</dirset>
-	</path>
-
 	<fileset id="jr.sources" dir="../../">
 		<include name="core/src/**/*.java"/>
 		<include name="j2me/**/src/**/*.java"/>
@@ -43,12 +22,33 @@
 
 	</fileset>
 
-	<target name="package" depends="clean,fetchPolishClassList">
+	<target name="package" depends="clean,init-libs,fetchPolishClassList">
 		<!-- first set source compliance. Java5 is correct, since we're postprocessing -->
 		<property name="ant.build.javac.compiler" value="1.5"/>
 		<property name="ant.build.javac.source" value="1.5"/>
 		<property name="ant.build.javac.target" value="1.5"/>
 
+		<path id="jr.classpath">
+			<fileset dir="${dir.lib}">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${wtk.home}/lib" includes="${wtk.includes}"/>
+			<fileset dir="${polish.home}/import" includes="${polish.includes}"/>
+		</path>
+
+		<path id="jr.compiled.classpath">
+			<path refid="jr.classpath"/>
+			<fileset dir="dist" includes="j2merosa-libraries.jar"/>
+		</path>
+		
+		<path id="jr.classpath.test">
+			<path refid="jr.compiled.classpath" />
+			<fileset dir="${dir.lib}" includes="j2meunit-javarosa.jar"/>
+			<dirset dir="${basedir}">
+				<include name="buildTest/**"/>
+			</dirset>
+		</path>
+		
 		<mkdir dir="dist"/>
 		<mkdir dir="build"/>
 		<mkdir dir="build/src"/>
@@ -156,6 +156,12 @@
 			</classpath>
 		</typedef>
 
+		<taskdef name="for" classname="net.sf.antcontrib.logic.For" onerror="report">
+			<classpath>
+				<pathelement location="${dir.tools}/ant-contrib.jar"/>
+			</classpath>
+		</taskdef>
+		
 		<for list="${testclasses}" delimiter="${line.separator}" param="name">
 			<sequential>
 				<if>
@@ -221,18 +227,6 @@
 		</classpath>
 	</taskdef>
 
-	<taskdef name="for" classname="net.sf.antcontrib.logic.For" onerror="report">
-		<classpath>
-			<pathelement location="${dir.tools}/ant-contrib.jar"/>
-		</classpath>
-	</taskdef>
-
-	<taskdef name="trycatch" classname="net.sf.antcontrib.logic.TryCatchTask" onerror="report">
-		<classpath>
-			<pathelement location="${dir.tools}/ant-contrib.jar"/>
-		</classpath>
-	</taskdef>
-
 	<target name="clean">
 		<delete dir="dist"/>
 		<delete dir="build"/>
@@ -241,6 +235,12 @@
 	</target>
 
 	<target name="fetchPolishClassList">
+		<taskdef name="trycatch" classname="net.sf.antcontrib.logic.TryCatchTask" onerror="report">
+			<classpath>
+				<pathelement location="${dir.tools}/ant-contrib.jar"/>
+			</classpath>
+		</taskdef>
+		
 		<trycatch reference="exception_ref" >
 			<try>
 				<mkdir dir="${dir.tmp}"/>
@@ -260,5 +260,9 @@
 				<delete dir="${dir.tmp}"/>
 			</finally>
 		</trycatch>
+	</target>
+	
+	<target name="init-libs">
+		<ant antfile="${dir.root}/core/build.xml" target="extract-libs" inheritAll="true" inheritRefs="false" />
 	</target>
 </project>
