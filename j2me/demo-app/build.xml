@@ -50,6 +50,13 @@
 					<library dir="${dir.lib}" />
 				</libraries>
 
+				<jad>
+					<attribute name="App-Version" value="${jrdemo.version}" />
+					<attribute name="JRDemo-Build-Version" value="${jrdemo-build-version}" />
+					<attribute name="JR-Build-Version" value="${jr-build-version}" />
+					<attribute name="Polish-Device" value="${device.identifier}" />
+				</jad>
+				
 				<!-- midlets definition -->
 				<midlet class="${app.class}" name="${app.name}" />
 
@@ -190,6 +197,29 @@
 		<condition property="compile.from.source.true">
 			<equals arg1="${compile.source}" arg2="true" />
 		</condition>
+		
+		<exec executable="hg" outputproperty="jrdemo-build-version">
+			<arg line="parents --template {node|short}"/>
+		</exec>
+
+		<taskdef name="if" onerror="report" classname="net.sf.antcontrib.logic.IfTask" classpath="${dir.tools}/ant-contrib.jar" />
+		<if>
+			<equals arg1="${compile.source}" arg2="true" />
+			<then>
+				<exec executable="hg" outputproperty="jr-build-version">
+					<arg line="parents --template {node|short} -R &quot;${dir.root}&quot;"/>
+				</exec>
+			</then>
+			<else>
+				<unzip src="${dir.tools}/j2merosa-libraries.jar" dest="${dir.build}">
+				    <patternset>
+				        <include name="javarosa.properties"/>
+				    </patternset>
+				</unzip>
+				<property file="${dir.build}/javarosa.properties" /> 
+			</else>
+		</if>
+
 	</target>
 
 	<target name="supressOutput">
