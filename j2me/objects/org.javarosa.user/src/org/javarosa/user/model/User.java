@@ -99,7 +99,7 @@ public class User implements Persistable, Restorable
 		this.userType = ExtUtil.readString(in);
 		this.recordId = ExtUtil.readInt(in);
 		this.id = ExtUtil.readInt(in);
-		this.uniqueId = ExtUtil.readString(in);
+		this.uniqueId = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		this.rememberMe = ExtUtil.readBool(in);
 		this.properties = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class), pf);
 	}
@@ -117,7 +117,7 @@ public class User implements Persistable, Restorable
 		ExtUtil.writeString(out, userType);
 		ExtUtil.writeNumeric(out, recordId);
 		ExtUtil.writeNumeric(out, id);
-		ExtUtil.writeString(out, uniqueId);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(uniqueId));
         ExtUtil.writeBool(out, rememberMe);
 		ExtUtil.write(out, new ExtWrapMap(properties));
 	}
