@@ -1,0 +1,19 @@
+<project name="javarosa-validator-tools" default="build-all">
+	<property name="dir.root" value="${basedir}/../../../" />
+
+	<target name="build-all">
+
+		<ant antfile="${dir.root}/util/validator/org.javarosa.xform.validator/build.xml" target="buildClean" inheritAll="false" inheritRefs="false">
+			<property name="compile.source" value="${compile.source}"/>
+		</ant>
+
+		<ant antfile="${dir.root}/util/schema-gen/build.xml" target="buildClean" inheritAll="false" inheritRefs="false">
+			<property name="compile.source" value="${compile.source}"/>
+		</ant>
+
+		<ant antfile="${dir.root}/util/validator/org.javarosa.shellformtest/build.xml" target="BuildClean" inheritAll="false" inheritRefs="false">
+			<property name="compile.source" value="${compile.source}"/>
+		</ant>
+		
+	</target>
+</project>
