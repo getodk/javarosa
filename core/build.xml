@@ -2,7 +2,9 @@
 <project default="package">
 	<property name="name" value="javarosa-libraries"/>
 	<property name="jar" value="${name}.jar"/>
-	<property name="dir.lib" value="../lib/"/>
+	<property name="dir.root" value="${basedir}/../"/>
+	<property name="dir.lib" value="${dir.root}/lib/"/>
+	
 	<target name="init" description="set classpath and make needed directories">
 		<mkdir dir="lib/"/>
 		<path id="classpath">
@@ -11,16 +13,28 @@
 		<mkdir dir="bin/"/>
 		<mkdir dir="dist/"/>
 	</target>
+	
 	<target name="clean" description="delete dist and bin directories">
 		<delete dir="dist/"/>
 		<delete dir="bin/"/>
 	</target>
-	<target name="compile" depends="clean,init" description="compile the source">
+	
+	<target name="compile" depends="clean,extract-libs,init" description="compile the source">
 		<javac srcdir="src/" destdir="bin/" classpathref="classpath" debug="true" debuglevel="lines,source" source="1.5" target="1.5"/>
 	</target>
+	
 	<target name="package" depends="compile" description="package binary into jar">
 		<jar destfile="dist/${jar}">
 			<fileset dir="bin/" includes="**/*.class"/>
 		</jar>
 	</target>
+
+	<!-- for use primarily by the build server to extract the required 3rd-party libraries into the
+	     javarosa source tree. to use this in your own build, set the 'extract-libs-fresh' property,
+	     then also set the 'javarosa-deps' property to the path of the library archive (make sure you
+	     are using the version of the archive compatible with the version you wish to build) -->
+	<target name="extract-libs" if="extract-libs-fresh">
+		<unzip src="${javarosa-deps}" dest="${dir.root}" overwrite="true" />
+	</target>
+	
 </project>
