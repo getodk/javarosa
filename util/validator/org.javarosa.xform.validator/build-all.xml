@@ -1,7 +1,11 @@
 <project name="javarosa-validator-tools" default="build-all">
+	<property name="compile.source" value="true" />
+	<property name="polish.home" value="C:\\Program Files\\J2ME-Polish\\" />
+	
 	<property name="dir.root" value="${basedir}/../../../" />
 
 	<target name="build-all">
+		<ant antfile="${dir.root}/core/build.xml" target="extract-libs" inheritAll="true" inheritRefs="false" />
 
 		<ant antfile="${dir.root}/util/validator/org.javarosa.xform.validator/build.xml" target="buildClean" inheritAll="false" inheritRefs="false">
 			<property name="compile.source" value="${compile.source}"/>
@@ -13,6 +17,7 @@
 
 		<ant antfile="${dir.root}/util/validator/org.javarosa.shellformtest/build.xml" target="BuildClean" inheritAll="false" inheritRefs="false">
 			<property name="compile.source" value="${compile.source}"/>
+			<property name="polish.home" value="${polish.home}"/>
 		</ant>
 		
 	</target>
