@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.polish.activity"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.user"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-communication"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-form-entry"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-shared-resources"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
