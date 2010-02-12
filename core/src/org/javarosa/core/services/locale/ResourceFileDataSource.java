@@ -141,10 +141,9 @@ public class ResourceFileDataSource implements LocaleDataSource {
 			e.printStackTrace();
 		} finally {
 			try {
-				isr.close();
 				is.close();
 			} catch (IOException e) {
-				System.out.println("Input Stream for resource file " + resourceURI + " failed to close. This will eat up your memory! Fix Problem!");
+				System.out.println("Input Stream for resource file " + resourceURI + " failed to close. This will eat up your memory! Fix Problem! [" + e.getMessage() + "]");
 				e.printStackTrace();
 			}
 		}
