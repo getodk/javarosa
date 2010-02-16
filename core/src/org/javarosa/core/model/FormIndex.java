@@ -359,6 +359,21 @@ public class FormIndex {
 	}
 	
 	/**
+	 * @return the level of this index relative to the top level of the form
+	 */
+	public int getDepth() {
+
+		int depth = 0;
+		FormIndex ref = this;
+		while (ref != null) {
+			ref = ref.nextLevel;
+			depth++;
+		}
+		return depth;
+
+	}
+
+	/**
 	 * Trims any negative indices from the end of the passed in index.
 	 * 
 	 * @param index
