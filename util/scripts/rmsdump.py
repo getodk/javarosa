@@ -13,51 +13,7 @@
 # the License.
 
 import sys
-
-class EndOfStream (Exception):
-  def __init__ (self, bytes):
-    self.bytes = bytes
-
-def stream (data):
-  for c in data:
-    yield c
-
-def read_int (dstr, require_pos=False):
-  (nb, c) = ([], None)
-  try:
-    while c == None or ord(c) >= 128:
-      c = dstr.next()
-      nb.append(c)
-  except StopIteration:
-    raise EndOfStream(nb)
-
-  nv = [ord(c) % 128 for c in nb]
-  if nv[0] >= 64:
-    nv[0] -= 128
-  val = reduce(lambda x, y: 128 * x + y, nv, 0)
-
-  if val < 0 and require_pos:
-    raise ValueError
-  return val
-
-def read_string (dstr):
-  lb = [ord(i) for i in read_bytes(dstr, 2)]
-  ln = 256 * lb[0] + lb[1]
-
-  try:
-    return read_bytes(dstr, ln)
-  except EndOfStream, eos:
-    raise EndOfStream(lb + eos.bytes)
-
-def read_bytes (dstr, n):
-  bytes = []
-  try:
-    for i in range(0, n):
-      bytes.append(dstr.next())
-  except StopIteration:
-    raise EndOfStream(bytes)
-  
-  return ''.join(bytes)
+from recparse import *
 
 #parse the data stream from the dump file into a structure representing all RMSes and records, accounting for any errors in the stream
 #returns tuple (
