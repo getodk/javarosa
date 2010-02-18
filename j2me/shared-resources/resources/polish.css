@@ -34,8 +34,7 @@ colors {
 	buttonBgColor: #ffeecc;
 	requiredColor: 	#FF7F50;
 	requiredColorFocus: #DC143C;
-	groupColor: 	#D9D9D9;
-	groupColorAlt: 	#99CCFF;
+	headerColor: 	#D9D9D9;
 }
 
 .loginView {
@@ -53,14 +52,27 @@ colors {
 /**
  * singlequestionscreen styles
  */
-.View_All_Form{
-	padding: 2;
-	background-color: gray;
+.View_All_Form {
+	background-color: headerColor;
 	screen-change-animation: particle;
-	layout: bottom | horizontal-center;	
+	layout: bottom | horizontal-center;
+	always-include: true	
 }
 
-.SingleQuestionScreen_Form{
+.View_All_Header extends View_All_Form {
+	font-style: bold;
+	layout: left | expand;
+	background-color: headerColor;
+	always-include: true
+}
+
+.View_All_Prompt extends View_All_Form {
+	background-color: white;	
+	layout: left | expand;
+	always-include: true
+}
+
+.SingleQuestionScreen_Form {
 	padding: 2;
 	background-color: gray;
 	screen-change-animation: right;
@@ -85,31 +97,9 @@ colors {
 
 .SingleQuestionScreen_Compulsory extends SingleQuestionScreen_Form {
 	layout: left | expand;
-	focused-style: focusHighlight
+	focused-style: focusHighlight;
 }
 
-.SingleQuestionScreen_No_Group extends SingleQuestionScreen_Form {
-	layout: left | expand;
-	focused-style: focusHighlight
-}
-
-.SingleQuestionScreen_Group extends SingleQuestionScreen_Form {
-	background-color: groupColor;
-	layout: left | expand;
-	focused-style: focusHighlight
-}
-
-.SingleQuestionScreen_Group_Alt extends SingleQuestionScreen_Form {
-	background-color: groupColorAlt;
-	layout: left | expand;
-	focused-style: focusHighlight
-}
-
-.SingleQuestionScreen_Header extends SingleQuestionScreen_Form {
-	font-style: bold;
-	layout: left | expand;
-	background-color: white;
-}
 
 focusHighlight extends focused {
 	background-color: requiredColorFocus;

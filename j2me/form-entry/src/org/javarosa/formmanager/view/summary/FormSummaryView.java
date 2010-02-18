@@ -21,18 +21,16 @@ public class FormSummaryView extends List {
 	private FormEntryModel model;
 	private HashMap indexHash;
 
-	private static String STYLE_NOGROUP = "SingleQuestionScreen_No_Group";
-	private static String STYLE_GROUP = "SingleQuestionScreen_Group";
-	private static String STYLE_GROUP_ALT = "SingleQuestionScreen_Group_Alt";
-	private static String STYLE_HEADER = "SingleQuestionScreen_Header";
-	
+	private static String STYLE_PROMPT = "View_All_Prompt";
+	private static String STYLE_HEADER = "View_All_Header";
+
 	public final Command CMD_EXIT = new Command(Localization.get("menu.Exit"),
 			Command.EXIT, 4);
 	public final Command CMD_SAVE_EXIT = new Command(Localization
 			.get("menu.SaveAndExit"), Command.SCREEN, 4);
 
 	public FormSummaryView(FormEntryModel model) {
-		// #style SingleQuestionScreen_Form
+		// #style View_All_Form
 		super("Form Overview", List.IMPLICIT);
 		this.model = model;
 		createView();
@@ -54,9 +52,6 @@ public class FormSummaryView extends List {
 		FormDef form = model.getForm();
 		while (!index.isEndOfFormIndex()) {
 			if (index.isInForm() && model.isRelevant(index)) {
-				System.out.println("Index: " + index + ", Mult: "
-						+ index.getElementMultiplicity() + ", Event: "
-						+ model.getEvent(index));
 				String text = "";
 				boolean isHeader = false;
 				if (model.getEvent(index) == FormEntryController.EVENT_QUESTION) {
@@ -64,16 +59,16 @@ public class FormSummaryView extends List {
 					text = getText(prompt);
 				} else if ((model.getEvent(index) == FormEntryController.EVENT_GROUP)
 						|| (model.getEvent(index) == FormEntryController.EVENT_REPEAT)) {
-					text = getText(model.getCaptionHierarchy(index));
+					text = getHeaderText(model.getCaptionHierarchy(index),
+							index.getInstanceIndex());
 					isHeader = true;
 				}
 				if (!text.equals("")) {
-					Style style = isHeader?StyleSheet.getStyle(STYLE_HEADER):getStyle(index.getDepth()-1);
-					style.addAttribute("margin-left", new Dimension((5*(index.getDepth()-1))+"px"));
-					append(text, null,style);
+					append(text, null, isHeader ? StyleSheet
+							.getStyle(STYLE_HEADER) : StyleSheet
+							.getStyle(STYLE_PROMPT));
 					captioncount++;
 					indexHash.put(new Integer(captioncount), index);
-					System.out.println(text);
 				}
 			}
 			index = form.incrementIndex(index);
@@ -94,27 +89,20 @@ public class FormSummaryView extends List {
 		return line;
 	}
 
-	private String getText(FormEntryCaption[] hierachy) {
+	private String getHeaderText(FormEntryCaption[] hierachy, int instanceIndex) {
 		String headertext = "";
 		for (FormEntryCaption caption : hierachy) {
-			headertext += caption.getLongText() + ": ";
+			headertext += caption.getLongText();
+
+			if (instanceIndex > -1)
+				headertext += " #" + (instanceIndex + 1);
+
+			headertext += ": ";
 		}
 		if (headertext.endsWith(": "))
 			headertext = headertext.substring(0, headertext.length() - 2);
+
 		return headertext;
-	}
-
-	private Style getStyle(int level) {
-		Style style = null;
-		if (level == 0) {
-			style = StyleSheet.getStyle(STYLE_NOGROUP);
-		} else if ((level % 2) == 0) {
-			style = StyleSheet.getStyle(STYLE_GROUP);
-		} else {
-			style = StyleSheet.getStyle(STYLE_GROUP_ALT);
-		}
-
-		return style;
 	}
 
 	public FormIndex getFormIndex() {
