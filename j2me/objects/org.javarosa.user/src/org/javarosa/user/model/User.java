@@ -46,12 +46,12 @@ public class User implements Persistable, Restorable
 	public static final String STANDARD = "standard";
 	public static final String DEMO_USER = "demo_user";
 
-	private int recordId = -1; //TODO: replace recordID with just user id
+	private int recordId = -1; //record id on device
 	private String username;
 	private String password;
 	private String userType;
-	private String uniqueId;
-	private int id;
+	private String uniqueId;  //globally-unique id
+	private int id;           //human-friendly / organizational id
 	private boolean rememberMe= false;
 	
 	/** String -> String **/
@@ -94,20 +94,14 @@ public class User implements Persistable, Restorable
 
 	///fetch the value for the default user and password from the RMS
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		try {
-			this.username = in.readUTF();
-			this.password = in.readUTF();
-			this.userType = in.readUTF();
-			this.id = in.readInt();
-			this.rememberMe = in.readBoolean();
-			this.properties = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
-			this.recordId = in.readInt();
-		}
-		catch (IOException ioe)
-		{
-			ioe.printStackTrace();
-			System.out.println(ioe);
-		}
+		this.username = ExtUtil.readString(in);
+		this.password = ExtUtil.readString(in);
+		this.userType = ExtUtil.readString(in);
+		this.recordId = ExtUtil.readInt(in);
+		this.id = ExtUtil.readInt(in);
+		this.uniqueId = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		this.rememberMe = ExtUtil.readBool(in);
+		this.properties = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class), pf);
 	}
 
 	public boolean isAdminUser()
@@ -118,18 +112,14 @@ public class User implements Persistable, Restorable
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		try {
-			out.writeUTF(this.username);
-	        out.writeUTF(this.password);
-	        out.writeUTF(this.userType);
-	        out.writeInt(this.id);
-	        out.writeBoolean(this.rememberMe);
-			ExtUtil.write(out, new ExtWrapMap(properties));
-			out.writeInt(recordId);
-
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage()); //$NON-NLS-1$
-		}
+		ExtUtil.writeString(out, username);
+		ExtUtil.writeString(out, password);
+		ExtUtil.writeString(out, userType);
+		ExtUtil.writeNumeric(out, recordId);
+		ExtUtil.writeNumeric(out, id);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(uniqueId));
+        ExtUtil.writeBool(out, rememberMe);
+		ExtUtil.write(out, new ExtWrapMap(properties));
 	}
 
 	public String getUsername()
@@ -211,6 +201,7 @@ public class User implements Persistable, Restorable
 		RestoreUtils.addData(dm, "pass", password);
 		RestoreUtils.addData(dm, "type", userType);
 		RestoreUtils.addData(dm, "user-id", new Integer(id));
+		RestoreUtils.addData(dm, "uuid", uniqueId);
 		RestoreUtils.addData(dm, "remember", new Boolean(rememberMe));		
 		
 		for (Enumeration e = properties.keys(); e.hasMoreElements(); ) {
@@ -226,6 +217,7 @@ public class User implements Persistable, Restorable
 		RestoreUtils.applyDataType(dm, "pass", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "type", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "user-id", parentRef, Integer.class);
+		RestoreUtils.applyDataType(dm, "uuid", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "remember", parentRef, Boolean.class);
 		
 		// other/* defaults to string
@@ -236,6 +228,7 @@ public class User implements Persistable, Restorable
 		password = (String)RestoreUtils.getValue("pass", dm);
 		userType = (String)RestoreUtils.getValue("type", dm);
 		id = ((Integer)RestoreUtils.getValue("user-id", dm)).intValue();
+		uniqueId = (String)RestoreUtils.getValue("uuid", dm);
 		rememberMe = RestoreUtils.getBoolean(RestoreUtils.getValue("remember", dm));
         
         TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));

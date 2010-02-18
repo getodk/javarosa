@@ -5,7 +5,6 @@ package org.javarosa.formmanager.api;
 
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
 import org.javarosa.formmanager.view.IFormEntryView;
 
@@ -20,10 +19,14 @@ public class JrFormEntryController extends FormEntryController {
 	FormEntryTransitions transitions;
 	IFormEntryView view;
 	
-	public JrFormEntryController(FormEntryModel model) {
+	public JrFormEntryController(JrFormEntryModel model) {
 		super(model);
 	}
 
+	public JrFormEntryModel getModel () {
+		return (JrFormEntryModel)super.getModel();
+	}
+	
 	public void setView(IFormEntryView view) {
 		this.view = view;
 	}

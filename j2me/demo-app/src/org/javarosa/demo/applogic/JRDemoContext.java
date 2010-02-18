@@ -119,7 +119,7 @@ public class JRDemoContext {
 	}
 	
 	private void setProperties() {
-		final String POST_URL = "http://test.commcarehq.org/submit";
+		final String POST_URL = "http://staging.commcarehq.org/receiver/submit/test";
 		
 		PropertyManager._().addRules(new JavaRosaPropertyRules());
 		PropertyManager._().addRules(new DemoAppProperties());
