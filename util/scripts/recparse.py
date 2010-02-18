@@ -135,6 +135,12 @@ def parse (dstr, type):
   
   return get_parse_func(name)(*([dstr] + args))
   
+def parse_data (dstr, template):
+  val = get(parse_template(dstr, template))
+  if len(val) > 1:
+    raise ValueError('cannot be sequence')
+  return val[0]
+  
 def parse_template (dstr, template):
   types = parse_type_template(template)
   data = []
@@ -142,10 +148,10 @@ def parse_template (dstr, template):
   for type in types:
     data.append(parse(dstr, type))
   
-  return tuple(data)
+  return ('seq', tuple(data))
   
 def parse_custom (template):
-  return lambda dstr: parse_template(dstr, template)
+  return lambda dstr: get(parse_template(dstr, template))
   
 def parse_type_template (template):
   return parse_token_list(template)
@@ -284,7 +290,76 @@ type_tags = {
   '\xfb\x2c\xa2\x76': 'obj:txmsgserwrapper',
   '\x01\x02\x03\x04': 'obj:test'
 }
+
+def print_data (data):
+  return print_data_helper(data, 0) + '\n'
+
+def print_data_helper (data, indent, suppress_indent=False):
+  buf = ''
+  (type, val) = data
+
+  IND = '  ' * indent
+  if not suppress_indent:
+    buf += IND
   
+  if type == 'int':
+    buf += 'i %d' % val if val != None else 'i <null>'
+  elif type == 'dbl':
+    buf += 'f %f' % val if val != None else 'f <null>'
+  elif type == 'bool':
+    buf += 'b %s' % ('true' if val else 'false') if val != None else 'b <null>'
+  elif type == 'str':
+    buf += 's %s' % repr(val) if val != None else 's <null>'
+  elif type == 'date':
+    if val != None:
+      sdt = val.strftime('%Y-%m-%d %H:%M:%S')
+      buf += 'dt %s' % sdt
+    else:
+      buf += 'dt <null>'
+  elif type == 'seq':
+    buf += 'seq #%d (\n' % len(val)
+    for i in range(0, len(val)):
+      buf += print_data_helper(val[i], indent + 1)
+      buf += ',\n' if i < len(val) - 1 else '\n'
+    buf += IND + ')'
+  elif type.startswith('obj:'):
+    if val != None:
+      buf += type + ' (\n'
+      for i in range(0, len(val)):
+        buf += print_data_helper(val[i], indent + 1)
+        buf += ',\n' if i < len(val) - 1 else '\n'
+      buf += IND + ')'
+    else:
+      buf += type + ' <null>'
+  elif type == 'list':
+    if val != None:
+      buf += 'list #%d [' % len(val)
+      if len(val) > 0:
+        buf += '\n'
+        for i in range(0, len(val)):
+          buf += print_data_helper(val[i], indent + 1)
+          buf += ',\n' if i < len(val) - 1 else '\n'
+        buf += IND
+      buf += ']'
+    else:
+      buf += 'list <null>'
+  elif type == 'map':
+    if val != None:
+      buf += 'map #%d {' % len(val)
+      if len(val) > 0:
+        buf += '\n'
+        for (i, (k, v)) in enumerate(val.iteritems()):
+          buf += print_data_helper(k, indent + 1)
+          buf += ' => '
+          buf += print_data_helper(v, indent + 1, True)
+          buf += ',\n' if i < len(val) - 1 else '\n'
+        buf += IND
+      buf += '}'
+    else:
+      buf += 'map <null>'
+
+  return buf
+
   
 def hex_to_stream (hexstr):
   return stream(''.join([chr(int(c, 16)) for c in hexstr.split()]))
