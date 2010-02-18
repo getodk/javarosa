@@ -19,6 +19,9 @@ def read_bytes (dstr, n):
   
   return ''.join(bytes)
 
+def get (typed_val):
+  return typed_val[1]
+    
 def read_int (dstr, require_pos=False):
   (nb, c) = ([], None)
   try:
@@ -35,14 +38,15 @@ def read_int (dstr, require_pos=False):
 
   if val < 0 and require_pos:
     raise ValueError
-  return val
+  return ('int', val)
 
 def read_string (dstr):
   lb = [ord(i) for i in read_bytes(dstr, 2)]
   ln = 256 * lb[0] + lb[1]
 
   try:
-    return read_bytes(dstr, ln)
+    val = read_bytes(dstr, ln)
+    return ('str', val)
   except EndOfStream, eos:
     raise EndOfStream(lb + eos.bytes)
 
@@ -54,44 +58,46 @@ def read_bool (dstr):
 
   if b != 0 and b != 1:
     raise ValueError
-  return (b == 1)
+  return ('bool', b == 1)
 
 def read_float (dstr):
   raw = read_bytes(dstr, 8)
-  return struct.unpack('!d', raw)[0]
+  val = struct.unpack('!d', raw)[0]
+  return ('dbl', val)
   
 def read_date (dstr):
-  return datetime.utcfromtimestamp(read_int(dstr) / 1000.)
+  val = datetime.utcfromtimestamp(get(read_int(dstr)) / 1000.)
+  return ('date', val)
 
 #todo: the parse functions for compound objects don't retain the whole bytestream during unexpected end-of-stream  
 
 def read_null (dstr, type):
-  if read_bool(dstr):
+  if get(read_bool(dstr)):
     return parse(dstr, type)
   else:
-    return None
+    return (type[0], None)
     
 def read_list (dstr, type):
   return read_list_helper(dstr, lambda dstr: parse(dstr, type))
 
 def read_list_helper(dstr, get_elem):
   v = []
-  n = read_int(dstr)
+  n = get(read_int(dstr))
   for i in range(0, n):
     v.append(get_elem(dstr))
-  return v
+  return ('list', v)
   
 def read_map (dstr, keytype, elemtype):
   return read_map_helper(dstr, keytype, lambda dstr: parse(dstr, elemtype))
 
 def read_map_helper (dstr, keytype, get_elem):
   m = {}
-  n = read_int(dstr)
+  n = get(read_int(dstr))
   for i in range(0, n):
     k = parse(dstr, keytype)
     v = get_elem(dstr)
     m[k] = v
-  return m
+  return ('map', m)
   
 def read_tagged (dstr):
   tag = read_bytes(dstr, 4)
@@ -117,11 +123,11 @@ def get_parse_func (name):
   if name in builtin_types:
     return builtin_types[name]
   elif name.startswith('obj:'):
-    name = name[4:]
-    if name not in custom_types:
-      raise ValueError('unknown type [%s]' % name)
+    objname = name[4:]
+    if objname not in custom_types:
+      raise ValueError('unknown type [%s]' % objname)
       
-    return custom_types[name]
+    return lambda *args: (name, custom_types[objname](*args))
   
 def parse (dstr, type):
   name = type[0]
@@ -275,7 +281,8 @@ type_tags = {
   '\x27\x53\xac\x23': 'obj:simplehttptxmsg',
   '\x01\x12\x89\x43': 'obj:smstxmsg',
   '\x21\x71\xd6\x5d': 'obj:binsmstxmsg',
-  '\xfb\x2c\xa2\x76': 'obj:txmsgserwrapper'
+  '\xfb\x2c\xa2\x76': 'obj:txmsgserwrapper',
+  '\x01\x02\x03\x04': 'obj:test'
 }
   
   
