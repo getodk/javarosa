@@ -47,28 +47,28 @@ def extract_rms (dstr):
   err = False
 
   try:
-    num_rms = read_int(dstr, True)
+    num_rms = get(read_int(dstr, True))
     for i in range(0, num_rms):
       rms = {'name': None, 'size': None, 'records': []}
       rmses.append(rms)
 
-      rmsname = read_string(dstr)
+      rmsname = get(read_string(dstr))
       rms['name'] = rmsname
 
-      num_recs = read_int(dstr, True)
+      num_recs = get(read_int(dstr, True))
       rms['size'] = num_recs
 
       for j in range(0, num_recs):
         rec = {'id': None, 'len': None, 'data': None, 'status': None}
         rms['records'].append(rec)
 
-        id = read_int(dstr)
+        id = get(read_int(dstr))
         rec['id'] = id
         rec['status'] = 'data not read'
 
       for rec in rms['records']:
         try:
-          rec['len'] = read_int(dstr, True)
+          rec['len'] = get(read_int(dstr, True))
         except EndOfStream, eos:
           rec['status'] = 'corrupt length %s' % eos.bytes
           raise
