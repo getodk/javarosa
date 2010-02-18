@@ -69,7 +69,8 @@ def read_date (dstr):
   val = datetime.utcfromtimestamp(get(read_int(dstr)) / 1000.)
   return ('date', val)
 
-#todo: the parse functions for compound objects don't retain the whole bytestream during unexpected end-of-stream  
+#todo: the parse functions for compound objects don't retain the whole bytestream during unexpected end-of-stream,
+#nor do they keep around the (partial) data that led to value errors
 
 def read_null (dstr, type):
   if get(read_bool(dstr)):
@@ -236,6 +237,9 @@ builtin_types = {
 }
 
 custom_types = {
+  'rmsinfo': parse_custom('int,int,int'),
+  'recloc': parse_custom('int,int'),
+  'user': parse_custom('str,str,str,int,int,str,bool,map(str,str)'),
   'test': parse_custom('int,str,bool')
 }
   
@@ -291,8 +295,8 @@ type_tags = {
   '\x01\x02\x03\x04': 'obj:test'
 }
 
-def print_data (data):
-  return print_data_helper(data, 0) + '\n'
+def print_data (data, indent=0, suppress_start=False, suppress_end=False):
+  return print_data_helper(data, indent, suppress_start) + ('\n' if not suppress_end else '')
 
 def print_data_helper (data, indent, suppress_indent=False):
   buf = ''

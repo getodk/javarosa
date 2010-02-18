@@ -79,6 +79,7 @@ def extract_rms (dstr):
         try:
           rec['data'] = read_bytes(dstr, rec['len'])
           rec['status'] = 'ok'
+          rec['content'] = get_record_content(rec['data'], rec['id'], rms['name'])
         except EndOfStream, eos:
           rec['status'] = 'partial data'
           rec['data'] = ''.join(eos.bytes)
@@ -87,7 +88,7 @@ def extract_rms (dstr):
     err = True
 
   return (rmses, num_rms, err)
-
+  
 def get_unique (l, key, val, type):
   matches = filter(lambda x: x[key] == val, l)
   if not matches:
@@ -97,6 +98,37 @@ def get_unique (l, key, val, type):
     print 'Warning: more than one %s %s' % (type, val)
   return matches[0]
 
+rms_types = {
+  'USER': 'user'
+}
+  
+def get_record_content (bytes, rec_id, rms_name):
+  type = None
+  ignore = False
+  if rms_name.endswith('_IX'):
+    if rec_id == 1:
+      type = 'bool'
+    elif rec_id == 2:
+      type = 'obj:rmsinfo'
+    elif rec_id == 3:
+      type = 'map(int,obj:recloc)'
+    elif rec_id == 4:
+      ignore = True
+  elif len(rms_name) > 3 and rms_name[-3] == '_':
+    basename = rms_name[:-3]
+    if basename in rms_types:
+      type = 'obj:' + rms_types[basename]
+      
+  if ignore:
+    return ('ignore', None)
+  elif type != None:
+    try:
+      return ('ok', parse_data(stream(bytes), type))
+    except:
+      return ('error', None)
+  else:
+    return ('unknown', None)
+  
 #return the raw byte data content for a given RMS record; pass in the parsed RMS structure, RMS name, and record ID
 def get_record (rmses, name, id):
   rms = get_unique(rmses, 'name', name, 'RMS')
@@ -154,6 +186,13 @@ def print_contents (dlen, rmses, num_rms, err):
           print '  Data: %d bytes %s' % (len(rec['data']), '(expected %d)' % rec['len'] if len(rec['data']) < rec['len'] else '')
           if rec['data']:
             print format_bytes(rec['data'])
+          if rec['content'][0] == 'ok':
+            print '  Content:\n' + print_data(rec['content'][1], 2, False, True)
+          elif rec['content'][0] == 'error':
+            print '  Content: error deserializing'
+          elif rec['content'][0] == 'unknown':
+            print '  Content: don\'t know record format'          
+          print
         else:
           print '  Data: [no data]'
           print
