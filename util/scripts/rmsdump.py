@@ -102,6 +102,8 @@ rms_types = {
   'USER': 'user',
   'CASE': 'case',
   'PAT_REFERRAL': 'patref',
+  'FORMDEF': 'formdef',
+  'FORMDATA': 'forminst',
   'PROPERTY': 'property',
   'LOG': 'logentry',
   'JavaROSATransQ': 'txmsg',
