@@ -236,11 +236,24 @@ builtin_types = {
   'mapp': read_map_poly
 }
 
+
+# relies on stream containing ONLY data for the record
+def _parse_property (dstr):
+  return (('str', ''.join(list(dstr))),)
+
+
+
+
+
 custom_types = {
   'rmsinfo': parse_custom('int,int,int'),
   'recloc': parse_custom('int,int'),
   'user': parse_custom('str,str,str,int,int,str,bool,map(str,str)'),
-  'test': parse_custom('int,str,bool')
+  'case': parse_custom('str,str,str,str,bool,null(date),int,mapp(str)'),
+  'patref': parse_custom('str,date,date,str,str,int,bool'),
+  'property': _parse_property,
+  'logentry': parse_custom('date,str,str'),
+  'cc-recd-forms-mapping': parse_custom('list(int),map(int,int)')
 }
   
 type_tags = {
@@ -291,8 +304,7 @@ type_tags = {
   '\x27\x53\xac\x23': 'obj:simplehttptxmsg',
   '\x01\x12\x89\x43': 'obj:smstxmsg',
   '\x21\x71\xd6\x5d': 'obj:binsmstxmsg',
-  '\xfb\x2c\xa2\x76': 'obj:txmsgserwrapper',
-  '\x01\x02\x03\x04': 'obj:test'
+  '\xfb\x2c\xa2\x76': 'obj:txmsgserwrapper'
 }
 
 def print_data (data, indent=0, suppress_start=False, suppress_end=False):
@@ -364,6 +376,11 @@ def print_data_helper (data, indent, suppress_indent=False):
 
   return buf
 
+  
+  
+
+  
+  
   
 def hex_to_stream (hexstr):
   return stream(''.join([chr(int(c, 16)) for c in hexstr.split()]))

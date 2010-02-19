@@ -99,7 +99,12 @@ def get_unique (l, key, val, type):
   return matches[0]
 
 rms_types = {
-  'USER': 'user'
+  'USER': 'user',
+  'CASE': 'case',
+  'PAT_REFERRAL': 'patref',
+  'PROPERTY': 'property',
+  'LOG': 'logentry',
+  'FORMS_RECD': 'cc-recd-forms-mapping'
 }
   
 def get_record_content (bytes, rec_id, rms_name):
