@@ -44,7 +44,7 @@ public class FormSummaryView extends List {
 	}
 
 	protected void createView() {
-		int captioncount = -1;
+		int captioncount = 0;
 
 		indexHash = new HashMap();
 
@@ -67,8 +67,9 @@ public class FormSummaryView extends List {
 					append(text, null, isHeader ? StyleSheet
 							.getStyle(STYLE_HEADER) : StyleSheet
 							.getStyle(STYLE_PROMPT));
-					captioncount++;
 					indexHash.put(new Integer(captioncount), index);
+					
+					captioncount++;
 				}
 			}
 			index = form.incrementIndex(index);
