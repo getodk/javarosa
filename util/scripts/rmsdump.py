@@ -104,6 +104,8 @@ rms_types = {
   'PAT_REFERRAL': 'patref',
   'PROPERTY': 'property',
   'LOG': 'logentry',
+  'JavaROSATransQ': 'txmsg',
+  'JavaROSATransQSent': 'txmsg',  
   'FORMS_RECD': 'cc-recd-forms-mapping'
 }
   
@@ -123,7 +125,7 @@ def get_record_content (bytes, rec_id, rms_name):
     basename = rms_name[:-3]
     if basename in rms_types:
       type = 'obj:' + rms_types[basename]
-      
+  
   if ignore:
     return ('ignore', None)
   elif type != None:
