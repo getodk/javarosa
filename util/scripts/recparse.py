@@ -79,7 +79,17 @@ def read_null (dstr, type):
   if get(read_bool(dstr)):
     return parse(dstr, type)
   else:
-    return (type[0], None)
+    return (fix(type[0]), None)
+    
+def fix (type_name):
+  if type_name in ['null', 'tagged']:
+    return 'generic'
+  elif type_name == 'listp':
+    return 'list'
+  elif type_name == 'mapp':
+    return 'map'
+  else:
+    return type_name
     
 def read_list (dstr, type):
   return read_list_helper(dstr, lambda dstr: parse(dstr, type))
@@ -137,7 +147,7 @@ def parse (dstr, type):
   name = type[0]
   args = type[1:]
   
-  return get_parse_func(name)(*([dstr] + args))
+  return get_parse_func(name)(*([dstr] + args)) 
   
 def parse_data (dstr, template):
   val = get(parse_template(dstr, template))
@@ -245,16 +255,77 @@ builtin_types = {
 def _parse_property (dstr):
   return (('str', ''.join(list(dstr))),)
 
+def _parse_tree_child (dstr):
+  if get(read_bool(dstr)):
+    val = parse_data(dstr, 'obj:treeelem')
+  else:
+    val = read_tagged(dstr) # if this happens, which it almost certainly won't, we almost certainly won't have the prototype registered
+  return (val,)
+    
+def _parse_xpath_num_lit (dstr):
+  if get(read_bool(dstr)):
+    val = read_float(dstr)
+  else:
+    val = read_int(dstr)
+  return (val,)
 
+def _parse_xpath_path (dstr):
+  type = read_int(dstr)
+  filtexpr = parse_data(dstr, 'obj:xpath-expr-filt') if get(type) == 2 else ('obj:xpath-expr-filt', None)
+  return (type, filtexpr, parse_data(dstr, 'list(obj:xpath-step)'))
 
+def _parse_xpath_step (dstr):
+  axis = read_int(dstr)
+  test = read_int(dstr)
+  if test == 0:
+    detail = parse_data(dstr, 'obj:qname')
+  elif test == 2:
+    detail = read_string(dstr)
+  elif test == 6:
+    detail = parse_data(dstr, 'null(str)')
+  else:
+    detail = None
+  preds = parse_data(dstr, 'listp')
 
-
+  return (axis, test, detail, preds) if detail != None else (axis, test, preds)
+  
 custom_types = {
   'rmsinfo': parse_custom('int,int,int'),
   'recloc': parse_custom('int,int'),
   'user': parse_custom('str,str,str,int,int,str,bool,map(str,str)'),
   'case': parse_custom('str,str,str,str,bool,null(date),int,mapp(str)'),
   'patref': parse_custom('str,date,date,str,str,int,bool'),
+  'formdef': parse_custom('int,str,null(str)'), #FIXME - currently only partial deserialization
+  'forminst': parse_custom('int,int,null(str),null(str),null(date),map(str,str),obj:treeelem'),
+#  'forminst-compact': ...,   oh boy...
+  'treeelem': parse_custom('str,int,bool,null(tagged),null(list(obj:treechildhack)),int,bool,bool,bool,bool,bool,null(obj:constraint),str,str,list(str)'),
+  'treechildhack': _parse_tree_child,
+  'intdata': parse_custom('int'),
+  'booldata': parse_custom('bool'),
+  'strdata': parse_custom('str'),
+  'selonedata': parse_custom('obj:sel'),
+  'selmultidata': parse_custom('list(obj:sel)'),
+  'sel': parse_custom('str,int'),
+  'floatdata': parse_custom('dbl'),
+  'datedata': parse_custom('date'),
+  'datetimedata': parse_custom('date'),
+  'timedata': parse_custom('date'),
+  'constraint': parse_custom('tagged,str'),
+  'xpathcond': parse_custom('tagged'),
+  'xpath-expr-arith': parse_custom('int,tagged,tagged'),
+  'xpath-expr-bool': parse_custom('int,tagged,tagged'),
+  'xpath-expr-cmp': parse_custom('int,tagged,tagged'),
+  'xpath-expr-eq': parse_custom('bool,tagged,tagged'),
+  'xpath-expr-filt': parse_custom('tagged,listp'),
+  'xpath-expr-func': parse_custom('obj:qname,listp'),
+  'xpath-expr-numlit': _parse_xpath_num_lit,
+  'xpath-expr-numneg': parse_custom('tagged'),
+  'xpath-expr-path': _parse_xpath_path,
+  'xpath-expr-strlit': parse_custom('str'),
+  'xpath-expr-union': parse_custom('tagged,tagged'),
+  'xpath-expr-varref': parse_custom('obj:qname'),
+  'xpath-step': _parse_xpath_step,
+  'qname': parse_custom('null(str),str'),
   'property': _parse_property,
   'txmsg': parse_custom('tagged'),
   'simplehttptxmsg': parse_custom('str,int,str,int,str,date,date,int,int,str,int,str,bytes'),
@@ -338,6 +409,8 @@ def print_data_helper (data, indent, suppress_indent=False):
       buf += 'dt %s' % sdt
     else:
       buf += 'dt <null>'
+  elif type == 'generic':
+    buf += '? <null>'
   elif type == 'seq':
     buf += 'seq #%d (\n' % len(val)
     for i in range(0, len(val)):
