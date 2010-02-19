@@ -102,6 +102,10 @@
 			<include name="**/*.java"/>
 		</javac>
 
+		<copy todir="build/resources/">
+		    <fileset dir="${dir.resources-shared}/resources/"/>
+   		</copy>
+		
 		<exec executable="hg" outputproperty="jr-build-version">
 			<arg line="parents --template {node|short}"/>
 		</exec>		
