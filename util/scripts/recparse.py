@@ -69,6 +69,9 @@ def read_date (dstr):
   val = datetime.utcfromtimestamp(get(read_int(dstr)) / 1000.)
   return ('date', val)
 
+def read_binary (dstr):
+  return ('bytes', read_bytes(dstr, get(read_int(dstr))))
+  
 #todo: the parse functions for compound objects don't retain the whole bytestream during unexpected end-of-stream,
 #nor do they keep around the (partial) data that led to value errors
 
@@ -207,7 +210,7 @@ def parse_token (tokstr):
   return token
 
 def validate_token (name, args):
-  allowed = {'int': 0, 'bool': 0, 'dbl': 0, 'str': 0, 'date': 0, 'obj:': 0, 'null': 1, 'tagged': 0, 'list': 1, 'listp': 0, 'map': 2, 'mapp': 1}
+  allowed = {'int': 0, 'bool': 0, 'dbl': 0, 'str': 0, 'date': 0, 'obj:': 0, 'null': 1, 'tagged': 0, 'list': 1, 'listp': 0, 'map': 2, 'mapp': 1, 'bytes': 0}
   
   if name == 'obj:':
     raise ValueError('custom object not specified')
@@ -233,7 +236,8 @@ builtin_types = {
   'list': read_list,
   'listp': read_list_poly,
   'map': read_map,
-  'mapp': read_map_poly
+  'mapp': read_map_poly,
+  'bytes': read_binary
 }
 
 
@@ -252,13 +256,15 @@ custom_types = {
   'case': parse_custom('str,str,str,str,bool,null(date),int,mapp(str)'),
   'patref': parse_custom('str,date,date,str,str,int,bool'),
   'property': _parse_property,
+  'txmsg': parse_custom('tagged'),
+  'simplehttptxmsg': parse_custom('str,int,str,int,str,date,date,int,int,str,int,str,bytes'),
   'logentry': parse_custom('date,str,str'),
   'cc-recd-forms-mapping': parse_custom('list(int),map(int,int)')
 }
   
 type_tags = {
   '\xff\xff\xff\xff': 'wrapper',
-  '\xe5\xe9\xb5\x92': 'generic',
+  '\xe5\xe9\xb5\x92': 'generic', #object -- should never be encountered
   '\x7c\xa1\x6f\xdb': 'int',
   '\x8a\xc5\x87\x0b': 'int', #long
   '\xb5\xdc\x2e\x41': 'int', #short
@@ -271,7 +277,6 @@ type_tags = {
   '\xc5\x1d\xfd\xa6': 'date',
   '\x27\x51\x2e\xc9': 'obj:qdef',
   '\xb3\xc4\x9b\xbd': 'obj:gdef',
-  '\xed\x09\xe3\x8e': 'obj:forminst',
   '\x68\xc2\xaf\xad': 'obj:intdata',
   '\x8f\x4b\x45\xfe': 'obj:booldata',
   '\xed\xce\xd1\xce': 'obj:geodata',
@@ -304,7 +309,8 @@ type_tags = {
   '\x27\x53\xac\x23': 'obj:simplehttptxmsg',
   '\x01\x12\x89\x43': 'obj:smstxmsg',
   '\x21\x71\xd6\x5d': 'obj:binsmstxmsg',
-  '\xfb\x2c\xa2\x76': 'obj:txmsgserwrapper'
+ # '\xed\x09\xe3\x8e': 'obj:forminst', #unused i think
+ # '\xfb\x2c\xa2\x76': 'obj:txmsgserwrapper' #unused i think
 }
 
 def print_data (data, indent=0, suppress_start=False, suppress_end=False):
@@ -324,7 +330,7 @@ def print_data_helper (data, indent, suppress_indent=False):
     buf += 'f %f' % val if val != None else 'f <null>'
   elif type == 'bool':
     buf += 'b %s' % ('true' if val else 'false') if val != None else 'b <null>'
-  elif type == 'str':
+  elif type == 'str' or type == 'bytes':
     buf += 's %s' % repr(val) if val != None else 's <null>'
   elif type == 'date':
     if val != None:
