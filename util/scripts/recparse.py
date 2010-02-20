@@ -114,19 +114,40 @@ def read_map_helper (dstr, keytype, get_elem):
   return ('map', m)
   
 def read_tagged (dstr):
+  return parse(dstr, read_tagged_type(dstr))
+
+def read_tagged_type (dstr):
   tag = read_bytes(dstr, 4)
   if tag in type_tags:
     type = type_tags[tag]
     
     if type == 'wrapper':
-      raise ValueError("don't support wrapper tags currently")
+      return read_tagged_type_wrapper(dstr)
     elif type == 'generic':
       raise ValueError("don't know how to handle generic")
-    
-    return parse(dstr, [type])
+    else:
+      return [type]
   else:
     raise ValueError("don't know tag [%s]" % repr(tag))
-  
+
+def read_tagged_type_wrapper (dstr):
+  wrap_type = get(read_int(dstr))
+
+  if wrap_type == 0:
+    return ['null', read_tagged_type(dstr)]
+  elif wrap_type == 32:
+    return ['list', read_tagged_type(dstr)]
+  elif wrap_type == 33:
+    return ['listp']
+  elif wrap_type == 34:
+    read_bool(dstr) # 'ordered' flag
+    return ['map', read_tagged_type(dstr), read_tagged_type(dstr)]
+  elif wrap_type == 35:
+    read_bool(dstr) # 'ordered' flag
+    return ['mapp', read_tagged_type(dstr)]
+  else:
+    raise ValueError('don\'t recognize wrapper code [%d]' % wrap_type)  
+    
 def read_list_poly (dstr):
   return read_list_helper(dstr, lambda dstr: read_tagged(dstr))
   
