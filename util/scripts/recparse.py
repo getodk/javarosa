@@ -35,7 +35,7 @@ def read_int (dstr, require_pos=False):
   if nv[0] >= 64:
     nv[0] -= 128
   val = reduce(lambda x, y: 128 * x + y, nv, 0)
-
+  
   if val < 0 and require_pos:
     raise ValueError
   return ('int', val)
@@ -271,17 +271,18 @@ def _parse_xpath_num_lit (dstr):
 
 def _parse_xpath_path (dstr):
   type = read_int(dstr)
-  filtexpr = parse_data(dstr, 'obj:xpath-expr-filt') if get(type) == 2 else ('obj:xpath-expr-filt', None)
-  return (type, filtexpr, parse_data(dstr, 'list(obj:xpath-step)'))
+  filtexpr = parse_data(dstr, 'obj:xpath-expr-filt') if get(type) == 2 else None
+  steps = parse_data(dstr, 'list(obj:xpath-step)')
+  return (type, filtexpr, steps) if filtexpr != None else (type, steps)
 
 def _parse_xpath_step (dstr):
   axis = read_int(dstr)
   test = read_int(dstr)
-  if test == 0:
+  if get(test) == 0:
     detail = parse_data(dstr, 'obj:qname')
-  elif test == 2:
+  elif get(test) == 2:
     detail = read_string(dstr)
-  elif test == 6:
+  elif get(test) == 6:
     detail = parse_data(dstr, 'null(str)')
   else:
     detail = None
@@ -298,7 +299,7 @@ custom_types = {
   'formdef': parse_custom('int,str,null(str),listp,obj:forminst,null(obj:loclzr),list(obj:condition),list(obj:recalc),listp'),
   'qdef': parse_custom('int,null(str),null(str),null(str),null(str),null(str),null(str),null(str),int,list(obj:selchoice),null(tagged)'),
   'selchoice': parse_custom('bool,str,str'),
-  'gdef': parse_custom('int,tagged,null(str),null(str),null(str),null(str),bool,listp,bool,null(tagged)'),
+  'gdef': parse_custom('int,tagged,null(str),null(str),null(str),null(str),bool,listp,bool,tagged'), #null(tagged)'),
   'loclzr': parse_custom('bool,bool,map(str,listp),list(str),null(str),null(str)'),
   'resfiledatasrc': parse_custom('str'),
   'localedatasrc': parse_custom('map(str,str)'),
