@@ -320,7 +320,7 @@ custom_types = {
   'formdef': parse_custom('int,str,null(str),listp,obj:forminst,null(obj:loclzr),list(obj:condition),list(obj:recalc),listp'),
   'qdef': parse_custom('int,null(str),null(str),null(str),null(str),null(str),null(str),null(str),int,list(obj:selchoice),null(tagged)'),
   'selchoice': parse_custom('bool,str,str'),
-  'gdef': parse_custom('int,tagged,null(str),null(str),null(str),null(str),bool,listp,bool,tagged'), #null(tagged)'),
+  'gdef': parse_custom('int,tagged,null(str),null(str),null(str),null(str),bool,listp,bool,null(tagged)'),
   'loclzr': parse_custom('bool,bool,map(str,listp),list(str),null(str),null(str)'),
   'resfiledatasrc': parse_custom('str'),
   'localedatasrc': parse_custom('map(str,str)'),
