@@ -227,7 +227,7 @@ public class GroupDef implements IFormElement, Localizable {
 		//be able to maintain "count" as opposed to "Add more?" questions, but will
 		//_completely_ break RMS's that existed before this change that had groups.
 		noAddRemove = ExtUtil.readBool(dis);
-		count = (IDataReference)ExtUtil.read(dis, new ExtWrapTagged(new ExtWrapNullable(IDataReference.class)), pf);
+		count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 	}
 
 	/** Write the group definition object to the supplied stream. */
@@ -247,7 +247,7 @@ public class GroupDef implements IFormElement, Localizable {
 		//_completely_ break RMS's that existed before this change that had groups.
 		ExtUtil.writeBool(dos, noAddRemove);
 		//What if this is null?
-		ExtUtil.write(dos,new ExtWrapTagged(new ExtWrapNullable(count)));
+		ExtUtil.write(dos,new ExtWrapNullable(count != null ? new ExtWrapTagged(count) : null));
 		
 	}
 	
