@@ -133,8 +133,8 @@ def get_record_content (bytes, rec_id, rms_name):
   elif type != None:
     try:
       return ('ok', parse_data(stream(bytes), type))
-    except:
-      return ('error', None)
+    except Exception, e:
+      return ('error', e)
   else:
     return ('unknown', None)
   
@@ -198,7 +198,7 @@ def print_contents (dlen, rmses, num_rms, err):
           if rec['content'][0] == 'ok':
             print '  Content:\n' + print_data(rec['content'][1], 2, False, True)
           elif rec['content'][0] == 'error':
-            print '  Content: error deserializing'
+            print '  Content: error deserializing: %s' % str(rec['content'][1])
           elif rec['content'][0] == 'unknown':
             print '  Content: don\'t know record format'          
           print
