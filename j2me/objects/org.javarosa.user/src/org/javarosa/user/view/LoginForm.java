@@ -55,8 +55,6 @@ public class LoginForm extends FramedForm {
 
 	private String[] extraText;
 	
-	private final static int DEFAULT_ADMIN_USERID = -1;
-
 	public LoginForm() {
 		//#style loginView
 		super(Localization.get("form.login.login"));
@@ -185,14 +183,28 @@ public class LoginForm extends FramedForm {
 	 * @return
 	 */
 	public boolean validateUser() {
-
+		boolean superUserLogin = false;
+		//#ifdef superuser-login.enable:defined
+		//#if superuser-login.enable
+		//#    superUserLogin = true;
+		//#endif
+		//#endif
+		
 		String usernameEntered = this.usernameField.getString().trim();
 		String passwordEntered = this.passwordField.getString().trim();
 
 		IStorageIterator ui = users.iterate();
 		while (ui.hasMore()) {
 			User u = (User)ui.nextRecord();
-			if (u.getUsername().equalsIgnoreCase(usernameEntered) && u.getPassword().equals(passwordEntered)) {
+			
+			String xName = u.getUsername();
+			String xPass = u.getPassword();
+			String xType = u.getUserType();
+			
+			if (xPass.equals(passwordEntered) && (	
+					xName.equalsIgnoreCase(usernameEntered) ||
+					(superUserLogin && xType.equals(User.ADMINUSER))
+				)) {
 				setLoggedInUser(u);
 				return true;
 			}
