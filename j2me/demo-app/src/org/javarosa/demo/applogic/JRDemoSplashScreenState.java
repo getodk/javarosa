@@ -1,8 +1,8 @@
 package org.javarosa.demo.applogic;
 
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.demo.util.JRDemoUtil;
 import org.javarosa.splashscreen.api.SplashScreenState;
+import org.javarosa.user.utility.UserUtility;
 
 public class JRDemoSplashScreenState extends SplashScreenState {
 
@@ -12,7 +12,7 @@ public class JRDemoSplashScreenState extends SplashScreenState {
 
 	public void done() {
 		//#if javarosa.dev.shortcuts
-		new JRDemoLoginState().loggedIn(JRDemoUtil.demoUser());
+		new JRDemoLoginState().loggedIn(UserUtility.demoUser(true));
 		//#else
 		new JRDemoLoginState().start();
 		//#endif
