@@ -34,6 +34,9 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
+
 /**
  * The <code>FileBrowser</code> custom component lets the user list files and
  * directories. It's uses FileConnection Optional Package (JSR 75). The FileConnection
@@ -42,7 +45,7 @@ import javax.microedition.lcdui.List;
  * @author breh
  */
 
-public class FileBrowser extends List implements CommandListener {
+public class FileBrowser extends List implements HandledCommandListener {
 
     /**
      * Command fired on file selection.
@@ -129,7 +132,11 @@ public class FileBrowser extends List implements CommandListener {
      * or is the implicit <code>SELECT_COMMAND</code> of List.
      * @param d the <code>Displayable</code> on which this event has occurred
      */
-    public void commandAction(Command c, Displayable d) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
         if (c.equals(SELECT_FILE_COMMAND)) {
             List curr = (List) d;
             currFile = curr.getString(curr.getSelectedIndex());
@@ -145,7 +152,7 @@ public class FileBrowser extends List implements CommandListener {
                 }
             }).start();
         } else {
-            commandListener.commandAction(c, d);
+            commandListener._commandAction(c, d);
         }
     }
 

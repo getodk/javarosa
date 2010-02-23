@@ -17,12 +17,13 @@
 package org.javarosa.entity.model.view;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.model.Entity;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 
 import de.enough.polish.ui.Choice;
 import de.enough.polish.ui.ChoiceGroup;
@@ -30,7 +31,7 @@ import de.enough.polish.ui.Form;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemStateListener;
 
-public class EntitySelectSortPopup<E extends Persistable> extends Form implements CommandListener, ItemStateListener {
+public class EntitySelectSortPopup<E extends Persistable> extends Form implements HandledCommandListener, ItemStateListener {
 	private EntitySelectView<E> psv;
 	private EntitySelectController<E> psa;
 	private Entity<E> entityPrototype;
@@ -69,7 +70,11 @@ public class EntitySelectSortPopup<E extends Persistable> extends Form implement
     	psa.setView(this);
     }
 	
-	public void commandAction(Command cmd, Displayable d) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command cmd, Displayable d) {
 		if (d == this) {
 			if (cmd == cancelCmd) {
 				psa.showList();

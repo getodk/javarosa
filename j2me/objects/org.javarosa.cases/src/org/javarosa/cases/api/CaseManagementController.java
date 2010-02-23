@@ -7,7 +7,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
@@ -15,15 +14,16 @@ import org.javarosa.cases.api.transitions.CaseManagementTransitions;
 import org.javarosa.cases.util.ICaseType;
 import org.javarosa.cases.view.CaseManagementScreen;
 import org.javarosa.chsreferral.util.PatientReferralUtil;
-import org.javarosa.core.api.State;
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
  * @author ctsims
  *
  */
-public class CaseManagementController implements CommandListener {
+public class CaseManagementController implements HandledCommandListener {
     public static final String NEW = "menu.NewCase";
     public static final String FOLLOWUP = "menu.FollowUp";
     public static final String REFERRAL = "menu.Referral";
@@ -95,7 +95,11 @@ public class CaseManagementController implements CommandListener {
 		view.append(caption, null);
 	}
 
-	public void commandAction(Command c, Displayable arg1) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
 		if(c.equals(List.SELECT_COMMAND)) {
 			int action = ((Integer)indexMapping.elementAt(view.getSelectedIndex())).intValue();
 			

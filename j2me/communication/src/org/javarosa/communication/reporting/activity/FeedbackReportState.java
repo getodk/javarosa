@@ -20,7 +20,6 @@
 package org.javarosa.communication.reporting.activity;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.communication.reporting.properties.FeedbackReportProperties;
@@ -28,6 +27,8 @@ import org.javarosa.communication.reporting.view.FeedbackReportScreen;
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.util.TrivialTransitions;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
@@ -35,7 +36,7 @@ import org.javarosa.j2me.view.J2MEDisplay;
  * @date Feb 27, 2009 
  *
  */
-public abstract class FeedbackReportState implements TrivialTransitions, State, CommandListener {
+public abstract class FeedbackReportState implements TrivialTransitions, State, HandledCommandListener {
 	
 	FeedbackReportScreen screen;
 
@@ -46,6 +47,10 @@ public abstract class FeedbackReportState implements TrivialTransitions, State, 
 	}
 
 	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
 		if(c.equals(FeedbackReportScreen.SEND_REPORT)) {
 			String message = screen.getString();
 			

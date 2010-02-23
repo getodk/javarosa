@@ -4,7 +4,6 @@
 package org.javarosa.formmanager.api;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
@@ -15,6 +14,8 @@ import org.javarosa.formmanager.utility.FormSender;
 import org.javarosa.formmanager.view.transport.FormTransportSubmitStatusScreen;
 import org.javarosa.formmanager.view.transport.FormTransportViews;
 import org.javarosa.formmanager.view.transport.TransportResponseProcessor;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.services.transport.TransportMessage;
 
@@ -22,7 +23,7 @@ import org.javarosa.services.transport.TransportMessage;
  * @author ctsims
  *
  */
-public abstract class FormTransportState implements FormTransportStateTransitions, State, CommandListener, ItemStateListener {
+public abstract class FormTransportState implements FormTransportStateTransitions, State, HandledCommandListener, ItemStateListener {
 	//not separating out state/controller/etc, as form send is already kind of a mess
 	
 	FormTransportStateTransitions transitions;
@@ -48,7 +49,11 @@ public abstract class FormTransportState implements FormTransportStateTransition
 		J2MEDisplay.setView(screen);
 	}
 
-	public void commandAction(Command arg0, Displayable arg1) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
 		//The way this works now is crazy and needs to be rewritten when we have more time
 		//For now, and command means done.
 		transitions.done();

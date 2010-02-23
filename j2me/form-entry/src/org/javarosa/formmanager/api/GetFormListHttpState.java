@@ -17,12 +17,13 @@
 package org.javarosa.formmanager.api;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
 import org.javarosa.formmanager.api.transitions.HttpFetchTransitions;
 import org.javarosa.formmanager.view.ProgressScreen;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
@@ -32,7 +33,7 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.services.transport.senders.SenderThread;
 
-public abstract class GetFormListHttpState implements State,CommandListener,TransportListener, HttpFetchTransitions{
+public abstract class GetFormListHttpState implements State,HandledCommandListener,TransportListener, HttpFetchTransitions{
 
 	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
 	public final Command CMD_RETRY = new Command("Retry",Command.BACK, 1);
@@ -83,8 +84,11 @@ public abstract class GetFormListHttpState implements State,CommandListener,Tran
 		progressScreen.addCommand(CMD_RETRY);
 	}
 
-	public void commandAction(Command command, Displayable display) {
-		
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command command, Displayable display) {
 		if(display== progressScreen){
 			if(command == CMD_CANCEL){
 				cancel();
