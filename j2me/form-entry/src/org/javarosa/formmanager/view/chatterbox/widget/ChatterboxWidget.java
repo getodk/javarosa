@@ -197,7 +197,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 				cbox.questionAnswered();
 		} else {
 			//unrecognized commandAction, propagate to parent.
-			cbox.commandAction(c, cbox);
+			cbox._commandAction(c, cbox);
 		}
 	}
 	
