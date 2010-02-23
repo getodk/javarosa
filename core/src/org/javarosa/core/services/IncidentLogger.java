@@ -3,6 +3,8 @@ package org.javarosa.core.services;
 import java.util.Date;
 
 import org.javarosa.core.api.IIncidentLogger;
+import org.javarosa.core.log.FatalException;
+import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 
 public class IncidentLogger {
@@ -35,4 +37,21 @@ public class IncidentLogger {
 			}
 		}
 	}
+	
+	public static void logException (Exception e) {
+		logException(e, false);
+	}
+	
+	public static void logException (Exception e, boolean topLevel) {
+		logIncident("exception", (topLevel ? "unhandled exception at top level: " : "") + WrappedException.printException(e));
+	}
+	
+	public static void die (String thread, Exception e) {
+		//log exception
+		logException(e, true);
+		
+		//crash
+		throw new FatalException("unhandled exception in " + thread, e);
+	}
 }
+
