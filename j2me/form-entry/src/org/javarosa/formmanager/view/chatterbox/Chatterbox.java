@@ -39,10 +39,11 @@ import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
-import de.enough.polish.ui.CommandListener;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Displayable;
 import de.enough.polish.ui.FramedForm;
@@ -51,7 +52,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
 
 
-public class Chatterbox extends FramedForm implements CommandListener, IFormEntryView{
+public class Chatterbox extends FramedForm implements HandledPCommandListener, IFormEntryView{
 	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
     private static final String PROMPT_REQUIRED_QUESTION = Localization.get("view.sending.RequiredQuestion");
@@ -479,7 +480,11 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	this.requestRepaint();
     }
     
-    public void commandAction(Command command, Displayable s) {
+    public void commandAction(Command c, Displayable d) {
+    	CrashHandler.commandAction(this, c, d);
+    }
+    
+    public void _commandAction(Command command, Displayable s) {
     	System.out.println("cbox: command action");
     	
     	if (command == backCommand) {
