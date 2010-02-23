@@ -32,6 +32,13 @@ import org.javarosa.core.model.data.IAnswerData;
 public abstract class AcquireScreen extends Form
 		implements CommandListener /* , IFormEntryView */ {
 
+	/** droos 2/23/10
+	 * 
+	 * once this whole acquiring screen stuff is worked out, it should be updated to use the
+	 * exception-logging event handlers (HandledCommandListener, etc.)
+	 * 
+	 */
+	
 	private AcquiringQuestionScreen questionScreen;
 	private CommandListener listenerToReturnTo;
 	public Command cancelCommand;

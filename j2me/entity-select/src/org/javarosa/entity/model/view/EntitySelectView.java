@@ -21,15 +21,15 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectController;
-import org.javarosa.entity.api.EntitySelectState;
 import org.javarosa.entity.model.Entity;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
@@ -39,7 +39,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 import de.enough.polish.ui.UiAccess;
 
-public class EntitySelectView<E extends Persistable> extends FramedForm implements ItemStateListener, CommandListener {
+public class EntitySelectView<E extends Persistable> extends FramedForm implements ItemStateListener, HandledCommandListener {
 	//#if javarosa.patientselect.formfactor == nokia-s40 or javarosa.patientselect.formfactor == sony-k610i
 	//# private static final int MAX_ROWS_ON_SCREEN = 5;
 	//# private static final int SCROLL_INCREMENT = 4;	
@@ -433,7 +433,11 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		return (getNumSortFields() == 0 ? null : entityPrototype.getSortFields()[0]);
 	}
 	
-	public void commandAction(Command cmd, Displayable d) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command cmd, Displayable d) {
 		if (d == this) {
 			if (cmd == exitCmd) {
 				controller.exit();
