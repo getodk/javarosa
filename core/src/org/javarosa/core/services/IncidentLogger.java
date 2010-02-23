@@ -29,13 +29,37 @@ public class IncidentLogger {
 	 * @param message A message describing the incident.
 	 */
 	public static void logIncident(String type, String message) {
-		if(JavaRosaPropertyRules.LOGS_ENABLED_YES.equals(PropertyManager._().getSingularProperty(JavaRosaPropertyRules.LOGS_ENABLED))){
+		if (isLoggingEnabled()) {
 			if(logger != null) {
-				logger.logIncident(type, message, new Date());
+				try {
+					logger.logIncident(type, message, new Date());
+				} catch (Exception e) {
+					//TODO: do something better here
+					System.err.println("exception when trying to write log message!");
+				}
 			} else {
 				System.out.println(type + ": " + message);
 			}
 		}
+	}
+	
+	public static boolean isLoggingEnabled () {
+		boolean enabled;
+		boolean problemReadingFlag = false;
+		try {
+			String flag = PropertyManager._().getSingularProperty(JavaRosaPropertyRules.LOGS_ENABLED);
+			enabled = (flag == null || flag.equals(JavaRosaPropertyRules.LOGS_ENABLED));
+		} catch (Exception e) {
+			enabled = true;	//default to true if problem
+			problemReadingFlag = true;
+		}
+		
+		//TODO: do something better here
+		if (problemReadingFlag) {
+			System.err.println("error reading 'logging enabled' flag");
+		}
+		
+		return enabled;
 	}
 	
 	public static void logException (Exception e) {
@@ -49,9 +73,13 @@ public class IncidentLogger {
 	public static void die (String thread, Exception e) {
 		//log exception
 		logException(e, true);
-		
+				
 		//crash
 		throw new FatalException("unhandled exception in " + thread, e);
+	}
+	
+	public static void crashTest (String msg) {
+		throw new FatalException("shit has hit the fan");
 	}
 }
 
