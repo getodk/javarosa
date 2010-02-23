@@ -3,7 +3,7 @@ package org.javarosa.core.log;
 public class FatalException extends WrappedException {
 
 	public FatalException () {
-		super();
+		this("");
 	}
 	
 	public FatalException (String message) {

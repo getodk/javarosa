@@ -5,10 +5,6 @@ public class WrappedException extends RuntimeException {
 	String message;
 	Exception child;
 	
-	public WrappedException () {
-
-	}
-	
 	public WrappedException (String message) {
 		this(message, null);
 	}
@@ -18,11 +14,12 @@ public class WrappedException extends RuntimeException {
 	}
 	
 	public WrappedException (String message, Exception child) {
+		super(constructMessage(message, child));
 		this.message = message;
 		this.child = child;
 	}
 
-	public String getMessage () {
+	public static String constructMessage (String message, Exception child) {
 		String str = "";
 		if (message != null) {
 			str += message;
@@ -30,7 +27,10 @@ public class WrappedException extends RuntimeException {
 		if (child != null) {
 			str += (message != null ? " => " : "") + printException(child);
 		}
-		return (str.equals("") ? "[exception]" : str);
+		
+		if (str.equals(""))
+			str = "[exception]";		
+		return str;
 	}
 	
 	public static String printException (Exception e) {
