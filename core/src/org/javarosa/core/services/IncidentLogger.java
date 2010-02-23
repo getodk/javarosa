@@ -79,7 +79,7 @@ public class IncidentLogger {
 	}
 	
 	public static void crashTest (String msg) {
-		throw new FatalException("shit has hit the fan");
+		throw new FatalException(msg != null ? msg : "shit has hit the fan");
 	}
 }
 
