@@ -30,16 +30,16 @@ import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.model.Entity;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledPItemStateListener;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
-import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.TextField;
 import de.enough.polish.ui.UiAccess;
 
-public class EntitySelectView<E extends Persistable> extends FramedForm implements ItemStateListener, HandledCommandListener {
+public class EntitySelectView<E extends Persistable> extends FramedForm implements HandledPItemStateListener, HandledCommandListener {
 	//#if javarosa.patientselect.formfactor == nokia-s40 or javarosa.patientselect.formfactor == sony-k610i
 	//# private static final int MAX_ROWS_ON_SCREEN = 5;
 	//# private static final int SCROLL_INCREMENT = 4;	
@@ -338,7 +338,11 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		}
 	}
 	
-	public void itemStateChanged (Item item) {
+	public void itemStateChanged(Item i) {
+		CrashHandler.itemStateChanged(this, i);
+	}  
+
+	public void _itemStateChanged(Item item) {
 		if (item == tf) {
 			refresh();
 		}

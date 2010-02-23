@@ -24,14 +24,14 @@ import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.model.Entity;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledPItemStateListener;
 
 import de.enough.polish.ui.Choice;
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.Form;
 import de.enough.polish.ui.Item;
-import de.enough.polish.ui.ItemStateListener;
 
-public class EntitySelectSortPopup<E extends Persistable> extends Form implements HandledCommandListener, ItemStateListener {
+public class EntitySelectSortPopup<E extends Persistable> extends Form implements HandledCommandListener, HandledPItemStateListener {
 	private EntitySelectView<E> psv;
 	private EntitySelectController<E> psa;
 	private Entity<E> entityPrototype;
@@ -82,7 +82,11 @@ public class EntitySelectSortPopup<E extends Persistable> extends Form implement
 		}
 	}
 
-	public void itemStateChanged(Item item) {
+	public void itemStateChanged(Item i) {
+		CrashHandler.itemStateChanged(this, i);
+	}  
+
+	public void _itemStateChanged(Item item) {
 		if (item == sortField) {
 			psv.changeSort(entityPrototype.getSortFields()[sortField.getSelectedIndex()]);
 			psa.showList();

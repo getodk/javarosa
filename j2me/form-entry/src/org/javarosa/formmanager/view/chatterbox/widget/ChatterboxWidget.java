@@ -21,16 +21,18 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.IQuestionWidget;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledPItemCommandListener;
+import org.javarosa.j2me.log.HandledPItemStateListener;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.ItemCommandListener;
-import de.enough.polish.ui.ItemStateListener;
 import de.enough.polish.ui.Style;
 
-public class ChatterboxWidget extends Container implements IQuestionWidget, ItemStateListener, ItemCommandListener {
+public class ChatterboxWidget extends Container implements IQuestionWidget, HandledPItemStateListener, HandledPItemCommandListener {
 	public static final int VIEW_NOT_SET = -1;
 	/** A Widget currently interacting with the user **/
 	public static final int VIEW_EXPANDED = 0;
@@ -187,7 +189,11 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 		widget.setItemCommandListener((ItemCommandListener)null);
 	}
 	
-	public void commandAction (Command c, Item i) {
+	public void commandAction(Command c, Item i) {
+		CrashHandler.commandAction(this, c, i);
+	}  
+
+	public void _commandAction(Command c, Item i) {
     	System.out.println("cw: command action");
 		
 		if (i == expandedStyle.getInteractiveWidget() && c == nextCommand) {
@@ -201,7 +207,11 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Item
 		}
 	}
 	
-	public void itemStateChanged (Item i) {
+	public void itemStateChanged(Item i) {
+		CrashHandler.itemStateChanged(this, i);
+	}  
+
+	public void _itemStateChanged(Item i) {
 		//debugging
     	System.out.println("cw: item state");
     	if (i instanceof ChoiceGroup) {
