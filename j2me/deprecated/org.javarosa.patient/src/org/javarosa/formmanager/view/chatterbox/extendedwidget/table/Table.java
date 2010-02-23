@@ -27,22 +27,23 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import javax.microedition.lcdui.Canvas;
-import de.enough.polish.ui.Command;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.ExtensionConstants;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledPItemCommandListener;
 import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.ImmunizationRow;
 
+import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.CustomItem;
 import de.enough.polish.ui.DateField;
 import de.enough.polish.ui.Item;
-import de.enough.polish.ui.ItemCommandListener;
 import de.enough.polish.ui.StringItem;
 
-public class Table extends CustomItem implements ItemCommandListener {
+public class Table extends CustomItem implements HandledPItemCommandListener {
     
 	private static final Command CMD_EDIT = new Command("OK", Command.OK, 1);
 	///private static final Command CMD_DATE_OK = new Command("OK", Command.OK, 1);
@@ -489,9 +490,14 @@ public class Table extends CustomItem implements ItemCommandListener {
 
     }
 
-    public void commandAction(Command c, Item i) {
+	public void commandAction(Command c, Item i) {
+		CrashHandler.commandAction(this, c, i);
+	}  
+
+	public void _commandAction(Command c, Item i) {
         if (c == CMD_EDIT) {
-    }
+        	
+        }
    }
     public String[][] getText()
     {

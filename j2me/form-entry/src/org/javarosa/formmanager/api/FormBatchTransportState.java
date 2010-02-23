@@ -8,7 +8,6 @@ import java.util.Vector;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.ItemStateListener;
 
 import org.javarosa.core.api.State;
 import org.javarosa.formmanager.api.transitions.FormBatchTransportStateTransitions;
@@ -18,13 +17,14 @@ import org.javarosa.formmanager.view.transport.MultiSubmitStatusScreen;
 import org.javarosa.formmanager.view.transport.TransportResponseProcessor;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledItemStateListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
  * @author ctsims
  *
  */
-public abstract class FormBatchTransportState implements FormBatchTransportStateTransitions, State, HandledCommandListener, ItemStateListener {
+public abstract class FormBatchTransportState implements FormBatchTransportStateTransitions, State, HandledCommandListener, HandledItemStateListener {
 	//not separating out state/controller/etc, as form send is already kind of a mess
 
 	MultiSubmitStatusScreen screen;
@@ -61,7 +61,11 @@ public abstract class FormBatchTransportState implements FormBatchTransportState
 		transitions.done();
 	}
 
-	public void itemStateChanged(Item arg0) {
+	public void itemStateChanged(Item i) {
+		CrashHandler.itemStateChanged(this, i);
+	}  
+
+	public void _itemStateChanged(Item i) {
 		//It's pretty atrocious, but I don't have time to completely rewrite this right now. 
 		//Any exit from the multiscreen is just a bail.
 		transitions.done();
