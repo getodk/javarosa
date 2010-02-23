@@ -45,6 +45,10 @@ class Datum:
       _print_element = lambda e: e._pretty_print(indent + 1)
       _print_mapping = lambda (k, v): k._pretty_print(indent + 1) + ' => ' + v._pretty_print(indent + 1, True)
     
+      def _iteritems_sorted (map):
+        for k in sorted(map.keys(), key=lambda datum: datum.val):
+          yield (k, map[k])
+      
       if self.type == 'seq':
         config = (True, '()', lambda x: x, _print_element)
       elif self.type.startswith('obj:'):
@@ -52,7 +56,7 @@ class Datum:
       elif self.type == 'list':
         config = (True, '[]', lambda x: x, _print_element)
       elif self.type == 'map':
-        config = (True, '{}', lambda x: x.iteritems(), _print_mapping)
+        config = (True, '{}', _iteritems_sorted, _print_mapping)
       (show_count, brackets, iterator, print_elem) = config
         
       buf += self.type + ' '
