@@ -22,6 +22,8 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 
 /**
  * @author mel
@@ -30,14 +32,7 @@ import org.javarosa.core.model.data.IAnswerData;
  * 
  */
 public abstract class AcquireScreen extends Form
-		implements CommandListener /* , IFormEntryView */ {
-
-	/** droos 2/23/10
-	 * 
-	 * once this whole acquiring screen stuff is worked out, it should be updated to use the
-	 * exception-logging event handlers (HandledCommandListener, etc.)
-	 * 
-	 */
+		implements HandledCommandListener /* , IFormEntryView */ {
 	
 	private AcquiringQuestionScreen questionScreen;
 	private CommandListener listenerToReturnTo;
@@ -115,17 +110,21 @@ public abstract class AcquireScreen extends Form
 	 * 
 	 * Command handler for generic acquisition commands
 	 */
-	public void commandAction(Command command, Displayable arg1) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}
+	
+	public void _commandAction(Command command, Displayable arg1) {
 
 		if (command == cancelCommand) {
 			cleanUp();
-			listenerToReturnTo.commandAction(command, arg1);
+			forwardCommand(command, arg1);
 
 		} else if (command == setCallingScreenDataCommand) {
 			IAnswerData data = this.getAcquiredData();
 			if (data != null) {
 				questionScreen.setAcquiredData(data);
-				commandAction(cancelCommand, this);
+				_commandAction(cancelCommand, this);
 			}
 
 		} else {
@@ -133,6 +132,16 @@ public abstract class AcquireScreen extends Form
 		}
 
 	}
+	
+    private void forwardCommand (Command c, Displayable d) {
+    	CommandListener cl = listenerToReturnTo;
+    	
+    	if (cl instanceof HandledCommandListener) {
+    		((HandledCommandListener)cl)._commandAction(c, d);
+    	} else {
+    		cl.commandAction(c, d);
+    	}
+    }
 
 	/**
 	 * Cleans up the resources used to do the acquiring (e.g. video player)

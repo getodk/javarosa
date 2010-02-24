@@ -25,6 +25,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.IncidentLogger;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.model.Entity;
@@ -299,7 +300,8 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		}
 		//#next esstyle
 	}
-	
+		
+	//needs no exception wrapping
 	protected boolean handleKeyPressed(int keyCode, int gameAction) {
 		//Supress these actions, letting the propogates screws up scrolling on some platforms.
 		if (gameAction == Canvas.UP && keyCode != Canvas.KEY_NUM2) {
@@ -311,19 +313,25 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	}
 
 	protected boolean handleKeyReleased(int keyCode, int gameAction) {
-		if (gameAction == Canvas.UP && keyCode != Canvas.KEY_NUM2) {
-			stepIndex(false);
-			refreshList();
-			return true;
-		} else if (gameAction == Canvas.DOWN && keyCode != Canvas.KEY_NUM8) {
-			stepIndex(true);
-			refreshList();
-			return true;
-		} else if (gameAction == Canvas.FIRE && keyCode != Canvas.KEY_NUM5) {
-			processSelect();
-			return true;
-		}
+		try {
 		
+			if (gameAction == Canvas.UP && keyCode != Canvas.KEY_NUM2) {
+				stepIndex(false);
+				refreshList();
+				return true;
+			} else if (gameAction == Canvas.DOWN && keyCode != Canvas.KEY_NUM8) {
+				stepIndex(true);
+				refreshList();
+				return true;
+			} else if (gameAction == Canvas.FIRE && keyCode != Canvas.KEY_NUM5) {
+				processSelect();
+				return true;
+			}
+
+		} catch (Exception e) {
+			IncidentLogger.die("gui-keyup", e);
+		}
+			
 		return super.handleKeyReleased(keyCode, gameAction);
 	}
 
@@ -460,27 +468,30 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 //#		return firstIndex + i;
 //#	}
 //#	
-//#	/* (non-Javadoc)
-//#	 * @see de.enough.polish.ui.Container#handlePointerPressed(int, int)
-//#	 */
-//#	protected boolean handlePointerPressed(int x, int y) {
+//#	protected boolean handlePointerPressed (int x, int y) {
 //#		boolean handled = false;
 //#		
-//#		int screenIndex = 0;
-//#		for (int i = 0; i < this.container.size(); i++) {
-//#			Item item = this.container.getItems()[i];
-//#			if (item instanceof Container) {
-//#				if (this.container.isInItemArea(x - this.container.getAbsoluteX(), y - this.container.getAbsoluteY(), item)) {
-//#					selectedIndex = selectedIndexFromScreen(screenIndex);
-//#					refreshList();
-//#					processSelect();
+//#		try {
+//#	
+//#			int screenIndex = 0;
+//#			for (int i = 0; i < this.container.size(); i++) {
+//#				Item item = this.container.getItems()[i];
+//#				if (item instanceof Container) {
+//#					if (this.container.isInItemArea(x - this.container.getAbsoluteX(), y - this.container.getAbsoluteY(), item)) {
+//#						selectedIndex = selectedIndexFromScreen(screenIndex);
+//#						refreshList();
+//#						processSelect();
 //#					
-//#					handled = true;
-//#					break;
-//#				}
+//#						handled = true;
+//#						break;
+//#					}
 //#				
-//#				screenIndex++;
+//#					screenIndex++;
+//#				}
 //#			}
+//#			
+//#		} catch (Exception e) {
+//#			IncidentLogger.die("gui-ptrdown", e);
 //#		}
 //#		
 //#		if (handled) {

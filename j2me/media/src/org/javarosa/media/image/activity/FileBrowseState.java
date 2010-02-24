@@ -29,6 +29,7 @@ import org.javarosa.core.api.State;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledThread;
 import org.javarosa.j2me.services.FileService;
 import org.javarosa.j2me.services.exception.FileException;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -127,7 +128,7 @@ public abstract class FileBrowseState implements DataCaptureTransitions, State, 
 		if (c == selectCommand ) {
 			List curr = (List) d;
 			final String currFile = curr.getString(curr.getSelectedIndex());
-			new Thread(new Runnable() {
+			new HandledThread(new Runnable() {
 				public void run() {
 					if (currFile.endsWith(SEP_STR)
 							|| currFile.equals(UP_DIRECTORY)) {

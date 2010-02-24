@@ -74,6 +74,7 @@ public class CameraCanvas extends Canvas {
 	    g.drawRect(1, 1, width - 3, height - 3);
 	  }
 	  
+   	  //no exception handling needed
 	  public void keyPressed(int keyCode) {
 	   // int action = getGameAction(keyCode);
 	    //if (action == FIRE) 

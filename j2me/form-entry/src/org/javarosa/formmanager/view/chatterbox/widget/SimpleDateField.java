@@ -23,6 +23,8 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
+import org.javarosa.core.services.IncidentLogger;
+
 import de.enough.polish.ui.CustomItem;
 
 /**
@@ -140,22 +142,32 @@ public class SimpleDateField extends CustomItem
 	
 	public boolean handleKeyPressed(int keyCode, int gameAction)
 	{
-		System.err.println("KeyCode =" + keyCode);
-		System.err.println("GameAction =" + gameAction);
-		boolean gameActionActivated = handleGameActionPressed(gameAction);
 		
-		boolean keyCodePressed = false;
-		if(selectionMode != NONE)
-			keyCodePressed = handleKeyCodePressed(keyCode);
-		boolean fieldsChanged = keyCodePressed || gameActionActivated;
-		if(fieldsChanged)
-		{
-			updateDate();
-			repaint();
+		try {
+		
+			System.err.println("KeyCode =" + keyCode);
+			System.err.println("GameAction =" + gameAction);
+			boolean gameActionActivated = handleGameActionPressed(gameAction);
+			
+			boolean keyCodePressed = false;
+			if(selectionMode != NONE)
+				keyCodePressed = handleKeyCodePressed(keyCode);
+			boolean fieldsChanged = keyCodePressed || gameActionActivated;
+			if(fieldsChanged)
+			{
+				updateDate();
+				repaint();
+			}
+			return fieldsChanged;
+			
+		} catch (Exception e) {
+			IncidentLogger.die("gui-keydown", e);
+			return false;
 		}
-		return fieldsChanged;
+			
 	}
 	
+	//exception handling delegated to keyPressed
 	public boolean handleKeyRepeated(int keyCode, int gameAction)
 	{
 		//repeatCount = 1;
@@ -164,6 +176,7 @@ public class SimpleDateField extends CustomItem
 		return false;
 	}
 	
+	//needs no exception handling
 	public boolean handleKeyReleased(int keyCode, int gameAction)
 	{
 		repeatCount = 0;

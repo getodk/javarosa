@@ -232,12 +232,12 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 				String text = (((TextEntryWidget)expandedStyle).textField()).getText();
 				System.out.println("Text equals: " + text);
 				if (text == null || text.length() == 0) {
-					commandAction(nextCommand, expandedStyle.getInteractiveWidget());
+					_commandAction(nextCommand, expandedStyle.getInteractiveWidget());
 				}
 				else {
 					//Jan 14, 2009 - I don't know why only the P1i was setup to do this. Seems weird to me...
 					
-					commandAction(nextCommand, expandedStyle.getInteractiveWidget());
+					_commandAction(nextCommand, expandedStyle.getInteractiveWidget());
 					//#if device.identifier == Sony-Ericsson/P1i
 					//#endif
 				}
