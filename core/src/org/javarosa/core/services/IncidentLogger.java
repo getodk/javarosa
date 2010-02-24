@@ -30,15 +30,20 @@ public class IncidentLogger {
 	 */
 	public static void logIncident(String type, String message) {
 		if (isLoggingEnabled()) {
-			if(logger != null) {
-				try {
-					logger.logIncident(type, message, new Date());
-				} catch (Exception e) {
-					//TODO: do something better here
-					System.err.println("exception when trying to write log message!");
-				}
-			} else {
-				System.out.println(type + ": " + message);
+			logIncidentForce(type, message);
+		}
+	}
+	
+	protected static void logIncidentForce(String type, String message) {
+		System.err.println("logger> " + type + ": " + message);
+		
+		if(logger != null) {
+			try {
+				logger.logIncident(type, message, new Date());
+			} catch (Exception e) {
+				//do not catch exceptions here; if this fails, we want the app to crash
+				System.err.println("exception when trying to write log message!");
+				logger.panic();
 			}
 		}
 	}
@@ -54,9 +59,8 @@ public class IncidentLogger {
 			problemReadingFlag = true;
 		}
 		
-		//TODO: do something better here
 		if (problemReadingFlag) {
-			System.err.println("error reading 'logging enabled' flag");
+			logIncidentForce("log-error", "could not read 'logging enabled' flag");
 		}
 		
 		return enabled;

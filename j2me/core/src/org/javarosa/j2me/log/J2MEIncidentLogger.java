@@ -19,17 +19,20 @@
  */
 package org.javarosa.j2me.log;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
+
+import javax.microedition.rms.RecordStore;
+import javax.microedition.rms.RecordStoreException;
 
 import org.javarosa.core.api.IIncidentLogger;
 import org.javarosa.core.log.ILogSerializer;
 import org.javarosa.core.log.IncidentLog;
+import org.javarosa.core.log.WrappedException;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.j2me.storage.rms.RMSStorageUtility;
 
 /**
@@ -90,4 +93,23 @@ public class J2MEIncidentLogger implements IIncidentLogger {
 		return serializer.serializeLogs(collection);
 	}
 
+	/**
+	 * called when an attempt to write to the log fails
+	 */
+	public void panic () {
+		final String LOG_PANIC = "LOG_PANIC";
+		
+		try {
+			RecordStore store = RecordStore.openRecordStore(LOG_PANIC, true);
+			
+			int days = (int)(System.currentTimeMillis() / DateUtils.DAY_IN_MS);
+			byte[] record = new byte[] {(byte)((days / 256) % 256), (byte)(days % 256)};
+			store.addRecord(record, 0, record.length);
+			
+			store.closeRecordStore();
+		} catch (RecordStoreException rse) {
+			throw new WrappedException(rse);
+		}
+	}
+	
 }
