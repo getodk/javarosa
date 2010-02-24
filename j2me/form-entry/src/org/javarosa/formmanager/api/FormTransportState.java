@@ -38,7 +38,6 @@ public abstract class FormTransportState implements FormTransportStateTransition
 	public FormTransportState(TransportMessage message, TransportResponseProcessor responder) {
 		FormTransportViews views = new FormTransportViews(this, this, responder);
 		sender = new FormSender(views, message);
-		sender.setMultiple(false);
 		screen = views.getSubmitStatusScreen();
 		this.transitions = this;
 	}

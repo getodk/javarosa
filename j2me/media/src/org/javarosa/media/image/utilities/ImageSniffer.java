@@ -19,6 +19,7 @@ package org.javarosa.media.image.utilities;
 import java.util.Vector;
 
 import org.javarosa.core.services.UnavailableServiceException;
+import org.javarosa.j2me.log.HandledThread;
 import org.javarosa.j2me.services.FileService;
 import org.javarosa.j2me.services.exception.FileException;
 import org.javarosa.media.image.activity.ImageChooserState;
@@ -31,7 +32,7 @@ import org.javarosa.utilities.file.J2MEFileService;
  * @author Cory Zue
  *
  */
-public class ImageSniffer implements Runnable
+public class ImageSniffer extends HandledThread
 {
 	private boolean quit = false;
 	private String directory;
@@ -59,7 +60,7 @@ public class ImageSniffer implements Runnable
 		System.out.println("Created Sniffer.");
 	}
 		
-	public void run()
+	public void _run()
 	{
 		// first pass - run in the background and find new images, just printing out their names
 		System.out.println("Starting to sniff: " + directory);
