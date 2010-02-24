@@ -36,6 +36,7 @@ import javax.microedition.lcdui.List;
 
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledThread;
 
 /**
  * The <code>FileBrowser</code> custom component lets the user list files and
@@ -108,7 +109,7 @@ public class FileBrowser extends List implements HandledCommandListener {
     }
 
     private void showDir() {
-        new Thread(new Runnable() {
+        new HandledThread(new Runnable() {
 
             public void run() {
                 try {
@@ -140,8 +141,7 @@ public class FileBrowser extends List implements HandledCommandListener {
         if (c.equals(SELECT_FILE_COMMAND)) {
             List curr = (List) d;
             currFile = curr.getString(curr.getSelectedIndex());
-            new Thread(new Runnable() {
-
+            new HandledThread(new Runnable() {
                 public void run() {
                     if (currFile.endsWith(SEP_STR) || currFile.equals(UP_DIRECTORY)) {
                         openDir(currFile);
@@ -152,7 +152,7 @@ public class FileBrowser extends List implements HandledCommandListener {
                 }
             }).start();
         } else {
-            commandListener._commandAction(c, d);
+            forwardCommand(c, d);
         }
     }
 
@@ -291,7 +291,17 @@ public class FileBrowser extends List implements HandledCommandListener {
         System.out.println("selURL: "+ currDirName + "    "+ currFile);
         CommandListener commandListener = getCommandListener();
         if (commandListener != null) {
-            commandListener.commandAction(SELECT_FILE_COMMAND, this);
+        	forwardCommand(SELECT_FILE_COMMAND, this);
         }
+    }
+
+    private void forwardCommand (Command c, Displayable d) {
+    	CommandListener cl = getCommandListener();
+    	
+    	if (cl instanceof HandledCommandListener) {
+    		((HandledCommandListener)cl)._commandAction(c, d);
+    	} else {
+    		cl.commandAction(c, d);
+    	}
     }
 }

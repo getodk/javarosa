@@ -11,10 +11,12 @@ public class CrashHandler {
 	/**
 	 * other places exceptions need to be explicitly trapped
 	 * 
-	 * 1) anywhere that app code is called from a background thread or timeout (SplashScreen)
+	 * 1) anywhere that app code is called from a background thread or timeout (SplashScreen,
+	 *    network callbacks (if any?))
 	 * 2) anywhere a GUI event handler can trigger app code; most of these are handled by the
-	 *    wrappers here, but there are still places such as handleKey*() and handlePointer*()
-	 * 3) anywhere the app code launches a Runnable (background thread or timertask)
+	 *    wrappers here, but there are still places such as key*(), pointer*(), (handle)Key*(),
+	 *    and (handle)Pointer*()
+	 * 3) anywhere the app code launches a Runnable (thread or timertask)
 	 * 
 	 */
 	
@@ -67,4 +69,5 @@ public class CrashHandler {
 			IncidentLogger.die("gui-islp", e);
 		}
 	}
+
 }

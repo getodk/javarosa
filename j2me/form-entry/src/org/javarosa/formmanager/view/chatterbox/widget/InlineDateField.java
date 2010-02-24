@@ -24,6 +24,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.IncidentLogger;
 
 import de.enough.polish.ui.CustomItem;
 
@@ -73,94 +74,101 @@ public class InlineDateField extends CustomItem {
 
   // Handle key presses.
 	public boolean handleKeyPressed(int keyCode, int gameAction) {
-		int curDay = sel.get(Calendar.DAY_OF_MONTH);
-		int daysInMonth = DateUtils.daysInMonth(sel.get(Calendar.MONTH), sel.get(Calendar.YEAR));
-		boolean changed = false;
+		try {
 		
-		// Handle four arrows.
-		if (gameAction == Canvas.RIGHT) {
-			if (selectionMode == YEAR) {
-				changeMonth(sel, 12);
-				changed = true;
-			} else if (selectionMode == MONTH) {
-				changeMonth(sel, 1);
-				changed = true;
-			} else if (selectionMode == DAYS) {
-				if (curDay < daysInMonth) {
-					curDay++;
+			int curDay = sel.get(Calendar.DAY_OF_MONTH);
+			int daysInMonth = DateUtils.daysInMonth(sel.get(Calendar.MONTH), sel.get(Calendar.YEAR));
+			boolean changed = false;
+			
+			// Handle four arrows.
+			if (gameAction == Canvas.RIGHT) {
+				if (selectionMode == YEAR) {
+					changeMonth(sel, 12);
 					changed = true;
-				} else {
-					selectionMode = NO_DATE;
+				} else if (selectionMode == MONTH) {
+					changeMonth(sel, 1);
+					changed = true;
+				} else if (selectionMode == DAYS) {
+					if (curDay < daysInMonth) {
+						curDay++;
+						changed = true;
+					} else {
+						selectionMode = NO_DATE;
+						changed = true;
+					}
+				} 
+			} else if (gameAction == Canvas.LEFT) {
+				if (selectionMode == YEAR) {
+					changeMonth(sel, -12);
+					changed = true;
+				} else if (selectionMode == MONTH) {
+					changeMonth(sel, -1);
+					changed = true;
+				} else if (selectionMode == DAYS && curDay > 1) {
+					curDay--;
+					changed = true;
+				} else if (selectionMode == NO_DATE) {
+					curDay = daysInMonth;
+					selectionMode = DAYS;
 					changed = true;
 				}
-			} 
-		} else if (gameAction == Canvas.LEFT) {
-			if (selectionMode == YEAR) {
-				changeMonth(sel, -12);
-				changed = true;
-			} else if (selectionMode == MONTH) {
-				changeMonth(sel, -1);
-				changed = true;
-			} else if (selectionMode == DAYS && curDay > 1) {
-				curDay--;
-				changed = true;
-			} else if (selectionMode == NO_DATE) {
-				curDay = daysInMonth;
-				selectionMode = DAYS;
-				changed = true;
-			}
-		} else if (gameAction == Canvas.UP) {
-			if (selectionMode == MONTH) {
-				selectionMode = YEAR;
-				changed = true;
-			} else if (selectionMode == DAYS) {
-				if (curDay > 7)
-					curDay -= 7;
-				else 
+			} else if (gameAction == Canvas.UP) {
+				if (selectionMode == MONTH) {
+					selectionMode = YEAR;
+					changed = true;
+				} else if (selectionMode == DAYS) {
+					if (curDay > 7)
+						curDay -= 7;
+					else 
+						selectionMode = MONTH;
+					changed = true;
+				} else if (selectionMode == NO_DATE) {
+					selectionMode = DAYS;
+					curDay = 28;
+					changed = true;
+				}
+			} else if (gameAction == Canvas.DOWN) {
+				if (selectionMode == YEAR) {
 					selectionMode = MONTH;
-				changed = true;
-			} else if (selectionMode == NO_DATE) {
-				selectionMode = DAYS;
-				curDay = 28;
-				changed = true;
-			}
-		} else if (gameAction == Canvas.DOWN) {
-			if (selectionMode == YEAR) {
-				selectionMode = MONTH;
-				changed = true;
-			} else if (selectionMode == MONTH) {
-				selectionMode = DAYS;
-				changed = true;
-			} else if (selectionMode == DAYS) {
-				if (curDay <= daysInMonth - 7) {
-					curDay += 7;
 					changed = true;
-				} else {
-					selectionMode = NO_DATE;
+				} else if (selectionMode == MONTH) {
+					selectionMode = DAYS;
+					changed = true;
+				} else if (selectionMode == DAYS) {
+					if (curDay <= daysInMonth - 7) {
+						curDay += 7;
+						changed = true;
+					} else {
+						selectionMode = NO_DATE;
+						changed = true;
+					}
+				}
+			} else if (gameAction == Canvas.FIRE) {
+				if (selectionMode == NO_DATE) {
+					value = null;
+					changed = true;
+				} else if (selectionMode == DAYS) {
+					// If value is null, create a new instance.
+					if (value == null) value = Calendar.getInstance();
+					
+					// Set the value to be the same as the selection.
+					value.setTime(sel.getTime());
 					changed = true;
 				}
 			}
-		} else if (gameAction == Canvas.FIRE) {
-			if (selectionMode == NO_DATE) {
-				value = null;
-				changed = true;
-			} else if (selectionMode == DAYS) {
-				// If value is null, create a new instance.
-				if (value == null) value = Calendar.getInstance();
-				
-				// Set the value to be the same as the selection.
-				value.setTime(sel.getTime());
-				changed = true;
-			}
-		}
-
-		// Check if changed flag has been raised and repaint if it has.
-		if (changed) {
-			sel.set(Calendar.DAY_OF_MONTH, curDay);
-			repaint();
-			return true;
-		} else
+	
+			// Check if changed flag has been raised and repaint if it has.
+			if (changed) {
+				sel.set(Calendar.DAY_OF_MONTH, curDay);
+				repaint();
+				return true;
+			} else
+				return false;
+			
+		} catch (Exception e) {
+			IncidentLogger.die("gui-keydown", e);
 			return false;
+		}
 	}
 	
 	public boolean handleKeyRepeated(int keyCode, int gameAction) {
@@ -168,26 +176,33 @@ public class InlineDateField extends CustomItem {
 		if ((selectionMode == YEAR || selectionMode == MONTH)
 			&& (gameAction == Canvas.LEFT || gameAction == Canvas.RIGHT)) {
 
-			int repeatIncrement;
-			int diff;
-
-			// Increment repeat count.
-			repeatCount++;
-		
-			// Determine number of years/months to increment/decrement by.
-			if (repeatCount % 2 == 0) repeatIncrement = 0;
-			else if (repeatCount <= 10) repeatIncrement = 1;
-			else repeatIncrement = 5;
-		
-			diff = (gameAction == Canvas.LEFT ? -1 : 1) * (selectionMode == YEAR ? 12 : 1) * repeatIncrement;
+			try {
+			
+				int repeatIncrement;
+				int diff;
+	
+				// Increment repeat count.
+				repeatCount++;
+			
+				// Determine number of years/months to increment/decrement by.
+				if (repeatCount % 2 == 0) repeatIncrement = 0;
+				else if (repeatCount <= 10) repeatIncrement = 1;
+				else repeatIncrement = 5;
+			
+				diff = (gameAction == Canvas.LEFT ? -1 : 1) * (selectionMode == YEAR ? 12 : 1) * repeatIncrement;
+					
+				changeMonth(sel, diff);
 				
-			changeMonth(sel, diff);
-		
+			} catch (Exception e) {
+				IncidentLogger.die("gui-keyrep", e);
+			}
+
 			return true;
 		} else
 			return false;
 	}
 
+	//needs no exception handling
 	public boolean handleKeyReleased(int keyCode, int gameAction) {
 		if (gameAction == Canvas.LEFT || gameAction == Canvas.RIGHT) {
 			repeatCount = 0;

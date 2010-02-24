@@ -29,6 +29,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.services.IncidentLogger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryController;
@@ -584,21 +585,30 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 //	}
 	
     public void keyPressed(int keyCode) {
-    	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
-    	super.keyPressed(keyCode);
-    	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
-    		controller.cycleLanguage();
-    	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
-    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
-				ChatterboxWidget widget = activeFrame();
-				if (widget != null) {
-					widget.UIHack(UIHACK_SELECT_PRESS);
+    	
+    	try {
+    	
+	    	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
+	    	super.keyPressed(keyCode);
+	    	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
+	    		controller.cycleLanguage();
+	    	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
+	    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
+					ChatterboxWidget widget = activeFrame();
+					if (widget != null) {
+						widget.UIHack(UIHACK_SELECT_PRESS);
+					}
 				}
-			}
-        	indexWhenKeyPressed = keyDownSelectedWidget;
+	        	indexWhenKeyPressed = keyDownSelectedWidget;
+	    	}
+	    	
+    	} catch (Exception e) {
+    		IncidentLogger.die("gui-keydown", e);
     	}
+
     }
     
+    //no exception handling needed
     public void keyReleased(int keyCode) {
     	if(keyCode == KEY_CENTER_LETS_HOPE && !(indexWhenKeyPressed == this.activeQuestionIndex)) {
     		//The previous select keypress was for a different item.

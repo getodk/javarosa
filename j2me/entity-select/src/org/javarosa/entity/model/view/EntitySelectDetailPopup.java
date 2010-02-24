@@ -90,6 +90,7 @@ public class EntitySelectDetailPopup<E extends Persistable> extends Form impleme
 		}		
 	}
 	
+	//exception wrapping is delegated to commandAction
 	public boolean handleKeyReleased (int keyCode, int gameAction) {
 		boolean ret = super.handleKeyReleased(keyCode, gameAction);
 		
