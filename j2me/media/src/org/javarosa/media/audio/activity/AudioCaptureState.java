@@ -37,6 +37,7 @@ import org.javarosa.core.api.State;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledThread;
 import org.javarosa.j2me.services.AudioCaptureService;
 import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 import org.javarosa.j2me.services.exception.AudioException;
@@ -97,7 +98,7 @@ public abstract class AudioCaptureState implements DataCaptureTransitions, State
 		{
 			serviceUnavailable(ue);
 		}
-		captureThread = new Thread(this, "CaptureThread");
+		captureThread = new HandledThread(this, "CaptureThread");
 	}
 
 	public void destroy() 

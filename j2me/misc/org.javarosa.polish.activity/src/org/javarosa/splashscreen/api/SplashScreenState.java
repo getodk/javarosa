@@ -6,6 +6,7 @@ package org.javarosa.splashscreen.api;
 import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.api.State;
+import org.javarosa.core.services.IncidentLogger;
 import org.javarosa.core.util.TrivialTransitions;
 import org.javarosa.j2me.view.J2MEDisplay;
 
@@ -49,13 +50,19 @@ public abstract class SplashScreenState implements TrivialTransitions, State, Ap
 	}
 	
 	public Displayable initApp() {
-		try{
-			Thread.sleep(this.delay);
-  		} catch (Exception e) { }
-
-  		//we could be doing, like... actual initialization here
+		try {
+		
+			try{
+				Thread.sleep(this.delay);
+	  		} catch (Exception e) { }
+	
+	  		//we could be doing, like... actual initialization here
+	  		
+	  		done();
   		
-  		done();
+		} catch (Exception e) {
+			IncidentLogger.die("splash", e);
+		}
   		
   		//we will set the display ourselves
 		return null;

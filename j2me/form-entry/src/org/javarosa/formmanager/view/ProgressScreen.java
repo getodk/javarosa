@@ -21,9 +21,10 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 
+import org.javarosa.j2me.log.HandledThread;
+
 public class ProgressScreen extends Form{
 	private Gauge progressbar;
-	private GaugeUpdater gupd = new GaugeUpdater();
 	private Thread updater_T;
 	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
 	public final Command CMD_RETRY = new Command("Retry",Command.ITEM, 1);
@@ -34,7 +35,7 @@ public class ProgressScreen extends Form{
 		addCommand(CMD_CANCEL);
 		append(progressbar);
 		setCommandListener(cmdListener);
-		updater_T = new Thread(gupd);
+		updater_T = new HandledThread(new GaugeUpdater());
 		updater_T.start();
 	}
 	

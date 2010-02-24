@@ -72,7 +72,6 @@ public abstract class ImageChooserState implements DataCaptureTransitions, State
 	 * This holds the key to lookup the return value from a capture or browse activity
 	 * when it gets control back.
 	 */
-	private Thread snifferThread;
 	private ImageSniffer sniffer;
 	private MIDlet midlet;
 
@@ -160,8 +159,7 @@ public abstract class ImageChooserState implements DataCaptureTransitions, State
 				fe.printStackTrace();
 				processCancel();
 			}
-			snifferThread = new Thread(sniffer);
-			snifferThread.start();
+			sniffer.start();
 			isActivelySniffing = true;
 			mainForm.addCommand(changeSniffDirectoryCommand);
 		} else {

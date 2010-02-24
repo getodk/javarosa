@@ -2,6 +2,7 @@ package org.javarosa.services.transport.senders;
 
 import java.util.Vector;
 
+import org.javarosa.j2me.log.HandledThread;
 import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
@@ -15,7 +16,7 @@ import org.javarosa.services.transport.impl.TransportException;
  * delay between each try
  * 
  */
-public abstract class SenderThread extends Thread {
+public abstract class SenderThread extends HandledThread {
 
 	/**
 	 * 
@@ -91,7 +92,7 @@ public abstract class SenderThread extends Thread {
 	 * 
 	 * @see java.lang.Thread#run()
 	 */
-	public void run() {
+	public void _run() {
 		send();
 	}
 
