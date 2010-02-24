@@ -38,4 +38,6 @@ public interface IIncidentLogger {
 	public void clearLogs();
 	
 	public <T> T serializeLogs(ILogSerializer<T> serializer);
+	
+	public void panic();
 }
