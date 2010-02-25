@@ -96,8 +96,8 @@ public class LogEntry implements Externalizable {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeDate(out, time);
-		ExtUtil.writeString(out, type);
-		ExtUtil.writeString(out, message);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(type));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(message));
 	}
 
 }
