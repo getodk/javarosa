@@ -12,10 +12,10 @@ import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
-import org.javarosa.core.log.IncidentLog;
+import org.javarosa.core.log.LogEntry;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.EntityFilter;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -1555,8 +1555,8 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	}
 	
 	public void log (String type, String message) {
-		if (!IncidentLog.STORAGE_KEY.equals(basename)) {
-			IncidentLogger.logIncident(type, basename + ": " + message);
+		if (!LogEntry.STORAGE_KEY.equals(basename)) {
+			Logger.log(type, basename + ": " + message);
 		}
 	}
 }

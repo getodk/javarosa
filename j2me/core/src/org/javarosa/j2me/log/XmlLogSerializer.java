@@ -20,7 +20,7 @@
 package org.javarosa.j2me.log;
 
 import org.javarosa.core.log.ILogSerializer;
-import org.javarosa.core.log.IncidentLog;
+import org.javarosa.core.log.LogEntry;
 import org.kxml2.kdom.Element;
 
 /**
@@ -39,7 +39,7 @@ public class XmlLogSerializer implements ILogSerializer<Element> {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.log.ILogSerializer#serializeLog(org.javarosa.core.log.IncidentLog)
 	 */
-	private Element serializeLog(IncidentLog log) {
+	private Element serializeLog(LogEntry log) {
 		Element entry = new Element();
 		entry.setName("log_entry");
 		entry.setAttribute(null, "date", log.getTime().toString());
@@ -58,7 +58,7 @@ public class XmlLogSerializer implements ILogSerializer<Element> {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.log.ILogSerializer#serializeLogs(org.javarosa.core.log.IncidentLog[])
 	 */
-	public Element serializeLogs(IncidentLog[] logs) {
+	public Element serializeLogs(LogEntry[] logs) {
 		Element report = new Element();
 		report.setName(topElementName);
 		for(int i = 0; i < logs.length; ++i ) {

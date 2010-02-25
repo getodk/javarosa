@@ -24,7 +24,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 
 import de.enough.polish.ui.CustomItem;
 
@@ -166,7 +166,7 @@ public class InlineDateField extends CustomItem {
 				return false;
 			
 		} catch (Exception e) {
-			IncidentLogger.die("gui-keydown", e);
+			Logger.die("gui-keydown", e);
 			return false;
 		}
 	}
@@ -194,7 +194,7 @@ public class InlineDateField extends CustomItem {
 				changeMonth(sel, diff);
 				
 			} catch (Exception e) {
-				IncidentLogger.die("gui-keyrep", e);
+				Logger.die("gui-keyrep", e);
 			}
 
 			return true;

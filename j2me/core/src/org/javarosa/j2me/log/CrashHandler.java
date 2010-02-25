@@ -4,7 +4,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
 
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 
 public class CrashHandler {
 	
@@ -24,7 +24,7 @@ public class CrashHandler {
 		try {
 			handler._commandAction(c, d);
 		} catch (Exception e) {
-			IncidentLogger.die("gui-cl", e);
+			Logger.die("gui-cl", e);
 		}
 	}
 	
@@ -33,7 +33,7 @@ public class CrashHandler {
 		try {
 			handler._commandAction(c, d);
 		} catch (Exception e) {
-			IncidentLogger.die("gui-clp", e);
+			Logger.die("gui-clp", e);
 		}
 	}
 	
@@ -41,7 +41,7 @@ public class CrashHandler {
 		try {
 			handler._commandAction(c, i);
 		} catch (Exception e) {
-			IncidentLogger.die("gui-icl", e);
+			Logger.die("gui-icl", e);
 		}
 	}
 	
@@ -50,7 +50,7 @@ public class CrashHandler {
 		try {
 			handler._commandAction(c, i);
 		} catch (Exception e) {
-			IncidentLogger.die("gui-iclp", e);
+			Logger.die("gui-iclp", e);
 		}
 	}
 	
@@ -58,7 +58,7 @@ public class CrashHandler {
 		try {
 			handler._itemStateChanged(i);
 		} catch (Exception e) {
-			IncidentLogger.die("gui-isl", e);
+			Logger.die("gui-isl", e);
 		}
 	}
 	
@@ -66,7 +66,7 @@ public class CrashHandler {
 		try {
 			handler._itemStateChanged(i);
 		} catch (Exception e) {
-			IncidentLogger.die("gui-islp", e);
+			Logger.die("gui-islp", e);
 		}
 	}
 

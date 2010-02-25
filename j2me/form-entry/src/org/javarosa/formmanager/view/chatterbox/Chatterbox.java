@@ -29,7 +29,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryController;
@@ -603,7 +603,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	    	}
 	    	
     	} catch (Exception e) {
-    		IncidentLogger.die("gui-keydown", e);
+    		Logger.die("gui-keydown", e);
     	}
 
     }
