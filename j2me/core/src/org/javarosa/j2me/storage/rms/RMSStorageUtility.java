@@ -205,7 +205,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			boolean recordExists = idIndex.containsKey(new Integer(id));
 
 			setDirty();
-			
+						
 			//reserve space for updating index/metadata
 			int bytesNeededEstimate = (recordExists ? 20 : 40);
 			if (!setReserveBuffer(bytesNeededEstimate)) {
@@ -785,29 +785,35 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		}
 
 		if (newID == null) {
-			log("rms-spill", "attempting spill-over");
+			logSpill(info.numDataStores, "attempting spill-over", true);
 			RMS rs = newDataStore(info);
 			if (rs != null) {
 				iDatastore = info.numDataStores - 1;
 				int recID = rs.addRecord(data);
 				if (recID != -1) {
-					log("rms-spill", "success");
+					logSpill(iDatastore, "success", true);
 					newID = new RMSRecordLoc(iDatastore, recID);
 				} else {
-					log("rms-spill", "spillover write failed");
+					logSpill(iDatastore, "spillover write failed", false);
 					//not enough space in spillover RMS to store new record
 					//remove newly-created spillover RMS so it's not lying around empty
 					removeLastDataStore(info);
 				}
 			} else {
 				//could not create spillover recordstore; entire RMS system is full
-				log("rms-spill", "failed to create spillover");
+				logSpill(info.numDataStores, "failed to create spillover", false);
 			}
 		}
 		
 		return newID;
 	}
 
+	private void logSpill (int dataStoreNum, String msg, boolean ignoreForFirst) {
+		if (!ignoreForFirst || dataStoreNum > 0) {
+			log("rms-spill", "#" + dataStoreNum + " " + msg);
+		}
+	}
+	
 	/**
 	 * Update a record in the data stores. It always tries to add a new record with the updated data, and then delete the
 	 * old record. This is because (on some phones, at least), the RMS gets completely hosed if you try to update a record
@@ -887,31 +893,33 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			throw new RuntimeException("Error creating spillover datastore; " + e.getMessage());
 		}
 		
-		try {
-			if (rs.rms.getNumRecords() != 0) {
-				log("rms-spill", "spillover store not empty!");
-
-				//attempt to clear it out
-				try {
-					Vector<Integer> IDs = new Vector<Integer>();
-					for (RecordEnumeration re = rs.rms.enumerateRecords(null, null, false); re.hasNextElement(); ) {
-						IDs.addElement(new Integer(re.nextRecordId()));
+		if (rs != null) {
+			try {
+				if (rs.rms.getNumRecords() != 0) {
+					logSpill(info.numDataStores, "spillover store not empty!", false);
+	
+					//attempt to clear it out
+					try {
+						Vector<Integer> IDs = new Vector<Integer>();
+						for (RecordEnumeration re = rs.rms.enumerateRecords(null, null, false); re.hasNextElement(); ) {
+							IDs.addElement(new Integer(re.nextRecordId()));
+						}
+						for (int i = 0; i < IDs.size(); i++) {
+							rs.rms.deleteRecord(IDs.elementAt(i).intValue());
+						}
+					} catch (RecordStoreException rse) {
+						logSpill(info.numDataStores, "error emptying out new data store: " + WrappedException.printException(rse), false);
 					}
-					for (int i = 0; i < IDs.size(); i++) {
-						rs.rms.deleteRecord(IDs.elementAt(i).intValue());
-					}
-				} catch (RecordStoreException rse) {
-					log("rms-spill", "error emptying out new data store: " + WrappedException.printException(rse));
 				}
+			} catch (RecordStoreNotOpenException e) {
+				throw new RuntimeException("can't happen");
 			}
-		} catch (RecordStoreNotOpenException e) {
-			throw new RuntimeException("can't happen");
+		
+			info.numDataStores++;
+			resizeDatastoreArray(info);		
+			datastores[info.numDataStores - 1] = rs;
 		}
-		
-		info.numDataStores++;
-		resizeDatastoreArray(info);		
-		datastores[info.numDataStores - 1] = rs;
-		
+			
 		return rs;
 	}
 	
