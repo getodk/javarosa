@@ -30,7 +30,7 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.ExtensionConstants;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledPItemCommandListener;
@@ -445,7 +445,7 @@ public class Table extends CustomItem implements HandledPItemCommandListener {
 	    	}
 	    	
     	} catch (Exception e) {
-    		IncidentLogger.die("gui-keydown", e);
+    		Logger.die("gui-keydown", e);
     	}
     	
     }

@@ -1,7 +1,7 @@
 package org.javarosa.j2me.log;
 
 import org.javarosa.core.log.FatalException;
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 
 public class HandledThread extends Thread {
 	private boolean withRunnable = false;
@@ -30,7 +30,7 @@ public class HandledThread extends Thread {
 				try {
 					r.run();
 				} catch (Exception e) {
-					IncidentLogger.die("thread-r", e);
+					Logger.die("thread-r", e);
 				}
 			}
 		};
@@ -43,7 +43,7 @@ public class HandledThread extends Thread {
 			try {
 				_run();
 			} catch (Exception e) {
-				IncidentLogger.die("thread", e);
+				Logger.die("thread", e);
 			}
 		}
 	}

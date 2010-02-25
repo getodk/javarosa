@@ -25,9 +25,9 @@ import java.util.Vector;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
-import org.javarosa.core.api.IIncidentLogger;
+import org.javarosa.core.api.ILogger;
 import org.javarosa.core.log.ILogSerializer;
-import org.javarosa.core.log.IncidentLog;
+import org.javarosa.core.log.LogEntry;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.IStorageIterator;
@@ -40,12 +40,12 @@ import org.javarosa.j2me.storage.rms.RMSStorageUtility;
  * @date Apr 10, 2009 
  *
  */
-public class J2MEIncidentLogger implements IIncidentLogger {
+public class J2MELogger implements ILogger {
 	
 	IStorageUtility logStorage;
 	
-	public J2MEIncidentLogger() {
-		logStorage = new RMSStorageUtility(IncidentLog.STORAGE_KEY, IncidentLog.class);
+	public J2MELogger() {
+		logStorage = new RMSStorageUtility(LogEntry.STORAGE_KEY, LogEntry.class);
 	}
 
 	/* (non-Javadoc)
@@ -70,8 +70,8 @@ public class J2MEIncidentLogger implements IIncidentLogger {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IIncidentLogger#logIncident(java.lang.String, java.lang.String, java.util.Date)
 	 */
-	public void logIncident(String type, String message, Date logDate) {
-		IncidentLog log = new IncidentLog(type, message, logDate);
+	public void log(String type, String message, Date logDate) {
+		LogEntry log = new LogEntry(type, message, logDate);
 		try {
 			logStorage.add(log);
 		} catch (StorageFullException e) {
@@ -88,7 +88,7 @@ public class J2MEIncidentLogger implements IIncidentLogger {
 		while (li.hasMore()) {
 			logs.addElement(li.nextRecord());
 		}
-		IncidentLog[] collection = new IncidentLog[logs.size()];
+		LogEntry[] collection = new LogEntry[logs.size()];
 		logs.copyInto(collection);
 		return serializer.serializeLogs(collection);
 	}

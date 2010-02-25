@@ -14,7 +14,7 @@ import java.util.Vector;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
@@ -135,7 +135,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	
 	private void createDeviceLogSubreport(Document parent, Element errorsNode) {
 		try {
-			Element report = IncidentLogger._().serializeLogs(new XmlLogSerializer("log_subreport"));
+			Element report = Logger._().serializeLogs(new XmlLogSerializer("log_subreport"));
 			parent.addChild(Element.ELEMENT, report);
 		} catch(Exception e) {
 			logError(errorsNode, new StatusReportException(e,"log_subreport","Exception when writing device log report."));
@@ -222,7 +222,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	public void onStatusChange(TransportMessage message) {
 		if(message.getStatus() == TransportMessageStatus.SENT) {
 			//The data's off the device. We don't want it to get out of control, so wipe the logs.
-			IncidentLogger._().clearLogs();
+			Logger._().clearLogs();
 		}
 	}
 }

@@ -31,9 +31,9 @@ import org.javarosa.core.log.ILogSerializer;
  * @date Apr 10, 2009 
  *
  */
-public interface IIncidentLogger {
+public interface ILogger {
 	
-	public void logIncident(String type, String message, Date logDate);
+	public void log(String type, String message, Date logDate);
 	
 	public void clearLogs();
 	

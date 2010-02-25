@@ -2,7 +2,7 @@ package org.javarosa.j2me.log;
 
 import java.util.TimerTask;
 
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 
 public abstract class HandledTimerTask extends TimerTask {
 
@@ -10,7 +10,7 @@ public abstract class HandledTimerTask extends TimerTask {
 		try {
 			_run();
 		} catch (Exception e) {
-			IncidentLogger.die("timer", e);
+			Logger.die("timer", e);
 		}
 	}
 	

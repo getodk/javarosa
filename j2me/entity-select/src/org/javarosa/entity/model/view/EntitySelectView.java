@@ -25,7 +25,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.model.Entity;
@@ -329,7 +329,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 			}
 
 		} catch (Exception e) {
-			IncidentLogger.die("gui-keyup", e);
+			Logger.die("gui-keyup", e);
 		}
 			
 		return super.handleKeyReleased(keyCode, gameAction);

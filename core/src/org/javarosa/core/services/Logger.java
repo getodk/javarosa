@@ -2,19 +2,19 @@ package org.javarosa.core.services;
 
 import java.util.Date;
 
-import org.javarosa.core.api.IIncidentLogger;
+import org.javarosa.core.api.ILogger;
 import org.javarosa.core.log.FatalException;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 
-public class IncidentLogger {
-    private static IIncidentLogger logger;
+public class Logger {
+    private static ILogger logger;
 
-	public static void registerIncidentLogger(IIncidentLogger theLogger) {
+	public static void registerLogger(ILogger theLogger) {
 		logger = theLogger;
 	}
 	
-	public static IIncidentLogger _ () {
+	public static ILogger _ () {
 		return logger;
 	}
 	
@@ -28,18 +28,18 @@ public class IncidentLogger {
 	 * @param type The type of incident to be logged. 
 	 * @param message A message describing the incident.
 	 */
-	public static void logIncident(String type, String message) {
+	public static void log(String type, String message) {
 		if (isLoggingEnabled()) {
-			logIncidentForce(type, message);
+			logForce(type, message);
 		}
 	}
 	
-	protected static void logIncidentForce(String type, String message) {
+	protected static void logForce(String type, String message) {
 		System.err.println("logger> " + type + ": " + message);
 		
 		if(logger != null) {
 			try {
-				logger.logIncident(type, message, new Date());
+				logger.log(type, message, new Date());
 			} catch (Exception e) {
 				//do not catch exceptions here; if this fails, we want the app to crash
 				System.err.println("exception when trying to write log message!");
@@ -60,23 +60,23 @@ public class IncidentLogger {
 		}
 		
 		if (problemReadingFlag) {
-			logIncidentForce("log-error", "could not read 'logging enabled' flag");
+			logForce("log-error", "could not read 'logging enabled' flag");
 		}
 		
 		return enabled;
 	}
 	
-	public static void logException (Exception e) {
-		logException(e, false);
+	public static void exception (Exception e) {
+		exception(e, false);
 	}
 	
-	public static void logException (Exception e, boolean topLevel) {
-		logIncident("exception", (topLevel ? "unhandled exception at top level: " : "") + WrappedException.printException(e));
+	public static void exception (Exception e, boolean topLevel) {
+		log("exception", (topLevel ? "unhandled exception at top level: " : "") + WrappedException.printException(e));
 	}
 	
 	public static void die (String thread, Exception e) {
 		//log exception
-		logException(e, true);
+		exception(e, true);
 				
 		//crash
 		throw new FatalException("unhandled exception in " + thread, e);

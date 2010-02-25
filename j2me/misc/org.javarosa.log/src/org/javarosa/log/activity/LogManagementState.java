@@ -25,7 +25,7 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.log.FlatLogSerializer;
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.util.TrivialTransitions;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
@@ -134,7 +134,7 @@ public abstract class LogManagementState implements TrivialTransitions, State, H
 	 */
 	private void viewLogs() {
 		this.viewer.deleteAll();
-		String logData = IncidentLogger._().serializeLogs(new FlatLogSerializer());
+		String logData = Logger._().serializeLogs(new FlatLogSerializer());
 		this.viewer.loadLogs(logData);
 		this.viewer.setCommandListener(this);
 		this.viewer.addCommand(EXIT);
@@ -145,7 +145,7 @@ public abstract class LogManagementState implements TrivialTransitions, State, H
 	 * 
 	 */
 	private void clearLogs() {
-		IncidentLogger._().clearLogs();
+		Logger._().clearLogs();
 		
 		J2MEDisplay.showError("Logs Cleared", "Logs cleared succesfully");
 	}

@@ -23,7 +23,7 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 
 import de.enough.polish.ui.CustomItem;
 
@@ -161,7 +161,7 @@ public class SimpleDateField extends CustomItem
 			return fieldsChanged;
 			
 		} catch (Exception e) {
-			IncidentLogger.die("gui-keydown", e);
+			Logger.die("gui-keydown", e);
 			return false;
 		}
 			
