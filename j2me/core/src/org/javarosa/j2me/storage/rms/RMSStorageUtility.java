@@ -12,6 +12,8 @@ import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
+import org.javarosa.core.log.IncidentLog;
+import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.IncidentLogger;
 import org.javarosa.core.services.storage.EntityFilter;
@@ -539,7 +541,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 				
 			} catch (IllegalStateException ise) {
 				//utility is corrupt; fix it
-				IncidentLogger.logIncident("RMS", "storage utility [" + basename + "] is corrupt");
+				log("rms-repair", "buf[" + getReserveBufferSize() + "]");
 			
 				RMSStorageInfo info = getInfoRecord();
 				Hashtable idIndex = getIDIndexRecord();
@@ -555,9 +557,15 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 					}
 					
 					boolean recordExists = false;
-					RMS rms = getDataStore(loc.rmsID);
-					if (rms != null && rms.readRecord(loc.recID) != null) {
-						recordExists = true;
+					if (loc.rmsID >= info.numDataStores) {
+						log("rms-corrupt", id + " => (" + loc.rmsID + "," + loc.recID + ") data store out of range [" + info.numDataStores + "]");
+					} else {
+						RMS rms = getDataStore(loc.rmsID);
+						if (rms != null && rms.readRecord(loc.recID) != null) {
+							recordExists = true;
+						} else {
+							log("rms-corrupt", id + " => (" + loc.rmsID + "," + loc.recID + ") no record exists");						
+						}
 					}
 					
 					if (!recordExists) {
@@ -572,20 +580,31 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 				//note: this is hte most likely failure scenario
 				//TODO -- it's not going to hurt anything for now
 				
+				//check for uncommitted spillover
+				try {
+					RMS spilled = new RMS(dataStoreName(info.numDataStores), false);
+					if (spilled != null && spilled.rms.getNumRecords() > 0) {
+						log("rms-corrupt", "uncommitted spillover rms found");												
+					}
+				} catch (RecordStoreException rse) {
+					//ok
+				}
+				
 				info.numRecords = idIndex.size();
 				info.numDataStores = max_datastore + 1;
 				info.nextRecordID = info.numRecords + 1;
 				
 				commitIndex(info, idIndex);
+				setReserveBuffer(0);
 				setClean();
 				storageModified();	
 				
 				//check again
 				try {
 					checkNotCorrupt();
-					IncidentLogger.logIncident("RMS", "storage utility repaired successfully");
+					log("rms-repair", "storage utility repaired successfully");
 				} catch (IllegalStateException ise2) {
-					IncidentLogger.logIncident("RMS", "unable to repair storage utility!!!");
+					log("rms-repair", "unable to repair storage utility!!!");
 					throw new IllegalStateException("Storage utility [" + basename + "] is corrupt and could not be repaired");
 				}
 			}
@@ -614,6 +633,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 
 		if (failed) {
 			System.err.println("We weren't able to commit the updated index and meta-data, even though we thought we had enough space! The utility is now corrupt!!");
+			log("rms-corrupt", "unable to commit index; utility is now corrupt");
 			throw new RuntimeException("ERROR! Enable to complete action! Utility must be repaired!");
 		}
 	}
@@ -765,18 +785,24 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		}
 
 		if (newID == null) {
+			log("rms-spill", "attempting spill-over");
 			RMS rs = newDataStore(info);
 			if (rs != null) {
 				iDatastore = info.numDataStores - 1;
 				int recID = rs.addRecord(data);
 				if (recID != -1) {
+					log("rms-spill", "success");
 					newID = new RMSRecordLoc(iDatastore, recID);
 				} else {
+					log("rms-spill", "spillover write failed");
 					//not enough space in spillover RMS to store new record
 					//remove newly-created spillover RMS so it's not lying around empty
 					removeLastDataStore(info);
 				}
-			} //else, could not create spillover recordstore; entire RMS system is full
+			} else {
+				//could not create spillover recordstore; entire RMS system is full
+				log("rms-spill", "failed to create spillover");
+			}
 		}
 		
 		return newID;
@@ -863,7 +889,20 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		
 		try {
 			if (rs.rms.getNumRecords() != 0) {
-				throw new RuntimeException("Newly created datastore is not empty!");
+				log("rms-spill", "spillover store not empty!");
+
+				//attempt to clear it out
+				try {
+					Vector<Integer> IDs = new Vector<Integer>();
+					for (RecordEnumeration re = rs.rms.enumerateRecords(null, null, false); re.hasNextElement(); ) {
+						IDs.addElement(new Integer(re.nextRecordId()));
+					}
+					for (int i = 0; i < IDs.size(); i++) {
+						rs.rms.deleteRecord(IDs.elementAt(i).intValue());
+					}
+				} catch (RecordStoreException rse) {
+					log("rms-spill", "error emptying out new data store: " + WrappedException.printException(rse));
+				}
 			}
 		} catch (RecordStoreNotOpenException e) {
 			throw new RuntimeException("can't happen");
@@ -1034,6 +1073,14 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	private boolean setReserveBuffer (int size) {
 		int bufsize = (size <= 0 ? 1 : size + RESERVE_BUFFER_SIZE);
 		return getIndexStore().updateRecord(RESERVE_BUFFER_REC_ID, new byte[bufsize], true);
+	}
+	
+	private int getReserveBufferSize () {
+		try {
+			return getIndexStore().rms.getRecordSize(RESERVE_BUFFER_REC_ID);
+		} catch (Exception e) {
+			return -1;
+		}
 	}
 	
 	/**
@@ -1505,6 +1552,12 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			storage.addChild(Element.ELEMENT, store);
 		}
 		return storage;
+	}
+	
+	public void log (String type, String message) {
+		if (!IncidentLog.STORAGE_KEY.equals(basename)) {
+			IncidentLogger.logIncident(type, basename + ": " + message);
+		}
 	}
 }
 

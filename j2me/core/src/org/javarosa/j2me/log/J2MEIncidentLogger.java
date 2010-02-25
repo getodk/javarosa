@@ -41,11 +41,11 @@ import org.javarosa.j2me.storage.rms.RMSStorageUtility;
  *
  */
 public class J2MEIncidentLogger implements IIncidentLogger {
-		
+	
 	IStorageUtility logStorage;
 	
 	public J2MEIncidentLogger() {
-		logStorage = new RMSStorageUtility("LOG", IncidentLog.class);
+		logStorage = new RMSStorageUtility(IncidentLog.STORAGE_KEY, IncidentLog.class);
 	}
 
 	/* (non-Javadoc)
