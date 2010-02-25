@@ -380,7 +380,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		removeAll(null);
 	}
 	
-	public void removeAll (EntityFilter filter) {
+	public Vector<Integer> removeAll (EntityFilter filter) {
 		synchronized (getAccessLock()) {
 			Vector IDs = new Vector();
 			
@@ -409,6 +409,8 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 				int id = ((Integer)IDs.elementAt(i)).intValue();
 				remove(id);
 			}
+			
+			return IDs;
 		}
 	}
 	
@@ -1007,7 +1009,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 * 
 	 * @return index hashtable, which maps integer record ID -> record locator
 	 */
-	private Hashtable getIDIndexRecord () {
+	public Hashtable getIDIndexRecord () {
 		return (Hashtable)getIndexStore().readRecord(ID_INDEX_REC_ID, new ExtWrapMap(Integer.class, RMSRecordLoc.class));		
 	}
 	

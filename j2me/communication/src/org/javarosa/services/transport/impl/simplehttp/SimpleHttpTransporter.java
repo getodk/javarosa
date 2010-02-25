@@ -76,6 +76,7 @@ public class SimpleHttpTransporter implements Transporter {
 			os.close();
 
 			// Get the response
+			//BUG: the string is not being built correctly; it will mojibake utf-8 FIXME
 			is = (DataInputStream) conn.openDataInputStream();
 			int ch;
 			StringBuffer sb = new StringBuffer();
