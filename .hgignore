@@ -1,5 +1,8 @@
 syntax: glob
 
+#local only
+local.properties
+
 #compiled files and libraries
 *.class
 *.jar
@@ -30,5 +33,3 @@ devices/
 #mercurial
 *.rej
 *.orig
-
-glob:local.properties
