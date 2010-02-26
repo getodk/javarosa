@@ -892,33 +892,32 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		} catch (RecordStoreException e) {
 			throw new RuntimeException("Error creating spillover datastore; " + e.getMessage());
 		}
-		
-		if (rs != null) {
-			try {
-				if (rs.rms.getNumRecords() != 0) {
-					logSpill(info.numDataStores, "spillover store not empty!", false);
-	
-					//attempt to clear it out
-					try {
-						Vector<Integer> IDs = new Vector<Integer>();
-						for (RecordEnumeration re = rs.rms.enumerateRecords(null, null, false); re.hasNextElement(); ) {
-							IDs.addElement(new Integer(re.nextRecordId()));
-						}
-						for (int i = 0; i < IDs.size(); i++) {
-							rs.rms.deleteRecord(IDs.elementAt(i).intValue());
-						}
-					} catch (RecordStoreException rse) {
-						logSpill(info.numDataStores, "error emptying out new data store: " + WrappedException.printException(rse), false);
+
+		//rs must not be null at this point
+		try {
+			if (rs.rms.getNumRecords() != 0) {
+				logSpill(info.numDataStores, "spillover store not empty!", false);
+
+				//attempt to clear it out
+				try {
+					Vector<Integer> IDs = new Vector<Integer>();
+					for (RecordEnumeration re = rs.rms.enumerateRecords(null, null, false); re.hasNextElement(); ) {
+						IDs.addElement(new Integer(re.nextRecordId()));
 					}
+					for (int i = 0; i < IDs.size(); i++) {
+						rs.rms.deleteRecord(IDs.elementAt(i).intValue());
+					}
+				} catch (RecordStoreException rse) {
+					logSpill(info.numDataStores, "error emptying out new data store: " + WrappedException.printException(rse), false);
 				}
-			} catch (RecordStoreNotOpenException e) {
-				throw new RuntimeException("can't happen");
 			}
-		
-			info.numDataStores++;
-			resizeDatastoreArray(info);		
-			datastores[info.numDataStores - 1] = rs;
+		} catch (RecordStoreNotOpenException e) {
+			throw new RuntimeException("can't happen");
 		}
+	
+		info.numDataStores++;
+		resizeDatastoreArray(info);		
+		datastores[info.numDataStores - 1] = rs;
 			
 		return rs;
 	}
