@@ -17,7 +17,6 @@
 package org.javarosa.formmanager.view.transport;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -28,12 +27,15 @@ import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.formmanager.view.ISubmitStatusObserver;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledTimerTask;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.TransportService;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 
 public class FormTransportSubmitStatusScreen extends Form implements
-	ISubmitStatusObserver, CommandListener {
+	ISubmitStatusObserver, HandledCommandListener {
 	private String cacheId = null;
 	private StringItem msg;
 	private Command okCommand;
@@ -66,14 +68,18 @@ public class FormTransportSubmitStatusScreen extends Form implements
 		initTimer();
 	}
 	
-	
 	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
+
 	}
 
 	private void initTimer() {
 		this.timer = new Timer();
-		this.timer.schedule(new TimerTask() {
-			public void run() {
+		this.timer.schedule(new HandledTimerTask() {
+			public void _run() {
 				updateStatus();
 			}
 		}, REFRESH_INTERVAL, REFRESH_INTERVAL);

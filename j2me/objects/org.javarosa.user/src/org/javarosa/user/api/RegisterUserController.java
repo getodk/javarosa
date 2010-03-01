@@ -3,6 +3,8 @@ package org.javarosa.user.api;
 import java.io.IOException;
 
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
@@ -17,14 +19,13 @@ import org.javarosa.user.transport.UserRegistrationTranslator;
 import org.javarosa.user.view.UserRegistrationForm;
 
 import de.enough.polish.ui.Command;
-import de.enough.polish.ui.CommandListener;
 import de.enough.polish.ui.Displayable;
 
 /**
  * @author ctsims
  *
  */
-public class RegisterUserController<M extends TransportMessage> implements TransportListener, CommandListener {
+public class RegisterUserController<M extends TransportMessage> implements TransportListener, HandledPCommandListener {
 	
 	private UserRegistrationTranslator<M> builder; 
 	private RegisterUserTransitions transitions;
@@ -100,6 +101,10 @@ public class RegisterUserController<M extends TransportMessage> implements Trans
 	}
 
 	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
 		if(c == CANCEL) {
 			transitions.cancel();
 		} else if(c == OK ){

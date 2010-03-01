@@ -135,7 +135,8 @@ public class ExtUtil {
 	}
 	public static void writeBytes(DataOutputStream out, byte[] bytes) throws IOException {
 		ExtUtil.writeNumeric(out, bytes.length);
-		out.write(bytes);
+		if (bytes.length > 0) //i think writing zero-length array might close the stream
+			out.write(bytes);
 	}
 	
 	public static Object read (DataInputStream in, Class type) throws IOException, DeserializationException {
@@ -272,6 +273,10 @@ public class ExtUtil {
 		}
 	}
 
+	public static byte[] nullIfEmpty (byte[] ba) {
+		return (ba == null ? null : (ba.length == 0 ? null : ba));
+	}
+	
 	public static String nullIfEmpty (String s) {
 		return (s == null ? null : (s.length() == 0 ? null : s));
 	}
@@ -282,6 +287,10 @@ public class ExtUtil {
 	
 	public static Hashtable nullIfEmpty (Hashtable h) {
 		return (h == null ? null : (h.size() == 0 ? null : h));
+	}
+	
+	public static byte[] emptyIfNull (byte[] ba) {
+		return ba == null ? new byte[0] : ba;
 	}
 	
 	public static String emptyIfNull (String s) {

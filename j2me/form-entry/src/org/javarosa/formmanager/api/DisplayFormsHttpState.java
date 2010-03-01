@@ -24,19 +24,20 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
 import org.javarosa.core.api.State;
 import org.javarosa.formmanager.api.transitions.FormListTransitions;
 import org.javarosa.formmanager.view.AvailableFormsScreen;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-public abstract class DisplayFormsHttpState implements FormListTransitions, State, CommandListener {
+public abstract class DisplayFormsHttpState implements FormListTransitions, State, HandledCommandListener {
 	private AvailableFormsScreen formList;
 	private ByteArrayInputStream bin;
 
@@ -125,7 +126,11 @@ public abstract class DisplayFormsHttpState implements FormListTransitions, Stat
 		J2MEDisplay.setView(formList);
 	}
 
-	public void commandAction(Command command, Displayable display) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command command, Displayable display) {
 		if(display == formList){
 			if (command == formList.CMD_CANCEL) {
 				cancel();

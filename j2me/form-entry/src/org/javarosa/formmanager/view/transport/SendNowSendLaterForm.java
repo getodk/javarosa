@@ -70,11 +70,13 @@ public class SendNowSendLaterForm extends FramedForm {
 	// in the form, and the keyup event from the same button press is passed to this view, automatically
 	// selecting 'send now'
 	//
+	//no exception handling needed
     public void keyPressed(int keyCode) {
     	super.keyPressed(keyCode);
     	seenKeyPressed = true;
     }
     //
+	//no exception handling needed
     public void keyReleased(int keyCode) {
     	if (seenKeyPressed) {
     		super.keyReleased(keyCode);

@@ -20,19 +20,20 @@ package org.javarosa.entity.model.view;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.model.Entity;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Form;
 import de.enough.polish.ui.StringItem;
 
-public class EntitySelectDetailPopup<E extends Persistable> extends Form implements CommandListener {
+public class EntitySelectDetailPopup<E extends Persistable> extends Form implements HandledCommandListener {
 	EntitySelectController<E> psa;
 	
 	int recordID;
@@ -75,7 +76,11 @@ public class EntitySelectDetailPopup<E extends Persistable> extends Form impleme
 		psa.setView(this);
 	}
 
-	public void commandAction(Command cmd, Displayable d) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command cmd, Displayable d) {
 		if (d == this) {
 			if (cmd == okCmd) {
 				psa.entityChosen(recordID);
@@ -85,6 +90,7 @@ public class EntitySelectDetailPopup<E extends Persistable> extends Form impleme
 		}		
 	}
 	
+	//exception wrapping is delegated to commandAction
 	public boolean handleKeyReleased (int keyCode, int gameAction) {
 		boolean ret = super.handleKeyReleased(keyCode, gameAction);
 		

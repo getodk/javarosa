@@ -4,21 +4,22 @@
 package org.javarosa.formmanager.api;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.ItemStateListener;
 
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.formmanager.api.transitions.CompletedFormOptionsTransitions;
 import org.javarosa.formmanager.view.transport.SendNowSendLaterForm;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledItemStateListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
  * @author ctsims
  *
  */
-public class CompletedFormOptionsController implements CommandListener, ItemStateListener {
+public class CompletedFormOptionsController implements HandledCommandListener, HandledItemStateListener {
 	CompletedFormOptionsTransitions transitions;
 	FormInstance data;
 	SendNowSendLaterForm view;
@@ -36,7 +37,11 @@ public class CompletedFormOptionsController implements CommandListener, ItemStat
 		J2MEDisplay.setView(view);
 	}
 
-	public void commandAction(Command c, Displayable arg1) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
 		int choice = view.getCommandChoice();
 		if(choice == SendNowSendLaterForm.SEND_NOW_DEFAULT) {
 			transitions.sendData(data);
@@ -47,7 +52,11 @@ public class CompletedFormOptionsController implements CommandListener, ItemStat
 		}
 	}
 
-	public void itemStateChanged(Item arg0) {
+	public void itemStateChanged(Item i) {
+		CrashHandler.itemStateChanged(this, i);
+	}  
+
+	public void _itemStateChanged(Item i) {
 		switch (view.getCommandChoice()) {
 		case SendNowSendLaterForm.SEND_NOW_DEFAULT:
 			transitions.sendData(data);
