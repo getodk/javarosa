@@ -6,6 +6,16 @@ import javax.microedition.lcdui.Item;
 
 import org.javarosa.core.services.Logger;
 
+/**
+ * This class provides exception-handling wrappers for the GUI event interfaces CommandListener,
+ * ItemStateListener, etc.
+ * 
+ * The entry point of the interface (i.e, CommandListener.commandAction()) calls out to this class,
+ * which sets up an exception trap, then delegates back to the calling class via a helper method.
+ * 
+ * @author Drew Roos
+ *
+ */
 public class CrashHandler {
 	
 	/**
