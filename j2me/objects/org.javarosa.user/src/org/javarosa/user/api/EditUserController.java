@@ -4,11 +4,11 @@
 package org.javarosa.user.api;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.api.State;
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.user.api.transitions.EditUserTransitions;
 import org.javarosa.user.model.User;
@@ -20,7 +20,7 @@ import org.javarosa.user.view.UserForm;
  * @author ctsims
  *
  */
-public class EditUserController implements CommandListener {
+public class EditUserController implements HandledCommandListener {
 	
 	EditUserTransitions transitions;
 	
@@ -53,7 +53,11 @@ public class EditUserController implements CommandListener {
 		J2MEDisplay.setView(view);
 	}
 
-	public void commandAction(Command c, Displayable arg1) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
 		if(c.equals(CMD_SAVE)) {
 			UserValidator validator = new UserValidator(view);
 			int status = validator.validateUserEdit();

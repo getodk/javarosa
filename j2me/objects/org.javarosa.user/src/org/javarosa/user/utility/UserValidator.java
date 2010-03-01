@@ -130,8 +130,7 @@ public class UserValidator {
 		if (!this.view.adminRightsSelected())
 			user = new User(username, password, userid);
 		else
-			user = new User(username, password, userid,
-					org.javarosa.user.model.Constants.ADMINUSER);
+			user = new User(username, password, userid, User.ADMINUSER);
 
 		if (this.view.getDecorator() != null) {
 			String[] elements = this.view.getDecorator()

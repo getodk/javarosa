@@ -14,17 +14,30 @@
  * the License.
  */
 
-package org.javarosa.core.util;
+/**
+ * 
+ */
+package org.javarosa.core.api;
+
+import java.util.Date;
+
+import org.javarosa.core.log.ILogSerializer;
 
 /**
- * IncompatibleViewException is thrown whenever a View is attempted
- * to be set on a Display that does not recognize the view.   
+ * IIncidentLogger's are used for instrumenting applications to identify usage
+ * patterns, usability errors, and general trajectories through applications.
  * 
  * @author Clayton Sims
+ * @date Apr 10, 2009 
  *
  */
-public class IncompatibleViewException extends RuntimeException {
-	public IncompatibleViewException(String message) {
-		super(message);
-	}
+public interface ILogger {
+	
+	public void log(String type, String message, Date logDate);
+	
+	public void clearLogs();
+	
+	public <T> T serializeLogs(ILogSerializer<T> serializer);
+	
+	public void panic();
 }

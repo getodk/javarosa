@@ -12,8 +12,10 @@ import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 import javax.microedition.rms.RecordStoreNotOpenException;
 
+import org.javarosa.core.log.LogEntry;
+import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.EntityFilter;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -203,7 +205,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			boolean recordExists = idIndex.containsKey(new Integer(id));
 
 			setDirty();
-			
+						
 			//reserve space for updating index/metadata
 			int bytesNeededEstimate = (recordExists ? 20 : 40);
 			if (!setReserveBuffer(bytesNeededEstimate)) {
@@ -380,7 +382,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		removeAll(null);
 	}
 	
-	public void removeAll (EntityFilter filter) {
+	public Vector<Integer> removeAll (EntityFilter filter) {
 		synchronized (getAccessLock()) {
 			Vector IDs = new Vector();
 			
@@ -409,6 +411,8 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 				int id = ((Integer)IDs.elementAt(i)).intValue();
 				remove(id);
 			}
+			
+			return IDs;
 		}
 	}
 	
@@ -537,7 +541,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 				
 			} catch (IllegalStateException ise) {
 				//utility is corrupt; fix it
-				IncidentLogger.logIncident("RMS", "storage utility [" + basename + "] is corrupt");
+				log("rms-repair", "buf[" + getReserveBufferSize() + "]");
 			
 				RMSStorageInfo info = getInfoRecord();
 				Hashtable idIndex = getIDIndexRecord();
@@ -553,9 +557,15 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 					}
 					
 					boolean recordExists = false;
-					RMS rms = getDataStore(loc.rmsID);
-					if (rms != null && rms.readRecord(loc.recID) != null) {
-						recordExists = true;
+					if (loc.rmsID >= info.numDataStores) {
+						log("rms-corrupt", id + " => (" + loc.rmsID + "," + loc.recID + ") data store out of range [" + info.numDataStores + "]");
+					} else {
+						RMS rms = getDataStore(loc.rmsID);
+						if (rms != null && rms.readRecord(loc.recID) != null) {
+							recordExists = true;
+						} else {
+							log("rms-corrupt", id + " => (" + loc.rmsID + "," + loc.recID + ") no record exists");						
+						}
 					}
 					
 					if (!recordExists) {
@@ -570,20 +580,31 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 				//note: this is hte most likely failure scenario
 				//TODO -- it's not going to hurt anything for now
 				
+				//check for uncommitted spillover
+				try {
+					RMS spilled = new RMS(dataStoreName(info.numDataStores), false);
+					if (spilled != null && spilled.rms.getNumRecords() > 0) {
+						log("rms-corrupt", "uncommitted spillover rms found");												
+					}
+				} catch (RecordStoreException rse) {
+					//ok
+				}
+				
 				info.numRecords = idIndex.size();
 				info.numDataStores = max_datastore + 1;
 				info.nextRecordID = info.numRecords + 1;
 				
 				commitIndex(info, idIndex);
+				setReserveBuffer(0);
 				setClean();
 				storageModified();	
 				
 				//check again
 				try {
 					checkNotCorrupt();
-					IncidentLogger.logIncident("RMS", "storage utility repaired successfully");
+					log("rms-repair", "storage utility repaired successfully");
 				} catch (IllegalStateException ise2) {
-					IncidentLogger.logIncident("RMS", "unable to repair storage utility!!!");
+					log("rms-repair", "unable to repair storage utility!!!");
 					throw new IllegalStateException("Storage utility [" + basename + "] is corrupt and could not be repaired");
 				}
 			}
@@ -612,6 +633,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 
 		if (failed) {
 			System.err.println("We weren't able to commit the updated index and meta-data, even though we thought we had enough space! The utility is now corrupt!!");
+			log("rms-corrupt", "unable to commit index; utility is now corrupt");
 			throw new RuntimeException("ERROR! Enable to complete action! Utility must be repaired!");
 		}
 	}
@@ -763,23 +785,35 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		}
 
 		if (newID == null) {
+			logSpill(info.numDataStores, "attempting spill-over", true);
 			RMS rs = newDataStore(info);
 			if (rs != null) {
 				iDatastore = info.numDataStores - 1;
 				int recID = rs.addRecord(data);
 				if (recID != -1) {
+					logSpill(iDatastore, "success", true);
 					newID = new RMSRecordLoc(iDatastore, recID);
 				} else {
+					logSpill(iDatastore, "spillover write failed", false);
 					//not enough space in spillover RMS to store new record
 					//remove newly-created spillover RMS so it's not lying around empty
 					removeLastDataStore(info);
 				}
-			} //else, could not create spillover recordstore; entire RMS system is full
+			} else {
+				//could not create spillover recordstore; entire RMS system is full
+				logSpill(info.numDataStores, "failed to create spillover", false);
+			}
 		}
 		
 		return newID;
 	}
 
+	private void logSpill (int dataStoreNum, String msg, boolean ignoreForFirst) {
+		if (!ignoreForFirst || dataStoreNum > 0) {
+			log("rms-spill", "#" + dataStoreNum + " " + msg);
+		}
+	}
+	
 	/**
 	 * Update a record in the data stores. It always tries to add a new record with the updated data, and then delete the
 	 * old record. This is because (on some phones, at least), the RMS gets completely hosed if you try to update a record
@@ -858,19 +892,33 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		} catch (RecordStoreException e) {
 			throw new RuntimeException("Error creating spillover datastore; " + e.getMessage());
 		}
-		
+
+		//rs must not be null at this point
 		try {
 			if (rs.rms.getNumRecords() != 0) {
-				throw new RuntimeException("Newly created datastore is not empty!");
+				logSpill(info.numDataStores, "spillover store not empty!", false);
+
+				//attempt to clear it out
+				try {
+					Vector<Integer> IDs = new Vector<Integer>();
+					for (RecordEnumeration re = rs.rms.enumerateRecords(null, null, false); re.hasNextElement(); ) {
+						IDs.addElement(new Integer(re.nextRecordId()));
+					}
+					for (int i = 0; i < IDs.size(); i++) {
+						rs.rms.deleteRecord(IDs.elementAt(i).intValue());
+					}
+				} catch (RecordStoreException rse) {
+					logSpill(info.numDataStores, "error emptying out new data store: " + WrappedException.printException(rse), false);
+				}
 			}
 		} catch (RecordStoreNotOpenException e) {
 			throw new RuntimeException("can't happen");
 		}
-		
+	
 		info.numDataStores++;
 		resizeDatastoreArray(info);		
 		datastores[info.numDataStores - 1] = rs;
-		
+			
 		return rs;
 	}
 	
@@ -1007,7 +1055,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 * 
 	 * @return index hashtable, which maps integer record ID -> record locator
 	 */
-	private Hashtable getIDIndexRecord () {
+	public Hashtable getIDIndexRecord () {
 		return (Hashtable)getIndexStore().readRecord(ID_INDEX_REC_ID, new ExtWrapMap(Integer.class, RMSRecordLoc.class));		
 	}
 	
@@ -1032,6 +1080,14 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	private boolean setReserveBuffer (int size) {
 		int bufsize = (size <= 0 ? 1 : size + RESERVE_BUFFER_SIZE);
 		return getIndexStore().updateRecord(RESERVE_BUFFER_REC_ID, new byte[bufsize], true);
+	}
+	
+	private int getReserveBufferSize () {
+		try {
+			return getIndexStore().rms.getRecordSize(RESERVE_BUFFER_REC_ID);
+		} catch (Exception e) {
+			return -1;
+		}
 	}
 	
 	/**
@@ -1503,6 +1559,12 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			storage.addChild(Element.ELEMENT, store);
 		}
 		return storage;
+	}
+	
+	public void log (String type, String message) {
+		if (!LogEntry.STORAGE_KEY.equals(basename)) {
+			Logger.log(type, basename + ": " + message);
+		}
 	}
 }
 

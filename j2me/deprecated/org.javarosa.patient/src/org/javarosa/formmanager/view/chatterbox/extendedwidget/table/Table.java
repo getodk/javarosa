@@ -27,22 +27,24 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import javax.microedition.lcdui.Canvas;
-import de.enough.polish.ui.Command;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
+import org.javarosa.core.services.Logger;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.ExtensionConstants;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledPItemCommandListener;
 import org.javarosa.patient.model.data.ImmunizationData;
 import org.javarosa.patient.model.data.ImmunizationRow;
 
+import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.CustomItem;
 import de.enough.polish.ui.DateField;
 import de.enough.polish.ui.Item;
-import de.enough.polish.ui.ItemCommandListener;
 import de.enough.polish.ui.StringItem;
 
-public class Table extends CustomItem implements ItemCommandListener {
+public class Table extends CustomItem implements HandledPItemCommandListener {
     
 	private static final Command CMD_EDIT = new Command("OK", Command.OK, 1);
 	///private static final Command CMD_DATE_OK = new Command("OK", Command.OK, 1);
@@ -379,66 +381,73 @@ public class Table extends CustomItem implements ItemCommandListener {
         //repaint(currentY * dx, currentX * dy, dx, dy);
     }
     public void keyPressed(int code) {
-    	if(availablecells[currentY][currentX]) {
-    		switch(code)
-    		{
-    			case Canvas.KEY_NUM1:
-    				question1.setLabel("");
-    				question1.setText("1:Given. ");
-    				question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				setText("X",currentX,currentY);
-    				selectedindex[currentY][currentX] = 1;
-    				checkdatefield();
-    				break;
-            
-    			case Canvas.KEY_NUM2:
-    				question2.setLabel("");
-    				question2.setText("2:No vaccination. ");
-    				question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				setText("X",currentX,currentY);
-    				selectedindex[currentY][currentX] = 2;
-    				checkdatefield();
-    				break;
-    			case Canvas.KEY_NUM3:
-    				question3.setLabel("");
-    				question3.setText("3:Unknown. ");
-    				question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				setText("X",currentX,currentY);
-    				selectedindex[currentY][currentX] = 3;
-    				checkdatefield();
-    				break;
-    			case Canvas.KEY_NUM4:
-    				isDatefield=true;
-    				question4.setLabel("");
-    				question4.setText("4:Specify Date Given: ");
-    				question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
-    				Calendar calendar = Calendar.getInstance();
-  	    	  		calendar.setTime(new Date());  
-  	    	  		calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)-6);
-  	    	  		calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-  	    	  		calendar.set(Calendar.DAY_OF_MONTH,calendar.get(Calendar.DAY_OF_MONTH));
-  	    	  		datefield.setDate(calendar.getTime());
-  	    	  		//chatScreen.insert(chatScreen.getCurrentIndex()+1,datefield);
-  	    	  		setText("X",currentX,currentY);
-  	    	  		selectedindex[currentY][currentX] = 4;
-  	    	  		recorddate[currentY][currentX] = calendar.getTime().getTime();
-  	    	  		//chatScreen.append(datefield);
-  	    	  		//chatScreen.focus(datefield);
-  	    	  		break;
-    		}
+    	try {
+    	
+	    	if(availablecells[currentY][currentX]) {
+	    		switch(code)
+	    		{
+	    			case Canvas.KEY_NUM1:
+	    				question1.setLabel("");
+	    				question1.setText("1:Given. ");
+	    				question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				setText("X",currentX,currentY);
+	    				selectedindex[currentY][currentX] = 1;
+	    				checkdatefield();
+	    				break;
+	            
+	    			case Canvas.KEY_NUM2:
+	    				question2.setLabel("");
+	    				question2.setText("2:No vaccination. ");
+	    				question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				setText("X",currentX,currentY);
+	    				selectedindex[currentY][currentX] = 2;
+	    				checkdatefield();
+	    				break;
+	    			case Canvas.KEY_NUM3:
+	    				question3.setLabel("");
+	    				question3.setText("3:Unknown. ");
+	    				question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				setText("X",currentX,currentY);
+	    				selectedindex[currentY][currentX] = 3;
+	    				checkdatefield();
+	    				break;
+	    			case Canvas.KEY_NUM4:
+	    				isDatefield=true;
+	    				question4.setLabel("");
+	    				question4.setText("4:Specify Date Given: ");
+	    				question1.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question2.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question3.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_PLAIN,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				question4.setFont(Font.getFont(Font.FACE_SYSTEM,Font.STYLE_BOLD,Font.SIZE_MEDIUM)); //get specific Font for ur 'text'
+	    				Calendar calendar = Calendar.getInstance();
+	  	    	  		calendar.setTime(new Date());  
+	  	    	  		calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)-6);
+	  	    	  		calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+	  	    	  		calendar.set(Calendar.DAY_OF_MONTH,calendar.get(Calendar.DAY_OF_MONTH));
+	  	    	  		datefield.setDate(calendar.getTime());
+	  	    	  		//chatScreen.insert(chatScreen.getCurrentIndex()+1,datefield);
+	  	    	  		setText("X",currentX,currentY);
+	  	    	  		selectedindex[currentY][currentX] = 4;
+	  	    	  		recorddate[currentY][currentX] = calendar.getTime().getTime();
+	  	    	  		//chatScreen.append(datefield);
+	  	    	  		//chatScreen.focus(datefield);
+	  	    	  		break;
+	    		}
+	    	}
+	    	
+    	} catch (Exception e) {
+    		Logger.die("gui-keydown", e);
     	}
+    	
     }
     public void addOptions()
     {
@@ -489,9 +498,14 @@ public class Table extends CustomItem implements ItemCommandListener {
 
     }
 
-    public void commandAction(Command c, Item i) {
+	public void commandAction(Command c, Item i) {
+		CrashHandler.commandAction(this, c, i);
+	}  
+
+	public void _commandAction(Command c, Item i) {
         if (c == CMD_EDIT) {
-    }
+        	
+        }
    }
     public String[][] getText()
     {

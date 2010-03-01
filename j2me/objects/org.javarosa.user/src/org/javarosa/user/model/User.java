@@ -40,9 +40,7 @@ public class User implements Persistable, Restorable
 {
 	public static final String STORAGE_KEY = "USER";
 	
-	//USERTYPEs
 	public static final String ADMINUSER = "admin";
-	public static final String USERTYPE1 = "TLP";
 	public static final String STANDARD = "standard";
 	public static final String DEMO_USER = "demo_user";
 
@@ -52,44 +50,26 @@ public class User implements Persistable, Restorable
 	private String userType;
 	private String uniqueId;  //globally-unique id
 	private int id;           //human-friendly / organizational id
-	private boolean rememberMe= false;
+	private boolean rememberMe = false;
 	
 	/** String -> String **/
 	private Hashtable properties = new Hashtable(); 
 
-	public User ()
-	{
+	public User () {
 		userType = STANDARD;
 	}
 
-	public User(String name, String passw, int id)
-	{
-		username = name;
-		password = passw;
-		userType =  STANDARD;
-		rememberMe = false;
-		this.id = id;
+	public User(String name, String passw, int id) {
+		this(name, passw, id, STANDARD);
 	}
 	
-	
-	public User(String name, String passw, int id, String isAAdmin)
-	{
+	public User(String name, String passw, int id, String userType) {
 		username = name;
 		password = passw;
-		if (isAAdmin.equals(ADMINUSER))
-		{
-			this.setUserType(ADMINUSER);
-		}
-		else if (isAAdmin.equals( STANDARD))
-		{
-			this.setUserType(STANDARD);
-		}
-		else if (isAAdmin.equals(USERTYPE1))
-			this.setUserType( USERTYPE1);
-		else
-			System.out.println("while creating user, an invalid isAAdmin variable was passed in: options are \"STANDARD\" or \"ADMINSUER\" or \"USERTYPE1\"");
+		setUserType(userType);
 		this.id = id;
 		this.uniqueId = String.valueOf(id);
+		rememberMe = false;
 	}
 
 	///fetch the value for the default user and password from the RMS
@@ -104,13 +84,6 @@ public class User implements Persistable, Restorable
 		this.properties = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class), pf);
 	}
 
-	public boolean isAdminUser()
-	{
-		if (userType.equals( ADMINUSER))
-		return true;
-		else return false;
-	}
-
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeString(out, username);
 		ExtUtil.writeString(out, password);
@@ -120,6 +93,10 @@ public class User implements Persistable, Restorable
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(uniqueId));
         ExtUtil.writeBool(out, rememberMe);
 		ExtUtil.write(out, new ExtWrapMap(properties));
+	}
+
+	public boolean isAdminUser() {
+		return userType.equals(ADMINUSER);
 	}
 
 	public String getUsername()
@@ -177,7 +154,6 @@ public class User implements Persistable, Restorable
 	public String getUniqueId() {
 		return uniqueId;
 	}
-	
 	
 	public Enumeration listProperties() {
 		return this.properties.keys();

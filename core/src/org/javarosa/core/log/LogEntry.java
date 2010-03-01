@@ -34,7 +34,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @date Apr 10, 2009 
  *
  */
-public class IncidentLog implements Externalizable {
+public class LogEntry implements Externalizable {
+	
+	public static final String STORAGE_KEY = "LOG";
 	
 	public static String LOG_TYPE_APPLICATION = "APP";
 	public static String LOG_TYPE_ACTIVITY = "ACTIVITY";
@@ -48,11 +50,11 @@ public class IncidentLog implements Externalizable {
 	/** 
 	 * NOTE: For serialization purposes only
 	 */
-	public IncidentLog() {
+	public LogEntry() {
 		
 	}
 	
-	public IncidentLog(String type, String message, Date time) {
+	public LogEntry(String type, String message, Date time) {
 		this.time = time;
 		this.type = type;
 		this.message = message;
@@ -94,8 +96,8 @@ public class IncidentLog implements Externalizable {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeDate(out, time);
-		ExtUtil.writeString(out, type);
-		ExtUtil.writeString(out, message);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(type));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(message));
 	}
 
 }

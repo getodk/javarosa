@@ -16,7 +16,7 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen.acquire;
 
-import org.javarosa.formmanager.view.FormElementBinding;
+import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
@@ -28,6 +28,6 @@ import de.enough.polish.ui.Style;
  */
 public interface IAcquiringService {
 	
-	public AcquiringQuestionScreen getWidget(FormElementBinding prompt, Style style);
+	public AcquiringQuestionScreen getWidget(FormEntryPrompt prompt, Style style);
 
 }

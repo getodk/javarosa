@@ -6,14 +6,15 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
-import de.enough.polish.ui.CommandListener;
 import de.enough.polish.ui.Displayable;
 import de.enough.polish.ui.List;
 
-public class FormSummaryController implements CommandListener {
+public class FormSummaryController implements HandledPCommandListener {
 
 	private FormSummaryTransitions transistions;
 	private FormSummaryView view;
@@ -25,7 +26,11 @@ public class FormSummaryController implements CommandListener {
 		view.setCommandListener(this);
 	}
 
-	public void commandAction(Command command, Displayable d) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command command, Displayable d) {
 		if (d == view) {
 			if (command == view.CMD_EXIT) {
 				transistions.exit();

@@ -3,12 +3,12 @@ package org.javarosa.services.transport;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 
+import org.javarosa.core.log.FatalException;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Document;
 import org.xmlpull.v1.XmlPullParser;
-
-import de.enough.polish.io.StringReader;
 
 /**
  * utility class for extracting an xml document out of a string or bytestream, typically used for
@@ -20,7 +20,11 @@ import de.enough.polish.io.StringReader;
 public class CommUtil {
 
 	public static Document getXMLResponse (byte[] response) {
-		return getXMLResponse(new InputStreamReader(new ByteArrayInputStream(response)));
+		try {
+			return getXMLResponse(new InputStreamReader(new ByteArrayInputStream(response), "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			throw new FatalException("can't happen; utf8 must be supported", e);
+		}
 	}
 
 	public static Document getXMLResponse (Reader reader) {

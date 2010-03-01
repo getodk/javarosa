@@ -22,12 +22,14 @@ package org.javarosa.media.image.activity;
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.UnavailableServiceException;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledThread;
 import org.javarosa.j2me.services.FileService;
 import org.javarosa.j2me.services.exception.FileException;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -44,7 +46,7 @@ import org.javarosa.utilities.file.J2MEFileService;
  * @author Cory Zue
  */
 
-public abstract class FileBrowseState implements DataCaptureTransitions, State, CommandListener {
+public abstract class FileBrowseState implements DataCaptureTransitions, State, HandledCommandListener {
 
 	private String currDirName;
 
@@ -118,11 +120,15 @@ public abstract class FileBrowseState implements DataCaptureTransitions, State, 
 	}
 
 	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
 		System.out.println("updir:" + UP_DIRECTORY);
 		if (c == selectCommand ) {
 			List curr = (List) d;
 			final String currFile = curr.getString(curr.getSelectedIndex());
-			new Thread(new Runnable() {
+			new HandledThread(new Runnable() {
 				public void run() {
 					if (currFile.endsWith(SEP_STR)
 							|| currFile.equals(UP_DIRECTORY)) {

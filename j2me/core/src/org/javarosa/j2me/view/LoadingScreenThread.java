@@ -4,15 +4,16 @@
 package org.javarosa.j2me.view;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.microedition.lcdui.Display;
+
+import org.javarosa.j2me.log.HandledTimerTask;
 
 /**
  * @author ctsims
  *
  */
-public class LoadingScreenThread extends TimerTask {
+public class LoadingScreenThread extends HandledTimerTask {
 	private Timer timer;
 	private static final long START_THRESHOLD = 500;
 	private static final long POLL_PERIOD = 50;
@@ -36,11 +37,12 @@ public class LoadingScreenThread extends TimerTask {
 		timer.schedule(this, START_THRESHOLD, POLL_PERIOD);
 	}
 
-	public void run() {
+	public void _run() {
 		if(!canceled) {
 			if(!displayed) {
 				elapsed += START_THRESHOLD;
 				display.setCurrent(screen);
+				displayed = true;
 			}
 			if(indicator != null) {
 				screen.updateProgress(indicator.getProgress());

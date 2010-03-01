@@ -28,7 +28,6 @@ import java.io.OutputStream;
 
 import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
@@ -36,6 +35,9 @@ import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.UnavailableServiceException;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledThread;
 import org.javarosa.j2me.services.AudioCaptureService;
 import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 import org.javarosa.j2me.services.exception.AudioException;
@@ -44,7 +46,7 @@ import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.media.image.activity.DataCaptureTransitions;
 import org.javarosa.media.image.model.FileDataPointer;
 
-public abstract class AudioCaptureState implements DataCaptureTransitions, State, CommandListener, Runnable 
+public abstract class AudioCaptureState implements DataCaptureTransitions, State, HandledCommandListener, Runnable 
 {
 	//private final long FOREVER = 1000000;
 	private AudioCaptureService recordService;
@@ -96,7 +98,7 @@ public abstract class AudioCaptureState implements DataCaptureTransitions, State
 		{
 			serviceUnavailable(ue);
 		}
-		captureThread = new Thread(this, "CaptureThread");
+		captureThread = new HandledThread(this, "CaptureThread");
 	}
 
 	public void destroy() 
@@ -126,8 +128,11 @@ public abstract class AudioCaptureState implements DataCaptureTransitions, State
     	eraseCommand = new Command("Erase", Command.SCREEN, 0);
 	}
 	
-	public void commandAction(Command comm, Displayable disp)
-	{
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command comm, Displayable disp) {
 		//Record to file
 		if(comm == recordCommand)
 		{			
