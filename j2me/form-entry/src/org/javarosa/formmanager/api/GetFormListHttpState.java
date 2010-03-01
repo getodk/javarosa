@@ -99,7 +99,7 @@ public abstract class GetFormListHttpState implements State,CommandListener,Tran
 		
 	}
 
-	public void process(String response) {
+	public void process(byte[] response) {
 		//FIXME - resolve the responses to be received from the webserver
 		if(response ==null){
 			//TODO: I don't think this is even possible.

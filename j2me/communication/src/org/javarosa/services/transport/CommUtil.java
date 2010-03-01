@@ -1,5 +1,7 @@
 package org.javarosa.services.transport;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.kxml2.io.KXmlParser;
@@ -17,8 +19,8 @@ import de.enough.polish.io.StringReader;
  */
 public class CommUtil {
 
-	public static Document getXMLResponse (String response) {
-		return getXMLResponse(new StringReader(response));
+	public static Document getXMLResponse (byte[] response) {
+		return getXMLResponse(new InputStreamReader(new ByteArrayInputStream(response)));
 	}
 
 	public static Document getXMLResponse (Reader reader) {
