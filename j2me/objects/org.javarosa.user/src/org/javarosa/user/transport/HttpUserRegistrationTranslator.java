@@ -53,10 +53,10 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 	}
 
 	public User readResponse(SimpleHttpTransportMessage message) throws UnrecognizedResponseException {
-		String body = message.getResponseBody();
+		
 		KXmlParser parser = new KXmlParser();
 		try {
-			parser.setInput(new ByteArrayInputStream(body.getBytes()),null);
+			parser.setInput(new ByteArrayInputStream(message.getResponseBody()),null);
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
 			Document response = new Document();
 			response.parse(parser);
