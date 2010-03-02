@@ -78,21 +78,23 @@ public class SimpleHttpTransporter implements Transporter {
 			// Get the response
 			is = (DataInputStream) conn.openDataInputStream();
 			int ch;
-			StringBuffer sb = new StringBuffer();
-			while ((ch = is.read()) != -1) {
-				sb.append((char) ch);
-			}
+			byte[] response = new byte[10000];
+			is.read(response);
+//			while ((ch = is.read()) != -1) {
+//				sb.append((char) ch);
+//			}
 			is.close();
 			int responseCode = conn.getResponseCode();
 			System.out.println("response code: "+responseCode);
 			// set return information in the message
-			this.message.setResponseBody(sb.toString());
+			this.message.setResponseBody(response);
 			this.message.setResponseCode(responseCode);
 			if (responseCode == HttpConnection.HTTP_OK) {
 				this.message.setStatus(TransportMessageStatus.SENT);
 			}
 
 			conn.close();
+			System.out.println("Everything successful!");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Connection failed: " + e.getClass() + " : "

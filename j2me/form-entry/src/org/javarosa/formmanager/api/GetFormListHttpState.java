@@ -16,6 +16,9 @@
 
 package org.javarosa.formmanager.api;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -32,96 +35,139 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.services.transport.senders.SenderThread;
 
-public abstract class GetFormListHttpState implements State,CommandListener,TransportListener, HttpFetchTransitions{
+public abstract class GetFormListHttpState implements State, CommandListener,
+		TransportListener, HttpFetchTransitions {
 
-	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
-	public final Command CMD_RETRY = new Command("Retry",Command.BACK, 1);
-	private ProgressScreen progressScreen = new ProgressScreen("Searching","Please Wait. Contacting Server...",this);
-	
-	private String getListUrl; 
+	public final Command CMD_CANCEL = new Command("Cancel", Command.BACK, 1);
+	public final Command CMD_RETRY = new Command("Retry", Command.BACK, 1);
+	private ProgressScreen progressScreen = new ProgressScreen("Searching",
+			"Please Wait. Contacting Server...", this);
+
+	private String getListUrl;
 	private String credentials;
-	
+
 	private String requestPayload = "#";
-	
+
 	private SenderThread thread;
+	
 
 	public GetFormListHttpState() {
-		
+
 	}
-	
+
 	public abstract String getUrl();
-	
+
 	public abstract String getUserName();
-	
-	private void init(){
-		getListUrl = getUrl(); 
-		credentials = "?user=" + getUserName();
+
+	private void init() {
+		getListUrl = getUrl();
+		String userName = getUserName();
+		credentials = userName == null ? "" : "?user=" + userName;
 		requestPayload = credentials;
 	}
-	
+
 	public void start() {
 		progressScreen.addCommand(CMD_CANCEL);
 		J2MEDisplay.setView(progressScreen);
 		init();
 		fetchList();
 	}
-	
+
 	public void fetchList() {
-		SimpleHttpTransportMessage message= new SimpleHttpTransportMessage(requestPayload,getListUrl+credentials);//send username and url
+		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(
+				requestPayload, getListUrl + credentials);// send username and
+		// url
 		message.setCacheable(false);
-		
+
 		try {
 			thread = TransportService.send(message);
 			thread.addListener(this);
 		} catch (TransportException e) {
-			fail("Error Downloading List! Transport Exception while downloading forms list " + e.getMessage());
+			fail("Error Downloading List! Transport Exception while downloading forms list "
+					+ e.getMessage());
 		}
 	}
 	
-	private void fail(String message) {
+	protected void fail(String message) {
 		progressScreen.setText(message);
 		progressScreen.addCommand(CMD_RETRY);
 	}
 
 	public void commandAction(Command command, Displayable display) {
-		
-		if(display== progressScreen){
-			if(command == CMD_CANCEL){
+
+		if (display == progressScreen) {
+			if (command == CMD_CANCEL) {
 				cancel();
 			}
-			if(command == CMD_RETRY) {
-				progressScreen = new ProgressScreen("Searching","Please Wait. Contacting Server...",this);
+			if (command == CMD_RETRY) {
+				progressScreen = new ProgressScreen("Searching",
+						"Please Wait. Contacting Server...", this);
 				progressScreen.addCommand(CMD_CANCEL);
 				J2MEDisplay.setView(progressScreen);
 				fetchList();
 			}
 		}
-		
+
 	}
 
-	public void process(String response) {
-		//FIXME - resolve the responses to be received from the webserver
-		if(response ==null){
-			//TODO: I don't think this is even possible.
-			fail("Null Response from server");
-		}else if(response.equals("WebServerResponses.GET_LIST_ERROR")){
-			fail("Get List Error from Server");
-		}else if(response.equals("WebServerResponses.GET_LIST_NO_SURVEY")){
-			fail("No survey error from server");
-		}else{
-			fetched();
-		}
-		
+	public void process(InputStream response) {
+//		// FIXME - resolve the responses to be received from the webserver
+//		if (response == null) {
+//			// TODO: I don't think this is even possible.
+//			fail("Null Response from server");
+//		} else if (response.equals("WebServerResponses.GET_LIST_ERROR")) {
+//			fail("Get List Error from Server");
+//		} else if (response.equals("WebServerResponses.GET_LIST_NO_SURVEY")) {
+//			fail("No survey error from server");
+//		} else {
+//			// IStorageUtility formStorage =
+//			// StorageManager.getStorage(FormDef.STORAGE_KEY);
+//
+//			// ByteArrayInputStream bin = new
+//			// ByteArrayInputStream(response.getBytes());
+//			// try {
+//			// formStorage.write(XFormUtils.getFormFromInputStream(bin));
+//			// } catch (StorageFullException e) {
+//			// throw new RuntimeException("Whoops! Storage full : " +
+//			// FormDef.STORAGE_KEY);
+//			// }
+//			
+//			
+//			System.out.println(response);
+//			StringTokenizer st = new StringTokenizer(response.trim(), "<>");
+//			String formNum = "";
+//			String formName = "";
+//
+//			while (st.hasMoreTokens()){
+//				
+//				String s = st.nextToken();
+//
+//				if (s.equals("id")){
+//					 formNum =  st.nextToken();st.nextToken();
+//				}
+//				if (s.equals("name")){
+//					formName = st.nextToken();st.nextToken();
+//				}
+//				if (s.equals("/xform")){
+//					st.nextToken();
+//					System.out.println(formNum + " - " + formName);
+//				}
+//				
+//			}
+//								
+//			fetched();
+//		}
+
 	}
-	
+
 	public void onChange(TransportMessage message, String remark) {
 		progressScreen.setText(remark);
 	}
 
 	public void onStatusChange(TransportMessage message) {
-		if(message.getStatus() == TransportMessageStatus.SENT) {
-			//TODO: Response codes signal statuses?
-			process(((SimpleHttpTransportMessage)message).getResponseBody());
+		if (message.getStatus() == TransportMessageStatus.SENT) {
+			// TODO: Response codes signal statuses?
+			process(new ByteArrayInputStream(((SimpleHttpTransportMessage) message).getResponseBody()));
 		} else {
 			fail("Transport Failure: " + message.getFailureReason());
 		}
