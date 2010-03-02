@@ -51,7 +51,6 @@ public class User implements Persistable, Restorable
 	private String password;
 	private String userType;
 	private String uniqueId;
-	private int id;
 	private boolean rememberMe= false;
 	
 	/** String -> String **/
@@ -62,17 +61,16 @@ public class User implements Persistable, Restorable
 		userType = STANDARD;
 	}
 
-	public User(String name, String passw, int id)
+	public User(String name, String passw)
 	{
 		username = name;
 		password = passw;
 		userType =  STANDARD;
 		rememberMe = false;
-		this.id = id;
 	}
 	
 	
-	public User(String name, String passw, int id, String isAAdmin)
+	public User(String name, String passw, String isAAdmin)
 	{
 		username = name;
 		password = passw;
@@ -88,9 +86,7 @@ public class User implements Persistable, Restorable
 			this.setUserType( USERTYPE1);
 		else
 			System.out.println("while creating user, an invalid isAAdmin variable was passed in: options are \"STANDARD\" or \"ADMINSUER\" or \"USERTYPE1\"");
-		this.id = id;
-		this.uniqueId = String.valueOf(id);
-	}
+		}
 
 	///fetch the value for the default user and password from the RMS
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
@@ -98,7 +94,6 @@ public class User implements Persistable, Restorable
 			this.username = in.readUTF();
 			this.password = in.readUTF();
 			this.userType = in.readUTF();
-			this.id = in.readInt();
 			this.rememberMe = in.readBoolean();
 			this.properties = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class));
 			this.recordId = in.readInt();
@@ -122,7 +117,6 @@ public class User implements Persistable, Restorable
 			out.writeUTF(this.username);
 	        out.writeUTF(this.password);
 	        out.writeUTF(this.userType);
-	        out.writeInt(this.id);
 	        out.writeBoolean(this.rememberMe);
 			ExtUtil.write(out, new ExtWrapMap(properties));
 			out.writeInt(recordId);
@@ -156,10 +150,6 @@ public class User implements Persistable, Restorable
 		return userType;
 	}
 	
-	public int getUserID() {
-		return this.id;
-	}
-
 	public void setUserType(String userType) {
 		this.userType = userType;
 	}
@@ -210,7 +200,6 @@ public class User implements Persistable, Restorable
 		RestoreUtils.addData(dm, "name", username);
 		RestoreUtils.addData(dm, "pass", password);
 		RestoreUtils.addData(dm, "type", userType);
-		RestoreUtils.addData(dm, "user-id", new Integer(id));
 		RestoreUtils.addData(dm, "remember", new Boolean(rememberMe));		
 		
 		for (Enumeration e = properties.keys(); e.hasMoreElements(); ) {
@@ -235,7 +224,6 @@ public class User implements Persistable, Restorable
 		username = (String)RestoreUtils.getValue("name", dm);
 		password = (String)RestoreUtils.getValue("pass", dm);
 		userType = (String)RestoreUtils.getValue("type", dm);
-		id = ((Integer)RestoreUtils.getValue("user-id", dm)).intValue();
 		rememberMe = RestoreUtils.getBoolean(RestoreUtils.getValue("remember", dm));
         
         TreeElement e = dm.resolveReference(RestoreUtils.absRef("other", dm));
