@@ -188,18 +188,21 @@ public class LoginForm extends FramedForm {
 
 		String usernameEntered = this.usernameField.getString().trim();
 		String passwordEntered = this.passwordField.getString().trim();
+		System.out.println("Username: " + usernameEntered + ", Password: " + passwordEntered);
 
 		IStorageIterator ui = users.iterate();
 		while (ui.hasMore()) {
 			User u = (User)ui.nextRecord();
+			System.out.println("User: Username= " + u.getUsername() + ", Password= " + u.getPassword());
 			if (u.getUsername().equalsIgnoreCase(usernameEntered) && u.getPassword().equals(passwordEntered)) {
 				setLoggedInUser(u);
+				System.out.println("Match found, returing true");
 				return true;
+				
 			}
 		}
-
+		System.out.println("No Match found, returing false");
 		return false;
-
 	}
 
 	/**

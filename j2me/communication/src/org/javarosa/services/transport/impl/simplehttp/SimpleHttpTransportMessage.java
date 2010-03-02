@@ -35,7 +35,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	/**
 	 * 
 	 */
-	private String responseBody;
+	private byte[] responseBody;
 	
 	private boolean cacheable = true;
 
@@ -50,6 +50,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	 */
 	public SimpleHttpTransportMessage(String str, String url) {
 		content = str.getBytes();
+		System.out.println("String: "+ str +", URL: " + url);
 		this.url = url;
 	}
 
@@ -104,14 +105,14 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	/**
 	 * @return
 	 */
-	public String getResponseBody() {
+	public byte[] getResponseBody() {
 		return responseBody;
 	}
 
 	/**
 	 * @param responseBody
 	 */
-	public void setResponseBody(String responseBody) {
+	public void setResponseBody(byte[] responseBody) {
 		this.responseBody = responseBody;
 	}
 
@@ -151,7 +152,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 		super.readExternal(in, pf);
 		url = ExtUtil.readString(in);
 		responseCode = (int)ExtUtil.readNumeric(in);
-		responseBody = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		responseBody = ExtUtil.readBytes(in);
 		content = ExtUtil.readBytes(in);
 	}
 		
@@ -160,7 +161,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 		super.writeExternal(out);
 		ExtUtil.writeString(out,url);
 		ExtUtil.writeNumeric(out,responseCode);
-		ExtUtil.writeString(out, ExtUtil.emptyIfNull(responseBody));
+		ExtUtil.writeBytes(out, responseBody);
 		ExtUtil.writeBytes(out,content);
 	}
 

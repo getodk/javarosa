@@ -160,7 +160,6 @@ public class SingleQuestionView extends FramedForm implements
 							+ command.getLabel() + "]");
 				}
 			}
-
 		} 
 	}
 

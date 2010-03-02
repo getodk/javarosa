@@ -212,12 +212,22 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		applyStyle(title, STYLE_TITLE);
 		
 		String[] titleData = controller.getTitleData();
+		System.out.println("controller: " + (controller!=null) + ", titledata: " + ((titleData!=null)&&(titleData.length > 0)));
+	
+		if (titleData!=null){
 		for (int j = 0; j < titleData.length; j++) {
 			//#style patselCell
 			StringItem str = new StringItem("", titleData[j]);
 			applyStyle(str, STYLE_CELL);
 			title.add(str);
 		}
+		}else{
+			StringItem str = new StringItem("","No Title");
+			applyStyle(str, STYLE_CELL);
+			title.add(str);
+		}
+		
+		
 		this.append(title);
 		
 		if (listIsEmpty()) {

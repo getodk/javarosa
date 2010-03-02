@@ -63,8 +63,17 @@ public class Patient implements Persistable, Restorable {
 	public static final String STORAGE_KEY = "PATIENT";
 	
 	/** RMS Record Id */
-	private int recordId = INVALID_RECORD_ID;
+	protected int recordId = INVALID_RECORD_ID;
 	
+	public int getRecordId() {
+		return recordId;
+	}
+
+	public void setRecordId(int recordId) {
+		this.recordId = recordId;
+	}
+
+
 	String prefix;
 	
 	String familyName;  	/** Patient's Family name */
