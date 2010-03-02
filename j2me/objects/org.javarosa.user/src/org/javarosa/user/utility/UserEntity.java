@@ -19,10 +19,6 @@
  */
 package org.javarosa.user.utility;
 
-import java.io.IOException;
-
-import org.javarosa.core.services.storage.IStorageUtility;
-import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.entity.model.Entity;
 import org.javarosa.user.model.User;
 
@@ -55,7 +51,7 @@ public class UserEntity extends Entity<User> {
 	 */
 	public void loadEntity(User u) {
 		this.username = u.getUsername();
-		this.userid = u.getUserID();
+		this.userid = u.getID();
 	}
 	
 	/* (non-Javadoc)
