@@ -58,7 +58,8 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String helpTextID;
 
 	private Vector<SelectChoice> choices;
-			
+	private ItemsetBinding dynamicChoices;
+	
 	Vector observers;
 	
 	public QuestionDef () {
@@ -192,6 +193,14 @@ public class QuestionDef implements IFormElement, Localizable {
 		return null;
 	}
 	
+	public ItemsetBinding getDynamicChoices () {
+		return dynamicChoices;
+	}
+	
+	public void setDynamicChoices (ItemsetBinding ib) {
+		this.dynamicChoices = ib;
+	}
+	
     public void localeChanged(String locale, Localizer localizer) {
     	if(longTextID != null) {
     		longText = localizer.getLocalizedText(longTextID);
@@ -249,6 +258,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		for (int i = 0; i < getNumChoices(); i++) {
 			choices.elementAt(i).setIndex(i);
 		}
+		dynamicChoices = (ItemsetBinding)ExtUtil.read(dis, new ExtWrapNullable(ItemsetBinding.class));
 
 		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 	}
@@ -270,6 +280,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		ExtUtil.writeNumeric(dos, getControlType());
 		
 		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(choices)));
+		ExtUtil.write(dos, new ExtWrapNullable(dynamicChoices));
 
 		ExtUtil.write(dos, new ExtWrapNullable(binding == null ? null : new ExtWrapTagged(binding)));
 	}

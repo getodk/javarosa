@@ -31,6 +31,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.Condition;
@@ -50,6 +51,7 @@ import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.IXFormBindHandler;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 import org.javarosa.xpath.XPathConditional;
+import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.kdom.Document;
@@ -463,10 +465,14 @@ public class XFormParser {
 				parseHint(f, question, child);
 			} else if (isSelect && "item".equals(childName)) {
 				parseItem(f, question, child);
+			} else if (isSelect && "itemset".equals(childName)) {
+				parseItemset(f, question, child, parent);
 			}
 		}
 		if (isSelect) {
-			if (question.getNumChoices() == 0) {
+			if (question.getNumChoices() > 0 && question.getDynamicChoices() != null) {
+				throw new XFormParseException("Select question contains both literal choices and <itemset>");
+			} else if (question.getNumChoices() == 0 && question.getDynamicChoices() == null) {
 				throw new XFormParseException("Select question has no choices");
 			}
 		}
@@ -662,6 +668,68 @@ public class XFormParser {
 		}
 	}
 
+	private static void parseItemset (FormDef f, QuestionDef q, Element e, IFormElement qparent) {
+		ItemsetBinding itemset = new ItemsetBinding();
+		
+		String nodesetStr = e.getAttributeValue("", "nodeset");
+		XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
+		itemset.nodeset = new XPathConditional(path);
+		TreeReference nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), qparent));
+		
+		for (int i = 0; i < e.getChildCount(); i++) {
+			int type = e.getType(i);
+			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
+			String childName = (child != null ? child.getName() : null);
+
+			if ("label".equals(childName)) {
+				String labelRef = child.getAttributeValue("", "ref");
+				boolean labelItext = false;
+				
+				if (labelRef != null) {
+					if (labelRef.startsWith("jr:itext('") && labelRef.endsWith("')")) {
+						labelRef = labelRef.substring("jr:itext('".length(), labelRef.indexOf("')"));
+						labelItext = true;
+					}
+				} else {
+					throw new XFormParseException("<label> in <itemset> requires 'ref'");
+				}
+				
+				itemset.label = FormInstance.unpackReference(getAbsRef(new XPathReference(labelRef), nodesetRef));
+				itemset.labelIsItext = labelItext;
+			} else if ("copy".equals(childName)) {
+				String copyRef = child.getAttributeValue("", "ref");
+				if (copyRef == null) {
+					throw new XFormParseException("<copy> in <itemset> requires 'ref'");
+				}
+				
+				itemset.dest = FormInstance.unpackReference(getAbsRef(new XPathReference(copyRef), nodesetRef));
+				itemset.destCopy = true;
+			} else if ("value".equals(childName)) {
+				String valueRef = child.getAttributeValue("", "ref");
+				if (valueRef == null) {
+					throw new XFormParseException("<value> in <itemset> requires 'ref'");
+				}
+				
+				itemset.dest = FormInstance.unpackReference(getAbsRef(new XPathReference(valueRef), nodesetRef));
+				itemset.destCopy = false;
+			}
+		}
+		
+		if (itemset.label == null) {
+			throw new XFormParseException("<itemset> requires <label>");
+		} else if (itemset.dest == null) {			
+			throw new XFormParseException("<itemset> requires <copy> or <value>");
+		}
+		
+		if (!nodesetRef.isParentOf(itemset.label, false)) {
+			throw new XFormParseException("itemset nodeset ref is not a parent of label ref");
+		} else if (!nodesetRef.isParentOf(itemset.dest, false)) {
+			throw new XFormParseException("itemset nodeset ref is not a parent of dest/copy ref");
+		}
+		
+		q.setDynamicChoices(itemset);
+	}
+	
 	private static void parseGroup (IFormElement parent, Element e, FormDef f, int groupType) {
 		GroupDef group = new GroupDef();
 		group.setID(serialQuestionID++); //until we come up with a better scheme
@@ -725,24 +793,34 @@ public class XFormParser {
 		parent.addChild(group);
 	}
 
-	//take a (possibly relative) reference, and make it absolute based on its parent
 	private static IDataReference getAbsRef (IDataReference ref, IFormElement parent) {
-		TreeReference tref, parentRef = null;
-		
-		if (ref != null) {
-			tref = (TreeReference)ref.getReference();
-		} else {
-			tref = TreeReference.selfRef(); //only happens for <group>s with no binding
-		}
-		
+		TreeReference parentRef = null;
+
 		if (parent instanceof FormDef) {
 			parentRef = TreeReference.rootRef();
 			parentRef.add(instanceNode.getName(), 0);
 		} else if (parent instanceof GroupDef) {
 			parentRef = (TreeReference)((GroupDef)parent).getBind().getReference();
 		} else if (parent instanceof QuestionDef) {
-			parentRef = (TreeReference)((QuestionDef)parent).getBind().getReference();			
+			parentRef = (TreeReference)((QuestionDef)parent).getBind().getReference();	
 		}
+		
+		return getAbsRef(ref, parentRef);
+	}
+	
+	//take a (possibly relative) reference, and make it absolute based on its parent
+	private static IDataReference getAbsRef (IDataReference ref, TreeReference parentRef) {
+		TreeReference tref;
+		
+		if (!parentRef.isAbsolute()) {
+			throw new RuntimeException("XFormParser.getAbsRef: parentRef must be absolute");
+		}
+		
+		if (ref != null) {
+			tref = (TreeReference)ref.getReference();
+		} else {
+			tref = TreeReference.selfRef(); //only happens for <group>s with no binding
+		}		
 		
 		tref = tref.parent(parentRef);
 		if (tref == null) {
