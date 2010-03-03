@@ -45,6 +45,10 @@ public class XPathConditional implements IConditionExpr {
 		this.xpath = xpath;
 	}
 	
+	public XPathConditional (XPathExpression expr) {
+		this.expr = expr;
+	}
+	
 	public XPathConditional () {
 		
 	}

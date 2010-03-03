@@ -64,6 +64,10 @@ public class XPathPathExpr extends XPathExpression {
 		this.filtExpr = filtExpr;
 	}
 	
+	public TreeReference getReference () throws XPathUnsupportedException {
+		return getReference(false);
+	}
+	
 	/**
 	 * translate an xpath path reference into a TreeReference
 	 * TreeReferences only support a subset of true xpath paths; restrictions are:
@@ -71,7 +75,7 @@ public class XPathPathExpr extends XPathExpression {
 	 *   no predicates
 	 *   all '..' steps must come before anything else
 	 */
-	public TreeReference getReference () throws XPathUnsupportedException {
+	public TreeReference getReference (boolean allowPredicates) throws XPathUnsupportedException {
 		TreeReference ref = new TreeReference();
 		boolean parentsAllowed;
 		
@@ -90,7 +94,7 @@ public class XPathPathExpr extends XPathExpression {
 		for (int i = 0; i < steps.length; i++) {
 			XPathStep step = steps[i];
 			
-			if (step.predicates.length > 0) {
+			if (!allowPredicates && step.predicates.length > 0) {
 				throw new XPathUnsupportedException("predicates");
 			}
 			
