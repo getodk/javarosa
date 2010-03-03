@@ -24,6 +24,7 @@ import javax.microedition.io.file.FileConnection;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.j2me.log.HandledThread;
 
 /**
  * @author Kieran
@@ -42,13 +43,14 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 // Clayton Sims - Sep 4, 2008 : This class should be separated out in such a way that FormManager isn't dependent
 // on the FileConnection API. Even surrounding the appropriate code sections with preprocessor directives would be
 // fine.
-public class FormDefSerializer implements Runnable{
+public class FormDefSerializer extends HandledThread {
 
 	private FormDef form;
 	private String fname;
 
-	public FormDefSerializer(){
-
+	public FormDefSerializer(FormDef form, String fname){
+		setForm(form);
+		setFname(fname);
 	}
 
 	public FormDef getForm() {
@@ -67,11 +69,11 @@ public class FormDefSerializer implements Runnable{
 		this.fname = fname;
 	}
 
-	public void run() {
-		this.saveForm(form, fname);
+	public void _run() {
+		saveForm(form, fname);
 	}
 
-	public void saveForm(FormDef theForm, String filename){
+	public static void saveForm(FormDef theForm, String filename){
 		byte[] data;
 		try {
 			data = ExtUtil.serialize(theForm);

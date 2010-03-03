@@ -17,12 +17,13 @@
 package org.javarosa.patient.activity.view;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.patient.activity.EditPatientTransitions;
 import org.javarosa.patient.model.Patient;
@@ -34,7 +35,7 @@ import de.enough.polish.ui.DateField;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.TextField;
 
-public class PatientEditControllerView extends FramedForm implements CommandListener {
+public class PatientEditControllerView extends FramedForm implements HandledCommandListener {
 
 	public static final Command DONE = new Command("Done",Command.SCREEN, 1);
 	public static final Command CANCEL = new Command("Cancel",Command.CANCEL, 1);
@@ -138,6 +139,10 @@ public class PatientEditControllerView extends FramedForm implements CommandList
 	}
 	
 	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
 		if(c.equals(PatientEditControllerView.CANCEL)) {
 			transitions.cancel();
 		} else{

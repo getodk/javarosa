@@ -50,6 +50,13 @@
 					<library dir="${dir.lib}" />
 				</libraries>
 
+				<jad>
+					<attribute name="App-Version" value="${jrdemo.version}" />
+					<attribute name="JRDemo-Build-Version" value="${jrdemo-build-version}" />
+					<attribute name="JR-Build-Version" value="${jr-build-version}" />
+					<attribute name="Polish-Device" value="${device.identifier}" />
+				</jad>
+				
 				<!-- midlets definition -->
 				<midlet class="${app.class}" name="${app.name}" />
 
@@ -168,11 +175,7 @@
 	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
 	
 	<target name="DecomposeJar" depends="BuildClean">
-		<!--exec executable="python" failifexecutionfails="false" dir="dist">
-			<arg value="../tools/jar_usage.py" />
-			<arg value="JavaRosaDemoP.jar" />
-			<arg value="obfuscation_mapping.txt" />
-		</exec-->
+		<taskdef name="py-run" onerror="report" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.3.jar"/>
 	    <py-run script="${dir.tools}/jar_usage.py" optimize="0" python="${pythonexec}">
 	      <arg value="${basedir}\dist\${app.jarName}"/>
 	      <arg value="${basedir}\dist\obfuscation_mapping.txt"/>
@@ -185,11 +188,36 @@
 
 	<!-- Initialization for the build targets                    -->
 	<target name="init">
+		<ant antfile="${dir.root}/core/build.xml" target="extract-libs" inheritAll="true" inheritRefs="false" />
+		
 		<!-- Disable the Emulator by default -->
 		<property name="test" value="false" />
 		<condition property="compile.from.source.true">
 			<equals arg1="${compile.source}" arg2="true" />
 		</condition>
+		
+		<exec executable="hg" outputproperty="jrdemo-build-version">
+			<arg line="parents --template {node|short}"/>
+		</exec>
+
+		<taskdef name="if" onerror="report" classname="net.sf.antcontrib.logic.IfTask" classpath="${dir.tools}/ant-contrib.jar" />
+		<if>
+			<equals arg1="${compile.source}" arg2="true" />
+			<then>
+				<exec executable="hg" outputproperty="jr-build-version">
+					<arg line="parents --template {node|short} -R &quot;${dir.root}&quot;"/>
+				</exec>
+			</then>
+			<else>
+				<unzip src="${dir.tools}/j2merosa-libraries.jar" dest="${dir.build}">
+				    <patternset>
+				        <include name="javarosa.properties"/>
+				    </patternset>
+				</unzip>
+				<property file="${dir.build}/javarosa.properties" /> 
+			</else>
+		</if>
+
 	</target>
 
 	<target name="supressOutput">
@@ -222,7 +250,4 @@
 
 	<!-- import global properties                                 -->
 	<property file="${polish.home}/global.properties" />
-
-	<!-- Defines the py-run task                                  -->
-	<taskdef name="py-run" onerror="report" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.3.jar"/>
 </project>

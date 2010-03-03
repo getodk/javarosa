@@ -1,5 +1,6 @@
 package org.javarosa.services.transport.impl.simplehttp;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -60,34 +61,42 @@ public class SimpleHttpTransporter implements Transporter {
 		DataInputStream is = null;
 		OutputStream os = null;
 		try {
-			
-			System.out.println("Ready to send: "+this.message);
+
+			System.out.println("Ready to send: " + this.message);
 
 			conn = getConnection();
-			
-			System.out.println("Connection: "+conn);
 
+			System.out.println("Connection: " + conn);
 
 			os = conn.openOutputStream();
 			byte[] o = (byte[]) this.message.getContent();
-			
-			System.out.println("content: "+new String(o));
+
+			System.out.println("content: " + new String(o));
 			StreamsUtil.writeToOutput(o, os);
 			os.close();
 
 			// Get the response
 			is = (DataInputStream) conn.openDataInputStream();
+<<<<<<< /home/munaf/workspace/2010/J2EE_Galileo/javarosa/j2me/communication/src/org/javarosa/services/transport/impl/simplehttp/SimpleHttpTransporter.java
 			int ch;
 			byte[] response = new byte[10000];
 			is.read(response);
 //			while ((ch = is.read()) != -1) {
 //				sb.append((char) ch);
 //			}
+=======
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			StreamsUtil.writeFromInputToOutput(is, baos);
+>>>>>>> /tmp/SimpleHttpTransporter.java~other.F9hMei
 			is.close();
 			int responseCode = conn.getResponseCode();
-			System.out.println("response code: "+responseCode);
+			System.out.println("response code: " + responseCode);
 			// set return information in the message
+<<<<<<< /home/munaf/workspace/2010/J2EE_Galileo/javarosa/j2me/communication/src/org/javarosa/services/transport/impl/simplehttp/SimpleHttpTransporter.java
 			this.message.setResponseBody(response);
+=======
+			this.message.setResponseBody(baos.toByteArray());
+>>>>>>> /tmp/SimpleHttpTransporter.java~other.F9hMei
 			this.message.setResponseCode(responseCode);
 			if (responseCode == HttpConnection.HTTP_OK) {
 				this.message.setStatus(TransportMessageStatus.SENT);
@@ -135,15 +144,20 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @throws IOException
 	 */
 	private HttpConnection getConnection() throws IOException {
-		if(this.message==null)throw new RuntimeException("Null message in getConnection()");
-		
+		if (this.message == null)
+			throw new RuntimeException("Null message in getConnection()");
+
 		HttpConnection conn = (HttpConnection) Connector.open(this.message
 				.getUrl());
-		if(conn==null)throw new RuntimeException("Null conn in getConnection()");
-		if(this.message.getRequestProperties()==null)throw new RuntimeException("Null message.getRequestProperties() in getConnection()");
-		if(this.message.getContent()==null)throw new RuntimeException("Null message.getContent() in getConnection()");
-		
-		
+		if (conn == null)
+			throw new RuntimeException("Null conn in getConnection()");
+		if (this.message.getRequestProperties() == null)
+			throw new RuntimeException(
+					"Null message.getRequestProperties() in getConnection()");
+		if (this.message.getContent() == null)
+			throw new RuntimeException(
+					"Null message.getContent() in getConnection()");
+
 		conn.setRequestMethod(HttpConnection.POST);
 		conn.setRequestProperty("User-Agent", this.message
 				.getRequestProperties().getUserAgent());

@@ -20,7 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
@@ -30,6 +29,8 @@ import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.util.TrivialTransitions;
 import org.javarosa.formmanager.view.ProgressScreen;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
@@ -39,7 +40,7 @@ import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessag
 import org.javarosa.services.transport.senders.SenderThread;
 import org.javarosa.xform.util.XFormUtils;
 
-public abstract class GetFormHttpState implements State,TrivialTransitions,CommandListener,TransportListener {
+public abstract class GetFormHttpState implements State,TrivialTransitions,HandledCommandListener,TransportListener {
 
 	private ProgressScreen progressScreen =  new ProgressScreen("Downloadng","Please Wait. Fetching Form...", this);
 
@@ -76,7 +77,11 @@ public abstract class GetFormHttpState implements State,TrivialTransitions,Comma
 		progressScreen.addCommand(progressScreen.CMD_RETRY);
 	}
 
-	public void commandAction(Command command, Displayable display) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command command, Displayable display) {
 		if(display == progressScreen){
 			if(command==progressScreen.CMD_CANCEL){
 				sendThread.cancel();
@@ -92,9 +97,8 @@ public abstract class GetFormHttpState implements State,TrivialTransitions,Comma
 	public void process(InputStream response) {
 		IStorageUtility formStorage = StorageManager.getStorage(FormDef.STORAGE_KEY);
 
-//		bin = new ByteArrayInputStream(response.getBytes());
 		try {
-			System.out.println("Trying to write to RMS...");
+		
 			formStorage.write(XFormUtils.getFormFromInputStream(response));
 		} catch (StorageFullException e) {
 			throw new RuntimeException("Whoops! Storage full : " + FormDef.STORAGE_KEY);

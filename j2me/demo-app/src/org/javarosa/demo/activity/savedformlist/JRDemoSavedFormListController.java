@@ -4,14 +4,15 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.demo.util.JRDemoUtil;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
-public class JRDemoSavedFormListController implements CommandListener {
+public class JRDemoSavedFormListController implements HandledCommandListener {
 	JRDemoSavedFormListTransitions transitions;
 	JRDemoSavedFormListView view;
 
@@ -39,6 +40,10 @@ public class JRDemoSavedFormListController implements CommandListener {
 	}
 
 	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
 		if (d == view) {
 			if (c == view.CMD_BACK) {
 				transitions.back();

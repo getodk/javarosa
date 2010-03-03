@@ -35,6 +35,7 @@ import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.user.activity.UserModule;
 import org.javarosa.user.model.User;
+import org.javarosa.user.utility.UserUtility;
 import org.javarosa.xform.util.XFormUtils;
 
 public class JRDemoContext {
@@ -79,12 +80,13 @@ public class JRDemoContext {
 			JRDemoUtil.loadDemoPatients(patients);
 		}
 		
-		JRDemoUtil.initAdminUser("234");
+		UserUtility.populateAdminUser();
 	}
 	
 	private void loadForms (IStorageUtility forms) {
 		try {
-			forms.write(XFormUtils.getFormFromResource("/shortform.xhtml"));
+			//forms.write(XFormUtils.getFormFromResource("/shortform.xhtml"));
+			forms.write(XFormUtils.getFormFromResource("/intelligibleshortform.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/condtest.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
@@ -118,7 +120,7 @@ public class JRDemoContext {
 	}
 	
 	private void setProperties() {
-		final String POST_URL = "http://test.commcarehq.org/submit";
+		final String POST_URL = "http://staging.commcarehq.org/receiver/submit/test";
 		
 		PropertyManager._().addRules(new JavaRosaPropertyRules());
 		PropertyManager._().addRules(new DemoAppProperties());

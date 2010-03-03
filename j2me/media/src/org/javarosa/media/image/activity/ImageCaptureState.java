@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.media.Manager;
 import javax.microedition.media.MediaException;
@@ -29,6 +28,8 @@ import javax.microedition.media.control.VideoControl;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.services.UnavailableServiceException;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.services.FileService;
 import org.javarosa.j2me.services.exception.FileException;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -45,7 +46,7 @@ import org.javarosa.utilities.file.J2MEFileService;
  * @author Cory Zue
  *
  */
-public abstract class ImageCaptureState implements DataCaptureTransitions, State, CommandListener
+public abstract class ImageCaptureState implements DataCaptureTransitions, State, HandledCommandListener
 {
 	// camera needed variables
 	
@@ -156,8 +157,11 @@ public abstract class ImageCaptureState implements DataCaptureTransitions, State
 		doError();
 	}
 
-	
-	public void commandAction(Command cmd, Displayable display) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command cmd, Displayable display) {
 		if (cmd.equals(this.mBackCommand)) {
 			goBack();
 		}

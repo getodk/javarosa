@@ -29,20 +29,22 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.JrFormEntryController;
+import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
-import de.enough.polish.ui.CommandListener;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Displayable;
 import de.enough.polish.ui.FramedForm;
@@ -51,7 +53,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
 
 
-public class Chatterbox extends FramedForm implements CommandListener, IFormEntryView{
+public class Chatterbox extends FramedForm implements HandledPCommandListener, IFormEntryView{
 	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
     private static final String PROMPT_REQUIRED_QUESTION = Localization.get("view.sending.RequiredQuestion");
@@ -63,7 +65,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     public static final int UIHACK_SELECT_PRESS = 1;
 	
 	private JrFormEntryController controller;
-    private FormEntryModel model;
+    private JrFormEntryModel model;
     
     private ChatterboxWidgetFactory widgetFactory;
     private boolean multiLingual;
@@ -91,9 +93,10 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     public Chatterbox (String formTitle, JrFormEntryController controller) {
         //#style framedForm
     	super(formTitle);
+    	this.controller = controller;
+    	this.model = controller.getModel();
     	
-    	//TODO: READONLY FLAG!
-    	if(false) {
+    	if (model.isReadOnlyMode()) {
     		//#style ReviewFramedForm
     		UiAccess.setStyle(this);
     	}
@@ -107,14 +110,9 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     			return false;
     		}
     	};
-    	
-    	this.model = controller.getModel();
-    	this.controller = controller;
 
     	widgetFactory = new ChatterboxWidgetFactory(this);
-    	
-    	//TODO: READONLY FLAG!
-    	widgetFactory.setReadOnly(false);
+    	widgetFactory.setReadOnly(model.isReadOnlyMode());
     	
     	multiLingual = (model.getForm().getLocalizer() != null);
     	questionIndexes = new SortedIndexSet();
@@ -151,16 +149,15 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	initProgressBar();
     	
     	//Mode 1: Read only review screen.
-    	//TODO: READONLY FLAG!
-    	if(false) {
+    	if(model.isReadOnlyMode()) {
     		while(controller.stepToNextEvent() != FormEntryController.EVENT_END_OF_FORM) {
-    			//TODO: Anything?
+    			jumpToQuestion(FormIndex.createEndOfFormIndex());
     		}
-    	} else if(null != null) { //TODO: Starting from a specific question
-    		
+    	} else if (null /*model.getStartIndex()*/ != null) { //TODO: Starting from a specific question
     		//Mode 2: Seek to current question
     		while(!model.getCurrentFormIndex().equals(null)) {
     			controller.stepToNextEvent();
+        		jumpToQuestion(model.getCurrentFormIndex());
     		}
     	} else {
     		//Default Mode: Start at first question
@@ -183,8 +180,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
         
         //next command is added on a per-widget basis
         
-        //TODO: READ ONLY FLAG!
-        if(true) {
+        if(!model.isReadOnlyMode()) {
             addCommand(backCommand);
             addCommand(exitSaveCommand);
             addCommand(saveCommand);
@@ -438,8 +434,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     }
     
     public void formComplete () {
-    	//TODO: READONLY FLAG!
-    	if(true) {
+    	if(!model.isReadOnlyMode()) {
 	    	controller.jumpToIndex(FormIndex.createEndOfFormIndex());
 	    	babysitStyles();
 			progressBar.setValue(progressBar.getMaxValue());
@@ -450,8 +445,6 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
 			} catch (InterruptedException ie) { }
 				
 			controller.saveAndExit(true);
-    	} else { 
-    		
     	}
     }
     
@@ -470,8 +463,7 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     		ChatterboxWidget cw = (ChatterboxWidget)get(i);
     		switch (cw.getViewState()) {
     		case ChatterboxWidget.VIEW_COLLAPSED:
-    			//TODO: READONLY FLAG!
-    			if(false) {
+    			if(model.isReadOnlyMode()) {
     				//#style ReviewSplit
     				UiAccess.setStyle(cw);
     			} else {
@@ -489,7 +481,11 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	this.requestRepaint();
     }
     
-    public void commandAction(Command command, Displayable s) {
+    public void commandAction(Command c, Displayable d) {
+    	CrashHandler.commandAction(this, c, d);
+    }
+    
+    public void _commandAction(Command command, Displayable s) {
     	System.out.println("cbox: command action");
     	
     	if (command == backCommand) {
@@ -510,11 +506,10 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	} else if (command.getLabel() == "Back") {
     		backFromCamera();
     	} else if (command.getLabel().equals(CollapsedWidget.UPDATE_TEXT)) { //TODO: Put this static string in a better place.
-    		//Return to shell providing the question index.
-    		model.setQuestionIndex(this.questionIndexes.get(this.getCurrentIndex()));
+    		System.out.println("not implemented: updating answers from review mode");
     		
-    		throw new RuntimeException("NOT YET IMPLEMENTED: i don't where to transit to [droos 10/29]");
-    		//controller.exit("update");
+//    		model.setQuestionIndex(this.questionIndexes.get(this.getCurrentIndex()));
+//    		throw new RuntimeException("NOT YET IMPLEMENTED: i don't where to transit to [droos 10/29]");
     	} else {
     		String language = null;
     		if (multiLingual) {
@@ -590,21 +585,30 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
 //	}
 	
     public void keyPressed(int keyCode) {
-    	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
-    	super.keyPressed(keyCode);
-    	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
-    		controller.cycleLanguage();
-    	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
-    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
-				ChatterboxWidget widget = activeFrame();
-				if (widget != null) {
-					widget.UIHack(UIHACK_SELECT_PRESS);
+    	
+    	try {
+    	
+	    	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
+	    	super.keyPressed(keyCode);
+	    	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
+	    		controller.cycleLanguage();
+	    	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
+	    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
+					ChatterboxWidget widget = activeFrame();
+					if (widget != null) {
+						widget.UIHack(UIHACK_SELECT_PRESS);
+					}
 				}
-			}
-        	indexWhenKeyPressed = keyDownSelectedWidget;
+	        	indexWhenKeyPressed = keyDownSelectedWidget;
+	    	}
+	    	
+    	} catch (Exception e) {
+    		Logger.die("gui-keydown", e);
     	}
+
     }
     
+    //no exception handling needed
     public void keyReleased(int keyCode) {
     	if(keyCode == KEY_CENTER_LETS_HOPE && !(indexWhenKeyPressed == this.activeQuestionIndex)) {
     		//The previous select keypress was for a different item.

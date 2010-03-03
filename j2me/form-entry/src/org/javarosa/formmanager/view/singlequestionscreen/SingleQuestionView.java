@@ -33,15 +33,16 @@ import org.javarosa.formmanager.view.singlequestionscreen.screen.NewRepeatScreen
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
 import org.javarosa.formmanager.view.summary.FormSummaryState;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
-import de.enough.polish.ui.CommandListener;
 import de.enough.polish.ui.Displayable;
 import de.enough.polish.ui.FramedForm;
 
-public class SingleQuestionView extends FramedForm implements
-		IFormEntryView, CommandListener {
+public class SingleQuestionView extends FramedForm implements IFormEntryView,
+		HandledPCommandListener {
 	private JrFormEntryController controller;
 	private FormEntryModel model;
 
@@ -57,9 +58,11 @@ public class SingleQuestionView extends FramedForm implements
 		this.goingForward = true;
 	}
 
-	public SingleQuestionScreen getView(FormIndex qIndex, boolean fromFormView) {
-		FormEntryPrompt prompt = model.getQuestionPrompt(qIndex);
-		FormEntryCaption[] captionHeirarchy = model.getCaptionHierarchy(qIndex);
+	public SingleQuestionScreen getView(FormEntryPrompt prompt,
+			boolean fromFormView) {
+
+		FormEntryCaption[] captionHeirarchy = model.getCaptionHierarchy(prompt
+				.getIndex());
 		String groupTitle = null;
 		if (captionHeirarchy.length > 1) {
 			FormEntryCaption caption = captionHeirarchy[1];
@@ -82,7 +85,7 @@ public class SingleQuestionView extends FramedForm implements
 	public void show() {
 		showFormSummary();
 	}
-	
+
 	public void show(FormIndex index) {
 		controller.jumpToIndex(index);
 		refreshView();
@@ -95,14 +98,20 @@ public class SingleQuestionView extends FramedForm implements
 	}
 
 	public void refreshView() {
-		SingleQuestionScreen view = getView(model.getCurrentFormIndex(),
-				this.goingForward);
-		J2MEDisplay.setView(view);
+		if (model.currentIndexIsQuestionPrompt()) {
+			FormEntryPrompt prompt = model.getCurrentQuestionPrompt();
+			SingleQuestionScreen view = getView(prompt, this.goingForward);
+			J2MEDisplay.setView(view);
+		}
 	}
 
-	public void commandAction(Command command, Displayable arg1) {
-		if (arg1 == repeatScreen){
-			if (command == NewRepeatScreen.yesCommand){
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command command, Displayable arg1) {
+		if (arg1 == repeatScreen) {
+			if (command == NewRepeatScreen.yesCommand) {
 				controller.newRepeat(model.getCurrentFormIndex());
 				controller.stepToNextEvent();
 				refreshView();
@@ -145,9 +154,11 @@ public class SingleQuestionView extends FramedForm implements
 				String language = null;
 				for (int i = 0; i < SingleQuestionScreen.languageCommands.length; i++) {
 					if (command == SingleQuestionScreen.languageCommands[i]) {
-						String label = command.getLabel(); //has form language > mylanguage
-    					int sep = label.indexOf(">");
-    					language = label.substring(sep+1, label.length()).trim();
+						String label = command.getLabel(); // has form language
+															// > mylanguage
+						int sep = label.indexOf(">");
+						language = label.substring(sep + 1, label.length())
+								.trim();
 						break;
 					}
 				}
@@ -160,7 +171,7 @@ public class SingleQuestionView extends FramedForm implements
 							+ command.getLabel() + "]");
 				}
 			}
-		} 
+		}
 	}
 
 	private void viewAnswers() {
@@ -195,8 +206,10 @@ public class SingleQuestionView extends FramedForm implements
 					: controller.stepToPreviousEvent();
 			break;
 		case FormEntryController.EVENT_PROMPT_NEW_REPEAT:
-			FormEntryCaption[] hierachy = model.getCaptionHierarchy(model.getCurrentFormIndex());
-			repeatScreen = new NewRepeatScreen("Add a new " + hierachy[hierachy.length -1].getLongText());
+			FormEntryCaption[] hierachy = model.getCaptionHierarchy(model
+					.getCurrentFormIndex());
+			repeatScreen = new NewRepeatScreen("Add a new "
+					+ hierachy[hierachy.length - 1].getLongText());
 			repeatScreen.setCommandListener(this);
 			J2MEDisplay.setView(repeatScreen);
 			break;

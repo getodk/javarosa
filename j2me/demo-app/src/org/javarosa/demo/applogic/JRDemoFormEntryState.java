@@ -12,10 +12,10 @@ import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.demo.util.JRDemoFormEntryViewFactory;
 import org.javarosa.demo.util.JRDemoUtil;
-import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.formmanager.api.CompletedFormOptionsState;
 import org.javarosa.formmanager.api.FormEntryState;
 import org.javarosa.formmanager.api.JrFormEntryController;
+import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
 
@@ -47,7 +47,7 @@ public class JRDemoFormEntryState extends FormEntryState {
 		FormDefFetcher fetcher = new FormDefFetcher(new RMSRetreivalMethod(formID), preloaders, funcHandlers);
 		FormDef form = fetcher.getFormDef();
 		
-		JrFormEntryController controller =  new JrFormEntryController(new FormEntryModel(form));
+		JrFormEntryController controller =  new JrFormEntryController(new JrFormEntryModel(form));
 		controller.setView(new JRDemoFormEntryViewFactory().getFormEntryView(controller));
 		return controller;
 	}

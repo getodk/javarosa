@@ -43,14 +43,15 @@ public class SimpleSenderThread extends SenderThread {
 			}
 		}
 
+		// if the loop was executed merely because the tries have been
+		// used up, then the message becomes cached, for sending
+		// via the "Send Unsent" user function
+		if (!message.isSuccess()) {
+			message.setStatus(message.isCacheable() ? TransportMessageStatus.CACHED : TransportMessageStatus.FAILED);
+			notifyStatusChange(message);
+		}
+		
 		if (message.isCacheable()) {
-			// if the loop was executed merely because the tries have been
-			// used up, then the message becomes cached, for sending
-			// via the "Send Unsent" user function
-			if (!message.isSuccess()) {
-				message.setStatus(TransportMessageStatus.CACHED);
-				notifyStatusChange(message);
-			}
 			try {
 				this.messageStore.updateMessage(message);
 			} catch (Exception e) {

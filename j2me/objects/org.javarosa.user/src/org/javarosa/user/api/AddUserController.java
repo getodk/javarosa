@@ -4,14 +4,14 @@
 package org.javarosa.user.api;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
-import org.javarosa.core.api.State;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.user.api.transitions.AddUserTransitions;
 import org.javarosa.user.model.User;
@@ -23,7 +23,7 @@ import org.javarosa.user.view.UserForm;
  * @author ctsims
  *
  */
-public class AddUserController implements CommandListener {
+public class AddUserController implements HandledCommandListener {
 
 	private AddUserTransitions transitions;
 	private UserForm view;
@@ -56,7 +56,11 @@ public class AddUserController implements CommandListener {
 		J2MEDisplay.setView(view);
 	}
 	
-	public void commandAction(Command c, Displayable arg1) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
 		if(c.equals(CMD_SAVE)) {
 			UserValidator validator = new UserValidator(view);
 			int status = validator.validateNewUser();

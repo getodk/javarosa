@@ -113,6 +113,8 @@ public class TransportService {
 				// persist the message
 				CACHE.cache(message);
 			}
+		} else {
+			message.setStatus(TransportMessageStatus.QUEUED);
 		}
 
 		// start the sender thread

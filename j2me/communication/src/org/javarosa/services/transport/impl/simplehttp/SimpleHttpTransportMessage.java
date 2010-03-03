@@ -152,7 +152,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 		super.readExternal(in, pf);
 		url = ExtUtil.readString(in);
 		responseCode = (int)ExtUtil.readNumeric(in);
-		responseBody = ExtUtil.readBytes(in);
+		responseBody = ExtUtil.nullIfEmpty(ExtUtil.readBytes(in));
 		content = ExtUtil.readBytes(in);
 	}
 		
@@ -161,8 +161,8 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 		super.writeExternal(out);
 		ExtUtil.writeString(out,url);
 		ExtUtil.writeNumeric(out,responseCode);
-		ExtUtil.writeBytes(out, responseBody);
-		ExtUtil.writeBytes(out,content);
+		ExtUtil.writeBytes(out, ExtUtil.emptyIfNull(responseBody));
+		ExtUtil.writeBytes(out, content);
 	}
 
 }

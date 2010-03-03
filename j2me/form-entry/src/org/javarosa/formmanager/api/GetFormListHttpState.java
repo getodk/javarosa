@@ -14,18 +14,27 @@
  * the License.
  */
 
+<<<<<<< /home/munaf/workspace/2010/J2EE_Galileo/javarosa/j2me/form-entry/src/org/javarosa/formmanager/api/GetFormListHttpState.java
 package org.javarosa.formmanager.api;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+=======
+package org.javarosa.formmanager.api;
+
+import java.io.UnsupportedEncodingException;
+
+>>>>>>> /tmp/GetFormListHttpState.java~other.QKx40Q
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
+import org.javarosa.core.log.FatalException;
 import org.javarosa.formmanager.api.transitions.HttpFetchTransitions;
 import org.javarosa.formmanager.view.ProgressScreen;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
@@ -34,6 +43,11 @@ import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.services.transport.senders.SenderThread;
+<<<<<<< /home/munaf/workspace/2010/J2EE_Galileo/javarosa/j2me/form-entry/src/org/javarosa/formmanager/api/GetFormListHttpState.java
+=======
+
+public abstract class GetFormListHttpState implements State,HandledCommandListener,TransportListener, HttpFetchTransitions{
+>>>>>>> /tmp/GetFormListHttpState.java~other.QKx40Q
 
 public abstract class GetFormListHttpState implements State, CommandListener,
 		TransportListener, HttpFetchTransitions {
@@ -91,6 +105,7 @@ public abstract class GetFormListHttpState implements State, CommandListener,
 	protected void fail(String message) {
 		progressScreen.setText(message);
 		progressScreen.addCommand(CMD_RETRY);
+<<<<<<< /home/munaf/workspace/2010/J2EE_Galileo/javarosa/j2me/form-entry/src/org/javarosa/formmanager/api/GetFormListHttpState.java
 	}
 
 	public void commandAction(Command command, Displayable display) {
@@ -102,9 +117,25 @@ public abstract class GetFormListHttpState implements State, CommandListener,
 			if (command == CMD_RETRY) {
 				progressScreen = new ProgressScreen("Searching",
 						"Please Wait. Contacting Server...", this);
+=======
+	}
+
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command command, Displayable display) {
+		if(display== progressScreen){
+			if(command == CMD_CANCEL){
+				cancel();
+			}
+			if(command == CMD_RETRY) {
+				progressScreen = new ProgressScreen("Searching","Please Wait. Contacting Server...",this);
+>>>>>>> /tmp/GetFormListHttpState.java~other.QKx40Q
 				progressScreen.addCommand(CMD_CANCEL);
 				J2MEDisplay.setView(progressScreen);
 				fetchList();
+<<<<<<< /home/munaf/workspace/2010/J2EE_Galileo/javarosa/j2me/form-entry/src/org/javarosa/formmanager/api/GetFormListHttpState.java
 			}
 		}
 
@@ -158,6 +189,35 @@ public abstract class GetFormListHttpState implements State, CommandListener,
 //			fetched();
 //		}
 
+=======
+			}
+		}
+		
+	}
+
+	public void process(byte[] response) {
+		String sResponse = null;
+		if (response != null) {
+			try {
+				sResponse = new String(response, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				throw new FatalException("can't happen; utf8 must be supported", e);
+			}
+		}
+		
+		//FIXME - resolve the responses to be received from the webserver
+		if(sResponse ==null){
+			//TODO: I don't think this is even possible.
+			fail("Null Response from server");
+		}else if(sResponse.equals("WebServerResponses.GET_LIST_ERROR")){
+			fail("Get List Error from Server");
+		}else if(sResponse.equals("WebServerResponses.GET_LIST_NO_SURVEY")){
+			fail("No survey error from server");
+		}else{
+			fetched();
+		}
+		
+>>>>>>> /tmp/GetFormListHttpState.java~other.QKx40Q
 	}
 
 	public void onChange(TransportMessage message, String remark) {

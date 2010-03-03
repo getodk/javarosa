@@ -13,51 +13,7 @@
 # the License.
 
 import sys
-
-class EndOfStream (Exception):
-  def __init__ (self, bytes):
-    self.bytes = bytes
-
-def stream (data):
-  for c in data:
-    yield c
-
-def read_int (dstr, require_pos=False):
-  (nb, c) = ([], None)
-  try:
-    while c == None or ord(c) >= 128:
-      c = dstr.next()
-      nb.append(c)
-  except StopIteration:
-    raise EndOfStream(nb)
-
-  nv = [ord(c) % 128 for c in nb]
-  if nv[0] >= 64:
-    nv[0] -= 128
-  val = reduce(lambda x, y: 128 * x + y, nv, 0)
-
-  if val < 0 and require_pos:
-    raise ValueError
-  return val
-
-def read_string (dstr):
-  lb = [ord(i) for i in read_bytes(dstr, 2)]
-  ln = 256 * lb[0] + lb[1]
-
-  try:
-    return read_bytes(dstr, ln)
-  except EndOfStream, eos:
-    raise EndOfStream(lb + eos.bytes)
-
-def read_bytes (dstr, n):
-  bytes = []
-  try:
-    for i in range(0, n):
-      bytes.append(dstr.next())
-  except StopIteration:
-    raise EndOfStream(bytes)
-  
-  return ''.join(bytes)
+from recparse import *
 
 #parse the data stream from the dump file into a structure representing all RMSes and records, accounting for any errors in the stream
 #returns tuple (
@@ -76,7 +32,8 @@ def read_bytes (dstr, n):
 #    'len': expected length of data -- None if unreadable,
 #    'data': raw content of record as a string -- None if could not read ID or data length, partial data
 #            if stream terminated while reading -- may be empty string,
-#    'status': status of record
+#    'status': status of record,
+#    'content': parsed data content of the record (if status is 'ok', unset otherwise) (still working out the details of this)
 #  }
 #  where 'status' is one of:
 #    'ok' if record is intact
@@ -85,35 +42,38 @@ def read_bytes (dstr, n):
 #        occured in a different record)
 #    'corrupt length <list of 'length' bytes read>' if could not read data length
 #    'partial data' if stream terminated before expected length of data was read
-def extract_rms (dstr):
+#  where 'content' is tuple (
+#    (still working out the details of this -- for now it's a Datum)
+#  )
+def extract_rms (stream):
   rmses = []
   num_rms = None
   err = False
 
   try:
-    num_rms = read_int(dstr, True)
+    num_rms = stream.read_int(True).val
     for i in range(0, num_rms):
       rms = {'name': None, 'size': None, 'records': []}
       rmses.append(rms)
 
-      rmsname = read_string(dstr)
+      rmsname = stream.read_string().val
       rms['name'] = rmsname
 
-      num_recs = read_int(dstr, True)
+      num_recs = stream.read_int(True).val
       rms['size'] = num_recs
 
       for j in range(0, num_recs):
         rec = {'id': None, 'len': None, 'data': None, 'status': None}
         rms['records'].append(rec)
 
-        id = read_int(dstr)
+        id = stream.read_int().val
         rec['id'] = id
         rec['status'] = 'data not read'
 
       for rec in rms['records']:
         try:
-          rec['len'] = read_int(dstr, True)
-        except EndOfStream, eos:
+          rec['len'] = stream.read_int(True).val
+        except Stream.EndOfStream, eos:
           rec['status'] = 'corrupt length %s' % eos.bytes
           raise
         except ValueError:
@@ -121,17 +81,18 @@ def extract_rms (dstr):
           raise
 
         try:
-          rec['data'] = read_bytes(dstr, rec['len'])
+          rec['data'] = stream.read(rec['len'])
           rec['status'] = 'ok'
-        except EndOfStream, eos:
+          rec['content'] = get_record_content(rec['data'], rec['id'], rms['name'])
+        except Stream.EndOfStream, eos:
           rec['status'] = 'partial data'
           rec['data'] = ''.join(eos.bytes)
           raise
-  except (EndOfStream, ValueError):
+  except (Stream.EndOfStream, ValueError):
     err = True
 
   return (rmses, num_rms, err)
-
+  
 def get_unique (l, key, val, type):
   matches = filter(lambda x: x[key] == val, l)
   if not matches:
@@ -141,6 +102,50 @@ def get_unique (l, key, val, type):
     print 'Warning: more than one %s %s' % (type, val)
   return matches[0]
 
+rms_types = {
+  'USER': 'user',
+  'CASE': 'case',
+  'PAT_REFERRAL': 'patref',
+  'FORMDEF': 'formdef',
+  'FORMDATA': 'forminst',
+  'PROPERTY': 'property',
+  'LOG': 'logentry',
+  'JavaROSATransQ': 'txmsg',
+  'JavaROSATransQSent': 'txmsg',  
+  'FORMS_RECD': 'cc-recd-forms-mapping'
+}
+  
+def get_record_content (bytes, rec_id, rms_name):
+  type = None
+  if rms_name.endswith('_IX'):
+    if rec_id == 1:
+      type = 'bool'
+    elif rec_id == 2:
+      type = 'obj:rmsinfo'
+    elif rec_id == 3:
+      type = 'map(int,obj:recloc)'
+    elif rec_id == 4:
+      type = 'none'
+  elif len(rms_name) > 3 and rms_name[-3] == '_':
+    basename = rms_name[:-3]
+    if basename in rms_types:
+      type = 'obj:' + rms_types[basename]
+  
+  if type == None:
+    return ('unknown', None)  
+  elif type == 'none':
+    return None
+  else:
+    try:
+      return ('ok', deserialize(bytes, type))
+    except Exception, e:
+      return ('error', e)
+
+  #ok
+  #deserialization error
+  #ok, but extra bytes
+  #unexpected exception
+      
 #return the raw byte data content for a given RMS record; pass in the parsed RMS structure, RMS name, and record ID
 def get_record (rmses, name, id):
   rms = get_unique(rmses, 'name', name, 'RMS')
@@ -198,6 +203,14 @@ def print_contents (dlen, rmses, num_rms, err):
           print '  Data: %d bytes %s' % (len(rec['data']), '(expected %d)' % rec['len'] if len(rec['data']) < rec['len'] else '')
           if rec['data']:
             print format_bytes(rec['data'])
+          if rec['content'] != None:
+            if rec['content'][0] == 'ok':
+              print '  Content:\n' + rec['content'][1].pretty_print(2, False, True)
+            elif rec['content'][0] == 'error':
+              print '  Content: error deserializing: %s' % str(rec['content'][1])
+            elif rec['content'][0] == 'unknown':
+              print '  Content: don\'t know record format'          
+          print
         else:
           print '  Data: [no data]'
           print
@@ -210,8 +223,8 @@ def print_contents (dlen, rmses, num_rms, err):
 if __name__ == "__main__":
 
   data = sys.stdin.read()
-  dstr = stream(data)
+  stream = DataStream(data)
 
-  (rmses, num_rms, err) = extract_rms(dstr)
+  (rmses, num_rms, err) = extract_rms(stream)
 
   print_contents(len(data), rmses, num_rms, err)
