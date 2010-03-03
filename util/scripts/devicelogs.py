@@ -16,6 +16,10 @@ if __name__ == "__main__":
   for log_rms in log_rmses:
     log_entries.extend([rec['content'][1] for rec in log_rms['records']])
 
+  panic_rms = [rms for rms in rmses if rms['name'] == 'LOG_PANIC']
+  if len(panic_rms) > 0 and len(panic_rms[0]['records']) > 0:
+    print 'PANIC entries detected!'
+
   log_digest = [read_log_entry(le) for le in log_entries]
   for la in sorted(log_digest, key=lambda la: la[0]):
     print_log(la)
