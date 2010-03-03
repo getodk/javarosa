@@ -701,13 +701,17 @@ public class XFormParser {
 			dataRef = getAbsRef(dataRef, parent);
 		}
 		group.setBind(dataRef);
+		
 		if (group.getRepeat()) {
 			repeats.addElement((TreeReference)dataRef.getReference());
-			//group.startEmpty = (e.getAttributeValue(NAMESPACE_JAVAROSA, "startEmpty") != null); //TODO: still may need this but for alternate purpose, e.g., startWithN
-			group.noAddRemove = (e.getAttributeValue(NAMESPACE_JAVAROSA, "noAddRemove") != null);
+
 			String countRef = e.getAttributeValue(NAMESPACE_JAVAROSA, "count");
-			if (countRef != null)
-				group.count = new XPathReference(countRef);
+			if (countRef != null) {
+				group.count = getAbsRef(new XPathReference(countRef), parent);
+				group.noAddRemove = true;
+			} else {
+				group.noAddRemove = (e.getAttributeValue(NAMESPACE_JAVAROSA, "noAddRemove") != null);				
+			}
 		}
 
 		//the case of a group wrapping a repeat is cleaned up in a post-processing step (collapseRepeatGroups)
