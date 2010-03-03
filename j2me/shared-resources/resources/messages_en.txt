@@ -134,6 +134,7 @@ form.login.loading.profile=Loading your Profile
 
 activity.login.loginincorrect=Login incorrect
 activity.login.tryagain=Please try again
+activity.login.error=Login error
 activity.login.demomode=Demo Mode
 activity.login.demomode.intro=You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.
 

@@ -16,7 +16,6 @@
 
 package org.javarosa.user.model;
 
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -34,37 +33,55 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
-
-
-public class User implements Persistable, Restorable
-{
+public class User implements Persistable, Restorable {
 	public static final String STORAGE_KEY = "USER";
-	
+	public static final String USERTYPE1 = "TLP";
 	public static final String ADMINUSER = "admin";
 	public static final String STANDARD = "standard";
 	public static final String DEMO_USER = "demo_user";
 
-	private int recordId = -1; //record id on device
+	private int recordId = -1; // record id on device
 	private String username;
 	private String password;
 	private String userType;
-	private String uniqueId;  //globally-unique id
-	private int id;           //human-friendly / organizational id
+	private String uniqueId; // globally-unique id
+	private int id; // human-friendly / organizational id
 	private boolean rememberMe = false;
-	
-	/** String -> String **/
-	private Hashtable properties = new Hashtable(); 
 
-	public User () {
+	/** String -> String **/
+	private Hashtable properties = new Hashtable();
+
+	public User() {
 		userType = STANDARD;
+	}
+
+	public User(String name, String passw) {
+		username = name;
+		password = passw;
+		userType = STANDARD;
+		rememberMe = false;
 	}
 
 	public User(String name, String passw, int id) {
 		this(name, passw, id, STANDARD);
 	}
-	
-	public User(String name, String passw, int id, String userType) {
+
+	public User(String name, String passw, String isAAdmin) {
 		username = name;
+		password = passw;
+		if (isAAdmin.equals(ADMINUSER)) {
+			this.setUserType(ADMINUSER);
+		} else if (isAAdmin.equals(STANDARD)) {
+			this.setUserType(STANDARD);
+		} else if (isAAdmin.equals(USERTYPE1)) {
+			this.setUserType(USERTYPE1);
+		} else
+			System.out
+					.println("while creating user, an invalid isAAdmin variable was passed in: options are \"STANDARD\" or \"ADMINSUER\" or \"USERTYPE1\"");
+	}
+
+	public User(String name, String passw, int id, String userType) {
+
 		password = passw;
 		setUserType(userType);
 		this.id = id;
@@ -72,8 +89,9 @@ public class User implements Persistable, Restorable
 		rememberMe = false;
 	}
 
-	///fetch the value for the default user and password from the RMS
-	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
+	// /fetch the value for the default user and password from the RMS
+	public void readExternal(DataInputStream in, PrototypeFactory pf)
+			throws IOException, DeserializationException {
 		this.username = ExtUtil.readString(in);
 		this.password = ExtUtil.readString(in);
 		this.userType = ExtUtil.readString(in);
@@ -81,17 +99,19 @@ public class User implements Persistable, Restorable
 		this.id = ExtUtil.readInt(in);
 		this.uniqueId = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		this.rememberMe = ExtUtil.readBool(in);
-		this.properties = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class), pf);
+		this.properties = (Hashtable) ExtUtil.read(in, new ExtWrapMap(
+				String.class, String.class), pf);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
+
 		ExtUtil.writeString(out, username);
 		ExtUtil.writeString(out, password);
 		ExtUtil.writeString(out, userType);
 		ExtUtil.writeNumeric(out, recordId);
 		ExtUtil.writeNumeric(out, id);
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(uniqueId));
-        ExtUtil.writeBool(out, rememberMe);
+		ExtUtil.writeBool(out, rememberMe);
 		ExtUtil.write(out, new ExtWrapMap(properties));
 	}
 
@@ -99,18 +119,15 @@ public class User implements Persistable, Restorable
 		return userType.equals(ADMINUSER);
 	}
 
-	public String getUsername()
-	{
+	public String getUsername() {
 		return username;
 	}
 
-	public String getPassword()
-	{
+	public String getPassword() {
 		return password;
 	}
 
-	public void setID(int recordId)
-	{
+	public void setID(int recordId) {
 
 		this.recordId = recordId;
 	}
@@ -121,10 +138,6 @@ public class User implements Persistable, Restorable
 
 	public String getUserType() {
 		return userType;
-	}
-	
-	public int getUserID() {
-		return this.id;
 	}
 
 	public void setUserType(String userType) {
@@ -146,27 +159,27 @@ public class User implements Persistable, Restorable
 	public void setRememberMe(boolean rememberMe) {
 		this.rememberMe = rememberMe;
 	}
-	
+
 	public void setUuid(String uuid) {
 		this.uniqueId = uuid;
 	}
-	
+
 	public String getUniqueId() {
 		return uniqueId;
 	}
-	
+
 	public Enumeration listProperties() {
 		return this.properties.keys();
 	}
-	
+
 	public void setProperty(String key, String val) {
 		this.properties.put(key, val);
-	} 
-	
-	public String getProperty(String key) {
-		return (String)this.properties.get(key);
 	}
-	
+
+	public String getProperty(String key) {
+		return (String) this.properties.get(key);
+	}
+
 	public String getRestorableType() {
 		return "user";
 	}
@@ -195,7 +208,7 @@ public class User implements Persistable, Restorable
 		RestoreUtils.applyDataType(dm, "user-id", parentRef, Integer.class);
 		RestoreUtils.applyDataType(dm, "uuid", parentRef, String.class);
 		RestoreUtils.applyDataType(dm, "remember", parentRef, Boolean.class);
-		
+
 		// other/* defaults to string
 	}
 
@@ -219,5 +232,4 @@ public class User implements Persistable, Restorable
             }
         }
 	}
-	
 }

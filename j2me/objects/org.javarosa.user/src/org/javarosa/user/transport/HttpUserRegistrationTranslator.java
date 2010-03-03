@@ -14,9 +14,12 @@ import org.javarosa.services.transport.CommUtil;
 import org.javarosa.services.transport.UnrecognizedResponseException;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.user.model.User;
+import org.kxml2.io.KXmlParser;
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 public class HttpUserRegistrationTranslator implements UserRegistrationTranslator<SimpleHttpTransportMessage>{
@@ -51,12 +54,13 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 	}
 	
 	public User readResponse(SimpleHttpTransportMessage message) throws UnrecognizedResponseException {
+
 		Document doc = CommUtil.getXMLResponse(message.getResponseBody());
 		if (doc == null) {
 			throw new UnrecognizedResponseException("can't parse xml");
 		}
-		
 		return readResponseDocument(doc);
+		
 	}
 	
 	/**

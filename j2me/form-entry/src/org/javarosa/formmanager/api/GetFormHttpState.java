@@ -17,6 +17,7 @@
 package org.javarosa.formmanager.api;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
@@ -59,6 +60,7 @@ public abstract class GetFormHttpState implements State,TrivialTransitions,Handl
 		
 		try {
 			sendThread = TransportService.send(message);
+			sendThread.addListener(this); // MUNAF: 
 		} catch (TransportException e) {
 			//TODO: Isn't there a screen where this can be displayed?
 			fail("Transport Error while downloading form!" + e.getMessage());
@@ -92,12 +94,12 @@ public abstract class GetFormHttpState implements State,TrivialTransitions,Handl
 		}
 	}
 	
-	public void process(byte[] response) {
+	public void process(InputStream response) {
 		IStorageUtility formStorage = StorageManager.getStorage(FormDef.STORAGE_KEY);
 
-		bin = new ByteArrayInputStream(response);
 		try {
-			formStorage.write(XFormUtils.getFormFromInputStream(bin));
+		
+			formStorage.write(XFormUtils.getFormFromInputStream(response));
 		} catch (StorageFullException e) {
 			throw new RuntimeException("Whoops! Storage full : " + FormDef.STORAGE_KEY);
 		}
@@ -111,7 +113,7 @@ public abstract class GetFormHttpState implements State,TrivialTransitions,Handl
 	public void onStatusChange(TransportMessage message) {
 		SimpleHttpTransportMessage httpMessage = (SimpleHttpTransportMessage)message;
 		if(httpMessage.isSuccess()) {
-			process(httpMessage.getResponseBody());
+			process(new ByteArrayInputStream(httpMessage.getResponseBody()));
 		} else {
 			fail("Failure while fetching XForm: " + message.getFailureReason());
 		}

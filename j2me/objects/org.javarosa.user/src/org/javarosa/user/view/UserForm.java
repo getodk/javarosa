@@ -108,7 +108,7 @@ public class UserForm extends Form {
 		this.passwordField.setString(user.getPassword());
 
 		// #if javarosa.adduser.extended
-		this.userIDField.setString(String.valueOf(user.getUserID()));
+		this.userIDField.setString(String.valueOf(user.getID()));
 		// #endif
 
 		if (user.isAdminUser()) {
