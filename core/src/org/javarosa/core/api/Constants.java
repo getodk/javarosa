@@ -60,11 +60,4 @@ public class Constants {
 	final public static String TRANSPORT_MANAGER = "Transport Manager";
 	final public static String PROPERTY_MANAGER = "Property Manager";
 
-	/**
-	 * Style codes
-	 */
-	public static final String STYLE_COMPULSORY = "OneQPS_Compulsory";
-	public static final String STYLE_TRANSISION_LEFT = "OneQPS_Form_Left";
-	public static final String STYLE_TRANSISION_RIGHT = "OneQPS_Form_Right";
-
 }

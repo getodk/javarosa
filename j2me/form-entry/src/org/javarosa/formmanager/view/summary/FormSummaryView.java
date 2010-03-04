@@ -59,8 +59,7 @@ public class FormSummaryView extends List {
 					text = getText(prompt);
 				} else if ((model.getEvent(index) == FormEntryController.EVENT_GROUP)
 						|| (model.getEvent(index) == FormEntryController.EVENT_REPEAT)) {
-					text = getHeaderText(model.getCaptionHierarchy(index),
-							index.getInstanceIndex());
+					text = getHeaderText(model.getCaptionHierarchy(index));
 					isHeader = true;
 				}
 				if (!text.equals("")) {
@@ -90,13 +89,13 @@ public class FormSummaryView extends List {
 		return line;
 	}
 
-	private String getHeaderText(FormEntryCaption[] hierachy, int instanceIndex) {
+	private String getHeaderText(FormEntryCaption[] hierachy) {
 		String headertext = "";
 		for (FormEntryCaption caption : hierachy) {
 			headertext += caption.getLongText();
-
-			if (instanceIndex > -1)
-				headertext += " #" + (instanceIndex + 1);
+			
+			if (caption.getIndex().getInstanceIndex() > -1)
+				headertext += " #" + (caption.getMultiplicity() + 1);
 
 			headertext += ": ";
 		}

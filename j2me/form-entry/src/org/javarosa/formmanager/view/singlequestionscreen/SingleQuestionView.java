@@ -61,12 +61,25 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	public SingleQuestionScreen getView(FormEntryPrompt prompt,
 			boolean fromFormView) {
 
-		FormEntryCaption[] captionHeirarchy = model.getCaptionHierarchy(prompt
+		FormEntryCaption[] captionHierarchy = model.getCaptionHierarchy(prompt
 				.getIndex());
-		String groupTitle = null;
-		if (captionHeirarchy.length > 1) {
-			FormEntryCaption caption = captionHeirarchy[1];
-			groupTitle = caption.getShortText();
+		String groupTitle = "";
+		if (captionHierarchy.length > 1) {
+			int instanceIndex = prompt.getIndex().getInstanceIndex();
+			int captionCount = 0;
+			for (FormEntryCaption caption : captionHierarchy) {
+				captionCount++;
+				groupTitle += caption.getLongText();
+
+				if ((caption.getIndex().getInstanceIndex() > -1)
+						&& (captionCount < captionHierarchy.length))
+					groupTitle += " #" + (caption.getMultiplicity() + 1);
+
+				groupTitle += ": ";
+			}
+			if (groupTitle.endsWith(": "))
+				groupTitle = groupTitle.substring(0, groupTitle.length() - 2);
+
 		}
 
 		currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(
@@ -98,7 +111,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	}
 
 	public void refreshView() {
-		if (model.currentIndexIsQuestionPrompt()) {
+		if (model.getCurrentEvent() == FormEntryController.EVENT_QUESTION) {
 			FormEntryPrompt prompt = model.getCurrentQuestionPrompt();
 			SingleQuestionScreen view = getView(prompt, this.goingForward);
 			J2MEDisplay.setView(view);
@@ -155,7 +168,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 				for (int i = 0; i < SingleQuestionScreen.languageCommands.length; i++) {
 					if (command == SingleQuestionScreen.languageCommands[i]) {
 						String label = command.getLabel(); // has form language
-															// > mylanguage
+						// > mylanguage
 						int sep = label.indexOf(">");
 						language = label.substring(sep + 1, label.length())
 								.trim();
@@ -209,8 +222,12 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 		case FormEntryController.EVENT_PROMPT_NEW_REPEAT:
 			FormEntryCaption[] hierachy = model.getCaptionHierarchy(model
 					.getCurrentFormIndex());
-			repeatScreen = new NewRepeatScreen("Add a new "
-					+ hierachy[hierachy.length - 1].getLongText());
+			repeatScreen = new NewRepeatScreen(
+					"Add "
+							+ (model.getCurrentFormIndex()
+									.getElementMultiplicity() == 0 ? "a new "
+									: "another ")
+							+ hierachy[hierachy.length - 1].getLongText() + "?");
 			repeatScreen.setCommandListener(this);
 			J2MEDisplay.setView(repeatScreen);
 			break;
