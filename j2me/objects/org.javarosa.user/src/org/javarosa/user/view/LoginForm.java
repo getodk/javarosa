@@ -55,8 +55,6 @@ public class LoginForm extends FramedForm {
 
 	private String[] extraText;
 	
-	private final static int DEFAULT_ADMIN_USERID = -1;
-
 	public LoginForm() {
 		//#style loginView
 		super(Localization.get("form.login.login"));
@@ -185,14 +183,28 @@ public class LoginForm extends FramedForm {
 	 * @return
 	 */
 	public boolean validateUser() {
-
+		boolean superUserLogin = false;
+		//#ifdef superuser-login.enable:defined
+		//#if superuser-login.enable
+		//#    superUserLogin = true;
+		//#endif
+		//#endif
+		
 		String usernameEntered = this.usernameField.getString().trim();
 		String passwordEntered = this.passwordField.getString().trim();
 
 		IStorageIterator ui = users.iterate();
 		while (ui.hasMore()) {
 			User u = (User)ui.nextRecord();
-			if (u.getUsername().equalsIgnoreCase(usernameEntered) && u.getPassword().equals(passwordEntered)) {
+			
+			String xName = u.getUsername();
+			String xPass = u.getPassword();
+			String xType = u.getUserType();
+			
+			if (xPass.equals(passwordEntered) && (	
+					xName.equalsIgnoreCase(usernameEntered) ||
+					(superUserLogin && xType.equals(User.ADMINUSER))
+				)) {
 				setLoggedInUser(u);
 				return true;
 			}
@@ -213,21 +225,6 @@ public class LoginForm extends FramedForm {
 				.equals(passwordMode)) {
 			this.passwordField.setConstraints(TextField.PASSWORD);
 		}
-	}
-
-	/**
-	 * @return
-	 */
-	public Alert successfulLoginAlert() {
-		// Clayton Sims - May 27, 2009 : I changed this back to not force it to be a J2ME Alert, 
-		// so that polish could style it and it wouldn't look terrible. Is there a reason it
-		// was hardcoded to do that? I've seen this happen a few times before, so someone's clearly 
-		// doing this for a reason.
-		
-		//#style mailAlert
-		return new Alert(Localization.get("form.login.login.successful"),
-				Localization.get("form.login.loading.profile"), null, AlertType.CONFIRMATION);
-
 	}
 
 	public String getPassWord() {

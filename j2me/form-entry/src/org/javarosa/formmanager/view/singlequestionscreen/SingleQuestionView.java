@@ -33,15 +33,16 @@ import org.javarosa.formmanager.view.singlequestionscreen.screen.NewRepeatScreen
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
 import org.javarosa.formmanager.view.summary.FormSummaryState;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
-import de.enough.polish.ui.CommandListener;
 import de.enough.polish.ui.Displayable;
 import de.enough.polish.ui.FramedForm;
 
 public class SingleQuestionView extends FramedForm implements IFormEntryView,
-		CommandListener {
+		HandledPCommandListener {
 	private JrFormEntryController controller;
 	private FormEntryModel model;
 
@@ -117,7 +118,11 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 		}
 	}
 
-	public void commandAction(Command command, Displayable arg1) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command command, Displayable arg1) {
 		if (arg1 == repeatScreen) {
 			if (command == NewRepeatScreen.yesCommand) {
 				controller.newRepeat(model.getCurrentFormIndex());

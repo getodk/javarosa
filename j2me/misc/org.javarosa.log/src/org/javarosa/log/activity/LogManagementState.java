@@ -21,13 +21,14 @@ package org.javarosa.log.activity;
 
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.log.FlatLogSerializer;
-import org.javarosa.core.services.IncidentLogger;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.util.TrivialTransitions;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.log.view.LogManagementView;
 import org.javarosa.log.view.LogViewer;
@@ -37,7 +38,7 @@ import org.javarosa.log.view.LogViewer;
  * @date Apr 13, 2009
  * 
  */
-public abstract class LogManagementState implements TrivialTransitions, State, CommandListener {
+public abstract class LogManagementState implements TrivialTransitions, State, HandledCommandListener {
 
 	private static final String CLEAR_LOGS = "Clear Logs";
 	private static final String VIEW_LOGS = "View Logs";
@@ -76,7 +77,11 @@ public abstract class LogManagementState implements TrivialTransitions, State, C
 	/* (non-Javadoc)
 	 * @see javax.microedition.lcdui.CommandListener#commandAction(javax.microedition.lcdui.Command, javax.microedition.lcdui.Displayable)
 	 */
-	public void commandAction(Command com, Displayable d) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command com, Displayable d) {
 		if (d instanceof Alert) {
 			J2MEDisplay.setView(this.manager);
 		}
@@ -129,7 +134,7 @@ public abstract class LogManagementState implements TrivialTransitions, State, C
 	 */
 	private void viewLogs() {
 		this.viewer.deleteAll();
-		String logData = IncidentLogger._().serializeLogs(new FlatLogSerializer());
+		String logData = Logger._().serializeLogs(new FlatLogSerializer());
 		this.viewer.loadLogs(logData);
 		this.viewer.setCommandListener(this);
 		this.viewer.addCommand(EXIT);
@@ -140,7 +145,7 @@ public abstract class LogManagementState implements TrivialTransitions, State, C
 	 * 
 	 */
 	private void clearLogs() {
-		IncidentLogger._().clearLogs();
+		Logger._().clearLogs();
 		
 		J2MEDisplay.showError("Logs Cleared", "Logs cleared succesfully");
 	}

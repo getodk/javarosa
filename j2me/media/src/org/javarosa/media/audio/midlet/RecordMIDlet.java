@@ -18,11 +18,21 @@
 
 package org.javarosa.media.audio.midlet;
 
-import java.io.*;
-import javax.microedition.midlet.*;
-import javax.microedition.lcdui.*;
-import javax.microedition.media.*;
-import javax.microedition.media.control.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Display;
+import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.StringItem;
+import javax.microedition.media.Manager;
+import javax.microedition.media.MediaException;
+import javax.microedition.media.Player;
+import javax.microedition.media.control.RecordControl;
+import javax.microedition.midlet.MIDlet;
 
 public class RecordMIDlet extends MIDlet{
     public void startApp(){

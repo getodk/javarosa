@@ -5,7 +5,6 @@ package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.formmanager.view.FormElementBinding;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService;
 
 import de.enough.polish.ui.Style;
@@ -118,7 +117,7 @@ public class SingleQuestionScreenFactory {
 	 * @return
 	 */
 	public static SingleQuestionScreen getQuestionScreen(
-			FormElementBinding prompt, String groupTitle, boolean fromFormView,
+			FormEntryPrompt prompt, String groupTitle, boolean fromFormView,
 			boolean goingForward, IAcquiringService barcodeService) {
 
 		Style style = StyleSheet

@@ -27,6 +27,8 @@ import javax.microedition.lcdui.StringItem;
 
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.formmanager.view.ISubmitStatusObserver;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 
@@ -39,7 +41,7 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
  * 
  */
 public class MultiSubmitStatusScreen extends Form implements
-		ISubmitStatusObserver, CommandListener {
+		ISubmitStatusObserver, HandledCommandListener {
 
 	private static final int REFRESH_INTERVAL = 1000;
 	private static final int TIMEOUT = 180000;
@@ -104,6 +106,11 @@ public class MultiSubmitStatusScreen extends Form implements
 	}
 
 	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command c, Displayable d) {
+
 	}
 
 	/**

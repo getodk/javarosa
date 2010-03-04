@@ -35,6 +35,7 @@ import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.user.activity.UserModule;
 import org.javarosa.user.model.User;
+import org.javarosa.user.utility.UserUtility;
 import org.javarosa.xform.util.XFormUtils;
 
 public class JRDemoContext {
@@ -79,7 +80,7 @@ public class JRDemoContext {
 			JRDemoUtil.loadDemoPatients(patients);
 		}
 		
-		JRDemoUtil.initAdminUser("234");
+		UserUtility.populateAdminUser();
 	}
 	
 	private void loadForms (IStorageUtility forms) {

@@ -20,14 +20,14 @@ import java.util.Hashtable;
 
 import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
-import org.javarosa.core.api.Constants;
 import org.javarosa.core.api.State;
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.services.UnavailableServiceException;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.services.FileService;
 import org.javarosa.j2me.services.exception.FileException;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -49,7 +49,7 @@ import de.enough.polish.util.ArrayList;
  * @author Cory Zue
  * 
  */
-public abstract class ImageChooserState implements DataCaptureTransitions, State, CommandListener {
+public abstract class ImageChooserState implements DataCaptureTransitions, State, HandledCommandListener {
 	
 	/**
 	 * String -> IDataPointer map of image names to references
@@ -72,7 +72,6 @@ public abstract class ImageChooserState implements DataCaptureTransitions, State
 	 * This holds the key to lookup the return value from a capture or browse activity
 	 * when it gets control back.
 	 */
-	private Thread snifferThread;
 	private ImageSniffer sniffer;
 	private MIDlet midlet;
 
@@ -160,8 +159,7 @@ public abstract class ImageChooserState implements DataCaptureTransitions, State
 				fe.printStackTrace();
 				processCancel();
 			}
-			snifferThread = new Thread(sniffer);
-			snifferThread.start();
+			sniffer.start();
 			isActivelySniffing = true;
 			mainForm.addCommand(changeSniffDirectoryCommand);
 		} else {
@@ -296,10 +294,11 @@ public abstract class ImageChooserState implements DataCaptureTransitions, State
 	}
 	*/
 
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
 
-	
-
-	public void commandAction(Command command, Displayable display) {
+	public void _commandAction(Command command, Displayable d) {
 		if (command.equals(cameraCommand)) {
 			processCamera();
 		} else if (command.equals(browseCommand)) {

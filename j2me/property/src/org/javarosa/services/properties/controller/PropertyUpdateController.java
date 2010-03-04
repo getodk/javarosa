@@ -9,14 +9,15 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
-import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.util.TrivialTransitions;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
+import org.javarosa.j2me.log.HandledItemStateListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.services.properties.view.PropertiesScreen;
 
@@ -24,7 +25,7 @@ import org.javarosa.services.properties.view.PropertiesScreen;
  * @author ctsims
  *
  */
-public class PropertyUpdateController implements CommandListener, ItemStateListener{
+public class PropertyUpdateController implements HandledCommandListener, HandledItemStateListener{
 	
 	private PropertiesScreen screen;
 	
@@ -50,14 +51,22 @@ public class PropertyUpdateController implements CommandListener, ItemStateListe
 		J2MEDisplay.setView(screen);
 	}
 	
-	public void commandAction(Command command, Displayable arg1) {
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command command, Displayable d) {
 		if(command == CMD_DONE) {
 			commitChanges(changes);
 		}
 		listener.done();
 	}
 
-    public void itemStateChanged(Item item) {
+	public void itemStateChanged(Item i) {
+		CrashHandler.itemStateChanged(this, i);
+	}  
+
+	public void _itemStateChanged(Item item) {
         if (item instanceof ChoiceGroup) {
             ChoiceGroup cg = (ChoiceGroup) item;
             Vector choices = (Vector) screen.getItemChoices().get(cg);

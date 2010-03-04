@@ -29,6 +29,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryController;
@@ -39,10 +40,11 @@ import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
-import de.enough.polish.ui.CommandListener;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Displayable;
 import de.enough.polish.ui.FramedForm;
@@ -51,7 +53,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
 
 
-public class Chatterbox extends FramedForm implements CommandListener, IFormEntryView{
+public class Chatterbox extends FramedForm implements HandledPCommandListener, IFormEntryView{
 	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
     private static final String PROMPT_REQUIRED_QUESTION = Localization.get("view.sending.RequiredQuestion");
@@ -479,7 +481,11 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
     	this.requestRepaint();
     }
     
-    public void commandAction(Command command, Displayable s) {
+    public void commandAction(Command c, Displayable d) {
+    	CrashHandler.commandAction(this, c, d);
+    }
+    
+    public void _commandAction(Command command, Displayable s) {
     	System.out.println("cbox: command action");
     	
     	if (command == backCommand) {
@@ -579,21 +585,30 @@ public class Chatterbox extends FramedForm implements CommandListener, IFormEntr
 //	}
 	
     public void keyPressed(int keyCode) {
-    	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
-    	super.keyPressed(keyCode);
-    	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
-    		controller.cycleLanguage();
-    	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
-    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
-				ChatterboxWidget widget = activeFrame();
-				if (widget != null) {
-					widget.UIHack(UIHACK_SELECT_PRESS);
+    	
+    	try {
+    	
+	    	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
+	    	super.keyPressed(keyCode);
+	    	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
+	    		controller.cycleLanguage();
+	    	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
+	    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
+					ChatterboxWidget widget = activeFrame();
+					if (widget != null) {
+						widget.UIHack(UIHACK_SELECT_PRESS);
+					}
 				}
-			}
-        	indexWhenKeyPressed = keyDownSelectedWidget;
+	        	indexWhenKeyPressed = keyDownSelectedWidget;
+	    	}
+	    	
+    	} catch (Exception e) {
+    		Logger.die("gui-keydown", e);
     	}
+
     }
     
+    //no exception handling needed
     public void keyReleased(int keyCode) {
     	if(keyCode == KEY_CENTER_LETS_HOPE && !(indexWhenKeyPressed == this.activeQuestionIndex)) {
     		//The previous select keypress was for a different item.

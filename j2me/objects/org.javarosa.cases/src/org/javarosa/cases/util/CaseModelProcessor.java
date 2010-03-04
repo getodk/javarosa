@@ -15,6 +15,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.IInstanceProcessor;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.IStorageUtilityIndexed;
 import org.javarosa.core.services.storage.StorageFullException;
@@ -178,6 +179,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		c.setDateOpened(date);
 		c.setUserId(userId);
 		commit(c);
+		Logger.log("case-create", c.getID() + ";" + c.getCaseId() + ";" + c.getTypeId());
 		return c;
 	}
 	
@@ -215,6 +217,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 	private void processCaseClose(TreeElement close,Case c, Date date) throws MalformedCaseModelException {
 		c.setClosed(true);
 		commit(c);
+		Logger.log("case-close", c.getCaseId());
 	}
 	
 	private void processCaseReferral(TreeElement referral, Case c, Date date) throws MalformedCaseModelException {
@@ -245,6 +248,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 					String referralType = (String)referralTypeList.elementAt(ir);
 					PatientReferral r = new PatientReferral(referralType, date, referralId, c.getCaseId(), followup);
 					commit(r);
+					Logger.log("referral-open", r.getID() + ";" + r.getReferralId() + ";" + r.getType());
 				}
 			}
 			else if(kid.getName().equals("update")) {
@@ -256,10 +260,14 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 				PatientReferral r = getReferral(referralId,refType);
 				r.setDateDue(followup);
 				Vector dateCloseds = kid.getChildrenWithName("date_closed");
-				if(dateCloseds.size() > 0 && ((TreeElement)dateCloseds.elementAt(0)).isRelevant()) {
+				boolean closing = (dateCloseds.size() > 0 && ((TreeElement)dateCloseds.elementAt(0)).isRelevant());
+				if(closing) {
 					r.close();
 				}
 				commit(r);
+				if (closing) {
+					Logger.log("referral-resolve", r.getReferralId() + ";" + r.getType()); //type currently needed to uniquely identify referral
+				}
 			}
 		}
 	}

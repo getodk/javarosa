@@ -16,13 +16,17 @@
 
 package org.javarosa.formmanager.api;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
+import org.javarosa.core.log.FatalException;
 import org.javarosa.formmanager.api.transitions.HttpFetchTransitions;
 import org.javarosa.formmanager.view.ProgressScreen;
+import org.javarosa.j2me.log.CrashHandler;
+import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
@@ -32,7 +36,7 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.services.transport.senders.SenderThread;
 
-public abstract class GetFormListHttpState implements State,CommandListener,TransportListener, HttpFetchTransitions{
+public abstract class GetFormListHttpState implements State,HandledCommandListener,TransportListener, HttpFetchTransitions{
 
 	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
 	public final Command CMD_RETRY = new Command("Retry",Command.BACK, 1);
@@ -83,8 +87,11 @@ public abstract class GetFormListHttpState implements State,CommandListener,Tran
 		progressScreen.addCommand(CMD_RETRY);
 	}
 
-	public void commandAction(Command command, Displayable display) {
-		
+	public void commandAction(Command c, Displayable d) {
+		CrashHandler.commandAction(this, c, d);
+	}  
+
+	public void _commandAction(Command command, Displayable display) {
 		if(display== progressScreen){
 			if(command == CMD_CANCEL){
 				cancel();
@@ -99,14 +106,23 @@ public abstract class GetFormListHttpState implements State,CommandListener,Tran
 		
 	}
 
-	public void process(String response) {
+	public void process(byte[] response) {
+		String sResponse = null;
+		if (response != null) {
+			try {
+				sResponse = new String(response, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				throw new FatalException("can't happen; utf8 must be supported", e);
+			}
+		}
+		
 		//FIXME - resolve the responses to be received from the webserver
-		if(response ==null){
+		if(sResponse ==null){
 			//TODO: I don't think this is even possible.
 			fail("Null Response from server");
-		}else if(response.equals("WebServerResponses.GET_LIST_ERROR")){
+		}else if(sResponse.equals("WebServerResponses.GET_LIST_ERROR")){
 			fail("Get List Error from Server");
-		}else if(response.equals("WebServerResponses.GET_LIST_NO_SURVEY")){
+		}else if(sResponse.equals("WebServerResponses.GET_LIST_NO_SURVEY")){
 			fail("No survey error from server");
 		}else{
 			fetched();

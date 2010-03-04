@@ -24,6 +24,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.api.State;
+import org.javarosa.j2me.log.HandledThread;
 
 public class J2MEDisplay {
 	private static Display display;
@@ -54,7 +55,7 @@ public class J2MEDisplay {
 		final State s = state;
 		loading = new LoadingScreenThread(display);
 		loading.startLoading(indicator);
-		new Thread(new Runnable() {
+		new HandledThread(new Runnable() {
 			public void run() {
 				s.start();
 			}

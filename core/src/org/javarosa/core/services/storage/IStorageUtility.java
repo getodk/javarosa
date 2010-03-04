@@ -1,5 +1,7 @@
 package org.javarosa.core.services.storage;
 
+import java.util.Vector;
+
 import org.javarosa.core.util.externalizable.Externalizable;
 
 /**
@@ -87,7 +89,7 @@ public interface IStorageUtility {
 
 	void removeAll ();
 	
-	void removeAll (EntityFilter ef);
+	Vector<Integer> removeAll (EntityFilter ef);
 	
 	/**
 	 * Return the number of records in the store
