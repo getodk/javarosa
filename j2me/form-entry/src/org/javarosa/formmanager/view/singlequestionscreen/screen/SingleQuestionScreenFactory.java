@@ -36,8 +36,8 @@ public class SingleQuestionScreenFactory {
 		int contType = prompt.getControlType();
 
 		Style style = StyleSheet
-				.getStyle(fromFormView || goingForward ? org.javarosa.core.api.Constants.STYLE_TRANSISION_RIGHT
-						: org.javarosa.core.api.Constants.STYLE_TRANSISION_LEFT);
+				.getStyle(fromFormView || goingForward ? org.javarosa.formmanager.view.singlequestionscreen.Constants.STYLE_TRANSITION_RIGHT
+						: org.javarosa.formmanager.view.singlequestionscreen.Constants.STYLE_TRANSITION_LEFT);
 
 		switch (contType) {
 		case Constants.CONTROL_INPUT:
@@ -45,49 +45,58 @@ public class SingleQuestionScreenFactory {
 			case Constants.DATATYPE_TEXT:
 			case Constants.DATATYPE_NULL:
 			case Constants.DATATYPE_UNSUPPORTED:
-				screenToReturn = new TextQuestionScreen(prompt,groupTitle, style);
+				screenToReturn = new TextQuestionScreen(prompt, groupTitle,
+						style);
 
 				break;
 			case Constants.DATATYPE_DATE:
 			case Constants.DATATYPE_DATE_TIME:
-				screenToReturn = new DateQuestionScreen(prompt,groupTitle, style);
+				screenToReturn = new DateQuestionScreen(prompt, groupTitle,
+						style);
 
 				break;
 			case Constants.DATATYPE_TIME:
-				screenToReturn = new TimeQuestionScreen(prompt,groupTitle, style);
+				screenToReturn = new TimeQuestionScreen(prompt, groupTitle,
+						style);
 
 				break;
 			case Constants.DATATYPE_INTEGER:
-				screenToReturn = new NumericQuestionScreen(prompt,groupTitle, style);
+				screenToReturn = new NumericQuestionScreen(prompt, groupTitle,
+						style);
 
 				break;
 			case Constants.DATATYPE_DECIMAL:
-				screenToReturn = new DecimalQuestionScreen(prompt,groupTitle, style);
+				screenToReturn = new DecimalQuestionScreen(prompt, groupTitle,
+						style);
 
 				break;
 
 			case Constants.DATATYPE_BARCODE:
-				screenToReturn = new TextQuestionScreen(prompt,groupTitle, style);
+				screenToReturn = new TextQuestionScreen(prompt, groupTitle,
+						style);
 				break;
 
 			default:
-				screenToReturn = new TextQuestionScreen(prompt,groupTitle, style);
+				screenToReturn = new TextQuestionScreen(prompt, groupTitle,
+						style);
 
 			}
 			break;
-			
+
 		case Constants.CONTROL_SELECT_ONE:
-			screenToReturn = new SelectOneQuestionScreen(prompt,groupTitle, style);
+			screenToReturn = new SelectOneQuestionScreen(prompt, groupTitle,
+					style);
 			break;
-			
+
 		case Constants.CONTROL_SELECT_MULTI:
-			screenToReturn = new SelectMultiQuestionScreen(prompt,groupTitle, style);
+			screenToReturn = new SelectMultiQuestionScreen(prompt, groupTitle,
+					style);
 			break;
-			
+
 		case Constants.CONTROL_TEXTAREA:
-			screenToReturn = new TextQuestionScreen(prompt,groupTitle, style);
+			screenToReturn = new TextQuestionScreen(prompt, groupTitle, style);
 			break;
-			
+
 		default:
 			throw new IllegalStateException(
 					"No appropriate screen to render question");
@@ -113,8 +122,8 @@ public class SingleQuestionScreenFactory {
 			boolean goingForward, IAcquiringService barcodeService) {
 
 		Style style = StyleSheet
-				.getStyle(fromFormView || goingForward ? "OneQPS_Form_Right"
-						: "OneQPS_Form_Left");
+				.getStyle(fromFormView || goingForward ? org.javarosa.formmanager.view.singlequestionscreen.Constants.STYLE_TRANSITION_RIGHT
+						: org.javarosa.formmanager.view.singlequestionscreen.Constants.STYLE_TRANSITION_LEFT);
 
 		return barcodeService.getWidget(prompt, style);
 
