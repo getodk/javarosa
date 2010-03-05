@@ -50,7 +50,6 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	 */
 	public SimpleHttpTransportMessage(String str, String url) {
 		content = str.getBytes();
-		System.out.println("String: "+ str +", URL: " + url);
 		this.url = url;
 	}
 

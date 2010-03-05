@@ -19,6 +19,7 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Displayable;
 
+import org.javarosa.core.api.State;
 import org.javarosa.core.services.storage.EntityFilter;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -135,27 +136,19 @@ public class EntitySelectController <E extends Persistable> {
 	private void loadEntities () {
 		entities = new Vector<Entity<E>>();
 		EntityFilter<? super E> filter = entityPrototype.getFilter();
-		System.out.println("entityPrototype: " + (entityPrototype!=null));
-		System.out.println("filter: " + (filter!=null));
-		IStorageIterator ei = entityStorage.iterate();
 		
+		IStorageIterator ei = entityStorage.iterate();
 		while (ei.hasMore()) {
-			System.out.println("has more!");
 			E obj = null;
 			
 			if (filter == null) {
 				obj = (E)ei.nextRecord();
-				System.out.println("Obj: " + (obj!=null));
-				
 			} else {
 				int id = ei.nextID();
-				System.out.println("id: " + id);
-				
 				int preFilt = filter.preFilter(id, null);
 				
 				if (preFilt != EntityFilter.PREFILTER_EXCLUDE) {
 					E candidateObj = (E)entityStorage.read(id);
-					System.out.println("CandidateObject: " + (candidateObj!=null));
 					if (preFilt == EntityFilter.PREFILTER_INCLUDE || filter.matches(candidateObj)) {
 						obj = candidateObj;
 					}
@@ -163,21 +156,15 @@ public class EntitySelectController <E extends Persistable> {
 			}
 			
 			if (obj != null) {
-				System.out.println("Loading Object!");
 				loadEntity(obj);
-			}	else{
-				System.out.println("Object is null");
-			}
+			}			
 		}
 	}
 	
 	private void loadEntity (E obj) {
 		Entity<E> entity = entityPrototype.factory();
-		System.out.println("Entity: " + (entity!=null));
 		entity.readEntity(obj);
-		System.out.println("Adding entity to entities!");
 		entities.addElement(entity);
-		
 	}
 	
 	public void setView (Displayable view) {

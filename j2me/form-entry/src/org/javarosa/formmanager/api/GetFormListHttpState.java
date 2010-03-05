@@ -16,8 +16,6 @@
 
 package org.javarosa.formmanager.api;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import javax.microedition.lcdui.Command;
@@ -38,85 +36,74 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.services.transport.senders.SenderThread;
 
-public abstract class GetFormListHttpState implements State,
-		HandledCommandListener, TransportListener, HttpFetchTransitions {
+public abstract class GetFormListHttpState implements State,HandledCommandListener,TransportListener, HttpFetchTransitions{
 
-	public final Command CMD_CANCEL = new Command("Cancel", Command.BACK, 1);
-	public final Command CMD_RETRY = new Command("Retry", Command.BACK, 1);
-	private ProgressScreen progressScreen = new ProgressScreen("Searching",
-			"Please Wait. Contacting Server...", this);
-
-	private String getListUrl;
+	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
+	public final Command CMD_RETRY = new Command("Retry",Command.BACK, 1);
+	private ProgressScreen progressScreen = new ProgressScreen("Searching","Please Wait. Contacting Server...",this);
+	
+	private String getListUrl; 
 	private String credentials;
-
+	
 	private String requestPayload = "#";
-
+	
 	private SenderThread thread;
 
 	public GetFormListHttpState() {
-
+		
 	}
-
+	
 	public abstract String getUrl();
-
+	
 	public abstract String getUserName();
-
-	private void init() {
-		getListUrl = getUrl();
-		String userName = getUserName();
-		credentials = userName == null ? "" : "?user=" + userName;
+	
+	private void init(){
+		getListUrl = getUrl(); 
+		credentials = "?user=" + getUserName();
 		requestPayload = credentials;
 	}
-
+	
 	public void start() {
 		progressScreen.addCommand(CMD_CANCEL);
 		J2MEDisplay.setView(progressScreen);
 		init();
 		fetchList();
 	}
-
+	
 	public void fetchList() {
-		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(
-				requestPayload, getListUrl + credentials);// send username and
-		// url
+		SimpleHttpTransportMessage message= new SimpleHttpTransportMessage(requestPayload,getListUrl+credentials);//send username and url
 		message.setCacheable(false);
-
+		
 		try {
 			thread = TransportService.send(message);
 			thread.addListener(this);
 		} catch (TransportException e) {
-			fail("Error Downloading List! Transport Exception while downloading forms list "
-					+ e.getMessage());
+			fail("Error Downloading List! Transport Exception while downloading forms list " + e.getMessage());
 		}
 	}
-
-	protected void fail(String message) {
+	
+	private void fail(String message) {
 		progressScreen.setText(message);
 		progressScreen.addCommand(CMD_RETRY);
 	}
 
 	public void commandAction(Command c, Displayable d) {
 		CrashHandler.commandAction(this, c, d);
-	}
+	}  
 
 	public void _commandAction(Command command, Displayable display) {
-		if (display == progressScreen) {
-			if (command == CMD_CANCEL) {
+		if(display== progressScreen){
+			if(command == CMD_CANCEL){
 				cancel();
 			}
-			if (command == CMD_RETRY) {
-				progressScreen = new ProgressScreen("Searching",
-						"Please Wait. Contacting Server...", this);
+			if(command == CMD_RETRY) {
+				progressScreen = new ProgressScreen("Searching","Please Wait. Contacting Server...",this);
 				progressScreen.addCommand(CMD_CANCEL);
 				J2MEDisplay.setView(progressScreen);
 				fetchList();
 			}
 		}
-
-	}
-
-	public void process(InputStream response) {
-
+		
 	}
 
 	public void process(byte[] response) {
@@ -125,34 +112,32 @@ public abstract class GetFormListHttpState implements State,
 			try {
 				sResponse = new String(response, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
-				throw new FatalException(
-						"can't happen; utf8 must be supported", e);
+				throw new FatalException("can't happen; utf8 must be supported", e);
 			}
 		}
-
-		// FIXME - resolve the responses to be received from the webserver
-		if (sResponse == null) {
-			// TODO: I don't think this is even possible.
+		
+		//FIXME - resolve the responses to be received from the webserver
+		if(sResponse ==null){
+			//TODO: I don't think this is even possible.
 			fail("Null Response from server");
-		} else if (sResponse.equals("WebServerResponses.GET_LIST_ERROR")) {
+		}else if(sResponse.equals("WebServerResponses.GET_LIST_ERROR")){
 			fail("Get List Error from Server");
-		} else if (sResponse.equals("WebServerResponses.GET_LIST_NO_SURVEY")) {
+		}else if(sResponse.equals("WebServerResponses.GET_LIST_NO_SURVEY")){
 			fail("No survey error from server");
-		} else {
+		}else{
 			fetched();
 		}
-
+		
 	}
-
+	
 	public void onChange(TransportMessage message, String remark) {
 		progressScreen.setText(remark);
 	}
 
 	public void onStatusChange(TransportMessage message) {
-		if (message.getStatus() == TransportMessageStatus.SENT) {
-			// TODO: Response codes signal statuses?
-			process(new ByteArrayInputStream(
-					((SimpleHttpTransportMessage) message).getResponseBody()));
+		if(message.getStatus() == TransportMessageStatus.SENT) {
+			//TODO: Response codes signal statuses?
+			process(((SimpleHttpTransportMessage)message).getResponseBody());
 		} else {
 			fail("Transport Failure: " + message.getFailureReason());
 		}
