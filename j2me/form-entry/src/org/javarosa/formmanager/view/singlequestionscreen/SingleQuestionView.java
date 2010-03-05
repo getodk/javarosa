@@ -171,6 +171,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 							+ command.getLabel() + "]");
 				}
 			}
+
 		}
 	}
 

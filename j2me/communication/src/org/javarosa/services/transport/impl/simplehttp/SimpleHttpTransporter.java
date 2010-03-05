@@ -77,16 +77,11 @@ public class SimpleHttpTransporter implements Transporter {
 
 			// Get the response
 			is = (DataInputStream) conn.openDataInputStream();
-			int ch;
-			byte[] response = new byte[10000];
-			is.read(response);
-//			while ((ch = is.read()) != -1) {
-//				sb.append((char) ch);
-//			}
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			StreamsUtil.writeFromInputToOutput(is, baos);
 			is.close();
 			int responseCode = conn.getResponseCode();
+			System.out.println("response code: " + responseCode);
 			// set return information in the message
 			this.message.setResponseBody(baos.toByteArray());
 			this.message.setResponseCode(responseCode);
@@ -95,7 +90,6 @@ public class SimpleHttpTransporter implements Transporter {
 			}
 
 			conn.close();
-			System.out.println("Everything successful!");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Connection failed: " + e.getClass() + " : "

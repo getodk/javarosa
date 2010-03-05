@@ -196,6 +196,7 @@ public class LoginForm extends FramedForm {
 		IStorageIterator ui = users.iterate();
 		while (ui.hasMore()) {
 			User u = (User)ui.nextRecord();
+			
 			String xName = u.getUsername();
 			String xPass = u.getPassword();
 			String xType = u.getUserType();
@@ -204,10 +205,13 @@ public class LoginForm extends FramedForm {
 					xName.equalsIgnoreCase(usernameEntered) ||
 					(superUserLogin && xType.equals(User.ADMINUSER))
 				)) {
+				setLoggedInUser(u);
 				return true;
 			}
 		}
+
 		return false;
+
 	}
 
 	/**
