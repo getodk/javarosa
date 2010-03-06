@@ -125,24 +125,31 @@ public class XPathPathExpr extends XPathExpression {
 		
 		return ref;
 	}
-	
+
 	public Object eval (FormInstance m, EvaluationContext evalContext) {
+		return eval(m, evalContext, false);
+	}
+		
+	public Object eval (FormInstance m, EvaluationContext evalContext, boolean forceNodeset) {
 		TreeReference ref = getReference().contextualize(evalContext.getContextRef());
 		
+		//ITEMSET TODO: need to update this; for itemset/copy constraints, need to simulate a whole xml sub-tree here
 		if (evalContext.isConstraint && ref.equals(evalContext.getContextRef())) {
 			return unpackValue(evalContext.candidateValue);
 		}
 		
-		//is this a nodeset? it is if the ref contains any unbound multiplicities AND the unbound nodes are repeatable
-		//the way i'm calculating this sucks; there has got to be an easier way to find out if a node is repeatable
-		boolean nodeset = false;
-		TreeReference repeatTestRef = TreeReference.rootRef();
-		for (int i = 0; i < ref.size(); i++) {
-			repeatTestRef.add(ref.getName(i), ref.getMultiplicity(i));
-			if (ref.getMultiplicity(i) == TreeReference.INDEX_UNBOUND) {
-				if (m.getTemplate(repeatTestRef) != null) {
-					nodeset = true;
-					break;
+		boolean nodeset = forceNodeset;
+		if (!nodeset) {
+			//is this a nodeset? it is if the ref contains any unbound multiplicities AND the unbound nodes are repeatable
+			//the way i'm calculating this sucks; there has got to be an easier way to find out if a node is repeatable
+			TreeReference repeatTestRef = TreeReference.rootRef();
+			for (int i = 0; i < ref.size(); i++) {
+				repeatTestRef.add(ref.getName(i), ref.getMultiplicity(i));
+				if (ref.getMultiplicity(i) == TreeReference.INDEX_UNBOUND) {
+					if (m.getTemplate(repeatTestRef) != null) {
+						nodeset = true;
+						break;
+					}
 				}
 			}
 		}
@@ -163,7 +170,7 @@ public class XPathPathExpr extends XPathExpression {
 			return getRefValue(m, ref);
 		}
 	}
-	
+		
 	public static Object getRefValue (FormInstance model, TreeReference ref) {
 		TreeElement node = model.resolveReference(ref);
 		if (node == null) {
@@ -250,5 +257,19 @@ public class XPathPathExpr extends XPathExpression {
 		for (int i = 0; i < steps.length; i++)
 			v.addElement(steps[i]);
 		ExtUtil.write(out, new ExtWrapList(v));
+	}
+	
+	public static XPathPathExpr fromRef (TreeReference ref) {
+		XPathPathExpr path = new XPathPathExpr();
+		path.init_context = (ref.isAbsolute() ? INIT_CONTEXT_ROOT : INIT_CONTEXT_RELATIVE);
+		path.steps = new XPathStep[ref.size()];
+		for (int i = 0; i < path.steps.length; i++) {
+			if (ref.getName(i).equals(TreeReference.NAME_WILDCARD)) {
+				path.steps[i] = new XPathStep(XPathStep.AXIS_CHILD, XPathStep.TEST_NAME_WILDCARD);
+			} else {
+				path.steps[i] = new XPathStep(XPathStep.AXIS_CHILD, new XPathQName(ref.getName(i)));
+			}
+		}
+		return path;
 	}
 }

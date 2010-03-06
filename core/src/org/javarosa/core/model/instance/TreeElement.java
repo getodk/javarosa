@@ -109,7 +109,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	public TreeElement getChild(String name, int multiplicity) {
 		if (name.equals(TreeReference.NAME_WILDCARD)) {
-			return (TreeElement) this.children.elementAt(multiplicity);
+			return (TreeElement) this.children.elementAt(multiplicity); //droos: i'm suspicious of this
 		} else {
 			for (int i = 0; i < this.children.size(); i++) {
 				TreeElement child = (TreeElement) this.children.elementAt(i);
@@ -138,8 +138,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 		for (int i = 0; i < this.children.size(); i++) {
 			TreeElement child = (TreeElement) this.children.elementAt(i);
-			if ((child.getName().equals(name) || name
-					.equals(TreeReference.NAME_WILDCARD))
+			if ((child.getName().equals(name) || name.equals(TreeReference.NAME_WILDCARD))
 					&& (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
 				v.addElement(child);
 		}

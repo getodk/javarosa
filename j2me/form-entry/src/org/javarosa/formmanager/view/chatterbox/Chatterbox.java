@@ -563,6 +563,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     			createHeaderForElement(this.model.getCurrentFormIndex());
     		}
     		step(controller.stepToNextEvent());
+    	//} else if { //ITEMSET TODO: add clause here than handled itemset copying -- hmm, should go in controller
     	} else {
     		int status = controller.answerQuestion(this.model.getCurrentFormIndex(), frame.getData());
 	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
