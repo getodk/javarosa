@@ -20,6 +20,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
@@ -69,6 +70,7 @@ public class FormEntryPrompt extends FormEntryCaption {
         return null;
     }
 
+    //ITEMSET TODO handle mapping of saved itemset answers here? xml subtree -> selection based on match against nodeset
     public IAnswerData getAnswerValue() {
         return mTreeElement.getValue();
     }
@@ -82,7 +84,22 @@ public class FormEntryPrompt extends FormEntryCaption {
     }
 
     public Vector<SelectChoice> getSelectChoices() {
-        return getQuestion().getChoices();
+    	QuestionDef q = getQuestion();
+    	
+		ItemsetBinding itemset = q.getDynamicChoices();
+    	if (itemset != null) {
+    		Vector<SelectChoice> choices = form.getDynamicChoices(itemset, mTreeElement.getRef());
+    		
+    		if (choices.size() == 0) {
+    			throw new RuntimeException("dynamic select question has no choices!");
+    		}
+    		
+    		//itemset TODO register choices for loc updates?
+    		
+    		return choices;
+    	} else { //static choices
+    		return getQuestion().getChoices();
+    	}
     }
 
     public String getHelpText() {

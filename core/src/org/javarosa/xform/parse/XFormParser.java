@@ -675,6 +675,8 @@ public class XFormParser {
 		XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
 		itemset.nodeset = new XPathConditional(path);
 		TreeReference nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), qparent));
+		TreeReference labelRef = null;
+		TreeReference valueRef = null;
 		
 		for (int i = 0; i < e.getChildCount(); i++) {
 			int type = e.getType(i);
@@ -682,19 +684,19 @@ public class XFormParser {
 			String childName = (child != null ? child.getName() : null);
 
 			if ("label".equals(childName)) {
-				String labelRef = child.getAttributeValue("", "ref");
+				String labelXpath = child.getAttributeValue("", "ref");
 				boolean labelItext = false;
 				
-				if (labelRef != null) {
-					if (labelRef.startsWith("jr:itext('") && labelRef.endsWith("')")) {
-						labelRef = labelRef.substring("jr:itext('".length(), labelRef.indexOf("')"));
+				if (labelXpath != null) {
+					if (labelXpath.startsWith("jr:itext('") && labelXpath.endsWith("')")) {
+						labelXpath = labelXpath.substring("jr:itext('".length(), labelXpath.indexOf("')"));
 						labelItext = true;
 					}
 				} else {
 					throw new XFormParseException("<label> in <itemset> requires 'ref'");
 				}
 				
-				itemset.label = FormInstance.unpackReference(getAbsRef(new XPathReference(labelRef), nodesetRef));
+				labelRef = FormInstance.unpackReference(getAbsRef(new XPathReference(labelXpath), nodesetRef));
 				itemset.labelIsItext = labelItext;
 			} else if ("copy".equals(childName)) {
 				String copyRef = child.getAttributeValue("", "ref");
@@ -702,30 +704,38 @@ public class XFormParser {
 					throw new XFormParseException("<copy> in <itemset> requires 'ref'");
 				}
 				
-				itemset.dest = FormInstance.unpackReference(getAbsRef(new XPathReference(copyRef), nodesetRef));
-				itemset.destCopy = true;
+				itemset.copyRef = FormInstance.unpackReference(getAbsRef(new XPathReference(copyRef), nodesetRef));
+				itemset.copyMode = true;
 			} else if ("value".equals(childName)) {
-				String valueRef = child.getAttributeValue("", "ref");
-				if (valueRef == null) {
+				String valueXpath = child.getAttributeValue("", "ref");
+				if (valueXpath == null) {
 					throw new XFormParseException("<value> in <itemset> requires 'ref'");
 				}
 				
-				itemset.dest = FormInstance.unpackReference(getAbsRef(new XPathReference(valueRef), nodesetRef));
-				itemset.destCopy = false;
+				valueRef = FormInstance.unpackReference(getAbsRef(new XPathReference(valueXpath), nodesetRef));
+				itemset.copyMode = false;
 			}
 		}
 		
-		if (itemset.label == null) {
+		if (labelRef == null) {
 			throw new XFormParseException("<itemset> requires <label>");
-		} else if (itemset.dest == null) {			
+		} else if (itemset.copyRef == null && valueRef == null) {			
 			throw new XFormParseException("<itemset> requires <copy> or <value>");
 		}
 		
-		if (!nodesetRef.isParentOf(itemset.label, false)) {
+		if (!nodesetRef.isParentOf(labelRef, false)) {
 			throw new XFormParseException("itemset nodeset ref is not a parent of label ref");
-		} else if (!nodesetRef.isParentOf(itemset.dest, false)) {
-			throw new XFormParseException("itemset nodeset ref is not a parent of dest/copy ref");
+		} else if (itemset.copyRef != null && !nodesetRef.isParentOf(itemset.copyRef, false)) {
+			throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
+		} else if (valueRef != null && !nodesetRef.isParentOf(valueRef, false)) {
+			throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
 		}
+		
+		//convert references to conditionals (even though they contain no expression logic, predicates, etc.)
+		//because it's much easier to evaluate a conditional than a ref
+		itemset.label = new XPathConditional(XPathPathExpr.fromRef(labelRef));
+		if (valueRef != null)
+			itemset.value = new XPathConditional(XPathPathExpr.fromRef(valueRef));
 		
 		q.setDynamicChoices(itemset);
 	}
