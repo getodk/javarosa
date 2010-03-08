@@ -79,9 +79,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 			}
 			if (groupTitle.endsWith(": "))
 				groupTitle = groupTitle.substring(0, groupTitle.length() - 2);
-
 		}
-
 		currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(
 				prompt, groupTitle, fromFormView, goingForward);
 
@@ -115,6 +113,18 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 			FormEntryPrompt prompt = model.getCurrentQuestionPrompt();
 			SingleQuestionScreen view = getView(prompt, this.goingForward);
 			J2MEDisplay.setView(view);
+		}
+		else if (model.getCurrentEvent() == FormEntryController.EVENT_PROMPT_NEW_REPEAT) {
+			FormEntryCaption[] hierachy = model.getCaptionHierarchy(model
+					.getCurrentFormIndex());
+			repeatScreen = new NewRepeatScreen(
+					"Add "
+							+ (model.getCurrentFormIndex()
+									.getElementMultiplicity() == 0 ? "a new "
+									: "another ")
+							+ hierachy[hierachy.length - 1].getLongText() + "?");
+			repeatScreen.setCommandListener(this);
+			J2MEDisplay.setView(repeatScreen);
 		}
 	}
 
@@ -220,16 +230,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 					: controller.stepToPreviousEvent();
 			break;
 		case FormEntryController.EVENT_PROMPT_NEW_REPEAT:
-			FormEntryCaption[] hierachy = model.getCaptionHierarchy(model
-					.getCurrentFormIndex());
-			repeatScreen = new NewRepeatScreen(
-					"Add "
-							+ (model.getCurrentFormIndex()
-									.getElementMultiplicity() == 0 ? "a new "
-									: "another ")
-							+ hierachy[hierachy.length - 1].getLongText() + "?");
-			repeatScreen.setCommandListener(this);
-			J2MEDisplay.setView(repeatScreen);
+			refreshView();
 			break;
 		case FormEntryController.EVENT_QUESTION:
 			refreshView();
