@@ -1,28 +1,29 @@
 package org.javarosa.formmanager.view.summary;
 
+import java.io.IOException;
+
+import javax.microedition.lcdui.Image;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.view.singlequestionscreen.Constants;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
-import de.enough.polish.ui.Dimension;
 import de.enough.polish.ui.List;
-import de.enough.polish.ui.Style;
 import de.enough.polish.ui.StyleSheet;
 import de.enough.polish.util.HashMap;
 
 public class FormSummaryView extends List {
 	private FormEntryModel model;
 	private HashMap indexHash;
-
-	private static String STYLE_PROMPT = "View_All_Prompt";
-	private static String STYLE_HEADER = "View_All_Header";
 
 	public final Command CMD_EXIT = new Command(Localization.get("menu.Exit"),
 			Command.EXIT, 4);
@@ -54,20 +55,40 @@ public class FormSummaryView extends List {
 			if (index.isInForm() && model.isRelevant(index)) {
 				String text = "";
 				boolean isHeader = false;
+				Image img = null;
 				if (model.getEvent(index) == FormEntryController.EVENT_QUESTION) {
 					FormEntryPrompt prompt = model.getQuestionPrompt(index);
 					text = getText(prompt);
+					try {
+						img = Image.createImage(Localization.get(prompt.isRequired()?"questioncompulsory":"question"));
+					} catch (IOException ioe) {
+						img = null;
+						Logger.exception(ioe);
+					}
+				} else if (model.getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT) {
+					FormEntryCaption[] hierachy = model
+							.getCaptionHierarchy(index);
+					text = "Add "
+							+ (index.getElementMultiplicity() == 0 ? "a "
+									: "another ")
+							+ hierachy[hierachy.length - 1].getLongText() + "?";
+					try {
+						img = Image.createImage(Localization.get("plussign"));
+					} catch (IOException ioe) {
+						img = null;
+						Logger.exception(ioe);
+					}
 				} else if ((model.getEvent(index) == FormEntryController.EVENT_GROUP)
 						|| (model.getEvent(index) == FormEntryController.EVENT_REPEAT)) {
 					text = getHeaderText(model.getCaptionHierarchy(index));
 					isHeader = true;
 				}
 				if (!text.equals("")) {
-					append(text, null, isHeader ? StyleSheet
-							.getStyle(STYLE_HEADER) : StyleSheet
-							.getStyle(STYLE_PROMPT));
+					append(text, img, isHeader ? StyleSheet
+							.getStyle(Constants.STYLE_HEADER) : StyleSheet
+							.getStyle(Constants.STYLE_PROMPT));
 					indexHash.put(new Integer(captioncount), index);
-					
+
 					captioncount++;
 				}
 			}
@@ -78,9 +99,7 @@ public class FormSummaryView extends List {
 	private String getText(FormEntryPrompt prompt) {
 		String line = "";
 		line += prompt.getLongText() + " => ";
-		if (prompt.isRequired() && prompt.getAnswerValue() == null) {
-			line = "*" + line;
-		}
+		
 		IAnswerData answerValue = prompt.getAnswerValue();
 		if (answerValue != null) {
 			line += answerValue.getDisplayText();
@@ -93,7 +112,7 @@ public class FormSummaryView extends List {
 		String headertext = "";
 		for (FormEntryCaption caption : hierachy) {
 			headertext += caption.getLongText();
-			
+
 			if (caption.getIndex().getInstanceIndex() > -1)
 				headertext += " #" + (caption.getMultiplicity() + 1);
 
