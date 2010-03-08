@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
@@ -25,6 +26,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	public TreeReference copyRef;
 	public IConditionExpr value;
 	
+	private TreeReference destRef; //ref that identifies the repeated nodes resulting from this itemset
 	private Vector<SelectChoice> choices; //dynamic choices
 	
 	public Vector<SelectChoice> getChoices () {
@@ -57,6 +59,19 @@ public class ItemsetBinding implements Externalizable, Localizable {
 				choices.elementAt(i).localeChanged(locale, localizer);
 			}
 		}
+	}
+
+	public void setDestRef (QuestionDef q) {
+		if (copyMode) {
+			TreeReference destRef = FormInstance.unpackReference(q.getBind()).clone();
+			destRef.add(copyRef.getNameLast(), TreeReference.INDEX_UNBOUND);
+		} else {
+			destRef = null;
+		}
+	}
+	
+	public TreeReference getDestRef () {
+		return destRef;
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

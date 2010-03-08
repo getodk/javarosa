@@ -198,6 +198,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	}
 	
 	public void setDynamicChoices (ItemsetBinding ib) {
+		ib.setDestRef(this);
 		this.dynamicChoices = ib;
 	}
 	
