@@ -53,7 +53,8 @@ colors {
  * singlequestionscreen styles
  */
 .View_All_Form {
-	background-color: headerColor;
+	padding: 2;	
+	background-color: white;
 	screen-change-animation: particle;
 	layout: bottom | horizontal-center;
 	always-include: true	
@@ -61,8 +62,9 @@ colors {
 
 .View_All_Header extends View_All_Form {
 	font-style: bold;
+	font-color: #000033;
 	layout: left | expand;
-	background-color: headerColor;
+	
 	always-include: true
 }
 
