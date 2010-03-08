@@ -85,6 +85,7 @@ public class XFormParser {
 	private static Hashtable bindingsByID;
 	private static Vector bindings; //DataBinding
 	private static Vector repeats; //TreeReference
+	private static Vector itemsets; //ItemsetBinding
 	private static Vector selectOnes; //TreeReference
 	private static Vector selectMultis; //TreeReference
 	private static Element instanceNode; //top-level data node of the instance; saved off so it can be processed after the <bind>s
@@ -205,6 +206,7 @@ public class XFormParser {
 		bindingsByID = new Hashtable();
 		bindings = new Vector();
 		repeats = new Vector();
+		itemsets = new Vector();
 		selectOnes = new Vector();
 		selectMultis = new Vector();
 		instanceNode = null;
@@ -738,6 +740,7 @@ public class XFormParser {
 			itemset.value = new XPathConditional(XPathPathExpr.fromRef(valueRef));
 		
 		q.setDynamicChoices(itemset);
+		itemsets.addElement(itemset);
 	}
 	
 	private static void parseGroup (IFormElement parent, Element e, FormDef f, int groupType) {
