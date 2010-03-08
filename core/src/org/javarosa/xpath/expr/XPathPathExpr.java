@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -195,7 +196,10 @@ public class XPathPathExpr extends XPathExpression {
 			return (new XFormAnswerDataSerializer()).serializeAnswerData(val);
 		} else if (val instanceof DateData) {
 			return val.getValue();
+		} else if (val instanceof BooleanData) {
+			return val.getValue();
 		} else {
+			System.out.println("warning: unrecognized data type in xpath expr: " + val.getClass().getName());
 			return val.getValue(); //is this a good idea?
 		}
 	}
