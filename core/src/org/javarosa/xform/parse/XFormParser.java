@@ -673,7 +673,6 @@ public class XFormParser {
 		
 		String nodesetStr = e.getAttributeValue("", "nodeset");
 		XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
-		itemset.nodeset = new XPathConditional(path);
 		TreeReference nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), qparent));
 		TreeReference labelRef = null;
 		TreeReference valueRef = null;
@@ -688,8 +687,8 @@ public class XFormParser {
 				boolean labelItext = false;
 				
 				if (labelXpath != null) {
-					if (labelXpath.startsWith("jr:itext('") && labelXpath.endsWith("')")) {
-						labelXpath = labelXpath.substring("jr:itext('".length(), labelXpath.indexOf("')"));
+					if (labelXpath.startsWith("jr:itext(") && labelXpath.endsWith(")")) {
+						labelXpath = labelXpath.substring("jr:itext(".length(), labelXpath.indexOf(")"));
 						labelItext = true;
 					}
 				} else {
@@ -733,6 +732,7 @@ public class XFormParser {
 		
 		//convert references to conditionals (even though they contain no expression logic, predicates, etc.)
 		//because it's much easier to evaluate a conditional than a ref
+		itemset.nodeset = new XPathConditional(XPathPathExpr.fromRef(nodesetRef));
 		itemset.label = new XPathConditional(XPathPathExpr.fromRef(labelRef));
 		if (valueRef != null)
 			itemset.value = new XPathConditional(XPathPathExpr.fromRef(valueRef));

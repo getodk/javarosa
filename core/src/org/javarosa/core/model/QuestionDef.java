@@ -220,6 +220,10 @@ public class QuestionDef implements IFormElement, Localizable {
     		}
     	}
     	
+    	if (dynamicChoices != null) {
+    		dynamicChoices.localeChanged(locale, localizer);
+    	}
+    	
     	alertStateObservers(FormElementStateListener.CHANGE_LOCALE);
     }
 	

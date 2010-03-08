@@ -597,7 +597,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return template;
 	}
 
-	public Vector<SelectChoice> getDynamicChoices (ItemsetBinding itemset, TreeReference qRef) {
+	public void populateDynamicChoices (ItemsetBinding itemset, TreeReference qRef) {
 		Vector<SelectChoice> choices = new Vector<SelectChoice>();
 		Vector<TreeReference> matches = itemset.nodeset.evalNodeset(this.getInstance(), new EvaluationContext(exprEvalContext, qRef));
 		
@@ -622,7 +622,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			choices.addElement(choice);
 		}
 		
-		return choices;
+		itemset.setChoices(choices, this.getLocalizer());
 	}
 	
 	/**
