@@ -36,7 +36,8 @@ import org.javarosa.formmanager.view.IQuestionWidget;
 public class FormEntryPrompt extends FormEntryCaption {
 
     TreeElement mTreeElement;
-
+    boolean dynamicChoicesPopulated = false;
+    
     /**
      * This empty constructor exists for convenience of any supertypes of this prompt
      */
@@ -88,13 +89,15 @@ public class FormEntryPrompt extends FormEntryCaption {
     	
 		ItemsetBinding itemset = q.getDynamicChoices();
     	if (itemset != null) {
-    		Vector<SelectChoice> choices = form.getDynamicChoices(itemset, mTreeElement.getRef());
+    		if (!dynamicChoicesPopulated) {
+    			form.populateDynamicChoices(itemset, mTreeElement.getRef());
+    			dynamicChoicesPopulated = true;
+    		}
+    		Vector<SelectChoice> choices = itemset.getChoices();
     		
     		if (choices.size() == 0) {
     			throw new RuntimeException("dynamic select question has no choices!");
     		}
-    		
-    		//itemset TODO register choices for loc updates?
     		
     		return choices;
     	} else { //static choices
@@ -102,6 +105,14 @@ public class FormEntryPrompt extends FormEntryCaption {
     	}
     }
 
+    public void expireDynamicChoices () {
+    	dynamicChoicesPopulated = false;
+		ItemsetBinding itemset = getQuestion().getDynamicChoices();
+		if (itemset != null) {
+			itemset.clearChoices();
+		}
+    }
+    
     public String getHelpText() {
         return getQuestion().getHelpText();
     }
