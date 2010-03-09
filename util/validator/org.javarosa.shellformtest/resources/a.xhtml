@@ -1,0 +1,257 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/2002/xforms"
+	  xmlns:ev="http://www.w3.org/2001/xml-events"
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	  xmlns:jr="http://openrosa.org/javarosa">
+<h:head>
+    <h:title>Repeat/International Demo</h:title>
+    <meta jr:name="dimagi-scratch-repint"/>
+    <model>
+
+<itext>
+<translation lang="English">
+<text id="q1">
+<value>Last Name</value>
+</text>
+<text id="q2">
+<value>First Name</value>
+</text>
+<text id="q3">
+<value form="long">Date of Birth</value>
+<value form="short">DOB</value>
+</text>
+<text id="q4">
+<value>Sex</value>
+</text>
+<text id="q4a">
+<value>Male</value>
+</text>
+<text id="q4b">
+<value>Female</value>
+</text>
+<text id="q5">
+<value>Address</value>
+</text>
+
+<text id="blah">
+<value>blahhhhh</value>
+</text>
+<text id="red">
+<value>red</value>
+</text>
+<text id="green">
+<value>green</value>
+</text>
+<text id="yellow">
+<value>yellow</value>
+</text>
+<text id="fav">
+<value>Favorite Color??</value>
+</text>
+
+
+
+
+</translation>
+
+<translation lang="Spanish">
+<text id="q1">
+<value>Apedillo</value>
+</text>
+<text id="q2">
+<value>Nombre</value>
+</text>
+<text id="q3">
+<value form="long">Fecha de Nacimiento</value>
+<value form="short">Nacimiento</value>
+</text>
+<text id="q4">
+<value>Género</value>
+</text>
+<text id="q4a">
+<value>Masculino</value>
+</text>
+<text id="q4b">
+<value>Femenino</value>
+</text>
+<text id="q5">
+<value>Dirección</value>
+</text>
+
+<text id="blah">
+<value>sp blahhhhh</value>
+</text>
+<text id="red">
+<value>sp red</value>
+</text>
+<text id="green">
+<value>sp green</value>
+</text>
+<text id="yellow">
+<value>sp yellow</value>
+</text>
+<text id="fav">
+<value>sp Favorite Color??</value>
+</text>
+
+</translation>
+
+<translation lang="Swahili">
+<text id="q1">
+<value>Jina Jamaa</value>
+</text>
+<text id="q2">
+<value>Jina Kwanza</value>
+</text>
+<text id="q3">
+<value form="long">Tarehe Uzawila</value>
+<value form="short">Uzawila</value>
+</text>
+<text id="q4">
+<value>Jinsia</value>
+</text>
+<text id="q4a">
+<value>Kiume</value>
+</text>
+<text id="q4b">
+<value>Kike</value>
+</text>
+<text id="q5">
+<value>Anwane</value>
+</text>
+
+<text id="blah">
+<value>sw blahhhhh</value>
+</text>
+<text id="red">
+<value>sw red</value>
+</text>
+<text id="green">
+<value>sw green</value>
+</text>
+<text id="yellow">
+<value>sw yellow</value>
+</text>
+<text id="fav">
+<value>sw Favorite Color??</value>
+</text>
+
+
+</translation>
+
+</itext>
+
+	<instance>
+		<demog xmlns="">
+			<blah />
+			<fizz />
+			
+			<children>
+			  <child jr:template="">			  
+			    <name />
+			    <fav-color jr:template="">red</fav-color>
+			    <age />
+			    
+			    <start />
+			    <end />
+			  </child>
+			</children>
+		
+			<lname>Sims</lname>
+			<feeling />
+			<fname />
+			<dob />
+			<sex />
+			<preg />
+			<addr />
+
+			<gr>
+				<a/><b/><c/>
+			</gr>
+
+		</demog>
+	</instance>
+	
+	<bind nodeset="blah" relevant="/demog/lname='Sims'" />
+	
+	<bind nodeset="children/child/start" jr:preload="timestamp" jr:preloadParams="start" />
+	<bind nodeset="children/child/end" jr:preload="timestamp" jr:preloadParams="end" />
+		
+	<bind nodeset="blah" type="xsd:int" />
+	<bind nodeset="fizz" relevant="sum(../blah) >= 100" />
+		
+	<bind nodeset="/demog/children/child/age" type="xsd:int" relevant="count(/demog/blah) > 3" />
+	<bind nodeset="/demog/children/child/name" relevant="../age > 10" />
+	<bind id="DOB" nodeset="/demog/dob" type="xsd:date" required="true()" />
+	<bind id="lname" nodeset="/demog/lname" required="true()" />
+	<bind id="fname" nodeset="/demog/fname" required="true()" />
+	<bind id="feeling" nodeset="/demog/feeling" required="true()" />
+	<bind id="sex" nodeset="/demog/sex" required="true()" />
+	<bind id="addr" nodeset="/demog/addr" required="true()" />
+	<bind id="preg" nodeset="/demog/preg" relevant="/demog/sex='f'" />
+	
+	<bind nodeset="gr" relevant="/demog/fname = 'AD'" />
+    </model>
+</h:head>			
+<h:body>
+
+<input ref="lname"><label ref="jr:itext('q1')"></label></input>
+
+<group>
+<label>Melozov</label>
+<repeat nodeset="/demog/blah">
+	<input ref="."><label ref="jr:itext('blah')" /></input>
+</repeat>
+</group>
+
+<input ref="fizz"><label>i am a meat popsicle</label></input>
+
+<group>
+<label>Chotchke</label>
+<repeat nodeset="/demog/children/child">
+  <input ref="age"><label>Child Age</label></input>
+  <input ref="name"><label>Child Name</label></input>
+  
+  <group>
+  <label>Fav Color</label>
+  <repeat nodeset="fav-color">
+    <select1 ref=".">
+      <label ref="jr:itext('fav')" />
+      <item><label ref="jr:itext('red')" /><value>red</value></item>
+      <item><label ref="jr:itext('green')" /><value>green</value></item>
+      <item><label ref="jr:itext('yellow')" /><value>yellow</value></item>
+    </select1>
+  </repeat>
+  </group>
+  
+</repeat>
+</group>
+
+<input bind="fname"><label ref="jr:itext('q2')"></label></input>
+
+<input ref="gr/a"><label>a</label></input>
+<input ref="gr/b"><label>b</label></input>
+<input ref="gr/c"><label>c</label></input>
+
+<group>
+<label>asdf</label>
+
+  <input bind="DOB"><label ref="jr:itext('q3')"></label></input>
+  <select1 ref="/demog/sex">
+    <label ref="jr:itext('q4')"></label>
+    <item><label ref="jr:itext('q4a')"></label><value>m</value></item>
+    <item><label ref="jr:itext('q4b')"></label><value>f</value></item>
+  </select1>
+
+  <group>
+  <label>qwer</label>
+    <input bind="preg"><label>Pregnant?</label></input>
+  </group>  
+</group>
+  
+<input ref="/demog/addr"><label ref="jr:itext('q5')"></label></input>
+   
+
+   
+</h:body>
+</h:html>
