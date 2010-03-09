@@ -18,16 +18,24 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class ItemsetBinding implements Externalizable, Localizable {
+
+	/**
+	 * note that storing both the ref and expr for everything is kind of redundant, but we're forced
+	 * to since it's nearly impossible to convert between the two w/o having access to the underlying
+	 * xform/xpath classes, which we don't from the core model project
+	 */
 	
 	public TreeReference nodesetRef;   //absolute ref of itemset source nodes
 	public IConditionExpr nodesetExpr; //path expression for source nodes; may be relative, may contain predicates
 	
-	public IConditionExpr labelExpr;   //path expression for label; absolute, no predicates  
+	public TreeReference labelRef;     //absolute ref of label
+	public IConditionExpr labelExpr;   //path expression for label; may be relative, no predicates  
 	public boolean labelIsItext;       //if true, content of 'label' is an itext id
 	
-	public boolean copyMode;         //true = copy subtree; false = copy string value
-	public TreeReference copyRef;    //absolute ref to copy
-	public IConditionExpr valueExpr; //path expression for value; absolute, no predicates
+	public boolean copyMode;           //true = copy subtree; false = copy string value
+	public TreeReference copyRef;      //absolute ref to copy
+	public TreeReference valueRef;     //absolute ref to value
+	public IConditionExpr valueExpr;   //path expression for value; may be relative, no predicates
 
 	private TreeReference destRef; //ref that identifies the repeated nodes resulting from this itemset
 								   //not serialized -- set by QuestionDef.setDynamicChoices()
@@ -81,7 +89,9 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		nodesetRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 		nodesetExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		labelRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 		labelExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		valueRef = (TreeReference)ExtUtil.read(in, new ExtWrapNullable(TreeReference.class), pf);
 		valueExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
 		copyRef = (TreeReference)ExtUtil.read(in, new ExtWrapNullable(TreeReference.class), pf);
 		labelIsItext = ExtUtil.readBool(in);
@@ -91,7 +101,9 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, nodesetRef);
 		ExtUtil.write(out, new ExtWrapTagged(nodesetExpr));
+		ExtUtil.write(out, labelRef);
 		ExtUtil.write(out, new ExtWrapTagged(labelExpr));
+		ExtUtil.write(out, new ExtWrapNullable(valueRef));
 		ExtUtil.write(out, new ExtWrapNullable(valueExpr == null ? null : new ExtWrapTagged(valueExpr)));
 		ExtUtil.write(out, new ExtWrapNullable(copyRef));
 		ExtUtil.writeBool(out, labelIsItext);
