@@ -678,9 +678,6 @@ public class XFormParser {
 		itemset.nodesetExpr = new XPathConditional(path);
 		itemset.nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), qparent));
 
-		TreeReference labelRef = null;
-		TreeReference valueRef = null;
-		
 		for (int i = 0; i < e.getChildCount(); i++) {
 			int type = e.getType(i);
 			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
@@ -699,7 +696,9 @@ public class XFormParser {
 					throw new XFormParseException("<label> in <itemset> requires 'ref'");
 				}
 				
-				labelRef = FormInstance.unpackReference(getAbsRef(new XPathReference(labelXpath), itemset.nodesetRef));
+				XPathPathExpr labelPath = XPathReference.getPathExpr(labelXpath);
+				itemset.labelRef = FormInstance.unpackReference(getAbsRef(new XPathReference(labelPath), itemset.nodesetRef));
+				itemset.labelExpr = new XPathConditional(labelPath);
 				itemset.labelIsItext = labelItext;
 			} else if ("copy".equals(childName)) {
 				String copyRef = child.getAttributeValue("", "ref");
@@ -715,30 +714,18 @@ public class XFormParser {
 					throw new XFormParseException("<value> in <itemset> requires 'ref'");
 				}
 				
-				valueRef = FormInstance.unpackReference(getAbsRef(new XPathReference(valueXpath), itemset.nodesetRef));
+				XPathPathExpr valuePath = XPathReference.getPathExpr(valueXpath);
+				itemset.valueRef = FormInstance.unpackReference(getAbsRef(new XPathReference(valuePath), itemset.nodesetRef));
+				itemset.valueExpr = new XPathConditional(valuePath);
 				itemset.copyMode = false;
 			}
 		}
 		
-		if (labelRef == null) {
+		if (itemset.labelRef == null) {
 			throw new XFormParseException("<itemset> requires <label>");
-		} else if (itemset.copyRef == null && valueRef == null) {			
+		} else if (itemset.copyRef == null && itemset.valueRef == null) {			
 			throw new XFormParseException("<itemset> requires <copy> or <value>");
 		}
-		
-		if (!itemset.nodesetRef.isParentOf(labelRef, false)) {
-			throw new XFormParseException("itemset nodeset ref is not a parent of label ref");
-		} else if (itemset.copyRef != null && !itemset.nodesetRef.isParentOf(itemset.copyRef, false)) {
-			throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
-		} else if (valueRef != null && !itemset.nodesetRef.isParentOf(valueRef, false)) {
-			throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
-		}
-		
-		//convert references to conditionals (even though they contain no expression logic, predicates, etc.)
-		//because it's much easier to evaluate a conditional than a ref
-		itemset.labelExpr = new XPathConditional(XPathPathExpr.fromRef(labelRef));
-		if (valueRef != null)
-			itemset.valueExpr = new XPathConditional(XPathPathExpr.fromRef(valueRef));
 		
 		q.setDynamicChoices(itemset);
 		itemsets.addElement(itemset);
@@ -1500,8 +1487,9 @@ public class XFormParser {
 		}
 				
 		//check <repeat>s (can't bind to '/' or '/data')
-		for (int i = 0; i < repeats.size(); i++) {
-			TreeReference ref = (TreeReference)repeats.elementAt(i);
+		Vector refs = getRepeatableRefs();
+		for (int i = 0; i < refs.size(); i++) {
+			TreeReference ref = (TreeReference)refs.elementAt(i);
 			
 			if (ref.size() <= 1) {
 				throw new XFormParseException("Cannot bind repeat to '/' or '/" + instanceNode.getName() + "'");
@@ -1513,6 +1501,11 @@ public class XFormParser {
 		
 		//check that repeat members bind to the proper scope (not above the binding of the parent repeat, and not within any sub-repeat (or outside repeat))
 		verifyRepeatMemberBindings(f, instance, null);
+		
+		//check that label/copy/value refs are children of nodeset ref, and exist
+		verifyItemsetBindings(instance);
+		
+		verifyItemsetSrcDstCompatibility(instance);
 	}
 	
 	private static void verifyControlBindings (IFormElement fe, FormInstance instance) {
@@ -1596,6 +1589,60 @@ public class XFormParser {
 			}
 
 			verifyRepeatMemberBindings(child, instance, (isRepeat ? (GroupDef)child : parentRepeat));
+		}
+	}
+	
+	private static void verifyItemsetBindings (FormInstance instance) {
+		for (int i = 0; i < itemsets.size(); i++) {
+			ItemsetBinding itemset = (ItemsetBinding)itemsets.elementAt(i);
+			
+			//check proper parent/child relationship
+			if (!itemset.nodesetRef.isParentOf(itemset.labelRef, false)) {
+				throw new XFormParseException("itemset nodeset ref is not a parent of label ref");
+			} else if (itemset.copyRef != null && !itemset.nodesetRef.isParentOf(itemset.copyRef, false)) {
+				throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
+			} else if (itemset.valueRef != null && !itemset.nodesetRef.isParentOf(itemset.valueRef, false)) {
+				throw new XFormParseException("itemset nodeset ref is not a parent of value ref");
+			}
+
+			//check label/value/copy nodes exist
+			if (instance.getTemplatePath(itemset.labelRef) == null) {
+				throw new XFormParseException("<label> node for itemset doesn't exist! [" + itemset.labelRef + "]");
+			} else if (itemset.copyRef != null && instance.getTemplatePath(itemset.copyRef) == null) {
+				throw new XFormParseException("<copy> node for itemset doesn't exist! [" + itemset.copyRef + "]");
+			} else if (itemset.valueRef != null && instance.getTemplatePath(itemset.valueRef) == null) {
+				throw new XFormParseException("<value> node for itemset doesn't exist! [" + itemset.valueRef + "]");
+			}
+		}
+	}
+	
+	private static void verifyItemsetSrcDstCompatibility (FormInstance instance) {
+		for (int i = 0; i < itemsets.size(); i++) {
+			ItemsetBinding itemset = (ItemsetBinding)itemsets.elementAt(i);
+
+			boolean destRepeatable = (instance.getTemplate(itemset.getDestRef()) != null);
+			if (itemset.copyMode) {
+				if (!destRepeatable) {
+					throw new XFormParseException("itemset copies to node(s) which are not repeatable");
+				}
+				
+				//validate homogeneity between src and dst nodes
+				TreeElement srcNode = instance.getTemplatePath(itemset.copyRef);
+				TreeElement dstNode = instance.getTemplate(itemset.getDestRef());
+				
+				if (!FormInstance.isHomogeneous(srcNode, dstNode)) {
+					System.out.println("WARNING! Source [" + srcNode.getRef().toString() + "] and dest [" + dstNode.getRef().toString() +
+							"] of itemset appear to be incompatible!");
+				}
+				
+				//TODO: i feel like, in theory, i should additionally check that the repeatable children of src and dst
+				//match up (Achild is repeatable <--> Bchild is repeatable). isHomogeneous doesn't check this. but i'm
+				//hard-pressed to think of scenarios where this would actually cause problems
+			} else {
+				if (destRepeatable) {
+					throw new XFormParseException("itemset sets value on repeatable nodes");
+				}
+			}
 		}
 	}
 	
