@@ -77,7 +77,9 @@ public class Logger {
 	public static void die (String thread, Exception e) {
 		//log exception
 		exception(e, true);
-				
+		
+		e.printStackTrace();
+		
 		//crash
 		throw new FatalException("unhandled exception in " + thread, e);
 	}
