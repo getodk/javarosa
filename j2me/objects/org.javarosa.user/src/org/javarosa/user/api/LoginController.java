@@ -21,22 +21,25 @@ import org.javarosa.user.view.LoginForm;
  */
 public class LoginController implements HandledCommandListener {
 	
-	LoginTransitions transitions;
+	protected LoginTransitions transitions;
 
-	LoginForm view;
+	protected LoginForm view;
 	
-	Alert demoModeAlert = null;
-	private String[] extraText;
+	protected Alert demoModeAlert = null;
+	protected String[] extraText;
 	
 	public LoginController() {
 		this(null);
 	}
-	
-	public LoginController(String[] extraText) {
+	public LoginController(String[] extraText, String passwordFormat) {
 		this.extraText = extraText;
 		view = new LoginForm(Localization.get("form.login.login"), this.extraText);
 		view.setCommandListener(this);
-		view.setPasswordMode(AddUserController.PASSWORD_FORMAT_NUMERIC);
+		view.setPasswordMode(passwordFormat);
+	}
+	
+	public LoginController(String[] extraText) {
+		this(extraText,AddUserController.PASSWORD_FORMAT_NUMERIC);
 	}
 
 	public void setTransitions (LoginTransitions transitions) {
