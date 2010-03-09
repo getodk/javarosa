@@ -599,19 +599,19 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 	public void populateDynamicChoices (ItemsetBinding itemset, TreeReference qRef) {
 		Vector<SelectChoice> choices = new Vector<SelectChoice>();
-		Vector<TreeReference> matches = itemset.nodeset.evalNodeset(this.getInstance(), new EvaluationContext(exprEvalContext, qRef));
+		Vector<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getInstance(), new EvaluationContext(exprEvalContext, qRef));
 		
 		for (int i = 0; i < matches.size(); i++) {
 			TreeReference item = matches.elementAt(i);
 			
-			String label = itemset.label.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, item));
+			String label = itemset.labelExpr.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, item));
 			String value = null;
 			TreeElement copyNode = null;
 			
 			if (itemset.copyMode) {
 				copyNode = this.getInstance().resolveReference(itemset.copyRef.contextualize(item));
 			} else {
-				value = itemset.value.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, item));
+				value = itemset.valueExpr.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, item));
 			}
 			
 			SelectChoice choice = new SelectChoice(label, value != null ? value : "dynamic:" + i, itemset.labelIsItext);
