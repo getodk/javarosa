@@ -74,11 +74,9 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	}
 	
 	public void setDestRef (QuestionDef q) {
+		destRef = FormInstance.unpackReference(q.getBind()).clone();
 		if (copyMode) {
-			TreeReference destRef = FormInstance.unpackReference(q.getBind()).clone();
 			destRef.add(copyRef.getNameLast(), TreeReference.INDEX_UNBOUND);
-		} else {
-			destRef = null;
 		}
 	}
 	

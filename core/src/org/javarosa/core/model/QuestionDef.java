@@ -252,6 +252,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	 */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
+		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
@@ -266,8 +267,6 @@ public class QuestionDef implements IFormElement, Localizable {
 			choices.elementAt(i).setIndex(i);
 		}
 		setDynamicChoices((ItemsetBinding)ExtUtil.read(dis, new ExtWrapNullable(ItemsetBinding.class)));
-
-		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 	}
 
 	/*
@@ -276,6 +275,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		ExtUtil.writeNumeric(dos, getID());
+		ExtUtil.write(dos, new ExtWrapNullable(binding == null ? null : new ExtWrapTagged(binding)));
 		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
 		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
@@ -288,8 +288,6 @@ public class QuestionDef implements IFormElement, Localizable {
 		
 		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(choices)));
 		ExtUtil.write(dos, new ExtWrapNullable(dynamicChoices));
-
-		ExtUtil.write(dos, new ExtWrapNullable(binding == null ? null : new ExtWrapTagged(binding)));
 	}
 
 	/* === MANAGING OBSERVERS === */
