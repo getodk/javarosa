@@ -675,7 +675,9 @@ public class XFormParser {
 		
 		String nodesetStr = e.getAttributeValue("", "nodeset");
 		XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
-		TreeReference nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), qparent));
+		itemset.nodesetExpr = new XPathConditional(path);
+		itemset.nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), qparent));
+
 		TreeReference labelRef = null;
 		TreeReference valueRef = null;
 		
@@ -697,7 +699,7 @@ public class XFormParser {
 					throw new XFormParseException("<label> in <itemset> requires 'ref'");
 				}
 				
-				labelRef = FormInstance.unpackReference(getAbsRef(new XPathReference(labelXpath), nodesetRef));
+				labelRef = FormInstance.unpackReference(getAbsRef(new XPathReference(labelXpath), itemset.nodesetRef));
 				itemset.labelIsItext = labelItext;
 			} else if ("copy".equals(childName)) {
 				String copyRef = child.getAttributeValue("", "ref");
@@ -705,7 +707,7 @@ public class XFormParser {
 					throw new XFormParseException("<copy> in <itemset> requires 'ref'");
 				}
 				
-				itemset.copyRef = FormInstance.unpackReference(getAbsRef(new XPathReference(copyRef), nodesetRef));
+				itemset.copyRef = FormInstance.unpackReference(getAbsRef(new XPathReference(copyRef), itemset.nodesetRef));
 				itemset.copyMode = true;
 			} else if ("value".equals(childName)) {
 				String valueXpath = child.getAttributeValue("", "ref");
@@ -713,7 +715,7 @@ public class XFormParser {
 					throw new XFormParseException("<value> in <itemset> requires 'ref'");
 				}
 				
-				valueRef = FormInstance.unpackReference(getAbsRef(new XPathReference(valueXpath), nodesetRef));
+				valueRef = FormInstance.unpackReference(getAbsRef(new XPathReference(valueXpath), itemset.nodesetRef));
 				itemset.copyMode = false;
 			}
 		}
@@ -724,20 +726,19 @@ public class XFormParser {
 			throw new XFormParseException("<itemset> requires <copy> or <value>");
 		}
 		
-		if (!nodesetRef.isParentOf(labelRef, false)) {
+		if (!itemset.nodesetRef.isParentOf(labelRef, false)) {
 			throw new XFormParseException("itemset nodeset ref is not a parent of label ref");
-		} else if (itemset.copyRef != null && !nodesetRef.isParentOf(itemset.copyRef, false)) {
+		} else if (itemset.copyRef != null && !itemset.nodesetRef.isParentOf(itemset.copyRef, false)) {
 			throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
-		} else if (valueRef != null && !nodesetRef.isParentOf(valueRef, false)) {
+		} else if (valueRef != null && !itemset.nodesetRef.isParentOf(valueRef, false)) {
 			throw new XFormParseException("itemset nodeset ref is not a parent of copy ref");
 		}
 		
 		//convert references to conditionals (even though they contain no expression logic, predicates, etc.)
 		//because it's much easier to evaluate a conditional than a ref
-		itemset.nodeset = new XPathConditional(XPathPathExpr.fromRef(nodesetRef));
-		itemset.label = new XPathConditional(XPathPathExpr.fromRef(labelRef));
+		itemset.labelExpr = new XPathConditional(XPathPathExpr.fromRef(labelRef));
 		if (valueRef != null)
-			itemset.value = new XPathConditional(XPathPathExpr.fromRef(valueRef));
+			itemset.valueExpr = new XPathConditional(XPathPathExpr.fromRef(valueRef));
 		
 		q.setDynamicChoices(itemset);
 		itemsets.addElement(itemset);
@@ -1248,6 +1249,24 @@ public class XFormParser {
 		return element;
 	}
 	
+	private static Vector<TreeReference> getRepeatableRefs () {
+		Vector<TreeReference> refs = new Vector<TreeReference>();
+
+		for (int i = 0; i < repeats.size(); i++) {
+			refs.addElement((TreeReference)repeats.elementAt(i));
+		}
+
+		for (int i = 0; i < itemsets.size(); i++) {
+			ItemsetBinding itemset = (ItemsetBinding)itemsets.elementAt(i);
+			TreeReference srcRef = itemset.nodesetRef;
+			if (!refs.contains(srcRef)) {
+				refs.addElement(srcRef);
+			}
+		}
+		
+		return refs;
+	}
+	
 	//pre-process and clean up instance regarding repeats; in particular:
 	// 1) flag all repeat-related nodes as repeatable
 	// 2) catalog which repeat template nodes are explicitly defined, and note which repeats bindings lack templates
@@ -1264,8 +1283,9 @@ public class XFormParser {
 
 	//flag all nodes identified by repeat bindings as repeatable
 	private static void flagRepeatables (FormInstance instance) {
-		for (int i = 0; i < repeats.size(); i++) {
-			TreeReference ref = (TreeReference)repeats.elementAt(i);
+		Vector refs = getRepeatableRefs();
+		for (int i = 0; i < refs.size(); i++) {
+			TreeReference ref = (TreeReference)refs.elementAt(i);
 			Vector nodes = instance.expandReference(ref, true);
 			for (int j = 0; j < nodes.size(); j++) {
 				TreeReference nref = (TreeReference)nodes.elementAt(j);
@@ -1277,7 +1297,7 @@ public class XFormParser {
 	}
 	
 	private static void processTemplates (FormInstance instance) {
-		repeatTree = buildRepeatTree(repeats, instance.getRoot().getName());
+		repeatTree = buildRepeatTree(getRepeatableRefs(), instance.getRoot().getName());
 		
 		Vector missingTemplates = new Vector(); //Vector<TreeReference>
 		checkRepeatsForTemplate(instance, repeatTree, missingTemplates);
@@ -1440,8 +1460,9 @@ public class XFormParser {
 	
 	//check repeat sets for homogeneity
 	private static void checkHomogeneity (FormInstance instance) {
-		for (int i = 0; i < repeats.size(); i++) {
-			TreeReference ref = (TreeReference)repeats.elementAt(i);
+		Vector refs = getRepeatableRefs();
+		for (int i = 0; i < refs.size(); i++) {
+			TreeReference ref = (TreeReference)refs.elementAt(i);
 			TreeElement template = null;
 			Vector nodes = instance.expandReference(ref);
 			for (int j = 0; j < nodes.size(); j++) {

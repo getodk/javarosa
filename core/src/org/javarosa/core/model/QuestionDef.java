@@ -198,7 +198,9 @@ public class QuestionDef implements IFormElement, Localizable {
 	}
 	
 	public void setDynamicChoices (ItemsetBinding ib) {
-		ib.setDestRef(this);
+		if (ib != null) {
+			ib.setDestRef(this);
+		}
 		this.dynamicChoices = ib;
 	}
 	
@@ -263,7 +265,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		for (int i = 0; i < getNumChoices(); i++) {
 			choices.elementAt(i).setIndex(i);
 		}
-		dynamicChoices = (ItemsetBinding)ExtUtil.read(dis, new ExtWrapNullable(ItemsetBinding.class));
+		setDynamicChoices((ItemsetBinding)ExtUtil.read(dis, new ExtWrapNullable(ItemsetBinding.class)));
 
 		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 	}

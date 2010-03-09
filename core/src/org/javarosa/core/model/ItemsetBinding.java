@@ -19,15 +19,19 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class ItemsetBinding implements Externalizable, Localizable {
 	
-	public IConditionExpr nodeset;
-	public IConditionExpr label;
-	public boolean labelIsItext;
-	public boolean copyMode; //true = copy subtree; false = copy string value
-	public TreeReference copyRef;
-	public IConditionExpr value;
+	public TreeReference nodesetRef;   //absolute ref of itemset source nodes
+	public IConditionExpr nodesetExpr; //path expression for source nodes; may be relative, may contain predicates
 	
+	public IConditionExpr labelExpr;   //path expression for label; absolute, no predicates  
+	public boolean labelIsItext;       //if true, content of 'label' is an itext id
+	
+	public boolean copyMode;         //true = copy subtree; false = copy string value
+	public TreeReference copyRef;    //absolute ref to copy
+	public IConditionExpr valueExpr; //path expression for value; absolute, no predicates
+
 	private TreeReference destRef; //ref that identifies the repeated nodes resulting from this itemset
-	private Vector<SelectChoice> choices; //dynamic choices
+								   //not serialized -- set by QuestionDef.setDynamicChoices()
+	private Vector<SelectChoice> choices; //dynamic choices -- not serialized, obviously
 	
 	public Vector<SelectChoice> getChoices () {
 		return choices;
@@ -60,7 +64,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 			}
 		}
 	}
-
+	
 	public void setDestRef (QuestionDef q) {
 		if (copyMode) {
 			TreeReference destRef = FormInstance.unpackReference(q.getBind()).clone();
@@ -75,18 +79,20 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		nodeset = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
-		label = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
-		value = (IConditionExpr)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
+		nodesetRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
+		nodesetExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		labelExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		valueExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapNullable(new ExtWrapTagged()), pf);
 		copyRef = (TreeReference)ExtUtil.read(in, new ExtWrapNullable(TreeReference.class), pf);
 		labelIsItext = ExtUtil.readBool(in);
 		copyMode = ExtUtil.readBool(in);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.write(out, new ExtWrapTagged(nodeset));
-		ExtUtil.write(out, new ExtWrapTagged(label));
-		ExtUtil.write(out, new ExtWrapNullable(value == null ? null : new ExtWrapTagged(value)));
+		ExtUtil.write(out, nodesetRef);
+		ExtUtil.write(out, new ExtWrapTagged(nodesetExpr));
+		ExtUtil.write(out, new ExtWrapTagged(labelExpr));
+		ExtUtil.write(out, new ExtWrapNullable(valueExpr == null ? null : new ExtWrapTagged(valueExpr)));
 		ExtUtil.write(out, new ExtWrapNullable(copyRef));
 		ExtUtil.writeBool(out, labelIsItext);
 		ExtUtil.writeBool(out, copyMode);
