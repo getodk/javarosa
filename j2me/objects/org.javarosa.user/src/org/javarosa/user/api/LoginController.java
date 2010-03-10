@@ -63,7 +63,7 @@ public class LoginController implements HandledCommandListener {
 				transitions.loggedIn(view.getLoggedInUser());
 				return;
 			}
-			J2MEDisplay.showError(Localization.get("activity.login.loginincorrect"), Localization.get("activity.login.tryagain"));
+			performCustomUserValidation();
 
 		}
 
@@ -79,6 +79,13 @@ public class LoginController implements HandledCommandListener {
 			transitions.loggedIn(u);
 		}
 		// #endif
+	}
+	
+	
+	// this method is to be overridden by users. 
+	// handle errors here.
+	protected void performCustomUserValidation() {
+		J2MEDisplay.showError(Localization.get("activity.login.loginincorrect"), Localization.get("activity.login.tryagain"));
 	}
 
 }
