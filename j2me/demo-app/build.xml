@@ -142,6 +142,7 @@
 	<target name="CompileAndLinkSource" if="compile.from.source.true">
 			<ant antfile="${dir.jrlibs}/build.xml" target="package" inheritAll="false" inheritRefs="false">
 				<property name="polish.home" value="${polish.home}"/>
+				<property name="wtk.home" value="${wtk.home}"/>
 			</ant>
 			<copy file="${dir.jrlibs}/dist/j2merosa-libraries.jar" todir="${dir.tools}"/>
 	</target>
