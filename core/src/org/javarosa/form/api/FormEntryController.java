@@ -17,6 +17,7 @@
 package org.javarosa.form.api;
 
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
 
@@ -72,14 +73,21 @@ public class FormEntryController {
      * @return OK if save was successful, error if a constraint was violated.
      */
     public int answerQuestion(FormIndex index, IAnswerData data) {
+    	QuestionDef q = model.getQuestionPrompt(index).getQuestion();
         TreeElement element = model.getTreeElement(index);
+        boolean complexQuestion = q.isComplex();
+        
         if (element.required && data == null) {
             return ANSWER_REQUIRED_BUT_EMPTY;
-        } else if (!model.getForm().evaluateConstraint(index.getReference(), data)) {
+        } else if (!complexQuestion && !model.getForm().evaluateConstraint(index.getReference(), data)) {
+        	//TODO: itemsets: don't currently evaluate constraints for itemset/copy -- haven't figured out how handle it yet
             return ANSWER_CONSTRAINT_VIOLATED;
-        } else {
+        } else if (!complexQuestion) {
             commitAnswer(element, index, data);
             return ANSWER_OK;
+        } else {
+        	model.getForm().copyItemsetAnswer(q, element, data);
+        	return ANSWER_OK;
         }
     }
 
