@@ -27,4 +27,5 @@ public interface IXFormyFactory {
 	IDataPayload serializeInstance (FormInstance dm);
 	FormInstance parseRestore (byte[] data, Class restorableType);
 	IAnswerData parseData (String textVal, int dataType, TreeReference ref, FormDef f);
+	String serializeData (IAnswerData data);
 }

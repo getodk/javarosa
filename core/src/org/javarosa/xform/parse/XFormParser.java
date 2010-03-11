@@ -1249,6 +1249,13 @@ public class XFormParser {
 			if (!refs.contains(srcRef)) {
 				refs.addElement(srcRef);
 			}
+			
+			if (itemset.copyMode) {
+				TreeReference destRef = itemset.getDestRef();
+				if (!refs.contains(destRef)) {
+					refs.addElement(destRef);
+				}				
+			}
 		}
 		
 		return refs;
@@ -1409,7 +1416,7 @@ public class XFormParser {
 				firstMatch = (TreeReference)nodes.elementAt(0);
 			}
 			
-			if (!instance.copyNode(firstMatch, templRef)) {
+			if (instance.copyNode(firstMatch, templRef) == null) {
 				System.out.println("WARNING! Could not create a default repeat template; this is almost certainly a homogeneity error! Your form will not work! (Failed on " + templRef.toString() + ")");
 				//if the warning above is not heeded, this is the result
 			}

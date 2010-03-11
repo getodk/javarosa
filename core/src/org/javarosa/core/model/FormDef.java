@@ -289,10 +289,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		instance.copyNode(template, destRef);
 
 		preloadInstance(instance.resolveReference(destRef));
-		triggerTriggerables(destRef); // trigger conditions that depend on the
-		// creation of this new node
-		initializeTriggerables(destRef); // initialize conditions for the node
-		// (and sub-nodes)
+		triggerTriggerables(destRef); // trigger conditions that depend on the creation of this new node
+		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
 	}
 
 	public boolean canCreateRepeat(TreeReference repeatRef) {
@@ -305,6 +303,40 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 		return true;
 	}
+
+	//ITEMSET TODO identify dest nodes that already exist (and are in answer) and don't overwrite them
+	public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data) {
+		ItemsetBinding itemset = q.getDynamicChoices();
+		TreeReference targetRef = targetNode.getRef();
+		TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
+
+		Vector<Selection> selections = null;
+		if (data instanceof SelectMultiData) {
+			selections = (Vector<Selection>)data.getValue();
+		} else if (data instanceof SelectOneData) {
+			selections = new Vector<Selection>();
+			selections.addElement((Selection)data.getValue());
+		}
+		
+		//get all existing dest nodes and delete them
+		Vector<TreeReference> existingNodes = getInstance().expandReference(destRef);
+		for (int i = 0; i < existingNodes.size(); i++) {
+			targetNode.removeChild(getInstance().resolveReference(existingNodes.elementAt(i)));
+		}
+		//TODO don't always delete existing
+		
+		for (int i = 0; i < selections.size(); i++) {
+			Selection s = selections.elementAt(i);
+			SelectChoice ch = s.choice;
+			
+			getInstance().copyItemsetNode(ch.copyNode, destRef, this);
+		}
+		
+		triggerTriggerables(destRef); // trigger conditions that depend on the creation of these new nodes
+		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
+		  //not 100% sure this will work since destRef is ambiguous as the last step, but i think it's supposed to work
+	}
+	
 
 	/**
 	 * Add a Condition to the form's Collection.
@@ -597,9 +629,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return template;
 	}
 
-	public void populateDynamicChoices (ItemsetBinding itemset, TreeReference qRef) {
+	public void populateDynamicChoices (ItemsetBinding itemset, TreeElement questionElement) {
 		Vector<SelectChoice> choices = new Vector<SelectChoice>();
-		Vector<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getInstance(), new EvaluationContext(exprEvalContext, qRef));
+		
+		TreeReference contextRef = questionElement.getParent().getRef();
+		Vector<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getInstance(), new EvaluationContext(exprEvalContext, contextRef));
 		
 		for (int i = 0; i < matches.size(); i++) {
 			TreeReference item = matches.elementAt(i);

@@ -204,6 +204,13 @@ public class QuestionDef implements IFormElement, Localizable {
 		this.dynamicChoices = ib;
 	}
 	
+	/**
+	 * true if the answer to this question yields xml tree data, not a simple string value
+	 */
+	public boolean isComplex () {
+		return (dynamicChoices != null && dynamicChoices.copyMode);
+	}
+	
     public void localeChanged(String locale, Localizer localizer) {
     	if(longTextID != null) {
     		longText = localizer.getLocalizedText(longTextID);
