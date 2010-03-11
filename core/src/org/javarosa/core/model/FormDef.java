@@ -337,7 +337,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		  //not 100% sure this will work since destRef is ambiguous as the last step, but i think it's supposed to work
 	}
 	
-
 	/**
 	 * Add a Condition to the form's Collection.
 	 * 
@@ -629,11 +628,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return template;
 	}
 
-	public void populateDynamicChoices (ItemsetBinding itemset, TreeElement questionElement) {
+	public void populateDynamicChoices (ItemsetBinding itemset) {
 		Vector<SelectChoice> choices = new Vector<SelectChoice>();
 		
-		TreeReference contextRef = questionElement.getParent().getRef();
-		Vector<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getInstance(), new EvaluationContext(exprEvalContext, contextRef));
+		Vector<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getInstance(),
+				new EvaluationContext(exprEvalContext, itemset.contextRef));
 		
 		for (int i = 0; i < matches.size(); i++) {
 			TreeReference item = matches.elementAt(i);
@@ -654,6 +653,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				choice.copyNode = copyNode;
 			
 			choices.addElement(choice);
+		}
+		
+		if (choices.size() == 0) {
+			throw new RuntimeException("dynamic select question has no choices! [" + itemset.nodesetRef + "]");
 		}
 		
 		itemset.setChoices(choices, this.getLocalizer());
