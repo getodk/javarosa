@@ -676,8 +676,9 @@ public class XFormParser {
 		String nodesetStr = e.getAttributeValue("", "nodeset");
 		XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
 		itemset.nodesetExpr = new XPathConditional(path);
-		itemset.nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), qparent));
-
+		itemset.contextRef = getFormElementRef(qparent);
+		itemset.nodesetRef = FormInstance.unpackReference(getAbsRef(new XPathReference(path.getReference(true)), itemset.contextRef));
+		
 		for (int i = 0; i < e.getChildCount(); i++) {
 			int type = e.getType(i);
 			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
@@ -794,19 +795,18 @@ public class XFormParser {
 		parent.addChild(group);
 	}
 
-	private static IDataReference getAbsRef (IDataReference ref, IFormElement parent) {
-		TreeReference parentRef = null;
-
-		if (parent instanceof FormDef) {
-			parentRef = TreeReference.rootRef();
-			parentRef.add(instanceNode.getName(), 0);
-		} else if (parent instanceof GroupDef) {
-			parentRef = (TreeReference)((GroupDef)parent).getBind().getReference();
-		} else if (parent instanceof QuestionDef) {
-			parentRef = (TreeReference)((QuestionDef)parent).getBind().getReference();	
+	private static TreeReference getFormElementRef (IFormElement fe) {
+		if (fe instanceof FormDef) {
+			TreeReference ref = TreeReference.rootRef();
+			ref.add(instanceNode.getName(), 0);
+			return ref;
+		} else {
+			return (TreeReference)fe.getBind().getReference();	
 		}
-		
-		return getAbsRef(ref, parentRef);
+	}
+	
+	private static IDataReference getAbsRef (IDataReference ref, IFormElement parent) {
+		return getAbsRef(ref, getFormElementRef(parent));
 	}
 	
 	//take a (possibly relative) reference, and make it absolute based on its parent

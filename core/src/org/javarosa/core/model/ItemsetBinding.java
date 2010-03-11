@@ -27,6 +27,9 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	
 	public TreeReference nodesetRef;   //absolute ref of itemset source nodes
 	public IConditionExpr nodesetExpr; //path expression for source nodes; may be relative, may contain predicates
+	public TreeReference contextRef;   //context ref for nodesetExpr; ref of the control parent (group/formdef) of itemset question
+	   //note: this is only here because its currently impossible to both (a) get a form control's parent, and (b)
+       //convert expressions into refs while preserving predicates. once these are fixed, this field can go away
 	
 	public TreeReference labelRef;     //absolute ref of label
 	public IConditionExpr labelExpr;   //path expression for label; may be relative, no predicates  
@@ -87,6 +90,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		nodesetRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 		nodesetExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		contextRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 		labelRef = (TreeReference)ExtUtil.read(in, TreeReference.class, pf);
 		labelExpr = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		valueRef = (TreeReference)ExtUtil.read(in, new ExtWrapNullable(TreeReference.class), pf);
@@ -99,6 +103,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, nodesetRef);
 		ExtUtil.write(out, new ExtWrapTagged(nodesetExpr));
+		ExtUtil.write(out, contextRef);
 		ExtUtil.write(out, labelRef);
 		ExtUtil.write(out, new ExtWrapTagged(labelExpr));
 		ExtUtil.write(out, new ExtWrapNullable(valueRef));

@@ -90,16 +90,10 @@ public class FormEntryPrompt extends FormEntryCaption {
 		ItemsetBinding itemset = q.getDynamicChoices();
     	if (itemset != null) {
     		if (!dynamicChoicesPopulated) {
-    			form.populateDynamicChoices(itemset, mTreeElement);
+    			form.populateDynamicChoices(itemset);
     			dynamicChoicesPopulated = true;
     		}
-    		Vector<SelectChoice> choices = itemset.getChoices();
-    		
-    		if (choices.size() == 0) {
-    			throw new RuntimeException("dynamic select question has no choices!");
-    		}
-    		
-    		return choices;
+    		return itemset.getChoices();
     	} else { //static choices
     		return getQuestion().getChoices();
     	}
