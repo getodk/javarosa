@@ -18,13 +18,9 @@ import org.xmlpull.v1.XmlPullParser;
  *
  */
 public class CommUtil {
-
+	
 	public static Document getXMLResponse (byte[] response) {
-		try {
-			return getXMLResponse(new InputStreamReader(new ByteArrayInputStream(response), "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			throw new FatalException("can't happen; utf8 must be supported", e);
-		}
+		return getXMLResponse(getReader(response));
 	}
 
 	public static Document getXMLResponse (Reader reader) {
@@ -51,5 +47,21 @@ public class CommUtil {
     	
     	return doc;
     }
+	
+	public static String getString (byte[] data) {
+		try {
+			return new String(data, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new FatalException("can't happen; utf8 must be supported", e);
+		}
+	}
+
+	public static Reader getReader (byte[] data) {
+		try {
+			return new InputStreamReader(new ByteArrayInputStream(data), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new FatalException("can't happen; utf8 must be supported", e);
+		}
+	}
 	
 }
