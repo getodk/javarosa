@@ -64,6 +64,9 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		
 		for(int i=0; i < caseElement.getNumChildren(); ++i ){
 			TreeElement kid = caseElement.getChildAt(i);
+			if(!caseElement.isRelevant()) {
+				continue;
+			}
 			if(kid.getName().equals("create")) {
 				if(kid.isRelevant()) {
 					c = processCaseCreate(kid,caseId, date);
@@ -151,6 +154,9 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		
 		for(int i=0; i < create.getNumChildren(); ++i ){
 			TreeElement kid = create.getChildAt(i);
+			if(!kid.isRelevant()) {
+				continue;
+			}
 			if(kid.getName().equals("case_type_id")) {
 				caseTypeId = (String)serializer.serializeAnswerData(kid.getValue());
 			}
@@ -186,6 +192,9 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 	private void processCaseMutate(TreeElement mutate,Case c, Date date) throws MalformedCaseModelException {
 		for(int i=0; i < mutate.getNumChildren(); ++i ){
 			TreeElement kid = mutate.getChildAt(i);
+			if(!kid.isRelevant()) {
+				continue;
+			}
 			if(kid.getName().equals("case_type_id")) {
 				c.setTypeId((String)serializer.serializeAnswerData(kid.getValue()));
 			}
@@ -237,6 +246,9 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		
 		for(int i=0; i < referral.getNumChildren(); ++i ){
 			TreeElement kid = referral.getChildAt(i);
+			if(!kid.isRelevant()) {
+				continue;
+			}
 			if(kid.getName().equals("open")) {
 				Vector types = kid.getChildrenWithName("referral_types");
 				if(types.size() < 1) {
@@ -281,6 +293,9 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 			TreeElement element = (TreeElement)children.pop();
 			for(int i =0; i < element.getNumChildren(); ++i) {
 				TreeElement caseElement = element.getChildAt(i);
+				if(!caseElement.isRelevant()) {
+					continue;
+				}
 				if(caseElement.getName().equals("case")) {
 					caseElements.addElement(caseElement);
 				} else {				
