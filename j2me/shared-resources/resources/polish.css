@@ -61,17 +61,36 @@ colors {
 }
 
 .View_All_Header extends View_All_Form {
+	padding: 2;
+	padding-top: 2;
+	padding-bottom: 2;
+	padding-right: 2;
+	font-face: proportional;
+	font-size: small;
 	font-style: bold;
-	font-color: #000033;
+	font-color: #fff;
 	layout: left | expand;
-	
+	text-effect: split;
+	text-split-bottom-color: #ddd;
+	background {
+		type: split;
+		top-color: #073b46;
+		bottom-color: #042931;
+		split-pos: 50%;
+		arc-width: 4;
+		arc-height:4;
+	}
 	always-include: true
 }
+
+.View_All_Header:hover {
+}
+
 
 .View_All_Prompt extends View_All_Form {
 	background-color: white;	
 	layout: left | expand;
-	always-include: true
+	always-include: true;	
 }
 
 .SingleQuestionScreen_Form {
