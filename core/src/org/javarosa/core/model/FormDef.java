@@ -628,11 +628,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return template;
 	}
 
-	public void populateDynamicChoices (ItemsetBinding itemset) {
+	public void populateDynamicChoices (ItemsetBinding itemset, TreeReference curQRef) {
 		Vector<SelectChoice> choices = new Vector<SelectChoice>();
 		
 		Vector<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getInstance(),
-				new EvaluationContext(exprEvalContext, itemset.contextRef));
+				new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
 		
 		for (int i = 0; i < matches.size(); i++) {
 			TreeReference item = matches.elementAt(i);
