@@ -123,7 +123,9 @@ public class FormSummaryView extends List {
 	private String getText(FormEntryPrompt prompt) {
 		String line = "";
 		line += prompt.getLongText() + " => ";
-
+		if (prompt.isRequired() && prompt.getAnswerValue() == null) {
+			line = "*" + line;
+		}
 		IAnswerData answerValue = prompt.getAnswerValue();
 		if (answerValue != null) {
 			line += answerValue.getDisplayText();
