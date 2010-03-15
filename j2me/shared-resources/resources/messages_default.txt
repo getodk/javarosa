@@ -127,8 +127,6 @@ view.sending.ok=ok
 # inaenda in swahili
 view.sending.endOfSendingMessage=
 
- 
-
 prop.healthunit=Health Unit
 prop.healthunitcode=Health Unit Code
 prop.subcounty=Subcounty
@@ -136,7 +134,7 @@ prop.district=District
 prop.hsd=HSD
 prop.finyear=Financial Year
 
-
+form.property.url=URL:
 
 form.login.commcareversion=CommCare Version
 form.login.buildnumber=Build Number

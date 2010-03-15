@@ -59,7 +59,10 @@ public abstract class GetFormListHttpState implements State,HandledCommandListen
 	
 	private void init(){
 		getListUrl = getUrl(); 
-		credentials = "?user=" + getUserName();
+		if (getListUrl.indexOf("?")>=0) 
+			credentials = "";
+		else
+			credentials = "?user=" + getUserName();
 		requestPayload = credentials;
 	}
 	
