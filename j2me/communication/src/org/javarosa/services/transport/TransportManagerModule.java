@@ -4,11 +4,13 @@
 package org.javarosa.services.transport;
 
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.storage.IStorageFactory;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.services.storage.WrappingStorageUtility;
+import org.javarosa.j2me.reference.HttpRoot;
 import org.javarosa.j2me.storage.rms.RMSStorageUtilityIndexed;
 import org.javarosa.services.transport.impl.TransportMessageSerializationWrapper;
 import org.javarosa.services.transport.impl.TransportMessageStore;
@@ -35,6 +37,7 @@ public class TransportManagerModule implements IModule {
 		} ;
 		StorageManager.registerStorage(TransportMessageStore.Q_STORENAME, new WrappingStorageUtility(TransportMessageStore.Q_STORENAME,new TransportMessageSerializationWrapper(),f));
 		StorageManager.registerStorage(TransportMessageStore.RECENTLY_SENT_STORENAME, new WrappingStorageUtility(TransportMessageStore.RECENTLY_SENT_STORENAME,new TransportMessageSerializationWrapper(),f));
+		ReferenceManager._().addRawReferenceRoot(new HttpRoot());
 	}
 
 }

@@ -223,6 +223,12 @@ public class Case implements Persistable, Restorable, IMetaData {
 			return name;
 		} else if("external-id".equals(key)) {
 			return extId;
+		} else if("status".equals(key)) {
+			if(closed) {
+				return "closed";
+			} else {
+				return "open";
+			}
 		}
 		return data.get(key);
 	}
