@@ -116,6 +116,14 @@ public abstract class Entity <E extends Persistable> {
 	 * @return headers
 	 */
 	public abstract String[] getHeaders (boolean detailed);
+	
+	public int[] getStyleHints (boolean header) {
+		int[] empty = new int[this.getHeaders(false).length];
+		for(int i = 0; i < empty.length ; ++i ) {
+			empty[i] = -1;
+		}
+		return empty;
+	}
 
 	/**
 	 * Return the data to be shown for this entity on the list screen. Data should correspond one-for-one

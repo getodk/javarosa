@@ -20,6 +20,8 @@
 package org.javarosa.core.util;
 
 import org.javarosa.core.api.IModule;
+import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.core.reference.ResourceRoot;
 import org.javarosa.core.services.PrototypeManager;
 
 /**
@@ -38,5 +40,6 @@ public class JavaRosaCoreModule implements IModule {
 				"org.javarosa.core.services.locale.TableLocaleSource"
 		};		
 		PrototypeManager.registerPrototypes(classes);
+		ReferenceManager._().addRawReferenceRoot(new ResourceRoot());
 	}
 }

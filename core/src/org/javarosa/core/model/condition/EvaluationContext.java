@@ -27,11 +27,13 @@ import org.javarosa.core.model.instance.TreeReference;
 public class EvaluationContext {
 	private TreeReference contextNode; //unambiguous ref used as the anchor for relative paths
 	private Hashtable functionHandlers;
+	private Hashtable variables;
 	
 	public boolean isConstraint; //true if we are evaluating a constraint
 	public IAnswerData candidateValue; //if isConstraint, this is the value being validated
 	public boolean isCheckAddChild; //if isConstraint, true if we are checking the constraint of a parent node on how
 									//  many children it may have
+	
 	
 	public EvaluationContext (EvaluationContext base, TreeReference context) {
 		this.functionHandlers = base.functionHandlers;
@@ -40,6 +42,7 @@ public class EvaluationContext {
 	
 	public EvaluationContext () {
 		functionHandlers = new Hashtable();
+		variables = new Hashtable();
 	}
 	
 	public TreeReference getContextRef () {
@@ -52,5 +55,13 @@ public class EvaluationContext {
 	
 	public Hashtable getFunctionHandlers () {
 		return functionHandlers;
+	}
+	
+	public void setVariable(String name, Object value) {
+		variables.put(name, value);
+	}
+	
+	public Object getVariable(String name) {
+		return variables.get(name);
 	}
 }
