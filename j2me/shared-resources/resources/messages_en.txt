@@ -137,6 +137,7 @@ activity.login.tryagain=Please try again
 activity.login.demomode=Demo Mode
 activity.login.demomode.intro=You are starting CommCare in Demo mode. Demo mode is for testing and practice only! Log in with your user account to perform client visits.
 
+form.property.url=URL:
 
 form.user.name=Name (ie: loginID):
 form.user.password=User Password:
