@@ -20,7 +20,9 @@
 package org.javarosa.cases.util;
 
 import org.javarosa.cases.model.Case;
+import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.model.utils.PreloadUtils;
@@ -50,8 +52,22 @@ public class CasePreloadHandler implements IPreloadHandler {
 	 * @see org.javarosa.core.model.utils.IPreloadHandler#handlePreload(java.lang.String)
 	 */
 	public IAnswerData handlePreload(String preloadParams) {
-		Object property = c.getProperty(preloadParams);
-		return PreloadUtils.wrapIndeterminedObject(property);
+		 if("name".equals(preloadParams)) {
+			return new StringData(c.getName());
+		 } else if("external-id".equals(preloadParams)) {
+			return new StringData(c.getExternalId());
+	 	 } else if("status".equals(preloadParams)) {
+		 	if(c.isClosed()) {
+				return new StringData("closed");
+			} else {
+				return new StringData("open");
+			}
+		} else if("date-opened".equals(preloadParams)) {
+			return new DateData(c.getDateOpened());
+		} else {
+			Object retVal = c.getProperty(preloadParams);
+			return PreloadUtils.wrapIndeterminedObject(retVal);
+		}
 	}
 
 	/* (non-Javadoc)

@@ -38,6 +38,7 @@ public class EvaluationContext {
 	public EvaluationContext (EvaluationContext base, TreeReference context) {
 		this.functionHandlers = base.functionHandlers;
 		this.contextNode = context;
+		this.variables = new Hashtable();
 	}
 	
 	public EvaluationContext () {
