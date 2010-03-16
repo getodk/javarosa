@@ -59,6 +59,7 @@ public abstract class GetFormHttpState implements State,TrivialTransitions,Handl
 		
 		try {
 			sendThread = TransportService.send(message);
+			sendThread.addListener(this);
 		} catch (TransportException e) {
 			//TODO: Isn't there a screen where this can be displayed?
 			fail("Transport Error while downloading form!" + e.getMessage());
