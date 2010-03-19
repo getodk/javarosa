@@ -3,10 +3,14 @@
  */
 package org.javarosa.xform.schema;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.TreeMap;
@@ -111,8 +115,14 @@ public class FormTranslationFormatter {
 		return writer.getBuffer();
 	}
 	
-	public static StringBuffer turnTranslationsCSVtoItext(InputStream stream) {
-		InputStreamReader reader = new InputStreamReader(stream);
+	public static void turnTranslationsCSVtoItext(InputStream stream, OutputStream output, String encoding, String printEncoding) {
+		InputStreamReader reader;
+		if(encoding == null) {
+			reader = new InputStreamReader(stream);
+		} else {
+			Charset charset = Charset.forName(encoding);
+			reader = new InputStreamReader(stream, charset);
+		}
 		
 		//Lots of Dictionaries!
 		//Treemap is important here to keep ordering constraints.
@@ -220,23 +230,44 @@ public class FormTranslationFormatter {
 		
 		doc.addChild(Document.ELEMENT, itext);
 		
-		StringWriter writer = new StringWriter();
 		
 		MXSerializer ser = new MXSerializer();
 		
 		ser.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "    ");
 		ser.setProperty("http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n");
-		ser.setOutput(writer);
+		
 		try {
+			
+		if(encoding == null) {
+			StringWriter writer = new StringWriter();
+			ser.setOutput(writer);
+			
 			doc.write(ser);
+			
+			StringBuffer outputBuffer = new StringBuffer();
+			outputBuffer.append(writer);
+			PrintStream p = new PrintStream(output);
+			p.println(outputBuffer);
+		} else if(printEncoding == null){ 
+			ser.setOutput(output, encoding);
+			
+			doc.write(ser);
+		} else {
+			ser.setOutput(output, printEncoding);
+			
+			doc.write(ser);
+		}
+
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		
-		StringBuffer outputBuffer = new StringBuffer();
-		outputBuffer.append(writer);
-		return outputBuffer;
+	}
+	
+	public static void turnTranslationsCSVtoItext(InputStream stream, OutputStream output) {
+		turnTranslationsCSVtoItext(stream, output, null, null);
 	}
 	
 }
