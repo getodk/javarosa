@@ -192,9 +192,9 @@ public class Case implements Persistable, Restorable, IMetaData {
 		extId = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		name = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		closed = ExtUtil.readBool(in);
-		dateOpened = (Date)ExtUtil.read(in, new ExtWrapNullable(Date.class));
+		dateOpened = (Date)ExtUtil.read(in, new ExtWrapNullable(Date.class), pf);
 		recordId = ExtUtil.readInt(in);
-		data = (Hashtable)ExtUtil.read(in, new ExtWrapMapPoly(String.class, true));
+		data = (Hashtable)ExtUtil.read(in, new ExtWrapMapPoly(String.class, true), pf);
 	}
 
 	/* (non-Javadoc)
