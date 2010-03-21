@@ -111,31 +111,6 @@ public class FormEntryModel {
 					"Invalid query for Question prompt. Non-Question object at the form index");
 		}
 	}
-	
-	/**
-	 * Is this a question event?
-	 * 
-	 * @param index
-	 * @return true if the index references a question
-	 */
-	public boolean isQuestionPrompt(FormIndex index) {
-		if (form.getChild(index) instanceof QuestionDef)
-			return true;
-		return false;
-	}
-	
-	/**
-	 * Is the current index a question event?
-	 * 
-	 * @param index
-	 * @return true if the current index references a question
-	 */
-	public boolean currentIndexIsQuestionPrompt() {
-		if (form.getChild(currentFormIndex) instanceof QuestionDef)
-			return true;
-		return false;
-	}
-
 
 	public FormEntryPrompt getCurrentQuestionPrompt() {
 		return getQuestionPrompt(currentFormIndex);
