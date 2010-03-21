@@ -78,8 +78,25 @@ public class Logger {
 		//log exception
 		exception(e, true);
 				
+		//print stacktrace
+		e.printStackTrace();
+		
 		//crash
-		throw new FatalException("unhandled exception in " + thread, e);
+		final FatalException crashException = new FatalException("unhandled exception in " + thread, e);
+		
+		//depending on how the code was invoked, a straight 'throw' won't always reliably crash the app
+		//throwing in a thread should work (at least on our nokias)
+		new Thread() {
+			public void run () {
+				throw crashException;
+			}
+		}.start();
+		
+		//still do plain throw as a fallback
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException ie) { }
+		throw crashException;
 	}
 	
 	public static void crashTest (String msg) {
