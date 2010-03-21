@@ -46,7 +46,7 @@ public class Harness {
 			mode = MODE_CSV_IMPORT;
 		} else {
 			System.out.println("Usage: java -jar form_translate.jar [schema|summary|csvdump] < form.xml > output");
-			System.out.println("or: java -jar form_translate.jar [csvimport] < translations.csv > itextoutput");
+			System.out.println("or: java -jar form_translate.jar csvimport [encoding] < translations.csv > itextoutput");
 			System.exit(1);
 		}
 		
@@ -56,7 +56,16 @@ public class Harness {
 		
 		if(mode == MODE_CSV_IMPORT) {
 			System.setOut(sysOut);
-			System.out.println(FormTranslationFormatter.turnTranslationsCSVtoItext(System.in));
+			if(args.length > 1) {
+				String encoding = args[1];
+				FormTranslationFormatter.turnTranslationsCSVtoItext(System.in, System.out, encoding, null);
+			} if(args.length > 2) {
+				String incoding = args[1];
+				String outcoding = args[2];
+				FormTranslationFormatter.turnTranslationsCSVtoItext(System.in, System.out, incoding, outcoding );
+			} else {
+				FormTranslationFormatter.turnTranslationsCSVtoItext(System.in, System.out);
+			}
 			System.exit(0);
 		}
 		FormDef f = XFormUtils.getFormFromInputStream(System.in);

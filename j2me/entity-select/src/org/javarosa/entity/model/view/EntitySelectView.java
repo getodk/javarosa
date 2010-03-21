@@ -44,6 +44,10 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	//#if javarosa.patientselect.formfactor == nokia-s40 or javarosa.patientselect.formfactor == sony-k610i
 	//# private static final int MAX_ROWS_ON_SCREEN = 5;
 	//# private static final int SCROLL_INCREMENT = 4;	
+	//#elif javarosa.patientselect.formfactor == generic-mcs
+	//note: should have a real target for 2700c; shouldn't be using generic-mcs
+	//# private static final int MAX_ROWS_ON_SCREEN = 6;
+	//# private static final int SCROLL_INCREMENT = 5;	
 	//#else
 	private static final int MAX_ROWS_ON_SCREEN = 10;
 	private static final int SCROLL_INCREMENT = 5;	
