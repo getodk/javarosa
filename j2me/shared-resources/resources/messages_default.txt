@@ -53,7 +53,9 @@ polish.predictive.setup.cmd.yes=Yes
 polish.predictive.setup.cmd.no=No
 
 #Javarosa-specific
-
+plussign=/add.png
+question=/question.png
+questioncompulsory=/questioncompulsory.png
 splashscreen=/splash.gif
 
 
