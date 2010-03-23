@@ -88,7 +88,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	// nodes with the Condition
 	// that determines their
 	// relevancy
-	private EvaluationContext exprEvalContext;
+	public EvaluationContext exprEvalContext;
 
 	private QuestionPreloader preloader = new QuestionPreloader();
 
