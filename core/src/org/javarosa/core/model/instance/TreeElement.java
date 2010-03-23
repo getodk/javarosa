@@ -203,7 +203,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	public void removeChild(TreeElement child) {
 		children.removeElement(child);
-
 	}
 
 	public void removeChild(String name, int multiplicity) {

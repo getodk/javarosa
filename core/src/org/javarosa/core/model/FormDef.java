@@ -303,45 +303,63 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 		return true;
 	}
-
 	
-	/**
-	 * for each dest node
-	 *   
-	 * 
-	 * @param q
-	 * @param targetNode
-	 * @param data
-	 */
-	
-	//ITEMSET TODO identify dest nodes that already exist (and are in answer) and don't overwrite them
 	public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data) {
 		ItemsetBinding itemset = q.getDynamicChoices();
 		TreeReference targetRef = targetNode.getRef();
 		TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
 
 		Vector<Selection> selections = null;
+		Vector<String> selectedValues = new Vector<String>();
 		if (data instanceof SelectMultiData) {
 			selections = (Vector<Selection>)data.getValue();
 		} else if (data instanceof SelectOneData) {
 			selections = new Vector<Selection>();
 			selections.addElement((Selection)data.getValue());
 		}
-		
-		//get all existing dest nodes and delete them
+		if (itemset.valueRef != null) {
+			for (int i = 0; i < selections.size(); i++) {
+				selectedValues.addElement(selections.elementAt(i).choice.getValue());
+			}
+		}
+					
+		//delete existing dest nodes that are not in the answer selection
+		Hashtable<String, TreeElement> existingValues = new Hashtable<String, TreeElement>();
 		Vector<TreeReference> existingNodes = getInstance().expandReference(destRef);
 		for (int i = 0; i < existingNodes.size(); i++) {
-			targetNode.removeChild(getInstance().resolveReference(existingNodes.elementAt(i)));
+			TreeElement node = getInstance().resolveReference(existingNodes.elementAt(i));
+			
+			if (itemset.valueRef != null) {
+				String value = itemset.getRelativeValue().evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, node.getRef()));
+				if (selectedValues.contains(value)) {
+					existingValues.put(value, node); //cache node if in selection and already exists
+				}
+			}
+
+			//delete from target
+			targetNode.removeChild(node);
 		}
-		//TODO don't always delete existing -- delete all that are not in the selected set
 		
+		//copy in nodes for new answer; preserve ordering in answer
 		for (int i = 0; i < selections.size(); i++) {
 			Selection s = selections.elementAt(i);
 			SelectChoice ch = s.choice;
 			
-			getInstance().copyItemsetNode(ch.copyNode, destRef, this);
+			TreeElement cachedNode = null;
+			if (itemset.valueRef != null) {
+				String value = ch.getValue();
+				if (existingValues.containsKey(value)) {
+					cachedNode = existingValues.get(value);
+				}
+			}
+
+			if (cachedNode != null) {
+				cachedNode.setMult(i);
+				targetNode.addChild(cachedNode);
+			} else {
+				getInstance().copyItemsetNode(ch.copyNode, destRef, this);
+			}
 		}
-		//copy all that are not in the answer set
 		
 		triggerTriggerables(destRef); // trigger conditions that depend on the creation of these new nodes
 		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
