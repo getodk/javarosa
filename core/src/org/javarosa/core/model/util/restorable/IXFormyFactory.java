@@ -17,6 +17,7 @@
 package org.javarosa.core.model.util.restorable;
 
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
@@ -28,4 +29,7 @@ public interface IXFormyFactory {
 	FormInstance parseRestore (byte[] data, Class restorableType);
 	IAnswerData parseData (String textVal, int dataType, TreeReference ref, FormDef f);
 	String serializeData (IAnswerData data);
+
+	//kinda ghetto
+	IConditionExpr refToPathExpr (TreeReference ref);
 }

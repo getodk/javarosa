@@ -304,6 +304,16 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return true;
 	}
 
+	
+	/**
+	 * for each dest node
+	 *   
+	 * 
+	 * @param q
+	 * @param targetNode
+	 * @param data
+	 */
+	
 	//ITEMSET TODO identify dest nodes that already exist (and are in answer) and don't overwrite them
 	public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data) {
 		ItemsetBinding itemset = q.getDynamicChoices();
@@ -323,7 +333,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		for (int i = 0; i < existingNodes.size(); i++) {
 			targetNode.removeChild(getInstance().resolveReference(existingNodes.elementAt(i)));
 		}
-		//TODO don't always delete existing
+		//TODO don't always delete existing -- delete all that are not in the selected set
 		
 		for (int i = 0; i < selections.size(); i++) {
 			Selection s = selections.elementAt(i);
@@ -331,6 +341,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			
 			getInstance().copyItemsetNode(ch.copyNode, destRef, this);
 		}
+		//copy all that are not in the answer set
 		
 		triggerTriggerables(destRef); // trigger conditions that depend on the creation of these new nodes
 		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
@@ -643,7 +654,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			
 			if (itemset.copyMode) {
 				copyNode = this.getInstance().resolveReference(itemset.copyRef.contextualize(item));
-			} else {
+			}
+			if (itemset.valueRef != null) {
 				value = itemset.valueExpr.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, item));
 			}
 			

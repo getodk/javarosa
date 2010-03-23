@@ -227,6 +227,18 @@ public class TreeReference implements Externalizable {
 		return newRef;
 	}
 	
+	public TreeReference relativize (TreeReference parent) {
+		if (parent.isParentOf(this, false)) {
+			TreeReference relRef = selfRef();
+			for (int i = parent.size(); i < this.size(); i++) {
+				relRef.add(this.getName(i), INDEX_UNBOUND);
+			}
+			return relRef;
+		} else {
+			return null;
+		}
+	}
+	
 	//turn unambiguous ref into a generic ref
 	public TreeReference genericize () {	
 		TreeReference genericRef = clone();
