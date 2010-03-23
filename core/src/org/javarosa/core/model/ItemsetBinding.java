@@ -88,20 +88,16 @@ public class ItemsetBinding implements Externalizable, Localizable {
 		return destRef;
 	}
 	
-	public IConditionExpr getValueRelative () {
+	public IConditionExpr getRelativeValue () {
 		TreeReference relRef = null;
 		
 		if (copyRef == null) {
-			relRef = valueRef; //must be absolute
+			relRef = valueRef; //must be absolute in this case
 		} else if (valueRef != null) {
-			relRef = valueRef.relativize(contextRef);
+			relRef = valueRef.relativize(copyRef);
 		}
 		
-		if (relRef == null) {
-			return null;
-		} else {
-			return RestoreUtils.xfFact.refToPathExpr(relRef);
-		}
+		return relRef != null ? RestoreUtils.xfFact.refToPathExpr(relRef) : null;
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
