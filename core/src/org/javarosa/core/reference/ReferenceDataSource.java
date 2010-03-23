@@ -65,7 +65,8 @@ public class ReferenceDataSource implements LocaleDataSource {
 	 */
 	public OrderedHashtable getLocalizedText() {
 		try {
-			return LocalizationUtils.parseLocaleInput(ReferenceManager._().DeriveReference(referenceURI).getStream());
+			InputStream is = ReferenceManager._().DeriveReference(referenceURI).getStream();
+			return LocalizationUtils.parseLocaleInput(is);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("IOException while getting localized text at reference " + referenceURI);
