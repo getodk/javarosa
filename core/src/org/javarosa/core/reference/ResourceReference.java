@@ -5,6 +5,7 @@ package org.javarosa.core.reference;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author ctsims
@@ -18,18 +19,12 @@ public class ResourceReference implements Reference {
 		this.URI = URI;
 	}
 	
-	public boolean doesBinaryExist() {
+	public boolean doesBinaryExist() throws IOException {
 		InputStream is = System.class.getResourceAsStream(URI);
 		if(is == null) {
 			return false;
 		} else {
-			try {
-				is.close();
-			} catch(IOException e) {
-				//TODO: Honestly, I dunno what to do about this, it happens
-				//sometimes...
-				e.printStackTrace();
-			}
+			is.close();
 			return true;
 		}
 	}
@@ -53,5 +48,13 @@ public class ResourceReference implements Reference {
 		} else {
 			return false;
 		}
+	}
+
+	public OutputStream getOutputStream() throws IOException {
+		throw new IOException("Resource references are read-only URI's");
+	}
+
+	public void remove() throws IOException {
+		throw new IOException("Resource references are read-only URI's");
 	}
 }
