@@ -162,7 +162,7 @@ public class XFormAnswerDataParser {
 	private static Selection getSelection(String choiceValue, QuestionDef q) {
 		Selection s;
 		
-		if (q == null) {
+		if (q == null || q.getDynamicChoices() != null) {
 			s = new Selection(choiceValue);
 		} else {
 			SelectChoice choice = q.getChoiceForValue(choiceValue);
