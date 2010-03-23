@@ -95,6 +95,9 @@ public class Selection implements Externalizable {
 	}
 		
 	public void attachChoice (QuestionDef q) {
+		if (q.getDynamicChoices() != null) //can't attach dynamic choices because they aren't guaranteed to exist yet
+			return;
+		
 		SelectChoice choice = null;
 		
 		if (index != -1 && index < q.getNumChoices()) {
