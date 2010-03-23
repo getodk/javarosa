@@ -8,6 +8,7 @@ import java.util.Vector;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -38,7 +39,7 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	public boolean copyMode;           //true = copy subtree; false = copy string value
 	public TreeReference copyRef;      //absolute ref to copy
 	public TreeReference valueRef;     //absolute ref to value
-	public IConditionExpr valueExpr;   //path expression for value; may be relative, no predicates
+	public IConditionExpr valueExpr;   //path expression for value; may be relative, no predicates (must be relative if copy mode)
 
 	private TreeReference destRef; //ref that identifies the repeated nodes resulting from this itemset
 								   //not serialized -- set by QuestionDef.setDynamicChoices()
@@ -85,6 +86,22 @@ public class ItemsetBinding implements Externalizable, Localizable {
 	
 	public TreeReference getDestRef () {
 		return destRef;
+	}
+	
+	public IConditionExpr getValueRelative () {
+		TreeReference relRef = null;
+		
+		if (copyRef == null) {
+			relRef = valueRef; //must be absolute
+		} else if (valueRef != null) {
+			relRef = valueRef.relativize(contextRef);
+		}
+		
+		if (relRef == null) {
+			return null;
+		} else {
+			return RestoreUtils.xfFact.refToPathExpr(relRef);
+		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {

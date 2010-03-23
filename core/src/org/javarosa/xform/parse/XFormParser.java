@@ -728,6 +728,14 @@ public class XFormParser {
 			throw new XFormParseException("<itemset> requires <copy> or <value>");
 		}
 		
+		if (itemset.copyRef != null) {
+			if (itemset.valueRef == null) {
+				System.err.println("WARNING: <itemset>s with <copy> are strongly recommended to have <value> as well; pre-selecting and default answers will not work properly otherwise");
+			} else if (!itemset.copyRef.isParentOf(itemset.valueRef, false)) {
+				throw new XFormParseException("<value> is outside <copy>");					
+			}
+		}
+		
 		q.setDynamicChoices(itemset);
 		itemsets.addElement(itemset);
 	}
