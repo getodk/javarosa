@@ -16,15 +16,22 @@
 
 package org.javarosa.form.api;
 
+import java.util.Hashtable;
 import java.util.Vector;
 
+import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.formmanager.view.IQuestionWidget;
 
 /**
@@ -71,9 +78,71 @@ public class FormEntryPrompt extends FormEntryCaption {
         return null;
     }
 
-    //ITEMSET TODO handle mapping of saved itemset answers here? xml subtree -> selection based on match against nodeset
+    //note: code overlap with FormDef.copyItemsetAnswer
     public IAnswerData getAnswerValue() {
-        return mTreeElement.getValue();
+    	QuestionDef q = getQuestion();
+    	
+		ItemsetBinding itemset = q.getDynamicChoices();
+    	if (itemset != null) {
+    		if (itemset.valueRef != null) {
+	    		Vector<SelectChoice> choices = getSelectChoices();
+	    		Vector<String> preselectedValues = new Vector<String>();
+
+	    		//determine which selections are already present in the answer
+	    		if (itemset.copyMode) {
+	    			TreeReference destRef = itemset.getDestRef().contextualize(mTreeElement.getRef());
+	    			Vector<TreeReference> subNodes = form.getInstance().expandReference(destRef);
+	    			for (int i = 0; i < subNodes.size(); i++) {
+	    				TreeElement node = form.getInstance().resolveReference(subNodes.elementAt(i));
+    					String value = itemset.getRelativeValue().evalReadable(form.getInstance(), new EvaluationContext(form.exprEvalContext, node.getRef()));
+    					preselectedValues.addElement(value);
+	    			}
+	    		} else {
+	    			Vector<Selection> sels = new Vector<Selection>();
+	    			IAnswerData data = mTreeElement.getValue();
+	    			if (data instanceof SelectMultiData) {
+	    				sels = (Vector<Selection>)data.getValue();
+	    			} else if (data instanceof SelectOneData) {
+	    				sels = new Vector<Selection>();
+	    				sels.addElement((Selection)data.getValue());
+	    			}
+	    			for (int i = 0; i < sels.size(); i++) {
+	    				preselectedValues.addElement(sels.elementAt(i).xmlValue);
+	    			}
+	    		}
+	    			    		  
+    			//populate 'selection' with the corresponding choices (matching 'value') from the dynamic choiceset
+	    		Vector<Selection> selection = new Vector<Selection>();    		
+	    		for (int i = 0; i < preselectedValues.size(); i++) {
+	    			String value = preselectedValues.elementAt(i);
+	    			SelectChoice choice = null;
+	    			for (int j = 0; j < choices.size(); j++) {
+	    				SelectChoice ch = choices.elementAt(j);
+	    				if (value.equals(ch.getValue())) {
+	    					choice = ch;
+	    					break;
+	    				}
+	    			}
+	    			
+	    			selection.addElement(choice.selection());
+	    		}
+	    		
+	    		//convert to IAnswerData
+	    		if (selection.size() == 0) {
+	    			return null;
+	    		} else if (q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
+	    			return new SelectMultiData(selection);
+	    		} else if (q.getControlType() == Constants.CONTROL_SELECT_ONE) {
+	    			return new SelectOneData(selection.elementAt(0)); //do something if more than one selected?
+	    		} else {
+	    			throw new RuntimeException("can't happen");
+	    		}
+    		} else {
+    			return null; //cannot map up selections without <value>
+    		}
+    	} else { //static choices
+            return mTreeElement.getValue();
+    	}
     }
 
     public String getAnswerText() {
@@ -95,7 +164,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     		}
     		return itemset.getChoices();
     	} else { //static choices
-    		return getQuestion().getChoices();
+    		return q.getChoices();
     	}
     }
 
