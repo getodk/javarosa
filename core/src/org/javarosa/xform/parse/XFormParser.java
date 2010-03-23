@@ -730,7 +730,7 @@ public class XFormParser {
 		
 		if (itemset.copyRef != null) {
 			if (itemset.valueRef == null) {
-				System.err.println("WARNING: <itemset>s with <copy> are strongly recommended to have <value> as well; pre-selecting and default answers will not work properly otherwise");
+				System.err.println("WARNING: <itemset>s with <copy> are STRONGLY recommended to have <value> as well; pre-selecting, default answers, and display of answers will not work properly otherwise");
 			} else if (!itemset.copyRef.isParentOf(itemset.valueRef, false)) {
 				throw new XFormParseException("<value> is outside <copy>");					
 			}

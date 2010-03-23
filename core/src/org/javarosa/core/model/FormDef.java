@@ -1202,7 +1202,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public void attachControlsToInstanceData () {
 		attachControlsToInstanceData(instance.getRoot());
 	}
-		
+	
 	private void attachControlsToInstanceData (TreeElement node) {
 		for (int i = 0; i < node.getNumChildren(); i++) {
 			attachControlsToInstanceData(node.getChildAt(i));
@@ -1221,6 +1221,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			QuestionDef q = findQuestionByRef(node.getRef(), this);
 			if (q == null) {
 				throw new RuntimeException("FormDef.attachControlsToInstanceData: can't find question to link");
+			}
+			
+			if (q.getDynamicChoices() != null) {
+				//droos: i think we should do something like initializing the itemset here, so that default answers
+				//can be linked to the selectchoices. however, there are complications. for example, the itemset might
+				//not be ready to be evaluated at form initialization; it may require certain questions to be answered
+				//first. e.g., if we evaluate an itemset and it has no choices, the xform engine will throw an error
+				//itemset TODO
 			}
 			
 			for (int i = 0; i < selections.size(); i++) {
