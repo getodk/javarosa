@@ -26,6 +26,9 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.instance.utils.CompactInstanceWrapper;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -109,7 +112,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	public TreeElement getChild(String name, int multiplicity) {
 		if (name.equals(TreeReference.NAME_WILDCARD)) {
-			return (TreeElement) this.children.elementAt(multiplicity);
+			return (TreeElement) this.children.elementAt(multiplicity); //droos: i'm suspicious of this
 		} else {
 			for (int i = 0; i < this.children.size(); i++) {
 				TreeElement child = (TreeElement) this.children.elementAt(i);
@@ -138,8 +141,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 		for (int i = 0; i < this.children.size(); i++) {
 			TreeElement child = (TreeElement) this.children.elementAt(i);
-			if ((child.getName().equals(name) || name
-					.equals(TreeReference.NAME_WILDCARD))
+			if ((child.getName().equals(name) || name.equals(TreeReference.NAME_WILDCARD))
 					&& (includeTemplate || child.multiplicity != TreeReference.INDEX_TEMPLATE))
 				v.addElement(child);
 		}
@@ -201,7 +203,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	public void removeChild(TreeElement child) {
 		children.removeElement(child);
-
 	}
 
 	public void removeChild(String name, int multiplicity) {
@@ -776,6 +777,50 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		}
 	}
 	
+	//this method is for copying in the answers to an itemset. the template node of the destination
+	//is used for overall structure (including data types), and the itemset source node is used for
+	//raw data. note that data may be coerced across types, which may result in type conversion error
+	//very similar in structure to populate()
+	public void populateTemplate(TreeElement incoming, FormDef f) {
+		if (this.isLeaf()) {
+			IAnswerData value = incoming.getValue();
+			if (value == null) {
+				this.setValue(null);
+			} else {
+				Class classType = CompactInstanceWrapper.classForDataType(this.dataType);
+				
+				if (classType == null) {
+					throw new RuntimeException("data type [" + value.getClass().getName() + "] not supported inside itemset");
+				} else if (classType.isAssignableFrom(value.getClass()) &&
+							!(value instanceof SelectOneData || value instanceof SelectMultiData)) {
+					this.setValue(value);
+				} else {
+					String textVal = RestoreUtils.xfFact.serializeData(value);
+					IAnswerData typedVal = RestoreUtils.xfFact.parseData(textVal, this.dataType, this.getRef(), f);
+					this.setValue(typedVal);
+				}
+			}
+		} else {
+			for (int i = 0; i < this.getNumChildren(); i++) {
+				TreeElement child = this.getChildAt(i);
+				Vector newChildren = incoming.getChildrenWithName(child.getName());
+
+				if (child.repeatable) {
+				    for (int k = 0; k < newChildren.size(); k++) {
+				    	TreeElement template = f.getInstance().getTemplate(child.getRef());
+				        TreeElement newChild = template.deepCopy(false);
+				        newChild.setMult(k);
+				        this.children.insertElementAt(newChild, i + k + 1);
+				        newChild.populateTemplate((TreeElement)newChildren.elementAt(k), f);
+				    }
+				    i += newChildren.size();
+				} else {
+					child.populateTemplate((TreeElement)newChildren.elementAt(0), f);
+				}
+			}
+		}
+	}
+	
 	//return the tree reference that corresponds to this tree element
 	public TreeReference getRef () {
 		TreeElement elem = this;
@@ -852,6 +897,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	public void setParent (TreeElement parent) {
 		this.parent = parent;
+	}
+	
+	public TreeElement getParent () {
+		return parent;
 	}
 	
 	public IAnswerData getValue() {

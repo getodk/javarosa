@@ -88,7 +88,7 @@ public class Recalculate extends Triggerable {
 			return null;
 		}
 		
-		if (Constants.DATATYPE_BOOLEAN == dataType) {
+		if (Constants.DATATYPE_BOOLEAN == dataType || val instanceof Boolean) {
 			//ctsims: We should really be using the boolean datatype for real, it's 
 			//necessary for backend calculations and XSD compliance
 			
@@ -120,7 +120,7 @@ public class Recalculate extends Triggerable {
 		} else if (val instanceof Date) {
 			return new DateData((Date)val);
 		} else {
-			throw new RuntimeException("unrecognized data type in 'calculate' expression");
+			throw new RuntimeException("unrecognized data type in 'calculate' expression: " + val.getClass().getName());
 		}
 	}
 }

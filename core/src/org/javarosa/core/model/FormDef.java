@@ -88,7 +88,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	// nodes with the Condition
 	// that determines their
 	// relevancy
-	private EvaluationContext exprEvalContext;
+	public EvaluationContext exprEvalContext;
 
 	private QuestionPreloader preloader = new QuestionPreloader();
 
@@ -289,10 +289,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		instance.copyNode(template, destRef);
 
 		preloadInstance(instance.resolveReference(destRef));
-		triggerTriggerables(destRef); // trigger conditions that depend on the
-		// creation of this new node
-		initializeTriggerables(destRef); // initialize conditions for the node
-		// (and sub-nodes)
+		triggerTriggerables(destRef); // trigger conditions that depend on the creation of this new node
+		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
 	}
 
 	public boolean canCreateRepeat(TreeReference repeatRef) {
@@ -305,7 +303,69 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 		return true;
 	}
+	
+	public void copyItemsetAnswer(QuestionDef q, TreeElement targetNode, IAnswerData data) {
+		ItemsetBinding itemset = q.getDynamicChoices();
+		TreeReference targetRef = targetNode.getRef();
+		TreeReference destRef = itemset.getDestRef().contextualize(targetRef);
 
+		Vector<Selection> selections = null;
+		Vector<String> selectedValues = new Vector<String>();
+		if (data instanceof SelectMultiData) {
+			selections = (Vector<Selection>)data.getValue();
+		} else if (data instanceof SelectOneData) {
+			selections = new Vector<Selection>();
+			selections.addElement((Selection)data.getValue());
+		}
+		if (itemset.valueRef != null) {
+			for (int i = 0; i < selections.size(); i++) {
+				selectedValues.addElement(selections.elementAt(i).choice.getValue());
+			}
+		}
+					
+		//delete existing dest nodes that are not in the answer selection
+		Hashtable<String, TreeElement> existingValues = new Hashtable<String, TreeElement>();
+		Vector<TreeReference> existingNodes = getInstance().expandReference(destRef);
+		for (int i = 0; i < existingNodes.size(); i++) {
+			TreeElement node = getInstance().resolveReference(existingNodes.elementAt(i));
+			
+			if (itemset.valueRef != null) {
+				String value = itemset.getRelativeValue().evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, node.getRef()));
+				if (selectedValues.contains(value)) {
+					existingValues.put(value, node); //cache node if in selection and already exists
+				}
+			}
+
+			//delete from target
+			targetNode.removeChild(node);
+		}
+		
+		//copy in nodes for new answer; preserve ordering in answer
+		for (int i = 0; i < selections.size(); i++) {
+			Selection s = selections.elementAt(i);
+			SelectChoice ch = s.choice;
+			
+			TreeElement cachedNode = null;
+			if (itemset.valueRef != null) {
+				String value = ch.getValue();
+				if (existingValues.containsKey(value)) {
+					cachedNode = existingValues.get(value);
+				}
+			}
+
+			if (cachedNode != null) {
+				cachedNode.setMult(i);
+				targetNode.addChild(cachedNode);
+			} else {
+				getInstance().copyItemsetNode(ch.copyNode, destRef, this);
+			}
+		}
+		
+		triggerTriggerables(destRef); // trigger conditions that depend on the creation of these new nodes
+		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
+		  //not 100% sure this will work since destRef is ambiguous as the last step, but i think it's supposed to work
+	}
+	
 	/**
 	 * Add a Condition to the form's Collection.
 	 * 
@@ -597,6 +657,41 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return template;
 	}
 
+	public void populateDynamicChoices (ItemsetBinding itemset, TreeReference curQRef) {
+		Vector<SelectChoice> choices = new Vector<SelectChoice>();
+		
+		Vector<TreeReference> matches = itemset.nodesetExpr.evalNodeset(this.getInstance(),
+				new EvaluationContext(exprEvalContext, itemset.contextRef.contextualize(curQRef)));
+		
+		for (int i = 0; i < matches.size(); i++) {
+			TreeReference item = matches.elementAt(i);
+			
+			String label = itemset.labelExpr.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, item));
+			String value = null;
+			TreeElement copyNode = null;
+			
+			if (itemset.copyMode) {
+				copyNode = this.getInstance().resolveReference(itemset.copyRef.contextualize(item));
+			}
+			if (itemset.valueRef != null) {
+				value = itemset.valueExpr.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, item));
+			}
+			
+			SelectChoice choice = new SelectChoice(label, value != null ? value : "dynamic:" + i, itemset.labelIsItext);
+			choice.setIndex(i);
+			if (itemset.copyMode)
+				choice.copyNode = copyNode;
+			
+			choices.addElement(choice);
+		}
+		
+		if (choices.size() == 0) {
+			throw new RuntimeException("dynamic select question has no choices! [" + itemset.nodesetRef + "]");
+		}
+		
+		itemset.setChoices(choices, this.getLocalizer());
+	}
+	
 	/**
 	 * @return the preloads
 	 */
@@ -1107,7 +1202,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public void attachControlsToInstanceData () {
 		attachControlsToInstanceData(instance.getRoot());
 	}
-		
+	
 	private void attachControlsToInstanceData (TreeElement node) {
 		for (int i = 0; i < node.getNumChildren(); i++) {
 			attachControlsToInstanceData(node.getChildAt(i));
@@ -1126,6 +1221,14 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			QuestionDef q = findQuestionByRef(node.getRef(), this);
 			if (q == null) {
 				throw new RuntimeException("FormDef.attachControlsToInstanceData: can't find question to link");
+			}
+			
+			if (q.getDynamicChoices() != null) {
+				//droos: i think we should do something like initializing the itemset here, so that default answers
+				//can be linked to the selectchoices. however, there are complications. for example, the itemset might
+				//not be ready to be evaluated at form initialization; it may require certain questions to be answered
+				//first. e.g., if we evaluate an itemset and it has no choices, the xform engine will throw an error
+				//itemset TODO
 			}
 			
 			for (int i = 0; i < selections.size(); i++) {
