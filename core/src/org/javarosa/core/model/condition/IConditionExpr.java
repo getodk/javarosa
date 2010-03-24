@@ -25,5 +25,6 @@ public interface IConditionExpr extends Externalizable {
 	boolean eval (FormInstance model, EvaluationContext evalContext);
 	Object evalRaw (FormInstance model, EvaluationContext evalContext);
 	String evalReadable (FormInstance model, EvaluationContext evalContext);
+	Vector evalNodeset (FormInstance model, EvaluationContext evalContext);
 	Vector getTriggers (); /* vector of TreeReference */
 }
