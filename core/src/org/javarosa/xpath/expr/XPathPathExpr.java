@@ -39,6 +39,7 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
+import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnsupportedException;
 
@@ -127,61 +128,55 @@ public class XPathPathExpr extends XPathExpression {
 		return ref;
 	}
 
-	public Object eval (FormInstance m, EvaluationContext evalContext) {
-		return eval(m, evalContext, false);
-	}
-		
-	public Object eval (FormInstance m, EvaluationContext evalContext, boolean forceNodeset) {
+	//TODO we still want to make references to non-existent nodes fail? (nodes for which no template exists?)
+	public XPathNodeset eval (FormInstance m, EvaluationContext evalContext) {
 		TreeReference ref = getReference().contextualize(evalContext.getContextRef());
 		
-		//ITEMSET TODO: need to update this; for itemset/copy constraints, need to simulate a whole xml sub-tree here
-		if (evalContext.isConstraint && ref.equals(evalContext.getContextRef())) {
-			return unpackValue(evalContext.candidateValue);
+		Vector<TreeReference> nodesetRefs = m.expandReference(ref);
+		
+		//to fix conditions based on non-relevant data, filter the nodeset by relevancy
+		for (int i = 0; i < nodesetRefs.size(); i++) {
+			if (!m.resolveReference((TreeReference)nodesetRefs.elementAt(i)).isRelevant()) {
+				nodesetRefs.removeElementAt(i);
+				i--;
+			}
 		}
 		
-		boolean nodeset = forceNodeset;
-		if (!nodeset) {
-			//is this a nodeset? it is if the ref contains any unbound multiplicities AND the unbound nodes are repeatable
-			//the way i'm calculating this sucks; there has got to be an easier way to find out if a node is repeatable
-			TreeReference repeatTestRef = TreeReference.rootRef();
-			for (int i = 0; i < ref.size(); i++) {
-				repeatTestRef.add(ref.getName(i), ref.getMultiplicity(i));
-				if (ref.getMultiplicity(i) == TreeReference.INDEX_UNBOUND) {
-					if (m.getTemplate(repeatTestRef) != null) {
-						nodeset = true;
-						break;
-					}
-				}
-			}
-		}
-
-		if (nodeset) {
-			Vector nodesetRefs = m.expandReference(ref);
-			
-			//to fix conditions based on non-relevant data, filter the nodeset by relevancy
-			for (int i = 0; i < nodesetRefs.size(); i++) {
-				if (!m.resolveReference((TreeReference)nodesetRefs.elementAt(i)).isRelevant()) {
-					nodesetRefs.removeElementAt(i);
-					i--;
-				}
-			}
-			
-			return nodesetRefs;
-		} else {
-			return getRefValue(m, ref);
-		}
+		return new XPathNodeset(nodesetRefs, m, evalContext);
 	}
-		
-	public static Object getRefValue (FormInstance model, TreeReference ref) {
-		TreeElement node = model.resolveReference(ref);
-		if (node == null) {
-			throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
+
+//	
+//	boolean nodeset = forceNodeset;
+//	if (!nodeset) {
+//		//is this a nodeset? it is if the ref contains any unbound multiplicities AND the unbound nodes are repeatable
+//		//the way i'm calculating this sucks; there has got to be an easier way to find out if a node is repeatable
+//		TreeReference repeatTestRef = TreeReference.rootRef();
+//		for (int i = 0; i < ref.size(); i++) {
+//			repeatTestRef.add(ref.getName(i), ref.getMultiplicity(i));
+//			if (ref.getMultiplicity(i) == TreeReference.INDEX_UNBOUND) {
+//				if (m.getTemplate(repeatTestRef) != null) {
+//					nodeset = true;
+//					break;
+//				}
+//			}
+//		}
+//	}
+
+	public static Object getRefValue (FormInstance model, EvaluationContext ec, TreeReference ref) {
+		if (ec.isConstraint && ref.equals(ec.getContextRef())) {
+			//ITEMSET TODO: need to update this; for itemset/copy constraints, need to simulate a whole xml sub-tree here
+			return unpackValue(ec.candidateValue);
+		} else {
+			TreeElement node = model.resolveReference(ref);
+			if (node == null) {
+				throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
+			}
+			
+			return unpackValue(node.isRelevant() ? node.getValue() : null);
 		}
-		
-		return unpackValue(node.isRelevant() ? node.getValue() : null);
 	}
 	
-	private static Object unpackValue (IAnswerData val) {
+	public static Object unpackValue (IAnswerData val) {
 		if (val == null) {
 			return "";
 		} else if (val instanceof IntegerData) {
