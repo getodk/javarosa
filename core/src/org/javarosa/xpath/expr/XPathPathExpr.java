@@ -128,10 +128,13 @@ public class XPathPathExpr extends XPathExpression {
 		return ref;
 	}
 
-	//TODO we still want to make references to non-existent nodes fail? (nodes for which no template exists?)
 	public XPathNodeset eval (FormInstance m, EvaluationContext evalContext) {
-		TreeReference ref = getReference().contextualize(evalContext.getContextRef());
+		TreeReference genericRef = getReference();
+		if (m.getTemplatePath(genericRef) == null) {
+			throw new XPathTypeMismatchException("Node " + genericRef.toString() + " does not exist!");
+		}
 		
+		TreeReference ref = genericRef.contextualize(evalContext.getContextRef());
 		Vector<TreeReference> nodesetRefs = m.expandReference(ref);
 		
 		//to fix conditions based on non-relevant data, filter the nodeset by relevancy
@@ -169,6 +172,7 @@ public class XPathPathExpr extends XPathExpression {
 		} else {
 			TreeElement node = model.resolveReference(ref);
 			if (node == null) {
+				//shouldn't happen -- only existent nodes should be in nodeset
 				throw new XPathTypeMismatchException("Node " + ref.toString() + " does not exist!");
 			}
 			
