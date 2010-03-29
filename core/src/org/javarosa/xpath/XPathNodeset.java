@@ -23,7 +23,7 @@ public class XPathNodeset {
 		if (size() == 0) {
 			return XPathPathExpr.unpackValue(null);
 		} else if (size() > 1) {
-			throw new XPathTypeMismatchException("nodeset has more than one node; cannot convert to value");
+			throw new XPathTypeMismatchException("nodeset has more than one node [" + nodeContents() + "]; cannot convert to value");
 		} else {
 			return getValAt(0);
 		}
@@ -58,5 +58,14 @@ public class XPathNodeset {
 		return XPathPathExpr.getRefValue(instance, ec, getRefAt(i));
 	}
 	
-	
+	private String nodeContents () {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < nodes.size(); i++) {
+			sb.append(nodes.elementAt(i).toString());
+			if (i < nodes.size() - 1) {
+				sb.append(";");
+			}
+		}
+		return sb.toString();
+	}
 }
