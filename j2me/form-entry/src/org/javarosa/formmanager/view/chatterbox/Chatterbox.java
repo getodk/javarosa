@@ -31,6 +31,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryModel;
@@ -87,6 +88,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     private Command saveCommand;
     private Command languageSubMenu;
     private Command[] languageCommands;
+    private String[] localeCommandMap;
     //private Command deleteRepeatCommand; //TODO do something with this
     private Gauge progressBar;
         
@@ -168,13 +170,13 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     }
     
     private void setUpCommands () {
-        backCommand = new Command("Back", Command.BACK, 2);
-        exitNoSaveCommand = new Command("Exit", Command.EXIT, 4);
-        exitSaveCommand = new Command("Save and Exit", Command.SCREEN, 4);
-        saveCommand = new Command("Save", Command.SCREEN, 4);
+    	backCommand = new Command(Localization.get("command.back"), Command.BACK, 2);
+    	exitNoSaveCommand = new Command(Localization.get("command.exit"), Command.EXIT, 4);
+    	exitSaveCommand = new Command(Localization.get("command.saveexit"), Command.SCREEN, 4);
+    	saveCommand = new Command(Localization.get("command.save"), Command.SCREEN, 4);
         
         if (multiLingual) {
-            languageSubMenu = new Command("Language", Command.SCREEN, 2);
+        	languageSubMenu = new Command(Localization.get("command.language"), Command.SCREEN, 2);
         	populateLanguages();
         }
         
@@ -201,8 +203,17 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     private void populateLanguages () {
     	String[] availableLocales = model.getForm().getLocalizer().getAvailableLocales();
     	languageCommands = new Command[availableLocales.length];
-    	for (int i = 0; i < languageCommands.length; i++)
-    		languageCommands[i] = new Command(availableLocales[i], Command.SCREEN, 3);
+    	localeCommandMap = new String[languageCommands.length];
+    	for (int i = 0; i < languageCommands.length; i++) {
+    		String label = availableLocales[i];
+    		try {
+    			label = Localization.get("locale.name." + label.toLowerCase());
+    		} catch(NoLocalizedTextException nlte) {
+    			//nothing. Just don't have a way to check for this yet.
+    		}
+    		languageCommands[i] = new Command(label, Command.SCREEN, 3);
+    		localeCommandMap[i] = availableLocales[i];
+    	}
     }
 
     private void initProgressBar () {
@@ -515,10 +526,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		if (multiLingual) {
     			for (int i = 0; i < languageCommands.length; i++) {
     				if (command == languageCommands[i]) {
-    					String label = command.getLabel(); //has form language > mylanguage
-    					int sep = label.indexOf(">");
-    					language = label.substring(sep+1, label.length()).trim();
-    					break;
+    					language = localeCommandMap[i];
     				}
     			}
     		}

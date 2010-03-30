@@ -18,6 +18,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.IQuestionWidget;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
@@ -70,7 +71,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 		//blankSlateStyle = this.getStyle();
 
 		this.cbox = cbox;
-        this.nextCommand = new Command("Next", Command.ITEM, 1);
+		this.nextCommand = new Command(Localization.get("command.next"), Command.ITEM, 1);
         this.prompt = prompt;
         
 		this.collapsedStyle = collapsedStyle;

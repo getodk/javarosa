@@ -53,9 +53,11 @@ polish.predictive.setup.cmd.yes=Yes
 polish.predictive.setup.cmd.no=No
 
 #Javarosa-specific
+
 plussign=/add.png
 question=/question.png
 questioncompulsory=/questioncompulsory.png
+
 splashscreen=/splash.gif
 
 
@@ -128,6 +130,8 @@ view.sending.of=of
 view.sending.ok=ok
 # inaenda in swahili
 view.sending.endOfSendingMessage=
+
+ 
 
 prop.healthunit=Health Unit
 prop.healthunitcode=Health Unit Code
@@ -289,5 +293,44 @@ user.registration.success=User Succesfully Registered!
 user.registration.badresponse=User Registration Received, but Response Couldn't be Recognized. Continue?
 
 command.retry=Retry
+
+
+# -- Begin Entries on March 10, 2010 to complete localizations -- 
+
+command.ok=Ok
+command.back=Back
+command.select=Select
 command.cancel=Cancel
 
+#Chatterbox commands
+command.next=Next
+command.exit=Exit;
+command.saveexit=Save and Exit;
+command.save=Save;
+command.language=Language;
+
+chatterbox.button.trigger=Ok
+
+entity.command.sort=Sort
+entity.find=Find: 
+entity.nomatch=No matches
+entity.detail.title=${0} Detail
+entity.sort.title=Sort by...
+
+case.title=Select Action
+
+loading.screen.message=Loading...
+loading.screen.title=Loading
+
+#Used by chatterbox dynamically for the "name" of the xform itext locale 
+locale.name.english=English
+locale.name.swahili=Swahili
+
+case.name=Name
+case.id=ID
+case.date.opened=Date Opened
+case.status=Currently Open
+
+yes=Yes
+no=No
+date.unknown=unknown

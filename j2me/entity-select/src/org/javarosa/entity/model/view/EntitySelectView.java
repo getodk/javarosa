@@ -26,6 +26,7 @@ import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.Logger;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.model.Entity;
@@ -88,14 +89,14 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		
 		this.sortField = getDefaultSortField();
 		
-		tf = new TextField("Find:  ", "", 20, TextField.ANY);
+		tf = new TextField(Localization.get("entity.find") + " ", "", 20, TextField.ANY);
 		tf.setInputMode(TextField.MODE_UPPERCASE);
 		tf.setItemStateListener(this);
 				
         append(Graphics.BOTTOM, tf);
         
-        exitCmd = new Command("Cancel", Command.CANCEL, 4);
-        sortCmd = new Command("Sort", Command.SCREEN, 3);
+        exitCmd = new Command(Localization.get("command.cancel"), Command.CANCEL, 4);
+        sortCmd = new Command(Localization.get("entity.command.sort"), Command.SCREEN, 3);
         addCommand(exitCmd);
         if (getNumSortFields() > 1) {
         	addCommand(sortCmd);
@@ -226,7 +227,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		this.append(title);
 		
 		if (listIsEmpty()) {
-			this.append( new StringItem("", "(No matches)"));
+			this.append( new StringItem("", "(" + Localization.get("entity.nomatch") + ")"));
 		}
 		
 		for (int i = firstIndex; i < rowIDs.size() && i < firstIndex + MAX_ROWS_ON_SCREEN; i++) {

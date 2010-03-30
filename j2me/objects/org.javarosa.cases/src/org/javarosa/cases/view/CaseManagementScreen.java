@@ -22,16 +22,20 @@ package org.javarosa.cases.view;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.List;
 
+import org.javarosa.core.services.locale.Localization;
+
 /**
  * @author Clayton Sims
  * @date Mar 19, 2009 
  *
  */
 public class CaseManagementScreen extends List {
-	public final static Command BACK = new Command("Back", Command.BACK, 0);
+	public final static Command BACK = new Command(Localization.get("command.back"), Command.BACK, 0);
+	public final static Command SELECT = new Command(Localization.get("command.select"), Command.SCREEN, 0);
 	
 	public CaseManagementScreen(String title) {
 		super(title, List.IMPLICIT);
 		this.addCommand(BACK);
+		this.addCommand(SELECT);
 	}
 }

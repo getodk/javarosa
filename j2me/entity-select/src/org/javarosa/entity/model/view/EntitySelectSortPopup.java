@@ -19,6 +19,7 @@ package org.javarosa.entity.model.view;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectController;
 import org.javarosa.entity.model.Entity;
@@ -41,7 +42,7 @@ public class EntitySelectSortPopup<E extends Persistable> extends Form implement
 
     public EntitySelectSortPopup (EntitySelectView<E> psv, EntitySelectController<E> psa, Entity<E> entityPrototype) {
 		//#style patselSortPopup
-		super("Sort by...");
+		super(Localization.get("entity.sort.title"));
 
 		this.psv = psv;
 		this.psa = psa;
