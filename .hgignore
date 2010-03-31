@@ -1,0 +1,35 @@
+syntax: glob
+
+#local only
+local.properties
+
+#compiled files and libraries
+*.class
+*.jar
+*.jad
+*.zip
+*.rar
+*.pyc
+
+#build process
+bin/
+build/
+deployed/
+dist/
+webdocs/
+j2mepolish.index.txt
+
+#IDE and polish
+.eclipseme.tmp/
+.polishSettings/
+.settings/
+default.build
+devices/
+
+#OS and environment
+*~
+.DS_Store
+
+#mercurial
+*.rej
+*.orig
