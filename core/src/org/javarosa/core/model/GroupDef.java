@@ -47,6 +47,8 @@ public class GroupDef implements IFormElement, Localizable {
 	private String shortText;
 	private String shortTextID;
 	
+	private String appearanceAttr;
+	
 	Vector observers;
 	
 	public boolean noAddRemove = false;
@@ -155,6 +157,15 @@ public class GroupDef implements IFormElement, Localizable {
     	}
     } 
 	
+	public String getAppearanceAttr () {
+		return appearanceAttr;
+	}
+	
+	public void setAppearanceAttr (String appearanceAttr) {
+		this.appearanceAttr = appearanceAttr;
+	}	
+    
+    
 	/*
 	public QuestionDef getQuestion(String varName){
 		for(byte i=0; i<getQuestions().size(); i++){
@@ -214,6 +225,7 @@ public class GroupDef implements IFormElement, Localizable {
 	/** Reads a group definition object from the supplied stream. */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
+		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setBind((IDataReference)ExtUtil.read(dis, new ExtWrapTagged(), pf));
 		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
@@ -233,6 +245,7 @@ public class GroupDef implements IFormElement, Localizable {
 	/** Write the group definition object to the supplied stream. */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		ExtUtil.writeNumeric(dos, getID());
+		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
 		ExtUtil.write(dos, new ExtWrapTagged(getBind()));
 		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));

@@ -69,6 +69,10 @@ public class FormEntryCaption implements FormElementStateListener {
 		return substituteStringArgs(shortText);
 	}
 
+	public String getAppearanceHint ()  {
+		return element.getAppearanceAttr();
+	}
+	
 	public String substituteStringArgs(String templateStr) {
 		if (templateStr == null) {
 			return null;

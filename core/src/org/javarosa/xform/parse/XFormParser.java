@@ -675,6 +675,7 @@ public class XFormParser {
 		String ref = e.getAttributeValue(null, "ref");
 		String nodeset = e.getAttributeValue(null, "nodeset");
 		String bind = e.getAttributeValue(null, "bind");
+		group.setAppearanceAttr(e.getAttributeValue(null, "appearance"));
 		
 		if (bind != null) {
 			DataBinding binding = (DataBinding)bindingsByID.get(bind);

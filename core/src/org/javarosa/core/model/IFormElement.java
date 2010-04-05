@@ -98,4 +98,11 @@ public interface IFormElement extends Localizable, Externalizable {
 	 * @return
 	 */
 	public String getLongText();
+	
+	/**
+	 * @return
+	 */
+	public String getAppearanceAttr();
+	
+	public void setAppearanceAttr (String appearanceAttr);
 }
