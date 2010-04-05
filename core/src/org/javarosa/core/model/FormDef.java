@@ -1163,4 +1163,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return null;
 	}
 
+	/**
+	 * Appearance isn't a valid attribute for form, but this method must be included
+	 * as a result of conforming to the IFormElement interface.
+	 */
+	public String getAppearanceAttr () {
+		throw new RuntimeException("This method call is not relevant for FormDefs");
+	}
+	
+	/**
+	 * Appearance isn't a valid attribute for form, but this method must be included
+	 * as a result of conforming to the IFormElement interface.
+	 */
+	public void setAppearanceAttr (String appearanceAttr) {
+		throw new RuntimeException("This method call is not relevant for FormDefs");
+	}	
+	
 }
