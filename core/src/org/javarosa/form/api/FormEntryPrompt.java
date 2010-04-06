@@ -74,7 +74,10 @@ public class FormEntryPrompt extends FormEntryCaption {
     }
 
     public String getAnswerText() {
-        return mTreeElement.getValue().getDisplayText();
+        if (mTreeElement.getValue() == null)
+            return null;
+        else
+            return mTreeElement.getValue().getDisplayText();
     }
 
     public String getConstraintText() {
