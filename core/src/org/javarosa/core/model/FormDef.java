@@ -294,6 +294,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		initializeTriggerables(destRef); // initialize conditions for the node
 		// (and sub-nodes)
 	}
+	
+	
 
 	public boolean canCreateRepeat(TreeReference repeatRef) {
 		Condition c = (Condition) conditionRepeatTargetIndex.get(repeatRef.genericize());

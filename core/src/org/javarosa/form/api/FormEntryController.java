@@ -55,11 +55,8 @@ public class FormEntryController {
      * @param data
      * @return
      */
-    public int answerCurrentQuestion(IAnswerData data) {
-    	if (model.getCurrentEvent() != FormEntryController.EVENT_QUESTION){
-    		throw new RuntimeException("Non-Question object at the form index.");
-    	}
-        return answerQuestion(model.getCurrentFormIndex(), data);
+    public int answerQuestion(IAnswerData data) {
+        return answerQuestion(model.getFormIndex(), data);
     }
 
 
@@ -72,6 +69,9 @@ public class FormEntryController {
      * @return OK if save was successful, error if a constraint was violated.
      */
     public int answerQuestion(FormIndex index, IAnswerData data) {
+        if (model.getEvent() != FormEntryController.EVENT_QUESTION) {
+            throw new RuntimeException("Non-Question object at the form index.");
+        }
         TreeElement element = model.getTreeElement(index);
         if (element.required && data == null) {
             return ANSWER_REQUIRED_BUT_EMPTY;
@@ -95,8 +95,26 @@ public class FormEntryController {
      * @return true if saved successfully, false otherwise.
      */
     public boolean saveAnswer(FormIndex index, IAnswerData data) {
+        if (model.getEvent() != FormEntryController.EVENT_QUESTION) {
+            throw new RuntimeException("Non-Question object at the form index.");
+        }
         TreeElement element = model.getTreeElement(index);
         return commitAnswer(element, index, data);
+    }
+
+
+    /**
+     * saveAnswer attempts to save the current answer into the data model
+     * without doing any constraint checking. Only use this if you know what
+     * you're doing. For normal form filling you should always use
+     * answerQuestion().
+     * 
+     * @param index
+     * @param data
+     * @return true if saved successfully, false otherwise.
+     */
+    public boolean saveAnswer(IAnswerData data) {
+        return saveAnswer(model.getFormIndex(), data);
     }
 
 
@@ -147,7 +165,7 @@ public class FormEntryController {
      * @return
      */
     private int stepEvent(boolean forward) {
-        FormIndex index = model.getCurrentFormIndex();
+        FormIndex index = model.getFormIndex();
 
         do {
             if (forward) {
@@ -155,7 +173,7 @@ public class FormEntryController {
             } else {
                 index = model.getForm().decrementIndex(index);
             }
-        } while (index.isInForm() && !model.isRelevant(index));
+        } while (index.isInForm() && !model.isIndexRelevant(index));
 
         return jumpToIndex(index);
     }
@@ -185,6 +203,17 @@ public class FormEntryController {
 
 
     /**
+     * Creates a new repeated instance of the group referenced by the current
+     * FormIndex.
+     * 
+     * @param questionIndex
+     */
+    public void newRepeat() {
+        newRepeat(model.getFormIndex());
+    }
+
+
+    /**
      * Deletes a repeated instance of a group referenced by the specified
      * FormIndex.
      * 
@@ -196,7 +225,23 @@ public class FormEntryController {
     }
 
 
+    /**
+     * Deletes a repeated instance of a group referenced by the current
+     * FormIndex.
+     * 
+     * @param questionIndex
+     * @return
+     */
+    public FormIndex deleteRepeat() {
+        return deleteRepeat(model.getFormIndex());
+    }
+
+
+    /**
+     * Sets the current language.
+     * @param language
+     */
     public void setLanguage(String language) {
-        model.setCurrentLanguage(language);
+        model.setLanguage(language);
     }
 }
