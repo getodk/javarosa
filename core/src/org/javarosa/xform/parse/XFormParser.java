@@ -56,6 +56,7 @@ import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -242,6 +243,10 @@ public class XFormParser {
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
 			
 			doc.parse(parser);
+		}  catch (XmlPullParserException e) {
+			System.err.println("XML Syntax Error at Line: " + e.getLineNumber() +", Column: "+ e.getColumnNumber()+ "!");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch(Exception e){
 			//#if debug.output==verbose || debug.output==exception
 			System.err.println("XML Syntax Error!");
