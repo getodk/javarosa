@@ -1,0 +1,171 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/2002/xforms"
+	  xmlns:ev="http://www.w3.org/2001/xml-events"
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	  xmlns:jr="http://openrosa.org/javarosa">
+<h:head>
+    <h:title>Field Tests Form Demo</h:title>
+    <meta jr:name="physchem_test_report_001_demo"/>
+    <model>
+    <itext>
+ 	 	<translation lang="English" default="">
+    			<text id="PointCode">
+     	 			<value>Where was the sample taken?</value>
+    			</text>
+			<text id="AssessmentDate">
+     	 			<value>Sample Date</value>
+    			</text>
+			<text id="turbidity">
+     	 			<value form="short">Turbidity</value>
+					<value form="long">Tuuurrrbidity</value>
+					<value form="image">turbidity-image.jpg</value>
+    			</text>
+			<text id="conductivity">
+     	 			<value>Electrical Conductivity</value>
+    			</text>
+			<text id="ph">
+     	 			<value>pH reading</value>
+    			</text>
+			<text id="chlorine">
+     	 			<value>Free Chlorine</value>
+    			</text>
+    			<text id="Temperature">
+     	 			<value>Temp (deg. C)</value>
+    			</text>
+    			<text id="Weather">
+     	 			<value>Weather conditions</value>
+    			</text>
+			<text id="EnteredBy">
+     	 			<value>Your name</value>
+    			</text>
+			<text id="Comments">
+     	 			<value>Any other comments</value>
+    			</text>
+  		</translation>
+		<translation lang="Afrikaans">
+    			<text id="PointCode">
+     	 			<value>Waar was die monster geneem?</value>
+    			</text>
+			<text id="AssessmentDate">
+     	 			<value>Datum (waarop monster geneem is)</value>
+    			</text>
+			<text id="turbidity">
+     	 			<value form="short">Troebelheid</value>
+					<value form="long">AFR Tuuurrrbidity</value>
+					<value form="image">turbidity-image.jpg</value>
+    			</text>
+			<text id="conductivity">
+     	 			<value>Elektriese geleibaarheid</value>
+    			</text>
+			<text id="ph">
+     	 			<value>pH lesing</value>
+    			</text>
+			<text id="chlorine">
+     	 			<value>Chloor</value>
+    			</text>
+    			<text id="Temperature">
+     	 			<value>Temp (deg. C)</value>
+    			</text>
+    			<text id="Weather">
+     	 			<value>Weer</value>
+    			</text>
+			<text id="EnteredBy">
+     	 			<value>Jou naam</value>
+    			</text>
+			<text id="Comments">
+     	 			<value>Einige ander komments</value>
+    			</text>
+  		</translation>
+	</itext>
+	<instance>
+		<physchem_test xmlns="">
+			<Meta>
+				<formName>physchem_test_report_001</formName>
+				<formVersion>0.0.1</formVersion>
+			</Meta>
+				
+			<Assessment>
+				<PointCode />
+				<AssessmentDate />
+				<Temperature />
+				<Weather />
+			</Assessment>
+
+         		<TestResults>
+					<turbidity />
+	        		<conductivity />     
+	        		<ph />
+	        		<chlorine />
+	        	</TestResults>
+
+         		<DataCapture>
+					<EnteredBy />
+					<DeviceID />
+					<Comments />
+				</DataCapture>
+		</physchem_test>
+	</instance>
+		
+<bind id="PointCode" nodeset="/physchem_test/Assessment/PointCode" type="xsd:string" required="true()" />
+<bind id="AssessmentDate" nodeset="/physchem_test/Assessment/AssessmentDate" type="xsd:date" required="true()" jr:preload="date" jr:preloadParams="today"/>
+<bind id="turbidity" nodeset="/physchem_test/TestResults/turbidity" type="xsd:decimal" required="false()"/>
+<bind id="conductivity" nodeset="/physchem_test/TestResults/conductivity" type="xsd:decimal" required="false()"/>
+<bind id="ph" nodeset="/physchem_test/TestResults/ph" type="xsd:decimal" required="false()"/>
+<bind id="chlorine" nodeset="/physchem_test/TestResults/chlorine" type="xsd:decimal" required="false()"/>
+<bind id="Temperature" nodeset="/physchem_test/Assessment/Temperature" type="xsd:decimal" required="false()"/>
+<bind id="Weather" nodeset="/physchem_test/Assessment/Weather" type="xsd:string" required="false()"/>
+<bind id="EnteredBy" nodeset="/physchem_test/DataCapture/EnteredBy" type="xsd:string" required="true()" jr:preload="property" jr:preloadParams="your-name"/>
+<bind id="DeviceID" nodeset="/physchem_test/DataCapture/DeviceID" type="xsd:string" required="true()" jr:preload="property" jr:preloadParams="DeviceID"/>
+<bind id="Comments" nodeset="/physchem_test/DataCapture/Comments" type="xsd:string" required="false()"/>
+
+</model>
+</h:head>			
+<h:body>
+
+
+<select1 bind="PointCode">
+<label ref="jr:itext('PointCode')" />
+<item><label>DemoSite</label><value>DemoSite</value></item>
+<item><label>OtherSite</label><value>OtherSite</value></item>
+</select1>
+
+<input bind="AssessmentDate">
+<label ref="jr:itext('AssessmentDate')"></label>
+</input>
+
+<input bind="turbidity">
+<label ref="jr:itext('turbidity')" />
+</input>
+
+<input bind="conductivity">
+<label ref="jr:itext('conductivity')" />
+</input>
+
+<input bind="chlorine">
+<label ref="jr:itext('chlorine')" />
+</input>
+
+<input bind="ph">
+<label ref="jr:itext('ph')" />
+</input>
+
+<input bind="Temperature">
+<label ref="jr:itext('Temperature')" />
+</input>
+
+<input bind="Weather">
+<label ref="jr:itext('Weather')" />
+</input>
+
+<input bind="EnteredBy">
+<label ref="jr:itext('EnteredBy')" />
+</input>
+
+<input bind="Comments">
+<label ref="jr:itext('Comments')" />
+</input>
+
+	 
+</h:body>
+</h:html>
+
