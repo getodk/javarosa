@@ -52,6 +52,12 @@ public class LabelWidget implements IWidgetStyle {
 		// Clayton Sims - Feb 6, 2009 : Labels are now applicable for questions, so that we can pin 
 		// question texts for long questions.
 		String caption = prompt.getLongText();
+
+		/////////##########DELETEME
+		System.out.println("Available RM forms vector size in element caption:"+caption+"::"+prompt.getAvailableRMForms().size());
+		/////////##################
+		
+		
 		if(multiplicity != -1) {
 			caption += ": " + multiplicity;
 		}

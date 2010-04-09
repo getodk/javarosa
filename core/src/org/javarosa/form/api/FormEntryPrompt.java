@@ -24,7 +24,12 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.util.NoLocalizedTextException;
+import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.formmanager.view.IQuestionWidget;
+
+
 
 /**
  * This class gives you all the information you need to display a question when
@@ -73,6 +78,8 @@ public class FormEntryPrompt extends FormEntryCaption {
         return mTreeElement.getValue();
     }
 
+    
+    //TODO RE-ROUTE me through Localizer
     public String getAnswerText() {
         return mTreeElement.getValue().getDisplayText();
     }
@@ -85,10 +92,43 @@ public class FormEntryPrompt extends FormEntryCaption {
         return getQuestion().getChoices();
     }
 
-    public String getHelpText() {
-        return getQuestion().getHelpText();
-    }
-
+//    /**
+//     * Get a vector containing the captions (or URIs as the case may be)
+//     * of the SelectChoices within the current Question.
+//     * @param subForm Specificy a specific type of subform (e.g. "audio","image","long",etc) to return. Can be null. See getChoiceCaption(int,String) for specifics.
+//     * @return
+//     */
+//    public Vector<String> getChoiceCaptions(String subForm){
+//    	Vector<SelectChoice> choices = getSelectChoices();
+//    	Vector<String> captions = new Vector<String>();
+//    	
+//    	for(int i=0;i<choices.size();i++){
+//    		captions.addElement(getChoiceCaption(i,subForm));
+//    	}
+//    	
+//    	return captions;
+//    	
+//    }
+//    
+//    /**
+//     * Gets the caption of a select choice, according to form.
+//     * if form=null or the subform doesn't exist for the current locale
+//     * the long-form will be returned. If the long form doesn't exist either
+//     * return the &ltvalue&gt innerText value.
+//     * @param ind
+//     * @param subform subform type (e.g. "long","audio","image","short",etc). Can be null.
+//     * @return
+//     */
+//    public String getChoiceCaption(int ind,String subform){
+//    	SelectChoice choice = getSelectChoices().elementAt(ind);
+//    	Localizer l = form.getLocalizer();
+//    	String caption = l.getText(choice.getCaptionID()+";"+subform,l.getLocale());
+//    	if(caption==null && subform!="long") caption=l.getText(choice.getCaptionID()+";long");
+//    
+//    	if(caption==null) caption=choice.getValue();
+//    	return caption;
+//    }
+    
     public boolean isRequired() {
         return mTreeElement.required;
     }
@@ -118,5 +158,26 @@ public class FormEntryPrompt extends FormEntryCaption {
 			throw new IllegalStateException("Widget received event from foreign question");
 		if (viewWidget != null)
 			viewWidget.refreshWidget(changeFlags);		
+	}
+	
+	/**
+	 * ONLY RELEVANT to Question elements!
+	 * Will throw runTimeException if this is called for anything that isn't a Question.
+	 * @return
+	 */
+	public String getHelpText(){
+		String helpText=null;
+		try{
+			helpText=form.getLocalizer().getLocalizedText(((QuestionDef)element).getHelpTextID());
+		}catch(NoLocalizedTextException nlt){
+			helpText = ((QuestionDef)element).getHelpText();
+		}catch(UnregisteredLocaleException ule){
+			System.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return helpText;
+		
 	}
 }

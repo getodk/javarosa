@@ -21,7 +21,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.lang.String;
 
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -41,13 +43,11 @@ public class GroupDef implements IFormElement, Localizable {
 	private boolean repeat;  /** True if this is a "repeat", false if it is a "group" */
 	private int id;	/** The group number. */
 	private IDataReference binding;	/** reference to a location in the model to store data in */
-	
-	private String longText;
-	private String longTextID;
-	private String shortText;
-	private String shortTextID;
-	
+
+
+	private String labelInnerText;
 	private String appearanceAttr;
+	private String textID;
 	
 	Vector observers;
 	
@@ -113,50 +113,21 @@ public class GroupDef implements IFormElement, Localizable {
 		this.repeat = repeat;
 	}
 	
-	public String getLongText () {
-		return longText;
+
+
+	
+	
+	
+	public String getLabelInnerText() {
+		// TODO Auto-generated method stub
+		return labelInnerText;
 	}
 	
-	public void setLongText (String longText) {
-		this.longText = longText;
+	public void setLabelInnerText(String lit){
+		labelInnerText = lit;
 	}
 
-    /**
-     * @return the iText id for the long text
-     */
-    public String getLongTextID () {
-        return longTextID;
-    }
-    
-    public void setLongTextID (String textID, Localizer localizer) {
-    	this.longTextID = textID;
-    	if (localizer != null) {
-    		longText = localizer.getLocalizedText(longTextID);
-    	}
-    }
-	
-	public String getShortText () {
-		return shortText;
-	}
-	
-	public void setShortText (String shortText) {
-		this.shortText = shortText;
-	}
 
-    /**
-     * @return the iText id for the short text
-     */
-    public String getShortTextID () {
-        return shortTextID;
-    }
-
-    public void setShortTextID (String textID, Localizer localizer) {
-    	this.shortTextID = textID;
-    	if (localizer != null) {
-    		shortText = localizer.getLocalizedText(shortTextID);        
-    	}
-    } 
-	
 	public String getAppearanceAttr () {
 		return appearanceAttr;
 	}
@@ -189,14 +160,6 @@ public class GroupDef implements IFormElement, Localizable {
 	*/
     
     public void localeChanged(String locale, Localizer localizer) {
-    	if(longTextID != null) {
-    		longText = localizer.getLocalizedText(longTextID);
-    	}
-
-    	if(shortTextID != null) {
-    		shortText = localizer.getLocalizedText(shortTextID);
-    	}
-    	
     	for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
     		((IFormElement)e.nextElement()).localeChanged(locale, localizer);
     	}
@@ -227,10 +190,12 @@ public class GroupDef implements IFormElement, Localizable {
 		setID(ExtUtil.readInt(dis));
 		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setBind((IDataReference)ExtUtil.read(dis, new ExtWrapTagged(), pf));
-		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setLongTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
-		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
+		setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+//		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+//		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+//		setLongTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
+//		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 		setRepeat(ExtUtil.readBool(dis));
 		setChildren((Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 		
@@ -247,10 +212,12 @@ public class GroupDef implements IFormElement, Localizable {
 		ExtUtil.writeNumeric(dos, getID());
 		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
 		ExtUtil.write(dos, new ExtWrapTagged(getBind()));
-		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
-		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
-		ExtUtil.write(dos, new ExtWrapNullable(getLongTextID()));
-		ExtUtil.write(dos, new ExtWrapNullable(getShortTextID()));				
+		ExtUtil.write(dos, new ExtWrapNullable(getTextID()));
+		ExtUtil.write(dos, new ExtWrapNullable(getLabelInnerText()));
+//		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
+//		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
+//		ExtUtil.write(dos, new ExtWrapNullable(getLongTextID()));
+//		ExtUtil.write(dos, new ExtWrapNullable(getShortTextID()));				
 		ExtUtil.writeBool(dos, getRepeat());
 		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
 
@@ -272,5 +239,21 @@ public class GroupDef implements IFormElement, Localizable {
 	
 	public void unregisterStateObserver (FormElementStateListener qsl) {
 		observers.removeElement(qsl);
+	}
+	
+	public String getTextID() {
+		return textID;
+	}
+
+	public void setTextID(String textID) {
+		if(textID==null){
+			this.textID = null;
+			return;
+		}
+		if(DateUtils.stringContains(textID,";")){
+			System.err.println("Warning: TextID contains ;form modifier:: \""+textID.substring(textID.indexOf(";"))+"\"... will be stripped.");
+			textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
+		}
+		this.textID = textID;
 	}
 }

@@ -58,7 +58,7 @@ public class Property implements Persistable, IMetaData {
         value = new Vector();
         if(nameindex == -1) {
     		//#if debug.output==verbose
-            System.out.println("WARNING: Property in RMS with no value");
+            System.out.println("WARNING: Property in RMS with no value:"+fullString);
             //#endif
             name = fullString.substring(0, fullString.length());
         }

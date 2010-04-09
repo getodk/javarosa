@@ -484,14 +484,12 @@ public class XFormParser {
 				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
 				verifyTextMappings(f, textRef, "Question <label>", true);
-				q.setLongTextID(textRef + ";long", null);
-				q.setShortTextID(textRef + ";short", null);
+				q.setTextID(textRef);
 			} else {
 				throw new RuntimeException("malformed ref [" + ref + "] for <label>");
 			}
 		} else {
-			q.setLongText(label);
-			q.setShortText(label);
+			q.setLabelInnerText(label);
 		}
 	}
 
@@ -507,14 +505,12 @@ public class XFormParser {
 				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
 				verifyTextMappings(f, textRef, "Group <label>", true);
-				g.setLongTextID(textRef + ";long", null);
-				g.setShortTextID(textRef + ";short", null);
+				g.setTextID(textRef);
 			} else {
 				throw new RuntimeException("malformed ref [" + ref + "] for <label>");
 			}
 		} else {
-			g.setLongText(label);
-			g.setShortText(label);
+			g.setLabelInnerText(label);
 		}
 	}
 	
@@ -622,7 +618,7 @@ public class XFormParser {
 					if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
 						textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
-						verifyTextMappings(f, textRef, "Item <label>", false);
+						verifyTextMappings(f, textRef, "Item <label>", true);
 					} else {
 						throw new XFormParseException("malformed ref [" + ref + "] for <item>");
 					}
@@ -773,10 +769,12 @@ public class XFormParser {
 						//merge group into repeat
 						//id - later
 						//name - later
-						repeat.setLongText(group.getLongText());
-						repeat.setShortText(group.getShortText());
-						repeat.setLongTextID(group.getLongTextID(), null);
-						repeat.setShortTextID(group.getShortTextID(), null);						
+						repeat.setLabelInnerText(group.getLabelInnerText());
+						repeat.setTextID(group.getTextID());
+//						repeat.setLongText(group.getLongText());
+//						repeat.setShortText(group.getShortText());
+//						repeat.setLongTextID(group.getLongTextID(), null);
+//						repeat.setShortTextID(group.getShortTextID(), null);						
 						//don't merge binding; repeat will always already have one
 						
 						//replace group with repeat

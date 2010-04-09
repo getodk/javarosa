@@ -477,7 +477,7 @@ public class Localizer implements Externalizable {
 	public String getLocalizedText (String textID) {
 	    String text = getText(textID);
 	    if (text == null)
-	    	throw new NoLocalizedTextException("Can't find localized text for current locale! text id: [" + textID + "]", textID, currentLocale);
+	    	throw new NoLocalizedTextException("Can't find localized text for current locale! text id: [" + textID + "] locale: ["+currentLocale+"]", textID, currentLocale);
 	    return text;
 	}
 	
