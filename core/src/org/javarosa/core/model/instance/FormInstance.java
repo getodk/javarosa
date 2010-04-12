@@ -116,23 +116,25 @@ public class FormInstance implements Persistable, Restorable {
 		return (TreeReference) ref.getReference();
 	}
 
-	public boolean copyNode(TreeReference from, TreeReference to) {
-		if (!from.isAbsolute())
-			return false;
+	public TreeReference copyNode(TreeReference from, TreeReference to) throws InvalidReferenceException {
+		if (!from.isAbsolute()) {
+			throw new InvalidReferenceException("Source reference must be absolute for copying", from);
+		}
 
 		TreeElement src = resolveReference(from);
-		if (src == null)
-			return false; // source does not exist
+		if (src == null) {
+			throw new InvalidReferenceException("Null Source reference while attempting to copy node", from);
+		}
 
-		return copyNode(src, to);
+		return copyNode(src, to).getRef();
 	}
 
 	// for making new repeat instances; 'from' and 'to' must be unambiguous
 	// references EXCEPT 'to' may be ambiguous at its final step
 	// return true is successfully copied, false otherwise
-	public boolean copyNode(TreeElement src, TreeReference to) {
+	public TreeElement copyNode(TreeElement src, TreeReference to) throws InvalidReferenceException {
 		if (!to.isAbsolute())
-			return false;
+			throw new InvalidReferenceException("Destination reference must be absolute for copying", to);
 
 		// strip out dest node info and get dest parent
 		String dstName = to.getNameLast();
@@ -140,24 +142,32 @@ public class FormInstance implements Persistable, Restorable {
 		TreeReference toParent = to.getParentRef();
 
 		TreeElement parent = resolveReference(toParent);
-		if (parent == null)
-			return false; // dest parent does not exist
-		if (!parent.isChildable())
-			return false; // dest parent is an unfit parent
+		if (parent == null) {
+			throw new InvalidReferenceException("Null parent reference whle attempting to copy", toParent);
+		}
+		if (!parent.isChildable()) {
+			throw new InvalidReferenceException("Invalid Parent Node: cannot accept children.", toParent);
+		}
 
 		if (dstMult == TreeReference.INDEX_UNBOUND) {
 			dstMult = parent.getChildMultiplicity(dstName);
 		} else if (parent.getChild(dstName, dstMult) != null) {
-			return false; // dest node already exists
+			throw new InvalidReferenceException("Destination already exists!", to);
 		}
 
 		TreeElement dest = src.deepCopy(false);
 		dest.setName(dstName);
 		dest.multiplicity = dstMult;
 		parent.addChild(dest);
-		return true;
+		return dest;
 	}
 
+	public void copyItemsetNode (TreeElement copyNode, TreeReference destRef, FormDef f) throws InvalidReferenceException {
+		TreeElement templateNode = getTemplate(destRef);
+		TreeElement newNode = copyNode(templateNode, destRef);
+		newNode.populateTemplate(copyNode, f);
+	}
+	
 	// don't think this is used anymore
 	public IAnswerData getDataValue(IDataReference questionReference) {
 		TreeElement element = resolveReference(questionReference);

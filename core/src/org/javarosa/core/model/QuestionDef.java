@@ -58,7 +58,8 @@ public class QuestionDef implements IFormElement, Localizable {
 	private String helpTextID;
 
 	private Vector<SelectChoice> choices;
-			
+	private ItemsetBinding dynamicChoices;
+	
 	Vector observers;
 	
 	public QuestionDef () {
@@ -192,6 +193,24 @@ public class QuestionDef implements IFormElement, Localizable {
 		return null;
 	}
 	
+	public ItemsetBinding getDynamicChoices () {
+		return dynamicChoices;
+	}
+	
+	public void setDynamicChoices (ItemsetBinding ib) {
+		if (ib != null) {
+			ib.setDestRef(this);
+		}
+		this.dynamicChoices = ib;
+	}
+	
+	/**
+	 * true if the answer to this question yields xml tree data, not a simple string value
+	 */
+	public boolean isComplex () {
+		return (dynamicChoices != null && dynamicChoices.copyMode);
+	}
+	
     public void localeChanged(String locale, Localizer localizer) {
     	if(longTextID != null) {
     		longText = localizer.getLocalizedText(longTextID);
@@ -209,6 +228,10 @@ public class QuestionDef implements IFormElement, Localizable {
     		for (int i = 0; i < choices.size(); i++) {
     			choices.elementAt(i).localeChanged(null, localizer);
     		}
+    	}
+    	
+    	if (dynamicChoices != null) {
+    		dynamicChoices.localeChanged(locale, localizer);
     	}
     	
     	alertStateObservers(FormElementStateListener.CHANGE_LOCALE);
@@ -236,6 +259,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	 */
 	public void readExternal(DataInputStream dis, PrototypeFactory pf) throws IOException, DeserializationException {
 		setID(ExtUtil.readInt(dis));
+		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
@@ -249,8 +273,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		for (int i = 0; i < getNumChoices(); i++) {
 			choices.elementAt(i).setIndex(i);
 		}
-
-		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
+		setDynamicChoices((ItemsetBinding)ExtUtil.read(dis, new ExtWrapNullable(ItemsetBinding.class)));
 	}
 
 	/*
@@ -259,6 +282,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	 */
 	public void writeExternal(DataOutputStream dos) throws IOException {
 		ExtUtil.writeNumeric(dos, getID());
+		ExtUtil.write(dos, new ExtWrapNullable(binding == null ? null : new ExtWrapTagged(binding)));
 		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
 		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
@@ -270,8 +294,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		ExtUtil.writeNumeric(dos, getControlType());
 		
 		ExtUtil.write(dos, new ExtWrapList(ExtUtil.emptyIfNull(choices)));
-
-		ExtUtil.write(dos, new ExtWrapNullable(binding == null ? null : new ExtWrapTagged(binding)));
+		ExtUtil.write(dos, new ExtWrapNullable(dynamicChoices));
 	}
 
 	/* === MANAGING OBSERVERS === */
