@@ -24,6 +24,7 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 
@@ -402,7 +403,13 @@ public class FormEntryModel {
                         TreeElement element = getForm().getInstance().resolveReference(ref);
                         if (element == null) {
                             if (index.getInstanceIndex() < fullcount) {
-                                getForm().createNewRepeat(index);
+                            	
+                                try {
+									getForm().createNewRepeat(index);
+								} catch (InvalidReferenceException ire) {
+									ire.printStackTrace();
+									throw new RuntimeException("Invalid Reference while creting new repeat!" + ire.getMessage());
+								}
                             }
                         }
                     }

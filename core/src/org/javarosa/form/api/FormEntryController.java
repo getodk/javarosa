@@ -17,7 +17,9 @@
 package org.javarosa.form.api;
 
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 
 /**
@@ -69,17 +71,29 @@ public class FormEntryController {
      * @return OK if save was successful, error if a constraint was violated.
      */
     public int answerQuestion(FormIndex index, IAnswerData data) {
+    	QuestionDef q = model.getQuestionPrompt(index).getQuestion();
         if (model.getEvent() != FormEntryController.EVENT_QUESTION) {
             throw new RuntimeException("Non-Question object at the form index.");
         }
         TreeElement element = model.getTreeElement(index);
+        boolean complexQuestion = q.isComplex();
+        
         if (element.required && data == null) {
             return ANSWER_REQUIRED_BUT_EMPTY;
-        } else if (!model.getForm().evaluateConstraint(index.getReference(), data)) {
-            return ANSWER_CONSTRAINT_VIOLATED;
-        } else {
+        } else if (!complexQuestion && !model.getForm().evaluateConstraint(index.getReference(), data)) {
+        	//TODO: itemsets: don't currently evaluate constraints for itemset/copy -- haven't figured out how handle it yet
+            throw new RuntimeException("Itemsets do not currently evaluate constraints. Your constraint will not work, please remove it before proceeding.");
+        } else if (!complexQuestion) {
             commitAnswer(element, index, data);
             return ANSWER_OK;
+        } else {
+        	try {
+				model.getForm().copyItemsetAnswer(q, element, data);
+			} catch (InvalidReferenceException ire) {
+				ire.printStackTrace();
+				throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
+			}
+        	return ANSWER_OK;
         }
     }
 
@@ -198,7 +212,11 @@ public class FormEntryController {
      * @param questionIndex
      */
     public void newRepeat(FormIndex questionIndex) {
-        model.getForm().createNewRepeat(questionIndex);
+    	try{
+    		model.getForm().createNewRepeat(questionIndex);
+    	} catch(InvalidReferenceException ire) {
+    		throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
+    	}
     }
 
 
