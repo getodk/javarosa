@@ -63,7 +63,7 @@ public class SelectOneData implements IAnswerData {
 	}
 	
 	public String getDisplayText () {
-		return s.getText();
+		return s.getValue();
 	}
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)

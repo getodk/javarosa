@@ -148,8 +148,8 @@ public class ChatterboxWidgetFactory {
     	
     	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?",
     										Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
-    	prompt.addSelectChoice(new SelectChoice("Yes", "y", false));
-    	prompt.addSelectChoice(new SelectChoice("No", "n", false));
+    	prompt.addSelectChoice(new SelectChoice(null,"Yes", "y", false));
+    	prompt.addSelectChoice(new SelectChoice(null,"No", "n", false));
 		
 		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }

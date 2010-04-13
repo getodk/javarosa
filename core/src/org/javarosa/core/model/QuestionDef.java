@@ -108,45 +108,7 @@ public class QuestionDef implements IFormElement, Localizable {
 
 	
 	
-//	public String getLongText () {
-//		return longText;
-//	}
-//	
-//	public void setLongText (String longText) {
-//		this.longText = longText;
-//	}
 
-//	//not used during normal usage
-//    public String getLongTextID () {
-//        return longTextID;
-//    }
-    
-//    public void setLongTextID (String textID, Localizer localizer) {
-//    	this.longTextID = textID;
-//    	if (localizer != null) {
-//    		longText = localizer.getLocalizedText(longTextID);
-//    	}
-//    }
-//	
-//	public String getShortText () {
-//		return shortText;
-//	}
-//	
-//	public void setShortText (String shortText) {
-//		this.shortText = shortText;
-//	}
-//
-//	//not used during normal usage
-//    public String getShortTextID () {
-//        return shortTextID;
-//    }
-//
-//    public void setShortTextID (String textID, Localizer localizer) {
-//    	this.shortTextID = textID;
-//    	if (localizer != null) {
-//    		shortText = localizer.getLocalizedText(shortTextID);        
-//    	}
-//    } 
 
 	/**
 	 * Only if there is no localizable version of the &lthint&gt available should this method be used
@@ -203,7 +165,7 @@ public class QuestionDef implements IFormElement, Localizable {
 	}
 	
 	
-	
+@Deprecated	
     public void localeChanged(String locale, Localizer localizer) {
 //    	if(longTextID != null) {
 //    		longText = localizer.getLocalizedText(longTextID);

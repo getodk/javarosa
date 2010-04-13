@@ -16,6 +16,7 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;
@@ -172,7 +173,10 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 
 	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
-			choiceGroup().getItem(i).setText(prompt.getSelectChoices().elementAt(i).getCaption());
+			SelectChoice choice = prompt.getSelectChoices().elementAt(i);
+			prompt.
+			
+			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(choice));
 		}
 	}
 }
