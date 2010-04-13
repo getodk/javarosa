@@ -654,7 +654,7 @@ public class XFormParser {
 		if (textRef != null) {
 			q.addSelectChoice(new SelectChoice(textRef, value));
 		} else {
-			q.addSelectChoice(new SelectChoice(label, value, false));
+			q.addSelectChoice(new SelectChoice(null,label, value, false));
 		}
 	}
 

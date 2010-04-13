@@ -3,8 +3,18 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="/javarosa-libs/j2meunit-javarosa.jar"/>
-	<classpathentry kind="lib" path="/javarosa-libs/kxml2-2.3.0.jar"/>
+	<classpathentry kind="lib" path="/javarosa-libs/kxml2-2.3.0.jar" sourcepath="C:/Users/adewinter/workspace/dimagi/library stuff/kxml2/src">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/Users/adewinter/workspace/dimagi/library stuff/kxml2/javadoc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="/javarosa-libs/regexp-me.jar"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/cldc-1.1-java5.0.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/WTK2.5.2/docs/api/midp/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/midp-2.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

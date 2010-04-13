@@ -23,6 +23,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.NoLocalizedTextException;
@@ -79,10 +80,12 @@ public class FormEntryPrompt extends FormEntryCaption {
     }
 
     
-    //TODO RE-ROUTE me through Localizer
-    public String getAnswerText() {
-        return mTreeElement.getValue().getDisplayText();
-    }
+//    //TODO AnswerText is.. problematic.
+//    //There are various forms of "AnswerText" that could be returned
+//    //depending on what the answer type is.
+//    public String getAnswerText() {
+//        return getAnswerValue().getDisplayText();
+//    }
 
     public String getConstraintText() {
         return mTreeElement.getConstraint().constraintMsg;
@@ -180,4 +183,153 @@ public class FormEntryPrompt extends FormEntryCaption {
 		return helpText;
 		
 	}
+	
+	public Localizer getLocalizer(){
+		return this.localizer;
+	}
+	
+	
+	/**
+	 * 
+	 * @return localized Question text (default form), LabelInnerText if default form is not available.
+	 */
+	public String getQText(){
+		return this.getDefaultText();
+	}
+	
+	/**
+	 * 
+	 * @param form Specific subform of question text (e.g. "audio","image", etc)
+	 * @return Question text subform (SEE Localizer.getLocalizedText(String) for fallback details). Null if form not available
+	 */
+	public String getQText(String form){
+		return this.getText(this.getTextID(), form);
+	}
+	
+	
+
+	
+//	/**
+//	 * 
+//	 * @return String array of all available text forms for this question text
+//	 * example {{"default","Text in Bla"},{"audio","sound-file.mp3"},{"image","image.jpg"}}
+//	 * Forms are in no particular order.  If there are no forms to be found, an empty array will be returned.
+//	 */
+//	public String[][] getTextForms(){
+//		return getTextForms(this.getTextID());
+//	}
+//	
+//	private String[][] getTextForms(String tID){
+//		Vector strings = new Vector();
+//		Vector types = new Vector();
+//		
+//		String temp;
+//		
+//		String defaultText = this.localizer.getText(tID);
+//		
+//		if(defaultText!=null && defaultText != ""){
+//			strings.addElement(defaultText);
+//			types.addElement("default");
+//		}
+//		
+//		for(String s:this.richMediaFormTypes){
+//			temp = this.localizer.getText(tID+";"+s);
+//			if(temp==defaultText || temp == null || temp == ""){
+//				continue;
+//			}else{
+//				strings.addElement(temp);
+//				types.addElement(s);
+//			}
+//			
+//		}
+//		
+//		String returnStrings[][] = new String[types.size()][2];
+//		for(int i = 0;i<types.size();i++){
+//			returnStrings[i][0] = (String)types.elementAt(i);
+//			returnStrings[i][1] = (String)strings.elementAt(i);
+//		}
+//		
+//		return returnStrings;
+//	}
+	
+
+	
+	/**
+	 * Get the text for the specified selection (localized if possible)
+	 * @param sel the selection
+	 * @return localized (if available, default LabelInnerText if not) text label.  If no localized version
+	 * is available, will attempt to return labelInnerText. If not available throws NullPointerException.
+	 * @throws NullPointerException
+	 */
+	public String getSelectionText(Selection sel){
+		return getSelectChoiceText(sel.choice);
+	}
+	
+	/**
+	 * Get the text for the specified SelectChoice (localized if possible)
+	 * @param sel the selection
+	 * @return localized (if available, default LabelInnerText if not) text label.  If no localized version
+	 * is available, will attempt to return labelInnerText. If not available throws NullPointerException.
+	 * @throws NullPointerException
+	 */
+	public String getSelectChoiceText(SelectChoice sel){
+		String tID = sel.getTextID();
+		
+		if(tID == null || tID == ""){
+			return sel.getLabelInnerText();
+		}
+		
+		String text = getText(tID,"");
+		if(text == null || text == ""){
+			text = sel.getLabelInnerText(); //final fallback
+		}
+		
+		return text;
+	}
+	
+
+	
+	/**
+	 * 
+	 * @param sel
+	 * @return String array of all the Itext form types available for this text
+	 * see getTextForms() javadoc for example.
+	 */
+	public String[][] getSelectTextForms(Selection sel){
+		return getTextForms(sel.choice.getTextID());
+	}
+	
+	/**
+	 * Get the Itext for a specific selection and specific itext form
+	 * @param s
+	 * @param form
+	 * @return
+	 */
+	public String getSelectText(Selection s,String form){
+		return getText(s.choice.getTextID(), form);
+	}
+	
+	/**
+	 * Get the Itext for a specific SelectChoice and specific itext form
+	 * @param s
+	 * @param form
+	 * @return
+	 */
+	public String getSelectChoiceText(SelectChoice sel, String form){
+		return getText(sel.getTextID(), form);
+	}
+	
+	
+//	/**
+//	 * Get the answer text for this question.
+//	 * @return
+//	 * TODO
+//	 */
+//	public String getAnswerText(){
+//		return null
+//	}
+
+
+
 }
+

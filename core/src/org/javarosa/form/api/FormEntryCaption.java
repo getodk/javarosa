@@ -42,7 +42,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	FormIndex index;
 	protected IFormElement element;
 	private String textID;
-	private Localizer localizer;
+	protected Localizer localizer;
 	
 	String[] richMediaFormTypes = {"long",
 								   "short",
@@ -74,18 +74,26 @@ public class FormEntryCaption implements FormElementStateListener {
 	}
 
 	/**
-	 * Find out what RichMediaTypes forms (e.g. audio, long form text, etc) are available
-	 * for the element
-	 * @param textID
+	 * Find out what Text forms (e.g. audio, long form text, etc) are available
+	 * for this element or the element specified by textID
+	 * @param textID (Optional) if null, uses textID of this FormEntryCaption
 	 * @return String Array of form names available in current locale
 	 */
-	public Vector getAvailableRMForms(){
-		if(textID==null)return new Vector();
+	public Vector getAvailableTextForms(String textID){
+		String tID = textID;
+		if(tID == null || tID == "") tID = this.textID; //fallback to this FormEntry's textID
+		if(tID == null) return new Vector();
 		String types="";
-		//String[] types= new String[richMediaFormTypes.length];
+
+		//check for default
+		if(null != localizer.getRawText(localizer.getLocale(), tID)){
+			types+="default";
+		}
+		
+		//run through types list
 		for(int i=0;i<richMediaFormTypes.length;i++){
 			String curType = richMediaFormTypes[i];
-			if(null != localizer.getRawText(localizer.getLocale(), textID+";"+curType)){
+			if(null != localizer.getRawText(localizer.getLocale(), tID+";"+curType)){
 				types+=","+curType;
 			}
 		}
@@ -93,18 +101,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	}
 	
 	public String getDefaultText(){
-		if (textID == null) return null;
-		System.out.print("getDefaultText()...");
-		String txt;
-		try{
-			txt = localizer.getLocalizedText(textID);
-			System.out.println("result:"+txt+" ");
-		}catch(NoLocalizedTextException nlte){
-			System.out.println("No Localized Text Exception!");
-			txt = element.getLabelInnerText();
-		}
-		
-		return txt;  
+		return getText(null,null);
 	}
 	
 	/**
@@ -113,11 +110,10 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @return longText form 
 	 */
 	public String getLongText() {
-		if(textID==null)return null;
-		
-		String t = getRichMediaText("long");
-		if(t==null)t=getDefaultText();
-		return substituteStringArgs(t);
+		if(!getAvailableTextForms(null).contains("long")){
+			return null;
+		}
+		return getText(null,"long");
 	}
 
 	/**
@@ -126,11 +122,10 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @return shortText form 
 	 */
 	public String getShortText() {
-		if(textID==null)return null;
-		
-		String t = getRichMediaText("short");
-		if(t==null)t=getDefaultText();
-		return substituteStringArgs(t);
+		if(!getAvailableTextForms(null).contains("short")){
+			return null;
+		}
+		return getText(null,"short");
 	}
 	
 	/**
@@ -139,9 +134,10 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @return audio URI form stored in current locale of Text, returns null if not available
 	 */
 	public String getAudioURI() {
-		if(textID==null)return null;
-		
-		return substituteStringArgs(getRichMediaText("audio"));
+		if(!getAvailableTextForms(null).contains("audio")){
+			return null;
+		}
+		return getText(null,"audio");
 	}
 	
 	/**
@@ -150,48 +146,72 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @return URI of image form stored in current locale of Text, returns null if not available
 	 */
 	public String getImageURI() {
-		if(textID==null)return null;
-		
-		return substituteStringArgs(getRichMediaText("image"));
-	}
-	
-	/**
-	 * Retrieves the text (or value or resource URI) of the
-	 * element (for the current locale) according to the form specificed (e.g. "long","audio",etc)
-	 * @param form type of media (&ltvalue form="..."$gt)
-	 * @return The actual value string (usually text or a URI) for that form, or the default value if the special form doesn't exist.
-	 */
-	public String getRichMediaText(String form){
-		
-		/////////######
-		System.out.println("getRichMediaText("+form+") calls localizer.getRawText("+textID+";"+form+")");
-		System.out.println("textID="+textID+",form="+form);
-		/////////######
-		
-		
-		if(textID==null) return null;
-		if(form==null) return getDefaultText();
-		
-		
-		
-		if(getAvailableRMForms().contains(form)){
-			return localizer.getRawText(localizer.getLocale(),textID+";"+form);
-		}else{
+		if(!getAvailableTextForms(null).contains("image")){
 			return null;
 		}
+		return getText(null,"image");
+	}
+	
+
+	
+	/**
+	 * Standard Localized text retreiver.
+	 * 
+	 * use getAvailableTextForms to check which are available before you
+	 * call this method.
+	 * 
+	 * @param tID
+	 * @param form
+	 * @return
+	 * @throws NullPointerException if this element is unlocalized but a special form is requested.
+	 */
+	protected String getText(String tID,String form){
+		if(form == "") form = null; //
+		if(tID == "") tID = null;   //this is just to make the code look a little cleaner
+		String text=null;
+		String textID = tID;
+		if(textID == null){ //if no textID was specified as an argument switch to this FormEntry's ID
+			textID = this.textID;
+			if(textID == null && form == null){ //if this has no ID (it's not a localized element)
+				return substituteStringArgs(element.getLabelInnerText()); //get the inner text if available
+			}else if(textID == null && form != null){ //if it's not localized but you specified a form...
+				throw new NullPointerException("Can't ask for a special form for unlocalized element!");
+			}
+		}
+		
+		if(form!=null){
+			textID += ";" + form;
+		}
+		
+		text = this.localizer.getLocalizedText(textID);
+		return substituteStringArgs(text);
 	}
 	
 	/**
 	 * Convenience method.
 	 * 
+	 * @param Optional.  If null (or = "") will use the textID associated with this FormEntryCaption
 	 * @return A String array of all the texts/URIs of all the available special localized forms for this element's itext. (Given in the order provided by getAvailableRMForms())
 	 */ 
-	public Vector getAllRMTexts(){
-		String forms = "";
-		for(int i=0;i<getAvailableRMForms().size();i++){
-			forms +=","+getRichMediaText((String)getAvailableRMForms().elementAt(i));
+	public Vector getAllTextForms(String textID){
+		String tID = textID;
+		if(tID == null || tID == "") tID = this.textID;
+		
+		String texts = "";
+		Vector availForms = getAvailableTextForms(tID);
+		
+		for(int i=0;i<availForms.size();i++){
+			String curForm = (String)availForms.elementAt(i);
+			
+			if(curForm == "default" ){
+				texts+=","+getText(tID,"");
+				continue;
+			}
+			
+			texts +=","+getText(tID,curForm);
 		}
-		return DateUtils.split(forms,",",false);
+		
+		return DateUtils.split(texts,",",false);
 	}
 
 	public String getAppearanceHint ()  {
@@ -251,6 +271,10 @@ public class FormEntryCaption implements FormElementStateListener {
 	public void formElementStateChanged(TreeElement instanceNode,
 			int changeFlags) {
 		throw new RuntimeException("cannot happen");
+	}
+	
+	public String getTextID(){
+		return this.textID;
 	}
 	
 

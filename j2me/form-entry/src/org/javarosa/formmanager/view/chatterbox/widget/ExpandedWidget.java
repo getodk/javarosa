@@ -51,12 +51,6 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
 		String caption = fep.getLongText();
 		
-		////////####
-		System.out.println("RICH MEDIA IMAGE uri="+fep.getImageURI());
-		if(fep.getLongText()!=null && fep.getImageURI()!=null){
-			caption+="  "+fep.getImageURI();
-		}
-		///////####
 		prompt.setText(caption);
 		updateWidget(fep);
 		
