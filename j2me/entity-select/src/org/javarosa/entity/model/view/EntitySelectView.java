@@ -16,6 +16,7 @@
 
 package org.javarosa.entity.model.view;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
@@ -23,8 +24,11 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.Persistable;
@@ -36,8 +40,10 @@ import org.javarosa.j2me.log.HandledPItemStateListener;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
+import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
+import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
 import de.enough.polish.ui.UiAccess;
 
@@ -76,6 +82,9 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	private int firstIndex;
 	private int selectedIndex;
 	private String sortField;
+	
+	private Style headerStyle;
+	private Style rowStyle;
 	
 	private Vector<Integer> rowIDs; //index into data corresponding to current matches
 	
@@ -116,6 +125,8 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
         selectedIndex = 0;
         firstIndex = 0;
         
+        calculateStyles();
+        
         refresh();
 	}
 	
@@ -130,6 +141,52 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
         getMatches(tf.getText());
         selectEntity(selectedEntity);
         refreshList();
+	}
+	
+	private void calculateStyles() {
+		headerStyle = genStyleFromHints(entityPrototype.getStyleHints(true));
+		
+		rowStyle = genStyleFromHints(entityPrototype.getStyleHints(false));
+	}
+	
+	private Style genStyleFromHints(int[] hints) {
+		
+		int screenwidth = 240;
+		
+		//#ifdef javarosa.patientselect.screenwidth:defined
+		//#= screenwidth = ${ javarosa.patientselect.screenwidth };
+		//#elifdef polish.ScreenWidth:defined
+		//#= screenwidth = ${ polish.ScreenWidth };
+		//#else
+		//# screenwidth = this.getWidth();
+		//#endif
+		
+		Style style = new Style();
+		style.addAttribute("columns", new Integer(hints.length));
+		
+		int fullSize = 100;
+		int sharedBetween = 0;
+		for(int hint : hints) {
+			if(hint != -1) {
+				fullSize -= hint;
+			} else {
+				sharedBetween ++;
+			}
+		}
+		
+		double average = ((double)fullSize) / (double)sharedBetween;
+		int averagePixels = (int)(Math.floor((average / 100.0) * screenwidth));
+		
+		String columnswidth = "";
+		for(int hint : hints) {
+			int width = hint == -1? averagePixels : 
+				(int)Math.floor((((double)hint)/100.0)*screenwidth);
+			columnswidth += width + ",";
+		}
+		columnswidth = columnswidth.substring(0, columnswidth.lastIndexOf(','));
+		
+		style.addAttribute("columns-width", columnswidth);
+		return style;
 	}
 	
 	public void show () {
@@ -230,6 +287,8 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 			this.append( new StringItem("", "(" + Localization.get("entity.nomatch") + ")"));
 		}
 		
+		String[] colFormat = controller.getColumnFormat(false);
+		
 		for (int i = firstIndex; i < rowIDs.size() && i < firstIndex + MAX_ROWS_ON_SCREEN; i++) {
 			Container row;
 			int rowID = rowID(i);
@@ -254,10 +313,34 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 				String[] rowData = controller.getDataFields(rowID);
 				
 				for (int j = 0; j < rowData.length; j++) {
-					//#style patselCell
-					StringItem str = new StringItem("", rowData[j]);
-					applyStyle(str, STYLE_CELL);
-					row.add(str);
+					if(colFormat[j] == null) {
+						//#style patselCell
+						StringItem str = new StringItem("", rowData[j]);
+						applyStyle(str, STYLE_CELL);
+						row.add(str);
+					}
+					else if ("image".equals(colFormat[j])) {
+							String uri = rowData[j];
+							if(uri == null || uri.equals("")) {
+								//#style patselCell
+								StringItem str = new StringItem("", rowData[j]);
+								applyStyle(str, STYLE_CELL);
+								row.add(str);
+							} else {
+								try {
+							//#style patselCell
+							ImageItem img = new ImageItem("", Image.createImage(ReferenceManager._().DeriveReference(uri).getStream()),ImageItem.LAYOUT_CENTER,"img");
+							applyStyle(img, STYLE_CELL);
+							row.add(img);
+							} catch (IOException e) {
+							e.printStackTrace();
+							throw new RuntimeException("IO Exception while reading an image item for Entity Select");
+						} catch (InvalidReferenceException e) {
+							e.printStackTrace();
+							throw new RuntimeException("Invalid reference while trying to create an image for Entity Select: " + e.getReferenceString());
+						}
+						}
+					}
 				}
 			}
 
@@ -274,36 +357,14 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	private static final int STYLE_SELECTED = 4;
 	
 	private void applyStyle(Item i, int type) {
-		if (entityPrototype.getStyleKey() == null) {
-			return;
+		
+		if(type == STYLE_TITLE) {
+			i.getStyle().addAttribute("columns",  headerStyle.getIntProperty("columns"));
+			i.getStyle().addAttribute("columns-width", headerStyle.getProperty("columns-width"));
+		} else {
+			i.getStyle().addAttribute("columns",  rowStyle.getIntProperty("columns"));
+			i.getStyle().addAttribute("columns-width", rowStyle.getProperty("columns-width"));
 		}
-			
-		//#foreach esstyle in javarosa.patientselect.types
-		if("${esstyle}".equals(entityPrototype.getStyleKey())) {
-			switch(type) {
-			case STYLE_TITLE:
-				//#style ${esstyle}SelectTitleRow, patselTitleRow
-				UiAccess.setStyle(i);
-				break;
-			case STYLE_CELL:
-				//#style ${esstyle}SelectCell, patselCell
-				UiAccess.setStyle(i);
-				break;
-			case STYLE_EVEN:
-				//#style ${esstyle}SelectEvenRow, patselEvenRow
-				UiAccess.setStyle(i);
-				break;
-			case STYLE_ODD:
-				//#style ${esstyle}SelectOddRow, patselOddRow
-				UiAccess.setStyle(i);
-				break;
-			case STYLE_SELECTED:
-				//#style ${esstyle}SelectSelectedRow, patselSelectedRow
-				UiAccess.setStyle(i);
-				break;
-			}
-		}
-		//#next esstyle
 	}
 		
 	//needs no exception wrapping

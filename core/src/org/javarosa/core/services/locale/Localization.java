@@ -2,6 +2,8 @@ package org.javarosa.core.services.locale;
 
 import java.util.Hashtable;
 
+import org.javarosa.core.reference.ReferenceDataSource;
+
 public class Localization {
 	private static Localizer globalLocalizer;
 	
@@ -25,6 +27,17 @@ public class Localization {
 			globalLocalizer.addAvailableLocale(localeName);
 		}
 		globalLocalizer.registerLocaleResource(localeName, new ResourceFileDataSource(resourceFileURI));
+		if(globalLocalizer.getDefaultLocale() == null) {
+			globalLocalizer.setDefaultLocale(localeName);
+		}
+	}
+	
+	public static void registerLanguageReference(String localeName, String referenceUri) {
+		init();
+		if(!globalLocalizer.hasLocale(localeName)){ 
+			globalLocalizer.addAvailableLocale(localeName);
+		}
+		globalLocalizer.registerLocaleResource(localeName, new ReferenceDataSource(referenceUri));
 		if(globalLocalizer.getDefaultLocale() == null) {
 			globalLocalizer.setDefaultLocale(localeName);
 		}

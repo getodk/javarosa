@@ -116,7 +116,7 @@ public class UserValidator {
 			s += ": " + Localization.get("activity.adduser.problem.mismatchingpasswords");
 		}
 		
-		J2MEDisplay.showError("",s);
+		J2MEDisplay.showError(null,s);
 	}
 
 
