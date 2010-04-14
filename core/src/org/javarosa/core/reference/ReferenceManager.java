@@ -14,12 +14,12 @@ public class ReferenceManager {
 	
 	private static ReferenceManager instance;
 	
-	private Vector<Root> runtimeRoots;
-	private Vector<RawRoot> rawRoots;
+	private Vector<RootTranslator> translators;
+	private Vector<ReferenceFactory> factories;
 	
 	private ReferenceManager() {
-		runtimeRoots = new Vector<Root>();
-		rawRoots = new Vector<RawRoot>();
+		translators = new Vector<RootTranslator>();
+		factories = new Vector<ReferenceFactory>();
 	}
 	
 	public static ReferenceManager _() {
@@ -29,21 +29,21 @@ public class ReferenceManager {
 		return instance;
 	}
 	
-	public RawRoot[] getRoots() {
-		RawRoot[] roots = new RawRoot[runtimeRoots.size()];
-		runtimeRoots.copyInto(roots);
+	public ReferenceFactory[] getFactories() {
+		ReferenceFactory[] roots = new ReferenceFactory[translators.size()];
+		translators.copyInto(roots);
 		return roots;
 	}
 	
-	public void addRoot(Root root) {
-		if(!runtimeRoots.contains(root)) {
-			runtimeRoots.addElement(root);
+	public void addRootTranslator(RootTranslator translator) {
+		if(!translators.contains(translator)) {
+			translators.addElement(translator);
 		}
 	}
 	
-	public void addRawReferenceRoot(RawRoot root) {
-		if(!rawRoots.contains(root)) {
-			rawRoots.addElement(root);
+	public void addReferenceFactory(ReferenceFactory factory) {
+		if(!factories.contains(factory)) {
+			factories.addElement(factory);
 		}
 	}
 	
@@ -75,17 +75,17 @@ public class ReferenceManager {
 		}
 	}
 	
-	private RawRoot derivingRoot(String uri) throws InvalidReferenceException {
+	private ReferenceFactory derivingRoot(String uri) throws InvalidReferenceException {
 		
 		//First, try any/all roots referenced at runtime.
-		for(Root root : runtimeRoots) {
+		for(RootTranslator root : translators) {
 			if(root.derives(uri)) {
 				return root;
 			}
 		}
 		
 		//Now try all of the raw connectors available 
-		for(RawRoot root : rawRoots) {
+		for(ReferenceFactory root : factories) {
 			if(root.derives(uri)) {
 				return root;
 			}

@@ -37,7 +37,7 @@ public class TransportManagerModule implements IModule {
 		} ;
 		StorageManager.registerStorage(TransportMessageStore.Q_STORENAME, new WrappingStorageUtility(TransportMessageStore.Q_STORENAME,new TransportMessageSerializationWrapper(),f));
 		StorageManager.registerStorage(TransportMessageStore.RECENTLY_SENT_STORENAME, new WrappingStorageUtility(TransportMessageStore.RECENTLY_SENT_STORENAME,new TransportMessageSerializationWrapper(),f));
-		ReferenceManager._().addRawReferenceRoot(new HttpRoot());
+		ReferenceManager._().addReferenceFactory(new HttpRoot());
 	}
 
 }
