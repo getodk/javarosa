@@ -16,6 +16,7 @@
 
 package org.javarosa.entity.model.view;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
@@ -23,8 +24,11 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectController;
@@ -32,15 +36,14 @@ import org.javarosa.entity.model.Entity;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.log.HandledPItemStateListener;
-import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.FramedForm;
+import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
-import de.enough.polish.ui.UiAccess;
 
 public class EntitySelectView<E extends Persistable> extends FramedForm implements HandledPItemStateListener, HandledCommandListener {
 	//#if javarosa.patientselect.formfactor == nokia-s40 or javarosa.patientselect.formfactor == sony-k610i
@@ -278,6 +281,8 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 			this.append( new StringItem("", "(No matches)"));
 		}
 		
+		String[] colFormat = controller.getColumnFormat(false);
+		
 		for (int i = firstIndex; i < rowIDs.size() && i < firstIndex + MAX_ROWS_ON_SCREEN; i++) {
 			Container row;
 			int rowID = rowID(i);
@@ -302,10 +307,34 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 				String[] rowData = controller.getDataFields(rowID);
 				
 				for (int j = 0; j < rowData.length; j++) {
-					//#style patselCell
-					StringItem str = new StringItem("", rowData[j]);
-					applyStyle(str, STYLE_CELL);
-					row.add(str);
+					if(colFormat[j] == null) {
+						//#style patselCell
+						StringItem str = new StringItem("", rowData[j]);
+						applyStyle(str, STYLE_CELL);
+						row.add(str);
+					}
+					else if ("image".equals(colFormat[j])) {
+							String uri = rowData[j];
+							if(uri == null || uri.equals("")) {
+								//#style patselCell
+								StringItem str = new StringItem("", rowData[j]);
+								applyStyle(str, STYLE_CELL);
+								row.add(str);
+							} else {
+								try {
+							//#style patselCell
+							ImageItem img = new ImageItem("", Image.createImage(ReferenceManager._().DeriveReference(uri).getStream()),ImageItem.LAYOUT_CENTER,"img");
+							applyStyle(img, STYLE_CELL);
+							row.add(img);
+							} catch (IOException e) {
+							e.printStackTrace();
+							throw new RuntimeException("IO Exception while reading an image item for Entity Select");
+						} catch (InvalidReferenceException e) {
+							e.printStackTrace();
+							throw new RuntimeException("Invalid reference while trying to create an image for Entity Select: " + e.getReferenceString());
+						}
+						}
+					}
 				}
 			}
 

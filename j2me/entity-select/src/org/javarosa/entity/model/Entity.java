@@ -124,6 +124,17 @@ public abstract class Entity <E extends Persistable> {
 		}
 		return empty;
 	}
+	
+	/**
+	 * @param header Whether the forms pertain to the header or to the
+	 * fields themselves
+	 * @return A set of hints representing how the text inside of the field
+	 * should be displayed. The basic forms are
+	 * <ul><li>null : normal text</li><li>"image" : an image</li></ul>
+	 */
+	public String[] getForms(boolean header) {
+		return new String[this.getHeaders(false).length];
+	}
 
 	/**
 	 * Return the data to be shown for this entity on the list screen. Data should correspond one-for-one
