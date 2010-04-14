@@ -16,7 +16,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @author ctsims
  *
  */
-public class Root implements RawRoot, Externalizable {
+public class RootTranslator implements ReferenceFactory, Externalizable {
 	
 	public String prefix;
 	public String translatedPrefix;
@@ -24,11 +24,11 @@ public class Root implements RawRoot, Externalizable {
 	/**
 	 * Serialization only!
 	 */
-	public Root() {
+	public RootTranslator() {
 		
 	}
 	
-	public Root(String prefix, String translatedPrefix) {
+	public RootTranslator(String prefix, String translatedPrefix) {
 		//TODO: Manage semantics of "ends with /" etc here?
 		this.prefix = prefix;
 		this.translatedPrefix = translatedPrefix;
