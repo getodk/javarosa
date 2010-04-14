@@ -16,10 +16,12 @@
 
 package org.javarosa.core.model.condition;
 
+import java.util.Date;
 import java.util.Hashtable;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.xpath.IExprDataType;
 
 /* a collection of objects that affect the evaluation of an expression, like function handlers
  * and (not supported) variable bindings
@@ -59,7 +61,38 @@ public class EvaluationContext {
 	}
 	
 	public void setVariable(String name, Object value) {
-		variables.put(name, value);
+		//No such thing as a null xpath variable. Empty
+		//values in XPath just get converted to ""
+		if(value == null) {
+			variables.put(name, "");
+			return;
+		}
+		//Otherwise check whether the value is one of the normal first
+		//order datatypes used in xpath evaluation
+		if(value instanceof Boolean ||
+				   value instanceof Double  ||
+				   value instanceof String  ||
+				   value instanceof Date    ||
+				   value instanceof IExprDataType) {
+				variables.put(name, value);
+				return;
+		}
+		
+		//Some datatypes can be trivially converted to a first order
+		//xpath datatype
+		if(value instanceof Integer) {
+			variables.put(name, new Double(((Integer)value).doubleValue()));
+			return;
+		}
+		if(value instanceof Float) {
+			variables.put(name, new Double(((Float)value).doubleValue()));
+			return;
+		}
+		
+		//Otherwise we just hope for the best, I suppose? Should we log this?
+		else {
+			variables.put(name, value);
+		}
 	}
 	
 	public Object getVariable(String name) {
