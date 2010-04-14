@@ -37,7 +37,7 @@ public class XPathVariableReference extends XPathExpression {
     }
     
 	public Object eval (FormInstance model, EvaluationContext evalContext) {
-		throw new XPathUnsupportedException("variable reference");
+		return evalContext.getVariable(id.toString());
 	}
 
 	public String toString () {

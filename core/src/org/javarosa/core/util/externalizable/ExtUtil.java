@@ -139,6 +139,13 @@ public class ExtUtil {
 			out.write(bytes);
 	}
 	
+	public static void writeInts(DataOutputStream out, int[] ints) throws IOException {
+		ExtUtil.writeNumeric(out, ints.length);
+		for(int i : ints) {
+			ExtUtil.writeNumeric(out, i);
+		}
+	}
+	
 	public static Object read (DataInputStream in, Class type) throws IOException, DeserializationException {
 		return read(in, type, null);
 	}
@@ -237,6 +244,15 @@ public class ExtUtil {
 			toread -= read;
 		}
 		return bytes;
+	}
+	
+	public static int[] readInts(DataInputStream in) throws IOException {
+		int size = (int)ExtUtil.readNumeric(in);
+		int[] ints = new int[size];
+		for(int i = 0 ; i < size ; ++i ) {
+			ints[i] = (int)ExtUtil.readNumeric(in);
+		}
+		return ints;
 	}
 	
 	public static int toInt (long l) {

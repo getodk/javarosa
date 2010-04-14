@@ -20,6 +20,7 @@
 package org.javarosa.chsreferral.util;
 
 import org.javarosa.chsreferral.model.PatientReferral;
+import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.TreeElement;
@@ -61,6 +62,10 @@ public class PatientReferralPreloader implements IPreloadHandler {
 			return new StringData(referral.getReferralId());
 		} if(preloadParams.equals("type")) {
 			return new StringData(referral.getType());
+		} if(preloadParams.equals("date-due")) {
+			return new DateData(referral.getDateDue());
+		} if(preloadParams.equals("date-created")) {
+			return new DateData(referral.getDateCreated());
 		} else {
 			return null;
 		}
