@@ -39,11 +39,11 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen {
 		if (prompt.isRequired()) {
 			// #style choiceGroup
 			cg = new ChoiceGroup("*"
-					+ prompt.getLongText(),
+					+ prompt.getLongText(null),
 					ChoiceGroup.EXCLUSIVE);
 		} else {
 			// #style choiceGroup
-			cg = new ChoiceGroup(prompt.getLongText(),
+			cg = new ChoiceGroup(prompt.getLongText(null),
 					ChoiceGroup.EXCLUSIVE);
 		}
 

@@ -286,6 +286,8 @@ public class QuestionDef implements IFormElement, Localizable {
 	}
 
 	public String getLabelInnerText() {
+		System.out.println("QuestionDef.getLabelInnerText()");
+		System.out.flush();
 		return labelInnerText;
 	}
 	

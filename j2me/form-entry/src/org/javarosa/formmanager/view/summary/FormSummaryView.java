@@ -80,7 +80,7 @@ public class FormSummaryView extends List {
 					text = "Add "
 							+ (index.getElementMultiplicity() == 0 ? "a "
 									: "another ")
-							+ hierachy[hierachy.length - 1].getLongText() + "?";
+							+ hierachy[hierachy.length - 1].getLongText(null) + "?";
 					try {
 						img = Image.createImage(Localization.get("plussign"));
 					} catch (IOException ioe) {
@@ -122,7 +122,7 @@ public class FormSummaryView extends List {
 
 	private String getText(FormEntryPrompt prompt) {
 		String line = "";
-		line += prompt.getLongText() + " => ";
+		line += prompt.getLongText(null) + " => ";
 		if (prompt.isRequired() && prompt.getAnswerValue() == null) {
 			line = "*" + line;
 		}
@@ -137,7 +137,7 @@ public class FormSummaryView extends List {
 	private String getHeaderText(FormEntryCaption[] hierachy) {
 		String headertext = "";
 		for (FormEntryCaption caption : hierachy) {
-			headertext += caption.getLongText();
+			headertext += caption.getLongText(null);
 
 			if (caption.getIndex().getInstanceIndex() > -1)
 				headertext += " " + (caption.getMultiplicity() + 1);

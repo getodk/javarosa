@@ -47,7 +47,7 @@ public class MessageWidget implements IWidgetStyleEditable {
 	}
 
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
-		prompt.setText(fep.getLongText());
+		prompt.setText(fep.getLongText(null));
 	}
 
 	public IAnswerData getData () {

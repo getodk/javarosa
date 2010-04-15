@@ -120,6 +120,8 @@ public class GroupDef implements IFormElement, Localizable {
 	
 	public String getLabelInnerText() {
 		// TODO Auto-generated method stub
+		System.out.println("FormDef.getLabelInnerText()");
+		System.out.flush();
 		return labelInnerText;
 	}
 	

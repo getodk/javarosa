@@ -170,7 +170,7 @@
 	<target name="BuildRelease" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, enableRelease, BuildPolish"/>
 
 	<!-- Main Target: Cleans, and then runs the build target with the emulator -->
-	<target name="BuildCleanRunEmulator" description="allows a clean build, and then launches the emulator" depends="Clean, enableEmulator, BuildPolish" />
+	<target name="BuildCleanRunEmulator" description="allows a clean build, and then launches the emulator" depends="disableObfuscator, Clean, enableEmulator, BuildPolish" />
 
 	<target name="BuildRunEmulator" description="allows a clean build, and then launches the emulator" depends="disableObfuscator, enableEmulator, BuildPolish" />
 

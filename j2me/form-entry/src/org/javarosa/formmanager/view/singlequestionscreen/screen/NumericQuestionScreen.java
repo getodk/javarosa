@@ -35,9 +35,9 @@ public class NumericQuestionScreen extends SingleQuestionScreen {
 		// #style textBox
 		tf = new TextField("", "", 200, TextField.NUMERIC);
 		if (prompt.isRequired())
-			tf.setLabel("*" + prompt.getLongText());
+			tf.setLabel("*" + prompt.getLongText(null));
 		else
-			tf.setLabel(prompt.getLongText());
+			tf.setLabel(prompt.getLongText(null));
 
 		IAnswerData answerData = prompt.getAnswerValue();
 		if ((answerData != null) && (answerData instanceof IntegerData))

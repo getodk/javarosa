@@ -92,7 +92,7 @@ public class FormOverview {
 	private static void listQuestion (FormDef f, QuestionDef q, int indent, StringBuffer sb) {
 		TreeElement instanceNode = getInstanceNode(f.getInstance(), q.getBind());
 		
-		String caption = q.getLongText();
+		String caption = q.getLongText(null);
 		int type = instanceNode.dataType;
 		
 		if (q.getControlType() != Constants.CONTROL_TRIGGER) {
@@ -254,7 +254,7 @@ public class FormOverview {
 	
 	private static boolean listGroup (FormDef f, GroupDef g, int indent, StringBuffer sb) {
 		boolean repeat = g.getRepeat();
-		String caption = ExtUtil.nullIfEmpty(g.getLongText());
+		String caption = ExtUtil.nullIfEmpty(g.getLongText(null));
 		TreeElement instanceNode = getInstanceNode(f.getInstance(), g.getBind());
 		
 		String relevant = printConditionalProperty("relevant", f, instanceNode);
