@@ -14,7 +14,7 @@ import java.io.OutputStream;
  * 
  * References are retrieved from the ReferenceManager, which is
  * responsible for turning different URI's (either normal http://,
- * etc URI's or JavaRosa jr:// URI's) into a referenc to an actual
+ * etc URI's or JavaRosa jr:// URI's) into a reference to an actual
  * resource.
  * 
  * @author ctsims
