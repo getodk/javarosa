@@ -94,6 +94,7 @@ public class JRDemoContext {
 			forms.write(XFormUtils.getFormFromResource("/PhysicoChemTestsDemo.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/RichMediaExample.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/ImageSelectTester.xhtml"));
+			
 		} catch (StorageFullException e) {
 			throw new RuntimeException("uh-oh, storage full [forms]"); //TODO: handle this
 		}
