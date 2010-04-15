@@ -69,13 +69,13 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		if(AvailFormTypes.contains("long")){
 			ILabel = (String)AvailForms.elementAt(AvailFormTypes.indexOf("long"));
 		}else{
-			ILabel = fep.getDefaultText();
+			ILabel = fep.getDefaultText(null);
 		}
 		
 		if(AvailFormTypes.contains("short")){
 			IaltText = (String)AvailForms.elementAt(AvailFormTypes.indexOf("short"));
 		}else{
-			IaltText = fep.getDefaultText();
+			IaltText = fep.getDefaultText(null);
 		}
 		
 		if(AvailFormTypes.contains("image")){
@@ -91,9 +91,9 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 				c.add(imItem);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				System.out.println("IOEXCEPTION ERROR!! Probably something to do with the image at supposed URI: "+Iuri);
-				System.out.println("Available form Types: "+AvailFormTypes);
-				System.out.println("Available form Texts: "+AvailForms);
+				System.out.println("IOEXCEPTION ERROR! Cant find image at URI:"+Iuri);
+				System.out.println("Available Text forms: "+AvailFormTypes);
+				System.out.println("Available Texts: "+AvailForms);
 				e.printStackTrace();
 			}
 			
@@ -104,11 +104,11 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		String caption;
 		
 		if(fep.getAvailableTextFormTypes(fep.getTextID()).contains("long")){
-			caption = fep.getLongText();
+			caption = fep.getLongText(null);
 		}else if(fep.getAvailableTextFormTypes(fep.getTextID()).contains("short")){
-			caption = fep.getShortText();
+			caption = fep.getShortText(null);
 		}else{
-			caption = fep.getDefaultText();
+			caption = fep.getDefaultText(null);
 		}
 		
 		prompt.setText(caption);

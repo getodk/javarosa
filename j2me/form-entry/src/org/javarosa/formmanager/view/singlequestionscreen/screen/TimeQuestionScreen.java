@@ -35,14 +35,14 @@ public class TimeQuestionScreen extends SingleQuestionScreen {
 
 	public void createView() {
 		// #style textBox
-		timePicker = new DateField(prompt.getShortText(),
+		timePicker = new DateField(prompt.getShortText(null),
 				DateField.TIME);
 		// set question
 		if (prompt.isRequired())
 			timePicker.setLabel("*"
-					+ prompt.getLongText()); 
+					+ prompt.getLongText(null)); 
 		else
-			timePicker.setLabel(prompt.getLongText());
+			timePicker.setLabel(prompt.getLongText(null));
 
 		// check if the field has already been filled in by default value- if so
 		// display value

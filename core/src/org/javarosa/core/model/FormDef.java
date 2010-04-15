@@ -1197,6 +1197,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * Not applicable here.
 	 */
 	public String getLabelInnerText() {
+		System.out.println("FormDef.getLabelInnerText()");
+		System.out.flush();
 		return null;
 	}
 

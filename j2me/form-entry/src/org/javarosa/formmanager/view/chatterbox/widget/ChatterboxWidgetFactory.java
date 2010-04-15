@@ -149,17 +149,17 @@ public class ChatterboxWidgetFactory {
 		
 		String label; //decide what text form to use.
 		
-		////!!!DELETEME
-		System.out.println("getNewRepeatWidget(), Avail String forms:\n"+p.getAvailableTextFormTypes(p.getTextID()));
-		//////
 		
 		
 		if(p.getAvailableTextFormTypes(p.getTextID()).contains("long")){
-			label = p.getLongText();
+			label = p.getLongText(null);
 		}else if(p.getAvailableTextFormTypes(p.getTextID()).contains("short")){
-			label = p.getShortText();
+			label = p.getShortText(null);
 		}else{
-			label = p.getDefaultText();
+	
+			label = p.getDefaultText(null);
+			
+	
 		}
     	
     	

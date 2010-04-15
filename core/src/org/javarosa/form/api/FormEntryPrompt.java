@@ -152,7 +152,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @return localized Question text (default form), LabelInnerText if default form is not available.
 	 */
 	public String getQText(){
-		return this.getDefaultText();
+		return this.getDefaultText(null);
 	}
 	
 	/**
@@ -190,14 +190,13 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @throws NullPointerException
 	 */
 	public String getSelectChoiceText(SelectChoice sel){
-		System.out.println("getSelectChoiceText() textID = "+sel.getTextID());
 		String tID = sel.getTextID();
 		
 		if(tID == null || tID == ""){
 			return sel.getLabelInnerText();
 		}
 		
-		String text = getText(tID,"");
+		String text = getLongText(tID);
 		if(text == null || text == ""){
 			text = sel.getLabelInnerText(); //final fallback
 		}
@@ -213,8 +212,6 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @return String array of all the Itext form texts available for this text
 	 */
 	public Vector getAllSelectTextForms(SelectChoice sel){
-//		return this.getAllTextForms(sel.choice.getTextID());
-		
 		String tID = sel.getTextID();
 		if(tID == null || tID == "") return new Vector();
 		
@@ -239,10 +236,8 @@ public class FormEntryPrompt extends FormEntryCaption {
 	
 	//sorry for the ugly wording...
 	public Vector getAvailSelectTextFormTypes(SelectChoice sel){
-		//return this.getAvailableTextFormTypes(sel.choice.getTextID());
-		
 		String tID = sel.getTextID();
-		System.out.println("TextID in getAvailSelectTextFormTypes() = "+tID);
+
 		if(tID == null||tID=="") return new Vector();
 		String types="";
 

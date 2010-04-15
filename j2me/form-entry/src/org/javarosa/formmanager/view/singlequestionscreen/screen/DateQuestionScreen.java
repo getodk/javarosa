@@ -35,14 +35,14 @@ public class DateQuestionScreen extends SingleQuestionScreen {
 
 	public void createView() {
 		// #style textBox
-		datePicker = new DateField(prompt.getShortText(),
+		datePicker = new DateField(prompt.getShortText(null),
 				DateField.DATE);
 		
 		if (prompt.isRequired())
 			datePicker.setLabel("*"
-					+ prompt.getLongText());
+					+ prompt.getLongText(null));
 		else
-			datePicker.setLabel(prompt.getLongText());
+			datePicker.setLabel(prompt.getLongText(null));
 
 		// check if the field has already been filled in by default value- if so
 		// display value
