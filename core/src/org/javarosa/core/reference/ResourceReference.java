@@ -8,6 +8,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
+ * A Resource Reference is a reference to a file which 
+ * is a Java Resource, which is accessible with the
+ * 'getResourceAsStream' method from the Java Classloader.
+ * 
+ * Resource References are read only, and can identify with
+ * certainty whether a binary file is located at them. 
+ * 
  * @author ctsims
  *
  */
