@@ -31,8 +31,12 @@ public abstract class PrefixedRootFactory implements ReferenceFactory {
 	String[] roots;
 	
 	/**
-	 * Construct a PrefixedRootFactory which handles the 
-	 * @param roots
+	 * Construct a PrefixedRootFactory which handles the roots 
+	 * provided. Implementing subclasses will actually do the
+	 * root construction by implementing the "factory()" method.
+	 * 
+	 * @param roots The roots of URI's which should be derived by
+	 * this factory.
 	 */
 	public PrefixedRootFactory(String[] roots) {
 		this.roots = new String[roots.length];
@@ -66,6 +70,7 @@ public abstract class PrefixedRootFactory implements ReferenceFactory {
 	 * URI. 
 	 * 
 	 * @param terminal The local part of the URI for this prefixed root
+	 * (excluding the root itself)
 	 * @param URI The full URI 
 	 * @return A reference which describes the URI 
 	 */
