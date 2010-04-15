@@ -10,7 +10,7 @@ package org.javarosa.core.reference;
  * reference exception is not thrown does not mean
  * that there is a binary data blob at the created
  * reference, only that it has meaning and could refer
- * to something in the current environmnt.
+ * to something in the current environment.
  * 
  * @author ctsims
  *
