@@ -31,6 +31,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
+import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryModel;
@@ -373,10 +374,19 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     
 
 	private void createHeaderForElement(FormIndex questionIndex) {
-		String headerText = model.getCaptionPrompt(questionIndex).getLongText();
-		if(headerText != null) {
-			
-				
+		FormEntryCaption prompt = model.getCaptionPrompt(questionIndex);
+		
+		String headerText; //decide what text form to use.
+		if(prompt.getAvailableTextFormTypes(prompt.getTextID()).contains("long")){
+			headerText = prompt.getLongText();
+		}else if(prompt.getAvailableTextFormTypes(prompt.getTextID()).contains("short")){
+			headerText = prompt.getShortText();
+		}else{
+			headerText = prompt.getDefaultText();
+		}
+		
+		
+		if(headerText != null) {		
 			ChatterboxWidget headerWidget = widgetFactory.getNewLabelWidget(questionIndex, headerText);
 			//If there is no valid header, there's no valid header. Possibly no label.
 			this.append(headerWidget);

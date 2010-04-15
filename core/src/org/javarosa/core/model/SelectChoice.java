@@ -82,15 +82,17 @@ public class SelectChoice implements Externalizable, Localizable {
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		isLocalizable = ExtUtil.readBool(in);
-		setLabelInnerText(ExtUtil.readString(in));
-		value = ExtUtil.readString(in);
+		setLabelInnerText(ExtUtil.nullIfEmpty(ExtUtil.readString(in)));
+		setTextID(ExtUtil.nullIfEmpty(ExtUtil.readString(in)));
+		value = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		//index will be set by questiondef
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeBool(out, isLocalizable);
-		ExtUtil.writeString(out, isLocalizable ? textID : labelInnerText);
-		ExtUtil.writeString(out, value);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(labelInnerText));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(textID));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(value));
 		//don't serialize index; it will be restored from questiondef
 	}
 

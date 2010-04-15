@@ -16,12 +16,19 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import java.io.IOException;
+import java.util.Vector;
+
+import javax.microedition.lcdui.Image;
+
 import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Container;
+import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.MoreUIAccess;
 import de.enough.polish.ui.Style;
@@ -173,10 +180,54 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 
 	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
-			SelectChoice choice = prompt.getSelectChoices().elementAt(i);
-			prompt.
 			
-			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(choice));
+			SelectChoice sc = prompt.getSelectChoices().elementAt(i);
+			Selection s = sc.selection();
+			
+			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(sc));
+			
+			String ILabel,Iuri,IaltText;
+			Vector AvailFormTypes = prompt.getAvailSelectTextFormTypes(sc);
+			Vector AvailForms = prompt.getAllSelectTextForms(sc);
+			System.out.println("SelectEntryWidget.updateWidget() AvailableSelectTextForms: "+AvailFormTypes);
+			System.out.println("SelectEntryWidget.updateWidget() AvailableSelectTexts: "+AvailForms);
+			if(AvailFormTypes.contains("long")){
+				ILabel = (String)AvailForms.elementAt(AvailFormTypes.indexOf("long"));
+			}else{
+				ILabel = prompt.getSelectChoiceText(sc);
+			}
+			
+			if(AvailFormTypes.contains("short")){
+				IaltText = (String)AvailForms.elementAt(AvailFormTypes.indexOf("short"));
+			}else{
+				IaltText = prompt.getSelectChoiceText(sc);
+			}
+			
+			if(AvailFormTypes.contains("image")){
+				Iuri = (String)AvailForms.elementAt(AvailFormTypes.indexOf("image"));
+				
+			}else{
+				Iuri = null;
+			}
+			
+			if(Iuri != null){
+				try {
+					Image im = Image.createImage(Iuri);
+					choiceGroup().getItem(i).setImage(im);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					System.out.println("IOEXCEPTION ERROR!! Probably something to do with the image at supposed URI: "+Iuri);
+					System.out.println("Available form Types: "+AvailFormTypes);
+					System.out.println("Available form Texts: "+AvailForms);
+					e.printStackTrace();
+				}
+				
+				
+				
+			}else{
+				System.out.println("IUri was null in SelectEntryWidget.updateWidget()");
+			}
+			
 		}
 	}
 }

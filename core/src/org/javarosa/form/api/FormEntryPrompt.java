@@ -25,6 +25,7 @@ import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.UnregisteredLocaleException;
@@ -78,15 +79,7 @@ public class FormEntryPrompt extends FormEntryCaption {
     public IAnswerData getAnswerValue() {
         return mTreeElement.getValue();
     }
-
-    
-//    //TODO AnswerText is.. problematic.
-//    //There are various forms of "AnswerText" that could be returned
-//    //depending on what the answer type is.
-//    public String getAnswerText() {
-//        return getAnswerValue().getDisplayText();
-//    }
-
+   
     public String getConstraintText() {
         return mTreeElement.getConstraint().constraintMsg;
     }
@@ -95,42 +88,7 @@ public class FormEntryPrompt extends FormEntryCaption {
         return getQuestion().getChoices();
     }
 
-//    /**
-//     * Get a vector containing the captions (or URIs as the case may be)
-//     * of the SelectChoices within the current Question.
-//     * @param subForm Specificy a specific type of subform (e.g. "audio","image","long",etc) to return. Can be null. See getChoiceCaption(int,String) for specifics.
-//     * @return
-//     */
-//    public Vector<String> getChoiceCaptions(String subForm){
-//    	Vector<SelectChoice> choices = getSelectChoices();
-//    	Vector<String> captions = new Vector<String>();
-//    	
-//    	for(int i=0;i<choices.size();i++){
-//    		captions.addElement(getChoiceCaption(i,subForm));
-//    	}
-//    	
-//    	return captions;
-//    	
-//    }
-//    
-//    /**
-//     * Gets the caption of a select choice, according to form.
-//     * if form=null or the subform doesn't exist for the current locale
-//     * the long-form will be returned. If the long form doesn't exist either
-//     * return the &ltvalue&gt innerText value.
-//     * @param ind
-//     * @param subform subform type (e.g. "long","audio","image","short",etc). Can be null.
-//     * @return
-//     */
-//    public String getChoiceCaption(int ind,String subform){
-//    	SelectChoice choice = getSelectChoices().elementAt(ind);
-//    	Localizer l = form.getLocalizer();
-//    	String caption = l.getText(choice.getCaptionID()+";"+subform,l.getLocale());
-//    	if(caption==null && subform!="long") caption=l.getText(choice.getCaptionID()+";long");
-//    
-//    	if(caption==null) caption=choice.getValue();
-//    	return caption;
-//    }
+
     
     public boolean isRequired() {
         return mTreeElement.required;
@@ -209,48 +167,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	
 
 	
-//	/**
-//	 * 
-//	 * @return String array of all available text forms for this question text
-//	 * example {{"default","Text in Bla"},{"audio","sound-file.mp3"},{"image","image.jpg"}}
-//	 * Forms are in no particular order.  If there are no forms to be found, an empty array will be returned.
-//	 */
-//	public String[][] getTextForms(){
-//		return getTextForms(this.getTextID());
-//	}
-//	
-//	private String[][] getTextForms(String tID){
-//		Vector strings = new Vector();
-//		Vector types = new Vector();
-//		
-//		String temp;
-//		
-//		String defaultText = this.localizer.getText(tID);
-//		
-//		if(defaultText!=null && defaultText != ""){
-//			strings.addElement(defaultText);
-//			types.addElement("default");
-//		}
-//		
-//		for(String s:this.richMediaFormTypes){
-//			temp = this.localizer.getText(tID+";"+s);
-//			if(temp==defaultText || temp == null || temp == ""){
-//				continue;
-//			}else{
-//				strings.addElement(temp);
-//				types.addElement(s);
-//			}
-//			
-//		}
-//		
-//		String returnStrings[][] = new String[types.size()][2];
-//		for(int i = 0;i<types.size();i++){
-//			returnStrings[i][0] = (String)types.elementAt(i);
-//			returnStrings[i][1] = (String)strings.elementAt(i);
-//		}
-//		
-//		return returnStrings;
-//	}
+
 	
 
 	
@@ -273,6 +190,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @throws NullPointerException
 	 */
 	public String getSelectChoiceText(SelectChoice sel){
+		System.out.println("getSelectChoiceText() textID = "+sel.getTextID());
 		String tID = sel.getTextID();
 		
 		if(tID == null || tID == ""){
@@ -292,12 +210,60 @@ public class FormEntryPrompt extends FormEntryCaption {
 	/**
 	 * 
 	 * @param sel
-	 * @return String array of all the Itext form types available for this text
-	 * see getTextForms() javadoc for example.
+	 * @return String array of all the Itext form texts available for this text
 	 */
-	public String[][] getSelectTextForms(Selection sel){
-		return getTextForms(sel.choice.getTextID());
+	public Vector getAllSelectTextForms(SelectChoice sel){
+//		return this.getAllTextForms(sel.choice.getTextID());
+		
+		String tID = sel.getTextID();
+		if(tID == null || tID == "") return new Vector();
+		
+		String texts = "";
+		Vector availForms = getAvailSelectTextFormTypes(sel);
+		
+		for(int i=0;i<availForms.size();i++){
+			String curForm = (String)availForms.elementAt(i);
+			
+			if(curForm == "default"){
+				texts+=","+getText(tID,"");
+				continue;
+			}
+			
+			texts +=","+getText(tID,curForm);
+		}
+		
+		Vector vec = DateUtils.split(texts,",",false);
+		vec.removeElement("");
+		return vec;
 	}
+	
+	//sorry for the ugly wording...
+	public Vector getAvailSelectTextFormTypes(SelectChoice sel){
+		//return this.getAvailableTextFormTypes(sel.choice.getTextID());
+		
+		String tID = sel.getTextID();
+		System.out.println("TextID in getAvailSelectTextFormTypes() = "+tID);
+		if(tID == null||tID=="") return new Vector();
+		String types="";
+
+		//check for default
+		if(null != localizer.getRawText(localizer.getLocale(), tID)){
+			types+="default";
+		}
+		
+		//run through types list
+		for(int i=0;i<richMediaFormTypes.length;i++){
+			String curType = richMediaFormTypes[i];
+			if(null != localizer.getRawText(localizer.getLocale(), tID+";"+curType)){
+				types+=","+curType;
+			}
+		}
+		Vector vec = DateUtils.split(types,",",false);
+		vec.removeElement("");
+		return vec;
+	}
+		
+	
 	
 	/**
 	 * Get the Itext for a specific selection and specific itext form
@@ -318,18 +284,5 @@ public class FormEntryPrompt extends FormEntryCaption {
 	public String getSelectChoiceText(SelectChoice sel, String form){
 		return getText(sel.getTextID(), form);
 	}
-	
-	
-//	/**
-//	 * Get the answer text for this question.
-//	 * @return
-//	 * TODO
-//	 */
-//	public String getAnswerText(){
-//		return null
-//	}
-
-
-
 }
 

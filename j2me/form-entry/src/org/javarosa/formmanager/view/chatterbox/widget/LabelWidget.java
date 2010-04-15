@@ -53,9 +53,7 @@ public class LabelWidget implements IWidgetStyle {
 		// question texts for long questions.
 		String caption = prompt.getLongText();
 
-		/////////##########DELETEME
-		System.out.println("Available RM forms vector size in element caption:"+caption+"::"+prompt.getAvailableRMForms().size());
-		/////////##################
+
 		
 		
 		if(multiplicity != -1) {

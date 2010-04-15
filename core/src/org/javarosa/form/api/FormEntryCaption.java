@@ -79,7 +79,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @param textID (Optional) if null, uses textID of this FormEntryCaption
 	 * @return String Array of form names available in current locale
 	 */
-	public Vector getAvailableTextForms(String textID){
+	public Vector getAvailableTextFormTypes(String textID){
 		String tID = textID;
 		if(tID == null || tID == "") tID = this.textID; //fallback to this FormEntry's textID
 		if(tID == null) return new Vector();
@@ -97,7 +97,9 @@ public class FormEntryCaption implements FormElementStateListener {
 				types+=","+curType;
 			}
 		}
-		return DateUtils.split(types,",",false);
+		Vector vec = DateUtils.split(types,",",false);
+		vec.removeElement("");
+		return vec;
 	}
 	
 	public String getDefaultText(){
@@ -106,26 +108,44 @@ public class FormEntryCaption implements FormElementStateListener {
 	
 	/**
 	 * Convenience method
-	 * Get longText form of text (if available) (falls back to default form (&lttext&gt with no form="something") then falls back to unlocalized version (innertext in actual label)
+	 * Get longText form of text (if available) 
+	 * DOES NOT FALL BACK TO ANYTHING
 	 * @return longText form 
 	 */
 	public String getLongText() {
-		if(!getAvailableTextForms(null).contains("long")){
-			return null;
-		}
-		return getText(null,"long");
+//		//!!!!!!!!!!!!!!!!!!!!!DELETEME
+//		System.out.print("getLongText() textID = "+this.getTextID());
+//		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		
+		String t;
+		t = getText(null,"long");
+		
+//		///!!!DELETEME
+//		System.out.println(",text ="+t);
+//		///!!!!!		
+		
+		return t;
 	}
 
 	/**
 	 * Convenience method
-	 * Get shortText form of text (if available) (falls back to default form (&lttext&gt with no form="something") then falls back to unlocalized version (innertext in actual label)
+	 * Get shortText form of text (if available) 
+	 * DOES NOT FALL BACK TO ANYTHING
 	 * @return shortText form 
 	 */
 	public String getShortText() {
-		if(!getAvailableTextForms(null).contains("short")){
-			return null;
-		}
-		return getText(null,"short");
+//		//!!!!!!!!!!!!!!!!!!!!!DELETEME
+//		System.out.print("getShortText() textID = "+this.getTextID());
+//		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+		String t;
+		t = getText(null,"short");
+		
+//		///!!!DELETEME
+//		System.out.println(",text ="+t);
+//		///!!!!!
+		
+		return t;
 	}
 	
 	/**
@@ -133,8 +153,8 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * Get audio URI from Text form (if available)
 	 * @return audio URI form stored in current locale of Text, returns null if not available
 	 */
-	public String getAudioURI() {
-		if(!getAvailableTextForms(null).contains("audio")){
+	public String getAudioText() {
+		if(!getAvailableTextFormTypes(null).contains("audio")){
 			return null;
 		}
 		return getText(null,"audio");
@@ -145,8 +165,8 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * Get image URI form of text (if available)
 	 * @return URI of image form stored in current locale of Text, returns null if not available
 	 */
-	public String getImageURI() {
-		if(!getAvailableTextForms(null).contains("image")){
+	public String getImageText() {
+		if(!getAvailableTextFormTypes(null).contains("image")){
 			return null;
 		}
 		return getText(null,"image");
@@ -157,25 +177,36 @@ public class FormEntryCaption implements FormElementStateListener {
 	/**
 	 * Standard Localized text retreiver.
 	 * 
-	 * use getAvailableTextForms to check which are available before you
+	 * use getAvailableTextForms to check which forms are available before you
 	 * call this method.
+	 * Falls back to labelInnerText if textID and form are null
+	 * or if textID!=null and there is no Localized text available.
+	 * 
 	 * 
 	 * @param tID
 	 * @param form
 	 * @return
 	 * @throws NullPointerException if this element is unlocalized but a special form is requested.
+	 * 
+	 * 
+	 * 
 	 */
 	protected String getText(String tID,String form){
 		if(form == "") form = null; //
 		if(tID == "") tID = null;   //this is just to make the code look a little cleaner
+		
+		
 		String text=null;
+		
 		String textID = tID;
-		if(textID == null){ //if no textID was specified as an argument switch to this FormEntry's ID
-			textID = this.textID;
-			if(textID == null && form == null){ //if this has no ID (it's not a localized element)
-				return substituteStringArgs(element.getLabelInnerText()); //get the inner text if available
-			}else if(textID == null && form != null){ //if it's not localized but you specified a form...
-				throw new NullPointerException("Can't ask for a special form for unlocalized element!");
+		if(textID == null){ //if no textID was specified as an argument...
+			textID = this.textID; //switch to this FormEntry's ID.
+			
+			if(textID == null && form == null){ //If this has no ID (ie it's not a localized element)
+				return substituteStringArgs(element.getLabelInnerText()); //get the inner text if available.
+			
+			}else if(textID == null && form != null){ //But if it's not localized and you specified a form...
+				throw new NullPointerException("Can't ask for a special form for unlocalized element! Form = "+form);
 			}
 		}
 		
@@ -183,7 +214,11 @@ public class FormEntryCaption implements FormElementStateListener {
 			textID += ";" + form;
 		}
 		
-		text = this.localizer.getLocalizedText(textID);
+		try{
+			text = this.localizer.getLocalizedText(textID);
+		}catch(NoLocalizedTextException nlte){
+			text = element.getLabelInnerText();
+		}
 		return substituteStringArgs(text);
 	}
 	
@@ -198,7 +233,7 @@ public class FormEntryCaption implements FormElementStateListener {
 		if(tID == null || tID == "") tID = this.textID;
 		
 		String texts = "";
-		Vector availForms = getAvailableTextForms(tID);
+		Vector availForms = getAvailableTextFormTypes(tID);
 		
 		for(int i=0;i<availForms.size();i++){
 			String curForm = (String)availForms.elementAt(i);
@@ -211,7 +246,9 @@ public class FormEntryCaption implements FormElementStateListener {
 			texts +=","+getText(tID,curForm);
 		}
 		
-		return DateUtils.split(texts,",",false);
+		Vector vec = DateUtils.split(texts,",",false);
+		vec.removeElement("");
+		return vec;
 	}
 
 	public String getAppearanceHint ()  {
