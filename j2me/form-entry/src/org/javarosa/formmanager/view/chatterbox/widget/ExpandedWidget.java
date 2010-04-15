@@ -22,6 +22,7 @@ import java.util.Vector;
 import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.model.FormElementStateListener;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -57,14 +58,11 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		
 		this.c = c;
 	}
-
-	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
 		
-		String ILabel,Iuri,IaltText;
+	public ImageItem getImageItem(FormEntryPrompt fep){
 		Vector AvailFormTypes = fep.getAvailableTextFormTypes(fep.getTextID());
 		Vector AvailForms = fep.getAllTextForms(fep.getTextID());
-		ImageItem imItem;
-	
+		String ILabel,IaltText;
 		
 		if(AvailFormTypes.contains("long")){
 			ILabel = (String)AvailForms.elementAt(AvailFormTypes.indexOf("long"));
@@ -77,38 +75,59 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		}else{
 			IaltText = fep.getDefaultText(null);
 		}
+		Image im = getImage(fep,null);
+		if(im!=null){
+			ImageItem imItem = new ImageItem(ILabel,getImage(fep,null), ImageItem.LAYOUT_CENTER, IaltText);
+			return imItem;
+		}else{
+			return null;
+		}
+	}
+	
+	public Image getImage(FormEntryPrompt fep,SelectChoice sc){
+		String Iuri;
+		Vector AvailFormTypes;
+		Vector AvailForms;
+		Image im = null;
+		
+		if(sc!=null){
+			AvailFormTypes = fep.getAvailSelectTextFormTypes(sc);
+			AvailForms = fep.getAllSelectTextForms(sc);
+		}else{
+			AvailFormTypes = fep.getAvailableTextFormTypes(fep.getTextID());
+			AvailForms = fep.getAllTextForms(fep.getTextID());
+		}
 		
 		if(AvailFormTypes.contains("image")){
 			Iuri = (String)AvailForms.elementAt(AvailFormTypes.indexOf("image"));
-			
 		}else{
 			Iuri = null;
 		}
 		
 		if(Iuri != null){
 			try {
-				imItem = new ImageItem(ILabel,Image.createImage(Iuri) , ImageItem.LAYOUT_CENTER, IaltText);
-				c.add(imItem);
+				im = Image.createImage(Iuri);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.out.println("IOEXCEPTION ERROR! Cant find image at URI:"+Iuri);
-				System.out.println("Available Text forms: "+AvailFormTypes);
-				System.out.println("Available Texts: "+AvailForms);
-				e.printStackTrace();
+				throw new RuntimeException("ERROR! Cant find image at URI:"+Iuri);	
 			}
-			
-			
-			
 		}
+		
+		return im;
+	}
+
+	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
+		
+		ImageItem imItem = getImageItem(fep);
+		if(imItem!=null) c.add(imItem);
 		
 		String caption;
 		
 		if(fep.getAvailableTextFormTypes(fep.getTextID()).contains("long")){
-			caption = fep.getLongText(null);
+			caption = fep.getLongText();
 		}else if(fep.getAvailableTextFormTypes(fep.getTextID()).contains("short")){
-			caption = fep.getShortText(null);
+			caption = fep.getShortText();
 		}else{
-			caption = fep.getDefaultText(null);
+			caption = fep.getDefaultText();
 		}
 		
 		prompt.setText(caption);

@@ -152,12 +152,12 @@ public class ChatterboxWidgetFactory {
 		
 		
 		if(p.getAvailableTextFormTypes(p.getTextID()).contains("long")){
-			label = p.getLongText(null);
+			label = p.getLongText();
 		}else if(p.getAvailableTextFormTypes(p.getTextID()).contains("short")){
-			label = p.getShortText(null);
+			label = p.getShortText();
 		}else{
 	
-			label = p.getDefaultText(null);
+			label = p.getDefaultText();
 			
 	
 		}

@@ -104,11 +104,6 @@ public class QuestionDef implements IFormElement, Localizable {
 	public void setAppearanceAttr (String appearanceAttr) {
 		this.appearanceAttr = appearanceAttr;
 	}	
-	
-
-	
-	
-
 
 	/**
 	 * Only if there is no localizable version of the &lthint&gt available should this method be used
@@ -123,12 +118,12 @@ public class QuestionDef implements IFormElement, Localizable {
 	public void setHelpText (String helpText) {
 		this.helpText = helpText;
 	}
-//
-	//not used during normal usage
+	
+
     public String getHelpTextID () {
         return helpTextID;
     }
-//    
+    
     public void setHelpTextID (String textID, Localizer localizer) {
         this.helpTextID = textID;
 
@@ -167,18 +162,6 @@ public class QuestionDef implements IFormElement, Localizable {
 	
 @Deprecated	
     public void localeChanged(String locale, Localizer localizer) {
-//    	if(longTextID != null) {
-//    		longText = localizer.getLocalizedText(longTextID);
-//    	}
-//
-//    	if(shortTextID != null) {
-//    		shortText = localizer.getLocalizedText(shortTextID);
-//    	}
-//
-//    	if(helpTextID != null) {
-//    		helpText = localizer.getLocalizedText(helpTextID);
-//    	}
-    	
     	if (choices != null) {
     		for (int i = 0; i < choices.size(); i++) {
     			choices.elementAt(i).localeChanged(null, localizer);
@@ -213,11 +196,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-//		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-//		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setHelpText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-//		setLongTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
-//		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 
 		setControlType(ExtUtil.readInt(dis));
@@ -238,11 +217,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
 		ExtUtil.write(dos, new ExtWrapNullable(getTextID()));
 		ExtUtil.write(dos, new ExtWrapNullable(getLabelInnerText()));
-//		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
-//		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getHelpText()));
-//		ExtUtil.write(dos, new ExtWrapNullable(getLongTextID()));
-//		ExtUtil.write(dos, new ExtWrapNullable(getShortTextID()));
 		ExtUtil.write(dos, new ExtWrapNullable(getHelpTextID()));
 				
 		ExtUtil.writeNumeric(dos, getControlType());
@@ -286,8 +261,6 @@ public class QuestionDef implements IFormElement, Localizable {
 	}
 
 	public String getLabelInnerText() {
-		System.out.println("QuestionDef.getLabelInnerText()");
-		System.out.flush();
 		return labelInnerText;
 	}
 	
