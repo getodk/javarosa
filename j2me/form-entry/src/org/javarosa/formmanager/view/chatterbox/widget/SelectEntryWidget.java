@@ -180,50 +180,15 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 
 	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
-			
 			SelectChoice sc = prompt.getSelectChoices().elementAt(i);
 			Selection s = sc.selection();
+			Image im = this.getImage(prompt, sc);
 			
 			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(sc));
 			
-			String ILabel,Iuri,IaltText;
-			Vector AvailFormTypes = prompt.getAvailSelectTextFormTypes(sc);
-			Vector AvailForms = prompt.getAllSelectTextForms(sc);
-				
-			if(AvailFormTypes.contains("long")){
-				ILabel = (String)AvailForms.elementAt(AvailFormTypes.indexOf("long"));
-			}else{
-				ILabel = prompt.getSelectChoiceText(sc);
+			if(im!=null){
+				choiceGroup().getItem(i).setImage(im);			
 			}
-			
-			if(AvailFormTypes.contains("short")){
-				IaltText = (String)AvailForms.elementAt(AvailFormTypes.indexOf("short"));
-			}else{
-				IaltText = prompt.getSelectChoiceText(sc);
-			}
-			
-			if(AvailFormTypes.contains("image")){
-				Iuri = (String)AvailForms.elementAt(AvailFormTypes.indexOf("image"));
-				
-			}else{
-				Iuri = null;
-			}
-			
-			if(Iuri != null){
-				try {
-					Image im = Image.createImage(Iuri);
-					choiceGroup().getItem(i).setImage(im);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					System.out.println("IOEXCEPTION ERROR! Can't find image at URI:"+Iuri);
-					System.out.println("Available Text Forms:\t"+AvailFormTypes);
-					System.out.println("Available Texts:\t\t"+AvailForms);
-					e.printStackTrace();
-				}	
-			}else{
-				System.out.println("IUri was null for ["+sc.getTextID()+"] in SelectEntryWidget.updateWidget()");
-			}
-			
 		}
 	}
 }

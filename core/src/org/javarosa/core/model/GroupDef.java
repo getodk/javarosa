@@ -112,16 +112,8 @@ public class GroupDef implements IFormElement, Localizable {
 	public void setRepeat (boolean repeat) {
 		this.repeat = repeat;
 	}
-	
 
-
-	
-	
-	
 	public String getLabelInnerText() {
-		// TODO Auto-generated method stub
-		System.out.println("FormDef.getLabelInnerText()");
-		System.out.flush();
 		return labelInnerText;
 	}
 	
@@ -137,30 +129,7 @@ public class GroupDef implements IFormElement, Localizable {
 	public void setAppearanceAttr (String appearanceAttr) {
 		this.appearanceAttr = appearanceAttr;
 	}	
-    
-    
-	/*
-	public QuestionDef getQuestion(String varName){
-		for(byte i=0; i<getQuestions().size(); i++){
-			QuestionDef def = (QuestionDef)getQuestions().elementAt(i);
-			if(def.getVariableName().equals(varName))
-				return def;
-		}
-		
-		return null;
-	}
-	
-	public QuestionDef getQuestionById(String id){
-		for(byte i=0; i<getQuestions().size(); i++){
-			QuestionDef def = (QuestionDef)getQuestions().elementAt(i);
-			if(def.getId() == id)
-				return def;
-		}
-		
-		return null;
-	}
-	*/
-    
+        
     public void localeChanged(String locale, Localizer localizer) {
     	for (Enumeration e = children.elements(); e.hasMoreElements(); ) {
     		((IFormElement)e.nextElement()).localeChanged(locale, localizer);
@@ -194,10 +163,6 @@ public class GroupDef implements IFormElement, Localizable {
 		setBind((IDataReference)ExtUtil.read(dis, new ExtWrapTagged(), pf));
 		setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-//		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-//		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-//		setLongTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
-//		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 		setRepeat(ExtUtil.readBool(dis));
 		setChildren((Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 		
@@ -215,11 +180,7 @@ public class GroupDef implements IFormElement, Localizable {
 		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
 		ExtUtil.write(dos, new ExtWrapTagged(getBind()));
 		ExtUtil.write(dos, new ExtWrapNullable(getTextID()));
-		ExtUtil.write(dos, new ExtWrapNullable(getLabelInnerText()));
-//		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
-//		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
-//		ExtUtil.write(dos, new ExtWrapNullable(getLongTextID()));
-//		ExtUtil.write(dos, new ExtWrapNullable(getShortTextID()));				
+		ExtUtil.write(dos, new ExtWrapNullable(getLabelInnerText()));	
 		ExtUtil.writeBool(dos, getRepeat());
 		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
 

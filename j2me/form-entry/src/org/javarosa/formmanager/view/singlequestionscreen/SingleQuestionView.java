@@ -69,7 +69,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 			int captionCount = 0;
 			for (FormEntryCaption caption : captionHierarchy) {
 				captionCount++;
-				groupTitle += caption.getLongText(null);
+				groupTitle += caption.getLongText();
 
 				if ((caption.getIndex().getInstanceIndex() > -1)
 						&& (captionCount < captionHierarchy.length))
@@ -122,7 +122,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 							+ (model.getCurrentFormIndex()
 									.getElementMultiplicity() == 0 ? "a new "
 									: "another ")
-							+ hierachy[hierachy.length - 1].getLongText(null) + "?");
+							+ hierachy[hierachy.length - 1].getLongText() + "?");
 			repeatScreen.setCommandListener(this);
 			J2MEDisplay.setView(repeatScreen);
 		}

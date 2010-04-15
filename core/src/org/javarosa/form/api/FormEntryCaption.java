@@ -103,6 +103,10 @@ public class FormEntryCaption implements FormElementStateListener {
 		return vec;
 	}
 	
+	public String getDefaultText(){
+		return getDefaultText(null);
+	}
+	
 	public String getDefaultText(String textID){
 		if(textID==null)textID=this.textID;
 		return getText(textID,null);
@@ -112,7 +116,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * Convenience method
 	 * Get longText form of text (if available) 
 	 * Falls back to default if long text form doesn't exist.
-	 * @param textID TODO
+	 * @param textID
 	 * @return longText form 
 	 */
 	public String getLongText(String textID) {
@@ -126,12 +130,21 @@ public class FormEntryCaption implements FormElementStateListener {
 		}
 		return t;
 	}
+	
+	/**
+	 * Convenience method
+	 * Get longText form of text for THIS element (if available) 
+	 * Falls back to default if long text form doesn't exist.
+	 * @return longText form 
+	 */
+	public String getLongText(){
+		return getLongText(null);
+	}
 
 	/**
 	 * Convenience method
 	 * Get shortText form of text (if available) 
-	 * DOES NOT FALL BACK TO ANYTHING
-	 * @param textID TODO
+	 * @param textID
 	 * @return shortText form 
 	 */
 	public String getShortText(String textID) {
@@ -149,30 +162,60 @@ public class FormEntryCaption implements FormElementStateListener {
 	
 	/**
 	 * Convenience method
-	 * Get audio URI from Text form (if available)
+	 * Get shortText form of text for THIS element (if available) 
+	 * @return shortText form 
+	 */
+	public String getShortText(){
+		return getShortText(null);
+	}
+	
+	/**
+	 * Convenience method
+	 * Get audio URI from Text form for THIS element (if available)
 	 * @return audio URI form stored in current locale of Text, returns null if not available
 	 */
 	public String getAudioText() {
-		if(!getAvailableTextFormTypes(this.textID).contains("audio")){
-			System.out.println("Warning: Audio text form requested for ["+this.textID+"] but it doesn't exist! Null returned.");
+		return getAudioText(null);
+	}
+	
+	/**
+	 * Convenience method
+	 * Get audio URI from Text form (if available)
+	 * @param
+	 * @return audio URI form stored in current locale of Text, returns null if not available
+	 */
+	public String getAudioText(String textID){
+		if(textID==null)textID=this.textID;
+		if(!getAvailableTextFormTypes(textID).contains("audio")){
+			System.out.println("Warning: Audio text form requested for ["+textID+"] but it doesn't exist! Null returned.");
 			return null;
 		}
-		return getText(this.textID,"audio");
+		return getText(textID,"audio");
+	}
+	
+	/**
+	 * Convenience method
+	 * Get image URI form of text for THIS element (if available)
+	 * @return URI of image form stored in current locale of Text, returns null if not available
+	 */
+	public String getImageText() {
+		return getImageText(null);
 	}
 	
 	/**
 	 * Convenience method
 	 * Get image URI form of text (if available)
+	 * @param
 	 * @return URI of image form stored in current locale of Text, returns null if not available
 	 */
-	public String getImageText() {
-		if(!getAvailableTextFormTypes(this.textID).contains("image")){
-			System.out.println("Warning: Image text form requested for ["+this.textID+"] but it doesn't exist! Null returned.");
+	public String getImageText(String textID){
+		if(textID==null)textID=this.textID;
+		if(!getAvailableTextFormTypes(textID).contains("image")){
+			System.out.println("Warning: Image text form requested for ["+textID+"] but it doesn't exist! Null returned.");
 			return null;
 		}
-		return getText(this.textID,"image");
+		return getText(textID,"image");
 	}
-	
 
 	
 	/**
