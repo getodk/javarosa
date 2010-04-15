@@ -23,7 +23,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import org.javarosa.core.services.locale.LocaleDataSource;
 import org.javarosa.core.services.locale.LocalizationUtils;
@@ -32,6 +31,9 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
+ * The ReferenceDataSource is a source of locale data which
+ * is located at a location which is defined by a ReferenceURI.
+ * 
  * @author Clayton Sims
  * @date Jun 1, 2009 
  *

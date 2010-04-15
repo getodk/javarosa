@@ -4,6 +4,25 @@
 package org.javarosa.core.reference;
 
 /**
+ * PrefixedRootFactory provides a clean way to implement
+ * the vast majority of behavior for a reference factory.
+ * 
+ * A PrefixedRootFactory defines a set of roots which it can
+ * provide references for. Roots can either be a full URI root
+ * like "http://", or "file://", or can be local roots like
+ * "resource" or "file", in which case the assumed protocol
+ * parent will be "jr://". 
+ * 
+ * For example: a PrefixedRootFactory with the roots "media"
+ * and "resource" will be used by the ReferenceManager to derive
+ * any URI with the roots
+ * <ul><li>jr://media/</li><li>jr://resource/</li></ul> like 
+ * <pre>jr://media/checkmark.png</pre>
+ * and a PrefixedRootFactory with roots "file" and "file://" will
+ * be used by the ReferenceManager to derive any URI with the roots
+ * <ul><li>jr://file/</li><li>file://</li></ul> like 
+ * <pre>jr://file/myxform.xhtml</pre> or <pre>file://myxform.xhtml</pre>
+ * 
  * @author ctsims
  *
  */
@@ -11,6 +30,10 @@ public abstract class PrefixedRootFactory implements ReferenceFactory {
 
 	String[] roots;
 	
+	/**
+	 * Construct a PrefixedRootFactory which handles the 
+	 * @param roots
+	 */
 	public PrefixedRootFactory(String[] roots) {
 		this.roots = new String[roots.length];
 		for(int i = 0 ; i < this.roots.length; ++i) {
