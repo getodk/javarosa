@@ -21,6 +21,7 @@ import javax.microedition.lcdui.Command;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.utility.WidgetUtil;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.StringItem;
@@ -73,8 +74,9 @@ public class CollapsedWidget implements IWidgetStyle {
 		c.add(answer);
 	}
 
-	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {		
-		prompt.setText(fep.getShortText());
+	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {	
+		
+		prompt.setText(WidgetUtil.getAppropriateTextForm(fep,fep.getTextID()));
 		
 		IAnswerData data = fep.getAnswerValue();
 		if (data != null) {

@@ -26,6 +26,7 @@ import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.utility.WidgetUtil;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.ImageItem;
@@ -120,17 +121,8 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		ImageItem imItem = getImageItem(fep);
 		if(imItem!=null) c.add(imItem);
 		
-		String caption;
-		
-		if(fep.getAvailableTextFormTypes(fep.getTextID()).contains("long")){
-			caption = fep.getLongText();
-		}else if(fep.getAvailableTextFormTypes(fep.getTextID()).contains("short")){
-			caption = fep.getShortText();
-		}else{
-			caption = fep.getDefaultText();
-		}
-		
-		prompt.setText(caption);
+		prompt.setText(WidgetUtil.getAppropriateTextForm(fep,fep.getTextID()));
+
 		updateWidget(fep);
 		
 		//don't wipe out user-entered data, even on data-changed event
