@@ -152,7 +152,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @return localized Question text (default form), LabelInnerText if default form is not available.
 	 */
 	public String getQText(){
-		return this.getDefaultText(null);
+		return this.getDefaultText();
 	}
 	
 	/**

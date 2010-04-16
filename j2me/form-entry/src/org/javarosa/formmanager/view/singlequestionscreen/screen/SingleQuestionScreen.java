@@ -52,7 +52,7 @@ public abstract class SingleQuestionScreen extends FramedForm {
 			.get("button.Next"), Item.BUTTON);
 
 	public SingleQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
-		super(prompt.getShortText(null), style);
+		super(prompt.getShortText(), style);
 		this.prompt = prompt;
 		this.groupName=groupName;
 		this.createView();
