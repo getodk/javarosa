@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -64,6 +65,10 @@ public class XPathPathExpr extends XPathExpression {
 		this.filtExpr = filtExpr;
 	}
 	
+	public TreeReference getReference () throws XPathUnsupportedException {
+		return getReference(false);
+	}
+	
 	/**
 	 * translate an xpath path reference into a TreeReference
 	 * TreeReferences only support a subset of true xpath paths; restrictions are:
@@ -71,7 +76,7 @@ public class XPathPathExpr extends XPathExpression {
 	 *   no predicates
 	 *   all '..' steps must come before anything else
 	 */
-	public TreeReference getReference () throws XPathUnsupportedException {
+	public TreeReference getReference (boolean allowPredicates) throws XPathUnsupportedException {
 		TreeReference ref = new TreeReference();
 		boolean parentsAllowed;
 		
@@ -90,7 +95,7 @@ public class XPathPathExpr extends XPathExpression {
 		for (int i = 0; i < steps.length; i++) {
 			XPathStep step = steps[i];
 			
-			if (step.predicates.length > 0) {
+			if (!allowPredicates && step.predicates.length > 0) {
 				throw new XPathUnsupportedException("predicates");
 			}
 			
@@ -121,24 +126,31 @@ public class XPathPathExpr extends XPathExpression {
 		
 		return ref;
 	}
-	
+
 	public Object eval (FormInstance m, EvaluationContext evalContext) {
+		return eval(m, evalContext, false);
+	}
+		
+	public Object eval (FormInstance m, EvaluationContext evalContext, boolean forceNodeset) {
 		TreeReference ref = getReference().contextualize(evalContext.getContextRef());
 		
+		//ITEMSET TODO: need to update this; for itemset/copy constraints, need to simulate a whole xml sub-tree here
 		if (evalContext.isConstraint && ref.equals(evalContext.getContextRef())) {
 			return unpackValue(evalContext.candidateValue);
 		}
 		
-		//is this a nodeset? it is if the ref contains any unbound multiplicities AND the unbound nodes are repeatable
-		//the way i'm calculating this sucks; there has got to be an easier way to find out if a node is repeatable
-		boolean nodeset = false;
-		TreeReference repeatTestRef = TreeReference.rootRef();
-		for (int i = 0; i < ref.size(); i++) {
-			repeatTestRef.add(ref.getName(i), ref.getMultiplicity(i));
-			if (ref.getMultiplicity(i) == TreeReference.INDEX_UNBOUND) {
-				if (m.getTemplate(repeatTestRef) != null) {
-					nodeset = true;
-					break;
+		boolean nodeset = forceNodeset;
+		if (!nodeset) {
+			//is this a nodeset? it is if the ref contains any unbound multiplicities AND the unbound nodes are repeatable
+			//the way i'm calculating this sucks; there has got to be an easier way to find out if a node is repeatable
+			TreeReference repeatTestRef = TreeReference.rootRef();
+			for (int i = 0; i < ref.size(); i++) {
+				repeatTestRef.add(ref.getName(i), ref.getMultiplicity(i));
+				if (ref.getMultiplicity(i) == TreeReference.INDEX_UNBOUND) {
+					if (m.getTemplate(repeatTestRef) != null) {
+						nodeset = true;
+						break;
+					}
 				}
 			}
 		}
@@ -159,7 +171,7 @@ public class XPathPathExpr extends XPathExpression {
 			return getRefValue(m, ref);
 		}
 	}
-	
+		
 	public static Object getRefValue (FormInstance model, TreeReference ref) {
 		TreeElement node = model.resolveReference(ref);
 		if (node == null) {
@@ -184,7 +196,10 @@ public class XPathPathExpr extends XPathExpression {
 			return (new XFormAnswerDataSerializer()).serializeAnswerData(val);
 		} else if (val instanceof DateData) {
 			return val.getValue();
+		} else if (val instanceof BooleanData) {
+			return val.getValue();
 		} else {
+			System.out.println("warning: unrecognized data type in xpath expr: " + val.getClass().getName());
 			return val.getValue(); //is this a good idea?
 		}
 	}
@@ -246,5 +261,19 @@ public class XPathPathExpr extends XPathExpression {
 		for (int i = 0; i < steps.length; i++)
 			v.addElement(steps[i]);
 		ExtUtil.write(out, new ExtWrapList(v));
+	}
+	
+	public static XPathPathExpr fromRef (TreeReference ref) {
+		XPathPathExpr path = new XPathPathExpr();
+		path.init_context = (ref.isAbsolute() ? INIT_CONTEXT_ROOT : INIT_CONTEXT_RELATIVE);
+		path.steps = new XPathStep[ref.size()];
+		for (int i = 0; i < path.steps.length; i++) {
+			if (ref.getName(i).equals(TreeReference.NAME_WILDCARD)) {
+				path.steps[i] = new XPathStep(XPathStep.AXIS_CHILD, XPathStep.TEST_NAME_WILDCARD);
+			} else {
+				path.steps[i] = new XPathStep(XPathStep.AXIS_CHILD, new XPathQName(ref.getName(i)));
+			}
+		}
+		return path;
 	}
 }

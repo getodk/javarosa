@@ -21,6 +21,7 @@ package org.javarosa.cases.util;
 
 import org.javarosa.cases.model.Case;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.entity.model.Entity;
 
@@ -56,18 +57,13 @@ public class CaseEntity extends Entity<Case> {
 	public String[] getHeaders(boolean detailed) {
 		String [] headers;
 		if(detailed) {
-			//#if commcare.lang.sw
-			//headers = new String[] {"Jina", "Namba", "Tarehe ya mkutano wa kwanza", "Bado inaendelea?"};
-			headers = new String[] {"Jina", "Namba", "Tar.", "Bado inaendelea?"};
-			//#else
-			headers = new String[] {"Name", "ID", "Date Opened", "Currently Open"};			
-			//#endif
+			headers = new String[] {Localization.get("case.name"),
+					Localization.get("case.id"),
+					Localization.get("case.date.opened"),
+					Localization.get("case.status")};
 		} else {
-			//#if commcare.lang.sw
-			headers = new String[] {"Jina", "Namba"};
-			//#else
-			headers = new String[] {"Name", "ID"};
-			//#endif
+			headers = new String[] {Localization.get("case.name"),
+					Localization.get("case.id")};
 		}
 		return headers;
 	}
@@ -78,25 +74,12 @@ public class CaseEntity extends Entity<Case> {
 	public String[] getLongFields(Case c) {
 		String date;
 		if(c.getDateOpened() == null) {
-			date = "unknown";
+			date = Localization.get("date.unknown");
 		} else {
 			date = DateUtils.formatDate(c.getDateOpened(), DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 		}
 
-		String open;
-		if(c.isClosed()) {
-			//#if commcare.lang.sw
-			open = "Hapana";
-			//#else
-			open = "No";
-			//#endif
-		} else {
-			//#if commcare.lang.sw
-			open = "Ndiyo";
-			//#else
-			open = "Yes";
-			//#endif
-		}
+		String open = Localization.get( c.isClosed() ? "no" : "yes");
 		return new String[] {c.getName(), ExtUtil.emptyIfNull(this.getID()), date, open};
 	}
 	
@@ -125,7 +108,7 @@ public class CaseEntity extends Entity<Case> {
 	}
 	
 	public String[] getSortFieldNames () {
-		return new String[] {"Name", "Case ID"};
+		return new String[] {Localization.get("case.name"), Localization.get("case.id")};
 	}
 	
 	public Object getSortKey (String fieldKey) {

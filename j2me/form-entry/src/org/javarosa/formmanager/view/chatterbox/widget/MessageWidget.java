@@ -18,6 +18,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Container;
@@ -40,7 +41,7 @@ public class MessageWidget implements IWidgetStyleEditable {
 		//#style questiontext
 		prompt = new StringItem(null, null);
 		//#style button
-		ok = new StringItem(null, "OK");
+		ok = new StringItem(null, Localization.get("chatterbox.button.trigger"));
 		
 		c.add(prompt);
 		c.add(ok);

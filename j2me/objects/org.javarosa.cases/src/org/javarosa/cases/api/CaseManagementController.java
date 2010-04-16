@@ -39,7 +39,7 @@ public class CaseManagementController implements HandledCommandListener {
 	public CaseManagementController(ICaseType type) {
 		this.type = type;
 		
-		view = new CaseManagementScreen("Select Action");
+		view = new CaseManagementScreen(Localization.get("case.title"));
 		configView();
 		view.setCommandListener(this);
 	}
@@ -100,7 +100,7 @@ public class CaseManagementController implements HandledCommandListener {
 	}  
 
 	public void _commandAction(Command c, Displayable d) {
-		if(c.equals(List.SELECT_COMMAND)) {
+		if(c.equals(CaseManagementScreen.SELECT) || c.equals(List.SELECT_COMMAND)) {
 			int action = ((Integer)indexMapping.elementAt(view.getSelectedIndex())).intValue();
 			
 			switch(action) {

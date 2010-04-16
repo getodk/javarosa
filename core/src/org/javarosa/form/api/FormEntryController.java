@@ -17,7 +17,9 @@
 package org.javarosa.form.api;
 
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 
 /**
@@ -55,11 +57,8 @@ public class FormEntryController {
      * @param data
      * @return
      */
-    public int answerCurrentQuestion(IAnswerData data) {
-    	if (model.getCurrentEvent() != FormEntryController.EVENT_QUESTION){
-    		throw new RuntimeException("Non-Question object at the form index.");
-    	}
-        return answerQuestion(model.getCurrentFormIndex(), data);
+    public int answerQuestion(IAnswerData data) {
+        return answerQuestion(model.getFormIndex(), data);
     }
 
 
@@ -72,14 +71,29 @@ public class FormEntryController {
      * @return OK if save was successful, error if a constraint was violated.
      */
     public int answerQuestion(FormIndex index, IAnswerData data) {
+    	QuestionDef q = model.getQuestionPrompt(index).getQuestion();
+        if (model.getEvent() != FormEntryController.EVENT_QUESTION) {
+            throw new RuntimeException("Non-Question object at the form index.");
+        }
         TreeElement element = model.getTreeElement(index);
+        boolean complexQuestion = q.isComplex();
+        
         if (element.required && data == null) {
             return ANSWER_REQUIRED_BUT_EMPTY;
-        } else if (!model.getForm().evaluateConstraint(index.getReference(), data)) {
-            return ANSWER_CONSTRAINT_VIOLATED;
-        } else {
+        } else if (!complexQuestion && !model.getForm().evaluateConstraint(index.getReference(), data)) {
+        	//TODO: itemsets: don't currently evaluate constraints for itemset/copy -- haven't figured out how handle it yet
+            throw new RuntimeException("Itemsets do not currently evaluate constraints. Your constraint will not work, please remove it before proceeding.");
+        } else if (!complexQuestion) {
             commitAnswer(element, index, data);
             return ANSWER_OK;
+        } else {
+        	try {
+				model.getForm().copyItemsetAnswer(q, element, data);
+			} catch (InvalidReferenceException ire) {
+				ire.printStackTrace();
+				throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
+			}
+        	return ANSWER_OK;
         }
     }
 
@@ -95,8 +109,26 @@ public class FormEntryController {
      * @return true if saved successfully, false otherwise.
      */
     public boolean saveAnswer(FormIndex index, IAnswerData data) {
+        if (model.getEvent() != FormEntryController.EVENT_QUESTION) {
+            throw new RuntimeException("Non-Question object at the form index.");
+        }
         TreeElement element = model.getTreeElement(index);
         return commitAnswer(element, index, data);
+    }
+
+
+    /**
+     * saveAnswer attempts to save the current answer into the data model
+     * without doing any constraint checking. Only use this if you know what
+     * you're doing. For normal form filling you should always use
+     * answerQuestion().
+     * 
+     * @param index
+     * @param data
+     * @return true if saved successfully, false otherwise.
+     */
+    public boolean saveAnswer(IAnswerData data) {
+        return saveAnswer(model.getFormIndex(), data);
     }
 
 
@@ -147,7 +179,7 @@ public class FormEntryController {
      * @return
      */
     private int stepEvent(boolean forward) {
-        FormIndex index = model.getCurrentFormIndex();
+        FormIndex index = model.getFormIndex();
 
         do {
             if (forward) {
@@ -155,7 +187,7 @@ public class FormEntryController {
             } else {
                 index = model.getForm().decrementIndex(index);
             }
-        } while (index.isInForm() && !model.isRelevant(index));
+        } while (index.isInForm() && !model.isIndexRelevant(index));
 
         return jumpToIndex(index);
     }
@@ -180,7 +212,22 @@ public class FormEntryController {
      * @param questionIndex
      */
     public void newRepeat(FormIndex questionIndex) {
-        model.getForm().createNewRepeat(questionIndex);
+    	try{
+    		model.getForm().createNewRepeat(questionIndex);
+    	} catch(InvalidReferenceException ire) {
+    		throw new RuntimeException("Invalid reference while copying itemset answer: " + ire.getMessage());
+    	}
+    }
+
+
+    /**
+     * Creates a new repeated instance of the group referenced by the current
+     * FormIndex.
+     * 
+     * @param questionIndex
+     */
+    public void newRepeat() {
+        newRepeat(model.getFormIndex());
     }
 
 
@@ -196,7 +243,23 @@ public class FormEntryController {
     }
 
 
+    /**
+     * Deletes a repeated instance of a group referenced by the current
+     * FormIndex.
+     * 
+     * @param questionIndex
+     * @return
+     */
+    public FormIndex deleteRepeat() {
+        return deleteRepeat(model.getFormIndex());
+    }
+
+
+    /**
+     * Sets the current language.
+     * @param language
+     */
     public void setLanguage(String language) {
-        model.setCurrentLanguage(language);
+        model.setLanguage(language);
     }
 }

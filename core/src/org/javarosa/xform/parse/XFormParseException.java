@@ -16,6 +16,8 @@
 
 package org.javarosa.xform.parse;
 
+import org.kxml2.kdom.Element;
+
 /**
  * Exception thrown when an XForms Parsing error occurs.
  * 
@@ -26,9 +28,24 @@ package org.javarosa.xform.parse;
 // to be a RuntimeException to me. Is there justification
 // as to why it is?
 public class XFormParseException extends RuntimeException {
+	Element element;
+	
 	public XFormParseException () { }
 	
 	public XFormParseException (String msg) {
 		super(msg);
+		element = null;
+	}
+	
+	public XFormParseException (String msg, Element e) {
+		super(msg);
+		element = e;
+	}
+	
+	public String getMessage() {
+		if(element == null) {
+			return super.getMessage();
+		}
+		return super.getMessage() + XFormParser.getVagueLocation(element);
 	}
 }

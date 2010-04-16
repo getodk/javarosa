@@ -109,17 +109,17 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	}
 
 	public void refreshView() {
-		if (model.getCurrentEvent() == FormEntryController.EVENT_QUESTION) {
-			FormEntryPrompt prompt = model.getCurrentQuestionPrompt();
+		if (model.getEvent() == FormEntryController.EVENT_QUESTION) {
+			FormEntryPrompt prompt = model.getQuestionPrompt();
 			SingleQuestionScreen view = getView(prompt, this.goingForward);
 			J2MEDisplay.setView(view);
 		}
-		else if (model.getCurrentEvent() == FormEntryController.EVENT_PROMPT_NEW_REPEAT) {
+		else if (model.getEvent() == FormEntryController.EVENT_PROMPT_NEW_REPEAT) {
 			FormEntryCaption[] hierachy = model.getCaptionHierarchy(model
-					.getCurrentFormIndex());
+					.getFormIndex());
 			repeatScreen = new NewRepeatScreen(
 					"Add "
-							+ (model.getCurrentFormIndex()
+							+ (model.getFormIndex()
 									.getElementMultiplicity() == 0 ? "a new "
 									: "another ")
 							+ hierachy[hierachy.length - 1].getLongText() + "?");
@@ -135,7 +135,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	public void _commandAction(Command command, Displayable arg1) {
 		if (arg1 == repeatScreen) {
 			if (command == NewRepeatScreen.yesCommand) {
-				controller.newRepeat(model.getCurrentFormIndex());
+				controller.newRepeat(model.getFormIndex());
 				controller.stepToNextEvent();
 				refreshView();
 			} else {
@@ -206,7 +206,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	private void switchViewLanguage() {
 		IAnswerData answer = currentQuestionScreen.getWidgetValue();
 		this.goingForward = true;
-		controller.answerQuestion(controller.getModel().getCurrentFormIndex(),
+		controller.answerQuestion(controller.getModel().getFormIndex(),
 				answer);
 		refreshView();
 	}
@@ -246,13 +246,13 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 		IAnswerData answer = currentQuestionScreen.getWidgetValue();
 		this.goingForward = true;
 		int result = controller.answerQuestion(controller.getModel()
-				.getCurrentFormIndex(), answer);
+				.getFormIndex(), answer);
 		if (result == FormEntryController.ANSWER_OK) {
 			int event = controller.stepToNextEvent();
 			processModelEvent(event);
 		} else if (result == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
 			J2MEDisplay.showError("Validation failure", model
-					.getCurrentQuestionPrompt().getConstraintText());
+					.getQuestionPrompt().getConstraintText());
 		} else if (result == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
 			String txt = Localization
 					.get("formview.CompulsoryQuestionIncomplete");
