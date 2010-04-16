@@ -20,6 +20,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.utility.WidgetUtil;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
@@ -48,7 +49,7 @@ public class MessageWidget implements IWidgetStyleEditable {
 	}
 
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
-		prompt.setText(fep.getLongText());
+		prompt.setText(WidgetUtil.getAppropriateTextForm(fep, fep.getTextID()));
 	}
 
 	public IAnswerData getData () {
