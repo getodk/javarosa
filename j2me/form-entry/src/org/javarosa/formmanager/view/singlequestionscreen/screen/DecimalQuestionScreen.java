@@ -37,9 +37,9 @@ public class DecimalQuestionScreen extends SingleQuestionScreen {
 		tf = new TextField("", "", 200, TextField.DECIMAL);
 
 		if (prompt.isRequired())
-			tf.setLabel("*" + prompt.getLongText(null));
+			tf.setLabel("*" + prompt.getLongText());
 		else
-			tf.setLabel(prompt.getLongText(null));
+			tf.setLabel(prompt.getLongText());
 
 		IAnswerData answerData = prompt.getAnswerValue();
 		if ((answerData != null) && (answerData instanceof DecimalData))

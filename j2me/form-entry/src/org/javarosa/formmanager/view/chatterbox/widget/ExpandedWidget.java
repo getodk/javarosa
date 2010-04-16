@@ -67,13 +67,13 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		if(AvailFormTypes.contains("long")){
 			ILabel = (String)AvailForms.elementAt(AvailFormTypes.indexOf("long"));
 		}else{
-			ILabel = fep.getDefaultText(null);
+			ILabel = fep.getDefaultText();
 		}
 		
 		if(AvailFormTypes.contains("short")){
 			IaltText = (String)AvailForms.elementAt(AvailFormTypes.indexOf("short"));
 		}else{
-			IaltText = fep.getDefaultText(null);
+			IaltText = fep.getDefaultText();
 		}
 		Image im = getImage(fep,null);
 		if(im!=null){

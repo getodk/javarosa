@@ -40,11 +40,11 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 		if (prompt.isRequired()) {
 			// #style choiceGroup
 			cg = new ChoiceGroup("*"
-					+ prompt.getLongText(null),
+					+ prompt.getLongText(),
 					ChoiceGroup.MULTIPLE);
 		} else {
 			// #style choiceGroup
-			cg = new ChoiceGroup(prompt.getLongText(null),
+			cg = new ChoiceGroup(prompt.getLongText(),
 					ChoiceGroup.MULTIPLE);
 		}
 		
