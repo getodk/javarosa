@@ -208,9 +208,6 @@ public class QuestionDef implements IFormElement, Localizable {
 	 * true if the answer to this question yields xml tree data, not a simple string value
 	 */
 	public boolean isComplex () {
-	    System.out.println("dynamic choices = " + dynamicChoices); 
-	    if (dynamicChoices != null)
-	        System.out.println("and copymode = " + dynamicChoices.copyMode);
 		return (dynamicChoices != null && dynamicChoices.copyMode);
 	}
 	
