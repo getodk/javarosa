@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-form-entry"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-entity-select"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
