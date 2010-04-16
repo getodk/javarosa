@@ -300,6 +300,9 @@ public class FormEntryModel {
      * @return true if the element at the specified index is read only
      */
     public boolean isIndexReadonly(FormIndex index) {
+        if (index.isBeginningOfFormIndex() || index.isEndOfFormIndex())
+            return true;
+        
         TreeReference ref = form.getChildInstanceRef(index);
         boolean isAskNewRepeat = getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT;
 
