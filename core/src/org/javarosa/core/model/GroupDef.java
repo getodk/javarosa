@@ -52,7 +52,6 @@ public class GroupDef implements IFormElement, Localizable {
 	Vector observers;
 	
 	public boolean noAddRemove = false;
-	//public boolean startEmpty = false;
 	public IDataReference count = null;
 	
 	public GroupDef () {
@@ -166,10 +165,6 @@ public class GroupDef implements IFormElement, Localizable {
 		setRepeat(ExtUtil.readBool(dis));
 		setChildren((Vector)ExtUtil.read(dis, new ExtWrapListPoly(), pf));
 		
-		//TODO: custom group parameters
-		//Clayton Sims - June 16, 2009: This change is necessary for having groups
-		//be able to maintain "count" as opposed to "Add more?" questions, but will
-		//_completely_ break RMS's that existed before this change that had groups.
 		noAddRemove = ExtUtil.readBool(dis);
 		count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 	}
@@ -184,13 +179,8 @@ public class GroupDef implements IFormElement, Localizable {
 		ExtUtil.writeBool(dos, getRepeat());
 		ExtUtil.write(dos, new ExtWrapListPoly(getChildren()));
 
-		//TODO: custom group parameters
-		//Clayton Sims - June 16, 2009: This change is necessary for having groups
-		//be able to maintain "count" as opposed to "Add more?" questions, but will
-		//_completely_ break RMS's that existed before this change that had groups.
 		ExtUtil.writeBool(dos, noAddRemove);
-		//What if this is null?
-		ExtUtil.write(dos,new ExtWrapNullable(count != null ? new ExtWrapTagged(count) : null));
+		ExtUtil.write(dos, new ExtWrapNullable(count != null ? new ExtWrapTagged(count) : null));
 		
 	}
 	

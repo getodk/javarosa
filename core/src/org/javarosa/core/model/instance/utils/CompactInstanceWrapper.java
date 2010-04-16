@@ -24,8 +24,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
@@ -38,6 +37,7 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -208,7 +208,19 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 					
 					for (int j = 0; j < n; j++) {
 						TreeReference dstRef = e.getRef().extendRef(childName, j);
-						instance.copyNode(childTempl, dstRef);
+						try {
+							instance.copyNode(childTempl, dstRef);
+						} catch(InvalidReferenceException ire) {
+							//If there is an invalid reference, this is a malformed instance,
+							//so we'll throw a Deserialization exception.
+							TreeReference r = ire.getInvalidReference();
+							if(r == null) {
+								throw new DeserializationException("Null Reference while attempting to deserialize! " + ire.getMessage());
+							} else{
+								throw new DeserializationException("Invalid Reference while attemtping to deserialize! Reference: " + r.toString(true) + " | "+ ire.getMessage());
+							}
+							
+						}
 						
 						TreeElement child = e.getChild(childName, j);
 						child.setRelevant(true);
@@ -302,6 +314,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 					case 0x41: answerType = IntegerData.class; break;
 					case 0x42: answerType = DecimalData.class; break;
 					case 0x43: answerType = DateData.class; break;
+					case 0x44: answerType = BooleanData.class; break;
 					}
 					
 					val = (IAnswerData)ExtUtil.read(in, answerType);
@@ -336,6 +349,8 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 							prefix = 0x42;
 						} else if (val instanceof DateData) {
 							prefix = 0x43;
+						} else if (val instanceof BooleanData) {
+							prefix = 0x44;
 						} else {
 							throw new RuntimeException("divergent data type not allowed");
 						}
@@ -440,12 +455,13 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 	 * @param dataType
 	 * @return
 	 */
-	private Class classForDataType (int dataType) {
+	public static Class classForDataType (int dataType) {
 		switch (dataType) {
 		case Constants.DATATYPE_NULL: return StringData.class;
 		case Constants.DATATYPE_TEXT: return StringData.class;
 		case Constants.DATATYPE_INTEGER: return IntegerData.class;
 		case Constants.DATATYPE_DECIMAL: return DecimalData.class;
+		case Constants.DATATYPE_BOOLEAN: return BooleanData.class;
 		case Constants.DATATYPE_DATE: return DateData.class;
 		case Constants.DATATYPE_TIME: return TimeData.class;
 		case Constants.DATATYPE_DATE_TIME: return DateTimeData.class;

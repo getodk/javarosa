@@ -22,6 +22,7 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.entity.api.EntitySelectController;
@@ -44,7 +45,7 @@ public class EntitySelectDetailPopup<E extends Persistable> extends Form impleme
 	Command backCmd;
 	
 	public EntitySelectDetailPopup (EntitySelectController<E> psa, Entity<E> entity, IStorageUtility storage) {
-		super(entity.entityType() + " Detail");
+		super(Localization.get("entity.detail.title", new String[] {entity.entityType()}));
 		
 		this.psa = psa;
 		
@@ -52,8 +53,8 @@ public class EntitySelectDetailPopup<E extends Persistable> extends Form impleme
 		headers = entity.getHeaders(true);
 		data = entity.getLongFields((E)storage.read(recordID));
 		
-		okCmd = new Command("OK", Command.OK, 1);
-		backCmd = new Command("Back", Command.BACK, 1);
+		okCmd = new Command(Localization.get("command.ok"), Command.OK, 1);
+		backCmd = new Command(Localization.get("command.back"), Command.BACK, 1);
 		addCommand(okCmd);
 		addCommand(backCmd);	
 		setCommandListener(this);

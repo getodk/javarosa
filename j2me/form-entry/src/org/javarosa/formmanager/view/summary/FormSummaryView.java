@@ -67,7 +67,7 @@ public class FormSummaryView extends List {
 		int prevDepth = 0;
 
 		while (!index.isEndOfFormIndex()) {
-			if (index.isInForm() && model.isRelevant(index)) {
+			if (index.isInForm() && model.isIndexRelevant(index)) {
 				String text = "";
 				boolean isHeader = false;
 				Image img = null;

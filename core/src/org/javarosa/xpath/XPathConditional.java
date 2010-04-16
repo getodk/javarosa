@@ -21,6 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Vector;
 
+import org.javarosa.core.log.FatalException;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.FormInstance;
@@ -45,6 +46,10 @@ public class XPathConditional implements IConditionExpr {
 		this.xpath = xpath;
 	}
 	
+	public XPathConditional (XPathExpression expr) {
+		this.expr = expr;
+	}
+	
 	public XPathConditional () {
 		
 	}
@@ -63,6 +68,14 @@ public class XPathConditional implements IConditionExpr {
 	
 	public String evalReadable (FormInstance model, EvaluationContext evalContext) {
 		return XPathFuncExpr.toString(evalRaw(model, evalContext));
+	}
+	
+	public Vector evalNodeset (FormInstance model, EvaluationContext evalContext) {
+		if (expr instanceof XPathPathExpr) {
+			return (Vector)((XPathPathExpr)expr).eval(model, evalContext, true);
+		} else {
+			throw new FatalException("evalNodeset: must be path expression");
+		}
 	}
 	
 	public Vector getTriggers () {

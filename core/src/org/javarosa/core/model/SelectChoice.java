@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -21,6 +22,10 @@ public class SelectChoice implements Externalizable, Localizable {
 	private boolean isLocalizable;
 	private String value;
 	private int index = -1;
+	
+	public TreeElement copyNode; //if this choice represents part of an <itemset>, and the itemset uses 'copy'
+	                             //answer mode, this points to the node to be copied if this selection is chosen
+								 //this field only has meaning for dynamic choices, thus is unserialized
 	
 	//for deserialization only
 	public SelectChoice () {
@@ -48,6 +53,12 @@ public class SelectChoice implements Externalizable, Localizable {
 		}else{
 			throw new XFormParseException("SelectChoice{id,innerText}:{"+labelID+","+labelInnerText+"}, has null Value!");
 		}
+	}
+	
+	public SelectChoice(String labelOrID,String Value, boolean isLocalizable){
+		this(isLocalizable ? labelOrID : null,
+			 isLocalizable ? null : labelOrID,
+			 Value,isLocalizable);
 	}
 	
 	public void setIndex (int index) {

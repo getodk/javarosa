@@ -32,6 +32,7 @@ import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryCaption;
+import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryModel;
@@ -88,6 +89,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     private Command saveCommand;
     private Command languageSubMenu;
     private Command[] languageCommands;
+    private String[] localeCommandMap;
     //private Command deleteRepeatCommand; //TODO do something with this
     private Gauge progressBar;
         
@@ -156,26 +158,26 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		}
     	} else if (null /*model.getStartIndex()*/ != null) { //TODO: Starting from a specific question
     		//Mode 2: Seek to current question
-    		while(!model.getCurrentFormIndex().equals(null)) {
+    		while(!model.getFormIndex().equals(null)) {
     			controller.stepToNextEvent();
-        		jumpToQuestion(model.getCurrentFormIndex());
+        		jumpToQuestion(model.getFormIndex());
     		}
     	} else {
     		//Default Mode: Start at first question
     		controller.stepToNextEvent();
-    		jumpToQuestion(model.getCurrentFormIndex());
+    		jumpToQuestion(model.getFormIndex());
     	}
     	this.currentlyActiveContainer = this.container;
     }
     
     private void setUpCommands () {
-        backCommand = new Command("Back", Command.BACK, 2);
-        exitNoSaveCommand = new Command("Exit", Command.EXIT, 4);
-        exitSaveCommand = new Command("Save and Exit", Command.SCREEN, 4);
-        saveCommand = new Command("Save", Command.SCREEN, 4);
+    	backCommand = new Command(Localization.get("command.back"), Command.BACK, 2);
+    	exitNoSaveCommand = new Command(Localization.get("command.exit"), Command.EXIT, 4);
+    	exitSaveCommand = new Command(Localization.get("command.saveexit"), Command.SCREEN, 4);
+    	saveCommand = new Command(Localization.get("command.save"), Command.SCREEN, 4);
         
         if (multiLingual) {
-            languageSubMenu = new Command("Language", Command.SCREEN, 2);
+        	languageSubMenu = new Command(Localization.get("command.language"), Command.SCREEN, 2);
         	populateLanguages();
         }
         
@@ -202,8 +204,17 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     private void populateLanguages () {
     	String[] availableLocales = model.getForm().getLocalizer().getAvailableLocales();
     	languageCommands = new Command[availableLocales.length];
-    	for (int i = 0; i < languageCommands.length; i++)
-    		languageCommands[i] = new Command(availableLocales[i], Command.SCREEN, 3);
+    	localeCommandMap = new String[languageCommands.length];
+    	for (int i = 0; i < languageCommands.length; i++) {
+    		String label = availableLocales[i];
+    		try {
+    			label = Localization.get("locale.name." + label.toLowerCase());
+    		} catch(NoLocalizedTextException nlte) {
+    			//nothing. Just don't have a way to check for this yet.
+    		}
+    		languageCommands[i] = new Command(label, Command.SCREEN, 3);
+    		localeCommandMap[i] = availableLocales[i];
+    	}
     }
 
     private void initProgressBar () {
@@ -220,7 +231,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		formComplete();
     		break;
     		default:
-    			FormIndex index = model.getCurrentFormIndex();
+    			FormIndex index = model.getFormIndex();
     			jumpToQuestion(index);
     			break;
     	}
@@ -230,7 +241,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     private void jumpToQuestion (FormIndex questionIndex) {
     	boolean newRepeat = false;
     	
-    	if (questionIndex.isInForm() && !model.isRelevant(questionIndex))
+    	if (questionIndex.isInForm() && !model.isIndexRelevant(questionIndex))
 			throw new IllegalStateException();
 
 		// Determine what should and shouldn't be pinned.
@@ -272,7 +283,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 				}
     			return;
     		}
-    	} else if (questionIndex.isInForm() && model.isReadonly(questionIndex)) {
+    	} else if (questionIndex.isInForm() && model.isIndexReadonly(questionIndex)) {
 			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
 			if(forwards) {
 				step(controller.stepToNextEvent());
@@ -412,7 +423,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		activeIsInterstitial = true;
     	} else if (model.getForm().explodeIndex(questionIndex).lastElement() instanceof GroupDef) {
     		//do nothing
-    	} else if (model.isRelevant(questionIndex)) { //FIXME relevancy check
+    	} else if (model.isIndexRelevant(questionIndex)) { //FIXME relevancy check
     		cw = widgetFactory.getWidget(questionIndex, model,
     									  expanded ? ChatterboxWidget.VIEW_EXPANDED
     									    	   : ChatterboxWidget.VIEW_COLLAPSED);
@@ -527,10 +538,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		if (multiLingual) {
     			for (int i = 0; i < languageCommands.length; i++) {
     				if (command == languageCommands[i]) {
-    					String label = command.getLabel(); //has form language > mylanguage
-    					int sep = label.indexOf(">");
-    					language = label.substring(sep+1, label.length()).trim();
-    					break;
+    					language = localeCommandMap[i];
     				}
     			}
     		}
@@ -552,7 +560,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     private void commitAndSave () {
        	ChatterboxWidget frame = (activeIsInterstitial ? null : activeFrame());
     	if (frame != null) {
-    		controller.answerQuestion(this.model.getCurrentFormIndex(), frame.getData());
+    		controller.answerQuestion(this.model.getFormIndex(), frame.getData());
     	}
     	//TODO: DEAL;
     	controller.saveAndExit(true);
@@ -561,7 +569,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     public void questionAnswered () {
     	ChatterboxWidget frame = activeFrame();
 	
-    	if(activeQuestionIndex != this.model.getCurrentFormIndex()) {
+    	if(activeQuestionIndex != this.model.getFormIndex()) {
     		//this is an error that comes from polish sending two events for button up and button
     		//down. We need to make it not send that message twice.
     		System.out.println("mismatching indices");
@@ -571,12 +579,12 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		//'new repeat?' answered
     		String answer = ((Selection)frame.getData().getValue()).getValue();
     		if (answer.equals("y")) {
-    			controller.newRepeat(this.model.getCurrentFormIndex());
-    			createHeaderForElement(this.model.getCurrentFormIndex());
+    			controller.newRepeat(this.model.getFormIndex());
+    			createHeaderForElement(this.model.getFormIndex());
     		}
     		step(controller.stepToNextEvent());
     	} else {
-    		int status = controller.answerQuestion(this.model.getCurrentFormIndex(), frame.getData());
+    		int status = controller.answerQuestion(this.model.getFormIndex(), frame.getData());
 	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
 	        	J2MEDisplay.showError(null, PROMPT_REQUIRED_QUESTION);
 	    	} else if (status == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
