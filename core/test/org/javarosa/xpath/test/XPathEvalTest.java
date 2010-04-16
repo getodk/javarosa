@@ -106,7 +106,6 @@ public class XPathEvalTest extends TestCase {
 		EvaluationContext ec = getFunctionHandlers();
 		
 		/* unsupporteds */
-		testEval("$var", null, null, new XPathUnsupportedException());
 		testEval("/union | /expr", null, null, new XPathUnsupportedException());
 		testEval("/descendant::blah", null, null, new XPathUnsupportedException());
 		testEval("/@blah", null, null, new XPathUnsupportedException());
@@ -368,6 +367,12 @@ public class XPathEvalTest extends TestCase {
 		testEval("check-types(55, '55', false(), '1999-09-09', get-custom(false()))", null, ec, Boolean.TRUE);
 		testEval("check-types(55, '55', false(), '1999-09-09', get-custom(true()))", null, ec, Boolean.TRUE);
 		testEval("regex('12345','[0-9]+')", null, ec, Boolean.TRUE);
+		//Variables
+		EvaluationContext varContext = getVariableContext();
+		testEval("$var_float_five", null, varContext, new Double(5.0));
+		testEval("$var_string_five", null, varContext, "five");
+		testEval("$var_int_five", null, varContext, new Double(5.0));
+		testEval("$var_double_five", null, varContext, new Double(5.0));
 		
 		try {
 			testEval("null-proto()", null, ec, new XPathUnhandledException());
@@ -655,6 +660,16 @@ public class XPathEvalTest extends TestCase {
 				return Boolean.TRUE;
 			}
 		});
+		return ec;
+	}
+	
+	private EvaluationContext getVariableContext() {
+		EvaluationContext ec = new EvaluationContext();
+		
+		ec.setVariable("var_float_five", new Float(5.0));
+		ec.setVariable("var_string_five", "five");
+		ec.setVariable("var_int_five", new Integer(5));
+		ec.setVariable("var_double_five", new Double(5.0));
 		
 		return ec;
 	}
