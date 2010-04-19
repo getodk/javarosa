@@ -153,7 +153,10 @@ public class FormEntryPrompt extends FormEntryCaption {
     }
 
     public String getConstraintText() {
-        return mTreeElement.getConstraint().constraintMsg;
+        if (mTreeElement.getConstraint() == null)
+            return null;
+        else
+            return mTreeElement.getConstraint().constraintMsg;
     }
 
     public Vector<SelectChoice> getSelectChoices() {
