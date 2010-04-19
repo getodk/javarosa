@@ -52,18 +52,18 @@ public class FormTransportSubmitStatusScreen extends Form implements
 		super(Localization.get("sending.status.title"));
 		setCommandListener(listener);
 		this.responder = responder;
+		
+		this.msg = new StringItem(null, Localization.get("sending.status.going"));
+		append(new Spacer(80, 0));
+		append(this.msg);
 	}
 
 	
 	public void reinit(String cacheId){
-		
 		setCacheId(cacheId);
 		this.okCommand = new Command(Localization.get("menu.ok"), Command.OK, 1);
-		this.msg = new StringItem(null, Localization.get("sending.status.going"));
 
 		addCommand(this.okCommand);
-		append(new Spacer(80, 0));
-		append(this.msg);
 
 		initTimer();
 	}
@@ -101,8 +101,9 @@ public class FormTransportSubmitStatusScreen extends Form implements
 		this.counter += REFRESH_INTERVAL;
 
 		int status = transportMessage.getStatus();
-		if (status != TransportMessageStatus.QUEUED)
+		if (status != TransportMessageStatus.QUEUED) {
 			this.timer.cancel();
+		}
 
 		String message;
 		switch (status) {
