@@ -42,6 +42,10 @@ public class TableLocaleSource implements LocaleDataSource {
 		localeData = new OrderedHashtable();
 	}
 	
+	public TableLocaleSource(OrderedHashtable localeData) {
+		this.localeData = localeData;
+	}
+	
 	
 	/**
 	 * Set a text mapping for a single text handle for a given locale.

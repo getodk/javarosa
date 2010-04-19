@@ -231,6 +231,10 @@ public class EntitySelectController <E extends Persistable> {
 		return entityPrototype.getHeaders(false);
 	}
 	
+	public String[] getColumnFormat(boolean header) {
+		return entityPrototype.getForms(header);
+	}
+	
 	public Entity<E> getEntity (int i) {
 		return entities.elementAt(i);
 	}	

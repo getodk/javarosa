@@ -187,7 +187,7 @@ public class WrappingStorageUtility implements IStorageUtilityIndexed {
 		
 	public Externalizable getRecordForValue(String fieldName, Object value)
 			throws NoSuchElementException, InvalidIndexException {
-		return indexedStorage().getRecordForValue(fieldName, value);
+		return ((SerializationWrapper)indexedStorage().getRecordForValue(fieldName, value)).getData();
 	}
 		
 	private IStorageUtilityIndexed indexedStorage() {

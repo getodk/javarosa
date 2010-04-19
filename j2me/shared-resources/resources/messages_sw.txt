@@ -2,7 +2,7 @@ polish.command.ok=Sawa
 polish.command.cancel=Kataa
 polish.command.options=Options
 polish.command.exit=Toka
-polish.command.select=Select
+polish.command.select=Chagua
 polish.command.mark=Chagua
 polish.command.unmark=Usichague
 # for deleting a single char:
@@ -22,7 +22,7 @@ polish.command.followlink=Go
 # used by the HtmlBrowser for submitting a form:
 polish.command.submit=Submit
 # used by the RssBrowser for returning to the previous page:
-polish.command.back=Back
+polish.command.back=Rudi
 # RSS commands:
 polish.rss.command.select=Show
 polish.rss.command.followlink=Go
