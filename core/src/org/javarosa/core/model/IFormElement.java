@@ -42,6 +42,19 @@ public interface IFormElement extends Localizable, Externalizable {
 	void setID (int id);
 	
 	/**
+	 * get the TextID for this element used for localization purposes
+	 * @return the TextID (bare, no ;form appended to it!!)
+	 */
+	String getTextID();
+	
+	/**
+	 * Set the textID for this element for use with localization.
+	 * @param id the plain TextID WITHOUT any form specification (e.g. ;long)
+	 */
+	void setTextID(String id);
+	
+	
+	/**
 	 * @return A vector containing any children that this element
 	 * might have. Null if the element is not able to have child
 	 * elements.
@@ -90,14 +103,12 @@ public interface IFormElement extends Localizable, Externalizable {
 	public void unregisterStateObserver (FormElementStateListener qsl);
 
 	/**
-	 * @return
+	 * This method returns the regular
+	 * innertext betweem label tags (if present) (&ltlabel&gtinnertext&lt/label&gt).
+	 * @return &ltlabel&gt innertext or null (if innertext is not present).
 	 */
-	public String getShortText();
-
-	/**
-	 * @return
-	 */
-	public String getLongText();
+	public String getLabelInnerText();
+	
 	
 	/**
 	 * @return

@@ -16,11 +16,20 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import java.io.IOException;
+import java.util.Vector;
+
+import javax.microedition.lcdui.Image;
+
 import org.javarosa.core.model.FormElementStateListener;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.utility.WidgetUtil;
 
 import de.enough.polish.ui.Container;
+import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
@@ -29,6 +38,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 
 	private StringItem prompt;
 	protected Item entryWidget;
+	private Container c;
 
 	public ExpandedWidget () {
 		reset();
@@ -46,11 +56,73 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		
 		c.add(prompt);
 		c.add(entryWidget);
+		
+		this.c = c;
+	}
+		
+	public ImageItem getImageItem(FormEntryPrompt fep){
+		Vector AvailFormTypes = fep.getAvailableTextFormTypes(fep.getTextID());
+		Vector AvailForms = fep.getAllTextForms(fep.getTextID());
+		String ILabel,IaltText;
+		
+		if(AvailFormTypes.contains("long")){
+			ILabel = (String)AvailForms.elementAt(AvailFormTypes.indexOf("long"));
+		}else{
+			ILabel = fep.getDefaultText();
+		}
+		
+		if(AvailFormTypes.contains("short")){
+			IaltText = (String)AvailForms.elementAt(AvailFormTypes.indexOf("short"));
+		}else{
+			IaltText = fep.getDefaultText();
+		}
+		Image im = getImage(fep,null);
+		if(im!=null){
+			ImageItem imItem = new ImageItem(ILabel,getImage(fep,null), ImageItem.LAYOUT_CENTER, IaltText);
+			return imItem;
+		}else{
+			return null;
+		}
+	}
+	
+	public Image getImage(FormEntryPrompt fep,SelectChoice sc){
+		String Iuri;
+		Vector AvailFormTypes;
+		Vector AvailForms;
+		Image im = null;
+		
+		if(sc!=null){
+			AvailFormTypes = fep.getAvailSelectTextFormTypes(sc);
+			AvailForms = fep.getAllSelectTextForms(sc);
+		}else{
+			AvailFormTypes = fep.getAvailableTextFormTypes(fep.getTextID());
+			AvailForms = fep.getAllTextForms(fep.getTextID());
+		}
+		
+		if(AvailFormTypes.contains("image")){
+			Iuri = (String)AvailForms.elementAt(AvailFormTypes.indexOf("image"));
+		}else{
+			Iuri = null;
+		}
+		
+		if(Iuri != null){
+			try {
+				im = Image.createImage(Iuri);
+			} catch (IOException e) {
+				throw new RuntimeException("ERROR! Cant find image at URI:"+Iuri);	
+			}
+		}
+		
+		return im;
 	}
 
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
-		String caption = fep.getLongText();
-		prompt.setText(caption);
+		
+		ImageItem imItem = getImageItem(fep);
+		if(imItem!=null) c.add(imItem);
+		
+		prompt.setText(WidgetUtil.getAppropriateTextForm(fep,fep.getTextID()));
+
 		updateWidget(fep);
 		
 		//don't wipe out user-entered data, even on data-changed event

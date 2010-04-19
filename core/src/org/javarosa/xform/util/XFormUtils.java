@@ -21,11 +21,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.xform.parse.XFormParser;
+import org.kxml2.kdom.Element;
 
 /**
  * Static Utility methods pertaining to XForms.
@@ -89,4 +91,46 @@ public class XFormUtils {
 		}
 		return returnForm;
 	}
+	
+	
+	/////Parser Attribute warning stuff
+	
+	public static Vector getAttributeList(Element e){
+		Vector atts = new Vector();
+		for(int i=0;i<e.getAttributeCount();i++){
+			atts.addElement(e.getAttributeName(i));
+		}
+		
+		return atts;
+	}
+	
+	public static Vector getUnusedAttributes(Element e,Vector usedAtts){
+		Vector unusedAtts = getAttributeList(e);
+		for(int i=0;i<usedAtts.size();i++){
+			if(unusedAtts.contains(usedAtts.elementAt(i))){
+				unusedAtts.removeElement(usedAtts.elementAt(i));
+			}
+		}
+		
+		return unusedAtts;
+	}
+	
+	public static String unusedAttWarning(Element e, Vector usedAtts){
+		String warning = "Warning: ";
+		Vector ua = getUnusedAttributes(e,usedAtts);
+		warning+=ua.size()+" Unrecognized attributes found in Element ["+e.getName()+"] and will be ignored: ";
+		warning+="[";
+		for(int i=0;i<ua.size();i++){
+			warning+=ua.elementAt(i);
+			if(i!=ua.size()-1) warning+=",";
+		}
+		warning+="]";
+		
+		return warning;
+	}
+	
+	public static boolean showUnusedAttributeWarning(Element e, Vector usedAtts){
+		return getUnusedAttributes(e,usedAtts).size()>0;
+	}
+	
 }

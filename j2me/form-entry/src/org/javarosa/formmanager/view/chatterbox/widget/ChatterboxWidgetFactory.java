@@ -20,6 +20,7 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
+import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
@@ -144,12 +145,28 @@ public class ChatterboxWidgetFactory {
     	}
     	int multiplicity = end.getInstanceIndex();
     	
-    	String label = model.getCaptionPrompt(index).getLongText();
+    	FormEntryCaption p = model.getCaptionPrompt(index);
+		
+		String label; //decide what text form to use.
+		
+		
+		
+		if(p.getAvailableTextFormTypes(p.getTextID()).contains("long")){
+			label = p.getLongText();
+		}else if(p.getAvailableTextFormTypes(p.getTextID()).contains("short")){
+			label = p.getShortText();
+		}else{
+	
+			label = p.getDefaultText();
+			
+	
+		}
+    	
     	
     	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?",
     										Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
-    	prompt.addSelectChoice(new SelectChoice("Yes", "y", false));
-    	prompt.addSelectChoice(new SelectChoice("No", "n", false));
+    	prompt.addSelectChoice(new SelectChoice(null,"Yes", "y", false));
+    	prompt.addSelectChoice(new SelectChoice(null,"No", "n", false));
 		
 		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }

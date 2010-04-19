@@ -52,7 +52,7 @@ public class SelectMultiDataTests extends TestCase {
 		question = new QuestionDef();
 		
 		for (int i = 0; i < 4; i++) {
-			question.addSelectChoice(new SelectChoice("Selection" + i, "Selection " + i, false));
+			question.addSelectChoice(new SelectChoice("","Selection" + i, "Selection " + i, false));
 		}	
 				
 		one = new Selection("Selection 1");

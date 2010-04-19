@@ -12,12 +12,14 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.xform.parse.XFormParseException;
 
 public class SelectChoice implements Externalizable, Localizable {
 
-	private String caption;
-	private String captionID;
-	private boolean captionLocalizable;
+	private String labelInnerText;
+	private String textID;
+	private boolean isLocalizable;
 	private String value;
 	private int index = -1;
 	
@@ -30,27 +32,42 @@ public class SelectChoice implements Externalizable, Localizable {
 	
 	}
 	
-	public SelectChoice (String captionID, String value) {
-		this(captionID, value, true);
+	public SelectChoice (String labelID, String value) {
+		this(labelID,null,value,true);
 	}
 	
-	public SelectChoice (String captionStr, String value, boolean captionLocalizable) {
-		this.captionLocalizable = captionLocalizable;
-		setCaptionStr(captionStr);
-		this.value = value;
+	/**
+	 * 
+	 * @param labelID can be null
+	 * @param labelInnerText can be null
+	 * @param value should not be null
+	 * @param isLocalizable
+	 * @throws XFormParseException if value is null
+	 */
+	public SelectChoice (String labelID, String labelInnerText, String value, boolean isLocalizable) {
+		this.isLocalizable = isLocalizable;
+		this.textID = labelID;
+		this.labelInnerText = labelInnerText;
+		if(value != null){
+			this.value = value;
+		}else{
+			throw new XFormParseException("SelectChoice{id,innerText}:{"+labelID+","+labelInnerText+"}, has null Value!");
+		}
+	}
+	
+	public SelectChoice(String labelOrID,String Value, boolean isLocalizable){
+		this(isLocalizable ? labelOrID : null,
+			 isLocalizable ? null : labelOrID,
+			 Value,isLocalizable);
 	}
 	
 	public void setIndex (int index) {
 		this.index = index;
 	}
 	
-	public String getCaption () {
-		if (caption != null) {
-			return caption;
-		} else {
-			System.err.println("attempted to retrieve caption but no locale set yet! [" + captionID + "]");
-			return "[itext:" + captionID + "]";
-		}
+
+	public String getLabelInnerText () {
+		return labelInnerText;
 	}
 	
 	public String getValue () {
@@ -64,41 +81,59 @@ public class SelectChoice implements Externalizable, Localizable {
 		
 		return index;
 	}
-	
+
+	/**
+	 * @deprecated
+	 */
 	public void localeChanged(String locale, Localizer localizer) {
-		if (captionLocalizable) {
-			caption = localizer.getLocalizedText(captionID);
-		}
+//		if (captionLocalizable) {
+//			caption = localizer.getLocalizedText(captionID);
+//		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		captionLocalizable = ExtUtil.readBool(in);
-		setCaptionStr(ExtUtil.readString(in));
-		value = ExtUtil.readString(in);
+		isLocalizable = ExtUtil.readBool(in);
+		setLabelInnerText(ExtUtil.nullIfEmpty(ExtUtil.readString(in)));
+		setTextID(ExtUtil.nullIfEmpty(ExtUtil.readString(in)));
+		value = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		//index will be set by questiondef
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeBool(out, captionLocalizable);
-		ExtUtil.writeString(out, captionLocalizable ? captionID : caption);
-		ExtUtil.writeString(out, value);
+		ExtUtil.writeBool(out, isLocalizable);
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(labelInnerText));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(textID));
+		ExtUtil.writeString(out, ExtUtil.emptyIfNull(value));
 		//don't serialize index; it will be restored from questiondef
 	}
 
-	private void setCaptionStr (String captionStr) {
-		if (captionLocalizable) {
-			captionID = captionStr;
-		} else {
-			caption = captionStr;
-		}
+	private void setLabelInnerText (String labelInnerText) {
+		this.labelInnerText = labelInnerText;
 	}
 	
 	public Selection selection () {
 		return new Selection(this);
 	}
 	
+	public boolean isLocalizable(){
+		return isLocalizable;
+	}
+	
+	public void setLocalizable(boolean localizable){
+		this.isLocalizable = localizable;
+	}
+	
 	public String toString () {
-		return (captionID != null ? "{" + captionID + "}" : "") + (caption != null ? caption : "") + " => " + value;
+		return (textID != null ? "{" + textID + "}" : "") + (labelInnerText != null ? labelInnerText : "") + " => " + value;
+//		return ("{" + textID + ",innerText: " + getLabelInnerText() + "}");
+	}
+
+	public String getTextID() {
+		return textID;
+	}
+
+	public void setTextID(String textID) {
+		this.textID = textID;
 	}
 	
 }

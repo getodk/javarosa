@@ -16,11 +16,19 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import java.io.IOException;
+import java.util.Vector;
+
+import javax.microedition.lcdui.Image;
+
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Container;
+import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.MoreUIAccess;
 import de.enough.polish.ui.Style;
@@ -172,7 +180,15 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 
 	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
-			choiceGroup().getItem(i).setText(prompt.getSelectChoices().elementAt(i).getCaption());
+			SelectChoice sc = prompt.getSelectChoices().elementAt(i);
+			Selection s = sc.selection();
+			Image im = this.getImage(prompt, sc);
+			
+			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(sc));
+			
+			if(im!=null){
+				choiceGroup().getItem(i).setImage(im);			
+			}
 		}
 	}
 }

@@ -57,8 +57,8 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 		boolean[] selectedFlags = new boolean[choices.size()];
 		while (itr.hasMoreElements()) {
 			SelectChoice choice = (SelectChoice)itr.nextElement();
-			selectedFlags[i] = selectionStrings.contains(choice.getCaption());
-			String label = choice.getCaption();
+			selectedFlags[i] = selectionStrings.contains(this.prompt.getSelectChoiceText(choice));
+			String label = this.prompt.getSelectChoiceText(choice);
 			cg.append(label, null);
 			i++;
 		}
@@ -75,7 +75,7 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 		Vector<Selection> selections = (Vector<Selection>) answerValue.getValue();
 		Vector<String> strings = new Vector<String>();
 		for (Selection selection : selections) {
-			strings.addElement(selection.choice.getCaption());
+			strings.addElement(prompt.getSelectionText(selection));
 		}
 		return strings;
 	}

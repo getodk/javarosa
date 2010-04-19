@@ -21,7 +21,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.lang.String;
 
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -48,14 +50,14 @@ public class QuestionDef implements IFormElement, Localizable {
 	private IDataReference binding;	/** reference to a location in the model to store data in */
 	
 	private int controlType;  /* The type of widget. eg TextInput,Slider,List etc. */
-	private String appearanceAttr;
-	
-	private String longText;	 /* The prompt text. The text the user sees. */
-	private String longTextID;
-	private String shortText;	 /* The prompt text. The text the user sees in short modes. */
-	private String shortTextID;
-	private String helpText;	 /* The help text. */
+	private String appearanceAttr;	
 	private String helpTextID;
+	private String labelInnerText;
+	private String helpText;
+	private String textID; /* The id (ref) pointing to the localized values of (pic-URIs,audio-URIs,text) */
+
+
+
 
 	private Vector<SelectChoice> choices;
 	private ItemsetBinding dynamicChoices;
@@ -103,66 +105,31 @@ public class QuestionDef implements IFormElement, Localizable {
 	public void setAppearanceAttr (String appearanceAttr) {
 		this.appearanceAttr = appearanceAttr;
 	}	
-	
-	public String getLongText () {
-		return longText;
-	}
-	
-	public void setLongText (String longText) {
-		this.longText = longText;
-	}
 
-	//not used during normal usage
-    public String getLongTextID () {
-        return longTextID;
-    }
-    
-    public void setLongTextID (String textID, Localizer localizer) {
-    	this.longTextID = textID;
-    	if (localizer != null) {
-    		longText = localizer.getLocalizedText(longTextID);
-    	}
-    }
-	
-	public String getShortText () {
-		return shortText;
-	}
-	
-	public void setShortText (String shortText) {
-		this.shortText = shortText;
-	}
-
-	//not used during normal usage
-    public String getShortTextID () {
-        return shortTextID;
-    }
-
-    public void setShortTextID (String textID, Localizer localizer) {
-    	this.shortTextID = textID;
-    	if (localizer != null) {
-    		shortText = localizer.getLocalizedText(shortTextID);        
-    	}
-    } 
-
+	/**
+	 * Only if there is no localizable version of the &lthint&gt available should this method be used
+	 */
 	public String getHelpText () {
 		return helpText;
 	}
 
+	/**
+	 * Only if there is no localizable version of the &lthint&gtavailable should this method be used
+	 */
 	public void setHelpText (String helpText) {
 		this.helpText = helpText;
 	}
+	
 
-	//not used during normal usage
     public String getHelpTextID () {
         return helpTextID;
     }
     
     public void setHelpTextID (String textID, Localizer localizer) {
         this.helpTextID = textID;
-        if (localizer != null) {
-            helpText = localizer.getLocalizedText(helpTextID);
-        }
+
     }
+    
 
     public void addSelectChoice (SelectChoice choice) {
     	if (choices == null) {
@@ -210,32 +177,20 @@ public class QuestionDef implements IFormElement, Localizable {
 	public boolean isComplex () {
 		return (dynamicChoices != null && dynamicChoices.copyMode);
 	}
-	
-    public void localeChanged(String locale, Localizer localizer) {
-    	if(longTextID != null) {
-    		longText = localizer.getLocalizedText(longTextID);
-    	}
-
-    	if(shortTextID != null) {
-    		shortText = localizer.getLocalizedText(shortTextID);
-    	}
-
-    	if(helpTextID != null) {
-    		helpText = localizer.getLocalizedText(helpTextID);
-    	}
-    	
-    	if (choices != null) {
-    		for (int i = 0; i < choices.size(); i++) {
-    			choices.elementAt(i).localeChanged(null, localizer);
+	@Deprecated
+    	public void localeChanged(String locale, Localizer localizer) {
+   	 	if (choices != null) {
+    			for (int i = 0; i < choices.size(); i++) {
+    				choices.elementAt(i).localeChanged(null, localizer);
+    			}
     		}
-    	}
     	
-    	if (dynamicChoices != null) {
-    		dynamicChoices.localeChanged(locale, localizer);
-    	}
+   	 	if (dynamicChoices != null) {
+    			dynamicChoices.localeChanged(locale, localizer);
+    		}
     	
-    	alertStateObservers(FormElementStateListener.CHANGE_LOCALE);
-    }
+    		alertStateObservers(FormElementStateListener.CHANGE_LOCALE);
+    	}
 	
 	public Vector getChildren () {
 		return null;
@@ -261,11 +216,9 @@ public class QuestionDef implements IFormElement, Localizable {
 		setID(ExtUtil.readInt(dis));
 		binding = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
 		setAppearanceAttr((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setLongText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setShortText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
+		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setHelpText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setLongTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
-		setShortTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
 
 		setControlType(ExtUtil.readInt(dis));
@@ -284,11 +237,9 @@ public class QuestionDef implements IFormElement, Localizable {
 		ExtUtil.writeNumeric(dos, getID());
 		ExtUtil.write(dos, new ExtWrapNullable(binding == null ? null : new ExtWrapTagged(binding)));
 		ExtUtil.write(dos, new ExtWrapNullable(getAppearanceAttr()));
-		ExtUtil.write(dos, new ExtWrapNullable(getLongText()));
-		ExtUtil.write(dos, new ExtWrapNullable(getShortText()));
+		ExtUtil.write(dos, new ExtWrapNullable(getTextID()));
+		ExtUtil.write(dos, new ExtWrapNullable(getLabelInnerText()));
 		ExtUtil.write(dos, new ExtWrapNullable(getHelpText()));
-		ExtUtil.write(dos, new ExtWrapNullable(getLongTextID()));
-		ExtUtil.write(dos, new ExtWrapNullable(getShortTextID()));
 		ExtUtil.write(dos, new ExtWrapNullable(getHelpTextID()));
 				
 		ExtUtil.writeNumeric(dos, getControlType());
@@ -324,5 +275,25 @@ public class QuestionDef implements IFormElement, Localizable {
 	 */
 	public int getDeepChildCount() {
 		return 1;
+	}
+
+	public void setLabelInnerText(String labelInnerText) {
+		this.labelInnerText = labelInnerText;
+	}
+
+	public String getLabelInnerText() {
+		return labelInnerText;
+	}
+	
+	public String getTextID() {
+		return textID;
+	}
+
+	public void setTextID(String textID) {
+		if(DateUtils.stringContains(textID,";")){
+			System.err.println("Warning: TextID contains ;form modifier:: \""+textID.substring(textID.indexOf(";"))+"\"... will be stripped.");
+			textID=textID.substring(0, textID.indexOf(";")); //trim away the form specifier
+		}
+		this.textID = textID;
 	}
 }
