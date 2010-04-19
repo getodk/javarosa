@@ -361,6 +361,14 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		progressBar.setValue(questionIndexes.size());    		
     	}
     	
+    	//If there's only one thing on the screen, back is a meaningless
+    	//and confusing no-op. Don't show it.
+    	if(this.questionIndexes.size() <= 1) {
+    		this.removeCommand(backCommand);
+    	} else {
+    		this.addCommand(backCommand);
+    	}
+    	
     	//UI hacks ho!
     	babysitStyles();
     }
