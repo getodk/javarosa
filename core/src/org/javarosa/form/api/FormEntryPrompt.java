@@ -320,6 +320,10 @@ public class FormEntryPrompt extends FormEntryCaption {
 		return text;
 	}
 	
+	public String getSelectChoiceText(int i){
+		return this.getSelectChoiceText(this.getQuestion().getChoice(i));
+	}
+	
 
 	
 	/**
