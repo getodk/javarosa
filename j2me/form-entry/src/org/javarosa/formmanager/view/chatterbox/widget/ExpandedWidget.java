@@ -24,6 +24,8 @@ import javax.microedition.lcdui.Image;
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.utility.WidgetUtil;
@@ -107,9 +109,11 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		
 		if(Iuri != null){
 			try {
-				im = Image.createImage(Iuri);
+				im = Image.createImage(ReferenceManager._().DeriveReference(Iuri).getStream());
 			} catch (IOException e) {
 				throw new RuntimeException("ERROR! Cant find image at URI:"+Iuri);	
+			} catch (InvalidReferenceException ire){
+				throw new RuntimeException("Invalid Reference for image at:"+Iuri+", with TextID ["+ ((sc != null) ? sc.getTextID() : fep.getTextID())+"]");
 			}
 		}
 		

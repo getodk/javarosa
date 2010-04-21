@@ -250,7 +250,11 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @return localized Question text (default form), LabelInnerText if default form is not available.
 	 */
 	public String getQText(){
-		return this.getDefaultText();
+		try{
+			return this.getText(this.getTextID(),null);
+		}catch(NoLocalizedTextException nle){
+			return getQuestion().getLabelInnerText();
+		}
 	}
 	
 	/**
@@ -259,11 +263,25 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @return Question text subform (SEE Localizer.getLocalizedText(String) for fallback details). Null if form not available
 	 */
 	public String getQText(String form){
-		return this.getText(this.getTextID(), form);
+		try{
+			return this.getText(this.getTextID(),form);
+		}catch(NoLocalizedTextException nle){
+			return null;
+		}
 	}
 	
-	
-
+	/**
+	 * @param textID of the Question whose text you want
+	 * @param Specific subform of question text (e.g. "audio","image", etc)
+	 * @return Question text subform (SEE Localizer.getLocalizedText(String) for fallback details). Null if form not available
+	 */
+	public String getQText(String textID,String form){
+		try{
+			return this.getText(getTextID(),form);
+		}catch(NoLocalizedTextException nle){
+			return null;
+		}
+	}
 	
 
 	
