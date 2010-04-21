@@ -11,6 +11,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.test.FormDefTest;
 import org.javarosa.core.model.test.QuestionDefTest;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.form.api.FormEntryCaption;
@@ -74,7 +75,12 @@ public class FormParseInit {
 //		}while(t.fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
 		for(int i=0;i<QuestionDefTest.NUM_TESTS+1;i++){
 			new QuestionDefTest().doTest(i);
-		}		
+		}
+		
+		for(int i=0;i<FormDefTest.NUM_TESTS+1;i++){
+			new FormDefTest().doTest(i);
+		}
+		
 	}
 	
 	public void init(){

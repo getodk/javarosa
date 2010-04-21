@@ -13,11 +13,13 @@
 				<name />
 				<find-mirc />
 				<non-local />
+				<consTest />
 			</icons>
 		</instance>
 
 		<bind nodeset="/icons/name" required="true()" />
 		<bind nodeset="/icons/find-mirc" required="true()" />
+		<bind nodeset="/icons/consTest" type="xsd:int" constraint=". > 10" />
 		
 		<itext>
 			<translation lang="English" default="">
@@ -54,7 +56,10 @@
 					<value form="image">jr://images/one.gif</value>
 					<value form="long">Icon 1</value>
 					<value form="short">AltText</value>
-				</text>				
+				</text>	
+				<text id="constraint-test">
+					<value>Should Be Less than 10</value>
+				</text>
 			</translation>
 			<translation lang="Afrikaans">
 				<text id="id">
@@ -89,10 +94,13 @@
 					<value form="image">jr://images/one.gif</value>
 					<value form="short">AltText</value>
 					<value form="long">Icon 1</value>
+				</text>	
+				<text id="constraint-test">
+					<value>Should Be Less than 10</value>
 				</text>				
 			</translation>
 		</itext>
-
+	
 	</model>
 </h:head>
 <h:body>
@@ -106,5 +114,6 @@
 				<item><label ref="jr:itext('gmail')" /><value>gmail</value></item>
 			</select1>
 	<input ref="non-local"><label>Non-Localized label inner text!</label></input>
+	<input ref="consTest"><label ref="jr:itext('constraint-test')" /></input>
 </h:body>
 </h:html>
