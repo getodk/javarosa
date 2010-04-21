@@ -180,5 +180,6 @@ public class JRDemoContext {
 	
 	public void loadRootTranslator(){
 		ReferenceManager._().addRootTranslator(new RootTranslator("jr://images/", "jr://resource/"));
+		ReferenceManager._().addRootTranslator(new RootTranslator("jr://audio/", "jr://resource/"));
 	}
 }

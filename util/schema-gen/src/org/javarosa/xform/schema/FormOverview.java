@@ -32,6 +32,7 @@ import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathConditional;
@@ -115,13 +116,9 @@ public class FormOverview {
 		FormEntryModel femodel = fec.getModel();
 		TreeElement instanceNode = getInstanceNode(f.getInstance(), q.getBind());
 		String caption = "";
-		if(q.getTextID()!=null&&q.getTextID()!=""){
-			caption = femodel.getQuestionPrompt().getLongText();
-		}else{
-			caption = femodel.getQuestionPrompt().getQText();
-		}
-		
-		
+		FormEntryPrompt fep = femodel.getQuestionPrompt();
+		caption = getAppropriateTextForm(fep,fep.getTextID());
+
 		int type = instanceNode.dataType;
 		
 		if (q.getControlType() != Constants.CONTROL_TRIGGER) {
@@ -341,4 +338,34 @@ public class FormOverview {
 	private static void println (StringBuffer sb) {
 		println(sb, 0, "");
 	}
+	
+	/**
+	 * Use this, usually in refresh/updateWidget() method to do
+	 * the text form fallback boogey.
+	 * 
+	 * Fallback logic:
+	 * Try get the "long" form,
+	 * then try get the "short" form,
+	 * then try get the default form.
+	 * 
+	 * If through all of this textID is actually null,
+	 * this method will return the LabelInnerText.
+	 * 
+	 * @param textID
+	 * @returns text of the appropriate form.
+	 */
+	public static String getAppropriateTextForm(FormEntryPrompt fep,String textID){
+		String caption;
+		
+		if(fep.getAvailableTextFormTypes(textID).contains("long")){
+			caption = fep.getLongText();
+		}else if(fep.getAvailableTextFormTypes(textID).contains("short")){
+			caption = fep.getShortText();
+		}else{
+			caption = fep.getDefaultText();
+		}
+		return caption;
+	}
+	
+	
 }
