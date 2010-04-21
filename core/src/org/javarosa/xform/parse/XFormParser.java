@@ -682,7 +682,7 @@ public class XFormParser {
 				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
 				verifyTextMappings(f, textRef, "<hint>", false);
-				q.setHelpTextID(textRef, null);
+				q.setHelpTextID(textRef);
 			} else {
 				throw new RuntimeException("malformed ref [" + ref + "] for <hint>");
 			}

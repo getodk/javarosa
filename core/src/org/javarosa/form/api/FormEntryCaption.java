@@ -254,7 +254,7 @@ public class FormEntryCaption implements FormElementStateListener {
 			}
 		}
 		
-		if(form!=null){
+		if(form!=null && form != ""){
 			textID += ";" + form;	
 		}
 		

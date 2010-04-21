@@ -125,7 +125,7 @@ public class QuestionDef implements IFormElement, Localizable {
         return helpTextID;
     }
     
-    public void setHelpTextID (String textID, Localizer localizer) {
+    public void setHelpTextID (String textID) {
         this.helpTextID = textID;
 
     }
@@ -137,6 +137,23 @@ public class QuestionDef implements IFormElement, Localizable {
     	}
     	choice.setIndex(choices.size());
     	choices.addElement(choice);
+    }
+    
+    public void removeSelectChoice(SelectChoice choice){
+    	if(choices == null) {
+    		choice.setIndex(0);
+    		return;
+    	}
+    	
+    	if(choices.contains(choice)){
+    		choices.removeElement(choice);
+       	}
+    }
+    
+    public void removeAllSelectChoices(){
+    	if(choices != null){
+    		choices.removeAllElements();		
+    	}
     }
     
     public Vector<SelectChoice> getChoices () {
@@ -219,7 +236,7 @@ public class QuestionDef implements IFormElement, Localizable {
 		setTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setLabelInnerText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 		setHelpText((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
-		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf), null);
+		setHelpTextID((String)ExtUtil.read(dis, new ExtWrapNullable(String.class), pf));
 
 		setControlType(ExtUtil.readInt(dis));
 		choices = ExtUtil.nullIfEmpty((Vector)ExtUtil.read(dis, new ExtWrapList(SelectChoice.class), pf));
