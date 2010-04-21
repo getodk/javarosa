@@ -34,6 +34,11 @@ import org.javarosa.xform.util.XFormUtils;
  * REMEMBER to set the 
  */
 
+
+//TODO
+//Make some better lazy-people methods for testing constraints.
+
+
 public class FormParseInit {
 	private String FORM_NAME = new String("resources/ImageSelectTester.xhtml");
 	private FormDef xform;
