@@ -138,6 +138,9 @@ public class PropertiesScreen extends Form{
 								itemForPropertyName.put(input, propertyName);
 							if (rules.checkPropertyUserReadOnly(propertyName)) {
 								input.setConstraints(TextField.UNEDITABLE);
+								//If it's read only, there might be a special way it will be displayed
+								//to the user (which is fine, since it can't be changed on this screen anyway).
+								input.setString(rules.getHumanReadableValue(propertyName, (String) propValues.elementAt(0)));
 								readOnlys.addElement(input);
 							} else {
 								this.append(input);

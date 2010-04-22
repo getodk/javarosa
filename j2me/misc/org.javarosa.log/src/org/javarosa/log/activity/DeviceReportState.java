@@ -25,6 +25,7 @@ import org.javarosa.core.util.TrivialTransitions;
 import org.javarosa.j2me.log.StatusReportException;
 import org.javarosa.j2me.log.XmlLogSerializer;
 import org.javarosa.j2me.log.XmlStatusProvider;
+import org.javarosa.log.util.LogReportUtils;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.TransportService;
@@ -36,27 +37,59 @@ import org.kxml2.kdom.Element;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
+ * Note: Much of this behavior should be moved into a controller
+ * which is used by multiple states. This one is a non-interactive
+ * behind the scenes report, but it's likely that in the future there
+ * will exist manual report sending which should be vaguely interactive
+ * 
  * @author ctsims
  *
  */
 public abstract class DeviceReportState implements State, TrivialTransitions, TransportListener {
 
+	private static final String XMLNS = "http://code.javarosa.org/devicereport";
+	
 	private int reportFormat;
+	private long now;
 	
-	public static final int REPORT_FORMAT_FULL = 1;
-	public static final int REPORT_FORMAT_COMPACT = 2;
-	
-	public DeviceReportState(int reportFormat) {
-		this.reportFormat = reportFormat;
+	/**
+	 * Create a behind-the-scenes Device Reporting state which manages all operations 
+	 * without user intervention.
+	 */
+	public DeviceReportState() {
+		now = new Date().getTime();
+		//Get what reports are pending for the week and for the day.
+		//If logging is disabled, these methods default to skipping.
+		int weeklyPending = LogReportUtils.getPendingWeeklyReportType(now);
+		int dailyPending = LogReportUtils.getPendingDailyReportType(now);
+		
+		//Pick the most verbose pending report.
+		this.reportFormat = Math.max(dailyPending,weeklyPending);
 	}
+
 	
 	public void start() {
+		if(reportFormat == LogReportUtils.REPORT_FORMAT_SKIP) {
+			System.out.println("No reports pending");
+			done();
+			return;
+		}
+		
 		try {
 			Document report = createReport();
 			InputStream payload = serializeReport(report);
 			TransportMessage message = constructMessageFromPayload(payload);
 			SenderThread s = TransportService.send(message);
+			
+			//We have no way of knowing whether the message will get 
+			//off the phone successfully if it can get cached, the
+			//logs are in the transport layer's hands at that point.
+			if(message.isCacheable()) {
+				Logger._().clearLogs();
+			}
+			
 			s.addListener(this);
+			LogReportUtils.setPendingFromNow(now);
 		} catch (Exception e) {
 			// Don't let this code break the application, ever.
 			e.printStackTrace();
@@ -92,21 +125,23 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	
 	private Document createReport() {
 		Document xmlDoc = new Document();
-		Element errors = xmlDoc.createElement(null,"report_errors");
-		addHeader(xmlDoc, errors);
-		createDeviceLogSubreport(xmlDoc,errors);
-		createTransportSubreport(xmlDoc,errors);
-		if(reportFormat == REPORT_FORMAT_FULL) {
-			createRmsSubreport(xmlDoc,errors);
-			createPropertiesSubreport(xmlDoc,errors);
+		Element root = xmlDoc.createElement(XMLNS, "device_report");
+		xmlDoc.addChild(Element.ELEMENT, root);
+		Element errors = root.createElement(null,"report_errors");
+		addHeader(root, errors);
+		createDeviceLogSubreport(root,errors);
+		createTransportSubreport(root,errors);
+		if(reportFormat == LogReportUtils.REPORT_FORMAT_FULL) {
+			createRmsSubreport(root,errors);
+			createPropertiesSubreport(root,errors);
 		}
 		if(errors.getChildCount() != 0) {
-			xmlDoc.addChild(Element.ELEMENT,errors);
+			root.addChild(Element.ELEMENT,errors);
 		}
 		return xmlDoc;
 	}
 	
-	private void addHeader(Document parent, Element errorsNode) {
+	private void addHeader(Element parent, Element errorsNode) {
 		String deviceId = PropertyManager._().getSingularProperty(JavaRosaPropertyRules.DEVICE_ID_PROPERTY);
 		String reportDate = DateUtils.formatDate(new Date(), DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 
@@ -119,7 +154,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		parent.addChild(Element.ELEMENT, date);
 	}
 	
-	private void createTransportSubreport(Document parent, Element errorsNode) {
+	private void createTransportSubreport(Element parent, Element errorsNode) {
 		try{
 			Element report = new Element();
 			report.setName("transport_subreport");
@@ -133,7 +168,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		}
 	}
 	
-	private void createDeviceLogSubreport(Document parent, Element errorsNode) {
+	private void createDeviceLogSubreport(Element parent, Element errorsNode) {
 		try {
 			Element report = Logger._().serializeLogs(new XmlLogSerializer("log_subreport"));
 			parent.addChild(Element.ELEMENT, report);
@@ -142,7 +177,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		}
 	}
 	
-	private void createRmsSubreport(Document root, Element errorsNode)  {
+	private void createRmsSubreport(Element root, Element errorsNode)  {
 		Element parent = new Element();
 		parent.setName("rms_subreport");
 		
@@ -166,7 +201,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	}
 	
 	
-	private void createPropertiesSubreport(Document root, Element errorsNode) {
+	private void createPropertiesSubreport(Element root, Element errorsNode) {
 		Element report = root.createElement(null, "properties_subreport");
 		Vector rules = PropertyManager._().getRules();
 		for(Enumeration en = rules.elements(); en.hasMoreElements();) {
@@ -219,10 +254,20 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		errorsNode.addChild(Element.ELEMENT,error);
 	}
 	
+	
+
+	public void onChange(TransportMessage message, String remark) {
+		// TODO Auto-generated method stub
+		
+	}
 	public void onStatusChange(TransportMessage message) {
 		if(message.getStatus() == TransportMessageStatus.SENT) {
-			//The data's off the device. We don't want it to get out of control, so wipe the logs.
-			Logger._().clearLogs();
+			//If the message isn't cacheable, we haven't wiped the
+			//logs yet, since we needed to wait for success in order
+			//to know they'd get off the phone.
+			if(!message.isCacheable()) {
+				Logger._().clearLogs();
+			}
 		}
 	}
 }

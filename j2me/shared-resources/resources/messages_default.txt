@@ -334,3 +334,14 @@ case.status=Currently Open
 yes=Yes
 no=No
 date.unknown=unknown
+
+log.submit.url=Log Submit URL
+log.submit.never=Disable Auto-Send
+log.submit.short=Send Device Log
+log.submit.full=Send Full Diagnostic
+log.submit.nigthly=Nightly Log Format
+log.submit.weekly=Weekly Log Format
+log.submit.next.daily=Next Daily Log
+log.submit.next.weekly=Next Weekly Log
+
+user.create.header=New User
