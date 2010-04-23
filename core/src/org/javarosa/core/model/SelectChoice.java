@@ -82,9 +82,7 @@ public class SelectChoice implements Externalizable, Localizable {
 		return index;
 	}
 
-	/**
-	 * @deprecated
-	 */
+
 	public void localeChanged(String locale, Localizer localizer) {
 //		if (captionLocalizable) {
 //			caption = localizer.getLocalizedText(captionID);

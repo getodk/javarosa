@@ -194,8 +194,9 @@ public class QuestionDef implements IFormElement, Localizable {
 	public boolean isComplex () {
 		return (dynamicChoices != null && dynamicChoices.copyMode);
 	}
-	@Deprecated
-    	public void localeChanged(String locale, Localizer localizer) {
+	
+	//Deprecated
+    public void localeChanged(String locale, Localizer localizer) {
    	 	if (choices != null) {
     			for (int i = 0; i < choices.size(); i++) {
     				choices.elementAt(i).localeChanged(null, localizer);

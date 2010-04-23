@@ -154,6 +154,8 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 	private void attachWidget () {
 		Item widget = expandedStyle.getInteractiveWidget();
 		
+//		ExpandedWidget.getAudioAndPlay(prompt);
+		
 		widget.addCommand(nextCommand);
 		widget.setItemCommandListener(this);
 		
