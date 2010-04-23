@@ -32,6 +32,6 @@ public class UserModule implements IModule {
 
 	public void registerModule() {
 		StorageManager.registerStorage(User.STORAGE_KEY, User.class);
+		//TODO: Register Default User XForm
 	}
-
 }

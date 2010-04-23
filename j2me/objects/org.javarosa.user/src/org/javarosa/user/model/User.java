@@ -28,6 +28,7 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
+import org.javarosa.core.services.storage.IMetaData;
 import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
@@ -36,13 +37,17 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 
 
-public class User implements Persistable, Restorable
+public class User implements Persistable, Restorable, IMetaData
 {
 	public static final String STORAGE_KEY = "USER";
 	
 	public static final String ADMINUSER = "admin";
 	public static final String STANDARD = "standard";
 	public static final String DEMO_USER = "demo_user";
+	
+	public static final String META_UID = "uid";
+	public static final String META_USERNAME = "username";
+	public static final String META_ID = "id";
 
 	private int recordId = -1; //record id on device
 	private String username;
@@ -218,6 +223,29 @@ public class User implements Persistable, Restorable
             	}
             }
         }
+	}
+
+	public Hashtable getMetaData() {
+		Hashtable ret = new Hashtable();
+		for(String name : getMetaDataFields()) {
+			ret.put(name, getMetaData(name));
+		}
+		return ret;
+	}
+
+	public Object getMetaData(String fieldName) {
+		if(META_UID.equals(fieldName)) {
+			return uniqueId;
+		} else if(META_USERNAME.equals(fieldName)) {
+			return username;
+		} else if(META_ID.equals(fieldName)) {
+			return new Integer(id);
+		}
+		throw new IllegalArgumentException("No metadata field " + fieldName  + " for User Models");
+	}
+
+	public String[] getMetaDataFields() {
+		return new String[] {META_UID, META_USERNAME, META_ID};
 	}
 	
 }
