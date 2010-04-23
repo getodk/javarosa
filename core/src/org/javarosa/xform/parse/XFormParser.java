@@ -1048,20 +1048,12 @@ public class XFormParser {
 		}
 	}
 	
-	/**
-	 * KNOWN ISSUES WITH ITEXT
-	 *
-	 * 'long' and 'short' forms of text are only supported for input control labels at this time. all other
-	 * situations (<hint> tags, <label>s within <item>s, etc.) should only reference text handles that have
-	 * only the single, default form.
-	 */
-
 	private static void parseIText (FormDef f, Element itext) {
 		Localizer l = new Localizer(true, true);
 		f.setLocalizer(l);
 		l.registerLocalizable(f);
 
-		Vector usedAtts = new Vector();
+		Vector usedAtts = new Vector(); //used for warning message
 		
 		for (int i = 0; i < itext.getChildCount(); i++) {
 			Element trans = itext.getElement(i);
@@ -1085,10 +1077,11 @@ public class XFormParser {
 	}
 
 	private static void parseTranslation (Localizer l, Element trans, FormDef f) {
+		/////for warning message
 		Vector usedAtts = new Vector();
 		usedAtts.addElement("lang");
-		usedAtts.addElement("lang");
 		usedAtts.addElement("default");
+		/////////////////////////
 		
 		String lang = trans.getAttributeValue("", "lang");
 		if (lang == null || lang.length() == 0)
@@ -1134,20 +1127,24 @@ public class XFormParser {
 	private static void parseTextHandle (TableLocaleSource l, Element text, FormDef f) {
 		String id = text.getAttributeValue("", "id");
 		
+		//used for parser warnings...
 		Vector usedAtts = new Vector();
 		Vector childUsedAtts = new Vector();
 		usedAtts.addElement("id");
 		usedAtts.addElement("form");
 		childUsedAtts.addElement("form");
 		childUsedAtts.addElement("id");
+		//////////
 		
 		if (id == null || id.length() == 0)
 			throw new XFormParseException("no id defined for <text>",text);
 
 		for (int k = 0; k < text.getChildCount(); k++) {
 			Element value = text.getElement(k);
-			if (value == null || !value.getName().equals("value"))
-				continue;
+			if (value == null) continue;
+			if(!value.getName().equals("value")){
+				throw new XFormParseException("Unrecognized element ["+value.getName()+"] in Itext->translation->text");
+			}
 
 			String form = value.getAttributeValue("", "form");
 			if (form != null && form.length() == 0)
@@ -1158,7 +1155,7 @@ public class XFormParser {
 
 			String textID = (form == null ? id : id + ";" + form);  //kind of a hack
 			if (l.hasMapping(textID))
-				throw new XFormParseException("duplicate definition for text ID \"" + id + "\" and form \"" + form + "\"",text);
+				throw new XFormParseException("duplicate definition for text ID \"" + id + "\" and form \"" + form + "\""+". Can only have one definition for each text form.",text);
 			l.setLocaleMapping(textID, data);
 			
 			//print unused attribute warning message for child element
