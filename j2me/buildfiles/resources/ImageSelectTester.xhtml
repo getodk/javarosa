@@ -1,0 +1,119 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/2002/xforms"
+	  xmlns:ev="http://www.w3.org/2001/xml-events"
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	  xmlns:jr="http://openrosa.org/javarosa">
+<h:head>
+    <h:title>RichMedia testing Images</h:title>
+    <meta jr:name="rm-subforms-test-images"/>
+    <model>
+		<instance>
+			<icons>
+				<id />
+				<name />
+				<find-mirc />
+				<non-local />
+				<consTest />
+			</icons>
+		</instance>
+
+		<bind nodeset="/icons/name" required="true()" />
+		<bind nodeset="/icons/find-mirc" required="true()" />
+		<bind nodeset="/icons/consTest" type="xsd:int" constraint=". > 10" />
+		
+		<itext>
+			<translation lang="English" default="">
+				<text id="id">
+				  <value form="long">Patient ID</value>
+				  <value form="short">ID</value>
+				  <value form="audio">jr://audio/hah.mp3</value>
+				</text>
+				<text id="name">
+				  	<value form="long">Full Name</value>
+					<value form="short">Name</value>
+					<value form="image">jr://images/four.gif</value>
+				</text>
+				<text id="find-mirc">
+					<value form="long">Please find the mirc icon</value>
+					<value form="short">MircIcon</value>
+				</text>
+				<text id="pandora">
+					<value form="image">jr://images/four.gif</value>
+					<value form="long">Icon 4</value>
+					<value form="short">AltText</value>
+				</text>
+				<text id="mirc">
+					<value form="image">jr://images/three.gif</value>
+					<value form="long">Icon 3</value>
+					<value form="short">AltText</value>
+				</text>
+				<text id="gmail">
+					<value form="image">jr://images/two.gif</value>
+					<value form="long">Icon 2</value>
+					<value form="short">AltText</value>
+				</text>
+				<text id="powerpoint">
+					<value form="image">jr://images/one.gif</value>
+					<value form="long">Icon 1</value>
+					<value form="short">AltText</value>
+				</text>	
+				<text id="constraint-test">
+					<value>Should Be Less than 10</value>
+				</text>
+			</translation>
+			<translation lang="Afrikaans">
+				<text id="id">
+				  <value form="long">Patient ID</value>
+				  <value form="short">ID</value>
+				</text>
+				<text id="name">
+				  	<value form="long">Vol Naam</value>
+					<value form="short">Naam</value>
+					<value form="image">jr://images/four.gif</value>
+				</text>
+				<text id="find-mirc">
+					<value form="long">Vind asseblief die mIRC icon.</value>
+					<value form="short">MircIcon</value>
+				</text>
+				<text id="pandora">
+					<value form="image">jr://images/four.gif</value>
+					<value form="long">Icon 4</value>
+					<value form="short">AltText</value>
+				</text>
+				<text id="mirc">
+					<value form="image">jr://images/three.gif</value>
+					<value form="long">Icon 3</value>
+					<value form="short">AltText</value>
+				</text>
+				<text id="gmail">
+					<value form="image">jr://images/two.gif</value>
+					<value form="long">Icon 2</value>
+					<value form="short">AltText</value>
+				</text>
+				<text id="powerpoint">
+					<value form="image">jr://images/one.gif</value>
+					<value form="short">AltText</value>
+					<value form="long">Icon 1</value>
+				</text>	
+				<text id="constraint-test">
+					<value>Should Be Less than 10</value>
+				</text>				
+			</translation>
+		</itext>
+	
+	</model>
+</h:head>
+<h:body>
+	<input ref="id"><label ref="jr:itext('id')" /></input>
+	<input ref="name"><label ref="jr:itext('name')" /></input>
+			<select1 ref="find-mirc">
+				<label ref="jr:itext('find-mirc')" />
+				<item><label ref="jr:itext('pandora')"/><value>pand</value></item>
+				<item><label ref="jr:itext('mirc')" /><value>mirc</value></item>
+				<item><label ref="jr:itext('powerpoint')" /><value>powerp</value></item>
+				<item><label ref="jr:itext('gmail')" /><value>gmail</value></item>
+			</select1>
+	<input ref="non-local"><label>Non-Localized label inner text!</label></input>
+	<input ref="consTest"><label ref="constraint-test" /></input>
+</h:body>
+</h:html>

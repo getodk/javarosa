@@ -49,7 +49,7 @@ public class SelectOneDataTests extends TestCase {
 		OrderedHashtable oh = new OrderedHashtable();
 		Vector v = new Vector();
 		for (int i = 0; i < 3; i++) {
-			question.addSelectChoice(new SelectChoice("Selection" + i, "Selection" + i, false));
+			question.addSelectChoice(new SelectChoice("","Selection" + i, "Selection" + i, false));
 		}	
 		
 		one = new Selection("Selection1");

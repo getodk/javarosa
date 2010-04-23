@@ -172,6 +172,9 @@
 	<!-- Main Target: Cleans, and then runs the build target with the emulator -->
 	<target name="BuildCleanRunEmulator" description="allows a clean build, and then launches the emulator" depends="Clean, enableEmulator, BuildPolish" />
 
+	<target name="BuildRunEmulator" description="allows a clean build, and then launches the emulator" depends="disableObfuscator, enableEmulator, BuildPolish" />
+
+	
 	<!-- Main Target: Runs the build with all debug properties enabled -->
 	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
 	

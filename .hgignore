@@ -33,3 +33,4 @@ devices/
 #mercurial
 *.rej
 *.orig
+glob:util/validator/org.javarosa.xform.validator/settings.properties

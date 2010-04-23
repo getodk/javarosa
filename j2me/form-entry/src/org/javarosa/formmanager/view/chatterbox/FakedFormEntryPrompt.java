@@ -46,7 +46,7 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 		return null;
 	}
 
-	public String getLongText() {
+	public String getLongText(String textID) {
 		return text;
 	}
 
@@ -63,7 +63,7 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 		choices.addElement(choice);
 	}
 
-	public String getShortText() {
+	public String getShortText(String textID) {
 		return text;
 	}
 
@@ -83,6 +83,10 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 	
 	public void unregister () {
 		//do nothing -- this fake prompt is not bound to anything real in the instance		
+	}
+
+	protected String getText(String tID, String form) {
+		return text;
 	}
 	
 }

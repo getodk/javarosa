@@ -18,6 +18,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.utility.WidgetUtil;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.StringItem;
@@ -51,7 +52,12 @@ public class LabelWidget implements IWidgetStyle {
 		
 		// Clayton Sims - Feb 6, 2009 : Labels are now applicable for questions, so that we can pin 
 		// question texts for long questions.
-		String caption = prompt.getLongText();
+//		String caption = prompt.getLongText();
+		String caption = WidgetUtil.getAppropriateTextForm(prompt,prompt.getTextID());
+
+
+		
+		
 		if(multiplicity != -1) {
 			caption += ": " + multiplicity;
 		}
