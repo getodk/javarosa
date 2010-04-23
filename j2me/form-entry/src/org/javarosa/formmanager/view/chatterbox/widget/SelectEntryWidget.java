@@ -163,6 +163,17 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 				}
 				return retStyle; 
 			}
+			
+			
+			/** Hack #5 **/
+			//Anton de Winter 4/23/2010
+			//To play an audio file whenever a choice is highlighted we need to make the following hack.
+			public void focusChild( int index, Item item, int direction ) {
+				if(direction != 0){
+					doAudio(index);
+				}
+				super.focusChild(index, item, direction);
+			}
 		};
 		for (int i = 0; i < prompt.getSelectChoices().size(); i++){
 			cg.append("", null);
@@ -176,6 +187,10 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 	protected ChoiceGroup choiceGroup () {
 		//return (ChoiceGroup)entryWidget;
 		return this.choicegroup;
+	}
+	
+	private void doAudio(int index){
+		getAudioAndPlay(prompt,prompt.getSelectChoices().elementAt(index));
 	}
 
 	protected void updateWidget (FormEntryPrompt prompt) {

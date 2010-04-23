@@ -46,7 +46,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	private StringItem prompt;
 	protected Item entryWidget;
 	private Container c;
-	protected boolean playAudioIfAvailable = true;
+	protected static boolean playAudioIfAvailable = true;
 
 	public ExpandedWidget () {
 		reset();
@@ -68,41 +68,61 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		this.c = c;
 	}
 	
+	static Player player;
+	public static void getAudioAndPlay(FormEntryPrompt fep,SelectChoice select){
+		if (!playAudioIfAvailable) return;
+		String AudioURI;
+		String textID;
+		
+		if (select == null) {
+			textID = fep.getQuestion().getTextID();		
+			if (fep.getAvailableTextFormTypes(textID).contains("audio")) {
+				int index = fep.getAvailableTextFormTypes(textID).indexOf("audio");
+				AudioURI = (String) fep.getAllTextForms(textID).elementAt(index);
+			} else {
+				return;
+			}	
+		}else{
+			textID = select.getTextID();
+			if(textID == null || textID == "") return;
+			
+			if (fep.getAvailSelectTextFormTypes(select).contains("audio")) {
+				int index = fep.getAvailSelectTextFormTypes(select).indexOf("audio");
+				AudioURI = (String) fep.getAllSelectTextForms(select).elementAt(index);
+			} else {
+				return;
+			}
+		}	
+//		System.out.println("Audio URI:"+ AudioURI);
+		try {
+			Reference audRef = ReferenceManager._().DeriveReference(AudioURI);
+			if(player==null || player.getState()!=player.STARTED){
+				player = Manager.createPlayer(audRef.getStream(), "audio/x-wav");
+				player.start();
+//				System.out.println("Playing audio:"+audRef.getURI());
+			}else{
+				System.out.println("Player busy so skipping requested audio for now:"+AudioURI);
+			}
+				// player = new AudioPlayer("audio/mp3");
+				// player.play(audRef.getStream());
+			
+			
+			System.out.flush();
+			} catch (InvalidReferenceException ire) {
+				throw new RuntimeException("Invalid Reference Exception when attempting to play audio at URI:"+ AudioURI);
+			} catch (IOException ioe) {
+				throw new RuntimeException(	"IO Exception (input cannot be read) when attempting to play audio stream with URI:"+ AudioURI);
+			} catch (MediaException e) {
+				throw new RuntimeException("Media format not supported! Uri: "+ AudioURI);
+			}
+	}
+	
 	/**
 	 * Checks the boolean playAudioIfAvailable first.
 	 */
-	public void getAudioAndPlay(FormEntryPrompt fep){
-		System.out.println(getCaptureSupport("audio"));
-		System.out.println("-------------------");
-		System.out.println(Manager.getSupportedContentTypes(null)[0]);
-		System.out.println("--------------------");
-		System.out.print("In getAudioAndPlay()...");
-		if(!playAudioIfAvailable) return;
-		System.out.print("---");
-		Player player;
-		String AudioURI;
-		String textID = fep.getQuestion().getTextID();
-		if(fep.getAvailableTextFormTypes(textID).contains("audio")){
-			int index = fep.getAvailableTextFormTypes(textID).indexOf("audio");
-			AudioURI = (String)fep.getAllTextForms(textID).elementAt(index);
-			System.out.println("Question contains a legit audio URI:"+AudioURI+",attempting to get player and play...");
-		}else{
-			return;
-		}
-		try{
-			Reference audRef = ReferenceManager._().DeriveReference(AudioURI);
-			player = Manager.createPlayer(audRef.getStream(),"audio/x-wav");
-//			player = new AudioPlayer("audio/mp3");
-//			player.play(audRef.getStream());
-			player.start();
-			System.out.println("Should have played at this point.");
-		}catch(InvalidReferenceException ire){
-			throw new RuntimeException("Invalid Reference Exception when attempting to play audio at URI:"+AudioURI);
-		}catch(IOException ioe){
-			throw new RuntimeException("IO Exception (input cannot be read) when attempting to play audio stream with URI:"+AudioURI);
-		} catch (MediaException e) {
-			throw new RuntimeException("Media format not supported! Uri: "+AudioURI);
-		}
+	public static void getAudioAndPlay(FormEntryPrompt fep){
+//		System.out.println(getCaptureSupport("audio"));
+		getAudioAndPlay(fep,null);
 	}
 		
 	public ImageItem getImageItem(FormEntryPrompt fep){
@@ -123,7 +143,9 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		}
 		Image im = getImage(fep,null);
 		if(im!=null){
-			ImageItem imItem = new ImageItem(ILabel,getImage(fep,null), ImageItem.LAYOUT_CENTER, IaltText);
+			ImageItem imItem = new ImageItem(null,getImage(fep,null), ImageItem.LAYOUT_CENTER, IaltText);
+			imItem.setLayout(Item.LAYOUT_CENTER);
+//			ImageItem imItem = new ImageItem(ILabel,getImage(fep,null), ImageItem.LAYOUT_CENTER, IaltText);
 			return imItem;
 		}else{
 			return null;
@@ -164,13 +186,21 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		return im;
 	}
 
+	private int imageIndex=-1;
+	private ImageItem imItem;
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
+		if(imItem!=null && imageIndex !=-1){	//replace an already existing image
+			imItem = getImageItem(fep);
+			if(imItem!=null) c.set(imageIndex, imItem);
+			imageIndex = c.indexOf(imItem);
+		}else{
+			imItem = getImageItem(fep);
+			if(imItem!=null) c.add(imItem);
+			imageIndex = c.indexOf(imItem);
+		}
 		
-		ImageItem imItem = getImageItem(fep);
-		if(imItem!=null) c.add(imItem);
-		
-		prompt.setText(WidgetUtil.getAppropriateTextForm(fep,fep.getTextID()));
-		getAudioAndPlay(fep);	
+		getAudioAndPlay(fep);
+		prompt.setText(WidgetUtil.getAppropriateTextForm(fep,fep.getTextID()));	
 		updateWidget(fep);
 		
 		//don't wipe out user-entered data, even on data-changed event
@@ -199,6 +229,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	}
 	
 	public Item getInteractiveWidget () {
+		
 		return entryWidget;
 	}
 	
@@ -214,39 +245,39 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	protected abstract void setWidgetValue (Object o);
 	protected abstract IAnswerData getWidgetValue ();
 	
-	private String getCaptureSupport(String media) {
-		StringBuffer sbuf = new StringBuffer(media);
-		String support = System.getProperty("supports." + media + ".capture");
-
-		if ((support != null) && (!support.trim().equals(""))) {
-			sbuf.append(" capture supported");
-			String supportRecording = System.getProperty("supports.recording");
-			if ((supportRecording != null)
-					&& (!supportRecording.trim().equals(""))) {
-				String recordingEncodings = System.getProperty(media
-						+ ".encodings");
-				if ((recordingEncodings != null)
-						&& (!recordingEncodings.trim().equals(""))) {
-					sbuf.append(", recording supported to ");
-					sbuf.append(recordingEncodings);
-				} else {
-					sbuf
-							.append(", recording not supported for this media format");
-				}
-			} else {
-				sbuf.append(", recording not supported");
-			}
-
-			String snapshotEncodings = System.getProperty(media
-					+ ".snapshot.encodings");
-
-			if (snapshotEncodings != null) {
-				sbuf.append(", snapshots supported to ");
-				sbuf.append(snapshotEncodings);
-			}
-		} else {
-			sbuf.append(" capture not supported");
-		}
-		return sbuf.toString();
-	}
+//	private String getCaptureSupport(String media) {
+//		StringBuffer sbuf = new StringBuffer(media);
+//		String support = System.getProperty("supports." + media + ".capture");
+//
+//		if ((support != null) && (!support.trim().equals(""))) {
+//			sbuf.append(" capture supported");
+//			String supportRecording = System.getProperty("supports.recording");
+//			if ((supportRecording != null)
+//					&& (!supportRecording.trim().equals(""))) {
+//				String recordingEncodings = System.getProperty(media
+//						+ ".encodings");
+//				if ((recordingEncodings != null)
+//						&& (!recordingEncodings.trim().equals(""))) {
+//					sbuf.append(", recording supported to ");
+//					sbuf.append(recordingEncodings);
+//				} else {
+//					sbuf
+//							.append(", recording not supported for this media format");
+//				}
+//			} else {
+//				sbuf.append(", recording not supported");
+//			}
+//
+//			String snapshotEncodings = System.getProperty(media
+//					+ ".snapshot.encodings");
+//
+//			if (snapshotEncodings != null) {
+//				sbuf.append(", snapshots supported to ");
+//				sbuf.append(snapshotEncodings);
+//			}
+//		} else {
+//			sbuf.append(" capture not supported");
+//		}
+//		return sbuf.toString();
+//	}
 }

@@ -359,7 +359,7 @@ public class QuestionDefTest extends TestCase {
 	 * Image uri translation/reference tests (Clayton's stuff)
 	 */
 	
-	@Deprecated
+	//Deprecated
 	public void testLocaleChanged () {
 		QuestionDef q = new QuestionDef();
 		q.setLabelInnerText("zh: some text");
