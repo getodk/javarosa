@@ -79,23 +79,29 @@ public class WrappingStorageUtility implements IStorageUtilityIndexed {
 	}
 
 	public void write(final Persistable p) throws StorageFullException {
-		wrapper.setData(p);
-		if(wrapper instanceof IMetaData) {
-			storage.write(new FauxIndexedPersistable(p, wrapper, (IMetaData)wrapper));
-		} else {
-			storage.write(new FauxIndexedPersistable(p, wrapper));
+		synchronized(wrapper) {
+			wrapper.setData(p);
+			if(wrapper instanceof IMetaData) {
+				storage.write(new FauxIndexedPersistable(p, wrapper, (IMetaData)wrapper));
+			} else {
+				storage.write(new FauxIndexedPersistable(p, wrapper));
+			}
 		}
 	}
 			 	
 	
 	public int add(Externalizable e) throws StorageFullException {
-		wrapper.setData(e);
-		return storage.add(wrapper);
+		synchronized(wrapper) {
+			wrapper.setData(e);
+			return storage.add(wrapper);
+		}
 	}
 	
 	public void update(int id, Externalizable e) throws StorageFullException {
-		wrapper.setData(e);
-		storage.update(id, wrapper);
+		synchronized(wrapper) {
+			wrapper.setData(e);
+			storage.update(id, wrapper);
+		}
 	}
 	
 	public IStorageIterator iterate() {
