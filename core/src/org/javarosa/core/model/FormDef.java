@@ -221,6 +221,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public void setValue(IAnswerData data, TreeReference ref, TreeElement node) {
 		setAnswer(data, node);
 		triggerTriggerables(ref);
+		//TODO: pre-populate fix-count repeats here?
 	}
 
 	public void setAnswer(IAnswerData data, TreeReference ref) {
