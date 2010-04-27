@@ -184,8 +184,10 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
         
         if(!model.isReadOnlyMode()) {
             addCommand(backCommand);
-            addCommand(exitSaveCommand);
-            addCommand(saveCommand);
+            //CTS (4/27/2010): We don't handle these appropriately, and it does nothing but confuse
+            //users when they appear and break stuff.
+            //addCommand(exitSaveCommand);
+            //addCommand(saveCommand);
     	}
 
         addCommand(exitNoSaveCommand);        
