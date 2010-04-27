@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-entity-select"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-form-entry"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

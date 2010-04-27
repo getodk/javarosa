@@ -270,4 +270,11 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			}
 		}
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.util.TrivialTransitions#done()
+	 */
+	//THIS CANNOT BE REMOVED! S40 phones will fail horribly.
+	public abstract void done();
 }

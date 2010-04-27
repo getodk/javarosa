@@ -48,15 +48,17 @@ import de.enough.polish.ui.TextField;
 import de.enough.polish.ui.UiAccess;
 
 public class EntitySelectView<E extends Persistable> extends FramedForm implements HandledPItemStateListener, HandledCommandListener {
-	//#if javarosa.patientselect.formfactor == nokia-s40 or javarosa.patientselect.formfactor == sony-k610i
-	//# private static final int MAX_ROWS_ON_SCREEN = 5;
-	//# private static final int SCROLL_INCREMENT = 4;	
-	//#elif javarosa.patientselect.formfactor == generic-mcs
-	//note: should have a real target for 2700c; shouldn't be using generic-mcs
-	//# private static final int MAX_ROWS_ON_SCREEN = 6;
-	//# private static final int SCROLL_INCREMENT = 5;	
+	
+	//TODO: Capture screen height and define this based on it
+	//#ifdef javarosa.patientselect.maxrows:defined
+	//#= private static final int MAX_ROWS_ON_SCREEN = ${ javarosa.patientselect.maxrows };
 	//#else
 	private static final int MAX_ROWS_ON_SCREEN = 10;
+	//#endif
+	
+	//#ifdef javarosa.patientselect.scrollincrement:defined
+	//#= private static final int SCROLL_INCREMENT = ${ javarosa.patientselect.scrollincrement };
+	//#else
 	private static final int SCROLL_INCREMENT = 5;	
 	//#endif
 	

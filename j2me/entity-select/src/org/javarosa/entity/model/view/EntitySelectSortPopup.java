@@ -62,7 +62,7 @@ public class EntitySelectSortPopup<E extends Persistable> extends Form implement
 		append(sortField);
 		sortField.setItemStateListener(this);
 		
-		cancelCmd = new Command("Cancel", Command.CANCEL, 1);
+		cancelCmd = new Command(Localization.get("polish.command.cancel"), Command.CANCEL, 1);
 		addCommand(cancelCmd);
 		setCommandListener(this);
     }
