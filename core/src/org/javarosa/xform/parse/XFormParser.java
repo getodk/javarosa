@@ -2182,9 +2182,11 @@ public class XFormParser {
 		return (n.getChildCount() == 0 ? null : getXMLText(n, 0, trim));
 	}
 
-	//reads all subsequent text nodes and returns the combined string
-	//needed because escape sequences are parsed into consecutive text nodes
-	//e.g. "abc&amp;123" --> (abc)(&)(123)
+	/**
+	* reads all subsequent text nodes and returns the combined string
+	* needed because escape sequences are parsed into consecutive text nodes
+	* e.g. "abc&amp;123" --> (abc)(&)(123)
+	**/
 	public static String getXMLText (Node node, int i, boolean trim) {
 		StringBuffer strBuff = null;
 
