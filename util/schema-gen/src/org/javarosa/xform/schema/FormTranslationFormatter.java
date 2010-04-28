@@ -115,7 +115,7 @@ public class FormTranslationFormatter {
 		return writer.getBuffer();
 	}
 	
-	public static void turnTranslationsCSVtoItext(InputStream stream, OutputStream output, String encoding, String printEncoding) {
+	public static void turnTranslationsCSVtoItext(InputStream stream, OutputStream output, String delimeter, String encoding, String printEncoding) {
 		InputStreamReader reader;
 		if(encoding == null) {
 			reader = new InputStreamReader(stream);
@@ -130,7 +130,20 @@ public class FormTranslationFormatter {
 		Hashtable<String,Hashtable<String,Element>> textValues = new Hashtable<String,Hashtable<String,Element>>();
 		Hashtable<String, Hashtable<String,String>> args = new Hashtable<String, Hashtable<String,String>>();
 		
-		CsvReader csv = new CsvReader(reader);
+		CsvReader csv;
+		
+		if(delimeter == null) {
+			csv = new CsvReader(reader);
+		} else {
+			if(delimeter.equals("\\t")) {
+				csv = new CsvReader(reader,'\t');
+			} else if(delimeter.length() > 1) {
+				System.err.println("Invalid delimeter: " + delimeter + " Using comma");
+				csv = new CsvReader(reader);
+			} else {
+				csv = new CsvReader(reader,delimeter.charAt(0));
+			}
+		}
 		
 		Document doc = new Document();
 		try {
@@ -172,8 +185,8 @@ public class FormTranslationFormatter {
 					id = divided[0];
 					form = divided[1];
 				}
-				
-				for(int i = 1 ; i < values.length ; i++) {
+				int read = Math.min(headers.length,values.length);
+				for(int i = 1 ; i < read ; i++) {
 					String valueText = values[i];
 					Element text;
 					
@@ -267,7 +280,7 @@ public class FormTranslationFormatter {
 	}
 	
 	public static void turnTranslationsCSVtoItext(InputStream stream, OutputStream output) {
-		turnTranslationsCSVtoItext(stream, output, null, null);
+		turnTranslationsCSVtoItext(stream, output, null, null, null);
 	}
 	
 }

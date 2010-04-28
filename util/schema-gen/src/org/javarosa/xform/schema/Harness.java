@@ -46,7 +46,7 @@ public class Harness {
 			mode = MODE_CSV_IMPORT;
 		} else {
 			System.out.println("Usage: java -jar form_translate.jar [schema|summary|csvdump] < form.xml > output");
-			System.out.println("or: java -jar form_translate.jar csvimport [encoding] < translations.csv > itextoutput");
+			System.out.println("or: java -jar form_translate.jar csvimport [delimeter] [encoding] [outcoding] < translations.csv > itextoutput");
 			System.exit(1);
 		}
 		
@@ -57,12 +57,18 @@ public class Harness {
 		if(mode == MODE_CSV_IMPORT) {
 			System.setOut(sysOut);
 			if(args.length > 1) {
-				String encoding = args[1];
-				FormTranslationFormatter.turnTranslationsCSVtoItext(System.in, System.out, encoding, null);
-			} if(args.length > 2) {
-				String incoding = args[1];
-				String outcoding = args[2];
-				FormTranslationFormatter.turnTranslationsCSVtoItext(System.in, System.out, incoding, outcoding );
+				String delimeter = args[1];
+				FormTranslationFormatter.turnTranslationsCSVtoItext(System.in, System.out, delimeter, null,null);
+			}
+			else if(args.length > 2) {
+				String delimeter = args[1];
+				String encoding = args[2];
+				FormTranslationFormatter.turnTranslationsCSVtoItext(System.in, System.out, delimeter, encoding, null);
+			} else if(args.length > 3) {
+				String delimeter = args[1];
+				String incoding = args[2];
+				String outcoding = args[3];
+				FormTranslationFormatter.turnTranslationsCSVtoItext(System.in, System.out, delimeter, incoding, outcoding );
 			} else {
 				FormTranslationFormatter.turnTranslationsCSVtoItext(System.in, System.out);
 			}
