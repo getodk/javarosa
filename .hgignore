@@ -34,3 +34,4 @@ devices/
 *.rej
 *.orig
 glob:util/validator/org.javarosa.xform.validator/settings.properties
+glob:j2me/demo-app/resources/localizertest.xhtml
