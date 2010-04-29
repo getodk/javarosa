@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.annotation.ElementType;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -51,6 +52,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.IXFormBindHandler;
 import org.javarosa.xform.util.XFormAnswerDataParser;
+import org.javarosa.xform.util.XFormSerializer;
 import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.expr.XPathPathExpr;
@@ -274,7 +276,7 @@ public class XFormParser {
 		defaultNamespace = doc.getRootElement().getNamespaceUri(null);
 		
 		parseElement(formDef, doc.getRootElement(), formDef, topLevelHandlers);
-		
+			
 		collapseRepeatGroups(formDef);
 		
 		if(instanceNode != null) {
@@ -593,7 +595,58 @@ public class XFormParser {
 		}
 	}
 	
-	private static String getLabel (Element e, FormDef f) {
+	private static String getLabel (Element e, FormDef f){
+		if(e.getChildCount() == 0) return null;
+		
+		recurseForOutput(e,f);
+		
+		StringBuffer sb = new StringBuffer();
+		for(int i = 0; i<e.getChildCount();i++){
+			if(e.getType(i)!=Node.TEXT && !(e.getChild(i) instanceof String)){
+				Object b = e.getChild(i);
+				if(b instanceof String)System.out.println("WTF?!?!");
+				sb.append(XFormSerializer.elementToString((Element)b));
+			}else{
+				sb.append(e.getText(i));
+			}
+		}
+		
+		String s = sb.toString().trim();
+		
+		return s;
+	}
+	
+	private static void recurseForOutput(Element e, FormDef f){
+		if(e.getChildCount() == 0) return;
+		
+		for(int i=0;i<e.getChildCount();i++){
+			int kidType = e.getType(i);
+			if(kidType == Node.TEXT) continue;
+			if(e.getChild(i) instanceof String) continue;
+			Element kid = (Element)e.getChild(i);
+			
+				//is just text
+			if(kidType == Node.ELEMENT && XFormUtils.isOutput(kid)){
+				String s = "${"+parseOutput(kid, f)+"}";
+				e.removeChild(i);
+				e.addChild(i, Node.TEXT, s);
+				
+				//has kids? Recurse through them and swap output tag for parsed version
+			}else if(kid.getChildCount() !=0){
+				recurseForOutput(kid,f);
+				//is something else
+			}else{
+				continue;
+			}
+		}
+	}
+	
+	
+	
+/*	private static String getLabel (Element e, FormDef f) {
+		return getLabel2(e,f);
+		
+		
 		boolean outputFound = false;
 		boolean otherStuffFound = false;
 		Vector outputs = new Vector();
@@ -630,7 +683,9 @@ public class XFormParser {
 		} else {
 			return getXMLText(e, true);
 		}
+		
 	}	
+	*/
 	
 	private static String parseOutput (Element e, FormDef f) {
 		Vector usedAtts = new Vector();

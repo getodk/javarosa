@@ -32,7 +32,6 @@ import org.javarosa.core.reference.Reference;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.formmanager.utility.WidgetUtil;
 
 import de.enough.polish.multimedia.AudioPlayer;
 import de.enough.polish.ui.Container;
@@ -200,7 +199,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		}
 		
 		getAudioAndPlay(fep);
-		prompt.setText(WidgetUtil.getAppropriateTextForm(fep,fep.getTextID()));	
+		prompt.setText(fep.getLongText());	
 		updateWidget(fep);
 		
 		//don't wipe out user-entered data, even on data-changed event
