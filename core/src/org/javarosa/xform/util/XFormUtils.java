@@ -133,4 +133,14 @@ public class XFormUtils {
 		return getUnusedAttributes(e,usedAtts).size()>0;
 	}
 	
+	/**
+	 * Is this element an Output tag?
+	 * @param e
+	 * @return
+	 */
+	public static boolean isOutput(Element e){
+		if(e.getName().toLowerCase().equals("output")) return true;
+		else return false;
+	}
+	
 }

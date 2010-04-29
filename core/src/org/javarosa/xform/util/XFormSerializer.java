@@ -25,6 +25,8 @@ import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 
+import com.sun.org.apache.xerces.internal.util.XML11Char;
+
 /* this is just a big dump of serialization-related code */
 
 /* basically, anything that didn't belong in XFormParser */
@@ -35,7 +37,6 @@ public class XFormSerializer {
 		KXmlSerializer serializer = new KXmlSerializer();
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
-
 		try {
 			serializer.setOutput(dos, null);
 			doc.write(serializer);
@@ -49,11 +50,13 @@ public class XFormSerializer {
 	
 	public static String elementToString(Element e){
 		KXmlSerializer serializer = new KXmlSerializer();
+		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
 		String s=null;
 		try {
 			serializer.setOutput(dos, null);
+//			System.out.println("DDDDDDDDDD elementToString, getNameSpace() = "+e.getNamespace());
 			e.write(serializer);
 			serializer.flush();
 			s = new String(bos.toByteArray(),"UTF-8");

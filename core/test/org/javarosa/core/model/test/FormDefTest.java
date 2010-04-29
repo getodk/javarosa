@@ -135,16 +135,13 @@ public class FormDefTest extends TestCase {
 		}while(fec.stepToNextEvent()!=fec.EVENT_END_OF_FORM);
 	}
 	
-
-
-	public IDataReference newRef (String xpath) {
+	public IDataReference newRef(String xpath){
 			IDataReference ref = new DummyReference();
 			ref.setReference(xpath);
 			pf.addClass(DummyReference.class);
 			return ref;
 	}
 	
-
 	private class QuestionObserver implements FormElementStateListener {
 		public boolean flag = false;
 		public TreeElement e;
