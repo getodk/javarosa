@@ -100,4 +100,8 @@ public class ResourceReference implements Reference {
 	public void remove() throws IOException {
 		throw new IOException("Resource references are read-only URI's");
 	}
+
+	public String getLocalURI() {
+		return URI;
+	}
 }
