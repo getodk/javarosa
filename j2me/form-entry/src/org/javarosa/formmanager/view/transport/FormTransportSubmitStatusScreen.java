@@ -90,8 +90,9 @@ public class FormTransportSubmitStatusScreen extends Form implements
 	 */
 	public void updateStatus() {
 		TransportMessage message = TransportService.retrieve(cacheId);
-		
-		updateStatus(message);
+		if(message != null) {
+			updateStatus(message);
+		}
 	}
 
 	/**
