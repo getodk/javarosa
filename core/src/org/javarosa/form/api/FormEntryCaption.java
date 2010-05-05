@@ -137,6 +137,9 @@ public class FormEntryCaption implements FormElementStateListener {
 		}catch(NoLocalizedTextException nlte){
 			System.out.println("Warning, " + form + " text form requested for ["+textID+"] but doesn't exist. (Falling back to Default form).");
 			t = getDefaultText(textID);
+		}catch(IllegalArgumentException iae){
+			System.out.println("Warning, Long text form requested for ["+textID+"] but doesn't exist. (Falling back to Default form).");
+			t = getDefaultText(textID);
 		}
 		return t;
 
@@ -163,6 +166,9 @@ public class FormEntryCaption implements FormElementStateListener {
 	
 	/**
 	 * Convenience method
+			System.out.println("Warning, Short text form requested for ["+textID+"] but doesn't exist. (Falling back to Default form).");
+			t = getDefaultText(textID);
+		}catch(IllegalArgumentException iae){
 	 * Get shortText form of text for THIS element (if available) 
 	 * @return shortText form 
 	 */

@@ -78,7 +78,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		if (!playAudioIfAvailable) return;
 		String AudioURI;
 		String textID;
-		
+		AudioURI = null;
 		if (select == null) {		
 			if (fep.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_AUDIO)) {
 				AudioURI = fep.getAudioText();

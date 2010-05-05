@@ -254,7 +254,6 @@ public class XFormParser {
 			doc.parse(parser);
 		}  catch (XmlPullParserException e) {
 			System.err.println("XML Syntax Error at Line: " + e.getLineNumber() +", Column: "+ e.getColumnNumber()+ "!");
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch(Exception e){
 			//#if debug.output==verbose || debug.output==exception
@@ -851,6 +850,7 @@ public class XFormParser {
 	private static void parseItemset (FormDef f, QuestionDef q, Element e, IFormElement qparent) {
 		ItemsetBinding itemset = new ItemsetBinding();
 		
+		////////////////USED FOR PARSER WARNING OUTPUT ONLY
 		//catalogue of used attributes in this method/element
 		Vector usedAtts = new Vector();
 		Vector labelUA = new Vector(); //for child with name 'label'
@@ -861,9 +861,10 @@ public class XFormParser {
 		valueUA.addElement("ref");
 		valueUA.addElement("form");
 		copyUA.addElement("ref");
-		
+		////////////////////////////////////////////////////
 		
 		String nodesetStr = e.getAttributeValue("", "nodeset");
+		if(nodesetStr == null ) throw new RuntimeException("No nodeset attribute in element: ["+e.getName()+"]. This is required. (Element Printout:"+XFormSerializer.elementToString(e)+")");
 		XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
 		itemset.nodesetExpr = new XPathConditional(path);
 		itemset.contextRef = getFormElementRef(qparent);
@@ -883,6 +884,7 @@ public class XFormParser {
 					//System.out.println("Debug:parseItemset()");
 					System.out.println(XFormUtils.unusedAttWarning(child, labelUA));
 				}
+				/////////////////////////////////////////////////////////////
 				
 				if (labelXpath != null) {
 					if (labelXpath.startsWith("jr:itext(") && labelXpath.endsWith(")")) {
@@ -1839,7 +1841,7 @@ public class XFormParser {
 				ref = ((QuestionDef)child).getBind();
 				type = "Control";
 			}
-			TreeReference tref = FormInstance.unpackReference(ref);
+				TreeReference tref = FormInstance.unpackReference(ref);
 
 			if (child instanceof QuestionDef && tref.size() == 0) {
 				System.out.println("Warning! Cannot bind control to '/'"); //group can bind to '/'; repeat can't, but that's checked above
