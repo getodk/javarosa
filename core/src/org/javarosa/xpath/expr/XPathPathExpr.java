@@ -110,7 +110,16 @@ public class XPathPathExpr extends XPathExpression {
 				} else {
 					ref.incrementRefLevel();
 				}
-			} else if (step.axis == XPathStep.AXIS_CHILD) {
+			} else if (step.axis == XPathStep.AXIS_ATTRIBUTE) {
+				if (step.test == XPathStep.TEST_NAME) {
+					ref.add(step.name.toString(), TreeReference.INDEX_ATTRIBUTE);
+					parentsAllowed = false;
+					//TODO: Can you step back from an attribute, or should this always be
+					//the last step?
+				} else {
+					throw new XPathUnsupportedException("attribute step other than 'attribute::name");
+				}
+			}else if (step.axis == XPathStep.AXIS_CHILD) {
 				if (step.test == XPathStep.TEST_NAME) {
 					ref.add(step.name.toString(), TreeReference.INDEX_UNBOUND);
 					parentsAllowed = false;

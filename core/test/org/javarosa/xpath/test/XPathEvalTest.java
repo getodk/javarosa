@@ -108,7 +108,6 @@ public class XPathEvalTest extends TestCase {
 		/* unsupporteds */
 		testEval("/union | /expr", null, null, new XPathUnsupportedException());
 		testEval("/descendant::blah", null, null, new XPathUnsupportedException());
-		testEval("/@blah", null, null, new XPathUnsupportedException());
 		testEval("/cant//support", null, null, new XPathUnsupportedException());
 		testEval("/text()", null, null, new XPathUnsupportedException());
 		testEval("/namespace:*", null, null, new XPathUnsupportedException());
@@ -373,6 +372,11 @@ public class XPathEvalTest extends TestCase {
 		testEval("$var_string_five", null, varContext, "five");
 		testEval("$var_int_five", null, varContext, new Double(5.0));
 		testEval("$var_double_five", null, varContext, new Double(5.0));
+		
+		//Attribute XPath References
+		//testEval("/@blah", null, null, new XPathUnsupportedException());
+		//TODO: Need to test with model, probably in a different file
+		
 		
 		try {
 			testEval("null-proto()", null, ec, new XPathUnhandledException());
