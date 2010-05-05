@@ -31,6 +31,7 @@ public class TreeReference implements Externalizable {
 	public static final int DEFAULT_MUTLIPLICITY = 0;//multiplicity
 	public static final int INDEX_UNBOUND = -1;//multiplicity
 	public static final int INDEX_TEMPLATE = -2;//multiplicity
+	public static final int INDEX_ATTRIBUTE = -4;//multiplicity
 	public static final int REF_ABSOLUTE = -1;
 	
 	public static final String NAME_WILDCARD = "*";
@@ -146,6 +147,7 @@ public class TreeReference implements Externalizable {
 	}
 	
 	public TreeReference getParentRef () {
+		//TODO: level
 		TreeReference ref = this.clone();
 		if (ref.removeLastLevel()) {
 			return ref;
@@ -202,7 +204,7 @@ public class TreeReference implements Externalizable {
 				}
 				for (int i = 0; i < size(); i++) {
 					newRef.add(this.getName(i), this.getMultiplicity(i));
-				}		
+				}
 				return newRef;
 			}
 		}
@@ -279,6 +281,7 @@ public class TreeReference implements Externalizable {
 	 * @return
 	 */
 	public TreeReference extendRef (String name, int mult) {
+		//TODO: Shouldn't work for this if this is an attribute ref;
 		TreeReference childRef = this.clone();
 		childRef.add(name, mult);
 		return childRef;
@@ -306,7 +309,7 @@ public class TreeReference implements Externalizable {
 							return false;
 						}
 					}
-				}	
+				}
 				return true;
 			} else {
 				return false;
@@ -350,6 +353,9 @@ public class TreeReference implements Externalizable {
 			String name = getName(i);
 			int mult = getMultiplicity(i);
 			
+			if(mult == INDEX_ATTRIBUTE) {
+				sb.append("@");
+			}
 			sb.append(name);
 			
 			if (includePredicates) {
@@ -366,7 +372,6 @@ public class TreeReference implements Externalizable {
 			if (i < size() - 1)
 				sb.append("/");
 		}
-		
 		return sb.toString();
 	}
 

@@ -11,7 +11,7 @@
     <model>
       <instance>
         <patient>
-          <form-id>4523534653252</form-id>
+          <form-id type="normal">4523534653252</form-id>
           <first-name>DREW</first-name>
           <last-name>ROOS</last-name>
           <date-of-birth>1983-10-06</date-of-birth>
@@ -25,9 +25,9 @@
 
       <bind nodeset="first-name" required="true()" />
       <bind nodeset="last-name" required="true()" />
-      <bind nodeset="date-of-birth" type="xsd:date" constraint=". &lt;= today()" jr:constraintMsg="Date of birth cannot be in future" />
+      <bind nodeset="date-of-birth" type="xsd:date" />
       <bind nodeset="pregnant" relevant="/patient/sex = 'f'" />
-      <bind nodeset="number-of-children" type="xsd:int" constraint=". &lt;= 20" jr:constraintMsg="# children must be less than 20" />
+      <bind nodeset="number-of-children" type="xsd:int"/>
 
       <itext>
         <translation lang="English">
@@ -70,6 +70,14 @@
     </model>
   </h:head>
   <h:body>
+  
+  <!--select1 ref="form-id/@type"><label>Form ID Type</label>
+  <item><label>Normal Id</label><value>normal</value></item>
+  <item><label>Extended Id</label><value>extended</value></item>
+  </select1-->
+    <input ref="form-id/@type">
+        <label>Form ID Type</label>
+    </input>
 
     <input ref="first-name">
       <label ref="jr:itext('q1')"/>
