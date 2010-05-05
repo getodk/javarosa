@@ -54,7 +54,6 @@ public class XPathReference implements IDataReference {
 		boolean validNonPathExpr = false;
 		
 		try {
-			
 		path = XPathParseTool.parseXPath(nodeset);
 		if (!(path instanceof XPathPathExpr)) {
 			validNonPathExpr = true;
