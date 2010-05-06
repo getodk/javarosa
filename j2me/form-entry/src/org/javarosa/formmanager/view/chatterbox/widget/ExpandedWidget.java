@@ -45,6 +45,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	private StringItem prompt;
 	protected Item entryWidget;
 	private Container c;
+	private Container fullPrompt;
 	protected static boolean playAudioIfAvailable = true;
 
 	public ExpandedWidget () {
@@ -56,12 +57,17 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		UiAccess.setStyle(c); //it is dubious whether this works properly; Chatterbox.babysitStyles() takes care of this for now
 		
 		//#style questiontext
+		fullPrompt= new Container(false);
+		
+		//#style prompttext
 		prompt = new StringItem(null, null);
+		fullPrompt.add(prompt);
+		
 		entryWidget = getEntryWidget(fep);
 		//#style textBox
 		UiAccess.setStyle(entryWidget);
 		
-		c.add(prompt);
+		c.add(fullPrompt);
 		c.add(entryWidget);
 		
 		this.c = c;
@@ -112,7 +118,6 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	 * Checks the boolean playAudioIfAvailable first.
 	 */
 	public static void getAudioAndPlay(FormEntryPrompt fep){
-//		System.out.println(getCaptureSupport("audio"));
 		getAudioAndPlay(fep,null);
 	}
 		
@@ -133,7 +138,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		}
 		Image im = getImage(fep.getImageText());
 		if(im!=null){
-			ImageItem imItem = new ImageItem(null,getImage(fep.getImageText()), ImageItem.LAYOUT_CENTER, IaltText);
+			ImageItem imItem = new ImageItem(null,getImage(fep.getImageText()), ImageItem.LAYOUT_CENTER | ImageItem.LAYOUT_VCENTER, IaltText);
 			imItem.setLayout(Item.LAYOUT_CENTER);
 			return imItem;
 		}else{
@@ -163,12 +168,12 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
 		if(imItem!=null && imageIndex !=-1){	//replace an already existing image
 			imItem = getImageItem(fep);
-			if(imItem!=null) c.set(imageIndex, imItem);
-			imageIndex = c.indexOf(imItem);
+			if(imItem!=null) fullPrompt.set(imageIndex, imItem);
+			imageIndex = fullPrompt.indexOf(imItem);
 		}else{
 			imItem = getImageItem(fep);
-			if(imItem!=null) c.add(imItem);
-			imageIndex = c.indexOf(imItem);
+			if(imItem!=null) fullPrompt.add(imItem);
+			imageIndex = fullPrompt.indexOf(imItem);
 		}
 		
 		getAudioAndPlay(fep);

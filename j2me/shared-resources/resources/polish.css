@@ -257,6 +257,11 @@ choiceGroup extends textBox {
 	font-size: medium;	
 	layout: horizontal-center | expand | bottom; 
 }
+
+.prompttext extends questiontext {
+    border: none;
+}
+
 .oldprompttext extends questiontext {
 	font-style: bold;	 
 	background-color: oldQuestionColor;
