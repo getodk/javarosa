@@ -40,7 +40,7 @@ import org.javarosa.xform.util.XFormUtils;
 
 
 public class FormParseInit {
-	private String FORM_NAME = new String("resources/ImageSelectTester.xhtml");
+	private String FORM_NAME = new String("test/resources/ImageSelectTester.xhtml");
 	private FormDef xform;
 	private FormEntryController fec;
 	private FormEntryModel femodel;
