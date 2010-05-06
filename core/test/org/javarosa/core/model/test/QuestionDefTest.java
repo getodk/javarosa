@@ -25,31 +25,52 @@ import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormElementStateListener;
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.Reference;
+import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.core.reference.ResourceReferenceFactory;
+import org.javarosa.core.reference.RootTranslator;
 import org.javarosa.core.services.PrototypeManager;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
-import org.javarosa.core.util.OrderedHashtable;
+import org.javarosa.core.test.FormParseInit;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.core.util.test.ExternalizableTest;
+import org.javarosa.form.api.FormEntryCaption;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryPrompt;
 
 public class QuestionDefTest extends TestCase {
+	QuestionDef q = null;
+	FormEntryPrompt fep = null;
+	FormParseInit fpi = null;
+	
 	public QuestionDefTest(String name, TestMethod rTestMethod) {
 		super(name, rTestMethod);
+		initStuff();
 	}
 	
 	public QuestionDefTest(String name) {
 		super(name);
+		initStuff();
 	}
 	
 	public QuestionDefTest() {
 		super();
+		initStuff();
 	}	
+	
+	public void initStuff(){
+		fpi = new FormParseInit();
+		q = fpi.getFirstQuestionDef();
+		fep = new FormEntryPrompt(fpi.getFormDef(), fpi.getFormEntryModel().getFormIndex());
+	}
 	
 	static PrototypeFactory pf;
 	
@@ -77,7 +98,7 @@ public class QuestionDefTest extends TestCase {
 		//ExternalizableTest.testExternalizable(q, this, pf, "QuestionDef [" + msg + "]");
 	}
 	
-	public final static int NUM_TESTS = 11;
+	public final static int NUM_TESTS = 12;
 	public void doTest (int i) {
 		switch (i) {
 		case 1: testConstructors(); break;
@@ -89,8 +110,9 @@ public class QuestionDefTest extends TestCase {
 		case 7: testPromptsWithLocalizer(); break;
 		case 8: testSelectChoicesNoLocalizer(); break;
 		case 9: testSelectChoiceIDsNoLocalizer(); break;
-		case 10: testLocaleChanged(); break;
-		case 11: testLocaleChangedNoLocalizable(); break;
+		case 10: testNonLocalizedText(); break;
+		case 11: testTextForms(); break;
+		case 12: testReferences(); break;
 		}
 	}
 	
@@ -188,53 +210,37 @@ public class QuestionDefTest extends TestCase {
 	public void testPromptsNoLocalizer () {
 		QuestionDef q = new QuestionDef();
 		
-		q.setLongText("long text");
-		if (!"long text".equals(q.getLongText())) {
-			fail("Long text getter/setter broken");
+		q.setLabelInnerText("labelInnerText");
+		if (!"labelInnerText".equals(q.getLabelInnerText())) {
+			fail("LabelInnerText getter/setter broken");
 		}
-		testSerialize(q, "n");
 
-		q.setShortText("short text");
-		if (!"short text".equals(q.getShortText())) {
-			fail("Short text getter/setter broken");
-		}
-		testSerialize(q, "o");
-		
 		q.setHelpText("help text");
 		if (!"help text".equals(q.getHelpText())) {
 			fail("Help text getter/setter broken");
 		}
-		testSerialize(q, "p");
 	}
 	
 	public void testPromptIDsNoLocalizer () {
 		QuestionDef q = new QuestionDef();
 		
-		q.setLongTextID("long text id", null);
-		if (!"long text id".equals(q.getLongTextID()) || q.getLongText() != null) {
+		q.setTextID("long text id");
+		if (!"long text id".equals(q.getTextID())) {
 			fail("Long text ID getter/setter broken");
 		}
-		testSerialize(q, "q");
 
-		q.setShortTextID("short text id", null);
-		if (!"short text id".equals(q.getShortTextID()) || q.getShortText() != null) {
-			fail("Short text ID getter/setter broken");
-		}
-		testSerialize(q, "r");
-
-		q.setHelpTextID("help text id", null);
+		q.setHelpTextID("help text id");
 		if (!"help text id".equals(q.getHelpTextID()) || q.getHelpText() != null) {
 			fail("Help text ID getter/setter broken");
 		}
-		testSerialize(q, "s");
 	}
 	
 	public void testPromptsWithLocalizer () {
-		QuestionDef q = new QuestionDef();
-		
 		Localizer l = new Localizer();
+
 		TableLocaleSource table = new TableLocaleSource();
 		l.addAvailableLocale("locale");
+		l.setDefaultLocale("locale");
 		table.setLocaleMapping("prompt;long", "loc: long text");
 		table.setLocaleMapping("prompt;short", "loc: short text");
 		table.setLocaleMapping("help", "loc: help text");
@@ -242,60 +248,127 @@ public class QuestionDefTest extends TestCase {
 		
 		l.setLocale("locale");
 		
-		q.setLongTextID("prompt;long", l);
-		if (!"loc: long text".equals(q.getLongText())) {
-			fail("Long text did not localize when setting ID");
+		
+		QuestionDef q = new QuestionDef();
+				
+		q.setHelpTextID("help");
+		FormEntryPrompt fep = new DummyFormEntryPrompt(l,"prompt",q);
+				
+		if (!"loc: long text".equals(fep.getLongText())) {
+			fail("Long text did not localize properly");
+		}
+		if (!"loc: short text".equals(fep.getShortText())){
+			fail("Short text did not localize properly");
 		}
 		testSerialize(q, "t");
-	
-		q.setShortTextID("prompt;short", l);
-		if (!"loc: short text".equals(q.getShortText())) {
-			fail("Short text did not localize when setting ID");
-		}
-		testSerialize(q, "u");
-	
-		q.setHelpTextID("help", l);
-		if (!"loc: help text".equals(q.getHelpText())) {
+		if (!"loc: help text".equals(fep.getHelpText())) {
 			fail("Help text did not localize when setting ID");
 		}
 		testSerialize(q, "v");
 	}
 
-	public void testSelectChoicesNoLocalizer () {
-		QuestionDef q = new QuestionDef();
+	public void testSelectChoicesNoLocalizer () {		
+		QuestionDef q = fpi.getFirstQuestionDef();
 		if (q.getNumChoices() != 0) {
 			fail("Select choices not empty on init");
 		}
 
-		q.addSelectChoice(new SelectChoice("choice", "val", false));
-		q.addSelectChoice(new SelectChoice("stacey's", "mom", false));
-		if (!q.getChoices().toString().equals("[choice => val, stacey's => mom]")) {
-			fail("Could not add individual select choice");
+		q.addSelectChoice(new SelectChoice("","choice", "val", false));
+		q.addSelectChoice(new SelectChoice("","stacey's", "mom", false));
+		
+		
+		if(!fep.getSelectChoices().toString().equals("[choice => val, stacey's => mom]")) {
+//		if (!q.getChoices().toString().equals("[choice => val, stacey's => mom]")) {
+			fail("Could not add individual select choice"+fep.getSelectChoices().toString());
 		}
 		testSerialize(q, "w");
+		
+		q.removeSelectChoice(q.getChoice(0));
+		q.removeSelectChoice(q.getChoice(0));
 	}
 	
 	public void testSelectChoiceIDsNoLocalizer () {
-		QuestionDef q = new QuestionDef();
+		
+		QuestionDef q = fpi.getFirstQuestionDef();
 		
 		q.addSelectChoice(new SelectChoice("choice1 id", "val1"));
 		q.addSelectChoice(new SelectChoice("loc: choice2", "val2", false));
-		if (!q.getChoices().toString().equals("[{choice1 id} => val1, loc: choice2 => val2]")) {
-			fail("Could not add individual select choice ID");
+		
+		if (!fep.getSelectChoices().toString().equals("[{choice1 id} => val1, loc: choice2 => val2]")) {
+			fail("Could not add individual select choice ID"+fep.getSelectChoices().toString());
 		}
 		testSerialize(q, "y");
+		
+		//clean up
+		q.removeSelectChoice(q.getChoices().elementAt(0));
+		q.removeSelectChoice(q.getChoices().elementAt(0));
 	}
 	
+	public void testTextForms(){
+		FormEntryController fec = fpi.getFormEntryController();
+		fec.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+		boolean foundFlag = false;
+		Localizer l = fpi.getFormDef().getLocalizer();
+		
+		l.setDefaultLocale(l.getAvailableLocales()[0]);
+		l.setLocale(l.getAvailableLocales()[0]);
+		
+		//test image long text
+		do{
+			if(!(fpi.getFormEntryModel().getCaptionPrompt().getFormElement() instanceof QuestionDef)) continue;
+			
+			fep = fpi.getFormEntryModel().getQuestionPrompt();
+			q = fpi.getCurrentQuestion();
+			if(q.getTextID() == null) continue;
+			//yes. It's a little ugly. -Anton
+			if(q.getTextID().equals("name")){
+				if(fep.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_IMAGE)){
+					if(!"jr://images/four.gif".equals(fep.getImageText())){
+						fail ("getImageText is being faulty.");
+					}else{
+						foundFlag = true;
+					}
+				}
+			}	
+		}while(fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
+		if(!foundFlag) fail("Couldn't find QuestionDef with TextID [name] with available image/audio text form.");
+		foundFlag = false;
+		
+		fec.jumpToIndex(FormIndex.createBeginningOfFormIndex()); //go back to start
+		
+		//test audio long text
+		do{
+			if(!(fpi.getFormEntryModel().getCaptionPrompt().getFormElement() instanceof QuestionDef)) continue;
+			fep = fpi.getFormEntryModel().getQuestionPrompt();
+			q = fpi.getCurrentQuestion();
+			if(q.getTextID() == null) continue;
+			if(q.getTextID().equals("id") && fep.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_AUDIO)){
+				if(!("jr://audio/hah.mp3".equals(fep.getAudioText()))){
+					fail("get AudioText() doesn't work.");
+				}else{
+					foundFlag = true;
+				}
+			}
+		}while(fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
+		
+		if(!foundFlag) fail("Couldn't find QuestionDef with TextID [id] with available image/audio text form.");
+	}
+	
+	/* TODO
+	 * Image uri translation/reference tests (Clayton's stuff)
+	 */
+	
+	//Deprecated
 	public void testLocaleChanged () {
 		QuestionDef q = new QuestionDef();
-		q.setLongText("zh: long text");
-		q.setShortText("zh: short text");
+		q.setLabelInnerText("zh: some text");
+//		q.setShortText("zh: short text");
 		q.setHelpText("zh: help text");
-		q.setLongTextID("long text", null);
-		q.setShortTextID("short text", null);
-		q.setHelpTextID("help text", null);
+		q.setTextID("textID");
+//		q.setShortTextID("short text", null);
+		q.setHelpTextID("help text");
 		q.addSelectChoice(new SelectChoice("choice", "val1"));
-		q.addSelectChoice(new SelectChoice("non-loc: choice", "val2", false));
+		q.addSelectChoice(new SelectChoice("","non-loc: choice", "val2", false));
 		
 		QuestionObserver qo = new QuestionObserver();
 		q.registerStateObserver(qo);
@@ -303,7 +376,7 @@ public class QuestionDefTest extends TestCase {
 		Localizer l = new Localizer();
 		TableLocaleSource table = new TableLocaleSource();
 		l.addAvailableLocale("en");
-		table.setLocaleMapping("long text", "en: long text");
+		table.setLocaleMapping("textID", "en: some text");
 		table.setLocaleMapping("short text", "en: short text");
 		table.setLocaleMapping("help text", "en: help text");
 		table.setLocaleMapping("choice", "en: choice");
@@ -311,33 +384,78 @@ public class QuestionDefTest extends TestCase {
 		l.setLocale("en");
 		
 		q.localeChanged("locale", l);
-		if (!"en: long text".equals(q.getLongText()) || !"en: short text".equals(q.getShortText()) || !"en: help text".equals(q.getHelpText()) ||
+		if (!"en: some text".equals(q.getLabelInnerText()) || !"en: help text".equals(q.getHelpText()) ||
 				!"[{choice}en: choice => val1, non-loc: choice => val2]".equals(q.getChoices().toString()) ||
 				!qo.flag || qo.flags != FormElementStateListener.CHANGE_LOCALE) {
 			fail("Improper locale change update");
 		}
 	}	
 
-	public void testLocaleChangedNoLocalizable () {
-		QuestionDef q = new QuestionDef();
-		q.setLongText("long text");
-		q.setShortText("short text");
-		q.setHelpText("help text");
-		//choices tested above
+
+	//test to check if the method for getting labelInnerText when an element
+	//is not localized works.
+	public void testNonLocalizedText(){
+		FormEntryController fec = fpi.getFormEntryController();
+		boolean testFlag = false;
+		Localizer l = fpi.getFormDef().getLocalizer();
 		
-		QuestionObserver qo = new QuestionObserver();
-		q.registerStateObserver(qo);
+		l.setDefaultLocale(l.getAvailableLocales()[0]);
+		l.setLocale(l.getAvailableLocales()[0]);
 		
-		Localizer l = new Localizer();
-		l.addAvailableLocale("locale");
-		l.setLocale("locale");
+		do{
+			if(fpi.getCurrentQuestion()==null) continue;
+			QuestionDef q = fpi.getCurrentQuestion();
+			fep = fpi.getFormEntryModel().getQuestionPrompt();
+			String t = fep.getQText();
+			if(t==null) continue;
+			if(t.equals("Non-Localized label inner text!")) testFlag = true;
+			
+			
+		}while(fec.stepToNextEvent()!=fec.EVENT_END_OF_FORM);
 		
-		q.localeChanged("locale", l);
-		if (!"long text".equals(q.getLongText()) || !"short text".equals(q.getShortText()) || !"help text".equals(q.getHelpText()) ||
-				!qo.flag || qo.flags != FormElementStateListener.CHANGE_LOCALE) {
-			fail("Improper locale change update (no localizable fields)");
-		}
+		if(!testFlag) fail("Failed to fallback to labelInnerText in testNonLocalizedText()");
 	}	
+	
+	public void testReferences(){
+		QuestionDef q = fpi.getFirstQuestionDef();
+		FormEntryPrompt fep = fpi.getFormEntryModel().getQuestionPrompt();
+		
+		Localizer l = fpi.getFormDef().getLocalizer();
+		l.setDefaultLocale(l.getAvailableLocales()[0]);
+		l.setLocale(l.getAvailableLocales()[0]);
+		
+		String audioURI = fep.getAudioText();
+		String ref;
+		
+		ReferenceManager._().addReferenceFactory(new ResourceReferenceFactory());
+		ReferenceManager._().addRootTranslator(new RootTranslator("jr://audio/", "jr://resource/"));
+		try{
+			Reference r = ReferenceManager._().DeriveReference(audioURI);
+			ref = r.getURI();
+			if(!ref.equals("jr://resource/hah.mp3")){
+				fail("Root translation failed.");
+			}
+		}catch(InvalidReferenceException ire){
+			fail("There was an Invalid Reference Exception:"+ire.getMessage());
+			ire.printStackTrace();
+		}
+		
+		
+		ReferenceManager._().addRootTranslator(new RootTranslator("jr://images/","jr://resource/"));
+		q = fpi.getNextQuestion();
+		fep = fpi.getFormEntryModel().getQuestionPrompt();
+		String imURI = fep.getImageText();
+		try{
+			Reference r = ReferenceManager._().DeriveReference(imURI);
+			ref = r.getURI();
+			if(!ref.equals("jr://resource/four.gif")){
+				fail("Root translation failed.");
+			}
+		}catch(InvalidReferenceException ire){
+			fail("There was an Invalid Reference Exception:"+ire.getMessage());
+			ire.printStackTrace();
+		}
+	}
 	
 	private class QuestionObserver implements FormElementStateListener {
 		public boolean flag = false;
@@ -356,5 +474,21 @@ public class QuestionDefTest extends TestCase {
 			this.e = question;
 			this.flags = changeFlags;
 		}
+	}
+
+	public QuestionDef getQ() {
+		return q;
+	}
+
+	public void setQ(QuestionDef q) {
+		this.q = q;
+	}
+
+	public FormEntryPrompt getFep() {
+		return fep;
+	}
+
+	public void setFep(FormEntryPrompt fep) {
+		this.fep = fep;
 	}
 }

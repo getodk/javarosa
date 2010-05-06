@@ -57,4 +57,10 @@ public class HttpReference implements Reference {
 	public void remove() throws IOException {
 		throw new IOException("JavaRosa HTTP References are readonly. Please use the transport manager for this op.");
 	}
+
+	public String getLocalURI() {
+		return URI;
+	}
+	
+	
 }

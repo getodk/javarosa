@@ -47,6 +47,14 @@ public interface Reference {
 	public String getURI();
 	
 	/**
+	 * @return A URI which may or may not exist in the local context
+	 * which will resolves to this reference. This method should be
+	 * used with caution: There is no guarantee that a local URI
+	 * can be constructed or used in a general way.
+	 */
+	public String getLocalURI();
+	
+	/**
 	 * @return True if the remote data is only available to
 	 * be read from (using getStream), False if the remote
 	 * data can also be modified or written to.

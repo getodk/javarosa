@@ -34,7 +34,7 @@ public class DummyReference implements IDataReference {
 	String ref = "";
 	
 	public DummyReference() {
-		
+		super();
 	}
 	
 	public Object getReference() {

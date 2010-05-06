@@ -57,7 +57,7 @@ public class J2meFileReference implements Reference
 	}
 	
 	private FileConnection connector() throws IOException {
-		String uri = "file:///" + localPart + referencePart;
+		String uri = getLocalURI();
 		if(connections.containsKey(uri)) {
 			System.out.println("Retrieving existing connection for file " + uri);
 			return connections.get(uri);
@@ -77,5 +77,9 @@ public class J2meFileReference implements Reference
 		
 		con.close();
 		connections.remove(con);
+	}
+
+	public String getLocalURI() {
+		return "file:///" + localPart + referencePart;
 	}
 }

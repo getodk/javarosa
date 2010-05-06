@@ -70,6 +70,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	private String title;
 	/** The display title of the form. */
 	private String name;
+	
+	private boolean isLocalized;
+	
 	/**
 	 * A unique external name that is used to identify the form between machines
 	 */
@@ -689,7 +692,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			if (itemset.valueRef != null) {
 				value = itemset.valueExpr.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, item));
 			}
-			
+//			SelectChoice choice = new SelectChoice(labelID,labelInnerText,value,isLocalizable);
 			SelectChoice choice = new SelectChoice(label, value != null ? value : "dynamic:" + i, itemset.labelIsItext);
 			choice.setIndex(i);
 			if (itemset.copyMode)
@@ -1187,10 +1190,19 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public Hashtable getMetaData() {
 		Hashtable metadata = new Hashtable();
 		String[] fields = getMetaDataFields();
+		
 		for (int i = 0; i < fields.length; i++) {
-			metadata.put(fields[i], getMetaData(fields[i]));
+				try{
+					metadata.put(fields[i], getMetaData(fields[i]));
+				}catch(NullPointerException npe){
+					if(getMetaData(fields[i])==null){
+						System.out.println("ERROR! XFORM MUST HAVE A NAME!");
+						npe.printStackTrace();
+					}
+				}
 		}
-		return metadata;
+		
+			return metadata;
 	}
 
 	public Object getMetaData(String fieldName) {
@@ -1269,22 +1281,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			return null;
 		}
 	}
-	
-	public String getLongText() {
-		return null;
-	}
-
-
-	public String getShortText() {
-		return null;
-	}
 
 	/**
 	 * Appearance isn't a valid attribute for form, but this method must be included
 	 * as a result of conforming to the IFormElement interface.
 	 */
 	public String getAppearanceAttr () {
-		throw new RuntimeException("This method call is not relevant for FormDefs");
+		throw new RuntimeException("This method call is not relevant for FormDefs getAppearanceAttr ()");
 	}
 	
 	/**
@@ -1292,7 +1295,41 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	 * as a result of conforming to the IFormElement interface.
 	 */
 	public void setAppearanceAttr (String appearanceAttr) {
-		throw new RuntimeException("This method call is not relevant for FormDefs");
+		throw new RuntimeException("This method call is not relevant for FormDefs setAppearanceAttr()");
 	}	
+	
+	/**
+	 * Not applicable here.
+	 */
+	public String getLabelInnerText() {
+		return null;
+	}
+
+
+	/**
+	 * Is there a translation available for his IFormElement?
+	 */
+	public boolean isLocalized() {
+		// TODO Auto-generated method stub
+		return isLocalized;
+	}
+	
+	public void setLocalized(boolean l){
+		isLocalized = l;
+	}
+	
+	/**
+	 * Not applicable
+	 */
+	public String getTextID() {
+		return null;
+	}
+
+	/**
+	 * Not applicable
+	 */
+	public void setTextID(String textID) {
+		throw new RuntimeException("This method call is not relevant for FormDefs [setTextID()]");
+	}
 	
 }

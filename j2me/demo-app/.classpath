@@ -4,7 +4,6 @@
 	<classpathentry excluding="**/ExtensionIntegrationTests.java" kind="src" path="test"/>
 	<classpathentry kind="src" path="/org.javarosa.polish.activity"/>
 	<classpathentry kind="src" path="/org.javarosa.user"/>
-	<classpathentry kind="lib" path="tools/j2merosa-libraries.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-entity-select"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-form-entry"/>
@@ -15,6 +14,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.javarosa.patient.entry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-communication"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-shared-resources"/>
+	<classpathentry kind="lib" path="tools/j2merosa-libraries.jar"/>
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

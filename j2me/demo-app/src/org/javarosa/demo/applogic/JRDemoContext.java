@@ -9,6 +9,8 @@ import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.utils.IPreloadHandler;
+import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.core.reference.RootTranslator;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
@@ -81,6 +83,7 @@ public class JRDemoContext {
 		}
 		
 		UserUtility.populateAdminUser();
+		loadRootTranslator();
 	}
 	
 	private void loadForms (IStorageUtility forms) {
@@ -92,6 +95,9 @@ public class JRDemoContext {
 			forms.write(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/imci.xml"));
 			forms.write(XFormUtils.getFormFromResource("/PhysicoChemTestsDemo.xhtml"));
+			forms.write(XFormUtils.getFormFromResource("/RichMediaExample.xhtml"));
+			forms.write(XFormUtils.getFormFromResource("/ImageSelectTester.xhtml"));
+			
 		} catch (StorageFullException e) {
 			throw new RuntimeException("uh-oh, storage full [forms]"); //TODO: handle this
 		}
@@ -170,5 +176,10 @@ public class JRDemoContext {
 	
 	public Vector<IFunctionHandler> getFuncHandlers () {
 		return null;
+	}
+	
+	public void loadRootTranslator(){
+		ReferenceManager._().addRootTranslator(new RootTranslator("jr://images/", "jr://resource/"));
+		ReferenceManager._().addRootTranslator(new RootTranslator("jr://audio/", "jr://resource/"));
 	}
 }
