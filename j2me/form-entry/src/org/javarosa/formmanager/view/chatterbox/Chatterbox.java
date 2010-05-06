@@ -396,9 +396,9 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 		FormEntryCaption prompt = model.getCaptionPrompt(questionIndex);
 		
 		String headerText; //decide what text form to use.
-		if(prompt.getAvailableTextFormTypes(prompt.getTextID()).contains("long")){
+		if(prompt.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_LONG)){
 			headerText = prompt.getLongText();
-		}else if(prompt.getAvailableTextFormTypes(prompt.getTextID()).contains("short")){
+		}else if(prompt.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_SHORT)){
 			headerText = prompt.getShortText();
 		}else{
 			headerText = prompt.getDefaultText();

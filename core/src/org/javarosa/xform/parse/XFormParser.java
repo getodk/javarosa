@@ -75,6 +75,7 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class XFormParser {
 	public static final String NAMESPACE_JAVAROSA = "http://openrosa.org/javarosa";
+	public static final String NAMESPACE_HTML = "http://www.w3.org/1999/xhtml";
 
 	private static Hashtable topLevelHandlers;
 	private static Hashtable groupLevelHandlers;
@@ -604,8 +605,17 @@ public class XFormParser {
 		for(int i = 0; i<e.getChildCount();i++){
 			if(e.getType(i)!=Node.TEXT && !(e.getChild(i) instanceof String)){
 				Object b = e.getChild(i);
-				if(b instanceof String)System.out.println("WTF?!?!");
-				sb.append(XFormSerializer.elementToString((Element)b));
+				Element child = (Element)b;
+				
+				//If the child is in the HTML namespace, retain it. 
+				if(NAMESPACE_HTML.equals(child.getNamespace())) {
+					sb.append(XFormSerializer.elementToString(child));
+				} else {
+					//Otherwise, ignore it.
+					System.out.println("Unrecognized tag inside of text: <"  + child.getName() + ">. " +
+							"Did you intend to use HTML markup? If so, ensure that the element is defined in " +
+							"the HTML namespace.");
+				}
 			}else{
 				sb.append(e.getText(i));
 			}
@@ -621,8 +631,8 @@ public class XFormParser {
 		
 		for(int i=0;i<e.getChildCount();i++){
 			int kidType = e.getType(i);
-			if(kidType == Node.TEXT) continue;
-			if(e.getChild(i) instanceof String) continue;
+			if(kidType == Node.TEXT) { continue; }
+			if(e.getChild(i) instanceof String) { continue; }
 			Element kid = (Element)e.getChild(i);
 			
 				//is just text

@@ -230,7 +230,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	public String getHelpText(){
 		String helpText=null;
 		try{
-			helpText=form.getLocalizer().getLocalizedText(((QuestionDef)element).getHelpTextID());
+			helpText=localizer().getLocalizedText(((QuestionDef)element).getHelpTextID());
 		}catch(NoLocalizedTextException nlt){
 			helpText = ((QuestionDef)element).getHelpText();
 		}catch(UnregisteredLocaleException ule){
@@ -242,12 +242,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 		return helpText;
 		
 	}
-	
-	public Localizer getLocalizer(){
-		return this.localizer;
-	}
-	
-	
+
 	/**
 	 * 
 	 * @return localized Question text (default form), LabelInnerText if default form is not available.
@@ -272,21 +267,6 @@ public class FormEntryPrompt extends FormEntryCaption {
 			return null;
 		}
 	}
-	
-	/**
-	 * @param textID of the Question whose text you want
-	 * @param Specific subform of question text (e.g. "audio","image", etc)
-	 * @return Question text subform (SEE Localizer.getLocalizedText(String) for fallback details). Null if form not available
-	 */
-	public String getQText(String textID,String form){
-		try{
-			return this.getText(getTextID(),form);
-		}catch(NoLocalizedTextException nle){
-			return null;
-		}
-	}
-	
-
 	
 
 	
@@ -315,7 +295,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 			return sel.getLabelInnerText();
 		}
 		
-		String text = getLongText(tID);
+		String text = getFormOrDefault(tID, TEXT_FORM_LONG);
 		if(text == null || text == ""){
 			text = sel.getLabelInnerText(); //final fallback
 		}
@@ -327,70 +307,34 @@ public class FormEntryPrompt extends FormEntryCaption {
 		return this.getSelectChoiceText(this.getQuestion().getChoice(i));
 	}
 	
-
-	
 	/**
+	 * Retrieve a Vector containing the available forms of text for the
+	 * provided select choice.
 	 * 
 	 * @param sel
-	 * @return String array of all the Itext form texts available for this text
+	 * @return
 	 */
-	public Vector getAllSelectTextForms(SelectChoice sel){
-		String tID = sel.getTextID();
-		if(tID == null || tID == "") return new Vector();
-		
-		String texts = "";
-		Vector availForms = getAvailSelectTextFormTypes(sel);
-		
-		for(int i=0;i<availForms.size();i++){
-			String curForm = (String)availForms.elementAt(i);
-			
-			if(curForm == "default"){
-				texts+=","+getText(tID,"");
-				continue;
-			}
-			
-			texts +=","+getText(tID,curForm);
-		}
-		
-		Vector vec = DateUtils.split(texts,",",false);
-		vec.removeElement("");
-		return vec;
-	}
-	
-	//sorry for the ugly wording...
-	public Vector getAvailSelectTextFormTypes(SelectChoice sel){
+	public Vector getSelectTextForms(SelectChoice sel){
 		String tID = sel.getTextID();
 
 		if(tID == null||tID=="") return new Vector();
 		String types="";
 
 		//check for default
-		if(null != localizer.getRawText(localizer.getLocale(), tID)){
+		if(null != localizer().getRawText(localizer().getLocale(), tID)){
 			types+="default";
 		}
 		
 		//run through types list
 		for(int i=0;i<richMediaFormTypes.length;i++){
 			String curType = richMediaFormTypes[i];
-			if(null != localizer.getRawText(localizer.getLocale(), tID+";"+curType)){
+			if(null != localizer().getRawText(localizer().getLocale(), tID+";"+curType)){
 				types+=","+curType;
 			}
 		}
 		Vector vec = DateUtils.split(types,",",false);
 		vec.removeElement("");
 		return vec;
-	}
-		
-	
-	
-	/**
-	 * Get the Itext for a specific selection and specific itext form
-	 * @param s
-	 * @param form
-	 * @return
-	 */
-	public String getSelectText(Selection s,String form){
-		return getText(s.choice.getTextID(), form);
 	}
 	
 	/**

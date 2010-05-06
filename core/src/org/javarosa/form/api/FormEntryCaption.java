@@ -43,12 +43,16 @@ public class FormEntryCaption implements FormElementStateListener {
 	FormIndex index;
 	protected IFormElement element;
 	private String textID;
-	protected Localizer localizer;
 	
-	String[] richMediaFormTypes = {"long",
-								   "short",
-								   "audio",
-								   "image"};
+	public static final String TEXT_FORM_LONG = "long";
+	public static final String TEXT_FORM_SHORT = "short";
+	public static final String TEXT_FORM_AUDIO = "audio";
+	public static final String TEXT_FORM_IMAGE = "image";
+	
+	protected String[] richMediaFormTypes = {TEXT_FORM_LONG,
+										   TEXT_FORM_SHORT,
+										   TEXT_FORM_AUDIO,
+										   TEXT_FORM_IMAGE};
 
 	protected IQuestionWidget viewWidget;
 
@@ -71,7 +75,6 @@ public class FormEntryCaption implements FormElementStateListener {
 		this.element = form.getChild(index);
 		this.viewWidget = null;
 		this.textID = this.element.getTextID();
-		this.localizer = this.form.getLocalizer();
 	}
 
 	/**
@@ -80,21 +83,25 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @param textID (Optional) if null, uses textID of this FormEntryCaption
 	 * @return String Array of form names available in current locale
 	 */
-	public Vector getAvailableTextFormTypes(String textID){
+	public Vector getAvailableTextForms() {
+		return this.getAvailableTextForms(this.textID);
+	}
+	
+	protected Vector getAvailableTextForms(String textID){
 		String tID = textID;
 		if(tID == null || tID == "") tID = this.textID; //fallback to this FormEntry's textID
 		if(tID == null) return new Vector();
 		String types="";
 
 		//check for default
-		if(null != localizer.getRawText(localizer.getLocale(), tID)){
+		if(null != localizer().getRawText(localizer().getLocale(), tID)){
 			types+="default";
 		}
 		
 		//run through types list
 		for(int i=0;i<richMediaFormTypes.length;i++){
 			String curType = richMediaFormTypes[i];
-			if(null != localizer.getRawText(localizer.getLocale(), tID+";"+curType)){
+			if(null != localizer().getRawText(localizer().getLocale(), tID+";"+curType)){
 				types+=","+curType;
 			}
 		}
@@ -103,32 +110,42 @@ public class FormEntryCaption implements FormElementStateListener {
 		return vec;
 	}
 	
+	/**
+	 * @return The default text form for this caption, either the inner
+	 * text or the appropriate localized form.
+	 */
 	public String getDefaultText(){
-		return getDefaultText(null);
-	}
-	
-	public String getDefaultText(String textID){
-		if(textID==null)textID=this.textID;
-		return getText(textID,null);
+		return getDefaultText(this.textID);
 	}
 	
 	/**
-	 * Convenience method
-	 * Get longText form of text (if available) 
-	 * Falls back to default if long text form doesn't exist.
-	 * @param textID
-	 * @return longText form 
+	 * Get the default text for the provided ID; 
+	 * @param textID 
+	 * @return
 	 */
-	public String getLongText(String textID) {
-		if(textID==null)textID=this.textID;
+	protected String getDefaultText(String textID){
+		return getText(textID,null);
+	}
+	
+	protected String getFormOrDefault(String textID, String form) {
 		String t = null;
 		try{
-			t = getText(textID,"long");
+			t = getText(textID,form);
 		}catch(NoLocalizedTextException nlte){
-			System.out.println("Warning, Long text form requested for ["+textID+"] but doesn't exist. (Falling back to Default form).");
+			System.out.println("Warning, " + form + " text form requested for ["+textID+"] but doesn't exist. (Falling back to Default form).");
 			t = getDefaultText(textID);
 		}
 		return t;
+
+	}
+	
+	protected String getFormOrNull(String textID, String form) {
+		if(textID==null)textID=this.textID;
+		if(!getAvailableTextForms(textID).contains(form)){
+			System.out.println("Warning: " + form +" text form requested for ["+textID+"] but it doesn't exist! Null returned.");
+			return null;
+		}
+		return getText(textID,form);
 	}
 	
 	/**
@@ -138,26 +155,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @return longText form 
 	 */
 	public String getLongText(){
-		return getLongText(null);
-	}
-
-	/**
-	 * Convenience method
-	 * Get shortText form of text (if available) 
-	 * @param textID
-	 * @return shortText form 
-	 */
-	public String getShortText(String textID) {
-		if(textID==null)textID=this.textID;
-		
-		String t = null;
-		try{
-			t = getText(textID,"short");
-		}catch(NoLocalizedTextException nlte){
-			System.out.println("Warning, Short text form requested for ["+textID+"] but doesn't exist. (Falling back to Default form).");
-			t = getDefaultText(textID);
-		}
-		return t;
+		return getFormOrDefault(getTextID(), TEXT_FORM_LONG);
 	}
 	
 	/**
@@ -166,7 +164,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @return shortText form 
 	 */
 	public String getShortText(){
-		return getShortText(null);
+		return getFormOrDefault(getTextID(), TEXT_FORM_SHORT);
 	}
 	
 	/**
@@ -175,22 +173,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @return audio URI form stored in current locale of Text, returns null if not available
 	 */
 	public String getAudioText() {
-		return getAudioText(null);
-	}
-	
-	/**
-	 * Convenience method
-	 * Get audio URI from Text form (if available)
-	 * @param
-	 * @return audio URI form stored in current locale of Text, returns null if not available
-	 */
-	public String getAudioText(String textID){
-		if(textID==null)textID=this.textID;
-		if(!getAvailableTextFormTypes(textID).contains("audio")){
-			System.out.println("Warning: Audio text form requested for ["+textID+"] but it doesn't exist! Null returned.");
-			return null;
-		}
-		return getText(textID,"audio");
+		return getFormOrNull(getTextID(), TEXT_FORM_AUDIO);
 	}
 	
 	/**
@@ -199,24 +182,8 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @return URI of image form stored in current locale of Text, returns null if not available
 	 */
 	public String getImageText() {
-		return getImageText(null);
+		return getFormOrNull(getTextID(), TEXT_FORM_IMAGE);
 	}
-	
-	/**
-	 * Convenience method
-	 * Get image URI form of text (if available)
-	 * @param
-	 * @return URI of image form stored in current locale of Text, returns null if not available
-	 */
-	public String getImageText(String textID){
-		if(textID==null)textID=this.textID;
-		if(!getAvailableTextFormTypes(textID).contains("image")){
-			System.out.println("Warning: Image text form requested for ["+textID+"] but it doesn't exist! Null returned.");
-			return null;
-		}
-		return getText(textID,"image");
-	}
-
 	
 	/**
 	 * Standard Localized text retreiver.
@@ -254,48 +221,19 @@ public class FormEntryCaption implements FormElementStateListener {
 			}
 		}
 		
-		if(form!=null && form != ""){
+		if(form!=null){
 			textID += ";" + form;	
 		}
 		
-		text = this.localizer.getLocalizedText(textID);
+		text = localizer().getLocalizedText(textID);
 		return substituteStringArgs(text);
-	}
-	
-	/**
-	 * Convenience method.
-	 * 
-	 * @param Optional.  If null (or = "") will use the textID associated with this FormEntryCaption
-	 * @return A String array of all the texts/URIs of all the available special localized forms for this element's itext. (Given in the order provided by getAvailableRMForms())
-	 */ 
-	public Vector getAllTextForms(String textID){
-		String tID = textID;
-		if(tID == null || tID == "") tID = this.textID;
-		
-		String texts = "";
-		Vector availForms = getAvailableTextFormTypes(tID);
-		
-		for(int i=0;i<availForms.size();i++){
-			String curForm = (String)availForms.elementAt(i);
-			
-			if(curForm == "default" ){
-				texts+=","+getText(tID,"");
-				continue;
-			}
-			
-			texts +=","+getText(tID,curForm);
-		}
-		
-		Vector vec = DateUtils.split(texts,",",false);
-		vec.removeElement("");
-		return vec;
 	}
 
 	public String getAppearanceHint ()  {
 		return element.getAppearanceAttr();
 	}
 	
-	public String substituteStringArgs(String templateStr) {
+	protected String substituteStringArgs(String templateStr) {
 		if (templateStr == null) {
 			return null;
 		}
@@ -324,6 +262,10 @@ public class FormEntryCaption implements FormElementStateListener {
 	public FormIndex getIndex() {
 		return index;
 	}
+	
+	protected Localizer localizer() {
+		return this.form.getLocalizer();
+	}
 
 	// ==== observer pattern ====//
 
@@ -350,7 +292,7 @@ public class FormEntryCaption implements FormElementStateListener {
 		throw new RuntimeException("cannot happen");
 	}
 	
-	public String getTextID(){
+	protected String getTextID(){
 		return this.textID;
 	}
 	
