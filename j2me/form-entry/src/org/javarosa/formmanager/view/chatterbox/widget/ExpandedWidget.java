@@ -73,11 +73,9 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		String AudioURI;
 		String textID;
 		
-		if (select == null) {
-			textID = fep.getQuestion().getTextID();		
-			if (fep.getAvailableTextFormTypes(textID).contains("audio")) {
-				int index = fep.getAvailableTextFormTypes(textID).indexOf("audio");
-				AudioURI = (String) fep.getAllTextForms(textID).elementAt(index);
+		if (select == null) {		
+			if (fep.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_AUDIO)) {
+				AudioURI = fep.getAudioText();
 			} else {
 				return;
 			}	
@@ -85,26 +83,20 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 			textID = select.getTextID();
 			if(textID == null || textID == "") return;
 			
-			if (fep.getAvailSelectTextFormTypes(select).contains("audio")) {
-				int index = fep.getAvailSelectTextFormTypes(select).indexOf("audio");
-				AudioURI = (String) fep.getAllSelectTextForms(select).elementAt(index);
+			if (fep.getSelectTextForms(select).contains(FormEntryCaption.TEXT_FORM_AUDIO)) {
+				AudioURI = fep.getSelectChoiceText(select,FormEntryCaption.TEXT_FORM_AUDIO);
 			} else {
 				return;
 			}
 		}	
-//		System.out.println("Audio URI:"+ AudioURI);
 		try {
 			Reference audRef = ReferenceManager._().DeriveReference(AudioURI);
 			if(player==null || player.getState()!=player.STARTED){
 				player = Manager.createPlayer(audRef.getStream(), "audio/x-wav");
 				player.start();
-//				System.out.println("Playing audio:"+audRef.getURI());
 			}else{
 				System.out.println("Player busy so skipping requested audio for now:"+AudioURI);
 			}
-				// player = new AudioPlayer("audio/mp3");
-				// player.play(audRef.getStream());
-			
 			
 			System.out.flush();
 			} catch (InvalidReferenceException ire) {
@@ -125,26 +117,24 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	}
 		
 	public ImageItem getImageItem(FormEntryPrompt fep){
-		Vector AvailFormTypes = fep.getAvailableTextFormTypes(fep.getTextID());
-		Vector AvailForms = fep.getAllTextForms(fep.getTextID());
+		Vector AvailForms = fep.getAvailableTextForms();
 		String ILabel,IaltText;
 		
-		if(AvailFormTypes.contains("long")){
-			ILabel = (String)AvailForms.elementAt(AvailFormTypes.indexOf("long"));
+		if(AvailForms.contains(FormEntryCaption.TEXT_FORM_LONG)){
+			ILabel = fep.getLongText();
 		}else{
 			ILabel = fep.getDefaultText();
 		}
 		
-		if(AvailFormTypes.contains("short")){
-			IaltText = (String)AvailForms.elementAt(AvailFormTypes.indexOf("short"));
+		if(AvailForms.contains(FormEntryCaption.TEXT_FORM_SHORT)){
+			IaltText = fep.getShortText();
 		}else{
 			IaltText = fep.getDefaultText();
 		}
-		Image im = getImage(fep,null);
+		Image im = getImage(fep.getImageText());
 		if(im!=null){
-			ImageItem imItem = new ImageItem(null,getImage(fep,null), ImageItem.LAYOUT_CENTER, IaltText);
+			ImageItem imItem = new ImageItem(null,getImage(fep.getImageText()), ImageItem.LAYOUT_CENTER, IaltText);
 			imItem.setLayout(Item.LAYOUT_CENTER);
-//			ImageItem imItem = new ImageItem(ILabel,getImage(fep,null), ImageItem.LAYOUT_CENTER, IaltText);
 			return imItem;
 		}else{
 			return null;
@@ -152,41 +142,24 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		
 	}
 	
-	public Image getImage(FormEntryPrompt fep,SelectChoice sc){
-		String Iuri;
-		Vector AvailFormTypes;
-		Vector AvailForms;
-		Image im = null;
-		
-		if(sc!=null){
-			AvailFormTypes = fep.getAvailSelectTextFormTypes(sc);
-			AvailForms = fep.getAllSelectTextForms(sc);
-		}else{
-			AvailFormTypes = fep.getAvailableTextFormTypes(fep.getTextID());
-			AvailForms = fep.getAllTextForms(fep.getTextID());
-		}
-		
-		if(AvailFormTypes.contains("image")){
-			Iuri = (String)AvailForms.elementAt(AvailFormTypes.indexOf("image"));
-		}else{
-			Iuri = null;
-		}
-		
-		if(Iuri != null){
+	public Image getImage(String URI){
+		if(URI != null){
 			try {
-				im = Image.createImage(ReferenceManager._().DeriveReference(Iuri).getStream());
+				return Image.createImage(ReferenceManager._().DeriveReference(URI).getStream()); 
 			} catch (IOException e) {
-				throw new RuntimeException("ERROR! Cant find image at URI:"+Iuri);	
+				throw new RuntimeException("ERROR! Cant find image at URI: "+URI);	
 			} catch (InvalidReferenceException ire){
-				throw new RuntimeException("Invalid Reference for image at:"+Iuri+", with TextID ["+ ((sc != null) ? sc.getTextID() : fep.getTextID())+"]");
+				throw new RuntimeException("Invalid Reference for image at: " +URI);
 			}
+		} else{
+			return null;
 		}
-		
-		return im;
 	}
 
 	private int imageIndex=-1;
+	
 	private ImageItem imItem;
+	
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
 		if(imItem!=null && imageIndex !=-1){	//replace an already existing image
 			imItem = getImageItem(fep);

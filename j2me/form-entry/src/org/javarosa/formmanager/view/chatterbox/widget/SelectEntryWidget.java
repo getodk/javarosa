@@ -23,6 +23,7 @@ import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;
@@ -197,7 +198,7 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 		for (int i = 0; i < choiceGroup().size(); i++) {
 			SelectChoice sc = prompt.getSelectChoices().elementAt(i);
 			Selection s = sc.selection();
-			Image im = this.getImage(prompt, sc);
+			Image im = this.getImage(prompt.getSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
 			
 			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(sc));
 			

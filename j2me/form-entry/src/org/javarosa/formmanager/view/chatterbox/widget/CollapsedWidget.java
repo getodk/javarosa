@@ -75,7 +75,7 @@ public class CollapsedWidget implements IWidgetStyle {
 
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {	
 		
-		prompt.setText(fep.getShortText(fep.getTextID()));
+		prompt.setText(fep.getShortText());
 		
 		IAnswerData data = fep.getAnswerValue();
 		if (data != null) {

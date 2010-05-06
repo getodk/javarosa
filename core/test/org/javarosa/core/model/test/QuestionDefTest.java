@@ -107,7 +107,7 @@ public class QuestionDefTest extends TestCase {
 		case 4: testFlagObservers(); break;
 		case 5: testPromptsNoLocalizer(); break;
 		case 6: testPromptIDsNoLocalizer(); break;
-		case 7: testPromptsWithLocalizer(q,fep); break;
+		case 7: testPromptsWithLocalizer(); break;
 		case 8: testSelectChoicesNoLocalizer(); break;
 		case 9: testSelectChoiceIDsNoLocalizer(); break;
 		case 10: testNonLocalizedText(); break;
@@ -235,10 +235,8 @@ public class QuestionDefTest extends TestCase {
 		}
 	}
 	
-	public void testPromptsWithLocalizer (QuestionDef q, FormEntryPrompt fep) {
-		if(q==null||fep==null) fail("QuestionDef and Localizer not set in QuestionDefTest!");
-		
-		Localizer l = fep.getLocalizer();
+	public void testPromptsWithLocalizer () {
+		Localizer l = new Localizer();
 
 		TableLocaleSource table = new TableLocaleSource();
 		l.addAvailableLocale("locale");
@@ -250,18 +248,19 @@ public class QuestionDefTest extends TestCase {
 		
 		l.setLocale("locale");
 		
-		q.setTextID("prompt");
-
-		if (!"loc: long text".equals(fep.getLongText(q.getTextID()))) {
+		
+		QuestionDef q = new QuestionDef();
+				
+		q.setHelpTextID("help");
+		FormEntryPrompt fep = new DummyFormEntryPrompt(l,"prompt",q);
+				
+		if (!"loc: long text".equals(fep.getLongText())) {
 			fail("Long text did not localize properly");
 		}
-		if (!"loc: short text".equals(fep.getShortText(q.getTextID()))){
+		if (!"loc: short text".equals(fep.getShortText())){
 			fail("Short text did not localize properly");
 		}
-		
 		testSerialize(q, "t");
-	
-		q.setHelpTextID("help");
 		if (!"loc: help text".equals(fep.getHelpText())) {
 			fail("Help text did not localize when setting ID");
 		}
@@ -323,7 +322,7 @@ public class QuestionDefTest extends TestCase {
 			if(q.getTextID() == null) continue;
 			//yes. It's a little ugly. -Anton
 			if(q.getTextID().equals("name")){
-				if(fep.getAvailableTextFormTypes(q.getTextID()).contains("image")){
+				if(fep.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_IMAGE)){
 					if(!"jr://images/four.gif".equals(fep.getImageText())){
 						fail ("getImageText is being faulty.");
 					}else{
@@ -343,7 +342,7 @@ public class QuestionDefTest extends TestCase {
 			fep = fpi.getFormEntryModel().getQuestionPrompt();
 			q = fpi.getCurrentQuestion();
 			if(q.getTextID() == null) continue;
-			if(q.getTextID().equals("id") && fep.getAvailableTextFormTypes(q.getTextID()).contains("audio")){
+			if(q.getTextID().equals("id") && fep.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_AUDIO)){
 				if(!("jr://audio/hah.mp3".equals(fep.getAudioText()))){
 					fail("get AudioText() doesn't work.");
 				}else{

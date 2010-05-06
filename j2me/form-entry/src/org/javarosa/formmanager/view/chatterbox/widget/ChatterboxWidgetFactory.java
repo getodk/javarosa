@@ -151,9 +151,9 @@ public class ChatterboxWidgetFactory {
 		
 		
 		
-		if(p.getAvailableTextFormTypes(p.getTextID()).contains("long")){
+		if(p.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_LONG)){
 			label = p.getLongText();
-		}else if(p.getAvailableTextFormTypes(p.getTextID()).contains("short")){
+		}else if(p.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_SHORT)){
 			label = p.getShortText();
 		}else{
 	

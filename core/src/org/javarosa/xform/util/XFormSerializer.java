@@ -19,13 +19,10 @@ package org.javarosa.xform.util;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.UnsupportedCharsetException;
 
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
-
-import com.sun.org.apache.xerces.internal.util.XML11Char;
 
 /* this is just a big dump of serialization-related code */
 
