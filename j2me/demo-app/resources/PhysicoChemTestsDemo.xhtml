@@ -8,7 +8,7 @@
     <meta jr:name="physchem_test_report_001_demo"/>
     <model>
     <itext>
- 	 	<translation lang="English"  default="">
+ 	 	<translation lang="English" default="">
     			<text id="PointCode">
      	 			<value>Where was the sample taken?</value>
     			</text>
@@ -16,8 +16,9 @@
      	 			<value>Sample Date</value>
     			</text>
 			<text id="turbidity">
-     	 			<value>Turbidity</value>
-    			</text>
+     	 			<value form="short">Turbidity</value>
+					<value form="long">Turbidity</value>
+    		</text>
 			<text id="conductivity">
      	 			<value>Electrical Conductivity</value>
     			</text>
@@ -48,7 +49,8 @@
      	 			<value>Datum (waarop monster geneem is)</value>
     			</text>
 			<text id="turbidity">
-     	 			<value>Troebelheid</value>
+     	 			<value form="short">Troebelheid</value>
+					<value form="long">Troebelheid</value>
     			</text>
 			<text id="conductivity">
      	 			<value>Elektriese geleibaarheid</value>
@@ -126,7 +128,7 @@
 </select1>
 
 <input bind="AssessmentDate">
-<label ref="jr:itext('AssessmentDate')" />
+<label ref="jr:itext('AssessmentDate')"></label>
 </input>
 
 <input bind="turbidity">

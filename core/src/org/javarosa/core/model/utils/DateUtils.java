@@ -533,4 +533,15 @@ public class DateUtils {
 	public static Date getDateTimeFromString(String value) {
 		return parseDateTime(value);
 	}	
+	
+	public static boolean stringContains(String string,String substring){
+		if(string == null || substring == null){
+			return false;
+		}
+		if(string.indexOf(substring)== -1){
+			return false;
+		}else{
+			return true;
+		}
+	}
 }

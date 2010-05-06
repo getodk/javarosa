@@ -91,7 +91,9 @@ public class SelectMultiData implements IAnswerData {
 		}
 		return output;
 	}
-	
+	/**
+	 * @return THE XMLVALUE!!
+	 */
 	/*
 	 * (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#getDisplayText()
@@ -101,7 +103,7 @@ public class SelectMultiData implements IAnswerData {
 		
 		for (int i = 0; i < vs.size(); i++) {
 			Selection s = (Selection)vs.elementAt(i);
-			str += s.getText();
+			str += s.getValue();
 			if (i < vs.size() - 1)
 				str += ", ";
 		}

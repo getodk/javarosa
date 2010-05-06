@@ -18,6 +18,7 @@ package org.javarosa.xform.schema;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
@@ -29,6 +30,9 @@ import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.XPathConditional;
@@ -68,31 +72,53 @@ public class FormOverview {
 		
 		//readTranslations(outputBuffer, sb);
 		
-		listQuestions(f, f, 0, sb);
+		listQuestions(f, 0, sb);
 		
 		return sb.toString();
 	}
 	
-	private static void listQuestions (FormDef f, IFormElement fe, int indent, StringBuffer sb) {
-		if (fe instanceof QuestionDef) {
-			listQuestion(f, (QuestionDef)fe, indent, sb);
-		} else {
-			if (fe instanceof GroupDef) {
+	private static void listQuestions (FormDef f, int indent, StringBuffer sb) {
+		//using fec to walk through form (instead of old recursive algorithm)
+		FormEntryModel femodel = new FormEntryModel(f);
+		FormEntryController fec = new FormEntryController(femodel);
+		fec.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+		IFormElement fe;
+		do{
+			fe = femodel.getCaptionPrompt().getFormElement();
+			if(fe instanceof QuestionDef){
+				listQuestion(f,(QuestionDef)fe,fec,indent,sb);
+			}else if(fe instanceof GroupDef){
 				if (listGroup(f, (GroupDef)fe, indent, sb)) {
 					indent += 1;
 				}
 			}
 			
-			for (int i = 0; i < fe.getChildren().size(); i++) {
-				listQuestions(f, fe.getChild(i), indent, sb);
-			}
-		}
+		}while(fec.stepToNextEvent()!=fec.EVENT_END_OF_FORM);
+	
+		//Old Recursive Algorithm
+//		if (fe instanceof QuestionDef) {
+//			listQuestion(f, (QuestionDef)fe, indent, sb);
+//		} else {
+//			if (fe instanceof GroupDef) {
+//				if (listGroup(f, (GroupDef)fe, indent, sb)) {
+//					indent += 1;
+//				}
+//			}
+//			
+//			for (int i = 0; i < fe.getChildren().size(); i++) {
+//				listQuestions(f, fe.getChild(i), indent, sb);
+//			}
+//		}
+	
 	}
 	
-	private static void listQuestion (FormDef f, QuestionDef q, int indent, StringBuffer sb) {
+	private static void listQuestion (FormDef f, QuestionDef q,FormEntryController fec, int indent, StringBuffer sb) {
+		FormEntryModel femodel = fec.getModel();
 		TreeElement instanceNode = getInstanceNode(f.getInstance(), q.getBind());
-		
-		String caption = q.getLongText();
+		String caption = "";
+		FormEntryPrompt fep = femodel.getQuestionPrompt();
+		caption = getAppropriateTextForm(fep,fep.getTextID());
+
 		int type = instanceNode.dataType;
 		
 		if (q.getControlType() != Constants.CONTROL_TRIGGER) {
@@ -103,7 +129,7 @@ public class FormOverview {
 		}
 			
 		if (q.getControlType() == Constants.CONTROL_SELECT_ONE || q.getControlType() == Constants.CONTROL_SELECT_MULTI) {
-			printChoices(q, indent + 1, sb);
+			printChoices(f,q,fec, indent + 1, sb);
 		}
 		
 		printProperty("relevant", f, instanceNode, indent + 1, sb);
@@ -124,10 +150,12 @@ public class FormOverview {
 		println(sb);
 	}
 	
-	private static void printChoices (QuestionDef q, int indent, StringBuffer sb) {
+	private static void printChoices (FormDef f,QuestionDef q,FormEntryController fec,int indent, StringBuffer sb) {
+		FormEntryModel femodel = fec.getModel();
+		
 		println(sb, indent, "Choices: " + q.getNumChoices());
 		for (int i = 0; i < q.getNumChoices(); i++) {
-			println(sb, indent + 1, "\"" + q.getChoice(i).getCaption() + "\"");
+			println(sb, indent + 1, "\"" + femodel.getQuestionPrompt().getSelectChoiceText(i) + "\"");
 		}
 	}
 	
@@ -253,8 +281,9 @@ public class FormOverview {
 	}
 	
 	private static boolean listGroup (FormDef f, GroupDef g, int indent, StringBuffer sb) {
+		FormEntryModel femodel = new FormEntryModel(f);
 		boolean repeat = g.getRepeat();
-		String caption = ExtUtil.nullIfEmpty(g.getLongText());
+		String caption = ExtUtil.nullIfEmpty(femodel.getQuestionPrompt().getLongText());
 		TreeElement instanceNode = getInstanceNode(f.getInstance(), g.getBind());
 		
 		String relevant = printConditionalProperty("relevant", f, instanceNode);
@@ -309,4 +338,34 @@ public class FormOverview {
 	private static void println (StringBuffer sb) {
 		println(sb, 0, "");
 	}
+	
+	/**
+	 * Use this, usually in refresh/updateWidget() method to do
+	 * the text form fallback boogey.
+	 * 
+	 * Fallback logic:
+	 * Try get the "long" form,
+	 * then try get the "short" form,
+	 * then try get the default form.
+	 * 
+	 * If through all of this textID is actually null,
+	 * this method will return the LabelInnerText.
+	 * 
+	 * @param textID
+	 * @returns text of the appropriate form.
+	 */
+	public static String getAppropriateTextForm(FormEntryPrompt fep,String textID){
+		String caption;
+		
+		if(fep.getAvailableTextFormTypes(textID).contains("long")){
+			caption = fep.getLongText();
+		}else if(fep.getAvailableTextFormTypes(textID).contains("short")){
+			caption = fep.getShortText();
+		}else{
+			caption = fep.getDefaultText();
+		}
+		return caption;
+	}
+	
+	
 }

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.annotation.ElementType;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -51,6 +52,8 @@ import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.xform.util.IXFormBindHandler;
 import org.javarosa.xform.util.XFormAnswerDataParser;
+import org.javarosa.xform.util.XFormSerializer;
+import org.javarosa.xform.util.XFormUtils;
 import org.javarosa.xpath.XPathConditional;
 import org.javarosa.xpath.expr.XPathPathExpr;
 import org.javarosa.xpath.parser.XPathSyntaxException;
@@ -72,6 +75,7 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class XFormParser {
 	public static final String NAMESPACE_JAVAROSA = "http://openrosa.org/javarosa";
+	public static final String NAMESPACE_HTML = "http://www.w3.org/1999/xhtml";
 
 	private static Hashtable topLevelHandlers;
 	private static Hashtable groupLevelHandlers;
@@ -273,7 +277,7 @@ public class XFormParser {
 		defaultNamespace = doc.getRootElement().getNamespaceUri(null);
 		
 		parseElement(formDef, doc.getRootElement(), formDef, topLevelHandlers);
-		
+			
 		collapseRepeatGroups(formDef);
 		
 		if(instanceNode != null) {
@@ -311,6 +315,7 @@ public class XFormParser {
 	}
 
 	private static void parseTitle (FormDef f, Element e) {
+		Vector usedAtts = new Vector(); //no attributes parsed in title.
 		String title = getXMLText(e, true);
 		System.out.println("Title: \"" + title + "\"");
 		f.setTitle(title);
@@ -321,9 +326,16 @@ public class XFormParser {
 			//that.
 			f.setName(title);
 		}
+		
+		
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseTitle()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
 	}
 	
 	private static void parseMeta (FormDef f, Element e) {
+		Vector usedAtts = new Vector();
 		int attributes = e.getAttributeCount();
 		for(int i = 0 ; i < attributes ; ++i) {
 			String name = e.getAttributeName(i);
@@ -332,10 +344,20 @@ public class XFormParser {
 				f.setName(value);
 			}
 		}
+		
+
+		usedAtts.addElement("name");
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseTitle()2");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
 	}
 
 	//for ease of parsing, we assume a model comes before the controls, which isn't necessarily mandated by the xforms spec
 	private static void parseModel (FormDef f, Element e) {
+		Vector usedAtts = new Vector(); //no attributes parsed in title.
+		
+		
 		if (modelFound) {
 			//#if debug.output==verbose
 			System.err.println("Multiple models not supported. Ignoring subsequent models." + getVagueLocation(e));
@@ -343,7 +365,12 @@ public class XFormParser {
 			return;
 		}
 		modelFound = true;
-
+		
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseModel()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
+		
 		for (int i = 0; i < e.getChildCount(); i++) {
 			
 			int type = e.getType(i);
@@ -402,6 +429,7 @@ public class XFormParser {
 	
 	protected static QuestionDef parseUpload(IFormElement parent, Element e, FormDef f,
 			int controlUpload) {
+		Vector usedAtts = new Vector();
 		QuestionDef question = parseControl(parent, e, f, controlUpload);
 		String mediaType = e.getAttributeValue(null, "mediatype");
 		if ("image/*".equals(mediaType)) {
@@ -416,12 +444,25 @@ public class XFormParser {
 		{
             question.setControlType(Constants.CONTROL_VIDEO_CAPTURE);
         }
+		
+		usedAtts.addElement("mediatype");
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseUpload()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
+		
         return question;
     }
 	
 	protected static QuestionDef parseControl (IFormElement parent, Element e, FormDef f, int controlType) {
 		QuestionDef question = new QuestionDef();
 		question.setID(serialQuestionID++); //until we come up with a better scheme
+		
+		Vector usedAtts = new Vector();
+		usedAtts.addElement("ref");
+		usedAtts.addElement("bind");
+		usedAtts.addElement("appearance");
+		
 		IDataReference dataRef = null;
 		boolean refFromBind = false;
 		
@@ -486,32 +527,51 @@ public class XFormParser {
 		}
 			
 		parent.addChild(question);
+		
+
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseControl()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
+		
+		
 		return question;
 	}
 
 	private static void parseQuestionLabel (FormDef f, QuestionDef q, Element e) {
 		String label = getLabel(e, f);
 		String ref = e.getAttributeValue("", "ref");
-
+		
+		Vector usedAtts = new Vector();
+		usedAtts.addElement("ref");
+		
 		if (ref != null) {
 			if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
 				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
 				verifyTextMappings(f, textRef, "Question <label>", true);
-				q.setLongTextID(textRef + ";long", null);
-				q.setShortTextID(textRef + ";short", null);
+				q.setTextID(textRef);
 			} else {
 				throw new RuntimeException("malformed ref [" + ref + "] for <label>");
 			}
 		} else {
-			q.setLongText(label);
-			q.setShortText(label);
+			q.setLabelInnerText(label);
+		}
+		
+
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseQuestionLabel()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
 
 	private static void parseGroupLabel (FormDef f, GroupDef g, Element e) {
 		if (g.getRepeat())
 			return; //ignore child <label>s for <repeat>; the appropriate <label> must be in the wrapping <group>
+		
+		Vector usedAtts = new Vector();
+		usedAtts.addElement("ref");
+		
 		
 		String label = getLabel(e, f);
 		String ref = e.getAttributeValue("", "ref");
@@ -521,18 +581,82 @@ public class XFormParser {
 				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
 				verifyTextMappings(f, textRef, "Group <label>", true);
-				g.setLongTextID(textRef + ";long", null);
-				g.setShortTextID(textRef + ";short", null);
+				g.setTextID(textRef);
 			} else {
 				throw new RuntimeException("malformed ref [" + ref + "] for <label>");
 			}
 		} else {
-			g.setLongText(label);
-			g.setShortText(label);
+			g.setLabelInnerText(label);
+		}
+		
+
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseGroupHandle()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
 	
-	private static String getLabel (Element e, FormDef f) {
+	private static String getLabel (Element e, FormDef f){
+		if(e.getChildCount() == 0) return null;
+		
+		recurseForOutput(e,f);
+		
+		StringBuffer sb = new StringBuffer();
+		for(int i = 0; i<e.getChildCount();i++){
+			if(e.getType(i)!=Node.TEXT && !(e.getChild(i) instanceof String)){
+				Object b = e.getChild(i);
+				Element child = (Element)b;
+				
+				//If the child is in the HTML namespace, retain it. 
+				if(NAMESPACE_HTML.equals(child.getNamespace())) {
+					sb.append(XFormSerializer.elementToString(child));
+				} else {
+					//Otherwise, ignore it.
+					System.out.println("Unrecognized tag inside of text: <"  + child.getName() + ">. " +
+							"Did you intend to use HTML markup? If so, ensure that the element is defined in " +
+							"the HTML namespace.");
+				}
+			}else{
+				sb.append(e.getText(i));
+			}
+		}
+		
+		String s = sb.toString().trim();
+		
+		return s;
+	}
+	
+	private static void recurseForOutput(Element e, FormDef f){
+		if(e.getChildCount() == 0) return;
+		
+		for(int i=0;i<e.getChildCount();i++){
+			int kidType = e.getType(i);
+			if(kidType == Node.TEXT) { continue; }
+			if(e.getChild(i) instanceof String) { continue; }
+			Element kid = (Element)e.getChild(i);
+			
+				//is just text
+			if(kidType == Node.ELEMENT && XFormUtils.isOutput(kid)){
+				String s = "${"+parseOutput(kid, f)+"}";
+				e.removeChild(i);
+				e.addChild(i, Node.TEXT, s);
+				
+				//has kids? Recurse through them and swap output tag for parsed version
+			}else if(kid.getChildCount() !=0){
+				recurseForOutput(kid,f);
+				//is something else
+			}else{
+				continue;
+			}
+		}
+	}
+	
+	
+	
+/*	private static String getLabel (Element e, FormDef f) {
+		return getLabel2(e,f);
+		
+		
 		boolean outputFound = false;
 		boolean otherStuffFound = false;
 		Vector outputs = new Vector();
@@ -546,6 +670,8 @@ public class XFormParser {
 				}
 			}
 		}
+		
+
 		
 		if (outputFound && !otherStuffFound) {
 			StringBuffer sb = new StringBuffer();
@@ -567,9 +693,15 @@ public class XFormParser {
 		} else {
 			return getXMLText(e, true);
 		}
+		
 	}	
+	*/
 	
 	private static String parseOutput (Element e, FormDef f) {
+		Vector usedAtts = new Vector();
+		usedAtts.addElement("ref");
+		usedAtts.addElement("value");
+		
 		String xpath = e.getAttributeValue(null, "ref");
 		if (xpath == null) {
 			xpath = e.getAttributeValue(null, "value");
@@ -595,10 +727,18 @@ public class XFormParser {
 			index = f.getOutputFragments().size();
 			f.getOutputFragments().addElement(expr);
 		}
+		
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseOutput()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
+		
 		return String.valueOf(index);
 	}
 	
 	private static void parseHint (FormDef f, QuestionDef q, Element e) {
+		Vector usedAtts = new Vector();
+		usedAtts.addElement("ref");
 		String hint = getXMLText(e, true);
 		String ref = e.getAttributeValue("", "ref");
 
@@ -607,17 +747,30 @@ public class XFormParser {
 				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
 				verifyTextMappings(f, textRef, "<hint>", false);
-				q.setHelpTextID(textRef, null);
+				q.setHelpTextID(textRef);
 			} else {
 				throw new RuntimeException("malformed ref [" + ref + "] for <hint>");
 			}
 		} else {
 			q.setHelpText(hint);
 		}
+		
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseHint()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
 	}
 
 	private static void parseItem (FormDef f, QuestionDef q, Element e) {
 		final int MAX_VALUE_LEN = 32;
+		
+		//catalogue of used attributes in this method/element
+		Vector usedAtts = new Vector();
+		Vector labelUA = new Vector();
+		Vector valueUA = new Vector();
+		labelUA.addElement("ref");
+		valueUA.addElement("form");
+		
 		
 		String label = null;
 		String textRef = null;
@@ -629,6 +782,13 @@ public class XFormParser {
 			String childName = (child != null ? child.getName() : null);
 
 			if ("label".equals(childName)) {
+				
+				//print attribute warning for child element
+				if(XFormUtils.showUnusedAttributeWarning(child, labelUA)){
+					//System.out.println("Debug:parseItem()");
+					//System.out.println("Debug: "+XFormUtils.getAttributeList(child));
+					System.out.println(XFormUtils.unusedAttWarning(child, labelUA));
+				}
 				label = getXMLText(child, true);
 				String ref = child.getAttributeValue("", "ref");
 
@@ -636,13 +796,19 @@ public class XFormParser {
 					if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
 						textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
 
-						verifyTextMappings(f, textRef, "Item <label>", false);
+						verifyTextMappings(f, textRef, "Item <label>", true);
 					} else {
 						throw new XFormParseException("malformed ref [" + ref + "] for <item>",child);
 					}
 				}
 			} else if ("value".equals(childName)) {
 				value = getXMLText(child, true);
+				
+				//print attribute warning for child element
+				if(XFormUtils.showUnusedAttributeWarning(child, valueUA)){
+					//System.out.println("Debug:parseItem2()");
+					System.out.println(XFormUtils.unusedAttWarning(child, valueUA));
+				}
 				
 				if (value.length() > MAX_VALUE_LEN) {
 					System.err.println("WARNING: choice value [" + value + "] is too long; max. suggested length " + MAX_VALUE_LEN + " chars" + getVagueLocation(child));
@@ -672,12 +838,30 @@ public class XFormParser {
 		if (textRef != null) {
 			q.addSelectChoice(new SelectChoice(textRef, value));
 		} else {
-			q.addSelectChoice(new SelectChoice(label, value, false));
+			q.addSelectChoice(new SelectChoice(null,label, value, false));
+		}
+		
+		//print unused attribute warning message for parent element
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseItem3()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
 
 	private static void parseItemset (FormDef f, QuestionDef q, Element e, IFormElement qparent) {
 		ItemsetBinding itemset = new ItemsetBinding();
+		
+		//catalogue of used attributes in this method/element
+		Vector usedAtts = new Vector();
+		Vector labelUA = new Vector(); //for child with name 'label'
+		Vector valueUA = new Vector(); //for child with name 'value'
+		Vector copyUA = new Vector(); //for child with name 'copy'
+		usedAtts.addElement("nodeset");
+		labelUA.addElement("ref");
+		valueUA.addElement("ref");
+		valueUA.addElement("form");
+		copyUA.addElement("ref");
+		
 		
 		String nodesetStr = e.getAttributeValue("", "nodeset");
 		XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
@@ -694,6 +878,12 @@ public class XFormParser {
 				String labelXpath = child.getAttributeValue("", "ref");
 				boolean labelItext = false;
 				
+				//print unused attribute warning message for child element
+				if(XFormUtils.showUnusedAttributeWarning(child, labelUA)){
+					//System.out.println("Debug:parseItemset()");
+					System.out.println(XFormUtils.unusedAttWarning(child, labelUA));
+				}
+				
 				if (labelXpath != null) {
 					if (labelXpath.startsWith("jr:itext(") && labelXpath.endsWith(")")) {
 						labelXpath = labelXpath.substring("jr:itext(".length(), labelXpath.indexOf(")"));
@@ -709,6 +899,13 @@ public class XFormParser {
 				itemset.labelIsItext = labelItext;
 			} else if ("copy".equals(childName)) {
 				String copyRef = child.getAttributeValue("", "ref");
+
+				//print unused attribute warning message for child element
+				if(XFormUtils.showUnusedAttributeWarning(child, copyUA)){
+					//System.out.println("Debug:parseItemset()2");
+					System.out.println(XFormUtils.unusedAttWarning(child, copyUA));
+				}
+				
 				if (copyRef == null) {
 					throw new XFormParseException("<copy> in <itemset> requires 'ref'");
 				}
@@ -717,6 +914,13 @@ public class XFormParser {
 				itemset.copyMode = true;
 			} else if ("value".equals(childName)) {
 				String valueXpath = child.getAttributeValue("", "ref");
+				
+				//print unused attribute warning message for child element
+				if(XFormUtils.showUnusedAttributeWarning(child, valueUA)){
+					//System.out.println("Debug:parseItemset()3");
+					System.out.println(XFormUtils.unusedAttWarning(child, valueUA));
+				}
+				
 				if (valueXpath == null) {
 					throw new XFormParseException("<value> in <itemset> requires 'ref'");
 				}
@@ -744,6 +948,12 @@ public class XFormParser {
 		
 		q.setDynamicChoices(itemset);
 		itemsets.addElement(itemset);
+		
+		//print unused attribute warning message for parent element
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseItemset()4");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
 	}
 	
 	private static void parseGroup (IFormElement parent, Element e, FormDef f, int groupType) {
@@ -751,6 +961,14 @@ public class XFormParser {
 		group.setID(serialQuestionID++); //until we come up with a better scheme
 		IDataReference dataRef = null;
 		boolean refFromBind = false;
+		
+		Vector usedAtts = new Vector();
+		usedAtts.addElement("ref");
+		usedAtts.addElement("nodeset");
+		usedAtts.addElement("bind");
+		usedAtts.addElement("appearance");
+		usedAtts.addElement("count");
+		usedAtts.addElement("noAddRemove");
 		
 		if (groupType == CONTAINER_REPEAT) {
 			group.setRepeat(true);
@@ -805,6 +1023,12 @@ public class XFormParser {
 			if (e.getType(i) == Element.ELEMENT) {
 				parseElement(f, e.getElement(i), group, groupLevelHandlers);
 			}
+		}
+		
+		//print unused attribute warning message for parent element
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseGroup()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 
 		parent.addChild(group);
@@ -870,10 +1094,12 @@ public class XFormParser {
 						//merge group into repeat
 						//id - later
 						//name - later
-						repeat.setLongText(group.getLongText());
-						repeat.setShortText(group.getShortText());
-						repeat.setLongTextID(group.getLongTextID(), null);
-						repeat.setShortTextID(group.getShortTextID(), null);						
+						repeat.setLabelInnerText(group.getLabelInnerText());
+						repeat.setTextID(group.getTextID());
+//						repeat.setLongText(group.getLongText());
+//						repeat.setShortText(group.getShortText());
+//						repeat.setLongTextID(group.getLongTextID(), null);
+//						repeat.setShortTextID(group.getShortTextID(), null);						
 						//don't merge binding; repeat will always already have one
 						
 						//replace group with repeat
@@ -887,19 +1113,13 @@ public class XFormParser {
 		}
 	}
 	
-	/**
-	 * KNOWN ISSUES WITH ITEXT
-	 *
-	 * 'long' and 'short' forms of text are only supported for input control labels at this time. all other
-	 * situations (<hint> tags, <label>s within <item>s, etc.) should only reference text handles that have
-	 * only the single, default form.
-	 */
-
 	private static void parseIText (FormDef f, Element itext) {
 		Localizer l = new Localizer(true, true);
 		f.setLocalizer(l);
 		l.registerLocalizable(f);
 
+		Vector usedAtts = new Vector(); //used for warning message
+		
 		for (int i = 0; i < itext.getChildCount(); i++) {
 			Element trans = itext.getElement(i);
 			if (trans == null || !trans.getName().equals("translation"))
@@ -913,9 +1133,21 @@ public class XFormParser {
 
 		if (l.getDefaultLocale() == null)
 			l.setDefaultLocale(l.getAvailableLocales()[0]);
+		
+		//print unused attribute warning message for parent element
+		if(XFormUtils.showUnusedAttributeWarning(itext, usedAtts)){
+			//System.out.println("Debug:parseItext()");
+			System.out.println(XFormUtils.unusedAttWarning(itext, usedAtts));
+		}
 	}
 
 	private static void parseTranslation (Localizer l, Element trans, FormDef f) {
+		/////for warning message
+		Vector usedAtts = new Vector();
+		usedAtts.addElement("lang");
+		usedAtts.addElement("default");
+		/////////////////////////
+		
 		String lang = trans.getAttributeValue("", "lang");
 		if (lang == null || lang.length() == 0)
 			throw new XFormParseException("no language specified for <translation>",trans);
@@ -948,18 +1180,36 @@ public class XFormParser {
 			//#endif
 		}
 		
+		//print unused attribute warning message for parent element
+		if(XFormUtils.showUnusedAttributeWarning(trans, usedAtts)){
+			//System.out.println("Debug:parseTranslation()");
+			System.out.println(XFormUtils.unusedAttWarning(trans, usedAtts));
+		}
+		
 		l.registerLocaleResource(lang, source);
 	}
 
 	private static void parseTextHandle (TableLocaleSource l, Element text, FormDef f) {
 		String id = text.getAttributeValue("", "id");
+		
+		//used for parser warnings...
+		Vector usedAtts = new Vector();
+		Vector childUsedAtts = new Vector();
+		usedAtts.addElement("id");
+		usedAtts.addElement("form");
+		childUsedAtts.addElement("form");
+		childUsedAtts.addElement("id");
+		//////////
+		
 		if (id == null || id.length() == 0)
 			throw new XFormParseException("no id defined for <text>",text);
 
 		for (int k = 0; k < text.getChildCount(); k++) {
 			Element value = text.getElement(k);
-			if (value == null || !value.getName().equals("value"))
-				continue;
+			if (value == null) continue;
+			if(!value.getName().equals("value")){
+				throw new XFormParseException("Unrecognized element ["+value.getName()+"] in Itext->translation->text");
+			}
 
 			String form = value.getAttributeValue("", "form");
 			if (form != null && form.length() == 0)
@@ -970,8 +1220,20 @@ public class XFormParser {
 
 			String textID = (form == null ? id : id + ";" + form);  //kind of a hack
 			if (l.hasMapping(textID))
-				throw new XFormParseException("duplicate definition for text ID \"" + id + "\" and form \"" + form + "\"",text);
+				throw new XFormParseException("duplicate definition for text ID \"" + id + "\" and form \"" + form + "\""+". Can only have one definition for each text form.",text);
 			l.setLocaleMapping(textID, data);
+			
+			//print unused attribute warning message for child element
+			if(XFormUtils.showUnusedAttributeWarning(value, childUsedAtts)){
+				System.out.println(XFormUtils.unusedAttWarning(value, childUsedAtts));
+				//System.out.println("Debug:parseTextHandle()");
+			}
+		}
+		
+		//print unused attribute warning message for parent element
+		if(XFormUtils.showUnusedAttributeWarning(text, usedAtts)){
+			//System.out.println("Debug:parseTextHandle()2");
+			System.out.println(XFormUtils.unusedAttWarning(text, usedAtts));
 		}
 	}
 
@@ -998,7 +1260,20 @@ public class XFormParser {
 
 	private static void parseBind (FormDef f, Element e) {
 		DataBinding binding  = new DataBinding();
-
+		
+		Vector usedAtts = new Vector();
+		usedAtts.addElement("id");
+		usedAtts.addElement("nodeset");
+		usedAtts.addElement("type");
+		usedAtts.addElement("relevant");
+		usedAtts.addElement("required");
+		usedAtts.addElement("readonly");
+		usedAtts.addElement("constraint");
+		usedAtts.addElement("constraintMsg");
+		usedAtts.addElement("calculate");
+		usedAtts.addElement("preload");
+		usedAtts.addElement("preloadParams");
+		
 		binding.setId(e.getAttributeValue("", "id"));
 
 		String nodeset = e.getAttributeValue(null, "nodeset");
@@ -1077,6 +1352,12 @@ public class XFormParser {
 		while(en.hasMoreElements()) {
 			((IXFormBindHandler)en.nextElement()).handle(e, binding);
 		}
+		
+		//print unused attribute warning message for parent element
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseBind()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
 
 		addBinding(binding);
 	}
@@ -1141,6 +1422,10 @@ public class XFormParser {
 		FormInstance instanceModel = new FormInstance(root);
 		instanceModel.setName(f.getTitle());
 		
+		Vector usedAtts = new Vector();
+		usedAtts.addElement("version");
+		usedAtts.addElement("uiVersion");
+		
 		String schema = e.getNamespace();
 		if (schema != null && schema.length() > 0 && !schema.equals(defaultNamespace)) {
 			instanceModel.schema = schema;
@@ -1159,6 +1444,12 @@ public class XFormParser {
 		f.finalizeTriggerables();
 		
 		f.setInstance(instanceModel);
+		
+		//print unused attribute warning message for parent element
+		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
+			//System.out.println("Debug:parseInstance()");
+			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
+		}
 	}
 	
 	private static Hashtable loadNamespaces(Element e, FormInstance tree) {
@@ -1956,9 +2247,11 @@ public class XFormParser {
 		return (n.getChildCount() == 0 ? null : getXMLText(n, 0, trim));
 	}
 
-	//reads all subsequent text nodes and returns the combined string
-	//needed because escape sequences are parsed into consecutive text nodes
-	//e.g. "abc&amp;123" --> (abc)(&)(123)
+	/**
+	* reads all subsequent text nodes and returns the combined string
+	* needed because escape sequences are parsed into consecutive text nodes
+	* e.g. "abc&amp;123" --> (abc)(&)(123)
+	**/
 	public static String getXMLText (Node node, int i, boolean trim) {
 		StringBuffer strBuff = null;
 

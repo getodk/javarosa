@@ -31,8 +31,14 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.util.NoLocalizedTextException;
+import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.formmanager.view.IQuestionWidget;
+
+
 
 /**
  * This class gives you all the information you need to display a question when
@@ -144,6 +150,7 @@ public class FormEntryPrompt extends FormEntryCaption {
             return mTreeElement.getValue();
     	}
     }
+   
 
     public String getAnswerText() {
         if (mTreeElement.getValue() == null)
@@ -182,10 +189,8 @@ public class FormEntryPrompt extends FormEntryCaption {
 		}
     }
     
-    public String getHelpText() {
-        return getQuestion().getHelpText();
-    }
 
+    
     public boolean isRequired() {
         return mTreeElement.required;
     }
@@ -216,4 +221,130 @@ public class FormEntryPrompt extends FormEntryCaption {
 		if (viewWidget != null)
 			viewWidget.refreshWidget(changeFlags);		
 	}
+	
+	/**
+	 * ONLY RELEVANT to Question elements!
+	 * Will throw runTimeException if this is called for anything that isn't a Question.
+	 * @return
+	 */
+	public String getHelpText(){
+		String helpText=null;
+		try{
+			helpText=localizer().getLocalizedText(((QuestionDef)element).getHelpTextID());
+		}catch(NoLocalizedTextException nlt){
+			helpText = ((QuestionDef)element).getHelpText();
+		}catch(UnregisteredLocaleException ule){
+			System.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return helpText;
+		
+	}
+
+	/**
+	 * 
+	 * @return localized Question text (default form), LabelInnerText if default form is not available.
+	 */
+	public String getQText(){
+		try{
+			return this.getText(this.getTextID(),null);
+		}catch(NoLocalizedTextException nle){
+			return getQuestion().getLabelInnerText();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param form Specific subform of question text (e.g. "audio","image", etc)
+	 * @return Question text subform (SEE Localizer.getLocalizedText(String) for fallback details). Null if form not available
+	 */
+	public String getQText(String form){
+		try{
+			return this.getText(this.getTextID(),form);
+		}catch(NoLocalizedTextException nle){
+			return null;
+		}
+	}
+	
+
+	
+	/**
+	 * Get the text for the specified selection (localized if possible)
+	 * @param sel the selection
+	 * @return localized (if available, default LabelInnerText if not) text label.  If no localized version
+	 * is available, will attempt to return labelInnerText. If not available throws NullPointerException.
+	 * @throws NullPointerException
+	 */
+	public String getSelectionText(Selection sel){
+		return getSelectChoiceText(sel.choice);
+	}
+	
+	/**
+	 * Get the text for the specified SelectChoice (localized if possible)
+	 * @param sel the selection
+	 * @return localized (if available, default LabelInnerText if not) text label.  If no localized version
+	 * is available, will attempt to return labelInnerText. If not available throws NullPointerException.
+	 * @throws NullPointerException
+	 */
+	public String getSelectChoiceText(SelectChoice sel){
+		String tID = sel.getTextID();
+		
+		if(tID == null || tID == ""){
+			return sel.getLabelInnerText();
+		}
+		
+		String text = getFormOrDefault(tID, TEXT_FORM_LONG);
+		if(text == null || text == ""){
+			text = sel.getLabelInnerText(); //final fallback
+		}
+		
+		return text;
+	}
+	
+	public String getSelectChoiceText(int i){
+		return this.getSelectChoiceText(this.getQuestion().getChoice(i));
+	}
+	
+	/**
+	 * Retrieve a Vector containing the available forms of text for the
+	 * provided select choice.
+	 * 
+	 * @param sel
+	 * @return
+	 */
+	public Vector getSelectTextForms(SelectChoice sel){
+		String tID = sel.getTextID();
+
+		if(tID == null||tID=="") return new Vector();
+		String types="";
+
+		//check for default
+		if(null != localizer().getRawText(localizer().getLocale(), tID)){
+			types+="default";
+		}
+		
+		//run through types list
+		for(int i=0;i<richMediaFormTypes.length;i++){
+			String curType = richMediaFormTypes[i];
+			if(null != localizer().getRawText(localizer().getLocale(), tID+";"+curType)){
+				types+=","+curType;
+			}
+		}
+		Vector vec = DateUtils.split(types,",",false);
+		vec.removeElement("");
+		return vec;
+	}
+	
+	/**
+	 * Get the Itext for a specific SelectChoice and specific itext form
+	 * @param s
+	 * @param form
+	 * @return
+	 */
+	public String getSelectChoiceText(SelectChoice sel, String form){
+		return getText(sel.getTextID(), form);
+	}
 }
+
