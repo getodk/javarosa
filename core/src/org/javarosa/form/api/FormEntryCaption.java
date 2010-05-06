@@ -129,6 +129,9 @@ public class FormEntryCaption implements FormElementStateListener {
 	
 	protected String getFormOrDefault(String textID, String form) {
 		String t = null;
+		if(textID == null) {
+			return this.getText(null, null);
+		}
 		try{
 			t = getText(textID,form);
 		}catch(NoLocalizedTextException nlte){
