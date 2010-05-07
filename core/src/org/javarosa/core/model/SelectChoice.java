@@ -33,7 +33,7 @@ public class SelectChoice implements Externalizable, Localizable {
 	}
 	
 	public SelectChoice (String labelID, String value) {
-		this(labelID,null,value,true);
+		this(labelID, null, value, true);
 	}
 	
 	/**
@@ -123,7 +123,6 @@ public class SelectChoice implements Externalizable, Localizable {
 	
 	public String toString () {
 		return ((textID != null && textID != "") ? "{" + textID + "}" : "") + (labelInnerText != null ? labelInnerText : "") + " => " + value;
-//		return ("{" + textID + ",innerText: " + getLabelInnerText() + "}");
 	}
 
 	public String getTextID() {

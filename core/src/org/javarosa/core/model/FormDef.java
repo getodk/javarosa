@@ -71,7 +71,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	/** The display title of the form. */
 	private String name;
 	
-	private boolean isLocalized;
 	
 	/**
 	 * A unique external name that is used to identify the form between machines
@@ -1306,17 +1305,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 
 
-	/**
-	 * Is there a translation available for his IFormElement?
-	 */
-	public boolean isLocalized() {
-		// TODO Auto-generated method stub
-		return isLocalized;
-	}
-	
-	public void setLocalized(boolean l){
-		isLocalized = l;
-	}
+
 	
 	/**
 	 * Not applicable

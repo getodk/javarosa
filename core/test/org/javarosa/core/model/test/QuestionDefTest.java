@@ -278,7 +278,6 @@ public class QuestionDefTest extends TestCase {
 		
 		
 		if(!fep.getSelectChoices().toString().equals("[choice => val, stacey's => mom]")) {
-//		if (!q.getChoices().toString().equals("[choice => val, stacey's => mom]")) {
 			fail("Could not add individual select choice"+fep.getSelectChoices().toString());
 		}
 		testSerialize(q, "w");
@@ -362,10 +361,8 @@ public class QuestionDefTest extends TestCase {
 	public void testLocaleChanged () {
 		QuestionDef q = new QuestionDef();
 		q.setLabelInnerText("zh: some text");
-//		q.setShortText("zh: short text");
 		q.setHelpText("zh: help text");
 		q.setTextID("textID");
-//		q.setShortTextID("short text", null);
 		q.setHelpTextID("help text");
 		q.addSelectChoice(new SelectChoice("choice", "val1"));
 		q.addSelectChoice(new SelectChoice("","non-loc: choice", "val2", false));

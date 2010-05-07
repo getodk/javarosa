@@ -53,7 +53,6 @@ public class XFormSerializer {
 		String s=null;
 		try {
 			serializer.setOutput(dos, null);
-//			System.out.println("DDDDDDDDDD elementToString, getNameSpace() = "+e.getNamespace());
 			e.write(serializer);
 			serializer.flush();
 			s = new String(bos.toByteArray(),"UTF-8");
