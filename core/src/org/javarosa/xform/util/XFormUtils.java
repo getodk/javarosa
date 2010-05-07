@@ -124,7 +124,8 @@ public class XFormUtils {
 			warning+=ua.elementAt(i);
 			if(i!=ua.size()-1) warning+=",";
 		}
-		warning+="]";
+		warning+="] ";
+		warning+="Location:\n"+XFormParser.getVagueLocation(e);
 		
 		return warning;
 	}

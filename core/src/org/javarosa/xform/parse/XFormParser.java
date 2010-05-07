@@ -328,7 +328,6 @@ public class XFormParser {
 		
 		
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseTitle()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
@@ -347,7 +346,6 @@ public class XFormParser {
 
 		usedAtts.addElement("name");
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseTitle()2");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
@@ -366,7 +364,6 @@ public class XFormParser {
 		modelFound = true;
 		
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseModel()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 		
@@ -446,7 +443,6 @@ public class XFormParser {
 		
 		usedAtts.addElement("mediatype");
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseUpload()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 		
@@ -529,7 +525,6 @@ public class XFormParser {
 		
 
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseControl()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 		
@@ -559,7 +554,6 @@ public class XFormParser {
 		
 
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseQuestionLabel()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
@@ -590,7 +584,6 @@ public class XFormParser {
 		
 
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseGroupHandle()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
@@ -728,7 +721,6 @@ public class XFormParser {
 		}
 		
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseOutput()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 		
@@ -755,7 +747,6 @@ public class XFormParser {
 		}
 		
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseHint()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
@@ -784,8 +775,6 @@ public class XFormParser {
 				
 				//print attribute warning for child element
 				if(XFormUtils.showUnusedAttributeWarning(child, labelUA)){
-					//System.out.println("Debug:parseItem()");
-					//System.out.println("Debug: "+XFormUtils.getAttributeList(child));
 					System.out.println(XFormUtils.unusedAttWarning(child, labelUA));
 				}
 				label = getXMLText(child, true);
@@ -805,7 +794,6 @@ public class XFormParser {
 				
 				//print attribute warning for child element
 				if(XFormUtils.showUnusedAttributeWarning(child, valueUA)){
-					//System.out.println("Debug:parseItem2()");
 					System.out.println(XFormUtils.unusedAttWarning(child, valueUA));
 				}
 				
@@ -842,7 +830,6 @@ public class XFormParser {
 		
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseItem3()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
@@ -881,7 +868,6 @@ public class XFormParser {
 				
 				//print unused attribute warning message for child element
 				if(XFormUtils.showUnusedAttributeWarning(child, labelUA)){
-					//System.out.println("Debug:parseItemset()");
 					System.out.println(XFormUtils.unusedAttWarning(child, labelUA));
 				}
 				/////////////////////////////////////////////////////////////
@@ -904,7 +890,6 @@ public class XFormParser {
 
 				//print unused attribute warning message for child element
 				if(XFormUtils.showUnusedAttributeWarning(child, copyUA)){
-					//System.out.println("Debug:parseItemset()2");
 					System.out.println(XFormUtils.unusedAttWarning(child, copyUA));
 				}
 				
@@ -919,7 +904,6 @@ public class XFormParser {
 				
 				//print unused attribute warning message for child element
 				if(XFormUtils.showUnusedAttributeWarning(child, valueUA)){
-					//System.out.println("Debug:parseItemset()3");
 					System.out.println(XFormUtils.unusedAttWarning(child, valueUA));
 				}
 				
@@ -953,7 +937,6 @@ public class XFormParser {
 		
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseItemset()4");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
@@ -1029,7 +1012,6 @@ public class XFormParser {
 		
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseGroup()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 
@@ -1138,7 +1120,6 @@ public class XFormParser {
 		
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(itext, usedAtts)){
-			//System.out.println("Debug:parseItext()");
 			System.out.println(XFormUtils.unusedAttWarning(itext, usedAtts));
 		}
 	}
@@ -1184,7 +1165,6 @@ public class XFormParser {
 		
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(trans, usedAtts)){
-			//System.out.println("Debug:parseTranslation()");
 			System.out.println(XFormUtils.unusedAttWarning(trans, usedAtts));
 		}
 		
@@ -1228,13 +1208,11 @@ public class XFormParser {
 			//print unused attribute warning message for child element
 			if(XFormUtils.showUnusedAttributeWarning(value, childUsedAtts)){
 				System.out.println(XFormUtils.unusedAttWarning(value, childUsedAtts));
-				//System.out.println("Debug:parseTextHandle()");
 			}
 		}
 		
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(text, usedAtts)){
-			//System.out.println("Debug:parseTextHandle()2");
 			System.out.println(XFormUtils.unusedAttWarning(text, usedAtts));
 		}
 	}
@@ -1357,7 +1335,6 @@ public class XFormParser {
 		
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseBind()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 
@@ -1449,7 +1426,6 @@ public class XFormParser {
 		
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){
-			//System.out.println("Debug:parseInstance()");
 			System.out.println(XFormUtils.unusedAttWarning(e, usedAtts));
 		}
 	}
