@@ -77,4 +77,8 @@ public class PointerAnswerData implements IAnswerData {
 		ExtUtil.write(out, new ExtWrapTagged(data));
 	}
 
+	public UncastData uncast() {
+		return new UncastData(data.getDisplayText());
+	}
+
 }

@@ -112,4 +112,9 @@ public class GeoPointData implements IAnswerData {
             ExtUtil.writeDecimal(out, gp[i]);
         }
     }
+
+
+	public UncastData uncast() {
+		return new UncastData(getDisplayText());
+	}
 }

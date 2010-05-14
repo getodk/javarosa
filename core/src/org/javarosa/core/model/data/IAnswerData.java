@@ -48,4 +48,6 @@ public interface IAnswerData extends Externalizable {
 	String getDisplayText ();
 	
 	IAnswerData clone ();
+	
+	UncastData uncast();
 }

@@ -78,4 +78,8 @@ public class SelectOneData implements IAnswerData {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, s);
 	}
+
+	public UncastData uncast() {
+		return new UncastData(s.getValue());
+	}
 }
