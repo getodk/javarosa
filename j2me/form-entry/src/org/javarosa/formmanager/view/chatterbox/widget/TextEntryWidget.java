@@ -32,7 +32,7 @@ public class TextEntryWidget extends ExpandedWidget {
 	private TextField textField;
 	
 	public TextEntryWidget () {
-		//#if polish.TextField.useDirectInput == true
+		//#if polish.TextField.useDirectInput == true && !polish.blackberry
 		this(TextField.MODE_UPPERCASE);
 		//#endif
 	}

@@ -101,7 +101,10 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		this.sortField = getDefaultSortField();
 		
 		tf = new TextField(Localization.get("entity.find") + " ", "", 20, TextField.ANY);
+		
+		//#if !polish.blackberry
 		tf.setInputMode(TextField.MODE_UPPERCASE);
+		//#endif
 		tf.setItemStateListener(this);
 				
         append(Graphics.BOTTOM, tf);
@@ -155,10 +158,12 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		
 		int screenwidth = 240;
 		
-		//#ifdef javarosa.patientselect.screenwidth:defined
+		//#ifdef polish.canvaswidth:defined
+		//#= screenwidth = ${ polish.canvaswidth };
+		//#elifdef polish.screenwidth:defined
+		//#= screenwidth = ${ polish.screenwidth };
+		//#elifdef javarosa.patientselect.screenwidth:defined
 		//#= screenwidth = ${ javarosa.patientselect.screenwidth };
-		//#elifdef polish.ScreenWidth:defined
-		//#= screenwidth = ${ polish.ScreenWidth };
 		//#else
 		//# screenwidth = this.getWidth();
 		//#endif

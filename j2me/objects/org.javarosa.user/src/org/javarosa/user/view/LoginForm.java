@@ -217,11 +217,15 @@ public class LoginForm extends FramedForm {
 	 */
 	public void setPasswordMode(String passwordMode) {
 		if (AddUserController.PASSWORD_FORMAT_NUMERIC.equals(passwordMode)) {
+			if(passwordField.getConstraints() != (TextField.PASSWORD | TextField.NUMERIC)) {
 			this.passwordField.setConstraints(TextField.PASSWORD
 					| TextField.NUMERIC);
+			}
 		} else if (AddUserController.PASSWORD_FORMAT_ALPHA_NUMERIC
 				.equals(passwordMode)) {
-			this.passwordField.setConstraints(TextField.PASSWORD);
+			if(this.passwordField.getConstraints() != TextField.PASSWORD) {
+				this.passwordField.setConstraints(TextField.PASSWORD);
+			}
 		}
 	}
 
