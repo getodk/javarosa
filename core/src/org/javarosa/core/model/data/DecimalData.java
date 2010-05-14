@@ -86,4 +86,8 @@ public class DecimalData implements IAnswerData {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeDecimal(out, d);
 	}
+
+	public UncastData uncast() {
+		return new UncastData(((Double)getValue()).toString());
+	}
 }

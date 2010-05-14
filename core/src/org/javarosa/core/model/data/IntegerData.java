@@ -86,4 +86,8 @@ public class IntegerData implements IAnswerData {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, n);
 	}
+
+	public UncastData uncast() {
+		return new UncastData(new Integer(n).toString());
+	}
 }

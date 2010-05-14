@@ -93,4 +93,7 @@ public class BooleanData implements IAnswerData {
 		out.writeBoolean(data);
 	}
 
+	public UncastData uncast() {
+		return new UncastData(data ? "1" : "0");
+	}
 }

@@ -79,4 +79,8 @@ public class DateData implements IAnswerData {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeDate(out, d);
 	}
+
+	public UncastData uncast() {
+		return new UncastData(DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601));
+	}
 }
