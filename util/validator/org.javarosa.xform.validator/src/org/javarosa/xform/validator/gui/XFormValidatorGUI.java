@@ -1169,10 +1169,11 @@ public class XFormValidatorGUI extends Frame implements ActionListener, KeyListe
 		wtkPath = "\"" + wtkPath;
 		jad = "\"" + jad + "\"";
 		try {
-			System.out.println("Launching emulator: \n\t" + wtkPath + "bin\\emulator.exe\"" + " -Xdescriptor " + jad );
-			addToTextArea("\nLaunching emulator: \n\t" + wtkPath + "bin\\emulator.exe\"" + " -Xdescriptor " + jad + "\n\n");
+			System.out.println("Launching emulator: \n\t" + wtkPath + "bin\\emulator.exe\"" + " -Xheapsize:32M" + " -Xheapsize:32M" + " -Xdescriptor " + jad);
+			addToTextArea("\nLaunching emulator: \n\t" + wtkPath + "bin\\emulator.exe\"" + " -Xheapsize:32M" + " -Xdescriptor " + jad + "\n\n");
 
-			process = Runtime.getRuntime().exec( new String[] { wtkPath + "bin\\emulator.exe\"", "-Xdescriptor", jad } );
+			process = Runtime.getRuntime().exec( new String[] { wtkPath + "bin\\emulator.exe\"","-Xheapsize:32M","-Xdescriptor", jad } );
+
 			brOut = new BufferedReader(
 			        new InputStreamReader(process.getInputStream()) );
 			brErr = new BufferedReader(
