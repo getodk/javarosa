@@ -71,13 +71,10 @@
   </h:head>
   <h:body>
   
-  <!--select1 ref="form-id/@type"><label>Form ID Type</label>
-  <item><label>Normal Id</label><value>normal</value></item>
-  <item><label>Extended Id</label><value>extended</value></item>
-  </select1-->
-    <input ref="form-id/@type">
-        <label>Form ID Type</label>
-    </input>
+  <select1 ref="form-id/@type"><label>Form ID Type</label>
+  	<item><label>Normal Id</label><value>normal</value></item>
+  	<item><label>Extended Id</label><value>extended</value></item>
+  </select1>
 
     <input ref="first-name">
       <label ref="jr:itext('q1')"/>

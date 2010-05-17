@@ -218,11 +218,3 @@ public class FormEntryPrompt extends FormEntryCaption {
 	}
 }
 
-		if(getSelectTextForms(sel).contains(form)) {
-			return getText(sel.getTextID(), form);
-		} else {
-			return null;
-		}
-	}
-}
-

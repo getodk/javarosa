@@ -136,4 +136,8 @@ public class Selection implements Externalizable {
 		ExtUtil.writeString(out, getValue());
 		ExtUtil.writeNumeric(out, index);
 	}
+	
+	public String getText() {
+		return choice.getCaption();
+	}
 }
