@@ -78,4 +78,13 @@ public class TimeData implements IAnswerData {
 	public UncastData uncast() {
 		return new UncastData(DateUtils.formatTime(d, DateUtils.FORMAT_ISO8601));
 	}
+	
+	public TimeData cast(UncastData data) throws IllegalArgumentException {
+		Date ret = DateUtils.parseTime(data.value);
+		if(ret != null) {
+			return new TimeData(ret);
+		}
+		
+		throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Time");
+	}
 }

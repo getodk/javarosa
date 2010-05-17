@@ -20,6 +20,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.PointerAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -38,6 +39,9 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 		Vector vs = (Vector)o;
 		for (int i = 0; i < vs.size(); i++) {
 			Selection s = (Selection)vs.elementAt(i);
+			if(s.index == -1) {
+				s.attachChoice(prompt.getQuestion());
+			}
 			choiceGroup().setSelectedIndex(s.index, true);
 		}
 	}
@@ -73,5 +77,9 @@ public class SelectMultiEntryWidget extends SelectEntryWidget {
 	 */
 	public int widgetType() {
 		return Constants.CONTROL_SELECT_MULTI;
+	}
+	
+	protected IAnswerData getAnswerTemplate() {
+		return new SelectMultiData();
 	}
 }

@@ -113,15 +113,6 @@ public class Selection implements Externalizable {
 		}
 	}
 	
-	public String getText () {
-		if (choice != null) {
-			return choice.getCaption();
-		} else {
-			System.err.println("Warning!! Calling Selection.getText() when Choice object not linked!");
-			return "[cannot access choice caption]";
-		}
-	}
-	
 	public String getValue () {
 		if (xmlValue != null && xmlValue.length() > 0) {
 			return xmlValue;

@@ -88,4 +88,8 @@ public class StringData implements IAnswerData {
 	public UncastData uncast() {
 		return new UncastData(s);
 	}
+	
+	public StringData cast(UncastData data) throws IllegalArgumentException {
+		return new StringData(data.value);
+	}
 }

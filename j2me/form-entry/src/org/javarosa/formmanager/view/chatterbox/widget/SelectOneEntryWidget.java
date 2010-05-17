@@ -18,6 +18,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.PointerAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 
@@ -41,6 +42,9 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 	
 	protected void setWidgetValue (Object o) {
 		Selection s = (Selection)o;
+		if(s.index == -1) {
+			s.attachChoice(prompt.getQuestion());
+		}
 		choiceGroup().setSelectedIndex(s.index, true);
 	}
 
@@ -72,5 +76,9 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 	 */
 	public int widgetType() {
 		return Constants.CONTROL_SELECT_ONE;
+	}
+	
+	protected IAnswerData getAnswerTemplate() {
+		return new SelectOneData();
 	}
 }

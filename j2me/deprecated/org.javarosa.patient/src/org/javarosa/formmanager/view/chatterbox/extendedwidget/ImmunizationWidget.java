@@ -25,6 +25,7 @@ import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget;
 import org.javarosa.patient.model.data.ImmunizationAnswerData;
 import org.javarosa.patient.model.data.ImmunizationData;
+import org.javarosa.patient.model.data.NumericListData;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.Item;
@@ -72,5 +73,8 @@ public class ImmunizationWidget extends ExpandedWidget {
 	public int widgetType() {
 		return CONTROL_IMMUNIZATION;
 	}
-
+	
+	protected IAnswerData getAnswerTemplate() {
+		return new ImmunizationAnswerData();
+	}
 }

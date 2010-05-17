@@ -82,4 +82,8 @@ public class SelectOneData implements IAnswerData {
 	public UncastData uncast() {
 		return new UncastData(s.getValue());
 	}
+	
+	public SelectOneData cast(UncastData data) throws IllegalArgumentException {
+		return new SelectOneData(new Selection(data.value));
+	}
 }

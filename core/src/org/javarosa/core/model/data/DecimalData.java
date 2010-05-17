@@ -19,7 +19,9 @@ package org.javarosa.core.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -89,5 +91,13 @@ public class DecimalData implements IAnswerData {
 
 	public UncastData uncast() {
 		return new UncastData(((Double)getValue()).toString());
+	}
+	
+	public DecimalData cast(UncastData data) throws IllegalArgumentException {
+		try {
+			return new DecimalData(Double.parseDouble(data.value));
+		} catch(NumberFormatException nfe) {
+			throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Decimal");
+		}
 	}
 }

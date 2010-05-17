@@ -166,5 +166,10 @@ public class NumericListData implements IAnswerData, IPatientRecord {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public IAnswerData cast(UncastData data) throws IllegalArgumentException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
