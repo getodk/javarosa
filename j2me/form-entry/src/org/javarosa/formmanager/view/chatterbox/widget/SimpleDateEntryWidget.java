@@ -21,6 +21,7 @@ import java.util.Date;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.PointerAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Item;
@@ -72,5 +73,9 @@ public class SimpleDateEntryWidget extends ExpandedWidget
 	{
 		// TODO Auto-generated method stub
 		return dateField;
+	}
+	
+	protected IAnswerData getAnswerTemplate() {
+		return new DateData();
 	}
 }

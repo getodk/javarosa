@@ -217,3 +217,12 @@ public class FormEntryPrompt extends FormEntryCaption {
 			viewWidget.refreshWidget(changeFlags);		
 	}
 }
+
+		if(getSelectTextForms(sel).contains(form)) {
+			return getText(sel.getTextID(), form);
+		} else {
+			return null;
+		}
+	}
+}
+

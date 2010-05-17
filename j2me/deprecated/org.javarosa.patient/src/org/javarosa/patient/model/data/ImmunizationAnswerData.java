@@ -21,6 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -85,4 +86,10 @@ public class ImmunizationAnswerData  implements IAnswerData {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public IAnswerData cast(UncastData data) throws IllegalArgumentException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

@@ -70,6 +70,7 @@ public class BooleanData implements IAnswerData {
 	public Object getValue() {
 		return new Boolean(data);
 	}
+	
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.model.data.IAnswerData#setValue(java.lang.Object)
@@ -95,5 +96,17 @@ public class BooleanData implements IAnswerData {
 
 	public UncastData uncast() {
 		return new UncastData(data ? "1" : "0");
+	}
+	
+	public BooleanData cast(UncastData data) throws IllegalArgumentException {
+		if("1".equals(data)) {
+			return new BooleanData(true);
+		}
+		
+		if("0".equals(data)) {
+			return new BooleanData(false);
+		}
+		
+		throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Boolean");
 	}
 }

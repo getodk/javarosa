@@ -18,6 +18,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Container;
@@ -56,7 +57,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		//don't wipe out user-entered data, even on data-changed event
 		IAnswerData data = fep.getAnswerValue();
 		if (data != null && changeFlags == FormElementStateListener.CHANGE_INIT) {
-			setWidgetValue(data.getValue());
+			setWidgetValue(cast(data).getValue());
 		}
 	}
 
@@ -89,6 +90,19 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		return prompt.getContentHeight();
 	}
 	
+	protected IAnswerData cast(IAnswerData data) {
+		if(data instanceof UncastData) {
+			return getAnswerTemplate().cast((UncastData)data);
+		} else {
+			return data;
+		}
+	}
+	
+	/**
+	 * @return An IAnswerData object which defines a template for the
+	 * data which should be given to this widget.
+	 */
+	protected abstract IAnswerData getAnswerTemplate();
 	protected abstract Item getEntryWidget (FormEntryPrompt prompt);
 	protected abstract void updateWidget (FormEntryPrompt prompt);
 	protected abstract void setWidgetValue (Object o);

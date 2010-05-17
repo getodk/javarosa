@@ -30,6 +30,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
@@ -192,6 +193,8 @@ public class XPathPathExpr extends XPathExpression {
 	public static Object unpackValue (IAnswerData val) {
 		if (val == null) {
 			return "";
+		} else if (val instanceof UncastData) {
+			return val.getValue();
 		} else if (val instanceof IntegerData) {
 			return new Double(((Integer)val.getValue()).doubleValue());
 		} else if (val instanceof DecimalData) {

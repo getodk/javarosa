@@ -90,4 +90,12 @@ public class IntegerData implements IAnswerData {
 	public UncastData uncast() {
 		return new UncastData(new Integer(n).toString());
 	}
+	
+	public IntegerData cast(UncastData data) throws IllegalArgumentException {
+		try {
+			return new IntegerData(Integer.parseInt(data.value));
+		} catch(NumberFormatException nfe) {
+			throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Decimal");
+		}
+	}
 }

@@ -98,4 +98,8 @@ public class MultiPointerAnswerData implements IAnswerData {
 		}
 		return new UncastData(ret);
 	}
+	
+	public MultiPointerAnswerData cast(UncastData data) throws IllegalArgumentException {
+		return null;
+	}
 }

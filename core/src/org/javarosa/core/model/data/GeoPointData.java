@@ -16,6 +16,8 @@
 
 package org.javarosa.core.model.data;
 
+import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -23,6 +25,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
 
 /**
@@ -116,5 +119,18 @@ public class GeoPointData implements IAnswerData {
 
 	public UncastData uncast() {
 		return new UncastData(getDisplayText());
+	}
+	
+	public GeoPointData cast(UncastData data) throws IllegalArgumentException {
+		double[] ret = new double[4];
+		
+		Vector<String> choices = DateUtils.split(data.value, " ", true);
+		int i = 0;
+		for(String s : choices) { 
+			double d = Double.parseDouble(s);
+			ret[i] = d;
+			++i;
+		}
+		return new GeoPointData(ret);
 	}
 }
