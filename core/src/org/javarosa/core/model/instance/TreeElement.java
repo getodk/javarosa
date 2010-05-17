@@ -29,10 +29,10 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.utils.CompactInstanceWrapper;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
-import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
@@ -450,7 +450,11 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	}
 	
 	private String getAttributeValue(TreeElement attribute) {
-		return (String)((StringData)attribute.getValue()).getValue();
+		if(attribute.getValue() == null) {
+			return null;
+		} else {
+			return attribute.getValue().uncast().getString();
+		}
 	}
 	
 	
@@ -476,7 +480,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * @return String
 	 */
 	public String getAttributeValue(String namespace, String name) {
-		return getAttribute(namespace,name).getValue().toString();
+		return getAttributeValue(getAttribute(namespace,name));
 	}
 
 	/**
@@ -495,13 +499,13 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 				if (value == null) {
 					attributes.removeElementAt(i);
 				} else {
-					attribut.setValue(new StringData(value));
+					attribut.setValue(new UncastData(value));
 				}
 				return;
 			}
 		}
 		TreeElement attr = TreeElement.constructAttributeElement(namespace, name);
-		attr.setValue(new StringData(value));
+		attr.setValue(new UncastData(value));
 		attr.setParent(this);
 
 		attributes.addElement(attr);
