@@ -94,4 +94,8 @@ public class AudioCaptureWidget extends ExpandedWidget
 		}
 	}
 
+	protected IAnswerData getAnswerTemplate() {
+		return new PointerAnswerData();
+	}
+
 }

@@ -19,13 +19,16 @@ package org.javarosa.core.model.data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 /**
  * A response to a question requesting a selection of
@@ -122,5 +125,30 @@ public class SelectMultiData implements IAnswerData {
 	 */
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapList(vs));
+	}
+
+	public UncastData uncast() {
+		Enumeration en = vs.elements();
+		StringBuffer selectString = new StringBuffer();
+		
+		while(en.hasMoreElements()) {
+			Selection selection = (Selection)en.nextElement();
+			if (selectString.length() > 0)
+				selectString.append(" ");
+			selectString.append(selection.getValue());
+		}
+		//As Crazy, and stupid, as it sounds, this is the XForms specification
+		//for storing multiple selections.	
+		return new UncastData(selectString.toString());
+	}
+	
+	public SelectMultiData cast(UncastData data) throws IllegalArgumentException {
+		Vector v = new Vector();
+		
+		Vector<String> choices = DateUtils.split(data.value, " ", true);
+		for(String s : choices) { 
+			v.addElement(new Selection(s));
+		}
+		return new SelectMultiData(v);
 	}
 }

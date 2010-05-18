@@ -84,4 +84,12 @@ public class StringData implements IAnswerData {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeString(out, s);
 	}
+
+	public UncastData uncast() {
+		return new UncastData(s);
+	}
+	
+	public StringData cast(UncastData data) throws IllegalArgumentException {
+		return new StringData(data.value);
+	}
 }

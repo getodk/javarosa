@@ -39,13 +39,11 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
 	}
 	
 	public Object eval (FormInstance model, EvaluationContext evalContext) {
-		Object aval = a.eval(model, evalContext);
-		Object bval = b.eval(model, evalContext);
+		Object aval = XPathFuncExpr.unpack(a.eval(model, evalContext));
+		Object bval = XPathFuncExpr.unpack(b.eval(model, evalContext));
 		boolean eq = false;
 
-		if (aval instanceof Vector || bval instanceof Vector) {
-			throw new XPathTypeMismatchException();
-		} else if (aval instanceof Boolean || bval instanceof Boolean) {
+		if (aval instanceof Boolean || bval instanceof Boolean) {
 			if (!(aval instanceof Boolean)) {
 				aval = XPathFuncExpr.toBoolean(aval);
 			} else if (!(bval instanceof Boolean)) {

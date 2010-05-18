@@ -27,6 +27,7 @@ import javax.microedition.media.Player;
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.Reference;
 import org.javarosa.core.reference.ReferenceManager;
@@ -183,7 +184,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		//don't wipe out user-entered data, even on data-changed event
 		IAnswerData data = fep.getAnswerValue();
 		if (data != null && changeFlags == FormElementStateListener.CHANGE_INIT) {
-			setWidgetValue(data.getValue());
+			setWidgetValue(cast(data).getValue());
 		}
 	}
 
@@ -206,7 +207,6 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	}
 	
 	public Item getInteractiveWidget () {
-		
 		return entryWidget;
 	}
 	
@@ -217,44 +217,21 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		return prompt.getContentHeight();
 	}
 	
+	protected IAnswerData cast(IAnswerData data) {
+		if(data instanceof UncastData) {
+			return getAnswerTemplate().cast((UncastData)data);
+		} else {
+			return data;
+		}
+	}
+	
+	/**
+	 * @return An IAnswerData object which defines a template for the
+	 * data which should be given to this widget.
+	 */
+	protected abstract IAnswerData getAnswerTemplate();
 	protected abstract Item getEntryWidget (FormEntryPrompt prompt);
 	protected abstract void updateWidget (FormEntryPrompt prompt);
 	protected abstract void setWidgetValue (Object o);
 	protected abstract IAnswerData getWidgetValue ();
-	
-//	private String getCaptureSupport(String media) {
-//		StringBuffer sbuf = new StringBuffer(media);
-//		String support = System.getProperty("supports." + media + ".capture");
-//
-//		if ((support != null) && (!support.trim().equals(""))) {
-//			sbuf.append(" capture supported");
-//			String supportRecording = System.getProperty("supports.recording");
-//			if ((supportRecording != null)
-//					&& (!supportRecording.trim().equals(""))) {
-//				String recordingEncodings = System.getProperty(media
-//						+ ".encodings");
-//				if ((recordingEncodings != null)
-//						&& (!recordingEncodings.trim().equals(""))) {
-//					sbuf.append(", recording supported to ");
-//					sbuf.append(recordingEncodings);
-//				} else {
-//					sbuf
-//							.append(", recording not supported for this media format");
-//				}
-//			} else {
-//				sbuf.append(", recording not supported");
-//			}
-//
-//			String snapshotEncodings = System.getProperty(media
-//					+ ".snapshot.encodings");
-//
-//			if (snapshotEncodings != null) {
-//				sbuf.append(", snapshots supported to ");
-//				sbuf.append(snapshotEncodings);
-//			}
-//		} else {
-//			sbuf.append(" capture not supported");
-//		}
-//		return sbuf.toString();
-//	}
 }
