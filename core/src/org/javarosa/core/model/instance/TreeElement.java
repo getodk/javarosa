@@ -28,6 +28,8 @@ import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.utils.CompactInstanceWrapper;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
@@ -55,7 +57,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	public int multiplicity; // see TreeReference for special values
 	private TreeElement parent;
 	public boolean repeatable;
-	//public boolean isAttribute; for when we support xml attributes as data nodes
+	public boolean isAttribute;// for when we support xml attributes as data nodes
 
 	private IAnswerData value;
 	private Vector children = new Vector();
@@ -75,7 +77,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	private Vector observers;
 
-	private Vector attributes = new Vector();
+	private Vector<TreeElement> attributes;
+	
+	private String namespace;
+	
 	
 	/**
 	 * TreeElement with null name and 0 multiplicity? (a "hidden root" node?)
@@ -92,6 +97,15 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		this.name = name;
 		this.multiplicity = multiplicity;
 		this.parent = null;
+		attributes = new Vector<TreeElement>();
+	}
+	
+	public static TreeElement constructAttributeElement(String namespace, String name) {
+		TreeElement element = new TreeElement(name);
+		element.isAttribute = true;
+		element.namespace = namespace;
+		element.multiplicity = TreeReference.INDEX_ATTRIBUTE;
+		return element;
 	}
 
 	public boolean isLeaf() {
@@ -315,6 +329,10 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 				((TreeElement) children.elementAt(i)).setRelevant(isRelevant(),
 						true);
 			}
+			
+			for(int i = 0 ; i < attributes.size(); ++i ) {
+				attributes.elementAt(i).setRelevant(isRelevant(), true);
+			}
 			alertStateObservers(FormElementStateListener.CHANGE_RELEVANT);
 		}
 	}
@@ -408,7 +426,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * @return String
 	 */
 	public String getAttributeNamespace(int index) {
-		return ((String[]) attributes.elementAt(index))[0];
+		return attributes.elementAt(index).namespace;
 	}
 
 	/**
@@ -418,7 +436,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * @return String
 	 */
 	public String getAttributeName(int index) {
-		return ((String[]) attributes.elementAt(index))[1];
+		return attributes.elementAt(index).name;
 	}
 
 	/**
@@ -428,7 +446,31 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * @return String
 	 */
 	public String getAttributeValue(int index) {
-		return ((String[]) attributes.elementAt(index))[2];
+		return getAttributeValue(attributes.elementAt(index));
+	}
+	
+	private String getAttributeValue(TreeElement attribute) {
+		if(attribute.getValue() == null) {
+			return null;
+		} else {
+			return attribute.getValue().uncast().getString();
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * 
+	 * @param index
+	 * @return String
+	 */
+	public TreeElement getAttribute(String namespace, String name) {
+		for (TreeElement attribute : attributes) {
+			if(attribute.getName().equals(name) && namespace == null || namespace.equals(attribute)) {
+				return attribute;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -438,12 +480,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * @return String
 	 */
 	public String getAttributeValue(String namespace, String name) {
-		for (int i = 0; i < getAttributeCount(); i++) {
-			if (name.equals(getAttributeName(i)) && (namespace == null || namespace.equals(getAttributeNamespace(i)))) {
-				return getAttributeValue(i);
-			}
-		}
-		return null;
+		return getAttributeValue(getAttribute(namespace,name));
 	}
 
 	/**
@@ -457,20 +494,21 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 			namespace = "";
 
 		for (int i = attributes.size() - 1; i >= 0; i--) {
-			String[] attribut = (String[]) attributes.elementAt(i);
-			if (attribut[0].equals(namespace) && attribut[1].equals(name)) {
-
+			TreeElement attribut =  attributes.elementAt(i);
+			if (attribut.name.equals(name) && namespace == null || namespace.equals(attribut.namespace)) {
 				if (value == null) {
 					attributes.removeElementAt(i);
-
 				} else {
-					attribut[2] = value;
+					attribut.setValue(new UncastData(value));
 				}
 				return;
 			}
 		}
+		TreeElement attr = TreeElement.constructAttributeElement(namespace, name);
+		attr.setValue(new UncastData(value));
+		attr.setParent(this);
 
-		attributes.addElement(new String[] { namespace, name, value });
+		attributes.addElement(attr);
 	}
 
 	/**
@@ -485,12 +523,13 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 			return null;
 		else {
 			for (int i = 0; i < this.attributes.size(); i++) {
-				String[] array = (String[]) attributes.elementAt(i);
-				if (array[0] == null || array[0] == "")
-					strings.addElement(new String(array[1] + "=" + array[2]));
+				TreeElement attribute = attributes.elementAt(i);
+				String value = getAttributeValue(attribute);
+				if (attribute.namespace == null || attribute.namespace == "")
+					strings.addElement(new String(attribute.getName() + "=" + value));
 				else
-					strings.addElement(new String(array[0] + ":" + array[1]
-							+ "=" + array[2]));
+					strings.addElement(new String(attribute.namespace + ":" + attribute.getName()
+							+ "=" + value));
 			}
 			return strings;
 		}
@@ -839,7 +878,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 			ref = ref.parent(step);
 			elem = elem.parent;
 		}
-		
 		return ref;
 	}
 	

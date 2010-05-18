@@ -190,6 +190,13 @@ public class FormInstance implements Persistable, Restorable {
 		for (int i = 0; i < ref.size(); i++) {
 			String name = ref.getName(i);
 			int mult = ref.getMultiplicity(i);
+			
+			if(mult == TreeReference.INDEX_ATTRIBUTE) {
+				//Should we possibly just return here? 
+				//I guess technically we could step back...
+				node = node.getAttribute(null, name);
+				continue;
+			}
 			if (mult == TreeReference.INDEX_UNBOUND) {
 				if (node.getChildMultiplicity(name) == 1) {
 					mult = 0;
@@ -198,7 +205,7 @@ public class FormInstance implements Persistable, Restorable {
 					node = null;
 					break;
 				}
-			}
+			} 
 
 			node = node.getChild(name, mult);
 			if (node == null)
@@ -221,22 +228,36 @@ public class FormInstance implements Persistable, Restorable {
 		for (int i = 0; i < ref.size(); i++) {
 			String name = ref.getName(i);
 			int mult = ref.getMultiplicity(i);
-			if (mult == TreeReference.INDEX_UNBOUND) {
-				if (cur.getChildMultiplicity(name) == 1) {
-					mult = 0;
-				} else {
-					// reference is not unambiguous
+			
+			//If the next node down the line is an attribute
+			if(mult == TreeReference.INDEX_ATTRIBUTE) {
+				//This is not the attribute we're testing
+				if(cur != root) {
+					//Add the current node
+					nodes.addElement(cur);
+				}
+				cur = cur.getAttribute(null, name);
+			}
+			
+			//Otherwise, it's another child element
+			else {
+				if (mult == TreeReference.INDEX_UNBOUND) {
+					if (cur.getChildMultiplicity(name) == 1) {
+						mult = 0;
+					} else {
+						// reference is not unambiguous
+						return null;
+					}
+				}
+
+				if (cur != root) {
+					nodes.addElement(cur);
+				}
+
+				cur = cur.getChild(name, mult);
+				if (cur == null) {
 					return null;
 				}
-			}
-
-			if (cur != root) {
-				nodes.addElement(cur);
-			}
-
-			cur = cur.getChild(name, mult);
-			if (cur == null) {
-				return null;
 			}
 		}
 		return nodes;
@@ -273,35 +294,46 @@ public class FormInstance implements Persistable, Restorable {
 
 		if (depth == sourceRef.size()) {
 			refs.addElement(node.getRef());
-		} else if (node.getNumChildren() > 0) {
+		} else {
 			String name = sourceRef.getName(depth);
 			int mult = sourceRef.getMultiplicity(depth);
-
-			Vector children = new Vector();
-			if (mult == TreeReference.INDEX_UNBOUND) {
-				int count = node.getChildMultiplicity(name);
-				for (int i = 0; i < count; i++) {
-					TreeElement child = node.getChild(name, i);
+			Vector<TreeElement> set = new Vector<TreeElement>();
+			
+			if (node.getNumChildren() > 0) {
+				if (mult == TreeReference.INDEX_UNBOUND) {
+					int count = node.getChildMultiplicity(name);
+					for (int i = 0; i < count; i++) {
+						TreeElement child = node.getChild(name, i);
+						if (child != null) {
+							set.addElement(child);
+						} else {
+							throw new IllegalStateException(); // missing/non-sequential
+							// nodes
+						}
+					}
+					if (includeTemplates) {
+						TreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
+						if (template != null) {
+							set.addElement(template);
+						}
+					}
+				} else if(mult != TreeReference.INDEX_ATTRIBUTE){
+					//TODO: Make this test mult >= 0?
+					//If the multiplicity is a simple integer, just get
+					//the appropriate child
+					TreeElement child = node.getChild(name, mult);
 					if (child != null) {
-						children.addElement(child);
-					} else {
-						throw new IllegalStateException(); // missing/non-sequential
-						// nodes
+						set.addElement(child);
 					}
 				}
-				if (includeTemplates) {
-					TreeElement template = node.getChild(name, TreeReference.INDEX_TEMPLATE);
-					if (template != null) {
-						children.addElement(template);
-					}
-				}
-			} else {
-				TreeElement child = node.getChild(name, mult);
-				if (child != null)
-					children.addElement(child);
 			}
-
-			for (Enumeration e = children.elements(); e.hasMoreElements();) {
+			
+			if(mult == TreeReference.INDEX_ATTRIBUTE) {
+				TreeElement attribute = node.getAttribute(null, name);
+				set.addElement(attribute);
+			}
+	
+			for (Enumeration e = set.elements(); e.hasMoreElements();) {
 				expandReference(sourceRef, (TreeElement)e.nextElement(), refs, includeTemplates);
 			}
 		}
@@ -322,13 +354,20 @@ public class FormInstance implements Persistable, Restorable {
 		TreeElement node = root;
 		for (int i = 0; i < ref.size(); i++) {
 			String name = ref.getName(i);
+			
+			if(ref.getMultiplicity(i) == TreeReference.INDEX_ATTRIBUTE) {
+				node = node.getAttribute(null, name);
+			} else {
 
-			TreeElement newNode = node.getChild(name, TreeReference.INDEX_TEMPLATE);
-			if (newNode == null)
-				newNode = node.getChild(name, 0);
-			if (newNode == null)
-				return null;
-			node = newNode;
+				TreeElement newNode = node.getChild(name, TreeReference.INDEX_TEMPLATE);
+				if (newNode == null) {
+					newNode = node.getChild(name, 0);
+				} 
+				if (newNode == null) {
+					return null;
+				}
+				node = newNode;
+			}
 		}
 
 		return node;

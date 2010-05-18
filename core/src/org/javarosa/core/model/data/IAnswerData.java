@@ -48,4 +48,16 @@ public interface IAnswerData extends Externalizable {
 	String getDisplayText ();
 	
 	IAnswerData clone ();
+	
+	UncastData uncast();
+
+	/**
+	 * @param data An uncast data value which is compatible
+	 * with this data type
+	 * @return  An instance of the instance's data type 
+	 * which contains that value
+	 * @throws IllegalArgumentException If the uncast data is
+	 * not in a compatible format 
+	 */
+	IAnswerData cast(UncastData data) throws IllegalArgumentException; 
 }

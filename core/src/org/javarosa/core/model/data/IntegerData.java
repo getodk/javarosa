@@ -86,4 +86,16 @@ public class IntegerData implements IAnswerData {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeNumeric(out, n);
 	}
+
+	public UncastData uncast() {
+		return new UncastData(new Integer(n).toString());
+	}
+	
+	public IntegerData cast(UncastData data) throws IllegalArgumentException {
+		try {
+			return new IntegerData(Integer.parseInt(data.value));
+		} catch(NumberFormatException nfe) {
+			throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Decimal");
+		}
+	}
 }

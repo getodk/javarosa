@@ -179,7 +179,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		// get reference for target element
 		TreeReference ref = FormInstance.unpackReference(((IFormElement) elements.lastElement()).getBind()).clone();
 		for (int i = 0; i < ref.size(); i++) {
-			ref.setMultiplicity(i, 0);
+			//There has to be a better way to encapsulate this
+			if(ref.getMultiplicity(i) != TreeReference.INDEX_ATTRIBUTE) {
+				ref.setMultiplicity(i, 0);
+			}
 		}
 
 		// fill in multiplicities for repeats along the way
@@ -223,6 +226,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public void setValue(IAnswerData data, TreeReference ref, TreeElement node) {
 		setAnswer(data, node);
 		triggerTriggerables(ref);
+		//TODO: pre-populate fix-count repeats here?
 	}
 
 	public void setAnswer(IAnswerData data, TreeReference ref) {

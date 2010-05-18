@@ -79,4 +79,17 @@ public class DateData implements IAnswerData {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeDate(out, d);
 	}
+
+	public UncastData uncast() {
+		return new UncastData(DateUtils.formatDate(d, DateUtils.FORMAT_ISO8601));
+	}
+	
+	public DateData cast(UncastData data) throws IllegalArgumentException {
+		Date ret = DateUtils.parseDate(data.value);
+		if(ret != null) {
+			return new DateData(ret);
+		}
+		
+		throw new IllegalArgumentException("Invalid cast of data [" + data.value + "] to type Date");
+	}
 }

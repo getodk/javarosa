@@ -96,6 +96,7 @@ public class JRDemoContext {
 			forms.write(XFormUtils.getFormFromResource("/imci.xml"));
 			forms.write(XFormUtils.getFormFromResource("/PhysicoChemTestsDemo.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/ImageSelectTester.xhtml"));
+			forms.write(XFormUtils.getFormFromResource("/sampleform.xml"));
 			forms.write(XFormUtils.getFormFromResource("/itemset_test.xml"));
 			
 		} catch (StorageFullException e) {

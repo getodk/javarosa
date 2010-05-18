@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
@@ -159,6 +160,16 @@ public class NumericListData implements IAnswerData, IPatientRecord {
 			data.valueList.addElement(entry.clone());
 		}
 		return data;
+	}
+
+	public UncastData uncast() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public IAnswerData cast(UncastData data) throws IllegalArgumentException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

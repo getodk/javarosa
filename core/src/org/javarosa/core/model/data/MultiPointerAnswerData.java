@@ -88,4 +88,18 @@ public class MultiPointerAnswerData implements IAnswerData {
 		}
 	}
 
+	public UncastData uncast() {
+		String ret = "";
+		for(IDataPointer datum : data) {
+			ret += datum.getDisplayText() + " ";
+		}
+		if(ret.length() > 0) {
+			ret = ret.substring(0, ret.length() -1);
+		}
+		return new UncastData(ret);
+	}
+	
+	public MultiPointerAnswerData cast(UncastData data) throws IllegalArgumentException {
+		return null;
+	}
 }

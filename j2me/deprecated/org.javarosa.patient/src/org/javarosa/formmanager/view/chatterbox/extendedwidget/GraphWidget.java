@@ -21,10 +21,8 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
 
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.util.Map;
-import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.IGraphTemplate;
 import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.LineChart;
@@ -32,6 +30,7 @@ import org.javarosa.formmanager.view.chatterbox.extendedwidget.chart.LinePointsI
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ExpandedWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.WidgetEscapeComponent;
+import org.javarosa.patient.model.data.NumericListData;
 import org.javarosa.patient.util.DateValueTuple;
 
 import de.enough.polish.ui.Item;
@@ -262,5 +261,9 @@ public class GraphWidget extends ExpandedWidget {
 	 */
 	public int widgetType() {
 		return CONTROL_GRAPH;
+	}
+
+	protected IAnswerData getAnswerTemplate() {
+		return new NumericListData();
 	}
 }

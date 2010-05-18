@@ -85,4 +85,8 @@ public class TextEntryWidget extends ExpandedWidget {
 	public int widgetType() {
 		return Constants.CONTROL_INPUT;
 	}
+
+	protected IAnswerData getAnswerTemplate() {
+		return new StringData();
+	}
 }

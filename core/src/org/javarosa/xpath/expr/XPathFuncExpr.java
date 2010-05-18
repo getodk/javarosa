@@ -29,7 +29,6 @@ import me.regexp.RE;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -37,6 +36,7 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.xpath.IExprDataType;
+import org.javarosa.xpath.XPathNodeset;
 import org.javarosa.xpath.XPathTypeMismatchException;
 import org.javarosa.xpath.XPathUnhandledException;
 
@@ -160,33 +160,37 @@ public class XPathFuncExpr extends XPathExpression {
 		} else if (name.equals("count") && args.length == 1) {
 			return count(argVals[0]);
 		} else if (name.equals("sum") && args.length == 1) {
-			return sum(model, argVals[0]);
+			if (argVals[0] instanceof XPathNodeset) {
+				return sum(((XPathNodeset)argVals[0]).toArgList());
+			} else {
+				throw new XPathTypeMismatchException("not a nodeset");				
+			}
 		} else if (name.equals("today") && args.length == 0) {
 			return DateUtils.roundDate(new Date());
 		} else if (name.equals("now") && args.length == 0) {
 			return new Date();
 		} else if (name.equals("concat")) {
-			if (args.length == 1 && argVals[0] instanceof Vector) {
-				return join("", nodesetToArgList(model, (Vector)argVals[0]));
+			if (args.length == 1 && argVals[0] instanceof XPathNodeset) {
+				return join("", ((XPathNodeset)argVals[0]).toArgList());
 			} else {
 				return join("", argVals);
 			}
 		} else if (name.equals("join") && args.length >= 1) {
-			if (args.length == 2 && argVals[1] instanceof Vector) {
-				return join(argVals[0], nodesetToArgList(model, (Vector)argVals[1]));
+			if (args.length == 2 && argVals[1] instanceof XPathNodeset) {
+				return join(argVals[0], ((XPathNodeset)argVals[1]).toArgList());
 			} else {
 				return join(argVals[0], subsetArgList(argVals, 1));
 			}
 		} else if (name.equals("checklist") && args.length >= 2) { //non-standard
-			if (args.length == 3 && argVals[2] instanceof Vector) {
-				return checklist(argVals[0], argVals[1], nodesetToArgList(model, (Vector)argVals[2]));
+			if (args.length == 3 && argVals[2] instanceof XPathNodeset) {
+				return checklist(argVals[0], argVals[1], ((XPathNodeset)argVals[2]).toArgList());
 			} else {
 				return checklist(argVals[0], argVals[1], subsetArgList(argVals, 2));
 			}
 		} else if (name.equals("weighted-checklist") && args.length >= 2 && args.length % 2 == 0) { //non-standard
-			if (args.length == 4 && argVals[2] instanceof Vector && argVals[3] instanceof Vector) {
-				Object[] factors = nodesetToArgList(model, (Vector)argVals[2]);
-				Object[] weights = nodesetToArgList(model, (Vector)argVals[3]);
+			if (args.length == 4 && argVals[2] instanceof XPathNodeset && argVals[3] instanceof XPathNodeset) {
+				Object[] factors = ((XPathNodeset)argVals[2]).toArgList();
+				Object[] weights = ((XPathNodeset)argVals[3]).toArgList();
 				if (factors.length != weights.length) {
 					throw new XPathTypeMismatchException("weighted-checklist: nodesets not same length");
 				}
@@ -310,6 +314,8 @@ public class XPathFuncExpr extends XPathExpression {
 	public static Boolean toBoolean (Object o) {
 		Boolean val = null;
 		
+		o = unpack(o);
+		
 		if (o instanceof Boolean) {
 			val = (Boolean)o;
 		} else if (o instanceof Double) {
@@ -320,8 +326,6 @@ public class XPathFuncExpr extends XPathExpression {
 			val = new Boolean(s.length() > 0);
 		} else if (o instanceof Date) {
 			val = Boolean.TRUE;
-		} else if (o instanceof Vector) {
-			return new Boolean(count(o).doubleValue() > 0);
 		} else if (o instanceof IExprDataType) {
 			val = ((IExprDataType)o).toBoolean();
 		}
@@ -342,6 +346,8 @@ public class XPathFuncExpr extends XPathExpression {
 	 */
 	public static Double toNumeric (Object o) {
 		Double val = null;
+		
+		o = unpack(o);
 		
 		if (o instanceof Boolean) {
 			val = new Double(((Boolean)o).booleanValue() ? 1 : 0);
@@ -414,6 +420,8 @@ public class XPathFuncExpr extends XPathExpression {
 	public static String toString (Object o) {
 		String val = null;
 		
+		o = unpack(o);
+		
 		if (o instanceof Boolean) {
 			val = (((Boolean)o).booleanValue() ? "true" : "false");
 		} else if (o instanceof Double) {
@@ -461,7 +469,9 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @return
 	 */
 	public static Object toDate (Object o) {
-		if (o instanceof Double) {			
+		o = unpack(o);
+		
+		if (o instanceof Double) {
 			Double n = toInt(o);
 			
 			if (n.isNaN()) {
@@ -519,8 +529,8 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @return
 	 */
 	public static Boolean multiSelected (Object o1, Object o2) {
-		String s1 = (String)o1;
-		String s2 = ((String)o2).trim();
+		String s1 = (String)unpack(o1);
+		String s2 = ((String)unpack(o2)).trim();
 		
 		return new Boolean((" " + s1 + " ").indexOf(" " + s2 + " ") != -1);
 	}
@@ -532,7 +542,7 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @return
 	 */
 	public static Double countSelected (Object o) {
-		String s = (String)o;
+		String s = (String)unpack(o);
 
 		return new Double(DateUtils.split(s, " ", true).size());
 	}
@@ -544,8 +554,8 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @return
 	 */
 	public static Double count (Object o) {
-		if (o instanceof Vector) {
-			return new Double(((Vector)o).size());
+		if (o instanceof XPathNodeset) {
+			return new Double(((XPathNodeset)o).size());
 		} else {
 			throw new XPathTypeMismatchException("not a nodeset");
 		}	
@@ -558,18 +568,12 @@ public class XPathFuncExpr extends XPathExpression {
 	 * @param o
 	 * @return
 	 */
-	public static Double sum (FormInstance model, Object o) {
-		if (o instanceof Vector) {
-			Vector v = (Vector)o;
-			double sum = 0.0;
-			for (int i = 0; i < v.size(); i++) {
-				TreeReference ref = (TreeReference)v.elementAt(i);
-				sum += toNumeric(XPathPathExpr.getRefValue(model, ref)).doubleValue();
-			}
-			return new Double(sum);
-		} else {
-			throw new XPathTypeMismatchException("not a nodeset");
-		}	
+	public static Double sum (Object argVals[]) {
+		double sum = 0.0;
+		for (int i = 0; i < argVals.length; i++) {
+			sum += toNumeric(argVals[i]).doubleValue();
+		}
+		return new Double(sum);
 	}
 
 	/**
@@ -664,31 +668,6 @@ public class XPathFuncExpr extends XPathExpression {
 		return new Boolean(result);
 	}
 
-	/**
-	 * convert a nodeset argument into a standard argument list
-	 * 
-	 * @param model
-	 * @param nodeset
-	 * @return
-	 */
-	private static Object[] nodesetToArgList (FormInstance model, Vector nodeset) {
-		Object[] args = new Object[nodeset.size()];
-		
-		for (int i = 0; i < nodeset.size(); i++) {
-			TreeReference ref = (TreeReference)nodeset.elementAt(i);
-			Object val = XPathPathExpr.getRefValue(model, ref);
-			
-			//sanity check
-			if (val == null) {
-				throw new RuntimeException("retrived a null value out of a nodeset! shouldn't happen!");
-			}
-			
-			args[i] = val;
-		}
-		
-		return args;
-	}
-
 	private static Object[] subsetArgList (Object[] args, int start) {
 		return subsetArgList(args, start, 1);
 	}
@@ -712,5 +691,13 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 		
 		return subargs;
+	}
+	
+	public static Object unpack (Object o) {
+		if (o instanceof XPathNodeset) {
+			return ((XPathNodeset)o).unpack();
+		} else {
+			return o;
+		}
 	}
 }

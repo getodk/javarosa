@@ -59,7 +59,7 @@ public class XPathConditional implements IConditionExpr {
 	}
 	
 	public Object evalRaw (FormInstance model, EvaluationContext evalContext) {
-		return expr.eval(model, evalContext);
+		return XPathFuncExpr.unpack(expr.eval(model, evalContext));
 	}
 	
 	public boolean eval (FormInstance model, EvaluationContext evalContext) {
@@ -70,9 +70,9 @@ public class XPathConditional implements IConditionExpr {
 		return XPathFuncExpr.toString(evalRaw(model, evalContext));
 	}
 	
-	public Vector evalNodeset (FormInstance model, EvaluationContext evalContext) {
+	public Vector<TreeReference> evalNodeset (FormInstance model, EvaluationContext evalContext) {
 		if (expr instanceof XPathPathExpr) {
-			return (Vector)((XPathPathExpr)expr).eval(model, evalContext, true);
+			return ((XPathPathExpr)expr).eval(model, evalContext).nodes;
 		} else {
 			throw new FatalException("evalNodeset: must be path expression");
 		}

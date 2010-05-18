@@ -23,6 +23,7 @@ import org.javarosa.cases.model.Case;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.model.utils.PreloadUtils;
@@ -66,6 +67,9 @@ public class CasePreloadHandler implements IPreloadHandler {
 			return new DateData(c.getDateOpened());
 		} else {
 			Object retVal = c.getProperty(preloadParams);
+			if(retVal instanceof String) {
+				return new UncastData((String)retVal);
+			}
 			return PreloadUtils.wrapIndeterminedObject(retVal);
 		}
 	}

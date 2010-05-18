@@ -113,17 +113,6 @@ public class Selection implements Externalizable {
 		}
 	}
 	
-
-//	@Deprecated
-//	public String getText () {
-//		if (choice != null) {
-//			return choice.getCaption();
-//		} else {
-//			System.err.println("Warning!! Calling Selection.getText() when Choice object not linked!");
-//			return "[cannot access choice caption]";
-//		}
-//	}
-	
 	public String getValue () {
 		if (xmlValue != null && xmlValue.length() > 0) {
 			return xmlValue;
@@ -146,5 +135,9 @@ public class Selection implements Externalizable {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeString(out, getValue());
 		ExtUtil.writeNumeric(out, index);
+	}
+	
+	public String getText() {
+		return choice.getCaption();
 	}
 }
