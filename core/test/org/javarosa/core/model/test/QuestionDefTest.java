@@ -273,14 +273,25 @@ public class QuestionDefTest extends TestCase {
 			fail("Select choices not empty on init");
 		}
 
-		q.addSelectChoice(new SelectChoice("","choice", "val", false));
-		q.addSelectChoice(new SelectChoice("","stacey's", "mom", false));
+		String onetext = "choice";
+		String twotext = "stacey's";
+		SelectChoice one = new SelectChoice(null,onetext, "val", false);
+		q.addSelectChoice(one);
+		SelectChoice two = new SelectChoice(null,twotext, "mom", false);
+		q.addSelectChoice(two);
 		
 		
 		if(!fep.getSelectChoices().toString().equals("[choice => val, stacey's => mom]")) {
 			fail("Could not add individual select choice"+fep.getSelectChoices().toString());
 		}
 		testSerialize(q, "w");
+		
+		this.assertEquals("Invalid select choice text returned", onetext, fep.getSelectChoiceText(one));
+		this.assertEquals("Invalid select choice text returned", twotext, fep.getSelectChoiceText(two));
+		
+		this.assertNull("Form Entry Caption incorrectly contains Image Text", fep.getSelectChoiceText(one, FormEntryCaption.TEXT_FORM_IMAGE));
+		
+		this.assertNull("Form Entry Caption incorrectly contains Audio Text", fep.getSelectChoiceText(one, FormEntryCaption.TEXT_FORM_AUDIO));
 		
 		q.removeSelectChoice(q.getChoice(0));
 		q.removeSelectChoice(q.getChoice(0));
