@@ -28,7 +28,6 @@ import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.utils.CompactInstanceWrapper;
 import org.javarosa.core.model.instance.utils.ITreeVisitor;
@@ -48,6 +47,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * a number of TreeElement children (e.g., <meta><device /><timestamp /><user_id /></meta>), or neither (e.g.,
  * <empty_node />)
  * 
+ * TreeElements can also represent attributes. Attributes are unique from normal elements in that they are
+ * not "children" of their parent, and are always leaf nodes: IE cannot have children.
+ * 
  * @author Clayton Sims
  * 
  */
@@ -57,7 +59,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	public int multiplicity; // see TreeReference for special values
 	private TreeElement parent;
 	public boolean repeatable;
-	public boolean isAttribute;// for when we support xml attributes as data nodes
+	public boolean isAttribute;
 
 	private IAnswerData value;
 	private Vector children = new Vector();
@@ -100,6 +102,14 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		attributes = new Vector<TreeElement>();
 	}
 	
+	/**
+	 * Construct a TreeElement which represents an attribute with the provided 
+	 * namespace and name.
+	 *  
+	 * @param namespace
+	 * @param name
+	 * @return A new instance of a TreeElement
+	 */
 	public static TreeElement constructAttributeElement(String namespace, String name) {
 		TreeElement element = new TreeElement(name);
 		element.isAttribute = true;
@@ -407,10 +417,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	}
 
-	/*
-	 * ==== HARD-CODED ATTRIBUTES (delete once we support writable attributes)
-	 * ====
-	 */
+	/* ==== Attributes ==== */
 
 	/**
 	 * Returns the number of attributes of this element.
@@ -449,6 +456,12 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		return getAttributeValue(attributes.elementAt(index));
 	}
 	
+	/**
+	 * Get the String value of the provided attribute 
+	 * 
+	 * @param attribute
+	 * @return
+	 */
 	private String getAttributeValue(TreeElement attribute) {
 		if(attribute.getValue() == null) {
 			return null;
@@ -459,10 +472,14 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	
 	
 	/**
+	 * Retrieves the TreeElement representing the attribute at
+	 * the provided namespace and name, or null if none exists.
 	 * 
+	 * If 'null' is provided for the namespace, it will match the first
+	 * attribute with the matching name.
 	 * 
 	 * @param index
-	 * @return String
+	 * @return TreeElement
 	 */
 	public TreeElement getAttribute(String namespace, String name) {
 		for (TreeElement attribute : attributes) {
@@ -485,7 +502,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	/**
 	 * Sets the given attribute; a value of null removes the attribute
-	 * 
 	 * 
 	 * */
 	public void setAttribute(String namespace, String name, String value) {
