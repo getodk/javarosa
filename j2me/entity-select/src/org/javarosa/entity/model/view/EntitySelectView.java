@@ -45,7 +45,6 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
-import de.enough.polish.ui.UiAccess;
 
 public class EntitySelectView<E extends Persistable> extends FramedForm implements HandledPItemStateListener, HandledCommandListener {
 	
@@ -564,7 +563,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 //#			}
 //#			
 //#		} catch (Exception e) {
-//#			IncidentLogger.die("gui-ptrdown", e);
+//#			Logger.die("gui-ptrdown", e);
 //#		}
 //#		
 //#		if (handled) {
