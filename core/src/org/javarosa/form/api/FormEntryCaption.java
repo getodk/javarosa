@@ -148,7 +148,6 @@ public class FormEntryCaption implements FormElementStateListener {
 	protected String getFormOrNull(String textID, String form) {
 		if(textID==null)textID=this.textID;
 		if(!getAvailableTextForms(textID).contains(form)){
-			System.out.println("Warning: " + form +" text form requested for ["+textID+"] but it doesn't exist! Null returned.");
 			return null;
 		}
 		return getText(textID,form);
