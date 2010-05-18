@@ -79,7 +79,7 @@ public class FormDefTest extends TestCase {
 		
 		for (int i = 1; i <= NUM_TESTS; i++) {
 			final int testID = i;
-			aSuite.addTest(new FormDefTest("QuestionDef Test " + i, new TestMethod() {
+			aSuite.addTest(new FormDefTest("FormDef Test " + i, new TestMethod() {
 				public void run (TestCase tc) {
 					((FormDefTest)tc).doTest(testID);
 				}
