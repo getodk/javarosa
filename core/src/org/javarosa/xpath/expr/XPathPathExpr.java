@@ -140,7 +140,7 @@ public class XPathPathExpr extends XPathExpression {
 
 	public XPathNodeset eval (FormInstance m, EvaluationContext evalContext) {
 		TreeReference genericRef = getReference();
-		if (m.getTemplatePath(genericRef) == null) {
+		if (genericRef.isAbsolute() && m.getTemplatePath(genericRef) == null) {
 			throw new XPathTypeMismatchException("Node " + genericRef.toString() + " does not exist!");
 		}
 		

@@ -338,13 +338,18 @@ public class FormEntryPrompt extends FormEntryCaption {
 	}
 	
 	/**
-	 * Get the Itext for a specific SelectChoice and specific itext form
+	 * Get the Itext for a specific SelectChoice and specific itext form, returns
+	 * null if the form requested is not available for the select choice
 	 * @param s
 	 * @param form
 	 * @return
 	 */
 	public String getSelectChoiceText(SelectChoice sel, String form){
-		return getText(sel.getTextID(), form);
+		if(getSelectTextForms(sel).contains(form)) {
+			return getText(sel.getTextID(), form);
+		} else {
+			return null;
+		}
 	}
 }
 
