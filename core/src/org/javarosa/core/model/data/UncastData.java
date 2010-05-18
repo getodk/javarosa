@@ -12,6 +12,16 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 /**
+ * Uncast data values are those which are not assigned a particular
+ * data type. This is relevant when data is read before a datatype is
+ * available, or when it must be pulled from external instances. 
+ * 
+ * In general, Uncast data should be used when a value is available
+ * in string form, and no adequate assumption can be made about the type
+ * of data being represented. This is preferable to making the assumption
+ * that data is a StringData object, since that will cause issues when
+ * select choices or other typed values are expected.
+ * 
  * @author ctsims
  *
  */
@@ -51,6 +61,10 @@ public class UncastData implements IAnswerData {
 		value = (String)o;
 	}
 	
+	/**
+	 * @return The string representation of this data. This value should be
+	 * castable into its appropriate data type.
+	 */
 	public String getString() {
 		return value;
 	}

@@ -31,7 +31,7 @@ public class TreeReference implements Externalizable {
 	public static final int DEFAULT_MUTLIPLICITY = 0;//multiplicity
 	public static final int INDEX_UNBOUND = -1;//multiplicity
 	public static final int INDEX_TEMPLATE = -2;//multiplicity
-	public static final int INDEX_ATTRIBUTE = -4;//multiplicity
+	public static final int INDEX_ATTRIBUTE = -4;//multiplicity flag for an attribute
 	public static final int REF_ABSOLUTE = -1;
 	
 	public static final String NAME_WILDCARD = "*";
