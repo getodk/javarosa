@@ -52,7 +52,7 @@ public class JRDemoUtil {
 	public static void loadDemoPatients(IStorageUtility patients) {
 		final String patientsFile = "/testpatients";
 
-		// #debug debug
+		//#debug debug
 		System.out.println("Initializing the test patients ");
 
 		// read test patient data into byte buffer
@@ -63,7 +63,7 @@ public class JRDemoUtil {
 		if (is == null) {
 			String err = "Test patient data file: " + patientsFile
 					+ " not found";
-			// #debug error
+			//#debug error
 			System.out.println(err);
 			throw new RuntimeException(err);
 		}
@@ -72,7 +72,7 @@ public class JRDemoUtil {
 		try {
 			len = is.read(buffer);
 		} catch (IOException e) {
-			// #debug error
+			//#debug error
 			throw new RuntimeException(e.getMessage());
 		}
 

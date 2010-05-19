@@ -32,7 +32,7 @@ public class NumericQuestionScreen extends SingleQuestionScreen {
 	}
 
 	public void createView() {
-		// #style textBox
+		//#style textBox
 		tf = new TextField("", "", 200, TextField.NUMERIC);
 		if (prompt.isRequired())
 			tf.setLabel("*" + prompt.getLongText());

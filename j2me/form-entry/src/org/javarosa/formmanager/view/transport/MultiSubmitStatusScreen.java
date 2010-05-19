@@ -151,7 +151,7 @@ public class MultiSubmitStatusScreen extends Form implements
 
 		// another problem
 		default:
-			// #debug error
+			//#debug error
 			System.out.println("Unrecognised status from Transport Manager: "
 					+ status);
 
