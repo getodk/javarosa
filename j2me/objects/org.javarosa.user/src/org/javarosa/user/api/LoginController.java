@@ -67,7 +67,7 @@ public class LoginController implements HandledCommandListener {
 
 		}
 
-		// #if javarosa.login.demobutton
+		//#if javarosa.login.demobutton
 		else if (c == LoginForm.CMD_DEMO_BUTTON) {
 			demoModeAlert = J2MEDisplay.showError(Localization.get("activity.login.demomode"), Localization.get("activity.login.demomode.intro"), null, this);
 		} else if (d == demoModeAlert) {
@@ -78,7 +78,7 @@ public class LoginController implements HandledCommandListener {
 			u.setUserType(User.DEMO_USER);
 			transitions.loggedIn(u);
 		}
-		// #endif
+		//#endif
 	}
 	
 	

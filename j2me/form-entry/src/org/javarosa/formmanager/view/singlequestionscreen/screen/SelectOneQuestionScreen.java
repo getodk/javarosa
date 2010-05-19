@@ -37,12 +37,12 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen {
 
 	public void createView() {
 		if (prompt.isRequired()) {
-			// #style choiceGroup
+			//#style choiceGroup
 			cg = new ChoiceGroup("*"
 					+ prompt.getLongText(),
 					ChoiceGroup.EXCLUSIVE);
 		} else {
-			// #style choiceGroup
+			//#style choiceGroup
 			cg = new ChoiceGroup(prompt.getLongText(),
 					ChoiceGroup.EXCLUSIVE);
 		}
