@@ -34,7 +34,7 @@ public class TimeQuestionScreen extends SingleQuestionScreen {
 	}
 
 	public void createView() {
-		// #style textBox
+		//#style textBox
 		timePicker = new DateField(prompt.getShortText(),
 				DateField.TIME);
 		// set question

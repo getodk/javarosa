@@ -33,7 +33,7 @@ public class DecimalQuestionScreen extends SingleQuestionScreen {
 
 	public void createView() {
 
-		// #style textBox
+		//#style textBox
 		tf = new TextField("", "", 200, TextField.DECIMAL);
 
 		if (prompt.isRequired())
