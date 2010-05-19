@@ -77,13 +77,13 @@ public abstract class ImageCaptureScreen extends AcquireScreen implements Comman
 
 	private void addCameraViewer() throws MediaException, IOException {
 		String refForCamera = "";
-		// #if polish.identifier.motorola/v3xx
+		//#if polish.identifier.motorola/v3xx
 		refForCamera = "capture://camera";
-		// #elif polish.group.series60e3
+		//#elif polish.group.series60e3
 		refForCamera = "capture://devcam0";
-		// #else
+		//#else
 		refForCamera = "capture://video";
-		// #endif
+		//#endif
 
 		String[] contentTypes = Manager.getSupportedContentTypes("capture");
 		if (contentTypes == null || contentTypes.length == 0) {

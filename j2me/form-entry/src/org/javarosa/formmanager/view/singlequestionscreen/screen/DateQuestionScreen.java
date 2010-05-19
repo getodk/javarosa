@@ -34,7 +34,7 @@ public class DateQuestionScreen extends SingleQuestionScreen {
 	}
 
 	public void createView() {
-		// #style textBox
+		//#style textBox
 		datePicker = new DateField(prompt.getShortText(),
 				DateField.DATE);
 		

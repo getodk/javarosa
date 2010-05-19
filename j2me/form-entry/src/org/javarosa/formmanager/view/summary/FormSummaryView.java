@@ -46,7 +46,7 @@ public class FormSummaryView extends List {
 	}
 
 	public FormSummaryView(FormEntryModel model) {
-		// #style View_All_Form
+		//#style View_All_Form
 		super("Form Overview", List.IMPLICIT);
 		this.model = model;
 		createView();

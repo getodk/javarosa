@@ -38,12 +38,12 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 
 	public void createView() {
 		if (prompt.isRequired()) {
-			// #style choiceGroup
+			//#style choiceGroup
 			cg = new ChoiceGroup("*"
 					+ prompt.getLongText(),
 					ChoiceGroup.MULTIPLE);
 		} else {
-			// #style choiceGroup
+			//#style choiceGroup
 			cg = new ChoiceGroup(prompt.getLongText(),
 					ChoiceGroup.MULTIPLE);
 		}

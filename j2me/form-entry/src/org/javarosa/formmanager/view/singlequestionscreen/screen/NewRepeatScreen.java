@@ -31,11 +31,11 @@ public class NewRepeatScreen extends FramedForm {
 	protected void createView() {
 		StringItem addNewQuestion = new StringItem(null,promptText,
 				Item.PLAIN);
-		// #style button
+		//#style button
 		StringItem yesItem = new StringItem(null, Localization
 				.get("button.Yes"), Item.BUTTON);
 		yesItem.setDefaultCommand(yesCommand);
-		// #style button
+		//#style button
 		StringItem noItem = new StringItem(null, Localization.get("button.No"),
 				Item.BUTTON);
 		noItem.setDefaultCommand(noCommand);

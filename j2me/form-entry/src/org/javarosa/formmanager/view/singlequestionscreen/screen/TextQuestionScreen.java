@@ -34,7 +34,7 @@ public class TextQuestionScreen extends SingleQuestionScreen {
 
 	public void createView() {
 		setHint("Type in your answer");
-		// #style textBox
+		//#style textBox
 		tf = new TextField("", "", 200, TextField.ANY);
 		if (prompt.isRequired())
 			tf.setLabel("*" + prompt.getLongText());

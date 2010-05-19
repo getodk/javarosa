@@ -34,11 +34,11 @@ public class LoginForm extends FramedForm {
 
 	private final static int DEFAULT_COMMAND_PRIORITY = 1;
 
-	// #if javarosa.login.demobutton
+	//#if javarosa.login.demobutton
 	private StringItem demoButton;
 	public final static Command CMD_DEMO_BUTTON = new Command(Localization.get("menu.Demo"),
 			Command.ITEM, DEFAULT_COMMAND_PRIORITY);
-	// #endif
+	//#endif
 
 	public final static Command CMD_CANCEL_LOGIN = new Command(Localization.get("menu.Exit"),
 			Command.SCREEN, DEFAULT_COMMAND_PRIORITY);
@@ -88,7 +88,7 @@ public class LoginForm extends FramedForm {
 
 		boolean recordsExist = this.users.getNumRecords() > 0;
 
-		// #debug debug
+		//#debug debug
 		System.out.println("records in RMS:" + recordsExist);
 
 		User tempUser = new User();
@@ -138,11 +138,11 @@ public class LoginForm extends FramedForm {
 		append(this.loginButton);
 		this.loginButton.setDefaultCommand(CMD_LOGIN_BUTTON);
 
-		// #if javarosa.login.demobutton
+		//#if javarosa.login.demobutton
 		this.demoButton = new StringItem(null, Localization.get("menu.Demo"), Item.BUTTON);
 		append(this.demoButton);
 		this.demoButton.setDefaultCommand(CMD_DEMO_BUTTON);
-		// #endif
+		//#endif
 
 		// put the extra text if it's been set
 		if(this.extraText != null) {

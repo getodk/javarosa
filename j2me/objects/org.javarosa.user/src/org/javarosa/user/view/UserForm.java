@@ -40,9 +40,9 @@ public class UserForm extends Form {
 
 	private IUserDecorator decorator;
 
-	// #if javarosa.adduser.extended
+	//#if javarosa.adduser.extended
 	private TextField userIDField;
-	// #endif
+	//#endif
 
 	private ChoiceGroup choice = new ChoiceGroup("", Choice.MULTIPLE);
 
@@ -54,18 +54,18 @@ public class UserForm extends Form {
 				TextField.PASSWORD);
 		this.confirmPasswordField = new TextField(Localization.get("form.user.confirmpassword"), "",
 				10, TextField.PASSWORD);
-		// #if javarosa.adduser.extended
+		//#if javarosa.adduser.extended
 		this.userIDField = new TextField(Localization.get("form.user.userid"), "", 10,
 				TextField.NUMERIC);
-		// #endif
+		//#endif
 		this.choice.append(Localization.get("form.user.giveadmin"), null);
 
 		append(this.usernameField);
 		append(this.passwordField);
 		append(this.confirmPasswordField);
-		// #if javarosa.adduser.extended
+		//#if javarosa.adduser.extended
 		append(this.userIDField);
-		// #endif
+		//#endif
 
 		this.decorator = d;
 		if (d != null) {
@@ -80,7 +80,7 @@ public class UserForm extends Form {
 
 	public int getUserId() {
 		int userid = -1;
-		// #if javarosa.adduser.extended
+		//#if javarosa.adduser.extended
 		// Clayton Sims - Mar 12, 2009 : this is stupid, and I hate it, but it
 		// is Java's
 		// only way of identifying whether userID is an int cleanly. If you have
@@ -91,7 +91,7 @@ public class UserForm extends Form {
 		} catch (NumberFormatException e) {
 			// Do nothing.
 		}
-		// #endif
+		//#endif
 		return userid;
 	}
 
@@ -107,9 +107,9 @@ public class UserForm extends Form {
 		this.usernameField.setString(user.getUsername());
 		this.passwordField.setString(user.getPassword());
 
-		// #if javarosa.adduser.extended
+		//#if javarosa.adduser.extended
 		this.userIDField.setString(String.valueOf(user.getUserID()));
-		// #endif
+		//#endif
 
 		if (user.isAdminUser()) {
 			this.choice.setSelectedIndex(0, true);
