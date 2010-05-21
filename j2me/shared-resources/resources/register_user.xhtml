@@ -1,0 +1,93 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" 
+	xmlns="http://www.w3.org/2002/xforms" 
+	xmlns:ev="http://www.w3.org/2001/xml-events" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:jr="http://openrosa.org/javarosa">
+
+	<h:head>
+
+		<h:title>User Registration</h:title>
+
+		<model>
+		
+			<itext>
+			<translation lang="English">
+				<text id="username">
+					<value>Username</value>
+				</text>
+				
+				<text id="password">
+					<value>Password</value>
+				</text>
+				
+				<text id="chwid">
+					<value>Program ID</value>
+				</text>
+				
+				<text id="usertype">
+					<value>User Type</value>
+				</text>
+				
+				<text id="user_admin">
+					<value>Super User</value>
+				</text>
+				
+				<text id="user_normal">
+					<value>Normal User</value>
+				</text>
+			
+			</translation>
+			</itext>
+
+			<instance>
+				<user_registration xmlns="http://code.javarosa.org/user_registration" xmlns:jrm="http://dev.commcarehq.org/jr/xforms" version="1" uiVersion="1">
+					<registration xmlns="http://openrosa.org/user-registration">
+					    <username/>
+					    <password/>
+					    <uuid/>
+					    <date/>
+					    
+					    <registering_phone_id/>
+					    <!--token/    UNUSED  -->
+					    
+					    <user_data>
+					    	<data key="chw_id"/>
+					    </user_data>
+			      	</registration>
+				</user_registration>
+			</instance>
+	
+			<!-- High Level -->
+			<bind nodeset="username" type="xsd:string" jr:preload="userreg" jr:preloadParams="username"/>
+			<bind nodeset="password" type="xsd:string" jr:preload="userreg" jr:preloadParams="password"/>
+			<bind nodeset="uuid" type="xsd:string" jr:preload="userreg" jr:preloadParams="uuid" />
+			<bind nodeset="date" type="xsd:dateTime" jr:preload="meta"  jr:preloadParams="start"/>
+			<bind nodeset="registering_phone_id" type="xsd:string" jr:preload="meta" jr:preloadParams="DeviceID" />
+			
+			<!-- User Data -->
+			<bind id="chwid" nodeset="user_data/data[@key='chw_id']" jr:preload="userreg" jr:preloadParams="chw_id"/>
+		</model>
+
+	</h:head>
+
+	<h:body>
+
+		<input ref="username">
+			<label ref="jr:itext('username')"/>
+		</input>
+		<input ref="password">
+			<label ref="jr:itext('password')"/>
+		</input>
+		<input bind="chwid">
+			<label ref="jr:itext('chwid')"/>
+		</input>
+		<select1 bind="type">
+			<label ref="jr:itext('usertype')"/>
+			<item><data>normal</data><label ref="jr:itext('user_normal')"/></item>
+			<item><data>admin</data><label ref="jr:itext('user_admin')"/></item>
+		</select1>
+
+	</h:body>
+
+</h:html>
+
