@@ -577,6 +577,62 @@ alertcontent {
 	background-color: #5CFFAD;
 }
 
+.patselTitleRowText{
+	/*text-wrap: false;
+	font {
+		face: proportional;
+		style: bold;
+		size: small;
+		color: white;
+	}
+	*/
+}
+
+.patselTitleRowContainer extends patselRow {
+	/*
+	background-color: lighterBlue;
+	*/
+}
+
+.loginTextFields {
+	/*margin-top:1;
+	margin-right:5;
+	margin-bottom:6;
+	padding:3;
+	layout: expand | vertical-center;
+	background-color: bgColor;
+	label-style:loginTextLabelStyle;
+	border-color: black;
+	border-width: 1;
+	font-color: black;*/
+}
+
+.loginTextFields:hover {
+	/*margin-top:1;
+	margin-right:5;
+	margin-bottom:6;
+	padding:3;
+	layout: expand | vertical-center;
+	background-color: white;
+	label-style:loginTextLabelStyle;
+	border-color: black;
+	border-width: 1;
+	font-color: black;*/
+	
+	}
+
+.loginTextLabelStyle{
+		/*margin-top:1;
+		margin-left:5;
+		margin-bottom:6;
+		padding:3;
+		layout: left | vertical-center;
+		font-style: bold;
+		border-color: black;
+		border-width: 1;*/
+}
+
+
 /** ------------    Entity Select for Model Select ----------------- **/
 .modelSelectRow {
     font-size: small;
