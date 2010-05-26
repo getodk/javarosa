@@ -118,8 +118,10 @@ public class LoginForm extends FramedForm {
 	private void initLoginControls(String username) {
 
 		// create the username and password input fields
+		//#style loginTextFields
 		this.usernameField = new TextField(Localization.get("form.login.username"), username, 50,
 				TextField.ANY);
+		//#style loginTextFields
 		this.passwordField = new TextField(Localization.get("form.login.password"), "", 10,
 				TextField.PASSWORD);
 
