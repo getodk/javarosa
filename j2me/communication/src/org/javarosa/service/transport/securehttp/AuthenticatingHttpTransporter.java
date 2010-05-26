@@ -88,6 +88,7 @@ public class AuthenticatingHttpTransporter implements Transporter {
 			throws IOException {
 		int responseCode = connection.getResponseCode();
 		if(responseCode >= 200 && responseCode < 300) {
+			message.setResponseCode(responseCode);
 			message.setStatus(TransportMessageStatus.SENT);
 			message.setResponseStream(connection.openInputStream());
 			return message;
@@ -118,7 +119,6 @@ public class AuthenticatingHttpTransporter implements Transporter {
 					"Null message.getRequestProperties() in getConnection()");
 		}
 		
-
 		conn.setRequestMethod(HttpConnection.GET);
 		conn.setRequestProperty("User-Agent", this.message.getRequestProperties().getUserAgent());
 		conn.setRequestProperty("Content-Language", this.message.getRequestProperties().getContentLanguage());

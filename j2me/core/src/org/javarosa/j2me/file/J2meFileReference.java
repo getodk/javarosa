@@ -66,6 +66,7 @@ public class J2meFileReference implements Reference
 			FileConnection connection = (FileConnection) Connector.open(uri);
 			//We only want to allow one connection to a file at a time. Otherwise
 			//we can get into trouble when we want to remove it.
+			
 			connections.put(uri, connection);
 			return connection;
 		}

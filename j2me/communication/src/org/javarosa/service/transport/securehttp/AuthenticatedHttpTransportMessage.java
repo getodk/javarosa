@@ -129,8 +129,7 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	 * @see org.javarosa.services.transport.TransportMessage#isSuccess()
 	 */
 	public boolean isSuccess() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.status == TransportMessageStatus.SENT;
 	}
 
 	/* (non-Javadoc)

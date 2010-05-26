@@ -25,7 +25,7 @@ public abstract class HttpAuthenticator {
 		if(type.equals("Digest")) {
 			return digestResponse(connection,args, message);
 		} else {
-			return customChallenge(challenge, message);
+			return customChallenge(connection, challenge, message);
 		}
 	}
 	
@@ -142,7 +142,7 @@ public abstract class HttpAuthenticator {
 	protected abstract String getUsername();
 	protected abstract String getPassword();
 	
-	public String customChallenge(String challenge, AuthenticatedHttpTransportMessage message) {
+	public String customChallenge(HttpConnection connection, String challenge, AuthenticatedHttpTransportMessage message) {
 		return null;
 	}
 }
