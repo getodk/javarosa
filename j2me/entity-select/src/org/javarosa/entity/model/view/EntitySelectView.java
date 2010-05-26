@@ -45,6 +45,10 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
+import de.enough.polish.ui.UiAccess;
+//#if polish.hasPointerEvents
+//# import org.javarosa.core.services.Logger;
+//#endif
 
 public class EntitySelectView<E extends Persistable> extends FramedForm implements HandledPItemStateListener, HandledCommandListener {
 	
@@ -276,13 +280,13 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 
 		this.setTitle(baseTitle + " (" + numMatches() + ")");
 		
-		//#style patselTitleRow
+		//#style patselTitleRowContainer
 		Container title = new Container(false);
 		applyStyle(title, STYLE_TITLE);
 		
 		String[] titleData = controller.getTitleData();
 		for (int j = 0; j < titleData.length; j++) {
-			//#style patselCell
+			//#style patselTitleRowText
 			StringItem str = new StringItem("", titleData[j]);
 			applyStyle(str, STYLE_CELL);
 			title.add(str);
@@ -574,5 +578,6 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 //#	}
 //#	
 //#endif
+
 
 }	
