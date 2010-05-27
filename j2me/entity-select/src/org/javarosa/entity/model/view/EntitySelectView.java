@@ -37,18 +37,16 @@ import org.javarosa.entity.model.Entity;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.log.HandledPItemStateListener;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Container;
+import de.enough.polish.ui.Display;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
-import de.enough.polish.ui.UiAccess;
-//#if polish.hasPointerEvents
-//# import org.javarosa.core.services.Logger;
-//#endif
 
 public class EntitySelectView<E extends Persistable> extends FramedForm implements HandledPItemStateListener, HandledCommandListener {
 	
@@ -159,17 +157,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	
 	private Style genStyleFromHints(int[] hints) {
 		
-		int screenwidth = 240;
-		
-		//#ifdef polish.canvaswidth:defined
-		//#= screenwidth = ${ polish.canvaswidth };
-		//#elifdef polish.screenwidth:defined
-		//#= screenwidth = ${ polish.screenwidth };
-		//#elifdef javarosa.patientselect.screenwidth:defined
-		//#= screenwidth = ${ javarosa.patientselect.screenwidth };
-		//#else
-		//# screenwidth = this.getWidth();
-		//#endif
+		int screenwidth = J2MEDisplay.getScreenWidth(240);
 		
 		Style style = new Style();
 		style.addAttribute("columns", new Integer(hints.length));
