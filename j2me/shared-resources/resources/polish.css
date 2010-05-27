@@ -573,25 +573,17 @@ alertcontent {
     text-wrap: false
 }
 
-.patselTitleRow extends patselRow {
-	background-color: #5CFFAD;
-}
-
 .patselTitleRowText{
-	/*text-wrap: false;
+	text-wrap: false;
 	font {
 		face: proportional;
 		style: bold;
 		size: small;
-		color: white;
 	}
-	*/
 }
 
 .patselTitleRowContainer extends patselRow {
-	/*
-	background-color: lighterBlue;
-	*/
+	background-color: #5CFFAD;
 }
 
 .loginTextFields {
@@ -632,87 +624,6 @@ alertcontent {
 		border-width: 1;*/
 }
 
-
-/** ------------    Entity Select for Model Select ----------------- **/
-.modelSelectRow {
-    font-size: small;
-	//#if javarosa.patientselect.formfactor == nokia-s40
-	/** NOTE: screen width 128px **/
-	columns: 4;
-	columns-width: 30,45,50,0;
-	//#else if javarosa.patientselect.formfactor == generic-mcs
-	columns: 4;
-	columns-width: 65,30,33,0;
-	//#else 
-	columns: 4;
-	columns-width: 110,15,25,0;
-	//#endif
-}
-
-.modelSelectEvenRow extends modelSelectRow {
-	background-color: white;
-}
-
-.modelSelectOddRow extends modelSelectRow {
-	background-color:  #EEEEFF;
-}
-
-.modelSelectSelectedRow extends modelSelectRow {
-	background-color:  #FFCCCC;
-}
-
-.modelSelectTitleRow extends modelSelectRow {
-	//#if javarosa.patientselect.formfactor == nokia-s40
-	/** NOTE: screen width 128px **/
-	columns: 4;
-	columns-width: 27,40,43,18;
-	//#else if javarosa.patientselect.formfactor == generic-mcs
-	columns: 4;
-	columns-width: 60,27,23,18;
-	//#else 
-	columns: 4;
-	columns-width: 110,95,25,10;
-	//#endif
-	background-color: #5CFFAD;
-	
-}
-
-/** ------------    Entity Select for Referral Select ----------------- **/
-
-.referralSelectRow {
-    font-size: small;
-	//#if javarosa.patientselect.formfactor == nokia-s40
-	columns: 4;
-	columns-width: 25,50,35,18;
-	//#else
-	columns: 4;
-	columns-width: 50,115,50,25;
-	//#endif
-}
-
-.referralSelectTitleRow extends modelSelectRow {
-    font-size: small;
-	//#if javarosa.patientselect.formfactor == nokia-s40
-	columns: 4;
-	columns-width: 25,50,35,18;
-	//#else
-	columns: 4;
-	columns-width: 50,115,50,25;
-	//#endif
-	background-color: #5CFFAD;
-}
-
-.referralSelectEvenRow extends referralSelectRow {
-	background-color: white;
-}
-
-.referralSelectOddRow extends referralSelectRow {
-	background-color:  #EEEEFF;
-}
-
-.referralSelectSelectedRow extends referralSelectRow {
-	background-color:  #FFCCCC;
-}
 /** ------------   Popup Style   -----------------**/
 
 .patselDetailRow {
