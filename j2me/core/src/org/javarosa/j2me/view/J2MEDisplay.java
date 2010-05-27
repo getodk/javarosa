@@ -93,6 +93,26 @@ public class J2MEDisplay {
 		
 		return alert;
 	}
+	
+
+	public static int getScreenHeight(int fallback) {
+		int staticHeight = -1;
+		int guess = de.enough.polish.ui.Display.getScreenHeight();
+		
+		//#ifdef polish.fullcanvasheight:defined
+		//#= staticHeight = ${ polish.fullcanvasheight };
+		//#elifdef polish.screenheight:defined
+		//#= staticHeight = ${ polish.screenheight };
+		//#endif
+		
+		if(guess == -1 && staticHeight == -1) {
+			return fallback;
+		} else if(guess != 1) {
+			return guess;
+		} else {
+			return staticHeight;
+		}
+	}
 
 	public static int getScreenWidth(int fallback) {
 		int staticWidth = -1;

@@ -50,18 +50,9 @@ import de.enough.polish.ui.TextField;
 
 public class EntitySelectView<E extends Persistable> extends FramedForm implements HandledPItemStateListener, HandledCommandListener {
 	
-	//TODO: Capture screen height and define this based on it
-	//#ifdef javarosa.patientselect.maxrows:defined
-	//#= private static final int MAX_ROWS_ON_SCREEN = ${ javarosa.patientselect.maxrows };
-	//#else
-	private static final int MAX_ROWS_ON_SCREEN = 10;
-	//#endif
-	
-	//#ifdef javarosa.patientselect.scrollincrement:defined
-	//#= private static final int SCROLL_INCREMENT = ${ javarosa.patientselect.scrollincrement };
-	//#else
-	private static final int SCROLL_INCREMENT = 5;	
-	//#endif
+	private int MAX_ROWS_ON_SCREEN = 10;
+
+	private int SCROLL_INCREMENT = 5;	
 	
 	public static final int NEW_DISALLOWED = 0;
 	public static final int NEW_IN_LIST = 1;
@@ -133,6 +124,8 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
         
         calculateStyles();
         
+        estimateHeights();
+        
         refresh();
 	}
 	
@@ -153,6 +146,31 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		headerStyle = genStyleFromHints(entityPrototype.getStyleHints(true));
 		
 		rowStyle = genStyleFromHints(entityPrototype.getStyleHints(false));
+	}
+	
+	private void estimateHeights() {
+		int screenHeight = J2MEDisplay.getScreenHeight(320);
+		
+		//This is _super_ basic based on commonly available
+		//phones. We should actually wait for things to be drawn once
+		//and then recalculate for real;
+		
+		if(screenHeight >= 300) { 
+			MAX_ROWS_ON_SCREEN = 10;
+		} else if(screenHeight >= 200) {
+			MAX_ROWS_ON_SCREEN = 6;
+		} else if(screenHeight >= 160) {
+			MAX_ROWS_ON_SCREEN = 5;
+		} else {
+			MAX_ROWS_ON_SCREEN = 4;
+		}
+		
+		
+		if(MAX_ROWS_ON_SCREEN > 5) {
+			SCROLL_INCREMENT = 5;
+		} else {
+			SCROLL_INCREMENT = 4;
+		}
 	}
 	
 	private Style genStyleFromHints(int[] hints) {
