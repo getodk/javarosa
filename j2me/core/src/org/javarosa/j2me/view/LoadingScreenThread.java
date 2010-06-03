@@ -24,9 +24,12 @@ public class LoadingScreenThread extends HandledTimerTask {
 	private boolean canceled;
 	private LoadingScreen screen;
 	
+	private Object lock;
+	
 	
 	public LoadingScreenThread(Display d) {
 		display = d;
+		lock = new Object();
 	}
 	
 	public void startLoading(ProgressIndicator indicator) {
@@ -38,25 +41,31 @@ public class LoadingScreenThread extends HandledTimerTask {
 	}
 
 	public void _run() {
-		if(!canceled) {
-			if(!displayed) {
-				elapsed += START_THRESHOLD;
-				display.setCurrent(screen);
-				displayed = true;
-			}
-			if(indicator != null) {
-				screen.updateProgress(indicator.getProgress());
+		synchronized(lock) {
+			if(!canceled) {
+				if(!displayed) {
+					System.out.println("Displaying loading");
+					elapsed += START_THRESHOLD;
+					display.setCurrent(screen);
+					displayed = true;
+				}	
+				if(indicator != null) {
+					screen.updateProgress(indicator.getProgress());
+				}
 			}
 		}
 	}
 	
 	public void cancelLoading() {
-		canceled = true;
-		displayed= false;
-		if(timer != null) {
-			timer.cancel();
+		synchronized(lock) {
+			canceled = true;
+			System.out.println("Loading canceled");
+			displayed= false;
+			if(timer != null) {
+				timer.cancel();
+			}
+			indicator = null;
+			screen = null;
 		}
-		indicator = null;
-		screen = null;
 	}
 }

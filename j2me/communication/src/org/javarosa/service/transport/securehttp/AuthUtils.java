@@ -5,15 +5,14 @@ package org.javarosa.service.transport.securehttp;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
 
-import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.util.MD5;
 
 /**
  * @author ctsims
  *
  */
-public class AuthenticationUtils {
+public class AuthUtils {
 	
 	public static Hashtable<String, String> getQuotedParameters(String args) {
 		//Note that this may not be correct. We're assuming that it's impossible to
@@ -54,12 +53,17 @@ public class AuthenticationUtils {
 		return argsList;
 	}
 	
-	private static String stripQuotes(String input) {
+	public static String unquote(String input) {
 		if(input.charAt(0) == '"' && input.charAt(input.length() -1) == '"') {
 			return input.substring(1, input.length()-1);
 		} else {
 			return input;
 		}
+	}
+	
+	
+	public static String quote(String input) {
+		return '"' + input + '"';
 	}
 	
 	public static String encodeQuotedParameters(Hashtable<String, String> parameters) {
@@ -74,4 +78,6 @@ public class AuthenticationUtils {
 		}
 		return encodedParams;
 	}
+	
+	public static String MD5(String input) { return MD5.toHex(new MD5(input.getBytes()).doFinal()); }
 }

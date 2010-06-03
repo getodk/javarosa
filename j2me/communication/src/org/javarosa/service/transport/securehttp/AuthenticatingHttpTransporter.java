@@ -119,7 +119,7 @@ public class AuthenticatingHttpTransporter implements Transporter {
 					"Null message.getRequestProperties() in getConnection()");
 		}
 		
-		conn.setRequestMethod(HttpConnection.GET);
+		conn.setRequestMethod(message.getMethod());
 		conn.setRequestProperty("User-Agent", this.message.getRequestProperties().getUserAgent());
 		conn.setRequestProperty("Content-Language", this.message.getRequestProperties().getContentLanguage());
 		conn.setRequestProperty("MIME-version", this.message.getRequestProperties().getMimeVersion());

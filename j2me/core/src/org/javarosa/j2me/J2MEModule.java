@@ -21,9 +21,11 @@ package org.javarosa.j2me;
 
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.Logger;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.storage.IStorageFactory;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.j2me.file.J2meFileSystemProperties;
 import org.javarosa.j2me.log.J2MELogger;
 import org.javarosa.j2me.storage.rms.RMSStorageUtilityIndexed;
 
@@ -45,6 +47,10 @@ public class J2MEModule implements IModule {
 		});
 
 		Logger.registerLogger(new J2MELogger());
+		
+		J2meFileSystemProperties properties = new J2meFileSystemProperties();
+		PropertyManager._().addRules(properties);
+		properties.initializeFileReference();
 	}
 
 }
