@@ -37,8 +37,10 @@ import org.javarosa.entity.model.Entity;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.log.HandledPItemStateListener;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Container;
+import de.enough.polish.ui.Display;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
@@ -48,18 +50,9 @@ import de.enough.polish.ui.TextField;
 
 public class EntitySelectView<E extends Persistable> extends FramedForm implements HandledPItemStateListener, HandledCommandListener {
 	
-	//TODO: Capture screen height and define this based on it
-	//#ifdef javarosa.patientselect.maxrows:defined
-	//#= private static final int MAX_ROWS_ON_SCREEN = ${ javarosa.patientselect.maxrows };
-	//#else
-	private static final int MAX_ROWS_ON_SCREEN = 10;
-	//#endif
-	
-	//#ifdef javarosa.patientselect.scrollincrement:defined
-	//#= private static final int SCROLL_INCREMENT = ${ javarosa.patientselect.scrollincrement };
-	//#else
-	private static final int SCROLL_INCREMENT = 5;	
-	//#endif
+	private int MAX_ROWS_ON_SCREEN = 10;
+
+	private int SCROLL_INCREMENT = 5;	
 	
 	public static final int NEW_DISALLOWED = 0;
 	public static final int NEW_IN_LIST = 1;
@@ -131,6 +124,8 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
         
         calculateStyles();
         
+        estimateHeights();
+        
         refresh();
 	}
 	
@@ -153,19 +148,34 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		rowStyle = genStyleFromHints(entityPrototype.getStyleHints(false));
 	}
 	
+	private void estimateHeights() {
+		int screenHeight = J2MEDisplay.getScreenHeight(320);
+		
+		//This is _super_ basic based on commonly available
+		//phones. We should actually wait for things to be drawn once
+		//and then recalculate for real;
+		
+		if(screenHeight >= 300) { 
+			MAX_ROWS_ON_SCREEN = 10;
+		} else if(screenHeight >= 200) {
+			MAX_ROWS_ON_SCREEN = 6;
+		} else if(screenHeight >= 160) {
+			MAX_ROWS_ON_SCREEN = 5;
+		} else {
+			MAX_ROWS_ON_SCREEN = 4;
+		}
+		
+		
+		if(MAX_ROWS_ON_SCREEN > 5) {
+			SCROLL_INCREMENT = 5;
+		} else {
+			SCROLL_INCREMENT = 4;
+		}
+	}
+	
 	private Style genStyleFromHints(int[] hints) {
 		
-		int screenwidth = 240;
-		
-		//#ifdef polish.canvaswidth:defined
-		//#= screenwidth = ${ polish.canvaswidth };
-		//#elifdef polish.screenwidth:defined
-		//#= screenwidth = ${ polish.screenwidth };
-		//#elifdef javarosa.patientselect.screenwidth:defined
-		//#= screenwidth = ${ javarosa.patientselect.screenwidth };
-		//#else
-		//# screenwidth = this.getWidth();
-		//#endif
+		int screenwidth = J2MEDisplay.getScreenWidth(240);
 		
 		Style style = new Style();
 		style.addAttribute("columns", new Integer(hints.length));
@@ -276,13 +286,13 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 
 		this.setTitle(baseTitle + " (" + numMatches() + ")");
 		
-		//#style patselTitleRow
+		//#style patselTitleRowContainer
 		Container title = new Container(false);
 		applyStyle(title, STYLE_TITLE);
 		
 		String[] titleData = controller.getTitleData();
 		for (int j = 0; j < titleData.length; j++) {
-			//#style patselCell
+			//#style patselTitleRowText
 			StringItem str = new StringItem("", titleData[j]);
 			applyStyle(str, STYLE_CELL);
 			title.add(str);
@@ -574,5 +584,6 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 //#	}
 //#	
 //#endif
+
 
 }	
