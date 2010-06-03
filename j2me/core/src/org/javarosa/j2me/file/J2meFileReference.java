@@ -77,7 +77,7 @@ public class J2meFileReference implements Reference
 		con.delete();
 		
 		con.close();
-		connections.remove(con);
+		connections.remove(getLocalURI());
 	}
 
 	public String getLocalURI() {

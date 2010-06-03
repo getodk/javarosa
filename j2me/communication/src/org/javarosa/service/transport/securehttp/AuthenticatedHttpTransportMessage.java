@@ -3,6 +3,7 @@
  */
 package org.javarosa.service.transport.securehttp;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.Date;
 
 import javax.microedition.io.HttpConnection;
 
+import org.javarosa.core.services.transport.payload.IDataPayload;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.services.transport.TransportMessage;
@@ -33,12 +35,34 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	InputStream response;
 	HttpAuthenticator authenticator;
 	String authentication;
+	String failureReason;
+	
+	IDataPayload payload;
+	
+	
+	public static AuthenticatedHttpTransportMessage AuthenticatedHttpRequest(String URL, HttpAuthenticator authenticator) {
+		AuthenticatedHttpTransportMessage message = new AuthenticatedHttpTransportMessage(URL, authenticator);
+		return message;	
+	}
+	
+	public static AuthenticatedHttpTransportMessage AuthenticatedHttpPOST(String URL, IDataPayload payload, HttpAuthenticator authenticator) {
+		AuthenticatedHttpTransportMessage message = new AuthenticatedHttpTransportMessage(URL, authenticator);
+		message.payload = payload;
+		return message;
+	}
 
-	public AuthenticatedHttpTransportMessage(String URL, HttpAuthenticator authenticator) {
+	private AuthenticatedHttpTransportMessage(String URL, HttpAuthenticator authenticator) {
 		created = new Date();
 		this.status = TransportMessageStatus.QUEUED;
 		this.URL = URL;
 		this.authenticator = authenticator;
+	}
+	
+	public String getMethod() {
+		if(payload == null) {
+			return HttpConnection.GET;
+		}
+		return HttpConnection.POST;
 	}
 	
 	public String getUrl() {
@@ -70,8 +94,10 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	 * @see org.javarosa.services.transport.TransportMessage#getContentStream()
 	 */
 	public InputStream getContentStream() {
-		//GET only for now...
-		return null;
+		if(payload == null) {
+			return new ByteArrayInputStream("".getBytes());
+		}
+		return payload.getPayloadStream();
 	}
 
 	/* (non-Javadoc)
@@ -93,8 +119,7 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	 * @see org.javarosa.services.transport.TransportMessage#getFailureReason()
 	 */
 	public String getFailureReason() {
-		// TODO Auto-generated method stub
-		return null;
+		return failureReason;
 	}
 
 	/* (non-Javadoc)
@@ -143,6 +168,7 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	 * @see org.javarosa.services.transport.TransportMessage#setFailureReason(java.lang.String)
 	 */
 	public void setFailureReason(String reason) {
+		failureReason = reason;
 	}
 
 	/* (non-Javadoc)
@@ -183,6 +209,10 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	}
 	
 	public String getAuthString() {
+		if(authentication == null) {
+			//generally pre-challenge
+			return authenticator.checkCache(this);
+		}
 		return authentication;
 	}
 	
@@ -194,7 +224,7 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 		return responseCode;
 	}
 	
-	public void setResponseStream(InputStream response) {
+	protected void setResponseStream(InputStream response) {
 		this.response = response;
 	}
 	
