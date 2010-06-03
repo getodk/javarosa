@@ -20,43 +20,52 @@ import org.javarosa.core.util.PropertyUtils;
 public class J2meFileSystemProperties implements IPropertyRules {
 	
 	public static final String FILE_SYSTEM_ROOT = "j2me-fileroot";
-	Vector<String> roots;
+	Vector<String> fileroots;
 	
 	J2meFileRoot currentRoot;
 	
 	public J2meFileSystemProperties() {
-		roots = new Vector<String>();
-		for(Enumeration en = FileSystemRegistry.listRoots(); en.hasMoreElements() ; ) {
-			String root = (String)en.nextElement();
-			if(root.endsWith("/")) {
-				//cut off any trailing /'s
-				root = root.substring(0, root.length() -1);
-				roots.addElement(root);
+
+	}
+	
+	private Vector<String> roots() {
+		if(fileroots == null) {
+			fileroots = new Vector<String>();
+			for(Enumeration en = FileSystemRegistry.listRoots(); en.hasMoreElements() ; ) {
+				String root = (String)en.nextElement();
+				if(root.endsWith("/")) {
+					//cut off any trailing /'s
+					root = root.substring(0, root.length() -1);
+					fileroots.addElement(root);
+				}
 			}
 		}
+		return fileroots;
 	}
 	
 	public String getPreferredDefaultRoot() {
 		Vector<String> preferredRoots = getCardRoots();
 		
-		for(String root : roots) {
+		for(String root : roots()) {
 			if(preferredRoots.contains(root.toLowerCase())) {
 				return root;
 			}
 		}
 		//no memory card roots found, just go with the first one
-		if(roots.size() > 0) {
-			return roots.elementAt(0);
+		if(roots().size() > 0) {
+			return roots().elementAt(0);
 		}
 		return null;
 	}
 	
 	public void initializeFileReference() {
-		String preferred = getPreferredDefaultRoot();
-		if(preferred != null) {
-			PropertyUtils.initializeProperty(FILE_SYSTEM_ROOT, preferred);
-		}
 		String root = PropertyManager._().getSingularProperty(FILE_SYSTEM_ROOT);
+		if(root == null) {
+			root = getPreferredDefaultRoot();
+			if(root != null) {
+				PropertyManager._().setProperty(FILE_SYSTEM_ROOT, root);
+			}
+		}
 		if(root != null) {
 			currentRoot = new J2meFileRoot(root);
 			ReferenceManager._().addReferenceFactory(currentRoot);
@@ -119,7 +128,7 @@ public class J2meFileSystemProperties implements IPropertyRules {
 	 */
 	public Vector allowableValues(String propertyName) {
 		if(propertyName.equals(FILE_SYSTEM_ROOT)) {
-			return roots;
+			return roots();
 		}
 		return null;
 	}
@@ -148,7 +157,7 @@ public class J2meFileSystemProperties implements IPropertyRules {
 	 * @see org.javarosa.core.services.properties.IPropertyRules#checkValueAllowed(java.lang.String, java.lang.String)
 	 */
 	public boolean checkValueAllowed(String propertyName, String potentialValue) {
-		if(propertyName.equals(FILE_SYSTEM_ROOT) && roots.contains(potentialValue)) {
+		if(propertyName.equals(FILE_SYSTEM_ROOT) && roots().contains(potentialValue)) {
 			return true;
 		}
 		return false;
