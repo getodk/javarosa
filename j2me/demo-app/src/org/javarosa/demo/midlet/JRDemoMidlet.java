@@ -19,6 +19,7 @@ package org.javarosa.demo.midlet;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
+import org.javarosa.core.services.Logger;
 import org.javarosa.demo.applogic.JRDemoContext;
 import org.javarosa.demo.util.JRDemoUtil;
 
