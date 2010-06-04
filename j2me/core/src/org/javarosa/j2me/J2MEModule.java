@@ -48,9 +48,15 @@ public class J2MEModule implements IModule {
 
 		Logger.registerLogger(new J2MELogger());
 		
+		//The j2merosa.disable.autofile is used if the automatic file
+		//system setup should not be used (since it might trigger security
+		//problems on some devices)
+		
+		//#if !j2merosa.disable.autofile
 		J2meFileSystemProperties properties = new J2meFileSystemProperties();
 		PropertyManager._().addRules(properties);
 		properties.initializeFileReference();
+		//#endif
 	}
 
 }

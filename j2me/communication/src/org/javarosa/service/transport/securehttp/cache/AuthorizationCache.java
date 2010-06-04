@@ -23,6 +23,10 @@ public class AuthorizationCache {
 	private AuthorizationCache() {
 	}
 	
+	/**
+	 * Loads the cache and makes it available for use.
+	 * @return The Authorization Cache.
+	 */
 	public static AuthorizationCache load() {
 		if(_ == null) {
 			_ = new AuthorizationCache();
@@ -33,6 +37,10 @@ public class AuthorizationCache {
 		return _;
 	}
 	
+	/**
+	 * Caches the provided record for future use.
+	 * @param record
+	 */
 	public void cache(AuthCacheRecord record) {
 		Vector<AuthCacheRecord> invalidated = new Vector<AuthCacheRecord>();
 		for(AuthCacheRecord old : records) {
@@ -46,6 +54,11 @@ public class AuthorizationCache {
 		records.addElement(record);
 	}
 	
+	/** 
+	 * @param message
+	 * @return An authentication header for the provided message if one could
+	 * be created. Null if none could.
+	 */
 	public String retrieveAuthHeader(AuthenticatedHttpTransportMessage message) {
 		for(AuthCacheRecord r: records) {
 			if(r.validFor(message.getUrl())) {

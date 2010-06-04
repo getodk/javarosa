@@ -4,6 +4,9 @@
 package org.javarosa.service.transport.securehttp;
 
 /**
+ * The default provider for http credentials. Simply provides a username
+ * and password for HTTP authentication upon request.
+ * 
  * @author ctsims
  *
  */

@@ -15,6 +15,15 @@ import org.javarosa.service.transport.securehttp.AuthUtils;
 import org.javarosa.service.transport.securehttp.AuthenticatedHttpTransportMessage;
 
 /**
+ * A digest authorization response object which accepts the
+ * various parameters associated with digest authentication
+ * challenges, and creates the appropriate authorization
+ * header for them. 
+ * 
+ * It is also a cachable response header, capable of creating
+ * a new response later for additional messages with the same
+ * credentails.
+ * 
  * @author ctsims
  *
  */
@@ -43,6 +52,10 @@ public class DigestAuthResponse implements AuthCacheRecord {
 		return URL;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.service.transport.securehttp.cache.AuthCacheRecord#invalidates(org.javarosa.service.transport.securehttp.cache.AuthCacheRecord)
+	 */
 	public boolean invalidates(AuthCacheRecord record) {
 		if(record.getUrl().equals(this.URL)) { return true; };
 		
@@ -66,6 +79,13 @@ public class DigestAuthResponse implements AuthCacheRecord {
 		return parameters.put(key,value);
 	}
 	
+	/**
+	 * Builds an auth response for the provided message based on the 
+	 * parameters currently available for authentication
+	 * @param message
+	 * @return An Authenticate HTTP header for the message if one could be
+	 * created, null otherwise.
+	 */
 	public String buildResponse(AuthenticatedHttpTransportMessage message) {
 		String qop = parameters.get("qop");
 		
@@ -128,6 +148,10 @@ public class DigestAuthResponse implements AuthCacheRecord {
 	}
 	
 	private String getNonceCount() {
+		//The nonce count represents the number of
+		//times that the nonce has been used for authentication
+		//and must be incremented for each request. Otherwise
+		//the nonce data becomes unavailable.
 		if(!parameters.contains("nc")) {
 			String nc = "00000001";
 			parameters.put("nc",nc);
@@ -159,6 +183,10 @@ public class DigestAuthResponse implements AuthCacheRecord {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.service.transport.securehttp.cache.AuthCacheRecord#retrieve(org.javarosa.service.transport.securehttp.AuthenticatedHttpTransportMessage)
+	 */
 	public String retrieve(AuthenticatedHttpTransportMessage message) {
 		//TODO: Extract the URI here and replace the one in the current parameter set
 		//so that we can use the same nonce on multiple URI's.
