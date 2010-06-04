@@ -21,6 +21,14 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.simplehttp.HttpRequestProperties;
 
 /**
+ * An AuthenticatedHttpTransportMessage is a transport message which is used to
+ * either perform a GET or POST request to an HTTP server, which includes the 
+ * capacity for authenticating with that server if a WWW-Authenticate challenge
+ * is issued. 
+ * 
+ * AuthenticatedHttpTransportMessage are currently unable to cache themselves
+ * natively with the transport service.
+ * 
  * @author ctsims
  *
  */
@@ -40,11 +48,30 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	IDataPayload payload;
 	
 	
+	/**
+	 * Creates a message which will perform an HTTP GET Request to the server referenced at
+	 * the given URL. 
+	 * 
+	 * @param URL The requested server URL
+	 * @param authenticator An authenticator which is capable of providing credentials upon
+	 * request.
+	 * @return A new authenticated HTTP message ready for sending.
+	 */
 	public static AuthenticatedHttpTransportMessage AuthenticatedHttpRequest(String URL, HttpAuthenticator authenticator) {
 		AuthenticatedHttpTransportMessage message = new AuthenticatedHttpTransportMessage(URL, authenticator);
 		return message;	
 	}
 	
+	/**
+	 * Creates a message which will perform an HTTP POST Request to the server referenced at
+	 * the given URL. 
+	 * 
+	 * @param URL The requested server URL
+	 * @param authenticator An authenticator which is capable of providing credentials upon
+	 * request.
+	 * @param payload A data payload which will be posted to the remote server.
+	 * @return A new authenticated HTTP message ready for sending.
+	 */
 	public static AuthenticatedHttpTransportMessage AuthenticatedHttpPOST(String URL, IDataPayload payload, HttpAuthenticator authenticator) {
 		AuthenticatedHttpTransportMessage message = new AuthenticatedHttpTransportMessage(URL, authenticator);
 		message.payload = payload;
@@ -58,6 +85,10 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 		this.authenticator = authenticator;
 	}
 	
+	/**
+	 * @return The HTTP request method (Either GET or POST) for
+	 * this message.
+	 */
 	public String getMethod() {
 		if(payload == null) {
 			return HttpConnection.GET;
@@ -65,6 +96,9 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 		return HttpConnection.POST;
 	}
 	
+	/**
+	 * @return The HTTP URL of the server for this message
+	 */
 	public String getUrl() {
 		return URL;
 	}
@@ -198,7 +232,16 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	public void setID(int ID) {
 		this.recordId = ID;
 	}
-	
+
+	/**
+	 * Issues an authentication challenge from the provided HttpConnection
+	 * 
+	 * @param connection The connection which issued the challenge
+	 * @param challenge The WWW-Authenticate challenge issued.
+	 * @return True if the challenge was addressed by the message's authenticator,
+	 * and the request should be retried, False if the challenge could not be 
+	 * addressed.
+	 */
 	public boolean issueChallenge(HttpConnection connection, String challenge) {
 		authentication = this.authenticator.challenge(connection, challenge, this);
 		if(authentication == null) {
@@ -208,6 +251,12 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 		}
 	}
 	
+	/**
+	 * @return the current best-guess authorization header for this message, 
+	 * either produced as a response to a WWW-Authenticate challenge, or 
+	 * provided by the authentication cache based on previous requests
+	 * (if enabled and relevant in the message's authenticator). 
+	 */
 	public String getAuthString() {
 		if(authentication == null) {
 			//generally pre-challenge
@@ -216,18 +265,35 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 		return authentication;
 	}
 	
+	/**
+	 * @param code The response code of the most recently attempted
+	 * request.
+	 */
 	public void setResponseCode(int code) {
 		this.responseCode = code;
 	}
 	
+	/**
+	 * @return code The response code of the most recently attempted
+	 * request.
+	 */
 	public int getResponseCode() {
 		return responseCode;
 	}
 	
+	/**
+	 * Sets the stream of the response from a delivery attempt
+	 * @param response The stream provided from the http connection
+	 * from a deliver attempt
+	 */
 	protected void setResponseStream(InputStream response) {
 		this.response = response;
 	}
 	
+	/**
+	 * @return The stream provided from the http connection
+	 * from the previous deliver attempt
+	 */
 	public InputStream getResponse() {
 		return response;
 	}
@@ -247,6 +313,10 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 		//doesn't cache;
 	}
 
+	/**
+	 * @return The properties for this http request (other than
+	 * authorization headers).
+	 */
 	public HttpRequestProperties getRequestProperties() {
 		return new HttpRequestProperties();
 	}

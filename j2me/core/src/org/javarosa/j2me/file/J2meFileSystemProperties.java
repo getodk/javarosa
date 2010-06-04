@@ -11,9 +11,18 @@ import javax.microedition.io.file.FileSystemRegistry;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
-import org.javarosa.core.util.PropertyUtils;
 
 /**
+ * The J2meFileSystemProperties class provides a clean and quick
+ * interface for configuring the parameters associated with the
+ * local file system. Registering the class provides the settings
+ * interface with a way to determine and configure a local 
+ * RootFactory (operating with the ReferenceManager in the
+ * local runtime environment), and it provides a helper method
+ * to initialize the most like-useful file root on startup, thus
+ * making jr://file/ references work reliably without manual
+ * configuration or intervention. 
+ * 
  * @author ctsims
  *
  */
@@ -43,6 +52,12 @@ public class J2meFileSystemProperties implements IPropertyRules {
 		return fileroots;
 	}
 	
+	/**
+	 * @return A root in the local environment which is deemed
+	 * to be likely to be the most useful with which to store
+	 * and retrieve data, if one exists. Null if no file roots
+	 * are available in the current environment.
+	 */
 	public String getPreferredDefaultRoot() {
 		Vector<String> preferredRoots = getCardRoots();
 		
@@ -58,6 +73,12 @@ public class J2meFileSystemProperties implements IPropertyRules {
 		return null;
 	}
 	
+	/**
+	 * Makes available a file reference in the current environment which is set
+	 * to either be the current property value for a file system root, or is 
+	 * set to the preferred default root inferred by the getPreferredDefaultRoot()
+	 * method.
+	 */
 	public void initializeFileReference() {
 		String root = PropertyManager._().getSingularProperty(FILE_SYSTEM_ROOT);
 		if(root == null) {
@@ -104,9 +125,6 @@ public class J2meFileSystemProperties implements IPropertyRules {
 		
 		//For (sony?)
 		phoneRoots.addElement("memorystick");
-		
-		//For BlackBerry's
-		phoneRoots.addElement("");
 		
 		//For Emulators
 		phoneRoots.addElement("root1");
