@@ -348,3 +348,11 @@ user.create.header=New User
 
 sending.status.success=Successfully Submitted. Today we have received ${0} forms from you.
 sending.status.problem.datasafe=Successfully Submitted. Your data is safe, but we made a small mistake. We're working on it.
+
+user.entity.name=User
+user.entity.username=Username
+user.entity.type=Type
+user.entity.admin=Administrator
+user.entity.normal=Normal
+user.entity.demo=Demo
+user.entity.unknown=Unknown

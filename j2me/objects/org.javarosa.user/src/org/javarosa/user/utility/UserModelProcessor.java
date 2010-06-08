@@ -30,6 +30,7 @@ public class UserModelProcessor implements IInstanceProcessor {
 	
 	private static final String XMLNS = "http://openrosa.org/user-registration";
 	private static final String elementName = "registration";
+	private  User user;
 	
 	XFormAnswerDataSerializer serializer = new XFormAnswerDataSerializer();
 
@@ -66,6 +67,10 @@ public class UserModelProcessor implements IInstanceProcessor {
 		}
 	}
 	
+	public User getRegisteredUser() {
+		return user;
+	}
+	
 	private void parseRegistration(TreeElement head) throws MalformedUserModelException, StorageFullException {
 		
 		String username = getString(getChild(head, "username"),head);
@@ -75,10 +80,8 @@ public class UserModelProcessor implements IInstanceProcessor {
 		User u = getUserFromStorage(uuid);
 		
 		if(u == null) {
-			//TODO: Integer ID is deprecated.
-			u = new User(username,password,-1);
+			u = new User(username,password, uuid);
 		}
-		
 		
 		TreeElement data = getChild(head,"user_data");
 		
@@ -96,6 +99,7 @@ public class UserModelProcessor implements IInstanceProcessor {
 		}
 		
 		storage().write(u);
+		user = u; 
 	}
 	
 	private IStorageUtilityIndexed storage() {
@@ -136,7 +140,7 @@ public class UserModelProcessor implements IInstanceProcessor {
 			throw new MalformedUserModelException("No data in Element: '" + element.getName() + "' with parent: " + parent.getName());
 		}
 		
-		return (String)serializer.serializeAnswerData(element.getValue());
+		return element.getValue().uncast().getString();
 	}
 	
 	

@@ -16,6 +16,8 @@ import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.NamespaceRetrievalMethod;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
+import org.javarosa.user.api.transitions.AddUserTransitions;
+import org.javarosa.user.model.User;
 import org.javarosa.user.utility.UserModelProcessor;
 
 /**
@@ -27,7 +29,7 @@ import org.javarosa.user.utility.UserModelProcessor;
  * @author ctsims
  *
  */
-public abstract class AddUserFormEntryState extends FormEntryState {
+public abstract class AddUserFormEntryState extends FormEntryState implements AddUserTransitions {
 
 	private String formName;
 	private Vector<IPreloadHandler> preloaders;
@@ -64,14 +66,16 @@ public abstract class AddUserFormEntryState extends FormEntryState {
 		if(formWasCompleted) {
 			UserModelProcessor processor = new UserModelProcessor();
 			processor.processInstance(instanceData);
-			
-			sendDataAndExit(instanceData);
+			User u = processor.getRegisteredUser();
+			if(u != null) {
+				userAdded(u);
+			} else {
+				abort();
+			}
 		} else {
 			abort();
 		}
 	}
-	
-	protected abstract void sendDataAndExit(FormInstance data);
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.formmanager.api.transitions.FormEntryTransitions#suspendForMediaCapture(int)
