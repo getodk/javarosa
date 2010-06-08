@@ -123,6 +123,8 @@ public class XFormParser {
 			public void handle (FormDef f, Element e, Object parent) { parseModel(f, e); } };
 		IElementHandler input = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, Constants.CONTROL_INPUT); } };
+		IElementHandler secret = new IElementHandler () {
+			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, Constants.CONTROL_SECRET); } };
 		IElementHandler select = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, Constants.CONTROL_SELECT_MULTI); } };
 		IElementHandler select1 = new IElementHandler () {
@@ -140,6 +142,7 @@ public class XFormParser {
 
 		groupLevelHandlers = new Hashtable();
 		groupLevelHandlers.put("input", input);
+		groupLevelHandlers.put("secret",secret);
 		groupLevelHandlers.put("select", select);
 		groupLevelHandlers.put("select1", select1);
 		groupLevelHandlers.put("group", group);

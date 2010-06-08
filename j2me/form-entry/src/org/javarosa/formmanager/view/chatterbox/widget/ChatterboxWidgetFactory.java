@@ -27,6 +27,7 @@ import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 import org.javarosa.formmanager.view.chatterbox.FakedFormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;
+import de.enough.polish.ui.TextField;
 
 public class ChatterboxWidgetFactory {
 	Chatterbox cbox;
@@ -67,12 +68,19 @@ public class ChatterboxWidgetFactory {
 		
 		switch (controlType) {
 		case Constants.CONTROL_INPUT:
+		case Constants.CONTROL_SECRET:
 			switch (dataType) {
 			case Constants.DATATYPE_INTEGER:
 				expandedStyle = new NumericEntryWidget();
+				if(controlType == Constants.CONTROL_SECRET) {
+					((NumericEntryWidget)expandedStyle).setConstraint(TextField.PASSWORD);
+				}
 				break;
 			case Constants.DATATYPE_DECIMAL:
 				expandedStyle = new NumericEntryWidget(true);
+				if(controlType == Constants.CONTROL_SECRET) {
+					((NumericEntryWidget)expandedStyle).setConstraint(TextField.PASSWORD);
+				}
 				break;
 			case Constants.DATATYPE_DATE_TIME:
 				expandedStyle = new DateEntryWidget(true);
@@ -119,6 +127,9 @@ public class ChatterboxWidgetFactory {
 
 		if (expandedStyle == null) { //catch types text, null, unsupported
 			expandedStyle = new TextEntryWidget();
+			if(controlType == Constants.CONTROL_SECRET) {
+				((TextEntryWidget)expandedStyle).setConstraint(TextField.PASSWORD);
+			}
 			
 			String name = String.valueOf(controlType); //huh? controlType is an int
 			Object widget = widgetFactory.getNewInstance(name);

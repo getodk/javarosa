@@ -40,12 +40,25 @@ public class J2meFileSystemProperties implements IPropertyRules {
 	private Vector<String> roots() {
 		if(fileroots == null) {
 			fileroots = new Vector<String>();
-			for(Enumeration en = FileSystemRegistry.listRoots(); en.hasMoreElements() ; ) {
-				String root = (String)en.nextElement();
-				if(root.endsWith("/")) {
-					//cut off any trailing /'s
-					root = root.substring(0, root.length() -1);
-					fileroots.addElement(root);
+			try {
+				for(Enumeration en = FileSystemRegistry.listRoots(); en.hasMoreElements() ; ) {
+					String root = (String)en.nextElement();
+					if(root.endsWith("/")) {
+						//cut off any trailing /'s
+						root = root.substring(0, root.length() -1);
+						fileroots.addElement(root);
+					}
+				}
+			} catch(Exception e) {
+				//TODO: This should probably be a java.lang.security exception catch
+				if(fileroots.size() > 0 ) {
+					//got something....
+					return fileroots;
+				} else {
+					//something happened, probably the user denying access to list the roots.
+					//return an empty vector, but set fileroots to null so that it'll try again later
+					fileroots = null;
+					return new Vector<String>();
 				}
 			}
 		}
@@ -61,13 +74,14 @@ public class J2meFileSystemProperties implements IPropertyRules {
 	public String getPreferredDefaultRoot() {
 		Vector<String> preferredRoots = getCardRoots();
 		
-		for(String root : roots()) {
+		Vector<String> roots = roots();
+		for(String root : roots) {
 			if(preferredRoots.contains(root.toLowerCase())) {
 				return root;
 			}
 		}
 		//no memory card roots found, just go with the first one
-		if(roots().size() > 0) {
+		if(roots.size() > 0) {
 			return roots().elementAt(0);
 		}
 		return null;
