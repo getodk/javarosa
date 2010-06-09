@@ -19,6 +19,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryModel;
@@ -173,11 +174,14 @@ public class ChatterboxWidgetFactory {
 	
 		}
     	
+		String labelInner = (label == null || label.length() == 0 ? Localization.get("repeat.repitition") : label);
+
+		String promptLabel = Localization.get((multiplicity > 0 ? "repeat.message.multiple" : "repeat.message.single"), new String[] {labelInner});
     	
-    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?",
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt(promptLabel,
     										Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
-    	prompt.addSelectChoice(new SelectChoice(null,"Yes", "y", false));
-    	prompt.addSelectChoice(new SelectChoice(null,"No", "n", false));
+    	prompt.addSelectChoice(new SelectChoice(null,Localization.get("yes"), "y", false));
+    	prompt.addSelectChoice(new SelectChoice(null,Localization.get("no"), "n", false));
 		
 		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }
