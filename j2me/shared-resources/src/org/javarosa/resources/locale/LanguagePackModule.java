@@ -38,6 +38,7 @@ public class LanguagePackModule implements IModule {
 		Localization.registerLanguageFile("en", "/messages_en.txt");
 		Localization.registerLanguageFile("sw","/messages_sw.txt");
 		Localization.registerLanguageFile("af","/messages_afr.txt");
+		Localization.registerLanguageFile("es","/messages_es.txt");
 		
 		Localization.setDefaultLocale("default");
 		

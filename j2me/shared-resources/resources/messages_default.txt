@@ -356,3 +356,7 @@ user.entity.admin=Administrator
 user.entity.normal=Normal
 user.entity.demo=Demo
 user.entity.unknown=Unknown
+
+repeat.repitition=repetition
+repeat.message.single=Add ${0}?
+repeat.message.multiple=Add another ${0}?
