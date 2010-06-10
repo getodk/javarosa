@@ -183,8 +183,10 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
         
         //next command is added on a per-widget basis
         
+        //one place for adding back command to prevent accidentally adding it in read only mode
+        addBackCommand();
+        
         if(!model.isReadOnlyMode()) {
-            addCommand(backCommand);
             //CTS (4/27/2010): We don't handle these appropriately, and it does nothing but confuse
             //users when they appear and break stuff.
             //addCommand(exitSaveCommand);
@@ -368,11 +370,17 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	if(this.questionIndexes.size() <= 1) {
     		this.removeCommand(backCommand);
     	} else {
-    		this.addCommand(backCommand);
+    		addBackCommand();
     	}
     	
     	//UI hacks ho!
     	babysitStyles();
+    }
+    
+    private void addBackCommand() {
+    	if(!this.model.isReadOnlyMode()) {
+    		this.addCommand(backCommand);
+    	}
     }
     
     private void updatePins(FormIndex questionIndex) {
@@ -522,7 +530,6 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	System.out.println("cbox: command action");
     	
     	if (command == backCommand) {
-    		System.out.println("back");
     		step(controller.stepToPreviousEvent());
     	} else if (command == exitNoSaveCommand) {
     		controller.abort();
