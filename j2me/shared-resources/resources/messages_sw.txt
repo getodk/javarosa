@@ -59,7 +59,7 @@ menu.Referral=Rufaa
 menu.ViewOpen=Orodha ya wajawazito
 menu.Resolve=Hitimisho la Ujauzito
 menu.Save=Save
-menu.Exit=Exit
+menu.Exit=Toka
 menu.GetNewForms=Get New Forms
 menu.Camera=Camera
 menu.Recorder=Recorder
@@ -134,13 +134,15 @@ prop.district=District
 prop.hsd=HSD
 prop.finyear=Financial Year
 
-
+menu.Exit=Toka
+menu.Login=Ingia
+menu.Demo=Mazoezi
 
 form.login.commcareversion=CommCare Version
 form.login.buildnumber=Build Number
-form.login.username=Username:
-form.login.password=Password:
-form.login.login=Login
+form.login.username=Jina:
+form.login.password=Ufunguo:
+form.login.login=Ingia
 form.login.login.successful=Login successful
 form.login.loading.profile=Loading your Profile
 
