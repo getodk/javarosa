@@ -305,10 +305,10 @@ command.cancel=Cancel
 
 #Chatterbox commands
 command.next=Next
-command.exit=Exit;
-command.saveexit=Save and Exit;
-command.save=Save;
-command.language=Language;
+command.exit=Exit
+command.saveexit=Save and Exit
+command.save=Save
+command.language=Language
 
 chatterbox.button.trigger=Ok
 
