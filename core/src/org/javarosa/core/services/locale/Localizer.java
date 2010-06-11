@@ -639,6 +639,16 @@ public class Localizer implements Externalizable {
 		return working;
 	}
 	
+
+	public static String clearArguments(String text) {
+		Vector v = getArgs(text);
+		String[] empty = new String[v.size()];
+		for(int i =0 ; i < empty.length ; ++i) {
+			empty[i] = "";
+		}
+		return processArguments(text, empty);
+	}	
+	
 	private static String extractValue(String text, String[] args) {
 		//int start = text.indexOf("${");
 		//int end = text.indexOf("}");
@@ -682,5 +692,5 @@ public class Localizer implements Externalizable {
 		ExtUtil.write(dos, new ExtWrapList(locales));
 		ExtUtil.write(dos, new ExtWrapNullable(defaultLocale));
 		ExtUtil.write(dos, new ExtWrapNullable(currentLocale));
-	}	
+	}
 }

@@ -44,7 +44,6 @@ public class LoadingScreenThread extends HandledTimerTask {
 		synchronized(lock) {
 			if(!canceled) {
 				if(!displayed) {
-					System.out.println("Displaying loading");
 					elapsed += START_THRESHOLD;
 					display.setCurrent(screen);
 					displayed = true;
@@ -59,7 +58,6 @@ public class LoadingScreenThread extends HandledTimerTask {
 	public void cancelLoading() {
 		synchronized(lock) {
 			canceled = true;
-			System.out.println("Loading canceled");
 			displayed= false;
 			if(timer != null) {
 				timer.cancel();
