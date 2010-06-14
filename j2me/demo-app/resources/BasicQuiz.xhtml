@@ -1,0 +1,37 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+  <h:title>test</h:title> 
+ <model id="34498">
+    <instance xmlns="">
+	<root>
+		<Meta>
+			<UserID/>
+			<DeviceID/>
+			<TimeStartRecorded/>
+			<TimeEndRecorded/>
+		</Meta>
+      		<Age qid="834" gid="118"/>
+      		<ID qid="835" gid="118"/>
+      		<Date qid="837" gid="118"/>
+    	</root>
+    </instance>
+	<bind id="hidden1" nodeset="/root/Meta/UserID" type="xsd:string" jr:preload="context" jr:preloadParams="UserID" />
+	<bind id="hidden2" nodeset="/root/Meta/DeviceID" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
+	<bind id="hidden3" nodeset="/root/Meta/TimeStartRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start" />
+	<bind id="hidden4" nodeset="/root/Meta/TimeEndRecorded" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="end" />
+    	<bind id="1" nodeset="/root/Age" required="true()" constraint="regex(.,'^([1-9]|[1-9]\d|100)$')"  jr:constraingMSG="the value entered is not of the correct type" type="xsd:string"/>
+    	<bind id="2" nodeset="/root/ID" required="true()" constraint="regex(.,'^[0-9]{13}$')"  jr:constraingMSG="the value entered is not of the correct type" type="xsd:string"/>
+    	<bind id="3" nodeset="/root/Date" required="true()"  constraint=". <= today()" jr:constraingMSG="the date entered cannot be in the future." type="xsd:date"/>
+  </model>
+  <input bind="1">
+    <label>How old are you?<br /></label>
+    <hint>Enter a number between 0 and 99.<br /></hint>
+  </input>
+  <input bind="2">
+    <label>Type your 13 digit ID number here</label>
+    <hint>Enter your ID number</hint>
+  </input>
+  <input bind="3">
+    <label>Enter date of questionairre</label>
+    <hint>Enter a date not after today.</hint>
+  </input>
+</h:html>
