@@ -41,6 +41,7 @@ public class InstanceSchema {
 		schema.setName("schema");
 		schema.setNamespace("http://www.w3.org/2001/XMLSchema");
 		schema.setPrefix("", "http://www.w3.org/2001/XMLSchema");
+		schema.setPrefix("jr", "http://openrosa.org/javarosa");
 		if (f.getInstance().schema != null) {
 			schema.setAttribute(null, "targetNamespace", f.getInstance().schema);
 		} else {
@@ -121,6 +122,7 @@ public class InstanceSchema {
 					System.err.println("can't find choices for select-type question [" + node.getName() + "]");
 				}
 				break;
+			case Constants.DATATYPE_GEOPOINT: type = "jr:geopoint"; break;
 			default:
 				type = null;
 				System.err.println("unrecognized type [" + node.dataType + ";" + node.getName() + "]");
