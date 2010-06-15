@@ -78,6 +78,7 @@ public class FormEntryController {
         TreeElement element = model.getTreeElement(index);
         boolean complexQuestion = q.isComplex();
         
+        boolean hasConstraints = false;
         if (element.required && data == null) {
             return ANSWER_REQUIRED_BUT_EMPTY;
         } else if (!complexQuestion && !model.getForm().evaluateConstraint(index.getReference(), data)) {
@@ -85,7 +86,7 @@ public class FormEntryController {
         } else if (!complexQuestion) {
             commitAnswer(element, index, data);
             return ANSWER_OK; 
-        } else if (complexQuestion) {
+        } else if (complexQuestion && hasConstraints) {
             //TODO: itemsets: don't currently evaluate constraints for itemset/copy -- haven't figured out how handle it yet
             throw new RuntimeException("Itemsets do not currently evaluate constraints. Your constraint will not work, please remove it before proceeding.");
         } else {

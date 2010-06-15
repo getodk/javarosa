@@ -1,14 +1,14 @@
 polish.command.ok=Sawa
 polish.command.cancel=Kataa
-polish.command.options=Options
+polish.command.options=Mengineyo
+# for deleting a single char:
+polish.command.delete=Futa
+# for deleting a complete TextField:
+polish.command.clear=Ondoa
 polish.command.exit=Toka
 polish.command.select=Chagua
 polish.command.mark=Chagua
 polish.command.unmark=Usichague
-# for deleting a single char:
-polish.command.delete=Delete
-# for deleting a complete TextField:
-polish.command.clear=Futa
 # for hiding menus on BlackBerry devices:
 polish.command.hide=Hide
 # for showing a default title when no label
@@ -300,3 +300,5 @@ case.status=Bado inaendelea?
 yes=Ndiyo
 no=Hapana
 date.unknown=unknown
+
+polish.date.select=Chagua Tarehe

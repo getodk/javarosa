@@ -58,6 +58,8 @@ import de.enough.polish.ui.UiAccess;
 public class Chatterbox extends FramedForm implements HandledPCommandListener, IFormEntryView{
 	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
+	private int AUDIO_PLAYBACK_KEYCODE = -1;
+	
     private static final String PROMPT_REQUIRED_QUESTION = Localization.get("view.sending.RequiredQuestion");
 
 	private static final String PROMPT_DEFAULT_CONSTRAINT_VIOL = "Answer is outside of the allowed range";
@@ -131,6 +133,10 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_STAR;
     	//#endif
 
+    }
+    
+    public void setAudioPlaybackKey(int keycode) {
+    	AUDIO_PLAYBACK_KEYCODE = keycode;
     }
 
     public void destroy () {
