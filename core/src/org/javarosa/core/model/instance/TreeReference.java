@@ -53,8 +53,8 @@ public class TreeReference implements Externalizable {
 	}
 	
 	public TreeReference () {
-		names = new Vector();
-		multiplicity = new Vector();		
+		names = new Vector(0);
+		multiplicity = new Vector(0);		
 	}
 	
 	public int getMultiplicity(int index) {

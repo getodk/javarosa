@@ -307,6 +307,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 		return this.getSelectChoiceText(this.getQuestion().getChoice(i));
 	}
 	
+	private static String d = "default";
 	/**
 	 * Retrieve a Vector containing the available forms of text for the
 	 * provided select choice.
@@ -322,7 +323,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 
 		//check for default
 		if(null != localizer().getRawText(localizer().getLocale(), tID)){
-			types+="default";
+			types+=d;
 		}
 		
 		//run through types list

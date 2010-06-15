@@ -397,8 +397,8 @@ public class XFormParser {
 				//used. This is sketchy if anything else plans on touching the nodes.
 				//This code can be removed once we're pull-parsing
 				//#if org.javarosa.xform.stingy
-				//# e.removeChild(i);
-				//# --i;
+				e.removeChild(i);
+				--i;
 				//#endif
 			}
 		}
@@ -1160,8 +1160,8 @@ public class XFormParser {
 			//used. This is sketchy if anything else plans on touching the nodes.
 			//This code can be removed once we're pull-parsing
 			//#if org.javarosa.xform.stingy
-			//# trans.removeChild(j);
-			//# --j;
+			trans.removeChild(j);
+			--j;
 			//#endif
 		}
 		
