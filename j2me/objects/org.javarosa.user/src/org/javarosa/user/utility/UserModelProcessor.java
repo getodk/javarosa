@@ -78,12 +78,13 @@ public class UserModelProcessor implements IInstanceProcessor {
 		String uuid = getString(getChild(head,"uuid"),head);
 		
 		User u = getUserFromStorage(uuid);
-		if(!u.getPassword().equals(password)) {
-			u.setPassword(password);
-		}
 		
 		if(u == null) {
 			u = new User(username,password, uuid);
+		} else {
+			if(!u.getPassword().equals(password)) {
+				u.setPassword(password);
+			}
 		}
 		
 		TreeElement data = getChild(head,"user_data");
