@@ -194,9 +194,9 @@ public class MultiSubmitStatusScreen extends Form implements
 	 */
 	private String getCurrentDisplay() {
 		return Localization.get("sending.status.multi", new String[] {
-				String.valueOf(currentid), 
+				String.valueOf(currentid + 1), 
 				String.valueOf(ids.size()),
-				String.valueOf(currentid + 1),
+				String.valueOf(currentid),
 				String.valueOf(ids.size())
 		});
 	}
