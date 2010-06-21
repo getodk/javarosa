@@ -224,7 +224,7 @@ sending.view.later=Send Later
 sending.view.when=Send Data Now
 sending.view.new=Send to New Server
 
-sending.status.multi=Currently sending ${0} of ${1}. Successfully transmitted ${2} of #{3}.
+sending.status.multi=Currently sending ${0} of ${1}. Successfully transmitted ${2} of ${3}.
 sending.status.title=Send Status
 sending.status.none=No Forms to Send
 sending.status.going=Sending in Progress
