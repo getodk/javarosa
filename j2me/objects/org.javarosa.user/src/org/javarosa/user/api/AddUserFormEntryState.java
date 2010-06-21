@@ -83,4 +83,11 @@ public abstract class AddUserFormEntryState extends FormEntryState implements Ad
 	public void suspendForMediaCapture(int captureType) {
 		//This doesn't mean anything anymore.
 	}
+	
+	
+	//For the Nokia JVM Bug
+	public abstract void abort();
+	
+	public abstract void userAdded(User newUser);
+	public abstract void cancel();
 }

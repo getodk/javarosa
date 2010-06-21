@@ -78,6 +78,9 @@ public class UserModelProcessor implements IInstanceProcessor {
 		String uuid = getString(getChild(head,"uuid"),head);
 		
 		User u = getUserFromStorage(uuid);
+		if(!u.getPassword().equals(password)) {
+			u.setPassword(password);
+		}
 		
 		if(u == null) {
 			u = new User(username,password, uuid);
