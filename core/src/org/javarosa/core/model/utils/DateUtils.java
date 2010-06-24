@@ -155,7 +155,15 @@ public class DateUtils {
 	}
 
 	private static String formatDateColloquial (DateFields f) {
-		return intPad(f.day, 2) + "/" + intPad(f.month, 2) + "/" + (new Integer(f.year)).toString().substring(2, 4);
+		String year = new Integer(f.year).toString();
+		
+		//Normal Date
+		if(year.length() == 4) {
+			year = year.substring(2, 4);
+		}
+		//Otherwise we have an old or bizzarre date, don't try to do anything
+		
+		return intPad(f.day, 2) + "/" + intPad(f.month, 2) + "/" + year;
 	}
 
 	private static String formatDateSuffix (DateFields f) {
