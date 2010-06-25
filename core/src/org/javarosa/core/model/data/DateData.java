@@ -55,7 +55,7 @@ public class DateData implements IAnswerData {
 		if(o == null) {
 			throw new NullPointerException("Attempt to set an IAnswerData class to null.");
 		}
-		d = new Date(((Date)o).getTime());
+		d = DateUtils.roundDate((Date)o);
 	}
 	
 	public Object getValue () {
