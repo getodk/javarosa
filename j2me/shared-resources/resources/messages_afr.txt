@@ -78,7 +78,6 @@ menu.SendLater=Stuur Later (Berg)
 menu.SendToNewServer=Stuur na nuwe adres
 menu.Scan=Neem af
 menu.SendData=Stuur Vorm
-menu.SendAllUnsent=Stuur Ongestuurde Vorms
 menu.Edit=Voeg Nog Info By
 menu.Review=Bekyk
 menu.Refresh=Hervat
