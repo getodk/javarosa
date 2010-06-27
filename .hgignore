@@ -1,0 +1,38 @@
+syntax: glob
+
+#local only
+local.properties
+
+#compiled files and libraries
+*.class
+*.jar
+*.jad
+*.zip
+*.rar
+*.pyc
+
+#build process
+bin/
+build/
+deployed/
+dist/
+webdocs/
+j2mepolish.index.txt
+
+#IDE and polish
+.eclipseme.tmp/
+.polishSettings/
+.settings/
+default.build
+devices/
+
+#OS and environment
+*~
+.DS_Store
+
+#mercurial
+*.rej
+*.orig
+glob:util/validator/org.javarosa.xform.validator/settings.properties
+glob:j2me/demo-app/resources/localizertest.xhtml
+glob:j2me/buildfiles/documentation/javadoc/
