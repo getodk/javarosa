@@ -79,7 +79,16 @@ public class CollapsedWidget implements IWidgetStyle {
 		
 		IAnswerData data = fep.getAnswerValue();
 		if (data != null) {
-			answer.setText(data.getDisplayText());
+			String value = data.getDisplayText();
+			if(fep.getControlType() == Constants.CONTROL_SECRET) {
+				String obfuscated = "";
+				for(int i =0 ; i < value.length() ; ++i ) { 
+					obfuscated += "*";
+				}
+				answer.setText(obfuscated);
+			} else {
+				answer.setText(value);	
+			}
 		}
 	}
 

@@ -107,10 +107,6 @@ public class UserForm extends Form {
 		this.usernameField.setString(user.getUsername());
 		this.passwordField.setString(user.getPassword());
 
-		//#if javarosa.adduser.extended
-		this.userIDField.setString(String.valueOf(user.getUserID()));
-		//#endif
-
 		if (user.isAdminUser()) {
 			this.choice.setSelectedIndex(0, true);
 		}

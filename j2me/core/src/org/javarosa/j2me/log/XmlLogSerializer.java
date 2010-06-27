@@ -19,7 +19,7 @@
  */
 package org.javarosa.j2me.log;
 
-import org.javarosa.core.log.ILogSerializer;
+import org.javarosa.core.log.IFullLogSerializer;
 import org.javarosa.core.log.LogEntry;
 import org.kxml2.kdom.Element;
 
@@ -28,7 +28,7 @@ import org.kxml2.kdom.Element;
  * @date Apr 10, 2009 
  *
  */
-public class XmlLogSerializer implements ILogSerializer<Element> {
+public class XmlLogSerializer implements IFullLogSerializer<Element> {
 
 	private String topElementName;
 	

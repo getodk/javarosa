@@ -1,14 +1,14 @@
 polish.command.ok=Sawa
 polish.command.cancel=Kataa
-polish.command.options=Options
+polish.command.options=Mengineyo
+# for deleting a single char:
+polish.command.delete=Futa
+# for deleting a complete TextField:
+polish.command.clear=Ondoa
 polish.command.exit=Toka
 polish.command.select=Chagua
 polish.command.mark=Chagua
 polish.command.unmark=Usichague
-# for deleting a single char:
-polish.command.delete=Delete
-# for deleting a complete TextField:
-polish.command.clear=Futa
 # for hiding menus on BlackBerry devices:
 polish.command.hide=Hide
 # for showing a default title when no label
@@ -59,7 +59,7 @@ menu.Referral=Rufaa
 menu.ViewOpen=Orodha ya wajawazito
 menu.Resolve=Hitimisho la Ujauzito
 menu.Save=Save
-menu.Exit=Exit
+menu.Exit=Toka
 menu.GetNewForms=Get New Forms
 menu.Camera=Camera
 menu.Recorder=Recorder
@@ -134,13 +134,15 @@ prop.district=District
 prop.hsd=HSD
 prop.finyear=Financial Year
 
-
+menu.Exit=Toka
+menu.Login=Ingia
+menu.Demo=Mazoezi
 
 form.login.commcareversion=CommCare Version
 form.login.buildnumber=Build Number
-form.login.username=Username:
-form.login.password=Password:
-form.login.login=Login
+form.login.username=Jina:
+form.login.password=Ufunguo:
+form.login.login=Ingia
 form.login.login.successful=Login successful
 form.login.loading.profile=Loading your Profile
 
@@ -298,3 +300,5 @@ case.status=Bado inaendelea?
 yes=Ndiyo
 no=Hapana
 date.unknown=unknown
+
+polish.date.select=Chagua Tarehe

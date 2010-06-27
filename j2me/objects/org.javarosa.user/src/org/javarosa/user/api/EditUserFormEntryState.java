@@ -16,36 +16,31 @@ import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.NamespaceRetrievalMethod;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
-import org.javarosa.user.api.transitions.AddUserTransitions;
+import org.javarosa.user.api.transitions.EditUserTransitions;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.UserModelProcessor;
+import org.javarosa.user.utility.UserPreloadHandler;
 
 /**
- * The Add User Form Entry State is responsible for 
- * running the user entry form for this device and 
- * applying the appropriate Model Processor to deal
- * with any user blocks.
- * 
  * @author ctsims
  *
  */
-public abstract class AddUserFormEntryState extends FormEntryState implements AddUserTransitions {
+public abstract class EditUserFormEntryState extends FormEntryState implements EditUserTransitions {
 
 	private String formName;
 	private Vector<IPreloadHandler> preloaders;
 	private Vector<IFunctionHandler> funcHandlers;
 		
-	public AddUserFormEntryState (String formName,
+	public EditUserFormEntryState (User u, String formName,
 			Vector<IPreloadHandler> preloaders, Vector<IFunctionHandler> funcHandlers) {
 		this.formName = formName;
+		preloaders.addElement(new UserPreloadHandler(u));
 		this.preloaders = preloaders;
 		this.funcHandlers = funcHandlers;
 	}
 	
-	public AddUserFormEntryState (Vector<IPreloadHandler> preloaders, Vector<IFunctionHandler> funcHandlers) {
-		this.formName = "http://code.javarosa.org/user_registration";
-		this.preloaders = preloaders;
-		this.funcHandlers = funcHandlers;
+	public EditUserFormEntryState (User u, Vector<IPreloadHandler> preloaders, Vector<IFunctionHandler> funcHandlers) {
+		this(u, "http://code.javarosa.org/user_registration", preloaders, funcHandlers);
 	}
 	
 	
@@ -55,6 +50,8 @@ public abstract class AddUserFormEntryState extends FormEntryState implements Ad
 	protected JrFormEntryController getController() {
 		FormDefFetcher fetcher = new FormDefFetcher(new NamespaceRetrievalMethod(formName), preloaders, funcHandlers);
 		JrFormEntryController controller = new JrFormEntryController(new JrFormEntryModel(fetcher.getFormDef()));
+		
+		//TODO: OQPS
 		controller.setView(new Chatterbox(Localization.get("user.create.header"),controller));
 		return controller;
 	}
@@ -68,7 +65,7 @@ public abstract class AddUserFormEntryState extends FormEntryState implements Ad
 			processor.processInstance(instanceData);
 			User u = processor.getRegisteredUser();
 			if(u != null) {
-				userAdded(u);
+				userEdited(u);
 			} else {
 				abort();
 			}
@@ -82,5 +79,9 @@ public abstract class AddUserFormEntryState extends FormEntryState implements Ad
 	 */
 	public void suspendForMediaCapture(int captureType) {
 		//This doesn't mean anything anymore.
+	}
+
+	public void abort() {
+		cancel();
 	}
 }
