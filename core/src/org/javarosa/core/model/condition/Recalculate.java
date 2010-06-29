@@ -29,6 +29,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.xpath.XPathConditional;
 
 public class Recalculate extends Triggerable {
 	public Recalculate () {
@@ -50,7 +51,12 @@ public class Recalculate extends Triggerable {
 	
 	public void apply (TreeReference ref, Object result, FormInstance model, FormDef f) {
 		int dataType = f.getInstance().resolveReference(ref).dataType;
-		f.setAnswer(wrapData(result, dataType), ref);
+		IAnswerData val = f.getInstance().resolveReference(ref).getValue();
+		if(this.expr instanceof XPathConditional && ((XPathConditional)this.expr).hasNow && val != null){
+			
+		}else{
+			f.setAnswer(wrapData(result, dataType), ref);
+		}
 	}
 		
 	public boolean canCascade () {
