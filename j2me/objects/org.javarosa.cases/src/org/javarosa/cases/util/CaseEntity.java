@@ -34,7 +34,7 @@ public class CaseEntity extends Entity<Case> {
 	protected String name;
 	protected String id;
 	protected String type;
-	protected int userId;
+	protected String userId;
 	protected boolean closed;
 
 	/* (non-Javadoc)
@@ -140,7 +140,7 @@ public class CaseEntity extends Entity<Case> {
 		return closed;
 	}
 	
-	public int getUserId() {
+	public String getUserId() {
 		return userId;
 	}
 
