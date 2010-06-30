@@ -33,7 +33,7 @@ public class CaseTypeEntityFilter extends EntityFilter<Case> {
 	
 	String caseTypeId;
 	
-	int userId= -2;
+	String userId = null;
 	
 	public CaseTypeEntityFilter(String caseTypeId) {
 		this(caseTypeId, true);
@@ -44,7 +44,7 @@ public class CaseTypeEntityFilter extends EntityFilter<Case> {
 		this.filterClosed = filterClosed;
 	}
 	
-	public void filterForUserId(int userId) {
+	public void filterForUserId(String userId) {
 		this.userId = userId;
 	}
 
@@ -54,15 +54,15 @@ public class CaseTypeEntityFilter extends EntityFilter<Case> {
 	public boolean matches(Case c) {
 		
 		//OK, so I'll admit this -2 thing isn't good.
-		if(userId != -2) {
+		if(userId != null) {
 			
 			//Note that we don't handle any sort of adminstrative user control here.
 			//If administrive users shouldn't filter cases, that should be handled elsewhere.
 			
-			int caseuserid = c.getUserId();
+			String caseuserid = c.getUserId();
 			//If the case's userid is -1 (unset), just don't worry about it.
-			if(c.getUserId() != -1) {
-				if(userId != caseuserid) {
+			if(c.getUserId() != null) {
+				if(!userId.equals(caseuserid)) {
 					return false;
 				}
 			}

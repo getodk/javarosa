@@ -150,7 +150,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		String caseTypeId = null;
 		String extId = null;
 		String caseName = null;
-		int userId = -1;
+		String userId = null;
 		
 		for(int i=0; i < create.getNumChildren(); ++i ){
 			TreeElement kid = create.getChildAt(i);
@@ -164,11 +164,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 				extId = (String)serializer.serializeAnswerData(kid.getValue());
 			}
 			if(kid.getName().equals("user_id")) {
-				try { 
-					userId = Integer.parseInt((String)serializer.serializeAnswerData(kid.getValue()));
-				} catch(NumberFormatException e) {
-					//Nothing. This is hacky for now
-				}
+				userId = kid.getValue().uncast().getString();
 			}
 			if(kid.getName().equals("case_name")) {
 				caseName = (String)serializer.serializeAnswerData(kid.getValue());
@@ -183,7 +179,9 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		c.setCaseId(caseId);
 		c.setExternalId(extId);
 		c.setDateOpened(date);
-		c.setUserId(userId);
+		if(userId != null) {
+			c.setUserId(userId);
+		}
 		commit(c);
 		Logger.log("case-create", c.getID() + ";" + c.getCaseId() + ";" + c.getTypeId());
 		return c;
