@@ -81,7 +81,6 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			done();
 			return;
 		}
-		
 		try {
 			Document report = createReport();
 			InputStream payload = serializeReport(report);
@@ -319,8 +318,16 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			e.printStackTrace();
 		}
 		
-		//No matter _what_, clear the logs.
-		Logger._().clearLogs();
+		try{
+			//No matter _what_, clear the logs if a logger is registered
+			if(Logger._() == null) {
+				System.out.println("Logger is null. Must have failed to initailize");
+			}
+			Logger._().clearLogs();
+		} catch(Exception e) {
+			//If this fails it's a serious problem, but not sure what to do about it.
+			e.printStackTrace();
+		}
 	}
 	
 	/*

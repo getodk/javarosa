@@ -49,7 +49,18 @@ public class TransportService {
 	 * persisted immediately
 	 * 
 	 */
-	private static TransportMessageStore CACHE = new TransportMessageStore();
+	private static TransportMessageStore T_CACHE;
+	
+	private static final String CACHE_LOCK="CACHE_LOCK";
+	
+	private static TransportMessageStore CACHE() {
+		synchronized(CACHE_LOCK) { 
+			if(T_CACHE == null) {
+				T_CACHE = new TransportMessageStore();
+			}
+			return T_CACHE;
+		}
+	}
 
 	/**
 	 * 
@@ -99,7 +110,7 @@ public class TransportService {
 		Transporter transporter = message.createTransporter();
 
 		// create a sender thread
-		SenderThread thread = new SimpleSenderThread(transporter, CACHE, tries,
+		SenderThread thread = new SimpleSenderThread(transporter, CACHE(), tries,
 				delay);
 
 		// if the message should be stored and never lost
@@ -109,9 +120,9 @@ public class TransportService {
 			message.setSendingThreadDeadline(getSendingThreadDeadline(thread
 					.getTries(), thread.getDelay()));
 
-			synchronized (CACHE) {
+			synchronized (CACHE()) {
 				// persist the message
-				CACHE.cache(message);
+				CACHE().cache(message);
 			}
 		} else {
 			message.setStatus(TransportMessageStatus.QUEUED);
@@ -136,7 +147,7 @@ public class TransportService {
 		// if the message should be saved in case of sending failure
 		if (message.isCacheable()) {
 			// persist the message
-			CACHE.cache(message);
+			CACHE().cache(message);
 		}
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
@@ -150,11 +161,11 @@ public class TransportService {
 
 			if (message.getStatus() == TransportMessageStatus.SENT) {
 				// if it was sent successfully, then remove it from cache
-				CACHE.decache(message);
+				CACHE().decache(message);
 			} else {
 				// otherwise, set the status to cached
 				message.setStatus(TransportMessageStatus.CACHED);
-				CACHE.updateMessage(message);
+				CACHE().updateMessage(message);
 			}
 		}
 		return message;
@@ -185,7 +196,7 @@ public class TransportService {
 			Transporter transporter = m.createTransporter();
 			// get a bulk sender to use the transporter to send all messages
 			TransporterSharingSender sender = new TransporterSharingSender(
-					transporter, messages, CACHE, listener);
+					transporter, messages, CACHE(), listener);
 
 			sender.send();
 
@@ -213,14 +224,14 @@ public class TransportService {
 	 * @return
 	 */
 	public static Vector getCachedMessages() {
-		return CACHE.getCachedMessages();
+		return CACHE().getCachedMessages();
 	}
 
 	/**
 	 * @return
 	 */
 	public static int getCachedMessagesSize() {
-		return CACHE.getCachedMessagesCount();
+		return CACHE().getCachedMessagesCount();
 	}
 
 	/**
@@ -235,7 +246,7 @@ public class TransportService {
 	 *         message was found)
 	 */
 	public static TransportMessage retrieve(String id) {
-		return CACHE.findMessage(id);
+		return CACHE().findMessage(id);
 	}
 
 }
