@@ -122,7 +122,7 @@ view.sending.CompulsoryQuestionIncomplete=This question is compulsory. Please an
 view.sending.FormUneditable=You cannot edit your answers when reviewing the form
 view.sending.RequiredQuestion=Swali hili lazima lijazwe
 view.sending.of=of
-view.sending.ok=ok
+view.sending.ok=sawa
 view.sending.endOfSendingMessage=
 
  
@@ -214,7 +214,7 @@ debug.log=Debug Log
 
 sending.status.long=Ujumbe haujapokelewa ila umehifadhiwa. (Utumaji unachukua muda mrefu mno)
 sending.status.success=Ujumbe umepokelewa!
-sending.status.failed=Submission Failed
+sending.status.failed=Utumaji Umeshindikana
 sending.status.error=Tatizo lisilojulikana katika uwasilishaji
 
 menu.transport=Transport Menu
