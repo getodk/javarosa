@@ -32,7 +32,6 @@ import org.javarosa.core.log.LogEntry;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.IStorageIterator;
-import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.j2me.storage.rms.RMSStorageUtility;
 
@@ -43,7 +42,7 @@ import org.javarosa.j2me.storage.rms.RMSStorageUtility;
  */
 public class J2MELogger implements ILogger {
 	
-	IStorageUtility logStorage;
+	RMSStorageUtility logStorage;
 	
 	public J2MELogger() {
 		logStorage = new RMSStorageUtility(LogEntry.STORAGE_KEY, LogEntry.class);
@@ -53,18 +52,21 @@ public class J2MELogger implements ILogger {
 	 * @see org.javarosa.core.api.IIncidentLogger#clearLogs()
 	 */
 	public void clearLogs() {
-		//'destroy' not supported yet
-		//logStorage.destroy();
-		//logStorage = new RMSStorageUtility("LOG", IncidentLog.class);
-		
-		Vector ids = new Vector();
-		IStorageIterator li = logStorage.iterate();
-		while (li.hasMore()) {
-			ids.addElement(new Integer(li.nextID()));
-		}
-		for (int i = 0; i < ids.size(); i++) {
-			int id = ((Integer)ids.elementAt(i)).intValue();
-			logStorage.remove(id);
+		synchronized(logStorage) {
+			if(!checkStorage()) { return; }
+			//'destroy' not supported yet
+			//logStorage.destroy();
+			//logStorage = new RMSStorageUtility("LOG", IncidentLog.class);
+			
+			Vector ids = new Vector();
+			IStorageIterator li = logStorage.iterate();
+			while (li.hasMore()) {
+				ids.addElement(new Integer(li.nextID()));
+			}
+			for (int i = 0; i < ids.size(); i++) {
+				int id = ((Integer)ids.elementAt(i)).intValue();
+				logStorage.remove(id);
+			}
 		}
 	}
 
@@ -72,11 +74,13 @@ public class J2MELogger implements ILogger {
 	 * @see org.javarosa.core.api.IIncidentLogger#logIncident(java.lang.String, java.lang.String, java.util.Date)
 	 */
 	public void log(String type, String message, Date logDate) {
-		LogEntry log = new LogEntry(type, message, logDate);
-		try {
-			logStorage.add(log);
-		} catch (StorageFullException e) {
-			throw new RuntimeException("uh-oh, storage full [incidentlog]"); //TODO: handle this
+		synchronized(logStorage) {
+			LogEntry log = new LogEntry(type, message, logDate);
+			try {
+				logStorage.add(log);
+			} catch (StorageFullException e) {
+				throw new RuntimeException("uh-oh, storage full [incidentlog]"); //TODO: handle this
+			}
 		}
 	}
 
@@ -84,14 +88,17 @@ public class J2MELogger implements ILogger {
 	 * @see org.javarosa.core.api.IIncidentLogger#serializeLogs()
 	 */
 	public <T> T serializeLogs(IFullLogSerializer<T> serializer) {
-		Vector logs = new Vector();
-		IStorageIterator li = logStorage.iterate();
-		while (li.hasMore()) {
-			logs.addElement(li.nextRecord());
+		synchronized(logStorage) {
+			if(!checkStorage()) { return null; }
+			Vector logs = new Vector();
+			IStorageIterator li = logStorage.iterate();
+			while (li.hasMore()) {
+				logs.addElement(li.nextRecord());
+			}
+			LogEntry[] collection = new LogEntry[logs.size()];
+			logs.copyInto(collection);
+			return serializer.serializeLogs(collection);
 		}
-		LogEntry[] collection = new LogEntry[logs.size()];
-		logs.copyInto(collection);
-		return serializer.serializeLogs(collection);
 	}
 
 	/**
@@ -114,17 +121,53 @@ public class J2MELogger implements ILogger {
 	}
 
 	public boolean serializeLogs(IAtomicLogSerializer serializer) {
-		IStorageIterator li = logStorage.iterate();
-		while (li.hasMore()) {
-			if(!serializer.serializeLog((LogEntry)li.nextRecord()));
-			//Panic?
-			return false;
+		synchronized(logStorage) {
+			if(!checkStorage()) { return false; }
+			IStorageIterator li = logStorage.iterate();
+			while (li.hasMore()) {
+				if(!serializer.serializeLog((LogEntry)li.nextRecord()));
+				//Panic?
+				return false;
+			}
+			return true;
 		}
-		return true;
 	}
 
 	public int logSize() {
-		return logStorage.getNumRecords();
+		synchronized(logStorage) {
+			if(!checkStorage()) { return -1; }
+			return logStorage.getNumRecords();
+		}
 	}
 	
+	
+	/**
+	 * Check storage attempts to determine whether the storage for the logger
+	 * is in a safe state and can be utilized without errors occurring. If
+	 * the Log storage is not in a safe state, the logger shouldn't attempt to
+	 * perform actions on it that might crash the app.
+	 * 
+	 * @return True if the log store is safe to manipulate. False otherwise. 
+	 */
+	private boolean checkStorage() {
+		try{logStorage.checkNotCorrupt(); return true;}
+		catch(Exception e) {
+			System.out.println("Log Storage Corrupt. Attempting to repair");
+			//storage isn't in good shape. Try to repair it.
+			try{
+				logStorage.repair();
+				logStorage.checkNotCorrupt();
+				this.log("logger", "Corrupted Log Storage Repaired.", new Date());
+				return true;
+			} catch(Exception ex) {
+				System.out.println("Log Storage Corrupted and Cannot be Repaired");
+				//Still isn't working. Bad scene, but nothing
+				//to do about it.
+				return false;
+				//We should either throw a runtime exception here, or we should
+				//keep trying. Possibly should just dump the old RecordStore
+				//completely and just start over.
+			}
+		}
+	}
 }

@@ -45,12 +45,15 @@ public class TransportMessageStore implements TransportCache {
 	 * We cache the size (in terms of numbers of records) of each of the
 	 * persistent store partitions
 	 */
-	private Hashtable cachedCounts = new Hashtable();
+	private Hashtable cachedCounts;
 
 	/**
 	 * @param testing
 	 */
 	public TransportMessageStore() {
+		cachedCounts = new Hashtable();
+		storage(Q_STORENAME).repair();
+		storage(RECENTLY_SENT_STORENAME).repair();
 		updateCachedCounts();
 	}
 
