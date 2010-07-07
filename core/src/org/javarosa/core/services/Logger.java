@@ -102,5 +102,11 @@ public class Logger {
 	public static void crashTest (String msg) {
 		throw new FatalException(msg != null ? msg : "shit has hit the fan");
 	}
+	
+	public static void halt() {
+		if(logger != null) {
+			logger.halt();
+		}
+	}
 }
 
