@@ -51,6 +51,8 @@ public class TransportService {
 	 */
 	private static TransportMessageStore T_CACHE;
 	
+	private static TransporterSharingSender SENDER;
+	
 	private static final String CACHE_LOCK="CACHE_LOCK";
 	
 	private static TransportMessageStore CACHE() {
@@ -60,6 +62,11 @@ public class TransportService {
 			}
 			return T_CACHE;
 		}
+	}
+	
+	public static synchronized void init() {
+		CACHE();
+		SENDER  = new TransporterSharingSender();
 	}
 
 	/**
@@ -183,25 +190,32 @@ public class TransportService {
 	 */
 	public static void sendCached(TransportListener listener)
 			throws TransportException {
-
-		// get all the cached messages
-		Vector messages = getCachedMessages();
-
-		if (messages.size() > 0) {
-
-			// create one appropriate transporter (to share a connection, for
-			// example)
-			TransportMessage m = (TransportMessage) messages.elementAt(0);
-
-			Transporter transporter = m.createTransporter();
-			// get a bulk sender to use the transporter to send all messages
-			TransporterSharingSender sender = new TransporterSharingSender(
-					transporter, messages, CACHE(), listener);
-
-			sender.send();
-
+		if(SENDER == null) {
+			//This is very bad, and the service should have been initialized
+			SENDER  = new TransporterSharingSender();
 		}
-		//throw new TransportException("No cached messages to send");
+
+		//We get into a lot of trouble with synchronicity if we just let all kinds of
+		//senders start going at once, so we'll just use the one and queue up 
+		//sendCached attempts.
+		synchronized(SENDER) {
+			// get all the cached messages
+			Vector messages = getCachedMessages();
+	
+			if (messages.size() > 0) {
+	
+				// create one appropriate transporter (to share a connection, for
+				// example)
+				TransportMessage m = (TransportMessage) messages.elementAt(0);
+	
+				Transporter transporter = m.createTransporter();
+				// get a bulk sender to use the transporter to send all messages
+				SENDER.init(transporter, messages, CACHE(), listener);
+	
+				SENDER.send();
+	
+			}
+		}
 	}
 
 	/**
@@ -248,5 +262,10 @@ public class TransportService {
 	public static TransportMessage retrieve(String id) {
 		return CACHE().findMessage(id);
 	}
-
+	
+	public static void halt() {
+		if(SENDER != null) {
+			SENDER.halt();
+		}
+	}
 }
