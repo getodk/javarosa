@@ -78,4 +78,10 @@ public class StorageManager {
 		}
 		return returnVal;
 	}
+	
+	public static void halt() {
+		for (Enumeration e = storageRegistry.elements(); e.hasMoreElements(); ) {
+			((IStorageUtility)e.nextElement()).close();
+		}
+	}
 }

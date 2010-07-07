@@ -43,15 +43,39 @@ import org.javarosa.j2me.storage.rms.RMSStorageUtility;
 public class J2MELogger implements ILogger {
 	
 	RMSStorageUtility logStorage;
+	boolean storageBroken = false;
 	
 	public J2MELogger() {
-		logStorage = new RMSStorageUtility(LogEntry.STORAGE_KEY, LogEntry.class);
+		String storageName = LogEntry.STORAGE_KEY;
+		for(int i = 0; i < 5 ; ++i) {
+			try {
+				logStorage = new RMSStorageUtility(storageName, LogEntry.class);
+				if(!LogEntry.STORAGE_KEY.equals(storageName)) {
+					this.log("logger", "Old log storage broken. New storage RMS: " + storageName, new Date());
+				}
+				return;
+			} catch(IllegalStateException ise) {
+				ise.printStackTrace();
+				//The logger not working should never break anything. This error
+				//signifies that the storage is broken in a pretty irreperable way, so
+				//we'll just start a new storage.
+				storageName += "F";
+			} catch(Exception e) {
+				e.printStackTrace();
+				//Even worse, we don't even know what's going on.
+				storageName += "E";
+			}
+		}
+		//If we made it here, the storage is seriously messed up and we'll just skip
+		//logging entirely
+		storageBroken=true;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IIncidentLogger#clearLogs()
 	 */
 	public void clearLogs() {
+		if(storageBroken) { return; };
 		synchronized(logStorage) {
 			if(!checkStorage()) { return; }
 			//'destroy' not supported yet
@@ -74,6 +98,7 @@ public class J2MELogger implements ILogger {
 	 * @see org.javarosa.core.api.IIncidentLogger#logIncident(java.lang.String, java.lang.String, java.util.Date)
 	 */
 	public void log(String type, String message, Date logDate) {
+		if(storageBroken) { return; };
 		synchronized(logStorage) {
 			LogEntry log = new LogEntry(type, message, logDate);
 			try {
@@ -88,6 +113,7 @@ public class J2MELogger implements ILogger {
 	 * @see org.javarosa.core.api.IIncidentLogger#serializeLogs()
 	 */
 	public <T> T serializeLogs(IFullLogSerializer<T> serializer) {
+		if(storageBroken) { return null; };
 		synchronized(logStorage) {
 			if(!checkStorage()) { return null; }
 			Vector logs = new Vector();
@@ -121,6 +147,7 @@ public class J2MELogger implements ILogger {
 	}
 
 	public boolean serializeLogs(IAtomicLogSerializer serializer) {
+		if(storageBroken) { return false; };
 		synchronized(logStorage) {
 			if(!checkStorage()) { return false; }
 			IStorageIterator li = logStorage.iterate();
@@ -134,6 +161,7 @@ public class J2MELogger implements ILogger {
 	}
 
 	public int logSize() {
+		if(storageBroken) { return -1; };
 		synchronized(logStorage) {
 			if(!checkStorage()) { return -1; }
 			return logStorage.getNumRecords();
@@ -167,6 +195,16 @@ public class J2MELogger implements ILogger {
 				//We should either throw a runtime exception here, or we should
 				//keep trying. Possibly should just dump the old RecordStore
 				//completely and just start over.
+			}
+		}
+	}
+
+	public void halt() {
+		if(!storageBroken){ 
+			try{
+				logStorage.close();
+			}catch(Exception e ) {
+				System.out.println("Caught error while trying to close log storage");
 			}
 		}
 	}
