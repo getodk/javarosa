@@ -15,6 +15,9 @@
 		<!-- exclude this until we've worked out issues with barcode apis -->
 		<exclude name="j2me/media/src/org/javarosa/barcode/**/*.java"/>
 		<exclude name="j2me/media/src/org/javarosa/view/**/Barcode*.java"/>
+		
+		<!-- don't want to put this in the jar for phones that don't suport location -->
+		<exclude name="j2me/location/src/org/javarosa/location/**/*.java"/>
 
 		<!-- stuff that hasn't been updated to build on the new framework -->
 		<exclude name="j2me/deprecated/org.javarosa.reminders/**/*.java"/>
