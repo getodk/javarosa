@@ -7,6 +7,7 @@ public interface FormEntryTransitions {
 	final int MEDIA_IMAGE = 1;
 	final int MEDIA_AUDIO = 2;
 	final int MEDIA_VIDEO = 3;
+	final int MEDIA_LOCATION = 4;
 
 	public void abort();
 	

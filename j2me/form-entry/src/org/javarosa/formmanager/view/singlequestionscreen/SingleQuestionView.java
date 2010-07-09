@@ -26,9 +26,11 @@ import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.api.FormEntryState;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.AcquireScreen;
+import org.javarosa.formmanager.view.singlequestionscreen.screen.LocationQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.NewRepeatScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
@@ -151,6 +153,8 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 				processModelEvent(event);
 			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
 				viewAnswers();
+			} else if (command == LocationQuestionScreen.captureCommand) {
+				controller.suspendActivity(FormEntryState.MEDIA_LOCATION);
 			}
 
 			// TODO: FIXME
