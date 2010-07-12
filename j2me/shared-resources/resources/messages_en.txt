@@ -83,6 +83,8 @@ menu.Review=Review
 menu.Refresh=Refresh
 menu.MessageStatus=Message Status
 menu.Empty=Empty
+menu.Capture=Capture
+menu.retry=Retry
 
 hint.TypeOrScan=Type in you answer, or choose Scan to scan the barcode
 
@@ -156,9 +158,18 @@ activity.adduser.problem.nametaken=Username ${0} already taken. Please choose an
 activity.adduser.problem.emptyuser=Username and password must both be given
 activity.adduser.problem.mismatchingpasswords=Passwords don't match
  
-
-
 activity.edituser.edituser=Edit User
+
+activity.locationcapture.capturelocation=Capture Location
+activity.locationcapture.capturelocationhint=Capture a GPS location
+activity.locationcapture.waitingforfix=Waiting for fix...
+activity.locationcapture.fixobtained=Fix obtained!
+activity.locationcapture.fixfailed=Location capture failed.
+activity.locationcapture.readyforcapture=Ready for location capture
+activity.locationcapture.Latitude=Latitude
+activity.locationcapture.Longitude=Longitude
+activity.locationcapture.Altitude=Altitude
+activity.locationcapture.Accuracy=Accuracy
 
 Pregnancy=Pregnancy
 NewBirth=New Birth

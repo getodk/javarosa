@@ -16,7 +16,9 @@
 
 package org.javarosa.location.activity;
 
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.j2me.log.CrashHandler;
@@ -37,6 +39,8 @@ public class LocationCaptureController implements LocationStateListener,
 	private LocationCaptureView locView;
 	private Thread captureThread;
 	private Fix myLoc;
+	
+	private boolean interrupted = false;
 
 	public LocationCaptureController(LocationCaptureService lService) {
 		this.locService = lService;
@@ -67,7 +71,10 @@ public class LocationCaptureController implements LocationStateListener,
 			transitions.captureCancelled();
 		} else if (comm == locView.okCommand) {
 			if (locService.getState() == LocationCaptureService.FIX_OBTAINED)
+			{
+				interrupted=true;
 				transitions.captured(myLoc);
+			}
 			else
 				transitions.captureCancelled();
 		} else if (comm == locView.retryCommand) {
@@ -80,8 +87,11 @@ public class LocationCaptureController implements LocationStateListener,
 	public void run() {
 		try {
 			myLoc = locService.getFix();
+			//ding! your fix is ready
+			AlertType.INFO.playSound(J2MEDisplay.getDisplay()); 
 			//sleep long enough for the message to show
 			Thread.sleep(2000);
+			if(!interrupted)
 			transitions.captured(myLoc);
 		}
 

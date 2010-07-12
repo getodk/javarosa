@@ -95,6 +95,8 @@ menu.MessageStatus=Message Status
 menu.Empty=Empty
 menu.Login=Login
 menu.Demo=Demo
+menu.Capture=Capture
+menu.retry=Retry
 
 settings.language=Language
 
@@ -172,6 +174,17 @@ activity.adduser.problem=Problem:
 activity.adduser.problem.nametaken=Username ${0} already taken. Please choose another username
 activity.adduser.problem.emptyuser=Username and password must both be given
 activity.adduser.problem.mismatchingpasswords=Passwords don't match
+
+activity.locationcapture.capturelocation=Capture Location
+activity.locationcapture.capturelocationhint=Capture a GPS location
+activity.locationcapture.waitingforfix=Waiting for fix...
+activity.locationcapture.fixobtained=Fix obtained!
+activity.locationcapture.fixfailed=Location capture failed.
+activity.locationcapture.readyforcapture=Ready for location capture
+activity.locationcapture.Latitude=Latitude
+activity.locationcapture.Longitude=Longitude
+activity.locationcapture.Altitude=Altitude
+activity.locationcapture.Accuracy=Accuracy
  
 formreview.period.select=Select Review Period
 formreview.period.today=Entered Today
@@ -348,3 +361,4 @@ user.create.header=New User
 
 sending.status.success=Successfully Submitted. Today we have received ${0} forms from you.
 sending.status.problem.datasafe=Successfully Submitted. Your data is safe, but we made a small mistake. We're working on it.
+
