@@ -677,6 +677,12 @@ alertcontent {
 
 }
 
+.capturingGauge {
+    view-type: gauge-horizontal-spheres;
+    label-style: gaugeLabel;
+    layout: horizontal-center | vertical-center;
+}
+
 .leftlabeledTextField {
 	background-color: white;
 	border-width: 1;
