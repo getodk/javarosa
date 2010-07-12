@@ -33,26 +33,26 @@ public class LocationCaptureView extends Form {
 	public void resetView(int status) {
 
 		if (status == LocationCaptureService.WAITING_FOR_FIX) {
-			busyIndicator.setLabel("Waiting for fix..");
+			busyIndicator.setLabel("Waiting for fix..\n");
 			busyIndicator.setValue(Gauge.CONTINUOUS_RUNNING);
 			this.addCommand(cancelCommand);
 			this.removeCommand(okCommand);
 			this.removeCommand(retryCommand);
 		} else if (status == LocationCaptureService.FIX_OBTAINED) {
-			busyIndicator.setLabel("Fix obtained!");
+			busyIndicator.setLabel("Fix obtained!\n");
 			busyIndicator.setValue(Gauge.CONTINUOUS_IDLE);
 			this.addCommand(okCommand);
 			this.removeCommand(cancelCommand);
 			this.removeCommand(retryCommand);
 		} else if (status == LocationCaptureService.FIX_FAILED) {
-			busyIndicator.setLabel("Location capture failed.");
+			busyIndicator.setLabel("Location capture failed.\n");
 			busyIndicator.setValue(Gauge.CONTINUOUS_IDLE);
 			this.addCommand(cancelCommand);
 			this.removeCommand(okCommand);
 			this.addCommand(retryCommand);
 		}
 		else if (status == LocationCaptureService.READY) {
-			busyIndicator.setLabel("Location capture starting...");
+			busyIndicator.setLabel("Location capture starting...\n");
 			busyIndicator.setValue(Gauge.CONTINUOUS_IDLE);
 			this.addCommand(cancelCommand);
 			this.removeCommand(okCommand);

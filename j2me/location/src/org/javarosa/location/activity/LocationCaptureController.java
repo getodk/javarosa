@@ -41,7 +41,6 @@ public class LocationCaptureController implements LocationStateListener,
 	public LocationCaptureController(LocationCaptureService lService) {
 		this.locService = lService;
 		locService.addListener(this);
-		locService.reset();
 	}
 
 	public void setTransitions(LocationCaptureTransitions transitions) {
@@ -51,8 +50,7 @@ public class LocationCaptureController implements LocationStateListener,
 	public void start() {
 		locView = new LocationCaptureView();
 		locView.setCommandListener(this);
-		locView.resetView(locService.getState());
-
+		
 		J2MEDisplay.setView(locView);
 
 		captureThread = new HandledThread(this, "CaptureThread");
@@ -83,7 +81,7 @@ public class LocationCaptureController implements LocationStateListener,
 		try {
 			myLoc = locService.getFix();
 			//sleep long enough for the message to show
-			captureThread.sleep(2000);
+			Thread.sleep(2000);
 			transitions.captured(myLoc);
 		}
 
@@ -91,8 +89,15 @@ public class LocationCaptureController implements LocationStateListener,
 			System.err.println(le.getMessage());
 		}
 		
+		catch (SecurityException se) {
+			//no permission
+			System.err.println(se.getMessage());
+			transitions.captureCancelled();
+		}
+		
 		catch (InterruptedException ie) {
-			//do nothing - user cancelled
+			//user cancelled
+			locService.reset();
 		}
 
 	}
