@@ -5,7 +5,9 @@ import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
 import de.enough.polish.ui.Style;
@@ -19,14 +21,14 @@ public class LocationQuestionScreen extends SingleQuestionScreen {
 	protected TextField tfAlt;
 	protected TextField tfAcc;
 	
-	public static Command captureCommand = new Command("Capture", Command.SCREEN, 2);
+	public static Command captureCommand = new Command(Localization.get("menu.Capture"), Command.SCREEN, 2);
 
 	public LocationQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
 		super(prompt,groupName,style);
 	}
 
 	public void createView() {
-		setHint("Capture a GPS location");
+		setHint(Localization.get("activity.locationcapture.capturelocationhint"));
 		
 		label = new StringItem("", "");
 		if (prompt.isRequired())
@@ -36,13 +38,13 @@ public class LocationQuestionScreen extends SingleQuestionScreen {
 		this.append(label);
 		
 		//#style leftlabeledTextField
-		tfLat = new TextField("Latitude:", "", 20, TextField.DECIMAL);
+		tfLat = new TextField(Localization.get("activity.locationcapture.Latitude")+":", "", 20, TextField.DECIMAL | TextField.UNEDITABLE);
 		//#style leftlabeledTextField
-		tfLon = new TextField("Longitude:", "", 20, TextField.DECIMAL);
+		tfLon = new TextField(Localization.get("activity.locationcapture.Longitude")+":", "", 20, TextField.DECIMAL| TextField.UNEDITABLE);
 		//#style leftlabeledTextField
-		tfAlt = new TextField("Altitude (m):", "", 20, TextField.DECIMAL);
+		tfAlt = new TextField(Localization.get("activity.locationcapture.Altitude")+"(m):", "", 20, TextField.DECIMAL| TextField.UNEDITABLE);
 		//#style leftlabeledTextField
-		tfAcc = new TextField("Accuracy (m):", "", 20, TextField.DECIMAL);
+		tfAcc = new TextField(Localization.get("activity.locationcapture.Accuracy")+"(m):", "", 20, TextField.DECIMAL| TextField.UNEDITABLE);
 		
 
 		IAnswerData answerData = prompt.getAnswerValue();
