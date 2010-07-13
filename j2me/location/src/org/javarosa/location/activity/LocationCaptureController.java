@@ -88,7 +88,7 @@ public class LocationCaptureController implements LocationStateListener,
 		try {
 			myLoc = locService.getFix();
 			//ding! your fix is ready
-			AlertType.INFO.playSound(J2MEDisplay.getDisplay()); 
+			AlertType.WARNING.playSound(J2MEDisplay.getDisplay()); 
 			//sleep long enough for the message to show
 			Thread.sleep(2000);
 			if(!interrupted)

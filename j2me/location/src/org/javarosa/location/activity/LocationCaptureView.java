@@ -16,7 +16,8 @@ public class LocationCaptureView extends Form {
 	public Command retryCommand;
 	
 	//#style capturingGauge
-	private Gauge busyIndicator = new Gauge( null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_IDLE );
+	private Gauge busyIndicator = new Gauge(Localization
+			.get("activity.locationcapture.waitingforfix"), false, Gauge.INDEFINITE, Gauge.CONTINUOUS_IDLE );
 
 
 	public LocationCaptureView() {
