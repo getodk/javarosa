@@ -21,6 +21,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
@@ -154,7 +155,13 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
 				viewAnswers();
 			} else if (command == LocationQuestionScreen.captureCommand) {
-				controller.suspendActivity(FormEntryState.MEDIA_LOCATION);
+				try {
+					controller.suspendActivity(FormEntryState.MEDIA_LOCATION);
+				} catch (UnavailableServiceException ue) {
+					J2MEDisplay.showError(Localization
+							.get("activity.locationcapture.LocationError"), Localization
+							.get("activity.locationcapture.GPSNotAvailable"));
+				}
 			}
 
 			// TODO: FIXME
