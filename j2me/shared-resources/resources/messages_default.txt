@@ -185,7 +185,8 @@ activity.locationcapture.Latitude=Latitude
 activity.locationcapture.Longitude=Longitude
 activity.locationcapture.Altitude=Altitude
 activity.locationcapture.Accuracy=Accuracy
- 
+activity.locationcapture.GPSNotAvailable=GPS Not Available
+
 formreview.period.select=Select Review Period
 formreview.period.today=Entered Today
 formreview.period.yesterday=Entered Yesterday
