@@ -30,6 +30,9 @@ public class JrFormEntryController extends FormEntryController {
 	public void setView(IFormEntryView view) {
 		this.view = view;
 	}
+	public IFormEntryView getView(){
+		return this.view;
+	}
 	public void setTransitions(FormEntryTransitions transitions) {
 		this.transitions = transitions;
 	}
