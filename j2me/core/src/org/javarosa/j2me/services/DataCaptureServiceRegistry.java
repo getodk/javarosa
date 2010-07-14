@@ -36,6 +36,7 @@ import org.javarosa.core.services.UnavailableServiceException;
  */
 public class DataCaptureServiceRegistry {
 	
+	private static DataCaptureServiceRegistry instance;
 	private Hashtable<String, DataCaptureService> services;
 	
 	public DataCaptureServiceRegistry () {
@@ -46,6 +47,13 @@ public class DataCaptureServiceRegistry {
 		this();
 		for (int i = 0; i < services.length; i++)
 			registerService(services[i]);
+	}
+	
+	public static DataCaptureServiceRegistry _() {
+		if(instance == null) {
+			instance = new DataCaptureServiceRegistry();
+		}
+		return instance;
 	}
 	
 	public void registerService (DataCaptureService service) {
@@ -99,11 +107,11 @@ public class DataCaptureServiceRegistry {
 	public VideoCaptureService getVideoCaptureService () throws UnavailableServiceException {
 		return (VideoCaptureService)getService(DataCaptureService.VIDEO);
 	}
-	*/
+	
 
 	public BarcodeCaptureService getBarcodeCaptureService () throws UnavailableServiceException {
 		return (BarcodeCaptureService)getService(DataCaptureService.BARCODE);
-	}
+	}*/
 
 
 	public LocationCaptureService getLocationCaptureService () throws UnavailableServiceException {
