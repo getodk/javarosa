@@ -3,6 +3,9 @@ package org.javarosa.demo.applogic;
 import java.io.IOException;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.data.GeoPointData;
@@ -115,16 +118,13 @@ LocationReceiver {
 		}
 	}
 
-	public void suspendForMediaCapture(int captureType) {
-		if(captureType == FormEntryState.MEDIA_LOCATION){
-			try {
-				LocationCaptureService ls = DataCaptureServiceRegistry._()
-						.getLocationCaptureService();
-				ls.getStateForCapture(this).start();
-			} catch (UnavailableServiceException ue) {
-				J2MEDisplay.showError("", Localization.get("activity.locationcapture.GPSNotAvailable"));
-				fixFailed();
-			}
+	public void suspendForMediaCapture(int captureType)
+			throws UnavailableServiceException {
+		if (captureType == FormEntryState.MEDIA_LOCATION) {
+
+			LocationCaptureService ls = DataCaptureServiceRegistry._()
+					.getLocationCaptureService();
+			ls.getStateForCapture(this).start();
 		}
 	}
 
