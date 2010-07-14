@@ -64,6 +64,7 @@
 				<!-- All source-level inclusions should be made here -->
 				<sources>
 					<source dir="${dir.src}"/>
+					<source dir="${dir.locationsrc}" if="${app.uselocation}"/>
 				</sources>
 
 				<!-- Build variables -->
@@ -114,7 +115,7 @@
 					<filter pattern="org.celllife.singlequestionscreen.*" level="debug" />
 				</debug>
 				<!-- Properties of the actual javac compiler -->
-				<compiler debug="on" includeJavaRuntime="yes" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/wmapi.jar:${wtk.home}/lib/jsr75.jar:${polish.home}/import/pim.jar"/>
+				<compiler debug="on" includeJavaRuntime="yes" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/wmapi.jar:${wtk.home}/lib/jsr75.jar:${polish.home}/import/pim.jar:${polish.home}/import/location.jar "/>
 				
 				<postcompiler name="java5"/>
 				<postcompiler name="serialization" if="org.javarosa.polish.serialization"/>

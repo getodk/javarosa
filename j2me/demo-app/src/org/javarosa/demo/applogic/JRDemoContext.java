@@ -40,6 +40,10 @@ import org.javarosa.user.model.User;
 import org.javarosa.user.utility.UserUtility;
 import org.javarosa.xform.util.XFormUtils;
 
+//#if app.uselocation && polish.api.locationapi
+import org.javarosa.location.LocationModule;
+//#endif
+
 public class JRDemoContext {
 
 	private static JRDemoContext instance;
@@ -115,6 +119,10 @@ public class JRDemoContext {
 		new PatientModule().registerModule();
 		new FormManagerModule().registerModule();
 		new LanguagePackModule().registerModule();
+		
+		//#if app.uselocation && polish.api.locationapi
+		new LocationModule().registerModule();
+		//#endif
 	}
 	
 	
