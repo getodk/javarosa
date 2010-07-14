@@ -12,6 +12,9 @@
     			<text id="PointCode">
      	 			<value>Where was the sample taken?</value>
     			</text>
+    		<text id="Location">
+     	 			<value>Current location</value>
+    		</text>
 			<text id="AssessmentDate">
      	 			<value>Sample Date</value>
     			</text>
@@ -45,6 +48,9 @@
     			<text id="PointCode">
      	 			<value>Waar was die monster geneem?</value>
     			</text>
+    		<text id="Location">
+     	 			<value>Huidige lokasie</value>
+    		</text>
 			<text id="AssessmentDate">
      	 			<value>Datum (waarop monster geneem is)</value>
     			</text>
@@ -84,6 +90,7 @@
 				
 			<Assessment>
 				<PointCode />
+				<Location />
 				<AssessmentDate />
 				<Temperature />
 				<Weather />
@@ -105,6 +112,7 @@
 	</instance>
 		
 <bind id="PointCode" nodeset="/physchem_test/Assessment/PointCode" type="xsd:string" required="true()" />
+<bind id="Location" nodeset="/h2s_test/Assessment/Location" type="xsd:geopoint" required="false()" />
 <bind id="AssessmentDate" nodeset="/physchem_test/Assessment/AssessmentDate" type="xsd:date" required="true()" jr:preload="date" jr:preloadParams="today"/>
 <bind id="turbidity" nodeset="/physchem_test/TestResults/turbidity" type="xsd:decimal" required="false()"/>
 <bind id="conductivity" nodeset="/physchem_test/TestResults/conductivity" type="xsd:decimal" required="false()"/>
@@ -126,6 +134,10 @@
 <item><label>DemoSite</label><value>DemoSite</value></item>
 <item><label>OtherSite</label><value>OtherSite</value></item>
 </select1>
+
+<input bind="Location">
+	<label ref="jr:itext('Location')" />
+</input>
 
 <input bind="AssessmentDate">
 <label ref="jr:itext('AssessmentDate')"></label>
