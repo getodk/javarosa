@@ -1,0 +1,210 @@
+﻿<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/2002/xforms"
+	  xmlns:ev="http://www.w3.org/2001/xml-events"
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	  xmlns:jr="http://openrosa.org/javarosa">
+<h:head>
+    <h:title>Repeat/International Demo</h:title>
+    <meta jr:name="dimagi-scratch-repint"/>
+    <model>
+
+<itext>
+<translation lang="English">
+<text id="q1">
+<value>Last Name</value>
+</text>
+<text id="q2">
+<value>First Name</value>
+</text>
+<text id="q3">
+<value form="long">Date of Birth</value>
+<value form="short">DOB</value>
+</text>
+<text id="q4">
+<value>Sex</value>
+</text>
+<text id="q4a">
+<value>Male</value>
+</text>
+<text id="q4b">
+<value>Female</value>
+</text>
+<text id="q5">
+<value>Address</value>
+</text>
+
+<text id="red">
+<value>red</value>
+</text>
+<text id="green">
+<value>green</value>
+</text>
+<text id="yellow">
+<value>yellow</value>
+</text>
+<text id="fav">
+<value>Favorite Color?</value>
+</text>
+
+
+
+
+</translation>
+
+<translation lang="Spanish">
+<text id="q1">
+<value>Apedillo</value>
+</text>
+<text id="q2">
+<value>Nombre</value>
+</text>
+<text id="q3">
+<value form="long">Fecha de Nacimiento</value>
+<value form="short">Nacimiento</value>
+</text>
+<text id="q4">
+<value>Género</value>
+</text>
+<text id="q4a">
+<value>Masculino</value>
+</text>
+<text id="q4b">
+<value>Femenino</value>
+</text>
+<text id="q5">
+<value>Dirección</value>
+</text>
+
+<text id="red">
+<value>sp red</value>
+</text>
+<text id="green">
+<value>sp green</value>
+</text>
+<text id="yellow">
+<value>sp yellow</value>
+</text>
+<text id="fav">
+<value>sp Favorite Color??</value>
+</text>
+
+</translation>
+
+<translation lang="Swahili">
+<text id="q1">
+<value>Jina Jamaa</value>
+</text>
+<text id="q2">
+<value>Jina Kwanza</value>
+</text>
+<text id="q3">
+<value form="long">Tarehe Uzawila</value>
+<value form="short">Uzawila</value>
+</text>
+<text id="q4">
+<value>Jinsia</value>
+</text>
+<text id="q4a">
+<value>Kiume</value>
+</text>
+<text id="q4b">
+<value>Kike</value>
+</text>
+<text id="q5">
+<value>Anwane</value>
+</text>
+
+<text id="red">
+<value>sw red</value>
+</text>
+<text id="green">
+<value>sw green</value>
+</text>
+<text id="yellow">
+<value>sw yellow</value>
+</text>
+<text id="fav">
+<value>sw Favorite Color??</value>
+</text>
+
+
+</translation>
+
+</itext>
+
+	<instance>
+		<demog xmlns="">
+			<lname>Sims</lname>
+			<fname />
+			<dob />
+			<sex />
+			<preg />
+			<children>
+			  <child jr:template="">			  
+			    <name />
+			    <fav-color jr:template="">red</fav-color>
+			    <age />
+			    
+			    <start />
+			    <end />
+			  </child>
+			</children>
+		</demog>
+	</instance>
+	
+	<bind nodeset="children/child/start" jr:preload="timestamp" jr:preloadParams="start" />
+	<bind nodeset="children/child/end" jr:preload="timestamp" jr:preloadParams="end" />
+		
+	<bind nodeset="/demog/children/child/age" type="xsd:int" />
+	<bind nodeset="/demog/children/child/name"/>
+	<bind id="lname" nodeset="/demog/lname" required="true()" />
+	<bind id="fname" nodeset="/demog/fname" required="true()" />
+	<bind id="dob" nodeset="/demog/dob" type="xsd:date" required="true()" />
+	<bind id="sex" nodeset="/demog/sex" required="true()" />
+	<bind id="preg" nodeset="/demog/preg" relevant="/demog/sex='f'" />
+    </model>
+</h:head>			
+<h:body>
+
+<input ref="lname"><label ref="jr:itext('q1')"></label></input>
+<input ref="fname"><label ref="jr:itext('q2')"></label></input>
+<input ref="dob"><label ref="jr:itext('q3')"></label></input>
+
+<group appearance="full">
+<label>Child</label>
+<repeat nodeset="/demog/children/child">
+  <input ref="age"><label>Child Age</label></input>
+  <input ref="name"><label>Child Name</label></input>
+  
+  <group>
+  <label>Fav Color</label>
+  <repeat nodeset="fav-color">
+    <select1 ref=".">
+      <label ref="jr:itext('fav')" />
+      <item><label ref="jr:itext('red')" /><value>red</value></item>
+      <item><label ref="jr:itext('green')" /><value>green</value></item>
+      <item><label ref="jr:itext('yellow')" /><value>yellow</value></item>
+    </select1>
+  </repeat>
+  </group>
+  
+</repeat>
+</group>
+
+<group>
+<label>Demographics</label>
+
+   <select1 ref="sex">
+    <label ref="jr:itext('q4')"></label>
+    <item><label ref="jr:itext('q4a')"></label><value>m</value></item>
+    <item><label ref="jr:itext('q4b')"></label><value>f</value></item>
+  </select1>
+
+  <group>
+  <label>Pregnancy</label>
+    <input ref="preg"><label>Pregnant?</label></input>
+  </group>  
+</group>
+   
+</h:body>
+</h:html>
