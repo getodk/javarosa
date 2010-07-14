@@ -171,6 +171,7 @@ activity.locationcapture.Longitude=Longitude
 activity.locationcapture.Altitude=Altitude
 activity.locationcapture.Accuracy=Accuracy
 activity.locationcapture.GPSNotAvailable=GPS Not Available
+activity.locationcapture.capturelocationhint=Use a GPS to get location
 
 Pregnancy=Pregnancy
 NewBirth=New Birth
