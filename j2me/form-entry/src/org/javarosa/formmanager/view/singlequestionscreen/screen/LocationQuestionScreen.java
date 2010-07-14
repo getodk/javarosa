@@ -38,13 +38,13 @@ public class LocationQuestionScreen extends SingleQuestionScreen {
 		this.append(label);
 		
 		//#style leftlabeledTextField
-		tfLat = new TextField(Localization.get("activity.locationcapture.Latitude")+":", "", 20, TextField.DECIMAL | TextField.UNEDITABLE);
+		tfLat = new TextField(Localization.get("activity.locationcapture.Latitude")+":", "", 20, TextField.DECIMAL);
 		//#style leftlabeledTextField
-		tfLon = new TextField(Localization.get("activity.locationcapture.Longitude")+":", "", 20, TextField.DECIMAL| TextField.UNEDITABLE);
+		tfLon = new TextField(Localization.get("activity.locationcapture.Longitude")+":", "", 20, TextField.DECIMAL);
 		//#style leftlabeledTextField
-		tfAlt = new TextField(Localization.get("activity.locationcapture.Altitude")+"(m):", "", 20, TextField.DECIMAL| TextField.UNEDITABLE);
+		tfAlt = new TextField(Localization.get("activity.locationcapture.Altitude")+"(m):", "", 20, TextField.DECIMAL);
 		//#style leftlabeledTextField
-		tfAcc = new TextField(Localization.get("activity.locationcapture.Accuracy")+"(m):", "", 20, TextField.DECIMAL| TextField.UNEDITABLE);
+		tfAcc = new TextField(Localization.get("activity.locationcapture.Accuracy")+"(m):", "", 20, TextField.DECIMAL);
 		
 
 		IAnswerData answerData = prompt.getAnswerValue();
