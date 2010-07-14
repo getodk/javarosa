@@ -121,10 +121,10 @@ LocationReceiver {
 	public void suspendForMediaCapture(int captureType)
 			throws UnavailableServiceException {
 		if (captureType == FormEntryState.MEDIA_LOCATION) {
-
 			LocationCaptureService ls = DataCaptureServiceRegistry._()
 					.getLocationCaptureService();
-			ls.getStateForCapture(this).start();
+			if (ls != null)
+				ls.getStateForCapture(this).start();
 		}
 	}
 

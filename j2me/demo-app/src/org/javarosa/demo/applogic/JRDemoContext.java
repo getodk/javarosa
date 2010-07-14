@@ -97,7 +97,7 @@ public class JRDemoContext {
 			forms.write(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/condtest.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
-			forms.write(XFormUtils.getFormFromResource("/imci.xml"));
+			//forms.write(XFormUtils.getFormFromResource("/imci.xml"));
 			forms.write(XFormUtils.getFormFromResource("/PhysicoChemTestsDemo.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/ImageSelectTester.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/sampleform.xml"));
