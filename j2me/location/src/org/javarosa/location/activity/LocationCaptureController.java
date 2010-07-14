@@ -16,9 +16,7 @@
 
 package org.javarosa.location.activity;
 
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.j2me.log.CrashHandler;
@@ -70,7 +68,7 @@ public class LocationCaptureController implements LocationStateListener,
 		if (comm == locView.cancelCommand) {
 			transitions.captureCancelled();
 		} else if (comm == locView.okCommand) {
-			if (locService.getState() == LocationCaptureService.FIX_OBTAINED)
+			if (locService.getStatus() == LocationCaptureService.FIX_OBTAINED)
 			{
 				interrupted=true;
 				transitions.captured(myLoc);
@@ -78,7 +76,6 @@ public class LocationCaptureController implements LocationStateListener,
 			else
 				transitions.captureCancelled();
 		} else if (comm == locView.retryCommand) {
-			locService.reset();
 			captureThread = new HandledThread(this, "CaptureThread");
 			captureThread.start();
 		}
@@ -87,12 +84,14 @@ public class LocationCaptureController implements LocationStateListener,
 	public void run() {
 		try {
 			myLoc = locService.getFix();
-			//ding! your fix is ready
-			AlertType.WARNING.playSound(J2MEDisplay.getDisplay()); 
-			//sleep long enough for the message to show
-			Thread.sleep(2000);
-			if(!interrupted)
-			transitions.captured(myLoc);
+			if (myLoc == null)
+				transitions.captureCancelled();
+			else {
+				// sleep long enough for the message to show
+				Thread.sleep(2000);
+				if (!interrupted)
+					transitions.captured(myLoc);
+			}
 		}
 
 		catch (LocationServiceException le) {
@@ -107,7 +106,6 @@ public class LocationCaptureController implements LocationStateListener,
 		
 		catch (InterruptedException ie) {
 			//user cancelled
-			locService.reset();
 		}
 
 	}
