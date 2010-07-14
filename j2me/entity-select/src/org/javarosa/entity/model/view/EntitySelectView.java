@@ -69,9 +69,9 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	private String baseTitle;
 	
 	private TextField tf;
-	private Command exitCmd;
-	private Command sortCmd;
-    private Command newCmd;
+	protected Command exitCmd;
+	protected Command sortCmd;
+    protected Command newCmd;
 	
 	private int firstIndex;
 	private int selectedIndex;
