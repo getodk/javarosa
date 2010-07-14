@@ -31,7 +31,7 @@ public class LocationCaptureView extends Form {
 		cancelCommand = new Command(Localization.get("polish.command.cancel"),
 				Command.CANCEL, 0);
 		okCommand = new Command(Localization.get("polish.command.ok"), Command.OK, 0);
-		retryCommand = new Command(Localization.get("menu.retry"), Command.SCREEN, 0);
+		retryCommand = new Command(Localization.get("menu.retry"), Command.OK, 0);
 	}
 
 	public void resetView(int status) {

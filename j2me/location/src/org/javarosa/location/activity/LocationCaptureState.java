@@ -26,22 +26,21 @@ package org.javarosa.location.activity;
 import org.javarosa.core.api.State;
 import org.javarosa.j2me.services.LocationCaptureService;
 import org.javarosa.j2me.services.LocationCaptureService.Fix;
-import org.javarosa.j2me.services.receiver.LocationReceiver;
+import org.javarosa.j2me.services.LocationCaptureService.LocationReceiver;
 
 public class LocationCaptureState implements LocationCaptureTransitions, State {
 
 	private LocationReceiver receiver;
 	private LocationCaptureController controller;
+	private LocationCaptureService locService;
 
-	public LocationCaptureState(LocationReceiver receiver) {
+	public LocationCaptureState(LocationReceiver receiver, LocationCaptureService locService) {
 		this.receiver = receiver;
+		this.locService = locService;
 	}
 
 	public void start() {
-		LocationCaptureService locationService = receiver.getLocationService();
-		if (locationService == null)
-			captureCancelled();
-		controller = new LocationCaptureController(locationService);
+		controller = new LocationCaptureController(locService);
 		controller.setTransitions(this);
 		controller.start();
 	}
