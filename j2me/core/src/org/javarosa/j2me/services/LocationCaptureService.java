@@ -14,56 +14,85 @@
  * the License.
  */
 
-/**
- *   An interface to describe the supported functions of all types of AudioCapture services
- * 
- *   @author Ndubisi Onuora
- */
-
 package org.javarosa.j2me.services;
 
 import java.util.Vector;
 
+import org.javarosa.core.api.State;
 import org.javarosa.j2me.services.exception.LocationServiceException;
 
+/**
+ * 
+ * A service to get a location fix
+ * 
+ * @author mel
+ * 
+ */
 public abstract class LocationCaptureService implements DataCaptureService {
-	
+
 	public static final int NOT_INITIALISED = 0;
 	public static final int READY = 1;
 	public static final int WAITING_FOR_FIX = 2;
 	public static final int FIX_OBTAINED = 3;
 	public static final int FIX_FAILED = 4;
-	
-	private int state = LocationCaptureService.NOT_INITIALISED;
-	
+
+	private int status = LocationCaptureService.NOT_INITIALISED;
+
 	private Vector listeners = new Vector();
-	
-	public int getState(){
-		return state;
+
+	/**
+	 * @return current service status
+	 */
+	public int getStatus() {
+		return status;
 	}
-	
-	protected void setState(int newState){
-		state = newState;
+
+	/**
+	 * @param newState
+	 *            the service status to set
+	 */
+	protected void setStatus(int newState) {
+		status = newState;
 		notifyStateChanged();
 	}
-	
-	
-	public void addListener(LocationStateListener listener)
-	{
+
+	/**
+	 * @param receiver
+	 *            the state that will receive the results of the location
+	 *            capture attempt
+	 * @return get a State that uses this service to perform location capture
+	 */
+	public abstract State getStateForCapture(LocationReceiver receiver);
+
+	/**
+	 * @param listener
+	 *            a LocationStateListener to notify of changes to the service
+	 *            state
+	 */
+	public void addListener(LocationStateListener listener) {
 		listeners.addElement(listener);
 	}
-	
-	protected void notifyStateChanged()
-	{
+
+	/**
+	 * Notify all listeners that the state of the service has changed
+	 */
+	protected void notifyStateChanged() {
 		for (int i = 0; i < listeners.size(); i++) {
-			((LocationStateListener) this.listeners.elementAt(i)).onChange(getState());
+			((LocationStateListener) this.listeners.elementAt(i))
+					.onChange(getStatus());
 		}
 	}
-	
-	public abstract void reset();
 
+	/**
+	 * @return a location fix
+	 * @throws LocationServiceException
+	 */
 	public abstract Fix getFix() throws LocationServiceException;
 
+	/**
+	 * @author mel a location fix
+	 * 
+	 */
 	public class Fix {
 		private double lat;
 		private double lon;
@@ -95,11 +124,37 @@ public abstract class LocationCaptureService implements DataCaptureService {
 		}
 
 	}
-	
+
+	/**
+	 * @author mel implementers of this interface want to be notified when the
+	 *         state of the location service changes
+	 * 
+	 */
 	public interface LocationStateListener {
-		
+
 		public void onChange(int status);
 
+	}
+	
+	/**
+	 * Implemented by states that can receive a location fix
+	 * 
+	 * @author melissa
+	 * 
+	 */
+	public interface LocationReceiver {
+
+		/**
+		 * Transition back to the calling state; fix has been obtained
+		 * 
+		 * @param fix
+		 */
+		void fixObtained(Fix fix);
+
+		/**
+		 * Transition back to the calling state; fix has not been obtained
+		 */
+		void fixFailed();
 	}
 
 }
