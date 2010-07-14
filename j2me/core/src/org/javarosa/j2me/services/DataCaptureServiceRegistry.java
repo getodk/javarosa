@@ -19,7 +19,6 @@ package org.javarosa.j2me.services;
 import java.util.Hashtable;
 
 import org.javarosa.core.services.UnavailableServiceException;
-import org.javarosa.j2me.services.DataCaptureService;
 
 /**
  * This is a registry of services to be passed to a state (such as form entry) that can perform data capture.
@@ -37,6 +36,7 @@ import org.javarosa.j2me.services.DataCaptureService;
  */
 public class DataCaptureServiceRegistry {
 	
+	private static DataCaptureServiceRegistry instance;
 	private Hashtable<String, DataCaptureService> services;
 	
 	public DataCaptureServiceRegistry () {
@@ -47,6 +47,13 @@ public class DataCaptureServiceRegistry {
 		this();
 		for (int i = 0; i < services.length; i++)
 			registerService(services[i]);
+	}
+	
+	public static DataCaptureServiceRegistry _() {
+		if(instance == null) {
+			instance = new DataCaptureServiceRegistry();
+		}
+		return instance;
 	}
 	
 	public void registerService (DataCaptureService service) {
@@ -77,8 +84,8 @@ public class DataCaptureServiceRegistry {
 	  		(DataCaptureService.IMAGE.equals(type) && !(service instanceof ImageCaptureService)) || */
 			(DataCaptureService.AUDIO.equals(type) && !(service instanceof AudioCaptureService)) || /*
 			(DataCaptureService.VIDEO.equals(type) && !(service instanceof VideoCaptureService)) || */
-			(DataCaptureService.BARCODE.equals(type) && !(service instanceof BarcodeCaptureService)) /*||
-			(DataCaptureService.LOCATION.equals(type) && !(service instanceof LocationCaptureService)) ||
+			(DataCaptureService.BARCODE.equals(type) && !(service instanceof BarcodeCaptureService)) ||
+			(DataCaptureService.LOCATION.equals(type) && !(service instanceof LocationCaptureService))/*||
 			(DataCaptureService.RFID.equals(type) && !(service instanceof RFIDCaptureService))*/) {
 			throw new RuntimeException("Service is not of the proper type!");
 		}
@@ -100,17 +107,18 @@ public class DataCaptureServiceRegistry {
 	public VideoCaptureService getVideoCaptureService () throws UnavailableServiceException {
 		return (VideoCaptureService)getService(DataCaptureService.VIDEO);
 	}
-	*/
+	
 
 	public BarcodeCaptureService getBarcodeCaptureService () throws UnavailableServiceException {
 		return (BarcodeCaptureService)getService(DataCaptureService.BARCODE);
-	}
+	}*/
 
-	/*
+
 	public LocationCaptureService getLocationCaptureService () throws UnavailableServiceException {
 		return (LocationCaptureService)getService(DataCaptureService.LOCATION);
 	}
 
+	/*
 	public RFIDCaptureService getRFIDCaptureService () throws UnavailableServiceException {
 		return (RFIDCaptureService)getService(DataCaptureService.RFID);
 	}

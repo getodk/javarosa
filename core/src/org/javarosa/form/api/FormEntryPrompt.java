@@ -227,18 +227,23 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * Will throw runTimeException if this is called for anything that isn't a Question.
 	 * @return
 	 */
-	public String getHelpText(){
-		String helpText=null;
-		try{
-			helpText=localizer().getLocalizedText(((QuestionDef)element).getHelpTextID());
-		}catch(NoLocalizedTextException nlt){
-			helpText = ((QuestionDef)element).getHelpText();
-		}catch(UnregisteredLocaleException ule){
-			System.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
-		}catch(Exception e){
+	public String getHelpText() {
+		String helpText = null;
+		try {
+			String helpTextID = ((QuestionDef) element).getHelpTextID();
+			if (helpTextID != null)
+				helpText = localizer().getLocalizedText(helpTextID);
+			else
+				helpText = "";
+		} catch (NoLocalizedTextException nlt) {
+			helpText = ((QuestionDef) element).getHelpText();
+		} catch (UnregisteredLocaleException ule) {
+			System.err
+					.println("Warning: No Locale set yet (while attempting to getHelpText())");
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return helpText;
 		
 	}
