@@ -2,6 +2,7 @@ package org.javarosa.formmanager.api.transitions;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.services.UnavailableServiceException;
 
 public interface FormEntryTransitions {
 	final int MEDIA_IMAGE = 1;
@@ -13,6 +14,6 @@ public interface FormEntryTransitions {
 	
 	public void formEntrySaved(FormDef form, FormInstance instanceData, boolean formWasCompleted);
 	
-	public void suspendForMediaCapture (int captureType);
+	public void suspendForMediaCapture (int captureType) throws UnavailableServiceException;
 	
 }
