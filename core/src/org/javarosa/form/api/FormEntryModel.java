@@ -337,7 +337,8 @@ public class FormEntryModel {
 
         boolean relevant;
         if (isAskNewRepeat) {
-            relevant = form.canCreateRepeat(ref);
+        	TreeElement node = form.getInstance().resolveReference(ref.getParentRef());
+        	relevant = form.canCreateRepeat(ref) && node.isRelevant();
         } else {
             TreeElement node = form.getInstance().resolveReference(ref);
             relevant = node.isRelevant(); // check instance flag first
