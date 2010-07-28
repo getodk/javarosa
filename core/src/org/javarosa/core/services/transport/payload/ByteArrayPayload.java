@@ -44,6 +44,8 @@ public class ByteArrayPayload implements IDataPayload {
 	
 	int type;
 	
+	String destination = null;
+	
 	/**
 	 * Note: Only useful for serialization.
 	 */
@@ -63,10 +65,26 @@ public class ByteArrayPayload implements IDataPayload {
 	}
 	
 
+	/**
+	 * 
+	 * @param payload The byte array for this payload.
+	 * @param id An optional id identifying the payload
+	 * @param type The type of data for this byte array
+	 * @param destination The destination url for the payload.
+	 */
+	public ByteArrayPayload(byte[] payload, String id, int type,
+			String destination) {
+		this.payload = payload;
+		this.id = id;
+		this.type = type;
+		this.destination = destination;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.transport.IDataPayload#getPayloadStream()
 	 */
 	public InputStream getPayloadStream() {
+		
 		return new ByteArrayInputStream(payload);
 	}
 
@@ -125,5 +143,13 @@ public class ByteArrayPayload implements IDataPayload {
 	public int getTransportId() {
 		//TODO: Most messages can include this data
 		return -1;
+	}
+	
+	public void setDestination(String destination){
+		this.destination = destination;
+	}
+	
+	public String getDestination() {
+		return destination;
 	}
 }

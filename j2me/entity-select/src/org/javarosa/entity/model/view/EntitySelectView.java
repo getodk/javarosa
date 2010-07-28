@@ -58,7 +58,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	public static final int NEW_IN_LIST = 1;
 	public static final int NEW_IN_MENU = 2;
 	
-	private static final int INDEX_NEW = -1;
+	protected static final int INDEX_NEW = -1;
 	
 	//behavior configuration options
 	public boolean wrapAround = false; //TODO: support this
@@ -74,13 +74,13 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
     protected Command newCmd;
 	
 	private int firstIndex;
-	private int selectedIndex;
+	protected int selectedIndex;
 	private String sortField;
 	
 	private Style headerStyle;
 	private Style rowStyle;
 	
-	private Vector<Integer> rowIDs; //index into data corresponding to current matches
+	protected Vector<Integer> rowIDs; //index into data corresponding to current matches
 	
 	public EntitySelectView (EntitySelectController<E> controller, Entity<E> entityPrototype, String title, int newMode) {
 		super(title);
@@ -94,9 +94,9 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		
 		tf = new TextField(Localization.get("entity.find") + " ", "", 20, TextField.ANY);
 		
-		//#if !polish.blackberry
-		tf.setInputMode(TextField.MODE_UPPERCASE);
-		//#endif
+//		//#if !polish.blackberry
+//		tf.setInputMode(TextField.MODE_UPPERCASE);
+//		//#endif
 		tf.setItemStateListener(this);
 				
         append(Graphics.BOTTOM, tf);
@@ -236,7 +236,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		}
 	}
 		
-	private int getSelectedEntity () {
+	public int getSelectedEntity () {
 		int selectedEntityID = -1;
 		
 		//save off old selected item
@@ -246,7 +246,6 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 				selectedEntityID = controller.getRecordID(rowID(selectedIndex));
 			}
 		}
-
 		return selectedEntityID;
 	}
 	
@@ -258,7 +257,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		return numMatches() <= 0;
 	}
 	
-	private int rowID (int i) {
+	protected int rowID (int i) {
 		return rowIDs.elementAt(i).intValue();
 	}
 	
@@ -417,7 +416,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		return super.handleKeyReleased(keyCode, gameAction);
 	}
 
-	private void processSelect() {
+	protected void processSelect() {
 		if (rowIDs.size() > 0) {
 			int rowID = rowID(selectedIndex);
 			if (rowID == INDEX_NEW) {

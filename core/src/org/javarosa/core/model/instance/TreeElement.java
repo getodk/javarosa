@@ -156,12 +156,12 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * @param name
 	 * @return
 	 */
-	public Vector getChildrenWithName(String name) {
+	public Vector<TreeElement> getChildrenWithName(String name) {
 		return getChildrenWithName(name, false);
 	}
 
-	private Vector getChildrenWithName(String name, boolean includeTemplate) {
-		Vector v = new Vector();
+	private Vector<TreeElement> getChildrenWithName(String name, boolean includeTemplate) {
+		Vector<TreeElement> v = new Vector<TreeElement>();
 
 		for (int i = 0; i < this.children.size(); i++) {
 			TreeElement child = (TreeElement) this.children.elementAt(i);
