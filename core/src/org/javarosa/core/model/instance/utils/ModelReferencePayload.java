@@ -47,6 +47,7 @@ public class ModelReferencePayload implements IDataPayload {
 	
 	int recordId;
 	IDataPayload payload;
+	String destination = null;
 	
 	IInstanceSerializingVisitor serializer;
 	
@@ -137,5 +138,13 @@ public class ModelReferencePayload implements IDataPayload {
 	
 	public int getTransportId() {
 		return recordId;
+	}
+	
+	public void setDestination(String destination){
+		this.destination = destination;
+	}
+	
+	public String getDestination() {
+		return destination;
 	}
 }

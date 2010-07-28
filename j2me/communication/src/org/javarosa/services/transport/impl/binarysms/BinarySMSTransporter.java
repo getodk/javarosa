@@ -50,10 +50,10 @@ public class BinarySMSTransporter implements Transporter {
 	public TransportMessage send() {
 		MessageConnection conn = null;
 		try {
+			System.out.println("BinarySMSTransporter.send() - destination = " + message.getDestinationURL());
 
 			// create a MessageConnection
 			conn = getConnection(message.getDestinationURL());
-
 			sendMessage((byte[]) message.getContent(), conn);
 
 		} catch (Exception e) {

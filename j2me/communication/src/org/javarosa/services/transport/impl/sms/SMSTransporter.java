@@ -47,6 +47,7 @@ public class SMSTransporter implements Transporter {
 	public TransportMessage send() {
 		MessageConnection conn = null;
 		try {
+			System.out.println("SMSTransporter.send() - destination = " + message.getDestinationURL());
 
 			// create a MessageConnection
 			conn = getConnection(message.getDestinationURL());
@@ -60,6 +61,7 @@ public class SMSTransporter implements Transporter {
 
 			for (int i = 0; i < messageParts.size(); i++) {
 				String smsContent = (String) messageParts.elementAt(i);
+				System.out.println("Sending: " + smsContent);
 				sendMessage(smsContent, conn);
 			}
 			message.setStatus(TransportMessageStatus.SENT);
