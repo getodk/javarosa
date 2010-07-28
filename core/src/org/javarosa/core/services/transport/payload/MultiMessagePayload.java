@@ -40,6 +40,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class MultiMessagePayload implements IDataPayload {
 	/** IDataPayload **/
 	Vector payloads = new Vector();
+	String destination = null;
 	
 	/**
 	 * Note: Only useful for serialization.
@@ -124,4 +125,16 @@ public class MultiMessagePayload implements IDataPayload {
 		}
 		return len;
 	}
+
+	
+	public void setDestination(String destination){
+		this.destination = destination;
+	}
+	
+	public String getDestination() {
+		return destination;
+	}
+	
+	
 }
+

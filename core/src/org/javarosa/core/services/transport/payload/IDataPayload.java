@@ -38,6 +38,7 @@ public interface IDataPayload extends Externalizable {
 	final public static int PAYLOAD_TYPE_JPG = 2;
 	final public static int PAYLOAD_TYPE_HEADER = 3;
 	final public static int PAYLOAD_TYPE_MULTI = 4;
+	final public static int PAYLOAD_TYPE_SMS = 5; // sms's are a variant of TEXT having a limit on length.
 	
 	/**
 	 * Gets the stream for this payload.
@@ -70,4 +71,13 @@ public interface IDataPayload extends Externalizable {
 	 * the status of transmissions related to this payload
 	 */
 	public int getTransportId();
+	
+	/**
+	 * @return A String for the destination url, or null if not set. 
+	 * 
+	 * 
+	 */
+	public String getDestination();
+	
+	
 }
