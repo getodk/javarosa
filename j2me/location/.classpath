@@ -5,5 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-form-entry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
 	<classpathentry kind="con" path="org.elipse.mtj.JavaMEContainer/Sun Java(TM) Wireless Toolkit 2.5.2 for CLDC/DefaultColorPhone"/>
+	<classpathentry kind="var" path="J2ME_POLISH_HOME/import/location.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
