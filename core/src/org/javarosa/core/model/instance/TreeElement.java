@@ -99,7 +99,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 		this.name = name;
 		this.multiplicity = multiplicity;
 		this.parent = null;
-		attributes = new Vector<TreeElement>();
+		attributes = new Vector<TreeElement>(0);
 	}
 	
 	/**
@@ -558,7 +558,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 	 * @param attStrings
 	 */
 	public void setAttributesFromSingleStringVector(Vector attStrings) {
-		this.attributes = new Vector();
+		this.attributes = new Vector(0);
 		if (attStrings != null) {
 			for (int i = 0; i < attStrings.size(); i++) {
 				addSingleAttribute(i, attStrings);

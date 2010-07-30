@@ -53,7 +53,7 @@ public class Logger {
 		boolean problemReadingFlag = false;
 		try {
 			String flag = PropertyManager._().getSingularProperty(JavaRosaPropertyRules.LOGS_ENABLED);
-			enabled = (flag == null || flag.equals(JavaRosaPropertyRules.LOGS_ENABLED));
+			enabled = (flag == null || flag.equals(JavaRosaPropertyRules.LOGS_ENABLED_YES));
 		} catch (Exception e) {
 			enabled = true;	//default to true if problem
 			problemReadingFlag = true;

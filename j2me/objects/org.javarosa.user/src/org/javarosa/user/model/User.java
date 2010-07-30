@@ -44,6 +44,7 @@ public class User implements Persistable, Restorable, IMetaData
 	public static final String ADMINUSER = "admin";
 	public static final String STANDARD = "standard";
 	public static final String DEMO_USER = "demo_user";
+	public static final String KEY_USER_TYPE = "user_type";
 	
 	public static final String META_UID = "uid";
 	public static final String META_USERNAME = "username";
@@ -52,28 +53,26 @@ public class User implements Persistable, Restorable, IMetaData
 	private int recordId = -1; //record id on device
 	private String username;
 	private String password;
-	private String userType;
 	private String uniqueId;  //globally-unique id
-	private int id;           //human-friendly / organizational id
+	
 	private boolean rememberMe = false;
 	
 	/** String -> String **/
-	private Hashtable properties = new Hashtable(); 
+	private Hashtable<String,String> properties = new Hashtable<String,String>(); 
 
 	public User () {
-		userType = STANDARD;
+		setUserType(STANDARD);
 	}
 
-	public User(String name, String passw, int id) {
-		this(name, passw, id, STANDARD);
+	public User(String name, String passw, String uniqueID) {
+		this(name, passw, uniqueID, STANDARD);
 	}
 	
-	public User(String name, String passw, int id, String userType) {
+	public User(String name, String passw, String uniqueID, String userType) {
 		username = name;
 		password = passw;
+		uniqueId = uniqueID;
 		setUserType(userType);
-		this.id = id;
-		this.uniqueId = String.valueOf(id);
 		rememberMe = false;
 	}
 
@@ -81,9 +80,7 @@ public class User implements Persistable, Restorable, IMetaData
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		this.username = ExtUtil.readString(in);
 		this.password = ExtUtil.readString(in);
-		this.userType = ExtUtil.readString(in);
 		this.recordId = ExtUtil.readInt(in);
-		this.id = ExtUtil.readInt(in);
 		this.uniqueId = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		this.rememberMe = ExtUtil.readBool(in);
 		this.properties = (Hashtable)ExtUtil.read(in, new ExtWrapMap(String.class, String.class), pf);
@@ -92,16 +89,14 @@ public class User implements Persistable, Restorable, IMetaData
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.writeString(out, username);
 		ExtUtil.writeString(out, password);
-		ExtUtil.writeString(out, userType);
 		ExtUtil.writeNumeric(out, recordId);
-		ExtUtil.writeNumeric(out, id);
 		ExtUtil.writeString(out, ExtUtil.emptyIfNull(uniqueId));
         ExtUtil.writeBool(out, rememberMe);
 		ExtUtil.write(out, new ExtWrapMap(properties));
 	}
 
 	public boolean isAdminUser() {
-		return userType.equals(ADMINUSER);
+		return ADMINUSER.equals(getUserType());
 	}
 
 	public String getUsername()
@@ -125,15 +120,15 @@ public class User implements Persistable, Restorable, IMetaData
 	}
 
 	public String getUserType() {
-		return userType;
+		if(properties.containsKey(KEY_USER_TYPE)) {
+			return properties.get(KEY_USER_TYPE);
+		} else {
+			return null;
+		}
 	}
 	
-	public int getUserID() {
-		return this.id;
-	}
-
 	public void setUserType(String userType) {
-		this.userType = userType;
+		properties.put(KEY_USER_TYPE,userType);
 	}
 
 	public void setUsername(String username) {
@@ -180,8 +175,6 @@ public class User implements Persistable, Restorable, IMetaData
 		FormInstance dm = RestoreUtils.createDataModel(this);
 		RestoreUtils.addData(dm, "name", username);
 		RestoreUtils.addData(dm, "pass", password);
-		RestoreUtils.addData(dm, "type", userType);
-		RestoreUtils.addData(dm, "user-id", new Integer(id));
 		RestoreUtils.addData(dm, "uuid", uniqueId);
 		RestoreUtils.addData(dm, "remember", new Boolean(rememberMe));		
 		
@@ -207,8 +200,6 @@ public class User implements Persistable, Restorable, IMetaData
 	public void importData(FormInstance dm) {
 		username = (String)RestoreUtils.getValue("name", dm);
 		password = (String)RestoreUtils.getValue("pass", dm);
-		userType = (String)RestoreUtils.getValue("type", dm);
-		id = ((Integer)RestoreUtils.getValue("user-id", dm)).intValue();
 		uniqueId = (String)RestoreUtils.getValue("uuid", dm);
 		rememberMe = RestoreUtils.getBoolean(RestoreUtils.getValue("remember", dm));
         
@@ -219,7 +210,7 @@ public class User implements Persistable, Restorable, IMetaData
             	String name = child.getName();
             	Object value = RestoreUtils.getValue("other/" + name, dm);
             	if (value != null){
-            	    properties.put(name, value);
+            	    properties.put(name, (String)value);
             	}
             }
         }
@@ -239,7 +230,7 @@ public class User implements Persistable, Restorable, IMetaData
 		} else if(META_USERNAME.equals(fieldName)) {
 			return username;
 		} else if(META_ID.equals(fieldName)) {
-			return new Integer(id);
+			return new Integer(recordId);
 		}
 		throw new IllegalArgumentException("No metadata field " + fieldName  + " for User Models");
 	}

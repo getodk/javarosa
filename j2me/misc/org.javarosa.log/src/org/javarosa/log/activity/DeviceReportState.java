@@ -14,6 +14,8 @@ import java.util.Vector;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.reference.Reference;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.IPropertyRules;
@@ -26,6 +28,7 @@ import org.javarosa.j2me.log.StatusReportException;
 import org.javarosa.j2me.log.XmlLogSerializer;
 import org.javarosa.j2me.log.XmlStatusProvider;
 import org.javarosa.log.util.LogReportUtils;
+import org.javarosa.log.util.StreamLogSerializer;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.TransportService;
@@ -70,7 +73,11 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	
 	public void start() {
 		if(reportFormat == LogReportUtils.REPORT_FORMAT_SKIP) {
-			System.out.println("No reports pending");
+			//If we've gotten 600 logger lines in less than 7 days,
+			//it's a problem
+			if(Logger.isLoggingEnabled()) {
+				determineLogFallback(600);
+			}
 			done();
 			return;
 		}
@@ -93,6 +100,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		} catch (Exception e) {
 			// Don't let this code break the application, ever.
 			e.printStackTrace();
+			dumpLogFallback();
 		}
 		done();
 	}
@@ -268,7 +276,51 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			if(!message.isCacheable()) {
 				Logger._().clearLogs();
 			}
+		} else {
+			//if we failed we need to determine if the logs are too big
+			//and either dump to the fileystem or just clear the logs...
+			determineLogFallback(200);
 		}
+	}
+	
+	private void determineLogFallback(int size) {
+		boolean fallback = false;
+		//Figure out if we need to dump the logs because they've gotten
+		//big and might be causing problems.
+		try{
+			if(Logger._().logSize() > size) {
+				//This is big enough that we need to try to dump them and move on...
+				fallback = true;
+			} else {
+				fallback = false;
+			}
+		} catch(Exception e) {
+			dumpLogFallback();
+			return ;
+		}
+		//We keep this outside so that the exception handling is reasonable.
+		if(fallback) {
+			dumpLogFallback();
+		}
+	}
+	
+	private void dumpLogFallback() {
+		try{
+			String dumpRef = "jr://file/jr_log_dump" + DateUtils.formatDateTime(new Date(), DateUtils.FORMAT_TIMESTAMP_SUFFIX) + ".log";
+			Reference ref = ReferenceManager._().DeriveReference(dumpRef);
+			if(!ref.isReadOnly()) {
+				if(Logger._().serializeLogs(new StreamLogSerializer(ref.getOutputStream()))) {
+					//Success!
+				} else {
+					//Not success!
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		//No matter _what_, clear the logs.
+		Logger._().clearLogs();
 	}
 	
 	/*

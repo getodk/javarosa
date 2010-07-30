@@ -35,6 +35,7 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.utils.DateUtils;
 import org.kxml2.kdom.Element;
@@ -65,12 +66,21 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData ||
 		    data instanceof SelectMultiData || data instanceof SelectOneData ||
 		    data instanceof IntegerData || data instanceof DecimalData || data instanceof PointerAnswerData	||
-		    data instanceof MultiPointerAnswerData || data instanceof GeoPointData || data instanceof DateTimeData) {
+		    data instanceof MultiPointerAnswerData || data instanceof GeoPointData || data instanceof DateTimeData || data instanceof UncastData) {
 			return true;
 		} else {
 			return false;
 		}
 	}
+	
+	/**
+	 * @param data The AnswerDataObject to be serialized
+	 * @return A String which contains the given answer
+	 */
+	public Object serializeAnswerData(UncastData data) {
+		return data.getString();
+	}
+	
 	
 	/**
 	 * @param data The AnswerDataObject to be serialized
@@ -234,6 +244,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
             return serializeAnswerData((DateTimeData)data);
         } else if (data instanceof BooleanData) {
             return serializeAnswerData((BooleanData)data);
+        } else if (data instanceof UncastData) {
+            return serializeAnswerData((UncastData)data);
         }
 		
 		return null;
