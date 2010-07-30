@@ -19,6 +19,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryModel;
@@ -27,6 +28,7 @@ import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 import org.javarosa.formmanager.view.chatterbox.FakedFormEntryPrompt;
 
 import de.enough.polish.ui.ChoiceGroup;
+import de.enough.polish.ui.TextField;
 
 public class ChatterboxWidgetFactory {
 	Chatterbox cbox;
@@ -67,12 +69,19 @@ public class ChatterboxWidgetFactory {
 		
 		switch (controlType) {
 		case Constants.CONTROL_INPUT:
+		case Constants.CONTROL_SECRET:
 			switch (dataType) {
 			case Constants.DATATYPE_INTEGER:
 				expandedStyle = new NumericEntryWidget();
+				if(controlType == Constants.CONTROL_SECRET) {
+					((NumericEntryWidget)expandedStyle).setConstraint(TextField.PASSWORD);
+				}
 				break;
 			case Constants.DATATYPE_DECIMAL:
 				expandedStyle = new NumericEntryWidget(true);
+				if(controlType == Constants.CONTROL_SECRET) {
+					((NumericEntryWidget)expandedStyle).setConstraint(TextField.PASSWORD);
+				}
 				break;
 			case Constants.DATATYPE_DATE_TIME:
 				expandedStyle = new DateEntryWidget(true);
@@ -119,6 +128,9 @@ public class ChatterboxWidgetFactory {
 
 		if (expandedStyle == null) { //catch types text, null, unsupported
 			expandedStyle = new TextEntryWidget();
+			if(controlType == Constants.CONTROL_SECRET) {
+				((TextEntryWidget)expandedStyle).setConstraint(TextField.PASSWORD);
+			}
 			
 			String name = String.valueOf(controlType); //huh? controlType is an int
 			Object widget = widgetFactory.getNewInstance(name);
@@ -162,11 +174,14 @@ public class ChatterboxWidgetFactory {
 	
 		}
     	
+		String labelInner = (label == null || label.length() == 0 ? Localization.get("repeat.repitition") : label);
+
+		String promptLabel = Localization.get((multiplicity > 0 ? "repeat.message.multiple" : "repeat.message.single"), new String[] {labelInner});
     	
-    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("Add " + (multiplicity > 0 ? "another " : "") + (label == null || label.length() == 0 ? "repetition" : label) + "?",
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt(promptLabel,
     										Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
-    	prompt.addSelectChoice(new SelectChoice(null,"Yes", "y", false));
-    	prompt.addSelectChoice(new SelectChoice(null,"No", "n", false));
+    	prompt.addSelectChoice(new SelectChoice(null,Localization.get("yes"), "y", false));
+    	prompt.addSelectChoice(new SelectChoice(null,Localization.get("no"), "n", false));
 		
 		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }

@@ -102,6 +102,7 @@ public class JRDemoContext {
 			forms.write(XFormUtils.getFormFromResource("/ImageSelectTester.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/sampleform.xml"));
 			forms.write(XFormUtils.getFormFromResource("/itemset_test.xml"));
+			forms.write(XFormUtils.getFormFromResource("/itemset_test_advanced.xml"));
 			
 		} catch (StorageFullException e) {
 			throw new RuntimeException("uh-oh, storage full [forms]"); //TODO: handle this

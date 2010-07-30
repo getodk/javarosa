@@ -38,7 +38,8 @@ public class NumericEntryWidget extends TextEntryWidget {
 	
 	protected Item getEntryWidget (FormEntryPrompt prompt) {
 		TextField tf = textField();
-		tf.setConstraints(isDecimal ? TextField.DECIMAL : TextField.NUMERIC);
+		int clearNumberType = tf.getConstraints() & ~(TextField.DECIMAL + TextField.NUMERIC);
+		tf.setConstraints( clearNumberType | (isDecimal ? TextField.DECIMAL : TextField.NUMERIC));
 		//UiAccess.setInputMode(tf,UiAccess.MODE_NUMBERS);
 		return super.getEntryWidget(prompt);
 	}
@@ -51,7 +52,7 @@ public class NumericEntryWidget extends TextEntryWidget {
 	}
 	
 	protected IAnswerData getWidgetValue () {
-		String s = textField().getText();
+		String s = textField().getString();
 		
 		if (s == null || s.equals(""))
 			return null;
