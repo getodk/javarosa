@@ -26,7 +26,8 @@ import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
 import org.javarosa.core.api.ILogger;
-import org.javarosa.core.log.ILogSerializer;
+import org.javarosa.core.log.IAtomicLogSerializer;
+import org.javarosa.core.log.IFullLogSerializer;
 import org.javarosa.core.log.LogEntry;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.utils.DateUtils;
@@ -82,7 +83,7 @@ public class J2MELogger implements ILogger {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IIncidentLogger#serializeLogs()
 	 */
-	public <T> T serializeLogs(ILogSerializer<T> serializer) {
+	public <T> T serializeLogs(IFullLogSerializer<T> serializer) {
 		Vector logs = new Vector();
 		IStorageIterator li = logStorage.iterate();
 		while (li.hasMore()) {
@@ -110,6 +111,20 @@ public class J2MELogger implements ILogger {
 		} catch (RecordStoreException rse) {
 			throw new WrappedException(rse);
 		}
+	}
+
+	public boolean serializeLogs(IAtomicLogSerializer serializer) {
+		IStorageIterator li = logStorage.iterate();
+		while (li.hasMore()) {
+			if(!serializer.serializeLog((LogEntry)li.nextRecord()));
+			//Panic?
+			return false;
+		}
+		return true;
+	}
+
+	public int logSize() {
+		return logStorage.getNumRecords();
 	}
 	
 }

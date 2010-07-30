@@ -19,10 +19,7 @@
  */
 package org.javarosa.user.utility;
 
-import java.io.IOException;
-
-import org.javarosa.core.services.storage.IStorageUtility;
-import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.entity.model.Entity;
 import org.javarosa.user.model.User;
 
@@ -34,13 +31,13 @@ import org.javarosa.user.model.User;
 public class UserEntity extends Entity<User> {
 	
 	String username;
-	int userid;
+	String type;
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.patient.select.activity.IEntity#entityType()
 	 */
 	public String entityType() {
-		return "User";
+		return Localization.get("user.entity.name");
 	}
 
 	/* (non-Javadoc)
@@ -55,7 +52,7 @@ public class UserEntity extends Entity<User> {
 	 */
 	public void loadEntity(User u) {
 		this.username = u.getUsername();
-		this.userid = u.getUserID();
+		this.type = u.getUserType();
 	}
 	
 	/* (non-Javadoc)
@@ -63,41 +60,46 @@ public class UserEntity extends Entity<User> {
 	 */
 	public String[] getHeaders(boolean detailed) {
 		if(!detailed) {
-			return new String[]{"Username", "ID"};
+			return new String[]{Localization.get("user.entity.username"),Localization.get("user.entity.type")};
 		} else {
-			return new String[]{"Username", "ID", "Type"};
+			return new String[]{Localization.get("user.entity.username"), Localization.get("user.entity.type")};
 		}
-	}
-
-	public String getID() {
-		return String.valueOf(userid);
 	}
 
 	public String getName() {
 		return username;
 	}
 	
+	private String getType() {
+		return getType(type);
+	}
+	
+	private String getType(String type) {
+		String output = Localization.get("user.entity.unknown");
+		if(User.ADMINUSER.equals(type)) {
+			output = Localization.get("user.entity.admin");
+		} else if(User.DEMO_USER.equals(type)) {
+			output = Localization.get("user.entity.demo");
+		} else if(User.STANDARD.equals(type)) {
+			output = Localization.get("user.entity.normal");
+		}
+		return output;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.patient.select.activity.IEntity#getLongFields(java.lang.Object)
 	 */
 	public String[] getLongFields(User u) {
-		String type = "Unknown";
-		if(User.ADMINUSER.equals(u.getUserType())) {
-			type = "Administrator";
-		} else if(User.DEMO_USER.equals(u.getUserType())) {
-			type = "Demo";
-		} else if(User.STANDARD.equals(u.getUserType())) {
-			type = "Standard";
-		}
+		String type = getType(u.getUserType());
 		
-		return new String[]{getName(), getID(), type};
+		return new String[]{getName(), type};
 	}
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.patient.select.activity.IEntity#getShortFields()
 	 */
 	public String[] getShortFields() {
-		return new String[]{getName(), getID()};
+		return new String[]{getName(), getType()};
 	}
 
 	public boolean match(String key) {
@@ -111,18 +113,16 @@ public class UserEntity extends Entity<User> {
 	}
 	
 	public String[] getSortFields () {
-		return new String[] {"NAME", "ID"};
+		return new String[] {"NAME"};
 	}
 	
 	public String[] getSortFieldNames () {
-		return new String[] {"Name", "ID"};
+		return new String[] {Localization.get("user.entity.username")};
 	}
 	
 	public Object getSortKey (String fieldKey) {
 		if (fieldKey.equals("NAME")) {
 			return getName();
-		} else if (fieldKey.equals("ID")) {
-			return getID();
 		} else {
 			throw new RuntimeException("Sort Key [" + fieldKey + "] is not supported by this entity");
 		}

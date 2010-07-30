@@ -51,6 +51,10 @@ public class TextEntryWidget extends ExpandedWidget {
 		//#endif
 	}
 	
+	public void setConstraint(int constraint) {
+		textField.setConstraints(textField.getConstraints() | constraint);
+	}
+	
 	public int getNextMode () {
 		return wec.wrapNextMode(ChatterboxWidget.NEXT_ON_SELECT);
 	}
@@ -70,11 +74,11 @@ public class TextEntryWidget extends ExpandedWidget {
 	protected void updateWidget (FormEntryPrompt prompt) { /* do nothing */ }
 	
 	protected void setWidgetValue (Object o) {
-		textField().setText((String)o);
+		textField().setString((String)o);
 	}
 
 	protected IAnswerData getWidgetValue () {
-		String s = textField().getText();
+		String s = textField().getString();
 		return (s == null || s.equals("") ? null : new StringData(s));
 	}
 	

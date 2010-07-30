@@ -21,9 +21,11 @@ package org.javarosa.j2me;
 
 import org.javarosa.core.api.IModule;
 import org.javarosa.core.services.Logger;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.storage.IStorageFactory;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.j2me.file.J2meFileSystemProperties;
 import org.javarosa.j2me.log.J2MELogger;
 import org.javarosa.j2me.storage.rms.RMSStorageUtilityIndexed;
 
@@ -45,6 +47,16 @@ public class J2MEModule implements IModule {
 		});
 
 		Logger.registerLogger(new J2MELogger());
+		
+		//The j2merosa.disable.autofile is used if the automatic file
+		//system setup should not be used (since it might trigger security
+		//problems on some devices)
+		
+		//#if !j2merosa.disable.autofile
+		J2meFileSystemProperties properties = new J2meFileSystemProperties();
+		PropertyManager._().addRules(properties);
+		properties.initializeFileReference();
+		//#endif
 	}
 
 }

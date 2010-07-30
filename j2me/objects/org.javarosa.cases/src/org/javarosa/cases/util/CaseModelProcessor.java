@@ -55,7 +55,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 		if(caseIdKids.size() < 1) {
 			throw new MalformedCaseModelException("Invalid <case> model. Required element (case_id) is missing.","<case>");
 		}
-		String caseId = (String)serializer.serializeAnswerData(((TreeElement)caseIdKids.elementAt(0)).getValue());
+		String caseId = ((TreeElement)caseIdKids.elementAt(0)).getValue().uncast().getString();
 		Vector dateModified = caseElement.getChildrenWithName("date_modified");
 		if(dateModified.size() < 1) {
 			throw new MalformedCaseModelException("Invalid <case> model. Required element (date_modified) is missing.","<case>");
