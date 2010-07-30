@@ -228,8 +228,8 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * Returns null if no help text is available
 	 * @return
 	 */
-	public String getHelpText(){
-		String helpText=null;
+	public String getHelpText() {
+		String helpText = null;
 		if(!(element instanceof QuestionDef)){
 			throw new RuntimeException("Can't get HelpText for Elements that are not Questions!");
 		}
