@@ -53,6 +53,7 @@ public class J2MEDisplay {
 	
 	public static void startStateWithLoadingScreen(State state, ProgressIndicator indicator) {
 		final State s = state;
+		loading.cancelLoading();
 		loading = new LoadingScreenThread(display);
 		loading.startLoading(indicator);
 		new HandledThread(new Runnable() {

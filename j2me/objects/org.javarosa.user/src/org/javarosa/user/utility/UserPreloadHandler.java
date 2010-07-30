@@ -21,6 +21,7 @@ package org.javarosa.user.utility;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.user.model.User;
@@ -48,12 +49,16 @@ public class UserPreloadHandler implements IPreloadHandler {
 	 * @see org.javarosa.core.model.utils.IPreloadHandler#handlePreload(java.lang.String)
 	 */
 	public IAnswerData handlePreload(String preloadParams) {
-		Object property = user.getProperty(preloadParams);
-		if(property instanceof String) {
-			return new StringData((String)property);
-		} else {
+		if(preloadParams.equals("username")) { 
+			return new UncastData(user.getUsername());
+		} else if(preloadParams.equals("uuid")) { 
+			return new UncastData(user.getUniqueId());
+		}
+		String property = user.getProperty(preloadParams);
+		if(property == null) {
 			return null;
 		}
+		return new UncastData(property);
 	}
 
 	/* (non-Javadoc)

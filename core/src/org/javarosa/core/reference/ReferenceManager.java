@@ -84,6 +84,10 @@ public class ReferenceManager {
 		}
 	}
 	
+	public boolean removeReferenceFactory(ReferenceFactory factory) {
+		return factories.removeElement(factory);
+	}
+	
 	/**
 	 * Derives a global reference from a URI in the current environment.
 	 * 

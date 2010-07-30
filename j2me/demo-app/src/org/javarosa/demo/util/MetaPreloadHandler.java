@@ -37,7 +37,7 @@ public class MetaPreloadHandler implements IPreloadHandler {
 		if(preloadParams.equals("UserName")) {
 			return new StringData(u.getUsername());
 		}else if(preloadParams.equals("UserID")) {
-			return new StringData(String.valueOf(u.getUserID()));
+			return new StringData(String.valueOf(u.getUniqueId()));
 		}
 		System.out.println("FAILED to preload: " + preloadParams);
 		return null;
