@@ -225,25 +225,26 @@ public class FormEntryPrompt extends FormEntryCaption {
 	/**
 	 * ONLY RELEVANT to Question elements!
 	 * Will throw runTimeException if this is called for anything that isn't a Question.
+	 * Returns null if no help text is available
 	 * @return
 	 */
 	public String getHelpText() {
 		String helpText = null;
-		try {
-			String helpTextID = ((QuestionDef) element).getHelpTextID();
-			if (helpTextID != null)
-				helpText = localizer().getLocalizedText(helpTextID);
-			else
-				helpText = "";
-		} catch (NoLocalizedTextException nlt) {
-			helpText = ((QuestionDef) element).getHelpText();
-		} catch (UnregisteredLocaleException ule) {
-			System.err
-					.println("Warning: No Locale set yet (while attempting to getHelpText())");
-		} catch (Exception e) {
+		if(!(element instanceof QuestionDef)){
+			throw new RuntimeException("Can't get HelpText for Elements that are not Questions!");
+		}
+		try{
+			helpText=localizer().getLocalizedText(((QuestionDef)element).getHelpTextID());
+		}catch(NoLocalizedTextException nlt){
+			helpText = ((QuestionDef)element).getHelpText();
+		}catch(UnregisteredLocaleException ule){
+			System.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
+		}catch(NullPointerException nlp){
+			helpText = ((QuestionDef)element).getHelpText(); //grab non-localized help text
+		}catch(Exception e){
 			e.printStackTrace();
 		}
-
+		
 		return helpText;
 		
 	}
@@ -267,7 +268,11 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 */
 	public String getQText(String form){
 		try{
-			return this.getText(this.getTextID(),form);
+			if(!(getFormElement() instanceof QuestionDef)){
+				return null;
+			}else{
+				return this.getText(this.getTextID(),form);
+			}
 		}catch(NoLocalizedTextException nle){
 			return null;
 		}
@@ -313,6 +318,11 @@ public class FormEntryPrompt extends FormEntryCaption {
 	}
 	
 	private static String d = "default";
+	
+	
+	
+	/////Bad idea. we should deprecate  this (limits the text forms available according to the list in array
+	//richMediaFormTypes...
 	/**
 	 * Retrieve a Vector containing the available forms of text for the
 	 * provided select choice.
@@ -351,11 +361,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @return
 	 */
 	public String getSelectChoiceText(SelectChoice sel, String form){
-		if(getSelectTextForms(sel).contains(form)) {
 			return getText(sel.getTextID(), form);
-		} else {
-			return null;
-		}
 	}
 }
 
