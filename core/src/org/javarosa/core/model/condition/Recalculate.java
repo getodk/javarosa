@@ -29,6 +29,7 @@ import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.xpath.XPathConditional;
 
 public class Recalculate extends Triggerable {
 	public Recalculate () {
