@@ -23,12 +23,10 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localizer;
-import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.formmanager.view.IQuestionWidget;
 import java.lang.String;
-import java.util.Vector;
+
 
 /**
  * This class gives you all the information you need to display a caption when
@@ -48,11 +46,6 @@ public class FormEntryCaption implements FormElementStateListener {
 	public static final String TEXT_FORM_SHORT = "short";
 	public static final String TEXT_FORM_AUDIO = "audio";
 	public static final String TEXT_FORM_IMAGE = "image";
-	
-	protected String[] richMediaFormTypes = {TEXT_FORM_LONG,
-										   TEXT_FORM_SHORT,
-										   TEXT_FORM_AUDIO,
-										   TEXT_FORM_IMAGE};
 
 	protected IQuestionWidget viewWidget;
 
@@ -78,123 +71,34 @@ public class FormEntryCaption implements FormElementStateListener {
 	}
 
 	
-	//////These two methods were a bad idea. Should be deprecated.  Use getText() and check for null instead
-	/**
-	 * Find out what Text forms (e.g. audio, long form text, etc) are available
-	 * for this element or the element specified by textID
-	 * @param textID (Optional) if null, uses textID of this FormEntryCaption
-	 * @return String Array of form names available in current locale
-	 */
-	public Vector getAvailableTextForms() {
-		return this.getAvailableTextForms(this.textID);
-	}
-	
-	protected Vector getAvailableTextForms(String textID){
-		String tID = textID;
-		if(tID == null || tID == "") tID = this.textID; //fallback to this FormEntry's textID
-		if(tID == null) return new Vector();
-		String types="";
 
-		//check for default
-		if(null != localizer().getRawText(localizer().getLocale(), tID)){
-			types+="default";
-		}
-		
-		//run through types list
-		for(int i=0;i<richMediaFormTypes.length;i++){
-			String curType = richMediaFormTypes[i];
-			if(null != localizer().getRawText(localizer().getLocale(), tID+";"+curType)){
-				types+=","+curType;
-			}
-		}
-		Vector vec = DateUtils.split(types,",",false);
-		vec.removeElement("");
-		return vec;
-	}
-	
-	/**
-	 * @return The default text form for this caption, either the inner
-	 * text or the appropriate localized form.
-	 */
-	public String getDefaultText(){
-		return getDefaultText(this.textID);
-	}
-	
-	/**
-	 * Get the default text for the provided ID; 
-	 * @param textID 
-	 * @return
-	 */
-	protected String getDefaultText(String textID){
-		return getText(textID,null);
-	}
-	
-	protected String getFormOrDefault(String textID, String form) {
-		String t = null;
-		if(textID == null) {
-			return this.getText(null, null);
-		}
-		try{
-			t = getText(textID,form);
-			if(t == null || t.equals("")) t = getDefaultText(textID);
-		}catch(NoLocalizedTextException nlte){
-			System.out.println("Warning, " + form + " text form requested for ["+textID+"] but doesn't exist. (Falling back to Default form).");
-			t = getDefaultText(textID);
-		}catch(IllegalArgumentException iae){
-			System.out.println("Warning, Long text form requested for ["+textID+"] but doesn't exist. (Falling back to Default form).");
-			t = getDefaultText(textID);
-		}
-		return t;
-
-	}
-	
-	/**
-	 * Get the text for a particular localized text form. If for whatever
-	 *  reason it's not available, return null.
-	 * @param textID - TextID of this question
-	 * @param form - text form like "video","image", etc
-	 * @return
-	 */
-	public String getFormOrNull(String textID, String form) {
-		if(textID==null && this.textID == null)return null;
-		else textID = this.textID;
-		
-		String ret = getText(textID,form);
-		if(ret=="")ret = null;
-		return ret;
-	}
-	
-	/**
-	 * Get the text for this question for a specified text form. If for whatever
-	 *  reason it's not available, return null.
-	 * @param form - text form like "video","image", etc
-	 * @return
-	 */
-	public String getFormOrNull(String form){
-		return getFormOrNull(null,form);
-	}
-	
 	/**
 	 * Convenience method
 	 * Get longText form of text for THIS element (if available) 
-	 * Falls back to default if long text form doesn't exist.
+	 * !!Falls back to default form if 'long' form does not exist.!!
+	 * Use getSpecialFormQuestionText() if you want short form only.
 	 * @return longText form 
 	 */
 	public String getLongText(){
-		return getFormOrDefault(getTextID(), TEXT_FORM_LONG);
+		String returnText = getSpecialFormQuestionText(getTextID(), TEXT_FORM_LONG);
+		if(returnText == null) returnText = getQuestionText(getTextID());
+		return returnText;
 	}
 	
 	/**
 	 * Convenience method
-			System.out.println("Warning, Short text form requested for ["+textID+"] but doesn't exist. (Falling back to Default form).");
-			t = getDefaultText(textID);
-		}catch(IllegalArgumentException iae){
 	 * Get shortText form of text for THIS element (if available) 
+	 * !!Falls back to default form if 'short' form does not exist.!!
+	 * Use getSpecialFormQuestionText() if you want short form only.
 	 * @return shortText form 
 	 */
 	public String getShortText(){
-		return getFormOrDefault(getTextID(), TEXT_FORM_SHORT);
+		String returnText = getSpecialFormQuestionText(getTextID(), TEXT_FORM_SHORT);
+		if(returnText == null) returnText = getQuestionText(getTextID());
+		return returnText;
 	}
+	
+
 	
 	/**
 	 * Convenience method
@@ -202,7 +106,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @return audio URI form stored in current locale of Text, returns null if not available
 	 */
 	public String getAudioText() {
-		return getFormOrNull(getTextID(), TEXT_FORM_AUDIO);
+		return getSpecialFormQuestionText(getTextID(), TEXT_FORM_AUDIO);
 	}
 	
 	/**
@@ -211,53 +115,98 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @return URI of image form stored in current locale of Text, returns null if not available
 	 */
 	public String getImageText() {
-		return getFormOrNull(getTextID(), TEXT_FORM_IMAGE);
+		return getSpecialFormQuestionText(getTextID(), TEXT_FORM_IMAGE);
 	}
 	
 	
-	/**
-	 * Standard Localized text retreiver.
-	 * 
-	 * Falls back to labelInnerText if textID and form are null
-	 * or (textID!=null and there is no Localized text available && form==null).
-	 * 
-	 * If textID == null && form != null, throws IllegalArgumentException
-	 * 
-	 * @param tID - the textID of the element
-	 * @param form - Special form of the text (such as "image","audio",whatever) can be null.
-	 * @return null if no text is available.
-	 * @throws IllegalArgumentException if this element is unlocalized but a special form is requested.
-	 * 
-	 * 
-	 * 
-	 */
-	protected String getText(String tID,String form){
-		if(form == "") form = null; //
-		if(tID == "") tID = null;   //this is just to make the code look a little cleaner
-	
-		String text=null;		
-		String textID = tID;
 
-		if(textID == null){ //if no textID was specified as an argument...
-			textID = this.textID; //switch to this FormEntry's ID.
-			if(textID == null && form == null){ //If there still is no ID (ie it's not a localizable element)
-				String tt = element.getLabelInnerText(); //get the inner text if available.		
-				if(tt == null) return null;
-				else return substituteStringArgs(tt);  //process any arguments in the text and return. 
-				
-			}else if(textID == null && form != null){ //But if it's not localized and you specified a form...
-				throw new IllegalArgumentException("Can't ask for a special form for unlocalized element! Form = "+form);
-			}
+	/**
+	 * Attempts to return question text for this element.
+	 * Will check for text in the following order:<br/>
+	 * Localized Text (long form) -> Localized Text (no special form) <br />
+	 * If no textID is specified, method will return THIS element's labelInnerText.
+	 * @param textID - The textID of the text you're trying to retrieve. if <code>textID == null</code> will get LabelInnerText for current element
+	 * @return Question Text.  <code>null</code> if no text for this element exists (after all fallbacks).
+	 * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
+	 */
+	public String getQuestionText(String textID){
+		//throw tantrum if this method is called when it shouldn't be
+		if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
+		
+		//check for the null id case and return labelInnerText if it is so.
+		String tid = textID;
+		if(tid == null || tid == "") tid = getTextID();
+		if(tid == null) return substituteStringArgs(((QuestionDef)getFormElement()).getLabelInnerText());
+		
+		//otherwise check for 'long' form of the textID, then for the default form and return
+		String returnText;
+		returnText = getIText(tid, "long");
+		if(returnText == null) returnText = getIText(tid,null);
+		
+		return substituteStringArgs(returnText);
+	}
+	
+	/**
+	 * Same as getQuestionText(String textID), but for the current element textID;
+	 * @see getQuestionText(String textID)
+	 * @return Question Text
+	 */
+	public String getQuestionText(){
+		return getQuestionText(getTextID());
+	}
+	
+	/**
+	 * This method is generally used to retrieve special forms of a
+	 * textID, e.g. "audio", "video", etc.
+	 * 
+	 * @param textID - The textID of the text you're trying to retrieve.
+	 * @param form - special text form of textID you're trying to retrieve. 
+	 * @return Special Form Question Text. <code>null</code> if no text for this element exists (with the specified special form).
+	 * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
+	 */
+	public String getSpecialFormQuestionText(String textID,String form){
+		//throw tantrum if this method is called when it shouldn't be
+		if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
+		if(textID == null || textID.equals("")) return null;
+		
+		String returnText = getIText(textID, form);
+		
+		return substituteStringArgs(returnText);
+	}
+	
+	/**
+	 * Same as getSpecialFormQuestionText(String textID,String form) except that the
+	 * textID defaults to the textID of the current element.
+	 * @param form - special text form of textID you're trying to retrieve. 
+	 * @return Special Form Question Text. <code>null</code> if no text for this element exists (with the specified special form).
+	 * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
+	 */
+	public String getSpecialFormQuestionText(String form){
+		if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
+		return getSpecialFormQuestionText(getTextID(), form);
+	}
+	
+
+	
+	
+	/**
+	 * @param textID - the textID of the text you'd like to retrieve
+	 * @param form - the special form (e.g. "audio","long", etc) of the text
+	 * @return the IText for the parameters specified.
+	 */
+	protected String getIText(String textID,String form){
+		String returnText = null;
+		if(textID == null || textID.equals("")) return null;
+		if(form != null && !form.equals("")){
+			try{
+				returnText = localizer().getRawText(localizer().getLocale(), textID + ";" + form);
+			}catch(NullPointerException npe){}
+		}else{
+			try{
+				returnText = localizer().getRawText(localizer().getLocale(), textID);
+			}catch(NullPointerException npe){}
 		}
-		
-		if(form!=null){
-			textID += ";" + form;	
-		}
-		
-//		text = localizer().getLocalizedText(textID);
-		text = localizer().getRawText(localizer().getLocale(), textID);
-		
-		return substituteStringArgs(text);
+		return returnText;
 	}
 
 	public String getAppearanceHint ()  {
