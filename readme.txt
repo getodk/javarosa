@@ -1,1 +1,1 @@
-Go to http://code.javarosa.org to learn how to get started with JavaRosa.
+Go to http://bitbucket.org/javarosa/javarosa/wiki/GettingStarted to learn how to get started with JavaRosa.

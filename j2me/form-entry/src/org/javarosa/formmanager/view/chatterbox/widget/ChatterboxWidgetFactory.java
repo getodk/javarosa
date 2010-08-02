@@ -160,18 +160,10 @@ public class ChatterboxWidgetFactory {
     	FormEntryCaption p = model.getCaptionPrompt(index);
 		
 		String label; //decide what text form to use.
-		
-		
-		
-		if(p.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_LONG)){
-			label = p.getLongText();
-		}else if(p.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_SHORT)){
+	
+		label = p.getLongText();
+		if(label == null){
 			label = p.getShortText();
-		}else{
-	
-			label = p.getDefaultText();
-			
-	
 		}
     	
 		String labelInner = (label == null || label.length() == 0 ? Localization.get("repeat.repitition") : label);
