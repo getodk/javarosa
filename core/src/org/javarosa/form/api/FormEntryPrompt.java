@@ -296,8 +296,6 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @throws IllegalArgumentException if <code>sel == null</code>
 	 */
 	public String getSpecialFormSelectItemText(Selection sel,String form){
-		//throw tantrum if this method is called when it shouldn't be or when sel == null
-		if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
 		if(sel == null) throw new IllegalArgumentException("Cannot use null as an argument for Selection!");
 		String textID = sel.choice.getTextID();
 		if(textID == null || textID.equals("")) return null;
