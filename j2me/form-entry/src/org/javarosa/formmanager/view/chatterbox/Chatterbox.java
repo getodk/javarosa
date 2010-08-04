@@ -413,7 +413,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 		
 		String headerText; //decide what text form to use.
 		headerText = prompt.getLongText();
-		if(headerText.equals(null)){
+		if(headerText == null){
 			headerText = prompt.getShortText();
 		}
 		
