@@ -23,6 +23,7 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.FormInstance;
@@ -154,8 +155,9 @@ public class FormOverview {
 		FormEntryModel femodel = fec.getModel();
 		
 		println(sb, indent, "Choices: " + q.getNumChoices());
-		for (int i = 0; i < q.getNumChoices(); i++) {
-			println(sb, indent + 1, "\"" + femodel.getQuestionPrompt().getSelectChoiceText(i) + "\"");
+//		for (int i = 0; i < q.getNumChoices(); i++) {
+		for (SelectChoice choice : q.getChoices()){
+			println(sb, indent + 1, "\"" + femodel.getQuestionPrompt().getSelectChoiceText(choice) + "\"");
 		}
 	}
 	
@@ -283,7 +285,7 @@ public class FormOverview {
 	private static boolean listGroup (FormDef f, GroupDef g, int indent, StringBuffer sb) {
 		FormEntryModel femodel = new FormEntryModel(f);
 		boolean repeat = g.getRepeat();
-		String caption = ExtUtil.nullIfEmpty(femodel.getQuestionPrompt().getLongText());
+		String caption = ExtUtil.nullIfEmpty(femodel.getCaptionPrompt().getLongText());
 		TreeElement instanceNode = getInstanceNode(f.getInstance(), g.getBind());
 		
 		String relevant = printConditionalProperty("relevant", f, instanceNode);
