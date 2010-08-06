@@ -52,37 +52,44 @@ public class MultiSubmitStatusScreen extends Form implements
 	private int counter = 0;
 	private Hashtable ids;
 	private int failed = 0;
-
+	
 	private TransportResponseProcessor responder;
+	private boolean silenceable;
+	
+	public MultiSubmitStatusScreen(CommandListener listener, TransportResponseProcessor responder) {
+		this(listener, responder, true);
+	}
 	
 	/**
 	 * @param listener
 	 * @param modelIDs
 	 */
-	public MultiSubmitStatusScreen(CommandListener listener, TransportResponseProcessor responder) {
+	public MultiSubmitStatusScreen(CommandListener listener, TransportResponseProcessor responder, boolean silenceable) {
 		//#style submitPopup
 		super(Localization.get("sending.status.title"));
 
 		setCommandListener(listener);
 
-		addCommand(new Command(Localization.get("menu.ok"), Command.OK, 1));
+		this.silenceable = silenceable;
+		if (silenceable) {
+			setOKCommand();
+		}
 
 		this.responder = responder;
 	}
 
+	private void setOKCommand() {
+		addCommand(new Command(Localization.get("menu.ok"), Command.OK, 1));		
+	}
+	
 	public void reinit(String[] ids) {
+		if (!this.silenceable && ids.length == 0) {
+			setOKCommand();
+		}
+		
 		deleteAll();
 		setModelIDs(ids);
 		setMessage();
-		failed = 0;
-	}
-
-	/**
-	 * Error situation - no data to send. when "sent unsent" is called with no forms
-	 */
-	public void reinitNodata() {
-		deleteAll();
-		setMessage(Localization.get("sending.status.none"));
 		failed = 0;
 	}
 
@@ -97,10 +104,11 @@ public class MultiSubmitStatusScreen extends Form implements
 
 	private void setMessage() {
 		append(new Spacer(80, 0));
-		if (this.ids.size() == 0)
+		if (this.ids.size() == 0) {
 			this.msg = new StringItem(null, Localization.get("sending.status.none"));
-		else
+		} else {
 			this.msg = new StringItem(null, getCurrentDisplay());
+		}
 		append(this.msg);
 
 	}
@@ -162,9 +170,16 @@ public class MultiSubmitStatusScreen extends Form implements
 		}
 		
 		if(this.currentid == ids.size()) {
+			if (!this.silenceable) {
+				setOKCommand();
+			}
 			constructFinalMessage(transportMessage);
 		}
 
+	}
+	
+	public boolean hasErrors () {
+		return failed > 0;
 	}
 	
 	private void constructFinalMessage(TransportMessage transportMessage) {

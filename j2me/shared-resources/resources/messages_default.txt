@@ -89,6 +89,7 @@ menu.Scan=Scan
 menu.SendData=Send Data
 menu.send.all=Send All Unsent
 menu.send.all.val=Send All Unsent (${0})
+menu.sync=Sync with Server
 menu.Edit=Edit
 menu.Review=Review
 menu.Refresh=Refresh
