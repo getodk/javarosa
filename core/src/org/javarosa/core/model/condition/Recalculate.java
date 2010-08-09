@@ -22,12 +22,14 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.xpath.XPathConditional;
 
 public class Recalculate extends Triggerable {
 	public Recalculate () {
@@ -118,7 +120,7 @@ public class Recalculate extends Triggerable {
 		} else if (val instanceof String) {
 			return new StringData((String)val);
 		} else if (val instanceof Date) {
-			return new DateData((Date)val);
+			return (dataType == Constants.DATATYPE_DATE_TIME ? new DateTimeData((Date)val) : new DateData((Date)val));
 		} else {
 			throw new RuntimeException("unrecognized data type in 'calculate' expression: " + val.getClass().getName());
 		}

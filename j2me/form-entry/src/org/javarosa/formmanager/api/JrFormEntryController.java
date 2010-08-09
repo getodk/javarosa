@@ -4,6 +4,7 @@
 package org.javarosa.formmanager.api;
 
 import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
@@ -75,7 +76,7 @@ public class JrFormEntryController extends FormEntryController {
 		transitions.formEntrySaved(this.getModel().getForm(),this.getModel().getForm().getInstance(),formComplete);
 	}
 	
-	public void suspendActivity(int mediaType) {
+	public void suspendActivity(int mediaType) throws UnavailableServiceException {
 		transitions.suspendForMediaCapture(mediaType);
 	}
 	

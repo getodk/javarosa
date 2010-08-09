@@ -81,18 +81,16 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		String textID;
 		AudioURI = null;
 		if (select == null) {		
-			if (fep.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_AUDIO)) {
-				AudioURI = fep.getAudioText();
-			} else {
+			AudioURI = fep.getAudioText();
+			if(AudioURI == null){
 				return;
 			}	
 		}else{
 			textID = select.getTextID();
 			if(textID == null || textID == "") return;
 			
-			if (fep.getSelectTextForms(select).contains(FormEntryCaption.TEXT_FORM_AUDIO)) {
-				AudioURI = fep.getSelectChoiceText(select,FormEntryCaption.TEXT_FORM_AUDIO);
-			} else {
+			AudioURI = fep.getSpecialFormSelectChoiceText(select,FormEntryCaption.TEXT_FORM_AUDIO);
+			if(AudioURI == null){
 				return;
 			}
 		}	
@@ -123,20 +121,11 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	}
 		
 	public ImageItem getImageItem(FormEntryPrompt fep){
-		Vector AvailForms = fep.getAvailableTextForms();
-		String ILabel,IaltText;
+//		Vector AvailForms = fep.getAvailableTextForms();
+		String IaltText;
+
+		IaltText = fep.getShortText();
 		
-		if(AvailForms.contains(FormEntryCaption.TEXT_FORM_LONG)){
-			ILabel = fep.getLongText();
-		}else{
-			ILabel = fep.getDefaultText();
-		}
-		
-		if(AvailForms.contains(FormEntryCaption.TEXT_FORM_SHORT)){
-			IaltText = fep.getShortText();
-		}else{
-			IaltText = fep.getDefaultText();
-		}
 		Image im = getImage(fep.getImageText());
 		if(im!=null){
 			ImageItem imItem = new ImageItem(null,getImage(fep.getImageText()), ImageItem.LAYOUT_CENTER | ImageItem.LAYOUT_VCENTER, IaltText);
