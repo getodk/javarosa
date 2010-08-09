@@ -74,6 +74,11 @@ public class SingleQuestionScreenFactory {
 				screenToReturn = new TextQuestionScreen(prompt, groupTitle,
 						style);
 				break;
+				
+			case Constants.DATATYPE_GEOPOINT:
+				screenToReturn = new LocationQuestionScreen(prompt, groupTitle,
+						style);
+				break;
 
 			default:
 				screenToReturn = new TextQuestionScreen(prompt, groupTitle,

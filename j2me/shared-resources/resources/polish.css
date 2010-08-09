@@ -661,3 +661,38 @@ alertcontent {
     label-style: gaugeLabel;
     layout: horizontal-center | vertical-center;
 }
+
+/* Location capture screen style */
+
+.capturingPopup {
+    margin-right: 5;
+    margin-left: 5;
+    padding-left: 5;
+    padding-right: 5;
+    border-width: 1;
+    border-color: black;
+    background-color: white;
+    repaint-previous-screen: true;
+    layout: horizontal-center | bottom | horizontal-shrink | vertical-shrink;
+
+}
+
+.capturingGauge {
+    view-type: gauge-horizontal-spheres;
+    label-style: gaugeLabel;
+    layout: horizontal-center | vertical-center;
+}
+
+.leftlabeledTextField {
+	background-color: white;
+	border-width: 1;
+	border-color: black;
+	padding: 2;
+	label-style: .leftLabel;
+	layout: expand;
+
+}
+
+.leftLabel {
+	font-face: proportional;
+}

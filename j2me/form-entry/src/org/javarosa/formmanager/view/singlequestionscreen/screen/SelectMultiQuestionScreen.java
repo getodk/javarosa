@@ -75,7 +75,7 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 		Vector<Selection> selections = (Vector<Selection>) answerValue.getValue();
 		Vector<String> strings = new Vector<String>();
 		for (Selection selection : selections) {
-			strings.addElement(prompt.getSelectionText(selection));
+			strings.addElement(prompt.getSelectItemText(selection));
 		}
 		return strings;
 	}
