@@ -2254,10 +2254,10 @@ public class XFormParser {
 		return text;
 	}
 	
-	public static FormInstance restoreDataModel (byte[] data, Class restorableType) {
+	public static FormInstance restoreDataModel (InputStream input, Class restorableType) {
 		Restorable r = (restorableType != null ? (Restorable)PrototypeFactory.getInstance(restorableType) : null);
 		
-		Document doc = getXMLDocument(new InputStreamReader(new ByteArrayInputStream(data)));
+		Document doc = getXMLDocument(new InputStreamReader(input));
 		if (doc == null) {
 			throw new RuntimeException("syntax error in XML instance; could not parse");
 		}
@@ -2273,6 +2273,10 @@ public class XFormParser {
 		loadInstanceData(e, te, null);
 		
 		return dm;
+	}
+	
+	public static FormInstance restoreDataModel (byte[] data, Class restorableType) {
+		return restoreDataModel(new ByteArrayInputStream(data), restorableType);
 	}
 	
 	public static String getVagueLocation(Element e) {
