@@ -6,6 +6,7 @@ package org.javarosa.formmanager.api;
 import org.javarosa.core.api.State;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
 
 /**
@@ -26,5 +27,5 @@ public abstract class FormEntryState implements FormEntryTransitions, State {
 	
 	public abstract void formEntrySaved(FormDef form, FormInstance instanceData, boolean formWasCompleted);
 	
-	public abstract void suspendForMediaCapture (int captureType);
+	public abstract void suspendForMediaCapture (int captureType) throws UnavailableServiceException;
 }
