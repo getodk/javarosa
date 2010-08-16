@@ -142,7 +142,15 @@ import org.kxml2.kdom.Node;
 		public void visit(FormInstance tree) {
 			theXmlDoc = new Document();
 			//TreeElement root = tree.getRoot();
+			
 			TreeElement root = tree.resolveReference(rootRef);
+			
+			//For some reason resolveReference won't ever return the root, so we'll 
+			//catch that case and just start at the root.
+			if(root == null) {
+				root = tree.getRoot();
+			}
+			
 			for (int i = 0; i< root.getNumChildren(); i++){
 				TreeElement childAt = root.getChildAt(i);
 			}
