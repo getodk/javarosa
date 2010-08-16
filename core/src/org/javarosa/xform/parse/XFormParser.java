@@ -34,6 +34,7 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.Recalculate;
@@ -93,6 +94,7 @@ public class XFormParser {
 	private static Vector itemsets; //ItemsetBinding
 	private static Vector selectOnes; //TreeReference
 	private static Vector selectMultis; //TreeReference
+	private static Vector<SubmissionParser> submissionParsers;
 	private static Element instanceNode; //top-level data node of the instance; saved off so it can be processed after the <bind>s
 	private static String defaultNamespace;
 	
@@ -104,6 +106,7 @@ public class XFormParser {
 		initTypeMappings();
 		modelPrototypes = new PrototypeFactoryDeprecated();
 		bindHandlers = new Vector();
+		submissionParsers = new Vector<SubmissionParser>();
 	}
 
 	/**
@@ -352,6 +355,7 @@ public class XFormParser {
 	//for ease of parsing, we assume a model comes before the controls, which isn't necessarily mandated by the xforms spec
 	private static void parseModel (FormDef f, Element e) {
 		Vector usedAtts = new Vector(); //no attributes parsed in title.
+		Vector<Element> submissionBlocks = new Vector<Element>();
 		
 		
 		if (modelFound) {
@@ -380,6 +384,8 @@ public class XFormParser {
 				saveInstanceNode(child);
 			} else if ("bind".equals(childName)) { //<instance> must come before <bind>s
 				parseBind(f, child);
+			} else if("submission".equals(childName)) {
+				submissionBlocks.addElement(child);
 			} else { //invalid model content
 				if (type == Node.ELEMENT) {
 					throw new XFormParseException("Unrecognized top-level tag [" + childName + "] found within <model>",child);
@@ -400,7 +406,62 @@ public class XFormParser {
 			}
 		}
 		
+		//Now parse out the submission blocks (we needed the binds to all be set before we could)
+		for(Element child : submissionBlocks) {
+			parseSubmission(f, child);
+		}
+	}
+	
+	private static void parseSubmission(FormDef def, Element submission) {
+		String id = submission.getAttributeValue(null, "id");
 		
+		//These two are always required
+		String method = submission.getAttributeValue(null, "method");
+		String action = submission.getAttributeValue(null, "action");
+		
+		SubmissionParser parser = new SubmissionParser();
+		for(SubmissionParser p : submissionParsers) {
+			if(p.matchesCustomMethod(method)) {
+				parser = p;
+			}
+		}
+		
+		//These two might exist, but if neither do, we just assume you want the entire instance.
+		String ref = submission.getAttributeValue(null, "ref");
+		String bind = submission.getAttributeValue(null, "bind");
+		
+		IDataReference dataRef = null;
+		boolean refFromBind = false;
+		
+		if (bind != null) {
+			DataBinding binding = (DataBinding)bindingsByID.get(bind);
+			if (binding == null) {
+				throw new XFormParseException("XForm Parse: invalid binding ID in submit'" + bind + "'", submission);
+			}
+			dataRef = binding.getReference();
+			refFromBind = true;
+		} else if (ref != null) {
+			dataRef = new XPathReference(ref);
+		} else {
+			//no reference! No big deal, assume we want the root reference
+			dataRef = new XPathReference("/");
+		}
+
+		if (dataRef != null) {
+			if (!refFromBind) {
+				dataRef = getAbsRef(dataRef, TreeReference.rootRef());
+			}
+		}
+
+		SubmissionProfile profile = parser.parseSubmission(method, action, dataRef, submission );
+		
+		if(id == null) {
+			//default submission profile
+			def.setDefaultSubmission(profile);
+		} else {
+			//typed submission profile
+			def.addSubmissionProfile(id, profile);
+		}
 	}
 
 	private static void saveInstanceNode (Element instance) {

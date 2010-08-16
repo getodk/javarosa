@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
+import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.transport.payload.IDataPayload;
 
@@ -31,10 +32,13 @@ import org.javarosa.core.services.transport.payload.IDataPayload;
  */
 public interface IInstanceSerializingVisitor extends IInstanceVisitor {
 	
+	//LEGACY: Should remove
 	byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException;
 	
+	byte[] serializeInstance(FormInstance model, IDataReference ref) throws IOException;
 	byte[] serializeInstance(FormInstance model) throws IOException;
 	
+	public IDataPayload createSerializedPayload	(FormInstance model, IDataReference ref) throws IOException;
 	public IDataPayload createSerializedPayload	(FormInstance model) throws IOException;
 	
 	void setAnswerDataSerializer(IAnswerDataSerializer ads);

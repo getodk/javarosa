@@ -37,8 +37,6 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 public class DataPointerPayload implements IDataPayload {
 	IDataPointer pointer;
 	
-	String destination = null;
-	
 	/**
 	 * Note: Only useful for serialization.
 	 */
@@ -110,14 +108,6 @@ public class DataPointerPayload implements IDataPayload {
 	
 	public int getTransportId() {
 		return -1;
-	}
-	
-	public void setDestination(String destination){
-		this.destination = destination;
-	}
-	
-	public String getDestination() {
-		return destination;
 	}
 
 }

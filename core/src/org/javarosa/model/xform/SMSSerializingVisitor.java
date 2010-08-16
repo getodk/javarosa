@@ -22,6 +22,7 @@ import java.util.Vector;
 import org.javarosa.core.data.IDataPointer;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.IAnswerDataSerializer;
+import org.javarosa.core.model.IDataReference;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
@@ -44,12 +45,12 @@ import org.kxml2.kdom.Node;
 public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 
 	private String theSmsStr = null; // sms string to be returned
-	private String smsNumber = null; // sms destination number
 	private String nodeSet = null; // which nodeset the sms contents are in
 	private String xmlns = null;
 	private String delimeter = null;
 	private String prefix = null;
 	private String method = null;
+	private TreeReference rootRef;
 
 	/** The serializer to be used in constructing XML for AnswerData elements */
 	IAnswerDataSerializer serializer;
@@ -63,24 +64,31 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 		theSmsStr = null;
 		schema = null;
 		dataPointers = new Vector();
+		theSmsStr = "";
 	}
 
-	public byte[] serializeInstance(FormInstance model, FormDef formDef)
-			throws IOException {
+	public byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException {
 		init();
 		this.schema = formDef;
 		return serializeInstance(model);
 	}
+	
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#serializeInstance(org.javarosa.core.model.instance.FormInstance)
+	 */
+	public byte[] serializeInstance(FormInstance model) throws IOException {
+		return this.serializeInstance(model, new XPathReference("/"));
+	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.javarosa.core.model.utils.IInstanceSerializingVisitor#serializeDataModel
-	 * (org.javarosa.core.model.IFormDataModel)
+	 * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#serializeInstance(org.javarosa.core.model.instance.FormInstance, org.javarosa.core.model.IDataReference)
 	 */
-	public byte[] serializeInstance(FormInstance model) throws IOException {
+	public byte[] serializeInstance(FormInstance model, IDataReference ref) throws IOException {
 		init();
+		rootRef = model.unpackReference(ref);
 		if (this.serializer == null) {
 			this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
 		}
@@ -91,33 +99,26 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 			return null;
 		}
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#createSerializedPayload(org.javarosa.core.model.instance.FormInstance)
+	 */
+	public IDataPayload createSerializedPayload(FormInstance model) throws IOException {
+		return createSerializedPayload(model, new XPathReference("/"));
+	}
 
-	public IDataPayload createSerializedPayload(FormInstance model)
+	public IDataPayload createSerializedPayload(FormInstance model, IDataReference ref)
 			throws IOException {
 		init();
+		rootRef = model.unpackReference(ref);
 		if (this.serializer == null) {
 			this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
 		}
 		model.accept(this);
 		if (theSmsStr != null) {
 			byte[] form = theSmsStr.getBytes("UTF-8");
-			if (dataPointers.size() == 0) {
-				if (smsNumber.length() == 0) {
-					return new ByteArrayPayload(form, null,
-							IDataPayload.PAYLOAD_TYPE_SMS);
-				}
-				return new ByteArrayPayload(form, null,
-						IDataPayload.PAYLOAD_TYPE_SMS, smsNumber);
-			}
-			MultiMessagePayload payload = new MultiMessagePayload();
-			payload.addPayload(new ByteArrayPayload(form, null,
-					IDataPayload.PAYLOAD_TYPE_SMS));
-			Enumeration en = dataPointers.elements();
-			while (en.hasMoreElements()) {
-				IDataPointer pointer = (IDataPointer) en.nextElement();
-				payload.addPayload(new DataPointerPayload(pointer));
-			}
-			return payload;
+			return new ByteArrayPayload(form, null, IDataPayload.PAYLOAD_TYPE_SMS);
 		} else {
 			return null;
 		}
@@ -131,48 +132,32 @@ public class SMSSerializingVisitor implements IInstanceSerializingVisitor {
 	 * .DataModelTree)
 	 */
 	public void visit(FormInstance tree) {
-		smsNumber = new String();
 		nodeSet = new String();
 
-		TreeElement root = tree.getRoot();
+		//TreeElement root = tree.getRoot();
+		TreeElement root = tree.resolveReference(rootRef);
 
-		// get contents of submission blocks
-		for (TreeElement te : root.getChildrenWithName("submission")) {
-			method = te.getAttributeValue("", "method");
-			smsNumber = te.getAttributeValue("", "action");
-			nodeSet = te.getAttributeValue("", "nodeset");
-		}
+		xmlns = root.getAttributeValue("", "xmlns");
+		delimeter = root.getAttributeValue("", "delimeter");
+		prefix = root.getAttributeValue("", "prefix");
 
-		// come in here only if there is a valid action and nodeset to parse
-		if ((nodeSet != null) && (smsNumber != null)) {
-			theSmsStr = "";
-			String nset = nodeSet;
+		xmlns = (xmlns != null)? xmlns : " ";
+		delimeter = (delimeter != null ) ? delimeter : " ";
+		prefix = (prefix != null) ? prefix : " ";
+		
+		//Don't bother adding any delimiters, yet. Delimiters are
+		//added before tags/data
+		theSmsStr = prefix;
 
-			XPathReference reference = new XPathReference(nset);
-			TreeElement t = tree.resolveReference(reference);
-
-			xmlns = t.getAttributeValue("", "xmlns");
-			delimeter = t.getAttributeValue("", "delimeter");
-			prefix = t.getAttributeValue("", "prefix");
-
-			xmlns = (xmlns != null)? xmlns : " ";
-			delimeter = (delimeter != null ) ? delimeter : " ";
-			prefix = (prefix != null) ? prefix : " ";
-			
-			theSmsStr += prefix + delimeter;
-
-			// serialize each node to get it's answers
-			for (int j = 0; j < t.getNumChildren(); j++) {
-				TreeElement tee = t.getChildAt(j);
-				String e = serializeNode(tee);
+		// serialize each node to get it's answers
+		for (int j = 0; j < root.getNumChildren(); j++) {
+			TreeElement tee = root.getChildAt(j);
+			String e = serializeNode(tee);
+			if(e != null) {
 				theSmsStr += e;
 			}
-			theSmsStr = theSmsStr.trim();
-
-		} else {
-			return;
 		}
-
+		theSmsStr = theSmsStr.trim();
 	}
 
 	public String serializeNode(TreeElement instanceNode) {
