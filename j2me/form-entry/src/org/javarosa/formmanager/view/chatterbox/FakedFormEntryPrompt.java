@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.IQuestionWidget;
 
@@ -85,8 +86,26 @@ public class FakedFormEntryPrompt extends FormEntryPrompt {
 		//do nothing -- this fake prompt is not bound to anything real in the instance		
 	}
 
-	protected String getText(String tID, String form) {
+
+
+	//Ugly hack.
+	public String getQuestionText(String textID){
 		return text;
 	}
 	
+	//Ugly hack.
+	public String getSpecialFormSelectItemText(Selection sel,String form){
+		if(sel == null)return null;
+		if(form != null || form != "long" || form != "short" || form != "") return null;
+		return sel.choice.getLabelInnerText();
+	}
+	
+	public String getSpecialFormSelectChoiceText(SelectChoice sel,String form){
+		return getSpecialFormSelectItemText(sel.selection(),form);
+	}
+	
+	//Hey look, another hack.
+	public String getSelectItemText(Selection sel){
+		return sel.choice.getLabelInnerText();
+	}
 }
