@@ -36,6 +36,7 @@ import org.javarosa.patient.PatientModule;
 import org.javarosa.patient.model.Patient;
 import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.resources.locale.LanguageUtils;
+import org.javarosa.services.transport.SubmissionTransportHelper;
 import org.javarosa.services.transport.TransportManagerModule;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
@@ -163,49 +164,11 @@ public class JRDemoContext {
 	}
 	
 	public TransportMessage buildMessage(FormInstance tree, SubmissionProfile profile) {
-		
 		if(profile == null) {
-			//Right now we have to just give the message the stream, rather than the payload,
-			//since the transport layer won't take payloads. This should be fixed _as soon 
-			//as possible_ so that we don't either (A) blow up the memory or (B) lose the ability
-			//to send payloads > than the phones' heap.
-			try {
-				IDataPayload payload = new XFormSerializingVisitor().createSerializedPayload(tree);
-				return new SimpleHttpTransportMessage(payload.getPayloadStream(), PropertyManager._().getSingularProperty(DemoAppProperties.POST_URL_PROPERTY));
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error Serializing Data to be transported");
-			}
+			profile = SubmissionTransportHelper.defaultPostSubmission(PropertyManager._().getSingularProperty(DemoAppProperties.POST_URL_PROPERTY));
 		}
 		
-		//If there is a submission profile, we need to use the relevant portions.
-		if(profile.getMethod().toLowerCase().equals("post")) {
-			
-			//URL
-			String url = profile.getAction();
-			
-			try {
-				IDataPayload payload = new XFormSerializingVisitor().createSerializedPayload(tree, profile.getRef());
-				return new SimpleHttpTransportMessage(payload.getPayloadStream(),url);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error Serializing Data to be transported");
-			}
-		} else if(profile.getMethod().toLowerCase().equals("smspush")) {
-			
-			//URL
-			String phoneUri = profile.getAction();
-			
-			try {
-				String payload = new String(new SMSSerializingVisitor().serializeInstance(tree, profile.getRef()));
-				return new SMSTransportMessage(payload,phoneUri);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error Serializing Data to be transported");
-			}
-		}
-		
-		return null;
+		return SubmissionTransportHelper.createMessage(tree, profile);
 	}
 	
 	public Vector<IPreloadHandler> getPreloaders() {
