@@ -16,7 +16,6 @@
 
 package org.javarosa.form.api;
 
-import java.util.ArrayList;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
@@ -460,14 +459,19 @@ public class FormEntryModel {
     }
     
     public FormIndex[] getCompoundIndices(FormIndex container) {
-    	ArrayList<FormIndex> indices = new ArrayList<FormIndex>();
+    	Vector<FormIndex> indices = new Vector<FormIndex>();
     	FormIndex walker = getForm().incrementIndex(container);
     	while(FormIndex.isSubElement(container, walker)) {
     		if(isIndexRelevant(walker)) {
-    			indices.add(walker);
+    			indices.addElement(walker);
     		}
     		walker = getForm().incrementIndex(walker);
     	}
-    	return indices.toArray(new FormIndex[0]);
+    	
+    	FormIndex[] ret = new FormIndex[indices.size()];
+    	for(int i = 0; i < ret.length ; ++i) {
+    		ret[i] = indices.elementAt(i);
+    	}
+    	return ret;
     }
 }
