@@ -128,9 +128,9 @@ public class UserValidator {
 		int userid = this.view.getUserId();
 
 		if (!this.view.adminRightsSelected())
-			user = new User(username, password, userid);
+			user = new User(username, password, String.valueOf(userid));
 		else
-			user = new User(username, password, userid, User.ADMINUSER);
+			user = new User(username, password, String.valueOf(userid), User.ADMINUSER);
 
 		if (this.view.getDecorator() != null) {
 			String[] elements = this.view.getDecorator()

@@ -5,6 +5,7 @@ polish.command.exit=Exit
 polish.command.select=Select
 polish.command.mark=Mark
 polish.command.unmark=Unmark
+polish.date.select=Select Date
 # for deleting a single char:
 polish.command.delete=Delete
 # for deleting a complete TextField:
@@ -95,6 +96,8 @@ menu.MessageStatus=Message Status
 menu.Empty=Empty
 menu.Login=Login
 menu.Demo=Demo
+menu.Capture=Capture
+menu.retry=Retry
 
 settings.language=Language
 
@@ -172,7 +175,21 @@ activity.adduser.problem=Problem:
 activity.adduser.problem.nametaken=Username ${0} already taken. Please choose another username
 activity.adduser.problem.emptyuser=Username and password must both be given
 activity.adduser.problem.mismatchingpasswords=Passwords don't match
- 
+
+activity.locationcapture.capturelocation=Capture Location
+activity.locationcapture.capturelocationhint=Capture a GPS location
+activity.locationcapture.waitingforfix=Waiting for fix...
+activity.locationcapture.fixobtained=Fix obtained!
+activity.locationcapture.fixfailed=Location capture failed.
+activity.locationcapture.readyforcapture=Ready for location capture
+activity.locationcapture.Latitude=Latitude
+activity.locationcapture.Longitude=Longitude
+activity.locationcapture.Altitude=Altitude
+activity.locationcapture.Accuracy=Accuracy
+activity.locationcapture.LocationError=Location Error
+activity.locationcapture.GPSNotAvailable=GPS Not Available
+activity.locationcapture.capturelocationhint=Use a GPS to get location
+
 formreview.period.select=Select Review Period
 formreview.period.today=Entered Today
 formreview.period.yesterday=Entered Yesterday
@@ -304,10 +321,10 @@ command.cancel=Cancel
 
 #Chatterbox commands
 command.next=Next
-command.exit=Exit;
-command.saveexit=Save and Exit;
-command.save=Save;
-command.language=Language;
+command.exit=Exit
+command.saveexit=Save and Exit
+command.save=Save
+command.language=Language
 
 chatterbox.button.trigger=Ok
 
@@ -348,3 +365,15 @@ user.create.header=New User
 
 sending.status.success=Successfully Submitted. Today we have received ${0} forms from you.
 sending.status.problem.datasafe=Successfully Submitted. Your data is safe, but we made a small mistake. We're working on it.
+
+user.entity.name=User
+user.entity.username=Username
+user.entity.type=Type
+user.entity.admin=Administrator
+user.entity.normal=Normal
+user.entity.demo=Demo
+user.entity.unknown=Unknown
+
+repeat.repitition=repetition
+repeat.message.single=Add ${0}?
+repeat.message.multiple=Add another ${0}?

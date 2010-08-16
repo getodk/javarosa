@@ -126,6 +126,8 @@ public class XFormParser {
 			public void handle (FormDef f, Element e, Object parent) { parseModel(f, e); } };
 		IElementHandler input = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, Constants.CONTROL_INPUT); } };
+		IElementHandler secret = new IElementHandler () {
+			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, Constants.CONTROL_SECRET); } };
 		IElementHandler select = new IElementHandler () {
 			public void handle (FormDef f, Element e, Object parent) { parseControl((IFormElement)parent, e, f, Constants.CONTROL_SELECT_MULTI); } };
 		IElementHandler select1 = new IElementHandler () {
@@ -143,6 +145,7 @@ public class XFormParser {
 
 		groupLevelHandlers = new Hashtable();
 		groupLevelHandlers.put("input", input);
+		groupLevelHandlers.put("secret",secret);
 		groupLevelHandlers.put("select", select);
 		groupLevelHandlers.put("select1", select1);
 		groupLevelHandlers.put("group", group);
@@ -400,8 +403,8 @@ public class XFormParser {
 				//used. This is sketchy if anything else plans on touching the nodes.
 				//This code can be removed once we're pull-parsing
 				//#if org.javarosa.xform.stingy
-				//# e.removeChild(i);
-				//# --i;
+				e.removeChild(i);
+				--i;
 				//#endif
 			}
 		}
@@ -1218,8 +1221,8 @@ public class XFormParser {
 			//used. This is sketchy if anything else plans on touching the nodes.
 			//This code can be removed once we're pull-parsing
 			//#if org.javarosa.xform.stingy
-			//# trans.removeChild(j);
-			//# --j;
+			trans.removeChild(j);
+			--j;
 			//#endif
 		}
 		

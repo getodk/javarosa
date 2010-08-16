@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-shared-resources"/>
 	<classpathentry kind="lib" path="tools/j2merosa-libraries.jar"/>
 	<classpathentry kind="con" path="J2MELIB"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/j2me-location"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -8,6 +8,7 @@ import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.user.model.User;
 
 /**
@@ -37,7 +38,7 @@ public class UserUtility {
 		
 		// There is no admin user to update, so add the user
 		if(!adminFound) {
-			User admin = new User("admin", defaultPassword, 0, User.ADMINUSER);
+			User admin = new User("admin", defaultPassword, PropertyUtils.genGUID(25), User.ADMINUSER);
 			admin.setUuid(PropertyManager._().getSingularProperty("DeviceID"));
 
 			try {
@@ -49,6 +50,6 @@ public class UserUtility {
 	}
 	
 	public static User demoUser(boolean isAdmin) {
-		return new User("demo", "", 999, isAdmin ? User.ADMINUSER : User.DEMO_USER);
+		return new User("demo", "", "demo"+PropertyUtils.genGUID(25), isAdmin ? User.ADMINUSER : User.DEMO_USER);
 	}
 }

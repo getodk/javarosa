@@ -20,7 +20,11 @@
 					<value>Password</value>
 				</text>
 				
-				<text id="chwid">
+				<text id="confirmpassword">
+					<value>Please Confirm Password</value>
+				</text>
+				
+				<text id="userid">
 					<value>Program ID</value>
 				</text>
 				
@@ -51,40 +55,53 @@
 					    <!--token/    UNUSED  -->
 					    
 					    <user_data>
-					    	<data key="chw_id"/>
+					    	<data key="user_id"/>
+					    	<type key="user_type"/>
 					    </user_data>
 			      	</registration>
+			      	
+			      	<confirmpass/>
+			      	<loadedguid/>
+			      	<freshguid/>
 				</user_registration>
 			</instance>
 	
 			<!-- High Level -->
-			<bind nodeset="username" type="xsd:string" jr:preload="userreg" jr:preloadParams="username"/>
-			<bind nodeset="password" type="xsd:string" jr:preload="userreg" jr:preloadParams="password"/>
-			<bind nodeset="uuid" type="xsd:string" jr:preload="userreg" jr:preloadParams="uuid" />
-			<bind nodeset="date" type="xsd:dateTime" jr:preload="meta"  jr:preloadParams="start"/>
-			<bind nodeset="registering_phone_id" type="xsd:string" jr:preload="meta" jr:preloadParams="DeviceID" />
+			<bind nodeset="registration/username" type="xsd:string" jr:preload="user" jr:preloadParams="username"/>
+			<bind nodeset="registration/password" type="xsd:int" jr:preload="user" jr:preloadParams="password"/>
+			<bind nodeset="registration/uuid" type="xsd:string" calculate="if(/user_registration/loadedguid='', /user_registration/freshguid,/user_registration/loadedguid)"/>
+			<bind nodeset="registration/date" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start"/>
+			<bind nodeset="registration/registering_phone_id" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
+			
+			<bind nodeset="confirmpass" type="xsd:int" jr:preload="user" jr:preloadParams="password" jr:constraint="/user_registration/registration/password = ." jr:constraintMsg="Passwords do not match!"/>
+			<bind nodeset="loadedguid" type="xsd:string" jr:preload="user" jr:preloadParams="uuid" />
+			<bind nodeset="freshguid" type="xsd:string" jr:preload="uid" jr:preloadParams="general" />
 			
 			<!-- User Data -->
-			<bind id="chwid" nodeset="user_data/data[@key='chw_id']" jr:preload="userreg" jr:preloadParams="chw_id"/>
+			<bind id="userid" nodeset="registration/user_data/data" jr:preload="user" jr:preloadParams="user_id"/>
+			<bind id="type" nodeset="registration/user_data/type" jr:preload="user" jr:preloadParams="user_type"/>
 		</model>
 
 	</h:head>
 
 	<h:body>
 
-		<input ref="username">
+		<input ref="registration/username">
 			<label ref="jr:itext('username')"/>
 		</input>
-		<input ref="password">
+		<secret ref="registration/password">
 			<label ref="jr:itext('password')"/>
-		</input>
-		<input bind="chwid">
-			<label ref="jr:itext('chwid')"/>
+		</secret>
+		<secret ref="confirmpass">
+			<label ref="jr:itext('confirmpassword')"/>
+		</secret>
+		<input bind="userid">
+			<label ref="jr:itext('userid')"/>
 		</input>
 		<select1 bind="type">
 			<label ref="jr:itext('usertype')"/>
-			<item><data>normal</data><label ref="jr:itext('user_normal')"/></item>
-			<item><data>admin</data><label ref="jr:itext('user_admin')"/></item>
+			<item><value>standard</value><label ref="jr:itext('user_normal')"/></item>
+			<item><value>admin</value><label ref="jr:itext('user_admin')"/></item>
 		</select1>
 
 	</h:body>

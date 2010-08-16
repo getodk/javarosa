@@ -24,6 +24,7 @@ import j2meunit.framework.TestSuite;
 import java.util.Date;
 
 import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.utils.DateUtils;
 
 public class DateDataTests extends TestCase{
 	
@@ -38,8 +39,8 @@ public class DateDataTests extends TestCase{
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		today = new Date();
-		notToday = new Date(today.getTime() - today.getTime()/2);
+		today = DateUtils.roundDate(new Date());
+		notToday = DateUtils.roundDate(new Date(today.getTime() - today.getTime()/2));
 	}
 	
 	public DateDataTests(String name, TestMethod rTestMethod) {

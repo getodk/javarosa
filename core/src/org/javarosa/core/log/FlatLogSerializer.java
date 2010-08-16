@@ -24,7 +24,7 @@ package org.javarosa.core.log;
  * @date Apr 10, 2009 
  *
  */
-public class FlatLogSerializer implements ILogSerializer<String> {
+public class FlatLogSerializer implements IFullLogSerializer<String> {
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.log.ILogSerializer#serializeLog(org.javarosa.core.log.IncidentLog)
