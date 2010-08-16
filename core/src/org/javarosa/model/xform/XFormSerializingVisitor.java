@@ -20,25 +20,26 @@ package org.javarosa.model.xform;
 
 
 	import java.io.IOException;
-	import java.util.Enumeration;
-	import java.util.Vector;
+import java.util.Enumeration;
+import java.util.Vector;
 
-	import org.javarosa.core.data.IDataPointer;
-	import org.javarosa.core.model.FormDef;
-	import org.javarosa.core.model.IAnswerDataSerializer;
-	import org.javarosa.core.model.instance.FormInstance;
-	import org.javarosa.core.model.instance.TreeElement;
-	import org.javarosa.core.model.instance.TreeReference;
-	import org.javarosa.core.model.utils.IInstanceSerializingVisitor;
-	import org.javarosa.core.services.transport.payload.ByteArrayPayload;
-	import org.javarosa.core.services.transport.payload.DataPointerPayload;
-	import org.javarosa.core.services.transport.payload.IDataPayload;
-	import org.javarosa.core.services.transport.payload.MultiMessagePayload;
-	import org.javarosa.xform.util.XFormAnswerDataSerializer;
-	import org.javarosa.xform.util.XFormSerializer;
-	import org.kxml2.kdom.Document;
-	import org.kxml2.kdom.Element;
-	import org.kxml2.kdom.Node;
+import org.javarosa.core.data.IDataPointer;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.IAnswerDataSerializer;
+import org.javarosa.core.model.IDataReference;
+import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.utils.IInstanceSerializingVisitor;
+import org.javarosa.core.services.transport.payload.ByteArrayPayload;
+import org.javarosa.core.services.transport.payload.DataPointerPayload;
+import org.javarosa.core.services.transport.payload.IDataPayload;
+import org.javarosa.core.services.transport.payload.MultiMessagePayload;
+import org.javarosa.xform.util.XFormAnswerDataSerializer;
+import org.javarosa.xform.util.XFormSerializer;
+import org.kxml2.kdom.Document;
+import org.kxml2.kdom.Element;
+import org.kxml2.kdom.Node;
 
 	/**
 	 * A visitor-esque class which walks a FormInstance and constructs an XML document
@@ -58,6 +59,9 @@ package org.javarosa.model.xform;
 		/** The serializer to be used in constructing XML for AnswerData elements */
 		IAnswerDataSerializer serializer;
 		
+		/** The root of the xml document which should be included in the serialization **/
+		TreeReference rootRef;
+		
 		/** The schema to be used to serialize answer data */
 		FormDef schema;	//not used
 		
@@ -70,20 +74,28 @@ package org.javarosa.model.xform;
 		}
 
 		public byte[] serializeInstance(FormInstance model, FormDef formDef) throws IOException {
+			
+			//LEGACY: Should remove
 			init();
 			this.schema = formDef;
 			return serializeInstance(model);
+		}
+		
+		public byte[] serializeInstance(FormInstance model) throws IOException {
+			return serializeInstance(model, new XPathReference("/"));
 		}
 
 		/*
 		 * (non-Javadoc)
 		 * @see org.javarosa.core.model.utils.IInstanceSerializingVisitor#serializeDataModel(org.javarosa.core.model.IFormDataModel)
 		 */
-		public byte[] serializeInstance(FormInstance model) throws IOException {
+		public byte[] serializeInstance(FormInstance model, IDataReference ref) throws IOException {
 			init();
+			rootRef = model.unpackReference(ref);
 			if(this.serializer == null) {
 				this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
 			}
+			
 			model.accept(this);
 			if(theXmlDoc != null) {
 				return XFormSerializer.getString(theXmlDoc).getBytes("UTF-8");
@@ -94,7 +106,12 @@ package org.javarosa.model.xform;
 		}
 		
 		public IDataPayload createSerializedPayload	(FormInstance model) throws IOException {
+			return createSerializedPayload(model, new XPathReference("/"));
+		}
+		
+		public IDataPayload createSerializedPayload	(FormInstance model, IDataReference ref) throws IOException {
 			init();
+			rootRef = model.unpackReference(ref);
 			if(this.serializer == null) {
 				this.setAnswerDataSerializer(new XFormAnswerDataSerializer());
 			}
@@ -124,7 +141,8 @@ package org.javarosa.model.xform;
 		 */
 		public void visit(FormInstance tree) {
 			theXmlDoc = new Document();
-			TreeElement root = tree.getRoot();
+			//TreeElement root = tree.getRoot();
+			TreeElement root = tree.resolveReference(rootRef);
 			for (int i = 0; i< root.getNumChildren(); i++){
 				TreeElement childAt = root.getChildAt(i);
 			}

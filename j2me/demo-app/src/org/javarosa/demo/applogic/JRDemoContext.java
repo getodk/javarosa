@@ -7,7 +7,9 @@ import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.reference.RootTranslator;
@@ -27,6 +29,8 @@ import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.j2me.J2MEModule;
 import org.javarosa.j2me.util.DumpRMS;
 import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.model.xform.SMSSerializingVisitor;
+import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.patient.PatientModule;
 import org.javarosa.patient.model.Patient;
@@ -35,6 +39,7 @@ import org.javarosa.resources.locale.LanguageUtils;
 import org.javarosa.services.transport.TransportManagerModule;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
+import org.javarosa.services.transport.impl.sms.SMSTransportMessage;
 import org.javarosa.user.activity.UserModule;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.UserUtility;
@@ -98,6 +103,8 @@ public class JRDemoContext {
 			forms.write(XFormUtils.getFormFromResource("/ImageSelectTester.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/sampleform.xml"));
 			forms.write(XFormUtils.getFormFromResource("/itemset_test.xml"));
+			forms.write(XFormUtils.getFormFromResource("/submissiontest.xml"));
+			forms.write(XFormUtils.getFormFromResource("/smspushtest.xml"));
 			
 		} catch (StorageFullException e) {
 			throw new RuntimeException("uh-oh, storage full [forms]"); //TODO: handle this
@@ -155,17 +162,50 @@ public class JRDemoContext {
 		return this.patientID;
 	}
 	
-	public TransportMessage buildMessage(IDataPayload payload) {
-		//Right now we have to just give the message the stream, rather than the payload,
-		//since the transport layer won't take payloads. This should be fixed _as soon 
-		//as possible_ so that we don't either (A) blow up the memory or (B) lose the ability
-		//to send payloads > than the phones' heap.
-		try {
-			return new SimpleHttpTransportMessage(payload.getPayloadStream(), PropertyManager._().getSingularProperty(DemoAppProperties.POST_URL_PROPERTY));
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error Serializing Data to be transported");
+	public TransportMessage buildMessage(FormInstance tree, SubmissionProfile profile) {
+		
+		if(profile == null) {
+			//Right now we have to just give the message the stream, rather than the payload,
+			//since the transport layer won't take payloads. This should be fixed _as soon 
+			//as possible_ so that we don't either (A) blow up the memory or (B) lose the ability
+			//to send payloads > than the phones' heap.
+			try {
+				IDataPayload payload = new XFormSerializingVisitor().createSerializedPayload(tree);
+				return new SimpleHttpTransportMessage(payload.getPayloadStream(), PropertyManager._().getSingularProperty(DemoAppProperties.POST_URL_PROPERTY));
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Error Serializing Data to be transported");
+			}
 		}
+		
+		//If there is a submission profile, we need to use the relevant portions.
+		if(profile.getMethod().toLowerCase().equals("post")) {
+			
+			//URL
+			String url = profile.getAction();
+			
+			try {
+				IDataPayload payload = new XFormSerializingVisitor().createSerializedPayload(tree, profile.getRef());
+				return new SimpleHttpTransportMessage(payload.getPayloadStream(),url);
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Error Serializing Data to be transported");
+			}
+		} else if(profile.getMethod().toLowerCase().equals("smspush")) {
+			
+			//URL
+			String phoneUri = profile.getAction();
+			
+			try {
+				String payload = new String(new SMSSerializingVisitor().serializeInstance(tree, profile.getRef()));
+				return new SMSTransportMessage(payload,phoneUri);
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Error Serializing Data to be transported");
+			}
+		}
+		
+		return null;
 	}
 	
 	public Vector<IPreloadHandler> getPreloaders() {

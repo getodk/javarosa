@@ -107,6 +107,9 @@
 					<parameter name="keep   ,     allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.locale.LocaleDataSource"/>
 					<parameter name="keep        ,       allowShrinking" value="class * implements org.javarosa.services.transport.TransportMessage"/>
 					<parameter name="keep       ,         allowShrinking" value="class * implements org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper"/>
+					<parameter name="keep              " value="class org.javarosa.core.model.SubmissionProfile"/>
+					<parameter name="keep          ,            allowShrinking" value="class org.javarosa.core.model.SubmissionProfile"/>
+					<parameter name="keep            ,              allowShrinking" value="class * extends org.javarosa.core.model.SubmissionProfile"/>
 				</obfuscator>
 
 				<!-- log settings: only use debug setting when the test-property is true -->

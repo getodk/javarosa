@@ -71,13 +71,4 @@ public interface IDataPayload extends Externalizable {
 	 * the status of transmissions related to this payload
 	 */
 	public int getTransportId();
-	
-	/**
-	 * @return A String for the destination url, or null if not set. 
-	 * 
-	 * 
-	 */
-	public String getDestination();
-	
-	
 }
