@@ -201,7 +201,8 @@ public class XPathFuncExpr extends XPathExpression {
 			}
 		} else if (name.equals("regex") && args.length == 2) { //non-standard
 			return regex(argVals[0], argVals[1]);
-			
+		} else if (name.equals("depend") && args.length >= 1) { //non-standard
+			return argVals[0];
 		} else {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
