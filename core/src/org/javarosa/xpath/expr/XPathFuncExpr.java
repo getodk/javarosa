@@ -203,6 +203,14 @@ public class XPathFuncExpr extends XPathExpression {
 			return regex(argVals[0], argVals[1]);
 		} else if (name.equals("depend") && args.length >= 1) { //non-standard
 			return argVals[0];
+			
+		} else if (name.equals("short_date") && args.length == 1) { //hack
+			Object o = (Date)toDate(argVals[0]);
+			if (o instanceof Date) {
+				return DateUtils.shortDateHack((Date)o);
+			} else {
+				return "";
+			}
 		} else {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
