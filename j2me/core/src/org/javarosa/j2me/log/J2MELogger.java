@@ -34,6 +34,7 @@ import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.j2me.storage.rms.RMSStorageUtility;
+import org.javarosa.j2me.util.SortedIntSet;
 
 /**
  * @author Clayton Sims
@@ -116,11 +117,19 @@ public class J2MELogger implements ILogger {
 		if(storageBroken) { return null; };
 		synchronized(logStorage) {
 			if(!checkStorage()) { return null; }
-			Vector logs = new Vector();
+			
+			SortedIntSet IDs = new SortedIntSet();
 			IStorageIterator li = logStorage.iterate();
 			while (li.hasMore()) {
-				logs.addElement(li.nextRecord());
+				IDs.add(li.nextID());
 			}
+			
+			Vector logs = new Vector();
+			Vector<Integer> vIDs = IDs.getVector();
+			for (int i = vIDs.size() - 1; i >= 0; i--) {
+				logs.addElement(logStorage.read(vIDs.elementAt(i).intValue()));
+			}
+		
 			LogEntry[] collection = new LogEntry[logs.size()];
 			logs.copyInto(collection);
 			return serializer.serializeLogs(collection);
