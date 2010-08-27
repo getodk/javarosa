@@ -207,7 +207,7 @@ public class XPathFuncExpr extends XPathExpression {
 			return argVals[0];
 			
 		} else if (name.equals("short_date") && args.length == 1) { //hack
-			Object o = (Date)toDate(argVals[0]);
+			Object o = toDate(argVals[0]);
 			if (o instanceof Date) {
 				return DateUtils.shortDateHack((Date)o);
 			} else {
