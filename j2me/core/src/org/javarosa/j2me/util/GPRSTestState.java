@@ -71,7 +71,7 @@ public abstract class GPRSTestState implements State, TrivialTransitions, Handle
 		InputStream is = null;
 		
 		try {
-			parent.addLine("Beginning test...");
+			parent.addLine("Beginning test... (" + parent.url + ")");
 			
 			conn = (HttpConnection)Connector.open(parent.url);
 			conn.setRequestMethod(HttpConnection.GET);
@@ -90,7 +90,7 @@ public abstract class GPRSTestState implements State, TrivialTransitions, Handle
             int len = (int)conn.getLength();
             if (len > 0) {
                 int actual = 0;
-                int bytesread = 0 ;
+                int bytesread = 0;
                 data = new byte[len];
                 while ((bytesread != len) && (actual != -1)) {
                     actual = is.read(data, bytesread, len - bytesread);
