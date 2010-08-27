@@ -19,7 +19,7 @@ import org.javarosa.j2me.view.J2MEDisplay;
 
 public abstract class LogViewerState implements State, TrivialTransitions, HandledCommandListener {
 
-	static final int DEFAULT_MAX_ENTRIES = 4;
+	static final int DEFAULT_MAX_ENTRIES = 200;
 	
 	int max_entries;
 	Command exit;
