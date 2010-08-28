@@ -150,11 +150,6 @@ public class DateUtils {
 		}	
 	}
 	
-	public static String shortDateHack (Date d) {
-		DateFields f = getFields(d);
-		return f.day + "/" + f.month;
-	}
-	
 	private static String formatDateISO8601 (DateFields f) {
 		return f.year + "-" + intPad(f.month, 2) + "-" + intPad(f.day, 2);
 	}
