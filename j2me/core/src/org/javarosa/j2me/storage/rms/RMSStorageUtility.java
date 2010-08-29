@@ -216,8 +216,10 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			
 			if (recordExists) {
 				RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
+				txRecord(id, "update");
 				newLoc = updateRecord(loc, data, info);
 			} else {
+				txRecord(id, "add");
 				newLoc = addRecord(data, info);
 				if (newLoc != null) {
 					info.numRecords++;
@@ -268,6 +270,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 				throw new StorageFullException();
 			}
 			
+			txRecord(id, "add");
 			RMSRecordLoc loc = addRecord(data, info);
 			
 			//release the space we reserved
@@ -322,6 +325,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			}
 			
 			RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
+			txRecord(id, "update");
 			loc = updateRecord(loc, data, info);
 	
 			//release the space we reserved
@@ -356,6 +360,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			setDirty();
 						
 			RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
+			txRecord(id, "delete");
 			getDataStore(loc.rmsID).removeRecord(loc.recID);
 			
 			info.numRecords--;
@@ -515,7 +520,13 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 * Delete the storage utility itself, along with all stored records and meta-data
 	 */
 	public void destroy () {
-		throw new RuntimeException("not implemented yet");
+		synchronized (getAccessLock()) {
+			if (RMSTransaction.anyTxOpen()) {
+				throw new RuntimeException("operation not allowed while transactions are active");
+			}
+			
+			throw new RuntimeException("not implemented yet");
+		}
 	}
 
 	/**
@@ -523,7 +534,13 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 * normal usage (e.g., if all the records are scattered among 10 half-empty RMSes, repack them into 5 full RMSes)
 	 */
 	public void repack () {
-		throw new RuntimeException("not implemented yet");
+		synchronized (getAccessLock()) {
+			if (RMSTransaction.anyTxOpen()) {
+				throw new RuntimeException("operation not allowed while transactions are active");
+			}
+			
+			throw new RuntimeException("not implemented yet");
+		}
 	}
 	
 	/**
@@ -532,6 +549,9 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 */
 	public void repair () {
 		synchronized (getAccessLock()) {
+			if (RMSTransaction.anyTxOpen()) {
+				throw new RuntimeException("operation not allowed while transactions are active");
+			}			
 		
 			try {
 				checkNotCorrupt();
@@ -1462,6 +1482,24 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			iterators = new Vector();
 		}
 	}
+
+	private void txRecord (int recordID, String opType) {
+		RMSTransaction tx = RMSTransaction.getTx();
+		if (tx == null) { //no active transaction
+			return;
+		}
+		
+		if (!tx.isRecordTouched(getName(), recordID)) {
+			try {
+				RMSStorageUtility tx_cache = new RMSStorageUtility(RMSTransaction.CACHE_RMS, TxCacheEntry.class);
+				boolean recordExists = !"add".equals(opType);
+				int entry_id = tx_cache.add(new TxCacheEntry(tx, this, recordID, recordExists));
+				tx.recordTouched(getName(), recordID, entry_id);
+			} catch (Exception e) {
+				throw new WrappedException("RMS transaction error; could not back up original state of record; original operation [" + opType + "] aborted because transaction guarantees cannot be met", e);
+			}
+		}
+	}	
 	
 	/* ========== DEBUGGING CODE ============ */
 	
