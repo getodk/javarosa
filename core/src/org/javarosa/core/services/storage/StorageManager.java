@@ -19,8 +19,6 @@ package org.javarosa.core.services.storage;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-/* droos: what is the future of this class? i think it will take a different form with the new storage API */
-
 /**
  * Manages StorageProviders for JavaRosa, which maintain persistent
  * data on a device.
