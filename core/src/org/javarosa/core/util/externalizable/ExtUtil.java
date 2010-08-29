@@ -99,6 +99,8 @@ public class ExtUtil {
 			writeString(out, (String)data);
 		} else if (data instanceof Date) {
 			writeDate(out, (Date)data);
+		} else if (data instanceof byte[]) {
+			writeBytes(out, (byte[])data);
 		} else {
 			throw new ClassCastException("Not a serializable datatype: " + data.getClass().getName());
 		}
@@ -133,12 +135,14 @@ public class ExtUtil {
 		writeNumeric(out, val.getTime());
 		//time zone?
 	}
+	
 	public static void writeBytes(DataOutputStream out, byte[] bytes) throws IOException {
 		ExtUtil.writeNumeric(out, bytes.length);
 		if (bytes.length > 0) //i think writing zero-length array might close the stream
 			out.write(bytes);
 	}
 	
+	//functions like these are bad; they should use the built-in list serialization facilities
 	public static void writeInts(DataOutputStream out, int[] ints) throws IOException {
 		ExtUtil.writeNumeric(out, ints.length);
 		for(int i : ints) {
@@ -175,6 +179,8 @@ public class ExtUtil {
 			return readString(in);
 		} else if (type == Date.class) {
 			return readDate(in);
+		} else if (type == byte[].class) {
+			return readBytes(in);
 		} else {
 			throw new ClassCastException("Not a deserializable datatype: " + type.getName());
 		}
@@ -246,6 +252,7 @@ public class ExtUtil {
 		return bytes;
 	}
 	
+	//bad
 	public static int[] readInts(DataInputStream in) throws IOException {
 		int size = (int)ExtUtil.readNumeric(in);
 		int[] ints = new int[size];
