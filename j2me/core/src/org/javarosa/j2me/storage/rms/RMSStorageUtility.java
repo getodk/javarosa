@@ -97,7 +97,12 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	private RMS indexstore;			//RMS wrapper for the indexing RMS
 	private RMS[] datastores;		//RMS wrappers for 1..n data RMSes (are loaded as needed, so entries may be null)
 	
-	public static final String[] TX_EXCL = {RMSTransaction.CACHE_RMS, LogEntry.STORAGE_KEY};
+	public static final String[] TX_EXCL = {
+		RMSTransaction.CACHE_RMS,
+		LogEntry.STORAGE_KEY,
+		LogEntry.STORAGE_KEY + "F", //logging fallback
+		LogEntry.STORAGE_KEY + "E"  //logging fallback
+	};
 	
 	public RMSStorageUtility (String basename, Class type) {
 		this(basename, type, true);
