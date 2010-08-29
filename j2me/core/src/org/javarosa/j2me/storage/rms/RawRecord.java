@@ -12,6 +12,10 @@ public class RawRecord implements Persistable {
 
 	byte[] data;
 	int id;
+
+	public RawRecord () {
+		
+	}
 	
 	public RawRecord (int id, byte[] data) {
 		this.id = id;

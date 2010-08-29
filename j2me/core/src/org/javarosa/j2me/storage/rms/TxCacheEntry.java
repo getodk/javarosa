@@ -11,8 +11,6 @@ import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class TxCacheEntry implements Externalizable {
-	int id = -1;
-	
 	int tx_id;
 	String rms;
 	int rec_id;
@@ -22,16 +20,11 @@ public class TxCacheEntry implements Externalizable {
 		
 	}
 	
-	public TxCacheEntry (RMSTransaction tx, RMSStorageUtility rms, int rec_id, boolean rec_exists) {
+	public TxCacheEntry (RMSTransaction tx, String rmsName, int rec_id, byte[] data) {
 		this.tx_id = tx.tx_id;
-		this.rms = rms.getName();
+		this.rms = rmsName;
 		this.rec_id = rec_id;
-		
-		if (rec_exists) {
-			this.data = rms.readBytes(rec_id);
-		} else {
-			this.data = null;
-		}
+		this.data = data;
 	}
 
 	public RawRecord toRawRec () {
@@ -43,7 +36,6 @@ public class TxCacheEntry implements Externalizable {
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		id = ExtUtil.readInt(in);
 		tx_id = ExtUtil.readInt(in);
 		rms = ExtUtil.readString(in);
 		rec_id = ExtUtil.readInt(in);
@@ -51,7 +43,6 @@ public class TxCacheEntry implements Externalizable {
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
-		ExtUtil.writeNumeric(out, id);
 		ExtUtil.writeNumeric(out, tx_id);
 		ExtUtil.writeString(out, rms);
 		ExtUtil.writeNumeric(out, rec_id);
