@@ -158,10 +158,16 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 * @return raw bytes for the record. null if no record is stored under that ID
 	 */
 	public byte[] readBytes (int id) {
+		return readBytes(id, true);
+	}
+	
+	private byte[] readBytes (int id, boolean publicAPI) {
 		synchronized (getAccessLock()) {
 			
-			checkNotCorrupt();
-			
+			if (publicAPI) {
+				checkNotCorrupt();
+			}
+				
 			Hashtable idIndex = getIDIndexRecord();
 			if (idIndex.containsKey(new Integer(id))) {
 				RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
@@ -1484,6 +1490,9 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	}
 
 	private void txRecord (int recordID, String opType) {
+		if (this.getName().equals(RMSTransaction.CACHE_RMS))
+			return;
+		
 		RMSTransaction tx = RMSTransaction.getTx();
 		if (tx == null) { //no active transaction
 			return;
@@ -1493,7 +1502,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			try {
 				RMSStorageUtility tx_cache = RMSTransaction.getCacheRMS();
 				boolean recordExists = !"add".equals(opType);
-				int entry_id = tx_cache.add(new TxCacheEntry(tx, this, recordID, recordExists));
+				int entry_id = tx_cache.add(new TxCacheEntry(tx, getName(), recordID, recordExists ? readBytes(recordID, false) : null));
 				tx.recordTouched(getName(), recordID, entry_id);
 			} catch (Exception e) {
 				Logger.log("rms-tx", "error during rms transaction back-up operation");
