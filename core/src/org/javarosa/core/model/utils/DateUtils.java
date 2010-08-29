@@ -183,6 +183,61 @@ public class DateUtils {
 		return intPad(f.hour, 2) + intPad(f.minute, 2) + intPad(f.second, 2);
 	}
 	
+	public static String format (Date d, String format) {
+		DateFields f = getFields(d);
+		StringBuffer sb = new StringBuffer();
+		
+		for (int i = 0; i < format.length(); i++) {
+			char c = format.charAt(i);
+			
+			if (c == '%') {
+				i++;
+				if (i >= format.length()) {
+					throw new RuntimeException("date format string ends with %");
+				} else {
+					c = format.charAt(i);
+				}
+
+				if (c == '%') {			//literal '%'
+					sb.append("%");
+				} else if (c == 'Y') {	//4-digit year
+					sb.append(intPad(f.year, 4));
+				} else if (c == 'y') {	//2-digit year
+					sb.append(intPad(f.year, 4).substring(2));
+				} else if (c == 'm') {	//0-padded month
+					sb.append(intPad(f.month, 2));
+				} else if (c == 'n') {	//numeric month
+					sb.append(f.month);
+				} else if (c == 'b') {	//short text month
+					String[] months = new String[] {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+					sb.append(months[f.month - 1]);
+				} else if (c == 'd') {	//0-padded day of month
+					sb.append(intPad(f.day, 2));
+				} else if (c == 'e') {	//day of month
+					sb.append(f.day);
+				} else if (c == 'H') {	//0-padded hour (24-hr time)
+					sb.append(intPad(f.hour, 2));
+				} else if (c == 'h') {	//hour (24-hr time)
+					sb.append(f.hour);
+				} else if (c == 'M') {	//0-padded minute
+					sb.append(intPad(f.minute, 2));
+				} else if (c == 'S') {	//0-padded second
+					sb.append(intPad(f.second, 2));
+				} else if (c == '3') {	//0-padded millisecond ticks (000-999)
+					sb.append(intPad(f.secTicks, 3));
+				} else if (c == 'Z' || c == 'A' || c == 'B' || c == 'a') {
+					throw new RuntimeException("unsupported escape in date format string [%" + c + "]");
+				} else {
+					throw new RuntimeException("unrecognized escape in date format string [%" + c + "]");
+				}
+			} else {
+				sb.append(c);
+			}
+		}
+		
+		return sb.toString();
+	}
+	
 	/* ==== PARSING DATES/TIMES FROM STANDARD STRINGS ==== */
 	
 	public static Date parseDateTime (String str) {

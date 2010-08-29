@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.formmanager.utility;
+package org.javarosa.j2me.util;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
