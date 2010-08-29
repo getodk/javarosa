@@ -97,6 +97,8 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	private RMS indexstore;			//RMS wrapper for the indexing RMS
 	private RMS[] datastores;		//RMS wrappers for 1..n data RMSes (are loaded as needed, so entries may be null)
 	
+	public static final String[] TX_EXCL = {RMSTransaction.CACHE_RMS, LogEntry.STORAGE_KEY};
+	
 	public RMSStorageUtility (String basename, Class type) {
 		this(basename, type, true);
 	}
@@ -1490,8 +1492,10 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	}
 
 	private void txRecord (int recordID, String opType) {
-		if (this.getName().equals(RMSTransaction.CACHE_RMS))
-			return;
+		for (int i = 0; i < TX_EXCL.length; i++) {
+			if (TX_EXCL[i].equals(getName()))
+				return;
+		}
 		
 		RMSTransaction tx = RMSTransaction.getTx();
 		if (tx == null) { //no active transaction
