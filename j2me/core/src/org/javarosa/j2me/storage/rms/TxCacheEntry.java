@@ -34,6 +34,14 @@ public class TxCacheEntry implements Externalizable {
 		}
 	}
 
+	public RawRecord toRawRec () {
+		if (data == null) {
+			throw new IllegalStateException("record must have data");
+		}
+		
+		return new RawRecord(rec_id, data);
+	}
+	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		id = ExtUtil.readInt(in);
 		tx_id = ExtUtil.readInt(in);
