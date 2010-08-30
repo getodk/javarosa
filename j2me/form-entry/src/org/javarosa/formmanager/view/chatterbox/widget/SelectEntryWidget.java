@@ -19,12 +19,14 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import java.io.IOException;
 import java.util.Vector;
 
+import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
@@ -170,10 +172,26 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 			//Anton de Winter 4/23/2010
 			//To play an audio file whenever a choice is highlighted we need to make the following hack.
 			public void focusChild( int index, Item item, int direction ) {
+				Chatterbox.selectedIndex = index;
 				if(direction != 0){
 					doAudio(index);
 				}
 				super.focusChild(index, item, direction);
+			}
+			
+			protected boolean handleKeyPressed(int keyCode, int gameAction){
+				if(!(keyCode >= Canvas.KEY_NUM1 && keyCode <= Canvas.KEY_NUM9)){
+					return super.handleKeyPressed(keyCode,gameAction);
+				}else{
+					int index = keyCode-Canvas.KEY_NUM1;
+					if(index < this.itemsList.size()){
+						doAudio(index);
+						super.focusChild(index);
+					}else{
+						return super.handleKeyPressed(keyCode,gameAction);
+					}
+					return true;
+				}
 			}
 		};
 		for (int i = 0; i < prompt.getSelectChoices().size(); i++){
@@ -191,13 +209,13 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 	}
 	
 	private void doAudio(int index){
-		getAudioAndPlay(prompt,prompt.getSelectChoices().elementAt(index));
+		Chatterbox.getAudioAndPlay(prompt,prompt.getSelectChoices().elementAt(index));
 	}
 
 	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
 			SelectChoice sc = prompt.getSelectChoices().elementAt(i);
-			Image im = this.getImage(prompt.getSpecialFormSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
+			Image im = MediaUtils.getImage(prompt.getSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
 			
 			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(sc));
 			

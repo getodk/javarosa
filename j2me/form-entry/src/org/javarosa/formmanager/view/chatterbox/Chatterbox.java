@@ -57,6 +57,7 @@ import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
+import de.enough.polish.ui.backgrounds.PolygonBackground;
 
 
 public class Chatterbox extends FramedForm implements HandledPCommandListener, IFormEntryView{
@@ -71,6 +72,26 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     public static int KEY_CENTER_LETS_HOPE = -5;
     
     public static final int UIHACK_SELECT_PRESS = 1;
+    
+    /////////AUDIO PLAYBACK
+	static Player audioPlayer;
+	protected static boolean playAudioIfAvailable = true;
+	protected static final int AUDIO_SUCCESS = 1;
+	protected static final int AUDIO_NO_RESOURCE = 2;
+	protected static final int AUDIO_ERROR = 3;
+	protected static final int AUDIO_DISABLED = 4;
+	protected static final int AUDIO_BUSY = 5;
+	protected static final int AUDIO_NOT_RECOGNIZED = 6;
+	/** Causes audio player to throw runtime exceptions if there are problems instead of failing silently **/
+	private static final boolean AUDIO_DEBUG_MODE = true;
+	private static Reference curAudRef = null;
+	private static Reference oldAudRef = null;
+	private static String curAudioURI;
+	private static String oldAudioURI = "";
+	
+	/** This value gets set by SelectEntryWidget to denote the last item the user was focused on
+	 * WARNING: this value does NOT get reset back to -1 when the FormEntryPrompt moves on to a new question.**/
+	public static int selectedIndex = -1;
 	
 	private JrFormEntryController controller;
     private JrFormEntryModel model;
@@ -670,6 +691,117 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		//#endif
     	}
     }
+    
+    /**
+     * Plays audio for the SelectChoice (if AudioURI is present and media is available)
+     * @param fep
+     * @param select
+     * @return
+     */
+	public static int getAudioAndPlay(FormEntryPrompt fep,SelectChoice select){
+		if (!playAudioIfAvailable) return AUDIO_DISABLED;
+		
+		//////BEGINDEBUG
+//		System.out.println("Busting out supported conteny type info..........");
+//	      String[] contentTypes = Manager.getSupportedContentTypes(null);
+//	      for (int i = 0; i < contentTypes.length; i++) {
+//	        String[] protocols = Manager.getSupportedProtocols(contentTypes[i]);
+//	        String pop = "";
+//	        for (int j = 0; j < protocols.length; j++) {
+//	          StringItem si = new StringItem(contentTypes[i] + ": ", protocols[j]);
+//	          pop += contentTypes[i] + ": "+ protocols[j];
+//	        }
+//	       System.out.println(pop);
+//	       J2MEDisplay.showError("Compatible stuff", pop);
+//	      }
+	      /////ENDDEBUG
+		
+		String textID;
+		oldAudioURI = curAudioURI;
+		curAudioURI = null;
+		if (select == null) {		
+			if (fep.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_AUDIO)) {
+				curAudioURI = fep.getAudioText();
+			} else {
+				return AUDIO_NO_RESOURCE;
+			}	
+		}else{
+			textID = select.getTextID();
+			if(textID == null || textID == "") return AUDIO_NO_RESOURCE;
+			
+			if (fep.getSelectTextForms(select).contains(FormEntryCaption.TEXT_FORM_AUDIO)) {
+				curAudioURI = fep.getSelectChoiceText(select,FormEntryCaption.TEXT_FORM_AUDIO);
+			} else {
+				return AUDIO_NO_RESOURCE;
+			}
+		}
+		int retcode = AUDIO_SUCCESS;
+		try {
+			oldAudRef = curAudRef;
+			curAudRef = ReferenceManager._().DeriveReference(curAudioURI);
+			String format = getFileFormat(curAudioURI);
+
+			if(format == null) return AUDIO_NOT_RECOGNIZED;
+			if(audioPlayer == null){
+				audioPlayer = Manager.createPlayer(curAudRef.getStream(), format);
+				audioPlayer.start();
+			}else{
+				audioPlayer.deallocate();
+				audioPlayer.close();
+				audioPlayer = Manager.createPlayer(curAudRef.getStream(), format);
+				audioPlayer.start();
+			}
+			
+		} catch (InvalidReferenceException ire) {
+			retcode = AUDIO_ERROR;
+			if(AUDIO_DEBUG_MODE)throw new RuntimeException("Invalid Reference Exception when attempting to play audio at URI:"+ curAudioURI + "Exception msg:"+ire.getMessage());
+			System.err.println("Invalid Reference Exception when attempting to play audio at URI:"+ curAudioURI + "Exception msg:"+ire.getMessage());
+		} catch (IOException ioe) {
+			retcode = AUDIO_ERROR;
+			if(AUDIO_DEBUG_MODE) throw new RuntimeException("IO Exception (input cannot be read) when attempting to play audio stream with URI:"+ curAudioURI + "Exception msg:"+ioe.getMessage());
+			System.err.println("IO Exception (input cannot be read) when attempting to play audio stream with URI:"+ curAudioURI + "Exception msg:"+ioe.getMessage());
+		} catch (MediaException e) {
+			retcode = AUDIO_ERROR;
+			if(AUDIO_DEBUG_MODE) throw new RuntimeException("Media format not supported! Uri: "+ curAudioURI + "Exception msg:"+e.getMessage());
+			System.err.println("Media format not supported! Uri: "+ curAudioURI + "Exception msg:"+e.getMessage());
+		}
+		return retcode;
+	}
+	
+	/**
+	 * Checks the boolean playAudioIfAvailable first.
+	 * Plays the question audio text
+	 */
+	public static void getAudioAndPlay(FormEntryPrompt fep){
+		getAudioAndPlay(fep,null);
+	}
+	
+	private static String getFileFormat(String fpath){
+//		Wave audio files: audio/x-wav
+//		AU audio files: audio/basic
+//		MP3 audio files: audio/mpeg
+//		MIDI files: audio/midi
+//		Tone sequences: audio/x-tone-seq
+//		MPEG video files: video/mpeg
+//		Audio 3GPP files (.3gp) audio/3gpp
+//		Audio AMR files (.amr) audio/amr
+//		Audio AMR (wideband) files (.awb) audio/amr-wb
+//		Audio MIDI files (.mid or .midi) audio/midi
+//		Audio MP3 files (.mp3) audio/mpeg
+//		Audio MP4 files (.mp4) audio/mp4
+//		Audio WAV files (.wav) audio/wav audio/x-wav
+		
+		if(fpath.indexOf(".mp3") > -1) return "audio/mp3";
+		if(fpath.indexOf(".wav") > -1) return "audio/x-wav";
+		if(fpath.indexOf(".amr") > -1) return "audio/amr";
+		if(fpath.indexOf(".awb") > -1) return "audio/amr-wb";
+		if(fpath.indexOf(".mp4") > -1) return "audio/mp4";
+		if(fpath.indexOf(".aac") > -1) return "audio/aac";
+		if(fpath.indexOf(".3gp") > -1) return "audio/3gpp";
+		if(fpath.indexOf(".au") > -1) return "audio/basic";
+		throw new RuntimeException("COULDN'T FIND FILE FORMAT");
+//		return null;
+	}
 	
     public ChatterboxWidget getWidgetAtIndex(int index) {
     	return (ChatterboxWidget)get(index);

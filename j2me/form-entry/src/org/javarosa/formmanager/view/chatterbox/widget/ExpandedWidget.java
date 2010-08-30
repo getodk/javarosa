@@ -17,6 +17,7 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Image;
@@ -33,6 +34,7 @@ import org.javarosa.core.reference.Reference;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.multimedia.AudioPlayer;
 import de.enough.polish.ui.Container;
@@ -47,7 +49,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	protected Item entryWidget;
 	private Container c;
 	private Container fullPrompt;
-	protected static boolean playAudioIfAvailable = true;
+	private boolean IMAGE_DEBUG_MODE = false;
 
 	public ExpandedWidget () {
 		reset();
@@ -74,52 +76,6 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		this.c = c;
 	}
 	
-	static Player player;
-	public static void getAudioAndPlay(FormEntryPrompt fep,SelectChoice select){
-		if (!playAudioIfAvailable) return;
-		String AudioURI;
-		String textID;
-		AudioURI = null;
-		if (select == null) {		
-			AudioURI = fep.getAudioText();
-			if(AudioURI == null){
-				return;
-			}	
-		}else{
-			textID = select.getTextID();
-			if(textID == null || textID == "") return;
-			
-			AudioURI = fep.getSpecialFormSelectChoiceText(select,FormEntryCaption.TEXT_FORM_AUDIO);
-			if(AudioURI == null){
-				return;
-			}
-		}	
-		try {
-			Reference audRef = ReferenceManager._().DeriveReference(AudioURI);
-			if(player==null || player.getState()!=player.STARTED){
-				player = Manager.createPlayer(audRef.getStream(), "audio/x-wav");
-				player.start();
-			}else{
-				System.out.println("Player busy so skipping requested audio for now:"+AudioURI);
-			}
-			
-			System.out.flush();
-			} catch (InvalidReferenceException ire) {
-				throw new RuntimeException("Invalid Reference Exception when attempting to play audio at URI:"+ AudioURI);
-			} catch (IOException ioe) {
-				throw new RuntimeException(	"IO Exception (input cannot be read) when attempting to play audio stream with URI:"+ AudioURI);
-			} catch (MediaException e) {
-				throw new RuntimeException("Media format not supported! Uri: "+ AudioURI);
-			}
-	}
-	
-	/**
-	 * Checks the boolean playAudioIfAvailable first.
-	 */
-	public static void getAudioAndPlay(FormEntryPrompt fep){
-		getAudioAndPlay(fep,null);
-	}
-		
 	public ImageItem getImageItem(FormEntryPrompt fep){
 //		Vector AvailForms = fep.getAvailableTextForms();
 		String IaltText;
@@ -140,11 +96,21 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	public Image getImage(String URI){
 		if(URI != null){
 			try {
-				return Image.createImage(ReferenceManager._().DeriveReference(URI).getStream()); 
+				Reference ref = ReferenceManager._().DeriveReference(URI);
+				InputStream is = ref.getStream();
+				Image i = Image.createImage(is);
+				is.close();
+				return i;
 			} catch (IOException e) {
-				throw new RuntimeException("ERROR! Cant find image at URI: "+URI);	
+				System.out.println("IOException for URI:"+URI);
+				e.printStackTrace();
+				if(IMAGE_DEBUG_MODE) throw new RuntimeException("ERROR! Cant find image at URI: "+URI);	
+				return null;
 			} catch (InvalidReferenceException ire){
-				throw new RuntimeException("Invalid Reference for image at: " +URI);
+				System.out.println("Invalid Reference Exception for URI:"+URI);
+				ire.printStackTrace();
+				if(IMAGE_DEBUG_MODE) throw new RuntimeException("Invalid Reference for image at: " +URI);
+				return null;
 			}
 		} else{
 			return null;
@@ -166,7 +132,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 			imageIndex = fullPrompt.indexOf(imItem);
 		}
 		
-		getAudioAndPlay(fep);
+		Chatterbox.getAudioAndPlay(fep);
 		prompt.setText(fep.getLongText());	
 		updateWidget(fep);
 		

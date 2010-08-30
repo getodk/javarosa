@@ -21,6 +21,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.PointerAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.ui.ChoiceGroup;
 
@@ -67,7 +68,7 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 	
 	public boolean focus () {
 		System.out.println("Focus() called in SelectOneEntryWidget");
-		getAudioAndPlay(prompt,null);
+		Chatterbox.getAudioAndPlay(prompt,null);
 		choiceGroup().focusChild(choiceGroup().getSelectedIndex());
 		return true;
 	}
