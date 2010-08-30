@@ -306,15 +306,13 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	}
 	
 	private void dumpLogFallback() {
+		String dumpRef = "";
+		boolean success = false;
 		try{
-			String dumpRef = "jr://file/jr_log_dump" + DateUtils.formatDateTime(new Date(), DateUtils.FORMAT_TIMESTAMP_SUFFIX) + ".log";
+			dumpRef = "jr://file/jr_log_dump" + DateUtils.formatDateTime(new Date(), DateUtils.FORMAT_TIMESTAMP_SUFFIX) + ".log";
 			Reference ref = ReferenceManager._().DeriveReference(dumpRef);
 			if(!ref.isReadOnly()) {
-				if(Logger._().serializeLogs(new StreamLogSerializer(ref.getOutputStream()))) {
-					//Success!
-				} else {
-					//Not success!
-				}
+				success = Logger._().serializeLogs(new StreamLogSerializer(ref.getOutputStream()));
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -326,6 +324,11 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 				System.out.println("Logger is null. Must have failed to initailize");
 			}
 			Logger._().clearLogs();
+			
+			Logger.log("log", "archived logs to file: " + dumpRef);
+			if (!success) {
+				Logger.log("log", "archive failed! logs lost!!");
+			}
 		} catch(Exception e) {
 			//If this fails it's a serious problem, but not sure what to do about it.
 			e.printStackTrace();

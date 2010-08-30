@@ -92,6 +92,8 @@ public class J2MELogger implements ILogger {
 				int id = ((Integer)ids.elementAt(i)).intValue();
 				logStorage.remove(id);
 			}
+			
+			log("logs", "cleared", new Date());
 		}
 	}
 
