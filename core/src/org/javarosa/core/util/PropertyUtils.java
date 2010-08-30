@@ -49,4 +49,8 @@ public class PropertyUtils {
 
 		return guid.toUpperCase();
 	}
+	
+	public static String trimGUID (String guid, int len) {
+		return guid.substring(0, Math.min(len, guid.length()));
+	}
 }
