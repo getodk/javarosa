@@ -1619,7 +1619,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	}
 	
 	public void log (String type, String message) {
-		if (!LogEntry.STORAGE_KEY.equals(basename)) {
+		if (!basename.startsWith(LogEntry.STORAGE_KEY)) {
 			Logger.log(type, basename + ": " + message);
 		}
 	}
