@@ -29,17 +29,17 @@ public class LoginController implements HandledCommandListener {
 	protected String[] extraText;
 	
 	public LoginController() {
-		this(null);
+		this(null, true);
 	}
-	public LoginController(String[] extraText, String passwordFormat) {
+	public LoginController(String[] extraText, String passwordFormat, boolean showDemo) {
 		this.extraText = extraText;
-		view = new LoginForm(Localization.get("form.login.login"), this.extraText);
+		view = new LoginForm(Localization.get("form.login.login"), this.extraText, showDemo);
 		view.setCommandListener(this);
 		view.setPasswordMode(passwordFormat);
 	}
 	
-	public LoginController(String[] extraText) {
-		this(extraText,AddUserController.PASSWORD_FORMAT_NUMERIC);
+	public LoginController(String[] extraText, boolean showDemo) {
+		this(extraText,AddUserController.PASSWORD_FORMAT_NUMERIC,showDemo);
 	}
 
 	public void setTransitions (LoginTransitions transitions) {
