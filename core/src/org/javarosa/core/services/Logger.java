@@ -75,16 +75,16 @@ public class Logger {
 	}
 	
 	public static void exception (Exception e) {
-		exception(e, false);
+		exception(null, e);
 	}
 	
-	public static void exception (Exception e, boolean topLevel) {
-		log("exception", (topLevel ? "unhandled exception at top level: " : "") + WrappedException.printException(e));
+	public static void exception (String info, Exception e) {
+		log("exception", (info != null ? info + ": " : "") + WrappedException.printException(e));
 	}
 	
 	public static void die (String thread, Exception e) {
 		//log exception
-		exception(e, true);
+		exception("unhandled exception at top level", e);
 				
 		//print stacktrace
 		e.printStackTrace();
