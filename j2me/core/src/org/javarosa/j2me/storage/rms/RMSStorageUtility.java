@@ -1515,6 +1515,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 				tx.recordTouched(getName(), recordID, entry_id);
 			} catch (Exception e) {
 				Logger.log("rms-tx", "error during rms transaction back-up operation");
+				Logger.exception(e);
 				throw new WrappedException("RMS transaction error; could not back up original state of record; original operation [" + opType + "] aborted because transaction guarantees cannot be met (transaction is still open; you must roll back manually, if you wish)", e);
 			}
 		}
