@@ -9,6 +9,7 @@ import java.util.Enumeration;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
+import org.javarosa.core.log.WrappedException;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
@@ -89,7 +90,7 @@ public class AuthenticatingHttpTransporter implements Transporter {
 		} catch (IOException e) {
 			e.printStackTrace();
 			message.setStatus(TransportMessageStatus.FAILED);
-			message.setFailureReason("IO Exception");
+			message.setFailureReason(WrappedException.printException(e));
 			return message;
 		}
 	}
