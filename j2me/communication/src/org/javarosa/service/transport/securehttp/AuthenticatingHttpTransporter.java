@@ -10,6 +10,7 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
 import org.javarosa.core.log.WrappedException;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
@@ -126,7 +127,9 @@ public class AuthenticatingHttpTransporter implements Transporter {
 			//We'll assume that any failures come with a message which is sufficiently
 			//small that they can be fit into memory.
 			byte[] response = StreamUtil.readFully(connection.openInputStream());
-			message.setFailureReason(new String(response));
+			String reason = new String(response);
+			reason = PropertyUtils.trim(reason, 400);
+			message.setFailureReason(reason);
 			return message;
 		}
 	}

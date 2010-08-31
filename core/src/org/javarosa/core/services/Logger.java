@@ -8,6 +8,8 @@ import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 
 public class Logger {
+	public static final int MAX_MSG_LENGTH = 2048;
+	
     private static ILogger logger;
 
 	public static void registerLogger(ILogger theLogger) {
@@ -36,14 +38,20 @@ public class Logger {
 	
 	protected static void logForce(String type, String message) {
 		System.err.println("logger> " + type + ": " + message);
+		if (message.length() > MAX_MSG_LENGTH)
+			System.err.println("  (message truncated)");
 		
+		message = message.substring(0, Math.min(message.length(), MAX_MSG_LENGTH));
 		if(logger != null) {
 			try {
 				logger.log(type, message, new Date());
-			} catch (Exception e) {
-				//do not catch exceptions here; if this fails, we want the app to crash
-				System.err.println("exception when trying to write log message!");
+			} catch (RuntimeException e) {
+				//do not catch exceptions here; if this fails, we want the exception to propogate
+				System.err.println("exception when trying to write log message! " + WrappedException.printException(e));
 				logger.panic();
+				
+				//be conservative for now
+				//throw e;
 			}
 		}
 	}
