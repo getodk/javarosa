@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
+import org.javarosa.core.services.Logger;
 import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.TransportMessageStore;
@@ -130,6 +131,10 @@ public class TransportService {
 			synchronized (CACHE()) {
 				// persist the message
 				CACHE().cache(message);
+				
+				if (tries == 0) {
+					Logger.log("send", "msg cached; " + CACHE().getCachedMessagesCount() + " in queue");
+				}
 			}
 		} else {
 			message.setStatus(TransportMessageStatus.QUEUED);

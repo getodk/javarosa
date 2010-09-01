@@ -1,5 +1,6 @@
 package org.javarosa.services.transport.senders;
 
+import org.javarosa.core.services.Logger;
 import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
@@ -37,6 +38,7 @@ public class SimpleSenderThread extends SenderThread {
 			try {
 				message = attemptToSend();
 			} catch (TransportException e) {
+				Logger.exception("SimpleSenderThread.send", e);
 				e.printStackTrace();
 				// can't log and throw this from within the API
 				// and since this is in a thread, nothing to do
@@ -47,14 +49,19 @@ public class SimpleSenderThread extends SenderThread {
 		// used up, then the message becomes cached, for sending
 		// via the "Send Unsent" user function
 		if (!message.isSuccess()) {
+			Logger.log("send", "failed");
 			message.setStatus(message.isCacheable() ? TransportMessageStatus.CACHED : TransportMessageStatus.FAILED);
 			notifyStatusChange(message);
+		} else {
+			Logger.log("send", "success");
 		}
+		
 		
 		if (message.isCacheable()) {
 			try {
 				this.messageStore.updateMessage(message);
 			} catch (Exception e) {
+				Logger.exception("SimpleSenderThread.send/isCacheable", e);
 				e.printStackTrace();
 				// if this update fails, the CACHED status
 				// isn't permanent (the message doesn't fall through

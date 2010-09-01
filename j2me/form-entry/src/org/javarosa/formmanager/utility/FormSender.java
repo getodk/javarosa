@@ -16,6 +16,7 @@
 
 package org.javarosa.formmanager.utility;
 
+import org.javarosa.core.services.Logger;
 import org.javarosa.formmanager.view.ISubmitStatusObserver;
 import org.javarosa.formmanager.view.transport.FormTransportSubmitStatusScreen;
 import org.javarosa.formmanager.view.transport.FormTransportViews;
@@ -89,6 +90,7 @@ public class FormSender {
 			thread.addListener(observer);
 		}
 		catch(TransportException e) {
+			Logger.exception("FormSender.sendData", e);
 			e.printStackTrace();
 			if(observer != null) {
 				observer.receiveError(e.getMessage());
