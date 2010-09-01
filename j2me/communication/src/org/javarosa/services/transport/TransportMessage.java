@@ -130,4 +130,6 @@ public interface TransportMessage extends Persistable {
 
 	Date getSent();
 
+	
+	String getTag();
 }
