@@ -153,7 +153,8 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	private void addHeader(Element parent, Element errorsNode) {
 		String deviceId = PropertyManager._().getSingularProperty(JavaRosaPropertyRules.DEVICE_ID_PROPERTY);
 		String reportDate = DateUtils.formatDate(new Date(), DateUtils.FORMAT_HUMAN_READABLE_SHORT);
-
+		String appVersion = PropertyManager._().getSingularProperty("app-version");
+		
 		Element id = parent.createElement(null,"device_id");
 		id.addChild(Element.TEXT, deviceId);
 		parent.addChild(Element.ELEMENT, id);
@@ -161,6 +162,10 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		Element date = parent.createElement(null,"report_date");
 		date.addChild(Element.TEXT, reportDate);
 		parent.addChild(Element.ELEMENT, date);
+
+		Element version = parent.createElement(null, "app_version");
+		version.addChild(Element.TEXT, appVersion);
+		parent.addChild(Element.ELEMENT, version);
 	}
 	
 	private void createTransportSubreport(Element parent, Element errorsNode) {
