@@ -1,6 +1,7 @@
 package org.javarosa.services.transport.senders;
 
 import org.javarosa.core.services.Logger;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
@@ -49,11 +50,11 @@ public class SimpleSenderThread extends SenderThread {
 		// used up, then the message becomes cached, for sending
 		// via the "Send Unsent" user function
 		if (!message.isSuccess()) {
-			Logger.log("send", "failed");
+			Logger.log("send", message.getTag() + " failed");
 			message.setStatus(message.isCacheable() ? TransportMessageStatus.CACHED : TransportMessageStatus.FAILED);
 			notifyStatusChange(message);
 		} else {
-			Logger.log("send", "success");
+			Logger.log("send", message.getTag() + " success");
 		}
 		
 		

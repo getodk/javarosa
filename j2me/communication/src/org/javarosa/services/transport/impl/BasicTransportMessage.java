@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -95,6 +96,11 @@ public abstract class BasicTransportMessage implements TransportMessage {
 		this.queueIdentifier = queueIdentifier;
 	}
 
+	public String getTag () {
+		String uuid = this.getCacheIdentifier();
+		return (uuid != null ? PropertyUtils.trim(uuid, 6) : "--");
+	}
+	
 	public int getID() {
 		return recordId;
 	}

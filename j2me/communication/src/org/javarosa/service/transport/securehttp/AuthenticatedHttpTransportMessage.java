@@ -117,6 +117,10 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 		return null;
 	}
 
+	public String getTag () {
+		return null;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.services.transport.TransportMessage#getContent()
 	 */
