@@ -9,6 +9,8 @@ import java.util.Enumeration;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
+import org.javarosa.core.log.WrappedException;
+import org.javarosa.core.services.Logger;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.StreamsUtil;
@@ -87,6 +89,8 @@ public class SimpleHttpTransporter implements Transporter {
 			this.message.setResponseCode(responseCode);
 			if (responseCode == HttpConnection.HTTP_OK) {
 				this.message.setStatus(TransportMessageStatus.SENT);
+			} else {
+				Logger.log("send", "http resp code: " + responseCode);
 			}
 
 			conn.close();
@@ -94,7 +98,7 @@ public class SimpleHttpTransporter implements Transporter {
 			e.printStackTrace();
 			System.out.println("Connection failed: " + e.getClass() + " : "
 					+ e.getMessage());
-			this.message.setFailureReason(e.getMessage());
+			this.message.setFailureReason(WrappedException.printException(e));
 			this.message.incrementFailureCount();
 		} finally {
 
