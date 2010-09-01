@@ -209,6 +209,8 @@ public class TransportService {
 			// get all the cached messages
 			Vector messages = getCachedMessages();
 	
+			Logger.log("send-all", "start; " + messages.size() + " msgs");
+			
 			if (messages.size() > 0) {
 	
 				// create one appropriate transporter (to share a connection, for
