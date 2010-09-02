@@ -87,17 +87,18 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			Document report = createReport();
 			InputStream payload = serializeReport(report);
 			TransportMessage message = constructMessageFromPayload(payload);
+			
+			Logger.log("device-report", "attempting to send");
 			SenderThread s = TransportService.send(message);
 			
 			//We have no way of knowing whether the message will get 
 			//off the phone successfully if it can get cached, the
 			//logs are in the transport layer's hands at that point.
 			if(message.isCacheable()) {
-				Logger._().clearLogs();
+				onSuccess();
 			}
 			
 			s.addListener(this);
-			LogReportUtils.setPendingFromNow(now);
 		} catch (Exception e) {
 			// Don't let this code break the application, ever.
 			e.printStackTrace();
@@ -280,13 +281,20 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			//logs yet, since we needed to wait for success in order
 			//to know they'd get off the phone.
 			if(!message.isCacheable()) {
-				Logger._().clearLogs();
+				onSuccess();
 			}
 		} else {
 			//if we failed we need to determine if the logs are too big
 			//and either dump to the fileystem or just clear the logs...
-			determineLogFallback(1000);
+			determineLogFallback(LOG_ROLLOVER_SIZE);
+			
+			//droos: maybe if this still fails after N attempts, then we start to trim the log size
 		}
+	}
+	
+	private void onSuccess () {
+		Logger._().clearLogs();
+		LogReportUtils.setPendingFromNow(now);		
 	}
 	
 	private void determineLogFallback(int size) {

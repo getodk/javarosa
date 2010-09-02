@@ -2,6 +2,7 @@ package org.javarosa.log.util;
 import java.util.Date;
 
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.log.properties.LogPropertyRules;
@@ -85,7 +86,13 @@ public class LogReportUtils {
 		if(LogPropertyRules.SHORT.equals(mode) ||
 		   LogPropertyRules.FULL.equals(mode)) {
 
-			if(now > getNextTimeForString(next)) {
+			long nextTime = getNextTimeForString(next);
+			if (nextTime - now > 14 * 86400000L) {
+				Logger.log("device-report", "next send time is suspiciously far in future [" + nextTime + "]; forcing send");
+				nextTime = now;
+			}
+			
+			if(now >= nextTime) {
 				if(LogPropertyRules.SHORT.equals(mode)) {
 					return REPORT_FORMAT_COMPACT;
 				} else {
