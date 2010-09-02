@@ -14,13 +14,13 @@ import org.javarosa.chsreferral.model.PatientReferral;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
-import org.javarosa.core.model.utils.IInstanceProcessor;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.IStorageUtilityIndexed;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.util.InvalidIndexException;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 
 /**
@@ -183,7 +183,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 			c.setUserId(userId);
 		}
 		commit(c);
-		Logger.log("case-create", c.getID() + ";" + c.getCaseId() + ";" + c.getTypeId());
+		Logger.log("case-create", c.getID() + ";" + PropertyUtils.trim(c.getCaseId(), 12) + ";" + c.getTypeId());
 		return c;
 	}
 	
@@ -216,7 +216,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 	private void processCaseClose(TreeElement close,Case c, Date date) throws MalformedCaseModelException {
 		c.setClosed(true);
 		commit(c);
-		Logger.log("case-close", c.getCaseId());
+		Logger.log("case-close", PropertyUtils.trim(c.getCaseId(), 12));
 	}
 	
 	private void processCaseReferral(TreeElement referral, Case c, Date date) throws MalformedCaseModelException {
@@ -250,7 +250,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 					String referralType = (String)referralTypeList.elementAt(ir);
 					PatientReferral r = new PatientReferral(referralType, date, referralId, c.getCaseId(), followup);
 					commit(r);
-					Logger.log("referral-open", r.getID() + ";" + r.getReferralId() + ";" + r.getType());
+					Logger.log("referral-open", r.getID() + ";" + PropertyUtils.trim(r.getReferralId(), 12) + ";" + r.getType());
 				}
 			}
 			else if(kid.getName().equals("update")) {
@@ -268,7 +268,7 @@ public class CaseModelProcessor implements ICaseModelProcessor {
 				}
 				commit(r);
 				if (closing) {
-					Logger.log("referral-resolve", r.getReferralId() + ";" + r.getType()); //type currently needed to uniquely identify referral
+					Logger.log("referral-resolve", PropertyUtils.trim(r.getReferralId(), 12) + ";" + r.getType()); //type currently needed to uniquely identify referral
 				}
 			}
 		}
