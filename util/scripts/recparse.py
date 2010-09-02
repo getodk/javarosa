@@ -422,7 +422,7 @@ def _parse_xpath_step (stream):
 custom_types = {
   'rmsinfo': parse_custom('int,int,int'),
   'recloc': parse_custom('int,int'),
-  'user': parse_custom('str,str,str,int,int,str,bool,map(str,str)'),
+  'user': parse_custom('str,str,int,str,bool,map(str,str)'),
   'case': parse_custom('str,str,str,str,bool,null(date),int,mapp(str)'),
   'patref': parse_custom('str,date,date,str,str,int,bool'),
   'formdef': parse_custom('int,str,null(str),listp,obj:forminst,null(obj:loclzr),list(obj:condition),list(obj:recalc),listp'),
