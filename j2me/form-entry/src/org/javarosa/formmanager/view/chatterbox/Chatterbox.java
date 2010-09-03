@@ -61,10 +61,9 @@ import de.enough.polish.ui.backgrounds.PolygonBackground;
 
 
 public class Chatterbox extends FramedForm implements HandledPCommandListener, IFormEntryView{
-	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
-	private int AUDIO_PLAYBACK_KEYCODE = -1;
-	
+	private boolean USE_HASH_FOR_AUDIO = false;
+	private static int POUND_KEYCODE = Canvas.KEY_POUND;
     private static final String PROMPT_REQUIRED_QUESTION = Localization.get("view.sending.RequiredQuestion");
 
 	private static final String PROMPT_DEFAULT_CONSTRAINT_VIOL = "Answer is outside of the allowed range";
@@ -155,14 +154,11 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	//#endif
     	
     	//#if device.identifier == Sony-Ericsson/K610i
-    	LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_STAR;
+    	POUND_KEYCODE = Canvas.KEY_STAR;
     	//#endif
 
     }
     
-    public void setAudioPlaybackKey(int keycode) {
-    	AUDIO_PLAYBACK_KEYCODE = keycode;
-    }
 
     public void destroy () {
     	for (int i = 0; i < size(); i++) {
@@ -655,19 +651,30 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 //	}
 	
     public void keyPressed(int keyCode) {
-    	
     	try {
-    	
 	    	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
 	    	super.keyPressed(keyCode);
-	    	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
+	    	if(multiLingual && keyCode == POUND_KEYCODE && !USE_HASH_FOR_AUDIO) {
 	    		controller.cycleLanguage();
-	    	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
-	    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
-					ChatterboxWidget widget = activeFrame();
-					if (widget != null) {
-						widget.UIHack(UIHACK_SELECT_PRESS);
-					}
+	    	}else if(USE_HASH_FOR_AUDIO && keyCode == POUND_KEYCODE){
+	    		if(model.getEvent() != FormEntryController.EVENT_QUESTION) return;
+	    		FormEntryPrompt fep = model.getQuestionPrompt();
+	    		Vector choices = fep.getSelectChoices();
+	    		if(selectedIndex != -1 && (choices != null && choices.size() > 0)){
+		    		SelectChoice selection = (SelectChoice)choices.elementAt(selectedIndex);
+		    		int code = getAudioAndPlay(fep, selection);
+		    		if(code == AUDIO_NO_RESOURCE){
+	    				getAudioAndPlay(fep);
+		    		}
+	    		}else{
+	    			getAudioAndPlay(fep);
+	    		}
+	    	}else if (keyCode == KEY_CENTER_LETS_HOPE) {
+		    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
+						ChatterboxWidget widget = activeFrame();
+						if (widget != null) {
+							widget.UIHack(UIHACK_SELECT_PRESS);
+						}
 				}
 	        	indexWhenKeyPressed = keyDownSelectedWidget;
 	    	}
@@ -683,7 +690,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		//The previous select keypress was for a different item.
     	} else {
     		//#if javarosa.supresscycle
-    		if(keyCode != LANGUAGE_CYCLE_KEYCODE) {
+    		if(keyCode != POUND_KEYCODE) {
         		super.keyReleased(keyCode);
     		}
     		//#else
