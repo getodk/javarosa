@@ -39,6 +39,10 @@ public class FormManagerProperties implements IPropertyRules {
 	    public static final String VIEW_CHATTERBOX = "v_chatterbox";
 	    public static final String VIEW_SINGLEQUESTIONSCREEN = "v_singlequestionscreen";
 	    
+	    public final static String USE_HASH_FOR_AUDIO_PLAYBACK = "hashkey-audio-playback";
+	    public final static String HASH_AUDIO_PLAYBACK_YES = "Yes";
+	    public final static String HASH_AUDIO_PLAYBACK_NO = "No";
+	    
 	    /**
 	     * Creates the JavaRosa set of property rules
 	     */
@@ -51,6 +55,12 @@ public class FormManagerProperties implements IPropertyRules {
 	        allowableDisplays.addElement(VIEW_CHATTERBOX);
 	        allowableDisplays.addElement(VIEW_SINGLEQUESTIONSCREEN);
 	        rules.put(VIEW_TYPE_PROPERTY, allowableDisplays);
+	        
+	        Vector hashkeyAudio = new Vector();
+	        hashkeyAudio.addElement(HASH_AUDIO_PLAYBACK_YES);
+	        hashkeyAudio.addElement(HASH_AUDIO_PLAYBACK_NO);
+	         
+	        rules.put(USE_HASH_FOR_AUDIO_PLAYBACK,hashkeyAudio);
 
 	    }
 
@@ -118,8 +128,9 @@ public class FormManagerProperties implements IPropertyRules {
 	    public String getHumanReadableDescription(String propertyName) {
 	    	if(VIEW_TYPE_PROPERTY.equals(propertyName)) {
 	    		return "Form Entry View";
-	    	}
-	    	return propertyName;
+	    	}else if(USE_HASH_FOR_AUDIO_PLAYBACK.equals(propertyName)) {
+	    		return "Use the # Key to play back audio prompts";
+	    	}return propertyName;
 	    }
 	    
 	    /*
@@ -133,6 +144,12 @@ public class FormManagerProperties implements IPropertyRules {
 	    		} else if(VIEW_SINGLEQUESTIONSCREEN.equals(value)) {
 	    			return "One Question Per Screen"; 
 	    		}
+	    	}else if(USE_HASH_FOR_AUDIO_PLAYBACK.equals(propertyName)) {
+    			if(HASH_AUDIO_PLAYBACK_YES.equals(value)){
+    				return "Use hash key to trigger playback";
+    			}else if(HASH_AUDIO_PLAYBACK_NO.equals(value)){
+    				return "Use hash key for changing languages";
+    			}
 	     	}
 	    	return value;
 	    }
