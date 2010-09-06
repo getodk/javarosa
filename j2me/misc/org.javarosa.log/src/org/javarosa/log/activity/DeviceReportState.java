@@ -50,6 +50,8 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public abstract class DeviceReportState implements State, TrivialTransitions, TransportListener {
 
+	private static final int LOG_ROLLOVER_SIZE = 3000;
+	
 	private static final String XMLNS = "http://code.javarosa.org/devicereport";
 	
 	private int reportFormat;
@@ -76,7 +78,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			//If we've gotten 600 logger lines in less than 7 days,
 			//it's a problem
 			if(Logger.isLoggingEnabled()) {
-				determineLogFallback(600);
+				determineLogFallback(LOG_ROLLOVER_SIZE);
 			}
 			done();
 			return;
@@ -278,7 +280,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		} else {
 			//if we failed we need to determine if the logs are too big
 			//and either dump to the fileystem or just clear the logs...
-			determineLogFallback(200);
+			determineLogFallback(1000);
 		}
 	}
 	

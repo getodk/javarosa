@@ -21,6 +21,7 @@ package org.javarosa.j2me.log;
 
 import org.javarosa.core.log.IFullLogSerializer;
 import org.javarosa.core.log.LogEntry;
+import org.javarosa.core.model.utils.DateUtils;
 import org.kxml2.kdom.Element;
 
 /**
@@ -41,14 +42,14 @@ public class XmlLogSerializer implements IFullLogSerializer<Element> {
 	 */
 	private Element serializeLog(LogEntry log) {
 		Element entry = new Element();
-		entry.setName("log_entry");
-		entry.setAttribute(null, "date", log.getTime().toString());
+		entry.setName("log");
+		entry.setAttribute(null, "date", DateUtils.formatDateTime(log.getTime(), DateUtils.FORMAT_ISO8601));
 		
-		Element type = entry.createElement(null,"entry_type");
+		Element type = entry.createElement(null,"type");
 		type.addChild(Element.TEXT, log.getType());
 		entry.addChild(Element.ELEMENT, type);
 		
-		Element message = entry.createElement(null,"entry_message");
+		Element message = entry.createElement(null,"msg");
 		message.addChild(Element.TEXT, log.getMessage());
 		entry.addChild(Element.ELEMENT, message);
 		
