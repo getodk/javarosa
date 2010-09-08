@@ -956,7 +956,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 
 		incrementHelper(indexes, multiplicities, elements);
-
+			
 		if (indexes.size() == 0) {
 			return FormIndex.createEndOfFormIndex();
 		} else {
@@ -966,7 +966,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 	private void incrementHelper(Vector indexes, Vector multiplicities,	Vector elements) {
 		int i = indexes.size() - 1;
-		boolean exitRepeat = false;
+		boolean exitRepeat = false; //if exiting a repetition? (i.e., go to next repetition instead of one level up)
 
 		if (i == -1 || elements.elementAt(i) instanceof GroupDef) {
 			// current index is group or repeat or the top-level form
@@ -977,10 +977,22 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				// specified instance actually exists
 				GroupDef group = (GroupDef) elements.elementAt(i);
 				if (group.getRepeat()) {
-					if (instance.resolveReference(getChildInstanceRef(elements,	multiplicities)) == null) {
-						descend = false; // repeat instance does not exist; do
-						// not descend into it
-						exitRepeat = true;
+					if (FormIndex.EXPERIMENTAL_API) {
+						
+						if (((Integer)multiplicities.lastElement()).intValue() == -1) {
+						
+							descend = false;
+							exitRepeat = true;
+							
+						}
+						
+					} else {
+					
+						if (instance.resolveReference(getChildInstanceRef(elements,	multiplicities)) == null) {
+							descend = false; // repeat instance does not exist; do not descend into it
+							exitRepeat = true;
+						}
+						
 					}
 				}
 			}
@@ -989,6 +1001,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				indexes.addElement(new Integer(0));
 				multiplicities.addElement(new Integer(0));
 				elements.addElement((i == -1 ? this : (IFormElement) elements.elementAt(i)).getChild(0));
+				
+				if (FormIndex.EXPERIMENTAL_API) {
+					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
+						multiplicities.setElementAt(new Integer(-1), multiplicities.size() - 1);
+					}
+				}
+				
 				return;
 			}
 		}
@@ -999,7 +1018,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			// (repeat-not-existing can only happen at lowest level; exitRepeat
 			// will be true)
 			if (!exitRepeat && elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements.elementAt(i)).getRepeat()) {
-				multiplicities.setElementAt(new Integer(((Integer) multiplicities.elementAt(i)).intValue() + 1), i);
+				if (FormIndex.EXPERIMENTAL_API) {
+					
+					multiplicities.setElementAt(new Integer(-1), i);
+
+				} else {
+					
+					multiplicities.setElementAt(new Integer(((Integer) multiplicities.elementAt(i)).intValue() + 1), i);
+					
+				}
 				return;
 			}
 
@@ -1019,11 +1046,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				indexes.setElementAt(new Integer(curIndex + 1), i);
 				multiplicities.setElementAt(new Integer(0), i);
 				elements.setElementAt(parent.getChild(curIndex + 1), i);
+				
+				if (FormIndex.EXPERIMENTAL_API) {
+					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
+						multiplicities.setElementAt(new Integer(-1), multiplicities.size() - 1);
+					}
+				}
+				
 				return;
 			}
 		}
 	}
-
+	
 	public FormIndex decrementIndex(FormIndex index) {
 		Vector indexes = new Vector();
 		Vector multiplicities = new Vector();
@@ -1055,8 +1089,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			int curIndex = ((Integer) indexes.elementAt(i)).intValue();
 			int curMult = ((Integer) multiplicities.elementAt(i)).intValue();
 
-			if (curMult > 0) {
-				// set node to previous repetition of current element
+			if (FormIndex.EXPERIMENTAL_API && 
+				elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat() &&
+				((Integer)multiplicities.lastElement()).intValue() != -1) {
+				multiplicities.setElementAt(new Integer(-1), i);
+				return;
+			} else if (!FormIndex.EXPERIMENTAL_API && curMult > 0) {
 				multiplicities.setElementAt(new Integer(curMult - 1), i);
 			} else if (curIndex > 0) {
 				// set node to previous element
@@ -1070,7 +1108,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				// at absolute beginning of current level; index to parent
 				indexes.removeElementAt(i);
 				multiplicities.removeElementAt(i);
-				elements.removeElementAt(i);
+				elements.removeElementAt(i);				
 				return;
 			}
 		}
@@ -1103,13 +1141,58 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				TreeElement parentNode = instance.resolveReference(nodeRef.getParentRef());
 				mult = parentNode.getChildMultiplicity(name);
 			}
-			multiplicities.setElementAt(new Integer(mult), multiplicities.size() - 1);
+			multiplicities.setElementAt(new Integer(FormIndex.EXPERIMENTAL_API ? -1 : mult), multiplicities.size() - 1);
 			return true;
 		} else {
 			return false;
 		}
 	}
 
+	public FormIndex descendIntoRepeat(FormIndex index, int repIndex) {
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+
+		if (!index.isInForm()) {
+			throw new RuntimeException();
+		}
+		
+		collapseIndex(index, indexes, multiplicities, elements);
+
+		if (!(elements.lastElement() instanceof GroupDef) || !((GroupDef)elements.lastElement()).getRepeat()) {
+			throw new RuntimeException();
+		}
+		
+		TreeElement node = instance.resolveReference(getChildInstanceRef(elements, multiplicities));
+		String name = node.getName();
+		int numRepetitions = node.getParent().getChildMultiplicity(name);
+		if (repIndex < 0 || repIndex >= numRepetitions) {
+			throw new RuntimeException();
+		}
+		
+		multiplicities.setElementAt(new Integer(repIndex), multiplicities.size() - 1);
+		
+		return buildIndex(indexes, multiplicities, elements);
+	}
+
+	public Vector<String> getAvailableRepetitions (FormIndex index) {
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+
+		collapseIndex(index, indexes, multiplicities, elements);
+
+		TreeElement node = instance.resolveReference(getChildInstanceRef(elements, multiplicities));
+		String name = node.getName();
+		int numRepetitions = node.getParent().getChildMultiplicity(name);
+
+		Vector<String> reps = new Vector<String>();
+		for (int i = 0; i < numRepetitions; i++) {
+			reps.addElement("rep " + (i + 1));
+		}
+		return reps;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

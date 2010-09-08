@@ -78,7 +78,11 @@ public class FormEntryModel {
         }
     }
 
-
+    public Vector<String> getRepetitions () {
+    	return form.getAvailableRepetitions(currentFormIndex);
+    }
+    
+    
     /**
      * 
      * @param index
