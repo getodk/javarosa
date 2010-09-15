@@ -1,0 +1,698 @@
+/** 
+  * The polish.css files contains all
+  * design information about a project.
+  * It can be adjusted for specific devices
+  * or device groups by putting it in the 
+  * appropriate sub-folder.
+  * If you want to adjust a design for all
+  * Nokia devices, define it in "resources/Nokia/polish.css"
+  * and so on. Only new and different settings
+  * need to be specified in such polish.css files. 
+  */
+
+/**
+  * the colors which are defined in
+  * the colors section can later be referenced.
+  * This makes changes easy, since the color
+  * just needs to be changed in one position.
+  * Even default colors (like blue, green, lime, etc)
+  * can be changed here. 
+  */
+
+colors {
+	fontColor: rgb( 30, 85, 86 );
+	focusedFontColor: #000;
+	bgColor:  #eee;
+	focusedBgColor:  #fff;
+	focusedBackground: yellow;
+	borderColor: fontColor;
+	focusedBorderColor: focusedFontColor;
+	menubarColor: rgb( 240, 240, 240 );
+	menubottombarColor: rgb( 210, 210, 210 );
+	oldQuestionColor: #E2E2E2;	
+	overlay: argb( 150, 255, 255, 255 );
+	buttonBgColor: #ffeecc;
+	requiredColor: 	#FF7F50;
+	requiredColorFocus: #DC143C;
+	headerColor: 	#D9D9D9;
+}
+
+.loginView {
+	background {
+		
+		color: white;
+		anchor: bottom | horizontal-center;
+	}
+	background-bottom: menubar;	
+	margin-bottom: 5;
+	layout: horizontal-center;
+}
+
+
+/**
+ * singlequestionscreen styles
+ */
+.View_All_Form {
+	padding: 2;	
+	background-color: white;
+	screen-change-animation: particle;
+	layout: bottom | horizontal-center;
+	always-include: true	
+}
+
+.View_All_Header extends View_All_Form {
+	padding: 2;
+	padding-top: 2;
+	padding-bottom: 2;
+	padding-right: 2;
+	font-face: proportional;
+	font-size: small;
+	font-style: bold;
+	font-color: #fff;
+	layout: left | expand;
+	text-effect: split;
+	text-split-bottom-color: #ddd;
+	background {
+		type: split;
+		top-color: #073b46;
+		bottom-color: #042931;
+		split-pos: 50%;
+		arc-width: 4;
+		arc-height:4;
+	}
+	always-include: true
+}
+
+.View_All_Header:hover {
+}
+
+
+.View_All_Prompt extends View_All_Form {
+	background-color: white;	
+	layout: left | expand;
+	always-include: true;	
+}
+
+.SingleQuestionScreen_Form {
+	padding: 2;
+	background-color: gray;
+	screen-change-animation: right;
+	layout: bottom | horizontal-center;
+	always-include: true;
+}
+
+.SingleQuestionScreen_Form_Right extends SingleQuestionScreen_Form {
+	screen-change-animation: right;
+	always-include: true;
+}
+
+.SingleQuestionScreen_Form_Left extends SingleQuestionScreen_Form {
+	screen-change-animation: left;
+	always-include: true;
+}
+
+.SingleQuestionScreen_Form_Flash extends SingleQuestionScreen_Form {
+	screen-change-animation: flash;
+	always-include: true;
+}
+
+.SingleQuestionScreen_Compulsory extends SingleQuestionScreen_Form {
+	layout: left | expand;
+	focused-style: focusHighlight;
+}
+
+
+focusHighlight extends focused {
+	background-color: requiredColorFocus;
+	font-color: white;
+}
+	
+.buttonfocused {
+	font-color: black;
+	font-style: bold;
+	border-color: black;
+	border-width: 1;
+	background-color: focusedBackground;
+
+/*
+	padding-vertical: 2;
+	padding-horizontal: 5;
+*/	
+	
+	layout: horizontal-center;
+	min-width: 80;
+}
+
+.button extends buttonfocused {
+	focused-style: buttonfocused;
+	background-color: buttonBgColor;
+}
+
+.groupName {
+	font-color: black;
+	font-style: italic;
+	background {
+		type: round-rect;
+		arc: 9;
+		color: buttonBgColor;
+
+	}
+}
+  
+
+title {
+	padding: 1;
+	font-face: proportional;
+	font-size: small;
+	font-style: bold;
+	font-color: focusedFontColor;
+	background-color: bgColor;
+	border: none;
+	layout: horizontal-center | horizontal-expand;
+	//#if polish.midp2
+		text-effect: vertical-gradient;
+		text-vertical-gradient-start-color: #f00;
+		text-vertical-gradient-end-color: #00f;		
+	//#endif
+}
+
+.modeList{
+	background: #FFC;
+	layout: center | expand;
+}
+
+focused{
+	/*
+	background-color: white;
+	border-type: round-rect;
+	border-arc: 6;
+	border-color: yellow;
+	border-width: 2;
+	layout: left | expand;
+	font-color: black;
+	font-style: bold;
+	*/
+	layout: left | expand;
+	background-color: focusedBackground;
+	border {
+		type: drop-shadow;
+		inner-color: #000;
+		outer-color: #000;
+		width: 3;
+		orientation: all;
+	}	
+}
+	
+.textBox {
+	label-style: choiceGroupLabel;
+	layout: horizontal-center;
+	background-color: white;
+	border-width: 1;
+	border-color: black;
+	layout: right | expand;
+
+/*
+	margin-top: 1;
+	margin-bottom: 1;
+	margin-left: 1;
+	margin-right: 1;
+*/
+}
+
+choiceGroup extends textBox {
+	
+}
+
+.choiceGroupLabel {
+	font-face: proportional;
+	/* font-size: large; */
+	layout: horizontal-center | newline-after;
+}
+
+.yesNoChoiceGroup extends choicegroup{
+	background-color: white;
+	view-type: midp2;
+}
+
+.choiceItem {
+	margin: 0;
+	icon-image-align: bottom;
+	font-size: medium;
+}
+
+.yesNoItem {
+	margin: 2;
+	layout: right;
+	icon-image-align: bottom
+}
+
+.framedForm {
+	padding: 1;
+	background-color: gray;
+	layout: bottom | horizontal-center;
+}
+	
+.questiontext extends textBox{
+	font-face: proportional;
+	font-size: medium;	
+	layout: horizontal-center | expand | bottom; 
+}
+
+.prompttext extends questiontext {
+    border: none;
+}
+
+.oldprompttext extends questiontext {
+	font-style: bold;	 
+	background-color: oldQuestionColor;
+}
+	
+.valueText extends textBox{
+	font-face: proportional;
+	font-size: medium;
+	font-style: bold;	
+	layout: horizontal-center | expand; 
+	background-color: oldQuestionColor;
+}
+
+leftframe {
+	layout: vertical-expand | vertical-center;
+}
+
+rightframe {
+	layout: vertical-expand | vertical-center;
+}
+
+menu {
+	border {
+		type: drop-shadow;
+		width: 2;
+		start-color: #aeee;
+		end-color: #2222;
+		orientation: top-right;
+	}
+	padding: 0;
+	background-color: menubarColor;
+	font-style: bold; 
+	font-face: proportional; 
+	font-size: small; 
+	font-color: black;
+	menubar-color: menubottombarColor;
+	margin: 0;
+}
+/**
+  * The menuItem style is a predefined style
+  * for the actual commands in a fullscreen-menu.
+  * When the menuItem style is not defined,
+  * the menu style will be used instead. 
+  */
+menuItem {
+	font {
+		color: fontColor;
+		size: small;
+		style: bold;
+	}
+	layout: left;
+	//#if ${ exists( arrowRight.png ) }
+		command-child-indicator: url(arrowRight.png);
+	//#else
+		command-child-indicator-color: blue;
+		command-child-indicator-width: 8;
+		command-child-indicator-height: 10;
+	//#endif
+}
+
+.menuItem:hover {
+	border {
+		type: simple;
+		width: 1;
+		color: black;
+		orientation: all;
+	}	
+	font {
+		style: bold;
+		size: small;
+		color: black;
+	}
+	layout: left | horizontal-expand;
+}
+
+.container {
+	columns: 1;
+	layout: expand | vshrink | bottom;
+}
+
+leftcommand {
+/*
+	padding-horizontal: 0;
+	padding-bottom: 0;
+*/
+	font-color: black;
+	font-style: bold;
+}
+
+rightcommand {
+/*
+	padding-horizontal: 0;
+	padding-bottom: 0;
+*/
+	font-color: black;
+	font-style: bold;
+	layout: right;
+}
+
+.split {
+	columns: 3; /* really two columns, with a null item prepended */
+	layout: expand | vshrink;
+ 	background-color: oldQuestionColor;
+ 	
+ /*	
+	padding: 2;
+	margin-top: 1;
+	margin-bottom: 1;
+	margin-left: 1;
+	margin-right: 1;
+*/	
+	
+	border-width: 1;
+	border-color: black;
+}
+
+/* 'expand' is currently set in both splitleft and splitright because without it the text doesn't always align correctly.
+ * it is not ideal, however, because if the question or answer is much longer than the other, we waste vertical space by
+ * wrapping prematurely */
+
+.splitleft {
+	layout: left | expand;
+  	font-face: proportional;
+	font-size: medium;
+	/* font-style: bold; */
+	focused-style: .empty_focus; 	
+}
+
+.empty_focus {
+	layout: left | expand;
+  	font-face: proportional;
+	font-size: medium;
+	/* font-style: bold; */
+	border: none;
+}
+
+.splitright {
+	layout: right | expand;
+	font-face: proportional;
+	font-size: medium;
+	/* font-style: bold; */
+}
+
+.progressbar {
+	gauge-mode: continuous;
+	gauge-show-value: false;	
+	gauge-height: 2;
+}
+
+.urlForm{}
+
+.urlInput{}
+
+.submitPopup {
+	margin: 10;
+	padding: 5;
+	layout: horizontal-center | vertical-center | horizontal-shrink;
+	repaint-previous-screen: true;
+	border-width: 1;
+	border-color: black;
+	background-color: white;
+	
+/*	
+	//#if polish.midp2 || polish.api.nokia-ui
+		border {
+			type: drop-shadow;
+			width: 6;
+			inner-color: #aff0;
+			outer-color: #2002;
+			orientation: top-right;
+		}
+	//#endif
+*/	
+}
+
+.submitYesNo {
+	
+}
+
+/* JJ trying this new style just to see if it works, copied the polish site */
+
+.mailForm {
+    padding: 5;
+    padding-left: 5;
+    padding-right: 5;
+    background-color: black;
+    layout: horizontal-expand | horizontal-center | top;
+    //#if polish.midp2 and false
+        screen-change-animation: fade;
+    //#endif
+}
+
+.mailAlert extends .mailForm {
+    title-style: none;
+    margin-right: 10;
+    margin-left: 10;
+    padding-left: 5;
+    padding-right: 5;
+    layout: horizontal-center | bottom | horizontal-shrink | vertical-shrink;
+    repaint-previous-screen: true;
+    //#if polish.midp2 and false
+        screen-change-animation: fade;
+    //#endif
+    background-color: green;
+}
+
+.accessDeniedAlert extends .mailForm {
+    title-style: none;
+    margin-right: 10;
+    margin-left: 10;
+    padding-left: 5;
+    padding-right: 5;
+    layout: horizontal-center | bottom | horizontal-shrink | vertical-shrink;
+    repaint-previous-screen: true;
+    //#if polish.midp2 and false
+        screen-change-animation: fade;
+    //#endif
+    background-color: red;
+}
+
+alertcontent {
+    font-color: white;
+}
+
+.lineChart {
+    layout: center | expand;
+    label-style: choiceGroupLabel;
+	focused-style: graphfocused;
+	padding: 3;
+	font-color: gray;
+	font-size: small;
+}
+
+.graphfocused{
+    background: default;
+    background-color: white;
+}
+
+.ReviewFramedForm extends .framedForm {
+	background-color: white;
+	padding: 0;
+}
+
+.ReviewSplit extends .split {
+ 	background-color: white;
+	padding: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: 1;
+	margin-right: 1;
+	border: none;
+	focused-style: .cbox_frame_focused;
+}
+
+.cbox_frame_focused {
+	layout: left | expand;
+	background-color: white;
+	border {
+		type: drop-shadow;
+		inner-color: #000;
+		outer-color: #000;
+		width: 3;
+		orientation: all;
+	}
+}	
+	
+	
+.patselRow {
+    font-size: small;
+	//#if javarosa.patientselect.formfactor == nokia-s40
+	columns: 3;
+	columns-width: 70,40,18;
+	//#else
+	columns: 3;
+	columns-width: 110,95,25;
+	//#endif
+}
+
+.patselDetailRow {
+    font-size: small;
+	columns: 2;
+	//#if javarosa.patientselect.formfactor == nokia-s40
+	columns-width: 40,85;
+	//#else
+	columns-width: 80,150;
+	//#endif
+}
+
+.patselEvenRow extends patselRow {
+	background-color: white;
+}
+
+.patselOddRow extends patselRow {
+	background-color:  #EEEEFF;
+}
+
+.patselSelectedRow extends patselRow {
+	background-color: focusedBackground;
+	border {
+		type: drop-shadow;
+		inner-color: #000;
+		outer-color: #000;
+		width: 3;
+		orientation: all;
+	}	
+}
+
+.patselCell {
+    text-wrap: false
+}
+
+.patselTitleRowText{
+	text-wrap: false;
+	font {
+		face: proportional;
+		style: bold;
+		size: small;
+	}
+}
+
+.patselTitleRowContainer extends patselRow {
+	background-color: #5CFFAD;
+}
+
+.loginTextFields {
+	/*margin-top:1;
+	margin-right:5;
+	margin-bottom:6;
+	padding:3;
+	layout: expand | vertical-center;
+	background-color: bgColor;
+	label-style:loginTextLabelStyle;
+	border-color: black;
+	border-width: 1;
+	font-color: black;*/
+}
+
+.loginTextFields:hover {
+	/*margin-top:1;
+	margin-right:5;
+	margin-bottom:6;
+	padding:3;
+	layout: expand | vertical-center;
+	background-color: white;
+	label-style:loginTextLabelStyle;
+	border-color: black;
+	border-width: 1;
+	font-color: black;*/
+	
+	}
+
+.loginTextLabelStyle{
+		/*margin-top:1;
+		margin-left:5;
+		margin-bottom:6;
+		padding:3;
+		layout: left | vertical-center;
+		font-style: bold;
+		border-color: black;
+		border-width: 1;*/
+}
+
+/** ------------   Popup Style   -----------------**/
+
+.patselDetailRow {
+    font-size: small;
+	columns: 2;
+	//#if javarosa.patientselect.formfactor == nokia-s40
+	columns-width: 40,85;
+	//#else
+	columns-width: 80,150;
+	//#endif
+}
+
+.patselSortPopup {
+    margin-right: 15;
+	margin-left: 15;
+    margin-top: 5;
+    margin-bottom: 5;
+    border-color: black;
+    border-width: 1;
+
+    font-size: large;
+    font-style: bold;
+    layout: vertical-center | horizontal-shrink | vertical-shrink;
+    repaint-previous-screen: true;
+}
+
+.gaugeLabel {
+	layout: horizontal-center | horizontal-shrink;
+	layout: newline-after;
+}
+
+
+.loadingGauge {
+    view-type: gauge-rotating-arcs;
+    label-style: gaugeLabel;
+    layout: horizontal-center | vertical-center;
+}
+
+/* Location capture screen style */
+
+.capturingPopup {
+    margin-right: 5;
+    margin-left: 5;
+    padding-left: 5;
+    padding-right: 5;
+    border-width: 1;
+    border-color: black;
+    background-color: white;
+    repaint-previous-screen: true;
+    layout: horizontal-center | bottom | horizontal-shrink | vertical-shrink;
+
+}
+
+.capturingGauge {
+    view-type: gauge-horizontal-spheres;
+    label-style: gaugeLabel;
+    layout: horizontal-center | vertical-center;
+}
+
+.leftlabeledTextField {
+	background-color: white;
+	border-width: 1;
+	border-color: black;
+	padding: 2;
+	label-style: .leftLabel;
+	layout: expand;
+
+}
+
+.leftLabel {
+	font-face: proportional;
+}
