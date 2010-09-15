@@ -1154,20 +1154,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		Vector elements = new Vector();
 
 		if (!index.isInForm()) {
-			throw new RuntimeException();
+			throw new RuntimeException("not an in-form index");
 		}
 		
 		collapseIndex(index, indexes, multiplicities, elements);
 
 		if (!(elements.lastElement() instanceof GroupDef) || !((GroupDef)elements.lastElement()).getRepeat()) {
-			throw new RuntimeException();
+			throw new RuntimeException("current element not a repeat");
 		}
 		
 		TreeElement node = instance.resolveReference(getChildInstanceRef(elements, multiplicities));
 		String name = node.getName();
 		int numRepetitions = node.getParent().getChildMultiplicity(name);
 		if (repIndex < 0 || repIndex >= numRepetitions) {
-			throw new RuntimeException();
+			throw new RuntimeException("selection exceeds current number of repetitions");
 		}
 		
 		multiplicities.setElementAt(new Integer(repIndex), multiplicities.size() - 1);

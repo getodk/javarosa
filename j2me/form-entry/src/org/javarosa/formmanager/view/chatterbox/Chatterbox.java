@@ -242,10 +242,10 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	case FormEntryController.EVENT_END_OF_FORM:
     		formComplete();
     		break;
-    		default:
-    			FormIndex index = model.getFormIndex();
-    			jumpToQuestion(index);
-    			break;
+    	default:
+    		FormIndex index = model.getFormIndex();
+    		jumpToQuestion(index);
+    		break;
     	}
     }
     
@@ -262,7 +262,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	//figure out kind of reference and how to handle it
     	IFormElement last = model.getForm().getChild(questionIndex);
     	if (last instanceof GroupDef) {
-    		if (((GroupDef)last).getRepeat() &&	
+    		if (!FormIndex.EXPERIMENTAL_API && ((GroupDef)last).getRepeat() &&	
     			model.getForm().getInstance().resolveReference(model.getForm().getChildInstanceRef(questionIndex)) == null) {
     			
     			//We're at a repeat interstitial point. If the group has the right configuration, we are able
@@ -281,6 +281,10 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     				//All Systems Go. Display an interstitial "Add another FOO" question.
         			newRepeat = true;	
     			}
+    		} else if (FormIndex.EXPERIMENTAL_API && ((GroupDef)last).getRepeat() && mult == -1) {
+    			
+    			//show repeat juncture question here
+    			
     		} else {
     			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
     			if(forwards) {
