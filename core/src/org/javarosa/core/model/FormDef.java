@@ -979,7 +979,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				if (group.getRepeat()) {
 					if (FormIndex.EXPERIMENTAL_API) {
 						
-						if (((Integer)multiplicities.lastElement()).intValue() == -1) {
+						if (((Integer)multiplicities.lastElement()).intValue() == TreeReference.INDEX_REPEAT_JUNCTURE) {
 						
 							descend = false;
 							exitRepeat = true;
@@ -1004,7 +1004,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				
 				if (FormIndex.EXPERIMENTAL_API) {
 					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
-						multiplicities.setElementAt(new Integer(-1), multiplicities.size() - 1);
+						multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), multiplicities.size() - 1);
 					}
 				}
 				
@@ -1020,7 +1020,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			if (!exitRepeat && elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements.elementAt(i)).getRepeat()) {
 				if (FormIndex.EXPERIMENTAL_API) {
 					
-					multiplicities.setElementAt(new Integer(-1), i);
+					multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), i);
 
 				} else {
 					
@@ -1049,7 +1049,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				
 				if (FormIndex.EXPERIMENTAL_API) {
 					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
-						multiplicities.setElementAt(new Integer(-1), multiplicities.size() - 1);
+						multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), multiplicities.size() - 1);
 					}
 				}
 				
@@ -1091,8 +1091,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 			if (FormIndex.EXPERIMENTAL_API && 
 				elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat() &&
-				((Integer)multiplicities.lastElement()).intValue() != -1) {
-				multiplicities.setElementAt(new Integer(-1), i);
+				((Integer)multiplicities.lastElement()).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
+				multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), i);
 				return;
 			} else if (!FormIndex.EXPERIMENTAL_API && curMult > 0) {
 				multiplicities.setElementAt(new Integer(curMult - 1), i);
@@ -1141,7 +1141,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				TreeElement parentNode = instance.resolveReference(nodeRef.getParentRef());
 				mult = parentNode.getChildMultiplicity(name);
 			}
-			multiplicities.setElementAt(new Integer(FormIndex.EXPERIMENTAL_API ? -1 : mult), multiplicities.size() - 1);
+			multiplicities.setElementAt(new Integer(FormIndex.EXPERIMENTAL_API ? TreeReference.INDEX_REPEAT_JUNCTURE : mult), multiplicities.size() - 1);
 			return true;
 		} else {
 			return false;
@@ -1163,9 +1163,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			throw new RuntimeException("current element not a repeat");
 		}
 		
+		//so painful
+		multiplicities.setElementAt(new Integer(0), multiplicities.size() - 1);
 		TreeElement node = instance.resolveReference(getChildInstanceRef(elements, multiplicities));
 		int numRepetitions = 0;
-		if (node != null) { //so painful
+		if (node != null) {
 			String name = node.getName();
 			numRepetitions = node.getParent().getChildMultiplicity(name);
 		}
@@ -1185,9 +1187,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 		collapseIndex(index, indexes, multiplicities, elements);
 
+		//so painful
+		multiplicities.setElementAt(new Integer(0), multiplicities.size() - 1);
 		TreeElement node = instance.resolveReference(getChildInstanceRef(elements, multiplicities));
 		int numRepetitions = 0;
-		if (node != null) { //so painful
+		if (node != null) {
 			String name = node.getName();
 			numRepetitions = node.getParent().getChildMultiplicity(name);
 		}

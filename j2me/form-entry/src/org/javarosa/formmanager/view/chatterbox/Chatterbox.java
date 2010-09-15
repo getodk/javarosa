@@ -26,10 +26,12 @@ import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.api.Constants;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.NoLocalizedTextException;
@@ -261,6 +263,14 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 
     	//figure out kind of reference and how to handle it
     	IFormElement last = model.getForm().getChild(questionIndex);
+    	
+    	//i am jack's boiling rage
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+		model.getForm().collapseIndex(questionIndex, indexes, multiplicities, elements);
+    	int mult = ((Integer)multiplicities.lastElement()).intValue();
+    	
     	if (last instanceof GroupDef) {
     		if (!FormIndex.EXPERIMENTAL_API && ((GroupDef)last).getRepeat() &&	
     			model.getForm().getInstance().resolveReference(model.getForm().getChildInstanceRef(questionIndex)) == null) {
@@ -279,11 +289,12 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     				return;
     			} else {
     				//All Systems Go. Display an interstitial "Add another FOO" question.
-        			newRepeat = true;	
+        			newRepeat = true;
     			}
-    		} else if (FormIndex.EXPERIMENTAL_API && ((GroupDef)last).getRepeat() && mult == -1) {
+    		} else if (FormIndex.EXPERIMENTAL_API && ((GroupDef)last).getRepeat() && mult == TreeReference.INDEX_REPEAT_JUNCTURE) {
     			
     			//show repeat juncture question here
+    			System.out.println("you've reached a repeat");
     			
     		} else {
     			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
