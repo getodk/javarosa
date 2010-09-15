@@ -1164,8 +1164,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 		
 		TreeElement node = instance.resolveReference(getChildInstanceRef(elements, multiplicities));
-		String name = node.getName();
-		int numRepetitions = node.getParent().getChildMultiplicity(name);
+		int numRepetitions = 0;
+		if (node != null) { //so painful
+			String name = node.getName();
+			numRepetitions = node.getParent().getChildMultiplicity(name);
+		}
 		if (repIndex < 0 || repIndex >= numRepetitions) {
 			throw new RuntimeException("selection exceeds current number of repetitions");
 		}
@@ -1183,8 +1186,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		collapseIndex(index, indexes, multiplicities, elements);
 
 		TreeElement node = instance.resolveReference(getChildInstanceRef(elements, multiplicities));
-		String name = node.getName();
-		int numRepetitions = node.getParent().getChildMultiplicity(name);
+		int numRepetitions = 0;
+		if (node != null) { //so painful
+			String name = node.getName();
+			numRepetitions = node.getParent().getChildMultiplicity(name);
+		}
 
 		Vector<String> reps = new Vector<String>();
 		for (int i = 0; i < numRepetitions; i++) {
