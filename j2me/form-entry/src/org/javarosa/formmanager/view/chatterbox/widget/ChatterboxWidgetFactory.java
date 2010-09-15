@@ -185,6 +185,10 @@ public class ChatterboxWidgetFactory {
 		
 		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }
+
+    public ChatterboxWidget getRepeatJunctureWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
+    	return null;
+    }
     
     public ChatterboxWidget getNewLabelWidget(FormIndex index, String text){
     	//Label Widget;
