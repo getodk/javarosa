@@ -49,7 +49,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	protected Item entryWidget;
 	private Container c;
 	private Container fullPrompt;
-	private boolean IMAGE_DEBUG_MODE = false;
+	private static boolean IMAGE_DEBUG_MODE = false;
 
 	public ExpandedWidget () {
 		reset();
@@ -75,8 +75,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		
 		this.c = c;
 	}
-	
-	public ImageItem getImageItem(FormEntryPrompt fep){
+	public static ImageItem getImageItem(FormEntryPrompt fep) {
 //		Vector AvailForms = fep.getAvailableTextForms();
 		String IaltText;
 
@@ -93,7 +92,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		
 	}
 	
-	public Image getImage(String URI){
+	public static Image getImage(String URI){
 		if(URI != null){
 			try {
 				Reference ref = ReferenceManager._().DeriveReference(URI);
@@ -122,14 +121,22 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	private ImageItem imItem;
 	
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
-		if(imItem!=null && imageIndex !=-1){	//replace an already existing image
-			imItem = getImageItem(fep);
-			if(imItem!=null) fullPrompt.set(imageIndex, imItem);
-			imageIndex = fullPrompt.indexOf(imItem);
-		}else{
-			imItem = getImageItem(fep);
-			if(imItem!=null) fullPrompt.add(imItem);
-			imageIndex = fullPrompt.indexOf(imItem);
+//		if(imItem!=null && imageIndex !=-1){	//replace an already existing image
+//			imItem = getImageItem(fep);
+//			if(imItem!=null) fullPrompt.set(imageIndex, imItem);
+//			imageIndex = fullPrompt.indexOf(imItem);
+//		}else{
+//			imItem = getImageItem(fep);
+//			if(imItem!=null) fullPrompt.add(imItem);
+//			imageIndex = fullPrompt.indexOf(imItem);
+//		}
+		ImageItem newImItem = ExpandedWidget.getImageItem(fep);
+		if(imItem!=null && newImItem!=null){
+			fullPrompt.remove(imItem);	//replace an already existing image
+		}
+		if(newImItem!=null){
+			fullPrompt.add(newImItem);
+			imItem = newImItem;
 		}
 		
 		Chatterbox.getAudioAndPlay(fep);

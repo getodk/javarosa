@@ -62,7 +62,7 @@ import de.enough.polish.ui.backgrounds.PolygonBackground;
 
 public class Chatterbox extends FramedForm implements HandledPCommandListener, IFormEntryView{
 	
-	private boolean USE_HASH_FOR_AUDIO = false;
+	private boolean USE_HASH_FOR_AUDIO = true;
 	private static int POUND_KEYCODE = Canvas.KEY_POUND;
     private static final String PROMPT_REQUIRED_QUESTION = Localization.get("view.sending.RequiredQuestion");
 
