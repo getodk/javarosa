@@ -18,10 +18,13 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.ui.Container;
+import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
@@ -29,6 +32,9 @@ import de.enough.polish.ui.UiAccess;
 public class MessageWidget implements IWidgetStyleEditable {
 	private StringItem prompt;
 	private StringItem ok;
+	
+	private ImageItem imItem;
+	private Container fullPrompt;
 
 	public MessageWidget () {
 		reset();
@@ -39,20 +45,33 @@ public class MessageWidget implements IWidgetStyleEditable {
 		UiAccess.setStyle(c); //it is dubious whether this works properly; Chatterbox.babysitStyles() takes care of this for now
 		
 		//#style questiontext
+		fullPrompt= new Container(false);
+		
+		//#style prompttext
 		prompt = new StringItem(null, null);
+		fullPrompt.add(prompt);
 		//#style button
 		ok = new StringItem(null, Localization.get("chatterbox.button.trigger"));
 		
-		c.add(prompt);
+		c.add(fullPrompt);
 		c.add(ok);
 	}
 
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
+		ImageItem newImItem = ExpandedWidget.getImageItem(fep);
+		if(imItem!=null && newImItem!=null){
+			fullPrompt.remove(imItem);	//replace an already existing image
+		}
+		if(newImItem!=null){
+			fullPrompt.add(newImItem);
+			imItem = newImItem;
+		}
+		Chatterbox.getAudioAndPlay(fep);
 		prompt.setText(fep.getLongText());
 	}
 
 	public IAnswerData getData () {
-		return null;
+		return new StringData("OK");
 	}
 
 	public void reset () {
