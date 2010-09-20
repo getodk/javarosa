@@ -16,6 +16,8 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
@@ -187,7 +189,17 @@ public class ChatterboxWidgetFactory {
     }
 
     public ChatterboxWidget getRepeatJunctureWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
-    	return null;
+    	Vector<String> choices = model.getRepetitions();
+    	
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("behold, a repeat!", Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
+    	for (int i = 0; i < choices.size(); i++) {
+        	prompt.addSelectChoice(new SelectChoice(null, choices.elementAt(i), "c" + i, false));
+    	}
+    	prompt.addSelectChoice(new SelectChoice(null, "add new", "new", false));
+    	prompt.addSelectChoice(new SelectChoice(null, "delete", "del", false));
+    	prompt.addSelectChoice(new SelectChoice(null, "done", "done", false));
+		
+		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }
     
     public ChatterboxWidget getNewLabelWidget(FormIndex index, String text){

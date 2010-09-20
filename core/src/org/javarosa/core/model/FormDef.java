@@ -1148,6 +1148,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
+	//repIndex == -1 => next repetition about to be created
 	public FormIndex descendIntoRepeat(FormIndex index, int repIndex) {
 		Vector indexes = new Vector();
 		Vector multiplicities = new Vector();
@@ -1171,8 +1172,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			String name = node.getName();
 			numRepetitions = node.getParent().getChildMultiplicity(name);
 		}
-		if (repIndex < 0 || repIndex >= numRepetitions) {
-			throw new RuntimeException("selection exceeds current number of repetitions");
+		
+		if (repIndex == -1) {
+			repIndex = numRepetitions;
+		} else {
+			if (repIndex < 0 || repIndex >= numRepetitions) {
+				throw new RuntimeException("selection exceeds current number of repetitions");
+			}
 		}
 		
 		multiplicities.setElementAt(new Integer(repIndex), multiplicities.size() - 1);

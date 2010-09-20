@@ -89,16 +89,16 @@ public class JRDemoContext {
 	private void loadForms (IStorageUtility forms) {
 		try {
 			//forms.write(XFormUtils.getFormFromResource("/shortform.xhtml"));
-			forms.write(XFormUtils.getFormFromResource("/intelligibleshortform.xhtml"));
-			forms.write(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
-			forms.write(XFormUtils.getFormFromResource("/condtest.xhtml"));
-			forms.write(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
-			forms.write(XFormUtils.getFormFromResource("/imci.xml"));
-			forms.write(XFormUtils.getFormFromResource("/PhysicoChemTestsDemo.xhtml"));
-			forms.write(XFormUtils.getFormFromResource("/ImageSelectTester.xhtml"));
+//			forms.write(XFormUtils.getFormFromResource("/intelligibleshortform.xhtml"));
+//			forms.write(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
+//			forms.write(XFormUtils.getFormFromResource("/condtest.xhtml"));
+//			forms.write(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
+//			forms.write(XFormUtils.getFormFromResource("/imci.xml"));
+//			forms.write(XFormUtils.getFormFromResource("/PhysicoChemTestsDemo.xhtml"));
+//			forms.write(XFormUtils.getFormFromResource("/ImageSelectTester.xhtml"));
 			forms.write(XFormUtils.getFormFromResource("/sampleform.xml"));
-			forms.write(XFormUtils.getFormFromResource("/itemset_test.xml"));
-			forms.write(XFormUtils.getFormFromResource("/itemset_test_advanced.xml"));
+//			forms.write(XFormUtils.getFormFromResource("/itemset_test.xml"));
+//			forms.write(XFormUtils.getFormFromResource("/itemset_test_advanced.xml"));
 			
 		} catch (StorageFullException e) {
 			throw new RuntimeException("uh-oh, storage full [forms]"); //TODO: handle this
