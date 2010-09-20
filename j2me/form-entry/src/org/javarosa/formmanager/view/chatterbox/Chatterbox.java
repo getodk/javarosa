@@ -295,6 +295,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     			
     			//show repeat juncture question here
     			System.out.println("you've reached a repeat");
+    			newRepeat = true; //note: hijacking the current interstitial repeat question variable; should rename
     			
     		} else {
     			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
@@ -460,7 +461,11 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		return;
     	
     	if (expanded && newRepeat) {
-    		cw = widgetFactory.getNewRepeatWidget(questionIndex, model, this);
+    		if (FormIndex.EXPERIMENTAL_API) {
+    			cw = widgetFactory.getRepeatJunctureWidget(questionIndex, model, this);
+    		} else {
+    			cw = widgetFactory.getNewRepeatWidget(questionIndex, model, this);
+    		}
     		activeIsInterstitial = true;
     	} else if (model.getForm().explodeIndex(questionIndex).lastElement() instanceof GroupDef) {
     		//do nothing
@@ -616,13 +621,36 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		return;
     	}
     	if (activeIsInterstitial) {
-    		//'new repeat?' answered
-    		String answer = ((Selection)frame.getData().getValue()).getValue();
-    		if (answer.equals("y")) {
-    			controller.newRepeat(this.model.getFormIndex());
-    			createHeaderForElement(this.model.getFormIndex());
+    		if (!FormIndex.EXPERIMENTAL_API) {
+    		
+	    		//'new repeat?' answered
+	    		String answer = ((Selection)frame.getData().getValue()).getValue();
+	    		if (answer.equals("y")) {
+	    			controller.newRepeat(this.model.getFormIndex());
+	    			createHeaderForElement(this.model.getFormIndex());
+	    		}
+	    		step(controller.stepToNextEvent());
+	    		
+    		} else {
+    		
+    			String answer = ((Selection)frame.getData().getValue()).getValue();
+    			if (answer.startsWith("c")) {
+    				int n = Integer.parseInt(answer.substring(1));
+    				model.getForm().descendIntoRepeat(activeQuestionIndex, n);
+    			} else if (answer.equals("new")) {
+	    			controller.jumpToIndex(model.getForm().descendIntoRepeat(activeQuestionIndex, -1));   				
+	    			controller.newRepeat(this.model.getFormIndex());
+	    			this.activeQuestionIndex = this.model.getFormIndex();
+	    			createHeaderForElement(activeQuestionIndex);
+    			} else if (answer.equals("del")) {
+    				throw new RuntimeException("not yet!");    				
+    			} else if (answer.equals("done")) {
+    				//do nothing
+    			}
+    			
+    			step(controller.stepToNextEvent());
+    			
     		}
-    		step(controller.stepToNextEvent());
     	} else {
     		int status = controller.answerQuestion(this.model.getFormIndex(), frame.getData());
 	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
