@@ -57,6 +57,9 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	private int reportFormat;
 	private long now;
 	
+	private int weeklyPending;
+	private int dailyPending;
+	
 	/**
 	 * Create a behind-the-scenes Device Reporting state which manages all operations 
 	 * without user intervention.
@@ -65,8 +68,8 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		now = new Date().getTime();
 		//Get what reports are pending for the week and for the day.
 		//If logging is disabled, these methods default to skipping.
-		int weeklyPending = LogReportUtils.getPendingWeeklyReportType(now);
-		int dailyPending = LogReportUtils.getPendingDailyReportType(now);
+		this.weeklyPending = LogReportUtils.getPendingWeeklyReportType(now);
+		this.dailyPending = LogReportUtils.getPendingDailyReportType(now);
 		
 		//Pick the most verbose pending report.
 		this.reportFormat = Math.max(dailyPending,weeklyPending);
@@ -294,7 +297,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	
 	private void onSuccess () {
 		Logger._().clearLogs();
-		LogReportUtils.setPendingFromNow(now);		
+		LogReportUtils.setPendingFromNow(now, this.dailyPending > 0, this.weeklyPending > 0);		
 	}
 	
 	private void determineLogFallback(int size) {
