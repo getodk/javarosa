@@ -1,0 +1,29 @@
+﻿
+
+form.login.username=Usuario:
+form.login.password=Contraseña:
+		
+Pregnancy=Embarazo
+NewBirth=Nacimiento Nuevo
+menu.send.all=MandarGuardados
+menu.send.all.val=MandarGuardados(${0})
+	
+menu.NewCase=Caso nuevo
+menu.FollowUp=Seguimiento de caso existente
+menu.Referral=Seguimiento de caso referido
+menu.ViewOpen=Ver casos abiertos
+menu.Resolve=Cerrar el caso
+
+polish.command.options=Opciones
+polish.command.exit=Salir
+polish.command.clear=Borrar
+menu.Back=Atras
+menu.Exit=Salir
+Loading=Cargando
+
+repeat.repitition=dosis
+repeat.message.single=Busca ${0}?
+repeat.message.multiple=Busca otra ${0}?
+
+yes=Sí
+no=No
