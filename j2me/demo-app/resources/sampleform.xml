@@ -10,135 +10,69 @@
 
     <model>
       <instance>
-        <patient>
-          <form-id type="normal">4523534653252</form-id>
-          <first-name>DREW</first-name>
-          <last-name>ROOS</last-name>
-          <date-of-birth>1983-10-06</date-of-birth>
-          <sex>m</sex>
-          <pregnant />
-          <number-of-children/>
-          <favorite-foods>ice-cream ugali</favorite-foods>
-          <address />
-        </patient>
+		<x>
+			<a />
+			<b />
+			<g1>
+			  <a />
+			  <r1 jr:template="">
+			    <a />
+			    <g2>
+			      <a />
+			      <r2 jr:template="">
+			        <a />
+			        <b />
+			      </r2>
+			      <b />
+			    </g2>
+			    <b />
+			  </r1>
+			  <c />
+			</g1>
+			<d />
+		</x>
+
       </instance>
-
-      <bind nodeset="first-name" required="true()" />
-      <bind nodeset="last-name" required="true()" />
-      <bind nodeset="date-of-birth" type="xsd:date" />
-      <bind nodeset="pregnant" relevant="/patient/sex = 'f'" />
-      <bind nodeset="number-of-children" type="xsd:int"/>
-
-      <itext>
-        <translation lang="English">
-          <text id="q1">
-            <value>First Name</value>
-          </text>
-          <text id="q2">
-            <value>Last Name</value>
-          </text>
-          <text id="sex">
-            <value>Sex</value>
-          </text>
-          <text id="m">
-            <value>Male</value>
-          </text>
-          <text id="f">
-            <value>Female</value>
-          </text>
-        </translation>
-
-        <translation lang="Swahili" default="">
-          <text id="q1">
-            <value>Jina</value>
-          </text>
-          <text id="q2">
-            <value>Jina 2</value>
-          </text>
-          <text id="sex">
-            <value>Jinsia</value>
-          </text>
-          <text id="m">
-            <value>Kiume</value>
-          </text>
-          <text id="f">
-            <value>Kike</value>
-          </text>
-        </translation>
-      </itext>
       
     </model>
   </h:head>
   <h:body>
   
-  <select1 ref="form-id/@type"><label>Form ID Type</label>
-  	<item><label>Normal Id</label><value>normal</value></item>
-  	<item><label>Extended Id</label><value>extended</value></item>
-  </select1>
+    <input ref="a"><label>a</label></input>
+    <input ref="b"><label>b</label></input>
+    
+    <group ref="g1">
+    
+    <input ref="a"><label>g1 a</label></input>
 
-    <input ref="first-name">
-      <label ref="jr:itext('q1')"/>
-    </input>
+    <repeat nodeset="r1">
 
-    <input ref="last-name">
-      <label ref="jr:itext('q2')"/>
-    </input>
-
-    <input ref="date-of-birth">
-      <label>Date of Birth</label>
-    </input>
-
-    <select1 ref="sex">
-      <label ref="jr:itext('sex')"/>
-
-      <item>
-        <label ref="jr:itext('m')"/>
-        <value>m</value>
-      </item>
-      <item>
-        <label ref="jr:itext('f')"/>
-        <value>f</value>
-      </item>
-    </select1>
-
-    <select1 ref="pregnant">
-      <label>Pregnant</label>
-
-      <item>
-        <label>Yes</label>
-        <value>y</value>
-      </item>
-      <item>
-        <label>No</label>
-        <value>n</value>
-      </item>
-    </select1>
-
-    <input ref="number-of-children">
-      <label># Children</label>
-    </input>
-
-    <select ref="favorite-foods">
-      <label>Likes foods</label>
-
-      <item>
-        <label>Ice cream</label>
-        <value>ice-cream</value>
-      </item>
-      <item>
-        <label>Mishkaki</label>
-        <value>mishkaki</value>
-      </item>
-      <item>
-        <label>Ugali</label>
-        <value>ugali</value>
-      </item>
-     </select>
-
-    <input ref="address">
-      <label>Address</label>
-    </input>
-
+    <input ref="a"><label>g1 r1 a</label></input>
+    
+    <group ref="g2">
+    
+    <input ref="a"><label>g1 r1 g2 a</label></input>
+    
+    <repeat nodeset="r2">
+    
+    <input ref="a"><label>g1 r1 g2 r2 a</label></input>
+    <input ref="b"><label>g1 r1 g2 r2 b</label></input>
+    
+    </repeat>
+    
+    <input ref="b"><label>g1 r1 g2 b</label></input>
+    
+    </group>
+    
+    <input ref="b"><label>g1 r1 b</label></input>
+    
+    </repeat>
+    
+    <input ref="c"><label>g1 c</label></input>
+    
+    </group>
+    
+    <input ref="d"><label>d</label></input>
 
 
   </h:body>

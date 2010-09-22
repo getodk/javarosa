@@ -37,6 +37,8 @@ import org.javarosa.core.model.instance.TreeReference;
  *
  */
 public class FormIndex {
+	public static boolean EXPERIMENTAL_API = true;
+	
 	private boolean beginningOfForm = false;
 	
 	private boolean endOfForm = false;
