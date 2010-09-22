@@ -952,6 +952,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 
 	public FormIndex incrementIndex(FormIndex index) {
+		return incrementIndex(index, true);
+	}
+	
+	public FormIndex incrementIndex(FormIndex index, boolean descend) {
 		Vector indexes = new Vector();
 		Vector multiplicities = new Vector();
 		Vector elements = new Vector();
@@ -966,7 +970,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			collapseIndex(index, indexes, multiplicities, elements);
 		}
 
-		incrementHelper(indexes, multiplicities, elements);
+		incrementHelper(indexes, multiplicities, elements, descend);
 
 		if (indexes.size() == 0) {
 			return FormIndex.createEndOfFormIndex();
@@ -975,13 +979,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
-	private void incrementHelper(Vector indexes, Vector multiplicities,	Vector elements) {
+	private void incrementHelper(Vector indexes, Vector multiplicities,	Vector elements, boolean descend) {
 		int i = indexes.size() - 1;
 		boolean exitRepeat = false;
 
 		if (i == -1 || elements.elementAt(i) instanceof GroupDef) {
 			// current index is group or repeat or the top-level form
-			boolean descend = true;
 
 			if (i >= 0) {
 				// find out whether we're on a repeat, and if so, whether the
