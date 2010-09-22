@@ -38,7 +38,7 @@ public class SortedIndexSet {
 	//add new value; return index inserted at if value was not already present, -1 if it was
 	public int add (FormIndex index) {
 		int i = indexOf(index, false);
-		if (i != -1 && get(i) == index) {
+		if (i != -1 && get(i).equals(index)) {
 			return -1;
 		} else {
 			v.insertElementAt(index, i + 1);
@@ -94,5 +94,13 @@ public class SortedIndexSet {
 	//return underlying vector (outside modification may corrupt the datastructure)
 	public Vector getVector () {
 		return v;
+	}
+	
+	public String toString () {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < v.size(); i++) {
+			sb.append(i + ": " + ((FormIndex)get(i)).toString() + "\n");
+		}
+		return sb.toString();
 	}
 }

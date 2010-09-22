@@ -284,15 +284,12 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		} else {
     			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
     			if(forwards) {
-    				createHeaderForElement(questionIndex);
+    				createHeaderForElement(questionIndex, false);
+					step(controller.stepToNextEvent());
     			} else {
     				removeHeaderForElement(questionIndex);
-    			}
-    			if(forwards) {
-					step(controller.stepToNextEvent());
-				} else {
 					step(controller.stepToPreviousEvent());
-				}
+    			}
     			return;
     		}
     	} else if (questionIndex.isInForm() && model.isIndexReadonly(questionIndex)) {
@@ -410,7 +407,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     }
     
 
-	private void createHeaderForElement(FormIndex questionIndex) {
+	private void createHeaderForElement(FormIndex questionIndex, boolean newRepeat) {
 		FormEntryCaption prompt = model.getCaptionPrompt(questionIndex);
 		
 		String headerText; //decide what text form to use.
@@ -423,7 +420,11 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 		}
 		
 		
-		if(headerText != null) {		
+		if(headerText != null) {
+			if (newRepeat) {
+				removeFrame(activeQuestionIndex);
+			}
+			
 			ChatterboxWidget headerWidget = widgetFactory.getNewLabelWidget(questionIndex, headerText);
 			//If there is no valid header, there's no valid header. Possibly no label.
 			this.append(headerWidget);
@@ -605,7 +606,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		String answer = ((Selection)frame.getData().getValue()).getValue();
     		if (answer.equals("y")) {
     			controller.newRepeat(this.model.getFormIndex());
-    			createHeaderForElement(this.model.getFormIndex());
+   			createHeaderForElement(this.model.getFormIndex(), true);
     		}
     		step(controller.stepToNextEvent());
     	} else {
