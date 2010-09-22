@@ -642,7 +642,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	    			controller.jumpToIndex(model.getForm().descendIntoRepeat(activeQuestionIndex, -1));   				
 	    			controller.newRepeat(this.model.getFormIndex());
 	    			this.activeQuestionIndex = this.model.getFormIndex();
-	    			createHeaderForElement(activeQuestionIndex);
+	    			createHeaderForElement(activeQuestionIndex, true);
     			} else if (answer.equals("del")) {
     				throw new RuntimeException("not yet!");    				
     			} else if (answer.equals("done")) {
