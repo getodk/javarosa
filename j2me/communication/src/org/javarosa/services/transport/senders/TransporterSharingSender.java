@@ -14,19 +14,24 @@ public class TransporterSharingSender {
 	private Transporter transporter;
 	private TransportCache cache;
 	private TransportListener listener;
+	boolean halted = false;
 
-	public TransporterSharingSender(Transporter transporter, Vector messages,
+	public TransporterSharingSender() {
+	}
+	
+	public void init(Transporter transporter, Vector messages,
 			TransportCache store, TransportListener listener) {
-
 		this.messages = messages;
 		this.transporter = transporter;
 		this.cache = store;
 		this.listener = listener;
+		halted = false;
 	}
 
 	public void send() {
 		System.out.println("Ready to send: "+this.messages.size()+" messages by "+this.transporter);
 		for (int i = 0; i < this.messages.size(); i++) {
+			if(halted) {return;}
 			TransportMessage message = (TransportMessage) this.messages
 					.elementAt(i);
 			this.transporter.setMessage(message);
@@ -68,6 +73,10 @@ public class TransporterSharingSender {
 				}
 			}
 		}
+	}
+	
+	public void halt() {
+		halted = true;
 	}
 
 }

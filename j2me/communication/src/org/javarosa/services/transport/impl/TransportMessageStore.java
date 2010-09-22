@@ -6,10 +6,12 @@ import java.util.Hashtable;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtilityIndexed;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.core.services.storage.StorageModifiedException;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportMessage;
@@ -43,12 +45,15 @@ public class TransportMessageStore implements TransportCache {
 	 * We cache the size (in terms of numbers of records) of each of the
 	 * persistent store partitions
 	 */
-	private Hashtable cachedCounts = new Hashtable();
+	private Hashtable cachedCounts;
 
 	/**
 	 * @param testing
 	 */
 	public TransportMessageStore() {
+		cachedCounts = new Hashtable();
+		storage(Q_STORENAME).repair();
+		storage(RECENTLY_SENT_STORENAME).repair();
 		updateCachedCounts();
 	}
 
@@ -127,7 +132,13 @@ public class TransportMessageStore implements TransportCache {
 	 */
 	public void decache(TransportMessage message) throws TransportException {
 		
-		storage(Q_STORENAME).remove(message);
+		try {
+			storage(Q_STORENAME).remove(message);
+		} catch(IllegalArgumentException iae) {
+			//Already removed from the cache. Possibly by another sender. Not a problem.
+			Logger._().log("transport", "Attempt to decache already decached message", new Date());
+			return;
+		} 
 		message.setID(-1);
 
 		// if we're dequeuing a successfully sent message
@@ -136,15 +147,40 @@ public class TransportMessageStore implements TransportCache {
 			IStorageUtilityIndexed recent = storage(RECENTLY_SENT_STORENAME);
 			// ensure that the recently sent store doesn't grow indefinitely
 			// by limiting its size
-			if(recent.getNumRecords() == RECENTLY_SENT_STORE_MAXSIZE) {
-				int first = recent.iterate().nextID();
-				recent.remove(first);
-				//ITERATOR IS NOW INVALID
-			}
-			try {
-				recent.write(message);
-			} catch (StorageFullException e) {
-				throw new TransportException(e);
+			
+			//With threads this gets tricky, since nextID can throw an exception if the iterator becomes invalid
+			//before the next ID is retrieved. As such, we'll put this attempt to remove the message in
+			//a loop and try to properly use the lock.
+			
+			boolean entered=false;
+			int attempts = 0;
+			
+			while(attempts < 5 && !entered) {
+				attempts++;
+			
+				if(recent.getNumRecords() == RECENTLY_SENT_STORE_MAXSIZE) {
+					try {
+						//I don't think we can simply grab the lock, since it's needed
+						//by the actual storage processes
+						int first = recent.iterate().nextID();
+						recent.remove(first);
+						
+						//ITERATOR IS NOW INVALID
+					} catch(StorageModifiedException sme) {
+						//The iterator became invalid before it could properly remove the record
+						//in question. Will try again.
+						Logger._().log("transport", "Iterator invalidated before message removal", new Date());
+					} catch(IllegalArgumentException iae) {
+						//The record that was going to be removed was deleted before we
+						//could get to it. Will try again.
+					}
+				}
+				try {
+					recent.write(message);
+					entered = true;
+				} catch (StorageFullException e) {
+					throw new TransportException(e);
+				}
 			}
 		}
 		updateCachedCounts();

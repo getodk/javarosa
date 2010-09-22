@@ -84,4 +84,7 @@ public abstract class EditUserFormEntryState extends FormEntryState implements E
 	public void abort() {
 		cancel();
 	}
+	
+	public abstract void userEdited(User newUser);
+	public abstract void cancel();
 }
