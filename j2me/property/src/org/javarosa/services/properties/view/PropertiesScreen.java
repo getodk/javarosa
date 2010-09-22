@@ -132,7 +132,7 @@ public class PropertiesScreen extends Form{
 								TextField input = new TextField(
 										rules
 												.getHumanReadableDescription(propertyName),
-										(String) propValues.elementAt(0), 50,
+										(String) propValues.elementAt(0), 150,
 										TextField.ANY);
 								
 								itemForPropertyName.put(input, propertyName);
@@ -150,7 +150,7 @@ public class PropertiesScreen extends Form{
 					}
 					else {
 							TextField input = new TextField(rules.getHumanReadableDescription(propertyName),
-									"", 50,
+									"", 150,
 									TextField.ANY);
 							itemForPropertyName.put(input, propertyName);
 							if(rules.checkPropertyUserReadOnly(propertyName)) {

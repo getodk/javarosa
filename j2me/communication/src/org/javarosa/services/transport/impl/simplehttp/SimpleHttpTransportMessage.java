@@ -6,6 +6,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.microedition.io.HttpConnection;
+
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -38,6 +40,12 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	private byte[] responseBody;
 	
 	private boolean cacheable = true;
+	
+	/**
+	 * Http connection method.
+	 */
+
+	private String httpConnectionMethod = HttpConnection.POST;
 
 
 	public SimpleHttpTransportMessage() {
@@ -126,6 +134,11 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	public void setCacheable(boolean cacheable) {
 		this.cacheable = cacheable;
 	}
+	
+	public void setHttpConnectionMethod(String httpConnectionMethod)
+	{
+		this.httpConnectionMethod = httpConnectionMethod;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -133,7 +146,9 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	 * @see org.javarosa.services.transport.TransportMessage#getTransporter()
 	 */
 	public Transporter createTransporter() {
-		return new SimpleHttpTransporter(this);
+		SimpleHttpTransporter transporter= new SimpleHttpTransporter(this);
+		transporter.setHttpConnectionMethod(this.httpConnectionMethod);
+		return transporter;
 	}
 
 	public String toString() {
