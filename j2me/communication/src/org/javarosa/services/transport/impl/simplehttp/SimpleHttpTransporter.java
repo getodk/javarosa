@@ -16,7 +16,7 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
 
 /**
  * The SimpleHttpTransporter is able to send SimpleHttpTransportMessages (text
- * over POST)
+ * over POST or GET)
  * 
  */
 public class SimpleHttpTransporter implements Transporter {
@@ -25,6 +25,13 @@ public class SimpleHttpTransporter implements Transporter {
 	 * The message to be sent by this Transporter
 	 */
 	private SimpleHttpTransportMessage message;
+
+	/**
+	 * The HTTP method to be used by this Transporter POST by Default
+	 */
+	private String httpConnectionMethod = HttpConnection.POST;
+
+	
 
 	/**
 	 * @param message
@@ -51,6 +58,23 @@ public class SimpleHttpTransporter implements Transporter {
 		// may have its own request properties
 	}
 
+
+	/*
+	 *Set the HTTP Connection Method 
+	 */
+	public void setHttpConnectionMethod(String method)
+	{
+		if (method.equals(HttpConnection.GET))
+		{
+			this.httpConnectionMethod = HttpConnection.GET;
+		}
+		else if( method.equals(HttpConnection.POST)  )
+		{
+			this.httpConnectionMethod = HttpConnection.POST;
+		}
+	}
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -85,7 +109,7 @@ public class SimpleHttpTransporter implements Transporter {
 			// set return information in the message
 			this.message.setResponseBody(baos.toByteArray());
 			this.message.setResponseCode(responseCode);
-			if (responseCode == HttpConnection.HTTP_OK) {
+			if (responseCode >= 200 && responseCode <= 299) {
 				this.message.setStatus(TransportMessageStatus.SENT);
 			}
 
@@ -144,7 +168,7 @@ public class SimpleHttpTransporter implements Transporter {
 			throw new RuntimeException(
 					"Null message.getContent() in getConnection()");
 
-		conn.setRequestMethod(HttpConnection.POST);
+		conn.setRequestMethod(this.httpConnectionMethod);
 		conn.setRequestProperty("User-Agent", this.message
 				.getRequestProperties().getUserAgent());
 		conn.setRequestProperty("Content-Language", this.message
