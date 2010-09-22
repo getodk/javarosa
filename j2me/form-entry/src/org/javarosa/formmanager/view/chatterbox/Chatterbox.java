@@ -18,6 +18,7 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
+import java.util.Date;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
@@ -31,8 +32,8 @@ import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.core.util.NoLocalizedTextException;
+import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryModel;
@@ -44,6 +45,7 @@ import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledPCommandListener;
+import org.javarosa.j2me.log.HandledThread;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Command;
@@ -605,10 +607,10 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	} else {
     		int status = controller.answerQuestion(this.model.getFormIndex(), frame.getData());
 	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
-	        	J2MEDisplay.showError(null, PROMPT_REQUIRED_QUESTION);
+	        	this.queueError(null, PROMPT_REQUIRED_QUESTION);
 	    	} else if (status == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
 	    		String msg = frame.getPrompt().getConstraintText();
-	    		J2MEDisplay.showError(null, msg != null ? msg : PROMPT_DEFAULT_CONSTRAINT_VIOL);
+	    		this.queueError(null, msg != null ? msg : PROMPT_DEFAULT_CONSTRAINT_VIOL);
 	     	} else {
 	     		step(controller.stepToNextEvent());
 	     	}
@@ -644,7 +646,6 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	} catch (Exception e) {
     		Logger.die("gui-keydown", e);
     	}
-
     }
     
     //no exception handling needed
@@ -747,6 +748,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 		computeHeaders();
 		//bar.setHeight(this.getAvailableHeight());
 		//bar.requestInit();
+		raiseAlert();
 	}
 
 	private void backFromCamera() {
@@ -757,6 +759,32 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	private void doCapture() {
 		// TODO Auto-generated method stub
 		System.out.println("Click!");
+	}
+	
+	String alertTitle;
+	String msg;
+	private void raiseAlert() {
+		if(alertTitle != null || msg != null) {
+			final String at = alertTitle;
+			final String m = msg;
+			final long time = new Date().getTime();
+			Runnable r = new Runnable() {
+	
+				public void run() {
+					while(new Date().getTime() < time + 300);
+					J2MEDisplay.showError(at, m);
+				}
+				
+			};
+			new HandledThread(r).start();
+			alertTitle = null;
+			msg = null;
+		}
+	}
+	
+	private void queueError(String title, String msg) {
+			alertTitle = title;
+			this.msg = msg;
 	}
 
 	/*

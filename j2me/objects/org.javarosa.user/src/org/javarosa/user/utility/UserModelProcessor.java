@@ -81,6 +81,10 @@ public class UserModelProcessor implements IInstanceProcessor {
 		
 		if(u == null) {
 			u = new User(username,password, uuid);
+		} else {
+			if(!u.getPassword().equals(password)) {
+				u.setPassword(password);
+			}
 		}
 		
 		TreeElement data = getChild(head,"user_data");
@@ -95,7 +99,10 @@ public class UserModelProcessor implements IInstanceProcessor {
 				throw new MalformedUserModelException("User data for user" + username + "has a data element with no key");
 			}
 			
-			u.setProperty(keyName, getString(datum, data));
+			String value = getStringOrNull(datum,data);
+			if(value != null) {
+				u.setProperty(keyName, value);
+			}
 		}
 		
 		storage().write(u);
@@ -138,6 +145,16 @@ public class UserModelProcessor implements IInstanceProcessor {
 		
 		if(element.getValue() == null) {
 			throw new MalformedUserModelException("No data in Element: '" + element.getName() + "' with parent: " + parent.getName());
+		}
+		
+		return element.getValue().uncast().getString();
+	}
+	
+	private String getStringOrNull(TreeElement element, TreeElement parent) {
+
+		
+		if(element.getValue() == null) {
+			return null;
 		}
 		
 		return element.getValue().uncast().getString();

@@ -57,6 +57,11 @@ public class DigestAuthResponse implements AuthCacheRecord {
 	 * @see org.javarosa.service.transport.securehttp.cache.AuthCacheRecord#invalidates(org.javarosa.service.transport.securehttp.cache.AuthCacheRecord)
 	 */
 	public boolean invalidates(AuthCacheRecord record) {
+		//this crashes with a null pointer if we try to do more than one digest-auth connection in a
+		//commcare session -- turning off for now
+		return true;
+
+		/*
 		if(record.getUrl().equals(this.URL)) { return true; };
 		
 		//For Digest Auth messages, the _domain_ should also be
@@ -69,6 +74,7 @@ public class DigestAuthResponse implements AuthCacheRecord {
 			}
 		}
 		return false;
+		*/
 	}
 	
 	public String get(String key) {
