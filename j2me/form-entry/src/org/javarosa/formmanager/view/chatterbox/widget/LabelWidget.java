@@ -48,16 +48,12 @@ public class LabelWidget implements IWidgetStyle {
 	}
 
 	public void refreshWidget(FormEntryPrompt prompt, int changeFlags) {
-		
 		// Clayton Sims - Feb 6, 2009 : Labels are now applicable for questions, so that we can pin 
 		// question texts for long questions.
 		String caption = prompt.getLongText();
-
-
-		
 		
 		if(multiplicity != -1) {
-			caption += ": " + multiplicity;
+			caption += ": " + (multiplicity + 1);
 		}
 		label.setText(caption);
 	}
