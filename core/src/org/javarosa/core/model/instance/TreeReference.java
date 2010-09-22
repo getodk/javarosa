@@ -34,6 +34,8 @@ public class TreeReference implements Externalizable {
 	public static final int INDEX_ATTRIBUTE = -4;//multiplicity flag for an attribute
 	public static final int REF_ABSOLUTE = -1;
 	
+	public static final int INDEX_REPEAT_JUNCTURE = -10;
+	
 	public static final String NAME_WILDCARD = "*";
 	
 	private int refLevel; //0 = context node, 1 = parent, 2 = grandparent ...

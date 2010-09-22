@@ -26,10 +26,12 @@ import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.api.Constants;
+import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.NoLocalizedTextException;
@@ -242,10 +244,10 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	case FormEntryController.EVENT_END_OF_FORM:
     		formComplete();
     		break;
-    		default:
-    			FormIndex index = model.getFormIndex();
-    			jumpToQuestion(index);
-    			break;
+    	default:
+    		FormIndex index = model.getFormIndex();
+    		jumpToQuestion(index);
+    		break;
     	}
     }
     
@@ -261,8 +263,16 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 
     	//figure out kind of reference and how to handle it
     	IFormElement last = model.getForm().getChild(questionIndex);
+    	
+    	//i am jack's boiling rage
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+		model.getForm().collapseIndex(questionIndex, indexes, multiplicities, elements);
+    	int mult = ((Integer)multiplicities.lastElement()).intValue();
+    	
     	if (last instanceof GroupDef) {
-    		if (((GroupDef)last).getRepeat() &&	
+    		if (!FormIndex.EXPERIMENTAL_API && ((GroupDef)last).getRepeat() &&	
     			model.getForm().getInstance().resolveReference(model.getForm().getChildInstanceRef(questionIndex)) == null) {
     			
     			//We're at a repeat interstitial point. If the group has the right configuration, we are able
@@ -279,8 +289,14 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     				return;
     			} else {
     				//All Systems Go. Display an interstitial "Add another FOO" question.
-        			newRepeat = true;	
+        			newRepeat = true;
     			}
+    		} else if (FormIndex.EXPERIMENTAL_API && ((GroupDef)last).getRepeat() && mult == TreeReference.INDEX_REPEAT_JUNCTURE) {
+    			
+    			//show repeat juncture question here
+    			System.out.println("you've reached a repeat");
+    			newRepeat = true; //note: hijacking the current interstitial repeat question variable; should rename
+    			
     		} else {
     			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
     			if(forwards) {
@@ -446,7 +462,11 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		return;
     	
     	if (expanded && newRepeat) {
-    		cw = widgetFactory.getNewRepeatWidget(questionIndex, model, this);
+    		if (FormIndex.EXPERIMENTAL_API) {
+    			cw = widgetFactory.getRepeatJunctureWidget(questionIndex, model, this);
+    		} else {
+    			cw = widgetFactory.getNewRepeatWidget(questionIndex, model, this);
+    		}
     		activeIsInterstitial = true;
     	} else if (model.getForm().explodeIndex(questionIndex).lastElement() instanceof GroupDef) {
     		//do nothing
@@ -602,13 +622,36 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		return;
     	}
     	if (activeIsInterstitial) {
-    		//'new repeat?' answered
-    		String answer = ((Selection)frame.getData().getValue()).getValue();
-    		if (answer.equals("y")) {
-    			controller.newRepeat(this.model.getFormIndex());
+    		if (!FormIndex.EXPERIMENTAL_API) {
+    		
+	    		//'new repeat?' answered
+	    		String answer = ((Selection)frame.getData().getValue()).getValue();
+	    		if (answer.equals("y")) {
+	    			controller.newRepeat(this.model.getFormIndex());
    			createHeaderForElement(this.model.getFormIndex(), true);
+	    		}
+	    		step(controller.stepToNextEvent());
+	    		
+    		} else {
+    		
+    			String answer = ((Selection)frame.getData().getValue()).getValue();
+    			if (answer.startsWith("c")) {
+    				int n = Integer.parseInt(answer.substring(1));
+    				model.getForm().descendIntoRepeat(activeQuestionIndex, n);
+    			} else if (answer.equals("new")) {
+	    			controller.jumpToIndex(model.getForm().descendIntoRepeat(activeQuestionIndex, -1));   				
+	    			controller.newRepeat(this.model.getFormIndex());
+	    			this.activeQuestionIndex = this.model.getFormIndex();
+	    			createHeaderForElement(activeQuestionIndex);
+    			} else if (answer.equals("del")) {
+    				throw new RuntimeException("not yet!");    				
+    			} else if (answer.equals("done")) {
+    				//do nothing
+    			}
+    			
+    			step(controller.stepToNextEvent());
+    			
     		}
-    		step(controller.stepToNextEvent());
     	} else {
     		int status = controller.answerQuestion(this.model.getFormIndex(), frame.getData());
 	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
