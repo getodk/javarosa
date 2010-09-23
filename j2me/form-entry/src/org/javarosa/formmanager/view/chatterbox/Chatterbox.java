@@ -72,6 +72,10 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     
     public static final int UIHACK_SELECT_PRESS = 1;
 	
+    public static final int Q_NORMAL = 0;
+    public static final int Q_REPEAT_JUNCTURE = 1;
+    public static final int Q_REPEAT_DELETE = 2;
+    
 	private JrFormEntryController controller;
     private JrFormEntryModel model;
     
@@ -253,6 +257,8 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     
     //make given question active; deal with all necessary questions in between
     private void jumpToQuestion (FormIndex questionIndex) {
+    	System.out.println(this.questionIndexes.toString());
+    	
     	boolean newRepeat = false;
     	
     	if (questionIndex.isInForm() && !model.isIndexRelevant(questionIndex))
@@ -330,7 +336,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		FormIndex index = activeQuestionIndex;
     		while(!index.equals(questionIndex)) {
     			index = model.getForm().incrementIndex(index);    			
-    			putQuestion(index, index.equals(questionIndex), newRepeat);
+    			putQuestion(index, index.equals(questionIndex), newRepeat ? Q_REPEAT_JUNCTURE : Q_NORMAL);
     		}
     	} else if (questionIndex.compareTo(activeQuestionIndex) <= 0) {
     		FormIndex index = activeQuestionIndex;
@@ -341,7 +347,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		
     		if (questionIndex.isInForm()) {
     			if (newRepeat) {
-    				putQuestion(questionIndex, true, newRepeat);
+    				putQuestion(questionIndex, true, newRepeat ? Q_REPEAT_JUNCTURE : Q_NORMAL);
     			} else {
     				((ChatterboxWidget)get(questionIndexes.indexOf(questionIndex, true))).setViewState(ChatterboxWidget.VIEW_EXPANDED);    
     			}
@@ -455,15 +461,19 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	}
 
 	//create a frame for a question and show it at the appropriate place in the form
-    private void putQuestion (FormIndex questionIndex, boolean expanded, boolean newRepeat) {
+    private void putQuestion (FormIndex questionIndex, boolean expanded, int qType) {
     	ChatterboxWidget cw = null;
     	
     	if (!questionIndex.isInForm())
     		return;
     	
-    	if (expanded && newRepeat) {
+    	if (expanded && qType != Q_NORMAL) {
     		if (FormIndex.EXPERIMENTAL_API) {
-    			cw = widgetFactory.getRepeatJunctureWidget(questionIndex, model, this);
+    			if (qType == Q_REPEAT_JUNCTURE) {
+    				cw = widgetFactory.getRepeatJunctureWidget(questionIndex, model, this);
+    			} else if (qType == Q_REPEAT_DELETE) {
+    				cw = widgetFactory.getRepeatDeleteWidget(questionIndex, model, this);
+    			}
     		} else {
     			cw = widgetFactory.getNewRepeatWidget(questionIndex, model, this);
     		}
@@ -628,7 +638,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	    		String answer = ((Selection)frame.getData().getValue()).getValue();
 	    		if (answer.equals("y")) {
 	    			controller.newRepeat(this.model.getFormIndex());
-   			createHeaderForElement(this.model.getFormIndex(), true);
+	    			createHeaderForElement(this.model.getFormIndex(), true);
 	    		}
 	    		step(controller.stepToNextEvent());
 	    		
@@ -637,20 +647,32 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     			String answer = ((Selection)frame.getData().getValue()).getValue();
     			if (answer.startsWith("c")) {
     				int n = Integer.parseInt(answer.substring(1));
-    				model.getForm().descendIntoRepeat(activeQuestionIndex, n);
+    				controller.jumpToIndex(model.getForm().descendIntoRepeat(activeQuestionIndex, n));
+
+    				removeFrame(this.activeQuestionIndex);
+	    			this.activeQuestionIndex = this.model.getFormIndex();
+    				createHeaderForElement(activeQuestionIndex, false);
     			} else if (answer.equals("new")) {
 	    			controller.jumpToIndex(model.getForm().descendIntoRepeat(activeQuestionIndex, -1));   				
 	    			controller.newRepeat(this.model.getFormIndex());
+
+	    			removeFrame(this.activeQuestionIndex);
 	    			this.activeQuestionIndex = this.model.getFormIndex();
-	    			createHeaderForElement(activeQuestionIndex, true);
+	    			createHeaderForElement(activeQuestionIndex, false);
     			} else if (answer.equals("del")) {
-    				throw new RuntimeException("not yet!");    				
+    				removeFrame(this.activeQuestionIndex);
+    				putQuestion(this.activeQuestionIndex, true, Q_REPEAT_DELETE);
+    			} else if (answer.startsWith("del")) {
+    				int n = Integer.parseInt(answer.substring(1));
+
+    				
+    				
     			} else if (answer.equals("done")) {
     				//do nothing
     			}
     			
     			step(controller.stepToNextEvent());
-    			
+
     		}
     	} else {
     		int status = controller.answerQuestion(this.model.getFormIndex(), frame.getData());
