@@ -435,14 +435,20 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 		FormEntryCaption prompt = model.getCaptionPrompt(questionIndex);
 		
 		String headerText; //decide what text form to use.
-		if(prompt.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_LONG)){
-			headerText = prompt.getLongText();
-		}else if(prompt.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_SHORT)){
-			headerText = prompt.getShortText();
-		}else{
-			headerText = prompt.getDefaultText();
-		}
 		
+		boolean isNew = uncommittedRepeats.contains(model.getForm().decrementIndex(questionIndex)); //this is ghetto
+		headerText = prompt.getRepetitionText("header", isNew); //droos: this doesn't feel right... should this if/else be wrapped up in the caption?
+		if (headerText == null) {
+		
+			if(prompt.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_LONG)){
+				headerText = prompt.getLongText();
+			}else if(prompt.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_SHORT)){
+				headerText = prompt.getShortText();
+			}else{
+				headerText = prompt.getDefaultText();
+			}
+
+		}
 		
 		if(headerText != null) {
 			if (newRepeat) {

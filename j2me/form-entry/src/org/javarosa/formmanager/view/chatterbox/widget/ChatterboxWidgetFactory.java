@@ -190,7 +190,7 @@ public class ChatterboxWidgetFactory {
 
     public ChatterboxWidget getRepeatJunctureWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
     	FormEntryCaption capt = model.getCaptionPrompt(index);
-    	Vector<String> choices = model.getRepetitions();
+    	Vector<String> choices = capt.getRepetitionsText();
     	
     	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt(capt.getRepeatText("mainheader"), Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
     	for (int i = 0; i < choices.size(); i++) {
@@ -207,7 +207,7 @@ public class ChatterboxWidgetFactory {
 
     public ChatterboxWidget getRepeatDeleteWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
     	FormEntryCaption capt = model.getCaptionPrompt(index);
-    	Vector<String> choices = model.getRepetitions();
+    	Vector<String> choices = capt.getRepetitionsText();
     	
     	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt(capt.getRepeatText("delheader"), Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
     	for (int i = 0; i < choices.size(); i++) {
@@ -219,9 +219,8 @@ public class ChatterboxWidgetFactory {
     
     public ChatterboxWidget getNewLabelWidget(FormIndex index, String text){
     	//Label Widget;
-    	int multiplicity = index.getInstanceIndex();
     	FormEntryPrompt fakePrompt = new FakedFormEntryPrompt(text, Constants.CONTROL_LABEL, Constants.DATATYPE_TEXT);
-    	return new ChatterboxWidget(cbox, fakePrompt,ChatterboxWidget.VIEW_LABEL, new LabelWidget(multiplicity), null);
+    	return new ChatterboxWidget(cbox, fakePrompt,ChatterboxWidget.VIEW_LABEL, new LabelWidget(), null);
     }
         
     public void setReadOnly(boolean readOnly) {
