@@ -49,6 +49,17 @@ public class GroupDef implements IFormElement, Localizable {
 	private String appearanceAttr;
 	private String textID;
 	
+	//custom phrasings for repeats
+	public String chooseCaption;
+	public String addCaption;
+	public String delCaption;
+	public String doneCaption;
+	public String addEmptyCaption;
+	public String doneEmptyCaption;
+	public String entryHeader;
+	public String delHeader;
+	public String mainHeader;
+	
 	Vector observers;
 	
 	public boolean noAddRemove = false;
@@ -167,6 +178,16 @@ public class GroupDef implements IFormElement, Localizable {
 		
 		noAddRemove = ExtUtil.readBool(dis);
 		count = (IDataReference)ExtUtil.read(dis, new ExtWrapNullable(new ExtWrapTagged()), pf);
+		
+		chooseCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+		addCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+		delCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+		doneCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+		addEmptyCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+		doneEmptyCaption = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+		entryHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+		delHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
+		mainHeader = ExtUtil.nullIfEmpty(ExtUtil.readString(dis));
 	}
 
 	/** Write the group definition object to the supplied stream. */
@@ -181,6 +202,16 @@ public class GroupDef implements IFormElement, Localizable {
 
 		ExtUtil.writeBool(dos, noAddRemove);
 		ExtUtil.write(dos, new ExtWrapNullable(count != null ? new ExtWrapTagged(count) : null));
+		
+		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(chooseCaption));
+		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(addCaption));
+		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(delCaption));
+		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(doneCaption));
+		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(addEmptyCaption));
+		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(doneEmptyCaption));
+		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(entryHeader));
+		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(delHeader));
+		ExtUtil.writeString(dos, ExtUtil.emptyIfNull(mainHeader));
 		
 	}
 	

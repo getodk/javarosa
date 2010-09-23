@@ -630,6 +630,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 
 	public String fillTemplateString(String template, TreeReference contextRef) {
+		return fillTemplateString(template, contextRef, new Hashtable());
+	}
+	
+	public String fillTemplateString(String template, TreeReference contextRef, Hashtable<String, ?> variables) {
 		Hashtable args = new Hashtable();
 
 		int depth = 0;
@@ -649,7 +653,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 						continue;
 
 					IConditionExpr expr = (IConditionExpr) outputFragments.elementAt(ix);
-					String value = expr.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, contextRef));
+					EvaluationContext ec = new EvaluationContext(exprEvalContext, contextRef);
+					ec.setVariables(variables);
+					String value = expr.evalReadable(this.getInstance(), ec);
 					args.put(argName, value);
 				}
 			}
@@ -1186,7 +1192,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return buildIndex(indexes, multiplicities, elements);
 	}
 
-	public Vector<String> getAvailableRepetitions (FormIndex index) {
+	//this should probably be somewhere better
+	public int getNumRepetitions (FormIndex index) {
 		Vector indexes = new Vector();
 		Vector multiplicities = new Vector();
 		Vector elements = new Vector();
@@ -1202,6 +1209,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			numRepetitions = node.getParent().getChildMultiplicity(name);
 		}
 
+		return numRepetitions;
+	}
+	
+	public Vector<String> getAvailableRepetitions (FormIndex index) {
+		int numRepetitions = getNumRepetitions(index);
 		Vector<String> reps = new Vector<String>();
 		for (int i = 0; i < numRepetitions; i++) {
 			reps.addElement("rep " + (i + 1));
