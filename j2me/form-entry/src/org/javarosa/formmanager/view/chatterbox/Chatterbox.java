@@ -88,6 +88,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     
     private boolean activeIsInterstitial = false; //true if the question corresponding to activeQuestionIndex is a 'create new repeat' question
     private boolean deleteInterstitial = false;
+    private Vector<FormIndex> uncommittedRepeats = new Vector<FormIndex>();
     //active repeat for deleting? //TODO figure this out
     
     //TODO get the progress bar working
@@ -471,6 +472,12 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	if (expanded && qType != Q_NORMAL) {
     		if (FormIndex.EXPERIMENTAL_API) {
     			if (qType == Q_REPEAT_JUNCTURE) {
+    				//TODO: make rollback work
+//    				if (!forward && uncommittedRepeats.contains(questionIndex)) {    				
+//        				controller.deleteRepeat(model.getForm().descendIntoRepeat(questionIndex, model.getRepetitions().size() - 1));
+//    				}
+    				uncommittedRepeats.removeElement(questionIndex);
+    				
     				cw = widgetFactory.getRepeatJunctureWidget(questionIndex, model, this);
     			} else if (qType == Q_REPEAT_DELETE) {
     				cw = widgetFactory.getRepeatDeleteWidget(questionIndex, model, this);
@@ -664,6 +671,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     			} else if (answer.equals("new")) {
 	    			controller.jumpToIndex(model.getForm().descendIntoRepeat(activeQuestionIndex, -1));   				
 	    			controller.newRepeat(this.model.getFormIndex());
+	    			uncommittedRepeats.addElement(this.activeQuestionIndex);
 
 	    			removeFrame(this.activeQuestionIndex);
 	    			this.activeQuestionIndex = this.model.getFormIndex();
