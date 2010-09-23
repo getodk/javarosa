@@ -151,6 +151,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return boolNot(argVals[0]);
 		} else if (name.equals("boolean-from-string") && args.length == 1) {
 			return boolStr(argVals[0]);
+		} else if (name.equals("format-date") && args.length == 2) {
+			return dateStr(argVals[0], argVals[1]);
 		} else if (name.equals("if") && args.length == 3) { //non-standard
 			return ifThenElse(argVals[0], argVals[1], argVals[2]);	
 		} else if ((name.equals("selected") || name.equals("is-selected")) && args.length == 2) { //non-standard
@@ -200,6 +202,8 @@ public class XPathFuncExpr extends XPathExpression {
 			}
 		} else if (name.equals("regex") && args.length == 2) { //non-standard
 			return regex(argVals[0], argVals[1]);
+		} else if (name.equals("depend") && args.length >= 1) { //non-standard
+			return argVals[0];
 		} else {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
@@ -516,6 +520,15 @@ public class XPathFuncExpr extends XPathExpression {
 			return Boolean.FALSE;
 	}
 
+	public static String dateStr (Object od, Object of) {
+		od = toDate(od);
+		if (od instanceof Date) {
+			return DateUtils.format((Date)od, toString(of));
+		} else {
+			return "";
+		}
+	}
+	
 	public static Object ifThenElse (Object o1, Object o2, Object o3) {
 		boolean b = toBoolean(o1).booleanValue();
 		return (b ? o2 : o3);

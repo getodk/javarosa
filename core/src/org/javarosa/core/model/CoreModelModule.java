@@ -28,6 +28,7 @@ public class CoreModelModule implements IModule {
 		StorageManager.registerStorage(FormInstance.STORAGE_KEY, FormInstance.class);
 		
 		String[] classes = {
+				"org.javarosa.core.model.SubmissionProfile",
 				"org.javarosa.core.model.QuestionDef",
 				"org.javarosa.core.model.GroupDef",
 				"org.javarosa.core.model.instance.FormInstance",

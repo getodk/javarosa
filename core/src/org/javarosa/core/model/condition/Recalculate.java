@@ -51,12 +51,7 @@ public class Recalculate extends Triggerable {
 	
 	public void apply (TreeReference ref, Object result, FormInstance model, FormDef f) {
 		int dataType = f.getInstance().resolveReference(ref).dataType;
-		IAnswerData val = f.getInstance().resolveReference(ref).getValue();
-		if(this.expr instanceof XPathConditional && ((XPathConditional)this.expr).hasNow && val != null){
-			
-		}else{
-			f.setAnswer(wrapData(result, dataType), ref);
-		}
+		f.setAnswer(wrapData(result, dataType), ref);
 	}
 		
 	public boolean canCascade () {

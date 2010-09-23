@@ -72,4 +72,12 @@ public class NumericEntryWidget extends TextEntryWidget {
 		else
 			return new IntegerData(i);
 	}
+	
+	protected IAnswerData getAnswerTemplate() {
+		if(this.isDecimal) {
+			return new DecimalData();
+		} else {
+			return new IntegerData();
+		}
+	}
 }

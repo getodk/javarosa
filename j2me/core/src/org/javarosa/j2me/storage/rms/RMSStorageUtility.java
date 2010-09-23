@@ -97,6 +97,13 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	private RMS indexstore;			//RMS wrapper for the indexing RMS
 	private RMS[] datastores;		//RMS wrappers for 1..n data RMSes (are loaded as needed, so entries may be null)
 	
+	public static final String[] TX_EXCL = {
+		RMSTransaction.CACHE_RMS,
+		LogEntry.STORAGE_KEY,
+		LogEntry.STORAGE_KEY + "F", //logging fallback
+		LogEntry.STORAGE_KEY + "E"  //logging fallback
+	};
+	
 	public RMSStorageUtility (String basename, Class type) {
 		this(basename, type, true);
 	}
@@ -158,10 +165,16 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 * @return raw bytes for the record. null if no record is stored under that ID
 	 */
 	public byte[] readBytes (int id) {
+		return readBytes(id, true);
+	}
+	
+	private byte[] readBytes (int id, boolean publicAPI) {
 		synchronized (getAccessLock()) {
 			
-			checkNotCorrupt();
-			
+			if (publicAPI) {
+				checkNotCorrupt();
+			}
+				
 			Hashtable idIndex = getIDIndexRecord();
 			if (idIndex.containsKey(new Integer(id))) {
 				RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
@@ -216,8 +229,10 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			
 			if (recordExists) {
 				RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
+				txRecord(id, "update");
 				newLoc = updateRecord(loc, data, info);
 			} else {
+				txRecord(id, "add");
 				newLoc = addRecord(data, info);
 				if (newLoc != null) {
 					info.numRecords++;
@@ -268,6 +283,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 				throw new StorageFullException();
 			}
 			
+			txRecord(id, "add");
 			RMSRecordLoc loc = addRecord(data, info);
 			
 			//release the space we reserved
@@ -322,6 +338,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			}
 			
 			RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
+			txRecord(id, "update");
 			loc = updateRecord(loc, data, info);
 	
 			//release the space we reserved
@@ -356,6 +373,7 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			setDirty();
 						
 			RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
+			txRecord(id, "delete");
 			getDataStore(loc.rmsID).removeRecord(loc.recID);
 			
 			info.numRecords--;
@@ -515,7 +533,13 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 * Delete the storage utility itself, along with all stored records and meta-data
 	 */
 	public void destroy () {
-		throw new RuntimeException("not implemented yet");
+		synchronized (getAccessLock()) {
+			if (RMSTransaction.anyTxOpen()) {
+				throw new RuntimeException("operation not allowed while transactions are active");
+			}
+			
+			throw new RuntimeException("not implemented yet");
+		}
 	}
 
 	/**
@@ -523,7 +547,13 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 * normal usage (e.g., if all the records are scattered among 10 half-empty RMSes, repack them into 5 full RMSes)
 	 */
 	public void repack () {
-		throw new RuntimeException("not implemented yet");
+		synchronized (getAccessLock()) {
+			if (RMSTransaction.anyTxOpen()) {
+				throw new RuntimeException("operation not allowed while transactions are active");
+			}
+			
+			throw new RuntimeException("not implemented yet");
+		}
 	}
 	
 	/**
@@ -532,6 +562,9 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 */
 	public void repair () {
 		synchronized (getAccessLock()) {
+			if (RMSTransaction.anyTxOpen()) {
+				throw new RuntimeException("operation not allowed while transactions are active");
+			}			
 		
 			try {
 				checkNotCorrupt();
@@ -1462,6 +1495,30 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			iterators = new Vector();
 		}
 	}
+
+	private void txRecord (int recordID, String opType) {
+		for (int i = 0; i < TX_EXCL.length; i++) {
+			if (TX_EXCL[i].equals(getName()))
+				return;
+		}
+		
+		RMSTransaction tx = RMSTransaction.getTx();
+		if (tx == null) { //no active transaction
+			return;
+		}
+		
+		if (!tx.isRecordTouched(getName(), recordID)) {
+			try {
+				RMSStorageUtility tx_cache = RMSTransaction.getCacheRMS();
+				boolean recordExists = !"add".equals(opType);
+				int entry_id = tx_cache.add(new TxCacheEntry(tx, getName(), recordID, recordExists ? readBytes(recordID, false) : null));
+				tx.recordTouched(getName(), recordID, entry_id);
+			} catch (Exception e) {
+				Logger.log("rms-tx", "error during rms transaction back-up operation");
+				throw new WrappedException("RMS transaction error; could not back up original state of record; original operation [" + opType + "] aborted because transaction guarantees cannot be met (transaction is still open; you must roll back manually, if you wish)", e);
+			}
+		}
+	}	
 	
 	/* ========== DEBUGGING CODE ============ */
 	

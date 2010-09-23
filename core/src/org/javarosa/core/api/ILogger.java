@@ -45,4 +45,6 @@ public interface ILogger {
 	public void panic();
 	
 	public int logSize();
+	
+	public void halt();
 }
