@@ -26,7 +26,6 @@ import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.api.Constants;
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
@@ -356,7 +355,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		}
     	}
     	
-    	if (!questionIndex.equals(activeQuestionIndex)) {
+    	if (!questionIndex.equals(activeQuestionIndex) || activeIsInterstitial) {
     		activeQuestionIndex = questionIndex;
 
     		if (activeQuestionIndex.isInForm()) {
@@ -639,10 +638,14 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		return;
     	}
     	if (activeIsInterstitial) {
+    		if (frame.getData() == null) {
+    			this.queueError(null, PROMPT_REQUIRED_QUESTION);
+    			return;
+    		}
+    		String answer = ((Selection)frame.getData().getValue()).getValue();
+    		
     		if (!FormIndex.EXPERIMENTAL_API) {
     		
-	    		//'new repeat?' answered
-	    		String answer = ((Selection)frame.getData().getValue()).getValue();
 	    		if (answer.equals("y")) {
 	    			controller.newRepeat(this.model.getFormIndex());
 	    			createHeaderForElement(this.model.getFormIndex(), true);
@@ -651,7 +654,6 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	    		
     		} else {
     		
-    			String answer = ((Selection)frame.getData().getValue()).getValue();
     			if (answer.startsWith("rep")) {
     				int n = Integer.parseInt(answer.substring(3));
     				controller.jumpToIndex(model.getForm().descendIntoRepeat(activeQuestionIndex, n));
