@@ -77,8 +77,6 @@ public class FormEntryCaption implements FormElementStateListener {
 		this.textID = this.element.getTextID();
 	}
 
-	
-	//////These two methods were a bad idea. Should be deprecated.  Use getText() and check for null instead
 	/**
 	 * Find out what Text forms (e.g. audio, long form text, etc) are available
 	 * for this element or the element specified by textID
@@ -136,7 +134,6 @@ public class FormEntryCaption implements FormElementStateListener {
 		}
 		try{
 			t = getText(textID,form);
-			if(t == null || t.equals("")) t = getDefaultText(textID);
 		}catch(NoLocalizedTextException nlte){
 			System.out.println("Warning, " + form + " text form requested for ["+textID+"] but doesn't exist. (Falling back to Default form).");
 			t = getDefaultText(textID);
@@ -148,30 +145,12 @@ public class FormEntryCaption implements FormElementStateListener {
 
 	}
 	
-	/**
-	 * Get the text for a particular localized text form. If for whatever
-	 *  reason it's not available, return null.
-	 * @param textID - TextID of this question
-	 * @param form - text form like "video","image", etc
-	 * @return
-	 */
-	public String getFormOrNull(String textID, String form) {
-		if(textID==null && this.textID == null)return null;
-		else textID = this.textID;
-		
-		String ret = getText(textID,form);
-		if(ret=="")ret = null;
-		return ret;
-	}
-	
-	/**
-	 * Get the text for this question for a specified text form. If for whatever
-	 *  reason it's not available, return null.
-	 * @param form - text form like "video","image", etc
-	 * @return
-	 */
-	public String getFormOrNull(String form){
-		return getFormOrNull(null,form);
+	protected String getFormOrNull(String textID, String form) {
+		if(textID==null)textID=this.textID;
+		if(!getAvailableTextForms(textID).contains(form)){
+			return null;
+		}
+		return getText(textID,form);
 	}
 	
 	/**
@@ -214,18 +193,18 @@ public class FormEntryCaption implements FormElementStateListener {
 		return getFormOrNull(getTextID(), TEXT_FORM_IMAGE);
 	}
 	
-	
 	/**
 	 * Standard Localized text retreiver.
 	 * 
+	 * use getAvailableTextForms to check which forms are available before you
+	 * call this method.
 	 * Falls back to labelInnerText if textID and form are null
-	 * or (textID!=null and there is no Localized text available && form==null).
+	 * or if textID!=null and there is no Localized text available.
 	 * 
-	 * If textID == null && form != null, throws IllegalArgumentException
 	 * 
-	 * @param tID - the textID of the element
-	 * @param form - Special form of the text (such as "image","audio",whatever) can be null.
-	 * @return null if no text is available.
+	 * @param tID
+	 * @param form
+	 * @return
 	 * @throws IllegalArgumentException if this element is unlocalized but a special form is requested.
 	 * 
 	 * 
@@ -254,9 +233,7 @@ public class FormEntryCaption implements FormElementStateListener {
 			textID += ";" + form;	
 		}
 		
-//		text = localizer().getLocalizedText(textID);
-		text = localizer().getRawText(localizer().getLocale(), textID);
-		
+		text = localizer().getLocalizedText(textID);
 		return substituteStringArgs(text);
 	}
 
