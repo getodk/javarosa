@@ -49,7 +49,25 @@ public class TransportService {
 	 * persisted immediately
 	 * 
 	 */
-	private static TransportMessageStore CACHE = new TransportMessageStore();
+	private static TransportMessageStore T_CACHE;
+	
+	private static TransporterSharingSender SENDER;
+	
+	private static final String CACHE_LOCK="CACHE_LOCK";
+	
+	private static TransportMessageStore CACHE() {
+		synchronized(CACHE_LOCK) { 
+			if(T_CACHE == null) {
+				T_CACHE = new TransportMessageStore();
+			}
+			return T_CACHE;
+		}
+	}
+	
+	public static synchronized void init() {
+		CACHE();
+		SENDER  = new TransporterSharingSender();
+	}
 
 	/**
 	 * 
@@ -99,7 +117,7 @@ public class TransportService {
 		Transporter transporter = message.createTransporter();
 
 		// create a sender thread
-		SenderThread thread = new SimpleSenderThread(transporter, CACHE, tries,
+		SenderThread thread = new SimpleSenderThread(transporter, CACHE(), tries,
 				delay);
 
 		// if the message should be stored and never lost
@@ -109,9 +127,9 @@ public class TransportService {
 			message.setSendingThreadDeadline(getSendingThreadDeadline(thread
 					.getTries(), thread.getDelay()));
 
-			synchronized (CACHE) {
+			synchronized (CACHE()) {
 				// persist the message
-				CACHE.cache(message);
+				CACHE().cache(message);
 			}
 		} else {
 			message.setStatus(TransportMessageStatus.QUEUED);
@@ -136,7 +154,7 @@ public class TransportService {
 		// if the message should be saved in case of sending failure
 		if (message.isCacheable()) {
 			// persist the message
-			CACHE.cache(message);
+			CACHE().cache(message);
 		}
 		// create the appropriate transporter
 		Transporter transporter = message.createTransporter();
@@ -150,11 +168,11 @@ public class TransportService {
 
 			if (message.getStatus() == TransportMessageStatus.SENT) {
 				// if it was sent successfully, then remove it from cache
-				CACHE.decache(message);
+				CACHE().decache(message);
 			} else {
 				// otherwise, set the status to cached
 				message.setStatus(TransportMessageStatus.CACHED);
-				CACHE.updateMessage(message);
+				CACHE().updateMessage(message);
 			}
 		}
 		return message;
@@ -172,25 +190,32 @@ public class TransportService {
 	 */
 	public static void sendCached(TransportListener listener)
 			throws TransportException {
-
-		// get all the cached messages
-		Vector messages = getCachedMessages();
-
-		if (messages.size() > 0) {
-
-			// create one appropriate transporter (to share a connection, for
-			// example)
-			TransportMessage m = (TransportMessage) messages.elementAt(0);
-
-			Transporter transporter = m.createTransporter();
-			// get a bulk sender to use the transporter to send all messages
-			TransporterSharingSender sender = new TransporterSharingSender(
-					transporter, messages, CACHE, listener);
-
-			sender.send();
-
+		if(SENDER == null) {
+			//This is very bad, and the service should have been initialized
+			SENDER  = new TransporterSharingSender();
 		}
-		//throw new TransportException("No cached messages to send");
+
+		//We get into a lot of trouble with synchronicity if we just let all kinds of
+		//senders start going at once, so we'll just use the one and queue up 
+		//sendCached attempts.
+		synchronized(SENDER) {
+			// get all the cached messages
+			Vector messages = getCachedMessages();
+	
+			if (messages.size() > 0) {
+	
+				// create one appropriate transporter (to share a connection, for
+				// example)
+				TransportMessage m = (TransportMessage) messages.elementAt(0);
+	
+				Transporter transporter = m.createTransporter();
+				// get a bulk sender to use the transporter to send all messages
+				SENDER.init(transporter, messages, CACHE(), listener);
+	
+				SENDER.send();
+	
+			}
+		}
 	}
 
 	/**
@@ -213,14 +238,14 @@ public class TransportService {
 	 * @return
 	 */
 	public static Vector getCachedMessages() {
-		return CACHE.getCachedMessages();
+		return CACHE().getCachedMessages();
 	}
 
 	/**
 	 * @return
 	 */
 	public static int getCachedMessagesSize() {
-		return CACHE.getCachedMessagesCount();
+		return CACHE().getCachedMessagesCount();
 	}
 
 	/**
@@ -235,7 +260,12 @@ public class TransportService {
 	 *         message was found)
 	 */
 	public static TransportMessage retrieve(String id) {
-		return CACHE.findMessage(id);
+		return CACHE().findMessage(id);
 	}
-
+	
+	public static void halt() {
+		if(SENDER != null) {
+			SENDER.halt();
+		}
+	}
 }

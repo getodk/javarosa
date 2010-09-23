@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Vector;
 
+import org.javarosa.core.form.api.test.TextFormTests;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
@@ -78,12 +79,13 @@ public class FormParseInit {
 //			QuestionDef q = t.getCurrentQuestion();
 //			if(q!=null)	System.out.println("Question Text ID is: "+q.getTextID());
 //		}while(t.fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
-		for(int i=0;i<QuestionDefTest.NUM_TESTS+1;i++){
-			new QuestionDefTest().doTest(i);
-		}
+//		for(int i=0;i<QuestionDefTest.NUM_TESTS+1;i++){
+//			new QuestionDefTest().doTest(i);
+//		}
+
 		
-		for(int i=0;i<FormDefTest.NUM_TESTS+1;i++){
-			new FormDefTest().doTest(i);
+		for(int i=0;i<TextFormTests.NUM_TESTS;i++){
+			new TextFormTests().doTest(i);
 		}
 		
 	}
@@ -126,7 +128,7 @@ public class FormParseInit {
 			}
 		}while(fec.stepToNextEvent()!=FormEntryController.EVENT_END_OF_FORM);
 		
-		return null; //we should really never end up here.
+		return null;
 	}
 	
 	/**

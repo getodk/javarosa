@@ -89,9 +89,12 @@ public class FormTransportSubmitStatusScreen extends Form implements
 	 * 
 	 */
 	public void updateStatus() {
-		TransportMessage message = TransportService.retrieve(cacheId);
-		if(message != null) {
-			updateStatus(message);
+		if (cacheId != null){
+			TransportMessage message = TransportService.retrieve(cacheId);
+			if(message != null) {
+				updateStatus(message);
+					
+			}
 		}
 	}
 
@@ -102,7 +105,8 @@ public class FormTransportSubmitStatusScreen extends Form implements
 		this.counter += REFRESH_INTERVAL;
 
 		int status = transportMessage.getStatus();
-		if (status != TransportMessageStatus.QUEUED) {
+		if (status != TransportMessageStatus.QUEUED && timer != null){
+
 			this.timer.cancel();
 		}
 

@@ -61,12 +61,12 @@ public class ByteArrayPayload implements IDataPayload {
 		this.id = id;
 		this.type = type;
 	}
-	
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.services.transport.IDataPayload#getPayloadStream()
 	 */
 	public InputStream getPayloadStream() {
+		
 		return new ByteArrayInputStream(payload);
 	}
 

@@ -9,6 +9,7 @@ import javax.wireless.messaging.TextMessage;
 
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.impl.TransportMessageStatus;
 
 /**
  * An SMSTransporter can send the SMSTransportMessage passed to it in its
@@ -46,6 +47,7 @@ public class SMSTransporter implements Transporter {
 	public TransportMessage send() {
 		MessageConnection conn = null;
 		try {
+			System.out.println("SMSTransporter.send() - destination = " + message.getDestinationURL());
 
 			// create a MessageConnection
 			conn = getConnection(message.getDestinationURL());
@@ -59,8 +61,10 @@ public class SMSTransporter implements Transporter {
 
 			for (int i = 0; i < messageParts.size(); i++) {
 				String smsContent = (String) messageParts.elementAt(i);
+				System.out.println("Sending: " + smsContent);
 				sendMessage(smsContent, conn);
 			}
+			message.setStatus(TransportMessageStatus.SENT);
 
 		} catch (Exception e) {
 			System.out.println("Connection failed: ");

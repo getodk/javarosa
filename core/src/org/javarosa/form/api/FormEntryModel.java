@@ -16,6 +16,7 @@
 
 package org.javarosa.form.api;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
@@ -337,7 +338,8 @@ public class FormEntryModel {
 
         boolean relevant;
         if (isAskNewRepeat) {
-            relevant = form.canCreateRepeat(ref);
+        	TreeElement node = form.getInstance().resolveReference(ref.getParentRef());
+        	relevant = form.canCreateRepeat(ref) && node.isRelevant();
         } else {
             TreeElement node = form.getInstance().resolveReference(ref);
             relevant = node.isRelevant(); // check instance flag first
@@ -419,5 +421,58 @@ public class FormEntryModel {
                 }
             }
         }
+    }
+    
+    
+    public boolean isIndexCompoundContainer() {
+    	return isIndexCompoundContainer(getFormIndex());
+    }
+    
+    public boolean isIndexCompoundContainer(FormIndex index) {
+    	FormEntryCaption caption = getCaptionPrompt(index);
+    	return getEvent(index) == FormEntryController.EVENT_GROUP && caption.getAppearanceHint() != null && caption.getAppearanceHint().toLowerCase().equals("full");
+    }
+    
+    public boolean isIndexCompoundElement() {
+    	return isIndexCompoundElement(getFormIndex());
+    }
+    
+    public boolean isIndexCompoundElement(FormIndex index) {
+    	//Can't be a subquestion if it's not even a question!
+    	if(getEvent(index) != FormEntryController.EVENT_QUESTION) {
+    		return false;
+    	}
+    	
+    	//get the set of nested groups that this question is in.
+    	FormEntryCaption[] captions = getCaptionHierarchy(index);
+    	for(FormEntryCaption caption : captions) {
+    		
+    		//If one of this question's parents is a group, this question is inside of it.
+    		if(isIndexCompoundContainer(caption.getIndex())) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    public FormIndex[] getCompoundIndices() {
+    	return getCompoundIndices(getFormIndex());
+    }
+    
+    public FormIndex[] getCompoundIndices(FormIndex container) {
+    	//ArrayLists are a no-go for J2ME
+    	Vector<FormIndex> indices = new Vector<FormIndex>();
+    	FormIndex walker = getForm().incrementIndex(container);
+    	while(FormIndex.isSubElement(container, walker)) {
+    		if(isIndexRelevant(walker)) {
+    			indices.addElement(walker);
+    		}
+    		walker = getForm().incrementIndex(walker);
+    	}
+    	FormIndex[] array = new FormIndex[indices.size()];
+    	for(int i = 0 ; i < indices.size() ; ++i) {
+    		array[i] = indices.elementAt(i);
+    	}
+    	return array;
     }
 }

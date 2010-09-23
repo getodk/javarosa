@@ -136,18 +136,12 @@ public class Case implements Persistable, Restorable, IMetaData {
 		this.recordId = id;
 	}
 		
-	public int getUserId() {
-		Integer id = (Integer)data.get(org.javarosa.core.api.Constants.USER_ID_KEY);
-		if(id == null) {
-			return -1;
-		}
-		else {
-			return id.intValue();
-		}
+	public String getUserId() {
+		return (String)data.get(org.javarosa.core.api.Constants.USER_ID_KEY);
 	}
 	
-	public void setUserId(int id) {
-		data.put(org.javarosa.core.api.Constants.USER_ID_KEY, new Integer(id));
+	public void setUserId(String id) {
+		data.put(org.javarosa.core.api.Constants.USER_ID_KEY, id);
 	}
 
 	/**

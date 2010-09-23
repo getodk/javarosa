@@ -70,7 +70,7 @@ public class Patient implements Persistable, Restorable {
 	String familyName;  	/** Patient's Family name */
 	String middleName;	    /** Optional Middle Name */
 	String givenName;       /** Patient's surname */
-	int gender;
+	protected int gender;
 	Date birthDate;
 	boolean birthDateEstimated;
 	

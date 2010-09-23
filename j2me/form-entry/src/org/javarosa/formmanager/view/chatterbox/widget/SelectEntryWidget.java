@@ -197,8 +197,7 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
 			SelectChoice sc = prompt.getSelectChoices().elementAt(i);
-			Selection s = sc.selection();
-			Image im = this.getImage(prompt.getSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
+			Image im = this.getImage(prompt.getSpecialFormSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
 			
 			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(sc));
 			
