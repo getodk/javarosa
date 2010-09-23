@@ -191,13 +191,24 @@ public class ChatterboxWidgetFactory {
     public ChatterboxWidget getRepeatJunctureWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
     	Vector<String> choices = model.getRepetitions();
     	
-    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("behold, a repeat!", Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("behold, a repeat! " + model.getCaptionPrompt(index).getDefaultText(), Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
     	for (int i = 0; i < choices.size(); i++) {
         	prompt.addSelectChoice(new SelectChoice(null, choices.elementAt(i), "c" + i, false));
     	}
     	prompt.addSelectChoice(new SelectChoice(null, "add new", "new", false));
     	prompt.addSelectChoice(new SelectChoice(null, "delete", "del", false));
     	prompt.addSelectChoice(new SelectChoice(null, "done", "done", false));
+		
+		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
+    }
+
+    public ChatterboxWidget getRepeatDeleteWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
+    	Vector<String> choices = model.getRepetitions();
+    	
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt("which [" + model.getCaptionPrompt(index).getDefaultText() + "] to delete?", Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
+    	for (int i = 0; i < choices.size(); i++) {
+        	prompt.addSelectChoice(new SelectChoice(null, choices.elementAt(i), "del" + i, false));
+    	}
 		
 		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }
