@@ -26,12 +26,6 @@ public class SimpleHttpTransporter implements Transporter {
 	 */
 	private SimpleHttpTransportMessage message;
 
-	/**
-	 * The HTTP method to be used by this Transporter POST by Default
-	 */
-	private String httpConnectionMethod = HttpConnection.POST;
-
-	
 
 	/**
 	 * @param message
@@ -56,24 +50,7 @@ public class SimpleHttpTransporter implements Transporter {
 		// if the message is set from a bulk sender
 		// we are sharing a connection but each message
 		// may have its own request properties
-	}
-
-
-	/*
-	 *Set the HTTP Connection Method 
-	 */
-	public void setHttpConnectionMethod(String method)
-	{
-		if (method.equals(HttpConnection.GET))
-		{
-			this.httpConnectionMethod = HttpConnection.GET;
-		}
-		else if( method.equals(HttpConnection.POST)  )
-		{
-			this.httpConnectionMethod = HttpConnection.POST;
-		}
-	}
-	
+	}	
 	
 	/*
 	 * (non-Javadoc)
@@ -88,7 +65,7 @@ public class SimpleHttpTransporter implements Transporter {
 
 			System.out.println("Ready to send: " + this.message);
 
-			conn = getConnection();
+			conn = getConnection(this.message.getConnectionMethod());
 
 			System.out.println("Connection: " + conn);
 
@@ -153,7 +130,7 @@ public class SimpleHttpTransporter implements Transporter {
 	 * @return
 	 * @throws IOException
 	 */
-	private HttpConnection getConnection() throws IOException {
+	private HttpConnection getConnection(String connectionMethod) throws IOException {
 		if (this.message == null)
 			throw new RuntimeException("Null message in getConnection()");
 
@@ -168,7 +145,7 @@ public class SimpleHttpTransporter implements Transporter {
 			throw new RuntimeException(
 					"Null message.getContent() in getConnection()");
 
-		conn.setRequestMethod(this.httpConnectionMethod);
+		conn.setRequestMethod(connectionMethod);
 		conn.setRequestProperty("User-Agent", this.message
 				.getRequestProperties().getUserAgent());
 		conn.setRequestProperty("Content-Language", this.message
