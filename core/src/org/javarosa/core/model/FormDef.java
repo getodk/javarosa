@@ -1191,35 +1191,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		
 		return buildIndex(indexes, multiplicities, elements);
 	}
-
-	//this should probably be somewhere better
-	public int getNumRepetitions (FormIndex index) {
-		Vector indexes = new Vector();
-		Vector multiplicities = new Vector();
-		Vector elements = new Vector();
-
-		collapseIndex(index, indexes, multiplicities, elements);
-
-		//so painful
-		multiplicities.setElementAt(new Integer(0), multiplicities.size() - 1);
-		TreeElement node = instance.resolveReference(getChildInstanceRef(elements, multiplicities));
-		int numRepetitions = 0;
-		if (node != null) {
-			String name = node.getName();
-			numRepetitions = node.getParent().getChildMultiplicity(name);
-		}
-
-		return numRepetitions;
-	}
-	
-	public Vector<String> getAvailableRepetitions (FormIndex index) {
-		int numRepetitions = getNumRepetitions(index);
-		Vector<String> reps = new Vector<String>();
-		for (int i = 0; i < numRepetitions; i++) {
-			reps.addElement("rep " + (i + 1));
-		}
-		return reps;
-	}
 	
 	/*
 	 * (non-Javadoc)

@@ -26,15 +26,8 @@ import de.enough.polish.ui.UiAccess;
 public class LabelWidget implements IWidgetStyle {
 	private StringItem label;
 	
-	private int multiplicity = -1;
-	
 	public LabelWidget() {
 		super();
-	}
-	
-	public LabelWidget(int mult) {
-		this();
-		multiplicity = mult;
 	}
 	
 	public void initWidget(FormEntryPrompt prompt, Container c) {
@@ -52,9 +45,6 @@ public class LabelWidget implements IWidgetStyle {
 		// question texts for long questions.
 		String caption = prompt.getLongText();
 		
-		if(multiplicity != -1) {
-			caption += ": " + (multiplicity + 1);
-		}
 		label.setText(caption);
 	}
 
@@ -71,15 +61,10 @@ public class LabelWidget implements IWidgetStyle {
 	}
 	
 	public Object clone() {
-		LabelWidget label = new LabelWidget(multiplicity);
-		return label;
+		return new LabelWidget();
 	}
 
 	public int getPinnableHeight() {
 		return label.getContentHeight();
-	}
-	
-	public int getMultiplicity() {
-		return multiplicity;
 	}
 }

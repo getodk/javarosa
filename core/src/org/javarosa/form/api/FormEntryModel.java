@@ -77,11 +77,6 @@ public class FormEntryModel {
             return FormEntryController.EVENT_QUESTION;
         }
     }
-
-    public Vector<String> getRepetitions () {
-    	return form.getAvailableRepetitions(currentFormIndex);
-    }
-    
     
     /**
      * 

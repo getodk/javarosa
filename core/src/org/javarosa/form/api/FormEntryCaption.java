@@ -246,7 +246,7 @@ public class FormEntryCaption implements FormElementStateListener {
 		}
 		
 		String title = getDefaultText();
-		int count = form.getNumRepetitions(index);
+		int count = getNumRepetitions();
 		
 		String caption = null;
 		if ("mainheader".equals(typeKey)) {
@@ -296,6 +296,76 @@ public class FormEntryCaption implements FormElementStateListener {
 		vars.put("name", title);
 		vars.put("n", new Integer(count));
 		return form.fillTemplateString(caption, index.getReference(), vars);
+	}
+	
+	//this should probably be somewhere better
+	public int getNumRepetitions () {
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+
+		form.collapseIndex(index, indexes, multiplicities, elements);
+
+		//so painful
+		multiplicities.setElementAt(new Integer(0), multiplicities.size() - 1);
+		TreeElement node = form.getInstance().resolveReference(form.getChildInstanceRef(elements, multiplicities));
+		int numRepetitions = 0;
+		if (node != null) {
+			String name = node.getName();
+			numRepetitions = node.getParent().getChildMultiplicity(name);
+		}
+
+		return numRepetitions;
+	}
+	
+	public String getRepetitionText(String type, boolean newrep) {
+		return getRepetitionText(type, index, newrep);
+	}
+	
+	private String getRepetitionText(String type, FormIndex index, boolean newrep) {
+		if (element instanceof GroupDef && ((GroupDef)element).getRepeat() && index.getElementMultiplicity() >= 0) {
+			GroupDef g = (GroupDef)element;
+	
+			String title = getDefaultText();
+			int ix = index.getElementMultiplicity() + 1;
+			int count = getNumRepetitions();
+			
+			String caption = null;
+			if ("header".equals(type)) {
+				caption = g.entryHeader;
+			} else if ("choose".equals(type)) {
+				caption = g.chooseCaption;
+				if (caption == null) {
+					caption = g.entryHeader;
+				}
+			}
+			if (caption == null) {
+				return title + " " + ix + "/" + count;
+			}
+	
+			Hashtable<String, Object> vars = new Hashtable<String, Object>();
+			vars.put("name", title);
+			vars.put("i", new Integer(ix));
+			vars.put("n", new Integer(count));
+			vars.put("new", new Boolean(newrep));
+			return form.fillTemplateString(caption, index.getReference(), vars);
+		} else {
+			return null;
+		}
+	}
+	
+	public Vector<String> getRepetitionsText () {
+		GroupDef g = (GroupDef)element;
+		if (!g.getRepeat()) {
+			throw new RuntimeException("not a repeat");
+		}
+		
+		int numRepetitions = getNumRepetitions();
+		Vector<String> reps = new Vector<String>();
+		for (int i = 0; i < numRepetitions; i++) {
+			reps.addElement(getRepetitionText("choose", form.descendIntoRepeat(index, i), false));
+		}
+		return reps;
 	}
 	
 	public String getAppearanceHint ()  {

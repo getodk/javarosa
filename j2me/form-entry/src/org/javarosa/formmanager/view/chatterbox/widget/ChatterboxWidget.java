@@ -293,15 +293,7 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 	}
 	
 	public ChatterboxWidget generateHeader() {
-		int mult = -1;
-		if(this.activeStyle instanceof LabelWidget) {
-			LabelWidget label = (LabelWidget)this.activeStyle;
-			mult = label.getMultiplicity();
-		}
-		LabelWidget labelStyle = new LabelWidget(mult);
-		ChatterboxWidget widget = new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_LABEL, labelStyle , null);
-
-		return widget;
+		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_LABEL, new LabelWidget(), null);
 	}
 	
 	/** 
