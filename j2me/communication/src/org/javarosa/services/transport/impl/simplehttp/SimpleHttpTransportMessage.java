@@ -135,9 +135,18 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 		this.cacheable = cacheable;
 	}
 	
+	public String getConnectionMethod() {
+		return this.httpConnectionMethod;
+	}
+	
 	public void setHttpConnectionMethod(String httpConnectionMethod)
 	{
 		this.httpConnectionMethod = httpConnectionMethod;
+		
+		//There's no meaning to caching a GET
+		if(this.httpConnectionMethod != HttpConnection.POST) {
+			setCacheable(false);
+		}
 	}
 
 	/*
@@ -147,7 +156,6 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	 */
 	public Transporter createTransporter() {
 		SimpleHttpTransporter transporter= new SimpleHttpTransporter(this);
-		transporter.setHttpConnectionMethod(this.httpConnectionMethod);
 		return transporter;
 	}
 
