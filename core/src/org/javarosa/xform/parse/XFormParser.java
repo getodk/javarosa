@@ -1003,6 +1003,35 @@ public class XFormParser {
 				group.noAddRemove = (e.getAttributeValue(NAMESPACE_JAVAROSA, "noAddRemove") != null);				
 			}
 		}
+		
+		for (int i = 0; i < e.getChildCount(); i++) {
+			int type = e.getType(i);
+			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
+			String childName = (child != null ? child.getName() : null);
+			String childNamespace = (child != null ? child.getNamespace() : null);
+
+			if (group.getRepeat() && NAMESPACE_JAVAROSA.equals(childNamespace)) {				
+				if ("chooseCaption".equals(childName)) {
+					group.chooseCaption = getLabel(child, f);
+				} else if ("addCaption".equals(childName)) {
+					group.addCaption = getLabel(child, f);
+				} else if ("delCaption".equals(childName)) {
+					group.delCaption = getLabel(child, f);
+				} else if ("doneCaption".equals(childName)) {
+					group.doneCaption = getLabel(child, f);
+				} else if ("addEmptyCaption".equals(childName)) {
+					group.addEmptyCaption = getLabel(child, f);
+				} else if ("doneEmptyCaption".equals(childName)) {
+					group.doneEmptyCaption = getLabel(child, f);
+				} else if ("entryHeader".equals(childName)) {
+					group.entryHeader = getLabel(child, f);
+				} else if ("delHeader".equals(childName)) {
+					group.delHeader = getLabel(child, f);
+				} else if ("mainHeader".equals(childName)) {
+					group.mainHeader = getLabel(child, f);
+				}
+			}
+		}
 
 		//the case of a group wrapping a repeat is cleaned up in a post-processing step (collapseRepeatGroups)
 		

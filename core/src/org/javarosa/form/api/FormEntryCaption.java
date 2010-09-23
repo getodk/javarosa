@@ -16,19 +16,19 @@
 
 package org.javarosa.form.api;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.formmanager.view.IQuestionWidget;
-import java.lang.String;
-import java.util.Vector;
 
 /**
  * This class gives you all the information you need to display a caption when
@@ -237,6 +237,67 @@ public class FormEntryCaption implements FormElementStateListener {
 		return substituteStringArgs(text);
 	}
 
+	//TODO: this is explicitly missing integration with the new multi-media support
+	//TODO: localize the default captions
+	public String getRepeatText(String typeKey) {
+		GroupDef g = (GroupDef)element;
+		if (!g.getRepeat()) {
+			throw new RuntimeException("not a repeat");
+		}
+		
+		String title = getDefaultText();
+		int count = form.getNumRepetitions(index);
+		
+		String caption = null;
+		if ("mainheader".equals(typeKey)) {
+			caption = g.mainHeader;
+			if (caption == null) {
+				return title;
+			}
+		} else if ("add".equals(typeKey)) {
+			caption = g.addCaption;
+			if (caption == null) {
+				return "Add another " + title;
+			}
+		} else if ("add-empty".equals(typeKey)) {
+			caption = g.addEmptyCaption;
+			if (caption == null) {
+				caption = g.addCaption;
+			}
+			if (caption == null) {
+				return "None - Add " + title;
+			}
+		} else if ("del".equals(typeKey)) {
+			caption = g.delCaption;
+			if (caption == null) {
+				return "Delete " + title;
+			}
+		} else if ("done".equals(typeKey)) {
+			caption = g.doneCaption;
+			if (caption == null) {
+				return "Done";
+			}
+		} else if ("done-empty".equals(typeKey)) {
+			caption = g.doneEmptyCaption;
+			if (caption == null) {
+				caption = g.doneCaption;
+			}
+			if (caption == null) {
+				return "Skip";
+			}
+		} else if ("delheader".equals(typeKey)) {
+			caption = g.delHeader;
+			if (caption == null) {
+				return "Delete which " + title + "?";
+			}
+		}
+		
+		Hashtable<String, Object> vars = new Hashtable<String, Object>();
+		vars.put("name", title);
+		vars.put("n", new Integer(count));
+		return form.fillTemplateString(caption, index.getReference(), vars);
+	}
+	
 	public String getAppearanceHint ()  {
 		return element.getAppearanceAttr();
 	}
