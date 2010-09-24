@@ -16,32 +16,28 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import java.io.IOException;
-import java.io.InputStream;
+
 import java.util.Vector;
 
 import javax.microedition.lcdui.Image;
-import javax.microedition.media.Manager;
-import javax.microedition.media.MediaException;
-import javax.microedition.media.Player;
+
 
 import org.javarosa.core.model.FormElementStateListener;
-import org.javarosa.core.model.SelectChoice;
+
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.UncastData;
-import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.core.reference.Reference;
-import org.javarosa.core.reference.ReferenceManager;
+
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
+import org.javarosa.utilities.media.MediaUtils;
 
-import de.enough.polish.multimedia.AudioPlayer;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
+
 
 public abstract class ExpandedWidget implements IWidgetStyleEditable {
 
@@ -49,7 +45,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	protected Item entryWidget;
 	private Container c;
 	private Container fullPrompt;
-	private static boolean IMAGE_DEBUG_MODE = false;
+
 
 	public ExpandedWidget () {
 		reset();
@@ -80,10 +76,9 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		String IaltText;
 
 		IaltText = fep.getShortText();
-		
-		Image im = getImage(fep.getImageText());
+		Image im = MediaUtils.getImage(fep.getImageText());
 		if(im!=null){
-			ImageItem imItem = new ImageItem(null,getImage(fep.getImageText()), ImageItem.LAYOUT_CENTER | ImageItem.LAYOUT_VCENTER, IaltText);
+			ImageItem imItem = new ImageItem(null,MediaUtils.getImage(fep.getImageText()), ImageItem.LAYOUT_CENTER | ImageItem.LAYOUT_VCENTER, IaltText);
 			imItem.setLayout(Item.LAYOUT_CENTER);
 			return imItem;
 		}else{
@@ -92,29 +87,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		
 	}
 	
-	public static Image getImage(String URI){
-		if(URI != null){
-			try {
-				Reference ref = ReferenceManager._().DeriveReference(URI);
-				InputStream is = ref.getStream();
-				Image i = Image.createImage(is);
-				is.close();
-				return i;
-			} catch (IOException e) {
-				System.out.println("IOException for URI:"+URI);
-				e.printStackTrace();
-				if(IMAGE_DEBUG_MODE) throw new RuntimeException("ERROR! Cant find image at URI: "+URI);	
-				return null;
-			} catch (InvalidReferenceException ire){
-				System.out.println("Invalid Reference Exception for URI:"+URI);
-				ire.printStackTrace();
-				if(IMAGE_DEBUG_MODE) throw new RuntimeException("Invalid Reference for image at: " +URI);
-				return null;
-			}
-		} else{
-			return null;
-		}
-	}
+
 
 	private int imageIndex=-1;
 	
