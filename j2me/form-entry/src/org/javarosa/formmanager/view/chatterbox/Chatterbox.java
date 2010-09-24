@@ -668,19 +668,18 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		} else {
     		
     			if (answer.startsWith("rep")) {
-    				int n = Integer.parseInt(answer.substring(3));
-    				controller.jumpToIndex(model.getForm().descendIntoRepeat(activeQuestionIndex, n));
-
     				removeFrame(this.activeQuestionIndex);
-	    			this.activeQuestionIndex = this.model.getFormIndex();
+    				
+    				int n = Integer.parseInt(answer.substring(3));
+    				this.activeQuestionIndex = controller.descendIntoRepeat(n);
+
     				createHeaderForElement(activeQuestionIndex, false);
     			} else if (answer.equals("new")) {
-	    			controller.jumpToIndex(model.getForm().descendIntoRepeat(activeQuestionIndex, -1));   				
-	    			controller.newRepeat(this.model.getFormIndex());
-	    			uncommittedRepeats.addElement(this.activeQuestionIndex);
-
 	    			removeFrame(this.activeQuestionIndex);
-	    			this.activeQuestionIndex = this.model.getFormIndex();
+    				
+	    			uncommittedRepeats.addElement(this.activeQuestionIndex);
+	    			this.activeQuestionIndex = controller.descendIntoNewRepeat();
+
 	    			createHeaderForElement(activeQuestionIndex, false);
     			} else if (answer.equals("del")) {
     				deleteInterstitial = true;
@@ -688,7 +687,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     				return;
     			} else if (answer.startsWith("del")) {
     				int n = Integer.parseInt(answer.substring(3));
-    				controller.deleteRepeat(model.getForm().descendIntoRepeat(activeQuestionIndex, n));
+    				controller.deleteRepeat(n);
     				
     				deleteInterstitial = false;
     				jumpToQuestion(this.activeQuestionIndex);

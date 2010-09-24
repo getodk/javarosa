@@ -300,16 +300,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
 	}
 	
-	
-
-	public boolean canCreateRepeat(TreeReference repeatRef) {
+	public boolean isRepeatRelevant (TreeReference repeatRef) {
 		Condition c = (Condition) conditionRepeatTargetIndex.get(repeatRef.genericize());
 		if (c != null) {
-			return c.evalBool(instance, new EvaluationContext(exprEvalContext,	repeatRef));
-		} /* else check # child constraints of parent
-		
-		} */
+			return c.evalBool(instance, new EvaluationContext(exprEvalContext, repeatRef));
+		} else {
+			return true;
+		}
+	}
 
+	public boolean canCreateRepeat(TreeReference repeatRef) {
+		//no-op currently
+		//TODO: check # child constraints on parent
 		return true;
 	}
 	
@@ -1154,8 +1156,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
-	//repIndex == -1 => next repetition about to be created
-	public FormIndex descendIntoRepeat(FormIndex index, int repIndex) {
+	public int getNumRepetitions (FormIndex index) {
 		Vector indexes = new Vector();
 		Vector multiplicities = new Vector();
 		Vector elements = new Vector();
@@ -1171,13 +1172,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 		
 		//so painful
-		multiplicities.setElementAt(new Integer(0), multiplicities.size() - 1);
-		TreeElement node = instance.resolveReference(getChildInstanceRef(elements, multiplicities));
-		int numRepetitions = 0;
-		if (node != null) {
-			String name = node.getName();
-			numRepetitions = node.getParent().getChildMultiplicity(name);
-		}
+		TreeElement templNode = instance.getTemplate(index.getReference());
+		TreeReference parentPath = templNode.getParent().getRef().genericize();
+		TreeElement parentNode = instance.resolveReference(parentPath.contextualize(index.getReference()));
+		return parentNode.getChildMultiplicity(templNode.getName());
+	}
+	
+	//repIndex == -1 => next repetition about to be created
+	public FormIndex descendIntoRepeat(FormIndex index, int repIndex) {
+		int numRepetitions = getNumRepetitions(index);
+		
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+		collapseIndex(index, indexes, multiplicities, elements);
 		
 		if (repIndex == -1) {
 			repIndex = numRepetitions;

@@ -196,7 +196,10 @@ public class ChatterboxWidgetFactory {
     	for (int i = 0; i < choices.size(); i++) {
         	prompt.addSelectChoice(new SelectChoice(null, choices.elementAt(i), "rep" + i, false));
     	}
-    	prompt.addSelectChoice(new SelectChoice(null, capt.getRepeatText(choices.size() > 0 ? "add" : "add-empty"), "new", false));
+    	
+    	if (model.getForm().canCreateRepeat(model.getForm().getChildInstanceRef(index))) {
+    		prompt.addSelectChoice(new SelectChoice(null, capt.getRepeatText(choices.size() > 0 ? "add" : "add-empty"), "new", false));
+    	}
     	if (choices.size() > 0) {
     		prompt.addSelectChoice(new SelectChoice(null, capt.getRepeatText("del"), "del", false));
     	}

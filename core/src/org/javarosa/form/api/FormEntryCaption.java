@@ -300,22 +300,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	
 	//this should probably be somewhere better
 	public int getNumRepetitions () {
-		Vector indexes = new Vector();
-		Vector multiplicities = new Vector();
-		Vector elements = new Vector();
-
-		form.collapseIndex(index, indexes, multiplicities, elements);
-
-		//so painful
-		multiplicities.setElementAt(new Integer(0), multiplicities.size() - 1);
-		TreeElement node = form.getInstance().resolveReference(form.getChildInstanceRef(elements, multiplicities));
-		int numRepetitions = 0;
-		if (node != null) {
-			String name = node.getName();
-			numRepetitions = node.getParent().getChildMultiplicity(name);
-		}
-
-		return numRepetitions;
+		return form.getNumRepetitions(index);
 	}
 	
 	public String getRepetitionText(String type, boolean newrep) {
