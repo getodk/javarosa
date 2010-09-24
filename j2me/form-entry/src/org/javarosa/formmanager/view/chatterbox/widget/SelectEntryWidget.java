@@ -27,6 +27,7 @@ import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
+import org.javarosa.utilities.media.MediaUtils;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
@@ -215,7 +216,7 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
 			SelectChoice sc = prompt.getSelectChoices().elementAt(i);
-			Image im = ExpandedWidget.getImage(prompt.getSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
+			Image im = MediaUtils.getImage(prompt.getSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
 
 			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(sc));
 			
