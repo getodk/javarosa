@@ -353,6 +353,35 @@ public class FormEntryCaption implements FormElementStateListener {
 		return reps;
 	}
 	
+	public class RepeatOptions {
+		public String header;
+		public String add;
+		public String delete;
+		public String done;
+		public String delete_header;
+	}
+	
+	public RepeatOptions getRepeatOptions () {
+		RepeatOptions ro = new RepeatOptions();
+		boolean has_repetitions = (getNumRepetitions() > 0);
+		
+		ro.header = getRepeatText("mainheader");
+		
+		ro.add = null;
+    	if (form.canCreateRepeat(form.getChildInstanceRef(index))) {
+    		ro.add = getRepeatText(has_repetitions ? "add" : "add-empty");
+    	}
+    	ro.delete = null;
+    	ro.delete_header = null;
+    	if (has_repetitions) {
+    		ro.delete = getRepeatText("del");
+    		ro.delete_header = getRepeatText("delheader");
+    	}
+    	ro.done = getRepeatText(has_repetitions ? "done" : "done-empty");
+
+    	return ro;
+	}
+	
 	public String getAppearanceHint ()  {
 		return element.getAppearanceAttr();
 	}

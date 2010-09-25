@@ -191,19 +191,20 @@ public class ChatterboxWidgetFactory {
     public ChatterboxWidget getRepeatJunctureWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
     	FormEntryCaption capt = model.getCaptionPrompt(index);
     	Vector<String> choices = capt.getRepetitionsText();
+    	FormEntryCaption.RepeatOptions repopt = capt.getRepeatOptions();
     	
-    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt(capt.getRepeatText("mainheader"), Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt(repopt.header, Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
     	for (int i = 0; i < choices.size(); i++) {
         	prompt.addSelectChoice(new SelectChoice(null, choices.elementAt(i), "rep" + i, false));
     	}
     	
-    	if (model.getForm().canCreateRepeat(model.getForm().getChildInstanceRef(index))) {
-    		prompt.addSelectChoice(new SelectChoice(null, capt.getRepeatText(choices.size() > 0 ? "add" : "add-empty"), "new", false));
+    	if (repopt.add != null) {
+    		prompt.addSelectChoice(new SelectChoice(null, repopt.add, "new", false));
     	}
-    	if (choices.size() > 0) {
-    		prompt.addSelectChoice(new SelectChoice(null, capt.getRepeatText("del"), "del", false));
+    	if (repopt.delete != null) {
+    		prompt.addSelectChoice(new SelectChoice(null, repopt.delete, "del", false));
     	}
-    	prompt.addSelectChoice(new SelectChoice(null, capt.getRepeatText(choices.size() > 0 ? "done" : "done-empty"), "done", false));
+    	prompt.addSelectChoice(new SelectChoice(null, repopt.done, "done", false));
 		
 		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }
@@ -212,7 +213,7 @@ public class ChatterboxWidgetFactory {
     	FormEntryCaption capt = model.getCaptionPrompt(index);
     	Vector<String> choices = capt.getRepetitionsText();
     	
-    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt(capt.getRepeatText("delheader"), Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt(capt.getRepeatOptions().delete_header, Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
     	for (int i = 0; i < choices.size(); i++) {
         	prompt.addSelectChoice(new SelectChoice(null, choices.elementAt(i), "del" + i, false));
     	}
