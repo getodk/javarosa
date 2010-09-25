@@ -303,8 +303,8 @@ public class FormEntryCaption implements FormElementStateListener {
 		return form.getNumRepetitions(index);
 	}
 	
-	public String getRepetitionText(String type, boolean newrep) {
-		return getRepetitionText(type, index, newrep);
+	public String getRepetitionText(boolean newrep) {
+		return getRepetitionText("header", index, newrep);
 	}
 	
 	private String getRepetitionText(String type, FormIndex index, boolean newrep) {

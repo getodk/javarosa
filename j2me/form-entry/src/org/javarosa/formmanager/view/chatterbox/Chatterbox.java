@@ -437,7 +437,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 		String headerText; //decide what text form to use.
 		
 		boolean isNew = uncommittedRepeats.contains(model.getForm().decrementIndex(questionIndex)); //this is ghetto
-		headerText = prompt.getRepetitionText("header", isNew); //droos: this doesn't feel right... should this if/else be wrapped up in the caption?
+		headerText = prompt.getRepetitionText(isNew); //droos: this doesn't feel right... should this if/else be wrapped up in the caption?
 		if (headerText == null) {
 		
 			if(prompt.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_LONG)){
