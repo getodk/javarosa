@@ -2,7 +2,6 @@ package org.javarosa.demo.applogic;
 
 import org.javarosa.formmanager.api.GetFormListHttpState;
 
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 
@@ -33,96 +32,94 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.services.transport.senders.SenderThread;
 
-public class JRDemoGetFormListHTTPState implements State,HandledCommandListener,TransportListener, HttpFetchTransitions
-{
-	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
-	public final Command CMD_RETRY = new Command("Retry",Command.BACK, 1);
-	private ProgressScreenFormDownload progressScreen = new ProgressScreenFormDownload("Searching","Please Wait. Contacting Server...",this);
-	
-	private String getListUrl; 
+public class JRDemoGetFormListHTTPState implements State,
+		HandledCommandListener, TransportListener, HttpFetchTransitions {
+	private ProgressScreenFormDownload progressScreen = new ProgressScreenFormDownload(
+			"Searching", "Please Wait. Contacting Server...", this);
+
+	private String getListUrl;
 	private String credentials;
-	
+
 	private String requestPayload = "#";
-	
+
 	private SenderThread thread;
 
 	private String response;
-	
+
 	public JRDemoGetFormListHTTPState(String url) {
 		this.getListUrl = url;
 	}
-	
-	public void SetURL(String url)
-	{
+
+	public void SetURL(String url) {
 		getListUrl = url;
 	}
-	
-	public String getUrl()
-	{
+
+	public String getUrl() {
 		return getListUrl;
 	}
-	
-	public String getUserName()
-	{
+
+	public String getUserName() {
 		return "";
 	}
-	
-	private void init(){
 
-		if (getListUrl.indexOf("?")>=0) 
+	private void init() {
+
+		if (getListUrl.indexOf("?") >= 0)
 			credentials = "";
 		else
 			credentials = "";
-			//credentials = "?user=" + getUserName();
+		// credentials = "?user=" + getUserName();
 		requestPayload = credentials;
 	}
-	
+
 	public void start() {
-		progressScreen.addCommand(CMD_CANCEL);
 		J2MEDisplay.setView(progressScreen);
 		init();
 		fetchList();
 	}
-	
-	
+
 	public void fetchList() {
-		SimpleHttpTransportMessageGet message= new SimpleHttpTransportMessageGet(requestPayload,getListUrl+credentials);//send username and url
+		SimpleHttpTransportMessageGet message = new SimpleHttpTransportMessageGet(
+				requestPayload, getListUrl + credentials);// send username and
+		// url
 		message.setCacheable(false);
-		
+
 		try {
-			thread = TransportService.send(message);
+			thread = TransportService.send(message, 1, 0);// only one try if
+															// we're going to
+															// give a retry
+															// option
 			thread.addListener(this);
 		} catch (TransportException e) {
-			fail("Error Downloading List! Transport Exception while downloading forms list " + e.getMessage());
+			fail("Error Downloading List! Transport Exception while downloading forms list "
+					+ e.getMessage());
 		}
 	}
-	
+
 	private void fail(String message) {
-//		progressScreen.setText(message);
-//		progressScreen.addCommand(CMD_RETRY);
-		JRDemoFormListState state = new JRDemoFormListState();
-		state.start();
-		state.bla();
-		
+		progressScreen.setText(message);
+		progressScreen.stopProgressBar();
+		progressScreen.addCommand(progressScreen.CMD_RETRY);
+
 	}
 
 	public void commandAction(Command c, Displayable d) {
 		CrashHandler.commandAction(this, c, d);
-	}  
+	}
 
 	public void _commandAction(Command command, Displayable display) {
-		if(display== progressScreen){
-			if(command == CMD_CANCEL){
+		if (display == progressScreen) {
+			if (command == progressScreen.CMD_CANCEL) {
 				cancel();
 			}
-			if(command == CMD_RETRY) {
-				progressScreen = new ProgressScreenFormDownload("Searching","Please Wait. Contacting Server...",this);
-				progressScreen.addCommand(CMD_CANCEL);
+			if (command == progressScreen.CMD_RETRY) {
+				progressScreen = new ProgressScreenFormDownload("Searching",
+						"Please Wait. Contacting Server...", this);
 				J2MEDisplay.setView(progressScreen);
 				fetchList();
 			}
 		}
-		
+
 	}
 
 	public void process(byte[] response) {
@@ -133,35 +130,62 @@ public class JRDemoGetFormListHTTPState implements State,HandledCommandListener,
 				this.response = sResponse;
 				System.out.print(sResponse);
 			} catch (UnsupportedEncodingException e) {
-				throw new FatalException("can't happen; utf8 must be supported", e);
+				throw new FatalException(
+						"can't happen; utf8 must be supported", e);
 			}
 		}
-		
-		//FIXME - resolve the responses to be received from the webserver
-		if(sResponse ==null){
-			//TODO: I don't think this is even possible.
+
+		// FIXME - resolve the responses to be received from the webserver
+		if (sResponse == null) {
+			// TODO: I don't think this is even possible.
 			fail("Null Response from server");
-		}else if(sResponse.equals("WebServerResponses.GET_LIST_ERROR")){
+		} else if (sResponse.equals("WebServerResponses.GET_LIST_ERROR")) {
 			fail("Get List Error from Server");
-		}else if(sResponse.equals("WebServerResponses.GET_LIST_NO_SURVEY")){
+		} else if (sResponse.equals("WebServerResponses.GET_LIST_NO_SURVEY")) {
 			fail("No survey error from server");
-		}else{
+		} else {
 			fetched();
 		}
-		
-	}
-	
-	public void onChange(TransportMessage message, String remark) {
-		progressScreen.setText(remark);
+
 	}
 
-	public void onStatusChange(TransportMessage message) {
-		if(message.getStatus() == TransportMessageStatus.SENT) {
-			//TODO: Response codes signal statuses?
-			process(((SimpleHttpTransportMessageGet)message).getResponseBody());
-		} else {
-			fail("Transport Failure: " + message.getFailureReason());
+	/*
+	 * This is actually the method that gets called on status change (?!)
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.services.transport.TransportListener#onChange(org.javarosa
+	 * .services.transport.TransportMessage, java.lang.String)
+	 */
+	public void onChange(TransportMessage message, String remark) {
+		int responsecode = ((SimpleHttpTransportMessageGet) message)
+				.getResponseCode(); // 200 success, 0 no response yet
+		if ((responsecode != 200) && (responsecode != 0)) {
+			fail("Error getting list from server");
+		} else if (message.getStatus() == TransportMessageStatus.SENT) {
+
+			process(((SimpleHttpTransportMessageGet) message).getResponseBody());
+
+		} else if (message.getStatus() == TransportMessageStatus.FAILED) {
+			String failMessage = message.getFailureReason() != null ? "Transport Failure: "
+					+ message.getFailureReason()
+					: "Transport Failure";
+			fail(failMessage);
 		}
+	}
+
+	/*
+	 * And this seems to get called on completion
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.javarosa.services.transport.TransportListener#onStatusChange(org.
+	 * javarosa.services.transport.TransportMessage)
+	 */
+	public void onStatusChange(TransportMessage message) {
+		onChange(message, "");
 	}
 
 	public void cancel() {
@@ -169,11 +193,10 @@ public class JRDemoGetFormListHTTPState implements State,HandledCommandListener,
 	}
 
 	public byte[] fetched() {
-		JRDemoRemoteFormListState jr = new JRDemoRemoteFormListState(this.response);
+		JRDemoRemoteFormListState jr = new JRDemoRemoteFormListState(
+				this.response);
 		jr.start();
 		return null;
 	}
-	
-	
 
 }

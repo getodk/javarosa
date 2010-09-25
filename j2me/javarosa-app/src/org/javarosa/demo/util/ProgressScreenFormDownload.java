@@ -15,20 +15,31 @@ public class ProgressScreenFormDownload extends Form{
 	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
 	public final Command CMD_RETRY = new Command("Retry",Command.ITEM, 1);
 
-	public ProgressScreenFormDownload(String title,String msg,CommandListener cmdListener) {
+	public ProgressScreenFormDownload(String title,String  msg,CommandListener cmdListener) {
+		//#style capturingPopup
 		super(title);
-		//#style loadingGauge
-		progressbar = new Gauge(null, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING );
+		//#style capturingGauge
+		progressbar = new Gauge(msg, false, Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING );
 
 		addCommand(CMD_CANCEL);
 		append(progressbar);
 		setCommandListener(cmdListener);
-		updater_T = new HandledThread(new GaugeUpdater());
-		updater_T.start();
+		
+		// TODO if this is ever an incremental progress bar, put this back in?
+		// updater_T = new HandledThread(new GaugeUpdater());
+		// updater_T.start();
 	}
 	
 	public void setText(String text) {
 		progressbar.setLabel(text);
+	}
+	
+	public void stopProgressBar(){
+		progressbar.setValue(Gauge.CONTINUOUS_IDLE);
+	}
+	
+	public void startProgressBar(){
+		progressbar.setValue(Gauge.CONTINUOUS_RUNNING);
 	}
 	
 	public void closeThread(){

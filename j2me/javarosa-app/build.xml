@@ -66,6 +66,7 @@
 				<!-- All source-level inclusions should be made here -->
 				<sources>
 					<source dir="${dir.src}"/>
+					<source dir="${dir.locationsrc}" if="${app.uselocation}" />					
 				</sources>
 
 				<!-- Build variables -->

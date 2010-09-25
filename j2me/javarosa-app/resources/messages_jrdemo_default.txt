@@ -108,7 +108,7 @@ title.Login=Login
 title.SavedForms=Saved Forms
 
 chatterbox.button.next=Done
-button.Next=VOLGENDE
+button.Next=NEXT
 button.Yes=YES
 button.No=NO
 
