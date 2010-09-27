@@ -65,9 +65,9 @@ public class FormEntryModel {
         IFormElement element = form.getChild(index);
         if (element instanceof GroupDef) {
             if (((GroupDef) element).getRepeat()) {
-                if (!FormIndex.EXPERIMENTAL_API && form.getInstance().resolveReference(form.getChildInstanceRef(index)) == null) {
+                if (!FormIndex.NONLINEAR_REPEAT_API && form.getInstance().resolveReference(form.getChildInstanceRef(index)) == null) {
                     return FormEntryController.EVENT_PROMPT_NEW_REPEAT;
-                } else if (FormIndex.EXPERIMENTAL_API && index.getElementMultiplicity() == TreeReference.INDEX_REPEAT_JUNCTURE) {
+                } else if (FormIndex.NONLINEAR_REPEAT_API && index.getElementMultiplicity() == TreeReference.INDEX_REPEAT_JUNCTURE) {
                 	return FormEntryController.EVENT_REPEAT_JUNCTURE;
                 } else {
                     return FormEntryController.EVENT_REPEAT;

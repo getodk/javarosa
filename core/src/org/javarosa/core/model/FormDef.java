@@ -1004,7 +1004,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				// specified instance actually exists
 				GroupDef group = (GroupDef) elements.elementAt(i);
 				if (group.getRepeat()) {
-					if (FormIndex.EXPERIMENTAL_API) {
+					if (FormIndex.NONLINEAR_REPEAT_API) {
 						
 						if (((Integer)multiplicities.lastElement()).intValue() == TreeReference.INDEX_REPEAT_JUNCTURE) {
 						
@@ -1029,7 +1029,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				multiplicities.addElement(new Integer(0));
 				elements.addElement((i == -1 ? this : (IFormElement) elements.elementAt(i)).getChild(0));
 				
-				if (FormIndex.EXPERIMENTAL_API) {
+				if (FormIndex.NONLINEAR_REPEAT_API) {
 					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
 						multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), multiplicities.size() - 1);
 					}
@@ -1045,7 +1045,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			// (repeat-not-existing can only happen at lowest level; exitRepeat
 			// will be true)
 			if (!exitRepeat && elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements.elementAt(i)).getRepeat()) {
-				if (FormIndex.EXPERIMENTAL_API) {
+				if (FormIndex.NONLINEAR_REPEAT_API) {
 					
 					multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), i);
 
@@ -1074,7 +1074,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				multiplicities.setElementAt(new Integer(0), i);
 				elements.setElementAt(parent.getChild(curIndex + 1), i);
 				
-				if (FormIndex.EXPERIMENTAL_API) {
+				if (FormIndex.NONLINEAR_REPEAT_API) {
 					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
 						multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), multiplicities.size() - 1);
 					}
@@ -1116,12 +1116,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			int curIndex = ((Integer) indexes.elementAt(i)).intValue();
 			int curMult = ((Integer) multiplicities.elementAt(i)).intValue();
 
-			if (FormIndex.EXPERIMENTAL_API && 
+			if (FormIndex.NONLINEAR_REPEAT_API && 
 				elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat() &&
 				((Integer)multiplicities.lastElement()).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
 				multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), i);
 				return;
-			} else if (!FormIndex.EXPERIMENTAL_API && curMult > 0) {
+			} else if (!FormIndex.NONLINEAR_REPEAT_API && curMult > 0) {
 				multiplicities.setElementAt(new Integer(curMult - 1), i);
 			} else if (curIndex > 0) {
 				// set node to previous element
@@ -1168,7 +1168,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				TreeElement parentNode = instance.resolveReference(nodeRef.getParentRef());
 				mult = parentNode.getChildMultiplicity(name);
 			}
-			multiplicities.setElementAt(new Integer(FormIndex.EXPERIMENTAL_API ? TreeReference.INDEX_REPEAT_JUNCTURE : mult), multiplicities.size() - 1);
+			multiplicities.setElementAt(new Integer(FormIndex.NONLINEAR_REPEAT_API ? TreeReference.INDEX_REPEAT_JUNCTURE : mult), multiplicities.size() - 1);
 			return true;
 		} else {
 			return false;

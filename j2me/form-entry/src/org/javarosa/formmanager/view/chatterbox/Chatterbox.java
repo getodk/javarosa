@@ -271,15 +271,8 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	//figure out kind of reference and how to handle it
     	IFormElement last = model.getForm().getChild(questionIndex);
     	
-    	//i am jack's boiling rage
-		Vector indexes = new Vector();
-		Vector multiplicities = new Vector();
-		Vector elements = new Vector();
-		model.getForm().collapseIndex(questionIndex, indexes, multiplicities, elements);
-    	int mult = ((Integer)multiplicities.lastElement()).intValue();
-    	
     	if (last instanceof GroupDef) {
-    		if (!FormIndex.EXPERIMENTAL_API && ((GroupDef)last).getRepeat() &&	
+    		if (!FormIndex.NONLINEAR_REPEAT_API && ((GroupDef)last).getRepeat() &&	
     			model.getForm().getInstance().resolveReference(model.getForm().getChildInstanceRef(questionIndex)) == null) {
     			
     			//We're at a repeat interstitial point. If the group has the right configuration, we are able
@@ -298,7 +291,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     				//All Systems Go. Display an interstitial "Add another FOO" question.
         			newRepeat = true;
     			}
-    		} else if (FormIndex.EXPERIMENTAL_API && ((GroupDef)last).getRepeat() && mult == TreeReference.INDEX_REPEAT_JUNCTURE) {
+    		} else if (FormIndex.NONLINEAR_REPEAT_API && model.getEvent() == FormEntryController.EVENT_REPEAT_JUNCTURE) {
     			
     			//show repeat juncture question here
     			System.out.println("you've reached a repeat");
@@ -476,7 +469,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		return;
     	
     	if (expanded && qType != Q_NORMAL) {
-    		if (FormIndex.EXPERIMENTAL_API) {
+    		if (FormIndex.NONLINEAR_REPEAT_API) {
     			if (qType == Q_REPEAT_JUNCTURE) {
     				//TODO: make rollback work
 //    				if (!forward && uncommittedRepeats.contains(questionIndex)) {    				
@@ -657,7 +650,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		}
     		String answer = ((Selection)frame.getData().getValue()).getValue();
     		
-    		if (!FormIndex.EXPERIMENTAL_API) {
+    		if (!FormIndex.NONLINEAR_REPEAT_API) {
     		
 	    		if (answer.equals("y")) {
 	    			controller.newRepeat(this.model.getFormIndex());
