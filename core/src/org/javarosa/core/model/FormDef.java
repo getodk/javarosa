@@ -104,7 +104,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		triggerables = new Vector();
 		triggerablesInOrder = true;
 		triggerIndex = new Hashtable();
-		conditionRepeatTargetIndex = new Hashtable();
 		setEvaluationContext(new EvaluationContext());
 		outputFragments = new Vector();
 	}
@@ -407,26 +406,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 					triggered.addElement(t);
 				}
 			}
-
-			if (t instanceof Condition) {
-				// droos 5/14: this this might be a bug? what if we encounter
-				// the same condition again, but the targets
-				// have since changed? we'll return the original condition
-				// (above), and not update this index
-				Vector targets = t.getTargets();
-				for (int i = 0; i < targets.size(); i++) {
-					TreeReference target = (TreeReference) targets.elementAt(i);
-					if (instance.getTemplate(target) != null) {
-						conditionRepeatTargetIndex.put(target, (Condition) t);
-					}
-				}
-			}
-
+			
 			return t;
 		}
 	}
 
 	public void finalizeTriggerables () {
+		//
+		//DAGify the triggerables based on dependencies and sort them so that
+		//trigbles come only after the trigbles they depend on
+		//
+		
 		Vector partialOrdering = new Vector();
 		for (int i = 0; i < triggerables.size(); i++) {
 			Triggerable t = (Triggerable)triggerables.elementAt(i);
@@ -488,8 +478,27 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 		
 		triggerablesInOrder = true;
+		
+		//
+		//build the condition index for repeatable nodes
+		//
+		
+		conditionRepeatTargetIndex = new Hashtable();
+		for (int i = 0; i < triggerables.size(); i++) {
+			Triggerable t = (Triggerable)triggerables.elementAt(i);
+			if (t instanceof Condition) {
+				Vector targets = t.getTargets();
+				for (int j = 0; j < targets.size(); j++) {
+					TreeReference target = (TreeReference) targets.elementAt(j);
+					if (instance.getTemplate(target) != null) {
+						conditionRepeatTargetIndex.put(target, (Condition) t);
+					}
+				}
+			}
+		}
+
 	}
-	
+		
 	public void initializeTriggerables() {
 		initializeTriggerables(TreeReference.rootRef());
 	}

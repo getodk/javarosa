@@ -1451,9 +1451,8 @@ public class XFormParser {
 		loadInstanceData(e, root, f); //FIXME: FormDef param is temporary
 		
 		checkDependencyCycles(f);
-		f.finalizeTriggerables();
-		
 		f.setInstance(instanceModel);
+		f.finalizeTriggerables();		
 		
 		//print unused attribute warning message for parent element
 		if(XFormUtils.showUnusedAttributeWarning(e, usedAtts)){

@@ -117,4 +117,8 @@ public class XPathConditional implements IConditionExpr {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(expr));
 	}
+	
+	public String toString () {
+		return "xpath[" + expr.toString() + "]";
+	}
 }
