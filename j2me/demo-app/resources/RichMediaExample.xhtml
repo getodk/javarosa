@@ -1,0 +1,107 @@
+<h:html xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/2002/xforms"
+	  xmlns:ev="http://www.w3.org/2001/xml-events"
+	  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	  xmlns:jr="http://openrosa.org/javarosa">
+<h:head>
+    <h:title>RichMedia subforms example test</h:title>
+    <meta jr:name="rm-subforms-test"/>
+    <model>
+		<instance>
+			<patients>
+				<patient>
+					<id />
+					<full-name />
+					<sex />
+					<weight-history>
+						<reading>
+							<weight />
+							<taken-on />
+						</reading>
+					</weight-history>
+				</patient>
+			</patients>
+		</instance>
+
+		<bind nodeset="/patients/patient/full-name" required="true()" />
+		<bind nodeset="/patients/patient/sex" required="true()" />
+		<bind nodeset="/patients/patient/weight-history/reading/weight" type="xsd:int" required="true()" />
+		<bind nodeset="/patients/patient/weight-history/reading/taken-on" type="xsd:date" required="true()" />
+		
+		<itext>
+			<translation lang="English">
+				<text id="patient">
+				  <value>Patient</value>
+				</text>
+				<text id="id">
+				  <value form="long">Patient ID</value>
+				  <value form="short">ID</value>
+				</text>
+				<text id="full-name">
+				  	<value form="long">Full Name</value>
+					<value form="short">Name</value>
+					<value form="audio">full-name.mp3</value> 
+				</text>
+				<text id="sex">
+					<value>Sex</value>
+				</text>
+				<text id="sex-male">
+					<value form="long">Male</value>
+					<value form="short">M</value>
+					<value>Male</value>
+					<value form="audio">sex-male.mp3</value> 
+				</text>
+				<text id="sex-female">
+				  <value>Female</value>
+				</text>
+				<text id="sex-unknown">
+				  <value>Unknown</value>
+				</text>				
+				<text id="weight-reading">
+				  <value>Weight Reading</value>
+				</text>
+				<text id="weight">
+				  <value>Weight</value>
+				</text>
+				<text id="weight-date">
+				  <value form="long">Date Taken</value>
+				  <value form="short">Taken</value>
+				</text>
+				<text id="taken-on">
+				  <value form="long">Taken On</value>
+				  <value form="short">Taken</value>
+				</text>
+			</translation>
+		</itext>
+
+	</model>
+</h:head>
+<h:body>
+	<group>
+		<label ref="jr:itext('patient')" />
+		<repeat nodeset="patient" jr:initCount="1">
+		
+			<input ref="id"><label ref="jr:itext('id')" /></input>
+			<input ref="full-name"><label ref="jr:itext('full-name')" /></input>
+			<select1 ref="sex">
+				<label ref="jr:itext('sex')" />
+				<item><label ref="jr:itext('sex-male')"/><value>m</value></item>
+				<item><label ref="jr:itext('sex-female')" /><value>f</value></item>
+				<item><label ref="jr:itext('sex-unknown')" /><value>u</value></item>
+			</select1>
+			
+			<group>
+				<label ref="jr:itext('weight-reading')" />
+				<repeat nodeset="weight-history/reading">
+				
+					<input ref="weight"><label ref="jr:itext('weight')" /></input>
+					<input ref="taken-on"><label ref="jr:itext('weight-date')" /></input>
+					
+				</repeat>
+			</group>
+			
+		</repeat>
+	</group>
+
+</h:body>
+</h:html>

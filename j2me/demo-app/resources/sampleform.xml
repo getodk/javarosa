@@ -1,0 +1,79 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:jr="http://openrosa.org/javarosa">
+  <h:head>
+    <h:meta name="name" content="demo" />
+    <h:meta name="version" content="0.1" />
+    <h:title>Demo Form</h:title>
+
+    <model>
+      <instance>
+		<x>
+			<a />
+			<b />
+			<g1>
+			  <a />
+			  <r1 jr:template="">
+			    <a />
+			    <g2>
+			      <a />
+			      <r2 jr:template="">
+			        <a />
+			        <b />
+			      </r2>
+			      <b />
+			    </g2>
+			    <b />
+			  </r1>
+			  <c />
+			</g1>
+			<d />
+		</x>
+
+      </instance>
+      
+    </model>
+  </h:head>
+  <h:body>
+  
+    <input ref="a"><label>a</label></input>
+    <input ref="b"><label>b</label></input>
+    
+    <group ref="g1">
+    
+    <input ref="a"><label>g1 a</label></input>
+
+    <repeat nodeset="r1">
+
+    <input ref="a"><label>g1 r1 a</label></input>
+    
+    <group ref="g2">
+    
+    <input ref="a"><label>g1 r1 g2 a</label></input>
+    
+    <repeat nodeset="r2">
+    
+    <input ref="a"><label>g1 r1 g2 r2 a</label></input>
+    <input ref="b"><label>g1 r1 g2 r2 b</label></input>
+    
+    </repeat>
+    
+    <input ref="b"><label>g1 r1 g2 b</label></input>
+    
+    </group>
+    
+    <input ref="b"><label>g1 r1 b</label></input>
+    
+    </repeat>
+    
+    <input ref="c"><label>g1 c</label></input>
+    
+    </group>
+    
+    <input ref="d"><label>d</label></input>
+
+
+  </h:body>
+</h:html>
