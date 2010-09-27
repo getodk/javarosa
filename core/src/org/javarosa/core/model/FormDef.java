@@ -300,12 +300,22 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 	
 	public boolean isRepeatRelevant (TreeReference repeatRef) {
+		boolean relev = true;
+		
 		Condition c = (Condition) conditionRepeatTargetIndex.get(repeatRef.genericize());
 		if (c != null) {
-			return c.evalBool(instance, new EvaluationContext(exprEvalContext, repeatRef));
-		} else {
-			return true;
+			relev = c.evalBool(instance, new EvaluationContext(exprEvalContext, repeatRef));
 		}
+
+		//check the relevancy of the immediate parent
+		if (relev) {
+			TreeElement templNode = instance.getTemplate(repeatRef);
+			TreeReference parentPath = templNode.getParent().getRef().genericize();
+			TreeElement parentNode = instance.resolveReference(parentPath.contextualize(repeatRef));
+			relev = parentNode.isRelevant();
+		}
+	
+		return relev;
 	}
 
 	public boolean canCreateRepeat(TreeReference repeatRef) {
