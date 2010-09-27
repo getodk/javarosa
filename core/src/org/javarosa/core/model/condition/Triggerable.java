@@ -125,4 +125,14 @@ public abstract class Triggerable implements Externalizable {
 		ExtUtil.write(out, contextRef);
 		ExtUtil.write(out, new ExtWrapList(targets));
 	}	
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < targets.size(); i++) {
+			sb.append(((TreeReference)targets.elementAt(i)).toString());
+			if (i < targets.size() - 1)
+				sb.append(",");
+		}
+		return "trig[expr:" + expr.toString() + ";targets[" + sb.toString() + "]]";
+	}
 }
