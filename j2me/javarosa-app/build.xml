@@ -110,6 +110,9 @@
 					<parameter name="keep   ,     allowShrinking" value="!abstract class org.javarosa.** implements org.javarosa.core.services.locale.LocaleDataSource"/>
 					<parameter name="keep        ,       allowShrinking" value="class * implements org.javarosa.services.transport.TransportMessage"/>
 					<parameter name="keep       ,         allowShrinking" value="class * implements org.javarosa.core.services.storage.WrappingStorageUtility.SerializationWrapper"/>
+					<parameter name="keep              " value="class org.javarosa.core.model.SubmissionProfile"/>
+					<parameter name="keep          ,            allowShrinking" value="class org.javarosa.core.model.SubmissionProfile"/>
+					<parameter name="keep            ,              allowShrinking" value="class * extends org.javarosa.core.model.SubmissionProfile"/>
 				</obfuscator>
 
 				<!-- log settings: only use debug setting when the test-property is true -->
@@ -167,13 +170,13 @@
 	</target>
 	
 	<!-- Main Target: Cleans, and then runs the build target -->
-	<target name="BuildClean" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean,disableObfuscator, BuildPolish"/>
+	<target name="BuildClean" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, BuildPolish"/>
 	
 	<!-- Main Target: Cleans, enables all release configurations and runs the build target -->
 	<target name="BuildRelease" description="allows a clean build. You should call [ant cleanbuild] whenever you made changes to devices.xml, vendors.xml or groups.xml" depends="Clean, enableRelease, BuildPolish"/>
 
 	<!-- Main Target: Cleans, and then runs the build target with the emulator -->
-	<target name="BuildCleanRunEmulator" description="allows a clean build, and then launches the emulator" depends="Clean, enableEmulator, BuildPolish" />
+	<target name="BuildCleanRunEmulator" description="allows a clean build, and then launches the emulator" depends="disableObfuscator, Clean, enableEmulator, BuildPolish" />
 
 	<target name="BuildRunEmulator" description="allows a clean build, and then launches the emulator" depends="disableObfuscator, enableEmulator, BuildPolish" />
 
@@ -182,7 +185,7 @@
 	<target name="LaunchEmulatorAndProfilers" description="debugs the project" depends="enableDebug, enableEmulator, BuildPolish" />
 	
 	<target name="DecomposeJar" depends="BuildClean">
-		<taskdef name="py-run" onerror="report" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.3.jar"/>
+		<taskdef name="py-run" onerror="report" classname="org.pyant.tasks.PythonRunTask" classpath="${dir.tools}/pyAntTasks-1.2.jar"/>
 	    <py-run script="${dir.tools}/jar_usage.py" optimize="0" python="${pythonexec}">
 	      <arg value="${basedir}\dist\${app.jarName}"/>
 	      <arg value="${basedir}\dist\obfuscation_mapping.txt"/>
