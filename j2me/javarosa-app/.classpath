@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="**/.svn/|**/CVS/" kind="src" path="src"/>
-	<classpathentry excluding="**/ExtensionIntegrationTests.java" kind="src" path="test"/>
 	<classpathentry kind="src" path="/org.javarosa.polish.activity"/>
 	<classpathentry kind="src" path="/org.javarosa.user"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
