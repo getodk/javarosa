@@ -63,74 +63,48 @@ public class JRDemoContext {
 	public void init (MIDlet m) {
 		DumpRMS.RMSRecoveryHook(m);
 		
-		setMidlet(m);
 		loadModules();
 		
-		IStorageUtility forms = StorageManager.getStorage(FormDef.STORAGE_KEY);
-		if (forms.getNumRecords() == 0) {
-			loadForms(forms);
-		}
+		//After load modules, so polish translations can be inserted.
+		setMidlet(m);
+		
 		addCustomLanguages();
 		setProperties();
 			
 		UserUtility.populateAdminUser();
 		loadRootTranslator();
-	}
-	
-	private void loadForms (IStorageUtility forms) {
-		/**try {
-			//forms.write(XFormUtils.getFormFromResource("/shortform.xhtml"));
-			//forms.write(XFormUtils.getFormFromResource("/intelligibleshortform.xhtml"));
-			//forms.write(XFormUtils.getFormFromResource("/CHMTTL.xhtml"));
-			//forms.write(XFormUtils.getFormFromResource("/condtest.xhtml"));
-			//forms.write(XFormUtils.getFormFromResource("/patient-entry.xhtml"));
-			//forms.write(XFormUtils.getFormFromResource("/imci.xml"));
-			//forms.write(XFormUtils.getFormFromResource("/PhysicoChemTestsDemo.xhtml"));
-			//forms.write(XFormUtils.getFormFromResource("/ImageSelectTester.xhtml"));
-			//forms.write(XFormUtils.getFormFromResource("/sampleform.xml"));
-			//forms.write(XFormUtils.getFormFromResource("/itemset_test.xml"));
-			
-		} catch (StorageFullException e) {
-			throw new RuntimeException("uh-oh, storage full [forms]"); //TODO: handle this
-		}**/
-	}
-	
-	
+	}	
 
 	private void loadModules() {
 		new J2MEModule().registerModule();
 		new JavaRosaCoreModule().registerModule();
 		new CoreModelModule().registerModule();
 		new XFormsModule().registerModule();
-		//new LanguagePackModule().registerModule();
 		new TransportManagerModule().registerModule();
 		new UserModule().registerModule();
 		new FormManagerModule().registerModule();
-		//new LanguagePackModule().registerModule();
+		new LanguagePackModule().registerModule();
 	}
 	
 	
 	private void addCustomLanguages() {
-//		Localization.registerLanguageFile("Afrikaans", "./messages_afr.txt");
-//		Localization.registerLanguageFile("Dari", "./messages_dari.txt");
-	//	Localization.registerLanguageFile("Espagnol", "./messages_es.txt");
-//		Localization.registerLanguageFile("Swahili", "./messages_sw.txt");
-		Localization.registerLanguageFile("Portuguese", "/messages_jrdemo_pt.txt");		
-		Localization.registerLanguageFile("English", "/messages_jrdemo_en.txt");		
+		Localization.registerLanguageFile("pt", "/messages_jrdemo_pt.txt");		
 		Localization.registerLanguageFile("default", "/messages_jrdemo_default.txt");
 	}
 	
 	private void setProperties() {
 		final String POST_URL = midlet.getAppProperty("JRDemo-Post-Url");
-		final String POST_URL_LIST = midlet.getAppProperty("JRDemo-Post-Url-List");
+		final String FORM_URL = midlet.getAppProperty("Form-Server-Url");
+		final String LANGUAGE = midlet.getAppProperty("cur_locale");
 		PropertyManager._().addRules(new JavaRosaPropertyRules());
 		PropertyManager._().addRules(new DemoAppProperties());
 
 		PropertyUtils.initializeProperty("DeviceID", PropertyUtils.genGUID(25));
-		PropertyUtils.initializeProperty(DemoAppProperties.POST_URL_LIST_PROPERTY, POST_URL_LIST);
-		System.out.println("Inicialmente a propriedade eh : " + POST_URL);
 
 		PropertyUtils.initializeProperty(DemoAppProperties.POST_URL_PROPERTY, POST_URL);
+		PropertyUtils.initializeProperty(DemoAppProperties.FORM_URL_PROPERTY, FORM_URL);
+		
+		LanguageUtils.initializeLanguage(false, LANGUAGE == null ? "default" : LANGUAGE);
 
 	}
 	
@@ -149,7 +123,6 @@ public class JRDemoContext {
 		//as possible_ so that we don't either (A) blow up the memory or (B) lose the ability
 		//to send payloads > than the phones' heap.
 		
-		System.out.println("A propriedade eh"+PropertyManager._().getSingularProperty(DemoAppProperties.POST_URL_PROPERTY));
 		try {
 			return new SimpleHttpTransportMessage(payload.getPayloadStream(), PropertyManager._().getSingularProperty(DemoAppProperties.POST_URL_PROPERTY));
 		} catch (IOException e) {

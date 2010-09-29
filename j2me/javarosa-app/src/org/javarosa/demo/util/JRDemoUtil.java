@@ -55,17 +55,16 @@ public class JRDemoUtil {
 	}
 
 	public static void start() {
-		Vector propVal =PropertyManager._().getProperty(JavaRosaPropertyRules.CURRENT_LOCALE);
+		String locale = PropertyManager._().getSingularProperty(JavaRosaPropertyRules.CURRENT_LOCALE);
 
-		
-		if (propVal == null || propVal.size() == 0)
+		// We assume that a completely un-set or a default locale choice indicates that the user has
+		// yet to specify the app language
+		if (locale == null || locale.equals("default"))
 		{
-			LanguageUtils.initializeLanguage(true, "default");
 			new JRDemoLanguageSelectState().start();
 		}
 		else
 		{
-			LanguageUtils.initializeLanguage(true, (String) propVal.elementAt(0));
 			new JRDemoSplashScreenState().start();
 		}
 	}

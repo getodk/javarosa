@@ -23,6 +23,7 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.model.FormDef;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
@@ -40,7 +41,7 @@ import org.javarosa.xform.util.XFormUtils;
 
 public abstract class GetFormHttpStateGet implements State,TrivialTransitions,HandledCommandListener,TransportListener {
 
-	private ProgressScreenFormDownload progressScreen =  new ProgressScreenFormDownload("Downloadng","Please Wait. Fetching Form...", this);
+	private ProgressScreenFormDownload progressScreen =  new ProgressScreenFormDownload(Localization.get("jrdemo.downloading"),Localization.get("jrdemo.fetching"), this);
 
 	private ByteArrayInputStream bin;
 
@@ -84,7 +85,7 @@ public abstract class GetFormHttpStateGet implements State,TrivialTransitions,Ha
 				sendThread.cancel();
 				done();
 			} if(command == progressScreen.CMD_RETRY) {
-				progressScreen = new ProgressScreenFormDownload("Downloadng","Please Wait. Fetching Form...", this);
+				progressScreen = new ProgressScreenFormDownload(Localization.get("jrdemo.downloading"),Localization.get("jrdemo.fetching"),this);
 				J2MEDisplay.setView(progressScreen);
 				fetchForm();
 			}

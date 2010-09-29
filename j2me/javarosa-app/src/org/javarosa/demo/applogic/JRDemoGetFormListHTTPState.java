@@ -1,15 +1,5 @@
 package org.javarosa.demo.applogic;
 
-import org.javarosa.formmanager.api.GetFormListHttpState;
-
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.Displayable;
-
-import org.javarosa.core.api.State;
-import org.javarosa.core.util.TrivialTransitions;
-import org.javarosa.j2me.log.HandledCommandListener;
-import org.javarosa.services.transport.TransportListener;
-import org.javarosa.services.transport.TransportMessage;
 import java.io.UnsupportedEncodingException;
 
 import javax.microedition.lcdui.Command;
@@ -17,10 +7,10 @@ import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.log.FatalException;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.demo.util.ProgressScreenFormDownload;
 import org.javarosa.demo.util.SimpleHttpTransportMessageGet;
 import org.javarosa.formmanager.api.transitions.HttpFetchTransitions;
-import org.javarosa.formmanager.view.ProgressScreen;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -29,13 +19,12 @@ import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.TransportService;
 import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
-import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.services.transport.senders.SenderThread;
 
 public class JRDemoGetFormListHTTPState implements State,
 		HandledCommandListener, TransportListener, HttpFetchTransitions {
 	private ProgressScreenFormDownload progressScreen = new ProgressScreenFormDownload(
-			"Searching", "Please Wait. Contacting Server...", this);
+			Localization.get("jrdemo.searching"), Localization.get("jrdemo.contacting"), this);
 
 	private String getListUrl;
 	private String credentials;
@@ -113,8 +102,8 @@ public class JRDemoGetFormListHTTPState implements State,
 				cancel();
 			}
 			if (command == progressScreen.CMD_RETRY) {
-				progressScreen = new ProgressScreenFormDownload("Searching",
-						"Please Wait. Contacting Server...", this);
+				progressScreen = new ProgressScreenFormDownload(
+						Localization.get("jrdemo.searching"), Localization.get("jrdemo.contacting"), this);
 				J2MEDisplay.setView(progressScreen);
 				fetchList();
 			}

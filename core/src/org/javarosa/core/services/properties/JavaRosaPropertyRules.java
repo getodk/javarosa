@@ -154,6 +154,12 @@ public class JavaRosaPropertyRules implements IPropertyRules {
      * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableValue(java.lang.String, java.lang.String)
      */
     public String getHumanReadableValue(String propertyName, String value) {
+    	if(CURRENT_LOCALE.equals(propertyName)) {
+    		String name = Localization.getGlobalLocalizerAdvanced().getText(value);
+    		if(name != null) {
+    			return name;
+    		}
+    	}
     	return value;
     }
     
