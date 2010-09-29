@@ -55,7 +55,6 @@ public class SubmissionProfile implements Externalizable {
 		return mediaType;
 	}
 
-	@Override
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		ref = (IDataReference)ExtUtil.read(in, new ExtWrapTagged(IDataReference.class));
 		method = ExtUtil.readString(in);
@@ -63,7 +62,6 @@ public class SubmissionProfile implements Externalizable {
 		mediaType = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 	}
 
-	@Override
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(ref));
 		ExtUtil.writeString(out, method);
