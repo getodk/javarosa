@@ -20,7 +20,7 @@
 		<exclude name="j2me/location/src/org/javarosa/location/**/*.java"/>
 		
 		<!-- exclude the demo app code -->
-		<exclude name="j2me/demo-app/src/**/*.java"/>
+		<exclude name="j2me/javarosa-app/src/**/*.java"/>
 
 		<!-- stuff that hasn't been updated to build on the new framework -->
 		<exclude name="j2me/deprecated/org.javarosa.reminders/**/*.java"/>
