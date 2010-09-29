@@ -11,7 +11,7 @@ import org.javarosa.core.services.locale.Localization;
 
 public class JRDemoRemoteFormListView extends List {
 
-	public final Command CMD_BACK = new Command(Localization.get("jrdemo.remoteformlist.command.back"), Command.BACK, 1);
+	public final Command CMD_BACK = new Command(Localization.get("polish.command.back"), Command.BACK, 1);
 	
 	public JRDemoRemoteFormListView (String title, Hashtable remoteForms, boolean admin) {
 		super(title, List.IMPLICIT);

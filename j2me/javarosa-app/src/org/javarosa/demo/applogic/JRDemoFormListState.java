@@ -19,9 +19,6 @@ public class JRDemoFormListState implements JRDemoFormListTransitions, State {
 		ctrl.start();	
 	}
 
-	public void bla(){
-		System.out.println("bla reached");
-	}
 	public void formSelected(int formID) {
 		FormInstance formInstance = JRDemoUtil.getSavedFormInstance(formID);
 		new JRDemoFormEntryState(formID).start();
@@ -56,6 +53,6 @@ public class JRDemoFormListState implements JRDemoFormListTransitions, State {
 	}
 
 	public void downloadForms() {
-	    new JRDemoGetFormListHTTPState(PropertyManager._().getSingularProperty(DemoAppProperties.POST_URL_LIST_PROPERTY)).start();
+	    new JRDemoGetFormListHTTPState(PropertyManager._().getSingularProperty(DemoAppProperties.FORM_URL_PROPERTY)).start();
 	}
 }

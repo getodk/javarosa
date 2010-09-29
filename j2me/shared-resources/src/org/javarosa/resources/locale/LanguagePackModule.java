@@ -42,7 +42,7 @@ public class LanguagePackModule implements IModule {
 		
 		Localization.setDefaultLocale("default");
 		
-		Localization.setLocale("en");
+		Localization.setLocale("default");
 	}
 
 }

@@ -377,3 +377,10 @@ user.entity.unknown=Unknown
 repeat.repitition=repetition
 repeat.message.single=Add ${0}?
 repeat.message.multiple=Add another ${0}?
+
+#List of two-letter->Language Mappings
+en=English
+pt=Portuguese
+es=Español
+sw=Kiswahili
+af=Afrikaans

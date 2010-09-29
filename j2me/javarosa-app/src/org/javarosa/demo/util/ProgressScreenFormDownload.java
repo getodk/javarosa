@@ -5,15 +5,15 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 
-import org.javarosa.j2me.log.HandledThread;
+import org.javarosa.core.services.locale.Localization;
 
 
 public class ProgressScreenFormDownload extends Form{
 	
 	private Gauge progressbar;
 	private Thread updater_T;
-	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
-	public final Command CMD_RETRY = new Command("Retry",Command.ITEM, 1);
+	public final Command CMD_CANCEL = new Command(Localization.get("polish.command.cancel"),Command.BACK, 1);
+	public final Command CMD_RETRY = new Command(Localization.get("menu.retry"),Command.ITEM, 1);
 
 	public ProgressScreenFormDownload(String title,String  msg,CommandListener cmdListener) {
 		//#style capturingPopup

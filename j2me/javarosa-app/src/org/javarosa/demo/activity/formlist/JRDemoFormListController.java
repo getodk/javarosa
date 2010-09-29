@@ -5,7 +5,6 @@ import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.List;
 
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.OrderedHashtable;
@@ -14,6 +13,8 @@ import org.javarosa.demo.util.JRDemoUtil;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
+
+import de.enough.polish.ui.List;
 
 public class JRDemoFormListController implements HandledCommandListener {
 

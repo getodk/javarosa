@@ -56,7 +56,7 @@
 					<attribute name="JR-Build-Version" value="${jr-build-version}" />
 					<attribute name="Polish-Device" value="${device.identifier}" />
 					<attribute name="JRDemo-Post-Url" value="${jrdemo.postUrl}" />
-					<attribute name="JRDemo-Post-Url-List" value="${jrdemo.postUrlList}" />
+					<attribute name="Form-Server-Url" value="${jrdemo.formListUrl}" />
 				</jad>
 				
 				<!-- midlets definition -->
@@ -75,7 +75,7 @@
 				</variables>
 
 				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) -->
-                <resources defaultexcludes="no" excludes="readme.txt">
+                <resources defaultexcludes="no" excludes="readme.txt, *.orig, polish.css">
                     <root dir="${dir.resources-external}" />
                     <root dir="${dir.resources}" />
                     <!-- Set the language for the strings in the application -->
@@ -251,6 +251,10 @@
 		<property name="test" value="true" />
 		<property name="dir.work" value="build/test" />
 	</target>
+	
+	<!-- import properties which introduce localization hacks for 
+		     j2me polish commands and UI elements                     -->
+	<property file="${basedir}/polish.localehacks.properties" />
 	
 	<!-- import local specific properties                          -->
 	<property file="${basedir}/local.properties" />

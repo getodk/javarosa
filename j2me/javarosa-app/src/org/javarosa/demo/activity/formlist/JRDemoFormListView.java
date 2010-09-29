@@ -15,9 +15,9 @@ import de.enough.polish.ui.TextField;
 public class JRDemoFormListView extends List {
 
 	public final Command CMD_VIEW_SAVED = new Command(Localization.get("jrdemo.formlist.command.viewsaved"), Command.OK, 3);
-	public final Command CMD_EXIT = new Command(Localization.get("jrdemo.formlist.command.exit"), Command.EXIT, 8);
+	public final Command CMD_EXIT = new Command(Localization.get("polish.command.exit"), Command.EXIT, 8);
 	public final Command CMD_DOWNLOAD_FORMS = new Command(Localization.get("jrdemo.formlist.command.downloadforms"),Command.EXIT,2);
-	public final Command CMD_SETTINGS = new Command(Localization.get("jrdemo.formlist.command.settings"),Command.SCREEN,5);
+	public final Command CMD_SETTINGS = new Command(Localization.get("menu.Settings"),Command.SCREEN,5);
 
 	Image img;
 	
@@ -32,7 +32,7 @@ public class JRDemoFormListView extends List {
 //		try { 
 		
 		//#style downloadNewForms
-		this.append("Download New Forms", null);//Image.createImage("/download_form_en.jpg"));
+		this.append(Localization.get("jrdemo.formlist.command.downloadforms"), null);//Image.createImage("/download_form_en.jpg"));
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}

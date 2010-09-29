@@ -10,7 +10,7 @@ import org.javarosa.demo.util.SavedFormListItem;
 
 public class JRDemoSavedFormListView extends List {
 
-	public final Command CMD_BACK = new Command(Localization.get("jrdemo.savedformlist.command.back"), Command.BACK, 1);
+	public final Command CMD_BACK = new Command(Localization.get("polish.command.back"), Command.BACK, 1);
 	public final Command CMD_SEND_DATA = new Command(Localization.get("jrdemo.savedformlist.command.senddata"), Command.OK, 1);
 	
 	public JRDemoSavedFormListView (String title, Vector formNames) {

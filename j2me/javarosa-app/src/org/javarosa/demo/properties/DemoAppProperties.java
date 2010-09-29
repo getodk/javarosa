@@ -21,6 +21,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.IPropertyRules;
 
 /**
@@ -35,8 +36,8 @@ public class DemoAppProperties implements IPropertyRules {
 	    Vector readOnlyProperties;
 
 		// http, since it doesn't go in transport layer anymore
-	    public final static String POST_URL_LIST_PROPERTY = "PostURLlist";
 	    public final static String POST_URL_PROPERTY = "PostURL";
+	    public final static String FORM_URL_PROPERTY = "form_url";
 	    
 	    /**
 	     * Creates the JavaRosa set of property rules
@@ -45,19 +46,9 @@ public class DemoAppProperties implements IPropertyRules {
 	        rules = new Hashtable();
 	        readOnlyProperties = new Vector();
 	        	        
-	        // PostURL List Property
-	        rules.put(POST_URL_LIST_PROPERTY, new Vector());
-	        Vector postList = PropertyManager._().getProperty(POST_URL_LIST_PROPERTY);
-	        if(postList == null) {
-	        	PropertyManager._().setProperty(POST_URL_LIST_PROPERTY, new Vector());
-	        }
-	        
 	        // PostURL Property
 	        rules.put(POST_URL_PROPERTY, new Vector());
-	        Vector postUrl = PropertyManager._().getProperty(POST_URL_PROPERTY);
-	        if(postUrl == null) {
-	        	PropertyManager._().setProperty(POST_URL_PROPERTY, new Vector());
-	        }
+	        rules.put(FORM_URL_PROPERTY, new Vector());
 	    }
 
 	    /** (non-Javadoc)
@@ -122,19 +113,11 @@ public class DemoAppProperties implements IPropertyRules {
 	     * @see org.javarosa.core.services.properties.IPropertyRules#getHumanReadableDescription(java.lang.String)
 	     */
 	    public String getHumanReadableDescription(String propertyName) {
-/**	    	if(HEALTH_UNIT_PROPERTY.equals(propertyName)) {
-	    		return "Health Unit";
-	    	} else if(HEALTH_UNIT_CODE_PROPERTY.equals(propertyName)) {
-	    		return "Health Unit Code";
-	    	} else if(SUBCOUNTY_PROPERTY.equals(propertyName)) {
-	    		return "Sub County";
-	     	} else if(DISTRICT_PROPERTY.equals(propertyName)) {
-	    		return "District";
-	     	} else if(HSD_PROPERTY.equals(propertyName)) {
-	    		return "HSD";
-	     	} else if(FIN_YEAR_PROPERTY.equals(propertyName)) {
-	    		return "Financial Year";
-	     	}**/
+	    	if(POST_URL_PROPERTY.equals(propertyName)) {
+	    		return Localization.get("jrdemo.posturi");
+	    	} else if(FORM_URL_PROPERTY.equals(propertyName)) {
+	    		return Localization.get("jrdemo.formuri");
+	    	}
 	    	
 	    	return propertyName;
 	    }

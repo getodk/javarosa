@@ -26,11 +26,17 @@ import org.javarosa.formmanager.view.singlequestionscreen.SingleQuestionView;
 
 
 public class JRDemoFormEntryViewFactory implements IFormEntryViewFactory {
+	
+	String title;
+	
+	public JRDemoFormEntryViewFactory(String title) {
+		this.title = title;
+	}
 	public IFormEntryView getFormEntryView (JrFormEntryController controller) {
 		String viewType = PropertyManager._().getSingularProperty(FormManagerProperties.VIEW_TYPE_PROPERTY);		
 		
 		if (FormManagerProperties.VIEW_CHATTERBOX.equals(viewType)) {
-			return new Chatterbox("Chatterbox", controller);
+			return new Chatterbox(title, controller);
 			
 		} else if (FormManagerProperties.VIEW_SINGLEQUESTIONSCREEN.equals(viewType)) {
 			return new SingleQuestionView(controller);

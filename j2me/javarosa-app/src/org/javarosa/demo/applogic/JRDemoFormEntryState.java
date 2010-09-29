@@ -53,7 +53,11 @@ public class JRDemoFormEntryState extends FormEntryState {
 		FormDef form = fetcher.getFormDef();
 		
 		JrFormEntryController controller =  new JrFormEntryController(new JrFormEntryModel(form));
-		controller.setView(new JRDemoFormEntryViewFactory().getFormEntryView(controller));
+		String title = form.getTitle();
+		if(title == null) {
+			title = "Enter Data";
+		}
+		controller.setView(new JRDemoFormEntryViewFactory(title).getFormEntryView(controller));
 		return controller;
 	}
 

@@ -25,21 +25,12 @@ public class JRDemoLanguageSelectState implements JRDemoSelectLanguageTransition
 	
 	public void languageSelected(String language)
 	{
-		System.out.println("Before Selection :"+ Localization.get("jrdemo.selectlanguage.title"));
-
-		System.out.println("The language selected was : "+language);
-
-		
 		Localization.setLocale(language);
 		
-		
-		System.out.println("IS passed of from initialization : ");
-	
-		System.out.println("After Selection :"+ Localization.get("jrdemo.selectlanguage.title"));
+		PropertyManager._().setProperty(JavaRosaPropertyRules.CURRENT_LOCALE, language);
 	
 		new JRDemoSplashScreenState().start();
 		
-		//new JRDemoFormListState().start();
 
 	}
 }

@@ -42,9 +42,10 @@ public class JRDemoSelectLanguageController implements HandledCommandListener {
 	public void _commandAction(Command c, Displayable d) {
 		if (d == view) {
 			if (c == List.SELECT_COMMAND) {
-				int index = view.getSelectedIndex();
-				if (index != -1)
-					transitions.languageSelected( languageList[index]  );
+				String key = view.getSelected();
+				if(key != null) {
+					transitions.languageSelected( key  );
+				}
 			}else if (c == view.CMD_EXIT) {
 				transitions.exit();
 			} 
