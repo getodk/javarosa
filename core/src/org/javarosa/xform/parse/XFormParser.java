@@ -74,6 +74,21 @@ import org.xmlpull.v1.XmlPullParserException;
  *
  */
 public class XFormParser {
+	
+	//Constants to clean up code and prevent user error
+	private static final String ID_ATTR = "id";
+	private static final String FORM_ATTR = "form";
+	private static final String APPEARANCE_ATTR = "appearance";
+	private static final String NODESET_ATTR = "nodeset";
+	private static final String LABEL_ELEMENT = "label";
+	private static final String VALUE = "value";
+	private static final String ITEXT_CLOSE = "')";
+	private static final String ITEXT_OPEN = "jr:itext('";
+	private static final String BIND_ATTR = "bind";
+	private static final String REF_ATTR = "ref";
+	private static final String SELECTONE = "select1";
+	private static final String SELECT = "select";
+	
 	public static final String NAMESPACE_JAVAROSA = "http://openrosa.org/javarosa";
 	public static final String NAMESPACE_HTML = "http://www.w3.org/1999/xhtml";
 
@@ -146,8 +161,8 @@ public class XFormParser {
 		groupLevelHandlers = new Hashtable();
 		groupLevelHandlers.put("input", input);
 		groupLevelHandlers.put("secret",secret);
-		groupLevelHandlers.put("select", select);
-		groupLevelHandlers.put("select1", select1);
+		groupLevelHandlers.put(SELECT, select);
+		groupLevelHandlers.put(SELECTONE, select1);
 		groupLevelHandlers.put("group", group);
 		groupLevelHandlers.put("repeat", repeat);
 		groupLevelHandlers.put("trigger", trigger); //multi-purpose now; need to dig deeper
@@ -162,7 +177,7 @@ public class XFormParser {
 		topLevelHandlers.put("title", title);
 		topLevelHandlers.put("meta", meta);
 
-		groupLevelHandlers.put("label", groupLabel);
+		groupLevelHandlers.put(LABEL_ELEMENT, groupLabel);
 	}
 
 	private static void initTypeMappings () {
@@ -187,8 +202,8 @@ public class XFormParser {
 		typeMappings.put("anyURI", new Integer(Constants.DATATYPE_UNSUPPORTED));        //xsd:
 		typeMappings.put("listItem", new Integer(Constants.DATATYPE_CHOICE));           //xforms:
 		typeMappings.put("listItems", new Integer(Constants.DATATYPE_CHOICE_LIST));	    //xforms:	
-		typeMappings.put("select1", new Integer(Constants.DATATYPE_CHOICE));	        //non-standard	
-		typeMappings.put("select", new Integer(Constants.DATATYPE_CHOICE_LIST));        //non-standard
+		typeMappings.put(SELECTONE, new Integer(Constants.DATATYPE_CHOICE));	        //non-standard	
+		typeMappings.put(SELECT, new Integer(Constants.DATATYPE_CHOICE_LIST));        //non-standard
 		typeMappings.put("geopoint", new Integer(Constants.DATATYPE_GEOPOINT));         //non-standard
 		typeMappings.put("barcode", new Integer(Constants.DATATYPE_BARCODE));           //non-standard
         typeMappings.put("binary", new Integer(Constants.DATATYPE_BINARY));             //non-standard
@@ -385,7 +400,7 @@ public class XFormParser {
 				//we save parsing the instance node until the end, giving us the information we need about
 				//binds and data types and such
 				saveInstanceNode(child);
-			} else if ("bind".equals(childName)) { //<instance> must come before <bind>s
+			} else if (BIND_ATTR.equals(childName)) { //<instance> must come before <bind>s
 				parseBind(f, child);
 			} else if("submission".equals(childName)) {
 				submissionBlocks.addElement(child);
@@ -397,7 +412,7 @@ public class XFormParser {
 				}
 			}
 			
-			if(child == null || "bind".equals(childName) || "itext".equals(childName)) {
+			if(child == null || BIND_ATTR.equals(childName) || "itext".equals(childName)) {
 				//Clayton Sims - Jun 17, 2009 - This code is used when the stinginess flag
 				//is set for the build. It dynamically wipes out old model nodes once they're
 				//used. This is sketchy if anything else plans on touching the nodes.
@@ -416,7 +431,7 @@ public class XFormParser {
 	}
 	
 	private static void parseSubmission(FormDef def, Element submission) {
-		String id = submission.getAttributeValue(null, "id");
+		String id = submission.getAttributeValue(null, ID_ATTR);
 		
 		//These two are always required
 		String method = submission.getAttributeValue(null, "method");
@@ -430,8 +445,8 @@ public class XFormParser {
 		}
 		
 		//These two might exist, but if neither do, we just assume you want the entire instance.
-		String ref = submission.getAttributeValue(null, "ref");
-		String bind = submission.getAttributeValue(null, "bind");
+		String ref = submission.getAttributeValue(null, REF_ATTR);
+		String bind = submission.getAttributeValue(null, BIND_ATTR);
 		
 		IDataReference dataRef = null;
 		boolean refFromBind = false;
@@ -517,15 +532,15 @@ public class XFormParser {
 		question.setID(serialQuestionID++); //until we come up with a better scheme
 		
 		Vector usedAtts = new Vector();
-		usedAtts.addElement("ref");
-		usedAtts.addElement("bind");
-		usedAtts.addElement("appearance");
+		usedAtts.addElement(REF_ATTR);
+		usedAtts.addElement(BIND_ATTR);
+		usedAtts.addElement(APPEARANCE_ATTR);
 		
 		IDataReference dataRef = null;
 		boolean refFromBind = false;
 		
-		String ref = e.getAttributeValue(null, "ref");
-		String bind = e.getAttributeValue(null, "bind");
+		String ref = e.getAttributeValue(null, REF_ATTR);
+		String bind = e.getAttributeValue(null, BIND_ATTR);
 		
 		if (bind != null) {
 			DataBinding binding = (DataBinding)bindingsByID.get(bind);
@@ -559,14 +574,14 @@ public class XFormParser {
 
 		boolean isSelect = (controlType == Constants.CONTROL_SELECT_MULTI || controlType == Constants.CONTROL_SELECT_ONE);
 		question.setControlType(controlType);
-		question.setAppearanceAttr(e.getAttributeValue(null, "appearance"));
+		question.setAppearanceAttr(e.getAttributeValue(null, APPEARANCE_ATTR));
 
 		for (int i = 0; i < e.getChildCount(); i++) {
 			int type = e.getType(i);
 			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
 			String childName = (child != null ? child.getName() : null);
 
-			if ("label".equals(childName)) {
+			if (LABEL_ELEMENT.equals(childName)) {
 				parseQuestionLabel(f, question, child);
 			} else if ("hint".equals(childName)) {
 				parseHint(f, question, child);
@@ -597,14 +612,14 @@ public class XFormParser {
 
 	private static void parseQuestionLabel (FormDef f, QuestionDef q, Element e) {
 		String label = getLabel(e, f);
-		String ref = e.getAttributeValue("", "ref");
+		String ref = e.getAttributeValue("", REF_ATTR);
 		
 		Vector usedAtts = new Vector();
-		usedAtts.addElement("ref");
+		usedAtts.addElement(REF_ATTR);
 		
 		if (ref != null) {
-			if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
-				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
+			if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
+				String textRef = ref.substring(ITEXT_OPEN.length(), ref.indexOf(ITEXT_CLOSE));
 
 				verifyTextMappings(f, textRef, "Question <label>", true);
 				q.setTextID(textRef);
@@ -626,15 +641,15 @@ public class XFormParser {
 			return; //ignore child <label>s for <repeat>; the appropriate <label> must be in the wrapping <group>
 		
 		Vector usedAtts = new Vector();
-		usedAtts.addElement("ref");
+		usedAtts.addElement(REF_ATTR);
 		
 		
 		String label = getLabel(e, f);
-		String ref = e.getAttributeValue("", "ref");
+		String ref = e.getAttributeValue("", REF_ATTR);
 
 		if (ref != null) {
-			if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
-				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
+			if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
+				String textRef = ref.substring(ITEXT_OPEN.length(), ref.indexOf(ITEXT_CLOSE));
 
 				verifyTextMappings(f, textRef, "Group <label>", true);
 				g.setTextID(textRef);
@@ -754,12 +769,12 @@ public class XFormParser {
 	
 	private static String parseOutput (Element e, FormDef f) {
 		Vector usedAtts = new Vector();
-		usedAtts.addElement("ref");
-		usedAtts.addElement("value");
+		usedAtts.addElement(REF_ATTR);
+		usedAtts.addElement(VALUE);
 		
-		String xpath = e.getAttributeValue(null, "ref");
+		String xpath = e.getAttributeValue(null, REF_ATTR);
 		if (xpath == null) {
-			xpath = e.getAttributeValue(null, "value");
+			xpath = e.getAttributeValue(null, VALUE);
 		}
 		if (xpath == null) {
 			throw new XFormParseException("XForm Parse: <output> without 'ref' or 'value'",e);	
@@ -792,13 +807,13 @@ public class XFormParser {
 	
 	private static void parseHint (FormDef f, QuestionDef q, Element e) {
 		Vector usedAtts = new Vector();
-		usedAtts.addElement("ref");
+		usedAtts.addElement(REF_ATTR);
 		String hint = getXMLText(e, true);
-		String ref = e.getAttributeValue("", "ref");
+		String ref = e.getAttributeValue("", REF_ATTR);
 
 		if (ref != null) {
-			if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
-				String textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
+			if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
+				String textRef = ref.substring(ITEXT_OPEN.length(), ref.indexOf(ITEXT_CLOSE));
 
 				verifyTextMappings(f, textRef, "<hint>", false);
 				q.setHelpTextID(textRef);
@@ -821,8 +836,8 @@ public class XFormParser {
 		Vector usedAtts = new Vector();
 		Vector labelUA = new Vector();
 		Vector valueUA = new Vector();
-		labelUA.addElement("ref");
-		valueUA.addElement("form");
+		labelUA.addElement(REF_ATTR);
+		valueUA.addElement(FORM_ATTR);
 		
 		
 		String label = null;
@@ -834,25 +849,25 @@ public class XFormParser {
 			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
 			String childName = (child != null ? child.getName() : null);
 
-			if ("label".equals(childName)) {
+			if (LABEL_ELEMENT.equals(childName)) {
 				
 				//print attribute warning for child element
 				if(XFormUtils.showUnusedAttributeWarning(child, labelUA)){
 					System.out.println(XFormUtils.unusedAttWarning(child, labelUA));
 				}
 				label = getXMLText(child, true);
-				String ref = child.getAttributeValue("", "ref");
+				String ref = child.getAttributeValue("", REF_ATTR);
 
 				if (ref != null) {
-					if (ref.startsWith("jr:itext('") && ref.endsWith("')")) {
-						textRef = ref.substring("jr:itext('".length(), ref.indexOf("')"));
+					if (ref.startsWith(ITEXT_OPEN) && ref.endsWith(ITEXT_CLOSE)) {
+						textRef = ref.substring(ITEXT_OPEN.length(), ref.indexOf(ITEXT_CLOSE));
 
 						verifyTextMappings(f, textRef, "Item <label>", true);
 					} else {
 						throw new XFormParseException("malformed ref [" + ref + "] for <item>",child);
 					}
 				}
-			} else if ("value".equals(childName)) {
+			} else if (VALUE.equals(childName)) {
 				value = getXMLText(child, true);
 				
 				//print attribute warning for child element
@@ -870,7 +885,7 @@ public class XFormParser {
 									
 					if (" \n\t\f\r\'\"`".indexOf(c) >= 0) {
 						boolean isMultiSelect = (q.getControlType() == Constants.CONTROL_SELECT_MULTI);
-						System.err.println("XForm Parse WARNING: " + (isMultiSelect ? "select" : "select1") + " question <value>s [" + value + "] " +
+						System.err.println("XForm Parse WARNING: " + (isMultiSelect ? SELECT : SELECTONE) + " question <value>s [" + value + "] " +
 								(isMultiSelect ? "cannot" : "should not") + " contain spaces, and are recommended not to contain apostraphes/quotation marks" + getVagueLocation(child));
 						break;
 					}
@@ -906,14 +921,14 @@ public class XFormParser {
 		Vector labelUA = new Vector(); //for child with name 'label'
 		Vector valueUA = new Vector(); //for child with name 'value'
 		Vector copyUA = new Vector(); //for child with name 'copy'
-		usedAtts.addElement("nodeset");
-		labelUA.addElement("ref");
-		valueUA.addElement("ref");
-		valueUA.addElement("form");
-		copyUA.addElement("ref");
+		usedAtts.addElement(NODESET_ATTR);
+		labelUA.addElement(REF_ATTR);
+		valueUA.addElement(REF_ATTR);
+		valueUA.addElement(FORM_ATTR);
+		copyUA.addElement(REF_ATTR);
 		////////////////////////////////////////////////////
 		
-		String nodesetStr = e.getAttributeValue("", "nodeset");
+		String nodesetStr = e.getAttributeValue("", NODESET_ATTR);
 		if(nodesetStr == null ) throw new RuntimeException("No nodeset attribute in element: ["+e.getName()+"]. This is required. (Element Printout:"+XFormSerializer.elementToString(e)+")");
 		XPathPathExpr path = XPathReference.getPathExpr(nodesetStr);
 		itemset.nodesetExpr = new XPathConditional(path);
@@ -925,8 +940,8 @@ public class XFormParser {
 			Element child = (type == Node.ELEMENT ? e.getElement(i) : null);
 			String childName = (child != null ? child.getName() : null);
 
-			if ("label".equals(childName)) {
-				String labelXpath = child.getAttributeValue("", "ref");
+			if (LABEL_ELEMENT.equals(childName)) {
+				String labelXpath = child.getAttributeValue("", REF_ATTR);
 				boolean labelItext = false;
 				
 				//print unused attribute warning message for child element
@@ -949,7 +964,7 @@ public class XFormParser {
 				itemset.labelExpr = new XPathConditional(labelPath);
 				itemset.labelIsItext = labelItext;
 			} else if ("copy".equals(childName)) {
-				String copyRef = child.getAttributeValue("", "ref");
+				String copyRef = child.getAttributeValue("", REF_ATTR);
 
 				//print unused attribute warning message for child element
 				if(XFormUtils.showUnusedAttributeWarning(child, copyUA)){
@@ -962,8 +977,8 @@ public class XFormParser {
 				
 				itemset.copyRef = FormInstance.unpackReference(getAbsRef(new XPathReference(copyRef), itemset.nodesetRef));
 				itemset.copyMode = true;
-			} else if ("value".equals(childName)) {
-				String valueXpath = child.getAttributeValue("", "ref");
+			} else if (VALUE.equals(childName)) {
+				String valueXpath = child.getAttributeValue("", REF_ATTR);
 				
 				//print unused attribute warning message for child element
 				if(XFormUtils.showUnusedAttributeWarning(child, valueUA)){
@@ -1011,10 +1026,10 @@ public class XFormParser {
 		boolean refFromBind = false;
 		
 		Vector usedAtts = new Vector();
-		usedAtts.addElement("ref");
-		usedAtts.addElement("nodeset");
-		usedAtts.addElement("bind");
-		usedAtts.addElement("appearance");
+		usedAtts.addElement(REF_ATTR);
+		usedAtts.addElement(NODESET_ATTR);
+		usedAtts.addElement(BIND_ATTR);
+		usedAtts.addElement(APPEARANCE_ATTR);
 		usedAtts.addElement("count");
 		usedAtts.addElement("noAddRemove");
 		
@@ -1022,10 +1037,10 @@ public class XFormParser {
 			group.setRepeat(true);
 		}
 		
-		String ref = e.getAttributeValue(null, "ref");
-		String nodeset = e.getAttributeValue(null, "nodeset");
-		String bind = e.getAttributeValue(null, "bind");
-		group.setAppearanceAttr(e.getAttributeValue(null, "appearance"));
+		String ref = e.getAttributeValue(null, REF_ATTR);
+		String nodeset = e.getAttributeValue(null, NODESET_ATTR);
+		String bind = e.getAttributeValue(null, BIND_ATTR);
+		group.setAppearanceAttr(e.getAttributeValue(null, APPEARANCE_ATTR));
 		
 		if (bind != null) {
 			DataBinding binding = (DataBinding)bindingsByID.get(bind);
@@ -1235,15 +1250,15 @@ public class XFormParser {
 	}
 
 	private static void parseTextHandle (TableLocaleSource l, Element text, FormDef f) {
-		String id = text.getAttributeValue("", "id");
+		String id = text.getAttributeValue("", ID_ATTR);
 		
 		//used for parser warnings...
 		Vector usedAtts = new Vector();
 		Vector childUsedAtts = new Vector();
-		usedAtts.addElement("id");
-		usedAtts.addElement("form");
-		childUsedAtts.addElement("form");
-		childUsedAtts.addElement("id");
+		usedAtts.addElement(ID_ATTR);
+		usedAtts.addElement(FORM_ATTR);
+		childUsedAtts.addElement(FORM_ATTR);
+		childUsedAtts.addElement(ID_ATTR);
 		//////////
 		
 		if (id == null || id.length() == 0)
@@ -1252,11 +1267,11 @@ public class XFormParser {
 		for (int k = 0; k < text.getChildCount(); k++) {
 			Element value = text.getElement(k);
 			if (value == null) continue;
-			if(!value.getName().equals("value")){
+			if(!value.getName().equals(VALUE)){
 				throw new XFormParseException("Unrecognized element ["+value.getName()+"] in Itext->translation->text");
 			}
 
-			String form = value.getAttributeValue("", "form");
+			String form = value.getAttributeValue("", FORM_ATTR);
 			if (form != null && form.length() == 0)
 				form = null;
 			String data = getLabel(value, f);
@@ -1305,8 +1320,8 @@ public class XFormParser {
 		DataBinding binding  = new DataBinding();
 		
 		Vector usedAtts = new Vector();
-		usedAtts.addElement("id");
-		usedAtts.addElement("nodeset");
+		usedAtts.addElement(ID_ATTR);
+		usedAtts.addElement(NODESET_ATTR);
 		usedAtts.addElement("type");
 		usedAtts.addElement("relevant");
 		usedAtts.addElement("required");
@@ -1317,9 +1332,9 @@ public class XFormParser {
 		usedAtts.addElement("preload");
 		usedAtts.addElement("preloadParams");
 		
-		binding.setId(e.getAttributeValue("", "id"));
+		binding.setId(e.getAttributeValue("", ID_ATTR));
 
-		String nodeset = e.getAttributeValue(null, "nodeset");
+		String nodeset = e.getAttributeValue(null, NODESET_ATTR);
 		if (nodeset == null) {
 			throw new XFormParseException("XForm Parse: <bind> without nodeset",e);
 		}
