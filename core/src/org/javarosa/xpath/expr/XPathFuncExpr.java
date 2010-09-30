@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Random;
 import java.util.Vector;
 
 import me.regexp.RE;
@@ -160,6 +159,8 @@ public class XPathFuncExpr extends XPathExpression {
 			return multiSelected(argVals[0], argVals[1]);
 		} else if (name.equals("count-selected") && args.length == 1) { //non-standard
 			return countSelected(argVals[0]);		
+		} else if (name.equals("coalesce") && args.length == 2) {
+			return (!isNull(argVals[0]) ? argVals[0] : argVals[1]);
 		} else if (name.equals("count") && args.length == 1) {
 			return count(argVals[0]);
 		} else if (name.equals("sum") && args.length == 1) {
@@ -309,6 +310,18 @@ public class XPathFuncExpr extends XPathExpression {
 	 *     it must, strive to make it an XPathException
 	 * 
 	 */
+	
+	public static boolean isNull (Object o) {
+		if (o == null) {
+			return true; //true 'null' values aren't allowed in the xpath engine, but whatever
+		} else if (o instanceof String && ((String)o).length() == 0) {
+			return true;
+		} else if (o instanceof Double && ((Double)o).isNaN()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	/**
 	 * convert a value to a boolean using xpath's type conversion rules
