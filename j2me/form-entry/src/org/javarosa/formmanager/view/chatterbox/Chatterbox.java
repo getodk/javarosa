@@ -39,6 +39,7 @@ import org.javarosa.form.api.FormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
+import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
@@ -156,7 +157,12 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	//#if device.identifier == Sony-Ericsson/K610i
     	POUND_KEYCODE = Canvas.KEY_STAR;
     	//#endif
-
+    	
+    	if(PropertyManager._().getSingularProperty(FormManagerProperties.USE_HASH_FOR_AUDIO_PLAYBACK).equals(FormManagerProperties.HASH_AUDIO_PLAYBACK_YES)){
+    		USE_HASH_FOR_AUDIO = true;
+    	}else{
+    		USE_HASH_FOR_AUDIO = false;
+    	}
     }
     
 

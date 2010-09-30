@@ -30,6 +30,7 @@ import org.javarosa.core.model.data.UncastData;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
+import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.utilities.media.MediaUtils;
 
 import de.enough.polish.ui.Container;
@@ -45,8 +46,12 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	protected Item entryWidget;
 	private Container c;
 	private Container fullPrompt;
-
-
+	private int scrHeight,scrWidth;
+	
+	public static boolean AUTOPLAYAUDIO = false;
+	
+	/** Used during image scaling **/
+	public static int fallback = 99;
 	public ExpandedWidget () {
 		reset();
 	}
@@ -68,17 +73,27 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		
 		c.add(fullPrompt);
 		c.add(entryWidget);
+		scrHeight = J2MEDisplay.getScreenHeight(ExpandedWidget.fallback);
+		scrWidth = J2MEDisplay.getScreenWidth(ExpandedWidget.fallback);
+		
 		
 		this.c = c;
 	}
-	public static ImageItem getImageItem(FormEntryPrompt fep) {
+	public static ImageItem getImageItem(FormEntryPrompt fep,int height,int width) {
 //		Vector AvailForms = fep.getAvailableTextForms();
 		String IaltText;
 
 		IaltText = fep.getShortText();
 		Image im = MediaUtils.getImage(fep.getImageText());
 		if(im!=null){
-			ImageItem imItem = new ImageItem(null,MediaUtils.getImage(fep.getImageText()), ImageItem.LAYOUT_CENTER | ImageItem.LAYOUT_VCENTER, IaltText);
+			System.out.println("in getImageItem(), screen height:"+height+", screen width:"+width);
+			System.out.println("image dimensions = ["+im.getHeight()+", "+im.getWidth()+"]");
+			if(height != ExpandedWidget.fallback && width != ExpandedWidget.fallback){
+				int[] dim = MediaUtils.getNewDimensions(im, height, width);
+				System.out.println("Scaled dimensions = ["+dim[0]+", "+dim[1]+"]");
+				im = MediaUtils.resizeImage(im, dim[0], dim[1]);
+			}
+			ImageItem imItem = new ImageItem(null,im, ImageItem.LAYOUT_CENTER | ImageItem.LAYOUT_VCENTER, IaltText);
 			imItem.setLayout(Item.LAYOUT_CENTER);
 			return imItem;
 		}else{
@@ -103,7 +118,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 //			if(imItem!=null) fullPrompt.add(imItem);
 //			imageIndex = fullPrompt.indexOf(imItem);
 //		}
-		ImageItem newImItem = ExpandedWidget.getImageItem(fep);
+		ImageItem newImItem = ExpandedWidget.getImageItem(fep,scrHeight/2,scrWidth-16);
 		if(imItem!=null && newImItem!=null){
 			fullPrompt.remove(imItem);	//replace an already existing image
 		}
@@ -112,7 +127,9 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 			imItem = newImItem;
 		}
 		
-		Chatterbox.getAudioAndPlay(fep);
+		if(AUTOPLAYAUDIO){
+			Chatterbox.getAudioAndPlay(fep);
+		}
 		prompt.setText(fep.getLongText());	
 		updateWidget(fep);
 		
