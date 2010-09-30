@@ -152,29 +152,29 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	private void estimateHeights() {
 		int screenHeight = J2MEDisplay.getScreenHeight(320);
 		
+		//TODO: we should find a sane way of computing this dynamically
+		//the newer low-end phone have large-pixel screens but small dimensions, so the font size is large
+		//and our 'guess' here is way off
+		
 		//This is _super_ basic based on commonly available
 		//phones. We should actually wait for things to be drawn once
 		//and then recalculate for real;
-		
-		MAX_ROWS_ON_SCREEN = 5;
-		SCROLL_INCREMENT = 4;
 		
 //		if(screenHeight >= 300) { 
 //			MAX_ROWS_ON_SCREEN = 10;
 //		} else if(screenHeight >= 200) {
 //			MAX_ROWS_ON_SCREEN = 6;
 //		} else if(screenHeight >= 160) {
-//			MAX_ROWS_ON_SCREEN = 5;
+			MAX_ROWS_ON_SCREEN = 5;
 //		} else {
 //			MAX_ROWS_ON_SCREEN = 4;
-//		}
-//		
-//		
-//		if(MAX_ROWS_ON_SCREEN > 5) {
-//			SCROLL_INCREMENT = 5;
-//		} else {
-//			SCROLL_INCREMENT = 4;
-//		}
+//		}		
+		
+		if(MAX_ROWS_ON_SCREEN > 5) {
+			SCROLL_INCREMENT = 5;
+		} else {
+			SCROLL_INCREMENT = 4;
+		}
 	}
 	
 	private int[] padHints(int[] hints) {
