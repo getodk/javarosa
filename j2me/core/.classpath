@@ -7,7 +7,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
-	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/midp-2.0.jar">
+	<classpathentry exported="true" kind="var" path="J2ME_POLISH_HOME/import/midp-2.0.jar" sourcepath="/J2ME_POLISH_HOME/j2mepolish-src/j2me/src">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/C:/Users/adewinter/workspace/dimagi/library stuff/midpng-javadoc-final/javadoc/"/>
 		</attributes>

@@ -29,20 +29,22 @@ import org.javarosa.core.services.locale.Localization;
  *
  */
 public class LanguagePackModule implements IModule {
+	
+	public static final String[] locales = new String[] {"default", "en", "sw", "af", "es"};
 
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IModule#registerModule(org.javarosa.core.Context)
 	 */
 	public void registerModule() {
-		Localization.registerLanguageFile("default", "/messages_default.txt");
-		Localization.registerLanguageFile("en", "/messages_en.txt");
-		Localization.registerLanguageFile("sw","/messages_sw.txt");
-		Localization.registerLanguageFile("af","/messages_afr.txt");
-		Localization.registerLanguageFile("es","/messages_es.txt");
+		Localization.registerLanguageFile(locales[0], "/messages_default.txt");
+		Localization.registerLanguageFile(locales[1], "/messages_en.txt");
+		Localization.registerLanguageFile(locales[2],"/messages_sw.txt");
+		Localization.registerLanguageFile(locales[3],"/messages_afr.txt");
+		Localization.registerLanguageFile(locales[4],"/messages_es.txt");
 		
-		Localization.setDefaultLocale("default");
+		Localization.setDefaultLocale(locales[0]);
 		
-		Localization.setLocale("en");
+		Localization.setLocale(locales[0]);
 	}
 
 }

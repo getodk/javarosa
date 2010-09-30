@@ -95,6 +95,7 @@ public class J2MELogger implements ILogger {
 			
 			log("logs", "cleared", new Date());
 		}
+		}
 	}
 
 	/* (non-Javadoc)

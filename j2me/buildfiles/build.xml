@@ -15,6 +15,12 @@
 		<!-- exclude this until we've worked out issues with barcode apis -->
 		<exclude name="j2me/media/src/org/javarosa/barcode/**/*.java"/>
 		<exclude name="j2me/media/src/org/javarosa/view/**/Barcode*.java"/>
+		
+		<!-- don't want to put this in the jar for phones that don't suport location -->
+		<exclude name="j2me/location/src/org/javarosa/location/**/*.java"/>
+		
+		<!-- exclude the demo app code -->
+		<exclude name="j2me/javarosa-app/src/**/*.java"/>
 
 		<!-- stuff that hasn't been updated to build on the new framework -->
 		<exclude name="j2me/deprecated/org.javarosa.reminders/**/*.java"/>
@@ -43,11 +49,17 @@
 		
 		<path id="jr.classpath.test">
 			<path refid="jr.compiled.classpath" />
+			<fileset dir="buildTest" includes="jr-resource-jar.jar"/>
 			<fileset dir="${dir.lib}" includes="j2meunit-javarosa.jar"/>
 			<dirset dir="${basedir}">
 				<include name="buildTest/**"/>
 			</dirset>
 		</path>
+		
+		<!-- Get the resource files which'll be used -->
+		<fileset id="jr.resources" dir="${basedir}/../">
+			<include name="**/resources/*.txt"/>
+		</fileset>
 		
 		<mkdir dir="dist"/>
 		<mkdir dir="build"/>
@@ -114,20 +126,27 @@
 		<!-- Schweet, now turn it into a 'jar' file! -->
 		<zip destfile="dist/j2merosa-libraries.jar" basedir="build"/>
 	</target>
+	
+	<target name="packageTestResources">
+		<mkdir dir="buildTest"/>
+		<mkdir dir="buildTest/tmp"/>
+		<copy todir="buildTest/tmp">
+			<fileset refid="jr.resources"/>
+			<flattenmapper/>
+		</copy>
+		<zip destfile="buildTest/jr-resource-jar.jar" basedir="buildTest/tmp"/>
+		<delete dir="buildTest/tmp"/>
+	</target>
 
-	<target name="buildTests" depends="package">
+	<target name="buildTests" depends="package, packageTestResources">
 		<!-- Ok, so now compile all of the source so that when people put this jar on their eclipse path and
 				stuff, they can link to the bytecode. It's not necessary for the polsh build, but important for if
 				one wants to look at this like it's a real jar file (it's not) -->
-		<mkdir dir="buildTest"/>
 		<javac destdir="buildTest" classpathref="jr.classpath.test">
 			<src path="../../core"/>
 			<src path="../../j2me"/>
 
 			<include name="**/test**/*.java"/>
-
-			<!-- TODO: do we need to exclude neglected/uncoverted code here? -->
-			<exclude name="demo-app/test/**/*.java"/>
 		</javac>
 	</target>
 

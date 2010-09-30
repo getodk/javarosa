@@ -78,11 +78,11 @@ public class EntitySelectController <E extends Persistable> {
 	
 	private EntitySelectView<E> selView;
 	
-	private IStorageUtility entityStorage;
+	protected IStorageUtility entityStorage;
 	private Entity<E> entityPrototype;
 	
-	boolean immediatelySelectNewlyCreated;
-	boolean bailOnEmpty;
+	protected boolean immediatelySelectNewlyCreated;
+	protected boolean bailOnEmpty;
 	
 	Vector<Entity<E>> entities;
 	

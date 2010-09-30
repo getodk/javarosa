@@ -89,5 +89,9 @@ public class TransporterSharingSender {
 	public void halt() {
 		halted = true;
 	}
+	
+	public void halt() {
+		halted = true;
+	}
 
 }

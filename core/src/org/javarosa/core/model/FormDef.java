@@ -50,7 +50,9 @@ import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
+import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
+import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XPathReference;
@@ -97,6 +99,11 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public EvaluationContext exprEvalContext;
 
 	private QuestionPreloader preloader = new QuestionPreloader();
+	
+	//XML ID's cannot start with numbers, so this should never conflict
+	private static String DEFAULT_SUBMISSION_PROFILE = "1";
+	
+	private Hashtable<String,SubmissionProfile> submissionProfiles;
 
 	/**
 	 * 
@@ -109,6 +116,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		triggerIndex = new Hashtable();
 		setEvaluationContext(new EvaluationContext());
 		outputFragments = new Vector();
+		submissionProfiles = new Hashtable<String, SubmissionProfile>();
 	}
 
 	
@@ -943,6 +951,8 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		finalizeTriggerables();
 		
 		outputFragments = (Vector) ExtUtil.read(dis, new ExtWrapListPoly(), pf);
+		
+		submissionProfiles = (Hashtable<String, SubmissionProfile>)ExtUtil.read(dis, new ExtWrapMap(String.class, SubmissionProfile.class));
 	}
 
 	/**
@@ -994,6 +1004,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		ExtUtil.write(dos, new ExtWrapList(recalcs));
 
 		ExtUtil.write(dos, new ExtWrapListPoly(outputFragments));
+		ExtUtil.write(dos, new ExtWrapMap(submissionProfiles));
 	}
 
 	public void collapseIndex(FormIndex index, Vector indexes, Vector multiplicities, Vector elements) {
@@ -1044,6 +1055,10 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	}
 
 	public FormIndex incrementIndex(FormIndex index) {
+		return incrementIndex(index, true);
+	}
+	
+	public FormIndex incrementIndex(FormIndex index, boolean descend) {
 		Vector indexes = new Vector();
 		Vector multiplicities = new Vector();
 		Vector elements = new Vector();
@@ -1058,7 +1073,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			collapseIndex(index, indexes, multiplicities, elements);
 		}
 
-		incrementHelper(indexes, multiplicities, elements);
+		incrementHelper(indexes, multiplicities, elements, descend);
 			
 		if (indexes.size() == 0) {
 			return FormIndex.createEndOfFormIndex();
@@ -1067,13 +1082,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 	}
 
-	private void incrementHelper(Vector indexes, Vector multiplicities,	Vector elements) {
+	private void incrementHelper(Vector indexes, Vector multiplicities,	Vector elements, boolean descend) {
 		int i = indexes.size() - 1;
 		boolean exitRepeat = false; //if exiting a repetition? (i.e., go to next repetition instead of one level up)
 
 		if (i == -1 || elements.elementAt(i) instanceof GroupDef) {
 			// current index is group or repeat or the top-level form
-			boolean descend = true;
 
 			if (i >= 0) {
 				// find out whether we're on a repeat, and if so, whether the
@@ -1493,9 +1507,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		return null;
 	}
 
-
-
-	
 	/**
 	 * Not applicable
 	 */
@@ -1509,5 +1520,20 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 	public void setTextID(String textID) {
 		throw new RuntimeException("This method call is not relevant for FormDefs [setTextID()]");
 	}
+
+
+	public void setDefaultSubmission(SubmissionProfile profile) {
+		submissionProfiles.put(DEFAULT_SUBMISSION_PROFILE, profile);
+	}
+
+	public void addSubmissionProfile(String submissionId, SubmissionProfile profile) {
+		submissionProfiles.put(submissionId, profile);
+	}
 	
+	public SubmissionProfile getSubmissionProfile() {
+		//At some point these profiles will be set by the <submit> control in the form. 
+		//In the mean time, though, we can only promise that the default one will be used.
+		
+		return submissionProfiles.get(DEFAULT_SUBMISSION_PROFILE);
+	}
 }

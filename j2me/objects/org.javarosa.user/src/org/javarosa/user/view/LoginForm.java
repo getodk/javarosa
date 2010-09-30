@@ -18,13 +18,16 @@ package org.javarosa.user.view;
 
 import javax.microedition.lcdui.Command;
 
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
+import org.javarosa.core.util.SHA1;
 import org.javarosa.user.api.AddUserController;
 import org.javarosa.user.model.User;
 
+import de.enough.polish.math.BigInteger;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
@@ -205,16 +208,30 @@ public class LoginForm extends FramedForm {
 			String xPass = u.getPassword();
 			String xType = u.getUserType();
 			
-			if (xPass.equals(passwordEntered) && (	
-					xName.equalsIgnoreCase(usernameEntered) ||
-					(superUserLogin && xType.equals(User.ADMINUSER))
-				)) {
+			if (   (xName.equalsIgnoreCase(usernameEntered) ||
+					(superUserLogin && xType.equals(User.ADMINUSER)))
+				 && checkPassword(xPass, passwordEntered)) {
 				setLoggedInUser(u);
 				return true;
 			}
 		}
 
 		return false;
+
+	}
+	
+	private boolean checkPassword(String stored, String input) {
+		if(stored.indexOf("$") != -1) {
+			String alg = "sha1";
+			String salt = (String)DateUtils.split(stored,"$", false).elementAt(1);
+			String hashed = SHA1.encodeHex(salt + input);
+			String compare = alg + "$" + salt + "$" + hashed;
+			
+			return stored.equalsIgnoreCase(compare);
+		}
+		else {
+			return stored.equalsIgnoreCase(input);
+		}
 
 	}
 

@@ -40,8 +40,13 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
 public class XPathConditional implements IConditionExpr {
 	private XPathExpression expr;
 	public String xpath; //not serialized!
+	public boolean hasNow; //indicates whether this XpathConditional contains the now() function (used for timestamping)
 	
 	public XPathConditional (String xpath) throws XPathSyntaxException {
+		hasNow = false;
+		if(xpath.indexOf("now()") > -1) {
+			hasNow = true;
+		}
 		this.expr = XPathParseTool.parseXPath(xpath);
 		this.xpath = xpath;
 	}
@@ -112,10 +117,12 @@ public class XPathConditional implements IConditionExpr {
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		expr = (XPathExpression)ExtUtil.read(in, new ExtWrapTagged(), pf);
+		hasNow = (boolean)ExtUtil.readBool(in);
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(expr));
+		ExtUtil.writeBool(out, hasNow);
 	}
 	
 	public String toString () {

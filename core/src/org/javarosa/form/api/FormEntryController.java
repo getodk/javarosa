@@ -73,7 +73,7 @@ public class FormEntryController {
      */
     public int answerQuestion(FormIndex index, IAnswerData data) {
     	QuestionDef q = model.getQuestionPrompt(index).getQuestion();
-        if (model.getEvent() != FormEntryController.EVENT_QUESTION) {
+        if (model.getEvent(index) != FormEntryController.EVENT_QUESTION) {
             throw new RuntimeException("Non-Question object at the form index.");
         }
         TreeElement element = model.getTreeElement(index);
@@ -113,7 +113,7 @@ public class FormEntryController {
      * @return true if saved successfully, false otherwise.
      */
     public boolean saveAnswer(FormIndex index, IAnswerData data) {
-        if (model.getEvent() != FormEntryController.EVENT_QUESTION) {
+        if (model.getEvent(index) != FormEntryController.EVENT_QUESTION) {
             throw new RuntimeException("Non-Question object at the form index.");
         }
         TreeElement element = model.getTreeElement(index);

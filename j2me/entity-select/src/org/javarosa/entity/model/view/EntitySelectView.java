@@ -58,7 +58,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	public static final int NEW_IN_LIST = 1;
 	public static final int NEW_IN_MENU = 2;
 	
-	private static final int INDEX_NEW = -1;
+	protected static final int INDEX_NEW = -1;
 	
 	//behavior configuration options
 	public boolean wrapAround = false; //TODO: support this
@@ -69,18 +69,18 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	private String baseTitle;
 	
 	private TextField tf;
-	private Command exitCmd;
-	private Command sortCmd;
-    private Command newCmd;
+	protected Command exitCmd;
+	protected Command sortCmd;
+    protected Command newCmd;
 	
 	private int firstIndex;
-	private int selectedIndex;
+	protected int selectedIndex;
 	private String sortField;
 	
 	private Style headerStyle;
 	private Style rowStyle;
 	
-	private Vector<Integer> rowIDs; //index into data corresponding to current matches
+	protected Vector<Integer> rowIDs; //index into data corresponding to current matches
 	
 	public EntitySelectView (EntitySelectController<E> controller, Entity<E> entityPrototype, String title, int newMode) {
 		super(title);
@@ -94,9 +94,9 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		
 		tf = new TextField(Localization.get("entity.find") + " ", "", 20, TextField.ANY);
 		
-		//#if !polish.blackberry
-		tf.setInputMode(TextField.MODE_UPPERCASE);
-		//#endif
+//		//#if !polish.blackberry
+//		tf.setInputMode(TextField.MODE_UPPERCASE);
+//		//#endif
 		tf.setItemStateListener(this);
 				
         append(Graphics.BOTTOM, tf);
@@ -148,6 +148,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		rowStyle = genStyleFromHints(entityPrototype.getStyleHints(false));
 	}
 	
+	
 	private void estimateHeights() {
 		int screenHeight = J2MEDisplay.getScreenHeight(320);
 		
@@ -176,7 +177,32 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 //		}
 	}
 	
+	private int[] padHints(int[] hints) {
+		if(hints.length == 1) {
+			int[] padded = new int[2];
+			padded[0] = hints[0];
+			padded[1] = 0;
+			return padded;
+		} else {
+			return hints;
+		}
+	}
+	
+	private String[] padCells(String[] cells, String empty) {
+		if(cells.length == 1) {
+			String[] padded = new String[2];
+			padded[0] = cells[0];
+			padded[1] = empty;
+			return padded;
+		} else {
+			return cells;
+		}
+	}
+	
 	private Style genStyleFromHints(int[] hints) {
+		
+		//polish doesn't deal with one column properly, so we need to create a second column with 0 width.
+		hints = padHints(hints);
 		
 		int screenwidth = J2MEDisplay.getScreenWidth(240);
 		
@@ -239,7 +265,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		}
 	}
 		
-	private int getSelectedEntity () {
+	public int getSelectedEntity () {
 		int selectedEntityID = -1;
 		
 		//save off old selected item
@@ -249,7 +275,6 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 				selectedEntityID = controller.getRecordID(rowID(selectedIndex));
 			}
 		}
-
 		return selectedEntityID;
 	}
 	
@@ -261,7 +286,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		return numMatches() <= 0;
 	}
 	
-	private int rowID (int i) {
+	protected int rowID (int i) {
 		return rowIDs.elementAt(i).intValue();
 	}
 	
@@ -293,7 +318,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		Container title = new Container(false);
 		applyStyle(title, STYLE_TITLE);
 		
-		String[] titleData = controller.getTitleData();
+		String[] titleData = padCells(controller.getTitleData(),"");
 		for (int j = 0; j < titleData.length; j++) {
 			//#style patselTitleRowText
 			StringItem str = new StringItem("", titleData[j]);
@@ -306,7 +331,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 			this.append( new StringItem("", "(" + Localization.get("entity.nomatch") + ")"));
 		}
 		
-		String[] colFormat = controller.getColumnFormat(false);
+		String[] colFormat = padCells(controller.getColumnFormat(false),null);
 		
 		for (int i = firstIndex; i < rowIDs.size() && i < firstIndex + MAX_ROWS_ON_SCREEN; i++) {
 			Container row;
@@ -329,7 +354,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 			if (rowID == INDEX_NEW) {
 				row.add(new StringItem("", "Add New " + entityPrototype.entityType()));
 			} else {
-				String[] rowData = controller.getDataFields(rowID);
+				String[] rowData = padCells(controller.getDataFields(rowID),"");
 				
 				for (int j = 0; j < rowData.length; j++) {
 					if(colFormat[j] == null) {
@@ -420,7 +445,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		return super.handleKeyReleased(keyCode, gameAction);
 	}
 
-	private void processSelect() {
+	protected void processSelect() {
 		if (rowIDs.size() > 0) {
 			int rowID = rowID(selectedIndex);
 			if (rowID == INDEX_NEW) {

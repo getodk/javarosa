@@ -222,12 +222,17 @@ public class FormEntryPrompt extends FormEntryCaption {
 			viewWidget.refreshWidget(changeFlags);		
 	}
 	
-	/**
+       /**
 	 * ONLY RELEVANT to Question elements!
 	 * Will throw runTimeException if this is called for anything that isn't a Question.
+	 * Returns null if no help text is available
 	 * @return
 	 */
-	public String getHelpText(){
+	public String getHelpText() {
+		if(!(element instanceof QuestionDef)){
+			throw new RuntimeException("Can't get HelpText for Elements that are not Questions!");
+		}
+
 		String textID = ((QuestionDef)element).getHelpTextID();
 		String helpText = ((QuestionDef)element).getHelpText();
 		try{
@@ -239,121 +244,74 @@ public class FormEntryPrompt extends FormEntryCaption {
 		}catch(UnregisteredLocaleException ule){
 			System.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
 		}catch(Exception e){
+			Logger.exception("FormEntryPrompt.getHelpText", e);
 			e.printStackTrace();
 		}
 		
 		return helpText;
-		
+
 	}
 
+
+	
 	/**
+	 * Attempts to return the specified Item (from a select or 1select) text.
+	 * Will check for text in the following order:<br/>
+	 * Localized Text (long form) -> Localized Text (no special form) <br />
+	 * If no textID is available, method will return this item's labelInnerText.
+	 * @param sel the selection (item), if <code>null</code> will throw a IllegalArgumentException
+	 * @return Question Text.  <code>null</code> if no text for this element exists (after all fallbacks).
+	 * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
+	 * @throws IllegalArgumentException if Selection is <code>null</code>
+	 */
+	public String getSelectItemText(Selection sel){
+		//throw tantrum if this method is called when it shouldn't be or sel==null
+		if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
+		if(sel == null) throw new IllegalArgumentException("Cannot use null as an argument!");
+		
+		//check for the null id case and return labelInnerText if it is so.
+		String tid = sel.choice.getTextID();
+		if(tid == null || tid == "") return substituteStringArgs(sel.choice.getLabelInnerText());
+		
+		//otherwise check for 'long' form of the textID, then for the default form and return
+		String returnText;
+		returnText = getIText(tid, "long");
+		if(returnText == null) returnText = getIText(tid,null);
+		
+		return substituteStringArgs(returnText);
+	}
+	
+	/**
+	 * @see getSelectItemText(Selection sel)
+	 */
+	public String getSelectChoiceText(SelectChoice selection){
+		return getSelectItemText(selection.selection());
+	}
+	
+	/**
+	 * This method is generally used to retrieve special forms for a 
+	 * (select or 1select) item, e.g. "audio", "video", etc.
 	 * 
-	 * @return localized Question text (default form), LabelInnerText if default form is not available.
+	 * @param sel - The Item whose text you're trying to retrieve.
+	 * @param form - Special text form of Item you're trying to retrieve. 
+	 * @return Special Form Text. <code>null</code> if no text for this element exists (with the specified special form).
+	 * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
+	 * @throws IllegalArgumentException if <code>sel == null</code>
 	 */
-	public String getQText(){
-		try{
-			return this.getText(this.getTextID(),null);
-		}catch(NoLocalizedTextException nle){
-			return getQuestion().getLabelInnerText();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param form Specific subform of question text (e.g. "audio","image", etc)
-	 * @return Question text subform (SEE Localizer.getLocalizedText(String) for fallback details). Null if form not available
-	 */
-	public String getQText(String form){
-		try{
-			return this.getText(this.getTextID(),form);
-		}catch(NoLocalizedTextException nle){
-			return null;
-		}
-	}
-	
-
-	
-	/**
-	 * Get the text for the specified selection (localized if possible)
-	 * @param sel the selection
-	 * @return localized (if available, default LabelInnerText if not) text label.  If no localized version
-	 * is available, will attempt to return labelInnerText. If not available throws NullPointerException.
-	 * @throws NullPointerException
-	 */
-	public String getSelectionText(Selection sel){
-		return getSelectChoiceText(sel.choice);
-	}
-	
-	/**
-	 * Get the text for the specified SelectChoice (localized if possible)
-	 * @param sel the selection
-	 * @return localized (if available, default LabelInnerText if not) text label.  If no localized version
-	 * is available, will attempt to return labelInnerText. If not available throws NullPointerException.
-	 * @throws NullPointerException
-	 */
-	public String getSelectChoiceText(SelectChoice sel){
-		String tID = sel.getTextID();
+	public String getSpecialFormSelectItemText(Selection sel,String form){
+		if(sel == null) throw new IllegalArgumentException("Cannot use null as an argument for Selection!");
+		String textID = sel.choice.getTextID();
+		if(textID == null || textID.equals("")) return null;
 		
-		if(tID == null || tID == ""){
-			return sel.getLabelInnerText();
-		}
+		String returnText = getIText(textID, form);
 		
-		String text = getFormOrDefault(tID, TEXT_FORM_LONG);
-		if(text == null || text == ""){
-			text = sel.getLabelInnerText(); //final fallback
-		}
+		return substituteStringArgs(returnText);
 		
-		return text;
 	}
 	
-	public String getSelectChoiceText(int i){
-		return this.getSelectChoiceText(this.getQuestion().getChoice(i));
+	public String getSpecialFormSelectChoiceText(SelectChoice sel,String form){
+		return getSpecialFormSelectItemText(sel.selection(),form);
 	}
 	
-	private static String d = "default";
-	/**
-	 * Retrieve a Vector containing the available forms of text for the
-	 * provided select choice.
-	 * 
-	 * @param sel
-	 * @return
-	 */
-	public Vector getSelectTextForms(SelectChoice sel){
-		String tID = sel.getTextID();
-
-		if(tID == null||tID=="") return new Vector();
-		String types="";
-
-		//check for default
-		if(null != localizer().getRawText(localizer().getLocale(), tID)){
-			types+=d;
-		}
-		
-		//run through types list
-		for(int i=0;i<richMediaFormTypes.length;i++){
-			String curType = richMediaFormTypes[i];
-			if(null != localizer().getRawText(localizer().getLocale(), tID+";"+curType)){
-				types+=","+curType;
-			}
-		}
-		Vector vec = DateUtils.split(types,",",false);
-		vec.removeElement("");
-		return vec;
-	}
-	
-	/**
-	 * Get the Itext for a specific SelectChoice and specific itext form, returns
-	 * null if the form requested is not available for the select choice
-	 * @param s
-	 * @param form
-	 * @return
-	 */
-	public String getSelectChoiceText(SelectChoice sel, String form){
-		if(getSelectTextForms(sel).contains(form)) {
-			return getText(sel.getTextID(), form);
-		} else {
-			return null;
-		}
-	}
 }
 
