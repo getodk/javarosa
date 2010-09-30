@@ -31,6 +31,7 @@ import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.services.Logger;
+import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.form.api.FormEntryCaption;
@@ -43,6 +44,7 @@ import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidgetFactory;
 import org.javarosa.formmanager.view.chatterbox.widget.CollapsedWidget;
+import org.javarosa.formmanager.view.chatterbox.widget.GeoPointWidget;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.log.HandledThread;
@@ -547,6 +549,9 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
         	suspendActivity(FormEntryTransitions.MEDIA_AUDIO);
     	} else if (command.getLabel() == "Capture") {
     		doCapture();
+    	} else if (command.equals(GeoPointWidget.captureCommand)) {
+    		//This is an awful way to catch this condition, but we'll try it for now.
+    		suspendActivity(FormEntryTransitions.MEDIA_LOCATION);
     	} else if (command.getLabel() == "Back") {
     		backFromCamera();
     	} else if (command.getLabel().equals(CollapsedWidget.UPDATE_TEXT)) { //TODO: Put this static string in a better place.
@@ -574,8 +579,11 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 
     
 	private void suspendActivity(int mediaType) {
-		//TODO: DEAL
-		//controller.suspendActivity(mediaType);
+		try {
+			controller.suspendActivity(mediaType);
+		} catch (UnavailableServiceException e) {
+			J2MEDisplay.showError("Unavailable Media Type", e.getMessage());
+		}
 	}
 	
     private void commitAndSave () {

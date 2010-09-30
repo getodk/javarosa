@@ -225,8 +225,9 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
     		System.out.println("---");
     	}
 		
-		if (i == expandedStyle.getInteractiveWidget())
+		if (i == expandedStyle.getInteractiveWidget()) {
 			cbox.questionAnswered();
+		}
 	}
 	
 	public void UIHack (int hackType) {
