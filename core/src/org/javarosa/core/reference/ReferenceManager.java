@@ -37,10 +37,12 @@ public class ReferenceManager {
 	
 	private Vector<RootTranslator> translators;
 	private Vector<ReferenceFactory> factories;
+	private Vector<RootTranslator> sessionTranslators;
 	
 	private ReferenceManager() {
 		translators = new Vector<RootTranslator>();
 		factories = new Vector<ReferenceFactory>();
+		sessionTranslators = new Vector<RootTranslator>();
 	}
 	
 	/**
@@ -145,9 +147,35 @@ public class ReferenceManager {
 		}
 	}
 	
+	/**
+	 * Adds a root translator that is maintained over the course of a session. It will be globally
+	 * available until the session is cleared using the "clearSession" method.  
+	 * 
+	 * @param translator A Root Translator that will be added to the current session
+	 */
+	public void addSessionRootTranslator(RootTranslator translator) {
+		sessionTranslators.addElement(translator);
+	}
+	
+	/**
+	 * Wipes out all of the translators being maintained in the current session (IE: Any translators
+	 * added via "addSessionRootTranslator". Used to manage a temporary set of translations for a limited
+	 * amount of time. 
+	 */
+	public void clearSession() {
+		sessionTranslators.removeAllElements();
+	}
+	
 	private ReferenceFactory derivingRoot(String uri) throws InvalidReferenceException {
 		
-		//First, try any/all roots referenced at runtime.
+		//First, try any/all roots which are put in the temporary session stack
+		for(RootTranslator root : sessionTranslators) {
+			if(root.derives(uri)) {
+				return root;
+			}
+		}
+		
+		//Now, try any/all roots referenced at runtime.
 		for(RootTranslator root : translators) {
 			if(root.derives(uri)) {
 				return root;
