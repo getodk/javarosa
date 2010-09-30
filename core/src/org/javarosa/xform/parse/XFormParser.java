@@ -298,11 +298,33 @@ public class XFormParser {
 //			boolean allowUnknownElements, boolean allowText, boolean recurseUnknown) {
 		String name = e.getName();
 
+		String[] suppressWarningArr = {
+			"html",
+			"head",
+			"body",
+			"xform",
+			"chooseCaption",
+			"addCaption",
+			"addEmptyCaption",
+			"delCaption",
+			"doneCaption",
+			"doneEmptyCaption",
+			"mainHeader",
+			"entryHeader",
+			"delHeader"
+		};
+		Vector<String> suppressWarning = new Vector<String>();
+		for (int i = 0; i < suppressWarningArr.length; i++) {
+			suppressWarning.addElement(suppressWarningArr[i]);
+		}
+		
 		IElementHandler eh = (IElementHandler)handlers.get(name);
 		if (eh != null) {
 			eh.handle(f, e, parent);
 		} else {
-			if (!name.equals("html") && !name.equals("head") && !name.equals("body")) {
+			
+			
+			if (!suppressWarning.contains(name)) {
 				//#if debug.output==verbose
 				System.err.println("XForm Parse: Unrecognized element [" + name	+ "]. Ignoring and processing children..." + getVagueLocation(e));
 				//#endif
