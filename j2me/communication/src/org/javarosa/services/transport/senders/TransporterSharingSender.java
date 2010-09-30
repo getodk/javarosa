@@ -90,8 +90,4 @@ public class TransporterSharingSender {
 		halted = true;
 	}
 	
-	public void halt() {
-		halted = true;
-	}
-
 }

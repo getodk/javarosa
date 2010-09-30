@@ -16,7 +16,6 @@
 
 package org.javarosa.form.api;
 
-import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
@@ -31,9 +30,8 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.services.locale.Localizer;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.core.util.UnregisteredLocaleException;
 import org.javarosa.formmanager.view.IQuestionWidget;
