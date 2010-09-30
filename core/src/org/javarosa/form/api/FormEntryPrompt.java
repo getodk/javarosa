@@ -228,11 +228,14 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 * @return
 	 */
 	public String getHelpText(){
-		String helpText=null;
+		String textID = ((QuestionDef)element).getHelpTextID();
+		String helpText = ((QuestionDef)element).getHelpText();
 		try{
-			helpText=localizer().getLocalizedText(((QuestionDef)element).getHelpTextID());
+			if (textID != null) {
+				helpText=localizer().getLocalizedText(textID);
+			}
 		}catch(NoLocalizedTextException nlt){
-			helpText = ((QuestionDef)element).getHelpText();
+			//use fallback helptext
 		}catch(UnregisteredLocaleException ule){
 			System.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
 		}catch(Exception e){
