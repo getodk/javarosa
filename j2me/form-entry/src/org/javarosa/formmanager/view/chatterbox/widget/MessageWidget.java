@@ -22,6 +22,7 @@ import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
+import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.ImageItem;
@@ -35,6 +36,7 @@ public class MessageWidget implements IWidgetStyleEditable {
 	
 	private ImageItem imItem;
 	private Container fullPrompt;
+	private int scrHeight,scrWidth;
 
 	public MessageWidget () {
 		reset();
@@ -52,13 +54,16 @@ public class MessageWidget implements IWidgetStyleEditable {
 		fullPrompt.add(prompt);
 		//#style button
 		ok = new StringItem(null, Localization.get("chatterbox.button.trigger"));
+		scrHeight = J2MEDisplay.getScreenHeight(ExpandedWidget.fallback);
+		scrWidth = J2MEDisplay.getScreenWidth(ExpandedWidget.fallback);
+
 		
 		c.add(fullPrompt);
 		c.add(ok);
 	}
 
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
-		ImageItem newImItem = ExpandedWidget.getImageItem(fep);
+		ImageItem newImItem = ExpandedWidget.getImageItem(fep,scrHeight-16,scrWidth-16);
 		if(imItem!=null && newImItem!=null){
 			fullPrompt.remove(imItem);	//replace an already existing image
 		}
@@ -66,7 +71,9 @@ public class MessageWidget implements IWidgetStyleEditable {
 			fullPrompt.add(newImItem);
 			imItem = newImItem;
 		}
-		Chatterbox.getAudioAndPlay(fep);
+		if(ExpandedWidget.AUTOPLAYAUDIO){
+			Chatterbox.getAudioAndPlay(fep);
+		}
 		prompt.setText(fep.getLongText());
 	}
 

@@ -129,7 +129,7 @@ public class FormManagerProperties implements IPropertyRules {
 	    	if(VIEW_TYPE_PROPERTY.equals(propertyName)) {
 	    		return "Form Entry View";
 	    	}else if(USE_HASH_FOR_AUDIO_PLAYBACK.equals(propertyName)) {
-	    		return "Use the # Key to play back audio prompts";
+	    		return "Use the # Key to play back audio prompts or change language?";
 	    	}return propertyName;
 	    }
 	    
@@ -146,9 +146,9 @@ public class FormManagerProperties implements IPropertyRules {
 	    		}
 	    	}else if(USE_HASH_FOR_AUDIO_PLAYBACK.equals(propertyName)) {
     			if(HASH_AUDIO_PLAYBACK_YES.equals(value)){
-    				return "Use hash key to trigger playback";
+    				return "Audio Playback";
     			}else if(HASH_AUDIO_PLAYBACK_NO.equals(value)){
-    				return "Use hash key for changing languages";
+    				return "Language Cycle";
     			}
 	     	}
 	    	return value;
