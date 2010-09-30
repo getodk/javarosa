@@ -2,6 +2,7 @@ package org.javarosa.services.transport.senders;
 
 import java.util.Vector;
 
+import org.javarosa.core.services.Logger;
 import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
@@ -30,6 +31,8 @@ public class TransporterSharingSender {
 
 	public void send() {
 		System.out.println("Ready to send: "+this.messages.size()+" messages by "+this.transporter);
+		
+		int numSuccessful = 0;
 		for (int i = 0; i < this.messages.size(); i++) {
 			if(halted) {return;}
 			TransportMessage message = (TransportMessage) this.messages
@@ -44,12 +47,15 @@ public class TransporterSharingSender {
 				// used up, then the message becomes cached, for sending
 				// via the "Send Unsent" user function
 				if (!message.isSuccess()) {
+					Logger.log("send-all", "fail on " + (i + 1) + "/" + messages.size() + " " + message.getFailureReason());
+					
 					message.setStatus(TransportMessageStatus.CACHED);
 					this.listener.onStatusChange(message);
 
 					try {
 						this.cache.updateMessage(message);
 					} catch (Exception e) {
+						Logger.exception("TransportSharingSender.send/failure", e);
 						e.printStackTrace();
 						// if this update fails, the SENDING status
 						// isn't permanent (the message doesn't fall through
@@ -61,18 +67,27 @@ public class TransporterSharingSender {
 						// then it is considered to have the SENDING status
 					}
 				} else {
+					numSuccessful++;
 					
 					// SUCCESS - remove from cache
 					this.listener.onStatusChange(message);
 					try {
 						this.cache.decache(message);
 					} catch (Exception e) {
+						Logger.exception("TransportSharingSender.send/success", e);
 						e.printStackTrace();
 
 					}
 				}
+			} else {
+				Logger.log("sanity", "TransportSharingSender.send msg not cacheable");
 			}
 		}
+		Logger.log("send-all", (numSuccessful == messages.size() ? "success" : numSuccessful + "/" + messages.size() + " successful"));
+	}
+	
+	public void halt() {
+		halted = true;
 	}
 	
 	public void halt() {

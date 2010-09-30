@@ -55,6 +55,7 @@ public class LoginForm extends FramedForm {
 	private User loggedInUser;
 
 	private String[] extraText;
+	private boolean demoEnabled = true;
 	
 	public LoginForm() {
 		//#style loginView
@@ -76,10 +77,11 @@ public class LoginForm extends FramedForm {
 	 * @param title
 	 * @param extraText
 	 */
-	public LoginForm(String title, String[] extraText) {
+	public LoginForm(String title, String[] extraText, boolean demoEnabled) {
 		//#style loginView
 		super(title);
 		this.extraText = extraText;
+		this.demoEnabled = demoEnabled;
 		init();
 	}
 
@@ -144,9 +146,11 @@ public class LoginForm extends FramedForm {
 		this.loginButton.setDefaultCommand(CMD_LOGIN_BUTTON);
 
 		//#if javarosa.login.demobutton
-		this.demoButton = new StringItem(null, Localization.get("menu.Demo"), Item.BUTTON);
-		append(this.demoButton);
-		this.demoButton.setDefaultCommand(CMD_DEMO_BUTTON);
+		if (demoEnabled) {
+			this.demoButton = new StringItem(null, Localization.get("menu.Demo"), Item.BUTTON);
+			append(this.demoButton);
+			this.demoButton.setDefaultCommand(CMD_DEMO_BUTTON);
+		}
 		//#endif
 
 		// put the extra text if it's been set

@@ -124,4 +124,8 @@ public class XPathConditional implements IConditionExpr {
 		ExtUtil.write(out, new ExtWrapTagged(expr));
 		ExtUtil.writeBool(out, hasNow);
 	}
+	
+	public String toString () {
+		return "xpath[" + expr.toString() + "]";
+	}
 }

@@ -16,6 +16,8 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
@@ -177,12 +179,44 @@ public class ChatterboxWidgetFactory {
 		
 		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
     }
+
+    public ChatterboxWidget getRepeatJunctureWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
+    	FormEntryCaption capt = model.getCaptionPrompt(index);
+    	Vector<String> choices = capt.getRepetitionsText();
+    	FormEntryCaption.RepeatOptions repopt = capt.getRepeatOptions();
+    	
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt(repopt.header, Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
+    	for (int i = 0; i < choices.size(); i++) {
+        	prompt.addSelectChoice(new SelectChoice(null, choices.elementAt(i), "rep" + i, false));
+    	}
+    	
+    	if (repopt.add != null) {
+    		prompt.addSelectChoice(new SelectChoice(null, repopt.add, "new", false));
+    	}
+    	if (repopt.delete != null) {
+    		prompt.addSelectChoice(new SelectChoice(null, repopt.delete, "del", false));
+    	}
+    	prompt.addSelectChoice(new SelectChoice(null, repopt.done, "done", false));
+		
+		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
+    }
+
+    public ChatterboxWidget getRepeatDeleteWidget (FormIndex index, FormEntryModel model, Chatterbox cbox) {
+    	FormEntryCaption capt = model.getCaptionPrompt(index);
+    	Vector<String> choices = capt.getRepetitionsText();
+    	
+    	FakedFormEntryPrompt prompt = new FakedFormEntryPrompt(capt.getRepeatOptions().delete_header, Constants.CONTROL_SELECT_ONE, Constants.DATATYPE_TEXT);
+    	for (int i = 0; i < choices.size(); i++) {
+        	prompt.addSelectChoice(new SelectChoice(null, choices.elementAt(i), "del" + i, false));
+    	}
+		
+		return new ChatterboxWidget(cbox, prompt, ChatterboxWidget.VIEW_EXPANDED, new CollapsedWidget(), new SelectOneEntryWidget(ChoiceGroup.EXCLUSIVE));
+    }
     
     public ChatterboxWidget getNewLabelWidget(FormIndex index, String text){
     	//Label Widget;
-    	int multiplicity = index.getInstanceIndex();
     	FormEntryPrompt fakePrompt = new FakedFormEntryPrompt(text, Constants.CONTROL_LABEL, Constants.DATATYPE_TEXT);
-    	return new ChatterboxWidget(cbox, fakePrompt,ChatterboxWidget.VIEW_LABEL, new LabelWidget(multiplicity), null);
+    	return new ChatterboxWidget(cbox, fakePrompt,ChatterboxWidget.VIEW_LABEL, new LabelWidget(), null);
     }
         
     public void setReadOnly(boolean readOnly) {

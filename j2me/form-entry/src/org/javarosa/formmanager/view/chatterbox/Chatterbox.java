@@ -30,6 +30,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.NoLocalizedTextException;
@@ -70,6 +71,10 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     
     public static final int UIHACK_SELECT_PRESS = 1;
 	
+    public static final int Q_NORMAL = 0;
+    public static final int Q_REPEAT_JUNCTURE = 1;
+    public static final int Q_REPEAT_DELETE = 2;
+    
 	private JrFormEntryController controller;
     private JrFormEntryModel model;
     
@@ -82,6 +87,8 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     private FormIndex indexWhenKeyPressed = null;
     
     private boolean activeIsInterstitial = false; //true if the question corresponding to activeQuestionIndex is a 'create new repeat' question
+    private boolean deleteInterstitial = false;
+    private Vector<FormIndex> uncommittedRepeats = new Vector<FormIndex>();
     //active repeat for deleting? //TODO figure this out
     
     //TODO get the progress bar working
@@ -242,15 +249,17 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	case FormEntryController.EVENT_END_OF_FORM:
     		formComplete();
     		break;
-    		default:
-    			FormIndex index = model.getFormIndex();
-    			jumpToQuestion(index);
-    			break;
+    	default:
+    		FormIndex index = model.getFormIndex();
+    		jumpToQuestion(index);
+    		break;
     	}
     }
     
     //make given question active; deal with all necessary questions in between
     private void jumpToQuestion (FormIndex questionIndex) {
+    	System.out.println(this.questionIndexes.toString());
+    	
     	boolean newRepeat = false;
     	
     	if (questionIndex.isInForm() && !model.isIndexRelevant(questionIndex))
@@ -261,8 +270,9 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 
     	//figure out kind of reference and how to handle it
     	IFormElement last = model.getForm().getChild(questionIndex);
+    	
     	if (last instanceof GroupDef) {
-    		if (((GroupDef)last).getRepeat() &&	
+    		if (!FormIndex.NONLINEAR_REPEAT_API && ((GroupDef)last).getRepeat() &&	
     			model.getForm().getInstance().resolveReference(model.getForm().getChildInstanceRef(questionIndex)) == null) {
     			
     			//We're at a repeat interstitial point. If the group has the right configuration, we are able
@@ -279,20 +289,23 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     				return;
     			} else {
     				//All Systems Go. Display an interstitial "Add another FOO" question.
-        			newRepeat = true;	
+        			newRepeat = true;
     			}
+    		} else if (FormIndex.NONLINEAR_REPEAT_API && model.getEvent() == FormEntryController.EVENT_REPEAT_JUNCTURE) {
+    			
+    			//show repeat juncture question here
+    			System.out.println("you've reached a repeat");
+    			newRepeat = true; //note: hijacking the current interstitial repeat question variable; should rename
+    			
     		} else {
     			boolean forwards = questionIndex.compareTo(activeQuestionIndex) > 0;
     			if(forwards) {
-    				createHeaderForElement(questionIndex);
+    				createHeaderForElement(questionIndex, false);
+					step(controller.stepToNextEvent());
     			} else {
     				removeHeaderForElement(questionIndex);
-    			}
-    			if(forwards) {
-					step(controller.stepToNextEvent());
-				} else {
 					step(controller.stepToPreviousEvent());
-				}
+    			}
     			return;
     		}
     	} else if (questionIndex.isInForm() && model.isIndexReadonly(questionIndex)) {
@@ -317,7 +330,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		FormIndex index = activeQuestionIndex;
     		while(!index.equals(questionIndex)) {
     			index = model.getForm().incrementIndex(index);    			
-    			putQuestion(index, index.equals(questionIndex), newRepeat);
+    			putQuestion(index, index.equals(questionIndex), newRepeat ? Q_REPEAT_JUNCTURE : Q_NORMAL);
     		}
     	} else if (questionIndex.compareTo(activeQuestionIndex) <= 0) {
     		FormIndex index = activeQuestionIndex;
@@ -328,14 +341,15 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		
     		if (questionIndex.isInForm()) {
     			if (newRepeat) {
-    				putQuestion(questionIndex, true, newRepeat);
+    				removeFrame(questionIndex);
+    				putQuestion(questionIndex, true, newRepeat ? (deleteInterstitial ? Q_REPEAT_DELETE : Q_REPEAT_JUNCTURE) : Q_NORMAL);
     			} else {
     				((ChatterboxWidget)get(questionIndexes.indexOf(questionIndex, true))).setViewState(ChatterboxWidget.VIEW_EXPANDED);    
     			}
     		}
     	}
     	
-    	if (!questionIndex.equals(activeQuestionIndex)) {
+    	if (!questionIndex.equals(activeQuestionIndex) || activeIsInterstitial) {
     		activeQuestionIndex = questionIndex;
 
     		if (activeQuestionIndex.isInForm()) {
@@ -410,16 +424,30 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     }
     
 
-	private void createHeaderForElement(FormIndex questionIndex) {
+	private void createHeaderForElement(FormIndex questionIndex, boolean newRepeat) {
 		FormEntryCaption prompt = model.getCaptionPrompt(questionIndex);
 		
 		String headerText; //decide what text form to use.
-		headerText = prompt.getLongText();
-		if(headerText == null){
-			headerText = prompt.getShortText();
+		
+		boolean isNew = uncommittedRepeats.contains(model.getForm().decrementIndex(questionIndex)); //this is ghetto
+		headerText = prompt.getRepetitionText(isNew); //droos: this doesn't feel right... should this if/else be wrapped up in the caption?
+		if (headerText == null) {
+		
+			if(prompt.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_LONG)){
+				headerText = prompt.getLongText();
+			}else if(prompt.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_SHORT)){
+				headerText = prompt.getShortText();
+			}else{
+				headerText = prompt.getDefaultText();
+			}
+
 		}
 		
-		if(headerText != null) {		
+		if(headerText != null) {
+			if (newRepeat) {
+				removeFrame(activeQuestionIndex);
+			}
+			
 			ChatterboxWidget headerWidget = widgetFactory.getNewLabelWidget(questionIndex, headerText);
 			//If there is no valid header, there's no valid header. Possibly no label.
 			this.append(headerWidget);
@@ -434,14 +462,28 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	}
 
 	//create a frame for a question and show it at the appropriate place in the form
-    private void putQuestion (FormIndex questionIndex, boolean expanded, boolean newRepeat) {
+    private void putQuestion (FormIndex questionIndex, boolean expanded, int qType) {
     	ChatterboxWidget cw = null;
     	
     	if (!questionIndex.isInForm())
     		return;
     	
-    	if (expanded && newRepeat) {
-    		cw = widgetFactory.getNewRepeatWidget(questionIndex, model, this);
+    	if (expanded && qType != Q_NORMAL) {
+    		if (FormIndex.NONLINEAR_REPEAT_API) {
+    			if (qType == Q_REPEAT_JUNCTURE) {
+    				//TODO: make rollback work
+//    				if (!forward && uncommittedRepeats.contains(questionIndex)) {    				
+//        				controller.deleteRepeat(model.getForm().descendIntoRepeat(questionIndex, model.getRepetitions().size() - 1));
+//    				}
+    				uncommittedRepeats.removeElement(questionIndex);
+    				
+    				cw = widgetFactory.getRepeatJunctureWidget(questionIndex, model, this);
+    			} else if (qType == Q_REPEAT_DELETE) {
+    				cw = widgetFactory.getRepeatDeleteWidget(questionIndex, model, this);
+    			}
+    		} else {
+    			cw = widgetFactory.getNewRepeatWidget(questionIndex, model, this);
+    		}
     		activeIsInterstitial = true;
     	} else if (model.getForm().explodeIndex(questionIndex).lastElement() instanceof GroupDef) {
     		//do nothing
@@ -534,7 +576,12 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	System.out.println("cbox: command action");
     	
     	if (command == backCommand) {
-    		step(controller.stepToPreviousEvent());
+    		if (deleteInterstitial) {
+    			deleteInterstitial = false;
+				jumpToQuestion(this.activeQuestionIndex);
+    		} else {
+    			step(controller.stepToPreviousEvent());
+    		}
     	} else if (command == exitNoSaveCommand) {
     		controller.abort();
     	} else if (command == exitSaveCommand) {
@@ -597,13 +644,54 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		return;
     	}
     	if (activeIsInterstitial) {
-    		//'new repeat?' answered
-    		String answer = ((Selection)frame.getData().getValue()).getValue();
-    		if (answer.equals("y")) {
-    			controller.newRepeat(this.model.getFormIndex());
-    			createHeaderForElement(this.model.getFormIndex());
+    		if (frame.getData() == null) {
+    			this.queueError(null, PROMPT_REQUIRED_QUESTION);
+    			return;
     		}
-    		step(controller.stepToNextEvent());
+    		String answer = ((Selection)frame.getData().getValue()).getValue();
+    		
+    		if (!FormIndex.NONLINEAR_REPEAT_API) {
+    		
+	    		if (answer.equals("y")) {
+	    			controller.newRepeat(this.model.getFormIndex());
+	    			createHeaderForElement(this.model.getFormIndex(), true);
+	    		}
+	    		step(controller.stepToNextEvent());
+	    		
+    		} else {
+    		
+    			if (answer.startsWith("rep")) {
+    				removeFrame(this.activeQuestionIndex);
+    				
+    				int n = Integer.parseInt(answer.substring(3));
+    				this.activeQuestionIndex = controller.descendIntoRepeat(n);
+
+    				createHeaderForElement(activeQuestionIndex, false);
+    			} else if (answer.equals("new")) {
+	    			removeFrame(this.activeQuestionIndex);
+    				
+	    			uncommittedRepeats.addElement(this.activeQuestionIndex);
+	    			this.activeQuestionIndex = controller.descendIntoNewRepeat();
+
+	    			createHeaderForElement(activeQuestionIndex, false);
+    			} else if (answer.equals("del")) {
+    				deleteInterstitial = true;
+    				jumpToQuestion(this.activeQuestionIndex);
+    				return;
+    			} else if (answer.startsWith("del")) {
+    				int n = Integer.parseInt(answer.substring(3));
+    				controller.deleteRepeat(n);
+    				
+    				deleteInterstitial = false;
+    				jumpToQuestion(this.activeQuestionIndex);
+    				return;
+    			} else if (answer.equals("done")) {
+    				//do nothing
+    			}
+    			
+    			step(controller.stepToNextEvent());
+
+    		}
     	} else {
     		int status = controller.answerQuestion(this.model.getFormIndex(), frame.getData());
 	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {

@@ -2,6 +2,7 @@ package org.javarosa.log.util;
 import java.util.Date;
 
 import org.javarosa.core.model.utils.DateUtils;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.log.properties.LogPropertyRules;
@@ -27,23 +28,23 @@ public class LogReportUtils {
 	 * 
 	 * @param now
 	 */
-	public static void setPendingFromNow(long now) {
-		setPendingWeekly(now);
-		setPendingDaily(now);
+	public static void setPendingFromNow(long now, boolean daily, boolean weekly) {
+		if (weekly) {
+			setPendingWeekly(now);
+		}
+		if (daily) {
+			setPendingDaily(now);
+		}
 	}
 	
 	private static void setPendingWeekly(long now) {
-		if(getPendingWeeklyReportType(now) > 0) {
-			Date nextWeekly = DateUtils.dateAdd(new Date(now), 7);
-			PropertyManager._().setProperty(LogPropertyRules.LOG_NEXT_WEEKLY_SUBMIT, String.valueOf(nextWeekly.getTime()));
-		}
+		Date nextWeekly = DateUtils.dateAdd(new Date(now), 7);
+		PropertyManager._().setProperty(LogPropertyRules.LOG_NEXT_WEEKLY_SUBMIT, String.valueOf(nextWeekly.getTime()));
 	}
 	
 	private static void setPendingDaily(long now) {
-		if(getPendingDailyReportType(now) > 0) {
-			Date nextDaily = DateUtils.dateAdd(new Date(now), 1);
-			PropertyManager._().setProperty(LogPropertyRules.LOG_NEXT_DAILY_SUBMIT, String.valueOf(nextDaily.getTime()));
-		}
+		Date nextDaily = DateUtils.dateAdd(new Date(now), 1);
+		PropertyManager._().setProperty(LogPropertyRules.LOG_NEXT_DAILY_SUBMIT, String.valueOf(nextDaily.getTime()));
 	}
 	
 	/**
@@ -70,7 +71,7 @@ public class LogReportUtils {
 		}
 		
 		return reportNeeded(now,PropertyManager._().getSingularProperty(LogPropertyRules.LOG_WEEKLY_SUBMIT), 
-                PropertyManager._().getSingularProperty(LogPropertyRules.LOG_NEXT_WEEKLY_SUBMIT));
+                PropertyManager._().getSingularProperty(LogPropertyRules.LOG_NEXT_WEEKLY_SUBMIT), 7);
 	}
 	
 	public static int getPendingDailyReportType(long now) {
@@ -78,14 +79,22 @@ public class LogReportUtils {
 			return REPORT_FORMAT_SKIP;
 		}
 		return reportNeeded(now,PropertyManager._().getSingularProperty(LogPropertyRules.LOG_DAILY_SUBMIT), 
-                PropertyManager._().getSingularProperty(LogPropertyRules.LOG_NEXT_DAILY_SUBMIT));
+                PropertyManager._().getSingularProperty(LogPropertyRules.LOG_NEXT_DAILY_SUBMIT), 1);
 	}
 	
-	private static int reportNeeded(long now, String mode, String next) {
+	private static int reportNeeded(long now, String mode, String next, int period) {
 		if(LogPropertyRules.SHORT.equals(mode) ||
 		   LogPropertyRules.FULL.equals(mode)) {
 
-			if(now > getNextTimeForString(next)) {
+			int maxNextDays = Math.max(2 * period, 3);
+			
+			long nextTime = getNextTimeForString(next);
+			if (nextTime - now > maxNextDays * 86400000L) {
+				Logger.log("device-report", "next send time is suspiciously far in future [" + nextTime + "]; forcing send");
+				nextTime = now;
+			}
+			
+			if(now >= nextTime) {
 				if(LogPropertyRules.SHORT.equals(mode)) {
 					return REPORT_FORMAT_COMPACT;
 				} else {

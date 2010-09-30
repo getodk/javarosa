@@ -156,22 +156,25 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 		//phones. We should actually wait for things to be drawn once
 		//and then recalculate for real;
 		
-		if(screenHeight >= 300) { 
-			MAX_ROWS_ON_SCREEN = 10;
-		} else if(screenHeight >= 200) {
-			MAX_ROWS_ON_SCREEN = 6;
-		} else if(screenHeight >= 160) {
-			MAX_ROWS_ON_SCREEN = 5;
-		} else {
-			MAX_ROWS_ON_SCREEN = 4;
-		}
+		MAX_ROWS_ON_SCREEN = 5;
+		SCROLL_INCREMENT = 4;
 		
-		
-		if(MAX_ROWS_ON_SCREEN > 5) {
-			SCROLL_INCREMENT = 5;
-		} else {
-			SCROLL_INCREMENT = 4;
-		}
+//		if(screenHeight >= 300) { 
+//			MAX_ROWS_ON_SCREEN = 10;
+//		} else if(screenHeight >= 200) {
+//			MAX_ROWS_ON_SCREEN = 6;
+//		} else if(screenHeight >= 160) {
+//			MAX_ROWS_ON_SCREEN = 5;
+//		} else {
+//			MAX_ROWS_ON_SCREEN = 4;
+//		}
+//		
+//		
+//		if(MAX_ROWS_ON_SCREEN > 5) {
+//			SCROLL_INCREMENT = 5;
+//		} else {
+//			SCROLL_INCREMENT = 4;
+//		}
 	}
 	
 	private int[] padHints(int[] hints) {

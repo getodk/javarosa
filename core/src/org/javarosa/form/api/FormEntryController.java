@@ -37,6 +37,7 @@ public class FormEntryController {
     public static final int EVENT_QUESTION = 4;
     public static final int EVENT_GROUP = 8;
     public static final int EVENT_REPEAT = 16;
+    public static final int EVENT_REPEAT_JUNCTURE = 32;
 
     FormEntryModel model;
 
@@ -207,7 +208,17 @@ public class FormEntryController {
         return model.getEvent(index);
     }
 
-
+    public FormIndex descendIntoRepeat (int n) {
+		jumpToIndex(model.getForm().descendIntoRepeat(model.getFormIndex(), n));
+    	return model.getFormIndex();
+    }
+    
+    public FormIndex descendIntoNewRepeat () {
+		jumpToIndex(model.getForm().descendIntoRepeat(model.getFormIndex(), -1));   				
+		newRepeat(model.getFormIndex());
+		return model.getFormIndex();
+    }
+    
     /**
      * Creates a new repeated instance of the group referenced by the specified
      * FormIndex.
@@ -257,7 +268,10 @@ public class FormEntryController {
         return deleteRepeat(model.getFormIndex());
     }
 
-
+    public void deleteRepeat (int n) {
+		deleteRepeat(model.getForm().descendIntoRepeat(model.getFormIndex(), n));
+    }
+    
     /**
      * Sets the current language.
      * @param language

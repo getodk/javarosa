@@ -222,31 +222,34 @@ public class FormEntryPrompt extends FormEntryCaption {
 			viewWidget.refreshWidget(changeFlags);		
 	}
 	
-	/**
+       /**
 	 * ONLY RELEVANT to Question elements!
 	 * Will throw runTimeException if this is called for anything that isn't a Question.
 	 * Returns null if no help text is available
 	 * @return
 	 */
 	public String getHelpText() {
-		String helpText = null;
 		if(!(element instanceof QuestionDef)){
 			throw new RuntimeException("Can't get HelpText for Elements that are not Questions!");
 		}
+
+		String textID = ((QuestionDef)element).getHelpTextID();
+		String helpText = ((QuestionDef)element).getHelpText();
 		try{
-			helpText=localizer().getLocalizedText(((QuestionDef)element).getHelpTextID());
+			if (textID != null) {
+				helpText=localizer().getLocalizedText(textID);
+			}
 		}catch(NoLocalizedTextException nlt){
-			helpText = ((QuestionDef)element).getHelpText();
+			//use fallback helptext
 		}catch(UnregisteredLocaleException ule){
 			System.err.println("Warning: No Locale set yet (while attempting to getHelpText())");
-		}catch(NullPointerException nlp){
-			helpText = ((QuestionDef)element).getHelpText(); //grab non-localized help text
 		}catch(Exception e){
+			Logger.exception("FormEntryPrompt.getHelpText", e);
 			e.printStackTrace();
 		}
 		
 		return helpText;
-		
+
 	}
 
 

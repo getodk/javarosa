@@ -24,6 +24,7 @@ import java.util.Hashtable;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.condition.Condition;
 import org.javarosa.core.model.condition.Constraint;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -39,6 +40,7 @@ import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.InvalidReferenceException;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.model.utils.QuestionPreloader;
 import org.javarosa.core.services.locale.Localizable;
 import org.javarosa.core.services.locale.Localizer;
@@ -52,6 +54,7 @@ import org.javarosa.core.util.externalizable.ExtWrapMap;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.model.xform.XPathReference;
 
 /**
@@ -111,7 +114,6 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		triggerables = new Vector();
 		triggerablesInOrder = true;
 		triggerIndex = new Hashtable();
-		conditionRepeatTargetIndex = new Hashtable();
 		setEvaluationContext(new EvaluationContext());
 		outputFragments = new Vector();
 		submissionProfiles = new Hashtable<String, SubmissionProfile>();
@@ -293,7 +295,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			}
 		}
 
-		triggerTriggerables(parentRef);
+		triggerTriggerables(deleteRef);
 		return newIndex;
 	}
 
@@ -308,16 +310,28 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		initializeTriggerables(destRef); // initialize conditions for the node (and sub-nodes)
 	}
 	
-	
-
-	public boolean canCreateRepeat(TreeReference repeatRef) {
+	public boolean isRepeatRelevant (TreeReference repeatRef) {
+		boolean relev = true;
+		
 		Condition c = (Condition) conditionRepeatTargetIndex.get(repeatRef.genericize());
 		if (c != null) {
-			return c.evalBool(instance, new EvaluationContext(exprEvalContext,	repeatRef));
-		} /* else check # child constraints of parent
-		
-		} */
+			relev = c.evalBool(instance, new EvaluationContext(exprEvalContext, repeatRef));
+		}
 
+		//check the relevancy of the immediate parent
+		if (relev) {
+			TreeElement templNode = instance.getTemplate(repeatRef);
+			TreeReference parentPath = templNode.getParent().getRef().genericize();
+			TreeElement parentNode = instance.resolveReference(parentPath.contextualize(repeatRef));
+			relev = parentNode.isRelevant();
+		}
+	
+		return relev;
+	}
+
+	public boolean canCreateRepeat(TreeReference repeatRef) {
+		//no-op currently
+		//TODO: check # child constraints on parent
 		return true;
 	}
 	
@@ -413,26 +427,17 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 					triggered.addElement(t);
 				}
 			}
-
-			if (t instanceof Condition) {
-				// droos 5/14: this this might be a bug? what if we encounter
-				// the same condition again, but the targets
-				// have since changed? we'll return the original condition
-				// (above), and not update this index
-				Vector targets = t.getTargets();
-				for (int i = 0; i < targets.size(); i++) {
-					TreeReference target = (TreeReference) targets.elementAt(i);
-					if (instance.getTemplate(target) != null) {
-						conditionRepeatTargetIndex.put(target, (Condition) t);
-					}
-				}
-			}
-
+			
 			return t;
 		}
 	}
 
 	public void finalizeTriggerables () {
+		//
+		//DAGify the triggerables based on dependencies and sort them so that
+		//trigbles come only after the trigbles they depend on
+		//
+		
 		Vector partialOrdering = new Vector();
 		for (int i = 0; i < triggerables.size(); i++) {
 			Triggerable t = (Triggerable)triggerables.elementAt(i);
@@ -494,8 +499,27 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 		
 		triggerablesInOrder = true;
+		
+		//
+		//build the condition index for repeatable nodes
+		//
+		
+		conditionRepeatTargetIndex = new Hashtable();
+		for (int i = 0; i < triggerables.size(); i++) {
+			Triggerable t = (Triggerable)triggerables.elementAt(i);
+			if (t instanceof Condition) {
+				Vector targets = t.getTargets();
+				for (int j = 0; j < targets.size(); j++) {
+					TreeReference target = (TreeReference) targets.elementAt(j);
+					if (instance.getTemplate(target) != null) {
+						conditionRepeatTargetIndex.put(target, (Condition) t);
+					}
+				}
+			}
+		}
+
 	}
-	
+		
 	public void initializeTriggerables() {
 		initializeTriggerables(TreeReference.rootRef());
 	}
@@ -635,9 +659,86 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				}
 			});
 		}
+
+		/* function to reverse a select value into the display label for that choice in the question it came from
+		 *
+		 * arg 1: select value
+		 * arg 2: string xpath referring to origin question; must be absolute path
+		 * 
+		 * this won't work at all if the original label needed to be processed/calculated in some way (<output>s, etc.) (is this even allowed?)
+		 * likely won't work with multi-media labels
+		 * _might_ work for itemsets, but probably not very well or at all; could potentially work better if we had some context info
+		 * DOES work with localization
+		 * 
+		 * it's mainly intended for the simple case of reversing a question with compile-time-static fields, for use inside an <output>
+		 */
+		if (!ec.getFunctionHandlers().containsKey("jr:choice-name")) {
+			final FormDef f = this;
+			ec.addFunctionHandler(new IFunctionHandler() {
+				public String getName() {
+					return "jr:choice-name";
+				}
+
+				public Object eval(Object[] args) {
+					try {
+						String value = (String)args[0];
+						String questionXpath = (String)args[1];
+						TreeReference ref = RestoreUtils.xfFact.ref(questionXpath);
+						
+						QuestionDef q = f.findQuestionByRef(ref, f);
+						if (q == null || (q.getControlType() != Constants.CONTROL_SELECT_ONE &&
+								          q.getControlType() != Constants.CONTROL_SELECT_MULTI)) {
+							return "";
+						}
+						
+						System.out.println("here!!");
+						
+						Vector<SelectChoice> choices = q.getChoices();
+						for (SelectChoice ch : choices) {
+							if (ch.getValue().equals(value)) {
+								//this is really not ideal. we should hook into the existing code (FormEntryPrompt) for pulling
+								//display text for select choices. however, it's hard, because we don't really have
+								//any context to work with, and all the situations where that context would be used
+								//don't make sense for trying to reverse a select value back to a label in an unrelated
+								//expression
+								
+								String textID = ch.getTextID();
+								if (textID != null) {
+									return f.getLocalizer().getText(textID);
+								} else {
+									return ch.getLabelInnerText();
+								}
+							}
+						}
+						return "";
+					} catch (Exception e) {
+						throw new WrappedException("error in evaluation of xpath function [choice-name]", e);
+					}
+				}
+
+				public Vector getPrototypes() {
+					Class[] proto = { String.class, String.class };
+					Vector v = new Vector();
+					v.addElement(proto);
+					return v;
+				}
+
+				public boolean rawArgs() {
+					return false;
+				}
+
+				public boolean realTime() {
+					return false;
+				}
+			});
+		}		
 	}
 
 	public String fillTemplateString(String template, TreeReference contextRef) {
+		return fillTemplateString(template, contextRef, new Hashtable());
+	}
+	
+	public String fillTemplateString(String template, TreeReference contextRef, Hashtable<String, ?> variables) {
 		Hashtable args = new Hashtable();
 
 		int depth = 0;
@@ -657,7 +758,9 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 						continue;
 
 					IConditionExpr expr = (IConditionExpr) outputFragments.elementAt(ix);
-					String value = expr.evalReadable(this.getInstance(), new EvaluationContext(exprEvalContext, contextRef));
+					EvaluationContext ec = new EvaluationContext(exprEvalContext, contextRef);
+					ec.setVariables(variables);
+					String value = expr.evalReadable(this.getInstance(), ec);
 					args.put(argName, value);
 				}
 			}
@@ -971,7 +1074,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 		}
 
 		incrementHelper(indexes, multiplicities, elements, descend);
-
+			
 		if (indexes.size() == 0) {
 			return FormIndex.createEndOfFormIndex();
 		} else {
@@ -981,7 +1084,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 
 	private void incrementHelper(Vector indexes, Vector multiplicities,	Vector elements, boolean descend) {
 		int i = indexes.size() - 1;
-		boolean exitRepeat = false;
+		boolean exitRepeat = false; //if exiting a repetition? (i.e., go to next repetition instead of one level up)
 
 		if (i == -1 || elements.elementAt(i) instanceof GroupDef) {
 			// current index is group or repeat or the top-level form
@@ -991,10 +1094,22 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				// specified instance actually exists
 				GroupDef group = (GroupDef) elements.elementAt(i);
 				if (group.getRepeat()) {
-					if (instance.resolveReference(getChildInstanceRef(elements,	multiplicities)) == null) {
-						descend = false; // repeat instance does not exist; do
-						// not descend into it
-						exitRepeat = true;
+					if (FormIndex.NONLINEAR_REPEAT_API) {
+						
+						if (((Integer)multiplicities.lastElement()).intValue() == TreeReference.INDEX_REPEAT_JUNCTURE) {
+						
+							descend = false;
+							exitRepeat = true;
+							
+						}
+						
+					} else {
+					
+						if (instance.resolveReference(getChildInstanceRef(elements,	multiplicities)) == null) {
+							descend = false; // repeat instance does not exist; do not descend into it
+							exitRepeat = true;
+						}
+						
 					}
 				}
 			}
@@ -1003,6 +1118,13 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				indexes.addElement(new Integer(0));
 				multiplicities.addElement(new Integer(0));
 				elements.addElement((i == -1 ? this : (IFormElement) elements.elementAt(i)).getChild(0));
+				
+				if (FormIndex.NONLINEAR_REPEAT_API) {
+					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
+						multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), multiplicities.size() - 1);
+					}
+				}
+				
 				return;
 			}
 		}
@@ -1013,7 +1135,15 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			// (repeat-not-existing can only happen at lowest level; exitRepeat
 			// will be true)
 			if (!exitRepeat && elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements.elementAt(i)).getRepeat()) {
-				multiplicities.setElementAt(new Integer(((Integer) multiplicities.elementAt(i)).intValue() + 1), i);
+				if (FormIndex.NONLINEAR_REPEAT_API) {
+					
+					multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), i);
+
+				} else {
+					
+					multiplicities.setElementAt(new Integer(((Integer) multiplicities.elementAt(i)).intValue() + 1), i);
+					
+				}
 				return;
 			}
 
@@ -1033,11 +1163,18 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				indexes.setElementAt(new Integer(curIndex + 1), i);
 				multiplicities.setElementAt(new Integer(0), i);
 				elements.setElementAt(parent.getChild(curIndex + 1), i);
+				
+				if (FormIndex.NONLINEAR_REPEAT_API) {
+					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
+						multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), multiplicities.size() - 1);
+					}
+				}
+				
 				return;
 			}
 		}
 	}
-
+	
 	public FormIndex decrementIndex(FormIndex index) {
 		Vector indexes = new Vector();
 		Vector multiplicities = new Vector();
@@ -1069,8 +1206,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			int curIndex = ((Integer) indexes.elementAt(i)).intValue();
 			int curMult = ((Integer) multiplicities.elementAt(i)).intValue();
 
-			if (curMult > 0) {
-				// set node to previous repetition of current element
+			if (FormIndex.NONLINEAR_REPEAT_API && 
+				elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat() &&
+				((Integer)multiplicities.lastElement()).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
+				multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), i);
+				return;
+			} else if (!FormIndex.NONLINEAR_REPEAT_API && curMult > 0) {
 				multiplicities.setElementAt(new Integer(curMult - 1), i);
 			} else if (curIndex > 0) {
 				// set node to previous element
@@ -1084,7 +1225,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				// at absolute beginning of current level; index to parent
 				indexes.removeElementAt(i);
 				multiplicities.removeElementAt(i);
-				elements.removeElementAt(i);
+				elements.removeElementAt(i);				
 				return;
 			}
 		}
@@ -1117,13 +1258,57 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 				TreeElement parentNode = instance.resolveReference(nodeRef.getParentRef());
 				mult = parentNode.getChildMultiplicity(name);
 			}
-			multiplicities.setElementAt(new Integer(mult), multiplicities.size() - 1);
+			multiplicities.setElementAt(new Integer(FormIndex.NONLINEAR_REPEAT_API ? TreeReference.INDEX_REPEAT_JUNCTURE : mult), multiplicities.size() - 1);
 			return true;
 		} else {
 			return false;
 		}
 	}
 
+	public int getNumRepetitions (FormIndex index) {
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+
+		if (!index.isInForm()) {
+			throw new RuntimeException("not an in-form index");
+		}
+		
+		collapseIndex(index, indexes, multiplicities, elements);
+
+		if (!(elements.lastElement() instanceof GroupDef) || !((GroupDef)elements.lastElement()).getRepeat()) {
+			throw new RuntimeException("current element not a repeat");
+		}
+		
+		//so painful
+		TreeElement templNode = instance.getTemplate(index.getReference());
+		TreeReference parentPath = templNode.getParent().getRef().genericize();
+		TreeElement parentNode = instance.resolveReference(parentPath.contextualize(index.getReference()));
+		return parentNode.getChildMultiplicity(templNode.getName());
+	}
+	
+	//repIndex == -1 => next repetition about to be created
+	public FormIndex descendIntoRepeat(FormIndex index, int repIndex) {
+		int numRepetitions = getNumRepetitions(index);
+		
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+		collapseIndex(index, indexes, multiplicities, elements);
+		
+		if (repIndex == -1) {
+			repIndex = numRepetitions;
+		} else {
+			if (repIndex < 0 || repIndex >= numRepetitions) {
+				throw new RuntimeException("selection exceeds current number of repetitions");
+			}
+		}
+		
+		multiplicities.setElementAt(new Integer(repIndex), multiplicities.size() - 1);
+		
+		return buildIndex(indexes, multiplicities, elements);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

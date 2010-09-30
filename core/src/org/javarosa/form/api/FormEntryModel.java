@@ -65,8 +65,10 @@ public class FormEntryModel {
         IFormElement element = form.getChild(index);
         if (element instanceof GroupDef) {
             if (((GroupDef) element).getRepeat()) {
-                if (form.getInstance().resolveReference(form.getChildInstanceRef(index)) == null) {
+                if (!FormIndex.NONLINEAR_REPEAT_API && form.getInstance().resolveReference(form.getChildInstanceRef(index)) == null) {
                     return FormEntryController.EVENT_PROMPT_NEW_REPEAT;
+                } else if (FormIndex.NONLINEAR_REPEAT_API && index.getElementMultiplicity() == TreeReference.INDEX_REPEAT_JUNCTURE) {
+                	return FormEntryController.EVENT_REPEAT_JUNCTURE;
                 } else {
                     return FormEntryController.EVENT_REPEAT;
                 }
@@ -77,8 +79,7 @@ public class FormEntryModel {
             return FormEntryController.EVENT_QUESTION;
         }
     }
-
-
+    
     /**
      * 
      * @param index
@@ -304,7 +305,8 @@ public class FormEntryModel {
             return true;
         
         TreeReference ref = form.getChildInstanceRef(index);
-        boolean isAskNewRepeat = getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT;
+        boolean isAskNewRepeat = (getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT ||
+        						  getEvent(index) == FormEntryController.EVENT_REPEAT_JUNCTURE);
 
         if (isAskNewRepeat) {
             return false;
@@ -333,12 +335,16 @@ public class FormEntryModel {
      */
     public boolean isIndexRelevant(FormIndex index) {
         TreeReference ref = form.getChildInstanceRef(index);
-        boolean isAskNewRepeat = getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT;
-
+        boolean isAskNewRepeat = (getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT);
+        boolean isRepeatJuncture = (getEvent(index) == FormEntryController.EVENT_REPEAT_JUNCTURE);
+        
         boolean relevant;
         if (isAskNewRepeat) {
-        	TreeElement node = form.getInstance().resolveReference(ref.getParentRef());
-        	relevant = form.canCreateRepeat(ref) && node.isRelevant();
+            relevant = form.isRepeatRelevant(ref) && form.canCreateRepeat(ref);
+            //repeat junctures are still relevant if no new repeat can be created; that option
+            //is simply missing from the menu
+        } else if (isRepeatJuncture) {
+        	relevant = form.isRepeatRelevant(ref);
         } else {
             TreeElement node = form.getInstance().resolveReference(ref);
             relevant = node.isRelevant(); // check instance flag first

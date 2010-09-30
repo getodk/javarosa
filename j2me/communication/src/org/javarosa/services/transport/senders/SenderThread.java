@@ -2,6 +2,8 @@ package org.javarosa.services.transport.senders;
 
 import java.util.Vector;
 
+import org.javarosa.core.services.Logger;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.j2me.log.HandledThread;
 import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportListener;
@@ -107,12 +109,15 @@ public abstract class SenderThread extends HandledThread {
 
 		notifyChange(this.transporter.getMessage(), "Attempts left: "
 				+ this.triesRemaining);
+		
+		Logger.log("send", "open " + transporter.getMessage().getTag());
 		TransportMessage message = this.transporter.send();
 		if (message.isSuccess()) {
 
 			onSuccess(message);
 			notifyStatusChange(message);
 		} else {
+			Logger.log("send", message.getTag() + " fail attempt " + (triesRemaining - 1) + "; " + message.getFailureReason());
 			onFailure();
 		}
 		return message;

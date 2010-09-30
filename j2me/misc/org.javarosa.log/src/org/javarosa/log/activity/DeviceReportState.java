@@ -50,10 +50,15 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public abstract class DeviceReportState implements State, TrivialTransitions, TransportListener {
 
+	private static final int LOG_ROLLOVER_SIZE = 3000;
+	
 	private static final String XMLNS = "http://code.javarosa.org/devicereport";
 	
 	private int reportFormat;
 	private long now;
+	
+	private int weeklyPending;
+	private int dailyPending;
 	
 	/**
 	 * Create a behind-the-scenes Device Reporting state which manages all operations 
@@ -63,8 +68,8 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		now = new Date().getTime();
 		//Get what reports are pending for the week and for the day.
 		//If logging is disabled, these methods default to skipping.
-		int weeklyPending = LogReportUtils.getPendingWeeklyReportType(now);
-		int dailyPending = LogReportUtils.getPendingDailyReportType(now);
+		this.weeklyPending = LogReportUtils.getPendingWeeklyReportType(now);
+		this.dailyPending = LogReportUtils.getPendingDailyReportType(now);
 		
 		//Pick the most verbose pending report.
 		this.reportFormat = Math.max(dailyPending,weeklyPending);
@@ -76,7 +81,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			//If we've gotten 600 logger lines in less than 7 days,
 			//it's a problem
 			if(Logger.isLoggingEnabled()) {
-				determineLogFallback(600);
+				determineLogFallback(LOG_ROLLOVER_SIZE);
 			}
 			done();
 			return;
@@ -85,17 +90,18 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			Document report = createReport();
 			InputStream payload = serializeReport(report);
 			TransportMessage message = constructMessageFromPayload(payload);
+			
+			Logger.log("device-report", "attempting to send");
 			SenderThread s = TransportService.send(message);
 			
 			//We have no way of knowing whether the message will get 
 			//off the phone successfully if it can get cached, the
 			//logs are in the transport layer's hands at that point.
 			if(message.isCacheable()) {
-				Logger._().clearLogs();
+				onSuccess();
 			}
 			
 			s.addListener(this);
-			LogReportUtils.setPendingFromNow(now);
 		} catch (Exception e) {
 			// Don't let this code break the application, ever.
 			e.printStackTrace();
@@ -151,7 +157,8 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	private void addHeader(Element parent, Element errorsNode) {
 		String deviceId = PropertyManager._().getSingularProperty(JavaRosaPropertyRules.DEVICE_ID_PROPERTY);
 		String reportDate = DateUtils.formatDate(new Date(), DateUtils.FORMAT_HUMAN_READABLE_SHORT);
-
+		String appVersion = PropertyManager._().getSingularProperty("app-version");
+		
 		Element id = parent.createElement(null,"device_id");
 		id.addChild(Element.TEXT, deviceId);
 		parent.addChild(Element.ELEMENT, id);
@@ -159,6 +166,10 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		Element date = parent.createElement(null,"report_date");
 		date.addChild(Element.TEXT, reportDate);
 		parent.addChild(Element.ELEMENT, date);
+
+		Element version = parent.createElement(null, "app_version");
+		version.addChild(Element.TEXT, appVersion);
+		parent.addChild(Element.ELEMENT, version);
 	}
 	
 	private void createTransportSubreport(Element parent, Element errorsNode) {
@@ -273,13 +284,20 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			//logs yet, since we needed to wait for success in order
 			//to know they'd get off the phone.
 			if(!message.isCacheable()) {
-				Logger._().clearLogs();
+				onSuccess();
 			}
 		} else {
 			//if we failed we need to determine if the logs are too big
 			//and either dump to the fileystem or just clear the logs...
-			determineLogFallback(200);
+			determineLogFallback(LOG_ROLLOVER_SIZE);
+			
+			//droos: maybe if this still fails after N attempts, then we start to trim the log size
 		}
+	}
+	
+	private void onSuccess () {
+		Logger._().clearLogs();
+		LogReportUtils.setPendingFromNow(now, this.dailyPending > 0, this.weeklyPending > 0);		
 	}
 	
 	private void determineLogFallback(int size) {
@@ -304,15 +322,13 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	}
 	
 	private void dumpLogFallback() {
+		String dumpRef = "";
+		boolean success = false;
 		try{
-			String dumpRef = "jr://file/jr_log_dump" + DateUtils.formatDateTime(new Date(), DateUtils.FORMAT_TIMESTAMP_SUFFIX) + ".log";
+			dumpRef = "jr://file/jr_log_dump" + DateUtils.formatDateTime(new Date(), DateUtils.FORMAT_TIMESTAMP_SUFFIX) + ".log";
 			Reference ref = ReferenceManager._().DeriveReference(dumpRef);
 			if(!ref.isReadOnly()) {
-				if(Logger._().serializeLogs(new StreamLogSerializer(ref.getOutputStream()))) {
-					//Success!
-				} else {
-					//Not success!
-				}
+				success = Logger._().serializeLogs(new StreamLogSerializer(ref.getOutputStream()));
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -324,6 +340,11 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 				System.out.println("Logger is null. Must have failed to initailize");
 			}
 			Logger._().clearLogs();
+			
+			Logger.log("log", "archived logs to file: " + dumpRef);
+			if (!success) {
+				Logger.log("log", "archive failed! logs lost!!");
+			}
 		} catch(Exception e) {
 			//If this fails it's a serious problem, but not sure what to do about it.
 			e.printStackTrace();

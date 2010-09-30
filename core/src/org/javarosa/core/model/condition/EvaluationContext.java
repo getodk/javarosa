@@ -17,6 +17,7 @@
 package org.javarosa.core.model.condition;
 
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.javarosa.core.model.data.IAnswerData;
@@ -58,6 +59,13 @@ public class EvaluationContext {
 	
 	public Hashtable getFunctionHandlers () {
 		return functionHandlers;
+	}
+	
+	public void setVariables(Hashtable<String, ?> variables) {
+		for (Enumeration e = variables.keys(); e.hasMoreElements(); ) {
+			String var = (String)e.nextElement();
+			setVariable(var, variables.get(var));
+		}
 	}
 	
 	public void setVariable(String name, Object value) {

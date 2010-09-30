@@ -27,5 +27,5 @@ public abstract class FormEntryState implements FormEntryTransitions, State {
 	
 	public abstract void formEntrySaved(FormDef form, FormInstance instanceData, boolean formWasCompleted);
 	
-	public abstract void suspendForMediaCapture (int captureType) throws UnavailableServiceException;
+	public abstract void suspendForMediaCapture (int captureType);
 }

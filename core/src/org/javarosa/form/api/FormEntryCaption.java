@@ -16,17 +16,17 @@
 
 package org.javarosa.form.api;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.formmanager.view.IQuestionWidget;
-import java.lang.String;
-
 
 /**
  * This class gives you all the information you need to display a caption when
@@ -205,6 +205,151 @@ public class FormEntryCaption implements FormElementStateListener {
 		return returnText;
 	}
 
+	//TODO: this is explicitly missing integration with the new multi-media support
+	//TODO: localize the default captions
+	public String getRepeatText(String typeKey) {
+		GroupDef g = (GroupDef)element;
+		if (!g.getRepeat()) {
+			throw new RuntimeException("not a repeat");
+		}
+		
+		String title = getDefaultText();
+		int count = getNumRepetitions();
+		
+		String caption = null;
+		if ("mainheader".equals(typeKey)) {
+			caption = g.mainHeader;
+			if (caption == null) {
+				return title;
+			}
+		} else if ("add".equals(typeKey)) {
+			caption = g.addCaption;
+			if (caption == null) {
+				return "Add another " + title;
+			}
+		} else if ("add-empty".equals(typeKey)) {
+			caption = g.addEmptyCaption;
+			if (caption == null) {
+				caption = g.addCaption;
+			}
+			if (caption == null) {
+				return "None - Add " + title;
+			}
+		} else if ("del".equals(typeKey)) {
+			caption = g.delCaption;
+			if (caption == null) {
+				return "Delete " + title;
+			}
+		} else if ("done".equals(typeKey)) {
+			caption = g.doneCaption;
+			if (caption == null) {
+				return "Done";
+			}
+		} else if ("done-empty".equals(typeKey)) {
+			caption = g.doneEmptyCaption;
+			if (caption == null) {
+				caption = g.doneCaption;
+			}
+			if (caption == null) {
+				return "Skip";
+			}
+		} else if ("delheader".equals(typeKey)) {
+			caption = g.delHeader;
+			if (caption == null) {
+				return "Delete which " + title + "?";
+			}
+		}
+		
+		Hashtable<String, Object> vars = new Hashtable<String, Object>();
+		vars.put("name", title);
+		vars.put("n", new Integer(count));
+		return form.fillTemplateString(caption, index.getReference(), vars);
+	}
+	
+	//this should probably be somewhere better
+	public int getNumRepetitions () {
+		return form.getNumRepetitions(index);
+	}
+	
+	public String getRepetitionText(boolean newrep) {
+		return getRepetitionText("header", index, newrep);
+	}
+	
+	private String getRepetitionText(String type, FormIndex index, boolean newrep) {
+		if (element instanceof GroupDef && ((GroupDef)element).getRepeat() && index.getElementMultiplicity() >= 0) {
+			GroupDef g = (GroupDef)element;
+	
+			String title = getDefaultText();
+			int ix = index.getElementMultiplicity() + 1;
+			int count = getNumRepetitions();
+			
+			String caption = null;
+			if ("header".equals(type)) {
+				caption = g.entryHeader;
+			} else if ("choose".equals(type)) {
+				caption = g.chooseCaption;
+				if (caption == null) {
+					caption = g.entryHeader;
+				}
+			}
+			if (caption == null) {
+				return title + " " + ix + "/" + count;
+			}
+	
+			Hashtable<String, Object> vars = new Hashtable<String, Object>();
+			vars.put("name", title);
+			vars.put("i", new Integer(ix));
+			vars.put("n", new Integer(count));
+			vars.put("new", new Boolean(newrep));
+			return form.fillTemplateString(caption, index.getReference(), vars);
+		} else {
+			return null;
+		}
+	}
+	
+	public Vector<String> getRepetitionsText () {
+		GroupDef g = (GroupDef)element;
+		if (!g.getRepeat()) {
+			throw new RuntimeException("not a repeat");
+		}
+		
+		int numRepetitions = getNumRepetitions();
+		Vector<String> reps = new Vector<String>();
+		for (int i = 0; i < numRepetitions; i++) {
+			reps.addElement(getRepetitionText("choose", form.descendIntoRepeat(index, i), false));
+		}
+		return reps;
+	}
+	
+	public class RepeatOptions {
+		public String header;
+		public String add;
+		public String delete;
+		public String done;
+		public String delete_header;
+	}
+	
+	public RepeatOptions getRepeatOptions () {
+		RepeatOptions ro = new RepeatOptions();
+		boolean has_repetitions = (getNumRepetitions() > 0);
+		
+		ro.header = getRepeatText("mainheader");
+		
+		ro.add = null;
+    	if (form.canCreateRepeat(form.getChildInstanceRef(index))) {
+    		ro.add = getRepeatText(has_repetitions ? "add" : "add-empty");
+    	}
+    	ro.delete = null;
+    	ro.delete_header = null;
+    	if (has_repetitions) {
+    		ro.delete = getRepeatText("del");
+    		ro.delete_header = getRepeatText("delheader");
+    	}
+    	ro.done = getRepeatText(has_repetitions ? "done" : "done-empty");
+
+    	return ro;
+	}
+	
 	public String getAppearanceHint ()  {
 		return element.getAppearanceAttr();
 	}
