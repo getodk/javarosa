@@ -1,3 +1,5 @@
+//#condition polish.api.locationapi || app.uselocation == true
+
 package org.javarosa.location.service;
 
 import javax.microedition.location.Criteria;

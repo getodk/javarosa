@@ -17,7 +17,8 @@
 		<exclude name="j2me/media/src/org/javarosa/view/**/Barcode*.java"/>
 		
 		<!-- don't want to put this in the jar for phones that don't suport location -->
-		<exclude name="j2me/location/src/org/javarosa/location/**/*.java"/>
+		<!-- We'll actually handle that with polish processors rather than manual exclusion -->
+		<!--exclude name="j2me/location/src/org/javarosa/location/**/*.java"/-->
 		
 		<!-- exclude the demo app code -->
 		<exclude name="j2me/javarosa-app/src/**/*.java"/>

@@ -111,9 +111,4 @@ public class JRDemoFormEntryState extends FormEntryState {
 			abort();
 		}
 	}
-
-	public void suspendForMediaCapture(int captureType) {
-		throw new RuntimeException("not supported yet!!");
-	}
-
 }
