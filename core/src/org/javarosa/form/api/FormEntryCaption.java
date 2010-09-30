@@ -213,7 +213,7 @@ public class FormEntryCaption implements FormElementStateListener {
 			throw new RuntimeException("not a repeat");
 		}
 		
-		String title = getDefaultText();
+		String title = getLongText();
 		int count = getNumRepetitions();
 		
 		String caption = null;
@@ -279,7 +279,7 @@ public class FormEntryCaption implements FormElementStateListener {
 		if (element instanceof GroupDef && ((GroupDef)element).getRepeat() && index.getElementMultiplicity() >= 0) {
 			GroupDef g = (GroupDef)element;
 	
-			String title = getDefaultText();
+			String title = getLongText();
 			int ix = index.getElementMultiplicity() + 1;
 			int count = getNumRepetitions();
 			

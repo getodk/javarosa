@@ -1515,30 +1515,6 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 				tx.recordTouched(getName(), recordID, entry_id);
 			} catch (Exception e) {
 				Logger.log("rms-tx", "error during rms transaction back-up operation");
-				throw new WrappedException("RMS transaction error; could not back up original state of record; original operation [" + opType + "] aborted because transaction guarantees cannot be met (transaction is still open; you must roll back manually, if you wish)", e);
-			}
-		}
-	}	
-
-	private void txRecord (int recordID, String opType) {
-		for (int i = 0; i < TX_EXCL.length; i++) {
-			if (TX_EXCL[i].equals(getName()))
-				return;
-		}
-		
-		RMSTransaction tx = RMSTransaction.getTx();
-		if (tx == null) { //no active transaction
-			return;
-		}
-		
-		if (!tx.isRecordTouched(getName(), recordID)) {
-			try {
-				RMSStorageUtility tx_cache = RMSTransaction.getCacheRMS();
-				boolean recordExists = !"add".equals(opType);
-				int entry_id = tx_cache.add(new TxCacheEntry(tx, getName(), recordID, recordExists ? readBytes(recordID, false) : null));
-				tx.recordTouched(getName(), recordID, entry_id);
-			} catch (Exception e) {
-				Logger.log("rms-tx", "error during rms transaction back-up operation");
 				Logger.exception(e);
 				throw new WrappedException("RMS transaction error; could not back up original state of record; original operation [" + opType + "] aborted because transaction guarantees cannot be met (transaction is still open; you must roll back manually, if you wish)", e);
 			}
