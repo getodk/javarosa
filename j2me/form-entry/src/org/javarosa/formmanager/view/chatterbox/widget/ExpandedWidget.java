@@ -86,13 +86,13 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		IaltText = fep.getShortText();
 		Image im = MediaUtils.getImage(fep.getImageText());
 		if(im!=null){
-			System.out.println("in getImageItem(), screen height:"+height+", screen width:"+width);
-			System.out.println("image dimensions = ["+im.getHeight()+", "+im.getWidth()+"]");
-			if(height != ExpandedWidget.fallback && width != ExpandedWidget.fallback){
-				int[] dim = MediaUtils.getNewDimensions(im, height, width);
-				System.out.println("Scaled dimensions = ["+dim[0]+", "+dim[1]+"]");
-				im = MediaUtils.resizeImage(im, dim[0], dim[1]);
-			}
+//			System.out.println("in getImageItem(), screen height:"+height+", screen width:"+width);
+//			System.out.println("image dimensions = ["+im.getHeight()+", "+im.getWidth()+"]");
+//			if(height != ExpandedWidget.fallback && width != ExpandedWidget.fallback){
+//				int[] dim = MediaUtils.getNewDimensions(im, height, width);
+//				System.out.println("Scaled dimensions = ["+dim[0]+", "+dim[1]+"]");
+//				im = MediaUtils.resizeImage(im, dim[0], dim[1]);
+//			}
 			ImageItem imItem = new ImageItem(null,im, ImageItem.LAYOUT_CENTER | ImageItem.LAYOUT_VCENTER, IaltText);
 			imItem.setLayout(Item.LAYOUT_CENTER);
 			return imItem;
@@ -118,7 +118,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 //			if(imItem!=null) fullPrompt.add(imItem);
 //			imageIndex = fullPrompt.indexOf(imItem);
 //		}
-		ImageItem newImItem = ExpandedWidget.getImageItem(fep,scrHeight/2,scrWidth-16);
+		ImageItem newImItem = ExpandedWidget.getImageItem(fep,scrHeight/2,scrWidth-16); //width and height have been disabled!
 		if(imItem!=null && newImItem!=null){
 			fullPrompt.remove(imItem);	//replace an already existing image
 		}

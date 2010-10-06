@@ -665,16 +665,16 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	    	}else if(USE_HASH_FOR_AUDIO && keyCode == POUND_KEYCODE){
 	    		if(model.getEvent() != FormEntryController.EVENT_QUESTION) return;
 	    		FormEntryPrompt fep = model.getQuestionPrompt();
-	    		Vector choices = fep.getSelectChoices();
-	    		if(selectedIndex != -1 && (choices != null && choices.size() > 0)){
-		    		SelectChoice selection = (SelectChoice)choices.elementAt(selectedIndex);
-		    		int code = getAudioAndPlay(fep, selection);
-		    		if(code == AUDIO_NO_RESOURCE){
-	    				getAudioAndPlay(fep);
-		    		}
-	    		}else{
+//	    		Vector choices = fep.getSelectChoices();
+//	    		if(selectedIndex != -1 && (choices != null && choices.size() > 0)){
+//		    		SelectChoice selection = (SelectChoice)choices.elementAt(selectedIndex);
+//		    		int code = getAudioAndPlay(fep, selection);
+//		    		if(code == AUDIO_NO_RESOURCE){
+//	    				getAudioAndPlay(fep);
+//		    		}
+//	    		}else{
 	    			getAudioAndPlay(fep);
-	    		}
+//	    		}
 	    	}else if (keyCode == KEY_CENTER_LETS_HOPE) {
 		    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
 						ChatterboxWidget widget = activeFrame();
