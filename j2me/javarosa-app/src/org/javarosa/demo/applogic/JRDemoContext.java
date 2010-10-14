@@ -6,7 +6,6 @@ import java.util.Vector;
 import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.model.CoreModelModule;
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.reference.ReferenceManager;
@@ -14,9 +13,6 @@ import org.javarosa.core.reference.RootTranslator;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
-import org.javarosa.core.services.storage.IStorageUtility;
-import org.javarosa.core.services.storage.StorageFullException;
-import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.services.transport.payload.IDataPayload;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.PropertyUtils;
@@ -26,6 +22,7 @@ import org.javarosa.formmanager.FormManagerModule;
 import org.javarosa.j2me.J2MEModule;
 import org.javarosa.j2me.util.DumpRMS;
 import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.location.LocationModule;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.resources.locale.LanguageUtils;
@@ -84,6 +81,7 @@ public class JRDemoContext {
 		new UserModule().registerModule();
 		new FormManagerModule().registerModule();
 		new LanguagePackModule().registerModule();
+		new LocationModule().registerModule();
 	}
 	
 	

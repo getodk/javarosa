@@ -18,14 +18,13 @@ package org.javarosa.location;
 
 import org.javarosa.core.api.IModule;
 import org.javarosa.j2me.services.DataCaptureServiceRegistry;
-import org.javarosa.location.service.J2MELocationService;
 
 public class LocationModule implements IModule {
 	
 	public void registerModule() {
-
-			DataCaptureServiceRegistry._().registerService(new J2MELocationService());
-		
+		//#if polish.api.locationapi || app.uselocation == true
+		DataCaptureServiceRegistry._().registerService(new org.javarosa.location.service.J2MELocationService());
+		//#endif
 	}
 
 }

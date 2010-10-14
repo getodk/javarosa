@@ -99,6 +99,9 @@ public class ChatterboxWidgetFactory {
 			case Constants.DATATYPE_TIME:
 				expandedStyle = new TimeEntryWidget();
 				break;
+			case Constants.DATATYPE_GEOPOINT:
+				expandedStyle = new GeoPointWidget();
+				break;
 			}
 			break;
 		case Constants.CONTROL_SELECT_ONE:
