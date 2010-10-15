@@ -59,6 +59,19 @@
 					<attribute name="Form-Server-Url" value="${jrdemo.formListUrl}" />
 				</jad>
 				
+				
+				<!-- We rely on the jad file to be able to change properties post-compile, so
+				we need to ensure that any non-static properties don't make it into the manifest file-->
+				<manifestFilter>
+					Manifest-Version, MIDlet-Name, MIDlet-Version, MIDlet-Vendor,
+					MIDlet-Description?, MIDlet-Icon?, MIDlet-Info-URL?,
+					MIDlet-1, MIDlet-2?, MIDlet-3?, MIDlet-4?, MIDlet-5?, 
+					MicroEdition-Profile, MicroEdition-Configuration,
+					MIDlet-Data-Size?,
+					MicroEdition-*,
+					Polish-*
+				</manifestFilter>
+				
 				<!-- midlets definition -->
 				<midlet class="${app.class}" name="${app.name}" />
 
