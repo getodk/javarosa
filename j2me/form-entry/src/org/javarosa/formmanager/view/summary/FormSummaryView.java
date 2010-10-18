@@ -18,12 +18,10 @@ import org.javarosa.formmanager.view.singlequestionscreen.Constants;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.ChoiceItem;
-import de.enough.polish.ui.Color;
 import de.enough.polish.ui.Command;
 import de.enough.polish.ui.List;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.StyleSheet;
-import de.enough.polish.ui.borders.BottomBorder;
 
 public class FormSummaryView extends List {
 	private FormEntryModel model;

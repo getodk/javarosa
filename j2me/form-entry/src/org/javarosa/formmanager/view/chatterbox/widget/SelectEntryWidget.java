@@ -16,14 +16,10 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import java.io.IOException;
-import java.util.Vector;
-
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
@@ -32,7 +28,6 @@ import org.javarosa.utilities.media.MediaUtils;
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Container;
-import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.MoreUIAccess;
 import de.enough.polish.ui.Style;
@@ -205,7 +200,6 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 	}
 
 	protected ChoiceGroup choiceGroup () {
-		//return (ChoiceGroup)entryWidget;
 		return this.choicegroup;
 	}
 	
@@ -216,7 +210,7 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
 			SelectChoice sc = prompt.getSelectChoices().elementAt(i);
-			Image im = MediaUtils.getImage(prompt.getSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
+			Image im = MediaUtils.getImage(prompt.getSpecialFormSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
 
 			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(sc));
 			

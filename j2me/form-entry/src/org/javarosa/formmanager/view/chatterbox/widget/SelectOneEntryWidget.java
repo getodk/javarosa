@@ -18,7 +18,6 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.PointerAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;

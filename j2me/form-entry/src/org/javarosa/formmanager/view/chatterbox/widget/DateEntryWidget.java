@@ -22,7 +22,6 @@ import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.PointerAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.DateField;
