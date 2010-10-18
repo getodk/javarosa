@@ -17,17 +17,11 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 
-import java.util.Vector;
-
 import javax.microedition.lcdui.Image;
 
-
 import org.javarosa.core.model.FormElementStateListener;
-
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.UncastData;
-
-import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 import org.javarosa.j2me.view.J2MEDisplay;

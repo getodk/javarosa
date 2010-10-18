@@ -18,24 +18,34 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.media.Manager;
+import javax.microedition.media.MediaException;
+import javax.microedition.media.Player;
 
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.Reference;
+import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.services.Logger;
+import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
@@ -58,7 +68,6 @@ import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
-import de.enough.polish.ui.backgrounds.PolygonBackground;
 
 
 public class Chatterbox extends FramedForm implements HandledPCommandListener, IFormEntryView{
@@ -714,26 +723,11 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	public static int getAudioAndPlay(FormEntryPrompt fep,SelectChoice select){
 		if (!playAudioIfAvailable) return AUDIO_DISABLED;
 		
-		//////BEGINDEBUG
-//		System.out.println("Busting out supported conteny type info..........");
-//	      String[] contentTypes = Manager.getSupportedContentTypes(null);
-//	      for (int i = 0; i < contentTypes.length; i++) {
-//	        String[] protocols = Manager.getSupportedProtocols(contentTypes[i]);
-//	        String pop = "";
-//	        for (int j = 0; j < protocols.length; j++) {
-//	          StringItem si = new StringItem(contentTypes[i] + ": ", protocols[j]);
-//	          pop += contentTypes[i] + ": "+ protocols[j];
-//	        }
-//	       System.out.println(pop);
-//	       J2MEDisplay.showError("Compatible stuff", pop);
-//	      }
-	      /////ENDDEBUG
-		
 		String textID;
 		oldAudioURI = curAudioURI;
 		curAudioURI = null;
-		if (select == null) {		
-			if (fep.getAvailableTextForms().contains(FormEntryCaption.TEXT_FORM_AUDIO)) {
+		if (select == null) {
+			if (fep.getAudioText() != null) {
 				curAudioURI = fep.getAudioText();
 			} else {
 				return AUDIO_NO_RESOURCE;
@@ -742,8 +736,8 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 			textID = select.getTextID();
 			if(textID == null || textID == "") return AUDIO_NO_RESOURCE;
 			
-			if (fep.getSelectTextForms(select).contains(FormEntryCaption.TEXT_FORM_AUDIO)) {
-				curAudioURI = fep.getSelectChoiceText(select,FormEntryCaption.TEXT_FORM_AUDIO);
+			if (fep.getSpecialFormSelectChoiceText(select, FormEntryCaption.TEXT_FORM_AUDIO) != null) {
+				curAudioURI = fep.getSpecialFormSelectChoiceText(select, FormEntryCaption.TEXT_FORM_AUDIO);
 			} else {
 				return AUDIO_NO_RESOURCE;
 			}
