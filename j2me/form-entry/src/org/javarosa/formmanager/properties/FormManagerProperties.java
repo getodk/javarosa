@@ -39,9 +39,9 @@ public class FormManagerProperties implements IPropertyRules {
 	    public static final String VIEW_CHATTERBOX = "v_chatterbox";
 	    public static final String VIEW_SINGLEQUESTIONSCREEN = "v_singlequestionscreen";
 	    
-	    public final static String USE_HASH_FOR_AUDIO_PLAYBACK = "hashkey-audio-playback";
-	    public final static String HASH_AUDIO_PLAYBACK_YES = "Yes";
-	    public final static String HASH_AUDIO_PLAYBACK_NO = "No";
+	    public final static String EXTRA_KEY_FORMAT = "extra_key_action";
+	    public final static String EXTRA_KEY_LANGUAGE_CYCLE = "cycle";
+	    public final static String EXTRA_KEY_AUDIO_PLAYBACK = "audio";
 	    
 	    /**
 	     * Creates the JavaRosa set of property rules
@@ -57,10 +57,10 @@ public class FormManagerProperties implements IPropertyRules {
 	        rules.put(VIEW_TYPE_PROPERTY, allowableDisplays);
 	        
 	        Vector hashkeyAudio = new Vector();
-	        hashkeyAudio.addElement(HASH_AUDIO_PLAYBACK_YES);
-	        hashkeyAudio.addElement(HASH_AUDIO_PLAYBACK_NO);
+	        hashkeyAudio.addElement(EXTRA_KEY_LANGUAGE_CYCLE);
+	        hashkeyAudio.addElement(EXTRA_KEY_AUDIO_PLAYBACK);
 	         
-	        rules.put(USE_HASH_FOR_AUDIO_PLAYBACK,hashkeyAudio);
+	        rules.put(EXTRA_KEY_FORMAT,hashkeyAudio);
 
 	    }
 
@@ -128,8 +128,8 @@ public class FormManagerProperties implements IPropertyRules {
 	    public String getHumanReadableDescription(String propertyName) {
 	    	if(VIEW_TYPE_PROPERTY.equals(propertyName)) {
 	    		return "Form Entry View";
-	    	}else if(USE_HASH_FOR_AUDIO_PLAYBACK.equals(propertyName)) {
-	    		return "Use the # Key to play back audio prompts or change language?";
+	    	}else if(EXTRA_KEY_FORMAT.equals(propertyName)) {
+	    		return "What Action Should the # Button Perform?";
 	    	}return propertyName;
 	    }
 	    
@@ -144,10 +144,10 @@ public class FormManagerProperties implements IPropertyRules {
 	    		} else if(VIEW_SINGLEQUESTIONSCREEN.equals(value)) {
 	    			return "One Question Per Screen"; 
 	    		}
-	    	}else if(USE_HASH_FOR_AUDIO_PLAYBACK.equals(propertyName)) {
-    			if(HASH_AUDIO_PLAYBACK_YES.equals(value)){
-    				return "Audio Playback";
-    			}else if(HASH_AUDIO_PLAYBACK_NO.equals(value)){
+	    	}else if(EXTRA_KEY_FORMAT.equals(propertyName)) {
+    			if(EXTRA_KEY_AUDIO_PLAYBACK.equals(value)){
+    				return "Play Audio";
+    			}else if(EXTRA_KEY_LANGUAGE_CYCLE.equals(value)){
     				return "Language Cycle";
     			}
 	     	}

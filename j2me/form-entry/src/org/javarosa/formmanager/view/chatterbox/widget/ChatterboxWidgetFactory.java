@@ -24,6 +24,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.api.FormMultimediaController;
 import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 import org.javarosa.formmanager.view.chatterbox.FakedFormEntryPrompt;
 
@@ -35,11 +36,16 @@ public class ChatterboxWidgetFactory {
 	
 	PrototypeFactoryDeprecated widgetFactory;
 	
+	private FormMultimediaController mediaController;
+	
 	boolean readOnly = false;
 	
-	public ChatterboxWidgetFactory (Chatterbox cbox) {
+	boolean optimizeEntry = true;
+	
+	public ChatterboxWidgetFactory (Chatterbox cbox, FormMultimediaController mediaController) {
 		widgetFactory = new PrototypeFactoryDeprecated();
 		this.cbox = cbox;
+		this.mediaController = mediaController;
 	}
 	
 	public void registerExtendedWidget(int controlType, IWidgetStyle prototype) {
@@ -110,10 +116,10 @@ public class ChatterboxWidgetFactory {
 			else
 				style = ChoiceGroup.EXCLUSIVE;
 
-			expandedStyle = new SelectOneEntryWidget(style);
+			expandedStyle = new SelectOneEntryWidget(style,optimizeEntry);
 			break;
 		case Constants.CONTROL_SELECT_MULTI:
-			expandedStyle = new SelectMultiEntryWidget();
+			expandedStyle = new SelectMultiEntryWidget(optimizeEntry);
 			break;
 		case Constants.CONTROL_TEXTAREA:
 			expandedStyle = new TextEntryWidget();
@@ -145,6 +151,7 @@ public class ChatterboxWidgetFactory {
 		if (collapsedStyle == null || expandedStyle == null)
 			throw new IllegalStateException("No appropriate widget to render question");
 		
+		expandedStyle.registerMultimediaController(mediaController);
 		ChatterboxWidget widget = new ChatterboxWidget(cbox, prompt, initViewState, collapsedStyle, expandedStyle);
 		prompt.register(widget);
 		return widget;
@@ -191,4 +198,8 @@ public class ChatterboxWidgetFactory {
     public void setReadOnly(boolean readOnly) {
     	this.readOnly = readOnly;
     }
+
+	public void setOptimizeEntry(boolean entryOptimized) {
+		this.optimizeEntry = entryOptimized;
+	}
 }

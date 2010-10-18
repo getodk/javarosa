@@ -20,10 +20,11 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.model.FormElementStateListener;
+import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.UncastData;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.formmanager.view.chatterbox.Chatterbox;
+import org.javarosa.formmanager.api.FormMultimediaController;
 import org.javarosa.j2me.view.J2MEDisplay;
 import org.javarosa.utilities.media.MediaUtils;
 
@@ -42,10 +43,11 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	private Container fullPrompt;
 	private int scrHeight,scrWidth;
 	
-	public static boolean AUTOPLAYAUDIO = false;
-	
 	/** Used during image scaling **/
 	public static int fallback = 99;
+	
+	protected FormMultimediaController multimediaController;
+	
 	public ExpandedWidget () {
 		reset();
 	}
@@ -103,15 +105,6 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	private ImageItem imItem;
 	
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
-//		if(imItem!=null && imageIndex !=-1){	//replace an already existing image
-//			imItem = getImageItem(fep);
-//			if(imItem!=null) fullPrompt.set(imageIndex, imItem);
-//			imageIndex = fullPrompt.indexOf(imItem);
-//		}else{
-//			imItem = getImageItem(fep);
-//			if(imItem!=null) fullPrompt.add(imItem);
-//			imageIndex = fullPrompt.indexOf(imItem);
-//		}
 		ImageItem newImItem = ExpandedWidget.getImageItem(fep,scrHeight/2,scrWidth-16); //width and height have been disabled!
 		if(imItem!=null && newImItem!=null){
 			fullPrompt.remove(imItem);	//replace an already existing image
@@ -121,9 +114,8 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 			imItem = newImItem;
 		}
 		
-		if(AUTOPLAYAUDIO){
-			Chatterbox.getAudioAndPlay(fep);
-		}
+		getMultimediaController().playAudioOnLoad(fep);
+			
 		prompt.setText(fep.getLongText());	
 		updateWidget(fep);
 		
@@ -168,6 +160,36 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 			return getAnswerTemplate().cast((UncastData)data);
 		} else {
 			return data;
+		}
+	}
+	
+
+	public void registerMultimediaController(FormMultimediaController controller) {
+		this.multimediaController = controller;
+	}
+	
+	protected FormMultimediaController getMultimediaController() {
+		if(this.multimediaController == null) {
+			return new FormMultimediaController() {
+
+				public void playAudioOnLoad(FormEntryPrompt fep) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				public void playAudioOnDemand(FormEntryPrompt fep) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				public int playAudioOnDemand(FormEntryPrompt fep, SelectChoice select) {
+					// TODO Auto-generated method stub
+					return 0;
+				}
+			};
+
+		} else {
+			return multimediaController;
 		}
 	}
 	

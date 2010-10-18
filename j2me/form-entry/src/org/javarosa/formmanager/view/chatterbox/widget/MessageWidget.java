@@ -21,7 +21,7 @@ import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.formmanager.view.chatterbox.Chatterbox;
+import org.javarosa.formmanager.api.FormMultimediaController;
 import org.javarosa.j2me.view.J2MEDisplay;
 
 import de.enough.polish.ui.Container;
@@ -30,6 +30,12 @@ import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
 
+/**
+ * TODO: make an expandedwidget.
+ * 
+ * @author ctsims
+ *
+ */
 public class MessageWidget implements IWidgetStyleEditable {
 	private StringItem prompt;
 	private StringItem ok;
@@ -37,6 +43,8 @@ public class MessageWidget implements IWidgetStyleEditable {
 	private ImageItem imItem;
 	private Container fullPrompt;
 	private int scrHeight,scrWidth;
+	
+	private FormMultimediaController multimediaController;
 
 	public MessageWidget () {
 		reset();
@@ -71,8 +79,8 @@ public class MessageWidget implements IWidgetStyleEditable {
 			fullPrompt.add(newImItem);
 			imItem = newImItem;
 		}
-		if(ExpandedWidget.AUTOPLAYAUDIO){
-			Chatterbox.getAudioAndPlay(fep);
+		if(multimediaController != null){
+			multimediaController.playAudioOnLoad(fep);
 		}
 		prompt.setText(fep.getLongText());
 	}
@@ -105,5 +113,10 @@ public class MessageWidget implements IWidgetStyleEditable {
 
 	public int getPinnableHeight() {
 		return prompt.getContentHeight();
+	}
+
+	
+	public void registerMultimediaController(FormMultimediaController controller) {
+		this.multimediaController = controller;
 	}
 }

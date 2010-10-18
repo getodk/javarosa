@@ -22,7 +22,6 @@ import javax.microedition.lcdui.Image;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 import org.javarosa.utilities.media.MediaUtils;
 
 import de.enough.polish.ui.ChoiceGroup;
@@ -48,12 +47,15 @@ import de.enough.polish.ui.Style;
  */
 public abstract class SelectEntryWidget extends ExpandedWidget {
 	private int style;
+	private boolean autoSelect;
+	protected int lastSelected = -1;
 	protected FormEntryPrompt prompt;
 	
 	private ChoiceGroup choicegroup;
 	
-	public SelectEntryWidget (int style) {
+	public SelectEntryWidget (int style, boolean autoSelect) {
 		this.style = style;
+		this.autoSelect = autoSelect;
 	}
 	
 	protected Item getEntryWidget (FormEntryPrompt prompt) {
@@ -165,23 +167,28 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 			
 			
 			/** Hack #5 **/
+			//Clayton Sims (10/18/2010) These should only happen if the autoSelect isn't true 
 			//Anton de Winter 4/23/2010
 			//To play an audio file whenever a choice is highlighted we need to make the following hack.
 			public void focusChild( int index, Item item, int direction ) {
-				Chatterbox.selectedIndex = index;
-				if(direction != 0){
-					doAudio(index);
+				if(autoSelect) {
+					//skip everything here;
+				} else {
+					//CTS(10/18/2010) : Remove selectedIndex hack.
+					if(direction != 0){
+						doAudio(index, false);
+					} 
 				}
 				super.focusChild(index, item, direction);
 			}
 			
 			protected boolean handleKeyPressed(int keyCode, int gameAction){
-				if(!(keyCode >= Canvas.KEY_NUM1 && keyCode <= Canvas.KEY_NUM9)){
+				if(autoSelect || !(keyCode >= Canvas.KEY_NUM1 && keyCode <= Canvas.KEY_NUM9)){
 					return super.handleKeyPressed(keyCode,gameAction);
 				}else{
 					int index = keyCode-Canvas.KEY_NUM1;
 					if(index < this.itemsList.size()){
-						doAudio(index);
+						doAudio(index,true);
 						super.focusChild(index);
 					}else{
 						return super.handleKeyPressed(keyCode,gameAction);
@@ -203,8 +210,11 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 		return this.choicegroup;
 	}
 	
-	private void doAudio(int index){
-		Chatterbox.getAudioAndPlay(prompt,prompt.getSelectChoices().elementAt(index));
+	private void doAudio(int index, boolean force){
+		if(force || lastSelected != index) {
+			lastSelected = index;
+			getMultimediaController().playAudioOnDemand(prompt,prompt.getSelectChoices().elementAt(index));
+		}
 	}
 
 	protected void updateWidget (FormEntryPrompt prompt) {

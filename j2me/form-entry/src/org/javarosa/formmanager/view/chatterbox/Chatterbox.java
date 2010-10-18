@@ -18,28 +18,19 @@
 
 package org.javarosa.formmanager.view.chatterbox;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.media.Manager;
-import javax.microedition.media.MediaException;
-import javax.microedition.media.Player;
 
 import org.javarosa.core.api.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.core.reference.Reference;
-import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.services.Logger;
-import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.NoLocalizedTextException;
@@ -81,26 +72,6 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     public static int KEY_CENTER_LETS_HOPE = -5;
     
     public static final int UIHACK_SELECT_PRESS = 1;
-    
-    /////////AUDIO PLAYBACK
-	static Player audioPlayer;
-	protected static boolean playAudioIfAvailable = true;
-	protected static final int AUDIO_SUCCESS = 1;
-	protected static final int AUDIO_NO_RESOURCE = 2;
-	protected static final int AUDIO_ERROR = 3;
-	protected static final int AUDIO_DISABLED = 4;
-	protected static final int AUDIO_BUSY = 5;
-	protected static final int AUDIO_NOT_RECOGNIZED = 6;
-	/** Causes audio player to throw runtime exceptions if there are problems instead of failing silently **/
-	private static final boolean AUDIO_DEBUG_MODE = true;
-	private static Reference curAudRef = null;
-	private static Reference oldAudRef = null;
-	private static String curAudioURI;
-	private static String oldAudioURI = "";
-	
-	/** This value gets set by SelectEntryWidget to denote the last item the user was focused on
-	 * WARNING: this value does NOT get reset back to -1 when the FormEntryPrompt moves on to a new question.**/
-	public static int selectedIndex = -1;
 	
 	private JrFormEntryController controller;
     private JrFormEntryModel model;
@@ -150,8 +121,9 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		}
     	};
 
-    	widgetFactory = new ChatterboxWidgetFactory(this);
+    	widgetFactory = new ChatterboxWidgetFactory(this, controller);
     	widgetFactory.setReadOnly(model.isReadOnlyMode());
+    	widgetFactory.setOptimizeEntry(controller.isEntryOptimized());
     	
     	multiLingual = (model.getForm().getLocalizer() != null);
     	questionIndexes = new SortedIndexSet();
@@ -167,7 +139,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	POUND_KEYCODE = Canvas.KEY_STAR;
     	//#endif
     	
-    	if(PropertyManager._().getSingularProperty(FormManagerProperties.USE_HASH_FOR_AUDIO_PLAYBACK).equals(FormManagerProperties.HASH_AUDIO_PLAYBACK_YES)){
+    	if(FormManagerProperties.EXTRA_KEY_AUDIO_PLAYBACK.equals(controller.getExtraKeyMode())){
     		USE_HASH_FOR_AUDIO = true;
     	}else{
     		USE_HASH_FOR_AUDIO = false;
@@ -671,19 +643,10 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	    	super.keyPressed(keyCode);
 	    	if(multiLingual && keyCode == POUND_KEYCODE && !USE_HASH_FOR_AUDIO) {
 	    		controller.cycleLanguage();
-	    	}else if(USE_HASH_FOR_AUDIO && keyCode == POUND_KEYCODE){
+	    	} else if(USE_HASH_FOR_AUDIO && keyCode == POUND_KEYCODE){
 	    		if(model.getEvent() != FormEntryController.EVENT_QUESTION) return;
 	    		FormEntryPrompt fep = model.getQuestionPrompt();
-//	    		Vector choices = fep.getSelectChoices();
-//	    		if(selectedIndex != -1 && (choices != null && choices.size() > 0)){
-//		    		SelectChoice selection = (SelectChoice)choices.elementAt(selectedIndex);
-//		    		int code = getAudioAndPlay(fep, selection);
-//		    		if(code == AUDIO_NO_RESOURCE){
-//	    				getAudioAndPlay(fep);
-//		    		}
-//	    		}else{
-	    			getAudioAndPlay(fep);
-//	    		}
+	    		controller.playAudioOnDemand(fep);
 	    	}else if (keyCode == KEY_CENTER_LETS_HOPE) {
 		    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
 						ChatterboxWidget widget = activeFrame();
@@ -714,101 +677,8 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	}
     }
     
-    /**
-     * Plays audio for the SelectChoice (if AudioURI is present and media is available)
-     * @param fep
-     * @param select
-     * @return
-     */
-	public static int getAudioAndPlay(FormEntryPrompt fep,SelectChoice select){
-		if (!playAudioIfAvailable) return AUDIO_DISABLED;
-		
-		String textID;
-		oldAudioURI = curAudioURI;
-		curAudioURI = null;
-		if (select == null) {
-			if (fep.getAudioText() != null) {
-				curAudioURI = fep.getAudioText();
-			} else {
-				return AUDIO_NO_RESOURCE;
-			}	
-		}else{
-			textID = select.getTextID();
-			if(textID == null || textID == "") return AUDIO_NO_RESOURCE;
-			
-			if (fep.getSpecialFormSelectChoiceText(select, FormEntryCaption.TEXT_FORM_AUDIO) != null) {
-				curAudioURI = fep.getSpecialFormSelectChoiceText(select, FormEntryCaption.TEXT_FORM_AUDIO);
-			} else {
-				return AUDIO_NO_RESOURCE;
-			}
-		}
-		int retcode = AUDIO_SUCCESS;
-		try {
-			oldAudRef = curAudRef;
-			curAudRef = ReferenceManager._().DeriveReference(curAudioURI);
-			String format = getFileFormat(curAudioURI);
+    
 
-			if(format == null) return AUDIO_NOT_RECOGNIZED;
-			if(audioPlayer == null){
-				audioPlayer = Manager.createPlayer(curAudRef.getStream(), format);
-				audioPlayer.start();
-			}else{
-				audioPlayer.deallocate();
-				audioPlayer.close();
-				audioPlayer = Manager.createPlayer(curAudRef.getStream(), format);
-				audioPlayer.start();
-			}
-			
-		} catch (InvalidReferenceException ire) {
-			retcode = AUDIO_ERROR;
-			if(AUDIO_DEBUG_MODE)throw new RuntimeException("Invalid Reference Exception when attempting to play audio at URI:"+ curAudioURI + "Exception msg:"+ire.getMessage());
-			System.err.println("Invalid Reference Exception when attempting to play audio at URI:"+ curAudioURI + "Exception msg:"+ire.getMessage());
-		} catch (IOException ioe) {
-			retcode = AUDIO_ERROR;
-			if(AUDIO_DEBUG_MODE) throw new RuntimeException("IO Exception (input cannot be read) when attempting to play audio stream with URI:"+ curAudioURI + "Exception msg:"+ioe.getMessage());
-			System.err.println("IO Exception (input cannot be read) when attempting to play audio stream with URI:"+ curAudioURI + "Exception msg:"+ioe.getMessage());
-		} catch (MediaException e) {
-			retcode = AUDIO_ERROR;
-			if(AUDIO_DEBUG_MODE) throw new RuntimeException("Media format not supported! Uri: "+ curAudioURI + "Exception msg:"+e.getMessage());
-			System.err.println("Media format not supported! Uri: "+ curAudioURI + "Exception msg:"+e.getMessage());
-		}
-		return retcode;
-	}
-	
-	/**
-	 * Checks the boolean playAudioIfAvailable first.
-	 * Plays the question audio text
-	 */
-	public static void getAudioAndPlay(FormEntryPrompt fep){
-		getAudioAndPlay(fep,null);
-	}
-	
-	private static String getFileFormat(String fpath){
-//		Wave audio files: audio/x-wav
-//		AU audio files: audio/basic
-//		MP3 audio files: audio/mpeg
-//		MIDI files: audio/midi
-//		Tone sequences: audio/x-tone-seq
-//		MPEG video files: video/mpeg
-//		Audio 3GPP files (.3gp) audio/3gpp
-//		Audio AMR files (.amr) audio/amr
-//		Audio AMR (wideband) files (.awb) audio/amr-wb
-//		Audio MIDI files (.mid or .midi) audio/midi
-//		Audio MP3 files (.mp3) audio/mpeg
-//		Audio MP4 files (.mp4) audio/mp4
-//		Audio WAV files (.wav) audio/wav audio/x-wav
-		
-		if(fpath.indexOf(".mp3") > -1) return "audio/mp3";
-		if(fpath.indexOf(".wav") > -1) return "audio/x-wav";
-		if(fpath.indexOf(".amr") > -1) return "audio/amr";
-		if(fpath.indexOf(".awb") > -1) return "audio/amr-wb";
-		if(fpath.indexOf(".mp4") > -1) return "audio/mp4";
-		if(fpath.indexOf(".aac") > -1) return "audio/aac";
-		if(fpath.indexOf(".3gp") > -1) return "audio/3gpp";
-		if(fpath.indexOf(".au") > -1) return "audio/basic";
-		throw new RuntimeException("COULDN'T FIND FILE FORMAT");
-//		return null;
-	}
 	
     public ChatterboxWidget getWidgetAtIndex(int index) {
     	return (ChatterboxWidget)get(index);
@@ -933,11 +803,4 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 			alertTitle = title;
 			this.msg = msg;
 	}
-
-	/*
-	private void handleException(Exception e) {
-		Alert a = new Alert("Exception", e.toString(), null, null);
-		a.setTimeout(Alert.FOREVER);
-		//JavaRosaServiceProvider.instance().getDisplay().setCurrent(a, mMainForm);
-	}*/
 }
