@@ -17,6 +17,7 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.api.FormMultimediaController;
 
 import de.enough.polish.ui.Container;
 
@@ -61,4 +62,5 @@ public interface IWidgetStyle {
 	 * in a pinned header.
 	 */
 	int getPinnableHeight();
+	
 }

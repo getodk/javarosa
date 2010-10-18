@@ -29,7 +29,7 @@ public class FormManagerModule implements IModule {
 	public void registerModule() {
 		PropertyManager._().addRules(new FormManagerProperties());
 		PropertyUtils.initializeProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, FormManagerProperties.VIEW_CHATTERBOX);
-		PropertyUtils.initializeProperty(FormManagerProperties.USE_HASH_FOR_AUDIO_PLAYBACK, FormManagerProperties.HASH_AUDIO_PLAYBACK_YES);
+		PropertyUtils.initializeProperty(FormManagerProperties.EXTRA_KEY_FORMAT, FormManagerProperties.EXTRA_KEY_LANGUAGE_CYCLE);
 	}
 
 }

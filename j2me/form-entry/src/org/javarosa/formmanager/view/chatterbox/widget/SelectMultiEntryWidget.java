@@ -30,8 +30,13 @@ import de.enough.polish.ui.Item;
 public class SelectMultiEntryWidget extends SelectEntryWidget {
 	private WidgetEscapeComponent wec = new WidgetEscapeComponent();
 	
+	
 	public SelectMultiEntryWidget () {
-		super(ChoiceGroup.MULTIPLE);
+		this(true);
+	}
+	
+	public SelectMultiEntryWidget(boolean autoSelect) {
+		super(ChoiceGroup.MULTIPLE, autoSelect);
 	}
 	
 	protected void setWidgetValue (Object o) {
