@@ -141,9 +141,6 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 		
 		activeStyle.reset();
 		clear();
-		//if (blankSlateStyle != null) {
-		//	setStyle(blankSlateStyle);
-		//}
 	}
 
 	//call-back from QuestionBinding
@@ -153,8 +150,6 @@ public class ChatterboxWidget extends Container implements IQuestionWidget, Hand
 		
 	private void attachWidget () {
 		Item widget = expandedStyle.getInteractiveWidget();
-		
-//		ExpandedWidget.getAudioAndPlay(prompt);
 		
 		widget.addCommand(nextCommand);
 		widget.setItemCommandListener(this);
