@@ -1871,7 +1871,7 @@ public class XFormParser {
 		if (bindErrors.size() > 0) {
 		    String errorMsg = "";
 		    for (int i = 0; i < bindErrors.size(); i++) {
-		        errorMsg += bindErrors.get(i) + "\n";
+		        errorMsg += bindErrors.elementAt(i) + "\n";
 		    }
 		    throw new XFormParseException(errorMsg);
 		}
@@ -1910,7 +1910,7 @@ public class XFormParser {
 				if (nodes.size() == 0) {
 				    String error = "ERROR: " + type + " binding [" + tref.toString() + "] matches no nodes";
 					System.err.println(error);
-					errors.add(error);
+					errors.addElement(error);
 				}
 				//we can't check whether questions map to the right kind of node ('data' node vs. 'sub-tree' node) as that depends
 				//on the question's data type, which we don't know yet
