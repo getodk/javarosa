@@ -18,9 +18,9 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.PointerAnswerData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.formmanager.view.chatterbox.Chatterbox;
 
 import de.enough.polish.ui.ChoiceGroup;
 
@@ -30,10 +30,15 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 	}
 	
 	public SelectOneEntryWidget (int style) {
-		super(style);
+		this(style, true);
+	}
+
+	public SelectOneEntryWidget(int style, boolean autoSelect) {
+		super(style, autoSelect);
 		
-		if (style == ChoiceGroup.MULTIPLE)
+		if (style == ChoiceGroup.MULTIPLE) {
 			throw new IllegalArgumentException("Cannot use style 'MULTIPLE' on select1 control");
+		}
 	}
 	
 	public int getNextMode () {
@@ -45,6 +50,8 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 		if(s.index == -1) {
 			s.attachChoice(prompt.getQuestion());
 		}
+		//To prevent audio from being played over if appropriate
+		this.lastSelected = s.index;
 		choiceGroup().setSelectedIndex(s.index, true);
 	}
 
@@ -66,8 +73,6 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 	}
 	
 	public boolean focus () {
-		System.out.println("Focus() called in SelectOneEntryWidget");
-		getAudioAndPlay(prompt,null);
 		choiceGroup().focusChild(choiceGroup().getSelectedIndex());
 		return true;
 	}

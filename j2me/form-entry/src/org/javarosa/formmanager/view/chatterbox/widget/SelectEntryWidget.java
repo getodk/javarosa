@@ -16,20 +16,17 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import java.io.IOException;
-import java.util.Vector;
-
+import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Image;
 
 import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.utilities.media.MediaUtils;
 
 import de.enough.polish.ui.ChoiceGroup;
 import de.enough.polish.ui.ChoiceItem;
 import de.enough.polish.ui.Container;
-import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.MoreUIAccess;
 import de.enough.polish.ui.Style;
@@ -50,12 +47,15 @@ import de.enough.polish.ui.Style;
  */
 public abstract class SelectEntryWidget extends ExpandedWidget {
 	private int style;
+	private boolean autoSelect;
+	protected int lastSelected = -1;
 	protected FormEntryPrompt prompt;
 	
 	private ChoiceGroup choicegroup;
 	
-	public SelectEntryWidget (int style) {
+	public SelectEntryWidget (int style, boolean autoSelect) {
 		this.style = style;
+		this.autoSelect = autoSelect;
 	}
 	
 	protected Item getEntryWidget (FormEntryPrompt prompt) {
@@ -167,13 +167,39 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 			
 			
 			/** Hack #5 **/
+			//Clayton Sims (10/18/2010) These should only happen if the autoSelect isn't true 
 			//Anton de Winter 4/23/2010
 			//To play an audio file whenever a choice is highlighted we need to make the following hack.
 			public void focusChild( int index, Item item, int direction ) {
-				if(direction != 0){
-					doAudio(index);
+				if(autoSelect) {
+					//skip everything here;
+				} else {
+					//CTS(10/18/2010) : Remove selectedIndex hack.
+					if(direction != 0){
+						doAudio(index, false);
+					} 
 				}
 				super.focusChild(index, item, direction);
+			}
+			
+			//This hack handles whether a widget should automatically be advanced
+			//when a number is pressed, or whether it should simply change what is
+			//currently ready to be selected.
+			protected boolean handleKeyPressed(int keyCode, int gameAction){
+				
+				//Only catch 1-9 and only then when autoselect isn't enabled.
+				if(autoSelect || !(keyCode >= Canvas.KEY_NUM1 && keyCode <= Canvas.KEY_NUM9)){
+					return super.handleKeyPressed(keyCode,gameAction);
+				}else{
+					int index = keyCode-Canvas.KEY_NUM1;
+					if(index < this.itemsList.size()){
+						doAudio(index,true);
+						super.focusChild(index);
+					}else{
+						return super.handleKeyPressed(keyCode,gameAction);
+					}
+					return true;
+				}
 			}
 		};
 		for (int i = 0; i < prompt.getSelectChoices().size(); i++){
@@ -186,19 +212,23 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 	}
 
 	protected ChoiceGroup choiceGroup () {
-		//return (ChoiceGroup)entryWidget;
 		return this.choicegroup;
 	}
 	
-	private void doAudio(int index){
-		getAudioAndPlay(prompt,prompt.getSelectChoices().elementAt(index));
+	private void doAudio(int index, boolean force){
+		//We only want to play the audio in certain circumstances to make sure we aren't
+		//double playing certain situations.
+		if(force || lastSelected != index) {
+			lastSelected = index;
+			getMultimediaController().playAudioOnDemand(prompt,prompt.getSelectChoices().elementAt(index));
+		}
 	}
 
 	protected void updateWidget (FormEntryPrompt prompt) {
 		for (int i = 0; i < choiceGroup().size(); i++) {
 			SelectChoice sc = prompt.getSelectChoices().elementAt(i);
-			Image im = this.getImage(prompt.getSpecialFormSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
-			
+			Image im = MediaUtils.getImage(prompt.getSpecialFormSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_IMAGE));
+
 			choiceGroup().getItem(i).setText(prompt.getSelectChoiceText(sc));
 			
 			if(im!=null){

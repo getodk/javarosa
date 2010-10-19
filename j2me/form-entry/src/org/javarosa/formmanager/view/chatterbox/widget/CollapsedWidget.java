@@ -74,21 +74,11 @@ public class CollapsedWidget implements IWidgetStyle {
 	}
 
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {	
-		
 		prompt.setText(fep.getShortText());
 		
-		IAnswerData data = fep.getAnswerValue();
-		if (data != null) {
-			String value = data.getDisplayText();
-			if(fep.getControlType() == Constants.CONTROL_SECRET) {
-				String obfuscated = "";
-				for(int i =0 ; i < value.length() ; ++i ) { 
-					obfuscated += "*";
-				}
-				answer.setText(obfuscated);
-			} else {
-				answer.setText(value);	
-			}
+		String value = fep.getAnswerText();
+		if (value != null) {
+			answer.setText(value);
 		}
 	}
 

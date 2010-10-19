@@ -92,7 +92,7 @@ public class FormEntryCaption implements FormElementStateListener {
 	 */
 	public String getShortText(){
 		String returnText = getSpecialFormQuestionText(getTextID(), TEXT_FORM_SHORT);
-		if(returnText == null) returnText = getSpecialFormQuestionText(null);
+		if(returnText == null) { returnText = getLongText(); }
 		return returnText;
 	}
 	
@@ -161,8 +161,6 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
 	 */
 	public String getSpecialFormQuestionText(String textID,String form){
-		//throw tantrum if this method is called when it shouldn't be
-//		if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
 		if(textID == null || textID.equals("")) return null;
 		
 		String returnText = getIText(textID, form);
@@ -178,7 +176,6 @@ public class FormEntryCaption implements FormElementStateListener {
 	 * @throws RunTimeException if this method is called on an element that is NOT a QuestionDef
 	 */
 	public String getSpecialFormQuestionText(String form){
-//		if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
 		return getSpecialFormQuestionText(getTextID(), form);
 	}
 	

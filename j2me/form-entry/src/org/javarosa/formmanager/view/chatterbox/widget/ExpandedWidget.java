@@ -16,30 +16,24 @@
 
 package org.javarosa.formmanager.view.chatterbox.widget;
 
-import java.io.IOException;
-import java.util.Vector;
 
 import javax.microedition.lcdui.Image;
-import javax.microedition.media.Manager;
-import javax.microedition.media.MediaException;
-import javax.microedition.media.Player;
 
 import org.javarosa.core.model.FormElementStateListener;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.UncastData;
-import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.core.reference.Reference;
-import org.javarosa.core.reference.ReferenceManager;
-import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.api.FormMultimediaController;
+import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.utilities.media.MediaUtils;
 
-import de.enough.polish.multimedia.AudioPlayer;
 import de.enough.polish.ui.Container;
 import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
 import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.UiAccess;
+
 
 public abstract class ExpandedWidget implements IWidgetStyleEditable {
 
@@ -47,8 +41,13 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	protected Item entryWidget;
 	private Container c;
 	private Container fullPrompt;
-	protected static boolean playAudioIfAvailable = true;
-
+	private int scrHeight,scrWidth;
+	
+	/** Used during image scaling **/
+	public static int fallback = 99;
+	
+	protected FormMultimediaController multimediaController;
+	
 	public ExpandedWidget () {
 		reset();
 	}
@@ -70,65 +69,19 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		
 		c.add(fullPrompt);
 		c.add(entryWidget);
+		scrHeight = J2MEDisplay.getScreenHeight(ExpandedWidget.fallback);
+		scrWidth = J2MEDisplay.getScreenWidth(ExpandedWidget.fallback);
+		
 		
 		this.c = c;
 	}
-	
-	static Player player;
-	public static void getAudioAndPlay(FormEntryPrompt fep,SelectChoice select){
-		if (!playAudioIfAvailable) return;
-		String AudioURI;
-		String textID;
-		AudioURI = null;
-		if (select == null) {		
-			AudioURI = fep.getAudioText();
-			if(AudioURI == null){
-				return;
-			}	
-		}else{
-			textID = select.getTextID();
-			if(textID == null || textID == "") return;
-			
-			AudioURI = fep.getSpecialFormSelectChoiceText(select,FormEntryCaption.TEXT_FORM_AUDIO);
-			if(AudioURI == null){
-				return;
-			}
-		}	
-		try {
-			Reference audRef = ReferenceManager._().DeriveReference(AudioURI);
-			if(player==null || player.getState()!=player.STARTED){
-				player = Manager.createPlayer(audRef.getStream(), "audio/x-wav");
-				player.start();
-			}else{
-				System.out.println("Player busy so skipping requested audio for now:"+AudioURI);
-			}
-			
-			System.out.flush();
-			} catch (InvalidReferenceException ire) {
-				throw new RuntimeException("Invalid Reference Exception when attempting to play audio at URI:"+ AudioURI);
-			} catch (IOException ioe) {
-				throw new RuntimeException(	"IO Exception (input cannot be read) when attempting to play audio stream with URI:"+ AudioURI);
-			} catch (MediaException e) {
-				throw new RuntimeException("Media format not supported! Uri: "+ AudioURI);
-			}
-	}
-	
-	/**
-	 * Checks the boolean playAudioIfAvailable first.
-	 */
-	public static void getAudioAndPlay(FormEntryPrompt fep){
-		getAudioAndPlay(fep,null);
-	}
-		
-	public ImageItem getImageItem(FormEntryPrompt fep){
-//		Vector AvailForms = fep.getAvailableTextForms();
+	public static ImageItem getImageItem(FormEntryPrompt fep,int height,int width) {
 		String IaltText;
 
 		IaltText = fep.getShortText();
-		
-		Image im = getImage(fep.getImageText());
+		Image im = MediaUtils.getImage(fep.getImageText());
 		if(im!=null){
-			ImageItem imItem = new ImageItem(null,getImage(fep.getImageText()), ImageItem.LAYOUT_CENTER | ImageItem.LAYOUT_VCENTER, IaltText);
+			ImageItem imItem = new ImageItem(null,im, ImageItem.LAYOUT_CENTER | ImageItem.LAYOUT_VCENTER, IaltText);
 			imItem.setLayout(Item.LAYOUT_CENTER);
 			return imItem;
 		}else{
@@ -137,36 +90,24 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		
 	}
 	
-	public Image getImage(String URI){
-		if(URI != null){
-			try {
-				return Image.createImage(ReferenceManager._().DeriveReference(URI).getStream()); 
-			} catch (IOException e) {
-				throw new RuntimeException("ERROR! Cant find image at URI: "+URI);	
-			} catch (InvalidReferenceException ire){
-				throw new RuntimeException("Invalid Reference for image at: " +URI);
-			}
-		} else{
-			return null;
-		}
-	}
+
 
 	private int imageIndex=-1;
 	
 	private ImageItem imItem;
 	
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
-		if(imItem!=null && imageIndex !=-1){	//replace an already existing image
-			imItem = getImageItem(fep);
-			if(imItem!=null) fullPrompt.set(imageIndex, imItem);
-			imageIndex = fullPrompt.indexOf(imItem);
-		}else{
-			imItem = getImageItem(fep);
-			if(imItem!=null) fullPrompt.add(imItem);
-			imageIndex = fullPrompt.indexOf(imItem);
+		ImageItem newImItem = ExpandedWidget.getImageItem(fep,scrHeight/2,scrWidth-16); //width and height have been disabled!
+		if(imItem!=null && newImItem!=null){
+			fullPrompt.remove(imItem);	//replace an already existing image
+		}
+		if(newImItem!=null){
+			fullPrompt.add(newImItem);
+			imItem = newImItem;
 		}
 		
-		getAudioAndPlay(fep);
+		getMultimediaController().playAudioOnLoad(fep);
+			
 		prompt.setText(fep.getLongText());	
 		updateWidget(fep);
 		
@@ -211,6 +152,37 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 			return getAnswerTemplate().cast((UncastData)data);
 		} else {
 			return data;
+		}
+	}
+	
+
+	public void registerMultimediaController(FormMultimediaController controller) {
+		this.multimediaController = controller;
+	}
+	
+	protected FormMultimediaController getMultimediaController() {
+		if(this.multimediaController == null) {
+			//If one isn't really set, use an empty shell
+			return new FormMultimediaController() {
+
+				public void playAudioOnLoad(FormEntryPrompt fep) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				public void playAudioOnDemand(FormEntryPrompt fep) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				public int playAudioOnDemand(FormEntryPrompt fep, SelectChoice select) {
+					// TODO Auto-generated method stub
+					return 0;
+				}
+			};
+
+		} else {
+			return multimediaController;
 		}
 	}
 	

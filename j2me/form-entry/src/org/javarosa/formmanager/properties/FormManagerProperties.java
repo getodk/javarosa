@@ -39,6 +39,10 @@ public class FormManagerProperties implements IPropertyRules {
 	    public static final String VIEW_CHATTERBOX = "v_chatterbox";
 	    public static final String VIEW_SINGLEQUESTIONSCREEN = "v_singlequestionscreen";
 	    
+	    public final static String EXTRA_KEY_FORMAT = "extra_key_action";
+	    public final static String EXTRA_KEY_LANGUAGE_CYCLE = "cycle";
+	    public final static String EXTRA_KEY_AUDIO_PLAYBACK = "audio";
+	    
 	    /**
 	     * Creates the JavaRosa set of property rules
 	     */
@@ -51,6 +55,12 @@ public class FormManagerProperties implements IPropertyRules {
 	        allowableDisplays.addElement(VIEW_CHATTERBOX);
 	        allowableDisplays.addElement(VIEW_SINGLEQUESTIONSCREEN);
 	        rules.put(VIEW_TYPE_PROPERTY, allowableDisplays);
+	        
+	        Vector hashkeyAudio = new Vector();
+	        hashkeyAudio.addElement(EXTRA_KEY_LANGUAGE_CYCLE);
+	        hashkeyAudio.addElement(EXTRA_KEY_AUDIO_PLAYBACK);
+	         
+	        rules.put(EXTRA_KEY_FORMAT,hashkeyAudio);
 
 	    }
 
@@ -118,8 +128,9 @@ public class FormManagerProperties implements IPropertyRules {
 	    public String getHumanReadableDescription(String propertyName) {
 	    	if(VIEW_TYPE_PROPERTY.equals(propertyName)) {
 	    		return "Form Entry View";
-	    	}
-	    	return propertyName;
+	    	}else if(EXTRA_KEY_FORMAT.equals(propertyName)) {
+	    		return "What Action Should the # Button Perform?";
+	    	}return propertyName;
 	    }
 	    
 	    /*
@@ -133,6 +144,12 @@ public class FormManagerProperties implements IPropertyRules {
 	    		} else if(VIEW_SINGLEQUESTIONSCREEN.equals(value)) {
 	    			return "One Question Per Screen"; 
 	    		}
+	    	}else if(EXTRA_KEY_FORMAT.equals(propertyName)) {
+    			if(EXTRA_KEY_AUDIO_PLAYBACK.equals(value)){
+    				return "Play Audio";
+    			}else if(EXTRA_KEY_LANGUAGE_CYCLE.equals(value)){
+    				return "Language Cycle";
+    			}
 	     	}
 	    	return value;
 	    }

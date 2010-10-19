@@ -46,6 +46,9 @@ public class XFormUtils {
 		return getFormFromInputStream(is);
 	}
 
+	/*
+     * This method throws XFormParseException when the form has errors.
+     */
 	public static FormDef getFormFromInputStream(InputStream is) {
 		FormDef returnForm = null;
 		InputStreamReader isr;

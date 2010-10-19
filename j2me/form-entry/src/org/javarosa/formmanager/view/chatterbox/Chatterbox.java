@@ -37,9 +37,11 @@ import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.formmanager.api.transitions.FormEntryTransitions;
+import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.formmanager.utility.SortedIndexSet;
 import org.javarosa.formmanager.view.IFormEntryView;
 import org.javarosa.formmanager.view.chatterbox.widget.ChatterboxWidget;
@@ -61,10 +63,9 @@ import de.enough.polish.ui.UiAccess;
 
 
 public class Chatterbox extends FramedForm implements HandledPCommandListener, IFormEntryView{
-	private static int LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_POUND;
 	
-	private int AUDIO_PLAYBACK_KEYCODE = -1;
-	
+	private boolean USE_HASH_FOR_AUDIO = true;
+	private static int POUND_KEYCODE = Canvas.KEY_POUND;
     private static final String PROMPT_REQUIRED_QUESTION = Localization.get("view.sending.RequiredQuestion");
 
 	private static final String PROMPT_DEFAULT_CONSTRAINT_VIOL = "Answer is outside of the allowed range";
@@ -127,8 +128,9 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		}
     	};
 
-    	widgetFactory = new ChatterboxWidgetFactory(this);
+    	widgetFactory = new ChatterboxWidgetFactory(this, controller);
     	widgetFactory.setReadOnly(model.isReadOnlyMode());
+    	widgetFactory.setOptimizeEntry(controller.isEntryOptimized());
     	
     	multiLingual = (model.getForm().getLocalizer() != null);
     	questionIndexes = new SortedIndexSet();
@@ -141,14 +143,16 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	//#endif
     	
     	//#if device.identifier == Sony-Ericsson/K610i
-    	LANGUAGE_CYCLE_KEYCODE = Canvas.KEY_STAR;
+    	POUND_KEYCODE = Canvas.KEY_STAR;
     	//#endif
-
+    	
+    	if(FormManagerProperties.EXTRA_KEY_AUDIO_PLAYBACK.equals(controller.getExtraKeyMode())){
+    		USE_HASH_FOR_AUDIO = true;
+    	}else{
+    		USE_HASH_FOR_AUDIO = false;
+    	}
     }
     
-    public void setAudioPlaybackKey(int keycode) {
-    	AUDIO_PLAYBACK_KEYCODE = keycode;
-    }
 
     public void destroy () {
     	for (int i = 0; i < size(); i++) {
@@ -713,19 +717,21 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 //	}
 	
     public void keyPressed(int keyCode) {
-    	
     	try {
-    	
 	    	FormIndex keyDownSelectedWidget = this.activeQuestionIndex;
 	    	super.keyPressed(keyCode);
-	    	if(multiLingual && keyCode == LANGUAGE_CYCLE_KEYCODE) {
+	    	if(multiLingual && keyCode == POUND_KEYCODE && !USE_HASH_FOR_AUDIO) {
 	    		controller.cycleLanguage();
-	    	} else if (keyCode == KEY_CENTER_LETS_HOPE) {
-	    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
-					ChatterboxWidget widget = activeFrame();
-					if (widget != null) {
-						widget.UIHack(UIHACK_SELECT_PRESS);
-					}
+	    	} else if(USE_HASH_FOR_AUDIO && keyCode == POUND_KEYCODE){
+	    		if(model.getEvent() != FormEntryController.EVENT_QUESTION) return;
+	    		FormEntryPrompt fep = model.getQuestionPrompt();
+	    		controller.playAudioOnDemand(fep);
+	    	}else if (keyCode == KEY_CENTER_LETS_HOPE) {
+		    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
+						ChatterboxWidget widget = activeFrame();
+						if (widget != null) {
+							widget.UIHack(UIHACK_SELECT_PRESS);
+						}
 				}
 	        	indexWhenKeyPressed = keyDownSelectedWidget;
 	    	}
@@ -741,7 +747,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		//The previous select keypress was for a different item.
     	} else {
     		//#if javarosa.supresscycle
-    		if(keyCode != LANGUAGE_CYCLE_KEYCODE) {
+    		if(keyCode != POUND_KEYCODE) {
         		super.keyReleased(keyCode);
     		}
     		//#else
@@ -749,6 +755,9 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		//#endif
     	}
     }
+    
+    
+
 	
     public ChatterboxWidget getWidgetAtIndex(int index) {
     	return (ChatterboxWidget)get(index);
@@ -873,11 +882,4 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 			alertTitle = title;
 			this.msg = msg;
 	}
-
-	/*
-	private void handleException(Exception e) {
-		Alert a = new Alert("Exception", e.toString(), null, null);
-		a.setTimeout(Alert.FOREVER);
-		//JavaRosaServiceProvider.instance().getDisplay().setCurrent(a, mMainForm);
-	}*/
 }

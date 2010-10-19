@@ -151,10 +151,38 @@ public class FormEntryPrompt extends FormEntryCaption {
    
 
     public String getAnswerText() {
-        if (mTreeElement.getValue() == null)
+    	IAnswerData data = this.getAnswerValue();
+    	
+        if (data == null)
             return null;
-        else
-            return mTreeElement.getValue().getDisplayText();
+        else {
+        	String text;
+        	
+        	//csims@dimagi.com - Aug 11, 2010 - Added special logic to
+        	//capture and display the appropriate value for selections
+        	//and multi-selects.
+        	if(data instanceof SelectOneData) {
+        		text = this.getSelectItemText((Selection)data.getValue());
+        	} else if(data  instanceof SelectMultiData) {
+        		String returnValue = "";
+        		Vector<Selection> values = (Vector<Selection>)data.getValue();
+        		for(Selection value : values) {
+        			returnValue += this.getSelectItemText(value) + " ";
+        		}
+        		text = returnValue;
+        	} else {
+        		text = data.getDisplayText();
+        	}
+        	
+        	if(getControlType() == Constants.CONTROL_SECRET) {
+				String obfuscated = "";
+				for(int i =0 ; i < text.length() ; ++i ) { 
+					obfuscated += "*";
+				}
+				text = obfuscated;
+        	}
+        	return text;
+        }
     }
 
     public String getConstraintText() {
