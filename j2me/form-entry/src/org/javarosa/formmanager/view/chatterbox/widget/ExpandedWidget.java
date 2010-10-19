@@ -76,19 +76,11 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 		this.c = c;
 	}
 	public static ImageItem getImageItem(FormEntryPrompt fep,int height,int width) {
-//		Vector AvailForms = fep.getAvailableTextForms();
 		String IaltText;
 
 		IaltText = fep.getShortText();
 		Image im = MediaUtils.getImage(fep.getImageText());
 		if(im!=null){
-//			System.out.println("in getImageItem(), screen height:"+height+", screen width:"+width);
-//			System.out.println("image dimensions = ["+im.getHeight()+", "+im.getWidth()+"]");
-//			if(height != ExpandedWidget.fallback && width != ExpandedWidget.fallback){
-//				int[] dim = MediaUtils.getNewDimensions(im, height, width);
-//				System.out.println("Scaled dimensions = ["+dim[0]+", "+dim[1]+"]");
-//				im = MediaUtils.resizeImage(im, dim[0], dim[1]);
-//			}
 			ImageItem imItem = new ImageItem(null,im, ImageItem.LAYOUT_CENTER | ImageItem.LAYOUT_VCENTER, IaltText);
 			imItem.setLayout(Item.LAYOUT_CENTER);
 			return imItem;
@@ -170,6 +162,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	
 	protected FormMultimediaController getMultimediaController() {
 		if(this.multimediaController == null) {
+			//If one isn't really set, use an empty shell
 			return new FormMultimediaController() {
 
 				public void playAudioOnLoad(FormEntryPrompt fep) {

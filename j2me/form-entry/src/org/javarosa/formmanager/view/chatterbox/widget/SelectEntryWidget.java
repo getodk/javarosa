@@ -182,7 +182,12 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 				super.focusChild(index, item, direction);
 			}
 			
+			//This hack handles whether a widget should automatically be advanced
+			//when a number is pressed, or whether it should simply change what is
+			//currently ready to be selected.
 			protected boolean handleKeyPressed(int keyCode, int gameAction){
+				
+				//Only catch 1-9 and only then when autoselect isn't enabled.
 				if(autoSelect || !(keyCode >= Canvas.KEY_NUM1 && keyCode <= Canvas.KEY_NUM9)){
 					return super.handleKeyPressed(keyCode,gameAction);
 				}else{
@@ -211,6 +216,8 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 	}
 	
 	private void doAudio(int index, boolean force){
+		//We only want to play the audio in certain circumstances to make sure we aren't
+		//double playing certain situations.
 		if(force || lastSelected != index) {
 			lastSelected = index;
 			getMultimediaController().playAudioOnDemand(prompt,prompt.getSelectChoices().elementAt(index));
