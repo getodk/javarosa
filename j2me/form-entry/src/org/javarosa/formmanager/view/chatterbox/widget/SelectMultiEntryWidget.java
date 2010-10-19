@@ -20,7 +20,6 @@ import java.util.Vector;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.PointerAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -31,8 +30,13 @@ import de.enough.polish.ui.Item;
 public class SelectMultiEntryWidget extends SelectEntryWidget {
 	private WidgetEscapeComponent wec = new WidgetEscapeComponent();
 	
+	
 	public SelectMultiEntryWidget () {
-		super(ChoiceGroup.MULTIPLE);
+		this(true);
+	}
+	
+	public SelectMultiEntryWidget(boolean autoSelect) {
+		super(ChoiceGroup.MULTIPLE, autoSelect);
 	}
 	
 	protected void setWidgetValue (Object o) {

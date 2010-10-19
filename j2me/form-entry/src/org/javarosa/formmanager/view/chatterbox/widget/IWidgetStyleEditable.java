@@ -17,6 +17,7 @@
 package org.javarosa.formmanager.view.chatterbox.widget;
 
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.formmanager.api.FormMultimediaController;
 
 import de.enough.polish.ui.Item;
 
@@ -41,4 +42,12 @@ public interface IWidgetStyleEditable extends IWidgetStyle {
 	
 	//get item to set event listeners for 
 	Item getInteractiveWidget ();
+	
+	/**
+	 * Register the controller that should be used by this editable widget for multimedia
+	 * playback and interfacing.
+	 * 
+	 * @param controller
+	 */
+	public void registerMultimediaController(FormMultimediaController controller);
 }

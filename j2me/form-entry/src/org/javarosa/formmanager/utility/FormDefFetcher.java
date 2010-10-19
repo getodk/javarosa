@@ -16,7 +16,6 @@
 
 package org.javarosa.formmanager.utility;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;

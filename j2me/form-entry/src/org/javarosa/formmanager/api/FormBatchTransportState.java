@@ -3,22 +3,10 @@
  */
 package org.javarosa.formmanager.api;
 
-import java.util.Vector;
-
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Item;
-
 import org.javarosa.core.api.State;
 import org.javarosa.formmanager.api.transitions.FormBatchTransportStateTransitions;
-import org.javarosa.formmanager.utility.FormSender;
-import org.javarosa.formmanager.view.transport.FormTransportViews;
-import org.javarosa.formmanager.view.transport.MultiSubmitStatusScreen;
-import org.javarosa.formmanager.view.transport.TransportResponseProcessor;
-import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.log.HandledItemStateListener;
-import org.javarosa.j2me.view.J2MEDisplay;
 
 /**
  * @author ctsims

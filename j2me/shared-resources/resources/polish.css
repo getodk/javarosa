@@ -683,6 +683,49 @@ alertcontent {
     layout: horizontal-center | vertical-center;
 }
 
+.downloadNewForms{
+
+	border {
+			color: lighterBlue;
+			width: 2;
+		}
+	padding:2;
+	margin-top:4;
+	focused-style: downloadNewFormsFocused;
+	layout: horizontal-center | vertical-center;
+}
+
+.downloadNewFormsFocused extends focused{
+	background-color: selectedBg;
+	border {
+		arc-width:6;
+		arc-height:6;
+		width:2;
+		color: lighterBlue;
+	}
+	padding:2;
+	margin-top:4;
+	layout: horizontal-center | vertical-center;
+}
+
+.formSelected{
+	focused-style:formSelectedFocused;
+	margin:2;
+	layout: left | expand;
+}
+
+.formSelectedFocused{
+	background-color: selectedBg;
+	border {
+		type:round-rect;
+		arc-width:6;
+		arc-height:6;
+		width:2;
+		color: dimagiBlue;
+	}
+	layout: left | expand;
+}
+
 .leftlabeledTextField {
 	background-color: white;
 	border-width: 1;
