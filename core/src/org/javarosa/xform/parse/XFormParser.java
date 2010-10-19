@@ -16,15 +16,6 @@
 
 package org.javarosa.xform.parse;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -63,6 +54,15 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -240,7 +240,13 @@ public class XFormParser {
 		defaultNamespace = null;
 	}
 
-	public static FormDef getFormDef(Reader reader) {
+	/**
+	 * 
+	 * @param reader
+	 * @return
+	 * @throws XmlPullParserException 
+	 */
+	public static FormDef getFormDef(Reader reader)   {
 		System.out.println("Parsing form...");
 		
 		Document doc = getXMLDocument(reader);
@@ -251,37 +257,29 @@ public class XFormParser {
 			e.printStackTrace();
 		}
 		
-		if (doc != null) {
-			try {
-				return getFormDef(doc);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-		} else {
-			return null;
-		}
+		return getFormDef(doc);
 	}
 
-	public static Document getXMLDocument(Reader reader){
+	public static Document getXMLDocument(Reader reader)  {
 		Document doc = new Document();
 
 		try{
 			KXmlParser parser = new KXmlParser();
 			parser.setInput(reader);
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
-			
 			doc.parse(parser);
 		}  catch (XmlPullParserException e) {
-			System.err.println("XML Syntax Error at Line: " + e.getLineNumber() +", Column: "+ e.getColumnNumber()+ "!");
+		    String errorMsg = "XML Syntax Error at Line: " + e.getLineNumber() +", Column: "+ e.getColumnNumber()+ "!";
+			System.err.println(errorMsg);
 			e.printStackTrace();
+			throw new XFormParseException(errorMsg);
 		} catch(Exception e){
 			//#if debug.output==verbose || debug.output==exception
-			System.err.println("XML Syntax Error!");
+		    String errorMsg = "Unhandled Exception while Parsing XForm";
+		    System.err.println(errorMsg);
 			e.printStackTrace();
+			throw new XFormParseException(errorMsg);
 			//#endif
-
-			return null;
 		}
 
 		return doc;
@@ -1868,7 +1866,15 @@ public class XFormParser {
 		}
 
 		//check control/group/repeat bindings (bound nodes exist, question can't bind to '/')
-		verifyControlBindings(f, instance);
+		Vector<String> bindErrors = new Vector<String>();
+		verifyControlBindings(f, instance, bindErrors);
+		if (bindErrors.size() > 0) {
+		    String errorMsg = "";
+		    for (int i = 0; i < bindErrors.size(); i++) {
+		        errorMsg += bindErrors.get(i) + "\n";
+		    }
+		    throw new XFormParseException(errorMsg);
+		}
 		
 		//check that repeat members bind to the proper scope (not above the binding of the parent repeat, and not within any sub-repeat (or outside repeat))
 		verifyRepeatMemberBindings(f, instance, null);
@@ -1879,7 +1885,7 @@ public class XFormParser {
 		verifyItemsetSrcDstCompatibility(instance);
 	}
 	
-	private static void verifyControlBindings (IFormElement fe, FormInstance instance) {
+	private static void verifyControlBindings (IFormElement fe, FormInstance instance, Vector<String> errors) { //throws XmlPullParserException {
 		if (fe.getChildren() == null)
 			return;
 		
@@ -1895,20 +1901,22 @@ public class XFormParser {
 				ref = ((QuestionDef)child).getBind();
 				type = "Control";
 			}
-				TreeReference tref = FormInstance.unpackReference(ref);
+			TreeReference tref = FormInstance.unpackReference(ref);
 
 			if (child instanceof QuestionDef && tref.size() == 0) {
 				System.out.println("Warning! Cannot bind control to '/'"); //group can bind to '/'; repeat can't, but that's checked above
 			} else {
 				Vector nodes = instance.expandReference(tref, true);
 				if (nodes.size() == 0) {
-					System.out.println("Warning: " + type + " binding [" + tref.toString() + "] matches no nodes");
+				    String error = "ERROR: " + type + " binding [" + tref.toString() + "] matches no nodes";
+					System.err.println(error);
+					errors.add(error);
 				}
 				//we can't check whether questions map to the right kind of node ('data' node vs. 'sub-tree' node) as that depends
 				//on the question's data type, which we don't know yet
 			}
 			
-			verifyControlBindings(child, instance);
+			verifyControlBindings(child, instance, errors);
 		}
 	}
 	
@@ -2226,7 +2234,7 @@ public class XFormParser {
 	//not only do we have to re-parse the entire formdef, but it is not guaranteed that you can drop in a submitted instance
 	//back into its original form def and it will still parse. in particular, non-relevant nodes will be missing, which will
 	//really confuse the binding verifier and repeat homogeneity checker.
-	public static FormInstance parseDataModelGhettoooooo (InputStream instanceXMLStream, InputStream formDefXMLStream, String locale) {
+	public static FormInstance parseDataModelGhettoooooo (InputStream instanceXMLStream, InputStream formDefXMLStream, String locale)   {
 		Document formDefXML = getXMLDocument(new InputStreamReader(formDefXMLStream));
 		Document instanceXML = getXMLDocument(new InputStreamReader(instanceXMLStream));
 
