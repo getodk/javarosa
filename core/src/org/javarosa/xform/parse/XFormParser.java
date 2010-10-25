@@ -16,6 +16,15 @@
 
 package org.javarosa.xform.parse;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.DataBinding;
 import org.javarosa.core.model.FormDef;
@@ -38,6 +47,7 @@ import org.javarosa.core.model.util.restorable.Restorable;
 import org.javarosa.core.model.util.restorable.RestoreUtils;
 import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.locale.TableLocaleSource;
+import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.model.xform.XPathReference;
@@ -54,15 +64,6 @@ import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
 
 /* droos: i think we need to start storing the contents of the <bind>s in the formdef again */
 
@@ -1208,12 +1209,14 @@ public class XFormParser {
 		/////////////////////////
 		
 		String lang = trans.getAttributeValue("", "lang");
-		if (lang == null || lang.length() == 0)
+		if (lang == null || lang.length() == 0) {
 			throw new XFormParseException("no language specified for <translation>",trans);
+		}
 		String isDefault = trans.getAttributeValue("", "default");
 
-		if (!l.addAvailableLocale(lang))
+		if (!l.addAvailableLocale(lang)) {
 			throw new XFormParseException("duplicate <translation> for language '" + lang + "'",trans);
+		}
 
 		if (isDefault != null) {
 			if (l.getDefaultLocale() != null)
@@ -1225,8 +1228,9 @@ public class XFormParser {
 
 		for (int j = 0; j < trans.getChildCount(); j++) {
 			Element text = trans.getElement(j);
-			if (text == null || !text.getName().equals("text"))
+			if (text == null || !text.getName().equals("text")) {
 				continue;
+			}
 
 			parseTextHandle(source, text, f);
 			//Clayton Sims - Jun 17, 2009 - This code is used when the stinginess flag
@@ -1259,8 +1263,9 @@ public class XFormParser {
 		childUsedAtts.addElement(ID_ATTR);
 		//////////
 		
-		if (id == null || id.length() == 0)
+		if (id == null || id.length() == 0) {
 			throw new XFormParseException("no id defined for <text>",text);
+		}
 
 		for (int k = 0; k < text.getChildCount(); k++) {
 			Element value = text.getElement(k);
@@ -1270,15 +1275,18 @@ public class XFormParser {
 			}
 
 			String form = value.getAttributeValue("", FORM_ATTR);
-			if (form != null && form.length() == 0)
+			if (form != null && form.length() == 0) {
 				form = null;
+			}
 			String data = getLabel(value, f);
-			if (data == null)
+			if (data == null) {
 				data = "";
+			}
 
 			String textID = (form == null ? id : id + ";" + form);  //kind of a hack
-			if (l.hasMapping(textID))
+			if (l.hasMapping(textID)) {
 				throw new XFormParseException("duplicate definition for text ID \"" + id + "\" and form \"" + form + "\""+". Can only have one definition for each text form.",text);
+			}
 			l.setLocaleMapping(textID, data);
 			
 			//print unused attribute warning message for child element
@@ -1303,8 +1311,9 @@ public class XFormParser {
 		String[] locales = l.getAvailableLocales();
 		
 		for (int i = 0; i < locales.length; i++) {
+			//Test whether there is a default translation, or whether there is any special form available.
 			if (!(hasITextMapping(form, textID, locales[i]) ||
-					(allowSubforms && hasITextMapping(form, textID + ";long", locales[i]) && hasITextMapping(form, textID + ";short", locales[i])))) {
+					(allowSubforms && hasSpecialFormMapping(form, textID, locales[i])))) {
 				if (locales[i].equals(l.getDefaultLocale())) {
 					throw new XFormParseException(type + " '" + textID + "': text is not localizable for default locale [" + l.getDefaultLocale() + "]!");
 				} else {
@@ -1312,6 +1321,41 @@ public class XFormParser {
 				}
 			}
 		}
+	}
+	
+	/** All of the forms which are likely to be in JR xforms by default */
+	private static String[] guesses = {"long", "short","image","audio"};
+	/**
+	 * Tests whether or not there is any form (default or special) for the provided
+	 * text id.
+	 * 
+	 * @return True if a translation is present for the given textID in the form. False otherwise
+	 */
+	private static boolean hasSpecialFormMapping(FormDef form, String textID, String locale) {
+		//First check our guesses
+		for(String guess : guesses) {
+			if(hasITextMapping(form, textID + ";" + guess, locale)) {
+				return true;
+			}
+		}
+		//Otherwise this sucks and we have to test the keys
+		OrderedHashtable table = form.getLocalizer().getLocaleData(locale);
+		for(Enumeration keys = table.keys() ; keys.hasMoreElements() ;) {
+			String key = (String)keys.nextElement();
+			if(key.startsWith(textID + ";")) {
+				//A key is found, pull it out, add it to the list of guesses, and return positive
+				String textForm = key.substring(key.indexOf(";") + 1, key.length());
+				System.out.println("adding unexpected special itext form: " + textForm + " to list of expected forms");
+				String[] newGuesses = new String[guesses.length + 1];
+				for(int i = 0; i < guesses.length ; ++i ){ 
+					newGuesses[i] = guesses[i];
+				}
+				newGuesses[newGuesses.length-1] = textForm;
+				guesses = newGuesses;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static void parseBind (FormDef f, Element e) {
