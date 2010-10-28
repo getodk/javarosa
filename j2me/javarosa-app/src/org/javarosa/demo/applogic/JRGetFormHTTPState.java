@@ -1,9 +1,11 @@
 package org.javarosa.demo.applogic;
 
-import org.javarosa.demo.util.GetFormHttpStateGet;
+import org.javarosa.core.services.locale.Localization;
+import org.javarosa.demo.util.ProgressScreenFormDownload;
 import org.javarosa.formmanager.api.GetFormHttpState;
+import org.javarosa.formmanager.view.ProgressScreen;
 
-public class JRGetFormHTTPState extends GetFormHttpStateGet {
+public class JRGetFormHTTPState extends GetFormHttpState {
 
 	private String formUrl;
 	
@@ -15,6 +17,10 @@ public class JRGetFormHTTPState extends GetFormHttpStateGet {
 		return this.formUrl;
 	}
 
+	protected ProgressScreen initProgressScreen() {
+		return new ProgressScreenFormDownload(Localization.get("jrdemo.downloading"),Localization.get("jrdemo.fetching"), this);
+	}
+	
 	public void done() {
 		new JRDemoFormListState().start();
 	}
