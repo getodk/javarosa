@@ -27,7 +27,6 @@ public class JRDemoGetFormListHTTPState implements State,
 			Localization.get("jrdemo.searching"), Localization.get("jrdemo.contacting"), this);
 
 	private String getListUrl;
-	private String credentials;
 
 	private SenderThread thread;
 
@@ -55,7 +54,7 @@ public class JRDemoGetFormListHTTPState implements State,
 	}
 
 	public void fetchList() {
-		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(getListUrl + credentials);
+		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(getListUrl);
 
 		try {
 			thread = TransportService.send(message, 1, 0);// only one try if

@@ -172,9 +172,12 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 
 			os = conn.openOutputStream();
 			byte[] o = (byte[]) this.getContent();
-
-			System.out.println("content: " + new String(o));
-			StreamsUtil.writeToOutput(o, os);
+			if (o != null) {
+				System.out.println("content: " + new String(o));
+				StreamsUtil.writeToOutput(o, os);
+			} else {
+				System.out.println("no request body");
+			}
 			os.close();
 
 			// Get the response
