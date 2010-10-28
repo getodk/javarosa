@@ -112,22 +112,16 @@ public class TransportService {
 	 * @return
 	 * @throws IOException
 	 */
-	public static SenderThread send(TransportMessage message, int tries,
-			int delay) throws TransportException {
-
-		// create the appropriate transporter
-		Transporter transporter = message.createTransporter();
+	public static SenderThread send(TransportMessage message, int tries, int delay) throws TransportException {
 
 		// create a sender thread
-		SenderThread thread = new SimpleSenderThread(transporter, CACHE(), tries,
-				delay);
+		SenderThread thread = new SimpleSenderThread(message, CACHE(), tries, delay);
 
 		// if the message should be stored and never lost
 		if (message.isCacheable()) {
 
 			// record the deadline for the sending thread phase in the message
-			message.setSendingThreadDeadline(getSendingThreadDeadline(thread
-					.getTries(), thread.getDelay()));
+			message.setSendingThreadDeadline(getSendingThreadDeadline(thread.getTries(), thread.getDelay()));
 
 			synchronized (CACHE()) {
 				// persist the message
@@ -163,12 +157,8 @@ public class TransportService {
 			// persist the message
 			CACHE().cache(message);
 		}
-		// create the appropriate transporter
-		Transporter transporter = message.createTransporter();
 
-		transporter.setMessage(message);
-		// and get the transporter to try to send the message
-		transporter.send();
+		message.send();
 
 		// if the message had been cached..
 		if (message.isCacheable()) {
@@ -195,8 +185,7 @@ public class TransportService {
 	 * 
 	 * 
 	 */
-	public static void sendCached(TransportListener listener)
-			throws TransportException {
+	public static void sendCached(TransportListener listener) throws TransportException {
 		if(SENDER == null) {
 			//This is very bad, and the service should have been initialized
 			SENDER  = new TransporterSharingSender();
@@ -212,17 +201,8 @@ public class TransportService {
 			Logger.log("send-all", "start; " + messages.size() + " msgs");
 			
 			if (messages.size() > 0) {
-	
-				// create one appropriate transporter (to share a connection, for
-				// example)
-				TransportMessage m = (TransportMessage) messages.elementAt(0);
-	
-				Transporter transporter = m.createTransporter();
-				// get a bulk sender to use the transporter to send all messages
-				SENDER.init(transporter, messages, CACHE(), listener);
-	
+				SENDER.init(messages, CACHE(), listener);
 				SENDER.send();
-	
 			}
 		}
 	}

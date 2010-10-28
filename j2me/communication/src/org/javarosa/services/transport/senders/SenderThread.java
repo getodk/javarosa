@@ -3,12 +3,10 @@ package org.javarosa.services.transport.senders;
 import java.util.Vector;
 
 import org.javarosa.core.services.Logger;
-import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.j2me.log.HandledThread;
 import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
-import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.TransportException;
 
 /**
@@ -32,16 +30,13 @@ public abstract class SenderThread extends HandledThread {
 	public Vector listeners = new Vector();
 
 	/**
-	 * the Transporter has the TransportMessage, and knows how to send it
-	 */
-	protected Transporter transporter;
-
-	/**
 	 * A reference to the TransportMessageStore is needed so that successfully
 	 * sent messages can be removed
 	 */
 	protected TransportCache messageStore;
 
+	protected TransportMessage message;
+	
 	/**
 	 * Number of times to try
 	 */
@@ -64,11 +59,8 @@ public abstract class SenderThread extends HandledThread {
 	 *            messages which are successfully sent can be removed from the
 	 *            queue
 	 */
-	protected SenderThread(Transporter transporter, TransportCache queue) {
-		this.transporter = transporter;
-		this.messageStore = queue;
-		this.tries = DEFAULT_TRIES;
-		this.delay = DEFAULT_DELAY;
+	protected SenderThread(TransportMessage message, TransportCache queue) {
+		this(message, queue, DEFAULT_TRIES, DEFAULT_DELAY);
 	}
 
 	/**
@@ -79,9 +71,8 @@ public abstract class SenderThread extends HandledThread {
 	 *            messages which are successfully sent can be removed from the
 	 *            queue
 	 */
-	protected SenderThread(Transporter transporter, TransportCache queue,
-			int tries, int delay) {
-		this.transporter = transporter;
+	protected SenderThread(TransportMessage message, TransportCache queue, int tries, int delay) {
+		this.message = message;
 		this.messageStore = queue;
 		this.tries = tries;
 		this.delay = delay;
@@ -105,22 +96,19 @@ public abstract class SenderThread extends HandledThread {
 	 * 
 	 * @return The message being sent (with updated status)
 	 */
-	protected TransportMessage attemptToSend() throws TransportException {
+	protected void attemptToSend() throws TransportException {
 
-		notifyChange(this.transporter.getMessage(), "Attempts left: "
-				+ this.triesRemaining);
+		notifyChange("Attempts left: " + this.triesRemaining);
 		
-		Logger.log("send", "open " + transporter.getMessage().getTag());
-		TransportMessage message = this.transporter.send();
+		Logger.log("send", "open " + message.getTag());
+		message.send();
 		if (message.isSuccess()) {
-
-			onSuccess(message);
-			notifyStatusChange(message);
+			onSuccess();
+			notifyStatusChange();
 		} else {
 			Logger.log("send", message.getTag() + " fail attempt " + (triesRemaining - 1) + "; " + message.getFailureReason());
 			onFailure();
 		}
-		return message;
 	}
 
 	/**
@@ -129,8 +117,7 @@ public abstract class SenderThread extends HandledThread {
 	 * 
 	 * @param message
 	 */
-	protected void onSuccess(TransportMessage message)
-			throws TransportException {
+	protected void onSuccess() throws TransportException {
 		if (message.isCacheable()) {
 			// remove from queue
 			this.messageStore.decache(message);
@@ -177,20 +164,18 @@ public abstract class SenderThread extends HandledThread {
 	 * @param message
 	 * @param remark
 	 */
-	public void notifyChange(TransportMessage message, String remark) {
+	public void notifyChange(String remark) {
 		for (int i = 0; i < this.listeners.size(); i++) {
-			((TransportListener) this.listeners.elementAt(i)).onChange(message,
-					remark);
+			((TransportListener) this.listeners.elementAt(i)).onChange(message,	remark);
 		}
 	}
 
 	/**
 	 * @param message
 	 */
-	public void notifyStatusChange(TransportMessage message) {
+	public void notifyStatusChange() {
 		for (int i = 0; i < this.listeners.size(); i++) {
-			((TransportListener) this.listeners.elementAt(i))
-					.onStatusChange(message);
+			((TransportListener) this.listeners.elementAt(i)).onStatusChange(message);
 		}
 	}
 

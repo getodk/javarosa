@@ -1,15 +1,16 @@
 package org.javarosa.services.transport.impl.binarysms;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+
+import javax.microedition.io.Connector;
+import javax.wireless.messaging.BinaryMessage;
+import javax.wireless.messaging.MessageConnection;
 
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 
 /**
@@ -67,19 +68,66 @@ public class BinarySMSTransportMessage extends BasicTransportMessage {
 		this.destinationURL = destinationURL;
 	}
 
-	/*
-	 * (non-Javadoc)
+	
+	
+	
+	
+	public void send() {
+		MessageConnection conn = null;
+		try {
+			System.out.println("BinarySMSTransporter.send() - destination = " + this.getDestinationURL());
+
+			// create a MessageConnection
+			conn = getConnection(this.getDestinationURL());
+			sendMessage((byte[]) this.getContent(), conn);
+
+		} catch (Exception e) {
+			System.out.println("Connection failed: ");
+			this.setFailureReason(e.getMessage());
+			this.incrementFailureCount();
+		} finally {
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (IOException e) {
+					// do nothing
+				}
+		}
+	}
+
+	/**
 	 * 
-	 * @see org.javarosa.services.transport.TransportMessage#createTransporter()
+	 * Send single sms over a MessageConnection
+	 * 
+	 * @param content
+	 *            The content of the SMS to be sent
+	 * @param conn
+	 *            The connection over which the SMS is to be sent
+	 * @throws IOException
 	 */
-	public Transporter createTransporter() {
-		return new BinarySMSTransporter(this);
+	private void sendMessage(byte[] content, MessageConnection conn) throws IOException {
+		BinaryMessage sms = (BinaryMessage) conn.newMessage(MessageConnection.BINARY_MESSAGE);
+		sms.setAddress(this.getDestinationURL());
+		sms.setPayloadData(content);
+		conn.send(sms);
 	}
 
-	public InputStream getContentStream() {
-		return new ByteArrayInputStream((byte[]) getContent());
+	/**
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
+	private static MessageConnection getConnection(String url) throws IOException {
+		Object o = Connector.open(url);
+		if (o instanceof MessageConnection)
+			return (MessageConnection) o;
+		else
+			throw new IllegalArgumentException("Not SMS URL:" + url);
 	}
-
+	
+	
+	
+	
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {
 		super.readExternal(in, pf);

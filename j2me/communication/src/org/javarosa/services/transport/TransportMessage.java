@@ -17,21 +17,7 @@ public interface TransportMessage extends Persistable {
 
 	public static final String STORAGE_NAME = "transport-message-store";
 	
-	/**
-	 * 
-	 * 
-	 * Each <code>TransportMessage</code> has the ability to create a
-	 * <code>Transporter</code> capable of sending itself
-	 * 
-	 * e.g. <code>
-	 * public Transporter createTransporter(){
-	 * 	    return <b>new</b> SimpleHttpTransporter(this);
-	 * }
-	 * </code>
-	 * 
-	 * @return A Transporter object able to send this message
-	 */
-	Transporter createTransporter();
+	public void send();
 
 	/**
 	 * 
@@ -45,16 +31,6 @@ public interface TransportMessage extends Persistable {
 	 */
 	boolean isCacheable();
 	
-	
-	/**
-	 *
-	 * 
-	 * @return Whatever is being sent
-	 */
-	Object getContent();
-	
-	InputStream getContentStream();
-
 	/**
 	 * 
 	 * 
