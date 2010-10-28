@@ -184,6 +184,8 @@ class Stream:
       raise StopIteration
   
   class EndOfStream (Exception):
+    bytes = 'not implemented'
+
     def __init__ (self, buffers):
       self.buffers = buffers
       

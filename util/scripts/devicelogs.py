@@ -11,7 +11,7 @@ if __name__ == "__main__":
   stream = DataStream(data)
   (rmses, num_rms, err) = extract_rms(stream)
 
-  log_rmses = [rms for rms in rmses if rms['name'].startswith('LOG_') and rms['name'] != 'LOG_IX']
+  log_rmses = [rms for rms in rmses if rms['name'].startswith('LOG_') and rms['name'] not in ('LOG_IX', 'LOG_PANIC')]
   log_entries = []
   for log_rms in log_rmses:
     log_entries.extend([rec['content'][1] for rec in log_rms['records']])
