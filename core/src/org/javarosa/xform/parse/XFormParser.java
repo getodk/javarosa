@@ -1651,7 +1651,18 @@ public class XFormParser {
 			ItemsetBinding itemset = (ItemsetBinding)itemsets.elementAt(i);
 			TreeReference srcRef = itemset.nodesetRef;
 			if (!refs.contains(srcRef)) {
-				refs.addElement(srcRef);
+				//CTS: Being an itemset root is not sufficient to mark
+				//a node as repeatable. It has to be nonstatic (which it
+				//must be inherently unless there's a wildcard).
+				boolean nonstatic = true;
+				for(int j = 0 ; j < srcRef.size(); ++j) {
+					if(TreeReference.NAME_WILDCARD.equals(srcRef.getName(j))) {
+						nonstatic = false;
+					}
+				}
+				if(nonstatic) {
+					refs.addElement(srcRef);
+				}
 			}
 			
 			if (itemset.copyMode) {
@@ -1688,8 +1699,9 @@ public class XFormParser {
 			for (int j = 0; j < nodes.size(); j++) {
 				TreeReference nref = (TreeReference)nodes.elementAt(j);
 				TreeElement node = instance.resolveReference(nref);
-				if (node != null) //catch '/'
+				if (node != null) {//catch '/'
 					node.repeatable = true;
+				}
 			}
 		}		
 	}

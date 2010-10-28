@@ -33,6 +33,7 @@ import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.core.model.utils.DateUtils;
 
@@ -141,8 +142,7 @@ public class XFormAnswerDataParser {
             }
             
 		default:
-
-			return null;
+			return new UncastData(trimmedText);
 		}
 	}	
 
