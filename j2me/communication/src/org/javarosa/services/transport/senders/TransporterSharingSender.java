@@ -6,13 +6,11 @@ import org.javarosa.core.services.Logger;
 import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
-import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 
 public class TransporterSharingSender {
 
 	private Vector messages;
-	private Transporter transporter;
 	private TransportCache cache;
 	private TransportListener listener;
 	boolean halted = false;
@@ -20,27 +18,23 @@ public class TransporterSharingSender {
 	public TransporterSharingSender() {
 	}
 	
-	public void init(Transporter transporter, Vector messages,
-			TransportCache store, TransportListener listener) {
+	public void init(Vector messages, TransportCache store, TransportListener listener) {
 		this.messages = messages;
-		this.transporter = transporter;
 		this.cache = store;
 		this.listener = listener;
 		halted = false;
 	}
 
 	public void send() {
-		System.out.println("Ready to send: "+this.messages.size()+" messages by "+this.transporter);
+		System.out.println("Ready to send: "+this.messages.size()+" messages");
 		
 		int numSuccessful = 0;
 		for (int i = 0; i < this.messages.size(); i++) {
 			if(halted) {return;}
-			TransportMessage message = (TransportMessage) this.messages
-					.elementAt(i);
-			this.transporter.setMessage(message);
+			TransportMessage message = (TransportMessage) this.messages.elementAt(i);
 
 			this.listener.onChange(message, "Preparing to send: " + message);
-			message = this.transporter.send();
+			message.send();
 
 			if (message.isCacheable()) {
 				// if the loop was executed merely because the tries have been

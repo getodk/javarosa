@@ -9,16 +9,22 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Enumeration;
 
+import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 
+import org.javarosa.core.log.WrappedException;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.transport.payload.IDataPayload;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.services.transport.TransportMessage;
-import org.javarosa.services.transport.Transporter;
+import org.javarosa.services.transport.impl.BasicTransportMessage;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.simplehttp.HttpRequestProperties;
+
+import de.enough.polish.util.StreamUtil;
 
 /**
  * An AuthenticatedHttpTransportMessage is a transport message which is used to
@@ -32,21 +38,22 @@ import org.javarosa.services.transport.impl.simplehttp.HttpRequestProperties;
  * @author ctsims
  *
  */
-public class AuthenticatedHttpTransportMessage implements TransportMessage {
-	Date created;
-	Date sent;
+public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 	String URL;
-	int recordId;
-	int status;
-	
+	HttpAuthenticator authenticator;
+
 	int responseCode;
 	InputStream response;
-	HttpAuthenticator authenticator;
 	String authentication;
-	String failureReason;
+
+	IDataPayload payload;	
 	
-	IDataPayload payload;
-	
+	private AuthenticatedHttpTransportMessage(String URL, HttpAuthenticator authenticator) {
+		this.setCreated(new Date());
+		this.setStatus(TransportMessageStatus.QUEUED);
+		this.URL = URL;
+		this.authenticator = authenticator;
+	}
 	
 	/**
 	 * Creates a message which will perform an HTTP GET Request to the server referenced at
@@ -58,8 +65,7 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	 * @return A new authenticated HTTP message ready for sending.
 	 */
 	public static AuthenticatedHttpTransportMessage AuthenticatedHttpRequest(String URL, HttpAuthenticator authenticator) {
-		AuthenticatedHttpTransportMessage message = new AuthenticatedHttpTransportMessage(URL, authenticator);
-		return message;	
+		return new AuthenticatedHttpTransportMessage(URL, authenticator);
 	}
 	
 	/**
@@ -77,23 +83,15 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 		message.payload = payload;
 		return message;
 	}
+	
 
-	private AuthenticatedHttpTransportMessage(String URL, HttpAuthenticator authenticator) {
-		created = new Date();
-		this.status = TransportMessageStatus.QUEUED;
-		this.URL = URL;
-		this.authenticator = authenticator;
-	}
 	
 	/**
 	 * @return The HTTP request method (Either GET or POST) for
 	 * this message.
 	 */
 	public String getMethod() {
-		if(payload == null) {
-			return HttpConnection.GET;
-		}
-		return HttpConnection.POST;
+		return (payload == null ? HttpConnection.GET : HttpConnection.POST);
 	}
 	
 	/**
@@ -101,84 +99,6 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	 */
 	public String getUrl() {
 		return URL;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#createTransporter()
-	 */
-	public Transporter createTransporter() {
-		return new AuthenticatingHttpTransporter();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#getCacheIdentifier()
-	 */
-	public String getCacheIdentifier() {
-		return null;
-	}
-
-	public String getTag () {
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#getContent()
-	 */
-	public Object getContent() {
-		throw new RuntimeException("The content of a Digest HTTP message can only be viewed as a stream"); 
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#getContentStream()
-	 */
-	public InputStream getContentStream() {
-		if(payload == null) {
-			return new ByteArrayInputStream("".getBytes());
-		}
-		return payload.getPayloadStream();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#getCreated()
-	 */
-	public Date getCreated() {
-		return created;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#getFailureCount()
-	 */
-	public int getFailureCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#getFailureReason()
-	 */
-	public String getFailureReason() {
-		return failureReason;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#getQueuingDeadline()
-	 */
-	public long getQueuingDeadline() {
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#getSent()
-	 */
-	public Date getSent() {
-		return sent;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#getStatus()
-	 */
-	public int getStatus() {
-		return status;
 	}
 
 	/* (non-Javadoc)
@@ -189,84 +109,16 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#isSuccess()
-	 */
-	public boolean isSuccess() {
-		return this.status == TransportMessageStatus.SENT;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.javarosa.services.transport.TransportMessage#setCacheIdentifier(java.lang.String)
 	 */
 	public void setCacheIdentifier(String id) {
-		//nothing, no caching.
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#setFailureReason(java.lang.String)
-	 */
-	public void setFailureReason(String reason) {
-		failureReason = reason;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#setSendingThreadDeadline(long)
-	 */
-	public void setSendingThreadDeadline(long time) {
-		//Not valid
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.services.transport.TransportMessage#setStatus(int)
-	 */
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.Persistable#getID()
-	 */
-	public int getID() {
-		return recordId;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.javarosa.core.services.storage.Persistable#setID(int)
-	 */
-	public void setID(int ID) {
-		this.recordId = ID;
-	}
-
-	/**
-	 * Issues an authentication challenge from the provided HttpConnection
-	 * 
-	 * @param connection The connection which issued the challenge
-	 * @param challenge The WWW-Authenticate challenge issued.
-	 * @return True if the challenge was addressed by the message's authenticator,
-	 * and the request should be retried, False if the challenge could not be 
-	 * addressed.
-	 */
-	public boolean issueChallenge(HttpConnection connection, String challenge) {
-		authentication = this.authenticator.challenge(connection, challenge, this);
-		if(authentication == null) {
-			return false;
-		} else {
-			return true;
-		}
+		Logger.log("transport", "warn: setting cache ID on non-cacheable message");
+		//suppress; these messages are not cacheable
 	}
 	
-	/**
-	 * @return the current best-guess authorization header for this message, 
-	 * either produced as a response to a WWW-Authenticate challenge, or 
-	 * provided by the authentication cache based on previous requests
-	 * (if enabled and relevant in the message's authenticator). 
-	 */
-	public String getAuthString() {
-		if(authentication == null) {
-			//generally pre-challenge
-			return authenticator.checkCache(this);
-		}
-		return authentication;
+	public void setSendingThreadDeadline(long queuingDeadline) {
+		Logger.log("transport", "warn: setting cache expiry on non-cacheable message");
+		//suppress; these messages are not cacheable
 	}
 	
 	/**
@@ -302,6 +154,177 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 		return response;
 	}
 
+	/**
+	 * @return The properties for this http request (other than
+	 * authorization headers).
+	 */
+	public HttpRequestProperties getRequestProperties() {
+		return new HttpRequestProperties();
+	}
+
+	public InputStream getContentStream() {
+		if (payload == null) {
+			return new ByteArrayInputStream("".getBytes());
+		} else {
+			return payload.getPayloadStream();
+		}
+	}
+	
+	
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.javarosa.services.transport.Transporter#send()
+	 */
+	public void send() {
+		try {
+			
+			//Open the connection assuming either cached credentials
+			//or no Authentication
+			HttpConnection connection = getConnection();
+			int response = connection.getResponseCode();
+			
+			if (response == HttpConnection.HTTP_UNAUTHORIZED) {
+				
+				String challenge = getChallenge(connection);
+				//If authentication is needed, issue the challenge
+				if (this.issueChallenge(connection, challenge)) {
+					
+					// The challenge was handled, and authentication
+					// is now provided, try the request again after
+					//closing the current connection.
+					connection.close();
+					connection = getConnection();
+					
+					//Handle the new response as-is, if authentication failed,
+					//the sending process can issue a new request.
+					handleResponse(connection);
+				} else {
+					// The challenge couldn't be addressed. Set the message to
+					// failure.
+					handleResponse(connection);
+				}
+			} else {
+				//The message did not fail due to authorization problems, so
+				//handle the response.
+				handleResponse(connection);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			this.setStatus(TransportMessageStatus.FAILED);
+			this.setFailureReason(WrappedException.printException(e));
+		}
+	}
+	
+	private String getChallenge(HttpConnection connection ) throws IOException {
+		//technically the standard
+		
+		String challenge = connection.getHeaderField("WWW-Authenticate");
+		if(challenge == null) {
+			//j2me sometimes lowercases everything;
+			System.out.println("lowercase fallback!");
+			challenge = connection.getHeaderField("www-authenticate");
+		}
+		return challenge;
+	}
+
+	/**
+	 * Issues an authentication challenge from the provided HttpConnection
+	 * 
+	 * @param connection The connection which issued the challenge
+	 * @param challenge The WWW-Authenticate challenge issued.
+	 * @return True if the challenge was addressed by the message's authenticator,
+	 * and the request should be retried, False if the challenge could not be 
+	 * addressed.
+	 */
+	public boolean issueChallenge(HttpConnection connection, String challenge) {
+		authentication = this.authenticator.challenge(connection, challenge, this);
+		if(authentication == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	/**
+	 * @return the current best-guess authorization header for this message, 
+	 * either produced as a response to a WWW-Authenticate challenge, or 
+	 * provided by the authentication cache based on previous requests
+	 * (if enabled and relevant in the message's authenticator). 
+	 */
+	public String getAuthString() {
+		if(authentication == null) {
+			//generally pre-challenge
+			return authenticator.checkCache(this);
+		}
+		return authentication;
+	}
+	
+	private void handleResponse(HttpConnection connection) throws IOException {
+		int responseCode = connection.getResponseCode();
+		
+		if(responseCode >= 200 && responseCode < 300) {
+			//It's all good, message was a success.
+			this.setResponseCode(responseCode);
+			this.setStatus(TransportMessageStatus.SENT);
+			
+			//Wire up the input stream from the connection to the message.
+			this.setResponseStream(connection.openInputStream());
+		} else {
+			this.setStatus(TransportMessageStatus.FAILED);
+			this.setResponseCode(responseCode);
+			
+			//We'll assume that any failures come with a message which is sufficiently
+			//small that they can be fit into memory.
+			byte[] response = StreamUtil.readFully(connection.openInputStream());
+			String reason = new String(response);
+			reason = PropertyUtils.trim(reason, 400);
+			this.setFailureReason(reason);
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	private HttpConnection getConnection() throws IOException {
+		HttpConnection conn = (HttpConnection) Connector.open(this.getUrl());
+		if (conn == null)
+			throw new RuntimeException("Null conn in getConnection()");
+
+		HttpRequestProperties requestProps = this.getRequestProperties();
+		if (requestProps == null) {
+			throw new RuntimeException("Null message.getRequestProperties() in getConnection()");
+		}
+		
+		conn.setRequestMethod(this.getMethod());
+		conn.setRequestProperty("User-Agent", requestProps.getUserAgent());
+		conn.setRequestProperty("Content-Language", requestProps.getContentLanguage());
+		conn.setRequestProperty("MIME-version", requestProps.getMimeVersion());
+		conn.setRequestProperty("Content-Type", requestProps.getContentType());
+		
+		//Retrieve either the response auth header, or the cached guess
+		String authorization = this.getAuthString();
+		if(authorization != null) {
+			conn.setRequestProperty("Authorization", authorization);
+		}
+		
+		// any others
+		Enumeration keys = requestProps.getOtherProperties().keys();
+		while (keys.hasMoreElements()) {
+			String key = (String) keys.nextElement();
+			String value = (String) requestProps.getOtherProperties().get(key);
+			conn.setRequestProperty(key, value);
+		}
+
+		return conn;
+	}
+
+	
+	
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
 	 */
@@ -316,13 +339,4 @@ public class AuthenticatedHttpTransportMessage implements TransportMessage {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		//doesn't cache;
 	}
-
-	/**
-	 * @return The properties for this http request (other than
-	 * authorization headers).
-	 */
-	public HttpRequestProperties getRequestProperties() {
-		return new HttpRequestProperties();
-	}
-
 }

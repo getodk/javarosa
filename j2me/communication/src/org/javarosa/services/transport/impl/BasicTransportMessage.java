@@ -108,7 +108,6 @@ public abstract class BasicTransportMessage implements TransportMessage {
 	public void setID(int ID) {
 		this.recordId = ID;
 	}
-	
 
 	public void readExternal(DataInputStream in, PrototypeFactory pf)
 			throws IOException, DeserializationException {

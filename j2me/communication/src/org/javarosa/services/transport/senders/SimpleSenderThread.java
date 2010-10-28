@@ -1,10 +1,8 @@
 package org.javarosa.services.transport.senders;
 
 import org.javarosa.core.services.Logger;
-import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.services.transport.TransportCache;
 import org.javarosa.services.transport.TransportMessage;
-import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 
@@ -17,27 +15,23 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
  */
 public class SimpleSenderThread extends SenderThread {
 
-	public SimpleSenderThread(Transporter transporter,
-			TransportCache queue, int tries, int delay) {
-		super(transporter, queue, tries, delay);
+	public SimpleSenderThread(TransportMessage message, TransportCache queue, int tries, int delay) {
+		super(message, queue, tries, delay);
 
 	}
 
-	public SimpleSenderThread(Transporter transporter,
-			TransportCache queue) {
-		super(transporter, queue);
+	public SimpleSenderThread(TransportMessage message, TransportCache queue) {
+		super(message, queue);
 
 	}
 
 	public void send() {
-		TransportMessage message = this.transporter.getMessage();
-
 		this.triesRemaining = this.tries;
 		// try to send repeatedly for a given number of tries
 		// or until the message has been successfully sent
 		while ((this.triesRemaining > 0) && !message.isSuccess()) {
 			try {
-				message = attemptToSend();
+				attemptToSend();
 			} catch (TransportException e) {
 				Logger.exception("SimpleSenderThread.send", e);
 				e.printStackTrace();
@@ -52,7 +46,7 @@ public class SimpleSenderThread extends SenderThread {
 		if (!message.isSuccess()) {
 			Logger.log("send", message.getTag() + " failed");
 			message.setStatus(message.isCacheable() ? TransportMessageStatus.CACHED : TransportMessageStatus.FAILED);
-			notifyStatusChange(message);
+			notifyStatusChange();
 		} else {
 			Logger.log("send", message.getTag() + " success");
 		}

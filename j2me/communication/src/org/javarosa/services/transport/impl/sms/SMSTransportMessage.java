@@ -1,18 +1,20 @@
 package org.javarosa.services.transport.impl.sms;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Vector;
+
+import javax.microedition.io.Connector;
+import javax.wireless.messaging.MessageConnection;
+import javax.wireless.messaging.TextMessage;
 
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapList;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
-import org.javarosa.services.transport.Transporter;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
+import org.javarosa.services.transport.impl.TransportMessageStatus;
 
 /**
  * 
@@ -110,20 +112,82 @@ public class SMSTransportMessage extends BasicTransportMessage {
 	public void setDestinationURL(String destinationURL) {
 		this.destinationURL = destinationURL;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.javarosa.services.transport.TransportMessage#createTransporter()
-	 */
-	public Transporter createTransporter() {
-		return new SMSTransporter(this);
-	}
 	
-	// TODO: content is a string Vector, so this is wrong
-	public InputStream getContentStream(){
-		return new ByteArrayInputStream((byte[])getContent());
+	
+	
+	
+	
+	
+	public void send() {
+		MessageConnection conn = null;
+		try {
+			System.out.println("SMSTransporter.send() - destination = " + this.getDestinationURL());
+
+			// create a MessageConnection
+			conn = getConnection(this.getDestinationURL());
+			
+			//int segments = conn.numberOfSegments(message);
+			
+
+			// the SMS content has been split into n parts of not more than 140
+			// characters
+			Vector messageParts = (Vector) this.getContent();
+
+			for (int i = 0; i < messageParts.size(); i++) {
+				String smsContent = (String) messageParts.elementAt(i);
+				System.out.println("Sending: " + smsContent);
+				sendMessage(smsContent, conn);
+			}
+			this.setStatus(TransportMessageStatus.SENT);
+
+		} catch (Exception e) {
+			System.out.println("Connection failed: ");
+			this.setFailureReason(e.getMessage());
+			this.incrementFailureCount();
+		} finally {
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (IOException e) {
+					// do nothing
+				}
+		}
 	}
+
+	/**
+	 * 
+	 * Send single sms over a MessageConnection
+	 * 
+	 * @param content The content of the SMS to be sent
+	 * @param conn The connection over which the SMS is to be sent
+	 * @throws IOException
+	 */
+	private void sendMessage(String content, MessageConnection conn) throws IOException {
+		TextMessage sms = (TextMessage) conn.newMessage(MessageConnection.TEXT_MESSAGE);
+		sms.setAddress(this.getDestinationURL());
+		sms.setPayloadText(content);
+		conn.send(sms);
+	}
+
+	/**
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
+	private static MessageConnection getConnection(String url) throws IOException {
+		Object o = Connector.open(url);
+		if (o instanceof MessageConnection)
+			return (MessageConnection) o;
+		else
+			throw new IllegalArgumentException("Not SMS URL:" + url);
+	}
+
+	
+	
+	
+	
+	
+	
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		super.readExternal(in, pf);
