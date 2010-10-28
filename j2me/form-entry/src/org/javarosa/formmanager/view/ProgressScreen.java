@@ -21,22 +21,31 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Gauge;
 
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.j2me.log.HandledThread;
 
 public class ProgressScreen extends Form{
-	private Gauge progressbar;
-	private Thread updater_T;
-	public final Command CMD_CANCEL = new Command("Cancel",Command.BACK, 1);
-	public final Command CMD_RETRY = new Command("Retry",Command.ITEM, 1);
+	protected Gauge progressbar;
+	protected Thread updater_T;
+	public final Command CMD_CANCEL = new Command(Localization.get("polish.command.cancel"),Command.BACK, 1);
+	public final Command CMD_RETRY = new Command(Localization.get("menu.retry"),Command.ITEM, 1);
 
-	public ProgressScreen(String title,String msg,CommandListener cmdListener) {
+	public ProgressScreen(String title, String msg, CommandListener cmdListener) {	
+		this(title, msg, cmdListener, false);
+	}
+	
+	public ProgressScreen(String title, String msg, CommandListener cmdListener, boolean continuous) {
 		super(title);
-		progressbar = new Gauge(msg, false, Gauge.INDEFINITE, 0);
+		progressbar = new Gauge(msg, false, Gauge.INDEFINITE, continuous ? Gauge.CONTINUOUS_RUNNING : 0);
+		
 		addCommand(CMD_CANCEL);
 		append(progressbar);
 		setCommandListener(cmdListener);
-		updater_T = new HandledThread(new GaugeUpdater());
-		updater_T.start();
+
+		if (!continuous) {
+			updater_T = new HandledThread(new GaugeUpdater());
+			updater_T.start();
+		}
 	}
 	
 	public void setText(String text) {

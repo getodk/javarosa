@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.model.FormDef;
@@ -41,7 +42,7 @@ import org.javarosa.xform.util.XFormUtils;
 
 public abstract class GetFormHttpState implements State,TrivialTransitions,HandledCommandListener,TransportListener {
 
-	private ProgressScreen progressScreen =  new ProgressScreen("Downloadng","Please Wait. Fetching Form...", this);
+	protected ProgressScreen progressScreen;
 
 	private ByteArrayInputStream bin;
 
@@ -49,13 +50,13 @@ public abstract class GetFormHttpState implements State,TrivialTransitions,Handl
 
 
 	public GetFormHttpState() {
+		
 	}
 	
 	public abstract String getURL();
 
 	public void fetchForm(){
-		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage("#",getURL());
-		message.setCacheable(false);
+		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(getURL());
 		
 		try {
 			sendThread = TransportService.send(message);
@@ -67,8 +68,13 @@ public abstract class GetFormHttpState implements State,TrivialTransitions,Handl
 	}
 
 	public void start() {
+		this.progressScreen = initProgressScreen();
 		J2MEDisplay.setView(progressScreen);
 		fetchForm();
+	}
+	
+	protected ProgressScreen initProgressScreen() {
+		return new ProgressScreen("Downloadng","Please Wait. Fetching Form...", this);
 	}
 	
 	public void fail(String message) {
@@ -86,9 +92,7 @@ public abstract class GetFormHttpState implements State,TrivialTransitions,Handl
 				sendThread.cancel();
 				done();
 			} if(command == progressScreen.CMD_RETRY) {
-				progressScreen = new ProgressScreen("Downloadng","Please Wait. Fetching Form...", this);
-				J2MEDisplay.setView(progressScreen);
-				fetchForm();
+				start();
 			}
 		}
 	}

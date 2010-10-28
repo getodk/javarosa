@@ -9,7 +9,6 @@ import org.javarosa.core.api.State;
 import org.javarosa.core.log.FatalException;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.demo.util.ProgressScreenFormDownload;
-import org.javarosa.demo.util.SimpleHttpTransportMessageGet;
 import org.javarosa.formmanager.api.transitions.HttpFetchTransitions;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
@@ -19,6 +18,7 @@ import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.TransportService;
 import org.javarosa.services.transport.impl.TransportException;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
+import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.services.transport.senders.SenderThread;
 
 public class JRDemoGetFormListHTTPState implements State,
@@ -28,8 +28,6 @@ public class JRDemoGetFormListHTTPState implements State,
 
 	private String getListUrl;
 	private String credentials;
-
-	private String requestPayload = "#";
 
 	private SenderThread thread;
 
@@ -51,27 +49,13 @@ public class JRDemoGetFormListHTTPState implements State,
 		return "";
 	}
 
-	private void init() {
-
-		if (getListUrl.indexOf("?") >= 0)
-			credentials = "";
-		else
-			credentials = "";
-		// credentials = "?user=" + getUserName();
-		requestPayload = credentials;
-	}
-
 	public void start() {
 		J2MEDisplay.setView(progressScreen);
-		init();
 		fetchList();
 	}
 
 	public void fetchList() {
-		SimpleHttpTransportMessageGet message = new SimpleHttpTransportMessageGet(
-				requestPayload, getListUrl + credentials);// send username and
-		// url
-		message.setCacheable(false);
+		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(getListUrl + credentials);
 
 		try {
 			thread = TransportService.send(message, 1, 0);// only one try if
@@ -148,13 +132,12 @@ public class JRDemoGetFormListHTTPState implements State,
 	 * .services.transport.TransportMessage, java.lang.String)
 	 */
 	public void onChange(TransportMessage message, String remark) {
-		int responsecode = ((SimpleHttpTransportMessageGet) message)
-				.getResponseCode(); // 200 success, 0 no response yet
+		int responsecode = ((SimpleHttpTransportMessage) message).getResponseCode(); // 200 success, 0 no response yet
 		if ((responsecode != 200) && (responsecode != 0)) {
 			fail("Error getting list from server");
 		} else if (message.getStatus() == TransportMessageStatus.SENT) {
 
-			process(((SimpleHttpTransportMessageGet) message).getResponseBody());
+			process(((SimpleHttpTransportMessage) message).getResponseBody());
 
 		} else if (message.getStatus() == TransportMessageStatus.FAILED) {
 			String failMessage = message.getFailureReason() != null ? "Transport Failure: "
