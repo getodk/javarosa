@@ -3,12 +3,14 @@
  */
 package org.javarosa.j2me.log;
 
-import org.kxml2.kdom.Element;
+import java.io.IOException;
+
+import org.xmlpull.v1.XmlSerializer;
 
 /**
  * @author ctsims
  *
  */
 public interface XmlStatusProvider {
-	public Element getStatusReport() throws StatusReportException;
+	public void getStatusReport(XmlSerializer o, String namespace) throws StatusReportException, IOException;
 }

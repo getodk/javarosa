@@ -1,5 +1,6 @@
 package org.javarosa.j2me.storage.rms;
 
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -30,7 +31,7 @@ import org.javarosa.core.util.externalizable.ExternalizableWrapper;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
 import org.javarosa.j2me.log.StatusReportException;
 import org.javarosa.j2me.log.XmlStatusProvider;
-import org.kxml2.kdom.Element;
+import org.xmlpull.v1.XmlSerializer;
 
 /**
  * class StorageUtility
@@ -1563,21 +1564,18 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		return sb.toString();
 	}
 
-	public Element getStatusReport() throws StatusReportException {
-		Element storage = new Element();
-		storage.setName("storage_utility");
-		storage.setAttribute(null, "name",this.getName());
+	public void getStatusReport(XmlSerializer o, String ns) throws StatusReportException, IOException {
+		o.startTag(ns, "storage_utility");
+		o.attribute(null, "name", this.getName());
 		
+		o.startTag(ns, "total_records");
+		o.text(String.valueOf(getNumRecords()));
+		o.endTag(ns, "total_records");
 		
-		Element total = storage.createElement(null, "total_records");
-		total.addChild(Element.TEXT,getNumRecords() + "");
-		storage.addChild(Element.ELEMENT, total);
+		o.startTag(ns, "total_size");
+		o.text(String.valueOf(getTotalSize()));
+		o.endTag(ns, "total_size");
 		
-		Element size = storage.createElement(null, "total_size");
-		size.addChild(Element.TEXT,getTotalSize() + "");
-		storage.addChild(Element.ELEMENT, size);
-		
-		Element status = storage.createElement(null, "status_flag");
 		String statusText;
 		int statusFlag = getStatus();
 		switch(statusFlag) {
@@ -1586,37 +1584,39 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			case STATUS_UNINITIALIZED: statusText = "UNINITIALIZED"; break;
 			default: statusText = "UNKNOWN: " + statusFlag; break;
 		}
-		status.addChild(Element.TEXT, statusText);
-		storage.addChild(Element.ELEMENT, status);
+		o.startTag(ns, "status_flag");
+		o.text(statusText);
+		o.endTag(ns, "status_flag");
 		
 		RMSStorageInfo info = getInfoRecord();
 
 		for (int i = 0; i < info.numDataStores; i++) {
 			RMS rmsStore = getDataStore(i);
 			
-			Element store = storage.createElement(null,"rms_store");
-			store.setAttribute(null,"name", rmsStore.name);
-			store.setAttribute(null,"index",i + "");
+			o.startTag(ns, "rms_store");
+			o.attribute(null, "name", rmsStore.name);
+			o.attribute(null, "index", String.valueOf(i));
 			
 			try {
-				Element storeRecords = storage.createElement(null,"num_records");
-				storeRecords.addChild(Element.TEXT, rmsStore.rms.getNumRecords() + "");
-				store.addChild(Element.ELEMENT,storeRecords);
+				o.startTag(ns, "num_records");
+				o.text(String.valueOf(rmsStore.rms.getNumRecords()));
+				o.endTag(ns, "num_records");
 				
-				Element sizeUsed = storage.createElement(null,"size_used");
-				sizeUsed.addChild(Element.TEXT, rmsStore.rms.getSize() + "");
-				store.addChild(Element.ELEMENT,sizeUsed);
-			
-				Element sizeAvail = storage.createElement(null,"size_available");
-				sizeAvail.addChild(Element.TEXT, rmsStore.rms.getSizeAvailable() + "");
-				store.addChild(Element.ELEMENT,sizeAvail);
+				o.startTag(ns, "size_used");
+				o.text(String.valueOf(rmsStore.rms.getSize()));
+				o.endTag(ns, "size_used");
+				
+				o.startTag(ns, "size_available");
+				o.text(String.valueOf(rmsStore.rms.getSizeAvailable()));
+				o.endTag(ns, "size_available");				
 			} catch (RecordStoreNotOpenException e) {
 				throw new StatusReportException(e, "storage_utility","Storage: " + this.getName() + " Record Store Not Open");
 			}
 			rmsStore.close();
-			storage.addChild(Element.ELEMENT, store);
+			
+			o.endTag(ns, "rms_store");
 		}
-		return storage;
+		o.endTag(ns, "storage_utility");
 	}
 	
 	public void log (String type, String message) {
