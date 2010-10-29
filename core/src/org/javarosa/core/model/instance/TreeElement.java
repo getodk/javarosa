@@ -136,6 +136,9 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 	public TreeElement getChild(String name, int multiplicity) {
 		if (name.equals(TreeReference.NAME_WILDCARD)) {
+			if(multiplicity == TreeReference.INDEX_TEMPLATE || this.children.size() < multiplicity + 1) {
+				return null;
+			}
 			return (TreeElement) this.children.elementAt(multiplicity); //droos: i'm suspicious of this
 		} else {
 			for (int i = 0; i < this.children.size(); i++) {
