@@ -96,8 +96,12 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	}
 	
 
-	public Object getContent() {
+	public byte[] getContent() {
 		return content;
+	}
+	
+	public int getContentLength() {
+		return getContent().length;
 	}
 	
 	/**
@@ -171,13 +175,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 			System.out.println("Connection: " + conn);
 
 			os = conn.openOutputStream();
-			byte[] o = (byte[]) this.getContent();
-			if (o != null) {
-				System.out.println("content: " + new String(o));
-				StreamsUtil.writeToOutput(o, os);
-			} else {
-				System.out.println("no request body");
-			}
+			writeBody(os);
 			os.close();
 
 			// Get the response
@@ -228,6 +226,16 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 		}
 	}
 
+	protected void writeBody(OutputStream os) throws IOException {
+		byte[] o = this.getContent();
+		if (o != null) {
+			System.out.println("content: " + new String(o));
+			StreamsUtil.writeToOutput(o, os);
+		} else {
+			System.out.println("no request body");
+		}
+	}
+	
 	/**
 	 * @param url
 	 * @return
@@ -248,8 +256,9 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 		conn.setRequestProperty("MIME-version", requestProps.getMimeVersion());
 		conn.setRequestProperty("Content-Type", requestProps.getContentType());
 
-		if (!HttpConnection.GET.equals(connectionMethod)) {
-			conn.setRequestProperty("Content-Length", new Integer(((byte[]) this.getContent()).length).toString());
+		int contentLength = this.getContentLength();
+		if (!HttpConnection.GET.equals(connectionMethod) && contentLength != -1) {
+			conn.setRequestProperty("Content-Length", String.valueOf(contentLength));
 		}
 			
 		// any others

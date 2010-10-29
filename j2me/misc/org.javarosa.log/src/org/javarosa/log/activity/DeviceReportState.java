@@ -3,10 +3,8 @@
  */
 package org.javarosa.log.activity;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
@@ -25,18 +23,17 @@ import org.javarosa.core.services.storage.StorageUtilAccessor;
 import org.javarosa.core.services.storage.WrappingStorageUtility;
 import org.javarosa.core.util.TrivialTransitions;
 import org.javarosa.j2me.log.StatusReportException;
-import org.javarosa.j2me.log.XmlLogSerializer;
 import org.javarosa.j2me.log.XmlStatusProvider;
+import org.javarosa.j2me.log.XmlStreamLogSerializer;
 import org.javarosa.log.util.LogReportUtils;
 import org.javarosa.log.util.StreamLogSerializer;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.TransportService;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
+import org.javarosa.services.transport.impl.simplehttp.StreamingHTTPMessage;
 import org.javarosa.services.transport.senders.SenderThread;
 import org.kxml2.io.KXmlSerializer;
-import org.kxml2.kdom.Document;
-import org.kxml2.kdom.Element;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -87,10 +84,14 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			return;
 		}
 		try {
-			Document report = createReport();
-			InputStream payload = serializeReport(report);
-			TransportMessage message = constructMessageFromPayload(payload);
-			
+			TransportMessage message = new StreamingHTTPMessage(getDestURL()) {
+				public void writeBody(OutputStream os) throws IOException {
+					KXmlSerializer serializer = new KXmlSerializer();
+					serializer.setOutput(os, "UTF-8");
+					createReport(serializer);
+				}
+			};
+						
 			Logger.log("device-report", "attempting to send");
 			SenderThread s = TransportService.send(message);
 			
@@ -110,94 +111,72 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		done();
 	}
 
-	/**
-	 * Creates a transport message responsible for sending the report off of the device.
-	 * 
-	 * NOTE: This message should generally not be cacheable or persisted in any way. 
-	 * 
-	 * @param reportPayload
-	 * @return
-	 */
-	public abstract TransportMessage constructMessageFromPayload(InputStream reportPayload);
-	
-	private InputStream serializeReport(Document report) {
-		 XmlSerializer ser = new KXmlSerializer();
-		 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		 try {
-			ser.setOutput(bos, null);
-			report.write(ser);
-		} catch (IOException e) {
-			// We don't actually want to ever fail on this report, 
-			e.printStackTrace();
-		}
-		//Note: If this gets too big, we can just write a wrapper to stream bytes one at a time
-		//to the array. It'll probably be the XML DOM itself which blows up the memory, though...
-		 ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-		 return bis;
-	}
-	
-	private Document createReport() {
-		Document xmlDoc = new Document();
-		Element root = xmlDoc.createElement(XMLNS, "device_report");
-		xmlDoc.addChild(Element.ELEMENT, root);
-		Element errors = root.createElement(null,"report_errors");
-		addHeader(root, errors);
-		createDeviceLogSubreport(root,errors);
-		createTransportSubreport(root,errors);
+	public abstract String getDestURL();
+		
+	private void createReport(XmlSerializer o) throws IOException {
+		o.startDocument("UTF-8", false);
+		o.setPrefix("", XMLNS);
+		o.startTag(XMLNS, "device_report");
+		
+		Vector errors = new Vector();
+
+		addHeader(o, errors);
+		createDeviceLogSubreport(o, errors);
+		createTransportSubreport(o, errors);
 		if(reportFormat == LogReportUtils.REPORT_FORMAT_FULL) {
-			createRmsSubreport(root,errors);
-			createPropertiesSubreport(root,errors);
+			createRmsSubreport(o, errors);
+			createPropertiesSubreport(o, errors);
 		}
-		if(errors.getChildCount() != 0) {
-			root.addChild(Element.ELEMENT,errors);
+
+		if(errors.size() > 0) {
+			logErrors(o, errors);
 		}
-		return xmlDoc;
+		
+		o.endTag(XMLNS, "device_report");
+		o.endDocument();
 	}
 	
-	private void addHeader(Element parent, Element errorsNode) {
+	private void addHeader(XmlSerializer o, Vector errors) throws IOException {
 		String deviceId = PropertyManager._().getSingularProperty(JavaRosaPropertyRules.DEVICE_ID_PROPERTY);
 		String reportDate = DateUtils.formatDate(new Date(), DateUtils.FORMAT_HUMAN_READABLE_SHORT);
 		String appVersion = PropertyManager._().getSingularProperty("app-version");
 		
-		Element id = parent.createElement(null,"device_id");
-		id.addChild(Element.TEXT, deviceId);
-		parent.addChild(Element.ELEMENT, id);
-		
-		Element date = parent.createElement(null,"report_date");
-		date.addChild(Element.TEXT, reportDate);
-		parent.addChild(Element.ELEMENT, date);
+		o.startTag(XMLNS, "device_id");
+		o.text(deviceId);
+		o.endTag(XMLNS, "device_id");
 
-		Element version = parent.createElement(null, "app_version");
-		version.addChild(Element.TEXT, appVersion);
-		parent.addChild(Element.ELEMENT, version);
+		o.startTag(XMLNS, "report_date");
+		o.text(reportDate);
+		o.endTag(XMLNS, "report_date");
+
+		o.startTag(XMLNS, "app_version");
+		o.text(appVersion);
+		o.endTag(XMLNS, "app_version");
 	}
 	
-	private void createTransportSubreport(Element parent, Element errorsNode) {
-		try{
-			Element report = new Element();
-			report.setName("transport_subreport");
-			Element unsent = report.createElement(null,"number_unsent");
-			unsent.addChild(Element.TEXT, TransportService.getCachedMessagesSize() + "");
-			report.addChild(Element.ELEMENT, unsent);
-			parent.addChild(Element.ELEMENT,report);
+	private void createTransportSubreport(XmlSerializer o, Vector errors) throws IOException {
+		try {
+			o.startTag(XMLNS, "transport_subreport");
+			o.startTag(XMLNS, "number_unsent");
+			o.text(String.valueOf(TransportService.getCachedMessagesSize()));
+			o.endTag(XMLNS, "number_unsent");
+			o.endTag(XMLNS, "transport_subreport");
 		}
 		catch(Exception e) {
-			logError(errorsNode, new StatusReportException(e,"transport_subreport","Exception retrieving transport subreport"));
+			logError(errors, new StatusReportException(e,"transport_subreport","Exception retrieving transport subreport"));
 		}
 	}
 	
-	private void createDeviceLogSubreport(Element parent, Element errorsNode) {
+	private void createDeviceLogSubreport(XmlSerializer o, Vector errors) throws IOException {
 		try {
-			Element report = Logger._().serializeLogs(new XmlLogSerializer("log_subreport"));
-			parent.addChild(Element.ELEMENT, report);
+			Logger._().serializeLogs(new XmlStreamLogSerializer(o, XMLNS, "log_subreport"));
 		} catch(Exception e) {
-			logError(errorsNode, new StatusReportException(e,"log_subreport","Exception when writing device log report."));
+			logError(errors, new StatusReportException(e,"log_subreport","Exception when writing device log report."));
 		}
 	}
 	
-	private void createRmsSubreport(Element root, Element errorsNode)  {
-		Element parent = new Element();
-		parent.setName("rms_subreport");
+	private void createRmsSubreport(XmlSerializer o, Vector errors) throws IOException {
+		o.startTag(XMLNS, "rms_subreport");
 		
 		String[] utils = StorageManager.listRegisteredUtilities();
 		for(int i = 0 ; i < utils.length ; ++ i) {
@@ -208,19 +187,20 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			}
 			if(storage instanceof XmlStatusProvider) {
 				XmlStatusProvider util = (XmlStatusProvider)storage;
-			try { 
-				parent.addChild(Element.ELEMENT,util.getStatusReport());
-			} catch(StatusReportException sre) {
-				logError(errorsNode,sre);
-			}
+				try { 
+					util.getStatusReport(o, XMLNS);
+				} catch(StatusReportException sre) {
+					logError(errors, sre);
+				}
 			}
 		}
-		root.addChild(Element.ELEMENT, parent);
+
+		o.endTag(XMLNS, "rms_subreport");
 	}
 	
 	
-	private void createPropertiesSubreport(Element root, Element errorsNode) {
-		Element report = root.createElement(null, "properties_subreport");
+	private void createPropertiesSubreport(XmlSerializer o, Vector errors) throws IOException {
+		o.startTag(XMLNS, "properties_subreport");
 		Vector rules = PropertyManager._().getRules();
 		for(Enumeration en = rules.elements(); en.hasMoreElements();) {
 			IPropertyRules ruleset = (IPropertyRules)en.nextElement();
@@ -229,16 +209,9 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 				try {
 					Vector list = PropertyManager._().getProperty(propertyName);
 					if(list != null) {
-						Element property = report.createElement(null,"property");
-						property.setAttribute(null,"name", propertyName);
 						String humanName = ruleset.getHumanReadableDescription(propertyName);
-						if(humanName != propertyName) {
-							Element title = property.createElement(null,"title");
-							title.addChild(Element.TEXT,humanName);
-							property.addChild(Element.ELEMENT,title);
-						}
+						humanName = (!propertyName.equals(humanName) ? humanName : null);
 						
-						Element value = property.createElement(null,"value");
 						String valueXml = "";
 						if(list.size() == 1) {
 							valueXml = (String)list.elementAt(0);
@@ -253,23 +226,40 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 							valueXml += "}";
 						}
 						
-						value.addChild(Element.TEXT,valueXml);
-						property.addChild(Element.ELEMENT,value);
-						report.addChild(Element.ELEMENT,property);
+						o.startTag(XMLNS, "property");
+						o.attribute(null, "name", propertyName);
+						if (humanName != null) {
+							o.startTag(XMLNS, "title");
+							o.text(humanName);
+							o.endTag(XMLNS, "title");
+						}
+						o.startTag(XMLNS, "value");
+						o.text(valueXml);
+						o.endTag(XMLNS, "value");
+						o.startTag(XMLNS, "property");
 					}
 				} catch (NoSuchElementException nsee) {
 					//Don't sweat it, not important.
 				}
 			}
 		}
-		root.addChild(Element.ELEMENT,report);
+		o.endTag(XMLNS, "properties_subreport");
 	}
 	
-	private void logError(Element errorsNode, StatusReportException sre) {
-		Element error = errorsNode.createElement(null,"report_error");
-		error.setAttribute(null,"report",sre.getReportName());
-		error.addChild(Element.TEXT,sre.getMessage());
-		errorsNode.addChild(Element.ELEMENT,error);
+	private void logErrors(XmlSerializer o, Vector errors) throws IOException {
+		o.startTag(XMLNS, "report_errors");
+		for (Enumeration e = errors.elements(); e.hasMoreElements(); ) {
+			String[] err = (String[])e.nextElement();
+			o.startTag(XMLNS, "report_error");
+			o.attribute(null, "report", err[0]);
+			o.text(err[1]);
+			o.endTag(XMLNS, "report_error");
+		}
+		o.endTag(XMLNS, "report_errors");
+	}
+	
+	private void logError(Vector errors, StatusReportException sre) {
+		errors.addElement(new String[] {sre.getReportName(), sre.getMessage()});
 	}
 	
 	
