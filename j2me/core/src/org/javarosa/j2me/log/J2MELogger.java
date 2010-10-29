@@ -143,8 +143,13 @@ public class J2MELogger implements ILogger {
 		try {
 			RecordStore store = RecordStore.openRecordStore(LOG_PANIC, true);
 			
-			int days = (int)(System.currentTimeMillis() / DateUtils.DAY_IN_MS);
-			byte[] record = new byte[] {(byte)((days / 256) % 256), (byte)(days % 256)};
+			int time = (int)(System.currentTimeMillis() / 1000);
+			byte[] record = new byte[] {
+				(byte)((time / 16777216) % 256),
+				(byte)((time / 65536) % 256),
+				(byte)((time / 256) % 256),
+				(byte)(time % 256)
+			};
 			store.addRecord(record, 0, record.length);
 			
 			store.closeRecordStore();
@@ -168,21 +173,27 @@ public class J2MELogger implements ILogger {
 	
 	public void serializeLogs(IAtomicLogSerializer serializer, int limit) throws IOException {
 		if(storageBroken) { return; };
+		
+		Vector<Integer> vIDs;
 		synchronized(logStorage) {
 			if(!checkStorage()) { return; }
+			vIDs = getLogIDsInOrder();
+		}
 			
-			Vector<Integer> vIDs = getLogIDsInOrder();
-			int start = vIDs.size() - 1;
-			int end = -1;
-			if (limit >= 0) {
-				end = Math.max(start - limit, end);
-			} else {
-				start = Math.min(-limit - 1, start);
-			}
-			
-			for (int i = start; i > end; i--) {
-				serializer.serializeLog((LogEntry)logStorage.read(vIDs.elementAt(i).intValue()));
-			}
+		int start = vIDs.size() - 1;
+		int end = -1;
+		if (limit >= 0) {
+			end = Math.max(start - limit, end);
+		} else {
+			start = Math.min(-limit - 1, start);
+		}
+		
+		//this is technically not safe to have outside the synchronized block, but sending the logs
+		//via streaming may potentially take a very long time, and we don't want all other logging
+		//calls in the app to block in the meantime. extra log entries being added shouldn't
+		//interfere... just don't clear the logs!
+		for (int i = start; i > end; i--) {
+			serializer.serializeLog((LogEntry)logStorage.read(vIDs.elementAt(i).intValue()));
 		}
 	}
 
