@@ -47,7 +47,7 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public abstract class DeviceReportState implements State, TrivialTransitions, TransportListener {
 
-	private static final int LOG_ROLLOVER_SIZE = 3000;
+	private static final int LOG_ROLLOVER_SIZE = 2000;
 	
 	private static final String XMLNS = "http://code.javarosa.org/devicereport";
 	
