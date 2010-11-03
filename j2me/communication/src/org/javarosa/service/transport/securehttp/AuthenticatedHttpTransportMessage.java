@@ -278,7 +278,7 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 			//We'll assume that any failures come with a message which is sufficiently
 			//small that they can be fit into memory.
 			byte[] response = StreamUtil.readFully(connection.openInputStream());
-			String reason = new String(response);
+			String reason = responseCode + ": " + new String(response);
 			reason = PropertyUtils.trim(reason, 400);
 			this.setFailureReason(reason);
 		}

@@ -96,7 +96,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		
 		try {
 			TransportMessage message = new StreamingHTTPMessage(getDestURL()) {
-				public void writeBody(OutputStream os) throws IOException {
+				public void _writeBody(OutputStream os) throws IOException {
 					KXmlSerializer serializer = new KXmlSerializer();
 					serializer.setOutput(os, "UTF-8");
 					createReport(serializer);

@@ -1,4 +1,4 @@
-package org.javarosa.services.transport.impl;
+package org.javarosa.core.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,16 +21,20 @@ public class StreamsUtil {
 	 * @param out
 	 * @throws IOException
 	 */
-	public static void writeFromInputToOutput(InputStream in, OutputStream out)
-			throws IOException {
+	public static void writeFromInputToOutput(InputStream in, OutputStream out, long[] tally) throws IOException {
 		int val = in.read();
 		while (val != -1) {
 			out.write(val);
+			incr(tally);
 			val = in.read();
 		}
 
 	}
-
+	
+	public static void writeFromInputToOutput(InputStream in, OutputStream out) throws IOException {
+		writeFromInputToOutput(in, out, null);
+	}
+	
 	/**
 	 * 
 	 * Write the byte array to the output stream
@@ -39,15 +43,25 @@ public class StreamsUtil {
 	 * @param out
 	 * @throws IOException
 	 */
-	public static void writeToOutput(byte[] bytes, OutputStream out)
-			throws IOException {
+	public static void writeToOutput(byte[] bytes, OutputStream out, long[] tally) throws IOException {
 
 		for (int i = 0; i < bytes.length; i++) {
 			out.write(bytes[i]);
+			incr(tally);
 		}
 
 	}
 
+	public static void writeToOutput(byte[] bytes, OutputStream out) throws IOException {
+		writeToOutput(bytes, out, null);
+	}
+	
+	private static void incr (long[] tally) {
+		if (tally != null) {
+			tally[0]++;
+		}
+	}
+	
 	/**
 	 * 
 	 * Read bytes from an input stream into a byte array then close the input
