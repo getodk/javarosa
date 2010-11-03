@@ -47,6 +47,8 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public abstract class DeviceReportState implements State, TrivialTransitions, TransportListener {
 
+	public static boolean activated = false;
+	
 	private static final int LOG_ROLLOVER_SIZE = 2000;
 	
 	private static final String XMLNS = "http://code.javarosa.org/devicereport";
@@ -74,6 +76,14 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 
 	
 	public void start() {
+		//ensure that this activity is only run once per boot of the application
+		if (activated) {
+			Logger.log("device-report", "short-circuit");
+			done();
+			return;
+		}
+		activated = true;
+		
 		if(reportFormat == LogReportUtils.REPORT_FORMAT_SKIP) {
 			//If we've gotten 600 logger lines in less than 7 days,
 			//it's a problem
@@ -83,6 +93,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			done();
 			return;
 		}
+		
 		try {
 			TransportMessage message = new StreamingHTTPMessage(getDestURL()) {
 				public void writeBody(OutputStream os) throws IOException {
