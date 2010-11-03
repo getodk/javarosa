@@ -13,11 +13,12 @@ import javax.microedition.io.HttpConnection;
 
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.services.Logger;
+import org.javarosa.core.util.StreamsUtil;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.services.transport.TransportService;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
-import org.javarosa.services.transport.impl.StreamsUtil;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 
 /**
@@ -167,11 +168,14 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 		HttpConnection conn = null;
 		DataInputStream is = null;
 		OutputStream os = null;
+		
+		long responseLength = -1;
+		long[] responseRead = {0};
+		boolean ex = false;
+		
 		try {
 			System.out.println("Ready to send: " + this);
-
 			conn = getConnection(this.getConnectionMethod());
-
 			System.out.println("Connection: " + conn);
 
 			os = conn.openOutputStream();
@@ -179,12 +183,16 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 			os.close();
 
 			// Get the response
-			is = (DataInputStream) conn.openDataInputStream();
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			StreamsUtil.writeFromInputToOutput(is, baos);
-			is.close();
 			int responseCode = conn.getResponseCode();
 			System.out.println("response code: " + responseCode);
+
+			responseLength = conn.getLength();
+			
+			is = (DataInputStream) conn.openDataInputStream();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			StreamsUtil.writeFromInputToOutput(is, baos, responseRead);
+			is.close();
+
 			// set return information in the message
 			this.setResponseBody(baos.toByteArray());
 			this.setResponseCode(responseCode);
@@ -196,13 +204,15 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 
 			conn.close();
 		} catch (Exception e) {
+			ex = true;
 			e.printStackTrace();
 			System.out.println("Connection failed: " + e.getClass() + " : "
 					+ e.getMessage());
 			this.setFailureReason(WrappedException.printException(e));
 			this.incrementFailureCount();
 		} finally {
-
+			logRecv(responseLength, responseRead[0], ex);
+						
 			if (os != null) {
 				try {
 					os.close();
@@ -217,22 +227,57 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 					// do nothing
 				}
 			}
-			if (conn != null)
+			if (conn != null) {
 				try {
 					conn.close();
 				} catch (IOException e) {
 					// do nothing
 				}
+			}
 		}
 	}
 
 	protected void writeBody(OutputStream os) throws IOException {
 		byte[] o = this.getContent();
 		if (o != null) {
+			if (o.length > TransportService.PAYLOAD_SIZE_REPORTING_THRESHOLD) {
+				Logger.log("send", "size " + o.length);
+			}
 			System.out.println("content: " + new String(o));
-			StreamsUtil.writeToOutput(o, os);
+			
+			long[] tally = {0};
+			try {
+				StreamsUtil.writeToOutput(o, os, tally);
+			} finally {
+				if (tally[0] != o.length) {
+					Logger.log("send", "only " + tally[0] + " of " + o.length);
+				}
+			}
 		} else {
 			System.out.println("no request body");
+		}
+	}
+	
+	public static void logRecv (long total, long read, boolean ex) {
+		try {
+			boolean hasLength = (total >= 0);	//whether we have total length
+			boolean diff;						//whether bytes read differed from total length
+			boolean logIt;						//whether to log stats
+			
+			if (hasLength) {
+				diff = (total != read);
+				logIt = (total > TransportService.PAYLOAD_SIZE_REPORTING_THRESHOLD || diff);
+			} else {
+				logIt = (read > TransportService.PAYLOAD_SIZE_REPORTING_THRESHOLD || ex);
+				diff = false;
+			}
+	
+			if (logIt) {
+				Logger.log("recv", read + (diff ? " of " + total : ""));
+			}
+		} catch (Exception e) {
+			//safety first!
+			Logger.exception("TransportMessage.logRecv", e);
 		}
 	}
 	
