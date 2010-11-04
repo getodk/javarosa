@@ -191,7 +191,6 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 			is = (DataInputStream) conn.openDataInputStream();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			StreamsUtil.writeFromInputToOutput(is, baos, responseRead);
-			is.close();
 
 			// set return information in the message
 			this.setResponseBody(baos.toByteArray());
