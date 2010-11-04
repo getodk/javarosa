@@ -265,7 +265,7 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 	private void handleResponse(HttpConnection connection) throws IOException {
 		int responseCode = connection.getResponseCode();
 		long responseLength = connection.getLength();
-		
+
 		if (responseLength > TransportService.PAYLOAD_SIZE_REPORTING_THRESHOLD) {
 			Logger.log("recv", "size " + responseLength);
 		}
@@ -345,9 +345,9 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 		
 		public int read() throws IOException {
 			try {
-				int k = is.read();
-				read += k;
-				return k;
+				int c = is.read();
+				read += 1;
+				return c;
 			} catch (IOException ioe) {
 				log(true);
 				throw ioe;
@@ -357,7 +357,7 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 		public int read(byte[] b) throws IOException {
 			try {
 				int k = is.read(b);
-				read += k;
+				read += Math.max(k, 0);
 				return k;
 			} catch (IOException ioe) {
 				log(true);
@@ -368,7 +368,7 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 		public int read(byte[] b, int off, int len) throws IOException {
 			try {
 				int k = is.read(b, off, len);
-				read += k;
+				read += Math.max(k, 0);
 				return k;
 			} catch (IOException ioe) {
 				log(true);
@@ -420,18 +420,22 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 		}
 		
 		public int available() throws IOException {
+			System.err.println("don't expect this to ever be called");
 			return is.available();
 		}
 		
 		public void mark(int rl) {
+			System.err.println("don't expect this to ever be called");
 			is.mark(rl);
 		}
 		
 		public void reset() throws IOException {
+			System.err.println("don't expect this to ever be called");
 			is.reset();
 		}
 		
 		public boolean markSupported() {
+			System.err.println("don't expect this to ever be called");
 			return is.markSupported();
 		}
 	}
