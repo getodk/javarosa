@@ -28,7 +28,7 @@ public class StreamsUtil {
 			incr(tally);
 			val = in.read();
 		}
-
+		in.close();
 	}
 	
 	public static void writeFromInputToOutput(InputStream in, OutputStream out) throws IOException {
