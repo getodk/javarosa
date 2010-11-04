@@ -72,7 +72,7 @@ public class FormSummaryController implements HandledPCommandListener {
 					counter++;
 				}
 			}
-			index = form.incrementIndex(index);
+			index = model.incrementIndex(index);
 		}
 
 		return counter;

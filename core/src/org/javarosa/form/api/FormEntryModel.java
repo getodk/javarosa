@@ -36,10 +36,32 @@ import org.javarosa.core.model.instance.TreeReference;
 public class FormEntryModel {
     private FormDef form;
     private FormIndex currentFormIndex;
+    
+    private int repeatStructure = REPEAT_STRUCTURE_LINEAR;
+    
+    public static final int REPEAT_STRUCTURE_LINEAR = 1;
+    public static final int REPEAT_STRUCTURE_NON_LINEAR = 2;
 
 
     public FormEntryModel(FormDef form) {
+    	this(form, REPEAT_STRUCTURE_LINEAR);
+    }
+    
+    /**
+     * Creates a new entry model for the form with the appropriate
+     * repeat structure
+     * 
+     * @param form
+     * @param repeatStructure The structure of repeats (the repeat signals which should
+     * be sent during form entry)
+     * @throws IllegalArgumentException If repeatStructure is not valid
+     */
+    public FormEntryModel(FormDef form, int repeatStructure) {
         this.form = form;
+        if(repeatStructure != REPEAT_STRUCTURE_LINEAR && repeatStructure != REPEAT_STRUCTURE_NON_LINEAR) {
+        	throw new IllegalArgumentException(repeatStructure +": does not correspond to a valid repeat structure");
+        }
+        this.repeatStructure = repeatStructure;
         this.currentFormIndex = FormIndex.createBeginningOfFormIndex();
     }
 
@@ -65,9 +87,9 @@ public class FormEntryModel {
         IFormElement element = form.getChild(index);
         if (element instanceof GroupDef) {
             if (((GroupDef) element).getRepeat()) {
-                if (!FormIndex.NONLINEAR_REPEAT_API && form.getInstance().resolveReference(form.getChildInstanceRef(index)) == null) {
+                if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && form.getInstance().resolveReference(form.getChildInstanceRef(index)) == null) {
                     return FormEntryController.EVENT_PROMPT_NEW_REPEAT;
-                } else if (FormIndex.NONLINEAR_REPEAT_API && index.getElementMultiplicity() == TreeReference.INDEX_REPEAT_JUNCTURE) {
+                } else if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR && index.getElementMultiplicity() == TreeReference.INDEX_REPEAT_JUNCTURE) {
                 	return FormEntryController.EVENT_REPEAT_JUNCTURE;
                 } else {
                     return FormEntryController.EVENT_REPEAT;
@@ -467,12 +489,12 @@ public class FormEntryModel {
     public FormIndex[] getCompoundIndices(FormIndex container) {
     	//ArrayLists are a no-go for J2ME
     	Vector<FormIndex> indices = new Vector<FormIndex>();
-    	FormIndex walker = getForm().incrementIndex(container);
+    	FormIndex walker = incrementIndex(container);
     	while(FormIndex.isSubElement(container, walker)) {
     		if(isIndexRelevant(walker)) {
     			indices.addElement(walker);
     		}
-    		walker = getForm().incrementIndex(walker);
+    		walker = incrementIndex(walker);
     	}
     	FormIndex[] array = new FormIndex[indices.size()];
     	for(int i = 0 ; i < indices.size() ; ++i) {
@@ -480,4 +502,223 @@ public class FormEntryModel {
     	}
     	return array;
     }
+    
+    
+    /**
+     * @return The Current Repeat style which should be used.
+     */
+    public int getRepeatStructure() {
+    	return this.repeatStructure;
+    }
+    
+    public FormIndex incrementIndex(FormIndex index) {
+		return incrementIndex(index, true);
+	}
+	
+	public FormIndex incrementIndex(FormIndex index, boolean descend) {
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+
+		if (index.isEndOfFormIndex()) {
+			return index;
+		} else if (index.isBeginningOfFormIndex()) {
+			if (form.getChildren() == null || form.getChildren().size() == 0) {
+				return FormIndex.createEndOfFormIndex();
+			}
+		} else {
+			form.collapseIndex(index, indexes, multiplicities, elements);
+		}
+
+		incrementHelper(indexes, multiplicities, elements, descend);
+			
+		if (indexes.size() == 0) {
+			return FormIndex.createEndOfFormIndex();
+		} else {
+			return form.buildIndex(indexes, multiplicities, elements);
+		}
+	}
+
+	private void incrementHelper(Vector indexes, Vector multiplicities,	Vector elements, boolean descend) {
+		int i = indexes.size() - 1;
+		boolean exitRepeat = false; //if exiting a repetition? (i.e., go to next repetition instead of one level up)
+
+		if (i == -1 || elements.elementAt(i) instanceof GroupDef) {
+			// current index is group or repeat or the top-level form
+
+			if (i >= 0) {
+				// find out whether we're on a repeat, and if so, whether the
+				// specified instance actually exists
+				GroupDef group = (GroupDef) elements.elementAt(i);
+				if (group.getRepeat()) {
+					if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
+						
+						if (((Integer)multiplicities.lastElement()).intValue() == TreeReference.INDEX_REPEAT_JUNCTURE) {
+						
+							descend = false;
+							exitRepeat = true;
+							
+						}
+						
+					} else {
+					
+						if (form.getInstance().resolveReference(form.getChildInstanceRef(elements,	multiplicities)) == null) {
+							descend = false; // repeat instance does not exist; do not descend into it
+							exitRepeat = true;
+						}
+						
+					}
+				}
+			}
+
+			if (descend) {
+				indexes.addElement(new Integer(0));
+				multiplicities.addElement(new Integer(0));
+				elements.addElement((i == -1 ? form : (IFormElement) elements.elementAt(i)).getChild(0));
+				
+				if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
+					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
+						multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), multiplicities.size() - 1);
+					}
+				}
+				
+				return;
+			}
+		}
+
+		while (i >= 0) {
+			// if on repeat, increment to next repeat EXCEPT when we're on a
+			// repeat instance that does not exist and was not created
+			// (repeat-not-existing can only happen at lowest level; exitRepeat
+			// will be true)
+			if (!exitRepeat && elements.elementAt(i) instanceof GroupDef && ((GroupDef) elements.elementAt(i)).getRepeat()) {
+				if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
+					
+					multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), i);
+
+				} else {
+					
+					multiplicities.setElementAt(new Integer(((Integer) multiplicities.elementAt(i)).intValue() + 1), i);
+					
+				}
+				return;
+			}
+
+			IFormElement parent = (i == 0 ? form : (IFormElement) elements.elementAt(i - 1));
+			int curIndex = ((Integer) indexes.elementAt(i)).intValue();
+
+			// increment to the next element on the current level
+			if (curIndex + 1 >= parent.getChildren().size()) {
+				// at the end of the current level; move up one level and start
+				// over
+				indexes.removeElementAt(i);
+				multiplicities.removeElementAt(i);
+				elements.removeElementAt(i);
+				i--;
+				exitRepeat = false;
+			} else {
+				indexes.setElementAt(new Integer(curIndex + 1), i);
+				multiplicities.setElementAt(new Integer(0), i);
+				elements.setElementAt(parent.getChild(curIndex + 1), i);
+				
+				if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR) {
+					if (elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat()) {
+						multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), multiplicities.size() - 1);
+					}
+				}
+				
+				return;
+			}
+		}
+	}
+	
+	public FormIndex decrementIndex(FormIndex index) {
+		Vector indexes = new Vector();
+		Vector multiplicities = new Vector();
+		Vector elements = new Vector();
+
+		if (index.isBeginningOfFormIndex()) {
+			return index;
+		} else if (index.isEndOfFormIndex()) {
+			if (form.getChildren() == null || form.getChildren().size() == 0) {
+				return FormIndex.createBeginningOfFormIndex();
+			}
+		} else {
+			form.collapseIndex(index, indexes, multiplicities, elements);
+		}
+
+		decrementHelper(indexes, multiplicities, elements);
+
+		if (indexes.size() == 0) {
+			return FormIndex.createBeginningOfFormIndex();
+		} else {
+			return form.buildIndex(indexes, multiplicities, elements);
+		}
+	}
+
+	private void decrementHelper(Vector indexes, Vector multiplicities,	Vector elements) {
+		int i = indexes.size() - 1;
+
+		if (i != -1) {
+			int curIndex = ((Integer) indexes.elementAt(i)).intValue();
+			int curMult = ((Integer) multiplicities.elementAt(i)).intValue();
+
+			if (repeatStructure == REPEAT_STRUCTURE_NON_LINEAR && 
+				elements.lastElement() instanceof GroupDef && ((GroupDef)elements.lastElement()).getRepeat() &&
+				((Integer)multiplicities.lastElement()).intValue() != TreeReference.INDEX_REPEAT_JUNCTURE) {
+				multiplicities.setElementAt(new Integer(TreeReference.INDEX_REPEAT_JUNCTURE), i);
+				return;
+			} else if (repeatStructure != REPEAT_STRUCTURE_NON_LINEAR && curMult > 0) {
+				multiplicities.setElementAt(new Integer(curMult - 1), i);
+			} else if (curIndex > 0) {
+				// set node to previous element
+				indexes.setElementAt(new Integer(curIndex - 1), i);
+				multiplicities.setElementAt(new Integer(0), i);
+				elements.setElementAt((i == 0 ? form : (IFormElement) elements.elementAt(i - 1)).getChild(curIndex - 1), i);
+
+				if (setRepeatNextMultiplicity(elements, multiplicities))
+					return;
+			} else {
+				// at absolute beginning of current level; index to parent
+				indexes.removeElementAt(i);
+				multiplicities.removeElementAt(i);
+				elements.removeElementAt(i);				
+				return;
+			}
+		}
+
+		IFormElement element = (i < 0 ? form : (IFormElement) elements.elementAt(i));
+		while (!(element instanceof QuestionDef)) {
+			int subIndex = element.getChildren().size() - 1;
+			element = element.getChild(subIndex);
+
+			indexes.addElement(new Integer(subIndex));
+			multiplicities.addElement(new Integer(0));
+			elements.addElement(element);
+
+			if (setRepeatNextMultiplicity(elements, multiplicities))
+				return;
+		}
+	}
+
+	private boolean setRepeatNextMultiplicity(Vector elements, Vector multiplicities) {
+		// find out if node is repeatable
+		TreeReference nodeRef = form.getChildInstanceRef(elements, multiplicities);
+		TreeElement node = form.getInstance().resolveReference(nodeRef);
+		if (node == null || node.repeatable) { // node == null if there are no
+			// instances of the repeat
+			int mult;
+			if (node == null) {
+				mult = 0; // no repeats; next is 0
+			} else {
+				String name = node.getName();
+				TreeElement parentNode = form.getInstance().resolveReference(nodeRef.getParentRef());
+				mult = parentNode.getChildMultiplicity(name);
+			}
+			multiplicities.setElementAt(new Integer(repeatStructure == REPEAT_STRUCTURE_NON_LINEAR ? TreeReference.INDEX_REPEAT_JUNCTURE : mult), multiplicities.size() - 1);
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

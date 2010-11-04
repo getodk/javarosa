@@ -295,7 +295,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 					counter++;
 				}
 			}
-			index = form.incrementIndex(index);
+			index = model.incrementIndex(index);
 		}
 
 		return counter;
