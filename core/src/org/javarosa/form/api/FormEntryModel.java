@@ -37,9 +37,24 @@ public class FormEntryModel {
     private FormDef form;
     private FormIndex currentFormIndex;
     
-    private int repeatStructure = REPEAT_STRUCTURE_LINEAR;
+    /**
+     * One of "REPEAT_STRUCUTRE_" in this class's static types,
+     * represents what abstract structure repeat events should
+     * be broadacast as.
+     */
+    private int repeatStructure = -1;
     
+    /**
+     * Repeats should be a prompted linear set of questions, either
+     * with a fixed set of repetitions, or a prompt for creating a 
+     * new one.
+     */
     public static final int REPEAT_STRUCTURE_LINEAR = 1;
+    
+    /**
+     * Repeats should be a custom juncture point with centralized
+     * "Create/Remove/Interact" hub.  
+     */
     public static final int REPEAT_STRUCTURE_NON_LINEAR = 2;
 
 
