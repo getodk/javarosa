@@ -57,6 +57,8 @@ public class TransportService {
 	
 	private static final String CACHE_LOCK="CACHE_LOCK";
 	
+	public static final int PAYLOAD_SIZE_REPORTING_THRESHOLD = 15000;
+	
 	private static TransportMessageStore CACHE() {
 		synchronized(CACHE_LOCK) { 
 			if(T_CACHE == null) {

@@ -20,6 +20,7 @@ import org.javarosa.core.services.transport.payload.IDataPayload;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.services.transport.TransportService;
 import org.javarosa.services.transport.impl.BasicTransportMessage;
 import org.javarosa.services.transport.impl.TransportMessageStatus;
 import org.javarosa.services.transport.impl.simplehttp.HttpRequestProperties;
@@ -263,6 +264,11 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 	
 	private void handleResponse(HttpConnection connection) throws IOException {
 		int responseCode = connection.getResponseCode();
+		long responseLength = connection.getLength();
+
+		if (responseLength > TransportService.PAYLOAD_SIZE_REPORTING_THRESHOLD) {
+			Logger.log("recv", "size " + responseLength);
+		}
 		
 		if(responseCode >= 200 && responseCode < 300) {
 			//It's all good, message was a success.
@@ -270,7 +276,7 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 			this.setStatus(TransportMessageStatus.SENT);
 			
 			//Wire up the input stream from the connection to the message.
-			this.setResponseStream(connection.openInputStream());
+			this.setResponseStream(new InputStreamC(connection.openInputStream(), responseLength, this.getTag()));
 		} else {
 			this.setStatus(TransportMessageStatus.FAILED);
 			this.setResponseCode(responseCode);
@@ -278,7 +284,7 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 			//We'll assume that any failures come with a message which is sufficiently
 			//small that they can be fit into memory.
 			byte[] response = StreamUtil.readFully(connection.openInputStream());
-			String reason = new String(response);
+			String reason = responseCode + ": " + new String(response);
 			reason = PropertyUtils.trim(reason, 400);
 			this.setFailureReason(reason);
 		}
@@ -322,8 +328,117 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 		return conn;
 	}
 
-	
-	
+	protected class InputStreamC extends InputStream {
+		private InputStream is;
+		private long total;
+		private long read;
+		private String tag;
+		
+		boolean logged = false;
+		
+		public InputStreamC (InputStream is, long totalLength, String tag) {
+			this.is = is;
+			this.total = totalLength;
+			this.read = 0;
+			this.tag = tag;
+		}
+		
+		public int read() throws IOException {
+			try {
+				int c = is.read();
+				read += 1;
+				return c;
+			} catch (IOException ioe) {
+				log(true);
+				throw ioe;
+			}
+		}
+		
+		public int read(byte[] b) throws IOException {
+			try {
+				int k = is.read(b);
+				read += Math.max(k, 0);
+				return k;
+			} catch (IOException ioe) {
+				log(true);
+				throw ioe;
+			}
+		}
+		
+		public int read(byte[] b, int off, int len) throws IOException {
+			try {
+				int k = is.read(b, off, len);
+				read += Math.max(k, 0);
+				return k;
+			} catch (IOException ioe) {
+				log(true);
+				throw ioe;
+			}
+		}
+		
+		public long skip(long n) throws IOException {
+			try {
+				long k = is.skip(n);
+				read += k;
+				return k;
+			} catch (IOException ioe) {
+				log(true);
+				throw ioe;
+			}
+		}
+
+		public void close() throws IOException {
+			log(false);
+			is.close();
+		}
+
+		private void log (boolean ex) {
+			if (logged)
+				return;
+			logged = true;
+			
+			try {
+				boolean hasLength = (total >= 0);	//whether we have total length
+				boolean diff;						//whether bytes read differed from total length
+				boolean logIt;						//whether to log stats
+				
+				if (hasLength) {
+					diff = (total != read);
+					logIt = diff;
+				} else {
+					logIt = (read > TransportService.PAYLOAD_SIZE_REPORTING_THRESHOLD || ex);
+					diff = false;
+				}
+		
+				if (logIt) {
+					Logger.log("recv", "<" + tag + "> " + read + (diff ? " of " + total : ""));
+				}
+			} catch (Exception e) {
+				//extrasafe
+				Logger.exception("InputStreamC.log", e);
+			}
+		}
+		
+		public int available() throws IOException {
+			System.err.println("don't expect this to ever be called");
+			return is.available();
+		}
+		
+		public void mark(int rl) {
+			System.err.println("don't expect this to ever be called");
+			is.mark(rl);
+		}
+		
+		public void reset() throws IOException {
+			System.err.println("don't expect this to ever be called");
+			is.reset();
+		}
+		
+		public boolean markSupported() {
+			System.err.println("don't expect this to ever be called");
+			return is.markSupported();
+		}
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.util.externalizable.Externalizable#readExternal(java.io.DataInputStream, org.javarosa.core.util.externalizable.PrototypeFactory)
