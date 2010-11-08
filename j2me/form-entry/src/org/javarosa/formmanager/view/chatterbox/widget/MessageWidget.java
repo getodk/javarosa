@@ -72,10 +72,8 @@ public class MessageWidget implements IWidgetStyleEditable {
 
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
 		ImageItem newImItem = ExpandedWidget.getImageItem(fep,scrHeight-16,scrWidth-16);
-		if(imItem!=null && newImItem!=null){
-			fullPrompt.remove(imItem);	//replace an already existing image
-		}
 		if(newImItem!=null){
+			detachImage();
 			fullPrompt.add(newImItem);
 			imItem = newImItem;
 		}
@@ -90,6 +88,7 @@ public class MessageWidget implements IWidgetStyleEditable {
 	}
 
 	public void reset () {
+		detachImage();
 		prompt = null;
 		ok = null;
 	}
@@ -118,5 +117,14 @@ public class MessageWidget implements IWidgetStyleEditable {
 	
 	public void registerMultimediaController(FormMultimediaController controller) {
 		this.multimediaController = controller;
+	}
+	
+	
+	private void detachImage() {
+		if(imItem!=null){
+			fullPrompt.remove(imItem);	//replace an already existing image
+			imItem.releaseResources();
+			imItem = null;
+		}
 	}
 }
