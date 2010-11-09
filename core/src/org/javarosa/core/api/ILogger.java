@@ -24,6 +24,7 @@ import java.util.Date;
 
 import org.javarosa.core.log.IAtomicLogSerializer;
 import org.javarosa.core.log.IFullLogSerializer;
+import org.javarosa.core.log.ILogPurger;
 
 /**
  * IIncidentLogger's are used for instrumenting applications to identify usage
@@ -41,8 +42,8 @@ public interface ILogger {
 	
 	public <T> T serializeLogs(IFullLogSerializer<T> serializer);
 	
-	public void serializeLogs(IAtomicLogSerializer serializer) throws IOException;
-	public void serializeLogs(IAtomicLogSerializer serializer, int limit) throws IOException;
+	public ILogPurger serializeLogs(IAtomicLogSerializer serializer) throws IOException;
+	public ILogPurger serializeLogs(IAtomicLogSerializer serializer, int limit) throws IOException;
 	
 	public void panic();
 	

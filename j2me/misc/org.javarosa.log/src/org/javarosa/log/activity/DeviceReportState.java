@@ -11,6 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.javarosa.core.api.State;
+import org.javarosa.core.log.ILogPurger;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.reference.Reference;
 import org.javarosa.core.reference.ReferenceManager;
@@ -59,6 +60,8 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	private int weeklyPending;
 	private int dailyPending;
 	
+	private ILogPurger logPurger;
+	
 	/**
 	 * Create a behind-the-scenes Device Reporting state which manages all operations 
 	 * without user intervention.
@@ -102,7 +105,8 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 					createReport(serializer);
 				}
 			};
-						
+			
+			logPurger = null;
 			Logger.log("device-report", "attempting to send");
 			SenderThread s = TransportService.send(message);
 			
@@ -181,8 +185,9 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	
 	private void createDeviceLogSubreport(XmlSerializer o, Vector errors) throws IOException {
 		try {
+			Logger.log("logsend", Logger._().logSize() + " entries");
 			o.startTag(XMLNS, "log_subreport");
-			Logger._().serializeLogs(new XmlStreamLogSerializer(o, XMLNS));
+			logPurger = Logger._().serializeLogs(new XmlStreamLogSerializer(o, XMLNS));
 			o.endTag(XMLNS, "log_subreport");
 		} catch(Exception e) {
 			logError(errors, new StatusReportException(e,"log_subreport","Exception when writing device log report."));
@@ -300,7 +305,9 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	}
 	
 	private void onSuccess () {
-		Logger._().clearLogs();
+		if (logPurger != null) {
+			logPurger.purge();
+		}
 		LogReportUtils.setPendingFromNow(now, this.dailyPending > 0, this.weeklyPending > 0);		
 	}
 	
@@ -348,7 +355,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			if(Logger._() == null) {
 				System.out.println("Logger is null. Must have failed to initailize");
 			}
-			Logger._().clearLogs();
+			Logger._().clearLogs(); //don't need to use LogPurger, since we're not in a background thread
 			
 			Logger.log("log", "archived logs to file: " + dumpRef);
 			if (!success) {

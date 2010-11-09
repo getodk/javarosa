@@ -29,9 +29,9 @@ import javax.microedition.rms.RecordStoreException;
 import org.javarosa.core.api.ILogger;
 import org.javarosa.core.log.IAtomicLogSerializer;
 import org.javarosa.core.log.IFullLogSerializer;
+import org.javarosa.core.log.ILogPurger;
 import org.javarosa.core.log.LogEntry;
 import org.javarosa.core.log.WrappedException;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.j2me.storage.rms.RMSStorageUtility;
@@ -80,24 +80,26 @@ public class J2MELogger implements ILogger {
 		if(storageBroken) { return; };
 		synchronized(logStorage) {
 			if(!checkStorage()) { return; }
-			//'destroy' not supported yet
-			//logStorage.destroy();
-			//logStorage = new RMSStorageUtility("LOG", IncidentLog.class);
-			
-			Vector ids = new Vector();
+
+			Vector<Integer> ids = new Vector<Integer>();
 			IStorageIterator li = logStorage.iterate();
 			while (li.hasMore()) {
 				ids.addElement(new Integer(li.nextID()));
 			}
-			for (int i = 0; i < ids.size(); i++) {
-				int id = ((Integer)ids.elementAt(i)).intValue();
-				logStorage.remove(id);
-			}
 			
-			log("logs", "cleared", new Date());
+			clearLogs(ids);
 		}
 	}
 
+	public void clearLogs(Vector<Integer> IDs) {
+		for (int i = 0; i < IDs.size(); i++) {
+			int id = IDs.elementAt(i).intValue();
+			logStorage.remove(id);
+		}
+		
+		log("logs", "purged " + IDs.size() + " " + logStorage.getNumRecords(), new Date());
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IIncidentLogger#logIncident(java.lang.String, java.lang.String, java.util.Date)
 	 */
@@ -167,16 +169,16 @@ public class J2MELogger implements ILogger {
 		return IDs.getVector();
 	}
 	
-	public void serializeLogs(IAtomicLogSerializer serializer) throws IOException {
-		serializeLogs(serializer, 1 << 20);
+	public ILogPurger serializeLogs(IAtomicLogSerializer serializer) throws IOException {
+		return serializeLogs(serializer, 1 << 20);
 	}
 	
-	public void serializeLogs(IAtomicLogSerializer serializer, int limit) throws IOException {
-		if(storageBroken) { return; };
+	public ILogPurger serializeLogs(IAtomicLogSerializer serializer, int limit) throws IOException {
+		if(storageBroken) { return null; };
 		
 		Vector<Integer> vIDs;
 		synchronized(logStorage) {
-			if(!checkStorage()) { return; }
+			if(!checkStorage()) { return null; }
 			vIDs = getLogIDsInOrder();
 		}
 			
@@ -192,9 +194,21 @@ public class J2MELogger implements ILogger {
 		//via streaming may potentially take a very long time, and we don't want all other logging
 		//calls in the app to block in the meantime. extra log entries being added shouldn't
 		//interfere... just don't clear the logs!
+		final Vector<Integer> toPurge = new Vector<Integer>();
 		for (int i = start; i > end; i--) {
 			serializer.serializeLog((LogEntry)logStorage.read(vIDs.elementAt(i).intValue()));
+			toPurge.addElement(vIDs.elementAt(i));
 		}
+		
+		return new ILogPurger () {
+			public void purge() {
+				if(storageBroken) { return; };
+				synchronized(logStorage) {
+					if(!checkStorage()) { return; }
+					clearLogs(toPurge);
+				}
+			}
+		};
 	}
 
 	public int logSize() {
