@@ -98,10 +98,8 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	
 	public void refreshWidget (FormEntryPrompt fep, int changeFlags) {
 		ImageItem newImItem = ExpandedWidget.getImageItem(fep,scrHeight/2,scrWidth-16); //width and height have been disabled!
-		if(imItem!=null && newImItem!=null){
-			fullPrompt.remove(imItem);	//replace an already existing image
-		}
 		if(newImItem!=null){
+			detachImage();
 			fullPrompt.add(newImItem);
 			imItem = newImItem;
 		}
@@ -123,6 +121,7 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 	}
 
 	public void reset () {
+		detachImage();
 		prompt = null;
 		entryWidget = null;
 	}
@@ -152,6 +151,14 @@ public abstract class ExpandedWidget implements IWidgetStyleEditable {
 			return getAnswerTemplate().cast((UncastData)data);
 		} else {
 			return data;
+		}
+	}
+	
+	private void detachImage() {
+		if(imItem!=null){
+			fullPrompt.remove(imItem);	//replace an already existing image
+			imItem.releaseResources();
+			imItem = null;
 		}
 	}
 	

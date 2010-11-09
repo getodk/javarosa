@@ -102,7 +102,11 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	}
 	
 	public int getContentLength() {
-		return getContent().length;
+		if(this.getContent() != null) {
+			return getContent().length;
+		} else {
+			return -1;
+		}
 	}
 	
 	/**
