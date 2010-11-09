@@ -115,21 +115,19 @@ public class TransportService {
 	 * @throws IOException
 	 */
 	public static SenderThread send(TransportMessage message, int tries, int delay) throws TransportException {
-
-		// create a sender thread
-		SenderThread thread = new SimpleSenderThread(message, CACHE(), tries, delay);
-
+		boolean sendLater = (tries == 0);
+		
 		// if the message should be stored and never lost
 		if (message.isCacheable()) {
 
 			// record the deadline for the sending thread phase in the message
-			message.setSendingThreadDeadline(getSendingThreadDeadline(thread.getTries(), thread.getDelay()));
+			message.setSendingThreadDeadline(getSendingThreadDeadline(tries, delay));
 
 			synchronized (CACHE()) {
 				// persist the message
 				CACHE().cache(message);
 				
-				if (tries == 0) {
+				if (sendLater) {
 					Logger.log("send", "msg cached " + message.getTag() + "; " + CACHE().getCachedMessagesCount() + " in queue");
 				}
 			}
@@ -137,13 +135,20 @@ public class TransportService {
 			message.setStatus(TransportMessageStatus.QUEUED);
 		}
 
-		// start the sender thread
-		Logger.log("send", "start " + message.getTag());
-		thread.start();
+		if (sendLater) {
+			return null;
+		} else {
+			// create a sender thread
+			SenderThread thread = new SimpleSenderThread(message, CACHE(), tries, delay);
+			
+			// start the sender thread
+			Logger.log("send", "start " + message.getTag());
+			thread.start();
 
-		// return the sender thread in case
-		// an application wants to permit the user to cancel it
-		return thread;
+			// return the sender thread in case
+			// an application wants to permit the user to cancel it
+			return thread;	
+		}		
 	}
 
 	/**
