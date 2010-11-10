@@ -21,21 +21,22 @@ package org.javarosa.j2me.log;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
 import org.javarosa.core.api.ILogger;
-import org.javarosa.core.log.IAtomicLogSerializer;
 import org.javarosa.core.log.IFullLogSerializer;
-import org.javarosa.core.log.ILogPurger;
 import org.javarosa.core.log.LogEntry;
+import org.javarosa.core.log.StreamLogSerializer;
 import org.javarosa.core.log.WrappedException;
+import org.javarosa.core.services.storage.EntityFilter;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.util.SortedIntSet;
 import org.javarosa.j2me.storage.rms.RMSStorageUtility;
-import org.javarosa.j2me.util.SortedIntSet;
 
 /**
  * @author Clayton Sims
@@ -81,23 +82,32 @@ public class J2MELogger implements ILogger {
 		synchronized(logStorage) {
 			if(!checkStorage()) { return; }
 
-			Vector<Integer> ids = new Vector<Integer>();
-			IStorageIterator li = logStorage.iterate();
-			while (li.hasMore()) {
-				ids.addElement(new Integer(li.nextID()));
-			}
-			
-			clearLogs(ids);
+			int size = logStorage.getNumRecords();
+			logStorage.removeAll();
+			log("logs", "purged " + size, new Date());
 		}
 	}
 
-	public void clearLogs(Vector<Integer> IDs) {
-		for (int i = 0; i < IDs.size(); i++) {
-			int id = IDs.elementAt(i).intValue();
-			logStorage.remove(id);
+	/* (non-Javadoc)
+	 * @see org.javarosa.core.api.IIncidentLogger#clearLogs()
+	 */
+	public void clearLogs(final SortedIntSet IDs) {
+		if(storageBroken) { return; };
+		synchronized(logStorage) {
+			if(!checkStorage()) { return; }
+			
+			logStorage.removeAll(new EntityFilter<LogEntry> () {
+				public int preFilter (int id, Hashtable<String, Object> metaData) {
+					return IDs.contains(id) ? PREFILTER_INCLUDE : PREFILTER_EXCLUDE;
+				}
+
+				public boolean matches(LogEntry e) {
+					throw new RuntimeException("can't happen");
+				}
+			});
+			
+			log("logs", "purged " + IDs.size() + " " + logStorage.getNumRecords(), new Date());
 		}
-		
-		log("logs", "purged " + IDs.size() + " " + logStorage.getNumRecords(), new Date());
 	}
 	
 	/* (non-Javadoc)
@@ -169,16 +179,16 @@ public class J2MELogger implements ILogger {
 		return IDs.getVector();
 	}
 	
-	public ILogPurger serializeLogs(IAtomicLogSerializer serializer) throws IOException {
-		return serializeLogs(serializer, 1 << 20);
+	public void serializeLogs(StreamLogSerializer serializer) throws IOException {
+		serializeLogs(serializer, 1 << 20);
 	}
 	
-	public ILogPurger serializeLogs(IAtomicLogSerializer serializer, int limit) throws IOException {
-		if(storageBroken) { return null; };
+	public void serializeLogs(StreamLogSerializer serializer, int limit) throws IOException {
+		if(storageBroken) { return; };
 		
 		Vector<Integer> vIDs;
 		synchronized(logStorage) {
-			if(!checkStorage()) { return null; }
+			if(!checkStorage()) { return; }
 			vIDs = getLogIDsInOrder();
 		}
 			
@@ -194,21 +204,11 @@ public class J2MELogger implements ILogger {
 		//via streaming may potentially take a very long time, and we don't want all other logging
 		//calls in the app to block in the meantime. extra log entries being added shouldn't
 		//interfere... just don't clear the logs!
-		final Vector<Integer> toPurge = new Vector<Integer>();
 		for (int i = start; i > end; i--) {
-			serializer.serializeLog((LogEntry)logStorage.read(vIDs.elementAt(i).intValue()));
-			toPurge.addElement(vIDs.elementAt(i));
+			int id = vIDs.elementAt(i).intValue();
+			serializer.serializeLog(id, (LogEntry)logStorage.read(id));
 		}
-		
-		return new ILogPurger () {
-			public void purge() {
-				if(storageBroken) { return; };
-				synchronized(logStorage) {
-					if(!checkStorage()) { return; }
-					clearLogs(toPurge);
-				}
-			}
-		};
+
 	}
 
 	public int logSize() {

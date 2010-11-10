@@ -8,17 +8,17 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
-import org.javarosa.core.log.IAtomicLogSerializer;
+import org.javarosa.core.log.StreamLogSerializer;
 import org.javarosa.core.log.LogEntry;
 
 /**
  * @author ctsims
  *
  */
-public class StreamLogSerializer implements IAtomicLogSerializer {
+public class LogWriter extends StreamLogSerializer {
 	OutputStreamWriter writer;
 	
-	public StreamLogSerializer(OutputStream stream) {
+	public LogWriter(OutputStream stream) {
 		try {
 			writer = new OutputStreamWriter(stream, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -31,7 +31,7 @@ public class StreamLogSerializer implements IAtomicLogSerializer {
 		return "[" + log.getType() + "] " +log.getTime().toString() + ": " +  log.getMessage()+ "\n"; 
 	}
 	
-	public void serializeLog(LogEntry entry) throws IOException {
+	protected void serializeLog(LogEntry entry) throws IOException {
 		writer.write(logToString(entry));
 	}
 

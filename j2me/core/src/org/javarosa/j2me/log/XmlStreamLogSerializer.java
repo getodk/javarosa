@@ -2,13 +2,13 @@ package org.javarosa.j2me.log;
 
 import java.io.IOException;
 
-import org.javarosa.core.log.IAtomicLogSerializer;
+import org.javarosa.core.log.StreamLogSerializer;
 import org.javarosa.core.log.LogEntry;
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.model.utils.DateUtils;
 import org.xmlpull.v1.XmlSerializer;
 
-public class XmlStreamLogSerializer implements IAtomicLogSerializer {
+public class XmlStreamLogSerializer extends StreamLogSerializer {
 
 	XmlSerializer o;
 	String ns;
@@ -21,7 +21,7 @@ public class XmlStreamLogSerializer implements IAtomicLogSerializer {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.log.ILogSerializer#serializeLog(org.javarosa.core.log.IncidentLog)
 	 */
-	public void serializeLog(LogEntry log) throws IOException {
+	protected void serializeLog(LogEntry log) throws IOException {
 		o.startTag(ns, "log");
 		o.attribute(null, "date", DateUtils.formatDateTime(log.getTime(), DateUtils.FORMAT_ISO8601));
 		

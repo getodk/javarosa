@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.javarosa.core.api.State;
-import org.javarosa.core.log.ILogPurger;
+import org.javarosa.core.log.StreamLogSerializer;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.reference.Reference;
 import org.javarosa.core.reference.ReferenceManager;
@@ -27,7 +27,7 @@ import org.javarosa.j2me.log.StatusReportException;
 import org.javarosa.j2me.log.XmlStatusProvider;
 import org.javarosa.j2me.log.XmlStreamLogSerializer;
 import org.javarosa.log.util.LogReportUtils;
-import org.javarosa.log.util.StreamLogSerializer;
+import org.javarosa.log.util.LogWriter;
 import org.javarosa.services.transport.TransportListener;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.TransportService;
@@ -60,7 +60,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	private int weeklyPending;
 	private int dailyPending;
 	
-	private ILogPurger logPurger;
+	private StreamLogSerializer logSerializer;
 	
 	/**
 	 * Create a behind-the-scenes Device Reporting state which manages all operations 
@@ -106,7 +106,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 				}
 			};
 			
-			logPurger = null;
+			logSerializer = null;
 			Logger.log("device-report", "attempting to send");
 			SenderThread s = TransportService.send(message);
 			
@@ -187,7 +187,8 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 		try {
 			Logger.log("logsend", Logger._().logSize() + " entries");
 			o.startTag(XMLNS, "log_subreport");
-			logPurger = Logger._().serializeLogs(new XmlStreamLogSerializer(o, XMLNS));
+			logSerializer = new XmlStreamLogSerializer(o, XMLNS);
+			Logger._().serializeLogs(logSerializer);
 			o.endTag(XMLNS, "log_subreport");
 		} catch(Exception e) {
 			logError(errors, new StatusReportException(e,"log_subreport","Exception when writing device log report."));
@@ -305,8 +306,8 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	}
 	
 	private void onSuccess () {
-		if (logPurger != null) {
-			logPurger.purge();
+		if (logSerializer != null) {
+			logSerializer.purge();
 		}
 		LogReportUtils.setPendingFromNow(now, this.dailyPending > 0, this.weeklyPending > 0);		
 	}
@@ -341,7 +342,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			if(!ref.isReadOnly()) {
 				success = true;
 				try {
-					Logger._().serializeLogs(new StreamLogSerializer(ref.getOutputStream()));
+					Logger._().serializeLogs(new LogWriter(ref.getOutputStream()));
 				} catch (IOException ioe) {
 					success = false;
 				}
