@@ -11,8 +11,12 @@ public class JrFormEntryModel extends FormEntryModel {
 		this(f, false);
 	}
 	
-	public JrFormEntryModel (FormDef f, boolean readOnlyMode) {
-		super(f);
+	public JrFormEntryModel(FormDef f, boolean readOnlyMode) {
+		this(f, readOnlyMode, FormEntryModel.REPEAT_STRUCTURE_NON_LINEAR);
+	}
+	
+	public JrFormEntryModel (FormDef f, boolean readOnlyMode, int repeatStructure) {
+		super(f, repeatStructure);
 		this.readOnlyMode = readOnlyMode;
 	}
 	
