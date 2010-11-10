@@ -22,9 +22,9 @@ package org.javarosa.core.api;
 import java.io.IOException;
 import java.util.Date;
 
-import org.javarosa.core.log.IAtomicLogSerializer;
 import org.javarosa.core.log.IFullLogSerializer;
-import org.javarosa.core.log.ILogPurger;
+import org.javarosa.core.log.StreamLogSerializer;
+import org.javarosa.core.util.SortedIntSet;
 
 /**
  * IIncidentLogger's are used for instrumenting applications to identify usage
@@ -39,11 +39,12 @@ public interface ILogger {
 	public void log(String type, String message, Date logDate);
 	
 	public void clearLogs();
+	public void clearLogs(SortedIntSet IDs);
 	
 	public <T> T serializeLogs(IFullLogSerializer<T> serializer);
 	
-	public ILogPurger serializeLogs(IAtomicLogSerializer serializer) throws IOException;
-	public ILogPurger serializeLogs(IAtomicLogSerializer serializer, int limit) throws IOException;
+	public void serializeLogs(StreamLogSerializer serializer) throws IOException;
+	public void serializeLogs(StreamLogSerializer serializer, int limit) throws IOException;
 	
 	public void panic();
 	

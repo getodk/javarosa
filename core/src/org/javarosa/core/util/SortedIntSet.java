@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.javarosa.j2me.util;
+package org.javarosa.core.util;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
