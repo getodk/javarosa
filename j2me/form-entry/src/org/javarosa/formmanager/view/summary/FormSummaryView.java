@@ -105,7 +105,7 @@ public class FormSummaryView extends List {
 				}
 			}
 			prevDepth = index.getDepth();
-			index = form.incrementIndex(index);
+			index = model.incrementIndex(index);
 		}
 		entries = new Entry[entriesVec.size()];
 		entriesVec.copyInto(entries);

@@ -30,13 +30,13 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.NoLocalizedTextException;
 import org.javarosa.form.api.FormEntryCaption;
 import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryModel;
@@ -278,7 +278,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     	IFormElement last = model.getForm().getChild(questionIndex);
     	
     	if (last instanceof GroupDef) {
-    		if (!FormIndex.NONLINEAR_REPEAT_API && ((GroupDef)last).getRepeat() &&	
+    		if (FormEntryModel.REPEAT_STRUCTURE_NON_LINEAR != model.getRepeatStructure() && ((GroupDef)last).getRepeat() &&	
     			model.getForm().getInstance().resolveReference(model.getForm().getChildInstanceRef(questionIndex)) == null) {
     			
     			//We're at a repeat interstitial point. If the group has the right configuration, we are able
@@ -297,7 +297,8 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     				//All Systems Go. Display an interstitial "Add another FOO" question.
         			newRepeat = true;
     			}
-    		} else if (FormIndex.NONLINEAR_REPEAT_API && model.getEvent() == FormEntryController.EVENT_REPEAT_JUNCTURE) {
+    		} else if (FormEntryModel.REPEAT_STRUCTURE_NON_LINEAR == model.getRepeatStructure() && 
+    				model.getEvent() == FormEntryController.EVENT_REPEAT_JUNCTURE) {
     			
     			//show repeat juncture question here
     			System.out.println("you've reached a repeat");
@@ -335,14 +336,14 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     			
     		FormIndex index = activeQuestionIndex;
     		while(!index.equals(questionIndex)) {
-    			index = model.getForm().incrementIndex(index);    			
+    			index = model.incrementIndex(index);    			
     			putQuestion(index, index.equals(questionIndex), newRepeat ? Q_REPEAT_JUNCTURE : Q_NORMAL);
     		}
     	} else if (questionIndex.compareTo(activeQuestionIndex) <= 0) {
     		FormIndex index = activeQuestionIndex;
     		while(!index.equals(questionIndex)) {
     			removeFrame(index);
-    			index = model.getForm().decrementIndex(index);
+    			index = model.decrementIndex(index);
     		}
     		
     		if (questionIndex.isInForm()) {
@@ -435,7 +436,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 		
 		String headerText; //decide what text form to use.
 		
-		boolean isNew = uncommittedRepeats.contains(model.getForm().decrementIndex(questionIndex)); //this is ghetto
+		boolean isNew = uncommittedRepeats.contains(model.decrementIndex(questionIndex)); //this is ghetto
 		headerText = prompt.getRepetitionText(isNew); //droos: this doesn't feel right... should this if/else be wrapped up in the caption?
 		if (headerText == null)
 			headerText = prompt.getLongText();
@@ -466,7 +467,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		return;
     	
     	if (expanded && qType != Q_NORMAL) {
-    		if (FormIndex.NONLINEAR_REPEAT_API) {
+    		if (FormEntryModel.REPEAT_STRUCTURE_NON_LINEAR == model.getRepeatStructure()) {
     			if (qType == Q_REPEAT_JUNCTURE) {
     				//TODO: make rollback work
 //    				if (!forward && uncommittedRepeats.contains(questionIndex)) {    				
@@ -653,7 +654,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
     		}
     		String answer = ((Selection)frame.getData().getValue()).getValue();
     		
-    		if (!FormIndex.NONLINEAR_REPEAT_API) {
+    		if (FormEntryModel.REPEAT_STRUCTURE_NON_LINEAR != model.getRepeatStructure()) {
     		
 	    		if (answer.equals("y")) {
 	    			controller.newRepeat(this.model.getFormIndex());

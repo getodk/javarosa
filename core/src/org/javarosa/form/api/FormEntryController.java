@@ -40,8 +40,12 @@ public class FormEntryController {
     public static final int EVENT_REPEAT_JUNCTURE = 32;
 
     FormEntryModel model;
-
-
+    
+    /**
+     * Creates a new form entry controller for the model provided
+     * 
+     * @param model
+     */
     public FormEntryController(FormEntryModel model) {
         this.model = model;
     }
@@ -187,9 +191,9 @@ public class FormEntryController {
 
         do {
             if (forward) {
-                index = model.getForm().incrementIndex(index);
+                index = model.incrementIndex(index);
             } else {
-                index = model.getForm().decrementIndex(index);
+                index = model.decrementIndex(index);
             }
         } while (index.isInForm() && !model.isIndexRelevant(index));
 

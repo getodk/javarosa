@@ -3,26 +3,16 @@ package org.javarosa.demo
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.util.Hashtable;
-import java.util.Vector;
-
-import javax.microedition.io.Connector;
-import javax.microedition.io.HttpConnection;
 
 import org.javarosa.core.api.State;
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.core.services.locale.Localizer;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
-import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.demo.applogic.JRDemoContext;
@@ -30,15 +20,7 @@ import org.javarosa.demo.applogic.JRDemoFormListState;
 import org.javarosa.demo.applogic.JRDemoLanguageSelectState;
 import org.javarosa.demo.applogic.JRDemoSavedFormListState;
 import org.javarosa.demo.applogic.JRDemoSplashScreenState;
-import org.javarosa.patient.model.Patient;
-import org.javarosa.resources.locale.LanguageUtils;
-import org.javarosa.services.transport.http.HttpConnectionROSA;
-
 import org.kxml2.io.KXmlParser;
-import org.kxml2.io.KXmlSerializer;
-import org.kxml2.kdom.Document;
-import org.kxml2.kdom.Element;	
-import org.xmlpull.v1.XmlSerializer;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
