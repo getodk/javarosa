@@ -295,6 +295,9 @@ public class FormEntryPrompt extends FormEntryCaption {
 		if(!(getFormElement() instanceof QuestionDef)) throw new RuntimeException("Can't retrieve question text for non-QuestionDef form elements!");
 		if(sel == null) throw new IllegalArgumentException("Cannot use null as an argument!");
 		
+		//Just in case the selection hasn't had a chance to be initialized yet.
+		if(sel.index == -1) { sel.attachChoice(this.getQuestion()); }
+		
 		//check for the null id case and return labelInnerText if it is so.
 		String tid = sel.choice.getTextID();
 		if(tid == null || tid == "") return substituteStringArgs(sel.choice.getLabelInnerText());
@@ -326,6 +329,10 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 */
 	public String getSpecialFormSelectItemText(Selection sel,String form){
 		if(sel == null) throw new IllegalArgumentException("Cannot use null as an argument for Selection!");
+		
+		//Just in case the selection hasn't had a chance to be initialized yet.
+		if(sel.index == -1) { sel.attachChoice(this.getQuestion()); }
+		
 		String textID = sel.choice.getTextID();
 		if(textID == null || textID.equals("")) return null;
 		
