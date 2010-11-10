@@ -91,7 +91,7 @@ public class J2MELogger implements ILogger {
 	/* (non-Javadoc)
 	 * @see org.javarosa.core.api.IIncidentLogger#clearLogs()
 	 */
-	public void clearLogs(final SortedIntSet IDs) {
+	protected void clearLogs(final SortedIntSet IDs) {
 		if(storageBroken) { return; };
 		synchronized(logStorage) {
 			if(!checkStorage()) { return; }
@@ -199,6 +199,12 @@ public class J2MELogger implements ILogger {
 		} else {
 			start = Math.min(-limit - 1, start);
 		}
+		
+		serializer.setPurger(new StreamLogSerializer.Purger () {
+			public void purge(SortedIntSet IDs) {
+				clearLogs(IDs);
+			}
+		});
 		
 		//this is technically not safe to have outside the synchronized block, but sending the logs
 		//via streaming may potentially take a very long time, and we don't want all other logging
