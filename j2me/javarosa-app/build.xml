@@ -57,6 +57,7 @@
 					<attribute name="Polish-Device" value="${device.identifier}" />
 					<attribute name="JRDemo-Post-Url" value="${jrdemo.postUrl}" />
 					<attribute name="Form-Server-Url" value="${jrdemo.formListUrl}" />
+					<attribute name="Default-View" value="${jrdemo.defaultview}"/>
 				</jad>
 				
 				

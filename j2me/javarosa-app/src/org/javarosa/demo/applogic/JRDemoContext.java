@@ -19,6 +19,7 @@ import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.demo.properties.DemoAppProperties;
 import org.javarosa.demo.util.MetaPreloadHandler;
 import org.javarosa.formmanager.FormManagerModule;
+import org.javarosa.formmanager.properties.FormManagerProperties;
 import org.javarosa.j2me.J2MEModule;
 import org.javarosa.j2me.util.DumpRMS;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -93,6 +94,7 @@ public class JRDemoContext {
 	private void setProperties() {
 		final String POST_URL = midlet.getAppProperty("JRDemo-Post-Url");
 		final String FORM_URL = midlet.getAppProperty("Form-Server-Url");
+		final String VIEW_TYPE = midlet.getAppProperty("Default-View");
 		final String LANGUAGE = midlet.getAppProperty("cur_locale");
 		PropertyManager._().addRules(new JavaRosaPropertyRules());
 		PropertyManager._().addRules(new DemoAppProperties());
@@ -101,6 +103,7 @@ public class JRDemoContext {
 
 		PropertyUtils.initializeProperty(DemoAppProperties.POST_URL_PROPERTY, POST_URL);
 		PropertyUtils.initializeProperty(DemoAppProperties.FORM_URL_PROPERTY, FORM_URL);
+		PropertyUtils.initializeProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, VIEW_TYPE);
 		
 		LanguageUtils.initializeLanguage(false, LANGUAGE == null ? "default" : LANGUAGE);
 
