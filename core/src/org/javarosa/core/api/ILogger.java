@@ -39,7 +39,6 @@ public interface ILogger {
 	public void log(String type, String message, Date logDate);
 	
 	public void clearLogs();
-	public void clearLogs(SortedIntSet IDs);
 	
 	public <T> T serializeLogs(IFullLogSerializer<T> serializer);
 	

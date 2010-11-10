@@ -15,6 +15,11 @@ import org.javarosa.core.util.SortedIntSet;
 public abstract class StreamLogSerializer {
 	
 	SortedIntSet logIDs;
+	Purger purger = null;
+	
+	public interface Purger {
+		void purge(SortedIntSet IDs);
+	}
 	
 	public StreamLogSerializer () {
 		logIDs = new SortedIntSet();
@@ -27,7 +32,11 @@ public abstract class StreamLogSerializer {
 	
 	protected abstract void serializeLog(LogEntry entry) throws IOException;
 	
+	public void setPurger (Purger purger) {
+		this.purger = purger;
+	}
+
 	public void purge() {
-		Logger._().clearLogs(logIDs);
+		this.purger.purge(logIDs);
 	}
 }
