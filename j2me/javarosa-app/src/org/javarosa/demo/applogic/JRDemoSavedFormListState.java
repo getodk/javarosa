@@ -2,12 +2,14 @@ package org.javarosa.demo.applogic;
 
 import java.io.IOException;
 
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageManager;
 import org.javarosa.demo.activity.savedformlist.JRDemoSavedFormListController;
 import org.javarosa.demo.activity.savedformlist.JRDemoSavedFormListTransitions;
-import org.javarosa.demo.util.JRDemoUtil;
+import org.javarosa.formmanager.utility.FormDefFetcher;
+import org.javarosa.formmanager.utility.ModelRmsRetrievalMethod;
 
 public class JRDemoSavedFormListState implements JRDemoSavedFormListTransitions{
 	public void start() {
@@ -26,12 +28,14 @@ public class JRDemoSavedFormListState implements JRDemoSavedFormListTransitions{
 	public void sendDataFormInstance(final FormInstance data) {
 		JRDemoFormTransportState send;
 		try {
-			send = new JRDemoFormTransportState(data) {
+			//Link to the FormDef so we can find the appropriate submission profile
+			FormDefFetcher fd = new FormDefFetcher(new ModelRmsRetrievalMethod(data), JRDemoContext._().getPreloaders(), JRDemoContext._().getFuncHandlers());
+			SubmissionProfile profile = fd.getFormDef().getSubmissionProfile();
+			send = new JRDemoFormTransportState(data, profile) {
 
 				public void done() {
 
-					IStorageUtility forms = StorageManager
-					.getStorage(FormInstance.STORAGE_KEY);
+					IStorageUtility forms = StorageManager.getStorage(FormInstance.STORAGE_KEY);
 					forms.remove(data);
 					new JRDemoSavedFormListState().start();				
 				}
