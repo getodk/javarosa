@@ -6,14 +6,15 @@ import java.util.Vector;
 import javax.microedition.midlet.MIDlet;
 
 import org.javarosa.core.model.CoreModelModule;
+import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IPreloadHandler;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.reference.RootTranslator;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
-import org.javarosa.core.services.transport.payload.IDataPayload;
 import org.javarosa.core.util.JavaRosaCoreModule;
 import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.demo.properties.DemoAppProperties;
@@ -27,6 +28,7 @@ import org.javarosa.location.LocationModule;
 import org.javarosa.model.xform.XFormsModule;
 import org.javarosa.resources.locale.LanguagePackModule;
 import org.javarosa.resources.locale.LanguageUtils;
+import org.javarosa.services.transport.SubmissionTransportHelper;
 import org.javarosa.services.transport.TransportManagerModule;
 import org.javarosa.services.transport.TransportMessage;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
@@ -118,14 +120,18 @@ public class JRDemoContext {
 	}
 	
 	
-	public TransportMessage buildMessage(IDataPayload payload) {
+	public TransportMessage buildMessage(FormInstance data, SubmissionProfile profile) {
 		//Right now we have to just give the message the stream, rather than the payload,
 		//since the transport layer won't take payloads. This should be fixed _as soon 
 		//as possible_ so that we don't either (A) blow up the memory or (B) lose the ability
 		//to send payloads > than the phones' heap.
 		
+		if(profile == null) {
+			profile = SubmissionTransportHelper.defaultPostSubmission(PropertyManager._().getSingularProperty(DemoAppProperties.POST_URL_PROPERTY));
+		}
+		
 		try {
-			return new SimpleHttpTransportMessage(payload.getPayloadStream(), PropertyManager._().getSingularProperty(DemoAppProperties.POST_URL_PROPERTY));
+			return SubmissionTransportHelper.createMessage(data, profile);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error Serializing Data to be transported");
