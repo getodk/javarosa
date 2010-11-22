@@ -24,32 +24,22 @@ public class SubmissionTransportHelper {
 		return new SubmissionProfile(new XPathReference("/"), "post", url, null);
 	}
 	
-	public static TransportMessage createMessage(FormInstance instance, SubmissionProfile profile) {
+	public static TransportMessage createMessage(FormInstance instance, SubmissionProfile profile) throws IOException {
 		//If there is a submission profile, we need to use the relevant portions.
 		if(profile.getMethod().toLowerCase().equals("post")) {
 			
 			//URL
 			String url = profile.getAction();
-			
-			try {
-				IDataPayload payload = new XFormSerializingVisitor().createSerializedPayload(instance, profile.getRef());
-				return new SimpleHttpTransportMessage(payload.getPayloadStream(),url);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error Serializing Data to be transported");
-			}
+		
+			IDataPayload payload = new XFormSerializingVisitor().createSerializedPayload(instance, profile.getRef());
+			return new SimpleHttpTransportMessage(payload.getPayloadStream(),url);
 		} else if(profile.getMethod().toLowerCase().equals("smspush")) {
 			
 			//URL
 			String phoneUri = profile.getAction();
-			
-			try {
-				String payload = new String(new SMSSerializingVisitor().serializeInstance(instance, profile.getRef()));
-				return new SMSTransportMessage(payload,phoneUri);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error Serializing Data to be transported");
-			}
+		
+			String payload = new String(new SMSSerializingVisitor().serializeInstance(instance, profile.getRef()));
+			return new SMSTransportMessage(payload,phoneUri);
 		}
 		return null;
 	}
