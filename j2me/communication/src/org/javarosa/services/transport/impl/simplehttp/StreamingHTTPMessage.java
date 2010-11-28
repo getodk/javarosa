@@ -18,12 +18,16 @@ public abstract class StreamingHTTPMessage extends SimpleHttpTransportMessage {
 		if (cacheable) {
 			throw new RuntimeException("streaming messages cannot be cached!");
 		}
+		
+		super.setCacheable(cacheable);
 	}
 	
 	public void setHttpConnectionMethod(String method) {
 		if (HttpConnection.GET.equals(method)) {
 			throw new RuntimeException("streaming messages must use method POST or PUT");
 		}
+		
+		super.setHttpConnectionMethod(method);
 	}
 	
 	public byte[] getContent() {
