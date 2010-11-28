@@ -107,6 +107,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			// Don't let this code break the application, ever.
 			e.printStackTrace();
 			dumpLogFallback();
+			Logger.exception("exception while trying to send logs; dumped", e);
 		}
 		done();
 	}
