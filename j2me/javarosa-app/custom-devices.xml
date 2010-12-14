@@ -1,0 +1,48 @@
+<!--
+This is just an example how you can extend the device database without
+interfering with the core files "devices.xml", "groups.xml", "apis.xml" and "vendors.xml".
+By using "custom-devices.xml", "custom-groups.xml", "custom-apis.xml" and "custom-vendors.xml"
+you can extend the database without needing to merge the file every time you update J2ME Polish.
+
+You can use this file either in the installation folder of J2ME Polish or in your project folder.
+
+Please have a look at the PDF documentation for a in-depth description of the device database.
+
+You must not define any device here that has already been defined in the ${polish.home}/devices.xml.
+
+Please consider to publish your device-definitions when they could be of use for the community
+at large.
+-->
+<devices>	
+	<device>
+		<identifier>Nokia/S40-native-input</identifier>
+		<capability name="international" value="true" />
+		<features>javarosa</features>
+		<parent>Nokia/6085</parent>
+	</device>
+	
+	<device>
+		<identifier>Nokia/S40-generic</identifier>
+		<features>javarosa</features>
+		<parent>Nokia/6085</parent> 
+	</device>
+	
+	<device>
+		<identifier>Generic/Default</identifier>
+		<features>javarosa</features>
+		<parent>Generic/AnyPhone</parent>
+	</device>
+	<device>
+		<identifier>Generic/International</identifier>
+		<capability name="international" value="true" />
+		<features>javarosa</features>
+		<parent>Generic/AnyPhone</parent>
+	</device>
+	
+	<device>
+		<identifier>BlackBerry/45</identifier>
+		<!-- Can't be used until the j2meunit library issue is resolved -->
+		<!-- features>javarosa</features -->
+		<parent>BlackBerry/4.5</parent>
+	</device>
+</devices>
