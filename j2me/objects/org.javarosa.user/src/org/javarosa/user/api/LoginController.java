@@ -99,6 +99,7 @@ public class LoginController implements HandledCommandListener {
 			u.setUsername(User.DEMO_USER); // NOTE: Using a user type as a
 			// username also!
 			u.setUserType(User.DEMO_USER);
+			u.setUuid(User.DEMO_USER);
 			transitions.loggedIn(u);
 		}
 		//#endif
