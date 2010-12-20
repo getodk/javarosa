@@ -100,6 +100,10 @@ public class SingleQuestionScreenFactory {
 		case Constants.CONTROL_TEXTAREA:
 			screenToReturn = new TextQuestionScreen(prompt, groupTitle, style);
 			break;
+			
+		case Constants.CONTROL_TRIGGER:
+			screenToReturn = new TriggerQuestionScreen(prompt, groupTitle, style);
+			break;
 
 		default:
 			throw new IllegalStateException(
