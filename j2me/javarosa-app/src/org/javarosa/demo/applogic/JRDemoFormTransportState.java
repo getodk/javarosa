@@ -15,11 +15,9 @@ import org.javarosa.formmanager.api.FormTransportState;
  */
 public abstract class JRDemoFormTransportState extends FormTransportState {
 	
-	private FormInstance formTree;
 	
 	public JRDemoFormTransportState(FormInstance tree, SubmissionProfile profile) throws IOException {
 		super(JRDemoContext._().buildMessage(tree, profile));
-		this.formTree = tree;
 
 	}
 

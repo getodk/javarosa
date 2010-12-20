@@ -7,13 +7,13 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Item;
 
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.formmanager.api.transitions.CompletedFormOptionsTransitions;
 import org.javarosa.formmanager.view.transport.SendNowSendLaterForm;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.log.HandledItemStateListener;
 import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.services.transport.TransportMessage;
 
 /**
  * @author ctsims
@@ -21,11 +21,11 @@ import org.javarosa.j2me.view.J2MEDisplay;
  */
 public class CompletedFormOptionsController implements HandledCommandListener, HandledItemStateListener {
 	CompletedFormOptionsTransitions transitions;
-	FormInstance data;
+	TransportMessage message;
 	SendNowSendLaterForm view;
 	
-	public CompletedFormOptionsController(FormInstance formData) {
-		this.data = formData;
+	public CompletedFormOptionsController(TransportMessage message) {
+		this.message = message;
 		view = new SendNowSendLaterForm(this, this);
 	}
 
@@ -44,11 +44,9 @@ public class CompletedFormOptionsController implements HandledCommandListener, H
 	public void _commandAction(Command c, Displayable d) {
 		int choice = view.getCommandChoice();
 		if(choice == SendNowSendLaterForm.SEND_NOW_DEFAULT) {
-			transitions.sendData(data);
+			transitions.sendData(message);
 		} else if(choice == SendNowSendLaterForm.SEND_LATER) {
-			transitions.skipSend(data);
-		} else if(choice == SendNowSendLaterForm.SEND_NOW_SPEC) {
-			transitions.sendToFreshLocation(data);
+			transitions.skipSend(message);
 		}
 	}
 
@@ -59,15 +57,12 @@ public class CompletedFormOptionsController implements HandledCommandListener, H
 	public void _itemStateChanged(Item i) {
 		switch (view.getCommandChoice()) {
 		case SendNowSendLaterForm.SEND_NOW_DEFAULT:
-			transitions.sendData(data);
+			transitions.sendData(message);
 			break;
 		case SendNowSendLaterForm.SEND_LATER:
 			//Since caching and sending later are now part of the queue, we need
 			//to let the transition have the data now. Possibly revisit this later.
-			transitions.skipSend(data);
-			break;
-		case SendNowSendLaterForm.SEND_NOW_SPEC:
-			transitions.sendToFreshLocation(data);
+			transitions.skipSend(message);
 			break;
 		}
 	}

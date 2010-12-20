@@ -96,7 +96,8 @@
 				<!-- Build variables -->
 				<variables includeAntProperties="true">
 					<variable file="configuration/configuration.properties" />
-					<variable name="polish.TextField.useDirectInput" value="true" unless="polish.international"/>
+					<variable name="polish.TextField.useDirectInput" value="true" unless="polish.international or ${ isOS( Windows ) }"/>
+					<variable name="polish.FullScreen" value="false" if="${ isOS( Windows ) }" />
 				</variables>
 
 				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) -->
@@ -145,7 +146,7 @@
 					<filter pattern="org.celllife.singlequestionscreen.*" level="debug" />
 				</debug>
 				<!-- Properties of the actual javac compiler -->
-				<compiler debug="on" includeJavaRuntime="yes" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/wmapi.jar:${wtk.home}/lib/jsr75.jar:${polish.home}/import/pim.jar:${polish.home}/import/location.jar:${polish.home}/import/jsr234.jar"/>
+				<compiler debug="on" includeJavaRuntime="yes"/>
 				
 				<postcompiler name="java5"/>
 				<postcompiler name="serialization" if="org.javarosa.polish.serialization"/>
