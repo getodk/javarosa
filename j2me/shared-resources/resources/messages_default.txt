@@ -385,3 +385,6 @@ pt=Portuguese
 es=Español
 sw=Kiswahili
 af=Afrikaans
+
+#OQPS Messages
+formentry.triggertitle=Message
