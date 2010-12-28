@@ -19,6 +19,7 @@
  */
 package org.javarosa.core.api;
 
+import java.io.IOException;
 import java.util.Date;
 
 import org.javarosa.core.log.IAtomicLogSerializer;
@@ -40,7 +41,8 @@ public interface ILogger {
 	
 	public <T> T serializeLogs(IFullLogSerializer<T> serializer);
 	
-	public boolean serializeLogs(IAtomicLogSerializer serializer);
+	public void serializeLogs(IAtomicLogSerializer serializer) throws IOException;
+	public void serializeLogs(IAtomicLogSerializer serializer, int limit) throws IOException;
 	
 	public void panic();
 	
