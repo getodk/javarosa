@@ -31,15 +31,8 @@ public class StreamLogSerializer implements IAtomicLogSerializer {
 		return "[" + log.getType() + "] " +log.getTime().toString() + ": " +  log.getMessage()+ "\n"; 
 	}
 	
-	public boolean serializeLog(LogEntry entry) {
-		try {
-			writer.write(logToString(entry));
-		} catch (IOException e) {
-			//er, log?
-			e.printStackTrace();
-			return false;
-		}
-		return true;
+	public void serializeLog(LogEntry entry) throws IOException {
+		writer.write(logToString(entry));
 	}
 
 }

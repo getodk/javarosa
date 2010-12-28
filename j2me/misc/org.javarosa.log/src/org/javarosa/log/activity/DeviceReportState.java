@@ -170,7 +170,9 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 	
 	private void createDeviceLogSubreport(XmlSerializer o, Vector errors) throws IOException {
 		try {
-			Logger._().serializeLogs(new XmlStreamLogSerializer(o, XMLNS, "log_subreport"));
+			o.startTag(XMLNS, "log_subreport");
+			Logger._().serializeLogs(new XmlStreamLogSerializer(o, XMLNS));
+			o.endTag(XMLNS, "log_subreport");
 		} catch(Exception e) {
 			logError(errors, new StatusReportException(e,"log_subreport","Exception when writing device log report."));
 		}
@@ -319,7 +321,12 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			dumpRef = "jr://file/jr_log_dump" + DateUtils.formatDateTime(new Date(), DateUtils.FORMAT_TIMESTAMP_SUFFIX) + ".log";
 			Reference ref = ReferenceManager._().DeriveReference(dumpRef);
 			if(!ref.isReadOnly()) {
-				success = Logger._().serializeLogs(new StreamLogSerializer(ref.getOutputStream()));
+				success = true;
+				try {
+					Logger._().serializeLogs(new StreamLogSerializer(ref.getOutputStream()));
+				} catch (IOException ioe) {
+					success = false;
+				}
 			}
 		} catch(Exception e) {
 			e.printStackTrace();

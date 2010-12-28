@@ -19,6 +19,7 @@
  */
 package org.javarosa.j2me.log;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
@@ -120,14 +121,9 @@ public class J2MELogger implements ILogger {
 		synchronized(logStorage) {
 			if(!checkStorage()) { return null; }
 			
-			SortedIntSet IDs = new SortedIntSet();
-			IStorageIterator li = logStorage.iterate();
-			while (li.hasMore()) {
-				IDs.add(li.nextID());
-			}
+			Vector<Integer> vIDs = getLogIDsInOrder();
 			
 			Vector logs = new Vector();
-			Vector<Integer> vIDs = IDs.getVector();
 			for (int i = vIDs.size() - 1; i >= 0; i--) {
 				logs.addElement(logStorage.read(vIDs.elementAt(i).intValue()));
 			}
@@ -157,17 +153,36 @@ public class J2MELogger implements ILogger {
 		}
 	}
 
-	public boolean serializeLogs(IAtomicLogSerializer serializer) {
-		if(storageBroken) { return false; };
+	private Vector<Integer> getLogIDsInOrder () {
+		SortedIntSet IDs = new SortedIntSet();
+		IStorageIterator li = logStorage.iterate();
+		while (li.hasMore()) {
+			IDs.add(li.nextID());
+		}
+		return IDs.getVector();
+	}
+	
+	public void serializeLogs(IAtomicLogSerializer serializer) throws IOException {
+		serializeLogs(serializer, 1 << 20);
+	}
+	
+	public void serializeLogs(IAtomicLogSerializer serializer, int limit) throws IOException {
+		if(storageBroken) { return; };
 		synchronized(logStorage) {
-			if(!checkStorage()) { return false; }
-			IStorageIterator li = logStorage.iterate();
-			while (li.hasMore()) {
-				if(!serializer.serializeLog((LogEntry)li.nextRecord()));
-				//Panic?
-				return false;
+			if(!checkStorage()) { return; }
+			
+			Vector<Integer> vIDs = getLogIDsInOrder();
+			int start = vIDs.size() - 1;
+			int end = -1;
+			if (limit >= 0) {
+				end = Math.max(start - limit, end);
+			} else {
+				start = Math.min(-limit - 1, start);
 			}
-			return true;
+			
+			for (int i = start; i > end; i--) {
+				serializer.serializeLog((LogEntry)logStorage.read(vIDs.elementAt(i).intValue()));
+			}
 		}
 	}
 

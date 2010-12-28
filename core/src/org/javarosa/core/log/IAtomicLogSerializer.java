@@ -3,10 +3,12 @@
  */
 package org.javarosa.core.log;
 
+import java.io.IOException;
+
 /**
  * @author ctsims
  *
  */
 public interface IAtomicLogSerializer {
-	public boolean serializeLog(LogEntry entry);
+	public void serializeLog(LogEntry entry) throws IOException;
 }
