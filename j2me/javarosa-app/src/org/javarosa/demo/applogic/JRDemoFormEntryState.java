@@ -8,6 +8,7 @@ import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.IPreloadHandler;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.services.storage.StorageManager;
@@ -15,10 +16,12 @@ import org.javarosa.demo.util.JRDemoFormEntryViewFactory;
 import org.javarosa.demo.util.JRDemoUtil;
 import org.javarosa.formmanager.api.CompletedFormOptionsState;
 import org.javarosa.formmanager.api.FormEntryState;
+import org.javarosa.formmanager.api.FormTransportState;
 import org.javarosa.formmanager.api.JrFormEntryController;
 import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.formmanager.utility.FormDefFetcher;
 import org.javarosa.formmanager.utility.RMSRetreivalMethod;
+import org.javarosa.services.transport.TransportMessage;
 
 public class JRDemoFormEntryState extends FormEntryState {
 
@@ -74,44 +77,47 @@ public class JRDemoFormEntryState extends FormEntryState {
 		
 		if (formWasCompleted) {
 			
-			CompletedFormOptionsState completed = new CompletedFormOptionsState(instanceData) {
+			// We want to cache this send before we actually ask, otherwise the user could quit before it is
+			// either sent _or_ saved.
+			
+			IStorageUtility storage = StorageManager.getStorage(FormInstance.STORAGE_KEY);
+			try {
+				Logger.log("formentry","writing data: " + instanceData.getName());
+				storage.write(instanceData);
+				final int record = instanceData.getID();	
 
-				public void sendData(FormInstance data) {
-					JRDemoFormTransportState send;
-					try {
-						send = new JRDemoFormTransportState(data, profile) {
-
+				TransportMessage message = JRDemoContext._().buildMessage(instanceData, profile);
+				
+				CompletedFormOptionsState completed = new CompletedFormOptionsState(message) {
+	
+					public void sendData(TransportMessage message) {
+						
+						FormTransportState send = new FormTransportState(message) {
 							public void done() {
 								JRDemoUtil.goToList(cameFromFormList);
 							}
-
+		
 							public void sendToBackground() {
 								JRDemoUtil.goToList(cameFromFormList);
 							}
-							
 						};
-					} catch (IOException e) {
-						throw new RuntimeException("Unable to serialize XML Payload!");
+							
+						send.start();
+						
+						// Now that we've ensured that the data is in the transport queue, we need to remove it
+						// from storage? What normally happens if a message can't send immediately?
+						StorageManager.getStorage(FormInstance.STORAGE_KEY).remove(record);
 					}
-					send.start();
-				}
-
-				public void sendToFreshLocation(FormInstance data) {
-					throw new RuntimeException("Sending to non-default location disabled");
-				}
-
-				public void skipSend(FormInstance data) {
-					IStorageUtility storage = StorageManager.getStorage(FormInstance.STORAGE_KEY);
-					try {
-						System.out.println("writing data: " + data.getName());
-						storage.write(data);
-					} catch (StorageFullException e) {
-						new RuntimeException("Storage full, unable to save data.");
+	
+					public void skipSend(TransportMessage message) {
+						// Message should already be cached.
+						abort();
 					}
-					abort();
-				}
-			};
-			completed.start();
+				};
+				completed.start();
+			} catch (StorageFullException e) {
+				new RuntimeException("Storage full, unable to save data.");
+			}
 		} else {
 			abort();
 		}

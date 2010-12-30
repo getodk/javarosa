@@ -12,7 +12,6 @@ import org.javarosa.model.xform.SMSSerializingVisitor;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
-import org.javarosa.services.transport.impl.sms.SMSTransportMessage;
 
 /**
  * @author ctsims
@@ -35,11 +34,17 @@ public class SubmissionTransportHelper {
 			return new SimpleHttpTransportMessage(payload.getPayloadStream(),url);
 		} else if(profile.getMethod().toLowerCase().equals("smspush")) {
 			
+			//#if polish.api.wmapi
+
 			//URL
 			String phoneUri = profile.getAction();
 		
 			String payload = new String(new SMSSerializingVisitor().serializeInstance(instance, profile.getRef()));
-			return new SMSTransportMessage(payload,phoneUri);
+			return new org.javarosa.services.transport.impl.sms.SMSTransportMessage(payload,phoneUri);
+			
+			//#else
+			//# throw new RuntimeException("SMS Messages not enabled on current device"); 
+			//#endif
 		}
 		return null;
 	}

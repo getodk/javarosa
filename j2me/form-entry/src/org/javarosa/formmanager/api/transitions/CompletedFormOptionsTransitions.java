@@ -3,14 +3,13 @@
  */
 package org.javarosa.formmanager.api.transitions;
 
-import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.services.transport.TransportMessage;
 
 /**
  * @author ctsims
  *
  */
 public interface CompletedFormOptionsTransitions {
-	public void sendData(FormInstance data);
-	public void skipSend(FormInstance data);
-	public void sendToFreshLocation(FormInstance data);
+	public void sendData(TransportMessage message);
+	public void skipSend(TransportMessage message);
 }

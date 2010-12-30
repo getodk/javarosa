@@ -1,15 +1,15 @@
 package org.javarosa.formmanager.api;
 
 import org.javarosa.core.api.State;
-import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.formmanager.api.transitions.CompletedFormOptionsTransitions;
+import org.javarosa.services.transport.TransportMessage;
 
 public abstract class CompletedFormOptionsState implements CompletedFormOptionsTransitions, State {
 
-	private FormInstance data;
+	private TransportMessage message;
 	
-	public CompletedFormOptionsState (FormInstance data) {
-		this.data = data;
+	public CompletedFormOptionsState (TransportMessage message) {
+		this.message = message;
 	}
 	
 	public void start () {
@@ -19,7 +19,7 @@ public abstract class CompletedFormOptionsState implements CompletedFormOptionsT
 	}
 	
 	protected CompletedFormOptionsController getController () {
-		return new CompletedFormOptionsController(data);
+		return new CompletedFormOptionsController(message);
 	}
 	
 }

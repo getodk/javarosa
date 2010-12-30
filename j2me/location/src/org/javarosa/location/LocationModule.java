@@ -22,7 +22,7 @@ import org.javarosa.j2me.services.DataCaptureServiceRegistry;
 public class LocationModule implements IModule {
 	
 	public void registerModule() {
-		//#if polish.api.locationapi || app.uselocation == true
+		//#if polish.api.locationapi
 		DataCaptureServiceRegistry._().registerService(new org.javarosa.location.service.J2MELocationService());
 		//#endif
 	}
