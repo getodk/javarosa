@@ -59,7 +59,7 @@ plussign=/add.png
 question=/question.png
 questioncompulsory=/questioncompulsory.png
 
-splashscreen=/splash.gif
+splashscreen=/splash.png
 
 
 menu.NewCase=New Case

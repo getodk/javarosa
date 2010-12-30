@@ -96,8 +96,9 @@
 				<!-- Build variables -->
 				<variables includeAntProperties="true">
 					<variable file="configuration/configuration.properties" />
-					<variable name="polish.TextField.useDirectInput" value="true" unless="polish.international or ${ isOS( Windows ) }"/>
+					<variable name="polish.TextField.useDirectInput" value="true" unless="polish.international"/>
 					<variable name="polish.FullScreen" value="false" if="${ isOS( Windows ) }" />
+					<variable name="obfuscate.force.no" value="true" if="${ isOS( Windows ) }" /> 
 				</variables>
 
 				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) -->
@@ -113,7 +114,7 @@
 				<!-- Whether to run the obfuscator, which makes reverse engineering the byte-code
 					 more difficult, and compresses the built JAR -->
 				<!-- obfuscator settings: do not obfuscate when the test-property is true  -->
-				<obfuscator name="ProGuard" unless="((noobfuscate or test) and not release) or polish.blackberry">
+				<obfuscator name="ProGuard" unless="((noobfuscate or test) and not release) or polish.blackberry or obfuscate.force.no">
 					<parameter name="optimize" value="true" />
 					<!--parameter name="printmapping" value="obfuscation_mapping.txt" /-->
 					

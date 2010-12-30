@@ -1,3 +1,5 @@
+//#condition polish.api.wmapi
+
 package org.javarosa.services.transport.impl.binarysms;
 
 import java.io.DataInputStream;
