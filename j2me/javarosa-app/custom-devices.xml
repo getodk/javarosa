@@ -1,0 +1,75 @@
+<!--
+This is just an example how you can extend the device database without
+interfering with the core files "devices.xml", "groups.xml", "apis.xml" and "vendors.xml".
+By using "custom-devices.xml", "custom-groups.xml", "custom-apis.xml" and "custom-vendors.xml"
+you can extend the database without needing to merge the file every time you update J2ME Polish.
+
+You can use this file either in the installation folder of J2ME Polish or in your project folder.
+
+Please have a look at the PDF documentation for a in-depth description of the device database.
+
+You must not define any device here that has already been defined in the ${polish.home}/devices.xml.
+
+Please consider to publish your device-definitions when they could be of use for the community
+at large.
+-->
+<devices>	
+	<device>
+		<identifier>Nokia/S40-native-input</identifier>
+		<capability name="international" value="true" />
+		<features>javarosa</features>
+		<parent>Nokia/6085</parent>
+	</device>
+	
+	<device>
+		<identifier>Nokia/S40-generic</identifier>
+		<features>javarosa</features>
+		<parent>Nokia/6085</parent> 
+	</device>
+	
+	<device>
+		<identifier>Generic/Default</identifier>
+		<features>javarosa</features>
+		<parent>Generic/AnyPhone</parent>
+	</device>
+	<device>
+		<identifier>Generic/International</identifier>
+		<capability name="international" value="true" />
+		<features>javarosa</features>
+		<parent>Generic/AnyPhone</parent>
+	</device>
+	
+	<device>
+		<identifier>BlackBerry/45</identifier>
+		<!-- Can't be used until the j2meunit library issue is resolved -->
+		<!-- features>javarosa</features -->
+		<parent>BlackBerry/4.5</parent>
+	</device>
+	
+	<device>
+		<identifier>Native/WinMo</identifier>
+		<!-- capability name="international" value="true" / -->
+		<features>javarosa, hasPointerEvents, hasPointerMotionEvents, hasCommandKeyEvents, isVirtual</features>
+	    <description>An unknown Windows powered phone.</description>
+	    <capability name="JavaPlatform" value="MIDP/2.0" />
+	    <capability name="JavaConfiguration" value="CLDC/1.1" />
+	    <capability name="JavaPackage" value="btapi,fileconnection,mmapi,pim" />
+	    <capability name="ScreenSize" value="240x320" />
+		<capability name="OS" value="Windows Mobile 5.0"/>
+	    <capability name="SoundFormat" value="midi, amr, wav" />
+	    <capability name="HeapSize" value="20MB" />
+	    <capability name="MenuBar.OptionsPosition" value="left" />
+	    <capability name="MenuBar.OkPosition" value="left" />
+	    <capability name="TextField.directInput" value="true" />
+	    <capability name="key.supportsAsciiKeyMap" value="true"/>
+	    <!-- capability name="key.maybeSupportsAsciiKeyMap" value="true"/ -->
+	    <capability name="key.up" value="-1" />
+	    <capability name="key.down" value="-2" />
+	    <capability name="key.left" value="-3" />
+	    <capability name="key.right" value="-4" />
+	    <capability name="key.backspace" value="27" />
+	    <capability name="key.ChangeInputModeKey" value="42" />
+	    <capability name="TextField.charactersKeyPound" value=" " />
+
+	</device>
+</devices>
