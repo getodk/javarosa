@@ -16,13 +16,26 @@
 
 package org.javarosa.xpath.expr;
 
+import java.util.Vector;
+
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 public abstract class XPathExpression implements Externalizable {
 	
 	public abstract Object eval (FormInstance model, EvaluationContext evalContext);
+	
+	public final Vector<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
+		Vector<Object> pivots = new Vector<Object>();
+		this.pivot(model, evalContext, pivots, evalContext.getContextRef());
+		return pivots;
+	}
+	
+	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+		return eval(model,evalContext);
+	}
 	
 	/*======= DEBUGGING ========*/
 	// should not compile onto phone

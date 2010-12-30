@@ -19,7 +19,11 @@ package org.javarosa.xpath.expr;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
+import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.UnpivotableExpressionException;
+import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
@@ -56,5 +60,20 @@ public abstract class XPathBinaryOpExpr extends XPathOpExpr {
 	public void writeExternal(DataOutputStream out) throws IOException {
 		ExtUtil.write(out, new ExtWrapTagged(a));
 		ExtUtil.write(out, new ExtWrapTagged(b));
+	}
+	
+	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+		Object aval = a.pivot(model, evalContext, pivots, sentinal);
+		Object bval = b.pivot(model, evalContext, pivots, sentinal);
+		
+		if(aval == sentinal || bval == sentinal) {
+			throw new UnpivotableExpressionException();
+		}
+		
+		if(aval == null || bval == null) {
+			return null;
+		}
+		
+		return this.eval(model, evalContext);
 	}
 }
