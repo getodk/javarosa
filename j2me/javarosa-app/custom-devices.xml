@@ -45,4 +45,31 @@ at large.
 		<!-- features>javarosa</features -->
 		<parent>BlackBerry/4.5</parent>
 	</device>
+	
+	<device>
+		<identifier>Native/WinMo</identifier>
+		<!-- capability name="international" value="true" / -->
+		<features>javarosa, hasPointerEvents, hasPointerMotionEvents, hasCommandKeyEvents, isVirtual</features>
+	    <description>An unknown Windows powered phone.</description>
+	    <capability name="JavaPlatform" value="MIDP/2.0" />
+	    <capability name="JavaConfiguration" value="CLDC/1.1" />
+	    <capability name="JavaPackage" value="btapi,fileconnection,mmapi,pim" />
+	    <capability name="ScreenSize" value="240x320" />
+		<capability name="OS" value="Windows Mobile 5.0"/>
+	    <capability name="SoundFormat" value="midi, amr, wav" />
+	    <capability name="HeapSize" value="20MB" />
+	    <capability name="MenuBar.OptionsPosition" value="left" />
+	    <capability name="MenuBar.OkPosition" value="left" />
+	    <capability name="TextField.directInput" value="true" />
+	    <capability name="key.supportsAsciiKeyMap" value="true"/>
+	    <!-- capability name="key.maybeSupportsAsciiKeyMap" value="true"/ -->
+	    <capability name="key.up" value="-1" />
+	    <capability name="key.down" value="-2" />
+	    <capability name="key.left" value="-3" />
+	    <capability name="key.right" value="-4" />
+	    <capability name="key.backspace" value="27" />
+	    <capability name="key.ChangeInputModeKey" value="42" />
+	    <capability name="TextField.charactersKeyPound" value=" " />
+
+	</device>
 </devices>
