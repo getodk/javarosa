@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.javarosa.core.model.condition;
+package org.javarosa.core.model.condition.pivot;
 
 /**
  * @author ctsims
