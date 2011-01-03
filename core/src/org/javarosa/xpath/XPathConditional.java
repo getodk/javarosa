@@ -129,4 +129,8 @@ public class XPathConditional implements IConditionExpr {
 	public String toString () {
 		return "xpath[" + expr.toString() + "]";
 	}
+
+	public Vector<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
+		return expr.pivot(model, evalContext);
+	}
 }

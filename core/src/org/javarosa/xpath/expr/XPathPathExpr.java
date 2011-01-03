@@ -290,7 +290,9 @@ public class XPathPathExpr extends XPathExpression {
 	}
 	
 	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
-		if(this.getReference().equals(sentinal)) {
+		TreeReference ref = this.getReference();
+		//Either concretely the sentinal, or "."
+		if(ref.equals(sentinal) || (ref.getRefLevel() == 0)) {
 			return sentinal;
 		}
 		else { 

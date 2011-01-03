@@ -5,10 +5,7 @@ package org.javarosa.core.model.condition.pivot;
 
 import java.util.Date;
 
-import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 
 /**
@@ -18,7 +15,7 @@ import org.javarosa.xpath.expr.XPathFuncExpr;
 public class DateRangeHint extends RangeHint<DateData> {
 
 	protected DateData castToValue(double value) {
-		return new DateData((Date)XPathFuncExpr.toDate(((int)Math.round(value))));
+		return new DateData((Date)XPathFuncExpr.toDate(new Double(Math.floor(value))));
 	}
 
 	protected double unit() {

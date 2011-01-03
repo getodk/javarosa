@@ -25,6 +25,8 @@ import org.javarosa.core.model.ItemsetBinding;
 import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.pivot.ConstraintHint;
+import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
@@ -344,6 +346,12 @@ public class FormEntryPrompt extends FormEntryCaption {
 	
 	public String getSpecialFormSelectChoiceText(SelectChoice sel,String form){
 		return getSpecialFormSelectItemText(sel.selection(),form);
+	}
+	
+	public void requestConstraintHint(ConstraintHint hint) throws UnpivotableExpressionException {
+		//NOTE: Technically there's some rep exposure, here. People could use this mechanism to expose the instance.
+		//We could hide it by dispatching hints through a final abstract class instead.
+		hint.init(new EvaluationContext(new EvaluationContext(), mTreeElement.getRef()), mTreeElement.getConstraint().constraint, this.form.getInstance());
 	}
 	
 }
