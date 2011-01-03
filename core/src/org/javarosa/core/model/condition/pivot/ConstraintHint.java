@@ -4,8 +4,8 @@
 package org.javarosa.core.model.condition.pivot;
 
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.xpath.expr.XPathExpression;
 
 /**
  * @author ctsims
@@ -13,5 +13,5 @@ import org.javarosa.xpath.expr.XPathExpression;
  */
 public interface ConstraintHint {
 	
-	public void init(EvaluationContext c, XPathExpression conditional, FormInstance instance) throws UnpivotableExpressionException;
+	public void init(EvaluationContext c, IConditionExpr conditional, FormInstance instance) throws UnpivotableExpressionException;
 }

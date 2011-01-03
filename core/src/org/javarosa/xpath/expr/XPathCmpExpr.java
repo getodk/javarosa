@@ -117,7 +117,7 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 				//WTF?
 				throw new UnpivotableExpressionException();
 			} else {
-				pivots.add(new CmpPivot(((Double)b).doubleValue(), op));
+				pivots.addElement(new CmpPivot(((Double)b).doubleValue(), op));
 				return true;
 			}
 		} 

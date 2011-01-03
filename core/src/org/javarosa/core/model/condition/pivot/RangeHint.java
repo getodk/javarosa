@@ -6,9 +6,9 @@ package org.javarosa.core.model.condition.pivot;
 import java.util.Vector;
 
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.IConditionExpr;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.FormInstance;
-import org.javarosa.xpath.expr.XPathExpression;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 
 /**
@@ -22,7 +22,7 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
 	boolean minInclusive;
 	boolean maxInclusive;
 	
-	public void init(EvaluationContext c, XPathExpression conditional, FormInstance instance) throws UnpivotableExpressionException {
+	public void init(EvaluationContext c, IConditionExpr conditional, FormInstance instance) throws UnpivotableExpressionException {
 		
 		Vector<Object> pivots = conditional.pivot(instance, c);
 		
@@ -31,7 +31,7 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
 			if(!(p instanceof CmpPivot)) {
 				throw new UnpivotableExpressionException();
 			}
-			internalPivots.add((CmpPivot)p);
+			internalPivots.addElement((CmpPivot)p);
 		}
 		
 		if(internalPivots.size() > 2) {
@@ -44,27 +44,29 @@ public abstract class RangeHint<T extends IAnswerData> implements ConstraintHint
 		}
 	}
 	
-	public Double getMin() {
-		return min;
+	public T getMin() {
+		return min == null ? null : castToValue(min);
 	}
 	
 	public boolean isMinInclusive() {
 		return minInclusive;
 	}
 	
-	public Double getMax() {
-		return max;
+	public T getMax() {
+		return max == null ? null : castToValue(max);
 	}
 	
 	public boolean isMaxInclusive() {
 		return maxInclusive;
 	}
 	
-	private void evaluatePivot(CmpPivot pivot, XPathExpression conditional, EvaluationContext c, FormInstance instance) throws UnpivotableExpressionException {
+	private void evaluatePivot(CmpPivot pivot, IConditionExpr conditional, EvaluationContext c, FormInstance instance) throws UnpivotableExpressionException {
 		double unit = unit();
 		double val = pivot.getVal();
 		double lt = val - unit;
 		double gt = val + unit;
+		
+		c.isConstraint = true;
 		
 		c.candidateValue = castToValue(val);
 		boolean eq = XPathFuncExpr.toBoolean(conditional.eval(instance, c)).booleanValue();
