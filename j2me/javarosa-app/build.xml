@@ -13,7 +13,7 @@
 <project name="JavaRosa" default="LaunchEmulator">
 	<!-- Main Target: Call to build the project -->
 	<!-- This is the main work target, it actually builds the code -->
-	<target name="BuildPolish" depends="init,CompileAndLinkSource" description="This is the controller for the J2ME build process.">
+	<target name="BuildPolish" depends="init,CompileAndLinkSource,RetrieveDevices" description="This is the controller for the J2ME build process.">
 		<!-- Definition of the J2ME Polish task:                      -->
 		<!-- Note that this takes place here (rather than in the script in general) in order to allow the libraries jar to be compiled from source before the classpath is evaluated-->
 		<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/pim.jar:${polish.home}/import/location.jar:${polish.home}/import/jsr234.jar" />
@@ -170,6 +170,10 @@
 			</emulator>
 
 		</buildPolish>
+	</target>
+	
+	<target name="RetrieveDevices" description="Retrieves custom device library from the shared resources">
+		<copy file="${device.list}" todir="${basedir}"/>
 	</target>
 	
 	<target name="CompileAndLinkSource" if="compile.from.source.true">
