@@ -19,7 +19,7 @@ package org.javarosa.xpath.expr;
 import java.util.Vector;
 
 import org.javarosa.core.model.condition.EvaluationContext;
-import org.javarosa.core.model.condition.UnpivotableExpressionException;
+import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.util.externalizable.Externalizable;
 

@@ -41,6 +41,7 @@ public class NumericEntryWidget extends TextEntryWidget {
 		int clearNumberType = tf.getConstraints() & ~(TextField.DECIMAL + TextField.NUMERIC);
 		tf.setConstraints( clearNumberType | (isDecimal ? TextField.DECIMAL : TextField.NUMERIC));
 		//UiAccess.setInputMode(tf,UiAccess.MODE_NUMBERS);
+		
 		return super.getEntryWidget(prompt);
 	}
 
