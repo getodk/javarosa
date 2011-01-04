@@ -28,6 +28,20 @@ at large.
 	</device>
 	
 	<device>
+		<identifier>Nokia/S40-gps-native-input</identifier>
+		<capability name="international" value="true" />
+		<features>javarosa</features>
+		<parent>Nokia/6275i</parent>
+	</device>
+	
+	<device>
+		<identifier>Nokia/S40-gps</identifier>
+		<features>javarosa</features>
+		<parent>Nokia/6275i</parent> 
+	</device>
+	
+	
+	<device>
 		<identifier>Nokia/S60-qwerty</identifier>
 		<features>javarosa</features>
 		<parent>Nokia/E70</parent> 

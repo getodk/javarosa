@@ -36,3 +36,4 @@ devices/
 glob:util/validator/org.javarosa.xform.validator/settings.properties
 glob:j2me/demo-app/resources/localizertest.xhtml
 glob:j2me/buildfiles/documentation/javadoc/
+glob:j2me/javarosa-app/custom-devices.xml

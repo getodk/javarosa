@@ -1,4 +1,4 @@
-//#condition polish.api.locationapi || app.uselocation == true
+//#condition polish.api.locationapi
 
 package org.javarosa.location.service;
 
