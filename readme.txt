@@ -1,0 +1,1 @@
+Go to http://bitbucket.org/javarosa/javarosa/wiki/GettingStarted to learn how to get started with JavaRosa.
