@@ -173,7 +173,7 @@
 	</target>
 	
 	<target name="RetrieveDevices" description="Retrieves custom device library from the shared resources">
-		<copy file="${device.list}" todir="${basedir}"/>
+		<copy file="${device.list}" todir="${basedir}" overwrite="true"/>
 	</target>
 	
 	<target name="CompileAndLinkSource" if="compile.from.source.true">
