@@ -9,6 +9,7 @@ import java.util.Enumeration;
 
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.PropertyManager;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
 import org.javarosa.services.transport.CommUtil;
 import org.javarosa.services.transport.UnrecognizedResponseException;
@@ -21,8 +22,13 @@ import org.xmlpull.v1.XmlSerializer;
 
 public class HttpUserRegistrationTranslator implements UserRegistrationTranslator<SimpleHttpTransportMessage>{
 	
+	public static final String XMLNS_ORR = "http://openrosa.org/http/response";
+	public static final String XMLNS_UR = "http://openrosa.org/user/registration";
+	
 	User user;
 	String registrationUrl;
+	
+	String prompt;
 
 	public HttpUserRegistrationTranslator(User user, String registrationUrl) {
 		this.user = user;
@@ -51,6 +57,7 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 	}
 	
 	public User readResponse(SimpleHttpTransportMessage message) throws UnrecognizedResponseException {
+		this.prompt = null;
 		Document doc = CommUtil.getXMLResponse(message.getResponseBody());
 		if (doc == null) {
 			throw new UnrecognizedResponseException("can't parse xml");
@@ -65,6 +72,11 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 	 * @return
 	 */
 	private User readResponseDocument(Document response) throws UnrecognizedResponseException {
+		
+		if("OpenRosaResponse".equals(response.getRootElement().getName()) && XMLNS_ORR.equals(response.getRootElement().getNamespace())) {
+			return readResponseDocumentNew(response);
+		}
+
 		//do we want to look for some kind of 'ok' message? otherwise the server could send back
 		//gibberish and we'd still interpret it as a successful registration. ideally, we should
 		//require a certain 'ok' token, and throw the exception if it's not present
@@ -92,6 +104,61 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 					updates = true;
 				}
 			}
+		}
+		return user;
+	}
+	
+	
+	//TODO: This should get updated to be part of a universal processor
+	private User readResponseDocumentNew(Document doc) throws UnrecognizedResponseException {
+		//Only relevant (for now!) for Form Submissions
+		try{
+			Element e = doc.getRootElement().getElement(HttpUserRegistrationTranslator.XMLNS_ORR,"message");
+			prompt = e.getText(0);
+		} catch(Exception e) {
+			//No problem if not.
+		}
+		
+		try{
+			Element e = doc.getRootElement().getElement(HttpUserRegistrationTranslator.XMLNS_UR,"Registration");
+			
+			try { 
+				user.setUsername(e.getElement(HttpUserRegistrationTranslator.XMLNS_UR,"username").getText(0));
+			} catch(Exception xmlParseError) {
+				//XML PARSING
+			}
+			
+			try { 
+				user.setPassword(e.getElement(HttpUserRegistrationTranslator.XMLNS_UR,"password").getText(0));
+			} catch(Exception xmlParseError) {
+				//XML PARSING
+			}
+			
+			try { 
+				user.setUuid(e.getElement(HttpUserRegistrationTranslator.XMLNS_UR,"uuid").getText(0));
+			} catch(Exception xmlParseError) {
+				//XML PARSING
+			}
+			
+			try { 
+				e = e.getElement(HttpUserRegistrationTranslator.XMLNS_UR,"user-data");
+
+				for(int j = 0; j < e.getChildCount(); ++j) {
+					Object data = e.getChild(j);
+					if(!(data instanceof Element)) {
+						continue;
+					}
+					Element dataElement = (Element)data;
+					String propertyName = dataElement.getAttributeValue(null, "key");
+					String property = (String)dataElement.getChild(0);
+					user.setProperty(propertyName, property);
+				}
+			}
+			catch(Exception xmlParseError) {
+				//Nothing
+			}
+		} catch(Exception e) {
+			//No registration response, clean user
 		}
 		return user;
 	}
@@ -128,6 +195,10 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 		Element e = parent.createElement(null,name);
 		e.addChild(Element.TEXT, text);
 		parent.addChild(Element.ELEMENT, e);
+	}
+	
+	public String getResponseMessageString() {
+		return prompt;
 	}
 
 }

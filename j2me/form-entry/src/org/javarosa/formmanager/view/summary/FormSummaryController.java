@@ -4,6 +4,7 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.j2me.log.CrashHandler;
@@ -55,29 +56,26 @@ public class FormSummaryController implements HandledPCommandListener {
 	 * @return number of unanswered questions
 	 */
 	public int countUnansweredQuestions(boolean countRequiredOnly) {
-		// TODO - should this include only relevant questions?
+		//ctsims - Made this list only count relevant questions
 		int counter = 0;
-
-		FormIndex index = FormIndex.createBeginningOfFormIndex();
-		FormDef form = model.getForm();
-		while (!index.isEndOfFormIndex()) {
-			IFormElement element = form.getChild(index);
-			if (element instanceof QuestionDef) {
+	
+		for(FormIndex index = model.incrementIndex(FormIndex.createBeginningOfFormIndex());!index.isEndOfFormIndex();index = model.incrementIndex(index)) {
+			if(!model.isIndexRelevant(index)) {
+				continue;
+			}
+			
+			if(model.getEvent(index) == FormEntryController.EVENT_QUESTION) {
 				FormEntryPrompt prompt = model.getQuestionPrompt(index);
-				if (countRequiredOnly) {
-					if (prompt.isRequired() && prompt.getAnswerValue() == null) {
+				if(prompt.getAnswerValue() == null) {
+					if(countRequiredOnly || prompt.isRequired()) {
 						counter++;
 					}
-				} else if (prompt.getAnswerValue() == null) {
-					counter++;
 				}
 			}
-			index = model.incrementIndex(index);
 		}
-
+	
 		return counter;
 	}
-
 	public void setTransitions(FormSummaryState transitions) {
 		this.transistions = transitions;
 	}

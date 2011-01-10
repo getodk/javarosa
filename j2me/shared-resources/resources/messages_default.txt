@@ -111,8 +111,7 @@ title.FormsList=Forms List
 title.Login=Login
 title.SavedForms=Saved Forms
 
-chatterbox.button.next=Done
-button.Next=VOLGENDE
+button.Next=Done
 button.Yes=YES
 button.No=NO
 
@@ -326,8 +325,6 @@ command.exit=Exit
 command.saveexit=Save and Exit
 command.save=Save
 command.language=Language
-
-chatterbox.button.trigger=Ok
 
 entity.command.sort=Sort
 entity.find=Find: 

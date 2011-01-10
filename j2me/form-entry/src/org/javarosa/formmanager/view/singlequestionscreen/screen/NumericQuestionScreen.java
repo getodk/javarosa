@@ -24,30 +24,16 @@ import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
-public class NumericQuestionScreen extends SingleQuestionScreen {
-	protected TextField tf;
+public class NumericQuestionScreen extends TextQuestionScreen {
 
 	public NumericQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
 		super(prompt,groupName,style);
 	}
 
 	public void createView() {
-		//#style textBox
-		tf = new TextField("", "", 200, TextField.NUMERIC);
-		if (prompt.isRequired())
-			tf.setLabel("*" + prompt.getLongText());
-		else
-			tf.setLabel(prompt.getLongText());
+		super.createView();
+		tf.setConstraints(TextField.NUMERIC);
 
-		IAnswerData answerData = prompt.getAnswerValue();
-		if ((answerData != null) && (answerData instanceof IntegerData))
-			tf.setString(((IntegerData) answerData).getDisplayText());
-
-		this.append(tf);
-		this.addNavigationWidgets();
-		if (prompt.getHelpText() != null) {
-			setHint(prompt.getHelpText());
-		}
 	}
 
 	public IAnswerData getWidgetValue() {

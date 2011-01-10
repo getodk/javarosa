@@ -36,27 +36,24 @@ public abstract class SingleQuestionScreen extends FramedForm {
 	protected IAnswerData answer;
 
 	// GUI elements
-	public static Command previousCommand;
-	public static Command nextCommand;
-	public static Command viewAnswersCommand;
-	public static Command languageSubMenu;
-	public static Command[] languageCommands;
+	public Command previousCommand;
+	public Command nextCommand;
+	public Command viewAnswersCommand;
+	public Command languageSubMenu;
+	public Command[] languageCommands;
 
 	public static Command nextItemCommand = new Command(Localization
 			.get("menu.Next"), Command.ITEM, 1);
-	
-	private String groupName = "";
 	
 	//#style button
 	public StringItem nextItem = new StringItem(null, Localization
 			.get("button.Next"), Item.BUTTON);
 
 	public SingleQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
-		super(prompt.getShortText(), style);
+		super(groupName, style);
 		this.prompt = prompt;
-		this.groupName=groupName;
-		this.createView();
 		this.setUpCommands();
+		this.createView();
 	}
 
 	public abstract void createView();
@@ -85,12 +82,12 @@ public abstract class SingleQuestionScreen extends FramedForm {
 		this.append(nextItem);
 		nextItem.setDefaultCommand(nextItemCommand); // add Command to Item.
 		
-		if(!((groupName==null)||(groupName.equals("")))){
-			//#style groupName
-			 StringItem groupNameTitle = new StringItem(null,groupName, Item.LAYOUT_EXPAND);
-			 append(Graphics.BOTTOM, groupNameTitle);
-			
-		}
+//		if(!((groupName==null)||(groupName.equals("")))){
+//			//#style groupName
+//			 StringItem groupNameTitle = new StringItem(null,groupName, Item.LAYOUT_EXPAND);
+//			 append(Graphics.BOTTOM, groupNameTitle);
+//			
+//		}
 	}
 	
 	public void addLanguageCommands(String[] availableLocales)

@@ -24,12 +24,13 @@ public class SingleQuestionScreenFactory {
 	 * @param goingForward
 	 *            - i.e. are we going to the next question in the form (rather
 	 *            than the previous one)
+	 * @param quickEntry Whether the UI for entry should be streamlined (auto select/move, etc).
 	 * @return
 	 * @throws IllegalStateException
 	 */
 	public static SingleQuestionScreen getQuestionScreen(
 			FormEntryPrompt prompt, String groupTitle, boolean fromFormView,
-			boolean goingForward) throws IllegalStateException {
+			boolean goingForward, boolean quickEntry) throws IllegalStateException {
 		SingleQuestionScreen screenToReturn = null;
 		int qType = prompt.getDataType();
 		int contType = prompt.getControlType();
@@ -88,8 +89,7 @@ public class SingleQuestionScreenFactory {
 			break;
 
 		case Constants.CONTROL_SELECT_ONE:
-			screenToReturn = new SelectOneQuestionScreen(prompt, groupTitle,
-					style);
+			screenToReturn = new SelectOneQuestionScreen(prompt, groupTitle,style, quickEntry);
 			break;
 
 		case Constants.CONTROL_SELECT_MULTI:

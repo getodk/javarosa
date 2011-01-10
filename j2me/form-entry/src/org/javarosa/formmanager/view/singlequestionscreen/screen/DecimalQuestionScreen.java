@@ -24,32 +24,15 @@ import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
-public class DecimalQuestionScreen extends SingleQuestionScreen {
-	protected TextField tf;
+public class DecimalQuestionScreen extends TextQuestionScreen {
 
 	public DecimalQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
 		super(prompt,groupName,style);
 	}
 
 	public void createView() {
-
-		//#style textBox
-		tf = new TextField("", "", 200, TextField.DECIMAL);
-
-		if (prompt.isRequired())
-			tf.setLabel("*" + prompt.getLongText());
-		else
-			tf.setLabel(prompt.getLongText());
-
-		IAnswerData answerData = prompt.getAnswerValue();
-		if ((answerData != null) && (answerData instanceof DecimalData))
-			tf.setString(((DecimalData) answerData).getDisplayText());
-
-		this.append(tf);
-		this.addNavigationWidgets();
-		if (prompt.getHelpText() != null) {
-			setHint(prompt.getHelpText());
-		}
+		super.createView();
+		tf.setConstraints(TextField.DECIMAL);
 	}
 
 	public IAnswerData getWidgetValue() {
