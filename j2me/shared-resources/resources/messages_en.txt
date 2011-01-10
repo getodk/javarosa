@@ -93,7 +93,7 @@ title.FormsList=Forms List
 title.Login=Login
 title.SavedForms=Saved Forms
 
-button.Next=NEXT
+button.Next=Next
 button.Yes=YES
 button.No=NO
 

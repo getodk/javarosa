@@ -61,7 +61,7 @@ public class MessageWidget implements IWidgetStyleEditable {
 		prompt = new StringItem(null, null);
 		fullPrompt.add(prompt);
 		//#style button
-		ok = new StringItem(null, Localization.get("chatterbox.button.trigger"));
+		ok = new StringItem(null, Localization.get("button.Next"));
 		scrHeight = J2MEDisplay.getScreenHeight(ExpandedWidget.fallback);
 		scrWidth = J2MEDisplay.getScreenWidth(ExpandedWidget.fallback);
 

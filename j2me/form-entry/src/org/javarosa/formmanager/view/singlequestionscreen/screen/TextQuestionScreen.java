@@ -42,14 +42,16 @@ public class TextQuestionScreen extends SingleQuestionScreen {
 			tf.setLabel(prompt.getLongText());
 
 		IAnswerData answerData = prompt.getAnswerValue();
-		if ((answerData != null) && (answerData instanceof StringData))
-			tf.setString(((StringData) answerData).getDisplayText());
+		if (answerData != null) {
+			tf.setString((String)new StringData().cast(answerData.uncast()).getValue());
+		}
 
 		this.append(tf);
 		this.addNavigationWidgets();
 		if (prompt.getHelpText() != null) {
 			setHint(prompt.getHelpText());
 		}
+		tf.setDefaultCommand(nextCommand);
 	}
 
 	public IAnswerData getWidgetValue() {

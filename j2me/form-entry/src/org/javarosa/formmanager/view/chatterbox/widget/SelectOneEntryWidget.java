@@ -51,7 +51,7 @@ public class SelectOneEntryWidget extends SelectEntryWidget {
 			s.attachChoice(prompt.getQuestion());
 		}
 		//To prevent audio from being played over if appropriate
-		this.lastSelected = s.index;
+		choiceGroup().setLastSelected(s.index);
 		choiceGroup().setSelectedIndex(s.index, true);
 	}
 
