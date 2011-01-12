@@ -17,11 +17,13 @@
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import java.util.Enumeration;
+import java.util.Vector;
 
 import javax.microedition.lcdui.ChoiceGroup;
 
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -56,15 +58,18 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen implements Ite
 		
 		int preselectionIndex = -1; // index of the preset value for the
 									// question, if any
-		String presetAnswerLabel = prompt.getAnswerValue()!= null ? prompt.getAnswerValue().getDisplayText()
-				: null;
+		
+		String xmlValue = null;
+		if(prompt.getAnswerValue() != null) {
+			xmlValue = ((Selection)new SelectOneData().cast(prompt.getAnswerValue().uncast()).getValue()).xmlValue;
+		}
 		int count = 0;
 
 		while (itr.hasMoreElements()) {
 			SelectChoice choice = (SelectChoice) itr.nextElement();
 			
 			// check if the value is equal to the preset for this question
-			if ((presetAnswerLabel != null) && (choice.getValue().equals(presetAnswerLabel))) {
+			if ((xmlValue != null) && (choice.getValue().equals(xmlValue))) {
 				preselectionIndex = count;
 			}
 

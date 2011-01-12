@@ -59,4 +59,17 @@ public class TextQuestionScreen extends SingleQuestionScreen {
 		return (s == null || s.equals("") ? null : new StringData(s));
 	}
 
+	protected boolean handleKeyPressed(int keyCode, int gameAction) {
+		boolean handled = super.handleKeyPressed(keyCode, gameAction);
+		
+		//The center key should work due to setting the default command, but
+		//that won't always be the case in international builds.
+		//Check whether there's a hanging center key event, and fire 
+		//next if so.
+		if(!handled && this.isGameActionFire(keyCode, gameAction)) {
+			this.handleCommand(this.nextCommand);
+			return true;
+		}
+		return handled;
+	}
 }
