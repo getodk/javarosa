@@ -56,7 +56,7 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 		IAnswerData data = this.prompt.getAnswerValue();
 		Vector<Selection> selected = null;
 		if(data != null) {
-			selected = (Vector<Selection>)data;
+			selected = (Vector<Selection>)new SelectMultiData().cast(data.uncast()).getValue();
 		}
 		while (itr.hasMoreElements()) {
 			SelectChoice choice = (SelectChoice)itr.nextElement();
