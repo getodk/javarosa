@@ -49,13 +49,19 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	private SingleQuestionScreen currentQuestionScreen;
 	private boolean goingForward;
 	private NewRepeatScreen repeatScreen;
+	private String backupTitle;
+	
+	public SingleQuestionView(JrFormEntryController controller) {
+		this(controller, controller.getModel().getFormTitle());
+	}
 	
 	// GUI elements
-	public SingleQuestionView(JrFormEntryController controller) {
+	public SingleQuestionView(JrFormEntryController controller, String title) {
 		super(controller.getModel().getFormTitle());
 		this.controller = controller;
 		this.model = controller.getModel();
 		this.goingForward = true;
+		this.backupTitle = title;
 	}
 
 	public SingleQuestionScreen getView(FormEntryPrompt prompt, boolean fromFormView) {
@@ -93,7 +99,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 		}
 		
 		if(groupTitle == "") {
-			groupTitle = "BACKUP";
+			groupTitle = backupTitle;
 		}
 		currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(
 				prompt, groupTitle, fromFormView, goingForward, controller.isEntryOptimized());
