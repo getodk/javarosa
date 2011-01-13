@@ -16,17 +16,19 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
-import javax.microedition.lcdui.TextField;
-
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.form.api.FormEntryPrompt;
 
+import de.enough.polish.ui.Screen;
 import de.enough.polish.ui.Style;
+import de.enough.polish.ui.TextField;
 
 public class TextQuestionScreen extends SingleQuestionScreen {
 
 	protected TextField tf;
+	
+	private boolean loaded = false;
 
 	public TextQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
 		super(prompt,groupName,style);
@@ -60,16 +62,22 @@ public class TextQuestionScreen extends SingleQuestionScreen {
 	}
 
 	protected boolean handleKeyPressed(int keyCode, int gameAction) {
-		boolean handled = super.handleKeyPressed(keyCode, gameAction);
+		loaded = !super.handleKeyPressed(keyCode,gameAction);
+		return !loaded;
+	}
+	
+	protected boolean handleKeyReleased(int keyCode, int gameAction) {
+		boolean handled = super.handleKeyReleased(keyCode, gameAction);
 		
 		//The center key should work due to setting the default command, but
 		//that won't always be the case in international builds.
 		//Check whether there's a hanging center key event, and fire 
 		//next if so.
-		if(!handled && this.isGameActionFire(keyCode, gameAction)) {
-			this.handleCommand(this.nextCommand);
+		if(loaded && !handled && this.isGameActionFire(keyCode, gameAction)) {
+			this.callCommandListener(nextCommand);
 			return true;
 		}
+		loaded = false;
 		return handled;
 	}
 }
