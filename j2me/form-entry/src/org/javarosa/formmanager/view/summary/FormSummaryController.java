@@ -36,7 +36,7 @@ public class FormSummaryController implements HandledPCommandListener {
 			if (command == view.CMD_EXIT) {
 				transistions.exit();
 			} else if (command == view.CMD_SAVE_EXIT) {
-				int counter = countUnansweredQuestions(true);
+				int counter = countUnansweredQuestions(model,true);
 				if (counter > 0) {
 					String txt = "There are unanswered compulsory questions and must be completed first to proceed";
 					J2MEDisplay.showError("Question Required!", txt);
@@ -55,7 +55,7 @@ public class FormSummaryController implements HandledPCommandListener {
 	 *            required
 	 * @return number of unanswered questions
 	 */
-	public int countUnansweredQuestions(boolean countRequiredOnly) {
+	public static int countUnansweredQuestions(FormEntryModel model, boolean countRequiredOnly) {
 		//ctsims - Made this list only count relevant questions
 		int counter = 0;
 	
@@ -67,7 +67,7 @@ public class FormSummaryController implements HandledPCommandListener {
 			if(model.getEvent(index) == FormEntryController.EVENT_QUESTION) {
 				FormEntryPrompt prompt = model.getQuestionPrompt(index);
 				if(prompt.getAnswerValue() == null) {
-					if(countRequiredOnly || prompt.isRequired()) {
+					if(!countRequiredOnly || prompt.isRequired()) {
 						counter++;
 					}
 				}

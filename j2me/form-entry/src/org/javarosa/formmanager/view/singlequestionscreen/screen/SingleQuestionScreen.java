@@ -37,13 +37,13 @@ public abstract class SingleQuestionScreen extends FramedForm {
 
 	// GUI elements
 	public Command previousCommand;
-	public Command nextCommand;
+	//public Command nextCommand;
 	public Command viewAnswersCommand;
 	public Command languageSubMenu;
 	public Command[] languageCommands;
 
 	public static Command nextItemCommand = new Command(Localization
-			.get("menu.Next"), Command.ITEM, 1);
+			.get("menu.Next"), Command.SCREEN, 1);
 	
 	//#style button
 	public StringItem nextItem = new StringItem(null, Localization
@@ -66,8 +66,8 @@ public abstract class SingleQuestionScreen extends FramedForm {
 	}
 
 	private void setUpCommands() {
-		nextCommand = new Command(Localization.get("menu.Next"),
-				Command.SCREEN, 0);
+//		nextCommand = new Command(Localization.get("menu.Next"),
+//				Command.SCREEN, 0);
 		previousCommand = new Command(Localization.get("menu.Back"),
 				Command.SCREEN, 2);
 		viewAnswersCommand = new Command(Localization.get("menu.ViewAnswers"),
@@ -75,7 +75,7 @@ public abstract class SingleQuestionScreen extends FramedForm {
 
 		this.addCommand(previousCommand);
 		this.addCommand(viewAnswersCommand);
-		this.addCommand(nextCommand);
+		this.addCommand(nextItemCommand);
 	}
 
 	public void addNavigationWidgets() {

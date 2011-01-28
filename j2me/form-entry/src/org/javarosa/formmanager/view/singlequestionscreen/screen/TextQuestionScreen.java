@@ -53,7 +53,7 @@ public class TextQuestionScreen extends SingleQuestionScreen {
 		if (prompt.getHelpText() != null) {
 			setHint(prompt.getHelpText());
 		}
-		tf.setDefaultCommand(nextCommand);
+		//tf.setDefaultCommand(SingleQuestionScreen.nextItemCommand);
 	}
 
 	public IAnswerData getWidgetValue() {
@@ -74,7 +74,7 @@ public class TextQuestionScreen extends SingleQuestionScreen {
 		//Check whether there's a hanging center key event, and fire 
 		//next if so.
 		if(loaded && !handled && this.isGameActionFire(keyCode, gameAction)) {
-			this.callCommandListener(nextCommand);
+			this.callCommandListener(SingleQuestionScreen.nextItemCommand);
 			return true;
 		}
 		loaded = false;

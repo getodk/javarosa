@@ -91,6 +91,8 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 			}
 		}
 
-		return (vs.size() == 0 ? null : new SelectMultiData(vs));
+		//ctsims: 1/28/2011: An empty select multidata is a valid return 
+		//format, and shouln't be confused with null.
+		return new SelectMultiData(vs);
 	}
 }
