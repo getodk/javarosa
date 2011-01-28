@@ -110,7 +110,7 @@ public class SelectOneQuestionScreen extends SingleQuestionScreen implements Ite
 
 	public void itemStateChanged(Item item) {
 		if(nextOnSelect) {
-			this.handleCommand(this.nextCommand);
+			this.handleCommand(SingleQuestionScreen.nextItemCommand);
 		}
 	}
 }

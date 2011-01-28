@@ -32,6 +32,7 @@ import org.javarosa.formmanager.view.singlequestionscreen.screen.LocationQuestio
 import org.javarosa.formmanager.view.singlequestionscreen.screen.NewRepeatScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
+import org.javarosa.formmanager.view.summary.FormSummaryController;
 import org.javarosa.formmanager.view.summary.FormSummaryState;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledPCommandListener;
@@ -115,7 +116,13 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	}
 
 	public void show() {
-		showFormSummary();
+		controller.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+		if(!controller.isEntryOptimized()) {
+			showFormSummary();
+		}
+		else {
+			processModelEvent(controller.stepToNextEvent());
+		}
 	}
 
 	public void show(FormIndex index) {
@@ -124,7 +131,6 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	}
 
 	private void showFormSummary() {
-		controller.jumpToIndex(FormIndex.createBeginningOfFormIndex());
 		FormSummaryState summaryState = new FormSummaryState(controller);
 		summaryState.start();
 	}
@@ -163,8 +169,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 				processModelEvent(controller.stepToNextEvent());
 			}
 		} else {
-			if (command == currentQuestionScreen.nextItemCommand
-					|| command == currentQuestionScreen.nextCommand) {
+			if (command == currentQuestionScreen.nextItemCommand) {
 				answerQuestion();
 			} else if (command == currentQuestionScreen.previousCommand) {
 				this.goingForward = false;
@@ -239,6 +244,17 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 				answer);
 		refreshView();
 	}
+	
+	private void endOfForm() {
+		int counter = FormSummaryController.countUnansweredQuestions(model, true);
+		if (counter > 0) {
+			String txt = "There are unanswered compulsory questions and must be completed first to proceed";
+			J2MEDisplay.showError("Question Required!", txt);
+			showFormSummary();
+		} else {
+			controller.saveAndExit(true);
+		}
+	}
 
 	private void processModelEvent(int event) {
 		int nextEvent = -1;
@@ -251,7 +267,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 			}
 			break;
 		case FormEntryController.EVENT_END_OF_FORM:
-			viewAnswers();
+			endOfForm();
 			break;
 		case FormEntryController.EVENT_REPEAT:
 		case FormEntryController.EVENT_GROUP:
