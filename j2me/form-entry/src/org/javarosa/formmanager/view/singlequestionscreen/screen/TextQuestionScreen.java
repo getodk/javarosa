@@ -53,6 +53,8 @@ public class TextQuestionScreen extends SingleQuestionScreen {
 		if (prompt.getHelpText() != null) {
 			setHint(prompt.getHelpText());
 		}
+		//Don't use the default command infrastructure, since we're duplicating
+		//it in the event of internationalized screens (with zoom-out behavior)
 		//tf.setDefaultCommand(SingleQuestionScreen.nextItemCommand);
 	}
 
