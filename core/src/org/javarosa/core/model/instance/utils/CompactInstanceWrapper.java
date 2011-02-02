@@ -31,6 +31,7 @@ import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
@@ -460,6 +461,7 @@ public class CompactInstanceWrapper implements WrappingStorageUtility.Serializat
 		case Constants.DATATYPE_NULL: return StringData.class;
 		case Constants.DATATYPE_TEXT: return StringData.class;
 		case Constants.DATATYPE_INTEGER: return IntegerData.class;
+		case Constants.DATATYPE_LONG: return LongData.class;
 		case Constants.DATATYPE_DECIMAL: return DecimalData.class;
 		case Constants.DATATYPE_BOOLEAN: return BooleanData.class;
 		case Constants.DATATYPE_DATE: return DateData.class;

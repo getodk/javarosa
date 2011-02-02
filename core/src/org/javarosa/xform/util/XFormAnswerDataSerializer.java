@@ -29,6 +29,7 @@ import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.MultiPointerAnswerData;
 import org.javarosa.core.model.data.PointerAnswerData;
 import org.javarosa.core.model.data.SelectMultiData;
@@ -66,7 +67,7 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 		if (data instanceof StringData || data instanceof DateData || data instanceof TimeData ||
 		    data instanceof SelectMultiData || data instanceof SelectOneData ||
 		    data instanceof IntegerData || data instanceof DecimalData || data instanceof PointerAnswerData	||
-		    data instanceof MultiPointerAnswerData || data instanceof GeoPointData || data instanceof DateTimeData || data instanceof UncastData) {
+		    data instanceof MultiPointerAnswerData || data instanceof GeoPointData || data instanceof LongData || data instanceof DateTimeData || data instanceof UncastData) {
 			return true;
 		} else {
 			return false;
@@ -187,6 +188,10 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 	public Object serializeAnswerData(IntegerData data) {
 		return ((Integer)data.getValue()).toString();
 	}
+	
+	public Object serializeAnswerData(LongData data) {
+		return ((Long)data.getValue()).toString();
+	}
 
 	public Object serializeAnswerData(DecimalData data) {
 		return ((Double)data.getValue()).toString();
@@ -228,6 +233,8 @@ public class XFormAnswerDataSerializer implements IAnswerDataSerializer {
 			return serializeAnswerData((SelectOneData)data);
 		} else if (data instanceof IntegerData){
 			return serializeAnswerData((IntegerData)data);
+		} else if (data instanceof LongData){
+			return serializeAnswerData((LongData)data);
 		} else if (data instanceof DecimalData) {
 			return serializeAnswerData((DecimalData)data);
 		} else if (data instanceof DateData) {

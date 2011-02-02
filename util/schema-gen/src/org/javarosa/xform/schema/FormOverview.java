@@ -317,6 +317,7 @@ public class FormOverview {
 			return "text";
 		case Constants.DATATYPE_INTEGER: return "integer";
 		case Constants.DATATYPE_DECIMAL: return "decimal";
+		case Constants.DATATYPE_LONG: return "long";
 		case Constants.DATATYPE_DATE: return "date";
 		case Constants.DATATYPE_DATE_TIME: return "date with time";
 		case Constants.DATATYPE_TIME: return "time of day";
