@@ -37,7 +37,6 @@ public class NumericQuestionScreen extends TextQuestionScreen {
 	public void createView() {
 		super.createView();
 		tf.setConstraints(TextField.NUMERIC);
-
 	}
 
 	public IAnswerData getWidgetValue() {
@@ -53,7 +52,10 @@ public class NumericQuestionScreen extends TextQuestionScreen {
 		} catch (NumberFormatException nfe) {
 			System.err.println("Non-numeric data in numeric entry field!");
 			return template.cast(new UncastData(fallback));
-		}
+		} catch (IllegalArgumentException iae) {
+			System.err.println("malformed entry into numeric entry field!");
+			return template.cast(new UncastData(fallback));
+		} 
 	}
 
 }
