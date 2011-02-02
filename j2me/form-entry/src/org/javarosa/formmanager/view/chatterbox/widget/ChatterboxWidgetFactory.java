@@ -21,6 +21,8 @@ import java.util.Vector;
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.data.DecimalData;
+import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.util.externalizable.PrototypeFactoryDeprecated;
 import org.javarosa.form.api.FormEntryCaption;
@@ -81,12 +83,14 @@ public class ChatterboxWidgetFactory {
 			switch (dataType) {
 			case Constants.DATATYPE_INTEGER:
 				expandedStyle = new NumericEntryWidget();
+			case Constants.DATATYPE_LONG:
+				expandedStyle = new NumericEntryWidget(false, new LongData());
 				if(controlType == Constants.CONTROL_SECRET) {
 					((NumericEntryWidget)expandedStyle).setConstraint(TextField.PASSWORD);
 				}
 				break;
 			case Constants.DATATYPE_DECIMAL:
-				expandedStyle = new NumericEntryWidget(true);
+				expandedStyle = new NumericEntryWidget(true, new DecimalData());
 				if(controlType == Constants.CONTROL_SECRET) {
 					((NumericEntryWidget)expandedStyle).setConstraint(TextField.PASSWORD);
 				}

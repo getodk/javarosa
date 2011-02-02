@@ -20,14 +20,18 @@ import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
 public class NumericQuestionScreen extends TextQuestionScreen {
+	
+	IAnswerData template;
 
-	public NumericQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+	public NumericQuestionScreen(FormEntryPrompt prompt, String groupName, Style style, IAnswerData template) {
 		super(prompt,groupName,style);
+		this.template = template;
 	}
 
 	public void createView() {
@@ -43,13 +47,13 @@ public class NumericQuestionScreen extends TextQuestionScreen {
 			return null;
 
 		// check answer integrity
-		int i = -99999;
+		String fallback = "-99999";
 		try {
-			i = Integer.parseInt(s);
+			return template.cast(new UncastData(s));
 		} catch (NumberFormatException nfe) {
 			System.err.println("Non-numeric data in numeric entry field!");
+			return template.cast(new UncastData(fallback));
 		}
-		return new IntegerData(i);
 	}
 
 }
