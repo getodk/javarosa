@@ -4,6 +4,7 @@
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IntegerData;
 import org.javarosa.core.model.data.LongData;
 import org.javarosa.form.api.FormEntryPrompt;
@@ -68,13 +69,13 @@ public class SingleQuestionScreenFactory {
 
 				break;
 			case Constants.DATATYPE_LONG:
-				screenToReturn = new NumericQuestionScreen(prompt, groupTitle,
+				screenToReturn = new DecimalQuestionScreen(prompt, groupTitle,
 						style, new LongData());
 
 				break;
 			case Constants.DATATYPE_DECIMAL:
 				screenToReturn = new DecimalQuestionScreen(prompt, groupTitle,
-						style);
+						style, new DecimalData());
 
 				break;
 
