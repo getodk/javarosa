@@ -7,6 +7,7 @@ import org.javarosa.core.model.QuestionDef;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -76,6 +77,29 @@ public class FormSummaryController implements HandledPCommandListener {
 	
 		return counter;
 	}
+	
+	/**
+	 * @param model Form entry model to test index against 
+	 * @return number of unanswered questions
+	 */
+
+	public static int countQuestionsToIndex(FormEntryModel model, FormIndex last) {
+		//ctsims - Made this list only count relevant questions
+		int counter = 0;
+	
+		for(FormIndex index = model.incrementIndex(FormIndex.createBeginningOfFormIndex());!index.equals(last);index = model.incrementIndex(index)) {
+			if(!model.isIndexRelevant(index)) {
+				continue;
+			}
+			
+			if(model.getEvent(index) == FormEntryController.EVENT_QUESTION) {
+				counter++;
+			}
+		}
+	
+		return counter;
+	}
+	
 	public void setTransitions(FormSummaryState transitions) {
 		this.transistions = transitions;
 	}
@@ -83,5 +107,4 @@ public class FormSummaryController implements HandledPCommandListener {
 	public void start() {
 		view.show();
 	}
-
 }

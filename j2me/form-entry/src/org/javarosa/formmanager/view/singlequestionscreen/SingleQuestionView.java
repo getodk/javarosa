@@ -52,6 +52,11 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	private NewRepeatScreen repeatScreen;
 	private String backupTitle;
 	
+	//TODO: Replace with something non-static once question count works properly
+	private int numQuestions = -1;
+	
+	private int currentGuess = -1;
+	
 	public SingleQuestionView(JrFormEntryController controller) {
 		this(controller, controller.getModel().getFormTitle());
 	}
@@ -63,6 +68,7 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 		this.model = controller.getModel();
 		this.goingForward = true;
 		this.backupTitle = title;
+		numQuestions = controller.getModel().getNumQuestions();
 	}
 
 	public SingleQuestionScreen getView(FormEntryPrompt prompt, boolean fromFormView) {
@@ -108,6 +114,11 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 		if (model.getLanguages() != null && model.getLanguages().length > 0) {
 			currentQuestionScreen.addLanguageCommands(model.getLanguages());
 		}
+		
+		if(currentGuess != -1) {
+			currentQuestionScreen.configureProgressBar(currentGuess,numQuestions);
+		}
+		
 		currentQuestionScreen.setCommandListener(this);
 		return currentQuestionScreen;
 	}
@@ -121,16 +132,21 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 			showFormSummary();
 		}
 		else {
-			processModelEvent(controller.stepToNextEvent());
+			goingForward = true;
+			processModelEvent(controller.getModel().getEvent());
 		}
 	}
 
 	public void show(FormIndex index) {
+		currentGuess = FormSummaryController.countQuestionsToIndex(controller.getModel(), index);
 		controller.jumpToIndex(index);
 		refreshView();
 	}
 
 	private void showFormSummary() {
+		//clear guess
+		currentGuess = -1;
+		
 		FormSummaryState summaryState = new FormSummaryState(controller);
 		summaryState.start();
 	}
@@ -260,9 +276,10 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 		int nextEvent = -1;
 		switch (event) {
 		case FormEntryController.EVENT_BEGINNING_OF_FORM:
-			if (goingForward)
+			if (goingForward) {
+				currentGuess = 0;
 				nextEvent = controller.stepToNextEvent();
-			else {
+			} else {
 				viewAnswers();
 			}
 			break;
@@ -278,13 +295,17 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 			refreshView();
 			break;
 		case FormEntryController.EVENT_QUESTION:
+			if(currentGuess != -1) {
+				currentGuess += goingForward ? 1 : -1;
+			}
 			refreshView();
 			break;
 		default:
 			break;
 		}
-		if (nextEvent > 0)
+		if (nextEvent > 0) {
 			processModelEvent(nextEvent);
+		}
 	}
 
 	private void answerQuestion() {
