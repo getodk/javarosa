@@ -385,3 +385,4 @@ af=Afrikaans
 
 #OQPS Messages
 formentry.triggertitle=Message
+formentry.invalid.input=Invalid Value ${0} Entered

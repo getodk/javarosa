@@ -16,15 +16,22 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
+import javax.microedition.lcdui.Command;
+import javax.microedition.lcdui.CommandListener;
+import javax.microedition.lcdui.Displayable;
+
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.view.InputSafeTextField;
+import org.javarosa.formmanager.view.InvalidInputListener;
+import org.javarosa.j2me.view.J2MEDisplay;
 
-import de.enough.polish.ui.Screen;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
 
-public class TextQuestionScreen extends SingleQuestionScreen {
+public class TextQuestionScreen extends SingleQuestionScreen implements InvalidInputListener {
 
 	protected TextField tf;
 	
@@ -37,12 +44,12 @@ public class TextQuestionScreen extends SingleQuestionScreen {
 	public void createView() {
 		setHint("Type in your answer");
 		//#style textBox
-		tf = new TextField("", "", 200, TextField.ANY);
+		tf = new InputSafeTextField("", "", 200, TextField.ANY, this);
 		if (prompt.isRequired())
 			tf.setLabel("*" + prompt.getLongText());
 		else
 			tf.setLabel(prompt.getLongText());
-
+		
 		IAnswerData answerData = prompt.getAnswerValue();
 		if (answerData != null) {
 			tf.setString((String)new StringData().cast(answerData.uncast()).getValue());
@@ -81,5 +88,19 @@ public class TextQuestionScreen extends SingleQuestionScreen {
 		}
 		loaded = false;
 		return handled;
+	}
+
+	public void invalidNativeInput(String input) {
+		System.out.println("loaded: " + loaded);
+		J2MEDisplay.showError(null,Localization.get("formentry.invalid.input", new String[] {input}), null, new CommandListener() {
+			private int count = 1;
+			public void commandAction(Command arg0, Displayable arg1) {
+				if(count < 1) {
+					TextQuestionScreen.this.show();
+				} else {
+					count--;
+				}
+			}
+		});
 	}
 }
