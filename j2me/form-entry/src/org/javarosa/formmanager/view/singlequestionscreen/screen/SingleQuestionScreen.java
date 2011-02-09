@@ -16,6 +16,7 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
+import javax.microedition.lcdui.Gauge;
 import javax.microedition.lcdui.Graphics;
 
 import org.javarosa.core.model.data.IAnswerData;
@@ -33,6 +34,8 @@ import de.enough.polish.ui.Ticker;
 public abstract class SingleQuestionScreen extends FramedForm {
 
 	protected FormEntryPrompt prompt;
+	private Gauge progressBar;
+    
 	protected IAnswerData answer;
 
 	// GUI elements
@@ -59,6 +62,17 @@ public abstract class SingleQuestionScreen extends FramedForm {
 	public abstract void createView();
 
 	public abstract IAnswerData getWidgetValue();
+	
+	public void configureProgressBar(int cur, int total) {
+		if(progressBar == null) {
+			//#style progressbar
+			progressBar = new Gauge(null, false, total, cur);
+		} else {
+			progressBar.setMaxValue(total);
+			progressBar.setValue(cur);
+		}
+        append(Graphics.BOTTOM, progressBar);
+	}
 
 	public void setHint(String helpText) {
 		Ticker tick = new Ticker("HELP: " + helpText);
