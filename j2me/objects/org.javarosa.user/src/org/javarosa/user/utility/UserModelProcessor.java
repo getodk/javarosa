@@ -18,8 +18,8 @@ import org.javarosa.xform.util.XFormAnswerDataSerializer;
 /**
  * The UserModel Processor is responsible for reading in a 
  * UserXML data block, parsing out the data elements relevant
- * to creating or updating user models, and handling those
- * elements in the J2ME Environment.
+ * to creating or updating user models, and returning a created
+ * user without modifying the internal storage.
  * 
  * TODO: The failures are not very well handled
  * 
@@ -105,7 +105,6 @@ public class UserModelProcessor implements IInstanceProcessor {
 			}
 		}
 		
-		storage().write(u);
 		user = u; 
 	}
 	

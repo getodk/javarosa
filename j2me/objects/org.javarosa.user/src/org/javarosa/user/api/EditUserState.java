@@ -19,7 +19,7 @@ public abstract class EditUserState implements EditUserTransitions, State {
 	}
 	
 	protected EditUserController getController () {
-		return new EditUserController(AddUserController.PASSWORD_FORMAT_NUMERIC, u);
+		return new EditUserController(CreateUserController.PASSWORD_FORMAT_NUMERIC, u);
 	}
 	
 }

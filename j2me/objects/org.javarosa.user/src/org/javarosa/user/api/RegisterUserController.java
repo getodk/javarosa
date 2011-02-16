@@ -32,6 +32,10 @@ public class RegisterUserController<M extends TransportMessage> implements Trans
 	private UserRegistrationForm form;
 	private User registerdUser;
 	
+	private M message;
+	
+	private boolean successRequired;
+	
 	private static final Command RETRY = new Command(Localization.get("command.retry"),Command.OK, 1);
 	private static final Command CANCEL = new Command(Localization.get("command.cancel"), Command.CANCEL,1);
 	
@@ -39,7 +43,12 @@ public class RegisterUserController<M extends TransportMessage> implements Trans
 	
 
 	public RegisterUserController(UserRegistrationTranslator<M> builder) {
+		this(builder,true);
+	}
+	
+	public RegisterUserController(UserRegistrationTranslator<M> builder, boolean successRequired) {
 		this.builder = builder;
+		this.successRequired = successRequired;
 	}
 	
 	public void setTransitions(RegisterUserTransitions transitions) {
@@ -53,9 +62,9 @@ public class RegisterUserController<M extends TransportMessage> implements Trans
 		J2MEDisplay.setView(form);
 		
 		try{
-			M message = builder.getUserRegistrationMessage();
+			message = builder.getUserRegistrationMessage();
 			try {
-				SenderThread thread = TransportService.send(message);
+				SenderThread thread = TransportService.send(message,1,0);
 				thread.addListener(this);
 			} catch (TransportException e) {
 				e.printStackTrace();
@@ -85,9 +94,15 @@ public class RegisterUserController<M extends TransportMessage> implements Trans
 	}
 	
 	private void onFail(String message) {
-		form.addCommand(RETRY);
-		form.addCommand(CANCEL);
 		form.setText(message);
+		
+		if(!successRequired) {
+			form.addCommand(RETRY);
+			form.addCommand(OK);
+		} else {
+			form.addCommand(RETRY);
+			form.addCommand(CANCEL);
+		}
 	}
 	
 	private void onFail() {
@@ -99,7 +114,6 @@ public class RegisterUserController<M extends TransportMessage> implements Trans
 			builder.readResponse(message);
 			String responseString = builder.getResponseMessageString();
 			this.onFail(responseString == null ? Localization.get("user.registration.failmessage") : responseString);
-			form.addCommand(OK);
 		} catch(UnrecognizedResponseException ure) {
 			this.onFail(Localization.get("user.registration.failmessage"));
 		}
@@ -133,15 +147,10 @@ public class RegisterUserController<M extends TransportMessage> implements Trans
 			form.removeAllCommands();
 			form.setText(Localization.get("user.registration.attempt"));
 			try {
-				M message = builder.getUserRegistrationMessage();
-				SenderThread thread = TransportService.send(message);
+				SenderThread thread = TransportService.send(message,1,0);
 				thread.addListener(this);
 			} catch (TransportException e) {
 				e.printStackTrace();
-				onFail();
-			} catch(IOException ioe) {
-				//This is from actually building the message
-				ioe.printStackTrace();
 				onFail();
 			}
 		}

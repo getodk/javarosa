@@ -18,6 +18,7 @@ package org.javarosa.core.model.utils;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import org.javarosa.core.services.locale.Localization;
@@ -39,6 +40,9 @@ public class DateUtils {
 	//public static final int FORMAT_HUMAN_READABLE_LONG = 3;
 	public static final int FORMAT_TIMESTAMP_SUFFIX = 7;
 	
+	/** RFC 822 **/
+	public static final int FORMAT_TIMESTAMP_HTTP = 9;
+	
 	public static final long DAY_IN_MS = 86400000l;
 	
 	public DateUtils() {
@@ -54,6 +58,7 @@ public class DateUtils {
 			minute = 0;
 			second = 0;
 			secTicks = 0;
+			dow = 0;
 			
 //			tzStr = "Z";
 //			tzOffset = 0;
@@ -67,6 +72,9 @@ public class DateUtils {
 		public int second; //0-59
 		public int secTicks; //0-999 (ms)
 		
+		/** NOTE: CANNOT BE USED TO SPECIFY A DATE **/
+		public int dow; //1-7;
+		
 //		public String tzStr;
 //		public int tzOffset; //s ahead of UTC
 		
@@ -77,8 +85,15 @@ public class DateUtils {
 	}
 	
 	public static DateFields getFields (Date d) {
+		return getFields(d, null);
+	}
+	
+	public static DateFields getFields (Date d, String timezone) {
 		Calendar cd = Calendar.getInstance();
 		cd.setTime(d);
+		if(timezone != null) {
+			cd.setTimeZone(TimeZone.getTimeZone(timezone));
+		}
 		
 		DateFields fields = new DateFields();
 		fields.year = cd.get(Calendar.YEAR);
@@ -88,6 +103,7 @@ public class DateUtils {
 		fields.minute = cd.get(Calendar.MINUTE);
 		fields.second = cd.get(Calendar.SECOND);
 		fields.secTicks = cd.get(Calendar.MILLISECOND);
+		fields.dow = cd.get(Calendar.DAY_OF_WEEK);
 		
 		return fields;
 	}
@@ -108,15 +124,17 @@ public class DateUtils {
 	/* ==== FORMATTING DATES/TIMES TO STANDARD STRINGS ==== */
 	
 	public static String formatDateTime (Date d, int format) {
-		if (d == null)
+		if (d == null) {
 			return "";
+		}
 		
-		DateFields fields = getFields(d);
+		DateFields fields = getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null);
 
 		String delim;
 		switch (format) {
 		case FORMAT_ISO8601: delim = "T"; break;
 		case FORMAT_TIMESTAMP_SUFFIX: delim = ""; break;
+		case FORMAT_TIMESTAMP_HTTP: delim = " "; break;
 		default: delim = " "; break;
 		}
 		
@@ -124,11 +142,11 @@ public class DateUtils {
 	}
 	
 	public static String formatDate (Date d, int format) {
-		return (d == null ? "" :formatDate(getFields(d), format));
+		return (d == null ? "" :formatDate(getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
 	}
 	
 	public static String formatTime (Date d, int format) {
-		return (d == null ? "" : formatTime(getFields(d), format));
+		return (d == null ? "" : formatTime(getFields(d, format == FORMAT_TIMESTAMP_HTTP ? "UTC" : null), format));
 	}
 	
 	private static String formatDate (DateFields f, int format) {
@@ -137,6 +155,7 @@ public class DateUtils {
 		case FORMAT_HUMAN_READABLE_SHORT: return formatDateColloquial(f);
 		case FORMAT_HUMAN_READABLE_DAYS_FROM_TODAY: return formatDaysFromToday(f);
 		case FORMAT_TIMESTAMP_SUFFIX: return formatDateSuffix(f);
+		case FORMAT_TIMESTAMP_HTTP: return formatDateHttp(f);
 		default: return null;
 		}	
 	}
@@ -146,8 +165,19 @@ public class DateUtils {
 		case FORMAT_ISO8601: return formatTimeISO8601(f);
 		case FORMAT_HUMAN_READABLE_SHORT: return formatTimeColloquial(f);
 		case FORMAT_TIMESTAMP_SUFFIX: return formatTimeSuffix(f);
+		case FORMAT_TIMESTAMP_HTTP: return formatTimeHttp(f);
 		default: return null;
 		}	
+	}
+	
+	/** RFC 822 **/
+	private static String formatDateHttp(DateFields f) {
+		return format(f, "%a, %d %b %Y");
+	}
+	
+	/** RFC 822 **/
+	private static String formatTimeHttp(DateFields f) {
+		return format(f, "%H:%M:%S GMT");
 	}
 	
 	private static String formatDateISO8601 (DateFields f) {
@@ -184,7 +214,10 @@ public class DateUtils {
 	}
 	
 	public static String format (Date d, String format) {
-		DateFields f = getFields(d);
+		return format(getFields(d), format);
+	}
+	
+	public static String format (DateFields f, String format) {
 		StringBuffer sb = new StringBuffer();
 		
 		for (int i = 0; i < format.length(); i++) {
@@ -225,7 +258,10 @@ public class DateUtils {
 					sb.append(intPad(f.second, 2));
 				} else if (c == '3') {	//0-padded millisecond ticks (000-999)
 					sb.append(intPad(f.secTicks, 3));
-				} else if (c == 'Z' || c == 'A' || c == 'B' || c == 'a') {
+				} else if (c == 'a') {	//Three letter short text day
+					String[] dayNames = new String[] {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+					sb.append(dayNames[f.dow - 1]);
+				} else if (c == 'Z' || c == 'A' || c == 'B') {
 					throw new RuntimeException("unsupported escape in date format string [%" + c + "]");
 				} else {
 					throw new RuntimeException("unrecognized escape in date format string [%" + c + "]");

@@ -23,7 +23,7 @@ import org.javarosa.user.view.UserForm;
  * @author ctsims
  *
  */
-public class AddUserController implements HandledCommandListener {
+public class CreateUserController implements HandledCommandListener {
 
 	private AddUserTransitions transitions;
 	private UserForm view;
@@ -36,10 +36,10 @@ public class AddUserController implements HandledCommandListener {
 	public final static Command CMD_CANCEL = new Command(Localization.get("menu.Exit"),
 			Command.EXIT, 2);
 
-	public AddUserController(String passwordFormat) {
+	public CreateUserController(String passwordFormat) {
 		this(passwordFormat, null);
 	}
-	public AddUserController(String passwordFormat, IUserDecorator decorator) {
+	public CreateUserController(String passwordFormat, IUserDecorator decorator) {
 		this.view = new UserForm(Localization.get("activity.adduser.adduser"), decorator);
 		this.view.setPasswordMode(passwordFormat);
 		this.view.addCommand(CMD_SAVE);
@@ -66,15 +66,9 @@ public class AddUserController implements HandledCommandListener {
 			int status = validator.validateNewUser();
 			if(status == UserValidator.OK) {
 				User u = validator.constructUser();
-				//Save to RMS
-				IStorageUtility users = StorageManager.getStorage(User.STORAGE_KEY);
-				try {
-					users.write(u);
-				} catch (StorageFullException e) {
-					throw new RuntimeException("uh-oh, storage full [users]"); //TODO: handle this
-				}
+				//Don't add the user to the RMS yet, that's for the receiver.
 
-				transitions.userAdded(u);
+				transitions.userCreated(u);
 			} else {
 				validator.handleInvalidUser(status, this);
 			}

@@ -22,7 +22,7 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.services.locale.Localization;
-import org.javarosa.user.api.AddUserController;
+import org.javarosa.user.api.CreateUserController;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.IUserDecorator;
 
@@ -133,12 +133,12 @@ public class UserForm extends Form {
 	}
 
 	public void setPasswordMode(String mode) {
-		if (AddUserController.PASSWORD_FORMAT_NUMERIC.equals(mode)) {
+		if (CreateUserController.PASSWORD_FORMAT_NUMERIC.equals(mode)) {
 			this.passwordField.setConstraints(TextField.PASSWORD
 					| TextField.NUMERIC);
 			this.confirmPasswordField.setConstraints(TextField.PASSWORD
 					| TextField.NUMERIC);
-		} else if (AddUserController.PASSWORD_FORMAT_ALPHA_NUMERIC.equals(mode)) {
+		} else if (CreateUserController.PASSWORD_FORMAT_ALPHA_NUMERIC.equals(mode)) {
 			this.passwordField.setConstraints(TextField.PASSWORD);
 			this.confirmPasswordField.setConstraints(TextField.PASSWORD);
 		}

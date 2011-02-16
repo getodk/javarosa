@@ -47,7 +47,9 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 	InputStream response;
 	String authentication;
 
-	IDataPayload payload;	
+	IDataPayload payload;
+	
+	HttpRequestProperties responseProperties;
 	
 	private AuthenticatedHttpTransportMessage(String URL, HttpAuthenticator authenticator) {
 		this.setCreated(new Date());
@@ -154,13 +156,18 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 	public InputStream getResponse() {
 		return response;
 	}
+	
+	public HttpRequestProperties getReponseProperties() {
+		return responseProperties;
+	}
 
 	/**
 	 * @return The properties for this http request (other than
 	 * authorization headers).
 	 */
 	public HttpRequestProperties getRequestProperties() {
-		return new HttpRequestProperties();
+		//TODO: Possibly actually count content length here
+		return new HttpRequestProperties(this.getMethod(), -1, "1.0");
 	}
 
 	public InputStream getContentStream() {
@@ -264,6 +271,7 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 	
 	private void handleResponse(HttpConnection connection) throws IOException {
 		int responseCode = connection.getResponseCode();
+		responseProperties = HttpRequestProperties.HttpResponsePropertyFactory(connection);
 		long responseLength = connection.getLength();
 
 		if (responseLength > TransportService.PAYLOAD_SIZE_REPORTING_THRESHOLD) {
@@ -304,25 +312,12 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 		if (requestProps == null) {
 			throw new RuntimeException("Null message.getRequestProperties() in getConnection()");
 		}
-		
-		conn.setRequestMethod(this.getMethod());
-		conn.setRequestProperty("User-Agent", requestProps.getUserAgent());
-		conn.setRequestProperty("Content-Language", requestProps.getContentLanguage());
-		conn.setRequestProperty("MIME-version", requestProps.getMimeVersion());
-		conn.setRequestProperty("Content-Type", requestProps.getContentType());
+		requestProps.configureConnection(conn);
 		
 		//Retrieve either the response auth header, or the cached guess
 		String authorization = this.getAuthString();
 		if(authorization != null) {
 			conn.setRequestProperty("Authorization", authorization);
-		}
-		
-		// any others
-		Enumeration keys = requestProps.getOtherProperties().keys();
-		while (keys.hasMoreElements()) {
-			String key = (String) keys.nextElement();
-			String value = (String) requestProps.getOtherProperties().get(key);
-			conn.setRequestProperty(key, value);
 		}
 
 		return conn;

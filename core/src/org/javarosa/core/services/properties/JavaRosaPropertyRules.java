@@ -43,6 +43,9 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     
     public final static String LOGS_ENABLED_YES = "Enabled";
     public final static String LOGS_ENABLED_NO = "Disabled";
+    
+    /** The expected compliance version for the OpenRosa API set **/
+    public final static String OPENROSA_API_LEVEL = "jr_openrosa_api";
 
     /**
      * Creates the JavaRosa set of property rules
@@ -60,7 +63,10 @@ public class JavaRosaPropertyRules implements IPropertyRules {
         
         rules.put(CURRENT_LOCALE, new Vector());
         
+        rules.put(OPENROSA_API_LEVEL, new Vector());
+        
         readOnlyProperties.addElement(DEVICE_ID_PROPERTY);
+        readOnlyProperties.addElement(OPENROSA_API_LEVEL);
         
     }
 
@@ -145,6 +151,8 @@ public class JavaRosaPropertyRules implements IPropertyRules {
     		return "Device Logging";
     	} else if(CURRENT_LOCALE.equals(propertyName)) {
     		return Localization.get("settings.language");
+    	} else if(OPENROSA_API_LEVEL.equals(propertyName)) {
+    		return "OpenRosa API Level";
     	}
     	return propertyName;
     }

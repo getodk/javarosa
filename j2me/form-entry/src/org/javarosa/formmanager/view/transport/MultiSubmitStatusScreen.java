@@ -17,6 +17,7 @@
 package org.javarosa.formmanager.view.transport;
 
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -53,6 +54,10 @@ public class MultiSubmitStatusScreen extends Form implements
 	private Hashtable ids;
 	private int failed = 0;
 	
+	private Vector<String> responses;
+	
+	private String finalResponse; 
+	
 	private TransportResponseProcessor responder;
 	private boolean silenceable;
 	
@@ -76,6 +81,9 @@ public class MultiSubmitStatusScreen extends Form implements
 		}
 
 		this.responder = responder;
+		
+		responses = new Vector<String>();
+		finalResponse = "";
 	}
 
 	private void setOKCommand() {
@@ -142,6 +150,14 @@ public class MultiSubmitStatusScreen extends Form implements
 		}
 			// finished
 		case TransportMessageStatus.SENT: {
+			
+			String message = responder.getResponseMessage(transportMessage);
+			if(message != null) {
+				if(!responses.contains(message)) {
+					responses.addElement(message);
+					finalResponse = message + "\n" + finalResponse;
+				}
+			}
 
 			this.currentid++;
 			this.msg.setText(getCurrentDisplay());
@@ -183,13 +199,13 @@ public class MultiSubmitStatusScreen extends Form implements
 	}
 	
 	private void constructFinalMessage(TransportMessage transportMessage) {
-		String message = "";
+		String message = finalResponse + "\n";
 		if(failed > 0) { 
 			message += Localization.get("sending.status.failures", new String[]{String.valueOf(failed)}) + "\n";
 		}
-		if(failed < this.ids.size()) {
-			message+= getResponseMessage(transportMessage) + "\n";
-		}
+//		if(failed < this.ids.size()) {
+//			message+= getResponseMessage(transportMessage) + "\n";
+//		}	
 		if(failed == this.ids.size()) {
 			message = Localization.get("sending.status.failed");
 		}

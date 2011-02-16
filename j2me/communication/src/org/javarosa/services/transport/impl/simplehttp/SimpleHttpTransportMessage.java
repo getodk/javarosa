@@ -44,6 +44,8 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	
 	private boolean cacheable = true;
 	
+	private HttpRequestProperties responseProperties;
+	
 	/**
 	 * Http connection method.
 	 */
@@ -89,7 +91,11 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	}
 
 	public HttpRequestProperties getRequestProperties() {
-		return new HttpRequestProperties();
+		return new HttpRequestProperties(this.getConnectionMethod(), this.getContentLength(), "1.0");
+	}
+	
+	public HttpRequestProperties getResponseProperties() {
+		return responseProperties;
 	}
 
 	public boolean isCacheable() {
@@ -189,6 +195,8 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 			// Get the response
 			int responseCode = conn.getResponseCode();
 			System.out.println("response code: " + responseCode);
+			
+			responseProperties = HttpRequestProperties.HttpResponsePropertyFactory(conn);
 
 			responseLength = conn.getLength();
 			
@@ -291,32 +299,17 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	 */
 	private HttpConnection getConnection(String connectionMethod) throws IOException {
 		HttpConnection conn = (HttpConnection) Connector.open(this.getUrl());
-		if (conn == null)
+		if (conn == null) {
 			throw new RuntimeException("Null conn in getConnection()");
+		}
 		
 		HttpRequestProperties requestProps = this.getRequestProperties();
-		if (requestProps == null)
+		if (requestProps == null) {
 			throw new RuntimeException("Null message.getRequestProperties() in getConnection()");
-
-		conn.setRequestMethod(connectionMethod);
-		conn.setRequestProperty("User-Agent", requestProps.getUserAgent());
-		conn.setRequestProperty("Content-Language", requestProps.getContentLanguage());
-		conn.setRequestProperty("MIME-version", requestProps.getMimeVersion());
-		conn.setRequestProperty("Content-Type", requestProps.getContentType());
-
-		int contentLength = this.getContentLength();
-		if (!HttpConnection.GET.equals(connectionMethod) && contentLength != -1) {
-			conn.setRequestProperty("Content-Length", String.valueOf(contentLength));
 		}
-			
-		// any others
-		Enumeration keys = requestProps.getOtherProperties().keys();
-		while (keys.hasMoreElements()) {
-			String key = (String) keys.nextElement();
-			String value = (String) requestProps.getOtherProperties().get(key);
-			conn.setRequestProperty(key, value);
-		}
-
+		
+		requestProps.configureConnection(conn);
+		
 		return conn;
 
 	}

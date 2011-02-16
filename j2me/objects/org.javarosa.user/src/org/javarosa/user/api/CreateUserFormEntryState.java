@@ -29,20 +29,20 @@ import org.javarosa.user.utility.UserModelProcessor;
  * @author ctsims
  *
  */
-public abstract class AddUserFormEntryState extends FormEntryState implements AddUserTransitions {
+public abstract class CreateUserFormEntryState extends FormEntryState implements AddUserTransitions {
 
 	private String formName;
 	private Vector<IPreloadHandler> preloaders;
 	private Vector<IFunctionHandler> funcHandlers;
 		
-	public AddUserFormEntryState (String formName,
+	public CreateUserFormEntryState (String formName,
 			Vector<IPreloadHandler> preloaders, Vector<IFunctionHandler> funcHandlers) {
 		this.formName = formName;
 		this.preloaders = preloaders;
 		this.funcHandlers = funcHandlers;
 	}
 	
-	public AddUserFormEntryState (Vector<IPreloadHandler> preloaders, Vector<IFunctionHandler> funcHandlers) {
+	public CreateUserFormEntryState (Vector<IPreloadHandler> preloaders, Vector<IFunctionHandler> funcHandlers) {
 		this.formName = "http://code.javarosa.org/user_registration";
 		this.preloaders = preloaders;
 		this.funcHandlers = funcHandlers;
@@ -68,7 +68,7 @@ public abstract class AddUserFormEntryState extends FormEntryState implements Ad
 			processor.processInstance(instanceData);
 			User u = processor.getRegisteredUser();
 			if(u != null) {
-				userAdded(u);
+				userCreated(u);
 			} else {
 				abort();
 			}
@@ -88,6 +88,6 @@ public abstract class AddUserFormEntryState extends FormEntryState implements Ad
 	//For the Nokia JVM Bug
 	public abstract void abort();
 	
-	public abstract void userAdded(User newUser);
+	public abstract void userCreated(User newUser);
 	public abstract void cancel();
 }

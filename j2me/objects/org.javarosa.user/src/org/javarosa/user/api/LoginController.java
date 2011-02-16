@@ -62,7 +62,7 @@ public class LoginController implements HandledCommandListener {
 	}
 	
 	public LoginController(String[] extraText, boolean showDemo) {
-		this(extraText,AddUserController.PASSWORD_FORMAT_NUMERIC,showDemo);
+		this(extraText,CreateUserController.PASSWORD_FORMAT_NUMERIC,showDemo);
 	}
 
 	public void setTransitions (LoginTransitions transitions) {

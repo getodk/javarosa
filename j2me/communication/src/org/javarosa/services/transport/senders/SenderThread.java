@@ -50,6 +50,12 @@ public abstract class SenderThread extends HandledThread {
 	 * Variable used to count down remaining tries
 	 */
 	protected int triesRemaining;
+	
+	
+	/**
+	 * Flag in case a message is updated before a listener is attached.
+	 */
+	private boolean hasUpdated;
 
 	/**
 	 * @param transporter
@@ -76,6 +82,7 @@ public abstract class SenderThread extends HandledThread {
 		this.messageStore = queue;
 		this.tries = tries;
 		this.delay = delay;
+		hasUpdated = false;
 	}
 
 	protected abstract void send();
@@ -158,6 +165,11 @@ public abstract class SenderThread extends HandledThread {
 	 */
 	public void addListener(TransportListener listener) {
 		this.listeners.addElement(listener);
+		
+		//In case the message has already changed, let the listener know
+		if(hasUpdated) {
+			listener.onStatusChange(message);
+		}
 	}
 
 	/**
@@ -174,6 +186,8 @@ public abstract class SenderThread extends HandledThread {
 	 * @param message
 	 */
 	public void notifyStatusChange() {
+		//In case a listener has not been attached yet.
+		hasUpdated = true;
 		for (int i = 0; i < this.listeners.size(); i++) {
 			((TransportListener) this.listeners.elementAt(i)).onStatusChange(message);
 		}

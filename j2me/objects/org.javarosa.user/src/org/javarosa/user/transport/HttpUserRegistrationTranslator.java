@@ -29,14 +29,26 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 	String registrationUrl;
 	
 	String prompt;
+	
+	//A guess for the response OR API version (Used if none is provided by the server).
+	String orApiVersion;
 
-	public HttpUserRegistrationTranslator(User user, String registrationUrl) {
+	public HttpUserRegistrationTranslator(User user, String registrationUrl, String orApiVersion) {
 		this.user = user;
 		this.registrationUrl = registrationUrl;
+		this.orApiVersion = orApiVersion;
 	}
 	
 	public SimpleHttpTransportMessage getUserRegistrationMessage() throws IOException {
-		return new SimpleHttpTransportMessage(getStreamFromRegistration(createXmlRegistrationDoc(user)), registrationUrl);
+		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(getStreamFromRegistration(createXmlRegistrationDoc(user)), registrationUrl);
+		if("1.0".equals(orApiVersion)) {
+			message.setCacheable(true);
+		} else {
+			//Pre 1.0 we'll assume that user registration is a synchronous process.
+			message.setCacheable(false);
+		}
+		
+		return message;
 	}
 	
 	private InputStream getStreamFromRegistration(Document registration) {
@@ -58,7 +70,22 @@ public class HttpUserRegistrationTranslator implements UserRegistrationTranslato
 	
 	public User readResponse(SimpleHttpTransportMessage message) throws UnrecognizedResponseException {
 		this.prompt = null;
-		Document doc = CommUtil.getXMLResponse(message.getResponseBody());
+		
+		byte[] responseBody = message.getResponseBody();
+		
+		//Not actually a response
+		if(responseBody == null) {
+			throw new UnrecognizedResponseException("No response body");
+		}
+		
+		String responseVersion = message.getResponseProperties().getORApiVersion();
+		if(responseVersion == null) {
+			//If there's no version from the server, assume it's the same as the 
+			//sent version
+			responseVersion = orApiVersion;
+		}
+		
+		Document doc = CommUtil.getXMLResponse(responseBody);
 		if (doc == null) {
 			throw new UnrecognizedResponseException("can't parse xml");
 		}
