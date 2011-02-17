@@ -29,6 +29,7 @@ import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
@@ -80,6 +81,14 @@ public class XFormAnswerDataParser {
 
 			try {
 				return (trimmedText == null ? null : new IntegerData(Integer.parseInt(trimmedText)));
+			} catch (NumberFormatException nfe) {
+				return null;
+			}
+			
+		case Constants.DATATYPE_LONG:
+
+			try {
+				return (trimmedText == null ? null : new LongData(Long.parseLong(trimmedText)));
 			} catch (NumberFormatException nfe) {
 				return null;
 			}

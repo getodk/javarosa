@@ -18,4 +18,6 @@ public interface UserRegistrationTranslator<M extends TransportMessage> {
 	public M getUserRegistrationMessage() throws IOException;
 	
 	public User readResponse(M message) throws UnrecognizedResponseException;
+	
+	public String getResponseMessageString();
 }

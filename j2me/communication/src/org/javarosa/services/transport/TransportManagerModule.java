@@ -14,9 +14,7 @@ import org.javarosa.j2me.reference.HttpRoot;
 import org.javarosa.j2me.storage.rms.RMSStorageUtilityIndexed;
 import org.javarosa.services.transport.impl.TransportMessageSerializationWrapper;
 import org.javarosa.services.transport.impl.TransportMessageStore;
-import org.javarosa.services.transport.impl.binarysms.BinarySMSTransportMessage;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
-import org.javarosa.services.transport.impl.sms.SMSTransportMessage;
 
 /**
  * @author ctsims
@@ -28,7 +26,15 @@ public class TransportManagerModule implements IModule {
 	 * @see org.javarosa.core.api.IModule#registerModule()
 	 */
 	public void registerModule() {
-		String[] prototypes = new String[] { SimpleHttpTransportMessage.class.getName(), SMSTransportMessage.class.getName(), BinarySMSTransportMessage.class.getName(), TransportMessageSerializationWrapper.class.getName()};
+		
+		//Note: Do not remove fully qualified names here, otherwise the imports mess up the polish preprocessing 
+		
+		//#if polish.api.wmapi
+		String[] prototypes = new String[] { SimpleHttpTransportMessage.class.getName(), org.javarosa.services.transport.impl.sms.SMSTransportMessage.class.getName(), org.javarosa.services.transport.impl.binarysms.BinarySMSTransportMessage.class.getName(), TransportMessageSerializationWrapper.class.getName()};
+		//#else
+		//# String[] prototypes = new String[] { SimpleHttpTransportMessage.class.getName(), TransportMessageSerializationWrapper.class.getName()};
+		//#endif
+		
 		PrototypeManager.registerPrototypes(prototypes);
 		IStorageFactory f = new IStorageFactory () {
 			public IStorageUtility newStorage(String name, Class type) {

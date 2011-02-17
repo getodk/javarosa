@@ -13,16 +13,18 @@
 <project name="JavaRosa" default="LaunchEmulator">
 	<!-- Main Target: Call to build the project -->
 	<!-- This is the main work target, it actually builds the code -->
-	<target name="BuildPolish" depends="init,CompileAndLinkSource" description="This is the controller for the J2ME build process.">
-		<!-- A property containing the path to the preprocessed source files -->
-		<property name="builtsource" value="${dir.build}/real/${device.identifier}/none/source/" />
-		
-
+	<target name="BuildPolish" depends="init,CompileAndLinkSource,RetrieveDevices" description="This is the controller for the J2ME build process.">
 		<!-- Definition of the J2ME Polish task:                      -->
 		<!-- Note that this takes place here (rather than in the script in general) in order to allow the libraries jar to be compiled from source before the classpath is evaluated-->
 		<taskdef name="buildPolish" classname="de.enough.polish.ant.PolishTask" classpath="${dir.tools}/j2merosa-libraries.jar:${polish.home}/lib/enough-j2mepolish-build.jar:${polish.home}/lib/jdom.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/pim.jar:${polish.home}/import/location.jar:${polish.home}/import/jsr234.jar" />
 			<path id="classpath.base">
 		</path>
+		
+		<!-- If not already set, set to nothing -->
+		<property name="dest.suffix" value=""/>
+		
+		<!-- If not already set, set to nothing -->
+		<property name="device.dir.dist" value="${dir.dist.root}${dest.suffix}"/>
 		
 		<buildPolish>
 			<info name="${app.name}"
@@ -34,8 +36,12 @@
 				jarUrl="${deploy-url}${app.jarName}" copyright="" />
 
 			<!-- selection of supported devices, set this in build.properties -->
-			<deviceRequirements>
-				<requirement name="Identifier" value="${device.identifier}" />
+			<deviceRequirements if="build.batch">
+				<requirement name="Feature" value="javarosa" />
+			</deviceRequirements>
+			
+			<deviceRequirements unless="build.batch">
+				<requirement name="Identifier" value="${device.identifier.test}" />
 			</deviceRequirements>
 
 			<!-- build settings -->
@@ -44,19 +50,24 @@
 			<build fullscreen="menu"
 				usePolishGui="${javarosa.usepolishui}"
 				workDir="${dir.work}"
-				destDir="${dir.dist}">
+				destDir="${device.dir.dist}">
 				
 				<libraries>
-					<library dir="${dir.lib}" />
+					<!-- The J2MEUnit Library is causing problems with blackberry builds. It should probably be moved 
+					     somewhere where it won't be included by default (as it isn't necessary for deployed apps -->
+					<library dir="${dir.lib}"/>
+					<!--library file="${dir.lib}${file.separator}kxml2-2.3.0.jar"/-->
+					<!--library file="${dir.lib}${file.separator}regexp-me.jar"/-->
 				</libraries>
 
 				<jad>
 					<attribute name="App-Version" value="${jrdemo.version}" />
 					<attribute name="JRDemo-Build-Version" value="${jrdemo-build-version}" />
 					<attribute name="JR-Build-Version" value="${jr-build-version}" />
-					<attribute name="Polish-Device" value="${device.identifier}" />
+					<attribute name="Polish-Device" value="${polish.identifier}" />
 					<attribute name="JRDemo-Post-Url" value="${jrdemo.postUrl}" />
 					<attribute name="Form-Server-Url" value="${jrdemo.formListUrl}" />
+					<attribute name="Default-View" value="${jrdemo.defaultview}"/>
 				</jad>
 				
 				
@@ -85,6 +96,9 @@
 				<!-- Build variables -->
 				<variables includeAntProperties="true">
 					<variable file="configuration/configuration.properties" />
+					<variable name="polish.TextField.useDirectInput" value="true" unless="polish.international"/>
+					<variable name="polish.FullScreen" value="false" if="${ isOS( Windows ) }" />
+					<variable name="obfuscate.force.no" value="true" if="${ isOS( Windows ) }" /> 
 				</variables>
 
 				<!-- Resources that should be used in the Polish build (images, the polish.css file, etc) -->
@@ -100,9 +114,9 @@
 				<!-- Whether to run the obfuscator, which makes reverse engineering the byte-code
 					 more difficult, and compresses the built JAR -->
 				<!-- obfuscator settings: do not obfuscate when the test-property is true  -->
-				<obfuscator name="ProGuard" unless="(noobfuscate or test) and not release">
+				<obfuscator name="ProGuard" unless="((noobfuscate or test) and not release) or polish.blackberry or obfuscate.force.no">
 					<parameter name="optimize" value="true" />
-					<parameter name="printmapping" value="'${dir.dist}/obfuscation_mapping.txt'" />
+					<!--parameter name="printmapping" value="obfuscation_mapping.txt" /-->
 					
 					<!-- none of the parameter names below can be the same, or else they will clobber previous parameters; hence the varied spacing -->
 					<parameter name="keep,allowshrinking" value="!abstract class org.javarosa.core.model.* implements org.javarosa.core.model.IFormElement" />
@@ -133,7 +147,7 @@
 					<filter pattern="org.celllife.singlequestionscreen.*" level="debug" />
 				</debug>
 				<!-- Properties of the actual javac compiler -->
-				<compiler debug="on" includeJavaRuntime="yes" classpath="${polish.home}/import/enough-j2mepolish-client.jar:${polish.home}/import/fileconnection.jar:${polish.home}/import/j2me-lib_1.1.jar:${wtk.home}/lib/jsr082.jar:${polish.home}/import/nokia-ui.jar:${polish.home}/import/m3g.jar:${polish.home}/import/wmapi.jar:${wtk.home}/lib/jsr75.jar:${polish.home}/import/pim.jar:${polish.home}/import/location.jar:${polish.home}/import/jsr234.jar"/>
+				<compiler debug="on" includeJavaRuntime="yes"/>
 				
 				<postcompiler name="java5"/>
 				<postcompiler name="serialization" if="org.javarosa.polish.serialization"/>
@@ -158,6 +172,10 @@
 		</buildPolish>
 	</target>
 	
+	<target name="RetrieveDevices" description="Retrieves custom device library from the shared resources">
+		<copy file="${device.list}" todir="${basedir}" overwrite="true"/>
+	</target>
+	
 	<target name="CompileAndLinkSource" if="compile.from.source.true">
 			<ant antfile="${dir.jrlibs}/build.xml" target="package" inheritAll="false" inheritRefs="false">
 				<property name="polish.home" value="${polish.home}"/>
@@ -174,7 +192,7 @@
 	<!-- Main Target: Call to clean directories created by a build -->
 	<target name="Clean" description="allows a clean build. You should call [ant clean] whenever you made changes to devices.xml, vendors.xml or groups.xml">
 		<delete dir="${dir.build}" />
-		<delete dir="${dir.dist}" />
+		<delete dir="${dir.dist.root}" />
 	</target>
 	
 	<!-- Main Target: Call to clean the emulator's RMS -->
@@ -206,7 +224,12 @@
 	</target>
 	
 	<!-- This target should prevent us from needing to re-run BuildClean for additional targets -->
-	<target name="BuildServerExtras" depends="BuildClean,DecomposeJar"/>
+	<target name="BuildServerExtras" depends="SetBatch,BuildClean"/>
+	
+	<target name="SetBatch">
+		<property name="build.batch" value="true"/>
+		<property name="dest.suffix" value="${file.separator}${polish.identifier}${file.separator}"/>
+	</target>
 	      	
 
 	<!-- Initialization for the build targets                    -->

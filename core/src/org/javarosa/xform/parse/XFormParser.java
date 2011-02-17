@@ -185,6 +185,7 @@ public class XFormParser {
 		typeMappings = new Hashtable();
 		typeMappings.put("string", new Integer(Constants.DATATYPE_TEXT));               //xsd:
 		typeMappings.put("integer", new Integer(Constants.DATATYPE_INTEGER));           //xsd:
+		typeMappings.put("long", new Integer(Constants.DATATYPE_LONG));                 //xsd:
 		typeMappings.put("int", new Integer(Constants.DATATYPE_INTEGER));               //xsd:
 		typeMappings.put("decimal", new Integer(Constants.DATATYPE_DECIMAL));           //xsd:
 		typeMappings.put("double", new Integer(Constants.DATATYPE_DECIMAL));            //xsd:

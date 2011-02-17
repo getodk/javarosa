@@ -48,16 +48,26 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 					ChoiceGroup.MULTIPLE);
 		}
 		
-		SelectMultiData answerValue = (SelectMultiData) prompt.getAnswerValue();
-		Vector<String> selectionStrings = getSelectionStrings(answerValue);
 		Vector<SelectChoice> choices = prompt.getSelectChoices();
 		Enumeration itr = choices.elements();
 		
 		int i = 0;
 		boolean[] selectedFlags = new boolean[choices.size()];
+		IAnswerData data = this.prompt.getAnswerValue();
+		Vector<Selection> selected = null;
+		if(data != null) {
+			selected = (Vector<Selection>)new SelectMultiData().cast(data.uncast()).getValue();
+		}
 		while (itr.hasMoreElements()) {
 			SelectChoice choice = (SelectChoice)itr.nextElement();
-			selectedFlags[i] = selectionStrings.contains(this.prompt.getSelectChoiceText(choice));
+			selectedFlags[i] = false;
+			if(selected != null) {
+				 for(Selection s : selected) {
+					 if(s.xmlValue.equals(choice.selection().xmlValue)) {
+						 selectedFlags[i] = true;
+					 }
+				 }
+			}
 			String label = this.prompt.getSelectChoiceText(choice);
 			cg.append(label, null);
 			i++;
@@ -71,15 +81,6 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 		}
 	}
 
-	private Vector<String> getSelectionStrings(SelectMultiData answerValue) {
-		Vector<Selection> selections = (Vector<Selection>) answerValue.getValue();
-		Vector<String> strings = new Vector<String>();
-		for (Selection selection : selections) {
-			strings.addElement(prompt.getSelectItemText(selection));
-		}
-		return strings;
-	}
-
 	public IAnswerData getWidgetValue() {
 		Vector<Selection> vs = new Vector<Selection>();
 
@@ -90,6 +91,8 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 			}
 		}
 
-		return (vs.size() == 0 ? null : new SelectMultiData(vs));
+		//ctsims: 1/28/2011: An empty select multidata is a valid return 
+		//format, and shouln't be confused with null.
+		return new SelectMultiData(vs);
 	}
 }

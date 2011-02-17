@@ -12,7 +12,6 @@ import org.javarosa.model.xform.SMSSerializingVisitor;
 import org.javarosa.model.xform.XFormSerializingVisitor;
 import org.javarosa.model.xform.XPathReference;
 import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
-import org.javarosa.services.transport.impl.sms.SMSTransportMessage;
 
 /**
  * @author ctsims
@@ -24,32 +23,28 @@ public class SubmissionTransportHelper {
 		return new SubmissionProfile(new XPathReference("/"), "post", url, null);
 	}
 	
-	public static TransportMessage createMessage(FormInstance instance, SubmissionProfile profile) {
+	public static TransportMessage createMessage(FormInstance instance, SubmissionProfile profile) throws IOException {
 		//If there is a submission profile, we need to use the relevant portions.
 		if(profile.getMethod().toLowerCase().equals("post")) {
 			
 			//URL
 			String url = profile.getAction();
-			
-			try {
-				IDataPayload payload = new XFormSerializingVisitor().createSerializedPayload(instance, profile.getRef());
-				return new SimpleHttpTransportMessage(payload.getPayloadStream(),url);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error Serializing Data to be transported");
-			}
+		
+			IDataPayload payload = new XFormSerializingVisitor().createSerializedPayload(instance, profile.getRef());
+			return new SimpleHttpTransportMessage(payload.getPayloadStream(),url);
 		} else if(profile.getMethod().toLowerCase().equals("smspush")) {
 			
+			//#if polish.api.wmapi
+
 			//URL
 			String phoneUri = profile.getAction();
+		
+			String payload = new String(new SMSSerializingVisitor().serializeInstance(instance, profile.getRef()));
+			return new org.javarosa.services.transport.impl.sms.SMSTransportMessage(payload,phoneUri);
 			
-			try {
-				String payload = new String(new SMSSerializingVisitor().serializeInstance(instance, profile.getRef()));
-				return new SMSTransportMessage(payload,phoneUri);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Error Serializing Data to be transported");
-			}
+			//#else
+			//# throw new RuntimeException("SMS Messages not enabled on current device"); 
+			//#endif
 		}
 		return null;
 	}

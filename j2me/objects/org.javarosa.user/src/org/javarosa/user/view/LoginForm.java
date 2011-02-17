@@ -156,6 +156,7 @@ public class LoginForm extends FramedForm {
 		// put the extra text if it's been set
 		if(this.extraText != null) {
 			for (int i = 0; i < extraText.length; i++) {
+				//#style loginExtraText?
 				append(this.extraText[i]);
 			}
 		}
