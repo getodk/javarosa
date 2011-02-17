@@ -54,15 +54,17 @@ public class RegisterUserController<M extends TransportMessage> implements Trans
 		
 		try{
 			M message = builder.getUserRegistrationMessage();
-			SenderThread thread = TransportService.send(message);
-			thread.addListener(this);
-		} catch (TransportException e) {
-			e.printStackTrace();
-			onFail();
+			try {
+				SenderThread thread = TransportService.send(message);
+				thread.addListener(this);
+			} catch (TransportException e) {
+				e.printStackTrace();
+				onFail(message);
+			}
 		} catch(IOException ioe) {
 			//This is from actually building the message
 			ioe.printStackTrace();
-			onFail();
+			
 		}
 	}
 	
@@ -76,13 +78,31 @@ public class RegisterUserController<M extends TransportMessage> implements Trans
 			form.addCommand(CANCEL);
 			form.setText(Localization.get("user.registration.badresponse"));
 		}
-		form.setText(Localization.get("user.registration.success"));
+		
+		String responseString = builder.getResponseMessageString();
+		
+		form.setText(responseString == null ? Localization.get("user.registration.success") : responseString);
+	}
+	
+	private void onFail(String message) {
+		form.addCommand(RETRY);
+		form.addCommand(CANCEL);
+		form.setText(message);
 	}
 	
 	private void onFail() {
-		form.addCommand(RETRY);
-		form.addCommand(CANCEL);
-		form.setText(Localization.get("user.registration.failmessage"));
+		this.onFail(Localization.get("user.registration.failmessage"));
+	}
+	
+	private void onFail(M message) {
+		try {
+			builder.readResponse(message);
+			String responseString = builder.getResponseMessageString();
+			this.onFail(responseString == null ? Localization.get("user.registration.failmessage") : responseString);
+			form.addCommand(OK);
+		} catch(UnrecognizedResponseException ure) {
+			this.onFail(Localization.get("user.registration.failmessage"));
+		}
 	}
 
 	public void onChange(TransportMessage message, String remark) {
@@ -95,7 +115,7 @@ public class RegisterUserController<M extends TransportMessage> implements Trans
 			onSuccess((M)message);
 			break;
 		default:
-			onFail();
+			onFail((M)message);
 			break;
 		}
 	}

@@ -26,6 +26,7 @@ import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.StringData;
 
@@ -48,12 +49,15 @@ public class PreloadUtils {
 			return null;
 		}
 		
+		//TODO: Replace this all with an uncast data
 		if(o instanceof String) {
 			return new StringData((String)o);
 		} else if(o instanceof Date) {
 			return new DateData((Date)o);
 		} else if (o instanceof Integer) {
 			return new IntegerData((Integer)o);
+		} else if (o instanceof Long) {
+			return new LongData((Long)o);
 		} else if (o instanceof Double) {
 			return new DecimalData((Double)o);
 		} else if(o instanceof Vector) {

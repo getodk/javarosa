@@ -16,10 +16,7 @@
 
 package org.javarosa.formmanager.view.singlequestionscreen;
 
-import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.IFormElement;
-import org.javarosa.core.model.QuestionDef;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
@@ -35,6 +32,7 @@ import org.javarosa.formmanager.view.singlequestionscreen.screen.LocationQuestio
 import org.javarosa.formmanager.view.singlequestionscreen.screen.NewRepeatScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreen;
 import org.javarosa.formmanager.view.singlequestionscreen.screen.SingleQuestionScreenFactory;
+import org.javarosa.formmanager.view.summary.FormSummaryController;
 import org.javarosa.formmanager.view.summary.FormSummaryState;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledPCommandListener;
@@ -52,43 +50,75 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	private SingleQuestionScreen currentQuestionScreen;
 	private boolean goingForward;
 	private NewRepeatScreen repeatScreen;
-
-	// GUI elements
+	private String backupTitle;
+	
+	//TODO: Replace with something non-static once question count works properly
+	private int numQuestions = -1;
+	
+	private int currentGuess = -1;
+	
 	public SingleQuestionView(JrFormEntryController controller) {
+		this(controller, controller.getModel().getFormTitle());
+	}
+	
+	// GUI elements
+	public SingleQuestionView(JrFormEntryController controller, String title) {
 		super(controller.getModel().getFormTitle());
 		this.controller = controller;
 		this.model = controller.getModel();
 		this.goingForward = true;
+		this.backupTitle = title;
+		numQuestions = controller.getModel().getNumQuestions();
 	}
 
-	public SingleQuestionScreen getView(FormEntryPrompt prompt,
-			boolean fromFormView) {
+	public SingleQuestionScreen getView(FormEntryPrompt prompt, boolean fromFormView) {
 
-		FormEntryCaption[] captionHierarchy = model.getCaptionHierarchy(prompt
-				.getIndex());
+		FormEntryCaption[] captionHierarchy = model.getCaptionHierarchy(prompt.getIndex());
 		String groupTitle = "";
 		if (captionHierarchy.length > 1) {
-			int instanceIndex = prompt.getIndex().getInstanceIndex();
 			int captionCount = 0;
-			for (FormEntryCaption caption : captionHierarchy) {
+			for (int i = 0 ; i < captionHierarchy.length -1 ; ++i) {
+				FormEntryCaption caption  = captionHierarchy[i];
 				captionCount++;
-				groupTitle += caption.getLongText();
+				String captionText = caption.getLongText();
+				if(captionText != null) {
+					groupTitle += caption.getLongText();
 
-				if ((caption.getIndex().getInstanceIndex() > -1)
-						&& (captionCount < captionHierarchy.length))
-					groupTitle += " #" + (caption.getMultiplicity() + 1);
+					if ((caption.getIndex().getInstanceIndex() > -1) && (captionCount < captionHierarchy.length)) {
+							groupTitle += " #" + (caption.getMultiplicity() + 1);
+					}
 
-				groupTitle += ": ";
+					groupTitle += ": ";
+				}
 			}
-			if (groupTitle.endsWith(": "))
+			if (groupTitle.endsWith(": ")) {
 				groupTitle = groupTitle.substring(0, groupTitle.length() - 2);
+			}
+		}
+		
+		String shortPrompt = prompt.getSpecialFormQuestionText(FormEntryCaption.TEXT_FORM_SHORT);
+		if(shortPrompt != null ){
+			if(groupTitle != "") {
+				groupTitle += ": " +shortPrompt;
+			} else {
+				groupTitle += shortPrompt;
+			}
+		}
+		
+		if(groupTitle == "") {
+			groupTitle = backupTitle;
 		}
 		currentQuestionScreen = SingleQuestionScreenFactory.getQuestionScreen(
-				prompt, groupTitle, fromFormView, goingForward);
+				prompt, groupTitle, fromFormView, goingForward, controller.isEntryOptimized());
 
 		if (model.getLanguages() != null && model.getLanguages().length > 0) {
 			currentQuestionScreen.addLanguageCommands(model.getLanguages());
 		}
+		
+		if(currentGuess != -1) {
+			currentQuestionScreen.configureProgressBar(currentGuess,numQuestions);
+		}
+		
 		currentQuestionScreen.setCommandListener(this);
 		return currentQuestionScreen;
 	}
@@ -97,16 +127,26 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 	}
 
 	public void show() {
-		showFormSummary();
+		controller.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+		if(!controller.isEntryOptimized()) {
+			showFormSummary();
+		}
+		else {
+			goingForward = true;
+			processModelEvent(controller.getModel().getEvent());
+		}
 	}
 
 	public void show(FormIndex index) {
+		currentGuess = FormSummaryController.countQuestionsToIndex(controller.getModel(), index);
 		controller.jumpToIndex(index);
 		refreshView();
 	}
 
 	private void showFormSummary() {
-		controller.jumpToIndex(FormIndex.createBeginningOfFormIndex());
+		//clear guess
+		currentGuess = -1;
+		
 		FormSummaryState summaryState = new FormSummaryState(controller);
 		summaryState.start();
 	}
@@ -145,14 +185,13 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 				processModelEvent(controller.stepToNextEvent());
 			}
 		} else {
-			if (command == SingleQuestionScreen.nextItemCommand
-					|| command == SingleQuestionScreen.nextCommand) {
+			if (command == currentQuestionScreen.nextItemCommand) {
 				answerQuestion();
-			} else if (command == SingleQuestionScreen.previousCommand) {
+			} else if (command == currentQuestionScreen.previousCommand) {
 				this.goingForward = false;
 				int event = controller.stepToPreviousEvent();
 				processModelEvent(event);
-			} else if (command == SingleQuestionScreen.viewAnswersCommand) {
+			} else if (command == currentQuestionScreen.viewAnswersCommand) {
 				viewAnswers();
 			} else if (command == LocationQuestionScreen.captureCommand) {
 				try {
@@ -186,8 +225,8 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 			} else // should be a command in the language submenu
 			{
 				String language = null;
-				for (int i = 0; i < SingleQuestionScreen.languageCommands.length; i++) {
-					if (command == SingleQuestionScreen.languageCommands[i]) {
+				for (int i = 0; i < currentQuestionScreen.languageCommands.length; i++) {
+					if (command == currentQuestionScreen.languageCommands[i]) {
 						String label = command.getLabel(); // has form language
 						// > mylanguage
 						int sep = label.indexOf(">");
@@ -221,19 +260,31 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 				answer);
 		refreshView();
 	}
+	
+	private void endOfForm() {
+		int counter = FormSummaryController.countUnansweredQuestions(model, true);
+		if (counter > 0) {
+			String txt = "There are unanswered compulsory questions and must be completed first to proceed";
+			J2MEDisplay.showError("Question Required!", txt);
+			showFormSummary();
+		} else {
+			controller.saveAndExit(true);
+		}
+	}
 
 	private void processModelEvent(int event) {
 		int nextEvent = -1;
 		switch (event) {
 		case FormEntryController.EVENT_BEGINNING_OF_FORM:
-			if (goingForward)
+			if (goingForward) {
+				currentGuess = 0;
 				nextEvent = controller.stepToNextEvent();
-			else {
+			} else {
 				viewAnswers();
 			}
 			break;
 		case FormEntryController.EVENT_END_OF_FORM:
-			viewAnswers();
+			endOfForm();
 			break;
 		case FormEntryController.EVENT_REPEAT:
 		case FormEntryController.EVENT_GROUP:
@@ -244,13 +295,17 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 			refreshView();
 			break;
 		case FormEntryController.EVENT_QUESTION:
+			if(currentGuess != -1) {
+				currentGuess += goingForward ? 1 : -1;
+			}
 			refreshView();
 			break;
 		default:
 			break;
 		}
-		if (nextEvent > 0)
+		if (nextEvent > 0) {
 			processModelEvent(nextEvent);
+		}
 	}
 
 	private void answerQuestion() {
@@ -269,35 +324,5 @@ public class SingleQuestionView extends FramedForm implements IFormEntryView,
 					.get("formview.CompulsoryQuestionIncomplete");
 			J2MEDisplay.showError("Question Required", txt);
 		}
-
-	}
-
-	/**
-	 * @param countRequiredOnly
-	 *            if true count only the questions that are unanswered and also
-	 *            required
-	 * @return number of unanswered questions
-	 */
-	public int countUnansweredQuestions(boolean countRequiredOnly) {
-		// TODO - should this include only relevant questions?
-		int counter = 0;
-
-		FormIndex index = FormIndex.createBeginningOfFormIndex();
-		FormDef form = model.getForm();
-		while (!index.isEndOfFormIndex()) {
-			IFormElement element = form.getChild(index);
-			if (element instanceof QuestionDef) {
-				FormEntryPrompt prompt = model.getQuestionPrompt(index);
-				if (countRequiredOnly && prompt.isRequired()
-						&& prompt.getAnswerValue() == null) {
-					counter++;
-				} else if (prompt.getAnswerValue() == null) {
-					counter++;
-				}
-			}
-			index = model.incrementIndex(index);
-		}
-
-		return counter;
 	}
 }

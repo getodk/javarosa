@@ -25,13 +25,13 @@ import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.data.TimeData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeElement;
 import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
 import org.javarosa.core.services.storage.Persistable;
@@ -101,6 +101,7 @@ public class RestoreUtils {
 		case -1: val = null; break;
 		case Constants.DATATYPE_TEXT: val = new StringData((String)data); break;
 		case Constants.DATATYPE_INTEGER: val = new IntegerData((Integer)data); break;
+		case Constants.DATATYPE_LONG: val = new LongData((Long)data); break;
 		case Constants.DATATYPE_DECIMAL: val = new DecimalData((Double)data); break;
 		case Constants.DATATYPE_BOOLEAN: val = new StringData(((Boolean)data).booleanValue() ? "t" : "f"); break;
 		case Constants.DATATYPE_DATE: val = new DateData((Date)data); break;
@@ -121,9 +122,11 @@ public class RestoreUtils {
 		int dataType = -1;
 		if (o instanceof String) {
 			dataType = Constants.DATATYPE_TEXT;
-		} else if (o instanceof Integer || o instanceof Long) {
+		} else if (o instanceof Integer) {
 			dataType = Constants.DATATYPE_INTEGER;
-		} else if (o instanceof Float || o instanceof Double) {
+		} else if (o instanceof Long) {
+			dataType = Constants.DATATYPE_LONG;
+		}  else if (o instanceof Float || o instanceof Double) {
 			dataType = Constants.DATATYPE_DECIMAL;
 		} else if (o instanceof Date) {
 			dataType = Constants.DATATYPE_DATE;
@@ -140,8 +143,10 @@ public class RestoreUtils {
 		int dataType;
 		if (c == String.class) {
 			dataType = Constants.DATATYPE_TEXT;
-		} else if (c == Integer.class || c == Long.class) {
+		} else if (c == Integer.class) {
 			dataType = Constants.DATATYPE_INTEGER;
+		} else if (c == Long.class) {
+			dataType = Constants.DATATYPE_LONG;
 		} else if (c == Float.class || c == Double.class) {
 			dataType = Constants.DATATYPE_DECIMAL;
 		} else if (c == Date.class) {

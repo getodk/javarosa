@@ -20,34 +20,23 @@ import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
-public class NumericQuestionScreen extends SingleQuestionScreen {
-	protected TextField tf;
+public class NumericQuestionScreen extends TextQuestionScreen {
+	
+	IAnswerData template;
 
-	public NumericQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+	public NumericQuestionScreen(FormEntryPrompt prompt, String groupName, Style style, IAnswerData template) {
 		super(prompt,groupName,style);
+		this.template = template;
 	}
 
 	public void createView() {
-		//#style textBox
-		tf = new TextField("", "", 200, TextField.NUMERIC);
-		if (prompt.isRequired())
-			tf.setLabel("*" + prompt.getLongText());
-		else
-			tf.setLabel(prompt.getLongText());
-
-		IAnswerData answerData = prompt.getAnswerValue();
-		if ((answerData != null) && (answerData instanceof IntegerData))
-			tf.setString(((IntegerData) answerData).getDisplayText());
-
-		this.append(tf);
-		this.addNavigationWidgets();
-		if (prompt.getHelpText() != null) {
-			setHint(prompt.getHelpText());
-		}
+		super.createView();
+		tf.setConstraints(TextField.NUMERIC);
 	}
 
 	public IAnswerData getWidgetValue() {
@@ -57,13 +46,16 @@ public class NumericQuestionScreen extends SingleQuestionScreen {
 			return null;
 
 		// check answer integrity
-		int i = -99999;
+		String fallback = "-99999";
 		try {
-			i = Integer.parseInt(s);
+			return template.cast(new UncastData(s));
 		} catch (NumberFormatException nfe) {
 			System.err.println("Non-numeric data in numeric entry field!");
-		}
-		return new IntegerData(i);
+			return template.cast(new UncastData(fallback));
+		} catch (IllegalArgumentException iae) {
+			System.err.println("malformed entry into numeric entry field!");
+			return template.cast(new UncastData(fallback));
+		} 
 	}
 
 }

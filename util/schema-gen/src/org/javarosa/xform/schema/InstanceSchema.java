@@ -110,6 +110,7 @@ public class InstanceSchema {
 				type = "string";
 				break;
 			case Constants.DATATYPE_INTEGER: type = "integer"; break;
+			case Constants.DATATYPE_LONG: type = "long"; break;
 			case Constants.DATATYPE_DECIMAL: type = "decimal"; break;
 			case Constants.DATATYPE_BOOLEAN: type = "boolean"; break;
 			case Constants.DATATYPE_DATE: type = "date"; break;

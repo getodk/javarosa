@@ -4,8 +4,10 @@ import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.QuestionDef;
+import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.formmanager.api.JrFormEntryModel;
 import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledPCommandListener;
 import org.javarosa.j2me.view.J2MEDisplay;
@@ -35,7 +37,7 @@ public class FormSummaryController implements HandledPCommandListener {
 			if (command == view.CMD_EXIT) {
 				transistions.exit();
 			} else if (command == view.CMD_SAVE_EXIT) {
-				int counter = countUnansweredQuestions(true);
+				int counter = countUnansweredQuestions(model,true);
 				if (counter > 0) {
 					String txt = "There are unanswered compulsory questions and must be completed first to proceed";
 					J2MEDisplay.showError("Question Required!", txt);
@@ -54,30 +56,50 @@ public class FormSummaryController implements HandledPCommandListener {
 	 *            required
 	 * @return number of unanswered questions
 	 */
-	public int countUnansweredQuestions(boolean countRequiredOnly) {
-		// TODO - should this include only relevant questions?
+	public static int countUnansweredQuestions(FormEntryModel model, boolean countRequiredOnly) {
+		//ctsims - Made this list only count relevant questions
 		int counter = 0;
-
-		FormIndex index = FormIndex.createBeginningOfFormIndex();
-		FormDef form = model.getForm();
-		while (!index.isEndOfFormIndex()) {
-			IFormElement element = form.getChild(index);
-			if (element instanceof QuestionDef) {
+	
+		for(FormIndex index = model.incrementIndex(FormIndex.createBeginningOfFormIndex());!index.isEndOfFormIndex();index = model.incrementIndex(index)) {
+			if(!model.isIndexRelevant(index)) {
+				continue;
+			}
+			
+			if(model.getEvent(index) == FormEntryController.EVENT_QUESTION) {
 				FormEntryPrompt prompt = model.getQuestionPrompt(index);
-				if (countRequiredOnly) {
-					if (prompt.isRequired() && prompt.getAnswerValue() == null) {
+				if(prompt.getAnswerValue() == null) {
+					if(!countRequiredOnly || prompt.isRequired()) {
 						counter++;
 					}
-				} else if (prompt.getAnswerValue() == null) {
-					counter++;
 				}
 			}
-			index = model.incrementIndex(index);
 		}
-
+	
 		return counter;
 	}
+	
+	/**
+	 * @param model Form entry model to test index against 
+	 * @return number of unanswered questions
+	 */
 
+	public static int countQuestionsToIndex(FormEntryModel model, FormIndex last) {
+		//ctsims - Made this list only count relevant questions
+		int counter = 0;
+	
+		for(FormIndex index = model.incrementIndex(FormIndex.createBeginningOfFormIndex());!index.equals(last);index = model.incrementIndex(index)) {
+			if(!model.isIndexRelevant(index)) {
+				continue;
+			}
+			
+			if(model.getEvent(index) == FormEntryController.EVENT_QUESTION) {
+				counter++;
+			}
+		}
+	
+		return counter;
+	}
+	
 	public void setTransitions(FormSummaryState transitions) {
 		this.transistions = transitions;
 	}
@@ -85,5 +107,4 @@ public class FormSummaryController implements HandledPCommandListener {
 	public void start() {
 		view.show();
 	}
-
 }

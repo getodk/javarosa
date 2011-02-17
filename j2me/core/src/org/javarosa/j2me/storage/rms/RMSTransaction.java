@@ -10,6 +10,7 @@ import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.StorageFullException;
+import org.javarosa.core.util.MathUtils;
 
 /**
  * This class enables basic transactions when writing to RMS -- that is, you can begin a transaction,
@@ -100,7 +101,7 @@ public class RMSTransaction {
 	Hashtable<RMSRec, Integer> tx_records;
 
 	public RMSTransaction () {
-		this.tx_id = new Random().nextInt();
+		this.tx_id = MathUtils.getRand().nextInt();
 		this.tx_records = new Hashtable<RMSRec, Integer>();
 	}
 	

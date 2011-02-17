@@ -17,6 +17,7 @@
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.form.api.FormEntryPrompt;
 
@@ -31,7 +32,6 @@ public class TriggerQuestionScreen extends SingleQuestionScreen {
 	}
 
 	public void createView() {
-		this.setTitle(Localization.get("formentry.triggertitle"));
 		String message = prompt.isRequired() ? "*" +  prompt.getLongText() : prompt.getLongText();
 		//#style textBox
 		display = new StringItem(message,null);
@@ -44,7 +44,6 @@ public class TriggerQuestionScreen extends SingleQuestionScreen {
 	}
 
 	public IAnswerData getWidgetValue() {
-		// TODO Auto-generated method stub
-		return null;
+		return new StringData("OK");
 	}
 }

@@ -20,36 +20,23 @@ import javax.microedition.lcdui.TextField;
 
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Style;
 
-public class DecimalQuestionScreen extends SingleQuestionScreen {
-	protected TextField tf;
+public class DecimalQuestionScreen extends TextQuestionScreen {
+	
+	IAnswerData template;
 
-	public DecimalQuestionScreen(FormEntryPrompt prompt, String groupName, Style style) {
+	public DecimalQuestionScreen(FormEntryPrompt prompt, String groupName, Style style, IAnswerData template) {
 		super(prompt,groupName,style);
+		this.template = template;
 	}
 
 	public void createView() {
-
-		//#style textBox
-		tf = new TextField("", "", 200, TextField.DECIMAL);
-
-		if (prompt.isRequired())
-			tf.setLabel("*" + prompt.getLongText());
-		else
-			tf.setLabel(prompt.getLongText());
-
-		IAnswerData answerData = prompt.getAnswerValue();
-		if ((answerData != null) && (answerData instanceof DecimalData))
-			tf.setString(((DecimalData) answerData).getDisplayText());
-
-		this.append(tf);
-		this.addNavigationWidgets();
-		if (prompt.getHelpText() != null) {
-			setHint(prompt.getHelpText());
-		}
+		super.createView();
+		tf.setConstraints(TextField.DECIMAL);
 	}
 
 	public IAnswerData getWidgetValue() {
@@ -58,15 +45,17 @@ public class DecimalQuestionScreen extends SingleQuestionScreen {
 		if (s == null || s.equals(""))
 			return null;
 
-		double d = -999999999;
+		String def = "-999999999";
 		try {
-			d = Double.parseDouble(s);
+			return template.cast(new UncastData(s));
 
 		} catch (NumberFormatException nfe) {
 			System.err.println("Non-numeric data in numeric entry field!");
-		}
-		return new DecimalData(d);
-
+			return template.cast(new UncastData(def));
+		} catch (IllegalArgumentException iae) {
+			System.err.println("malformed entry into numeric entry field!");
+			return template.cast(new UncastData(def));
+		} 
 	}
 
 }
