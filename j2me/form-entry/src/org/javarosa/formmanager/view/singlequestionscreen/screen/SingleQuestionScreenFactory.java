@@ -4,6 +4,9 @@
 package org.javarosa.formmanager.view.singlequestionscreen.screen;
 
 import org.javarosa.core.model.Constants;
+import org.javarosa.core.model.data.DecimalData;
+import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.LongData;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.formmanager.view.singlequestionscreen.acquire.IAcquiringService;
 
@@ -24,12 +27,13 @@ public class SingleQuestionScreenFactory {
 	 * @param goingForward
 	 *            - i.e. are we going to the next question in the form (rather
 	 *            than the previous one)
+	 * @param quickEntry Whether the UI for entry should be streamlined (auto select/move, etc).
 	 * @return
 	 * @throws IllegalStateException
 	 */
 	public static SingleQuestionScreen getQuestionScreen(
 			FormEntryPrompt prompt, String groupTitle, boolean fromFormView,
-			boolean goingForward) throws IllegalStateException {
+			boolean goingForward, boolean quickEntry) throws IllegalStateException {
 		SingleQuestionScreen screenToReturn = null;
 		int qType = prompt.getDataType();
 		int contType = prompt.getControlType();
@@ -61,12 +65,17 @@ public class SingleQuestionScreenFactory {
 				break;
 			case Constants.DATATYPE_INTEGER:
 				screenToReturn = new NumericQuestionScreen(prompt, groupTitle,
-						style);
+						style, new IntegerData());
+
+				break;
+			case Constants.DATATYPE_LONG:
+				screenToReturn = new DecimalQuestionScreen(prompt, groupTitle,
+						style, new LongData());
 
 				break;
 			case Constants.DATATYPE_DECIMAL:
 				screenToReturn = new DecimalQuestionScreen(prompt, groupTitle,
-						style);
+						style, new DecimalData());
 
 				break;
 
@@ -88,8 +97,7 @@ public class SingleQuestionScreenFactory {
 			break;
 
 		case Constants.CONTROL_SELECT_ONE:
-			screenToReturn = new SelectOneQuestionScreen(prompt, groupTitle,
-					style);
+			screenToReturn = new SelectOneQuestionScreen(prompt, groupTitle,style, quickEntry);
 			break;
 
 		case Constants.CONTROL_SELECT_MULTI:

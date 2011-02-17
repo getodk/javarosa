@@ -27,6 +27,7 @@ import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.SelectMultiData;
 import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.StringData;
@@ -197,6 +198,8 @@ public class XPathPathExpr extends XPathExpression {
 			return val.getValue();
 		} else if (val instanceof IntegerData) {
 			return new Double(((Integer)val.getValue()).doubleValue());
+		} else if (val instanceof LongData) {
+			return new Double(((Long)val.getValue()).doubleValue());	
 		} else if (val instanceof DecimalData) {
 			return val.getValue();			
 		} else if (val instanceof StringData) {

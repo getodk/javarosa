@@ -19,6 +19,7 @@ package org.javarosa.formmanager.view.chatterbox.widget;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.UncastData;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import de.enough.polish.ui.Item;
@@ -26,14 +27,16 @@ import de.enough.polish.ui.TextField;
 
 public class NumericEntryWidget extends TextEntryWidget {
 	private boolean isDecimal;
+	IAnswerData template;
 	
 	public NumericEntryWidget() {
-		this(false);
+		this(false, new IntegerData());
 	}
 	
-	public NumericEntryWidget(boolean dec) {
+	public NumericEntryWidget(boolean dec, IAnswerData template) {
 		super();
 		this.isDecimal = dec;
+		this.template = template;
 	}
 	
 	protected Item getEntryWidget (FormEntryPrompt prompt) {
@@ -45,39 +48,25 @@ public class NumericEntryWidget extends TextEntryWidget {
 	}
 
 	protected void setWidgetValue (Object o) {
-		if(this.isDecimal)
-			super.setWidgetValue(((Double)o).toString());
-		else
-			super.setWidgetValue(((Integer)o).toString());
+		template.setValue(o);
+		super.setWidgetValue(template.uncast().getString());
 	}
 	
 	protected IAnswerData getWidgetValue () {
 		String s = textField().getString();
 		
-		if (s == null || s.equals(""))
+		if (s == null || s.equals("")) {
 			return null;
-		
-		double d = -999999999;
-		int i = -99999;
+		}
 		try {
-			if(this.isDecimal)
-				d = Double.parseDouble(s);
-			else
-				i = Integer.parseInt(s);
+			return template.cast(new UncastData(s));
 		} catch (NumberFormatException nfe) {
 			System.err.println("Non-numeric data in numeric entry field!");
+			return template.cast(new UncastData("-999999"));
 		}
-		if(this.isDecimal)
-			return new DecimalData(d);
-		else
-			return new IntegerData(i);
 	}
 	
 	protected IAnswerData getAnswerTemplate() {
-		if(this.isDecimal) {
-			return new DecimalData();
-		} else {
-			return new IntegerData();
-		}
+		return template;
 	}
 }

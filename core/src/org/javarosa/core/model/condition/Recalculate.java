@@ -26,6 +26,7 @@ import org.javarosa.core.model.data.DateTimeData;
 import org.javarosa.core.model.data.DecimalData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.data.IntegerData;
+import org.javarosa.core.model.data.LongData;
 import org.javarosa.core.model.data.StringData;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
@@ -112,8 +113,10 @@ public class Recalculate extends Triggerable {
 		} else if (val instanceof Double) {
 			double d = ((Double)val).doubleValue();
 			boolean isIntegral = Math.abs(d - (int)d) < 1.0e-9;			
-			if(Constants.DATATYPE_INTEGER == dataType || isIntegral) {
+			if(Constants.DATATYPE_INTEGER == dataType) {
 				return new IntegerData((int)d);
+			} else if(Constants.DATATYPE_LONG == dataType || isIntegral) {
+				return new LongData((long)d);
 			} else {
 				return new DecimalData(d);
 			}

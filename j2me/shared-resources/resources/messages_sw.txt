@@ -105,8 +105,7 @@ title.FormsList=Forms List
 title.Login=Login
 title.SavedForms=Saved Forms
 
-chatterbox.button.next=Endelea
-button.Next=VOLGENDE
+button.Next=Endelea
 
 question.SendNow=Send data now?
 
@@ -274,8 +273,6 @@ command.exit=Toka
 command.saveexit=Hifadhi na toka
 command.save=Hifadhi
 command.language=Lugha
-
-chatterbox.button.trigger=Sawa
 
 entity.command.sort=Panga
 entity.find=Tafuta: 

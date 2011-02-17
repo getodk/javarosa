@@ -27,7 +27,7 @@ public class WidgetEscapeComponent implements IWidgetComponentWrapper {
 	
 	public WidgetEscapeComponent() {
 		//#style button
-		 nextItem = new StringItem(null,Localization.get("chatterbox.button.next"),Item.BUTTON);
+		 nextItem = new StringItem(null,Localization.get("button.Next"),Item.BUTTON);
 	}
 
 	public void init() {

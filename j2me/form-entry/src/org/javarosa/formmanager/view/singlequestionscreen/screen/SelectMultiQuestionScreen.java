@@ -56,7 +56,7 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 		IAnswerData data = this.prompt.getAnswerValue();
 		Vector<Selection> selected = null;
 		if(data != null) {
-			selected = (Vector<Selection>)data;
+			selected = (Vector<Selection>)new SelectMultiData().cast(data.uncast()).getValue();
 		}
 		while (itr.hasMoreElements()) {
 			SelectChoice choice = (SelectChoice)itr.nextElement();
@@ -91,6 +91,8 @@ public class SelectMultiQuestionScreen extends SingleQuestionScreen {
 			}
 		}
 
-		return (vs.size() == 0 ? null : new SelectMultiData(vs));
+		//ctsims: 1/28/2011: An empty select multidata is a valid return 
+		//format, and shouln't be confused with null.
+		return new SelectMultiData(vs);
 	}
 }

@@ -26,11 +26,10 @@ import de.enough.polish.ui.StyleSheet;
 public class FormSummaryView extends List {
 	private FormEntryModel model;
 
-	public final Command CMD_EXIT = new Command(Localization.get("menu.Exit"),
-			Command.EXIT, 4);
-	public final Command CMD_SAVE_EXIT = new Command(Localization
-			.get("menu.SaveAndExit"), Command.SCREEN, 4);
-
+	public final Command CMD_EXIT = new Command(Localization.get("menu.Exit"), Command.SCREEN, 2);
+	
+	public final Command CMD_SAVE_EXIT = new Command(Localization.get("menu.SaveAndExit"), Command.SCREEN, 1);
+	
 	private Entry[] entries;
 
 	static class Entry extends ChoiceItem {
@@ -50,7 +49,7 @@ public class FormSummaryView extends List {
 		createView();
 
 		addCommand(CMD_EXIT);
-
+		
 		// TODO: handle readonly
 		if (true) {
 			addCommand(CMD_SAVE_EXIT);
@@ -73,8 +72,7 @@ public class FormSummaryView extends List {
 					FormEntryPrompt prompt = model.getQuestionPrompt(index);
 					text = getText(prompt);
 				} else if (model.getEvent(index) == FormEntryController.EVENT_PROMPT_NEW_REPEAT) {
-					FormEntryCaption[] hierachy = model
-							.getCaptionHierarchy(index);
+					FormEntryCaption[] hierachy = model.getCaptionHierarchy(index);
 					text = "Add "
 							+ (index.getElementMultiplicity() == 0 ? "a "
 									: "another ")
@@ -97,7 +95,9 @@ public class FormSummaryView extends List {
 					String spacer="";
 					int i = isHeader?-1:0;
 					while (i < index.getDepth() - 2) {
-						spacer = "――" + spacer;
+						//ctsims : Huh?
+						//spacer = "――" + spacer;
+						spacer = "> > " + spacer;
 						i++;
 					}
 					text=img==null?spacer+text:text;
@@ -120,13 +120,12 @@ public class FormSummaryView extends List {
 
 	private String getText(FormEntryPrompt prompt) {
 		String line = "";
-		line += prompt.getLongText() + " => ";
+		line += prompt.getShortText() + " => ";
 		if (prompt.isRequired() && prompt.getAnswerValue() == null) {
 			line = "*" + line;
 		}
-		IAnswerData answerValue = prompt.getAnswerValue();
-		if (answerValue != null) {
-			line += answerValue.getDisplayText();
+		if (prompt.getAnswerValue() != null) {
+			line += prompt.getAnswerText();
 		}
 
 		return line;
@@ -135,12 +134,16 @@ public class FormSummaryView extends List {
 	private String getHeaderText(FormEntryCaption[] hierachy) {
 		String headertext = "";
 		for (FormEntryCaption caption : hierachy) {
-			headertext += caption.getLongText();
-
-			if (caption.getIndex().getInstanceIndex() > -1)
-				headertext += " " + (caption.getMultiplicity() + 1);
-
-			headertext += ": ";
+			String c = caption.getLongText();
+			if(c != null) {
+				headertext += c;
+	
+				if (caption.getIndex().getInstanceIndex() > -1) {
+					headertext += " " + (caption.getMultiplicity() + 1);
+				}
+	
+				headertext += ": ";
+			}
 		}
 		if (headertext.endsWith(": "))
 			headertext = headertext.substring(0, headertext.length() - 2);
