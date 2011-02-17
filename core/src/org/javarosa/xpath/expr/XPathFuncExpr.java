@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Random;
 import java.util.Vector;
 
 import me.regexp.RE;
@@ -187,6 +186,8 @@ public class XPathFuncExpr extends XPathExpression {
 			} else {
 				return join(argVals[0], subsetArgList(argVals, 1));
 			}
+		} else if (name.equals("substr") && (args.length == 2 || args.length == 3)) {
+			return substring(argVals[0], argVals[1], args.length == 3 ? argVals[2] : null);
 		} else if (name.equals("checklist") && args.length >= 2) { //non-standard
 			if (args.length == 3 && argVals[2] instanceof XPathNodeset) {
 				return checklist(argVals[0], argVals[1], ((XPathNodeset)argVals[2]).toArgList());
@@ -629,6 +630,24 @@ public class XPathFuncExpr extends XPathExpression {
 		}
 		
 		return sb.toString();
+	}
+	
+	public static String substring (Object o1, Object o2, Object o3) {
+		String s = toString(o1);
+		int start = toInt(o2).intValue();
+		int end = (o3 != null ? toInt(o3).intValue() : 9999);
+		int len = s.length();
+		
+		if (start < 0) {
+			start = len - start;
+		}
+		if (end < 0) {
+			end = len - end;
+		}
+		start = Math.max(0, start);
+		end = Math.min(len, end);
+		
+		return (start <= end ? s.substring(start, end) : "");
 	}
 	
 	/**
