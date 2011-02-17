@@ -32,6 +32,7 @@ import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.MathUtils;
+import org.javarosa.core.util.PropertyUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapListPoly;
@@ -57,8 +58,6 @@ public class XPathFuncExpr extends XPathExpression {
 	public XPathExpression[] args;	//argument list
 
 	public XPathFuncExpr () { } //for deserialization
-	
-	private Random r = new Random();
 	
 	public XPathFuncExpr (XPathQName id, XPathExpression[] args) {
 		this.id = id;
@@ -211,7 +210,11 @@ public class XPathFuncExpr extends XPathExpression {
 			return argVals[0];
 		} else if (name.equals("random") && args.length == 0) { //non-standard
 			//calculated expressions may be recomputed w/o warning! use with caution!!
-			return new Double(r.nextDouble());
+			return new Double(MathUtils.getRand().nextDouble());
+		} else if (name.equals("uuid") && (args.length == 0 || args.length == 1)) { //non-standard
+			//calculated expressions may be recomputed w/o warning! use with caution!!
+			int len = (args.length == 1 ? toInt(argVals[0]).intValue() : 25);			
+			return PropertyUtils.genGUID(len);
 		} else {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);

@@ -41,12 +41,9 @@ public class PropertyUtils {
 	
 	public static String genGUID(int len) {
 		String guid = "";
-		Random r = new Random();
-
 		for (int i = 0; i < len; i++) { // 25 == 128 bits of entropy
-			guid += Integer.toString(r.nextInt(36), 36);
+			guid += Integer.toString(MathUtils.getRand().nextInt(36), 36);
 		}
-
 		return guid.toUpperCase();
 	}
 	
