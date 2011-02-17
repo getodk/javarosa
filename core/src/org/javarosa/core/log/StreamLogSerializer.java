@@ -5,7 +5,6 @@ package org.javarosa.core.log;
 
 import java.io.IOException;
 
-import org.javarosa.core.services.Logger;
 import org.javarosa.core.util.SortedIntSet;
 
 /**
