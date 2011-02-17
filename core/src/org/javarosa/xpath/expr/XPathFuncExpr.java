@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.Vector;
 
 import me.regexp.RE;
@@ -56,6 +57,8 @@ public class XPathFuncExpr extends XPathExpression {
 	public XPathExpression[] args;	//argument list
 
 	public XPathFuncExpr () { } //for deserialization
+	
+	private Random r = new Random();
 	
 	public XPathFuncExpr (XPathQName id, XPathExpression[] args) {
 		this.id = id;
@@ -206,6 +209,9 @@ public class XPathFuncExpr extends XPathExpression {
 			return regex(argVals[0], argVals[1]);
 		} else if (name.equals("depend") && args.length >= 1) { //non-standard
 			return argVals[0];
+		} else if (name.equals("random") && args.length == 0) { //non-standard
+			//calculated expressions may be recomputed w/o warning! use with caution!!
+			return new Double(r.nextDouble());
 		} else {
 			//check for custom handler
 			IFunctionHandler handler = (IFunctionHandler)funcHandlers.get(name);
