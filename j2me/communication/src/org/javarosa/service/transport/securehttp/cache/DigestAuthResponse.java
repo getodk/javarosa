@@ -10,6 +10,7 @@ import java.util.Random;
 
 import org.javarosa.core.util.MD5;
 import org.javarosa.core.util.MD5InputStream;
+import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.OrderedHashtable;
 import org.javarosa.service.transport.securehttp.AuthUtils;
 import org.javarosa.service.transport.securehttp.AuthenticatedHttpTransportMessage;
@@ -138,7 +139,7 @@ public class DigestAuthResponse implements AuthCacheRecord {
 	
 	private String getClientNonce() {
 		if(!parameters.contains("cnonce")) {
-			Random r = new Random();
+			Random r = MathUtils.getRand();
 			byte[] b = new byte[8];
 			for(int i = 0; i < b.length ; ++i) {
 				b[i] = (byte)r.nextInt(256);
