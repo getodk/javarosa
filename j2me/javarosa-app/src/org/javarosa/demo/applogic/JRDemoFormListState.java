@@ -46,7 +46,7 @@ public class JRDemoFormListState implements JRDemoFormListTransitions, State {
 				new JRDemoFormListState().start();
 			}
 
-			public void userAdded(User newUser) {
+			public void userCreated(User newUser) {
 				new JRDemoFormListState().start();
 			}
 		}.start();
