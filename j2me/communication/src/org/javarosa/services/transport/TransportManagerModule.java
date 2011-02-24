@@ -35,14 +35,10 @@ public class TransportManagerModule implements IModule {
 		//# String[] prototypes = new String[] { SimpleHttpTransportMessage.class.getName(), TransportMessageSerializationWrapper.class.getName()};
 		//#endif
 		
-		PrototypeManager.registerPrototypes(prototypes);
-		IStorageFactory f = new IStorageFactory () {
-			public IStorageUtility newStorage(String name, Class type) {
-				return new RMSStorageUtilityIndexed(name, type);
-			}
-		} ;
-		StorageManager.registerStorage(TransportMessageStore.Q_STORENAME, new WrappingStorageUtility(TransportMessageStore.Q_STORENAME,new TransportMessageSerializationWrapper(),f));
-		StorageManager.registerStorage(TransportMessageStore.RECENTLY_SENT_STORENAME, new WrappingStorageUtility(TransportMessageStore.RECENTLY_SENT_STORENAME,new TransportMessageSerializationWrapper(),f));
+		PrototypeManager.registerPrototypes(prototypes);	
+		
+		StorageManager.registerWrappedStorage(TransportMessageStore.Q_STORENAME, TransportMessageStore.Q_STORENAME, new TransportMessageSerializationWrapper());
+		StorageManager.registerWrappedStorage(TransportMessageStore.RECENTLY_SENT_STORENAME, TransportMessageStore.RECENTLY_SENT_STORENAME, new TransportMessageSerializationWrapper());
 		ReferenceManager._().addReferenceFactory(new HttpRoot());
 		TransportService.init();
 	}

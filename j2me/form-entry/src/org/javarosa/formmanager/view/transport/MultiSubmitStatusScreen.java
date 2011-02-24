@@ -43,6 +43,9 @@ import org.javarosa.services.transport.impl.TransportMessageStatus;
  */
 public class MultiSubmitStatusScreen extends Form implements
 		ISubmitStatusObserver, HandledCommandListener {
+	
+	
+	//TODO: If this screen gets closed, messages need to continue getting processed! Right now this won't happen!
 
 	private static final int REFRESH_INTERVAL = 1000;
 	private static final int TIMEOUT = 180000;

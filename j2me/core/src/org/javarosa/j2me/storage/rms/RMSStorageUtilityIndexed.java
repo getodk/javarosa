@@ -13,6 +13,7 @@ import org.javarosa.core.services.storage.StorageFullException;
 import org.javarosa.core.util.InvalidIndexException;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.j2me.storage.rms.raw.RMSFactory;
 
 /* TEMPORARY / EXPERIMENTAL */
 
@@ -27,8 +28,8 @@ public class RMSStorageUtilityIndexed extends RMSStorageUtility implements IStor
 		init(type);
 	}
 
-	public RMSStorageUtilityIndexed (String basename, Class type, boolean allocateIDs) {
-		super(basename, type, allocateIDs);
+	public RMSStorageUtilityIndexed (String basename, Class type, boolean allocateIDs, RMSFactory factory) {
+		super(basename, type, allocateIDs, factory);
 		init(type);
 	}
 

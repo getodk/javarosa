@@ -32,6 +32,7 @@ import org.javarosa.core.services.storage.Persistable;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.j2me.storage.rms.Secure;
 
 /**
  * A patient referral is a persistent record associated with a patient.
@@ -43,7 +44,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
  * @date Jan 23, 2009 
  *
  */
-public class PatientReferral implements Persistable, Restorable, IMetaData {
+public class PatientReferral implements Persistable, Restorable, IMetaData, Secure {
 	public static final String STORAGE_KEY = "PAT_REFERRAL";
 	
 	private String type;

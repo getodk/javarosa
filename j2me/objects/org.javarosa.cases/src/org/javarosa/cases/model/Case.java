@@ -42,6 +42,7 @@ import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapMapPoly;
 import org.javarosa.core.util.externalizable.ExtWrapNullable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.j2me.storage.rms.Secure;
 import org.javarosa.xform.util.XFormAnswerDataParser;
 
 /**
@@ -53,7 +54,7 @@ import org.javarosa.xform.util.XFormAnswerDataParser;
  * @date Mar 19, 2009 
  *
  */
-public class Case implements Persistable, Restorable, IMetaData {
+public class Case implements Persistable, Restorable, IMetaData, Secure {
 	public static String STORAGE_KEY = "CASE";
 	
 	private String typeId;
