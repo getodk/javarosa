@@ -27,6 +27,10 @@
 		<exclude name="j2me/deprecated/org.javarosa.reminders/**/*.java"/>
 		<exclude name="j2me/communication/src/org/javarosa/communication/sms/trigger/**/*.java"/>
 
+		
+		<!-- Exclude BouncyCastle test sources -->
+		<exclude name="j2me/crypto/src/**/test/*.java"/>
+		<exclude name="j2me/crypto/src/**/examples/*.java"/>
 	</fileset>
 
 	<target name="package" depends="clean,init-libs,fetchPolishClassList">
@@ -148,6 +152,8 @@
 			<src path="../../j2me"/>
 
 			<include name="**/test**/*.java"/>
+			
+			<exclude name="crypto/src/**/test/*.java"/>
 		</javac>
 	</target>
 
