@@ -3,5 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/j2me-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/javarosa-core"/>
+	<classpathentry kind="lib" path="/javarosa-libs/bouncycastle-lw.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
