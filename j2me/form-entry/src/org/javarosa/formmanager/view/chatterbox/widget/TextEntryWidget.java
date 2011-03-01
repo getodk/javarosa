@@ -71,7 +71,7 @@ public class TextEntryWidget extends ExpandedWidget {
 			prompt.requestConstraintHint(hint);
 			
 			StringData maxexample = hint.getMax();
-			if(maxexample.getValue() != null) {
+			if(maxexample != null) {
 				int length = ((String)maxexample.getValue()).length();
 				if(!hint.isMaxInclusive()) {
 					length = -1;
