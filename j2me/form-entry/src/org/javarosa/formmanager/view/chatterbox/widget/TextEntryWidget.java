@@ -72,7 +72,11 @@ public class TextEntryWidget extends ExpandedWidget {
 			
 			StringData maxexample = hint.getMax();
 			if(maxexample.getValue() != null) {
-				textField.setMaxSize(((String)maxexample.getValue()).length());
+				int length = ((String)maxexample.getValue()).length();
+				if(!hint.isMaxInclusive()) {
+					length = -1;
+				}
+				textField.setMaxSize(length);
 			}
 		} catch (UnpivotableExpressionException e) {
 			// No big deal
