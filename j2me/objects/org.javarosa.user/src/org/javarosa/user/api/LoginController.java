@@ -83,7 +83,7 @@ public class LoginController implements HandledCommandListener {
 			transitions.exit();
 		} else if (c == LoginForm.CMD_LOGIN_BUTTON) {
 			if (this.view.validateUser()) {
-				transitions.loggedIn(view.getLoggedInUser());
+				transitions.loggedIn(view.getLoggedInUser(), view.getPassWord());
 				return;
 			}
 			performCustomUserValidation();
@@ -100,7 +100,7 @@ public class LoginController implements HandledCommandListener {
 			// username also!
 			u.setUserType(User.DEMO_USER);
 			u.setUuid(User.DEMO_USER);
-			transitions.loggedIn(u);
+			transitions.loggedIn(u, null);
 		}
 		//#endif
 	}
