@@ -31,7 +31,6 @@ import org.javarosa.resources.locale.LanguageUtils;
 import org.javarosa.services.transport.SubmissionTransportHelper;
 import org.javarosa.services.transport.TransportManagerModule;
 import org.javarosa.services.transport.TransportMessage;
-import org.javarosa.services.transport.impl.simplehttp.SimpleHttpTransportMessage;
 import org.javarosa.user.activity.UserModule;
 import org.javarosa.user.model.User;
 import org.javarosa.user.utility.UserUtility;

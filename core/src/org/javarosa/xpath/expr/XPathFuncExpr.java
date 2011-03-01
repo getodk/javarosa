@@ -28,7 +28,9 @@ import me.regexp.RE;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
+import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.util.MathUtils;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -185,6 +187,8 @@ public class XPathFuncExpr extends XPathExpression {
 			} else {
 				return join(argVals[0], subsetArgList(argVals, 1));
 			}
+		} else if (name.equals("string-length") && args.length == 1) {
+			return stringLength(argVals[0]);
 		} else if (name.equals("checklist") && args.length >= 2) { //non-standard
 			if (args.length == 3 && argVals[2] instanceof XPathNodeset) {
 				return checklist(argVals[0], argVals[1], ((XPathNodeset)argVals[2]).toArgList());
@@ -321,6 +325,14 @@ public class XPathFuncExpr extends XPathExpression {
 		} else {
 			return false;
 		}
+	}
+	
+	public static Double stringLength (Object o) {
+		String s = toString(o);
+		if(s == null) {
+			return new Double(0.0);
+		}
+		return new Double(s.length());
 	}
 	
 	/**
@@ -727,4 +739,62 @@ public class XPathFuncExpr extends XPathExpression {
 			return o;
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+		String name = id.toString();
+		
+		//for now we'll assume that all that functions do is return the composition of their components
+		Object[] argVals = new Object[args.length];
+		
+		
+		//Identify whether this function is an identity: IE: can reflect back the pivot sentinal with no modification
+		String[] identities = new String[] {"string-length"}; 
+		boolean id = false;
+		for(String identity : identities) {
+			if(identity.equals(name)) {
+				id = true;
+			}
+		}
+		
+		//get each argument's pivot
+		for (int i = 0; i < args.length; i++) {
+			argVals[i] = args[i].pivot(model, evalContext, pivots, sentinal);
+		}
+		
+		boolean pivoted = false;
+		//evaluate the pivots
+		for(int i = 0 ; i < argVals.length; ++i) {
+			if(argVals[i] == null) {
+				//one of our arguments contained pivots,  
+				pivoted = true;
+			} else if(sentinal.equals(argVals[i])) {
+				//one of our arguments is the sentinal, return the sentinal if possible
+				if(id) {
+					return sentinal;
+				} else {
+					//This function modifies the sentinal in a way that makes it impossible to capture
+					//the pivot.
+					throw new UnpivotableExpressionException();
+				}
+			}
+		}
+		
+		if(pivoted) {
+			if(id) {
+				return null;
+			} else {
+				//This function modifies the sentinal in a way that makes it impossible to capture
+				//the pivot.
+				throw new UnpivotableExpressionException();
+			}
+		}
+		
+		//TODO: Inner eval here with eval'd args to improve speed
+		return eval(model, evalContext);
+		
+	}
+
 }
