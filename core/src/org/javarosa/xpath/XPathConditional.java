@@ -24,6 +24,7 @@ import java.util.Vector;
 import org.javarosa.core.log.FatalException;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IConditionExpr;
+import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.FormInstance;
 import org.javarosa.core.model.instance.TreeReference;
 import org.javarosa.core.util.externalizable.DeserializationException;
@@ -127,5 +128,9 @@ public class XPathConditional implements IConditionExpr {
 	
 	public String toString () {
 		return "xpath[" + expr.toString() + "]";
+	}
+
+	public Vector<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
+		return expr.pivot(model, evalContext);
 	}
 }
