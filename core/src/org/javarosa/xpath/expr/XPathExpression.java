@@ -33,6 +33,19 @@ public abstract class XPathExpression implements Externalizable {
 		return pivots;
 	}
 	
+	/**
+	 * Pivot this expression, returning values if appropriate, and adding any pivots to the list. 
+	 * 
+	 * @param model The model to evaluate the current expression against
+	 * @param evalContext The evaluation context to evaluate against
+	 * @param pivots The list of pivot points in the xpath being evaluated. Pivots should be added to this list.
+	 * @param sentinal The value which is being pivoted around.
+	 * @return 
+	 *          null - If a pivot was identified in this expression
+	 *          sentinal - If the current expression represents the sentinal being pivoted
+	 *          any other value - The result of the expression if no pivots are detected
+	 * @throws UnpivotableExpressionException If the expression is too complex to pivot
+	 */
 	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
 		return eval(model,evalContext);
 	}

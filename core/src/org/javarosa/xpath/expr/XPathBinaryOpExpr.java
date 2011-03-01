@@ -63,17 +63,21 @@ public abstract class XPathBinaryOpExpr extends XPathOpExpr {
 	}
 	
 	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+		//Pivot both args
 		Object aval = a.pivot(model, evalContext, pivots, sentinal);
 		Object bval = b.pivot(model, evalContext, pivots, sentinal);
 		
+		//If either is the sentinal, we don't have a good way to represent the resulting expression, so fail
 		if(aval == sentinal || bval == sentinal) {
 			throw new UnpivotableExpressionException();
 		}
 		
+		//If either has added a pivot, this expression can't produce any more pivots, so signal that
 		if(aval == null || bval == null) {
 			return null;
 		}
 		
+		//Otherwise, return the value
 		return this.eval(model, evalContext);
 	}
 }
