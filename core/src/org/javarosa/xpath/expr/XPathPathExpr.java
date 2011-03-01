@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.javarosa.core.model.condition.EvaluationContext;
+import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.data.BooleanData;
 import org.javarosa.core.model.data.DateData;
 import org.javarosa.core.model.data.DecimalData;
@@ -289,5 +290,16 @@ public class XPathPathExpr extends XPathExpression {
 			}
 		}
 		return path;
+	}
+	
+	public Object pivot (FormInstance model, EvaluationContext evalContext, Vector<Object> pivots, Object sentinal) throws UnpivotableExpressionException {
+		TreeReference ref = this.getReference();
+		//Either concretely the sentinal, or "."
+		if(ref.equals(sentinal) || (ref.getRefLevel() == 0)) {
+			return sentinal;
+		}
+		else { 
+			return this.eval(model, evalContext);
+		}
 	}
 }
