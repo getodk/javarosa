@@ -15,7 +15,7 @@ public class JRDemoLoginState extends LoginState {
 		JRDemoUtil.exit();
 	}
 
-	public void loggedIn(User u) {
+	public void loggedIn(User u, String password) {
 		JRDemoContext._().setUser(u);
 		new JRDemoFormListState().start();
 	}
