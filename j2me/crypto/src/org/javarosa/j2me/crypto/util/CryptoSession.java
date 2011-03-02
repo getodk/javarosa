@@ -89,8 +89,7 @@ public final class CryptoSession {
 	public final BufferedBlockCipher getEncrypter() {		
 		if(inMemorySecretKey == null) { throw new RuntimeException("Secure encrypter requested before session is logged in"); }
 		
-		BlockCipher engine = new AESEngine();
-		BufferedBlockCipher encrypter = new CTSBlockCipher(new CBCBlockCipher(engine));
+		BufferedBlockCipher encrypter = CryptUtil.getAesCtsCipher();
 		
 		encrypter.init(true, new KeyParameter(inMemorySecretKey));
 		
@@ -105,8 +104,7 @@ public final class CryptoSession {
 	public final BufferedBlockCipher getDecrypter() {
 		if(inMemorySecretKey == null) { throw new RuntimeException("Secure decrypter requested before session is logged in"); } 
 		
-		BlockCipher engine = new AESEngine();
-		BufferedBlockCipher decrypter = new CTSBlockCipher(new CBCBlockCipher(engine));
+		BufferedBlockCipher decrypter = CryptUtil.getAesCtsCipher();
 		
 		decrypter.init(false, new KeyParameter(inMemorySecretKey));
 		

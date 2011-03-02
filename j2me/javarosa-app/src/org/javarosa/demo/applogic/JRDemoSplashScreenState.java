@@ -15,7 +15,7 @@ public class JRDemoSplashScreenState extends SplashScreenState {
 //		new JRDemoLanguageSelectState().start();
 
 		//#if javarosa.dev.shortcuts
-		new JRDemoLoginState().loggedIn(UserUtility.demoUser(true));
+		new JRDemoLoginState().loggedIn(UserUtility.demoUser(true), null);
 		//#else
 		new JRDemoLoginState().start();
 		//#endif

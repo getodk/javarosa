@@ -53,23 +53,7 @@ public class CryptUtil {
 		}
 
 	}
-	
-	public static byte[] process(byte[] input, BufferedBlockCipher cipher) {
-		
-		byte[] cipherText = new byte[cipher.getOutputSize(input.length)];
-		
-		int outputLen = cipher.processBytes(input, 0, input.length, cipherText, 0);
-		
-		try {
-			cipher.doFinal(cipherText, outputLen);
-		} catch(CryptoException e) {
-			Logger.die("process", e);
-		}
-		
-		return cipherText;
-	}
 
-	
 	public static byte[] decrypt(byte[] input, BufferedBlockCipher cipher) {
 		
 		synchronized(cipher) {
@@ -113,11 +97,11 @@ public class CryptUtil {
 		PBEParametersGenerator generator = new PKCS5S2ParametersGenerator();
 		generator.init(PBEParametersGenerator.PKCS5PasswordToBytes(password.toCharArray()), tempsalt, 5);
 		
-		BlockCipher engine = new AESEngine();
-		BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(engine));
+		//Technically we probably shouldn't need a CTS cipher here, but it's fine to be consistent
+		BufferedBlockCipher cipher = CryptUtil.getAesCtsCipher();
 		cipher.init(true, generator.generateDerivedParameters(PBE_KEY_SIZE));
 		
-		byte[] wrapped = process(secretKey, cipher);
+		byte[] wrapped = encrypt(secretKey, cipher);
 		return wrapped;
 	}
 	
@@ -126,11 +110,16 @@ public class CryptUtil {
 		PBEParametersGenerator generator = new PKCS5S2ParametersGenerator();
 		generator.init(PBEParametersGenerator.PKCS5PasswordToBytes(password.toCharArray()), tempsalt, 5);
 		
-		BlockCipher engine = new AESEngine();
-		BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(engine));
+		//Technically we probably shouldn't need a CTS cipher here, but it's fine to be consistent
+		BufferedBlockCipher cipher = CryptUtil.getAesCtsCipher();
 		cipher.init(false, generator.generateDerivedParameters(PBE_KEY_SIZE));
 		
-		byte[] unWrapped = process(wrapped, cipher);
+		byte[] unWrapped = decrypt(wrapped, cipher);
 		return unWrapped;
+	}
+
+	public static BufferedBlockCipher getAesCtsCipher() {
+		BlockCipher engine = new AESEngine();
+		return new CTSBlockCipher(new CBCBlockCipher(engine));
 	}
 }
