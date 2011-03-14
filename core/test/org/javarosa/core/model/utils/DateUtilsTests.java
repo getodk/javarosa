@@ -21,11 +21,15 @@ import j2meunit.framework.TestCase;
 import j2meunit.framework.TestMethod;
 import j2meunit.framework.TestSuite;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
+
+import org.javarosa.core.model.utils.DateUtils.DateFields;
 
 public class DateUtilsTests extends TestCase {
 	
-	private static int NUM_TESTS = 4;
+	private static int NUM_TESTS = 5;
 	
 	Date currentTime;
 	Date minusOneHour;
@@ -76,7 +80,8 @@ public class DateUtilsTests extends TestCase {
 		case 1: testGetXMLStringValueFormat(); break;
 		case 2: testSetDates(); break;
 		case 3: testNullDates(); break;
-		
+		case 4: testTimeParses(); break;
+		case 5: testParity(); break;
 		}
 	}
 	
@@ -114,6 +119,140 @@ public class DateUtilsTests extends TestCase {
 	private void testSetDates() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void testTimeParses() {
+		//This is all kind of tricky. We need to assume J2ME level compliance, so
+		//dates won't every be assumed to have an intrinsic timezone, they'll be
+		//assumed to be in the phone's default timezone
+		
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+		
+		testTime("10:00", 1000*60*60*10);
+		testTime("10:00Z", 1000*60*60*10);
+		
+		testTime("10:00+02", 1000*60*60*8);
+		testTime("10:00-02", 1000*60*60*12);
+		
+		testTime("10:00+02:30", 1000*60*6*75);
+		testTime("10:00-02:30", 1000*60*6*125);
+		
+		TimeZone offsetTwoHours = TimeZone.getTimeZone("GMT+02");
+		
+		TimeZone.setDefault(offsetTwoHours);
+		
+		testTime("10:00", 1000*60*60*10);
+		testTime("10:00Z", 1000*60*60*12);
+		
+		testTime("10:00+02", 1000*60*60*10);
+		testTime("10:00-02", 1000*60*60*14);
+		
+		testTime("10:00+02:30", 1000*60*6*95);
+		testTime("10:00-02:30", 1000*60*6*145);
+
+		TimeZone offsetMinusTwoHours = TimeZone.getTimeZone("GMT-02");
+		
+		TimeZone.setDefault(offsetMinusTwoHours);
+		
+		testTime("14:00", 1000*60*60*14);
+		testTime("14:00Z", 1000*60*60*12);
+		
+		testTime("14:00+02", 1000*60*60*10);
+		testTime("14:00-02", 1000*60*60*14);
+		
+		testTime("14:00+02:30", 1000*60*6*95);
+		testTime("14:00-02:30", 1000*60*6*145);
+
+
+		TimeZone offsetPlusHalf = TimeZone.getTimeZone("GMT+0230");
+		
+		TimeZone.setDefault(offsetPlusHalf);
+		
+		testTime("14:00", 1000*60*6*140);
+		testTime("14:00Z", 1000*60*6*165);
+		
+		testTime("14:00+02", 1000*60*6*145);
+		testTime("14:00-02", 1000*60*6*185);
+		
+		testTime("14:00+02:30", 1000*60*6*140);
+		testTime("14:00-02:30", 1000*60*6*190);
+		
+		testTime("14:00+04:00", 1000*60*6*125);
+		
+		TimeZone.setDefault(null);
+	}
+	
+	private void testTime(String in, long test) {
+		try{ 
+			Date d = DateUtils.parseTime(in);
+			
+			//getTime here should always assume that it's in the UTC context, since that's the
+			//only available mode for j2me 1.3 (IE: Dates will always come out flat). We'll 
+			//simulate that here by offsetting.
+			long offset = getOffset();
+			
+			long value = d.getTime() + offset;
+			
+			assertEquals("Fail: " + in + "(" + TimeZone.getDefault().getDisplayName() + ")", test, value);
+		} catch(Exception e) {
+			e.printStackTrace();
+			fail("Error: " + in + e.getMessage());
+		}
+	}
+	
+	private long getOffset() {
+		DateFields df = new DateFields();
+		Date d = DateUtils.getDate(df);
+
+		return -d.getTime();
+	}
+	
+	private void testParity() {
+		testCycle(new Date(1300139579000l));
+		testCycle(new Date(0));
+		
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+		
+		testCycle(new Date(1300139579000l));
+		testCycle(new Date(0));
+		
+		TimeZone offsetTwoHours = TimeZone.getTimeZone("GMT+02");
+		
+		TimeZone.setDefault(offsetTwoHours);
+		
+		testCycle(new Date(1300139579000l));
+		testCycle(new Date(0));
+
+		
+		TimeZone offTwoHalf = TimeZone.getTimeZone("GMT+0230");
+		
+		TimeZone.setDefault(offTwoHalf);
+		
+		testCycle(new Date(1300139579000l));
+		testCycle(new Date(0));
+		
+		TimeZone offMinTwoHalf = TimeZone.getTimeZone("GMT-0230");
+		
+		TimeZone.setDefault(offMinTwoHalf);
+		
+		testCycle(new Date(1300139579000l));
+		testCycle(new Date(0));
+
+
+		
+	}
+	
+	private void testCycle(Date in) {
+		try{
+			String formatted =DateUtils.formatDateTime(in, DateUtils.FORMAT_ISO8601);
+			Date out = DateUtils.parseDateTime(formatted);
+			assertEquals("Fail:", in.getTime(), out.getTime());
+
+		} catch(Exception e) {
+			e.printStackTrace();
+			fail("Error: " + in + e.getMessage());
+		}
+
 	}
 /*
 	private void testGetData() {

@@ -18,6 +18,7 @@ package org.javarosa.core.model.utils;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -109,7 +110,14 @@ public class DateUtils {
 	}
 	
 	public static Date getDate (DateFields f) {
+		return getDate(f, null);
+	}
+	
+	public static Date getDate (DateFields f, String timezone) {
 		Calendar cd = Calendar.getInstance();
+		if(timezone != null) {
+			cd.setTimeZone(TimeZone.getTimeZone(timezone));
+		}
 		cd.set(Calendar.YEAR, f.year);
 		cd.set(Calendar.MONTH, f.month - MONTH_OFFSET);
 		cd.set(Calendar.DAY_OF_MONTH, f.day);
@@ -201,8 +209,28 @@ public class DateUtils {
 	}
 	
 	private static String formatTimeISO8601 (DateFields f) {
-		return intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":" + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
-		//want to add time zone info to be fully ISO-8601 compliant, but API is totally on crack!
+		String time = intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":" + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
+
+		//Time Zone ops
+		int offset = TimeZone.getDefault().getOffset(GregorianCalendar.AD,f.year, f.month - 1, f.day, f.dow, 0);
+		
+		//NOTE: offset is in millis
+		if(offset ==0 ) {
+			time += "Z";
+		}
+		else {
+			
+			//Start with sign
+			String offsetSign = offset >0 ? "+" : "-";
+			
+			int value = Math.abs(offset) / 1000 / 60;
+			
+			String hrs = intPad(value / 60, 2);
+			String mins = value % 60 != 0 ? ":" + intPad(value % 60, 2) :""; 
+			
+			time += offsetSign + hrs + mins; 
+		}
+		return time;
 	}
 	
 	private static String formatTimeColloquial (DateFields f) {
@@ -324,6 +352,93 @@ public class DateUtils {
 	}
 	
 	private static boolean parseTime (String timeStr, DateFields f) {
+		//get timezone information first. Make a Datefields set for the possible offset
+		//NOTE: DO NOT DO DIRECT COMPUTATIONS AGAINST THIS. It's a holder for hour/minute
+		//data only, but has data in other fields
+		DateFields timeOffset = null; 
+		
+		if(timeStr.charAt(timeStr.length() -1) == 'Z') {
+			//UTC!
+			
+			//Clean up string for later processing
+			timeStr = timeStr.substring(0, timeStr.length() -1);
+			timeOffset = new DateFields();
+		} else if(timeStr.contains("+") || timeStr.contains("-")) {
+			timeOffset = new DateFields();
+
+			Vector<String> pieces = split(timeStr, "+", false);
+			
+			//We're going to add the Offset straight up to get UTC 
+			//so we need to invert the sign on the offset string
+			int offsetSign = -1;
+			
+			if(pieces.size() > 1) {
+				//offsetSign is already correct
+			} else {
+				pieces = split(timeStr, "-", false);
+				offsetSign = 1;
+			}
+			
+			timeStr = pieces.elementAt(0);
+			
+			String offset = pieces.elementAt(1);
+			String hours = offset;
+			if(offset.contains(":")) {
+				Vector<String> tzPieces = split(offset, ":", false);
+				hours = tzPieces.elementAt(0);
+				int mins = Integer.parseInt(tzPieces.elementAt(1));
+				timeOffset.minute = mins * offsetSign;
+			}
+			timeOffset.hour = Integer.parseInt(hours) * offsetSign;
+		}
+		
+		//Do the actual parse for the real time values;
+		if(!parseRawTime(timeStr, f)) {
+			return false;
+		}
+		
+		if(!(f.check())) {
+			return false;
+		}
+		
+		//Time is good, if there was no timezone info, just return that;
+		if(timeOffset == null) {
+			return true;
+		}
+		
+		//Now apply any relevant offsets from the timezone.
+		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		long one = c.get(Calendar.HOUR);
+		c.setTime(DateUtils.getDate(f, "UTC"));
+		long two = c.get(Calendar.HOUR);
+		c.add(Calendar.HOUR, timeOffset.hour);
+		c.add(Calendar.MINUTE, timeOffset.minute);
+		long three = c.get(Calendar.HOUR);
+		
+		//c is now in the timezone of the parsed value, so put
+		//it in the local timezone.
+		
+		c.setTimeZone(TimeZone.getDefault());
+		long four = c.get(Calendar.HOUR);
+		
+		DateFields adjusted = getFields(c.getTime());
+		
+		f.hour = adjusted.hour;
+		f.minute = adjusted.minute;
+		f.second = adjusted.second;
+		f.secTicks = adjusted.secTicks;
+		
+		return f.check();	
+	}
+	
+	/**
+	 * Parse the raw components of time (hh:mm:ss) with no timezone information
+	 * 
+	 * @param timeStr
+	 * @param f
+	 * @return
+	 */
+	private static boolean parseRawTime (String timeStr, DateFields f) {
 		Vector pieces = split(timeStr, ":", false);
 		if (pieces.size() != 2 && pieces.size() != 3)
 			return false;
@@ -352,6 +467,7 @@ public class DateUtils {
 		
 		return f.check();	
 	}
+
 	
 	/* ==== DATE UTILITY FUNCTIONS ==== */
 	
