@@ -75,7 +75,12 @@ public class PropertyUpdateController implements HandledCommandListener, Handled
                 String selection = (String) choices.elementAt(cg.getSelectedIndex());
                 // This is a weird way to do this, but essentially works as long as there is only
                 // one possible property (which is true for now).
-                if (PropertyManager._().getProperty(propertyName).contains(selection)) {
+                Vector<String> currentValue = PropertyManager._().getProperty(propertyName);
+                
+                if(currentValue == null) {
+                	currentValue = new Vector<String>();
+                }
+                if (currentValue.contains(selection)) {
                     changes.remove(propertyName);
                 } else {
                     changes.put(propertyName, selection);
