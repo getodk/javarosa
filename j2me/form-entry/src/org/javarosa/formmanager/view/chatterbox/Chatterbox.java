@@ -724,8 +724,19 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	    	if(multiLingual && keyCode == POUND_KEYCODE && !USE_HASH_FOR_AUDIO) {
 	    		controller.cycleLanguage();
 	    	} else if(USE_HASH_FOR_AUDIO && keyCode == POUND_KEYCODE){
-	    		if(model.getEvent() != FormEntryController.EVENT_QUESTION) return;
+	    		if(model.getEvent() != FormEntryController.EVENT_QUESTION) {return;}
+	    		//Get prompt
 	    		FormEntryPrompt fep = model.getQuestionPrompt();
+	    		
+	    		try{
+	    			if(fep != null && fep.getAudioText() != null) {
+	    				String audio = fep.getAudioText();
+	    				Logger.log("audio", "request: " + audio);
+	    			}
+	    		} catch(Exception e) {
+	    			//Nothing
+	    		}
+	    		
 	    		controller.playAudioOnDemand(fep);
 	    	}else if (keyCode == KEY_CENTER_LETS_HOPE) {
 		    		if (keyDownSelectedWidget == this.activeQuestionIndex) {
