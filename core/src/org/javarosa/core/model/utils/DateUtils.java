@@ -18,7 +18,6 @@ package org.javarosa.core.model.utils;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -211,8 +210,8 @@ public class DateUtils {
 	private static String formatTimeISO8601 (DateFields f) {
 		String time = intPad(f.hour, 2) + ":" + intPad(f.minute, 2) + ":" + intPad(f.second, 2) + "." + intPad(f.secTicks, 3);
 
-		//Time Zone ops
-		int offset = TimeZone.getDefault().getOffset(GregorianCalendar.AD,f.year, f.month - 1, f.day, f.dow, 0);
+		//Time Zone ops (1 in the first field corresponds to 'CE' ERA)
+		int offset = TimeZone.getDefault().getOffset(1,f.year, f.month - 1, f.day, f.dow, 0);
 		
 		//NOTE: offset is in millis
 		if(offset ==0 ) {
