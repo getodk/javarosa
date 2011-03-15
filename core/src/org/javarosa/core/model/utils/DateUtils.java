@@ -363,7 +363,7 @@ public class DateUtils {
 			//Clean up string for later processing
 			timeStr = timeStr.substring(0, timeStr.length() -1);
 			timeOffset = new DateFields();
-		} else if(timeStr.contains("+") || timeStr.contains("-")) {
+		} else if(timeStr.indexOf("+") != -1 || timeStr.indexOf("-") != -1) {
 			timeOffset = new DateFields();
 
 			Vector<String> pieces = split(timeStr, "+", false);
@@ -383,7 +383,7 @@ public class DateUtils {
 			
 			String offset = pieces.elementAt(1);
 			String hours = offset;
-			if(offset.contains(":")) {
+			if(offset.indexOf(":") != -1) {
 				Vector<String> tzPieces = split(offset, ":", false);
 				hours = tzPieces.elementAt(0);
 				int mins = Integer.parseInt(tzPieces.elementAt(1));
@@ -408,12 +408,8 @@ public class DateUtils {
 		
 		//Now apply any relevant offsets from the timezone.
 		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		long one = c.get(Calendar.HOUR);
-		c.setTime(DateUtils.getDate(f, "UTC"));
-		long two = c.get(Calendar.HOUR);
-		c.add(Calendar.HOUR, timeOffset.hour);
-		c.add(Calendar.MINUTE, timeOffset.minute);
-		long three = c.get(Calendar.HOUR);
+		
+		c.setTime(new Date(DateUtils.getDate(f, "UTC").getTime() + (((60 * timeOffset.hour)  + timeOffset.minute) * 60 * 1000)));
 		
 		//c is now in the timezone of the parsed value, so put
 		//it in the local timezone.
