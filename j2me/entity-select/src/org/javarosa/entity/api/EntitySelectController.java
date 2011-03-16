@@ -242,4 +242,8 @@ public class EntitySelectController <E extends Persistable> {
 	public int getRecordID (int i) {
 		return entities.elementAt(i).getRecordID();
 	}
+	
+	public void attemptCallout(String number) {
+		J2MEDisplay.showError("Not Available", "Calling functionality is not enabled for this application");
+	}
 }
