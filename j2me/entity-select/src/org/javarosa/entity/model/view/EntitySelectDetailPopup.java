@@ -18,6 +18,8 @@ package org.javarosa.entity.model.view;
 
 
 
+import java.util.Vector;
+
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
@@ -40,9 +42,12 @@ public class EntitySelectDetailPopup<E extends Persistable> extends Form impleme
 	int recordID;
 	String[] headers;
 	String[] data;
+	String[] forms;
 	
 	Command okCmd;
 	Command backCmd;
+	
+	Command[] phoneCallouts;
 	
 	public EntitySelectDetailPopup (EntitySelectController<E> psa, Entity<E> entity, IStorageUtility storage) {
 		super(Localization.get("entity.detail.title", new String[] {entity.entityType()}));
@@ -52,6 +57,9 @@ public class EntitySelectDetailPopup<E extends Persistable> extends Form impleme
 		recordID = entity.getRecordID();
 		headers = entity.getHeaders(true);
 		data = entity.getLongFields((E)storage.read(recordID));
+		forms = entity.getLongForms(false);
+		
+		phoneCallouts = new Command[data.length];
 		
 		okCmd = new Command(Localization.get("command.ok"), Command.OK, 1);
 		backCmd = new Command(Localization.get("command.back"), Command.BACK, 1);
@@ -69,6 +77,10 @@ public class EntitySelectDetailPopup<E extends Persistable> extends Form impleme
 			Container c = new Container(false);
 			c.add(new StringItem("", headers[i] + ":"));
 			c.add(new StringItem("", data[i]));
+			if("phone".equals(forms[i])) {
+				phoneCallouts[i] = new Command("Call " + data[i], Command.SCREEN, 3);
+				this.addCommand(phoneCallouts[i]);
+			}
 			append(c);
 		}
 	}
@@ -87,6 +99,12 @@ public class EntitySelectDetailPopup<E extends Persistable> extends Form impleme
 				psa.entityChosen(recordID);
 			} else if (cmd == backCmd) {
 				psa.showList();
+			} else {
+				for(int i = 0 ; i < phoneCallouts.length ; ++i) {
+					if(cmd.equals(phoneCallouts[i])) {
+						psa.attemptCallout(data[i]);
+					}
+				}
 			}
 		}		
 	}
