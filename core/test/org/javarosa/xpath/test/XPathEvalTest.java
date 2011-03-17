@@ -199,7 +199,14 @@ public class XPathEvalTest extends TestCase {
 		testEval("string('a string')", null, null, "a string");
 		testEval("string(date('1989-11-09'))", null, null, "1989-11-09");
 		testEval("string(convertible())", null, ec, "hi");
-		testEval("string(inconvertible())", null, ec, new XPathTypeMismatchException());		
+		testEval("string(inconvertible())", null, ec, new XPathTypeMismatchException());
+		testEval("substr('hello',0)", null, null, "hello");
+		testEval("substr('hello',0,5)", null, null, "hello");
+		testEval("substr('hello',1)", null, null, "ello");
+		testEval("substr('hello',1,5)", null, null, "ello");
+		testEval("substr('hello',1,4)", null, null, "ell");
+		testEval("substr('hello',-2)", null, null, "lo");
+		testEval("substr('hello',0,-1)", null, null, "hell");
 		testEval("date('2000-01-01')", null, null, DateUtils.getDate(2000, 1, 1));
 		testEval("date('1945-04-26')", null, null, DateUtils.getDate(1945, 4, 26));
 		testEval("date('1996-02-29')", null, null, DateUtils.getDate(1996, 2, 29));

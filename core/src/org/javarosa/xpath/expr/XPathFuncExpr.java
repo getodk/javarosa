@@ -218,7 +218,11 @@ public class XPathFuncExpr extends XPathExpression {
 			return new Double(MathUtils.getRand().nextDouble());
 		} else if (name.equals("uuid") && (args.length == 0 || args.length == 1)) { //non-standard
 			//calculated expressions may be recomputed w/o warning! use with caution!!
-			int len = (args.length == 1 ? toInt(argVals[0]).intValue() : 25);			
+			if(args.length == 0) {
+				return PropertyUtils.genUUID();
+			}
+			
+			int len = toInt(argVals[0]).intValue();			
 			return PropertyUtils.genGUID(len);
 		} else {
 			//check for custom handler
@@ -647,17 +651,18 @@ public class XPathFuncExpr extends XPathExpression {
 	public static String substring (Object o1, Object o2, Object o3) {
 		String s = toString(o1);
 		int start = toInt(o2).intValue();
-		int end = (o3 != null ? toInt(o3).intValue() : 9999);
-		int len = s.length();
 		
+		int len = s.length();
+
+		int end = (o3 != null ? toInt(o3).intValue() : len);		
 		if (start < 0) {
-			start = len - start;
+			start = len + start;
 		}
 		if (end < 0) {
-			end = len - end;
+			end = len + end;
 		}
-		start = Math.max(0, start);
-		end = Math.min(len, end);
+		start = Math.min(Math.max(0, start), end);
+		end = Math.min(Math.max(0, end), end);
 		
 		return (start <= end ? s.substring(start, end) : "");
 	}

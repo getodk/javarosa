@@ -77,7 +77,7 @@ public class LongData implements IAnswerData {
 	 * @see org.javarosa.core.services.storage.utilities.Externalizable#readExternal(java.io.DataInputStream)
 	 */
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
-		n = ExtUtil.readInt(in);
+		n = ExtUtil.readNumeric(in);
 	}
 
 	/* (non-Javadoc)
