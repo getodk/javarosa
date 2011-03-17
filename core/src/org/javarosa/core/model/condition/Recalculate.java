@@ -112,8 +112,10 @@ public class Recalculate extends Triggerable {
 			return new BooleanData(b);
 		} else if (val instanceof Double) {
 			double d = ((Double)val).doubleValue();
-			boolean isIntegral = Math.abs(d - (int)d) < 1.0e-9;			
-			if(Constants.DATATYPE_INTEGER == dataType) {
+			long l = (long) d;
+			boolean isIntegral = Math.abs(d - l) < 1.0e-9;			
+			if(Constants.DATATYPE_INTEGER == dataType ||
+					   (isIntegral && (Integer.MAX_VALUE >= l) && (Integer.MIN_VALUE <= l))) {
 				return new IntegerData((int)d);
 			} else if(Constants.DATATYPE_LONG == dataType || isIntegral) {
 				return new LongData((long)d);
