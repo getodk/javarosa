@@ -67,8 +67,8 @@
 			</instance>
 	
 			<!-- High Level -->
-			<bind nodeset="registration/username" type="xsd:string" jr:preload="user" jr:preloadParams="username"/>
-			<bind nodeset="registration/password" type="xsd:int" jr:preload="user" jr:preloadParams="password"/>
+			<bind nodeset="registration/username" required="true()" type="xsd:string" jr:preload="user" jr:preloadParams="username"/>
+			<bind nodeset="registration/password" required="true()" type="xsd:int" jr:preload="user" jr:preloadParams="password"/>
 			<bind nodeset="registration/uuid" type="xsd:string" calculate="if(/user_registration/loadedguid='', /user_registration/freshguid,/user_registration/loadedguid)"/>
 			<bind nodeset="registration/date" type="xsd:dateTime" jr:preload="timestamp" jr:preloadParams="start"/>
 			<bind nodeset="registration/registering_phone_id" type="xsd:string" jr:preload="property" jr:preloadParams="DeviceID" />
