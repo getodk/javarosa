@@ -21,6 +21,7 @@ import java.util.Vector;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.pivot.UnpivotableExpressionException;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 public abstract class XPathExpression implements Externalizable {
@@ -28,9 +29,19 @@ public abstract class XPathExpression implements Externalizable {
 	public abstract Object eval (FormInstance model, EvaluationContext evalContext);
 	
 	public final Vector<Object> pivot(FormInstance model, EvaluationContext evalContext) throws UnpivotableExpressionException {
-		Vector<Object> pivots = new Vector<Object>();
-		this.pivot(model, evalContext, pivots, evalContext.getContextRef());
-		return pivots;
+		try {
+			Vector<Object> pivots = new Vector<Object>();
+			this.pivot(model, evalContext, pivots, evalContext.getContextRef());
+			return pivots;
+		} catch(UnpivotableExpressionException uee) {
+			//Rethrow unpivotable (expected)
+			throw uee;
+		} catch(Exception e) {
+			//Pivots aren't critical, if there was a problem getting one, log the exception 
+			//so we can fix it, and then just report that.
+			Logger.exception(e);
+			throw new UnpivotableExpressionException(e.getMessage());
+		}
 	}
 	
 	/**

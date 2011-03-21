@@ -117,7 +117,34 @@ public class XPathCmpExpr extends XPathBinaryOpExpr {
 				//WTF?
 				throw new UnpivotableExpressionException();
 			} else {
-				pivots.addElement(new CmpPivot(((Double)b).doubleValue(), op));
+				Double val = null;
+				//either of
+				if(b instanceof Double) {
+					val = (Double)b;
+				} else {
+					//These are probably the 
+					if(b instanceof Integer) {
+						val = new Double(((Integer) b).doubleValue());
+					}
+					if(b instanceof Long) {
+						val = new Double(((Long) b).doubleValue());
+					}
+					if(b instanceof Float) {
+						val = new Double(((Float) b).doubleValue());
+					}
+					if(b instanceof Short) {
+						val = new Double(((Short) b).shortValue());
+					}
+					if(b instanceof Byte) {
+						val = new Double(((Byte) b).byteValue());
+					}
+					else {
+						throw new UnpivotableExpressionException("Unrecognized numeric data in cmp expression: " + b);
+					}
+				}
+				
+				
+				pivots.addElement(new CmpPivot(val.doubleValue(), op));
 				return true;
 			}
 		} 
