@@ -16,6 +16,7 @@
 
 package org.javarosa.form.api;
 
+import java.util.Enumeration;
 import java.util.Vector;
 
 import org.javarosa.core.model.FormDef;
@@ -76,12 +77,18 @@ public class FormEntryModel {
         if(repeatStructure != REPEAT_STRUCTURE_LINEAR && repeatStructure != REPEAT_STRUCTURE_NON_LINEAR) {
         	throw new IllegalArgumentException(repeatStructure +": does not correspond to a valid repeat structure");
         }
+        //We need to see if there are any guessed repeat counts in the form, which prevents
+        //us from being able to use the new repeat style
+        //Unfortunately this is probably (A) slow and (B) might overflow the stack. It's not the only
+        //recursive walk of the form, though, so (B) isn't really relevant
+        if(repeatStructure == REPEAT_STRUCTURE_NON_LINEAR && containsRepeatGuesses(form)) {
+        	repeatStructure = REPEAT_STRUCTURE_LINEAR;
+        }
         this.repeatStructure = repeatStructure;
         this.currentFormIndex = FormIndex.createBeginningOfFormIndex();
     }
-
-
-    /**
+    
+	/**
      * Given a FormIndex, returns the event this FormIndex represents.
      * 
      * @see FormEntryController
@@ -445,7 +452,7 @@ public class FormEntryModel {
                 if (g.getRepeat() && g.getCountReference() != null) {
                     IAnswerData count = getForm().getInstance().getDataValue(g.getCountReference());
                     if (count != null) {
-                        int fullcount = ((Integer) count.getValue()).intValue();
+                        long fullcount = ((Integer) count.getValue()).intValue();
                         TreeReference ref = getForm().getChildInstanceRef(index);
                         TreeElement element = getForm().getInstance().resolveReference(ref);
                         if (element == null) {
@@ -736,4 +743,30 @@ public class FormEntryModel {
 			return false;
 		}
 	}
+	
+	/**
+	 * This method does a recursive check of whether there are any repeat guesses 
+	 * in the element or its subtree. This is a necessary step when initializing
+	 * the model to be able to identify whether new repeats can be used.
+	 * 
+	 * @param parent The form element to begin checking
+	 * @return true if the element or any of its descendants is a repeat
+	 * which has a count guess, false otherwise.
+	 */
+    private boolean containsRepeatGuesses(IFormElement parent) {
+		if(parent instanceof GroupDef) {
+			GroupDef g = (GroupDef)parent;
+			if (g.getRepeat() && g.getCountReference() != null) {
+				return true;
+			}
+		}
+    	
+    	Vector<IFormElement> children = parent.getChildren();
+    	if(children == null) { return false; }
+    	for(Enumeration en = children.elements() ; en.hasMoreElements() ;) {
+    		if(containsRepeatGuesses((IFormElement)en.nextElement())) {return true;}
+    	}
+    	return false;
+	}
+
 }

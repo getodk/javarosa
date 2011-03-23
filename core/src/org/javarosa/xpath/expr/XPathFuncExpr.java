@@ -534,7 +534,7 @@ public class XPathFuncExpr extends XPathExpression {
 				return s;
 			}
 			
-			Date d = DateUtils.parseDate(s);
+			Date d = DateUtils.parseDateTime(s);
 			if (d == null) {
 				throw new XPathTypeMismatchException("converting to date");
 			} else {
