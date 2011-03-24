@@ -73,7 +73,7 @@ public class ExtUtil {
 	}
 	
 	public static PrototypeFactory defaultPrototypes () {
-		return new PrototypeFactory(PrototypeManager.getPrototypes());
+		return PrototypeManager.getDefault();
 	}
 	
 	public static void write (DataOutputStream out, Object data) throws IOException {

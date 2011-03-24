@@ -38,9 +38,9 @@ import org.javarosa.j2me.log.CrashHandler;
 import org.javarosa.j2me.log.HandledCommandListener;
 import org.javarosa.j2me.log.HandledPItemStateListener;
 import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.j2me.view.ProgressIndicator;
 
 import de.enough.polish.ui.Container;
-import de.enough.polish.ui.Display;
 import de.enough.polish.ui.FramedForm;
 import de.enough.polish.ui.ImageItem;
 import de.enough.polish.ui.Item;
@@ -48,7 +48,7 @@ import de.enough.polish.ui.StringItem;
 import de.enough.polish.ui.Style;
 import de.enough.polish.ui.TextField;
 
-public class EntitySelectView<E extends Persistable> extends FramedForm implements HandledPItemStateListener, HandledCommandListener {
+public class EntitySelectView<E extends Persistable> extends FramedForm implements HandledPItemStateListener, HandledCommandListener, ProgressIndicator {
 	
 	private int MAX_ROWS_ON_SCREEN = 10;
 
@@ -79,6 +79,9 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	
 	private Style headerStyle;
 	private Style rowStyle;
+	
+	private int progress = 0;
+	private int count = 1;
 	
 	protected Vector<Integer> rowIDs; //index into data corresponding to current matches
 	
@@ -126,7 +129,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
         
         estimateHeights();
         
-        refresh();
+        refresh();        
 	}
 	
 	public void refresh () {
@@ -311,6 +314,7 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	
 	private void refreshList () {
 		container.clear();
+		
 
 		this.setTitle(baseTitle + " (" + numMatches() + ")");
 		
@@ -477,17 +481,68 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 	
 	//can't believe i'm writing a .. sort function
 	private void sortRows () {
-		for (int i = rowIDs.size() - 1; i > 0; i--) {
-			for (int j = 0; j < i; j++) {
-				int rowA = rowID(j);
-				int rowB = rowID(j + 1);
-				if (compare(controller.getEntity(rowA), controller.getEntity(rowB)) > 0) {
-					rowIDs.setElementAt(new Integer(rowB), j);
-					rowIDs.setElementAt(new Integer(rowA), j + 1);
-				}
-			}
-		}
+		count = rowIDs.size();
+		mergeSort(rowIDs);
 	}
+	
+	//Start: SORT Code
+	  public void mergeSort(Vector<Integer> inputs) {
+		 if(inputs.size() == 0 ) return;
+		 int[] scratch = new int[inputs.size()];
+		 int[] inputArray = new int[inputs.size()];
+		 for(int i = 0 ; i < inputs.size() ; ++i) {
+			 inputArray[i] = inputs.elementAt(i).intValue();
+		 }
+		 mergeSortRecursiveStep(scratch, inputArray, 0, scratch.length - 1);
+		 
+		 for(int i = 0 ; i < inputArray.length ; ++i) {
+			 inputs.setElementAt(new Integer(inputArray[i]), i);
+		 }
+	  }
+
+	  private void mergeSortRecursiveStep(int[] scratch, int[] array, int low, int high) {
+	    if (low == high) // if range is 1,
+	      return; // no use sorting
+	    else { // find midpoint
+	      int mid = (low + high) / 2;
+	      // sort low half
+	      mergeSortRecursiveStep(scratch, array, low, mid);
+	      // sort high half
+	      mergeSortRecursiveStep(scratch, array, mid + 1, high);
+	      // merge them
+	      merge(scratch, array, low, mid + 1, high);
+	    }
+	  }
+
+	  private void merge(int[] scratch, int[] array, int lowPtr, int highPtr, int upperBound) {
+	    int j = 0; // workspace index
+	    int lowerBound = lowPtr;
+	    int mid = highPtr - 1;
+	    int n = upperBound - lowerBound + 1; // # of items
+
+	    while (lowPtr <= mid && highPtr <= upperBound)
+	      //if (array[lowPtr] < array[highPtr]) {
+		  if(compare(controller.getEntity(array[lowPtr]), controller.getEntity(array[highPtr])) < 0) {
+	        scratch[j++] = array[lowPtr++];
+	      }
+	      else {
+	        scratch[j++] = array[highPtr++];
+	      }
+
+	    while (lowPtr <= mid) {
+	      scratch[j++] = array[lowPtr++];
+	    }
+
+	    while (highPtr <= upperBound) {
+	      scratch[j++] = array[highPtr++];
+	    }
+
+	    for (j = 0; j < n; j++) {
+	      array[lowerBound + j] = scratch[j];
+	    }
+	  }
+
+	//END: Sort code
 
 	private int compare (Entity<E> eA, Entity<E> eB) {
 		if (sortField == null) {
@@ -571,6 +626,12 @@ public class EntitySelectView<E extends Persistable> extends FramedForm implemen
 			}
 		}
 	}
+	
+	public double getProgress() {
+		if(count == 0) { return 0.0;};
+		return (double)progress / count;
+	}
+
 	
 //#if polish.hasPointerEvents
 //#

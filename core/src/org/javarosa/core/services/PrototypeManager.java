@@ -6,6 +6,7 @@ import org.javarosa.core.util.externalizable.PrototypeFactory;
 
 public class PrototypeManager {
 	private static PrefixTree prototypes;
+	private static PrototypeFactory staticDefault;
 		
 	public static void registerPrototype (String className) {
 		getPrototypes().addString(className);
@@ -15,6 +16,7 @@ public class PrototypeManager {
 		} catch (ClassNotFoundException e) {
 			throw new CannotCreateObjectException(className + ": not found");
 		}
+		rebuild();
 	}
 	
 	public static void registerPrototypes (String[] classNames) {
@@ -27,6 +29,23 @@ public class PrototypeManager {
 			prototypes = new PrefixTree();
 		}
 		return prototypes;
+	}
+	
+	public static PrototypeFactory getDefault() {
+		if(staticDefault == null) {
+			rebuild();
+		}
+		return staticDefault;
+	}
+	
+	private static void rebuild() {
+		if(staticDefault == null) {
+			staticDefault = new PrototypeFactory(getPrototypes());
+			return;
+		}
+		synchronized(staticDefault) {
+			staticDefault = new PrototypeFactory(getPrototypes());
+		}
 	}
 	
 }

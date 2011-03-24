@@ -122,6 +122,10 @@ public class WrappingStorageUtility implements IStorageUtilityIndexed {
 			public int numRecords() {
 				return baseIterator.numRecords();
 			}
+
+			public int peekID() {
+				return baseIterator.peekID();
+			}
 		};
 	}
 
