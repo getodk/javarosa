@@ -30,6 +30,16 @@ public interface IStorageIterator {
 	int numRecords ();
 	
 	/**
+	 * Return the ID of the next record in the set without advancing the iterator.
+	 * 
+	 * @return ID of next record
+	 * @throws StorageModifiedException if the underlying StorageUtility has been modified since this iterator
+	 * was created
+	 * @throws IllegalStateException if all records have already been iterated through
+	 */
+	int peekID ();
+	
+	/**
 	 * Return the ID of the next record in the set. Advance the iteration cursor by one.
 	 * 
 	 * @return ID of next record

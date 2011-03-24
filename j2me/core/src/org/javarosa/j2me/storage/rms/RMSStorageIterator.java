@@ -1,5 +1,7 @@
 package org.javarosa.j2me.storage.rms;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.javarosa.core.services.storage.IStorageIterator;
@@ -11,8 +13,15 @@ public class RMSStorageIterator implements IStorageIterator {
 	private Vector IDs;
 	private int pos;
 	private boolean valid;
+	private Hashtable index;
 	
-	public RMSStorageIterator (RMSStorageUtility store, Vector IDs) {
+	public RMSStorageIterator (RMSStorageUtility store, Hashtable index) {
+		
+		Vector IDs = new Vector();
+		for (Enumeration e = index.keys(); e.hasMoreElements(); ) {
+			IDs.addElement(e.nextElement());
+		}
+		this.index = index;
 		this.store = store;
 		this.IDs = IDs;
 		pos = 0;
@@ -25,6 +34,18 @@ public class RMSStorageIterator implements IStorageIterator {
 	
 	public synchronized boolean hasMore () {
 		return pos < numRecords();
+	}
+	
+
+	public int peekID() {
+		if (!hasMore()) {
+			throw new IllegalStateException("All records have been iterated through");
+		}
+			
+		if (!valid) {
+			throw new StorageModifiedException();
+		}
+		return ((Integer)IDs.elementAt(pos)).intValue();
 	}
 
 	/* Note: StorageUtility lock must always be acquire before local lock, to avoid deadlock scenarios. */
@@ -55,7 +76,7 @@ public class RMSStorageIterator implements IStorageIterator {
 	public Externalizable nextRecord () {
 		synchronized (store.getAccessLock()) {
 			synchronized (this) {
-				return store.read(nextID());
+				return store.read(nextID(), index);
 			}
 		}
 	}

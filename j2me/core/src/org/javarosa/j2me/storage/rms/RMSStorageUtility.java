@@ -140,18 +140,12 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		return type;
 	}
 	
-	/**
-	 * Read and return the record corresponding to 'id'.
-	 * 
-	 * @param id id of the object
-	 * @return object for 'id'. null if no object is stored under that ID
-	 */
-	public Externalizable read (int id) {
+	protected Externalizable read(int id, Hashtable index) {
 		synchronized (getAccessLock()) {
 
 			checkNotCorrupt();
 			
-			Hashtable idIndex = getIDIndexRecord();
+			Hashtable idIndex = index;
 			if (idIndex.containsKey(new Integer(id))) {
 				RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
 				return (Externalizable)getDataStore(loc.rmsID).readRecord(loc.recID, type);
@@ -160,6 +154,20 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 			}
 			
 		}
+	}
+	
+	/**
+	 * Read and return the record corresponding to 'id'.
+	 * 
+	 * @param id id of the object
+	 * @return object for 'id'. null if no object is stored under that ID
+	 */
+	public Externalizable read (int id) {
+		Hashtable index;
+		synchronized (getAccessLock()) {
+			index = getIDIndexRecord();
+		}
+		return read(id, index);
 	}
 
 	/**
@@ -706,13 +714,8 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 		synchronized (getAccessLock()) {
 			
 			checkNotCorrupt();
-			
-			Vector IDs = new Vector();
-			for (Enumeration e = getIDIndexRecord().keys(); e.hasMoreElements(); ) {
-				IDs.addElement(e.nextElement());
-			}
 
-			return newIterator(IDs);
+			return newIterator(getIDIndexRecord());
 			
 		}
 	}
@@ -1225,11 +1228,11 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	/**
 	 * Create a new record iterator and register it
 	 * 
-	 * @param IDs list of record IDs to iterate over
+	 * @param index list of record IDs to iterate over
 	 * @return record iterator
 	 */
-	private RMSStorageIterator newIterator (Vector IDs) {
-		RMSStorageIterator iter = new RMSStorageIterator(this, IDs);
+	private RMSStorageIterator newIterator (Hashtable index) {
+		RMSStorageIterator iter = new RMSStorageIterator(this, index);
 		
 		synchronized (storageStaticInfo) {
 			((StorageStaticEntity)storageStaticInfo.get(basename)).iterators.addElement(iter);

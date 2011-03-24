@@ -15,11 +15,13 @@ package org.javarosa.entity.api;
  * the License.
  */
 
+import java.util.Date;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Displayable;
 
 import org.javarosa.core.api.State;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.storage.EntityFilter;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -29,6 +31,7 @@ import org.javarosa.entity.model.Entity;
 import org.javarosa.entity.model.view.EntitySelectDetailPopup;
 import org.javarosa.entity.model.view.EntitySelectView;
 import org.javarosa.j2me.view.J2MEDisplay;
+import org.javarosa.j2me.view.ProgressIndicator;
 
 /**
  * Entity Select is a reusable activity for selecting a single record from a set of like records. For
@@ -73,7 +76,7 @@ import org.javarosa.j2me.view.J2MEDisplay;
  *    will be used to select
  */
 
-public class EntitySelectController <E extends Persistable> {
+public class EntitySelectController <E extends Persistable> implements ProgressIndicator{
 	private EntitySelectTransitions transitions;
 	
 	private EntitySelectView<E> selView;
@@ -85,6 +88,9 @@ public class EntitySelectController <E extends Persistable> {
 	protected boolean bailOnEmpty;
 	
 	Vector<Entity<E>> entities;
+	
+	int progress = 0;
+	int count =1;
 	
 	public EntitySelectController (String title, IStorageUtility entityStorage, Entity<E> entityPrototype) {
 		this(title, entityStorage, entityPrototype, EntitySelectView.NEW_IN_LIST, true, false);
@@ -122,6 +128,8 @@ public class EntitySelectController <E extends Persistable> {
 	}
 	
 	public void start () {
+		Logger.log("timing", "start: " + new Date().getTime());
+
 		loadEntities();
 
 		if(entities.isEmpty() && bailOnEmpty && selView.newMode == EntitySelectView.NEW_DISALLOWED) {
@@ -131,11 +139,15 @@ public class EntitySelectController <E extends Persistable> {
 		
 		selView.init();
 		showList();
+		Logger.log("timing", "end: " + new Date().getTime());
 	}
 
 	private void loadEntities () {
 		entities = new Vector<Entity<E>>();
 		EntityFilter<? super E> filter = entityPrototype.getFilter();
+		
+		progress = 0;
+		count = entityStorage.getNumRecords();
 		
 		IStorageIterator ei = entityStorage.iterate();
 		while (ei.hasMore()) {
@@ -144,20 +156,26 @@ public class EntitySelectController <E extends Persistable> {
 			if (filter == null) {
 				obj = (E)ei.nextRecord();
 			} else {
-				int id = ei.nextID();
+				//Get the iterator without advancing
+				int id = ei.peekID();
+				
 				int preFilt = filter.preFilter(id, null);
 				
 				if (preFilt != EntityFilter.PREFILTER_EXCLUDE) {
-					E candidateObj = (E)entityStorage.read(id);
+					E candidateObj = (E)ei.nextRecord();
 					if (preFilt == EntityFilter.PREFILTER_INCLUDE || filter.matches(candidateObj)) {
 						obj = candidateObj;
 					}
+				} else {
+					//make sure that we advance the iterator
+					ei.nextID();
 				}
 			}
 			
 			if (obj != null) {
 				loadEntity(obj);
-			}			
+			}
+			progress++;
 		}
 	}
 	
@@ -245,5 +263,9 @@ public class EntitySelectController <E extends Persistable> {
 	
 	public void attemptCallout(String number) {
 		J2MEDisplay.showError("Not Available", "Calling functionality is not enabled for this application");
+	}
+
+	public double getProgress() {
+		return (double)progress / count;
 	}
 }

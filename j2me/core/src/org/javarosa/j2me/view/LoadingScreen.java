@@ -14,14 +14,14 @@ import org.javarosa.core.services.locale.Localization;
  */
 public class LoadingScreen extends Form {
 	
-	private final static int RESOLUTION = 1000;
+	private final static int RESOLUTION = 100;
 	
 	private Gauge gauge;
 	
 	public LoadingScreen(boolean interactive) {
 		super(Localization.get("loading.screen.title"));
 		if(interactive) {
-			gauge = new Gauge(Localization.get("loading.screen.message"), true, 0,RESOLUTION);
+			gauge = new Gauge(Localization.get("loading.screen.message"), true, RESOLUTION, 0);
 		} else{
 			//#style loadingGauge?
 			gauge = new Gauge(Localization.get("loading.screen.message"), false, Gauge.INDEFINITE,Gauge.CONTINUOUS_RUNNING);
