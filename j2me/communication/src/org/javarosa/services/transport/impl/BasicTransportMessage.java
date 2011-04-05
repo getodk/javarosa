@@ -113,7 +113,7 @@ public abstract class BasicTransportMessage implements TransportMessage {
 			throws IOException, DeserializationException {
 		contentType = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		status = (int)ExtUtil.readNumeric(in);
-		failureReason = ExtUtil.readString(in);
+		failureReason = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
 		failureCount = (int)ExtUtil.readNumeric(in);
 		failureCount = 0;
 		queueIdentifier = ExtUtil.readString(in);
