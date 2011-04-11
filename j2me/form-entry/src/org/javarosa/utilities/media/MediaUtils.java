@@ -84,22 +84,22 @@ public class MediaUtils {
 	   * @return int array [height, width]
 	   */
 	  public static int[] getNewDimensions(Image im, int height, int width){
-		int scalef = im.getHeight()/im.getWidth();
+		double scalef = im.getHeight()*1.0/im.getWidth();
 		int w = 1;
 		int h = 1;
 		if(im.getHeight() > height && im.getWidth() <= width){ //height is overbounds
 			h = height;
-			w = h/scalef;
+			w = (int)Math.floor(h/scalef);
 		}else if (im.getHeight() <= height && im.getWidth() > width){  //width is overbouds
 			w = width;
-			h = w*scalef;
+			h = (int)Math.floor(w*scalef);
 		}else if (im.getHeight() > height && im.getWidth() > width){ //both are overbounds
 			if(height > width){	//screen width is smaller dimension, so reduce im width and scale height				
 				w = width;
-				h = w*scalef;
+				h = (int)Math.floor(w*scalef);
 			}else if(height <= width){ //reduce height and scale width
 				h = height;
-				w = h/scalef;
+				w = (int)Math.floor(h/scalef);
 			}
 		}else{
 			h = im.getHeight();
