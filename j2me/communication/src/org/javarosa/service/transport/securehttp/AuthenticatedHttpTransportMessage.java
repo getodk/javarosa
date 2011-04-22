@@ -226,14 +226,24 @@ public class AuthenticatedHttpTransportMessage extends BasicTransportMessage {
 	}
 	
 	private String getChallenge(HttpConnection connection ) throws IOException {
+		final String AUTH_HEADER_HACK = "X-S60-Auth";
+		
 		//technically the standard
 		
-		String challenge = connection.getHeaderField("WWW-Authenticate");
+		String challenge = null;
+		if (challenge == null) {
+			challenge = connection.getHeaderField(AUTH_HEADER_HACK);			
+		}
+		if (challenge == null) {
+			challenge = connection.getHeaderField(AUTH_HEADER_HACK.toLowerCase());			
+		}
+		if (challenge == null) {
+			challenge = connection.getHeaderField("WWW-Authenticate");
+		}
 		if(challenge == null) {
-			//j2me sometimes lowercases everything;
-			System.out.println("lowercase fallback!");
 			challenge = connection.getHeaderField("www-authenticate");
 		}
+		
 		return challenge;
 	}
 
