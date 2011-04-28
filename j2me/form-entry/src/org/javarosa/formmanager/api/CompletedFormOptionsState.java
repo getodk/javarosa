@@ -6,7 +6,7 @@ import org.javarosa.services.transport.TransportMessage;
 
 public abstract class CompletedFormOptionsState implements CompletedFormOptionsTransitions, State {
 
-	private TransportMessage message;
+	protected TransportMessage message;
 	
 	public CompletedFormOptionsState (TransportMessage message) {
 		this.message = message;

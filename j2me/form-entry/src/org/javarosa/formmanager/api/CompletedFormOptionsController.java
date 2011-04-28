@@ -20,13 +20,17 @@ import org.javarosa.services.transport.TransportMessage;
  *
  */
 public class CompletedFormOptionsController implements HandledCommandListener, HandledItemStateListener {
-	CompletedFormOptionsTransitions transitions;
-	TransportMessage message;
-	SendNowSendLaterForm view;
+	protected CompletedFormOptionsTransitions transitions;
+	protected TransportMessage message;
+	protected SendNowSendLaterForm view;
 	
 	public CompletedFormOptionsController(TransportMessage message) {
+		this(message, false);
+	}
+	
+	public CompletedFormOptionsController(TransportMessage message, boolean cacheAutomatically) {
 		this.message = message;
-		view = new SendNowSendLaterForm(this, this);
+		view = new SendNowSendLaterForm(this, this, cacheAutomatically);
 	}
 
 	public void setTransitions (CompletedFormOptionsTransitions transitions) {
@@ -42,6 +46,13 @@ public class CompletedFormOptionsController implements HandledCommandListener, H
 	}  
 
 	public void _commandAction(Command c, Displayable d) {
+		//If we're just on the acknowledgment screen, we always want 
+		//to just skip.
+		if(c == view.commandOk) {
+			transitions.skipSend(message);
+			return;
+		}
+		
 		int choice = view.getCommandChoice();
 		if(choice == SendNowSendLaterForm.SEND_NOW_DEFAULT) {
 			transitions.sendData(message);

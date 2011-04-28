@@ -234,6 +234,8 @@ model.time.long=Time Entered
 Recorder= Recorder
 SendDataNow= Send Data Now
 
+sending.view.done.title=Finished
+sending.view.done=Form Complete, thanks!
 sending.view.submit=Submit Form
 sending.view.now=Send Now
 sending.view.later=Send Later

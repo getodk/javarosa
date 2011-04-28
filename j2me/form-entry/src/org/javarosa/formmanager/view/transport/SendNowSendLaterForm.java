@@ -24,29 +24,46 @@ import javax.microedition.lcdui.Spacer;
 
 import org.javarosa.core.services.locale.Localization;
 
+import de.enough.polish.ui.Command;
 import de.enough.polish.ui.FramedForm;
+import de.enough.polish.ui.Item;
+import de.enough.polish.ui.StringItem;
 
 public class SendNowSendLaterForm extends FramedForm {
 	private ChoiceGroup cg;
 
 	private boolean seenKeyPressed = false;
 	
+	public Command commandOk = new Command(Localization.get("polish.command.ok"), Command.OK, 0);
+	
 	public static final int SEND_NOW_DEFAULT = 0;
 	public static final int SEND_LATER = 1;
 	public static final int SEND_NOW_SPEC = 2;
-
+	
 	public SendNowSendLaterForm(CommandListener activity, ItemStateListener itemListener) {
+		this(activity, itemListener, false);
+	}
+
+	public SendNowSendLaterForm(CommandListener activity, ItemStateListener itemListener, boolean cacheAutomatically) {
 		//#style submitPopup
-		super(Localization.get("sending.view.submit"));
+		super(cacheAutomatically ? Localization.get("sending.view.done.title") : Localization.get("sending.view.submit"));
 
-		//#style submitYesNo
-		this.cg = new ChoiceGroup(Localization.get("sending.view.when"), Choice.EXCLUSIVE);
-
-		// NOTE! These Indexes are optimized to be added in a certain
-		// order. _DO NOT_ change it without updating the static values
-		// for their numerical order.
-		this.cg.append(Localization.get("sending.view.now"), null);
-		this.cg.append(Localization.get("sending.view.later"), null);
+		if(!cacheAutomatically) {
+			//#style submitYesNo
+			this.cg = new ChoiceGroup(Localization.get("sending.view.when"), Choice.EXCLUSIVE);
+			
+			// NOTE! These Indexes are optimized to be added in a certain
+			// order. _DO NOT_ change it without updating the static values
+			// for their numerical order.
+			this.cg.append(Localization.get("sending.view.now"), null);
+			this.cg.append(Localization.get("sending.view.later"), null);
+			append(this.cg);
+		} else {
+			StringItem message = new StringItem(null, Localization.get("sending.view.done"));
+			this.append(message);
+			
+			this.addCommand(commandOk);
+		}
 		
 
 		//TODO: Add this back in for admin users. Who took it out?
@@ -54,7 +71,6 @@ public class SendNowSendLaterForm extends FramedForm {
 		// see
 		// this
 
-		append(this.cg);
 
 		append(new Spacer(80, 0));
 
