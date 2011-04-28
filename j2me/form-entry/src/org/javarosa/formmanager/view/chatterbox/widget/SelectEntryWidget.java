@@ -63,6 +63,7 @@ public abstract class SelectEntryWidget extends ExpandedWidget {
 			}
 		};
 		for (int i = 0; i < prompt.getSelectChoices().size(); i++){
+			//#style listitem
 			cg.append("", null);
 		}
 		
