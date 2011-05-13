@@ -59,7 +59,7 @@ public interface IFormElement extends Localizable, Externalizable {
 	 * might have. Null if the element is not able to have child
 	 * elements.
 	 */
-	Vector getChildren ();
+	Vector<IFormElement> getChildren ();
 	
 	/** 
 	 * @param v the children of this element, if it is capable of having
@@ -67,7 +67,7 @@ public interface IFormElement extends Localizable, Externalizable {
 	 * @throws IllegalStateException if the element is incapable of
 	 * having children.
 	 */
-	void setChildren (Vector v);
+	void setChildren (Vector<IFormElement> v);
 	
 	/**
 	 * @param fe The child element to be added

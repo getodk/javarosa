@@ -263,7 +263,7 @@ public class FormInstance implements Persistable, Restorable {
 		return nodes;
 	}
 
-	public Vector expandReference(TreeReference ref) {
+	public Vector<TreeReference> expandReference(TreeReference ref) {
 		return expandReference(ref, false);
 	}
 
@@ -274,11 +274,11 @@ public class FormInstance implements Persistable, Restorable {
 	// return null if ref is relative, otherwise return vector of refs (but vector will be empty is no refs match)
 	// '/' returns {'/'}
 	// can handle sub-repetitions (e.g., {/a[1]/b[1], /a[1]/b[2], /a[2]/b[1]})
-	public Vector expandReference(TreeReference ref, boolean includeTemplates) {
+	public Vector<TreeReference> expandReference(TreeReference ref, boolean includeTemplates) {
 		if (!ref.isAbsolute())
 			return null;
 
-		Vector v = new Vector();
+		Vector<TreeReference> v = new Vector<TreeReference>();
 		expandReference(ref, root, v, includeTemplates);
 		return v;
 	}
@@ -289,7 +289,7 @@ public class FormInstance implements Persistable, Restorable {
 	// templateRef: explicit path that refers to the current node
 	// refs: Vector to collect matching paths; if 'node' is a target node that
 	// matches sourceRef, templateRef is added to refs
-	private void expandReference(TreeReference sourceRef, TreeElement node, Vector refs, boolean includeTemplates) {
+	private void expandReference(TreeReference sourceRef, TreeElement node, Vector<TreeReference> refs, boolean includeTemplates) {
 		int depth = node.getDepth();
 
 		if (depth == sourceRef.size()) {
