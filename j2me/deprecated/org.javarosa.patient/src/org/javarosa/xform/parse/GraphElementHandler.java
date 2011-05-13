@@ -34,13 +34,8 @@ public class GraphElementHandler implements IElementHandler{
 	/* (non-Javadoc)
 	 * @see org.javarosa.xform.parse.IElementHandler#handle(org.javarosa.core.model.FormDef, org.kxml2.kdom.Element, java.lang.Object)
 	 */
-	public void handle(FormDef f, Element e, Object parent) {
-		parseControl((IFormElement)parent, e, f, GraphWidget.CONTROL_GRAPH);
-		
-	}
-
-	private void parseControl (IFormElement parent, Element e, FormDef f, int controlType) {
-		QuestionDef question = XFormParser.parseControl(parent, e, f, controlType);
+	public void handle(XFormParser p, Element e, Object parent) {
+		QuestionDef question = p.parseControl((IFormElement)parent, e, GraphWidget.CONTROL_GRAPH);
 		String type = e.getAttributeValue(null,"type");
 		if (type != null) {
 			if (graphTypes.contains(type)) {
