@@ -50,7 +50,6 @@ public class XFormUtils {
      * This method throws XFormParseException when the form has errors.
      */
 	public static FormDef getFormFromInputStream(InputStream is) {
-		FormDef returnForm = null;
 		InputStreamReader isr;
 		try {
 			isr = new InputStreamReader(is,"UTF-8");
@@ -59,17 +58,17 @@ public class XFormUtils {
 			isr = new InputStreamReader(is); 
 		}
 		
-		if(isr != null) {
-			returnForm = XFormParser.getFormDef(isr);
-		}
 		try {
-			isr.close();
+			return new XFormParser(isr).parse();
+		} finally {
+			try {
+				isr.close();
+			}
+			catch(IOException e) {
+				System.err.println("IO Exception while closing stream.");
+				e.printStackTrace();
+			}
 		}
-		catch(IOException e) {
-			System.err.println("IO Exception while closing stream.");
-			e.printStackTrace();
-		}
-		return returnForm;
 	}
 
 	public static FormDef getFormFromSerializedResource(String resource) {
