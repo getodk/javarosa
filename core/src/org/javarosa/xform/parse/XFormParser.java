@@ -175,8 +175,8 @@ public class XFormParser {
 		groupLevelHandlers.put(Constants.XFTAG_UPLOAD, upload);
 
 		topLevelHandlers = new Hashtable<String, IElementHandler>();
-		for (Enumeration<String> en = groupLevelHandlers.keys(); en.hasMoreElements(); ) {
-			String key = en.nextElement();
+		for (Enumeration en = groupLevelHandlers.keys(); en.hasMoreElements(); ) {
+			String key = (String)en.nextElement();
 			topLevelHandlers.put(key, groupLevelHandlers.get(key));
 		}
 		topLevelHandlers.put("model", model);
@@ -229,10 +229,10 @@ public class XFormParser {
 		defaultNamespace = null;
 		
 		itextKnownForms = new Vector<String>();
-		itextKnownForms.add("long");
-		itextKnownForms.add("short");
-		itextKnownForms.add("image");
-		itextKnownForms.add("audio");
+		itextKnownForms.addElement("long");
+		itextKnownForms.addElement("short");
+		itextKnownForms.addElement("image");
+		itextKnownForms.addElement("audio");
 	}
 
 	public XFormParser(Reader reader) {
@@ -1332,7 +1332,7 @@ public class XFormParser {
 				//A key is found, pull it out, add it to the list of guesses, and return positive
 				String textForm = key.substring(key.indexOf(";") + 1, key.length());
 				System.out.println("adding unexpected special itext form: " + textForm + " to list of expected forms");
-				itextKnownForms.add(textForm);				
+				itextKnownForms.addElement(textForm);				
 				return true;
 			}
 		}
