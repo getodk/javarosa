@@ -61,6 +61,27 @@ at large.
 	</device>
 	
 	<device>
+		<identifier>Nokia/Minimal</identifier>
+		<groups>Series40</groups>
+		<features>javarosa</features>
+		<capability name="noobfuscate" value="true" />
+		<capability name="ScreenSize" value="240x320" />
+		<capability name="FullCanvasSize" value="240x320" />
+		
+		<!-- Overwrite the packages involved to remove File System -->
+		<capability name="JavaPlatform" value="MIDP/2.0, JTWI/1.0" />
+	    <capability name="JavaConfiguration" value="CLDC/1.1" />
+	    <capability name="JavaPackage" value="btapi,fileconnection,mmapi" />
+	    <capability name="SoundFormat" value="midi, amr, wav" />
+	    <capability name="HeapSize" value="1MB" />
+	    <capability name="key.LeftSoftKeys" value="-6,-21,21,57345,-1,-202" />
+	    <capability name="key.RightSoftKeys" value="-7,-22,22,57346,-4,-203" />
+	    <capability name="key.maybeSupportsAsciiKeyMap" value="true" />
+	    <capability name="MenuBar.OptionsPosition" value="left" />
+	    <capability name="Bugs" value="SoftKeyMappedToFire,noSoftKeyReleasedEvents,displaySetCurrentFlickers,needsBottomOrientiationForStringDrawing,BacklightRequiresLightOff, keyRepeatOverload, SnapshotRequiresScreenChange" />
+
+	</device>
+	<device>
 		<identifier>Generic/Default</identifier>
 		<features>javarosa</features>
 		<parent>Generic/AnyPhone</parent>
