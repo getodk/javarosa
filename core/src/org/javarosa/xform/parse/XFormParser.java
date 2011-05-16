@@ -533,7 +533,7 @@ public class XFormParser {
 	
 	protected QuestionDef parseControl (IFormElement parent, Element e, int controlType) {
 		QuestionDef question = new QuestionDef();
-		question.setID(serialQuestionID++); //until we come up with a better scheme
+		question.setID(newQuestionID()); //until we come up with a better scheme
 		
 		Vector usedAtts = new Vector();
 		usedAtts.addElement(REF_ATTR);
@@ -979,7 +979,7 @@ public class XFormParser {
 	
 	private void parseGroup (IFormElement parent, Element e, int groupType) {
 		GroupDef group = new GroupDef();
-		group.setID(serialQuestionID++); //until we come up with a better scheme
+		group.setID(newQuestionID()); //until we come up with a better scheme
 		IDataReference dataRef = null;
 		boolean refFromBind = false;
 		
@@ -2320,6 +2320,11 @@ public class XFormParser {
 
 	public static void addDataType (String type, int dataType) {
 		typeMappings.put(type, new Integer(dataType));
+	}
+	
+	public static synchronized int newQuestionID() {
+		serialQuestionID++;
+		return serialQuestionID;
 	}
 	
 	public static void registerControlType(String type, final int typeId) {
