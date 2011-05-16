@@ -95,9 +95,6 @@ public class XFormParser {
 
 	private static final int CONTAINER_GROUP = 1;
 	private static final int CONTAINER_REPEAT = 2;
-
-	//incremented to provide unique question ID for each question
-	private static int serialQuestionID = 1;
 	
 	private static Hashtable<String, IElementHandler> topLevelHandlers;
 	private static Hashtable<String, IElementHandler> groupLevelHandlers;
@@ -122,6 +119,9 @@ public class XFormParser {
 	
 	private FormInstance repeatTree; //pseudo-data model tree that describes the repeat structure of the instance;
 									 //useful during instance processing and validation
+
+	//incremented to provide unique question ID for each question
+	private int serialQuestionID = 1;
 	
 	static {
 		try {
@@ -533,7 +533,7 @@ public class XFormParser {
 	
 	protected QuestionDef parseControl (IFormElement parent, Element e, int controlType) {
 		QuestionDef question = new QuestionDef();
-		question.setID(newQuestionID()); //until we come up with a better scheme
+		question.setID(serialQuestionID++); //until we come up with a better scheme
 		
 		Vector usedAtts = new Vector();
 		usedAtts.addElement(REF_ATTR);
@@ -979,7 +979,7 @@ public class XFormParser {
 	
 	private void parseGroup (IFormElement parent, Element e, int groupType) {
 		GroupDef group = new GroupDef();
-		group.setID(newQuestionID()); //until we come up with a better scheme
+		group.setID(serialQuestionID++); //until we come up with a better scheme
 		IDataReference dataRef = null;
 		boolean refFromBind = false;
 		
@@ -2321,12 +2321,7 @@ public class XFormParser {
 	public static void addDataType (String type, int dataType) {
 		typeMappings.put(type, new Integer(dataType));
 	}
-	
-	public static synchronized int newQuestionID() {
-		serialQuestionID++;
-		return serialQuestionID;
-	}
-	
+		
 	public static void registerControlType(String type, final int typeId) {
 		IElementHandler newHandler = new IElementHandler() {
 			public void handle (XFormParser p, Element e, Object parent) { p.parseControl((IFormElement)parent, e, typeId); } };
