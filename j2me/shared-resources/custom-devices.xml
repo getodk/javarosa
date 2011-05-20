@@ -81,12 +81,12 @@ at large.
 	    <capability name="Bugs" value="SoftKeyMappedToFire,noSoftKeyReleasedEvents,displaySetCurrentFlickers,needsBottomOrientiationForStringDrawing,BacklightRequiresLightOff, keyRepeatOverload, SnapshotRequiresScreenChange" />
 
 	</device>
-	<device types="nokia sun">
+	<device types="sun">
 		<identifier>Generic/Default</identifier>
 		<features>javarosa</features>
 		<parent>Generic/AnyPhone</parent>
 	</device>
-	<device types="nokia sun nonroman">
+	<device types="sun nonroman">
 		<identifier>Generic/International</identifier>
 		<capability name="international" value="true" />
 		<features>javarosa</features>
@@ -100,7 +100,7 @@ at large.
 		<parent>BlackBerry/4.5</parent>
 	</device>
 	
-	<device types="nokia winmo">
+	<device types="winmo">
 		<identifier>Native/WinMo</identifier>
 		<!-- capability name="international" value="true" / -->
 		<features>javarosa, hasPointerEvents, hasPointerMotionEvents, hasCommandKeyEvents, isVirtual</features>
