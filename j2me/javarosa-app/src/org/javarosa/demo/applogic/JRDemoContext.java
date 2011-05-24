@@ -9,9 +9,12 @@ import org.javarosa.core.model.CoreModelModule;
 import org.javarosa.core.model.SubmissionProfile;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.model.utils.IPreloadHandler;
+import org.javarosa.core.reference.InvalidReferenceException;
 import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.reference.RootTranslator;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.locale.Localization;
 import org.javarosa.core.services.properties.JavaRosaPropertyRules;
@@ -92,11 +95,33 @@ public class JRDemoContext {
 		Localization.registerLanguageFile("default", "/messages_jrdemo_default.txt");
 	}
 	
+	private void parseAndProcessLanguageResources(String resourceString) {
+		Vector<String> resources = DateUtils.split(resourceString, ",", true);
+		for(int i = 0 ; i < resources.size() ; i+=2) {
+			String langkey = resources.elementAt(i);
+			String resource = resources.elementAt(i+1);
+			try {
+				if(!ReferenceManager._().DeriveReference(resource).doesBinaryExist()) {
+					Logger.die("Initialization", new RuntimeException("Language Resource (for locale: " + langkey + ") Unavailable during load. Could not resolve reference for " + resource));
+				}
+				Localization.registerLanguageReference(langkey, resource);
+			} catch (IOException e) {
+				Logger.exception(e);
+				Logger.die("Initialization", new RuntimeException("Language Resource (for locale: " + langkey + ") Unavailable during load. IO Exception while reading " + resource));
+			} catch (InvalidReferenceException e) {
+				Logger.exception(e);
+				Logger.die("Initialization", new RuntimeException("Language Resource (for locale: " + langkey + ") unavailable. Invalid JR Reference: " + resource));
+			}
+		}
+	}
+	
 	private void setProperties() {
 		final String POST_URL = midlet.getAppProperty("JRDemo-Post-Url");
 		final String FORM_URL = midlet.getAppProperty("Form-Server-Url");
 		final String VIEW_TYPE = midlet.getAppProperty("Default-View");
 		final String LANGUAGE = midlet.getAppProperty("cur_locale");
+		
+		final String LANGUAGE_RESOURCES = midlet.getAppProperty("Locale-Resources");
 		PropertyManager._().addRules(new JavaRosaPropertyRules());
 		PropertyManager._().addRules(new DemoAppProperties());
 
@@ -105,6 +130,10 @@ public class JRDemoContext {
 		PropertyUtils.initializeProperty(DemoAppProperties.POST_URL_PROPERTY, POST_URL);
 		PropertyUtils.initializeProperty(DemoAppProperties.FORM_URL_PROPERTY, FORM_URL);
 		PropertyUtils.initializeProperty(FormManagerProperties.VIEW_TYPE_PROPERTY, VIEW_TYPE);
+		
+		if(LANGUAGE_RESOURCES != null && LANGUAGE_RESOURCES != "") {
+			parseAndProcessLanguageResources(LANGUAGE_RESOURCES);
+		}
 		
 		LanguageUtils.initializeLanguage(false, LANGUAGE == null ? "default" : LANGUAGE);
 
