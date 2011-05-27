@@ -106,6 +106,9 @@ public class XFormParser {
 	private Document _xmldoc;
 	private FormDef _f;
 	
+	private Reader _instReader;
+	private Document _instDoc;
+	
 	private boolean modelFound;
 	private Hashtable<String, DataBinding> bindingsByID;
 	private Vector<DataBinding> bindings;
@@ -243,6 +246,16 @@ public class XFormParser {
 		_xmldoc = doc;
 	}
 	
+	public XFormParser(Reader form, Reader instance) {
+		_reader = form;
+		_instReader = instance;
+	}
+	
+	public XFormParser(Document form, Document instance) {
+		_xmldoc = form;
+		_instDoc = instance;
+	}
+	
 	public FormDef parse() {
 		if (_f == null) {
 			System.out.println("Parsing form...");
@@ -252,6 +265,13 @@ public class XFormParser {
 			}
 			
 			parseDoc();
+			
+			//load in a custom xml instance, if applicable
+			if (_instReader != null) {
+				loadXmlInstance(_f, _instReader);
+			} else if (_instDoc != null) {
+				loadXmlInstance(_f, _instDoc);
+			}
 		}
 		return _f;
 	}
@@ -2260,37 +2280,41 @@ public class XFormParser {
 		}
 	}
 	
-//	//this is terrible
-//	//not only do we have to re-parse the entire formdef, but it is not guaranteed that you can drop in a submitted instance
-//	//back into its original form def and it will still parse. in particular, non-relevant nodes will be missing, which will
-//	//really confuse the binding verifier and repeat homogeneity checker.
-//	public static FormInstance parseDataModelGhettoooooo (InputStream instanceXMLStream, InputStream formDefXMLStream, String locale)   {
-//		Document formDefXML = getXMLDocument(new InputStreamReader(formDefXMLStream));
-//		Document instanceXML = getXMLDocument(new InputStreamReader(instanceXMLStream));
-//
-//		//copied from getFromDef
-//		FormDef formDef = new FormDef();
-//		
-//		initBindHandlers();
-//		initStateVars();
-//
-//		parseElement(formDef, formDefXML.getRootElement(), formDef, topLevelHandlers);
-//		collapseRepeatGroups(formDef);
-//		
-//		instanceNode = instanceXML.getRootElement(); //replace default form instance with our new instance
-//		parseInstance(formDef, instanceNode);
-//
-//		initStateVars();
-//
-//		if (locale != null) {
-//			formDef.getLocalizer().setToDefault();
-//		} else {
-//			formDef.getLocalizer().setLocale(locale);
-//		}
-//		
-//		return formDef.getInstance();
-//	}
-		
+	public static void loadXmlInstance(FormDef f, Reader xmlReader) {
+		loadXmlInstance(f, getXMLDocument(xmlReader));
+	}
+	
+	/**
+	 * Load a compatible xml instance into FormDef f
+	 * 
+	 * call before f.initialize()!
+	 */
+	public static void loadXmlInstance(FormDef f, Document xmlInst) {
+        TreeElement savedRoot = XFormParser.restoreDataModel(xmlInst, null).getRoot();
+        TreeElement templateRoot = f.getInstance().getRoot().deepCopy(true);
+
+        // weak check for matching forms
+        // TODO: should check that namespaces match?
+	    if (!savedRoot.getName().equals(templateRoot.getName()) || savedRoot.getMult() != 0) {
+	    	throw new RuntimeException("Saved form instance does not match template form definition");
+	    }
+
+	    // populate the data model
+	    TreeReference tr = TreeReference.rootRef();
+	    tr.add(templateRoot.getName(), TreeReference.INDEX_UNBOUND);
+	    templateRoot.populate(savedRoot, f);
+
+	    // populated model to current form
+	    f.getInstance().setRoot(templateRoot);
+      
+	    // if the new instance is inserted into the formdef before f.initialize() is called, this
+	    // locale refresh is unnecessary
+	    //   Localizer loc = f.getLocalizer();
+	    //   if (loc != null) {
+	    //       f.localeChanged(loc.getLocale(), loc);
+	    //	 }
+	}
+			
 	//returns data type corresponding to type string; doesn't handle defaulting to 'text' if type unrecognized/unknown
 	private static int getDataType(String type) {
 		int dataType = Constants.DATATYPE_NULL;
@@ -2366,12 +2390,15 @@ public class XFormParser {
 	}
 	
 	public static FormInstance restoreDataModel (InputStream input, Class restorableType) {
-		Restorable r = (restorableType != null ? (Restorable)PrototypeFactory.getInstance(restorableType) : null);
-		
 		Document doc = getXMLDocument(new InputStreamReader(input));
 		if (doc == null) {
 			throw new RuntimeException("syntax error in XML instance; could not parse");
 		}
+		return restoreDataModel(doc, restorableType);
+	}
+	
+	public static FormInstance restoreDataModel (Document doc, Class restorableType) {
+		Restorable r = (restorableType != null ? (Restorable)PrototypeFactory.getInstance(restorableType) : null);
 		
 		Element e = doc.getRootElement();
 		
