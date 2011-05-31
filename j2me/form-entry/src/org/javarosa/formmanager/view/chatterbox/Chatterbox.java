@@ -30,6 +30,7 @@ import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.GroupDef;
 import org.javarosa.core.model.IFormElement;
 import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.model.utils.DateUtils;
 import org.javarosa.core.services.Logger;
 import org.javarosa.core.services.UnavailableServiceException;
 import org.javarosa.core.services.locale.Localization;
@@ -730,8 +731,22 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	    		
 	    		try{
 	    			if(fep != null && fep.getAudioText() != null) {
+	    				// log that audio file was (attempted to be) played
+	    				// TODO: move this to some sort of 'form entry diagnostics' framework
+	    				// instead of bloating the logs
 	    				String audio = fep.getAudioText();
-	    				Logger.log("audio", "request: " + audio);
+	    				
+	    				//extract just the audio filename to reduce log size
+	    				String audioShort;
+	    				try {
+	    					Vector<String> pieces = DateUtils.split(audio, "/", false);
+	    					String filename = pieces.lastElement();
+	    					int suffixIx = filename.lastIndexOf('.');
+	    					audioShort = (suffixIx != -1 ? filename.substring(0, suffixIx) : filename);
+	    				} catch (Exception e) {
+	    					audioShort = audio;
+	    				}	    				
+	    				Logger.log("audio", audioShort);
 	    			}
 	    		} catch(Exception e) {
 	    			//Nothing
