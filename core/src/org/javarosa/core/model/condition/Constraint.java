@@ -20,26 +20,61 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.javarosa.core.model.instance.FormInstance;
+import org.javarosa.core.services.Logger;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
 import org.javarosa.core.util.externalizable.ExtWrapTagged;
 import org.javarosa.core.util.externalizable.Externalizable;
 import org.javarosa.core.util.externalizable.PrototypeFactory;
+import org.javarosa.xpath.XPathParseTool;
+import org.javarosa.xpath.expr.XPathExpression;
 
 public class Constraint implements Externalizable {
 	public IConditionExpr constraint;
-	public String constraintMsg;
+	private String constraintMsg;
+	private XPathExpression xPathConstraintMsg;
 	
 	public Constraint () { }
 	
 	public Constraint (IConditionExpr constraint, String constraintMsg) {
 		this.constraint = constraint;
 		this.constraintMsg = constraintMsg;
+		attemptConstraintCompile();
+	}
+	
+	public String getConstraintMessage(EvaluationContext ec, FormInstance instance) {
+		if(xPathConstraintMsg == null) {
+			return constraintMsg;
+		} else{
+			try{
+				Object value = xPathConstraintMsg.eval(instance, ec);
+				if(value != null) {
+					return (String)value;
+				}
+				return null;
+			} catch(Exception e) {
+				Logger.exception("Error evaluating a valid-looking constraint xpath ", e);
+				return constraintMsg;
+			}
+		}
+	}
+	
+	private void attemptConstraintCompile() {
+		xPathConstraintMsg = null;
+		try {
+			if(constraintMsg != null) {
+				xPathConstraintMsg = XPathParseTool.parseXPath("string(" + constraintMsg + ")");
+			}
+		} catch(Exception e) {
+			//Expected in probably most cases.
+		}
 	}
 	
 	public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
 		constraint = (IConditionExpr)ExtUtil.read(in, new ExtWrapTagged(), pf);
 		constraintMsg = ExtUtil.nullIfEmpty(ExtUtil.readString(in));
+		attemptConstraintCompile();
 	}
 
 	public void writeExternal(DataOutputStream out) throws IOException {

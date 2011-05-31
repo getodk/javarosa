@@ -967,12 +967,12 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
 			// this)
 			preloadInstance(instance.getRoot());
 		}
-
-		initializeTriggerables();
-
+		
 		if (getLocalizer() != null && getLocalizer().getLocale() == null) {
 			getLocalizer().setToDefault();
 		}
+
+		initializeTriggerables();
 	}
 
 	/**
