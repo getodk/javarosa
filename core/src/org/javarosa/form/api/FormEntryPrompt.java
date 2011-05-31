@@ -66,8 +66,9 @@ public class FormEntryPrompt extends FormEntryCaption {
 	 */
     public FormEntryPrompt(FormDef form, FormIndex index) {
         super(form, index);
-        if (!(element instanceof QuestionDef))
+        if (!(element instanceof QuestionDef)) {
         	throw new IllegalArgumentException("FormEntryPrompt can only be created for QuestionDef elements");
+        }
         this.mTreeElement = form.getInstance().resolveReference(index.getReference());
     }
 
@@ -189,10 +190,27 @@ public class FormEntryPrompt extends FormEntryCaption {
     }
 
     public String getConstraintText() {
-        if (mTreeElement.getConstraint() == null)
+        return getConstraintText(null);
+    }
+    
+    public String getConstraintText(IAnswerData attemptedValue) {
+        return getConstraintText(null, attemptedValue);
+    }
+    
+    public String getConstraintText(String textForm, IAnswerData attemptedValue) {
+    	if (mTreeElement.getConstraint() == null) {
             return null;
-        else
-            return mTreeElement.getConstraint().constraintMsg;
+        } else {
+        	EvaluationContext ec = new EvaluationContext(form.exprEvalContext, mTreeElement.getRef());
+        	if(textForm != null) {
+        		ec.setOutputTextForm(textForm);
+        	} 
+        	if(attemptedValue != null) {
+        		ec.isConstraint = true;
+        		ec.candidateValue = attemptedValue;
+        	}
+            return mTreeElement.getConstraint().getConstraintMessage(ec, form.getInstance());
+        }
     }
 
     public Vector<SelectChoice> getSelectChoices() {
@@ -354,7 +372,7 @@ public class FormEntryPrompt extends FormEntryCaption {
 		//We could hide it by dispatching hints through a final abstract class instead.
 		Constraint c =  mTreeElement.getConstraint();
 		if(c != null) {
-			hint.init(new EvaluationContext(new EvaluationContext(), mTreeElement.getRef()), c.constraint, this.form.getInstance());
+			hint.init(new EvaluationContext(form.exprEvalContext, mTreeElement.getRef()), c.constraint, this.form.getInstance());
 		} else {
 			//can't pivot what ain't there.
 			throw new UnpivotableExpressionException();

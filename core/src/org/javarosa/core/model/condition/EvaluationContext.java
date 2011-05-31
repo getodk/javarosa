@@ -37,6 +37,7 @@ public class EvaluationContext {
 	public boolean isCheckAddChild; //if isConstraint, true if we are checking the constraint of a parent node on how
 									//  many children it may have
 	
+	private String outputTextForm = null; //Responsible for informing itext what form is requested if relevant
 	
 	public EvaluationContext (EvaluationContext base, TreeReference context) {
 		this.functionHandlers = base.functionHandlers;
@@ -59,6 +60,10 @@ public class EvaluationContext {
 	
 	public Hashtable getFunctionHandlers () {
 		return functionHandlers;
+	}
+	
+	public void setOutputTextForm(String form) {
+		this.outputTextForm = form;
 	}
 	
 	public void setVariables(Hashtable<String, ?> variables) {

@@ -699,7 +699,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 	    	if (status == FormEntryController.ANSWER_REQUIRED_BUT_EMPTY) {
 	        	this.queueError(null, PROMPT_REQUIRED_QUESTION);
 	    	} else if (status == FormEntryController.ANSWER_CONSTRAINT_VIOLATED) {
-	    		String msg = frame.getPrompt().getConstraintText();
+	    		String msg = frame.getPrompt().getConstraintText(frame.getData());
 	    		this.queueError(null, msg != null ? msg : PROMPT_DEFAULT_CONSTRAINT_VIOL);
 	     	} else {
 	     		step(controller.stepToNextEvent());
