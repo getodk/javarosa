@@ -526,10 +526,7 @@ public class Chatterbox extends FramedForm implements HandledPCommandListener, I
 			progressBar.setValue(progressBar.getMaxValue());
 			
 			repaint();
-			try {
-				Thread.sleep(1000); //let them bask in their completeness
-			} catch (InterruptedException ie) { }
-				
+			
 			controller.saveAndExit(true);
     	}
     }
