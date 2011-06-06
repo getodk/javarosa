@@ -64,7 +64,6 @@ at large.
 		<identifier>Nokia/Minimal</identifier>
 		<groups>Series40</groups>
 		<features>javarosa</features>
-		<capability name="noobfuscate" value="true" />
 		<capability name="ScreenSize" value="240x320" />
 		<capability name="FullCanvasSize" value="240x320" />
 		
