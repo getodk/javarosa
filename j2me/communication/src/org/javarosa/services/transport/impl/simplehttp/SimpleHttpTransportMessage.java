@@ -6,10 +6,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Enumeration;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
+import javax.microedition.pki.Certificate;
+import javax.microedition.pki.CertificateException;
 
 import org.javarosa.core.log.WrappedException;
 import org.javarosa.core.services.Logger;
@@ -214,6 +215,74 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 			}
 
 			conn.close();
+		} catch(CertificateException certe) {
+			String reason = "";
+			switch (certe.getReason())
+			{
+			case CertificateException.BAD_EXTENSIONS:
+			reason = "Certificate contains unrecognized extensions";
+			break;
+			case CertificateException.BROKEN_CHAIN:
+			reason = "Certificate was not issuied by next certificate in the chain";
+			break;
+			case CertificateException.CERTIFICATE_CHAIN_TOO_LONG:
+			reason = "Too long certificate chain";
+			break;
+			case CertificateException.EXPIRED:
+			reason = "Certificate has already expired";
+			break;
+			case CertificateException.INAPPROPRIATE_KEY_USAGE:
+			reason = "Certificate usage not acceptable";
+			break;
+			case CertificateException.MISSING_SIGNATURE:
+			reason = "Certificate does not contain a signature";
+			break;
+			case CertificateException.NOT_YET_VALID:
+			reason = "Attempte to use a Certificate not valid yet";
+			break;
+			case CertificateException.ROOT_CA_EXPIRED:
+			reason = "Certificate's root CA has expired";
+			break;
+			case CertificateException.SITENAME_MISMATCH:
+			reason = "Certificate's referred sitename is incorrect";
+			break;
+			case CertificateException.UNAUTHORIZED_INTERMEDIATE_CA:
+			reason = "One of the certificates in the chain is not authorized";
+			break;
+			case CertificateException.UNRECOGNIZED_ISSUER:
+			reason = "Certificate's issuer is unrecognized";
+			break;
+			case CertificateException.UNSUPPORTED_PUBLIC_KEY_TYPE:
+			reason = "The type of the public key is not supported";
+			break;
+			case CertificateException.UNSUPPORTED_SIGALG:
+			reason = "Certificate's signature algorithm is not supported";
+			break;
+			case CertificateException.VERIFICATION_FAILED:
+			reason = "Certificate could not be validated";
+			break;
+			default:
+			reason = "Unknown reason";
+			break;
+			}
+			
+			String certinfo = "";
+			Certificate cert = certe.getCertificate();
+			if (cert != null)
+			{
+				
+				certinfo += "DN: " + cert.getSubject();
+				certinfo += "Type: " + cert.getType();
+				certinfo += "Version: " + cert.getVersion() + "\r";
+				certinfo += "Serial Number: " + cert.getSerialNumber() + "\r";
+				certinfo += "Signature Algorithm: " + cert.getSigAlgName() + "\r";
+			}
+			
+			ex = true;
+			Logger.exception("Certificate error : " + reason +" . Provided cert: " + certinfo, certe);
+			
+			this.setFailureReason(WrappedException.printException(certe));
+			this.incrementFailureCount();
 		} catch (Exception e) {
 			ex = true;
 			e.printStackTrace();
