@@ -48,6 +48,9 @@ public class SendNowSendLaterForm extends FramedForm {
 		//#style submitPopup
 		super(cacheAutomatically ? Localization.get("sending.view.done.title") : Localization.get("sending.view.submit"));
 
+		setCommandListener(activity);
+		setItemStateListener(itemListener);
+		
 		if(!cacheAutomatically) {
 			//#style submitYesNo
 			this.cg = new ChoiceGroup(Localization.get("sending.view.when"), Choice.EXCLUSIVE);
@@ -73,9 +76,6 @@ public class SendNowSendLaterForm extends FramedForm {
 
 
 		append(new Spacer(80, 0));
-
-		setCommandListener(activity);
-		setItemStateListener(itemListener);
 	}
 
 	public int getCommandChoice() {

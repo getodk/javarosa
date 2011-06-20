@@ -73,7 +73,7 @@ public class JRDemoContext {
 		addCustomLanguages();
 		setProperties();
 			
-		UserUtility.populateAdminUser();
+		UserUtility.populateAdminUser(m);
 		loadRootTranslator();
 	}	
 

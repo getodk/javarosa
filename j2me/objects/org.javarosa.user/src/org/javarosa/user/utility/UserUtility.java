@@ -3,6 +3,8 @@
  */
 package org.javarosa.user.utility;
 
+import javax.microedition.midlet.MIDlet;
+
 import org.javarosa.core.services.PropertyManager;
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.IStorageUtility;
@@ -17,13 +19,16 @@ import org.javarosa.user.model.User;
  *
  */
 public class UserUtility {
+	
+	public static final String ADMIN_PW_PROPERTY = "JavaRosa-Admin-Password";
+	
 	//#ifdef admin.pw.default:defined
 	//#=	private static final String defaultPassword = "${admin.pw.default}";
 	//#else
 			private static final String defaultPassword = "234";
 	//#endif
 	
-	public static void populateAdminUser() {
+	public static void populateAdminUser(MIDlet m) {
 		IStorageUtility users = StorageManager.getStorage(User.STORAGE_KEY);
 
 		boolean adminFound = false;
@@ -38,7 +43,10 @@ public class UserUtility {
 		
 		// There is no admin user to update, so add the user
 		if(!adminFound) {
-			User admin = new User("admin", defaultPassword, PropertyUtils.genGUID(25), User.ADMINUSER);
+			//TODO: Test for MIDlet-Jar-RSA-SHA1 or other signing mechanism before allowing the property to be pulled?
+			String defaultFromEnvironment = m == null ? null : m.getAppProperty(ADMIN_PW_PROPERTY);
+			
+			User admin = new User("admin", defaultFromEnvironment != null ? defaultFromEnvironment : defaultPassword, PropertyUtils.genGUID(25), User.ADMINUSER);
 			admin.setUuid(PropertyManager._().getSingularProperty("DeviceID"));
 
 			try {
