@@ -1,0 +1,64 @@
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:jr="http://openrosa.org/javarosa">
+  <h:head>
+    <h:meta name="name" content="demo" />
+    <h:meta name="version" content="0.1" />
+    <h:title>Demo Form</h:title>
+
+    <model>
+      <instance>
+		    <x xmlns="drewstest">
+		      <q />
+          
+          <children>
+            <child jr:template="">
+              <name />
+              <age />
+              <sex />
+            </child>
+          </children>
+
+          <qq />
+          
+		    </x>
+
+      </instance>
+      
+      <bind nodeset="children/child/age" type="int" />
+      
+    </model>
+  </h:head>
+  <h:body>
+  
+    <group><label>imma group</label>
+      <input ref="q"><label>pre q</label></input>
+    </group>
+  
+  	<group>
+  	<label>child</label>
+  	<repeat nodeset="children/child">
+      <jr:mainHeader>Children in Household (<output value="$n" />)</jr:mainHeader>
+      <jr:addCaption>Add another <output value="$name" /></jr:addCaption>
+      <jr:addEmptyCaption>None -- Add new <output value="$name" /></jr:addEmptyCaption>
+      <jr:delCaption>Remove a <output value="$name" /></jr:delCaption>
+      <jr:doneCaption>Finished</jr:doneCaption>
+      <jr:doneEmptyCaption>Skip; no children</jr:doneEmptyCaption>
+      <jr:chooseCaption><output value="concat($i, ': ', if(./name, ./name, '--'), ' ', if(./age, ./age, '??'), '/', if(./sex, ./sex, '?'))" /></jr:chooseCaption>  
+
+  		<input ref="name"><label>name</label></input>
+  		<input ref="age"><label>age</label></input>
+  		<select1 ref="sex">
+        <label>sex</label>
+        <item><label>Male</label><value>M</value></item>
+        <item><label>Female</label><value>F</value></item>
+      </select1>
+  	</repeat>
+  	</group>
+  
+    <input ref="qq"><label>post q</label></input>
+
+  </h:body>
+</h:html>
