@@ -91,7 +91,8 @@ public class JRDemoContext {
 	
 	
 	private void addCustomLanguages() {
-		Localization.registerLanguageFile("pt", "/messages_jrdemo_pt.txt");		
+		Localization.registerLanguageFile("pt", "/messages_jrdemo_pt.txt");
+		Localization.registerLanguageFile("fra", "/messages_jrdemo_fra.txt");
 		Localization.registerLanguageFile("default", "/messages_jrdemo_default.txt");
 	}
 	

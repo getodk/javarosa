@@ -384,6 +384,7 @@ pt=Portuguese
 es=Español
 sw=Kiswahili
 af=Afrikaans
+fra=French
 
 #OQPS Messages
 formentry.triggertitle=Message
