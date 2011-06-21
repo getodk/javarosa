@@ -1,0 +1,290 @@
+<?xml version="1.0"?>
+<project name="J2ME Rosa Library Build" default="package">
+	<tstamp/>
+
+	<property file="local.properties"/>
+	<property file="build.properties"/>
+
+	<fileset id="jr.sources" dir="../../">
+		<include name="core/src/**/*.java"/>
+		<include name="j2me/**/src/**/*.java"/>
+
+		<!-- exclude this until we've worked out issues with bluetooth apis -->
+		<exclude name="j2me/communication/src/org/javarosa/communication/bluetooth/**/*.java"/>
+		<exclude name="j2me/communication/src/org/javarosa/communication/sim/**/*.java"/>
+		<!-- exclude this until we've worked out issues with barcode apis -->
+		<exclude name="j2me/media/src/org/javarosa/barcode/**/*.java"/>
+		<exclude name="j2me/media/src/org/javarosa/view/**/Barcode*.java"/>
+		
+		<!-- don't want to put this in the jar for phones that don't suport location -->
+		<!-- We'll actually handle that with polish processors rather than manual exclusion -->
+		<!--exclude name="j2me/location/src/org/javarosa/location/**/*.java"/-->
+		
+		<!-- exclude the demo app code -->
+		<exclude name="j2me/javarosa-app/src/**/*.java"/>
+
+		<!-- stuff that hasn't been updated to build on the new framework -->
+		<exclude name="j2me/deprecated/org.javarosa.reminders/**/*.java"/>
+		<exclude name="j2me/communication/src/org/javarosa/communication/sms/trigger/**/*.java"/>
+
+		
+		<!-- Exclude BouncyCastle test sources -->
+		<exclude name="j2me/crypto/src/**/test/*.java"/>
+		<exclude name="j2me/crypto/src/**/examples/*.java"/>
+	</fileset>
+
+	<target name="package" depends="clean,init-libs,fetchPolishClassList">
+		<!-- first set source compliance. Java5 is correct, since we're postprocessing -->
+		<property name="ant.build.javac.compiler" value="1.5"/>
+		<property name="ant.build.javac.source" value="1.5"/>
+		<property name="ant.build.javac.target" value="1.5"/>
+		
+		<path id="jr.classpath">
+			<fileset dir="${dir.lib}">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${wtk.home}/lib" includes="${wtk.includes}"/>
+			<fileset dir="${polish.home}/import" includes="${polish.includes}"/>
+		</path>
+
+		<path id="jr.compiled.classpath">
+			<path refid="jr.classpath"/>
+			<fileset dir="dist" includes="j2merosa-libraries.jar"/>
+		</path>
+		
+		<path id="jr.classpath.test">
+			<path refid="jr.compiled.classpath" />
+			<fileset dir="buildTest" includes="jr-resource-jar.jar"/>
+			<fileset dir="${dir.lib}" includes="j2meunit-javarosa.jar"/>
+			<dirset dir="${basedir}">
+				<include name="buildTest/**"/>
+			</dirset>
+		</path>
+		
+		<!-- Get the resource files which'll be used -->
+		<fileset id="jr.resources" dir="${basedir}/../">
+			<include name="**/resources/*.txt"/>
+		</fileset>
+		
+		<mkdir dir="dist"/>
+		<mkdir dir="build"/>
+		<mkdir dir="build/src"/>
+
+		<!-- collect all relevant sources and put them into one big source chunk -->
+		<copy todir="build">
+			<fileset refid="jr.sources"/>
+			<regexpmapper from="^(.*)src(.*)$$" to="src\2"/>
+		</copy>
+
+		<!-- Now it's time to make the big file that lets Polish index the source code. This part's tricky,
+		so pay attention.
+		
+		First, create a fileset containing all of the source we've collected -->
+		<fileset id="dist.contents" dir="build/src/" includes="**/*.java"/>
+
+		<!-- Now, convert that source list into a property which is newline seperated, and contains references
+		that start assuming you're in a zip file and in the src directory already -->
+		<pathconvert pathsep="${line.separator}" property="buildcontents" refid="dist.contents">
+			<chainedmapper>
+				<!-- first, make sure we're using zip file file seperators -->
+				<filtermapper>
+					<replacestring from="\" to="/"/>
+				</filtermapper>
+				<!-- Now, cut all non-local elements from the path -->
+				<regexpmapper from="^(.*)src(.*)$$" to="\2"/>
+				<!-- Finally, trim leading seperators -->
+				<globmapper from="/*" to="*"/>
+			</chainedmapper>
+		</pathconvert>
+
+		<!-- This is where our magic polish source map goes -->
+		<mkdir dir="build/build/"/>
+
+		<!-- This echo dumps our filelist path from above into the file j2mepolish.index.text, and creates 
+		the file itself -->
+		<echo file="build/build/j2mepolish.index.txt" append="false">${buildcontents}${line.separator}</echo>
+
+		<!-- The file also needs to contain the files from polish, so we'll grab them from the resources
+		directory. In the future this should be set up even more thoroughly to pull the file _directly_ from
+		a polish jar file, which should be easy enough -->
+		<concat destfile="build/build/j2mepolish.index.txt" append="true">
+			<filelist dir="resources" files="j2mepolish.index.txt"/>
+		</concat>
+
+		<!-- Ok, so now compile all of the source so that when people put this jar on their eclipse path and
+		stuff, they can link to the bytecode. It's not necessary for the polsh build, but important for if
+		one wants to look at this like it's a real jar file (it's not) -->
+		<javac destdir="build" classpathref="jr.classpath">
+			<src path="build/src" />
+			<include name="**/*.java"/>
+		</javac>
+
+		<copy todir="build/resources/">
+		    <fileset dir="${dir.resources-shared}/resources/"/>
+   		</copy>
+		
+		<exec executable="hg" outputproperty="jr-build-version">
+			<arg line="parents --template {node|short}"/>
+		</exec>		
+		<echo message="jr-build-version=${jr-build-version}" file="build/javarosa.properties" />
+		
+		<!-- Schweet, now turn it into a 'jar' file! -->
+		<zip destfile="dist/j2merosa-libraries.jar" basedir="build"/>
+	</target>
+	
+	<target name="packageTestResources">
+		<mkdir dir="buildTest"/>
+		<mkdir dir="buildTest/tmp"/>
+		<copy todir="buildTest/tmp">
+			<fileset refid="jr.resources"/>
+			<flattenmapper/>
+		</copy>
+		<zip destfile="buildTest/jr-resource-jar.jar" basedir="buildTest/tmp"/>
+		<delete dir="buildTest/tmp"/>
+	</target>
+
+	<target name="buildTests" depends="package, packageTestResources">
+		<!-- Ok, so now compile all of the source so that when people put this jar on their eclipse path and
+				stuff, they can link to the bytecode. It's not necessary for the polsh build, but important for if
+				one wants to look at this like it's a real jar file (it's not) -->
+		<javac destdir="buildTest" classpathref="jr.classpath.test">
+			<src path="../../core"/>
+			<src path="../../j2me"/>
+
+			<include name="**/test**/*.java"/>
+			
+			<exclude name="crypto/src/**/test/*.java"/>
+		</javac>
+	</target>
+
+	<!--target name="RunUnitTests" description="Runs all unit tests found in the code" depends="buildTests"-->
+	<target name="RunUnitTests" description="Runs all unit tests found in the code" depends="buildTests">
+		<fileset id="dist.contents.test" dir="buildTest" includes="**/*.class" excludes="**/*$*.class"/>
+
+		<!-- Now, convert that source list into a property which is newline seperated, and contains references
+				that start assuming you're in a zip file and in the src directory already -->
+		<pathconvert pathsep="${line.separator}" property="testclasses" refid="dist.contents.test">
+			<chainedmapper>
+				<!-- Cut all non-local elements from the path -->
+				<regexpmapper from="^(.*)buildTest(.*)$$" to="\2"/>
+				<!-- Now covert from seperators to package seperators -->
+				<filtermapper>
+					<replacestring from="\" to="."/>
+					<replacestring from="/" to="."/>
+				</filtermapper>
+				<!-- Trim leading seperators -->
+				<globmapper from=".*" to="*"/>
+				<!-- snip the .class, we should now be left with fully qualified classnames -->
+				<globmapper from="*.class" to="*"/>
+			</chainedmapper>
+		</pathconvert>
+
+		<typedef name="instanceof" classname="org.javarosa.build.InstanceOfCondition" onerror="report">
+			<classpath>
+				<pathelement location="${dir.tools}/javarosa-ant-libs.jar"/>
+				<path refid="jr.classpath.test" />
+			</classpath>
+		</typedef>
+
+		<for list="${testclasses}" delimiter="${line.separator}" param="name">
+			<sequential>
+				<if>
+					<instanceof classname="@{name}" baseclass="j2meunit.framework.TestCase"/>
+					<then>
+						<RunTestSuite suite="@{name}"/>
+					</then>
+				</if>
+			</sequential>
+		</for>
+		<fail if="testresult.global">Unit Tests Failed!</fail>
+	</target>
+
+	<target name="CreateJavadoc" depends="package" description="generates javadoc and also UML Diagram">
+		<mkdir dir="${dir.javadoc}"/>
+		<javadoc useexternalfile="yes" sourcepath="build\src" packagenames="org.javarosa.*" destdir="${dir.javadoc}"
+	        	classpathref="jr.compiled.classpath" private="true">
+			<doclet name="org.umlgraph.doclet.UmlGraphDoc"
+	        		  path="${dir.tools}/UMLGraph.jar">
+				<param name="-attributes" />
+				<param name="-operations" />
+				<param name="-qualify" />
+				<param name="-types" />
+				<param name="-visibility" />
+			</doclet>
+			<link href="http://java.sun.com/javame/reference/apis/jsr030/"/>
+			<link href="http://java.sun.com/javame/reference/apis/jsr118/"/>
+			<link href="http://www.j2mepolish.org/javadoc/j2me/"/>
+		</javadoc>
+		<apply executable="dot" dest="${dir.documentation}" parallel="false">
+			<arg value="-Tpng"/>
+			<arg value="-o"/>
+			<targetfile/>
+			<srcfile/>
+			<fileset dir="${dir.documentation}" includes="*.dot"/>
+			<mapper type="glob" from="*.dot" to="*.png"/>
+		</apply>
+	</target>
+
+	<target name="BuildRelease" depends="package,CreateJavadoc,RunUnitTests"/>
+
+	<!-- Macro: Runs a test suite, and sets testresult.global to be true on failure -->
+	<macrodef name="RunTestSuite" description="Runs a test suite, and sets testresult.global to be true on failure">
+		<attribute name="suite"/>
+		<!-- Note: The reason that we are using @{suite} as a property is because properties in ANT
+			are immutable, and this is a unique identifier -->
+		<sequential>
+			<java classname="j2meunit.textui.TestRunner" failonerror="false" fork="true" resultproperty="@{suite}">
+				<classpath refid="jr.classpath.test" />
+				<arg value="@{suite}"/>
+			</java>
+			<condition property="testresult.global">
+				<not>
+					<equals arg1="${@{suite}}" arg2="0"/>
+				</not>
+			</condition>
+		</sequential>
+	</macrodef>
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" onerror="report">
+		<classpath>
+			<pathelement location="${dir.tools}/ant-contrib.jar"/>
+		</classpath>
+	</taskdef>
+
+	<target name="clean">
+		<delete dir="dist"/>
+		<delete dir="build"/>
+		<delete dir="buildTest"/>
+		<delete dir="${dir.tmp}"/>
+	</target>
+
+	<target name="fetchPolishClassList">
+		<trycatch reference="exception_ref" >
+			<try>
+				<mkdir dir="${dir.tmp}"/>
+				<unzip src="${polish.jar.build}" dest="${dir.tmp}">
+				    <patternset>
+				        <include name="**/build/j2mepolish.index.txt"/>
+				    </patternset>
+				</unzip>
+				<copy file="${dir.tmp}/build/j2mepolish.index.txt" todir="resources" overwrite="true"/>
+			</try>
+			<catch>
+				<property name="exception" refid="exception_ref" />
+				<property name="message" value="Error trying to extract polish class list:${line.separator}${exception}" />
+				<echo message="${message}" />
+			</catch>
+			<finally>
+				<delete dir="${dir.tmp}"/>
+			</finally>
+		</trycatch>
+	</target>
+	
+	<target name="init-libs">
+		<ant antfile="${dir.root}/core/build.xml" target="extract-libs" inheritAll="true" inheritRefs="false" />
+		
+		<taskdef name="for" classname="net.sf.antcontrib.logic.For" onerror="report" classpath="${dir.tools}/ant-contrib.jar" />
+		<taskdef name="if" classname="net.sf.antcontrib.logic.IfTask" onerror="report" classpath="${dir.tools}/ant-contrib.jar" />
+		<taskdef name="trycatch" classname="net.sf.antcontrib.logic.TryCatchTask" onerror="report" classpath="${dir.tools}/ant-contrib.jar" />
+	</target>
+</project>
