@@ -55,6 +55,7 @@ public class JRDemoGetFormListHTTPState implements State,
 
 	public void fetchList() {
 		SimpleHttpTransportMessage message = new SimpleHttpTransportMessage(getListUrl);
+		message.setOpenRosaApiVersion(null);
 
 		try {
 			thread = TransportService.send(message, 1, 0);// only one try if
