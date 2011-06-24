@@ -35,6 +35,8 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	 * An http url, to which the message will be POSTed
 	 */
 	private String url;
+	
+	private String orApiVersion = "1.0";
 
 	/**
 	 * Http response code
@@ -92,7 +94,7 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 	}
 
 	public HttpRequestProperties getRequestProperties() {
-		return new HttpRequestProperties(this.getConnectionMethod(), this.getContentLength(), "1.0");
+		return new HttpRequestProperties(this.getConnectionMethod(), this.getContentLength(), orApiVersion);
 	}
 	
 	public HttpRequestProperties getResponseProperties() {
@@ -106,6 +108,10 @@ public class SimpleHttpTransportMessage extends BasicTransportMessage {
 
 	public byte[] getContent() {
 		return content;
+	}
+	
+	public void setOpenRosaApiVersion(String orApiVersion) {
+		this.orApiVersion = orApiVersion;
 	}
 	
 	public int getContentLength() {
