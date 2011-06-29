@@ -156,8 +156,9 @@ public class RMSStorageUtilityIndexed extends RMSStorageUtility implements IStor
 			
 		super.remove(id);
 		
-		if (hasMetaData)
+		if (hasMetaData) {
 			removeMetaData(id, (IMetaData)old);
+		}
 	}
 	
 	public Vector getIDsForValue (String fieldName, Object value) {

@@ -50,7 +50,7 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 
 	public static boolean activated = false;
 	
-	private static final int LOG_ROLLOVER_SIZE = 2000;
+	private static final int LOG_ROLLOVER_SIZE = 750;
 	
 	private static final String XMLNS = "http://code.javarosa.org/devicereport";
 	
@@ -342,7 +342,8 @@ public abstract class DeviceReportState implements State, TrivialTransitions, Tr
 			if(!ref.isReadOnly()) {
 				success = true;
 				try {
-					Logger._().serializeLogs(new LogWriter(ref.getOutputStream()));
+					LogWriter writer = new LogWriter(ref.getOutputStream());
+					Logger._().serializeLogs(writer);
 				} catch (IOException ioe) {
 					success = false;
 				}

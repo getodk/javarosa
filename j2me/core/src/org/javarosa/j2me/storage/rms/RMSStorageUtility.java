@@ -376,25 +376,95 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 	 */
 	public void remove (int id) {
 		synchronized (getAccessLock()) {
-			RMSStorageInfo info = getInfoRecord();
-			Hashtable idIndex = getIDIndexRecord();
+			
+			//Start a transaction, if we aren't already inside of one
+			final String transactionKey = "remove";
+			beginDeleteAction(transactionKey);
+			
+			//Get the current transaction state
+			RMSStorageInfo info = (RMSStorageInfo)deleteActionCache[0];
+			Hashtable idIndex = (Hashtable)deleteActionCache[1];
+			
 			if (!idIndex.containsKey(new Integer(id))) {
 				throw new IllegalArgumentException("Record ID [" + id + "] not found");
 			}
-	
-			setDirty();
-						
+			
+			//Perform the actual deletion
 			RMSRecordLoc loc = (RMSRecordLoc)idIndex.get(new Integer(id));
 			txRecord(id, "delete");
 			getDataStore(loc.rmsID).removeRecord(loc.recID);
 			
+			//clean up metadata
 			info.numRecords--;
 			idIndex.remove(new Integer(id));
+			
+			//commit transaction (if we opened it)
+			completeDeleteAction(transactionKey);
+		}
+	}
+	
+	
+	//these two objects contain the meta state of the store during a delete transaction
+	//If they are null, no transaction should be ocurring
+	/** RMSStorageInfo, Hashtable **/
+	private Object[] deleteActionCache;
+	//The object key representing the current transaction
+	private Object transactionKey;
+	
+	//Begins an atomic delete transaction, and captures the current state of the storage
+	//which it will use until that transaction is complete
+	private Object[] beginDeleteAction(Object transactionKey) {
+		synchronized (getAccessLock()) {
+			//check to see if something else owns the transaction handle
+			if(this.transactionKey != null) {
+				if(!this.transactionKey.equals(transactionKey)) {
+					return deleteActionCache;
+				} else {
+					throw new RuntimeException("Improperly structured atomic delete action (multiple transaction openings from same path)");
+				}
+			}
+			
+			
+			RMSStorageInfo info = getInfoRecord();
+			Hashtable idIndex = getIDIndexRecord();
+				
+			deleteActionCache = new Object[] {info, idIndex};
+			this.transactionKey = transactionKey;
+
+			setDirty();
+			return deleteActionCache;
+		}
+	}
+	
+	//Commits the delete action by updating all of the metadata and index information,
+	//and releases the transaction locks
+	private void completeDeleteAction(Object transactionKey) {
+		synchronized (getAccessLock()) {
+			
+			//If there's no data cached, this transaction is completely incorrect. 
+			if(this.transactionKey == null || deleteActionCache == null) {
+				throw new RuntimeException("Improperly structured atomic delete action");
+			}
+			
+			//See if the action in question owns this transaction, if not
+			//we need to bail
+			if(!this.transactionKey.equals(transactionKey)) {
+				return;
+			}
+			
+			RMSStorageInfo info = (RMSStorageInfo)deleteActionCache[0];
+			Hashtable idIndex = (Hashtable)deleteActionCache[1];
+			
 			commitIndex(info, idIndex);
+			
+			deleteActionCache = null;
+			transactionKey = null;
+			
 			setClean();
 			storageModified();
 		}
 	}
+
 	
 	/**
 	 * Remove object from the store
@@ -436,11 +506,19 @@ public class RMSStorageUtility implements IStorageUtility, XmlStatusProvider {
 					IDs.addElement(new Integer(id));
 				}
 			}
-						
+			final String transactionKey = "removeAll";
+
+			//Begin an atomic delete action, and capture/cache state variables
+			beginDeleteAction(transactionKey);
+			
+			//Delete the records
 			for (int i = 0; i < IDs.size(); i++) {
 				int id = ((Integer)IDs.elementAt(i)).intValue();
 				remove(id);
 			}
+			
+			//Complete the action, and commit the cached variables.
+			completeDeleteAction(transactionKey);
 			
 			return IDs;
 		}

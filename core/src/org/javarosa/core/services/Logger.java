@@ -79,6 +79,7 @@ public class Logger {
 	}
 	
 	public static void exception (String info, Exception e) {
+		e.printStackTrace();
 		log("exception", (info != null ? info + ": " : "") + WrappedException.printException(e));
 	}
 	

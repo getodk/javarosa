@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import org.javarosa.core.services.storage.IStorageIterator;
 import org.javarosa.core.services.storage.StorageModifiedException;
+import org.javarosa.core.util.SortedIntSet;
 import org.javarosa.core.util.externalizable.Externalizable;
 
 public class RMSStorageIterator implements IStorageIterator {
@@ -17,13 +18,14 @@ public class RMSStorageIterator implements IStorageIterator {
 	
 	public RMSStorageIterator (RMSStorageUtility store, Hashtable index) {
 		
-		Vector IDs = new Vector();
+		SortedIntSet IDs = new SortedIntSet();
+
 		for (Enumeration e = index.keys(); e.hasMoreElements(); ) {
-			IDs.addElement(e.nextElement());
+			IDs.add(((Integer)e.nextElement()).intValue());
 		}
 		this.index = index;
 		this.store = store;
-		this.IDs = IDs;
+		this.IDs = IDs.getVector();
 		pos = 0;
 		valid = true;
 	}

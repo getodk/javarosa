@@ -133,11 +133,9 @@ public class J2MELogger implements ILogger {
 		synchronized(logStorage) {
 			if(!checkStorage()) { return null; }
 			
-			Vector<Integer> vIDs = getLogIDsInOrder();
-			
 			Vector logs = new Vector();
-			for (int i = vIDs.size() - 1; i >= 0; i--) {
-				logs.addElement(logStorage.read(vIDs.elementAt(i).intValue()));
+			for(IStorageIterator li = logStorage.iterate(); li.hasMore() ; ) {
+				logs.addElement((LogEntry)li.nextRecord());
 			}
 		
 			LogEntry[] collection = new LogEntry[logs.size()];
@@ -169,15 +167,6 @@ public class J2MELogger implements ILogger {
 			throw new WrappedException(rse);
 		}
 	}
-
-	private Vector<Integer> getLogIDsInOrder () {
-		SortedIntSet IDs = new SortedIntSet();
-		IStorageIterator li = logStorage.iterate();
-		while (li.hasMore()) {
-			IDs.add(li.nextID());
-		}
-		return IDs.getVector();
-	}
 	
 	public void serializeLogs(StreamLogSerializer serializer) throws IOException {
 		serializeLogs(serializer, 1 << 20);
@@ -186,18 +175,20 @@ public class J2MELogger implements ILogger {
 	public void serializeLogs(StreamLogSerializer serializer, int limit) throws IOException {
 		if(storageBroken) { return; };
 		
-		Vector<Integer> vIDs;
+		int count = 0;
+		
+		IStorageIterator li;
+		
+		//This should capture its own internal state when it starts to iterate.
 		synchronized(logStorage) {
-			if(!checkStorage()) { return; }
-			vIDs = getLogIDsInOrder();
+			li = logStorage.iterate();
 		}
-			
-		int start = vIDs.size() - 1;
-		int end = -1;
-		if (limit >= 0) {
-			end = Math.max(start - limit, end);
-		} else {
-			start = Math.min(-limit - 1, start);
+		
+		while(li.hasMore() && count < limit) {
+			int id = li.peekID();
+			LogEntry log = (LogEntry)li.nextRecord();
+			serializer.serializeLog(id, log);
+			count++;
 		}
 		
 		serializer.setPurger(new StreamLogSerializer.Purger () {
@@ -205,16 +196,6 @@ public class J2MELogger implements ILogger {
 				clearLogs(IDs);
 			}
 		});
-		
-		//this is technically not safe to have outside the synchronized block, but sending the logs
-		//via streaming may potentially take a very long time, and we don't want all other logging
-		//calls in the app to block in the meantime. extra log entries being added shouldn't
-		//interfere... just don't clear the logs!
-		for (int i = start; i > end; i--) {
-			int id = vIDs.elementAt(i).intValue();
-			serializer.serializeLog(id, (LogEntry)logStorage.read(id));
-		}
-
 	}
 
 	public int logSize() {
